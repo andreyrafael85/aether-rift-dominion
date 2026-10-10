@@ -164,8 +164,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 #end-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.4rem}
 .stat{display:grid;border:1px solid var(--line);border-radius:6px;padding:.4rem .6rem;font-size:12px}.stat span{color:var(--fg2)}
 .loadbar{height:6px;background:#262A31;border-radius:3px;overflow:hidden;margin-top:.5rem}.loadbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--rift1),var(--rift2));transition:width .15s}
-#start{position:relative}
-#bgfx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#bgfx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
 .start-wrap{position:relative;z-index:1}
 .choose{font-family:var(--fd);font-weight:700;font-size:1.2rem;text-transform:uppercase;letter-spacing:.05em;color:var(--fg2);margin-bottom:-.5rem}
 .fac-card{border-left:3px solid var(--rc,var(--line))}
@@ -197,7 +196,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         <div class="opt"><label for="opt-seed">Semente do mapa</label><input id="opt-seed" inputmode="numeric"></div>
         <div class="opt"><label for="opt-gfx">Gráficos</label><select id="opt-gfx"><option value="3d">3D (Three.js, luz e relevo)</option><option value="2d">2D isométrico (leve, para celulares fracos)</option></select></div>
         <div class="opt"><label for="opt-quality">Qualidade 3D</label><select id="opt-quality"><option value="auto">Automática</option><option value="baixa">Baixa (sem sombras e efeitos)</option><option value="media">Média (sombras e bloom)</option><option value="alta">Alta (sombras 4K e bloom)</option><option value="ultra">Ultra (Alta + oclusão ambiente, experimental)</option></select></div>
-        <div class="opt"><label for="opt-clima">Clima do campo (visual)</label><select id="opt-clima"><option value="auto">Automático (pelo bioma)</option><option value="toxica">Névoa tóxica</option><option value="plasma">Tempestade de plasma</option><option value="cristais">Chuva de cristais</option><option value="aurora">Aurora da Fenda</option><option value="acida">Chuva ácida</option></select></div>
+        <div class="opt"><label for="opt-clima">Clima do campo (efeito dentro da partida)</label><select id="opt-clima"><option value="auto">Automático (pelo bioma)</option><option value="toxica">Névoa tóxica</option><option value="plasma">Tempestade de plasma</option><option value="cristais">Chuva de cristais</option><option value="aurora">Aurora da Fenda</option><option value="acida">Chuva ácida</option></select></div>
         <div class="row"><button id="btn-start" class="btn primary">Iniciar partida</button><button id="btn-help-start" class="btn">Como jogar</button></div>
         <div class="mp">
           <div class="opt"><label for="opt-room">Multiplayer P2P (beta): sala só com os jogadores humanos, sem IAs</label><select id="opt-room"><option value="2">2 jogadores na sala</option><option value="3">3 jogadores na sala</option><option value="4">4 jogadores na sala</option></select></div>

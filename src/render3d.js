@@ -152,9 +152,9 @@ function create(canvas, overlay, mini) {
   const matGhost = new THREE.MeshStandardMaterial({ vertexColors: true, transparent: true, opacity: 0.55, roughness: 0.9 });
   // 4.0a — materiais por Raça: parâmetros PBR distintos + brilho de borda (rim) barato injetado no shader padrão.
   const RACE_MAT = {
-    vehnar: { roughness: 0.58, metalness: 0.4, rim: [1.0, 0.5, 0.2], pow: 3.5, amt: 0.12 },
-    erevane: { roughness: 0.38, metalness: 0.22, rim: [0.2, 1.0, 0.82], pow: 2.2, amt: 0.3 },
-    tessara: { roughness: 0.85, metalness: 0.02, rim: [0.45, 1.0, 0.55], pow: 1.8, amt: 0.26 },
+    vehnar: { roughness: 0.55, metalness: 0.45, rim: [1.0, 0.5, 0.2], pow: 3.2, amt: 0.2 },
+    erevane: { roughness: 0.36, metalness: 0.22, rim: [0.2, 1.0, 0.82], pow: 2.1, amt: 0.48 },
+    tessara: { roughness: 0.85, metalness: 0.02, rim: [0.45, 1.0, 0.55], pow: 1.7, amt: 0.4 },
   };
   const raceMats = new Map();
   function matFor(pid) {
@@ -229,11 +229,11 @@ function create(canvas, overlay, mini) {
   function snow(x, y, col, vz, vx, life) { const i = P.i++ % PN; P.x[i] = x; P.y[i] = y; P.z[i] = 90 + Math.random() * 40; P.vx[i] = vx == null ? 25 : vx; P.vy[i] = 8; P.vz[i] = vz == null ? -45 : vz; P.t[i] = 0; P.life[i] = life || 3.2; P.kind[i] = 1; const c = col || [0.9, 0.93, 1]; pCol[i * 3] = c[0]; pCol[i * 3 + 1] = c[1]; pCol[i * 3 + 2] = c[2]; }
   // 4.0a — presets de clima local (só visual; a simulação não muda): tinge céu/névoa, luz ambiente e solta partículas.
   const CLIMATES = {
-    toxica: { tint: [0.45, 0.55, 0.33], mix: 0.5, fogNear: 700, fogFar: 2100, hemi: 0x9fc08a, drop: [0.55, 0.75, 0.3], vz: -16, vx: 6, rate: 0.5, burst: 2, life: 4 },
-    plasma: { tint: [0.55, 0.38, 0.3], mix: 0.45, fogNear: 1000, fogFar: 2500, hemi: 0xd6a88a, drop: [1, 0.55, 0.25], vz: 24, vx: 16, rate: 0.6, burst: 2, life: 3 },
-    cristais: { tint: [0.6, 0.7, 0.85], mix: 0.35, fogNear: 1400, fogFar: 3200, hemi: 0xaac4e6, drop: [0.7, 0.9, 1], vz: -60, vx: 10, rate: 0.8, burst: 3, life: 3 },
-    aurora: { tint: [0.35, 0.55, 0.5], mix: 0.3, fogNear: 1600, fogFar: 3600, hemi: 0x8ae6c0, aurora: [0.3, 0.8, 0.6] },
-    acida: { tint: [0.5, 0.58, 0.38], mix: 0.45, fogNear: 900, fogFar: 2400, hemi: 0xb4c88a, drop: [0.65, 0.85, 0.35], vz: -130, vx: 4, rate: 1, burst: 3, life: 1.6 },
+    toxica: { tint: [0.4, 0.54, 0.26], mix: 0.72, fogNear: 320, fogFar: 1450, hemi: 0x8fb86a, sun: 0xc8e696, drop: [0.5, 0.8, 0.25], vz: -14, vx: 9, rate: 0.9, burst: 3, life: 5 },
+    plasma: { tint: [0.6, 0.31, 0.2], mix: 0.68, fogNear: 550, fogFar: 1850, hemi: 0xe6a070, sun: 0xffa964, drop: [1, 0.5, 0.2], vz: 32, vx: 24, rate: 1, burst: 3, life: 2.6 },
+    cristais: { tint: [0.52, 0.66, 0.92], mix: 0.58, fogNear: 850, fogFar: 2500, hemi: 0x9fc0ff, sun: 0xcfe0ff, drop: [0.62, 0.9, 1], vz: -75, vx: 15, rate: 1, burst: 5, life: 2.6, sparkle: true },
+    aurora: { tint: [0.28, 0.54, 0.46], mix: 0.5, fogNear: 1300, fogFar: 3300, hemi: 0x7fe6c0, sun: 0x9effd4, aurora: [0.22, 0.85, 0.58] },
+    acida: { tint: [0.44, 0.56, 0.28], mix: 0.62, fogNear: 480, fogFar: 1650, hemi: 0xa8c878, sun: 0xd4e68a, drop: [0.6, 0.9, 0.3], vz: -175, vx: 6, rate: 1, burst: 5, life: 1.2 },
   };
   const _cc = new THREE.Color();
   R.setClimate = function (name) { const c = CLIMATES[name] || null; R.climateCfg = c; scene.fog.near = c ? c.fogNear : 1500; scene.fog.far = c ? c.fogFar : 3200; hemi.color.set(c ? c.hemi : 0x9fb8d6); };
@@ -290,9 +290,11 @@ function create(canvas, overlay, mini) {
     const bg = new THREE.Color().setRGB(0.62 * (1 - nt) + 0.02 * nt, 0.69 * (1 - nt) + 0.03 * nt, 0.77 * (1 - nt) + 0.06 * nt);
     const cl = R.climateCfg;
     if (cl) {
-      bg.lerp(_cc.setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), cl.mix * (1 - nt * 0.5));
-      if (cl.aurora) { const ka = (Math.sin(R.time * 0.25) + 1) / 2; bg.lerp(_cc.setRGB(cl.aurora[0], cl.aurora[1], cl.aurora[2]), 0.1 + 0.12 * ka); }
+      bg.lerp(_cc.setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), cl.mix * (1 - nt * 0.45));
+      if (cl.sun) sun.color.lerp(_cc.set(cl.sun), 0.5);
+      if (cl.aurora) { const ka = (Math.sin(R.time * 0.3) + 1) / 2; bg.lerp(_cc.setRGB(cl.aurora[0], cl.aurora[1], cl.aurora[2]), 0.14 + 0.2 * ka); hemi.intensity += 0.15 * ka; }
       if (cl.drop && Math.random() < cl.rate * R.quality.particles) for (let i = 0; i < cl.burst; i++) { const zf = Math.max(0.6, cam.zoom); snow(cam.x + (Math.random() - .5) * 1500 / zf, cam.y + (Math.random() - .5) * 1100 / zf, cl.drop, cl.vz, cl.vx, cl.life); }
+      if (cl.sparkle && Math.random() < 0.35 * R.quality.particles) { const zf = Math.max(0.6, cam.zoom); spark(cam.x + (Math.random() - .5) * 1300 / zf, cam.y + (Math.random() - .5) * 950 / zf, 2, [0.75, 0.95, 1], 18, false); }
     }
     scene.background = bg; scene.fog.color.copy(bg);
     // névoa de guerra e território → texturas do terreno
