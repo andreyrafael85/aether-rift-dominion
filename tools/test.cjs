@@ -28,7 +28,7 @@ function run(seed, players, minutes, log) {
 }
 // 1) AI vs AI, 4 players, 12 minutes
 const t0 = Date.now();
-const r1 = run(42, [{ name: 'Humano(IA)', faction: 'vehnar', human: false, difficulty: 'normal' }, { name: 'IA Erevane', faction: 'erevane', difficulty: 'normal' }, { name: 'IA Vehnar', faction: 'vehnar', difficulty: 'dificil' }, { name: 'IA Erevane 2', faction: 'erevane', difficulty: 'facil' }], 12, true);
+const r1 = run(42, [{ name: 'Humano(IA)', faction: 'vehnar', human: false, difficulty: 'normal' }, { name: 'IA Erevane', faction: 'erevane', difficulty: 'normal' }, { name: 'IA Tessara', faction: 'tessara', difficulty: 'dificil' }, { name: 'IA Erevane 2', faction: 'erevane', difficulty: 'facil' }], 12, true);
 console.log('elapsed ms', Date.now() - t0);
 // 2) determinism
 const a = run(7, [{ faction: 'erevane', difficulty: 'normal' }, { faction: 'vehnar', difficulty: 'dificil' }], 6, false).hash;

@@ -103,7 +103,7 @@ ARD.vox = { Model, renderSprite, drawShadow, hex, rgb };
 'use strict';
 const M = () => new ARD.vox.Model();
 const dark = '#2A2D33', steel = '#7A8290', steel2 = '#5E6671', glass = '#8FD8FF', rust = '#8A5A3A', orange = '#FF8C1A', magenta = '#D64CFF', plasma = '#FF6A3D', green = '#7FE3A1', yellow = '#F2C230', lamp = '#FFE08A';
-const pal = (col, style) => style === 'erevane' ? { body: '#3B4049', acc: col, trim: yellow, light: magenta } : { body: col, acc: steel2, trim: steel, light: lamp };
+const pal = (col, style) => style === 'erevane' ? { body: '#3B4049', acc: col, trim: yellow, light: magenta } : style === 'tessara' ? { body: '#DDD4C2', acc: col, trim: '#9A6B3F', light: green } : { body: col, acc: steel2, trim: steel, light: lamp };
 
 // ---------- unidades ----------
 function tank(col, style) {
@@ -169,6 +169,60 @@ function tug(col, style) { // Rebocador (Vehnar): caminhão pesado com guincho
   m.box(0, 1, 2, 15, 8, 3, p.body); m.box(10, 1, 5, 5, 8, 5, p.body); m.box(14, 2, 7, 1, 6, 2, glass, null, true);
   m.box(2, 3, 5, 6, 4, 2, steel2); m.box(0, 4, 5, 2, 2, 5, steel); m.box(-1, 4, 9, 4, 2, 1, dark); m.box(-2, 4, 8, 1, 2, 1, magenta, null, true);
   m.box(15, 3, 5, 1, 1, 1, lamp, null, true); m.box(15, 6, 5, 1, 1, 1, lamp, null, true);
+  return m;
+}
+// ---------- elenco ampliado (3.0c) ----------
+function flamer(col, style) { // Soldador: infantaria com tanque nas costas e bico de chama
+  const p = pal(col, style); const m = infantry(col, style);
+  m.box(-1, 0, 3, 1, 3, 4, rust); m.box(-1, 1, 7, 1, 1, 1, '#FF7A30', null, true); m.box(3, 1, 4, 4, 1, 1, dark); m.box(7, 1, 4, 1, 1, 1, '#FF9A3C', null, true);
+  return m;
+}
+function sniper(col, style) { // Atirador: fuzil longo e luneta
+  const m = infantry(col, style);
+  m.box(3, 1, 4, 8, 1, 1, steel2); m.box(5, 1, 5, 2, 1, 1, dark); m.box(6, 1, 5, 1, 1, 1, glass, null, true);
+  return m;
+}
+function buggy(col, style) { // Tratorzão: bugue leve com gaiola e metralhadora
+  const p = pal(col, style); const m = M();
+  for (const x of [1, 8]) for (const y of [0, 7]) m.cyl(x + 1.5, y + 1.5, 0, 1.6, 3, dark);
+  m.box(1, 1, 2, 10, 7, 2, p.body); m.box(7, 2, 4, 3, 5, 2, p.acc); m.box(10, 3, 4, 1, 3, 1, glass, null, true);
+  for (const [x, y] of [[2, 1], [2, 7], [6, 1], [6, 7]]) m.box(x, y, 4, 1, 1, 3, steel2); m.box(2, 1, 7, 5, 7, 1, steel2, (x, y) => x === 0 || x === 4 || y === 0 || y === 6);
+  m.box(3, 3, 5, 2, 2, 2, dark); m.box(5, 3, 6, 4, 2, 1, steel2); m.box(11, 3, 3, 1, 1, 1, lamp, null, true); m.box(11, 5, 3, 1, 1, 1, lamp, null, true);
+  return m;
+}
+function blade(col, style) { // Lâmina Rodante: cunha baixa com lâminas brilhantes
+  const p = pal(col, style); const m = M();
+  m.box(0, 1, 0, 12, 6, 1, dark); m.box(1, 0, 1, 10, 8, 2, p.body, (x, y, z) => !(x > 7 && (y === 0 || y === 7)));
+  m.box(11, 1, 1, 3, 6, 1, steel, (x, y) => x === 2 ? y > 1 && y < 4 : true); m.box(11, 1, 2, 3, 6, 1, '#CFE6FF', (x, y) => x === 0 && (y === 0 || y === 5), true);
+  m.box(4, 2, 3, 4, 4, 1, p.acc); m.box(7, 3, 3, 1, 2, 1, glass, null, true); m.box(0, 3, 2, 1, 2, 1, magenta, null, true);
+  if (style === 'erevane') m.box(2, 1, 3, 7, 1, 1, yellow);
+  return m;
+}
+function gnat(col, style) { // Mosquito: microdrone com asas
+  const p = pal(col, style); const m = M();
+  m.box(1, 1, 1, 3, 2, 2, p.body); m.box(4, 1, 1, 1, 2, 1, dark); m.box(0, 0, 2, 5, 1, 1, steel2, (x) => x !== 2); m.box(0, 3, 2, 5, 1, 1, steel2, (x) => x !== 2);
+  m.box(2, 1, 0, 1, 2, 1, p.light, null, true);
+  return m;
+}
+function anchor(col, style) { // Âncora: tripé com esfera e anel de estática
+  const p = pal(col, style); const m = M();
+  for (const [x, y] of [[0, 0], [6, 0], [3, 6]]) m.box(x, y, 0, 2, 2, 5, dark);
+  m.box(2, 2, 4, 4, 4, 2, p.acc); m.sphere(4, 4, 8, 2.5, steel); m.box(3, 3, 11, 2, 2, 3, p.body); m.box(3, 3, 14, 2, 2, 1, magenta, null, true);
+  for (const [x, y] of [[0, 3], [7, 3], [3, 0], [3, 7]]) m.box(x, y, 7, 1, 1, 1, magenta, null, true);
+  return m;
+}
+function crane(col, style) { // Guindaste Armado: caminhão com lança e gancho
+  const p = pal(col, style); const m = M();
+  for (const x of [1, 6, 11]) for (const y of [0, 8]) m.cyl(x + 1.5, y + 1.5, 0, 1.7, 3, dark);
+  m.box(0, 1, 2, 15, 8, 3, p.body); m.box(11, 1, 5, 4, 8, 5, p.body); m.box(15, 2, 7, 1, 6, 2, glass, null, true);
+  m.box(2, 3, 5, 5, 4, 3, p.acc); m.box(3, 4, 8, 2, 2, 10, steel); m.box(3, 4, 17, 9, 2, 2, steel2); m.box(11, 4, 15, 1, 2, 2, dark); m.box(11, 4, 14, 1, 2, 1, yellow, null, true);
+  m.box(15, 3, 5, 1, 1, 1, lamp, null, true); m.box(15, 6, 5, 1, 1, 1, lamp, null, true); m.box(1, 2, 5, 1, 6, 1, '#FF4040', null, true);
+  return m;
+}
+function colossus(col, style) { // Colosso Cambiante: mech grande com placas orgânicas
+  const m = mech(col, style); const p = pal(col, style);
+  m.box(0, 0, 8, 2, 12, 7, p.acc, (x, y, z) => (y + z) % 2 === 0); m.box(11, 0, 8, 2, 12, 7, p.acc, (x, y, z) => (y + z) % 2 === 0);
+  m.box(4, 4, 19, 6, 6, 2, p.body); m.box(6, 6, 21, 2, 2, 2, green, null, true);
   return m;
 }
 // ---------- partes giratórias (casco + torreta) ----------
@@ -343,10 +397,11 @@ const BY_DEF = {
   muro: (c, s) => wall(c, s, false), portao: (c, s) => wall(c, s, true),
   coletor: harvester, infantaria: infantry, veiculo: tank, drone: drone, suporte: support, pirata: raider, pirata_vehnar: tug,
   veiculo_hull: tankHull, veiculo_turret: tankTurret, torre_base: towerBase, torre_turret: towerTurret, bastiao_base: bastionBase, bastiao_turret: bastionTurret,
+  soldador: flamer, guindaste: crane, tratorzao: buggy, prensa: mech, atirador: sniper, lamina: blade, mosquito: gnat, ancora: anchor, quimera: infantry, esporo: drone, molde: support, colosso: colossus,
 };
 // defs que se desenham em duas partes: casco na direção do corpo e torreta na direção da mira; z = altura da torreta em voxels
 const PARTS = { veiculo: { hull: 'veiculo_hull', turret: 'veiculo_turret', z: 6 }, torre: { hull: 'torre_base', turret: 'torre_turret', z: 12 }, bastiao: { hull: 'bastiao_base', turret: 'bastiao_turret', z: 14 } };
-ARD.models = { PARTS, tankHull, tankTurret, towerBase, towerTurret, bastionBase, bastionTurret, tank, mech, harvester, infantry, drone, support, raider, tug, refinery, reactor, barracks, factory, hangar, tower, bastion, nodule, lab, wall, nucleus, crystals, ore, datashards, rocks, ruin, crate, wreck, BY_DEF };
+ARD.models = { PARTS, flamer, sniper, buggy, blade, gnat, anchor, crane, colossus, tankHull, tankTurret, towerBase, towerTurret, bastionBase, bastionTurret, tank, mech, harvester, infantry, drone, support, raider, tug, refinery, reactor, barracks, factory, hangar, tower, bastion, nodule, lab, wall, nucleus, crystals, ore, datashards, rocks, ruin, crate, wreck, BY_DEF };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Cena de teste de estilo: base cercada por muros numa planície de gelo, raid em andamento. */

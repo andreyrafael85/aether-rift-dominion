@@ -7,6 +7,7 @@ const S = ARD.sim;
 const BUILD_ORDERS = {
   vehnar:  ['reator', 'refinaria', 'quartel', 'nodulo', 'reator', 'fabrica', 'torre', 'reator', 'hangar', 'laboratorio', 'torre', 'nodulo', 'fabrica', 'reator', 'torre'],
   erevane: ['reator', 'quartel', 'refinaria', 'nodulo', 'reator', 'hangar', 'nodulo', 'torre', 'laboratorio', 'fabrica', 'reator', 'torre', 'quartel', 'reator'],
+  tessara: ['reator', 'refinaria', 'quartel', 'nodulo', 'hangar', 'reator', 'laboratorio', 'torre', 'fabrica', 'nodulo', 'reator', 'torre', 'quartel'],
 };
 const STRATS = {
   expansao:  { name: 'Expansão',            prod: { infantaria: 0.35, veiculo: 0.25, drone: 0.3, suporte: 0.1 }, col: 3, nodulos: 1, towers: 0, attackMul: 1.25, pirate: 1.0 },
@@ -15,7 +16,8 @@ const STRATS = {
   roubo:     { name: 'Roubo',                prod: { infantaria: 0.4, veiculo: 0.15, drone: 0.4, suporte: 0.05 }, col: 1, nodulos: 0, towers: 0, attackMul: 1.35, pirate: 2.5 },
   fortaleza: { name: 'Fortaleza',            prod: { infantaria: 0.35, veiculo: 0.35, drone: 0.2, suporte: 0.1 }, col: 0, nodulos: 0, towers: 2, attackMul: 1.6, pirate: 0.5, walls: true },
 };
-const PREF = { vehnar: ['blindados', 'fortaleza', 'expansao', 'massa'], erevane: ['roubo', 'expansao', 'massa', 'blindados'] };
+const PREF = { vehnar: ['blindados', 'fortaleza', 'expansao', 'massa'], erevane: ['roubo', 'expansao', 'massa', 'blindados'], tessara: ['expansao', 'blindados', 'massa', 'roubo'] };
+const CLASS_W = { infantaria: 'infantaria', soldador: 'infantaria', atirador: 'infantaria', quimera: 'infantaria', veiculo: 'veiculo', prensa: 'veiculo', tratorzao: 'veiculo', lamina: 'veiculo', colosso: 'veiculo', drone: 'drone', mosquito: 'drone', esporo: 'drone', suporte: 'suporte', ancora: 'suporte', molde: 'suporte', guindaste: 'suporte' };
 const VALUE = { refinaria: 3, nodulo: 2.5, reator: 2, laboratorio: 2, quartel: 1.5, fabrica: 1.5, hangar: 1.5, torre: 1, bastiao: 0.8, nucleo: 1.2, muro: 0.1, portao: 0.2 };
 
 function create(pid, difficulty) {
@@ -145,8 +147,9 @@ function think(sim, mem) {
   w.veiculo += 0.5 * (seen.inf + seen.est) / total; w.drone += 0.5 * (seen.vei + seen.sup) / total; w.infantaria += 0.5 * (seen.dro + seen.sup) / total; w.suporte += 0.3 * (seen.vei + seen.est) / total;
   const reserveArmy = t < 240 ? D.reserve : 40;
   for (const b of prodBuildings) {
-    if (b.queue.length >= 2) continue; const opts = S.BUILDINGS[b.def].produces.filter(u => u !== 'pirata' && u !== 'coletor');
-    let pick = null, best = -1; for (const u of opts) { const sc = (w[u] || 0.1) * (0.7 + sim.rand() * 0.6); if (sc > best) { best = sc; pick = u; } }
+    if (b.queue.length >= 2) continue; const opts = S.producesFor(b.def, p.faction).filter(u => u !== 'pirata' && u !== 'coletor');
+    let pick = null, best = -1;
+    for (const u of opts) { const ud = S.UNITS[u]; const cls = CLASS_W[u] || 'infantaria'; let sc = (w[cls] || 0.1) * (0.7 + sim.rand() * 0.6); if (!ud.attack) sc *= 0.35; if (ud.cost.dados && p.res.dados < (ud.cost.dados + 40)) sc = 0; if (S.unitCost(u) > 300 && t < 420) sc *= 0.3; if (sc > best) { best = sc; pick = u; } }
     if (pick === 'suporte' && p.res.dados < 60) pick = 'infantaria';
     if (pick) { const c = Object.assign({}, S.UNITS[pick].cost); c.minerio = (c.minerio || 0) + reserveArmy; if (S.canAfford(p, c)) emitC({ t: 'produce', id: b.id, def: pick }); }
   }

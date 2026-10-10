@@ -137,6 +137,10 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 #hints .hint{color:var(--fg2)} #hints .hint.now{color:var(--fg)} #hints .hint.now::before{content:"→ ";color:var(--rift1)}
 #hints-close{position:absolute;top:2px;right:6px;color:var(--fg2)}
 #log{position:absolute;right:.75rem;bottom:calc(.75rem + env(safe-area-inset-bottom,0));width:184px;max-height:120px;overflow:hidden;font-family:var(--fm);font-size:10.5px;color:var(--fg2);display:grid;gap:1px;mask-image:linear-gradient(#000 60%,transparent)}
+.banner{position:absolute;left:50%;top:28%;transform:translateX(-50%);text-align:center;pointer-events:none;padding:.6rem 1.4rem;border-radius:8px;background:rgba(13,15,19,.85);border:1px solid var(--line);backdrop-filter:blur(6px)}
+.banner #banner-title{font-family:var(--fd);font-weight:800;font-size:clamp(1.8rem,4vw,3rem);text-transform:uppercase;letter-spacing:.03em;line-height:1}
+.banner.good #banner-title{color:var(--good)} .banner.danger #banner-title{color:var(--bad)} .banner.warn #banner-title{color:var(--warn)}
+.banner #banner-sub{font-size:13px;color:var(--fg2);margin-top:.25rem}
 #notice{position:absolute;left:50%;bottom:calc(50vh - 120px);transform:translateX(-50%);background:rgba(20,23,29,.95);border:1px solid var(--line);padding:.45rem .9rem;border-radius:6px;opacity:0;transition:opacity .2s;font-size:13px;pointer-events:none}
 #notice.show{opacity:1}
 #proposal{position:absolute;left:50%;transform:translateX(-50%);top:calc(6rem + env(safe-area-inset-top,0));background:var(--panel);border:1px solid var(--warn);border-radius:8px;padding:.75rem 1rem;display:grid;gap:.5rem;max-width:min(420px,calc(100vw - 2rem))}
@@ -164,7 +168,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 
 <div id="start" class="screen">
   <div class="start-wrap">
-    <div class="eyebrow">Beta 3.0b · protótipo jogável no navegador · 3D com efeitos · multiplayer P2P</div>
+    <div class="eyebrow">Beta 3.0c · três facções · elenco ampliado · 3D · multiplayer P2P</div>
     <h1>Aether Rift<br><span>Dominion</span></h1>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -184,7 +188,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         </div>
       </div>
     </div>
-    <p class="start-notes"><b>Novo no 3.0b:</b> bloom nos emissivos, oclusão ambiente no preset Alta, névoa volumétrica na Fenda e na Tempestade, lagos de plasma animados, presets de qualidade, e <b>multiplayer P2P</b>: crie uma sala, mande o código para um amigo e joguem na mesma partida (com as IAs escolhidas). <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
+    <p class="start-notes"><b>Novo no 3.0c:</b> a facção Tessara (Traços de combate, Fotossíntese, Salto Evolutivo) e oito unidades novas: Soldador, Guindaste Armado, Tratorzão e Prensa para Vehnar; Atirador de Fenda, Lâmina Rodante, Mosquito e Âncora para Erevane; Quimera, Esporo-sentinela, Molde e Colosso para Tessara. Banner de eliminação e contador de inimigos. <b>No 3.0b:</b> bloom nos emissivos, oclusão ambiente no preset Alta, névoa volumétrica na Fenda e na Tempestade, lagos de plasma animados, presets de qualidade, e <b>multiplayer P2P</b>: crie uma sala, mande o código para um amigo e joguem na mesma partida (com as IAs escolhidas). <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
   </div>
 </div>
 
@@ -197,6 +201,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
       <div id="energy" class="energy pleno"><div class="row"><span>⚡ <span id="e-text">0 / 0</span></span><span id="e-regime">Pleno</span></div><div class="bar"><i id="e-bar"></i></div></div>
       <span id="clock">00:00</span>
       <span class="muted">Rep.: <span id="rep">Neutro</span></span>
+      <span class="muted">Inimigos: <b id="enemies">0</b></span>
       <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-sound" class="tb" title="Som">♪</button><button id="btn-voice" class="tb" title="Voz do sistema">🗣</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
     </div>
     <div id="hints"><button id="hints-close" aria-label="Fechar dicas">✕</button><div id="hints-body"></div></div>
@@ -215,6 +220,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     </div>
     <div id="chat" hidden><div id="chat-log"></div><input id="chat-in" placeholder="Mensagem (Enter)" maxlength="120"></div>
     <div id="mp-wait" hidden>Aguardando o outro jogador…</div>
+    <div id="banner" class="banner" hidden><div id="banner-title"></div><div id="banner-sub"></div></div>
     <div id="notice"></div>
     <div id="proposal" hidden><div id="proposal-text"></div><div class="row"><button id="prop-yes" class="act sm good">Aceitar pacto</button><button id="prop-no" class="act sm">Recusar</button></div></div>
   </div>
@@ -222,7 +228,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <div id="loading" class="modal" hidden><div class="box" style="max-width:360px"><div class="eyebrow">Preparando o campo</div><h2>Gerando sprites</h2><p class="muted small">Modelos voxel renderizados em 8 direções com iluminação, só nesta primeira vez.</p><div class="loadbar"><i id="load-bar"></i></div></div></div>
   <div id="diplo" class="modal" hidden><div class="box"><h2>Diplomacia</h2><div id="diplo-body"></div><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
   <div id="confirm" class="modal" hidden><div class="box"><h2>Confirmar</h2><p id="confirm-text"></p><div class="row"><button id="confirm-yes" class="btn primary">Confirmar</button><button id="confirm-no" class="btn">Cancelar</button></div></div></div>
-  <div id="end" class="modal" hidden><div class="box"><div class="eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-again" class="btn primary">Jogar de novo</button></div></div></div>
+  <div id="end" class="modal" hidden><div class="box"><div class="eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-again" class="btn primary">Jogar de novo</button><button id="btn-copy" class="btn">Copiar resultado (JSON)</button><a class="btn" href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Enviar feedback</a></div><textarea id="end-json" hidden rows="6" style="width:100%;font-family:var(--fm);font-size:11px;background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px"></textarea></div></div>
 </div>
 
 <div id="help" class="modal help" hidden><div class="box">
@@ -233,7 +239,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <tr><td>Botão direito</td><td>Mover. Em inimigo: atacar. Em nó com coletores: colher. Em Refinaria ou Reator inimigo com Pirata: Sifonar. Em Caixa: recolher. Com estrutura selecionada: ponto de reunião.</td></tr>
   <tr><td>A / S</td><td>Atacar-mover (clique no destino) / Parar</td></tr>
   <tr><td>B + letra</td><td>Construir: R Reator, F Refinaria, Q Quartel, V Fábrica, H Hangar, T Torre, N Nódulo, L Laboratório. Shift mantém o modo.</td></tr>
-  <tr><td>Letras com estrutura selecionada</td><td>Produzir: C Coletor, I Infantaria, S Suporte, P Pirata, V Veículo, D Drone</td></tr>
+  <tr><td>Letras com estrutura selecionada</td><td>Produzir: a tecla aparece em cada botão (C Coletor, I Infantaria, S Suporte, P Pirata, V Veículo, D Drone; e as unidades da sua facção, como O Soldador, U Guindaste, A Atirador, M Mosquito, N Âncora, L Lâmina, R Prensa, E Esporo, C Colosso na Fábrica)</td></tr>
   <tr><td>Ctrl+1–9 / 1–9</td><td>Definir / selecionar grupo (duas vezes centraliza)</td></tr>
   <tr><td>F1 / F2 / F / Espaço</td><td>Núcleo / exército / centralizar seleção / ir ao último alerta</td></tr>
   <tr><td>WASD, setas, roda, botão do meio</td><td>Câmera e zoom</td></tr>

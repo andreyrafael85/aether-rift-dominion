@@ -137,6 +137,10 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 #hints .hint{color:var(--fg2)} #hints .hint.now{color:var(--fg)} #hints .hint.now::before{content:"→ ";color:var(--rift1)}
 #hints-close{position:absolute;top:2px;right:6px;color:var(--fg2)}
 #log{position:absolute;right:.75rem;bottom:calc(.75rem + env(safe-area-inset-bottom,0));width:184px;max-height:120px;overflow:hidden;font-family:var(--fm);font-size:10.5px;color:var(--fg2);display:grid;gap:1px;mask-image:linear-gradient(#000 60%,transparent)}
+.banner{position:absolute;left:50%;top:28%;transform:translateX(-50%);text-align:center;pointer-events:none;padding:.6rem 1.4rem;border-radius:8px;background:rgba(13,15,19,.85);border:1px solid var(--line);backdrop-filter:blur(6px)}
+.banner #banner-title{font-family:var(--fd);font-weight:800;font-size:clamp(1.8rem,4vw,3rem);text-transform:uppercase;letter-spacing:.03em;line-height:1}
+.banner.good #banner-title{color:var(--good)} .banner.danger #banner-title{color:var(--bad)} .banner.warn #banner-title{color:var(--warn)}
+.banner #banner-sub{font-size:13px;color:var(--fg2);margin-top:.25rem}
 #notice{position:absolute;left:50%;bottom:calc(50vh - 120px);transform:translateX(-50%);background:rgba(20,23,29,.95);border:1px solid var(--line);padding:.45rem .9rem;border-radius:6px;opacity:0;transition:opacity .2s;font-size:13px;pointer-events:none}
 #notice.show{opacity:1}
 #proposal{position:absolute;left:50%;transform:translateX(-50%);top:calc(6rem + env(safe-area-inset-top,0));background:var(--panel);border:1px solid var(--warn);border-radius:8px;padding:.75rem 1rem;display:grid;gap:.5rem;max-width:min(420px,calc(100vw - 2rem))}
@@ -164,7 +168,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 
 <div id="start" class="screen">
   <div class="start-wrap">
-    <div class="eyebrow">Beta 3.0b · protótipo jogável no navegador · 3D com efeitos · multiplayer P2P</div>
+    <div class="eyebrow">Beta 3.0c · três facções · elenco ampliado · 3D · multiplayer P2P</div>
     <h1>Aether Rift<br><span>Dominion</span></h1>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -184,7 +188,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         </div>
       </div>
     </div>
-    <p class="start-notes"><b>Novo no 3.0b:</b> bloom nos emissivos, oclusão ambiente no preset Alta, névoa volumétrica na Fenda e na Tempestade, lagos de plasma animados, presets de qualidade, e <b>multiplayer P2P</b>: crie uma sala, mande o código para um amigo e joguem na mesma partida (com as IAs escolhidas). <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
+    <p class="start-notes"><b>Novo no 3.0c:</b> a facção Tessara (Traços de combate, Fotossíntese, Salto Evolutivo) e oito unidades novas: Soldador, Guindaste Armado, Tratorzão e Prensa para Vehnar; Atirador de Fenda, Lâmina Rodante, Mosquito e Âncora para Erevane; Quimera, Esporo-sentinela, Molde e Colosso para Tessara. Banner de eliminação e contador de inimigos. <b>No 3.0b:</b> bloom nos emissivos, oclusão ambiente no preset Alta, névoa volumétrica na Fenda e na Tempestade, lagos de plasma animados, presets de qualidade, e <b>multiplayer P2P</b>: crie uma sala, mande o código para um amigo e joguem na mesma partida (com as IAs escolhidas). <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
   </div>
 </div>
 
@@ -197,6 +201,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
       <div id="energy" class="energy pleno"><div class="row"><span>⚡ <span id="e-text">0 / 0</span></span><span id="e-regime">Pleno</span></div><div class="bar"><i id="e-bar"></i></div></div>
       <span id="clock">00:00</span>
       <span class="muted">Rep.: <span id="rep">Neutro</span></span>
+      <span class="muted">Inimigos: <b id="enemies">0</b></span>
       <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-sound" class="tb" title="Som">♪</button><button id="btn-voice" class="tb" title="Voz do sistema">🗣</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
     </div>
     <div id="hints"><button id="hints-close" aria-label="Fechar dicas">✕</button><div id="hints-body"></div></div>
@@ -215,6 +220,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     </div>
     <div id="chat" hidden><div id="chat-log"></div><input id="chat-in" placeholder="Mensagem (Enter)" maxlength="120"></div>
     <div id="mp-wait" hidden>Aguardando o outro jogador…</div>
+    <div id="banner" class="banner" hidden><div id="banner-title"></div><div id="banner-sub"></div></div>
     <div id="notice"></div>
     <div id="proposal" hidden><div id="proposal-text"></div><div class="row"><button id="prop-yes" class="act sm good">Aceitar pacto</button><button id="prop-no" class="act sm">Recusar</button></div></div>
   </div>
@@ -222,7 +228,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <div id="loading" class="modal" hidden><div class="box" style="max-width:360px"><div class="eyebrow">Preparando o campo</div><h2>Gerando sprites</h2><p class="muted small">Modelos voxel renderizados em 8 direções com iluminação, só nesta primeira vez.</p><div class="loadbar"><i id="load-bar"></i></div></div></div>
   <div id="diplo" class="modal" hidden><div class="box"><h2>Diplomacia</h2><div id="diplo-body"></div><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
   <div id="confirm" class="modal" hidden><div class="box"><h2>Confirmar</h2><p id="confirm-text"></p><div class="row"><button id="confirm-yes" class="btn primary">Confirmar</button><button id="confirm-no" class="btn">Cancelar</button></div></div></div>
-  <div id="end" class="modal" hidden><div class="box"><div class="eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-again" class="btn primary">Jogar de novo</button></div></div></div>
+  <div id="end" class="modal" hidden><div class="box"><div class="eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-again" class="btn primary">Jogar de novo</button><button id="btn-copy" class="btn">Copiar resultado (JSON)</button><a class="btn" href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Enviar feedback</a></div><textarea id="end-json" hidden rows="6" style="width:100%;font-family:var(--fm);font-size:11px;background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px"></textarea></div></div>
 </div>
 
 <div id="help" class="modal help" hidden><div class="box">
@@ -233,7 +239,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <tr><td>Botão direito</td><td>Mover. Em inimigo: atacar. Em nó com coletores: colher. Em Refinaria ou Reator inimigo com Pirata: Sifonar. Em Caixa: recolher. Com estrutura selecionada: ponto de reunião.</td></tr>
   <tr><td>A / S</td><td>Atacar-mover (clique no destino) / Parar</td></tr>
   <tr><td>B + letra</td><td>Construir: R Reator, F Refinaria, Q Quartel, V Fábrica, H Hangar, T Torre, N Nódulo, L Laboratório. Shift mantém o modo.</td></tr>
-  <tr><td>Letras com estrutura selecionada</td><td>Produzir: C Coletor, I Infantaria, S Suporte, P Pirata, V Veículo, D Drone</td></tr>
+  <tr><td>Letras com estrutura selecionada</td><td>Produzir: a tecla aparece em cada botão (C Coletor, I Infantaria, S Suporte, P Pirata, V Veículo, D Drone; e as unidades da sua facção, como O Soldador, U Guindaste, A Atirador, M Mosquito, N Âncora, L Lâmina, R Prensa, E Esporo, C Colosso na Fábrica)</td></tr>
   <tr><td>Ctrl+1–9 / 1–9</td><td>Definir / selecionar grupo (duas vezes centraliza)</td></tr>
   <tr><td>F1 / F2 / F / Espaço</td><td>Núcleo / exército / centralizar seleção / ir ao último alerta</td></tr>
   <tr><td>WASD, setas, roda, botão do meio</td><td>Câmera e zoom</td></tr>
@@ -295,9 +301,17 @@ const FACTIONS = {
     id: 'erevane', name: 'Erevane', short: 'Erevane',
     tagline: 'Furtividade e roubo. Nódulos camuflados, Sifonadores e recursos roubados limpos.',
     pirateName: 'Sifonador', lineBonus: false, lotes: false, smoke: false, structNeutralVsVehicle: false,
-    stolenMult: 1.2, cloak: { nodulo: true, infantaria: true, pirata: true }, jumps: 2, jumpCostFrac: 0.2,
+    stolenMult: 1.2, cloak: { nodulo: true, infantaria: true, pirata: true, atirador: true }, jumps: 2, jumpCostFrac: 0.2,
     superKey: 'blecaute', superName: 'Blecaute',
     superDesc: 'Sensores e energia inimigos a zero por 20 s; suas unidades +30% de velocidade. Custa 300 Dados + 200 Plasma.',
+  },
+  tessara: {
+    id: 'tessara', name: 'Tessara', short: 'Tessara',
+    tagline: 'Tecnologia adaptativa. Unidades ganham Traços contra o que combatem, o Núcleo faz Fotossíntese e o Salto Evolutivo muda a batalha.',
+    pirateName: 'Enxerto', lineBonus: false, lotes: false, smoke: false, structNeutralVsVehicle: false,
+    stolenMult: 1.0, cloak: {}, jumps: 1, jumpCostFrac: 0.3, photosynthesis: true, traits: true,
+    superKey: 'salto', superName: 'Salto Evolutivo',
+    superDesc: 'Por 45 s, todas as suas unidades causam +35% de dano. Custa 300 Dados + 200 Plasma.',
   },
 };
 
@@ -323,7 +337,29 @@ const UNITS = {
   drone:      { name: 'Drone Aéreo', key: 'D', cls: 'dro', hp: 160, r: 8, speed: 150, cost: { minerio: 120, plasma: 50 }, time: 10, energyUse: 2, flying: true, weapon: 'metralha', sensor: 220, desc: 'Forte vs Veículos e Suporte. Fraco vs Infantaria e Estruturas. Sobrevoa a Fenda.' },
   suporte:    { name: 'Suporte / Hack', key: 'S', cls: 'sup', hp: 100, r: 8, speed: 80, cost: { minerio: 90, dados: 20 }, time: 9, energyUse: 2, weapon: 'pulso', sensor: 200, desc: 'Forte vs Veículos e Estruturas, e os atrasa. Fraco vs Infantaria e Drones.' },
   pirata:     { name: 'Pirata de Extração', key: 'P', cls: 'sup', hp: 140, r: 9, speed: 100, cost: { minerio: 120, plasma: 30 }, time: 10, energyUse: 2, sensor: 180, siphonRange: 46, siphonRate: 7, siphonMax: 40, cargoCap: 300, desc: 'Sifona Refinarias e Reatores inimigos por até 40 s. Erevane: camuflado e +20% no roubo. Vehnar: Rebocador, lento e resistente, carrega 2x.' },
+  // --- Vehnar
+  soldador:   { name: 'Soldador', key: 'O', cls: 'inf', hp: 170, r: 8, speed: 75, cost: { minerio: 90, plasma: 15 }, time: 8, energyUse: 1, weapon: 'chama', sensor: 150, faction: 'vehnar', desc: 'Lança-chamas de curto alcance com dano em área. Devastador contra infantaria; fraco contra veículos.' },
+  guindaste:  { name: 'Guindaste Armado', key: 'U', cls: 'sup', hp: 320, r: 11, speed: 60, cost: { minerio: 180, plasma: 40 }, time: 12, energyUse: 3, sensor: 170, faction: 'vehnar', heal: { range: 90, unit: 4, building: 9 }, desc: 'Sem armas. Repara unidades e estruturas suas por perto, continuamente.' },
+  tratorzao:  { name: 'Tratorzão', key: 'T', cls: 'vei', hp: 220, r: 10, speed: 135, cost: { minerio: 110, plasma: 20 }, time: 8, energyUse: 2, weapon: 'metralha', sensor: 320, faction: 'vehnar', desc: 'Veículo leve e rápido de reconhecimento, com sensores longos e metralhadora.' },
+  prensa:     { name: 'Prensa', key: 'R', cls: 'vei', hp: 900, r: 15, speed: 50, cost: { minerio: 320, plasma: 80 }, time: 18, energyUse: 5, weapon: 'prensa', sensor: 170, faction: 'vehnar', desc: 'Mech bípede de cerco: canhões duplos com grande área. Lento e caro.' },
+  // --- Erevane
+  atirador:   { name: 'Atirador de Fenda', key: 'A', cls: 'inf', hp: 90, r: 7, speed: 85, cost: { minerio: 120, dados: 10 }, time: 9, energyUse: 1, weapon: 'fuzil_longo', sensor: 260, faction: 'erevane', desc: 'Camuflado quando parado. Tiro longo e letal contra infantaria e suporte; quase inútil contra estruturas.' },
+  lamina:     { name: 'Lâmina Rodante', key: 'L', cls: 'vei', hp: 260, r: 11, speed: 145, cost: { minerio: 150, plasma: 30 }, time: 10, energyUse: 2, weapon: 'laminas', sensor: 180, faction: 'erevane', desc: 'Veículo baixo e rápido de ataque corpo a corpo. Bata e fuja.' },
+  mosquito:   { name: 'Mosquito', key: 'M', cls: 'dro', hp: 55, r: 5, speed: 175, cost: { minerio: 45, plasma: 15 }, time: 4, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 200, faction: 'erevane', desc: 'Microdrone barato e frágil. Em enxame, pica veículos e suporte.' },
+  ancora:     { name: 'Âncora', key: 'N', cls: 'sup', hp: 160, r: 9, speed: 70, cost: { minerio: 140, plasma: 30, dados: 20 }, time: 11, energyUse: 3, sensor: 200, faction: 'erevane', aura: { cloak: 110 }, desc: 'Sem armas. Campo de Estática: suas unidades a até 110 dela ficam camufladas.' },
+  // --- Tessara
+  quimera:    { name: 'Quimera', key: 'I', cls: 'inf', hp: 130, r: 7, speed: 88, cost: { minerio: 60 }, time: 6, energyUse: 1, weapon: 'fuzil', sensor: 170, faction: 'tessara', desc: 'Infantaria adaptativa. Ganha Traços contra as classes que mais combate.' },
+  esporo:     { name: 'Esporo-sentinela', key: 'E', cls: 'dro', hp: 90, r: 6, speed: 160, cost: { minerio: 70, plasma: 20 }, time: 6, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 330, faction: 'tessara', desc: 'Drone de reconhecimento com sensores muito longos.' },
+  molde:      { name: 'Molde', key: 'O', cls: 'sup', hp: 150, r: 9, speed: 75, cost: { minerio: 130, plasma: 20, dados: 20 }, time: 10, energyUse: 2, sensor: 200, faction: 'tessara', aura: { buff: 100 }, desc: 'Sem armas. Suas unidades a até 100 dele causam +15% de dano.' },
+  colosso:    { name: 'Colosso Cambiante', key: 'C', cls: 'vei', hp: 1100, r: 16, speed: 48, cost: { minerio: 360, plasma: 90, dados: 30 }, time: 20, energyUse: 6, weapon: 'colosso', sensor: 180, faction: 'tessara', desc: 'Pesado de cerco com canhão de área. Ganha Traços como as outras unidades Tessara.' },
 };
+// o que cada estrutura produz, por facção
+const FACTION_EXTRAS = {
+  vehnar:  { quartel: ['soldador', 'guindaste'], fabrica: ['prensa', 'tratorzao'] },
+  erevane: { quartel: ['atirador', 'ancora'], fabrica: ['lamina'], hangar: ['mosquito'] },
+  tessara: { quartel: ['quimera', 'molde'], hangar: ['esporo'], fabrica: ['colosso'] },
+};
+function producesFor(def, faction) { const base = (BUILDINGS[def] && BUILDINGS[def].produces) || []; const ex = (FACTION_EXTRAS[faction] || {})[def] || []; return base.concat(ex); }
 
 /* Armas: dano base, alcance, recarga, projétil (bullet = rápido e reto, shell = balístico com área, beam = instantâneo),
    velocidade, inexatidão (raio de erro no alvo), área (splash) e tabela "versus" por tipo de armadura do alvo. */
@@ -334,6 +370,12 @@ const WEAPONS = {
   pulso:    { dmg: 10, range: 170, cd: 1.5, proj: 'beam',   speed: 0,   inacc: 0,  splash: 0,  cls: 'sup', stun: true },
   obus:     { dmg: 30, range: 230, cd: 1.0, proj: 'shell',  speed: 380, inacc: 8,  splash: 16, cls: 'est' },
   bombarda: { dmg: 60, range: 260, cd: 0.9, proj: 'shell',  speed: 400, inacc: 10, splash: 30, cls: 'est' },
+  chama:    { dmg: 20, range: 75,  cd: 0.5, proj: 'beam',   speed: 0,   inacc: 0,  splash: 22, cls: 'inf', versusOverride: { inf: 1.6, vei: 0.5, dro: 0.7, est: 0.9, sup: 1.3 } },
+  fuzil_longo: { dmg: 55, range: 260, cd: 2.6, proj: 'bullet', speed: 900, inacc: 2, splash: 0, cls: 'inf', versusOverride: { inf: 1.6, vei: 0.6, dro: 1.1, est: 0.4, sup: 1.6 } },
+  prensa:   { dmg: 70, range: 140, cd: 2.2, proj: 'shell',  speed: 280, inacc: 14, splash: 34, cls: 'vei' },
+  laminas:  { dmg: 24, range: 80,  cd: 0.6, proj: 'beam',   speed: 0,   inacc: 0,  splash: 0,  cls: 'vei' },
+  ferrao:   { dmg: 7,  range: 85,  cd: 0.45, proj: 'bullet', speed: 800, inacc: 5, splash: 0,  cls: 'dro' },
+  colosso:  { dmg: 60, range: 150, cd: 1.8, proj: 'shell',  speed: 300, inacc: 12, splash: 28, cls: 'vei' },
 };
 const COUNTER = {
   inf: { vei: 0.65, dro: 1.5, est: 0.65, sup: 1.5 },
@@ -342,7 +384,7 @@ const COUNTER = {
   est: { inf: 1.5, vei: 0.65, dro: 1.5, sup: 0.65 },
   sup: { inf: 0.65, vei: 1.5, dro: 0.65, est: 1.5 },
 };
-for (const k in WEAPONS) { const w = WEAPONS[k]; w.versus = Object.assign({ inf: 1, vei: 1, dro: 1, est: 1, sup: 1, civ: 1 }, COUNTER[w.cls] || {}); }
+for (const k in WEAPONS) { const w = WEAPONS[k]; w.versus = Object.assign({ inf: 1, vei: 1, dro: 1, est: 1, sup: 1, civ: 1 }, COUNTER[w.cls] || {}, w.versusOverride || {}); }
 const VET_RANKS = [0, 0.8, 2.4, 5.0]; // multiplicador do custo da unidade em XP para cada patente
 const CLASS_NAMES = { inf: 'Infantaria', vei: 'Veículos', dro: 'Drones', est: 'Estruturas', sup: 'Suporte/Hack', civ: 'Civil' };
 
@@ -404,7 +446,7 @@ function createSim(cfg) {
       res: { plasma: 300, minerio: 500, dados: 40 },
       energy: { prod: 40, cons: 0, ratio: 1, regime: 'pleno' },
       overchargeT: 0, overchargeCd: 0, superCd: 0, blackoutT: 0, speedBuffT: 0, golpeT: 0,
-      research: {}, rep: 0, pacts: {}, jumpsLeft: fac.jumps, lastBaseAlert: -99, lastNucleoAlert: -99,
+      research: {}, rep: 0, pacts: {}, jumpsLeft: fac.jumps, lastBaseAlert: -99, lastNucleoAlert: -99, saltoT: 0, traits: {}, traitXp: {},
       stats: { collected: 0, stolen: 0, lost: 0, unitsKilled: 0, unitsLost: 0, buildingsDestroyed: 0, buildingsLost: 0, treaties: 0, betrayals: 0, dmg: 0 },
       startAngle: rot + (Math.PI * 2 * i) / n,
     };
@@ -783,7 +825,7 @@ function processCommand(sim, c) {
       break; }
     case 'produce': {
       const b = sim.byId.get(c.id); if (!b || !b.alive || b.kind !== 'building' || b.owner !== c.p || !b.built) return;
-      const bd = BUILDINGS[b.def]; if (!bd.produces || !bd.produces.includes(c.def)) return;
+      const bd = BUILDINGS[b.def]; if (!producesFor(b.def, p.faction).includes(c.def)) return;
       if (b.queue.length >= 6) return;
       const ud = UNITS[c.def]; let mult = 1;
       if (facOf(sim, c.p).lotes) { const same = b.queue.filter(q => q.def === c.def).length; if (same >= 4) mult = 0.5; }
@@ -818,6 +860,10 @@ function processCommand(sim, c) {
         addBuilding(sim, c.p, 'bastiao', c.x, c.y, false);
         emit(sim, { t: 'super', p: c.p, kind: 'fundicao', x: c.x, y: c.y });
         for (const q of sim.players) if (q.alive) alertTo(sim, q.id, (q.id === c.p ? 'Fundição Orbital a caminho' : p.name + ' ativou Fundição Orbital!'), c.x, c.y, q.id === c.p ? 'good' : 'danger');
+      } else if (fac.superKey === 'salto') {
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD; p.saltoT = 45;
+        for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Salto Evolutivo: +35% de dano por 45 s' : p.name + ' ativou o Salto Evolutivo!', null, null, q.id === c.p ? 'good' : 'danger');
+        emit(sim, { t: 'super', p: c.p, kind: 'salto' });
       } else {
         pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD; p.speedBuffT = 20;
         for (const q of sim.players) if (q.alive && q.id !== c.p) { q.blackoutT = 20; alertTo(sim, q.id, p.name + ' ativou Blecaute! Sensores e energia a zero por 20 s', null, null, 'danger'); }
@@ -884,6 +930,7 @@ function computeEnergy(sim, p, dt) {
       if (!e.built) continue;
       if (d.energyProd) {
         if (d.plasmaBurn) { if (p.res.plasma > 0) { prod += d.energyProd; p.res.plasma = Math.max(0, p.res.plasma - d.plasmaBurn * dt); } }
+        else if (e.def === 'nucleo' && FACTIONS[p.faction].photosynthesis) { const nt = (1 - Math.cos(Math.PI * 2 * sim.time / 750)) / 2; prod += 95 - 50 * nt; }
         else prod += d.energyProd;
       }
       cons += d.energyUse || 0;
@@ -912,10 +959,13 @@ function damageMult(sim, a) { // multiplicadores do atacante (pesquisa, Golpe de
   if (p.research.armamento) m *= 1.15; if (p.golpeT > 0) m *= 1.2;
   if (a.kind === 'building') m *= regimeOf(sim, a.owner).defF;
   if (a.kind === 'unit') m *= 1 + 0.1 * (a.rank || 0);
+  if (p.saltoT > 0) m *= 1.35;
+  if (a.kind === 'unit' && sim.auras && sim.auras[a.owner].moldes.length) { for (const mo of sim.auras[a.owner].moldes) if (mo !== a && dist(mo.x, mo.y, a.x, a.y) <= UNITS.molde.aura.buff) { m *= 1.15; break; } }
   return m;
 }
 function applyDamage(sim, attackerOwner, attacker, t, dmg, weapon) {
   const q = sim.players[t.owner];
+  if (attacker && attacker.kind === 'unit') { const p0 = sim.players[attacker.owner]; if (FACTIONS[p0.faction].traits) { const tc = armorOf(t); const tr = p0.traits[attacker.def]; if (tr && tr[tc]) dmg *= 1.25; } }
   if (q && q.research.blindagem) dmg *= 0.87;
   if (t.kind === 'unit') dmg *= 1 - 0.07 * (t.rank || 0);
   t.hp -= dmg; t.lastHitT = sim.time; t.lastHitBy = attackerOwner;
@@ -924,6 +974,11 @@ function applyDamage(sim, attackerOwner, attacker, t, dmg, weapon) {
     attacker.xp += dmg; const cost = Math.max(50, unitCost(attacker.def));
     const nr = attacker.xp >= cost * VET_RANKS[3] ? 3 : attacker.xp >= cost * VET_RANKS[2] ? 2 : attacker.xp >= cost * VET_RANKS[1] ? 1 : 0;
     if (nr > attacker.rank) { attacker.rank = nr; emit(sim, { t: 'promote', x: attacker.x, y: attacker.y, owner: attacker.owner, rank: nr, id: attacker.id }); }
+    if (p && FACTIONS[p.faction].traits && t.cls !== 'civ') { // Traços Tessara: por tipo de unidade, contra a classe mais combatida (máximo 2)
+      const tc = armorOf(t); const x = p.traitXp[attacker.def] = p.traitXp[attacker.def] || {}; x[tc] = (x[tc] || 0) + dmg;
+      const tr = p.traits[attacker.def] = p.traits[attacker.def] || {};
+      if (!tr[tc] && Object.keys(tr).length < 2 && x[tc] >= 350) { tr[tc] = true; alertTo(sim, p.id, 'Traço adquirido: ' + UNITS[attacker.def].name + ' +25% contra ' + CLASS_NAMES[tc], attacker.x, attacker.y, 'good'); emit(sim, { t: 'trait', owner: p.id, x: attacker.x, y: attacker.y }); }
+    }
   }
   if (weapon && weapon.stun && (t.cls === 'vei' || t.kind === 'building')) t.cd = Math.max(t.cd || 0, 1.0);
   emit(sim, { t: 'hit', x: t.x, y: t.y, owner: t.owner, dmg });
@@ -941,7 +996,11 @@ function fire(sim, a, t) {
   a.cd = w.cd; a.lastAttack = sim.time; a.cloaked = false; a.aimAng = Math.atan2(t.y - a.y, t.x - a.x);
   const sx = a.x + Math.cos(a.aimAng) * a.r * 0.8, sy = a.y + Math.sin(a.aimAng) * a.r * 0.8;
   emit(sim, { t: 'shot', x1: sx, y1: sy, x2: t.x, y2: t.y, cls: a.cls, owner: a.owner, ambush, weapon: a.kind === 'unit' ? UNITS[a.def].weapon : BUILDINGS[a.def].weapon, beam: w.proj === 'beam' });
-  if (w.proj === 'beam') { applyDamage(sim, a.owner, a, t, base * counterMult(sim, a, t), w); return; }
+  if (w.proj === 'beam') {
+    if (w.splash > 0) { const hit = []; queryGrid(sim, t.x, t.y, w.splash + 40, e => { if (!e.alive || e.owner === a.owner || e.owner < 0 || e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck' || e.kind === 'rock' || !isEnemy(sim, a.owner, e.owner)) return; if (e.kind === 'unit' && UNITS[e.def].flying) return; if (dist(t.x, t.y, e.x, e.y) - e.r <= w.splash) hit.push(e); }); for (const e of hit) applyDamage(sim, a.owner, a, e, base * counterMult(sim, a, e) * (e === t ? 1 : 0.7), w); emit(sim, { t: 'impact', x: t.x, y: t.y, weapon: 'chama', splash: w.splash, hit: true, owner: a.owner }); }
+    else applyDamage(sim, a.owner, a, t, base * counterMult(sim, a, t), w);
+    return;
+  }
   // projétil: viaja até o ponto previsto do alvo com inexatidão; acerta o que estiver lá
   const ang = sim.rand() * Math.PI * 2, err = sim.rand() * w.inacc;
   const lead = t.kind === 'unit' ? Math.min(1, dist(a.x, a.y, t.x, t.y) / w.speed) : 0;
@@ -1101,6 +1160,8 @@ function updateUnit(sim, u, dt) {
   if (u.revealT > 0) u.revealT -= dt;
   const fac = facOf(sim, u.owner);
   u.cloaked = !!fac.cloak[u.def] && u.state !== 'siphon' && (sim.time - u.lastAttack) > 3;
+  if (!u.cloaked && u.def !== 'ancora' && sim.auras && sim.auras[u.owner].anchors.length && (sim.time - u.lastAttack) > 3) { for (const an of sim.auras[u.owner].anchors) if (dist(an.x, an.y, u.x, u.y) <= UNITS.ancora.aura.cloak) { u.cloaked = true; break; } }
+  if (d.heal && sim.tick % 5 === 0) { queryGrid(sim, u.x, u.y, d.heal.range + 40, e => { if (!e.alive || e.owner !== u.owner || e === u || (e.kind !== 'unit' && e.kind !== 'building')) return; if (dist(u.x, u.y, e.x, e.y) > d.heal.range || e.hp >= e.maxHp) return; if (e.kind === 'building' && !e.built) return; e.hp = Math.min(e.maxHp, e.hp + (e.kind === 'unit' ? d.heal.unit : d.heal.building) * dt * 5); }); }
   switch (u.state) {
     case 'idle': {
       if (d.attack) { const t = acquire(sim, u, d.attack.range + 70, false); if (t) { u.target = t.id; u.state = 'attack'; u.resume = null; } }
@@ -1352,10 +1413,12 @@ function step(sim) {
     if (p.overchargeT > 0) p.overchargeT -= dt;
     if (p.blackoutT > 0) p.blackoutT -= dt;
     if (p.speedBuffT > 0) p.speedBuffT -= dt;
-    if (p.golpeT > 0) p.golpeT -= dt;
+    if (p.golpeT > 0) p.golpeT -= dt; if (p.saltoT > 0) p.saltoT -= dt;
     computeEnergy(sim, p, dt);
   }
   updatePacts(sim);
+  sim.auras = sim.players.map(() => ({ anchors: [], moldes: [] }));
+  for (const e of sim.ents) { if (!e.alive || e.kind !== 'unit') continue; if (e.def === 'ancora') sim.auras[e.owner].anchors.push(e); else if (e.def === 'molde') sim.auras[e.owner].moldes.push(e); }
   for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'building') updateBuilding(sim, e, dt); }
   for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'unit') updateUnit(sim, e, dt); else if (e.kind === 'proj') { e.px = e.x; e.py = e.y; updateProjectile(sim, e, dt); } else if (e.kind === 'wreck' && (e.amount <= 0 || sim.time - e.bornT > 150)) e.alive = false; }
   separate(sim);
@@ -1390,7 +1453,7 @@ function hash(sim) { // cheap state hash for determinism tests
 
 ARD.sim = {
   TICK, WORLD, CX, CY, RIFT_R, FACTIONS, BUILDINGS, UNITS, WEAPONS, COUNTER, CLASS_NAMES, VET_RANKS, unitCost, RESEARCH, REGIME, DIFFICULTY, REP_NAMES,
-  SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS,
+  SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS, FACTION_EXTRAS, producesFor,
   NAV, NW, TILE, TILES, BIOMES, navIdx, passable, flowField, lineFree, inStorm,
   createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius,
 };
@@ -1405,6 +1468,7 @@ const S = ARD.sim;
 const BUILD_ORDERS = {
   vehnar:  ['reator', 'refinaria', 'quartel', 'nodulo', 'reator', 'fabrica', 'torre', 'reator', 'hangar', 'laboratorio', 'torre', 'nodulo', 'fabrica', 'reator', 'torre'],
   erevane: ['reator', 'quartel', 'refinaria', 'nodulo', 'reator', 'hangar', 'nodulo', 'torre', 'laboratorio', 'fabrica', 'reator', 'torre', 'quartel', 'reator'],
+  tessara: ['reator', 'refinaria', 'quartel', 'nodulo', 'hangar', 'reator', 'laboratorio', 'torre', 'fabrica', 'nodulo', 'reator', 'torre', 'quartel'],
 };
 const STRATS = {
   expansao:  { name: 'Expansão',            prod: { infantaria: 0.35, veiculo: 0.25, drone: 0.3, suporte: 0.1 }, col: 3, nodulos: 1, towers: 0, attackMul: 1.25, pirate: 1.0 },
@@ -1413,7 +1477,8 @@ const STRATS = {
   roubo:     { name: 'Roubo',                prod: { infantaria: 0.4, veiculo: 0.15, drone: 0.4, suporte: 0.05 }, col: 1, nodulos: 0, towers: 0, attackMul: 1.35, pirate: 2.5 },
   fortaleza: { name: 'Fortaleza',            prod: { infantaria: 0.35, veiculo: 0.35, drone: 0.2, suporte: 0.1 }, col: 0, nodulos: 0, towers: 2, attackMul: 1.6, pirate: 0.5, walls: true },
 };
-const PREF = { vehnar: ['blindados', 'fortaleza', 'expansao', 'massa'], erevane: ['roubo', 'expansao', 'massa', 'blindados'] };
+const PREF = { vehnar: ['blindados', 'fortaleza', 'expansao', 'massa'], erevane: ['roubo', 'expansao', 'massa', 'blindados'], tessara: ['expansao', 'blindados', 'massa', 'roubo'] };
+const CLASS_W = { infantaria: 'infantaria', soldador: 'infantaria', atirador: 'infantaria', quimera: 'infantaria', veiculo: 'veiculo', prensa: 'veiculo', tratorzao: 'veiculo', lamina: 'veiculo', colosso: 'veiculo', drone: 'drone', mosquito: 'drone', esporo: 'drone', suporte: 'suporte', ancora: 'suporte', molde: 'suporte', guindaste: 'suporte' };
 const VALUE = { refinaria: 3, nodulo: 2.5, reator: 2, laboratorio: 2, quartel: 1.5, fabrica: 1.5, hangar: 1.5, torre: 1, bastiao: 0.8, nucleo: 1.2, muro: 0.1, portao: 0.2 };
 
 function create(pid, difficulty) {
@@ -1543,8 +1608,9 @@ function think(sim, mem) {
   w.veiculo += 0.5 * (seen.inf + seen.est) / total; w.drone += 0.5 * (seen.vei + seen.sup) / total; w.infantaria += 0.5 * (seen.dro + seen.sup) / total; w.suporte += 0.3 * (seen.vei + seen.est) / total;
   const reserveArmy = t < 240 ? D.reserve : 40;
   for (const b of prodBuildings) {
-    if (b.queue.length >= 2) continue; const opts = S.BUILDINGS[b.def].produces.filter(u => u !== 'pirata' && u !== 'coletor');
-    let pick = null, best = -1; for (const u of opts) { const sc = (w[u] || 0.1) * (0.7 + sim.rand() * 0.6); if (sc > best) { best = sc; pick = u; } }
+    if (b.queue.length >= 2) continue; const opts = S.producesFor(b.def, p.faction).filter(u => u !== 'pirata' && u !== 'coletor');
+    let pick = null, best = -1;
+    for (const u of opts) { const ud = S.UNITS[u]; const cls = CLASS_W[u] || 'infantaria'; let sc = (w[cls] || 0.1) * (0.7 + sim.rand() * 0.6); if (!ud.attack) sc *= 0.35; if (ud.cost.dados && p.res.dados < (ud.cost.dados + 40)) sc = 0; if (S.unitCost(u) > 300 && t < 420) sc *= 0.3; if (sc > best) { best = sc; pick = u; } }
     if (pick === 'suporte' && p.res.dados < 60) pick = 'infantaria';
     if (pick) { const c = Object.assign({}, S.UNITS[pick].cost); c.minerio = (c.minerio || 0) + reserveArmy; if (S.canAfford(p, c)) emitC({ t: 'produce', id: b.id, def: pick }); }
   }
@@ -1665,7 +1731,7 @@ ARD.vox = { Model, renderSprite, drawShadow, hex, rgb };
 'use strict';
 const M = () => new ARD.vox.Model();
 const dark = '#2A2D33', steel = '#7A8290', steel2 = '#5E6671', glass = '#8FD8FF', rust = '#8A5A3A', orange = '#FF8C1A', magenta = '#D64CFF', plasma = '#FF6A3D', green = '#7FE3A1', yellow = '#F2C230', lamp = '#FFE08A';
-const pal = (col, style) => style === 'erevane' ? { body: '#3B4049', acc: col, trim: yellow, light: magenta } : { body: col, acc: steel2, trim: steel, light: lamp };
+const pal = (col, style) => style === 'erevane' ? { body: '#3B4049', acc: col, trim: yellow, light: magenta } : style === 'tessara' ? { body: '#DDD4C2', acc: col, trim: '#9A6B3F', light: green } : { body: col, acc: steel2, trim: steel, light: lamp };
 
 // ---------- unidades ----------
 function tank(col, style) {
@@ -1731,6 +1797,60 @@ function tug(col, style) { // Rebocador (Vehnar): caminhão pesado com guincho
   m.box(0, 1, 2, 15, 8, 3, p.body); m.box(10, 1, 5, 5, 8, 5, p.body); m.box(14, 2, 7, 1, 6, 2, glass, null, true);
   m.box(2, 3, 5, 6, 4, 2, steel2); m.box(0, 4, 5, 2, 2, 5, steel); m.box(-1, 4, 9, 4, 2, 1, dark); m.box(-2, 4, 8, 1, 2, 1, magenta, null, true);
   m.box(15, 3, 5, 1, 1, 1, lamp, null, true); m.box(15, 6, 5, 1, 1, 1, lamp, null, true);
+  return m;
+}
+// ---------- elenco ampliado (3.0c) ----------
+function flamer(col, style) { // Soldador: infantaria com tanque nas costas e bico de chama
+  const p = pal(col, style); const m = infantry(col, style);
+  m.box(-1, 0, 3, 1, 3, 4, rust); m.box(-1, 1, 7, 1, 1, 1, '#FF7A30', null, true); m.box(3, 1, 4, 4, 1, 1, dark); m.box(7, 1, 4, 1, 1, 1, '#FF9A3C', null, true);
+  return m;
+}
+function sniper(col, style) { // Atirador: fuzil longo e luneta
+  const m = infantry(col, style);
+  m.box(3, 1, 4, 8, 1, 1, steel2); m.box(5, 1, 5, 2, 1, 1, dark); m.box(6, 1, 5, 1, 1, 1, glass, null, true);
+  return m;
+}
+function buggy(col, style) { // Tratorzão: bugue leve com gaiola e metralhadora
+  const p = pal(col, style); const m = M();
+  for (const x of [1, 8]) for (const y of [0, 7]) m.cyl(x + 1.5, y + 1.5, 0, 1.6, 3, dark);
+  m.box(1, 1, 2, 10, 7, 2, p.body); m.box(7, 2, 4, 3, 5, 2, p.acc); m.box(10, 3, 4, 1, 3, 1, glass, null, true);
+  for (const [x, y] of [[2, 1], [2, 7], [6, 1], [6, 7]]) m.box(x, y, 4, 1, 1, 3, steel2); m.box(2, 1, 7, 5, 7, 1, steel2, (x, y) => x === 0 || x === 4 || y === 0 || y === 6);
+  m.box(3, 3, 5, 2, 2, 2, dark); m.box(5, 3, 6, 4, 2, 1, steel2); m.box(11, 3, 3, 1, 1, 1, lamp, null, true); m.box(11, 5, 3, 1, 1, 1, lamp, null, true);
+  return m;
+}
+function blade(col, style) { // Lâmina Rodante: cunha baixa com lâminas brilhantes
+  const p = pal(col, style); const m = M();
+  m.box(0, 1, 0, 12, 6, 1, dark); m.box(1, 0, 1, 10, 8, 2, p.body, (x, y, z) => !(x > 7 && (y === 0 || y === 7)));
+  m.box(11, 1, 1, 3, 6, 1, steel, (x, y) => x === 2 ? y > 1 && y < 4 : true); m.box(11, 1, 2, 3, 6, 1, '#CFE6FF', (x, y) => x === 0 && (y === 0 || y === 5), true);
+  m.box(4, 2, 3, 4, 4, 1, p.acc); m.box(7, 3, 3, 1, 2, 1, glass, null, true); m.box(0, 3, 2, 1, 2, 1, magenta, null, true);
+  if (style === 'erevane') m.box(2, 1, 3, 7, 1, 1, yellow);
+  return m;
+}
+function gnat(col, style) { // Mosquito: microdrone com asas
+  const p = pal(col, style); const m = M();
+  m.box(1, 1, 1, 3, 2, 2, p.body); m.box(4, 1, 1, 1, 2, 1, dark); m.box(0, 0, 2, 5, 1, 1, steel2, (x) => x !== 2); m.box(0, 3, 2, 5, 1, 1, steel2, (x) => x !== 2);
+  m.box(2, 1, 0, 1, 2, 1, p.light, null, true);
+  return m;
+}
+function anchor(col, style) { // Âncora: tripé com esfera e anel de estática
+  const p = pal(col, style); const m = M();
+  for (const [x, y] of [[0, 0], [6, 0], [3, 6]]) m.box(x, y, 0, 2, 2, 5, dark);
+  m.box(2, 2, 4, 4, 4, 2, p.acc); m.sphere(4, 4, 8, 2.5, steel); m.box(3, 3, 11, 2, 2, 3, p.body); m.box(3, 3, 14, 2, 2, 1, magenta, null, true);
+  for (const [x, y] of [[0, 3], [7, 3], [3, 0], [3, 7]]) m.box(x, y, 7, 1, 1, 1, magenta, null, true);
+  return m;
+}
+function crane(col, style) { // Guindaste Armado: caminhão com lança e gancho
+  const p = pal(col, style); const m = M();
+  for (const x of [1, 6, 11]) for (const y of [0, 8]) m.cyl(x + 1.5, y + 1.5, 0, 1.7, 3, dark);
+  m.box(0, 1, 2, 15, 8, 3, p.body); m.box(11, 1, 5, 4, 8, 5, p.body); m.box(15, 2, 7, 1, 6, 2, glass, null, true);
+  m.box(2, 3, 5, 5, 4, 3, p.acc); m.box(3, 4, 8, 2, 2, 10, steel); m.box(3, 4, 17, 9, 2, 2, steel2); m.box(11, 4, 15, 1, 2, 2, dark); m.box(11, 4, 14, 1, 2, 1, yellow, null, true);
+  m.box(15, 3, 5, 1, 1, 1, lamp, null, true); m.box(15, 6, 5, 1, 1, 1, lamp, null, true); m.box(1, 2, 5, 1, 6, 1, '#FF4040', null, true);
+  return m;
+}
+function colossus(col, style) { // Colosso Cambiante: mech grande com placas orgânicas
+  const m = mech(col, style); const p = pal(col, style);
+  m.box(0, 0, 8, 2, 12, 7, p.acc, (x, y, z) => (y + z) % 2 === 0); m.box(11, 0, 8, 2, 12, 7, p.acc, (x, y, z) => (y + z) % 2 === 0);
+  m.box(4, 4, 19, 6, 6, 2, p.body); m.box(6, 6, 21, 2, 2, 2, green, null, true);
   return m;
 }
 // ---------- partes giratórias (casco + torreta) ----------
@@ -1905,10 +2025,11 @@ const BY_DEF = {
   muro: (c, s) => wall(c, s, false), portao: (c, s) => wall(c, s, true),
   coletor: harvester, infantaria: infantry, veiculo: tank, drone: drone, suporte: support, pirata: raider, pirata_vehnar: tug,
   veiculo_hull: tankHull, veiculo_turret: tankTurret, torre_base: towerBase, torre_turret: towerTurret, bastiao_base: bastionBase, bastiao_turret: bastionTurret,
+  soldador: flamer, guindaste: crane, tratorzao: buggy, prensa: mech, atirador: sniper, lamina: blade, mosquito: gnat, ancora: anchor, quimera: infantry, esporo: drone, molde: support, colosso: colossus,
 };
 // defs que se desenham em duas partes: casco na direção do corpo e torreta na direção da mira; z = altura da torreta em voxels
 const PARTS = { veiculo: { hull: 'veiculo_hull', turret: 'veiculo_turret', z: 6 }, torre: { hull: 'torre_base', turret: 'torre_turret', z: 12 }, bastiao: { hull: 'bastiao_base', turret: 'bastiao_turret', z: 14 } };
-ARD.models = { PARTS, tankHull, tankTurret, towerBase, towerTurret, bastionBase, bastionTurret, tank, mech, harvester, infantry, drone, support, raider, tug, refinery, reactor, barracks, factory, hangar, tower, bastion, nodule, lab, wall, nucleus, crystals, ore, datashards, rocks, ruin, crate, wreck, BY_DEF };
+ARD.models = { PARTS, flamer, sniper, buggy, blade, gnat, anchor, crane, colossus, tankHull, tankTurret, towerBase, towerTurret, bastionBase, bastionTurret, tank, mech, harvester, infantry, drone, support, raider, tug, refinery, reactor, barracks, factory, hangar, tower, bastion, nodule, lab, wall, nucleus, crystals, ore, datashards, rocks, ruin, crate, wreck, BY_DEF };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Conversor voxel → malha Three.js (compartilhado entre o jogo e a validação 3D). Eixos: vox (x, y, z) → three (x, z, -y). */
@@ -2546,7 +2667,7 @@ function create(canvas, overlay, mini) {
       if (!own && !vis.has(e.id)) continue;
       const isUnit = e.kind === 'unit'; const [wx, wy] = isUnit ? lerp(e, alpha) : [e.x, e.y]; const ud = isUnit ? S.UNITS[e.def] : S.BUILDINGS[e.def];
       const parts = MD.PARTS[e.def]; const hullDef = parts ? parts.hull : e.def; const it = instOf(hullDef, e.owner, 0); const g = it.geo; const fit = fitOf(e, g);
-      const zz = isUnit && ud.flying ? 14 : 0; const moving = isUnit && (e.x !== e.px || e.y !== e.py); const bob = moving && e.def === 'infantaria' ? Math.abs(Math.sin(R.time * 11 + e.id)) * 1.2 : 0;
+      const zz = isUnit && ud.flying ? 14 : 0; const moving = isUnit && (e.x !== e.px || e.y !== e.py); const bob = moving && (e.def === 'infantaria' || e.def === 'quimera' || e.def === 'soldador' || e.def === 'atirador') ? Math.abs(Math.sin(R.time * 11 + e.id)) * 1.2 : moving && (e.def === 'prensa' || e.def === 'colosso') ? Math.abs(Math.sin(R.time * 5 + e.id)) * 2.2 : 0;
       const dmg = !isUnit && e.built && e.hp < e.maxHp * 0.5; const tint = e.cloaked ? 0.55 : dmg ? 0.6 : 1;
       put(it, wx, wy, zz + bob, isUnit || ud.wall ? (e.ang || 0) : 0, fit, isUnit ? 1 : (e.built ? 1 : 0.1 + 0.9 * e.progress), tint);
       if (parts && (isUnit || e.built)) { const tt = instOf(parts.turret, e.owner, 0); put(tt, wx, wy, zz + bob + parts.z * fit, e.aimAng != null ? e.aimAng : (e.ang || 0), fit, 1, tint); }
@@ -2965,7 +3086,7 @@ function savePrefs(p) { try { localStorage.setItem('ard-beta-prefs', JSON.string
 function initStart() {
   const prefs = loadPrefs();
   const facWrap = $('fac-cards'); facWrap.innerHTML = '';
-  for (const id of ['vehnar', 'erevane']) {
+  for (const id of Object.keys(S.FACTIONS)) {
     const f = S.FACTIONS[id];
     const el = document.createElement('label'); el.className = 'fac-card'; el.dataset.id = id;
     el.innerHTML = `<input type="radio" name="fac" value="${id}" ${((prefs.faction || 'vehnar') === id) ? 'checked' : ''}><div class="fac-name">${f.name}</div><div class="fac-tag">${f.tagline}</div><div class="fac-sup"><b>Superarma:</b> ${f.superName}. <b>Pirata:</b> ${f.pirateName}.</div>`;
@@ -3019,8 +3140,9 @@ function startGame(cfg, netCtx) {
   const net = netCtx ? netCtx.net : null;
   const players = cfg.players ? cfg.players.map(p => Object.assign({}, p)) : [{ name: cfg.name, faction: cfg.faction, human: true }];
   const facs = ['vehnar', 'erevane'];
-  const aiNames = { vehnar: ['Fundição Kessari', 'Consórcio Oryn', 'Estaleiro Vey'], erevane: ['Clã Sombrio', 'Náufragos de Ísk', 'Corsários da Faixa'] };
-  if (!cfg.players) for (let i = 0; i < parseInt(cfg.opp, 10); i++) { const f = facs[(i + (cfg.faction === 'vehnar' ? 1 : 0)) % 2]; players.push({ name: aiNames[f][i % 3], faction: f, difficulty: cfg.diff }); }
+  const aiNames = { vehnar: ['Fundição Kessari', 'Consórcio Oryn', 'Estaleiro Vey'], erevane: ['Clã Sombrio', 'Náufragos de Ísk', 'Corsários da Faixa'], tessara: ['Linhagem Oriel', 'Ordem do Molde', 'Enxerto Vassi'] };
+  const facsAll = Object.keys(S.FACTIONS).filter(f => f !== cfg.faction).concat([cfg.faction]);
+  if (!cfg.players) for (let i = 0; i < parseInt(cfg.opp, 10); i++) { const f = facsAll[i % facsAll.length]; players.push({ name: aiNames[f][i % 3], faction: f, difficulty: cfg.diff }); }
   const sim = S.createSim({ seed: cfg.seed, players, minutes: 25 });
   const human = netCtx ? netCtx.myId : 0;
   const canvas = $('world'), mini = $('minimap'), overlay = $('overlay');
@@ -3126,6 +3248,8 @@ function startGame(cfg, netCtx) {
       if (e.t === 'alert' && e.p === human) { if (e.x != null) view.lastAlert = { x: e.x, y: e.y }; if (!silent) pushAlert(e); }
       else if (e.t === 'notice' && e.p === human && !silent) notice(e.text);
       else if (e.t === 'proposal' && e.p === human && !silent) { G.pendingFor = e.from; showProposal(e.from); }
+      else if (e.t === 'eliminated' && !silent) { const q = sim.players[e.p]; const left = sim.players.filter(x => x.alive && x.id !== human).length; if (e.p !== human) { banner(q.name + ' eliminado', left > 0 ? left + (left > 1 ? ' inimigos restantes' : ' inimigo restante') + ' · destrua todos os Núcleos ou vença por Domínio aos 25:00' : 'Todos os Núcleos inimigos caíram', 'good'); AU.sfx('promote'); AU.say(q.name + ' eliminado. ' + (left > 0 ? left + (left > 1 ? ' inimigos restantes' : ' inimigo restante') : ''), 'elim', 0); } }
+      else if (e.t === 'trait' && e.owner === human && !silent) AU.sfx('promote');
       else if (e.t === 'end') endGame(e.result);
       else if (e.t === 'regime' && e.p === human && !silent) notice('Energia: ' + S.REGIME[e.regime].name);
     }
@@ -3138,6 +3262,7 @@ function startGame(cfg, netCtx) {
     setTimeout(() => { el.classList.add('fade'); }, 9000); setTimeout(() => el.remove(), 14000);
     const log = $('log'); const li = document.createElement('div'); li.textContent = mmss(sim.time) + ' · ' + e.text; log.prepend(li); while (log.children.length > 40) log.lastChild.remove();
   }
+  function banner(title, sub, kind) { const b = $('banner'); $('banner-title').textContent = title; $('banner-sub').textContent = sub || ''; b.className = 'banner ' + (kind || 'info'); b.hidden = false; clearTimeout(G.bannerT); G.bannerT = setTimeout(() => { b.hidden = true; }, 5000); }
   function notice(text) { const n = $('notice'); n.textContent = text; n.classList.add('show'); clearTimeout(G.noticeT); G.noticeT = setTimeout(() => n.classList.remove('show'), 2200); }
 
   // ---------- HUD ----------
@@ -3149,6 +3274,7 @@ function startGame(cfg, netCtx) {
     $('e-bar').style.width = Math.min(100, en.ratio * 100 / 1.5) + '%';
     $('clock').textContent = mmss(sim.time) + ' / ' + mmss(sim.maxTime);
     $('rep').textContent = S.REP_NAMES[p.rep];
+    const enemies = sim.players.filter(x => x.alive && x.id !== human && !S.hasPact(sim, human, x.id)).length; $('enemies').textContent = enemies;
     for (const b of document.querySelectorAll('[data-speed]')) b.classList.toggle('on', parseFloat(b.dataset.speed) === G.speed && !G.paused);
     $('btn-pause').classList.toggle('on', G.paused);
   }
@@ -3173,9 +3299,10 @@ function startGame(cfg, netCtx) {
     }
     if (e.kind === 'building' && ents.length === 1) {
       const d = S.BUILDINGS[e.def]; let h = `<div class="ph"><span class="dot" style="background:${p.color}"></span><b>${esc(d.name)}</b></div><div class="hp"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="muted small">${fmt(e.hp)} / ${fmt(e.maxHp)}${e.built ? '' : ' · construção ' + Math.round(e.progress * 100) + '%'}${d.energyProd ? ' · +' + d.energyProd + ' energia' : ''}${d.energyUse ? ' · −' + d.energyUse + ' energia' : ''}</div><div class="muted small">${esc(d.desc)}</div>`;
-      if (e.built && d.produces) {
+      const prodList = S.producesFor(e.def, p.faction);
+      if (e.built && prodList.length) {
         h += '<div class="grid">';
-        for (const ud of d.produces) { const u = S.UNITS[ud]; const name = ud === 'pirata' ? fac.pirateName : u.name; h += `<button class="act" data-prod="${ud}" title="${esc(u.desc)}"><img class="ico" alt="" src="${R.icon(ud, human)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span></button>`; }
+        for (const ud of prodList) { const u = S.UNITS[ud]; const name = ud === 'pirata' ? fac.pirateName : u.name; h += `<button class="act" data-prod="${ud}" title="${esc(u.desc)}"><img class="ico" alt="" src="${R.icon(ud, human)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span></button>`; }
         h += '</div>';
         if (e.queue.length) { h += '<div class="queue">'; e.queue.forEach((q, i) => { h += `<button class="q" data-cancel="${i}" title="Cancelar">${esc(S.UNITS[q.def].name)}${i === 0 ? ` <i>${Math.round(100 * q.t / q.total)}%</i>` : ''} ✕</button>`; }); h += '</div>'; }
         h += `<div class="row"><button class="act sm" data-mode="rally">Ponto de reunião</button>${e.def === 'nucleo' ? `<button class="act sm" data-mode="jump" ${p.jumpsLeft > 0 && e.jumpT <= 0 ? '' : 'disabled'}>Salto de Núcleo (${p.jumpsLeft})</button>` : ''}</div>`;
@@ -3323,6 +3450,7 @@ function startGame(cfg, netCtx) {
     $('end-scores').innerHTML = `<table><thead><tr><th>#</th><th>Jogador</th><th>Domínio</th></tr></thead><tbody>${rows}</tbody></table>`;
     $('end-stats').innerHTML = [['Coletado', fmt(st.collected)], ['Roubado', fmt(st.stolen)], ['Perdido para roubo', fmt(st.lost)], ['Unidades abatidas', st.unitsKilled], ['Unidades perdidas', st.unitsLost], ['Estruturas destruídas', st.buildingsDestroyed], ['Tratados', st.treaties], ['Traições', st.betrayals], ['Reputação final', S.REP_NAMES[p.rep]]].map(([k, v]) => `<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');
     $('btn-again').onclick = () => location.reload();
+    $('btn-copy').onclick = () => { const data = { versao: '3.0c', data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
   }
 
   // ---------- UI bridge for input ----------

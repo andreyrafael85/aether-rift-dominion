@@ -26,9 +26,17 @@ const FACTIONS = {
     id: 'erevane', name: 'Erevane', short: 'Erevane',
     tagline: 'Furtividade e roubo. Nódulos camuflados, Sifonadores e recursos roubados limpos.',
     pirateName: 'Sifonador', lineBonus: false, lotes: false, smoke: false, structNeutralVsVehicle: false,
-    stolenMult: 1.2, cloak: { nodulo: true, infantaria: true, pirata: true }, jumps: 2, jumpCostFrac: 0.2,
+    stolenMult: 1.2, cloak: { nodulo: true, infantaria: true, pirata: true, atirador: true }, jumps: 2, jumpCostFrac: 0.2,
     superKey: 'blecaute', superName: 'Blecaute',
     superDesc: 'Sensores e energia inimigos a zero por 20 s; suas unidades +30% de velocidade. Custa 300 Dados + 200 Plasma.',
+  },
+  tessara: {
+    id: 'tessara', name: 'Tessara', short: 'Tessara',
+    tagline: 'Tecnologia adaptativa. Unidades ganham Traços contra o que combatem, o Núcleo faz Fotossíntese e o Salto Evolutivo muda a batalha.',
+    pirateName: 'Enxerto', lineBonus: false, lotes: false, smoke: false, structNeutralVsVehicle: false,
+    stolenMult: 1.0, cloak: {}, jumps: 1, jumpCostFrac: 0.3, photosynthesis: true, traits: true,
+    superKey: 'salto', superName: 'Salto Evolutivo',
+    superDesc: 'Por 45 s, todas as suas unidades causam +35% de dano. Custa 300 Dados + 200 Plasma.',
   },
 };
 
@@ -54,7 +62,29 @@ const UNITS = {
   drone:      { name: 'Drone Aéreo', key: 'D', cls: 'dro', hp: 160, r: 8, speed: 150, cost: { minerio: 120, plasma: 50 }, time: 10, energyUse: 2, flying: true, weapon: 'metralha', sensor: 220, desc: 'Forte vs Veículos e Suporte. Fraco vs Infantaria e Estruturas. Sobrevoa a Fenda.' },
   suporte:    { name: 'Suporte / Hack', key: 'S', cls: 'sup', hp: 100, r: 8, speed: 80, cost: { minerio: 90, dados: 20 }, time: 9, energyUse: 2, weapon: 'pulso', sensor: 200, desc: 'Forte vs Veículos e Estruturas, e os atrasa. Fraco vs Infantaria e Drones.' },
   pirata:     { name: 'Pirata de Extração', key: 'P', cls: 'sup', hp: 140, r: 9, speed: 100, cost: { minerio: 120, plasma: 30 }, time: 10, energyUse: 2, sensor: 180, siphonRange: 46, siphonRate: 7, siphonMax: 40, cargoCap: 300, desc: 'Sifona Refinarias e Reatores inimigos por até 40 s. Erevane: camuflado e +20% no roubo. Vehnar: Rebocador, lento e resistente, carrega 2x.' },
+  // --- Vehnar
+  soldador:   { name: 'Soldador', key: 'O', cls: 'inf', hp: 170, r: 8, speed: 75, cost: { minerio: 90, plasma: 15 }, time: 8, energyUse: 1, weapon: 'chama', sensor: 150, faction: 'vehnar', desc: 'Lança-chamas de curto alcance com dano em área. Devastador contra infantaria; fraco contra veículos.' },
+  guindaste:  { name: 'Guindaste Armado', key: 'U', cls: 'sup', hp: 320, r: 11, speed: 60, cost: { minerio: 180, plasma: 40 }, time: 12, energyUse: 3, sensor: 170, faction: 'vehnar', heal: { range: 90, unit: 4, building: 9 }, desc: 'Sem armas. Repara unidades e estruturas suas por perto, continuamente.' },
+  tratorzao:  { name: 'Tratorzão', key: 'T', cls: 'vei', hp: 220, r: 10, speed: 135, cost: { minerio: 110, plasma: 20 }, time: 8, energyUse: 2, weapon: 'metralha', sensor: 320, faction: 'vehnar', desc: 'Veículo leve e rápido de reconhecimento, com sensores longos e metralhadora.' },
+  prensa:     { name: 'Prensa', key: 'R', cls: 'vei', hp: 900, r: 15, speed: 50, cost: { minerio: 320, plasma: 80 }, time: 18, energyUse: 5, weapon: 'prensa', sensor: 170, faction: 'vehnar', desc: 'Mech bípede de cerco: canhões duplos com grande área. Lento e caro.' },
+  // --- Erevane
+  atirador:   { name: 'Atirador de Fenda', key: 'A', cls: 'inf', hp: 90, r: 7, speed: 85, cost: { minerio: 120, dados: 10 }, time: 9, energyUse: 1, weapon: 'fuzil_longo', sensor: 260, faction: 'erevane', desc: 'Camuflado quando parado. Tiro longo e letal contra infantaria e suporte; quase inútil contra estruturas.' },
+  lamina:     { name: 'Lâmina Rodante', key: 'L', cls: 'vei', hp: 260, r: 11, speed: 145, cost: { minerio: 150, plasma: 30 }, time: 10, energyUse: 2, weapon: 'laminas', sensor: 180, faction: 'erevane', desc: 'Veículo baixo e rápido de ataque corpo a corpo. Bata e fuja.' },
+  mosquito:   { name: 'Mosquito', key: 'M', cls: 'dro', hp: 55, r: 5, speed: 175, cost: { minerio: 45, plasma: 15 }, time: 4, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 200, faction: 'erevane', desc: 'Microdrone barato e frágil. Em enxame, pica veículos e suporte.' },
+  ancora:     { name: 'Âncora', key: 'N', cls: 'sup', hp: 160, r: 9, speed: 70, cost: { minerio: 140, plasma: 30, dados: 20 }, time: 11, energyUse: 3, sensor: 200, faction: 'erevane', aura: { cloak: 110 }, desc: 'Sem armas. Campo de Estática: suas unidades a até 110 dela ficam camufladas.' },
+  // --- Tessara
+  quimera:    { name: 'Quimera', key: 'I', cls: 'inf', hp: 130, r: 7, speed: 88, cost: { minerio: 60 }, time: 6, energyUse: 1, weapon: 'fuzil', sensor: 170, faction: 'tessara', desc: 'Infantaria adaptativa. Ganha Traços contra as classes que mais combate.' },
+  esporo:     { name: 'Esporo-sentinela', key: 'E', cls: 'dro', hp: 90, r: 6, speed: 160, cost: { minerio: 70, plasma: 20 }, time: 6, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 330, faction: 'tessara', desc: 'Drone de reconhecimento com sensores muito longos.' },
+  molde:      { name: 'Molde', key: 'O', cls: 'sup', hp: 150, r: 9, speed: 75, cost: { minerio: 130, plasma: 20, dados: 20 }, time: 10, energyUse: 2, sensor: 200, faction: 'tessara', aura: { buff: 100 }, desc: 'Sem armas. Suas unidades a até 100 dele causam +15% de dano.' },
+  colosso:    { name: 'Colosso Cambiante', key: 'C', cls: 'vei', hp: 1100, r: 16, speed: 48, cost: { minerio: 360, plasma: 90, dados: 30 }, time: 20, energyUse: 6, weapon: 'colosso', sensor: 180, faction: 'tessara', desc: 'Pesado de cerco com canhão de área. Ganha Traços como as outras unidades Tessara.' },
 };
+// o que cada estrutura produz, por facção
+const FACTION_EXTRAS = {
+  vehnar:  { quartel: ['soldador', 'guindaste'], fabrica: ['prensa', 'tratorzao'] },
+  erevane: { quartel: ['atirador', 'ancora'], fabrica: ['lamina'], hangar: ['mosquito'] },
+  tessara: { quartel: ['quimera', 'molde'], hangar: ['esporo'], fabrica: ['colosso'] },
+};
+function producesFor(def, faction) { const base = (BUILDINGS[def] && BUILDINGS[def].produces) || []; const ex = (FACTION_EXTRAS[faction] || {})[def] || []; return base.concat(ex); }
 
 /* Armas: dano base, alcance, recarga, projétil (bullet = rápido e reto, shell = balístico com área, beam = instantâneo),
    velocidade, inexatidão (raio de erro no alvo), área (splash) e tabela "versus" por tipo de armadura do alvo. */
@@ -65,6 +95,12 @@ const WEAPONS = {
   pulso:    { dmg: 10, range: 170, cd: 1.5, proj: 'beam',   speed: 0,   inacc: 0,  splash: 0,  cls: 'sup', stun: true },
   obus:     { dmg: 30, range: 230, cd: 1.0, proj: 'shell',  speed: 380, inacc: 8,  splash: 16, cls: 'est' },
   bombarda: { dmg: 60, range: 260, cd: 0.9, proj: 'shell',  speed: 400, inacc: 10, splash: 30, cls: 'est' },
+  chama:    { dmg: 20, range: 75,  cd: 0.5, proj: 'beam',   speed: 0,   inacc: 0,  splash: 22, cls: 'inf', versusOverride: { inf: 1.6, vei: 0.5, dro: 0.7, est: 0.9, sup: 1.3 } },
+  fuzil_longo: { dmg: 55, range: 260, cd: 2.6, proj: 'bullet', speed: 900, inacc: 2, splash: 0, cls: 'inf', versusOverride: { inf: 1.6, vei: 0.6, dro: 1.1, est: 0.4, sup: 1.6 } },
+  prensa:   { dmg: 70, range: 140, cd: 2.2, proj: 'shell',  speed: 280, inacc: 14, splash: 34, cls: 'vei' },
+  laminas:  { dmg: 24, range: 80,  cd: 0.6, proj: 'beam',   speed: 0,   inacc: 0,  splash: 0,  cls: 'vei' },
+  ferrao:   { dmg: 7,  range: 85,  cd: 0.45, proj: 'bullet', speed: 800, inacc: 5, splash: 0,  cls: 'dro' },
+  colosso:  { dmg: 60, range: 150, cd: 1.8, proj: 'shell',  speed: 300, inacc: 12, splash: 28, cls: 'vei' },
 };
 const COUNTER = {
   inf: { vei: 0.65, dro: 1.5, est: 0.65, sup: 1.5 },
@@ -73,7 +109,7 @@ const COUNTER = {
   est: { inf: 1.5, vei: 0.65, dro: 1.5, sup: 0.65 },
   sup: { inf: 0.65, vei: 1.5, dro: 0.65, est: 1.5 },
 };
-for (const k in WEAPONS) { const w = WEAPONS[k]; w.versus = Object.assign({ inf: 1, vei: 1, dro: 1, est: 1, sup: 1, civ: 1 }, COUNTER[w.cls] || {}); }
+for (const k in WEAPONS) { const w = WEAPONS[k]; w.versus = Object.assign({ inf: 1, vei: 1, dro: 1, est: 1, sup: 1, civ: 1 }, COUNTER[w.cls] || {}, w.versusOverride || {}); }
 const VET_RANKS = [0, 0.8, 2.4, 5.0]; // multiplicador do custo da unidade em XP para cada patente
 const CLASS_NAMES = { inf: 'Infantaria', vei: 'Veículos', dro: 'Drones', est: 'Estruturas', sup: 'Suporte/Hack', civ: 'Civil' };
 
@@ -135,7 +171,7 @@ function createSim(cfg) {
       res: { plasma: 300, minerio: 500, dados: 40 },
       energy: { prod: 40, cons: 0, ratio: 1, regime: 'pleno' },
       overchargeT: 0, overchargeCd: 0, superCd: 0, blackoutT: 0, speedBuffT: 0, golpeT: 0,
-      research: {}, rep: 0, pacts: {}, jumpsLeft: fac.jumps, lastBaseAlert: -99, lastNucleoAlert: -99,
+      research: {}, rep: 0, pacts: {}, jumpsLeft: fac.jumps, lastBaseAlert: -99, lastNucleoAlert: -99, saltoT: 0, traits: {}, traitXp: {},
       stats: { collected: 0, stolen: 0, lost: 0, unitsKilled: 0, unitsLost: 0, buildingsDestroyed: 0, buildingsLost: 0, treaties: 0, betrayals: 0, dmg: 0 },
       startAngle: rot + (Math.PI * 2 * i) / n,
     };
@@ -514,7 +550,7 @@ function processCommand(sim, c) {
       break; }
     case 'produce': {
       const b = sim.byId.get(c.id); if (!b || !b.alive || b.kind !== 'building' || b.owner !== c.p || !b.built) return;
-      const bd = BUILDINGS[b.def]; if (!bd.produces || !bd.produces.includes(c.def)) return;
+      const bd = BUILDINGS[b.def]; if (!producesFor(b.def, p.faction).includes(c.def)) return;
       if (b.queue.length >= 6) return;
       const ud = UNITS[c.def]; let mult = 1;
       if (facOf(sim, c.p).lotes) { const same = b.queue.filter(q => q.def === c.def).length; if (same >= 4) mult = 0.5; }
@@ -549,6 +585,10 @@ function processCommand(sim, c) {
         addBuilding(sim, c.p, 'bastiao', c.x, c.y, false);
         emit(sim, { t: 'super', p: c.p, kind: 'fundicao', x: c.x, y: c.y });
         for (const q of sim.players) if (q.alive) alertTo(sim, q.id, (q.id === c.p ? 'Fundição Orbital a caminho' : p.name + ' ativou Fundição Orbital!'), c.x, c.y, q.id === c.p ? 'good' : 'danger');
+      } else if (fac.superKey === 'salto') {
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD; p.saltoT = 45;
+        for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Salto Evolutivo: +35% de dano por 45 s' : p.name + ' ativou o Salto Evolutivo!', null, null, q.id === c.p ? 'good' : 'danger');
+        emit(sim, { t: 'super', p: c.p, kind: 'salto' });
       } else {
         pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD; p.speedBuffT = 20;
         for (const q of sim.players) if (q.alive && q.id !== c.p) { q.blackoutT = 20; alertTo(sim, q.id, p.name + ' ativou Blecaute! Sensores e energia a zero por 20 s', null, null, 'danger'); }
@@ -615,6 +655,7 @@ function computeEnergy(sim, p, dt) {
       if (!e.built) continue;
       if (d.energyProd) {
         if (d.plasmaBurn) { if (p.res.plasma > 0) { prod += d.energyProd; p.res.plasma = Math.max(0, p.res.plasma - d.plasmaBurn * dt); } }
+        else if (e.def === 'nucleo' && FACTIONS[p.faction].photosynthesis) { const nt = (1 - Math.cos(Math.PI * 2 * sim.time / 750)) / 2; prod += 95 - 50 * nt; }
         else prod += d.energyProd;
       }
       cons += d.energyUse || 0;
@@ -643,10 +684,13 @@ function damageMult(sim, a) { // multiplicadores do atacante (pesquisa, Golpe de
   if (p.research.armamento) m *= 1.15; if (p.golpeT > 0) m *= 1.2;
   if (a.kind === 'building') m *= regimeOf(sim, a.owner).defF;
   if (a.kind === 'unit') m *= 1 + 0.1 * (a.rank || 0);
+  if (p.saltoT > 0) m *= 1.35;
+  if (a.kind === 'unit' && sim.auras && sim.auras[a.owner].moldes.length) { for (const mo of sim.auras[a.owner].moldes) if (mo !== a && dist(mo.x, mo.y, a.x, a.y) <= UNITS.molde.aura.buff) { m *= 1.15; break; } }
   return m;
 }
 function applyDamage(sim, attackerOwner, attacker, t, dmg, weapon) {
   const q = sim.players[t.owner];
+  if (attacker && attacker.kind === 'unit') { const p0 = sim.players[attacker.owner]; if (FACTIONS[p0.faction].traits) { const tc = armorOf(t); const tr = p0.traits[attacker.def]; if (tr && tr[tc]) dmg *= 1.25; } }
   if (q && q.research.blindagem) dmg *= 0.87;
   if (t.kind === 'unit') dmg *= 1 - 0.07 * (t.rank || 0);
   t.hp -= dmg; t.lastHitT = sim.time; t.lastHitBy = attackerOwner;
@@ -655,6 +699,11 @@ function applyDamage(sim, attackerOwner, attacker, t, dmg, weapon) {
     attacker.xp += dmg; const cost = Math.max(50, unitCost(attacker.def));
     const nr = attacker.xp >= cost * VET_RANKS[3] ? 3 : attacker.xp >= cost * VET_RANKS[2] ? 2 : attacker.xp >= cost * VET_RANKS[1] ? 1 : 0;
     if (nr > attacker.rank) { attacker.rank = nr; emit(sim, { t: 'promote', x: attacker.x, y: attacker.y, owner: attacker.owner, rank: nr, id: attacker.id }); }
+    if (p && FACTIONS[p.faction].traits && t.cls !== 'civ') { // Traços Tessara: por tipo de unidade, contra a classe mais combatida (máximo 2)
+      const tc = armorOf(t); const x = p.traitXp[attacker.def] = p.traitXp[attacker.def] || {}; x[tc] = (x[tc] || 0) + dmg;
+      const tr = p.traits[attacker.def] = p.traits[attacker.def] || {};
+      if (!tr[tc] && Object.keys(tr).length < 2 && x[tc] >= 350) { tr[tc] = true; alertTo(sim, p.id, 'Traço adquirido: ' + UNITS[attacker.def].name + ' +25% contra ' + CLASS_NAMES[tc], attacker.x, attacker.y, 'good'); emit(sim, { t: 'trait', owner: p.id, x: attacker.x, y: attacker.y }); }
+    }
   }
   if (weapon && weapon.stun && (t.cls === 'vei' || t.kind === 'building')) t.cd = Math.max(t.cd || 0, 1.0);
   emit(sim, { t: 'hit', x: t.x, y: t.y, owner: t.owner, dmg });
@@ -672,7 +721,11 @@ function fire(sim, a, t) {
   a.cd = w.cd; a.lastAttack = sim.time; a.cloaked = false; a.aimAng = Math.atan2(t.y - a.y, t.x - a.x);
   const sx = a.x + Math.cos(a.aimAng) * a.r * 0.8, sy = a.y + Math.sin(a.aimAng) * a.r * 0.8;
   emit(sim, { t: 'shot', x1: sx, y1: sy, x2: t.x, y2: t.y, cls: a.cls, owner: a.owner, ambush, weapon: a.kind === 'unit' ? UNITS[a.def].weapon : BUILDINGS[a.def].weapon, beam: w.proj === 'beam' });
-  if (w.proj === 'beam') { applyDamage(sim, a.owner, a, t, base * counterMult(sim, a, t), w); return; }
+  if (w.proj === 'beam') {
+    if (w.splash > 0) { const hit = []; queryGrid(sim, t.x, t.y, w.splash + 40, e => { if (!e.alive || e.owner === a.owner || e.owner < 0 || e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck' || e.kind === 'rock' || !isEnemy(sim, a.owner, e.owner)) return; if (e.kind === 'unit' && UNITS[e.def].flying) return; if (dist(t.x, t.y, e.x, e.y) - e.r <= w.splash) hit.push(e); }); for (const e of hit) applyDamage(sim, a.owner, a, e, base * counterMult(sim, a, e) * (e === t ? 1 : 0.7), w); emit(sim, { t: 'impact', x: t.x, y: t.y, weapon: 'chama', splash: w.splash, hit: true, owner: a.owner }); }
+    else applyDamage(sim, a.owner, a, t, base * counterMult(sim, a, t), w);
+    return;
+  }
   // projétil: viaja até o ponto previsto do alvo com inexatidão; acerta o que estiver lá
   const ang = sim.rand() * Math.PI * 2, err = sim.rand() * w.inacc;
   const lead = t.kind === 'unit' ? Math.min(1, dist(a.x, a.y, t.x, t.y) / w.speed) : 0;
@@ -832,6 +885,8 @@ function updateUnit(sim, u, dt) {
   if (u.revealT > 0) u.revealT -= dt;
   const fac = facOf(sim, u.owner);
   u.cloaked = !!fac.cloak[u.def] && u.state !== 'siphon' && (sim.time - u.lastAttack) > 3;
+  if (!u.cloaked && u.def !== 'ancora' && sim.auras && sim.auras[u.owner].anchors.length && (sim.time - u.lastAttack) > 3) { for (const an of sim.auras[u.owner].anchors) if (dist(an.x, an.y, u.x, u.y) <= UNITS.ancora.aura.cloak) { u.cloaked = true; break; } }
+  if (d.heal && sim.tick % 5 === 0) { queryGrid(sim, u.x, u.y, d.heal.range + 40, e => { if (!e.alive || e.owner !== u.owner || e === u || (e.kind !== 'unit' && e.kind !== 'building')) return; if (dist(u.x, u.y, e.x, e.y) > d.heal.range || e.hp >= e.maxHp) return; if (e.kind === 'building' && !e.built) return; e.hp = Math.min(e.maxHp, e.hp + (e.kind === 'unit' ? d.heal.unit : d.heal.building) * dt * 5); }); }
   switch (u.state) {
     case 'idle': {
       if (d.attack) { const t = acquire(sim, u, d.attack.range + 70, false); if (t) { u.target = t.id; u.state = 'attack'; u.resume = null; } }
@@ -1083,10 +1138,12 @@ function step(sim) {
     if (p.overchargeT > 0) p.overchargeT -= dt;
     if (p.blackoutT > 0) p.blackoutT -= dt;
     if (p.speedBuffT > 0) p.speedBuffT -= dt;
-    if (p.golpeT > 0) p.golpeT -= dt;
+    if (p.golpeT > 0) p.golpeT -= dt; if (p.saltoT > 0) p.saltoT -= dt;
     computeEnergy(sim, p, dt);
   }
   updatePacts(sim);
+  sim.auras = sim.players.map(() => ({ anchors: [], moldes: [] }));
+  for (const e of sim.ents) { if (!e.alive || e.kind !== 'unit') continue; if (e.def === 'ancora') sim.auras[e.owner].anchors.push(e); else if (e.def === 'molde') sim.auras[e.owner].moldes.push(e); }
   for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'building') updateBuilding(sim, e, dt); }
   for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'unit') updateUnit(sim, e, dt); else if (e.kind === 'proj') { e.px = e.x; e.py = e.y; updateProjectile(sim, e, dt); } else if (e.kind === 'wreck' && (e.amount <= 0 || sim.time - e.bornT > 150)) e.alive = false; }
   separate(sim);
@@ -1121,7 +1178,7 @@ function hash(sim) { // cheap state hash for determinism tests
 
 ARD.sim = {
   TICK, WORLD, CX, CY, RIFT_R, FACTIONS, BUILDINGS, UNITS, WEAPONS, COUNTER, CLASS_NAMES, VET_RANKS, unitCost, RESEARCH, REGIME, DIFFICULTY, REP_NAMES,
-  SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS,
+  SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS, FACTION_EXTRAS, producesFor,
   NAV, NW, TILE, TILES, BIOMES, navIdx, passable, flowField, lineFree, inStorm,
   createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius,
 };
