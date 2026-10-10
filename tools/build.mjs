@@ -10,7 +10,7 @@ import { readdirSync } from 'node:fs';
 import { existsSync as exists } from 'node:fs';
 function artBundle() { // arte aprovada (assets/*.jpg) vira ARD.ART no bundle do jogo
   const dir = root + 'assets/'; if (!exists(dir)) return ''; const art = { leader: {}, world: {}, insignia: {} };
-  for (const f of readdirSync(dir)) { if (!f.endsWith('.jpg')) continue; const data = 'data:image/jpeg;base64,' + readFileSync(dir + f).toString('base64'); const m = f.match(/^(leader|world|insignia)-([a-z]+)(?:-(\d))?\.jpg$/); if (f === 'hero-belt.jpg') art.hero = data; else if (m) { if (m[1] === 'leader') (art.leader[m[2]] = art.leader[m[2]] || [])[+m[3] - 1] = data; else art[m[1]][m[2]] = data; } }
+  for (const f of readdirSync(dir)) { if (!f.endsWith('.jpg') || f === 'hero-belt.jpg') continue; const data = 'data:image/jpeg;base64,' + readFileSync(dir + f).toString('base64'); const m = f.match(/^(leader|world|insignia)-([a-z]+)(?:-(\d))?\.jpg$/); if (f === 'hero-lo.jpg') art.hero = data; else if (m) { if (m[1] === 'leader') (art.leader[m[2]] = art.leader[m[2]] || [])[+m[3] - 1] = data; else art[m[1]][m[2]] = data; } }
   return '<script>window.ARD=window.ARD||{};ARD.ART=' + JSON.stringify(art) + ';</script>\n';
 }
 function bundle(tpl, scripts) { return read(tpl).replace('<!--SCRIPTS-->', (tpl === 'src/index.tpl.html' ? artBundle() : '') + '<script>\n' + scripts.map(read).join('\n') + '\n</script>').replace(/__BUILD__/g, BUILD); }
@@ -19,6 +19,7 @@ const game = bundle('src/index.tpl.html', ['src/sim.js', 'src/ai.js', 'src/voxel
 writeFileSync(root + 'dist/aether-rift-beta.html', game); writeFileSync(root + 'index.html', wrap(game));
 // Cópia para testes headless com three vendorizado (node tools/vendor.mjs); carrega sem rede.
 import { existsSync } from 'node:fs';
+mkdirSync(root + 'dist/assets', { recursive: true }); if (existsSync(root + 'assets/hero-belt.jpg')) writeFileSync(root + 'dist/assets/hero-belt.jpg', readFileSync(root + 'assets/hero-belt.jpg')); // o hero em alta e servido como arquivo (assets/hero-belt.jpg)
 if (existsSync(root + 'dist/vendor/three/build/three.module.min.js')) writeFileSync(root + 'dist/local.html', wrap(game).replace('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js', './vendor/three/build/three.module.min.js').replace('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/', './vendor/three/examples/jsm/'));
 const style = bundle('style/index.tpl.html', ['src/voxel.js', 'src/models.js', 'style/scene.js', 'style/boot.js']);
 writeFileSync(root + 'dist/estilo.html', style); writeFileSync(root + 'estilo.html', wrap(style));

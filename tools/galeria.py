@@ -54,27 +54,17 @@ p{max-width:74ch}.muted{color:var(--fg2)}
 def overlay(tagline):
     chips=''.join(f'<div class="chip" style="--rc:{c}"><i></i><div><b>{s.upper()}</b><small>{t}</small></div></div>' for _,_,s,_,c,t in RACES)
     return f'<div class="ov"><div class="t"><b>AETHER RIFT</b><b class="g">DOMINION</b><small>{tagline}</small></div><div class="row">{chips}<div class="cta">INICIAR PARTIDA</div></div></div>'
-out=[css,'<div class="wrap"><div class="eyebrow">Galeria visual v6 · aprovações aplicadas · logo para fechar</div><h1>Aether Rift <span>Dominion</span> · Galeria v6</h1>',
- '<p class="muted">O que você aprovou já está no jogo (build 4.0b): o Cinturão Oceano de Tempestades como fundo da tela inicial, os cinco líderes com os nomes novos nos portais e no HUD reagindo à partida, o Postal de dia como tela de carregamento e fundo dos portais, e a insígnia Cristal no retrato. Falta fechar o logo: seis emblemas novos abaixo, reestilizados com borda grossa de selo.</p>']
-out.append('<h2>1 · Aplicado no jogo <span class="ok">APROVADO</span></h2><div class="grid">')
-out.append(f'<div class="card"><span class="num">LAYOUT C · OCEANO DE TEMPESTADES</span><div class="hero">{img("belt_-_3")}{overlay("CINCO RAÇAS. UMA FENDA.")}</div><p>Fundo da tela inicial. Na 4.0c passa a girar devagar (nuvens e cinturão em movimento).</p></div>')
-out.append('</div><h3 class="race"><i style="background:#FF5E3A"></i>Líderes com os nomes novos</h3><div class="grid3">')
-for rid,name,short,lead,c,_ in RACES:
-    v={'vehnar':3,'erevane':2,'tessara':2,'quorith':2,'vorag':1}[rid]
-    out.append(f'<div class="card" style="--pc:{c}"><span class="num">{short.upper()} · RETRATO {"ABC"[v-1]}</span>{img(f"head_{rid}_{v}")}<div class="pname">{lead}</div><p>Era "{ {"vehnar":"Barão-Forja","erevane":"Olho do Véu","tessara":"Jardineira de Traços","quorith":"Primeira Voz","vorag":"Boca da Prole"}[rid] }". Nos portais, no HUD, no carregamento e na tela de fim.</p></div>')
-out.append('</div><h3 class="race"><i style="background:#55E68A"></i>Mundos: Postal de dia</h3><div class="grid3">')
-for rid,name,short,lead,c,_ in RACES: out.append(f'<div class="card"><span class="num">{short.upper()} · DIA</span>{img(f"postal_{rid}_1")}</div>')
-out.append('</div><h3 class="race"><i style="background:#B388FF"></i>Insígnias: Cristal</h3><div class="grid3">')
-for rid,name,short,lead,c,_ in RACES: out.append(f'<div class="card" style="text-align:center"><span class="num">{short.upper()}</span>{img(f"insignia_{rid}_3")}</div>')
-out.append('</div><h2>2 · Logo: seis emblemas novos</h2><p class="muted">Reestilização pedida: cada emblema ganhou borda grossa de selo (contorno escuro + aro metálico), silhueta mais forte e menos brilho difuso, para funcionar grande na tela inicial e pequeno como favicon. O nome compõe o lockup abaixo.</p><div class="grid">')
-for v,name,desc,tag in [(1,'Garra sobre o Mundo','Uma garra quitinosa da Prole fechando sobre um planeta vivo, num escudo hexagonal: dominar é segurar. A rachadura corre na base.','SEGURE O QUE É SEU'),
- (2,'Olho do Vórtice','O olho que é a própria Fenda: pálpebras de fogo e violeta, íris de vórtice com cinco braços e a pupila-núcleo. O mais icônico dos seis.','A FENDA OLHA DE VOLTA'),
- (3,'Trono de Cristal','Pentágono de aço com cinco cristais, um por Raça, apontando para o núcleo da Fenda. Combina com a insígnia Cristal aprovada.','CINCO VOZES, UM TRONO'),
- (4,'Cometa Dominion','Um cometa riscando um selo dourado, planeta anelado e lua: velocidade e conquista. Bom para animação de abertura.','RISQUE O CÉU'),
- (5,'Cinco Luas','Selo de ouro com sessenta marcas e cinco mundos orbitando o núcleo da Fenda: o mapa político do jogo num emblema.','CINCO MUNDOS, UMA FENDA'),
- (6,'Elmo do Barão','Mascote: o elmo do Barão-Forja com visor incandescente e chifres de aço, num escudo. Caminho de logo com personagem, como nas referências.','A FORJA NUNCA DORME')]:
-    out.append(f'<div class="card"><span class="num">LOGO {v}</span><div class="lockup">{img(f"emblem2_-_{v}")}<div><div class="name">Aether Rift<span>Dominion</span></div><div class="tag">{tag}</div></div></div><h4>{name}</h4><p>{desc}</p></div>')
-out.append("""</div><h2>3 · Como aprovar</h2>
-<div class="apply">Responda com o número do logo (ou "Logo 2 com as pálpebras mais finas", por exemplo). Com o logo fechado, ele entra na tela inicial, no favicon, na tela de carregamento e no rodapé; depois sigo para o restante da 4.0b: layout animado, diplomacia com os líderes e as Raças novas jogáveis.</div>
-<div class="endnote">Aether Rift Dominion · galeria visual v6 · arte 3D original renderizada pelo motor do jogo · sem material de terceiros · criado para Andrey Rafael</div></div>""")
-html=''.join(out); open(f'{ROOT}/dist/identidade-visual.html','w').write(html); print('galeria v6:', round(len(html)/1e6,2), 'MB')
+def imgfile(path, cls='art'):
+    with open(path,'rb') as f: return f'<img class="{cls}" src="data:image/jpeg;base64,{base64.b64encode(f.read()).decode()}" alt="">'
+out=[css+'<style>.fav{display:flex;gap:18px;align-items:center;justify-content:center;margin:.6em 0 .2em}.fav img{border-radius:50%;object-fit:cover;border:1px solid #2a2f3a}.fav span{font-family:var(--fm);font-size:10px;color:var(--fg2);display:block;text-align:center;margin-top:4px}</style>','<div class="wrap"><div class="eyebrow">Galeria visual v7 · logo final e fundo em alta</div><h1>Aether Rift <span>Dominion</span> · Galeria v7</h1>',
+ '<p class="muted">Duas versões finais do logo, combinando o que você destacou: o escudo de defesa do Logo 6, o selo com os cinco mundos e luzes do Logo 5, e a rachadura da Fenda cortando o meio como no Logo 1. Cada uma com o lockup e a prévia em tamanho de favicon. Abaixo, o fundo da tela inicial agora em 2560×1280.</p>']
+out.append('<h2>1 · Logo: versões finais</h2><div class="grid">')
+for v,name,desc,tag in [(1,'Escudo das Cinco Luas','Escudo de aço com aro de ouro e sessenta marcas; dentro, o selo com os cinco mundos em órbita plana ao redor do núcleo da Fenda, e a rachadura atravessando o centro. Simétrico, legível em qualquer tamanho.','CINCO MUNDOS, UM ESCUDO'),
+ (2,'Escudo-Órbita','Mesmo escudo, em aço, com a órbita inclinada em 3D: os cinco mundos passam na frente e atrás do núcleo, e a rachadura corre na posição do Logo 1, abaixo do centro. Mais dinâmico, pede animação (a órbita gira).','A ÓRBITA DO DOMÍNIO')]:
+    out.append(f'<div class="card"><span class="num">LOGO FINAL {v}</span><div class="lockup">{img(f"emblem3_-_{v}")}<div><div class="name">Aether Rift<span>Dominion</span></div><div class="tag">{tag}</div></div></div><div class="fav">'
+      + ''.join(f'<div>{img(f"emblem3_-_{v}","")[:-1]} style="width:{sz}px;height:{sz}px"><span>{sz} px</span></div>' for sz in (96,48,24)) + f'</div><h4>{name}</h4><p>{desc}</p></div>')
+out.append('</div><h2>2 · Fundo da tela inicial em alta resolução</h2><p class="muted">O hero foi renderizado de novo em 2560×1280 com texturas em dobro (planeta, nebulosa), 7 mil estrelas e 1.100 rochas facetadas. No site ele carrega como arquivo separado de 270 KB, com um placeholder leve para o primeiro paint; o pixelado que você viu era a versão de 960 px esticada.</p><div class="card">'+imgfile(f'{ROOT}/assets/hero-belt.jpg')+'</div>')
+out.append("""<h2>3 · Como aprovar</h2>
+<div class="apply">Responda <code>Logo final 1</code> ou <code>Logo final 2</code> (com ajustes, se quiser: "aro de ouro na 2", "rachadura mais fina"). Fechado o logo, ele entra na tela inicial, no favicon, no carregamento e no rodapé, e sigo com o restante da 4.0b.</div>
+<div class="endnote">Aether Rift Dominion · galeria visual v7 · arte 3D original renderizada pelo motor do jogo · sem material de terceiros · criado para Andrey Rafael</div></div>""")
+html=''.join(out); open(f'{ROOT}/dist/identidade-visual.html','w').write(html); print('galeria v7:', round(len(html)/1e6,2), 'MB')

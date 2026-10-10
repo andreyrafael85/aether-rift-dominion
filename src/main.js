@@ -59,7 +59,11 @@ function initStart() {
     facWrap.appendChild(el);
   }
   setRace(raceColor);
-  if (ART && ART.hero) { const st = $('start'); st.style.backgroundImage = `linear-gradient(180deg, rgba(13,15,19,.35), rgba(13,15,19,.82) 55%, rgba(13,15,19,.97)), url(${ART.hero})`; st.style.backgroundSize = 'cover'; st.style.backgroundPosition = 'center top'; st.style.backgroundAttachment = 'fixed'; }
+  if (ART && ART.hero) { // placeholder leve embutido, depois o hero em alta (assets/hero-belt.jpg, 2560×1280) quando carregar
+    const st = $('start'); const veil = 'linear-gradient(180deg, rgba(13,15,19,.35), rgba(13,15,19,.82) 55%, rgba(13,15,19,.97))';
+    st.style.backgroundImage = `${veil}, url(${ART.hero})`; st.style.backgroundSize = 'cover'; st.style.backgroundPosition = 'center top'; st.style.backgroundAttachment = 'fixed';
+    const hi = new Image(); hi.onload = () => { st.style.backgroundImage = `${veil}, url(${hi.src})`; }; hi.src = 'assets/hero-belt.jpg';
+  }
   // fundo vivo: estrelas e o brilho da Raça escolhida (respeita prefers-reduced-motion; para ao entrar em jogo)
   const bgfx = $('bgfx');
   if (bgfx) {
