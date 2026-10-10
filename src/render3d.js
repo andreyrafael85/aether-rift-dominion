@@ -96,6 +96,12 @@ function create(canvas, overlay, mini) {
     return (a * (1 - fx) + b * fx) * (1 - fy) + (c * (1 - fx) + d * fx) * fy;
   }
   R.H = H;
+  // 4.0b — sombras de nuvem: ruído de valor em canvas, repetido e deslocado no tempo pelo shader do terreno
+  const cloudTex = (() => { const N = 256; const cv = document.createElement('canvas'); cv.width = N; cv.height = N; const c = cv.getContext('2d'); const img = c.createImageData(N, N); const d = img.data;
+    const h2 = (x, y) => { let n = (x * 374761393 + y * 668265263) | 0; n = (n ^ (n >> 13)) * 1274126177; return ((n ^ (n >> 16)) & 0x7fffffff) / 0x7fffffff; }; const sm = t => t * t * (3 - 2 * t);
+    const vn = (x, y, p) => { const xi = Math.floor(x), yi = Math.floor(y); const fx = sm(x - xi), fy = sm(y - yi); const w = (a, b) => ((a % p) + p) % p; const l = (a, b, t) => a + (b - a) * t; return l(l(h2(w(xi, p), w(yi, p)), h2(w(xi + 1, p), w(yi, p)), fx), l(h2(w(xi, p), w(yi + 1, p)), h2(w(xi + 1, p), w(yi + 1, p)), fx), fy); };
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { let v = 0, a = 0.5, f = 4, s = 0; for (let o = 0; o < 4; o++) { v += a * vn(x / N * f, y / N * f, f); s += a; a *= 0.5; f *= 2; } v = v / s; v = Math.min(1, Math.max(0, (v - 0.35) * 2.2)); const i = (y * N + x) * 4; d[i] = d[i + 1] = d[i + 2] = 255 * v; d[i + 3] = 255; }
+    c.putImageData(img, 0, 0); const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.NoColorSpace; return t; })();
   const fogData = new Uint8Array(FOGN * FOGN * 4); const fogTex = new THREE.DataTexture(fogData, FOGN, FOGN, THREE.RGBAFormat); fogTex.magFilter = THREE.LinearFilter; fogTex.minFilter = THREE.LinearFilter; fogTex.colorSpace = THREE.NoColorSpace;
   const terrData = new Uint8Array(TILES * TILES * 4); const terrTex = new THREE.DataTexture(terrData, TILES, TILES, THREE.RGBAFormat); terrTex.magFilter = THREE.LinearFilter; terrTex.minFilter = THREE.LinearFilter; terrTex.colorSpace = THREE.NoColorSpace;
   let terrain = null; R.poolLights = []; R.mist = [];
@@ -124,10 +130,10 @@ function create(canvas, overlay, mini) {
     geo.setAttribute('color', new THREE.BufferAttribute(cols, 3)); geo.computeVertexNormals();
     const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0.02 });
     mat.onBeforeCompile = sh => {
-      sh.uniforms.fogMap = { value: fogTex }; sh.uniforms.terrMap = { value: terrTex }; sh.uniforms.worldSize = { value: S.WORLD };
+      sh.uniforms.fogMap = { value: fogTex }; sh.uniforms.terrMap = { value: terrTex }; sh.uniforms.worldSize = { value: S.WORLD }; sh.uniforms.cloudMap = { value: cloudTex }; sh.uniforms.uCloudT = { value: 0 }; R.terrShader = sh;
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vWuv;').replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n{ vec4 wp = modelMatrix * vec4(position, 1.0); vWuv = vec2(wp.x / worldSize, -wp.z / worldSize); }');
       sh.vertexShader = sh.vertexShader.replace('uniform float worldSize', 'uniform float worldSize'); if (!sh.vertexShader.includes('uniform float worldSize')) sh.vertexShader = 'uniform float worldSize;\n' + sh.vertexShader;
-      sh.fragmentShader = ('uniform sampler2D fogMap; uniform sampler2D terrMap; varying vec2 vWuv;\n' + sh.fragmentShader).replace('#include <color_fragment>', '#include <color_fragment>\n{ vec4 tc = texture2D(terrMap, vWuv); diffuseColor.rgb = mix(diffuseColor.rgb, tc.rgb, tc.a * 0.2); float fl = texture2D(fogMap, vWuv).r; diffuseColor.rgb *= mix(0.06, 1.0, fl); }');
+      sh.fragmentShader = ('uniform sampler2D fogMap; uniform sampler2D terrMap; uniform sampler2D cloudMap; uniform float uCloudT; varying vec2 vWuv;\n' + sh.fragmentShader).replace('#include <color_fragment>', '#include <color_fragment>\n{ vec4 tc = texture2D(terrMap, vWuv); diffuseColor.rgb = mix(diffuseColor.rgb, tc.rgb, tc.a * 0.2); float fl = texture2D(fogMap, vWuv).r; diffuseColor.rgb *= mix(0.06, 1.0, fl); float cl = texture2D(cloudMap, vWuv * 5.0 + vec2(uCloudT * 0.006, uCloudT * 0.0035)).r; diffuseColor.rgb *= 0.8 + 0.2 * cl; }');
     };
     if (terrain) scene.remove(terrain);
     terrain = new THREE.Mesh(geo, mat); terrain.position.set(S.WORLD / 2, 0, -S.WORLD / 2); terrain.receiveShadow = true; scene.add(terrain);
@@ -172,6 +178,7 @@ function create(canvas, overlay, mini) {
   function modelFor(def, pid, seed) {
     if (NODE_MODEL[def]) return MD[NODE_MODEL[def]](seed);
     if (def === 'crate') return MD.crate(); if (def === 'wreck') return MD.wreck(); if (def === 'rocks') return MD.rocks(seed); if (def === 'ruin') return MD.ruin(seed);
+    if (def.startsWith('prop_')) return MD.props[def.slice(5)](seed);
     const p = R.sim.players[pid]; const fn = (def === 'pirata' && p.faction === 'vehnar') ? MD.BY_DEF.pirata_vehnar : MD.BY_DEF[def]; return fn(p.color, p.faction);
   }
   function geoOf(def, pid, seed) { const key = def + '|' + pid + '|' + (seed || 0); let g = R.geos.get(key); if (!g) { g = X.buildGeometry(modelFor(def, pid, seed), { emBoost: 1.8 }); R.geos.set(key, g); } return g; }
@@ -198,6 +205,7 @@ function create(canvas, overlay, mini) {
     for (const p of sim.players) { for (const def in S.BUILDINGS) jobs.push([def, p.id, 0]); for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'torre_base', 'torre_turret', 'drone', 'suporte', 'pirata', 'bastiao_base', 'bastiao_turret']) jobs.push([def, p.id, 0]); }
     for (const res in NODE_MODEL) for (let s = 0; s < 4; s++) jobs.push([res, -1, s]);
     for (let s = 0; s < 6; s++) { jobs.push(['rocks', -1, s]); jobs.push(['ruin', -1, s]); } jobs.push(['crate', -1, 0]); jobs.push(['wreck', -1, 0]);
+    for (const p of sim.players) if (MD.props[p.faction]) for (let s = 0; s < 4; s++) jobs.push(['prop_' + p.faction, -1, s]);
     let i = 0; function chunk() { const t0 = performance.now(); while (i < jobs.length && performance.now() - t0 < 24) { const j = jobs[i++]; geoOf(j[0], j[1], j[2]); } if (onProgress) onProgress(i / jobs.length); if (i < jobs.length) requestAnimationFrame(chunk); else if (onDone) onDone(); } chunk();
   };
   // ---------- projeção ----------
@@ -281,7 +289,7 @@ function create(canvas, overlay, mini) {
 
   // ---------- quadro ----------
   R.draw = function (sim, view, alpha, dt) {
-    R.sim = sim; R.time += dt; updateFx(dt);
+    R.sim = sim; R.time += dt; updateFx(dt); if (R.terrShader) R.terrShader.uniforms.uCloudT.value = R.time;
     const cam = view.cam, human = view.human, me = sim.players[human]; const vis = view.reveal ? { has: () => true } : sim.vis[human]; const explored = sim.explored[human];
     R.night = (1 - Math.cos(TAU * sim.time / 750)) / 2;
     R.shakeX = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0; R.shakeY = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0;
@@ -348,6 +356,10 @@ function create(canvas, overlay, mini) {
     }
     for (let i = nBeam; i < BEAMS; i++) beams[i].visible = false;
     for (const [id, m] of view.memory) { if (vis.has(id)) continue; const it = instOf(MD.PARTS[m.def] ? MD.PARTS[m.def].hull : m.def, m.owner, 0); put(it, m.x, m.y, 0, 0, 2 * S.BUILDINGS[m.def].r * 1.25 / it.geo.width, 1, 0.45); }
+    // 4.0b — props de território: a geografia da Raça cresce em volta do Núcleo e dos Nódulos (visual, determinístico por id)
+    for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const bd = S.BUILDINGS[e.def]; const tr = bd && bd.territory; if (!tr) continue; const fac = (sim.players[e.owner] || {}).faction; if (!MD.props[fac]) continue;
+      if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue;
+      const K = e.def === 'nucleo' ? 10 : 5; for (let i = 0; i < K; i++) { const hsh = ((e.id * 2654435761 + i * 40503) >>> 0) / 4294967296; const a = (i / K) * TAU + hsh * 0.9; const rr = tr * (0.52 + 0.4 * ((hsh * 7) % 1)); const px = e.x + Math.cos(a) * rr, py = e.y + Math.sin(a) * rr; if (px < 20 || py < 20 || px > S.WORLD - 20 || py > S.WORLD - 20) continue; if (!view.reveal && !explored[((py / TILE) | 0) * TILES + ((px / TILE) | 0)]) continue; const it = instOf('prop_' + fac, -1, (e.id + i) % 4); put(it, px, py, 0, hsh * TAU, 15 / it.geo.width); if (fac === 'vehnar' && Math.random() < 0.012 * R.quality.particles) smoke(px, py, 9, [0.5, 0.5, 0.52], 2, 11); } }
     if (sim.props) for (const pr of sim.props) { if (!view.reveal && !explored[((pr.y / TILE) | 0) * TILES + ((pr.x / TILE) | 0)]) continue; const it = instOf(pr.kind, -1, pr.seed % 6); put(it, pr.x, pr.y, 0, (pr.seed % 7) * 0.9, 34 * pr.scale / it.geo.width); }
     if (view.ghost) { const gh = view.ghost; const d = S.BUILDINGS[gh.def]; const it = instOf(MD.PARTS[gh.def] ? MD.PARTS[gh.def].hull : gh.def, human, 0, true); put(it, gh.x, gh.y, 0, gh.ang || 0, 2 * d.r * 1.25 / it.geo.width, 1, gh.ok ? 1 : 0.5); nSel = ring(nSel, gh.x, gh.y, d.r + 4); if (d.territory && nRange < 32) { _p.set(gh.x, H(gh.x, gh.y) + 0.6, -gh.y); _s.set(d.territory, 1, d.territory); _q.identity(); _m.compose(_p, _q, _s); rangeRings.setMatrixAt(nRange++, _m); } }
     if (view.wallGhost && view.ghost) for (const g2 of view.wallGhost) { const it = instOf(view.ghost.def, human, 0, true); put(it, g2.x, g2.y, 0, g2.ang, 20 / it.geo.width, 1, g2.ok ? 1 : 0.5); }

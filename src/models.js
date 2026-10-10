@@ -279,6 +279,15 @@ function datashards(seed) { // fragmentos de dados: lâminas verdes flutuando so
   for (let i = 0; i < 6; i++) { const x = Math.floor(2 + rnd() * 8), y = Math.floor(2 + rnd() * 8); m.box(x, y, 2 + Math.floor(rnd() * 3), 1, 2, 3 + Math.floor(rnd() * 4), green, null, true); }
   return m;
 }
+// 4.0b — props de território por Raça (só visual): a "geografia" dos mundos natais entra no mapa
+function propRnd(seed) { let r = (seed | 0) * 7919 + 31; return () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; }; }
+const props = {
+  vehnar(seed) { const m = M(); const rnd = propRnd(seed); const h = 7 + Math.floor(rnd() * 4); m.cyl(3, 3, 0, 1.6, h, rust); m.cyl(3, 3, h, 1.9, 1, dark); m.box(2, 2, h + 1, 2, 2, 1, orange, null, true); if (rnd() > 0.5) m.box(0, 5, 0, 6, 2, 2, steel2); return m; },
+  erevane(seed) { const m = M(); const rnd = propRnd(seed); const h = 6 + Math.floor(rnd() * 5); for (let z = 0; z < h; z++) { const w = Math.max(1, Math.round(4 - z * 3.2 / h)); m.box(3 - Math.floor(w / 2), 3 - Math.floor(w / 2), z, w, w, 1, z > h * 0.7 ? '#cfeeff' : '#9fd8f0'); } m.box(3, 3, h, 1, 1, 1, '#aef7e8', null, true); if (rnd() > 0.5) m.box(5, 1, 0, 2, 2, 3, '#9fd8f0'); return m; },
+  tessara(seed) { const m = M(); const rnd = propRnd(seed); const h = 5 + Math.floor(rnd() * 5); m.box(3, 3, 0, 1, 1, h, '#2f7a49'); m.box(2, 2, h, 3, 3, 2, '#e6b85c', (x, y, z) => !(x === 1 && y === 1 && z === 1), true); m.box(2, 3, 2, 1, 1, 1, '#55e68a'); m.box(4, 3, 3, 1, 1, 1, '#55e68a'); if (rnd() > 0.4) m.box(0, 5, 0, 2, 1, 3, '#2f7a49'); return m; },
+  quorith(seed) { const m = M(); const rnd = propRnd(seed); const h = 6 + Math.floor(rnd() * 5); for (let z = 0; z < h; z++) { const r = z < h / 2 ? 1 + z * 3 / h : 2.5 - (z - h / 2) * 3 / h; m.box(3 - Math.round(r), 3 - Math.round(r), z, Math.round(r) * 2 + 1, Math.round(r) * 2 + 1, 1, z > h * 0.6 ? '#d4b8ff' : '#b388ff', (x, y, zz, w, d) => Math.abs(x - (w - 1) / 2) + Math.abs(y - (d - 1) / 2) <= r); } m.box(3, 3, Math.floor(h / 2), 1, 1, 1, '#ffffff', null, true); if (rnd() > 0.5) m.box(0, 0, 0, 2, 2, 3, '#b388ff'); return m; },
+  vorag(seed) { const m = M(); const rnd = propRnd(seed); m.sphere(2.5, 2.5, 1.5, 2, '#e8dcc8'); m.sphere(5.5, 4, 1.2, 1.6, '#e8dcc8'); m.sphere(3.5, 5.5, 1, 1.3, '#d8ccb8'); m.box(6, 1, 0, 1, 1, 5, '#e8dcc8'); m.box(3, 3, 3, 1, 1, 1, '#e6455a', null, true); return m; },
+};
 function rocks(seed) { const m = M(); let r = (seed | 0) + 11; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; }; for (let i = 0; i < 4; i++) m.sphere(3 + rnd() * 8, 3 + rnd() * 8, 0.5 + rnd(), 2 + rnd() * 2.5, ['#6E7682', '#5A616B', '#7E8794'][i % 3]); return m; }
 function ruin(seed) { // ruínas da civilização pré-Colapso: pilares quebrados e um arco
   const m = M(); let r = (seed | 0) + 19; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; };
@@ -302,5 +311,5 @@ const BY_DEF = {
 };
 // defs que se desenham em duas partes: casco na direção do corpo e torreta na direção da mira; z = altura da torreta em voxels
 const PARTS = { veiculo: { hull: 'veiculo_hull', turret: 'veiculo_turret', z: 6 }, torre: { hull: 'torre_base', turret: 'torre_turret', z: 12 }, bastiao: { hull: 'bastiao_base', turret: 'bastiao_turret', z: 14 } };
-ARD.models = { PARTS, flamer, sniper, buggy, blade, gnat, anchor, crane, colossus, tankHull, tankTurret, towerBase, towerTurret, bastionBase, bastionTurret, tank, mech, harvester, infantry, drone, support, raider, tug, refinery, reactor, barracks, factory, hangar, tower, bastion, nodule, lab, wall, nucleus, crystals, ore, datashards, rocks, ruin, crate, wreck, BY_DEF };
+ARD.models = { props, PARTS, flamer, sniper, buggy, blade, gnat, anchor, crane, colossus, tankHull, tankTurret, towerBase, towerTurret, bastionBase, bastionTurret, tank, mech, harvester, infantry, drone, support, raider, tug, refinery, reactor, barracks, factory, hangar, tower, bastion, nodule, lab, wall, nucleus, crystals, ore, datashards, rocks, ruin, crate, wreck, BY_DEF };
 })(globalThis.ARD = globalThis.ARD || {});

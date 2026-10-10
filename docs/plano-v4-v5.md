@@ -89,6 +89,25 @@ Regra geral de identidade: cada Raça tem biologia própria, **nascimento de con
 - **Partículas de recurso**: plasma gotejante, minério em estilhaços, dados como glifos ascendentes.
 - **Orçamento de performance**: ≤ 300 draw calls em partida 4 jogadores; InstancedMesh por def+jogador (existente); LOD em 2 níveis para unidades; metas na seção 6.
 
+### 2.1 Engine gráfica 4.x — a inteligência dos renders entra no jogo (continuidade)
+
+Tudo o que foi produzido na galeria (pipeline `tools/arte3d.html`) é código reaproveitável dentro do motor da partida, não só imagem. Mapa de transferência, com a release em que cada item entra:
+
+| Da galeria | No jogo | Release |
+|---|---|---|
+| Hero 3D Oceano de Tempestades | fundo da tela inicial em 2560×1280 (arquivo separado + placeholder) | 4.0b ✔ |
+| Logo Final 2 (Escudo-Órbita) | marca na tela inicial, favicon, carregamento, rodapé; versão viva com a órbita girando | 4.0b ✔ · animado 4.0c |
+| Líderes cartoon 3D com expressões | portais, HUD em "chamada" reagindo à partida, diplomacia, carregamento e fim | 4.0b ✔ |
+| Mundos natais (Postal) | tela de carregamento e fundo dos portais; geografia por Raça no mapa: props de território (chaminés, lanças de gelo, brotos, cristais, ovos) crescem em volta do Núcleo e dos Nódulos | 4.0b ✔ |
+| Nuvens e atmosfera dos mundos | sombras de nuvem deslizando no terreno; névoa de horizonte por clima | 4.0b ✔ · 4.0c |
+| Planetas, luas e nebulosas | céu de fundo com o planeta-mãe da Raça visível ao inclinar a câmera (inclinação livre entra junto) | 4.0c |
+| Materiais com reflexo (env map), anti-aliasing MSAA no pós | materiais das unidades e construções com reflexo real; MSAA no composer nos presets Alta/Ultra | 4.0c |
+| Cinturão de asteroides | mapa "Cinturão": combate em rochas flutuantes com buracos no terreno | 4.1 |
+| Insígnia Cristal | HUD ✔; decalque nas unidades e bandeira nos Nódulos | 4.0b ✔ · 4.0c |
+| Expressões dos líderes | cenas de diplomacia com os dois líderes frente a frente; briefing da campanha | 4.0c · 4.0d |
+
+Regra de ouro: cada técnica nova no renderizador da galeria vira um módulo do jogo (shader, modelo voxel ou cena Three.js) com orçamento de performance medido em celular intermediário antes de entrar no preset Automática.
+
 ## 3. Homepage v4.0
 
 - **Hero cinematográfico**: fundo em canvas com diorama voxel da Raça em foco (renderer existente reaproveitado), parallax leve; fallback estático com `prefers-reduced-motion` e em aparelhos fracos.

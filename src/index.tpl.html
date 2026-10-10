@@ -1,5 +1,6 @@
 <title>Aether Rift Dominion</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png"><link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png"><link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <style>
 /* Jogo: mundo escuro único (sci-fi industrial), HUD em grafite com acentos da Fenda. Tema único, por decisão. */
 :root{
@@ -152,6 +153,9 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 #proposal{position:absolute;left:50%;transform:translateX(-50%);top:calc(6rem + env(safe-area-inset-top,0));background:var(--panel);border:1px solid var(--warn);border-radius:8px;padding:.75rem 1rem;display:grid;gap:.5rem;max-width:min(420px,calc(100vw - 2rem))}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:1rem;z-index:5}
 .modal .box{background:#15181D;border:1px solid var(--line);border-radius:10px;padding:1.1rem;max-width:620px;width:100%;max-height:90vh;overflow:auto;display:grid;gap:.75rem}
+.modal .box{position:relative}
+.mclose{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:7px;border:1px solid var(--line);background:var(--panel2);color:var(--fg);font-size:16px;line-height:1;cursor:pointer;z-index:2}
+.mclose:hover{background:#2a2f38;border-color:var(--fg2)}
 .modal h2{font-family:var(--fd);font-weight:700;font-size:1.8rem;text-transform:uppercase;margin:0}
 .dp{border:1px solid var(--line);border-radius:6px;padding:.6rem .75rem;display:grid;gap:.4rem}
 .dp.dead{opacity:.5}
@@ -201,6 +205,11 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 @keyframes ltalk{0%,100%{transform:scale(1)}25%{transform:scale(1.04)}60%{transform:scale(.98)}}
 @media (max-width:760px),(max-height:560px){#leader{display:none}}
 @media (prefers-reduced-motion:reduce){#leader img,#leader .lframe::after{animation:none}}
+.brand-row{display:flex;gap:1.2rem;align-items:center;flex-wrap:wrap}
+.logo{width:clamp(96px,14vw,168px);height:clamp(96px,14vw,168px);border-radius:50%;box-shadow:0 0 34px rgba(178,60,255,.4),0 0 10px rgba(255,94,58,.35);border:2px solid #2E333B;flex:none}
+.load-logo{width:44px;height:44px;border-radius:50%;vertical-align:middle;margin-right:.5rem;border:1px solid var(--line)}
+.foot-logo{width:30px;height:30px;border-radius:50%;vertical-align:middle;margin-right:.45rem;border:1px solid var(--line)}
+.dp-lead{width:42px;height:42px;border-radius:8px;object-fit:cover;vertical-align:middle;margin-right:.45rem;border:1px solid var(--line)}
 #errbox{position:fixed;left:8px;bottom:8px;background:#5a1d1d;color:#fff;padding:.4rem .6rem;border-radius:6px;font-family:var(--fm);font-size:12px;z-index:9;max-width:80vw;cursor:pointer}
 </style>
 
@@ -208,7 +217,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
     <div class="eyebrow">Versão 4.0b · as Raças da Fenda · 3D · salas multiplayer de 2 a 4 jogadores</div>
-    <h1>Aether Rift<br><span>Dominion</span></h1>
+    <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div><h1>Aether Rift<br><span>Dominion</span></h1></div></div>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
       <div><div class="choose">Escolha sua Raça</div><div class="fac-cards" id="fac-cards" style="margin-top:1rem"></div></div>
@@ -239,7 +248,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     </div>
     <p class="start-notes" id="build-info" style="opacity:.65;font-size:12px"></p>
     <footer class="site-foot">
-      <div class="sf-brand">AETHER RIFT <b>DOMINION</b></div>
+      <div class="sf-brand"><img id="foot-logo" class="foot-logo" alt="" hidden>AETHER RIFT <b>DOMINION</b></div>
       <nav><a href="https://github.com/andreyrafael85/aether-rift-dominion" target="_blank" rel="noopener">GitHub</a><a href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Feedback</a><button class="linklike" id="foot-help">Como jogar</button><button class="linklike" id="foot-termos">Termos de Uso</button><button class="linklike" id="foot-priv">Privacidade</button><span class="muted">Discord em breve</span></nav>
       <div class="sf-legal">Aether Rift Dominion — Versão 4.0 | Lançamento 2026 · Criado por Andrey Rafael · Feito no navegador, para o navegador.</div>
     </footer>
@@ -280,15 +289,15 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     <div id="proposal" hidden><div id="proposal-text"></div><div class="row"><button id="prop-yes" class="act sm good">Aceitar pacto</button><button id="prop-no" class="act sm">Recusar</button></div></div>
   </div>
 
-  <div id="loading" class="modal" hidden><div class="box" style="max-width:360px"><img id="load-leader" alt="" hidden style="width:96px;height:96px;border-radius:12px;object-fit:cover;float:right;margin:0 0 .5rem .8rem;border:2px solid var(--line)"><div class="eyebrow">Preparando o campo</div><h2>Gerando sprites</h2><p class="muted small">Modelos voxel renderizados em 8 direções com iluminação, só nesta primeira vez.</p><div class="loadbar"><i id="load-bar"></i></div></div></div>
+  <div id="loading" class="modal" hidden><div class="box" style="max-width:360px"><img id="load-leader" alt="" hidden style="width:96px;height:96px;border-radius:12px;object-fit:cover;float:right;margin:0 0 .5rem .8rem;border:2px solid var(--line)"><div class="eyebrow"><img id="load-logo" class="load-logo" alt="" hidden>Preparando o campo</div><h2>Gerando sprites</h2><p class="muted small">Modelos voxel renderizados em 8 direções com iluminação, só nesta primeira vez.</p><div class="loadbar"><i id="load-bar"></i></div></div></div>
   <div id="diplo" class="modal" hidden><div class="box"><h2>Diplomacia</h2><div id="diplo-body"></div><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
   <div id="confirm" class="modal" hidden><div class="box"><h2>Confirmar</h2><p id="confirm-text"></p><div class="row"><button id="confirm-yes" class="btn primary">Confirmar</button><button id="confirm-no" class="btn">Cancelar</button></div></div></div>
   <div id="end" class="modal" hidden><div class="box"><img id="end-leader" alt="" hidden style="width:110px;height:110px;border-radius:14px;object-fit:cover;float:right;margin:0 0 .5rem 1rem;border:2px solid var(--line)"><div class="eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-again" class="btn primary">Jogar de novo</button><button id="btn-copy" class="btn">Copiar resultado (JSON)</button><a class="btn" href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Enviar feedback</a></div><textarea id="end-json" hidden rows="6" style="width:100%;font-family:var(--fm);font-size:11px;background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px"></textarea></div></div>
 </div>
 
-<div id="termos" class="modal" hidden><div class="box"><h2>Termos de Uso</h2><p class="muted small">Aether Rift: Dominion é um beta gratuito, em testes. O jogo é fornecido como está, sem garantias. Não reutilize os assets em outros projetos sem autorização. Nas partidas multiplayer, somas de verificação detectam divergências; trapaças encerram a partida para todos. Problemas e sugestões: use o link de feedback.</p><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
-<div id="priv" class="modal" hidden><div class="box"><h2>Política de Privacidade</h2><p class="muted small">O jogo não tem contas e não coleta dados pessoais. Preferências e progresso ficam no armazenamento local do seu navegador e podem ser apagados por você. No multiplayer, a conexão é direta entre os jogadores (WebRTC via PeerJS); o código da sala serve apenas para o pareamento e nenhuma partida passa por servidores nossos. O link de feedback leva ao GitHub, que tem políticas próprias.</p><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
-<div id="help" class="modal help" hidden><div class="box">
+<div id="termos" class="modal" hidden><div class="box"><button class="mclose" data-close aria-label="Fechar">✕</button><h2>Termos de Uso</h2><p class="muted small">Aether Rift: Dominion é um beta gratuito, em testes. O jogo é fornecido como está, sem garantias. Não reutilize os assets em outros projetos sem autorização. Nas partidas multiplayer, somas de verificação detectam divergências; trapaças encerram a partida para todos. Problemas e sugestões: use o link de feedback.</p><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
+<div id="priv" class="modal" hidden><div class="box"><button class="mclose" data-close aria-label="Fechar">✕</button><h2>Política de Privacidade</h2><p class="muted small">O jogo não tem contas e não coleta dados pessoais. Preferências e progresso ficam no armazenamento local do seu navegador e podem ser apagados por você. No multiplayer, a conexão é direta entre os jogadores (WebRTC via PeerJS); o código da sala serve apenas para o pareamento e nenhuma partida passa por servidores nossos. O link de feedback leva ao GitHub, que tem políticas próprias.</p><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
+<div id="help" class="modal help" hidden><div class="box"><button class="mclose" data-close aria-label="Fechar">✕</button>
   <h2>Como jogar</h2>
   <p class="muted small">Objetivo: destruir os Núcleos inimigos ou ter mais Domínio (território, exército e recursos) ao fim de 25 minutos. Energia abaixo de 100% deixa produção, sensores e defesas piores: construa Reatores.</p>
   <h3>Mouse e teclado</h3>
