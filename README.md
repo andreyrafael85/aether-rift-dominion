@@ -24,10 +24,18 @@ Abra uma **Issue** usando o modelo "Feedback de partida" (ou mande a captura da 
 
 ## Estrutura
 
-- `index.html` jogo em arquivo único (gerado de `beta-src/`)
-- `estilo.html` prova de conceito do visual voxel isométrico (gerado de `style-src/`)
-- `beta-src/` simulação determinística, IA, renderizador, entrada e HUD; `node build.mjs` gera o jogo, `node test.cjs` roda IA contra IA com verificação de invariantes
-- `docs/` documento de conceito e plano de desenvolvimento
-- `capturas/` imagens de referência do estilo
+```
+aether-rift-dominion/
+├─ index.html        jogo em arquivo único (gerado; é o que o GitHub Pages serve)
+├─ estilo.html       prova de conceito do visual voxel isométrico (gerado)
+├─ src/              fontes do jogo: sim.js (simulação determinística), ai.js, voxel.js e models.js
+│                    (sprites voxel), render.js, input.js, main.js, index.tpl.html (HUD e CSS)
+├─ style/            cena da prova de conceito (scene.js, boot.js, index.tpl.html)
+├─ tools/            build.mjs (gera index.html, estilo.html e dist/) e test.cjs (IA contra IA, invariantes, determinismo)
+├─ docs/             conceito, plano de desenvolvimento e proposta do beta v1.5
+└─ capturas/         imagens de referência do estilo
+```
+
+Build: `node tools/build.mjs` · Teste headless: `node tools/test.cjs`
 
 Conteúdo em fase de teste. Todos os direitos reservados; não é permitido redistribuir fora deste repositório sem autorização.

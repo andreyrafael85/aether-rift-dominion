@@ -1,5 +1,5 @@
 globalThis.ARD = {};
-require('./src/sim.js'); require('./src/ai.js');
+require('../src/sim.js'); require('../src/ai.js');
 const S = ARD.sim, AI = ARD.ai;
 function run(seed, players, minutes, log) {
   const sim = S.createSim({ seed, players, minutes });
