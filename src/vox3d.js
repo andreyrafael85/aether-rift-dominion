@@ -23,7 +23,7 @@ function buildGeometry(model, opts) {
       for (const i of [0, 1, 2, 0, 2, 3]) { tgt.pos.push(...vs[i]); tgt.nor.push(...n); tgt.col.push(...col); }
     }
   }
-  const mk = d => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(d.pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(d.nor, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(d.col, 3)); g.computeBoundingSphere(); return g; };
+  const mk = d => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(d.pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(d.nor, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(d.col, 3)); const n = d.pos.length / 3, rm = new Float32Array(n * 2); for (let i = 0; i < n; i++) { rm[i * 2] = 0.82; rm[i * 2 + 1] = 0.12; } g.setAttribute('rm', new THREE.BufferAttribute(rm, 2)); g.computeBoundingSphere(); return g; };
   return { main: mk(out), em: em.pos.length ? mk(em) : null, width: Math.max(b.x1 - b.x0, b.y1 - b.y0), height: b.z1 - b.z0 };
 }
 ARD.vox3d = { buildGeometry };

@@ -1,0 +1,40 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Catálogo 3D</title>
+<style>html,body{margin:0;background:#0e1116;overflow:hidden;font-family:system-ui,sans-serif}#lab{position:absolute;inset:0;pointer-events:none}.l{position:absolute;transform:translate(-50%,0);color:#dfe6ee;font:600 13px/1.1 system-ui;text-shadow:0 1px 3px #000,0 0 8px #000;white-space:nowrap}</style>
+<script type="importmap">{"imports":{"three":"../dist/vendor/three/build/three.module.min.js","three/addons/":"../dist/vendor/three/examples/jsm/"}}</script>
+</head><body><div id="lab"></div>
+<script src="../src/sim.js"></script><script src="../src/meshes.js"></script>
+<script type="module">
+// Catálogo das malhas 3D por Raça (Engine gráfica 2). Parâmetros: race, view=b|u|n, w, h, color, yaw, pitch
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+window.THREE = THREE;
+const q = new URLSearchParams(location.search); const race = q.get('race') || 'vehnar', view = q.get('view') || 'b'; const W = +(q.get('w') || 1600), Hh = +(q.get('h') || 900);
+const S = ARD.sim, M = ARD.meshes; const tc = q.get('color') || '#FF8C1A';
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); renderer.setSize(W, Hh); renderer.setPixelRatio(1); document.body.appendChild(renderer.domElement);
+renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0; renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x1a2029); const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+scene.add(new THREE.HemisphereLight(0x9fb8d6, 0x2a2a30, 0.55)); scene.add(new THREE.AmbientLight(0x404860, 0.25)); const sun = new THREE.DirectionalLight(0xffe9c4, 1.6); sun.position.set(-300, 520, 360); sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096); const sc = sun.shadow.camera; sc.left = -700; sc.right = 700; sc.top = 700; sc.bottom = -700; sc.near = 10; sc.far = 2000; sun.shadow.bias = -0.0004; scene.add(sun);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: q.get('ground') || 0x5f6670, roughness: 0.95 })); ground.receiveShadow = true; scene.add(ground);
+const mat = M.material({ env: +(q.get('env') || 0.55) }), matEm = new THREE.MeshBasicMaterial({ vertexColors: true });
+let defs, rOf;
+if (view === 'b') { defs = M.BUILDING_DEFS.slice(); rOf = d => S.BUILDINGS[d].r; }
+else if (view === 'n') { defs = M.NEUTRAL_DEFS.map(d => d).concat(M.PROP_RACES.map(r => 'prop_' + r)); rOf = d => d === 'crate' ? 9 : d === 'wreck' ? 12 : d.startsWith('prop_') ? 8 : 18; }
+else { defs = M.unitsOf(race); rOf = d => S.UNITS[d].r; }
+const cols = view === 'b' ? 4 : view === 'n' ? 6 : Math.ceil(Math.sqrt(defs.length * 1.6)); const rows = Math.ceil(defs.length / cols);
+const cell = view === 'b' ? 118 : view === 'n' ? 62 : 58; const labels = [];
+defs.forEach((d, i) => { const g = M.build(d, view === 'n' ? null : race, tc, i); if (!g) return; const fit = 2 * rOf(d) * 1.25 / g.width; const grp = new THREE.Group();
+  const a = new THREE.Mesh(g.main, mat); a.castShadow = a.receiveShadow = true; grp.add(a); if (g.em) grp.add(new THREE.Mesh(g.em, matEm)); grp.scale.setScalar(fit);
+  const cx = (i % cols - (cols - 1) / 2) * cell, cz = (Math.floor(i / cols) - (rows - 1) / 2) * cell; grp.position.set(cx, 0, cz); grp.rotation.y = view === 'u' ? 0.5 : 0; scene.add(grp);
+  labels.push({ d, p: new THREE.Vector3(cx, 0, cz + cell * 0.36) }); });
+const span = Math.max(cols * 0.95, rows * 1.45) * cell; const cam = new THREE.PerspectiveCamera(30, W / Hh, 10, 20000); const pitch = +(q.get('pitch') || 0.78), yaw = +(q.get('yaw') || 0.55); const dist = span * 1.62;
+cam.position.set(Math.sin(yaw) * Math.cos(pitch) * dist, Math.sin(pitch) * dist, Math.cos(yaw) * Math.cos(pitch) * dist); cam.lookAt(0, view === 'b' ? 8 : 4, 0);
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(W, Hh, { type: THREE.HalfFloatType, samples: 4 })); composer.addPass(new RenderPass(scene, cam)); composer.addPass(new UnrealBloomPass(new THREE.Vector2(W, Hh), 0.42, 0.5, 1.3)); composer.addPass(new OutputPass());
+composer.render();
+const lab = document.getElementById('lab'); const names = Object.assign({}, ...Object.keys(S.UNITS).map(k => ({ [k]: S.UNITS[k].name })), ...Object.keys(S.BUILDINGS).map(k => ({ [k]: S.BUILDINGS[k].name })));
+for (const L of labels) { const v = L.p.clone().project(cam); const el = document.createElement('div'); el.className = 'l'; el.style.left = ((v.x + 1) / 2 * W) + 'px'; el.style.top = ((1 - v.y) / 2 * Hh) + 'px'; el.textContent = (view === 'u' && (L.d === 'pirata' || L.d === 'coletor') && S.unitName) ? S.unitName(race, L.d) : (names[L.d] || L.d); lab.appendChild(el); }
+window.__done = true;
+</script></body></html>

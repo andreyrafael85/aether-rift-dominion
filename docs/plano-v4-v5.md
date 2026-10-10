@@ -96,15 +96,16 @@ Tudo o que foi produzido na galeria (pipeline `tools/arte3d.html`) é código re
 | Da galeria | No jogo | Release |
 |---|---|---|
 | Hero 3D Oceano de Tempestades | fundo da tela inicial em 2560×1280 (arquivo separado + placeholder) | 4.0b ✔ |
-| Logo Final 2 (Escudo-Órbita) | marca na tela inicial, favicon, carregamento, rodapé; versão viva com a órbita girando | 4.0b ✔ · animado 4.0d |
+| Logo Final 2 (Escudo-Órbita) | marca na tela inicial, favicon, carregamento, rodapé; versão viva com a órbita girando | 4.0b ✔ · animado 4.0d ✔ |
 | Líderes cartoon 3D com expressões | portais, HUD em "chamada" reagindo à partida, diplomacia, carregamento e fim | 4.0b ✔ |
 | Mundos natais (Postal) | tela de carregamento e fundo dos portais; geografia por Raça no mapa: props de território (chaminés, lanças de gelo, brotos, cristais, ovos) crescem em volta do Núcleo e dos Nódulos | 4.0b ✔ |
 | Nuvens e atmosfera dos mundos | sombras de nuvem deslizando no terreno; névoa de horizonte por clima | 4.0b ✔ · 4.0c |
-| Planetas, luas e nebulosas | céu de fundo com o planeta-mãe da Raça visível ao inclinar a câmera (inclinação livre entra junto) | 4.0d |
-| Materiais com reflexo (env map), anti-aliasing MSAA no pós | materiais das unidades e construções com reflexo real; MSAA no composer nos presets Alta/Ultra | MSAA 4.0c ✔ · env map 4.0d |
+| Planetas, luas e nebulosas | céu de fundo com o planeta-mãe da Raça visível ao inclinar a câmera (inclinação livre entra junto) | 4.0d ✔ |
+| Materiais com reflexo (env map), anti-aliasing MSAA no pós | materiais das unidades e construções com reflexo real; MSAA no composer nos presets Alta/Ultra | MSAA 4.0c ✔ · env map 4.0d ✔ |
 | Cinturão de asteroides | mapa "Cinturão": combate em rochas flutuantes com buracos no terreno | 4.1 |
-| Insígnia Cristal | HUD ✔; decalque nas unidades e bandeira nos Nódulos | 4.0b ✔ · 4.0d |
-| Expressões dos líderes | cenas de diplomacia com os dois líderes frente a frente; briefing da campanha | diplomacia 4.0c ✔ · briefing 4.0d |
+| Insígnia Cristal | HUD ✔; bandeira no Núcleo e nos Nódulos | 4.0b ✔ · bandeiras 4.0d ✔ |
+| Expressões dos líderes | cenas de diplomacia com os dois líderes frente a frente; briefing da campanha | diplomacia 4.0c ✔ · briefing 4.0e |
+| Modelos 3D por Raça (Engine gráfica 2) | construções, unidades, nós, rochas, ruínas e adereços em malhas suaves com PBR por peça (src/meshes.js), ícones do HUD renderizados dos modelos, terreno com textura de detalhe, cordilheiras além do mapa | 4.0d ✔ |
 
 Regra de ouro: cada técnica nova no renderizador da galeria vira um módulo do jogo (shader, modelo voxel ou cena Three.js) com orçamento de performance medido em celular intermediário antes de entrar no preset Automática.
 
@@ -182,8 +183,9 @@ Regra de ouro: cada técnica nova no renderizador da galeria vira um módulo do 
 - **4.0a — Identidade** ✔ (2026-10-10): rename Raça em toda a superfície; homepage nova com portais; materiais/paletas por Raça; animações de nascimento de construção; presets de clima.
 - **4.0b — Arte aprovada dentro do jogo** ✔ (2026-10-10): logo Escudo-Órbita (tela inicial, favicon, carregamento, rodapé), hero 4K, líderes com três expressões no HUD/diplomacia/fim, mundos natais nos portais, insígnia Cristal, props de território e sombras de nuvem no terreno.
 - **4.0c — Raças novas** ✔ (2026-10-10): Quorith e Vorag no sim (Elo de Sincronia, Uníssono, Ressonador que emudece torres, pactos pela metade; Crias em pares, Fome, Carniceiro que devora carcaças e Nódulos, Eclosão), IA com ordens de construção e nomes próprios, self-play round-robin (`tools/selfplay-all.sh`), det-test com as 5 Raças; MSAA 4× nos presets Alta/Ultra; cena de diplomacia frente a frente; controles no PC (rolagem de borda pela janela inteira e botão direito arrastando). *Medido em 2026-10-10 (1v1, IA normal, 4 sementes, 20 min): Vorag 62% de vitórias nos seus confrontos (rush de Crias; perde 0–4 para Quorith), Quorith e Vehnar ≈44%, Tessara 31%, Erevane 25% — Erevane e Tessara já eram as mais fracas antes da 4.0c; próxima rodada de balanceamento na 4.0d (buff Erevane/Tessara, defesa contra rush).*
-- **4.0d — Campanha e progresso**: ProgressStore, Comandante/conquistas/relíquias, Prólogo + Atos 1–2; depois Atos 3–4 + identidade; Hangar de personalização. *Critério: campanha jogável com progressão salva.* Engine: logo com órbita viva, céu com o planeta-mãe (inclinação livre), decalques de insígnia e bandeiras nos Nódulos.
-- **4.0e — Mobile/PWA e beta**: manifest+SW, heurística de qualidade, polish de toque, rodada com testadores.
+- **4.0d — Engine gráfica 2 (restilização 3D)** ✔ (2026-10-10): 191 modelos 3D suaves por Raça com PBR por peça e reflexo de ambiente (kits de arquitetura por Raça em src/meshes.js), ícones do HUD renderizados dos modelos, céu com sol e estrelas, planeta-mãe e lua no horizonte, cordilheiras além da borda do mapa, terreno com textura de detalhe e relevo fino, inclinação livre da câmera, bandeiras com a Insígnia, logo vivo, nível de detalhe menor no celular, catálogo 3D (tools/catalogo3d.html), portão de qualidade (tools/qa.cjs); balanceamento Erevane/Tessara.
+- **4.0e — Campanha e progresso**: ProgressStore, Comandante/conquistas/relíquias, Prólogo + Atos 1–2; depois Atos 3–4 + identidade; Hangar de personalização. *Critério: campanha jogável com progressão salva.*
+- **4.0f — Mobile/PWA e beta**: manifest+SW, heurística de qualidade, polish de toque, rodada com testadores.
 
 **Preparação para a v5.0 dentro da v4.0**: interface ProgressStore (local hoje, conta amanhã); IDs estáveis de itens/conquistas; log de comandos por partida (replay local); protocolo de rede versionado (feito na 3.0d); separação meta/jogo na estrutura de páginas.
 

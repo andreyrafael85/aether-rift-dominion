@@ -4,10 +4,13 @@ Todo arquivo de arte ou biblioteca externa entra aqui com origem e licença. Sem
 
 | Item | Origem | Autor | Licença | Uso |
 |---|---|---|---|---|
-| Modelos voxel (src/models.js) | próprios, definidos em código | equipe | todos os direitos reservados | jogo, estilo 2D e 3D |
+| Modelos voxel (src/models.js) | próprios, definidos em código | equipe | todos os direitos reservados | modo 2D, ícones de reserva, estilo 2D e 3D |
+| Malhas 3D por Raça (src/meshes.js, 4.0d) | próprias, geradas em código a partir de primitivas do Three.js | equipe | todos os direitos reservados | jogo (modo 3D), ícones do HUD, catálogo 3D |
+| Céu, planeta-mãe, horizonte e textura de detalhe do terreno (src/world3d.js) | procedurais (ruído fBm), paletas dos mundos aprovados | equipe | todos os direitos reservados | jogo (modo 3D) |
+| Logo vivo (src/logo3d.js) | cena procedural da Final 2 aprovada | equipe | todos os direitos reservados | tela inicial (desktop) |
 | Texturas de terreno | procedurais (src/render.js) | equipe | todos os direitos reservados | jogo |
 | Efeitos sonoros | sintetizados em tempo real (src/audio.js) | equipe | todos os direitos reservados | jogo |
 | Voz de sistema | Web Speech API do navegador | navegador do jogador | n/a | jogo |
 | Fontes Big Shoulders Display, IBM Plex Sans, IBM Plex Mono | Google Fonts | Indestructible Type, IBM | SIL Open Font License 1.1 | interface |
-| Three.js 0.160.0 | jsDelivr (three.module.min.js + examples/jsm/postprocessing) no jogo; cdnjs (three.min.js) em estilo3d.html | three.js authors | MIT | jogo (modo 3D) e estilo3d.html |
+| Three.js 0.160.0 | jsDelivr (three.module.min.js + examples/jsm/postprocessing + examples/jsm/environments/RoomEnvironment.js) no jogo; cdnjs (three.min.js) em estilo3d.html | three.js authors | MIT | jogo (modo 3D) e estilo3d.html |
 | PeerJS 1.5.4 | cdnjs (peerjs.min.js); sinalização pelo PeerServer público | PeerJS contributors | MIT | multiplayer P2P |

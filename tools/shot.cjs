@@ -14,7 +14,7 @@ const { chromium } = require('playwright');
   const tLoad = Date.now() - t0;
   await page.waitForTimeout(+settle);
   const hud = await page.evaluate(() => (document.getElementById('hud') || document.body).innerText.replace(/\s+/g, ' ').slice(0, 160));
-  await page.screenshot({ path: out });
+  await page.screenshot({ path: out, timeout: 180000 });
   await browser.close();
   console.log('load=' + tLoad + 'ms hud="' + hud + '"');
   for (const l of logs) console.log('  ' + l);

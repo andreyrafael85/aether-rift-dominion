@@ -107,15 +107,15 @@ const UNITS = {
   tratorzao:  { name: 'Tratorzão', key: 'T', cls: 'vei', hp: 220, r: 10, speed: 135, cost: { minerio: 110, plasma: 20 }, time: 8, energyUse: 2, weapon: 'metralha', sensor: 320, faction: 'vehnar', desc: 'Veículo leve e rápido de reconhecimento, com sensores longos e metralhadora.' },
   prensa:     { name: 'Prensa', key: 'R', cls: 'vei', hp: 900, r: 15, speed: 50, cost: { minerio: 320, plasma: 80 }, time: 18, energyUse: 5, weapon: 'prensa', sensor: 170, faction: 'vehnar', desc: 'Mech bípede de cerco: canhões duplos com grande área. Lento e caro.' },
   // --- Erevane
-  atirador:   { name: 'Atirador de Fenda', key: 'A', cls: 'inf', hp: 90, r: 7, speed: 85, cost: { minerio: 120, dados: 10 }, time: 9, energyUse: 1, weapon: 'fuzil_longo', sensor: 260, faction: 'erevane', desc: 'Camuflado quando parado. Tiro longo e letal contra infantaria e suporte; quase inútil contra estruturas.' },
-  lamina:     { name: 'Lâmina Rodante', key: 'L', cls: 'vei', hp: 260, r: 11, speed: 145, cost: { minerio: 150, plasma: 30 }, time: 10, energyUse: 2, weapon: 'laminas', sensor: 180, faction: 'erevane', desc: 'Veículo baixo e rápido de ataque corpo a corpo. Bata e fuja.' },
-  mosquito:   { name: 'Mosquito', key: 'M', cls: 'dro', hp: 55, r: 5, speed: 175, cost: { minerio: 45, plasma: 15 }, time: 4, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 200, faction: 'erevane', desc: 'Microdrone barato e frágil. Em enxame, pica veículos e suporte.' },
+  atirador:   { name: 'Atirador de Fenda', key: 'A', cls: 'inf', hp: 100, r: 7, speed: 85, cost: { minerio: 100, dados: 10 }, time: 9, energyUse: 1, weapon: 'fuzil_longo', sensor: 260, faction: 'erevane', desc: 'Camuflado quando parado. Tiro longo e letal contra infantaria e suporte; quase inútil contra estruturas.' },
+  lamina:     { name: 'Lâmina Rodante', key: 'L', cls: 'vei', hp: 300, r: 11, speed: 145, cost: { minerio: 140, plasma: 30 }, time: 10, energyUse: 2, weapon: 'laminas', sensor: 180, faction: 'erevane', desc: 'Veículo baixo e rápido de ataque corpo a corpo. Bata e fuja.' },
+  mosquito:   { name: 'Mosquito', key: 'M', cls: 'dro', hp: 65, r: 5, speed: 175, cost: { minerio: 45, plasma: 15 }, time: 4, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 200, faction: 'erevane', desc: 'Microdrone barato e frágil. Em enxame, pica veículos e suporte.' },
   ancora:     { name: 'Âncora', key: 'N', cls: 'sup', hp: 160, r: 9, speed: 70, cost: { minerio: 140, plasma: 30, dados: 20 }, time: 11, energyUse: 3, sensor: 200, faction: 'erevane', aura: { cloak: 110 }, desc: 'Sem armas. Campo de Estática: suas unidades a até 110 dela ficam camufladas.' },
   // --- Tessara
-  quimera:    { name: 'Quimera', key: 'I', cls: 'inf', hp: 130, r: 7, speed: 88, cost: { minerio: 60 }, time: 6, energyUse: 1, weapon: 'fuzil', sensor: 170, faction: 'tessara', desc: 'Infantaria adaptativa. Ganha Traços contra as classes que mais combate.' },
+  quimera:    { name: 'Quimera', key: 'I', cls: 'inf', hp: 140, r: 7, speed: 88, cost: { minerio: 55 }, time: 6, energyUse: 1, weapon: 'fuzil', sensor: 170, faction: 'tessara', desc: 'Infantaria adaptativa. Ganha Traços contra as classes que mais combate.' },
   esporo:     { name: 'Esporo-sentinela', key: 'E', cls: 'dro', hp: 90, r: 6, speed: 160, cost: { minerio: 70, plasma: 20 }, time: 6, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 330, faction: 'tessara', desc: 'Drone de reconhecimento com sensores muito longos.' },
   molde:      { name: 'Molde', key: 'O', cls: 'sup', hp: 150, r: 9, speed: 75, cost: { minerio: 130, plasma: 20, dados: 20 }, time: 10, energyUse: 2, sensor: 200, faction: 'tessara', aura: { buff: 100 }, desc: 'Sem armas. Suas unidades a até 100 dele causam +15% de dano.' },
-  colosso:    { name: 'Colosso Cambiante', key: 'C', cls: 'vei', hp: 1100, r: 16, speed: 48, cost: { minerio: 360, plasma: 90, dados: 30 }, time: 20, energyUse: 6, weapon: 'colosso', sensor: 180, faction: 'tessara', desc: 'Pesado de cerco com canhão de área. Ganha Traços como as outras unidades Tessara.' },
+  colosso:    { name: 'Colosso Cambiante', key: 'C', cls: 'vei', hp: 1150, r: 16, speed: 50, cost: { minerio: 320, plasma: 80, dados: 25 }, time: 20, energyUse: 6, weapon: 'colosso', sensor: 180, faction: 'tessara', desc: 'Pesado de cerco com canhão de área. Ganha Traços como as outras unidades Tessara.' },
   // --- Quorith (4.0c)
   voz:        { name: 'Voz', key: 'Z', cls: 'inf', hp: 95, r: 7, speed: 92, cost: { minerio: 55, dados: 5 }, time: 6, energyUse: 1, weapon: 'pulso_voz', sensor: 170, faction: 'quorith', desc: 'Pulso básico do Coro. Fraca sozinha; em acorde (Elo: +3,5% de dano e +2,5% de armadura por aliado Quorith a até 90, máx. 3) fica letal.' },
   agulha:     { name: 'Agulha', key: 'G', cls: 'inf', hp: 110, r: 7, speed: 85, cost: { minerio: 100, plasma: 25 }, time: 8, energyUse: 1, weapon: 'agulha', sensor: 220, faction: 'quorith', desc: 'Antiaérea: agulhas ressonantes que estilhaçam drones. Fraca contra veículos e estruturas.' },
@@ -152,7 +152,7 @@ const WEAPONS = {
   chama:    { dmg: 20, range: 75,  cd: 0.5, proj: 'beam',   speed: 0,   inacc: 0,  splash: 22, cls: 'inf', versusOverride: { inf: 1.6, vei: 0.5, dro: 0.7, est: 0.9, sup: 1.3 } },
   fuzil_longo: { dmg: 55, range: 260, cd: 2.6, proj: 'bullet', speed: 900, inacc: 2, splash: 0, cls: 'inf', versusOverride: { inf: 1.6, vei: 0.6, dro: 1.1, est: 0.4, sup: 1.6 } },
   prensa:   { dmg: 70, range: 140, cd: 2.2, proj: 'shell',  speed: 280, inacc: 14, splash: 34, cls: 'vei' },
-  laminas:  { dmg: 24, range: 80,  cd: 0.6, proj: 'beam',   speed: 0,   inacc: 0,  splash: 0,  cls: 'vei' },
+  laminas:  { dmg: 27, range: 80,  cd: 0.6, proj: 'beam',   speed: 0,   inacc: 0,  splash: 0,  cls: 'vei' },
   ferrao:   { dmg: 7,  range: 85,  cd: 0.45, proj: 'bullet', speed: 800, inacc: 5, splash: 0,  cls: 'dro' },
   colosso:  { dmg: 60, range: 150, cd: 1.8, proj: 'shell',  speed: 300, inacc: 12, splash: 28, cls: 'vei' },
   // 4.0c — Quorith
@@ -804,7 +804,7 @@ function applyDamage(sim, attackerOwner, attacker, t, dmg, weapon) {
     if (p && FACTIONS[p.faction].traits && t.cls !== 'civ') { // Traços Tessara: por tipo de unidade, contra a classe mais combatida (máximo 2)
       const tc = armorOf(t); const x = p.traitXp[attacker.def] = p.traitXp[attacker.def] || {}; x[tc] = (x[tc] || 0) + dmg;
       const tr = p.traits[attacker.def] = p.traits[attacker.def] || {};
-      if (!tr[tc] && Object.keys(tr).length < 2 && x[tc] >= 350) { tr[tc] = true; alertTo(sim, p.id, 'Traço adquirido: ' + UNITS[attacker.def].name + ' +25% contra ' + CLASS_NAMES[tc], attacker.x, attacker.y, 'good'); emit(sim, { t: 'trait', owner: p.id, x: attacker.x, y: attacker.y }); }
+      if (!tr[tc] && Object.keys(tr).length < 2 && x[tc] >= 280) { tr[tc] = true; alertTo(sim, p.id, 'Traço adquirido: ' + UNITS[attacker.def].name + ' +25% contra ' + CLASS_NAMES[tc], attacker.x, attacker.y, 'good'); emit(sim, { t: 'trait', owner: p.id, x: attacker.x, y: attacker.y }); }
     }
   }
   if (weapon && weapon.stun && (t.cls === 'vei' || t.kind === 'building')) t.cd = Math.max(t.cd || 0, 1.0);

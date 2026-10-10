@@ -223,7 +223,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 <div id="start" class="screen">
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Versão 4.0c · build 2026-10-10 19:57Z · cinco Raças jogáveis · 3D · multiplayer 2 a 4</div>
+    <div class="eyebrow">Versão 4.0d · build 2026-10-10 23:16Z · Engine gráfica 2 · cinco Raças · multiplayer 2 a 4</div>
     <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div><h1>Aether Rift<br><span>Dominion</span></h1></div></div>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -247,6 +247,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     </div>
     <div class="notes">
       <div class="choose">Notas da versão</div>
+      <p class="start-notes"><b>4.0d — Engine gráfica 2 (restilização 3D):</b> as cinco Raças ganharam <b>modelos 3D de verdade</b>, suaves e com materiais físicos (cor, rugosidade e metal por peça, reflexo do ambiente): aço chanfrado com faixas de equipe e chaminés acesas no Vehnar, placas angulares de vidro escuro com costuras luminosas na Erevane, cascos orgânicos cor de osso com nervuras e bulbos na Tessara, cristal facetado com anéis flutuantes no Quorith e quitina úmida com espinhos e sacos membranosos na Vorag. São 191 modelos (construções, unidades, nós de recurso, rochas, ruínas e adereços), com nível de detalhe menor no celular. Os ícones do HUD agora são renderizados a partir dos modelos 3D. O mundo ganhou <b>céu</b> com sol e estrelas, o <b>planeta-mãe da sua Raça</b> e uma lua no horizonte, <b>cordilheiras além da borda do mapa</b> e terreno com textura de detalhe, rachaduras e relevo fino. Nova <b>inclinação livre da câmera</b> (◢, PageUp/PageDown ou Ctrl + roda) até a visão de horizonte. <b>Bandeiras</b> com a Insígnia Cristal da Raça tremulam no Núcleo e nos Nódulos, e o <b>logo da tela inicial é 3D ao vivo</b>, com os cinco mundos girando na órbita. Balanceamento: Erevane e Tessara mais fortes (Lâmina, Atirador, Mosquito, Quimera, Colosso e Traços mais rápidos).</p>
       <p class="start-notes"><b>4.0c — Coro Quorith e Prole Vorag jogáveis:</b> cinco Raças na tela inicial e nas salas multiplayer. O <b>Coro Quorith</b> luta em acorde: o <b>Elo de Sincronia</b> dá +3,5% de dano e +2,5% de armadura por aliado a até 90 (máx. 3; o <b>Diapasão</b> aceita um quarto), pactos custam metade da Caução e rendem o dobro de reputação, o <b>Ressonador</b> emudece torres enquanto sifona e o <b>Uníssono</b> fecha o acorde inteiro por 20 s. Unidades: Voz, Agulha (antiaérea), Diapasão, Prisma, Monólito (cerco) e Harmônico (voador). A <b>Prole Vorag</b> é massa barata: <b>Crias</b> eclodem em pares, sentem <b>Fome</b> fora do território, o <b>Carniceiro</b> devora carcaças (150% do valor) e corrói Nódulos inimigos em biomassa, e a <b>Eclosão</b> solta 8 Crias num ponto visível. Unidades: Cria, Cuspidor (ácido), Escaravelho, Brutamonte, Ferroada (voadora). Cada Raça nasce do chão à sua maneira: cristal que afina em facetas, casulo que pulsa e rompe. IAs novas: Coro de Zayin, Acorde Sétimo, Silêncio de Quor, Prole Velk, Ninhada Cega, Fome de Oru. Engine: <b>anti-aliasing MSAA 4×</b> nos presets Alta e Ultra (o vigia de tela preta desliga sozinho se a GPU não aguentar) e a Diplomacia abre com os dois líderes <b>frente a frente</b>, sereno em pacto, furioso em guerra. Controles no PC: a câmera continua rolando quando o mouse encosta na barra do navegador ou na barra do Windows, e <b>segurar o botão direito e arrastar</b> move o mapa (toque no celular segue igual: arrastar move, pinça aproxima).</p>
       <p class="start-notes"><b>4.0a — Identidade das Raças:</b> o jogo agora fala em <b>Raças</b>; portais na tela inicial com fundo vivo que acompanha a escolha; materiais 3D próprios por Raça (metal Vehnar, vidro furtivo Erevane, pele viva Tessara); cada Raça constrói com um <b>nascimento</b> próprio: módulos soldados em degraus, origami que cintila até camuflar, casulo que pulsa e floresce; presets de <b>clima</b> dentro da partida (névoa tóxica, tempestade de plasma, chuva de cristais, aurora, chuva ácida).</p>
       <p class="start-notes"><b>O que este beta testa:</b> construção com energia dinâmica, três recursos, Nódulos de território, roubo por Sifão, tabela de contras, névoa de guerra com camuflagem, diplomacia com Caução, superarmas e salas multiplayer P2P de 2 a 4 jogadores. Partidas de até 25 minutos.</p>
@@ -288,7 +289,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     </div>
     <div id="log"></div>
     <div id="bar">
-      <button id="btn-nucleo" class="tb">Núcleo</button><button id="btn-rot" class="tb" title="Girar câmera">⟳</button><button id="btn-army" class="tb">Exército</button><button id="btn-all" class="tb">Na tela</button><button id="btn-build" class="tb">Construir</button><button id="btn-attack" class="tb">Atacar</button><button id="btn-stop" class="tb">Parar</button><button id="btn-box" class="tb">Caixa</button><button id="btn-clear" class="tb">✕</button>
+      <button id="btn-nucleo" class="tb">Núcleo</button><button id="btn-rot" class="tb" title="Girar câmera">⟳</button><button id="btn-tilt" class="tb" title="Inclinar câmera (PageUp/PageDown ou Ctrl + rolagem)">◢</button><button id="btn-army" class="tb">Exército</button><button id="btn-all" class="tb">Na tela</button><button id="btn-build" class="tb">Construir</button><button id="btn-attack" class="tb">Atacar</button><button id="btn-stop" class="tb">Parar</button><button id="btn-box" class="tb">Caixa</button><button id="btn-clear" class="tb">✕</button>
     </div>
     <div id="chat" hidden><div id="chat-log"></div><input id="chat-in" placeholder="Mensagem (Enter)" maxlength="120"></div>
     <div id="mp-wait" hidden>Aguardando o outro jogador…</div>
@@ -316,11 +317,13 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <tr><td>Letras com estrutura selecionada</td><td>Produzir: a tecla aparece em cada botão (C Coletor, I Infantaria, S Suporte, P Pirata, V Veículo, D Drone; e as unidades da sua Raça, como O Soldador, U Guindaste, A Atirador, M Mosquito, N Âncora, L Lâmina, R Prensa, E Esporo, C Colosso na Fábrica)</td></tr>
   <tr><td>Ctrl+1–9 / 1–9</td><td>Definir / selecionar grupo (duas vezes centraliza)</td></tr>
   <tr><td>F1 / F2 / F / Espaço</td><td>Núcleo / exército / centralizar seleção / ir ao último alerta</td></tr>
-  <tr><td>WASD, setas, roda, botão do meio</td><td>Câmera e zoom</td></tr>
+  <tr><td>WASD, setas, roda, botão do meio</td><td>Câmera e zoom. Encostar o mouse na borda da janela também move o mapa.</td></tr>
+  <tr><td>Segurar o botão direito e arrastar</td><td>Mover o mapa (o clique curto continua sendo o comando de mover/atacar)</td></tr>
   <tr><td>Q / E</td><td>Girar a câmera (modo 3D); no celular, o botão ⟳</td></tr>
+  <tr><td>PageUp / PageDown, Ctrl + roda, botão ◢</td><td>Inclinar a câmera até o horizonte (o planeta-mãe da sua Raça aparece no céu); Home volta à visão tática</td></tr>
   <tr><td>P / H / Esc</td><td>Pausar / ajuda / cancelar</td></tr></table>
   <h3>Toque</h3>
-  <table><tr><td>Toque</td><td>Toque em uma unidade sua para selecionar; duplo toque seleciona todas do tipo. Com unidades selecionadas: toque no chão move, toque no inimigo ataca, toque em nó ou carcaça colhe, toque em Refinaria inimiga com Pirata sifona.</td></tr><tr><td>Barra inferior</td><td>Núcleo, Exército, Na tela (seleciona o que aparece), Construir, Atacar (o modo fica ligado até desligar), Parar, Caixa (arrastar seleciona) e ✕ (limpar seleção).</td></tr><tr><td>Arrastar / dois dedos</td><td>Câmera / zoom. Em modo Construir com Muro, arrastar desenha o muro.</td></tr></table>
+  <table><tr><td>Toque</td><td>Toque em uma unidade sua para selecionar; duplo toque seleciona todas do tipo. Com unidades selecionadas: toque no chão move, toque no inimigo ataca, toque em nó ou carcaça colhe, toque em Refinaria inimiga com Pirata sifona.</td></tr><tr><td>Barra inferior</td><td>Núcleo, Exército, Na tela (seleciona o que aparece), Construir, Atacar (o modo fica ligado até desligar), Parar, Caixa (arrastar seleciona) e ✕ (limpar seleção).</td></tr><tr><td>Arrastar / dois dedos</td><td>Câmera / zoom. Em modo Construir com Muro, arrastar desenha o muro. O botão ◢ inclina a câmera.</td></tr></table>
   <h3>Contras (atacante → alvo)</h3>
   <table class="matrix"><thead><tr><th></th><th>Inf.</th><th>Veíc.</th><th>Drone</th><th>Estrut.</th><th>Sup.</th></tr></thead><tbody>
   <tr><td>Infantaria</td><td>—</td><td class="bad">▼</td><td class="good">▲</td><td class="bad">▼</td><td class="good">▲</td></tr>
@@ -342,7 +345,8 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
-window.THREE = THREE; window.THREE_ADDONS = { EffectComposer, RenderPass, UnrealBloomPass, OutputPass, SSAOPass };
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+window.THREE = THREE; window.THREE_ADDONS = { EffectComposer, RenderPass, UnrealBloomPass, OutputPass, SSAOPass, RoomEnvironment };
 window.dispatchEvent(new Event('three-ready'));
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
@@ -457,15 +461,15 @@ const UNITS = {
   tratorzao:  { name: 'Tratorzão', key: 'T', cls: 'vei', hp: 220, r: 10, speed: 135, cost: { minerio: 110, plasma: 20 }, time: 8, energyUse: 2, weapon: 'metralha', sensor: 320, faction: 'vehnar', desc: 'Veículo leve e rápido de reconhecimento, com sensores longos e metralhadora.' },
   prensa:     { name: 'Prensa', key: 'R', cls: 'vei', hp: 900, r: 15, speed: 50, cost: { minerio: 320, plasma: 80 }, time: 18, energyUse: 5, weapon: 'prensa', sensor: 170, faction: 'vehnar', desc: 'Mech bípede de cerco: canhões duplos com grande área. Lento e caro.' },
   // --- Erevane
-  atirador:   { name: 'Atirador de Fenda', key: 'A', cls: 'inf', hp: 90, r: 7, speed: 85, cost: { minerio: 120, dados: 10 }, time: 9, energyUse: 1, weapon: 'fuzil_longo', sensor: 260, faction: 'erevane', desc: 'Camuflado quando parado. Tiro longo e letal contra infantaria e suporte; quase inútil contra estruturas.' },
-  lamina:     { name: 'Lâmina Rodante', key: 'L', cls: 'vei', hp: 260, r: 11, speed: 145, cost: { minerio: 150, plasma: 30 }, time: 10, energyUse: 2, weapon: 'laminas', sensor: 180, faction: 'erevane', desc: 'Veículo baixo e rápido de ataque corpo a corpo. Bata e fuja.' },
-  mosquito:   { name: 'Mosquito', key: 'M', cls: 'dro', hp: 55, r: 5, speed: 175, cost: { minerio: 45, plasma: 15 }, time: 4, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 200, faction: 'erevane', desc: 'Microdrone barato e frágil. Em enxame, pica veículos e suporte.' },
+  atirador:   { name: 'Atirador de Fenda', key: 'A', cls: 'inf', hp: 100, r: 7, speed: 85, cost: { minerio: 100, dados: 10 }, time: 9, energyUse: 1, weapon: 'fuzil_longo', sensor: 260, faction: 'erevane', desc: 'Camuflado quando parado. Tiro longo e letal contra infantaria e suporte; quase inútil contra estruturas.' },
+  lamina:     { name: 'Lâmina Rodante', key: 'L', cls: 'vei', hp: 300, r: 11, speed: 145, cost: { minerio: 140, plasma: 30 }, time: 10, energyUse: 2, weapon: 'laminas', sensor: 180, faction: 'erevane', desc: 'Veículo baixo e rápido de ataque corpo a corpo. Bata e fuja.' },
+  mosquito:   { name: 'Mosquito', key: 'M', cls: 'dro', hp: 65, r: 5, speed: 175, cost: { minerio: 45, plasma: 15 }, time: 4, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 200, faction: 'erevane', desc: 'Microdrone barato e frágil. Em enxame, pica veículos e suporte.' },
   ancora:     { name: 'Âncora', key: 'N', cls: 'sup', hp: 160, r: 9, speed: 70, cost: { minerio: 140, plasma: 30, dados: 20 }, time: 11, energyUse: 3, sensor: 200, faction: 'erevane', aura: { cloak: 110 }, desc: 'Sem armas. Campo de Estática: suas unidades a até 110 dela ficam camufladas.' },
   // --- Tessara
-  quimera:    { name: 'Quimera', key: 'I', cls: 'inf', hp: 130, r: 7, speed: 88, cost: { minerio: 60 }, time: 6, energyUse: 1, weapon: 'fuzil', sensor: 170, faction: 'tessara', desc: 'Infantaria adaptativa. Ganha Traços contra as classes que mais combate.' },
+  quimera:    { name: 'Quimera', key: 'I', cls: 'inf', hp: 140, r: 7, speed: 88, cost: { minerio: 55 }, time: 6, energyUse: 1, weapon: 'fuzil', sensor: 170, faction: 'tessara', desc: 'Infantaria adaptativa. Ganha Traços contra as classes que mais combate.' },
   esporo:     { name: 'Esporo-sentinela', key: 'E', cls: 'dro', hp: 90, r: 6, speed: 160, cost: { minerio: 70, plasma: 20 }, time: 6, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 330, faction: 'tessara', desc: 'Drone de reconhecimento com sensores muito longos.' },
   molde:      { name: 'Molde', key: 'O', cls: 'sup', hp: 150, r: 9, speed: 75, cost: { minerio: 130, plasma: 20, dados: 20 }, time: 10, energyUse: 2, sensor: 200, faction: 'tessara', aura: { buff: 100 }, desc: 'Sem armas. Suas unidades a até 100 dele causam +15% de dano.' },
-  colosso:    { name: 'Colosso Cambiante', key: 'C', cls: 'vei', hp: 1100, r: 16, speed: 48, cost: { minerio: 360, plasma: 90, dados: 30 }, time: 20, energyUse: 6, weapon: 'colosso', sensor: 180, faction: 'tessara', desc: 'Pesado de cerco com canhão de área. Ganha Traços como as outras unidades Tessara.' },
+  colosso:    { name: 'Colosso Cambiante', key: 'C', cls: 'vei', hp: 1150, r: 16, speed: 50, cost: { minerio: 320, plasma: 80, dados: 25 }, time: 20, energyUse: 6, weapon: 'colosso', sensor: 180, faction: 'tessara', desc: 'Pesado de cerco com canhão de área. Ganha Traços como as outras unidades Tessara.' },
   // --- Quorith (4.0c)
   voz:        { name: 'Voz', key: 'Z', cls: 'inf', hp: 95, r: 7, speed: 92, cost: { minerio: 55, dados: 5 }, time: 6, energyUse: 1, weapon: 'pulso_voz', sensor: 170, faction: 'quorith', desc: 'Pulso básico do Coro. Fraca sozinha; em acorde (Elo: +3,5% de dano e +2,5% de armadura por aliado Quorith a até 90, máx. 3) fica letal.' },
   agulha:     { name: 'Agulha', key: 'G', cls: 'inf', hp: 110, r: 7, speed: 85, cost: { minerio: 100, plasma: 25 }, time: 8, energyUse: 1, weapon: 'agulha', sensor: 220, faction: 'quorith', desc: 'Antiaérea: agulhas ressonantes que estilhaçam drones. Fraca contra veículos e estruturas.' },
@@ -502,7 +506,7 @@ const WEAPONS = {
   chama:    { dmg: 20, range: 75,  cd: 0.5, proj: 'beam',   speed: 0,   inacc: 0,  splash: 22, cls: 'inf', versusOverride: { inf: 1.6, vei: 0.5, dro: 0.7, est: 0.9, sup: 1.3 } },
   fuzil_longo: { dmg: 55, range: 260, cd: 2.6, proj: 'bullet', speed: 900, inacc: 2, splash: 0, cls: 'inf', versusOverride: { inf: 1.6, vei: 0.6, dro: 1.1, est: 0.4, sup: 1.6 } },
   prensa:   { dmg: 70, range: 140, cd: 2.2, proj: 'shell',  speed: 280, inacc: 14, splash: 34, cls: 'vei' },
-  laminas:  { dmg: 24, range: 80,  cd: 0.6, proj: 'beam',   speed: 0,   inacc: 0,  splash: 0,  cls: 'vei' },
+  laminas:  { dmg: 27, range: 80,  cd: 0.6, proj: 'beam',   speed: 0,   inacc: 0,  splash: 0,  cls: 'vei' },
   ferrao:   { dmg: 7,  range: 85,  cd: 0.45, proj: 'bullet', speed: 800, inacc: 5, splash: 0,  cls: 'dro' },
   colosso:  { dmg: 60, range: 150, cd: 1.8, proj: 'shell',  speed: 300, inacc: 12, splash: 28, cls: 'vei' },
   // 4.0c — Quorith
@@ -1154,7 +1158,7 @@ function applyDamage(sim, attackerOwner, attacker, t, dmg, weapon) {
     if (p && FACTIONS[p.faction].traits && t.cls !== 'civ') { // Traços Tessara: por tipo de unidade, contra a classe mais combatida (máximo 2)
       const tc = armorOf(t); const x = p.traitXp[attacker.def] = p.traitXp[attacker.def] || {}; x[tc] = (x[tc] || 0) + dmg;
       const tr = p.traits[attacker.def] = p.traits[attacker.def] || {};
-      if (!tr[tc] && Object.keys(tr).length < 2 && x[tc] >= 350) { tr[tc] = true; alertTo(sim, p.id, 'Traço adquirido: ' + UNITS[attacker.def].name + ' +25% contra ' + CLASS_NAMES[tc], attacker.x, attacker.y, 'good'); emit(sim, { t: 'trait', owner: p.id, x: attacker.x, y: attacker.y }); }
+      if (!tr[tc] && Object.keys(tr).length < 2 && x[tc] >= 280) { tr[tc] = true; alertTo(sim, p.id, 'Traço adquirido: ' + UNITS[attacker.def].name + ' +25% contra ' + CLASS_NAMES[tc], attacker.x, attacker.y, 'good'); emit(sim, { t: 'trait', owner: p.id, x: attacker.x, y: attacker.y }); }
     }
   }
   if (weapon && weapon.stun && (t.cls === 'vei' || t.kind === 'building')) t.cd = Math.max(t.cd || 0, 1.0);
@@ -2294,10 +2298,560 @@ function buildGeometry(model, opts) {
       for (const i of [0, 1, 2, 0, 2, 3]) { tgt.pos.push(...vs[i]); tgt.nor.push(...n); tgt.col.push(...col); }
     }
   }
-  const mk = d => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(d.pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(d.nor, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(d.col, 3)); g.computeBoundingSphere(); return g; };
+  const mk = d => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(d.pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(d.nor, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(d.col, 3)); const n = d.pos.length / 3, rm = new Float32Array(n * 2); for (let i = 0; i < n; i++) { rm[i * 2] = 0.82; rm[i * 2 + 1] = 0.12; } g.setAttribute('rm', new THREE.BufferAttribute(rm, 2)); g.computeBoundingSphere(); return g; };
   return { main: mk(out), em: em.pos.length ? mk(em) : null, width: Math.max(b.x1 - b.x0, b.y1 - b.y0), height: b.z1 - b.z0 };
 }
 ARD.vox3d = { buildGeometry };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Aether Rift: Dominion — Engine gráfica 2 (4.0d): malhas 3D suaves por Raça.
+   Modelos procedurais com cor, rugosidade e metal por vértice e partes emissivas separadas, no mesmo formato do vox3d
+   ({ main, em, width, height, mount }) para o instancing do render3d. Autoria nos eixos do three: +x frente, +y cima, z lado.
+   Cada Raça tem um "kit" de arquitetura (Vehnar aço chanfrado, Erevane placas angulares, Tessara casco orgânico,
+   Quorith cristal facetado, Vorag quitina úmida); as receitas de construção e unidade usam o kit da Raça dona. */
+(function (ARD) {
+'use strict';
+let T = null; // THREE, resolvido na primeira construção (o módulo three carrega depois deste script)
+let LOD = 1; // 1 = completo; ~0.6 em celular (menos segmentos nas curvas)
+const SG = n => Math.max(5, Math.round(n * LOD));
+const MAT = { // [rugosidade, metal]
+  metal: [0.3, 0.78], steel: [0.42, 0.42], paint: [0.48, 0.18], dark: [0.58, 0.3], rubber: [0.9, 0], glass: [0.06, 0.3], gloss: [0.22, 0.45],
+  bone: [0.62, 0], chitin: [0.2, 0.05], crystal: [0.12, 0.18], skin: [0.48, 0], stone: [0.9, 0], ice: [0.12, 0.02], wet: [0.14, 0.02], matte: [0.82, 0.04],
+};
+const PAL = {
+  vehnar:  { a: '#7C8490', b: '#59606B', d: '#2B2E35', t: '#BCC2CA', r: '#8A5A3A', h: '#E8B23A', l: '#FFD27A', g: '#8FC9F0', ma: 'steel' },
+  erevane: { a: '#3A404B', b: '#262A31', d: '#121418', t: '#C9B458', l: '#E05CFF', c: '#3FE6CF', g: '#1D2A33', ma: 'gloss' },
+  tessara: { a: '#CFC3AA', b: '#B4A588', d: '#5E4F3C', t: '#8E623A', l: '#7FE3A1', am: '#F2A93B', g: '#A9E3BA', ma: 'bone' },
+  quorith: { a: '#C9BFEA', b: '#A797DC', d: '#342B4A', t: '#7E62D0', l: '#DCCBFF', c: '#B388FF', ma: 'crystal' },
+  vorag:   { a: '#5C2B37', b: '#7C3546', d: '#26121A', bo: '#E8DCC8', l: '#FF5A5A', m: '#E6455A', ac: '#B8E66A', ma: 'chitin' },
+};
+function rng(seed) { let r = ((seed | 0) * 7919 + 104729) >>> 0; return () => { r = (Math.imul(r, 1103515245) + 12345) >>> 0; return (r >>> 8) / 16777216; }; }
+
+// ---------- construtor ----------
+class Kit {
+  constructor() { this.main = []; this.emi = []; this.mount = null; this.ox = 0; this.oy = 0; this.oz = 0; }
+  _push(geo, col, mat, o) {
+    o = o || {};
+    if (geo.index) { const g2 = geo.toNonIndexed(); geo.dispose(); geo = g2; }
+    if (geo.attributes.uv) geo.deleteAttribute('uv'); if (geo.attributes.uv2) geo.deleteAttribute('uv2');
+    const q = o.q || new T.Quaternion().setFromEuler(new T.Euler(o.rx || 0, o.ry || 0, o.rz || 0, o.order || 'YXZ'));
+    const m = new T.Matrix4().compose(new T.Vector3((o.x || 0) + this.ox, (o.y || 0) + this.oy, (o.z || 0) + this.oz), q, new T.Vector3(o.sx || 1, o.sy || 1, o.sz || 1));
+    geo.applyMatrix4(m); if (o.flat) geo.computeVertexNormals();
+    const c = new T.Color(col);
+    if (o.e) { c.multiplyScalar(o.e === true ? 2.4 : o.e); this.emi.push({ geo, c }); }
+    else this.main.push({ geo, c, rm: Array.isArray(mat) ? mat : (MAT[mat] || MAT.paint) });
+    return this;
+  }
+  // caixa com base em y; o.b = chanfro (cantos arredondados na planta, bordas chanfradas em cima e embaixo)
+  box(x, y, z, w, h, d, col, mat, o) { o = Object.assign({}, o, { x, y, z }); const g = o.b ? roundBox(w, h, d, o.b, o.bs) : new T.BoxGeometry(w, h, d).translate(0, h / 2, 0); return this._push(g, col, mat, o); }
+  cyl(x, y, z, rt, rb, h, col, mat, o) { o = Object.assign({}, o, { x, y, z }); const g = new T.CylinderGeometry(rt, rb, h, o.facet ? (o.seg || 16) : SG(o.seg || 16), 1, !!o.open).translate(0, h / 2, 0); if (o.facet) o.flat = true; return this._push(g, col, mat, o); }
+  sph(x, y, z, r, col, mat, o) { o = Object.assign({}, o, { x, y, z }); const s = SG(o.seg || 16); const g = new T.SphereGeometry(r, s, Math.max(5, Math.round(s * 0.6)), 0, Math.PI * 2, 0, o.half ? Math.PI / 2 : Math.PI); return this._push(g, col, mat, o); }
+  cone(x, y, z, r, h, col, mat, o) { o = Object.assign({}, o, { x, y, z }); const g = new T.ConeGeometry(r, h, (o.seg || 14) <= 6 ? o.seg : SG(o.seg || 14)).translate(0, h / 2, 0); return this._push(g, col, mat, o); }
+  tor(x, y, z, R, r, col, mat, o) { o = Object.assign({}, o, { x, y, z }); const g = new T.TorusGeometry(R, r, SG(o.rs || 8), (o.ts || 32) <= 8 ? o.ts : SG(o.ts || 32), o.arc || Math.PI * 2).rotateX(Math.PI / 2); return this._push(g, col, mat, o); }
+  oct(x, y, z, r, h, col, mat, o) { o = Object.assign({ flat: true }, o, { x, y, z }); const g = new T.OctahedronGeometry(1, 0).scale(r, h / 2, r).translate(0, h / 2, 0); return this._push(g, col, mat, o); }
+  prism(x, y, z, r, h, n, col, mat, o) { o = Object.assign({ flat: true }, o, { x, y, z }); const g = new T.CylinderGeometry(r * (o.top == null ? 1 : o.top), r, h, n, 1).translate(0, h / 2, 0); return this._push(g, col, mat, o); }
+  cap(x, y, z, r, len, col, mat, o) { o = Object.assign({}, o, { x, y, z }); const g = new T.CapsuleGeometry(r, len, 3, SG(o.seg || 10)); return this._push(g, col, mat, o); }
+  lathe(pts, x, y, z, col, mat, o) { o = Object.assign({}, o, { x, y, z }); const g = new T.LatheGeometry(pts.map(p => new T.Vector2(p[0], p[1])), SG(o.seg || 18)); return this._push(g, col, mat, o); }
+  tube(pts, r, col, mat, o) { o = o || {}; const curve = new T.CatmullRomCurve3(pts.map(p => new T.Vector3(p[0], p[1], p[2]))); const g = new T.TubeGeometry(curve, SG(o.ts || 10), r, Math.max(4, Math.round((o.rs || 6) * LOD)), false); return this._push(g, col, mat, o); }
+  // segmento (cilindro) de a até b, com afinamento opcional; bom para pernas, canos, patas e lanças
+  seg(a, b, r, col, mat, o) { o = o || {}; const A = new T.Vector3(a[0], a[1], a[2]), dir = new T.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]); const len = dir.length() || 0.001; const g = new T.CylinderGeometry(r * (o.taper == null ? 1 : o.taper), r, len, SG(o.seg || 8)).translate(0, len / 2, 0); const q = new T.Quaternion().setFromUnitVectors(new T.Vector3(0, 1, 0), dir.normalize()); return this._push(g, col, mat, Object.assign({}, o, { x: A.x, y: A.y, z: A.z, q })); }
+  // polígono no plano XY (perfil lateral) extrudado em Z, centrado em z; o.b = chanfro
+  poly(pts, depth, col, mat, o) { o = Object.assign({}, o); const s = new T.Shape(pts.map(p => new T.Vector2(p[0], p[1]))); const g = new T.ExtrudeGeometry(s, { depth, bevelEnabled: !!o.b, bevelThickness: o.b || 0, bevelSize: o.b || 0, bevelSegments: o.bs || 1, curveSegments: 4 }).translate(0, 0, -depth / 2); return this._push(g, col, mat, o); }
+  // rocha/ovo facetado com relevo determinístico
+  rock(x, y, z, r, col, mat, o) { o = Object.assign({ flat: true }, o, { x, y, z }); const g = new T.IcosahedronGeometry(r, o.detail == null ? 1 : o.detail); const p = g.attributes.position; const rnd = o.amp || 0.22; for (let i = 0; i < p.count; i++) { const vx = p.getX(i), vy = p.getY(i), vz = p.getZ(i); const hsh = Math.sin(vx * 12.9898 + vy * 78.233 + vz * 37.719 + (o.seed || 0) * 3.7) * 43758.5453; const k = 1 + (hsh - Math.floor(hsh) - 0.5) * 2 * rnd; p.setXYZ(i, vx * k, vy * k, vz * k); } return this._push(g, col, mat, o); }
+  light(x, y, z, s, col, k) { return this.box(x, y, z, s, s, s, col, null, { e: k || 2.6 }); }
+  finish(o) {
+    o = o || {}; const all = this.main.concat(this.emi); const bb = new T.Box3(); const tmp = new T.Box3();
+    for (const p of all) { p.geo.computeBoundingBox(); tmp.copy(p.geo.boundingBox); bb.union(tmp); }
+    const cx = o.pivot ? o.pivot[0] : (bb.min.x + bb.max.x) / 2, cz = o.pivot ? o.pivot[1] : (bb.min.z + bb.max.z) / 2, y0 = bb.min.y;
+    const mk = (list, withRM) => {
+      if (!list.length) return null; let n = 0; for (const p of list) n += p.geo.attributes.position.count;
+      const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), col = new Float32Array(n * 3), rm = withRM ? new Float32Array(n * 2) : null; let k = 0;
+      for (const p of list) { const c = p.geo.attributes.position.count; pos.set(p.geo.attributes.position.array, k * 3); nor.set(p.geo.attributes.normal.array, k * 3); for (let i = 0; i < c; i++) { const j = k + i; pos[j * 3] -= cx; pos[j * 3 + 1] -= y0; pos[j * 3 + 2] -= cz; col[j * 3] = p.c.r; col[j * 3 + 1] = p.c.g; col[j * 3 + 2] = p.c.b; if (rm) { rm[j * 2] = p.rm[0]; rm[j * 2 + 1] = p.rm[1]; } } k += c; p.geo.dispose(); }
+      const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(pos, 3)); g.setAttribute('normal', new T.BufferAttribute(nor, 3)); g.setAttribute('color', new T.BufferAttribute(col, 3)); if (rm) g.setAttribute('rm', new T.BufferAttribute(rm, 2)); g.computeBoundingSphere(); return g;
+    };
+    const out = { main: mk(this.main, true), em: mk(this.emi, false), width: Math.max(bb.max.x - bb.min.x, bb.max.z - bb.min.z), height: bb.max.y - bb.min.y, mount: this.mount == null ? null : this.mount - y0, mesh: true };
+    if (!out.main) { const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(new Float32Array(9), 3)); g.setAttribute('normal', new T.BufferAttribute(new Float32Array(9), 3)); g.setAttribute('color', new T.BufferAttribute(new Float32Array(9), 3)); g.setAttribute('rm', new T.BufferAttribute(new Float32Array(6), 2)); out.main = g; }
+    return out;
+  }
+}
+function roundBox(w, h, d, b, segs) {
+  b = Math.max(0.01, Math.min(b, w / 2 - 0.02, d / 2 - 0.02, h / 2 - 0.02)); const iw = w - 2 * b, id = d - 2 * b, rc = Math.min(b, iw / 2, id / 2) * 0.8;
+  const s = new T.Shape(); const x0 = -iw / 2, x1 = iw / 2, y0 = -id / 2, y1 = id / 2;
+  s.moveTo(x0 + rc, y0); s.lineTo(x1 - rc, y0); s.quadraticCurveTo(x1, y0, x1, y0 + rc); s.lineTo(x1, y1 - rc); s.quadraticCurveTo(x1, y1, x1 - rc, y1); s.lineTo(x0 + rc, y1); s.quadraticCurveTo(x0, y1, x0, y1 - rc); s.lineTo(x0, y0 + rc); s.quadraticCurveTo(x0, y0, x0 + rc, y0);
+  const g = new T.ExtrudeGeometry(s, { depth: Math.max(0.01, h - 2 * b), bevelEnabled: true, bevelThickness: b, bevelSize: b, bevelSegments: LOD < 1 ? 1 : (segs || 2), curveSegments: LOD < 1 ? 2 : 3 });
+  g.rotateX(-Math.PI / 2); g.translate(0, b, 0); return g;
+}
+
+// ---------- utilitários de forma ----------
+const PI = Math.PI, H = Math.PI / 2;
+function wheel(K, P, x, y, z, r, w) { K.cyl(x, y, z - w / 2, r, r, w, P.d, 'rubber', { rx: H, seg: 14 }); K.cyl(x, y, z - w / 2 - 0.04, r * 0.55, r * 0.55, w + 0.08, P.t || P.b, 'metal', { rx: H, seg: 10 }); }
+function track(K, P, x, z, len, h, w) { K.box(x, 0, z, len, h, w, P.d, 'rubber', { b: Math.min(h, w) * 0.42 }); const n = Math.max(3, Math.round(len / 2.4)); const sz = z > 0 ? 1 : -1; for (let i = 0; i < n; i++) K.cyl(x - len / 2 + (i + 0.5) * len / n, h * 0.5, z + sz * (w / 2) - (sz > 0 ? 0 : 0.14), h * 0.36, h * 0.36, 0.14, P.b, 'metal', { rx: H, seg: 10 }); }
+function arch(K, x, y, z, A, Hh, D, phi, r, col, mat, o) { const pts = []; for (let i = 0; i <= 12; i++) { const th = i / 12 * PI; pts.push([x + A * Math.cos(th) * Math.cos(phi), y + Hh * Math.sin(th), z + D * Math.cos(th) * Math.sin(phi)]); } K.tube(pts, r, col, mat, Object.assign({ ts: 18 }, o)); }
+function leg(K, base, knee, foot, r, col, mat) { K.seg(base, knee, r, col, mat); K.seg(knee, foot, r * 0.85, col, mat, { taper: 0.45 }); }
+function ringOf(n, R, fn) { for (let i = 0; i < n; i++) { const a = i / n * PI * 2; fn(Math.cos(a) * R, Math.sin(a) * R, a, i); } }
+
+// ---------- kits de arquitetura por Raça ----------
+const KITS = {};
+// Consórcio Vehnar: aço chanfrado, faixas de equipe, chaminés com brasa, tanques com cintas, listras de perigo
+KITS.vehnar = {
+  block(K, P, tc, x, z, w, d, h, y) { y = y || 0;
+    K.box(x, y, z, w + 1, 0.7, d + 1, P.d, 'dark', { b: 0.3 }); K.box(x, y + 0.7, z, w, h - 0.7, d, P.a, 'steel', { b: 0.5 });
+    K.box(x, y + h * 0.66, z, w + 0.16, 0.55, d + 0.16, tc, 'paint'); K.box(x, y + h, z, w - 1.2, 0.45, d - 1.2, P.b, 'steel', { b: 0.15 });
+    const nx = Math.max(1, Math.round(w / 4.5)); for (let i = 0; i < nx; i++) { const px = x - w / 2 + (i + 0.5) * w / nx; for (const s of [-1, 1]) K.box(px, y + 1.1, z + s * (d / 2 + 0.05), 0.3, h * 0.42, 0.2, P.b, 'metal'); }
+    K.box(x - w * 0.2, y + h + 0.45, z + d * 0.16, Math.min(3, w * 0.22), 0.9, Math.min(2.2, d * 0.22), P.d, 'dark', { b: 0.15 }); },
+  tower(K, P, tc, x, z, r, h, y) { y = y || 0; K.cyl(x, y, z, r * 0.82, r, h, P.b, 'steel', { seg: 16 }); for (let i = 1; i <= 3; i++) K.tor(x, y + h * i / 4, z, r * (1 - 0.18 * i / 4) + 0.06, Math.max(0.12, r * 0.1), P.d, 'metal', { ts: 24, rs: 6 }); K.cyl(x, y + h, z, r * 0.92, r * 0.82, Math.max(0.4, r * 0.3), P.d, 'dark', { seg: 16 }); K.cyl(x, y + h + 0.06, z, r * 0.62, r * 0.62, Math.max(0.42, r * 0.3), '#FF7A2E', null, { e: 2.4, seg: 12 }); },
+  pillar(K, P, tc, x, z, r, h, y) { y = y || 0; K.cyl(x, y, z, r, r * 1.15, h, P.b, 'steel', { seg: 12 }); K.tor(x, y + h * 0.5, z, r * 1.05, 0.2, tc, 'paint', { ts: 24 }); K.cyl(x, y + h - 0.6, z, r * 1.25, r * 1.1, 0.6, P.d, 'dark', { seg: 12 }); },
+  tank(K, P, tc, x, z, r, h, y) { y = y || 0; K.cyl(x, y, z, r, r, h, P.t, 'metal', { seg: 18 }); K.sph(x, y + h, z, r, P.t, 'metal', { half: true, seg: 18 }); K.tor(x, y + h * 0.28, z, r + 0.04, 0.16, P.d, 'dark', { ts: 28 }); K.tor(x, y + h * 0.78, z, r + 0.04, 0.2, tc, 'paint', { ts: 28 }); K.box(x + r * 0.98, y, z, 0.25, h + r * 0.4, 0.55, P.d, 'dark'); },
+  dome(K, P, tc, x, z, r, y) { y = y || 0; K.cyl(x, y, z, r * 1.02, r * 1.1, 0.8, P.b, 'steel', { seg: 24 }); K.sph(x, y + 0.8, z, r, P.g, 'glass', { half: true, seg: 24 }); for (let i = 0; i < 4; i++) arch(K, x, y + 0.8, z, r * 1.01, r * 1.01, r * 1.01, i * PI / 4, 0.12, P.t, 'metal', { ts: 14 }); },
+  pad(K, P, tc, x, z, w, d, y) { y = y || 0; K.box(x, y, z, w, 0.6, d, P.d, 'dark', { b: 0.2 }); const n = Math.max(3, Math.round(w / 1.6)); for (let i = 0; i < n; i += 2) K.box(x - w / 2 + (i + 0.5) * w / n, y + 0.6, z + d / 2 - 0.4, w / n * 0.9, 0.06, 0.55, P.h, 'paint'); },
+  ring(K, P, tc, x, z, R, y) { K.tor(x, y, z, R, 0.3, P.t, 'metal', { ts: 40 }); ringOf(8, R, (cx, cz) => K.light(x + cx, y + 0.25, z + cz, 0.45, P.l)); },
+  door(K, P, tc, x, z, w, h, y) { y = y || 0; K.box(x, y, z, 0.5, h, w, P.d, 'dark'); for (let i = 0; i < 5; i++) K.box(x + 0.27, y + h * (0.1 + i * 0.18), z, 0.08, h * 0.08, w * 0.9, P.b, 'metal'); K.light(x + 0.3, y + h + 0.3, z - w / 2 + 0.3, 0.4, '#FF8A3A'); K.light(x + 0.3, y + h + 0.3, z + w / 2 - 0.3, 0.4, '#FF8A3A'); },
+  pipe(K, P, tc, pts) { K.tube(pts, 0.32, P.t, 'metal', { ts: 14 }); },
+  banner(K, P, tc, x, z, h) { K.seg([x, 0, z], [x, h, z], 0.12, P.t, 'metal'); K.box(x - 0.9, h * 0.55, z, 1.6, h * 0.42, 0.1, tc, 'paint'); },
+  crown(K, P, tc, x, z, y, s) { this.tower(K, P, tc, x - 2.4 * s, z + 2.4 * s, 1.1 * s, 5 * s, y); this.tower(K, P, tc, x - 2.4 * s, z - 2.4 * s, 0.9 * s, 4 * s, y); K.seg([x + 1.8 * s, y, z], [x + 1.8 * s, y + 9 * s, z], 0.24 * s, P.t, 'metal', { taper: 0.5 }); K.box(x + 1.8 * s, y + 5.2 * s, z, 2.8 * s, 0.3 * s, 0.3 * s, P.t, 'metal'); K.sph(x + 1.8 * s, y + 9.1 * s, z, 0.55 * s, '#FF4A3A', null, { e: 3 }); K.box(x + 2.6 * s, y, z + 2.6 * s, 2.4 * s, 1.6 * s, 2 * s, P.b, 'steel', { b: 0.3 }); },
+  reactor(K, P, tc) { this.pad(K, P, tc, 0, 0, 22, 18); K.lathe([[5.4, 0], [4.5, 3], [3.4, 7], [3.6, 9.6], [4.1, 11]], 3.4, 0.6, 0, '#B9B4AA', 'matte', { seg: 28 }); K.cyl(3.4, 10.7, 0, 3.85, 3.85, 0.3, '#FFC080', null, { e: 1.5, seg: 24 }); K.tor(3.4, 11.6, 0, 4.1, 0.16, tc, 'paint', { ts: 36 }); this.block(K, P, tc, -6, 0, 7, 12, 5.4, 0.6); this.pipe(K, P, tc, [[-2.5, 3.6, 3], [0, 3.2, 3.4], [1.6, 2.2, 3.4]]); this.pipe(K, P, tc, [[-2.5, 3.6, -3], [0, 3.2, -3.4], [1.6, 2.2, -3.4]]); this.tower(K, P, tc, -7.5, 4, 0.8, 5, 6); },
+  pylon(K, P, tc) { this.pad(K, P, tc, 0, 0, 12, 12); K.cyl(0, 0.6, 0, 2.6, 3.2, 1.6, P.a, 'steel', { seg: 8, facet: true }); for (let i = 0; i < 4; i++) { const a = i * PI / 2 + PI / 4; K.seg([Math.cos(a) * 2.4, 2, Math.sin(a) * 2.4], [Math.cos(a) * 0.5, 15, Math.sin(a) * 0.5], 0.22, P.b, 'metal'); } for (const yy of [6, 10]) K.tor(0, yy, 0, 1.9 - yy * 0.09, 0.12, P.t, 'metal', { ts: 20 }); this.ring(K, P, tc, 0, 0, 3.4, 14); K.sph(0, 16, 0, 0.7, '#FF4A3A', null, { e: 3 }); K.box(0, 3.2, 0, 2.2, 1.2, 2.2, tc, 'paint', { b: 0.2 }); },
+  turret(K, P, tc, s, twin) { K.box(0, 0, 0, 5 * s, 2 * s, 4.6 * s, P.a, 'steel', { b: 0.5 * s }); K.box(-0.6 * s, 2 * s, 0, 2.6 * s, 0.6 * s, 2.6 * s, tc, 'paint', { b: 0.2 * s }); for (const zz of twin ? [-1, 1] : [0]) { K.seg([2 * s, 1 * s, zz * 1.1 * s], [7.6 * s, 1 * s, zz * 1.1 * s], 0.36 * s, P.b, 'metal', { seg: 10 }); K.cyl(7.6 * s, 1 * s, zz * 1.1 * s, 0.55 * s, 0.55 * s, 1 * s, P.d, 'dark', { rz: -H, seg: 10 }); } K.light(-2.4 * s, 1.4 * s, 0, 0.4 * s, '#FF4040'); },
+  wall(K, P, tc, gate) { K.box(0, 0, 0, 16, 0.8, 4.2, P.d, 'dark', { b: 0.2 }); if (gate) { for (const s of [-1, 1]) { K.box(s * 6.6, 0.8, 0, 2.8, 6.6, 4, P.a, 'steel', { b: 0.4 }); K.light(s * 6.6, 7.6, 0, 0.6, '#FF8A3A'); } K.box(0, 4.4, 0, 10.4, 0.8, 1.6, P.d, 'dark'); for (let i = -2; i <= 2; i++) K.box(i * 2, 0.8, 0, 0.3, 3.6, 0.3, P.b, 'metal'); } else { K.box(0, 0.8, 0, 15.6, 4.6, 3.4, P.a, 'steel', { b: 0.35 }); K.box(0, 3.6, 0, 15.8, 0.5, 3.5, tc, 'paint'); for (let i = 0; i < 4; i++) K.box(-6 + i * 4, 5.4, 0, 2.2, 0.9, 3.6, P.b, 'steel', { b: 0.15 }); } },
+};
+// Erevane: placas angulares escuras ("origami"), vidro fosco, costuras luminosas, agulhas com ponta acesa
+KITS.erevane = {
+  block(K, P, tc, x, z, w, d, h, y) { y = y || 0; const s = Math.min(w * 0.18, h * 0.5);
+    K.poly([[-w / 2, 0], [w / 2, 0], [w / 2 - s, h], [-w / 2 + s * 0.6, h]], d, P.a, 'gloss', { x, y, z, b: 0.22 });
+    K.poly([[-w * 0.32, 0], [w * 0.28, 0], [-w * 0.02, h * 0.42]], d * 0.86, P.b, 'glass', { x, y: y + h + 0.2, z, b: 0.08 });
+    for (const sg of [-1, 1]) K.box(x, y + h * 0.5, z + sg * (d / 2 + 0.24), w * 0.78, 0.13, 0.08, tc, null, { e: 2 });
+    K.box(x - w * 0.02, y + h + 0.24 + h * 0.42, z, 0.18, 0.12, d * 0.8, P.l, null, { e: 2.6 }); },
+  tower(K, P, tc, x, z, r, h, y) { y = y || 0; K.cone(x, y, z, r, h, P.b, 'glass', { seg: 4, ry: PI / 4, flat: true }); K.oct(x, y + h + 0.3, z, r * 0.3, r * 0.9, P.l, null, { e: 3 }); for (let i = 0; i < 2; i++) K.poly([[0, 0], [r * 1.5, 0], [0, h * 0.55]], 0.12, P.a, 'gloss', { x, y, z, ry: i * PI / 2 + PI / 4 }); },
+  pillar(K, P, tc, x, z, r, h, y) { y = y || 0; K.cyl(x, y, z, r * 0.7, r * 1.2, h, P.a, 'gloss', { seg: 4, ry: PI / 4, facet: true }); K.box(x + r * 0.62, y + h * 0.3, z, 0.1, h * 0.5, 0.2, tc, null, { e: 2 }); },
+  tank(K, P, tc, x, z, r, h, y) { y = y || 0; K.cyl(x, y, z, r * 0.9, r, h, P.a, 'gloss', { seg: 6, facet: true }); K.cone(x, y + h, z, r * 0.9, r * 0.8, P.b, 'glass', { seg: 6, flat: true }); K.tor(x, y + h * 0.55, z, r * 1.0, 0.1, tc, null, { e: 2, ts: 6 }); },
+  dome(K, P, tc, x, z, r, y) { y = y || 0; K.sph(x, y, z, r, P.b, 'glass', { half: true, seg: 7, flat: true }); K.tor(x, y + 0.2, z, r * 1.01, 0.12, P.l, null, { e: 2.4, ts: 7 }); },
+  pad(K, P, tc, x, z, w, d, y) { y = y || 0; K.prism(x, y, z, 1, 0.5, 6, P.d, 'gloss', { sx: w / 2, sz: d / 2, ry: PI / 6 }); K.prism(x, y + 0.5, z, 1, 0.05, 6, P.c, null, { e: 1.2, sx: w / 2 - 0.4, sz: d / 2 - 0.4, ry: PI / 6, top: 0.98 }); K.prism(x, y + 0.52, z, 1, 0.06, 6, P.d, 'gloss', { sx: w / 2 - 0.8, sz: d / 2 - 0.8, ry: PI / 6 }); },
+  ring(K, P, tc, x, z, R, y) { K.tor(x, y, z, R, 0.16, P.l, null, { e: 2.6, ts: 6 }); K.tor(x, y - 0.4, z, R * 0.9, 0.22, P.a, 'gloss', { ts: 6 }); },
+  door(K, P, tc, x, z, w, h, y) { y = y || 0; K.poly([[0, 0], [0, h * 0.8], [0.01, h]], w, P.d, 'gloss', { x, y, z }); K.box(x + 0.05, y, z, 0.3, h * 0.9, w, P.d, 'gloss'); K.box(x + 0.25, y + h * 0.9, z, 0.12, 0.12, w * 0.9, tc, null, { e: 2.2 }); },
+  pipe(K, P, tc, pts) { K.tube(pts, 0.18, P.c, null, { e: 1.6, ts: 12 }); },
+  banner(K, P, tc, x, z, h) { K.seg([x, 0, z], [x, h, z], 0.1, P.d, 'gloss'); K.poly([[0, 0], [-1.6, -0.8], [-0.2, -h * 0.45]], 0.08, tc, 'paint', { x, y: h, z }); },
+  crown(K, P, tc, x, z, y, s) { this.tower(K, P, tc, x, z, 2.2 * s, 12 * s, y); ringOf(3, 4.2 * s, (cx, cz, a) => K.poly([[0, 0], [2.4 * s, 0.6 * s], [0.4 * s, 4.6 * s]], 0.16, P.a, 'gloss', { x: x + cx, y: y + 3 * s, z: z + cz, ry: -a, rz: 0.25 })); K.tor(x, y + 6 * s, z, 3.2 * s, 0.14, tc, null, { e: 2.2, ts: 6 }); },
+  reactor(K, P, tc) { this.pad(K, P, tc, 0, 0, 20, 18); K.oct(0, 3, 0, 3.4, 9, P.b, 'glass'); K.oct(0, 4.6, 0, 1.6, 5.4, P.l, null, { e: 2.2, ry: PI / 4 }); ringOf(4, 5.4, (cx, cz, a) => K.poly([[-1.6, 0], [1.6, 0], [0.9, 8.5], [-0.6, 7]], 0.3, P.a, 'gloss', { x: cx, y: 0.6, z: cz, ry: -a + H, rx: 0.18 })); K.tor(0, 1.4, 0, 4.2, 0.12, tc, null, { e: 2, ts: 6 }); },
+  pylon(K, P, tc) { this.pad(K, P, tc, 0, 0, 12, 12); K.cone(0, 0.5, 0, 2.2, 14, P.b, 'glass', { seg: 4, ry: PI / 4, flat: true }); this.ring(K, P, tc, 0, 0, 3.2, 12); K.oct(0, 15.2, 0, 0.8, 2.2, P.l, null, { e: 3 }); for (let i = 0; i < 4; i++) K.poly([[0, 0], [2.4, 0], [0, 5.5]], 0.12, P.a, 'gloss', { y: 0.5, ry: i * H + PI / 4 }); K.box(1.0, 4, 0, 0.1, 3.4, 0.6, tc, null, { e: 2 }); },
+  turret(K, P, tc, s, twin) { K.oct(0, 0, 0, 2.6 * s, 2.6 * s, P.b, 'gloss', { sx: 1.25 }); for (const zz of twin ? [-1, 1] : [0]) { K.box(3.8 * s, 1 * s, zz * 1.2 * s + 0.45 * s, 6.4 * s, 0.32 * s, 0.32 * s, P.d, 'metal'); K.box(3.8 * s, 1 * s, zz * 1.2 * s - 0.45 * s, 6.4 * s, 0.32 * s, 0.32 * s, P.d, 'metal'); K.box(3.8 * s, 1 * s, zz * 1.2 * s, 6 * s, 0.12 * s, 0.5 * s, P.l, null, { e: 2.4 }); } K.box(-0.6 * s, 1.6 * s, 0, 0.1, 0.4 * s, 2.4 * s, tc, null, { e: 2 }); },
+  wall(K, P, tc, gate) { if (gate) { for (const sg of [-1, 1]) { K.cone(sg * 6.4, 0, 0, 1.9, 8.4, P.a, 'gloss', { seg: 4, ry: PI / 4, flat: true }); K.oct(sg * 6.4, 8.6, 0, 0.4, 1.1, P.l, null, { e: 3 }); } K.box(0, 3.4, 0, 10.6, 0.16, 0.3, tc, null, { e: 2.2 }); K.box(0, 0, 0, 16, 0.5, 3.6, P.d, 'gloss'); } else { K.poly([[-8, 0], [8, 0], [7, 5.8], [-7, 5.8]], 2.4, P.a, 'gloss', { b: 0.25 }); for (let i = -3; i <= 3; i++) K.poly([[-1, 0], [1, 0], [0, 2.2]], 0.5, P.b, 'glass', { x: i * 2.1, y: 6, rz: (i % 2) * 0.12 }); K.box(0, 2.6, 1.5, 14, 0.14, 0.08, tc, null, { e: 2 }); K.box(0, 2.6, -1.5, 14, 0.14, 0.08, tc, null, { e: 2 }); } },
+};
+// Tessara: casco orgânico cor de osso, nervuras, bulbos bioluminescentes, raízes e pétalas
+KITS.tessara = {
+  block(K, P, tc, x, z, w, d, h, y) { y = y || 0; K.sph(x, y, z, 1, P.a, 'bone', { half: true, sx: w / 2, sy: h * 1.15, sz: d / 2, seg: 22 }); for (let i = 0; i < 3; i++) arch(K, x, y, z, w / 2 * 1.01, h * 1.16, d / 2 * 1.01, i * PI / 3 + PI / 6, Math.max(0.16, w * 0.012), P.t, 'bone'); K.tor(x, y + 0.15, z, w / 2 * 0.98, 0.28, P.d, 'matte', { sz: d / w, ts: 36 }); K.sph(x, y + h * 1.15, z, Math.max(0.6, w * 0.06), tc, 'skin', { seg: 12 }); ringOf(4, Math.min(w, d) * 0.36, (cx, cz) => K.sph(x + cx, y + h * 0.55, z + cz, Math.max(0.3, w * 0.03), P.l, null, { e: 1.6, seg: 8 })); },
+  tower(K, P, tc, x, z, r, h, y) { y = y || 0; K.tube([[x, y, z], [x + r * 0.4, y + h * 0.35, z + r * 0.2], [x - r * 0.3, y + h * 0.7, z], [x, y + h, z]], r * 0.5, P.b, 'bone', { ts: 14, rs: 8 }); K.sph(x, y + h + r * 0.6, z, r * 0.95, P.am, null, { e: 1.6, seg: 12 }); for (let i = 0; i < 3; i++) K.sph(x + Math.cos(i * 2.1) * r * 0.9, y + h * 0.5 + i * r * 0.4, z + Math.sin(i * 2.1) * r * 0.9, r * 0.55, '#6FBF7E', 'skin', { sy: 0.35, seg: 10 }); },
+  pillar(K, P, tc, x, z, r, h, y) { y = y || 0; K.cyl(x, y, z, r * 0.8, r * 1.3, h, P.b, 'bone', { seg: 12 }); for (let i = 0; i < 3; i++) K.tube([[x + Math.cos(i * 2.1) * r * 1.2, y, z + Math.sin(i * 2.1) * r * 1.2], [x + Math.cos(i * 2.1 + 0.6) * r, y + h * 0.5, z + Math.sin(i * 2.1 + 0.6) * r], [x + Math.cos(i * 2.1 + 1.2) * r * 0.85, y + h, z + Math.sin(i * 2.1 + 1.2) * r * 0.85]], 0.22, P.t, 'bone', { ts: 10 }); },
+  tank(K, P, tc, x, z, r, h, y) { y = y || 0; K.sph(x, y + h * 0.45, z, r, '#CDEFD6', 'wet', { sy: h / (2 * r) * 1.1, seg: 16 }); K.sph(x, y + h * 0.5, z, r * 0.45, P.l, null, { e: 1.2, seg: 10, sy: 1.6 }); for (let i = 0; i < 3; i++) arch(K, x, y + 0.1, z, r * 1.02, h * 0.9, r * 1.02, i * PI / 3, 0.12, P.t, 'bone', { ts: 12 }); },
+  dome(K, P, tc, x, z, r, y) { y = y || 0; K.sph(x, y, z, r, P.b, 'bone', { half: true, seg: 18 }); ringOf(6, r * 0.9, (cx, cz, a) => K.sph(x + cx, y + r * 0.35, z + cz, r * 0.42, '#7FCF8E', 'skin', { sx: 0.5, sy: 1.4, sz: 0.8, ry: -a, seg: 10 })); K.sph(x, y + r, z, r * 0.4, P.l, null, { e: 2, seg: 12 }); },
+  pad(K, P, tc, x, z, w, d, y) { y = y || 0; K.cyl(x, y, z, 1, 1.05, 0.5, P.d, 'matte', { sx: w / 2, sz: d / 2, seg: 28 }); ringOf(7, 1, (cx, cz, a) => K.tube([[x + cx * w * 0.4, y + 0.5, z + cz * d * 0.4], [x + cx * w * 0.55, y + 0.4, z + cz * d * 0.58], [x + cx * w * 0.66, y, z + cz * d * 0.7]], 0.3, P.t, 'bone', { ts: 8 })); },
+  ring(K, P, tc, x, z, R, y) { K.tor(x, y, z, R, 0.3, P.t, 'bone', { ts: 36 }); ringOf(6, R, (cx, cz) => K.sph(x + cx, y + 0.35, z + cz, 0.42, P.l, null, { e: 2, seg: 8 })); },
+  door(K, P, tc, x, z, w, h, y) { y = y || 0; K.sph(x, y, z, 1, P.d, 'matte', { half: true, sx: 0.6, sy: h, sz: w / 2, seg: 14 }); arch(K, x + 0.2, y, z, 0.01, h * 1.05, w / 2 * 1.05, H, 0.3, P.t, 'bone'); },
+  pipe(K, P, tc, pts) { K.tube(pts, 0.3, P.t, 'bone', { ts: 12 }); },
+  banner(K, P, tc, x, z, h) { K.tube([[x, 0, z], [x + 0.3, h * 0.5, z], [x, h, z]], 0.14, P.t, 'bone', { ts: 8 }); K.sph(x - 0.6, h * 0.75, z, 0.9, tc, 'skin', { sx: 0.8, sy: 1.3, sz: 0.15, seg: 10 }); },
+  crown(K, P, tc, x, z, y, s) { K.tube([[x, y, z], [x + 0.6 * s, y + 4 * s, z], [x, y + 7 * s, z]], 0.9 * s, P.b, 'bone', { ts: 10 }); ringOf(6, 2.2 * s, (cx, cz, a) => K.sph(x + cx, y + 7.4 * s, z + cz, 1.6 * s, i6(a) ? '#8FD8A0' : '#B9E8C2', 'skin', { sx: 0.4, sy: 1.5, sz: 0.9, ry: -a, rz: 0.6, seg: 10 })); K.sph(x, y + 7.8 * s, z, 1.5 * s, P.l, null, { e: 2.2, seg: 14 }); },
+  reactor(K, P, tc) { this.pad(K, P, tc, 0, 0, 20, 18); K.sph(0, 5, 0, 4.6, '#D98A5A', 'wet', { sy: 1.15, seg: 22 }); for (let i = 0; i < 5; i++) arch(K, 0, 0.5, 0, 4.7, 10, 4.7, i * PI / 5, 0.22, '#7A2E28', 'wet', { ts: 16 }); K.sph(0, 5.3, 0, 1.6, P.am, null, { e: 2.4, seg: 12 }); this.tower(K, P, tc, -6, 4, 0.9, 6, 0.4); this.tower(K, P, tc, 5.5, -4.5, 0.7, 4.5, 0.4); },
+  pylon(K, P, tc) { this.pad(K, P, tc, 0, 0, 12, 12); this.tower(K, P, tc, 0, 0, 1.6, 13, 0.4); this.ring(K, P, tc, 0, 0, 3.2, 9.5); K.box(0.9, 3, 0, 0.5, 1.4, 1.6, tc, 'skin', { b: 0.2 }); },
+  turret(K, P, tc, s, twin) { K.sph(0, 1.4 * s, 0, 2.4 * s, P.a, 'bone', { sx: 1.25, sy: 0.8, seg: 16 }); for (const zz of twin ? [-1, 1] : [0]) { K.seg([1.6 * s, 1.5 * s, zz * 1.1 * s], [7 * s, 1.7 * s, zz * 1.1 * s], 0.5 * s, P.b, 'bone', { taper: 0.7, seg: 10 }); K.sph(7 * s, 1.7 * s, zz * 1.1 * s, 0.4 * s, P.l, null, { e: 2.2, seg: 8 }); } K.sph(-1.8 * s, 2.2 * s, 0, 0.8 * s, tc, 'skin', { seg: 10 }); },
+  wall(K, P, tc, gate) { if (gate) { for (const sg of [-1, 1]) { this.pillar(K, P, tc, sg * 6.4, 0, 1.2, 7.4, 0); K.sph(sg * 6.4, 8, 0, 1.1, P.l, null, { e: 1.8, seg: 10 }); } arch(K, 0, 0, 0, 6.4, 7.6, 0.01, 0, 0.35, P.t, 'bone'); K.box(0, 0, 0, 16, 0.4, 3.6, P.d, 'matte'); } else { K.box(0, 0, 0, 16, 0.6, 3.4, P.d, 'matte', { b: 0.25 }); for (let i = -3; i <= 3; i++) { arch(K, i * 2.25, 0.4, 0, 0.01, 4.6 - Math.abs(i) * 0.25, 1.3, H, 0.32, P.b, 'bone', { ts: 12 }); K.cone(i * 2.25, 4.2 - Math.abs(i) * 0.25, 0, 0.32, 1.8, P.t, 'bone', { seg: 8, rz: (i % 2) * 0.25 }); } K.seg([-7.4, 2.4, 0], [7.4, 2.4, 0], 0.24, P.t, 'bone'); ringOf(3, 1, (cx, cz, a, i) => K.sph(-5 + i * 5, 3, 0, 0.35, P.l, null, { e: 1.6, seg: 8 })); } },
+};
+function i6(a) { return Math.round(a * 6 / (PI * 2)) % 2 === 0; }
+// Coro Quorith: cristal facetado claro, núcleos de ametista, anéis flutuantes, nada encosta no chão por inteiro
+KITS.quorith = {
+  block(K, P, tc, x, z, w, d, h, y) { y = y || 0; K.prism(x, y, z, 1, 0.6, 6, P.d, 'gloss', { sx: w / 2 + 0.6, sz: d / 2 + 0.6 }); K.prism(x, y + 0.6, z, 1, h * 0.8, 6, P.a, 'crystal', { sx: w / 2, sz: d / 2, top: 0.86 }); K.prism(x, y + 0.6 + h * 0.8, z, 0.86, h * 0.35, 6, P.b, 'crystal', { sx: w / 2, sz: d / 2, top: 0.35 }); K.prism(x, y + h * 0.45, z, 1.005, 0.22, 6, P.c, null, { e: 2.2, sx: w / 2, sz: d / 2, top: 1 }); K.oct(x, y + 0.6 + h * 1.15 + 0.6, z, Math.min(w, d) * 0.1, Math.min(w, d) * 0.3, tc, null, { e: 1.6 }); },
+  tower(K, P, tc, x, z, r, h, y) { y = y || 0; K.prism(x, y, z, r, h * 0.75, 6, P.a, 'crystal', { top: 0.55 }); K.cone(x, y + h * 0.75, z, r * 0.55, h * 0.3, P.b, 'crystal', { seg: 6, flat: true }); K.oct(x, y + h * 1.12, z, r * 0.4, r * 1.3, P.c, null, { e: 2.6 }); K.tor(x, y + h * 0.95, z, r * 1.4, 0.12, P.l, null, { e: 2, ts: 6 }); },
+  pillar(K, P, tc, x, z, r, h, y) { y = y || 0; K.prism(x, y, z, r * 1.2, h, 6, P.a, 'crystal', { top: 0.8 }); K.prism(x, y + h * 0.5, z, r * 1.2 * 0.9 + 0.02, 0.3, 6, P.c, null, { e: 2.2, top: 1 }); },
+  tank(K, P, tc, x, z, r, h, y) { y = y || 0; K.oct(x, y, z, r, h, P.a, 'crystal'); K.oct(x + r * 0.7, y, z + r * 0.4, r * 0.5, h * 0.6, P.b, 'crystal', { rz: -0.4 }); K.oct(x - r * 0.6, y, z - r * 0.5, r * 0.45, h * 0.55, P.b, 'crystal', { rz: 0.35 }); K.oct(x, y + h * 0.35, z, r * 0.4, h * 0.3, P.c, null, { e: 2 }); },
+  dome(K, P, tc, x, z, r, y) { y = y || 0; K.sph(x, y, z, r, P.b, 'crystal', { half: true, seg: 6, flat: true }); K.oct(x, y + r * 1.1, z, r * 0.35, r * 0.9, P.c, null, { e: 2.4 }); K.tor(x, y + r * 0.9, z, r * 0.9, 0.12, P.l, null, { e: 2, ts: 6 }); },
+  pad(K, P, tc, x, z, w, d, y) { y = y || 0; K.prism(x, y, z, 1, 0.5, 6, P.d, 'gloss', { sx: w / 2, sz: d / 2 }); K.prism(x, y + 0.5, z, 1, 0.06, 6, P.c, null, { e: 1.4, sx: w / 2 - 0.5, sz: d / 2 - 0.5 }); K.prism(x, y + 0.52, z, 1, 0.08, 6, P.d, 'gloss', { sx: w / 2 - 0.9, sz: d / 2 - 0.9 }); },
+  ring(K, P, tc, x, z, R, y) { K.tor(x, y, z, R, 0.18, P.l, null, { e: 2.4, ts: 6 }); K.tor(x, y + 0.6, z, R * 0.8, 0.14, P.a, 'crystal', { ts: 6, rx: 0.2 }); },
+  door(K, P, tc, x, z, w, h, y) { y = y || 0; K.box(x, y + 0.3, z, 0.3, h, 0.28, P.c, null, { e: 2.2 }); K.oct(x, y + h + 0.6, z, 0.4, 1.2, tc, null, { e: 1.6 }); },
+  pipe(K, P, tc, pts) { K.tube(pts, 0.12, P.l, null, { e: 2.2, ts: 12 }); },
+  banner(K, P, tc, x, z, h) { K.oct(x, 0, z, 0.5, h, P.a, 'crystal'); K.oct(x, h * 0.7, z, 0.4, 1.4, tc, null, { e: 1.4 }); },
+  crown(K, P, tc, x, z, y, s) { K.oct(x, y + 2.4 * s, z, 3 * s, 9 * s, P.a, 'crystal', { ry: PI / 4 }); K.oct(x, y + 5.2 * s, z, 1.3 * s, 3.6 * s, P.c, null, { e: 2.6 }); K.tor(x, y + 6.8 * s, z, 4.4 * s, 0.2 * s, P.t, 'crystal', { rx: 0.35, ts: 6 }); K.tor(x, y + 6.8 * s, z, 3.8 * s, 0.14 * s, P.l, null, { e: 2.2, rz: 0.4, ts: 6 }); },
+  reactor(K, P, tc) { this.pad(K, P, tc, 0, 0, 20, 18); K.oct(0, 2, 0, 2.6, 11, P.a, 'crystal'); K.oct(0, 4.6, 0, 1.2, 5.6, P.c, null, { e: 2.8 }); K.tor(0, 7.5, 0, 4.4, 0.24, P.t, 'crystal', { rx: 0.5, ts: 6 }); K.tor(0, 7.5, 0, 4.4, 0.24, P.t, 'crystal', { rz: 0.5, ts: 6 }); ringOf(5, 6.6, (cx, cz, a) => K.oct(cx, 0.5, cz, 0.9, 3.4, P.b, 'crystal', { rz: Math.cos(a) * 0.3, rx: Math.sin(a) * 0.3 })); },
+  pylon(K, P, tc) { this.pad(K, P, tc, 0, 0, 12, 12); K.prism(0, 0.5, 0, 1.8, 3, 6, P.b, 'crystal', { top: 0.6 }); K.oct(0, 5.2, 0, 1.9, 8.6, P.a, 'crystal'); K.oct(0, 7.5, 0, 0.8, 3.6, P.c, null, { e: 2.6 }); this.ring(K, P, tc, 0, 0, 3.1, 13.6); K.oct(0, 15, 0, 0.6, 1.6, tc, null, { e: 1.8 }); },
+  turret(K, P, tc, s, twin) { K.prism(0, 0, 0, 2.2 * s, 1.4 * s, 6, P.a, 'crystal', { top: 0.8 }); for (const zz of twin ? [-1, 1] : [0]) { K.oct(3.4 * s, 0.4 * s, zz * 1.1 * s, 0.7 * s, 1.4 * s, P.a, 'crystal', { rz: -H, sy: 3.4 }); K.oct(6.6 * s, 0.4 * s, zz * 1.1 * s, 0.3 * s, 0.7 * s, P.c, null, { e: 2.6, rz: -H }); } K.oct(0, 1.4 * s, 0, 0.8 * s, 1.8 * s, tc, null, { e: 1.6 }); },
+  wall(K, P, tc, gate) { K.prism(0, 0, 0, 1, 0.5, 6, P.d, 'gloss', { sx: 8.2, sz: 2 }); if (gate) { for (const sg of [-1, 1]) { K.prism(sg * 6.4, 0.5, 0, 1.6, 7.4, 6, P.a, 'crystal', { top: 0.4 }); K.oct(sg * 6.4, 8.4, 0, 0.5, 1.4, P.c, null, { e: 2.4 }); } K.box(0, 4, 0, 10.6, 0.16, 0.16, P.l, null, { e: 2.6 }); K.box(0, 2.2, 0, 10.6, 0.16, 0.16, P.l, null, { e: 2.6 }); } else { for (let i = -3; i <= 3; i++) K.oct(i * 2.25, 0.4, (i % 2) * 0.4, 1.3, 5.8 + (i % 2 ? -0.8 : 0.6), i % 3 ? P.a : P.b, 'crystal', { ry: i * 0.5 }); K.box(0, 2.4, 0, 15, 0.14, 0.14, tc, null, { e: 2 }); } },
+};
+// Prole Vorag: quitina úmida escura, placas sobrepostas, espinhos de osso, sacos membranosos e poros acesos
+KITS.vorag = {
+  block(K, P, tc, x, z, w, d, h, y) { y = y || 0; K.sph(x, y, z, 1, P.a, 'chitin', { half: true, sx: w / 2, sy: h * 1.1, sz: d / 2, seg: 20 }); ringOf(5, 1, (cx, cz, a) => K.sph(x + cx * w * 0.28, y + h * 0.35, z + cz * d * 0.28, 1, P.b, 'chitin', { sx: w * 0.24, sy: h * 0.62, sz: d * 0.2, ry: -a, seg: 12 })); ringOf(6, 1, (cx, cz, a) => K.cone(x + cx * w * 0.42, y + h * 0.42, z + cz * d * 0.42, Math.max(0.3, w * 0.04), Math.max(1.6, h * 0.5), P.bo, 'bone', { seg: 8, rz: -cx * 0.7, rx: cz * 0.7 })); ringOf(4, 1, (cx, cz) => K.sph(x + cx * w * 0.3, y + h * 0.82, z + cz * d * 0.3, Math.max(0.3, w * 0.03), P.l, null, { e: 2, seg: 8 })); K.sph(x, y + h * 1.08, z, Math.max(0.5, w * 0.06), tc, 'wet', { seg: 10 }); },
+  tower(K, P, tc, x, z, r, h, y) { y = y || 0; const pts = [[x, y, z], [x + r * 0.3, y + h * 0.4, z + r * 0.2], [x + r * 0.9, y + h * 0.8, z], [x + r * 1.8, y + h, z - r * 0.2]]; for (let i = 0; i < 3; i++) K.seg(pts[i], pts[i + 1], r * (1 - i * 0.28), P.bo, 'bone', { taper: 0.72, seg: 10 }); K.sph(x, y + 0.4, z, r * 1.3, P.a, 'chitin', { half: true, seg: 12 }); },
+  pillar(K, P, tc, x, z, r, h, y) { y = y || 0; K.cyl(x, y, z, r * 0.7, r * 1.3, h, P.a, 'chitin', { seg: 10 }); for (let i = 0; i < 4; i++) K.tor(x, y + h * (0.2 + i * 0.2), z, r * (1.2 - i * 0.12), 0.25, P.bo, 'bone', { ts: 18 }); },
+  tank(K, P, tc, x, z, r, h, y) { y = y || 0; K.sph(x, y + h * 0.5, z, r, P.m, 'wet', { sy: h / (2 * r), seg: 16 }); for (let i = 0; i < 3; i++) arch(K, x, y + 0.2, z, r * 1.02, h * 0.95, r * 1.02, i * PI / 3, 0.1, '#FF8A8A', null, { e: 1.3, ts: 12 }); K.tor(x, y + 0.3, z, r * 0.95, 0.3, P.bo, 'bone', { ts: 20 }); },
+  dome(K, P, tc, x, z, r, y) { y = y || 0; K.sph(x, y, z, r, P.m, 'wet', { half: true, seg: 16 }); for (let i = 0; i < 3; i++) arch(K, x, y, z, r * 1.01, r * 1.01, r * 1.01, i * PI / 3, 0.1, '#FF8A8A', null, { e: 1.4, ts: 12 }); K.sph(x, y + r, z, r * 0.25, P.l, null, { e: 2.4, seg: 8 }); },
+  pad(K, P, tc, x, z, w, d, y) { y = y || 0; K.sph(x, y, z, 1, '#3A1A28', 'wet', { half: true, sx: w / 2, sy: 0.5, sz: d / 2, seg: 22 }); ringOf(6, 1, (cx, cz) => K.tube([[x + cx * w * 0.3, y + 0.3, z + cz * d * 0.3], [x + cx * w * 0.5, y + 0.25, z + cz * d * 0.46 + 0.6], [x + cx * w * 0.62, y, z + cz * d * 0.6]], 0.26, P.b, 'wet', { ts: 8 })); },
+  ring(K, P, tc, x, z, R, y) { ringOf(8, R, (cx, cz) => K.cone(x + cx, y - 0.4, z + cz, 0.32, 1.6, P.bo, 'bone', { seg: 8, rz: -cx / R * 0.4, rx: cz / R * 0.4 })); K.tor(x, y - 0.3, z, R, 0.18, P.l, null, { e: 1.6, ts: 24 }); },
+  door(K, P, tc, x, z, w, h, y) { y = y || 0; K.sph(x, y, z, 1, '#140A0F', 'wet', { half: true, sx: 0.5, sy: h, sz: w / 2, seg: 12 }); for (let i = -2; i <= 2; i++) K.cone(x + 0.2, y + h * 0.9 - Math.abs(i) * h * 0.12, z + i * w * 0.18, 0.18, h * 0.32, P.bo, 'bone', { seg: 6, rz: PI }); },
+  pipe(K, P, tc, pts) { K.tube(pts, 0.32, P.b, 'wet', { ts: 12 }); },
+  banner(K, P, tc, x, z, h) { this.tower(K, P, tc, x, z, 0.35, h, 0); K.sph(x + 0.3, h * 0.55, z, 0.8, tc, 'wet', { sx: 0.6, sy: 1.2, seg: 10 }); },
+  crown(K, P, tc, x, z, y, s) { ringOf(5, 2.4 * s, (cx, cz) => K.sph(x + cx, y + 1.4 * s, z + cz, 1.2 * s, P.bo, 'bone', { sy: 1.5, seg: 12 })); K.sph(x, y + 2.6 * s, z, 2 * s, P.m, 'wet', { sy: 1.4, seg: 16 }); K.sph(x, y + 2.8 * s, z, 0.9 * s, P.l, null, { e: 2.2, seg: 10 }); ringOf(4, 3.6 * s, (cx, cz) => this.tower(K, P, tc, x + cx, z + cz, 0.5 * s, 6 * s, y)); },
+  reactor(K, P, tc) { this.pad(K, P, tc, 0, 0, 20, 18); K.sph(0, 5, 0, 4.4, P.m, 'wet', { sy: 1.15, seg: 20 }); for (let i = 0; i < 5; i++) arch(K, 0, 0.4, 0, 4.5, 10.2, 4.5, i * PI / 5, 0.2, '#FF8A8A', null, { e: 1.4, ts: 16 }); K.tor(0, 1, 0, 4.6, 0.5, P.bo, 'bone', { ts: 28 }); ringOf(5, 6.4, (cx, cz) => this.tower(K, P, tc, cx, cz, 0.55, 4.5, 0.2)); },
+  pylon(K, P, tc) { this.pad(K, P, tc, 0, 0, 12, 12); this.pillar(K, P, tc, 0, 0, 1.6, 10, 0.3); K.sph(0, 12, 0, 1.8, P.bo, 'bone', { sy: 1.4, seg: 14 }); K.sph(0, 12.2, 0, 0.8, P.l, null, { e: 2.4, seg: 10 }); this.ring(K, P, tc, 0, 0, 3.2, 10.6); K.sph(1.2, 4, 0, 0.6, tc, 'wet', { seg: 8 }); },
+  turret(K, P, tc, s, twin) { K.sph(0, 1.2 * s, 0, 2.2 * s, P.a, 'chitin', { sy: 0.75, seg: 14 }); for (const zz of twin ? [-1, 1] : [0]) { K.seg([1.4 * s, 1.4 * s, zz * 1.1 * s], [6.4 * s, 1.6 * s, zz * 1.1 * s], 0.55 * s, P.b, 'wet', { taper: 0.6, seg: 10 }); K.sph(6.4 * s, 1.6 * s, zz * 1.1 * s, 0.38 * s, P.ac, null, { e: 2, seg: 8 }); } K.sph(-1.5 * s, 1.9 * s, 0, 1 * s, P.m, 'wet', { seg: 12 }); ringOf(4, 1.6 * s, (cx, cz) => K.cone(cx - 0.4 * s, 2 * s, cz, 0.22 * s, 1.4 * s, P.bo, 'bone', { seg: 6 })); },
+  wall(K, P, tc, gate) { K.sph(0, 0, 0, 1, '#3A1A28', 'wet', { half: true, sx: 8.4, sy: 0.6, sz: 2.4, seg: 16 }); if (gate) { for (const sg of [-1, 1]) this.pillar(K, P, tc, sg * 6.4, 0, 1.3, 7.2, 0.2); arch(K, 0, 0, 0, 6.4, 7.4, 0.01, 0, 0.4, P.bo, 'bone'); K.sph(0, 7.4, 0, 0.6, P.l, null, { e: 2.2, seg: 8 }); } else { for (let i = -3; i <= 3; i++) K.sph(i * 2.2, 1.6, 0, 1.6, i % 2 ? P.a : P.b, 'chitin', { sy: 1.6, seg: 10 }); for (let i = -3; i <= 3; i++) K.cone(i * 2.2 + 0.6, 3.2, 0, 0.35, 2.8, P.bo, 'bone', { seg: 8, rz: -0.5 }); K.box(0, 2.4, 1.7, 13, 0.14, 0.1, tc, null, { e: 1.4 }); } },
+};
+
+// ---------- receitas de construção: mesma planta para todas as Raças, formas do kit da Raça ----------
+const QUAD = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
+const BLD = {
+  nucleo(K, k, P, tc) { k.pad(K, P, tc, 0, 0, 30, 30); k.block(K, P, tc, 0, 0, 22, 22, 7, 0.6); k.block(K, P, tc, 0, 0, 13, 13, 5.5, 7.8); k.crown(K, P, tc, 0, 0, 13.6, 1); for (const [sx, sz] of QUAD) k.tower(K, P, tc, sx * 12.2, sz * 12.2, 1.3, 8, 0.6); k.door(K, P, tc, 11.4, 0, 5, 4.2, 0.6); k.ring(K, P, tc, 0, 0, 9.4, 8.3); },
+  reator(K, k, P, tc) { k.reactor(K, P, tc); },
+  refinaria(K, k, P, tc) { k.pad(K, P, tc, 0, 0, 24, 20); k.block(K, P, tc, -5, 0, 10, 14, 5.2, 0.6); k.tank(K, P, tc, 5, -4.6, 2.9, 6, 0.6); k.tank(K, P, tc, 5, 4.6, 2.9, 6, 0.6); k.pipe(K, P, tc, [[-1.5, 4.2, -2.5], [1.2, 6.8, -3.6], [3.4, 7.4, -4.6]]); k.pipe(K, P, tc, [[-1.5, 4.2, 2.5], [1.2, 6.8, 3.6], [3.4, 7.4, 4.6]]); k.door(K, P, tc, 0.2, 0, 4, 3, 0.6); },
+  quartel(K, k, P, tc) { k.pad(K, P, tc, 0, 0, 26, 22); k.block(K, P, tc, -2, 0, 18, 14, 6, 0.6); k.block(K, P, tc, -4, 0, 9, 8, 3.2, 6.8); k.door(K, P, tc, 7.2, 0, 5, 4, 0.6); k.banner(K, P, tc, 9.4, 6.6, 7.4); k.banner(K, P, tc, 9.4, -6.6, 7.4); k.tower(K, P, tc, -10.6, -8.4, 1.1, 6.5, 0.6); },
+  fabrica(K, k, P, tc) { k.pad(K, P, tc, 0, 0, 28, 24); k.block(K, P, tc, -3, 0, 20, 17, 8, 0.6); k.door(K, P, tc, 7.2, 0, 9, 6, 0.6); k.tower(K, P, tc, -11.6, 9.6, 1.3, 10, 0.6); k.tower(K, P, tc, -11.6, -9.6, 1.0, 7.5, 0.6); k.pipe(K, P, tc, [[-11, 8.6, 6], [-4, 10.6, 2], [4, 9.4, -2]]); k.tank(K, P, tc, 10.6, -9.2, 1.8, 3.4, 0.6); },
+  hangar(K, k, P, tc) { k.pad(K, P, tc, 0, 0, 26, 26); k.block(K, P, tc, -8, 0, 8, 22, 7, 0.6); k.ring(K, P, tc, 4.5, 0, 6, 0.9); k.ring(K, P, tc, 4.5, 0, 3.4, 0.9); k.tower(K, P, tc, -11.4, 11.4, 1, 12, 0.6); k.dome(K, P, tc, 10.4, -10, 1.8, 0.6); },
+  torre_base(K, k, P, tc) { k.pad(K, P, tc, 0, 0, 11, 11); k.block(K, P, tc, 0, 0, 8.6, 8.6, 2.8, 0.6); k.pillar(K, P, tc, 0, 0, 2.4, 8, 3.4); K.mount = 11.4; },
+  torre_turret(K, k, P, tc) { k.turret(K, P, tc, 0.9, false); },
+  bastiao_base(K, k, P, tc) { k.pad(K, P, tc, 0, 0, 20, 20); k.block(K, P, tc, 0, 0, 16, 16, 9, 0.6); for (const [sx, sz] of QUAD) k.tower(K, P, tc, sx * 8.4, sz * 8.4, 1.4, 11, 0.6); k.pillar(K, P, tc, 0, 0, 3.2, 3.4, 9.6); K.mount = 13; },
+  bastiao_turret(K, k, P, tc) { k.turret(K, P, tc, 1.35, true); },
+  nodulo(K, k, P, tc) { k.pylon(K, P, tc); },
+  laboratorio(K, k, P, tc) { k.pad(K, P, tc, 0, 0, 24, 20); k.block(K, P, tc, -3, 0, 16, 14, 5, 0.6); k.dome(K, P, tc, 6.4, 0, 4.2, 0.6); k.tower(K, P, tc, -9.6, 6.4, 0.9, 9, 0.6); k.tank(K, P, tc, -9.6, -6, 1.6, 3, 0.6); k.pipe(K, P, tc, [[3, 2.6, 3.4], [5, 3.2, 3.6], [6.6, 4.4, 2.6]]); },
+  muro(K, k, P, tc) { k.wall(K, P, tc, false); },
+  portao(K, k, P, tc) { k.wall(K, P, tc, true); },
+};
+
+// ---------- receitas de unidade por Raça ----------
+const U = {};
+U.vehnar = {
+  infantaria(K, P, tc, o) { o = o || {};
+    for (const s of [-1, 1]) { K.seg([0, 0.4, s * 0.8], [0.15, 3.2, s * 0.75], 0.55, P.d, 'dark'); K.box(0.35, 0, s * 0.8, 1.7, 0.6, 1.1, P.d, 'rubber', { b: 0.2 }); }
+    K.box(0, 3, 0, 2.4, 3.2, 3, P.a, 'steel', { b: 0.45 }); K.box(0.95, 3.5, 0, 0.6, 2.2, 2.3, tc, 'paint', { b: 0.15 });
+    for (const s of [-1, 1]) K.sph(0, 5.9, s * 1.7, 0.85, tc, 'paint', { seg: 12 });
+    K.box(-1.55, 3.4, 0, 1.2, 2.6, 2.2, P.b, 'steel', { b: 0.3 }); K.sph(0.1, 6.9, 0, 1.15, P.b, 'steel', { seg: 14 }); K.box(1.15, 6.62, 0, 0.5, 0.5, 1.5, P.g, null, { e: 1.8 });
+    K.seg([0.1, 5.5, 1.5], [1.3, 4.6, 1.0], 0.38, P.a, 'steel'); K.seg([0.1, 5.5, -1.5], [1.7, 4.6, 0.3], 0.38, P.a, 'steel');
+    if (!o.noRifle) { K.box(2.2, 4.3, 0.95, 4, 0.55, 0.55, P.d, 'metal', { b: 0.12 }); K.box(3.7, 4.15, 0.95, 1.4, 0.85, 0.5, P.b, 'metal'); } },
+  coletor(K, P, tc) { for (const x of [-3.5, 0, 3.5]) for (const s of [-1, 1]) wheel(K, P, x, 1.1, s * 3.2, 1.1, 0.9);
+    K.box(0, 1.1, 0, 10, 1.4, 5.6, P.d, 'dark', { b: 0.3 }); K.box(3.4, 2.5, 0, 3.2, 3, 5, P.a, 'steel', { b: 0.5 }); K.box(4.75, 3.6, 0, 0.9, 1.4, 4.2, P.g, 'glass', { b: 0.2 });
+    K.box(-1.6, 2.5, 0, 6, 2.6, 5.4, tc, 'paint', { b: 0.4 }); K.box(-1.6, 5.1, 0, 5.4, 0.3, 4.8, P.b, 'steel');
+    K.poly([[0, 0], [1.6, 0.4], [1.6, 2.4], [0, 2.8]], 5.8, P.t, 'metal', { x: 5.2, y: 0.4 });
+    K.light(5.05, 4.9, 1.8, 0.4, P.l); K.light(5.05, 4.9, -1.8, 0.4, P.l); K.light(-4.7, 2.8, 0, 0.5, '#FF4040'); },
+  veiculo_hull(K, P, tc) { for (const s of [-1, 1]) track(K, P, 0, s * 3.5, 13, 2.4, 2.2);
+    K.poly([[-6.2, 1.2], [5.2, 1.2], [6.6, 2.6], [5.4, 4.0], [-5.6, 4.0], [-6.4, 2.8]], 5.2, P.a, 'steel', { b: 0.3 });
+    K.box(-0.4, 4.25, 0, 7.6, 0.2, 5, tc, 'paint'); K.light(6.25, 3.1, 2, 0.45, P.l); K.light(6.25, 3.1, -2, 0.45, P.l); K.light(-6.45, 3.0, 0, 0.5, '#FF4040'); K.mount = 4.3; },
+  veiculo_turret(K, P, tc) { KITS.vehnar.turret(K, P, tc, 0.85, false); },
+  drone(K, P, tc) { K.box(0, 1.2, 0, 4, 1.6, 3, P.a, 'steel', { b: 0.5 }); K.box(0.4, 2.8, 0, 2, 0.5, 2, tc, 'paint', { b: 0.2 });
+    for (const [sx, sz] of QUAD) { K.seg([0, 2, 0], [sx * 3.4, 2.3, sz * 3.4], 0.25, P.d, 'metal'); K.tor(sx * 3.4, 2.3, sz * 3.4, 1.6, 0.14, P.d, 'metal', { ts: 20 }); K.cyl(sx * 3.4, 2.15, sz * 3.4, 1.5, 1.5, 0.06, '#9AA3AD', 'glass'); K.light(sx * 3.4, 2.5, sz * 3.4, 0.3, P.l); }
+    K.box(1.6, 0, 0, 1.4, 1.2, 0.8, P.d, 'metal'); K.seg([2.2, 0.5, 0], [4.2, 0.5, 0], 0.18, P.d, 'metal'); K.light(-2.1, 1.8, 0, 0.4, '#FF4040'); },
+  suporte(K, P, tc) { K.box(0, 0.6, 0, 7, 1.8, 5, P.a, 'steel', { b: 0.5 }); K.box(0, 2.4, 0, 5, 0.6, 3.6, tc, 'paint', { b: 0.2 });
+    K.cyl(-0.5, 3, 0, 0.4, 0.5, 2.2, P.b, 'metal'); K.lathe([[0.2, 0], [1.4, 0.35], [2.4, 1.1], [2.6, 1.3], [2.4, 1.38], [1.3, 0.62], [0, 0.32]], -0.5, 5.2, 0, P.t, 'metal', { rz: -0.5 }); K.sph(-0.2, 5.8, 0, 0.35, '#7FE3A1', null, { e: 2.6 });
+    for (const s of [-1, 1]) K.cyl(0, 0, s * 1.8, 1.2, 1.4, 0.6, '#3FE6CF', null, { e: 1.4 }); K.light(3.6, 1.6, 0, 0.45, P.l); },
+  pirata(K, P, tc) { for (const x of [-4, -1.2, 3.6]) for (const s of [-1, 1]) wheel(K, P, x, 1.3, s * 3.6, 1.3, 1.1);
+    K.box(0, 1.2, 0, 12, 1.4, 6, P.d, 'dark', { b: 0.3 }); K.box(3.8, 2.6, 0, 3.6, 3.4, 5.6, tc, 'paint', { b: 0.5 }); K.box(5.25, 3.8, 0, 0.9, 1.6, 4.6, P.g, 'glass', { b: 0.2 });
+    K.box(-2, 2.6, 0, 6, 1.2, 5.6, P.a, 'steel', { b: 0.3 }); K.cyl(-3.4, 3.8, 0, 1.1, 1.3, 1.2, P.b, 'metal'); K.seg([-3.4, 4.6, 0], [-6.8, 8.4, 0], 0.45, P.h, 'paint'); K.seg([-6.8, 8.4, 0], [-7.4, 5.4, 0], 0.1, P.d, 'metal'); K.tor(-7.4, 5.0, 0, 0.5, 0.14, P.t, 'metal', { rx: H });
+    K.light(5.65, 5.6, 1.9, 0.4, P.l); K.light(5.65, 5.6, -1.9, 0.4, P.l); K.light(5.65, 5.6, 0, 0.4, '#FFA03A'); },
+  soldador(K, P, tc) { U.vehnar.infantaria(K, P, tc, { noRifle: true }); for (const s of [-1, 1]) K.cyl(-1.95, 3.1, s * 0.7, 0.62, 0.62, 3.4, P.h, 'paint', { seg: 12 });
+    K.seg([1, 4.3, 1], [4.4, 4.1, 1], 0.32, P.d, 'metal'); K.cyl(4.4, 4.1, 1, 0.52, 0.34, 0.9, P.b, 'metal', { rz: -H }); K.light(5.45, 4.1, 1, 0.34, '#FF7A2E', 3); K.tube([[-1.9, 3.6, 0.6], [-0.6, 3, 1.4], [1, 4.1, 1.1]], 0.15, P.d, 'rubber'); },
+  guindaste(K, P, tc) { for (const x of [-4, 0, 4]) for (const s of [-1, 1]) wheel(K, P, x, 1.2, s * 3.5, 1.2, 1);
+    K.box(0, 1.1, 0, 12, 1.4, 6, P.d, 'dark', { b: 0.3 }); K.box(4.2, 2.5, 0, 3.4, 3.2, 5.6, P.h, 'paint', { b: 0.5 }); K.box(5.55, 3.6, 0, 0.9, 1.5, 4.6, P.g, 'glass', { b: 0.2 });
+    K.cyl(-2, 2.5, 0, 1.6, 1.9, 1.4, P.b, 'metal'); K.seg([-2, 3.6, 0], [-7, 10, 0], 0.5, P.h, 'paint'); K.seg([-2.4, 3.6, 0.5], [-6.8, 9.6, 0.5], 0.14, P.d, 'metal'); K.seg([-7, 10, 0], [-7, 6.4, 0], 0.08, P.d, 'metal');
+    K.box(-7, 5.4, 0, 1.2, 1, 1.2, P.d, 'metal'); K.sph(-7, 5.2, 0, 0.45, '#7FE3A1', null, { e: 2.2 }); K.box(-3, 2.5, 0, 5, 0.8, 5.4, tc, 'paint', { b: 0.2 });
+    K.light(6.05, 5.4, 2, 0.4, P.l); K.light(6.05, 5.4, -2, 0.4, P.l); K.light(4.2, 5.9, 0, 0.5, '#FFA03A'); },
+  tratorzao(K, P, tc) { for (const x of [-3, 3]) for (const s of [-1, 1]) wheel(K, P, x, 1.6, s * 3.4, 1.6, 1.3);
+    K.box(0, 1.4, 0, 8.4, 1.2, 4.4, P.a, 'steel', { b: 0.4 }); K.box(1.6, 2.6, 0, 2.4, 0.4, 4, tc, 'paint', { b: 0.15 });
+    for (const s of [-1, 1]) { K.seg([-2.4, 2.6, s * 1.8], [-1, 5, s * 1.6], 0.16, P.d, 'metal'); K.seg([1.4, 2.6, s * 1.8], [-0.2, 5, s * 1.6], 0.16, P.d, 'metal'); }
+    K.seg([-1, 5, -1.6], [-1, 5, 1.6], 0.16, P.d, 'metal'); K.seg([-0.2, 5, -1.6], [-0.2, 5, 1.6], 0.16, P.d, 'metal'); K.box(-0.6, 5.1, 0, 1.2, 0.6, 1, P.b, 'metal'); K.seg([0, 5.5, 0], [2.8, 5.5, 0], 0.16, P.d, 'metal');
+    K.light(4.3, 2.2, 1.4, 0.4, P.l); K.light(4.3, 2.2, -1.4, 0.4, P.l); },
+  prensa(K, P, tc) { for (const s of [-1, 1]) { leg(K, [0, 6.4, s * 2.4], [1.4, 3.4, s * 2.8], [0, 0.6, s * 2.8], 0.8, P.b, 'steel'); K.box(0.6, 0, s * 2.8, 3.2, 0.8, 2, P.d, 'dark', { b: 0.3 }); }
+    K.box(0, 6, 0, 4, 1.6, 5.4, P.d, 'dark', { b: 0.4 }); K.box(0, 7.4, 0, 5.4, 3.8, 5, P.a, 'steel', { b: 0.6 }); K.box(2.65, 8.6, 0, 0.6, 1.2, 3, P.g, 'glass', { b: 0.2 }); K.box(-0.4, 11.2, 0, 3.6, 0.5, 3.6, tc, 'paint', { b: 0.2 });
+    for (const s of [-1, 1]) { K.box(0.4, 8.2, s * 3.4, 3, 2, 1.6, P.b, 'steel', { b: 0.3 }); K.seg([1.8, 9.1, s * 3.4], [7.4, 9.1, s * 3.4], 0.42, P.d, 'metal'); K.cyl(7.4, 9.1, s * 3.4, 0.6, 0.6, 0.9, P.d, 'dark', { rz: -H }); }
+    K.light(-2.85, 9.6, 0, 0.5, '#FF4040'); },
+};
+U.erevane = {
+  infantaria(K, P, tc, o) { o = o || {};
+    for (const s of [-1, 1]) { K.seg([0, 0.3, s * 0.7], [0.1, 3.4, s * 0.6], 0.42, P.b, 'gloss'); K.box(0.3, 0, s * 0.7, 1.3, 0.45, 0.8, P.d, 'rubber', { b: 0.15 }); }
+    K.poly([[-1.1, 0], [1.1, 0], [0.8, 3], [-0.9, 3.2]], 2.4, P.a, 'gloss', { y: 3.2, b: 0.15 }); K.box(0.95, 4.3, 0, 0.12, 1.6, 1.8, tc, null, { e: 1.6 });
+    K.oct(0.1, 6.2, 0, 0.95, 1.9, P.b, 'gloss'); K.box(0.8, 7.05, 0, 0.3, 0.16, 1.1, P.l, null, { e: 3 }); K.poly([[0, 0], [-1.6, -2.6], [-0.4, -2.8]], 0.12, P.d, 'gloss', { x: -1, y: 6.2 });
+    K.seg([0.1, 6, 1.3], [1.3, 4.9, 0.95], 0.3, P.a, 'gloss'); K.seg([0.1, 6, -1.3], [1.6, 4.9, 0.3], 0.3, P.a, 'gloss');
+    if (!o.noRifle) { K.box(2.4, 4.6, 0.9, 4.6, 0.36, 0.36, P.d, 'metal'); K.box(4.8, 4.6, 0.9, 0.5, 0.2, 0.2, P.c, null, { e: 2.2 }); } },
+  coletor(K, P, tc) { K.poly([[-5, 0.8], [4, 0.8], [5.4, 1.8], [3.4, 3.2], [-4.6, 3.2]], 5, P.a, 'gloss', { b: 0.2 }); K.box(0, 0.2, 0, 8, 0.25, 4, P.c, null, { e: 1.6 });
+    K.prism(-1.6, 3.2, 0, 1.5, 2.2, 6, P.g, 'glass', { top: 0.85 }); K.tor(-1.6, 4.4, 0, 1.42, 0.08, tc, null, { e: 2.2, ts: 6 }); K.box(4.45, 2, 0, 0.2, 0.5, 4.2, P.l, null, { e: 2.4 }); },
+  veiculo_hull(K, P, tc) { K.poly([[-6.6, 1.4], [5, 1.4], [7, 2.4], [4.6, 3.6], [-5.4, 3.6], [-6.8, 2.6]], 7.4, P.a, 'gloss', { b: 0.25 });
+    for (const [x, s] of [[-4, 1], [-4, -1], [3.4, 1], [3.4, -1]]) { K.cyl(x, 0.6, s * 3, 1.3, 1.5, 0.8, P.d, 'dark'); K.cyl(x, 0.45, s * 3, 1.1, 1.1, 0.16, P.c, null, { e: 2 }); }
+    K.box(-0.6, 3.62, 3.9, 9, 0.12, 0.12, tc, null, { e: 1.8 }); K.box(-0.6, 3.62, -3.9, 9, 0.12, 0.12, tc, null, { e: 1.8 }); K.mount = 3.75; },
+  veiculo_turret(K, P, tc) { KITS.erevane.turret(K, P, tc, 0.8, false); },
+  drone(K, P, tc) { K.poly([[4, 0], [-2.6, 4.8], [-1.2, 0], [-2.6, -4.8]], 0.5, P.a, 'gloss', { rx: -H, y: 2, b: 0.1 }); K.oct(-0.4, 1.4, 0, 1, 1.6, P.b, 'glass', { sx: 1.8 });
+    for (const s of [-1, 1]) K.seg([4, 2.25, 0], [-2.6, 2.25, s * 4.8], 0.08, tc, null, { e: 2 }); K.light(-1.2, 2.5, 0, 0.4, P.l); },
+  suporte(K, P, tc) { K.prism(0, 1.4, 0, 2.8, 2.2, 3, P.a, 'gloss', { top: 0.6 }); K.cone(0, 3.6, 0, 0.5, 3.4, P.b, 'gloss', { seg: 4 }); K.oct(0, 7.2, 0, 0.4, 0.8, P.l, null, { e: 3 }); K.cyl(0, 0.6, 0, 2, 2.2, 0.2, P.c, null, { e: 1.4 }); K.box(1.45, 2.6, 0, 0.12, 0.6, 1.6, tc, null, { e: 1.8 }); },
+  pirata(K, P, tc) { K.poly([[-5.4, 0.9], [4.4, 0.9], [6, 1.8], [3, 3], [-4.8, 3]], 5.2, P.a, 'gloss', { b: 0.2 });
+    for (const x of [-3.4, 3]) for (const s of [-1, 1]) { K.cyl(x, 0.4, s * 2.7, 0.9, 1, 0.6, P.d, 'dark'); K.cyl(x, 0.3, s * 2.7, 0.75, 0.75, 0.12, P.c, null, { e: 1.8 }); }
+    K.cyl(-1.8, 3, 0, 1.4, 1.4, 2.2, P.g, 'glass', { seg: 6, facet: true }); K.tor(-1.8, 4.1, 0, 1.42, 0.08, P.l, null, { e: 2.4, ts: 6 }); K.tube([[-1.8, 5, 0], [1, 5.4, 0], [4, 3.6, 0], [6.2, 2.4, 0]], 0.22, P.d, 'rubber'); K.light(6.2, 2.2, 0, 0.4, P.l); },
+  atirador(K, P, tc) { U.erevane.infantaria(K, P, tc, { noRifle: true }); K.box(3.2, 4.7, 0.9, 7.4, 0.3, 0.3, P.d, 'metal'); K.cyl(1.6, 5.05, 0.9, 0.22, 0.22, 1.6, P.b, 'gloss', { rz: -H }); K.box(6.95, 4.7, 0.9, 0.5, 0.18, 0.18, P.c, null, { e: 2.4 }); K.box(-0.2, 4.5, 0.9, 1.2, 0.8, 0.4, P.b, 'gloss'); },
+  lamina(K, P, tc) { K.poly([[-5, 0.8], [3.4, 0.8], [6.4, 1.2], [2, 2.8], [-4.4, 2.6]], 4.4, P.a, 'gloss', { b: 0.2 });
+    for (const s of [-1, 1]) { K.cyl(1.2, 1.6, s * 2.75 - 0.15, 2.2, 2.2, 0.3, '#7D8794', 'metal', { rx: H, seg: 20 }); K.tor(1.2, 1.6, s * 2.75, 2.25, 0.08, P.l, null, { e: 2.4, rx: H, ts: 24 }); }
+    K.box(-1.6, 2.75, 0, 3, 0.2, 2, tc, null, { e: 1.6 }); K.cyl(-3.6, 0.3, 0, 1.2, 1.2, 0.2, P.c, null, { e: 1.6 }); },
+  mosquito(K, P, tc) { K.oct(0, 1.2, 0, 0.8, 1.2, P.a, 'gloss', { sx: 2 }); for (const s of [-1, 1]) K.poly([[0, 0], [-1.6, s * 2.6], [-0.4, s * 2.8]], 0.08, P.b, 'glass', { rx: -H, y: 1.8 }); K.light(1.45, 1.7, 0, 0.3, P.l); K.light(-1.45, 1.7, 0, 0.25, tc); },
+  ancora(K, P, tc) { ringOf(3, 2.8, (cx, cz) => K.seg([cx, 0, cz], [cx * 0.25, 5.2, cz * 0.25], 0.32, P.d, 'gloss')); K.sph(0, 6.4, 0, 1.7, P.b, 'glass', { seg: 16 }); K.tor(0, 6.4, 0, 3, 0.12, P.l, null, { e: 2.6, rx: 0.3, ts: 32 }); K.tor(0, 6.4, 0, 2.6, 0.08, tc, null, { e: 2, rz: 0.5, ts: 32 }); K.cone(0, 7.9, 0, 0.35, 2.4, P.a, 'gloss', { seg: 4 }); K.oct(0, 10.4, 0, 0.3, 0.7, P.l, null, { e: 3 }); },
+};
+U.tessara = {
+  infantaria(K, P, tc, o) { o = o || {};
+    for (const s of [-1, 1]) { K.seg([-0.4, 0, s * 0.8], [0.5, 1.6, s * 0.8], 0.42, P.b, 'bone'); K.seg([0.5, 1.6, s * 0.8], [0, 3.4, s * 0.75], 0.5, P.b, 'bone'); }
+    K.sph(0, 4.6, 0, 1, P.a, 'bone', { sx: 1.25, sy: 1.6, sz: 1.35, seg: 14 }); K.sph(-1.05, 5, 0, 0.75, '#A8EBB8', null, { e: 1.2, seg: 12 });
+    K.sph(0.4, 6.8, 0, 0.85, P.a, 'bone', { sx: 1.2, seg: 12 }); K.light(1.35, 6.95, 0.35, 0.22, P.l); K.light(1.35, 6.95, -0.35, 0.22, P.l); K.box(0.6, 5.7, 0, 0.5, 0.5, 2.5, tc, 'skin', { b: 0.2 });
+    K.seg([0.2, 5.6, 1.3], [1.3, 4.7, 1.1], 0.32, P.b, 'bone'); K.seg([0.2, 5.6, -1.3], [1.6, 4.7, 0.4], 0.32, P.b, 'bone');
+    if (!o.noRifle) { K.seg([0.6, 4.6, 1.1], [4.2, 4.8, 1.1], 0.3, P.t, 'bone', { taper: 0.7 }); K.sph(1.2, 4.6, 1.1, 0.55, P.l, null, { e: 1.4, seg: 10 }); } },
+  coletor(K, P, tc) { K.sph(0, 1.2, 0, 1, P.a, 'bone', { half: true, sx: 5, sy: 3.2, sz: 3.4, seg: 18 }); K.sph(0, 1.2, 0, 1, P.d, 'matte', { half: true, sx: 5.15, sy: 0.6, sz: 3.55, seg: 18 });
+    for (const x of [-2.6, 0, 2.6]) for (const s of [-1, 1]) K.seg([x, 1.6, s * 2.8], [x + 0.6, 0, s * 4.4], 0.3, P.d, 'bone');
+    K.sph(-3, 3.4, 0, 1.5, '#9EE6B0', null, { e: 1.1, seg: 12 }); K.sph(4.8, 1.6, 0, 1.4, P.b, 'bone', { sx: 1.2, seg: 12 }); for (const s of [-1, 1]) K.seg([5.6, 1.2, s * 0.8], [7, 0.4, s * 1.2], 0.25, P.t, 'bone', { taper: 0.4 }); K.box(0, 4.35, 0, 4, 0.3, 1.2, tc, 'skin', { b: 0.1 }); },
+  veiculo_hull(K, P, tc) { K.sph(0, 1.4, 0, 1, P.a, 'bone', { half: true, sx: 6.4, sy: 3.2, sz: 4.4, seg: 20 }); for (let i = 0; i < 3; i++) arch(K, 0, 1.4, 0, 6.5, 3.25, 4.5, i * PI / 3 + PI / 6, 0.2, P.t, 'bone');
+    K.tor(0, 1.5, 0, 6.2, 0.4, P.d, 'matte', { sz: 0.7, ts: 30 }); for (const [x, s] of [[-3.6, 1], [-3.6, -1], [3.2, 1], [3.2, -1]]) leg(K, [x, 2, s * 3.6], [x + 0.6, 1.4, s * 5], [x + 0.4, 0, s * 5.2], 0.7, P.b, 'bone');
+    K.sph(6.4, 2, 0, 1.5, P.b, 'bone', { sx: 1.2, seg: 12 }); K.light(7.75, 2.4, 0.6, 0.3, P.l); K.light(7.75, 2.4, -0.6, 0.3, P.l); K.box(-1, 4.4, 0, 5, 0.3, 2, tc, 'skin', { b: 0.12 }); K.mount = 4.4; },
+  veiculo_turret(K, P, tc) { KITS.tessara.turret(K, P, tc, 0.8, false); },
+  drone(K, P, tc) { K.sph(0, 2, 0, 1.3, P.a, 'bone', { sx: 2, seg: 14 }); K.sph(2.4, 2.2, 0, 0.8, P.b, 'bone', { seg: 10 }); K.light(3.15, 2.4, 0.35, 0.22, P.l); K.light(3.15, 2.4, -0.35, 0.22, P.l);
+    for (const s of [-1, 1]) { K.sph(0.4, 2.8, s * 2.6, 1, '#CFF3D8', 'wet', { sx: 1.1, sy: 0.08, sz: 2.4, ry: s * 0.3, seg: 12 }); K.sph(-1.2, 2.6, s * 2.2, 1, '#BFE8C8', 'wet', { sx: 0.8, sy: 0.07, sz: 1.8, ry: -s * 0.4, seg: 12 }); }
+    K.sph(-2.3, 2, 0, 0.6, P.l, null, { e: 1.6, seg: 10 }); K.box(0, 3.2, 0, 1.6, 0.2, 0.6, tc, 'skin'); },
+  suporte(K, P, tc) { K.sph(0, 2.4, 0, 1.8, P.a, 'bone', { sy: 1.2, seg: 14 }); ringOf(5, 1.9, (cx, cz, a) => K.sph(cx, 3.6, cz, 1.2, '#8FD8A0', 'skin', { sx: 0.35, sy: 1.5, sz: 0.8, ry: -a, seg: 10 })); K.sph(0, 4.6, 0, 0.8, P.l, null, { e: 2.2, seg: 12 }); K.cyl(0, 0.5, 0, 1.6, 1.8, 0.2, P.l, null, { e: 1.2 }); K.box(0, 1.2, 0, 2, 0.3, 2, tc, 'skin', { b: 0.1 }); },
+  pirata(K, P, tc) { K.sph(0, 1.2, 0, 1, P.a, 'bone', { half: true, sx: 4.4, sy: 2.6, sz: 3, seg: 16 }); for (const x of [-2.4, 0, 2.4]) for (const s of [-1, 1]) leg(K, [x, 1.6, s * 2.4], [x + 0.6, 1.4, s * 3.8], [x + 0.4, 0, s * 4], 0.3, P.b, 'bone');
+    K.sph(-2, 3.3, 0, 1.4, '#9EE6B0', null, { e: 1.1, seg: 12 }); K.tube([[1.4, 3.4, 0], [3, 5.6, 0], [5.4, 5.4, 0], [6.4, 3.2, 0]], 0.3, P.t, 'bone', { ts: 14 }); K.cone(6.4, 3.4, 0, 0.45, 1.6, P.l, null, { e: 2, rz: PI }); K.box(0, 3.8, 0, 3, 0.3, 1.4, tc, 'skin'); },
+  quimera(K, P, tc) { U.tessara.infantaria(K, P, tc); for (const s of [-1, 1]) K.cone(-0.7, 5.6, s * 1.1, 0.3, 1.8, P.t, 'bone', { rx: s * -0.6, rz: 0.5, seg: 8 }); K.cone(-0.2, 7.4, 0, 0.25, 1.4, P.t, 'bone', { rz: 0.4, seg: 8 }); },
+  esporo(K, P, tc) { K.sph(0, 2.6, 0, 1.8, '#CFEFD6', 'wet', { seg: 14 }); ringOf(6, 1.62, (cx, cz) => K.sph(cx, 2.6 + (cx > 0 ? 0.5 : -0.4), cz, 0.35, P.l, null, { e: 1.8, seg: 8 }));
+    for (let i = 0; i < 4; i++) { const a = i * H; K.tube([[Math.cos(a) * 0.8, 1.2, Math.sin(a) * 0.8], [Math.cos(a + 0.4) * 1.3, 0.4, Math.sin(a + 0.4) * 1.3], [Math.cos(a + 0.8) * 1.5, -0.6, Math.sin(a + 0.8) * 1.5]], 0.12, P.t, 'bone', { ts: 8 }); } K.box(0, 4.3, 0, 1, 0.3, 1, tc, 'skin', { b: 0.1 }); },
+  molde(K, P, tc) { U.tessara.suporte(K, P, tc); K.tor(0, 2.4, 0, 2.6, 0.18, P.l, null, { e: 1.8, ts: 28 }); K.sph(0, 5.6, 0, 0.5, P.am, null, { e: 2.4, seg: 10 }); },
+  colosso(K, P, tc) { for (const s of [-1, 1]) { leg(K, [0, 7, s * 3], [1.8, 3.8, s * 3.6], [0.4, 0.4, s * 3.6], 1.1, P.b, 'bone'); K.sph(0.8, 0.2, s * 3.6, 1.4, P.d, 'matte', { half: true, sx: 1.6, seg: 12 }); }
+    K.sph(0, 9, 0, 3.6, P.a, 'bone', { sx: 1.25, sy: 0.95, seg: 18 }); for (let i = 0; i < 3; i++) arch(K, 0, 8.4, 0, 4.6, 4, 3.7, i * PI / 3 + PI / 6, 0.22, P.t, 'bone');
+    K.sph(3.8, 9.8, 0, 1.4, P.b, 'bone', { seg: 12 }); K.light(5.05, 10.2, 0.5, 0.3, P.l); K.light(5.05, 10.2, -0.5, 0.3, P.l);
+    for (const s of [-1, 1]) { K.seg([1, 9, s * 4.2], [8.2, 9.4, s * 4.2], 0.9, P.b, 'bone', { taper: 0.6, seg: 12 }); K.sph(8.2, 9.4, s * 4.2, 0.6, P.l, null, { e: 2.2, seg: 10 }); }
+    K.sph(-2.6, 11.4, 0, 1.6, '#9EE6B0', null, { e: 1.2, seg: 12 }); K.box(0, 12.2, 0, 3, 0.4, 2, tc, 'skin', { b: 0.15 }); },
+};
+U.quorith = {
+  infantaria(K, P, tc) { K.prism(0, 0, 0, 1.4, 0.3, 6, P.c, null, { e: 1.6 }); K.oct(0, 1.2, 0, 1.3, 5.2, P.a, 'crystal'); K.tor(0, 3.8, 0, 1.12, 0.1, P.c, null, { e: 2.6, ts: 6 }); for (const s of [-1, 1]) K.oct(0.3, 3, s * 2, 0.45, 1.8, P.b, 'crystal', { rx: s * 0.3 }); K.oct(1.4, 3.4, 0, 0.3, 1.4, tc, null, { e: 1.8, rz: -H }); },
+  coletor(K, P, tc) { K.prism(0, 2.2, 0, 2.6, 2.4, 6, P.a, 'crystal', { top: 0.7 }); K.cone(0, 4.6, 0, 1.82, 1.8, P.b, 'crystal', { seg: 6, flat: true }); K.cone(0, 2.2, 0, 2.6, 1.8, P.b, 'crystal', { seg: 6, flat: true, rx: PI });
+    K.prism(0, 3.2, 0, 2.47, 0.2, 6, P.c, null, { e: 2.2, top: 1 }); K.tor(0, 0.8, 0, 2.4, 0.16, P.l, null, { e: 2.6, ts: 6 }); K.tor(0, 1.1, 0, 3.2, 0.12, tc, null, { e: 1.8, ts: 6 }); K.oct(2.6, 2.6, 0, 0.6, 2.2, P.b, 'crystal', { rz: -H }); },
+  veiculo_hull(K, P, tc) { K.prism(0, 1.6, 0, 1, 1.6, 6, P.a, 'crystal', { sx: 6.4, sz: 4.2, top: 0.82 }); K.cone(0, 1.6, 0, 1, 1.4, P.b, 'crystal', { seg: 6, flat: true, rx: PI, sx: 6.4, sz: 4.2 }); K.prism(0, 2.3, 0, 1.01, 0.2, 6, tc, null, { e: 1.8, sx: 6.4, sz: 4.2, top: 1 }); K.tor(0, 0.4, 0, 2.2, 0.14, P.l, null, { e: 2.4, ts: 6 }); K.mount = 3.2; },
+  veiculo_turret(K, P, tc) { KITS.quorith.turret(K, P, tc, 0.85, false); },
+  drone(K, P, tc) { K.oct(-2, 1.6, 0, 1.1, 4.4, P.a, 'crystal', { rz: -H }); for (const s of [-1, 1]) K.oct(-1.6, 1.6, s * 2.4, 0.6, 2.6, P.b, 'crystal', { rz: -H, ry: s * 0.25 }); K.tor(0, 1.6, 0, 2.6, 0.1, P.l, null, { e: 2.4, ts: 6, rx: 0.4 }); K.oct(0.2, 2.6, 0, 0.35, 1, tc, null, { e: 2 }); },
+  suporte(K, P, tc) { K.prism(0, 0.6, 0, 1.8, 0.5, 6, P.d, 'gloss'); K.prism(0, 1.1, 0, 0.6, 2.4, 6, P.b, 'crystal'); K.box(0, 3.4, 0, 0.5, 0.5, 2.6, P.a, 'crystal'); for (const s of [-1, 1]) { K.prism(0, 3.4, s * 1.1, 0.4, 4.6, 6, P.a, 'crystal', { top: 0.5 }); K.oct(0, 8.2, s * 1.1, 0.3, 0.8, P.l, null, { e: 2.6 }); } K.tor(0, 0.3, 0, 1.6, 0.12, tc, null, { e: 1.8, ts: 6 }); },
+  pirata(K, P, tc) { K.prism(0, 1, 0, 1, 1.4, 6, P.a, 'crystal', { sx: 5, sz: 3.2, top: 0.8 }); K.cone(0, 1, 0, 1, 0.9, P.b, 'crystal', { seg: 6, flat: true, rx: PI, sx: 5, sz: 3.2 }); K.oct(4.4, 1.6, 0, 1, 4, P.b, 'crystal', { rz: -H }); K.oct(8.3, 1.6, 0, 0.35, 1.2, P.c, null, { e: 2.6, rz: -H });
+    K.oct(-1.4, 2.4, 0, 0.9, 2.6, P.a, 'crystal'); K.oct(-1.4, 5.1, 0, 0.3, 0.9, P.c, null, { e: 2.4 }); K.prism(0, 1.9, 0, 1.01, 0.18, 6, tc, null, { e: 1.8, sx: 5, sz: 3.2, top: 1 }); K.tor(0, 0.2, 0, 1.8, 0.12, P.l, null, { e: 2, ts: 6 }); },
+  voz(K, P, tc) { K.oct(0, 1.4, 0, 1.6, 6.2, P.a, 'crystal'); K.tor(0, 4.5, 0, 1.72, 0.12, P.c, null, { e: 2.6, ts: 6 }); ringOf(3, 2.6, (cx, cz, a) => K.oct(cx, 3.2 + (a > 3 ? 0.8 : 0), cz, 0.4, 1.4, P.b, 'crystal', { rz: 0.3 })); K.tor(0, 0.4, 0, 1.4, 0.1, tc, null, { e: 2, ts: 6 }); K.oct(0, 7.9, 0, 0.3, 0.8, P.c, null, { e: 2.6 }); },
+  agulha(K, P, tc) { K.prism(0, 0.4, 0, 1.6, 0.5, 6, P.d, 'gloss'); K.oct(0, 0.9, 0, 1.3, 3.8, P.a, 'crystal'); for (const [x, z, a] of [[0.8, 0.8, 0.3], [0.8, -0.8, 0.3], [-0.8, 0.8, -0.3], [-0.8, -0.8, -0.3]]) K.oct(x, 2, z, 0.28, 5.4, P.b, 'crystal', { rz: -a, rx: z * 0.3 }); K.oct(1.2, 2.4, 0, 0.3, 4, P.l, null, { e: 2.4, rz: -1.1 }); K.tor(0, 2.6, 0, 1.5, 0.1, tc, null, { e: 2, ts: 6 }); },
+  diapasao(K, P, tc) { K.prism(0, 0, 0, 2.6, 0.6, 6, P.d, 'gloss'); K.prism(0, 0.6, 0, 1.6, 0.6, 6, P.b, 'crystal'); K.prism(0, 1.2, 0, 0.7, 3, 6, P.a, 'crystal'); K.box(0, 4.2, 0, 0.8, 0.8, 3.8, P.a, 'crystal');
+    for (const s of [-1, 1]) { K.prism(0, 4.2, s * 1.6, 0.5, 8, 6, P.a, 'crystal', { top: 0.6 }); K.oct(0, 12.2, s * 1.6, 0.4, 1.2, P.l, null, { e: 2.8 }); } K.oct(0, 5.4, 0, 0.45, 1.4, P.c, null, { e: 2.6 }); K.tor(0, 0.7, 0, 2.2, 0.12, tc, null, { e: 1.8, ts: 6 }); },
+  prisma(K, P, tc) { U.quorith.veiculo_hull(K, P, tc); K.mount = null; K.oct(-0.6, 3, 0, 2.2, 6.4, P.a, 'crystal', { ry: PI / 4 }); K.oct(2.4, 4.4, 0, 0.7, 6, P.b, 'crystal', { rz: -H }); K.oct(8.5, 4.4, 0, 0.3, 1.2, P.c, null, { e: 2.8, rz: -H }); K.tor(-0.6, 6, 0, 2.6, 0.12, P.l, null, { e: 2.4, ts: 6, rx: 0.3 }); },
+  monolito(K, P, tc) { K.prism(0, 0, 0, 1, 0.8, 6, P.d, 'gloss', { sx: 5.4, sz: 4 }); K.tor(0, 1.2, 0, 3.2, 0.16, P.l, null, { e: 2.4, ts: 6 }); K.box(0, 1.8, 0, 3.6, 13, 2.6, P.a, 'crystal', { b: 0.2, bs: 1 });
+    K.box(0, 3, 1.33, 0.3, 10, 0.06, P.c, null, { e: 2.6 }); K.box(0, 3, -1.33, 0.3, 10, 0.06, P.c, null, { e: 2.6 }); K.box(1.83, 3, 0, 0.06, 10, 0.3, P.c, null, { e: 2.6 }); K.oct(0, 14.8, 0, 1.2, 2.8, P.b, 'crystal');
+    ringOf(4, 4.2, (cx, cz) => K.oct(cx, 0.6, cz, 0.7, 3.2, P.b, 'crystal', { rz: -cx * 0.08, rx: cz * 0.08 })); K.oct(0, 18.2, 0, 0.4, 1, tc, null, { e: 2 }); },
+  harmonico(K, P, tc) { ringOf(3, 1.8, (cx, cz, a) => K.oct(cx, 1, cz, 0.7, 3.4, P.a, 'crystal', { rx: Math.sin(a) * 0.4, rz: -Math.cos(a) * 0.4 })); K.oct(0, 1.6, 0, 0.5, 1.8, P.c, null, { e: 2.8 }); K.tor(0, 2.4, 0, 2.8, 0.1, P.l, null, { e: 2.4, ts: 6 }); K.tor(0, 2.4, 0, 2.2, 0.08, tc, null, { e: 2, ts: 6 }); },
+};
+U.vorag = {
+  infantaria(K, P, tc) { for (const s of [-1, 1]) leg(K, [-0.4, 3.2, s * 0.9], [0.8, 1.8, s * 1.2], [-0.2, 0, s * 1.2], 0.42, P.b, 'chitin');
+    K.sph(-0.3, 4.4, 0, 1.5, P.a, 'chitin', { sx: 1.3, sy: 1.1, seg: 14, rz: 0.4 }); K.sph(1.4, 5.6, 0, 0.95, P.a, 'chitin', { sx: 1.3, seg: 12 });
+    for (const s of [-1, 1]) { K.cone(2.4, 5.2, s * 0.45, 0.22, 1.2, P.bo, 'bone', { rz: -2, seg: 6 }); K.light(2.35, 6, s * 0.5, 0.22, P.l); K.seg([0.6, 5, s * 1.3], [2.6, 3.6, s * 1.4], 0.26, P.b, 'chitin'); K.cone(2.6, 3.6, s * 1.4, 0.24, 1.4, P.bo, 'bone', { rz: -2.2, seg: 6 }); }
+    ringOf(3, 0.6, (cx, cz) => K.cone(-1 + cx, 5.4, cz, 0.22, 1.4, P.bo, 'bone', { rz: 0.6, seg: 6 })); K.sph(-1.25, 4.6, 0, 0.6, tc, 'wet', { seg: 10 }); },
+  coletor(K, P, tc) { K.sph(0, 1.8, 0, 1, P.a, 'chitin', { sx: 4.4, sy: 1.6, sz: 3, seg: 16 }); K.sph(-1, 3.4, 0, 2.2, P.m, 'wet', { sy: 0.9, seg: 16 }); for (let i = 0; i < 3; i++) arch(K, -1, 2.4, 0, 2.25, 2, 2.25, i * PI / 3, 0.1, '#FF8A8A', null, { e: 1.3, ts: 10 });
+    for (const x of [-2.6, 0, 2.6]) for (const s of [-1, 1]) leg(K, [x, 1.8, s * 2.4], [x + 0.6, 1.6, s * 3.8], [x + 0.2, 0, s * 4.2], 0.28, P.b, 'chitin');
+    K.sph(4, 1.8, 0, 1.2, P.b, 'chitin', { sx: 1.2, seg: 12 }); for (const s of [-1, 1]) { K.cone(4.8, 1.4, s * 0.6, 0.25, 1.4, P.bo, 'bone', { rz: -2, seg: 6 }); K.light(5.15, 2.2, s * 0.5, 0.22, P.l); } K.box(1.4, 3.3, 0, 1.6, 0.25, 1.4, tc, 'wet'); },
+  veiculo_hull(K, P, tc) { K.sph(0, 2.2, 0, 1, P.a, 'chitin', { sx: 6.4, sy: 2.4, sz: 4, seg: 18 }); for (let i = 0; i < 4; i++) K.sph(-3.6 + i * 2.4, 3.6, 0, 1, P.b, 'chitin', { sx: 1.6, sy: 0.9, sz: 3.6, seg: 12 });
+    for (const x of [-4, -1.2, 1.6, 4.2]) for (const s of [-1, 1]) leg(K, [x, 2, s * 3.2], [x + 0.8, 1.8, s * 4.8], [x + 0.4, 0, s * 5], 0.42, P.b, 'chitin');
+    K.sph(6.6, 2.4, 0, 1.6, P.a, 'chitin', { sx: 1.2, seg: 12 }); for (const s of [-1, 1]) { K.cone(7.6, 2, s * 0.8, 0.35, 2, P.bo, 'bone', { rz: -2, seg: 6 }); K.light(8.4, 2.9, s * 0.6, 0.26, P.l); } K.sph(-3, 4.4, 0, 0.6, tc, 'wet', { seg: 8 }); K.mount = 4.4; },
+  veiculo_turret(K, P, tc) { KITS.vorag.turret(K, P, tc, 0.85, false); },
+  drone(K, P, tc, o) { o = o || {}; K.sph(0, 2, 0, 1.2, P.a, 'chitin', { sx: 1.8, seg: 12 }); K.sph(-2.6, 1.8, 0, 1, P.b, 'chitin', { sx: 1.6, sy: 0.9, seg: 12 }); K.cone(-4.3, 1.7, 0, 0.3, o.sting || 1.6, P.bo, 'bone', { rz: H, seg: 6 }); K.sph(2.1, 2.2, 0, 0.75, P.a, 'chitin', { seg: 10 });
+    for (const s of [-1, 1]) { K.light(2.75, 2.5, s * 0.35, 0.22, P.l); K.sph(0.2, 2.9, s * 2.4, 1, '#E8A0A8', 'wet', { sx: 1, sy: 0.06, sz: 2.4, ry: s * 0.25, seg: 12 }); if (o.wings4) K.sph(-1, 2.8, s * 2, 1, '#E8A0A8', 'wet', { sx: 0.7, sy: 0.05, sz: 1.8, ry: -s * 0.35, seg: 12 }); }
+    K.sph(0, 2.9, 0, 0.4, tc, 'wet', { seg: 8 }); },
+  suporte(K, P, tc) { K.sph(0, 3.2, 0, 2, P.m, 'wet', { sy: 0.85, seg: 16 }); for (let i = 0; i < 3; i++) arch(K, 0, 2.4, 0, 2.05, 1.7, 2.05, i * PI / 3, 0.1, '#FF8A8A', null, { e: 1.4, ts: 10 }); ringOf(5, 1.2, (cx, cz) => K.tube([[cx, 2, cz], [cx * 1.5, 1, cz * 1.5], [cx * 1.2, 0, cz * 1.2]], 0.14, P.b, 'wet', { ts: 8 })); K.sph(0, 4.8, 0, 0.5, P.l, null, { e: 2.4, seg: 10 }); K.tor(0, 2.4, 0, 2, 0.16, P.bo, 'bone', { ts: 20 }); K.sph(1.6, 3.6, 0, 0.45, tc, 'wet', { seg: 8 }); },
+  pirata(K, P, tc) { K.sph(-0.4, 3, 0, 2.4, P.a, 'chitin', { sx: 1.3, sy: 1.1, seg: 16 }); K.sph(-2.4, 4.2, 0, 1.6, P.m, 'wet', { seg: 14 }); for (const x of [-2, 0.4, 2.2]) for (const s of [-1, 1]) leg(K, [x, 2.4, s * 2], [x + 0.6, 2, s * 3.4], [x + 0.3, 0, s * 3.6], 0.36, P.b, 'chitin');
+    K.sph(2.6, 3, 0, 1.4, P.b, 'chitin', { sx: 1.3, seg: 12 }); for (const s of [-1, 1]) { K.seg([3.2, 2.6, s * 0.9], [5.2, 1.6, s * 0.5], 0.3, P.bo, 'bone', { taper: 0.3 }); K.light(4.1, 3.6, s * 0.5, 0.24, P.l); }
+    ringOf(4, 1, (cx, cz) => K.cone(-0.6 + cx, 5.2, cz, 0.28, 1.8, P.bo, 'bone', { seg: 6, rz: 0.5 })); K.sph(-0.4, 5.4, 0, 0.5, tc, 'wet', { seg: 8 }); },
+  cria(K, P, tc) { K.sph(0, 1.6, 0, 1.2, P.a, 'chitin', { sx: 1.5, sy: 0.9, seg: 12 }); K.sph(1.8, 1.7, 0, 0.75, P.b, 'chitin', { seg: 10 }); for (const s of [-1, 1]) { K.cone(2.4, 1.3, s * 0.35, 0.18, 0.9, P.bo, 'bone', { rz: -2, seg: 6 }); K.light(2.45, 2, s * 0.35, 0.18, P.l); }
+    for (const x of [-0.8, 0.2, 1]) for (const s of [-1, 1]) leg(K, [x, 1.4, s * 0.8], [x + 0.4, 1.4, s * 1.8], [x + 0.2, 0, s * 2], 0.16, P.b, 'chitin'); K.sph(-0.8, 2.3, 0, 0.35, tc, 'wet', { seg: 8 }); },
+  cuspidor(K, P, tc) { U.vorag.cria(K, P, tc); K.sph(-1.2, 2.8, 0, 1.3, P.ac, null, { e: 1.2, seg: 12 }); K.seg([1.8, 2, 0], [3.6, 2.6, 0], 0.32, P.b, 'chitin', { taper: 0.6 }); K.sph(3.6, 2.6, 0, 0.28, P.ac, null, { e: 2.2, seg: 8 }); },
+  escaravelho(K, P, tc) { K.sph(0, 2.2, 0, 1, P.a, 'chitin', { sx: 5.4, sy: 2.6, sz: 3.6, seg: 18 }); K.sph(0, 2.6, 0, 1, P.b, 'chitin', { half: true, sx: 5, sy: 2.6, sz: 0.4, seg: 12 });
+    for (const x of [-3, 0, 3]) for (const s of [-1, 1]) leg(K, [x, 2, s * 3], [x + 0.8, 1.6, s * 4.4], [x + 0.4, 0, s * 4.6], 0.4, P.b, 'chitin');
+    K.sph(5.4, 2.2, 0, 1.4, P.b, 'chitin', { seg: 12 }); K.seg([6, 2.6, 0], [8.4, 5.2, 0], 0.5, P.bo, 'bone', { taper: 0.2 }); for (const s of [-1, 1]) K.light(6.6, 2.8, s * 0.6, 0.24, P.l); K.sph(-2.6, 4.4, 0, 0.6, tc, 'wet', { seg: 8 }); },
+  brutamonte(K, P, tc) { K.sph(0, 3.4, 0, 1, P.a, 'chitin', { sx: 8, sy: 4.4, sz: 5.6, seg: 20 }); for (let i = 0; i < 4; i++) K.sph(-4.8 + i * 3.2, 6.2, 0, 1, P.b, 'chitin', { sx: 2, sy: 1.3, sz: 5, seg: 12 });
+    ringOf(7, 1, (cx, cz) => { if (cx > -0.95) K.cone(cx * 5.4, 6.4, cz * 3.6, 0.5, 3.2, P.bo, 'bone', { seg: 8, rz: -cx * 0.5, rx: cz * 0.5 }); });
+    for (const x of [-5, -1.6, 1.8, 5]) for (const s of [-1, 1]) leg(K, [x, 3, s * 4.6], [x + 1, 2.6, s * 6.4], [x + 0.6, 0, s * 6.8], 0.8, P.b, 'chitin');
+    K.sph(8.2, 3.6, 0, 2.4, P.b, 'chitin', { sx: 1.1, seg: 14 }); for (const s of [-1, 1]) { K.seg([9.4, 3, s * 1.4], [12, 4.6, s * 2.2], 0.5, P.bo, 'bone', { taper: 0.25 }); K.light(10.6, 4.6, s * 0.8, 0.32, P.l); }
+    K.sph(-4, 7.6, 0, 0.9, tc, 'wet', { seg: 10 }); K.sph(-6.6, 5.4, 0, 1.8, P.m, 'wet', { seg: 12 }); },
+  ferroada(K, P, tc) { U.vorag.drone(K, P, tc, { sting: 2.6, wings4: true }); },
+};
+
+// ---------- cenário neutro: nós de recurso, rochas, ruínas, caixas, carcaças e adereços de território ----------
+const NEUTRAL = {
+  plasma(K, seed) { const r = rng(seed + 3); K.rock(0, 0.3, 0, 3, '#3A2A2E', 'stone', { sy: 0.35, seed });
+    for (let i = 0; i < 8; i++) { const a = r() * PI * 2, d = 0.6 + r() * 3, h = 3 + r() * 6, hot = r() < 0.55; K.prism(Math.cos(a) * d, 0.2, Math.sin(a) * d, 0.45 + r() * 0.5, h, 6, hot ? '#FF7A45' : '#C55CFF', 'crystal', { top: 0.12, rz: (r() - 0.5) * 0.6, rx: (r() - 0.5) * 0.6, e: hot ? 1.5 : 0 }); } },
+  minerio(K, seed) { const r = rng(seed + 7); for (let i = 0; i < 5; i++) K.rock((r() - 0.5) * 6, 0.6 + r(), (r() - 0.5) * 6, 1.6 + r() * 1.6, ['#6E7682', '#5A616B', '#7E8794'][i % 3], 'stone', { seed: seed + i, sy: 0.75 });
+    for (let i = 0; i < 9; i++) K.oct((r() - 0.5) * 6, 0.8 + r() * 1.6, (r() - 0.5) * 6, 0.35 + r() * 0.3, 1 + r() * 1.2, '#C9D8E8', 'metal', { rz: (r() - 0.5) * 1.4, rx: (r() - 0.5) * 1.4 }); },
+  dados(K, seed) { const r = rng(seed + 11); K.rock(0, 0.2, 0, 2.6, '#33403A', 'stone', { sy: 0.3, seed }); K.tor(0, 1, 0, 2.6, 0.1, '#7FE3A1', null, { e: 2, ts: 24 });
+    for (let i = 0; i < 5; i++) { const a = i / 5 * PI * 2 + r(); K.oct(Math.cos(a) * (0.8 + r() * 1.6), 1.6 + r() * 3, Math.sin(a) * (0.8 + r() * 1.6), 0.35 + r() * 0.25, 1.6 + r() * 1.6, '#7FE3A1', null, { e: 1.6 + r(), rz: (r() - 0.5) * 0.8 }); } },
+  rocks(K, seed) { const r = rng(seed + 13); for (let i = 0; i < 4; i++) K.rock((r() - 0.5) * 7, 0.8 + i * 0.4, (r() - 0.5) * 7, 1.8 + r() * 2.2, ['#5D5A57', '#6B6560', '#4E4B49'][i % 3], 'stone', { seed: seed * 3 + i, sy: 0.7 + r() * 0.5, amp: 0.28 }); },
+  ruin(K, seed) { const r = rng(seed + 17); for (let i = 0; i < 3; i++) K.box((r() - 0.5) * 7, 0, (r() - 0.5) * 7, 1.6, 3 + r() * 6, 1.6, '#8A8478', 'stone', { b: 0.15, rz: (r() - 0.5) * 0.35, rx: (r() - 0.5) * 0.35 });
+    K.box((r() - 0.5) * 4, 0, (r() - 0.5) * 4, 5, 0.9, 1.8, '#7A746A', 'stone', { b: 0.15, ry: r() * PI, rz: 0.12 }); for (let i = 0; i < 4; i++) K.rock((r() - 0.5) * 8, 0.3, (r() - 0.5) * 8, 0.5 + r() * 0.6, '#77716A', 'stone', { seed: seed + i }); K.light(0, 0.4, 0, 0.3, '#7FE3A1', 1.4); },
+  crate(K) { K.box(0, 0, 0, 6, 4.6, 5, '#B8862B', 'paint', { b: 0.35 }); for (const x of [-1.6, 1.6]) K.box(x, -0.05, 0, 0.5, 4.75, 5.12, '#4A3A20', 'dark'); K.box(0, 4.6, 0, 1.6, 0.3, 1.6, '#F2C230', null, { e: 1.6 }); },
+  wreck(K) { K.box(0, 0, 0, 12, 2.4, 6, '#2A2624', 'dark', { b: 0.4, rz: 0.08, rx: 0.1 }); K.box(-1, 2.2, 0.4, 4.6, 1.6, 4, '#3A3430', 'dark', { b: 0.4, ry: 0.5, rz: -0.2 }); K.seg([1, 3, 0.2], [6.4, 1.2, 2.2], 0.36, '#1E1C1B', 'metal');
+    for (let i = 0; i < 3; i++) K.light(-3 + i * 2.6, 2.4, (i - 1) * 1.6, 0.35, '#FF7A2E', 2); },
+};
+const PROPS = {
+  vehnar(K, s) { const r = rng(s); const P = Object.assign({}, PAL.vehnar, { b: '#9AA2AD' }); if (s % 2) { KITS.vehnar.tower(K, P, '#7C8490', 0, 0, 0.8 + r() * 0.3, 4 + r() * 2.5, 0); K.box(1.7, 0, 0.8, 1.6, 1.2, 1.4, PAL.vehnar.a, 'steel', { b: 0.2 }); } else { K.box(0, 0, 0, 4.6, 2.2, 2.2, ['#B8862B', '#7C8490', '#8A5A3A'][s % 3], 'paint', { b: 0.2 }); K.box(0.6, 2.2, 0.2, 3.4, 1.8, 2, ['#59606B', '#B8862B', '#7C8490'][s % 3], 'paint', { b: 0.2, ry: 0.2 }); K.light(2.4, 1.2, 0, 0.3, PAL.vehnar.l, 1.8); } },
+  erevane(K, s) { const r = rng(s); K.cone(0, 0, 0, 0.9 + r() * 0.4, 6 + r() * 4, '#9FC7D6', 'ice', { seg: 5, flat: true, rz: (r() - 0.5) * 0.3 }); K.cone(1.2, 0, 0.6, 0.5, 3 + r() * 2, '#BFDDE6', 'ice', { seg: 5, flat: true, rz: -0.3 }); K.oct(0, 0.4, -1, 0.4, 1.4, PAL.erevane.c, null, { e: 1.6 }); },
+  tessara(K, s) { const r = rng(s); KITS.tessara.tower(K, PAL.tessara, '#888', 0, 0, 0.8 + r() * 0.3, 4 + r() * 3, 0); },
+  quorith(K, s) { const r = rng(s); K.oct(0, 0, 0, 1 + r() * 0.5, 5 + r() * 4, PAL.quorith.a, 'crystal', { rz: (r() - 0.5) * 0.4 }); K.oct(1.2, 0, 0.4, 0.5, 2.6, PAL.quorith.b, 'crystal', { rz: -0.5 }); K.oct(-0.9, 0.2, -0.6, 0.3, 1.2, PAL.quorith.c, null, { e: 2.2 }); },
+  vorag(K, s) { const r = rng(s); for (let i = 0; i < 3; i++) K.sph((r() - 0.5) * 2.4, 0.8, (r() - 0.5) * 2.4, 0.9 + r() * 0.5, PAL.vorag.bo, 'bone', { sy: 1.4, seg: 10 }); K.sph(0, 0, 0, 1.8, '#3A1A28', 'wet', { half: true, sy: 0.3, seg: 12 }); K.sph(0.3, 1.8, 0.2, 0.25, PAL.vorag.l, null, { e: 2, seg: 8 }); },
+};
+
+// ---------- API ----------
+const FULL = { veiculo: ['veiculo_hull', 'veiculo_turret'], torre: ['torre_base', 'torre_turret'], bastiao: ['bastiao_base', 'bastiao_turret'] };
+function recipe(race, def) {
+  const u = U[race]; if (u && u[def]) return (K, P, tc) => u[def](K, P, tc);
+  if (BLD[def]) return (K, P, tc) => BLD[def](K, KITS[race] || KITS.vehnar, P, tc);
+  for (const r in U) if (U[r][def]) return (K, P, tc) => U[r][def](K, P, tc);
+  return null;
+}
+function build(def, race, color, seed) {
+  T = T || globalThis.THREE; if (!T) return null;
+  const K = new Kit();
+  try {
+    if (NEUTRAL[def]) { NEUTRAL[def](K, seed | 0); return K.finish(); }
+    if (def.startsWith('prop_')) { const f = PROPS[def.slice(5)]; if (!f) return null; f(K, seed | 0); return K.finish(); }
+    race = PAL[race] ? race : 'vehnar'; const P = PAL[race]; const tc = color || '#FF8C1A';
+    if (FULL[def]) { const a = recipe(race, FULL[def][0]), b = recipe(race, FULL[def][1]); if (!a || !b) return null; a(K, P, tc); const m = K.mount || 0; K.mount = null; K.oy = m; b(K, P, tc); K.oy = 0; return K.finish({ pivot: [0, 0] }); }
+    const f = recipe(race, def); if (!f) return null; f(K, P, tc); return K.finish({ pivot: [0, 0] });
+  } catch (err) { console.warn('[ARD] malha ' + def + '/' + race + ' falhou: ' + err.message); return null; }
+}
+// material padrão das malhas: rugosidade e metal vêm do atributo rm por vértice; rim opcional por Raça
+function material(o) { T = T || globalThis.THREE; o = o || {}; const m = new T.MeshStandardMaterial(Object.assign({ vertexColors: true, roughness: 1, metalness: 1, envMapIntensity: o.env == null ? 1 : o.env }, o.params || {}));
+  m.onBeforeCompile = sh => {
+    sh.vertexShader = 'attribute vec2 rm;\nvarying vec2 vRM;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvRM = rm;');
+    sh.fragmentShader = 'varying vec2 vRM;\n' + sh.fragmentShader.replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = vRM.x;').replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor = vRM.y;');
+    if (o.rim) sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n{ float rim = pow(1.0 - abs(dot(normalize(normal), normalize(vViewPosition))), ' + o.rim.pow.toFixed(2) + '); totalEmissiveRadiance += vec3(' + o.rim.col.map(v => v.toFixed(3)).join(', ') + ') * (rim * ' + o.rim.amt.toFixed(3) + '); }');
+    if (o.onShader) o.onShader(sh);
+  };
+  m.customProgramCacheKey = () => 'ard-mesh-' + (o.key || 'base'); return m; }
+const BUILDING_DEFS = ['nucleo', 'reator', 'refinaria', 'quartel', 'fabrica', 'hangar', 'torre', 'nodulo', 'laboratorio', 'muro', 'portao', 'bastiao'];
+const GENERIC_UNITS = ['coletor', 'infantaria', 'veiculo', 'drone', 'suporte', 'pirata'];
+function unitsOf(race) { return GENERIC_UNITS.concat(Object.keys(U[race] || {}).filter(d => !GENERIC_UNITS.includes(d) && !d.startsWith('veiculo_'))); }
+ARD.meshes = { setLod(v) { LOD = Math.max(0.4, Math.min(1, v)); }, build, material, PAL, MAT, BUILDING_DEFS, GENERIC_UNITS, unitsOf, NEUTRAL_DEFS: Object.keys(NEUTRAL), PROP_RACES: Object.keys(PROPS), FULL };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Aether Rift: Dominion — Engine gráfica 2 (4.0d): céu, planeta-mãe, horizonte além do mapa e detalhe do terreno.
+   Reaproveita os geradores da galeria (tools/arte3d.html): ruído fBm, planetas com faixas e atmosfera por Fresnel.
+   Tudo aqui é só visual: nada lê ou altera a simulação. */
+(function (ARD) {
+'use strict';
+const PLANETS = { // paletas dos mundos natais aprovados (Postal Dia)
+  vehnar:  { pl: ['#1a120c', '#5a3a22', '#a06a3a', '#e6b070'], atmo: 0xff9a4a, bands: true, moon: '#b9a690' },
+  erevane: { pl: ['#070c14', '#14283a', '#2f5a78', '#9fd8f0'], atmo: 0x33ffd0, bands: false, moon: '#9fb6c4' },
+  tessara: { pl: ['#0a1a10', '#1f4a2e', '#3f9a5e', '#c8f0a0'], atmo: 0x8affb0, bands: false, moon: '#b8c9a8' },
+  quorith: { pl: ['#0e0a1c', '#2a2140', '#6a50b0', '#e0d0ff'], atmo: 0xc8a8ff, bands: true, moon: '#c4bce0' },
+  vorag:   { pl: ['#140608', '#3b1420', '#8e2a3a', '#ffb090'], atmo: 0xff6a7c, bands: false, moon: '#c9a2a2' },
+};
+function hash3(x, y, z) { let n = (x * 374761393 + y * 668265263 + z * 2147483647) | 0; n = (n ^ (n >> 13)) * 1274126177; n = n ^ (n >> 16); return (n & 0x7fffffff) / 0x7fffffff; }
+const sm = t => t * t * (3 - 2 * t);
+function vnoise(x, y, z) { const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z); const fx = sm(x - xi), fy = sm(y - yi), fz = sm(z - zi); const l = (a, b, t) => a + (b - a) * t;
+  return l(l(l(hash3(xi, yi, zi), hash3(xi + 1, yi, zi), fx), l(hash3(xi, yi + 1, zi), hash3(xi + 1, yi + 1, zi), fx), fy), l(l(hash3(xi, yi, zi + 1), hash3(xi + 1, yi, zi + 1), fx), l(hash3(xi, yi + 1, zi + 1), hash3(xi + 1, yi + 1, zi + 1), fx), fy), fz); }
+function fbm(x, y, z, oct) { let v = 0, a = 0.5, f = 1, s = 0; for (let i = 0; i < (oct || 5); i++) { v += a * vnoise(x * f, y * f, z * f); s += a; a *= 0.5; f *= 2.1; } return v / s; }
+const pstr = s => [parseInt(s.slice(1, 3), 16), parseInt(s.slice(3, 5), 16), parseInt(s.slice(5, 7), 16)];
+function ramp(stops, t) { const n = stops.length - 1; const i = Math.min(n - 1, Math.max(0, Math.floor(t * n))); const u = t * n - i; const a = stops[i], b = stops[i + 1]; return [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u]; }
+
+// textura de detalhe do terreno, repetível: R = grão fino, G = manchas médias, B = rachaduras (ruído em crista)
+function detailTexture(THREE) {
+  const N = 256; const cv = document.createElement('canvas'); cv.width = cv.height = N; const c = cv.getContext('2d'); const img = c.createImageData(N, N); const d = img.data;
+  const h2 = (x, y, s) => hash3(x, y, s); const vn = (x, y, p, s) => { const xi = Math.floor(x), yi = Math.floor(y); const fx = sm(x - xi), fy = sm(y - yi); const w = a => ((a % p) + p) % p; const l = (a, b, t) => a + (b - a) * t; return l(l(h2(w(xi), w(yi), s), h2(w(xi + 1), w(yi), s), fx), l(h2(w(xi), w(yi + 1), s), h2(w(xi + 1), w(yi + 1), s), fx), fy); };
+  const tile = (x, y, f0, oct, s) => { let v = 0, a = 0.5, f = f0, t = 0; for (let o = 0; o < oct; o++) { v += a * vn(x / N * f, y / N * f, f, s + o); t += a; a *= 0.5; f *= 2; } return v / t; };
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const i = (y * N + x) * 4; const r = tile(x, y, 16, 4, 1), g = tile(x, y, 4, 4, 9); const cr = 1 - Math.abs(tile(x, y, 8, 3, 21) * 2 - 1); d[i] = 255 * r; d[i + 1] = 255 * g; d[i + 2] = 255 * Math.pow(cr, 6); d[i + 3] = 255; }
+  c.putImageData(img, 0, 0); const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.NoColorSpace; return t;
+}
+function planetTexture(THREE, race, seed, W) {
+  const P = PLANETS[race] || PLANETS.vehnar; W = W || 384; const Hh = W / 2; const cv = document.createElement('canvas'); cv.width = W; cv.height = Hh; const c = cv.getContext('2d'); const img = c.createImageData(W, Hh); const d = img.data; const stops = P.pl.map(pstr);
+  for (let y = 0; y < Hh; y++) for (let x = 0; x < W; x++) { const u = x / W * Math.PI * 2, vv = y / Hh; const nx = Math.cos(u) * 2.2 + seed, nz = Math.sin(u) * 2.2, ny = vv * 4.4;
+    let t = P.bands ? fbm(nx * 0.25, ny * 2.6 + fbm(nx, ny, nz, 3) * 1.2, nz * 0.25, 4) : fbm(nx, ny, nz, 5); t = Math.min(1, Math.max(0, (t - 0.32) * 1.9)); const [r, g, b] = ramp(stops, t); const i = (y * W + x) * 4; d[i] = r; d[i + 1] = g; d[i + 2] = b; d[i + 3] = 255; }
+  c.putImageData(img, 0, 0); const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; return tex;
+}
+function atmo(THREE, r, color, power, intensity) {
+  const mat = new THREE.ShaderMaterial({ uniforms: { col: { value: new THREE.Color(color) }, pw: { value: power }, it: { value: intensity } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.BackSide, fog: false,
+    vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position,1.0); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }',
+    fragmentShader: 'uniform vec3 col; uniform float pw; uniform float it; varying vec3 vN; varying vec3 vV; void main(){ float d = abs(dot(normalize(vN), normalize(vV))); float f = pow(1.0 - d, pw); gl_FragColor = vec4(col * f * it, f * it); }' });
+  return new THREE.Mesh(new THREE.SphereGeometry(r, 48, 32), mat);
+}
+// céu: cúpula em gradiente com brilho do sol e estrelas que aparecem à noite; acompanha a câmera (fica "no infinito")
+function makeSky(THREE) {
+  const mat = new THREE.ShaderMaterial({ uniforms: { uTop: { value: new THREE.Color(0x3a5f8f) }, uHor: { value: new THREE.Color(0x9fb0c4) }, uBot: { value: new THREE.Color(0x30343a) }, uSunDir: { value: new THREE.Vector3(-0.4, 0.7, 0.5).normalize() }, uSunCol: { value: new THREE.Color(1, 0.9, 0.75) }, uNight: { value: 0 }, uTime: { value: 0 } },
+    depthWrite: false, side: THREE.BackSide, fog: false,
+    vertexShader: 'varying vec3 vDir; void main(){ vDir = position; vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0); gl_Position = p.xyww; }',
+    fragmentShader: 'uniform vec3 uTop; uniform vec3 uHor; uniform vec3 uBot; uniform vec3 uSunDir; uniform vec3 uSunCol; uniform float uNight; uniform float uTime; varying vec3 vDir;\nfloat hh(vec3 p){ return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }\nvoid main(){ vec3 d = normalize(vDir); float y = d.y; vec3 col = y > 0.0 ? mix(uHor, uTop, pow(clamp(y, 0.0, 1.0), 0.5)) : mix(uHor, uBot, clamp(-y * 4.0, 0.0, 1.0));\n float sd = max(dot(d, uSunDir), 0.0); col += uSunCol * (pow(sd, 600.0) * 4.0 + pow(sd, 18.0) * 0.18) * (1.0 - uNight * 0.9);\n vec3 q = d * 420.0; vec3 cc = floor(q); float s = hh(cc); float st = step(0.9972, s) * smoothstep(0.02, 0.2, y); float tw = 0.65 + 0.35 * sin(uTime * 1.7 + s * 60.0); col += vec3(0.9, 0.95, 1.0) * st * tw * (0.25 + 1.35 * uNight);\n gl_FragColor = vec4(col, 1.0);\n #include <tonemapping_fragment>\n #include <colorspace_fragment>\n}' });
+  const m = new THREE.Mesh(new THREE.SphereGeometry(4800, 32, 20), mat); m.frustumCulled = false; m.renderOrder = -1000; m.userData.mat = mat; return m;
+}
+// planeta-mãe da Raça do jogador e uma lua, baixos no horizonte; aparecem ao inclinar a câmera
+function makeHomeWorld(THREE, race, seed) {
+  const P = PLANETS[race] || PLANETS.vehnar; const g = new THREE.Group();
+  const ptex = planetTexture(THREE, race, seed); const planet = new THREE.Mesh(new THREE.SphereGeometry(640, 64, 40), new THREE.MeshStandardMaterial({ map: ptex, emissiveMap: ptex, emissive: 0xffffff, emissiveIntensity: 0.16, roughness: 0.92, metalness: 0, fog: false, envMapIntensity: 0 })); planet.rotation.z = 0.35; planet.rotation.x = 0.2; g.add(planet);
+  g.add(atmo(THREE, 690, P.atmo, 2.2, 1.25));
+  const moon = new THREE.Mesh(new THREE.SphereGeometry(120, 32, 20), new THREE.MeshStandardMaterial({ color: P.moon, roughness: 0.95, fog: false, envMapIntensity: 0 })); moon.position.set(-1350, 520, 300); g.add(moon); const mg = atmo(THREE, 132, 0xffffff, 3, 0.35); mg.position.copy(moon.position); g.add(mg);
+  g.userData.planet = planet; return g;
+}
+// cordilheiras além da borda do mapa: grade grande alinhada às bordas; dentro do mapa fica escondida sob o terreno
+function makeHorizon(THREE, WORLD, H, seed, tint) {
+  const SEG = 60, SIZE = WORLD * 5, CELL = SIZE / SEG, OFF = (SIZE - WORLD) / 2; const geo = new THREE.PlaneGeometry(SIZE, SIZE, SEG, SEG); geo.rotateX(-Math.PI / 2);
+  const pos = geo.attributes.position; const col = new Float32Array(pos.count * 3); const rock = new THREE.Color(tint || 0x4a4c52), snow = new THREE.Color(0xc9d2dc), deep = new THREE.Color(0x26282d);
+  for (let i = 0; i < pos.count; i++) { const x = pos.getX(i) + SIZE / 2 - OFF, y = -pos.getZ(i) + SIZE / 2 - OFF; // coordenadas do mundo do jogo
+    const dx = Math.max(0, -x, x - WORLD), dy = Math.max(0, -y, y - WORLD); const dist = Math.hypot(dx, dy); const inside = x > 1 && x < WORLD - 1 && y > 1 && y < WORLD - 1; const edge = !inside && dist < 1;
+    let h; if (inside) h = -70; else if (edge) h = H(Math.min(WORLD, Math.max(0, x)), Math.min(WORLD, Math.max(0, y))) - 3; else { const n = fbm(x / 900 + seed, y / 900, seed * 0.7, 4), r = 1 - Math.abs(fbm(x / 520, y / 520 + seed, 3.1, 3) * 2 - 1); h = -6 + Math.min(1, dist / 2200) * (90 + 520 * Math.pow(n, 1.6) + 260 * r * r); }
+    pos.setY(i, h); const k = Math.min(1, Math.max(0, (h - 260) / 260)); const c = deep.clone().lerp(rock, Math.min(1, dist / 700 + 0.3)).lerp(snow, k * 0.85); const v = 0.85 + 0.3 * fbm(x / 140, y / 140, 5.5, 2); col[i * 3] = c.r * v; col[i * 3 + 1] = c.g * v; col[i * 3 + 2] = c.b * v; }
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3)); geo.computeVertexNormals();
+  const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.96, metalness: 0, envMapIntensity: 0.15, flatShading: true })); m.position.set(WORLD / 2, 0, -WORLD / 2); m.receiveShadow = false; return m;
+}
+ARD.world3d = { PLANETS, detailTexture, planetTexture, makeSky, makeHomeWorld, makeHorizon, fbm };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Aether Rift: Dominion — logo vivo (4.0d): a Final 2 "Escudo-Órbita" aprovada, renderizada em tempo real com os cinco
+   mundos girando na órbita, o núcleo pulsando e a rachadura da Fenda cintilando. Mesma cena da galeria (tools/arte3d.html).
+   Só no desktop e sem prefers-reduced-motion; no celular, em falha ou com ?logo=estatico fica a imagem (assets/logo.jpg). */
+(function (ARD) {
+'use strict';
+const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'];
+let st = null;
+function mount(img) {
+  const THREE = window.THREE, ADD = window.THREE_ADDONS || {}, W3 = ARD.world3d;
+  if (!THREE || !W3 || !img || st) return false;
+  if (new URLSearchParams(location.search).get('logo') === 'estatico' || matchMedia('(prefers-reduced-motion: reduce)').matches || matchMedia('(pointer: coarse)').matches) return false;
+  let renderer = null;
+  try {
+    const cv = document.createElement('canvas'); cv.className = img.className; cv.id = 'logo-live'; cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', 'Logo Aether Rift Dominion');
+    const css = img.getBoundingClientRect().width || 168; const px = Math.round(Math.max(160, css) * Math.min(2, window.devicePixelRatio || 1));
+    renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: 'low-power' }); renderer.setPixelRatio(1); renderer.setSize(px, px, false);
+    renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+    const scene = new THREE.Scene(); scene.background = new THREE.Color(0x06070c);
+    if (ADD.RoomEnvironment) { const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new ADD.RoomEnvironment(), 0.04).texture; pm.dispose(); }
+    { const n = 700, pos = new Float32Array(n * 3); for (let i = 0; i < n; i++) { const u = Math.random() * 2 - 1, th = Math.random() * Math.PI * 2, s = Math.sqrt(1 - u * u); pos[i * 3] = 60 * s * Math.cos(th); pos[i * 3 + 1] = 60 * s * Math.sin(th); pos[i * 3 + 2] = 60 * u; } const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xdfe6ff, size: 1.1, sizeAttenuation: false, transparent: true, opacity: 0.85, depthWrite: false }))); }
+    const g = new THREE.Group(); scene.add(g);
+    const steel = new THREE.MeshStandardMaterial({ color: 0xb4bcc9, metalness: 0.95, roughness: 0.3, envMapIntensity: 0.6 }), gun = new THREE.MeshStandardMaterial({ color: 0x242934, metalness: 0.85, roughness: 0.42, envMapIntensity: 0.5 });
+    const glowMat = (c, k) => new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: k, roughness: 0.3 });
+    // escudo (mesma forma da galeria): contorno escuro, aro de aço e placa
+    const r = 2.2, sh = new THREE.Shape(); sh.moveTo(0, -r * 1.15); sh.quadraticCurveTo(r * 0.95, -r * 0.65, r, r * 0.3); sh.lineTo(r, r * 0.85); sh.lineTo(-r, r * 0.85); sh.lineTo(-r, r * 0.3); sh.quadraticCurveTo(-r * 0.95, -r * 0.65, 0, -r * 1.15); sh.closePath();
+    const ex = (d, bs, bt) => new THREE.ExtrudeGeometry(sh, { depth: d, bevelEnabled: true, bevelSize: bs, bevelThickness: bt, bevelSegments: 3, curveSegments: 40 });
+    const outline = new THREE.Mesh(ex(0.12, 0.06, 0.06), new THREE.MeshStandardMaterial({ color: 0x07080c, roughness: 0.6, metalness: 0.4 })); outline.scale.set(1.12, 1.12, 1); outline.position.z = -0.55; g.add(outline);
+    const rim = new THREE.Mesh(ex(0.1, 0.05, 0.05), steel); rim.scale.set(1.06, 1.06, 1); rim.position.z = -0.45; g.add(rim);
+    const plate = new THREE.Mesh(ex(0.2, 0.06, 0.08), gun); plate.position.z = -0.32; g.add(plate);
+    { const tg = []; for (let k = 0; k < 60; k++) { const a = k / 60 * Math.PI * 2; const t = new THREE.BoxGeometry(0.03, k % 5 === 0 ? 0.16 : 0.08, 0.05); t.rotateZ(a + Math.PI / 2); t.translate(Math.cos(a) * 1.62, Math.sin(a) * 1.62 - 0.1, 0.02); tg.push(t); } for (const t of tg) g.add(new THREE.Mesh(t, steel)); }
+    const seal = new THREE.Mesh(new THREE.TorusGeometry(1.5, 0.045, 12, 128), steel); seal.position.set(0, -0.1, 0.08); g.add(seal);
+    const core = new THREE.Mesh(new THREE.OctahedronGeometry(0.42, 0), glowMat(0xff7a4a, 2.4)); core.scale.set(0.8, 1.15, 0.8); core.position.set(0, -0.1, 0.55); g.add(core);
+    const halo = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.035, 10, 64), glowMat(0xb23cff, 1.4)); halo.position.set(0, -0.1, 0.5); g.add(halo);
+    const orb = new THREE.Group(); orb.position.set(0, -0.02, 0.25); orb.rotation.x = 0.42; orb.rotation.z = -0.1; g.add(orb);
+    orb.add(new THREE.Mesh(new THREE.TorusGeometry(1.18, 0.028, 10, 160), steel)); const spin = new THREE.Group(); orb.add(spin); const planets = [];
+    RACES.forEach((rid, i) => { const a = Math.PI / 2 + i * Math.PI * 2 / 5; const P = W3.PLANETS[rid]; const pl = new THREE.Mesh(new THREE.SphereGeometry(0.3, 32, 22), new THREE.MeshStandardMaterial({ map: W3.planetTexture(THREE, rid, 7 + i, 128), roughness: 0.9 })); pl.position.set(Math.cos(a) * 1.18, Math.sin(a) * 1.18, 0.12); spin.add(pl); planets.push(pl);
+      const at = new THREE.Mesh(new THREE.SphereGeometry(0.315, 32, 22), new THREE.ShaderMaterial({ uniforms: { col: { value: new THREE.Color(P.atmo) } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position,1.0); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }', fragmentShader: 'uniform vec3 col; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 3.0); gl_FragColor = vec4(col * f * 1.3, f * 1.3); }' })); at.position.copy(pl.position); spin.add(at); });
+    const crackPts = [[-2.4, -1.85, 0.9], [-1.6, -1.5, 0.95], [-0.9, -1.8, 1.0], [0.1, -1.4, 1.05], [0.9, -1.72, 1.0], [1.7, -1.35, 0.95], [2.4, -1.65, 0.9]].map(p => new THREE.Vector3(...p)); const curve = new THREE.CatmullRomCurve3(crackPts, false, 'catmullrom', 0.05);
+    const crack = new THREE.Mesh(new THREE.TubeGeometry(curve, 120, 0.06, 8, false), glowMat(0xff7a4a, 3.5)); scene.add(crack); const hz = new THREE.Mesh(new THREE.TubeGeometry(curve, 120, 0.2, 8, false), new THREE.MeshBasicMaterial({ color: 0xb23cff, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false })); scene.add(hz);
+    for (const sx of [-1, 1]) { const wing = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.08, 0.1), steel); wing.position.set(sx * 2.0, 1.55, -0.1); wing.rotation.z = sx * -0.25; g.add(wing); }
+    g.rotation.x = -0.12; g.rotation.y = 0.06;
+    const key = new THREE.DirectionalLight(0xfff4e6, 1.8); key.position.set(-3, 4, 6); scene.add(key); const rl = new THREE.DirectionalLight(0xb23cff, 1.0); rl.position.set(3, 1, -4); scene.add(rl); const warm = new THREE.DirectionalLight(0xff6a3d, 0.7); warm.position.set(3, -2, 3); scene.add(warm); scene.add(new THREE.AmbientLight(0x404860, 0.4));
+    const glow = new THREE.Mesh(new THREE.CircleGeometry(3.3, 48), new THREE.MeshBasicMaterial({ color: 0xb23cff, transparent: true, opacity: 0.08, blending: THREE.AdditiveBlending, depthWrite: false })); glow.position.z = -2.5; scene.add(glow);
+    const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 200); cam.position.set(0, 0.1, 9.8); cam.lookAt(0, -0.05, 0);
+    let composer = null; if (ADD.EffectComposer && ADD.UnrealBloomPass) { composer = new ADD.EffectComposer(renderer, new THREE.WebGLRenderTarget(px, px, { type: THREE.HalfFloatType, samples: 4 })); composer.addPass(new ADD.RenderPass(scene, cam)); composer.addPass(new ADD.UnrealBloomPass(new THREE.Vector2(px, px), 0.4, 0.5, 0.9)); composer.addPass(new ADD.OutputPass()); }
+    img.parentNode.insertBefore(cv, img); img.hidden = true;
+    let visible = true; const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => { visible = es[0].isIntersecting; }) : null; if (io) io.observe(cv);
+    let last = 0; const t0 = performance.now();
+    const frame = now => { if (!st) return; st.raf = requestAnimationFrame(frame); if (!visible || document.hidden || (st.screen && st.screen.hidden) || now - last < 33) return; last = now; const t = (now - t0) / 1000;
+      spin.rotation.z = t * 0.105; for (let i = 0; i < planets.length; i++) planets[i].rotation.y = t * (0.3 + i * 0.07);
+      core.material.emissiveIntensity = 2.4 + Math.sin(t * 2.1) * 0.55; halo.material.emissiveIntensity = 1.4 + Math.sin(t * 1.3 + 1) * 0.35; crack.material.emissiveIntensity = 3.3 + Math.sin(t * 7.3) * 0.25 + Math.sin(t * 17.1) * 0.2; hz.material.opacity = 0.2 + Math.sin(t * 3.1) * 0.05;
+      g.rotation.y = 0.06 + Math.sin(t * 0.4) * 0.05; if (composer) composer.render(); else renderer.render(scene, cam); };
+    st = { renderer, cv, img, io, raf: requestAnimationFrame(frame), screen: document.getElementById('start') };
+    return true;
+  } catch (err) { console.warn('[ARD] logo vivo indisponível: ' + err.message); if (renderer) try { renderer.dispose(); } catch (e) {} img.hidden = false; return false; }
+}
+function stop() { if (!st) return; cancelAnimationFrame(st.raf); if (st.io) st.io.disconnect(); try { st.renderer.dispose(); st.renderer.forceContextLoss(); } catch (e) {} if (st.cv.parentNode) st.cv.parentNode.removeChild(st.cv); st.img.hidden = false; st = null; }
+ARD.logo3d = { mount, stop, active: () => !!st };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Líderes das Raças: bustos voxel usados no HUD (retrato 2.5D) e na arte da galeria. Mesma API Model do jogo (+x é a frente). */
@@ -2729,9 +3283,13 @@ ARD.render = { create, NODE_COLOR, rgba, shade, K };
    relevo real (biomas, cordilheiras, Fenda), névoa projetada no terreno, sombras, dia e noite, efeitos. Só lê a simulação. */
 (function (ARD) {
 'use strict';
-const S = ARD.sim, V = ARD.vox, MD = ARD.models, X = ARD.vox3d;
+const S = ARD.sim, V = ARD.vox, MD = ARD.models, X = ARD.vox3d, ME = ARD.meshes, W3 = ARD.world3d;
 const TAU = Math.PI * 2; const TILE = 64, TILES = S.WORLD / TILE; const FOGN = 100, FOGC = S.WORLD / FOGN;
 const NODE_MODEL = { plasma: 'crystals', minerio: 'ore', dados: 'datashards' };
+// 4.0d — Engine gráfica 2: malhas 3D suaves por Raça (src/meshes.js); voxel fica como reserva e no modo 2D. ?malhas=0 volta ao voxel.
+const USE_MESH = !!ME && new URLSearchParams(location.search).get('malhas') !== '0';
+if (ME && matchMedia('(pointer: coarse)').matches) ME.setLod(0.6); // celular: menos segmentos por modelo
+const DBG_OFF = new Set((new URLSearchParams(location.search).get('sem') || '').split(',')); // diagnóstico: ?sem=ceu,horizonte,relevo,detalhe
 const NODE_COLOR = { plasma: '#FF6A3D', minerio: '#8FA3B8', dados: '#7FE3A1' };
 const BIOME_RGB = { gelo: [0.66, 0.73, 0.8], rocha: [0.41, 0.42, 0.45], tundra: [0.36, 0.43, 0.36], basalto: [0.23, 0.21, 0.24] };
 const BIOME_MINI = { gelo: '#5C6B7A', rocha: '#4A4E56', tundra: '#3E5242', basalto: '#2A262C' };
@@ -2808,18 +3366,19 @@ function create(canvas, overlay, mini) {
   };
   const octx = overlay.getContext('2d'); const mctx = mini.getContext('2d'); const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
   const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(38, 1, 30, 6000);
-  const CAM = { pitch: 0.95, baseDist: 760 };
+  const CAM = { pitch: 0.95, baseDist: 760, minPitch: 0.2, maxPitch: 1.12 }; R.CAM = CAM;
   // ---------- luzes ----------
   const hemi = new THREE.HemisphereLight(0x9fb8d6, 0x2a2a30, 0.55); scene.add(hemi);
   const sun = new THREE.DirectionalLight(0xffe9c4, 1.6); sun.castShadow = !isTouch; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0006; scene.add(sun); scene.add(sun.target);
   const amb = new THREE.AmbientLight(0x404860, 0.3); scene.add(amb);
   scene.fog = new THREE.Fog(0x9fb0c4, 1500, 3200);
+  if (ADD && ADD.RoomEnvironment) { try { const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new ADD.RoomEnvironment(), 0.04).texture; pm.dispose(); } catch (err) { console.warn('[ARD] mapa de ambiente indisponível: ' + err.message); } }
   R.setQuality('auto');
   const lightPool = []; for (let i = 0; i < 10; i++) { const l = new THREE.PointLight(0xffc070, 0, 220, 2); scene.add(l); lightPool.push(l); }
   const flashLight = new THREE.PointLight(0xffc878, 0, 160, 2); scene.add(flashLight); let flashT = 0;
 
   // ---------- terreno ----------
-  let heights = null; const HN = 101; const HS = S.WORLD / (HN - 1);
+  let heights = null; const HN = 161; const HS = S.WORLD / (HN - 1);
   function H(x, y) { // altura bilinear
     if (!heights) return 0; const gx = Math.max(0, Math.min(HN - 1.001, x / HS)), gy = Math.max(0, Math.min(HN - 1.001, y / HS)); const ix = gx | 0, iy = gy | 0, fx = gx - ix, fy = gy - iy;
     const a = heights[iy * HN + ix], b = heights[iy * HN + ix + 1], c = heights[(iy + 1) * HN + ix], d = heights[(iy + 1) * HN + ix + 1];
@@ -2834,7 +3393,8 @@ function create(canvas, overlay, mini) {
     c.putImageData(img, 0, 0); const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.NoColorSpace; return t; })();
   const fogData = new Uint8Array(FOGN * FOGN * 4); const fogTex = new THREE.DataTexture(fogData, FOGN, FOGN, THREE.RGBAFormat); fogTex.magFilter = THREE.LinearFilter; fogTex.minFilter = THREE.LinearFilter; fogTex.colorSpace = THREE.NoColorSpace;
   const terrData = new Uint8Array(TILES * TILES * 4); const terrTex = new THREE.DataTexture(terrData, TILES, TILES, THREE.RGBAFormat); terrTex.magFilter = THREE.LinearFilter; terrTex.minFilter = THREE.LinearFilter; terrTex.colorSpace = THREE.NoColorSpace;
-  let terrain = null; R.poolLights = []; R.mist = [];
+  const detailTex = W3 ? W3.detailTexture(THREE) : null; if (detailTex) { detailTex.repeat.set(44, 44); if (!/swiftshader|llvmpipe|software/i.test(R.gpu)) detailTex.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy()); } // anisotropia só em GPU de verdade (no SwiftShader custa 10×)
+  let terrain = null, horizon = null, sky = null, home = null; R.poolLights = []; R.mist = [];
   function buildTerrain(sim) {
     const seed = sim.seed; const hash = (ix, iy) => { let n = (ix * 374761393 + iy * 668265263 + seed * 1274126177) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); n ^= n >>> 16; return (n >>> 0) / 4294967296; };
     const sm = t => t * t * (3 - 2 * t); const val = (x, y) => { const ix = Math.floor(x), iy = Math.floor(y); const fx = sm(x - ix), fy = sm(y - iy); const a = hash(ix, iy), b = hash(ix + 1, iy), c = hash(ix, iy + 1), d = hash(ix + 1, iy + 1); return (a * (1 - fx) + b * fx) * (1 - fy) + (c * (1 - fx) + d * fx) * fy; };
@@ -2858,15 +3418,21 @@ function create(canvas, overlay, mini) {
       cols[i * 3] = c[0] * g; cols[i * 3 + 1] = c[1] * g; cols[i * 3 + 2] = c[2] * g;
     }
     geo.setAttribute('color', new THREE.BufferAttribute(cols, 3)); geo.computeVertexNormals();
-    const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0.02 });
+    const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0.02, envMapIntensity: 0.22 }); mat.userData.env = 0.22; envMats.push(mat);
+    if (detailTex && !DBG_OFF.has('relevo')) { mat.bumpMap = detailTex; mat.bumpScale = 1.4; }
     mat.onBeforeCompile = sh => {
-      sh.uniforms.fogMap = { value: fogTex }; sh.uniforms.terrMap = { value: terrTex }; sh.uniforms.worldSize = { value: S.WORLD }; sh.uniforms.cloudMap = { value: cloudTex }; sh.uniforms.uCloudT = { value: 0 }; R.terrShader = sh;
-      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vWuv;').replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n{ vec4 wp = modelMatrix * vec4(position, 1.0); vWuv = vec2(wp.x / worldSize, -wp.z / worldSize); }');
+      sh.uniforms.fogMap = { value: fogTex }; sh.uniforms.terrMap = { value: terrTex }; sh.uniforms.worldSize = { value: S.WORLD }; sh.uniforms.cloudMap = { value: cloudTex }; sh.uniforms.uCloudT = { value: 0 }; sh.uniforms.detailMap = { value: detailTex || cloudTex }; R.terrShader = sh; const useDet = !!detailTex && !DBG_OFF.has('detalhe');
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vWuv; varying float vNy;').replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n{ vec4 wp = modelMatrix * vec4(position, 1.0); vWuv = vec2(wp.x / worldSize, -wp.z / worldSize); vNy = normal.y; }');
       sh.vertexShader = sh.vertexShader.replace('uniform float worldSize', 'uniform float worldSize'); if (!sh.vertexShader.includes('uniform float worldSize')) sh.vertexShader = 'uniform float worldSize;\n' + sh.vertexShader;
-      sh.fragmentShader = ('uniform sampler2D fogMap; uniform sampler2D terrMap; uniform sampler2D cloudMap; uniform float uCloudT; varying vec2 vWuv;\n' + sh.fragmentShader).replace('#include <color_fragment>', '#include <color_fragment>\n{ vec4 tc = texture2D(terrMap, vWuv); diffuseColor.rgb = mix(diffuseColor.rgb, tc.rgb, tc.a * 0.2); float fl = texture2D(fogMap, vWuv).r; diffuseColor.rgb *= mix(0.06, 1.0, fl); float cl = texture2D(cloudMap, vWuv * 5.0 + vec2(uCloudT * 0.006, uCloudT * 0.0035)).r; diffuseColor.rgb *= 0.8 + 0.2 * cl; }');
+      sh.fragmentShader = ('uniform sampler2D fogMap; uniform sampler2D terrMap; uniform sampler2D cloudMap; uniform sampler2D detailMap; uniform float uCloudT; varying vec2 vWuv; varying float vNy;\n' + sh.fragmentShader).replace('#include <color_fragment>', '#include <color_fragment>\n' + (useDet ? '' : '#define NO_DET\n') + '#ifndef NO_DET\n{ vec3 dn = texture2D(detailMap, vWuv * 44.0).rgb; vec3 dm = texture2D(detailMap, vWuv * 7.0 + 0.37).rgb; float det = dn.r * 0.5 + dm.g * 0.5; diffuseColor.rgb *= 0.8 + 0.4 * det; diffuseColor.rgb *= 1.0 - 0.2 * dn.b * smoothstep(0.35, 0.65, dm.r); float slope = 1.0 - clamp(vNy, 0.0, 1.0); diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.30, 0.29, 0.31) * (0.75 + 0.5 * dm.r), smoothstep(0.06, 0.2, slope)); }\n#endif\n{ vec4 tc = texture2D(terrMap, vWuv); diffuseColor.rgb = mix(diffuseColor.rgb, tc.rgb, tc.a * 0.2); float fl = texture2D(fogMap, vWuv).r; diffuseColor.rgb *= mix(0.06, 1.0, fl); float cl = texture2D(cloudMap, vWuv * 5.0 + vec2(uCloudT * 0.006, uCloudT * 0.0035)).r; diffuseColor.rgb *= 0.8 + 0.2 * cl; }');
     };
     if (terrain) scene.remove(terrain);
     terrain = new THREE.Mesh(geo, mat); terrain.position.set(S.WORLD / 2, 0, -S.WORLD / 2); terrain.receiveShadow = true; scene.add(terrain);
+    if (W3) { try {
+      if (horizon) { scene.remove(horizon); horizon.geometry.dispose(); horizon = null; } if (!DBG_OFF.has('horizonte')) horizon = W3.makeHorizon(THREE, S.WORLD, H, sim.seed % 97, 0x4c4e55); if (horizon) { horizon.material.userData.env = 0.15; envMats.push(horizon.material); scene.add(horizon); }
+      if (!sky && !DBG_OFF.has('ceu')) { sky = W3.makeSky(THREE); scene.add(sky); }
+      if (home) scene.remove(home); const me = sim.players[R.humanId || 0] || sim.players[0]; home = W3.makeHomeWorld(THREE, me ? me.faction : 'vehnar', (sim.seed % 13) + 1); scene.add(home);
+    } catch (err) { console.warn('[ARD] céu/horizonte indisponível: ' + err.message); } }
     // Fenda: anel emissivo e luz
     const ring = new THREE.Mesh(new THREE.TorusGeometry(S.RIFT_R * 0.9, 6, 8, 48), new THREE.MeshBasicMaterial({ color: new THREE.Color(2.6, 1.0, 0.5) })); ring.rotation.x = Math.PI / 2; ring.position.set(S.CX, H(S.CX, S.CY) + 4, -S.CY); scene.add(ring);
     // lagos de plasma no anel de basalto (só visuais)
@@ -2883,7 +3449,9 @@ function create(canvas, overlay, mini) {
     const rl = new THREE.PointLight(0xff5e3a, 2500, 900, 2); rl.position.set(S.CX, H(S.CX, S.CY) + 60, -S.CY); scene.add(rl);
   }
   // ---------- geometrias e instancing ----------
-  const matMain = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.82, metalness: 0.12 });
+  const envMats = []; // materiais que refletem o ambiente; a intensidade cai à noite
+  const mkMat = (o, base) => { const m = USE_MESH ? ME.material(o) : new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.82, metalness: 0.12 }); m.userData.env = base == null ? (o.env || 0.5) : base; envMats.push(m); return m; };
+  const matMain = mkMat({ env: 0.45, key: 'neutro' });
   const matEm = new THREE.MeshBasicMaterial({ vertexColors: true });
   const matGhost = new THREE.MeshStandardMaterial({ vertexColors: true, transparent: true, opacity: 0.55, roughness: 0.9 });
   // 4.0a — materiais por Raça: parâmetros PBR distintos + brilho de borda (rim) barato injetado no shader padrão.
@@ -2897,16 +3465,15 @@ function create(canvas, overlay, mini) {
   const SPIN = { voz: 1.6, harmonico: 2.2, diapasao: 0.8, monolito: 0.35 }; // Quorith gira para "olhar"
 
   const raceMats = new Map();
+  const RACE_ENV = { vehnar: 0.75, erevane: 0.9, tessara: 0.4, quorith: 0.85, vorag: 0.7 };
   function matFor(pid) {
     if (pid == null || pid < 0 || !R.sim || !R.sim.players[pid]) return matMain;
     const fac = R.sim.players[pid].faction; const cfg = RACE_MAT[fac]; if (!cfg) return matMain;
     let m = raceMats.get(fac); if (m) return m;
-    m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: cfg.roughness, metalness: cfg.metalness });
-    m.onBeforeCompile = sh => {
-      sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>',
-        '#include <emissivemap_fragment>\n{ float rim = pow(1.0 - abs(dot(normalize(normal), normalize(vViewPosition))), ' + cfg.pow.toFixed(1) + '); totalEmissiveRadiance += vec3(' + cfg.rim.join(', ') + ') * (rim * ' + cfg.amt.toFixed(2) + '); }');
-    };
-    m.customProgramCacheKey = () => 'race-' + fac;
+    if (USE_MESH) m = mkMat({ env: RACE_ENV[fac] || 0.6, key: 'race-' + fac, rim: { col: cfg.rim, pow: cfg.pow, amt: cfg.amt * 0.7 } });
+    else { m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: cfg.roughness, metalness: cfg.metalness });
+      m.onBeforeCompile = sh => { sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n{ float rim = pow(1.0 - abs(dot(normalize(normal), normalize(vViewPosition))), ' + cfg.pow.toFixed(1) + '); totalEmissiveRadiance += vec3(' + cfg.rim.join(', ') + ') * (rim * ' + cfg.amt.toFixed(2) + '); }'); };
+      m.customProgramCacheKey = () => 'race-' + fac; }
     raceMats.set(fac, m); return m;
   }
   function modelFor(def, pid, seed) {
@@ -2915,7 +3482,12 @@ function create(canvas, overlay, mini) {
     if (def.startsWith('prop_')) return MD.props[def.slice(5)](seed);
     const p = R.sim.players[pid]; const fn = (def === 'pirata' && MD.BY_DEF['pirata_' + p.faction]) || MD.BY_DEF[def]; return fn(p.color, p.faction);
   }
-  function geoOf(def, pid, seed) { const key = def + '|' + pid + '|' + (seed || 0); let g = R.geos.get(key); if (!g) { g = X.buildGeometry(modelFor(def, pid, seed), { emBoost: 1.8 }); R.geos.set(key, g); } return g; }
+  function meshFor(def, pid, seed) {
+    if (!USE_MESH) return null;
+    if (pid == null || pid < 0) return ME.build(NODE_MODEL[def] ? def : def, null, null, seed); // nós de recurso, rochas, ruínas, caixas, carcaças e adereços
+    const p = R.sim && R.sim.players[pid]; if (!p) return null; return ME.build(def, p.faction, p.color, seed);
+  }
+  function geoOf(def, pid, seed) { const key = def + '|' + pid + '|' + (seed || 0); let g = R.geos.get(key); if (!g) { g = meshFor(def, pid, seed) || X.buildGeometry(modelFor(def, pid, seed), { emBoost: 1.8 }); R.geos.set(key, g); } return g; }
   function instOf(def, pid, seed, ghost) {
     const key = def + '|' + pid + '|' + (seed || 0) + (ghost ? '|g' : ''); let it = R.inst.get(key); if (it) return it;
     const g = geoOf(def, pid, seed); const cap = 64;
@@ -2933,7 +3505,20 @@ function create(canvas, overlay, mini) {
   function fitOf(e, g) { const foot = e.kind === 'node' ? 2 * e.r * 1.2 * (0.55 + 0.45 * (e.max ? e.amount / e.max : 1)) : e.kind === 'wreck' ? 2 * e.r * 1.3 : e.kind === 'rock' ? 2 * e.r * 1.9 : 2 * e.r * 1.25; return foot / g.width; }
   // sprites 2D só para ícones do HUD
   R.sprite = function (def, pid, facing, dmg, seed) { const key = def + '|' + pid + '|' + (seed || 0); let sp = R.spriteCache.get(key); if (!sp) { const m = modelFor(def, pid, seed); sp = V.renderSprite(m, 0, 4, {}); R.spriteCache.set(key, sp); } return sp; };
-  R.icon = function (def, pid) { const key = def + '|' + pid; let u = R.icons.get(key); if (u) return u; const sp = R.sprite(def, pid, 0, false, 0); const cv = document.createElement('canvas'); cv.width = 48; cv.height = 48; const c = cv.getContext('2d'); const sc = Math.min(44 / sp.w, 44 / sp.h); c.imageSmoothingEnabled = sc < 1; c.drawImage(sp.canvas, (48 - sp.w * sc) / 2, (48 - sp.h * sc) / 2, sp.w * sc, sp.h * sc); u = cv.toDataURL(); R.icons.set(key, u); return u; };
+  let iconR = null, iconScene = null, iconCam = null, iconMat = null, iconMatEm = null;
+  function meshIcon(def, pid) {
+    const g = geoOf(def, pid, 0); if (!g || !g.mesh) return null;
+    try {
+      if (!iconR) { const cv = document.createElement('canvas'); cv.width = cv.height = 96; iconR = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true }); iconR.setPixelRatio(1); iconR.setSize(96, 96, false); iconR.outputColorSpace = THREE.SRGBColorSpace; iconR.toneMapping = THREE.ACESFilmicToneMapping; iconR.toneMappingExposure = 1.2;
+        iconScene = new THREE.Scene(); iconScene.add(new THREE.HemisphereLight(0xd6e4f5, 0x34302c, 1.4)); const d = new THREE.DirectionalLight(0xfff1dc, 2.2); d.position.set(-3, 6, 4); iconScene.add(d); const rimL = new THREE.DirectionalLight(0xa9ccff, 1.6); rimL.position.set(4, 3, -5); iconScene.add(rimL);
+        if (ADD && ADD.RoomEnvironment) { const pm = new THREE.PMREMGenerator(iconR); iconScene.environment = pm.fromScene(new ADD.RoomEnvironment(), 0.04).texture; }
+        iconCam = new THREE.PerspectiveCamera(28, 1, 0.1, 2000); iconMat = ME.material({ env: 0.8, key: 'icone' }); iconMatEm = new THREE.MeshBasicMaterial({ vertexColors: true }); }
+      const grp = new THREE.Group(); grp.add(new THREE.Mesh(g.main, iconMat)); if (g.em) grp.add(new THREE.Mesh(g.em, iconMatEm)); grp.rotation.y = 0.55;
+      const sz = Math.max(g.width, g.height * 1.15); const d = sz * 2.25; iconCam.position.set(d * 0.62, d * 0.52, d * 0.62); iconCam.lookAt(0, g.height * 0.42, 0);
+      iconScene.add(grp); iconR.render(iconScene, iconCam); const url = iconR.domElement.toDataURL(); iconScene.remove(grp); return url;
+    } catch (err) { console.warn('[ARD] ícone 3D falhou: ' + err.message); return null; }
+  }
+  R.icon = function (def, pid) { const key = def + '|' + pid; let u = R.icons.get(key); if (u) return u; if (USE_MESH) { u = meshIcon(def, pid); if (u) { R.icons.set(key, u); return u; } } const sp = R.sprite(def, pid, 0, false, 0); const cv = document.createElement('canvas'); cv.width = 48; cv.height = 48; const c = cv.getContext('2d'); const sc = Math.min(44 / sp.w, 44 / sp.h); c.imageSmoothingEnabled = sc < 1; c.drawImage(sp.canvas, (48 - sp.w * sc) / 2, (48 - sp.h * sc) / 2, sp.w * sc, sp.h * sc); u = cv.toDataURL(); R.icons.set(key, u); return u; };
   R.prepare = function (sim, onProgress, onDone) {
     R.sim = sim; buildTerrain(sim); const jobs = [];
     for (const p of sim.players) { for (const def in S.BUILDINGS) jobs.push([def, p.id, 0]); for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'torre_base', 'torre_turret', 'drone', 'suporte', 'pirata', 'bastiao_base', 'bastiao_turret']) jobs.push([def, p.id, 0]); for (const def in S.UNITS) if (S.UNITS[def].faction === p.faction) jobs.push([def, p.id, 0]); }
@@ -2944,21 +3529,43 @@ function create(canvas, overlay, mini) {
   };
   // ---------- projeção ----------
   function updateCamera(cam) {
-    const d = CAM.baseDist / cam.zoom; const yaw = cam.yaw == null ? Math.PI / 4 : cam.yaw; const ty = H(cam.x, cam.y);
-    camera.position.set(cam.x + Math.sin(yaw) * Math.cos(CAM.pitch) * d + R.shakeX, ty + Math.sin(CAM.pitch) * d, -cam.y + Math.cos(yaw) * Math.cos(CAM.pitch) * d + R.shakeY);
+    const d = CAM.baseDist / cam.zoom; const yaw = cam.yaw == null ? Math.PI / 4 : cam.yaw; const ty = H(cam.x, cam.y); const pitch = cam.pitch == null ? CAM.pitch : Math.max(CAM.minPitch, Math.min(CAM.maxPitch, cam.pitch));
+    camera.position.set(cam.x + Math.sin(yaw) * Math.cos(pitch) * d + R.shakeX, ty + Math.sin(pitch) * d, -cam.y + Math.cos(yaw) * Math.cos(pitch) * d + R.shakeY);
     camera.lookAt(cam.x, ty, -cam.y); camera.updateMatrixWorld(); camera.updateProjectionMatrix();
+    if (sky) sky.position.copy(camera.position); if (home) { home.position.set(camera.position.x - 0.36 * 4200, camera.position.y * 0.15 + 4200 * 0.06, camera.position.z - 0.93 * 4200); }
     sun.position.set(cam.x - 420, ty + 760, -cam.y + 520); sun.target.position.set(cam.x, ty, -cam.y); sun.target.updateMatrixWorld();
     const sc = sun.shadow.camera; const ext = Math.min(900, d * 1.1); sc.left = -ext; sc.right = ext; sc.top = ext; sc.bottom = -ext; sc.near = 100; sc.far = 2200; sc.updateProjectionMatrix();
   }
   R.shakeX = 0; R.shakeY = 0;
   R.worldToScreen = function (cam, x, y, z) { _v.set(x, H(x, y) + (z || 0), -y).project(camera); return [(_v.x + 1) / 2 * R.w, (1 - _v.y) / 2 * R.h]; };
   const ray = new THREE.Raycaster(); const plane = new THREE.Plane(UP, 0); const hit = new THREE.Vector3(); const ndc = new THREE.Vector2();
-  R.screenToWorld = function (cam, sx, sy) { ndc.set(sx / R.w * 2 - 1, 1 - sy / R.h * 2); ray.setFromCamera(ndc, camera); plane.constant = 0; if (!ray.ray.intersectPlane(plane, hit)) return [cam.x, cam.y]; let wx = hit.x, wy = -hit.z; plane.constant = -H(wx, wy); if (ray.ray.intersectPlane(plane, hit)) { wx = hit.x; wy = -hit.z; } return [wx, wy]; };
+  R.screenToWorld = function (cam, sx, sy) { ndc.set(sx / R.w * 2 - 1, 1 - sy / R.h * 2); ray.setFromCamera(ndc, camera); plane.constant = 0; if (!ray.ray.intersectPlane(plane, hit)) { const dir = ray.ray.direction; const hl = Math.hypot(dir.x, dir.z) || 1; return [camera.position.x + dir.x / hl * 3000, -(camera.position.z + dir.z / hl * 3000)]; } let wx = hit.x, wy = -hit.z; plane.constant = -H(wx, wy); if (ray.ray.intersectPlane(plane, hit)) { wx = hit.x; wy = -hit.z; } return [wx, wy]; };
   R.screenDeltaToWorld = function (cam, dx, dy) { const a = R.screenToWorld(cam, R.w / 2, R.h / 2), b = R.screenToWorld(cam, R.w / 2 + dx, R.h / 2 + dy); return [b[0] - a[0], b[1] - a[1]]; };
   function miniM() { return mini.width / (2 * S.WORLD); }
   R.worldToMini = function (x, y) { const m = miniM(); return [(x - y) * m + mini.width / 2, (x + y) * m / 2 + mini.width / 4]; };
   R.miniToWorld = function (nx, ny) { const m = miniM(); const X2 = (nx * mini.width - mini.width / 2) / m, Y2 = (ny * mini.width - mini.width / 4) * 2 / m; return [(X2 + Y2) / 2, (Y2 - X2) / 2]; };
   R.resize = function () { const dpr = Math.min(2, window.devicePixelRatio || 1); const w = canvas.clientWidth, h = canvas.clientHeight; R.w = w; R.h = h; R.dpr = dpr; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); if (composer) { composer.setSize(w, h); if (ssaoPass) ssaoPass.setSize(w, h); } if (overlay.width !== Math.round(w * dpr)) { overlay.width = Math.round(w * dpr); overlay.height = Math.round(h * dpr); } const ms = mini.clientWidth || 184; if (mini.width !== ms * dpr) { mini.width = ms * dpr; mini.height = ms * dpr; mfog.width = mini.width; mfog.height = mini.height; } };
+
+  // ---------- 4.0d: bandeiras com a Insígnia da Raça no Núcleo e nos Nódulos ----------
+  const FLAG = { poleGeo: new THREE.CylinderGeometry(0.06, 0.08, 1, 6).translate(0, 0.5, 0), clothGeo: new THREE.PlaneGeometry(1, 0.66, 10, 4).translate(0.5, 0, 0), poles: null, cloth: new Map(), uTime: { value: 0 } };
+  FLAG.poleMat = new THREE.MeshStandardMaterial({ color: 0x8a919b, roughness: 0.4, metalness: 0.6 });
+  FLAG.poles = new THREE.InstancedMesh(FLAG.poleGeo, FLAG.poleMat, 96); FLAG.poles.count = 0; FLAG.poles.frustumCulled = false; FLAG.poles.castShadow = !isTouch; scene.add(FLAG.poles);
+  function clothFor(fac) {
+    let it = FLAG.cloth.get(fac); if (it) return it; const art = window.ARD && ARD.ART && ARD.ART.insignia && ARD.ART.insignia[fac]; if (!art) { FLAG.cloth.set(fac, null); return null; }
+    const tex = new THREE.TextureLoader().load(art); tex.colorSpace = THREE.SRGBColorSpace;
+    const mat = new THREE.MeshStandardMaterial({ map: tex, side: THREE.DoubleSide, roughness: 0.75, metalness: 0, envMapIntensity: 0.3, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.25 });
+    mat.onBeforeCompile = sh => { sh.uniforms.uTime = FLAG.uTime; sh.vertexShader = 'uniform float uTime;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n{ float ph = instanceMatrix[3].x * 0.013 + instanceMatrix[3].z * 0.017; float k = position.x; transformed.z += sin(k * 5.0 - uTime * 4.2 + ph) * 0.09 * k; transformed.y += sin(k * 3.0 - uTime * 2.6 + ph) * 0.03 * k; }'); };
+    mat.customProgramCacheKey = () => 'bandeira';
+    it = new THREE.InstancedMesh(FLAG.clothGeo, mat, 64); it.count = 0; it.frustumCulled = false; it.castShadow = !isTouch; scene.add(it); FLAG.cloth.set(fac, it); return it;
+  }
+  function drawFlags(list, sim, yaw) {
+    FLAG.uTime.value = R.time; let np = 0; for (const it of FLAG.cloth.values()) if (it) it.count = 0;
+    for (const e of list) { const fac = (sim.players[e.owner] || {}).faction; const cl = clothFor(fac); if (!cl || np >= 96 || cl.count >= 64) continue;
+      const big = e.def === 'nucleo'; const hgt = big ? 46 : 26, fw = big ? 18 : 11; const ox = e.x + e.r * (big ? 0.78 : 0.62), oy = e.y + e.r * (big ? 0.78 : 0.62); const gy = H(ox, oy);
+      _p.set(ox, gy, -oy); _q.identity(); _s.set(hgt / 7, hgt, hgt / 7); _m.compose(_p, _q, _s); FLAG.poles.setMatrixAt(np++, _m);
+      _p.set(ox, gy + hgt - fw * 0.36, -oy); _q.setFromAxisAngle(UP, (yaw == null ? Math.PI / 4 : yaw) + Math.sin(R.time * 0.3 + e.id) * 0.25); _s.set(fw, fw, fw); _m.compose(_p, _q, _s); cl.setMatrixAt(cl.count++, _m); }
+    FLAG.poles.count = np; FLAG.poles.instanceMatrix.needsUpdate = true; for (const it of FLAG.cloth.values()) if (it) it.instanceMatrix.needsUpdate = true;
+  }
 
   // ---------- efeitos ----------
   const PN = 2200; const pPos = new Float32Array(PN * 3), pCol = new Float32Array(PN * 3); const P = { x: new Float32Array(PN), y: new Float32Array(PN), z: new Float32Array(PN), vx: new Float32Array(PN), vy: new Float32Array(PN), vz: new Float32Array(PN), t: new Float32Array(PN), life: new Float32Array(PN), kind: new Uint8Array(PN), i: 0 };
@@ -3025,11 +3632,11 @@ function create(canvas, overlay, mini) {
   R.draw = function (sim, view, alpha, dt) {
     R.sim = sim; R.time += dt; updateFx(dt); if (R.terrShader) R.terrShader.uniforms.uCloudT.value = R.time;
     const cam = view.cam, human = view.human, me = sim.players[human]; const vis = view.reveal ? { has: () => true } : sim.vis[human]; const explored = sim.explored[human];
-    R.night = (1 - Math.cos(TAU * sim.time / 750)) / 2;
+    R.night = R.forceDay ? 0 : (1 - Math.cos(TAU * sim.time / 750)) / 2;
     R.shakeX = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0; R.shakeY = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0;
     updateCamera(cam);
     // dia e noite
-    const nt = R.night; sun.intensity = 1.6 * (1 - nt) + 0.14 * nt; sun.color.setRGB(1 - 0.45 * nt, 0.91 - 0.3 * nt, 0.77 + 0.2 * nt); hemi.intensity = 0.55 * (1 - nt) + 0.2 * nt + lightning * 0.5; amb.intensity = 0.22 * (1 - nt) + 0.1 * nt + lightning * 0.6;
+    const nt = R.night; for (const m of envMats) m.envMapIntensity = m.userData.env * (1 - 0.72 * nt); sun.intensity = 1.6 * (1 - nt) + 0.14 * nt; sun.color.setRGB(1 - 0.45 * nt, 0.91 - 0.3 * nt, 0.77 + 0.2 * nt); hemi.intensity = 0.55 * (1 - nt) + 0.2 * nt + lightning * 0.5; amb.intensity = 0.22 * (1 - nt) + 0.1 * nt + lightning * 0.6;
     const bg = new THREE.Color().setRGB(0.62 * (1 - nt) + 0.02 * nt, 0.69 * (1 - nt) + 0.03 * nt, 0.77 * (1 - nt) + 0.06 * nt);
     const cl = R.climateCfg;
     if (cl) {
@@ -3041,6 +3648,9 @@ function create(canvas, overlay, mini) {
       if (cl.sparkle && Math.random() < 0.35 * R.quality.particles) { const zf = Math.max(0.6, cam.zoom); spark(cam.x + (Math.random() - .5) * 1300 / zf, cam.y + (Math.random() - .5) * 950 / zf, 2, [0.75, 0.95, 1], 18, false); }
     }
     scene.background = bg; scene.fog.color.copy(bg);
+    const pitchNow = cam.pitch == null ? CAM.pitch : cam.pitch; const tilt = Math.max(0, Math.min(1, (CAM.pitch - pitchNow) / (CAM.pitch - CAM.minPitch)));
+    if (tilt > 0) { scene.fog.near = Math.max(scene.fog.near, 900 + 1400 * tilt); scene.fog.far = Math.max(scene.fog.far, 3200 + 3800 * tilt); }
+    if (sky) { const u = sky.userData.mat.uniforms; u.uHor.value.copy(bg); u.uTop.value.copy(bg).multiplyScalar(0.55).lerp(_cc.setRGB(0.12, 0.2, 0.36), 0.5 * (1 - nt)); u.uBot.value.copy(bg).multiplyScalar(0.4); u.uNight.value = nt; u.uTime.value = R.time; u.uSunDir.value.set(-420, 760, 520).normalize(); u.uSunCol.value.copy(sun.color); }
     // névoa de guerra e território → texturas do terreno
     for (let iy = 0; iy < FOGN; iy++) for (let ix = 0; ix < FOGN; ix++) { const i = (iy * FOGN + ix) * 4; const tx = (ix * FOGC / TILE) | 0, ty = (iy * FOGC / TILE) | 0; const ex = view.reveal || explored[ty * TILES + tx]; fogData[i] = ex ? 110 : 0; fogData[i + 3] = 255; }
     if (!view.reveal) for (const e of sim.ents) { if (!e.alive || e.owner !== human || (e.kind !== 'unit' && e.kind !== 'building')) continue; const r = S.sensorRadius(sim, e); const x0 = Math.max(0, ((e.x - r) / FOGC) | 0), x1 = Math.min(FOGN - 1, ((e.x + r) / FOGC) | 0), y0 = Math.max(0, ((e.y - r) / FOGC) | 0), y1 = Math.min(FOGN - 1, ((e.y + r) / FOGC) | 0); for (let iy = y0; iy <= y1; iy++) for (let ix = x0; ix <= x1; ix++) { const d = Math.hypot((ix + 0.5) * FOGC - e.x, (iy + 0.5) * FOGC - e.y); if (d <= r) { const i = (iy * FOGN + ix) * 4; const v = d > r * 0.75 ? 110 + 145 * (1 - (d - r * 0.75) / (r * 0.25)) : 255; if (v > fogData[i]) fogData[i] = v; } } }
@@ -3051,7 +3661,7 @@ function create(canvas, overlay, mini) {
     terrTex.needsUpdate = true;
     // instâncias
     for (const it of R.inst.values()) it.n = 0;
-    let nSel = 0, nRange = 0, nShell = 0, nBul = 0, nBeam = 0; const hpList = []; const emitters = [];
+    let nSel = 0, nRange = 0, nShell = 0, nBul = 0, nBeam = 0; const hpList = []; const emitters = []; const flags = [];
     for (const e of sim.ents) {
       if (!e.alive) continue; const own = e.owner === human;
       if (e.kind === 'node') { const it = instOf(e.res, -1, e.id % 4); const g = it.geo; put(it, e.x, e.y, 0, 0, fitOf(e, g)); if (view.sel.has(e.id)) nSel = ring(nSel, e.x, e.y, e.r + 6); continue; }
@@ -3089,14 +3699,16 @@ function create(canvas, overlay, mini) {
           if (Math.random() < 0.07 * pp) smoke(wx, wy, 4, [0.5, 0.5, 0.52], 1.5, 14);
         }
       } else put(it, wx, wy, zz + bob, (isUnit || ud.wall ? (e.ang || 0) : 0) + (isUnit && SPIN[e.def] ? R.time * SPIN[e.def] : 0), fit, 1, tint);
-      if (parts && (isUnit || e.built)) { const tt = instOf(parts.turret, e.owner, 0); put(tt, wx, wy, zz + bob + parts.z * fit, e.aimAng != null ? e.aimAng : (e.ang || 0), fit, 1, tint); }
+      if (parts && (isUnit || e.built)) { const tt = instOf(parts.turret, e.owner, 0); put(tt, wx, wy, zz + bob + (g.mount != null ? g.mount : parts.z) * fit, e.aimAng != null ? e.aimAng : (e.ang || 0), fit, 1, tint); }
       if (view.sel.has(e.id)) { nSel = ring(nSel, wx, wy, e.r + 5); if (!isUnit && ud.attack && nRange < 32) { _p.set(wx, H(wx, wy) + 0.6, -wy); _s.set(ud.attack.range, 1, ud.attack.range); _q.identity(); _m.compose(_p, _q, _s); rangeRings.setMatrixAt(nRange++, _m); } }
       if (e.hp < e.maxHp - 0.5 || view.sel.has(e.id) || (isUnit && e.rank > 0)) hpList.push({ x: wx, y: wy, z: zz + g.height * fit + 4, w: Math.max(16, e.r * 1.4), frac: e.hp / e.maxHp, rank: isUnit ? e.rank : 0, cloak: e.cloaked && own, r: e.r });
+      if (!isUnit && e.built && (e.def === 'nucleo' || e.def === 'nodulo')) flags.push(e);
       if (!isUnit && e.built && (e.def === 'nucleo' || e.def === 'reator' || e.def === 'laboratorio' || e.def === 'bastiao')) emitters.push({ x: wx, y: wy, z: e.def === 'nucleo' ? 40 * fit / 1 : g.height * fit * 0.9, col: e.def === 'reator' ? 0xff8c1a : e.def === 'laboratorio' ? 0x7fe3a1 : 0xff6a3d, d: Math.hypot(wx - cam.x, wy - cam.y) });
       if (!isUnit && e.built && (e.def === 'reator' && Math.random() < 0.1 || dmg && Math.random() < 0.08)) smoke(wx + (e.def === 'reator' ? e.r * 0.35 : (Math.random() - .5) * e.r), wy - (e.def === 'reator' ? e.r * 0.3 : (Math.random() - .5) * e.r), e.def === 'reator' ? e.r * 1.1 : e.r * 0.6, dmg ? [0.15, 0.15, 0.17] : [0.4, 0.42, 0.46], 2.2 + Math.random(), 16);
       if (isUnit && (e.state === 'siphon' || e.state === 'devour') && nBeam < BEAMS) { const t = sim.byId.get(e.target); if (t && S.dist(e.x, e.y, t.x, t.y) <= (e.state === 'devour' ? 44 : S.UNITS.pirata.siphonRange) + t.r + 2) { const l = beams[nBeam++]; l.visible = true; const pa = l.geometry.attributes.position; pa.setXYZ(0, wx, H(wx, wy) + 5, -wy); pa.setXYZ(1, t.x, H(t.x, t.y) + t.r * 0.6, -t.y); pa.needsUpdate = true; if (Math.random() < 0.4) spark(t.x, t.y, t.r * 0.6, e.state === 'devour' ? [1, 0.35, 0.4] : [0.85, 0.5, 1], 12, true); } }
     }
     for (let i = nBeam; i < BEAMS; i++) beams[i].visible = false;
+    drawFlags(flags, sim, cam.yaw);
     for (const [id, m] of view.memory) { if (vis.has(id)) continue; const it = instOf(MD.PARTS[m.def] ? MD.PARTS[m.def].hull : m.def, m.owner, 0); put(it, m.x, m.y, 0, 0, 2 * S.BUILDINGS[m.def].r * 1.25 / it.geo.width, 1, 0.45); }
     // 4.0b — props de território: a geografia da Raça cresce em volta do Núcleo e dos Nódulos (visual, determinístico por id)
     for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const bd = S.BUILDINGS[e.def]; const tr = bd && bd.territory; if (!tr) continue; const fac = (sim.players[e.owner] || {}).faction; if (!MD.props[fac]) continue;
@@ -3532,7 +4144,7 @@ function create(o) {
   }
   canvas.addEventListener('pointerup', endPointer);
   canvas.addEventListener('pointercancel', e => { I.pointers.delete(e.pointerId); I.pinch = null; I.down = null; view.box = null; I.wallDrag = null; view.wallGhost = null; clearTimeout(I.longPress); });
-  canvas.addEventListener('wheel', e => { e.preventDefault(); const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top; const [wx, wy] = R.screenToWorld(cam, sx, sy); const f = Math.exp(-e.deltaY * 0.0012); cam.zoom *= f; clampCam(); const [wx2, wy2] = R.screenToWorld(cam, sx, sy); cam.x += wx - wx2; cam.y += wy - wy2; clampCam(); if (view.ghost) updateGhost(sx, sy); }, { passive: false });
+  canvas.addEventListener('wheel', e => { e.preventDefault(); if (e.ctrlKey && R.CAM) { cam.pitchT = Math.max(R.CAM.minPitch, Math.min(R.CAM.maxPitch, (cam.pitchT == null ? R.CAM.pitch : cam.pitchT) + (e.deltaY > 0 ? 0.06 : -0.06))); return; } const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top; const [wx, wy] = R.screenToWorld(cam, sx, sy); const f = Math.exp(-e.deltaY * 0.0012); cam.zoom *= f; clampCam(); const [wx2, wy2] = R.screenToWorld(cam, sx, sy); cam.x += wx - wx2; cam.y += wy - wy2; clampCam(); if (view.ghost) updateGhost(sx, sy); }, { passive: false });
 
   // ---- keyboard
   const PROD_KEYS = {}; for (const k in S.UNITS) PROD_KEYS[S.UNITS[k].key] = k;
@@ -3559,11 +4171,13 @@ function create(o) {
     if (k === 'P') { if (!(b && S.BUILDINGS[b.def].produces && S.BUILDINGS[b.def].produces.includes('pirata'))) ui.togglePause(); return; }
     if (e.key === '+' || e.key === '=') { cam.zoom *= 1.15; clampCam(); } if (e.key === '-') { cam.zoom /= 1.15; clampCam(); }
     if ((k === 'Q' || k === 'E') && R.supportsYaw) { cam.yaw = (cam.yaw || 0) + (k === 'Q' ? -1 : 1) * Math.PI / 8; return; }
+    if ((e.code === 'PageUp' || e.code === 'PageDown' || e.code === 'Home') && R.CAM) { e.preventDefault(); cam.pitchT = e.code === 'Home' ? R.CAM.pitch : Math.max(R.CAM.minPitch, Math.min(R.CAM.maxPitch, (cam.pitchT == null ? R.CAM.pitch : cam.pitchT) + (e.code === 'PageUp' ? -0.1 : 0.1))); return; }
   });
   window.addEventListener('keyup', e => I.keys.delete(e.code));
   window.addEventListener('blur', () => I.keys.clear());
 
   I.update = function (dt) {
+    if (cam.pitchT != null && cam.pitch != null && Math.abs(cam.pitchT - cam.pitch) > 0.001) cam.pitch += (cam.pitchT - cam.pitch) * Math.min(1, dt * 6); // inclinação suave
     const sp = 900 * dt / cam.zoom; let dx = 0, dy = 0;
     if (I.keys.has('KeyW') || I.keys.has('ArrowUp')) dy -= 1; if (I.keys.has('KeyS') && !ownSelectedUnits().length || I.keys.has('ArrowDown')) dy += 1;
     if (I.keys.has('KeyA') && !ownSelectedUnits().length || I.keys.has('ArrowLeft')) dx -= 1; if (I.keys.has('KeyD') || I.keys.has('ArrowRight')) dx += 1;
@@ -3599,7 +4213,7 @@ const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-10 19:57Z';
+const BUILD = '2026-10-10 23:16Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
@@ -3636,6 +4250,8 @@ function initStart() {
   }
   setRace(raceColor);
   if (ART && ART.logo) for (const id of ['logo-img', 'load-logo', 'foot-logo']) { const el = $(id); if (el) { el.src = ART.logo; el.hidden = false; } }
+  // 4.0d — logo vivo: a mesma Final 2 em 3D com a órbita girando (desktop; celular e movimento reduzido ficam com a imagem)
+  if (ARD.logo3d && $('logo-img')) { const tryLogo = () => { const im = $('logo-img'); if (im && !im.hidden && !(document.getElementById('start') || {}).hidden) ARD.logo3d.mount(im); }; if (window.THREE) setTimeout(tryLogo, 300); else window.addEventListener('three-ready', () => setTimeout(tryLogo, 300), { once: true }); }
   if (ART && ART.hero) { // placeholder leve embutido, depois o hero em alta (assets/hero-belt.jpg, 2560×1280) quando carregar
     const st = $('start'); const veil = 'linear-gradient(180deg, rgba(13,15,19,.35), rgba(13,15,19,.82) 55%, rgba(13,15,19,.97))';
     st.style.backgroundImage = `${veil}, url(${ART.hero})`; st.style.backgroundSize = 'cover'; st.style.backgroundPosition = 'center top'; st.style.backgroundAttachment = 'fixed';
@@ -3750,6 +4366,7 @@ function initStart() {
 
 // ---------- game ----------
 function startGame(cfg, netCtx) {
+  if (ARD.logo3d) ARD.logo3d.stop(); // libera o contexto WebGL do logo vivo antes da partida
   const want3dEarly = (cfg.gfx || '3d') === '3d' && params.get('r') !== '2d';
   if (want3dEarly && !window.THREE && !window.__threeFailed) { $('start').hidden = true; $('game').hidden = false; $('loading').hidden = false; $('load-bar').style.width = '5%'; whenThree(() => startGame(cfg, netCtx)); return; }
   const net = netCtx ? netCtx.net : null;
@@ -3783,16 +4400,17 @@ function startGame(cfg, netCtx) {
   const nuc = S.nucleoOf(sim, human);
   if (params.get('demo') === 'birth' && !net) { sim.players[human].res.minerio += 1500; sim.players[human].res.plasma += 600; ['reator', 'refinaria', 'quartel'].forEach((d, i) => S.enqueue(sim, { t: 'build', p: human, def: d, x: nuc.x + 75 + (i % 2) * 95, y: nuc.y - 80 + i * 80, ang: 0 })); } // depuração: três canteiros para ver o nascimento
   const isTouch = matchMedia('(pointer: coarse)').matches || !!params.get('touch');
-  const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.9 : 1.0, yaw: Math.PI / 4 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
+  const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.9 : 1.0, yaw: Math.PI / 4, pitch: 0.95, pitchT: 0.95 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
   const ui = makeUI(); // closures below
   const I = ARD.input.create({ canvas, sim, view, R, human, ui });
-  const ais = sim.players.filter(p => !p.human).map(p => ARD.ai.create(p.id, p.difficulty));
+  const ais = sim.players.filter(p => !p.human || (!netCtx && params.get('ia') === 'todos')).map(p => ARD.ai.create(p.id, p.difficulty)); // ?ia=todos: a IA joga também pelo humano (capturas e testes)
   G = { sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null, net, pending: [], waiting: false, waitT: 0 };
   window.addEventListener('resize', () => R.resize());
   document.body.classList.toggle('touch', isTouch);
 
   bindHUD(); refreshTop(); refreshHints(); refreshQuick();
   $('loading').hidden = false;
+  R.humanId = human;
   R.prepare(sim, f => { $('load-bar').style.width = Math.round(f * 100) + '%'; }, () => {
     $('loading').hidden = true;
     const ff = net ? 0 : parseInt(params.get('ff') || '0', 10);
@@ -3800,9 +4418,12 @@ function startGame(cfg, netCtx) {
     if (net) setupNet();
     if (params.get('speed')) G.speed = parseFloat(params.get('speed')) || 1;
     if (params.get('night')) sim.tick = 3600; // teste: começa de noite
+    if (params.get('dia')) R.forceDay = true; // teste: luz do dia fixa (capturas)
     if (params.get('reveal')) view.reveal = true; // teste: sem névoa
     if (params.get('cam')) { const n = S.nucleoOf(sim, parseInt(params.get('cam'), 10)); if (n) { view.cam.x = n.x; view.cam.y = n.y; } }
     if (params.get('zoom')) view.cam.zoom = parseFloat(params.get('zoom'));
+    if (params.get('pitch')) view.cam.pitch = view.cam.pitchT = parseFloat(params.get('pitch'));
+    if (params.get('yaw')) view.cam.yaw = parseFloat(params.get('yaw'));
     refreshPanel(true); G.last = performance.now();
     requestAnimationFrame(frame);
   });
@@ -4001,6 +4622,7 @@ function startGame(cfg, netCtx) {
     $('btn-nucleo').addEventListener('click', () => { const n = S.nucleoOf(sim, human); if (n) { I.select([n.id]); I.center(n.x, n.y); } });
     $('btn-clear').addEventListener('click', () => { I.select([]); if (I.mode !== 'normal') I.setMode('normal'); });
     $('btn-rot').addEventListener('click', () => { if (R.supportsYaw) view.cam.yaw = (view.cam.yaw || 0) + Math.PI / 2; else notice('Rotação só no modo 3D'); });
+    { const TILTS = [0.95, 0.62, 0.3], TN = ['Câmera tática', 'Câmera inclinada', 'Câmera de horizonte (planeta-mãe no céu)']; const tb = $('btn-tilt'); if (tb) tb.addEventListener('click', () => { if (!R.CAM) { notice('Inclinação só no modo 3D'); return; } const i = (TILTS.findIndex(t => Math.abs(t - view.cam.pitchT) < 0.05) + 1) % TILTS.length; view.cam.pitchT = TILTS[i]; notice(TN[i] + ' · PageUp/PageDown ou Ctrl + rolagem ajustam'); }); }
     $('btn-all').addEventListener('click', () => { const n = I.selectOnScreen(); notice(n ? n + ' unidades selecionadas' : 'Nenhuma unidade de combate na tela'); });
     const syncAudioBtns = () => { $('btn-sound').classList.toggle('on', AU.enabled); $('btn-voice').classList.toggle('on', AU.voice); };
     $('btn-sound').addEventListener('click', () => { AU.setEnabled(!AU.enabled); AU.init(); syncAudioBtns(); if (AU.enabled) AU.sfx('click'); });
@@ -4090,7 +4712,7 @@ function startGame(cfg, netCtx) {
     $('end-scores').innerHTML = `<table><thead><tr><th>#</th><th>Jogador</th><th>Domínio</th></tr></thead><tbody>${rows}</tbody></table>`;
     $('end-stats').innerHTML = [['Coletado', fmt(st.collected)], ['Roubado', fmt(st.stolen)], ['Perdido para roubo', fmt(st.lost)], ['Unidades abatidas', st.unitsKilled], ['Unidades perdidas', st.unitsLost], ['Estruturas destruídas', st.buildingsDestroyed], ['Tratados', st.treaties], ['Traições', st.betrayals], ['Reputação final', S.REP_NAMES[p.rep]]].map(([k, v]) => `<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');
     $('btn-again').onclick = () => location.reload();
-    $('btn-copy').onclick = () => { const data = { versao: '4.0c', data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
+    $('btn-copy').onclick = () => { const data = { versao: '4.0d', data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
   }
 
   // ---------- UI bridge for input ----------

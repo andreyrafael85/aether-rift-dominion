@@ -181,7 +181,7 @@ function create(o) {
   }
   canvas.addEventListener('pointerup', endPointer);
   canvas.addEventListener('pointercancel', e => { I.pointers.delete(e.pointerId); I.pinch = null; I.down = null; view.box = null; I.wallDrag = null; view.wallGhost = null; clearTimeout(I.longPress); });
-  canvas.addEventListener('wheel', e => { e.preventDefault(); const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top; const [wx, wy] = R.screenToWorld(cam, sx, sy); const f = Math.exp(-e.deltaY * 0.0012); cam.zoom *= f; clampCam(); const [wx2, wy2] = R.screenToWorld(cam, sx, sy); cam.x += wx - wx2; cam.y += wy - wy2; clampCam(); if (view.ghost) updateGhost(sx, sy); }, { passive: false });
+  canvas.addEventListener('wheel', e => { e.preventDefault(); if (e.ctrlKey && R.CAM) { cam.pitchT = Math.max(R.CAM.minPitch, Math.min(R.CAM.maxPitch, (cam.pitchT == null ? R.CAM.pitch : cam.pitchT) + (e.deltaY > 0 ? 0.06 : -0.06))); return; } const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top; const [wx, wy] = R.screenToWorld(cam, sx, sy); const f = Math.exp(-e.deltaY * 0.0012); cam.zoom *= f; clampCam(); const [wx2, wy2] = R.screenToWorld(cam, sx, sy); cam.x += wx - wx2; cam.y += wy - wy2; clampCam(); if (view.ghost) updateGhost(sx, sy); }, { passive: false });
 
   // ---- keyboard
   const PROD_KEYS = {}; for (const k in S.UNITS) PROD_KEYS[S.UNITS[k].key] = k;
@@ -208,11 +208,13 @@ function create(o) {
     if (k === 'P') { if (!(b && S.BUILDINGS[b.def].produces && S.BUILDINGS[b.def].produces.includes('pirata'))) ui.togglePause(); return; }
     if (e.key === '+' || e.key === '=') { cam.zoom *= 1.15; clampCam(); } if (e.key === '-') { cam.zoom /= 1.15; clampCam(); }
     if ((k === 'Q' || k === 'E') && R.supportsYaw) { cam.yaw = (cam.yaw || 0) + (k === 'Q' ? -1 : 1) * Math.PI / 8; return; }
+    if ((e.code === 'PageUp' || e.code === 'PageDown' || e.code === 'Home') && R.CAM) { e.preventDefault(); cam.pitchT = e.code === 'Home' ? R.CAM.pitch : Math.max(R.CAM.minPitch, Math.min(R.CAM.maxPitch, (cam.pitchT == null ? R.CAM.pitch : cam.pitchT) + (e.code === 'PageUp' ? -0.1 : 0.1))); return; }
   });
   window.addEventListener('keyup', e => I.keys.delete(e.code));
   window.addEventListener('blur', () => I.keys.clear());
 
   I.update = function (dt) {
+    if (cam.pitchT != null && cam.pitch != null && Math.abs(cam.pitchT - cam.pitch) > 0.001) cam.pitch += (cam.pitchT - cam.pitch) * Math.min(1, dt * 6); // inclinação suave
     const sp = 900 * dt / cam.zoom; let dx = 0, dy = 0;
     if (I.keys.has('KeyW') || I.keys.has('ArrowUp')) dy -= 1; if (I.keys.has('KeyS') && !ownSelectedUnits().length || I.keys.has('ArrowDown')) dy += 1;
     if (I.keys.has('KeyA') && !ownSelectedUnits().length || I.keys.has('ArrowLeft')) dx -= 1; if (I.keys.has('KeyD') || I.keys.has('ArrowRight')) dx += 1;
