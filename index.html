@@ -1,0 +1,2136 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark">
+<title>Aether Rift Beta</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Jogo: mundo escuro único (sci-fi industrial), HUD em grafite com acentos da Fenda. Tema único, por decisão. */
+:root{
+  --bg:#0D0F13; --panel:rgba(20,23,29,.92); --panel2:#1C1F25; --line:#2E333B; --fg:#E8E2D6; --fg2:#A6A197;
+  --rift1:#FF5E3A; --rift2:#B23CFF; --good:#7FE3A1; --warn:#F2C230; --bad:#FF6B6B;
+  --plasma:#FF8A5C; --minerio:#AFC2D6; --dados:#7FE3A1;
+  --fd:'Big Shoulders Display','Arial Narrow',Impact,sans-serif; --fb:'IBM Plex Sans',system-ui,sans-serif; --fm:'IBM Plex Mono',ui-monospace,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--fb);font-size:14px;line-height:1.4;overflow:hidden;-webkit-font-smoothing:antialiased;touch-action:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--rift1);outline-offset:2px}
+[hidden]{display:none!important}
+.muted{color:var(--fg2)} .small{font-size:12px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.k{font-family:var(--fm);font-size:11px;background:#2A2F38;border:1px solid var(--line);border-radius:3px;padding:0 5px;color:var(--fg)}
+.c-plasma{color:var(--plasma)} .c-minerio{color:var(--minerio)} .c-dados{color:var(--dados)}
+
+/* start */
+.screen{position:fixed;inset:0;overflow:auto;padding:env(safe-area-inset-top,0) 16px env(safe-area-inset-bottom,0);background:
+  radial-gradient(ellipse 60% 60% at 75% 15%, rgba(178,60,255,.25), transparent 60%),
+  radial-gradient(ellipse 50% 60% at 15% 95%, rgba(255,94,58,.22), transparent 55%), var(--bg)}
+.start-wrap{max-width:900px;margin:0 auto;padding-block:2.5rem 2rem;display:grid;gap:1.25rem}
+.eyebrow{font-family:var(--fm);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rift1)}
+h1{font-family:var(--fd);font-weight:800;font-size:clamp(3rem,10vw,6.5rem);line-height:.9;margin:0;text-transform:uppercase}
+h1 span{background:linear-gradient(90deg,var(--rift1),var(--rift2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tagline{font-family:var(--fd);font-weight:600;font-size:1.5rem;text-transform:uppercase;letter-spacing:.03em}
+.start-grid{display:grid;gap:1rem;grid-template-columns:1fr}
+@media(min-width:760px){.start-grid{grid-template-columns:1.2fr 1fr}}
+.fac-cards{display:grid;gap:.75rem}
+.fac-card{display:block;border:1px solid var(--line);border-radius:8px;padding:.9rem 1rem;background:var(--panel);cursor:pointer;position:relative}
+.fac-card input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.fac-card:has(input:checked){border-color:var(--rift1);box-shadow:0 0 0 1px var(--rift1) inset}
+.fac-name{font-family:var(--fd);font-weight:700;font-size:1.5rem;text-transform:uppercase}
+.fac-tag{color:var(--fg2);margin-top:.2rem}
+.fac-sup{font-size:12px;margin-top:.4rem;color:var(--fg2)}
+.opts{display:grid;gap:.75rem;border:1px solid var(--line);border-radius:8px;padding:1rem;background:var(--panel);align-content:start}
+.opt label{display:block;font-family:var(--fm);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg2);margin-bottom:.25rem}
+.opt input,.opt select{width:100%;background:#12151A;border:1px solid var(--line);color:var(--fg);border-radius:6px;padding:.55rem .7rem;font:inherit}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border:1px solid var(--line);background:var(--panel2);border-radius:6px;padding:.6rem 1rem;font-weight:600}
+.btn:hover{background:#262A31}
+.btn.primary{background:linear-gradient(90deg,var(--rift1),#d4512f);border-color:transparent;color:#14161A;font-family:var(--fd);font-size:1.3rem;text-transform:uppercase;letter-spacing:.04em;padding:.7rem 1.4rem}
+.btn.primary:hover{filter:brightness(1.08)}
+.start-notes{font-size:13px;color:var(--fg2);max-width:70ch}
+.start-notes b{color:var(--fg)}
+
+/* game */
+#game{position:fixed;inset:0}
+#world{position:absolute;inset:0;width:100%;height:100%;display:block;background:#0D0F13}
+#hud{position:absolute;inset:0;pointer-events:none}
+#hud>*{pointer-events:auto}
+#top{position:absolute;top:env(safe-area-inset-top,0);left:0;right:0;display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;padding:.4rem .75rem;background:linear-gradient(rgba(13,15,19,.95),rgba(13,15,19,.6));font-family:var(--fm);font-size:13px}
+.res{display:flex;gap:.9rem}
+.res b{font-weight:500}
+.energy{display:grid;gap:2px;min-width:150px}
+.energy .row{display:flex;justify-content:space-between;gap:.5rem}
+.energy .bar{height:4px;background:#262A31;border-radius:2px;overflow:hidden}
+.energy .bar i{display:block;height:100%;background:var(--good);width:0}
+.energy.racionado .bar i{background:var(--warn)} .energy.colapso .bar i{background:var(--bad)}
+.energy.racionado #e-regime{color:var(--warn)} .energy.colapso #e-regime{color:var(--bad)} .energy.pleno #e-regime{color:var(--good)}
+.speed{display:flex;gap:2px;margin-left:auto}
+.speed button,.tb{border:1px solid var(--line);border-radius:4px;padding:.25rem .5rem;background:rgba(28,31,37,.9);font-family:var(--fm);font-size:12px}
+.speed button.on,.tb.on{background:var(--rift1);color:#14161A;border-color:var(--rift1)}
+.tb.attn{animation:pulse 1s infinite alternate;border-color:var(--warn);color:var(--warn)}
+@keyframes pulse{to{box-shadow:0 0 0 3px rgba(242,194,48,.35)}}
+#panel{position:absolute;left:.75rem;bottom:calc(.75rem + env(safe-area-inset-bottom,0));width:min(380px,calc(100vw - 1.5rem - 200px));max-height:46vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.75rem;display:grid;gap:.5rem;align-content:start;backdrop-filter:blur(6px)}
+.ph{display:flex;align-items:center;gap:.25rem;font-size:15px}
+.hp{height:5px;background:#262A31;border-radius:3px;overflow:hidden}.hp i{display:block;height:100%;background:var(--good)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:.4rem}
+.act{display:grid;gap:2px;text-align:left;border:1px solid var(--line);background:#1C1F25;border-radius:6px;padding:.45rem .5rem;min-height:44px}
+.act:hover{background:#262A31;border-color:#3B414B}
+.act.on{border-color:var(--rift1);box-shadow:0 0 0 1px var(--rift1) inset}
+.act.poor .cost{opacity:.55}
+.act:disabled{opacity:.45;cursor:default}
+.act .n{font-weight:600;font-size:12.5px}
+.act .cost{font-family:var(--fm);font-size:11px;display:flex;gap:.4rem;flex-wrap:wrap}
+.act.sm{min-height:36px;padding:.35rem .6rem;display:inline-flex;align-items:center;gap:.4rem}
+.act.good{border-color:var(--good)} .act.danger{border-color:var(--bad);color:var(--bad)}
+.act.super{border-color:var(--rift2)}
+.row{display:flex;flex-wrap:wrap;gap:.4rem}
+.queue{display:flex;flex-wrap:wrap;gap:.3rem}
+.q{font-family:var(--fm);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:.2rem .45rem;background:#15181D}
+.q i{color:var(--warn);font-style:normal}
+.chips{display:flex;flex-wrap:wrap;gap:.3rem}
+.chip{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:.1rem .55rem;background:#15181D}
+.tip{font-size:12px;color:var(--fg2);border-left:2px solid var(--rift1);padding-left:.5rem}
+#right{position:absolute;right:.75rem;top:calc(3.2rem + env(safe-area-inset-top,0));width:184px;display:grid;gap:.5rem}
+#minimap{width:184px;height:184px;display:block;border:1px solid var(--line);border-radius:6px;background:#0B0D11;touch-action:none}
+#alerts{display:grid;gap:.25rem}
+.alert{display:grid;grid-template-columns:auto 1fr;gap:.4rem;text-align:left;font-size:12px;padding:.35rem .5rem;border-radius:6px;background:var(--panel);border:1px solid var(--line);border-left-width:3px;transition:opacity .8s}
+.alert .t{font-family:var(--fm);color:var(--fg2)} .alert.fade{opacity:.35}
+.alert.danger{border-left-color:var(--bad)} .alert.good{border-left-color:var(--good)} .alert.warn{border-left-color:var(--warn)} .alert.info{border-left-color:#5B9BD5}
+.quick{display:grid;gap:.3rem}
+.qb{display:grid;text-align:left;border:1px solid var(--line);border-radius:6px;padding:.4rem .55rem;background:var(--panel);font-size:12px}
+.qb .n{font-weight:600} .qb .sub{font-family:var(--fm);font-size:10.5px;color:var(--fg2)}
+.qb:disabled{opacity:.5;cursor:default}
+#bar{position:absolute;left:0;right:0;bottom:calc(.5rem + env(safe-area-inset-bottom,0));display:none;justify-content:center;gap:.4rem;padding:0 .5rem}
+body.touch #bar{display:flex}
+body.touch #panel{width:calc(100vw - 1.5rem);max-height:34vh;bottom:calc(3.6rem + env(safe-area-inset-bottom,0))}
+body.touch #right{width:120px} body.touch #minimap{width:120px;height:120px} body.touch #alerts{display:none} body.touch #log{display:none}
+body.touch .quick{font-size:11px}
+body.touch #top{gap:.3rem .6rem;padding:.3rem .5rem;font-size:12px}
+body.touch #top .muted{display:none}
+body.touch .speed{margin-left:0}
+body.touch .speed button,body.touch .tb{padding:.2rem .4rem}
+body.touch #hints{top:calc(5.6rem + env(safe-area-inset-top,0))}
+body.touch #right{top:calc(5.8rem + env(safe-area-inset-top,0))}
+#bar .tb{min-width:44px;min-height:40px;font-size:13px}
+#hints{position:absolute;left:50%;transform:translateX(-50%);top:calc(3.4rem + env(safe-area-inset-top,0));width:min(520px,calc(100vw - 420px));background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.5rem .75rem;display:grid;gap:.25rem;font-size:12.5px}
+body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
+#hints .hint{color:var(--fg2)} #hints .hint.now{color:var(--fg)} #hints .hint.now::before{content:"→ ";color:var(--rift1)}
+#hints-close{position:absolute;top:2px;right:6px;color:var(--fg2)}
+#log{position:absolute;right:.75rem;bottom:calc(.75rem + env(safe-area-inset-bottom,0));width:184px;max-height:120px;overflow:hidden;font-family:var(--fm);font-size:10.5px;color:var(--fg2);display:grid;gap:1px;mask-image:linear-gradient(#000 60%,transparent)}
+#notice{position:absolute;left:50%;bottom:calc(50vh - 120px);transform:translateX(-50%);background:rgba(20,23,29,.95);border:1px solid var(--line);padding:.45rem .9rem;border-radius:6px;opacity:0;transition:opacity .2s;font-size:13px;pointer-events:none}
+#notice.show{opacity:1}
+#proposal{position:absolute;left:50%;transform:translateX(-50%);top:calc(6rem + env(safe-area-inset-top,0));background:var(--panel);border:1px solid var(--warn);border-radius:8px;padding:.75rem 1rem;display:grid;gap:.5rem;max-width:min(420px,calc(100vw - 2rem))}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:1rem;z-index:5}
+.modal .box{background:#15181D;border:1px solid var(--line);border-radius:10px;padding:1.1rem;max-width:620px;width:100%;max-height:90vh;overflow:auto;display:grid;gap:.75rem}
+.modal h2{font-family:var(--fd);font-weight:700;font-size:1.8rem;text-transform:uppercase;margin:0}
+.dp{border:1px solid var(--line);border-radius:6px;padding:.6rem .75rem;display:grid;gap:.4rem}
+.dp.dead{opacity:.5}
+.dp-h{display:flex;align-items:center;gap:.2rem}
+.help h3{font-family:var(--fd);font-size:1.2rem;text-transform:uppercase;margin:.5rem 0 .25rem}
+.help table{border-collapse:collapse;width:100%;font-size:12.5px}
+.help td,.help th{border-bottom:1px solid var(--line);padding:.3rem .4rem;text-align:left;vertical-align:top}
+.help th{font-family:var(--fm);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg2)}
+.matrix td{text-align:center}.matrix td:first-child{text-align:left;font-weight:600}
+.good{color:var(--good);font-weight:600}.bad{color:var(--bad);font-weight:600}
+#end .box{max-width:720px}
+#end-title{font-size:clamp(3rem,8vw,5rem);line-height:.9}
+#end-title.victory{color:var(--good)} #end-title.defeat{color:var(--bad)}
+#end table{width:100%;border-collapse:collapse}#end td,#end th{padding:.35rem .5rem;border-bottom:1px solid var(--line);text-align:left}
+#end-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.4rem}
+.stat{display:grid;border:1px solid var(--line);border-radius:6px;padding:.4rem .6rem;font-size:12px}.stat span{color:var(--fg2)}
+#errbox{position:fixed;left:8px;bottom:8px;background:#5a1d1d;color:#fff;padding:.4rem .6rem;border-radius:6px;font-family:var(--fm);font-size:12px;z-index:9;max-width:80vw}
+</style>
+</head><body>
+
+<div id="start" class="screen">
+  <div class="start-wrap">
+    <div class="eyebrow">Beta 0.1 · protótipo jogável no navegador · contra IA</div>
+    <h1>Aether Rift<br><span>Dominion</span></h1>
+    <p class="tagline">Nada aqui é seu. Ainda.</p>
+    <div class="start-grid">
+      <div class="fac-cards" id="fac-cards"></div>
+      <div class="opts">
+        <div class="opt"><label for="opt-name">Nome</label><input id="opt-name" maxlength="18"></div>
+        <div class="opt"><label for="opt-opp">Oponentes</label><select id="opt-opp"><option value="1">1 IA (1v1)</option><option value="2">2 IAs (FFA 3)</option><option value="3">3 IAs (FFA 4)</option></select></div>
+        <div class="opt"><label for="opt-diff">Dificuldade</label><select id="opt-diff"><option value="facil">Fácil</option><option value="normal">Normal</option><option value="dificil">Difícil</option></select></div>
+        <div class="opt"><label for="opt-seed">Semente do mapa</label><input id="opt-seed" inputmode="numeric"></div>
+        <div class="row"><button id="btn-start" class="btn primary">Iniciar partida</button><button id="btn-help-start" class="btn">Como jogar</button></div>
+      </div>
+    </div>
+    <p class="start-notes"><b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
+  </div>
+</div>
+
+<div id="game" hidden>
+  <canvas id="world"></canvas>
+  <div id="hud">
+    <div id="top">
+      <div class="res"><span class="c-plasma">◆ <b id="r-plasma">0</b></span><span class="c-minerio">▣ <b id="r-minerio">0</b></span><span class="c-dados">◈ <b id="r-dados">0</b></span></div>
+      <div id="energy" class="energy pleno"><div class="row"><span>⚡ <span id="e-text">0 / 0</span></span><span id="e-regime">Pleno</span></div><div class="bar"><i id="e-bar"></i></div></div>
+      <span id="clock">00:00</span>
+      <span class="muted">Rep.: <span id="rep">Neutro</span></span>
+      <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
+    </div>
+    <div id="hints"><button id="hints-close" aria-label="Fechar dicas">✕</button><div id="hints-body"></div></div>
+    <div id="panel"></div>
+    <div id="right">
+      <canvas id="minimap" width="184" height="184"></canvas>
+      <div class="quick">
+        <button id="btn-over" class="qb"><span class="n">Sobrecarga</span><span class="sub"></span></button>
+        <button id="btn-super" class="qb"><span class="n">Superarma</span><span class="sub"></span></button>
+      </div>
+      <div id="alerts"></div>
+    </div>
+    <div id="log"></div>
+    <div id="bar">
+      <button id="btn-nucleo" class="tb">Núcleo</button><button id="btn-army" class="tb">Exército</button><button id="btn-build" class="tb">Construir</button><button id="btn-attack" class="tb">Atacar</button><button id="btn-stop" class="tb">Parar</button><button id="btn-box" class="tb">Caixa</button>
+    </div>
+    <div id="notice"></div>
+    <div id="proposal" hidden><div id="proposal-text"></div><div class="row"><button id="prop-yes" class="act sm good">Aceitar pacto</button><button id="prop-no" class="act sm">Recusar</button></div></div>
+  </div>
+
+  <div id="diplo" class="modal" hidden><div class="box"><h2>Diplomacia</h2><div id="diplo-body"></div><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
+  <div id="confirm" class="modal" hidden><div class="box"><h2>Confirmar</h2><p id="confirm-text"></p><div class="row"><button id="confirm-yes" class="btn primary">Confirmar</button><button id="confirm-no" class="btn">Cancelar</button></div></div></div>
+  <div id="end" class="modal" hidden><div class="box"><div class="eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-again" class="btn primary">Jogar de novo</button></div></div></div>
+</div>
+
+<div id="help" class="modal help" hidden><div class="box">
+  <h2>Como jogar</h2>
+  <p class="muted small">Objetivo: destruir os Núcleos inimigos ou ter mais Domínio (território, exército e recursos) ao fim de 25 minutos. Energia abaixo de 100% deixa produção, sensores e defesas piores: construa Reatores.</p>
+  <h3>Mouse e teclado</h3>
+  <table><tr><td>Clique / arrastar</td><td>Selecionar / caixa de seleção. Shift adiciona. Duplo clique seleciona todas do mesmo tipo na tela.</td></tr>
+  <tr><td>Botão direito</td><td>Mover. Em inimigo: atacar. Em nó com coletores: colher. Em Refinaria ou Reator inimigo com Pirata: Sifonar. Em Caixa: recolher. Com estrutura selecionada: ponto de reunião.</td></tr>
+  <tr><td>A / S</td><td>Atacar-mover (clique no destino) / Parar</td></tr>
+  <tr><td>B + letra</td><td>Construir: R Reator, F Refinaria, Q Quartel, V Fábrica, H Hangar, T Torre, N Nódulo, L Laboratório. Shift mantém o modo.</td></tr>
+  <tr><td>Letras com estrutura selecionada</td><td>Produzir: C Coletor, I Infantaria, S Suporte, P Pirata, V Veículo, D Drone</td></tr>
+  <tr><td>Ctrl+1–9 / 1–9</td><td>Definir / selecionar grupo (duas vezes centraliza)</td></tr>
+  <tr><td>F1 / F2 / F / Espaço</td><td>Núcleo / exército / centralizar seleção / ir ao último alerta</td></tr>
+  <tr><td>WASD, setas, roda, botão do meio</td><td>Câmera e zoom</td></tr>
+  <tr><td>P / H / Esc</td><td>Pausar / ajuda / cancelar</td></tr></table>
+  <h3>Toque</h3>
+  <table><tr><td>Toque</td><td>Selecionar. Com unidades selecionadas, toque no chão move.</td></tr><tr><td>Toque longo</td><td>Comando de contexto (atacar, colher, sifonar, recolher).</td></tr><tr><td>Arrastar / dois dedos</td><td>Câmera / zoom. Ative "Caixa" para arrastar uma seleção.</td></tr></table>
+  <h3>Contras (atacante → alvo)</h3>
+  <table class="matrix"><thead><tr><th></th><th>Inf.</th><th>Veíc.</th><th>Drone</th><th>Estrut.</th><th>Sup.</th></tr></thead><tbody>
+  <tr><td>Infantaria</td><td>—</td><td class="bad">▼</td><td class="good">▲</td><td class="bad">▼</td><td class="good">▲</td></tr>
+  <tr><td>Veículos</td><td class="good">▲</td><td>—</td><td class="bad">▼</td><td class="good">▲</td><td class="bad">▼</td></tr>
+  <tr><td>Drones</td><td class="bad">▼</td><td class="good">▲</td><td>—</td><td class="bad">▼</td><td class="good">▲</td></tr>
+  <tr><td>Estruturas</td><td class="good">▲</td><td class="bad">▼</td><td class="good">▲</td><td>—</td><td class="bad">▼</td></tr>
+  <tr><td>Suporte/Hack</td><td class="bad">▼</td><td class="good">▲</td><td class="bad">▼</td><td class="good">▲</td><td>—</td></tr></tbody></table>
+  <p class="muted small">▲ Forte = 1,5× dano · ▼ Fraco = 0,65×. Vehnar: estruturas neutras contra veículos. Erevane: infantaria camuflada acerta 1,5× saindo da camuflagem.</p>
+  <h3>Roubo e diplomacia</h3>
+  <p class="small">Piratas sifonam Refinarias e Reatores inimigos por até 40 s; a vítima recebe um Alerta com atraso de 3 a 5 s. Pirata morto com carga vira Caixa que qualquer um recolhe. Erevane rouba com +20% e sem deixar Rastro. Pactos de Não-agressão custam Caução de 150 Minério por lado; quebrar dá +20% de dano por 45 s, entrega sua Caução à vítima e derruba sua reputação.</p>
+  <div class="row"><button class="btn" data-close>Fechar</button></div>
+</div></div>
+<div id="errbox" hidden></div>
+<script>
+/* Aether Rift: Dominion — simulação determinística (beta 0.1)
+   Comandos entram, estado sai. Sem DOM. Roda em Node e no navegador. */
+(function (ARD) {
+'use strict';
+
+const TICK = 0.1;
+const WORLD = 3200;
+const CX = WORLD / 2, CY = WORLD / 2;
+const RIFT_R = 170;
+const PLAYER_COLORS = ['#FF8C1A', '#38D1E0', '#B98BFF', '#7FE3A1'];
+
+const FACTIONS = {
+  vehnar: {
+    id: 'vehnar', name: 'Consórcio Vehnar', short: 'Vehnar',
+    tagline: 'Eficiência industrial. Linhas de Montagem, Lotes e Reatores que fumegam.',
+    pirateName: 'Rebocador', lineBonus: true, lotes: true, smoke: true, structNeutralVsVehicle: true,
+    stolenMult: 1.0, cloak: {}, jumps: 1, jumpCostFrac: 0.4,
+    superKey: 'fundicao', superName: 'Fundição Orbital',
+    superDesc: 'Derruba um Bastião pré-construído em território próprio (3 s). Custa 300 Dados + 200 Plasma.',
+  },
+  erevane: {
+    id: 'erevane', name: 'Erevane', short: 'Erevane',
+    tagline: 'Furtividade e roubo. Nódulos camuflados, Sifonadores e recursos roubados limpos.',
+    pirateName: 'Sifonador', lineBonus: false, lotes: false, smoke: false, structNeutralVsVehicle: false,
+    stolenMult: 1.2, cloak: { nodulo: true, infantaria: true, pirata: true }, jumps: 2, jumpCostFrac: 0.2,
+    superKey: 'blecaute', superName: 'Blecaute',
+    superDesc: 'Sensores e energia inimigos a zero por 20 s; suas unidades +30% de velocidade. Custa 300 Dados + 200 Plasma.',
+  },
+};
+
+const BUILDINGS = {
+  nucleo:      { name: 'Núcleo de Domínio', key: '', hp: 8000, r: 38, cost: {}, buildTime: 0, energyProd: 60, energyUse: 0, sensor: 420, detect: 120, deposit: true, territory: 380, produces: ['coletor'], desc: 'Centro da colônia. Produz coletores. Se cair, você é eliminado.' },
+  reator:      { name: 'Reator', key: 'R', hp: 700, r: 20, cost: { minerio: 120 }, buildTime: 12, energyProd: 35, plasmaBurn: 0.3, energyUse: 0, sensor: 120, desc: '+35 de energia queimando 0,3 Plasma/s. Vehnar: emite Fumaça visível a todos.' },
+  refinaria:   { name: 'Refinaria', key: 'F', hp: 1000, r: 24, cost: { minerio: 150 }, buildTime: 15, energyUse: 6, sensor: 140, deposit: true, desc: 'Ponto de entrega perto dos nós. Alvo de Sifão.' },
+  quartel:     { name: 'Quartel Orbital', key: 'Q', hp: 1150, r: 26, cost: { minerio: 200 }, buildTime: 18, energyUse: 8, sensor: 140, produces: ['infantaria', 'suporte', 'pirata'], desc: 'Produz Infantaria, Suporte/Hack e Piratas.' },
+  fabrica:     { name: 'Fábrica de Veículos', key: 'V', hp: 1300, r: 28, cost: { minerio: 300, plasma: 60 }, buildTime: 22, energyUse: 12, sensor: 140, produces: ['veiculo'], desc: 'Produz Veículos Pesados.' },
+  hangar:      { name: 'Hangar de Drones', key: 'H', hp: 1150, r: 26, cost: { minerio: 280, plasma: 60 }, buildTime: 22, energyUse: 12, sensor: 160, produces: ['drone'], desc: 'Produz Drones Aéreos.' },
+  torre:       { name: 'Torre de Defesa', key: 'T', hp: 1100, r: 16, cost: { minerio: 180, plasma: 40 }, buildTime: 14, energyUse: 10, sensor: 260, detect: 140, attack: { dmg: 30, range: 230, cd: 1.0 }, desc: 'Forte vs Infantaria e Drones. Detecta camuflagem em 140.' },
+  nodulo:      { name: 'Nódulo de Avanço', key: 'N', hp: 650, r: 16, cost: { minerio: 120, plasma: 20 }, buildTime: 10, energyUse: 4, sensor: 260, territory: 320, desc: 'Reclama território em 320 e libera nós para coleta automática. Pode ser colocado até 650 de qualquer estrutura sua.' },
+  laboratorio: { name: 'Laboratório', key: 'L', hp: 900, r: 24, cost: { minerio: 220, plasma: 60, dados: 40 }, buildTime: 20, energyUse: 10, sensor: 140, desc: 'Pesquisas e superarma, pagas com Fragmentos de Dados.' },
+  bastiao:     { name: 'Bastião', key: '', hp: 2200, r: 24, cost: {}, buildTime: 3, energyUse: 12, sensor: 300, detect: 160, attack: { dmg: 60, range: 260, cd: 0.9 }, desc: 'Fortaleza da Fundição Orbital.' },
+};
+
+const UNITS = {
+  coletor:    { name: 'Coletor', key: 'C', cls: 'civ', hp: 90, r: 7, speed: 85, cost: { minerio: 60 }, time: 8, energyUse: 1, capacity: 50, harvestRate: 12, sensor: 110, desc: 'Coleta automaticamente nós no seu território e entrega na Refinaria ou Núcleo mais próximo.' },
+  infantaria: { name: 'Infantaria Orbital', key: 'I', cls: 'inf', hp: 120, r: 7, speed: 90, cost: { minerio: 50 }, time: 6, energyUse: 1, attack: { dmg: 12, range: 110, cd: 0.8 }, sensor: 160, desc: 'Forte vs Drones e Suporte. Fraca vs Veículos e Estruturas.' },
+  veiculo:    { name: 'Veículo Pesado', key: 'V', cls: 'vei', hp: 420, r: 12, speed: 65, cost: { minerio: 160, plasma: 40 }, time: 12, energyUse: 3, attack: { dmg: 40, range: 150, cd: 1.4 }, sensor: 170, desc: 'Forte vs Infantaria e Estruturas. Fraco vs Drones e Suporte.' },
+  drone:      { name: 'Drone Aéreo', key: 'D', cls: 'dro', hp: 160, r: 8, speed: 150, cost: { minerio: 120, plasma: 50 }, time: 10, energyUse: 2, flying: true, attack: { dmg: 18, range: 120, cd: 0.9 }, sensor: 220, desc: 'Forte vs Veículos e Suporte. Fraco vs Infantaria e Estruturas. Sobrevoa a Fenda.' },
+  suporte:    { name: 'Suporte / Hack', key: 'S', cls: 'sup', hp: 100, r: 8, speed: 80, cost: { minerio: 90, dados: 20 }, time: 9, energyUse: 2, attack: { dmg: 10, range: 170, cd: 1.5, stun: true }, sensor: 200, desc: 'Forte vs Veículos e Estruturas, e os atrasa. Fraco vs Infantaria e Drones.' },
+  pirata:     { name: 'Pirata de Extração', key: 'P', cls: 'sup', hp: 140, r: 9, speed: 100, cost: { minerio: 120, plasma: 30 }, time: 10, energyUse: 2, sensor: 180, siphonRange: 46, siphonRate: 7, siphonMax: 40, cargoCap: 300, desc: 'Sifona Refinarias e Reatores inimigos por até 40 s. Erevane: camuflado e +20% no roubo. Vehnar: Rebocador, lento e resistente, carrega 2x.' },
+};
+
+const COUNTER = {
+  inf: { vei: 0.65, dro: 1.5, est: 0.65, sup: 1.5 },
+  vei: { inf: 1.5, dro: 0.65, est: 1.5, sup: 0.65 },
+  dro: { inf: 0.65, vei: 1.5, est: 0.65, sup: 1.5 },
+  est: { inf: 1.5, vei: 0.65, dro: 1.5, sup: 0.65 },
+  sup: { inf: 0.65, vei: 1.5, dro: 0.65, est: 1.5 },
+};
+const CLASS_NAMES = { inf: 'Infantaria', vei: 'Veículos', dro: 'Drones', est: 'Estruturas', sup: 'Suporte/Hack', civ: 'Civil' };
+
+const RESEARCH = {
+  armamento: { name: 'Armamento', cost: { dados: 150 }, desc: '+15% de dano para todas as unidades e torres.' },
+  blindagem: { name: 'Blindagem', cost: { dados: 150 }, desc: '−13% de dano recebido por unidades e estruturas.' },
+  sensores:  { name: 'Sensores', cost: { dados: 100 }, desc: '+25% de alcance de sensores.' },
+};
+
+const SUPER_COST = { dados: 300, plasma: 200 };
+const SUPER_CD = 600;
+const OVERCHARGE_COST = 200, OVERCHARGE_T = 60, OVERCHARGE_CD = 300;
+const PACT_DURATION = 600, PACT_CAUCAO = 150, PROPOSAL_TTL = 30;
+const JUMP_CHANNEL = 60;
+const REP_NAMES = { 2: 'Palavra de Ferro', 1: 'Confiável', 0: 'Neutro', '-1': 'Volátil', '-2': 'Traidor Conhecido' };
+
+const REGIME = {
+  pleno:     { prodF: 1.0,  sensF: 1.0, defF: 1.0,  name: 'Pleno' },
+  racionado: { prodF: 0.75, sensF: 0.8, defF: 0.9,  name: 'Racionado' },
+  colapso:   { prodF: 0.5,  sensF: 0.6, defF: 0.65, name: 'Colapso' },
+};
+
+const DIFFICULTY = {
+  facil:   { name: 'Fácil',   income: 0.85, attackAt: 1500, minAttack: 600, acceptP: 0.8,  breakP: 0.0,  pirateEvery: 150, reserve: 200 },
+  normal:  { name: 'Normal',  income: 1.0,  attackAt: 1100, minAttack: 420, acceptP: 0.65, breakP: 0.12, pirateEvery: 100, reserve: 150 },
+  dificil: { name: 'Difícil', income: 1.2,  attackAt: 850,  minAttack: 240, acceptP: 0.5,  breakP: 0.35, pirateEvery: 70,  reserve: 100 },
+};
+
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function dist(ax, ay, bx, by) { return Math.hypot(ax - bx, ay - by); }
+function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+
+function createSim(cfg) {
+  const sim = {
+    cfg, tick: 0, time: 0, seed: cfg.seed || 1, ents: [], byId: new Map(), nextId: 1,
+    players: [], events: [], cmdQueue: [], pending: [], vis: [], result: null,
+    maxTime: (cfg.minutes || 25) * 60, grid: new Map(),
+  };
+  sim.rand = mulberry32(sim.seed);
+  const n = cfg.players.length;
+  const rot = sim.rand() * Math.PI * 2;
+  for (let i = 0; i < n; i++) {
+    const pc = cfg.players[i];
+    const fac = FACTIONS[pc.faction] || FACTIONS.vehnar;
+    const p = {
+      id: i, name: pc.name || (pc.human ? 'Você' : 'IA ' + i), faction: fac.id, color: PLAYER_COLORS[i % PLAYER_COLORS.length],
+      human: !!pc.human, difficulty: pc.difficulty || 'normal', alive: true,
+      res: { plasma: 300, minerio: 500, dados: 40 },
+      energy: { prod: 40, cons: 0, ratio: 1, regime: 'pleno' },
+      overchargeT: 0, overchargeCd: 0, superCd: 0, blackoutT: 0, speedBuffT: 0, golpeT: 0,
+      research: {}, rep: 0, pacts: {}, jumpsLeft: fac.jumps, lastBaseAlert: -99, lastNucleoAlert: -99,
+      stats: { collected: 0, stolen: 0, lost: 0, unitsKilled: 0, unitsLost: 0, buildingsDestroyed: 0, buildingsLost: 0, treaties: 0, betrayals: 0, dmg: 0 },
+      startAngle: rot + (Math.PI * 2 * i) / n,
+    };
+    sim.players.push(p);
+    sim.vis.push(new Set());
+  }
+  generateMap(sim);
+  computeVisibility(sim);
+  return sim;
+}
+
+function generateMap(sim) {
+  const R0 = 1180;
+  // Plasma ring around the Rift
+  for (let k = 0; k < 8; k++) {
+    const a = (Math.PI * 2 * k) / 8 + Math.PI / 8;
+    addNode(sim, 'plasma', CX + Math.cos(a) * 330, CY + Math.sin(a) * 330, 1800);
+  }
+  // Data anomalies between players on a mid ring
+  const n = sim.players.length;
+  for (let i = 0; i < n; i++) {
+    const a = sim.players[i].startAngle + Math.PI / n;
+    addNode(sim, 'dados', CX + Math.cos(a) * 640, CY + Math.sin(a) * 640, 600);
+    addNode(sim, 'minerio', CX + Math.cos(a + 0.18) * 800, CY + Math.sin(a + 0.18) * 800, 1600);
+    addNode(sim, 'minerio', CX + Math.cos(a - 0.18) * 800, CY + Math.sin(a - 0.18) * 800, 1600);
+  }
+  if (n < 4) { // extra data for small games
+    for (let k = 0; k < 4 - n; k++) {
+      const a = sim.rand() * Math.PI * 2;
+      addNode(sim, 'dados', CX + Math.cos(a) * 520, CY + Math.sin(a) * 520, 500);
+    }
+  }
+  for (let i = 0; i < n; i++) {
+    const p = sim.players[i];
+    const sx = CX + Math.cos(p.startAngle) * R0, sy = CY + Math.sin(p.startAngle) * R0;
+    const nuc = addBuilding(sim, p.id, 'nucleo', sx, sy, true);
+    nuc.hp = nuc.maxHp;
+    // three minério nodes around the start, one small plasma, one dados a bit away
+    for (let k = 0; k < 3; k++) {
+      const a = p.startAngle + Math.PI + (k - 1) * 0.75 + (sim.rand() - 0.5) * 0.3;
+      const d = 190 + sim.rand() * 60;
+      addNode(sim, 'minerio', sx + Math.cos(a) * d, sy + Math.sin(a) * d, 2200);
+    }
+    const ap = p.startAngle + Math.PI + (sim.rand() < 0.5 ? 1.5 : -1.5);
+    addNode(sim, 'plasma', sx + Math.cos(ap) * 250, sy + Math.sin(ap) * 250, 1500);
+    const ad = p.startAngle + (sim.rand() < 0.5 ? 1.1 : -1.1);
+    addNode(sim, 'dados', sx + Math.cos(ad) * 420, sy + Math.sin(ad) * 420, 350);
+    // starting units
+    for (let k = 0; k < 3; k++) {
+      const u = addUnit(sim, p.id, 'coletor', sx + Math.cos(p.startAngle + Math.PI + k * 0.5) * 60, sy + Math.sin(p.startAngle + Math.PI + k * 0.5) * 60);
+      u.state = 'idle';
+    }
+    const u1 = addUnit(sim, p.id, 'infantaria', sx + Math.cos(p.startAngle) * 70, sy + Math.sin(p.startAngle) * 70);
+    const u2 = addUnit(sim, p.id, 'infantaria', sx + Math.cos(p.startAngle + 0.4) * 70, sy + Math.sin(p.startAngle + 0.4) * 70);
+    u1.state = u2.state = 'idle';
+  }
+  // scattered extra minério
+  let tries = 0;
+  for (let k = 0; k < 6 && tries < 200; tries++) {
+    const a = sim.rand() * Math.PI * 2, d = 450 + sim.rand() * 550;
+    const x = CX + Math.cos(a) * d, y = CY + Math.sin(a) * d;
+    if (nearestEntity(sim, x, y, 150, e => e.kind !== 'unit')) continue;
+    addNode(sim, 'minerio', x, y, 1200); k++;
+  }
+}
+
+function addNode(sim, res, x, y, amount) {
+  const e = { id: sim.nextId++, kind: 'node', res, x: clamp(x, 60, WORLD - 60), y: clamp(y, 60, WORLD - 60), r: 18, amount, max: amount, alive: true, owner: -1 };
+  sim.ents.push(e); sim.byId.set(e.id, e); return e;
+}
+function addBuilding(sim, owner, def, x, y, built) {
+  const d = BUILDINGS[def];
+  const e = {
+    id: sim.nextId++, kind: 'building', def, cls: 'est', owner, x, y, px: x, py: y, r: d.r,
+    maxHp: d.hp, hp: built ? d.hp : d.hp * 0.3, built: !!built, progress: built ? 1 : 0, queue: [], cd: 0,
+    alive: true, lastHitT: -99, lastAttack: -99, cloaked: false, revealT: 0, rally: null, jumpT: 0, jumpTo: null, lotes: {},
+  };
+  sim.ents.push(e); sim.byId.set(e.id, e); return e;
+}
+function addUnit(sim, owner, def, x, y) {
+  const d = UNITS[def];
+  const p = sim.players[owner];
+  const fac = FACTIONS[p.faction];
+  const e = {
+    id: sim.nextId++, kind: 'unit', def, cls: d.cls, owner, x, y, px: x, py: y, r: d.r, ang: p.startAngle,
+    maxHp: d.hp, hp: d.hp, speed: d.speed, state: 'idle', tx: x, ty: y, target: null, resume: null, cd: 0,
+    cargo: { plasma: 0, minerio: 0, dados: 0 }, cargoTotal: 0, stolen: false, cargoCap: d.cargoCap || d.capacity || 0,
+    siphonT: 0, alive: true, lastHitT: -99, lastAttack: -99, cloaked: false, revealT: 0, node: null,
+  };
+  if (def === 'pirata' && fac.id === 'vehnar') { e.maxHp = e.hp = 260; e.speed = 72; e.cargoCap = 600; e.r = 11; }
+  sim.ents.push(e); sim.byId.set(e.id, e); return e;
+}
+
+function nearestEntity(sim, x, y, rad, pred) {
+  let best = null, bd = rad;
+  for (const e of sim.ents) {
+    if (!e.alive) continue;
+    if (pred && !pred(e)) continue;
+    const d = dist(x, y, e.x, e.y) - (e.r || 0);
+    if (d < bd) { bd = d; best = e; }
+  }
+  return best;
+}
+
+// ---------- spatial hash ----------
+const CELL = 100;
+function rebuildGrid(sim) {
+  sim.grid.clear();
+  for (const e of sim.ents) {
+    if (!e.alive || e.kind === 'node') continue;
+    const k = ((e.x / CELL) | 0) * 4096 + ((e.y / CELL) | 0);
+    let arr = sim.grid.get(k); if (!arr) { arr = []; sim.grid.set(k, arr); }
+    arr.push(e);
+  }
+}
+function queryGrid(sim, x, y, rad, fn) {
+  const x0 = ((x - rad) / CELL) | 0, x1 = ((x + rad) / CELL) | 0, y0 = ((y - rad) / CELL) | 0, y1 = ((y + rad) / CELL) | 0;
+  for (let cx = x0; cx <= x1; cx++) for (let cy = y0; cy <= y1; cy++) {
+    const arr = sim.grid.get(cx * 4096 + cy); if (!arr) continue;
+    for (const e of arr) if (e.alive) fn(e);
+  }
+}
+
+// ---------- helpers ----------
+function facOf(sim, pid) { return FACTIONS[sim.players[pid].faction]; }
+function regimeOf(sim, pid) { return REGIME[sim.players[pid].energy.regime]; }
+function canAfford(p, cost) { for (const k in cost) if ((p.res[k] || 0) < cost[k]) return false; return true; }
+function pay(p, cost, mult) { mult = mult || 1; for (const k in cost) p.res[k] = Math.max(0, p.res[k] - cost[k] * mult); }
+function refund(p, cost, mult) { mult = mult || 1; for (const k in cost) p.res[k] += cost[k] * mult; }
+function hasPact(sim, a, b) { return !!sim.players[a].pacts[b]; }
+function isEnemy(sim, a, b) { return a !== b && !hasPact(sim, a, b); }
+function sensorRadius(sim, e) {
+  const p = sim.players[e.owner];
+  const d = e.kind === 'unit' ? UNITS[e.def] : BUILDINGS[e.def];
+  let r = e.kind === 'building' && !e.built ? 60 : d.sensor;
+  r *= regimeOf(sim, e.owner).sensF;
+  if (p.research.sensores) r *= 1.25;
+  if (p.blackoutT > 0) r *= 0.15;
+  return r;
+}
+function speedOf(sim, u) {
+  const p = sim.players[u.owner];
+  let s = u.speed;
+  if (p.speedBuffT > 0) s *= 1.3;
+  return s;
+}
+function inTerritory(sim, pid, x, y) {
+  for (const e of sim.ents) {
+    if (!e.alive || e.kind !== 'building' || e.owner !== pid || !e.built) continue;
+    const t = BUILDINGS[e.def].territory;
+    if (t && dist(x, y, e.x, e.y) <= t) return true;
+  }
+  return false;
+}
+function territoryOwner(sim, x, y) { // first owner whose territory covers; -1 if none
+  for (const e of sim.ents) {
+    if (!e.alive || e.kind !== 'building' || !e.built) continue;
+    const t = BUILDINGS[e.def].territory;
+    if (t && dist(x, y, e.x, e.y) <= t) return e.owner;
+  }
+  return -1;
+}
+function canBuild(sim, pid, def, x, y) {
+  const d = BUILDINGS[def]; if (!d) return { ok: false, why: 'Desconhecido' };
+  if (x < 60 || y < 60 || x > WORLD - 60 || y > WORLD - 60) return { ok: false, why: 'Fora do mapa' };
+  if (dist(x, y, CX, CY) < RIFT_R + d.r + 12) return { ok: false, why: 'Dentro da Fenda' };
+  for (const e of sim.ents) {
+    if (!e.alive || e.kind === 'unit' || e.kind === 'crate') continue;
+    if (dist(x, y, e.x, e.y) < e.r + d.r + 10) return { ok: false, why: 'Sobreposição' };
+  }
+  if (def === 'nodulo') {
+    let near = false;
+    for (const e of sim.ents) if (e.alive && e.kind === 'building' && e.owner === pid && dist(x, y, e.x, e.y) <= 650) { near = true; break; }
+    if (!near) return { ok: false, why: 'Longe demais das suas estruturas (650)' };
+    const to = territoryOwner(sim, x, y);
+    if (to !== -1 && to !== pid) return { ok: false, why: 'Território inimigo' };
+  } else if (def !== 'bastiao' && !inTerritory(sim, pid, x, y)) return { ok: false, why: 'Fora do seu território' };
+  return { ok: true };
+}
+function canSee(sim, pid, e) { return e.owner === pid || e.kind === 'node' || sim.vis[pid].has(e.id); }
+function emit(sim, ev) { ev.time = sim.time; sim.events.push(ev); }
+function alertTo(sim, pid, text, x, y, kind) { emit(sim, { t: 'alert', p: pid, text, x, y, kind: kind || 'info' }); }
+
+// ---------- commands ----------
+function enqueue(sim, cmd) { sim.cmdQueue.push(cmd); }
+
+function ownUnits(sim, pid, ids) {
+  const out = [];
+  if (!ids) return out;
+  for (const id of ids) { const e = sim.byId.get(id); if (e && e.alive && e.kind === 'unit' && e.owner === pid) out.push(e); }
+  return out;
+}
+function formation(units, x, y) {
+  const n = units.length; if (n === 0) return [];
+  const cols = Math.ceil(Math.sqrt(n)); const sp = 24;
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const c = i % cols, r = (i / cols) | 0;
+    out.push({ x: x + (c - (cols - 1) / 2) * sp, y: y + (r - (Math.ceil(n / cols) - 1) / 2) * sp });
+  }
+  return out;
+}
+function processCommand(sim, c) {
+  const p = sim.players[c.p]; if (!p || !p.alive) return;
+  switch (c.t) {
+    case 'move': case 'attackmove': {
+      const us = ownUnits(sim, c.p, c.ids); const f = formation(us, c.x, c.y);
+      us.forEach((u, i) => { u.state = c.t === 'move' ? 'move' : 'attackmove'; u.tx = clamp(f[i].x, 20, WORLD - 20); u.ty = clamp(f[i].y, 20, WORLD - 20); u.target = null; u.resume = null; u.node = null; });
+      break; }
+    case 'stop': ownUnits(sim, c.p, c.ids).forEach(u => { u.state = 'idle'; u.target = null; u.resume = null; }); break;
+    case 'attack': {
+      const t = sim.byId.get(c.target); if (!t || !t.alive || t.owner === c.p || t.kind === 'node' || !canSee(sim, c.p, t)) return;
+      if (t.owner >= 0 && hasPact(sim, c.p, t.owner)) return; // UI must break the pact first
+      ownUnits(sim, c.p, c.ids).forEach(u => { if (UNITS[u.def].attack) { u.state = 'attack'; u.target = t.id; u.resume = null; } else { u.state = 'move'; u.tx = t.x; u.ty = t.y; } });
+      break; }
+    case 'harvest': {
+      const t = sim.byId.get(c.target); if (!t || !t.alive || t.kind !== 'node') return;
+      ownUnits(sim, c.p, c.ids).forEach(u => { if (u.def === 'coletor') { u.state = 'harvest'; u.node = t.id; u.target = null; } else { u.state = 'move'; u.tx = t.x; u.ty = t.y; } });
+      break; }
+    case 'siphon': {
+      const t = sim.byId.get(c.target); if (!t || !t.alive || t.kind !== 'building' || t.owner === c.p || !canSee(sim, c.p, t)) return;
+      if (!(t.def === 'refinaria' || t.def === 'reator') || hasPact(sim, c.p, t.owner)) return;
+      ownUnits(sim, c.p, c.ids).forEach(u => { if (u.def === 'pirata') { u.state = 'siphon'; u.target = t.id; u.siphonT = 0; } else { u.state = 'move'; u.tx = t.x; u.ty = t.y; } });
+      break; }
+    case 'pickup': {
+      const t = sim.byId.get(c.target); if (!t || !t.alive || t.kind !== 'crate') return;
+      ownUnits(sim, c.p, c.ids).forEach(u => { u.state = 'pickup'; u.target = t.id; });
+      break; }
+    case 'build': {
+      const d = BUILDINGS[c.def]; if (!d || !d.key) return;
+      const ok = canBuild(sim, c.p, c.def, c.x, c.y); if (!ok.ok) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: ok.why }); return; }
+      if (!canAfford(p, d.cost)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Recursos insuficientes' }); return; }
+      pay(p, d.cost); addBuilding(sim, c.p, c.def, c.x, c.y, false);
+      emit(sim, { t: 'place', p: c.p, x: c.x, y: c.y, def: c.def });
+      break; }
+    case 'produce': {
+      const b = sim.byId.get(c.id); if (!b || !b.alive || b.kind !== 'building' || b.owner !== c.p || !b.built) return;
+      const bd = BUILDINGS[b.def]; if (!bd.produces || !bd.produces.includes(c.def)) return;
+      if (b.queue.length >= 6) return;
+      const ud = UNITS[c.def]; let mult = 1;
+      if (facOf(sim, c.p).lotes) { const same = b.queue.filter(q => q.def === c.def).length; if (same >= 4) mult = 0.5; }
+      if (!canAfford(p, scaleCost(ud.cost, mult))) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Recursos insuficientes' }); return; }
+      pay(p, ud.cost, mult); b.queue.push({ def: c.def, t: 0, total: ud.time, mult });
+      break; }
+    case 'cancel': {
+      const b = sim.byId.get(c.id); if (!b || !b.alive || b.owner !== c.p) return;
+      const it = b.queue[c.index]; if (!it) return; refund(p, UNITS[it.def].cost, it.mult); b.queue.splice(c.index, 1);
+      break; }
+    case 'rally': { const b = sim.byId.get(c.id); if (b && b.alive && b.owner === c.p && b.kind === 'building') b.rally = { x: c.x, y: c.y }; break; }
+    case 'research': {
+      const r = RESEARCH[c.key]; if (!r || p.research[c.key]) return;
+      if (!hasBuilt(sim, c.p, 'laboratorio')) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Requer Laboratório' }); return; }
+      if (!canAfford(p, r.cost)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Fragmentos de Dados insuficientes' }); return; }
+      pay(p, r.cost); p.research[c.key] = true; alertTo(sim, c.p, 'Pesquisa concluída: ' + r.name, null, null, 'good');
+      break; }
+    case 'overcharge': {
+      if (sim.time < p.overchargeCd || p.res.plasma < OVERCHARGE_COST) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: sim.time < p.overchargeCd ? 'Sobrecarga em recarga' : 'Requer 200 Plasma' }); return; }
+      p.res.plasma -= OVERCHARGE_COST; p.overchargeT = OVERCHARGE_T; p.overchargeCd = sim.time + OVERCHARGE_CD;
+      alertTo(sim, c.p, 'Sobrecarga: +50% de energia por 60 s', null, null, 'good');
+      break; }
+    case 'super': {
+      const fac = facOf(sim, c.p);
+      if (!hasBuilt(sim, c.p, 'laboratorio')) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Requer Laboratório' }); return; }
+      if (sim.time < p.superCd) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Superarma em recarga' }); return; }
+      if (!canAfford(p, SUPER_COST)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Requer 300 Dados e 200 Plasma' }); return; }
+      if (fac.superKey === 'fundicao') {
+        const ok = canBuild(sim, c.p, 'bastiao', c.x, c.y);
+        if (!ok.ok || !inTerritory(sim, c.p, c.x, c.y)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: ok.ok ? 'Fora do seu território' : ok.why }); return; }
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD;
+        addBuilding(sim, c.p, 'bastiao', c.x, c.y, false);
+        emit(sim, { t: 'super', p: c.p, kind: 'fundicao', x: c.x, y: c.y });
+        for (const q of sim.players) if (q.alive) alertTo(sim, q.id, (q.id === c.p ? 'Fundição Orbital a caminho' : p.name + ' ativou Fundição Orbital!'), c.x, c.y, q.id === c.p ? 'good' : 'danger');
+      } else {
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD; p.speedBuffT = 20;
+        for (const q of sim.players) if (q.alive && q.id !== c.p) { q.blackoutT = 20; alertTo(sim, q.id, p.name + ' ativou Blecaute! Sensores e energia a zero por 20 s', null, null, 'danger'); }
+        alertTo(sim, c.p, 'Blecaute ativo: inimigos cegos por 20 s', null, null, 'good');
+        emit(sim, { t: 'super', p: c.p, kind: 'blecaute' });
+      }
+      break; }
+    case 'jump': {
+      const nuc = nucleoOf(sim, c.p); if (!nuc || nuc.jumpT > 0) return;
+      if (p.jumpsLeft <= 0) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Sem Saltos restantes' }); return; }
+      const ok = canBuild(sim, c.p, 'bastiao', c.x, c.y); // generic placement check (bounds, rift, overlap)
+      if (!ok.ok) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: ok.why }); return; }
+      const to = territoryOwner(sim, c.x, c.y); if (to !== -1 && to !== c.p) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Território inimigo' }); return; }
+      const frac = facOf(sim, c.p).jumpCostFrac;
+      for (const k in p.res) p.res[k] = Math.floor(p.res[k] * (1 - frac));
+      p.jumpsLeft--; nuc.jumpT = JUMP_CHANNEL; nuc.jumpTo = { x: c.x, y: c.y };
+      for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Salto de Núcleo iniciado (60 s)' : p.name + ' iniciou um Salto de Núcleo!', nuc.x, nuc.y, q.id === c.p ? 'good' : 'warn');
+      break; }
+    case 'propose': {
+      const q = sim.players[c.to]; if (!q || !q.alive || c.to === c.p || hasPact(sim, c.p, c.to)) return;
+      if (sim.pending.some(pr => pr.from === c.p && pr.to === c.to)) return;
+      if (!canAfford(p, { minerio: PACT_CAUCAO })) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Caução: 150 Minério' }); return; }
+      sim.pending.push({ from: c.p, to: c.to, t: sim.time });
+      emit(sim, { t: 'proposal', p: c.to, from: c.p });
+      alertTo(sim, c.to, p.name + ' propõe Não-agressão (10 min, Caução 150)', null, null, 'info');
+      if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Proposta enviada a ' + q.name });
+      break; }
+    case 'respond': {
+      const idx = sim.pending.findIndex(pr => pr.to === c.p && pr.from === c.to); if (idx < 0) return;
+      sim.pending.splice(idx, 1);
+      const a = sim.players[c.to];
+      if (!c.accept) { alertTo(sim, c.to, p.name + ' recusou o pacto', null, null, 'warn'); return; }
+      if (!canAfford(a, { minerio: PACT_CAUCAO }) || !canAfford(p, { minerio: PACT_CAUCAO })) { alertTo(sim, c.to, 'Pacto falhou: Caução insuficiente', null, null, 'warn'); return; }
+      a.res.minerio -= PACT_CAUCAO; p.res.minerio -= PACT_CAUCAO;
+      const pact = { a: a.id, b: p.id, until: sim.time + PACT_DURATION, since: sim.time, caucao: PACT_CAUCAO };
+      a.pacts[p.id] = pact; p.pacts[a.id] = pact; a.stats.treaties++; p.stats.treaties++;
+      alertTo(sim, a.id, 'Pacto de Não-agressão com ' + p.name + ' (10 min)', null, null, 'good');
+      alertTo(sim, p.id, 'Pacto de Não-agressão com ' + a.name + ' (10 min)', null, null, 'good');
+      emit(sim, { t: 'pact', a: a.id, b: p.id });
+      break; }
+    case 'break': {
+      const pact = p.pacts[c.with]; if (!pact) return;
+      const v = sim.players[c.with];
+      delete p.pacts[c.with]; delete v.pacts[c.p];
+      v.res.minerio += pact.caucao * 2; // victim gets both deposits
+      p.rep = Math.max(-2, p.rep - 1); p.golpeT = 45; p.stats.betrayals++;
+      alertTo(sim, c.with, p.name + ' QUEBROU O PACTO! Golpe de Traição ativo por 45 s', null, null, 'danger');
+      alertTo(sim, c.p, 'Você quebrou o pacto: +20% de dano por 45 s. Reputação ↓ (' + REP_NAMES[p.rep] + ')', null, null, 'warn');
+      emit(sim, { t: 'betrayal', by: c.p, victim: c.with });
+      break; }
+  }
+}
+function scaleCost(cost, m) { const o = {}; for (const k in cost) o[k] = cost[k] * m; return o; }
+function hasBuilt(sim, pid, def) { for (const e of sim.ents) if (e.alive && e.kind === 'building' && e.owner === pid && e.def === def && e.built) return true; return false; }
+function nucleoOf(sim, pid) { for (const e of sim.ents) if (e.alive && e.kind === 'building' && e.owner === pid && e.def === 'nucleo') return e; return null; }
+
+// ---------- per-tick systems ----------
+function computeEnergy(sim, p, dt) {
+  let prod = 0, cons = 0;
+  for (const e of sim.ents) {
+    if (!e.alive || e.owner !== p.id) continue;
+    if (e.kind === 'building') {
+      const d = BUILDINGS[e.def];
+      if (!e.built) continue;
+      if (d.energyProd) {
+        if (d.plasmaBurn) { if (p.res.plasma > 0) { prod += d.energyProd; p.res.plasma = Math.max(0, p.res.plasma - d.plasmaBurn * dt); } }
+        else prod += d.energyProd;
+      }
+      cons += d.energyUse || 0;
+    } else if (e.kind === 'unit') cons += UNITS[e.def].energyUse || 0;
+  }
+  if (p.overchargeT > 0) prod *= 1.5;
+  if (p.blackoutT > 0) prod = 0;
+  const ratio = cons > 0 ? prod / cons : 1;
+  p.energy.prod = prod; p.energy.cons = cons; p.energy.ratio = ratio;
+  const prev = p.energy.regime;
+  p.energy.regime = ratio >= 1 ? 'pleno' : ratio >= 0.7 ? 'racionado' : 'colapso';
+  if (prev !== p.energy.regime && p.human) emit(sim, { t: 'regime', p: p.id, regime: p.energy.regime });
+}
+
+function counterMult(sim, a, t) {
+  const ac = a.cls, tc = t.kind === 'building' ? 'est' : t.cls;
+  if (tc === 'civ' || ac === 'civ') return 1;
+  let m = (COUNTER[ac] && COUNTER[ac][tc]) || 1;
+  if (t.kind === 'building' && facOf(sim, t.owner).structNeutralVsVehicle && ac === 'vei') m = 1;
+  if (a.kind === 'building' && facOf(sim, a.owner).structNeutralVsVehicle && tc === 'vei') m = 1;
+  return m;
+}
+function fire(sim, a, t) {
+  const p = sim.players[a.owner], q = sim.players[t.owner];
+  const atk = a.kind === 'unit' ? UNITS[a.def].attack : BUILDINGS[a.def].attack;
+  let dmg = atk.dmg * counterMult(sim, a, t);
+  if (p.research.armamento) dmg *= 1.15;
+  if (p.golpeT > 0) dmg *= 1.2;
+  if (a.kind === 'building') dmg *= regimeOf(sim, a.owner).defF;
+  let ambush = false;
+  if (a.kind === 'unit' && a.cloaked && a.def === 'infantaria') { dmg *= 1.5; ambush = true; }
+  if (q && q.research.blindagem) dmg *= 0.87;
+  t.hp -= dmg; t.lastHitT = sim.time; t.lastHitBy = a.owner;
+  p.stats.dmg += dmg;
+  a.cd = atk.cd; a.lastAttack = sim.time; a.cloaked = false;
+  if (atk.stun && (t.cls === 'vei' || t.kind === 'building')) t.cd = Math.max(t.cd || 0, 1.0);
+  emit(sim, { t: 'shot', x1: a.x, y1: a.y, x2: t.x, y2: t.y, cls: a.cls, owner: a.owner, ambush });
+  if (t.kind === 'building' && q) {
+    if (t.def === 'nucleo' && sim.time - q.lastNucleoAlert > 10) { q.lastNucleoAlert = sim.time; alertTo(sim, q.id, 'NÚCLEO SOB ATAQUE!', t.x, t.y, 'danger'); }
+    else if (sim.time - q.lastBaseAlert > 12) { q.lastBaseAlert = sim.time; alertTo(sim, q.id, 'Base sob ataque', t.x, t.y, 'danger'); }
+  }
+  if (t.hp <= 0) kill(sim, t, a.owner);
+}
+function kill(sim, e, killer) {
+  if (!e.alive) return;
+  e.alive = false;
+  const p = sim.players[e.owner];
+  emit(sim, { t: 'death', x: e.x, y: e.y, r: e.r, kind: e.kind, def: e.def, owner: e.owner, cls: e.cls });
+  if (e.kind === 'unit') {
+    if (p) p.stats.unitsLost++;
+    if (killer >= 0 && killer !== e.owner) sim.players[killer].stats.unitsKilled++;
+    if (e.cargoTotal > 0) {
+      const c = { id: sim.nextId++, kind: 'crate', x: e.x, y: e.y, r: 9, alive: true, owner: -1, cargo: Object.assign({}, e.cargo), stolen: e.stolen, bornT: sim.time };
+      sim.ents.push(c); sim.byId.set(c.id, c);
+      emit(sim, { t: 'crate', x: e.x, y: e.y });
+      if (p && p.human) alertTo(sim, p.id, 'Caixa derrubada: ' + Math.round(e.cargoTotal) + ' em recursos', e.x, e.y, 'warn');
+    }
+  } else if (e.kind === 'building') {
+    if (p) p.stats.buildingsLost++;
+    if (killer >= 0 && killer !== e.owner) sim.players[killer].stats.buildingsDestroyed++;
+    if (e.def === 'nucleo') eliminate(sim, e.owner, killer);
+  }
+}
+function eliminate(sim, pid, killer) {
+  const p = sim.players[pid]; if (!p.alive) return;
+  p.alive = false;
+  for (const e of sim.ents) if (e.alive && e.owner === pid) { e.alive = false; emit(sim, { t: 'death', x: e.x, y: e.y, r: e.r, kind: e.kind, def: e.def, owner: pid, cls: e.cls }); }
+  for (const k in p.pacts) { const q = sim.players[k]; delete q.pacts[pid]; } p.pacts = {};
+  for (const q of sim.players) if (q.alive) alertTo(sim, q.id, p.name + ' foi eliminado' + (killer >= 0 && killer !== pid ? ' por ' + sim.players[killer].name : ''), null, null, q.id === killer ? 'good' : 'warn');
+  emit(sim, { t: 'eliminated', p: pid });
+}
+
+function acquire(sim, u, rad, unitsOnly) {
+  let best = null, bd = Infinity;
+  const vis = sim.vis[u.owner];
+  queryGrid(sim, u.x, u.y, rad + 40, e => {
+    if (e.owner === u.owner || e.owner < 0 || e.kind === 'crate') return;
+    if (!isEnemy(sim, u.owner, e.owner)) return;
+    if (!vis.has(e.id)) return;
+    if (unitsOnly && e.kind !== 'unit') return;
+    const d = dist(u.x, u.y, e.x, e.y) - e.r;
+    if (d > rad) return;
+    const score = d + (e.kind === 'building' ? 200 : 0) + (e.cls === 'civ' ? 60 : 0);
+    if (score < bd) { bd = score; best = e; }
+  });
+  return best;
+}
+function moveToward(sim, u, tx, ty, dt) {
+  const dx = tx - u.x, dy = ty - u.y; const d = Math.hypot(dx, dy);
+  const sp = speedOf(sim, u) * dt;
+  if (d <= Math.max(sp, 4)) { u.x = tx; u.y = ty; return true; }
+  u.x += dx / d * sp; u.y += dy / d * sp; u.ang = Math.atan2(dy, dx); return false;
+}
+function nearestDeposit(sim, u) {
+  let best = null, bd = Infinity;
+  for (const e of sim.ents) {
+    if (!e.alive || e.kind !== 'building' || e.owner !== u.owner || !e.built || !BUILDINGS[e.def].deposit) continue;
+    const d = dist(u.x, u.y, e.x, e.y); if (d < bd) { bd = d; best = e; }
+  }
+  return best;
+}
+function pickNode(sim, u) {
+  const p = sim.players[u.owner];
+  // weight: prefer resource with lowest stock
+  const stock = p.res; const w = { minerio: 1, plasma: 1, dados: 0.8 };
+  const lowest = ['minerio', 'plasma', 'dados'].sort((a, b) => stock[a] - stock[b])[0];
+  w[lowest] *= 0.6;
+  let best = null, bd = Infinity;
+  for (const e of sim.ents) {
+    if (!e.alive || e.kind !== 'node' || e.amount <= 0) continue;
+    if (!inTerritory(sim, u.owner, e.x, e.y)) continue;
+    const d = dist(u.x, u.y, e.x, e.y) * w[e.res];
+    if (d < bd) { bd = d; best = e; }
+  }
+  return best;
+}
+function deliver(sim, u) {
+  const p = sim.players[u.owner];
+  const mult = p.human ? 1 : (DIFFICULTY[p.difficulty] || DIFFICULTY.normal).income;
+  let total = 0;
+  for (const k in u.cargo) {
+    let v = u.cargo[k];
+    if (u.stolen) v *= facOf(sim, u.owner).stolenMult; else v *= mult;
+    p.res[k] += v; total += v;
+  }
+  if (u.stolen) {
+    p.stats.stolen += total;
+    emit(sim, { t: 'float', x: u.x, y: u.y, text: 'ROUBO +' + Math.round(total), owner: u.owner, kind: 'steal' });
+    if (!facOf(sim, u.owner).cleanTheft && u.victim >= 0 && sim.players[u.victim].alive) {
+      // Rastro: victim learns where the stolen resources went
+      const nuc = nucleoOf(sim, u.owner);
+      if (nuc) alertTo(sim, u.victim, 'Rastro: recursos roubados entregues na base de ' + p.name, nuc.x, nuc.y, 'warn');
+    }
+  } else {
+    p.stats.collected += total;
+    emit(sim, { t: 'float', x: u.x, y: u.y, text: '+' + Math.round(total), owner: u.owner, kind: 'gain' });
+  }
+  u.cargo = { plasma: 0, minerio: 0, dados: 0 }; u.cargoTotal = 0; u.stolen = false; u.victim = -1;
+}
+
+function updateUnit(sim, u, dt) {
+  const d = UNITS[u.def];
+  if (u.cd > 0) u.cd -= dt;
+  if (u.revealT > 0) u.revealT -= dt;
+  const fac = facOf(sim, u.owner);
+  u.cloaked = !!fac.cloak[u.def] && u.state !== 'siphon' && (sim.time - u.lastAttack) > 3;
+  switch (u.state) {
+    case 'idle': {
+      if (d.attack) { const t = acquire(sim, u, d.attack.range + 70, false); if (t) { u.target = t.id; u.state = 'attack'; u.resume = null; } }
+      else if (u.def === 'coletor') { const n = pickNode(sim, u); if (n) { u.node = n.id; u.state = 'harvest'; } }
+      break; }
+    case 'move': if (moveToward(sim, u, u.tx, u.ty, dt)) u.state = 'idle'; break;
+    case 'attackmove': {
+      if (d.attack) { const t = acquire(sim, u, d.attack.range + 90, false); if (t) { u.target = t.id; u.state = 'attack'; u.resume = { x: u.tx, y: u.ty }; break; } }
+      if (moveToward(sim, u, u.tx, u.ty, dt)) u.state = 'idle';
+      break; }
+    case 'attack': {
+      const t = sim.byId.get(u.target);
+      if (!t || !t.alive || !d.attack || !sim.vis[u.owner].has(t.id) && t.owner !== u.owner || !isEnemy(sim, u.owner, t.owner)) {
+        if (u.resume) { u.state = 'attackmove'; u.tx = u.resume.x; u.ty = u.resume.y; u.resume = null; } else u.state = 'idle';
+        u.target = null; break;
+      }
+      const dd = dist(u.x, u.y, t.x, t.y);
+      if (dd <= d.attack.range + t.r) { u.ang = Math.atan2(t.y - u.y, t.x - u.x); if (u.cd <= 0) fire(sim, u, t); }
+      else moveToward(sim, u, t.x, t.y, dt);
+      break; }
+    case 'harvest': {
+      const n = sim.byId.get(u.node);
+      if (!n || !n.alive || n.amount <= 0) { const m = pickNode(sim, u); if (m) u.node = m.id; else u.state = u.cargoTotal > 0 ? 'return' : 'idle'; break; }
+      if (dist(u.x, u.y, n.x, n.y) <= u.r + n.r + 8) {
+        const take = Math.min(d.harvestRate * dt, n.amount, d.capacity - u.cargoTotal);
+        n.amount -= take; u.cargo[n.res] += take; u.cargoTotal += take;
+        if (u.cargoTotal >= d.capacity - 0.01 || n.amount <= 0) u.state = 'return';
+      } else moveToward(sim, u, n.x, n.y, dt);
+      break; }
+    case 'return': {
+      const dep = nearestDeposit(sim, u);
+      if (!dep) { u.state = 'idle'; break; }
+      if (dist(u.x, u.y, dep.x, dep.y) <= u.r + dep.r + 10) {
+        deliver(sim, u);
+        if (u.def === 'coletor') { const n = sim.byId.get(u.node); if (n && n.alive && n.amount > 0) u.state = 'harvest'; else { const m = pickNode(sim, u); if (m) { u.node = m.id; u.state = 'harvest'; } else u.state = 'idle'; } }
+        else u.state = 'idle';
+      } else moveToward(sim, u, dep.x, dep.y, dt);
+      break; }
+    case 'siphon': {
+      const b = sim.byId.get(u.target);
+      if (!b || !b.alive || !isEnemy(sim, u.owner, b.owner)) { u.state = u.cargoTotal > 0 ? 'return' : 'idle'; u.target = null; break; }
+      if (dist(u.x, u.y, b.x, b.y) <= d.siphonRange + b.r) {
+        const v = sim.players[b.owner];
+        if (u.siphonT === 0) {
+          const delay = v.energy.regime === 'pleno' ? 3 : v.energy.regime === 'racionado' ? 4 : 5;
+          u.alertAt = sim.time + delay; u.alerted = false;
+        }
+        u.siphonT += dt;
+        if (!u.alerted && sim.time >= u.alertAt) { u.alerted = true; alertTo(sim, b.owner, 'ALERTA DE SIFÃO em ' + BUILDINGS[b.def].name, b.x, b.y, 'danger'); u.revealT = 2; }
+        const rate = d.siphonRate * dt;
+        for (const k of ['plasma', 'minerio']) {
+          const take = Math.min(rate, v.res[k], u.cargoCap - u.cargoTotal);
+          if (take > 0) { v.res[k] -= take; u.cargo[k] += take; u.cargoTotal += take; v.stats.lost += take; }
+        }
+        u.stolen = u.cargoTotal > 0; u.victim = b.owner;
+        emit(sim, { t: 'siphon', x1: u.x, y1: u.y, x2: b.x, y2: b.y, owner: u.owner });
+        if (u.siphonT >= d.siphonMax || u.cargoTotal >= u.cargoCap - 0.01) { u.state = 'return'; u.siphonT = 0; }
+      } else moveToward(sim, u, b.x, b.y, dt);
+      break; }
+    case 'pickup': {
+      const c = sim.byId.get(u.target);
+      if (!c || !c.alive) { u.state = 'idle'; break; }
+      if (dist(u.x, u.y, c.x, c.y) > u.r + c.r + 6) moveToward(sim, u, c.x, c.y, dt); else u.state = 'idle';
+      break; }
+  }
+}
+function pickupCrates(sim) {
+  for (const c of sim.ents) {
+    if (!c.alive || c.kind !== 'crate') continue;
+    let taker = null;
+    queryGrid(sim, c.x, c.y, 30, e => { if (!taker && e.kind === 'unit' && e.alive && dist(e.x, e.y, c.x, c.y) <= e.r + c.r + 6) taker = e; });
+    if (taker) {
+      const p = sim.players[taker.owner]; let total = 0;
+      for (const k in c.cargo) { p.res[k] += c.cargo[k]; total += c.cargo[k]; }
+      p.stats.stolen += c.stolen ? total : 0; if (!c.stolen) p.stats.collected += total;
+      c.alive = false;
+      emit(sim, { t: 'float', x: c.x, y: c.y, text: 'CAIXA +' + Math.round(total), owner: taker.owner, kind: 'steal' });
+      if (p.human) alertTo(sim, p.id, 'Caixa recolhida: +' + Math.round(total), c.x, c.y, 'good');
+    } else if (sim.time - c.bornT > 120) c.alive = false;
+  }
+}
+function updateBuilding(sim, b, dt) {
+  const d = BUILDINGS[b.def]; const p = sim.players[b.owner];
+  if (b.cd > 0) b.cd -= dt;
+  if (b.revealT > 0) b.revealT -= dt;
+  b.cloaked = !!facOf(sim, b.owner).cloak[b.def];
+  const reg = regimeOf(sim, b.owner);
+  if (!b.built) {
+    const dp = Math.min(1 - b.progress, (d.buildTime > 0 ? dt / d.buildTime : 1) * reg.prodF);
+    b.progress += dp; b.hp = Math.min(b.maxHp, b.hp + b.maxHp * 0.7 * dp);
+    if (b.progress >= 0.999) { b.built = true; b.progress = 1; emit(sim, { t: 'built', p: b.owner, x: b.x, y: b.y, def: b.def }); }
+    return;
+  }
+  if (b.jumpT > 0) {
+    b.jumpT -= dt;
+    if (b.jumpT <= 0) {
+      const from = { x: b.x, y: b.y };
+      b.x = b.jumpTo.x; b.y = b.jumpTo.y; b.px = b.x; b.py = b.y; b.jumpTo = null; b.jumpT = 0;
+      emit(sim, { t: 'jump', p: b.owner, from, to: { x: b.x, y: b.y } });
+      for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === b.owner ? 'Salto de Núcleo concluído' : p.name + ' saltou o Núcleo!', b.x, b.y, q.id === b.owner ? 'good' : 'warn');
+    }
+    return; // no production while jumping
+  }
+  if (b.queue.length) {
+    let mult = reg.prodF;
+    if (facOf(sim, b.owner).lineBonus && d.produces && b.def !== 'nucleo') {
+      let n = 0; queryGrid(sim, b.x, b.y, 160, e => { if (e !== b && e.kind === 'building' && e.owner === b.owner && e.built && BUILDINGS[e.def].produces && e.def !== 'nucleo' && dist(e.x, e.y, b.x, b.y) <= 150) n++; });
+      mult *= 1 + 0.12 * Math.min(4, n);
+    }
+    const it = b.queue[0]; it.t += dt * mult;
+    if (it.t >= it.total) {
+      b.queue.shift();
+      const ang = b.rally ? Math.atan2(b.rally.y - b.y, b.rally.x - b.x) : Math.atan2(CY - b.y, CX - b.x);
+      const u = addUnit(sim, b.owner, it.def, b.x + Math.cos(ang) * (b.r + 14), b.y + Math.sin(ang) * (b.r + 14));
+      if (b.rally) { u.state = 'move'; u.tx = b.rally.x + (sim.rand() - 0.5) * 30; u.ty = b.rally.y + (sim.rand() - 0.5) * 30; }
+      emit(sim, { t: 'spawn', p: b.owner, x: u.x, y: u.y, def: it.def });
+    }
+  }
+  if (d.attack && b.cd <= 0) {
+    const t = acquire(sim, b, d.attack.range, false);
+    if (t) fire(sim, b, t);
+  }
+}
+function separate(sim) {
+  const units = [];
+  for (const e of sim.ents) if (e.alive && e.kind === 'unit') units.push(e);
+  for (const u of units) {
+    let fx = 0, fy = 0;
+    queryGrid(sim, u.x, u.y, 40, e => {
+      if (e === u || !e.alive) return;
+      if (e.kind === 'unit') {
+        if (UNITS[e.def].flying !== UNITS[u.def].flying) return;
+        const dx = u.x - e.x, dy = u.y - e.y; const dd = Math.hypot(dx, dy) || 0.01; const min = u.r + e.r + 1;
+        if (dd < min) { const push = (min - dd) * 0.5; fx += dx / dd * push; fy += dy / dd * push; }
+      } else if (e.kind === 'building') {
+        if (UNITS[u.def].flying) return;
+        const dx = u.x - e.x, dy = u.y - e.y; const dd = Math.hypot(dx, dy) || 0.01; const min = u.r + e.r + 2;
+        if (dd < min) { fx += dx / dd * (min - dd); fy += dy / dd * (min - dd); }
+      }
+    });
+    if (!UNITS[u.def].flying) {
+      const dx = u.x - CX, dy = u.y - CY; const dd = Math.hypot(dx, dy) || 0.01; const min = RIFT_R + u.r;
+      if (dd < min) { fx += dx / dd * (min - dd); fy += dy / dd * (min - dd); }
+    }
+    if (fx || fy) { u.x = clamp(u.x + fx, 10, WORLD - 10); u.y = clamp(u.y + fy, 10, WORLD - 10); }
+  }
+}
+function computeVisibility(sim) {
+  for (const p of sim.players) {
+    const vis = sim.vis[p.id]; vis.clear();
+    if (!p.alive) continue;
+    const circles = [], detectors = [];
+    for (const e of sim.ents) {
+      if (!e.alive || e.owner !== p.id) continue;
+      circles.push([e.x, e.y, sensorRadius(sim, e)]);
+      if (e.kind === 'building' && e.built && BUILDINGS[e.def].detect) detectors.push([e.x, e.y, BUILDINGS[e.def].detect]);
+    }
+    for (const e of sim.ents) {
+      if (!e.alive || e.owner === p.id || e.kind === 'node') continue;
+      let seen = false;
+      if (e.kind === 'building' && e.built && e.def === 'reator' && facOf(sim, e.owner).smoke) seen = true;
+      if (!seen) for (const c of circles) { if (dist(e.x, e.y, c[0], c[1]) <= c[2] + e.r) { seen = true; break; } }
+      if (seen && e.cloaked && !(e.revealT > 0)) {
+        seen = false;
+        for (const c of detectors) { if (dist(e.x, e.y, c[0], c[1]) <= c[2] + e.r) { seen = true; break; } }
+      }
+      if (seen) vis.add(e.id);
+    }
+  }
+}
+function updatePacts(sim) {
+  for (let i = sim.pending.length - 1; i >= 0; i--) if (sim.time - sim.pending[i].t > PROPOSAL_TTL) sim.pending.splice(i, 1);
+  const done = new Set();
+  for (const p of sim.players) for (const k in p.pacts) {
+    const pact = p.pacts[k]; if (done.has(pact)) continue;
+    if (sim.time >= pact.until) {
+      done.add(pact);
+      const a = sim.players[pact.a], b = sim.players[pact.b];
+      delete a.pacts[b.id]; delete b.pacts[a.id];
+      a.res.minerio += pact.caucao; b.res.minerio += pact.caucao;
+      a.rep = Math.min(2, a.rep + 1); b.rep = Math.min(2, b.rep + 1);
+      if (a.alive) alertTo(sim, a.id, 'Pacto cumprido com ' + b.name + '. Caução devolvida. Reputação ↑ (' + REP_NAMES[a.rep] + ')', null, null, 'good');
+      if (b.alive) alertTo(sim, b.id, 'Pacto cumprido com ' + a.name + '. Caução devolvida. Reputação ↑ (' + REP_NAMES[b.rep] + ')', null, null, 'good');
+    }
+  }
+}
+function score(sim, p) {
+  let s = 0;
+  for (const e of sim.ents) {
+    if (!e.alive || e.owner !== p.id) continue;
+    if (e.kind === 'building') { s += 100; if (e.def === 'nodulo') s += 300; if (e.def === 'nucleo') s += 200; }
+    else if (e.kind === 'unit') { const c = UNITS[e.def].cost; s += (c.minerio || 0) + (c.plasma || 0) + (c.dados || 0); }
+  }
+  s += p.res.plasma + p.res.minerio + p.res.dados;
+  return Math.round(s);
+}
+function checkEnd(sim) {
+  if (sim.result) return;
+  const humans = sim.players.filter(p => p.human), ais = sim.players.filter(p => !p.human);
+  const humanAlive = humans.some(p => p.alive), aiAlive = ais.some(p => p.alive);
+  const scores = sim.players.map(p => ({ id: p.id, name: p.name, score: p.alive ? score(sim, p) : 0, alive: p.alive }));
+  if (humans.length === 0) { // headless mode: last one standing or time
+    const aliveN = sim.players.filter(p => p.alive).length;
+    if (aliveN <= 1) sim.result = { outcome: 'headless', reason: 'Último sobrevivente', scores };
+    else if (sim.time >= sim.maxTime) sim.result = { outcome: 'headless', reason: 'Tempo', scores };
+    if (sim.result) emit(sim, { t: 'end', result: sim.result });
+    return;
+  }
+  if (!humanAlive) sim.result = { outcome: 'defeat', reason: 'Seu Núcleo foi destruído.', scores };
+  else if (!aiAlive) sim.result = { outcome: 'victory', reason: 'Todos os Núcleos inimigos caíram.', scores };
+  else if (sim.time >= sim.maxTime) {
+    const best = scores.slice().sort((a, b) => b.score - a.score)[0];
+    const h = humans[0];
+    sim.result = { outcome: best.id === h.id ? 'victory' : 'defeat', reason: 'Fim do Ciclo de Maré: vitória por Domínio de ' + best.name + '.', scores };
+  }
+  if (sim.result) emit(sim, { t: 'end', result: sim.result });
+}
+
+function step(sim) {
+  const dt = TICK;
+  sim.events = [];
+  if (sim.result) return sim.events;
+  for (const e of sim.ents) if (e.kind !== 'node') { e.px = e.x; e.py = e.y; }
+  rebuildGrid(sim);
+  const cmds = sim.cmdQueue; sim.cmdQueue = [];
+  for (const c of cmds) processCommand(sim, c);
+  for (const p of sim.players) {
+    if (!p.alive) continue;
+    if (p.overchargeT > 0) p.overchargeT -= dt;
+    if (p.blackoutT > 0) p.blackoutT -= dt;
+    if (p.speedBuffT > 0) p.speedBuffT -= dt;
+    if (p.golpeT > 0) p.golpeT -= dt;
+    computeEnergy(sim, p, dt);
+  }
+  updatePacts(sim);
+  for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'building') updateBuilding(sim, e, dt); }
+  for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'unit') updateUnit(sim, e, dt); }
+  separate(sim);
+  pickupCrates(sim);
+  // prune
+  if (sim.tick % 10 === 0) {
+    const keep = [];
+    for (const e of sim.ents) { if (e.alive) keep.push(e); else sim.byId.delete(e.id); }
+    sim.ents = keep;
+  }
+  computeVisibility(sim);
+  sim.tick++; sim.time = sim.tick * TICK;
+  checkEnd(sim);
+  return sim.events;
+}
+
+// ---------- queries for UI/AI ----------
+function entitiesOf(sim, pid) { const out = []; for (const e of sim.ents) if (e.alive && e.owner === pid) out.push(e); return out; }
+function armyValue(sim, pid) {
+  let v = 0;
+  for (const e of sim.ents) if (e.alive && e.owner === pid && e.kind === 'unit' && UNITS[e.def].attack) { const c = UNITS[e.def].cost; v += (c.minerio || 0) + (c.plasma || 0) + (c.dados || 0); }
+  return v;
+}
+function hash(sim) { // cheap state hash for determinism tests
+  let h = 2166136261;
+  const mix = v => { h ^= (v | 0); h = Math.imul(h, 16777619) >>> 0; };
+  for (const e of sim.ents) { if (!e.alive) continue; mix(e.id); mix(Math.round(e.x * 10)); mix(Math.round(e.y * 10)); mix(Math.round((e.hp || 0) * 10)); mix(Math.round((e.amount || 0) * 10)); }
+  for (const p of sim.players) { mix(Math.round(p.res.plasma * 10)); mix(Math.round(p.res.minerio * 10)); mix(Math.round(p.res.dados * 10)); mix(p.rep); }
+  return h >>> 0;
+}
+
+ARD.sim = {
+  TICK, WORLD, CX, CY, RIFT_R, FACTIONS, BUILDINGS, UNITS, COUNTER, CLASS_NAMES, RESEARCH, REGIME, DIFFICULTY, REP_NAMES,
+  SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS,
+  createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius,
+};
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* IA de oponente — decide a cada 1 s de jogo, só por comandos; usa o RNG da simulação (determinístico). */
+(function (ARD) {
+'use strict';
+const S = ARD.sim;
+
+const BUILD_ORDERS = {
+  vehnar:  ['reator', 'refinaria', 'quartel', 'nodulo', 'reator', 'fabrica', 'torre', 'reator', 'hangar', 'laboratorio', 'torre', 'nodulo', 'fabrica', 'reator', 'torre'],
+  erevane: ['reator', 'quartel', 'refinaria', 'nodulo', 'reator', 'hangar', 'nodulo', 'torre', 'laboratorio', 'fabrica', 'reator', 'torre', 'quartel', 'reator'],
+};
+
+function create(pid, difficulty) {
+  return { pid, diff: S.DIFFICULTY[difficulty] || S.DIFFICULTY.normal, bo: 0, mode: 'defend', attackStart: 0, target: null, known: new Map(),
+    lastPirate: 0, lastPropose: -999, lastExtra: 0, lastThink: -1, enemySeen: { inf: 0, vei: 0, dro: 0, est: 0, sup: 0 }, lastAttackOrder: -99 };
+}
+
+function own(sim, pid) { return S.entitiesOf(sim, pid); }
+function count(list, pred) { let n = 0; for (const e of list) if (pred(e)) n++; return n; }
+
+function findSpot(sim, pid, def, cx, cy, rmin, rmax, tries) {
+  const d = S.BUILDINGS[def];
+  for (let i = 0; i < tries; i++) {
+    const a = sim.rand() * Math.PI * 2, r = rmin + sim.rand() * (rmax - rmin);
+    const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r;
+    if (S.canBuild(sim, pid, def, x, y).ok) return { x, y };
+  }
+  return null;
+}
+function nearestEnemyNucleoPos(sim, pid) {
+  const me = S.nucleoOf(sim, pid); if (!me) return null;
+  let best = null, bd = Infinity;
+  for (const q of sim.players) {
+    if (q.id === pid || !q.alive || S.hasPact(sim, pid, q.id)) continue;
+    const n = S.nucleoOf(sim, q.id); if (!n) continue;
+    const d = S.dist(me.x, me.y, n.x, n.y); if (d < bd) { bd = d; best = { x: n.x, y: n.y, owner: q.id }; }
+  }
+  return best;
+}
+function updateKnown(sim, mem) {
+  const vis = sim.vis[mem.pid];
+  for (const id of vis) { const e = sim.byId.get(id); if (e && e.alive && e.kind === 'building') mem.known.set(id, { x: e.x, y: e.y, def: e.def, owner: e.owner }); }
+  for (const [id, k] of mem.known) { const e = sim.byId.get(id); if (!e || !e.alive || !sim.players[k.owner].alive) mem.known.delete(id); }
+  // enemy composition seen (decayed)
+  for (const k in mem.enemySeen) mem.enemySeen[k] *= 0.9;
+  for (const id of vis) { const e = sim.byId.get(id); if (e && e.alive && e.kind === 'unit' && S.isEnemy(sim, mem.pid, e.owner) && mem.enemySeen[e.cls] !== undefined) mem.enemySeen[e.cls] += 1; }
+}
+
+function think(sim, mem) {
+  const cmds = [];
+  const p = sim.players[mem.pid]; if (!p.alive || sim.result) return cmds;
+  const t = sim.time; const D = mem.diff;
+  const mine = own(sim, mem.pid);
+  const nuc = mine.find(e => e.kind === 'building' && e.def === 'nucleo'); if (!nuc) return cmds;
+  const builds = mine.filter(e => e.kind === 'building');
+  const units = mine.filter(e => e.kind === 'unit');
+  const collectors = units.filter(u => u.def === 'coletor');
+  const pirates = units.filter(u => u.def === 'pirata');
+  const army = units.filter(u => S.UNITS[u.def].attack);
+  const nodulos = count(builds, b => b.def === 'nodulo');
+  const underConstruction = count(builds, b => !b.built);
+  updateKnown(sim, mem);
+  const emit = c => { c.p = mem.pid; cmds.push(c); };
+
+  // --- pending proposals to me
+  for (const pr of sim.pending) {
+    if (pr.to !== mem.pid) continue;
+    const other = sim.players[pr.from];
+    const myV = S.armyValue(sim, mem.pid), theirV = S.armyValue(sim, pr.from);
+    const accept = other.rep >= -1 && (myV < theirV * 1.15 || sim.rand() < 0.25) && sim.rand() < D.acceptP;
+    emit({ t: 'respond', to: pr.from, accept });
+  }
+  // --- propose when weaker
+  const human = sim.players.find(q => q.human && q.alive);
+  if (human && t > 180 && !S.hasPact(sim, mem.pid, human.id) && t - mem.lastPropose > 150 && S.armyValue(sim, mem.pid) < S.armyValue(sim, human.id) * 0.6 && sim.rand() < 0.5) {
+    mem.lastPropose = t; emit({ t: 'propose', to: human.id });
+  }
+  // --- betray when much stronger
+  for (const k in p.pacts) {
+    const pact = p.pacts[k]; const q = sim.players[k];
+    if (!q.alive) continue;
+    if (D.breakP > 0 && t - pact.since > 180 && S.armyValue(sim, mem.pid) > S.armyValue(sim, q.id) * 1.6 && sim.rand() < D.breakP / 60) {
+      emit({ t: 'break', with: q.id }); mem.mode = 'attack'; mem.attackStart = S.armyValue(sim, mem.pid); mem.target = null;
+    }
+  }
+
+  // --- economy: collectors
+  const wantCol = Math.min(14, 6 + nodulos * 2);
+  if (collectors.length + count(nuc.queue, q => q.def === 'coletor') < wantCol && nuc.queue.length < 2 && S.canAfford(p, S.UNITS.coletor.cost) && nuc.jumpT <= 0) emit({ t: 'produce', id: nuc.id, def: 'coletor' });
+
+  // --- energy first
+  const reactors = count(builds, b => b.def === 'reator');
+  const needEnergy = p.energy.ratio < 1.1 && reactors < 7 && underConstruction < 2;
+  const reserve = t < 240 ? D.reserve : 60;
+  if (needEnergy && S.canAfford(p, { minerio: S.BUILDINGS.reator.cost.minerio + reserve })) {
+    const s = findSpot(sim, mem.pid, 'reator', nuc.x, nuc.y, 70, 260, 30); if (s) emit({ t: 'build', def: 'reator', x: s.x, y: s.y });
+  } else if (underConstruction < 2) {
+    // --- build order
+    const order = BUILD_ORDERS[p.faction] || BUILD_ORDERS.vehnar;
+    let def = order[mem.bo];
+    if (!def && t - mem.lastExtra > 90) { def = sim.rand() < 0.5 ? 'nodulo' : (sim.rand() < 0.5 ? 'torre' : (p.faction === 'vehnar' ? 'fabrica' : 'hangar')); mem.lastExtra = t; }
+    if (def) {
+      const bd = S.BUILDINGS[def];
+      const cost = Object.assign({}, bd.cost); cost.minerio = (cost.minerio || 0) + (t < 240 ? 40 : 0);
+      if (S.canAfford(p, cost)) {
+        let s = null;
+        if (def === 'nodulo') {
+          // nearest unclaimed node
+          let best = null, bdist = Infinity;
+          for (const e of sim.ents) {
+            if (!e.alive || e.kind !== 'node' || e.amount <= 0) continue;
+            if (S.territoryOwner(sim, e.x, e.y) !== -1) continue;
+            const d = S.dist(nuc.x, nuc.y, e.x, e.y); if (d < bdist) { bdist = d; best = e; }
+          }
+          if (best) s = findSpot(sim, mem.pid, 'nodulo', best.x, best.y, 60, 140, 30);
+          if (!s) s = findSpot(sim, mem.pid, 'nodulo', nuc.x, nuc.y, 380, 600, 30);
+        } else if (def === 'refinaria') {
+          // near centroid of own-territory nodes
+          let sx = 0, sy = 0, n = 0;
+          for (const e of sim.ents) if (e.alive && e.kind === 'node' && S.inTerritory(sim, mem.pid, e.x, e.y)) { sx += e.x; sy += e.y; n++; }
+          if (n) s = findSpot(sim, mem.pid, 'refinaria', sx / n, sy / n, 50, 160, 30);
+          if (!s) s = findSpot(sim, mem.pid, 'refinaria', nuc.x, nuc.y, 90, 300, 30);
+        } else if (def === 'torre') {
+          const en = nearestEnemyNucleoPos(sim, mem.pid);
+          if (en) { const a = Math.atan2(en.y - nuc.y, en.x - nuc.x); s = findSpot(sim, mem.pid, 'torre', nuc.x + Math.cos(a) * 240, nuc.y + Math.sin(a) * 240, 0, 110, 30); }
+          if (!s) s = findSpot(sim, mem.pid, 'torre', nuc.x, nuc.y, 150, 330, 30);
+        } else s = findSpot(sim, mem.pid, def, nuc.x, nuc.y, 90, 320, 40);
+        if (s) { emit({ t: 'build', def, x: s.x, y: s.y }); if (mem.bo < order.length) mem.bo++; }
+        else if (mem.bo < order.length) mem.bo++; // skip impossible step
+      }
+    }
+  }
+
+  // --- research & super
+  if (S.hasBuilt(sim, mem.pid, 'laboratorio')) {
+    for (const key of ['armamento', 'blindagem', 'sensores']) if (!p.research[key] && S.canAfford(p, S.RESEARCH[key].cost) && p.res.dados > 160) { emit({ t: 'research', key }); break; }
+    if (t >= p.superCd && S.canAfford(p, { dados: 300, plasma: 300 })) {
+      const fac = S.FACTIONS[p.faction];
+      if (fac.superKey === 'fundicao') {
+        const en = nearestEnemyNucleoPos(sim, mem.pid);
+        if (en) { const a = Math.atan2(en.y - nuc.y, en.x - nuc.x); const s = findSpot(sim, mem.pid, 'bastiao', nuc.x + Math.cos(a) * 300, nuc.y + Math.sin(a) * 300, 0, 80, 30); if (s && S.inTerritory(sim, mem.pid, s.x, s.y)) emit({ t: 'super', x: s.x, y: s.y }); }
+      } else if (mem.mode === 'attack') emit({ t: 'super' });
+    }
+  }
+  if (p.energy.regime !== 'pleno' && p.res.plasma > 450 && t >= p.overchargeCd) emit({ t: 'overcharge' });
+
+  // --- army production
+  const prodBuildings = builds.filter(b => b.built && S.BUILDINGS[b.def].produces && b.def !== 'nucleo');
+  const seen = mem.enemySeen; const total = seen.inf + seen.vei + seen.dro + seen.est + seen.sup + 0.01;
+  const w = { infantaria: 0.35, veiculo: 0.3, drone: 0.3, suporte: 0.05 };
+  w.veiculo += 0.5 * (seen.inf + seen.est) / total; w.drone += 0.5 * (seen.vei + seen.sup) / total; w.infantaria += 0.5 * (seen.dro + seen.sup) / total; w.suporte += 0.3 * (seen.vei + seen.est) / total;
+  const reserveArmy = t < 240 ? D.reserve : 40;
+  for (const b of prodBuildings) {
+    if (b.queue.length >= 2) continue;
+    const opts = S.BUILDINGS[b.def].produces.filter(u => u !== 'pirata' && u !== 'coletor');
+    let pick = null, best = -1;
+    for (const u of opts) { const sc = (w[u] || 0.1) * (0.7 + sim.rand() * 0.6); if (sc > best) { best = sc; pick = u; } }
+    if (pick === 'suporte' && p.res.dados < 60) pick = 'infantaria';
+    if (pick) { const c = Object.assign({}, S.UNITS[pick].cost); c.minerio = (c.minerio || 0) + reserveArmy; if (S.canAfford(p, c)) emit({ t: 'produce', id: b.id, def: pick }); }
+  }
+  // --- pirates
+  const quartel = prodBuildings.find(b => b.def === 'quartel');
+  if (quartel && t - mem.lastPirate > D.pirateEvery && pirates.length < 2 && S.canAfford(p, { minerio: 120 + reserveArmy, plasma: 30 }) && quartel.queue.length < 3) { mem.lastPirate = t; emit({ t: 'produce', id: quartel.id, def: 'pirata' }); }
+  for (const pr of pirates) {
+    if (pr.state !== 'idle') continue;
+    let best = null, bd = Infinity;
+    for (const [id, k] of mem.known) { if ((k.def === 'refinaria' || k.def === 'reator') && S.isEnemy(sim, mem.pid, k.owner)) { const d = S.dist(pr.x, pr.y, k.x, k.y); if (d < bd) { bd = d; best = id; } } }
+    if (best && sim.vis[mem.pid].has(best)) emit({ t: 'siphon', ids: [pr.id], target: best });
+    else if (best) { const k = mem.known.get(best); emit({ t: 'move', ids: [pr.id], x: k.x + (sim.rand() - 0.5) * 80, y: k.y + (sim.rand() - 0.5) * 80 }); }
+    else { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en && sim.rand() < 0.3) emit({ t: 'move', ids: [pr.id], x: en.x + (sim.rand() - 0.5) * 500, y: en.y + (sim.rand() - 0.5) * 500 }); }
+  }
+
+  // --- army control
+  const value = S.armyValue(sim, mem.pid);
+  const threshold = D.attackAt + Math.max(0, (t - 600) / 60) * 25;
+  const attacked = builds.find(b => t - b.lastHitT < 6 && b.lastHitBy !== undefined && b.lastHitBy !== mem.pid);
+  const rally = { x: nuc.x + (S.CX - nuc.x) * 0.12, y: nuc.y + (S.CY - nuc.y) * 0.12 };
+  const ids = army.map(u => u.id);
+  if (attacked && ids.length) {
+    if (t - mem.lastAttackOrder > 4) { mem.lastAttackOrder = t; emit({ t: 'attackmove', ids, x: attacked.x, y: attacked.y }); }
+    if (mem.mode === 'attack' && value < mem.attackStart * 0.5) mem.mode = 'defend';
+  } else if (mem.mode === 'defend') {
+    if (value >= threshold && ids.length >= 4 && t >= D.minAttack) {
+      mem.mode = 'attack'; mem.attackStart = value; mem.target = null;
+    } else if (t - mem.lastAttackOrder > 8) {
+      const far = army.filter(u => u.state === 'idle' && S.dist(u.x, u.y, rally.x, rally.y) > 160).map(u => u.id);
+      if (far.length) { mem.lastAttackOrder = t; emit({ t: 'attackmove', ids: far, x: rally.x, y: rally.y }); }
+    }
+  }
+  if (mem.mode === 'attack' && !attacked) {
+    if (value < mem.attackStart * 0.35 || ids.length === 0) { mem.mode = 'defend'; if (ids.length) emit({ t: 'move', ids, x: rally.x, y: rally.y }); }
+    else {
+      // choose target: nearest known enemy building, else enemy nucleo
+      let tgt = null, bd = Infinity;
+      for (const [id, k] of mem.known) if (S.isEnemy(sim, mem.pid, k.owner)) { const d = S.dist(nuc.x, nuc.y, k.x, k.y); if (d < bd) { bd = d; tgt = { x: k.x, y: k.y }; } }
+      if (!tgt) tgt = nearestEnemyNucleoPos(sim, mem.pid);
+      if (tgt && t - mem.lastAttackOrder > 5) { mem.lastAttackOrder = t; emit({ t: 'attackmove', ids, x: tgt.x, y: tgt.y }); }
+      if (!tgt) mem.mode = 'defend';
+    }
+  }
+  return cmds;
+}
+
+ARD.ai = { create, think };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Renderizador Canvas 2D: mundo, névoa, efeitos e minimapa. Só lê a simulação. */
+(function (ARD) {
+'use strict';
+const S = ARD.sim;
+const GLYPH = { nucleo: '◎', reator: 'R', refinaria: 'F', quartel: 'Q', fabrica: 'V', hangar: 'H', torre: 'T', nodulo: 'N', laboratorio: 'L', bastiao: 'B' };
+const NODE_COLOR = { plasma: '#FF6A3D', minerio: '#8FA3B8', dados: '#7FE3A1' };
+
+function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function rgba(h, a) { const c = hexToRgb(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+function shade(h, f) { const c = hexToRgb(h).map(v => Math.max(0, Math.min(255, Math.round(v * f)))); return `rgb(${c[0]},${c[1]},${c[2]})`; }
+
+function create(canvas, mini) {
+  const ctx = canvas.getContext('2d');
+  const mctx = mini.getContext('2d');
+  const fog = document.createElement('canvas'); const fctx = fog.getContext('2d');
+  const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
+  const R = { canvas, ctx, w: 0, h: 0, dpr: 1, fx: { tracers: [], parts: [], floats: [], rings: [] }, time: 0, shake: 0 };
+
+  R.resize = function () {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      fog.width = canvas.width; fog.height = canvas.height;
+    }
+    R.w = w; R.h = h; R.dpr = dpr;
+    const ms = mini.clientWidth || 180;
+    if (mini.width !== ms * dpr) { mini.width = ms * dpr; mini.height = ms * dpr; mfog.width = mini.width; mfog.height = mini.height; }
+  };
+  R.worldToScreen = function (cam, x, y) { return [(x - cam.x) * cam.zoom + R.w / 2, (y - cam.y) * cam.zoom + R.h / 2]; };
+  R.screenToWorld = function (cam, sx, sy) { return [(sx - R.w / 2) / cam.zoom + cam.x, (sy - R.h / 2) / cam.zoom + cam.y]; };
+
+  R.onEvents = function (events, sim, human) {
+    const vis = sim.vis[human];
+    for (const e of events) {
+      switch (e.t) {
+        case 'shot': {
+          const col = sim.players[e.owner].color;
+          R.fx.tracers.push({ x1: e.x1, y1: e.y1, x2: e.x2, y2: e.y2, col, t: 0, life: 0.14, ambush: e.ambush });
+          for (let i = 0; i < 3; i++) R.fx.parts.push({ x: e.x2, y: e.y2, vx: (Math.random() - 0.5) * 120, vy: (Math.random() - 0.5) * 120, t: 0, life: 0.3 + Math.random() * 0.2, col: '#FFD27A', size: 1.5 });
+          break; }
+        case 'death': {
+          const col = e.owner >= 0 ? sim.players[e.owner].color : '#AAAAAA';
+          const n = e.kind === 'building' ? 40 : 12;
+          for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, sp = 40 + Math.random() * (e.kind === 'building' ? 220 : 120); R.fx.parts.push({ x: e.x, y: e.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, t: 0, life: 0.5 + Math.random() * 0.6, col: Math.random() < 0.5 ? col : '#FF9A5C', size: e.kind === 'building' ? 3 : 2 }); }
+          R.fx.rings.push({ x: e.x, y: e.y, r0: e.r, r1: e.r * (e.kind === 'building' ? 4 : 2.5), col: '#FF9A5C', t: 0, life: 0.5 });
+          if (e.kind === 'building' && e.owner === human) R.shake = Math.min(1, R.shake + 0.4);
+          break; }
+        case 'float': {
+          const col = e.kind === 'steal' ? '#FF6A3D' : (e.owner === human ? '#E8E2D6' : rgba(sim.players[e.owner].color, 0.8));
+          if (e.owner === human || e.kind === 'steal') R.fx.floats.push({ x: e.x, y: e.y, text: e.text, col, t: 0, life: 1.3 });
+          break; }
+        case 'alert': if (e.p === human && e.x != null) R.fx.rings.push({ x: e.x, y: e.y, r0: 20, r1: 160, col: e.kind === 'danger' ? '#FF5E3A' : e.kind === 'good' ? '#7FE3A1' : '#F2C230', t: 0, life: 1.6, ping: true }); break;
+        case 'super': if (e.kind === 'fundicao') R.fx.rings.push({ x: e.x, y: e.y, r0: 10, r1: 220, col: '#FF8C1A', t: 0, life: 3, ping: true }); else R.shake = 1; break;
+        case 'jump': R.fx.rings.push({ x: e.from.x, y: e.from.y, r0: 40, r1: 300, col: '#B23CFF', t: 0, life: 1.2 }); R.fx.rings.push({ x: e.to.x, y: e.to.y, r0: 300, r1: 40, col: '#B23CFF', t: 0, life: 1.2 }); break;
+        case 'built': if (e.p === human) R.fx.rings.push({ x: e.x, y: e.y, r0: 10, r1: 60, col: '#7FE3A1', t: 0, life: 0.6 }); break;
+        case 'crate': R.fx.rings.push({ x: e.x, y: e.y, r0: 5, r1: 50, col: '#F2C230', t: 0, life: 0.8 }); break;
+      }
+    }
+  };
+
+  function updateFx(dt) {
+    const f = R.fx;
+    for (const arr of [f.tracers, f.parts, f.floats, f.rings]) for (let i = arr.length - 1; i >= 0; i--) { const o = arr[i]; o.t += dt; if (o.t >= o.life) arr.splice(i, 1); }
+    for (const p of f.parts) { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.9; p.vy *= 0.9; }
+    R.shake = Math.max(0, R.shake - dt * 2);
+    if (f.parts.length > 1500) f.parts.splice(0, f.parts.length - 1500);
+  }
+
+  function lerp(e, a) { return [e.px + (e.x - e.px) * a, e.py + (e.y - e.py) * a]; }
+
+  function drawUnitShape(c, u, col, sel, alpha) {
+    const r = u.r; c.globalAlpha = alpha;
+    c.fillStyle = col; c.strokeStyle = shade(col, 0.45); c.lineWidth = 1.2;
+    switch (u.cls === 'civ' ? 'col' : u.def === 'pirata' ? 'pir' : u.cls) {
+      case 'inf': c.beginPath(); c.moveTo(r * 1.1, 0); c.lineTo(-r * 0.9, r * 0.8); c.lineTo(-r * 0.5, 0); c.lineTo(-r * 0.9, -r * 0.8); c.closePath(); c.fill(); c.stroke(); break;
+      case 'vei': c.beginPath(); c.roundRect(-r, -r * 0.7, r * 2, r * 1.4, 3); c.fill(); c.stroke(); c.fillStyle = shade(col, 0.6); c.beginPath(); c.arc(0, 0, r * 0.45, 0, 7); c.fill(); c.strokeStyle = shade(col, 1.3); c.lineWidth = 2.5; c.beginPath(); c.moveTo(0, 0); c.lineTo(r * 1.3, 0); c.stroke(); break;
+      case 'dro': c.beginPath(); c.arc(0, 0, r * 0.65, 0, 7); c.fill(); c.stroke(); c.strokeStyle = rgba(col, 0.7); c.lineWidth = 1.5; c.beginPath(); c.arc(0, 0, r * 1.25, 0, 7); c.stroke(); c.fillStyle = shade(col, 1.4); c.beginPath(); c.arc(r * 0.9, r * 0.9, 1.6, 0, 7); c.arc(-r * 0.9, -r * 0.9, 1.6, 0, 7); c.fill(); break;
+      case 'sup': c.beginPath(); c.moveTo(r, 0); c.lineTo(0, r * 0.8); c.lineTo(-r, 0); c.lineTo(0, -r * 0.8); c.closePath(); c.fill(); c.stroke(); c.strokeStyle = shade(col, 1.4); c.lineWidth = 1.5; c.beginPath(); c.moveTo(0, -r * 0.8); c.lineTo(0, -r * 1.8); c.stroke(); c.beginPath(); c.arc(0, -r * 1.9, 1.6, 0, 7); c.fill(); break;
+      case 'pir': c.beginPath(); c.moveTo(r * 1.1, 0); c.lineTo(-r * 0.4, r * 0.9); c.lineTo(-r * 1, r * 0.9); c.lineTo(0, 0); c.lineTo(-r * 1, -r * 0.9); c.lineTo(-r * 0.4, -r * 0.9); c.closePath(); c.fill(); c.stroke();
+        if (u.cargoTotal > 0) { c.fillStyle = '#FF6A3D'; c.beginPath(); c.arc(-r * 1.4, 0, 3, 0, 7); c.fill(); } break;
+      default: c.beginPath(); c.roundRect(-r, -r, r * 2, r * 2, 2); c.fill(); c.stroke();
+        if (u.cargoTotal > 0) { c.fillStyle = NODE_COLOR[Object.keys(u.cargo).sort((a, b) => u.cargo[b] - u.cargo[a])[0]] || '#fff'; c.fillRect(-r * 0.6, -r * 0.6, r * 1.2 * Math.min(1, u.cargoTotal / (u.cargoCap || 50)), r * 1.2); }
+    }
+    c.globalAlpha = 1;
+  }
+
+  function drawBuilding(c, b, sim, col, fac, zoom, isGhost) {
+    const r = b.r; const d = S.BUILDINGS[b.def];
+    c.save();
+    if (!b.built && !isGhost) { c.setLineDash([4, 3]); }
+    const dark = shade(col, 0.35), mid = shade(col, 0.7);
+    c.lineWidth = 1.5; c.strokeStyle = shade(col, 1.1);
+    if (b.def === 'nucleo') {
+      c.fillStyle = dark; poly(c, 0, 0, r, 8, Math.PI / 8); c.fill(); c.stroke();
+      c.fillStyle = mid; poly(c, 0, 0, r * 0.72, 8, Math.PI / 8); c.fill();
+      const pulse = 0.6 + 0.4 * Math.sin(R.time * 2);
+      c.fillStyle = rgba(col, pulse); c.beginPath(); c.arc(0, 0, r * 0.32, 0, 7); c.fill();
+      c.strokeStyle = rgba('#FFFFFF', 0.25); c.beginPath(); c.arc(0, 0, r * 0.5, 0, 7); c.stroke();
+    } else if (fac.id === 'vehnar') {
+      c.fillStyle = dark; c.beginPath(); c.roundRect(-r, -r, r * 2, r * 2, 3); c.fill(); c.stroke();
+      c.fillStyle = mid; c.fillRect(-r * 0.7, -r * 0.7, r * 1.4, r * 1.4);
+      c.fillStyle = shade(col, 1.3); for (const [x, y] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { c.beginPath(); c.arc(x * r * 0.82, y * r * 0.82, 1.6, 0, 7); c.fill(); }
+      if (b.def === 'reator' && b.built) { const g = 0.5 + 0.5 * Math.sin(R.time * 4 + b.id); c.fillStyle = rgba('#FF8C1A', 0.5 + 0.5 * g); c.fillRect(-r * 0.5, -r * 0.15, r, r * 0.3); }
+    } else {
+      c.fillStyle = dark; poly(c, 0, 0, r * 1.05, 6, 0); c.fill(); c.stroke();
+      c.fillStyle = mid; poly(c, 0, 0, r * 0.7, 6, 0); c.fill();
+      c.save(); c.clip(); c.strokeStyle = rgba('#F2C230', 0.9); c.lineWidth = r * 0.22; c.beginPath(); c.moveTo(-r, r * 0.4); c.lineTo(r, -r * 0.4); c.stroke(); c.restore();
+      if (b.def === 'reator' && b.built) { c.fillStyle = rgba('#B23CFF', 0.5 + 0.5 * Math.sin(R.time * 4 + b.id)); c.beginPath(); c.arc(0, 0, r * 0.2, 0, 7); c.fill(); }
+    }
+    if (d.attack) { c.strokeStyle = shade(col, 1.4); c.lineWidth = 3; c.beginPath(); c.moveTo(0, 0); const a = b.aimAng || 0; c.lineTo(Math.cos(a) * r * 1.3, Math.sin(a) * r * 1.3); c.stroke(); }
+    c.setLineDash([]);
+    if (zoom > 0.45) { c.fillStyle = rgba('#FFFFFF', 0.85); c.font = `bold ${Math.max(9, r * 0.8)}px IBM Plex Mono, monospace`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(GLYPH[b.def] || '?', 0, 1); }
+    c.restore();
+  }
+  function poly(c, x, y, r, n, rot) { c.beginPath(); for (let i = 0; i < n; i++) { const a = rot + (Math.PI * 2 * i) / n; const px = x + Math.cos(a) * r, py = y + Math.sin(a) * r; if (i === 0) c.moveTo(px, py); else c.lineTo(px, py); } c.closePath(); }
+  function drawNode(c, n, zoom) {
+    const col = NODE_COLOR[n.res]; const r = n.r; const frac = n.max > 0 ? n.amount / n.max : 0;
+    c.save();
+    const g = c.createRadialGradient(0, 0, 2, 0, 0, r * 2.2); g.addColorStop(0, rgba(col, 0.35)); g.addColorStop(1, rgba(col, 0)); c.fillStyle = g; c.beginPath(); c.arc(0, 0, r * 2.2, 0, 7); c.fill();
+    c.fillStyle = shade(col, 0.55); c.strokeStyle = col; c.lineWidth = 1.5;
+    if (n.res === 'plasma') { poly(c, 0, 0, r * (0.7 + 0.3 * frac), 6, R.time * 0.3); c.fill(); c.stroke(); c.fillStyle = rgba('#FFFFFF', 0.6 + 0.3 * Math.sin(R.time * 3 + n.id)); c.beginPath(); c.arc(0, 0, r * 0.25, 0, 7); c.fill(); }
+    else if (n.res === 'minerio') { for (let i = 0; i < 3; i++) { const a = i * 2.1 + n.id; c.beginPath(); c.roundRect(Math.cos(a) * r * 0.5 - r * 0.45, Math.sin(a) * r * 0.5 - r * 0.35, r * 0.9 * (0.5 + 0.5 * frac), r * 0.7, 2); c.fill(); c.stroke(); } }
+    else { poly(c, 0, 0, r * (0.6 + 0.4 * frac), 4, Math.PI / 4 + R.time * 0.6); c.fill(); c.stroke(); c.strokeStyle = rgba(col, 0.6); c.setLineDash([2, 3]); c.beginPath(); c.arc(0, 0, r * 1.2, 0, 7); c.stroke(); }
+    if (zoom > 0.5) { c.setLineDash([]); c.strokeStyle = rgba(col, 0.8); c.lineWidth = 2; c.beginPath(); c.arc(0, 0, r + 4, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * frac); c.stroke(); }
+    c.restore();
+  }
+  function hpBar(c, x, y, w, frac, col) { c.fillStyle = 'rgba(0,0,0,0.55)'; c.fillRect(x - w / 2, y, w, 3); c.fillStyle = frac > 0.5 ? '#7FE3A1' : frac > 0.25 ? '#F2C230' : '#FF5E3A'; c.fillRect(x - w / 2, y, w * Math.max(0, frac), 3); }
+
+  R.draw = function (sim, view, alpha, dt) {
+    R.time += dt; updateFx(dt);
+    const c = ctx, cam = view.cam, human = view.human, vis = sim.vis[human], me = sim.players[human];
+    const W = R.w, H = R.h, z = cam.zoom;
+    c.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
+    // background
+    c.fillStyle = '#0D0F13'; c.fillRect(0, 0, W, H);
+    let shx = 0, shy = 0; if (R.shake > 0) { shx = (Math.random() - 0.5) * 8 * R.shake; shy = (Math.random() - 0.5) * 8 * R.shake; }
+    c.save(); c.translate(W / 2 + shx, H / 2 + shy); c.scale(z, z); c.translate(-cam.x, -cam.y);
+    const vx0 = cam.x - W / 2 / z - 60, vy0 = cam.y - H / 2 / z - 60, vx1 = cam.x + W / 2 / z + 60, vy1 = cam.y + H / 2 / z + 60;
+    const onScreen = (x, y, r) => x + r > vx0 && x - r < vx1 && y + r > vy0 && y - r < vy1;
+    // world bounds + grid
+    c.fillStyle = '#111419'; c.fillRect(0, 0, S.WORLD, S.WORLD);
+    c.strokeStyle = 'rgba(255,255,255,0.035)'; c.lineWidth = 1 / z;
+    const gs = 200; c.beginPath();
+    for (let x = Math.max(0, Math.floor(vx0 / gs) * gs); x <= Math.min(S.WORLD, vx1); x += gs) { c.moveTo(x, Math.max(0, vy0)); c.lineTo(x, Math.min(S.WORLD, vy1)); }
+    for (let y = Math.max(0, Math.floor(vy0 / gs) * gs); y <= Math.min(S.WORLD, vy1); y += gs) { c.moveTo(Math.max(0, vx0), y); c.lineTo(Math.min(S.WORLD, vx1), y); }
+    c.stroke();
+    c.strokeStyle = 'rgba(255,94,58,0.35)'; c.lineWidth = 3 / z; c.strokeRect(0, 0, S.WORLD, S.WORLD);
+    // rift
+    if (onScreen(S.CX, S.CY, 600)) {
+      const g = c.createRadialGradient(S.CX, S.CY, S.RIFT_R * 0.3, S.CX, S.CY, S.RIFT_R * 3.2);
+      g.addColorStop(0, 'rgba(255,94,58,0.55)'); g.addColorStop(0.35, 'rgba(178,60,255,0.28)'); g.addColorStop(1, 'rgba(178,60,255,0)');
+      c.fillStyle = g; c.beginPath(); c.arc(S.CX, S.CY, S.RIFT_R * 3.2, 0, 7); c.fill();
+      c.fillStyle = '#07060A'; c.beginPath(); c.arc(S.CX, S.CY, S.RIFT_R, 0, 7); c.fill();
+      for (let i = 0; i < 3; i++) { const ph = (R.time * 0.25 + i / 3) % 1; c.strokeStyle = `rgba(255,120,80,${0.5 * (1 - ph)})`; c.lineWidth = 2 / z; c.beginPath(); c.arc(S.CX, S.CY, S.RIFT_R * (0.4 + ph * 0.7), 0, 7); c.stroke(); }
+      c.strokeStyle = 'rgba(255,160,120,0.6)'; c.lineWidth = 1.5 / z; c.setLineDash([6 / z, 6 / z]); c.beginPath(); c.arc(S.CX, S.CY, S.RIFT_R, 0, 7); c.stroke(); c.setLineDash([]);
+    }
+    // territories (own + visible/remembered enemies)
+    for (const e of sim.ents) {
+      if (!e.alive || e.kind !== 'building' || !e.built) continue;
+      const t = S.BUILDINGS[e.def].territory; if (!t) continue;
+      if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue;
+      if (!onScreen(e.x, e.y, t)) continue;
+      const col = sim.players[e.owner].color;
+      c.fillStyle = rgba(col, 0.045); c.beginPath(); c.arc(e.x, e.y, t, 0, 7); c.fill();
+      c.strokeStyle = rgba(col, 0.28); c.lineWidth = 1.5 / z; c.setLineDash([8 / z, 6 / z]); c.stroke(); c.setLineDash([]);
+    }
+    // nodes
+    for (const e of sim.ents) { if (!e.alive || e.kind !== 'node' || !onScreen(e.x, e.y, 40)) continue; c.save(); c.translate(e.x, e.y); drawNode(c, e, z); c.restore(); }
+    // memory ghosts
+    for (const [id, m] of view.memory) {
+      if (vis.has(id) || !onScreen(m.x, m.y, 60)) continue;
+      c.save(); c.translate(m.x, m.y); c.globalAlpha = 0.35;
+      drawBuilding(c, { def: m.def, r: S.BUILDINGS[m.def].r, built: true, id }, sim, sim.players[m.owner].color, S.FACTIONS[sim.players[m.owner].faction], z, true);
+      c.restore();
+    }
+    // buildings
+    for (const e of sim.ents) {
+      if (!e.alive || e.kind !== 'building') continue;
+      const own = e.owner === human; if (!own && !vis.has(e.id)) continue;
+      if (!onScreen(e.x, e.y, 80)) continue;
+      const p = sim.players[e.owner], fac = S.FACTIONS[p.faction];
+      c.save(); c.translate(e.x, e.y);
+      if (e.cloaked && own) c.globalAlpha = 0.55;
+      if (view.sel.has(e.id)) { c.strokeStyle = 'rgba(255,255,255,0.9)'; c.lineWidth = 2 / z; c.beginPath(); c.arc(0, 0, e.r + 6, 0, 7); c.stroke(); const d = S.BUILDINGS[e.def]; if (d.attack) { c.strokeStyle = 'rgba(255,255,255,0.18)'; c.setLineDash([4 / z, 6 / z]); c.beginPath(); c.arc(0, 0, d.attack.range, 0, 7); c.stroke(); c.setLineDash([]); } if (d.detect) { c.strokeStyle = 'rgba(127,227,161,0.3)'; c.beginPath(); c.arc(0, 0, d.detect, 0, 7); c.stroke(); } }
+      drawBuilding(c, e, sim, p.color, fac, z, false);
+      c.globalAlpha = 1;
+      if (!e.built) { c.strokeStyle = '#7FE3A1'; c.lineWidth = 3 / z; c.beginPath(); c.arc(0, 0, e.r + 5, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * e.progress); c.stroke(); }
+      if (e.jumpT > 0) { const d = S.JUMP_CHANNEL; c.strokeStyle = '#B23CFF'; c.lineWidth = 4 / z; c.beginPath(); c.arc(0, 0, e.r + 10, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (1 - e.jumpT / d)); c.stroke(); if (e.jumpTo && own) { c.setLineDash([6 / z, 6 / z]); c.strokeStyle = 'rgba(178,60,255,0.6)'; c.lineWidth = 2 / z; c.beginPath(); c.moveTo(0, 0); c.lineTo(e.jumpTo.x - e.x, e.jumpTo.y - e.y); c.stroke(); c.setLineDash([]); c.beginPath(); c.arc(e.jumpTo.x - e.x, e.jumpTo.y - e.y, e.r, 0, 7); c.stroke(); } }
+      if (own && e.queue && e.queue.length && e.built) { const it = e.queue[0]; c.strokeStyle = '#F2C230'; c.lineWidth = 2.5 / z; c.beginPath(); c.arc(0, 0, e.r + 3, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (it.t / it.total)); c.stroke(); }
+      if (e.hp < e.maxHp - 1 || view.sel.has(e.id)) hpBar(c, 0, e.r + 8, e.r * 2, e.hp / e.maxHp, p.color);
+      if (!own && S.FACTIONS[p.faction].smoke && e.def === 'reator' && e.built) { c.fillStyle = 'rgba(200,200,200,0.5)'; for (let i = 0; i < 3; i++) { const ph = (R.time * 0.4 + i / 3) % 1; c.beginPath(); c.arc(6 + Math.sin(R.time + i) * 6, -e.r - 10 - ph * 40, 4 + ph * 8, 0, 7); c.fill(); } }
+      c.restore();
+    }
+    // siphon beams
+    for (const e of sim.ents) {
+      if (!e.alive || e.kind !== 'unit' || e.state !== 'siphon') continue;
+      const t = sim.byId.get(e.target); if (!t) continue;
+      if (e.owner !== human && !vis.has(e.id) && t.owner !== human) continue;
+      if (S.dist(e.x, e.y, t.x, t.y) > S.UNITS.pirata.siphonRange + t.r + 2) continue;
+      c.save(); c.strokeStyle = 'rgba(178,60,255,0.9)'; c.lineWidth = 2.5 / z; c.setLineDash([6 / z, 5 / z]); c.lineDashOffset = -R.time * 60; c.beginPath(); c.moveTo(e.x, e.y); c.lineTo(t.x, t.y); c.stroke(); c.restore();
+      if (Math.random() < 0.3) R.fx.parts.push({ x: t.x, y: t.y, vx: (e.x - t.x) * 1.2, vy: (e.y - t.y) * 1.2, t: 0, life: 0.8, col: '#C77DFF', size: 2 });
+    }
+    // units
+    for (const e of sim.ents) {
+      if (!e.alive || e.kind !== 'unit') continue;
+      const own = e.owner === human; if (!own && !vis.has(e.id)) continue;
+      const [x, y] = lerp(e, alpha); if (!onScreen(x, y, 30)) continue;
+      const p = sim.players[e.owner];
+      c.save(); c.translate(x, y);
+      if (view.sel.has(e.id)) { c.strokeStyle = 'rgba(255,255,255,0.9)'; c.lineWidth = 1.5 / z; c.beginPath(); c.arc(0, 0, e.r + 4, 0, 7); c.stroke(); }
+      if (S.UNITS[e.def].flying) { c.fillStyle = 'rgba(0,0,0,0.35)'; c.beginPath(); c.ellipse(6, 10, e.r * 0.8, e.r * 0.4, 0, 0, 7); c.fill(); }
+      c.rotate(e.ang || 0);
+      drawUnitShape(c, e, p.color, view.sel.has(e.id), e.cloaked ? 0.5 : 1);
+      c.rotate(-(e.ang || 0));
+      if (e.cloaked && own) { c.strokeStyle = 'rgba(255,255,255,0.35)'; c.setLineDash([2 / z, 3 / z]); c.lineWidth = 1 / z; c.beginPath(); c.arc(0, 0, e.r + 3, 0, 7); c.stroke(); c.setLineDash([]); }
+      if (e.hp < e.maxHp - 0.5 || view.sel.has(e.id)) hpBar(c, 0, e.r + 5, Math.max(14, e.r * 2.4), e.hp / e.maxHp, p.color);
+      if (view.sel.has(e.id) && (e.state === 'move' || e.state === 'attackmove')) { c.strokeStyle = e.state === 'attackmove' ? 'rgba(255,94,58,0.35)' : 'rgba(255,255,255,0.2)'; c.lineWidth = 1 / z; c.setLineDash([3 / z, 5 / z]); c.beginPath(); c.moveTo(0, 0); c.lineTo(e.tx - x, e.ty - y); c.stroke(); c.setLineDash([]); }
+      c.restore();
+    }
+    // crates
+    for (const e of sim.ents) {
+      if (!e.alive || e.kind !== 'crate' || !vis.has(e.id) && !onScreen(e.x, e.y, 20)) continue;
+      if (!vis.has(e.id)) continue;
+      c.save(); c.translate(e.x, e.y); c.rotate(Math.PI / 4); c.fillStyle = '#F2C230'; c.strokeStyle = '#7A5A00'; c.lineWidth = 1.5 / z; c.fillRect(-7, -7, 14, 14); c.strokeRect(-7, -7, 14, 14); c.restore();
+      c.strokeStyle = `rgba(242,194,48,${0.4 + 0.3 * Math.sin(R.time * 4)})`; c.lineWidth = 1.5 / z; c.beginPath(); c.arc(e.x, e.y, 16, 0, 7); c.stroke();
+    }
+    // effects
+    for (const t of R.fx.tracers) { const a = 1 - t.t / t.life; c.strokeStyle = rgba(t.ambush ? '#FFFFFF' : t.col, a); c.lineWidth = (t.ambush ? 3 : 1.5) / z; c.beginPath(); c.moveTo(t.x1, t.y1); c.lineTo(t.x2, t.y2); c.stroke(); }
+    for (const p of R.fx.parts) { const a = 1 - p.t / p.life; c.fillStyle = rgba(p.col, a); c.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size); }
+    for (const r of R.fx.rings) { const k = r.t / r.life; const rr = r.r0 + (r.r1 - r.r0) * k; c.strokeStyle = rgba(r.col, (1 - k) * (r.ping ? 0.9 : 0.6)); c.lineWidth = (r.ping ? 3 : 2) / z; c.beginPath(); c.arc(r.x, r.y, rr, 0, 7); c.stroke(); }
+    // build ghost
+    if (view.ghost) {
+      const g = view.ghost; const d = S.BUILDINGS[g.def]; const col = g.ok ? '#7FE3A1' : '#FF5E3A';
+      c.save(); c.translate(g.x, g.y); c.globalAlpha = 0.75;
+      drawBuilding(c, { def: g.def, r: d.r, built: true, id: 0 }, sim, col, S.FACTIONS[me.faction], z, true);
+      c.globalAlpha = 1; c.strokeStyle = rgba(col, 0.5); c.lineWidth = 1.5 / z; c.setLineDash([6 / z, 4 / z]);
+      if (d.territory) { c.beginPath(); c.arc(0, 0, d.territory, 0, 7); c.stroke(); }
+      if (d.attack) { c.beginPath(); c.arc(0, 0, d.attack.range, 0, 7); c.stroke(); }
+      c.restore();
+    }
+    if (view.marker) { const m = view.marker; const k = Math.min(1, (R.time - m.t) / 0.6); if (k < 1) { c.strokeStyle = rgba(m.col, 1 - k); c.lineWidth = 2 / z; c.beginPath(); c.arc(m.x, m.y, 6 + 24 * (1 - k), 0, 7); c.stroke(); } }
+    c.restore();
+
+    // fog (screen space)
+    fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.globalCompositeOperation = 'source-over';
+    fctx.clearRect(0, 0, fog.width, fog.height);
+    fctx.fillStyle = me.blackoutT > 0 ? 'rgba(4,4,8,0.93)' : 'rgba(6,8,12,0.84)'; fctx.fillRect(0, 0, fog.width, fog.height);
+    fctx.globalCompositeOperation = 'destination-out';
+    fctx.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
+    for (const e of sim.ents) {
+      if (!e.alive || e.owner !== human) continue;
+      const rad = S.sensorRadius(sim, e); if (!onScreen(e.x, e.y, rad)) continue;
+      const [sx, sy] = R.worldToScreen(cam, e.x, e.y); const sr = rad * z;
+      const g = fctx.createRadialGradient(sx, sy, sr * 0.7, sx, sy, sr); g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+      fctx.fillStyle = g; fctx.beginPath(); fctx.arc(sx, sy, sr, 0, 7); fctx.fill();
+    }
+    c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(fog, 0, 0); c.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
+    // smoke of enemy Vehnar reactors is drawn above fog (always visible)
+    c.save(); c.translate(W / 2, H / 2); c.scale(z, z); c.translate(-cam.x, -cam.y);
+    for (const e of sim.ents) {
+      if (!e.alive || e.kind !== 'building' || e.def !== 'reator' || !e.built || e.owner === human) continue;
+      if (!S.FACTIONS[sim.players[e.owner].faction].smoke || vis.has(e.id) && false) continue;
+      if (!onScreen(e.x, e.y, 60)) continue;
+      c.fillStyle = 'rgba(190,190,200,0.45)';
+      for (let i = 0; i < 3; i++) { const ph = (R.time * 0.4 + i / 3 + e.id * 0.1) % 1; c.beginPath(); c.arc(e.x + 6 + Math.sin(R.time + i) * 6, e.y - e.r - 10 - ph * 40, 4 + ph * 8, 0, 7); c.fill(); }
+    }
+    // nodes outside vision: faint map knowledge above the fog
+    for (const e of sim.ents) {
+      if (!e.alive || e.kind !== 'node' || !onScreen(e.x, e.y, 30)) continue;
+      let seen = false; for (const o of sim.ents) { if (o.alive && o.owner === human && S.dist(o.x, o.y, e.x, e.y) <= S.sensorRadius(sim, o)) { seen = true; break; } }
+      if (seen) continue;
+      c.save(); c.translate(e.x, e.y); c.globalAlpha = 0.28; drawNode(c, e, z); c.restore();
+    }
+    // floats above fog
+    for (const f of R.fx.floats) { const k = f.t / f.life; c.fillStyle = rgba(f.col, 1 - k); c.font = `bold ${13 / z}px IBM Plex Mono, monospace`; c.textAlign = 'center'; c.fillText(f.text, f.x, f.y - 14 - k * 30); }
+    c.restore();
+    // box selection
+    if (view.box) { const b = view.box; c.strokeStyle = 'rgba(255,255,255,0.8)'; c.fillStyle = 'rgba(255,255,255,0.08)'; c.lineWidth = 1; c.fillRect(b.x0, b.y0, b.x1 - b.x0, b.y1 - b.y0); c.strokeRect(b.x0, b.y0, b.x1 - b.x0, b.y1 - b.y0); }
+    // regime vignette
+    const reg = me.energy.regime;
+    if (reg !== 'pleno') {
+      const col = reg === 'colapso' ? '255,94,58' : '242,194,48'; const a = reg === 'colapso' ? 0.25 + 0.15 * Math.sin(R.time * 5) : 0.15;
+      const g = c.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.75); g.addColorStop(0, `rgba(${col},0)`); g.addColorStop(1, `rgba(${col},${a})`);
+      c.fillStyle = g; c.fillRect(0, 0, W, H);
+    }
+    drawMinimap(sim, view);
+  };
+
+  function drawMinimap(sim, view) {
+    const c = mctx; const size = mini.width; const s = size / S.WORLD; const human = view.human; const vis = sim.vis[human];
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.fillStyle = '#0B0D11'; c.fillRect(0, 0, size, size);
+    c.fillStyle = 'rgba(255,94,58,0.35)'; c.beginPath(); c.arc(S.CX * s, S.CY * s, S.RIFT_R * 2 * s, 0, 7); c.fill();
+    c.fillStyle = '#07060A'; c.beginPath(); c.arc(S.CX * s, S.CY * s, S.RIFT_R * s, 0, 7); c.fill();
+    for (const e of sim.ents) {
+      if (!e.alive) continue;
+      if (e.kind === 'node') { c.fillStyle = NODE_COLOR[e.res]; c.fillRect(e.x * s - 1.5, e.y * s - 1.5, 3, 3); continue; }
+      const own = e.owner === human; const seen = own || vis.has(e.id) || (e.kind === 'building' && view.memory.has(e.id));
+      if (!seen) continue;
+      const col = sim.players[e.owner].color;
+      if (e.kind === 'building') { const t = S.BUILDINGS[e.def].territory; if (t && e.built) { c.fillStyle = rgba(col, 0.08); c.beginPath(); c.arc(e.x * s, e.y * s, t * s, 0, 7); c.fill(); } c.fillStyle = col; const r = e.def === 'nucleo' ? 4 : 2.5; c.fillRect(e.x * s - r, e.y * s - r, r * 2, r * 2); }
+      else if (e.kind === 'unit') { c.fillStyle = col; c.fillRect(e.x * s - 1, e.y * s - 1, 2, 2); }
+    }
+    for (const [id, m] of view.memory) if (!vis.has(id)) { c.fillStyle = rgba(sim.players[m.owner].color, 0.5); c.fillRect(m.x * s - 2, m.y * s - 2, 4, 4); }
+    // fog on minimap
+    mfctx.setTransform(1, 0, 0, 1, 0, 0); mfctx.globalCompositeOperation = 'source-over'; mfctx.clearRect(0, 0, size, size);
+    mfctx.fillStyle = 'rgba(6,8,12,0.7)'; mfctx.fillRect(0, 0, size, size); mfctx.globalCompositeOperation = 'destination-out';
+    for (const e of sim.ents) { if (!e.alive || e.owner !== human) continue; const r = S.sensorRadius(sim, e) * s; mfctx.beginPath(); mfctx.arc(e.x * s, e.y * s, r, 0, 7); mfctx.fill(); }
+    c.drawImage(mfog, 0, 0);
+    // pings
+    for (const r of R.fx.rings) if (r.ping) { const k = r.t / r.life; c.strokeStyle = rgba(r.col, 1 - k); c.lineWidth = 1.5; c.beginPath(); c.arc(r.x * s, r.y * s, 3 + 10 * k, 0, 7); c.stroke(); }
+    // camera rect
+    const cam = view.cam; const vw = R.w / cam.zoom, vh = R.h / cam.zoom;
+    c.strokeStyle = 'rgba(255,255,255,0.7)'; c.lineWidth = 1; c.strokeRect((cam.x - vw / 2) * s, (cam.y - vh / 2) * s, vw * s, vh * s);
+  }
+  return R;
+}
+ARD.render = { create, NODE_COLOR, rgba, shade };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Entrada: mouse, teclado e toque → comandos para a simulação e estado de visão (câmera, seleção, modos). */
+(function (ARD) {
+'use strict';
+const S = ARD.sim;
+
+function create(o) {
+  const { canvas, sim, view, R, human, ui } = o;
+  const I = { keys: new Set(), pointers: new Map(), down: null, lastTap: 0, lastClickId: null, lastClickT: 0, groups: {}, longPress: null, pinch: null, mode: 'normal', touchBox: false };
+  const cam = view.cam;
+
+  function clampCam() { cam.zoom = Math.max(0.3, Math.min(1.8, cam.zoom)); const m = 200; cam.x = Math.max(-m, Math.min(S.WORLD + m, cam.x)); cam.y = Math.max(-m, Math.min(S.WORLD + m, cam.y)); }
+  I.center = function (x, y) { cam.x = x; cam.y = y; clampCam(); };
+  I.setMode = function (mode, data) {
+    I.mode = mode; view.mode = mode; view.ghost = null;
+    if (mode === 'build') { view.ghost = { def: data, x: cam.x, y: cam.y, ok: false }; updateGhost(I.lastSX || R.w / 2, I.lastSY || R.h / 2); }
+    canvas.style.cursor = mode === 'normal' ? 'default' : 'crosshair';
+    ui.modeChanged(mode, data);
+  };
+  function updateGhost(sx, sy) { if (!view.ghost) return; const [wx, wy] = R.screenToWorld(cam, sx, sy); view.ghost.x = wx; view.ghost.y = wy; view.ghost.ok = S.canBuild(sim, human, view.ghost.def, wx, wy).ok && S.canAfford(sim.players[human], S.BUILDINGS[view.ghost.def].cost); }
+
+  function pick(wx, wy, radiusPx) {
+    const vis = sim.vis[human]; let best = null, bd = Infinity; const slack = radiusPx / cam.zoom;
+    for (const e of sim.ents) {
+      if (!e.alive) continue;
+      if (e.kind !== 'node' && e.owner !== human && !vis.has(e.id)) continue;
+      const d = S.dist(wx, wy, e.x, e.y) - e.r; if (d > slack) continue;
+      const pri = e.kind === 'unit' ? 0 : e.kind === 'crate' ? 1 : e.kind === 'building' ? 2 : 3;
+      const sc = d + pri * 5; if (sc < bd) { bd = sc; best = e; }
+    }
+    return best;
+  }
+  function ownSelectedUnits() { const out = []; for (const id of view.sel) { const e = sim.byId.get(id); if (e && e.alive && e.kind === 'unit' && e.owner === human) out.push(e); } return out; }
+  function ownSelectedBuilding() { for (const id of view.sel) { const e = sim.byId.get(id); if (e && e.alive && e.kind === 'building' && e.owner === human) return e; } return null; }
+  function setSel(ids) { view.sel = new Set(ids); ui.selectionChanged(); }
+  I.select = setSel;
+  function cmd(c) { c.p = human; S.enqueue(sim, c); }
+  I.cmd = cmd;
+
+  function contextCommand(wx, wy, sx, sy) {
+    const units = ownSelectedUnits(); const t = pick(wx, wy, I.lastType === 'touch' ? 22 : 10);
+    if (!units.length) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice('Ponto de reunião definido'); } return; }
+    const ids = units.map(u => u.id);
+    if (t && t.kind === 'node') { cmd({ t: 'harvest', ids, target: t.id }); view.marker = { x: t.x, y: t.y, t: R.time, col: '#7FE3A1' }; return; }
+    if (t && t.kind === 'crate') { cmd({ t: 'pickup', ids, target: t.id }); view.marker = { x: t.x, y: t.y, t: R.time, col: '#F2C230' }; return; }
+    if (t && t.owner >= 0 && t.owner !== human) {
+      const doIt = () => {
+        const pirates = units.filter(u => u.def === 'pirata'); const others = units.filter(u => u.def !== 'pirata');
+        if (pirates.length && t.kind === 'building' && (t.def === 'refinaria' || t.def === 'reator')) cmd({ t: 'siphon', ids: pirates.map(u => u.id), target: t.id });
+        else if (pirates.length) cmd({ t: 'move', ids: pirates.map(u => u.id), x: t.x, y: t.y });
+        if (others.length) cmd({ t: 'attack', ids: others.map(u => u.id), target: t.id });
+        view.marker = { x: t.x, y: t.y, t: R.time, col: '#FF5E3A' };
+      };
+      if (S.hasPact(sim, human, t.owner)) ui.confirm('Atacar ' + sim.players[t.owner].name + ' quebra o pacto de Não-agressão: você perde a Caução, ganha +20% de dano por 45 s e sua Reputação cai. Quebrar?', () => { cmd({ t: 'break', with: t.owner }); doIt(); });
+      else doIt();
+      return;
+    }
+    cmd({ t: 'move', ids, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#E8E2D6' };
+  }
+  function primaryAction(wx, wy, sx, sy, shift) {
+    const mode = I.mode;
+    if (mode === 'build' && view.ghost) {
+      const g = view.ghost; const ok = S.canBuild(sim, human, g.def, g.x, g.y);
+      if (!ok.ok) { ui.notice(ok.why); return; }
+      if (!S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost)) { ui.notice('Recursos insuficientes'); return; }
+      cmd({ t: 'build', def: g.def, x: g.x, y: g.y }); view.marker = { x: g.x, y: g.y, t: R.time, col: '#7FE3A1' };
+      if (!shift) I.setMode('normal'); else updateGhost(sx, sy);
+      return;
+    }
+    if (mode === 'attackmove') {
+      const units = ownSelectedUnits(); const t = pick(wx, wy, 10);
+      if (units.length) {
+        if (t && t.owner >= 0 && t.owner !== human) contextCommand(wx, wy, sx, sy);
+        else { cmd({ t: 'attackmove', ids: units.map(u => u.id), x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#FF5E3A' }; }
+      }
+      if (!shift) I.setMode('normal'); return;
+    }
+    if (mode === 'super') { cmd({ t: 'super', x: wx, y: wy }); I.setMode('normal'); return; }
+    if (mode === 'jump') { ui.confirm('Saltar o Núcleo para este ponto? Custa ' + Math.round(S.FACTIONS[sim.players[human].faction].jumpCostFrac * 100) + '% de cada recurso e 60 s de canalização visível a todos.', () => cmd({ t: 'jump', x: wx, y: wy })); I.setMode('normal'); return; }
+    if (mode === 'rally') { const b = ownSelectedBuilding(); if (b) cmd({ t: 'rally', id: b.id, x: wx, y: wy }); I.setMode('normal'); return; }
+    // normal: select
+    const t = pick(wx, wy, I.lastType === 'touch' ? 20 : 8);
+    const now = performance.now();
+    if (t && t.kind !== 'node' && t.kind !== 'crate') {
+      if (t.owner === human && t.kind === 'unit' && I.lastClickId === t.id && now - I.lastClickT < 350) {
+        // double click: all same type on screen
+        const ids = []; for (const e of sim.ents) if (e.alive && e.owner === human && e.kind === 'unit' && e.def === t.def) { const [sx2, sy2] = R.worldToScreen(cam, e.x, e.y); if (sx2 >= 0 && sy2 >= 0 && sx2 <= R.w && sy2 <= R.h) ids.push(e.id); }
+        setSel(ids);
+      } else if (shift && t.owner === human) { const s = new Set(view.sel); if (s.has(t.id)) s.delete(t.id); else s.add(t.id); setSel([...s]); }
+      else setSel([t.id]);
+      I.lastClickId = t.id; I.lastClickT = now;
+    } else if (t && t.kind === 'node') { setSel([t.id]); }
+    else if (!shift) setSel([]);
+  }
+  function boxSelect(b, shift) {
+    const x0 = Math.min(b.x0, b.x1), x1 = Math.max(b.x0, b.x1), y0 = Math.min(b.y0, b.y1), y1 = Math.max(b.y0, b.y1);
+    const ids = shift ? [...view.sel] : [];
+    let anyUnit = false;
+    for (const e of sim.ents) {
+      if (!e.alive || e.owner !== human || e.kind !== 'unit') continue;
+      const [sx, sy] = R.worldToScreen(cam, e.x, e.y); if (sx >= x0 && sx <= x1 && sy >= y0 && sy <= y1) { ids.push(e.id); anyUnit = true; }
+    }
+    if (!anyUnit && !shift) { // allow box-selecting a single building
+      for (const e of sim.ents) { if (!e.alive || e.owner !== human || e.kind !== 'building') continue; const [sx, sy] = R.worldToScreen(cam, e.x, e.y); if (sx >= x0 && sx <= x1 && sy >= y0 && sy <= y1) { ids.push(e.id); break; } }
+    }
+    // prefer combat units over collectors when both present
+    const ents = ids.map(id => sim.byId.get(id)).filter(Boolean);
+    const combat = ents.filter(e => e.kind === 'unit' && e.def !== 'coletor');
+    setSel((combat.length && ents.some(e => e.def === 'coletor') ? combat : ents).map(e => e.id));
+  }
+
+  // ---- pointer events
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+  canvas.addEventListener('pointerdown', e => {
+    canvas.setPointerCapture(e.pointerId);
+    I.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, type: e.pointerType });
+    const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top;
+    if (I.pointers.size === 2) { const pts = [...I.pointers.values()]; I.pinch = { d: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y), zoom: cam.zoom, cx: (pts[0].x + pts[1].x) / 2, cy: (pts[0].y + pts[1].y) / 2, camx: cam.x, camy: cam.y }; I.down = null; view.box = null; clearTimeout(I.longPress); return; }
+    I.lastType = e.pointerType;
+    I.down = { sx, sy, button: e.button, type: e.pointerType, moved: false, camx: cam.x, camy: cam.y, shift: e.shiftKey, t: performance.now() };
+    if (e.pointerType === 'touch') { clearTimeout(I.longPress); I.longPress = setTimeout(() => { if (I.down && !I.down.moved) { const [wx, wy] = R.screenToWorld(cam, sx, sy); if (I.mode === 'normal') contextCommand(wx, wy, sx, sy); I.down = null; if (navigator.vibrate) navigator.vibrate(15); } }, 450); }
+  });
+  canvas.addEventListener('pointermove', e => {
+    const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top; I.lastSX = sx; I.lastSY = sy;
+    const p = I.pointers.get(e.pointerId); if (p) { p.x = e.clientX; p.y = e.clientY; }
+    if (I.pinch && I.pointers.size === 2) { const pts = [...I.pointers.values()]; const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y); const cx = (pts[0].x + pts[1].x) / 2, cy = (pts[0].y + pts[1].y) / 2; cam.zoom = I.pinch.zoom * (d / I.pinch.d); clampCam(); cam.x = I.pinch.camx - (cx - I.pinch.cx) / cam.zoom; cam.y = I.pinch.camy - (cy - I.pinch.cy) / cam.zoom; clampCam(); return; }
+    if (view.ghost) updateGhost(sx, sy);
+    const d = I.down; if (!d) { const t = pick(...R.screenToWorld(cam, sx, sy), 8); view.hover = t ? t.id : null; return; }
+    if (!d.moved && Math.hypot(sx - d.sx, sy - d.sy) > 7) { d.moved = true; clearTimeout(I.longPress); }
+    if (!d.moved) return;
+    const panning = d.button === 1 || (d.type === 'touch' && !I.touchBox) || (d.button === 0 && I.keys.has('Space'));
+    if (panning) { cam.x = d.camx - (sx - d.sx) / cam.zoom; cam.y = d.camy - (sy - d.sy) / cam.zoom; clampCam(); view.box = null; }
+    else if (d.button === 0 && I.mode === 'normal') view.box = { x0: d.sx, y0: d.sy, x1: sx, y1: sy };
+  });
+  function endPointer(e) {
+    I.pointers.delete(e.pointerId);
+    if (I.pointers.size < 2) I.pinch = null;
+    clearTimeout(I.longPress);
+    const d = I.down; if (!d) return; I.down = null;
+    const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top;
+    const [wx, wy] = R.screenToWorld(cam, sx, sy);
+    if (view.box) { const b = view.box; view.box = null; boxSelect(b, d.shift); return; }
+    if (d.moved) return;
+    if (d.button === 2) { if (I.mode !== 'normal') I.setMode('normal'); else contextCommand(wx, wy, sx, sy); return; }
+    if (d.button === 0) {
+      if (d.type === 'touch' && I.touchBox) { I.touchBox = false; ui.touchBoxChanged(false); }
+      primaryAction(wx, wy, sx, sy, d.shift);
+    }
+  }
+  canvas.addEventListener('pointerup', endPointer);
+  canvas.addEventListener('pointercancel', e => { I.pointers.delete(e.pointerId); I.pinch = null; I.down = null; view.box = null; clearTimeout(I.longPress); });
+  canvas.addEventListener('wheel', e => { e.preventDefault(); const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top; const [wx, wy] = R.screenToWorld(cam, sx, sy); const f = Math.exp(-e.deltaY * 0.0012); cam.zoom *= f; clampCam(); const [wx2, wy2] = R.screenToWorld(cam, sx, sy); cam.x += wx - wx2; cam.y += wy - wy2; clampCam(); if (view.ghost) updateGhost(sx, sy); }, { passive: false });
+
+  // ---- keyboard
+  const PROD_KEYS = {}; for (const k in S.UNITS) PROD_KEYS[S.UNITS[k].key] = k;
+  const BUILD_KEYS = {}; for (const k in S.BUILDINGS) if (S.BUILDINGS[k].key) BUILD_KEYS[S.BUILDINGS[k].key] = k;
+  I.buildMenu = false;
+  window.addEventListener('keydown', e => {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) return;
+    if (ui.modalOpen()) { if (e.code === 'Escape') ui.closeModals(); return; }
+    I.keys.add(e.code);
+    const k = e.key.toUpperCase();
+    if (e.code === 'Escape') { if (I.mode !== 'normal') I.setMode('normal'); else if (I.buildMenu) { I.buildMenu = false; ui.buildMenuChanged(false); } else setSel([]); return; }
+    if (e.code === 'Space') { e.preventDefault(); if (view.lastAlert) I.center(view.lastAlert.x, view.lastAlert.y); return; }
+    if (e.code === 'F1') { e.preventDefault(); const n = S.nucleoOf(sim, human); if (n) { setSel([n.id]); I.center(n.x, n.y); } return; }
+    if (e.code === 'F2') { e.preventDefault(); const ids = []; for (const en of sim.ents) if (en.alive && en.owner === human && en.kind === 'unit' && S.UNITS[en.def].attack) ids.push(en.id); setSel(ids); return; }
+    if (/^Digit[0-9]$/.test(e.code)) { const n = e.code.slice(5); if (e.ctrlKey || e.metaKey) { e.preventDefault(); I.groups[n] = [...view.sel]; ui.notice('Grupo ' + n + ' definido'); } else { const g = (I.groups[n] || []).filter(id => { const en = sim.byId.get(id); return en && en.alive; }); if (g.length) { setSel(g); const now = performance.now(); if (I.lastGroupKey === n && now - I.lastGroupT < 400) { const en = sim.byId.get(g[0]); if (en) I.center(en.x, en.y); } I.lastGroupKey = n; I.lastGroupT = now; } } return; }
+    if (k === 'B' && !e.ctrlKey) { I.buildMenu = !I.buildMenu; ui.buildMenuChanged(I.buildMenu); return; }
+    if (I.buildMenu && BUILD_KEYS[k]) { I.buildMenu = false; ui.buildMenuChanged(false); I.setMode('build', BUILD_KEYS[k]); return; }
+    const b = ownSelectedBuilding(); const units = ownSelectedUnits();
+    if (b && !units.length && S.BUILDINGS[b.def].produces && PROD_KEYS[k] && S.BUILDINGS[b.def].produces.includes(PROD_KEYS[k])) { cmd({ t: 'produce', id: b.id, def: PROD_KEYS[k] }); return; }
+    if (k === 'A' && units.length) { I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'); return; }
+    if (k === 'S' && units.length) { cmd({ t: 'stop', ids: units.map(u => u.id) }); return; }
+    if (k === 'F' && view.sel.size) { const en = sim.byId.get([...view.sel][0]); if (en) I.center(en.x, en.y); return; }
+    if (k === 'H' || e.key === '?') { ui.toggleHelp(); return; }
+    if (k === 'P') { if (!(b && S.BUILDINGS[b.def].produces && S.BUILDINGS[b.def].produces.includes('pirata'))) ui.togglePause(); return; }
+    if (e.key === '+' || e.key === '=') { cam.zoom *= 1.15; clampCam(); } if (e.key === '-') { cam.zoom /= 1.15; clampCam(); }
+  });
+  window.addEventListener('keyup', e => I.keys.delete(e.code));
+  window.addEventListener('blur', () => I.keys.clear());
+
+  I.update = function (dt) {
+    const sp = 900 * dt / cam.zoom; let dx = 0, dy = 0;
+    if (I.keys.has('KeyW') || I.keys.has('ArrowUp')) dy -= 1; if (I.keys.has('KeyS') && !ownSelectedUnits().length || I.keys.has('ArrowDown')) dy += 1;
+    if (I.keys.has('KeyA') && !ownSelectedUnits().length || I.keys.has('ArrowLeft')) dx -= 1; if (I.keys.has('KeyD') || I.keys.has('ArrowRight')) dx += 1;
+    // edge pan (mouse only, when pointer inside canvas)
+    if (I.lastSX != null && !I.down && I.pointers.size === 0 && I.edgePanEnabled) { const m = 18; if (I.lastSX < m) dx -= 0.7; if (I.lastSX > R.w - m) dx += 0.7; if (I.lastSY < m) dy -= 0.7; if (I.lastSY > R.h - m) dy += 0.7; }
+    if (dx || dy) { cam.x += dx * sp; cam.y += dy * sp; clampCam(); if (view.ghost) updateGhost(I.lastSX || R.w / 2, I.lastSY || R.h / 2); }
+  };
+  canvas.addEventListener('pointerenter', e => { I.edgePanEnabled = e.pointerType === 'mouse'; });
+  canvas.addEventListener('pointerleave', () => { I.edgePanEnabled = false; I.lastSX = null; I.lastSY = null; });
+  return I;
+}
+ARD.input = { create };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Bootstrap: tela inicial, laço de jogo, HUD, diplomacia, dicas e tela final. */
+(function (ARD) {
+'use strict';
+const S = ARD.sim;
+const $ = id => document.getElementById(id);
+const fmt = n => Math.floor(n).toLocaleString('pt-BR');
+const mmss = t => { t = Math.max(0, Math.floor(t)); return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
+const esc = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+const RES_ICON = { plasma: '◆', minerio: '▣', dados: '◈' };
+const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
+function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
+
+const params = new URLSearchParams(location.search);
+let G = null; // game state
+
+function loadPrefs() { try { return JSON.parse(localStorage.getItem('ard-beta-prefs') || '{}') || {}; } catch (e) { return {}; } }
+function savePrefs(p) { try { localStorage.setItem('ard-beta-prefs', JSON.stringify(p)); } catch (e) {} }
+
+// ---------- start screen ----------
+function initStart() {
+  const prefs = loadPrefs();
+  const facWrap = $('fac-cards'); facWrap.innerHTML = '';
+  for (const id of ['vehnar', 'erevane']) {
+    const f = S.FACTIONS[id];
+    const el = document.createElement('label'); el.className = 'fac-card'; el.dataset.id = id;
+    el.innerHTML = `<input type="radio" name="fac" value="${id}" ${((prefs.faction || 'vehnar') === id) ? 'checked' : ''}><div class="fac-name">${f.name}</div><div class="fac-tag">${f.tagline}</div><div class="fac-sup"><b>Superarma:</b> ${f.superName}. <b>Pirata:</b> ${f.pirateName}.</div>`;
+    facWrap.appendChild(el);
+  }
+  $('opt-name').value = prefs.name || 'Comandante';
+  $('opt-opp').value = prefs.opp || '2';
+  $('opt-diff').value = prefs.diff || 'normal';
+  $('opt-seed').value = params.get('seed') || String(Math.floor(Math.random() * 90000) + 1000);
+  $('btn-start').addEventListener('click', () => {
+    const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar';
+    const cfg = { name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1 };
+    savePrefs(cfg); startGame(cfg);
+  });
+  $('btn-help-start').addEventListener('click', () => toggleHelp(true));
+  if (params.get('autostart')) { startGame({ name: 'Teste', faction: params.get('faction') || 'erevane', opp: params.get('opp') || '2', diff: params.get('diff') || 'normal', seed: parseInt(params.get('seed') || '5', 10) }); }
+}
+
+// ---------- game ----------
+function startGame(cfg) {
+  const players = [{ name: cfg.name, faction: cfg.faction, human: true }];
+  const facs = ['vehnar', 'erevane'];
+  const aiNames = { vehnar: ['Fundição Kessari', 'Consórcio Oryn', 'Estaleiro Vey'], erevane: ['Clã Sombrio', 'Náufragos de Ísk', 'Corsários da Faixa'] };
+  for (let i = 0; i < parseInt(cfg.opp, 10); i++) { const f = facs[(i + (cfg.faction === 'vehnar' ? 1 : 0)) % 2]; players.push({ name: aiNames[f][i % 3], faction: f, difficulty: cfg.diff }); }
+  const sim = S.createSim({ seed: cfg.seed, players, minutes: 25 });
+  const human = 0;
+  const canvas = $('world'), mini = $('minimap');
+  $('start').hidden = true; $('game').hidden = false; $('end').hidden = true;
+  const R = ARD.render.create(canvas, mini); R.resize();
+  const nuc = S.nucleoOf(sim, human);
+  const isTouch = matchMedia('(pointer: coarse)').matches || !!params.get('touch');
+  const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.55 : 0.8 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
+  const ui = makeUI(); // closures below
+  const I = ARD.input.create({ canvas, sim, view, R, human, ui });
+  const ais = sim.players.filter(p => !p.human).map(p => ARD.ai.create(p.id, p.difficulty));
+  G = { sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null };
+  window.addEventListener('resize', () => R.resize());
+  document.body.classList.toggle('touch', isTouch);
+
+  // fast-forward for tests
+  const ff = parseInt(params.get('ff') || '0', 10);
+  for (let i = 0; i < ff * 10; i++) tickOnce(true);
+  if (params.get('speed')) G.speed = parseFloat(params.get('speed')) || 1;
+
+  bindHUD();
+  refreshPanel(); refreshTop(); refreshHints(); refreshQuick();
+  requestAnimationFrame(frame);
+
+  function tickOnce(silent) {
+    const sim = G.sim;
+    if (sim.tick % 10 === 0) for (const a of G.ais) for (const c of ARD.ai.think(sim, a)) S.enqueue(sim, c);
+    const ev = S.step(sim);
+    if (!silent) G.R.onEvents(ev, sim, human);
+    handleEvents(ev, silent);
+    if (sim.tick % 10 === 0) updateMemory();
+  }
+  function frame(now) {
+    if (!G || G.sim !== sim) return;
+    let dt = Math.min(0.25, (now - G.last) / 1000); G.last = now;
+    if (!G.paused && !G.ended) { G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { tickOnce(false); G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; }
+    I.update(dt);
+    if (G.frameN % 3 === 0) refreshTop();
+    if (G.frameN++ % 6 === 0) { refreshPanel(false); refreshQuick(); }
+    if (G.frameN % 30 === 0) refreshHints();
+    R.draw(sim, view, G.paused ? 1 : Math.min(1, G.acc / S.TICK), dt);
+    requestAnimationFrame(frame);
+  }
+  G.frameN = 0;
+
+  function updateMemory() {
+    const vis = sim.vis[human];
+    for (const id of vis) { const e = sim.byId.get(id); if (e && e.alive && e.kind === 'building') view.memory.set(id, { x: e.x, y: e.y, def: e.def, owner: e.owner }); }
+    // forget buildings that are gone once we can see the spot again
+    const own = S.entitiesOf(sim, human);
+    for (const [id, m] of view.memory) {
+      const e = sim.byId.get(id);
+      if (e && e.alive) { if (vis.has(id)) view.memory.set(id, { x: e.x, y: e.y, def: e.def, owner: e.owner }); continue; }
+      let seen = false; for (const o of own) { if (S.dist(o.x, o.y, m.x, m.y) <= S.sensorRadius(sim, o)) { seen = true; break; } }
+      if (seen) view.memory.delete(id);
+    }
+  }
+
+  function handleEvents(ev, silent) {
+    for (const e of ev) {
+      if (e.t === 'alert' && e.p === human) { if (e.x != null) view.lastAlert = { x: e.x, y: e.y }; if (!silent) pushAlert(e); }
+      else if (e.t === 'notice' && e.p === human && !silent) notice(e.text);
+      else if (e.t === 'proposal' && e.p === human && !silent) { G.pendingFor = e.from; showProposal(e.from); }
+      else if (e.t === 'end') endGame(e.result);
+      else if (e.t === 'regime' && e.p === human && !silent) notice('Energia: ' + S.REGIME[e.regime].name);
+    }
+  }
+  function pushAlert(e) {
+    const list = $('alerts'); const el = document.createElement('button'); el.className = 'alert ' + (e.kind || 'info'); el.type = 'button';
+    el.innerHTML = `<span class="t">${mmss(sim.time)}</span><span class="m">${esc(e.text)}</span>`;
+    if (e.x != null) el.addEventListener('click', () => I.center(e.x, e.y)); else el.disabled = true;
+    list.prepend(el); while (list.children.length > 6) list.lastChild.remove();
+    setTimeout(() => { el.classList.add('fade'); }, 9000); setTimeout(() => el.remove(), 14000);
+    const log = $('log'); const li = document.createElement('div'); li.textContent = mmss(sim.time) + ' · ' + e.text; log.prepend(li); while (log.children.length > 40) log.lastChild.remove();
+  }
+  function notice(text) { const n = $('notice'); n.textContent = text; n.classList.add('show'); clearTimeout(G.noticeT); G.noticeT = setTimeout(() => n.classList.remove('show'), 2200); }
+
+  // ---------- HUD ----------
+  function refreshTop() {
+    const p = sim.players[human];
+    $('r-plasma').textContent = fmt(p.res.plasma); $('r-minerio').textContent = fmt(p.res.minerio); $('r-dados').textContent = fmt(p.res.dados);
+    const en = p.energy; const reg = $('energy'); reg.className = 'energy ' + en.regime;
+    $('e-text').textContent = `${Math.round(en.prod)} / ${Math.round(en.cons)}`; $('e-regime').textContent = S.REGIME[en.regime].name + (p.overchargeT > 0 ? ' · Sobrecarga' : '') + (p.blackoutT > 0 ? ' · BLECAUTE' : '');
+    $('e-bar').style.width = Math.min(100, en.ratio * 100 / 1.5) + '%';
+    $('clock').textContent = mmss(sim.time) + ' / ' + mmss(sim.maxTime);
+    $('rep').textContent = S.REP_NAMES[p.rep];
+    for (const b of document.querySelectorAll('[data-speed]')) b.classList.toggle('on', parseFloat(b.dataset.speed) === G.speed && !G.paused);
+    $('btn-pause').classList.toggle('on', G.paused);
+  }
+  function selectionSummary() {
+    const ents = [...view.sel].map(id => sim.byId.get(id)).filter(e => e && e.alive);
+    if (ents.length !== view.sel.size) view.sel = new Set(ents.map(e => e.id));
+    return ents;
+  }
+  function refreshPanel(force) {
+    const ents = selectionSummary();
+    const key = ents.map(e => e.id + ':' + Math.round(e.hp) + ':' + (e.queue ? e.queue.length + ':' + (e.queue[0] ? Math.floor(e.queue[0].t) : '') : '') + ':' + (e.built ? 1 : Math.floor(e.progress * 20)) + ':' + (e.amount != null ? Math.floor(e.amount) : '')).join('|') + '|' + I.buildMenu + '|' + I.mode + '|' + Object.keys(sim.players[human].research).length;
+    if (!force && key === G.selKey) return; G.selKey = key;
+    const panel = $('panel'); const p = sim.players[human]; const fac = S.FACTIONS[p.faction];
+    if (!ents.length || I.buildMenu) { panel.innerHTML = buildMenuHTML(p); bindBuildMenu(); return; }
+    const e = ents[0];
+    if (e.kind === 'node') { panel.innerHTML = `<div class="ph"><span class="dot" style="background:${ARD.render.NODE_COLOR[e.res]}"></span><b>Nó de ${RES_NAME[e.res]}</b></div><div class="muted">${fmt(e.amount)} / ${fmt(e.max)} restantes</div><div class="muted small">Coletores colhem automaticamente nós dentro do seu território. Clique direito com coletores para colher manualmente.</div>`; return; }
+    if (e.owner !== human) {
+      const q = sim.players[e.owner]; const d = e.kind === 'unit' ? S.UNITS[e.def] : S.BUILDINGS[e.def];
+      panel.innerHTML = `<div class="ph"><span class="dot" style="background:${q.color}"></span><b>${esc(d.name)}</b> <span class="muted">· ${esc(q.name)} (${S.FACTIONS[q.faction].short})</span></div><div class="hp"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="muted small">${fmt(e.hp)} / ${fmt(e.maxHp)} · ${e.kind === 'unit' ? S.CLASS_NAMES[e.cls] : 'Estrutura'} · ${S.hasPact(sim, human, e.owner) ? 'Em pacto de Não-agressão' : 'Inimigo'}</div>${e.kind === 'building' && (e.def === 'refinaria' || e.def === 'reator') ? '<div class="tip">Alvo de Sifão: selecione um Pirata e clique com o botão direito aqui.</div>' : ''}`;
+      return;
+    }
+    if (e.kind === 'building' && ents.length === 1) {
+      const d = S.BUILDINGS[e.def]; let h = `<div class="ph"><span class="dot" style="background:${p.color}"></span><b>${esc(d.name)}</b></div><div class="hp"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="muted small">${fmt(e.hp)} / ${fmt(e.maxHp)}${e.built ? '' : ' · construção ' + Math.round(e.progress * 100) + '%'}${d.energyProd ? ' · +' + d.energyProd + ' energia' : ''}${d.energyUse ? ' · −' + d.energyUse + ' energia' : ''}</div><div class="muted small">${esc(d.desc)}</div>`;
+      if (e.built && d.produces) {
+        h += '<div class="grid">';
+        for (const ud of d.produces) { const u = S.UNITS[ud]; const name = ud === 'pirata' ? fac.pirateName : u.name; h += `<button class="act" data-prod="${ud}" title="${esc(u.desc)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span></button>`; }
+        h += '</div>';
+        if (e.queue.length) { h += '<div class="queue">'; e.queue.forEach((q, i) => { h += `<button class="q" data-cancel="${i}" title="Cancelar">${esc(S.UNITS[q.def].name)}${i === 0 ? ` <i>${Math.round(100 * q.t / q.total)}%</i>` : ''} ✕</button>`; }); h += '</div>'; }
+        h += `<div class="row"><button class="act sm" data-mode="rally">Ponto de reunião</button>${e.def === 'nucleo' ? `<button class="act sm" data-mode="jump" ${p.jumpsLeft > 0 && e.jumpT <= 0 ? '' : 'disabled'}>Salto de Núcleo (${p.jumpsLeft})</button>` : ''}</div>`;
+      }
+      if (e.built && e.def === 'laboratorio') {
+        h += '<div class="grid">';
+        for (const k in S.RESEARCH) { const r = S.RESEARCH[k]; h += `<button class="act" data-research="${k}" ${p.research[k] ? 'disabled' : ''} title="${esc(r.desc)}"><span class="n">${esc(r.name)}${p.research[k] ? ' ✓' : ''}</span><span class="cost">${costStr(r.cost)}</span></button>`; }
+        h += '</div>';
+        const cd = Math.max(0, p.superCd - sim.time);
+        h += `<button class="act super" data-super="1" ${cd > 0 ? 'disabled' : ''} title="${esc(fac.superDesc)}"><span class="n">${esc(fac.superName)}${cd > 0 ? ' · ' + mmss(cd) : ''}</span><span class="cost">${costStr(S.SUPER_COST)}</span></button>`;
+      }
+      if (e.jumpT > 0) h += `<div class="tip">Salto em ${Math.ceil(e.jumpT)} s. O Núcleo está visível para todos.</div>`;
+      panel.innerHTML = h;
+      panel.querySelectorAll('[data-prod]').forEach(b => b.addEventListener('click', () => I.cmd({ t: 'produce', id: e.id, def: b.dataset.prod })));
+      panel.querySelectorAll('[data-cancel]').forEach(b => b.addEventListener('click', () => I.cmd({ t: 'cancel', id: e.id, index: parseInt(b.dataset.cancel, 10) })));
+      panel.querySelectorAll('[data-research]').forEach(b => b.addEventListener('click', () => I.cmd({ t: 'research', key: b.dataset.research })));
+      panel.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => { if (b.dataset.mode === 'jump') I.setMode('jump'); else I.setMode('rally'); notice(b.dataset.mode === 'jump' ? 'Clique no mapa para escolher o destino do Salto' : 'Clique no mapa para definir o ponto de reunião'); }));
+      const sb = panel.querySelector('[data-super]'); if (sb) sb.addEventListener('click', () => { if (fac.superKey === 'fundicao') { I.setMode('super'); notice('Clique em território seu para derrubar o Bastião'); } else I.cmd({ t: 'super' }); });
+      return;
+    }
+    // units
+    const counts = {}; for (const u of ents) if (u.kind === 'unit') counts[u.def] = (counts[u.def] || 0) + 1;
+    let h = `<div class="ph"><b>${ents.length} unidade${ents.length > 1 ? 's' : ''}</b></div><div class="chips">`;
+    for (const k in counts) h += `<span class="chip">${counts[k]}× ${esc(k === 'pirata' ? fac.pirateName : S.UNITS[k].name)}</span>`;
+    h += '</div>';
+    if (ents.length === 1) { const u = ents[0]; h += `<div class="hp"><i style="width:${(100 * u.hp / u.maxHp)}%"></i></div><div class="muted small">${fmt(u.hp)} / ${fmt(u.maxHp)} · ${S.CLASS_NAMES[u.cls]} · ${esc(S.UNITS[u.def].desc)}</div>`; if (u.cargoTotal > 0) h += `<div class="muted small">Carga: ${fmt(u.cargoTotal)}${u.stolen ? ' (roubada)' : ''}</div>`; }
+    const combat = ents.some(u => S.UNITS[u.def].attack);
+    h += `<div class="row">${combat ? `<button class="act sm ${I.mode === 'attackmove' ? 'on' : ''}" data-u="attackmove"><span class="k">A</span> Atacar-mover</button>` : ''}<button class="act sm" data-u="stop"><span class="k">S</span> Parar</button></div>`;
+    if (counts.pirata) h += '<div class="tip">Pirata: clique com o direito em uma Refinaria ou Reator inimigo para Sifonar (40 s). Volte à base para entregar. Se morrer carregado, a carga vira Caixa.</div>';
+    if (counts.coletor) h += '<div class="tip">Coletor: colhe sozinho nós dentro do seu território. Clique direito em um nó para escolher manualmente.</div>';
+    panel.innerHTML = h;
+    panel.querySelectorAll('[data-u]').forEach(b => b.addEventListener('click', () => { if (b.dataset.u === 'stop') I.cmd({ t: 'stop', ids: ents.map(u => u.id) }); else I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'); }));
+  }
+  function buildMenuHTML(p) {
+    let h = `<div class="ph"><b>Construir</b> <span class="muted small">(B, depois a tecla)</span></div><div class="grid">`;
+    for (const k in S.BUILDINGS) { const d = S.BUILDINGS[k]; if (!d.key) continue; const can = S.canAfford(p, d.cost); h += `<button class="act ${can ? '' : 'poor'} ${view.ghost && view.ghost.def === k ? 'on' : ''}" data-build="${k}" title="${esc(d.desc)}"><span class="k">${d.key}</span><span class="n">${esc(d.name)}</span><span class="cost">${costStr(d.cost)}</span></button>`; }
+    h += '</div>';
+    if (!view.sel.size) h += '<div class="tip">Nada selecionado. Clique em unidades ou arraste uma caixa. F1 seleciona o Núcleo, F2 o exército.</div>';
+    return h;
+  }
+  function bindBuildMenu() { $('panel').querySelectorAll('[data-build]').forEach(b => b.addEventListener('click', () => { I.buildMenu = false; I.setMode('build', b.dataset.build); notice('Posicione e clique para construir. Shift mantém o modo.'); })); }
+  function refreshQuick() {
+    const p = sim.players[human]; const fac = S.FACTIONS[p.faction];
+    const oc = $('btn-over'); const cd = Math.max(0, p.overchargeCd - sim.time);
+    oc.disabled = cd > 0 || p.res.plasma < S.OVERCHARGE_COST; oc.querySelector('.sub').textContent = cd > 0 ? 'recarga ' + mmss(cd) : '200 Plasma · +50% energia 60 s';
+    const sp = $('btn-super'); const lab = S.hasBuilt(sim, human, 'laboratorio'); const scd = Math.max(0, p.superCd - sim.time);
+    sp.querySelector('.n').textContent = fac.superName; sp.disabled = !lab || scd > 0 || !S.canAfford(p, S.SUPER_COST);
+    sp.querySelector('.sub').textContent = !lab ? 'requer Laboratório' : scd > 0 ? 'recarga ' + mmss(scd) : '300 Dados · 200 Plasma';
+    const dp = $('btn-diplo'); dp.classList.toggle('attn', !!G.pendingFor);
+    $('btn-build').classList.toggle('on', I.buildMenu || I.mode === 'build');
+    $('btn-attack').classList.toggle('on', I.mode === 'attackmove');
+    $('btn-box').classList.toggle('on', I.touchBox);
+  }
+  function bindHUD() {
+    document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => { G.speed = parseFloat(b.dataset.speed); G.paused = false; refreshTop(); }));
+    $('btn-pause').addEventListener('click', () => ui.togglePause());
+    $('btn-over').addEventListener('click', () => I.cmd({ t: 'overcharge' }));
+    $('btn-super').addEventListener('click', () => { if (fac().superKey === 'fundicao') { I.setMode('super'); notice('Clique em território seu para derrubar o Bastião'); } else I.cmd({ t: 'super' }); });
+    $('btn-diplo').addEventListener('click', () => openDiplo());
+    $('btn-help').addEventListener('click', () => toggleHelp(true));
+    $('btn-menu').addEventListener('click', () => ui.confirm('Encerrar esta partida e voltar ao início?', () => location.reload()));
+    $('btn-build').addEventListener('click', () => { I.buildMenu = !I.buildMenu; view.sel = new Set(); ui.buildMenuChanged(I.buildMenu); });
+    $('btn-attack').addEventListener('click', () => I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'));
+    $('btn-box').addEventListener('click', () => { I.touchBox = !I.touchBox; refreshQuick(); notice(I.touchBox ? 'Arraste para selecionar em caixa' : 'Arraste para mover a câmera'); });
+    $('btn-stop').addEventListener('click', () => { const ids = [...view.sel].filter(id => { const e = sim.byId.get(id); return e && e.alive && e.kind === 'unit' && e.owner === human; }); if (ids.length) I.cmd({ t: 'stop', ids }); });
+    $('btn-nucleo').addEventListener('click', () => { const n = S.nucleoOf(sim, human); if (n) { I.select([n.id]); I.center(n.x, n.y); } });
+    $('btn-army').addEventListener('click', () => { const ids = []; for (const en of sim.ents) if (en.alive && en.owner === human && en.kind === 'unit' && S.UNITS[en.def].attack) ids.push(en.id); I.select(ids); if (ids.length) { const e = sim.byId.get(ids[0]); I.center(e.x, e.y); } });
+    mini.addEventListener('pointerdown', e => { e.preventDefault(); const r = mini.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width * S.WORLD, y = (e.clientY - r.top) / r.height * S.WORLD; if (e.button === 2) { const ids = [...view.sel].filter(id => { const u = sim.byId.get(id); return u && u.alive && u.kind === 'unit' && u.owner === human; }); if (ids.length) I.cmd({ t: 'attackmove', ids, x, y }); } else I.center(x, y); });
+    mini.addEventListener('contextmenu', e => e.preventDefault());
+    $('hints-close').addEventListener('click', () => { $('hints').hidden = true; G.hintsOff = true; });
+    document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => ui.closeModals()));
+  }
+  function fac() { return S.FACTIONS[sim.players[human].faction]; }
+
+  // ---------- diplomacy ----------
+  function openDiplo() {
+    const m = $('diplo'); m.hidden = false; const p = sim.players[human]; let h = '';
+    h += `<div class="muted small">Sua reputação: <b>${S.REP_NAMES[p.rep]}</b>. Pactos cumpridos sobem a reputação; quebrar pactos derruba. Caução: 150 Minério por lado, devolvida ao fim do pacto; quem quebra perde a dele para a vítima.</div>`;
+    for (const q of sim.players) {
+      if (q.id === human) continue;
+      const pact = p.pacts[q.id]; const pending = sim.pending.find(pr => pr.from === q.id && pr.to === human); const mine = sim.pending.find(pr => pr.from === human && pr.to === q.id);
+      h += `<div class="dp ${q.alive ? '' : 'dead'}"><div class="dp-h"><span class="dot" style="background:${q.color}"></span><b>${esc(q.name)}</b> <span class="muted">· ${S.FACTIONS[q.faction].short} · ${q.alive ? S.REP_NAMES[q.rep] : 'eliminado'}</span></div>`;
+      if (!q.alive) { h += '</div>'; continue; }
+      if (pact) h += `<div class="small">Não-agressão ativa · restam ${mmss(pact.until - sim.time)}</div><button class="act sm danger" data-break="${q.id}">Quebrar pacto (Golpe de Traição)</button>`;
+      else if (pending) h += `<div class="small">Propõe Não-agressão (10 min, Caução 150)</div><div class="row"><button class="act sm good" data-accept="${q.id}">Aceitar</button><button class="act sm" data-decline="${q.id}">Recusar</button></div>`;
+      else if (mine) h += `<div class="small muted">Proposta enviada, aguardando resposta</div>`;
+      else h += `<button class="act sm" data-propose="${q.id}" ${p.res.minerio < S.PACT_CAUCAO ? 'disabled' : ''}>Propor Não-agressão (Caução 150)</button>`;
+      h += '</div>';
+    }
+    $('diplo-body').innerHTML = h;
+    m.querySelectorAll('[data-propose]').forEach(b => b.addEventListener('click', () => { I.cmd({ t: 'propose', to: parseInt(b.dataset.propose, 10) }); setTimeout(openDiplo, 150); }));
+    m.querySelectorAll('[data-accept]').forEach(b => b.addEventListener('click', () => { I.cmd({ t: 'respond', to: parseInt(b.dataset.accept, 10), accept: true }); G.pendingFor = null; setTimeout(openDiplo, 150); }));
+    m.querySelectorAll('[data-decline]').forEach(b => b.addEventListener('click', () => { I.cmd({ t: 'respond', to: parseInt(b.dataset.decline, 10), accept: false }); G.pendingFor = null; setTimeout(openDiplo, 150); }));
+    m.querySelectorAll('[data-break]').forEach(b => b.addEventListener('click', () => { const id = parseInt(b.dataset.break, 10); ui.confirm('Quebrar o pacto com ' + sim.players[id].name + '? Você perde a Caução, ganha +20% de dano por 45 s e sua Reputação cai.', () => { I.cmd({ t: 'break', with: id }); setTimeout(openDiplo, 150); }); }));
+  }
+  function showProposal(from) { const q = sim.players[from]; const el = $('proposal'); el.hidden = false; $('proposal-text').textContent = q.name + ' propõe um pacto de Não-agressão por 10 min (Caução 150 Minério).'; $('prop-yes').onclick = () => { I.cmd({ t: 'respond', to: from, accept: true }); el.hidden = true; G.pendingFor = null; }; $('prop-no').onclick = () => { I.cmd({ t: 'respond', to: from, accept: false }); el.hidden = true; G.pendingFor = null; }; setTimeout(() => { el.hidden = true; }, 30000); }
+
+  // ---------- hints ----------
+  function makeHints() {
+    return [
+      { id: 'col', text: 'Selecione o Núcleo (F1) e produza Coletores (C) até ter 5.', done: () => S.entitiesOf(sim, human).filter(e => e.kind === 'unit' && e.def === 'coletor').length >= 5 },
+      { id: 'reator', text: 'Construa um Reator (B → R). Energia abaixo de 100% deixa tudo mais lento.', done: () => S.hasBuilt(sim, human, 'reator') },
+      { id: 'quartel', text: 'Construa um Quartel (B → Q) e treine Infantaria (I).', done: () => S.hasBuilt(sim, human, 'quartel') },
+      { id: 'nodulo', text: 'Expanda com um Nódulo (B → N) perto de cristais de Plasma. Coletores só colhem no seu território.', done: () => S.hasBuilt(sim, human, 'nodulo') },
+      { id: 'refinaria', text: 'Uma Refinaria (B → F) perto dos nós encurta as viagens dos coletores.', done: () => S.hasBuilt(sim, human, 'refinaria') },
+      { id: 'pirata', text: 'Treine um Pirata (P) no Quartel e clique com o direito em uma Refinaria inimiga para Sifonar.', done: () => sim.players[human].stats.stolen > 0 },
+      { id: 'diplo', text: 'Abra a Diplomacia e proponha Não-agressão a quem está forte demais. Ou quebre um pacto na hora certa.', done: () => sim.players[human].stats.treaties > 0 || sim.players[human].stats.betrayals > 0 || sim.time > 540 },
+      { id: 'lab', text: 'Um Laboratório (B → L) libera pesquisas e a superarma da sua facção.', done: () => S.hasBuilt(sim, human, 'laboratorio') },
+    ];
+  }
+  function refreshHints() {
+    if (G.hintsOff) return;
+    const todo = G.hints.filter(h => !h.done()).slice(0, 2);
+    const box = $('hints'); if (!todo.length) { box.hidden = true; return; }
+    box.hidden = false; $('hints-body').innerHTML = todo.map((h, i) => `<div class="hint ${i === 0 ? 'now' : ''}">${esc(h.text)}</div>`).join('');
+  }
+
+  // ---------- end ----------
+  function endGame(result) {
+    if (G.ended) return; G.ended = true;
+    const p = sim.players[human]; const st = p.stats;
+    $('end').hidden = false; $('end-title').textContent = result.outcome === 'victory' ? 'DOMÍNIO' : 'COLAPSO'; $('end-title').className = result.outcome;
+    $('end-reason').textContent = result.reason;
+    const rows = result.scores.slice().sort((a, b) => b.score - a.score).map((s, i) => `<tr><td>${i + 1}</td><td><span class="dot" style="background:${sim.players[s.id].color}"></span>${esc(s.name)}</td><td>${s.alive ? fmt(s.score) : 'eliminado'}</td></tr>`).join('');
+    $('end-scores').innerHTML = `<table><thead><tr><th>#</th><th>Jogador</th><th>Domínio</th></tr></thead><tbody>${rows}</tbody></table>`;
+    $('end-stats').innerHTML = [['Coletado', fmt(st.collected)], ['Roubado', fmt(st.stolen)], ['Perdido para roubo', fmt(st.lost)], ['Unidades abatidas', st.unitsKilled], ['Unidades perdidas', st.unitsLost], ['Estruturas destruídas', st.buildingsDestroyed], ['Tratados', st.treaties], ['Traições', st.betrayals], ['Reputação final', S.REP_NAMES[p.rep]]].map(([k, v]) => `<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');
+    $('btn-again').onclick = () => location.reload();
+  }
+
+  // ---------- UI bridge for input ----------
+  function makeUI() {
+    return {
+      selectionChanged() { I.buildMenu = false; refreshPanel(true); refreshQuick(); },
+      modeChanged() { refreshPanel(true); refreshQuick(); },
+      buildMenuChanged() { refreshPanel(true); refreshQuick(); },
+      touchBoxChanged() { refreshQuick(); },
+      notice, confirm: confirmModal, modalOpen() { return !$('diplo').hidden || !$('help').hidden || !$('confirm').hidden; },
+      closeModals() { $('diplo').hidden = true; $('help').hidden = true; $('confirm').hidden = true; },
+      toggleHelp() { toggleHelp(); }, togglePause() { G.paused = !G.paused; refreshTop(); notice(G.paused ? 'Pausado' : 'Continuando'); },
+    };
+  }
+  function confirmModal(text, onYes) { const m = $('confirm'); m.hidden = false; $('confirm-text').textContent = text; $('confirm-yes').onclick = () => { m.hidden = true; onYes(); }; $('confirm-no').onclick = () => { m.hidden = true; }; }
+}
+
+function toggleHelp(force) { const h = $('help'); h.hidden = force === true ? false : !h.hidden; }
+
+window.addEventListener('error', e => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent = 'Erro: ' + (e.message || e.error); } });
+document.addEventListener('DOMContentLoaded', initStart);
+if (params.get('debug')) setTimeout(() => {
+  const out = [];
+  out.push('vw=' + innerWidth + ' sw=' + document.documentElement.scrollWidth);
+  for (const sel of ['#start', '.start-wrap', '.start-grid', '.fac-cards', '.fac-card', '.opts', '.eyebrow', 'h1', '#game', '#panel', '#top', '#right', '#bar']) { const el = document.querySelector(sel); if (el) out.push(sel + '=' + Math.round(el.getBoundingClientRect().width) + 'x' + Math.round(el.getBoundingClientRect().height)); }
+  const d = document.createElement('pre'); d.id = 'dbg'; d.textContent = out.join('\n'); document.body.appendChild(d);
+}, 800);
+})(globalThis.ARD = globalThis.ARD || {});
+
+</script>
+</body></html>

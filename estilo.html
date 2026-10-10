@@ -1,0 +1,425 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark">
+<title>Teste de Estilo Voxel</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{color-scheme:dark;--fg:#E8E2D6;--fg2:#A6A197;--line:#2E333B;--rift1:#FF5E3A}
+html,body{height:100%;margin:0}
+body{background:#0A0C10;color:var(--fg);font-family:'IBM Plex Mono',ui-monospace,monospace;overflow:hidden}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+#cap{position:fixed;left:16px;top:calc(12px + env(safe-area-inset-top,0));max-width:min(560px,calc(100vw - 32px));background:rgba(13,15,19,.86);border:1px solid var(--line);border-radius:8px;padding:10px 14px;display:grid;gap:6px;backdrop-filter:blur(6px)}
+#cap h1{margin:0;font-family:'Big Shoulders Display','Arial Narrow',Impact,sans-serif;font-weight:800;font-size:1.6rem;text-transform:uppercase;line-height:1}
+#cap p{margin:0;font-size:12px;color:var(--fg2);font-family:'IBM Plex Sans',system-ui,sans-serif}
+#cap .eyebrow{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rift1)}
+#stats{font-size:11px;color:var(--fg2)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+button{font:inherit;font-size:12px;color:var(--fg);background:#1C1F25;border:1px solid var(--line);border-radius:4px;padding:4px 10px;cursor:pointer}
+button.on{background:var(--rift1);color:#14161A;border-color:var(--rift1)}
+button:focus-visible{outline:2px solid var(--rift1);outline-offset:2px}
+</style>
+</head><body>
+<canvas id="c"></canvas>
+<div id="cap">
+  <div class="eyebrow">Aether Rift: Dominion · prova de conceito visual para o beta v1.5</div>
+  <h1>Sprites voxel pré-renderizados</h1>
+  <p>Tudo nesta cena é gerado no navegador ao carregar: modelos voxel renderizados em 16 direções com iluminação, terreno isométrico com textura, muros, sombras, destroços, fumaça, rastros de tiro, sifão e luz noturna. Nenhum asset externo. É o pipeline proposto para substituir as formas planas do beta 0.1.</p>
+  <div class="row"><button id="b-night">Noite</button><button id="b-grid">Grade</button></div>
+  <div id="stats"></div>
+</div>
+<script>
+/* Teste de estilo: pipeline de sprites voxel pré-renderizados em isométrico (2:1), gerados em tempo de carga. Sem assets externos. */
+(function (ARD) {
+'use strict';
+const SQ3 = Math.sqrt(3);
+const VIEW = [-1 / SQ3, -1 / SQ3, 1 / SQ3];          // direção para a câmera
+const LIGHT = norm([-0.55, -0.9, 1.25]);               // sol: alto, atrás-esquerda
+function norm(v) { const l = Math.hypot(v[0], v[1], v[2]); return [v[0] / l, v[1] / l, v[2] / l]; }
+function hex(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function rgb(c, f, add) { add = add || 0; return `rgb(${Math.min(255, Math.max(0, c[0] * f + add)) | 0},${Math.min(255, Math.max(0, c[1] * f + add)) | 0},${Math.min(255, Math.max(0, c[2] * f + add)) | 0})`; }
+
+function Model() { this.v = new Map(); this.lights = []; }
+Model.prototype.set = function (x, y, z, c, e) { this.v.set(x + ',' + y + ',' + z, { x, y, z, c: typeof c === 'string' ? hex(c) : c, e: !!e }); if (e) this.lights.push([x + .5, y + .5, z + .5, typeof c === 'string' ? c : '#fff']); return this; };
+Model.prototype.box = function (x0, y0, z0, w, d, h, c, f, e) { for (let x = x0; x < x0 + w; x++) for (let y = y0; y < y0 + d; y++) for (let z = z0; z < z0 + h; z++) if (!f || f(x - x0, y - y0, z - z0, w, d, h)) this.set(x, y, z, c, e); return this; };
+Model.prototype.cyl = function (cx, cy, z0, r, h, c, e) { for (let x = Math.floor(cx - r); x <= cx + r; x++) for (let y = Math.floor(cy - r); y <= cy + r; y++) if ((x + .5 - cx) ** 2 + (y + .5 - cy) ** 2 <= r * r) for (let z = z0; z < z0 + h; z++) this.set(x, y, z, c, e); return this; };
+Model.prototype.sphere = function (cx, cy, cz, r, c, e) { for (let x = Math.floor(cx - r); x <= cx + r; x++) for (let y = Math.floor(cy - r); y <= cy + r; y++) for (let z = Math.floor(cz - r); z <= cz + r; z++) if ((x + .5 - cx) ** 2 + (y + .5 - cy) ** 2 + (z + .5 - cz) ** 2 <= r * r) this.set(x, y, z, c, e); return this; };
+Model.prototype.has = function (x, y, z) { return this.v.has(x + ',' + y + ',' + z); };
+Model.prototype.bounds = function () { let b = { x0: 1e9, y0: 1e9, z0: 1e9, x1: -1e9, y1: -1e9, z1: -1e9 }; for (const v of this.v.values()) { b.x0 = Math.min(b.x0, v.x); b.y0 = Math.min(b.y0, v.y); b.z0 = Math.min(b.z0, v.z); b.x1 = Math.max(b.x1, v.x + 1); b.y1 = Math.max(b.y1, v.y + 1); b.z1 = Math.max(b.z1, v.z + 1); } return b; };
+
+// 6 faces: normal, 4 vértices (offsets), vizinho
+const FACES = [
+  { n: [0, 0, 1], q: [[0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]], nb: [0, 0, 1] },
+  { n: [1, 0, 0], q: [[1, 0, 0], [1, 1, 0], [1, 1, 1], [1, 0, 1]], nb: [1, 0, 0] },
+  { n: [-1, 0, 0], q: [[0, 0, 0], [0, 0, 1], [0, 1, 1], [0, 1, 0]], nb: [-1, 0, 0] },
+  { n: [0, 1, 0], q: [[0, 1, 0], [0, 1, 1], [1, 1, 1], [1, 1, 0]], nb: [0, 1, 0] },
+  { n: [0, -1, 0], q: [[0, 0, 0], [1, 0, 0], [1, 0, 1], [0, 0, 1]], nb: [0, -1, 0] },
+];
+
+/* Renderiza um modelo em um canvas offscreen. angle em radianos (rotação em z). s = px por voxel. */
+function renderSprite(model, angle, s, opt) {
+  opt = opt || {};
+  const b = model.bounds(); const cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2;
+  const ca = Math.cos(angle), sa = Math.sin(angle);
+  const rot = (x, y) => [cx + (x - cx) * ca - (y - cy) * sa, cy + (x - cx) * sa + (y - cy) * ca];
+  const proj = (x, y, z) => { const [xr, yr] = rot(x, y); return [(xr - yr) * s, (xr + yr) * s * 0.5 - z * s]; };
+  // bounds em tela
+  let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+  for (const [x, y, z] of [[b.x0, b.y0, b.z0], [b.x1, b.y0, b.z0], [b.x0, b.y1, b.z0], [b.x1, b.y1, b.z0], [b.x0, b.y0, b.z1], [b.x1, b.y0, b.z1], [b.x0, b.y1, b.z1], [b.x1, b.y1, b.z1]]) { const p = proj(x, y, z); minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]); minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]); }
+  const pad = 4; const w = Math.ceil(maxX - minX) + pad * 2, h = Math.ceil(maxY - minY) + pad * 2;
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h; const c = cv.getContext('2d');
+  const ox = -minX + pad, oy = -minY + pad;
+  const vox = [...model.v.values()];
+  for (const v of vox) { const [xr, yr] = rot(v.x + .5, v.y + .5); v.d = xr + yr + v.z * 1.0001; }
+  vox.sort((a, b2) => a.d - b2.d);
+  const faces = FACES.map(f => { const n = [f.n[0] * ca - f.n[1] * sa, f.n[0] * sa + f.n[1] * ca, f.n[2]]; const vis = n[0] * VIEW[0] + n[1] * VIEW[1] + n[2] * VIEW[2] > 0.02; const lit = Math.max(0, n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]); return Object.assign({}, f, { vis, shade: 0.42 + 0.62 * lit }); });
+  const dmg = opt.damage || 0;
+  for (const v of vox) {
+    for (const f of faces) {
+      if (!f.vis) continue;
+      if (model.has(v.x + f.nb[0], v.y + f.nb[1], v.z + f.nb[2])) continue;
+      c.beginPath();
+      for (let i = 0; i < 4; i++) { const q = f.q[i]; const p = proj(v.x + q[0], v.y + q[1], v.z + q[2]); if (i === 0) c.moveTo(p[0] + ox, p[1] + oy); else c.lineTo(p[0] + ox, p[1] + oy); }
+      c.closePath();
+      let col;
+      if (v.e) col = rgb(v.c, 1.05, 25);
+      else { let cc = v.c; if (dmg) cc = [cc[0] * (1 - dmg * .6), cc[1] * (1 - dmg * .7), cc[2] * (1 - dmg * .7)]; col = rgb(cc, f.shade, f.n[2] ? 6 : 0); }
+      c.fillStyle = col; c.fill();
+      // leve contorno interno para legibilidade em escala pequena
+      c.strokeStyle = 'rgba(0,0,0,0.12)'; c.lineWidth = 0.5; c.stroke();
+    }
+  }
+  // luzes emissivas (brilho)
+  const lights = [];
+  for (const l of model.lights) { const p = proj(l[0], l[1], l[2]); const L = { x: p[0] + ox, y: p[1] + oy, c: l[3] }; if (!lights.some(k => Math.abs(k.x - L.x) < 7 && Math.abs(k.y - L.y) < 7)) lights.push(L); }
+  const base = proj(cx, cy, b.z0);
+  return { canvas: cv, ox, oy, w, h, lights, s, cx, cy, ax: base[0] + ox, ay: base[1] + oy, hz: (b.z1 - b.z0) };
+}
+
+/* Ambiente: luz vem do alto; sombra projetada no chão deslocada (sol atrás-esquerda) */
+function drawShadow(ctx, x, y, w, h) { ctx.save(); ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(x + w * 0.12, y + 2, w * 0.55, h * 0.28, 0, 0, 7); ctx.fill(); ctx.restore(); }
+
+ARD.vox = { Model, renderSprite, drawShadow, hex, rgb };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Biblioteca de modelos voxel (definidos em código; em produção viriam de MagicaVoxel/.vox) */
+(function (ARD) {
+'use strict';
+const M = () => new ARD.vox.Model();
+const dark = '#2A2D33', steel = '#7A8290', steel2 = '#5E6671', glass = '#8FD8FF', rust = '#8A5A3A', orange = '#FF8C1A', magenta = '#D64CFF', plasma = '#FF6A3D', green = '#7FE3A1';
+
+function tank(col) {
+  const m = M();
+  m.box(0, 0, 0, 14, 3, 3, dark, (x, y, z) => !(z === 2 && (x % 3 === 1)));      // esteira esquerda
+  m.box(0, 7, 0, 14, 3, 3, dark, (x, y, z) => !(z === 2 && (x % 3 === 1)));      // esteira direita
+  m.box(1, 2, 2, 12, 6, 3, col);                                                   // casco
+  m.box(2, 3, 5, 9, 4, 1, steel2);                                                 // convés
+  m.box(3, 3, 5, 6, 4, 3, col);                                                    // torre
+  m.box(4, 4, 8, 4, 2, 1, steel);                                                  // escotilha
+  m.box(9, 4, 6, 7, 2, 1, steel2);                                                 // canhão
+  m.box(15, 4, 6, 2, 2, 1, dark);
+  m.box(12, 3, 4, 1, 1, 1, '#FFE08A', null, true); m.box(12, 6, 4, 1, 1, 1, '#FFE08A', null, true); // faróis
+  m.box(1, 4, 4, 1, 2, 1, '#FF4040', null, true);                                  // luz traseira
+  return m;
+}
+function mech(col) {
+  const m = M();
+  for (const y of [1, 8]) { m.box(3, y, 0, 5, 3, 1, dark); m.box(4, y, 1, 3, 3, 5, steel2); m.box(4, y + 1, 6, 3, 1, 2, col); } // pés e pernas
+  m.box(2, 1, 8, 9, 10, 6, col);                                                   // corpo
+  m.box(3, 2, 14, 7, 8, 2, steel2);                                                // ombros
+  m.box(5, 4, 16, 4, 4, 3, col);                                                   // cabine
+  m.box(9, 5, 17, 1, 2, 1, glass, null, true);                                     // visor
+  m.box(10, 0, 11, 1, 3, 3, steel2); m.box(11, 0, 11, 9, 3, 3, dark);             // canhão esq
+  m.box(10, 9, 11, 1, 3, 3, steel2); m.box(11, 9, 11, 9, 3, 3, dark);             // canhão dir
+  m.box(0, 3, 10, 2, 6, 3, rust);                                                  // mochila
+  m.box(19, 1, 12, 1, 1, 1, orange, null, true); m.box(19, 10, 12, 1, 1, 1, orange, null, true);
+  return m;
+}
+function harvester(col) {
+  const m = M();
+  for (const x of [1, 9]) for (const y of [0, 8]) m.cyl(x + 1.5, y + 1.5, 0, 1.6, 3, dark);  // rodas
+  m.box(0, 1, 2, 13, 8, 3, steel2);                                                // chassi
+  m.box(9, 1, 4, 4, 8, 5, col);                                                    // cabine
+  m.box(12, 2, 6, 1, 6, 2, glass, null, true);                                     // para-brisa
+  m.box(0, 1, 4, 9, 8, 5, col, (x, y, z) => !(x > 0 && x < 8 && y > 0 && y < 7 && z > 2)); // caçamba
+  for (let i = 0; i < 14; i++) { const x = 1 + (i * 7) % 7, y = 2 + (i * 5) % 6; m.box(x, y, 7, 1, 1, 1 + (i % 3), plasma, null, i % 4 === 0); } // carga brilhante
+  m.box(13, 3, 4, 1, 1, 1, '#FFE08A', null, true); m.box(13, 6, 4, 1, 1, 1, '#FFE08A', null, true);
+  return m;
+}
+function infantry(col) {
+  const m = M();
+  m.box(1, 0, 0, 1, 1, 3, dark); m.box(1, 2, 0, 1, 1, 3, dark);                    // pernas
+  m.box(0, 0, 3, 3, 3, 3, col);                                                    // torso
+  m.box(3, 1, 4, 3, 1, 1, steel2);                                                 // arma
+  m.box(1, 1, 6, 1, 1, 1, '#E8C9A0'); m.box(0, 0, 7, 3, 3, 1, steel2);             // cabeça e capacete
+  m.box(2, 1, 6, 1, 1, 1, glass, null, true);
+  return m;
+}
+function drone(col) {
+  const m = M();
+  m.box(2, 2, 2, 4, 4, 2, col); m.box(3, 3, 4, 2, 2, 1, steel2);
+  for (const [x, y] of [[0, 0], [6, 0], [0, 6], [6, 6]]) { m.box(x, y, 2, 2, 2, 1, dark); m.box(x - 1, y - 1, 3, 4, 4, 1, steel2, (a, b2) => (a === 0 || a === 3 || b2 === 0 || b2 === 3)); }
+  m.box(3, 3, 1, 2, 2, 1, magenta, null, true);
+  return m;
+}
+function raider(col) { // pirata: veículo baixo e angular com mangueira de sifão
+  const m = M();
+  m.box(0, 1, 0, 12, 6, 2, dark);
+  m.box(1, 0, 2, 10, 8, 3, col, (x, y, z) => !(z === 2 && (y === 0 || y === 7) && x > 7));
+  m.box(8, 2, 5, 3, 4, 2, steel2); m.box(11, 3, 5, 1, 2, 1, glass, null, true);
+  m.box(0, 3, 5, 3, 2, 1, magenta, null, true);                                    // tanque de sifão brilhante
+  m.box(-2, 3, 3, 3, 2, 1, steel2);
+  return m;
+}
+function refinery(col) {
+  const m = M();
+  m.box(0, 0, 0, 26, 20, 2, steel2, (x, y) => !((x + y) % 7 === 0 && x > 1 && y > 1 && x < 24 && y < 18));   // laje com placas
+  m.box(2, 2, 2, 14, 12, 9, col);                                                  // bloco principal
+  m.box(2, 2, 11, 14, 12, 1, steel2);                                              // telhado
+  m.box(4, 4, 12, 10, 8, 1, dark);
+  m.cyl(20.5, 6.5, 2, 3.4, 11, steel); m.cyl(20.5, 6.5, 13, 3.6, 1, steel2);        // tanque 1
+  m.cyl(20.5, 14.5, 2, 3.4, 9, steel); m.cyl(20.5, 14.5, 11, 3.6, 1, steel2);       // tanque 2
+  m.box(16, 6, 6, 4, 1, 1, dark); m.box(16, 14, 5, 4, 1, 1, dark);                 // tubulações
+  m.box(6, 15, 2, 8, 3, 3, dark); m.box(7, 16, 5, 6, 1, 1, plasma, null, true);    // entrada de coletores com calha brilhante
+  for (let i = 0; i < 4; i++) m.box(3 + i * 3, 1, 4 + (i % 2) * 2, 2, 1, 1, '#FFE08A', null, true); // janelas
+  m.box(9, 9, 13, 2, 2, 5, dark); m.box(9, 9, 18, 2, 2, 1, '#FF4040', null, true); // antena
+  m.box(18, 6, 13, 2, 1, 1, plasma, null, true); m.box(18, 14, 11, 2, 1, 1, plasma, null, true); // válvulas
+  return m;
+}
+function reactor(col) {
+  const m = M();
+  m.box(0, 0, 0, 18, 18, 2, steel2);
+  m.box(2, 2, 2, 14, 14, 3, col);
+  m.sphere(9, 9, 7, 5.5, steel);
+  m.box(7, 7, 11, 4, 4, 1, plasma, null, true);
+  m.box(13, 3, 2, 3, 3, 16, dark); m.box(13, 3, 18, 3, 3, 1, '#FF7A30', null, true); // chaminé com boca quente
+  m.box(3, 13, 5, 3, 3, 4, steel2); m.box(3, 13, 9, 3, 3, 1, orange, null, true);
+  for (let i = 0; i < 3; i++) m.box(3 + i * 4, 2, 3, 2, 1, 1, '#FFE08A', null, true);
+  return m;
+}
+function barracks(col) {
+  const m = M();
+  m.box(0, 0, 0, 22, 14, 2, steel2);
+  m.box(1, 1, 2, 20, 12, 7, col, (x, y, z, w, d, h) => !(z === h - 1 && (x === 0 || x === w - 1 || y === 0 || y === d - 1)));
+  m.box(1, 1, 8, 20, 12, 1, dark, (x, y) => (x + y) % 2 === 0);                   // telhado ondulado
+  m.box(9, 13, 2, 4, 1, 5, dark); m.box(10, 13, 3, 2, 1, 3, glass, null, true);    // porta iluminada
+  for (let i = 0; i < 5; i++) m.box(2 + i * 4, 0, 5, 2, 1, 1, '#FFE08A', null, true);
+  m.box(18, 10, 9, 2, 2, 6, steel); m.box(18, 10, 15, 2, 2, 1, green, null, true); // mastro/sinal
+  return m;
+}
+function tower(col) {
+  const m = M();
+  m.box(0, 0, 0, 10, 10, 3, steel2); m.box(2, 2, 3, 6, 6, 9, dark);
+  m.box(1, 1, 12, 8, 8, 3, col); m.box(3, 3, 15, 4, 4, 2, steel2);
+  m.box(7, 4, 13, 7, 2, 1, dark); m.box(7, 4, 14, 7, 2, 1, steel2);                // canhão duplo
+  m.box(4, 4, 17, 2, 2, 1, '#FF4040', null, true);
+  return m;
+}
+function wall(col, gate) {
+  const m = M();
+  m.box(0, 0, 0, 16, 4, 1, steel2);
+  if (gate) { m.box(0, 0, 1, 3, 4, 7, col); m.box(13, 0, 1, 3, 4, 7, col); m.box(3, 1, 5, 10, 2, 1, dark); m.box(1, 1, 8, 1, 2, 1, orange, null, true); m.box(14, 1, 8, 1, 2, 1, orange, null, true); }
+  else { m.box(0, 0, 1, 16, 4, 5, col, (x, y, z) => !(z === 4 && x % 4 === 2 && y > 0 && y < 3)); m.box(0, 1, 6, 16, 2, 1, steel2, (x) => x % 4 !== 2); }
+  return m;
+}
+function nucleus(col) {
+  const m = M();
+  m.box(0, 0, 0, 30, 30, 3, steel2, (x, y) => Math.abs(x - 14.5) + Math.abs(y - 14.5) < 24);     // laje octogonal
+  m.box(3, 3, 3, 24, 24, 3, col, (x, y) => Math.abs(x - 11.5) + Math.abs(y - 11.5) < 19);
+  m.box(8, 8, 6, 14, 14, 10, col);                                                                   // torre central
+  m.box(10, 10, 16, 10, 10, 2, steel2); m.cyl(15, 15, 18, 3.4, 6, steel); m.sphere(15, 15, 25, 3, plasma, true); // núcleo brilhante
+  for (const [x, y] of [[4, 4], [22, 4], [4, 22], [22, 22]]) { m.box(x, y, 6, 4, 4, 8, dark); m.box(x + 1, y + 1, 14, 2, 2, 1, '#FFE08A', null, true); }
+  for (let i = 0; i < 6; i++) { m.box(9 + i * 2, 7, 9, 1, 1, 1, '#FFE08A', null, true); m.box(7, 9 + i * 2, 11, 1, 1, 1, '#FFE08A', null, true); }
+  m.box(14, 2, 6, 2, 6, 1, plasma, null, true); m.box(2, 14, 6, 6, 2, 1, plasma, null, true);      // calhas de energia
+  return m;
+}
+function crystals(seed) {
+  const m = M(); let r = seed;
+  const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; };
+  for (let i = 0; i < 9; i++) { const x = Math.floor(rnd() * 12), y = Math.floor(rnd() * 12), h = 3 + Math.floor(rnd() * 7); const c = rnd() < 0.5 ? '#FF6A3D' : '#D64CFF'; m.box(x, y, 0, 2, 2, h, c, (a, b2, z) => !(z === h - 1 && (a + b2) % 2), true); m.box(x, y, 0, 2, 2, 1, dark); }
+  return m;
+}
+function rocks(seed) {
+  const m = M(); let r = seed; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; };
+  for (let i = 0; i < 4; i++) m.sphere(3 + rnd() * 8, 3 + rnd() * 8, 0.5 + rnd(), 2 + rnd() * 2.5, ['#6E7682', '#5A616B', '#7E8794'][i % 3]);
+  return m;
+}
+function wreck(col) {
+  const m = M();
+  m.box(0, 0, 0, 14, 3, 2, dark); m.box(0, 7, 0, 10, 3, 2, dark);
+  m.box(1, 2, 2, 12, 6, 2, '#3A2F2A', (x, y, z) => !(z === 1 && (x + y) % 3 === 0));
+  m.box(4, 3, 4, 5, 4, 2, '#2E2622', (x, y, z) => (x + y) % 2 === 0);
+  m.box(6, 4, 3, 2, 2, 1, '#FF5A1A', null, true);                                  // brasa
+  return m;
+}
+ARD.models = { tank, mech, harvester, infantry, drone, raider, refinery, reactor, barracks, tower, wall, nucleus, crystals, rocks, wreck };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Cena de teste de estilo: base cercada por muros numa planície de gelo, raid em andamento. */
+(function (ARD) {
+'use strict';
+const V = ARD.vox, MD = ARD.models;
+const S = 4;                       // px por voxel
+const T = 16;                      // voxels por tile
+const TW = T * S * 2, TH = T * S;  // tile 96x48
+const GRID = 11;
+const P1 = '#2E6BE6', P2 = '#C8322E';
+const FACINGS = 16;
+const canvas = document.getElementById('c'); const ctx = canvas.getContext('2d');
+const light = document.createElement('canvas'); const lctx = light.getContext('2d');
+let W = 0, H = 0, DPR = 1;
+const state = { night: false, grid: false, time: 0, spriteCount: 0, buildMs: 0 };
+
+function proj(x, y, z) { return [(x - y) * S, (x + y) * S * 0.5 - (z || 0) * S]; } // mundo em voxels → tela (sem câmera)
+const cache = new Map();
+function sprite(name, col, facing, extra) {
+  const key = name + '|' + col + '|' + facing + '|' + (extra || '');
+  let sp = cache.get(key); if (sp) return sp;
+  const m = MD[name](col, extra);
+  const t0 = performance.now();
+  sp = V.renderSprite(m, (facing / FACINGS) * Math.PI * 2, S);
+  state.buildMs += performance.now() - t0; state.spriteCount++;
+  cache.set(key, sp); return sp;
+}
+// ---------- terreno ----------
+const tiles = {};
+function makeTile(kind, seed) {
+  const cv = document.createElement('canvas'); cv.width = TW; cv.height = TH + 1; const c = cv.getContext('2d');
+  let r = seed; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; };
+  c.beginPath(); c.moveTo(TW / 2, 0); c.lineTo(TW, TH / 2); c.lineTo(TW / 2, TH); c.lineTo(0, TH / 2); c.closePath(); c.clip();
+  const base = kind === 'ice' ? [196, 214, 230] : kind === 'rock' ? [96, 104, 116] : kind === 'metal' ? [52, 58, 68] : [170, 190, 205];
+  c.fillStyle = `rgb(${base[0]},${base[1]},${base[2]})`; c.fillRect(0, 0, TW, TH + 1);
+  for (let i = 0; i < 260; i++) { const f = 0.86 + rnd() * 0.28; c.fillStyle = `rgba(${base[0] * f | 0},${base[1] * f | 0},${base[2] * f | 0},${0.5 + rnd() * 0.5})`; const x = rnd() * TW, y = rnd() * TH; c.fillRect(x, y, 1 + rnd() * 5, 1 + rnd() * 2.5); }
+  if (kind === 'ice') { c.strokeStyle = 'rgba(120,150,180,0.35)'; c.lineWidth = 1; for (let i = 0; i < 4; i++) { c.beginPath(); c.moveTo(rnd() * TW, rnd() * TH); c.lineTo(rnd() * TW, rnd() * TH); c.lineTo(rnd() * TW, rnd() * TH); c.stroke(); } }
+  if (kind === 'metal') { c.strokeStyle = 'rgba(0,0,0,0.45)'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(TW / 2, 0); c.lineTo(TW / 2, TH); c.moveTo(0, TH / 2); c.lineTo(TW, TH / 2); c.stroke(); c.fillStyle = 'rgba(255,255,255,0.08)'; for (let i = 0; i < 6; i++) c.fillRect(rnd() * TW, rnd() * TH, 2, 2); }
+  if (kind === 'rock') { c.fillStyle = 'rgba(0,0,0,0.25)'; for (let i = 0; i < 5; i++) { c.beginPath(); c.ellipse(rnd() * TW, rnd() * TH, 4 + rnd() * 8, 2 + rnd() * 4, 0, 0, 7); c.fill(); } }
+  return cv;
+}
+function tile(kind, v) { const k = kind + v; if (!tiles[k]) tiles[k] = makeTile(kind, 17 + v * 31 + kind.length * 7); return tiles[k]; }
+const map = []; { let r = 99; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; };
+  for (let y = 0; y < GRID; y++) { map[y] = []; for (let x = 0; x < GRID; x++) { const inBase = x >= 2 && x <= 8 && y >= 2 && y <= 8; const edge = (x + y) % 9 === 0 || (x * 7 + y * 3) % 11 === 0; map[y][x] = { kind: inBase ? 'metal' : edge ? 'rock' : 'ice', v: Math.floor(rnd() * 4) }; } } }
+
+// ---------- objetos ----------
+// posições em voxels de mundo (tile = 16); base ocupa os tiles 2..8
+const objects = [
+  { n: 'nucleus', col: P1, x: 4.6 * T, y: 4.6 * T },
+  { n: 'refinery', col: P1, x: 2.3 * T, y: 2.1 * T },
+  { n: 'reactor', col: P1, x: 6.9 * T, y: 2.2 * T }, { n: 'reactor', col: P1, x: 7.7 * T, y: 3.9 * T },
+  { n: 'barracks', col: P1, x: 2.3 * T, y: 6.7 * T },
+  { n: 'tower', col: P1, x: 1.7 * T, y: 1.1 * T }, { n: 'tower', col: P1, x: 8.5 * T, y: 1.1 * T }, { n: 'tower', col: P1, x: 1.7 * T, y: 8.9 * T }, { n: 'tower', col: P1, x: 8.5 * T, y: 8.9 * T },
+  { n: 'crystals', col: 5, x: 9.2 * T, y: 7.4 * T }, { n: 'crystals', col: 9, x: 9.9 * T, y: 8.6 * T }, { n: 'crystals', col: 3, x: 0.2 * T, y: 8.2 * T }, { n: 'crystals', col: 7, x: 9.4 * T, y: 9.7 * T },
+  { n: 'rocks', col: 2, x: 0.3 * T, y: 1.0 * T }, { n: 'rocks', col: 4, x: 9.6 * T, y: 0.4 * T }, { n: 'rocks', col: 6, x: 0.9 * T, y: 9.6 * T }, { n: 'rocks', col: 8, x: 9.3 * T, y: 5.0 * T },
+  { n: 'wreck', col: P2, x: 7.0 * T, y: 9.5 * T, facing: 3 },
+];
+for (let i = 0; i < 8; i++) { const x = (1.6 + i) * T; objects.push({ n: 'wall', col: P1, x, y: 1.5 * T, wall: true }); objects.push({ n: 'wall', col: P1, x, y: 8.9 * T, wall: true, gate: i === 4 }); }
+for (let i = 0; i < 8; i++) { const y = (1.6 + i) * T; objects.push({ n: 'wall', col: P1, x: 1.4 * T, y, wall: true, rot: 1 }); objects.push({ n: 'wall', col: P1, x: 8.9 * T, y, wall: true, rot: 1 }); }
+
+// unidades com rotas simples
+const units = [
+  { n: 'harvester', col: P1, path: [[8.4 * T, 5.3 * T], [9.6 * T, 7.9 * T], [8.4 * T, 5.3 * T]], sp: 9, t: 0 },
+  { n: 'harvester', col: P1, path: [[3.4 * T, 3.4 * T], [0.9 * T, 8.4 * T], [3.4 * T, 3.4 * T]], sp: 9, t: 0.5 },
+  { n: 'tank', col: P1, path: [[5.6 * T, 9.9 * T], [5.6 * T, 6.4 * T], [7.6 * T, 6.4 * T], [5.6 * T, 9.9 * T]], sp: 14, t: 0.2 },
+  { n: 'tank', col: P1, path: [[6.3 * T, 10.3 * T], [6.3 * T, 6.9 * T], [7.9 * T, 7.0 * T], [6.3 * T, 10.3 * T]], sp: 14, t: 0.25 },
+  { n: 'mech', col: P1, path: [[4.2 * T, 7.9 * T], [6.8 * T, 7.9 * T], [4.2 * T, 7.9 * T]], sp: 6, t: 0 },
+  { n: 'drone', col: P1, path: [[3.4 * T, 4.2 * T], [7.6 * T, 5.0 * T], [6.2 * T, 8.6 * T], [3.4 * T, 4.2 * T]], sp: 24, t: 0.1, fly: 14 },
+  { n: 'drone', col: P1, path: [[7.8 * T, 9.4 * T], [9.4 * T, 2.6 * T], [7.8 * T, 9.4 * T]], sp: 24, t: 0.6, fly: 16 },
+  { n: 'raider', col: P2, path: [[0.5 * T, 3.9 * T], [1.9 * T, 3.3 * T], [0.5 * T, 3.9 * T]], sp: 10, t: 0, siphon: true },
+  { n: 'tank', col: P2, path: [[10.4 * T, 10.4 * T], [8.4 * T, 9.9 * T], [10.4 * T, 10.4 * T]], sp: 11, t: 0.3, firing: true },
+  { n: 'tank', col: P2, path: [[10.6 * T, 9.1 * T], [9.2 * T, 9.6 * T], [10.6 * T, 9.1 * T]], sp: 11, t: 0.7, firing: true },
+];
+for (let i = 0; i < 6; i++) units.push({ n: 'infantry', col: P1, path: [[5.4 * T + (i % 3) * 5, 9.4 * T + Math.floor(i / 3) * 5], [7.9 * T + (i % 3) * 5, 9.4 * T + Math.floor(i / 3) * 5], [5.4 * T + (i % 3) * 5, 9.4 * T + Math.floor(i / 3) * 5]], sp: 7, t: 0.05 * i, firing: i < 3 });
+for (let i = 0; i < 4; i++) units.push({ n: 'infantry', col: P2, path: [[10.7 * T - i * 4, 8.1 * T + i * 6], [9.8 * T - i * 4, 8.6 * T + i * 6], [10.7 * T - i * 4, 8.1 * T + i * 6]], sp: 6, t: 0.3 + i * 0.1, firing: true });
+
+const fx = { parts: [], flashes: [], tracers: [] };
+let lastT = performance.now();
+
+function resize() { DPR = Math.min(2, devicePixelRatio || 1); W = canvas.clientWidth; H = canvas.clientHeight; canvas.width = W * DPR; canvas.height = H * DPR; light.width = canvas.width; light.height = canvas.height; }
+addEventListener('resize', resize); resize();
+
+function unitPos(u) {
+  const segs = u.path.length - 1; let total = 0; const lens = [];
+  for (let i = 0; i < segs; i++) { const l = Math.hypot(u.path[i + 1][0] - u.path[i][0], u.path[i + 1][1] - u.path[i][1]); lens.push(l); total += l; }
+  let d = (u.t * total) % total;
+  for (let i = 0; i < segs; i++) { if (d <= lens[i]) { const k = lens[i] ? d / lens[i] : 0; const a = u.path[i], b = u.path[i + 1]; return { x: a[0] + (b[0] - a[0]) * k, y: a[1] + (b[1] - a[1]) * k, ang: Math.atan2(b[1] - a[1], b[0] - a[0]) }; } d -= lens[i]; }
+  return { x: u.path[0][0], y: u.path[0][1], ang: 0 };
+}
+function facingOf(ang) { let f = Math.round((ang / (Math.PI * 2)) * FACINGS); return ((f % FACINGS) + FACINGS) % FACINGS; }
+
+function draw(now) {
+  const dt = Math.min(0.1, (now - lastT) / 1000); lastT = now; state.time += dt;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = '#0A0C10'; ctx.fillRect(0, 0, W, H);
+  // câmera: centraliza o mapa
+  const center = proj(GRID * T / 2, GRID * T / 2, 0);
+  const camX = W / 2 - center[0], camY = H / 2 - center[1] + 40;
+  ctx.save(); ctx.translate(camX, camY);
+  // terreno
+  for (let y = 0; y < GRID; y++) for (let x = 0; x < GRID; x++) { const p = proj(x * T, y * T, 0); const t = map[y][x]; ctx.drawImage(tile(t.kind, t.v), p[0] - TW / 2, p[1]); }
+  // decalques: rastros e crateras
+  ctx.save(); ctx.globalAlpha = 0.35; ctx.strokeStyle = '#3A3F48'; ctx.lineWidth = 3;
+  for (const u of units) if (u.n === 'tank' || u.n === 'harvester') { ctx.beginPath(); u.path.forEach((p, i) => { const q = proj(p[0], p[1], 0); if (i === 0) ctx.moveTo(q[0], q[1]); else ctx.lineTo(q[0], q[1]); }); ctx.stroke(); }
+  ctx.restore();
+  for (const [cx, cy, r] of [[7.3 * T, 9.3 * T, 16], [9.4 * T, 8.5 * T, 10], [2.2 * T, 4.0 * T, 12]]) { const p = proj(cx, cy, 0); const g = ctx.createRadialGradient(p[0], p[1], 2, p[0], p[1], r * 2); g.addColorStop(0, 'rgba(10,8,8,0.8)'); g.addColorStop(0.6, 'rgba(40,36,34,0.5)'); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(p[0], p[1], r * 2, r, 0, 0, 7); ctx.fill(); }
+  if (state.grid) { ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 1; for (let y = 0; y <= GRID; y++) { const a = proj(0, y * T, 0), b = proj(GRID * T, y * T, 0); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); } for (let x = 0; x <= GRID; x++) { const a = proj(x * T, 0, 0), b = proj(x * T, GRID * T, 0); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); } }
+  // lista de desenho ordenada por profundidade
+  const items = [];
+  for (const o of objects) { const sp = sprite(o.n, o.col, o.rot ? 4 : (o.facing || 0), o.gate ? 'gate' : ''); items.push({ sp, x: o.x, y: o.y, z: 0, d: o.x + o.y + (o.n === 'nucleus' ? 30 : o.n === 'refinery' ? 22 : 12), shadow: !o.wall && o.n !== 'crystals' && o.n !== 'rocks', big: o.n !== 'wall' }); }
+  const lights = [];
+  for (const u of units) {
+    u.t += dt * u.sp / 400;
+    const p = unitPos(u); const f = facingOf(p.ang); const sp = sprite(u.n, u.col, f);
+    const bob = u.n === 'mech' ? Math.abs(Math.sin(state.time * 6)) * 1.5 : 0;
+    items.push({ sp, x: p.x, y: p.y, z: (u.fly || 0) + bob, d: p.x + p.y + 8, unit: u, shadow: true, pos: p, f });
+    if (u.n === 'tank' && u.col === P1) { const q = proj(p.x, p.y, 4); lights.push({ x: q[0], y: q[1], r: 40, c: 'rgba(255,230,150,0.25)' }); }
+    if (u.firing && Math.random() < 0.08) { const q = proj(p.x + Math.cos(p.ang) * 8, p.y + Math.sin(p.ang) * 8, 5); fx.flashes.push({ x: q[0], y: q[1], t: 0 }); const tx = q[0] + Math.cos(p.ang - Math.PI / 4) * (60 + Math.random() * 60), ty = q[1] + Math.sin(p.ang - Math.PI / 4) * 0.5 * (60 + Math.random() * 60); fx.tracers.push({ x1: q[0], y1: q[1], x2: tx, y2: ty, t: 0 }); if (Math.random() < 0.4) { for (let i = 0; i < 6; i++) fx.parts.push({ x: tx, y: ty, vx: (Math.random() - .5) * 60, vy: -20 - Math.random() * 40, t: 0, life: .5, c: '#FFB060', s: 2 }); fx.parts.push({ x: tx, y: ty, vx: 0, vy: -8, t: 0, life: 1.6, c: '#555', s: 6, smoke: true }); } }
+    if (u.siphon) { const q = proj(p.x, p.y, 4); lights.push({ x: q[0], y: q[1], r: 36, c: 'rgba(214,76,255,0.35)' }); }
+  }
+  items.sort((a, b) => a.d - b.d);
+  for (const it of items) {
+    const sp = it.sp;
+    const cxw = it.unit ? it.x : it.x + sp.cx, cyw = it.unit ? it.y : it.y + sp.cy;
+    const g = proj(cxw, cyw, 0), q = proj(cxw, cyw, it.z);
+    if (it.shadow) V.drawShadow(ctx, g[0], g[1], it.unit ? sp.w * 0.5 : sp.w * 0.8, it.unit ? sp.h * 0.3 : sp.h * 0.4);
+    ctx.drawImage(sp.canvas, Math.round(q[0] - sp.ax), Math.round(q[1] - sp.ay));
+    if (it.unit && it.unit.siphon) { // mangueira de sifão até a refinaria
+      const ref = objects.find(o => o.n === 'refinery'); const rs = sprite('refinery', P1, 0); const rq = proj(ref.x + rs.cx, ref.y + rs.cy, 5);
+      ctx.save(); ctx.strokeStyle = 'rgba(214,76,255,0.9)'; ctx.lineWidth = 2.5; ctx.setLineDash([8, 6]); ctx.lineDashOffset = -state.time * 80; ctx.beginPath(); ctx.moveTo(q[0], q[1] - 6); ctx.quadraticCurveTo((q[0] + rq[0]) / 2, Math.min(q[1], rq[1]) - 40, rq[0], rq[1]); ctx.stroke(); ctx.restore();
+      if (Math.random() < 0.5) fx.parts.push({ x: rq[0], y: rq[1], vx: (q[0] - rq[0]) * 0.9, vy: (q[1] - 6 - rq[1]) * 0.9 - 30, t: 0, life: 1.1, c: '#E08CFF', s: 2.5, glow: true });
+    }
+    for (const l of sp.lights) lights.push({ x: q[0] - sp.ax + l.x, y: q[1] - sp.ay + l.y, r: it.unit ? 10 : 22, c: l.c });
+  }
+  // efeitos
+  for (let i = fx.parts.length - 1; i >= 0; i--) { const p = fx.parts[i]; p.t += dt; if (p.t > p.life) { fx.parts.splice(i, 1); continue; } p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.96; if (p.smoke) { p.s += dt * 10; p.vy -= dt * 6; } const a = 1 - p.t / p.life; ctx.globalAlpha = p.smoke ? a * 0.45 : a; ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, 7); ctx.fill(); ctx.globalAlpha = 1; if (p.glow) lights.push({ x: p.x, y: p.y, r: 8, c: p.c }); }
+  for (let i = fx.tracers.length - 1; i >= 0; i--) { const t = fx.tracers[i]; t.t += dt; if (t.t > 0.12) { fx.tracers.splice(i, 1); continue; } ctx.strokeStyle = `rgba(255,220,140,${1 - t.t / 0.12})`; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(t.x1, t.y1); ctx.lineTo(t.x2, t.y2); ctx.stroke(); }
+  for (let i = fx.flashes.length - 1; i >= 0; i--) { const f = fx.flashes[i]; f.t += dt; if (f.t > 0.08) { fx.flashes.splice(i, 1); continue; } lights.push({ x: f.x, y: f.y, r: 26, c: 'rgba(255,200,120,0.9)' }); ctx.fillStyle = 'rgba(255,240,200,0.95)'; ctx.beginPath(); ctx.arc(f.x, f.y, 4, 0, 7); ctx.fill(); }
+  // chaminé do reator: fumaça contínua
+  if (Math.random() < 0.5) { for (const o of objects) if (o.n === 'reactor') { const rs = sprite('reactor', P1, 0); const q = proj(o.x + 14.5, o.y + 4.5, 19); fx.parts.push({ x: q[0], y: q[1], vx: 6 + Math.random() * 8, vy: -14, t: 0, life: 2.2 + Math.random(), c: '#6A6F78', s: 3, smoke: true }); } }
+  // destroço em chamas
+  { const o = objects.find(z => z.n === 'wreck'); const q = proj(o.x + 7, o.y + 5, 4); if (Math.random() < 0.6) fx.parts.push({ x: q[0] + (Math.random() - .5) * 8, y: q[1], vx: (Math.random() - .5) * 6, vy: -18 - Math.random() * 10, t: 0, life: 0.5 + Math.random() * 0.4, c: Math.random() < 0.5 ? '#FF7A30' : '#FFC050', s: 2 + Math.random() * 2, glow: true }); if (Math.random() < 0.3) fx.parts.push({ x: q[0], y: q[1] - 6, vx: 3, vy: -10, t: 0, life: 2.5, c: '#2A2A2E', s: 4, smoke: true }); }
+  ctx.restore();
+  // ---- iluminação (noite): escurece e recorta luzes com gradientes ----
+  if (state.night) {
+    lctx.setTransform(DPR, 0, 0, DPR, 0, 0); lctx.globalCompositeOperation = 'source-over';
+    lctx.fillStyle = 'rgba(8,12,28,0.62)'; lctx.fillRect(0, 0, W, H);
+    lctx.globalCompositeOperation = 'destination-out';
+    for (const l of lights) { const g = lctx.createRadialGradient(camX + l.x, camY + l.y, 0, camX + l.x, camY + l.y, l.r * 2.2); g.addColorStop(0, 'rgba(0,0,0,0.9)'); g.addColorStop(1, 'rgba(0,0,0,0)'); lctx.fillStyle = g; lctx.beginPath(); lctx.arc(camX + l.x, camY + l.y, l.r * 2.2, 0, 7); lctx.fill(); }
+    // holofotes da base
+    for (const [tx, ty] of [[5.5 * T, 5.5 * T], [3.2 * T, 7.6 * T], [7.6 * T, 3.0 * T], [3.2 * T, 3.0 * T]]) { const q = proj(tx, ty, 0); const g = lctx.createRadialGradient(camX + q[0], camY + q[1], 0, camX + q[0], camY + q[1], 150); g.addColorStop(0, 'rgba(0,0,0,0.55)'); g.addColorStop(0.5, 'rgba(0,0,0,0.25)'); g.addColorStop(1, 'rgba(0,0,0,0)'); lctx.fillStyle = g; lctx.beginPath(); lctx.arc(camX + q[0], camY + q[1], 150, 0, 7); lctx.fill(); }
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(light, 0, 0); ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    // brilho aditivo das luzes
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    for (const l of lights) { const g = ctx.createRadialGradient(camX + l.x, camY + l.y, 0, camX + l.x, camY + l.y, l.r); const c = l.c.startsWith('rgba') ? l.c : hexA(l.c, 0.55); g.addColorStop(0, c); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(camX + l.x, camY + l.y, l.r, 0, 7); ctx.fill(); }
+    ctx.restore();
+  }
+  const st = document.getElementById('stats'); if (st) st.textContent = `${state.spriteCount} sprites gerados em ${state.buildMs.toFixed(0)} ms · ${items.length} objetos · ${fx.parts.length} partículas`;
+  requestAnimationFrame(draw);
+}
+function hexA(h, a) { const n = parseInt(h.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; }
+ARD.scene = { state, cache, fx, units, objects, proj, sprite, S, T, draw };
+})(globalThis.ARD = globalThis.ARD || {});
+
+document.getElementById('b-night').addEventListener('click', e => { ARD.scene.state.night = !ARD.scene.state.night; e.target.classList.toggle('on', ARD.scene.state.night); });
+document.getElementById('b-grid').addEventListener('click', e => { ARD.scene.state.grid = !ARD.scene.state.grid; e.target.classList.toggle('on', ARD.scene.state.grid); });
+window.addEventListener('error', e => { const d = document.createElement('pre'); d.id = 'err'; d.style.cssText = 'position:fixed;left:8px;bottom:8px;background:#5a1d1d;color:#fff;padding:6px;z-index:9'; d.textContent = 'Erro: ' + e.message + ' @' + e.lineno; document.body.appendChild(d); });
+if (new URLSearchParams(location.search).get('night')) { ARD.scene.state.night = true; document.getElementById('b-night').classList.add('on'); }
+requestAnimationFrame(ARD.scene.draw);
+
+</script>
+</body></html>

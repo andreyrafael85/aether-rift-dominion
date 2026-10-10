@@ -1,0 +1,222 @@
+<title>Aether Rift Beta</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Jogo: mundo escuro único (sci-fi industrial), HUD em grafite com acentos da Fenda. Tema único, por decisão. */
+:root{
+  --bg:#0D0F13; --panel:rgba(20,23,29,.92); --panel2:#1C1F25; --line:#2E333B; --fg:#E8E2D6; --fg2:#A6A197;
+  --rift1:#FF5E3A; --rift2:#B23CFF; --good:#7FE3A1; --warn:#F2C230; --bad:#FF6B6B;
+  --plasma:#FF8A5C; --minerio:#AFC2D6; --dados:#7FE3A1;
+  --fd:'Big Shoulders Display','Arial Narrow',Impact,sans-serif; --fb:'IBM Plex Sans',system-ui,sans-serif; --fm:'IBM Plex Mono',ui-monospace,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--fb);font-size:14px;line-height:1.4;overflow:hidden;-webkit-font-smoothing:antialiased;touch-action:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--rift1);outline-offset:2px}
+[hidden]{display:none!important}
+.muted{color:var(--fg2)} .small{font-size:12px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.k{font-family:var(--fm);font-size:11px;background:#2A2F38;border:1px solid var(--line);border-radius:3px;padding:0 5px;color:var(--fg)}
+.c-plasma{color:var(--plasma)} .c-minerio{color:var(--minerio)} .c-dados{color:var(--dados)}
+
+/* start */
+.screen{position:fixed;inset:0;overflow:auto;padding:env(safe-area-inset-top,0) 16px env(safe-area-inset-bottom,0);background:
+  radial-gradient(ellipse 60% 60% at 75% 15%, rgba(178,60,255,.25), transparent 60%),
+  radial-gradient(ellipse 50% 60% at 15% 95%, rgba(255,94,58,.22), transparent 55%), var(--bg)}
+.start-wrap{max-width:900px;margin:0 auto;padding-block:2.5rem 2rem;display:grid;gap:1.25rem}
+.eyebrow{font-family:var(--fm);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rift1)}
+h1{font-family:var(--fd);font-weight:800;font-size:clamp(3rem,10vw,6.5rem);line-height:.9;margin:0;text-transform:uppercase}
+h1 span{background:linear-gradient(90deg,var(--rift1),var(--rift2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tagline{font-family:var(--fd);font-weight:600;font-size:1.5rem;text-transform:uppercase;letter-spacing:.03em}
+.start-grid{display:grid;gap:1rem;grid-template-columns:1fr}
+@media(min-width:760px){.start-grid{grid-template-columns:1.2fr 1fr}}
+.fac-cards{display:grid;gap:.75rem}
+.fac-card{display:block;border:1px solid var(--line);border-radius:8px;padding:.9rem 1rem;background:var(--panel);cursor:pointer;position:relative}
+.fac-card input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.fac-card:has(input:checked){border-color:var(--rift1);box-shadow:0 0 0 1px var(--rift1) inset}
+.fac-name{font-family:var(--fd);font-weight:700;font-size:1.5rem;text-transform:uppercase}
+.fac-tag{color:var(--fg2);margin-top:.2rem}
+.fac-sup{font-size:12px;margin-top:.4rem;color:var(--fg2)}
+.opts{display:grid;gap:.75rem;border:1px solid var(--line);border-radius:8px;padding:1rem;background:var(--panel);align-content:start}
+.opt label{display:block;font-family:var(--fm);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg2);margin-bottom:.25rem}
+.opt input,.opt select{width:100%;background:#12151A;border:1px solid var(--line);color:var(--fg);border-radius:6px;padding:.55rem .7rem;font:inherit}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border:1px solid var(--line);background:var(--panel2);border-radius:6px;padding:.6rem 1rem;font-weight:600}
+.btn:hover{background:#262A31}
+.btn.primary{background:linear-gradient(90deg,var(--rift1),#d4512f);border-color:transparent;color:#14161A;font-family:var(--fd);font-size:1.3rem;text-transform:uppercase;letter-spacing:.04em;padding:.7rem 1.4rem}
+.btn.primary:hover{filter:brightness(1.08)}
+.start-notes{font-size:13px;color:var(--fg2);max-width:70ch}
+.start-notes b{color:var(--fg)}
+
+/* game */
+#game{position:fixed;inset:0}
+#world{position:absolute;inset:0;width:100%;height:100%;display:block;background:#0D0F13}
+#hud{position:absolute;inset:0;pointer-events:none}
+#hud>*{pointer-events:auto}
+#top{position:absolute;top:env(safe-area-inset-top,0);left:0;right:0;display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;padding:.4rem .75rem;background:linear-gradient(rgba(13,15,19,.95),rgba(13,15,19,.6));font-family:var(--fm);font-size:13px}
+.res{display:flex;gap:.9rem}
+.res b{font-weight:500}
+.energy{display:grid;gap:2px;min-width:150px}
+.energy .row{display:flex;justify-content:space-between;gap:.5rem}
+.energy .bar{height:4px;background:#262A31;border-radius:2px;overflow:hidden}
+.energy .bar i{display:block;height:100%;background:var(--good);width:0}
+.energy.racionado .bar i{background:var(--warn)} .energy.colapso .bar i{background:var(--bad)}
+.energy.racionado #e-regime{color:var(--warn)} .energy.colapso #e-regime{color:var(--bad)} .energy.pleno #e-regime{color:var(--good)}
+.speed{display:flex;gap:2px;margin-left:auto}
+.speed button,.tb{border:1px solid var(--line);border-radius:4px;padding:.25rem .5rem;background:rgba(28,31,37,.9);font-family:var(--fm);font-size:12px}
+.speed button.on,.tb.on{background:var(--rift1);color:#14161A;border-color:var(--rift1)}
+.tb.attn{animation:pulse 1s infinite alternate;border-color:var(--warn);color:var(--warn)}
+@keyframes pulse{to{box-shadow:0 0 0 3px rgba(242,194,48,.35)}}
+#panel{position:absolute;left:.75rem;bottom:calc(.75rem + env(safe-area-inset-bottom,0));width:min(380px,calc(100vw - 1.5rem - 200px));max-height:46vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.75rem;display:grid;gap:.5rem;align-content:start;backdrop-filter:blur(6px)}
+.ph{display:flex;align-items:center;gap:.25rem;font-size:15px}
+.hp{height:5px;background:#262A31;border-radius:3px;overflow:hidden}.hp i{display:block;height:100%;background:var(--good)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:.4rem}
+.act{display:grid;gap:2px;text-align:left;border:1px solid var(--line);background:#1C1F25;border-radius:6px;padding:.45rem .5rem;min-height:44px}
+.act:hover{background:#262A31;border-color:#3B414B}
+.act.on{border-color:var(--rift1);box-shadow:0 0 0 1px var(--rift1) inset}
+.act.poor .cost{opacity:.55}
+.act:disabled{opacity:.45;cursor:default}
+.act .n{font-weight:600;font-size:12.5px}
+.act .cost{font-family:var(--fm);font-size:11px;display:flex;gap:.4rem;flex-wrap:wrap}
+.act.sm{min-height:36px;padding:.35rem .6rem;display:inline-flex;align-items:center;gap:.4rem}
+.act.good{border-color:var(--good)} .act.danger{border-color:var(--bad);color:var(--bad)}
+.act.super{border-color:var(--rift2)}
+.row{display:flex;flex-wrap:wrap;gap:.4rem}
+.queue{display:flex;flex-wrap:wrap;gap:.3rem}
+.q{font-family:var(--fm);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:.2rem .45rem;background:#15181D}
+.q i{color:var(--warn);font-style:normal}
+.chips{display:flex;flex-wrap:wrap;gap:.3rem}
+.chip{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:.1rem .55rem;background:#15181D}
+.tip{font-size:12px;color:var(--fg2);border-left:2px solid var(--rift1);padding-left:.5rem}
+#right{position:absolute;right:.75rem;top:calc(3.2rem + env(safe-area-inset-top,0));width:184px;display:grid;gap:.5rem}
+#minimap{width:184px;height:184px;display:block;border:1px solid var(--line);border-radius:6px;background:#0B0D11;touch-action:none}
+#alerts{display:grid;gap:.25rem}
+.alert{display:grid;grid-template-columns:auto 1fr;gap:.4rem;text-align:left;font-size:12px;padding:.35rem .5rem;border-radius:6px;background:var(--panel);border:1px solid var(--line);border-left-width:3px;transition:opacity .8s}
+.alert .t{font-family:var(--fm);color:var(--fg2)} .alert.fade{opacity:.35}
+.alert.danger{border-left-color:var(--bad)} .alert.good{border-left-color:var(--good)} .alert.warn{border-left-color:var(--warn)} .alert.info{border-left-color:#5B9BD5}
+.quick{display:grid;gap:.3rem}
+.qb{display:grid;text-align:left;border:1px solid var(--line);border-radius:6px;padding:.4rem .55rem;background:var(--panel);font-size:12px}
+.qb .n{font-weight:600} .qb .sub{font-family:var(--fm);font-size:10.5px;color:var(--fg2)}
+.qb:disabled{opacity:.5;cursor:default}
+#bar{position:absolute;left:0;right:0;bottom:calc(.5rem + env(safe-area-inset-bottom,0));display:none;justify-content:center;gap:.4rem;padding:0 .5rem}
+body.touch #bar{display:flex}
+body.touch #panel{width:calc(100vw - 1.5rem);max-height:34vh;bottom:calc(3.6rem + env(safe-area-inset-bottom,0))}
+body.touch #right{width:120px} body.touch #minimap{width:120px;height:120px} body.touch #alerts{display:none} body.touch #log{display:none}
+body.touch .quick{font-size:11px}
+body.touch #top{gap:.3rem .6rem;padding:.3rem .5rem;font-size:12px}
+body.touch #top .muted{display:none}
+body.touch .speed{margin-left:0}
+body.touch .speed button,body.touch .tb{padding:.2rem .4rem}
+body.touch #hints{top:calc(5.6rem + env(safe-area-inset-top,0))}
+body.touch #right{top:calc(5.8rem + env(safe-area-inset-top,0))}
+#bar .tb{min-width:44px;min-height:40px;font-size:13px}
+#hints{position:absolute;left:50%;transform:translateX(-50%);top:calc(3.4rem + env(safe-area-inset-top,0));width:min(520px,calc(100vw - 420px));background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.5rem .75rem;display:grid;gap:.25rem;font-size:12.5px}
+body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
+#hints .hint{color:var(--fg2)} #hints .hint.now{color:var(--fg)} #hints .hint.now::before{content:"→ ";color:var(--rift1)}
+#hints-close{position:absolute;top:2px;right:6px;color:var(--fg2)}
+#log{position:absolute;right:.75rem;bottom:calc(.75rem + env(safe-area-inset-bottom,0));width:184px;max-height:120px;overflow:hidden;font-family:var(--fm);font-size:10.5px;color:var(--fg2);display:grid;gap:1px;mask-image:linear-gradient(#000 60%,transparent)}
+#notice{position:absolute;left:50%;bottom:calc(50vh - 120px);transform:translateX(-50%);background:rgba(20,23,29,.95);border:1px solid var(--line);padding:.45rem .9rem;border-radius:6px;opacity:0;transition:opacity .2s;font-size:13px;pointer-events:none}
+#notice.show{opacity:1}
+#proposal{position:absolute;left:50%;transform:translateX(-50%);top:calc(6rem + env(safe-area-inset-top,0));background:var(--panel);border:1px solid var(--warn);border-radius:8px;padding:.75rem 1rem;display:grid;gap:.5rem;max-width:min(420px,calc(100vw - 2rem))}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:1rem;z-index:5}
+.modal .box{background:#15181D;border:1px solid var(--line);border-radius:10px;padding:1.1rem;max-width:620px;width:100%;max-height:90vh;overflow:auto;display:grid;gap:.75rem}
+.modal h2{font-family:var(--fd);font-weight:700;font-size:1.8rem;text-transform:uppercase;margin:0}
+.dp{border:1px solid var(--line);border-radius:6px;padding:.6rem .75rem;display:grid;gap:.4rem}
+.dp.dead{opacity:.5}
+.dp-h{display:flex;align-items:center;gap:.2rem}
+.help h3{font-family:var(--fd);font-size:1.2rem;text-transform:uppercase;margin:.5rem 0 .25rem}
+.help table{border-collapse:collapse;width:100%;font-size:12.5px}
+.help td,.help th{border-bottom:1px solid var(--line);padding:.3rem .4rem;text-align:left;vertical-align:top}
+.help th{font-family:var(--fm);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg2)}
+.matrix td{text-align:center}.matrix td:first-child{text-align:left;font-weight:600}
+.good{color:var(--good);font-weight:600}.bad{color:var(--bad);font-weight:600}
+#end .box{max-width:720px}
+#end-title{font-size:clamp(3rem,8vw,5rem);line-height:.9}
+#end-title.victory{color:var(--good)} #end-title.defeat{color:var(--bad)}
+#end table{width:100%;border-collapse:collapse}#end td,#end th{padding:.35rem .5rem;border-bottom:1px solid var(--line);text-align:left}
+#end-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.4rem}
+.stat{display:grid;border:1px solid var(--line);border-radius:6px;padding:.4rem .6rem;font-size:12px}.stat span{color:var(--fg2)}
+#errbox{position:fixed;left:8px;bottom:8px;background:#5a1d1d;color:#fff;padding:.4rem .6rem;border-radius:6px;font-family:var(--fm);font-size:12px;z-index:9;max-width:80vw}
+</style>
+
+<div id="start" class="screen">
+  <div class="start-wrap">
+    <div class="eyebrow">Beta 0.1 · protótipo jogável no navegador · contra IA</div>
+    <h1>Aether Rift<br><span>Dominion</span></h1>
+    <p class="tagline">Nada aqui é seu. Ainda.</p>
+    <div class="start-grid">
+      <div class="fac-cards" id="fac-cards"></div>
+      <div class="opts">
+        <div class="opt"><label for="opt-name">Nome</label><input id="opt-name" maxlength="18"></div>
+        <div class="opt"><label for="opt-opp">Oponentes</label><select id="opt-opp"><option value="1">1 IA (1v1)</option><option value="2">2 IAs (FFA 3)</option><option value="3">3 IAs (FFA 4)</option></select></div>
+        <div class="opt"><label for="opt-diff">Dificuldade</label><select id="opt-diff"><option value="facil">Fácil</option><option value="normal">Normal</option><option value="dificil">Difícil</option></select></div>
+        <div class="opt"><label for="opt-seed">Semente do mapa</label><input id="opt-seed" inputmode="numeric"></div>
+        <div class="row"><button id="btn-start" class="btn primary">Iniciar partida</button><button id="btn-help-start" class="btn">Como jogar</button></div>
+      </div>
+    </div>
+    <p class="start-notes"><b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
+  </div>
+</div>
+
+<div id="game" hidden>
+  <canvas id="world"></canvas>
+  <div id="hud">
+    <div id="top">
+      <div class="res"><span class="c-plasma">◆ <b id="r-plasma">0</b></span><span class="c-minerio">▣ <b id="r-minerio">0</b></span><span class="c-dados">◈ <b id="r-dados">0</b></span></div>
+      <div id="energy" class="energy pleno"><div class="row"><span>⚡ <span id="e-text">0 / 0</span></span><span id="e-regime">Pleno</span></div><div class="bar"><i id="e-bar"></i></div></div>
+      <span id="clock">00:00</span>
+      <span class="muted">Rep.: <span id="rep">Neutro</span></span>
+      <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
+    </div>
+    <div id="hints"><button id="hints-close" aria-label="Fechar dicas">✕</button><div id="hints-body"></div></div>
+    <div id="panel"></div>
+    <div id="right">
+      <canvas id="minimap" width="184" height="184"></canvas>
+      <div class="quick">
+        <button id="btn-over" class="qb"><span class="n">Sobrecarga</span><span class="sub"></span></button>
+        <button id="btn-super" class="qb"><span class="n">Superarma</span><span class="sub"></span></button>
+      </div>
+      <div id="alerts"></div>
+    </div>
+    <div id="log"></div>
+    <div id="bar">
+      <button id="btn-nucleo" class="tb">Núcleo</button><button id="btn-army" class="tb">Exército</button><button id="btn-build" class="tb">Construir</button><button id="btn-attack" class="tb">Atacar</button><button id="btn-stop" class="tb">Parar</button><button id="btn-box" class="tb">Caixa</button>
+    </div>
+    <div id="notice"></div>
+    <div id="proposal" hidden><div id="proposal-text"></div><div class="row"><button id="prop-yes" class="act sm good">Aceitar pacto</button><button id="prop-no" class="act sm">Recusar</button></div></div>
+  </div>
+
+  <div id="diplo" class="modal" hidden><div class="box"><h2>Diplomacia</h2><div id="diplo-body"></div><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
+  <div id="confirm" class="modal" hidden><div class="box"><h2>Confirmar</h2><p id="confirm-text"></p><div class="row"><button id="confirm-yes" class="btn primary">Confirmar</button><button id="confirm-no" class="btn">Cancelar</button></div></div></div>
+  <div id="end" class="modal" hidden><div class="box"><div class="eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-again" class="btn primary">Jogar de novo</button></div></div></div>
+</div>
+
+<div id="help" class="modal help" hidden><div class="box">
+  <h2>Como jogar</h2>
+  <p class="muted small">Objetivo: destruir os Núcleos inimigos ou ter mais Domínio (território, exército e recursos) ao fim de 25 minutos. Energia abaixo de 100% deixa produção, sensores e defesas piores: construa Reatores.</p>
+  <h3>Mouse e teclado</h3>
+  <table><tr><td>Clique / arrastar</td><td>Selecionar / caixa de seleção. Shift adiciona. Duplo clique seleciona todas do mesmo tipo na tela.</td></tr>
+  <tr><td>Botão direito</td><td>Mover. Em inimigo: atacar. Em nó com coletores: colher. Em Refinaria ou Reator inimigo com Pirata: Sifonar. Em Caixa: recolher. Com estrutura selecionada: ponto de reunião.</td></tr>
+  <tr><td>A / S</td><td>Atacar-mover (clique no destino) / Parar</td></tr>
+  <tr><td>B + letra</td><td>Construir: R Reator, F Refinaria, Q Quartel, V Fábrica, H Hangar, T Torre, N Nódulo, L Laboratório. Shift mantém o modo.</td></tr>
+  <tr><td>Letras com estrutura selecionada</td><td>Produzir: C Coletor, I Infantaria, S Suporte, P Pirata, V Veículo, D Drone</td></tr>
+  <tr><td>Ctrl+1–9 / 1–9</td><td>Definir / selecionar grupo (duas vezes centraliza)</td></tr>
+  <tr><td>F1 / F2 / F / Espaço</td><td>Núcleo / exército / centralizar seleção / ir ao último alerta</td></tr>
+  <tr><td>WASD, setas, roda, botão do meio</td><td>Câmera e zoom</td></tr>
+  <tr><td>P / H / Esc</td><td>Pausar / ajuda / cancelar</td></tr></table>
+  <h3>Toque</h3>
+  <table><tr><td>Toque</td><td>Selecionar. Com unidades selecionadas, toque no chão move.</td></tr><tr><td>Toque longo</td><td>Comando de contexto (atacar, colher, sifonar, recolher).</td></tr><tr><td>Arrastar / dois dedos</td><td>Câmera / zoom. Ative "Caixa" para arrastar uma seleção.</td></tr></table>
+  <h3>Contras (atacante → alvo)</h3>
+  <table class="matrix"><thead><tr><th></th><th>Inf.</th><th>Veíc.</th><th>Drone</th><th>Estrut.</th><th>Sup.</th></tr></thead><tbody>
+  <tr><td>Infantaria</td><td>—</td><td class="bad">▼</td><td class="good">▲</td><td class="bad">▼</td><td class="good">▲</td></tr>
+  <tr><td>Veículos</td><td class="good">▲</td><td>—</td><td class="bad">▼</td><td class="good">▲</td><td class="bad">▼</td></tr>
+  <tr><td>Drones</td><td class="bad">▼</td><td class="good">▲</td><td>—</td><td class="bad">▼</td><td class="good">▲</td></tr>
+  <tr><td>Estruturas</td><td class="good">▲</td><td class="bad">▼</td><td class="good">▲</td><td>—</td><td class="bad">▼</td></tr>
+  <tr><td>Suporte/Hack</td><td class="bad">▼</td><td class="good">▲</td><td class="bad">▼</td><td class="good">▲</td><td>—</td></tr></tbody></table>
+  <p class="muted small">▲ Forte = 1,5× dano · ▼ Fraco = 0,65×. Vehnar: estruturas neutras contra veículos. Erevane: infantaria camuflada acerta 1,5× saindo da camuflagem.</p>
+  <h3>Roubo e diplomacia</h3>
+  <p class="small">Piratas sifonam Refinarias e Reatores inimigos por até 40 s; a vítima recebe um Alerta com atraso de 3 a 5 s. Pirata morto com carga vira Caixa que qualquer um recolhe. Erevane rouba com +20% e sem deixar Rastro. Pactos de Não-agressão custam Caução de 150 Minério por lado; quebrar dá +20% de dano por 45 s, entrega sua Caução à vítima e derruba sua reputação.</p>
+  <div class="row"><button class="btn" data-close>Fechar</button></div>
+</div></div>
+<div id="errbox" hidden></div>
+<!--SCRIPTS-->
