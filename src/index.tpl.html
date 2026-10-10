@@ -51,6 +51,7 @@ h1 span{background:linear-gradient(90deg,var(--rift1),var(--rift2));-webkit-back
 /* game */
 #game{position:fixed;inset:0}
 #world{position:absolute;inset:0;width:100%;height:100%;display:block;background:#0D0F13}
+#overlay{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
 #hud{position:absolute;inset:0;pointer-events:none}
 #hud>*{pointer-events:auto}
 #top{position:absolute;top:env(safe-area-inset-top,0);left:0;right:0;display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;padding:.4rem .75rem;background:linear-gradient(rgba(13,15,19,.95),rgba(13,15,19,.6));font-family:var(--fm);font-size:13px}
@@ -155,7 +156,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 
 <div id="start" class="screen">
   <div class="start-wrap">
-    <div class="eyebrow">Beta 2.0a · protótipo jogável no navegador · contra IA</div>
+    <div class="eyebrow">Beta 3.0a · protótipo jogável no navegador · contra IA · agora em 3D</div>
     <h1>Aether Rift<br><span>Dominion</span></h1>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -165,15 +166,17 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         <div class="opt"><label for="opt-opp">Oponentes</label><select id="opt-opp"><option value="1">1 IA (1v1)</option><option value="2">2 IAs (FFA 3)</option><option value="3">3 IAs (FFA 4)</option></select></div>
         <div class="opt"><label for="opt-diff">Dificuldade</label><select id="opt-diff"><option value="facil">Fácil</option><option value="normal">Normal</option><option value="dificil">Difícil</option></select></div>
         <div class="opt"><label for="opt-seed">Semente do mapa</label><input id="opt-seed" inputmode="numeric"></div>
+        <div class="opt"><label for="opt-gfx">Gráficos</label><select id="opt-gfx"><option value="3d">3D (Three.js, luz e relevo)</option><option value="2d">2D isométrico (leve, para celulares fracos)</option></select></div>
         <div class="row"><button id="btn-start" class="btn primary">Iniciar partida</button><button id="btn-help-start" class="btn">Como jogar</button></div>
       </div>
     </div>
-    <p class="start-notes"><b>Novo no 2.0a:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
+    <p class="start-notes"><b>Novo no 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
   </div>
 </div>
 
 <div id="game" hidden>
   <canvas id="world"></canvas>
+  <canvas id="overlay"></canvas>
   <div id="hud">
     <div id="top">
       <div class="res"><span class="c-plasma">◆ <b id="r-plasma">0</b></span><span class="c-minerio">▣ <b id="r-minerio">0</b></span><span class="c-dados">◈ <b id="r-dados">0</b></span></div>
@@ -194,7 +197,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     </div>
     <div id="log"></div>
     <div id="bar">
-      <button id="btn-nucleo" class="tb">Núcleo</button><button id="btn-army" class="tb">Exército</button><button id="btn-all" class="tb">Na tela</button><button id="btn-build" class="tb">Construir</button><button id="btn-attack" class="tb">Atacar</button><button id="btn-stop" class="tb">Parar</button><button id="btn-box" class="tb">Caixa</button><button id="btn-clear" class="tb">✕</button>
+      <button id="btn-nucleo" class="tb">Núcleo</button><button id="btn-rot" class="tb" title="Girar câmera">⟳</button><button id="btn-army" class="tb">Exército</button><button id="btn-all" class="tb">Na tela</button><button id="btn-build" class="tb">Construir</button><button id="btn-attack" class="tb">Atacar</button><button id="btn-stop" class="tb">Parar</button><button id="btn-box" class="tb">Caixa</button><button id="btn-clear" class="tb">✕</button>
     </div>
     <div id="notice"></div>
     <div id="proposal" hidden><div id="proposal-text"></div><div class="row"><button id="prop-yes" class="act sm good">Aceitar pacto</button><button id="prop-no" class="act sm">Recusar</button></div></div>
@@ -218,6 +221,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <tr><td>Ctrl+1–9 / 1–9</td><td>Definir / selecionar grupo (duas vezes centraliza)</td></tr>
   <tr><td>F1 / F2 / F / Espaço</td><td>Núcleo / exército / centralizar seleção / ir ao último alerta</td></tr>
   <tr><td>WASD, setas, roda, botão do meio</td><td>Câmera e zoom</td></tr>
+  <tr><td>Q / E</td><td>Girar a câmera (modo 3D); no celular, o botão ⟳</td></tr>
   <tr><td>P / H / Esc</td><td>Pausar / ajuda / cancelar</td></tr></table>
   <h3>Toque</h3>
   <table><tr><td>Toque</td><td>Toque em uma unidade sua para selecionar; duplo toque seleciona todas do tipo. Com unidades selecionadas: toque no chão move, toque no inimigo ataca, toque em nó ou carcaça colhe, toque em Refinaria inimiga com Pirata sifona.</td></tr><tr><td>Barra inferior</td><td>Núcleo, Exército, Na tela (seleciona o que aparece), Construir, Atacar (o modo fica ligado até desligar), Parar, Caixa (arrastar seleciona) e ✕ (limpar seleção).</td></tr><tr><td>Arrastar / dois dedos</td><td>Câmera / zoom. Em modo Construir com Muro, arrastar desenha o muro.</td></tr></table>
@@ -234,4 +238,5 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <div class="row"><button class="btn" data-close>Fechar</button></div>
 </div></div>
 <div id="errbox" hidden onclick="this.hidden=true"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
 <!--SCRIPTS-->

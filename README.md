@@ -1,6 +1,6 @@
 # Aether Rift: Dominion — beta de testes
 
-RTS multiplayer browser-first em desenvolvimento. Este repositório publica o **beta 2.0b jogável** (contra IA: terreno com biomas e cordilheiras, visual isométrico voxel, projéteis e torretas, muros com caminhos, veterância, carcaças, Tempestade de Éter, som e voz, controles de toque), a **prova de conceito visual 2D** (`estilo.html`) e a **validação do caminho 3D** (`estilo3d.html`, Three.js), para testes com amigos.
+RTS multiplayer browser-first em desenvolvimento. Este repositório publica o **beta 3.0a jogável** (contra IA, agora em 3D com Three.js: relevo, sombras, névoa projetada, luzes à noite, câmera com rotação; modo 2D isométrico mantido como alternativa; terreno com biomas e cordilheiras, projéteis e torretas, muros com caminhos, veterância, carcaças, Tempestade de Éter, som e voz, controles de toque), a **prova de conceito visual 2D** (`estilo.html`) e a **validação do caminho 3D** (`estilo3d.html`, Three.js), para testes com amigos.
 
 **Jogar agora:** abra `index.html` pelo GitHub Pages deste repositório (link na descrição) ou localmente, direto no navegador. Funciona em desktop e celular; nada para instalar.
 
@@ -31,8 +31,8 @@ aether-rift-dominion/
 ├─ index.html        jogo em arquivo único (gerado; é o que o GitHub Pages serve)
 ├─ estilo.html       prova de conceito do visual voxel isométrico (gerado)
 ├─ estilo3d.html     validação 3D em Three.js com os mesmos modelos (gerado)
-├─ src/              fontes do jogo: sim.js (simulação determinística), ai.js, voxel.js e models.js
-│                    (sprites voxel), render.js, input.js, main.js, index.tpl.html (HUD e CSS)
+├─ src/              fontes do jogo: sim.js (simulação determinística), ai.js, voxel.js e models.js (modelos voxel),
+│                    vox3d.js (voxel → malha), render.js (2D isométrico), render3d.js (Three.js), audio.js, input.js, main.js, index.tpl.html
 ├─ style/            cena da prova de conceito 2D (scene.js, boot.js, index.tpl.html)
 ├─ style3d/          cena da validação 3D (scene3d.js, boot.js, index.tpl.html)
 ├─ tools/            build.mjs (gera index.html, estilo.html e dist/) e test.cjs (IA contra IA, invariantes, determinismo)

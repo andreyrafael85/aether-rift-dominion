@@ -201,6 +201,7 @@ function create(o) {
     if (k === 'H' || e.key === '?') { ui.toggleHelp(); return; }
     if (k === 'P') { if (!(b && S.BUILDINGS[b.def].produces && S.BUILDINGS[b.def].produces.includes('pirata'))) ui.togglePause(); return; }
     if (e.key === '+' || e.key === '=') { cam.zoom *= 1.15; clampCam(); } if (e.key === '-') { cam.zoom /= 1.15; clampCam(); }
+    if ((k === 'Q' || k === 'E') && R.supportsYaw) { cam.yaw = (cam.yaw || 0) + (k === 'Q' ? -1 : 1) * Math.PI / 8; return; }
   });
   window.addEventListener('keyup', e => I.keys.delete(e.code));
   window.addEventListener('blur', () => I.keys.clear());
