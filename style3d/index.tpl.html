@@ -1,0 +1,28 @@
+<title>Teste de Estilo 3D</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{color-scheme:dark;--fg:#E8E2D6;--fg2:#A6A197;--line:#2E333B;--rift1:#FF5E3A}
+html,body{height:100%;margin:0}
+body{background:#0A0C10;color:var(--fg);font-family:'IBM Plex Mono',ui-monospace,monospace;overflow:hidden;touch-action:none}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+#cap{position:fixed;left:16px;top:calc(12px + env(safe-area-inset-top,0));max-width:min(560px,calc(100vw - 32px));background:rgba(13,15,19,.86);border:1px solid var(--line);border-radius:8px;padding:10px 14px;display:grid;gap:6px;backdrop-filter:blur(6px)}
+#cap h1{margin:0;font-family:'Big Shoulders Display','Arial Narrow',Impact,sans-serif;font-weight:800;font-size:1.6rem;text-transform:uppercase;line-height:1}
+#cap p{margin:0;font-size:12px;color:var(--fg2);font-family:'IBM Plex Sans',system-ui,sans-serif}
+#cap .eyebrow{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rift1)}
+#stats{font-size:11px;color:var(--fg2)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+button{font:inherit;font-size:12px;color:var(--fg);background:#1C1F25;border:1px solid var(--line);border-radius:4px;padding:4px 10px;cursor:pointer}
+button.on{background:var(--rift1);color:#14161A;border-color:var(--rift1)}
+button:focus-visible{outline:2px solid var(--rift1);outline-offset:2px}
+#err{position:fixed;left:8px;bottom:8px;background:#5a1d1d;color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;z-index:9;max-width:80vw}
+</style>
+<canvas id="c"></canvas>
+<div id="cap">
+  <div class="eyebrow">Aether Rift: Dominion · validação do caminho 3D para o v2.0</div>
+  <h1>Os mesmos modelos, em 3D</h1>
+  <p>Os modelos voxel do jogo viram malhas 3D no navegador, com luz direcional, sombras, relevo com biomas, muros, torretas que giram, projéteis, fumaça e luzes emissivas. Arraste para orbitar, roda para aproximar, botão direito para deslocar. Nenhum asset externo além do Three.js.</p>
+  <div class="row"><button id="b-night">Noite</button><button id="b-shadow" class="on">Sombras</button><button id="b-orbit" class="on">Órbita</button></div>
+  <div id="stats"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+<!--SCRIPTS-->

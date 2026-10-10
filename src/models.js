@@ -226,6 +226,15 @@ function datashards(seed) { // fragmentos de dados: lâminas verdes flutuando so
   return m;
 }
 function rocks(seed) { const m = M(); let r = (seed | 0) + 11; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; }; for (let i = 0; i < 4; i++) m.sphere(3 + rnd() * 8, 3 + rnd() * 8, 0.5 + rnd(), 2 + rnd() * 2.5, ['#6E7682', '#5A616B', '#7E8794'][i % 3]); return m; }
+function ruin(seed) { // ruínas da civilização pré-Colapso: pilares quebrados e um arco
+  const m = M(); let r = (seed | 0) + 19; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; };
+  const stone = ['#9A9CA4', '#7E8088', '#B0B2BA'];
+  m.box(0, 0, 0, 14, 10, 1, '#6B6E76', (x, y) => rnd() > 0.15);
+  for (let i = 0; i < 3; i++) { const x = 1 + Math.floor(rnd() * 11), y = 1 + Math.floor(rnd() * 7), h = 3 + Math.floor(rnd() * 7); m.box(x, y, 1, 2, 2, h, stone[i % 3], (a, b2, z) => !(z === h - 1 && rnd() < 0.5)); }
+  m.box(2, 8, 1, 2, 2, 7, stone[0]); m.box(10, 8, 1, 2, 2, 7, stone[0]); m.box(2, 8, 8, 10, 2, 1, stone[1], (x) => x !== 5);
+  if (rnd() < 0.6) m.box(6, 3, 1, 1, 1, 2, green, null, true);
+  return m;
+}
 function crate() { const m = M(); m.box(0, 0, 0, 6, 6, 5, '#B8862B'); m.box(0, 2, 0, 6, 2, 5, '#6E4F16'); m.box(2, 0, 0, 2, 6, 5, '#6E4F16'); m.box(2, 2, 5, 2, 2, 1, yellow, null, true); return m; }
 function wreck() { const m = M(); m.box(0, 0, 0, 14, 3, 2, dark); m.box(0, 7, 0, 10, 3, 2, dark); m.box(1, 2, 2, 12, 6, 2, '#3A2F2A', (x, y, z) => !(z === 1 && (x + y) % 3 === 0)); m.box(4, 3, 4, 5, 4, 2, '#2E2622', (x, y) => (x + y) % 2 === 0); m.box(6, 4, 3, 2, 2, 1, '#FF5A1A', null, true); return m; }
 
@@ -238,5 +247,5 @@ const BY_DEF = {
 };
 // defs que se desenham em duas partes: casco na direção do corpo e torreta na direção da mira; z = altura da torreta em voxels
 const PARTS = { veiculo: { hull: 'veiculo_hull', turret: 'veiculo_turret', z: 6 }, torre: { hull: 'torre_base', turret: 'torre_turret', z: 12 }, bastiao: { hull: 'bastiao_base', turret: 'bastiao_turret', z: 14 } };
-ARD.models = { PARTS, tankHull, tankTurret, towerBase, towerTurret, bastionBase, bastionTurret, tank, mech, harvester, infantry, drone, support, raider, tug, refinery, reactor, barracks, factory, hangar, tower, bastion, nodule, lab, wall, nucleus, crystals, ore, datashards, rocks, crate, wreck, BY_DEF };
+ARD.models = { PARTS, tankHull, tankTurret, towerBase, towerTurret, bastionBase, bastionTurret, tank, mech, harvester, infantry, drone, support, raider, tug, refinery, reactor, barracks, factory, hangar, tower, bastion, nodule, lab, wall, nucleus, crystals, ore, datashards, rocks, ruin, crate, wreck, BY_DEF };
 })(globalThis.ARD = globalThis.ARD || {});

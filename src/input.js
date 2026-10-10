@@ -21,7 +21,7 @@ function create(o) {
   function pick(sx, sy, radiusPx) {
     const vis = sim.vis[human]; let best = null, bd = Infinity; const k = R.K * cam.zoom;
     for (const e of sim.ents) {
-      if (!e.alive || e.kind === 'proj') continue;
+      if (!e.alive || e.kind === 'proj' || e.kind === 'rock') continue;
       if (e.kind !== 'node' && e.owner !== human && !vis.has(e.id)) continue;
       const z = e.kind === 'unit' && S.UNITS[e.def].flying ? 14 : 0;
       const [ex, ey] = R.worldToScreen(cam, e.x, e.y, z);

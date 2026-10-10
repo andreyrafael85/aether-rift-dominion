@@ -11,6 +11,7 @@ const PLAYER_COLORS = ['#FF8C1A', '#38D1E0', '#B98BFF', '#7FE3A1'];
 const NAV = 32, NW = WORLD / NAV;          // grade de navegação 100×100
 const TILE = 64, TILES = WORLD / TILE;      // grade de exploração 50×50
 const DX8 = [1, 1, 0, -1, -1, -1, 0, 1], DY8 = [0, 1, 1, 1, 0, -1, -1, -1];
+const BIOMES = ['gelo', 'rocha', 'tundra', 'basalto'];
 
 const FACTIONS = {
   vehnar: {
@@ -144,6 +145,7 @@ function createSim(cfg) {
   }
   sim.nextStorm = 300 + sim.rand() * 120;
   generateMap(sim);
+  generateTerrain(sim);
   rebuildNav(sim);
   computeVisibility(sim); markExplored(sim);
   return sim;
@@ -204,6 +206,67 @@ function generateMap(sim) {
   }
 }
 
+// ---------- terreno: biomas por ruído, adereços e cordilheiras intransponíveis ----------
+function makeNoise(seed) {
+  const h = (ix, iy) => { let n = (ix * 374761393 + iy * 668265263 + seed * 1274126177) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); n ^= n >>> 16; return (n >>> 0) / 4294967296; };
+  const sm = t => t * t * (3 - 2 * t);
+  const val = (x, y) => { const ix = Math.floor(x), iy = Math.floor(y); const fx = sm(x - ix), fy = sm(y - iy); const a = h(ix, iy), b = h(ix + 1, iy), c = h(ix, iy + 1), d = h(ix + 1, iy + 1); return (a * (1 - fx) + b * fx) * (1 - fy) + (c * (1 - fx) + d * fx) * fy; };
+  return (x, y) => 0.6 * val(x, y) + 0.3 * val(x * 2.1 + 7.3, y * 2.1 + 3.1) + 0.1 * val(x * 4.3 + 1.7, y * 4.3 + 9.2);
+}
+function generateTerrain(sim) {
+  const n = TILES * TILES; sim.biome = new Uint8Array(n); sim.biome2 = new Uint8Array(n); sim.biomeMix = new Float32Array(n); sim.props = [];
+  const noise = makeNoise(sim.seed);
+  const nucs = sim.players.map(p => nucleoOf(sim, p.id)).filter(Boolean);
+  for (let ty = 0; ty < TILES; ty++) for (let tx = 0; tx < TILES; tx++) {
+    const i = ty * TILES + tx; const cx = (tx + 0.5) * TILE, cy = (ty + 0.5) * TILE; const d = dist(cx, cy, CX, CY);
+    const v = noise(cx / 460, cy / 460);
+    let b = v < 0.42 ? 0 : v < 0.6 ? 1 : 2; let b2 = b, mix = 0;
+    const th = v < 0.42 ? 0.42 : v < 0.6 ? (v - 0.42 < 0.6 - v ? 0.42 : 0.6) : 0.6; const dt = Math.abs(v - th);
+    if (dt < 0.05) { mix = (1 - dt / 0.05) * 0.5; b2 = th === 0.42 ? (v < 0.42 ? 1 : 0) : (v < 0.6 ? 2 : 1); }
+    if (d < 560) { b = 3; b2 = 3; mix = 0; } else if (d < 660) { b2 = 3; mix = (660 - d) / 100 * 0.7; }
+    sim.biome[i] = b; sim.biome2[i] = b2; sim.biomeMix[i] = mix;
+    // adereços decorativos (só visuais): ruínas no gelo, pedras na rocha, estilhaços na tundra, cristais no basalto
+    const hh = (tx * 92821 + ty * 68917 + sim.seed * 3) % 1000 / 1000;
+    if (d < RIFT_R + 60 || hh > 0.14) continue;
+    if (nucs.some(nc => dist(cx, cy, nc.x, nc.y) < 300)) continue;
+    if (sim.ents.some(e => e.kind === 'node' && dist(cx, cy, e.x, e.y) < 70)) continue;
+    const kind = (b === 0 || b === 2) && hh < 0.045 ? 'ruin' : 'rocks'; // só pedras e ruínas: nada que pareça um nó de recurso
+    sim.props.push({ x: cx + (hh * 977 % 40) - 20, y: cy + (hh * 613 % 40) - 20, kind, seed: Math.floor(hh * 1000), scale: 0.35 + (hh * 331 % 1) * 0.35 });
+  }
+  // cordilheiras: segmentos de rochas intransponíveis no anel médio, mantendo o mapa conectado
+  const nR = 5 + sim.players.length; const placed = [];
+  for (let k = 0; k < nR * 3 && placed.length < nR; k++) {
+    const a = sim.rand() * Math.PI * 2, rr = 620 + sim.rand() * 420; const cx = CX + Math.cos(a) * rr, cy = CY + Math.sin(a) * rr;
+    if (nucs.some(nc => dist(cx, cy, nc.x, nc.y) < 460)) continue;
+    const dir = a + Math.PI / 2 + (sim.rand() - 0.5) * 0.8; const len = 150 + sim.rand() * 220; const curve = (sim.rand() - 0.5) * 0.004;
+    const rocks = [];
+    for (let t = -len / 2; t <= len / 2; t += 26) {
+      const ang = dir + curve * t * 2; const x = cx + Math.cos(ang) * t, y = cy + Math.sin(ang) * t + Math.sin(t * 0.08) * 6;
+      if (x < 80 || y < 80 || x > WORLD - 80 || y > WORLD - 80) continue;
+      if (sim.ents.some(e => (e.kind === 'node' && dist(x, y, e.x, e.y) < 70) || (e.kind === 'building' && dist(x, y, e.x, e.y) < 120))) continue;
+      const r = { id: sim.nextId++, kind: 'rock', x, y, r: 13, alive: true, owner: -1, seed: Math.floor(sim.rand() * 1000) };
+      sim.ents.push(r); sim.byId.set(r.id, r); rocks.push(r);
+    }
+    if (rocks.length < 4) { for (const r of rocks) { r.alive = false; sim.byId.delete(r.id); } continue; }
+    rebuildNav(sim);
+    if (!connected(sim, nucs)) { for (const r of rocks) { r.alive = false; sim.byId.delete(r.id); } continue; }
+    placed.push(rocks);
+  }
+  sim.ents = sim.ents.filter(e => e.alive);
+  rebuildNav(sim);
+}
+function nearPassable(sim, x, y, owner) { // célula transitável mais próxima (os Núcleos ocupam as próprias células)
+  const ci = navIdx(x, y); const cx = ci % NW, cy = (ci / NW) | 0;
+  for (let r = 0; r <= 5; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue; const x2 = cx + dx, y2 = cy + dy; if (x2 < 0 || y2 < 0 || x2 >= NW || y2 >= NW) continue; const i = y2 * NW + x2; if (passable(sim, i, owner)) return i; }
+  return -1;
+}
+function connected(sim, nucs) { // todos os Núcleos e o anel de Plasma alcançam o primeiro Núcleo pela grade
+  const src = nearPassable(sim, nucs[0].x, nucs[0].y, -2); if (src < 0) return false;
+  const f = flowField(sim, src, -2);
+  for (let i = 1; i < nucs.length; i++) { const ci = nearPassable(sim, nucs[i].x, nucs[i].y, -2); if (ci < 0 || f.cost[ci] < 0) return false; }
+  for (const e of sim.ents) if (e.alive && e.kind === 'node' && e.res === 'plasma' && dist(e.x, e.y, CX, CY) < 400) { const ci = nearPassable(sim, e.x, e.y, -2); if (ci >= 0 && f.cost[ci] >= 0) return true; }
+  return false;
+}
 function addNode(sim, res, x, y, amount) {
   const e = { id: sim.nextId++, kind: 'node', res, x: clamp(x, 60, WORLD - 60), y: clamp(y, 60, WORLD - 60), r: 18, amount, max: amount, alive: true, owner: -1 };
   sim.ents.push(e); sim.byId.set(e.id, e); return e;
@@ -267,9 +330,9 @@ function rebuildNav(sim) {
   const nav = sim.nav; nav.blocked.fill(0); nav.gates.clear(); nav.gatePos.clear(); nav.fields.clear(); nav.version++;
   for (let cy = 0; cy < NW; cy++) for (let cx = 0; cx < NW; cx++) { const x = (cx + 0.5) * NAV, y = (cy + 0.5) * NAV; if (dist(x, y, CX, CY) < RIFT_R + 14) nav.blocked[cy * NW + cx] = 1; }
   for (const e of sim.ents) {
-    if (!e.alive || e.kind !== 'building') continue;
+    if (!e.alive || (e.kind !== 'building' && e.kind !== 'rock')) continue;
     const rr = e.r + 7; const x0 = Math.max(0, ((e.x - rr) / NAV) | 0), x1 = Math.min(NW - 1, ((e.x + rr) / NAV) | 0), y0 = Math.max(0, ((e.y - rr) / NAV) | 0), y1 = Math.min(NW - 1, ((e.y + rr) / NAV) | 0);
-    const gate = BUILDINGS[e.def].gate;
+    const gate = e.kind === 'building' && BUILDINGS[e.def].gate;
     for (let cy = y0; cy <= y1; cy++) for (let cx = x0; cx <= x1; cx++) {
       // bloqueia se o círculo da estrutura toca o quadrado da célula
       const qx = Math.max(cx * NAV, Math.min(e.x, (cx + 1) * NAV)), qy = Math.max(cy * NAV, Math.min(e.y, (cy + 1) * NAV));
@@ -393,7 +456,7 @@ function canBuild(sim, pid, def, x, y) {
   } else if (def !== 'bastiao' && !inTerritory(sim, pid, x, y)) return { ok: false, why: 'Fora do seu território' };
   return { ok: true };
 }
-function canSee(sim, pid, e) { return e.owner === pid || e.kind === 'node' || sim.vis[pid].has(e.id); }
+function canSee(sim, pid, e) { return e.owner === pid || e.kind === 'node' || e.kind === 'rock' || sim.vis[pid].has(e.id); }
 function emit(sim, ev) { ev.time = sim.time; sim.events.push(ev); }
 function alertTo(sim, pid, text, x, y, kind) { emit(sim, { t: 'alert', p: pid, text, x, y, kind: kind || 'info' }); }
 
@@ -627,7 +690,7 @@ function updateProjectile(sim, pr, dt) {
     let hitAny = false;
     if (w.splash > 0) {
       queryGrid(sim, pr.x, pr.y, w.splash + 40, e => {
-        if (!e.alive || e.owner === pr.owner || e.owner < 0 || e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck') return;
+        if (!e.alive || e.owner === pr.owner || e.owner < 0 || e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck' || e.kind === 'rock') return;
         if (!isEnemy(sim, pr.owner, e.owner)) return;
         if (e.kind === 'unit' && UNITS[e.def].flying && !pr.flying) return;
         const dd = dist(pr.x, pr.y, e.x, e.y) - e.r; if (dd > w.splash) return;
@@ -903,9 +966,9 @@ function separate(sim) {
         if (UNITS[e.def].flying !== UNITS[u.def].flying) return;
         const dx = u.x - e.x, dy = u.y - e.y; const dd = Math.hypot(dx, dy) || 0.01; const min = u.r + e.r + 1;
         if (dd < min) { const push = (min - dd) * 0.5; fx += dx / dd * push; fy += dy / dd * push; }
-      } else if (e.kind === 'building') {
+      } else if (e.kind === 'building' || e.kind === 'rock') {
         if (UNITS[u.def].flying) return;
-        if (BUILDINGS[e.def].gate && e.owner === u.owner) return; // portão próprio: passa
+        if (e.kind === 'building' && BUILDINGS[e.def].gate && e.owner === u.owner) return; // portão próprio: passa
         const dx = u.x - e.x, dy = u.y - e.y; const dd = Math.hypot(dx, dy) || 0.01; const min = u.r + e.r + 2;
         if (dd < min) { const push = (min - dd); fx += dx / dd * push; fy += dy / dd * push; bfx += dx / dd * push; bfy += dy / dd * push; }
       }
@@ -939,7 +1002,7 @@ function computeVisibility(sim) {
       if (e.kind === 'building' && e.built && BUILDINGS[e.def].detect) detectors.push([e.x, e.y, BUILDINGS[e.def].detect]);
     }
     for (const e of sim.ents) {
-      if (!e.alive || e.owner === p.id || e.kind === 'node') continue;
+      if (!e.alive || e.owner === p.id || e.kind === 'node' || e.kind === 'rock') continue;
       if (e.kind === 'proj' && e.owner === p.id) { vis.add(e.id); continue; }
       let seen = false;
       if (e.kind === 'building' && e.built && e.def === 'reator' && facOf(sim, e.owner).smoke) seen = true;
@@ -1054,7 +1117,7 @@ function hash(sim) { // cheap state hash for determinism tests
 ARD.sim = {
   TICK, WORLD, CX, CY, RIFT_R, FACTIONS, BUILDINGS, UNITS, WEAPONS, COUNTER, CLASS_NAMES, VET_RANKS, unitCost, RESEARCH, REGIME, DIFFICULTY, REP_NAMES,
   SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS,
-  NAV, NW, TILE, TILES, navIdx, passable, flowField, lineFree, inStorm,
+  NAV, NW, TILE, TILES, BIOMES, navIdx, passable, flowField, lineFree, inStorm,
   createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius,
 };
 })(globalThis.ARD = globalThis.ARD || {});

@@ -11,4 +11,6 @@ const game = bundle('src/index.tpl.html', ['src/sim.js', 'src/ai.js', 'src/voxel
 writeFileSync(root + 'dist/aether-rift-beta.html', game); writeFileSync(root + 'index.html', wrap(game));
 const style = bundle('style/index.tpl.html', ['src/voxel.js', 'src/models.js', 'style/scene.js', 'style/boot.js']);
 writeFileSync(root + 'dist/estilo.html', style); writeFileSync(root + 'estilo.html', wrap(style));
-console.log('jogo', game.length, 'bytes · estilo', style.length, 'bytes');
+const s3 = bundle('style3d/index.tpl.html', ['src/voxel.js', 'src/models.js', 'style3d/scene3d.js', 'style3d/boot.js']);
+writeFileSync(root + 'dist/estilo3d.html', s3); writeFileSync(root + 'estilo3d.html', wrap(s3));
+console.log('jogo', game.length, 'bytes · estilo', style.length, 'bytes · estilo3d', s3.length, 'bytes');

@@ -4,6 +4,10 @@
 'use strict';
 const S = ARD.sim, V = ARD.vox, MD = ARD.models;
 const K = 1.7, SV = 4, FACINGS = 8, TILE = 64, TILES = S.WORLD / TILE;
+const FINE = { veiculo_hull: 16, veiculo_turret: 16, torre_turret: 16, bastiao_turret: 16, coletor: 16, pirata: 16 };
+const facingsFor = def => FINE[def] || FACINGS;
+const BIOME_RGB = { gelo: [168, 186, 204], rocha: [104, 108, 116], tundra: [92, 110, 92], basalto: [58, 54, 60] };
+const BIOME_MINI = { gelo: '#5C6B7A', rocha: '#4A4E56', tundra: '#3E5242', basalto: '#2A262C' };
 const NODE_COLOR = { plasma: '#FF6A3D', minerio: '#8FA3B8', dados: '#7FE3A1' };
 const NODE_MODEL = { plasma: 'crystals', minerio: 'ore', dados: 'datashards' };
 function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
@@ -33,7 +37,7 @@ function create(canvas, mini) {
   // ---------- sprites ----------
   function modelFor(def, pid, seed) {
     if (NODE_MODEL[def]) return MD[NODE_MODEL[def]](seed);
-    if (def === 'crate') return MD.crate(); if (def === 'wreck') return MD.wreck(); if (def === 'rocks') return MD.rocks(seed);
+    if (def === 'crate') return MD.crate(); if (def === 'wreck') return MD.wreck(); if (def === 'rocks') return MD.rocks(seed); if (def === 'ruin') return MD.ruin(seed); if (def === 'crystals' || def === 'datashards') return MD[def](seed);
     const p = R.sim.players[pid]; const style = p.faction; const col = p.color;
     const fn = (def === 'pirata' && style === 'vehnar') ? MD.BY_DEF.pirata_vehnar : MD.BY_DEF[def];
     return fn(col, style);
@@ -42,7 +46,7 @@ function create(canvas, mini) {
     const key = def + '|' + pid + '|' + facing + '|' + (dmg ? 1 : 0) + '|' + (seed || 0);
     let sp = R.cache.get(key); if (sp) return sp;
     const m = modelFor(def, pid, seed); const b = m.bounds();
-    sp = V.renderSprite(m, (facing / FACINGS) * TAU, SV, { damage: dmg ? 0.55 : 0 });
+    sp = V.renderSprite(m, (facing / facingsFor(def)) * TAU, SV, { damage: dmg ? 0.55 : 0 });
     sp.fw = Math.max(b.x1 - b.x0, b.y1 - b.y0); sp.fh = b.z1 - b.z0;
     R.cache.set(key, sp); return sp;
   };
@@ -56,16 +60,17 @@ function create(canvas, mini) {
     R.sim = sim; const jobs = [];
     for (const p of sim.players) {
       for (const def in S.BUILDINGS) jobs.push([def, p.id, 0, false]);
-      for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'torre_turret']) for (let f = 0; f < FACINGS; f++) jobs.push([def, p.id, f, false]);
+      for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'torre_turret']) for (let f = 0; f < facingsFor(def); f++) jobs.push([def, p.id, f, false]);
       for (const def of ['drone', 'suporte', 'pirata', 'veiculo', 'torre_base', 'bastiao_base', 'bastiao_turret']) jobs.push([def, p.id, 0, false]);
     }
     for (const res in NODE_MODEL) for (let s = 0; s < 4; s++) jobs.push([res, -1, 0, false, s]);
     jobs.push(['crate', -1, 0, false, 0]); for (let f = 0; f < FACINGS; f++) jobs.push(['wreck', -1, f, false, 0]);
+    for (let sd = 0; sd < 6; sd++) { jobs.push(['rocks', -1, 0, false, sd]); jobs.push(['ruin', -1, 0, false, sd]); }
     let i = 0;
     function chunk() { const t0 = performance.now(); while (i < jobs.length && performance.now() - t0 < 24) { const j = jobs[i++]; R.sprite(j[0], j[1], j[2], j[3], j[4]); } if (onProgress) onProgress(i / jobs.length); if (i < jobs.length) requestAnimationFrame(chunk); else if (onDone) onDone(); }
     chunk();
   };
-  function facingOf(ang) { return ((Math.round(ang / (TAU / FACINGS)) % FACINGS) + FACINGS) % FACINGS; }
+  function facingOf(ang, n) { n = n || FACINGS; return ((Math.round(ang / (TAU / n)) % n) + n) % n; }
   function fitOf(e, sp) { const foot = e.kind === 'node' ? 2 * e.r * 1.2 * (0.55 + 0.45 * (e.max ? e.amount / e.max : 1)) : e.kind === 'wreck' ? 2 * e.r * 1.3 : 2 * e.r * 1.25; return foot / sp.fw; }
 
   // ---------- terreno ----------
@@ -73,16 +78,18 @@ function create(canvas, mini) {
     const cv = document.createElement('canvas'); cv.width = 256; cv.height = 128; const c = cv.getContext('2d');
     let r = 31 + v * 977 + kind.length * 13; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; };
     c.beginPath(); c.moveTo(128, 0); c.lineTo(256, 64); c.lineTo(128, 128); c.lineTo(0, 64); c.closePath(); c.clip();
-    const base = kind === 'ice' ? [168, 186, 204] : kind === 'crater' ? [74, 70, 76] : [120, 128, 140];
+    const base = BIOME_RGB[kind] || [120, 128, 140];
     c.fillStyle = `rgb(${base[0]},${base[1]},${base[2]})`; c.fillRect(0, 0, 256, 128);
     for (let i = 0; i < 520; i++) { const f = 0.84 + rnd() * 0.32; c.fillStyle = `rgba(${base[0] * f | 0},${base[1] * f | 0},${base[2] * f | 0},${0.5 + rnd() * 0.5})`; c.fillRect(rnd() * 256, rnd() * 128, 1 + rnd() * 8, 1 + rnd() * 4); }
-    if (kind === 'ice') { c.strokeStyle = 'rgba(110,140,170,0.35)'; c.lineWidth = 1.2; for (let i = 0; i < 5; i++) { c.beginPath(); c.moveTo(rnd() * 256, rnd() * 128); c.lineTo(rnd() * 256, rnd() * 128); c.lineTo(rnd() * 256, rnd() * 128); c.stroke(); } c.fillStyle = 'rgba(255,255,255,0.18)'; for (let i = 0; i < 40; i++) c.fillRect(rnd() * 256, rnd() * 128, 2, 1); }
-    if (kind === 'crater') { c.strokeStyle = 'rgba(255,110,70,0.35)'; c.lineWidth = 1.5; for (let i = 0; i < 4; i++) { c.beginPath(); c.moveTo(rnd() * 256, rnd() * 128); c.lineTo(rnd() * 256, rnd() * 128); c.stroke(); } c.fillStyle = 'rgba(0,0,0,0.3)'; for (let i = 0; i < 7; i++) { c.beginPath(); c.ellipse(rnd() * 256, rnd() * 128, 6 + rnd() * 16, 3 + rnd() * 8, 0, 0, TAU); c.fill(); } }
+    if (kind === 'gelo') { c.strokeStyle = 'rgba(110,140,170,0.35)'; c.lineWidth = 1.2; for (let i = 0; i < 5; i++) { c.beginPath(); c.moveTo(rnd() * 256, rnd() * 128); c.lineTo(rnd() * 256, rnd() * 128); c.lineTo(rnd() * 256, rnd() * 128); c.stroke(); } c.fillStyle = 'rgba(255,255,255,0.18)'; for (let i = 0; i < 40; i++) c.fillRect(rnd() * 256, rnd() * 128, 2, 1); }
+    if (kind === 'rocha') { c.fillStyle = 'rgba(0,0,0,0.22)'; for (let i = 0; i < 9; i++) { c.beginPath(); c.ellipse(rnd() * 256, rnd() * 128, 5 + rnd() * 14, 2 + rnd() * 6, rnd() * 3, 0, TAU); c.fill(); } c.fillStyle = 'rgba(190,196,206,0.35)'; for (let i = 0; i < 30; i++) c.fillRect(rnd() * 256, rnd() * 128, 2 + rnd() * 3, 1); }
+    if (kind === 'tundra') { c.fillStyle = 'rgba(70,96,70,0.5)'; for (let i = 0; i < 12; i++) { c.beginPath(); c.ellipse(rnd() * 256, rnd() * 128, 8 + rnd() * 18, 4 + rnd() * 8, 0, 0, TAU); c.fill(); } c.fillStyle = 'rgba(150,205,140,0.45)'; for (let i = 0; i < 70; i++) c.fillRect(rnd() * 256, rnd() * 128, 1.5, 1.5); }
+    if (kind === 'basalto') { c.strokeStyle = 'rgba(255,120,60,0.55)'; c.lineWidth = 1.5; for (let i = 0; i < 5; i++) { c.beginPath(); c.moveTo(rnd() * 256, rnd() * 128); c.lineTo(rnd() * 256, rnd() * 128); c.lineTo(rnd() * 256, rnd() * 128); c.stroke(); } c.fillStyle = 'rgba(0,0,0,0.35)'; for (let i = 0; i < 7; i++) { c.beginPath(); c.ellipse(rnd() * 256, rnd() * 128, 6 + rnd() * 16, 3 + rnd() * 8, 0, 0, TAU); c.fill(); } c.fillStyle = 'rgba(255,150,80,0.35)'; for (let i = 0; i < 16; i++) c.fillRect(rnd() * 256, rnd() * 128, 2, 2); }
     c.strokeStyle = 'rgba(0,0,0,0.12)'; c.lineWidth = 1; c.beginPath(); c.moveTo(128, 0); c.lineTo(256, 64); c.lineTo(128, 128); c.lineTo(0, 64); c.closePath(); c.stroke();
     return cv;
   }
   function tile(kind, v) { const k = kind + v; let t = R.tiles.get(k); if (!t) { t = makeTile(kind, v); R.tiles.set(k, t); } return t; }
-  function tileKind(tx, ty) { const cx = (tx + 0.5) * TILE, cy = (ty + 0.5) * TILE; const d = Math.hypot(cx - S.CX, cy - S.CY); if (d < S.RIFT_R + 24) return null; return d < 540 ? 'crater' : 'ice'; }
+  function tileKind(tx, ty) { const cx = (tx + 0.5) * TILE, cy = (ty + 0.5) * TILE; const d = Math.hypot(cx - S.CX, cy - S.CY); if (d < S.RIFT_R + 24) return null; return S.BIOMES[R.sim.biome ? R.sim.biome[ty * TILES + tx] : 0]; }
   function diamond(c, px, py, hw, hh) { c.beginPath(); c.moveTo(px, py - hh); c.lineTo(px + hw, py); c.lineTo(px, py + hh); c.lineTo(px - hw, py); c.closePath(); }
   function ellipse(c, px, py, rx) { c.beginPath(); c.ellipse(px, py, rx, rx * 0.5, 0, 0, TAU); }
   function drawSprite(c, sp, gx, gy, z, scale, k, alpha, clipFrac) {
@@ -170,7 +177,8 @@ function create(canvas, mini) {
       if (p[0] < -tw || p[0] > W + tw || p[1] < -th || p[1] > H + th) continue;
       if (!view.reveal && !explored[ty * TILES + tx]) { unexplored.push(p); continue; }
       c.drawImage(tile(kind, (tx * 7 + ty * 13) % 3), p[0] - tw / 2, p[1] - th / 2, tw, th);
-      for (const t of terr) if (Math.hypot(cx - t.x, cy - t.y) <= t.r) { c.fillStyle = rgba(t.col, 0.16); diamond(c, p[0], p[1], tw / 2, th / 2); c.fill(); c.strokeStyle = 'rgba(0,0,0,0.18)'; c.lineWidth = 1; c.stroke(); break; }
+      { const i = ty * TILES + tx; const mix = sim.biomeMix ? sim.biomeMix[i] : 0; if (mix > 0.03) { c.globalAlpha = mix; c.drawImage(tile(S.BIOMES[sim.biome2[i]], (tx * 11 + ty * 5) % 3), p[0] - tw / 2, p[1] - th / 2, tw, th); c.globalAlpha = 1; } }
+      for (const t of terr) if (Math.hypot(cx - t.x, cy - t.y) <= t.r) { c.fillStyle = rgba(t.col, 0.11); diamond(c, p[0], p[1], tw / 2, th / 2); c.fill(); c.strokeStyle = 'rgba(0,0,0,0.14)'; c.lineWidth = 1; c.stroke(); break; }
     }
     c.lineWidth = 1.5; c.setLineDash([8, 6]);
     for (const t of terr) { const p = P(t.x, t.y, 0); c.strokeStyle = rgba(t.col, 0.35); ellipse(c, p[0], p[1], t.r * k); c.stroke(); }
@@ -205,13 +213,15 @@ function create(canvas, mini) {
       if (!e.alive) continue;
       const own = e.owner === human;
       if (e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck') { if (!own && !vis.has(e.id)) continue; }
-      else if (e.kind !== 'node' && !own && !vis.has(e.id)) continue;
+      else if (e.kind !== 'node' && e.kind !== 'rock' && !own && !vis.has(e.id)) continue;
       if (!inView(e.x, e.y, 60 + e.r * 3)) continue;
       items.push({ e, d: e.x + e.y });
     }
     for (const [id, m] of view.memory) { if (vis.has(id) || !inView(m.x, m.y, 100)) continue; items.push({ mem: m, id, d: m.x + m.y }); }
+    if (sim.props) for (const pr of sim.props) { if (!inView(pr.x, pr.y, 40)) continue; if (!view.reveal && !explored[((pr.y / TILE) | 0) * TILES + ((pr.x / TILE) | 0)]) continue; items.push({ prop: pr, d: pr.x + pr.y }); }
     items.sort((a, b) => a.d - b.d);
     for (const it of items) {
+      if (it.prop) { const pr = it.prop; const sp = R.sprite(pr.kind, -1, 0, false, pr.seed % 6); const p = P(pr.x, pr.y, 0); drawSprite(c, sp, p[0], p[1], 0, (34 * pr.scale / sp.fw) * k / SV, k, 1); continue; }
       if (it.mem) { const m = it.mem; const sp = R.sprite(m.def, m.owner, 0, false, 0); const p = P(m.x, m.y, 0); drawSprite(c, sp, p[0], p[1], 0, (2 * S.BUILDINGS[m.def].r * 1.25 / sp.fw) * k / SV, k, 0.35); continue; }
       const e = it.e; const own = e.owner === human;
       if (e.kind === 'node') {
@@ -222,6 +232,7 @@ function create(canvas, mini) {
         for (const l of sp.lights) lights.push({ x: p[0] - sp.ax * sc + l.x * sc, y: p[1] - sp.ay * sc + l.y * sc, r: 12 * z, c: l.c, a: 0.5 });
         continue;
       }
+      if (e.kind === 'rock') { const sp = R.sprite('rocks', -1, 0, false, e.seed % 6); const p = P(e.x, e.y, 0); c.fillStyle = 'rgba(0,0,0,0.3)'; ellipse(c, p[0] + 4, p[1] + 1, e.r * 1.4 * k); c.fill(); drawSprite(c, sp, p[0], p[1], 0, (2 * e.r * 1.9 / sp.fw) * k / SV, k, 1); continue; }
       if (e.kind === 'crate') { const sp = R.sprite('crate', -1, 0, false, 0); const p = P(e.x, e.y, 0); drawSprite(c, sp, p[0], p[1], 0, (2 * e.r * 1.6 / sp.fw) * k / SV, k, 1); c.strokeStyle = `rgba(242,194,48,${0.4 + 0.3 * Math.sin(R.time * 4)})`; c.lineWidth = 1.5; ellipse(c, p[0], p[1], 16 * k); c.stroke(); continue; }
       if (e.kind === 'wreck') {
         const sp = R.sprite('wreck', -1, facingOf(e.ang || 0), false, 0); const p = P(e.x, e.y, 0); const age = sim.time - e.bornT;
@@ -243,17 +254,19 @@ function create(canvas, mini) {
       const ud = isUnit ? S.UNITS[e.def] : S.BUILDINGS[e.def];
       const zz = isUnit && ud.flying ? 14 : 0;
       const parts = (!isUnit || e.built !== false) ? MD.PARTS[e.def] : null;
-      let facing = 0; if (isUnit) facing = facingOf(e.ang || 0); else if (ud.wall) facing = facingOf(e.ang || 0);
+      const hullDef = parts ? parts.hull : e.def;
+      let facing = 0; if (isUnit) facing = facingOf(e.ang || 0, facingsFor(hullDef)); else if (ud.wall) facing = facingOf(e.ang || 0);
       const dmg = !isUnit && e.built && e.hp < e.maxHp * 0.5;
-      const sp = R.sprite(parts ? parts.hull : e.def, e.owner, parts && !isUnit ? 0 : facing, dmg, 0); const sc = fitOf(e, sp) * k / SV;
+      const sp = R.sprite(hullDef, e.owner, parts && !isUnit ? 0 : facing, dmg, 0); const sc = fitOf(e, sp) * k / SV;
+      const moving = isUnit && (e.x !== e.px || e.y !== e.py); const bob = moving && e.def === 'infantaria' ? Math.abs(Math.sin(R.time * 11 + e.id)) * 1.3 : 0;
       const g = P(wx, wy, 0);
       c.fillStyle = 'rgba(0,0,0,0.35)'; ellipse(c, g[0] + sp.fw * sc * 0.15, g[1] + 1, sp.fw * sc * 0.55); c.fill();
       if (view.sel.has(e.id)) { c.strokeStyle = 'rgba(255,255,255,0.9)'; c.lineWidth = 1.5; ellipse(c, g[0], g[1], (e.r + 5) * k); c.stroke(); if (!isUnit && ud.attack) { c.strokeStyle = 'rgba(255,255,255,0.18)'; c.setLineDash([4, 6]); ellipse(c, g[0], g[1], ud.attack.range * k); c.stroke(); c.setLineDash([]); } if (!isUnit && ud.detect) { c.strokeStyle = 'rgba(127,227,161,0.3)'; ellipse(c, g[0], g[1], ud.detect * k); c.stroke(); } }
       const alphaS = e.cloaked ? (own ? 0.45 : 1) : 1;
       const clip = isUnit ? 1 : (e.built ? 1 : 0.12 + 0.88 * e.progress);
-      const box = drawSprite(c, sp, g[0], g[1], zz, sc, k, alphaS, clip);
+      const box = drawSprite(c, sp, g[0], g[1], zz + bob, sc, k, alphaS, clip);
       if (parts && (isUnit || e.built)) { // torreta na direção da mira
-        const tsp = R.sprite(parts.turret, e.owner, facingOf(e.aimAng != null ? e.aimAng : (e.ang || 0)), dmg, 0);
+        const tsp = R.sprite(parts.turret, e.owner, facingOf(e.aimAng != null ? e.aimAng : (e.ang || 0), facingsFor(parts.turret)), dmg, 0);
         const fit = fitOf(e, sp); drawSprite(c, tsp, g[0], g[1], zz + parts.z * fit, fit * k / SV, k, alphaS, 1);
       }
       if (!isUnit && !e.built) { c.strokeStyle = '#7FE3A1'; c.lineWidth = 3; c.beginPath(); c.ellipse(g[0], g[1], (e.r + 5) * k, (e.r + 5) * k * 0.5, 0, -Math.PI / 2, -Math.PI / 2 + TAU * e.progress); c.stroke(); }
@@ -315,7 +328,8 @@ function create(canvas, mini) {
     const c = mctx; const size = mini.width; const human = view.human; const vis = view.reveal ? { has: () => true } : sim.vis[human]; const m = miniM(); const ex = sim.explored[human];
     const M = (x, y) => R.worldToMini(x, y);
     c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#0B0D11'; c.fillRect(0, 0, size, size);
-    c.fillStyle = '#15181F'; diamond(c, size / 2, size / 2, size / 2, size / 4); c.fill();
+    if (!R.miniBase || R.miniBase.width !== size) { const mb = document.createElement('canvas'); mb.width = size; mb.height = size; const bc = mb.getContext('2d'); const tm = TILE * m; for (let ty = 0; ty < TILES; ty++) for (let tx = 0; tx < TILES; tx++) { const kind = tileKind(tx, ty); if (!kind) continue; const p = M((tx + 0.5) * TILE, (ty + 0.5) * TILE); bc.fillStyle = BIOME_MINI[kind] || '#15181F'; diamond(bc, p[0], p[1], tm + 0.6, tm * 0.5 + 0.6); bc.fill(); } for (const e of sim.ents) if (e.alive && e.kind === 'rock') { const p = M(e.x, e.y); bc.fillStyle = '#8A9098'; bc.fillRect(p[0] - 1, p[1] - 1, 2, 2); } R.miniBase = mb; }
+    c.drawImage(R.miniBase, 0, 0);
     { const p = M(S.CX, S.CY); c.fillStyle = 'rgba(255,94,58,0.35)'; c.beginPath(); c.ellipse(p[0], p[1], S.RIFT_R * 2 * m, S.RIFT_R * m, 0, 0, TAU); c.fill(); c.fillStyle = '#05040A'; c.beginPath(); c.ellipse(p[0], p[1], S.RIFT_R * m, S.RIFT_R * m * 0.5, 0, 0, TAU); c.fill(); }
     for (const e of sim.ents) {
       if (!e.alive) continue;
