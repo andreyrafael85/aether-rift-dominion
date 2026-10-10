@@ -13,6 +13,27 @@ const TILE = 64, TILES = WORLD / TILE;      // grade de exploração 50×50
 const DX8 = [1, 1, 0, -1, -1, -1, 0, 1], DY8 = [0, 1, 1, 1, 0, -1, -1, -1];
 const BIOMES = ['gelo', 'rocha', 'tundra', 'basalto'];
 
+// Matemática determinística: só +, -, *, / e sqrt (exatos em IEEE-754), para que Chrome, Firefox e Safari calculem o mesmo
+// resultado bit a bit. Math.sin/cos/atan2/hypot variam entre motores JS e dessincronizavam o multiplayer entre navegadores diferentes.
+const DM = (() => {
+  const PI = Math.PI, TWO_PI = 2 * PI, HALF_PI = PI / 2, SQRT3 = Math.sqrt(3);
+  function sin(x) {
+    x = x - TWO_PI * Math.floor((x + PI) / TWO_PI); // [-PI, PI)
+    if (x > HALF_PI) x = PI - x; else if (x < -HALF_PI) x = -PI - x; // [-PI/2, PI/2]
+    const x2 = x * x;
+    return x * (1 + x2 * (-1 / 6 + x2 * (1 / 120 + x2 * (-1 / 5040 + x2 * (1 / 362880 + x2 * (-1 / 39916800 + x2 * (1 / 6227020800 + x2 * (-1 / 1307674368000))))))));
+  }
+  function cos(x) { return sin(x + HALF_PI); }
+  function atan(t) {
+    const neg = t < 0; if (neg) t = -t; const inv = t > 1; if (inv) t = 1 / t;
+    let add = 0; if (t > 0.2679491924311227) { t = (t * SQRT3 - 1) / (t + SQRT3); add = PI / 6; }
+    const t2 = t * t; let r = t * (1 + t2 * (-1 / 3 + t2 * (1 / 5 + t2 * (-1 / 7 + t2 * (1 / 9 + t2 * (-1 / 11 + t2 * (1 / 13 + t2 * (-1 / 15))))))));
+    r += add; if (inv) r = HALF_PI - r; return neg ? -r : r;
+  }
+  function atan2(y, x) { if (x > 0) return atan(y / x); if (x < 0) return y >= 0 ? atan(y / x) + PI : atan(y / x) - PI; return y > 0 ? HALF_PI : y < 0 ? -HALF_PI : 0; }
+  function hypot(x, y) { return Math.sqrt(x * x + y * y); }
+  return { sin, cos, atan2, hypot, atan };
+})();
 const FACTIONS = {
   vehnar: {
     id: 'vehnar', name: 'Consórcio Vehnar', short: 'Vehnar',
@@ -149,7 +170,7 @@ function mulberry32(seed) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
-function dist(ax, ay, bx, by) { return Math.hypot(ax - bx, ay - by); }
+function dist(ax, ay, bx, by) { return DM.hypot(ax - bx, ay - by); }
 function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
 
 function createSim(cfg) {
@@ -192,51 +213,51 @@ function generateMap(sim) {
   // Plasma ring around the Rift
   for (let k = 0; k < 8; k++) {
     const a = (Math.PI * 2 * k) / 8 + Math.PI / 8;
-    addNode(sim, 'plasma', CX + Math.cos(a) * 330, CY + Math.sin(a) * 330, 1800);
+    addNode(sim, 'plasma', CX + DM.cos(a) * 330, CY + DM.sin(a) * 330, 1800);
   }
   // Data anomalies between players on a mid ring
   const n = sim.players.length;
   for (let i = 0; i < n; i++) {
     const a = sim.players[i].startAngle + Math.PI / n;
-    addNode(sim, 'dados', CX + Math.cos(a) * 640, CY + Math.sin(a) * 640, 600);
-    addNode(sim, 'minerio', CX + Math.cos(a + 0.18) * 800, CY + Math.sin(a + 0.18) * 800, 1600);
-    addNode(sim, 'minerio', CX + Math.cos(a - 0.18) * 800, CY + Math.sin(a - 0.18) * 800, 1600);
+    addNode(sim, 'dados', CX + DM.cos(a) * 640, CY + DM.sin(a) * 640, 600);
+    addNode(sim, 'minerio', CX + DM.cos(a + 0.18) * 800, CY + DM.sin(a + 0.18) * 800, 1600);
+    addNode(sim, 'minerio', CX + DM.cos(a - 0.18) * 800, CY + DM.sin(a - 0.18) * 800, 1600);
   }
   if (n < 4) { // extra data for small games
     for (let k = 0; k < 4 - n; k++) {
       const a = sim.rand() * Math.PI * 2;
-      addNode(sim, 'dados', CX + Math.cos(a) * 520, CY + Math.sin(a) * 520, 500);
+      addNode(sim, 'dados', CX + DM.cos(a) * 520, CY + DM.sin(a) * 520, 500);
     }
   }
   for (let i = 0; i < n; i++) {
     const p = sim.players[i];
-    const sx = CX + Math.cos(p.startAngle) * R0, sy = CY + Math.sin(p.startAngle) * R0;
+    const sx = CX + DM.cos(p.startAngle) * R0, sy = CY + DM.sin(p.startAngle) * R0;
     const nuc = addBuilding(sim, p.id, 'nucleo', sx, sy, true);
     nuc.hp = nuc.maxHp;
     // three minério nodes around the start, one small plasma, one dados a bit away
     for (let k = 0; k < 3; k++) {
       const a = p.startAngle + Math.PI + (k - 1) * 0.75 + (sim.rand() - 0.5) * 0.3;
       const d = 190 + sim.rand() * 60;
-      addNode(sim, 'minerio', sx + Math.cos(a) * d, sy + Math.sin(a) * d, 2200);
+      addNode(sim, 'minerio', sx + DM.cos(a) * d, sy + DM.sin(a) * d, 2200);
     }
     const ap = p.startAngle + Math.PI + (sim.rand() < 0.5 ? 1.5 : -1.5);
-    addNode(sim, 'plasma', sx + Math.cos(ap) * 250, sy + Math.sin(ap) * 250, 1500);
+    addNode(sim, 'plasma', sx + DM.cos(ap) * 250, sy + DM.sin(ap) * 250, 1500);
     const ad = p.startAngle + (sim.rand() < 0.5 ? 1.1 : -1.1);
-    addNode(sim, 'dados', sx + Math.cos(ad) * 420, sy + Math.sin(ad) * 420, 350);
+    addNode(sim, 'dados', sx + DM.cos(ad) * 420, sy + DM.sin(ad) * 420, 350);
     // starting units
     for (let k = 0; k < 3; k++) {
-      const u = addUnit(sim, p.id, 'coletor', sx + Math.cos(p.startAngle + Math.PI + k * 0.5) * 60, sy + Math.sin(p.startAngle + Math.PI + k * 0.5) * 60);
+      const u = addUnit(sim, p.id, 'coletor', sx + DM.cos(p.startAngle + Math.PI + k * 0.5) * 60, sy + DM.sin(p.startAngle + Math.PI + k * 0.5) * 60);
       u.state = 'idle';
     }
-    const u1 = addUnit(sim, p.id, 'infantaria', sx + Math.cos(p.startAngle) * 70, sy + Math.sin(p.startAngle) * 70);
-    const u2 = addUnit(sim, p.id, 'infantaria', sx + Math.cos(p.startAngle + 0.4) * 70, sy + Math.sin(p.startAngle + 0.4) * 70);
+    const u1 = addUnit(sim, p.id, 'infantaria', sx + DM.cos(p.startAngle) * 70, sy + DM.sin(p.startAngle) * 70);
+    const u2 = addUnit(sim, p.id, 'infantaria', sx + DM.cos(p.startAngle + 0.4) * 70, sy + DM.sin(p.startAngle + 0.4) * 70);
     u1.state = u2.state = 'idle';
   }
   // scattered extra minério
   let tries = 0;
   for (let k = 0; k < 6 && tries < 200; tries++) {
     const a = sim.rand() * Math.PI * 2, d = 450 + sim.rand() * 550;
-    const x = CX + Math.cos(a) * d, y = CY + Math.sin(a) * d;
+    const x = CX + DM.cos(a) * d, y = CY + DM.sin(a) * d;
     if (nearestEntity(sim, x, y, 150, e => e.kind !== 'unit')) continue;
     addNode(sim, 'minerio', x, y, 1200); k++;
   }
@@ -272,12 +293,12 @@ function generateTerrain(sim) {
   // cordilheiras: segmentos de rochas intransponíveis no anel médio, mantendo o mapa conectado
   const nR = 5 + sim.players.length; const placed = [];
   for (let k = 0; k < nR * 3 && placed.length < nR; k++) {
-    const a = sim.rand() * Math.PI * 2, rr = 620 + sim.rand() * 420; const cx = CX + Math.cos(a) * rr, cy = CY + Math.sin(a) * rr;
+    const a = sim.rand() * Math.PI * 2, rr = 620 + sim.rand() * 420; const cx = CX + DM.cos(a) * rr, cy = CY + DM.sin(a) * rr;
     if (nucs.some(nc => dist(cx, cy, nc.x, nc.y) < 460)) continue;
     const dir = a + Math.PI / 2 + (sim.rand() - 0.5) * 0.8; const len = 150 + sim.rand() * 220; const curve = (sim.rand() - 0.5) * 0.004;
     const rocks = [];
     for (let t = -len / 2; t <= len / 2; t += 26) {
-      const ang = dir + curve * t * 2; const x = cx + Math.cos(ang) * t, y = cy + Math.sin(ang) * t + Math.sin(t * 0.08) * 6;
+      const ang = dir + curve * t * 2; const x = cx + DM.cos(ang) * t, y = cy + DM.sin(ang) * t + DM.sin(t * 0.08) * 6;
       if (x < 80 || y < 80 || x > WORLD - 80 || y > WORLD - 80) continue;
       if (sim.ents.some(e => (e.kind === 'node' && dist(x, y, e.x, e.y) < 70) || (e.kind === 'building' && dist(x, y, e.x, e.y) < 120))) continue;
       const r = { id: sim.nextId++, kind: 'rock', x, y, r: 13, alive: true, owner: -1, seed: Math.floor(sim.rand() * 1000) };
@@ -421,7 +442,7 @@ function updateStorm(sim, dt) {
   if (!st) {
     if (sim.time >= sim.nextStorm) {
       const a = sim.rand() * Math.PI * 2, rr = 520 + sim.rand() * 560;
-      sim.storm = { x: CX + Math.cos(a) * rr, y: CY + Math.sin(a) * rr, r: 420, t: 0, phase: 'warn', warn: 30, dur: 90 };
+      sim.storm = { x: CX + DM.cos(a) * rr, y: CY + DM.sin(a) * rr, r: 420, t: 0, phase: 'warn', warn: 30, dur: 90 };
       for (const q of sim.players) if (q.alive) alertTo(sim, q.id, 'Tempestade de Éter se aproximando (30 s)', sim.storm.x, sim.storm.y, 'warn');
       emit(sim, { t: 'storm', phase: 'warn', x: sim.storm.x, y: sim.storm.y, r: sim.storm.r });
     }
@@ -655,7 +676,7 @@ function computeEnergy(sim, p, dt) {
       if (!e.built) continue;
       if (d.energyProd) {
         if (d.plasmaBurn) { if (p.res.plasma > 0) { prod += d.energyProd; p.res.plasma = Math.max(0, p.res.plasma - d.plasmaBurn * dt); } }
-        else if (e.def === 'nucleo' && FACTIONS[p.faction].photosynthesis) { const nt = (1 - Math.cos(Math.PI * 2 * sim.time / 750)) / 2; prod += 95 - 50 * nt; }
+        else if (e.def === 'nucleo' && FACTIONS[p.faction].photosynthesis) { const nt = (1 - DM.cos(Math.PI * 2 * sim.time / 750)) / 2; prod += 95 - 50 * nt; }
         else prod += d.energyProd;
       }
       cons += d.energyUse || 0;
@@ -718,8 +739,8 @@ function fire(sim, a, t) {
   const w = a.kind === 'unit' ? UNITS[a.def].attack : BUILDINGS[a.def].attack;
   const ambush = a.kind === 'unit' && a.cloaked && a.def === 'infantaria';
   const base = w.dmg * damageMult(sim, a) * (ambush ? 1.5 : 1);
-  a.cd = w.cd; a.lastAttack = sim.time; a.cloaked = false; a.aimAng = Math.atan2(t.y - a.y, t.x - a.x);
-  const sx = a.x + Math.cos(a.aimAng) * a.r * 0.8, sy = a.y + Math.sin(a.aimAng) * a.r * 0.8;
+  a.cd = w.cd; a.lastAttack = sim.time; a.cloaked = false; a.aimAng = DM.atan2(t.y - a.y, t.x - a.x);
+  const sx = a.x + DM.cos(a.aimAng) * a.r * 0.8, sy = a.y + DM.sin(a.aimAng) * a.r * 0.8;
   emit(sim, { t: 'shot', x1: sx, y1: sy, x2: t.x, y2: t.y, cls: a.cls, owner: a.owner, ambush, weapon: a.kind === 'unit' ? UNITS[a.def].weapon : BUILDINGS[a.def].weapon, beam: w.proj === 'beam' });
   if (w.proj === 'beam') {
     if (w.splash > 0) { const hit = []; queryGrid(sim, t.x, t.y, w.splash + 40, e => { if (!e.alive || e.owner === a.owner || e.owner < 0 || e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck' || e.kind === 'rock' || !isEnemy(sim, a.owner, e.owner)) return; if (e.kind === 'unit' && UNITS[e.def].flying) return; if (dist(t.x, t.y, e.x, e.y) - e.r <= w.splash) hit.push(e); }); for (const e of hit) applyDamage(sim, a.owner, a, e, base * counterMult(sim, a, e) * (e === t ? 1 : 0.7), w); emit(sim, { t: 'impact', x: t.x, y: t.y, weapon: 'chama', splash: w.splash, hit: true, owner: a.owner }); }
@@ -729,7 +750,7 @@ function fire(sim, a, t) {
   // projétil: viaja até o ponto previsto do alvo com inexatidão; acerta o que estiver lá
   const ang = sim.rand() * Math.PI * 2, err = sim.rand() * w.inacc;
   const lead = t.kind === 'unit' ? Math.min(1, dist(a.x, a.y, t.x, t.y) / w.speed) : 0;
-  const tx = t.x + (t.x - t.px) * lead * 10 + Math.cos(ang) * err, ty = t.y + (t.y - t.py) * lead * 10 + Math.sin(ang) * err;
+  const tx = t.x + (t.x - t.px) * lead * 10 + DM.cos(ang) * err, ty = t.y + (t.y - t.py) * lead * 10 + DM.sin(ang) * err;
   const d = dist(sx, sy, tx, ty); const dir = [(tx - sx) / (d || 1), (ty - sy) / (d || 1)];
   const pr = { id: sim.nextId++, kind: 'proj', x: sx, y: sy, px: sx, py: sy, z: a.kind === 'building' ? a.r * 0.9 : 6, tx, ty, vx: dir[0] * w.speed, vy: dir[1] * w.speed, weapon: a.kind === 'unit' ? UNITS[a.def].weapon : BUILDINGS[a.def].weapon, owner: a.owner, shooter: a.id, target: t.id, dmg: base, total: d, done: 0, arc: w.proj === 'shell' ? Math.min(60, d * 0.25) : 0, flying: !!(t.kind === 'unit' && UNITS[t.def].flying), alive: true, r: 1 };
   sim.ents.push(pr); sim.byId.set(pr.id, pr);
@@ -759,7 +780,7 @@ function updateProjectile(sim, pr, dt) {
     return;
   }
   pr.done += step; pr.x += pr.vx * dt; pr.y += pr.vy * dt;
-  const k = pr.done / pr.total; pr.z = (pr.arc ? Math.sin(k * Math.PI) * pr.arc : 0) + 6 * (1 - k) + 3;
+  const k = pr.done / pr.total; pr.z = (pr.arc ? DM.sin(k * Math.PI) * pr.arc : 0) + 6 * (1 - k) + 3;
 }
 function kill(sim, e, killer) {
   if (!e.alive) return;
@@ -811,7 +832,7 @@ function acquire(sim, u, rad, unitsOnly) {
   return best;
 }
 function moveToward(sim, u, tx, ty, dt) {
-  const dx = tx - u.x, dy = ty - u.y; const d = Math.hypot(dx, dy);
+  const dx = tx - u.x, dy = ty - u.y; const d = DM.hypot(dx, dy);
   const sp = speedOf(sim, u) * dt;
   if (d <= Math.max(sp, 4)) { u.x = tx; u.y = ty; return true; }
   if (!UNITS[u.def].flying && d > NAV * 1.2 && !lineFree(sim, u.x, u.y, tx, ty, u.owner)) {
@@ -825,11 +846,11 @@ function moveToward(sim, u, tx, ty, dt) {
       if (best >= 0) { nx = (best % NW + 0.5) * NAV; ny = (((best / NW) | 0) + 0.5) * NAV; dir = 0; }
     }
     if (dir >= 0) {
-      const ddx = nx - u.x, ddy = ny - u.y; const dd = Math.hypot(ddx, ddy) || 1;
-      u.x += ddx / dd * sp; u.y += ddy / dd * sp; u.ang = Math.atan2(ddy, ddx); return false;
+      const ddx = nx - u.x, ddy = ny - u.y; const dd = DM.hypot(ddx, ddy) || 1;
+      u.x += ddx / dd * sp; u.y += ddy / dd * sp; u.ang = DM.atan2(ddy, ddx); return false;
     }
   }
-  u.x += dx / d * sp; u.y += dy / d * sp; u.ang = Math.atan2(dy, dx); return false;
+  u.x += dx / d * sp; u.y += dy / d * sp; u.ang = DM.atan2(dy, dx); return false;
 }
 function nearestDeposit(sim, u) {
   let best = null, bd = Infinity;
@@ -904,7 +925,7 @@ function updateUnit(sim, u, dt) {
         u.target = null; break;
       }
       const dd = dist(u.x, u.y, t.x, t.y);
-      if (dd <= d.attack.range + t.r) { u.ang = Math.atan2(t.y - u.y, t.x - u.x); if (u.cd <= 0) fire(sim, u, t); }
+      if (dd <= d.attack.range + t.r) { u.ang = DM.atan2(t.y - u.y, t.x - u.x); if (u.cd <= 0) fire(sim, u, t); }
       else moveToward(sim, u, t.x, t.y, dt);
       break; }
     case 'harvest': {
@@ -999,8 +1020,8 @@ function updateBuilding(sim, b, dt) {
     const it = b.queue[0]; it.t += dt * mult;
     if (it.t >= it.total) {
       b.queue.shift();
-      const ang = b.rally ? Math.atan2(b.rally.y - b.y, b.rally.x - b.x) : Math.atan2(CY - b.y, CX - b.x);
-      const u = addUnit(sim, b.owner, it.def, b.x + Math.cos(ang) * (b.r + 14), b.y + Math.sin(ang) * (b.r + 14));
+      const ang = b.rally ? DM.atan2(b.rally.y - b.y, b.rally.x - b.x) : DM.atan2(CY - b.y, CX - b.x);
+      const u = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang) * (b.r + 14), b.y + DM.sin(ang) * (b.r + 14));
       if (b.rally) { u.state = 'move'; u.tx = b.rally.x + (sim.rand() - 0.5) * 30; u.ty = b.rally.y + (sim.rand() - 0.5) * 30; }
       emit(sim, { t: 'spawn', p: b.owner, x: u.x, y: u.y, def: it.def });
     }
@@ -1015,16 +1036,19 @@ function separate(sim) {
   for (const e of sim.ents) if (e.alive && e.kind === 'unit') units.push(e);
   for (const u of units) {
     let fx = 0, fy = 0, bfx = 0, bfy = 0;
+    // Dentro do vão de um portão próprio (36 wu), os muros do próprio jogador não empurram: o portão é a passagem, mesmo para veículos largos.
+    let inOwnGate = false; if (!UNITS[u.def].flying && sim.nav.gatePos.size) { for (const g of sim.nav.gatePos.values()) if (g.alive && g.owner === u.owner && dist(u.x, u.y, g.x, g.y) < 36) { inOwnGate = true; break; } }
     queryGrid(sim, u.x, u.y, 40, e => {
       if (e === u || !e.alive) return;
       if (e.kind === 'unit') {
         if (UNITS[e.def].flying !== UNITS[u.def].flying) return;
-        const dx = u.x - e.x, dy = u.y - e.y; const dd = Math.hypot(dx, dy) || 0.01; const min = u.r + e.r + 1;
+        const dx = u.x - e.x, dy = u.y - e.y; const dd = DM.hypot(dx, dy) || 0.01; const min = u.r + e.r + 1;
         if (dd < min) { const push = (min - dd) * 0.5; fx += dx / dd * push; fy += dy / dd * push; }
       } else if (e.kind === 'building' || e.kind === 'rock') {
         if (UNITS[u.def].flying) return;
         if (e.kind === 'building' && BUILDINGS[e.def].gate && e.owner === u.owner) return; // portão próprio: passa
-        const dx = u.x - e.x, dy = u.y - e.y; const dd = Math.hypot(dx, dy) || 0.01; const min = u.r + e.r + 2;
+        if (inOwnGate && e.kind === 'building' && BUILDINGS[e.def].wall && e.owner === u.owner) return; // muro ao lado do próprio portão: não trava a passagem
+        const dx = u.x - e.x, dy = u.y - e.y; const dd = DM.hypot(dx, dy) || 0.01; const min = u.r + e.r + 2;
         if (dd < min) { const push = (min - dd); fx += dx / dd * push; fy += dy / dd * push; bfx += dx / dd * push; bfy += dy / dd * push; }
       }
     });
@@ -1034,12 +1058,12 @@ function separate(sim) {
       if (u.state === 'attack' || u.state === 'siphon' || u.state === 'pickup') { const t = sim.byId.get(u.target); if (t) { gx = t.x; gy = t.y; } }
       else if (u.state === 'harvest') { const n = sim.byId.get(u.node); if (n) { gx = n.x; gy = n.y; } }
       else if (u.state === 'return') { const d = nearestDeposit(sim, u); if (d) { gx = d.x; gy = d.y; } }
-      const dxg = gx - u.x, dyg = gy - u.y; const bl = Math.hypot(bfx, bfy) || 1;
+      const dxg = gx - u.x, dyg = gy - u.y; const bl = DM.hypot(bfx, bfy) || 1;
       let tx = -bfy / bl, ty = bfx / bl; if (tx * dxg + ty * dyg < 0) { tx = -tx; ty = -ty; }
       const sp = speedOf(sim, u) * TICK * 0.85; fx += tx * sp; fy += ty * sp;
     }
     if (!UNITS[u.def].flying) {
-      const dx = u.x - CX, dy = u.y - CY; const dd = Math.hypot(dx, dy) || 0.01; const min = RIFT_R + u.r;
+      const dx = u.x - CX, dy = u.y - CY; const dd = DM.hypot(dx, dy) || 0.01; const min = RIFT_R + u.r;
       if (dd < min) { fx += dx / dd * (min - dd); fy += dy / dd * (min - dd); }
     }
     if (fx || fy) { u.x = clamp(u.x + fx, 10, WORLD - 10); u.y = clamp(u.y + fy, 10, WORLD - 10); }
@@ -1180,6 +1204,7 @@ ARD.sim = {
   TICK, WORLD, CX, CY, RIFT_R, FACTIONS, BUILDINGS, UNITS, WEAPONS, COUNTER, CLASS_NAMES, VET_RANKS, unitCost, RESEARCH, REGIME, DIFFICULTY, REP_NAMES,
   SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS, FACTION_EXTRAS, producesFor,
   NAV, NW, TILE, TILES, BIOMES, navIdx, passable, flowField, lineFree, inStorm,
+  DM,
   createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius,
 };
 })(globalThis.ARD = globalThis.ARD || {});

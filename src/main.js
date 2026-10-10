@@ -43,20 +43,22 @@ function initStart() {
   // multiplayer P2P por código de sala: 2 a 4 jogadores humanos, sem IAs; o anfitrião é o relé do lockstep
   let lobby = null;
   const mpStatus = t => { $('mp-status').textContent = t; };
-  const myInfo = () => ({ name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar' });
+  const myInfo = () => ({ name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar', build: BUILD });
   const facName = f => (S.FACTIONS[f] && S.FACTIONS[f].short) || f;
   function renderLobby(players, size) {
     const el = $('mp-players'); el.innerHTML = ''; const me = lobby ? lobby.me : null;
     players.forEach(p => { const d = document.createElement('div'); d.textContent = (p.id === 0 ? '★ ' : '• ') + p.name + ' (' + facName(p.faction) + ')' + (p.id === 0 ? ' anfitrião' : '') + (me && p.name === me.name && (lobby.role === 'host' ? p.id === 0 : p.id !== 0) ? ' — você' : ''); el.appendChild(d); });
     for (let i = players.length; i < size; i++) { const d = document.createElement('div'); d.className = 'muted'; d.textContent = '• vaga livre'; el.appendChild(d); }
+    if (lobby && lobby.warn) { const d = document.createElement('div'); d.className = 'warn'; d.textContent = '⚠ ' + lobby.warn; el.appendChild(d); }
   }
   function setStartButton() {
     const b = $('btn-start');
-    if (!lobby) { b.disabled = false; b.textContent = 'Iniciar partida'; return; }
+    $('opt-opp').disabled = !!lobby; $('opt-diff').disabled = !!lobby;
+    if (!lobby) { const typed = $('opt-code').value.trim(); b.disabled = false; b.textContent = typed.length >= 4 ? 'Entrar na sala ' + typed.toUpperCase() : 'Iniciar partida'; return; }
     if (lobby.role === 'host') { const n = lobby.N.roster().length; b.disabled = n < 2 || lobby.started; b.textContent = n < 2 ? 'Aguardando jogadores…' : 'Iniciar partida (' + n + '/' + lobby.size + ')'; }
     else { b.disabled = true; b.textContent = 'Aguardando o anfitrião…'; }
   }
-  function leaveLobby() { if (lobby) { try { lobby.N.close(); } catch (e) {} lobby = null; } $('mp-players').innerHTML = ''; setStartButton(); }
+  function leaveLobby() { if (lobby) { if (lobby.timer) clearInterval(lobby.timer); if (lobby.role === 'host') $('opt-code').value = ''; try { lobby.N.close(); } catch (e) {} lobby = null; } $('mp-players').innerHTML = ''; setStartButton(); }
   function startHosted() {
     if (!lobby || lobby.role !== 'host' || lobby.started) return;
     const N = lobby.N; N.me = myInfo(); const roster = N.roster();
@@ -74,28 +76,39 @@ function initStart() {
     const N = ARD.net.create(); lobby = { N, role: 'host', size, code: null, started: false, me };
     mpStatus('Criando sala…'); setStartButton();
     N.on('error', e => mpStatus('Erro de rede: ' + e.message));
+    N.on('warn', w => { if (lobby) { lobby.warn = w.message; renderLobby(N.roster(), lobby.size); } });
     N.on('lobby', d => { renderLobby(d.players, d.size); setStartButton(); if (lobby && !lobby.started) { if (d.players.length >= d.size) { mpStatus('Sala completa. Iniciando…'); setTimeout(startHosted, 500); } else mpStatus('Sala ' + lobby.code + ': ' + d.players.length + '/' + d.size + ' jogadores. A partida começa quando a sala encher, ou clique em Iniciar partida com 2 ou mais.'); } });
-    N.host({ size, me }, code => { lobby.code = code; $('opt-code').value = code; renderLobby(N.roster(), size); mpStatus('Sala ' + code + ' criada para ' + size + ' jogadores. Envie o código aos amigos e aguarde a entrada deles.'); });
+    N.host({ size, me, code: (loadPrefs() || {}).room }, code => { lobby.code = code; $('opt-code').value = code; savePrefs(Object.assign(loadPrefs() || {}, { room: code })); renderLobby(N.roster(), size); mpStatus('Sala ' + code + ' criada para ' + size + ' jogadores. Envie o código aos amigos e aguarde a entrada deles.'); });
   });
-  $('btn-join').addEventListener('click', () => {
+  function joinRoom(code, attempt) {
+    attempt = attempt || 0;
     if (!window.Peer) { mpStatus('PeerJS não carregou neste navegador.'); return; }
     if (lobby) { mpStatus('Você já está na sala ' + (lobby.code || '…') + '. Recarregue a página para sair dela.'); return; }
-    const code = $('opt-code').value.trim().toUpperCase(); if (code.length < 4) { mpStatus('Digite o código da sala.'); return; }
-    const me = myInfo(); const N = ARD.net.create(); lobby = { N, role: 'guest', code, started: false, size: 2, me };
+    code = String(code || '').trim().toUpperCase(); if (code.length < 4) { mpStatus('Digite o código da sala.'); return; }
+    const me = myInfo(); const N = ARD.net.create(); lobby = { N, role: 'guest', code, started: false, size: 2, me, t0: Date.now(), timer: null, warn: null };
     mpStatus('Conectando à sala ' + code + '…'); setStartButton();
-    N.on('error', e => { mpStatus('Erro de rede: ' + e.message); if (lobby && !lobby.started && N.state !== 'connected') leaveLobby(); });
+    lobby.timer = setInterval(() => { if (!lobby || lobby.N !== N || N.state !== 'joining') return; const sec = Math.round((Date.now() - lobby.t0) / 1000); mpStatus(sec < 20 ? 'Conectando à sala ' + code + '… (' + sec + ' s)' : 'Sem resposta da sala ' + code + ' há ' + sec + ' s. Confira o código e se o anfitrião está com a sala aberta; continuamos tentando.'); }, 1000);
+    N.on('error', e => {
+      if (lobby && lobby.N === N && !lobby.started && N.state !== 'connected' && /não encontrada/.test(e.message) && attempt < 20) { leaveLobby(); mpStatus('Sala ' + code + ' ainda não está aberta. Nova tentativa em 3 s… (' + (attempt + 1) + '/20)'); setTimeout(() => { if (!lobby) joinRoom(code, attempt + 1); }, 3000); return; }
+      mpStatus('Erro de rede: ' + e.message); if (lobby && lobby.N === N && !lobby.started && N.state !== 'connected') leaveLobby();
+    });
+    N.on('warn', w => { if (lobby && lobby.N === N) { lobby.warn = w.message; renderLobby(N.players || [], lobby.size); } });
     N.on('open', () => mpStatus('Conectado à sala ' + code + '. Aguardando o anfitrião…'));
     N.on('full', () => { mpStatus('A sala ' + code + ' está cheia ou a partida já começou.'); leaveLobby(); });
-    N.on('close', () => { if (!lobby || lobby.started) return; mpStatus('O anfitrião saiu da sala ' + code + '.'); leaveLobby(); });
-    N.on('lobby', d => { if (!lobby) return; lobby.size = d.size; renderLobby(d.players, d.size); mpStatus('Na sala ' + code + ' como ' + me.name + ' (' + d.players.length + '/' + d.size + '). A partida começa quando o anfitrião iniciar.'); });
-    N.on('start', d => { if (!lobby) return; lobby.started = true; startGame(Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value }), { net: N, myId: d.you }); });
+    N.on('close', () => { if (!lobby || lobby.N !== N || lobby.started) return; mpStatus('O anfitrião saiu da sala ' + code + '.'); leaveLobby(); });
+    N.on('lobby', d => { if (!lobby || lobby.N !== N) return; lobby.size = d.size; renderLobby(d.players, d.size); mpStatus('Na sala ' + code + ' como ' + me.name + ' (' + d.players.length + '/' + d.size + '). A partida começa quando o anfitrião iniciar.'); });
+    N.on('start', d => { if (!lobby || lobby.N !== N) return; lobby.started = true; if (lobby.timer) clearInterval(lobby.timer); startGame(Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value }), { net: N, myId: d.you }); });
     N.join(code, me);
-  });
+  }
+  $('btn-join').addEventListener('click', () => joinRoom($('opt-code').value));
+  $('opt-code').addEventListener('input', () => { if (!lobby) setStartButton(); });
+  $('opt-code').addEventListener('keydown', e => { if (e.key === 'Enter' && !lobby) { e.preventDefault(); joinRoom($('opt-code').value); } });
   $('btn-start').addEventListener('click', () => {
     if (lobby) { if (lobby.role === 'host') startHosted(); else mpStatus('Aguarde o anfitrião iniciar a partida.'); return; }
+    const typed = $('opt-code').value.trim(); if (typed.length >= 4) { joinRoom(typed); return; } // código digitado: entra na sala, nunca inicia partida solo
     const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar';
     const cfg = { name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value };
-    savePrefs(cfg); startGame(cfg);
+    savePrefs(Object.assign(loadPrefs() || {}, cfg)); startGame(cfg);
   });
   $('btn-help-start').addEventListener('click', () => toggleHelp(true));
   if (params.get('autostart')) { startGame({ name: 'Teste', faction: params.get('faction') || 'erevane', opp: params.get('opp') || '2', diff: params.get('diff') || 'normal', seed: parseInt(params.get('seed') || '5', 10), gfx: params.get('r') === '2d' ? '2d' : '3d' }); }
@@ -408,7 +421,7 @@ function startGame(cfg, netCtx) {
     net.on('chat', d => { const nm = d.name || (sim.players[d.id] || {}).name || '?'; const tx = String(d.text || '').slice(0, 120); log(nm, tx); notice(nm + ': ' + tx.slice(0, 60)); AU.sfx('click'); });
     net.on('left', d => { const nm = (sim.players[d.id] || {}).name || d.name || 'Um jogador'; banner('Jogador desconectado', nm + ' saiu da partida; as unidades dele ficam paradas.', 'warn'); log('', nm + ' desconectou.'); });
     net.on('close', () => { if (net.role === 'guest') { banner('Conexão perdida', 'A ligação com o anfitrião caiu; a partida não pode continuar.', 'danger'); log('', 'Conexão perdida com o anfitrião.'); } });
-    net.on('desync', d => { notice('Dessincronização detectada no tick ' + d.tick + '. As partidas divergiram.'); log('', 'Dessincronização no tick ' + d.tick + '.'); });
+    net.on('desync', d => { banner('Dessincronização', 'Os mundos divergiram no tick ' + d.tick + '. Isto não deveria acontecer; exporte o resultado no fim e envie o feedback com os navegadores usados.', 'danger'); log('', 'Dessincronização no tick ' + d.tick + ' (jogador ' + ((sim.players[d.id] || {}).name || d.id) + ').'); });
     if (net.role === 'host') setInterval(() => net.ping(), 5000);
   }
   // ---------- end ----------

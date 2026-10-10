@@ -28,7 +28,7 @@ function create(pid, difficulty) {
 function own(sim, pid) { return S.entitiesOf(sim, pid); }
 function count(list, pred) { let n = 0; for (const e of list) if (pred(e)) n++; return n; }
 function findSpot(sim, pid, def, cx, cy, rmin, rmax, tries) {
-  for (let i = 0; i < tries; i++) { const a = sim.rand() * Math.PI * 2, r = rmin + sim.rand() * (rmax - rmin); const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r; if (S.canBuild(sim, pid, def, x, y).ok) return { x, y }; }
+  for (let i = 0; i < tries; i++) { const a = sim.rand() * Math.PI * 2, r = rmin + sim.rand() * (rmax - rmin); const x = cx + S.DM.cos(a) * r, y = cy + S.DM.sin(a) * r; if (S.canBuild(sim, pid, def, x, y).ok) return { x, y }; }
   return null;
 }
 function nearestEnemyNucleoPos(sim, pid) {
@@ -119,7 +119,7 @@ function think(sim, mem) {
         let s = null;
         if (def === 'nodulo') { let best = null, bdist = Infinity; for (const e of sim.ents) { if (!e.alive || e.kind !== 'node' || e.amount <= 0 || S.territoryOwner(sim, e.x, e.y) !== -1) continue; const d = S.dist(nuc.x, nuc.y, e.x, e.y); if (d < bdist) { bdist = d; best = e; } } if (best) s = findSpot(sim, mem.pid, 'nodulo', best.x, best.y, 60, 140, 30); if (!s) s = findSpot(sim, mem.pid, 'nodulo', nuc.x, nuc.y, 380, 600, 30); }
         else if (def === 'refinaria') { let sx = 0, sy = 0, n = 0; for (const e of sim.ents) if (e.alive && e.kind === 'node' && S.inTerritory(sim, mem.pid, e.x, e.y)) { sx += e.x; sy += e.y; n++; } if (n) s = findSpot(sim, mem.pid, 'refinaria', sx / n, sy / n, 50, 160, 30); if (!s) s = findSpot(sim, mem.pid, 'refinaria', nuc.x, nuc.y, 90, 300, 30); }
-        else if (def === 'torre') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = Math.atan2(en.y - nuc.y, en.x - nuc.x) + (sim.rand() - 0.5) * 1.2; s = findSpot(sim, mem.pid, 'torre', nuc.x + Math.cos(a) * 250, nuc.y + Math.sin(a) * 250, 0, 110, 30); } if (!s) s = findSpot(sim, mem.pid, 'torre', nuc.x, nuc.y, 150, 330, 30); }
+        else if (def === 'torre') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = S.DM.atan2(en.y - nuc.y, en.x - nuc.x) + (sim.rand() - 0.5) * 1.2; s = findSpot(sim, mem.pid, 'torre', nuc.x + S.DM.cos(a) * 250, nuc.y + S.DM.sin(a) * 250, 0, 110, 30); } if (!s) s = findSpot(sim, mem.pid, 'torre', nuc.x, nuc.y, 150, 330, 30); }
         else s = findSpot(sim, mem.pid, def, nuc.x, nuc.y, 90, 320, 40);
         if (s) { emitC({ t: 'build', def, x: s.x, y: s.y }); if (mem.bo < order.length) mem.bo++; }
         else if (mem.bo < order.length) mem.bo++;
@@ -129,14 +129,14 @@ function think(sim, mem) {
   // muros na Fortaleza: arco voltado para o inimigo mais próximo, com portão no meio
   if (strat.walls && !mem.wallsBuilt && t > 240 && p.res.minerio > 700) {
     const en = nearestEnemyNucleoPos(sim, mem.pid);
-    if (en) { const a0 = Math.atan2(en.y - nuc.y, en.x - nuc.x); const R = 300; let n = 0;
-      for (let a = a0 - 0.7; a <= a0 + 0.7; a += 16 / R) { const x = nuc.x + Math.cos(a) * R, y = nuc.y + Math.sin(a) * R; const gate = Math.abs(a - a0) < 0.06; if (S.canBuild(sim, mem.pid, gate ? 'portao' : 'muro', x, y).ok) { emitC({ t: 'build', def: gate ? 'portao' : 'muro', x, y, ang: a + Math.PI / 2 }); n++; } }
+    if (en) { const a0 = S.DM.atan2(en.y - nuc.y, en.x - nuc.x); const R = 300; let n = 0;
+      for (let a = a0 - 0.7; a <= a0 + 0.7; a += 16 / R) { const x = nuc.x + S.DM.cos(a) * R, y = nuc.y + S.DM.sin(a) * R; const gate = Math.abs(a - a0) < 0.06; if (S.canBuild(sim, mem.pid, gate ? 'portao' : 'muro', x, y).ok) { emitC({ t: 'build', def: gate ? 'portao' : 'muro', x, y, ang: a + Math.PI / 2 }); n++; } }
       mem.wallsBuilt = true; }
   }
   // --- pesquisa, superarma, sobrecarga
   if (S.hasBuilt(sim, mem.pid, 'laboratorio')) {
     for (const key of ['armamento', 'blindagem', 'sensores']) if (!p.research[key] && S.canAfford(p, S.RESEARCH[key].cost) && p.res.dados > 160) { emitC({ t: 'research', key }); break; }
-    if (t >= p.superCd && S.canAfford(p, { dados: 300, plasma: 300 })) { const fac = S.FACTIONS[p.faction]; if (fac.superKey === 'fundicao') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = Math.atan2(en.y - nuc.y, en.x - nuc.x); const s = findSpot(sim, mem.pid, 'bastiao', nuc.x + Math.cos(a) * 300, nuc.y + Math.sin(a) * 300, 0, 80, 30); if (s && S.inTerritory(sim, mem.pid, s.x, s.y)) emitC({ t: 'super', x: s.x, y: s.y }); } } else if (mem.mode === 'attack') emitC({ t: 'super' }); }
+    if (t >= p.superCd && S.canAfford(p, { dados: 300, plasma: 300 })) { const fac = S.FACTIONS[p.faction]; if (fac.superKey === 'fundicao') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = S.DM.atan2(en.y - nuc.y, en.x - nuc.x); const s = findSpot(sim, mem.pid, 'bastiao', nuc.x + S.DM.cos(a) * 300, nuc.y + S.DM.sin(a) * 300, 0, 80, 30); if (s && S.inTerritory(sim, mem.pid, s.x, s.y)) emitC({ t: 'super', x: s.x, y: s.y }); } } else if (mem.mode === 'attack') emitC({ t: 'super' }); }
   }
   if (p.energy.regime !== 'pleno' && p.res.plasma > 450 && t >= p.overchargeCd) emitC({ t: 'overcharge' });
 

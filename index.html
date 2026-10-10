@@ -52,7 +52,7 @@ h1 span{background:linear-gradient(90deg,var(--rift1),var(--rift2));-webkit-back
 #chat-log{max-height:120px;overflow:auto;font-size:12px;display:grid;gap:2px}
 #chat-log div{background:rgba(20,23,29,.85);border-radius:4px;padding:.15rem .4rem}
 #chat-in{width:100%;background:rgba(18,21,26,.95);border:1px solid var(--line);color:var(--fg);border-radius:6px;padding:.35rem .5rem;font:inherit;font-size:12px}
-#mp-players div{font-family:var(--fm);font-size:12px;line-height:1.5} #mp-players .muted{opacity:.55}
+#mp-players div{font-family:var(--fm);font-size:12px;line-height:1.5} #mp-players .muted{opacity:.55} #mp-players .warn{color:var(--warn)}
 #mp-wait{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);background:rgba(20,23,29,.92);border:1px solid var(--warn);border-radius:8px;padding:.6rem 1rem;font-family:var(--fm);font-size:13px}
 body.touch #chat{width:170px;bottom:calc(9.5rem + env(safe-area-inset-bottom,0))}
 .start-notes b{color:var(--fg)}
@@ -176,7 +176,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
       <div class="fac-cards" id="fac-cards"></div>
       <div class="opts">
         <div class="opt"><label for="opt-name">Nome</label><input id="opt-name" maxlength="18"></div>
-        <div class="opt"><label for="opt-opp">Oponentes</label><select id="opt-opp"><option value="1">1 IA (1v1)</option><option value="2">2 IAs (FFA 3)</option><option value="3">3 IAs (FFA 4)</option></select></div>
+        <div class="opt"><label for="opt-opp">Oponentes de IA (só no modo solo)</label><select id="opt-opp"><option value="1">1 IA (1v1)</option><option value="2">2 IAs (FFA 3)</option><option value="3">3 IAs (FFA 4)</option></select></div>
         <div class="opt"><label for="opt-diff">Dificuldade</label><select id="opt-diff"><option value="facil">Fácil</option><option value="normal">Normal</option><option value="dificil">Difícil</option></select></div>
         <div class="opt"><label for="opt-seed">Semente do mapa</label><input id="opt-seed" inputmode="numeric"></div>
         <div class="opt"><label for="opt-gfx">Gráficos</label><select id="opt-gfx"><option value="3d">3D (Three.js, luz e relevo)</option><option value="2d">2D isométrico (leve, para celulares fracos)</option></select></div>
@@ -190,7 +190,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         </div>
       </div>
     </div>
-    <p class="start-notes"><b>Novo no 3.0d:</b> salas multiplayer de 2 a 4 jogadores humanos por código, com lista de quem entrou; só os jogadores da sala entram no mapa (sem IAs), o anfitrião é o relé do lockstep e quem cair é retirado em 8 s sem travar a partida. Presets Alta/Ultra com proteção contra tela preta. <b>No 3.0c:</b> a facção Tessara (Traços de combate, Fotossíntese, Salto Evolutivo) e oito unidades novas: Soldador, Guindaste Armado, Tratorzão e Prensa para Vehnar; Atirador de Fenda, Lâmina Rodante, Mosquito e Âncora para Erevane; Quimera, Esporo-sentinela, Molde e Colosso para Tessara. Banner de eliminação e contador de inimigos. <b>No 3.0b:</b> bloom nos emissivos, oclusão ambiente no preset Alta, névoa volumétrica na Fenda e na Tempestade, lagos de plasma animados, presets de qualidade, e <b>multiplayer P2P</b> por código de sala. <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Servidor dedicado, reconexão e relé TURN</b> ficam para a próxima etapa: hoje a sala é P2P direta (STUN), o que funciona na maioria das redes domésticas.</p>
+    <p class="start-notes"><b>Novo no 3.0d:</b> salas multiplayer de 2 a 4 jogadores humanos por código, com lista de quem entrou; só os jogadores da sala entram no mapa (sem IAs), o anfitrião é o relé do lockstep e quem cair é retirado em 8 s sem travar a partida. Simulação idêntica em Chrome, Firefox e Safari (matemática determinística), para que navegadores diferentes não dessincronizem. Unidades atravessam o próprio Portão sem travar. Presets Alta/Ultra com proteção contra tela preta. <b>No 3.0c:</b> a facção Tessara (Traços de combate, Fotossíntese, Salto Evolutivo) e oito unidades novas: Soldador, Guindaste Armado, Tratorzão e Prensa para Vehnar; Atirador de Fenda, Lâmina Rodante, Mosquito e Âncora para Erevane; Quimera, Esporo-sentinela, Molde e Colosso para Tessara. Banner de eliminação e contador de inimigos. <b>No 3.0b:</b> bloom nos emissivos, oclusão ambiente no preset Alta, névoa volumétrica na Fenda e na Tempestade, lagos de plasma animados, presets de qualidade, e <b>multiplayer P2P</b> por código de sala. <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Servidor dedicado, reconexão e relé TURN</b> ficam para a próxima etapa: hoje a sala é P2P direta (STUN), o que funciona na maioria das redes domésticas.</p>
     <p class="start-notes" id="build-info" style="opacity:.65;font-size:12px"></p>
   </div>
 </div>
@@ -291,6 +291,27 @@ const TILE = 64, TILES = WORLD / TILE;      // grade de exploração 50×50
 const DX8 = [1, 1, 0, -1, -1, -1, 0, 1], DY8 = [0, 1, 1, 1, 0, -1, -1, -1];
 const BIOMES = ['gelo', 'rocha', 'tundra', 'basalto'];
 
+// Matemática determinística: só +, -, *, / e sqrt (exatos em IEEE-754), para que Chrome, Firefox e Safari calculem o mesmo
+// resultado bit a bit. Math.sin/cos/atan2/hypot variam entre motores JS e dessincronizavam o multiplayer entre navegadores diferentes.
+const DM = (() => {
+  const PI = Math.PI, TWO_PI = 2 * PI, HALF_PI = PI / 2, SQRT3 = Math.sqrt(3);
+  function sin(x) {
+    x = x - TWO_PI * Math.floor((x + PI) / TWO_PI); // [-PI, PI)
+    if (x > HALF_PI) x = PI - x; else if (x < -HALF_PI) x = -PI - x; // [-PI/2, PI/2]
+    const x2 = x * x;
+    return x * (1 + x2 * (-1 / 6 + x2 * (1 / 120 + x2 * (-1 / 5040 + x2 * (1 / 362880 + x2 * (-1 / 39916800 + x2 * (1 / 6227020800 + x2 * (-1 / 1307674368000))))))));
+  }
+  function cos(x) { return sin(x + HALF_PI); }
+  function atan(t) {
+    const neg = t < 0; if (neg) t = -t; const inv = t > 1; if (inv) t = 1 / t;
+    let add = 0; if (t > 0.2679491924311227) { t = (t * SQRT3 - 1) / (t + SQRT3); add = PI / 6; }
+    const t2 = t * t; let r = t * (1 + t2 * (-1 / 3 + t2 * (1 / 5 + t2 * (-1 / 7 + t2 * (1 / 9 + t2 * (-1 / 11 + t2 * (1 / 13 + t2 * (-1 / 15))))))));
+    r += add; if (inv) r = HALF_PI - r; return neg ? -r : r;
+  }
+  function atan2(y, x) { if (x > 0) return atan(y / x); if (x < 0) return y >= 0 ? atan(y / x) + PI : atan(y / x) - PI; return y > 0 ? HALF_PI : y < 0 ? -HALF_PI : 0; }
+  function hypot(x, y) { return Math.sqrt(x * x + y * y); }
+  return { sin, cos, atan2, hypot, atan };
+})();
 const FACTIONS = {
   vehnar: {
     id: 'vehnar', name: 'Consórcio Vehnar', short: 'Vehnar',
@@ -427,7 +448,7 @@ function mulberry32(seed) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
-function dist(ax, ay, bx, by) { return Math.hypot(ax - bx, ay - by); }
+function dist(ax, ay, bx, by) { return DM.hypot(ax - bx, ay - by); }
 function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
 
 function createSim(cfg) {
@@ -470,51 +491,51 @@ function generateMap(sim) {
   // Plasma ring around the Rift
   for (let k = 0; k < 8; k++) {
     const a = (Math.PI * 2 * k) / 8 + Math.PI / 8;
-    addNode(sim, 'plasma', CX + Math.cos(a) * 330, CY + Math.sin(a) * 330, 1800);
+    addNode(sim, 'plasma', CX + DM.cos(a) * 330, CY + DM.sin(a) * 330, 1800);
   }
   // Data anomalies between players on a mid ring
   const n = sim.players.length;
   for (let i = 0; i < n; i++) {
     const a = sim.players[i].startAngle + Math.PI / n;
-    addNode(sim, 'dados', CX + Math.cos(a) * 640, CY + Math.sin(a) * 640, 600);
-    addNode(sim, 'minerio', CX + Math.cos(a + 0.18) * 800, CY + Math.sin(a + 0.18) * 800, 1600);
-    addNode(sim, 'minerio', CX + Math.cos(a - 0.18) * 800, CY + Math.sin(a - 0.18) * 800, 1600);
+    addNode(sim, 'dados', CX + DM.cos(a) * 640, CY + DM.sin(a) * 640, 600);
+    addNode(sim, 'minerio', CX + DM.cos(a + 0.18) * 800, CY + DM.sin(a + 0.18) * 800, 1600);
+    addNode(sim, 'minerio', CX + DM.cos(a - 0.18) * 800, CY + DM.sin(a - 0.18) * 800, 1600);
   }
   if (n < 4) { // extra data for small games
     for (let k = 0; k < 4 - n; k++) {
       const a = sim.rand() * Math.PI * 2;
-      addNode(sim, 'dados', CX + Math.cos(a) * 520, CY + Math.sin(a) * 520, 500);
+      addNode(sim, 'dados', CX + DM.cos(a) * 520, CY + DM.sin(a) * 520, 500);
     }
   }
   for (let i = 0; i < n; i++) {
     const p = sim.players[i];
-    const sx = CX + Math.cos(p.startAngle) * R0, sy = CY + Math.sin(p.startAngle) * R0;
+    const sx = CX + DM.cos(p.startAngle) * R0, sy = CY + DM.sin(p.startAngle) * R0;
     const nuc = addBuilding(sim, p.id, 'nucleo', sx, sy, true);
     nuc.hp = nuc.maxHp;
     // three minério nodes around the start, one small plasma, one dados a bit away
     for (let k = 0; k < 3; k++) {
       const a = p.startAngle + Math.PI + (k - 1) * 0.75 + (sim.rand() - 0.5) * 0.3;
       const d = 190 + sim.rand() * 60;
-      addNode(sim, 'minerio', sx + Math.cos(a) * d, sy + Math.sin(a) * d, 2200);
+      addNode(sim, 'minerio', sx + DM.cos(a) * d, sy + DM.sin(a) * d, 2200);
     }
     const ap = p.startAngle + Math.PI + (sim.rand() < 0.5 ? 1.5 : -1.5);
-    addNode(sim, 'plasma', sx + Math.cos(ap) * 250, sy + Math.sin(ap) * 250, 1500);
+    addNode(sim, 'plasma', sx + DM.cos(ap) * 250, sy + DM.sin(ap) * 250, 1500);
     const ad = p.startAngle + (sim.rand() < 0.5 ? 1.1 : -1.1);
-    addNode(sim, 'dados', sx + Math.cos(ad) * 420, sy + Math.sin(ad) * 420, 350);
+    addNode(sim, 'dados', sx + DM.cos(ad) * 420, sy + DM.sin(ad) * 420, 350);
     // starting units
     for (let k = 0; k < 3; k++) {
-      const u = addUnit(sim, p.id, 'coletor', sx + Math.cos(p.startAngle + Math.PI + k * 0.5) * 60, sy + Math.sin(p.startAngle + Math.PI + k * 0.5) * 60);
+      const u = addUnit(sim, p.id, 'coletor', sx + DM.cos(p.startAngle + Math.PI + k * 0.5) * 60, sy + DM.sin(p.startAngle + Math.PI + k * 0.5) * 60);
       u.state = 'idle';
     }
-    const u1 = addUnit(sim, p.id, 'infantaria', sx + Math.cos(p.startAngle) * 70, sy + Math.sin(p.startAngle) * 70);
-    const u2 = addUnit(sim, p.id, 'infantaria', sx + Math.cos(p.startAngle + 0.4) * 70, sy + Math.sin(p.startAngle + 0.4) * 70);
+    const u1 = addUnit(sim, p.id, 'infantaria', sx + DM.cos(p.startAngle) * 70, sy + DM.sin(p.startAngle) * 70);
+    const u2 = addUnit(sim, p.id, 'infantaria', sx + DM.cos(p.startAngle + 0.4) * 70, sy + DM.sin(p.startAngle + 0.4) * 70);
     u1.state = u2.state = 'idle';
   }
   // scattered extra minério
   let tries = 0;
   for (let k = 0; k < 6 && tries < 200; tries++) {
     const a = sim.rand() * Math.PI * 2, d = 450 + sim.rand() * 550;
-    const x = CX + Math.cos(a) * d, y = CY + Math.sin(a) * d;
+    const x = CX + DM.cos(a) * d, y = CY + DM.sin(a) * d;
     if (nearestEntity(sim, x, y, 150, e => e.kind !== 'unit')) continue;
     addNode(sim, 'minerio', x, y, 1200); k++;
   }
@@ -550,12 +571,12 @@ function generateTerrain(sim) {
   // cordilheiras: segmentos de rochas intransponíveis no anel médio, mantendo o mapa conectado
   const nR = 5 + sim.players.length; const placed = [];
   for (let k = 0; k < nR * 3 && placed.length < nR; k++) {
-    const a = sim.rand() * Math.PI * 2, rr = 620 + sim.rand() * 420; const cx = CX + Math.cos(a) * rr, cy = CY + Math.sin(a) * rr;
+    const a = sim.rand() * Math.PI * 2, rr = 620 + sim.rand() * 420; const cx = CX + DM.cos(a) * rr, cy = CY + DM.sin(a) * rr;
     if (nucs.some(nc => dist(cx, cy, nc.x, nc.y) < 460)) continue;
     const dir = a + Math.PI / 2 + (sim.rand() - 0.5) * 0.8; const len = 150 + sim.rand() * 220; const curve = (sim.rand() - 0.5) * 0.004;
     const rocks = [];
     for (let t = -len / 2; t <= len / 2; t += 26) {
-      const ang = dir + curve * t * 2; const x = cx + Math.cos(ang) * t, y = cy + Math.sin(ang) * t + Math.sin(t * 0.08) * 6;
+      const ang = dir + curve * t * 2; const x = cx + DM.cos(ang) * t, y = cy + DM.sin(ang) * t + DM.sin(t * 0.08) * 6;
       if (x < 80 || y < 80 || x > WORLD - 80 || y > WORLD - 80) continue;
       if (sim.ents.some(e => (e.kind === 'node' && dist(x, y, e.x, e.y) < 70) || (e.kind === 'building' && dist(x, y, e.x, e.y) < 120))) continue;
       const r = { id: sim.nextId++, kind: 'rock', x, y, r: 13, alive: true, owner: -1, seed: Math.floor(sim.rand() * 1000) };
@@ -699,7 +720,7 @@ function updateStorm(sim, dt) {
   if (!st) {
     if (sim.time >= sim.nextStorm) {
       const a = sim.rand() * Math.PI * 2, rr = 520 + sim.rand() * 560;
-      sim.storm = { x: CX + Math.cos(a) * rr, y: CY + Math.sin(a) * rr, r: 420, t: 0, phase: 'warn', warn: 30, dur: 90 };
+      sim.storm = { x: CX + DM.cos(a) * rr, y: CY + DM.sin(a) * rr, r: 420, t: 0, phase: 'warn', warn: 30, dur: 90 };
       for (const q of sim.players) if (q.alive) alertTo(sim, q.id, 'Tempestade de Éter se aproximando (30 s)', sim.storm.x, sim.storm.y, 'warn');
       emit(sim, { t: 'storm', phase: 'warn', x: sim.storm.x, y: sim.storm.y, r: sim.storm.r });
     }
@@ -933,7 +954,7 @@ function computeEnergy(sim, p, dt) {
       if (!e.built) continue;
       if (d.energyProd) {
         if (d.plasmaBurn) { if (p.res.plasma > 0) { prod += d.energyProd; p.res.plasma = Math.max(0, p.res.plasma - d.plasmaBurn * dt); } }
-        else if (e.def === 'nucleo' && FACTIONS[p.faction].photosynthesis) { const nt = (1 - Math.cos(Math.PI * 2 * sim.time / 750)) / 2; prod += 95 - 50 * nt; }
+        else if (e.def === 'nucleo' && FACTIONS[p.faction].photosynthesis) { const nt = (1 - DM.cos(Math.PI * 2 * sim.time / 750)) / 2; prod += 95 - 50 * nt; }
         else prod += d.energyProd;
       }
       cons += d.energyUse || 0;
@@ -996,8 +1017,8 @@ function fire(sim, a, t) {
   const w = a.kind === 'unit' ? UNITS[a.def].attack : BUILDINGS[a.def].attack;
   const ambush = a.kind === 'unit' && a.cloaked && a.def === 'infantaria';
   const base = w.dmg * damageMult(sim, a) * (ambush ? 1.5 : 1);
-  a.cd = w.cd; a.lastAttack = sim.time; a.cloaked = false; a.aimAng = Math.atan2(t.y - a.y, t.x - a.x);
-  const sx = a.x + Math.cos(a.aimAng) * a.r * 0.8, sy = a.y + Math.sin(a.aimAng) * a.r * 0.8;
+  a.cd = w.cd; a.lastAttack = sim.time; a.cloaked = false; a.aimAng = DM.atan2(t.y - a.y, t.x - a.x);
+  const sx = a.x + DM.cos(a.aimAng) * a.r * 0.8, sy = a.y + DM.sin(a.aimAng) * a.r * 0.8;
   emit(sim, { t: 'shot', x1: sx, y1: sy, x2: t.x, y2: t.y, cls: a.cls, owner: a.owner, ambush, weapon: a.kind === 'unit' ? UNITS[a.def].weapon : BUILDINGS[a.def].weapon, beam: w.proj === 'beam' });
   if (w.proj === 'beam') {
     if (w.splash > 0) { const hit = []; queryGrid(sim, t.x, t.y, w.splash + 40, e => { if (!e.alive || e.owner === a.owner || e.owner < 0 || e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck' || e.kind === 'rock' || !isEnemy(sim, a.owner, e.owner)) return; if (e.kind === 'unit' && UNITS[e.def].flying) return; if (dist(t.x, t.y, e.x, e.y) - e.r <= w.splash) hit.push(e); }); for (const e of hit) applyDamage(sim, a.owner, a, e, base * counterMult(sim, a, e) * (e === t ? 1 : 0.7), w); emit(sim, { t: 'impact', x: t.x, y: t.y, weapon: 'chama', splash: w.splash, hit: true, owner: a.owner }); }
@@ -1007,7 +1028,7 @@ function fire(sim, a, t) {
   // projétil: viaja até o ponto previsto do alvo com inexatidão; acerta o que estiver lá
   const ang = sim.rand() * Math.PI * 2, err = sim.rand() * w.inacc;
   const lead = t.kind === 'unit' ? Math.min(1, dist(a.x, a.y, t.x, t.y) / w.speed) : 0;
-  const tx = t.x + (t.x - t.px) * lead * 10 + Math.cos(ang) * err, ty = t.y + (t.y - t.py) * lead * 10 + Math.sin(ang) * err;
+  const tx = t.x + (t.x - t.px) * lead * 10 + DM.cos(ang) * err, ty = t.y + (t.y - t.py) * lead * 10 + DM.sin(ang) * err;
   const d = dist(sx, sy, tx, ty); const dir = [(tx - sx) / (d || 1), (ty - sy) / (d || 1)];
   const pr = { id: sim.nextId++, kind: 'proj', x: sx, y: sy, px: sx, py: sy, z: a.kind === 'building' ? a.r * 0.9 : 6, tx, ty, vx: dir[0] * w.speed, vy: dir[1] * w.speed, weapon: a.kind === 'unit' ? UNITS[a.def].weapon : BUILDINGS[a.def].weapon, owner: a.owner, shooter: a.id, target: t.id, dmg: base, total: d, done: 0, arc: w.proj === 'shell' ? Math.min(60, d * 0.25) : 0, flying: !!(t.kind === 'unit' && UNITS[t.def].flying), alive: true, r: 1 };
   sim.ents.push(pr); sim.byId.set(pr.id, pr);
@@ -1037,7 +1058,7 @@ function updateProjectile(sim, pr, dt) {
     return;
   }
   pr.done += step; pr.x += pr.vx * dt; pr.y += pr.vy * dt;
-  const k = pr.done / pr.total; pr.z = (pr.arc ? Math.sin(k * Math.PI) * pr.arc : 0) + 6 * (1 - k) + 3;
+  const k = pr.done / pr.total; pr.z = (pr.arc ? DM.sin(k * Math.PI) * pr.arc : 0) + 6 * (1 - k) + 3;
 }
 function kill(sim, e, killer) {
   if (!e.alive) return;
@@ -1089,7 +1110,7 @@ function acquire(sim, u, rad, unitsOnly) {
   return best;
 }
 function moveToward(sim, u, tx, ty, dt) {
-  const dx = tx - u.x, dy = ty - u.y; const d = Math.hypot(dx, dy);
+  const dx = tx - u.x, dy = ty - u.y; const d = DM.hypot(dx, dy);
   const sp = speedOf(sim, u) * dt;
   if (d <= Math.max(sp, 4)) { u.x = tx; u.y = ty; return true; }
   if (!UNITS[u.def].flying && d > NAV * 1.2 && !lineFree(sim, u.x, u.y, tx, ty, u.owner)) {
@@ -1103,11 +1124,11 @@ function moveToward(sim, u, tx, ty, dt) {
       if (best >= 0) { nx = (best % NW + 0.5) * NAV; ny = (((best / NW) | 0) + 0.5) * NAV; dir = 0; }
     }
     if (dir >= 0) {
-      const ddx = nx - u.x, ddy = ny - u.y; const dd = Math.hypot(ddx, ddy) || 1;
-      u.x += ddx / dd * sp; u.y += ddy / dd * sp; u.ang = Math.atan2(ddy, ddx); return false;
+      const ddx = nx - u.x, ddy = ny - u.y; const dd = DM.hypot(ddx, ddy) || 1;
+      u.x += ddx / dd * sp; u.y += ddy / dd * sp; u.ang = DM.atan2(ddy, ddx); return false;
     }
   }
-  u.x += dx / d * sp; u.y += dy / d * sp; u.ang = Math.atan2(dy, dx); return false;
+  u.x += dx / d * sp; u.y += dy / d * sp; u.ang = DM.atan2(dy, dx); return false;
 }
 function nearestDeposit(sim, u) {
   let best = null, bd = Infinity;
@@ -1182,7 +1203,7 @@ function updateUnit(sim, u, dt) {
         u.target = null; break;
       }
       const dd = dist(u.x, u.y, t.x, t.y);
-      if (dd <= d.attack.range + t.r) { u.ang = Math.atan2(t.y - u.y, t.x - u.x); if (u.cd <= 0) fire(sim, u, t); }
+      if (dd <= d.attack.range + t.r) { u.ang = DM.atan2(t.y - u.y, t.x - u.x); if (u.cd <= 0) fire(sim, u, t); }
       else moveToward(sim, u, t.x, t.y, dt);
       break; }
     case 'harvest': {
@@ -1277,8 +1298,8 @@ function updateBuilding(sim, b, dt) {
     const it = b.queue[0]; it.t += dt * mult;
     if (it.t >= it.total) {
       b.queue.shift();
-      const ang = b.rally ? Math.atan2(b.rally.y - b.y, b.rally.x - b.x) : Math.atan2(CY - b.y, CX - b.x);
-      const u = addUnit(sim, b.owner, it.def, b.x + Math.cos(ang) * (b.r + 14), b.y + Math.sin(ang) * (b.r + 14));
+      const ang = b.rally ? DM.atan2(b.rally.y - b.y, b.rally.x - b.x) : DM.atan2(CY - b.y, CX - b.x);
+      const u = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang) * (b.r + 14), b.y + DM.sin(ang) * (b.r + 14));
       if (b.rally) { u.state = 'move'; u.tx = b.rally.x + (sim.rand() - 0.5) * 30; u.ty = b.rally.y + (sim.rand() - 0.5) * 30; }
       emit(sim, { t: 'spawn', p: b.owner, x: u.x, y: u.y, def: it.def });
     }
@@ -1293,16 +1314,19 @@ function separate(sim) {
   for (const e of sim.ents) if (e.alive && e.kind === 'unit') units.push(e);
   for (const u of units) {
     let fx = 0, fy = 0, bfx = 0, bfy = 0;
+    // Dentro do vão de um portão próprio (36 wu), os muros do próprio jogador não empurram: o portão é a passagem, mesmo para veículos largos.
+    let inOwnGate = false; if (!UNITS[u.def].flying && sim.nav.gatePos.size) { for (const g of sim.nav.gatePos.values()) if (g.alive && g.owner === u.owner && dist(u.x, u.y, g.x, g.y) < 36) { inOwnGate = true; break; } }
     queryGrid(sim, u.x, u.y, 40, e => {
       if (e === u || !e.alive) return;
       if (e.kind === 'unit') {
         if (UNITS[e.def].flying !== UNITS[u.def].flying) return;
-        const dx = u.x - e.x, dy = u.y - e.y; const dd = Math.hypot(dx, dy) || 0.01; const min = u.r + e.r + 1;
+        const dx = u.x - e.x, dy = u.y - e.y; const dd = DM.hypot(dx, dy) || 0.01; const min = u.r + e.r + 1;
         if (dd < min) { const push = (min - dd) * 0.5; fx += dx / dd * push; fy += dy / dd * push; }
       } else if (e.kind === 'building' || e.kind === 'rock') {
         if (UNITS[u.def].flying) return;
         if (e.kind === 'building' && BUILDINGS[e.def].gate && e.owner === u.owner) return; // portão próprio: passa
-        const dx = u.x - e.x, dy = u.y - e.y; const dd = Math.hypot(dx, dy) || 0.01; const min = u.r + e.r + 2;
+        if (inOwnGate && e.kind === 'building' && BUILDINGS[e.def].wall && e.owner === u.owner) return; // muro ao lado do próprio portão: não trava a passagem
+        const dx = u.x - e.x, dy = u.y - e.y; const dd = DM.hypot(dx, dy) || 0.01; const min = u.r + e.r + 2;
         if (dd < min) { const push = (min - dd); fx += dx / dd * push; fy += dy / dd * push; bfx += dx / dd * push; bfy += dy / dd * push; }
       }
     });
@@ -1312,12 +1336,12 @@ function separate(sim) {
       if (u.state === 'attack' || u.state === 'siphon' || u.state === 'pickup') { const t = sim.byId.get(u.target); if (t) { gx = t.x; gy = t.y; } }
       else if (u.state === 'harvest') { const n = sim.byId.get(u.node); if (n) { gx = n.x; gy = n.y; } }
       else if (u.state === 'return') { const d = nearestDeposit(sim, u); if (d) { gx = d.x; gy = d.y; } }
-      const dxg = gx - u.x, dyg = gy - u.y; const bl = Math.hypot(bfx, bfy) || 1;
+      const dxg = gx - u.x, dyg = gy - u.y; const bl = DM.hypot(bfx, bfy) || 1;
       let tx = -bfy / bl, ty = bfx / bl; if (tx * dxg + ty * dyg < 0) { tx = -tx; ty = -ty; }
       const sp = speedOf(sim, u) * TICK * 0.85; fx += tx * sp; fy += ty * sp;
     }
     if (!UNITS[u.def].flying) {
-      const dx = u.x - CX, dy = u.y - CY; const dd = Math.hypot(dx, dy) || 0.01; const min = RIFT_R + u.r;
+      const dx = u.x - CX, dy = u.y - CY; const dd = DM.hypot(dx, dy) || 0.01; const min = RIFT_R + u.r;
       if (dd < min) { fx += dx / dd * (min - dd); fy += dy / dd * (min - dd); }
     }
     if (fx || fy) { u.x = clamp(u.x + fx, 10, WORLD - 10); u.y = clamp(u.y + fy, 10, WORLD - 10); }
@@ -1458,6 +1482,7 @@ ARD.sim = {
   TICK, WORLD, CX, CY, RIFT_R, FACTIONS, BUILDINGS, UNITS, WEAPONS, COUNTER, CLASS_NAMES, VET_RANKS, unitCost, RESEARCH, REGIME, DIFFICULTY, REP_NAMES,
   SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS, FACTION_EXTRAS, producesFor,
   NAV, NW, TILE, TILES, BIOMES, navIdx, passable, flowField, lineFree, inStorm,
+  DM,
   createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius,
 };
 })(globalThis.ARD = globalThis.ARD || {});
@@ -1492,7 +1517,7 @@ function create(pid, difficulty) {
 function own(sim, pid) { return S.entitiesOf(sim, pid); }
 function count(list, pred) { let n = 0; for (const e of list) if (pred(e)) n++; return n; }
 function findSpot(sim, pid, def, cx, cy, rmin, rmax, tries) {
-  for (let i = 0; i < tries; i++) { const a = sim.rand() * Math.PI * 2, r = rmin + sim.rand() * (rmax - rmin); const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r; if (S.canBuild(sim, pid, def, x, y).ok) return { x, y }; }
+  for (let i = 0; i < tries; i++) { const a = sim.rand() * Math.PI * 2, r = rmin + sim.rand() * (rmax - rmin); const x = cx + S.DM.cos(a) * r, y = cy + S.DM.sin(a) * r; if (S.canBuild(sim, pid, def, x, y).ok) return { x, y }; }
   return null;
 }
 function nearestEnemyNucleoPos(sim, pid) {
@@ -1583,7 +1608,7 @@ function think(sim, mem) {
         let s = null;
         if (def === 'nodulo') { let best = null, bdist = Infinity; for (const e of sim.ents) { if (!e.alive || e.kind !== 'node' || e.amount <= 0 || S.territoryOwner(sim, e.x, e.y) !== -1) continue; const d = S.dist(nuc.x, nuc.y, e.x, e.y); if (d < bdist) { bdist = d; best = e; } } if (best) s = findSpot(sim, mem.pid, 'nodulo', best.x, best.y, 60, 140, 30); if (!s) s = findSpot(sim, mem.pid, 'nodulo', nuc.x, nuc.y, 380, 600, 30); }
         else if (def === 'refinaria') { let sx = 0, sy = 0, n = 0; for (const e of sim.ents) if (e.alive && e.kind === 'node' && S.inTerritory(sim, mem.pid, e.x, e.y)) { sx += e.x; sy += e.y; n++; } if (n) s = findSpot(sim, mem.pid, 'refinaria', sx / n, sy / n, 50, 160, 30); if (!s) s = findSpot(sim, mem.pid, 'refinaria', nuc.x, nuc.y, 90, 300, 30); }
-        else if (def === 'torre') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = Math.atan2(en.y - nuc.y, en.x - nuc.x) + (sim.rand() - 0.5) * 1.2; s = findSpot(sim, mem.pid, 'torre', nuc.x + Math.cos(a) * 250, nuc.y + Math.sin(a) * 250, 0, 110, 30); } if (!s) s = findSpot(sim, mem.pid, 'torre', nuc.x, nuc.y, 150, 330, 30); }
+        else if (def === 'torre') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = S.DM.atan2(en.y - nuc.y, en.x - nuc.x) + (sim.rand() - 0.5) * 1.2; s = findSpot(sim, mem.pid, 'torre', nuc.x + S.DM.cos(a) * 250, nuc.y + S.DM.sin(a) * 250, 0, 110, 30); } if (!s) s = findSpot(sim, mem.pid, 'torre', nuc.x, nuc.y, 150, 330, 30); }
         else s = findSpot(sim, mem.pid, def, nuc.x, nuc.y, 90, 320, 40);
         if (s) { emitC({ t: 'build', def, x: s.x, y: s.y }); if (mem.bo < order.length) mem.bo++; }
         else if (mem.bo < order.length) mem.bo++;
@@ -1593,14 +1618,14 @@ function think(sim, mem) {
   // muros na Fortaleza: arco voltado para o inimigo mais próximo, com portão no meio
   if (strat.walls && !mem.wallsBuilt && t > 240 && p.res.minerio > 700) {
     const en = nearestEnemyNucleoPos(sim, mem.pid);
-    if (en) { const a0 = Math.atan2(en.y - nuc.y, en.x - nuc.x); const R = 300; let n = 0;
-      for (let a = a0 - 0.7; a <= a0 + 0.7; a += 16 / R) { const x = nuc.x + Math.cos(a) * R, y = nuc.y + Math.sin(a) * R; const gate = Math.abs(a - a0) < 0.06; if (S.canBuild(sim, mem.pid, gate ? 'portao' : 'muro', x, y).ok) { emitC({ t: 'build', def: gate ? 'portao' : 'muro', x, y, ang: a + Math.PI / 2 }); n++; } }
+    if (en) { const a0 = S.DM.atan2(en.y - nuc.y, en.x - nuc.x); const R = 300; let n = 0;
+      for (let a = a0 - 0.7; a <= a0 + 0.7; a += 16 / R) { const x = nuc.x + S.DM.cos(a) * R, y = nuc.y + S.DM.sin(a) * R; const gate = Math.abs(a - a0) < 0.06; if (S.canBuild(sim, mem.pid, gate ? 'portao' : 'muro', x, y).ok) { emitC({ t: 'build', def: gate ? 'portao' : 'muro', x, y, ang: a + Math.PI / 2 }); n++; } }
       mem.wallsBuilt = true; }
   }
   // --- pesquisa, superarma, sobrecarga
   if (S.hasBuilt(sim, mem.pid, 'laboratorio')) {
     for (const key of ['armamento', 'blindagem', 'sensores']) if (!p.research[key] && S.canAfford(p, S.RESEARCH[key].cost) && p.res.dados > 160) { emitC({ t: 'research', key }); break; }
-    if (t >= p.superCd && S.canAfford(p, { dados: 300, plasma: 300 })) { const fac = S.FACTIONS[p.faction]; if (fac.superKey === 'fundicao') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = Math.atan2(en.y - nuc.y, en.x - nuc.x); const s = findSpot(sim, mem.pid, 'bastiao', nuc.x + Math.cos(a) * 300, nuc.y + Math.sin(a) * 300, 0, 80, 30); if (s && S.inTerritory(sim, mem.pid, s.x, s.y)) emitC({ t: 'super', x: s.x, y: s.y }); } } else if (mem.mode === 'attack') emitC({ t: 'super' }); }
+    if (t >= p.superCd && S.canAfford(p, { dados: 300, plasma: 300 })) { const fac = S.FACTIONS[p.faction]; if (fac.superKey === 'fundicao') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = S.DM.atan2(en.y - nuc.y, en.x - nuc.x); const s = findSpot(sim, mem.pid, 'bastiao', nuc.x + S.DM.cos(a) * 300, nuc.y + S.DM.sin(a) * 300, 0, 80, 30); if (s && S.inTerritory(sim, mem.pid, s.x, s.y)) emitC({ t: 'super', x: s.x, y: s.y }); } } else if (mem.mode === 'attack') emitC({ t: 'super' }); }
   }
   if (p.energy.regime !== 'pleno' && p.res.plasma > 450 && t >= p.overchargeCd) emitC({ t: 'overcharge' });
 
@@ -2837,6 +2862,7 @@ ARD.audio = A;
    tick T sem o pacote. Também: sala por código, lista de jogadores, checksums por tick, chat e aviso de desconexão. */
 (function (ARD) {
 'use strict';
+const PROTO = 2; // versão do protocolo: anfitrião e convidados precisam coincidir
 const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function makeCode() { let c = ''; for (let i = 0; i < 6; i++) c += ALPHA[Math.floor(Math.random() * ALPHA.length)]; return c; }
 const errText = t => ({ 'peer-unavailable': 'sala não encontrada (código errado ou anfitrião offline)', 'network': 'sem conexão com o servidor de sinalização', 'server-error': 'servidor de sinalização indisponível', 'browser-incompatible': 'navegador sem WebRTC', 'unavailable-id': 'código em uso' }[t] || t);
@@ -2858,7 +2884,14 @@ function create() {
     conn.on('open', () => { g.open = true; if (full()) { sendTo(conn, { t: 'full' }); setTimeout(() => { try { conn.close(); } catch (e) {} }, 400); } });
     conn.on('data', d => {
       if (!d || typeof d !== 'object') return;
-      if (d.t === 'hello') { if (g.ready) return; if (full()) { sendTo(conn, { t: 'full' }); return; } g.name = String(d.name || 'Convidado').slice(0, 18); g.faction = String(d.faction || 'vehnar'); g.ready = true; sendTo(conn, { t: 'welcome', size: N.size }); pushLobby(); }
+      if (d.t === 'hello') {
+        if (g.ready) return;
+        if (d.v !== PROTO) { sendTo(conn, { t: 'bad-version', v: PROTO, build: N.me.build || '' }); fire('error', { message: 'o convidado ' + String(d.name || '?').slice(0, 18) + ' está com outra versão do jogo; peça para atualizar a página (Ctrl+F5)' }); setTimeout(() => { try { conn.close(); } catch (e) {} }, 500); return; }
+        if (full()) { sendTo(conn, { t: 'full' }); return; }
+        g.name = String(d.name || 'Convidado').slice(0, 18); g.faction = String(d.faction || 'vehnar'); g.ready = true;
+        if (d.build && N.me.build && d.build !== N.me.build) fire('warn', { message: 'build diferente em ' + g.name + ' (' + d.build + ' × ' + N.me.build + '); se algo falhar, Ctrl+F5 nos dois lados' });
+        sendTo(conn, { t: 'welcome', size: N.size, v: PROTO, build: N.me.build || '' }); pushLobby();
+      }
       else if (d.t === 'cmds') { if (g.id >= 0 && !N.dropped.has(g.id)) { put(d.tick, g.id, d.cmds || []); tryBundle(d.tick); } }
       else if (d.t === 'hash') { if (g.id >= 0) checkHash(d.tick, d.h, g.id); }
       else if (d.t === 'chat') { const m = { t: 'chat', id: g.id, name: g.name, text: String(d.text || '').slice(0, 120) }; broadcast(m, conn); fire('chat', m); }
@@ -2879,7 +2912,8 @@ function create() {
     N.role = 'host'; N.me = opts.me; N.size = Math.max(2, Math.min(4, opts.size | 0 || 2)); N.state = 'hosting'; N.id = 0;
     let tries = 0;
     const open = () => {
-      N.code = makeCode(); N.peer = new Peer('aether-rift-' + N.code.toLowerCase(), { debug: 0 });
+      N.code = (tries === 0 && opts.code && /^[A-Z2-9]{6}$/.test(String(opts.code).toUpperCase())) ? String(opts.code).toUpperCase() : makeCode(); // reaproveita o código da última sala deste navegador
+      N.peer = new Peer('aether-rift-' + N.code.toLowerCase(), { debug: 0 });
       N.peer.on('open', () => { if (onReady) onReady(N.code); });
       N.peer.on('connection', conn => bindGuest(conn));
       N.peer.on('error', e => { const type = String(e && e.type || e); if (type === 'unavailable-id' && tries++ < 3) { try { N.peer.destroy(); } catch (x) {} open(); return; } fire('error', { message: errText(type) }); });
@@ -2901,10 +2935,11 @@ function create() {
     N.peer = new Peer({ debug: 0 });
     N.peer.on('open', () => {
       const conn = N.peer.connect('aether-rift-' + N.code.toLowerCase(), { reliable: true, serialization: 'json' }); N.hostConn = conn;
-      conn.on('open', () => { N.state = 'connected'; send({ t: 'hello', name: me.name, faction: me.faction }); fire('open', {}); });
+      conn.on('open', () => { N.state = 'connected'; send({ t: 'hello', name: me.name, faction: me.faction, v: PROTO, build: me.build || '' }); fire('open', {}); });
       conn.on('data', d => {
         if (!d || typeof d !== 'object') return;
-        if (d.t === 'welcome') N.size = d.size;
+        if (d.t === 'welcome') { if (d.v !== PROTO) { N.state = 'lost'; fire('error', { message: 'versão do jogo diferente da do anfitrião; atualizem a página (Ctrl+F5) nos dois lados' }); try { conn.close(); } catch (e) {} return; } N.size = d.size; if (d.build && me.build && d.build !== me.build) fire('warn', { message: 'build diferente do anfitrião (' + d.build + ' × ' + me.build + '); se algo falhar, Ctrl+F5 nos dois lados' }); }
+        else if (d.t === 'bad-version') { N.state = 'lost'; fire('error', { message: 'versão do jogo diferente da do anfitrião; atualizem a página (Ctrl+F5) nos dois lados' }); }
         else if (d.t === 'lobby') { N.players = d.players; N.size = d.size; fire('lobby', d); }
         else if (d.t === 'full') { N.state = 'full'; fire('full', {}); }
         else if (d.t === 'start') { N.started = true; N.id = d.you; N.players = d.players; fire('start', d); }
@@ -3193,7 +3228,7 @@ const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-10 12:16Z';
+const BUILD = '2026-10-10 12:57Z';
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
 let G = null; // game state
 ARD.inspect = () => { if (!G || !G.sim) return null; const sim = G.sim; return { tick: sim.tick, time: sim.time, hash: S.hash(sim), human: G.human, waiting: G.waiting, ended: G.ended, mpWait: $('mp-wait') ? $('mp-wait').hidden === false : null, net: G.net ? { state: G.net.state, role: G.net.role, code: G.net.code, desync: G.net.desync, rtt: Math.round(G.net.rtt) } : null, players: sim.players.map(p => ({ id: p.id, name: p.name, faction: p.faction, human: p.human, alive: p.alive, nucleo: !!S.nucleoOf(sim, p.id), units: sim.ents.filter(e => e.alive && e.kind === 'unit' && e.owner === p.id).length })), hashLog: G.hashLog ? Object.assign({}, G.hashLog) : null }; };
@@ -3224,20 +3259,22 @@ function initStart() {
   // multiplayer P2P por código de sala: 2 a 4 jogadores humanos, sem IAs; o anfitrião é o relé do lockstep
   let lobby = null;
   const mpStatus = t => { $('mp-status').textContent = t; };
-  const myInfo = () => ({ name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar' });
+  const myInfo = () => ({ name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar', build: BUILD });
   const facName = f => (S.FACTIONS[f] && S.FACTIONS[f].short) || f;
   function renderLobby(players, size) {
     const el = $('mp-players'); el.innerHTML = ''; const me = lobby ? lobby.me : null;
     players.forEach(p => { const d = document.createElement('div'); d.textContent = (p.id === 0 ? '★ ' : '• ') + p.name + ' (' + facName(p.faction) + ')' + (p.id === 0 ? ' anfitrião' : '') + (me && p.name === me.name && (lobby.role === 'host' ? p.id === 0 : p.id !== 0) ? ' — você' : ''); el.appendChild(d); });
     for (let i = players.length; i < size; i++) { const d = document.createElement('div'); d.className = 'muted'; d.textContent = '• vaga livre'; el.appendChild(d); }
+    if (lobby && lobby.warn) { const d = document.createElement('div'); d.className = 'warn'; d.textContent = '⚠ ' + lobby.warn; el.appendChild(d); }
   }
   function setStartButton() {
     const b = $('btn-start');
-    if (!lobby) { b.disabled = false; b.textContent = 'Iniciar partida'; return; }
+    $('opt-opp').disabled = !!lobby; $('opt-diff').disabled = !!lobby;
+    if (!lobby) { const typed = $('opt-code').value.trim(); b.disabled = false; b.textContent = typed.length >= 4 ? 'Entrar na sala ' + typed.toUpperCase() : 'Iniciar partida'; return; }
     if (lobby.role === 'host') { const n = lobby.N.roster().length; b.disabled = n < 2 || lobby.started; b.textContent = n < 2 ? 'Aguardando jogadores…' : 'Iniciar partida (' + n + '/' + lobby.size + ')'; }
     else { b.disabled = true; b.textContent = 'Aguardando o anfitrião…'; }
   }
-  function leaveLobby() { if (lobby) { try { lobby.N.close(); } catch (e) {} lobby = null; } $('mp-players').innerHTML = ''; setStartButton(); }
+  function leaveLobby() { if (lobby) { if (lobby.timer) clearInterval(lobby.timer); if (lobby.role === 'host') $('opt-code').value = ''; try { lobby.N.close(); } catch (e) {} lobby = null; } $('mp-players').innerHTML = ''; setStartButton(); }
   function startHosted() {
     if (!lobby || lobby.role !== 'host' || lobby.started) return;
     const N = lobby.N; N.me = myInfo(); const roster = N.roster();
@@ -3255,28 +3292,39 @@ function initStart() {
     const N = ARD.net.create(); lobby = { N, role: 'host', size, code: null, started: false, me };
     mpStatus('Criando sala…'); setStartButton();
     N.on('error', e => mpStatus('Erro de rede: ' + e.message));
+    N.on('warn', w => { if (lobby) { lobby.warn = w.message; renderLobby(N.roster(), lobby.size); } });
     N.on('lobby', d => { renderLobby(d.players, d.size); setStartButton(); if (lobby && !lobby.started) { if (d.players.length >= d.size) { mpStatus('Sala completa. Iniciando…'); setTimeout(startHosted, 500); } else mpStatus('Sala ' + lobby.code + ': ' + d.players.length + '/' + d.size + ' jogadores. A partida começa quando a sala encher, ou clique em Iniciar partida com 2 ou mais.'); } });
-    N.host({ size, me }, code => { lobby.code = code; $('opt-code').value = code; renderLobby(N.roster(), size); mpStatus('Sala ' + code + ' criada para ' + size + ' jogadores. Envie o código aos amigos e aguarde a entrada deles.'); });
+    N.host({ size, me, code: (loadPrefs() || {}).room }, code => { lobby.code = code; $('opt-code').value = code; savePrefs(Object.assign(loadPrefs() || {}, { room: code })); renderLobby(N.roster(), size); mpStatus('Sala ' + code + ' criada para ' + size + ' jogadores. Envie o código aos amigos e aguarde a entrada deles.'); });
   });
-  $('btn-join').addEventListener('click', () => {
+  function joinRoom(code, attempt) {
+    attempt = attempt || 0;
     if (!window.Peer) { mpStatus('PeerJS não carregou neste navegador.'); return; }
     if (lobby) { mpStatus('Você já está na sala ' + (lobby.code || '…') + '. Recarregue a página para sair dela.'); return; }
-    const code = $('opt-code').value.trim().toUpperCase(); if (code.length < 4) { mpStatus('Digite o código da sala.'); return; }
-    const me = myInfo(); const N = ARD.net.create(); lobby = { N, role: 'guest', code, started: false, size: 2, me };
+    code = String(code || '').trim().toUpperCase(); if (code.length < 4) { mpStatus('Digite o código da sala.'); return; }
+    const me = myInfo(); const N = ARD.net.create(); lobby = { N, role: 'guest', code, started: false, size: 2, me, t0: Date.now(), timer: null, warn: null };
     mpStatus('Conectando à sala ' + code + '…'); setStartButton();
-    N.on('error', e => { mpStatus('Erro de rede: ' + e.message); if (lobby && !lobby.started && N.state !== 'connected') leaveLobby(); });
+    lobby.timer = setInterval(() => { if (!lobby || lobby.N !== N || N.state !== 'joining') return; const sec = Math.round((Date.now() - lobby.t0) / 1000); mpStatus(sec < 20 ? 'Conectando à sala ' + code + '… (' + sec + ' s)' : 'Sem resposta da sala ' + code + ' há ' + sec + ' s. Confira o código e se o anfitrião está com a sala aberta; continuamos tentando.'); }, 1000);
+    N.on('error', e => {
+      if (lobby && lobby.N === N && !lobby.started && N.state !== 'connected' && /não encontrada/.test(e.message) && attempt < 20) { leaveLobby(); mpStatus('Sala ' + code + ' ainda não está aberta. Nova tentativa em 3 s… (' + (attempt + 1) + '/20)'); setTimeout(() => { if (!lobby) joinRoom(code, attempt + 1); }, 3000); return; }
+      mpStatus('Erro de rede: ' + e.message); if (lobby && lobby.N === N && !lobby.started && N.state !== 'connected') leaveLobby();
+    });
+    N.on('warn', w => { if (lobby && lobby.N === N) { lobby.warn = w.message; renderLobby(N.players || [], lobby.size); } });
     N.on('open', () => mpStatus('Conectado à sala ' + code + '. Aguardando o anfitrião…'));
     N.on('full', () => { mpStatus('A sala ' + code + ' está cheia ou a partida já começou.'); leaveLobby(); });
-    N.on('close', () => { if (!lobby || lobby.started) return; mpStatus('O anfitrião saiu da sala ' + code + '.'); leaveLobby(); });
-    N.on('lobby', d => { if (!lobby) return; lobby.size = d.size; renderLobby(d.players, d.size); mpStatus('Na sala ' + code + ' como ' + me.name + ' (' + d.players.length + '/' + d.size + '). A partida começa quando o anfitrião iniciar.'); });
-    N.on('start', d => { if (!lobby) return; lobby.started = true; startGame(Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value }), { net: N, myId: d.you }); });
+    N.on('close', () => { if (!lobby || lobby.N !== N || lobby.started) return; mpStatus('O anfitrião saiu da sala ' + code + '.'); leaveLobby(); });
+    N.on('lobby', d => { if (!lobby || lobby.N !== N) return; lobby.size = d.size; renderLobby(d.players, d.size); mpStatus('Na sala ' + code + ' como ' + me.name + ' (' + d.players.length + '/' + d.size + '). A partida começa quando o anfitrião iniciar.'); });
+    N.on('start', d => { if (!lobby || lobby.N !== N) return; lobby.started = true; if (lobby.timer) clearInterval(lobby.timer); startGame(Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value }), { net: N, myId: d.you }); });
     N.join(code, me);
-  });
+  }
+  $('btn-join').addEventListener('click', () => joinRoom($('opt-code').value));
+  $('opt-code').addEventListener('input', () => { if (!lobby) setStartButton(); });
+  $('opt-code').addEventListener('keydown', e => { if (e.key === 'Enter' && !lobby) { e.preventDefault(); joinRoom($('opt-code').value); } });
   $('btn-start').addEventListener('click', () => {
     if (lobby) { if (lobby.role === 'host') startHosted(); else mpStatus('Aguarde o anfitrião iniciar a partida.'); return; }
+    const typed = $('opt-code').value.trim(); if (typed.length >= 4) { joinRoom(typed); return; } // código digitado: entra na sala, nunca inicia partida solo
     const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar';
     const cfg = { name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value };
-    savePrefs(cfg); startGame(cfg);
+    savePrefs(Object.assign(loadPrefs() || {}, cfg)); startGame(cfg);
   });
   $('btn-help-start').addEventListener('click', () => toggleHelp(true));
   if (params.get('autostart')) { startGame({ name: 'Teste', faction: params.get('faction') || 'erevane', opp: params.get('opp') || '2', diff: params.get('diff') || 'normal', seed: parseInt(params.get('seed') || '5', 10), gfx: params.get('r') === '2d' ? '2d' : '3d' }); }
@@ -3589,7 +3637,7 @@ function startGame(cfg, netCtx) {
     net.on('chat', d => { const nm = d.name || (sim.players[d.id] || {}).name || '?'; const tx = String(d.text || '').slice(0, 120); log(nm, tx); notice(nm + ': ' + tx.slice(0, 60)); AU.sfx('click'); });
     net.on('left', d => { const nm = (sim.players[d.id] || {}).name || d.name || 'Um jogador'; banner('Jogador desconectado', nm + ' saiu da partida; as unidades dele ficam paradas.', 'warn'); log('', nm + ' desconectou.'); });
     net.on('close', () => { if (net.role === 'guest') { banner('Conexão perdida', 'A ligação com o anfitrião caiu; a partida não pode continuar.', 'danger'); log('', 'Conexão perdida com o anfitrião.'); } });
-    net.on('desync', d => { notice('Dessincronização detectada no tick ' + d.tick + '. As partidas divergiram.'); log('', 'Dessincronização no tick ' + d.tick + '.'); });
+    net.on('desync', d => { banner('Dessincronização', 'Os mundos divergiram no tick ' + d.tick + '. Isto não deveria acontecer; exporte o resultado no fim e envie o feedback com os navegadores usados.', 'danger'); log('', 'Dessincronização no tick ' + d.tick + ' (jogador ' + ((sim.players[d.id] || {}).name || d.id) + ').'); });
     if (net.role === 'host') setInterval(() => net.ping(), 5000);
   }
   // ---------- end ----------
