@@ -396,13 +396,89 @@ function scenePostal(S, race, v) {
   if (v === 3) { const lamp = new THREE.PointLight(R.c, 12, 8, 2); lamp.position.set(-0.9, -0.6, -1.2); S.scene.add(lamp); }
   S.cam.fov = 38; S.cam.updateProjectionMatrix(); S.cam.position.set(0, 0.35, 6.4); S.cam.lookAt(0.2, -0.1, -1); S.bloom.strength = v === 3 ? 1.1 : 0.8; S.bloom.threshold = 0.8;
 }
+
+// ---------- logo: seis emblemas novos (reestilização) ----------
+function spiralPoints(n, rMax, size) { const pos = new Float32Array(n * 3), col = new Float32Array(n * 3); const cols = RACE_IDS.map(r => new THREE.Color(RACES[r].c));
+  for (let i = 0; i < n; i++) { const arm = i % 5, t = i / n; const r = 0.12 + t * rMax; const a = arm * Math.PI * 2 / 5 + t * 4.4 + (Math.random() - 0.5) * 0.3; pos[i * 3] = Math.cos(a) * r; pos[i * 3 + 1] = Math.sin(a) * r; pos[i * 3 + 2] = (Math.random() - 0.5) * 0.06; const c = cols[arm].clone().lerp(new THREE.Color(1, 1, 1), Math.max(0, 0.85 - t * 1.5)); col[i * 3] = c.r * 1.5; col[i * 3 + 1] = c.g * 1.5; col[i * 3 + 2] = c.b * 1.5; }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3)); return new THREE.Points(g, new THREE.PointsMaterial({ size, vertexColors: true, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); }
+function badge(g, kind, r, mat, rimMat) { // placa de fundo com borda escura grossa (leitura de logotipo)
+  const sh = new THREE.Shape();
+  if (kind === 'hex') { for (let k = 0; k < 6; k++) { const a = Math.PI / 6 + k * Math.PI / 3; k ? sh.lineTo(Math.cos(a) * r, Math.sin(a) * r) : sh.moveTo(Math.cos(a) * r, Math.sin(a) * r); } }
+  else if (kind === 'pent') { for (let k = 0; k < 5; k++) { const a = Math.PI / 2 + k * Math.PI * 2 / 5; k ? sh.lineTo(Math.cos(a) * r, Math.sin(a) * r) : sh.moveTo(Math.cos(a) * r, Math.sin(a) * r); } }
+  else if (kind === 'shield') { sh.moveTo(0, -r * 1.15); sh.quadraticCurveTo(r * 0.95, -r * 0.65, r, r * 0.3); sh.lineTo(r, r * 0.85); sh.lineTo(-r, r * 0.85); sh.lineTo(-r, r * 0.3); sh.quadraticCurveTo(-r * 0.95, -r * 0.65, 0, -r * 1.15); }
+  else if (kind === 'almond') { sh.moveTo(-r * 1.35, 0); sh.quadraticCurveTo(0, r * 1.05, r * 1.35, 0); sh.quadraticCurveTo(0, -r * 1.05, -r * 1.35, 0); }
+  else { sh.absarc(0, 0, r, 0, Math.PI * 2, false); }
+  sh.closePath();
+  const outline = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.12, bevelEnabled: true, bevelSize: 0.06, bevelThickness: 0.06, bevelSegments: 3, curveSegments: 48 }), new THREE.MeshStandardMaterial({ color: 0x07080c, roughness: 0.6, metalness: 0.4 })); outline.scale.set(1.12, 1.12, 1); outline.position.z = -0.55; g.add(outline);
+  const rim = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.1, bevelEnabled: true, bevelSize: 0.05, bevelThickness: 0.05, bevelSegments: 3, curveSegments: 48 }), rimMat); rim.scale.set(1.06, 1.06, 1); rim.position.z = -0.45; g.add(rim);
+  const plate = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.2, bevelEnabled: true, bevelSize: 0.06, bevelThickness: 0.08, bevelSegments: 4, curveSegments: 48 }), mat); plate.position.z = -0.32; g.add(plate);
+  return plate;
+}
+function sceneEmblem2(S, v) {
+  S.scene.background = new THREE.Color(0x06070c); S.scene.environment = envTex; S.scene.add(stars(700, 60, 0.9));
+  const g = new THREE.Group(); S.scene.add(g);
+  const steel = new THREE.MeshStandardMaterial({ color: 0xb4bcc9, metalness: 0.95, roughness: 0.3, envMapIntensity: 0.6 }), gun = new THREE.MeshStandardMaterial({ color: 0x242934, metalness: 0.85, roughness: 0.42, envMapIntensity: 0.5 }), gold = new THREE.MeshStandardMaterial({ color: 0xd9a94d, metalness: 1, roughness: 0.3, envMapIntensity: 0.55 });
+  const glowMat = (c, k) => new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: k, roughness: 0.3 });
+  const riftOct = (sz, z) => { const o = new THREE.Mesh(new THREE.OctahedronGeometry(sz, 0), glowMat(0xff7a4a, 2.4)); o.scale.set(0.8, 1.15, 0.8); o.position.z = z; return o; };
+  if (v === 1) { // Garra sobre o Mundo
+    badge(g, 'hex', 2.1, gun, steel);
+    const tex = planetTextures(RACES.tessara, 3.1, false, true); const pl = new THREE.Mesh(new THREE.SphereGeometry(1.05, 64, 48), new THREE.MeshStandardMaterial({ map: tex.map, bumpMap: tex.bumpMap, bumpScale: 0.02, roughness: 0.9, emissiveMap: tex.em, emissive: new THREE.Color(0xb8ffd2), emissiveIntensity: 1.2 })); pl.position.set(0, -0.3, 0.6); pl.rotation.y = 0.8; g.add(pl); const pa = atmo(1.08, 0x8affb0, true, 3, 1.0); pa.position.copy(pl.position); g.add(pa);
+    const bone = new THREE.MeshStandardMaterial({ color: 0xe8dcc8, roughness: 0.35, metalness: 0.1 });
+    const chit = new THREE.MeshStandardMaterial({ color: 0x3a0c14, roughness: 0.4, metalness: 0.3, clearcoat: 0.6 });
+    for (const [x, rot] of [[-0.85, 0.5], [0, 0], [0.85, -0.5]]) { const claw = new THREE.Mesh(new THREE.TorusGeometry(1.0, 0.09, 14, 40, Math.PI * 0.6), chit); claw.position.set(x, 0.95, 1.1); claw.rotation.set(Math.PI * 0.52, rot, Math.PI * 0.08); g.add(claw); const tip = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.55, 12), bone); tip.position.set(x * 1.02, -0.1, 1.7); tip.rotation.x = Math.PI; g.add(tip); }
+    const wrist = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.62, 0.8, 24), chit); wrist.position.set(0, 1.7, 0.8); wrist.rotation.x = 0.5; g.add(wrist);
+    S.scene.add(tube([[-2.2, -1.9, 0.0], [-1.4, -1.5, 0.05], [-0.8, -1.8, 0.1], [0.2, -1.3, 0.1], [1.1, -1.6, 0.05], [2.2, -1.1, 0.0]], 0.05, 0xff7a4a, 3.5));
+  } else if (v === 2) { // Olho do Vórtice
+    badge(g, 'almond', 1.9, gun, steel);
+    const lidU = new THREE.Mesh(new THREE.TorusGeometry(1.95, 0.17, 20, 64, Math.PI * 0.86), new THREE.MeshStandardMaterial({ color: 0xff5e3a, emissive: 0xff5e3a, emissiveIntensity: 0.5, metalness: 0.6, roughness: 0.3 })); lidU.rotation.z = Math.PI * 0.07; lidU.position.z = 0.15; lidU.scale.set(1.3, 0.78, 1); g.add(lidU);
+    const lidD = new THREE.Mesh(new THREE.TorusGeometry(1.95, 0.17, 20, 64, Math.PI * 0.86), new THREE.MeshStandardMaterial({ color: 0xb23cff, emissive: 0xb23cff, emissiveIntensity: 0.5, metalness: 0.6, roughness: 0.3 })); lidD.rotation.z = Math.PI * 1.07; lidD.position.z = 0.15; lidD.scale.set(1.3, 0.78, 1); g.add(lidD);
+    const iris = new THREE.Mesh(new THREE.CircleGeometry(1.25, 64), new THREE.MeshBasicMaterial({ color: 0x04050b })); iris.position.z = 0.05; g.add(iris);
+    const sp = spiralPoints(7000, 1.2, 0.03); sp.position.z = 0.1; g.add(sp);
+    const irisRing = new THREE.Mesh(new THREE.TorusGeometry(1.25, 0.05, 12, 96), steel); irisRing.position.z = 0.12; g.add(irisRing);
+    g.add(riftOct(0.42, 0.3));
+    RACE_IDS.forEach((rid, i) => { const a = Math.PI + i * Math.PI / 4 - Math.PI / 8; const gem = new THREE.Mesh(new THREE.SphereGeometry(0.1, 18, 12), glowMat(RACES[rid].c, 0.9)); gem.position.set(Math.cos(a) * 2.45, Math.sin(a) * 1.1 - 0.0, 0.1); g.add(gem); });
+  } else if (v === 3) { // Trono de Cristal
+    const crystal = new THREE.MeshPhysicalMaterial({ color: 0xb388ff, roughness: 0.08, metalness: 0.05, transmission: 0.5, thickness: 0.8, transparent: true, emissive: 0x5a3aa0, emissiveIntensity: 0.25, envMapIntensity: 0.8 });
+    badge(g, 'pent', 2.15, gun, steel);
+    RACE_IDS.forEach((rid, i) => { const a = Math.PI / 2 + i * Math.PI * 2 / 5; const cm = new THREE.MeshPhysicalMaterial({ color: RACES[rid].c, roughness: 0.08, transmission: 0.45, thickness: 0.8, transparent: true, emissive: RACES[rid].c, emissiveIntensity: 0.45 }); const c = new THREE.Mesh(new THREE.OctahedronGeometry(0.42, 0), cm); c.scale.set(0.6, 1.9, 0.6); c.position.set(Math.cos(a) * 1.35, Math.sin(a) * 1.35, 0.5); c.rotation.z = a - Math.PI / 2; g.add(c); });
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.35, 0.06, 12, 96), steel); ring.position.z = 0.2; g.add(ring);
+    const core = riftOct(0.55, 0.7); g.add(core); const halo = new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.03, 10, 64), glowMat(0xb23cff, 1.6)); halo.position.z = 0.7; g.add(halo);
+  } else if (v === 4) { // Cometa Dominion
+    badge(g, 'round', 2.05, gun, gold);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.3, 32, 24), glowMat(0xfff0d0, 2.2)); head.position.set(0.9, 0.75, 0.6); g.add(head); const hh = new THREE.Mesh(new THREE.TorusGeometry(0.46, 0.035, 10, 64), glowMat(0xff7a4a, 1.6)); hh.position.copy(head.position); g.add(hh);
+    const n = 5000, pos = new Float32Array(n * 3), col = new Float32Array(n * 3); for (let i = 0; i < n; i++) { const t = Math.random(); const w = t * 0.9; pos[i * 3] = 0.9 - t * 3.4 + (Math.random() - 0.5) * w; pos[i * 3 + 1] = 0.75 - t * 2.3 + (Math.random() - 0.5) * w; pos[i * 3 + 2] = 0.5 + (Math.random() - 0.5) * 0.3; const c = new THREE.Color(0xff8a5c).lerp(new THREE.Color(0xb23cff), t); col[i * 3] = c.r * 1.6; col[i * 3 + 1] = c.g * 1.6; col[i * 3 + 2] = c.b * 1.6; }
+    const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); pg.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.add(new THREE.Points(pg, new THREE.PointsMaterial({ size: 0.05, vertexColors: true, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })));
+    S.scene.add(tube([[0.9, 0.75, 0.55], [-0.2, 0.0, 0.5], [-1.1, -0.6, 0.45], [-2.4, -1.5, 0.4]], 0.09, 0xff7a4a, 2.6));
+    const tex = planetTextures(RACES.vehnar, 5.5, true, false); const pl = new THREE.Mesh(new THREE.SphereGeometry(0.55, 48, 32), new THREE.MeshStandardMaterial({ map: tex.map, roughness: 0.9 })); pl.position.set(-1.1, 1.05, 0.3); g.add(pl); const ring = ringMesh(0.75, 1.15, 0xd9c8b0); ring.position.copy(pl.position); ring.rotation.x = -Math.PI / 2 + 1.2; g.add(ring);
+    const moon = new THREE.Mesh(new THREE.SphereGeometry(0.22, 32, 24), new THREE.MeshStandardMaterial({ color: 0x9a9aa6, roughness: 1 })); moon.position.set(1.4, -1.0, 0.3); g.add(moon);
+  } else if (v === 5) { // Cinco Luas
+    badge(g, 'round', 2.1, gun, gold);
+    for (let k = 0; k < 60; k++) { const a = k / 60 * Math.PI * 2; const t = new THREE.Mesh(new THREE.BoxGeometry(0.03, k % 5 === 0 ? 0.16 : 0.08, 0.05), gold); t.position.set(Math.cos(a) * 1.92, Math.sin(a) * 1.92, 0); t.rotation.z = a + Math.PI / 2; g.add(t); }
+    const orbit = new THREE.Mesh(new THREE.TorusGeometry(1.35, 0.025, 10, 128), steel); orbit.position.z = 0.1; g.add(orbit);
+    RACE_IDS.forEach((rid, i) => { const a = Math.PI / 2 + i * Math.PI * 2 / 5; const tex = planetTextures(RACES[rid], 7 + i, RACES[rid].bands, false); const pl = new THREE.Mesh(new THREE.SphereGeometry(0.32, 40, 28), new THREE.MeshStandardMaterial({ map: tex.map, bumpMap: tex.bumpMap, bumpScale: 0.02, roughness: 0.9 })); pl.position.set(Math.cos(a) * 1.35, Math.sin(a) * 1.35, 0.3); pl.rotation.y = i; g.add(pl); const pa = atmo(0.335, RACES[rid].atmo, true, 3, 1.1); pa.position.copy(pl.position); g.add(pa); });
+    g.add(riftOct(0.5, 0.5)); const halo = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.035, 10, 64), glowMat(0xff5e3a, 1.4)); halo.position.z = 0.5; g.add(halo);
+  } else { // Elmo do Barão (mascote)
+    badge(g, 'shield', 2.0, gun, steel);
+    const helm = new THREE.Mesh(new THREE.SphereGeometry(1.25, 64, 48, 0, Math.PI * 2, 0, Math.PI * 0.6), new THREE.MeshStandardMaterial({ color: 0x59627a, roughness: 0.3, metalness: 0.9, envMapIntensity: 0.9 })); helm.position.set(0, 0.2, 0.5); g.add(helm);
+    const brim = new THREE.Mesh(new THREE.TorusGeometry(1.2, 0.1, 14, 72), new THREE.MeshStandardMaterial({ color: 0x3a4150, metalness: 0.95, roughness: 0.3 })); brim.rotation.x = Math.PI / 2; brim.position.set(0, 0.22, 0.5); g.add(brim);
+    const face = new THREE.Mesh(new THREE.SphereGeometry(1.1, 64, 48), new THREE.MeshStandardMaterial({ color: 0x1b1e26, roughness: 0.5, metalness: 0.5 })); face.scale.set(1, 0.9, 0.9); face.position.set(0, -0.1, 0.4); g.add(face);
+    const vis = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.18, 0.12), glowMat(0xff7733, 2.4)); vis.position.set(0, 0.0, 1.5); g.add(vis);
+    for (let k = -2; k <= 2; k++) { const bar = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.26, 0.12), steel); bar.position.set(k * 0.17, -0.58, 1.42); g.add(bar); }
+    for (const sx of [-1, 1]) { const horn = new THREE.Mesh(new THREE.ConeGeometry(0.2, 1.1, 14), steel); horn.position.set(sx * 1.25, 1.0, 0.4); horn.rotation.z = sx * -0.7; g.add(horn); }
+    S.scene.add(tube([[-2.1, 1.3, -0.2], [-1.2, 0.9, -0.2], [-0.6, 1.25, -0.2], [0.5, 0.7, -0.2], [1.3, 1.1, -0.2], [2.2, 0.5, -0.2]], 0.05, 0xff7a4a, 3.0));
+  }
+  g.rotation.x = -0.12; g.rotation.y = 0.08;
+  const key = new THREE.DirectionalLight(0xfff4e6, 1.8); key.position.set(-3, 4, 6); S.scene.add(key); const rim = new THREE.DirectionalLight(0xb23cff, 1.0); rim.position.set(3, 1, -4); S.scene.add(rim); const warm = new THREE.DirectionalLight(0xff6a3d, 0.7); warm.position.set(3, -2, 3); S.scene.add(warm); S.scene.add(new THREE.AmbientLight(0x404860, 0.4));
+  const glow = new THREE.Mesh(new THREE.CircleGeometry(3.3, 48), new THREE.MeshBasicMaterial({ color: 0xb23cff, transparent: true, opacity: 0.08, blending: THREE.AdditiveBlending, depthWrite: false })); glow.position.z = -2.5; S.scene.add(glow);
+  S.cam.fov = 30; S.cam.updateProjectionMatrix(); S.cam.position.set(0, 0.1, 9.6); S.cam.lookAt(0, -0.05, 0); S.bloom.strength = 0.4; S.bloom.threshold = 0.9;
+}
 function disposeScene(scene) { scene.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) { const ms = Array.isArray(o.material) ? o.material : [o.material]; for (const m of ms) { for (const k of ['map', 'bumpMap', 'emissiveMap']) if (m[k]) m[k].dispose(); m.dispose(); } } }); }
 window.render3d = function (kind, race, variant, w, h) {
   try {
     setup(w, h); renderer.shadowMap.enabled = false; const scene = new THREE.Scene(); const cam = new THREE.PerspectiveCamera(35, w / h, 0.1, 400);
     const composer = new EffectComposer(renderer); composer.setSize(w, h); composer.addPass(new RenderPass(scene, cam)); const bloom = new UnrealBloomPass(new THREE.Vector2(w, h), 0.8, 0.55, 0.8); composer.addPass(bloom); composer.addPass(new OutputPass());
     const S = { scene, cam, bloom }; scene.environment = null;
-    if (kind === 'bust') sceneBust(S, race, variant); else if (kind === 'insignia') sceneInsignia(S, race, variant); else if (kind === 'world') sceneWorld(S, race, variant); else if (kind === 'layout') sceneLayout(S, variant); else if (kind === 'logo') sceneLogo(S, variant); else if (kind === 'head') sceneHead(S, race, variant); else if (kind === 'emblem') sceneEmblem(S, variant); else if (kind === 'belt') sceneBelt(S, variant); else if (kind === 'postal') scenePostal(S, race, variant); else throw new Error('kind ' + kind);
+    if (kind === 'bust') sceneBust(S, race, variant); else if (kind === 'insignia') sceneInsignia(S, race, variant); else if (kind === 'world') sceneWorld(S, race, variant); else if (kind === 'layout') sceneLayout(S, variant); else if (kind === 'logo') sceneLogo(S, variant); else if (kind === 'head') sceneHead(S, race, variant); else if (kind === 'emblem') sceneEmblem(S, variant); else if (kind === 'belt') sceneBelt(S, variant); else if (kind === 'postal') scenePostal(S, race, variant); else if (kind === 'emblem2') sceneEmblem2(S, variant); else throw new Error('kind ' + kind);
     composer.render(); const url = renderer.domElement.toDataURL('image/jpeg', 0.9); disposeScene(scene); composer.dispose(); return url;
   } catch (e) { return 'ERR:' + (e.stack || e.message); }
 };

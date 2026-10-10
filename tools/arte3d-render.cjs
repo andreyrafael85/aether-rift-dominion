@@ -6,6 +6,7 @@ const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag']; const jobs =
 for (const r of RACES) for (const v of [1, 2, 3]) { jobs.push(['bust', r, v, 520, 620]); jobs.push(['insignia', r, v, 520, 520]); jobs.push(['world', r, v, 960, 600]); }
 for (const v of [1, 2, 3]) { jobs.push(['layout', '-', v, 1040, 520]); jobs.push(['logo', '-', v, 1040, 400]); jobs.push(['belt', '-', v, 1040, 520]); jobs.push(['emblem', '-', v, 720, 720]); }
 for (const r of RACES) for (const v of [1, 2, 3]) { jobs.push(['head', r, v, 640, 640]); jobs.push(['postal', r, v, 960, 600]); }
+for (const v of [1, 2, 3, 4, 5, 6]) jobs.push(['emblem2', '-', v, 720, 720]);
 (async () => { const b = await chromium.launch({ headless: true, args: ['--no-sandbox', '--allow-file-access-from-files', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--disable-dev-shm-usage'] });
   const p = await b.newPage(); p.setDefaultTimeout(180000); const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error') errs.push(m.text().slice(0, 200)); });
   await p.goto('file://' + root + '/tools/arte3d.html'); await p.waitForFunction(() => window.__ready === true, null, { timeout: 60000 });
