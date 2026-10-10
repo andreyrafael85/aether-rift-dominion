@@ -15,6 +15,7 @@ const params = new URLSearchParams(location.search);
 const BUILD = '__BUILD__';
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
 let G = null; // game state
+ARD.inspect = () => { if (!G || !G.sim) return null; const sim = G.sim; return { tick: sim.tick, time: sim.time, hash: S.hash(sim), human: G.human, waiting: G.waiting, ended: G.ended, mpWait: $('mp-wait') ? $('mp-wait').hidden === false : null, net: G.net ? { state: G.net.state, role: G.net.role, code: G.net.code, desync: G.net.desync, rtt: Math.round(G.net.rtt) } : null, players: sim.players.map(p => ({ id: p.id, name: p.name, faction: p.faction, human: p.human, alive: p.alive, nucleo: !!S.nucleoOf(sim, p.id), units: sim.ents.filter(e => e.alive && e.kind === 'unit' && e.owner === p.id).length })), hashLog: G.hashLog ? Object.assign({}, G.hashLog) : null }; };
 
 function whenThree(cb) {
   if (window.THREE) return cb(true); if (window.__threeFailed) return cb(false);
@@ -39,34 +40,59 @@ function initStart() {
   $('opt-diff').value = prefs.diff || 'normal';
   $('opt-seed').value = params.get('seed') || String(Math.floor(Math.random() * 90000) + 1000);
   $('opt-gfx').value = prefs.gfx || '3d'; $('opt-quality').value = prefs.quality || 'auto';
-  // multiplayer P2P por código de sala
+  // multiplayer P2P por código de sala: 2 a 4 jogadores humanos, sem IAs; o anfitrião é o relé do lockstep
+  let lobby = null;
   const mpStatus = t => { $('mp-status').textContent = t; };
   const myInfo = () => ({ name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar' });
+  const facName = f => (S.FACTIONS[f] && S.FACTIONS[f].short) || f;
+  function renderLobby(players, size) {
+    const el = $('mp-players'); el.innerHTML = ''; const me = lobby ? lobby.me : null;
+    players.forEach(p => { const d = document.createElement('div'); d.textContent = (p.id === 0 ? '★ ' : '• ') + p.name + ' (' + facName(p.faction) + ')' + (p.id === 0 ? ' anfitrião' : '') + (me && p.name === me.name && (lobby.role === 'host' ? p.id === 0 : p.id !== 0) ? ' — você' : ''); el.appendChild(d); });
+    for (let i = players.length; i < size; i++) { const d = document.createElement('div'); d.className = 'muted'; d.textContent = '• vaga livre'; el.appendChild(d); }
+  }
+  function setStartButton() {
+    const b = $('btn-start');
+    if (!lobby) { b.disabled = false; b.textContent = 'Iniciar partida'; return; }
+    if (lobby.role === 'host') { const n = lobby.N.roster().length; b.disabled = n < 2 || lobby.started; b.textContent = n < 2 ? 'Aguardando jogadores…' : 'Iniciar partida (' + n + '/' + lobby.size + ')'; }
+    else { b.disabled = true; b.textContent = 'Aguardando o anfitrião…'; }
+  }
+  function leaveLobby() { if (lobby) { try { lobby.N.close(); } catch (e) {} lobby = null; } $('mp-players').innerHTML = ''; setStartButton(); }
+  function startHosted() {
+    if (!lobby || lobby.role !== 'host' || lobby.started) return;
+    const N = lobby.N; N.me = myInfo(); const roster = N.roster();
+    if (roster.length < 2) { mpStatus('Aguarde pelo menos um jogador entrar na sala.'); return; }
+    lobby.started = true; setStartButton();
+    const players = roster.map(r => ({ name: r.name, faction: r.faction, human: true }));
+    const cfg = { players, seed: parseInt($('opt-seed').value, 10) || 1, name: players[0].name, faction: players[0].faction, opp: '0', diff: 'normal' };
+    N.start(cfg);
+    setTimeout(() => startGame(Object.assign({}, cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value }), { net: N, myId: 0 }), 150);
+  }
   $('btn-host').addEventListener('click', () => {
     if (!window.Peer) { mpStatus('PeerJS não carregou neste navegador.'); return; }
-    const N = ARD.net.create(); mpStatus('Criando sala…');
+    if (lobby) { mpStatus('Você já está na sala ' + (lobby.code || '…') + '. Recarregue a página para sair dela.'); return; }
+    const size = parseInt($('opt-room').value, 10) || 2; const me = myInfo();
+    const N = ARD.net.create(); lobby = { N, role: 'host', size, code: null, started: false, me };
+    mpStatus('Criando sala…'); setStartButton();
     N.on('error', e => mpStatus('Erro de rede: ' + e.message));
-    N.on('open', () => mpStatus('Jogador conectado. Iniciando…'));
-    N.on('hello', d => {
-      const me = myInfo(); const opp = parseInt($('opt-opp').value, 10); const facs = ['vehnar', 'erevane']; const aiNames = ['Fundição Kessari', 'Clã Sombrio', 'Consórcio Oryn'];
-      const players = [{ name: me.name, faction: me.faction, human: true }, { name: (d.name || 'Convidado').slice(0, 18), faction: d.faction === 'erevane' ? 'erevane' : 'vehnar', human: true }];
-      for (let i = 0; i < Math.min(2, opp); i++) players.push({ name: aiNames[i], faction: facs[i % 2], difficulty: $('opt-diff').value });
-      const cfg = { players, seed: parseInt($('opt-seed').value, 10) || 1, diff: $('opt-diff').value, gfx: $('opt-gfx').value, quality: $('opt-quality').value, name: me.name, faction: me.faction, opp: String(players.length - 2) };
-      N.send('start', { cfg: Object.assign({}, cfg, { gfx: undefined, quality: undefined }) });
-      setTimeout(() => startGame(cfg, { net: N, myId: 0 }), 150);
-    });
-    N.host(code => { $('opt-code').value = code; mpStatus('Sala ' + code + ' criada. Envie o código ao seu amigo e aguarde a conexão…'); });
+    N.on('lobby', d => { renderLobby(d.players, d.size); setStartButton(); if (lobby && !lobby.started) { if (d.players.length >= d.size) { mpStatus('Sala completa. Iniciando…'); setTimeout(startHosted, 500); } else mpStatus('Sala ' + lobby.code + ': ' + d.players.length + '/' + d.size + ' jogadores. A partida começa quando a sala encher, ou clique em Iniciar partida com 2 ou mais.'); } });
+    N.host({ size, me }, code => { lobby.code = code; $('opt-code').value = code; renderLobby(N.roster(), size); mpStatus('Sala ' + code + ' criada para ' + size + ' jogadores. Envie o código aos amigos e aguarde a entrada deles.'); });
   });
   $('btn-join').addEventListener('click', () => {
     if (!window.Peer) { mpStatus('PeerJS não carregou neste navegador.'); return; }
-    const code = $('opt-code').value.trim(); if (code.length < 4) { mpStatus('Digite o código da sala.'); return; }
-    const N = ARD.net.create(); mpStatus('Conectando à sala ' + code.toUpperCase() + '…');
-    N.on('error', e => mpStatus('Erro de rede: ' + e.message + ' (sala existe? ambos online?)'));
-    N.on('open', () => { mpStatus('Conectado. Aguardando o anfitrião iniciar…'); N.send('hello', myInfo()); });
-    N.on('start', d => { const cfg = Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value }); startGame(cfg, { net: N, myId: 1 }); });
-    N.join(code);
+    if (lobby) { mpStatus('Você já está na sala ' + (lobby.code || '…') + '. Recarregue a página para sair dela.'); return; }
+    const code = $('opt-code').value.trim().toUpperCase(); if (code.length < 4) { mpStatus('Digite o código da sala.'); return; }
+    const me = myInfo(); const N = ARD.net.create(); lobby = { N, role: 'guest', code, started: false, size: 2, me };
+    mpStatus('Conectando à sala ' + code + '…'); setStartButton();
+    N.on('error', e => { mpStatus('Erro de rede: ' + e.message); if (lobby && !lobby.started && N.state !== 'connected') leaveLobby(); });
+    N.on('open', () => mpStatus('Conectado à sala ' + code + '. Aguardando o anfitrião…'));
+    N.on('full', () => { mpStatus('A sala ' + code + ' está cheia ou a partida já começou.'); leaveLobby(); });
+    N.on('close', () => { if (!lobby || lobby.started) return; mpStatus('O anfitrião saiu da sala ' + code + '.'); leaveLobby(); });
+    N.on('lobby', d => { if (!lobby) return; lobby.size = d.size; renderLobby(d.players, d.size); mpStatus('Na sala ' + code + ' como ' + me.name + ' (' + d.players.length + '/' + d.size + '). A partida começa quando o anfitrião iniciar.'); });
+    N.on('start', d => { if (!lobby) return; lobby.started = true; startGame(Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value }), { net: N, myId: d.you }); });
+    N.join(code, me);
   });
   $('btn-start').addEventListener('click', () => {
+    if (lobby) { if (lobby.role === 'host') startHosted(); else mpStatus('Aguarde o anfitrião iniciar a partida.'); return; }
     const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar';
     const cfg = { name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value };
     savePrefs(cfg); startGame(cfg);
@@ -131,9 +157,9 @@ function startGame(cfg, netCtx) {
       G.waiting = false;
     }
     if (sim.tick % 10 === 0) for (const a of G.ais) for (const c of ARD.ai.think(sim, a)) S.enqueue(sim, c);
-    if (net) for (const c of net.takeCmds(tick, human)) S.enqueue(sim, c);
+    if (net) for (const c of net.takeCmds(tick)) S.enqueue(sim, c);
     const ev = S.step(sim);
-    if (net && sim.tick % 10 === 0) net.sendHash(sim.tick, S.hash(sim));
+    if (net && sim.tick % 10 === 0) { const h = S.hash(sim); net.sendHash(sim.tick, h); (G.hashLog = G.hashLog || {})[sim.tick] = h; const ks = Object.keys(G.hashLog); if (ks.length > 80) delete G.hashLog[ks[0]]; }
     if (!silent) G.R.onEvents(ev, sim, human);
     handleEvents(ev, silent);
     if (sim.tick % 10 === 0) updateMemory();
@@ -142,7 +168,7 @@ function startGame(cfg, netCtx) {
     if (!G || G.sim !== sim) return;
     let dt = Math.min(0.25, (now - G.last) / 1000); G.last = now;
     if (!G.paused && !G.ended) { G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { if (tickOnce(false) === false) { G.acc = Math.min(G.acc, S.TICK); break; } G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; }
-    if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; $('mp-wait').hidden = G.waitT < 0.8; if (G.waitT >= 0.8) $('mp-wait').textContent = net.state === 'lost' ? 'Conexão perdida com o outro jogador.' : 'Aguardando o outro jogador… (' + G.waitT.toFixed(0) + ' s)'; }
+    if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; $('mp-wait').hidden = G.waitT < 0.8; if (G.waitT >= 0.8) $('mp-wait').textContent = net.state === 'lost' ? 'Conexão perdida.' : 'Aguardando os outros jogadores… (' + G.waitT.toFixed(0) + ' s)'; }
     I.update(dt);
     if (G.frameN % 3 === 0) refreshTop();
     if (G.frameN++ % 6 === 0) { refreshPanel(false); refreshQuick(); }
@@ -376,13 +402,14 @@ function startGame(cfg, netCtx) {
   function setupNet() {
     $('chat').hidden = false; document.querySelectorAll('[data-speed]').forEach(b => { b.disabled = true; b.style.opacity = 0.4; });
     const log = (who, text) => { const d = document.createElement('div'); d.textContent = who ? who + ': ' + text : text; $('chat-log').appendChild(d); $('chat-log').scrollTop = 9999; while ($('chat-log').children.length > 30) $('chat-log').firstChild.remove(); };
-    const other = sim.players[human === 0 ? 1 : 0];
-    log('', 'Conectado com ' + other.name + '. Sala ' + net.code + '.');
-    $('chat-in').addEventListener('keydown', e => { if (e.key === 'Enter') { const t = $('chat-in').value.trim(); if (t) { net.send('chat', { text: t.slice(0, 120), name: sim.players[human].name }); log(sim.players[human].name, t); } $('chat-in').value = ''; e.stopPropagation(); } e.stopPropagation(); });
-    net.on('chat', d => { log(d.name || other.name, String(d.text || '').slice(0, 120)); notice((d.name || other.name) + ': ' + String(d.text || '').slice(0, 60)); AU.sfx('click'); });
-    net.on('close', () => { notice('Conexão perdida com o outro jogador'); log('', 'Conexão perdida.'); });
+    const myName = sim.players[human].name;
+    log('', 'Sala ' + net.code + ': ' + sim.players.map(p => p.name).join(', ') + '.');
+    $('chat-in').addEventListener('keydown', e => { if (e.key === 'Enter') { const t = $('chat-in').value.trim(); if (t) { net.chat(t); log(myName, t); } $('chat-in').value = ''; e.stopPropagation(); } e.stopPropagation(); });
+    net.on('chat', d => { const nm = d.name || (sim.players[d.id] || {}).name || '?'; const tx = String(d.text || '').slice(0, 120); log(nm, tx); notice(nm + ': ' + tx.slice(0, 60)); AU.sfx('click'); });
+    net.on('left', d => { const nm = (sim.players[d.id] || {}).name || d.name || 'Um jogador'; banner('Jogador desconectado', nm + ' saiu da partida; as unidades dele ficam paradas.', 'warn'); log('', nm + ' desconectou.'); });
+    net.on('close', () => { if (net.role === 'guest') { banner('Conexão perdida', 'A ligação com o anfitrião caiu; a partida não pode continuar.', 'danger'); log('', 'Conexão perdida com o anfitrião.'); } });
     net.on('desync', d => { notice('Dessincronização detectada no tick ' + d.tick + '. As partidas divergiram.'); log('', 'Dessincronização no tick ' + d.tick + '.'); });
-    setInterval(() => net.ping(), 5000);
+    if (net.role === 'host') setInterval(() => net.ping(), 5000);
   }
   // ---------- end ----------
   function endGame(result) {
@@ -395,7 +422,7 @@ function startGame(cfg, netCtx) {
     $('end-scores').innerHTML = `<table><thead><tr><th>#</th><th>Jogador</th><th>Domínio</th></tr></thead><tbody>${rows}</tbody></table>`;
     $('end-stats').innerHTML = [['Coletado', fmt(st.collected)], ['Roubado', fmt(st.stolen)], ['Perdido para roubo', fmt(st.lost)], ['Unidades abatidas', st.unitsKilled], ['Unidades perdidas', st.unitsLost], ['Estruturas destruídas', st.buildingsDestroyed], ['Tratados', st.treaties], ['Traições', st.betrayals], ['Reputação final', S.REP_NAMES[p.rep]]].map(([k, v]) => `<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');
     $('btn-again').onclick = () => location.reload();
-    $('btn-copy').onclick = () => { const data = { versao: '3.0c', data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
+    $('btn-copy').onclick = () => { const data = { versao: '3.0d', data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
   }
 
   // ---------- UI bridge for input ----------

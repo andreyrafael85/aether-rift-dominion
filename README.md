@@ -1,6 +1,6 @@
 # Aether Rift: Dominion — beta de testes
 
-RTS multiplayer browser-first em desenvolvimento. Este repositório publica o **beta 3.0c jogável** (três facções: Vehnar, Erevane e Tessara, com elenco ampliado; contra IA ou **multiplayer P2P por código de sala**; em 3D com Three.js: relevo, sombras, bloom, oclusão ambiente, névoa volumétrica, lagos de plasma, presets de qualidade, câmera com rotação; modo 2D isométrico mantido como alternativa; terreno com biomas e cordilheiras, projéteis e torretas, muros com caminhos, veterância, carcaças, Tempestade de Éter, som e voz, controles de toque), a **prova de conceito visual 2D** (`estilo.html`) e a **validação do caminho 3D** (`estilo3d.html`, Three.js), para testes com amigos.
+RTS multiplayer browser-first em desenvolvimento. Este repositório publica o **beta 3.0d jogável** (três facções: Vehnar, Erevane e Tessara, com elenco ampliado; contra IA ou **multiplayer P2P por código de sala**; em 3D com Three.js: relevo, sombras, bloom, oclusão ambiente, névoa volumétrica, lagos de plasma, presets de qualidade, câmera com rotação; modo 2D isométrico mantido como alternativa; terreno com biomas e cordilheiras, projéteis e torretas, muros com caminhos, veterância, carcaças, Tempestade de Éter, som e voz, controles de toque), a **prova de conceito visual 2D** (`estilo.html`) e a **validação do caminho 3D** (`estilo3d.html`, Three.js), para testes com amigos.
 
 **Jogar agora:** abra `index.html` pelo GitHub Pages deste repositório (link na descrição) ou localmente, direto no navegador. Funciona em desktop e celular; nada para instalar.
 
@@ -13,7 +13,7 @@ RTS multiplayer browser-first em desenvolvimento. Este repositório publica o **
 3. Tente roubar: treine um Pirata no Quartel e clique com o botão direito em uma Refinaria inimiga.
 4. Tente um pacto pela Diplomacia e, se quiser, quebre-o na hora certa.
 5. Desenhe muros arrastando o mouse (B, depois M) e deixe um Portão (G) para suas unidades.
-7. Multiplayer: um jogador clica em "Criar sala" e envia o código de seis letras; o outro digita o código e clica em "Entrar". As IAs escolhidas pelo anfitrião entram na partida. Sem servidor: a conexão é direta entre os dois navegadores (WebRTC via PeerJS).
+7. Multiplayer: o anfitrião escolhe o tamanho da sala (2 a 4 jogadores), clica em "Criar sala" e envia o código de seis letras; cada amigo escolhe a facção, digita o código e clica em "Entrar". A lista da sala mostra quem entrou; a partida começa quando a sala enche ou quando o anfitrião clica em "Iniciar partida" com 2 ou mais. Só os jogadores da sala entram no mapa, sem IAs. Sem servidor de jogo: o anfitrião é o relé do lockstep (PeerJS/WebRTC); se um convidado cair, as unidades dele ficam paradas e a partida segue.
 6. No celular: toque em uma unidade sua, depois toque no chão para mover ou no inimigo para atacar. A barra inferior tem Núcleo, Exército, Na tela, Construir, Atacar, Parar, Caixa e ✕.
 
 ## Como dar feedback
