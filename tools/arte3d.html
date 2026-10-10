@@ -482,7 +482,7 @@ function sceneEmblem3(S, v) {
   badge(g, 'shield', 2.2, gun, metal);
   for (let k = 0; k < 60; k++) { const a = k / 60 * Math.PI * 2; const t = new THREE.Mesh(new THREE.BoxGeometry(0.03, k % 5 === 0 ? 0.16 : 0.08, 0.05), metal); t.position.set(Math.cos(a) * 1.62, Math.sin(a) * 1.62 - 0.1, 0.02); t.rotation.z = a + Math.PI / 2; g.add(t); }
   const seal = new THREE.Mesh(new THREE.TorusGeometry(1.5, 0.045, 12, 128), metal); seal.position.set(0, -0.1, 0.08); g.add(seal);
-  const core = new THREE.Mesh(new THREE.OctahedronGeometry(0.5, 0), glowMat(0xff7a4a, 2.4)); core.scale.set(0.8, 1.15, 0.8); core.position.set(0, -0.1, 0.55); g.add(core);
+  const core = new THREE.Mesh(new THREE.OctahedronGeometry(v === 2 ? 0.42 : 0.5, 0), glowMat(0xff7a4a, 2.4)); core.scale.set(0.8, 1.15, 0.8); core.position.set(0, -0.1, 0.55); g.add(core);
   const halo = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.035, 10, 64), glowMat(v === 1 ? 0xff5e3a : 0xb23cff, 1.4)); halo.position.set(0, -0.1, 0.5); g.add(halo);
   if (v === 1) { // órbita plana: cinco mundos em pentágono (como no logo 5)
     const orbit = new THREE.Mesh(new THREE.TorusGeometry(1.12, 0.025, 10, 128), steel); orbit.position.set(0, -0.1, 0.12); g.add(orbit);
@@ -490,11 +490,12 @@ function sceneEmblem3(S, v) {
     S.scene.add(tube([[-2.4, -0.25, 0.9], [-1.5, 0.05, 0.95], [-0.8, -0.3, 1.0], [0.1, 0.15, 1.05], [0.9, -0.2, 1.0], [1.6, 0.1, 0.95], [2.4, -0.2, 0.9]], 0.06, 0xff7a4a, 3.5));
     const hz = tube([[-2.4, -0.25, 0.9], [-1.5, 0.05, 0.95], [-0.8, -0.3, 1.0], [0.1, 0.15, 1.05], [0.9, -0.2, 1.0], [1.6, 0.1, 0.95], [2.4, -0.2, 0.9]], 0.2, 0xb23cff, 1); hz.material = new THREE.MeshBasicMaterial({ color: 0xb23cff, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false }); S.scene.add(hz);
   } else { // órbita inclinada em 3D: os mundos passam na frente e atrás do núcleo; rachadura na posição do logo 1
-    const orb = new THREE.Group(); orb.position.set(0, -0.1, 0.3); orb.rotation.x = 1.15; orb.rotation.z = -0.25; g.add(orb);
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.25, 0.025, 10, 160), steel); orb.add(ring);
-    RACE_IDS.forEach((rid, i) => { const a = i * Math.PI * 2 / 5 + 0.6; const tex = planetTextures(RACES[rid], 7 + i, RACES[rid].bands, false); const pl = new THREE.Mesh(new THREE.SphereGeometry(0.26, 40, 28), new THREE.MeshStandardMaterial({ map: tex.map, bumpMap: tex.bumpMap, bumpScale: 0.02, roughness: 0.9 })); pl.position.set(Math.cos(a) * 1.25, Math.sin(a) * 1.25, 0); orb.add(pl); const pa = atmo(0.275, RACES[rid].atmo, true, 3, 1.2); pa.position.copy(pl.position); orb.add(pa); });
-    S.scene.add(tube([[-2.4, -1.5, 0.9], [-1.6, -1.1, 0.95], [-0.9, -1.45, 1.0], [0.1, -0.95, 1.05], [0.9, -1.3, 1.0], [1.7, -0.85, 0.95], [2.4, -1.2, 0.9]], 0.06, 0xff7a4a, 3.5));
-    const hz = tube([[-2.4, -1.5, 0.9], [-1.6, -1.1, 0.95], [-0.9, -1.45, 1.0], [0.1, -0.95, 1.05], [0.9, -1.3, 1.0], [1.7, -0.85, 0.95], [2.4, -1.2, 0.9]], 0.2, 0xb23cff, 1); hz.material = new THREE.MeshBasicMaterial({ color: 0xb23cff, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false }); S.scene.add(hz);
+    // órbita inclinada, mas com os cinco mundos sempre visíveis (pentágono, nenhum atrás do núcleo)
+    const orb = new THREE.Group(); orb.position.set(0, -0.02, 0.25); orb.rotation.x = 0.42; orb.rotation.z = -0.1; g.add(orb);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.18, 0.028, 10, 160), steel); orb.add(ring);
+    RACE_IDS.forEach((rid, i) => { const a = Math.PI / 2 + i * Math.PI * 2 / 5; const tex = planetTextures(RACES[rid], 7 + i, RACES[rid].bands, false); const pl = new THREE.Mesh(new THREE.SphereGeometry(0.3, 40, 28), new THREE.MeshStandardMaterial({ map: tex.map, bumpMap: tex.bumpMap, bumpScale: 0.02, roughness: 0.9 })); pl.position.set(Math.cos(a) * 1.18, Math.sin(a) * 1.18, 0.12); orb.add(pl); const pa = atmo(0.315, RACES[rid].atmo, true, 3, 1.3); pa.position.copy(pl.position); orb.add(pa); });
+    S.scene.add(tube([[-2.4, -1.85, 0.9], [-1.6, -1.5, 0.95], [-0.9, -1.8, 1.0], [0.1, -1.4, 1.05], [0.9, -1.72, 1.0], [1.7, -1.35, 0.95], [2.4, -1.65, 0.9]], 0.06, 0xff7a4a, 3.5));
+    const hz = tube([[-2.4, -1.85, 0.9], [-1.6, -1.5, 0.95], [-0.9, -1.8, 1.0], [0.1, -1.4, 1.05], [0.9, -1.72, 1.0], [1.7, -1.35, 0.95], [2.4, -1.65, 0.9]], 0.2, 0xb23cff, 1); hz.material = new THREE.MeshBasicMaterial({ color: 0xb23cff, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false }); S.scene.add(hz);
     for (const sx of [-1, 1]) { const wing = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.08, 0.1), metal); wing.position.set(sx * 2.0, 1.55, -0.1); wing.rotation.z = sx * -0.25; g.add(wing); }
   }
   g.rotation.x = -0.12; g.rotation.y = 0.06;
