@@ -38,6 +38,8 @@ const BUILDINGS = {
   torre:       { name: 'Torre de Defesa', key: 'T', hp: 1100, r: 16, cost: { minerio: 180, plasma: 40 }, buildTime: 14, energyUse: 10, sensor: 260, detect: 140, attack: { dmg: 30, range: 230, cd: 1.0 }, desc: 'Forte vs Infantaria e Drones. Detecta camuflagem em 140.' },
   nodulo:      { name: 'Nódulo de Avanço', key: 'N', hp: 650, r: 16, cost: { minerio: 120, plasma: 20 }, buildTime: 10, energyUse: 4, sensor: 260, territory: 320, desc: 'Reclama território em 320 e libera nós para coleta automática. Pode ser colocado até 650 de qualquer estrutura sua.' },
   laboratorio: { name: 'Laboratório', key: 'L', hp: 900, r: 24, cost: { minerio: 220, plasma: 60, dados: 40 }, buildTime: 20, energyUse: 10, sensor: 140, desc: 'Pesquisas e superarma, pagas com Fragmentos de Dados.' },
+  muro:        { name: 'Muro', key: 'M', hp: 450, r: 8, cost: { minerio: 20 }, buildTime: 3, energyUse: 0, sensor: 50, wall: true, desc: 'Barreira barata. Arraste para desenhar uma linha. Bloqueia unidades e absorve tiros.' },
+  portao:      { name: 'Portão', key: 'G', hp: 600, r: 8, cost: { minerio: 40 }, buildTime: 4, energyUse: 0, sensor: 60, wall: true, gate: true, desc: 'Trecho de muro que suas unidades atravessam. Inimigos precisam derrubá-lo.' },
   bastiao:     { name: 'Bastião', key: '', hp: 2200, r: 24, cost: {}, buildTime: 3, energyUse: 12, sensor: 300, detect: 160, attack: { dmg: 60, range: 260, cd: 0.9 }, desc: 'Fortaleza da Fundição Orbital.' },
 };
 
@@ -191,7 +193,7 @@ function addBuilding(sim, owner, def, x, y, built) {
   const e = {
     id: sim.nextId++, kind: 'building', def, cls: 'est', owner, x, y, px: x, py: y, r: d.r,
     maxHp: d.hp, hp: built ? d.hp : d.hp * 0.3, built: !!built, progress: built ? 1 : 0, queue: [], cd: 0,
-    alive: true, lastHitT: -99, lastAttack: -99, cloaked: false, revealT: 0, rally: null, jumpT: 0, jumpTo: null, lotes: {},
+    alive: true, lastHitT: -99, lastAttack: -99, cloaked: false, revealT: 0, rally: null, jumpT: 0, jumpTo: null, lotes: {}, ang: 0, aimAng: 0,
   };
   sim.ents.push(e); sim.byId.set(e.id, e); return e;
 }
@@ -284,7 +286,8 @@ function canBuild(sim, pid, def, x, y) {
   if (dist(x, y, CX, CY) < RIFT_R + d.r + 12) return { ok: false, why: 'Dentro da Fenda' };
   for (const e of sim.ents) {
     if (!e.alive || e.kind === 'unit' || e.kind === 'crate') continue;
-    if (dist(x, y, e.x, e.y) < e.r + d.r + 10) return { ok: false, why: 'Sobreposição' };
+    const bothWalls = d.wall && e.kind === 'building' && BUILDINGS[e.def].wall;
+    if (dist(x, y, e.x, e.y) < (bothWalls ? 13 : e.r + d.r + 10)) return { ok: false, why: 'Sobreposição' };
   }
   if (def === 'nodulo') {
     let near = false;
@@ -348,7 +351,7 @@ function processCommand(sim, c) {
       const d = BUILDINGS[c.def]; if (!d || !d.key) return;
       const ok = canBuild(sim, c.p, c.def, c.x, c.y); if (!ok.ok) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: ok.why }); return; }
       if (!canAfford(p, d.cost)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Recursos insuficientes' }); return; }
-      pay(p, d.cost); addBuilding(sim, c.p, c.def, c.x, c.y, false);
+      pay(p, d.cost); const nb = addBuilding(sim, c.p, c.def, c.x, c.y, false); if (typeof c.ang === 'number') nb.ang = c.ang;
       emit(sim, { t: 'place', p: c.p, x: c.x, y: c.y, def: c.def });
       break; }
     case 'produce': {
@@ -487,6 +490,7 @@ function fire(sim, a, t) {
   if (a.kind === 'unit' && a.cloaked && a.def === 'infantaria') { dmg *= 1.5; ambush = true; }
   if (q && q.research.blindagem) dmg *= 0.87;
   t.hp -= dmg; t.lastHitT = sim.time; t.lastHitBy = a.owner;
+  if (a.kind === 'building') a.aimAng = Math.atan2(t.y - a.y, t.x - a.x);
   p.stats.dmg += dmg;
   a.cd = atk.cd; a.lastAttack = sim.time; a.cloaked = false;
   if (atk.stun && (t.cls === 'vei' || t.kind === 'building')) t.cd = Math.max(t.cd || 0, 1.0);
@@ -536,7 +540,7 @@ function acquire(sim, u, rad, unitsOnly) {
     if (unitsOnly && e.kind !== 'unit') return;
     const d = dist(u.x, u.y, e.x, e.y) - e.r;
     if (d > rad) return;
-    const score = d + (e.kind === 'building' ? 200 : 0) + (e.cls === 'civ' ? 60 : 0);
+    const score = d + (e.kind === 'building' ? (BUILDINGS[e.def].wall ? 320 : 200) : 0) + (e.cls === 'civ' ? 60 : 0);
     if (score < bd) { bd = score; best = e; }
   });
   return best;
@@ -727,7 +731,7 @@ function separate(sim) {
   const units = [];
   for (const e of sim.ents) if (e.alive && e.kind === 'unit') units.push(e);
   for (const u of units) {
-    let fx = 0, fy = 0;
+    let fx = 0, fy = 0, bfx = 0, bfy = 0;
     queryGrid(sim, u.x, u.y, 40, e => {
       if (e === u || !e.alive) return;
       if (e.kind === 'unit') {
@@ -736,10 +740,21 @@ function separate(sim) {
         if (dd < min) { const push = (min - dd) * 0.5; fx += dx / dd * push; fy += dy / dd * push; }
       } else if (e.kind === 'building') {
         if (UNITS[u.def].flying) return;
+        if (BUILDINGS[e.def].gate && e.owner === u.owner) return; // portão próprio: passa
         const dx = u.x - e.x, dy = u.y - e.y; const dd = Math.hypot(dx, dy) || 0.01; const min = u.r + e.r + 2;
-        if (dd < min) { fx += dx / dd * (min - dd); fy += dy / dd * (min - dd); }
+        if (dd < min) { const push = (min - dd); fx += dx / dd * push; fy += dy / dd * push; bfx += dx / dd * push; bfy += dy / dd * push; }
       }
     });
+    // deslizar ao longo de obstáculos (muros e prédios) em direção ao destino
+    if ((bfx || bfy) && (u.state === 'move' || u.state === 'attackmove' || u.state === 'attack' || u.state === 'harvest' || u.state === 'return' || u.state === 'siphon' || u.state === 'pickup')) {
+      let gx = u.tx, gy = u.ty;
+      if (u.state === 'attack' || u.state === 'siphon' || u.state === 'pickup') { const t = sim.byId.get(u.target); if (t) { gx = t.x; gy = t.y; } }
+      else if (u.state === 'harvest') { const n = sim.byId.get(u.node); if (n) { gx = n.x; gy = n.y; } }
+      else if (u.state === 'return') { const d = nearestDeposit(sim, u); if (d) { gx = d.x; gy = d.y; } }
+      const dxg = gx - u.x, dyg = gy - u.y; const bl = Math.hypot(bfx, bfy) || 1;
+      let tx = -bfy / bl, ty = bfx / bl; if (tx * dxg + ty * dyg < 0) { tx = -tx; ty = -ty; }
+      const sp = speedOf(sim, u) * TICK * 0.85; fx += tx * sp; fy += ty * sp;
+    }
     if (!UNITS[u.def].flying) {
       const dx = u.x - CX, dy = u.y - CY; const dd = Math.hypot(dx, dy) || 0.01; const min = RIFT_R + u.r;
       if (dd < min) { fx += dx / dd * (min - dd); fy += dy / dd * (min - dd); }
@@ -790,7 +805,7 @@ function score(sim, p) {
   let s = 0;
   for (const e of sim.ents) {
     if (!e.alive || e.owner !== p.id) continue;
-    if (e.kind === 'building') { s += 100; if (e.def === 'nodulo') s += 300; if (e.def === 'nucleo') s += 200; }
+    if (e.kind === 'building') { s += BUILDINGS[e.def].wall ? 10 : 100; if (e.def === 'nodulo') s += 300; if (e.def === 'nucleo') s += 200; }
     else if (e.kind === 'unit') { const c = UNITS[e.def].cost; s += (c.minerio || 0) + (c.plasma || 0) + (c.dados || 0); }
   }
   s += p.res.plasma + p.res.minerio + p.res.dados;

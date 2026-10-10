@@ -67,15 +67,18 @@ h1 span{background:linear-gradient(90deg,var(--rift1),var(--rift2));-webkit-back
 .speed button.on,.tb.on{background:var(--rift1);color:#14161A;border-color:var(--rift1)}
 .tb.attn{animation:pulse 1s infinite alternate;border-color:var(--warn);color:var(--warn)}
 @keyframes pulse{to{box-shadow:0 0 0 3px rgba(242,194,48,.35)}}
-#panel{position:absolute;left:.75rem;bottom:calc(.75rem + env(safe-area-inset-bottom,0));width:min(380px,calc(100vw - 1.5rem - 200px));max-height:46vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.75rem;display:grid;gap:.5rem;align-content:start;backdrop-filter:blur(6px)}
+#panel{position:absolute;left:.75rem;bottom:calc(.75rem + env(safe-area-inset-bottom,0));width:min(470px,calc(100vw - 1.5rem - 200px));max-height:48vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.75rem;display:grid;gap:.5rem;align-content:start;backdrop-filter:blur(6px)}
 .ph{display:flex;align-items:center;gap:.25rem;font-size:15px}
 .hp{height:5px;background:#262A31;border-radius:3px;overflow:hidden}.hp i{display:block;height:100%;background:var(--good)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:.4rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:.4rem}
 .act{display:grid;gap:2px;text-align:left;border:1px solid var(--line);background:#1C1F25;border-radius:6px;padding:.45rem .5rem;min-height:44px}
 .act:hover{background:#262A31;border-color:#3B414B}
 .act.on{border-color:var(--rift1);box-shadow:0 0 0 1px var(--rift1) inset}
 .act.poor .cost{opacity:.55}
 .act:disabled{opacity:.45;cursor:default}
+.act{grid-template-columns:auto 1fr;column-gap:.45rem;align-items:center}
+.act .ico{grid-row:1 / span 3;width:34px;height:34px;object-fit:contain;image-rendering:auto}
+.act .k,.act .n,.act .cost{grid-column:2}
 .act .n{font-weight:600;font-size:12.5px}
 .act .cost{font-family:var(--fm);font-size:11px;display:flex;gap:.4rem;flex-wrap:wrap}
 .act.sm{min-height:36px;padding:.35rem .6rem;display:inline-flex;align-items:center;gap:.4rem}
@@ -136,12 +139,13 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 #end table{width:100%;border-collapse:collapse}#end td,#end th{padding:.35rem .5rem;border-bottom:1px solid var(--line);text-align:left}
 #end-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.4rem}
 .stat{display:grid;border:1px solid var(--line);border-radius:6px;padding:.4rem .6rem;font-size:12px}.stat span{color:var(--fg2)}
+.loadbar{height:6px;background:#262A31;border-radius:3px;overflow:hidden;margin-top:.5rem}.loadbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--rift1),var(--rift2));transition:width .15s}
 #errbox{position:fixed;left:8px;bottom:8px;background:#5a1d1d;color:#fff;padding:.4rem .6rem;border-radius:6px;font-family:var(--fm);font-size:12px;z-index:9;max-width:80vw}
 </style>
 
 <div id="start" class="screen">
   <div class="start-wrap">
-    <div class="eyebrow">Beta 0.1 · protótipo jogável no navegador · contra IA</div>
+    <div class="eyebrow">Beta 1.5a · protótipo jogável no navegador · contra IA</div>
     <h1>Aether Rift<br><span>Dominion</span></h1>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -154,7 +158,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         <div class="row"><button id="btn-start" class="btn primary">Iniciar partida</button><button id="btn-help-start" class="btn">Como jogar</button></div>
       </div>
     </div>
-    <p class="start-notes"><b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
+    <p class="start-notes"><b>Novo no 1.5a:</b> visual isométrico com sprites voxel gerados no navegador, terreno com biomas, muros e portões desenhados por arrasto, estados de dano, destroços e crateras, ciclo de dia e noite com luzes. <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
   </div>
 </div>
 
@@ -186,6 +190,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     <div id="proposal" hidden><div id="proposal-text"></div><div class="row"><button id="prop-yes" class="act sm good">Aceitar pacto</button><button id="prop-no" class="act sm">Recusar</button></div></div>
   </div>
 
+  <div id="loading" class="modal" hidden><div class="box" style="max-width:360px"><div class="eyebrow">Preparando o campo</div><h2>Gerando sprites</h2><p class="muted small">Modelos voxel renderizados em 8 direções com iluminação, só nesta primeira vez.</p><div class="loadbar"><i id="load-bar"></i></div></div></div>
   <div id="diplo" class="modal" hidden><div class="box"><h2>Diplomacia</h2><div id="diplo-body"></div><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
   <div id="confirm" class="modal" hidden><div class="box"><h2>Confirmar</h2><p id="confirm-text"></p><div class="row"><button id="confirm-yes" class="btn primary">Confirmar</button><button id="confirm-no" class="btn">Cancelar</button></div></div></div>
   <div id="end" class="modal" hidden><div class="box"><div class="eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-again" class="btn primary">Jogar de novo</button></div></div></div>

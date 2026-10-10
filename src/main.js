@@ -52,7 +52,7 @@ function startGame(cfg) {
   const R = ARD.render.create(canvas, mini); R.resize();
   const nuc = S.nucleoOf(sim, human);
   const isTouch = matchMedia('(pointer: coarse)').matches || !!params.get('touch');
-  const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.55 : 0.8 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
+  const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.75 : 1.0 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
   const ui = makeUI(); // closures below
   const I = ARD.input.create({ canvas, sim, view, R, human, ui });
   const ais = sim.players.filter(p => !p.human).map(p => ARD.ai.create(p.id, p.difficulty));
@@ -60,14 +60,20 @@ function startGame(cfg) {
   window.addEventListener('resize', () => R.resize());
   document.body.classList.toggle('touch', isTouch);
 
-  // fast-forward for tests
-  const ff = parseInt(params.get('ff') || '0', 10);
-  for (let i = 0; i < ff * 10; i++) tickOnce(true);
-  if (params.get('speed')) G.speed = parseFloat(params.get('speed')) || 1;
-
-  bindHUD();
-  refreshPanel(); refreshTop(); refreshHints(); refreshQuick();
-  requestAnimationFrame(frame);
+  bindHUD(); refreshTop(); refreshHints(); refreshQuick();
+  $('loading').hidden = false;
+  R.prepare(sim, f => { $('load-bar').style.width = Math.round(f * 100) + '%'; }, () => {
+    $('loading').hidden = true;
+    const ff = parseInt(params.get('ff') || '0', 10);
+    for (let i = 0; i < ff * 10; i++) tickOnce(true);
+    if (params.get('speed')) G.speed = parseFloat(params.get('speed')) || 1;
+    if (params.get('night')) sim.tick = 3600; // teste: começa de noite
+    if (params.get('reveal')) view.reveal = true; // teste: sem névoa
+    if (params.get('cam')) { const n = S.nucleoOf(sim, parseInt(params.get('cam'), 10)); if (n) { view.cam.x = n.x; view.cam.y = n.y; } }
+    if (params.get('zoom')) view.cam.zoom = parseFloat(params.get('zoom'));
+    refreshPanel(true); G.last = performance.now();
+    requestAnimationFrame(frame);
+  });
 
   function tickOnce(silent) {
     const sim = G.sim;
@@ -156,7 +162,7 @@ function startGame(cfg) {
       const d = S.BUILDINGS[e.def]; let h = `<div class="ph"><span class="dot" style="background:${p.color}"></span><b>${esc(d.name)}</b></div><div class="hp"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="muted small">${fmt(e.hp)} / ${fmt(e.maxHp)}${e.built ? '' : ' · construção ' + Math.round(e.progress * 100) + '%'}${d.energyProd ? ' · +' + d.energyProd + ' energia' : ''}${d.energyUse ? ' · −' + d.energyUse + ' energia' : ''}</div><div class="muted small">${esc(d.desc)}</div>`;
       if (e.built && d.produces) {
         h += '<div class="grid">';
-        for (const ud of d.produces) { const u = S.UNITS[ud]; const name = ud === 'pirata' ? fac.pirateName : u.name; h += `<button class="act" data-prod="${ud}" title="${esc(u.desc)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span></button>`; }
+        for (const ud of d.produces) { const u = S.UNITS[ud]; const name = ud === 'pirata' ? fac.pirateName : u.name; h += `<button class="act" data-prod="${ud}" title="${esc(u.desc)}"><img class="ico" alt="" src="${R.icon(ud, human)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span></button>`; }
         h += '</div>';
         if (e.queue.length) { h += '<div class="queue">'; e.queue.forEach((q, i) => { h += `<button class="q" data-cancel="${i}" title="Cancelar">${esc(S.UNITS[q.def].name)}${i === 0 ? ` <i>${Math.round(100 * q.t / q.total)}%</i>` : ''} ✕</button>`; }); h += '</div>'; }
         h += `<div class="row"><button class="act sm" data-mode="rally">Ponto de reunião</button>${e.def === 'nucleo' ? `<button class="act sm" data-mode="jump" ${p.jumpsLeft > 0 && e.jumpT <= 0 ? '' : 'disabled'}>Salto de Núcleo (${p.jumpsLeft})</button>` : ''}</div>`;
@@ -192,7 +198,7 @@ function startGame(cfg) {
   }
   function buildMenuHTML(p) {
     let h = `<div class="ph"><b>Construir</b> <span class="muted small">(B, depois a tecla)</span></div><div class="grid">`;
-    for (const k in S.BUILDINGS) { const d = S.BUILDINGS[k]; if (!d.key) continue; const can = S.canAfford(p, d.cost); h += `<button class="act ${can ? '' : 'poor'} ${view.ghost && view.ghost.def === k ? 'on' : ''}" data-build="${k}" title="${esc(d.desc)}"><span class="k">${d.key}</span><span class="n">${esc(d.name)}</span><span class="cost">${costStr(d.cost)}</span></button>`; }
+    for (const k in S.BUILDINGS) { const d = S.BUILDINGS[k]; if (!d.key) continue; const can = S.canAfford(p, d.cost); h += `<button class="act ${can ? '' : 'poor'} ${view.ghost && view.ghost.def === k ? 'on' : ''}" data-build="${k}" title="${esc(d.desc)}"><img class="ico" alt="" src="${R.icon(k, human)}"><span class="k">${d.key}</span><span class="n">${esc(d.name)}</span><span class="cost">${costStr(d.cost)}</span></button>`; }
     h += '</div>';
     if (!view.sel.size) h += '<div class="tip">Nada selecionado. Clique em unidades ou arraste uma caixa. F1 seleciona o Núcleo, F2 o exército.</div>';
     return h;
@@ -224,7 +230,7 @@ function startGame(cfg) {
     $('btn-stop').addEventListener('click', () => { const ids = [...view.sel].filter(id => { const e = sim.byId.get(id); return e && e.alive && e.kind === 'unit' && e.owner === human; }); if (ids.length) I.cmd({ t: 'stop', ids }); });
     $('btn-nucleo').addEventListener('click', () => { const n = S.nucleoOf(sim, human); if (n) { I.select([n.id]); I.center(n.x, n.y); } });
     $('btn-army').addEventListener('click', () => { const ids = []; for (const en of sim.ents) if (en.alive && en.owner === human && en.kind === 'unit' && S.UNITS[en.def].attack) ids.push(en.id); I.select(ids); if (ids.length) { const e = sim.byId.get(ids[0]); I.center(e.x, e.y); } });
-    mini.addEventListener('pointerdown', e => { e.preventDefault(); const r = mini.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width * S.WORLD, y = (e.clientY - r.top) / r.height * S.WORLD; if (e.button === 2) { const ids = [...view.sel].filter(id => { const u = sim.byId.get(id); return u && u.alive && u.kind === 'unit' && u.owner === human; }); if (ids.length) I.cmd({ t: 'attackmove', ids, x, y }); } else I.center(x, y); });
+    mini.addEventListener('pointerdown', e => { e.preventDefault(); const r = mini.getBoundingClientRect(); const [x, y] = R.miniToWorld((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height); if (e.button === 2) { const ids = [...view.sel].filter(id => { const u = sim.byId.get(id); return u && u.alive && u.kind === 'unit' && u.owner === human; }); if (ids.length) I.cmd({ t: 'attackmove', ids, x, y }); } else I.center(x, y); });
     mini.addEventListener('contextmenu', e => e.preventDefault());
     $('hints-close').addEventListener('click', () => { $('hints').hidden = true; G.hintsOff = true; });
     document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => ui.closeModals()));
@@ -262,6 +268,7 @@ function startGame(cfg) {
       { id: 'quartel', text: 'Construa um Quartel (B → Q) e treine Infantaria (I).', done: () => S.hasBuilt(sim, human, 'quartel') },
       { id: 'nodulo', text: 'Expanda com um Nódulo (B → N) perto de cristais de Plasma. Coletores só colhem no seu território.', done: () => S.hasBuilt(sim, human, 'nodulo') },
       { id: 'refinaria', text: 'Uma Refinaria (B → F) perto dos nós encurta as viagens dos coletores.', done: () => S.hasBuilt(sim, human, 'refinaria') },
+      { id: 'muro', text: 'Muros (B → M) se desenham arrastando o mouse. Deixe um Portão (G) para suas unidades passarem.', done: () => S.hasBuilt(sim, human, 'muro') || sim.time > 600 },
       { id: 'pirata', text: 'Treine um Pirata (P) no Quartel e clique com o direito em uma Refinaria inimiga para Sifonar.', done: () => sim.players[human].stats.stolen > 0 },
       { id: 'diplo', text: 'Abra a Diplomacia e proponha Não-agressão a quem está forte demais. Ou quebre um pacto na hora certa.', done: () => sim.players[human].stats.treaties > 0 || sim.players[human].stats.betrayals > 0 || sim.time > 540 },
       { id: 'lab', text: 'Um Laboratório (B → L) libera pesquisas e a superarma da sua facção.', done: () => S.hasBuilt(sim, human, 'laboratorio') },

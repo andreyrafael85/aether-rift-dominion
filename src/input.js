@@ -8,7 +8,7 @@ function create(o) {
   const I = { keys: new Set(), pointers: new Map(), down: null, lastTap: 0, lastClickId: null, lastClickT: 0, groups: {}, longPress: null, pinch: null, mode: 'normal', touchBox: false };
   const cam = view.cam;
 
-  function clampCam() { cam.zoom = Math.max(0.3, Math.min(1.8, cam.zoom)); const m = 200; cam.x = Math.max(-m, Math.min(S.WORLD + m, cam.x)); cam.y = Math.max(-m, Math.min(S.WORLD + m, cam.y)); }
+  function clampCam() { cam.zoom = Math.max(R.zoomMin || 0.3, Math.min(R.zoomMax || 1.8, cam.zoom)); const m = 200; cam.x = Math.max(-m, Math.min(S.WORLD + m, cam.x)); cam.y = Math.max(-m, Math.min(S.WORLD + m, cam.y)); }
   I.center = function (x, y) { cam.x = x; cam.y = y; clampCam(); };
   I.setMode = function (mode, data) {
     I.mode = mode; view.mode = mode; view.ghost = null;
@@ -18,13 +18,17 @@ function create(o) {
   };
   function updateGhost(sx, sy) { if (!view.ghost) return; const [wx, wy] = R.screenToWorld(cam, sx, sy); view.ghost.x = wx; view.ghost.y = wy; view.ghost.ok = S.canBuild(sim, human, view.ghost.def, wx, wy).ok && S.canAfford(sim.players[human], S.BUILDINGS[view.ghost.def].cost); }
 
-  function pick(wx, wy, radiusPx) {
-    const vis = sim.vis[human]; let best = null, bd = Infinity; const slack = radiusPx / cam.zoom;
+  function pick(sx, sy, radiusPx) {
+    const vis = sim.vis[human]; let best = null, bd = Infinity; const k = R.K * cam.zoom;
     for (const e of sim.ents) {
       if (!e.alive) continue;
       if (e.kind !== 'node' && e.owner !== human && !vis.has(e.id)) continue;
-      const d = S.dist(wx, wy, e.x, e.y) - e.r; if (d > slack) continue;
-      const pri = e.kind === 'unit' ? 0 : e.kind === 'crate' ? 1 : e.kind === 'building' ? 2 : 3;
+      const z = e.kind === 'unit' && S.UNITS[e.def].flying ? 14 : 0;
+      const [ex, ey] = R.worldToScreen(cam, e.x, e.y, z);
+      const dx = sx - ex, dy = sy - ey; const rx = e.r * k * 1.2 + radiusPx;
+      if (Math.abs(dx) > rx) continue;
+      if (dy > e.r * k * 0.7 + radiusPx || dy < -(e.r * k * 2.4 + radiusPx)) continue;
+      const d = Math.hypot(dx, Math.max(0, dy)); const pri = e.kind === 'unit' ? 0 : e.kind === 'crate' ? 1 : e.kind === 'building' ? 2 : 3;
       const sc = d + pri * 5; if (sc < bd) { bd = sc; best = e; }
     }
     return best;
@@ -36,8 +40,20 @@ function create(o) {
   function cmd(c) { c.p = human; S.enqueue(sim, c); }
   I.cmd = cmd;
 
+  function wallSegments(x0, y0, x1, y1, def) {
+    const len = Math.hypot(x1 - x0, y1 - y0); const n = Math.max(1, Math.round(len / 16)); const ang = Math.atan2(y1 - y0, x1 - x0);
+    const out = []; const p = sim.players[human]; const d = S.BUILDINGS[def]; let spent = 0;
+    for (let i = 0; i <= n; i++) {
+      const x = x0 + Math.cos(ang) * 16 * i, y = y0 + Math.sin(ang) * 16 * i;
+      let ok = S.canBuild(sim, human, def, x, y).ok;
+      if (ok) { for (const q of out) if (q.ok && Math.hypot(q.x - x, q.y - y) < 13) { ok = false; break; } }
+      if (ok) { spent += d.cost.minerio || 0; if (spent > p.res.minerio) ok = false; }
+      out.push({ x, y, ang, ok });
+    }
+    return out;
+  }
   function contextCommand(wx, wy, sx, sy) {
-    const units = ownSelectedUnits(); const t = pick(wx, wy, I.lastType === 'touch' ? 22 : 10);
+    const units = ownSelectedUnits(); const t = pick(sx, sy, I.lastType === 'touch' ? 22 : 10);
     if (!units.length) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice('Ponto de reunião definido'); } return; }
     const ids = units.map(u => u.id);
     if (t && t.kind === 'node') { cmd({ t: 'harvest', ids, target: t.id }); view.marker = { x: t.x, y: t.y, t: R.time, col: '#7FE3A1' }; return; }
@@ -60,6 +76,7 @@ function create(o) {
     const mode = I.mode;
     if (mode === 'build' && view.ghost) {
       const g = view.ghost; const ok = S.canBuild(sim, human, g.def, g.x, g.y);
+      if (S.BUILDINGS[g.def].wall) { if (ok.ok && S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost)) { cmd({ t: 'build', def: g.def, x: g.x, y: g.y, ang: 0 }); if (!shift) I.setMode('normal'); } else ui.notice(ok.ok ? 'Recursos insuficientes' : ok.why); return; }
       if (!ok.ok) { ui.notice(ok.why); return; }
       if (!S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost)) { ui.notice('Recursos insuficientes'); return; }
       cmd({ t: 'build', def: g.def, x: g.x, y: g.y }); view.marker = { x: g.x, y: g.y, t: R.time, col: '#7FE3A1' };
@@ -67,7 +84,7 @@ function create(o) {
       return;
     }
     if (mode === 'attackmove') {
-      const units = ownSelectedUnits(); const t = pick(wx, wy, 10);
+      const units = ownSelectedUnits(); const t = pick(sx, sy, 10);
       if (units.length) {
         if (t && t.owner >= 0 && t.owner !== human) contextCommand(wx, wy, sx, sy);
         else { cmd({ t: 'attackmove', ids: units.map(u => u.id), x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#FF5E3A' }; }
@@ -78,7 +95,7 @@ function create(o) {
     if (mode === 'jump') { ui.confirm('Saltar o Núcleo para este ponto? Custa ' + Math.round(S.FACTIONS[sim.players[human].faction].jumpCostFrac * 100) + '% de cada recurso e 60 s de canalização visível a todos.', () => cmd({ t: 'jump', x: wx, y: wy })); I.setMode('normal'); return; }
     if (mode === 'rally') { const b = ownSelectedBuilding(); if (b) cmd({ t: 'rally', id: b.id, x: wx, y: wy }); I.setMode('normal'); return; }
     // normal: select
-    const t = pick(wx, wy, I.lastType === 'touch' ? 20 : 8);
+    const t = pick(sx, sy, I.lastType === 'touch' ? 20 : 8);
     const now = performance.now();
     if (t && t.kind !== 'node' && t.kind !== 'crate') {
       if (t.owner === human && t.kind === 'unit' && I.lastClickId === t.id && now - I.lastClickT < 350) {
@@ -117,18 +134,20 @@ function create(o) {
     if (I.pointers.size === 2) { const pts = [...I.pointers.values()]; I.pinch = { d: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y), zoom: cam.zoom, cx: (pts[0].x + pts[1].x) / 2, cy: (pts[0].y + pts[1].y) / 2, camx: cam.x, camy: cam.y }; I.down = null; view.box = null; clearTimeout(I.longPress); return; }
     I.lastType = e.pointerType;
     I.down = { sx, sy, button: e.button, type: e.pointerType, moved: false, camx: cam.x, camy: cam.y, shift: e.shiftKey, t: performance.now() };
+    if (e.button === 0 && I.mode === 'build' && view.ghost && S.BUILDINGS[view.ghost.def].wall) { const [wx0, wy0] = R.screenToWorld(cam, sx, sy); I.wallDrag = { x: wx0, y: wy0 }; }
     if (e.pointerType === 'touch') { clearTimeout(I.longPress); I.longPress = setTimeout(() => { if (I.down && !I.down.moved) { const [wx, wy] = R.screenToWorld(cam, sx, sy); if (I.mode === 'normal') contextCommand(wx, wy, sx, sy); I.down = null; if (navigator.vibrate) navigator.vibrate(15); } }, 450); }
   });
   canvas.addEventListener('pointermove', e => {
     const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top; I.lastSX = sx; I.lastSY = sy;
     const p = I.pointers.get(e.pointerId); if (p) { p.x = e.clientX; p.y = e.clientY; }
-    if (I.pinch && I.pointers.size === 2) { const pts = [...I.pointers.values()]; const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y); const cx = (pts[0].x + pts[1].x) / 2, cy = (pts[0].y + pts[1].y) / 2; cam.zoom = I.pinch.zoom * (d / I.pinch.d); clampCam(); cam.x = I.pinch.camx - (cx - I.pinch.cx) / cam.zoom; cam.y = I.pinch.camy - (cy - I.pinch.cy) / cam.zoom; clampCam(); return; }
+    if (I.pinch && I.pointers.size === 2) { const pts = [...I.pointers.values()]; const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y); const cx = (pts[0].x + pts[1].x) / 2, cy = (pts[0].y + pts[1].y) / 2; cam.zoom = I.pinch.zoom * (d / I.pinch.d); clampCam(); const [pwx, pwy] = R.screenDeltaToWorld(cam, cx - I.pinch.cx, cy - I.pinch.cy); cam.x = I.pinch.camx - pwx; cam.y = I.pinch.camy - pwy; clampCam(); return; }
     if (view.ghost) updateGhost(sx, sy);
-    const d = I.down; if (!d) { const t = pick(...R.screenToWorld(cam, sx, sy), 8); view.hover = t ? t.id : null; return; }
+    const d = I.down; if (!d) { const t = pick(sx, sy, 8); view.hover = t ? t.id : null; return; }
     if (!d.moved && Math.hypot(sx - d.sx, sy - d.sy) > 7) { d.moved = true; clearTimeout(I.longPress); }
     if (!d.moved) return;
+    if (I.wallDrag) { const [wx1, wy1] = R.screenToWorld(cam, sx, sy); view.wallGhost = wallSegments(I.wallDrag.x, I.wallDrag.y, wx1, wy1, view.ghost.def); return; }
     const panning = d.button === 1 || (d.type === 'touch' && !I.touchBox) || (d.button === 0 && I.keys.has('Space'));
-    if (panning) { cam.x = d.camx - (sx - d.sx) / cam.zoom; cam.y = d.camy - (sy - d.sy) / cam.zoom; clampCam(); view.box = null; }
+    if (panning) { const [dwx, dwy] = R.screenDeltaToWorld(cam, sx - d.sx, sy - d.sy); cam.x = d.camx - dwx; cam.y = d.camy - dwy; clampCam(); view.box = null; }
     else if (d.button === 0 && I.mode === 'normal') view.box = { x0: d.sx, y0: d.sy, x1: sx, y1: sy };
   });
   function endPointer(e) {
@@ -138,6 +157,7 @@ function create(o) {
     const d = I.down; if (!d) return; I.down = null;
     const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top;
     const [wx, wy] = R.screenToWorld(cam, sx, sy);
+    if (I.wallDrag) { const segs = view.wallGhost; I.wallDrag = null; view.wallGhost = null; if (d.moved && segs && segs.length && view.ghost) { let n = 0; for (const g of segs) if (g.ok) { cmd({ t: 'build', def: view.ghost.def, x: g.x, y: g.y, ang: g.ang }); n++; } if (n) view.marker = { x: segs[0].x, y: segs[0].y, t: R.time, col: '#7FE3A1' }; if (!d.shift) I.setMode('normal'); return; } }
     if (view.box) { const b = view.box; view.box = null; boxSelect(b, d.shift); return; }
     if (d.moved) return;
     if (d.button === 2) { if (I.mode !== 'normal') I.setMode('normal'); else contextCommand(wx, wy, sx, sy); return; }
@@ -147,7 +167,7 @@ function create(o) {
     }
   }
   canvas.addEventListener('pointerup', endPointer);
-  canvas.addEventListener('pointercancel', e => { I.pointers.delete(e.pointerId); I.pinch = null; I.down = null; view.box = null; clearTimeout(I.longPress); });
+  canvas.addEventListener('pointercancel', e => { I.pointers.delete(e.pointerId); I.pinch = null; I.down = null; view.box = null; I.wallDrag = null; view.wallGhost = null; clearTimeout(I.longPress); });
   canvas.addEventListener('wheel', e => { e.preventDefault(); const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top; const [wx, wy] = R.screenToWorld(cam, sx, sy); const f = Math.exp(-e.deltaY * 0.0012); cam.zoom *= f; clampCam(); const [wx2, wy2] = R.screenToWorld(cam, sx, sy); cam.x += wx - wx2; cam.y += wy - wy2; clampCam(); if (view.ghost) updateGhost(sx, sy); }, { passive: false });
 
   // ---- keyboard
@@ -184,7 +204,7 @@ function create(o) {
     if (I.keys.has('KeyA') && !ownSelectedUnits().length || I.keys.has('ArrowLeft')) dx -= 1; if (I.keys.has('KeyD') || I.keys.has('ArrowRight')) dx += 1;
     // edge pan (mouse only, when pointer inside canvas)
     if (I.lastSX != null && !I.down && I.pointers.size === 0 && I.edgePanEnabled) { const m = 18; if (I.lastSX < m) dx -= 0.7; if (I.lastSX > R.w - m) dx += 0.7; if (I.lastSY < m) dy -= 0.7; if (I.lastSY > R.h - m) dy += 0.7; }
-    if (dx || dy) { cam.x += dx * sp; cam.y += dy * sp; clampCam(); if (view.ghost) updateGhost(I.lastSX || R.w / 2, I.lastSY || R.h / 2); }
+    if (dx || dy) { const [dwx, dwy] = R.screenDeltaToWorld(cam, dx * sp * cam.zoom, dy * sp * cam.zoom); cam.x += dwx; cam.y += dwy; clampCam(); if (view.ghost) updateGhost(I.lastSX || R.w / 2, I.lastSY || R.h / 2); }
   };
   canvas.addEventListener('pointerenter', e => { I.edgePanEnabled = e.pointerType === 'mouse'; });
   canvas.addEventListener('pointerleave', () => { I.edgePanEnabled = false; I.lastSX = null; I.lastSY = null; });

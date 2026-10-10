@@ -1,6 +1,6 @@
 # Aether Rift: Dominion — beta de testes
 
-RTS multiplayer browser-first em desenvolvimento. Este repositório publica o **beta 0.1 jogável** (contra IA) e a **prova de conceito visual** do beta v1.5 para testes com amigos.
+RTS multiplayer browser-first em desenvolvimento. Este repositório publica o **beta 1.5a jogável** (contra IA, visual isométrico voxel, muros e portões, dia e noite) e a **prova de conceito visual** que originou essa direção, para testes com amigos.
 
 **Jogar agora:** abra `index.html` pelo GitHub Pages deste repositório (link na descrição) ou localmente, direto no navegador. Funciona em desktop e celular; nada para instalar.
 
@@ -12,6 +12,7 @@ RTS multiplayer browser-first em desenvolvimento. Este repositório publica o **
 2. Uma partida FFA com 2 IAs no Normal.
 3. Tente roubar: treine um Pirata no Quartel e clique com o botão direito em uma Refinaria inimiga.
 4. Tente um pacto pela Diplomacia e, se quiser, quebre-o na hora certa.
+5. Desenhe muros arrastando o mouse (B, depois M) e deixe um Portão (G) para suas unidades.
 
 ## Como dar feedback
 
