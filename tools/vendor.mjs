@@ -5,7 +5,8 @@ import { dirname } from 'node:path';
 const BASE = 'https://cdn.jsdelivr.net/npm/three@0.160.0/';
 const root = new URL('../', import.meta.url).pathname + 'dist/vendor/three/';
 const entries = ['build/three.module.min.js', 'examples/jsm/postprocessing/EffectComposer.js', 'examples/jsm/postprocessing/RenderPass.js',
-  'examples/jsm/postprocessing/UnrealBloomPass.js', 'examples/jsm/postprocessing/OutputPass.js', 'examples/jsm/postprocessing/SSAOPass.js'];
+  'examples/jsm/postprocessing/UnrealBloomPass.js', 'examples/jsm/postprocessing/OutputPass.js', 'examples/jsm/postprocessing/SSAOPass.js',
+  'examples/jsm/environments/RoomEnvironment.js'];
 const seen = new Set(); let n = 0;
 async function grab(rel) {
   if (seen.has(rel)) return; seen.add(rel);

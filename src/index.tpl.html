@@ -181,6 +181,19 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 .sf-brand{font-family:var(--fd);font-weight:700;font-size:1.15rem;letter-spacing:.04em}
 .sf-brand b{color:var(--race,var(--rift1))}
 .sf-legal{font-family:var(--fm);font-size:11px;color:var(--fg2)}
+#leader{position:absolute;left:12px;top:52px;width:124px;z-index:3;--pc:var(--race,#FF5E3A)}
+#leader .lframe{position:relative;width:118px;height:118px;border:2px solid var(--pc);border-radius:6px;background:radial-gradient(70% 70% at 50% 65%,color-mix(in srgb,var(--pc) 28%,transparent),#060709 80%);overflow:hidden;box-shadow:0 0 16px color-mix(in srgb,var(--pc) 45%,transparent)}
+#leader img{position:absolute;left:50%;bottom:-6px;width:96px;transform:translateX(-50%);animation:lfloat 4s ease-in-out infinite;image-rendering:auto}
+#leader .lscan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 2px,transparent 2px 5px);pointer-events:none}
+#leader .lframe::after{content:"";position:absolute;left:0;right:0;top:-40%;height:30%;background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--pc) 35%,transparent),transparent);animation:lsweep 3.4s linear infinite}
+#leader .lname{font-family:var(--fd);font-size:17px;text-transform:uppercase;letter-spacing:.04em;margin-top:4px;text-shadow:0 1px 6px #000}
+#leader .lsub{font-family:var(--fm);font-size:10px;color:var(--pc)}
+#leader.talk .lframe{animation:ltalk .9s ease-in-out}
+@keyframes lfloat{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
+@keyframes lsweep{0%{top:-40%}100%{top:120%}}
+@keyframes ltalk{0%,100%{transform:scale(1)}25%{transform:scale(1.04)}60%{transform:scale(.98)}}
+@media (max-width:760px),(max-height:560px){#leader{display:none}}
+@media (prefers-reduced-motion:reduce){#leader img,#leader .lframe::after{animation:none}}
 #errbox{position:fixed;left:8px;bottom:8px;background:#5a1d1d;color:#fff;padding:.4rem .6rem;border-radius:6px;font-family:var(--fm);font-size:12px;z-index:9;max-width:80vw;cursor:pointer}
 </style>
 
@@ -238,6 +251,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
       <span class="muted">Inimigos: <b id="enemies">0</b></span>
       <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-sound" class="tb" title="Som">♪</button><button id="btn-voice" class="tb" title="Voz do sistema">🗣</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
     </div>
+    <div id="leader" hidden><div class="lframe"><img id="leader-img" alt=""><div class="lscan"></div></div><div class="lname" id="leader-name"></div><div class="lsub">● em chamada</div></div>
     <div id="hints"><button id="hints-close" aria-label="Fechar dicas">✕</button><div id="hints-body"></div></div>
     <div id="panel"></div>
     <div id="right">

@@ -181,6 +181,19 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 .sf-brand{font-family:var(--fd);font-weight:700;font-size:1.15rem;letter-spacing:.04em}
 .sf-brand b{color:var(--race,var(--rift1))}
 .sf-legal{font-family:var(--fm);font-size:11px;color:var(--fg2)}
+#leader{position:absolute;left:12px;top:52px;width:124px;z-index:3;--pc:var(--race,#FF5E3A)}
+#leader .lframe{position:relative;width:118px;height:118px;border:2px solid var(--pc);border-radius:6px;background:radial-gradient(70% 70% at 50% 65%,color-mix(in srgb,var(--pc) 28%,transparent),#060709 80%);overflow:hidden;box-shadow:0 0 16px color-mix(in srgb,var(--pc) 45%,transparent)}
+#leader img{position:absolute;left:50%;bottom:-6px;width:96px;transform:translateX(-50%);animation:lfloat 4s ease-in-out infinite;image-rendering:auto}
+#leader .lscan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 2px,transparent 2px 5px);pointer-events:none}
+#leader .lframe::after{content:"";position:absolute;left:0;right:0;top:-40%;height:30%;background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--pc) 35%,transparent),transparent);animation:lsweep 3.4s linear infinite}
+#leader .lname{font-family:var(--fd);font-size:17px;text-transform:uppercase;letter-spacing:.04em;margin-top:4px;text-shadow:0 1px 6px #000}
+#leader .lsub{font-family:var(--fm);font-size:10px;color:var(--pc)}
+#leader.talk .lframe{animation:ltalk .9s ease-in-out}
+@keyframes lfloat{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-3px)}}
+@keyframes lsweep{0%{top:-40%}100%{top:120%}}
+@keyframes ltalk{0%,100%{transform:scale(1)}25%{transform:scale(1.04)}60%{transform:scale(.98)}}
+@media (max-width:760px),(max-height:560px){#leader{display:none}}
+@media (prefers-reduced-motion:reduce){#leader img,#leader .lframe::after{animation:none}}
 #errbox{position:fixed;left:8px;bottom:8px;background:#5a1d1d;color:#fff;padding:.4rem .6rem;border-radius:6px;font-family:var(--fm);font-size:12px;z-index:9;max-width:80vw;cursor:pointer}
 </style></head><body>
 
@@ -238,6 +251,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
       <span class="muted">Inimigos: <b id="enemies">0</b></span>
       <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-sound" class="tb" title="Som">♪</button><button id="btn-voice" class="tb" title="Voz do sistema">🗣</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
     </div>
+    <div id="leader" hidden><div class="lframe"><img id="leader-img" alt=""><div class="lscan"></div></div><div class="lname" id="leader-name"></div><div class="lsub">● em chamada</div></div>
     <div id="hints"><button id="hints-close" aria-label="Fechar dicas">✕</button><div id="hints-body"></div></div>
     <div id="panel"></div>
     <div id="right">
@@ -2124,6 +2138,72 @@ function buildGeometry(model, opts) {
 ARD.vox3d = { buildGeometry };
 })(globalThis.ARD = globalThis.ARD || {});
 
+/* Líderes das Raças: bustos voxel usados no HUD (retrato 2.5D) e na arte da galeria. Mesma API Model do jogo (+x é a frente). */
+(function (ARD) {
+'use strict';
+const V = ARD.vox; const M = () => new V.Model();
+const B = {};
+// ---- Vehnar: Barão-Forja — elmo pesado, visor de fornalha, chaminés nos ombros
+B.vehnar = () => { const m = M(); const steel = '#9aa6b8', dk = '#596274', rust = '#a8542e', org = '#ff7733', ember = '#ffc08a';
+  m.cyl(0, 9, 0, 10.5, 6, dk);                              // ombros arredondados
+  m.box(-8, 0, 6, 16, 18, 3, steel);                      // placa peitoral
+  m.box(-7, 2, 9, 14, 14, 2, dk);                         // gola
+  m.box(-6, 4, 11, 12, 10, 12, steel);                    // elmo
+  m.box(-6, 4, 11, 12, 10, 12, dk, (x, y, z) => (x === 0 || x === 11) && (y === 0 || y === 9) && z % 3 === 0); // rebites nas arestas
+  m.box(-6, 6, 23, 12, 6, 1, dk);                         // topo chato
+  m.box(6, 5, 17, 1, 8, 2, org, null, true);              // visor emissivo (face +x)
+  m.box(6, 5, 16, 1, 8, 1, dk); m.box(6, 5, 19, 1, 8, 1, dk);
+  m.box(6, 6, 12, 1, 6, 3, dk, (x, y, z) => y % 2 === 0); // grade do queixo
+  m.cyl(-6, 0, 6, 2.2, 9, rust); m.cyl(-6, 18, 6, 2.2, 9, rust); // chaminés
+  m.box(-7, -1, 15, 2, 2, 1, ember, null, true); m.box(-7, 17, 15, 2, 2, 1, ember, null, true); // brasa no topo
+  m.box(-2, 7, 7, 4, 4, 1, org, null, true);              // núcleo do reator no peito
+  return m; };
+// ---- Erevane: Olho do Véu — cúpula iridescente, olho-fenda, colar de lâminas
+B.erevane = () => { const m = M(); const bands = ['#2a4a66', '#33587a', '#3b6a8a', '#2f6f7a', '#3c6e9a'];
+  m.cyl(0, 9, 0, 9, 4, '#223447');                       // ombros
+  m.cyl(0, 9, 4, 7, 2, '#2d4660');
+  m.box(-10, 2, 5, 3, 14, 1, '#4a7a9e'); m.box(7, 2, 5, 3, 14, 1, '#4a7a9e'); // lâminas do colar
+  m.cyl(0, 9, 6, 2.5, 4, '#2d4660');                      // pescoço
+  for (let z = 0; z < 13; z++) { const r = z < 10 ? 6.5 : 6.5 - (z - 9) * 1.6; m.cyl(0, 9, 10 + z, Math.max(1.5, r), 1, bands[z % bands.length]); } // cúpula em bandas
+  m.box(5, 4, 15, 2, 10, 2, '#33ffd0', null, true);       // olho-fenda
+  m.box(5, 4, 14, 2, 10, 1, '#071017'); m.box(5, 4, 17, 2, 10, 1, '#071017');
+  m.box(-1, 2, 20, 1, 1, 1, '#9fe8ff', null, true); m.box(2, 14, 21, 1, 1, 1, '#9fe8ff', null, true); // brilhos iridescentes
+  return m; };
+// ---- Tessara: Jardineira de Traços — cabeça bulbosa, frondes, seiva âmbar
+B.tessara = () => { const m = M(); const g = '#49a86a', gd = '#2f7a4a', amber = '#e6b85c', eye = '#7fffb0';
+  m.cyl(0, 9, 0, 9, 4, gd); m.cyl(0, 9, 4, 5.5, 3, gd);         // ombros orgânicos e pescoço
+  m.box(-2, 7, 5, 4, 4, 2, amber, null, true);                   // seiva no peito
+  m.sphere(0, 9, 14, 6.5, g); m.sphere(0, 9, 11.5, 5.5, gd);     // cabeça com parte de baixo escura
+  m.sphere(5.5, 6, 15, 1.6, eye, true); m.sphere(5.5, 12, 15, 1.6, eye, true); // olhos grandes
+  m.box(6, 8, 12, 1, 2, 1, amber, null, true);                   // boca-núcleo
+  for (const [fx, fy, h] of [[-3, 4, 8], [0, 9, 10], [-2, 14, 7], [3, 6, 6], [2, 12, 6]]) { m.box(fx, fy, 20, 1, 1, h, g); m.box(fx, fy, 20 + h, 1, 1, 1, amber, null, true); } // frondes com ponta âmbar
+  return m; };
+// ---- Quorith: Primeira Voz — octaedro de cristal sólido flutuando sobre um anel
+B.quorith = () => { const m = M(); const top = '#d4b8ff', mid = '#b388ff', low = '#6d50b8', w = '#ffffff';
+  m.cyl(0, 9, 0, 7, 2, '#5a4a8a'); m.cyl(0, 9, 2, 5, 1, '#7a68b0'); m.cyl(0, 9, 1, 2, 3, mid, true); // anel-base com núcleo
+  const oct = (z0, h, c) => m.box(-8, 1, z0, 17, 17, h, c, (x, y, z, ww, dd) => Math.abs(x - 8) + Math.abs(y - 8) + Math.abs((z + z0) - 14) <= 8);
+  oct(6, 6, low); oct(12, 5, mid); oct(17, 6, top);                      // três faixas de cor
+  m.box(7, 6, 13, 1, 2, 1, w, null, true); m.box(7, 10, 13, 1, 2, 1, w, null, true); // fendas de luz na faceta frontal
+  m.box(-10, 2, 12, 2, 2, 3, mid); m.box(8, 16, 17, 2, 2, 3, top); m.box(-4, 18, 20, 1, 1, 2, w, null, true); // lascas flutuantes
+  return m; };
+// ---- Vorag: Boca da Prole — carapaça larga, quatro olhos, mandíbula de osso
+B.vorag = () => { const m = M(); const red = '#b8384a', red2 = '#86202f', hot = '#ff6a7c', bone = '#f0e6d2', amber = '#ffc24a', dkk = '#3a0c14';
+  m.cyl(0, 9, 0, 9, 4, red2); m.box(-4, 5, 4, 8, 8, 3, red2);           // tórax e pescoço
+  m.box(-6, 0, 7, 12, 18, 8, red);                                       // cabeça larga
+  m.box(-6, 0, 15, 12, 18, 1, red2); m.box(-4, 3, 16, 8, 12, 1, red2); m.box(-2, 6, 17, 4, 6, 1, red2); // carapaça em degraus
+  m.box(-7, -1, 9, 2, 2, 4, red2); m.box(-7, 17, 9, 2, 2, 4, red2);      // bordas laterais
+  m.box(6, 4, 11, 1, 3, 3, amber, null, true); m.box(6, 11, 11, 1, 3, 3, amber, null, true); // olhos grandes
+  m.box(6, 2, 14, 1, 1, 1, amber, null, true); m.box(6, 15, 14, 1, 1, 1, amber, null, true); // olhos pequenos
+  m.box(1, 1, 4, 8, 16, 2, red);                                          // maxilar inferior projetado
+  m.box(7, 1, 6, 2, 16, 1, bone, (x, y) => y % 2 === 0);                  // dentes inferiores
+  m.box(7, 1, 8, 2, 16, 1, bone, (x, y) => y % 2 === 1);                  // dentes superiores
+  m.box(1, 2, 6, 6, 14, 2, dkk);                                          // goela escura
+  m.box(7, -3, 8, 5, 3, 2, hot); m.box(7, 18, 8, 5, 3, 2, hot);           // mandíbulas laterais
+  m.box(12, -3, 9, 1, 3, 1, bone); m.box(12, 18, 9, 1, 3, 1, bone);
+  return m; };
+ARD.leaders = B;
+})(globalThis.ARD = globalThis.ARD || {});
+
 /* Renderizador isométrico com sprites voxel (v2.0): torretas que giram, projéteis, impactos, carcaças, veterância,
    névoa em três camadas (nunca visto / explorado / visível), Tempestade de Éter, dia e noite. Só lê a simulação. */
 (function (ARD) {
@@ -3317,7 +3397,8 @@ const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-10 16:30Z';
+const BUILD = '2026-10-10 17:44Z';
+const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
 let G = null; // game state
 ARD.inspect = () => { if (!G || !G.sim) return null; const sim = G.sim; return { tick: sim.tick, time: sim.time, hash: S.hash(sim), human: G.human, waiting: G.waiting, ended: G.ended, mpWait: $('mp-wait') ? $('mp-wait').hidden === false : null, net: G.net ? { state: G.net.state, role: G.net.role, code: G.net.code, desync: G.net.desync, rtt: Math.round(G.net.rtt) } : null, players: sim.players.map(p => ({ id: p.id, name: p.name, faction: p.faction, human: p.human, alive: p.alive, nucleo: !!S.nucleoOf(sim, p.id), units: sim.ents.filter(e => e.alive && e.kind === 'unit' && e.owner === p.id).length })), hashLog: G.hashLog ? Object.assign({}, G.hashLog) : null }; };
@@ -3481,6 +3562,8 @@ function startGame(cfg, netCtx) {
   if (R.setQuality) R.setQuality(params.get('q') || cfg.quality || 'auto', { ssao: params.has('ssao') ? params.get('ssao') === '1' : null, shadowMap: params.get('sm') ? parseInt(params.get('sm'), 10) : null, post: params.has('post') ? params.get('post') === '1' : null });
   if (R.setClimate) R.setClimate(params.get('clima') || cfg.clima || 'auto');
   if (R.is3d) R.onDegrade = (what, reason) => { if (what) banner('Qualidade 3D reduzida', what + ' desativada: ' + reason + '. Se continuar escuro, escolha outra qualidade na tela inicial e envie o feedback.', 'warn'); else banner('Renderização 3D falhou', 'Volte à tela inicial e escolha Gráficos: 2D. Exporte o resultado e envie o feedback.', 'danger'); };
+  // protótipo 4.0a: o líder da Raça em "chamada" no canto do HUD (retrato 2.5D renderizado na hora pelo motor voxel)
+  try { const fac = sim.players[human].faction; if (ARD.leaders && ARD.leaders[fac] && $('leader')) { const sp = ARD.vox.renderSprite(ARD.leaders[fac](), 0.62, 3, {}); $('leader-img').src = sp.canvas.toDataURL(); $('leader-name').textContent = 'Líder ' + (S.FACTIONS[fac].short || fac); $('leader').style.setProperty('--pc', RACE_COLORS[fac] || '#FF5E3A'); $('leader').hidden = false; } } catch (e) { console.warn('[ARD] retrato do líder indisponível:', e); }
   R.resize();
   const nuc = S.nucleoOf(sim, human);
   if (params.get('demo') === 'birth' && !net) { sim.players[human].res.minerio += 1500; sim.players[human].res.plasma += 600; ['reator', 'refinaria', 'quartel'].forEach((d, i) => S.enqueue(sim, { t: 'build', p: human, def: d, x: nuc.x + 75 + (i % 2) * 95, y: nuc.y - 80 + i * 80, ang: 0 })); } // depuração: três canteiros para ver o nascimento
@@ -3593,7 +3676,7 @@ function startGame(cfg, netCtx) {
     setTimeout(() => { el.classList.add('fade'); }, 9000); setTimeout(() => el.remove(), 14000);
     const log = $('log'); const li = document.createElement('div'); li.textContent = mmss(sim.time) + ' · ' + e.text; log.prepend(li); while (log.children.length > 40) log.lastChild.remove();
   }
-  function banner(title, sub, kind) { const b = $('banner'); $('banner-title').textContent = title; $('banner-sub').textContent = sub || ''; b.className = 'banner ' + (kind || 'info'); b.hidden = false; clearTimeout(G.bannerT); G.bannerT = setTimeout(() => { b.hidden = true; }, 5000); }
+  function banner(title, sub, kind) { const L = $('leader'); if (L && !L.hidden) { L.classList.remove('talk'); void L.offsetWidth; L.classList.add('talk'); } const b = $('banner'); $('banner-title').textContent = title; $('banner-sub').textContent = sub || ''; b.className = 'banner ' + (kind || 'info'); b.hidden = false; clearTimeout(G.bannerT); G.bannerT = setTimeout(() => { b.hidden = true; }, 5000); }
   function notice(text) { const n = $('notice'); n.textContent = text; n.classList.add('show'); clearTimeout(G.noticeT); G.noticeT = setTimeout(() => n.classList.remove('show'), 2200); }
 
   // ---------- HUD ----------

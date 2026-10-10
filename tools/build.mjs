@@ -8,7 +8,7 @@ function wrap(page) { const i = page.indexOf('</style>') + 8; return HEAD + page
 const BUILD = new Date().toISOString().slice(0, 16).replace('T', ' ') + 'Z';
 function bundle(tpl, scripts) { return read(tpl).replace('<!--SCRIPTS-->', '<script>\n' + scripts.map(read).join('\n') + '\n</script>').replace(/__BUILD__/g, BUILD); }
 mkdirSync(root + 'dist', { recursive: true });
-const game = bundle('src/index.tpl.html', ['src/sim.js', 'src/ai.js', 'src/voxel.js', 'src/models.js', 'src/vox3d.js', 'src/render.js', 'src/render3d.js', 'src/audio.js', 'src/net.js', 'src/input.js', 'src/main.js']);
+const game = bundle('src/index.tpl.html', ['src/sim.js', 'src/ai.js', 'src/voxel.js', 'src/models.js', 'src/vox3d.js', 'src/leaders.js', 'src/render.js', 'src/render3d.js', 'src/audio.js', 'src/net.js', 'src/input.js', 'src/main.js']);
 writeFileSync(root + 'dist/aether-rift-beta.html', game); writeFileSync(root + 'index.html', wrap(game));
 // Cópia para testes headless com three vendorizado (node tools/vendor.mjs); carrega sem rede.
 import { existsSync } from 'node:fs';
