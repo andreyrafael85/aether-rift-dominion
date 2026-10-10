@@ -14,6 +14,11 @@ function create(canvas, overlay, mini) {
   const _v = new THREE.Vector3(), _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3(), _c = new THREE.Color(); const UP = new THREE.Vector3(0, 1, 0);
   const R = { canvas, w: 0, h: 0, dpr: 1, K: 1.7, zoomMin: 0.55, zoomMax: 2.4, supportsYaw: true, fx: { floats: [], rings: [] }, time: 0, shake: 0, icons: new Map(), geos: new Map(), inst: new Map(), sim: null, night: 0, spriteCache: new Map(), is3d: true };
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+  R.gpu = '?'; R.shaderErrors = []; R.degraded = [];
+  try { const gl = renderer.getContext(); const ext = gl.getExtension('WEBGL_debug_renderer_info'); R.gpu = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); } catch (e) {}
+  // Erros de shader viram mensagens legíveis (three cala o console.error próprio quando este hook existe).
+  renderer.debug.onShaderError = (gl, program, vs, fs) => { let src = '', log = ''; try { src = gl.getShaderSource(fs) || ''; log = (gl.getProgramInfoLog(program) || gl.getShaderInfoLog(fs) || gl.getShaderInfoLog(vs) || '').trim(); } catch (e) {} const tag = src.includes('kernelRadius') ? 'SSAO' : src.includes('fogMap') ? 'terreno' : src.includes('luminosityThreshold') || src.includes('blurTexture') ? 'bloom' : 'material'; const msg = 'Shader (' + tag + '): ' + (log || 'falha de compilação').slice(0, 300); R.shaderErrors.push(msg); console.error('[ARD] ' + msg); };
+  console.log('[ARD] GPU: ' + R.gpu + ' · WebGL2: ' + !!renderer.capabilities.isWebGL2);
   const isTouch = matchMedia('(pointer: coarse)').matches;
   renderer.setPixelRatio(Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1));
   renderer.shadowMap.enabled = !isTouch; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
@@ -33,16 +38,43 @@ function create(canvas, overlay, mini) {
     composer.addPass(new ADD.OutputPass());
     if (R.w) composer.setSize(R.w, R.h);
   }
+  function applyShadows() { const q = R.quality; renderer.shadowMap.enabled = q.shadows; if (typeof sun !== 'undefined') { sun.castShadow = q.shadows; sun.shadow.mapSize.set(q.shadowMap, q.shadowMap); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } } scene.traverse(o => { if (o.isInstancedMesh || o.isMesh) o.castShadow = o.castShadow && q.shadows; }); }
+  // Vigia de quadro preto: após (re)configurar a qualidade, lê alguns pixels do canvas nos primeiros segundos de jogo.
+  // Se vierem todos pretos repetidamente, reduz a qualidade em etapas (oclusão → pós → sombras 4K → sombras) e avisa via R.onDegrade.
+  R.wd = null; R.onDegrade = null;
+  function armWatchdog() { R.wd = { t0: R.time, last: R.time, black: 0, pix: new Uint8Array(64) }; }
+  function checkFrame() {
+    const wd = R.wd; if (!wd) return; if (R.time - wd.last < 0.25) return; wd.last = R.time;
+    if (R.time - wd.t0 > 15) { R.wd = null; return; }
+    const gl = renderer.getContext(); if (!gl || gl.isContextLost()) return;
+    const W = gl.drawingBufferWidth, Hh = gl.drawingBufferHeight; let maxv = 0;
+    for (const f of [[0.5, 0.5], [0.3, 0.3], [0.7, 0.3], [0.3, 0.7], [0.7, 0.7]]) {
+      gl.readPixels(Math.max(0, (W * f[0]) | 0), Math.max(0, (Hh * f[1]) | 0), 4, 4, gl.RGBA, gl.UNSIGNED_BYTE, wd.pix);
+      for (let i = 0; i < 64; i++) if ((i & 3) !== 3 && wd.pix[i] > maxv) maxv = wd.pix[i];
+    }
+    if (R.debug) console.log('[ARD] vigia: max=' + maxv + ' pretos=' + wd.black + ' t=' + (R.time - wd.t0).toFixed(1));
+    if (maxv > 4) { R.wd = null; return; }
+    if (++wd.black >= 2) degrade('o quadro 3D saiu todo preto');
+  }
+  function degrade(reason) {
+    const q = R.quality; let what = null;
+    if (q.ssao) { q.ssao = false; what = 'oclusão ambiente'; buildComposer(); }
+    else if (q.post) { q.post = false; what = 'pós-processamento (bloom)'; buildComposer(); }
+    else if (q.shadows && q.shadowMap > 2048) { q.shadowMap = 2048; what = 'sombras 4K (agora 2K)'; applyShadows(); }
+    else if (q.shadows) { q.shadows = false; what = 'sombras'; applyShadows(); }
+    R.wd = null;
+    if (what) { R.degraded.push(what); console.warn('[ARD] Qualidade reduzida: ' + what + ' — ' + reason + ' (GPU: ' + R.gpu + ')'); armWatchdog(); }
+    else console.error('[ARD] Renderização 3D falhou mesmo sem efeitos (GPU: ' + R.gpu + ')');
+    if (R.onDegrade) R.onDegrade(what, reason);
+  }
   R.setQuality = function (name, over) {
     const q = R.quality; q.name = name; over = over || {};
     if (name === 'auto') name = isTouch ? 'baixa' : 'media';
     if (name === 'baixa') { q.shadows = false; q.post = false; q.ssao = false; q.pr = 1; q.particles = 0.5; }
-    else if (name === 'alta') { q.shadows = true; q.shadowMap = 4096; q.post = !!ADD; q.ssao = !!ADD; q.pr = Math.min(2, window.devicePixelRatio || 1); q.particles = 1; }
+    else if (name === 'alta' || name === 'ultra') { q.shadows = true; q.shadowMap = 4096; q.post = !!ADD; q.ssao = name === 'ultra' && !!ADD; q.pr = Math.min(2, window.devicePixelRatio || 1); q.particles = 1; }
     else { q.shadows = !isTouch; q.shadowMap = 2048; q.post = !!ADD; q.ssao = false; q.pr = Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1); q.particles = 1; }
     if (over.ssao != null) q.ssao = over.ssao && !!ADD; if (over.shadowMap) q.shadowMap = over.shadowMap; if (over.post != null) q.post = over.post && !!ADD;
-    renderer.shadowMap.enabled = q.shadows; renderer.setPixelRatio(q.pr); if (typeof sun !== 'undefined') { sun.castShadow = q.shadows; sun.shadow.mapSize.set(q.shadowMap, q.shadowMap); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
-    scene.traverse(o => { if (o.isInstancedMesh || o.isMesh) o.castShadow = o.castShadow && q.shadows; });
-    buildComposer();
+    renderer.setPixelRatio(q.pr); applyShadows(); buildComposer(); armWatchdog();
   };
   const octx = overlay.getContext('2d'); const mctx = mini.getContext('2d'); const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
   const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(38, 1, 30, 6000);
@@ -273,6 +305,8 @@ function create(canvas, overlay, mini) {
     if (R.poolMat) R.poolMat.uniforms.uTime.value = R.time; for (const pl of R.poolLights) pl.intensity = 120 * nt + 20;
     for (const sp of R.mist) { const u = sp.userData; if (u.kind === 'rift') { const zz = u.z + Math.sin(R.time * 0.3 + u.ph) * 8; sp.position.set(u.x + Math.sin(R.time * 0.2 + u.ph) * 20, H(u.x, u.y) + zz, -u.y); sp.scale.set(u.s, u.s * 0.7, 1); sp.material.opacity = 0.16 + 0.1 * nt; } else { if (st && st.phase === 'active') { sp.visible = true; const a = u.ox * TAU + R.time * 0.05, rr = u.oy * st.r * 0.9; const px = st.x + Math.cos(a) * rr, py = st.y + Math.sin(a) * rr; sp.position.set(px, H(px, py) + u.z, -py); sp.scale.set(u.s, u.s * 0.6, 1); } else sp.visible = false; } }
     if (composer) { composer.render(); } else renderer.render(scene, camera);
+    if (R.testBlack && R.quality.ssao) { const pc = renderer.getClearColor(new THREE.Color()), pa = renderer.getClearAlpha(); renderer.setClearColor(0x000000, 1); renderer.clear(true, false, false); renderer.setClearColor(pc, pa); } // ?testblack=1: simula falha da GPU enquanto o SSAO está ligado
+    checkFrame();
     drawOverlay(sim, view, hpList, me);
     drawMinimap(sim, view);
   };

@@ -179,7 +179,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         <div class="opt"><label for="opt-diff">Dificuldade</label><select id="opt-diff"><option value="facil">Fácil</option><option value="normal">Normal</option><option value="dificil">Difícil</option></select></div>
         <div class="opt"><label for="opt-seed">Semente do mapa</label><input id="opt-seed" inputmode="numeric"></div>
         <div class="opt"><label for="opt-gfx">Gráficos</label><select id="opt-gfx"><option value="3d">3D (Three.js, luz e relevo)</option><option value="2d">2D isométrico (leve, para celulares fracos)</option></select></div>
-        <div class="opt"><label for="opt-quality">Qualidade 3D</label><select id="opt-quality"><option value="auto">Automática</option><option value="baixa">Baixa (sem sombras e efeitos)</option><option value="media">Média (sombras e bloom)</option><option value="alta">Alta (sombras 4K, bloom e oclusão ambiente)</option></select></div>
+        <div class="opt"><label for="opt-quality">Qualidade 3D</label><select id="opt-quality"><option value="auto">Automática</option><option value="baixa">Baixa (sem sombras e efeitos)</option><option value="media">Média (sombras e bloom)</option><option value="alta">Alta (sombras 4K e bloom)</option><option value="ultra">Ultra (Alta + oclusão ambiente, experimental)</option></select></div>
         <div class="row"><button id="btn-start" class="btn primary">Iniciar partida</button><button id="btn-help-start" class="btn">Como jogar</button></div>
         <div class="mp">
           <div class="opt"><label>Multiplayer P2P (beta): 2 jogadores por código de sala, mais as IAs escolhidas acima</label></div>
@@ -189,6 +189,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
       </div>
     </div>
     <p class="start-notes"><b>Novo no 3.0c:</b> a facção Tessara (Traços de combate, Fotossíntese, Salto Evolutivo) e oito unidades novas: Soldador, Guindaste Armado, Tratorzão e Prensa para Vehnar; Atirador de Fenda, Lâmina Rodante, Mosquito e Âncora para Erevane; Quimera, Esporo-sentinela, Molde e Colosso para Tessara. Banner de eliminação e contador de inimigos. <b>No 3.0b:</b> bloom nos emissivos, oclusão ambiente no preset Alta, névoa volumétrica na Fenda e na Tempestade, lagos de plasma animados, presets de qualidade, e <b>multiplayer P2P</b>: crie uma sala, mande o código para um amigo e joguem na mesma partida (com as IAs escolhidas). <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
+    <p class="start-notes" id="build-info" style="opacity:.65;font-size:12px"></p>
   </div>
 </div>
 
@@ -2438,6 +2439,11 @@ function create(canvas, overlay, mini) {
   const _v = new THREE.Vector3(), _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3(), _c = new THREE.Color(); const UP = new THREE.Vector3(0, 1, 0);
   const R = { canvas, w: 0, h: 0, dpr: 1, K: 1.7, zoomMin: 0.55, zoomMax: 2.4, supportsYaw: true, fx: { floats: [], rings: [] }, time: 0, shake: 0, icons: new Map(), geos: new Map(), inst: new Map(), sim: null, night: 0, spriteCache: new Map(), is3d: true };
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+  R.gpu = '?'; R.shaderErrors = []; R.degraded = [];
+  try { const gl = renderer.getContext(); const ext = gl.getExtension('WEBGL_debug_renderer_info'); R.gpu = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); } catch (e) {}
+  // Erros de shader viram mensagens legíveis (three cala o console.error próprio quando este hook existe).
+  renderer.debug.onShaderError = (gl, program, vs, fs) => { let src = '', log = ''; try { src = gl.getShaderSource(fs) || ''; log = (gl.getProgramInfoLog(program) || gl.getShaderInfoLog(fs) || gl.getShaderInfoLog(vs) || '').trim(); } catch (e) {} const tag = src.includes('kernelRadius') ? 'SSAO' : src.includes('fogMap') ? 'terreno' : src.includes('luminosityThreshold') || src.includes('blurTexture') ? 'bloom' : 'material'; const msg = 'Shader (' + tag + '): ' + (log || 'falha de compilação').slice(0, 300); R.shaderErrors.push(msg); console.error('[ARD] ' + msg); };
+  console.log('[ARD] GPU: ' + R.gpu + ' · WebGL2: ' + !!renderer.capabilities.isWebGL2);
   const isTouch = matchMedia('(pointer: coarse)').matches;
   renderer.setPixelRatio(Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1));
   renderer.shadowMap.enabled = !isTouch; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
@@ -2457,16 +2463,43 @@ function create(canvas, overlay, mini) {
     composer.addPass(new ADD.OutputPass());
     if (R.w) composer.setSize(R.w, R.h);
   }
+  function applyShadows() { const q = R.quality; renderer.shadowMap.enabled = q.shadows; if (typeof sun !== 'undefined') { sun.castShadow = q.shadows; sun.shadow.mapSize.set(q.shadowMap, q.shadowMap); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } } scene.traverse(o => { if (o.isInstancedMesh || o.isMesh) o.castShadow = o.castShadow && q.shadows; }); }
+  // Vigia de quadro preto: após (re)configurar a qualidade, lê alguns pixels do canvas nos primeiros segundos de jogo.
+  // Se vierem todos pretos repetidamente, reduz a qualidade em etapas (oclusão → pós → sombras 4K → sombras) e avisa via R.onDegrade.
+  R.wd = null; R.onDegrade = null;
+  function armWatchdog() { R.wd = { t0: R.time, last: R.time, black: 0, pix: new Uint8Array(64) }; }
+  function checkFrame() {
+    const wd = R.wd; if (!wd) return; if (R.time - wd.last < 0.25) return; wd.last = R.time;
+    if (R.time - wd.t0 > 15) { R.wd = null; return; }
+    const gl = renderer.getContext(); if (!gl || gl.isContextLost()) return;
+    const W = gl.drawingBufferWidth, Hh = gl.drawingBufferHeight; let maxv = 0;
+    for (const f of [[0.5, 0.5], [0.3, 0.3], [0.7, 0.3], [0.3, 0.7], [0.7, 0.7]]) {
+      gl.readPixels(Math.max(0, (W * f[0]) | 0), Math.max(0, (Hh * f[1]) | 0), 4, 4, gl.RGBA, gl.UNSIGNED_BYTE, wd.pix);
+      for (let i = 0; i < 64; i++) if ((i & 3) !== 3 && wd.pix[i] > maxv) maxv = wd.pix[i];
+    }
+    if (R.debug) console.log('[ARD] vigia: max=' + maxv + ' pretos=' + wd.black + ' t=' + (R.time - wd.t0).toFixed(1));
+    if (maxv > 4) { R.wd = null; return; }
+    if (++wd.black >= 2) degrade('o quadro 3D saiu todo preto');
+  }
+  function degrade(reason) {
+    const q = R.quality; let what = null;
+    if (q.ssao) { q.ssao = false; what = 'oclusão ambiente'; buildComposer(); }
+    else if (q.post) { q.post = false; what = 'pós-processamento (bloom)'; buildComposer(); }
+    else if (q.shadows && q.shadowMap > 2048) { q.shadowMap = 2048; what = 'sombras 4K (agora 2K)'; applyShadows(); }
+    else if (q.shadows) { q.shadows = false; what = 'sombras'; applyShadows(); }
+    R.wd = null;
+    if (what) { R.degraded.push(what); console.warn('[ARD] Qualidade reduzida: ' + what + ' — ' + reason + ' (GPU: ' + R.gpu + ')'); armWatchdog(); }
+    else console.error('[ARD] Renderização 3D falhou mesmo sem efeitos (GPU: ' + R.gpu + ')');
+    if (R.onDegrade) R.onDegrade(what, reason);
+  }
   R.setQuality = function (name, over) {
     const q = R.quality; q.name = name; over = over || {};
     if (name === 'auto') name = isTouch ? 'baixa' : 'media';
     if (name === 'baixa') { q.shadows = false; q.post = false; q.ssao = false; q.pr = 1; q.particles = 0.5; }
-    else if (name === 'alta') { q.shadows = true; q.shadowMap = 4096; q.post = !!ADD; q.ssao = !!ADD; q.pr = Math.min(2, window.devicePixelRatio || 1); q.particles = 1; }
+    else if (name === 'alta' || name === 'ultra') { q.shadows = true; q.shadowMap = 4096; q.post = !!ADD; q.ssao = name === 'ultra' && !!ADD; q.pr = Math.min(2, window.devicePixelRatio || 1); q.particles = 1; }
     else { q.shadows = !isTouch; q.shadowMap = 2048; q.post = !!ADD; q.ssao = false; q.pr = Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1); q.particles = 1; }
     if (over.ssao != null) q.ssao = over.ssao && !!ADD; if (over.shadowMap) q.shadowMap = over.shadowMap; if (over.post != null) q.post = over.post && !!ADD;
-    renderer.shadowMap.enabled = q.shadows; renderer.setPixelRatio(q.pr); if (typeof sun !== 'undefined') { sun.castShadow = q.shadows; sun.shadow.mapSize.set(q.shadowMap, q.shadowMap); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
-    scene.traverse(o => { if (o.isInstancedMesh || o.isMesh) o.castShadow = o.castShadow && q.shadows; });
-    buildComposer();
+    renderer.setPixelRatio(q.pr); applyShadows(); buildComposer(); armWatchdog();
   };
   const octx = overlay.getContext('2d'); const mctx = mini.getContext('2d'); const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
   const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(38, 1, 30, 6000);
@@ -2697,6 +2730,8 @@ function create(canvas, overlay, mini) {
     if (R.poolMat) R.poolMat.uniforms.uTime.value = R.time; for (const pl of R.poolLights) pl.intensity = 120 * nt + 20;
     for (const sp of R.mist) { const u = sp.userData; if (u.kind === 'rift') { const zz = u.z + Math.sin(R.time * 0.3 + u.ph) * 8; sp.position.set(u.x + Math.sin(R.time * 0.2 + u.ph) * 20, H(u.x, u.y) + zz, -u.y); sp.scale.set(u.s, u.s * 0.7, 1); sp.material.opacity = 0.16 + 0.1 * nt; } else { if (st && st.phase === 'active') { sp.visible = true; const a = u.ox * TAU + R.time * 0.05, rr = u.oy * st.r * 0.9; const px = st.x + Math.cos(a) * rr, py = st.y + Math.sin(a) * rr; sp.position.set(px, H(px, py) + u.z, -py); sp.scale.set(u.s, u.s * 0.6, 1); } else sp.visible = false; } }
     if (composer) { composer.render(); } else renderer.render(scene, camera);
+    if (R.testBlack && R.quality.ssao) { const pc = renderer.getClearColor(new THREE.Color()), pa = renderer.getClearAlpha(); renderer.setClearColor(0x000000, 1); renderer.clear(true, false, false); renderer.setClearColor(pc, pa); } // ?testblack=1: simula falha da GPU enquanto o SSAO está ligado
+    checkFrame();
     drawOverlay(sim, view, hpList, me);
     drawMinimap(sim, view);
   };
@@ -3077,6 +3112,8 @@ const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
+const BUILD = '2026-10-10 04:28Z';
+function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
 let G = null; // game state
 
 function whenThree(cb) {
@@ -3156,7 +3193,9 @@ function startGame(cfg, netCtx) {
   if (want3d && window.THREE) { try { R = ARD.render3d.create(canvas, overlay, mini); } catch (err) { console.warn('3D indisponível, usando 2D:', err); R = null; } }
   if (!R) { R = ARD.render.create(canvas, mini); overlay.hidden = true; if (want3d) setTimeout(() => notice('3D indisponível neste navegador; usando o modo 2D'), 1200); }
   if (params.get('ssaoout')) R.ssaoOut = parseInt(params.get('ssaoout'), 10);
+  if (params.get('testblack')) R.testBlack = true; R.debug = !!params.get('debug');
   if (R.setQuality) R.setQuality(params.get('q') || cfg.quality || 'auto', { ssao: params.has('ssao') ? params.get('ssao') === '1' : null, shadowMap: params.get('sm') ? parseInt(params.get('sm'), 10) : null, post: params.has('post') ? params.get('post') === '1' : null });
+  if (R.is3d) R.onDegrade = (what, reason) => { if (what) banner('Qualidade 3D reduzida', what + ' desativada: ' + reason + '. Se continuar escuro, escolha outra qualidade na tela inicial e envie o feedback.', 'warn'); else banner('Renderização 3D falhou', 'Volte à tela inicial e escolha Gráficos: 2D. Exporte o resultado e envie o feedback.', 'danger'); };
   R.resize();
   const nuc = S.nucleoOf(sim, human);
   const isTouch = matchMedia('(pointer: coarse)').matches || !!params.get('touch');
@@ -3456,7 +3495,7 @@ function startGame(cfg, netCtx) {
     $('end-scores').innerHTML = `<table><thead><tr><th>#</th><th>Jogador</th><th>Domínio</th></tr></thead><tbody>${rows}</tbody></table>`;
     $('end-stats').innerHTML = [['Coletado', fmt(st.collected)], ['Roubado', fmt(st.stolen)], ['Perdido para roubo', fmt(st.lost)], ['Unidades abatidas', st.unitsKilled], ['Unidades perdidas', st.unitsLost], ['Estruturas destruídas', st.buildingsDestroyed], ['Tratados', st.treaties], ['Traições', st.betrayals], ['Reputação final', S.REP_NAMES[p.rep]]].map(([k, v]) => `<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');
     $('btn-again').onclick = () => location.reload();
-    $('btn-copy').onclick = () => { const data = { versao: '3.0c', data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
+    $('btn-copy').onclick = () => { const data = { versao: '3.0c', data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
   }
 
   // ---------- UI bridge for input ----------
@@ -3478,6 +3517,7 @@ function startGame(cfg, netCtx) {
 function toggleHelp(force) { const h = $('help'); h.hidden = force === true ? false : !h.hidden; }
 
 window.addEventListener('error', e => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent = 'Erro: ' + (e.message || e.error); } });
+{ const setBuild = () => { const el = $('build-info'); if (el) el.textContent = 'Build ' + BUILD + ' · GPU: ' + gpuName(); }; if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setBuild); else setBuild(); }
 window.addEventListener('unhandledrejection', e => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent = 'Erro (promise): ' + (e.reason && (e.reason.stack || e.reason.message) || e.reason); } });
 document.addEventListener('DOMContentLoaded', initStart);
 if (params.get('debug')) { const oe = console.error, ow = console.warn; const cap = (...a) => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent += ' || ' + a.map(x => String(x && x.message || x)).join(' ').slice(0, 400); } }; console.error = (...a) => { cap(...a); oe.apply(console, a); }; console.warn = (...a) => { cap(...a); ow.apply(console, a); }; }
