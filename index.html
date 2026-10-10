@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>Aether Rift Beta</title>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>Aether Rift Dominion</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Jogo: mundo escuro único (sci-fi industrial), HUD em grafite com acentos da Fenda. Tema único, por decisão. */
@@ -164,16 +164,32 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 #end-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.4rem}
 .stat{display:grid;border:1px solid var(--line);border-radius:6px;padding:.4rem .6rem;font-size:12px}.stat span{color:var(--fg2)}
 .loadbar{height:6px;background:#262A31;border-radius:3px;overflow:hidden;margin-top:.5rem}.loadbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--rift1),var(--rift2));transition:width .15s}
+#start{position:relative}
+#bgfx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.start-wrap{position:relative;z-index:1}
+.choose{font-family:var(--fd);font-weight:700;font-size:1.2rem;text-transform:uppercase;letter-spacing:.05em;color:var(--fg2);margin-bottom:-.5rem}
+.fac-card{border-left:3px solid var(--rc,var(--line))}
+.fac-card:has(input:checked){border-color:var(--rc,var(--rift1));box-shadow:0 0 0 1px var(--rc,var(--rift1)) inset}
+.fac-card.soon{opacity:.72;cursor:default}
+.soon-badge{font-family:var(--fm);font-size:10px;letter-spacing:.1em;background:var(--rc);color:#14161A;border-radius:3px;padding:2px 6px;vertical-align:middle;margin-left:.4rem}
+.site-foot{border-top:1px solid var(--line);margin-top:1.25rem;padding-top:1rem;display:grid;gap:.5rem;font-size:13px}
+.site-foot nav{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+.site-foot a{color:var(--fg2)}
+.linklike{background:none;border:none;color:var(--fg2);font:inherit;cursor:pointer;padding:0;text-decoration:underline}
+.sf-brand{font-family:var(--fd);font-weight:700;font-size:1.15rem;letter-spacing:.04em}
+.sf-brand b{color:var(--race,var(--rift1))}
+.sf-legal{font-family:var(--fm);font-size:11px;color:var(--fg2)}
 #errbox{position:fixed;left:8px;bottom:8px;background:#5a1d1d;color:#fff;padding:.4rem .6rem;border-radius:6px;font-family:var(--fm);font-size:12px;z-index:9;max-width:80vw;cursor:pointer}
 </style></head><body>
 
 <div id="start" class="screen">
+  <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Beta 3.0d · três facções · 3D · salas multiplayer de 2 a 4 jogadores</div>
+    <div class="eyebrow">Versão 4.0a · as Raças da Fenda · 3D · salas multiplayer de 2 a 4 jogadores</div>
     <h1>Aether Rift<br><span>Dominion</span></h1>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
-      <div class="fac-cards" id="fac-cards"></div>
+      <div><div class="choose">Escolha sua Raça</div><div class="fac-cards" id="fac-cards" style="margin-top:1rem"></div></div>
       <div class="opts">
         <div class="opt"><label for="opt-name">Nome</label><input id="opt-name" maxlength="18"></div>
         <div class="opt"><label for="opt-opp">Oponentes de IA (só no modo solo)</label><select id="opt-opp"><option value="1">1 IA (1v1)</option><option value="2">2 IAs (FFA 3)</option><option value="3">3 IAs (FFA 4)</option></select></div>
@@ -181,6 +197,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         <div class="opt"><label for="opt-seed">Semente do mapa</label><input id="opt-seed" inputmode="numeric"></div>
         <div class="opt"><label for="opt-gfx">Gráficos</label><select id="opt-gfx"><option value="3d">3D (Three.js, luz e relevo)</option><option value="2d">2D isométrico (leve, para celulares fracos)</option></select></div>
         <div class="opt"><label for="opt-quality">Qualidade 3D</label><select id="opt-quality"><option value="auto">Automática</option><option value="baixa">Baixa (sem sombras e efeitos)</option><option value="media">Média (sombras e bloom)</option><option value="alta">Alta (sombras 4K e bloom)</option><option value="ultra">Ultra (Alta + oclusão ambiente, experimental)</option></select></div>
+        <div class="opt"><label for="opt-clima">Clima do campo (visual)</label><select id="opt-clima"><option value="auto">Automático (pelo bioma)</option><option value="toxica">Névoa tóxica</option><option value="plasma">Tempestade de plasma</option><option value="cristais">Chuva de cristais</option><option value="aurora">Aurora da Fenda</option><option value="acida">Chuva ácida</option></select></div>
         <div class="row"><button id="btn-start" class="btn primary">Iniciar partida</button><button id="btn-help-start" class="btn">Como jogar</button></div>
         <div class="mp">
           <div class="opt"><label for="opt-room">Multiplayer P2P (beta): sala só com os jogadores humanos, sem IAs</label><select id="opt-room"><option value="2">2 jogadores na sala</option><option value="3">3 jogadores na sala</option><option value="4">4 jogadores na sala</option></select></div>
@@ -190,8 +207,13 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         </div>
       </div>
     </div>
-    <p class="start-notes"><b>Novo no 3.0d:</b> salas multiplayer de 2 a 4 jogadores humanos por código, com lista de quem entrou; só os jogadores da sala entram no mapa (sem IAs), o anfitrião é o relé do lockstep e quem cair é retirado em 8 s sem travar a partida. Simulação idêntica em Chrome, Firefox e Safari (matemática determinística), para que navegadores diferentes não dessincronizem. Unidades atravessam o próprio Portão sem travar. Presets Alta/Ultra com proteção contra tela preta. <b>No 3.0c:</b> a facção Tessara (Traços de combate, Fotossíntese, Salto Evolutivo) e oito unidades novas: Soldador, Guindaste Armado, Tratorzão e Prensa para Vehnar; Atirador de Fenda, Lâmina Rodante, Mosquito e Âncora para Erevane; Quimera, Esporo-sentinela, Molde e Colosso para Tessara. Banner de eliminação e contador de inimigos. <b>No 3.0b:</b> bloom nos emissivos, oclusão ambiente no preset Alta, névoa volumétrica na Fenda e na Tempestade, lagos de plasma animados, presets de qualidade, e <b>multiplayer P2P</b> por código de sala. <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Servidor dedicado, reconexão e relé TURN</b> ficam para a próxima etapa: hoje a sala é P2P direta (STUN), o que funciona na maioria das redes domésticas.</p>
+    <p class="start-notes"><b>Novo no 4.0a:</b> o jogo agora fala em <b>Raças</b>; portais de Raça na tela inicial com fundo vivo que acompanha a escolha; materiais 3D próprios por Raça (metal Vehnar, vidro furtivo Erevane, pele viva Tessara); cada Raça constrói com um <b>nascimento</b> próprio: módulos soldados em degraus, origami que cintila até camuflar, casulo que pulsa e floresce; presets de <b>clima</b> (névoa tóxica, tempestade de plasma, chuva de cristais, aurora, chuva ácida); e a prévia do <b>Coro Quorith</b> e da <b>Prole Vorag</b>, jogáveis na 4.0b. <b>No 3.0d:</b> salas multiplayer de 2 a 4 jogadores humanos por código, com lista de quem entrou; só os jogadores da sala entram no mapa (sem IAs), o anfitrião é o relé do lockstep e quem cair é retirado em 8 s sem travar a partida. Simulação idêntica em Chrome, Firefox e Safari (matemática determinística), para que navegadores diferentes não dessincronizem. Unidades atravessam o próprio Portão sem travar. Presets Alta/Ultra com proteção contra tela preta. <b>No 3.0c:</b> a Raça Tessara (Traços de combate, Fotossíntese, Salto Evolutivo) e oito unidades novas: Soldador, Guindaste Armado, Tratorzão e Prensa para Vehnar; Atirador de Fenda, Lâmina Rodante, Mosquito e Âncora para Erevane; Quimera, Esporo-sentinela, Molde e Colosso para Tessara. Banner de eliminação e contador de inimigos. <b>No 3.0b:</b> bloom nos emissivos, oclusão ambiente no preset Alta, névoa volumétrica na Fenda e na Tempestade, lagos de plasma animados, presets de qualidade, e <b>multiplayer P2P</b> por código de sala. <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Servidor dedicado, reconexão e relé TURN</b> ficam para a próxima etapa: hoje a sala é P2P direta (STUN), o que funciona na maioria das redes domésticas.</p>
     <p class="start-notes" id="build-info" style="opacity:.65;font-size:12px"></p>
+    <footer class="site-foot">
+      <div class="sf-brand">AETHER RIFT <b>DOMINION</b></div>
+      <nav><a href="https://github.com/andreyrafael85/aether-rift-dominion" target="_blank" rel="noopener">GitHub</a><a href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Feedback</a><button class="linklike" id="foot-help">Como jogar</button><button class="linklike" id="foot-termos">Termos de Uso</button><button class="linklike" id="foot-priv">Privacidade</button><span class="muted">Discord em breve</span></nav>
+      <div class="sf-legal">Aether Rift Dominion — Versão 4.0 | Lançamento Global 2026 · Feito no navegador, para o navegador.</div>
+    </footer>
   </div>
 </div>
 
@@ -234,6 +256,8 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <div id="end" class="modal" hidden><div class="box"><div class="eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-again" class="btn primary">Jogar de novo</button><button id="btn-copy" class="btn">Copiar resultado (JSON)</button><a class="btn" href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Enviar feedback</a></div><textarea id="end-json" hidden rows="6" style="width:100%;font-family:var(--fm);font-size:11px;background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px"></textarea></div></div>
 </div>
 
+<div id="termos" class="modal" hidden><div class="box"><h2>Termos de Uso</h2><p class="muted small">Aether Rift: Dominion é um beta gratuito, em testes. O jogo é fornecido como está, sem garantias. Não reutilize os assets em outros projetos sem autorização. Nas partidas multiplayer, somas de verificação detectam divergências; trapaças encerram a partida para todos. Problemas e sugestões: use o link de feedback.</p><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
+<div id="priv" class="modal" hidden><div class="box"><h2>Política de Privacidade</h2><p class="muted small">O jogo não tem contas e não coleta dados pessoais. Preferências e progresso ficam no armazenamento local do seu navegador e podem ser apagados por você. No multiplayer, a conexão é direta entre os jogadores (WebRTC via PeerJS); o código da sala serve apenas para o pareamento e nenhuma partida passa por servidores nossos. O link de feedback leva ao GitHub, que tem políticas próprias.</p><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
 <div id="help" class="modal help" hidden><div class="box">
   <h2>Como jogar</h2>
   <p class="muted small">Objetivo: destruir os Núcleos inimigos ou ter mais Domínio (território, exército e recursos) ao fim de 25 minutos. Energia abaixo de 100% deixa produção, sensores e defesas piores: construa Reatores.</p>
@@ -242,7 +266,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <tr><td>Botão direito</td><td>Mover. Em inimigo: atacar. Em nó com coletores: colher. Em Refinaria ou Reator inimigo com Pirata: Sifonar. Em Caixa: recolher. Com estrutura selecionada: ponto de reunião.</td></tr>
   <tr><td>A / S</td><td>Atacar-mover (clique no destino) / Parar</td></tr>
   <tr><td>B + letra</td><td>Construir: R Reator, F Refinaria, Q Quartel, V Fábrica, H Hangar, T Torre, N Nódulo, L Laboratório. Shift mantém o modo.</td></tr>
-  <tr><td>Letras com estrutura selecionada</td><td>Produzir: a tecla aparece em cada botão (C Coletor, I Infantaria, S Suporte, P Pirata, V Veículo, D Drone; e as unidades da sua facção, como O Soldador, U Guindaste, A Atirador, M Mosquito, N Âncora, L Lâmina, R Prensa, E Esporo, C Colosso na Fábrica)</td></tr>
+  <tr><td>Letras com estrutura selecionada</td><td>Produzir: a tecla aparece em cada botão (C Coletor, I Infantaria, S Suporte, P Pirata, V Veículo, D Drone; e as unidades da sua Raça, como O Soldador, U Guindaste, A Atirador, M Mosquito, N Âncora, L Lâmina, R Prensa, E Esporo, C Colosso na Fábrica)</td></tr>
   <tr><td>Ctrl+1–9 / 1–9</td><td>Definir / selecionar grupo (duas vezes centraliza)</td></tr>
   <tr><td>F1 / F2 / F / Espaço</td><td>Núcleo / exército / centralizar seleção / ir ao último alerta</td></tr>
   <tr><td>WASD, setas, roda, botão do meio</td><td>Câmera e zoom</td></tr>
@@ -377,7 +401,7 @@ const UNITS = {
   molde:      { name: 'Molde', key: 'O', cls: 'sup', hp: 150, r: 9, speed: 75, cost: { minerio: 130, plasma: 20, dados: 20 }, time: 10, energyUse: 2, sensor: 200, faction: 'tessara', aura: { buff: 100 }, desc: 'Sem armas. Suas unidades a até 100 dele causam +15% de dano.' },
   colosso:    { name: 'Colosso Cambiante', key: 'C', cls: 'vei', hp: 1100, r: 16, speed: 48, cost: { minerio: 360, plasma: 90, dados: 30 }, time: 20, energyUse: 6, weapon: 'colosso', sensor: 180, faction: 'tessara', desc: 'Pesado de cerco com canhão de área. Ganha Traços como as outras unidades Tessara.' },
 };
-// o que cada estrutura produz, por facção
+// o que cada estrutura produz, por Raça
 const FACTION_EXTRAS = {
   vehnar:  { quartel: ['soldador', 'guindaste'], fabrica: ['prensa', 'tratorzao'] },
   erevane: { quartel: ['atirador', 'ancora'], fabrica: ['lamina'], hangar: ['mosquito'] },
@@ -1753,7 +1777,7 @@ function drawShadow(ctx, x, y, w, h) { ctx.save(); ctx.fillStyle = 'rgba(0,0,0,0
 ARD.vox = { Model, renderSprite, drawShadow, hex, rgb };
 })(globalThis.ARD = globalThis.ARD || {});
 
-/* Biblioteca de modelos voxel. Cada função recebe (cor do jogador, estilo da facção) e devolve um Model.
+/* Biblioteca de modelos voxel. Cada função recebe (cor do jogador, estilo da Raça) e devolve um Model.
    Eixo +x é a frente das unidades. Em produção, modelos podem vir de MagicaVoxel (.vox). */
 (function (ARD) {
 'use strict';
@@ -2602,6 +2626,25 @@ function create(canvas, overlay, mini) {
   const matMain = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.82, metalness: 0.12 });
   const matEm = new THREE.MeshBasicMaterial({ vertexColors: true });
   const matGhost = new THREE.MeshStandardMaterial({ vertexColors: true, transparent: true, opacity: 0.55, roughness: 0.9 });
+  // 4.0a — materiais por Raça: parâmetros PBR distintos + brilho de borda (rim) barato injetado no shader padrão.
+  const RACE_MAT = {
+    vehnar: { roughness: 0.58, metalness: 0.4, rim: [1.0, 0.5, 0.2], pow: 3.5, amt: 0.12 },
+    erevane: { roughness: 0.38, metalness: 0.22, rim: [0.2, 1.0, 0.82], pow: 2.2, amt: 0.3 },
+    tessara: { roughness: 0.85, metalness: 0.02, rim: [0.45, 1.0, 0.55], pow: 1.8, amt: 0.26 },
+  };
+  const raceMats = new Map();
+  function matFor(pid) {
+    if (pid == null || pid < 0 || !R.sim || !R.sim.players[pid]) return matMain;
+    const fac = R.sim.players[pid].faction; const cfg = RACE_MAT[fac]; if (!cfg) return matMain;
+    let m = raceMats.get(fac); if (m) return m;
+    m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: cfg.roughness, metalness: cfg.metalness });
+    m.onBeforeCompile = sh => {
+      sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>',
+        '#include <emissivemap_fragment>\n{ float rim = pow(1.0 - abs(dot(normalize(normal), normalize(vViewPosition))), ' + cfg.pow.toFixed(1) + '); totalEmissiveRadiance += vec3(' + cfg.rim.join(', ') + ') * (rim * ' + cfg.amt.toFixed(2) + '); }');
+    };
+    m.customProgramCacheKey = () => 'race-' + fac;
+    raceMats.set(fac, m); return m;
+  }
   function modelFor(def, pid, seed) {
     if (NODE_MODEL[def]) return MD[NODE_MODEL[def]](seed);
     if (def === 'crate') return MD.crate(); if (def === 'wreck') return MD.wreck(); if (def === 'rocks') return MD.rocks(seed); if (def === 'ruin') return MD.ruin(seed);
@@ -2612,7 +2655,7 @@ function create(canvas, overlay, mini) {
     const key = def + '|' + pid + '|' + (seed || 0) + (ghost ? '|g' : ''); let it = R.inst.get(key); if (it) return it;
     const g = geoOf(def, pid, seed); const cap = 64;
     const mk = (geo, mat) => { const m = new THREE.InstancedMesh(geo, mat, cap); m.count = 0; m.frustumCulled = false; m.castShadow = !ghost && !isTouch; m.receiveShadow = !ghost; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(m); return m; };
-    it = { geo: g, main: mk(g.main, ghost ? matGhost : matMain), em: g.em && !ghost ? mk(g.em, matEm) : null, n: 0, cap }; R.inst.set(key, it); return it;
+    it = { geo: g, main: mk(g.main, ghost ? matGhost : matFor(pid)), em: g.em && !ghost ? mk(g.em, matEm) : null, n: 0, cap }; R.inst.set(key, it); return it;
   }
   function grow(it) { const cap = it.cap * 2; for (const k of ['main', 'em']) { const old = it[k]; if (!old) continue; const m = new THREE.InstancedMesh(old.geometry, old.material, cap); m.frustumCulled = false; m.castShadow = old.castShadow; m.receiveShadow = old.receiveShadow; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.remove(old); old.dispose(); scene.add(m); it[k] = m; } it.cap = cap; }
   function put(it, x, y, z, ang, scale, scaleY, tint) {
@@ -2659,7 +2702,17 @@ function create(canvas, overlay, mini) {
   const sGeo = new THREE.BufferGeometry(); sGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3)); sGeo.setAttribute('color', new THREE.BufferAttribute(sCol, 3));
   const sparkPts = new THREE.Points(sGeo, new THREE.PointsMaterial({ size: 3.2, vertexColors: true, transparent: true, opacity: 0.95, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })); sparkPts.frustumCulled = false; scene.add(sparkPts);
   function smoke(x, y, z, col, life, vz) { const i = P.i++ % PN; P.x[i] = x; P.y[i] = y; P.z[i] = z; P.vx[i] = (Math.random() - .5) * 6; P.vy[i] = (Math.random() - .5) * 6; P.vz[i] = vz == null ? 14 : vz; P.t[i] = 0; P.life[i] = life || 2.5; P.kind[i] = 0; pCol[i * 3] = col[0]; pCol[i * 3 + 1] = col[1]; pCol[i * 3 + 2] = col[2]; }
-  function snow(x, y) { const i = P.i++ % PN; P.x[i] = x; P.y[i] = y; P.z[i] = 90 + Math.random() * 40; P.vx[i] = 25; P.vy[i] = 8; P.vz[i] = -45; P.t[i] = 0; P.life[i] = 3.2; P.kind[i] = 1; pCol[i * 3] = 0.9; pCol[i * 3 + 1] = 0.93; pCol[i * 3 + 2] = 1; }
+  function snow(x, y, col, vz, vx, life) { const i = P.i++ % PN; P.x[i] = x; P.y[i] = y; P.z[i] = 90 + Math.random() * 40; P.vx[i] = vx == null ? 25 : vx; P.vy[i] = 8; P.vz[i] = vz == null ? -45 : vz; P.t[i] = 0; P.life[i] = life || 3.2; P.kind[i] = 1; const c = col || [0.9, 0.93, 1]; pCol[i * 3] = c[0]; pCol[i * 3 + 1] = c[1]; pCol[i * 3 + 2] = c[2]; }
+  // 4.0a — presets de clima local (só visual; a simulação não muda): tinge céu/névoa, luz ambiente e solta partículas.
+  const CLIMATES = {
+    toxica: { tint: [0.45, 0.55, 0.33], mix: 0.5, fogNear: 700, fogFar: 2100, hemi: 0x9fc08a, drop: [0.55, 0.75, 0.3], vz: -16, vx: 6, rate: 0.5, burst: 2, life: 4 },
+    plasma: { tint: [0.55, 0.38, 0.3], mix: 0.45, fogNear: 1000, fogFar: 2500, hemi: 0xd6a88a, drop: [1, 0.55, 0.25], vz: 24, vx: 16, rate: 0.6, burst: 2, life: 3 },
+    cristais: { tint: [0.6, 0.7, 0.85], mix: 0.35, fogNear: 1400, fogFar: 3200, hemi: 0xaac4e6, drop: [0.7, 0.9, 1], vz: -60, vx: 10, rate: 0.8, burst: 3, life: 3 },
+    aurora: { tint: [0.35, 0.55, 0.5], mix: 0.3, fogNear: 1600, fogFar: 3600, hemi: 0x8ae6c0, aurora: [0.3, 0.8, 0.6] },
+    acida: { tint: [0.5, 0.58, 0.38], mix: 0.45, fogNear: 900, fogFar: 2400, hemi: 0xb4c88a, drop: [0.65, 0.85, 0.35], vz: -130, vx: 4, rate: 1, burst: 3, life: 1.6 },
+  };
+  const _cc = new THREE.Color();
+  R.setClimate = function (name) { const c = CLIMATES[name] || null; R.climateCfg = c; scene.fog.near = c ? c.fogNear : 1500; scene.fog.far = c ? c.fogFar : 3200; hemi.color.set(c ? c.hemi : 0x9fb8d6); };
   function spark(x, y, z, col, sp, g) { const i = SP.i++ % SN; const a = Math.random() * TAU; SP.x[i] = x; SP.y[i] = y; SP.z[i] = z; SP.vx[i] = Math.cos(a) * sp * Math.random(); SP.vy[i] = Math.sin(a) * sp * Math.random(); SP.vz[i] = sp * (0.4 + Math.random() * 0.8); SP.t[i] = 0; SP.life[i] = 0.4 + Math.random() * 0.6; sCol[i * 3] = col[0]; sCol[i * 3 + 1] = col[1]; sCol[i * 3 + 2] = col[2]; }
   const boomGeo = new THREE.SphereGeometry(1, 10, 8); const boomMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 1.5, 0.8), transparent: true, opacity: 0.8, depthWrite: false }); const booms = new THREE.InstancedMesh(boomGeo, boomMat, 48); booms.count = 0; booms.frustumCulled = false; scene.add(booms); const boomList = [];
   const decalGeo = new THREE.CircleGeometry(1, 18); decalGeo.rotateX(-Math.PI / 2); const decals = new THREE.InstancedMesh(decalGeo, new THREE.MeshBasicMaterial({ color: 0x0b0908, transparent: true, opacity: 0.55, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }), 160); decals.count = 0; decals.frustumCulled = false; scene.add(decals); const decalList = [];
@@ -2710,7 +2763,14 @@ function create(canvas, overlay, mini) {
     updateCamera(cam);
     // dia e noite
     const nt = R.night; sun.intensity = 1.6 * (1 - nt) + 0.14 * nt; sun.color.setRGB(1 - 0.45 * nt, 0.91 - 0.3 * nt, 0.77 + 0.2 * nt); hemi.intensity = 0.55 * (1 - nt) + 0.2 * nt + lightning * 0.5; amb.intensity = 0.22 * (1 - nt) + 0.1 * nt + lightning * 0.6;
-    const bg = new THREE.Color().setRGB(0.62 * (1 - nt) + 0.02 * nt, 0.69 * (1 - nt) + 0.03 * nt, 0.77 * (1 - nt) + 0.06 * nt); scene.background = bg; scene.fog.color.copy(bg);
+    const bg = new THREE.Color().setRGB(0.62 * (1 - nt) + 0.02 * nt, 0.69 * (1 - nt) + 0.03 * nt, 0.77 * (1 - nt) + 0.06 * nt);
+    const cl = R.climateCfg;
+    if (cl) {
+      bg.lerp(_cc.setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), cl.mix * (1 - nt * 0.5));
+      if (cl.aurora) { const ka = (Math.sin(R.time * 0.25) + 1) / 2; bg.lerp(_cc.setRGB(cl.aurora[0], cl.aurora[1], cl.aurora[2]), 0.1 + 0.12 * ka); }
+      if (cl.drop && Math.random() < cl.rate * R.quality.particles) for (let i = 0; i < cl.burst; i++) { const zf = Math.max(0.6, cam.zoom); snow(cam.x + (Math.random() - .5) * 1500 / zf, cam.y + (Math.random() - .5) * 1100 / zf, cl.drop, cl.vz, cl.vx, cl.life); }
+    }
+    scene.background = bg; scene.fog.color.copy(bg);
     // névoa de guerra e território → texturas do terreno
     for (let iy = 0; iy < FOGN; iy++) for (let ix = 0; ix < FOGN; ix++) { const i = (iy * FOGN + ix) * 4; const tx = (ix * FOGC / TILE) | 0, ty = (iy * FOGC / TILE) | 0; const ex = view.reveal || explored[ty * TILES + tx]; fogData[i] = ex ? 110 : 0; fogData[i + 3] = 255; }
     if (!view.reveal) for (const e of sim.ents) { if (!e.alive || e.owner !== human || (e.kind !== 'unit' && e.kind !== 'building')) continue; const r = S.sensorRadius(sim, e); const x0 = Math.max(0, ((e.x - r) / FOGC) | 0), x1 = Math.min(FOGN - 1, ((e.x + r) / FOGC) | 0), y0 = Math.max(0, ((e.y - r) / FOGC) | 0), y1 = Math.min(FOGN - 1, ((e.y + r) / FOGC) | 0); for (let iy = y0; iy <= y1; iy++) for (let ix = x0; ix <= x1; ix++) { const d = Math.hypot((ix + 0.5) * FOGC - e.x, (iy + 0.5) * FOGC - e.y); if (d <= r) { const i = (iy * FOGN + ix) * 4; const v = d > r * 0.75 ? 110 + 145 * (1 - (d - r * 0.75) / (r * 0.25)) : 255; if (v > fogData[i]) fogData[i] = v; } } }
@@ -2734,7 +2794,23 @@ function create(canvas, overlay, mini) {
       const parts = MD.PARTS[e.def]; const hullDef = parts ? parts.hull : e.def; const it = instOf(hullDef, e.owner, 0); const g = it.geo; const fit = fitOf(e, g);
       const zz = isUnit && ud.flying ? 14 : 0; const moving = isUnit && (e.x !== e.px || e.y !== e.py); const bob = moving && (e.def === 'infantaria' || e.def === 'quimera' || e.def === 'soldador' || e.def === 'atirador') ? Math.abs(Math.sin(R.time * 11 + e.id)) * 1.2 : moving && (e.def === 'prensa' || e.def === 'colosso') ? Math.abs(Math.sin(R.time * 5 + e.id)) * 2.2 : 0;
       const dmg = !isUnit && e.built && e.hp < e.maxHp * 0.5; const tint = e.cloaked ? 0.55 : dmg ? 0.6 : 1;
-      put(it, wx, wy, zz + bob, isUnit || ud.wall ? (e.ang || 0) : 0, fit, isUnit ? 1 : (e.built ? 1 : 0.1 + 0.9 * e.progress), tint);
+      if (!isUnit && !e.built) { // 4.0a — nascimento de construção com assinatura por Raça
+        const pr = Math.min(1, Math.max(0.04, e.progress || 0)); const fac2 = (sim.players[e.owner] || {}).faction; const pp = R.quality.particles;
+        if (fac2 === 'erevane') { // origami: abre no plano e cintila até a camuflagem assentar
+          const flick = 1 + Math.sin(R.time * 16 + e.id * 1.7) * 0.22 * (1 - pr);
+          put(it, wx, wy, zz, (e.ang || 0), fit * (0.3 + 0.7 * pr), 0.25 + 0.75 * pr, (0.5 + 0.5 * pr) * flick);
+          if (Math.random() < 0.14 * pp) spark(wx + (Math.random() - .5) * e.r * 1.5, wy + (Math.random() - .5) * e.r * 1.5, 4 + Math.random() * 14, [0.3, 1, 0.85], 22, false);
+        } else if (fac2 === 'tessara') { // casulo: pulsa, incha e floresce
+          const pulse = 1 + Math.sin(R.time * 6.5 + e.id) * 0.08 * (1 - pr);
+          put(it, wx, wy, zz, (e.ang || 0), fit * (0.4 + 0.6 * pr) * pulse, (0.18 + 0.82 * pr * pr) * pulse, 0.65 + 0.35 * pr);
+          if (Math.random() < 0.1 * pp) smoke(wx + (Math.random() - .5) * e.r, wy + (Math.random() - .5) * e.r, 5, [0.35, 0.85, 0.5], 1.6, 12);
+        } else { // vehnar e neutro: módulos empilham em degraus com soldagem e vapor
+          const t5 = pr * 5, k = Math.floor(t5), fr = Math.min(1, (t5 - k) * 1.5);
+          put(it, wx, wy, zz, ud.wall ? (e.ang || 0) : 0, fit, Math.max(0.08, (k + fr) / 5), 0.7 + 0.3 * pr);
+          if (Math.random() < 0.2 * pp) spark(wx + (Math.random() - .5) * e.r * 1.3, wy + (Math.random() - .5) * e.r * 1.3, ((k + fr) / 5) * g.height * fit * 0.9 + 2, [1, 0.82, 0.45], 42, true);
+          if (Math.random() < 0.07 * pp) smoke(wx, wy, 4, [0.5, 0.5, 0.52], 1.5, 14);
+        }
+      } else put(it, wx, wy, zz + bob, isUnit || ud.wall ? (e.ang || 0) : 0, fit, 1, tint);
       if (parts && (isUnit || e.built)) { const tt = instOf(parts.turret, e.owner, 0); put(tt, wx, wy, zz + bob + parts.z * fit, e.aimAng != null ? e.aimAng : (e.ang || 0), fit, 1, tint); }
       if (view.sel.has(e.id)) { nSel = ring(nSel, wx, wy, e.r + 5); if (!isUnit && ud.attack && nRange < 32) { _p.set(wx, H(wx, wy) + 0.6, -wy); _s.set(ud.attack.range, 1, ud.attack.range); _q.identity(); _m.compose(_p, _q, _s); rangeRings.setMatrixAt(nRange++, _m); } }
       if (e.hp < e.maxHp - 0.5 || view.sel.has(e.id) || (isUnit && e.rank > 0)) hpList.push({ x: wx, y: wy, z: zz + g.height * fit + 4, w: Math.max(16, e.r * 1.4), frac: e.hp / e.maxHp, rank: isUnit ? e.rank : 0, cloak: e.cloaked && own, r: e.r });
@@ -3228,7 +3304,7 @@ const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-10 12:57Z';
+const BUILD = '2026-10-10 16:00Z';
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
 let G = null; // game state
 ARD.inspect = () => { if (!G || !G.sim) return null; const sim = G.sim; return { tick: sim.tick, time: sim.time, hash: S.hash(sim), human: G.human, waiting: G.waiting, ended: G.ended, mpWait: $('mp-wait') ? $('mp-wait').hidden === false : null, net: G.net ? { state: G.net.state, role: G.net.role, code: G.net.code, desync: G.net.desync, rtt: Math.round(G.net.rtt) } : null, players: sim.players.map(p => ({ id: p.id, name: p.name, faction: p.faction, human: p.human, alive: p.alive, nucleo: !!S.nucleoOf(sim, p.id), units: sim.ents.filter(e => e.alive && e.kind === 'unit' && e.owner === p.id).length })), hashLog: G.hashLog ? Object.assign({}, G.hashLog) : null }; };
@@ -3244,18 +3320,58 @@ function savePrefs(p) { try { localStorage.setItem('ard-beta-prefs', JSON.string
 // ---------- start screen ----------
 function initStart() {
   const prefs = loadPrefs();
+  // 4.0a — portais de Raça: cor própria por card, prévia das Raças da 4.0b e fundo vivo que acompanha a escolha
+  const RACE_UI = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A' };
+  const RACE_SOON = [
+    { name: 'Coro Quorith', color: '#B388FF', tagline: 'Mente-colmeia de cristal ressonante. Vozes em sincronia, pactos em uníssono.' },
+    { name: 'Prole Vorag', color: '#E6455A', tagline: 'Enxame biológico voraz. Barato, rápido e sempre com fome.' },
+  ];
+  let raceColor = RACE_UI[prefs.faction] || '#FF5E3A';
+  const setRace = c => { raceColor = c; document.documentElement.style.setProperty('--race', c); };
   const facWrap = $('fac-cards'); facWrap.innerHTML = '';
   for (const id of Object.keys(S.FACTIONS)) {
     const f = S.FACTIONS[id];
-    const el = document.createElement('label'); el.className = 'fac-card'; el.dataset.id = id;
+    const el = document.createElement('label'); el.className = 'fac-card'; el.dataset.id = id; el.style.setProperty('--rc', RACE_UI[id] || '#FF5E3A');
     el.innerHTML = `<input type="radio" name="fac" value="${id}" ${((prefs.faction || 'vehnar') === id) ? 'checked' : ''}><div class="fac-name">${f.name}</div><div class="fac-tag">${f.tagline}</div><div class="fac-sup"><b>Superarma:</b> ${f.superName}. <b>Pirata:</b> ${f.pirateName}.</div>`;
+    el.querySelector('input').addEventListener('change', () => setRace(RACE_UI[id] || '#FF5E3A'));
     facWrap.appendChild(el);
   }
+  for (const r of RACE_SOON) {
+    const el = document.createElement('div'); el.className = 'fac-card soon'; el.style.setProperty('--rc', r.color);
+    el.innerHTML = `<div class="fac-name">${r.name} <span class="soon-badge">EM BREVE · 4.0b</span></div><div class="fac-tag">${r.tagline}</div>`;
+    facWrap.appendChild(el);
+  }
+  setRace(raceColor);
+  // fundo vivo: estrelas e o brilho da Raça escolhida (respeita prefers-reduced-motion; para ao entrar em jogo)
+  const bgfx = $('bgfx');
+  if (bgfx) {
+    const bctx = bgfx.getContext('2d'); const stars = [];
+    for (let i = 0; i < 140; i++) stars.push({ x: Math.random(), y: Math.random(), r: Math.random() * 1.4 + 0.4, ph: Math.random() * Math.PI * 2 });
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches; const t0 = performance.now();
+    const drawBg = () => {
+      if ($('start').hidden) return;
+      const w = bgfx.clientWidth, h = bgfx.clientHeight; if (!w || !h) { if (!reduced) requestAnimationFrame(drawBg); return; }
+      if (bgfx.width !== w || bgfx.height !== h) { bgfx.width = w; bgfx.height = h; }
+      const t = (performance.now() - t0) / 1000; const c = bctx; c.clearRect(0, 0, w, h);
+      const g1 = c.createRadialGradient(w * 0.72, h * 0.18, 0, w * 0.72, h * 0.18, Math.max(w, h) * 0.6);
+      g1.addColorStop(0, raceColor + '3a'); g1.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g1; c.fillRect(0, 0, w, h);
+      c.fillStyle = '#fff';
+      for (const st of stars) { const tw = reduced ? 0.55 : 0.3 + 0.7 * Math.abs(Math.sin(t * 0.5 + st.ph)); c.globalAlpha = 0.26 * tw; const x = (st.x + (reduced ? 0 : t * 0.003 * st.r)) % 1; c.fillRect(x * w, st.y * h, st.r, st.r); }
+      c.globalAlpha = 1;
+      if (!reduced) requestAnimationFrame(drawBg);
+    };
+    drawBg(); if (reduced) window.addEventListener('resize', drawBg);
+  }
+  // rodapé: Termos, Privacidade e atalho do tutorial
+  const wireModal = (btn, modal) => { const b = $(btn), m = $(modal); if (!b || !m) return; b.addEventListener('click', () => { m.hidden = false; }); m.querySelectorAll('[data-close]').forEach(x => x.addEventListener('click', () => { m.hidden = true; })); };
+  wireModal('foot-termos', 'termos'); wireModal('foot-priv', 'priv');
+  if ($('foot-help')) $('foot-help').addEventListener('click', () => toggleHelp(true));
   $('opt-name').value = prefs.name || 'Comandante';
   $('opt-opp').value = prefs.opp || '2';
   $('opt-diff').value = prefs.diff || 'normal';
   $('opt-seed').value = params.get('seed') || String(Math.floor(Math.random() * 90000) + 1000);
   $('opt-gfx').value = prefs.gfx || '3d'; $('opt-quality').value = prefs.quality || 'auto';
+  if ($('opt-clima')) $('opt-clima').value = prefs.clima || 'auto';
   // multiplayer P2P por código de sala: 2 a 4 jogadores humanos, sem IAs; o anfitrião é o relé do lockstep
   let lobby = null;
   const mpStatus = t => { $('mp-status').textContent = t; };
@@ -3283,7 +3399,7 @@ function initStart() {
     const players = roster.map(r => ({ name: r.name, faction: r.faction, human: true }));
     const cfg = { players, seed: parseInt($('opt-seed').value, 10) || 1, name: players[0].name, faction: players[0].faction, opp: '0', diff: 'normal' };
     N.start(cfg);
-    setTimeout(() => startGame(Object.assign({}, cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value }), { net: N, myId: 0 }), 150);
+    setTimeout(() => startGame(Object.assign({}, cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }), { net: N, myId: 0 }), 150);
   }
   $('btn-host').addEventListener('click', () => {
     if (!window.Peer) { mpStatus('PeerJS não carregou neste navegador.'); return; }
@@ -3313,7 +3429,7 @@ function initStart() {
     N.on('full', () => { mpStatus('A sala ' + code + ' está cheia ou a partida já começou.'); leaveLobby(); });
     N.on('close', () => { if (!lobby || lobby.N !== N || lobby.started) return; mpStatus('O anfitrião saiu da sala ' + code + '.'); leaveLobby(); });
     N.on('lobby', d => { if (!lobby || lobby.N !== N) return; lobby.size = d.size; renderLobby(d.players, d.size); mpStatus('Na sala ' + code + ' como ' + me.name + ' (' + d.players.length + '/' + d.size + '). A partida começa quando o anfitrião iniciar.'); });
-    N.on('start', d => { if (!lobby || lobby.N !== N) return; lobby.started = true; if (lobby.timer) clearInterval(lobby.timer); startGame(Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value }), { net: N, myId: d.you }); });
+    N.on('start', d => { if (!lobby || lobby.N !== N) return; lobby.started = true; if (lobby.timer) clearInterval(lobby.timer); startGame(Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }), { net: N, myId: d.you }); });
     N.join(code, me);
   }
   $('btn-join').addEventListener('click', () => joinRoom($('opt-code').value));
@@ -3323,7 +3439,7 @@ function initStart() {
     if (lobby) { if (lobby.role === 'host') startHosted(); else mpStatus('Aguarde o anfitrião iniciar a partida.'); return; }
     const typed = $('opt-code').value.trim(); if (typed.length >= 4) { joinRoom(typed); return; } // código digitado: entra na sala, nunca inicia partida solo
     const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar';
-    const cfg = { name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value };
+    const cfg = { name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value };
     savePrefs(Object.assign(loadPrefs() || {}, cfg)); startGame(cfg);
   });
   $('btn-help-start').addEventListener('click', () => toggleHelp(true));
@@ -3350,9 +3466,11 @@ function startGame(cfg, netCtx) {
   if (params.get('ssaoout')) R.ssaoOut = parseInt(params.get('ssaoout'), 10);
   if (params.get('testblack')) R.testBlack = true; R.debug = !!params.get('debug');
   if (R.setQuality) R.setQuality(params.get('q') || cfg.quality || 'auto', { ssao: params.has('ssao') ? params.get('ssao') === '1' : null, shadowMap: params.get('sm') ? parseInt(params.get('sm'), 10) : null, post: params.has('post') ? params.get('post') === '1' : null });
+  if (R.setClimate) R.setClimate(params.get('clima') || cfg.clima || 'auto');
   if (R.is3d) R.onDegrade = (what, reason) => { if (what) banner('Qualidade 3D reduzida', what + ' desativada: ' + reason + '. Se continuar escuro, escolha outra qualidade na tela inicial e envie o feedback.', 'warn'); else banner('Renderização 3D falhou', 'Volte à tela inicial e escolha Gráficos: 2D. Exporte o resultado e envie o feedback.', 'danger'); };
   R.resize();
   const nuc = S.nucleoOf(sim, human);
+  if (params.get('demo') === 'birth' && !net) { sim.players[human].res.minerio += 1500; sim.players[human].res.plasma += 600; ['reator', 'refinaria', 'quartel'].forEach((d, i) => S.enqueue(sim, { t: 'build', p: human, def: d, x: nuc.x + 75 + (i % 2) * 95, y: nuc.y - 80 + i * 80, ang: 0 })); } // depuração: três canteiros para ver o nascimento
   const isTouch = matchMedia('(pointer: coarse)').matches || !!params.get('touch');
   const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.9 : 1.0, yaw: Math.PI / 4 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
   const ui = makeUI(); // closures below
@@ -3618,7 +3736,7 @@ function startGame(cfg, netCtx) {
       { id: 'muro', text: 'Muros (B → M) se desenham arrastando o mouse. Deixe um Portão (G) para suas unidades passarem.', done: () => S.hasBuilt(sim, human, 'muro') || sim.time > 600 },
       { id: 'pirata', text: 'Treine um Pirata (P) no Quartel e clique com o direito em uma Refinaria inimiga para Sifonar.', done: () => sim.players[human].stats.stolen > 0 },
       { id: 'diplo', text: 'Abra a Diplomacia e proponha Não-agressão a quem está forte demais. Ou quebre um pacto na hora certa.', done: () => sim.players[human].stats.treaties > 0 || sim.players[human].stats.betrayals > 0 || sim.time > 540 },
-      { id: 'lab', text: 'Um Laboratório (B → L) libera pesquisas e a superarma da sua facção.', done: () => S.hasBuilt(sim, human, 'laboratorio') },
+      { id: 'lab', text: 'Um Laboratório (B → L) libera pesquisas e a superarma da sua Raça.', done: () => S.hasBuilt(sim, human, 'laboratorio') },
     ];
   }
   function refreshHints() {
@@ -3651,7 +3769,7 @@ function startGame(cfg, netCtx) {
     $('end-scores').innerHTML = `<table><thead><tr><th>#</th><th>Jogador</th><th>Domínio</th></tr></thead><tbody>${rows}</tbody></table>`;
     $('end-stats').innerHTML = [['Coletado', fmt(st.collected)], ['Roubado', fmt(st.stolen)], ['Perdido para roubo', fmt(st.lost)], ['Unidades abatidas', st.unitsKilled], ['Unidades perdidas', st.unitsLost], ['Estruturas destruídas', st.buildingsDestroyed], ['Tratados', st.treaties], ['Traições', st.betrayals], ['Reputação final', S.REP_NAMES[p.rep]]].map(([k, v]) => `<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');
     $('btn-again').onclick = () => location.reload();
-    $('btn-copy').onclick = () => { const data = { versao: '3.0d', data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
+    $('btn-copy').onclick = () => { const data = { versao: '4.0a', data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
   }
 
   // ---------- UI bridge for input ----------

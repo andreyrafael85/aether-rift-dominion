@@ -1,4 +1,4 @@
-/* Biblioteca de modelos voxel. Cada função recebe (cor do jogador, estilo da facção) e devolve um Model.
+/* Biblioteca de modelos voxel. Cada função recebe (cor do jogador, estilo da Raça) e devolve um Model.
    Eixo +x é a frente das unidades. Em produção, modelos podem vir de MagicaVoxel (.vox). */
 (function (ARD) {
 'use strict';

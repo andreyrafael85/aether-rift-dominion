@@ -1,4 +1,4 @@
-<title>Aether Rift Beta</title>
+<title>Aether Rift Dominion</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* Jogo: mundo escuro único (sci-fi industrial), HUD em grafite com acentos da Fenda. Tema único, por decisão. */
@@ -164,16 +164,32 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 #end-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.4rem}
 .stat{display:grid;border:1px solid var(--line);border-radius:6px;padding:.4rem .6rem;font-size:12px}.stat span{color:var(--fg2)}
 .loadbar{height:6px;background:#262A31;border-radius:3px;overflow:hidden;margin-top:.5rem}.loadbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--rift1),var(--rift2));transition:width .15s}
+#start{position:relative}
+#bgfx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.start-wrap{position:relative;z-index:1}
+.choose{font-family:var(--fd);font-weight:700;font-size:1.2rem;text-transform:uppercase;letter-spacing:.05em;color:var(--fg2);margin-bottom:-.5rem}
+.fac-card{border-left:3px solid var(--rc,var(--line))}
+.fac-card:has(input:checked){border-color:var(--rc,var(--rift1));box-shadow:0 0 0 1px var(--rc,var(--rift1)) inset}
+.fac-card.soon{opacity:.72;cursor:default}
+.soon-badge{font-family:var(--fm);font-size:10px;letter-spacing:.1em;background:var(--rc);color:#14161A;border-radius:3px;padding:2px 6px;vertical-align:middle;margin-left:.4rem}
+.site-foot{border-top:1px solid var(--line);margin-top:1.25rem;padding-top:1rem;display:grid;gap:.5rem;font-size:13px}
+.site-foot nav{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+.site-foot a{color:var(--fg2)}
+.linklike{background:none;border:none;color:var(--fg2);font:inherit;cursor:pointer;padding:0;text-decoration:underline}
+.sf-brand{font-family:var(--fd);font-weight:700;font-size:1.15rem;letter-spacing:.04em}
+.sf-brand b{color:var(--race,var(--rift1))}
+.sf-legal{font-family:var(--fm);font-size:11px;color:var(--fg2)}
 #errbox{position:fixed;left:8px;bottom:8px;background:#5a1d1d;color:#fff;padding:.4rem .6rem;border-radius:6px;font-family:var(--fm);font-size:12px;z-index:9;max-width:80vw;cursor:pointer}
 </style>
 
 <div id="start" class="screen">
+  <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Beta 3.0d · três facções · 3D · salas multiplayer de 2 a 4 jogadores</div>
+    <div class="eyebrow">Versão 4.0a · as Raças da Fenda · 3D · salas multiplayer de 2 a 4 jogadores</div>
     <h1>Aether Rift<br><span>Dominion</span></h1>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
-      <div class="fac-cards" id="fac-cards"></div>
+      <div><div class="choose">Escolha sua Raça</div><div class="fac-cards" id="fac-cards" style="margin-top:1rem"></div></div>
       <div class="opts">
         <div class="opt"><label for="opt-name">Nome</label><input id="opt-name" maxlength="18"></div>
         <div class="opt"><label for="opt-opp">Oponentes de IA (só no modo solo)</label><select id="opt-opp"><option value="1">1 IA (1v1)</option><option value="2">2 IAs (FFA 3)</option><option value="3">3 IAs (FFA 4)</option></select></div>
@@ -181,6 +197,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         <div class="opt"><label for="opt-seed">Semente do mapa</label><input id="opt-seed" inputmode="numeric"></div>
         <div class="opt"><label for="opt-gfx">Gráficos</label><select id="opt-gfx"><option value="3d">3D (Three.js, luz e relevo)</option><option value="2d">2D isométrico (leve, para celulares fracos)</option></select></div>
         <div class="opt"><label for="opt-quality">Qualidade 3D</label><select id="opt-quality"><option value="auto">Automática</option><option value="baixa">Baixa (sem sombras e efeitos)</option><option value="media">Média (sombras e bloom)</option><option value="alta">Alta (sombras 4K e bloom)</option><option value="ultra">Ultra (Alta + oclusão ambiente, experimental)</option></select></div>
+        <div class="opt"><label for="opt-clima">Clima do campo (visual)</label><select id="opt-clima"><option value="auto">Automático (pelo bioma)</option><option value="toxica">Névoa tóxica</option><option value="plasma">Tempestade de plasma</option><option value="cristais">Chuva de cristais</option><option value="aurora">Aurora da Fenda</option><option value="acida">Chuva ácida</option></select></div>
         <div class="row"><button id="btn-start" class="btn primary">Iniciar partida</button><button id="btn-help-start" class="btn">Como jogar</button></div>
         <div class="mp">
           <div class="opt"><label for="opt-room">Multiplayer P2P (beta): sala só com os jogadores humanos, sem IAs</label><select id="opt-room"><option value="2">2 jogadores na sala</option><option value="3">3 jogadores na sala</option><option value="4">4 jogadores na sala</option></select></div>
@@ -190,8 +207,13 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         </div>
       </div>
     </div>
-    <p class="start-notes"><b>Novo no 3.0d:</b> salas multiplayer de 2 a 4 jogadores humanos por código, com lista de quem entrou; só os jogadores da sala entram no mapa (sem IAs), o anfitrião é o relé do lockstep e quem cair é retirado em 8 s sem travar a partida. Simulação idêntica em Chrome, Firefox e Safari (matemática determinística), para que navegadores diferentes não dessincronizem. Unidades atravessam o próprio Portão sem travar. Presets Alta/Ultra com proteção contra tela preta. <b>No 3.0c:</b> a facção Tessara (Traços de combate, Fotossíntese, Salto Evolutivo) e oito unidades novas: Soldador, Guindaste Armado, Tratorzão e Prensa para Vehnar; Atirador de Fenda, Lâmina Rodante, Mosquito e Âncora para Erevane; Quimera, Esporo-sentinela, Molde e Colosso para Tessara. Banner de eliminação e contador de inimigos. <b>No 3.0b:</b> bloom nos emissivos, oclusão ambiente no preset Alta, névoa volumétrica na Fenda e na Tempestade, lagos de plasma animados, presets de qualidade, e <b>multiplayer P2P</b> por código de sala. <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Servidor dedicado, reconexão e relé TURN</b> ficam para a próxima etapa: hoje a sala é P2P direta (STUN), o que funciona na maioria das redes domésticas.</p>
+    <p class="start-notes"><b>Novo no 4.0a:</b> o jogo agora fala em <b>Raças</b>; portais de Raça na tela inicial com fundo vivo que acompanha a escolha; materiais 3D próprios por Raça (metal Vehnar, vidro furtivo Erevane, pele viva Tessara); cada Raça constrói com um <b>nascimento</b> próprio: módulos soldados em degraus, origami que cintila até camuflar, casulo que pulsa e floresce; presets de <b>clima</b> (névoa tóxica, tempestade de plasma, chuva de cristais, aurora, chuva ácida); e a prévia do <b>Coro Quorith</b> e da <b>Prole Vorag</b>, jogáveis na 4.0b. <b>No 3.0d:</b> salas multiplayer de 2 a 4 jogadores humanos por código, com lista de quem entrou; só os jogadores da sala entram no mapa (sem IAs), o anfitrião é o relé do lockstep e quem cair é retirado em 8 s sem travar a partida. Simulação idêntica em Chrome, Firefox e Safari (matemática determinística), para que navegadores diferentes não dessincronizem. Unidades atravessam o próprio Portão sem travar. Presets Alta/Ultra com proteção contra tela preta. <b>No 3.0c:</b> a Raça Tessara (Traços de combate, Fotossíntese, Salto Evolutivo) e oito unidades novas: Soldador, Guindaste Armado, Tratorzão e Prensa para Vehnar; Atirador de Fenda, Lâmina Rodante, Mosquito e Âncora para Erevane; Quimera, Esporo-sentinela, Molde e Colosso para Tessara. Banner de eliminação e contador de inimigos. <b>No 3.0b:</b> bloom nos emissivos, oclusão ambiente no preset Alta, névoa volumétrica na Fenda e na Tempestade, lagos de plasma animados, presets de qualidade, e <b>multiplayer P2P</b> por código de sala. <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Servidor dedicado, reconexão e relé TURN</b> ficam para a próxima etapa: hoje a sala é P2P direta (STUN), o que funciona na maioria das redes domésticas.</p>
     <p class="start-notes" id="build-info" style="opacity:.65;font-size:12px"></p>
+    <footer class="site-foot">
+      <div class="sf-brand">AETHER RIFT <b>DOMINION</b></div>
+      <nav><a href="https://github.com/andreyrafael85/aether-rift-dominion" target="_blank" rel="noopener">GitHub</a><a href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Feedback</a><button class="linklike" id="foot-help">Como jogar</button><button class="linklike" id="foot-termos">Termos de Uso</button><button class="linklike" id="foot-priv">Privacidade</button><span class="muted">Discord em breve</span></nav>
+      <div class="sf-legal">Aether Rift Dominion — Versão 4.0 | Lançamento Global 2026 · Feito no navegador, para o navegador.</div>
+    </footer>
   </div>
 </div>
 
@@ -234,6 +256,8 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <div id="end" class="modal" hidden><div class="box"><div class="eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-again" class="btn primary">Jogar de novo</button><button id="btn-copy" class="btn">Copiar resultado (JSON)</button><a class="btn" href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Enviar feedback</a></div><textarea id="end-json" hidden rows="6" style="width:100%;font-family:var(--fm);font-size:11px;background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px"></textarea></div></div>
 </div>
 
+<div id="termos" class="modal" hidden><div class="box"><h2>Termos de Uso</h2><p class="muted small">Aether Rift: Dominion é um beta gratuito, em testes. O jogo é fornecido como está, sem garantias. Não reutilize os assets em outros projetos sem autorização. Nas partidas multiplayer, somas de verificação detectam divergências; trapaças encerram a partida para todos. Problemas e sugestões: use o link de feedback.</p><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
+<div id="priv" class="modal" hidden><div class="box"><h2>Política de Privacidade</h2><p class="muted small">O jogo não tem contas e não coleta dados pessoais. Preferências e progresso ficam no armazenamento local do seu navegador e podem ser apagados por você. No multiplayer, a conexão é direta entre os jogadores (WebRTC via PeerJS); o código da sala serve apenas para o pareamento e nenhuma partida passa por servidores nossos. O link de feedback leva ao GitHub, que tem políticas próprias.</p><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
 <div id="help" class="modal help" hidden><div class="box">
   <h2>Como jogar</h2>
   <p class="muted small">Objetivo: destruir os Núcleos inimigos ou ter mais Domínio (território, exército e recursos) ao fim de 25 minutos. Energia abaixo de 100% deixa produção, sensores e defesas piores: construa Reatores.</p>
@@ -242,7 +266,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <tr><td>Botão direito</td><td>Mover. Em inimigo: atacar. Em nó com coletores: colher. Em Refinaria ou Reator inimigo com Pirata: Sifonar. Em Caixa: recolher. Com estrutura selecionada: ponto de reunião.</td></tr>
   <tr><td>A / S</td><td>Atacar-mover (clique no destino) / Parar</td></tr>
   <tr><td>B + letra</td><td>Construir: R Reator, F Refinaria, Q Quartel, V Fábrica, H Hangar, T Torre, N Nódulo, L Laboratório. Shift mantém o modo.</td></tr>
-  <tr><td>Letras com estrutura selecionada</td><td>Produzir: a tecla aparece em cada botão (C Coletor, I Infantaria, S Suporte, P Pirata, V Veículo, D Drone; e as unidades da sua facção, como O Soldador, U Guindaste, A Atirador, M Mosquito, N Âncora, L Lâmina, R Prensa, E Esporo, C Colosso na Fábrica)</td></tr>
+  <tr><td>Letras com estrutura selecionada</td><td>Produzir: a tecla aparece em cada botão (C Coletor, I Infantaria, S Suporte, P Pirata, V Veículo, D Drone; e as unidades da sua Raça, como O Soldador, U Guindaste, A Atirador, M Mosquito, N Âncora, L Lâmina, R Prensa, E Esporo, C Colosso na Fábrica)</td></tr>
   <tr><td>Ctrl+1–9 / 1–9</td><td>Definir / selecionar grupo (duas vezes centraliza)</td></tr>
   <tr><td>F1 / F2 / F / Espaço</td><td>Núcleo / exército / centralizar seleção / ir ao último alerta</td></tr>
   <tr><td>WASD, setas, roda, botão do meio</td><td>Câmera e zoom</td></tr>

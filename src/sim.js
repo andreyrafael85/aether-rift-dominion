@@ -99,7 +99,7 @@ const UNITS = {
   molde:      { name: 'Molde', key: 'O', cls: 'sup', hp: 150, r: 9, speed: 75, cost: { minerio: 130, plasma: 20, dados: 20 }, time: 10, energyUse: 2, sensor: 200, faction: 'tessara', aura: { buff: 100 }, desc: 'Sem armas. Suas unidades a até 100 dele causam +15% de dano.' },
   colosso:    { name: 'Colosso Cambiante', key: 'C', cls: 'vei', hp: 1100, r: 16, speed: 48, cost: { minerio: 360, plasma: 90, dados: 30 }, time: 20, energyUse: 6, weapon: 'colosso', sensor: 180, faction: 'tessara', desc: 'Pesado de cerco com canhão de área. Ganha Traços como as outras unidades Tessara.' },
 };
-// o que cada estrutura produz, por facção
+// o que cada estrutura produz, por Raça
 const FACTION_EXTRAS = {
   vehnar:  { quartel: ['soldador', 'guindaste'], fabrica: ['prensa', 'tratorzao'] },
   erevane: { quartel: ['atirador', 'ancora'], fabrica: ['lamina'], hangar: ['mosquito'] },

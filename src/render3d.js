@@ -150,6 +150,25 @@ function create(canvas, overlay, mini) {
   const matMain = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.82, metalness: 0.12 });
   const matEm = new THREE.MeshBasicMaterial({ vertexColors: true });
   const matGhost = new THREE.MeshStandardMaterial({ vertexColors: true, transparent: true, opacity: 0.55, roughness: 0.9 });
+  // 4.0a — materiais por Raça: parâmetros PBR distintos + brilho de borda (rim) barato injetado no shader padrão.
+  const RACE_MAT = {
+    vehnar: { roughness: 0.58, metalness: 0.4, rim: [1.0, 0.5, 0.2], pow: 3.5, amt: 0.12 },
+    erevane: { roughness: 0.38, metalness: 0.22, rim: [0.2, 1.0, 0.82], pow: 2.2, amt: 0.3 },
+    tessara: { roughness: 0.85, metalness: 0.02, rim: [0.45, 1.0, 0.55], pow: 1.8, amt: 0.26 },
+  };
+  const raceMats = new Map();
+  function matFor(pid) {
+    if (pid == null || pid < 0 || !R.sim || !R.sim.players[pid]) return matMain;
+    const fac = R.sim.players[pid].faction; const cfg = RACE_MAT[fac]; if (!cfg) return matMain;
+    let m = raceMats.get(fac); if (m) return m;
+    m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: cfg.roughness, metalness: cfg.metalness });
+    m.onBeforeCompile = sh => {
+      sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>',
+        '#include <emissivemap_fragment>\n{ float rim = pow(1.0 - abs(dot(normalize(normal), normalize(vViewPosition))), ' + cfg.pow.toFixed(1) + '); totalEmissiveRadiance += vec3(' + cfg.rim.join(', ') + ') * (rim * ' + cfg.amt.toFixed(2) + '); }');
+    };
+    m.customProgramCacheKey = () => 'race-' + fac;
+    raceMats.set(fac, m); return m;
+  }
   function modelFor(def, pid, seed) {
     if (NODE_MODEL[def]) return MD[NODE_MODEL[def]](seed);
     if (def === 'crate') return MD.crate(); if (def === 'wreck') return MD.wreck(); if (def === 'rocks') return MD.rocks(seed); if (def === 'ruin') return MD.ruin(seed);
@@ -160,7 +179,7 @@ function create(canvas, overlay, mini) {
     const key = def + '|' + pid + '|' + (seed || 0) + (ghost ? '|g' : ''); let it = R.inst.get(key); if (it) return it;
     const g = geoOf(def, pid, seed); const cap = 64;
     const mk = (geo, mat) => { const m = new THREE.InstancedMesh(geo, mat, cap); m.count = 0; m.frustumCulled = false; m.castShadow = !ghost && !isTouch; m.receiveShadow = !ghost; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(m); return m; };
-    it = { geo: g, main: mk(g.main, ghost ? matGhost : matMain), em: g.em && !ghost ? mk(g.em, matEm) : null, n: 0, cap }; R.inst.set(key, it); return it;
+    it = { geo: g, main: mk(g.main, ghost ? matGhost : matFor(pid)), em: g.em && !ghost ? mk(g.em, matEm) : null, n: 0, cap }; R.inst.set(key, it); return it;
   }
   function grow(it) { const cap = it.cap * 2; for (const k of ['main', 'em']) { const old = it[k]; if (!old) continue; const m = new THREE.InstancedMesh(old.geometry, old.material, cap); m.frustumCulled = false; m.castShadow = old.castShadow; m.receiveShadow = old.receiveShadow; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.remove(old); old.dispose(); scene.add(m); it[k] = m; } it.cap = cap; }
   function put(it, x, y, z, ang, scale, scaleY, tint) {
@@ -207,7 +226,17 @@ function create(canvas, overlay, mini) {
   const sGeo = new THREE.BufferGeometry(); sGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3)); sGeo.setAttribute('color', new THREE.BufferAttribute(sCol, 3));
   const sparkPts = new THREE.Points(sGeo, new THREE.PointsMaterial({ size: 3.2, vertexColors: true, transparent: true, opacity: 0.95, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })); sparkPts.frustumCulled = false; scene.add(sparkPts);
   function smoke(x, y, z, col, life, vz) { const i = P.i++ % PN; P.x[i] = x; P.y[i] = y; P.z[i] = z; P.vx[i] = (Math.random() - .5) * 6; P.vy[i] = (Math.random() - .5) * 6; P.vz[i] = vz == null ? 14 : vz; P.t[i] = 0; P.life[i] = life || 2.5; P.kind[i] = 0; pCol[i * 3] = col[0]; pCol[i * 3 + 1] = col[1]; pCol[i * 3 + 2] = col[2]; }
-  function snow(x, y) { const i = P.i++ % PN; P.x[i] = x; P.y[i] = y; P.z[i] = 90 + Math.random() * 40; P.vx[i] = 25; P.vy[i] = 8; P.vz[i] = -45; P.t[i] = 0; P.life[i] = 3.2; P.kind[i] = 1; pCol[i * 3] = 0.9; pCol[i * 3 + 1] = 0.93; pCol[i * 3 + 2] = 1; }
+  function snow(x, y, col, vz, vx, life) { const i = P.i++ % PN; P.x[i] = x; P.y[i] = y; P.z[i] = 90 + Math.random() * 40; P.vx[i] = vx == null ? 25 : vx; P.vy[i] = 8; P.vz[i] = vz == null ? -45 : vz; P.t[i] = 0; P.life[i] = life || 3.2; P.kind[i] = 1; const c = col || [0.9, 0.93, 1]; pCol[i * 3] = c[0]; pCol[i * 3 + 1] = c[1]; pCol[i * 3 + 2] = c[2]; }
+  // 4.0a — presets de clima local (só visual; a simulação não muda): tinge céu/névoa, luz ambiente e solta partículas.
+  const CLIMATES = {
+    toxica: { tint: [0.45, 0.55, 0.33], mix: 0.5, fogNear: 700, fogFar: 2100, hemi: 0x9fc08a, drop: [0.55, 0.75, 0.3], vz: -16, vx: 6, rate: 0.5, burst: 2, life: 4 },
+    plasma: { tint: [0.55, 0.38, 0.3], mix: 0.45, fogNear: 1000, fogFar: 2500, hemi: 0xd6a88a, drop: [1, 0.55, 0.25], vz: 24, vx: 16, rate: 0.6, burst: 2, life: 3 },
+    cristais: { tint: [0.6, 0.7, 0.85], mix: 0.35, fogNear: 1400, fogFar: 3200, hemi: 0xaac4e6, drop: [0.7, 0.9, 1], vz: -60, vx: 10, rate: 0.8, burst: 3, life: 3 },
+    aurora: { tint: [0.35, 0.55, 0.5], mix: 0.3, fogNear: 1600, fogFar: 3600, hemi: 0x8ae6c0, aurora: [0.3, 0.8, 0.6] },
+    acida: { tint: [0.5, 0.58, 0.38], mix: 0.45, fogNear: 900, fogFar: 2400, hemi: 0xb4c88a, drop: [0.65, 0.85, 0.35], vz: -130, vx: 4, rate: 1, burst: 3, life: 1.6 },
+  };
+  const _cc = new THREE.Color();
+  R.setClimate = function (name) { const c = CLIMATES[name] || null; R.climateCfg = c; scene.fog.near = c ? c.fogNear : 1500; scene.fog.far = c ? c.fogFar : 3200; hemi.color.set(c ? c.hemi : 0x9fb8d6); };
   function spark(x, y, z, col, sp, g) { const i = SP.i++ % SN; const a = Math.random() * TAU; SP.x[i] = x; SP.y[i] = y; SP.z[i] = z; SP.vx[i] = Math.cos(a) * sp * Math.random(); SP.vy[i] = Math.sin(a) * sp * Math.random(); SP.vz[i] = sp * (0.4 + Math.random() * 0.8); SP.t[i] = 0; SP.life[i] = 0.4 + Math.random() * 0.6; sCol[i * 3] = col[0]; sCol[i * 3 + 1] = col[1]; sCol[i * 3 + 2] = col[2]; }
   const boomGeo = new THREE.SphereGeometry(1, 10, 8); const boomMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 1.5, 0.8), transparent: true, opacity: 0.8, depthWrite: false }); const booms = new THREE.InstancedMesh(boomGeo, boomMat, 48); booms.count = 0; booms.frustumCulled = false; scene.add(booms); const boomList = [];
   const decalGeo = new THREE.CircleGeometry(1, 18); decalGeo.rotateX(-Math.PI / 2); const decals = new THREE.InstancedMesh(decalGeo, new THREE.MeshBasicMaterial({ color: 0x0b0908, transparent: true, opacity: 0.55, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }), 160); decals.count = 0; decals.frustumCulled = false; scene.add(decals); const decalList = [];
@@ -258,7 +287,14 @@ function create(canvas, overlay, mini) {
     updateCamera(cam);
     // dia e noite
     const nt = R.night; sun.intensity = 1.6 * (1 - nt) + 0.14 * nt; sun.color.setRGB(1 - 0.45 * nt, 0.91 - 0.3 * nt, 0.77 + 0.2 * nt); hemi.intensity = 0.55 * (1 - nt) + 0.2 * nt + lightning * 0.5; amb.intensity = 0.22 * (1 - nt) + 0.1 * nt + lightning * 0.6;
-    const bg = new THREE.Color().setRGB(0.62 * (1 - nt) + 0.02 * nt, 0.69 * (1 - nt) + 0.03 * nt, 0.77 * (1 - nt) + 0.06 * nt); scene.background = bg; scene.fog.color.copy(bg);
+    const bg = new THREE.Color().setRGB(0.62 * (1 - nt) + 0.02 * nt, 0.69 * (1 - nt) + 0.03 * nt, 0.77 * (1 - nt) + 0.06 * nt);
+    const cl = R.climateCfg;
+    if (cl) {
+      bg.lerp(_cc.setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), cl.mix * (1 - nt * 0.5));
+      if (cl.aurora) { const ka = (Math.sin(R.time * 0.25) + 1) / 2; bg.lerp(_cc.setRGB(cl.aurora[0], cl.aurora[1], cl.aurora[2]), 0.1 + 0.12 * ka); }
+      if (cl.drop && Math.random() < cl.rate * R.quality.particles) for (let i = 0; i < cl.burst; i++) { const zf = Math.max(0.6, cam.zoom); snow(cam.x + (Math.random() - .5) * 1500 / zf, cam.y + (Math.random() - .5) * 1100 / zf, cl.drop, cl.vz, cl.vx, cl.life); }
+    }
+    scene.background = bg; scene.fog.color.copy(bg);
     // névoa de guerra e território → texturas do terreno
     for (let iy = 0; iy < FOGN; iy++) for (let ix = 0; ix < FOGN; ix++) { const i = (iy * FOGN + ix) * 4; const tx = (ix * FOGC / TILE) | 0, ty = (iy * FOGC / TILE) | 0; const ex = view.reveal || explored[ty * TILES + tx]; fogData[i] = ex ? 110 : 0; fogData[i + 3] = 255; }
     if (!view.reveal) for (const e of sim.ents) { if (!e.alive || e.owner !== human || (e.kind !== 'unit' && e.kind !== 'building')) continue; const r = S.sensorRadius(sim, e); const x0 = Math.max(0, ((e.x - r) / FOGC) | 0), x1 = Math.min(FOGN - 1, ((e.x + r) / FOGC) | 0), y0 = Math.max(0, ((e.y - r) / FOGC) | 0), y1 = Math.min(FOGN - 1, ((e.y + r) / FOGC) | 0); for (let iy = y0; iy <= y1; iy++) for (let ix = x0; ix <= x1; ix++) { const d = Math.hypot((ix + 0.5) * FOGC - e.x, (iy + 0.5) * FOGC - e.y); if (d <= r) { const i = (iy * FOGN + ix) * 4; const v = d > r * 0.75 ? 110 + 145 * (1 - (d - r * 0.75) / (r * 0.25)) : 255; if (v > fogData[i]) fogData[i] = v; } } }
@@ -282,7 +318,23 @@ function create(canvas, overlay, mini) {
       const parts = MD.PARTS[e.def]; const hullDef = parts ? parts.hull : e.def; const it = instOf(hullDef, e.owner, 0); const g = it.geo; const fit = fitOf(e, g);
       const zz = isUnit && ud.flying ? 14 : 0; const moving = isUnit && (e.x !== e.px || e.y !== e.py); const bob = moving && (e.def === 'infantaria' || e.def === 'quimera' || e.def === 'soldador' || e.def === 'atirador') ? Math.abs(Math.sin(R.time * 11 + e.id)) * 1.2 : moving && (e.def === 'prensa' || e.def === 'colosso') ? Math.abs(Math.sin(R.time * 5 + e.id)) * 2.2 : 0;
       const dmg = !isUnit && e.built && e.hp < e.maxHp * 0.5; const tint = e.cloaked ? 0.55 : dmg ? 0.6 : 1;
-      put(it, wx, wy, zz + bob, isUnit || ud.wall ? (e.ang || 0) : 0, fit, isUnit ? 1 : (e.built ? 1 : 0.1 + 0.9 * e.progress), tint);
+      if (!isUnit && !e.built) { // 4.0a — nascimento de construção com assinatura por Raça
+        const pr = Math.min(1, Math.max(0.04, e.progress || 0)); const fac2 = (sim.players[e.owner] || {}).faction; const pp = R.quality.particles;
+        if (fac2 === 'erevane') { // origami: abre no plano e cintila até a camuflagem assentar
+          const flick = 1 + Math.sin(R.time * 16 + e.id * 1.7) * 0.22 * (1 - pr);
+          put(it, wx, wy, zz, (e.ang || 0), fit * (0.3 + 0.7 * pr), 0.25 + 0.75 * pr, (0.5 + 0.5 * pr) * flick);
+          if (Math.random() < 0.14 * pp) spark(wx + (Math.random() - .5) * e.r * 1.5, wy + (Math.random() - .5) * e.r * 1.5, 4 + Math.random() * 14, [0.3, 1, 0.85], 22, false);
+        } else if (fac2 === 'tessara') { // casulo: pulsa, incha e floresce
+          const pulse = 1 + Math.sin(R.time * 6.5 + e.id) * 0.08 * (1 - pr);
+          put(it, wx, wy, zz, (e.ang || 0), fit * (0.4 + 0.6 * pr) * pulse, (0.18 + 0.82 * pr * pr) * pulse, 0.65 + 0.35 * pr);
+          if (Math.random() < 0.1 * pp) smoke(wx + (Math.random() - .5) * e.r, wy + (Math.random() - .5) * e.r, 5, [0.35, 0.85, 0.5], 1.6, 12);
+        } else { // vehnar e neutro: módulos empilham em degraus com soldagem e vapor
+          const t5 = pr * 5, k = Math.floor(t5), fr = Math.min(1, (t5 - k) * 1.5);
+          put(it, wx, wy, zz, ud.wall ? (e.ang || 0) : 0, fit, Math.max(0.08, (k + fr) / 5), 0.7 + 0.3 * pr);
+          if (Math.random() < 0.2 * pp) spark(wx + (Math.random() - .5) * e.r * 1.3, wy + (Math.random() - .5) * e.r * 1.3, ((k + fr) / 5) * g.height * fit * 0.9 + 2, [1, 0.82, 0.45], 42, true);
+          if (Math.random() < 0.07 * pp) smoke(wx, wy, 4, [0.5, 0.5, 0.52], 1.5, 14);
+        }
+      } else put(it, wx, wy, zz + bob, isUnit || ud.wall ? (e.ang || 0) : 0, fit, 1, tint);
       if (parts && (isUnit || e.built)) { const tt = instOf(parts.turret, e.owner, 0); put(tt, wx, wy, zz + bob + parts.z * fit, e.aimAng != null ? e.aimAng : (e.ang || 0), fit, 1, tint); }
       if (view.sel.has(e.id)) { nSel = ring(nSel, wx, wy, e.r + 5); if (!isUnit && ud.attack && nRange < 32) { _p.set(wx, H(wx, wy) + 0.6, -wy); _s.set(ud.attack.range, 1, ud.attack.range); _q.identity(); _m.compose(_p, _q, _s); rangeRings.setMatrixAt(nRange++, _m); } }
       if (e.hp < e.maxHp - 0.5 || view.sel.has(e.id) || (isUnit && e.rank > 0)) hpList.push({ x: wx, y: wy, z: zz + g.height * fit + 4, w: Math.max(16, e.r * 1.4), frac: e.hp / e.maxHp, rank: isUnit ? e.rank : 0, cloak: e.cloaked && own, r: e.r });

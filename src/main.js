@@ -28,18 +28,58 @@ function savePrefs(p) { try { localStorage.setItem('ard-beta-prefs', JSON.string
 // ---------- start screen ----------
 function initStart() {
   const prefs = loadPrefs();
+  // 4.0a — portais de Raça: cor própria por card, prévia das Raças da 4.0b e fundo vivo que acompanha a escolha
+  const RACE_UI = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A' };
+  const RACE_SOON = [
+    { name: 'Coro Quorith', color: '#B388FF', tagline: 'Mente-colmeia de cristal ressonante. Vozes em sincronia, pactos em uníssono.' },
+    { name: 'Prole Vorag', color: '#E6455A', tagline: 'Enxame biológico voraz. Barato, rápido e sempre com fome.' },
+  ];
+  let raceColor = RACE_UI[prefs.faction] || '#FF5E3A';
+  const setRace = c => { raceColor = c; document.documentElement.style.setProperty('--race', c); };
   const facWrap = $('fac-cards'); facWrap.innerHTML = '';
   for (const id of Object.keys(S.FACTIONS)) {
     const f = S.FACTIONS[id];
-    const el = document.createElement('label'); el.className = 'fac-card'; el.dataset.id = id;
+    const el = document.createElement('label'); el.className = 'fac-card'; el.dataset.id = id; el.style.setProperty('--rc', RACE_UI[id] || '#FF5E3A');
     el.innerHTML = `<input type="radio" name="fac" value="${id}" ${((prefs.faction || 'vehnar') === id) ? 'checked' : ''}><div class="fac-name">${f.name}</div><div class="fac-tag">${f.tagline}</div><div class="fac-sup"><b>Superarma:</b> ${f.superName}. <b>Pirata:</b> ${f.pirateName}.</div>`;
+    el.querySelector('input').addEventListener('change', () => setRace(RACE_UI[id] || '#FF5E3A'));
     facWrap.appendChild(el);
   }
+  for (const r of RACE_SOON) {
+    const el = document.createElement('div'); el.className = 'fac-card soon'; el.style.setProperty('--rc', r.color);
+    el.innerHTML = `<div class="fac-name">${r.name} <span class="soon-badge">EM BREVE · 4.0b</span></div><div class="fac-tag">${r.tagline}</div>`;
+    facWrap.appendChild(el);
+  }
+  setRace(raceColor);
+  // fundo vivo: estrelas e o brilho da Raça escolhida (respeita prefers-reduced-motion; para ao entrar em jogo)
+  const bgfx = $('bgfx');
+  if (bgfx) {
+    const bctx = bgfx.getContext('2d'); const stars = [];
+    for (let i = 0; i < 140; i++) stars.push({ x: Math.random(), y: Math.random(), r: Math.random() * 1.4 + 0.4, ph: Math.random() * Math.PI * 2 });
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches; const t0 = performance.now();
+    const drawBg = () => {
+      if ($('start').hidden) return;
+      const w = bgfx.clientWidth, h = bgfx.clientHeight; if (!w || !h) { if (!reduced) requestAnimationFrame(drawBg); return; }
+      if (bgfx.width !== w || bgfx.height !== h) { bgfx.width = w; bgfx.height = h; }
+      const t = (performance.now() - t0) / 1000; const c = bctx; c.clearRect(0, 0, w, h);
+      const g1 = c.createRadialGradient(w * 0.72, h * 0.18, 0, w * 0.72, h * 0.18, Math.max(w, h) * 0.6);
+      g1.addColorStop(0, raceColor + '3a'); g1.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g1; c.fillRect(0, 0, w, h);
+      c.fillStyle = '#fff';
+      for (const st of stars) { const tw = reduced ? 0.55 : 0.3 + 0.7 * Math.abs(Math.sin(t * 0.5 + st.ph)); c.globalAlpha = 0.26 * tw; const x = (st.x + (reduced ? 0 : t * 0.003 * st.r)) % 1; c.fillRect(x * w, st.y * h, st.r, st.r); }
+      c.globalAlpha = 1;
+      if (!reduced) requestAnimationFrame(drawBg);
+    };
+    drawBg(); if (reduced) window.addEventListener('resize', drawBg);
+  }
+  // rodapé: Termos, Privacidade e atalho do tutorial
+  const wireModal = (btn, modal) => { const b = $(btn), m = $(modal); if (!b || !m) return; b.addEventListener('click', () => { m.hidden = false; }); m.querySelectorAll('[data-close]').forEach(x => x.addEventListener('click', () => { m.hidden = true; })); };
+  wireModal('foot-termos', 'termos'); wireModal('foot-priv', 'priv');
+  if ($('foot-help')) $('foot-help').addEventListener('click', () => toggleHelp(true));
   $('opt-name').value = prefs.name || 'Comandante';
   $('opt-opp').value = prefs.opp || '2';
   $('opt-diff').value = prefs.diff || 'normal';
   $('opt-seed').value = params.get('seed') || String(Math.floor(Math.random() * 90000) + 1000);
   $('opt-gfx').value = prefs.gfx || '3d'; $('opt-quality').value = prefs.quality || 'auto';
+  if ($('opt-clima')) $('opt-clima').value = prefs.clima || 'auto';
   // multiplayer P2P por código de sala: 2 a 4 jogadores humanos, sem IAs; o anfitrião é o relé do lockstep
   let lobby = null;
   const mpStatus = t => { $('mp-status').textContent = t; };
@@ -67,7 +107,7 @@ function initStart() {
     const players = roster.map(r => ({ name: r.name, faction: r.faction, human: true }));
     const cfg = { players, seed: parseInt($('opt-seed').value, 10) || 1, name: players[0].name, faction: players[0].faction, opp: '0', diff: 'normal' };
     N.start(cfg);
-    setTimeout(() => startGame(Object.assign({}, cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value }), { net: N, myId: 0 }), 150);
+    setTimeout(() => startGame(Object.assign({}, cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }), { net: N, myId: 0 }), 150);
   }
   $('btn-host').addEventListener('click', () => {
     if (!window.Peer) { mpStatus('PeerJS não carregou neste navegador.'); return; }
@@ -97,7 +137,7 @@ function initStart() {
     N.on('full', () => { mpStatus('A sala ' + code + ' está cheia ou a partida já começou.'); leaveLobby(); });
     N.on('close', () => { if (!lobby || lobby.N !== N || lobby.started) return; mpStatus('O anfitrião saiu da sala ' + code + '.'); leaveLobby(); });
     N.on('lobby', d => { if (!lobby || lobby.N !== N) return; lobby.size = d.size; renderLobby(d.players, d.size); mpStatus('Na sala ' + code + ' como ' + me.name + ' (' + d.players.length + '/' + d.size + '). A partida começa quando o anfitrião iniciar.'); });
-    N.on('start', d => { if (!lobby || lobby.N !== N) return; lobby.started = true; if (lobby.timer) clearInterval(lobby.timer); startGame(Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value }), { net: N, myId: d.you }); });
+    N.on('start', d => { if (!lobby || lobby.N !== N) return; lobby.started = true; if (lobby.timer) clearInterval(lobby.timer); startGame(Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }), { net: N, myId: d.you }); });
     N.join(code, me);
   }
   $('btn-join').addEventListener('click', () => joinRoom($('opt-code').value));
@@ -107,7 +147,7 @@ function initStart() {
     if (lobby) { if (lobby.role === 'host') startHosted(); else mpStatus('Aguarde o anfitrião iniciar a partida.'); return; }
     const typed = $('opt-code').value.trim(); if (typed.length >= 4) { joinRoom(typed); return; } // código digitado: entra na sala, nunca inicia partida solo
     const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar';
-    const cfg = { name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value };
+    const cfg = { name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value };
     savePrefs(Object.assign(loadPrefs() || {}, cfg)); startGame(cfg);
   });
   $('btn-help-start').addEventListener('click', () => toggleHelp(true));
@@ -134,9 +174,11 @@ function startGame(cfg, netCtx) {
   if (params.get('ssaoout')) R.ssaoOut = parseInt(params.get('ssaoout'), 10);
   if (params.get('testblack')) R.testBlack = true; R.debug = !!params.get('debug');
   if (R.setQuality) R.setQuality(params.get('q') || cfg.quality || 'auto', { ssao: params.has('ssao') ? params.get('ssao') === '1' : null, shadowMap: params.get('sm') ? parseInt(params.get('sm'), 10) : null, post: params.has('post') ? params.get('post') === '1' : null });
+  if (R.setClimate) R.setClimate(params.get('clima') || cfg.clima || 'auto');
   if (R.is3d) R.onDegrade = (what, reason) => { if (what) banner('Qualidade 3D reduzida', what + ' desativada: ' + reason + '. Se continuar escuro, escolha outra qualidade na tela inicial e envie o feedback.', 'warn'); else banner('Renderização 3D falhou', 'Volte à tela inicial e escolha Gráficos: 2D. Exporte o resultado e envie o feedback.', 'danger'); };
   R.resize();
   const nuc = S.nucleoOf(sim, human);
+  if (params.get('demo') === 'birth' && !net) { sim.players[human].res.minerio += 1500; sim.players[human].res.plasma += 600; ['reator', 'refinaria', 'quartel'].forEach((d, i) => S.enqueue(sim, { t: 'build', p: human, def: d, x: nuc.x + 75 + (i % 2) * 95, y: nuc.y - 80 + i * 80, ang: 0 })); } // depuração: três canteiros para ver o nascimento
   const isTouch = matchMedia('(pointer: coarse)').matches || !!params.get('touch');
   const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.9 : 1.0, yaw: Math.PI / 4 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
   const ui = makeUI(); // closures below
@@ -402,7 +444,7 @@ function startGame(cfg, netCtx) {
       { id: 'muro', text: 'Muros (B → M) se desenham arrastando o mouse. Deixe um Portão (G) para suas unidades passarem.', done: () => S.hasBuilt(sim, human, 'muro') || sim.time > 600 },
       { id: 'pirata', text: 'Treine um Pirata (P) no Quartel e clique com o direito em uma Refinaria inimiga para Sifonar.', done: () => sim.players[human].stats.stolen > 0 },
       { id: 'diplo', text: 'Abra a Diplomacia e proponha Não-agressão a quem está forte demais. Ou quebre um pacto na hora certa.', done: () => sim.players[human].stats.treaties > 0 || sim.players[human].stats.betrayals > 0 || sim.time > 540 },
-      { id: 'lab', text: 'Um Laboratório (B → L) libera pesquisas e a superarma da sua facção.', done: () => S.hasBuilt(sim, human, 'laboratorio') },
+      { id: 'lab', text: 'Um Laboratório (B → L) libera pesquisas e a superarma da sua Raça.', done: () => S.hasBuilt(sim, human, 'laboratorio') },
     ];
   }
   function refreshHints() {
@@ -435,7 +477,7 @@ function startGame(cfg, netCtx) {
     $('end-scores').innerHTML = `<table><thead><tr><th>#</th><th>Jogador</th><th>Domínio</th></tr></thead><tbody>${rows}</tbody></table>`;
     $('end-stats').innerHTML = [['Coletado', fmt(st.collected)], ['Roubado', fmt(st.stolen)], ['Perdido para roubo', fmt(st.lost)], ['Unidades abatidas', st.unitsKilled], ['Unidades perdidas', st.unitsLost], ['Estruturas destruídas', st.buildingsDestroyed], ['Tratados', st.treaties], ['Traições', st.betrayals], ['Reputação final', S.REP_NAMES[p.rep]]].map(([k, v]) => `<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');
     $('btn-again').onclick = () => location.reload();
-    $('btn-copy').onclick = () => { const data = { versao: '3.0d', data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
+    $('btn-copy').onclick = () => { const data = { versao: '4.0a', data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
   }
 
   // ---------- UI bridge for input ----------
