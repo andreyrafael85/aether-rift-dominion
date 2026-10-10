@@ -1,6 +1,6 @@
 # Aether Rift: Dominion — beta de testes
 
-RTS multiplayer browser-first em desenvolvimento. Este repositório publica o **beta 1.5a jogável** (contra IA, visual isométrico voxel, muros e portões, dia e noite) e a **prova de conceito visual** que originou essa direção, para testes com amigos.
+RTS multiplayer browser-first em desenvolvimento. Este repositório publica o **beta 2.0a jogável** (contra IA: visual isométrico voxel, projéteis e torretas, muros com caminhos, veterância, carcaças, Tempestade de Éter, som e voz, controles de toque) e a **prova de conceito visual** que originou essa direção, para testes com amigos.
 
 **Jogar agora:** abra `index.html` pelo GitHub Pages deste repositório (link na descrição) ou localmente, direto no navegador. Funciona em desktop e celular; nada para instalar.
 
@@ -13,6 +13,7 @@ RTS multiplayer browser-first em desenvolvimento. Este repositório publica o **
 3. Tente roubar: treine um Pirata no Quartel e clique com o botão direito em uma Refinaria inimiga.
 4. Tente um pacto pela Diplomacia e, se quiser, quebre-o na hora certa.
 5. Desenhe muros arrastando o mouse (B, depois M) e deixe um Portão (G) para suas unidades.
+6. No celular: toque em uma unidade sua, depois toque no chão para mover ou no inimigo para atacar. A barra inferior tem Núcleo, Exército, Na tela, Construir, Atacar, Parar, Caixa e ✕.
 
 ## Como dar feedback
 

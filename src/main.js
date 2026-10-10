@@ -3,6 +3,7 @@
 'use strict';
 const S = ARD.sim;
 const $ = id => document.getElementById(id);
+const AU = ARD.audio;
 const fmt = n => Math.floor(n).toLocaleString('pt-BR');
 const mmss = t => { t = Math.max(0, Math.floor(t)); return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
@@ -52,7 +53,7 @@ function startGame(cfg) {
   const R = ARD.render.create(canvas, mini); R.resize();
   const nuc = S.nucleoOf(sim, human);
   const isTouch = matchMedia('(pointer: coarse)').matches || !!params.get('touch');
-  const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.75 : 1.0 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
+  const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.9 : 1.0 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
   const ui = makeUI(); // closures below
   const I = ARD.input.create({ canvas, sim, view, R, human, ui });
   const ais = sim.players.filter(p => !p.human).map(p => ARD.ai.create(p.id, p.difficulty));
@@ -109,8 +110,31 @@ function startGame(cfg) {
     }
   }
 
+  function volAt(x, y) { if (x == null) return 1; const d = S.dist(x, y, view.cam.x, view.cam.y); return Math.max(0.12, 1 - d / (1100 / Math.max(0.6, view.cam.zoom))); }
+  function voiceFor(text) {
+    const t = text.toUpperCase();
+    if (t.includes('SIFÃO')) return 'Alerta de sifão'; if (t.includes('NÚCLEO SOB')) return 'Núcleo sob ataque'; if (t.includes('BASE SOB')) return 'Base sob ataque';
+    if (t.includes('QUEBROU')) return 'Pacto quebrado'; if (t.includes('TEMPESTADE')) return 'Tempestade de Éter'; if (t.includes('ELIMINADO')) return text; if (t.includes('PESQUISA')) return 'Pesquisa concluída';
+    if (t.includes('PACTO DE NÃO')) return 'Pacto assinado'; if (t.includes('BLECAUTE')) return 'Blecaute'; if (t.includes('FUNDIÇÃO')) return 'Fundição Orbital'; if (t.includes('SALTO')) return 'Salto de Núcleo'; return null;
+  }
+  function audioFor(e) {
+    switch (e.t) {
+      case 'shot': { const w = S.WEAPONS[e.weapon]; AU.sfx(e.beam ? 'beam' : (w && w.proj === 'shell') ? 'shot_heavy' : 'shot_light', volAt(e.x1, e.y1)); break; }
+      case 'impact': AU.sfx(e.splash > 0 ? 'impact' : 'shot_light', volAt(e.x, e.y) * (e.splash > 0 ? 1 : 0.3)); break;
+      case 'death': AU.sfx('explosion', volAt(e.x, e.y) * (e.kind === 'building' ? 1 : 0.6)); break;
+      case 'built': if (e.p === human) { AU.sfx('build'); AU.say('Construção concluída', 'built', 4); } break;
+      case 'spawn': if (e.p === human) { AU.sfx('spawn'); AU.say('Unidade pronta', 'spawn', 5); } break;
+      case 'promote': if (e.owner === human) AU.sfx('promote'); break;
+      case 'alert': if (e.p === human) { AU.sfx(e.kind === 'danger' ? 'danger' : 'alert'); const v = voiceFor(e.text); if (v) AU.say(v, v, e.kind === 'danger' ? 8 : 15); } break;
+      case 'storm': if (e.phase === 'active') AU.sfx('storm'); break;
+      case 'pact': AU.sfx('pact'); break;
+      case 'betrayal': AU.sfx('betrayal'); break;
+      case 'siphon': if (Math.random() < 0.05) AU.sfx('siphon', volAt(e.x2, e.y2)); break;
+    }
+  }
   function handleEvents(ev, silent) {
     for (const e of ev) {
+      if (!silent) audioFor(e);
       if (e.t === 'alert' && e.p === human) { if (e.x != null) view.lastAlert = { x: e.x, y: e.y }; if (!silent) pushAlert(e); }
       else if (e.t === 'notice' && e.p === human && !silent) notice(e.text);
       else if (e.t === 'proposal' && e.p === human && !silent) { G.pendingFor = e.from; showProposal(e.from); }
@@ -152,6 +176,7 @@ function startGame(cfg) {
     const panel = $('panel'); const p = sim.players[human]; const fac = S.FACTIONS[p.faction];
     if (!ents.length || I.buildMenu) { panel.innerHTML = buildMenuHTML(p); bindBuildMenu(); return; }
     const e = ents[0];
+    if (e.kind === 'wreck') { panel.innerHTML = `<div class="ph"><span class="dot" style="background:#8A5A3A"></span><b>Carcaça de ${esc(S.UNITS[e.def] ? S.UNITS[e.def].name : 'veículo')}</b></div><div class="muted">${fmt(e.amount)} de Minério recuperável</div><div class="muted small">Coletores podem saquear carcaças em qualquer lugar: clique direito com um coletor.</div>`; return; }
     if (e.kind === 'node') { panel.innerHTML = `<div class="ph"><span class="dot" style="background:${ARD.render.NODE_COLOR[e.res]}"></span><b>Nó de ${RES_NAME[e.res]}</b></div><div class="muted">${fmt(e.amount)} / ${fmt(e.max)} restantes</div><div class="muted small">Coletores colhem automaticamente nós dentro do seu território. Clique direito com coletores para colher manualmente.</div>`; return; }
     if (e.owner !== human) {
       const q = sim.players[e.owner]; const d = e.kind === 'unit' ? S.UNITS[e.def] : S.BUILDINGS[e.def];
@@ -188,7 +213,7 @@ function startGame(cfg) {
     let h = `<div class="ph"><b>${ents.length} unidade${ents.length > 1 ? 's' : ''}</b></div><div class="chips">`;
     for (const k in counts) h += `<span class="chip">${counts[k]}× ${esc(k === 'pirata' ? fac.pirateName : S.UNITS[k].name)}</span>`;
     h += '</div>';
-    if (ents.length === 1) { const u = ents[0]; h += `<div class="hp"><i style="width:${(100 * u.hp / u.maxHp)}%"></i></div><div class="muted small">${fmt(u.hp)} / ${fmt(u.maxHp)} · ${S.CLASS_NAMES[u.cls]} · ${esc(S.UNITS[u.def].desc)}</div>`; if (u.cargoTotal > 0) h += `<div class="muted small">Carga: ${fmt(u.cargoTotal)}${u.stolen ? ' (roubada)' : ''}</div>`; }
+    if (ents.length === 1) { const u = ents[0]; h += `<div class="hp"><i style="width:${(100 * u.hp / u.maxHp)}%"></i></div><div class="muted small">${fmt(u.hp)} / ${fmt(u.maxHp)} · ${S.CLASS_NAMES[u.cls]}${u.rank ? ' · ' + ['', '★ Veterano', '★★ Elite', '★★★ Lenda'][u.rank] : ''} · ${esc(S.UNITS[u.def].desc)}</div>`; if (u.cargoTotal > 0) h += `<div class="muted small">Carga: ${fmt(u.cargoTotal)}${u.stolen ? ' (roubada)' : ''}</div>`; }
     const combat = ents.some(u => S.UNITS[u.def].attack);
     h += `<div class="row">${combat ? `<button class="act sm ${I.mode === 'attackmove' ? 'on' : ''}" data-u="attackmove"><span class="k">A</span> Atacar-mover</button>` : ''}<button class="act sm" data-u="stop"><span class="k">S</span> Parar</button></div>`;
     if (counts.pirata) h += '<div class="tip">Pirata: clique com o direito em uma Refinaria ou Reator inimigo para Sifonar (40 s). Volte à base para entregar. Se morrer carregado, a carga vira Caixa.</div>';
@@ -229,6 +254,12 @@ function startGame(cfg) {
     $('btn-box').addEventListener('click', () => { I.touchBox = !I.touchBox; refreshQuick(); notice(I.touchBox ? 'Arraste para selecionar em caixa' : 'Arraste para mover a câmera'); });
     $('btn-stop').addEventListener('click', () => { const ids = [...view.sel].filter(id => { const e = sim.byId.get(id); return e && e.alive && e.kind === 'unit' && e.owner === human; }); if (ids.length) I.cmd({ t: 'stop', ids }); });
     $('btn-nucleo').addEventListener('click', () => { const n = S.nucleoOf(sim, human); if (n) { I.select([n.id]); I.center(n.x, n.y); } });
+    $('btn-clear').addEventListener('click', () => { I.select([]); if (I.mode !== 'normal') I.setMode('normal'); });
+    $('btn-all').addEventListener('click', () => { const n = I.selectOnScreen(); notice(n ? n + ' unidades selecionadas' : 'Nenhuma unidade de combate na tela'); });
+    const syncAudioBtns = () => { $('btn-sound').classList.toggle('on', AU.enabled); $('btn-voice').classList.toggle('on', AU.voice); };
+    $('btn-sound').addEventListener('click', () => { AU.setEnabled(!AU.enabled); AU.init(); syncAudioBtns(); if (AU.enabled) AU.sfx('click'); });
+    $('btn-voice').addEventListener('click', () => { AU.setVoice(!AU.voice); syncAudioBtns(); if (AU.voice) AU.say('Voz ativada', 'voz-on', 0); });
+    syncAudioBtns();
     $('btn-army').addEventListener('click', () => { const ids = []; for (const en of sim.ents) if (en.alive && en.owner === human && en.kind === 'unit' && S.UNITS[en.def].attack) ids.push(en.id); I.select(ids); if (ids.length) { const e = sim.byId.get(ids[0]); I.center(e.x, e.y); } });
     mini.addEventListener('pointerdown', e => { e.preventDefault(); const r = mini.getBoundingClientRect(); const [x, y] = R.miniToWorld((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height); if (e.button === 2) { const ids = [...view.sel].filter(id => { const u = sim.byId.get(id); return u && u.alive && u.kind === 'unit' && u.owner === human; }); if (ids.length) I.cmd({ t: 'attackmove', ids, x, y }); } else I.center(x, y); });
     mini.addEventListener('contextmenu', e => e.preventDefault());
@@ -278,7 +309,7 @@ function startGame(cfg) {
     if (G.hintsOff) return;
     const todo = G.hints.filter(h => !h.done()).slice(0, 2);
     const box = $('hints'); if (!todo.length) { box.hidden = true; return; }
-    box.hidden = false; $('hints-body').innerHTML = todo.map((h, i) => `<div class="hint ${i === 0 ? 'now' : ''}">${esc(h.text)}</div>`).join('');
+    box.hidden = false; $('hints-body').innerHTML = (G.isTouch ? todo.slice(0, 1) : todo).map((h, i) => `<div class="hint ${i === 0 ? 'now' : ''}">${esc(h.text)}</div>`).join('');
   }
 
   // ---------- end ----------
@@ -312,6 +343,7 @@ function toggleHelp(force) { const h = $('help'); h.hidden = force === true ? fa
 
 window.addEventListener('error', e => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent = 'Erro: ' + (e.message || e.error); } });
 document.addEventListener('DOMContentLoaded', initStart);
+for (const ev of ['pointerdown', 'keydown', 'touchstart']) document.addEventListener(ev, () => { ARD.audio.init(); ARD.audio.resume(); }, { passive: true });
 if (params.get('debug')) setTimeout(() => {
   const out = [];
   out.push('vw=' + innerWidth + ' sw=' + document.documentElement.scrollWidth);

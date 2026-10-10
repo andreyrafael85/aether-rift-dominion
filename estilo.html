@@ -54,7 +54,7 @@ const FACES = [
 /* Renderiza um modelo em um canvas offscreen. angle em radianos (rotação em z). s = px por voxel. */
 function renderSprite(model, angle, s, opt) {
   opt = opt || {};
-  const b = model.bounds(); const cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2;
+  const b = model.bounds(); const cx = model.pivot ? model.pivot.x : (b.x0 + b.x1) / 2, cy = model.pivot ? model.pivot.y : (b.y0 + b.y1) / 2;
   const ca = Math.cos(angle), sa = Math.sin(angle);
   const rot = (x, y) => [cx + (x - cx) * ca - (y - cy) * sa, cy + (x - cx) * sa + (y - cy) * ca];
   const proj = (x, y, z) => { const [xr, yr] = rot(x, y); return [(xr - yr) * s, (xr + yr) * s * 0.5 - z * s]; };
@@ -170,6 +170,44 @@ function tug(col, style) { // Rebocador (Vehnar): caminhão pesado com guincho
   m.box(2, 3, 5, 6, 4, 2, steel2); m.box(0, 4, 5, 2, 2, 5, steel); m.box(-1, 4, 9, 4, 2, 1, dark); m.box(-2, 4, 8, 1, 2, 1, magenta, null, true);
   m.box(15, 3, 5, 1, 1, 1, lamp, null, true); m.box(15, 6, 5, 1, 1, 1, lamp, null, true);
   return m;
+}
+// ---------- partes giratórias (casco + torreta) ----------
+function tankHull(col, style) {
+  const p = pal(col, style); const m = M();
+  m.box(0, 0, 0, 14, 3, 3, dark, (x, y, z) => !(z === 2 && (x % 3 === 1)));
+  m.box(0, 7, 0, 14, 3, 3, dark, (x, y, z) => !(z === 2 && (x % 3 === 1)));
+  m.box(1, 2, 2, 12, 6, 3, p.body); m.box(2, 3, 5, 9, 4, 1, p.acc);
+  if (style === 'erevane') m.box(1, 2, 4, 12, 1, 1, p.trim);
+  m.box(12, 3, 4, 1, 1, 1, lamp, null, true); m.box(12, 6, 4, 1, 1, 1, lamp, null, true); m.box(1, 4, 4, 1, 2, 1, '#FF4040', null, true);
+  return m;
+}
+function tankTurret(col, style) {
+  const p = pal(col, style); const m = M();
+  m.box(0, 0, 0, 6, 4, 3, p.body); m.box(1, 1, 3, 4, 2, 1, p.trim); m.box(6, 1, 1, 7, 2, 1, steel2); m.box(12, 1, 1, 2, 2, 1, dark);
+  m.pivot = { x: 3, y: 2 }; return m;
+}
+function towerBase(col, style) {
+  const p = pal(col, style); const m = M();
+  m.box(0, 0, 0, 10, 10, 3, steel2); m.box(2, 2, 3, 6, 6, 9, dark);
+  if (style === 'erevane') m.box(2, 2, 8, 6, 1, 1, yellow);
+  return m;
+}
+function towerTurret(col, style) {
+  const p = pal(col, style); const m = M();
+  m.box(0, 0, 0, 8, 8, 3, p.body); m.box(2, 2, 3, 4, 4, 2, p.acc); m.box(6, 3, 1, 7, 2, 1, dark); m.box(6, 3, 2, 7, 2, 1, steel2); m.box(3, 3, 5, 2, 2, 1, '#FF4040', null, true);
+  m.pivot = { x: 4, y: 4 }; return m;
+}
+function bastionBase(col, style) {
+  const p = pal(col, style); const m = M();
+  m.box(0, 0, 0, 18, 18, 4, steel2); m.box(2, 2, 4, 14, 14, 8, p.body); m.box(1, 1, 12, 16, 16, 2, p.acc);
+  for (const [x, y] of [[2, 2], [14, 2], [2, 14], [14, 14]]) m.box(x, y, 12, 2, 2, 1, orange, null, true);
+  return m;
+}
+function bastionTurret(col, style) {
+  const p = pal(col, style); const m = M();
+  m.box(0, 0, 0, 10, 10, 5, dark); m.box(1, 1, 5, 8, 8, 2, p.body); m.box(8, 1, 3, 9, 2, 2, steel2); m.box(8, 7, 3, 9, 2, 2, steel2); m.box(16, 1, 3, 2, 2, 2, dark); m.box(16, 7, 3, 2, 2, 2, dark);
+  m.box(4, 4, 7, 2, 2, 3, steel); m.box(4, 4, 10, 2, 2, 1, '#FF4040', null, true);
+  m.pivot = { x: 5, y: 5 }; return m;
 }
 // ---------- estruturas ----------
 function nucleus(col, style) {
@@ -295,8 +333,11 @@ const BY_DEF = {
   nucleo: nucleus, reator: reactor, refinaria: refinery, quartel: barracks, fabrica: factory, hangar: hangar, torre: tower, bastiao: bastion, nodulo: nodule, laboratorio: lab,
   muro: (c, s) => wall(c, s, false), portao: (c, s) => wall(c, s, true),
   coletor: harvester, infantaria: infantry, veiculo: tank, drone: drone, suporte: support, pirata: raider, pirata_vehnar: tug,
+  veiculo_hull: tankHull, veiculo_turret: tankTurret, torre_base: towerBase, torre_turret: towerTurret, bastiao_base: bastionBase, bastiao_turret: bastionTurret,
 };
-ARD.models = { tank, mech, harvester, infantry, drone, support, raider, tug, refinery, reactor, barracks, factory, hangar, tower, bastion, nodule, lab, wall, nucleus, crystals, ore, datashards, rocks, crate, wreck, BY_DEF };
+// defs que se desenham em duas partes: casco na direção do corpo e torreta na direção da mira; z = altura da torreta em voxels
+const PARTS = { veiculo: { hull: 'veiculo_hull', turret: 'veiculo_turret', z: 6 }, torre: { hull: 'torre_base', turret: 'torre_turret', z: 12 }, bastiao: { hull: 'bastiao_base', turret: 'bastiao_turret', z: 14 } };
+ARD.models = { PARTS, tankHull, tankTurret, towerBase, towerTurret, bastionBase, bastionTurret, tank, mech, harvester, infantry, drone, support, raider, tug, refinery, reactor, barracks, factory, hangar, tower, bastion, nodule, lab, wall, nucleus, crystals, ore, datashards, rocks, crate, wreck, BY_DEF };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Cena de teste de estilo: base cercada por muros numa planície de gelo, raid em andamento. */

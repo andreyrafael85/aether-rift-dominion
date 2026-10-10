@@ -110,7 +110,17 @@ body.touch #top{gap:.3rem .6rem;padding:.3rem .5rem;font-size:12px}
 body.touch #top .muted{display:none}
 body.touch .speed{margin-left:0}
 body.touch .speed button,body.touch .tb{padding:.2rem .4rem}
-body.touch #hints{top:calc(5.6rem + env(safe-area-inset-top,0))}
+body.touch #hints{top:calc(5.6rem + env(safe-area-inset-top,0));padding:.35rem .6rem;font-size:12px;width:calc(100vw - 130px)}
+body.touch #bar{flex-wrap:wrap;gap:.3rem}
+body.touch #bar .tb{min-width:0;flex:1 1 auto;padding:.3rem .35rem;font-size:12px}
+body.touch #panel{max-height:30vh;padding:.5rem}
+body.touch .grid{grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
+body.touch .act{min-height:40px;padding:.3rem .4rem}
+body.touch .act .ico{width:28px;height:28px}
+body.touch #right{width:104px}
+body.touch #minimap{width:104px;height:104px}
+body.touch .qb{padding:.25rem .4rem}
+body.touch .qb .sub{display:none}
 body.touch #right{top:calc(5.8rem + env(safe-area-inset-top,0))}
 #bar .tb{min-width:44px;min-height:40px;font-size:13px}
 #hints{position:absolute;left:50%;transform:translateX(-50%);top:calc(3.4rem + env(safe-area-inset-top,0));width:min(520px,calc(100vw - 420px));background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.5rem .75rem;display:grid;gap:.25rem;font-size:12.5px}
@@ -140,12 +150,12 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 #end-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.4rem}
 .stat{display:grid;border:1px solid var(--line);border-radius:6px;padding:.4rem .6rem;font-size:12px}.stat span{color:var(--fg2)}
 .loadbar{height:6px;background:#262A31;border-radius:3px;overflow:hidden;margin-top:.5rem}.loadbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--rift1),var(--rift2));transition:width .15s}
-#errbox{position:fixed;left:8px;bottom:8px;background:#5a1d1d;color:#fff;padding:.4rem .6rem;border-radius:6px;font-family:var(--fm);font-size:12px;z-index:9;max-width:80vw}
+#errbox{position:fixed;left:8px;bottom:8px;background:#5a1d1d;color:#fff;padding:.4rem .6rem;border-radius:6px;font-family:var(--fm);font-size:12px;z-index:9;max-width:80vw;cursor:pointer}
 </style></head><body>
 
 <div id="start" class="screen">
   <div class="start-wrap">
-    <div class="eyebrow">Beta 1.5a · protótipo jogável no navegador · contra IA</div>
+    <div class="eyebrow">Beta 2.0a · protótipo jogável no navegador · contra IA</div>
     <h1>Aether Rift<br><span>Dominion</span></h1>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -158,7 +168,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         <div class="row"><button id="btn-start" class="btn primary">Iniciar partida</button><button id="btn-help-start" class="btn">Como jogar</button></div>
       </div>
     </div>
-    <p class="start-notes"><b>Novo no 1.5a:</b> visual isométrico com sprites voxel gerados no navegador, terreno com biomas, muros e portões desenhados por arrasto, estados de dano, destroços e crateras, ciclo de dia e noite com luzes. <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
+    <p class="start-notes"><b>Novo no 2.0a:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
   </div>
 </div>
 
@@ -170,7 +180,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
       <div id="energy" class="energy pleno"><div class="row"><span>⚡ <span id="e-text">0 / 0</span></span><span id="e-regime">Pleno</span></div><div class="bar"><i id="e-bar"></i></div></div>
       <span id="clock">00:00</span>
       <span class="muted">Rep.: <span id="rep">Neutro</span></span>
-      <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
+      <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-sound" class="tb" title="Som">♪</button><button id="btn-voice" class="tb" title="Voz do sistema">🗣</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
     </div>
     <div id="hints"><button id="hints-close" aria-label="Fechar dicas">✕</button><div id="hints-body"></div></div>
     <div id="panel"></div>
@@ -184,7 +194,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     </div>
     <div id="log"></div>
     <div id="bar">
-      <button id="btn-nucleo" class="tb">Núcleo</button><button id="btn-army" class="tb">Exército</button><button id="btn-build" class="tb">Construir</button><button id="btn-attack" class="tb">Atacar</button><button id="btn-stop" class="tb">Parar</button><button id="btn-box" class="tb">Caixa</button>
+      <button id="btn-nucleo" class="tb">Núcleo</button><button id="btn-army" class="tb">Exército</button><button id="btn-all" class="tb">Na tela</button><button id="btn-build" class="tb">Construir</button><button id="btn-attack" class="tb">Atacar</button><button id="btn-stop" class="tb">Parar</button><button id="btn-box" class="tb">Caixa</button><button id="btn-clear" class="tb">✕</button>
     </div>
     <div id="notice"></div>
     <div id="proposal" hidden><div id="proposal-text"></div><div class="row"><button id="prop-yes" class="act sm good">Aceitar pacto</button><button id="prop-no" class="act sm">Recusar</button></div></div>
@@ -210,7 +220,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <tr><td>WASD, setas, roda, botão do meio</td><td>Câmera e zoom</td></tr>
   <tr><td>P / H / Esc</td><td>Pausar / ajuda / cancelar</td></tr></table>
   <h3>Toque</h3>
-  <table><tr><td>Toque</td><td>Selecionar. Com unidades selecionadas, toque no chão move.</td></tr><tr><td>Toque longo</td><td>Comando de contexto (atacar, colher, sifonar, recolher).</td></tr><tr><td>Arrastar / dois dedos</td><td>Câmera / zoom. Ative "Caixa" para arrastar uma seleção.</td></tr></table>
+  <table><tr><td>Toque</td><td>Toque em uma unidade sua para selecionar; duplo toque seleciona todas do tipo. Com unidades selecionadas: toque no chão move, toque no inimigo ataca, toque em nó ou carcaça colhe, toque em Refinaria inimiga com Pirata sifona.</td></tr><tr><td>Barra inferior</td><td>Núcleo, Exército, Na tela (seleciona o que aparece), Construir, Atacar (o modo fica ligado até desligar), Parar, Caixa (arrastar seleciona) e ✕ (limpar seleção).</td></tr><tr><td>Arrastar / dois dedos</td><td>Câmera / zoom. Em modo Construir com Muro, arrastar desenha o muro.</td></tr></table>
   <h3>Contras (atacante → alvo)</h3>
   <table class="matrix"><thead><tr><th></th><th>Inf.</th><th>Veíc.</th><th>Drone</th><th>Estrut.</th><th>Sup.</th></tr></thead><tbody>
   <tr><td>Infantaria</td><td>—</td><td class="bad">▼</td><td class="good">▲</td><td class="bad">▼</td><td class="good">▲</td></tr>
@@ -223,7 +233,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <p class="small">Piratas sifonam Refinarias e Reatores inimigos por até 40 s; a vítima recebe um Alerta com atraso de 3 a 5 s. Pirata morto com carga vira Caixa que qualquer um recolhe. Erevane rouba com +20% e sem deixar Rastro. Pactos de Não-agressão custam Caução de 150 Minério por lado; quebrar dá +20% de dano por 45 s, entrega sua Caução à vítima e derruba sua reputação.</p>
   <div class="row"><button class="btn" data-close>Fechar</button></div>
 </div></div>
-<div id="errbox" hidden></div>
+<div id="errbox" hidden onclick="this.hidden=true"></div>
 <script>
 /* Aether Rift: Dominion — simulação determinística (beta 0.1)
    Comandos entram, estado sai. Sem DOM. Roda em Node e no navegador. */
@@ -235,6 +245,9 @@ const WORLD = 3200;
 const CX = WORLD / 2, CY = WORLD / 2;
 const RIFT_R = 170;
 const PLAYER_COLORS = ['#FF8C1A', '#38D1E0', '#B98BFF', '#7FE3A1'];
+const NAV = 32, NW = WORLD / NAV;          // grade de navegação 100×100
+const TILE = 64, TILES = WORLD / TILE;      // grade de exploração 50×50
+const DX8 = [1, 1, 0, -1, -1, -1, 0, 1], DY8 = [0, 1, 1, 1, 0, -1, -1, -1];
 
 const FACTIONS = {
   vehnar: {
@@ -262,23 +275,33 @@ const BUILDINGS = {
   quartel:     { name: 'Quartel Orbital', key: 'Q', hp: 1150, r: 26, cost: { minerio: 200 }, buildTime: 18, energyUse: 8, sensor: 140, produces: ['infantaria', 'suporte', 'pirata'], desc: 'Produz Infantaria, Suporte/Hack e Piratas.' },
   fabrica:     { name: 'Fábrica de Veículos', key: 'V', hp: 1300, r: 28, cost: { minerio: 300, plasma: 60 }, buildTime: 22, energyUse: 12, sensor: 140, produces: ['veiculo'], desc: 'Produz Veículos Pesados.' },
   hangar:      { name: 'Hangar de Drones', key: 'H', hp: 1150, r: 26, cost: { minerio: 280, plasma: 60 }, buildTime: 22, energyUse: 12, sensor: 160, produces: ['drone'], desc: 'Produz Drones Aéreos.' },
-  torre:       { name: 'Torre de Defesa', key: 'T', hp: 1100, r: 16, cost: { minerio: 180, plasma: 40 }, buildTime: 14, energyUse: 10, sensor: 260, detect: 140, attack: { dmg: 30, range: 230, cd: 1.0 }, desc: 'Forte vs Infantaria e Drones. Detecta camuflagem em 140.' },
+  torre:       { name: 'Torre de Defesa', key: 'T', hp: 1100, r: 16, cost: { minerio: 180, plasma: 40 }, buildTime: 14, energyUse: 10, sensor: 260, detect: 140, weapon: 'obus', desc: 'Forte vs Infantaria e Drones. Detecta camuflagem em 140.' },
   nodulo:      { name: 'Nódulo de Avanço', key: 'N', hp: 650, r: 16, cost: { minerio: 120, plasma: 20 }, buildTime: 10, energyUse: 4, sensor: 260, territory: 320, desc: 'Reclama território em 320 e libera nós para coleta automática. Pode ser colocado até 650 de qualquer estrutura sua.' },
   laboratorio: { name: 'Laboratório', key: 'L', hp: 900, r: 24, cost: { minerio: 220, plasma: 60, dados: 40 }, buildTime: 20, energyUse: 10, sensor: 140, desc: 'Pesquisas e superarma, pagas com Fragmentos de Dados.' },
   muro:        { name: 'Muro', key: 'M', hp: 450, r: 8, cost: { minerio: 20 }, buildTime: 3, energyUse: 0, sensor: 50, wall: true, desc: 'Barreira barata. Arraste para desenhar uma linha. Bloqueia unidades e absorve tiros.' },
   portao:      { name: 'Portão', key: 'G', hp: 600, r: 8, cost: { minerio: 40 }, buildTime: 4, energyUse: 0, sensor: 60, wall: true, gate: true, desc: 'Trecho de muro que suas unidades atravessam. Inimigos precisam derrubá-lo.' },
-  bastiao:     { name: 'Bastião', key: '', hp: 2200, r: 24, cost: {}, buildTime: 3, energyUse: 12, sensor: 300, detect: 160, attack: { dmg: 60, range: 260, cd: 0.9 }, desc: 'Fortaleza da Fundição Orbital.' },
+  bastiao:     { name: 'Bastião', key: '', hp: 2200, r: 24, cost: {}, buildTime: 3, energyUse: 12, sensor: 300, detect: 160, weapon: 'bombarda', desc: 'Fortaleza da Fundição Orbital.' },
 };
 
 const UNITS = {
   coletor:    { name: 'Coletor', key: 'C', cls: 'civ', hp: 90, r: 7, speed: 85, cost: { minerio: 60 }, time: 8, energyUse: 1, capacity: 50, harvestRate: 12, sensor: 110, desc: 'Coleta automaticamente nós no seu território e entrega na Refinaria ou Núcleo mais próximo.' },
-  infantaria: { name: 'Infantaria Orbital', key: 'I', cls: 'inf', hp: 120, r: 7, speed: 90, cost: { minerio: 50 }, time: 6, energyUse: 1, attack: { dmg: 12, range: 110, cd: 0.8 }, sensor: 160, desc: 'Forte vs Drones e Suporte. Fraca vs Veículos e Estruturas.' },
-  veiculo:    { name: 'Veículo Pesado', key: 'V', cls: 'vei', hp: 420, r: 12, speed: 65, cost: { minerio: 160, plasma: 40 }, time: 12, energyUse: 3, attack: { dmg: 40, range: 150, cd: 1.4 }, sensor: 170, desc: 'Forte vs Infantaria e Estruturas. Fraco vs Drones e Suporte.' },
-  drone:      { name: 'Drone Aéreo', key: 'D', cls: 'dro', hp: 160, r: 8, speed: 150, cost: { minerio: 120, plasma: 50 }, time: 10, energyUse: 2, flying: true, attack: { dmg: 18, range: 120, cd: 0.9 }, sensor: 220, desc: 'Forte vs Veículos e Suporte. Fraco vs Infantaria e Estruturas. Sobrevoa a Fenda.' },
-  suporte:    { name: 'Suporte / Hack', key: 'S', cls: 'sup', hp: 100, r: 8, speed: 80, cost: { minerio: 90, dados: 20 }, time: 9, energyUse: 2, attack: { dmg: 10, range: 170, cd: 1.5, stun: true }, sensor: 200, desc: 'Forte vs Veículos e Estruturas, e os atrasa. Fraco vs Infantaria e Drones.' },
+  infantaria: { name: 'Infantaria Orbital', key: 'I', cls: 'inf', hp: 120, r: 7, speed: 90, cost: { minerio: 50 }, time: 6, energyUse: 1, weapon: 'fuzil', sensor: 160, desc: 'Forte vs Drones e Suporte. Fraca vs Veículos e Estruturas.' },
+  veiculo:    { name: 'Veículo Pesado', key: 'V', cls: 'vei', hp: 420, r: 12, speed: 65, cost: { minerio: 160, plasma: 40 }, time: 12, energyUse: 3, weapon: 'canhao', sensor: 170, turret: true, desc: 'Forte vs Infantaria e Estruturas. Fraco vs Drones e Suporte.' },
+  drone:      { name: 'Drone Aéreo', key: 'D', cls: 'dro', hp: 160, r: 8, speed: 150, cost: { minerio: 120, plasma: 50 }, time: 10, energyUse: 2, flying: true, weapon: 'metralha', sensor: 220, desc: 'Forte vs Veículos e Suporte. Fraco vs Infantaria e Estruturas. Sobrevoa a Fenda.' },
+  suporte:    { name: 'Suporte / Hack', key: 'S', cls: 'sup', hp: 100, r: 8, speed: 80, cost: { minerio: 90, dados: 20 }, time: 9, energyUse: 2, weapon: 'pulso', sensor: 200, desc: 'Forte vs Veículos e Estruturas, e os atrasa. Fraco vs Infantaria e Drones.' },
   pirata:     { name: 'Pirata de Extração', key: 'P', cls: 'sup', hp: 140, r: 9, speed: 100, cost: { minerio: 120, plasma: 30 }, time: 10, energyUse: 2, sensor: 180, siphonRange: 46, siphonRate: 7, siphonMax: 40, cargoCap: 300, desc: 'Sifona Refinarias e Reatores inimigos por até 40 s. Erevane: camuflado e +20% no roubo. Vehnar: Rebocador, lento e resistente, carrega 2x.' },
 };
 
+/* Armas: dano base, alcance, recarga, projétil (bullet = rápido e reto, shell = balístico com área, beam = instantâneo),
+   velocidade, inexatidão (raio de erro no alvo), área (splash) e tabela "versus" por tipo de armadura do alvo. */
+const WEAPONS = {
+  fuzil:    { dmg: 12, range: 110, cd: 0.8, proj: 'bullet', speed: 760, inacc: 4,  splash: 0,  cls: 'inf' },
+  canhao:   { dmg: 40, range: 150, cd: 1.4, proj: 'shell',  speed: 300, inacc: 12, splash: 24, cls: 'vei' },
+  metralha: { dmg: 18, range: 120, cd: 0.9, proj: 'bullet', speed: 760, inacc: 6,  splash: 0,  cls: 'dro' },
+  pulso:    { dmg: 10, range: 170, cd: 1.5, proj: 'beam',   speed: 0,   inacc: 0,  splash: 0,  cls: 'sup', stun: true },
+  obus:     { dmg: 30, range: 230, cd: 1.0, proj: 'shell',  speed: 380, inacc: 8,  splash: 16, cls: 'est' },
+  bombarda: { dmg: 60, range: 260, cd: 0.9, proj: 'shell',  speed: 400, inacc: 10, splash: 30, cls: 'est' },
+};
 const COUNTER = {
   inf: { vei: 0.65, dro: 1.5, est: 0.65, sup: 1.5 },
   vei: { inf: 1.5, dro: 0.65, est: 1.5, sup: 0.65 },
@@ -286,6 +309,8 @@ const COUNTER = {
   est: { inf: 1.5, vei: 0.65, dro: 1.5, sup: 0.65 },
   sup: { inf: 0.65, vei: 1.5, dro: 0.65, est: 1.5 },
 };
+for (const k in WEAPONS) { const w = WEAPONS[k]; w.versus = Object.assign({ inf: 1, vei: 1, dro: 1, est: 1, sup: 1, civ: 1 }, COUNTER[w.cls] || {}); }
+const VET_RANKS = [0, 0.8, 2.4, 5.0]; // multiplicador do custo da unidade em XP para cada patente
 const CLASS_NAMES = { inf: 'Infantaria', vei: 'Veículos', dro: 'Drones', est: 'Estruturas', sup: 'Suporte/Hack', civ: 'Civil' };
 
 const RESEARCH = {
@@ -294,6 +319,7 @@ const RESEARCH = {
   sensores:  { name: 'Sensores', cost: { dados: 100 }, desc: '+25% de alcance de sensores.' },
 };
 
+for (const t of [BUILDINGS, UNITS]) for (const k in t) if (t[k].weapon) t[k].attack = WEAPONS[t[k].weapon];
 const SUPER_COST = { dados: 300, plasma: 200 };
 const SUPER_CD = 600;
 const OVERCHARGE_COST = 200, OVERCHARGE_T = 60, OVERCHARGE_CD = 300;
@@ -331,6 +357,7 @@ function createSim(cfg) {
     cfg, tick: 0, time: 0, seed: cfg.seed || 1, ents: [], byId: new Map(), nextId: 1,
     players: [], events: [], cmdQueue: [], pending: [], vis: [], result: null,
     maxTime: (cfg.minutes || 25) * 60, grid: new Map(),
+    nav: { blocked: new Uint8Array(NW * NW), gates: new Map(), gatePos: new Map(), fields: new Map(), version: 0 }, navDirty: true, explored: [], storm: null, nextStorm: 0,
   };
   sim.rand = mulberry32(sim.seed);
   const n = cfg.players.length;
@@ -350,9 +377,12 @@ function createSim(cfg) {
     };
     sim.players.push(p);
     sim.vis.push(new Set());
+    sim.explored.push(new Uint8Array(TILES * TILES));
   }
+  sim.nextStorm = 300 + sim.rand() * 120;
   generateMap(sim);
-  computeVisibility(sim);
+  rebuildNav(sim);
+  computeVisibility(sim); markExplored(sim);
   return sim;
 }
 
@@ -422,7 +452,7 @@ function addBuilding(sim, owner, def, x, y, built) {
     maxHp: d.hp, hp: built ? d.hp : d.hp * 0.3, built: !!built, progress: built ? 1 : 0, queue: [], cd: 0,
     alive: true, lastHitT: -99, lastAttack: -99, cloaked: false, revealT: 0, rally: null, jumpT: 0, jumpTo: null, lotes: {}, ang: 0, aimAng: 0,
   };
-  sim.ents.push(e); sim.byId.set(e.id, e); return e;
+  sim.ents.push(e); sim.byId.set(e.id, e); sim.navDirty = true; return e;
 }
 function addUnit(sim, owner, def, x, y) {
   const d = UNITS[def];
@@ -432,7 +462,7 @@ function addUnit(sim, owner, def, x, y) {
     id: sim.nextId++, kind: 'unit', def, cls: d.cls, owner, x, y, px: x, py: y, r: d.r, ang: p.startAngle,
     maxHp: d.hp, hp: d.hp, speed: d.speed, state: 'idle', tx: x, ty: y, target: null, resume: null, cd: 0,
     cargo: { plasma: 0, minerio: 0, dados: 0 }, cargoTotal: 0, stolen: false, cargoCap: d.cargoCap || d.capacity || 0,
-    siphonT: 0, alive: true, lastHitT: -99, lastAttack: -99, cloaked: false, revealT: 0, node: null,
+    siphonT: 0, alive: true, lastHitT: -99, lastAttack: -99, cloaked: false, revealT: 0, node: null, xp: 0, rank: 0, aimAng: p.startAngle,
   };
   if (def === 'pirata' && fac.id === 'vehnar') { e.maxHp = e.hp = 260; e.speed = 72; e.cargoCap = 600; e.r = 11; }
   sim.ents.push(e); sim.byId.set(e.id, e); return e;
@@ -454,7 +484,7 @@ const CELL = 100;
 function rebuildGrid(sim) {
   sim.grid.clear();
   for (const e of sim.ents) {
-    if (!e.alive || e.kind === 'node') continue;
+    if (!e.alive || e.kind === 'node' || e.kind === 'proj' || e.kind === 'wreck') continue;
     const k = ((e.x / CELL) | 0) * 4096 + ((e.y / CELL) | 0);
     let arr = sim.grid.get(k); if (!arr) { arr = []; sim.grid.set(k, arr); }
     arr.push(e);
@@ -468,6 +498,78 @@ function queryGrid(sim, x, y, rad, fn) {
   }
 }
 
+// ---------- navegação: grade de obstáculos e campos de fluxo ----------
+function navIdx(x, y) { const cx = clamp((x / NAV) | 0, 0, NW - 1), cy = clamp((y / NAV) | 0, 0, NW - 1); return cy * NW + cx; }
+function rebuildNav(sim) {
+  const nav = sim.nav; nav.blocked.fill(0); nav.gates.clear(); nav.gatePos.clear(); nav.fields.clear(); nav.version++;
+  for (let cy = 0; cy < NW; cy++) for (let cx = 0; cx < NW; cx++) { const x = (cx + 0.5) * NAV, y = (cy + 0.5) * NAV; if (dist(x, y, CX, CY) < RIFT_R + 14) nav.blocked[cy * NW + cx] = 1; }
+  for (const e of sim.ents) {
+    if (!e.alive || e.kind !== 'building') continue;
+    const rr = e.r + 7; const x0 = Math.max(0, ((e.x - rr) / NAV) | 0), x1 = Math.min(NW - 1, ((e.x + rr) / NAV) | 0), y0 = Math.max(0, ((e.y - rr) / NAV) | 0), y1 = Math.min(NW - 1, ((e.y + rr) / NAV) | 0);
+    const gate = BUILDINGS[e.def].gate;
+    for (let cy = y0; cy <= y1; cy++) for (let cx = x0; cx <= x1; cx++) {
+      // bloqueia se o círculo da estrutura toca o quadrado da célula
+      const qx = Math.max(cx * NAV, Math.min(e.x, (cx + 1) * NAV)), qy = Math.max(cy * NAV, Math.min(e.y, (cy + 1) * NAV));
+      if (dist(qx, qy, e.x, e.y) <= rr) { const i = cy * NW + cx; if (gate) { nav.gates.set(i, e.owner); nav.gatePos.set(i, e); } else nav.blocked[i] = 1; }
+    }
+  }
+  for (const i of nav.gates.keys()) nav.blocked[i] = 0; // o portão vence os muros vizinhos
+  sim.navDirty = false;
+}
+function passable(sim, i, owner) { if (sim.nav.blocked[i]) return false; const g = sim.nav.gates.get(i); return g === undefined || g === owner; }
+function flowField(sim, destIdx, owner) {
+  const nav = sim.nav; const key = owner * 1000000 + destIdx; let f = nav.fields.get(key); if (f) return f;
+  if (nav.fields.size > 96) nav.fields.clear();
+  const N = NW * NW; const cost = new Int32Array(N).fill(-1); const dir = new Int8Array(N).fill(-1);
+  // Dijkstra com heap binário; custo 10 reto, 14 diagonal; sem cortar cantos
+  const heap = []; const push = (c, i) => { heap.push(c * 1048576 + i); let k = heap.length - 1; while (k > 0) { const pk = (k - 1) >> 1; if (heap[pk] <= heap[k]) break; const tmp = heap[pk]; heap[pk] = heap[k]; heap[k] = tmp; k = pk; } };
+  const pop = () => { const top = heap[0]; const last = heap.pop(); if (heap.length) { heap[0] = last; let k = 0; for (;;) { const l = 2 * k + 1, r = l + 1; let m = k; if (l < heap.length && heap[l] < heap[m]) m = l; if (r < heap.length && heap[r] < heap[m]) m = r; if (m === k) break; const tmp = heap[m]; heap[m] = heap[k]; heap[k] = tmp; k = m; } } return top; };
+  cost[destIdx] = 0; push(0, destIdx);
+  while (heap.length) {
+    const v = pop(); const c = Math.floor(v / 1048576), i = v % 1048576; if (c > cost[i]) continue;
+    const cx = i % NW, cy = (i / NW) | 0;
+    for (let d = 0; d < 8; d++) {
+      const nx = cx + DX8[d], ny = cy + DY8[d]; if (nx < 0 || ny < 0 || nx >= NW || ny >= NW) continue;
+      const ni = ny * NW + nx; if (!passable(sim, ni, owner)) continue;
+      if (DX8[d] && DY8[d]) { if (!passable(sim, cy * NW + nx, owner) || !passable(sim, ny * NW + cx, owner)) continue; }
+      const nc = c + (DX8[d] && DY8[d] ? 14 : 10);
+      if (cost[ni] < 0 || nc < cost[ni]) { cost[ni] = nc; dir[ni] = (d + 4) % 8; push(nc, ni); }
+    }
+  }
+  f = { dir, cost, version: nav.version }; nav.fields.set(key, f); return f;
+}
+function lineFree(sim, x0, y0, x1, y1, owner) {
+  const d = dist(x0, y0, x1, y1); const n = Math.max(1, Math.ceil(d / (NAV * 0.5)));
+  for (let i = 1; i <= n; i++) { const k = i / n; if (!passable(sim, navIdx(x0 + (x1 - x0) * k, y0 + (y1 - y0) * k), owner)) return false; }
+  return true;
+}
+function markExplored(sim) {
+  for (const p of sim.players) {
+    if (!p.alive) continue; const ex = sim.explored[p.id];
+    for (const e of sim.ents) {
+      if (!e.alive || e.owner !== p.id || (e.kind !== 'unit' && e.kind !== 'building')) continue;
+      const r = sensorRadius(sim, e); const x0 = Math.max(0, ((e.x - r) / TILE) | 0), x1 = Math.min(TILES - 1, ((e.x + r) / TILE) | 0), y0 = Math.max(0, ((e.y - r) / TILE) | 0), y1 = Math.min(TILES - 1, ((e.y + r) / TILE) | 0);
+      for (let ty = y0; ty <= y1; ty++) for (let tx = x0; tx <= x1; tx++) { if (!ex[ty * TILES + tx] && dist((tx + 0.5) * TILE, (ty + 0.5) * TILE, e.x, e.y) <= r + TILE * 0.5) ex[ty * TILES + tx] = 1; }
+    }
+  }
+}
+function inStorm(sim, x, y) { const st = sim.storm; return !!(st && st.phase === 'active' && dist(x, y, st.x, st.y) <= st.r); }
+function updateStorm(sim, dt) {
+  const st = sim.storm;
+  if (!st) {
+    if (sim.time >= sim.nextStorm) {
+      const a = sim.rand() * Math.PI * 2, rr = 520 + sim.rand() * 560;
+      sim.storm = { x: CX + Math.cos(a) * rr, y: CY + Math.sin(a) * rr, r: 420, t: 0, phase: 'warn', warn: 30, dur: 90 };
+      for (const q of sim.players) if (q.alive) alertTo(sim, q.id, 'Tempestade de Éter se aproximando (30 s)', sim.storm.x, sim.storm.y, 'warn');
+      emit(sim, { t: 'storm', phase: 'warn', x: sim.storm.x, y: sim.storm.y, r: sim.storm.r });
+    }
+    return;
+  }
+  st.t += dt;
+  if (st.phase === 'warn' && st.t >= st.warn) { st.phase = 'active'; st.t = 0; for (const q of sim.players) if (q.alive) alertTo(sim, q.id, 'Tempestade de Éter ativa: drones e sensores a 50%, Plasma 2× dentro dela', st.x, st.y, 'warn'); emit(sim, { t: 'storm', phase: 'active', x: st.x, y: st.y, r: st.r }); }
+  else if (st.phase === 'active' && st.t >= st.dur) { sim.storm = null; sim.nextStorm = sim.time + 360 + sim.rand() * 120; emit(sim, { t: 'storm', phase: 'end' }); }
+}
+
 // ---------- helpers ----------
 function facOf(sim, pid) { return FACTIONS[sim.players[pid].faction]; }
 function regimeOf(sim, pid) { return REGIME[sim.players[pid].energy.regime]; }
@@ -477,18 +579,21 @@ function refund(p, cost, mult) { mult = mult || 1; for (const k in cost) p.res[k
 function hasPact(sim, a, b) { return !!sim.players[a].pacts[b]; }
 function isEnemy(sim, a, b) { return a !== b && !hasPact(sim, a, b); }
 function sensorRadius(sim, e) {
+  if (e.kind !== 'unit' && e.kind !== 'building') return 0;
   const p = sim.players[e.owner];
   const d = e.kind === 'unit' ? UNITS[e.def] : BUILDINGS[e.def];
   let r = e.kind === 'building' && !e.built ? 60 : d.sensor;
   r *= regimeOf(sim, e.owner).sensF;
   if (p.research.sensores) r *= 1.25;
   if (p.blackoutT > 0) r *= 0.15;
+  if (inStorm(sim, e.x, e.y)) r *= 0.5;
   return r;
 }
 function speedOf(sim, u) {
   const p = sim.players[u.owner];
   let s = u.speed;
   if (p.speedBuffT > 0) s *= 1.3;
+  if (UNITS[u.def].flying && inStorm(sim, u.x, u.y)) s *= 0.5;
   return s;
 }
 function inTerritory(sim, pid, x, y) {
@@ -512,7 +617,7 @@ function canBuild(sim, pid, def, x, y) {
   if (x < 60 || y < 60 || x > WORLD - 60 || y > WORLD - 60) return { ok: false, why: 'Fora do mapa' };
   if (dist(x, y, CX, CY) < RIFT_R + d.r + 12) return { ok: false, why: 'Dentro da Fenda' };
   for (const e of sim.ents) {
-    if (!e.alive || e.kind === 'unit' || e.kind === 'crate') continue;
+    if (!e.alive || e.kind === 'unit' || e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck') continue;
     const bothWalls = d.wall && e.kind === 'building' && BUILDINGS[e.def].wall;
     if (dist(x, y, e.x, e.y) < (bothWalls ? 13 : e.r + d.r + 10)) return { ok: false, why: 'Sobreposição' };
   }
@@ -562,7 +667,7 @@ function processCommand(sim, c) {
       ownUnits(sim, c.p, c.ids).forEach(u => { if (UNITS[u.def].attack) { u.state = 'attack'; u.target = t.id; u.resume = null; } else { u.state = 'move'; u.tx = t.x; u.ty = t.y; } });
       break; }
     case 'harvest': {
-      const t = sim.byId.get(c.target); if (!t || !t.alive || t.kind !== 'node') return;
+      const t = sim.byId.get(c.target); if (!t || !t.alive || (t.kind !== 'node' && t.kind !== 'wreck')) return;
       ownUnits(sim, c.p, c.ids).forEach(u => { if (u.def === 'coletor') { u.state = 'harvest'; u.node = t.id; u.target = null; } else { u.state = 'move'; u.tx = t.x; u.ty = t.y; } });
       break; }
     case 'siphon': {
@@ -706,27 +811,76 @@ function counterMult(sim, a, t) {
   if (a.kind === 'building' && facOf(sim, a.owner).structNeutralVsVehicle && tc === 'vei') m = 1;
   return m;
 }
-function fire(sim, a, t) {
-  const p = sim.players[a.owner], q = sim.players[t.owner];
-  const atk = a.kind === 'unit' ? UNITS[a.def].attack : BUILDINGS[a.def].attack;
-  let dmg = atk.dmg * counterMult(sim, a, t);
-  if (p.research.armamento) dmg *= 1.15;
-  if (p.golpeT > 0) dmg *= 1.2;
-  if (a.kind === 'building') dmg *= regimeOf(sim, a.owner).defF;
-  let ambush = false;
-  if (a.kind === 'unit' && a.cloaked && a.def === 'infantaria') { dmg *= 1.5; ambush = true; }
+function unitCost(def) { const c = (UNITS[def] || BUILDINGS[def] || {}).cost || {}; return (c.minerio || 0) + (c.plasma || 0) + (c.dados || 0); }
+function damageMult(sim, a) { // multiplicadores do atacante (pesquisa, Golpe de Traição, regime das torres, veterância)
+  const p = sim.players[a.owner]; let m = 1;
+  if (p.research.armamento) m *= 1.15; if (p.golpeT > 0) m *= 1.2;
+  if (a.kind === 'building') m *= regimeOf(sim, a.owner).defF;
+  if (a.kind === 'unit') m *= 1 + 0.1 * (a.rank || 0);
+  return m;
+}
+function applyDamage(sim, attackerOwner, attacker, t, dmg, weapon) {
+  const q = sim.players[t.owner];
   if (q && q.research.blindagem) dmg *= 0.87;
-  t.hp -= dmg; t.lastHitT = sim.time; t.lastHitBy = a.owner;
-  if (a.kind === 'building') a.aimAng = Math.atan2(t.y - a.y, t.x - a.x);
-  p.stats.dmg += dmg;
-  a.cd = atk.cd; a.lastAttack = sim.time; a.cloaked = false;
-  if (atk.stun && (t.cls === 'vei' || t.kind === 'building')) t.cd = Math.max(t.cd || 0, 1.0);
-  emit(sim, { t: 'shot', x1: a.x, y1: a.y, x2: t.x, y2: t.y, cls: a.cls, owner: a.owner, ambush });
+  if (t.kind === 'unit') dmg *= 1 - 0.07 * (t.rank || 0);
+  t.hp -= dmg; t.lastHitT = sim.time; t.lastHitBy = attackerOwner;
+  const p = sim.players[attackerOwner]; if (p) p.stats.dmg += dmg;
+  if (attacker && attacker.alive && attacker.kind === 'unit') {
+    attacker.xp += dmg; const cost = Math.max(50, unitCost(attacker.def));
+    const nr = attacker.xp >= cost * VET_RANKS[3] ? 3 : attacker.xp >= cost * VET_RANKS[2] ? 2 : attacker.xp >= cost * VET_RANKS[1] ? 1 : 0;
+    if (nr > attacker.rank) { attacker.rank = nr; emit(sim, { t: 'promote', x: attacker.x, y: attacker.y, owner: attacker.owner, rank: nr, id: attacker.id }); }
+  }
+  if (weapon && weapon.stun && (t.cls === 'vei' || t.kind === 'building')) t.cd = Math.max(t.cd || 0, 1.0);
+  emit(sim, { t: 'hit', x: t.x, y: t.y, owner: t.owner, dmg });
   if (t.kind === 'building' && q) {
     if (t.def === 'nucleo' && sim.time - q.lastNucleoAlert > 10) { q.lastNucleoAlert = sim.time; alertTo(sim, q.id, 'NÚCLEO SOB ATAQUE!', t.x, t.y, 'danger'); }
-    else if (sim.time - q.lastBaseAlert > 12) { q.lastBaseAlert = sim.time; alertTo(sim, q.id, 'Base sob ataque', t.x, t.y, 'danger'); }
+    else if (!BUILDINGS[t.def].wall && sim.time - q.lastBaseAlert > 12) { q.lastBaseAlert = sim.time; alertTo(sim, q.id, 'Base sob ataque', t.x, t.y, 'danger'); }
   }
-  if (t.hp <= 0) kill(sim, t, a.owner);
+  if (t.hp <= 0) kill(sim, t, attackerOwner);
+}
+function armorOf(t) { return t.kind === 'building' ? 'est' : (t.cls || 'civ'); }
+function fire(sim, a, t) {
+  const w = a.kind === 'unit' ? UNITS[a.def].attack : BUILDINGS[a.def].attack;
+  const ambush = a.kind === 'unit' && a.cloaked && a.def === 'infantaria';
+  const base = w.dmg * damageMult(sim, a) * (ambush ? 1.5 : 1);
+  a.cd = w.cd; a.lastAttack = sim.time; a.cloaked = false; a.aimAng = Math.atan2(t.y - a.y, t.x - a.x);
+  const sx = a.x + Math.cos(a.aimAng) * a.r * 0.8, sy = a.y + Math.sin(a.aimAng) * a.r * 0.8;
+  emit(sim, { t: 'shot', x1: sx, y1: sy, x2: t.x, y2: t.y, cls: a.cls, owner: a.owner, ambush, weapon: a.kind === 'unit' ? UNITS[a.def].weapon : BUILDINGS[a.def].weapon, beam: w.proj === 'beam' });
+  if (w.proj === 'beam') { applyDamage(sim, a.owner, a, t, base * counterMult(sim, a, t), w); return; }
+  // projétil: viaja até o ponto previsto do alvo com inexatidão; acerta o que estiver lá
+  const ang = sim.rand() * Math.PI * 2, err = sim.rand() * w.inacc;
+  const lead = t.kind === 'unit' ? Math.min(1, dist(a.x, a.y, t.x, t.y) / w.speed) : 0;
+  const tx = t.x + (t.x - t.px) * lead * 10 + Math.cos(ang) * err, ty = t.y + (t.y - t.py) * lead * 10 + Math.sin(ang) * err;
+  const d = dist(sx, sy, tx, ty); const dir = [(tx - sx) / (d || 1), (ty - sy) / (d || 1)];
+  const pr = { id: sim.nextId++, kind: 'proj', x: sx, y: sy, px: sx, py: sy, z: a.kind === 'building' ? a.r * 0.9 : 6, tx, ty, vx: dir[0] * w.speed, vy: dir[1] * w.speed, weapon: a.kind === 'unit' ? UNITS[a.def].weapon : BUILDINGS[a.def].weapon, owner: a.owner, shooter: a.id, target: t.id, dmg: base, total: d, done: 0, arc: w.proj === 'shell' ? Math.min(60, d * 0.25) : 0, flying: !!(t.kind === 'unit' && UNITS[t.def].flying), alive: true, r: 1 };
+  sim.ents.push(pr); sim.byId.set(pr.id, pr);
+}
+function updateProjectile(sim, pr, dt) {
+  const w = WEAPONS[pr.weapon]; const step = w.speed * dt;
+  if (pr.done + step >= pr.total) { // impacto
+    pr.x = pr.tx; pr.y = pr.ty; pr.alive = false;
+    const shooter = sim.byId.get(pr.shooter); const atk = shooter && shooter.alive ? shooter : null;
+    const fakeA = atk || { kind: 'unit', cls: w.cls, owner: pr.owner };
+    let hitAny = false;
+    if (w.splash > 0) {
+      queryGrid(sim, pr.x, pr.y, w.splash + 40, e => {
+        if (!e.alive || e.owner === pr.owner || e.owner < 0 || e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck') return;
+        if (!isEnemy(sim, pr.owner, e.owner)) return;
+        if (e.kind === 'unit' && UNITS[e.def].flying && !pr.flying) return;
+        const dd = dist(pr.x, pr.y, e.x, e.y) - e.r; if (dd > w.splash) return;
+        const fall = dd <= 0 ? 1 : 1 - dd / w.splash * 0.6;
+        applyDamage(sim, pr.owner, atk, e, pr.dmg * fall * counterMult(sim, fakeA, e), w); hitAny = true;
+      });
+    } else {
+      const t = sim.byId.get(pr.target);
+      if (t && t.alive && dist(pr.x, pr.y, t.x, t.y) <= t.r + 10) { applyDamage(sim, pr.owner, atk, t, pr.dmg * counterMult(sim, fakeA, t), w); hitAny = true; }
+      else { let best = null, bd = 12; queryGrid(sim, pr.x, pr.y, 30, e => { if (!e.alive || e.owner === pr.owner || e.owner < 0 || e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck' || !isEnemy(sim, pr.owner, e.owner)) return; const dd = dist(pr.x, pr.y, e.x, e.y) - e.r; if (dd < bd) { bd = dd; best = e; } }); if (best) { applyDamage(sim, pr.owner, atk, best, pr.dmg * counterMult(sim, fakeA, best), w); hitAny = true; } }
+    }
+    emit(sim, { t: 'impact', x: pr.x, y: pr.y, weapon: pr.weapon, splash: w.splash, hit: hitAny, owner: pr.owner });
+    return;
+  }
+  pr.done += step; pr.x += pr.vx * dt; pr.y += pr.vy * dt;
+  const k = pr.done / pr.total; pr.z = (pr.arc ? Math.sin(k * Math.PI) * pr.arc : 0) + 6 * (1 - k) + 3;
 }
 function kill(sim, e, killer) {
   if (!e.alive) return;
@@ -742,7 +896,12 @@ function kill(sim, e, killer) {
       emit(sim, { t: 'crate', x: e.x, y: e.y });
       if (p && p.human) alertTo(sim, p.id, 'Caixa derrubada: ' + Math.round(e.cargoTotal) + ' em recursos', e.x, e.y, 'warn');
     }
+    if (e.cls === 'vei' || e.def === 'coletor' || e.def === 'pirata') { // carcaça saqueável
+      const wr = { id: sim.nextId++, kind: 'wreck', x: e.x, y: e.y, r: e.r, ang: e.ang || 0, alive: true, owner: -1, res: 'minerio', amount: Math.round(unitCost(e.def) * 0.35), max: Math.round(unitCost(e.def) * 0.35), bornT: sim.time, def: e.def };
+      sim.ents.push(wr); sim.byId.set(wr.id, wr);
+    }
   } else if (e.kind === 'building') {
+    sim.navDirty = true;
     if (p) p.stats.buildingsLost++;
     if (killer >= 0 && killer !== e.owner) sim.players[killer].stats.buildingsDestroyed++;
     if (e.def === 'nucleo') eliminate(sim, e.owner, killer);
@@ -750,7 +909,7 @@ function kill(sim, e, killer) {
 }
 function eliminate(sim, pid, killer) {
   const p = sim.players[pid]; if (!p.alive) return;
-  p.alive = false;
+  p.alive = false; sim.navDirty = true;
   for (const e of sim.ents) if (e.alive && e.owner === pid) { e.alive = false; emit(sim, { t: 'death', x: e.x, y: e.y, r: e.r, kind: e.kind, def: e.def, owner: pid, cls: e.cls }); }
   for (const k in p.pacts) { const q = sim.players[k]; delete q.pacts[pid]; } p.pacts = {};
   for (const q of sim.players) if (q.alive) alertTo(sim, q.id, p.name + ' foi eliminado' + (killer >= 0 && killer !== pid ? ' por ' + sim.players[killer].name : ''), null, null, q.id === killer ? 'good' : 'warn');
@@ -776,6 +935,21 @@ function moveToward(sim, u, tx, ty, dt) {
   const dx = tx - u.x, dy = ty - u.y; const d = Math.hypot(dx, dy);
   const sp = speedOf(sim, u) * dt;
   if (d <= Math.max(sp, 4)) { u.x = tx; u.y = ty; return true; }
+  if (!UNITS[u.def].flying && d > NAV * 1.2 && !lineFree(sim, u.x, u.y, tx, ty, u.owner)) {
+    const f = flowField(sim, navIdx(tx, ty), u.owner); const ci = navIdx(u.x, u.y); let dir = f.dir[ci];
+    let nx = 0, ny = 0;
+    const cx = ci % NW, cy = (ci / NW) | 0;
+    if (dir >= 0) { const ni = (cy + DY8[dir]) * NW + (cx + DX8[dir]); const g = sim.nav.gatePos.get(ni); if (g && !sim.nav.gates.has(ci)) { nx = g.x; ny = g.y; } else { nx = (cx + DX8[dir] + 0.5) * NAV; ny = (cy + DY8[dir] + 0.5) * NAV; } }
+    else { // célula bloqueada ou sem rota: vai para o vizinho alcançável de menor custo
+      let best = -1, bc = Infinity;
+      for (let d = 0; d < 8; d++) { const x2 = cx + DX8[d], y2 = cy + DY8[d]; if (x2 < 0 || y2 < 0 || x2 >= NW || y2 >= NW) continue; const ni = y2 * NW + x2; if (f.cost[ni] >= 0 && f.cost[ni] < bc) { bc = f.cost[ni]; best = ni; } }
+      if (best >= 0) { nx = (best % NW + 0.5) * NAV; ny = (((best / NW) | 0) + 0.5) * NAV; dir = 0; }
+    }
+    if (dir >= 0) {
+      const ddx = nx - u.x, ddy = ny - u.y; const dd = Math.hypot(ddx, ddy) || 1;
+      u.x += ddx / dd * sp; u.y += ddy / dd * sp; u.ang = Math.atan2(ddy, ddx); return false;
+    }
+  }
   u.x += dx / d * sp; u.y += dy / d * sp; u.ang = Math.atan2(dy, dx); return false;
 }
 function nearestDeposit(sim, u) {
@@ -794,9 +968,10 @@ function pickNode(sim, u) {
   w[lowest] *= 0.6;
   let best = null, bd = Infinity;
   for (const e of sim.ents) {
-    if (!e.alive || e.kind !== 'node' || e.amount <= 0) continue;
-    if (!inTerritory(sim, u.owner, e.x, e.y)) continue;
-    const d = dist(u.x, u.y, e.x, e.y) * w[e.res];
+    if (!e.alive || (e.kind !== 'node' && e.kind !== 'wreck') || e.amount <= 0) continue;
+    if (e.kind === 'node' && !inTerritory(sim, u.owner, e.x, e.y)) continue;
+    if (e.kind === 'wreck' && dist(u.x, u.y, e.x, e.y) > 520) continue;
+    const d = dist(u.x, u.y, e.x, e.y) * w[e.res] * (e.kind === 'wreck' ? 0.7 : 1);
     if (d < bd) { bd = d; best = e; }
   }
   return best;
@@ -855,7 +1030,7 @@ function updateUnit(sim, u, dt) {
       const n = sim.byId.get(u.node);
       if (!n || !n.alive || n.amount <= 0) { const m = pickNode(sim, u); if (m) u.node = m.id; else u.state = u.cargoTotal > 0 ? 'return' : 'idle'; break; }
       if (dist(u.x, u.y, n.x, n.y) <= u.r + n.r + 8) {
-        const take = Math.min(d.harvestRate * dt, n.amount, d.capacity - u.cargoTotal);
+        const take = Math.min(d.harvestRate * dt * (n.res === 'plasma' && inStorm(sim, n.x, n.y) ? 2 : 1), n.amount, d.capacity - u.cargoTotal);
         n.amount -= take; u.cargo[n.res] += take; u.cargoTotal += take;
         if (u.cargoTotal >= d.capacity - 0.01 || n.amount <= 0) u.state = 'return';
       } else moveToward(sim, u, n.x, n.y, dt);
@@ -928,7 +1103,7 @@ function updateBuilding(sim, b, dt) {
     b.jumpT -= dt;
     if (b.jumpT <= 0) {
       const from = { x: b.x, y: b.y };
-      b.x = b.jumpTo.x; b.y = b.jumpTo.y; b.px = b.x; b.py = b.y; b.jumpTo = null; b.jumpT = 0;
+      b.x = b.jumpTo.x; b.y = b.jumpTo.y; b.px = b.x; b.py = b.y; b.jumpTo = null; b.jumpT = 0; sim.navDirty = true;
       emit(sim, { t: 'jump', p: b.owner, from, to: { x: b.x, y: b.y } });
       for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === b.owner ? 'Salto de Núcleo concluído' : p.name + ' saltou o Núcleo!', b.x, b.y, q.id === b.owner ? 'good' : 'warn');
     }
@@ -996,11 +1171,13 @@ function computeVisibility(sim) {
     const circles = [], detectors = [];
     for (const e of sim.ents) {
       if (!e.alive || e.owner !== p.id) continue;
+      if (e.kind !== 'unit' && e.kind !== 'building') continue;
       circles.push([e.x, e.y, sensorRadius(sim, e)]);
       if (e.kind === 'building' && e.built && BUILDINGS[e.def].detect) detectors.push([e.x, e.y, BUILDINGS[e.def].detect]);
     }
     for (const e of sim.ents) {
       if (!e.alive || e.owner === p.id || e.kind === 'node') continue;
+      if (e.kind === 'proj' && e.owner === p.id) { vis.add(e.id); continue; }
       let seen = false;
       if (e.kind === 'building' && e.built && e.def === 'reator' && facOf(sim, e.owner).smoke) seen = true;
       if (!seen) for (const c of circles) { if (dist(e.x, e.y, c[0], c[1]) <= c[2] + e.r) { seen = true; break; } }
@@ -1065,7 +1242,9 @@ function step(sim) {
   sim.events = [];
   if (sim.result) return sim.events;
   for (const e of sim.ents) if (e.kind !== 'node') { e.px = e.x; e.py = e.y; }
+  if (sim.navDirty) rebuildNav(sim);
   rebuildGrid(sim);
+  updateStorm(sim, dt);
   const cmds = sim.cmdQueue; sim.cmdQueue = [];
   for (const c of cmds) processCommand(sim, c);
   for (const p of sim.players) {
@@ -1078,7 +1257,7 @@ function step(sim) {
   }
   updatePacts(sim);
   for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'building') updateBuilding(sim, e, dt); }
-  for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'unit') updateUnit(sim, e, dt); }
+  for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'unit') updateUnit(sim, e, dt); else if (e.kind === 'proj') { e.px = e.x; e.py = e.y; updateProjectile(sim, e, dt); } else if (e.kind === 'wreck' && (e.amount <= 0 || sim.time - e.bornT > 150)) e.alive = false; }
   separate(sim);
   pickupCrates(sim);
   // prune
@@ -1088,6 +1267,7 @@ function step(sim) {
     sim.ents = keep;
   }
   computeVisibility(sim);
+  if (sim.tick % 3 === 0) markExplored(sim);
   sim.tick++; sim.time = sim.tick * TICK;
   checkEnd(sim);
   return sim.events;
@@ -1109,13 +1289,15 @@ function hash(sim) { // cheap state hash for determinism tests
 }
 
 ARD.sim = {
-  TICK, WORLD, CX, CY, RIFT_R, FACTIONS, BUILDINGS, UNITS, COUNTER, CLASS_NAMES, RESEARCH, REGIME, DIFFICULTY, REP_NAMES,
+  TICK, WORLD, CX, CY, RIFT_R, FACTIONS, BUILDINGS, UNITS, WEAPONS, COUNTER, CLASS_NAMES, VET_RANKS, unitCost, RESEARCH, REGIME, DIFFICULTY, REP_NAMES,
   SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS,
+  NAV, NW, TILE, TILES, navIdx, passable, flowField, lineFree, inStorm,
   createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius,
 };
 })(globalThis.ARD = globalThis.ARD || {});
 
-/* IA de oponente — decide a cada 1 s de jogo, só por comandos; usa o RNG da simulação (determinístico). */
+/* IA de oponente (v2.0): módulos com estratégias nomeadas, duas cadências (tático 1 s, estratégico 60 s),
+   avaliação de alvo por defesa, batedores, raids de piratas e muros na estratégia Fortaleza. Só emite comandos; usa o RNG da simulação. */
 (function (ARD) {
 'use strict';
 const S = ARD.sim;
@@ -1124,199 +1306,184 @@ const BUILD_ORDERS = {
   vehnar:  ['reator', 'refinaria', 'quartel', 'nodulo', 'reator', 'fabrica', 'torre', 'reator', 'hangar', 'laboratorio', 'torre', 'nodulo', 'fabrica', 'reator', 'torre'],
   erevane: ['reator', 'quartel', 'refinaria', 'nodulo', 'reator', 'hangar', 'nodulo', 'torre', 'laboratorio', 'fabrica', 'reator', 'torre', 'quartel', 'reator'],
 };
+const STRATS = {
+  expansao:  { name: 'Expansão',            prod: { infantaria: 0.35, veiculo: 0.25, drone: 0.3, suporte: 0.1 }, col: 3, nodulos: 1, towers: 0, attackMul: 1.25, pirate: 1.0 },
+  massa:     { name: 'Massa de Infantaria',  prod: { infantaria: 0.7, veiculo: 0.1, drone: 0.15, suporte: 0.05 }, col: 0, nodulos: 0, towers: 0, attackMul: 0.85, pirate: 0.7 },
+  blindados: { name: 'Blindados',            prod: { infantaria: 0.15, veiculo: 0.55, drone: 0.2, suporte: 0.1 }, col: 1, nodulos: 0, towers: 0, attackMul: 1.0, pirate: 0.7 },
+  roubo:     { name: 'Roubo',                prod: { infantaria: 0.4, veiculo: 0.15, drone: 0.4, suporte: 0.05 }, col: 1, nodulos: 0, towers: 0, attackMul: 1.35, pirate: 2.5 },
+  fortaleza: { name: 'Fortaleza',            prod: { infantaria: 0.35, veiculo: 0.35, drone: 0.2, suporte: 0.1 }, col: 0, nodulos: 0, towers: 2, attackMul: 1.6, pirate: 0.5, walls: true },
+};
+const PREF = { vehnar: ['blindados', 'fortaleza', 'expansao', 'massa'], erevane: ['roubo', 'expansao', 'massa', 'blindados'] };
+const VALUE = { refinaria: 3, nodulo: 2.5, reator: 2, laboratorio: 2, quartel: 1.5, fabrica: 1.5, hangar: 1.5, torre: 1, bastiao: 0.8, nucleo: 1.2, muro: 0.1, portao: 0.2 };
 
 function create(pid, difficulty) {
   return { pid, diff: S.DIFFICULTY[difficulty] || S.DIFFICULTY.normal, bo: 0, mode: 'defend', attackStart: 0, target: null, known: new Map(),
-    lastPirate: 0, lastPropose: -999, lastExtra: 0, lastThink: -1, enemySeen: { inf: 0, vei: 0, dro: 0, est: 0, sup: 0 }, lastAttackOrder: -99 };
+    lastPirate: 0, lastPropose: -999, lastExtra: 0, enemySeen: { inf: 0, vei: 0, dro: 0, est: 0, sup: 0 }, lastAttackOrder: -99,
+    strategy: null, lastStrategic: -999, lostRecent: 0, armyPrev: 0, lastScout: -999, wallsBuilt: false, towersWanted: 0 };
 }
-
 function own(sim, pid) { return S.entitiesOf(sim, pid); }
 function count(list, pred) { let n = 0; for (const e of list) if (pred(e)) n++; return n; }
-
 function findSpot(sim, pid, def, cx, cy, rmin, rmax, tries) {
-  const d = S.BUILDINGS[def];
-  for (let i = 0; i < tries; i++) {
-    const a = sim.rand() * Math.PI * 2, r = rmin + sim.rand() * (rmax - rmin);
-    const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r;
-    if (S.canBuild(sim, pid, def, x, y).ok) return { x, y };
-  }
+  for (let i = 0; i < tries; i++) { const a = sim.rand() * Math.PI * 2, r = rmin + sim.rand() * (rmax - rmin); const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r; if (S.canBuild(sim, pid, def, x, y).ok) return { x, y }; }
   return null;
 }
 function nearestEnemyNucleoPos(sim, pid) {
-  const me = S.nucleoOf(sim, pid); if (!me) return null;
-  let best = null, bd = Infinity;
-  for (const q of sim.players) {
-    if (q.id === pid || !q.alive || S.hasPact(sim, pid, q.id)) continue;
-    const n = S.nucleoOf(sim, q.id); if (!n) continue;
-    const d = S.dist(me.x, me.y, n.x, n.y); if (d < bd) { bd = d; best = { x: n.x, y: n.y, owner: q.id }; }
-  }
+  const me = S.nucleoOf(sim, pid); if (!me) return null; let best = null, bd = Infinity;
+  for (const q of sim.players) { if (q.id === pid || !q.alive || S.hasPact(sim, pid, q.id)) continue; const n = S.nucleoOf(sim, q.id); if (!n) continue; const d = S.dist(me.x, me.y, n.x, n.y); if (d < bd) { bd = d; best = { x: n.x, y: n.y, owner: q.id, def: 'nucleo' }; } }
   return best;
 }
 function updateKnown(sim, mem) {
   const vis = sim.vis[mem.pid];
   for (const id of vis) { const e = sim.byId.get(id); if (e && e.alive && e.kind === 'building') mem.known.set(id, { x: e.x, y: e.y, def: e.def, owner: e.owner }); }
   for (const [id, k] of mem.known) { const e = sim.byId.get(id); if (!e || !e.alive || !sim.players[k.owner].alive) mem.known.delete(id); }
-  // enemy composition seen (decayed)
   for (const k in mem.enemySeen) mem.enemySeen[k] *= 0.9;
   for (const id of vis) { const e = sim.byId.get(id); if (e && e.alive && e.kind === 'unit' && S.isEnemy(sim, mem.pid, e.owner) && mem.enemySeen[e.cls] !== undefined) mem.enemySeen[e.cls] += 1; }
 }
+// --- estratégico (a cada 60 s): escolhe a estratégia com heurísticas e um pouco de aleatório
+function strategic(sim, mem, p, army) {
+  const t = sim.time; const prefs = PREF[p.faction] || PREF.vehnar;
+  const value = S.armyValue(sim, mem.pid); const lost = mem.armyPrev > 0 ? Math.max(0, (mem.armyPrev - value) / mem.armyPrev) : 0; mem.armyPrev = value;
+  const human = sim.players.find(q => q.human && q.alive); const hv = human ? S.armyValue(sim, human.id) : 0;
+  let next = mem.strategy;
+  if (!next) next = sim.rand() < 0.6 ? prefs[0] : prefs[1 + Math.floor(sim.rand() * (prefs.length - 1))];
+  else if (lost > 0.4 && mem.mode === 'defend') next = 'fortaleza';
+  else if (t > 300 && p.res.plasma < 150) next = 'expansao';
+  else if (hv > 0 && value > hv * 1.8) next = p.faction === 'erevane' ? 'roubo' : 'blindados';
+  else if (sim.rand() < 0.3) next = prefs[Math.floor(sim.rand() * prefs.length)];
+  if (next !== mem.strategy) { mem.strategy = next; emit(mem, sim, { t: 'aistrat', p: mem.pid, strategy: STRATS[next].name }); }
+  mem.towersWanted = 2 + (STRATS[mem.strategy].towers || 0) + Math.floor(t / 400);
+}
+function emit(mem, sim, ev) { /* eventos informativos da IA aparecem só em depuração */ }
+function assessTargets(sim, mem, from) {
+  // melhor alvo = valor / (1 + defesa) com leve preferência por proximidade
+  let best = null, bs = -Infinity;
+  const cands = [...mem.known.values()].filter(k => S.isEnemy(sim, mem.pid, k.owner));
+  const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) cands.push(en);
+  for (const k of cands) {
+    let def = 0;
+    for (const o of mem.known.values()) if (o.owner === k.owner && (o.def === 'torre' || o.def === 'bastiao') && S.dist(o.x, o.y, k.x, k.y) < 280) def += o.def === 'bastiao' ? 2 : 1;
+    for (const id of sim.vis[mem.pid]) { const e = sim.byId.get(id); if (e && e.alive && e.kind === 'unit' && e.owner === k.owner && S.UNITS[e.def].attack && S.dist(e.x, e.y, k.x, k.y) < 220) def += 0.5; }
+    const d = S.dist(from.x, from.y, k.x, k.y); const strat = STRATS[mem.strategy] || STRATS.expansao;
+    let val = VALUE[k.def] || 1; if (strat.pirate >= 2 && (k.def === 'refinaria' || k.def === 'reator')) val *= 1.5;
+    const sc = val / (1 + def) * (1 - Math.min(0.5, d / 4000));
+    if (sc > bs) { bs = sc; best = k; }
+  }
+  return best;
+}
 
 function think(sim, mem) {
-  const cmds = [];
-  const p = sim.players[mem.pid]; if (!p.alive || sim.result) return cmds;
-  const t = sim.time; const D = mem.diff;
-  const mine = own(sim, mem.pid);
+  const cmds = []; const p = sim.players[mem.pid]; if (!p.alive || sim.result) return cmds;
+  const t = sim.time; const D = mem.diff; const mine = own(sim, mem.pid);
   const nuc = mine.find(e => e.kind === 'building' && e.def === 'nucleo'); if (!nuc) return cmds;
-  const builds = mine.filter(e => e.kind === 'building');
-  const units = mine.filter(e => e.kind === 'unit');
-  const collectors = units.filter(u => u.def === 'coletor');
-  const pirates = units.filter(u => u.def === 'pirata');
-  const army = units.filter(u => S.UNITS[u.def].attack);
-  const nodulos = count(builds, b => b.def === 'nodulo');
-  const underConstruction = count(builds, b => !b.built);
+  const builds = mine.filter(e => e.kind === 'building'); const units = mine.filter(e => e.kind === 'unit');
+  const collectors = units.filter(u => u.def === 'coletor'); const pirates = units.filter(u => u.def === 'pirata'); const army = units.filter(u => S.UNITS[u.def].attack);
+  const nodulos = count(builds, b => b.def === 'nodulo'); const underConstruction = count(builds, b => !b.built);
   updateKnown(sim, mem);
-  const emit = c => { c.p = mem.pid; cmds.push(c); };
+  const emitC = c => { c.p = mem.pid; cmds.push(c); };
+  if (t - mem.lastStrategic >= 60 || !mem.strategy) { mem.lastStrategic = t; strategic(sim, mem, p, army); }
+  const strat = STRATS[mem.strategy] || STRATS.expansao;
 
-  // --- pending proposals to me
+  // --- diplomacia
   for (const pr of sim.pending) {
-    if (pr.to !== mem.pid) continue;
-    const other = sim.players[pr.from];
+    if (pr.to !== mem.pid) continue; const other = sim.players[pr.from];
     const myV = S.armyValue(sim, mem.pid), theirV = S.armyValue(sim, pr.from);
     const accept = other.rep >= -1 && (myV < theirV * 1.15 || sim.rand() < 0.25) && sim.rand() < D.acceptP;
-    emit({ t: 'respond', to: pr.from, accept });
+    emitC({ t: 'respond', to: pr.from, accept });
   }
-  // --- propose when weaker
   const human = sim.players.find(q => q.human && q.alive);
-  if (human && t > 180 && !S.hasPact(sim, mem.pid, human.id) && t - mem.lastPropose > 150 && S.armyValue(sim, mem.pid) < S.armyValue(sim, human.id) * 0.6 && sim.rand() < 0.5) {
-    mem.lastPropose = t; emit({ t: 'propose', to: human.id });
-  }
-  // --- betray when much stronger
-  for (const k in p.pacts) {
-    const pact = p.pacts[k]; const q = sim.players[k];
-    if (!q.alive) continue;
-    if (D.breakP > 0 && t - pact.since > 180 && S.armyValue(sim, mem.pid) > S.armyValue(sim, q.id) * 1.6 && sim.rand() < D.breakP / 60) {
-      emit({ t: 'break', with: q.id }); mem.mode = 'attack'; mem.attackStart = S.armyValue(sim, mem.pid); mem.target = null;
-    }
-  }
+  if (human && t > 180 && !S.hasPact(sim, mem.pid, human.id) && t - mem.lastPropose > 150 && S.armyValue(sim, mem.pid) < S.armyValue(sim, human.id) * 0.6 && sim.rand() < 0.5) { mem.lastPropose = t; emitC({ t: 'propose', to: human.id }); }
+  for (const k in p.pacts) { const pact = p.pacts[k]; const q = sim.players[k]; if (!q.alive) continue; if (D.breakP > 0 && t - pact.since > 180 && S.armyValue(sim, mem.pid) > S.armyValue(sim, q.id) * 1.6 && sim.rand() < D.breakP / 60) { emitC({ t: 'break', with: q.id }); mem.mode = 'attack'; mem.attackStart = S.armyValue(sim, mem.pid); mem.target = null; } }
 
-  // --- economy: collectors
-  const wantCol = Math.min(14, 6 + nodulos * 2);
-  if (collectors.length + count(nuc.queue, q => q.def === 'coletor') < wantCol && nuc.queue.length < 2 && S.canAfford(p, S.UNITS.coletor.cost) && nuc.jumpT <= 0) emit({ t: 'produce', id: nuc.id, def: 'coletor' });
-
-  // --- energy first
-  const reactors = count(builds, b => b.def === 'reator');
-  const needEnergy = p.energy.ratio < 1.1 && reactors < 7 && underConstruction < 2;
+  // --- economia
+  const wantCol = Math.min(16, 6 + nodulos * 2 + strat.col);
+  if (collectors.length + count(nuc.queue, q => q.def === 'coletor') < wantCol && nuc.queue.length < 2 && S.canAfford(p, S.UNITS.coletor.cost) && nuc.jumpT <= 0) emitC({ t: 'produce', id: nuc.id, def: 'coletor' });
+  const reactors = count(builds, b => b.def === 'reator'); const towers = count(builds, b => b.def === 'torre');
+  const needEnergy = p.energy.ratio < 1.1 && reactors < 8 && underConstruction < 2;
   const reserve = t < 240 ? D.reserve : 60;
-  if (needEnergy && S.canAfford(p, { minerio: S.BUILDINGS.reator.cost.minerio + reserve })) {
-    const s = findSpot(sim, mem.pid, 'reator', nuc.x, nuc.y, 70, 260, 30); if (s) emit({ t: 'build', def: 'reator', x: s.x, y: s.y });
-  } else if (underConstruction < 2) {
-    // --- build order
-    const order = BUILD_ORDERS[p.faction] || BUILD_ORDERS.vehnar;
-    let def = order[mem.bo];
-    if (!def && t - mem.lastExtra > 90) { def = sim.rand() < 0.5 ? 'nodulo' : (sim.rand() < 0.5 ? 'torre' : (p.faction === 'vehnar' ? 'fabrica' : 'hangar')); mem.lastExtra = t; }
+  if (needEnergy && S.canAfford(p, { minerio: S.BUILDINGS.reator.cost.minerio + reserve })) { const s = findSpot(sim, mem.pid, 'reator', nuc.x, nuc.y, 70, 260, 30); if (s) emitC({ t: 'build', def: 'reator', x: s.x, y: s.y }); }
+  else if (underConstruction < 2) {
+    const order = BUILD_ORDERS[p.faction] || BUILD_ORDERS.vehnar; let def = order[mem.bo];
+    if (!def || mem.bo >= order.length) {
+      if (towers < mem.towersWanted && t - mem.lastExtra > 45) { def = 'torre'; mem.lastExtra = t; }
+      else if (nodulos < 2 + strat.nodulos + Math.floor(t / 500) && t - mem.lastExtra > 60) { def = 'nodulo'; mem.lastExtra = t; }
+      else if (t - mem.lastExtra > 90) { def = sim.rand() < 0.5 ? (p.faction === 'vehnar' ? 'fabrica' : 'hangar') : 'quartel'; mem.lastExtra = t; }
+      else def = null;
+    }
     if (def) {
-      const bd = S.BUILDINGS[def];
-      const cost = Object.assign({}, bd.cost); cost.minerio = (cost.minerio || 0) + (t < 240 ? 40 : 0);
+      const bd = S.BUILDINGS[def]; const cost = Object.assign({}, bd.cost); cost.minerio = (cost.minerio || 0) + (t < 240 ? 40 : 0);
       if (S.canAfford(p, cost)) {
         let s = null;
-        if (def === 'nodulo') {
-          // nearest unclaimed node
-          let best = null, bdist = Infinity;
-          for (const e of sim.ents) {
-            if (!e.alive || e.kind !== 'node' || e.amount <= 0) continue;
-            if (S.territoryOwner(sim, e.x, e.y) !== -1) continue;
-            const d = S.dist(nuc.x, nuc.y, e.x, e.y); if (d < bdist) { bdist = d; best = e; }
-          }
-          if (best) s = findSpot(sim, mem.pid, 'nodulo', best.x, best.y, 60, 140, 30);
-          if (!s) s = findSpot(sim, mem.pid, 'nodulo', nuc.x, nuc.y, 380, 600, 30);
-        } else if (def === 'refinaria') {
-          // near centroid of own-territory nodes
-          let sx = 0, sy = 0, n = 0;
-          for (const e of sim.ents) if (e.alive && e.kind === 'node' && S.inTerritory(sim, mem.pid, e.x, e.y)) { sx += e.x; sy += e.y; n++; }
-          if (n) s = findSpot(sim, mem.pid, 'refinaria', sx / n, sy / n, 50, 160, 30);
-          if (!s) s = findSpot(sim, mem.pid, 'refinaria', nuc.x, nuc.y, 90, 300, 30);
-        } else if (def === 'torre') {
-          const en = nearestEnemyNucleoPos(sim, mem.pid);
-          if (en) { const a = Math.atan2(en.y - nuc.y, en.x - nuc.x); s = findSpot(sim, mem.pid, 'torre', nuc.x + Math.cos(a) * 240, nuc.y + Math.sin(a) * 240, 0, 110, 30); }
-          if (!s) s = findSpot(sim, mem.pid, 'torre', nuc.x, nuc.y, 150, 330, 30);
-        } else s = findSpot(sim, mem.pid, def, nuc.x, nuc.y, 90, 320, 40);
-        if (s) { emit({ t: 'build', def, x: s.x, y: s.y }); if (mem.bo < order.length) mem.bo++; }
-        else if (mem.bo < order.length) mem.bo++; // skip impossible step
+        if (def === 'nodulo') { let best = null, bdist = Infinity; for (const e of sim.ents) { if (!e.alive || e.kind !== 'node' || e.amount <= 0 || S.territoryOwner(sim, e.x, e.y) !== -1) continue; const d = S.dist(nuc.x, nuc.y, e.x, e.y); if (d < bdist) { bdist = d; best = e; } } if (best) s = findSpot(sim, mem.pid, 'nodulo', best.x, best.y, 60, 140, 30); if (!s) s = findSpot(sim, mem.pid, 'nodulo', nuc.x, nuc.y, 380, 600, 30); }
+        else if (def === 'refinaria') { let sx = 0, sy = 0, n = 0; for (const e of sim.ents) if (e.alive && e.kind === 'node' && S.inTerritory(sim, mem.pid, e.x, e.y)) { sx += e.x; sy += e.y; n++; } if (n) s = findSpot(sim, mem.pid, 'refinaria', sx / n, sy / n, 50, 160, 30); if (!s) s = findSpot(sim, mem.pid, 'refinaria', nuc.x, nuc.y, 90, 300, 30); }
+        else if (def === 'torre') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = Math.atan2(en.y - nuc.y, en.x - nuc.x) + (sim.rand() - 0.5) * 1.2; s = findSpot(sim, mem.pid, 'torre', nuc.x + Math.cos(a) * 250, nuc.y + Math.sin(a) * 250, 0, 110, 30); } if (!s) s = findSpot(sim, mem.pid, 'torre', nuc.x, nuc.y, 150, 330, 30); }
+        else s = findSpot(sim, mem.pid, def, nuc.x, nuc.y, 90, 320, 40);
+        if (s) { emitC({ t: 'build', def, x: s.x, y: s.y }); if (mem.bo < order.length) mem.bo++; }
+        else if (mem.bo < order.length) mem.bo++;
       }
     }
   }
-
-  // --- research & super
-  if (S.hasBuilt(sim, mem.pid, 'laboratorio')) {
-    for (const key of ['armamento', 'blindagem', 'sensores']) if (!p.research[key] && S.canAfford(p, S.RESEARCH[key].cost) && p.res.dados > 160) { emit({ t: 'research', key }); break; }
-    if (t >= p.superCd && S.canAfford(p, { dados: 300, plasma: 300 })) {
-      const fac = S.FACTIONS[p.faction];
-      if (fac.superKey === 'fundicao') {
-        const en = nearestEnemyNucleoPos(sim, mem.pid);
-        if (en) { const a = Math.atan2(en.y - nuc.y, en.x - nuc.x); const s = findSpot(sim, mem.pid, 'bastiao', nuc.x + Math.cos(a) * 300, nuc.y + Math.sin(a) * 300, 0, 80, 30); if (s && S.inTerritory(sim, mem.pid, s.x, s.y)) emit({ t: 'super', x: s.x, y: s.y }); }
-      } else if (mem.mode === 'attack') emit({ t: 'super' });
-    }
+  // muros na Fortaleza: arco voltado para o inimigo mais próximo, com portão no meio
+  if (strat.walls && !mem.wallsBuilt && t > 240 && p.res.minerio > 700) {
+    const en = nearestEnemyNucleoPos(sim, mem.pid);
+    if (en) { const a0 = Math.atan2(en.y - nuc.y, en.x - nuc.x); const R = 300; let n = 0;
+      for (let a = a0 - 0.7; a <= a0 + 0.7; a += 16 / R) { const x = nuc.x + Math.cos(a) * R, y = nuc.y + Math.sin(a) * R; const gate = Math.abs(a - a0) < 0.06; if (S.canBuild(sim, mem.pid, gate ? 'portao' : 'muro', x, y).ok) { emitC({ t: 'build', def: gate ? 'portao' : 'muro', x, y, ang: a + Math.PI / 2 }); n++; } }
+      mem.wallsBuilt = true; }
   }
-  if (p.energy.regime !== 'pleno' && p.res.plasma > 450 && t >= p.overchargeCd) emit({ t: 'overcharge' });
+  // --- pesquisa, superarma, sobrecarga
+  if (S.hasBuilt(sim, mem.pid, 'laboratorio')) {
+    for (const key of ['armamento', 'blindagem', 'sensores']) if (!p.research[key] && S.canAfford(p, S.RESEARCH[key].cost) && p.res.dados > 160) { emitC({ t: 'research', key }); break; }
+    if (t >= p.superCd && S.canAfford(p, { dados: 300, plasma: 300 })) { const fac = S.FACTIONS[p.faction]; if (fac.superKey === 'fundicao') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = Math.atan2(en.y - nuc.y, en.x - nuc.x); const s = findSpot(sim, mem.pid, 'bastiao', nuc.x + Math.cos(a) * 300, nuc.y + Math.sin(a) * 300, 0, 80, 30); if (s && S.inTerritory(sim, mem.pid, s.x, s.y)) emitC({ t: 'super', x: s.x, y: s.y }); } } else if (mem.mode === 'attack') emitC({ t: 'super' }); }
+  }
+  if (p.energy.regime !== 'pleno' && p.res.plasma > 450 && t >= p.overchargeCd) emitC({ t: 'overcharge' });
 
-  // --- army production
+  // --- produção: estratégia + contras do que foi visto
   const prodBuildings = builds.filter(b => b.built && S.BUILDINGS[b.def].produces && b.def !== 'nucleo');
   const seen = mem.enemySeen; const total = seen.inf + seen.vei + seen.dro + seen.est + seen.sup + 0.01;
-  const w = { infantaria: 0.35, veiculo: 0.3, drone: 0.3, suporte: 0.05 };
+  const w = Object.assign({}, strat.prod);
   w.veiculo += 0.5 * (seen.inf + seen.est) / total; w.drone += 0.5 * (seen.vei + seen.sup) / total; w.infantaria += 0.5 * (seen.dro + seen.sup) / total; w.suporte += 0.3 * (seen.vei + seen.est) / total;
   const reserveArmy = t < 240 ? D.reserve : 40;
   for (const b of prodBuildings) {
-    if (b.queue.length >= 2) continue;
-    const opts = S.BUILDINGS[b.def].produces.filter(u => u !== 'pirata' && u !== 'coletor');
-    let pick = null, best = -1;
-    for (const u of opts) { const sc = (w[u] || 0.1) * (0.7 + sim.rand() * 0.6); if (sc > best) { best = sc; pick = u; } }
+    if (b.queue.length >= 2) continue; const opts = S.BUILDINGS[b.def].produces.filter(u => u !== 'pirata' && u !== 'coletor');
+    let pick = null, best = -1; for (const u of opts) { const sc = (w[u] || 0.1) * (0.7 + sim.rand() * 0.6); if (sc > best) { best = sc; pick = u; } }
     if (pick === 'suporte' && p.res.dados < 60) pick = 'infantaria';
-    if (pick) { const c = Object.assign({}, S.UNITS[pick].cost); c.minerio = (c.minerio || 0) + reserveArmy; if (S.canAfford(p, c)) emit({ t: 'produce', id: b.id, def: pick }); }
+    if (pick) { const c = Object.assign({}, S.UNITS[pick].cost); c.minerio = (c.minerio || 0) + reserveArmy; if (S.canAfford(p, c)) emitC({ t: 'produce', id: b.id, def: pick }); }
   }
-  // --- pirates
+  // --- piratas (raids) e batedores
   const quartel = prodBuildings.find(b => b.def === 'quartel');
-  if (quartel && t - mem.lastPirate > D.pirateEvery && pirates.length < 2 && S.canAfford(p, { minerio: 120 + reserveArmy, plasma: 30 }) && quartel.queue.length < 3) { mem.lastPirate = t; emit({ t: 'produce', id: quartel.id, def: 'pirata' }); }
+  const pirateEvery = D.pirateEvery / strat.pirate; const maxPirates = strat.pirate >= 2 ? 3 : 2;
+  if (quartel && t - mem.lastPirate > pirateEvery && pirates.length < maxPirates && S.canAfford(p, { minerio: 120 + reserveArmy, plasma: 30 }) && quartel.queue.length < 3) { mem.lastPirate = t; emitC({ t: 'produce', id: quartel.id, def: 'pirata' }); }
   for (const pr of pirates) {
-    if (pr.state !== 'idle') continue;
-    let best = null, bd = Infinity;
+    if (pr.state !== 'idle') continue; let best = null, bd = Infinity;
     for (const [id, k] of mem.known) { if ((k.def === 'refinaria' || k.def === 'reator') && S.isEnemy(sim, mem.pid, k.owner)) { const d = S.dist(pr.x, pr.y, k.x, k.y); if (d < bd) { bd = d; best = id; } } }
-    if (best && sim.vis[mem.pid].has(best)) emit({ t: 'siphon', ids: [pr.id], target: best });
-    else if (best) { const k = mem.known.get(best); emit({ t: 'move', ids: [pr.id], x: k.x + (sim.rand() - 0.5) * 80, y: k.y + (sim.rand() - 0.5) * 80 }); }
-    else { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en && sim.rand() < 0.3) emit({ t: 'move', ids: [pr.id], x: en.x + (sim.rand() - 0.5) * 500, y: en.y + (sim.rand() - 0.5) * 500 }); }
+    if (best && sim.vis[mem.pid].has(best)) emitC({ t: 'siphon', ids: [pr.id], target: best });
+    else if (best) { const k = mem.known.get(best); emitC({ t: 'move', ids: [pr.id], x: k.x + (sim.rand() - 0.5) * 80, y: k.y + (sim.rand() - 0.5) * 80 }); }
+    else { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en && sim.rand() < 0.5) emitC({ t: 'move', ids: [pr.id], x: en.x + (sim.rand() - 0.5) * 520, y: en.y + (sim.rand() - 0.5) * 520 }); }
   }
-
-  // --- army control
-  const value = S.armyValue(sim, mem.pid);
-  const threshold = D.attackAt + Math.max(0, (t - 600) / 60) * 25;
+  if (t - mem.lastScout > 90 && t > 120) { // batedor: uma unidade barata vai olhar a base inimiga
+    const en = nearestEnemyNucleoPos(sim, mem.pid); const scout = army.find(u => u.state === 'idle' && (u.def === 'drone' || u.def === 'infantaria'));
+    if (en && scout) { mem.lastScout = t; emitC({ t: 'move', ids: [scout.id], x: en.x + (sim.rand() - 0.5) * 300, y: en.y + (sim.rand() - 0.5) * 300 }); }
+  }
+  // --- esquadrões: defesa, ataque por avaliação de alvo, recuo
+  const value = S.armyValue(sim, mem.pid); const threshold = (D.attackAt + Math.max(0, (t - 600) / 60) * 25) * strat.attackMul;
   const attacked = builds.find(b => t - b.lastHitT < 6 && b.lastHitBy !== undefined && b.lastHitBy !== mem.pid);
   const rally = { x: nuc.x + (S.CX - nuc.x) * 0.12, y: nuc.y + (S.CY - nuc.y) * 0.12 };
   const ids = army.map(u => u.id);
-  if (attacked && ids.length) {
-    if (t - mem.lastAttackOrder > 4) { mem.lastAttackOrder = t; emit({ t: 'attackmove', ids, x: attacked.x, y: attacked.y }); }
-    if (mem.mode === 'attack' && value < mem.attackStart * 0.5) mem.mode = 'defend';
-  } else if (mem.mode === 'defend') {
-    if (value >= threshold && ids.length >= 4 && t >= D.minAttack) {
-      mem.mode = 'attack'; mem.attackStart = value; mem.target = null;
-    } else if (t - mem.lastAttackOrder > 8) {
-      const far = army.filter(u => u.state === 'idle' && S.dist(u.x, u.y, rally.x, rally.y) > 160).map(u => u.id);
-      if (far.length) { mem.lastAttackOrder = t; emit({ t: 'attackmove', ids: far, x: rally.x, y: rally.y }); }
-    }
+  if (attacked && ids.length) { if (t - mem.lastAttackOrder > 4) { mem.lastAttackOrder = t; emitC({ t: 'attackmove', ids, x: attacked.x, y: attacked.y }); } if (mem.mode === 'attack' && value < mem.attackStart * 0.5) mem.mode = 'defend'; }
+  else if (mem.mode === 'defend') {
+    if (value >= threshold && ids.length >= 4 && t >= D.minAttack) { mem.mode = 'attack'; mem.attackStart = value; mem.target = assessTargets(sim, mem, nuc); }
+    else if (t - mem.lastAttackOrder > 8) { const far = army.filter(u => u.state === 'idle' && S.dist(u.x, u.y, rally.x, rally.y) > 160).map(u => u.id); if (far.length) { mem.lastAttackOrder = t; emitC({ t: 'attackmove', ids: far, x: rally.x, y: rally.y }); } }
   }
   if (mem.mode === 'attack' && !attacked) {
-    if (value < mem.attackStart * 0.35 || ids.length === 0) { mem.mode = 'defend'; if (ids.length) emit({ t: 'move', ids, x: rally.x, y: rally.y }); }
+    if (value < mem.attackStart * 0.35 || ids.length === 0) { mem.mode = 'defend'; if (ids.length) emitC({ t: 'move', ids, x: rally.x, y: rally.y }); }
     else {
-      // choose target: nearest known enemy building, else enemy nucleo
-      let tgt = null, bd = Infinity;
-      for (const [id, k] of mem.known) if (S.isEnemy(sim, mem.pid, k.owner)) { const d = S.dist(nuc.x, nuc.y, k.x, k.y); if (d < bd) { bd = d; tgt = { x: k.x, y: k.y }; } }
-      if (!tgt) tgt = nearestEnemyNucleoPos(sim, mem.pid);
-      if (tgt && t - mem.lastAttackOrder > 5) { mem.lastAttackOrder = t; emit({ t: 'attackmove', ids, x: tgt.x, y: tgt.y }); }
-      if (!tgt) mem.mode = 'defend';
+      if (!mem.target || (mem.target.def !== 'nucleo' && ![...mem.known.values()].some(k => k.x === mem.target.x && k.y === mem.target.y))) mem.target = assessTargets(sim, mem, nuc);
+      if (mem.target && t - mem.lastAttackOrder > 5) { mem.lastAttackOrder = t; emitC({ t: 'attackmove', ids, x: mem.target.x, y: mem.target.y }); }
+      if (!mem.target) mem.mode = 'defend';
     }
   }
   return cmds;
 }
-
-ARD.ai = { create, think };
+ARD.ai = { create, think, STRATS };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Teste de estilo: pipeline de sprites voxel pré-renderizados em isométrico (2:1), gerados em tempo de carga. Sem assets externos. */
@@ -1349,7 +1516,7 @@ const FACES = [
 /* Renderiza um modelo em um canvas offscreen. angle em radianos (rotação em z). s = px por voxel. */
 function renderSprite(model, angle, s, opt) {
   opt = opt || {};
-  const b = model.bounds(); const cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2;
+  const b = model.bounds(); const cx = model.pivot ? model.pivot.x : (b.x0 + b.x1) / 2, cy = model.pivot ? model.pivot.y : (b.y0 + b.y1) / 2;
   const ca = Math.cos(angle), sa = Math.sin(angle);
   const rot = (x, y) => [cx + (x - cx) * ca - (y - cy) * sa, cy + (x - cx) * sa + (y - cy) * ca];
   const proj = (x, y, z) => { const [xr, yr] = rot(x, y); return [(xr - yr) * s, (xr + yr) * s * 0.5 - z * s]; };
@@ -1465,6 +1632,44 @@ function tug(col, style) { // Rebocador (Vehnar): caminhão pesado com guincho
   m.box(2, 3, 5, 6, 4, 2, steel2); m.box(0, 4, 5, 2, 2, 5, steel); m.box(-1, 4, 9, 4, 2, 1, dark); m.box(-2, 4, 8, 1, 2, 1, magenta, null, true);
   m.box(15, 3, 5, 1, 1, 1, lamp, null, true); m.box(15, 6, 5, 1, 1, 1, lamp, null, true);
   return m;
+}
+// ---------- partes giratórias (casco + torreta) ----------
+function tankHull(col, style) {
+  const p = pal(col, style); const m = M();
+  m.box(0, 0, 0, 14, 3, 3, dark, (x, y, z) => !(z === 2 && (x % 3 === 1)));
+  m.box(0, 7, 0, 14, 3, 3, dark, (x, y, z) => !(z === 2 && (x % 3 === 1)));
+  m.box(1, 2, 2, 12, 6, 3, p.body); m.box(2, 3, 5, 9, 4, 1, p.acc);
+  if (style === 'erevane') m.box(1, 2, 4, 12, 1, 1, p.trim);
+  m.box(12, 3, 4, 1, 1, 1, lamp, null, true); m.box(12, 6, 4, 1, 1, 1, lamp, null, true); m.box(1, 4, 4, 1, 2, 1, '#FF4040', null, true);
+  return m;
+}
+function tankTurret(col, style) {
+  const p = pal(col, style); const m = M();
+  m.box(0, 0, 0, 6, 4, 3, p.body); m.box(1, 1, 3, 4, 2, 1, p.trim); m.box(6, 1, 1, 7, 2, 1, steel2); m.box(12, 1, 1, 2, 2, 1, dark);
+  m.pivot = { x: 3, y: 2 }; return m;
+}
+function towerBase(col, style) {
+  const p = pal(col, style); const m = M();
+  m.box(0, 0, 0, 10, 10, 3, steel2); m.box(2, 2, 3, 6, 6, 9, dark);
+  if (style === 'erevane') m.box(2, 2, 8, 6, 1, 1, yellow);
+  return m;
+}
+function towerTurret(col, style) {
+  const p = pal(col, style); const m = M();
+  m.box(0, 0, 0, 8, 8, 3, p.body); m.box(2, 2, 3, 4, 4, 2, p.acc); m.box(6, 3, 1, 7, 2, 1, dark); m.box(6, 3, 2, 7, 2, 1, steel2); m.box(3, 3, 5, 2, 2, 1, '#FF4040', null, true);
+  m.pivot = { x: 4, y: 4 }; return m;
+}
+function bastionBase(col, style) {
+  const p = pal(col, style); const m = M();
+  m.box(0, 0, 0, 18, 18, 4, steel2); m.box(2, 2, 4, 14, 14, 8, p.body); m.box(1, 1, 12, 16, 16, 2, p.acc);
+  for (const [x, y] of [[2, 2], [14, 2], [2, 14], [14, 14]]) m.box(x, y, 12, 2, 2, 1, orange, null, true);
+  return m;
+}
+function bastionTurret(col, style) {
+  const p = pal(col, style); const m = M();
+  m.box(0, 0, 0, 10, 10, 5, dark); m.box(1, 1, 5, 8, 8, 2, p.body); m.box(8, 1, 3, 9, 2, 2, steel2); m.box(8, 7, 3, 9, 2, 2, steel2); m.box(16, 1, 3, 2, 2, 2, dark); m.box(16, 7, 3, 2, 2, 2, dark);
+  m.box(4, 4, 7, 2, 2, 3, steel); m.box(4, 4, 10, 2, 2, 1, '#FF4040', null, true);
+  m.pivot = { x: 5, y: 5 }; return m;
 }
 // ---------- estruturas ----------
 function nucleus(col, style) {
@@ -1590,11 +1795,15 @@ const BY_DEF = {
   nucleo: nucleus, reator: reactor, refinaria: refinery, quartel: barracks, fabrica: factory, hangar: hangar, torre: tower, bastiao: bastion, nodulo: nodule, laboratorio: lab,
   muro: (c, s) => wall(c, s, false), portao: (c, s) => wall(c, s, true),
   coletor: harvester, infantaria: infantry, veiculo: tank, drone: drone, suporte: support, pirata: raider, pirata_vehnar: tug,
+  veiculo_hull: tankHull, veiculo_turret: tankTurret, torre_base: towerBase, torre_turret: towerTurret, bastiao_base: bastionBase, bastiao_turret: bastionTurret,
 };
-ARD.models = { tank, mech, harvester, infantry, drone, support, raider, tug, refinery, reactor, barracks, factory, hangar, tower, bastion, nodule, lab, wall, nucleus, crystals, ore, datashards, rocks, crate, wreck, BY_DEF };
+// defs que se desenham em duas partes: casco na direção do corpo e torreta na direção da mira; z = altura da torreta em voxels
+const PARTS = { veiculo: { hull: 'veiculo_hull', turret: 'veiculo_turret', z: 6 }, torre: { hull: 'torre_base', turret: 'torre_turret', z: 12 }, bastiao: { hull: 'bastiao_base', turret: 'bastiao_turret', z: 14 } };
+ARD.models = { PARTS, tankHull, tankTurret, towerBase, towerTurret, bastionBase, bastionTurret, tank, mech, harvester, infantry, drone, support, raider, tug, refinery, reactor, barracks, factory, hangar, tower, bastion, nodule, lab, wall, nucleus, crystals, ore, datashards, rocks, crate, wreck, BY_DEF };
 })(globalThis.ARD = globalThis.ARD || {});
 
-/* Renderizador isométrico com sprites voxel pré-renderizados (v1.5a). Só lê a simulação. */
+/* Renderizador isométrico com sprites voxel (v2.0): torretas que giram, projéteis, impactos, carcaças, veterância,
+   névoa em três camadas (nunca visto / explorado / visível), Tempestade de Éter, dia e noite. Só lê a simulação. */
 (function (ARD) {
 'use strict';
 const S = ARD.sim, V = ARD.vox, MD = ARD.models;
@@ -1610,7 +1819,7 @@ function create(canvas, mini) {
   const ctx = canvas.getContext('2d'); const mctx = mini.getContext('2d');
   const fog = document.createElement('canvas'); const fctx = fog.getContext('2d');
   const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
-  const R = { canvas, ctx, w: 0, h: 0, dpr: 1, K, zoomMin: 0.55, zoomMax: 2.2, fx: { tracers: [], parts: [], floats: [], rings: [], flashes: [] }, decals: [], time: 0, shake: 0, cache: new Map(), icons: new Map(), tiles: new Map(), sim: null, night: 0 };
+  const R = { canvas, ctx, w: 0, h: 0, dpr: 1, K, zoomMin: 0.55, zoomMax: 2.4, fx: { tracers: [], parts: [], floats: [], rings: [], flashes: [] }, decals: [], time: 0, shake: 0, cache: new Map(), icons: new Map(), tiles: new Map(), sim: null, night: 0, lightning: 0 };
 
   R.resize = function () {
     const dpr = Math.min(2, window.devicePixelRatio || 1); const w = canvas.clientWidth, h = canvas.clientHeight;
@@ -1618,7 +1827,6 @@ function create(canvas, mini) {
     R.w = w; R.h = h; R.dpr = dpr;
     const ms = mini.clientWidth || 184; if (mini.width !== ms * dpr) { mini.width = ms * dpr; mini.height = ms * dpr; mfog.width = mini.width; mfog.height = mini.height; }
   };
-  // ---------- projeção isométrica 2:1 ----------
   R.worldToScreen = function (cam, x, y, z) { const k = K * cam.zoom; return [(x - y - (cam.x - cam.y)) * k + R.w / 2, (x + y - (cam.x + cam.y)) * k * 0.5 + R.h / 2 - (z || 0) * k]; };
   R.screenToWorld = function (cam, sx, sy) { const k = K * cam.zoom; const X = (sx - R.w / 2) / k + (cam.x - cam.y); const Y2 = (sy - R.h / 2) * 2 / k + (cam.x + cam.y); return [(X + Y2) / 2, (Y2 - X) / 2]; };
   R.screenDeltaToWorld = function (cam, dx, dy) { const k = K * cam.zoom; const X = dx / k, Y2 = dy * 2 / k; return [(X + Y2) / 2, (Y2 - X) / 2]; };
@@ -1652,17 +1860,17 @@ function create(canvas, mini) {
     R.sim = sim; const jobs = [];
     for (const p of sim.players) {
       for (const def in S.BUILDINGS) jobs.push([def, p.id, 0, false]);
-      for (const def of ['infantaria', 'coletor', 'veiculo']) for (let f = 0; f < FACINGS; f++) jobs.push([def, p.id, f, false]);
-      for (const def of ['drone', 'suporte', 'pirata']) jobs.push([def, p.id, 0, false]);
+      for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'torre_turret']) for (let f = 0; f < FACINGS; f++) jobs.push([def, p.id, f, false]);
+      for (const def of ['drone', 'suporte', 'pirata', 'veiculo', 'torre_base', 'bastiao_base', 'bastiao_turret']) jobs.push([def, p.id, 0, false]);
     }
     for (const res in NODE_MODEL) for (let s = 0; s < 4; s++) jobs.push([res, -1, 0, false, s]);
-    jobs.push(['crate', -1, 0, false, 0]); jobs.push(['wreck', -1, 0, false, 0]);
+    jobs.push(['crate', -1, 0, false, 0]); for (let f = 0; f < FACINGS; f++) jobs.push(['wreck', -1, f, false, 0]);
     let i = 0;
     function chunk() { const t0 = performance.now(); while (i < jobs.length && performance.now() - t0 < 24) { const j = jobs[i++]; R.sprite(j[0], j[1], j[2], j[3], j[4]); } if (onProgress) onProgress(i / jobs.length); if (i < jobs.length) requestAnimationFrame(chunk); else if (onDone) onDone(); }
     chunk();
   };
   function facingOf(ang) { return ((Math.round(ang / (TAU / FACINGS)) % FACINGS) + FACINGS) % FACINGS; }
-  function fitOf(e, sp) { const foot = e.kind === 'building' ? 2 * e.r * 1.25 : e.kind === 'node' ? 2 * e.r * 1.2 * (0.55 + 0.45 * (e.max ? e.amount / e.max : 1)) : 2 * e.r * 1.25; return foot / sp.fw; }
+  function fitOf(e, sp) { const foot = e.kind === 'node' ? 2 * e.r * 1.2 * (0.55 + 0.45 * (e.max ? e.amount / e.max : 1)) : e.kind === 'wreck' ? 2 * e.r * 1.3 : 2 * e.r * 1.25; return foot / sp.fw; }
 
   // ---------- terreno ----------
   function makeTile(kind, v) {
@@ -1679,7 +1887,6 @@ function create(canvas, mini) {
   }
   function tile(kind, v) { const k = kind + v; let t = R.tiles.get(k); if (!t) { t = makeTile(kind, v); R.tiles.set(k, t); } return t; }
   function tileKind(tx, ty) { const cx = (tx + 0.5) * TILE, cy = (ty + 0.5) * TILE; const d = Math.hypot(cx - S.CX, cy - S.CY); if (d < S.RIFT_R + 24) return null; return d < 540 ? 'crater' : 'ice'; }
-
   function diamond(c, px, py, hw, hh) { c.beginPath(); c.moveTo(px, py - hh); c.lineTo(px + hw, py); c.lineTo(px, py + hh); c.lineTo(px - hw, py); c.closePath(); }
   function ellipse(c, px, py, rx) { c.beginPath(); c.ellipse(px, py, rx, rx * 0.5, 0, 0, TAU); }
   function drawSprite(c, sp, gx, gy, z, scale, k, alpha, clipFrac) {
@@ -1690,17 +1897,24 @@ function create(canvas, mini) {
     c.globalAlpha = 1; return { x, y, w, h };
   }
   function hpBar(c, x, y, w, frac) { c.fillStyle = 'rgba(0,0,0,0.6)'; c.fillRect(x - w / 2, y, w, 3); c.fillStyle = frac > 0.5 ? '#7FE3A1' : frac > 0.25 ? '#F2C230' : '#FF5E3A'; c.fillRect(x - w / 2, y, w * Math.max(0, frac), 3); }
+  function chevrons(c, x, y, rank) { c.fillStyle = '#F2C230'; for (let i = 0; i < rank; i++) { const cx = x - (rank - 1) * 4 + i * 8; c.beginPath(); c.moveTo(cx - 3, y + 3); c.lineTo(cx, y - 1); c.lineTo(cx + 3, y + 3); c.lineTo(cx, y + 1.5); c.closePath(); c.fill(); } }
 
   // ---------- eventos → efeitos ----------
   R.onEvents = function (events, sim, human) {
     for (const e of events) {
       switch (e.t) {
         case 'shot': {
-          const col = sim.players[e.owner].color;
-          R.fx.tracers.push({ x1: e.x1, y1: e.y1, x2: e.x2, y2: e.y2, col, t: 0, life: 0.13, ambush: e.ambush, cls: e.cls });
-          R.fx.flashes.push({ x: e.x1, y: e.y1, z: 7, t: 0 });
-          for (let i = 0; i < 3; i++) R.fx.parts.push({ x: e.x2, y: e.y2, z: 5, vx: (Math.random() - .5) * 90, vy: (Math.random() - .5) * 90, vz: 40 + Math.random() * 60, t: 0, life: 0.35, c: '#FFD27A', s: 1.6 });
+          R.fx.flashes.push({ x: e.x1, y: e.y1, z: 7, t: 0, big: e.cls === 'vei' || e.cls === 'est' });
+          if (e.beam) R.fx.tracers.push({ x1: e.x1, y1: e.y1, x2: e.x2, y2: e.y2, t: 0, life: 0.14, beam: true });
+          if (e.ambush) R.fx.tracers.push({ x1: e.x1, y1: e.y1, x2: e.x2, y2: e.y2, t: 0, life: 0.2, ambush: true });
           break; }
+        case 'impact': {
+          const big = e.splash > 0; const n = big ? 14 : 4;
+          for (let i = 0; i < n; i++) { const a = Math.random() * TAU, sp = 30 + Math.random() * (big ? 120 : 60); R.fx.parts.push({ x: e.x, y: e.y, z: 2, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, vz: 50 + Math.random() * (big ? 160 : 70), t: 0, life: 0.4 + Math.random() * 0.4, c: Math.random() < 0.5 ? '#FFD27A' : '#FF8A4C', s: big ? 2.2 : 1.5, g: true }); }
+          if (big) { R.fx.rings.push({ x: e.x, y: e.y, r0: 4, r1: e.splash * 1.6, col: '#FFB070', t: 0, life: 0.35 }); R.fx.parts.push({ x: e.x, y: e.y, z: 4, vx: 0, vy: 0, vz: 22, t: 0, life: 1.6, c: '#55504C', s: 4, smoke: true }); if (!e.hit) R.decals.push({ type: 'scorch', x: e.x, y: e.y, r: e.splash * 0.7, t: 0, life: 40 }); }
+          R.fx.flashes.push({ x: e.x, y: e.y, z: 3, t: 0, big });
+          break; }
+        case 'hit': if (Math.random() < 0.5) R.fx.parts.push({ x: e.x, y: e.y, z: 6, vx: (Math.random() - .5) * 60, vy: (Math.random() - .5) * 60, vz: 30, t: 0, life: 0.3, c: '#FFE0A0', s: 1.5 }); break;
         case 'death': {
           const col = e.owner >= 0 ? sim.players[e.owner].color : '#AAAAAA'; const big = e.kind === 'building';
           const n = big ? 34 : 10;
@@ -1708,27 +1922,29 @@ function create(canvas, mini) {
           for (let i = 0; i < (big ? 8 : 2); i++) R.fx.parts.push({ x: e.x + (Math.random() - .5) * e.r, y: e.y + (Math.random() - .5) * e.r, z: 6, vx: 0, vy: 0, vz: 25, t: 0, life: 2 + Math.random() * 2, c: '#2A2A2E', s: 4, smoke: true });
           R.fx.rings.push({ x: e.x, y: e.y, r0: e.r, r1: e.r * (big ? 4 : 2.5), col: '#FF9A5C', t: 0, life: 0.5 });
           if (big) { R.decals.push({ type: 'crater', x: e.x, y: e.y, r: e.r * 1.3, t: 0, life: 240 }); if (e.owner === human) R.shake = Math.min(1, R.shake + 0.5); }
-          else if (e.cls === 'vei' || e.def === 'coletor' || e.def === 'pirata') R.decals.push({ type: 'wreck', x: e.x, y: e.y, r: e.r, ang: Math.random() * TAU, t: 0, life: 60 });
-          else R.decals.push({ type: 'scorch', x: e.x, y: e.y, r: e.r * 1.4, t: 0, life: 25 });
+          else if (e.cls === 'inf') R.decals.push({ type: 'scorch', x: e.x, y: e.y, r: e.r * 1.4, t: 0, life: 25 });
           if (R.decals.length > 160) R.decals.splice(0, R.decals.length - 160);
           break; }
         case 'float': if (e.owner === human || e.kind === 'steal') R.fx.floats.push({ x: e.x, y: e.y, text: e.text, col: e.kind === 'steal' ? '#FF6A3D' : '#E8E2D6', t: 0, life: 1.3 }); break;
+        case 'promote': if (e.owner === human) R.fx.floats.push({ x: e.x, y: e.y, text: ['', '★ Veterano', '★★ Elite', '★★★ Lenda'][e.rank], col: '#F2C230', t: 0, life: 1.8 }); break;
         case 'alert': if (e.p === human && e.x != null) R.fx.rings.push({ x: e.x, y: e.y, r0: 20, r1: 170, col: e.kind === 'danger' ? '#FF5E3A' : e.kind === 'good' ? '#7FE3A1' : '#F2C230', t: 0, life: 1.6, ping: true }); break;
         case 'super': if (e.kind === 'fundicao') R.fx.rings.push({ x: e.x, y: e.y, r0: 10, r1: 240, col: '#FF8C1A', t: 0, life: 3, ping: true }); else R.shake = 1; break;
         case 'jump': R.fx.rings.push({ x: e.from.x, y: e.from.y, r0: 40, r1: 300, col: '#B23CFF', t: 0, life: 1.2 }); R.fx.rings.push({ x: e.to.x, y: e.to.y, r0: 300, r1: 40, col: '#B23CFF', t: 0, life: 1.2 }); break;
         case 'built': if (e.p === human) R.fx.rings.push({ x: e.x, y: e.y, r0: 10, r1: 60, col: '#7FE3A1', t: 0, life: 0.6 }); break;
         case 'place': for (let i = 0; i < 8; i++) R.fx.parts.push({ x: e.x + (Math.random() - .5) * 30, y: e.y + (Math.random() - .5) * 30, z: 1, vx: 0, vy: 0, vz: 20, t: 0, life: 1.2, c: '#9A9A9A', s: 3, smoke: true }); break;
         case 'crate': R.fx.rings.push({ x: e.x, y: e.y, r0: 5, r1: 50, col: '#F2C230', t: 0, life: 0.8 }); break;
+        case 'storm': if (e.phase === 'active') R.lightning = 0.6; break;
       }
     }
   };
   function updateFx(dt) {
     const f = R.fx;
-    for (const arr of [f.tracers, f.parts, f.floats, f.rings, f.flashes]) for (let i = arr.length - 1; i >= 0; i--) { const o = arr[i]; o.t += dt; if (o.t >= o.life || (o.life == null && o.t > 0.07)) arr.splice(i, 1); }
-    for (const p of f.parts) { p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt; if (p.smoke) { p.vz = Math.max(8, p.vz - dt * 6); p.s += dt * 6; p.vx += (Math.random() - .5) * 8 * dt; } else if (p.g) { p.vz -= 260 * dt; if (p.z < 0) { p.z = 0; p.vz = 0; p.vx *= 0.5; p.vy *= 0.5; } } }
+    for (const arr of [f.tracers, f.parts, f.floats, f.rings]) for (let i = arr.length - 1; i >= 0; i--) { const o = arr[i]; o.t += dt; if (o.t >= o.life) arr.splice(i, 1); }
+    for (let i = f.flashes.length - 1; i >= 0; i--) { f.flashes[i].t += dt; if (f.flashes[i].t > 0.07) f.flashes.splice(i, 1); }
+    for (const p of f.parts) { p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt; if (p.smoke) { p.vz = Math.max(8, p.vz - dt * 6); p.s += dt * 6; p.vx += (Math.random() - .5) * 8 * dt; } else if (p.snow) { p.vz = -40; p.vx += (Math.random() - .5) * 20 * dt; if (p.z <= 0) p.t = p.life; } else if (p.g) { p.vz -= 260 * dt; if (p.z < 0) { p.z = 0; p.vz = 0; p.vx *= 0.5; p.vy *= 0.5; } } }
     for (let i = R.decals.length - 1; i >= 0; i--) { const d = R.decals[i]; d.t += dt; if (d.t > d.life) R.decals.splice(i, 1); }
-    R.shake = Math.max(0, R.shake - dt * 2);
-    if (f.parts.length > 1400) f.parts.splice(0, f.parts.length - 1400);
+    R.shake = Math.max(0, R.shake - dt * 2); R.lightning = Math.max(0, R.lightning - dt * 3);
+    if (f.parts.length > 1600) f.parts.splice(0, f.parts.length - 1600);
   }
   function lerp(e, a) { return [e.px + (e.x - e.px) * a, e.py + (e.y - e.py) * a]; }
 
@@ -1736,7 +1952,7 @@ function create(canvas, mini) {
   R.draw = function (sim, view, alpha, dt) {
     R.sim = sim; R.time += dt; updateFx(dt);
     const c = ctx, cam = view.cam, human = view.human, me = sim.players[human];
-    const vis = view.reveal ? { has: () => true } : sim.vis[human];
+    const vis = view.reveal ? { has: () => true } : sim.vis[human]; const explored = sim.explored[human];
     const W = R.w, H = R.h, k = K * cam.zoom; const z = cam.zoom;
     R.night = (1 - Math.cos(TAU * sim.time / 750)) / 2;
     c.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
@@ -1747,24 +1963,22 @@ function create(canvas, mini) {
     const corners = [R.screenToWorld(cam, 0, 0), R.screenToWorld(cam, W, 0), R.screenToWorld(cam, 0, H), R.screenToWorld(cam, W, H)];
     const wx0 = Math.min(...corners.map(p => p[0])) - 80, wx1 = Math.max(...corners.map(p => p[0])) + 80, wy0 = Math.min(...corners.map(p => p[1])) - 80, wy1 = Math.max(...corners.map(p => p[1])) + 80;
     const inView = (x, y, m) => x > wx0 - m && x < wx1 + m && y > wy0 - m && y < wy1 + m;
-    // territórios visíveis
     const terr = [];
     for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const t = S.BUILDINGS[e.def].territory; if (!t) continue; if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue; terr.push({ x: e.x, y: e.y, r: t, col: sim.players[e.owner].color }); }
     // terreno
-    const tw = TILE * k * 2, th = TILE * k;
+    const tw = TILE * k * 2, th = TILE * k; const unexplored = [];
     const tx0 = Math.max(0, Math.floor(wx0 / TILE)), tx1 = Math.min(TILES - 1, Math.ceil(wx1 / TILE)), ty0 = Math.max(0, Math.floor(wy0 / TILE)), ty1 = Math.min(TILES - 1, Math.ceil(wy1 / TILE));
     for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) {
       const kind = tileKind(tx, ty); if (!kind) continue;
       const cx = (tx + 0.5) * TILE, cy = (ty + 0.5) * TILE; const p = P(cx, cy, 0);
       if (p[0] < -tw || p[0] > W + tw || p[1] < -th || p[1] > H + th) continue;
+      if (!view.reveal && !explored[ty * TILES + tx]) { unexplored.push(p); continue; }
       c.drawImage(tile(kind, (tx * 7 + ty * 13) % 3), p[0] - tw / 2, p[1] - th / 2, tw, th);
       for (const t of terr) if (Math.hypot(cx - t.x, cy - t.y) <= t.r) { c.fillStyle = rgba(t.col, 0.16); diamond(c, p[0], p[1], tw / 2, th / 2); c.fill(); c.strokeStyle = 'rgba(0,0,0,0.18)'; c.lineWidth = 1; c.stroke(); break; }
     }
-    // bordas de território
     c.lineWidth = 1.5; c.setLineDash([8, 6]);
     for (const t of terr) { const p = P(t.x, t.y, 0); c.strokeStyle = rgba(t.col, 0.35); ellipse(c, p[0], p[1], t.r * k); c.stroke(); }
     c.setLineDash([]);
-    // Fenda
     { const p = P(S.CX, S.CY, 0); const rr = S.RIFT_R * k;
       if (p[0] > -rr * 4 && p[0] < W + rr * 4 && p[1] > -rr * 2 && p[1] < H + rr * 2) {
         const g = c.createRadialGradient(p[0], p[1], rr * 0.3, p[0], p[1], rr * 3); g.addColorStop(0, 'rgba(255,94,58,0.5)'); g.addColorStop(0.4, 'rgba(178,60,255,0.25)'); g.addColorStop(1, 'rgba(178,60,255,0)');
@@ -1773,19 +1987,29 @@ function create(canvas, mini) {
         for (let i = 0; i < 3; i++) { const ph = (R.time * 0.25 + i / 3) % 1; c.strokeStyle = `rgba(255,120,80,${0.55 * (1 - ph)})`; c.lineWidth = 2; c.beginPath(); c.arc(0, 0, rr * (0.35 + ph * 0.75), 0, TAU); c.stroke(); }
         c.strokeStyle = 'rgba(255,160,120,0.6)'; c.lineWidth = 1.5; c.setLineDash([6, 6]); c.beginPath(); c.arc(0, 0, rr, 0, TAU); c.stroke(); c.setLineDash([]); c.restore();
       } }
+    // tempestade: área e aviso
+    const st = sim.storm;
+    if (st && inView(st.x, st.y, st.r)) {
+      const p = P(st.x, st.y, 0);
+      if (st.phase === 'warn') { c.strokeStyle = `rgba(178,60,255,${0.4 + 0.3 * Math.sin(R.time * 6)})`; c.lineWidth = 2; c.setLineDash([10, 8]); ellipse(c, p[0], p[1], st.r * k); c.stroke(); c.setLineDash([]); }
+      else { c.save(); c.translate(p[0], p[1]); c.scale(1, 0.5); const g = c.createRadialGradient(0, 0, st.r * k * 0.2, 0, 0, st.r * k); g.addColorStop(0, 'rgba(120,90,255,0.22)'); g.addColorStop(1, 'rgba(120,90,255,0)'); c.fillStyle = g; c.beginPath(); c.arc(0, 0, st.r * k, 0, TAU); c.fill(); c.restore();
+        for (let i = 0; i < 6; i++) { const a = Math.random() * TAU, rr = Math.sqrt(Math.random()) * st.r; R.fx.parts.push({ x: st.x + Math.cos(a) * rr, y: st.y + Math.sin(a) * rr, z: 70 + Math.random() * 30, vx: 30, vy: 10, vz: -40, t: 0, life: 3, c: '#DCE8FF', s: 1.4, snow: true }); }
+        if (Math.random() < 0.012) { R.lightning = 1; R.fx.rings.push({ x: st.x + (Math.random() - .5) * st.r, y: st.y + (Math.random() - .5) * st.r, r0: 6, r1: 120, col: '#C8B0FF', t: 0, life: 0.4 }); }
+      }
+    }
     // decalques
     for (const d of R.decals) {
       if (!inView(d.x, d.y, 80)) continue; const p = P(d.x, d.y, 0); const a = Math.min(1, (d.life - d.t) / 10);
       if (d.type === 'crater') { const g = c.createRadialGradient(p[0], p[1], 1, p[0], p[1], d.r * k); g.addColorStop(0, `rgba(10,8,8,${0.85 * a})`); g.addColorStop(0.6, `rgba(40,36,34,${0.5 * a})`); g.addColorStop(1, 'rgba(0,0,0,0)'); c.save(); c.translate(p[0], p[1]); c.scale(1, 0.5); c.fillStyle = g; c.beginPath(); c.arc(0, 0, d.r * k, 0, TAU); c.fill(); c.restore(); }
-      else if (d.type === 'scorch') { c.save(); c.translate(p[0], p[1]); c.scale(1, 0.5); c.fillStyle = `rgba(20,16,14,${0.5 * a})`; c.beginPath(); c.arc(0, 0, d.r * k, 0, TAU); c.fill(); c.restore(); }
-      else if (d.type === 'wreck') { const sp = R.sprite('wreck', -1, facingOf(d.ang), false, 0); drawSprite(c, sp, p[0], p[1], 0, (2 * d.r * 1.3 / sp.fw) * k / SV, k, 0.9 * a); if (d.t < 20 && Math.random() < 0.25) R.fx.parts.push({ x: d.x, y: d.y, z: 6, vx: 0, vy: 0, vz: 18, t: 0, life: 1.5, c: '#3A3A3E', s: 3, smoke: true }); }
+      else { c.save(); c.translate(p[0], p[1]); c.scale(1, 0.5); c.fillStyle = `rgba(20,16,14,${0.5 * a})`; c.beginPath(); c.arc(0, 0, d.r * k, 0, TAU); c.fill(); c.restore(); }
     }
-    // lista de objetos ordenada por profundidade
+    // objetos ordenados por profundidade
     const items = []; const lights = [];
     for (const e of sim.ents) {
-      if (!e.alive || e.kind === 'crate' && !vis.has(e.id)) continue;
+      if (!e.alive) continue;
       const own = e.owner === human;
-      if (e.kind !== 'node' && !own && !vis.has(e.id)) continue;
+      if (e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck') { if (!own && !vis.has(e.id)) continue; }
+      else if (e.kind !== 'node' && !own && !vis.has(e.id)) continue;
       if (!inView(e.x, e.y, 60 + e.r * 3)) continue;
       items.push({ e, d: e.x + e.y });
     }
@@ -1803,73 +2027,86 @@ function create(canvas, mini) {
         continue;
       }
       if (e.kind === 'crate') { const sp = R.sprite('crate', -1, 0, false, 0); const p = P(e.x, e.y, 0); drawSprite(c, sp, p[0], p[1], 0, (2 * e.r * 1.6 / sp.fw) * k / SV, k, 1); c.strokeStyle = `rgba(242,194,48,${0.4 + 0.3 * Math.sin(R.time * 4)})`; c.lineWidth = 1.5; ellipse(c, p[0], p[1], 16 * k); c.stroke(); continue; }
-      const p = sim.players[e.owner];
-      const isUnit = e.kind === 'unit';
+      if (e.kind === 'wreck') {
+        const sp = R.sprite('wreck', -1, facingOf(e.ang || 0), false, 0); const p = P(e.x, e.y, 0); const age = sim.time - e.bornT;
+        if (view.sel.has(e.id)) { c.strokeStyle = 'rgba(255,255,255,0.8)'; c.lineWidth = 1.5; ellipse(c, p[0], p[1], (e.r + 6) * k); c.stroke(); }
+        drawSprite(c, sp, p[0], p[1], 0, fitOf(e, sp) * k / SV, k, 0.6 + 0.4 * (e.max ? e.amount / e.max : 1));
+        if (age < 25 && Math.random() < 0.2) R.fx.parts.push({ x: e.x, y: e.y, z: 6, vx: 2, vy: -2, vz: 18, t: 0, life: 1.6, c: '#3A3A3E', s: 3, smoke: true });
+        if (age < 25 && Math.random() < 0.3) R.fx.parts.push({ x: e.x + (Math.random() - .5) * e.r, y: e.y + (Math.random() - .5) * e.r, z: 4, vx: 0, vy: 0, vz: 20, t: 0, life: 0.5, c: Math.random() < 0.5 ? '#FF7A30' : '#FFC050', s: 1.8 });
+        continue;
+      }
+      if (e.kind === 'proj') {
+        const w = S.WEAPONS[e.weapon]; const [wx, wy] = lerp(e, alpha); const p = P(wx, wy, e.z); const g = P(wx, wy, 0);
+        c.fillStyle = 'rgba(0,0,0,0.3)'; c.beginPath(); c.arc(g[0], g[1], 1.6 * z, 0, TAU); c.fill();
+        if (w.proj === 'shell') { c.fillStyle = '#FFD9A0'; c.beginPath(); c.arc(p[0], p[1], 2.2 * z, 0, TAU); c.fill(); c.strokeStyle = 'rgba(255,200,120,0.5)'; c.lineWidth = 1; c.beginPath(); c.moveTo(p[0], p[1]); const q = P(e.px, e.py, e.z); c.lineTo(q[0], q[1]); c.stroke(); if (R.night > 0.2) lights.push({ x: p[0], y: p[1], r: 10 * z, c: '#FFC070', a: 0.6 }); }
+        else { const q = P(wx - e.vx * 0.03, wy - e.vy * 0.03, e.z); c.strokeStyle = 'rgba(255,230,160,0.95)'; c.lineWidth = 1.5 * Math.max(0.7, z); c.beginPath(); c.moveTo(q[0], q[1]); c.lineTo(p[0], p[1]); c.stroke(); }
+        continue;
+      }
+      const p = sim.players[e.owner]; const isUnit = e.kind === 'unit';
       const [wx, wy] = isUnit ? lerp(e, alpha) : [e.x, e.y];
       const ud = isUnit ? S.UNITS[e.def] : S.BUILDINGS[e.def];
       const zz = isUnit && ud.flying ? 14 : 0;
-      let facing = 0; if (isUnit) facing = facingOf(e.ang || 0); else if (ud.wall) facing = facingOf(e.ang || 0); else if (ud.attack) facing = facingOf(e.aimAng || 0);
+      const parts = (!isUnit || e.built !== false) ? MD.PARTS[e.def] : null;
+      let facing = 0; if (isUnit) facing = facingOf(e.ang || 0); else if (ud.wall) facing = facingOf(e.ang || 0);
       const dmg = !isUnit && e.built && e.hp < e.maxHp * 0.5;
-      const sp = R.sprite(e.def, e.owner, facing, dmg, 0); const sc = fitOf(e, sp) * k / SV;
+      const sp = R.sprite(parts ? parts.hull : e.def, e.owner, parts && !isUnit ? 0 : facing, dmg, 0); const sc = fitOf(e, sp) * k / SV;
       const g = P(wx, wy, 0);
-      // sombra
       c.fillStyle = 'rgba(0,0,0,0.35)'; ellipse(c, g[0] + sp.fw * sc * 0.15, g[1] + 1, sp.fw * sc * 0.55); c.fill();
       if (view.sel.has(e.id)) { c.strokeStyle = 'rgba(255,255,255,0.9)'; c.lineWidth = 1.5; ellipse(c, g[0], g[1], (e.r + 5) * k); c.stroke(); if (!isUnit && ud.attack) { c.strokeStyle = 'rgba(255,255,255,0.18)'; c.setLineDash([4, 6]); ellipse(c, g[0], g[1], ud.attack.range * k); c.stroke(); c.setLineDash([]); } if (!isUnit && ud.detect) { c.strokeStyle = 'rgba(127,227,161,0.3)'; ellipse(c, g[0], g[1], ud.detect * k); c.stroke(); } }
       const alphaS = e.cloaked ? (own ? 0.45 : 1) : 1;
-      const box = drawSprite(c, sp, g[0], g[1], zz, sc, k, alphaS, isUnit ? 1 : (e.built ? 1 : 0.12 + 0.88 * e.progress));
+      const clip = isUnit ? 1 : (e.built ? 1 : 0.12 + 0.88 * e.progress);
+      const box = drawSprite(c, sp, g[0], g[1], zz, sc, k, alphaS, clip);
+      if (parts && (isUnit || e.built)) { // torreta na direção da mira
+        const tsp = R.sprite(parts.turret, e.owner, facingOf(e.aimAng != null ? e.aimAng : (e.ang || 0)), dmg, 0);
+        const fit = fitOf(e, sp); drawSprite(c, tsp, g[0], g[1], zz + parts.z * fit, fit * k / SV, k, alphaS, 1);
+      }
       if (!isUnit && !e.built) { c.strokeStyle = '#7FE3A1'; c.lineWidth = 3; c.beginPath(); c.ellipse(g[0], g[1], (e.r + 5) * k, (e.r + 5) * k * 0.5, 0, -Math.PI / 2, -Math.PI / 2 + TAU * e.progress); c.stroke(); }
       if (!isUnit && e.jumpT > 0) { c.strokeStyle = '#B23CFF'; c.lineWidth = 4; c.beginPath(); c.ellipse(g[0], g[1], (e.r + 10) * k, (e.r + 10) * k * 0.5, 0, -Math.PI / 2, -Math.PI / 2 + TAU * (1 - e.jumpT / S.JUMP_CHANNEL)); c.stroke(); if (e.jumpTo && own) { const q = P(e.jumpTo.x, e.jumpTo.y, 0); c.setLineDash([6, 6]); c.strokeStyle = 'rgba(178,60,255,0.6)'; c.lineWidth = 2; c.beginPath(); c.moveTo(g[0], g[1]); c.lineTo(q[0], q[1]); c.stroke(); c.setLineDash([]); ellipse(c, q[0], q[1], e.r * k); c.stroke(); } }
       if (own && e.queue && e.queue.length && e.built) { const it2 = e.queue[0]; c.strokeStyle = '#F2C230'; c.lineWidth = 2.5; c.beginPath(); c.ellipse(g[0], g[1], (e.r + 3) * k, (e.r + 3) * k * 0.5, 0, -Math.PI / 2, -Math.PI / 2 + TAU * (it2.t / it2.total)); c.stroke(); }
       if (e.hp < e.maxHp - 0.5 || view.sel.has(e.id)) hpBar(c, g[0], box.y - 6, Math.max(14, e.r * 2 * k), e.hp / e.maxHp);
+      if (isUnit && e.rank > 0) chevrons(c, g[0], box.y - 12, e.rank);
       if (e.cloaked && own) { c.strokeStyle = 'rgba(255,255,255,0.35)'; c.setLineDash([2, 3]); c.lineWidth = 1; ellipse(c, g[0], g[1], (e.r + 3) * k); c.stroke(); c.setLineDash([]); }
       if (isUnit && view.sel.has(e.id) && (e.state === 'move' || e.state === 'attackmove')) { const q = P(e.tx, e.ty, 0); c.strokeStyle = e.state === 'attackmove' ? 'rgba(255,94,58,0.35)' : 'rgba(255,255,255,0.2)'; c.lineWidth = 1; c.setLineDash([3, 5]); c.beginPath(); c.moveTo(g[0], g[1]); c.lineTo(q[0], q[1]); c.stroke(); c.setLineDash([]); }
-      // luzes emissivas do sprite (só estruturas e à noite)
       if (!isUnit && R.night > 0.12 && z > 0.7) { let nL = 0; for (const l of sp.lights) { if (nL++ >= 5) break; lights.push({ x: box.x + l.x * sc, y: box.y + l.y * sc, r: 9 * z, c: l.c, a: 0.55 }); } }
-      // fumaça: reatores ativos e estruturas danificadas
       if (!isUnit && e.built && (e.def === 'reator' && Math.random() < 0.12 || dmg && Math.random() < 0.08)) R.fx.parts.push({ x: wx + (e.def === 'reator' ? e.r * 0.35 : (Math.random() - .5) * e.r), y: wy - (e.def === 'reator' ? e.r * 0.3 : (Math.random() - .5) * e.r), z: e.def === 'reator' ? e.r * 1.1 : e.r * 0.6, vx: 4, vy: -3, vz: 16, t: 0, life: 2.2 + Math.random(), c: dmg ? '#2A2A2E' : '#6A6F78', s: 2.5, smoke: true });
-      // sifão
       if (isUnit && e.state === 'siphon') { const t = sim.byId.get(e.target); if (t && S.dist(e.x, e.y, t.x, t.y) <= S.UNITS.pirata.siphonRange + t.r + 2) { const a = P(wx, wy, 5), b = P(t.x, t.y, t.r * 0.6); c.save(); c.strokeStyle = 'rgba(214,76,255,0.9)'; c.lineWidth = 2.5; c.setLineDash([7, 5]); c.lineDashOffset = -R.time * 80; c.beginPath(); c.moveTo(a[0], a[1]); c.quadraticCurveTo((a[0] + b[0]) / 2, Math.min(a[1], b[1]) - 30 * z, b[0], b[1]); c.stroke(); c.restore(); if (Math.random() < 0.4) R.fx.parts.push({ x: t.x, y: t.y, z: t.r * 0.6, vx: (e.x - t.x) * 1.1, vy: (e.y - t.y) * 1.1, vz: 10, t: 0, life: 0.9, c: '#E08CFF', s: 2.2 }); lights.push({ x: b[0], y: b[1], r: 18 * z, c: '#D64CFF', a: 0.5 }); } }
     }
     // efeitos
-    for (const t of R.fx.tracers) { const a = 1 - t.t / t.life; const p1 = P(t.x1, t.y1, 7), p2 = P(t.x2, t.y2, 5); c.strokeStyle = rgba(t.ambush ? '#FFFFFF' : '#FFE0A0', a); c.lineWidth = t.ambush ? 3 : (t.cls === 'vei' || t.cls === 'est' ? 2 : 1.3); c.beginPath(); c.moveTo(p1[0], p1[1]); c.lineTo(p2[0], p2[1]); c.stroke(); }
-    for (const f of R.fx.flashes) { const p = P(f.x, f.y, f.z); c.fillStyle = 'rgba(255,240,200,0.9)'; c.beginPath(); c.arc(p[0], p[1], 3 * z, 0, TAU); c.fill(); lights.push({ x: p[0], y: p[1], r: 26 * z, c: '#FFC878', a: 0.8 }); }
-    for (const p of R.fx.parts) { const a = 1 - p.t / p.life; const q = P(p.x, p.y, p.z); c.fillStyle = rgba(p.c, p.smoke ? a * 0.45 : a); c.beginPath(); c.arc(q[0], q[1], p.s * z, 0, TAU); c.fill(); }
+    for (const t of R.fx.tracers) { const a = 1 - t.t / t.life; const p1 = P(t.x1, t.y1, 7), p2 = P(t.x2, t.y2, 5); c.strokeStyle = rgba(t.ambush ? '#FFFFFF' : '#9FE8FF', a); c.lineWidth = t.ambush ? 3 : 2; c.beginPath(); c.moveTo(p1[0], p1[1]); c.lineTo(p2[0], p2[1]); c.stroke(); }
+    for (const f of R.fx.flashes) { const p = P(f.x, f.y, f.z); c.fillStyle = 'rgba(255,240,200,0.9)'; c.beginPath(); c.arc(p[0], p[1], (f.big ? 4 : 2.5) * z, 0, TAU); c.fill(); lights.push({ x: p[0], y: p[1], r: (f.big ? 34 : 20) * z, c: '#FFC878', a: 0.8 }); }
+    for (const p of R.fx.parts) { const a = 1 - p.t / p.life; const q = P(p.x, p.y, p.z); c.fillStyle = rgba(p.c, p.smoke ? a * 0.45 : p.snow ? 0.8 : a); c.beginPath(); c.arc(q[0], q[1], p.s * z, 0, TAU); c.fill(); }
     for (const r of R.fx.rings) { const kk = r.t / r.life; const rr = (r.r0 + (r.r1 - r.r0) * kk) * k; const p = P(r.x, r.y, 0); c.strokeStyle = rgba(r.col, (1 - kk) * (r.ping ? 0.9 : 0.6)); c.lineWidth = r.ping ? 3 : 2; ellipse(c, p[0], p[1], rr); c.stroke(); }
-    // fantasma de construção e muros
     if (view.ghost) {
       const gh = view.ghost; const d = S.BUILDINGS[gh.def]; const col = gh.ok ? '#7FE3A1' : '#FF5E3A'; const p = P(gh.x, gh.y, 0);
       c.fillStyle = rgba(col, 0.18); ellipse(c, p[0], p[1], (d.r + 4) * k); c.fill(); c.strokeStyle = rgba(col, 0.8); c.lineWidth = 1.5; c.stroke();
-      const sp = R.sprite(gh.def, human, d.wall ? facingOf(gh.ang || 0) : 0, false, 0); drawSprite(c, sp, p[0], p[1], 0, (2 * d.r * 1.25 / sp.fw) * k / SV, k, 0.65);
+      const sp = R.sprite(MD.PARTS[gh.def] ? MD.PARTS[gh.def].hull : gh.def, human, d.wall ? facingOf(gh.ang || 0) : 0, false, 0); drawSprite(c, sp, p[0], p[1], 0, (2 * d.r * 1.25 / sp.fw) * k / SV, k, 0.65);
       c.setLineDash([6, 4]); c.strokeStyle = rgba(col, 0.5); if (d.territory) { ellipse(c, p[0], p[1], d.territory * k); c.stroke(); } if (d.attack) { ellipse(c, p[0], p[1], d.attack.range * k); c.stroke(); } c.setLineDash([]);
     }
     if (view.wallGhost) for (const g of view.wallGhost) { const p = P(g.x, g.y, 0); const col = g.ok ? '#7FE3A1' : '#FF5E3A'; const sp = R.sprite(view.ghost ? view.ghost.def : 'muro', human, facingOf(g.ang), false, 0); c.fillStyle = rgba(col, 0.25); ellipse(c, p[0], p[1], 9 * k); c.fill(); drawSprite(c, sp, p[0], p[1], 0, (20 / sp.fw) * k / SV, k, 0.6); }
     if (view.marker) { const m = view.marker; const kk = Math.min(1, (R.time - m.t) / 0.6); if (kk < 1) { const p = P(m.x, m.y, 0); c.strokeStyle = rgba(m.col, 1 - kk); c.lineWidth = 2; ellipse(c, p[0], p[1], (6 + 26 * (1 - kk)) * z); c.stroke(); } }
     c.restore();
-    // ---- névoa de guerra + noite (espaço de tela) ----
+    // ---- névoa: explorado (escuro), nunca visto (quase preto), visível (recorte) ----
     fctx.setTransform(1, 0, 0, 1, 0, 0); fctx.globalCompositeOperation = 'source-over'; fctx.clearRect(0, 0, fog.width, fog.height);
-    const nightA = me.blackoutT > 0 ? 0.93 : 0.84;
-    fctx.fillStyle = `rgba(5,7,12,${view.reveal ? 0 : nightA})`; fctx.fillRect(0, 0, fog.width, fog.height);
-    fctx.globalCompositeOperation = 'destination-out'; fctx.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
+    fctx.fillStyle = `rgba(5,7,12,${view.reveal ? 0 : me.blackoutT > 0 ? 0.93 : 0.8})`; fctx.fillRect(0, 0, fog.width, fog.height);
+    fctx.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
+    fctx.fillStyle = 'rgba(2,3,6,0.85)'; for (const p of unexplored) { diamond(fctx, p[0] + shx, p[1] + shy, tw / 2 + 1, th / 2 + 1); fctx.fill(); }
+    fctx.globalCompositeOperation = 'destination-out';
     for (const e of sim.ents) {
-      if (!e.alive || e.owner !== human) continue; const rad = S.sensorRadius(sim, e); if (!inView(e.x, e.y, rad)) continue;
+      if (!e.alive || e.owner !== human || (e.kind !== 'unit' && e.kind !== 'building')) continue; const rad = S.sensorRadius(sim, e); if (!inView(e.x, e.y, rad)) continue;
       const p = R.worldToScreen(cam, e.x, e.y, 0); const rx = rad * k;
       fctx.save(); fctx.translate(p[0], p[1]); fctx.scale(1, 0.5); const g = fctx.createRadialGradient(0, 0, rx * 0.68, 0, 0, rx); g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)'); fctx.fillStyle = g; fctx.beginPath(); fctx.arc(0, 0, rx, 0, TAU); fctx.fill(); fctx.restore();
     }
     c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(fog, 0, 0); c.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
-    // noite: escurecimento suave + brilhos
     if (R.night > 0.12) {
       c.fillStyle = `rgba(6,10,28,${0.42 * R.night})`; c.fillRect(0, 0, W, H);
       c.save(); c.globalCompositeOperation = 'lighter';
-      for (const l of lights) { if (l.x < -40 || l.x > W + 40 || l.y < -40 || l.y > H + 40) continue; const g = c.createRadialGradient(l.x, l.y, 0, l.x, l.y, l.r); g.addColorStop(0, rgba(l.c, (l.a || 0.5) * R.night)); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.beginPath(); c.arc(l.x, l.y, l.r, 0, TAU); c.fill(); }
+      for (const l of lights) { if (l.x < -40 || l.x > W + 40 || l.y < -40 || l.y > H + 40) continue; const g = c.createRadialGradient(l.x, l.y, 0, l.x, l.y, l.r); g.addColorStop(0, rgba(l.c, (l.a || 0.5) * Math.max(0.5, R.night))); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.beginPath(); c.arc(l.x, l.y, l.r, 0, TAU); c.fill(); }
       c.restore();
-    } else if (lights.length) { // de dia só flashes e sifão brilham
-      c.save(); c.globalCompositeOperation = 'lighter'; for (const l of lights) { if (l.a < 0.6) continue; const g = c.createRadialGradient(l.x, l.y, 0, l.x, l.y, l.r); g.addColorStop(0, rgba(l.c, 0.5)); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.beginPath(); c.arc(l.x, l.y, l.r, 0, TAU); c.fill(); } c.restore();
-    }
-    // nós fora de visão (conhecimento do mapa) e textos flutuantes, acima da névoa
+    } else if (lights.length) { c.save(); c.globalCompositeOperation = 'lighter'; for (const l of lights) { if (l.a < 0.6) continue; const g = c.createRadialGradient(l.x, l.y, 0, l.x, l.y, l.r); g.addColorStop(0, rgba(l.c, 0.5)); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.beginPath(); c.arc(l.x, l.y, l.r, 0, TAU); c.fill(); } c.restore(); }
+    if (R.lightning > 0) { c.fillStyle = `rgba(200,190,255,${0.25 * R.lightning})`; c.fillRect(0, 0, W, H); }
     c.save(); c.translate(shx, shy);
-    for (const e of sim.ents) { if (!e.alive || e.kind !== 'node' || !inView(e.x, e.y, 40)) continue; let seen = false; for (const o of sim.ents) { if (o.alive && o.owner === human && S.dist(o.x, o.y, e.x, e.y) <= S.sensorRadius(sim, o)) { seen = true; break; } } if (seen) continue; const sp = R.sprite(e.res, -1, 0, false, e.id % 4); const p = P(e.x, e.y, 0); drawSprite(c, sp, p[0], p[1], 0, fitOf(e, sp) * k / SV, k, 0.3); }
+    for (const e of sim.ents) { if (!e.alive || e.kind !== 'node' || !inView(e.x, e.y, 40)) continue; let seen = false; for (const o of sim.ents) { if (o.alive && o.owner === human && (o.kind === 'unit' || o.kind === 'building') && S.dist(o.x, o.y, e.x, e.y) <= S.sensorRadius(sim, o)) { seen = true; break; } } if (seen) continue; const sp = R.sprite(e.res, -1, 0, false, e.id % 4); const p = P(e.x, e.y, 0); drawSprite(c, sp, p[0], p[1], 0, fitOf(e, sp) * k / SV, k, 0.3); }
     for (const f of R.fx.floats) { const kk = f.t / f.life; const p = P(f.x, f.y, 10); c.fillStyle = rgba(f.col, 1 - kk); c.font = 'bold 13px IBM Plex Mono, monospace'; c.textAlign = 'center'; c.fillText(f.text, p[0], p[1] - kk * 30); }
-    // fumaça de reatores inimigos Vehnar acima da névoa (Fumaça é visível a todos)
     for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || e.def !== 'reator' || !e.built || e.owner === human || !S.FACTIONS[sim.players[e.owner].faction].smoke || !inView(e.x, e.y, 60)) continue; const p = P(e.x, e.y, e.r * 1.2); c.fillStyle = 'rgba(190,190,200,0.45)'; for (let i = 0; i < 3; i++) { const ph = (R.time * 0.4 + i / 3 + e.id * 0.1) % 1; c.beginPath(); c.arc(p[0] + 6 + Math.sin(R.time + i) * 6, p[1] - 6 - ph * 40 * z, (4 + ph * 8) * z, 0, TAU); c.fill(); } }
     c.restore();
     if (view.box) { const b = view.box; c.strokeStyle = 'rgba(255,255,255,0.8)'; c.fillStyle = 'rgba(255,255,255,0.08)'; c.lineWidth = 1; c.fillRect(b.x0, b.y0, b.x1 - b.x0, b.y1 - b.y0); c.strokeRect(b.x0, b.y0, b.x1 - b.x0, b.y1 - b.y0); }
@@ -1879,7 +2116,7 @@ function create(canvas, mini) {
   };
 
   function drawMinimap(sim, view) {
-    const c = mctx; const size = mini.width; const human = view.human; const vis = view.reveal ? { has: () => true } : sim.vis[human]; const m = miniM();
+    const c = mctx; const size = mini.width; const human = view.human; const vis = view.reveal ? { has: () => true } : sim.vis[human]; const m = miniM(); const ex = sim.explored[human];
     const M = (x, y) => R.worldToMini(x, y);
     c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#0B0D11'; c.fillRect(0, 0, size, size);
     c.fillStyle = '#15181F'; diamond(c, size / 2, size / 2, size / 2, size / 4); c.fill();
@@ -1887,15 +2124,19 @@ function create(canvas, mini) {
     for (const e of sim.ents) {
       if (!e.alive) continue;
       if (e.kind === 'node') { const p = M(e.x, e.y); c.fillStyle = NODE_COLOR[e.res]; c.fillRect(p[0] - 1.5, p[1] - 1.5, 3, 3); continue; }
+      if (e.kind !== 'unit' && e.kind !== 'building') continue;
       const own = e.owner === human; if (!(own || vis.has(e.id))) continue;
       const col = sim.players[e.owner].color; const p = M(e.x, e.y);
       if (e.kind === 'building') { const t = S.BUILDINGS[e.def].territory; if (t && e.built) { c.fillStyle = rgba(col, 0.1); c.beginPath(); c.ellipse(p[0], p[1], t * m, t * m * 0.5, 0, 0, TAU); c.fill(); } c.fillStyle = col; const r = e.def === 'nucleo' ? 4 : S.BUILDINGS[e.def].wall ? 1.5 : 2.5; c.fillRect(p[0] - r, p[1] - r, r * 2, r * 2); }
-      else if (e.kind === 'unit') { c.fillStyle = col; c.fillRect(p[0] - 1, p[1] - 1, 2, 2); }
+      else { c.fillStyle = col; c.fillRect(p[0] - 1, p[1] - 1, 2, 2); }
     }
     for (const [id, mm] of view.memory) if (!vis.has(id)) { const p = M(mm.x, mm.y); c.fillStyle = rgba(sim.players[mm.owner].color, 0.5); c.fillRect(p[0] - 2, p[1] - 2, 4, 4); }
+    if (sim.storm) { const p = M(sim.storm.x, sim.storm.y); c.strokeStyle = sim.storm.phase === 'active' ? 'rgba(178,60,255,0.9)' : `rgba(178,60,255,${0.4 + 0.4 * Math.sin(R.time * 6)})`; c.lineWidth = 1.5; c.beginPath(); c.ellipse(p[0], p[1], sim.storm.r * m, sim.storm.r * m * 0.5, 0, 0, TAU); c.stroke(); }
     mfctx.setTransform(1, 0, 0, 1, 0, 0); mfctx.globalCompositeOperation = 'source-over'; mfctx.clearRect(0, 0, size, size);
-    mfctx.fillStyle = 'rgba(6,8,12,0.72)'; diamond(mfctx, size / 2, size / 2, size / 2, size / 4); mfctx.fill(); mfctx.globalCompositeOperation = 'destination-out';
-    for (const e of sim.ents) { if (!e.alive || e.owner !== human) continue; const r = S.sensorRadius(sim, e) * m; const p = M(e.x, e.y); mfctx.beginPath(); mfctx.ellipse(p[0], p[1], r, r * 0.5, 0, 0, TAU); mfctx.fill(); }
+    mfctx.fillStyle = 'rgba(6,8,12,0.72)'; diamond(mfctx, size / 2, size / 2, size / 2, size / 4); mfctx.fill();
+    if (!view.reveal) { mfctx.fillStyle = 'rgba(2,3,6,0.8)'; const tm = TILE * m; for (let ty = 0; ty < TILES; ty++) for (let tx = 0; tx < TILES; tx++) { if (ex[ty * TILES + tx]) continue; const p = M((tx + 0.5) * TILE, (ty + 0.5) * TILE); diamond(mfctx, p[0], p[1], tm + 0.5, tm * 0.5 + 0.5); mfctx.fill(); } }
+    mfctx.globalCompositeOperation = 'destination-out';
+    for (const e of sim.ents) { if (!e.alive || e.owner !== human || (e.kind !== 'unit' && e.kind !== 'building')) continue; const r = S.sensorRadius(sim, e) * m; const p = M(e.x, e.y); mfctx.beginPath(); mfctx.ellipse(p[0], p[1], r, r * 0.5, 0, 0, TAU); mfctx.fill(); }
     c.drawImage(mfog, 0, 0);
     for (const r of R.fx.rings) if (r.ping) { const kk = r.t / r.life; const p = M(r.x, r.y); c.strokeStyle = rgba(r.col, 1 - kk); c.lineWidth = 1.5; c.beginPath(); c.arc(p[0], p[1], 3 + 10 * kk, 0, TAU); c.stroke(); }
     const cam = view.cam; const cs = [R.screenToWorld(cam, 0, 0), R.screenToWorld(cam, R.w, 0), R.screenToWorld(cam, R.w, R.h), R.screenToWorld(cam, 0, R.h)].map(p => M(p[0], p[1]));
@@ -1904,6 +2145,67 @@ function create(canvas, mini) {
   return R;
 }
 ARD.render = { create, NODE_COLOR, rgba, shade, K };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Áudio: efeitos sintetizados em WebAudio (sem arquivos) e voz de sistema pela Web Speech API. */
+(function (ARD) {
+'use strict';
+const A = { ctx: null, master: null, enabled: true, voice: true, inited: false, last: {}, recent: [], lastVoice: {}, voiceObj: null };
+try { const p = JSON.parse(localStorage.getItem('ard-audio') || '{}'); if (p.enabled === false) A.enabled = false; if (p.voice === false) A.voice = false; } catch (e) {}
+function save() { try { localStorage.setItem('ard-audio', JSON.stringify({ enabled: A.enabled, voice: A.voice })); } catch (e) {} }
+A.init = function () {
+  if (A.inited) return; A.inited = true;
+  try { const C = window.AudioContext || window.webkitAudioContext; if (!C) return; A.ctx = new C(); A.master = A.ctx.createGain(); A.master.gain.value = 0.35; A.master.connect(A.ctx.destination); } catch (e) { A.ctx = null; }
+};
+A.resume = function () { if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume(); };
+let noiseBuf = null;
+function noise(dur, o) {
+  const c = A.ctx; if (!noiseBuf) { noiseBuf = c.createBuffer(1, c.sampleRate, c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+  const src = c.createBufferSource(); src.buffer = noiseBuf; const f = c.createBiquadFilter(); f.type = o.type || 'lowpass'; f.frequency.value = o.freq || 800; if (o.sweep) f.frequency.exponentialRampToValueAtTime(o.sweep, c.currentTime + dur); f.Q.value = o.q || 0.7;
+  const g = c.createGain(); g.gain.setValueAtTime(o.gain || 0.3, c.currentTime); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+  src.connect(f); f.connect(g); g.connect(A.master); src.start(); src.stop(c.currentTime + dur + 0.05);
+}
+function tone(freq, dur, o) {
+  const c = A.ctx; o = o || {}; const osc = c.createOscillator(); osc.type = o.type || 'sine'; osc.frequency.setValueAtTime(freq, c.currentTime + (o.delay || 0));
+  if (o.slide) osc.frequency.exponentialRampToValueAtTime(o.slide, c.currentTime + (o.delay || 0) + dur);
+  const g = c.createGain(); g.gain.setValueAtTime(0.0001, c.currentTime + (o.delay || 0)); g.gain.exponentialRampToValueAtTime(o.gain || 0.2, c.currentTime + (o.delay || 0) + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + (o.delay || 0) + dur);
+  osc.connect(g); g.connect(A.master); osc.start(c.currentTime + (o.delay || 0)); osc.stop(c.currentTime + (o.delay || 0) + dur + 0.05);
+}
+const MIN_GAP = { shot_light: 60, shot_heavy: 90, beam: 120, impact: 70, explosion: 120, build: 300, spawn: 300, alert: 800, danger: 1200, promote: 500, click: 40, siphon: 600, storm: 3000, pact: 1000, betrayal: 1000 };
+A.sfx = function (name, vol) {
+  if (!A.enabled || !A.ctx) return; A.resume(); vol = vol == null ? 1 : Math.max(0, Math.min(1, vol)); if (vol < 0.03) return;
+  const now = performance.now(); if (A.last[name] && now - A.last[name] < (MIN_GAP[name] || 50)) return;
+  A.recent = A.recent.filter(t => now - t < 100); if (A.recent.length > 10) return; A.recent.push(now); A.last[name] = now;
+  const v = vol;
+  switch (name) {
+    case 'shot_light': tone(900, 0.05, { type: 'square', gain: 0.08 * v, slide: 300 }); break;
+    case 'shot_heavy': noise(0.14, { freq: 500, sweep: 120, gain: 0.35 * v }); tone(90, 0.12, { type: 'triangle', gain: 0.25 * v, slide: 45 }); break;
+    case 'beam': tone(1400, 0.16, { type: 'sawtooth', gain: 0.08 * v, slide: 380 }); break;
+    case 'impact': noise(0.22, { freq: 900, sweep: 150, gain: 0.3 * v }); tone(70, 0.15, { type: 'sine', gain: 0.25 * v, slide: 40 }); break;
+    case 'explosion': noise(0.7, { freq: 420, sweep: 50, gain: 0.6 * v }); tone(55, 0.5, { type: 'sine', gain: 0.4 * v, slide: 28 }); break;
+    case 'build': tone(520, 0.09, { gain: 0.15 }); tone(780, 0.14, { gain: 0.15, delay: 0.1 }); break;
+    case 'spawn': tone(660, 0.07, { gain: 0.12 }); tone(880, 0.1, { gain: 0.12, delay: 0.08 }); break;
+    case 'alert': for (let i = 0; i < 3; i++) tone(700, 0.12, { type: 'square', gain: 0.1, delay: i * 0.18, slide: 520 }); break;
+    case 'danger': for (let i = 0; i < 2; i++) tone(320, 0.3, { type: 'sawtooth', gain: 0.12, delay: i * 0.35, slide: 200 }); break;
+    case 'promote': [523, 659, 784].forEach((f, i) => tone(f, 0.12, { gain: 0.12, delay: i * 0.09 })); break;
+    case 'click': tone(1200, 0.03, { type: 'square', gain: 0.05 }); break;
+    case 'siphon': tone(180, 0.5, { type: 'triangle', gain: 0.1 * v, slide: 240 }); break;
+    case 'storm': noise(1.4, { freq: 260, sweep: 90, gain: 0.35 }); break;
+    case 'pact': [440, 554, 659].forEach((f, i) => tone(f, 0.25, { gain: 0.1, delay: i * 0.05 })); break;
+    case 'betrayal': tone(220, 0.5, { type: 'sawtooth', gain: 0.14, slide: 110 }); tone(233, 0.5, { type: 'sawtooth', gain: 0.1, slide: 116 }); break;
+  }
+};
+function pickVoice() {
+  if (!('speechSynthesis' in window)) return null; const vs = speechSynthesis.getVoices(); if (!vs.length) return null;
+  return vs.find(v => /pt[-_]BR/i.test(v.lang)) || vs.find(v => /^pt/i.test(v.lang)) || vs[0];
+}
+A.say = function (text, key, cooldown) {
+  if (!A.voice || !('speechSynthesis' in window)) return; const now = performance.now(); key = key || text; cooldown = cooldown == null ? 6 : cooldown;
+  if (A.lastVoice[key] && now - A.lastVoice[key] < cooldown * 1000) return; A.lastVoice[key] = now;
+  try { if (speechSynthesis.pending && speechSynthesis.speaking) return; const u = new SpeechSynthesisUtterance(text); const v = pickVoice(); if (v) u.voice = v; u.lang = 'pt-BR'; u.rate = 1.05; u.pitch = 0.85; u.volume = 0.9; speechSynthesis.speak(u); } catch (e) {}
+};
+A.setEnabled = function (on) { A.enabled = on; save(); }; A.setVoice = function (on) { A.voice = on; save(); if (!on && 'speechSynthesis' in window) speechSynthesis.cancel(); };
+ARD.audio = A;
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Entrada: mouse, teclado e toque → comandos para a simulação e estado de visão (câmera, seleção, modos). */
@@ -1929,7 +2231,7 @@ function create(o) {
   function pick(sx, sy, radiusPx) {
     const vis = sim.vis[human]; let best = null, bd = Infinity; const k = R.K * cam.zoom;
     for (const e of sim.ents) {
-      if (!e.alive) continue;
+      if (!e.alive || e.kind === 'proj') continue;
       if (e.kind !== 'node' && e.owner !== human && !vis.has(e.id)) continue;
       const z = e.kind === 'unit' && S.UNITS[e.def].flying ? 14 : 0;
       const [ex, ey] = R.worldToScreen(cam, e.x, e.y, z);
@@ -1945,6 +2247,7 @@ function create(o) {
   function ownSelectedBuilding() { for (const id of view.sel) { const e = sim.byId.get(id); if (e && e.alive && e.kind === 'building' && e.owner === human) return e; } return null; }
   function setSel(ids) { view.sel = new Set(ids); ui.selectionChanged(); }
   I.select = setSel;
+  I.selectOnScreen = function () { const ids = []; for (const e of sim.ents) { if (!e.alive || e.owner !== human || e.kind !== 'unit' || !S.UNITS[e.def].attack) continue; const [sx, sy] = R.worldToScreen(cam, e.x, e.y); if (sx >= 0 && sy >= 0 && sx <= R.w && sy <= R.h) ids.push(e.id); } setSel(ids); return ids.length; };
   function cmd(c) { c.p = human; S.enqueue(sim, c); }
   I.cmd = cmd;
 
@@ -1964,7 +2267,7 @@ function create(o) {
     const units = ownSelectedUnits(); const t = pick(sx, sy, I.lastType === 'touch' ? 22 : 10);
     if (!units.length) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice('Ponto de reunião definido'); } return; }
     const ids = units.map(u => u.id);
-    if (t && t.kind === 'node') { cmd({ t: 'harvest', ids, target: t.id }); view.marker = { x: t.x, y: t.y, t: R.time, col: '#7FE3A1' }; return; }
+    if (t && (t.kind === 'node' || t.kind === 'wreck')) { cmd({ t: 'harvest', ids, target: t.id }); view.marker = { x: t.x, y: t.y, t: R.time, col: '#7FE3A1' }; return; }
     if (t && t.kind === 'crate') { cmd({ t: 'pickup', ids, target: t.id }); view.marker = { x: t.x, y: t.y, t: R.time, col: '#F2C230' }; return; }
     if (t && t.owner >= 0 && t.owner !== human) {
       const doIt = () => {
@@ -1997,14 +2300,20 @@ function create(o) {
         if (t && t.owner >= 0 && t.owner !== human) contextCommand(wx, wy, sx, sy);
         else { cmd({ t: 'attackmove', ids: units.map(u => u.id), x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#FF5E3A' }; }
       }
-      if (!shift) I.setMode('normal'); return;
+      if (!shift && I.lastType !== 'touch') I.setMode('normal'); return;
     }
     if (mode === 'super') { cmd({ t: 'super', x: wx, y: wy }); I.setMode('normal'); return; }
     if (mode === 'jump') { ui.confirm('Saltar o Núcleo para este ponto? Custa ' + Math.round(S.FACTIONS[sim.players[human].faction].jumpCostFrac * 100) + '% de cada recurso e 60 s de canalização visível a todos.', () => cmd({ t: 'jump', x: wx, y: wy })); I.setMode('normal'); return; }
     if (mode === 'rally') { const b = ownSelectedBuilding(); if (b) cmd({ t: 'rally', id: b.id, x: wx, y: wy }); I.setMode('normal'); return; }
     // normal: select
-    const t = pick(sx, sy, I.lastType === 'touch' ? 20 : 8);
+    const t = pick(sx, sy, I.lastType === 'touch' ? 26 : 8);
     const now = performance.now();
+    if (I.lastType === 'touch') { // toque: com unidades selecionadas, tocar no chão move e tocar em alvo comanda
+      const units = ownSelectedUnits();
+      if (units.length && t && (t.owner !== human && t.owner >= 0 || t.kind === 'node' || t.kind === 'crate' || t.kind === 'wreck')) { contextCommand(wx, wy, sx, sy); return; }
+      if (units.length && !t) { cmd({ t: 'move', ids: units.map(u => u.id), x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#E8E2D6' }; return; }
+      if (!units.length && !t) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice('Ponto de reunião definido'); return; } }
+    }
     if (t && t.kind !== 'node' && t.kind !== 'crate') {
       if (t.owner === human && t.kind === 'unit' && I.lastClickId === t.id && now - I.lastClickT < 350) {
         // double click: all same type on screen
@@ -2013,7 +2322,7 @@ function create(o) {
       } else if (shift && t.owner === human) { const s = new Set(view.sel); if (s.has(t.id)) s.delete(t.id); else s.add(t.id); setSel([...s]); }
       else setSel([t.id]);
       I.lastClickId = t.id; I.lastClickT = now;
-    } else if (t && t.kind === 'node') { setSel([t.id]); }
+    } else if (t && (t.kind === 'node' || t.kind === 'wreck')) { setSel([t.id]); }
     else if (!shift) setSel([]);
   }
   function boxSelect(b, shift) {
@@ -2126,6 +2435,7 @@ ARD.input = { create };
 'use strict';
 const S = ARD.sim;
 const $ = id => document.getElementById(id);
+const AU = ARD.audio;
 const fmt = n => Math.floor(n).toLocaleString('pt-BR');
 const mmss = t => { t = Math.max(0, Math.floor(t)); return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
@@ -2175,7 +2485,7 @@ function startGame(cfg) {
   const R = ARD.render.create(canvas, mini); R.resize();
   const nuc = S.nucleoOf(sim, human);
   const isTouch = matchMedia('(pointer: coarse)').matches || !!params.get('touch');
-  const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.75 : 1.0 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
+  const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.9 : 1.0 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
   const ui = makeUI(); // closures below
   const I = ARD.input.create({ canvas, sim, view, R, human, ui });
   const ais = sim.players.filter(p => !p.human).map(p => ARD.ai.create(p.id, p.difficulty));
@@ -2232,8 +2542,31 @@ function startGame(cfg) {
     }
   }
 
+  function volAt(x, y) { if (x == null) return 1; const d = S.dist(x, y, view.cam.x, view.cam.y); return Math.max(0.12, 1 - d / (1100 / Math.max(0.6, view.cam.zoom))); }
+  function voiceFor(text) {
+    const t = text.toUpperCase();
+    if (t.includes('SIFÃO')) return 'Alerta de sifão'; if (t.includes('NÚCLEO SOB')) return 'Núcleo sob ataque'; if (t.includes('BASE SOB')) return 'Base sob ataque';
+    if (t.includes('QUEBROU')) return 'Pacto quebrado'; if (t.includes('TEMPESTADE')) return 'Tempestade de Éter'; if (t.includes('ELIMINADO')) return text; if (t.includes('PESQUISA')) return 'Pesquisa concluída';
+    if (t.includes('PACTO DE NÃO')) return 'Pacto assinado'; if (t.includes('BLECAUTE')) return 'Blecaute'; if (t.includes('FUNDIÇÃO')) return 'Fundição Orbital'; if (t.includes('SALTO')) return 'Salto de Núcleo'; return null;
+  }
+  function audioFor(e) {
+    switch (e.t) {
+      case 'shot': { const w = S.WEAPONS[e.weapon]; AU.sfx(e.beam ? 'beam' : (w && w.proj === 'shell') ? 'shot_heavy' : 'shot_light', volAt(e.x1, e.y1)); break; }
+      case 'impact': AU.sfx(e.splash > 0 ? 'impact' : 'shot_light', volAt(e.x, e.y) * (e.splash > 0 ? 1 : 0.3)); break;
+      case 'death': AU.sfx('explosion', volAt(e.x, e.y) * (e.kind === 'building' ? 1 : 0.6)); break;
+      case 'built': if (e.p === human) { AU.sfx('build'); AU.say('Construção concluída', 'built', 4); } break;
+      case 'spawn': if (e.p === human) { AU.sfx('spawn'); AU.say('Unidade pronta', 'spawn', 5); } break;
+      case 'promote': if (e.owner === human) AU.sfx('promote'); break;
+      case 'alert': if (e.p === human) { AU.sfx(e.kind === 'danger' ? 'danger' : 'alert'); const v = voiceFor(e.text); if (v) AU.say(v, v, e.kind === 'danger' ? 8 : 15); } break;
+      case 'storm': if (e.phase === 'active') AU.sfx('storm'); break;
+      case 'pact': AU.sfx('pact'); break;
+      case 'betrayal': AU.sfx('betrayal'); break;
+      case 'siphon': if (Math.random() < 0.05) AU.sfx('siphon', volAt(e.x2, e.y2)); break;
+    }
+  }
   function handleEvents(ev, silent) {
     for (const e of ev) {
+      if (!silent) audioFor(e);
       if (e.t === 'alert' && e.p === human) { if (e.x != null) view.lastAlert = { x: e.x, y: e.y }; if (!silent) pushAlert(e); }
       else if (e.t === 'notice' && e.p === human && !silent) notice(e.text);
       else if (e.t === 'proposal' && e.p === human && !silent) { G.pendingFor = e.from; showProposal(e.from); }
@@ -2275,6 +2608,7 @@ function startGame(cfg) {
     const panel = $('panel'); const p = sim.players[human]; const fac = S.FACTIONS[p.faction];
     if (!ents.length || I.buildMenu) { panel.innerHTML = buildMenuHTML(p); bindBuildMenu(); return; }
     const e = ents[0];
+    if (e.kind === 'wreck') { panel.innerHTML = `<div class="ph"><span class="dot" style="background:#8A5A3A"></span><b>Carcaça de ${esc(S.UNITS[e.def] ? S.UNITS[e.def].name : 'veículo')}</b></div><div class="muted">${fmt(e.amount)} de Minério recuperável</div><div class="muted small">Coletores podem saquear carcaças em qualquer lugar: clique direito com um coletor.</div>`; return; }
     if (e.kind === 'node') { panel.innerHTML = `<div class="ph"><span class="dot" style="background:${ARD.render.NODE_COLOR[e.res]}"></span><b>Nó de ${RES_NAME[e.res]}</b></div><div class="muted">${fmt(e.amount)} / ${fmt(e.max)} restantes</div><div class="muted small">Coletores colhem automaticamente nós dentro do seu território. Clique direito com coletores para colher manualmente.</div>`; return; }
     if (e.owner !== human) {
       const q = sim.players[e.owner]; const d = e.kind === 'unit' ? S.UNITS[e.def] : S.BUILDINGS[e.def];
@@ -2311,7 +2645,7 @@ function startGame(cfg) {
     let h = `<div class="ph"><b>${ents.length} unidade${ents.length > 1 ? 's' : ''}</b></div><div class="chips">`;
     for (const k in counts) h += `<span class="chip">${counts[k]}× ${esc(k === 'pirata' ? fac.pirateName : S.UNITS[k].name)}</span>`;
     h += '</div>';
-    if (ents.length === 1) { const u = ents[0]; h += `<div class="hp"><i style="width:${(100 * u.hp / u.maxHp)}%"></i></div><div class="muted small">${fmt(u.hp)} / ${fmt(u.maxHp)} · ${S.CLASS_NAMES[u.cls]} · ${esc(S.UNITS[u.def].desc)}</div>`; if (u.cargoTotal > 0) h += `<div class="muted small">Carga: ${fmt(u.cargoTotal)}${u.stolen ? ' (roubada)' : ''}</div>`; }
+    if (ents.length === 1) { const u = ents[0]; h += `<div class="hp"><i style="width:${(100 * u.hp / u.maxHp)}%"></i></div><div class="muted small">${fmt(u.hp)} / ${fmt(u.maxHp)} · ${S.CLASS_NAMES[u.cls]}${u.rank ? ' · ' + ['', '★ Veterano', '★★ Elite', '★★★ Lenda'][u.rank] : ''} · ${esc(S.UNITS[u.def].desc)}</div>`; if (u.cargoTotal > 0) h += `<div class="muted small">Carga: ${fmt(u.cargoTotal)}${u.stolen ? ' (roubada)' : ''}</div>`; }
     const combat = ents.some(u => S.UNITS[u.def].attack);
     h += `<div class="row">${combat ? `<button class="act sm ${I.mode === 'attackmove' ? 'on' : ''}" data-u="attackmove"><span class="k">A</span> Atacar-mover</button>` : ''}<button class="act sm" data-u="stop"><span class="k">S</span> Parar</button></div>`;
     if (counts.pirata) h += '<div class="tip">Pirata: clique com o direito em uma Refinaria ou Reator inimigo para Sifonar (40 s). Volte à base para entregar. Se morrer carregado, a carga vira Caixa.</div>';
@@ -2352,6 +2686,12 @@ function startGame(cfg) {
     $('btn-box').addEventListener('click', () => { I.touchBox = !I.touchBox; refreshQuick(); notice(I.touchBox ? 'Arraste para selecionar em caixa' : 'Arraste para mover a câmera'); });
     $('btn-stop').addEventListener('click', () => { const ids = [...view.sel].filter(id => { const e = sim.byId.get(id); return e && e.alive && e.kind === 'unit' && e.owner === human; }); if (ids.length) I.cmd({ t: 'stop', ids }); });
     $('btn-nucleo').addEventListener('click', () => { const n = S.nucleoOf(sim, human); if (n) { I.select([n.id]); I.center(n.x, n.y); } });
+    $('btn-clear').addEventListener('click', () => { I.select([]); if (I.mode !== 'normal') I.setMode('normal'); });
+    $('btn-all').addEventListener('click', () => { const n = I.selectOnScreen(); notice(n ? n + ' unidades selecionadas' : 'Nenhuma unidade de combate na tela'); });
+    const syncAudioBtns = () => { $('btn-sound').classList.toggle('on', AU.enabled); $('btn-voice').classList.toggle('on', AU.voice); };
+    $('btn-sound').addEventListener('click', () => { AU.setEnabled(!AU.enabled); AU.init(); syncAudioBtns(); if (AU.enabled) AU.sfx('click'); });
+    $('btn-voice').addEventListener('click', () => { AU.setVoice(!AU.voice); syncAudioBtns(); if (AU.voice) AU.say('Voz ativada', 'voz-on', 0); });
+    syncAudioBtns();
     $('btn-army').addEventListener('click', () => { const ids = []; for (const en of sim.ents) if (en.alive && en.owner === human && en.kind === 'unit' && S.UNITS[en.def].attack) ids.push(en.id); I.select(ids); if (ids.length) { const e = sim.byId.get(ids[0]); I.center(e.x, e.y); } });
     mini.addEventListener('pointerdown', e => { e.preventDefault(); const r = mini.getBoundingClientRect(); const [x, y] = R.miniToWorld((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height); if (e.button === 2) { const ids = [...view.sel].filter(id => { const u = sim.byId.get(id); return u && u.alive && u.kind === 'unit' && u.owner === human; }); if (ids.length) I.cmd({ t: 'attackmove', ids, x, y }); } else I.center(x, y); });
     mini.addEventListener('contextmenu', e => e.preventDefault());
@@ -2401,7 +2741,7 @@ function startGame(cfg) {
     if (G.hintsOff) return;
     const todo = G.hints.filter(h => !h.done()).slice(0, 2);
     const box = $('hints'); if (!todo.length) { box.hidden = true; return; }
-    box.hidden = false; $('hints-body').innerHTML = todo.map((h, i) => `<div class="hint ${i === 0 ? 'now' : ''}">${esc(h.text)}</div>`).join('');
+    box.hidden = false; $('hints-body').innerHTML = (G.isTouch ? todo.slice(0, 1) : todo).map((h, i) => `<div class="hint ${i === 0 ? 'now' : ''}">${esc(h.text)}</div>`).join('');
   }
 
   // ---------- end ----------
@@ -2435,6 +2775,7 @@ function toggleHelp(force) { const h = $('help'); h.hidden = force === true ? fa
 
 window.addEventListener('error', e => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent = 'Erro: ' + (e.message || e.error); } });
 document.addEventListener('DOMContentLoaded', initStart);
+for (const ev of ['pointerdown', 'keydown', 'touchstart']) document.addEventListener(ev, () => { ARD.audio.init(); ARD.audio.resume(); }, { passive: true });
 if (params.get('debug')) setTimeout(() => {
   const out = [];
   out.push('vw=' + innerWidth + ' sw=' + document.documentElement.scrollWidth);

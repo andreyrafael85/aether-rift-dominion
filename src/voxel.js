@@ -28,7 +28,7 @@ const FACES = [
 /* Renderiza um modelo em um canvas offscreen. angle em radianos (rotação em z). s = px por voxel. */
 function renderSprite(model, angle, s, opt) {
   opt = opt || {};
-  const b = model.bounds(); const cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2;
+  const b = model.bounds(); const cx = model.pivot ? model.pivot.x : (b.x0 + b.x1) / 2, cy = model.pivot ? model.pivot.y : (b.y0 + b.y1) / 2;
   const ca = Math.cos(angle), sa = Math.sin(angle);
   const rot = (x, y) => [cx + (x - cx) * ca - (y - cy) * sa, cy + (x - cx) * sa + (y - cy) * ca];
   const proj = (x, y, z) => { const [xr, yr] = rot(x, y); return [(xr - yr) * s, (xr + yr) * s * 0.5 - z * s]; };

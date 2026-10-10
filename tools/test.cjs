@@ -37,3 +37,18 @@ console.log('determinism', a === b ? 'OK' : 'FAIL', a, b);
 // 3) 2 player long game to see an ending
 const r3 = run(3, [{ name: 'A', faction: 'vehnar', difficulty: 'dificil' }, { name: 'B', faction: 'erevane', difficulty: 'facil' }], 25, true);
 console.log('events', JSON.stringify(r3.counts));
+// 4) navegação: unidade cercada por muros com um portão deve sair pelo portão
+{
+  const sim = S.createSim({ seed: 11, players: [{ name: 'A', faction: 'vehnar', human: false }, { name: 'B', faction: 'erevane', human: false }], minutes: 5 });
+  const nuc = S.nucleoOf(sim, 0); const u = sim.ents.find(e => e.kind === 'unit' && e.owner === 0 && e.def === 'infantaria');
+  // anel de muros a 150 de distância do núcleo, com portão a leste
+  const cx = nuc.x, cy = nuc.y; let placed = 0;
+  for (let a = 0; a < Math.PI * 2; a += 16 / 150) { const x = cx + Math.cos(a) * 150, y = cy + Math.sin(a) * 150; const gate = Math.abs(a) < 0.12; S.enqueue(sim, { t: 'build', p: 0, def: gate ? 'portao' : 'muro', x, y, ang: a + Math.PI / 2 }); placed++; }
+  sim.players[0].res.minerio = 99999; S.step(sim);
+  const walls = sim.ents.filter(e => e.kind === 'building' && (e.def === 'muro' || e.def === 'portao'));
+  for (const w of walls) { w.built = true; w.progress = 1; } sim.navDirty = true;
+  const target = { x: Math.max(80, cx - 600), y: cy }; // oeste: lado oposto ao portão
+  S.enqueue(sim, { t: 'move', p: 0, ids: [u.id], x: target.x, y: target.y });
+  let reached = false; for (let i = 0; i < 1200; i++) { S.step(sim); if (S.dist(u.x, u.y, target.x, target.y) < 40) { reached = true; break; } }
+  console.log('navegação muro+portão:', reached ? 'OK (saiu pelo portão)' : 'FAIL', 'muros=' + walls.length, 'pos=' + Math.round(u.x) + ',' + Math.round(u.y), 'alvo=' + Math.round(target.x) + ',' + Math.round(target.y));
+}

@@ -21,7 +21,7 @@ function create(o) {
   function pick(sx, sy, radiusPx) {
     const vis = sim.vis[human]; let best = null, bd = Infinity; const k = R.K * cam.zoom;
     for (const e of sim.ents) {
-      if (!e.alive) continue;
+      if (!e.alive || e.kind === 'proj') continue;
       if (e.kind !== 'node' && e.owner !== human && !vis.has(e.id)) continue;
       const z = e.kind === 'unit' && S.UNITS[e.def].flying ? 14 : 0;
       const [ex, ey] = R.worldToScreen(cam, e.x, e.y, z);
@@ -37,6 +37,7 @@ function create(o) {
   function ownSelectedBuilding() { for (const id of view.sel) { const e = sim.byId.get(id); if (e && e.alive && e.kind === 'building' && e.owner === human) return e; } return null; }
   function setSel(ids) { view.sel = new Set(ids); ui.selectionChanged(); }
   I.select = setSel;
+  I.selectOnScreen = function () { const ids = []; for (const e of sim.ents) { if (!e.alive || e.owner !== human || e.kind !== 'unit' || !S.UNITS[e.def].attack) continue; const [sx, sy] = R.worldToScreen(cam, e.x, e.y); if (sx >= 0 && sy >= 0 && sx <= R.w && sy <= R.h) ids.push(e.id); } setSel(ids); return ids.length; };
   function cmd(c) { c.p = human; S.enqueue(sim, c); }
   I.cmd = cmd;
 
@@ -56,7 +57,7 @@ function create(o) {
     const units = ownSelectedUnits(); const t = pick(sx, sy, I.lastType === 'touch' ? 22 : 10);
     if (!units.length) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice('Ponto de reunião definido'); } return; }
     const ids = units.map(u => u.id);
-    if (t && t.kind === 'node') { cmd({ t: 'harvest', ids, target: t.id }); view.marker = { x: t.x, y: t.y, t: R.time, col: '#7FE3A1' }; return; }
+    if (t && (t.kind === 'node' || t.kind === 'wreck')) { cmd({ t: 'harvest', ids, target: t.id }); view.marker = { x: t.x, y: t.y, t: R.time, col: '#7FE3A1' }; return; }
     if (t && t.kind === 'crate') { cmd({ t: 'pickup', ids, target: t.id }); view.marker = { x: t.x, y: t.y, t: R.time, col: '#F2C230' }; return; }
     if (t && t.owner >= 0 && t.owner !== human) {
       const doIt = () => {
@@ -89,14 +90,20 @@ function create(o) {
         if (t && t.owner >= 0 && t.owner !== human) contextCommand(wx, wy, sx, sy);
         else { cmd({ t: 'attackmove', ids: units.map(u => u.id), x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#FF5E3A' }; }
       }
-      if (!shift) I.setMode('normal'); return;
+      if (!shift && I.lastType !== 'touch') I.setMode('normal'); return;
     }
     if (mode === 'super') { cmd({ t: 'super', x: wx, y: wy }); I.setMode('normal'); return; }
     if (mode === 'jump') { ui.confirm('Saltar o Núcleo para este ponto? Custa ' + Math.round(S.FACTIONS[sim.players[human].faction].jumpCostFrac * 100) + '% de cada recurso e 60 s de canalização visível a todos.', () => cmd({ t: 'jump', x: wx, y: wy })); I.setMode('normal'); return; }
     if (mode === 'rally') { const b = ownSelectedBuilding(); if (b) cmd({ t: 'rally', id: b.id, x: wx, y: wy }); I.setMode('normal'); return; }
     // normal: select
-    const t = pick(sx, sy, I.lastType === 'touch' ? 20 : 8);
+    const t = pick(sx, sy, I.lastType === 'touch' ? 26 : 8);
     const now = performance.now();
+    if (I.lastType === 'touch') { // toque: com unidades selecionadas, tocar no chão move e tocar em alvo comanda
+      const units = ownSelectedUnits();
+      if (units.length && t && (t.owner !== human && t.owner >= 0 || t.kind === 'node' || t.kind === 'crate' || t.kind === 'wreck')) { contextCommand(wx, wy, sx, sy); return; }
+      if (units.length && !t) { cmd({ t: 'move', ids: units.map(u => u.id), x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#E8E2D6' }; return; }
+      if (!units.length && !t) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice('Ponto de reunião definido'); return; } }
+    }
     if (t && t.kind !== 'node' && t.kind !== 'crate') {
       if (t.owner === human && t.kind === 'unit' && I.lastClickId === t.id && now - I.lastClickT < 350) {
         // double click: all same type on screen
@@ -105,7 +112,7 @@ function create(o) {
       } else if (shift && t.owner === human) { const s = new Set(view.sel); if (s.has(t.id)) s.delete(t.id); else s.add(t.id); setSel([...s]); }
       else setSel([t.id]);
       I.lastClickId = t.id; I.lastClickT = now;
-    } else if (t && t.kind === 'node') { setSel([t.id]); }
+    } else if (t && (t.kind === 'node' || t.kind === 'wreck')) { setSel([t.id]); }
     else if (!shift) setSel([]);
   }
   function boxSelect(b, shift) {

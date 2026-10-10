@@ -8,6 +8,9 @@ const WORLD = 3200;
 const CX = WORLD / 2, CY = WORLD / 2;
 const RIFT_R = 170;
 const PLAYER_COLORS = ['#FF8C1A', '#38D1E0', '#B98BFF', '#7FE3A1'];
+const NAV = 32, NW = WORLD / NAV;          // grade de navegação 100×100
+const TILE = 64, TILES = WORLD / TILE;      // grade de exploração 50×50
+const DX8 = [1, 1, 0, -1, -1, -1, 0, 1], DY8 = [0, 1, 1, 1, 0, -1, -1, -1];
 
 const FACTIONS = {
   vehnar: {
@@ -35,23 +38,33 @@ const BUILDINGS = {
   quartel:     { name: 'Quartel Orbital', key: 'Q', hp: 1150, r: 26, cost: { minerio: 200 }, buildTime: 18, energyUse: 8, sensor: 140, produces: ['infantaria', 'suporte', 'pirata'], desc: 'Produz Infantaria, Suporte/Hack e Piratas.' },
   fabrica:     { name: 'Fábrica de Veículos', key: 'V', hp: 1300, r: 28, cost: { minerio: 300, plasma: 60 }, buildTime: 22, energyUse: 12, sensor: 140, produces: ['veiculo'], desc: 'Produz Veículos Pesados.' },
   hangar:      { name: 'Hangar de Drones', key: 'H', hp: 1150, r: 26, cost: { minerio: 280, plasma: 60 }, buildTime: 22, energyUse: 12, sensor: 160, produces: ['drone'], desc: 'Produz Drones Aéreos.' },
-  torre:       { name: 'Torre de Defesa', key: 'T', hp: 1100, r: 16, cost: { minerio: 180, plasma: 40 }, buildTime: 14, energyUse: 10, sensor: 260, detect: 140, attack: { dmg: 30, range: 230, cd: 1.0 }, desc: 'Forte vs Infantaria e Drones. Detecta camuflagem em 140.' },
+  torre:       { name: 'Torre de Defesa', key: 'T', hp: 1100, r: 16, cost: { minerio: 180, plasma: 40 }, buildTime: 14, energyUse: 10, sensor: 260, detect: 140, weapon: 'obus', desc: 'Forte vs Infantaria e Drones. Detecta camuflagem em 140.' },
   nodulo:      { name: 'Nódulo de Avanço', key: 'N', hp: 650, r: 16, cost: { minerio: 120, plasma: 20 }, buildTime: 10, energyUse: 4, sensor: 260, territory: 320, desc: 'Reclama território em 320 e libera nós para coleta automática. Pode ser colocado até 650 de qualquer estrutura sua.' },
   laboratorio: { name: 'Laboratório', key: 'L', hp: 900, r: 24, cost: { minerio: 220, plasma: 60, dados: 40 }, buildTime: 20, energyUse: 10, sensor: 140, desc: 'Pesquisas e superarma, pagas com Fragmentos de Dados.' },
   muro:        { name: 'Muro', key: 'M', hp: 450, r: 8, cost: { minerio: 20 }, buildTime: 3, energyUse: 0, sensor: 50, wall: true, desc: 'Barreira barata. Arraste para desenhar uma linha. Bloqueia unidades e absorve tiros.' },
   portao:      { name: 'Portão', key: 'G', hp: 600, r: 8, cost: { minerio: 40 }, buildTime: 4, energyUse: 0, sensor: 60, wall: true, gate: true, desc: 'Trecho de muro que suas unidades atravessam. Inimigos precisam derrubá-lo.' },
-  bastiao:     { name: 'Bastião', key: '', hp: 2200, r: 24, cost: {}, buildTime: 3, energyUse: 12, sensor: 300, detect: 160, attack: { dmg: 60, range: 260, cd: 0.9 }, desc: 'Fortaleza da Fundição Orbital.' },
+  bastiao:     { name: 'Bastião', key: '', hp: 2200, r: 24, cost: {}, buildTime: 3, energyUse: 12, sensor: 300, detect: 160, weapon: 'bombarda', desc: 'Fortaleza da Fundição Orbital.' },
 };
 
 const UNITS = {
   coletor:    { name: 'Coletor', key: 'C', cls: 'civ', hp: 90, r: 7, speed: 85, cost: { minerio: 60 }, time: 8, energyUse: 1, capacity: 50, harvestRate: 12, sensor: 110, desc: 'Coleta automaticamente nós no seu território e entrega na Refinaria ou Núcleo mais próximo.' },
-  infantaria: { name: 'Infantaria Orbital', key: 'I', cls: 'inf', hp: 120, r: 7, speed: 90, cost: { minerio: 50 }, time: 6, energyUse: 1, attack: { dmg: 12, range: 110, cd: 0.8 }, sensor: 160, desc: 'Forte vs Drones e Suporte. Fraca vs Veículos e Estruturas.' },
-  veiculo:    { name: 'Veículo Pesado', key: 'V', cls: 'vei', hp: 420, r: 12, speed: 65, cost: { minerio: 160, plasma: 40 }, time: 12, energyUse: 3, attack: { dmg: 40, range: 150, cd: 1.4 }, sensor: 170, desc: 'Forte vs Infantaria e Estruturas. Fraco vs Drones e Suporte.' },
-  drone:      { name: 'Drone Aéreo', key: 'D', cls: 'dro', hp: 160, r: 8, speed: 150, cost: { minerio: 120, plasma: 50 }, time: 10, energyUse: 2, flying: true, attack: { dmg: 18, range: 120, cd: 0.9 }, sensor: 220, desc: 'Forte vs Veículos e Suporte. Fraco vs Infantaria e Estruturas. Sobrevoa a Fenda.' },
-  suporte:    { name: 'Suporte / Hack', key: 'S', cls: 'sup', hp: 100, r: 8, speed: 80, cost: { minerio: 90, dados: 20 }, time: 9, energyUse: 2, attack: { dmg: 10, range: 170, cd: 1.5, stun: true }, sensor: 200, desc: 'Forte vs Veículos e Estruturas, e os atrasa. Fraco vs Infantaria e Drones.' },
+  infantaria: { name: 'Infantaria Orbital', key: 'I', cls: 'inf', hp: 120, r: 7, speed: 90, cost: { minerio: 50 }, time: 6, energyUse: 1, weapon: 'fuzil', sensor: 160, desc: 'Forte vs Drones e Suporte. Fraca vs Veículos e Estruturas.' },
+  veiculo:    { name: 'Veículo Pesado', key: 'V', cls: 'vei', hp: 420, r: 12, speed: 65, cost: { minerio: 160, plasma: 40 }, time: 12, energyUse: 3, weapon: 'canhao', sensor: 170, turret: true, desc: 'Forte vs Infantaria e Estruturas. Fraco vs Drones e Suporte.' },
+  drone:      { name: 'Drone Aéreo', key: 'D', cls: 'dro', hp: 160, r: 8, speed: 150, cost: { minerio: 120, plasma: 50 }, time: 10, energyUse: 2, flying: true, weapon: 'metralha', sensor: 220, desc: 'Forte vs Veículos e Suporte. Fraco vs Infantaria e Estruturas. Sobrevoa a Fenda.' },
+  suporte:    { name: 'Suporte / Hack', key: 'S', cls: 'sup', hp: 100, r: 8, speed: 80, cost: { minerio: 90, dados: 20 }, time: 9, energyUse: 2, weapon: 'pulso', sensor: 200, desc: 'Forte vs Veículos e Estruturas, e os atrasa. Fraco vs Infantaria e Drones.' },
   pirata:     { name: 'Pirata de Extração', key: 'P', cls: 'sup', hp: 140, r: 9, speed: 100, cost: { minerio: 120, plasma: 30 }, time: 10, energyUse: 2, sensor: 180, siphonRange: 46, siphonRate: 7, siphonMax: 40, cargoCap: 300, desc: 'Sifona Refinarias e Reatores inimigos por até 40 s. Erevane: camuflado e +20% no roubo. Vehnar: Rebocador, lento e resistente, carrega 2x.' },
 };
 
+/* Armas: dano base, alcance, recarga, projétil (bullet = rápido e reto, shell = balístico com área, beam = instantâneo),
+   velocidade, inexatidão (raio de erro no alvo), área (splash) e tabela "versus" por tipo de armadura do alvo. */
+const WEAPONS = {
+  fuzil:    { dmg: 12, range: 110, cd: 0.8, proj: 'bullet', speed: 760, inacc: 4,  splash: 0,  cls: 'inf' },
+  canhao:   { dmg: 40, range: 150, cd: 1.4, proj: 'shell',  speed: 300, inacc: 12, splash: 24, cls: 'vei' },
+  metralha: { dmg: 18, range: 120, cd: 0.9, proj: 'bullet', speed: 760, inacc: 6,  splash: 0,  cls: 'dro' },
+  pulso:    { dmg: 10, range: 170, cd: 1.5, proj: 'beam',   speed: 0,   inacc: 0,  splash: 0,  cls: 'sup', stun: true },
+  obus:     { dmg: 30, range: 230, cd: 1.0, proj: 'shell',  speed: 380, inacc: 8,  splash: 16, cls: 'est' },
+  bombarda: { dmg: 60, range: 260, cd: 0.9, proj: 'shell',  speed: 400, inacc: 10, splash: 30, cls: 'est' },
+};
 const COUNTER = {
   inf: { vei: 0.65, dro: 1.5, est: 0.65, sup: 1.5 },
   vei: { inf: 1.5, dro: 0.65, est: 1.5, sup: 0.65 },
@@ -59,6 +72,8 @@ const COUNTER = {
   est: { inf: 1.5, vei: 0.65, dro: 1.5, sup: 0.65 },
   sup: { inf: 0.65, vei: 1.5, dro: 0.65, est: 1.5 },
 };
+for (const k in WEAPONS) { const w = WEAPONS[k]; w.versus = Object.assign({ inf: 1, vei: 1, dro: 1, est: 1, sup: 1, civ: 1 }, COUNTER[w.cls] || {}); }
+const VET_RANKS = [0, 0.8, 2.4, 5.0]; // multiplicador do custo da unidade em XP para cada patente
 const CLASS_NAMES = { inf: 'Infantaria', vei: 'Veículos', dro: 'Drones', est: 'Estruturas', sup: 'Suporte/Hack', civ: 'Civil' };
 
 const RESEARCH = {
@@ -67,6 +82,7 @@ const RESEARCH = {
   sensores:  { name: 'Sensores', cost: { dados: 100 }, desc: '+25% de alcance de sensores.' },
 };
 
+for (const t of [BUILDINGS, UNITS]) for (const k in t) if (t[k].weapon) t[k].attack = WEAPONS[t[k].weapon];
 const SUPER_COST = { dados: 300, plasma: 200 };
 const SUPER_CD = 600;
 const OVERCHARGE_COST = 200, OVERCHARGE_T = 60, OVERCHARGE_CD = 300;
@@ -104,6 +120,7 @@ function createSim(cfg) {
     cfg, tick: 0, time: 0, seed: cfg.seed || 1, ents: [], byId: new Map(), nextId: 1,
     players: [], events: [], cmdQueue: [], pending: [], vis: [], result: null,
     maxTime: (cfg.minutes || 25) * 60, grid: new Map(),
+    nav: { blocked: new Uint8Array(NW * NW), gates: new Map(), gatePos: new Map(), fields: new Map(), version: 0 }, navDirty: true, explored: [], storm: null, nextStorm: 0,
   };
   sim.rand = mulberry32(sim.seed);
   const n = cfg.players.length;
@@ -123,9 +140,12 @@ function createSim(cfg) {
     };
     sim.players.push(p);
     sim.vis.push(new Set());
+    sim.explored.push(new Uint8Array(TILES * TILES));
   }
+  sim.nextStorm = 300 + sim.rand() * 120;
   generateMap(sim);
-  computeVisibility(sim);
+  rebuildNav(sim);
+  computeVisibility(sim); markExplored(sim);
   return sim;
 }
 
@@ -195,7 +215,7 @@ function addBuilding(sim, owner, def, x, y, built) {
     maxHp: d.hp, hp: built ? d.hp : d.hp * 0.3, built: !!built, progress: built ? 1 : 0, queue: [], cd: 0,
     alive: true, lastHitT: -99, lastAttack: -99, cloaked: false, revealT: 0, rally: null, jumpT: 0, jumpTo: null, lotes: {}, ang: 0, aimAng: 0,
   };
-  sim.ents.push(e); sim.byId.set(e.id, e); return e;
+  sim.ents.push(e); sim.byId.set(e.id, e); sim.navDirty = true; return e;
 }
 function addUnit(sim, owner, def, x, y) {
   const d = UNITS[def];
@@ -205,7 +225,7 @@ function addUnit(sim, owner, def, x, y) {
     id: sim.nextId++, kind: 'unit', def, cls: d.cls, owner, x, y, px: x, py: y, r: d.r, ang: p.startAngle,
     maxHp: d.hp, hp: d.hp, speed: d.speed, state: 'idle', tx: x, ty: y, target: null, resume: null, cd: 0,
     cargo: { plasma: 0, minerio: 0, dados: 0 }, cargoTotal: 0, stolen: false, cargoCap: d.cargoCap || d.capacity || 0,
-    siphonT: 0, alive: true, lastHitT: -99, lastAttack: -99, cloaked: false, revealT: 0, node: null,
+    siphonT: 0, alive: true, lastHitT: -99, lastAttack: -99, cloaked: false, revealT: 0, node: null, xp: 0, rank: 0, aimAng: p.startAngle,
   };
   if (def === 'pirata' && fac.id === 'vehnar') { e.maxHp = e.hp = 260; e.speed = 72; e.cargoCap = 600; e.r = 11; }
   sim.ents.push(e); sim.byId.set(e.id, e); return e;
@@ -227,7 +247,7 @@ const CELL = 100;
 function rebuildGrid(sim) {
   sim.grid.clear();
   for (const e of sim.ents) {
-    if (!e.alive || e.kind === 'node') continue;
+    if (!e.alive || e.kind === 'node' || e.kind === 'proj' || e.kind === 'wreck') continue;
     const k = ((e.x / CELL) | 0) * 4096 + ((e.y / CELL) | 0);
     let arr = sim.grid.get(k); if (!arr) { arr = []; sim.grid.set(k, arr); }
     arr.push(e);
@@ -241,6 +261,78 @@ function queryGrid(sim, x, y, rad, fn) {
   }
 }
 
+// ---------- navegação: grade de obstáculos e campos de fluxo ----------
+function navIdx(x, y) { const cx = clamp((x / NAV) | 0, 0, NW - 1), cy = clamp((y / NAV) | 0, 0, NW - 1); return cy * NW + cx; }
+function rebuildNav(sim) {
+  const nav = sim.nav; nav.blocked.fill(0); nav.gates.clear(); nav.gatePos.clear(); nav.fields.clear(); nav.version++;
+  for (let cy = 0; cy < NW; cy++) for (let cx = 0; cx < NW; cx++) { const x = (cx + 0.5) * NAV, y = (cy + 0.5) * NAV; if (dist(x, y, CX, CY) < RIFT_R + 14) nav.blocked[cy * NW + cx] = 1; }
+  for (const e of sim.ents) {
+    if (!e.alive || e.kind !== 'building') continue;
+    const rr = e.r + 7; const x0 = Math.max(0, ((e.x - rr) / NAV) | 0), x1 = Math.min(NW - 1, ((e.x + rr) / NAV) | 0), y0 = Math.max(0, ((e.y - rr) / NAV) | 0), y1 = Math.min(NW - 1, ((e.y + rr) / NAV) | 0);
+    const gate = BUILDINGS[e.def].gate;
+    for (let cy = y0; cy <= y1; cy++) for (let cx = x0; cx <= x1; cx++) {
+      // bloqueia se o círculo da estrutura toca o quadrado da célula
+      const qx = Math.max(cx * NAV, Math.min(e.x, (cx + 1) * NAV)), qy = Math.max(cy * NAV, Math.min(e.y, (cy + 1) * NAV));
+      if (dist(qx, qy, e.x, e.y) <= rr) { const i = cy * NW + cx; if (gate) { nav.gates.set(i, e.owner); nav.gatePos.set(i, e); } else nav.blocked[i] = 1; }
+    }
+  }
+  for (const i of nav.gates.keys()) nav.blocked[i] = 0; // o portão vence os muros vizinhos
+  sim.navDirty = false;
+}
+function passable(sim, i, owner) { if (sim.nav.blocked[i]) return false; const g = sim.nav.gates.get(i); return g === undefined || g === owner; }
+function flowField(sim, destIdx, owner) {
+  const nav = sim.nav; const key = owner * 1000000 + destIdx; let f = nav.fields.get(key); if (f) return f;
+  if (nav.fields.size > 96) nav.fields.clear();
+  const N = NW * NW; const cost = new Int32Array(N).fill(-1); const dir = new Int8Array(N).fill(-1);
+  // Dijkstra com heap binário; custo 10 reto, 14 diagonal; sem cortar cantos
+  const heap = []; const push = (c, i) => { heap.push(c * 1048576 + i); let k = heap.length - 1; while (k > 0) { const pk = (k - 1) >> 1; if (heap[pk] <= heap[k]) break; const tmp = heap[pk]; heap[pk] = heap[k]; heap[k] = tmp; k = pk; } };
+  const pop = () => { const top = heap[0]; const last = heap.pop(); if (heap.length) { heap[0] = last; let k = 0; for (;;) { const l = 2 * k + 1, r = l + 1; let m = k; if (l < heap.length && heap[l] < heap[m]) m = l; if (r < heap.length && heap[r] < heap[m]) m = r; if (m === k) break; const tmp = heap[m]; heap[m] = heap[k]; heap[k] = tmp; k = m; } } return top; };
+  cost[destIdx] = 0; push(0, destIdx);
+  while (heap.length) {
+    const v = pop(); const c = Math.floor(v / 1048576), i = v % 1048576; if (c > cost[i]) continue;
+    const cx = i % NW, cy = (i / NW) | 0;
+    for (let d = 0; d < 8; d++) {
+      const nx = cx + DX8[d], ny = cy + DY8[d]; if (nx < 0 || ny < 0 || nx >= NW || ny >= NW) continue;
+      const ni = ny * NW + nx; if (!passable(sim, ni, owner)) continue;
+      if (DX8[d] && DY8[d]) { if (!passable(sim, cy * NW + nx, owner) || !passable(sim, ny * NW + cx, owner)) continue; }
+      const nc = c + (DX8[d] && DY8[d] ? 14 : 10);
+      if (cost[ni] < 0 || nc < cost[ni]) { cost[ni] = nc; dir[ni] = (d + 4) % 8; push(nc, ni); }
+    }
+  }
+  f = { dir, cost, version: nav.version }; nav.fields.set(key, f); return f;
+}
+function lineFree(sim, x0, y0, x1, y1, owner) {
+  const d = dist(x0, y0, x1, y1); const n = Math.max(1, Math.ceil(d / (NAV * 0.5)));
+  for (let i = 1; i <= n; i++) { const k = i / n; if (!passable(sim, navIdx(x0 + (x1 - x0) * k, y0 + (y1 - y0) * k), owner)) return false; }
+  return true;
+}
+function markExplored(sim) {
+  for (const p of sim.players) {
+    if (!p.alive) continue; const ex = sim.explored[p.id];
+    for (const e of sim.ents) {
+      if (!e.alive || e.owner !== p.id || (e.kind !== 'unit' && e.kind !== 'building')) continue;
+      const r = sensorRadius(sim, e); const x0 = Math.max(0, ((e.x - r) / TILE) | 0), x1 = Math.min(TILES - 1, ((e.x + r) / TILE) | 0), y0 = Math.max(0, ((e.y - r) / TILE) | 0), y1 = Math.min(TILES - 1, ((e.y + r) / TILE) | 0);
+      for (let ty = y0; ty <= y1; ty++) for (let tx = x0; tx <= x1; tx++) { if (!ex[ty * TILES + tx] && dist((tx + 0.5) * TILE, (ty + 0.5) * TILE, e.x, e.y) <= r + TILE * 0.5) ex[ty * TILES + tx] = 1; }
+    }
+  }
+}
+function inStorm(sim, x, y) { const st = sim.storm; return !!(st && st.phase === 'active' && dist(x, y, st.x, st.y) <= st.r); }
+function updateStorm(sim, dt) {
+  const st = sim.storm;
+  if (!st) {
+    if (sim.time >= sim.nextStorm) {
+      const a = sim.rand() * Math.PI * 2, rr = 520 + sim.rand() * 560;
+      sim.storm = { x: CX + Math.cos(a) * rr, y: CY + Math.sin(a) * rr, r: 420, t: 0, phase: 'warn', warn: 30, dur: 90 };
+      for (const q of sim.players) if (q.alive) alertTo(sim, q.id, 'Tempestade de Éter se aproximando (30 s)', sim.storm.x, sim.storm.y, 'warn');
+      emit(sim, { t: 'storm', phase: 'warn', x: sim.storm.x, y: sim.storm.y, r: sim.storm.r });
+    }
+    return;
+  }
+  st.t += dt;
+  if (st.phase === 'warn' && st.t >= st.warn) { st.phase = 'active'; st.t = 0; for (const q of sim.players) if (q.alive) alertTo(sim, q.id, 'Tempestade de Éter ativa: drones e sensores a 50%, Plasma 2× dentro dela', st.x, st.y, 'warn'); emit(sim, { t: 'storm', phase: 'active', x: st.x, y: st.y, r: st.r }); }
+  else if (st.phase === 'active' && st.t >= st.dur) { sim.storm = null; sim.nextStorm = sim.time + 360 + sim.rand() * 120; emit(sim, { t: 'storm', phase: 'end' }); }
+}
+
 // ---------- helpers ----------
 function facOf(sim, pid) { return FACTIONS[sim.players[pid].faction]; }
 function regimeOf(sim, pid) { return REGIME[sim.players[pid].energy.regime]; }
@@ -250,18 +342,21 @@ function refund(p, cost, mult) { mult = mult || 1; for (const k in cost) p.res[k
 function hasPact(sim, a, b) { return !!sim.players[a].pacts[b]; }
 function isEnemy(sim, a, b) { return a !== b && !hasPact(sim, a, b); }
 function sensorRadius(sim, e) {
+  if (e.kind !== 'unit' && e.kind !== 'building') return 0;
   const p = sim.players[e.owner];
   const d = e.kind === 'unit' ? UNITS[e.def] : BUILDINGS[e.def];
   let r = e.kind === 'building' && !e.built ? 60 : d.sensor;
   r *= regimeOf(sim, e.owner).sensF;
   if (p.research.sensores) r *= 1.25;
   if (p.blackoutT > 0) r *= 0.15;
+  if (inStorm(sim, e.x, e.y)) r *= 0.5;
   return r;
 }
 function speedOf(sim, u) {
   const p = sim.players[u.owner];
   let s = u.speed;
   if (p.speedBuffT > 0) s *= 1.3;
+  if (UNITS[u.def].flying && inStorm(sim, u.x, u.y)) s *= 0.5;
   return s;
 }
 function inTerritory(sim, pid, x, y) {
@@ -285,7 +380,7 @@ function canBuild(sim, pid, def, x, y) {
   if (x < 60 || y < 60 || x > WORLD - 60 || y > WORLD - 60) return { ok: false, why: 'Fora do mapa' };
   if (dist(x, y, CX, CY) < RIFT_R + d.r + 12) return { ok: false, why: 'Dentro da Fenda' };
   for (const e of sim.ents) {
-    if (!e.alive || e.kind === 'unit' || e.kind === 'crate') continue;
+    if (!e.alive || e.kind === 'unit' || e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck') continue;
     const bothWalls = d.wall && e.kind === 'building' && BUILDINGS[e.def].wall;
     if (dist(x, y, e.x, e.y) < (bothWalls ? 13 : e.r + d.r + 10)) return { ok: false, why: 'Sobreposição' };
   }
@@ -335,7 +430,7 @@ function processCommand(sim, c) {
       ownUnits(sim, c.p, c.ids).forEach(u => { if (UNITS[u.def].attack) { u.state = 'attack'; u.target = t.id; u.resume = null; } else { u.state = 'move'; u.tx = t.x; u.ty = t.y; } });
       break; }
     case 'harvest': {
-      const t = sim.byId.get(c.target); if (!t || !t.alive || t.kind !== 'node') return;
+      const t = sim.byId.get(c.target); if (!t || !t.alive || (t.kind !== 'node' && t.kind !== 'wreck')) return;
       ownUnits(sim, c.p, c.ids).forEach(u => { if (u.def === 'coletor') { u.state = 'harvest'; u.node = t.id; u.target = null; } else { u.state = 'move'; u.tx = t.x; u.ty = t.y; } });
       break; }
     case 'siphon': {
@@ -479,27 +574,76 @@ function counterMult(sim, a, t) {
   if (a.kind === 'building' && facOf(sim, a.owner).structNeutralVsVehicle && tc === 'vei') m = 1;
   return m;
 }
-function fire(sim, a, t) {
-  const p = sim.players[a.owner], q = sim.players[t.owner];
-  const atk = a.kind === 'unit' ? UNITS[a.def].attack : BUILDINGS[a.def].attack;
-  let dmg = atk.dmg * counterMult(sim, a, t);
-  if (p.research.armamento) dmg *= 1.15;
-  if (p.golpeT > 0) dmg *= 1.2;
-  if (a.kind === 'building') dmg *= regimeOf(sim, a.owner).defF;
-  let ambush = false;
-  if (a.kind === 'unit' && a.cloaked && a.def === 'infantaria') { dmg *= 1.5; ambush = true; }
+function unitCost(def) { const c = (UNITS[def] || BUILDINGS[def] || {}).cost || {}; return (c.minerio || 0) + (c.plasma || 0) + (c.dados || 0); }
+function damageMult(sim, a) { // multiplicadores do atacante (pesquisa, Golpe de Traição, regime das torres, veterância)
+  const p = sim.players[a.owner]; let m = 1;
+  if (p.research.armamento) m *= 1.15; if (p.golpeT > 0) m *= 1.2;
+  if (a.kind === 'building') m *= regimeOf(sim, a.owner).defF;
+  if (a.kind === 'unit') m *= 1 + 0.1 * (a.rank || 0);
+  return m;
+}
+function applyDamage(sim, attackerOwner, attacker, t, dmg, weapon) {
+  const q = sim.players[t.owner];
   if (q && q.research.blindagem) dmg *= 0.87;
-  t.hp -= dmg; t.lastHitT = sim.time; t.lastHitBy = a.owner;
-  if (a.kind === 'building') a.aimAng = Math.atan2(t.y - a.y, t.x - a.x);
-  p.stats.dmg += dmg;
-  a.cd = atk.cd; a.lastAttack = sim.time; a.cloaked = false;
-  if (atk.stun && (t.cls === 'vei' || t.kind === 'building')) t.cd = Math.max(t.cd || 0, 1.0);
-  emit(sim, { t: 'shot', x1: a.x, y1: a.y, x2: t.x, y2: t.y, cls: a.cls, owner: a.owner, ambush });
+  if (t.kind === 'unit') dmg *= 1 - 0.07 * (t.rank || 0);
+  t.hp -= dmg; t.lastHitT = sim.time; t.lastHitBy = attackerOwner;
+  const p = sim.players[attackerOwner]; if (p) p.stats.dmg += dmg;
+  if (attacker && attacker.alive && attacker.kind === 'unit') {
+    attacker.xp += dmg; const cost = Math.max(50, unitCost(attacker.def));
+    const nr = attacker.xp >= cost * VET_RANKS[3] ? 3 : attacker.xp >= cost * VET_RANKS[2] ? 2 : attacker.xp >= cost * VET_RANKS[1] ? 1 : 0;
+    if (nr > attacker.rank) { attacker.rank = nr; emit(sim, { t: 'promote', x: attacker.x, y: attacker.y, owner: attacker.owner, rank: nr, id: attacker.id }); }
+  }
+  if (weapon && weapon.stun && (t.cls === 'vei' || t.kind === 'building')) t.cd = Math.max(t.cd || 0, 1.0);
+  emit(sim, { t: 'hit', x: t.x, y: t.y, owner: t.owner, dmg });
   if (t.kind === 'building' && q) {
     if (t.def === 'nucleo' && sim.time - q.lastNucleoAlert > 10) { q.lastNucleoAlert = sim.time; alertTo(sim, q.id, 'NÚCLEO SOB ATAQUE!', t.x, t.y, 'danger'); }
-    else if (sim.time - q.lastBaseAlert > 12) { q.lastBaseAlert = sim.time; alertTo(sim, q.id, 'Base sob ataque', t.x, t.y, 'danger'); }
+    else if (!BUILDINGS[t.def].wall && sim.time - q.lastBaseAlert > 12) { q.lastBaseAlert = sim.time; alertTo(sim, q.id, 'Base sob ataque', t.x, t.y, 'danger'); }
   }
-  if (t.hp <= 0) kill(sim, t, a.owner);
+  if (t.hp <= 0) kill(sim, t, attackerOwner);
+}
+function armorOf(t) { return t.kind === 'building' ? 'est' : (t.cls || 'civ'); }
+function fire(sim, a, t) {
+  const w = a.kind === 'unit' ? UNITS[a.def].attack : BUILDINGS[a.def].attack;
+  const ambush = a.kind === 'unit' && a.cloaked && a.def === 'infantaria';
+  const base = w.dmg * damageMult(sim, a) * (ambush ? 1.5 : 1);
+  a.cd = w.cd; a.lastAttack = sim.time; a.cloaked = false; a.aimAng = Math.atan2(t.y - a.y, t.x - a.x);
+  const sx = a.x + Math.cos(a.aimAng) * a.r * 0.8, sy = a.y + Math.sin(a.aimAng) * a.r * 0.8;
+  emit(sim, { t: 'shot', x1: sx, y1: sy, x2: t.x, y2: t.y, cls: a.cls, owner: a.owner, ambush, weapon: a.kind === 'unit' ? UNITS[a.def].weapon : BUILDINGS[a.def].weapon, beam: w.proj === 'beam' });
+  if (w.proj === 'beam') { applyDamage(sim, a.owner, a, t, base * counterMult(sim, a, t), w); return; }
+  // projétil: viaja até o ponto previsto do alvo com inexatidão; acerta o que estiver lá
+  const ang = sim.rand() * Math.PI * 2, err = sim.rand() * w.inacc;
+  const lead = t.kind === 'unit' ? Math.min(1, dist(a.x, a.y, t.x, t.y) / w.speed) : 0;
+  const tx = t.x + (t.x - t.px) * lead * 10 + Math.cos(ang) * err, ty = t.y + (t.y - t.py) * lead * 10 + Math.sin(ang) * err;
+  const d = dist(sx, sy, tx, ty); const dir = [(tx - sx) / (d || 1), (ty - sy) / (d || 1)];
+  const pr = { id: sim.nextId++, kind: 'proj', x: sx, y: sy, px: sx, py: sy, z: a.kind === 'building' ? a.r * 0.9 : 6, tx, ty, vx: dir[0] * w.speed, vy: dir[1] * w.speed, weapon: a.kind === 'unit' ? UNITS[a.def].weapon : BUILDINGS[a.def].weapon, owner: a.owner, shooter: a.id, target: t.id, dmg: base, total: d, done: 0, arc: w.proj === 'shell' ? Math.min(60, d * 0.25) : 0, flying: !!(t.kind === 'unit' && UNITS[t.def].flying), alive: true, r: 1 };
+  sim.ents.push(pr); sim.byId.set(pr.id, pr);
+}
+function updateProjectile(sim, pr, dt) {
+  const w = WEAPONS[pr.weapon]; const step = w.speed * dt;
+  if (pr.done + step >= pr.total) { // impacto
+    pr.x = pr.tx; pr.y = pr.ty; pr.alive = false;
+    const shooter = sim.byId.get(pr.shooter); const atk = shooter && shooter.alive ? shooter : null;
+    const fakeA = atk || { kind: 'unit', cls: w.cls, owner: pr.owner };
+    let hitAny = false;
+    if (w.splash > 0) {
+      queryGrid(sim, pr.x, pr.y, w.splash + 40, e => {
+        if (!e.alive || e.owner === pr.owner || e.owner < 0 || e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck') return;
+        if (!isEnemy(sim, pr.owner, e.owner)) return;
+        if (e.kind === 'unit' && UNITS[e.def].flying && !pr.flying) return;
+        const dd = dist(pr.x, pr.y, e.x, e.y) - e.r; if (dd > w.splash) return;
+        const fall = dd <= 0 ? 1 : 1 - dd / w.splash * 0.6;
+        applyDamage(sim, pr.owner, atk, e, pr.dmg * fall * counterMult(sim, fakeA, e), w); hitAny = true;
+      });
+    } else {
+      const t = sim.byId.get(pr.target);
+      if (t && t.alive && dist(pr.x, pr.y, t.x, t.y) <= t.r + 10) { applyDamage(sim, pr.owner, atk, t, pr.dmg * counterMult(sim, fakeA, t), w); hitAny = true; }
+      else { let best = null, bd = 12; queryGrid(sim, pr.x, pr.y, 30, e => { if (!e.alive || e.owner === pr.owner || e.owner < 0 || e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck' || !isEnemy(sim, pr.owner, e.owner)) return; const dd = dist(pr.x, pr.y, e.x, e.y) - e.r; if (dd < bd) { bd = dd; best = e; } }); if (best) { applyDamage(sim, pr.owner, atk, best, pr.dmg * counterMult(sim, fakeA, best), w); hitAny = true; } }
+    }
+    emit(sim, { t: 'impact', x: pr.x, y: pr.y, weapon: pr.weapon, splash: w.splash, hit: hitAny, owner: pr.owner });
+    return;
+  }
+  pr.done += step; pr.x += pr.vx * dt; pr.y += pr.vy * dt;
+  const k = pr.done / pr.total; pr.z = (pr.arc ? Math.sin(k * Math.PI) * pr.arc : 0) + 6 * (1 - k) + 3;
 }
 function kill(sim, e, killer) {
   if (!e.alive) return;
@@ -515,7 +659,12 @@ function kill(sim, e, killer) {
       emit(sim, { t: 'crate', x: e.x, y: e.y });
       if (p && p.human) alertTo(sim, p.id, 'Caixa derrubada: ' + Math.round(e.cargoTotal) + ' em recursos', e.x, e.y, 'warn');
     }
+    if (e.cls === 'vei' || e.def === 'coletor' || e.def === 'pirata') { // carcaça saqueável
+      const wr = { id: sim.nextId++, kind: 'wreck', x: e.x, y: e.y, r: e.r, ang: e.ang || 0, alive: true, owner: -1, res: 'minerio', amount: Math.round(unitCost(e.def) * 0.35), max: Math.round(unitCost(e.def) * 0.35), bornT: sim.time, def: e.def };
+      sim.ents.push(wr); sim.byId.set(wr.id, wr);
+    }
   } else if (e.kind === 'building') {
+    sim.navDirty = true;
     if (p) p.stats.buildingsLost++;
     if (killer >= 0 && killer !== e.owner) sim.players[killer].stats.buildingsDestroyed++;
     if (e.def === 'nucleo') eliminate(sim, e.owner, killer);
@@ -523,7 +672,7 @@ function kill(sim, e, killer) {
 }
 function eliminate(sim, pid, killer) {
   const p = sim.players[pid]; if (!p.alive) return;
-  p.alive = false;
+  p.alive = false; sim.navDirty = true;
   for (const e of sim.ents) if (e.alive && e.owner === pid) { e.alive = false; emit(sim, { t: 'death', x: e.x, y: e.y, r: e.r, kind: e.kind, def: e.def, owner: pid, cls: e.cls }); }
   for (const k in p.pacts) { const q = sim.players[k]; delete q.pacts[pid]; } p.pacts = {};
   for (const q of sim.players) if (q.alive) alertTo(sim, q.id, p.name + ' foi eliminado' + (killer >= 0 && killer !== pid ? ' por ' + sim.players[killer].name : ''), null, null, q.id === killer ? 'good' : 'warn');
@@ -549,6 +698,21 @@ function moveToward(sim, u, tx, ty, dt) {
   const dx = tx - u.x, dy = ty - u.y; const d = Math.hypot(dx, dy);
   const sp = speedOf(sim, u) * dt;
   if (d <= Math.max(sp, 4)) { u.x = tx; u.y = ty; return true; }
+  if (!UNITS[u.def].flying && d > NAV * 1.2 && !lineFree(sim, u.x, u.y, tx, ty, u.owner)) {
+    const f = flowField(sim, navIdx(tx, ty), u.owner); const ci = navIdx(u.x, u.y); let dir = f.dir[ci];
+    let nx = 0, ny = 0;
+    const cx = ci % NW, cy = (ci / NW) | 0;
+    if (dir >= 0) { const ni = (cy + DY8[dir]) * NW + (cx + DX8[dir]); const g = sim.nav.gatePos.get(ni); if (g && !sim.nav.gates.has(ci)) { nx = g.x; ny = g.y; } else { nx = (cx + DX8[dir] + 0.5) * NAV; ny = (cy + DY8[dir] + 0.5) * NAV; } }
+    else { // célula bloqueada ou sem rota: vai para o vizinho alcançável de menor custo
+      let best = -1, bc = Infinity;
+      for (let d = 0; d < 8; d++) { const x2 = cx + DX8[d], y2 = cy + DY8[d]; if (x2 < 0 || y2 < 0 || x2 >= NW || y2 >= NW) continue; const ni = y2 * NW + x2; if (f.cost[ni] >= 0 && f.cost[ni] < bc) { bc = f.cost[ni]; best = ni; } }
+      if (best >= 0) { nx = (best % NW + 0.5) * NAV; ny = (((best / NW) | 0) + 0.5) * NAV; dir = 0; }
+    }
+    if (dir >= 0) {
+      const ddx = nx - u.x, ddy = ny - u.y; const dd = Math.hypot(ddx, ddy) || 1;
+      u.x += ddx / dd * sp; u.y += ddy / dd * sp; u.ang = Math.atan2(ddy, ddx); return false;
+    }
+  }
   u.x += dx / d * sp; u.y += dy / d * sp; u.ang = Math.atan2(dy, dx); return false;
 }
 function nearestDeposit(sim, u) {
@@ -567,9 +731,10 @@ function pickNode(sim, u) {
   w[lowest] *= 0.6;
   let best = null, bd = Infinity;
   for (const e of sim.ents) {
-    if (!e.alive || e.kind !== 'node' || e.amount <= 0) continue;
-    if (!inTerritory(sim, u.owner, e.x, e.y)) continue;
-    const d = dist(u.x, u.y, e.x, e.y) * w[e.res];
+    if (!e.alive || (e.kind !== 'node' && e.kind !== 'wreck') || e.amount <= 0) continue;
+    if (e.kind === 'node' && !inTerritory(sim, u.owner, e.x, e.y)) continue;
+    if (e.kind === 'wreck' && dist(u.x, u.y, e.x, e.y) > 520) continue;
+    const d = dist(u.x, u.y, e.x, e.y) * w[e.res] * (e.kind === 'wreck' ? 0.7 : 1);
     if (d < bd) { bd = d; best = e; }
   }
   return best;
@@ -628,7 +793,7 @@ function updateUnit(sim, u, dt) {
       const n = sim.byId.get(u.node);
       if (!n || !n.alive || n.amount <= 0) { const m = pickNode(sim, u); if (m) u.node = m.id; else u.state = u.cargoTotal > 0 ? 'return' : 'idle'; break; }
       if (dist(u.x, u.y, n.x, n.y) <= u.r + n.r + 8) {
-        const take = Math.min(d.harvestRate * dt, n.amount, d.capacity - u.cargoTotal);
+        const take = Math.min(d.harvestRate * dt * (n.res === 'plasma' && inStorm(sim, n.x, n.y) ? 2 : 1), n.amount, d.capacity - u.cargoTotal);
         n.amount -= take; u.cargo[n.res] += take; u.cargoTotal += take;
         if (u.cargoTotal >= d.capacity - 0.01 || n.amount <= 0) u.state = 'return';
       } else moveToward(sim, u, n.x, n.y, dt);
@@ -701,7 +866,7 @@ function updateBuilding(sim, b, dt) {
     b.jumpT -= dt;
     if (b.jumpT <= 0) {
       const from = { x: b.x, y: b.y };
-      b.x = b.jumpTo.x; b.y = b.jumpTo.y; b.px = b.x; b.py = b.y; b.jumpTo = null; b.jumpT = 0;
+      b.x = b.jumpTo.x; b.y = b.jumpTo.y; b.px = b.x; b.py = b.y; b.jumpTo = null; b.jumpT = 0; sim.navDirty = true;
       emit(sim, { t: 'jump', p: b.owner, from, to: { x: b.x, y: b.y } });
       for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === b.owner ? 'Salto de Núcleo concluído' : p.name + ' saltou o Núcleo!', b.x, b.y, q.id === b.owner ? 'good' : 'warn');
     }
@@ -769,11 +934,13 @@ function computeVisibility(sim) {
     const circles = [], detectors = [];
     for (const e of sim.ents) {
       if (!e.alive || e.owner !== p.id) continue;
+      if (e.kind !== 'unit' && e.kind !== 'building') continue;
       circles.push([e.x, e.y, sensorRadius(sim, e)]);
       if (e.kind === 'building' && e.built && BUILDINGS[e.def].detect) detectors.push([e.x, e.y, BUILDINGS[e.def].detect]);
     }
     for (const e of sim.ents) {
       if (!e.alive || e.owner === p.id || e.kind === 'node') continue;
+      if (e.kind === 'proj' && e.owner === p.id) { vis.add(e.id); continue; }
       let seen = false;
       if (e.kind === 'building' && e.built && e.def === 'reator' && facOf(sim, e.owner).smoke) seen = true;
       if (!seen) for (const c of circles) { if (dist(e.x, e.y, c[0], c[1]) <= c[2] + e.r) { seen = true; break; } }
@@ -838,7 +1005,9 @@ function step(sim) {
   sim.events = [];
   if (sim.result) return sim.events;
   for (const e of sim.ents) if (e.kind !== 'node') { e.px = e.x; e.py = e.y; }
+  if (sim.navDirty) rebuildNav(sim);
   rebuildGrid(sim);
+  updateStorm(sim, dt);
   const cmds = sim.cmdQueue; sim.cmdQueue = [];
   for (const c of cmds) processCommand(sim, c);
   for (const p of sim.players) {
@@ -851,7 +1020,7 @@ function step(sim) {
   }
   updatePacts(sim);
   for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'building') updateBuilding(sim, e, dt); }
-  for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'unit') updateUnit(sim, e, dt); }
+  for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'unit') updateUnit(sim, e, dt); else if (e.kind === 'proj') { e.px = e.x; e.py = e.y; updateProjectile(sim, e, dt); } else if (e.kind === 'wreck' && (e.amount <= 0 || sim.time - e.bornT > 150)) e.alive = false; }
   separate(sim);
   pickupCrates(sim);
   // prune
@@ -861,6 +1030,7 @@ function step(sim) {
     sim.ents = keep;
   }
   computeVisibility(sim);
+  if (sim.tick % 3 === 0) markExplored(sim);
   sim.tick++; sim.time = sim.tick * TICK;
   checkEnd(sim);
   return sim.events;
@@ -882,8 +1052,9 @@ function hash(sim) { // cheap state hash for determinism tests
 }
 
 ARD.sim = {
-  TICK, WORLD, CX, CY, RIFT_R, FACTIONS, BUILDINGS, UNITS, COUNTER, CLASS_NAMES, RESEARCH, REGIME, DIFFICULTY, REP_NAMES,
+  TICK, WORLD, CX, CY, RIFT_R, FACTIONS, BUILDINGS, UNITS, WEAPONS, COUNTER, CLASS_NAMES, VET_RANKS, unitCost, RESEARCH, REGIME, DIFFICULTY, REP_NAMES,
   SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS,
+  NAV, NW, TILE, TILES, navIdx, passable, flowField, lineFree, inStorm,
   createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius,
 };
 })(globalThis.ARD = globalThis.ARD || {});

@@ -110,7 +110,17 @@ body.touch #top{gap:.3rem .6rem;padding:.3rem .5rem;font-size:12px}
 body.touch #top .muted{display:none}
 body.touch .speed{margin-left:0}
 body.touch .speed button,body.touch .tb{padding:.2rem .4rem}
-body.touch #hints{top:calc(5.6rem + env(safe-area-inset-top,0))}
+body.touch #hints{top:calc(5.6rem + env(safe-area-inset-top,0));padding:.35rem .6rem;font-size:12px;width:calc(100vw - 130px)}
+body.touch #bar{flex-wrap:wrap;gap:.3rem}
+body.touch #bar .tb{min-width:0;flex:1 1 auto;padding:.3rem .35rem;font-size:12px}
+body.touch #panel{max-height:30vh;padding:.5rem}
+body.touch .grid{grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
+body.touch .act{min-height:40px;padding:.3rem .4rem}
+body.touch .act .ico{width:28px;height:28px}
+body.touch #right{width:104px}
+body.touch #minimap{width:104px;height:104px}
+body.touch .qb{padding:.25rem .4rem}
+body.touch .qb .sub{display:none}
 body.touch #right{top:calc(5.8rem + env(safe-area-inset-top,0))}
 #bar .tb{min-width:44px;min-height:40px;font-size:13px}
 #hints{position:absolute;left:50%;transform:translateX(-50%);top:calc(3.4rem + env(safe-area-inset-top,0));width:min(520px,calc(100vw - 420px));background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.5rem .75rem;display:grid;gap:.25rem;font-size:12.5px}
@@ -140,12 +150,12 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 #end-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.4rem}
 .stat{display:grid;border:1px solid var(--line);border-radius:6px;padding:.4rem .6rem;font-size:12px}.stat span{color:var(--fg2)}
 .loadbar{height:6px;background:#262A31;border-radius:3px;overflow:hidden;margin-top:.5rem}.loadbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--rift1),var(--rift2));transition:width .15s}
-#errbox{position:fixed;left:8px;bottom:8px;background:#5a1d1d;color:#fff;padding:.4rem .6rem;border-radius:6px;font-family:var(--fm);font-size:12px;z-index:9;max-width:80vw}
+#errbox{position:fixed;left:8px;bottom:8px;background:#5a1d1d;color:#fff;padding:.4rem .6rem;border-radius:6px;font-family:var(--fm);font-size:12px;z-index:9;max-width:80vw;cursor:pointer}
 </style>
 
 <div id="start" class="screen">
   <div class="start-wrap">
-    <div class="eyebrow">Beta 1.5a · protótipo jogável no navegador · contra IA</div>
+    <div class="eyebrow">Beta 2.0a · protótipo jogável no navegador · contra IA</div>
     <h1>Aether Rift<br><span>Dominion</span></h1>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -158,7 +168,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         <div class="row"><button id="btn-start" class="btn primary">Iniciar partida</button><button id="btn-help-start" class="btn">Como jogar</button></div>
       </div>
     </div>
-    <p class="start-notes"><b>Novo no 1.5a:</b> visual isométrico com sprites voxel gerados no navegador, terreno com biomas, muros e portões desenhados por arrasto, estados de dano, destroços e crateras, ciclo de dia e noite com luzes. <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
+    <p class="start-notes"><b>Novo no 2.0a:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
   </div>
 </div>
 
@@ -170,7 +180,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
       <div id="energy" class="energy pleno"><div class="row"><span>⚡ <span id="e-text">0 / 0</span></span><span id="e-regime">Pleno</span></div><div class="bar"><i id="e-bar"></i></div></div>
       <span id="clock">00:00</span>
       <span class="muted">Rep.: <span id="rep">Neutro</span></span>
-      <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
+      <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-sound" class="tb" title="Som">♪</button><button id="btn-voice" class="tb" title="Voz do sistema">🗣</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
     </div>
     <div id="hints"><button id="hints-close" aria-label="Fechar dicas">✕</button><div id="hints-body"></div></div>
     <div id="panel"></div>
@@ -184,7 +194,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     </div>
     <div id="log"></div>
     <div id="bar">
-      <button id="btn-nucleo" class="tb">Núcleo</button><button id="btn-army" class="tb">Exército</button><button id="btn-build" class="tb">Construir</button><button id="btn-attack" class="tb">Atacar</button><button id="btn-stop" class="tb">Parar</button><button id="btn-box" class="tb">Caixa</button>
+      <button id="btn-nucleo" class="tb">Núcleo</button><button id="btn-army" class="tb">Exército</button><button id="btn-all" class="tb">Na tela</button><button id="btn-build" class="tb">Construir</button><button id="btn-attack" class="tb">Atacar</button><button id="btn-stop" class="tb">Parar</button><button id="btn-box" class="tb">Caixa</button><button id="btn-clear" class="tb">✕</button>
     </div>
     <div id="notice"></div>
     <div id="proposal" hidden><div id="proposal-text"></div><div class="row"><button id="prop-yes" class="act sm good">Aceitar pacto</button><button id="prop-no" class="act sm">Recusar</button></div></div>
@@ -210,7 +220,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <tr><td>WASD, setas, roda, botão do meio</td><td>Câmera e zoom</td></tr>
   <tr><td>P / H / Esc</td><td>Pausar / ajuda / cancelar</td></tr></table>
   <h3>Toque</h3>
-  <table><tr><td>Toque</td><td>Selecionar. Com unidades selecionadas, toque no chão move.</td></tr><tr><td>Toque longo</td><td>Comando de contexto (atacar, colher, sifonar, recolher).</td></tr><tr><td>Arrastar / dois dedos</td><td>Câmera / zoom. Ative "Caixa" para arrastar uma seleção.</td></tr></table>
+  <table><tr><td>Toque</td><td>Toque em uma unidade sua para selecionar; duplo toque seleciona todas do tipo. Com unidades selecionadas: toque no chão move, toque no inimigo ataca, toque em nó ou carcaça colhe, toque em Refinaria inimiga com Pirata sifona.</td></tr><tr><td>Barra inferior</td><td>Núcleo, Exército, Na tela (seleciona o que aparece), Construir, Atacar (o modo fica ligado até desligar), Parar, Caixa (arrastar seleciona) e ✕ (limpar seleção).</td></tr><tr><td>Arrastar / dois dedos</td><td>Câmera / zoom. Em modo Construir com Muro, arrastar desenha o muro.</td></tr></table>
   <h3>Contras (atacante → alvo)</h3>
   <table class="matrix"><thead><tr><th></th><th>Inf.</th><th>Veíc.</th><th>Drone</th><th>Estrut.</th><th>Sup.</th></tr></thead><tbody>
   <tr><td>Infantaria</td><td>—</td><td class="bad">▼</td><td class="good">▲</td><td class="bad">▼</td><td class="good">▲</td></tr>
@@ -223,5 +233,5 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <p class="small">Piratas sifonam Refinarias e Reatores inimigos por até 40 s; a vítima recebe um Alerta com atraso de 3 a 5 s. Pirata morto com carga vira Caixa que qualquer um recolhe. Erevane rouba com +20% e sem deixar Rastro. Pactos de Não-agressão custam Caução de 150 Minério por lado; quebrar dá +20% de dano por 45 s, entrega sua Caução à vítima e derruba sua reputação.</p>
   <div class="row"><button class="btn" data-close>Fechar</button></div>
 </div></div>
-<div id="errbox" hidden></div>
+<div id="errbox" hidden onclick="this.hidden=true"></div>
 <!--SCRIPTS-->
