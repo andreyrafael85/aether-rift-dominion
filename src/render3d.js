@@ -23,24 +23,29 @@ function create(canvas, overlay, mini) {
     if (composer) { composer.dispose && composer.dispose(); composer = null; bloomPass = null; ssaoPass = null; }
     if (!ADD || !R.quality.post) return;
     composer = new ADD.EffectComposer(renderer); composer.setPixelRatio(R.quality.pr);
-    if (R.quality.ssao) { ssaoPass = new ADD.SSAOPass(scene, camera, R.w || 800, R.h || 600); ssaoPass.kernelRadius = 10; ssaoPass.minDistance = 0.001; ssaoPass.maxDistance = 0.12; composer.addPass(ssaoPass); }
-    else composer.addPass(new ADD.RenderPass(scene, camera));
+    // r160: SSAOPass nao renderiza a cena; ele le o buffer do passe anterior. O RenderPass precisa vir SEMPRE antes.
+    composer.addPass(new ADD.RenderPass(scene, camera));
+    if (R.quality.ssao) { ssaoPass = new ADD.SSAOPass(scene, camera, R.w || 800, R.h || 600); ssaoPass.kernelRadius = 24; ssaoPass.minDistance = 0.0006; ssaoPass.maxDistance = 0.04; if (R.ssaoOut != null) ssaoPass.output = R.ssaoOut;
+      // Os passes de tela cheia do SSAO (oclusao e blur) nao precisam de depth; com depth test ligado o blur reprovava no proprio alvo e a saida ficava preta.
+      [ssaoPass.ssaoMaterial, ssaoPass.blurMaterial].forEach(m => { m.depthTest = false; m.depthWrite = false; });
+      composer.addPass(ssaoPass); }
     bloomPass = new ADD.UnrealBloomPass(new THREE.Vector2(R.w || 800, R.h || 600), 0.42, 0.5, 1.3); composer.addPass(bloomPass);
     composer.addPass(new ADD.OutputPass());
     if (R.w) composer.setSize(R.w, R.h);
   }
-  R.setQuality = function (name) {
-    const q = R.quality; q.name = name;
+  R.setQuality = function (name, over) {
+    const q = R.quality; q.name = name; over = over || {};
     if (name === 'auto') name = isTouch ? 'baixa' : 'media';
     if (name === 'baixa') { q.shadows = false; q.post = false; q.ssao = false; q.pr = 1; q.particles = 0.5; }
     else if (name === 'alta') { q.shadows = true; q.shadowMap = 4096; q.post = !!ADD; q.ssao = !!ADD; q.pr = Math.min(2, window.devicePixelRatio || 1); q.particles = 1; }
     else { q.shadows = !isTouch; q.shadowMap = 2048; q.post = !!ADD; q.ssao = false; q.pr = Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1); q.particles = 1; }
+    if (over.ssao != null) q.ssao = over.ssao && !!ADD; if (over.shadowMap) q.shadowMap = over.shadowMap; if (over.post != null) q.post = over.post && !!ADD;
     renderer.shadowMap.enabled = q.shadows; renderer.setPixelRatio(q.pr); if (typeof sun !== 'undefined') { sun.castShadow = q.shadows; sun.shadow.mapSize.set(q.shadowMap, q.shadowMap); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
     scene.traverse(o => { if (o.isInstancedMesh || o.isMesh) o.castShadow = o.castShadow && q.shadows; });
     buildComposer();
   };
   const octx = overlay.getContext('2d'); const mctx = mini.getContext('2d'); const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
-  const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(38, 1, 2, 6000);
+  const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(38, 1, 30, 6000);
   const CAM = { pitch: 0.95, baseDist: 760 };
   // ---------- luzes ----------
   const hemi = new THREE.HemisphereLight(0x9fb8d6, 0x2a2a30, 0.55); scene.add(hemi);

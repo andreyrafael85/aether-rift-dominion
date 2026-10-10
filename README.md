@@ -44,6 +44,6 @@ aether-rift-dominion/
 └─ capturas/         imagens de referência do estilo
 ```
 
-Build: `node tools/build.mjs` · Teste headless: `node tools/test.cjs`
+Build: `node tools/build.mjs` · Teste headless: `node tools/test.cjs` · Captura headless sem rede: `node tools/vendor.mjs` (baixa three r160 para `dist/vendor/`) e o build passa a gerar `dist/local.html`, igual ao jogo mas carregando three local (use com Playwright/Chromium; `--virtual-time-budget` do Chromium congela a página em tick 0 de forma intermitente)
 
 Conteúdo em fase de teste. Todos os direitos reservados; não é permitido redistribuir fora deste repositório sem autorização.

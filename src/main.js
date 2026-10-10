@@ -90,7 +90,8 @@ function startGame(cfg, netCtx) {
   let R = null; const want3d = (cfg.gfx || '3d') === '3d' && params.get('r') !== '2d';
   if (want3d && window.THREE) { try { R = ARD.render3d.create(canvas, overlay, mini); } catch (err) { console.warn('3D indisponível, usando 2D:', err); R = null; } }
   if (!R) { R = ARD.render.create(canvas, mini); overlay.hidden = true; if (want3d) setTimeout(() => notice('3D indisponível neste navegador; usando o modo 2D'), 1200); }
-  if (R.setQuality) R.setQuality(cfg.quality || 'auto');
+  if (params.get('ssaoout')) R.ssaoOut = parseInt(params.get('ssaoout'), 10);
+  if (R.setQuality) R.setQuality(params.get('q') || cfg.quality || 'auto', { ssao: params.has('ssao') ? params.get('ssao') === '1' : null, shadowMap: params.get('sm') ? parseInt(params.get('sm'), 10) : null, post: params.has('post') ? params.get('post') === '1' : null });
   R.resize();
   const nuc = S.nucleoOf(sim, human);
   const isTouch = matchMedia('(pointer: coarse)').matches || !!params.get('touch');
@@ -412,7 +413,9 @@ function startGame(cfg, netCtx) {
 function toggleHelp(force) { const h = $('help'); h.hidden = force === true ? false : !h.hidden; }
 
 window.addEventListener('error', e => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent = 'Erro: ' + (e.message || e.error); } });
+window.addEventListener('unhandledrejection', e => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent = 'Erro (promise): ' + (e.reason && (e.reason.stack || e.reason.message) || e.reason); } });
 document.addEventListener('DOMContentLoaded', initStart);
+if (params.get('debug')) { const oe = console.error, ow = console.warn; const cap = (...a) => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent += ' || ' + a.map(x => String(x && x.message || x)).join(' ').slice(0, 400); } }; console.error = (...a) => { cap(...a); oe.apply(console, a); }; console.warn = (...a) => { cap(...a); ow.apply(console, a); }; }
 for (const ev of ['pointerdown', 'keydown', 'touchstart']) document.addEventListener(ev, () => { ARD.audio.init(); ARD.audio.resume(); }, { passive: true });
 if (params.get('debug')) setTimeout(() => {
   const out = [];

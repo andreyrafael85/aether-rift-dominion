@@ -9,6 +9,9 @@ function bundle(tpl, scripts) { return read(tpl).replace('<!--SCRIPTS-->', '<scr
 mkdirSync(root + 'dist', { recursive: true });
 const game = bundle('src/index.tpl.html', ['src/sim.js', 'src/ai.js', 'src/voxel.js', 'src/models.js', 'src/vox3d.js', 'src/render.js', 'src/render3d.js', 'src/audio.js', 'src/net.js', 'src/input.js', 'src/main.js']);
 writeFileSync(root + 'dist/aether-rift-beta.html', game); writeFileSync(root + 'index.html', wrap(game));
+// Cópia para testes headless com three vendorizado (node tools/vendor.mjs); carrega sem rede.
+import { existsSync } from 'node:fs';
+if (existsSync(root + 'dist/vendor/three/build/three.module.min.js')) writeFileSync(root + 'dist/local.html', wrap(game).replace('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js', './vendor/three/build/three.module.min.js').replace('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/', './vendor/three/examples/jsm/'));
 const style = bundle('style/index.tpl.html', ['src/voxel.js', 'src/models.js', 'style/scene.js', 'style/boot.js']);
 writeFileSync(root + 'dist/estilo.html', style); writeFileSync(root + 'estilo.html', wrap(style));
 const s3 = bundle('style3d/index.tpl.html', ['src/voxel.js', 'src/models.js', 'src/vox3d.js', 'style3d/scene3d.js', 'style3d/boot.js']);
