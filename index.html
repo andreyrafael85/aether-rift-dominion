@@ -45,7 +45,10 @@ h1 span{background:linear-gradient(90deg,var(--rift1),var(--rift2));-webkit-back
 .btn:hover{background:#262A31}
 .btn.primary{background:linear-gradient(90deg,var(--rift1),#d4512f);border-color:transparent;color:#14161A;font-family:var(--fd);font-size:1.3rem;text-transform:uppercase;letter-spacing:.04em;padding:.7rem 1.4rem}
 .btn.primary:hover{filter:brightness(1.08)}
-.start-notes{font-size:13px;color:var(--fg2);max-width:70ch}
+.start-notes{font-size:13px;color:var(--fg2);max-width:72ch;text-align:justify;hyphens:auto}
+.notes{display:grid;gap:.6rem}
+.oldnotes summary{font-family:var(--fm);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg2);cursor:pointer;padding:.4rem 0}
+.oldnotes summary:hover{color:var(--fg)}
 .mp{border-top:1px solid var(--line);padding-top:.75rem;display:grid;gap:.5rem}
 .mp input{background:#12151A;border:1px solid var(--line);color:var(--fg);border-radius:6px;padding:.5rem .6rem;font:inherit;font-family:var(--fm)}
 #chat{position:absolute;right:.75rem;bottom:calc(8.5rem + env(safe-area-inset-bottom,0));width:260px;display:grid;gap:.3rem}
@@ -206,12 +209,19 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         </div>
       </div>
     </div>
-    <p class="start-notes"><b>Novo no 4.0a:</b> o jogo agora fala em <b>Raças</b>; portais de Raça na tela inicial com fundo vivo que acompanha a escolha; materiais 3D próprios por Raça (metal Vehnar, vidro furtivo Erevane, pele viva Tessara); cada Raça constrói com um <b>nascimento</b> próprio: módulos soldados em degraus, origami que cintila até camuflar, casulo que pulsa e floresce; presets de <b>clima</b> (névoa tóxica, tempestade de plasma, chuva de cristais, aurora, chuva ácida); e a prévia do <b>Coro Quorith</b> e da <b>Prole Vorag</b>, jogáveis na 4.0b. <b>No 3.0d:</b> salas multiplayer de 2 a 4 jogadores humanos por código, com lista de quem entrou; só os jogadores da sala entram no mapa (sem IAs), o anfitrião é o relé do lockstep e quem cair é retirado em 8 s sem travar a partida. Simulação idêntica em Chrome, Firefox e Safari (matemática determinística), para que navegadores diferentes não dessincronizem. Unidades atravessam o próprio Portão sem travar. Presets Alta/Ultra com proteção contra tela preta. <b>No 3.0c:</b> a Raça Tessara (Traços de combate, Fotossíntese, Salto Evolutivo) e oito unidades novas: Soldador, Guindaste Armado, Tratorzão e Prensa para Vehnar; Atirador de Fenda, Lâmina Rodante, Mosquito e Âncora para Erevane; Quimera, Esporo-sentinela, Molde e Colosso para Tessara. Banner de eliminação e contador de inimigos. <b>No 3.0b:</b> bloom nos emissivos, oclusão ambiente no preset Alta, névoa volumétrica na Fenda e na Tempestade, lagos de plasma animados, presets de qualidade, e <b>multiplayer P2P</b> por código de sala. <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Servidor dedicado, reconexão e relé TURN</b> ficam para a próxima etapa: hoje a sala é P2P direta (STUN), o que funciona na maioria das redes domésticas.</p>
+    <div class="notes">
+      <div class="choose">Notas da versão</div>
+      <p class="start-notes"><b>4.0a — Identidade das Raças:</b> o jogo agora fala em <b>Raças</b>; portais na tela inicial com fundo vivo que acompanha a escolha; materiais 3D próprios por Raça (metal Vehnar, vidro furtivo Erevane, pele viva Tessara); cada Raça constrói com um <b>nascimento</b> próprio: módulos soldados em degraus, origami que cintila até camuflar, casulo que pulsa e floresce; presets de <b>clima</b> dentro da partida (névoa tóxica, tempestade de plasma, chuva de cristais, aurora, chuva ácida); e a prévia do <b>Coro Quorith</b> e da <b>Prole Vorag</b>, jogáveis na 4.0b.</p>
+      <p class="start-notes"><b>O que este beta testa:</b> construção com energia dinâmica, três recursos, Nódulos de território, roubo por Sifão, tabela de contras, névoa de guerra com camuflagem, diplomacia com Caução, superarmas e salas multiplayer P2P de 2 a 4 jogadores. Partidas de até 25 minutos.</p>
+      <details class="oldnotes"><summary>Histórico das versões anteriores (3.0 → 2.0)</summary>
+      <p class="start-notes"><b>No 3.0d:</b> salas multiplayer de 2 a 4 jogadores humanos por código, com lista de quem entrou; o anfitrião é o relé do lockstep e quem cair é retirado em 8 s sem travar a partida; simulação idêntica em Chrome, Firefox e Safari (matemática determinística); unidades atravessam o próprio Portão; presets Alta/Ultra com proteção contra tela preta. <b>No 3.0c:</b> a Raça Tessara (Traços, Fotossíntese, Salto Evolutivo) e oito unidades novas; banner de eliminação e contador de inimigos. <b>No 3.0b:</b> bloom, oclusão ambiente, névoa volumétrica, lagos de plasma, presets de qualidade e multiplayer P2P por código de sala. <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel, câmera com rotação, relevo, sombras e névoa de guerra projetada no terreno. <b>No 2.0:</b> projéteis com área e erro, torretas, veterância, carcaças, caminhos ao redor de muros, três camadas de névoa, Tempestade de Éter, som e voz, IA com estratégias e raids, controles de toque. <b>Próxima etapa de rede:</b> servidor dedicado, reconexão e relé TURN; hoje a sala é P2P direta (STUN).</p>
+      </details>
+    </div>
     <p class="start-notes" id="build-info" style="opacity:.65;font-size:12px"></p>
     <footer class="site-foot">
       <div class="sf-brand">AETHER RIFT <b>DOMINION</b></div>
       <nav><a href="https://github.com/andreyrafael85/aether-rift-dominion" target="_blank" rel="noopener">GitHub</a><a href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Feedback</a><button class="linklike" id="foot-help">Como jogar</button><button class="linklike" id="foot-termos">Termos de Uso</button><button class="linklike" id="foot-priv">Privacidade</button><span class="muted">Discord em breve</span></nav>
-      <div class="sf-legal">Aether Rift Dominion — Versão 4.0 | Lançamento Global 2026 · Feito no navegador, para o navegador.</div>
+      <div class="sf-legal">Aether Rift Dominion — Versão 4.0 | Lançamento 2026 · Criado por Andrey Rafael · Feito no navegador, para o navegador.</div>
     </footer>
   </div>
 </div>
@@ -2703,15 +2713,16 @@ function create(canvas, overlay, mini) {
   function smoke(x, y, z, col, life, vz) { const i = P.i++ % PN; P.x[i] = x; P.y[i] = y; P.z[i] = z; P.vx[i] = (Math.random() - .5) * 6; P.vy[i] = (Math.random() - .5) * 6; P.vz[i] = vz == null ? 14 : vz; P.t[i] = 0; P.life[i] = life || 2.5; P.kind[i] = 0; pCol[i * 3] = col[0]; pCol[i * 3 + 1] = col[1]; pCol[i * 3 + 2] = col[2]; }
   function snow(x, y, col, vz, vx, life) { const i = P.i++ % PN; P.x[i] = x; P.y[i] = y; P.z[i] = 90 + Math.random() * 40; P.vx[i] = vx == null ? 25 : vx; P.vy[i] = 8; P.vz[i] = vz == null ? -45 : vz; P.t[i] = 0; P.life[i] = life || 3.2; P.kind[i] = 1; const c = col || [0.9, 0.93, 1]; pCol[i * 3] = c[0]; pCol[i * 3 + 1] = c[1]; pCol[i * 3 + 2] = c[2]; }
   // 4.0a — presets de clima local (só visual; a simulação não muda): tinge céu/névoa, luz ambiente e solta partículas.
+  // fogN/fogF multiplicam a distância atual da câmera: perto a névoa fecha, no zoom longe o mundo segue legível.
   const CLIMATES = {
-    toxica: { tint: [0.4, 0.54, 0.26], mix: 0.72, fogNear: 320, fogFar: 1450, hemi: 0x8fb86a, sun: 0xc8e696, drop: [0.5, 0.8, 0.25], vz: -14, vx: 9, rate: 0.9, burst: 3, life: 5 },
-    plasma: { tint: [0.6, 0.31, 0.2], mix: 0.68, fogNear: 550, fogFar: 1850, hemi: 0xe6a070, sun: 0xffa964, drop: [1, 0.5, 0.2], vz: 32, vx: 24, rate: 1, burst: 3, life: 2.6 },
-    cristais: { tint: [0.52, 0.66, 0.92], mix: 0.58, fogNear: 850, fogFar: 2500, hemi: 0x9fc0ff, sun: 0xcfe0ff, drop: [0.62, 0.9, 1], vz: -75, vx: 15, rate: 1, burst: 5, life: 2.6, sparkle: true },
-    aurora: { tint: [0.28, 0.54, 0.46], mix: 0.5, fogNear: 1300, fogFar: 3300, hemi: 0x7fe6c0, sun: 0x9effd4, aurora: [0.22, 0.85, 0.58] },
-    acida: { tint: [0.44, 0.56, 0.28], mix: 0.62, fogNear: 480, fogFar: 1650, hemi: 0xa8c878, sun: 0xd4e68a, drop: [0.6, 0.9, 0.3], vz: -175, vx: 6, rate: 1, burst: 5, life: 1.2 },
+    toxica: { tint: [0.4, 0.54, 0.26], mix: 0.72, fogN: 0.45, fogF: 2.1, hemi: 0x8fb86a, sun: 0xc8e696, drop: [0.5, 0.8, 0.25], vz: -14, vx: 9, rate: 0.9, burst: 3, life: 5 },
+    plasma: { tint: [0.6, 0.31, 0.2], mix: 0.68, fogN: 0.75, fogF: 2.7, hemi: 0xe6a070, sun: 0xffa964, drop: [1, 0.5, 0.2], vz: 32, vx: 24, rate: 1, burst: 3, life: 2.6 },
+    cristais: { tint: [0.52, 0.66, 0.92], mix: 0.58, fogN: 1.15, fogF: 3.5, hemi: 0x9fc0ff, sun: 0xcfe0ff, drop: [0.62, 0.9, 1], vz: -75, vx: 15, rate: 1, burst: 5, life: 2.6, sparkle: true },
+    aurora: { tint: [0.28, 0.54, 0.46], mix: 0.5, fogN: 1.8, fogF: 4.6, hemi: 0x7fe6c0, sun: 0x9effd4, aurora: [0.22, 0.85, 0.58] },
+    acida: { tint: [0.44, 0.56, 0.28], mix: 0.62, fogN: 0.65, fogF: 2.4, hemi: 0xa8c878, sun: 0xd4e68a, drop: [0.6, 0.9, 0.3], vz: -175, vx: 6, rate: 1, burst: 5, life: 1.2 },
   };
   const _cc = new THREE.Color();
-  R.setClimate = function (name) { const c = CLIMATES[name] || null; R.climateCfg = c; scene.fog.near = c ? c.fogNear : 1500; scene.fog.far = c ? c.fogFar : 3200; hemi.color.set(c ? c.hemi : 0x9fb8d6); };
+  R.setClimate = function (name) { const c = CLIMATES[name] || null; R.climateCfg = c; if (!c) { scene.fog.near = 1500; scene.fog.far = 3200; } hemi.color.set(c ? c.hemi : 0x9fb8d6); };
   function spark(x, y, z, col, sp, g) { const i = SP.i++ % SN; const a = Math.random() * TAU; SP.x[i] = x; SP.y[i] = y; SP.z[i] = z; SP.vx[i] = Math.cos(a) * sp * Math.random(); SP.vy[i] = Math.sin(a) * sp * Math.random(); SP.vz[i] = sp * (0.4 + Math.random() * 0.8); SP.t[i] = 0; SP.life[i] = 0.4 + Math.random() * 0.6; sCol[i * 3] = col[0]; sCol[i * 3 + 1] = col[1]; sCol[i * 3 + 2] = col[2]; }
   const boomGeo = new THREE.SphereGeometry(1, 10, 8); const boomMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 1.5, 0.8), transparent: true, opacity: 0.8, depthWrite: false }); const booms = new THREE.InstancedMesh(boomGeo, boomMat, 48); booms.count = 0; booms.frustumCulled = false; scene.add(booms); const boomList = [];
   const decalGeo = new THREE.CircleGeometry(1, 18); decalGeo.rotateX(-Math.PI / 2); const decals = new THREE.InstancedMesh(decalGeo, new THREE.MeshBasicMaterial({ color: 0x0b0908, transparent: true, opacity: 0.55, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }), 160); decals.count = 0; decals.frustumCulled = false; scene.add(decals); const decalList = [];
@@ -2765,6 +2776,7 @@ function create(canvas, overlay, mini) {
     const bg = new THREE.Color().setRGB(0.62 * (1 - nt) + 0.02 * nt, 0.69 * (1 - nt) + 0.03 * nt, 0.77 * (1 - nt) + 0.06 * nt);
     const cl = R.climateCfg;
     if (cl) {
+      const camD = CAM.baseDist / Math.max(0.3, cam.zoom); scene.fog.near = camD * cl.fogN; scene.fog.far = camD * cl.fogF;
       bg.lerp(_cc.setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), cl.mix * (1 - nt * 0.45));
       if (cl.sun) sun.color.lerp(_cc.set(cl.sun), 0.5);
       if (cl.aurora) { const ka = (Math.sin(R.time * 0.3) + 1) / 2; bg.lerp(_cc.setRGB(cl.aurora[0], cl.aurora[1], cl.aurora[2]), 0.14 + 0.2 * ka); hemi.intensity += 0.15 * ka; }
@@ -3305,7 +3317,7 @@ const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-10 16:18Z';
+const BUILD = '2026-10-10 16:30Z';
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
 let G = null; // game state
 ARD.inspect = () => { if (!G || !G.sim) return null; const sim = G.sim; return { tick: sim.tick, time: sim.time, hash: S.hash(sim), human: G.human, waiting: G.waiting, ended: G.ended, mpWait: $('mp-wait') ? $('mp-wait').hidden === false : null, net: G.net ? { state: G.net.state, role: G.net.role, code: G.net.code, desync: G.net.desync, rtt: Math.round(G.net.rtt) } : null, players: sim.players.map(p => ({ id: p.id, name: p.name, faction: p.faction, human: p.human, alive: p.alive, nucleo: !!S.nucleoOf(sim, p.id), units: sim.ents.filter(e => e.alive && e.kind === 'unit' && e.owner === p.id).length })), hashLog: G.hashLog ? Object.assign({}, G.hashLog) : null }; };
