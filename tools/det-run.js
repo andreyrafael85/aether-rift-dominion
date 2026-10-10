@@ -3,7 +3,7 @@
 (function (g) {
   g.ARD_DET = function (seed, ticks) {
     const S = g.ARD.sim, AI = g.ARD.ai;
-    const players = [{ name: 'A', faction: 'vehnar', difficulty: 'normal' }, { name: 'B', faction: 'erevane', difficulty: 'normal' }, { name: 'C', faction: 'tessara', difficulty: 'normal' }];
+    const players = [{ name: 'A', faction: 'vehnar', difficulty: 'normal' }, { name: 'B', faction: 'erevane', difficulty: 'normal' }, { name: 'C', faction: 'quorith', difficulty: 'normal' }, { name: 'D', faction: 'vorag', difficulty: 'normal' }]; // 4.0c: as Raças novas entram no teste entre motores
     const sim = S.createSim({ seed, players, minutes: 25 });
     const ais = sim.players.map(p => AI.create(p.id, p.difficulty));
     const out = [];

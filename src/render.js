@@ -39,7 +39,7 @@ function create(canvas, mini) {
     if (NODE_MODEL[def]) return MD[NODE_MODEL[def]](seed);
     if (def === 'crate') return MD.crate(); if (def === 'wreck') return MD.wreck(); if (def === 'rocks') return MD.rocks(seed); if (def === 'ruin') return MD.ruin(seed); if (def === 'crystals' || def === 'datashards') return MD[def](seed);
     const p = R.sim.players[pid]; const style = p.faction; const col = p.color;
-    const fn = (def === 'pirata' && style === 'vehnar') ? MD.BY_DEF.pirata_vehnar : MD.BY_DEF[def];
+    const fn = (def === 'pirata' && MD.BY_DEF['pirata_' + style]) || MD.BY_DEF[def];
     return fn(col, style);
   }
   R.sprite = function (def, pid, facing, dmg, seed) {
@@ -278,7 +278,7 @@ function create(canvas, mini) {
       if (isUnit && view.sel.has(e.id) && (e.state === 'move' || e.state === 'attackmove')) { const q = P(e.tx, e.ty, 0); c.strokeStyle = e.state === 'attackmove' ? 'rgba(255,94,58,0.35)' : 'rgba(255,255,255,0.2)'; c.lineWidth = 1; c.setLineDash([3, 5]); c.beginPath(); c.moveTo(g[0], g[1]); c.lineTo(q[0], q[1]); c.stroke(); c.setLineDash([]); }
       if (!isUnit && R.night > 0.12 && z > 0.7) { let nL = 0; for (const l of sp.lights) { if (nL++ >= 5) break; lights.push({ x: box.x + l.x * sc, y: box.y + l.y * sc, r: 9 * z, c: l.c, a: 0.55 }); } }
       if (!isUnit && e.built && (e.def === 'reator' && Math.random() < 0.12 || dmg && Math.random() < 0.08)) R.fx.parts.push({ x: wx + (e.def === 'reator' ? e.r * 0.35 : (Math.random() - .5) * e.r), y: wy - (e.def === 'reator' ? e.r * 0.3 : (Math.random() - .5) * e.r), z: e.def === 'reator' ? e.r * 1.1 : e.r * 0.6, vx: 4, vy: -3, vz: 16, t: 0, life: 2.2 + Math.random(), c: dmg ? '#2A2A2E' : '#6A6F78', s: 2.5, smoke: true });
-      if (isUnit && e.state === 'siphon') { const t = sim.byId.get(e.target); if (t && S.dist(e.x, e.y, t.x, t.y) <= S.UNITS.pirata.siphonRange + t.r + 2) { const a = P(wx, wy, 5), b = P(t.x, t.y, t.r * 0.6); c.save(); c.strokeStyle = 'rgba(214,76,255,0.9)'; c.lineWidth = 2.5; c.setLineDash([7, 5]); c.lineDashOffset = -R.time * 80; c.beginPath(); c.moveTo(a[0], a[1]); c.quadraticCurveTo((a[0] + b[0]) / 2, Math.min(a[1], b[1]) - 30 * z, b[0], b[1]); c.stroke(); c.restore(); if (Math.random() < 0.4) R.fx.parts.push({ x: t.x, y: t.y, z: t.r * 0.6, vx: (e.x - t.x) * 1.1, vy: (e.y - t.y) * 1.1, vz: 10, t: 0, life: 0.9, c: '#E08CFF', s: 2.2 }); lights.push({ x: b[0], y: b[1], r: 18 * z, c: '#D64CFF', a: 0.5 }); } }
+      if (isUnit && (e.state === 'siphon' || e.state === 'devour')) { const t = sim.byId.get(e.target); if (t && S.dist(e.x, e.y, t.x, t.y) <= (e.state === 'devour' ? 44 : S.UNITS.pirata.siphonRange) + t.r + 2) { const a = P(wx, wy, 5), b = P(t.x, t.y, t.r * 0.6); c.save(); c.strokeStyle = 'rgba(214,76,255,0.9)'; c.lineWidth = 2.5; c.setLineDash([7, 5]); c.lineDashOffset = -R.time * 80; c.beginPath(); c.moveTo(a[0], a[1]); c.quadraticCurveTo((a[0] + b[0]) / 2, Math.min(a[1], b[1]) - 30 * z, b[0], b[1]); c.stroke(); c.restore(); if (Math.random() < 0.4) R.fx.parts.push({ x: t.x, y: t.y, z: t.r * 0.6, vx: (e.x - t.x) * 1.1, vy: (e.y - t.y) * 1.1, vz: 10, t: 0, life: 0.9, c: '#E08CFF', s: 2.2 }); lights.push({ x: b[0], y: b[1], r: 18 * z, c: '#D64CFF', a: 0.5 }); } }
     }
     // efeitos
     for (const t of R.fx.tracers) { const a = 1 - t.t / t.life; const p1 = P(t.x1, t.y1, 7), p2 = P(t.x2, t.y2, 5); c.strokeStyle = rgba(t.ambush ? '#FFFFFF' : '#9FE8FF', a); c.lineWidth = t.ambush ? 3 : 2; c.beginPath(); c.moveTo(p1[0], p1[1]); c.lineTo(p2[0], p2[1]); c.stroke(); }

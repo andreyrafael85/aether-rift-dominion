@@ -34,12 +34,8 @@ function savePrefs(p) { try { localStorage.setItem('ard-beta-prefs', JSON.string
 // ---------- start screen ----------
 function initStart() {
   const prefs = loadPrefs();
-  // 4.0a — portais de Raça: cor própria por card, prévia das Raças da 4.0b e fundo vivo que acompanha a escolha
-  const RACE_UI = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A' };
-  const RACE_SOON = [
-    { name: 'Coro Quorith', color: '#B388FF', tagline: 'Mente-colmeia de cristal ressonante. Vozes em sincronia, pactos em uníssono.' },
-    { name: 'Prole Vorag', color: '#E6455A', tagline: 'Enxame biológico voraz. Barato, rápido e sempre com fome.' },
-  ];
+  // 4.0a/4.0c — portais das cinco Raças: cor própria por card e fundo vivo que acompanha a escolha
+  const RACE_UI = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
   let raceColor = RACE_UI[prefs.faction] || '#FF5E3A';
   const setRace = c => { raceColor = c; document.documentElement.style.setProperty('--race', c); };
   const facWrap = $('fac-cards'); facWrap.innerHTML = '';
@@ -49,13 +45,6 @@ function initStart() {
     el.innerHTML = `<input type="radio" name="fac" value="${id}" ${((prefs.faction || 'vehnar') === id) ? 'checked' : ''}><div class="fac-body"><div class="fac-name">${f.name}</div><div class="fac-tag">${f.tagline}</div><div class="fac-sup"><b>Líder:</b> ${LEADER_NAME[id] || '—'}. <b>Superarma:</b> ${f.superName}. <b>Pirata:</b> ${f.pirateName}.</div></div>${leaderArt(id) ? `<img class="fac-lead" src="${leaderArt(id)}" alt="">` : ''}`;
     if (ART && ART.world && ART.world[id]) el.style.backgroundImage = `linear-gradient(90deg, rgba(20,23,29,.96) 48%, rgba(20,23,29,.55)), url(${ART.world[id]})`;
     el.querySelector('input').addEventListener('change', () => setRace(RACE_UI[id] || '#FF5E3A'));
-    facWrap.appendChild(el);
-  }
-  for (const r of RACE_SOON) {
-    const el = document.createElement('div'); el.className = 'fac-card soon'; el.style.setProperty('--rc', r.color);
-    const rid = r.name.includes('Quorith') ? 'quorith' : 'vorag';
-    el.innerHTML = `<div class="fac-body"><div class="fac-name">${r.name} <span class="soon-badge">EM BREVE · 4.0c</span></div><div class="fac-tag">${r.tagline}</div><div class="fac-sup"><b>Líder:</b> ${LEADER_NAME[rid]}.</div></div>${leaderArt(rid) ? `<img class="fac-lead" src="${leaderArt(rid)}" alt="">` : ''}`;
-    if (ART && ART.world && ART.world[rid]) el.style.backgroundImage = `linear-gradient(90deg, rgba(20,23,29,.96) 48%, rgba(20,23,29,.55)), url(${ART.world[rid]})`;
     facWrap.appendChild(el);
   }
   setRace(raceColor);
@@ -179,7 +168,7 @@ function startGame(cfg, netCtx) {
   const net = netCtx ? netCtx.net : null;
   const players = cfg.players ? cfg.players.map(p => Object.assign({}, p)) : [{ name: cfg.name, faction: cfg.faction, human: true }];
   const facs = ['vehnar', 'erevane'];
-  const aiNames = { vehnar: ['Fundição Kessari', 'Consórcio Oryn', 'Estaleiro Vey'], erevane: ['Clã Sombrio', 'Náufragos de Ísk', 'Corsários da Faixa'], tessara: ['Linhagem Oriel', 'Ordem do Molde', 'Enxerto Vassi'] };
+  const aiNames = { vehnar: ['Fundição Kessari', 'Consórcio Oryn', 'Estaleiro Vey'], erevane: ['Clã Sombrio', 'Náufragos de Ísk', 'Corsários da Faixa'], tessara: ['Linhagem Oriel', 'Ordem do Molde', 'Enxerto Vassi'], quorith: ['Coro de Zayin', 'Acorde Sétimo', 'Silêncio de Quor'], vorag: ['Prole Velk', 'Ninhada Cega', 'Fome de Oru'] };
   const facsAll = Object.keys(S.FACTIONS).filter(f => f !== cfg.faction).concat([cfg.faction]);
   if (!cfg.players) for (let i = 0; i < parseInt(cfg.opp, 10); i++) { const f = facsAll[i % facsAll.length]; players.push({ name: aiNames[f][i % 3], faction: f, difficulty: cfg.diff }); }
   const sim = S.createSim({ seed: cfg.seed, players, minutes: 25 });
@@ -191,7 +180,7 @@ function startGame(cfg, netCtx) {
   if (!R) { R = ARD.render.create(canvas, mini); overlay.hidden = true; if (want3d) setTimeout(() => notice('3D indisponível neste navegador; usando o modo 2D'), 1200); }
   if (params.get('ssaoout')) R.ssaoOut = parseInt(params.get('ssaoout'), 10);
   if (params.get('testblack')) R.testBlack = true; R.debug = !!params.get('debug');
-  if (R.setQuality) R.setQuality(params.get('q') || cfg.quality || 'auto', { ssao: params.has('ssao') ? params.get('ssao') === '1' : null, shadowMap: params.get('sm') ? parseInt(params.get('sm'), 10) : null, post: params.has('post') ? params.get('post') === '1' : null });
+  if (R.setQuality) R.setQuality(params.get('q') || cfg.quality || 'auto', { msaa: params.has('msaa') ? params.get('msaa') === '1' : null, ssao: params.has('ssao') ? params.get('ssao') === '1' : null, shadowMap: params.get('sm') ? parseInt(params.get('sm'), 10) : null, post: params.has('post') ? params.get('post') === '1' : null });
   if (R.setClimate) R.setClimate(params.get('clima') || cfg.clima || 'auto');
   if (R.is3d) R.onDegrade = (what, reason) => { if (what) banner('Qualidade 3D reduzida', what + ' desativada: ' + reason + '. Se continuar escuro, escolha outra qualidade na tela inicial e envie o feedback.', 'warn'); else banner('Renderização 3D falhou', 'Volte à tela inicial e escolha Gráficos: 2D. Exporte o resultado e envie o feedback.', 'danger'); };
   // protótipo 4.0a: o líder da Raça em "chamada" no canto do HUD (retrato 2.5D renderizado na hora pelo motor voxel)
@@ -356,9 +345,9 @@ function startGame(cfg, netCtx) {
       const prodList = S.producesFor(e.def, p.faction);
       if (e.built && prodList.length) {
         h += '<div class="grid">';
-        for (const ud of prodList) { const u = S.UNITS[ud]; const name = ud === 'pirata' ? fac.pirateName : u.name; h += `<button class="act" data-prod="${ud}" title="${esc(u.desc)}"><img class="ico" alt="" src="${R.icon(ud, human)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span></button>`; }
+        for (const ud of prodList) { const u = S.UNITS[ud]; const name = S.unitName(fac.id, ud); h += `<button class="act" data-prod="${ud}" title="${esc(u.desc)}"><img class="ico" alt="" src="${R.icon(ud, human)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span></button>`; }
         h += '</div>';
-        if (e.queue.length) { h += '<div class="queue">'; e.queue.forEach((q, i) => { h += `<button class="q" data-cancel="${i}" title="Cancelar">${esc(S.UNITS[q.def].name)}${i === 0 ? ` <i>${Math.round(100 * q.t / q.total)}%</i>` : ''} ✕</button>`; }); h += '</div>'; }
+        if (e.queue.length) { h += '<div class="queue">'; e.queue.forEach((q, i) => { h += `<button class="q" data-cancel="${i}" title="Cancelar">${esc(S.unitName(fac.id, q.def))}${i === 0 ? ` <i>${Math.round(100 * q.t / q.total)}%</i>` : ''} ✕</button>`; }); h += '</div>'; }
         h += `<div class="row"><button class="act sm" data-mode="rally">Ponto de reunião</button>${e.def === 'nucleo' ? `<button class="act sm" data-mode="jump" ${p.jumpsLeft > 0 && e.jumpT <= 0 ? '' : 'disabled'}>Salto de Núcleo (${p.jumpsLeft})</button>` : ''}</div>`;
       }
       if (e.built && e.def === 'laboratorio') {
@@ -374,18 +363,18 @@ function startGame(cfg, netCtx) {
       panel.querySelectorAll('[data-cancel]').forEach(b => b.addEventListener('click', () => I.cmd({ t: 'cancel', id: e.id, index: parseInt(b.dataset.cancel, 10) })));
       panel.querySelectorAll('[data-research]').forEach(b => b.addEventListener('click', () => I.cmd({ t: 'research', key: b.dataset.research })));
       panel.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => { if (b.dataset.mode === 'jump') I.setMode('jump'); else I.setMode('rally'); notice(b.dataset.mode === 'jump' ? 'Clique no mapa para escolher o destino do Salto' : 'Clique no mapa para definir o ponto de reunião'); }));
-      const sb = panel.querySelector('[data-super]'); if (sb) sb.addEventListener('click', () => { if (fac.superKey === 'fundicao') { I.setMode('super'); notice('Clique em território seu para derrubar o Bastião'); } else I.cmd({ t: 'super' }); });
+      const sb = panel.querySelector('[data-super]'); if (sb) sb.addEventListener('click', () => superClick(fac));
       return;
     }
     // units
     const counts = {}; for (const u of ents) if (u.kind === 'unit') counts[u.def] = (counts[u.def] || 0) + 1;
     let h = `<div class="ph"><b>${ents.length} unidade${ents.length > 1 ? 's' : ''}</b></div><div class="chips">`;
-    for (const k in counts) h += `<span class="chip">${counts[k]}× ${esc(k === 'pirata' ? fac.pirateName : S.UNITS[k].name)}</span>`;
+    for (const k in counts) h += `<span class="chip">${counts[k]}× ${esc(S.unitName(fac.id, k))}</span>`;
     h += '</div>';
-    if (ents.length === 1) { const u = ents[0]; h += `<div class="hp"><i style="width:${(100 * u.hp / u.maxHp)}%"></i></div><div class="muted small">${fmt(u.hp)} / ${fmt(u.maxHp)} · ${S.CLASS_NAMES[u.cls]}${u.rank ? ' · ' + ['', '★ Veterano', '★★ Elite', '★★★ Lenda'][u.rank] : ''} · ${esc(S.UNITS[u.def].desc)}</div>`; if (u.cargoTotal > 0) h += `<div class="muted small">Carga: ${fmt(u.cargoTotal)}${u.stolen ? ' (roubada)' : ''}</div>`; }
+    if (ents.length === 1) { const u = ents[0]; h += `<div class="hp"><i style="width:${(100 * u.hp / u.maxHp)}%"></i></div><div class="muted small">${fmt(u.hp)} / ${fmt(u.maxHp)} · ${S.CLASS_NAMES[u.cls]}${u.rank ? ' · ' + ['', '★ Veterano', '★★ Elite', '★★★ Lenda'][u.rank] : ''}${u.elo ? ' · Acorde ' + u.elo + (u.elo >= 3 ? ' ♪' : '') : ''} · ${esc(S.UNITS[u.def].desc)}</div>`; if (u.cargoTotal > 0) h += `<div class="muted small">Carga: ${fmt(u.cargoTotal)}${u.stolen ? ' (roubada)' : ''}</div>`; }
     const combat = ents.some(u => S.UNITS[u.def].attack);
     h += `<div class="row">${combat ? `<button class="act sm ${I.mode === 'attackmove' ? 'on' : ''}" data-u="attackmove"><span class="k">A</span> Atacar-mover</button>` : ''}<button class="act sm" data-u="stop"><span class="k">S</span> Parar</button></div>`;
-    if (counts.pirata) h += '<div class="tip">Pirata: clique com o direito em uma Refinaria ou Reator inimigo para Sifonar (40 s). Volte à base para entregar. Se morrer carregado, a carga vira Caixa.</div>';
+    if (counts.pirata) h += '<div class="tip">' + S.unitName(fac.id, 'pirata') + ': clique com o direito em uma Refinaria ou Reator inimigo para Sifonar (40 s). Volte à base para entregar. Se morrer carregado, a carga vira Caixa.' + (fac.devour ? ' Carniceiro: clique direito numa carcaça ou num Nódulo inimigo para devorar (biomassa direto no cofre).' : '') + (fac.silence ? ' Enquanto sifona, torres inimigas a até 110 ficam mudas.' : '') + '</div>';
     if (counts.coletor) h += '<div class="tip">Coletor: colhe sozinho nós dentro do seu território. Clique direito em um nó para escolher manualmente.</div>';
     panel.innerHTML = h;
     panel.querySelectorAll('[data-u]').forEach(b => b.addEventListener('click', () => { if (b.dataset.u === 'stop') I.cmd({ t: 'stop', ids: ents.map(u => u.id) }); else I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'); }));
@@ -414,7 +403,7 @@ function startGame(cfg, netCtx) {
     document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => { if (net) { notice('Velocidade fixa no multiplayer'); return; } G.speed = parseFloat(b.dataset.speed); G.paused = false; refreshTop(); }));
     $('btn-pause').addEventListener('click', () => ui.togglePause());
     $('btn-over').addEventListener('click', () => I.cmd({ t: 'overcharge' }));
-    $('btn-super').addEventListener('click', () => { if (fac().superKey === 'fundicao') { I.setMode('super'); notice('Clique em território seu para derrubar o Bastião'); } else I.cmd({ t: 'super' }); });
+    $('btn-super').addEventListener('click', () => superClick(fac()));
     $('btn-diplo').addEventListener('click', () => openDiplo());
     $('btn-help').addEventListener('click', () => toggleHelp(true));
     $('btn-menu').addEventListener('click', () => ui.confirm('Encerrar esta partida e voltar ao início?', () => location.reload()));
@@ -437,23 +426,31 @@ function startGame(cfg, netCtx) {
     document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => ui.closeModals()));
   }
   function fac() { return S.FACTIONS[sim.players[human].faction]; }
+  const SUPER_TARGETED = { fundicao: 'Clique em território seu para derrubar o Bastião', eclosao: 'Clique num ponto visível para a Eclosão' };
+  function superClick(f) { if (SUPER_TARGETED[f.superKey]) { I.setMode('super'); notice(SUPER_TARGETED[f.superKey]); } else I.cmd({ t: 'super' }); }
 
   // ---------- diplomacy ----------
   function openDiplo() {
     const m = $('diplo'); m.hidden = false; const p = sim.players[human]; let h = '';
-    h += `<div class="muted small">Sua reputação: <b>${S.REP_NAMES[p.rep]}</b>. Pactos cumpridos sobem a reputação; quebrar pactos derruba. Caução: 150 Minério por lado, devolvida ao fim do pacto; quem quebra perde a dele para a vítima.</div>`;
+    // 4.0c — cena frente a frente: seu líder à esquerda, o líder da sala em foco à direita (pacto = sereno, guerra = furioso); passe o mouse ou toque numa linha para trocar
+    const others = sim.players.filter(q => q.id !== human); const focus = others.find(q => q.alive) || others[0];
+    const scene = q => { const pact = q && p.pacts[q.id]; const me = leaderArt(p.faction, pact ? 1 : 2), them = q && leaderArt(q.faction, q.alive ? (pact ? 1 : 2) : 1);
+      return `<div class="dp-side me">${me ? `<img src="${me}" alt="">` : ''}<div><b>${LEADER_NAME[p.faction] || ''}</b><div class="muted small">${S.FACTIONS[p.faction].short} · você</div></div></div><div class="dp-vs">${pact ? '🤝' : '⚔'}</div><div class="dp-side them${q && !q.alive ? ' dead' : ''}" style="--rc2:${q ? q.color : '#888'}"><div style="text-align:right"><b>${q ? (LEADER_NAME[q.faction] || '') : '—'}</b><div class="muted small">${q ? S.FACTIONS[q.faction].short + ' · ' + esc(q.name) + (q.alive ? '' : ' · eliminado') : ''}</div></div>${them ? `<img src="${them}" alt="">` : ''}</div>`; };
+    if (focus) h += `<div class="dp-scene" id="dp-scene">${scene(focus)}</div>`;
+    h += `<div class="muted small">Sua reputação: <b>${S.REP_NAMES[p.rep]}</b>. Pactos cumpridos sobem a reputação; quebrar pactos derruba. Caução: 150 Minério por lado, devolvida ao fim do pacto; quem quebra perde a dele para a vítima.${fac().pactHalf ? ' Como Quorith, sua Caução é 75 e cada pacto cumprido rende o dobro de reputação.' : ''}</div>`;
     for (const q of sim.players) {
       if (q.id === human) continue;
       const pact = p.pacts[q.id]; const pending = sim.pending.find(pr => pr.from === q.id && pr.to === human); const mine = sim.pending.find(pr => pr.from === human && pr.to === q.id);
-      h += `<div class="dp ${q.alive ? '' : 'dead'}"><div class="dp-h">${leaderArt(q.faction) ? `<img class="dp-lead" src="${leaderArt(q.faction)}" alt="">` : ''}<span class="dot" style="background:${q.color}"></span><b>${esc(q.name)}</b> <span class="muted">· ${LEADER_NAME[q.faction] || ''}</span> <span class="muted">· ${S.FACTIONS[q.faction].short} · ${q.alive ? S.REP_NAMES[q.rep] : 'eliminado'}</span></div>`;
+      h += `<div class="dp ${q.alive ? '' : 'dead'}" data-pid="${q.id}"><div class="dp-h">${leaderArt(q.faction) ? `<img class="dp-lead" src="${leaderArt(q.faction)}" alt="">` : ''}<span class="dot" style="background:${q.color}"></span><b>${esc(q.name)}</b> <span class="muted">· ${LEADER_NAME[q.faction] || ''}</span> <span class="muted">· ${S.FACTIONS[q.faction].short} · ${q.alive ? S.REP_NAMES[q.rep] : 'eliminado'}</span></div>`;
       if (!q.alive) { h += '</div>'; continue; }
       if (pact) h += `<div class="small">Não-agressão ativa · restam ${mmss(pact.until - sim.time)}</div><button class="act sm danger" data-break="${q.id}">Quebrar pacto (Golpe de Traição)</button>`;
       else if (pending) h += `<div class="small">Propõe Não-agressão (10 min, Caução 150)</div><div class="row"><button class="act sm good" data-accept="${q.id}">Aceitar</button><button class="act sm" data-decline="${q.id}">Recusar</button></div>`;
       else if (mine) h += `<div class="small muted">Proposta enviada, aguardando resposta</div>`;
-      else h += `<button class="act sm" data-propose="${q.id}" ${p.res.minerio < S.PACT_CAUCAO ? 'disabled' : ''}>Propor Não-agressão (Caução 150)</button>`;
+      else h += `<button class="act sm" data-propose="${q.id}" ${p.res.minerio < S.pactCost(p) ? 'disabled' : ''}>Propor Não-agressão (Caução ${S.pactCost(p)})</button>`;
       h += '</div>';
     }
     $('diplo-body').innerHTML = h;
+    m.querySelectorAll('.dp[data-pid]').forEach(el => { const f = () => { const sc = $('dp-scene'); if (sc) sc.innerHTML = scene(sim.players[parseInt(el.dataset.pid, 10)]); }; el.addEventListener('mouseenter', f); el.addEventListener('click', f); });
     m.querySelectorAll('[data-propose]').forEach(b => b.addEventListener('click', () => { I.cmd({ t: 'propose', to: parseInt(b.dataset.propose, 10) }); setTimeout(openDiplo, 150); }));
     m.querySelectorAll('[data-accept]').forEach(b => b.addEventListener('click', () => { I.cmd({ t: 'respond', to: parseInt(b.dataset.accept, 10), accept: true }); G.pendingFor = null; setTimeout(openDiplo, 150); }));
     m.querySelectorAll('[data-decline]').forEach(b => b.addEventListener('click', () => { I.cmd({ t: 'respond', to: parseInt(b.dataset.decline, 10), accept: false }); G.pendingFor = null; setTimeout(openDiplo, 150); }));
@@ -506,7 +503,7 @@ function startGame(cfg, netCtx) {
     $('end-scores').innerHTML = `<table><thead><tr><th>#</th><th>Jogador</th><th>Domínio</th></tr></thead><tbody>${rows}</tbody></table>`;
     $('end-stats').innerHTML = [['Coletado', fmt(st.collected)], ['Roubado', fmt(st.stolen)], ['Perdido para roubo', fmt(st.lost)], ['Unidades abatidas', st.unitsKilled], ['Unidades perdidas', st.unitsLost], ['Estruturas destruídas', st.buildingsDestroyed], ['Tratados', st.treaties], ['Traições', st.betrayals], ['Reputação final', S.REP_NAMES[p.rep]]].map(([k, v]) => `<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');
     $('btn-again').onclick = () => location.reload();
-    $('btn-copy').onclick = () => { const data = { versao: '4.0b', data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
+    $('btn-copy').onclick = () => { const data = { versao: '4.0c', data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
   }
 
   // ---------- UI bridge for input ----------

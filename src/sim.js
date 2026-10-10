@@ -59,6 +59,24 @@ const FACTIONS = {
     superKey: 'salto', superName: 'Salto Evolutivo',
     superDesc: 'Por 45 s, todas as suas unidades causam +35% de dano. Custa 300 Dados + 200 Plasma.',
   },
+  // 4.0c — Coro Quorith: Elo de Sincronia (acorde entre aliados próximos), pactos pela metade, Ressonador que desafina torres
+  quorith: {
+    id: 'quorith', name: 'Coro Quorith', short: 'Quorith',
+    tagline: 'Mente-colmeia de cristal ressonante. Vozes em sincronia: cada aliado perto afina o acorde (Elo), pactos custam metade e rendem o dobro.',
+    pirateName: 'Ressonador', names: { coletor: 'Afinador', pirata: 'Ressonador' }, lineBonus: false, lotes: false, smoke: false, structNeutralVsVehicle: false,
+    stolenMult: 1.0, cloak: {}, jumps: 1, jumpCostFrac: 0.3, elo: { range: 90, dmg: 0.035, armor: 0.025, cap: 3 }, pactHalf: true, silence: 110,
+    superKey: 'unissono', superName: 'Uníssono',
+    superDesc: 'Por 20 s, todo o exército conta como acorde cheio (Elo máximo) e recebe 25% menos dano. Custa 300 Dados + 200 Plasma.',
+  },
+  // 4.0c — Prole Vorag: unidades baratas que eclodem em pares, Fome fora do território, Carniceiro que devora carcaças e Nódulos
+  vorag: {
+    id: 'vorag', name: 'Prole Vorag', short: 'Vorag',
+    tagline: 'Enxame biológico voraz. Barato, rápido e sempre com fome: Crias eclodem em pares e o Carniceiro devora carcaças e Nódulos.',
+    pirateName: 'Carniceiro', names: { coletor: 'Semeador', pirata: 'Carniceiro' }, lineBonus: false, lotes: false, smoke: false, structNeutralVsVehicle: false,
+    stolenMult: 1.0, cloak: {}, jumps: 1, jumpCostFrac: 0.35, hunger: { def: 'cria', rate: 0.6, floor: 0.4 }, devour: { wreck: 40, wreckMult: 1.5, nodDmg: 30, nodGain: 8, range: 40 },
+    superKey: 'eclosao', superName: 'Eclosão',
+    superDesc: 'Ovos irrompem num ponto visível e liberam 8 Crias por 30 s. Custa 300 Dados + 200 Plasma.',
+  },
 };
 
 const BUILDINGS = {
@@ -98,12 +116,27 @@ const UNITS = {
   esporo:     { name: 'Esporo-sentinela', key: 'E', cls: 'dro', hp: 90, r: 6, speed: 160, cost: { minerio: 70, plasma: 20 }, time: 6, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 330, faction: 'tessara', desc: 'Drone de reconhecimento com sensores muito longos.' },
   molde:      { name: 'Molde', key: 'O', cls: 'sup', hp: 150, r: 9, speed: 75, cost: { minerio: 130, plasma: 20, dados: 20 }, time: 10, energyUse: 2, sensor: 200, faction: 'tessara', aura: { buff: 100 }, desc: 'Sem armas. Suas unidades a até 100 dele causam +15% de dano.' },
   colosso:    { name: 'Colosso Cambiante', key: 'C', cls: 'vei', hp: 1100, r: 16, speed: 48, cost: { minerio: 360, plasma: 90, dados: 30 }, time: 20, energyUse: 6, weapon: 'colosso', sensor: 180, faction: 'tessara', desc: 'Pesado de cerco com canhão de área. Ganha Traços como as outras unidades Tessara.' },
+  // --- Quorith (4.0c)
+  voz:        { name: 'Voz', key: 'Z', cls: 'inf', hp: 95, r: 7, speed: 92, cost: { minerio: 55, dados: 5 }, time: 6, energyUse: 1, weapon: 'pulso_voz', sensor: 170, faction: 'quorith', desc: 'Pulso básico do Coro. Fraca sozinha; em acorde (Elo: +3,5% de dano e +2,5% de armadura por aliado Quorith a até 90, máx. 3) fica letal.' },
+  agulha:     { name: 'Agulha', key: 'G', cls: 'inf', hp: 110, r: 7, speed: 85, cost: { minerio: 100, plasma: 25 }, time: 8, energyUse: 1, weapon: 'agulha', sensor: 220, faction: 'quorith', desc: 'Antiaérea: agulhas ressonantes que estilhaçam drones. Fraca contra veículos e estruturas.' },
+  diapasao:   { name: 'Diapasão', key: 'D', cls: 'sup', hp: 170, r: 9, speed: 72, cost: { minerio: 140, plasma: 20, dados: 30 }, time: 11, energyUse: 3, sensor: 210, faction: 'quorith', aura: { elo: 100 }, desc: 'Sem armas. Amplia o Elo: aliados a até 100 dele aceitam um quarto vizinho no acorde.' },
+  prisma:     { name: 'Prisma', key: 'P', cls: 'vei', hp: 520, r: 12, speed: 60, cost: { minerio: 190, plasma: 50, dados: 10 }, time: 13, energyUse: 3, weapon: 'refrator', sensor: 170, faction: 'quorith', desc: 'Tanque refrator: concentra a onda do Coro num feixe de área.' },
+  monolito:   { name: 'Monólito', key: 'O', cls: 'vei', hp: 780, r: 15, speed: 45, cost: { minerio: 330, plasma: 80, dados: 40 }, time: 19, energyUse: 5, weapon: 'ressonancia', sensor: 190, faction: 'quorith', desc: 'Cerco ressonante: onda lenta e longa que racha estruturas. Quase inútil contra drones.' },
+  harmonico:  { name: 'Harmônico', key: 'H', cls: 'dro', hp: 120, r: 7, speed: 150, cost: { minerio: 110, plasma: 45, dados: 10 }, time: 9, energyUse: 2, flying: true, weapon: 'harmonico', sensor: 230, faction: 'quorith', desc: 'Voador do Coro: acorde aéreo que persegue veículos e suporte.' },
+  // --- Vorag (4.0c)
+  cria:       { name: 'Cria', key: 'K', cls: 'inf', hp: 82, r: 6, speed: 122, cost: { minerio: 22, plasma: 12 }, time: 4.5, energyUse: 0.5, weapon: 'mordida', sensor: 150, faction: 'vorag', pair: true, desc: 'Enxame corpo a corpo; eclode em pares. Fome: fora do seu território perde vida devagar (até 40%).' },
+  cuspidor:   { name: 'Cuspidor', key: 'U', cls: 'inf', hp: 95, r: 7, speed: 90, cost: { minerio: 40, plasma: 30 }, time: 5, energyUse: 1, weapon: 'acido', sensor: 170, faction: 'vorag', desc: 'Cospe ácido a média distância; corrói veículos e estruturas.' },
+  escaravelho: { name: 'Escaravelho', key: 'E', cls: 'vei', hp: 300, r: 11, speed: 120, cost: { minerio: 70, plasma: 60 }, time: 8, energyUse: 2, weapon: 'chifrada', sensor: 190, faction: 'vorag', desc: 'Besta de carga blindada: investida rápida que atropela infantaria.' },
+  brutamonte: { name: 'Brutamonte', key: 'B', cls: 'vei', hp: 1000, r: 16, speed: 52, cost: { minerio: 160, plasma: 130 }, time: 15, energyUse: 4, weapon: 'brutamonte', sensor: 170, faction: 'vorag', desc: 'Tanque biológico: carapaça grossa e golpe de área.' },
+  ferroada:   { name: 'Ferroada', key: 'F', cls: 'dro', hp: 80, r: 6, speed: 170, cost: { minerio: 30, plasma: 50 }, time: 5, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 210, faction: 'vorag', desc: 'Voadora barata com ferrão; em enxame, pica veículos e suporte.' },
 };
 // o que cada estrutura produz, por Raça
 const FACTION_EXTRAS = {
   vehnar:  { quartel: ['soldador', 'guindaste'], fabrica: ['prensa', 'tratorzao'] },
   erevane: { quartel: ['atirador', 'ancora'], fabrica: ['lamina'], hangar: ['mosquito'] },
   tessara: { quartel: ['quimera', 'molde'], hangar: ['esporo'], fabrica: ['colosso'] },
+  quorith: { quartel: ['voz', 'agulha', 'diapasao'], fabrica: ['prisma', 'monolito'], hangar: ['harmonico'] },
+  vorag:   { quartel: ['cria', 'cuspidor'], fabrica: ['escaravelho', 'brutamonte'], hangar: ['ferroada'] },
 };
 function producesFor(def, faction) { const base = (BUILDINGS[def] && BUILDINGS[def].produces) || []; const ex = (FACTION_EXTRAS[faction] || {})[def] || []; return base.concat(ex); }
 
@@ -122,6 +155,17 @@ const WEAPONS = {
   laminas:  { dmg: 24, range: 80,  cd: 0.6, proj: 'beam',   speed: 0,   inacc: 0,  splash: 0,  cls: 'vei' },
   ferrao:   { dmg: 7,  range: 85,  cd: 0.45, proj: 'bullet', speed: 800, inacc: 5, splash: 0,  cls: 'dro' },
   colosso:  { dmg: 60, range: 150, cd: 1.8, proj: 'shell',  speed: 300, inacc: 12, splash: 28, cls: 'vei' },
+  // 4.0c — Quorith
+  pulso_voz: { dmg: 11, range: 115, cd: 0.8, proj: 'beam', speed: 0, inacc: 0, splash: 0, cls: 'inf' },
+  agulha:    { dmg: 16, range: 170, cd: 0.7, proj: 'bullet', speed: 900, inacc: 3, splash: 0, cls: 'inf', versusOverride: { inf: 0.6, vei: 0.5, dro: 2.4, est: 0.3, sup: 0.9 } },
+  refrator:  { dmg: 44, range: 150, cd: 1.5, proj: 'beam', speed: 0, inacc: 0, splash: 20, cls: 'vei' },
+  ressonancia: { dmg: 75, range: 210, cd: 2.6, proj: 'shell', speed: 260, inacc: 10, splash: 30, cls: 'vei', versusOverride: { inf: 0.8, vei: 0.9, dro: 0.3, est: 1.8, sup: 0.9 } },
+  harmonico: { dmg: 14, range: 120, cd: 0.9, proj: 'beam', speed: 0, inacc: 0, splash: 0, cls: 'dro' },
+  // 4.0c — Vorag
+  mordida:   { dmg: 12, range: 26, cd: 0.5, proj: 'beam', speed: 0, inacc: 0, splash: 0, cls: 'inf', versusOverride: { inf: 1.3, vei: 0.8, dro: 0.4, est: 0.9, sup: 1.4 } },
+  acido:     { dmg: 18, range: 130, cd: 1.1, proj: 'shell', speed: 260, inacc: 8, splash: 14, cls: 'inf', versusOverride: { inf: 1.2, vei: 1.1, dro: 0.5, est: 1.1, sup: 1.2 } },
+  chifrada:  { dmg: 30, range: 30, cd: 0.9, proj: 'beam', speed: 0, inacc: 0, splash: 0, cls: 'vei' },
+  brutamonte: { dmg: 55, range: 120, cd: 1.7, proj: 'shell', speed: 300, inacc: 12, splash: 26, cls: 'vei' },
 };
 const COUNTER = {
   inf: { vei: 0.65, dro: 1.5, est: 0.65, sup: 1.5 },
@@ -191,7 +235,7 @@ function createSim(cfg) {
       human: !!pc.human, difficulty: pc.difficulty || 'normal', alive: true,
       res: { plasma: 300, minerio: 500, dados: 40 },
       energy: { prod: 40, cons: 0, ratio: 1, regime: 'pleno' },
-      overchargeT: 0, overchargeCd: 0, superCd: 0, blackoutT: 0, speedBuffT: 0, golpeT: 0,
+      overchargeT: 0, overchargeCd: 0, superCd: 0, blackoutT: 0, speedBuffT: 0, golpeT: 0, unissonoT: 0,
       research: {}, rep: 0, pacts: {}, jumpsLeft: fac.jumps, lastBaseAlert: -99, lastNucleoAlert: -99, saltoT: 0, traits: {}, traitXp: {},
       stats: { collected: 0, stolen: 0, lost: 0, unitsKilled: 0, unitsLost: 0, buildingsDestroyed: 0, buildingsLost: 0, treaties: 0, betrayals: 0, dmg: 0 },
       startAngle: rot + (Math.PI * 2 * i) / n,
@@ -345,9 +389,10 @@ function addUnit(sim, owner, def, x, y) {
     id: sim.nextId++, kind: 'unit', def, cls: d.cls, owner, x, y, px: x, py: y, r: d.r, ang: p.startAngle,
     maxHp: d.hp, hp: d.hp, speed: d.speed, state: 'idle', tx: x, ty: y, target: null, resume: null, cd: 0,
     cargo: { plasma: 0, minerio: 0, dados: 0 }, cargoTotal: 0, stolen: false, cargoCap: d.cargoCap || d.capacity || 0,
-    siphonT: 0, alive: true, lastHitT: -99, lastAttack: -99, cloaked: false, revealT: 0, node: null, xp: 0, rank: 0, aimAng: p.startAngle,
+    siphonT: 0, alive: true, lastHitT: -99, lastAttack: -99, cloaked: false, revealT: 0, node: null, xp: 0, rank: 0, aimAng: p.startAngle, elo: 0,
   };
   if (def === 'pirata' && fac.id === 'vehnar') { e.maxHp = e.hp = 260; e.speed = 72; e.cargoCap = 600; e.r = 11; }
+  if (def === 'pirata' && fac.id === 'vorag') { e.maxHp = e.hp = 200; e.speed = 95; e.r = 10; }
   sim.ents.push(e); sim.byId.set(e.id, e); return e;
 }
 
@@ -460,6 +505,21 @@ function canAfford(p, cost) { for (const k in cost) if ((p.res[k] || 0) < cost[k
 function pay(p, cost, mult) { mult = mult || 1; for (const k in cost) p.res[k] = Math.max(0, p.res[k] - cost[k] * mult); }
 function refund(p, cost, mult) { mult = mult || 1; for (const k in cost) p.res[k] += cost[k] * mult; }
 function hasPact(sim, a, b) { return !!sim.players[a].pacts[b]; }
+function pactCost(p) { return FACTIONS[p.faction].pactHalf ? PACT_CAUCAO / 2 : PACT_CAUCAO; }
+function repGain(p) { return FACTIONS[p.faction].pactHalf ? 2 : 1; }
+function unitName(faction, def) { const f = FACTIONS[faction]; return (f && f.names && f.names[def]) || (def === 'pirata' && f ? f.pirateName : UNITS[def].name); }
+function seesPoint(sim, pid, x, y) { for (const e of sim.ents) { if (!e.alive || e.owner !== pid || (e.kind !== 'unit' && e.kind !== 'building')) continue; if (dist(e.x, e.y, x, y) <= sensorRadius(sim, e)) return true; } return false; }
+// 4.0c — Elo de Sincronia (Quorith): cada aliado de combate da mesma Raça a até `range` soma ao acorde (máx. 3; 4 perto de um Diapasão). Uníssono = acorde cheio.
+function updateElo(sim) {
+  for (const e of sim.ents) {
+    if (!e.alive || e.kind !== 'unit') continue; const p = sim.players[e.owner]; const fac = FACTIONS[p.faction];
+    if (!fac.elo || e.cls === 'civ') { e.elo = 0; continue; }
+    let cap = fac.elo.cap; for (const dp of sim.auras[e.owner].diapasoes) if (dist(dp.x, dp.y, e.x, e.y) <= UNITS.diapasao.aura.elo) { cap++; break; }
+    if (p.unissonoT > 0) { e.elo = cap; continue; }
+    let n = 0; queryGrid(sim, e.x, e.y, fac.elo.range + 40, o => { if (n >= cap || o === e || !o.alive || o.kind !== 'unit' || o.owner !== e.owner || o.cls === 'civ') return; if (dist(e.x, e.y, o.x, o.y) <= fac.elo.range) n++; });
+    e.elo = n;
+  }
+}
 function isEnemy(sim, a, b) { return a !== b && !hasPact(sim, a, b); }
 function sensorRadius(sim, e) {
   if (e.kind !== 'unit' && e.kind !== 'building') return 0;
@@ -553,6 +613,11 @@ function processCommand(sim, c) {
       const t = sim.byId.get(c.target); if (!t || !t.alive || (t.kind !== 'node' && t.kind !== 'wreck')) return;
       ownUnits(sim, c.p, c.ids).forEach(u => { if (u.def === 'coletor') { u.state = 'harvest'; u.node = t.id; u.target = null; } else { u.state = 'move'; u.tx = t.x; u.ty = t.y; } });
       break; }
+    case 'devour': { // Carniceiro (Vorag): carcaças e Nódulos inimigos
+      const t = sim.byId.get(c.target); if (!t || !t.alive || !facOf(sim, c.p).devour) return;
+      if (!(t.kind === 'wreck' || (t.kind === 'building' && t.def === 'nodulo' && t.owner >= 0 && t.owner !== c.p && !hasPact(sim, c.p, t.owner)))) return;
+      ownUnits(sim, c.p, c.ids).forEach(u => { if (u.def === 'pirata') { u.state = 'devour'; u.target = t.id; } else { u.state = 'move'; u.tx = t.x; u.ty = t.y; } });
+      break; }
     case 'siphon': {
       const t = sim.byId.get(c.target); if (!t || !t.alive || t.kind !== 'building' || t.owner === c.p || !canSee(sim, c.p, t)) return;
       if (!(t.def === 'refinaria' || t.def === 'reator') || hasPact(sim, c.p, t.owner)) return;
@@ -610,6 +675,18 @@ function processCommand(sim, c) {
         pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD; p.saltoT = 45;
         for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Salto Evolutivo: +35% de dano por 45 s' : p.name + ' ativou o Salto Evolutivo!', null, null, q.id === c.p ? 'good' : 'danger');
         emit(sim, { t: 'super', p: c.p, kind: 'salto' });
+      } else if (fac.superKey === 'unissono') {
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD; p.unissonoT = 20;
+        for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Uníssono: acorde cheio e 25% menos dano por 20 s' : p.name + ' ativou o Uníssono!', null, null, q.id === c.p ? 'good' : 'danger');
+        emit(sim, { t: 'super', p: c.p, kind: 'unissono' });
+      } else if (fac.superKey === 'eclosao') {
+        if (typeof c.x !== 'number' || typeof c.y !== 'number') return;
+        const ex = clamp(c.x, 40, WORLD - 40), ey = clamp(c.y, 40, WORLD - 40);
+        if (!inTerritory(sim, c.p, ex, ey) && !seesPoint(sim, c.p, ex, ey)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Escolha um ponto visível' }); return; }
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD;
+        for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; const u = addUnit(sim, c.p, 'cria', ex + DM.cos(a) * 22, ey + DM.sin(a) * 22); u.tempUntil = sim.time + 30; u.state = 'attackmove'; u.tx = ex; u.ty = ey; }
+        emit(sim, { t: 'super', p: c.p, kind: 'eclosao', x: ex, y: ey });
+        for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Eclosão: 8 Crias por 30 s' : p.name + ' ativou a Eclosão!', ex, ey, q.id === c.p ? 'good' : 'danger');
       } else {
         pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD; p.speedBuffT = 20;
         for (const q of sim.players) if (q.alive && q.id !== c.p) { q.blackoutT = 20; alertTo(sim, q.id, p.name + ' ativou Blecaute! Sensores e energia a zero por 20 s', null, null, 'danger'); }
@@ -631,7 +708,7 @@ function processCommand(sim, c) {
     case 'propose': {
       const q = sim.players[c.to]; if (!q || !q.alive || c.to === c.p || hasPact(sim, c.p, c.to)) return;
       if (sim.pending.some(pr => pr.from === c.p && pr.to === c.to)) return;
-      if (!canAfford(p, { minerio: PACT_CAUCAO })) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Caução: 150 Minério' }); return; }
+      const cc = pactCost(p); if (!canAfford(p, { minerio: cc })) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Caução: ' + cc + ' Minério' }); return; }
       sim.pending.push({ from: c.p, to: c.to, t: sim.time });
       emit(sim, { t: 'proposal', p: c.to, from: c.p });
       alertTo(sim, c.to, p.name + ' propõe Não-agressão (10 min, Caução 150)', null, null, 'info');
@@ -642,9 +719,10 @@ function processCommand(sim, c) {
       sim.pending.splice(idx, 1);
       const a = sim.players[c.to];
       if (!c.accept) { alertTo(sim, c.to, p.name + ' recusou o pacto', null, null, 'warn'); return; }
-      if (!canAfford(a, { minerio: PACT_CAUCAO }) || !canAfford(p, { minerio: PACT_CAUCAO })) { alertTo(sim, c.to, 'Pacto falhou: Caução insuficiente', null, null, 'warn'); return; }
-      a.res.minerio -= PACT_CAUCAO; p.res.minerio -= PACT_CAUCAO;
-      const pact = { a: a.id, b: p.id, until: sim.time + PACT_DURATION, since: sim.time, caucao: PACT_CAUCAO };
+      const ca = pactCost(a), cp = pactCost(p);
+      if (!canAfford(a, { minerio: ca }) || !canAfford(p, { minerio: cp })) { alertTo(sim, c.to, 'Pacto falhou: Caução insuficiente', null, null, 'warn'); return; }
+      a.res.minerio -= ca; p.res.minerio -= cp;
+      const pact = { a: a.id, b: p.id, until: sim.time + PACT_DURATION, since: sim.time, caucao: PACT_CAUCAO, caucaoA: ca, caucaoB: cp };
       a.pacts[p.id] = pact; p.pacts[a.id] = pact; a.stats.treaties++; p.stats.treaties++;
       alertTo(sim, a.id, 'Pacto de Não-agressão com ' + p.name + ' (10 min)', null, null, 'good');
       alertTo(sim, p.id, 'Pacto de Não-agressão com ' + a.name + ' (10 min)', null, null, 'good');
@@ -654,7 +732,7 @@ function processCommand(sim, c) {
       const pact = p.pacts[c.with]; if (!pact) return;
       const v = sim.players[c.with];
       delete p.pacts[c.with]; delete v.pacts[c.p];
-      v.res.minerio += pact.caucao * 2; // victim gets both deposits
+      v.res.minerio += (pact.caucaoA || pact.caucao) + (pact.caucaoB || pact.caucao); // a vítima fica com as duas cauções
       p.rep = Math.max(-2, p.rep - 1); p.golpeT = 45; p.stats.betrayals++;
       alertTo(sim, c.with, p.name + ' QUEBROU O PACTO! Golpe de Traição ativo por 45 s', null, null, 'danger');
       alertTo(sim, c.p, 'Você quebrou o pacto: +20% de dano por 45 s. Reputação ↓ (' + REP_NAMES[p.rep] + ')', null, null, 'warn');
@@ -706,6 +784,7 @@ function damageMult(sim, a) { // multiplicadores do atacante (pesquisa, Golpe de
   if (a.kind === 'building') m *= regimeOf(sim, a.owner).defF;
   if (a.kind === 'unit') m *= 1 + 0.1 * (a.rank || 0);
   if (p.saltoT > 0) m *= 1.35;
+  if (a.kind === 'unit' && a.elo > 0) m *= 1 + FACTIONS[p.faction].elo.dmg * a.elo; // Elo de Sincronia (Quorith)
   if (a.kind === 'unit' && sim.auras && sim.auras[a.owner].moldes.length) { for (const mo of sim.auras[a.owner].moldes) if (mo !== a && dist(mo.x, mo.y, a.x, a.y) <= UNITS.molde.aura.buff) { m *= 1.15; break; } }
   return m;
 }
@@ -713,6 +792,8 @@ function applyDamage(sim, attackerOwner, attacker, t, dmg, weapon) {
   const q = sim.players[t.owner];
   if (attacker && attacker.kind === 'unit') { const p0 = sim.players[attacker.owner]; if (FACTIONS[p0.faction].traits) { const tc = armorOf(t); const tr = p0.traits[attacker.def]; if (tr && tr[tc]) dmg *= 1.25; } }
   if (q && q.research.blindagem) dmg *= 0.87;
+  if (q && t.kind === 'unit' && t.elo > 0) dmg *= 1 - FACTIONS[q.faction].elo.armor * t.elo;
+  if (q && q.unissonoT > 0 && t.kind === 'unit') dmg *= 0.75;
   if (t.kind === 'unit') dmg *= 1 - 0.07 * (t.rank || 0);
   t.hp -= dmg; t.lastHitT = sim.time; t.lastHitBy = attackerOwner;
   const p = sim.players[attackerOwner]; if (p) p.stats.dmg += dmg;
@@ -905,6 +986,8 @@ function updateUnit(sim, u, dt) {
   if (u.cd > 0) u.cd -= dt;
   if (u.revealT > 0) u.revealT -= dt;
   const fac = facOf(sim, u.owner);
+  if (u.tempUntil && sim.time >= u.tempUntil) { kill(sim, u, -1); return; } // Crias da Eclosão
+  if (fac.hunger && u.def === fac.hunger.def && !u.tempUntil && sim.tick % 10 === 0 && !inTerritory(sim, u.owner, u.x, u.y)) { const floor = u.maxHp * fac.hunger.floor; if (u.hp > floor) u.hp = Math.max(floor, u.hp - fac.hunger.rate); }
   u.cloaked = !!fac.cloak[u.def] && u.state !== 'siphon' && (sim.time - u.lastAttack) > 3;
   if (!u.cloaked && u.def !== 'ancora' && sim.auras && sim.auras[u.owner].anchors.length && (sim.time - u.lastAttack) > 3) { for (const an of sim.auras[u.owner].anchors) if (dist(an.x, an.y, u.x, u.y) <= UNITS.ancora.aura.cloak) { u.cloaked = true; break; } }
   if (d.heal && sim.tick % 5 === 0) { queryGrid(sim, u.x, u.y, d.heal.range + 40, e => { if (!e.alive || e.owner !== u.owner || e === u || (e.kind !== 'unit' && e.kind !== 'building')) return; if (dist(u.x, u.y, e.x, e.y) > d.heal.range || e.hp >= e.maxHp) return; if (e.kind === 'building' && !e.built) return; e.hp = Math.min(e.maxHp, e.hp + (e.kind === 'unit' ? d.heal.unit : d.heal.building) * dt * 5); }); }
@@ -963,9 +1046,20 @@ function updateUnit(sim, u, dt) {
           if (take > 0) { v.res[k] -= take; u.cargo[k] += take; u.cargoTotal += take; v.stats.lost += take; }
         }
         u.stolen = u.cargoTotal > 0; u.victim = b.owner;
+        if (fac.silence) queryGrid(sim, u.x, u.y, fac.silence + 40, e => { if (e.alive && e.kind === 'building' && BUILDINGS[e.def].attack && isEnemy(sim, u.owner, e.owner) && dist(u.x, u.y, e.x, e.y) <= fac.silence) e.cd = Math.max(e.cd || 0, 0.6); });
         emit(sim, { t: 'siphon', x1: u.x, y1: u.y, x2: b.x, y2: b.y, owner: u.owner });
         if (u.siphonT >= d.siphonMax || u.cargoTotal >= u.cargoCap - 0.01) { u.state = 'return'; u.siphonT = 0; }
       } else moveToward(sim, u, b.x, b.y, dt);
+      break; }
+    case 'devour': { // Carniceiro (Vorag): come carcaças (150% do valor) e corrói Nódulos inimigos em biomassa
+      const t = sim.byId.get(u.target); const dv = fac.devour;
+      if (!t || !t.alive || !dv || (t.kind === 'wreck' ? t.amount <= 0 : (t.owner === u.owner || !isEnemy(sim, u.owner, t.owner)))) { u.state = 'idle'; u.target = null; if (u.devoured > 0) { emit(sim, { t: 'float', x: u.x, y: u.y, text: '+' + Math.round(u.devoured), owner: u.owner, kind: 'gain' }); u.devoured = 0; } break; }
+      if (dist(u.x, u.y, t.x, t.y) <= dv.range + t.r) {
+        const p = sim.players[u.owner]; const inc = p.human ? 1 : (DIFFICULTY[p.difficulty] || DIFFICULTY.normal).income;
+        if (t.kind === 'wreck') { const take = Math.min(t.amount, dv.wreck * dt); t.amount -= take; const gain = take * dv.wreckMult * inc; p.res.minerio += gain; p.stats.collected += gain; u.devoured = (u.devoured || 0) + gain; }
+        else { applyDamage(sim, u.owner, u, t, dv.nodDmg * dt, null); const gain = dv.nodGain * dt * inc; p.res.minerio += gain; p.stats.collected += gain; u.devoured = (u.devoured || 0) + gain; if (sim.tick % 50 === 0) alertTo(sim, t.owner, 'Carniceiro devorando seu Nódulo!', t.x, t.y, 'danger'); }
+        u.lastAttack = sim.time; emit(sim, { t: 'siphon', x1: u.x, y1: u.y, x2: t.x, y2: t.y, owner: u.owner });
+      } else moveToward(sim, u, t.x, t.y, dt);
       break; }
     case 'pickup': {
       const c = sim.byId.get(u.target);
@@ -1024,6 +1118,7 @@ function updateBuilding(sim, b, dt) {
       const u = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang) * (b.r + 14), b.y + DM.sin(ang) * (b.r + 14));
       if (b.rally) { u.state = 'move'; u.tx = b.rally.x + (sim.rand() - 0.5) * 30; u.ty = b.rally.y + (sim.rand() - 0.5) * 30; }
       emit(sim, { t: 'spawn', p: b.owner, x: u.x, y: u.y, def: it.def });
+      if (UNITS[it.def].pair) { const u2 = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang + 0.5) * (b.r + 14), b.y + DM.sin(ang + 0.5) * (b.r + 14)); if (b.rally) { u2.state = 'move'; u2.tx = b.rally.x + (sim.rand() - 0.5) * 30; u2.ty = b.rally.y + (sim.rand() - 0.5) * 30; } emit(sim, { t: 'spawn', p: b.owner, x: u2.x, y: u2.y, def: it.def }); }
     }
   }
   if (d.attack && b.cd <= 0) {
@@ -1103,8 +1198,8 @@ function updatePacts(sim) {
       done.add(pact);
       const a = sim.players[pact.a], b = sim.players[pact.b];
       delete a.pacts[b.id]; delete b.pacts[a.id];
-      a.res.minerio += pact.caucao; b.res.minerio += pact.caucao;
-      a.rep = Math.min(2, a.rep + 1); b.rep = Math.min(2, b.rep + 1);
+      a.res.minerio += pact.caucaoA || pact.caucao; b.res.minerio += pact.caucaoB || pact.caucao;
+      a.rep = Math.min(2, a.rep + repGain(a)); b.rep = Math.min(2, b.rep + repGain(b));
       if (a.alive) alertTo(sim, a.id, 'Pacto cumprido com ' + b.name + '. Caução devolvida. Reputação ↑ (' + REP_NAMES[a.rep] + ')', null, null, 'good');
       if (b.alive) alertTo(sim, b.id, 'Pacto cumprido com ' + a.name + '. Caução devolvida. Reputação ↑ (' + REP_NAMES[b.rep] + ')', null, null, 'good');
     }
@@ -1162,12 +1257,13 @@ function step(sim) {
     if (p.overchargeT > 0) p.overchargeT -= dt;
     if (p.blackoutT > 0) p.blackoutT -= dt;
     if (p.speedBuffT > 0) p.speedBuffT -= dt;
-    if (p.golpeT > 0) p.golpeT -= dt; if (p.saltoT > 0) p.saltoT -= dt;
+    if (p.golpeT > 0) p.golpeT -= dt; if (p.saltoT > 0) p.saltoT -= dt; if (p.unissonoT > 0) p.unissonoT -= dt;
     computeEnergy(sim, p, dt);
   }
   updatePacts(sim);
-  sim.auras = sim.players.map(() => ({ anchors: [], moldes: [] }));
-  for (const e of sim.ents) { if (!e.alive || e.kind !== 'unit') continue; if (e.def === 'ancora') sim.auras[e.owner].anchors.push(e); else if (e.def === 'molde') sim.auras[e.owner].moldes.push(e); }
+  sim.auras = sim.players.map(() => ({ anchors: [], moldes: [], diapasoes: [] }));
+  for (const e of sim.ents) { if (!e.alive || e.kind !== 'unit') continue; if (e.def === 'ancora') sim.auras[e.owner].anchors.push(e); else if (e.def === 'molde') sim.auras[e.owner].moldes.push(e); else if (e.def === 'diapasao') sim.auras[e.owner].diapasoes.push(e); }
+  if (sim.tick % 5 === 0) updateElo(sim);
   for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'building') updateBuilding(sim, e, dt); }
   for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'unit') updateUnit(sim, e, dt); else if (e.kind === 'proj') { e.px = e.x; e.py = e.y; updateProjectile(sim, e, dt); } else if (e.kind === 'wreck' && (e.amount <= 0 || sim.time - e.bornT > 150)) e.alive = false; }
   separate(sim);
@@ -1205,6 +1301,6 @@ ARD.sim = {
   SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS, FACTION_EXTRAS, producesFor,
   NAV, NW, TILE, TILES, BIOMES, navIdx, passable, flowField, lineFree, inStorm,
   DM,
-  createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius,
+  createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint,
 };
 })(globalThis.ARD = globalThis.ARD || {});

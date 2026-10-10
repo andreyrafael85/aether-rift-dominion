@@ -103,7 +103,8 @@ ARD.vox = { Model, renderSprite, drawShadow, hex, rgb };
 'use strict';
 const M = () => new ARD.vox.Model();
 const dark = '#2A2D33', steel = '#7A8290', steel2 = '#5E6671', glass = '#8FD8FF', rust = '#8A5A3A', orange = '#FF8C1A', magenta = '#D64CFF', plasma = '#FF6A3D', green = '#7FE3A1', yellow = '#F2C230', lamp = '#FFE08A';
-const pal = (col, style) => style === 'erevane' ? { body: '#3B4049', acc: col, trim: yellow, light: magenta } : style === 'tessara' ? { body: '#DDD4C2', acc: col, trim: '#9A6B3F', light: green } : { body: col, acc: steel2, trim: steel, light: lamp };
+const pal = (col, style) => style === 'erevane' ? { body: '#3B4049', acc: col, trim: yellow, light: magenta } : style === 'tessara' ? { body: '#DDD4C2', acc: col, trim: '#9A6B3F', light: green }
+  : style === 'quorith' ? { body: '#E6E0F5', acc: col, trim: '#8A6FD9', light: '#D9C8FF' } : style === 'vorag' ? { body: '#4A2630', acc: col, trim: '#E8DCC8', light: '#FF6A6A' } : { body: col, acc: steel2, trim: steel, light: lamp };
 
 // ---------- unidades ----------
 function tank(col, style) {
@@ -226,6 +227,33 @@ function colossus(col, style) { // Colosso Cambiante: mech grande com placas org
   return m;
 }
 // ---------- partes giratórias (casco + torreta) ----------
+// ---------- 4.0c: Coro Quorith (cristal ressonante, núcleo luminoso, sem frente óbvia) ----------
+const ell = (x, y, z, w, d, h) => ((x + .5 - w / 2) / (w / 2)) ** 2 + ((y + .5 - d / 2) / (d / 2)) ** 2 + ((z + .5 - h / 2) / (h / 2)) ** 2 <= 1;
+const disc = (x, y, z, w, d) => ((x + .5 - w / 2) / (w / 2)) ** 2 + ((y + .5 - d / 2) / (d / 2)) ** 2 <= 1;
+function crystal(m, cx, cy, z0, r, h, col, core) { // bipirâmide facetada com núcleo luminoso
+  for (let z = 0; z < h; z++) { const rr = Math.max(0.5, r * (1 - Math.abs(z + 0.5 - h / 2) / (h / 2))); const w = Math.max(1, Math.round(rr * 2)); m.box(Math.round(cx - w / 2), Math.round(cy - w / 2), z0 + z, w, w, 1, col, (x, y, _z, ww, dd) => (x + .5 - ww / 2) ** 2 + (y + .5 - dd / 2) ** 2 <= (ww / 2) ** 2 + 0.3); }
+  if (core) m.box(Math.round(cx) - 1, Math.round(cy) - 1, z0 + Math.floor(h / 2) - 1, 2, 2, 2, core, null, true);
+}
+function voice(col, style) { const p = pal(col, style); const m = M(); crystal(m, 3, 3, 1, 2.2, 8, p.body, p.light); m.box(1, 1, 0, 4, 4, 1, p.acc, (x, y) => (x === 0 || x === 3) !== (y === 0 || y === 3)); m.box(6, 2, 4, 2, 2, 1, p.acc); return m; }
+function needle(col, style) { const p = pal(col, style); const m = M(); crystal(m, 3, 3, 0, 2.2, 5, p.body, p.light); for (const [x, y] of [[0, 0], [5, 0], [0, 5], [5, 5]]) m.box(x, y, 3, 1, 1, 5, p.trim); m.box(6, 2, 2, 5, 2, 1, p.trim); m.box(10, 2, 2, 1, 2, 1, p.light, null, true); return m; }
+function tuningFork(col, style) { const p = pal(col, style); const m = M(); m.cyl(4, 4, 0, 3.4, 1, p.acc); m.cyl(4, 4, 1, 2, 1, p.body); m.box(3, 3, 2, 2, 2, 3, p.trim); m.box(3, 1, 5, 2, 1, 9, p.trim); m.box(3, 6, 5, 2, 1, 9, p.trim); m.box(3, 1, 13, 2, 1, 1, p.light, null, true); m.box(3, 6, 13, 2, 1, 1, p.light, null, true); m.box(3, 3, 6, 2, 2, 1, p.light, null, true); return m; }
+function prism(col, style) { const p = pal(col, style); const m = M(); m.box(0, 0, 0, 13, 1, 2, dark); m.box(0, 8, 0, 13, 1, 2, dark); m.box(0, 1, 0, 13, 7, 3, p.body, (x, y, z, w) => !(z === 2 && x > w - 4)); m.box(1, 2, 3, 7, 5, 1, p.acc); crystal(m, 5, 4.5, 4, 2.6, 6, p.body, p.light); m.box(12, 3, 1, 1, 3, 1, p.light, null, true); return m; }
+function monolith(col, style) { const p = pal(col, style); const m = M(); m.box(0, 0, 0, 11, 8, 2, dark); m.box(1, 1, 2, 9, 6, 1, p.acc); m.box(3, 2, 3, 5, 4, 15, p.body); m.box(5, 2, 5, 1, 1, 11, p.light, null, true); m.box(5, 5, 5, 1, 1, 11, p.light, null, true); for (const [x, y] of [[0, 0], [9, 0], [0, 6], [9, 6]]) crystal(m, x + 1, y + 1, 2, 1.1, 4, p.trim, null); return m; }
+function harmonic(col, style) { const p = pal(col, style); const m = M(); crystal(m, 4.5, 4.5, 1, 2.4, 6, p.body, p.light); m.box(0, 0, 3, 9, 1, 1, p.trim, (x) => x !== 4); m.box(0, 8, 3, 9, 1, 1, p.trim, (x) => x !== 4); m.box(8, 4, 3, 2, 1, 1, p.acc); return m; }
+function resonator(col, style) { // Ressonador: carro baixo com broca de cristal
+  const p = pal(col, style); const m = M(); m.box(0, 0, 0, 10, 1, 2, dark); m.box(0, 6, 0, 10, 1, 2, dark); m.box(0, 1, 1, 10, 5, 3, p.body); m.box(2, 2, 4, 5, 3, 1, p.acc); crystal(m, 4, 3.5, 5, 1.6, 5, p.body, p.light);
+  m.box(10, 2, 1, 2, 3, 2, p.trim); m.box(12, 3, 1, 2, 2, 2, p.trim); m.box(14, 3, 1, 1, 1, 1, p.light, null, true); return m;
+}
+// ---------- 4.0c: Prole Vorag (quitina úmida, membranas e patas demais) ----------
+function legs(m, xs, y0, y1, z) { for (const x of xs) { m.box(x, y0, 0, 1, 1, z, dark); m.box(x, y1, 0, 1, 1, z, dark); } }
+function spawnling(col, style) { const p = pal(col, style); const m = M(); m.sphere(3, 3.5, 2.2, 2, p.body); m.sphere(6, 3.5, 2, 1.5, p.body); m.box(7, 2, 1, 2, 1, 1, p.trim); m.box(7, 4, 1, 2, 1, 1, p.trim); m.box(2, 3, 4, 3, 1, 1, p.acc); legs(m, [2, 4], 0, 6, 2); m.box(7, 2, 2, 1, 1, 1, p.light, null, true); m.box(7, 4, 2, 1, 1, 1, p.light, null, true); return m; }
+function spitter(col, style) { const p = pal(col, style); const m = M(); m.sphere(4, 4, 3, 2.5, p.body); m.sphere(1.5, 4, 3.5, 2, '#B8E66A'); m.sphere(7, 4, 3, 1.6, p.body); m.box(8, 3, 3, 3, 2, 1, p.trim); m.box(3, 2, 5, 3, 4, 1, p.acc, (x, y) => (x + y) % 2 === 0); legs(m, [2, 4, 6], 1, 7, 2); m.box(8, 3, 4, 1, 1, 1, p.light, null, true); m.box(8, 4, 4, 1, 1, 1, p.light, null, true); return m; }
+function beetle(col, style) { const p = pal(col, style); const m = M(); m.box(1, 1, 1, 10, 8, 4, p.body, ell); m.box(2, 2, 5, 7, 6, 1, p.acc, disc); m.box(5, 4, 5, 1, 2, 1, p.trim); m.box(11, 4, 2, 3, 2, 2, p.body); m.box(13, 4, 3, 3, 1, 1, p.trim); m.box(14, 5, 4, 1, 1, 2, p.trim); legs(m, [2, 5, 8], 0, 9, 2); m.box(12, 3, 3, 1, 1, 1, p.light, null, true); m.box(12, 6, 3, 1, 1, 1, p.light, null, true); return m; }
+function brute(col, style) { const p = pal(col, style); const m = M(); m.box(0, 0, 1, 16, 12, 8, p.body, ell); m.box(2, 1, 8, 12, 10, 1, p.acc, disc); for (const [x, y] of [[4, 3], [4, 8], [8, 2], [8, 9], [11, 4], [11, 7]]) m.box(x, y, 9, 1, 1, 3, p.trim); m.sphere(16, 6, 4, 3, p.body); m.box(18, 3, 2, 3, 1, 2, p.trim); m.box(18, 8, 2, 3, 1, 2, p.trim); for (const x of [2, 7, 12]) { m.box(x, 0, 0, 2, 2, 3, dark); m.box(x, 10, 0, 2, 2, 3, dark); } m.box(18, 4, 5, 1, 1, 1, p.light, null, true); m.box(18, 7, 5, 1, 1, 1, p.light, null, true); return m; }
+function stinger(col, style) { const p = pal(col, style); const m = M(); m.box(3, 2, 1, 5, 3, 2, p.body); m.sphere(2.5, 3.5, 2, 1.8, p.acc); m.box(0, 3, 1, 1, 1, 1, p.trim); m.sphere(8.5, 3.5, 2.2, 1.3, p.body); m.box(2, 0, 3, 5, 1, 1, '#FFE8E8'); m.box(2, 6, 3, 5, 1, 1, '#FFE8E8'); m.box(9, 3, 2, 1, 1, 1, p.light, null, true); m.box(9, 4, 2, 1, 1, 1, p.light, null, true); return m; }
+function butcher(col, style) { // Carniceiro: corcunda com mandíbulas e saco de biomassa
+  const p = pal(col, style); const m = M(); m.sphere(5, 4, 3, 3, p.body); m.sphere(2, 4, 4, 2.2, p.acc); m.box(8, 2, 2, 3, 1, 2, p.trim); m.box(8, 5, 2, 3, 1, 2, p.trim); m.box(10, 3, 2, 1, 2, 1, p.trim); legs(m, [2, 4, 6], 0, 8, 3); m.box(8, 3, 4, 1, 1, 1, p.light, null, true); m.box(8, 4, 4, 1, 1, 1, p.light, null, true); return m;
+}
 function tankHull(col, style) {
   const p = pal(col, style); const m = M();
   m.box(0, 0, 0, 14, 3, 3, dark, (x, y, z) => !(z === 2 && (x % 3 === 1)));
@@ -407,6 +435,8 @@ const BY_DEF = {
   coletor: harvester, infantaria: infantry, veiculo: tank, drone: drone, suporte: support, pirata: raider, pirata_vehnar: tug,
   veiculo_hull: tankHull, veiculo_turret: tankTurret, torre_base: towerBase, torre_turret: towerTurret, bastiao_base: bastionBase, bastiao_turret: bastionTurret,
   soldador: flamer, guindaste: crane, tratorzao: buggy, prensa: mech, atirador: sniper, lamina: blade, mosquito: gnat, ancora: anchor, quimera: infantry, esporo: drone, molde: support, colosso: colossus,
+  voz: voice, agulha: needle, diapasao: tuningFork, prisma: prism, monolito: monolith, harmonico: harmonic, pirata_quorith: resonator,
+  cria: spawnling, cuspidor: spitter, escaravelho: beetle, brutamonte: brute, ferroada: stinger, pirata_vorag: butcher,
 };
 // defs que se desenham em duas partes: casco na direção do corpo e torreta na direção da mira; z = altura da torreta em voxels
 const PARTS = { veiculo: { hull: 'veiculo_hull', turret: 'veiculo_turret', z: 6 }, torre: { hull: 'torre_base', turret: 'torre_turret', z: 12 }, bastiao: { hull: 'bastiao_base', turret: 'bastiao_turret', z: 14 } };

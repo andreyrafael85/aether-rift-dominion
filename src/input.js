@@ -57,12 +57,18 @@ function create(o) {
     const units = ownSelectedUnits(); const t = pick(sx, sy, I.lastType === 'touch' ? 22 : 10);
     if (!units.length) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice('Ponto de reunião definido'); } return; }
     const ids = units.map(u => u.id);
-    if (t && (t.kind === 'node' || t.kind === 'wreck')) { cmd({ t: 'harvest', ids, target: t.id }); view.marker = { x: t.x, y: t.y, t: R.time, col: '#7FE3A1' }; return; }
+    if (t && (t.kind === 'node' || t.kind === 'wreck')) {
+      const eaters = t.kind === 'wreck' && S.FACTIONS[sim.players[human].faction].devour ? units.filter(u => u.def === 'pirata') : []; // Carniceiro (Vorag) devora a carcaça
+      if (eaters.length) { cmd({ t: 'devour', ids: eaters.map(u => u.id), target: t.id }); const rest = units.filter(u => u.def !== 'pirata').map(u => u.id); if (rest.length) cmd({ t: 'harvest', ids: rest, target: t.id }); }
+      else cmd({ t: 'harvest', ids, target: t.id });
+      view.marker = { x: t.x, y: t.y, t: R.time, col: '#7FE3A1' }; return;
+    }
     if (t && t.kind === 'crate') { cmd({ t: 'pickup', ids, target: t.id }); view.marker = { x: t.x, y: t.y, t: R.time, col: '#F2C230' }; return; }
     if (t && t.owner >= 0 && t.owner !== human) {
       const doIt = () => {
         const pirates = units.filter(u => u.def === 'pirata'); const others = units.filter(u => u.def !== 'pirata');
         if (pirates.length && t.kind === 'building' && (t.def === 'refinaria' || t.def === 'reator')) cmd({ t: 'siphon', ids: pirates.map(u => u.id), target: t.id });
+        else if (pirates.length && t.kind === 'building' && t.def === 'nodulo' && S.FACTIONS[sim.players[human].faction].devour) cmd({ t: 'devour', ids: pirates.map(u => u.id), target: t.id });
         else if (pirates.length) cmd({ t: 'move', ids: pirates.map(u => u.id), x: t.x, y: t.y });
         if (others.length) cmd({ t: 'attack', ids: others.map(u => u.id), target: t.id });
         view.marker = { x: t.x, y: t.y, t: R.time, col: '#FF5E3A' };
@@ -153,7 +159,7 @@ function create(o) {
     if (!d.moved && Math.hypot(sx - d.sx, sy - d.sy) > 7) { d.moved = true; clearTimeout(I.longPress); }
     if (!d.moved) return;
     if (I.wallDrag) { const [wx1, wy1] = R.screenToWorld(cam, sx, sy); view.wallGhost = wallSegments(I.wallDrag.x, I.wallDrag.y, wx1, wy1, view.ghost.def); return; }
-    const panning = d.button === 1 || (d.type === 'touch' && !I.touchBox) || (d.button === 0 && I.keys.has('Space'));
+    const panning = d.button === 1 || d.button === 2 || (d.type === 'touch' && !I.touchBox) || (d.button === 0 && I.keys.has('Space')); // 4.0c: botão direito arrastando também move o mapa
     if (panning) { const [dwx, dwy] = R.screenDeltaToWorld(cam, sx - d.sx, sy - d.sy); cam.x = d.camx - dwx; cam.y = d.camy - dwy; clampCam(); view.box = null; }
     else if (d.button === 0 && I.mode === 'normal') view.box = { x0: d.sx, y0: d.sy, x1: sx, y1: sy };
   });
@@ -210,12 +216,19 @@ function create(o) {
     const sp = 900 * dt / cam.zoom; let dx = 0, dy = 0;
     if (I.keys.has('KeyW') || I.keys.has('ArrowUp')) dy -= 1; if (I.keys.has('KeyS') && !ownSelectedUnits().length || I.keys.has('ArrowDown')) dy += 1;
     if (I.keys.has('KeyA') && !ownSelectedUnits().length || I.keys.has('ArrowLeft')) dx -= 1; if (I.keys.has('KeyD') || I.keys.has('ArrowRight')) dx += 1;
-    // edge pan (mouse only, when pointer inside canvas)
-    if (I.lastSX != null && !I.down && I.pointers.size === 0 && I.edgePanEnabled) { const m = 18; if (I.lastSX < m) dx -= 0.7; if (I.lastSX > R.w - m) dx += 0.7; if (I.lastSY < m) dy -= 0.7; if (I.lastSY > R.h - m) dy += 0.7; }
+    // 4.0c — rolagem de borda pela janela inteira (só mouse): continua rolando com o ponteiro sobre a barra do navegador ou a barra de tarefas,
+    // porque a última posição conhecida fica na borda até o ponteiro voltar. Para ao arrastar, com modal aberto ou sem foco na página.
+    if (I.edge.mouse && I.edge.x != null && !I.down && I.pointers.size === 0 && document.hasFocus() && !document.querySelector('.modal:not([hidden])')) {
+      const m = 14, W = window.innerWidth, Hh = window.innerHeight;
+      if (I.edge.x < m) dx -= 0.7; if (I.edge.x > W - m) dx += 0.7; if (I.edge.y < m) dy -= 0.7; if (I.edge.y > Hh - m) dy += 0.7;
+    }
     if (dx || dy) { const [dwx, dwy] = R.screenDeltaToWorld(cam, dx * sp * cam.zoom, dy * sp * cam.zoom); cam.x += dwx; cam.y += dwy; clampCam(); if (view.ghost) updateGhost(I.lastSX || R.w / 2, I.lastSY || R.h / 2); }
   };
-  canvas.addEventListener('pointerenter', e => { I.edgePanEnabled = e.pointerType === 'mouse'; });
-  canvas.addEventListener('pointerleave', () => { I.edgePanEnabled = false; I.lastSX = null; I.lastSY = null; });
+  canvas.addEventListener('pointerleave', () => { I.lastSX = null; I.lastSY = null; });
+  I.edge = { x: null, y: null, mouse: false };
+  window.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') { I.edge.mouse = false; return; } I.edge.mouse = true; I.edge.x = e.clientX; I.edge.y = e.clientY; }, { passive: true });
+  window.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') { I.edge.x = e.clientX; I.edge.y = e.clientY; } }, { passive: true });
+  window.addEventListener('blur', () => { I.edge.x = null; I.edge.y = null; });
   return I;
 }
 ARD.input = { create };

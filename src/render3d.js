@@ -27,7 +27,9 @@ function create(canvas, overlay, mini) {
   function buildComposer() {
     if (composer) { composer.dispose && composer.dispose(); composer = null; bloomPass = null; ssaoPass = null; }
     if (!ADD || !R.quality.post) return;
-    composer = new ADD.EffectComposer(renderer); composer.setPixelRatio(R.quality.pr);
+    // 4.0c: MSAA 4x no alvo do composer (mesma técnica do hero da galeria) nos presets Alta/Ultra; o watchdog desliga se a GPU não aguentar
+    const rt = R.quality.msaa ? new THREE.WebGLRenderTarget(R.w || 800, R.h || 600, { type: THREE.HalfFloatType, samples: 4 }) : undefined;
+    composer = new ADD.EffectComposer(renderer, rt); composer.setPixelRatio(R.quality.pr);
     // r160: SSAOPass nao renderiza a cena; ele le o buffer do passe anterior. O RenderPass precisa vir SEMPRE antes.
     composer.addPass(new ADD.RenderPass(scene, camera));
     if (R.quality.ssao) { ssaoPass = new ADD.SSAOPass(scene, camera, R.w || 800, R.h || 600); ssaoPass.kernelRadius = 24; ssaoPass.minDistance = 0.0006; ssaoPass.maxDistance = 0.04; if (R.ssaoOut != null) ssaoPass.output = R.ssaoOut;
@@ -59,6 +61,7 @@ function create(canvas, overlay, mini) {
   function degrade(reason) {
     const q = R.quality; let what = null;
     if (q.ssao) { q.ssao = false; what = 'oclusão ambiente'; buildComposer(); }
+    else if (q.msaa) { q.msaa = false; what = 'anti-aliasing MSAA'; buildComposer(); }
     else if (q.post) { q.post = false; what = 'pós-processamento (bloom)'; buildComposer(); }
     else if (q.shadows && q.shadowMap > 2048) { q.shadowMap = 2048; what = 'sombras 4K (agora 2K)'; applyShadows(); }
     else if (q.shadows) { q.shadows = false; what = 'sombras'; applyShadows(); }
@@ -70,10 +73,10 @@ function create(canvas, overlay, mini) {
   R.setQuality = function (name, over) {
     const q = R.quality; q.name = name; over = over || {};
     if (name === 'auto') name = isTouch ? 'baixa' : 'media';
-    if (name === 'baixa') { q.shadows = false; q.post = false; q.ssao = false; q.pr = 1; q.particles = 0.5; }
-    else if (name === 'alta' || name === 'ultra') { q.shadows = true; q.shadowMap = 4096; q.post = !!ADD; q.ssao = name === 'ultra' && !!ADD; q.pr = Math.min(2, window.devicePixelRatio || 1); q.particles = 1; }
-    else { q.shadows = !isTouch; q.shadowMap = 2048; q.post = !!ADD; q.ssao = false; q.pr = Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1); q.particles = 1; }
-    if (over.ssao != null) q.ssao = over.ssao && !!ADD; if (over.shadowMap) q.shadowMap = over.shadowMap; if (over.post != null) q.post = over.post && !!ADD;
+    if (name === 'baixa') { q.shadows = false; q.post = false; q.ssao = false; q.msaa = false; q.pr = 1; q.particles = 0.5; }
+    else if (name === 'alta' || name === 'ultra') { q.shadows = true; q.shadowMap = 4096; q.post = !!ADD; q.ssao = name === 'ultra' && !!ADD; q.msaa = !!ADD && !isTouch && !!(renderer.capabilities && renderer.capabilities.isWebGL2); q.pr = Math.min(2, window.devicePixelRatio || 1); q.particles = 1; }
+    else { q.shadows = !isTouch; q.shadowMap = 2048; q.post = !!ADD; q.ssao = false; q.msaa = false; q.pr = Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1); q.particles = 1; }
+    if (over.ssao != null) q.ssao = over.ssao && !!ADD; if (over.msaa != null) q.msaa = over.msaa && !!ADD; if (over.shadowMap) q.shadowMap = over.shadowMap; if (over.post != null) q.post = over.post && !!ADD;
     renderer.setPixelRatio(q.pr); applyShadows(); buildComposer(); armWatchdog();
   };
   const octx = overlay.getContext('2d'); const mctx = mini.getContext('2d'); const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
@@ -161,7 +164,11 @@ function create(canvas, overlay, mini) {
     vehnar: { roughness: 0.55, metalness: 0.45, rim: [1.0, 0.5, 0.2], pow: 3.2, amt: 0.2 },
     erevane: { roughness: 0.36, metalness: 0.22, rim: [0.2, 1.0, 0.82], pow: 2.1, amt: 0.48 },
     tessara: { roughness: 0.85, metalness: 0.02, rim: [0.45, 1.0, 0.55], pow: 1.7, amt: 0.4 },
+    quorith: { roughness: 0.22, metalness: 0.08, rim: [0.72, 0.55, 1.0], pow: 1.5, amt: 0.75 }, // cristal: arestas emissivas, bloom alto
+    vorag: { roughness: 0.28, metalness: 0.04, rim: [0.95, 0.3, 0.38], pow: 2.6, amt: 0.32 }, // quitina úmida: specular forte, borda carmim
   };
+  const SPIN = { voz: 1.6, harmonico: 2.2, diapasao: 0.8, monolito: 0.35 }; // Quorith gira para "olhar"
+
   const raceMats = new Map();
   function matFor(pid) {
     if (pid == null || pid < 0 || !R.sim || !R.sim.players[pid]) return matMain;
@@ -179,7 +186,7 @@ function create(canvas, overlay, mini) {
     if (NODE_MODEL[def]) return MD[NODE_MODEL[def]](seed);
     if (def === 'crate') return MD.crate(); if (def === 'wreck') return MD.wreck(); if (def === 'rocks') return MD.rocks(seed); if (def === 'ruin') return MD.ruin(seed);
     if (def.startsWith('prop_')) return MD.props[def.slice(5)](seed);
-    const p = R.sim.players[pid]; const fn = (def === 'pirata' && p.faction === 'vehnar') ? MD.BY_DEF.pirata_vehnar : MD.BY_DEF[def]; return fn(p.color, p.faction);
+    const p = R.sim.players[pid]; const fn = (def === 'pirata' && MD.BY_DEF['pirata_' + p.faction]) || MD.BY_DEF[def]; return fn(p.color, p.faction);
   }
   function geoOf(def, pid, seed) { const key = def + '|' + pid + '|' + (seed || 0); let g = R.geos.get(key); if (!g) { g = X.buildGeometry(modelFor(def, pid, seed), { emBoost: 1.8 }); R.geos.set(key, g); } return g; }
   function instOf(def, pid, seed, ghost) {
@@ -202,7 +209,7 @@ function create(canvas, overlay, mini) {
   R.icon = function (def, pid) { const key = def + '|' + pid; let u = R.icons.get(key); if (u) return u; const sp = R.sprite(def, pid, 0, false, 0); const cv = document.createElement('canvas'); cv.width = 48; cv.height = 48; const c = cv.getContext('2d'); const sc = Math.min(44 / sp.w, 44 / sp.h); c.imageSmoothingEnabled = sc < 1; c.drawImage(sp.canvas, (48 - sp.w * sc) / 2, (48 - sp.h * sc) / 2, sp.w * sc, sp.h * sc); u = cv.toDataURL(); R.icons.set(key, u); return u; };
   R.prepare = function (sim, onProgress, onDone) {
     R.sim = sim; buildTerrain(sim); const jobs = [];
-    for (const p of sim.players) { for (const def in S.BUILDINGS) jobs.push([def, p.id, 0]); for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'torre_base', 'torre_turret', 'drone', 'suporte', 'pirata', 'bastiao_base', 'bastiao_turret']) jobs.push([def, p.id, 0]); }
+    for (const p of sim.players) { for (const def in S.BUILDINGS) jobs.push([def, p.id, 0]); for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'torre_base', 'torre_turret', 'drone', 'suporte', 'pirata', 'bastiao_base', 'bastiao_turret']) jobs.push([def, p.id, 0]); for (const def in S.UNITS) if (S.UNITS[def].faction === p.faction) jobs.push([def, p.id, 0]); }
     for (const res in NODE_MODEL) for (let s = 0; s < 4; s++) jobs.push([res, -1, s]);
     for (let s = 0; s < 6; s++) { jobs.push(['rocks', -1, s]); jobs.push(['ruin', -1, s]); } jobs.push(['crate', -1, 0]); jobs.push(['wreck', -1, 0]);
     for (const p of sim.players) if (MD.props[p.faction]) for (let s = 0; s < 4; s++) jobs.push(['prop_' + p.faction, -1, s]);
@@ -328,7 +335,7 @@ function create(canvas, overlay, mini) {
       if (!own && !vis.has(e.id)) continue;
       const isUnit = e.kind === 'unit'; const [wx, wy] = isUnit ? lerp(e, alpha) : [e.x, e.y]; const ud = isUnit ? S.UNITS[e.def] : S.BUILDINGS[e.def];
       const parts = MD.PARTS[e.def]; const hullDef = parts ? parts.hull : e.def; const it = instOf(hullDef, e.owner, 0); const g = it.geo; const fit = fitOf(e, g);
-      const zz = isUnit && ud.flying ? 14 : 0; const moving = isUnit && (e.x !== e.px || e.y !== e.py); const bob = moving && (e.def === 'infantaria' || e.def === 'quimera' || e.def === 'soldador' || e.def === 'atirador') ? Math.abs(Math.sin(R.time * 11 + e.id)) * 1.2 : moving && (e.def === 'prensa' || e.def === 'colosso') ? Math.abs(Math.sin(R.time * 5 + e.id)) * 2.2 : 0;
+      const zz = isUnit && ud.flying ? 14 : 0; const moving = isUnit && (e.x !== e.px || e.y !== e.py); const bob = moving && (e.def === 'infantaria' || e.def === 'quimera' || e.def === 'soldador' || e.def === 'atirador' || e.def === 'agulha') ? Math.abs(Math.sin(R.time * 11 + e.id)) * 1.2 : moving && (e.def === 'cria' || e.def === 'cuspidor') ? Math.abs(Math.sin(R.time * 15 + e.id)) * 1.0 : moving && (e.def === 'prensa' || e.def === 'colosso' || e.def === 'brutamonte') ? Math.abs(Math.sin(R.time * 5 + e.id)) * 2.2 : (e.def === 'voz' || e.def === 'diapasao' || e.def === 'monolito' || e.def === 'prisma') ? 2 + Math.sin(R.time * 2.5 + e.id) * 1.2 : 0;
       const dmg = !isUnit && e.built && e.hp < e.maxHp * 0.5; const tint = e.cloaked ? 0.55 : dmg ? 0.6 : 1;
       if (!isUnit && !e.built) { // 4.0a — nascimento de construção com assinatura por Raça
         const pr = Math.min(1, Math.max(0.04, e.progress || 0)); const fac2 = (sim.players[e.owner] || {}).faction; const pp = R.quality.particles;
@@ -340,19 +347,27 @@ function create(canvas, overlay, mini) {
           const pulse = 1 + Math.sin(R.time * 6.5 + e.id) * 0.08 * (1 - pr);
           put(it, wx, wy, zz, (e.ang || 0), fit * (0.4 + 0.6 * pr) * pulse, (0.18 + 0.82 * pr * pr) * pulse, 0.65 + 0.35 * pr);
           if (Math.random() < 0.1 * pp) smoke(wx + (Math.random() - .5) * e.r, wy + (Math.random() - .5) * e.r, 5, [0.35, 0.85, 0.5], 1.6, 12);
+        } else if (fac2 === 'quorith') { // cristaliza do chão em facetas, afinando até o acorde final
+          const steps = 6, t6 = pr * steps, k = Math.floor(t6), fr = Math.min(1, (t6 - k) * 1.6); const ring = 1 + Math.sin(R.time * 18 + e.id) * 0.3 * (1 - pr);
+          put(it, wx, wy, zz, ud.wall ? (e.ang || 0) : 0, fit * (0.55 + 0.45 * pr), Math.max(0.08, (k + fr) / steps), (0.8 + 0.5 * (1 - pr)) * ring);
+          if (Math.random() < 0.16 * pp) spark(wx + (Math.random() - .5) * e.r * 1.4, wy + (Math.random() - .5) * e.r * 1.4, ((k + fr) / steps) * g.height * fit * 0.9 + 2, [0.72, 0.55, 1], 30, true);
+        } else if (fac2 === 'vorag') { // casulo úmido: irrompe, pulsa, estica e rompe na estrutura final
+          const pulse = 1 + Math.sin(R.time * 9 + e.id) * 0.12 * (1 - pr); const burst = pr > 0.85 ? 1 + 0.15 * Math.sin((pr - 0.85) / 0.15 * Math.PI) : 1;
+          put(it, wx, wy, zz, ud.wall ? (e.ang || 0) : 0, fit * (0.35 + 0.65 * pr) * pulse * burst, (0.15 + 0.85 * pr) * pulse, 0.55 + 0.45 * pr);
+          if (Math.random() < 0.12 * pp) smoke(wx + (Math.random() - .5) * e.r, wy + (Math.random() - .5) * e.r, 4, [0.75, 0.3, 0.35], 1.4, 10);
         } else { // vehnar e neutro: módulos empilham em degraus com soldagem e vapor
           const t5 = pr * 5, k = Math.floor(t5), fr = Math.min(1, (t5 - k) * 1.5);
           put(it, wx, wy, zz, ud.wall ? (e.ang || 0) : 0, fit, Math.max(0.08, (k + fr) / 5), 0.7 + 0.3 * pr);
           if (Math.random() < 0.2 * pp) spark(wx + (Math.random() - .5) * e.r * 1.3, wy + (Math.random() - .5) * e.r * 1.3, ((k + fr) / 5) * g.height * fit * 0.9 + 2, [1, 0.82, 0.45], 42, true);
           if (Math.random() < 0.07 * pp) smoke(wx, wy, 4, [0.5, 0.5, 0.52], 1.5, 14);
         }
-      } else put(it, wx, wy, zz + bob, isUnit || ud.wall ? (e.ang || 0) : 0, fit, 1, tint);
+      } else put(it, wx, wy, zz + bob, (isUnit || ud.wall ? (e.ang || 0) : 0) + (isUnit && SPIN[e.def] ? R.time * SPIN[e.def] : 0), fit, 1, tint);
       if (parts && (isUnit || e.built)) { const tt = instOf(parts.turret, e.owner, 0); put(tt, wx, wy, zz + bob + parts.z * fit, e.aimAng != null ? e.aimAng : (e.ang || 0), fit, 1, tint); }
       if (view.sel.has(e.id)) { nSel = ring(nSel, wx, wy, e.r + 5); if (!isUnit && ud.attack && nRange < 32) { _p.set(wx, H(wx, wy) + 0.6, -wy); _s.set(ud.attack.range, 1, ud.attack.range); _q.identity(); _m.compose(_p, _q, _s); rangeRings.setMatrixAt(nRange++, _m); } }
       if (e.hp < e.maxHp - 0.5 || view.sel.has(e.id) || (isUnit && e.rank > 0)) hpList.push({ x: wx, y: wy, z: zz + g.height * fit + 4, w: Math.max(16, e.r * 1.4), frac: e.hp / e.maxHp, rank: isUnit ? e.rank : 0, cloak: e.cloaked && own, r: e.r });
       if (!isUnit && e.built && (e.def === 'nucleo' || e.def === 'reator' || e.def === 'laboratorio' || e.def === 'bastiao')) emitters.push({ x: wx, y: wy, z: e.def === 'nucleo' ? 40 * fit / 1 : g.height * fit * 0.9, col: e.def === 'reator' ? 0xff8c1a : e.def === 'laboratorio' ? 0x7fe3a1 : 0xff6a3d, d: Math.hypot(wx - cam.x, wy - cam.y) });
       if (!isUnit && e.built && (e.def === 'reator' && Math.random() < 0.1 || dmg && Math.random() < 0.08)) smoke(wx + (e.def === 'reator' ? e.r * 0.35 : (Math.random() - .5) * e.r), wy - (e.def === 'reator' ? e.r * 0.3 : (Math.random() - .5) * e.r), e.def === 'reator' ? e.r * 1.1 : e.r * 0.6, dmg ? [0.15, 0.15, 0.17] : [0.4, 0.42, 0.46], 2.2 + Math.random(), 16);
-      if (isUnit && e.state === 'siphon' && nBeam < BEAMS) { const t = sim.byId.get(e.target); if (t && S.dist(e.x, e.y, t.x, t.y) <= S.UNITS.pirata.siphonRange + t.r + 2) { const l = beams[nBeam++]; l.visible = true; const pa = l.geometry.attributes.position; pa.setXYZ(0, wx, H(wx, wy) + 5, -wy); pa.setXYZ(1, t.x, H(t.x, t.y) + t.r * 0.6, -t.y); pa.needsUpdate = true; if (Math.random() < 0.4) spark(t.x, t.y, t.r * 0.6, [0.85, 0.5, 1], 12, true); } }
+      if (isUnit && (e.state === 'siphon' || e.state === 'devour') && nBeam < BEAMS) { const t = sim.byId.get(e.target); if (t && S.dist(e.x, e.y, t.x, t.y) <= (e.state === 'devour' ? 44 : S.UNITS.pirata.siphonRange) + t.r + 2) { const l = beams[nBeam++]; l.visible = true; const pa = l.geometry.attributes.position; pa.setXYZ(0, wx, H(wx, wy) + 5, -wy); pa.setXYZ(1, t.x, H(t.x, t.y) + t.r * 0.6, -t.y); pa.needsUpdate = true; if (Math.random() < 0.4) spark(t.x, t.y, t.r * 0.6, e.state === 'devour' ? [1, 0.35, 0.4] : [0.85, 0.5, 1], 12, true); } }
     }
     for (let i = nBeam; i < BEAMS; i++) beams[i].visible = false;
     for (const [id, m] of view.memory) { if (vis.has(id)) continue; const it = instOf(MD.PARTS[m.def] ? MD.PARTS[m.def].hull : m.def, m.owner, 0); put(it, m.x, m.y, 0, 0, 2 * S.BUILDINGS[m.def].r * 1.25 / it.geo.width, 1, 0.45); }
