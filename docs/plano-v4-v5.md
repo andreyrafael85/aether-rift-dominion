@@ -76,6 +76,8 @@ Regra geral de identidade: cada Raça tem biologia própria, **nascimento de con
 - **Paleta/materiais**: carmim `#e6455a` e osso, specular úmido, pulsação por vertex animation, membranas translúcidas.
 - **IAs de escaramuça**: "Prole Velk", "Ninhada Cega", "Fome de Oru".
 
+**Líderes (nomes e retratos aprovados em 2026-10-10)**: Vehnar · **Barão-Forja** (retrato triunfante); Erevane · **Vesper Ísk** (retrato furioso); Tessara · **Sylva Oriel** (retrato furioso); Quorith · **Zayin Coral** (retrato furioso); Vorag · **Oru Voraz** (retrato sereno). Cada líder tem três expressões (sereno, furioso, triunfante) usadas pelo retrato no HUD, que reage aos avisos da partida.
+
 ---
 
 ## 2. Reformulação gráfica e redesign 3D (v4.0)

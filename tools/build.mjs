@@ -6,7 +6,14 @@ const read = p => readFileSync(root + p, 'utf8');
 const HEAD = '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark">';
 function wrap(page) { const i = page.indexOf('</style>') + 8; return HEAD + page.slice(0, i) + '</head><body>' + page.slice(i) + '</body></html>'; }
 const BUILD = new Date().toISOString().slice(0, 16).replace('T', ' ') + 'Z';
-function bundle(tpl, scripts) { return read(tpl).replace('<!--SCRIPTS-->', '<script>\n' + scripts.map(read).join('\n') + '\n</script>').replace(/__BUILD__/g, BUILD); }
+import { readdirSync } from 'node:fs';
+import { existsSync as exists } from 'node:fs';
+function artBundle() { // arte aprovada (assets/*.jpg) vira ARD.ART no bundle do jogo
+  const dir = root + 'assets/'; if (!exists(dir)) return ''; const art = { leader: {}, world: {}, insignia: {} };
+  for (const f of readdirSync(dir)) { if (!f.endsWith('.jpg')) continue; const data = 'data:image/jpeg;base64,' + readFileSync(dir + f).toString('base64'); const m = f.match(/^(leader|world|insignia)-([a-z]+)(?:-(\d))?\.jpg$/); if (f === 'hero-belt.jpg') art.hero = data; else if (m) { if (m[1] === 'leader') (art.leader[m[2]] = art.leader[m[2]] || [])[+m[3] - 1] = data; else art[m[1]][m[2]] = data; } }
+  return '<script>window.ARD=window.ARD||{};ARD.ART=' + JSON.stringify(art) + ';</script>\n';
+}
+function bundle(tpl, scripts) { return read(tpl).replace('<!--SCRIPTS-->', (tpl === 'src/index.tpl.html' ? artBundle() : '') + '<script>\n' + scripts.map(read).join('\n') + '\n</script>').replace(/__BUILD__/g, BUILD); }
 mkdirSync(root + 'dist', { recursive: true });
 const game = bundle('src/index.tpl.html', ['src/sim.js', 'src/ai.js', 'src/voxel.js', 'src/models.js', 'src/vox3d.js', 'src/leaders.js', 'src/render.js', 'src/render3d.js', 'src/audio.js', 'src/net.js', 'src/input.js', 'src/main.js']);
 writeFileSync(root + 'dist/aether-rift-beta.html', game); writeFileSync(root + 'index.html', wrap(game));

@@ -18,7 +18,7 @@ B.vehnar = () => { const m = M(); const steel = '#9aa6b8', dk = '#596274', rust 
   m.box(-7, -1, 15, 2, 2, 1, ember, null, true); m.box(-7, 17, 15, 2, 2, 1, ember, null, true); // brasa no topo
   m.box(-2, 7, 7, 4, 4, 1, org, null, true);              // núcleo do reator no peito
   return m; };
-// ---- Erevane: Olho do Véu — cúpula iridescente, olho-fenda, colar de lâminas
+// ---- Erevane: Vesper Ísk — cúpula iridescente, olho-fenda, colar de lâminas
 B.erevane = () => { const m = M(); const bands = ['#2a4a66', '#33587a', '#3b6a8a', '#2f6f7a', '#3c6e9a'];
   m.cyl(0, 9, 0, 9, 4, '#223447');                       // ombros
   m.cyl(0, 9, 4, 7, 2, '#2d4660');
@@ -29,7 +29,7 @@ B.erevane = () => { const m = M(); const bands = ['#2a4a66', '#33587a', '#3b6a8a
   m.box(5, 4, 14, 2, 10, 1, '#071017'); m.box(5, 4, 17, 2, 10, 1, '#071017');
   m.box(-1, 2, 20, 1, 1, 1, '#9fe8ff', null, true); m.box(2, 14, 21, 1, 1, 1, '#9fe8ff', null, true); // brilhos iridescentes
   return m; };
-// ---- Tessara: Jardineira de Traços — cabeça bulbosa, frondes, seiva âmbar
+// ---- Tessara: Sylva Oriel — cabeça bulbosa, frondes, seiva âmbar
 B.tessara = () => { const m = M(); const g = '#49a86a', gd = '#2f7a4a', amber = '#e6b85c', eye = '#7fffb0';
   m.cyl(0, 9, 0, 9, 4, gd); m.cyl(0, 9, 4, 5.5, 3, gd);         // ombros orgânicos e pescoço
   m.box(-2, 7, 5, 4, 4, 2, amber, null, true);                   // seiva no peito
@@ -38,7 +38,7 @@ B.tessara = () => { const m = M(); const g = '#49a86a', gd = '#2f7a4a', amber = 
   m.box(6, 8, 12, 1, 2, 1, amber, null, true);                   // boca-núcleo
   for (const [fx, fy, h] of [[-3, 4, 8], [0, 9, 10], [-2, 14, 7], [3, 6, 6], [2, 12, 6]]) { m.box(fx, fy, 20, 1, 1, h, g); m.box(fx, fy, 20 + h, 1, 1, 1, amber, null, true); } // frondes com ponta âmbar
   return m; };
-// ---- Quorith: Primeira Voz — octaedro de cristal sólido flutuando sobre um anel
+// ---- Quorith: Zayin Coral — octaedro de cristal sólido flutuando sobre um anel
 B.quorith = () => { const m = M(); const top = '#d4b8ff', mid = '#b388ff', low = '#6d50b8', w = '#ffffff';
   m.cyl(0, 9, 0, 7, 2, '#5a4a8a'); m.cyl(0, 9, 2, 5, 1, '#7a68b0'); m.cyl(0, 9, 1, 2, 3, mid, true); // anel-base com núcleo
   const oct = (z0, h, c) => m.box(-8, 1, z0, 17, 17, h, c, (x, y, z, ww, dd) => Math.abs(x - 8) + Math.abs(y - 8) + Math.abs((z + z0) - 14) <= 8);
@@ -46,7 +46,7 @@ B.quorith = () => { const m = M(); const top = '#d4b8ff', mid = '#b388ff', low =
   m.box(7, 6, 13, 1, 2, 1, w, null, true); m.box(7, 10, 13, 1, 2, 1, w, null, true); // fendas de luz na faceta frontal
   m.box(-10, 2, 12, 2, 2, 3, mid); m.box(8, 16, 17, 2, 2, 3, top); m.box(-4, 18, 20, 1, 1, 2, w, null, true); // lascas flutuantes
   return m; };
-// ---- Vorag: Boca da Prole — carapaça larga, quatro olhos, mandíbula de osso
+// ---- Vorag: Oru Voraz — carapaça larga, quatro olhos, mandíbula de osso
 B.vorag = () => { const m = M(); const red = '#b8384a', red2 = '#86202f', hot = '#ff6a7c', bone = '#f0e6d2', amber = '#ffc24a', dkk = '#3a0c14';
   m.cyl(0, 9, 0, 9, 4, red2); m.box(-4, 5, 4, 8, 8, 3, red2);           // tórax e pescoço
   m.box(-6, 0, 7, 12, 18, 8, red);                                       // cabeça larga

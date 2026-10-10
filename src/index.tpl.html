@@ -32,7 +32,9 @@ h1 span{background:linear-gradient(90deg,var(--rift1),var(--rift2));-webkit-back
 .start-grid{display:grid;gap:1rem;grid-template-columns:1fr}
 @media(min-width:760px){.start-grid{grid-template-columns:1.2fr 1fr}}
 .fac-cards{display:grid;gap:.75rem}
-.fac-card{display:block;border:1px solid var(--line);border-radius:8px;padding:.9rem 1rem;background:var(--panel);cursor:pointer;position:relative}
+.fac-card{display:flex;gap:.8rem;align-items:center;border:1px solid var(--line);border-radius:8px;padding:.8rem .9rem;background:var(--panel);background-size:cover;background-position:center;cursor:pointer;position:relative;overflow:hidden}
+.fac-body{flex:1;min-width:0;position:relative}
+.fac-lead{width:84px;height:84px;border-radius:10px;border:2px solid var(--rc,var(--line));object-fit:cover;flex:none;box-shadow:0 0 14px color-mix(in srgb,var(--rc,#fff) 40%,transparent);position:relative}
 .fac-card input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .fac-card:has(input:checked){border-color:var(--rift1);box-shadow:0 0 0 1px var(--rift1) inset}
 .fac-name{font-family:var(--fd);font-weight:700;font-size:1.5rem;text-transform:uppercase}
@@ -183,7 +185,12 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 .sf-legal{font-family:var(--fm);font-size:11px;color:var(--fg2)}
 #leader{position:absolute;left:12px;top:52px;width:124px;z-index:3;--pc:var(--race,#FF5E3A)}
 #leader .lframe{position:relative;width:118px;height:118px;border:2px solid var(--pc);border-radius:6px;background:radial-gradient(70% 70% at 50% 65%,color-mix(in srgb,var(--pc) 28%,transparent),#060709 80%);overflow:hidden;box-shadow:0 0 16px color-mix(in srgb,var(--pc) 45%,transparent)}
-#leader img{position:absolute;left:50%;bottom:-6px;width:96px;transform:translateX(-50%);animation:lfloat 4s ease-in-out infinite;image-rendering:auto}
+#leader img.lport{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:lbreath 5s ease-in-out infinite;transform-origin:50% 60%}
+#leader img.lvox{position:absolute;left:50%;bottom:-6px;width:96px;transform:translateX(-50%);animation:lfloat 4s ease-in-out infinite}
+#leader .lbadge{position:absolute;right:-4px;bottom:-4px;width:34px;height:34px;border-radius:50%;border:2px solid var(--pc);background:#0b0d12;object-fit:cover;box-shadow:0 0 8px color-mix(in srgb,var(--pc) 50%,transparent)}
+@keyframes lbreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+#leader.mood img.lport{animation:lpop .5s ease-out}
+@keyframes lpop{0%{transform:scale(1.12)}100%{transform:scale(1)}}
 #leader .lscan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 2px,transparent 2px 5px);pointer-events:none}
 #leader .lframe::after{content:"";position:absolute;left:0;right:0;top:-40%;height:30%;background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--pc) 35%,transparent),transparent);animation:lsweep 3.4s linear infinite}
 #leader .lname{font-family:var(--fd);font-size:17px;text-transform:uppercase;letter-spacing:.04em;margin-top:4px;text-shadow:0 1px 6px #000}
@@ -200,7 +207,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 <div id="start" class="screen">
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Versão 4.0a · as Raças da Fenda · 3D · salas multiplayer de 2 a 4 jogadores</div>
+    <div class="eyebrow">Versão 4.0b · as Raças da Fenda · 3D · salas multiplayer de 2 a 4 jogadores</div>
     <h1>Aether Rift<br><span>Dominion</span></h1>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -251,7 +258,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
       <span class="muted">Inimigos: <b id="enemies">0</b></span>
       <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-sound" class="tb" title="Som">♪</button><button id="btn-voice" class="tb" title="Voz do sistema">🗣</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
     </div>
-    <div id="leader" hidden><div class="lframe"><img id="leader-img" alt=""><div class="lscan"></div></div><div class="lname" id="leader-name"></div><div class="lsub">● em chamada</div></div>
+    <div id="leader" hidden><div class="lframe"><img id="leader-img" class="lport" alt=""><div class="lscan"></div><img id="leader-badge" class="lbadge" alt="" hidden></div><div class="lname" id="leader-name"></div><div class="lsub" id="leader-sub">● em chamada</div></div>
     <div id="hints"><button id="hints-close" aria-label="Fechar dicas">✕</button><div id="hints-body"></div></div>
     <div id="panel"></div>
     <div id="right">
@@ -273,10 +280,10 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     <div id="proposal" hidden><div id="proposal-text"></div><div class="row"><button id="prop-yes" class="act sm good">Aceitar pacto</button><button id="prop-no" class="act sm">Recusar</button></div></div>
   </div>
 
-  <div id="loading" class="modal" hidden><div class="box" style="max-width:360px"><div class="eyebrow">Preparando o campo</div><h2>Gerando sprites</h2><p class="muted small">Modelos voxel renderizados em 8 direções com iluminação, só nesta primeira vez.</p><div class="loadbar"><i id="load-bar"></i></div></div></div>
+  <div id="loading" class="modal" hidden><div class="box" style="max-width:360px"><img id="load-leader" alt="" hidden style="width:96px;height:96px;border-radius:12px;object-fit:cover;float:right;margin:0 0 .5rem .8rem;border:2px solid var(--line)"><div class="eyebrow">Preparando o campo</div><h2>Gerando sprites</h2><p class="muted small">Modelos voxel renderizados em 8 direções com iluminação, só nesta primeira vez.</p><div class="loadbar"><i id="load-bar"></i></div></div></div>
   <div id="diplo" class="modal" hidden><div class="box"><h2>Diplomacia</h2><div id="diplo-body"></div><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
   <div id="confirm" class="modal" hidden><div class="box"><h2>Confirmar</h2><p id="confirm-text"></p><div class="row"><button id="confirm-yes" class="btn primary">Confirmar</button><button id="confirm-no" class="btn">Cancelar</button></div></div></div>
-  <div id="end" class="modal" hidden><div class="box"><div class="eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-again" class="btn primary">Jogar de novo</button><button id="btn-copy" class="btn">Copiar resultado (JSON)</button><a class="btn" href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Enviar feedback</a></div><textarea id="end-json" hidden rows="6" style="width:100%;font-family:var(--fm);font-size:11px;background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px"></textarea></div></div>
+  <div id="end" class="modal" hidden><div class="box"><img id="end-leader" alt="" hidden style="width:110px;height:110px;border-radius:14px;object-fit:cover;float:right;margin:0 0 .5rem 1rem;border:2px solid var(--line)"><div class="eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-again" class="btn primary">Jogar de novo</button><button id="btn-copy" class="btn">Copiar resultado (JSON)</button><a class="btn" href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Enviar feedback</a></div><textarea id="end-json" hidden rows="6" style="width:100%;font-family:var(--fm);font-size:11px;background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px"></textarea></div></div>
 </div>
 
 <div id="termos" class="modal" hidden><div class="box"><h2>Termos de Uso</h2><p class="muted small">Aether Rift: Dominion é um beta gratuito, em testes. O jogo é fornecido como está, sem garantias. Não reutilize os assets em outros projetos sem autorização. Nas partidas multiplayer, somas de verificação detectam divergências; trapaças encerram a partida para todos. Problemas e sugestões: use o link de feedback.</p><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
