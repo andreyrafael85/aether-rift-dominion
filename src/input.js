@@ -38,7 +38,7 @@ function create(o) {
   function setSel(ids) { view.sel = new Set(ids); ui.selectionChanged(); }
   I.select = setSel;
   I.selectOnScreen = function () { const ids = []; for (const e of sim.ents) { if (!e.alive || e.owner !== human || e.kind !== 'unit' || !S.UNITS[e.def].attack) continue; const [sx, sy] = R.worldToScreen(cam, e.x, e.y); if (sx >= 0 && sy >= 0 && sx <= R.w && sy <= R.h) ids.push(e.id); } setSel(ids); return ids.length; };
-  function cmd(c) { c.p = human; S.enqueue(sim, c); }
+  function cmd(c) { c.p = human; if (ui.enqueue) ui.enqueue(c); else S.enqueue(sim, c); }
   I.cmd = cmd;
 
   function wallSegments(x0, y0, x1, y1, def) {

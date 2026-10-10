@@ -1046,6 +1046,11 @@ function checkEnd(sim) {
   const humans = sim.players.filter(p => p.human), ais = sim.players.filter(p => !p.human);
   const humanAlive = humans.some(p => p.alive), aiAlive = ais.some(p => p.alive);
   const scores = sim.players.map(p => ({ id: p.id, name: p.name, score: p.alive ? score(sim, p) : 0, alive: p.alive }));
+  if (humans.length >= 2) { // multiplayer: a partida acaba quando sobra um jogador ou o tempo termina; cada cliente decide o próprio resultado
+    const aliveN = sim.players.filter(p => p.alive).length;
+    if (aliveN <= 1 || sim.time >= sim.maxTime) { const best = scores.filter(s2 => s2.alive).sort((a, b) => b.score - a.score)[0]; sim.result = { outcome: 'over', reason: aliveN <= 1 ? 'Último Núcleo de pé.' : 'Fim do Ciclo de Maré: vitória por Domínio.', scores, winner: best ? best.id : -1 }; emit(sim, { t: 'end', result: sim.result }); }
+    return;
+  }
   if (humans.length === 0) { // headless mode: last one standing or time
     const aliveN = sim.players.filter(p => p.alive).length;
     if (aliveN <= 1) sim.result = { outcome: 'headless', reason: 'Último sobrevivente', scores };

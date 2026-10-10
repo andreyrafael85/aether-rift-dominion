@@ -46,6 +46,14 @@ h1 span{background:linear-gradient(90deg,var(--rift1),var(--rift2));-webkit-back
 .btn.primary{background:linear-gradient(90deg,var(--rift1),#d4512f);border-color:transparent;color:#14161A;font-family:var(--fd);font-size:1.3rem;text-transform:uppercase;letter-spacing:.04em;padding:.7rem 1.4rem}
 .btn.primary:hover{filter:brightness(1.08)}
 .start-notes{font-size:13px;color:var(--fg2);max-width:70ch}
+.mp{border-top:1px solid var(--line);padding-top:.75rem;display:grid;gap:.5rem}
+.mp input{background:#12151A;border:1px solid var(--line);color:var(--fg);border-radius:6px;padding:.5rem .6rem;font:inherit;font-family:var(--fm)}
+#chat{position:absolute;right:.75rem;bottom:calc(8.5rem + env(safe-area-inset-bottom,0));width:260px;display:grid;gap:.3rem}
+#chat-log{max-height:120px;overflow:auto;font-size:12px;display:grid;gap:2px}
+#chat-log div{background:rgba(20,23,29,.85);border-radius:4px;padding:.15rem .4rem}
+#chat-in{width:100%;background:rgba(18,21,26,.95);border:1px solid var(--line);color:var(--fg);border-radius:6px;padding:.35rem .5rem;font:inherit;font-size:12px}
+#mp-wait{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);background:rgba(20,23,29,.92);border:1px solid var(--warn);border-radius:8px;padding:.6rem 1rem;font-family:var(--fm);font-size:13px}
+body.touch #chat{width:170px;bottom:calc(9.5rem + env(safe-area-inset-bottom,0))}
 .start-notes b{color:var(--fg)}
 
 /* game */
@@ -156,7 +164,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 
 <div id="start" class="screen">
   <div class="start-wrap">
-    <div class="eyebrow">Beta 3.0a · protótipo jogável no navegador · contra IA · agora em 3D</div>
+    <div class="eyebrow">Beta 3.0b · protótipo jogável no navegador · 3D com efeitos · multiplayer P2P</div>
     <h1>Aether Rift<br><span>Dominion</span></h1>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -167,10 +175,16 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         <div class="opt"><label for="opt-diff">Dificuldade</label><select id="opt-diff"><option value="facil">Fácil</option><option value="normal">Normal</option><option value="dificil">Difícil</option></select></div>
         <div class="opt"><label for="opt-seed">Semente do mapa</label><input id="opt-seed" inputmode="numeric"></div>
         <div class="opt"><label for="opt-gfx">Gráficos</label><select id="opt-gfx"><option value="3d">3D (Three.js, luz e relevo)</option><option value="2d">2D isométrico (leve, para celulares fracos)</option></select></div>
+        <div class="opt"><label for="opt-quality">Qualidade 3D</label><select id="opt-quality"><option value="auto">Automática</option><option value="baixa">Baixa (sem sombras e efeitos)</option><option value="media">Média (sombras e bloom)</option><option value="alta">Alta (sombras 4K, bloom e oclusão ambiente)</option></select></div>
         <div class="row"><button id="btn-start" class="btn primary">Iniciar partida</button><button id="btn-help-start" class="btn">Como jogar</button></div>
+        <div class="mp">
+          <div class="opt"><label>Multiplayer P2P (beta): 2 jogadores por código de sala, mais as IAs escolhidas acima</label></div>
+          <div class="row"><button id="btn-host" class="btn">Criar sala</button><input id="opt-code" placeholder="CÓDIGO" maxlength="6" style="width:7.5em;text-transform:uppercase"><button id="btn-join" class="btn">Entrar</button></div>
+          <div id="mp-status" class="muted small"></div>
+        </div>
       </div>
     </div>
-    <p class="start-notes"><b>Novo no 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
+    <p class="start-notes"><b>Novo no 3.0b:</b> bloom nos emissivos, oclusão ambiente no preset Alta, névoa volumétrica na Fenda e na Tempestade, lagos de plasma animados, presets de qualidade, e <b>multiplayer P2P</b>: crie uma sala, mande o código para um amigo e joguem na mesma partida (com as IAs escolhidas). <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
   </div>
 </div>
 
@@ -199,6 +213,8 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     <div id="bar">
       <button id="btn-nucleo" class="tb">Núcleo</button><button id="btn-rot" class="tb" title="Girar câmera">⟳</button><button id="btn-army" class="tb">Exército</button><button id="btn-all" class="tb">Na tela</button><button id="btn-build" class="tb">Construir</button><button id="btn-attack" class="tb">Atacar</button><button id="btn-stop" class="tb">Parar</button><button id="btn-box" class="tb">Caixa</button><button id="btn-clear" class="tb">✕</button>
     </div>
+    <div id="chat" hidden><div id="chat-log"></div><input id="chat-in" placeholder="Mensagem (Enter)" maxlength="120"></div>
+    <div id="mp-wait" hidden>Aguardando o outro jogador…</div>
     <div id="notice"></div>
     <div id="proposal" hidden><div id="proposal-text"></div><div class="row"><button id="prop-yes" class="act sm good">Aceitar pacto</button><button id="prop-no" class="act sm">Recusar</button></div></div>
   </div>
@@ -238,5 +254,16 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <div class="row"><button class="btn" data-close>Fechar</button></div>
 </div></div>
 <div id="errbox" hidden onclick="this.hidden=true"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
+window.THREE = THREE; window.THREE_ADDONS = { EffectComposer, RenderPass, UnrealBloomPass, OutputPass, SSAOPass };
+window.dispatchEvent(new Event('three-ready'));
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 <!--SCRIPTS-->

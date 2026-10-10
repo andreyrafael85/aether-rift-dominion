@@ -14,6 +14,11 @@ function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => 
 const params = new URLSearchParams(location.search);
 let G = null; // game state
 
+function whenThree(cb) {
+  if (window.THREE) return cb(true); if (window.__threeFailed) return cb(false);
+  let done = false; const t = setTimeout(() => { if (!done) { done = true; window.__threeFailed = true; cb(false); } }, 8000);
+  window.addEventListener('three-ready', () => { if (!done) { done = true; clearTimeout(t); cb(true); } }, { once: true });
+}
 function loadPrefs() { try { return JSON.parse(localStorage.getItem('ard-beta-prefs') || '{}') || {}; } catch (e) { return {}; } }
 function savePrefs(p) { try { localStorage.setItem('ard-beta-prefs', JSON.stringify(p)); } catch (e) {} }
 
@@ -31,10 +36,37 @@ function initStart() {
   $('opt-opp').value = prefs.opp || '2';
   $('opt-diff').value = prefs.diff || 'normal';
   $('opt-seed').value = params.get('seed') || String(Math.floor(Math.random() * 90000) + 1000);
-  $('opt-gfx').value = prefs.gfx || '3d';
+  $('opt-gfx').value = prefs.gfx || '3d'; $('opt-quality').value = prefs.quality || 'auto';
+  // multiplayer P2P por código de sala
+  const mpStatus = t => { $('mp-status').textContent = t; };
+  const myInfo = () => ({ name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar' });
+  $('btn-host').addEventListener('click', () => {
+    if (!window.Peer) { mpStatus('PeerJS não carregou neste navegador.'); return; }
+    const N = ARD.net.create(); mpStatus('Criando sala…');
+    N.on('error', e => mpStatus('Erro de rede: ' + e.message));
+    N.on('open', () => mpStatus('Jogador conectado. Iniciando…'));
+    N.on('hello', d => {
+      const me = myInfo(); const opp = parseInt($('opt-opp').value, 10); const facs = ['vehnar', 'erevane']; const aiNames = ['Fundição Kessari', 'Clã Sombrio', 'Consórcio Oryn'];
+      const players = [{ name: me.name, faction: me.faction, human: true }, { name: (d.name || 'Convidado').slice(0, 18), faction: d.faction === 'erevane' ? 'erevane' : 'vehnar', human: true }];
+      for (let i = 0; i < Math.min(2, opp); i++) players.push({ name: aiNames[i], faction: facs[i % 2], difficulty: $('opt-diff').value });
+      const cfg = { players, seed: parseInt($('opt-seed').value, 10) || 1, diff: $('opt-diff').value, gfx: $('opt-gfx').value, quality: $('opt-quality').value, name: me.name, faction: me.faction, opp: String(players.length - 2) };
+      N.send('start', { cfg: Object.assign({}, cfg, { gfx: undefined, quality: undefined }) });
+      setTimeout(() => startGame(cfg, { net: N, myId: 0 }), 150);
+    });
+    N.host(code => { $('opt-code').value = code; mpStatus('Sala ' + code + ' criada. Envie o código ao seu amigo e aguarde a conexão…'); });
+  });
+  $('btn-join').addEventListener('click', () => {
+    if (!window.Peer) { mpStatus('PeerJS não carregou neste navegador.'); return; }
+    const code = $('opt-code').value.trim(); if (code.length < 4) { mpStatus('Digite o código da sala.'); return; }
+    const N = ARD.net.create(); mpStatus('Conectando à sala ' + code.toUpperCase() + '…');
+    N.on('error', e => mpStatus('Erro de rede: ' + e.message + ' (sala existe? ambos online?)'));
+    N.on('open', () => { mpStatus('Conectado. Aguardando o anfitrião iniciar…'); N.send('hello', myInfo()); });
+    N.on('start', d => { const cfg = Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value }); startGame(cfg, { net: N, myId: 1 }); });
+    N.join(code);
+  });
   $('btn-start').addEventListener('click', () => {
     const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar';
-    const cfg = { name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value };
+    const cfg = { name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value };
     savePrefs(cfg); startGame(cfg);
   });
   $('btn-help-start').addEventListener('click', () => toggleHelp(true));
@@ -42,18 +74,22 @@ function initStart() {
 }
 
 // ---------- game ----------
-function startGame(cfg) {
-  const players = [{ name: cfg.name, faction: cfg.faction, human: true }];
+function startGame(cfg, netCtx) {
+  const want3dEarly = (cfg.gfx || '3d') === '3d' && params.get('r') !== '2d';
+  if (want3dEarly && !window.THREE && !window.__threeFailed) { $('start').hidden = true; $('game').hidden = false; $('loading').hidden = false; $('load-bar').style.width = '5%'; whenThree(() => startGame(cfg, netCtx)); return; }
+  const net = netCtx ? netCtx.net : null;
+  const players = cfg.players ? cfg.players.map(p => Object.assign({}, p)) : [{ name: cfg.name, faction: cfg.faction, human: true }];
   const facs = ['vehnar', 'erevane'];
   const aiNames = { vehnar: ['Fundição Kessari', 'Consórcio Oryn', 'Estaleiro Vey'], erevane: ['Clã Sombrio', 'Náufragos de Ísk', 'Corsários da Faixa'] };
-  for (let i = 0; i < parseInt(cfg.opp, 10); i++) { const f = facs[(i + (cfg.faction === 'vehnar' ? 1 : 0)) % 2]; players.push({ name: aiNames[f][i % 3], faction: f, difficulty: cfg.diff }); }
+  if (!cfg.players) for (let i = 0; i < parseInt(cfg.opp, 10); i++) { const f = facs[(i + (cfg.faction === 'vehnar' ? 1 : 0)) % 2]; players.push({ name: aiNames[f][i % 3], faction: f, difficulty: cfg.diff }); }
   const sim = S.createSim({ seed: cfg.seed, players, minutes: 25 });
-  const human = 0;
+  const human = netCtx ? netCtx.myId : 0;
   const canvas = $('world'), mini = $('minimap'), overlay = $('overlay');
   $('start').hidden = true; $('game').hidden = false; $('end').hidden = true;
   let R = null; const want3d = (cfg.gfx || '3d') === '3d' && params.get('r') !== '2d';
   if (want3d && window.THREE) { try { R = ARD.render3d.create(canvas, overlay, mini); } catch (err) { console.warn('3D indisponível, usando 2D:', err); R = null; } }
   if (!R) { R = ARD.render.create(canvas, mini); overlay.hidden = true; if (want3d) setTimeout(() => notice('3D indisponível neste navegador; usando o modo 2D'), 1200); }
+  if (R.setQuality) R.setQuality(cfg.quality || 'auto');
   R.resize();
   const nuc = S.nucleoOf(sim, human);
   const isTouch = matchMedia('(pointer: coarse)').matches || !!params.get('touch');
@@ -61,7 +97,7 @@ function startGame(cfg) {
   const ui = makeUI(); // closures below
   const I = ARD.input.create({ canvas, sim, view, R, human, ui });
   const ais = sim.players.filter(p => !p.human).map(p => ARD.ai.create(p.id, p.difficulty));
-  G = { sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null };
+  G = { sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null, net, pending: [], waiting: false, waitT: 0 };
   window.addEventListener('resize', () => R.resize());
   document.body.classList.toggle('touch', isTouch);
 
@@ -69,8 +105,9 @@ function startGame(cfg) {
   $('loading').hidden = false;
   R.prepare(sim, f => { $('load-bar').style.width = Math.round(f * 100) + '%'; }, () => {
     $('loading').hidden = true;
-    const ff = parseInt(params.get('ff') || '0', 10);
+    const ff = net ? 0 : parseInt(params.get('ff') || '0', 10);
     for (let i = 0; i < ff * 10; i++) tickOnce(true);
+    if (net) setupNet();
     if (params.get('speed')) G.speed = parseFloat(params.get('speed')) || 1;
     if (params.get('night')) sim.tick = 3600; // teste: começa de noite
     if (params.get('reveal')) view.reveal = true; // teste: sem névoa
@@ -81,9 +118,16 @@ function startGame(cfg) {
   });
 
   function tickOnce(silent) {
-    const sim = G.sim;
+    const sim = G.sim; const tick = sim.tick;
+    if (net) {
+      if (net.sentFor == null || net.sentFor < tick) { net.scheduleLocal(tick + net.DELAY, G.pending); G.pending = []; net.sentFor = tick; }
+      if (!net.canAdvance(tick)) { G.waiting = true; return false; }
+      G.waiting = false;
+    }
     if (sim.tick % 10 === 0) for (const a of G.ais) for (const c of ARD.ai.think(sim, a)) S.enqueue(sim, c);
+    if (net) for (const c of net.takeCmds(tick, human)) S.enqueue(sim, c);
     const ev = S.step(sim);
+    if (net && sim.tick % 10 === 0) net.sendHash(sim.tick, S.hash(sim));
     if (!silent) G.R.onEvents(ev, sim, human);
     handleEvents(ev, silent);
     if (sim.tick % 10 === 0) updateMemory();
@@ -91,7 +135,8 @@ function startGame(cfg) {
   function frame(now) {
     if (!G || G.sim !== sim) return;
     let dt = Math.min(0.25, (now - G.last) / 1000); G.last = now;
-    if (!G.paused && !G.ended) { G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { tickOnce(false); G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; }
+    if (!G.paused && !G.ended) { G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { if (tickOnce(false) === false) { G.acc = Math.min(G.acc, S.TICK); break; } G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; }
+    if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; $('mp-wait').hidden = G.waitT < 0.8; if (G.waitT >= 0.8) $('mp-wait').textContent = net.state === 'lost' ? 'Conexão perdida com o outro jogador.' : 'Aguardando o outro jogador… (' + G.waitT.toFixed(0) + ' s)'; }
     I.update(dt);
     if (G.frameN % 3 === 0) refreshTop();
     if (G.frameN++ % 6 === 0) { refreshPanel(false); refreshQuick(); }
@@ -246,7 +291,7 @@ function startGame(cfg) {
     $('btn-box').classList.toggle('on', I.touchBox);
   }
   function bindHUD() {
-    document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => { G.speed = parseFloat(b.dataset.speed); G.paused = false; refreshTop(); }));
+    document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => { if (net) { notice('Velocidade fixa no multiplayer'); return; } G.speed = parseFloat(b.dataset.speed); G.paused = false; refreshTop(); }));
     $('btn-pause').addEventListener('click', () => ui.togglePause());
     $('btn-over').addEventListener('click', () => I.cmd({ t: 'overcharge' }));
     $('btn-super').addEventListener('click', () => { if (fac().superKey === 'fundicao') { I.setMode('super'); notice('Clique em território seu para derrubar o Bastião'); } else I.cmd({ t: 'super' }); });
@@ -317,9 +362,21 @@ function startGame(cfg) {
     box.hidden = false; $('hints-body').innerHTML = (G.isTouch ? todo.slice(0, 1) : todo).map((h, i) => `<div class="hint ${i === 0 ? 'now' : ''}">${esc(h.text)}</div>`).join('');
   }
 
+  function setupNet() {
+    $('chat').hidden = false; document.querySelectorAll('[data-speed]').forEach(b => { b.disabled = true; b.style.opacity = 0.4; });
+    const log = (who, text) => { const d = document.createElement('div'); d.textContent = who ? who + ': ' + text : text; $('chat-log').appendChild(d); $('chat-log').scrollTop = 9999; while ($('chat-log').children.length > 30) $('chat-log').firstChild.remove(); };
+    const other = sim.players[human === 0 ? 1 : 0];
+    log('', 'Conectado com ' + other.name + '. Sala ' + net.code + '.');
+    $('chat-in').addEventListener('keydown', e => { if (e.key === 'Enter') { const t = $('chat-in').value.trim(); if (t) { net.send('chat', { text: t.slice(0, 120), name: sim.players[human].name }); log(sim.players[human].name, t); } $('chat-in').value = ''; e.stopPropagation(); } e.stopPropagation(); });
+    net.on('chat', d => { log(d.name || other.name, String(d.text || '').slice(0, 120)); notice((d.name || other.name) + ': ' + String(d.text || '').slice(0, 60)); AU.sfx('click'); });
+    net.on('close', () => { notice('Conexão perdida com o outro jogador'); log('', 'Conexão perdida.'); });
+    net.on('desync', d => { notice('Dessincronização detectada no tick ' + d.tick + '. As partidas divergiram.'); log('', 'Dessincronização no tick ' + d.tick + '.'); });
+    setInterval(() => net.ping(), 5000);
+  }
   // ---------- end ----------
   function endGame(result) {
     if (G.ended) return; G.ended = true;
+    if (result.outcome === 'over') { const me = sim.players[human]; result = Object.assign({}, result, { outcome: me.alive && result.winner === human ? 'victory' : 'defeat', reason: result.reason + (result.winner >= 0 ? ' Vencedor: ' + sim.players[result.winner].name + '.' : '') }); }
     const p = sim.players[human]; const st = p.stats;
     $('end').hidden = false; $('end-title').textContent = result.outcome === 'victory' ? 'DOMÍNIO' : 'COLAPSO'; $('end-title').className = result.outcome;
     $('end-reason').textContent = result.reason;
@@ -337,8 +394,9 @@ function startGame(cfg) {
       buildMenuChanged() { refreshPanel(true); refreshQuick(); },
       touchBoxChanged() { refreshQuick(); },
       notice, confirm: confirmModal, modalOpen() { return !$('diplo').hidden || !$('help').hidden || !$('confirm').hidden; },
+      enqueue(c) { if (net) G.pending.push(c); else S.enqueue(sim, c); },
       closeModals() { $('diplo').hidden = true; $('help').hidden = true; $('confirm').hidden = true; },
-      toggleHelp() { toggleHelp(); }, togglePause() { G.paused = !G.paused; refreshTop(); notice(G.paused ? 'Pausado' : 'Continuando'); },
+      toggleHelp() { toggleHelp(); }, togglePause() { if (net) { notice('Sem pausa no multiplayer'); return; } G.paused = !G.paused; refreshTop(); notice(G.paused ? 'Pausado' : 'Continuando'); },
     };
   }
   function confirmModal(text, onYes) { const m = $('confirm'); m.hidden = false; $('confirm-text').textContent = text; $('confirm-yes').onclick = () => { m.hidden = true; onYes(); }; $('confirm-no').onclick = () => { m.hidden = true; }; }

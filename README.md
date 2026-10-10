@@ -1,6 +1,6 @@
 # Aether Rift: Dominion — beta de testes
 
-RTS multiplayer browser-first em desenvolvimento. Este repositório publica o **beta 3.0a jogável** (contra IA, agora em 3D com Three.js: relevo, sombras, névoa projetada, luzes à noite, câmera com rotação; modo 2D isométrico mantido como alternativa; terreno com biomas e cordilheiras, projéteis e torretas, muros com caminhos, veterância, carcaças, Tempestade de Éter, som e voz, controles de toque), a **prova de conceito visual 2D** (`estilo.html`) e a **validação do caminho 3D** (`estilo3d.html`, Three.js), para testes com amigos.
+RTS multiplayer browser-first em desenvolvimento. Este repositório publica o **beta 3.0b jogável** (contra IA ou **multiplayer P2P por código de sala**; em 3D com Three.js: relevo, sombras, bloom, oclusão ambiente, névoa volumétrica, lagos de plasma, presets de qualidade, câmera com rotação; modo 2D isométrico mantido como alternativa; terreno com biomas e cordilheiras, projéteis e torretas, muros com caminhos, veterância, carcaças, Tempestade de Éter, som e voz, controles de toque), a **prova de conceito visual 2D** (`estilo.html`) e a **validação do caminho 3D** (`estilo3d.html`, Three.js), para testes com amigos.
 
 **Jogar agora:** abra `index.html` pelo GitHub Pages deste repositório (link na descrição) ou localmente, direto no navegador. Funciona em desktop e celular; nada para instalar.
 
@@ -13,6 +13,7 @@ RTS multiplayer browser-first em desenvolvimento. Este repositório publica o **
 3. Tente roubar: treine um Pirata no Quartel e clique com o botão direito em uma Refinaria inimiga.
 4. Tente um pacto pela Diplomacia e, se quiser, quebre-o na hora certa.
 5. Desenhe muros arrastando o mouse (B, depois M) e deixe um Portão (G) para suas unidades.
+7. Multiplayer: um jogador clica em "Criar sala" e envia o código de seis letras; o outro digita o código e clica em "Entrar". As IAs escolhidas pelo anfitrião entram na partida. Sem servidor: a conexão é direta entre os dois navegadores (WebRTC via PeerJS).
 6. No celular: toque em uma unidade sua, depois toque no chão para mover ou no inimigo para atacar. A barra inferior tem Núcleo, Exército, Na tela, Construir, Atacar, Parar, Caixa e ✕.
 
 ## Como dar feedback
@@ -32,7 +33,7 @@ aether-rift-dominion/
 ├─ estilo.html       prova de conceito do visual voxel isométrico (gerado)
 ├─ estilo3d.html     validação 3D em Three.js com os mesmos modelos (gerado)
 ├─ src/              fontes do jogo: sim.js (simulação determinística), ai.js, voxel.js e models.js (modelos voxel),
-│                    vox3d.js (voxel → malha), render.js (2D isométrico), render3d.js (Three.js), audio.js, input.js, main.js, index.tpl.html
+│                    vox3d.js (voxel → malha), render.js (2D isométrico), render3d.js (Three.js), audio.js, net.js (P2P lockstep), input.js, main.js, index.tpl.html
 ├─ style/            cena da prova de conceito 2D (scene.js, boot.js, index.tpl.html)
 ├─ style3d/          cena da validação 3D (scene3d.js, boot.js, index.tpl.html)
 ├─ tools/            build.mjs (gera index.html, estilo.html e dist/) e test.cjs (IA contra IA, invariantes, determinismo)

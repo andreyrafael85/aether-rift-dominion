@@ -16,7 +16,8 @@ function buildGeometry(model, opts) {
       if (model.has(v.x + f.n[0], v.y + f.n[1], v.z + f.n[2])) continue;
       if (f.n[2] === -1 && v.z === b.z0 && !opts.bottom) continue; // face de baixo no chão: invisível
       const shade = f.n[2] === 1 ? 1 : f.n[2] === -1 ? 0.6 : 0.88;
-      const col = v.e ? [Math.min(1, base[0] * 1.05), Math.min(1, base[1] * 1.05), Math.min(1, base[2] * 1.05)] : [base[0] * shade, base[1] * shade, base[2] * shade];
+      const eb = opts.emBoost || 1.05;
+      const col = v.e ? [base[0] * eb, base[1] * eb, base[2] * eb] : [base[0] * shade, base[1] * shade, base[2] * shade];
       const vs = f.q.map(q => [v.x + q[0] - cx, v.z + q[2] - b.z0, -(v.y + q[1] - cy)]);
       const n = [f.n[0], f.n[2], -f.n[1]];
       for (const i of [0, 1, 2, 0, 2, 3]) { tgt.pos.push(...vs[i]); tgt.nor.push(...n); tgt.col.push(...col); }

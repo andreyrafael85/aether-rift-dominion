@@ -46,6 +46,14 @@ h1 span{background:linear-gradient(90deg,var(--rift1),var(--rift2));-webkit-back
 .btn.primary{background:linear-gradient(90deg,var(--rift1),#d4512f);border-color:transparent;color:#14161A;font-family:var(--fd);font-size:1.3rem;text-transform:uppercase;letter-spacing:.04em;padding:.7rem 1.4rem}
 .btn.primary:hover{filter:brightness(1.08)}
 .start-notes{font-size:13px;color:var(--fg2);max-width:70ch}
+.mp{border-top:1px solid var(--line);padding-top:.75rem;display:grid;gap:.5rem}
+.mp input{background:#12151A;border:1px solid var(--line);color:var(--fg);border-radius:6px;padding:.5rem .6rem;font:inherit;font-family:var(--fm)}
+#chat{position:absolute;right:.75rem;bottom:calc(8.5rem + env(safe-area-inset-bottom,0));width:260px;display:grid;gap:.3rem}
+#chat-log{max-height:120px;overflow:auto;font-size:12px;display:grid;gap:2px}
+#chat-log div{background:rgba(20,23,29,.85);border-radius:4px;padding:.15rem .4rem}
+#chat-in{width:100%;background:rgba(18,21,26,.95);border:1px solid var(--line);color:var(--fg);border-radius:6px;padding:.35rem .5rem;font:inherit;font-size:12px}
+#mp-wait{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);background:rgba(20,23,29,.92);border:1px solid var(--warn);border-radius:8px;padding:.6rem 1rem;font-family:var(--fm);font-size:13px}
+body.touch #chat{width:170px;bottom:calc(9.5rem + env(safe-area-inset-bottom,0))}
 .start-notes b{color:var(--fg)}
 
 /* game */
@@ -156,7 +164,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 
 <div id="start" class="screen">
   <div class="start-wrap">
-    <div class="eyebrow">Beta 3.0a · protótipo jogável no navegador · contra IA · agora em 3D</div>
+    <div class="eyebrow">Beta 3.0b · protótipo jogável no navegador · 3D com efeitos · multiplayer P2P</div>
     <h1>Aether Rift<br><span>Dominion</span></h1>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -167,10 +175,16 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         <div class="opt"><label for="opt-diff">Dificuldade</label><select id="opt-diff"><option value="facil">Fácil</option><option value="normal">Normal</option><option value="dificil">Difícil</option></select></div>
         <div class="opt"><label for="opt-seed">Semente do mapa</label><input id="opt-seed" inputmode="numeric"></div>
         <div class="opt"><label for="opt-gfx">Gráficos</label><select id="opt-gfx"><option value="3d">3D (Three.js, luz e relevo)</option><option value="2d">2D isométrico (leve, para celulares fracos)</option></select></div>
+        <div class="opt"><label for="opt-quality">Qualidade 3D</label><select id="opt-quality"><option value="auto">Automática</option><option value="baixa">Baixa (sem sombras e efeitos)</option><option value="media">Média (sombras e bloom)</option><option value="alta">Alta (sombras 4K, bloom e oclusão ambiente)</option></select></div>
         <div class="row"><button id="btn-start" class="btn primary">Iniciar partida</button><button id="btn-help-start" class="btn">Como jogar</button></div>
+        <div class="mp">
+          <div class="opt"><label>Multiplayer P2P (beta): 2 jogadores por código de sala, mais as IAs escolhidas acima</label></div>
+          <div class="row"><button id="btn-host" class="btn">Criar sala</button><input id="opt-code" placeholder="CÓDIGO" maxlength="6" style="width:7.5em;text-transform:uppercase"><button id="btn-join" class="btn">Entrar</button></div>
+          <div id="mp-status" class="muted small"></div>
+        </div>
       </div>
     </div>
-    <p class="start-notes"><b>Novo no 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
+    <p class="start-notes"><b>Novo no 3.0b:</b> bloom nos emissivos, oclusão ambiente no preset Alta, névoa volumétrica na Fenda e na Tempestade, lagos de plasma animados, presets de qualidade, e <b>multiplayer P2P</b>: crie uma sala, mande o código para um amigo e joguem na mesma partida (com as IAs escolhidas). <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel: câmera de RTS com rotação (Q e E), relevo real com as cordilheiras e a cratera da Fenda, sombras, névoa de guerra projetada no terreno, luzes à noite, projéteis e explosões em 3D. O modo 2D continua disponível. <b>No 2.0:</b> projéteis de verdade com área e erro, torretas que giram, veterância com patentes, carcaças saqueáveis, caminhos ao redor de muros e bases, névoa em três camadas, Tempestade de Éter, som e voz de sistema, IA com estratégias nomeadas e raids, controles de toque refeitos (toque no chão move, toque no inimigo ataca). <b>O que este beta testa:</b> construção com energia dinâmica (Pleno, Racionado, Colapso), três recursos, Nódulos de território, roubo por Sifão com Alerta, Caixas, tabela de contras em cinco classes, névoa de guerra com camuflagem e detecção, diplomacia com Caução e Quebra de Pacto, Salto de Núcleo, pesquisas e as superarmas Fundição Orbital e Blecaute. Partidas de até 25 minutos; vence quem derrubar todos os Núcleos ou tiver mais Domínio no fim do Ciclo. <b>Multiplayer online</b> fica para a próxima etapa: a simulação já é determinística e dirigida por comandos, como o plano prevê.</p>
   </div>
 </div>
 
@@ -199,6 +213,8 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     <div id="bar">
       <button id="btn-nucleo" class="tb">Núcleo</button><button id="btn-rot" class="tb" title="Girar câmera">⟳</button><button id="btn-army" class="tb">Exército</button><button id="btn-all" class="tb">Na tela</button><button id="btn-build" class="tb">Construir</button><button id="btn-attack" class="tb">Atacar</button><button id="btn-stop" class="tb">Parar</button><button id="btn-box" class="tb">Caixa</button><button id="btn-clear" class="tb">✕</button>
     </div>
+    <div id="chat" hidden><div id="chat-log"></div><input id="chat-in" placeholder="Mensagem (Enter)" maxlength="120"></div>
+    <div id="mp-wait" hidden>Aguardando o outro jogador…</div>
     <div id="notice"></div>
     <div id="proposal" hidden><div id="proposal-text"></div><div class="row"><button id="prop-yes" class="act sm good">Aceitar pacto</button><button id="prop-no" class="act sm">Recusar</button></div></div>
   </div>
@@ -238,7 +254,18 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <div class="row"><button class="btn" data-close>Fechar</button></div>
 </div></div>
 <div id="errbox" hidden onclick="this.hidden=true"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
+window.THREE = THREE; window.THREE_ADDONS = { EffectComposer, RenderPass, UnrealBloomPass, OutputPass, SSAOPass };
+window.dispatchEvent(new Event('three-ready'));
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 <script>
 /* Aether Rift: Dominion — simulação determinística (beta 0.1)
    Comandos entram, estado sai. Sem DOM. Roda em Node e no navegador. */
@@ -1288,6 +1315,11 @@ function checkEnd(sim) {
   const humans = sim.players.filter(p => p.human), ais = sim.players.filter(p => !p.human);
   const humanAlive = humans.some(p => p.alive), aiAlive = ais.some(p => p.alive);
   const scores = sim.players.map(p => ({ id: p.id, name: p.name, score: p.alive ? score(sim, p) : 0, alive: p.alive }));
+  if (humans.length >= 2) { // multiplayer: a partida acaba quando sobra um jogador ou o tempo termina; cada cliente decide o próprio resultado
+    const aliveN = sim.players.filter(p => p.alive).length;
+    if (aliveN <= 1 || sim.time >= sim.maxTime) { const best = scores.filter(s2 => s2.alive).sort((a, b) => b.score - a.score)[0]; sim.result = { outcome: 'over', reason: aliveN <= 1 ? 'Último Núcleo de pé.' : 'Fim do Ciclo de Maré: vitória por Domínio.', scores, winner: best ? best.id : -1 }; emit(sim, { t: 'end', result: sim.result }); }
+    return;
+  }
   if (humans.length === 0) { // headless mode: last one standing or time
     const aliveN = sim.players.filter(p => p.alive).length;
     if (aliveN <= 1) sim.result = { outcome: 'headless', reason: 'Último sobrevivente', scores };
@@ -1897,7 +1929,8 @@ function buildGeometry(model, opts) {
       if (model.has(v.x + f.n[0], v.y + f.n[1], v.z + f.n[2])) continue;
       if (f.n[2] === -1 && v.z === b.z0 && !opts.bottom) continue; // face de baixo no chão: invisível
       const shade = f.n[2] === 1 ? 1 : f.n[2] === -1 ? 0.6 : 0.88;
-      const col = v.e ? [Math.min(1, base[0] * 1.05), Math.min(1, base[1] * 1.05), Math.min(1, base[2] * 1.05)] : [base[0] * shade, base[1] * shade, base[2] * shade];
+      const eb = opts.emBoost || 1.05;
+      const col = v.e ? [base[0] * eb, base[1] * eb, base[2] * eb] : [base[0] * shade, base[1] * shade, base[2] * shade];
       const vs = f.q.map(q => [v.x + q[0] - cx, v.z + q[2] - b.z0, -(v.y + q[1] - cy)]);
       const n = [f.n[0], f.n[2], -f.n[1]];
       for (const i of [0, 1, 2, 0, 2, 3]) { tgt.pos.push(...vs[i]); tgt.nor.push(...n); tgt.col.push(...col); }
@@ -2280,22 +2313,44 @@ const BIOME_RGB = { gelo: [0.66, 0.73, 0.8], rocha: [0.41, 0.42, 0.45], tundra: 
 const BIOME_MINI = { gelo: '#5C6B7A', rocha: '#4A4E56', tundra: '#3E5242', basalto: '#2A262C' };
 function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
 function rgba(h, a) { const c = hexToRgb(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
-const _v = new THREE.Vector3(), _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3(), _c = new THREE.Color(); const UP = new THREE.Vector3(0, 1, 0);
-
 function create(canvas, overlay, mini) {
+  const _v = new THREE.Vector3(), _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3(), _c = new THREE.Color(); const UP = new THREE.Vector3(0, 1, 0);
   const R = { canvas, w: 0, h: 0, dpr: 1, K: 1.7, zoomMin: 0.55, zoomMax: 2.4, supportsYaw: true, fx: { floats: [], rings: [] }, time: 0, shake: 0, icons: new Map(), geos: new Map(), inst: new Map(), sim: null, night: 0, spriteCache: new Map(), is3d: true };
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
   const isTouch = matchMedia('(pointer: coarse)').matches;
   renderer.setPixelRatio(Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1));
-  renderer.shadowMap.enabled = !isTouch; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.95;
+  renderer.shadowMap.enabled = !isTouch; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+  const ADD = window.THREE_ADDONS || null; let composer = null, bloomPass = null, ssaoPass = null;
+  R.quality = { name: 'media', shadows: !isTouch, shadowMap: 2048, post: !!ADD && !isTouch, ssao: false, pr: Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1), particles: 1 };
+  function buildComposer() {
+    if (composer) { composer.dispose && composer.dispose(); composer = null; bloomPass = null; ssaoPass = null; }
+    if (!ADD || !R.quality.post) return;
+    composer = new ADD.EffectComposer(renderer); composer.setPixelRatio(R.quality.pr);
+    if (R.quality.ssao) { ssaoPass = new ADD.SSAOPass(scene, camera, R.w || 800, R.h || 600); ssaoPass.kernelRadius = 10; ssaoPass.minDistance = 0.001; ssaoPass.maxDistance = 0.12; composer.addPass(ssaoPass); }
+    else composer.addPass(new ADD.RenderPass(scene, camera));
+    bloomPass = new ADD.UnrealBloomPass(new THREE.Vector2(R.w || 800, R.h || 600), 0.42, 0.5, 1.3); composer.addPass(bloomPass);
+    composer.addPass(new ADD.OutputPass());
+    if (R.w) composer.setSize(R.w, R.h);
+  }
+  R.setQuality = function (name) {
+    const q = R.quality; q.name = name;
+    if (name === 'auto') name = isTouch ? 'baixa' : 'media';
+    if (name === 'baixa') { q.shadows = false; q.post = false; q.ssao = false; q.pr = 1; q.particles = 0.5; }
+    else if (name === 'alta') { q.shadows = true; q.shadowMap = 4096; q.post = !!ADD; q.ssao = !!ADD; q.pr = Math.min(2, window.devicePixelRatio || 1); q.particles = 1; }
+    else { q.shadows = !isTouch; q.shadowMap = 2048; q.post = !!ADD; q.ssao = false; q.pr = Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1); q.particles = 1; }
+    renderer.shadowMap.enabled = q.shadows; renderer.setPixelRatio(q.pr); if (typeof sun !== 'undefined') { sun.castShadow = q.shadows; sun.shadow.mapSize.set(q.shadowMap, q.shadowMap); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
+    scene.traverse(o => { if (o.isInstancedMesh || o.isMesh) o.castShadow = o.castShadow && q.shadows; });
+    buildComposer();
+  };
   const octx = overlay.getContext('2d'); const mctx = mini.getContext('2d'); const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
   const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(38, 1, 2, 6000);
   const CAM = { pitch: 0.95, baseDist: 760 };
   // ---------- luzes ----------
-  const hemi = new THREE.HemisphereLight(0x9fb8d6, 0x2a2a30, 0.7); scene.add(hemi);
-  const sun = new THREE.DirectionalLight(0xffe9c4, 2.3); sun.castShadow = !isTouch; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0006; scene.add(sun); scene.add(sun.target);
+  const hemi = new THREE.HemisphereLight(0x9fb8d6, 0x2a2a30, 0.55); scene.add(hemi);
+  const sun = new THREE.DirectionalLight(0xffe9c4, 1.6); sun.castShadow = !isTouch; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0006; scene.add(sun); scene.add(sun.target);
   const amb = new THREE.AmbientLight(0x404860, 0.3); scene.add(amb);
   scene.fog = new THREE.Fog(0x9fb0c4, 1500, 3200);
+  R.setQuality('auto');
   const lightPool = []; for (let i = 0; i < 10; i++) { const l = new THREE.PointLight(0xffc070, 0, 220, 2); scene.add(l); lightPool.push(l); }
   const flashLight = new THREE.PointLight(0xffc878, 0, 160, 2); scene.add(flashLight); let flashT = 0;
 
@@ -2309,7 +2364,7 @@ function create(canvas, overlay, mini) {
   R.H = H;
   const fogData = new Uint8Array(FOGN * FOGN * 4); const fogTex = new THREE.DataTexture(fogData, FOGN, FOGN, THREE.RGBAFormat); fogTex.magFilter = THREE.LinearFilter; fogTex.minFilter = THREE.LinearFilter; fogTex.colorSpace = THREE.NoColorSpace;
   const terrData = new Uint8Array(TILES * TILES * 4); const terrTex = new THREE.DataTexture(terrData, TILES, TILES, THREE.RGBAFormat); terrTex.magFilter = THREE.LinearFilter; terrTex.minFilter = THREE.LinearFilter; terrTex.colorSpace = THREE.NoColorSpace;
-  let terrain = null;
+  let terrain = null; R.poolLights = []; R.mist = [];
   function buildTerrain(sim) {
     const seed = sim.seed; const hash = (ix, iy) => { let n = (ix * 374761393 + iy * 668265263 + seed * 1274126177) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); n ^= n >>> 16; return (n >>> 0) / 4294967296; };
     const sm = t => t * t * (3 - 2 * t); const val = (x, y) => { const ix = Math.floor(x), iy = Math.floor(y); const fx = sm(x - ix), fy = sm(y - iy); const a = hash(ix, iy), b = hash(ix + 1, iy), c = hash(ix, iy + 1), d = hash(ix + 1, iy + 1); return (a * (1 - fx) + b * fx) * (1 - fy) + (c * (1 - fx) + d * fx) * fy; };
@@ -2343,7 +2398,18 @@ function create(canvas, overlay, mini) {
     if (terrain) scene.remove(terrain);
     terrain = new THREE.Mesh(geo, mat); terrain.position.set(S.WORLD / 2, 0, -S.WORLD / 2); terrain.receiveShadow = true; scene.add(terrain);
     // Fenda: anel emissivo e luz
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(S.RIFT_R * 0.9, 6, 8, 48), new THREE.MeshBasicMaterial({ color: 0xff6a3d })); ring.rotation.x = Math.PI / 2; ring.position.set(S.CX, H(S.CX, S.CY) + 4, -S.CY); scene.add(ring);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(S.RIFT_R * 0.9, 6, 8, 48), new THREE.MeshBasicMaterial({ color: new THREE.Color(2.6, 1.0, 0.5) })); ring.rotation.x = Math.PI / 2; ring.position.set(S.CX, H(S.CX, S.CY) + 4, -S.CY); scene.add(ring);
+    // lagos de plasma no anel de basalto (só visuais)
+    const poolMat = new THREE.ShaderMaterial({ uniforms: { uTime: { value: 0 } }, transparent: true, depthWrite: false,
+      vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: 'uniform float uTime; varying vec2 vUv; float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); } float n(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f); return mix(mix(h(i), h(i+vec2(1,0)), f.x), mix(h(i+vec2(0,1)), h(i+vec2(1,1)), f.x), f.y); } void main(){ vec2 c = vUv - 0.5; float d = length(c) * 2.0; float v = n(vUv * 6.0 + uTime * 0.15) * 0.6 + n(vUv * 14.0 - uTime * 0.25) * 0.4; vec3 col = mix(vec3(2.4, 0.55, 0.25), vec3(1.6, 0.35, 2.2), smoothstep(0.35, 0.75, v)); float a = smoothstep(1.0, 0.72, d); gl_FragColor = vec4(col * (0.8 + 0.5 * v), a); }' });
+    R.poolMat = poolMat;
+    for (let i = 0; i < 6; i++) { const a = (i / 6) * TAU + 0.35, rr = 390 + (i % 2) * 110; const px = S.CX + Math.cos(a) * rr, py = S.CY + Math.sin(a) * rr; if (sim.ents.some(e => e.alive && e.kind === 'node' && S.dist(e.x, e.y, px, py) < 90)) continue; const pool = new THREE.Mesh(new THREE.CircleGeometry(28 + (i % 3) * 10, 32).rotateX(-Math.PI / 2), poolMat); pool.position.set(px, H(px, py) + 0.9, -py); scene.add(pool); const pl = new THREE.PointLight(0xff7a40, 0, 160, 2); pl.position.set(px, H(px, py) + 12, -py); scene.add(pl); R.poolLights.push(pl); }
+    // névoa volumétrica barata: sprites aditivos na cratera da Fenda e na Tempestade
+    const mistCv = document.createElement('canvas'); mistCv.width = 128; mistCv.height = 128; const mc = mistCv.getContext('2d'); const g = mc.createRadialGradient(64, 64, 4, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,0.55)'); g.addColorStop(0.5, 'rgba(255,255,255,0.18)'); g.addColorStop(1, 'rgba(255,255,255,0)'); mc.fillStyle = g; mc.fillRect(0, 0, 128, 128);
+    const mistTex = new THREE.CanvasTexture(mistCv); mistTex.colorSpace = THREE.SRGBColorSpace;
+    for (let i = 0; i < 16; i++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: mistTex, color: i % 2 ? 0xff7a4a : 0xb23cff, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false })); const a = Math.random() * TAU, rr = Math.random() * 300; sp.userData = { x: S.CX + Math.cos(a) * rr, y: S.CY + Math.sin(a) * rr, z: 10 + Math.random() * 60, s: 120 + Math.random() * 160, ph: Math.random() * TAU, kind: 'rift' }; scene.add(sp); R.mist.push(sp); }
+    for (let i = 0; i < 16; i++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: mistTex, color: 0x9a7cff, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, depthWrite: false })); sp.visible = false; sp.userData = { kind: 'storm', ph: Math.random() * TAU, ox: Math.random(), oy: Math.random(), z: 20 + Math.random() * 60, s: 160 + Math.random() * 160 }; scene.add(sp); R.mist.push(sp); }
     const rl = new THREE.PointLight(0xff5e3a, 2500, 900, 2); rl.position.set(S.CX, H(S.CX, S.CY) + 60, -S.CY); scene.add(rl);
   }
   // ---------- geometrias e instancing ----------
@@ -2355,7 +2421,7 @@ function create(canvas, overlay, mini) {
     if (def === 'crate') return MD.crate(); if (def === 'wreck') return MD.wreck(); if (def === 'rocks') return MD.rocks(seed); if (def === 'ruin') return MD.ruin(seed);
     const p = R.sim.players[pid]; const fn = (def === 'pirata' && p.faction === 'vehnar') ? MD.BY_DEF.pirata_vehnar : MD.BY_DEF[def]; return fn(p.color, p.faction);
   }
-  function geoOf(def, pid, seed) { const key = def + '|' + pid + '|' + (seed || 0); let g = R.geos.get(key); if (!g) { g = X.buildGeometry(modelFor(def, pid, seed)); R.geos.set(key, g); } return g; }
+  function geoOf(def, pid, seed) { const key = def + '|' + pid + '|' + (seed || 0); let g = R.geos.get(key); if (!g) { g = X.buildGeometry(modelFor(def, pid, seed), { emBoost: 1.8 }); R.geos.set(key, g); } return g; }
   function instOf(def, pid, seed, ghost) {
     const key = def + '|' + pid + '|' + (seed || 0) + (ghost ? '|g' : ''); let it = R.inst.get(key); if (it) return it;
     const g = geoOf(def, pid, seed); const cap = 64;
@@ -2397,7 +2463,7 @@ function create(canvas, overlay, mini) {
   function miniM() { return mini.width / (2 * S.WORLD); }
   R.worldToMini = function (x, y) { const m = miniM(); return [(x - y) * m + mini.width / 2, (x + y) * m / 2 + mini.width / 4]; };
   R.miniToWorld = function (nx, ny) { const m = miniM(); const X2 = (nx * mini.width - mini.width / 2) / m, Y2 = (ny * mini.width - mini.width / 4) * 2 / m; return [(X2 + Y2) / 2, (Y2 - X2) / 2]; };
-  R.resize = function () { const dpr = Math.min(2, window.devicePixelRatio || 1); const w = canvas.clientWidth, h = canvas.clientHeight; R.w = w; R.h = h; R.dpr = dpr; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); if (overlay.width !== Math.round(w * dpr)) { overlay.width = Math.round(w * dpr); overlay.height = Math.round(h * dpr); } const ms = mini.clientWidth || 184; if (mini.width !== ms * dpr) { mini.width = ms * dpr; mini.height = ms * dpr; mfog.width = mini.width; mfog.height = mini.height; } };
+  R.resize = function () { const dpr = Math.min(2, window.devicePixelRatio || 1); const w = canvas.clientWidth, h = canvas.clientHeight; R.w = w; R.h = h; R.dpr = dpr; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); if (composer) { composer.setSize(w, h); if (ssaoPass) ssaoPass.setSize(w, h); } if (overlay.width !== Math.round(w * dpr)) { overlay.width = Math.round(w * dpr); overlay.height = Math.round(h * dpr); } const ms = mini.clientWidth || 184; if (mini.width !== ms * dpr) { mini.width = ms * dpr; mini.height = ms * dpr; mfog.width = mini.width; mfog.height = mini.height; } };
 
   // ---------- efeitos ----------
   const PN = 2200; const pPos = new Float32Array(PN * 3), pCol = new Float32Array(PN * 3); const P = { x: new Float32Array(PN), y: new Float32Array(PN), z: new Float32Array(PN), vx: new Float32Array(PN), vy: new Float32Array(PN), vz: new Float32Array(PN), t: new Float32Array(PN), life: new Float32Array(PN), kind: new Uint8Array(PN), i: 0 };
@@ -2405,11 +2471,11 @@ function create(canvas, overlay, mini) {
   const smokePts = new THREE.Points(pGeo, new THREE.PointsMaterial({ size: 9, vertexColors: true, transparent: true, opacity: 0.5, depthWrite: false, sizeAttenuation: true })); smokePts.frustumCulled = false; scene.add(smokePts);
   const SN = 600; const sPos = new Float32Array(SN * 3), sCol = new Float32Array(SN * 3); const SP = { x: new Float32Array(SN), y: new Float32Array(SN), z: new Float32Array(SN), vx: new Float32Array(SN), vy: new Float32Array(SN), vz: new Float32Array(SN), t: new Float32Array(SN), life: new Float32Array(SN), i: 0 };
   const sGeo = new THREE.BufferGeometry(); sGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3)); sGeo.setAttribute('color', new THREE.BufferAttribute(sCol, 3));
-  const sparkPts = new THREE.Points(sGeo, new THREE.PointsMaterial({ size: 3.2, vertexColors: true, transparent: true, opacity: 0.95, depthWrite: false, blending: THREE.AdditiveBlending })); sparkPts.frustumCulled = false; scene.add(sparkPts);
+  const sparkPts = new THREE.Points(sGeo, new THREE.PointsMaterial({ size: 3.2, vertexColors: true, transparent: true, opacity: 0.95, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })); sparkPts.frustumCulled = false; scene.add(sparkPts);
   function smoke(x, y, z, col, life, vz) { const i = P.i++ % PN; P.x[i] = x; P.y[i] = y; P.z[i] = z; P.vx[i] = (Math.random() - .5) * 6; P.vy[i] = (Math.random() - .5) * 6; P.vz[i] = vz == null ? 14 : vz; P.t[i] = 0; P.life[i] = life || 2.5; P.kind[i] = 0; pCol[i * 3] = col[0]; pCol[i * 3 + 1] = col[1]; pCol[i * 3 + 2] = col[2]; }
   function snow(x, y) { const i = P.i++ % PN; P.x[i] = x; P.y[i] = y; P.z[i] = 90 + Math.random() * 40; P.vx[i] = 25; P.vy[i] = 8; P.vz[i] = -45; P.t[i] = 0; P.life[i] = 3.2; P.kind[i] = 1; pCol[i * 3] = 0.9; pCol[i * 3 + 1] = 0.93; pCol[i * 3 + 2] = 1; }
   function spark(x, y, z, col, sp, g) { const i = SP.i++ % SN; const a = Math.random() * TAU; SP.x[i] = x; SP.y[i] = y; SP.z[i] = z; SP.vx[i] = Math.cos(a) * sp * Math.random(); SP.vy[i] = Math.sin(a) * sp * Math.random(); SP.vz[i] = sp * (0.4 + Math.random() * 0.8); SP.t[i] = 0; SP.life[i] = 0.4 + Math.random() * 0.6; sCol[i * 3] = col[0]; sCol[i * 3 + 1] = col[1]; sCol[i * 3 + 2] = col[2]; }
-  const boomGeo = new THREE.SphereGeometry(1, 10, 8); const boomMat = new THREE.MeshBasicMaterial({ color: 0xffb070, transparent: true, opacity: 0.8, depthWrite: false }); const booms = new THREE.InstancedMesh(boomGeo, boomMat, 48); booms.count = 0; booms.frustumCulled = false; scene.add(booms); const boomList = [];
+  const boomGeo = new THREE.SphereGeometry(1, 10, 8); const boomMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 1.5, 0.8), transparent: true, opacity: 0.8, depthWrite: false }); const booms = new THREE.InstancedMesh(boomGeo, boomMat, 48); booms.count = 0; booms.frustumCulled = false; scene.add(booms); const boomList = [];
   const decalGeo = new THREE.CircleGeometry(1, 18); decalGeo.rotateX(-Math.PI / 2); const decals = new THREE.InstancedMesh(decalGeo, new THREE.MeshBasicMaterial({ color: 0x0b0908, transparent: true, opacity: 0.55, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }), 160); decals.count = 0; decals.frustumCulled = false; scene.add(decals); const decalList = [];
   const ringGeo = new THREE.RingGeometry(0.82, 1, 28); ringGeo.rotateX(-Math.PI / 2); const selRings = new THREE.InstancedMesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 }), 256); selRings.count = 0; selRings.frustumCulled = false; scene.add(selRings);
   const rangeRings = new THREE.InstancedMesh(new THREE.RingGeometry(0.98, 1, 64).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.25, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 }), 32); rangeRings.count = 0; rangeRings.frustumCulled = false; scene.add(rangeRings);
@@ -2457,7 +2523,7 @@ function create(canvas, overlay, mini) {
     R.shakeX = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0; R.shakeY = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0;
     updateCamera(cam);
     // dia e noite
-    const nt = R.night; sun.intensity = 2.3 * (1 - nt) + 0.18 * nt; sun.color.setRGB(1 - 0.45 * nt, 0.91 - 0.3 * nt, 0.77 + 0.2 * nt); hemi.intensity = 0.7 * (1 - nt) + 0.22 * nt; amb.intensity = 0.3 * (1 - nt) + 0.12 * nt + lightning * 0.6;
+    const nt = R.night; sun.intensity = 1.6 * (1 - nt) + 0.14 * nt; sun.color.setRGB(1 - 0.45 * nt, 0.91 - 0.3 * nt, 0.77 + 0.2 * nt); hemi.intensity = 0.55 * (1 - nt) + 0.2 * nt + lightning * 0.5; amb.intensity = 0.22 * (1 - nt) + 0.1 * nt + lightning * 0.6;
     const bg = new THREE.Color().setRGB(0.62 * (1 - nt) + 0.02 * nt, 0.69 * (1 - nt) + 0.03 * nt, 0.77 * (1 - nt) + 0.06 * nt); scene.background = bg; scene.fog.color.copy(bg);
     // névoa de guerra e território → texturas do terreno
     for (let iy = 0; iy < FOGN; iy++) for (let ix = 0; ix < FOGN; ix++) { const i = (iy * FOGN + ix) * 4; const tx = (ix * FOGC / TILE) | 0, ty = (iy * FOGC / TILE) | 0; const ex = view.reveal || explored[ty * TILES + tx]; fogData[i] = ex ? 110 : 0; fogData[i + 3] = 255; }
@@ -2501,8 +2567,10 @@ function create(canvas, overlay, mini) {
     // luzes pontuais: as mais próximas da câmera, à noite
     emitters.sort((a, b) => a.d - b.d); for (let i = 0; i < lightPool.length; i++) { const l = lightPool[i]; const em = emitters[i]; if (em && nt > 0.1) { l.position.set(em.x, H(em.x, em.y) + em.z, -em.y); l.color.set(em.col); l.intensity = 700 * nt; } else l.intensity = 0; }
     // tempestade
-    const st = sim.storm; if (st && st.phase === 'active') { stormDisc.visible = true; stormDisc.position.set(st.x, H(st.x, st.y) + 2, -st.y); stormDisc.scale.set(st.r, 1, st.r); for (let i = 0; i < 8; i++) { const a = Math.random() * TAU, rr = Math.sqrt(Math.random()) * st.r; snow(st.x + Math.cos(a) * rr, st.y + Math.sin(a) * rr); } if (Math.random() < 0.012) lightning = 1; } else stormDisc.visible = false;
-    renderer.render(scene, camera);
+    const st = sim.storm; if (st && st.phase === 'active') { stormDisc.visible = true; stormDisc.position.set(st.x, H(st.x, st.y) + 2, -st.y); stormDisc.scale.set(st.r, 1, st.r); for (let i = 0; i < 8 * R.quality.particles; i++) { const a = Math.random() * TAU, rr = Math.sqrt(Math.random()) * st.r; snow(st.x + Math.cos(a) * rr, st.y + Math.sin(a) * rr); } if (Math.random() < 0.012) lightning = 1; } else stormDisc.visible = false;
+    if (R.poolMat) R.poolMat.uniforms.uTime.value = R.time; for (const pl of R.poolLights) pl.intensity = 120 * nt + 20;
+    for (const sp of R.mist) { const u = sp.userData; if (u.kind === 'rift') { const zz = u.z + Math.sin(R.time * 0.3 + u.ph) * 8; sp.position.set(u.x + Math.sin(R.time * 0.2 + u.ph) * 20, H(u.x, u.y) + zz, -u.y); sp.scale.set(u.s, u.s * 0.7, 1); sp.material.opacity = 0.16 + 0.1 * nt; } else { if (st && st.phase === 'active') { sp.visible = true; const a = u.ox * TAU + R.time * 0.05, rr = u.oy * st.r * 0.9; const px = st.x + Math.cos(a) * rr, py = st.y + Math.sin(a) * rr; sp.position.set(px, H(px, py) + u.z, -py); sp.scale.set(u.s, u.s * 0.6, 1); } else sp.visible = false; } }
+    if (composer) { composer.render(); } else renderer.render(scene, camera);
     drawOverlay(sim, view, hpList, me);
     drawMinimap(sim, view);
   };
@@ -2601,6 +2669,51 @@ A.setEnabled = function (on) { A.enabled = on; save(); }; A.setVoice = function 
 ARD.audio = A;
 })(globalThis.ARD = globalThis.ARD || {});
 
+/* Rede P2P (PeerJS, WebRTC) com lockstep de comandos: código de sala, troca de configuração, comandos por tick, checksums e chat. */
+(function (ARD) {
+'use strict';
+const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function makeCode() { let c = ''; for (let i = 0; i < 6; i++) c += ALPHA[Math.floor(Math.random() * ALPHA.length)]; return c; }
+function create() {
+  const N = { state: 'idle', code: null, peer: null, conn: null, handlers: {}, role: null, DELAY: 3, localSched: new Map(), remoteSched: new Map(), hashes: new Map(), remoteHashes: new Map(), desync: false, lastRemoteTick: -1, rtt: 0 };
+  N.on = (t, fn) => { N.handlers[t] = fn; };
+  function fire(t, p) { if (N.handlers[t]) N.handlers[t](p); }
+  function bind(conn) {
+    N.conn = conn;
+    conn.on('open', () => { N.state = 'connected'; fire('open', {}); });
+    conn.on('data', d => { if (!d || typeof d !== 'object') return; if (d.t === 'cmds') { N.remoteSched.set(d.tick, d.cmds || []); N.lastRemoteTick = Math.max(N.lastRemoteTick, d.tick); } else if (d.t === 'hash') { N.remoteHashes.set(d.tick, d.h); checkHash(d.tick); } else if (d.t === 'ping') { conn.send({ t: 'pong', s: d.s }); } else if (d.t === 'pong') { N.rtt = performance.now() - d.s; } else fire(d.t, d); });
+    conn.on('close', () => { N.state = 'lost'; fire('close', {}); });
+    conn.on('error', e => { N.state = 'lost'; fire('error', { message: String(e && e.message || e) }); });
+  }
+  N.host = function (onReady) {
+    if (typeof Peer === 'undefined') { fire('error', { message: 'PeerJS não carregou' }); return; }
+    N.role = 'host'; N.code = makeCode(); N.state = 'hosting';
+    N.peer = new Peer('aether-rift-' + N.code.toLowerCase(), { debug: 0 });
+    N.peer.on('open', () => { if (onReady) onReady(N.code); });
+    N.peer.on('connection', conn => { if (N.conn) { conn.close(); return; } bind(conn); });
+    N.peer.on('error', e => { fire('error', { message: String(e && e.type || e) }); });
+  };
+  N.join = function (code) {
+    if (typeof Peer === 'undefined') { fire('error', { message: 'PeerJS não carregou' }); return; }
+    N.role = 'guest'; N.code = code.trim().toUpperCase(); N.state = 'joining';
+    N.peer = new Peer({ debug: 0 });
+    N.peer.on('open', () => { const conn = N.peer.connect('aether-rift-' + N.code.toLowerCase(), { reliable: true, serialization: 'json' }); bind(conn); });
+    N.peer.on('error', e => { fire('error', { message: String(e && e.type || e) }); });
+  };
+  N.send = function (t, payload) { if (!N.conn || N.state !== 'connected') return; try { N.conn.send(Object.assign({ t }, payload || {})); } catch (e) {} };
+  N.ping = function () { N.send('ping', { s: performance.now() }); };
+  // ---- lockstep
+  N.scheduleLocal = function (tick, cmds) { N.localSched.set(tick, cmds); N.send('cmds', { tick, cmds }); };
+  N.canAdvance = function (tick) { return tick < N.DELAY || N.remoteSched.has(tick); };
+  N.takeCmds = function (tick, myId) { const a = N.localSched.get(tick) || [], b = N.remoteSched.get(tick) || []; N.localSched.delete(tick); N.remoteSched.delete(tick); const mine = a.map(c => Object.assign({}, c)), theirs = b.map(c => Object.assign({}, c)); return myId === 0 ? mine.concat(theirs) : theirs.concat(mine); };
+  N.sendHash = function (tick, h) { N.hashes.set(tick, h); N.send('hash', { tick, h }); checkHash(tick); if (N.hashes.size > 40) { const k = N.hashes.keys().next().value; N.hashes.delete(k); } };
+  function checkHash(tick) { if (N.desync) return; const a = N.hashes.get(tick), b = N.remoteHashes.get(tick); if (a != null && b != null) { if (a !== b) { N.desync = true; fire('desync', { tick }); } N.remoteHashes.delete(tick); N.hashes.delete(tick); } }
+  N.close = function () { try { if (N.conn) N.conn.close(); if (N.peer) N.peer.destroy(); } catch (e) {} N.state = 'idle'; };
+  return N;
+}
+ARD.net = { create, makeCode };
+})(globalThis.ARD = globalThis.ARD || {});
+
 /* Entrada: mouse, teclado e toque → comandos para a simulação e estado de visão (câmera, seleção, modos). */
 (function (ARD) {
 'use strict';
@@ -2641,7 +2754,7 @@ function create(o) {
   function setSel(ids) { view.sel = new Set(ids); ui.selectionChanged(); }
   I.select = setSel;
   I.selectOnScreen = function () { const ids = []; for (const e of sim.ents) { if (!e.alive || e.owner !== human || e.kind !== 'unit' || !S.UNITS[e.def].attack) continue; const [sx, sy] = R.worldToScreen(cam, e.x, e.y); if (sx >= 0 && sy >= 0 && sx <= R.w && sy <= R.h) ids.push(e.id); } setSel(ids); return ids.length; };
-  function cmd(c) { c.p = human; S.enqueue(sim, c); }
+  function cmd(c) { c.p = human; if (ui.enqueue) ui.enqueue(c); else S.enqueue(sim, c); }
   I.cmd = cmd;
 
   function wallSegments(x0, y0, x1, y1, def) {
@@ -2840,6 +2953,11 @@ function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => 
 const params = new URLSearchParams(location.search);
 let G = null; // game state
 
+function whenThree(cb) {
+  if (window.THREE) return cb(true); if (window.__threeFailed) return cb(false);
+  let done = false; const t = setTimeout(() => { if (!done) { done = true; window.__threeFailed = true; cb(false); } }, 8000);
+  window.addEventListener('three-ready', () => { if (!done) { done = true; clearTimeout(t); cb(true); } }, { once: true });
+}
 function loadPrefs() { try { return JSON.parse(localStorage.getItem('ard-beta-prefs') || '{}') || {}; } catch (e) { return {}; } }
 function savePrefs(p) { try { localStorage.setItem('ard-beta-prefs', JSON.stringify(p)); } catch (e) {} }
 
@@ -2857,10 +2975,37 @@ function initStart() {
   $('opt-opp').value = prefs.opp || '2';
   $('opt-diff').value = prefs.diff || 'normal';
   $('opt-seed').value = params.get('seed') || String(Math.floor(Math.random() * 90000) + 1000);
-  $('opt-gfx').value = prefs.gfx || '3d';
+  $('opt-gfx').value = prefs.gfx || '3d'; $('opt-quality').value = prefs.quality || 'auto';
+  // multiplayer P2P por código de sala
+  const mpStatus = t => { $('mp-status').textContent = t; };
+  const myInfo = () => ({ name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar' });
+  $('btn-host').addEventListener('click', () => {
+    if (!window.Peer) { mpStatus('PeerJS não carregou neste navegador.'); return; }
+    const N = ARD.net.create(); mpStatus('Criando sala…');
+    N.on('error', e => mpStatus('Erro de rede: ' + e.message));
+    N.on('open', () => mpStatus('Jogador conectado. Iniciando…'));
+    N.on('hello', d => {
+      const me = myInfo(); const opp = parseInt($('opt-opp').value, 10); const facs = ['vehnar', 'erevane']; const aiNames = ['Fundição Kessari', 'Clã Sombrio', 'Consórcio Oryn'];
+      const players = [{ name: me.name, faction: me.faction, human: true }, { name: (d.name || 'Convidado').slice(0, 18), faction: d.faction === 'erevane' ? 'erevane' : 'vehnar', human: true }];
+      for (let i = 0; i < Math.min(2, opp); i++) players.push({ name: aiNames[i], faction: facs[i % 2], difficulty: $('opt-diff').value });
+      const cfg = { players, seed: parseInt($('opt-seed').value, 10) || 1, diff: $('opt-diff').value, gfx: $('opt-gfx').value, quality: $('opt-quality').value, name: me.name, faction: me.faction, opp: String(players.length - 2) };
+      N.send('start', { cfg: Object.assign({}, cfg, { gfx: undefined, quality: undefined }) });
+      setTimeout(() => startGame(cfg, { net: N, myId: 0 }), 150);
+    });
+    N.host(code => { $('opt-code').value = code; mpStatus('Sala ' + code + ' criada. Envie o código ao seu amigo e aguarde a conexão…'); });
+  });
+  $('btn-join').addEventListener('click', () => {
+    if (!window.Peer) { mpStatus('PeerJS não carregou neste navegador.'); return; }
+    const code = $('opt-code').value.trim(); if (code.length < 4) { mpStatus('Digite o código da sala.'); return; }
+    const N = ARD.net.create(); mpStatus('Conectando à sala ' + code.toUpperCase() + '…');
+    N.on('error', e => mpStatus('Erro de rede: ' + e.message + ' (sala existe? ambos online?)'));
+    N.on('open', () => { mpStatus('Conectado. Aguardando o anfitrião iniciar…'); N.send('hello', myInfo()); });
+    N.on('start', d => { const cfg = Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value }); startGame(cfg, { net: N, myId: 1 }); });
+    N.join(code);
+  });
   $('btn-start').addEventListener('click', () => {
     const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar';
-    const cfg = { name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value };
+    const cfg = { name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value };
     savePrefs(cfg); startGame(cfg);
   });
   $('btn-help-start').addEventListener('click', () => toggleHelp(true));
@@ -2868,18 +3013,22 @@ function initStart() {
 }
 
 // ---------- game ----------
-function startGame(cfg) {
-  const players = [{ name: cfg.name, faction: cfg.faction, human: true }];
+function startGame(cfg, netCtx) {
+  const want3dEarly = (cfg.gfx || '3d') === '3d' && params.get('r') !== '2d';
+  if (want3dEarly && !window.THREE && !window.__threeFailed) { $('start').hidden = true; $('game').hidden = false; $('loading').hidden = false; $('load-bar').style.width = '5%'; whenThree(() => startGame(cfg, netCtx)); return; }
+  const net = netCtx ? netCtx.net : null;
+  const players = cfg.players ? cfg.players.map(p => Object.assign({}, p)) : [{ name: cfg.name, faction: cfg.faction, human: true }];
   const facs = ['vehnar', 'erevane'];
   const aiNames = { vehnar: ['Fundição Kessari', 'Consórcio Oryn', 'Estaleiro Vey'], erevane: ['Clã Sombrio', 'Náufragos de Ísk', 'Corsários da Faixa'] };
-  for (let i = 0; i < parseInt(cfg.opp, 10); i++) { const f = facs[(i + (cfg.faction === 'vehnar' ? 1 : 0)) % 2]; players.push({ name: aiNames[f][i % 3], faction: f, difficulty: cfg.diff }); }
+  if (!cfg.players) for (let i = 0; i < parseInt(cfg.opp, 10); i++) { const f = facs[(i + (cfg.faction === 'vehnar' ? 1 : 0)) % 2]; players.push({ name: aiNames[f][i % 3], faction: f, difficulty: cfg.diff }); }
   const sim = S.createSim({ seed: cfg.seed, players, minutes: 25 });
-  const human = 0;
+  const human = netCtx ? netCtx.myId : 0;
   const canvas = $('world'), mini = $('minimap'), overlay = $('overlay');
   $('start').hidden = true; $('game').hidden = false; $('end').hidden = true;
   let R = null; const want3d = (cfg.gfx || '3d') === '3d' && params.get('r') !== '2d';
   if (want3d && window.THREE) { try { R = ARD.render3d.create(canvas, overlay, mini); } catch (err) { console.warn('3D indisponível, usando 2D:', err); R = null; } }
   if (!R) { R = ARD.render.create(canvas, mini); overlay.hidden = true; if (want3d) setTimeout(() => notice('3D indisponível neste navegador; usando o modo 2D'), 1200); }
+  if (R.setQuality) R.setQuality(cfg.quality || 'auto');
   R.resize();
   const nuc = S.nucleoOf(sim, human);
   const isTouch = matchMedia('(pointer: coarse)').matches || !!params.get('touch');
@@ -2887,7 +3036,7 @@ function startGame(cfg) {
   const ui = makeUI(); // closures below
   const I = ARD.input.create({ canvas, sim, view, R, human, ui });
   const ais = sim.players.filter(p => !p.human).map(p => ARD.ai.create(p.id, p.difficulty));
-  G = { sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null };
+  G = { sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null, net, pending: [], waiting: false, waitT: 0 };
   window.addEventListener('resize', () => R.resize());
   document.body.classList.toggle('touch', isTouch);
 
@@ -2895,8 +3044,9 @@ function startGame(cfg) {
   $('loading').hidden = false;
   R.prepare(sim, f => { $('load-bar').style.width = Math.round(f * 100) + '%'; }, () => {
     $('loading').hidden = true;
-    const ff = parseInt(params.get('ff') || '0', 10);
+    const ff = net ? 0 : parseInt(params.get('ff') || '0', 10);
     for (let i = 0; i < ff * 10; i++) tickOnce(true);
+    if (net) setupNet();
     if (params.get('speed')) G.speed = parseFloat(params.get('speed')) || 1;
     if (params.get('night')) sim.tick = 3600; // teste: começa de noite
     if (params.get('reveal')) view.reveal = true; // teste: sem névoa
@@ -2907,9 +3057,16 @@ function startGame(cfg) {
   });
 
   function tickOnce(silent) {
-    const sim = G.sim;
+    const sim = G.sim; const tick = sim.tick;
+    if (net) {
+      if (net.sentFor == null || net.sentFor < tick) { net.scheduleLocal(tick + net.DELAY, G.pending); G.pending = []; net.sentFor = tick; }
+      if (!net.canAdvance(tick)) { G.waiting = true; return false; }
+      G.waiting = false;
+    }
     if (sim.tick % 10 === 0) for (const a of G.ais) for (const c of ARD.ai.think(sim, a)) S.enqueue(sim, c);
+    if (net) for (const c of net.takeCmds(tick, human)) S.enqueue(sim, c);
     const ev = S.step(sim);
+    if (net && sim.tick % 10 === 0) net.sendHash(sim.tick, S.hash(sim));
     if (!silent) G.R.onEvents(ev, sim, human);
     handleEvents(ev, silent);
     if (sim.tick % 10 === 0) updateMemory();
@@ -2917,7 +3074,8 @@ function startGame(cfg) {
   function frame(now) {
     if (!G || G.sim !== sim) return;
     let dt = Math.min(0.25, (now - G.last) / 1000); G.last = now;
-    if (!G.paused && !G.ended) { G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { tickOnce(false); G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; }
+    if (!G.paused && !G.ended) { G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { if (tickOnce(false) === false) { G.acc = Math.min(G.acc, S.TICK); break; } G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; }
+    if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; $('mp-wait').hidden = G.waitT < 0.8; if (G.waitT >= 0.8) $('mp-wait').textContent = net.state === 'lost' ? 'Conexão perdida com o outro jogador.' : 'Aguardando o outro jogador… (' + G.waitT.toFixed(0) + ' s)'; }
     I.update(dt);
     if (G.frameN % 3 === 0) refreshTop();
     if (G.frameN++ % 6 === 0) { refreshPanel(false); refreshQuick(); }
@@ -3072,7 +3230,7 @@ function startGame(cfg) {
     $('btn-box').classList.toggle('on', I.touchBox);
   }
   function bindHUD() {
-    document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => { G.speed = parseFloat(b.dataset.speed); G.paused = false; refreshTop(); }));
+    document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => { if (net) { notice('Velocidade fixa no multiplayer'); return; } G.speed = parseFloat(b.dataset.speed); G.paused = false; refreshTop(); }));
     $('btn-pause').addEventListener('click', () => ui.togglePause());
     $('btn-over').addEventListener('click', () => I.cmd({ t: 'overcharge' }));
     $('btn-super').addEventListener('click', () => { if (fac().superKey === 'fundicao') { I.setMode('super'); notice('Clique em território seu para derrubar o Bastião'); } else I.cmd({ t: 'super' }); });
@@ -3143,9 +3301,21 @@ function startGame(cfg) {
     box.hidden = false; $('hints-body').innerHTML = (G.isTouch ? todo.slice(0, 1) : todo).map((h, i) => `<div class="hint ${i === 0 ? 'now' : ''}">${esc(h.text)}</div>`).join('');
   }
 
+  function setupNet() {
+    $('chat').hidden = false; document.querySelectorAll('[data-speed]').forEach(b => { b.disabled = true; b.style.opacity = 0.4; });
+    const log = (who, text) => { const d = document.createElement('div'); d.textContent = who ? who + ': ' + text : text; $('chat-log').appendChild(d); $('chat-log').scrollTop = 9999; while ($('chat-log').children.length > 30) $('chat-log').firstChild.remove(); };
+    const other = sim.players[human === 0 ? 1 : 0];
+    log('', 'Conectado com ' + other.name + '. Sala ' + net.code + '.');
+    $('chat-in').addEventListener('keydown', e => { if (e.key === 'Enter') { const t = $('chat-in').value.trim(); if (t) { net.send('chat', { text: t.slice(0, 120), name: sim.players[human].name }); log(sim.players[human].name, t); } $('chat-in').value = ''; e.stopPropagation(); } e.stopPropagation(); });
+    net.on('chat', d => { log(d.name || other.name, String(d.text || '').slice(0, 120)); notice((d.name || other.name) + ': ' + String(d.text || '').slice(0, 60)); AU.sfx('click'); });
+    net.on('close', () => { notice('Conexão perdida com o outro jogador'); log('', 'Conexão perdida.'); });
+    net.on('desync', d => { notice('Dessincronização detectada no tick ' + d.tick + '. As partidas divergiram.'); log('', 'Dessincronização no tick ' + d.tick + '.'); });
+    setInterval(() => net.ping(), 5000);
+  }
   // ---------- end ----------
   function endGame(result) {
     if (G.ended) return; G.ended = true;
+    if (result.outcome === 'over') { const me = sim.players[human]; result = Object.assign({}, result, { outcome: me.alive && result.winner === human ? 'victory' : 'defeat', reason: result.reason + (result.winner >= 0 ? ' Vencedor: ' + sim.players[result.winner].name + '.' : '') }); }
     const p = sim.players[human]; const st = p.stats;
     $('end').hidden = false; $('end-title').textContent = result.outcome === 'victory' ? 'DOMÍNIO' : 'COLAPSO'; $('end-title').className = result.outcome;
     $('end-reason').textContent = result.reason;
@@ -3163,8 +3333,9 @@ function startGame(cfg) {
       buildMenuChanged() { refreshPanel(true); refreshQuick(); },
       touchBoxChanged() { refreshQuick(); },
       notice, confirm: confirmModal, modalOpen() { return !$('diplo').hidden || !$('help').hidden || !$('confirm').hidden; },
+      enqueue(c) { if (net) G.pending.push(c); else S.enqueue(sim, c); },
       closeModals() { $('diplo').hidden = true; $('help').hidden = true; $('confirm').hidden = true; },
-      toggleHelp() { toggleHelp(); }, togglePause() { G.paused = !G.paused; refreshTop(); notice(G.paused ? 'Pausado' : 'Continuando'); },
+      toggleHelp() { toggleHelp(); }, togglePause() { if (net) { notice('Sem pausa no multiplayer'); return; } G.paused = !G.paused; refreshTop(); notice(G.paused ? 'Pausado' : 'Continuando'); },
     };
   }
   function confirmModal(text, onYes) { const m = $('confirm'); m.hidden = false; $('confirm-text').textContent = text; $('confirm-yes').onclick = () => { m.hidden = true; onYes(); }; $('confirm-no').onclick = () => { m.hidden = true; }; }
