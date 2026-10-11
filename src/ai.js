@@ -23,7 +23,7 @@ const CLASS_W = { voz: 'infantaria', agulha: 'infantaria', cria: 'infantaria', c
 const VALUE = { refinaria: 3, nodulo: 2.5, reator: 2, laboratorio: 2, quartel: 1.5, fabrica: 1.5, hangar: 1.5, torre: 1, bastiao: 0.8, nucleo: 1.2, muro: 0.1, portao: 0.2 };
 
 function create(pid, difficulty) {
-  return { pid, diff: S.DIFFICULTY[difficulty] || S.DIFFICULTY.normal, bo: 0, mode: 'defend', attackStart: 0, target: null, known: new Map(),
+  return { pid, dn: S.DIFFICULTY[difficulty] ? difficulty : 'normal', diff: S.DIFFICULTY[difficulty] || S.DIFFICULTY.normal, bo: 0, mode: 'defend', attackStart: 0, target: null, known: new Map(),
     lastPirate: 0, lastPropose: -999, lastExtra: 0, enemySeen: { inf: 0, vei: 0, dro: 0, est: 0, sup: 0 }, lastAttackOrder: -99,
     strategy: null, lastStrategic: -999, lostRecent: 0, armyPrev: 0, lastScout: -999, wallsBuilt: false, towersWanted: 0 };
 }
@@ -82,6 +82,7 @@ function think(sim, mem) {
   const t = sim.time; const D = mem.diff; const mine = own(sim, mem.pid);
   const nuc = mine.find(e => e.kind === 'building' && e.def === 'nucleo'); if (!nuc) return cmds;
   const builds = mine.filter(e => e.kind === 'building'); const units = mine.filter(e => e.kind === 'unit');
+  const era = p.era || 1; const ERA_AT = { facil: [0, 0, 300, 600], normal: [0, 0, 200, 420], dificil: [0, 0, 150, 330], brutal: [0, 0, 120, 280] }[mem.dn || 'normal'] || [0, 0, 200, 420];
   const collectors = units.filter(u => u.def === 'coletor'); const pirates = units.filter(u => u.def === 'pirata'); const army = units.filter(u => S.UNITS[u.def].attack && !u.scripted); // 4.0e: chefes de campanha obedecem só ao roteiro
   const nodulos = count(builds, b => b.def === 'nodulo'); const underConstruction = count(builds, b => !b.built);
   updateKnown(sim, mem);
@@ -100,7 +101,13 @@ function think(sim, mem) {
   if (human && t > 180 && !S.hasPact(sim, mem.pid, human.id) && t - mem.lastPropose > 150 && S.armyValue(sim, mem.pid) < S.armyValue(sim, human.id) * 0.6 && sim.rand() < 0.5) { mem.lastPropose = t; emitC({ t: 'propose', to: human.id }); }
   for (const k in p.pacts) { const pact = p.pacts[k]; const q = sim.players[k]; if (!q.alive) continue; if (D.breakP > 0 && t - pact.since > 180 && S.armyValue(sim, mem.pid) > S.armyValue(sim, q.id) * 1.6 && sim.rand() < D.breakP / 60) { emitC({ t: 'break', with: q.id }); mem.mode = 'attack'; mem.attackStart = S.armyValue(sim, mem.pid); mem.target = null; } }
 
+  // --- 4.1d: evolução da Era (antes de gastar com o resto)
+  if (era < 3 && !(p.evolveT > 0) && t >= ERA_AT[era + 1] && !S.eraBlock(sim, mem.pid)) { const nx = S.ERAS[era + 1]; const c = Object.assign({}, nx.cost); c.minerio = (c.minerio || 0) + 60; if (S.canAfford(p, c)) emitC({ t: 'evolve' }); }
+  const eraDue = era < 3 && !(p.evolveT > 0) && t >= ERA_AT[era + 1] && !S.eraBlock(sim, mem.pid); const eraHold = eraDue ? S.ERAS[era + 1].cost.minerio + 60 : 0; // 4.1d: hora de evoluir: o resto espera o Núcleo
   // --- economia
+  let terrNodes = 0, terrAmt = 0, terrMin = 0; for (const e of sim.ents) if (e.alive && e.kind === 'node' && e.amount > 0 && S.inTerritory(sim, mem.pid, e.x, e.y)) { terrNodes++; terrAmt += e.amount; if (e.res === 'minerio') terrMin += e.amount; }
+  const lowNodes = terrAmt < 2500 || terrMin < 1200; // 4.1d: o território está secando: expandir já (antes a IA esgotava os nós aos 4 min e parava)
+  if (!terrNodes && t - (mem.lastFar || -99) > 8) { mem.lastFar = t; const idle = collectors.filter(u => u.state === 'idle'); if (idle.length) { let best = null, bd = Infinity; for (const e of sim.ents) { if (!e.alive || e.amount <= 0 || (e.kind !== 'node' && e.kind !== 'wreck')) continue; const ow = S.territoryOwner(sim, e.x, e.y); if (ow !== -1 && ow !== mem.pid && S.isEnemy(sim, mem.pid, ow)) continue; const want = p.res.minerio < 400 ? 'minerio' : null; const d = S.dist(nuc.x, nuc.y, e.x, e.y) * (want && e.kind === 'node' && e.res !== want ? 3 : 1); if (d < bd) { bd = d; best = e; } } if (best) emitC({ t: 'harvest', ids: idle.map(u => u.id), target: best.id }); } } // 4.1d: nunca parar a renda
   const wantCol = Math.min(D.maxCol || 16, 6 + nodulos * 2 + strat.col);
   if (collectors.length + count(nuc.queue, q => q.def === 'coletor') < wantCol && nuc.queue.length < 2 && S.canAfford(p, S.UNITS.coletor.cost) && nuc.jumpT <= 0) emitC({ t: 'produce', id: nuc.id, def: 'coletor' });
   const reactors = count(builds, b => b.def === 'reator'); const towers = count(builds, b => b.def === 'torre');
@@ -109,23 +116,26 @@ function think(sim, mem) {
   const paced = !D.buildEvery || t - (mem.lastBuild == null ? -999 : mem.lastBuild) >= D.buildEvery; // 4.1a: o ritmo vale para tudo, Reatores inclusive
   if (needEnergy && paced && S.canAfford(p, { minerio: S.BUILDINGS.reator.cost.minerio + reserve })) { const s = findSpot(sim, mem.pid, 'reator', nuc.x, nuc.y, 70, 260, 30); if (s) { emitC({ t: 'build', def: 'reator', x: s.x, y: s.y }); mem.lastBuild = t; } }
   else if (underConstruction < 2 && paced) { // 4.1a: Fácil/Normal constroem num ritmo humano
-    const order = BUILD_ORDERS[p.faction] || BUILD_ORDERS.vehnar; let def = order[mem.bo];
+    const order = mem.order || (mem.order = (BUILD_ORDERS[p.faction] || BUILD_ORDERS.vehnar).slice()); let def = order[mem.bo];
+    if (def && S.lockReason(sim, mem.pid, 'building', def)) { let j = mem.bo + 1; while (j < order.length && S.lockReason(sim, mem.pid, 'building', order[j])) j++; if (j < order.length) { const tmp = order[mem.bo]; order[mem.bo] = order[j]; order[j] = tmp; def = order[mem.bo]; } } // 4.1d: o trancado espera; adianta o próximo liberado
+    if (lowNodes && nodulos < 7 && t > 60 && def !== 'nodulo' && t - (mem.lastExpand || -99) > 25) { def = 'nodulo'; mem.emergency = true; } // território secando: expandir antes de tudo
     if (!def || mem.bo >= order.length) {
       if (towers < mem.towersWanted && t - mem.lastExtra > 45) { def = 'torre'; mem.lastExtra = t; }
       else if (nodulos < 2 + strat.nodulos + Math.floor(t / 500) && t - mem.lastExtra > 60) { def = 'nodulo'; mem.lastExtra = t; }
-      else if (t - mem.lastExtra > 90) { def = sim.rand() < 0.5 ? (p.faction === 'vehnar' ? 'fabrica' : 'hangar') : 'quartel'; mem.lastExtra = t; }
+      else if (t - mem.lastExtra > 90 && era >= 2) { def = sim.rand() < 0.5 ? (p.faction === 'vehnar' ? 'fabrica' : 'hangar') : 'quartel'; mem.lastExtra = t; }
       else def = null;
     }
+    if (def && S.lockReason(sim, mem.pid, 'building', def)) def = null; // 4.1d: tudo o que resta está trancado: espera a Era
     if (def) {
-      const bd = S.BUILDINGS[def]; const cost = Object.assign({}, bd.cost); cost.minerio = (cost.minerio || 0) + (t < 240 ? 40 : 0);
+      const bd = S.BUILDINGS[def]; const cost = Object.assign({}, bd.cost); cost.minerio = (cost.minerio || 0) + (t < 240 ? 40 : 0) + (def === 'nodulo' && lowNodes ? 0 : eraHold);
       if (S.canAfford(p, cost)) {
         let s = null;
         if (def === 'nodulo') { let best = null, bdist = Infinity; for (const e of sim.ents) { if (!e.alive || e.kind !== 'node' || e.amount <= 0 || S.territoryOwner(sim, e.x, e.y) !== -1) continue; const d = S.dist(nuc.x, nuc.y, e.x, e.y); if (d < bdist) { bdist = d; best = e; } } if (best) s = findSpot(sim, mem.pid, 'nodulo', best.x, best.y, 60, 140, 30); if (!s) s = findSpot(sim, mem.pid, 'nodulo', nuc.x, nuc.y, 380, 600, 30); }
         else if (def === 'refinaria') { let sx = 0, sy = 0, n = 0; for (const e of sim.ents) if (e.alive && e.kind === 'node' && S.inTerritory(sim, mem.pid, e.x, e.y)) { sx += e.x; sy += e.y; n++; } if (n) s = findSpot(sim, mem.pid, 'refinaria', sx / n, sy / n, 50, 160, 30); if (!s) s = findSpot(sim, mem.pid, 'refinaria', nuc.x, nuc.y, 90, 300, 30); }
         else if (def === 'torre') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = S.DM.atan2(en.y - nuc.y, en.x - nuc.x) + (sim.rand() - 0.5) * 1.2; s = findSpot(sim, mem.pid, 'torre', nuc.x + S.DM.cos(a) * 250, nuc.y + S.DM.sin(a) * 250, 0, 110, 30); } if (!s) s = findSpot(sim, mem.pid, 'torre', nuc.x, nuc.y, 150, 330, 30); }
         else s = findSpot(sim, mem.pid, def, nuc.x, nuc.y, 90, 320, 40);
-        if (s) { emitC({ t: 'build', def, x: s.x, y: s.y }); mem.lastBuild = t; if (mem.bo < order.length) mem.bo++; }
-        else if (mem.bo < order.length) mem.bo++;
+        const inOrder = order[mem.bo] === def && !mem.emergency; mem.emergency = false; if (s) { emitC({ t: 'build', def, x: s.x, y: s.y }); mem.lastBuild = t; if (def === 'nodulo') mem.lastExpand = t; if (inOrder && mem.bo < order.length) mem.bo++; }
+        else if (inOrder && mem.bo < order.length) mem.bo++;
       }
     }
   }
@@ -138,23 +148,26 @@ function think(sim, mem) {
   }
   // --- pesquisa, superarma, sobrecarga
   if (S.hasBuilt(sim, mem.pid, 'laboratorio')) {
-    if (Object.keys(p.research).length < (D.research == null ? 3 : D.research)) for (const key of ['armamento', 'blindagem', 'sensores']) if (!p.research[key] && S.canAfford(p, S.RESEARCH[key].cost) && p.res.dados > 160) { emitC({ t: 'research', key }); break; }
+    if (Object.keys(p.research).length < (D.research == null ? 3 : D.research)) for (const key of ['armamento', 'blindagem', 'sensores']) if (!p.research[key] && !S.lockReason(sim, mem.pid, 'research', key) && S.canAfford(p, S.RESEARCH[key].cost) && p.res.dados > 160) { emitC({ t: 'research', key }); break; }
+    if (era >= 3 && !p.ascended && (D.research == null ? 3 : D.research) >= 2 && S.ASCENSION[p.faction] && S.canAfford(p, { minerio: S.ASCENSION[p.faction].cost.minerio + 150, plasma: S.ASCENSION[p.faction].cost.plasma + 60, dados: S.ASCENSION[p.faction].cost.dados })) emitC({ t: 'ascend' });
     if (D.superweapon !== false && t >= p.superCd && S.canAfford(p, { dados: 300, plasma: 300 })) { const fac = S.FACTIONS[p.faction]; if (fac.superKey === 'fundicao') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = S.DM.atan2(en.y - nuc.y, en.x - nuc.x); const s = findSpot(sim, mem.pid, 'bastiao', nuc.x + S.DM.cos(a) * 300, nuc.y + S.DM.sin(a) * 300, 0, 80, 30); if (s && S.inTerritory(sim, mem.pid, s.x, s.y)) emitC({ t: 'super', x: s.x, y: s.y }); } } else if (fac.superKey === 'eclosao') { if (mem.mode === 'attack' && mem.target) emitC({ t: 'super', x: mem.target.x, y: mem.target.y }); } else if (mem.mode === 'attack') emitC({ t: 'super' }); }
   }
   if (p.energy.regime !== 'pleno' && p.res.plasma > 450 && t >= p.overchargeCd) emitC({ t: 'overcharge' });
+  // 4.1d: módulos (um por vez): Fusão nos Reatores, Academia no Quartel, Bateria Pesada nas Torres
+  if (era >= 2 && !eraDue && !(mem.lastModule > t - 20) && p.res.minerio > 400) { const cand = builds.find(b => b.built && !b.mod && !(b.upT > 0) && S.BUILDINGS[b.def].module && !S.lockReason(sim, mem.pid, 'module', b.def) && S.canAfford(p, S.BUILDINGS[b.def].module.cost) && (b.def !== 'reator' || p.energy.ratio < 1.4)); if (cand) { emitC({ t: 'upgrade', id: cand.id }); mem.lastModule = t; } }
 
   // --- produção: estratégia + contras do que foi visto
   const prodBuildings = builds.filter(b => b.built && S.BUILDINGS[b.def].produces && b.def !== 'nucleo');
   const seen = mem.enemySeen; const total = seen.inf + seen.vei + seen.dro + seen.est + seen.sup + 0.01;
   const w = Object.assign({}, strat.prod);
   w.veiculo += 0.5 * (seen.inf + seen.est) / total; w.drone += 0.5 * (seen.vei + seen.sup) / total; w.infantaria += 0.5 * (seen.dro + seen.sup) / total; w.suporte += 0.3 * (seen.vei + seen.est) / total;
-  const reserveArmy = t < 240 ? D.reserve : 40;
+  const reserveArmy = (t < 240 ? D.reserve : 40) + (lowNodes && nodulos < 7 ? 140 : 0) + eraHold; // 4.1d: guarda para expandir e para a Era
   let prodOrders = 0; const prodPaced = !D.prodEvery || t - (mem.lastProd == null ? -999 : mem.lastProd) >= D.prodEvery; // 4.1a: ritmo de produção por nível
   for (const b of prodBuildings) {
-    if (!prodPaced || b.queue.length >= 2 || prodOrders >= (D.maxProd || 9)) continue; const opts = S.producesFor(b.def, p.faction).filter(u => u !== 'pirata' && u !== 'coletor');
+    if (!prodPaced || b.queue.length >= 2 || prodOrders >= (D.maxProd || 9)) continue; const opts = S.producesFor(b.def, p.faction).filter(u => u !== 'pirata' && u !== 'coletor' && !S.lockReason(sim, mem.pid, 'unit', u));
     let pick = null, best = -1;
     for (const u of opts) { const ud = S.UNITS[u]; const cls = CLASS_W[u] || 'infantaria'; let sc = (w[cls] || 0.1) * (0.7 + sim.rand() * 0.6); if (!ud.attack) sc *= 0.35; if (ud.cost.dados && p.res.dados < (ud.cost.dados + 40)) sc = 0; if (S.unitCost(u) > 300 && t < 420) sc *= 0.3; if (sc > best) { best = sc; pick = u; } }
-    if (pick === 'suporte' && p.res.dados < 60) pick = 'infantaria';
+    if (pick === 'suporte' && p.res.dados < 60) pick = opts.includes('infantaria') ? 'infantaria' : null;
     if (pick) { const c = Object.assign({}, S.UNITS[pick].cost); c.minerio = (c.minerio || 0) + reserveArmy; if (S.canAfford(p, c)) { emitC({ t: 'produce', id: b.id, def: pick }); prodOrders++; mem.lastProd = t; } }
   }
   // --- piratas (raids) e batedores
@@ -194,6 +207,6 @@ function think(sim, mem) {
 }
 // 4.1c: memória da IA no salvamento (a tabela de dificuldade volta pelo nome; o mapa de prédios conhecidos vira lista)
 function snapshot(mem) { const o = S.jsonSafe(Object.assign({}, mem, { diff: null, known: null })); o.dn = Object.keys(S.DIFFICULTY).find(k => S.DIFFICULTY[k] === mem.diff) || 'normal'; o.known = [...mem.known].map(([id, k]) => [id, S.jsonSafe(k)]); return o; }
-function restore(o) { const mem = S.jsonBack(Object.assign({}, o, { known: null })); delete mem.dn; mem.diff = S.DIFFICULTY[o.dn] || S.DIFFICULTY.normal; mem.known = new Map(o.known.map(([id, k]) => [id, S.jsonBack(k)])); return mem; }
+function restore(o) { const mem = S.jsonBack(Object.assign({}, o, { known: null })); mem.diff = S.DIFFICULTY[o.dn] || S.DIFFICULTY.normal; mem.known = new Map(o.known.map(([id, k]) => [id, S.jsonBack(k)])); return mem; }
 ARD.ai = { create, think, STRATS, snapshot, restore };
 })(globalThis.ARD = globalThis.ARD || {});

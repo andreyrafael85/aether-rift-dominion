@@ -93,14 +93,14 @@ const FACTIONS = {
 
 const BUILDINGS = {
   nucleo:      { name: 'Núcleo de Domínio', key: '', hp: 8000, r: 38, cost: {}, buildTime: 0, energyProd: 60, energyUse: 0, sensor: 420, detect: 120, deposit: true, territory: 380, produces: ['coletor'], desc: 'Centro da colônia. Produz coletores. Se cair, você é eliminado.' },
-  reator:      { name: 'Reator', key: 'R', hp: 700, r: 20, cost: { minerio: 120 }, buildTime: 12, energyProd: 35, plasmaBurn: 0.3, energyUse: 0, sensor: 120, desc: '+35 de energia queimando 0,3 Plasma/s. Vehnar: emite Fumaça visível a todos.' },
+  reator:      { name: 'Reator', key: 'R', hp: 700, r: 20, cost: { minerio: 120 }, buildTime: 12, energyProd: 35, plasmaBurn: 0.3, energyUse: 0, sensor: 120, module: { name: 'Câmara de Fusão', era: 2, cost: { minerio: 120, plasma: 40 }, time: 15, desc: '+60% de energia neste Reator, sem queimar mais Plasma.' }, desc: '+35 de energia queimando 0,3 Plasma/s. Vehnar: emite Fumaça visível a todos.' },
   refinaria:   { name: 'Refinaria', key: 'F', hp: 1000, r: 24, cost: { minerio: 150 }, buildTime: 15, energyUse: 6, sensor: 140, deposit: true, desc: 'Ponto de entrega perto dos nós. Alvo de Sifão.' },
-  quartel:     { name: 'Quartel Orbital', key: 'Q', hp: 1150, r: 26, cost: { minerio: 200 }, buildTime: 18, energyUse: 8, sensor: 140, produces: ['infantaria', 'suporte', 'pirata'], desc: 'Produz Infantaria, Suporte/Hack e Piratas.' },
-  fabrica:     { name: 'Fábrica de Veículos', key: 'V', hp: 1300, r: 28, cost: { minerio: 300, plasma: 60 }, buildTime: 22, energyUse: 12, sensor: 140, produces: ['veiculo'], desc: 'Produz Veículos Pesados.' },
-  hangar:      { name: 'Hangar de Drones', key: 'H', hp: 1150, r: 26, cost: { minerio: 280, plasma: 60 }, buildTime: 22, energyUse: 12, sensor: 160, produces: ['drone'], desc: 'Produz Drones Aéreos.' },
-  torre:       { name: 'Torre de Defesa', key: 'T', hp: 1100, r: 16, cost: { minerio: 180, plasma: 40 }, buildTime: 14, energyUse: 10, sensor: 260, detect: 140, weapon: 'obus', desc: 'Forte vs Infantaria e Drones. Detecta camuflagem em 140.' },
+  quartel:     { name: 'Quartel Orbital', key: 'Q', hp: 1150, r: 26, cost: { minerio: 200 }, buildTime: 18, energyUse: 8, sensor: 140, module: { name: 'Academia', era: 2, needs: ['laboratorio'], cost: { minerio: 160, plasma: 60, dados: 30 }, time: 20, desc: 'A infantaria deste Quartel já sai Veterana (★): +10% de dano e −7% de dano recebido.' }, produces: ['infantaria', 'suporte', 'pirata'], desc: 'Produz Infantaria, Suporte/Hack e Piratas.' },
+  fabrica:     { name: 'Fábrica de Veículos', key: 'V', era: 2, hp: 1300, r: 28, cost: { minerio: 300, plasma: 60 }, buildTime: 22, energyUse: 12, sensor: 140, produces: ['veiculo'], desc: 'Produz Veículos Pesados.' },
+  hangar:      { name: 'Hangar de Drones', key: 'H', era: 2, hp: 1150, r: 26, cost: { minerio: 280, plasma: 60 }, buildTime: 22, energyUse: 12, sensor: 160, produces: ['drone'], desc: 'Produz Drones Aéreos.' },
+  torre:       { name: 'Torre de Defesa', key: 'T', hp: 1100, r: 16, cost: { minerio: 180, plasma: 40 }, buildTime: 14, energyUse: 10, sensor: 260, detect: 140, weapon: 'obus', module: { name: 'Bateria Pesada', era: 3, cost: { minerio: 150, plasma: 60 }, time: 15, desc: '+40% de vida e +30% de dano nesta Torre.' }, desc: 'Forte vs Infantaria e Drones. Detecta camuflagem em 140.' },
   nodulo:      { name: 'Nódulo de Avanço', key: 'N', hp: 650, r: 16, cost: { minerio: 120, plasma: 20 }, buildTime: 10, energyUse: 4, sensor: 260, territory: 320, desc: 'Reclama território em 320 e libera nós para coleta automática. Pode ser colocado até 650 de qualquer estrutura sua.' },
-  laboratorio: { name: 'Laboratório', key: 'L', hp: 900, r: 24, cost: { minerio: 220, plasma: 60, dados: 40 }, buildTime: 20, energyUse: 10, sensor: 140, desc: 'Pesquisas e superarma, pagas com Fragmentos de Dados.' },
+  laboratorio: { name: 'Laboratório', key: 'L', era: 2, hp: 900, r: 24, cost: { minerio: 220, plasma: 60, dados: 40 }, buildTime: 20, energyUse: 10, sensor: 140, desc: 'Pesquisas e superarma, pagas com Fragmentos de Dados.' },
   muro:        { name: 'Muro', key: 'M', hp: 450, r: 8, cost: { minerio: 20 }, buildTime: 3, energyUse: 0, sensor: 50, wall: true, desc: 'Barreira barata. Arraste para desenhar uma linha. Bloqueia unidades e absorve tiros.' },
   portao:      { name: 'Portão', key: 'G', hp: 600, r: 8, cost: { minerio: 40 }, buildTime: 4, energyUse: 0, sensor: 60, wall: true, gate: true, desc: 'Trecho de muro que suas unidades atravessam. Inimigos precisam derrubá-lo.' },
   bastiao:     { name: 'Bastião', key: '', hp: 2200, r: 24, cost: {}, buildTime: 3, energyUse: 12, sensor: 300, detect: 160, weapon: 'bombarda', desc: 'Fortaleza da Fundição Orbital.' },
@@ -111,35 +111,35 @@ const UNITS = {
   infantaria: { name: 'Infantaria Orbital', key: 'I', cls: 'inf', hp: 120, r: 7, speed: 90, cost: { minerio: 50 }, time: 6, energyUse: 1, weapon: 'fuzil', sensor: 160, desc: 'Forte vs Drones e Suporte. Fraca vs Veículos e Estruturas.' },
   veiculo:    { name: 'Veículo Pesado', key: 'V', cls: 'vei', hp: 420, r: 12, speed: 65, cost: { minerio: 160, plasma: 40 }, time: 12, energyUse: 3, weapon: 'canhao', sensor: 170, turret: true, desc: 'Forte vs Infantaria e Estruturas. Fraco vs Drones e Suporte.' },
   drone:      { name: 'Drone Aéreo', key: 'D', cls: 'dro', hp: 160, r: 8, speed: 150, cost: { minerio: 120, plasma: 50 }, time: 10, energyUse: 2, flying: true, weapon: 'metralha', sensor: 220, desc: 'Forte vs Veículos e Suporte. Fraco vs Infantaria e Estruturas. Sobrevoa a Fenda.' },
-  suporte:    { name: 'Suporte / Hack', key: 'S', cls: 'sup', hp: 100, r: 8, speed: 80, cost: { minerio: 90, dados: 20 }, time: 9, energyUse: 2, weapon: 'pulso', sensor: 200, desc: 'Forte vs Veículos e Estruturas, e os atrasa. Fraco vs Infantaria e Drones.' },
+  suporte:    { name: 'Suporte / Hack', key: 'S', era: 2, needs: ['laboratorio'], cls: 'sup', hp: 100, r: 8, speed: 80, cost: { minerio: 90, dados: 20 }, time: 9, energyUse: 2, weapon: 'pulso', sensor: 200, desc: 'Forte vs Veículos e Estruturas, e os atrasa. Fraco vs Infantaria e Drones.' },
   pirata:     { name: 'Pirata de Extração', key: 'P', cls: 'sup', hp: 140, r: 9, speed: 100, cost: { minerio: 120, plasma: 30 }, time: 10, energyUse: 2, sensor: 180, siphonRange: 46, siphonRate: 7, siphonMax: 40, cargoCap: 300, desc: 'Sifona Refinarias e Reatores inimigos por até 40 s. Erevane: camuflado e +20% no roubo. Vehnar: Rebocador, lento e resistente, carrega 2x.' },
   // --- Vehnar
   soldador:   { name: 'Soldador', key: 'O', cls: 'inf', hp: 170, r: 8, speed: 75, cost: { minerio: 90, plasma: 15 }, time: 8, energyUse: 1, weapon: 'chama', sensor: 150, faction: 'vehnar', desc: 'Lança-chamas de curto alcance com dano em área. Devastador contra infantaria; fraco contra veículos.' },
-  guindaste:  { name: 'Guindaste Armado', key: 'U', cls: 'sup', hp: 320, r: 11, speed: 60, cost: { minerio: 180, plasma: 40 }, time: 12, energyUse: 3, sensor: 170, faction: 'vehnar', heal: { range: 90, unit: 4, building: 9 }, desc: 'Sem armas. Repara unidades e estruturas suas por perto, continuamente.' },
+  guindaste:  { name: 'Guindaste Armado', key: 'U', era: 2, cls: 'sup', hp: 320, r: 11, speed: 60, cost: { minerio: 180, plasma: 40 }, time: 12, energyUse: 3, sensor: 170, faction: 'vehnar', heal: { range: 90, unit: 4, building: 9 }, desc: 'Sem armas. Repara unidades e estruturas suas por perto, continuamente.' },
   tratorzao:  { name: 'Tratorzão', key: 'T', cls: 'vei', hp: 220, r: 10, speed: 135, cost: { minerio: 110, plasma: 20 }, time: 8, energyUse: 2, weapon: 'metralha', sensor: 320, faction: 'vehnar', desc: 'Veículo leve e rápido de reconhecimento, com sensores longos e metralhadora.' },
-  prensa:     { name: 'Prensa', key: 'R', cls: 'vei', hp: 900, r: 15, speed: 50, cost: { minerio: 320, plasma: 80 }, time: 18, energyUse: 5, weapon: 'prensa', sensor: 170, faction: 'vehnar', desc: 'Mech bípede de cerco: canhões duplos com grande área. Lento e caro.' },
+  prensa:     { name: 'Prensa', key: 'R', era: 3, cls: 'vei', hp: 900, r: 15, speed: 50, cost: { minerio: 320, plasma: 80 }, time: 18, energyUse: 5, weapon: 'prensa', sensor: 170, faction: 'vehnar', desc: 'Mech bípede de cerco: canhões duplos com grande área. Lento e caro.' },
   // --- Erevane
-  atirador:   { name: 'Atirador de Fenda', key: 'A', cls: 'inf', hp: 100, r: 7, speed: 85, cost: { minerio: 100, dados: 10 }, time: 9, energyUse: 1, weapon: 'fuzil_longo', sensor: 260, faction: 'erevane', desc: 'Camuflado quando parado. Tiro longo e letal contra infantaria e suporte; quase inútil contra estruturas.' },
+  atirador:   { name: 'Atirador de Fenda', key: 'A', era: 2, cls: 'inf', hp: 100, r: 7, speed: 85, cost: { minerio: 100, dados: 10 }, time: 9, energyUse: 1, weapon: 'fuzil_longo', sensor: 260, faction: 'erevane', desc: 'Camuflado quando parado. Tiro longo e letal contra infantaria e suporte; quase inútil contra estruturas.' },
   lamina:     { name: 'Lâmina Rodante', key: 'L', cls: 'vei', hp: 300, r: 11, speed: 145, cost: { minerio: 140, plasma: 30 }, time: 10, energyUse: 2, weapon: 'laminas', sensor: 180, faction: 'erevane', desc: 'Veículo baixo e rápido de ataque corpo a corpo. Bata e fuja.' },
   mosquito:   { name: 'Mosquito', key: 'M', cls: 'dro', hp: 65, r: 5, speed: 175, cost: { minerio: 45, plasma: 15 }, time: 4, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 200, faction: 'erevane', desc: 'Microdrone barato e frágil. Em enxame, pica veículos e suporte.' },
-  ancora:     { name: 'Âncora', key: 'N', cls: 'sup', hp: 160, r: 9, speed: 70, cost: { minerio: 140, plasma: 30, dados: 20 }, time: 11, energyUse: 3, sensor: 200, faction: 'erevane', aura: { cloak: 110 }, desc: 'Sem armas. Campo de Estática: suas unidades a até 110 dela ficam camufladas.' },
+  ancora:     { name: 'Âncora', key: 'N', era: 2, needs: ['laboratorio'], cls: 'sup', hp: 160, r: 9, speed: 70, cost: { minerio: 140, plasma: 30, dados: 20 }, time: 11, energyUse: 3, sensor: 200, faction: 'erevane', aura: { cloak: 110 }, desc: 'Sem armas. Campo de Estática: suas unidades a até 110 dela ficam camufladas.' },
   // --- Tessara
   quimera:    { name: 'Quimera', key: 'I', cls: 'inf', hp: 140, r: 7, speed: 88, cost: { minerio: 55 }, time: 6, energyUse: 1, weapon: 'fuzil', sensor: 170, faction: 'tessara', desc: 'Infantaria adaptativa. Ganha Traços contra as classes que mais combate.' },
   esporo:     { name: 'Esporo-sentinela', key: 'E', cls: 'dro', hp: 90, r: 6, speed: 160, cost: { minerio: 70, plasma: 20 }, time: 6, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 330, faction: 'tessara', desc: 'Drone de reconhecimento com sensores muito longos.' },
-  molde:      { name: 'Molde', key: 'O', cls: 'sup', hp: 150, r: 9, speed: 75, cost: { minerio: 130, plasma: 20, dados: 20 }, time: 10, energyUse: 2, sensor: 200, faction: 'tessara', aura: { buff: 100 }, desc: 'Sem armas. Suas unidades a até 100 dele causam +15% de dano.' },
-  colosso:    { name: 'Colosso Cambiante', key: 'C', cls: 'vei', hp: 1150, r: 16, speed: 50, cost: { minerio: 320, plasma: 80, dados: 25 }, time: 20, energyUse: 6, weapon: 'colosso', sensor: 180, faction: 'tessara', desc: 'Pesado de cerco com canhão de área. Ganha Traços como as outras unidades Tessara.' },
+  molde:      { name: 'Molde', key: 'O', era: 2, needs: ['laboratorio'], cls: 'sup', hp: 150, r: 9, speed: 75, cost: { minerio: 130, plasma: 20, dados: 20 }, time: 10, energyUse: 2, sensor: 200, faction: 'tessara', aura: { buff: 100 }, desc: 'Sem armas. Suas unidades a até 100 dele causam +15% de dano.' },
+  colosso:    { name: 'Colosso Cambiante', key: 'C', era: 3, cls: 'vei', hp: 1150, r: 16, speed: 50, cost: { minerio: 320, plasma: 80, dados: 25 }, time: 20, energyUse: 6, weapon: 'colosso', sensor: 180, faction: 'tessara', desc: 'Pesado de cerco com canhão de área. Ganha Traços como as outras unidades Tessara.' },
   // --- Quorith (4.0c)
   voz:        { name: 'Voz', key: 'Z', cls: 'inf', hp: 95, r: 7, speed: 92, cost: { minerio: 55, dados: 5 }, time: 6, energyUse: 1, weapon: 'pulso_voz', sensor: 170, faction: 'quorith', desc: 'Pulso básico do Coro. Fraca sozinha; em acorde (Elo: +3,5% de dano e +2,5% de armadura por aliado Quorith a até 90, máx. 3) fica letal.' },
-  agulha:     { name: 'Agulha', key: 'G', cls: 'inf', hp: 110, r: 7, speed: 85, cost: { minerio: 100, plasma: 25 }, time: 8, energyUse: 1, weapon: 'agulha', sensor: 220, faction: 'quorith', desc: 'Antiaérea: agulhas ressonantes que estilhaçam drones. Fraca contra veículos e estruturas.' },
-  diapasao:   { name: 'Diapasão', key: 'D', cls: 'sup', hp: 170, r: 9, speed: 72, cost: { minerio: 140, plasma: 20, dados: 30 }, time: 11, energyUse: 3, sensor: 210, faction: 'quorith', aura: { elo: 100 }, desc: 'Sem armas. Amplia o Elo: aliados a até 100 dele aceitam um quarto vizinho no acorde.' },
+  agulha:     { name: 'Agulha', key: 'G', era: 2, cls: 'inf', hp: 110, r: 7, speed: 85, cost: { minerio: 100, plasma: 25 }, time: 8, energyUse: 1, weapon: 'agulha', sensor: 220, faction: 'quorith', desc: 'Antiaérea: agulhas ressonantes que estilhaçam drones. Fraca contra veículos e estruturas.' },
+  diapasao:   { name: 'Diapasão', key: 'D', era: 2, needs: ['laboratorio'], cls: 'sup', hp: 170, r: 9, speed: 72, cost: { minerio: 140, plasma: 20, dados: 30 }, time: 11, energyUse: 3, sensor: 210, faction: 'quorith', aura: { elo: 100 }, desc: 'Sem armas. Amplia o Elo: aliados a até 100 dele aceitam um quarto vizinho no acorde.' },
   prisma:     { name: 'Prisma', key: 'P', cls: 'vei', hp: 520, r: 12, speed: 60, cost: { minerio: 190, plasma: 50, dados: 10 }, time: 13, energyUse: 3, weapon: 'refrator', sensor: 170, faction: 'quorith', desc: 'Tanque refrator: concentra a onda do Coro num feixe de área.' },
-  monolito:   { name: 'Monólito', key: 'O', cls: 'vei', hp: 780, r: 15, speed: 45, cost: { minerio: 330, plasma: 80, dados: 40 }, time: 19, energyUse: 5, weapon: 'ressonancia', sensor: 190, faction: 'quorith', desc: 'Cerco ressonante: onda lenta e longa que racha estruturas. Quase inútil contra drones.' },
+  monolito:   { name: 'Monólito', key: 'O', era: 3, cls: 'vei', hp: 780, r: 15, speed: 45, cost: { minerio: 330, plasma: 80, dados: 40 }, time: 19, energyUse: 5, weapon: 'ressonancia', sensor: 190, faction: 'quorith', desc: 'Cerco ressonante: onda lenta e longa que racha estruturas. Quase inútil contra drones.' },
   harmonico:  { name: 'Harmônico', key: 'H', cls: 'dro', hp: 120, r: 7, speed: 150, cost: { minerio: 110, plasma: 45, dados: 10 }, time: 9, energyUse: 2, flying: true, weapon: 'harmonico', sensor: 230, faction: 'quorith', desc: 'Voador do Coro: acorde aéreo que persegue veículos e suporte.' },
   // --- Vorag (4.0c)
   cria:       { name: 'Cria', key: 'K', cls: 'inf', hp: 82, r: 6, speed: 122, cost: { minerio: 22, plasma: 12 }, time: 4.5, energyUse: 0.5, weapon: 'mordida', sensor: 150, faction: 'vorag', pair: true, desc: 'Enxame corpo a corpo; eclode em pares. Fome: fora do seu território perde vida devagar (até 40%).' },
   cuspidor:   { name: 'Cuspidor', key: 'U', cls: 'inf', hp: 95, r: 7, speed: 90, cost: { minerio: 40, plasma: 30 }, time: 5, energyUse: 1, weapon: 'acido', sensor: 170, faction: 'vorag', desc: 'Cospe ácido a média distância; corrói veículos e estruturas.' },
   escaravelho: { name: 'Escaravelho', key: 'E', cls: 'vei', hp: 300, r: 11, speed: 120, cost: { minerio: 70, plasma: 60 }, time: 8, energyUse: 2, weapon: 'chifrada', sensor: 190, faction: 'vorag', desc: 'Besta de carga blindada: investida rápida que atropela infantaria.' },
-  brutamonte: { name: 'Brutamonte', key: 'B', cls: 'vei', hp: 1000, r: 16, speed: 52, cost: { minerio: 160, plasma: 130 }, time: 15, energyUse: 4, weapon: 'brutamonte', sensor: 170, faction: 'vorag', desc: 'Tanque biológico: carapaça grossa e golpe de área.' },
+  brutamonte: { name: 'Brutamonte', key: 'B', era: 3, cls: 'vei', hp: 1000, r: 16, speed: 52, cost: { minerio: 160, plasma: 130 }, time: 15, energyUse: 4, weapon: 'brutamonte', sensor: 170, faction: 'vorag', desc: 'Tanque biológico: carapaça grossa e golpe de área.' },
   // --- épicos de campanha (4.0e): não são produzidos; os roteiros do Ato 4 os criam
   catedral:   { name: 'Catedral Errante', key: '', cls: 'vei', hp: 9000, r: 30, speed: 26, cost: { minerio: 1600, plasma: 400 }, time: 60, energyUse: 0, weapon: 'catedral', sensor: 320, faction: 'quorith', epic: true, desc: 'Épico do Coro: uma catedral de cristal que caminha cantando. Onda de ressonância em área.' },
   matriarca:  { name: 'Matriarca', key: '', cls: 'vei', hp: 8000, r: 28, speed: 34, cost: { minerio: 1600, plasma: 400 }, time: 60, energyUse: 0, weapon: 'matriarca', sensor: 300, faction: 'vorag', epic: true, desc: 'Épica da Prole: a rainha que choca Crias sem parar.' },
@@ -196,12 +196,45 @@ const VET_RANKS = [0, 0.8, 2.4, 5.0]; // multiplicador do custo da unidade em XP
 const CLASS_NAMES = { inf: 'Infantaria', vei: 'Veículos', dro: 'Drones', est: 'Estruturas', sup: 'Suporte/Hack', civ: 'Civil' };
 
 const RESEARCH = {
-  armamento: { name: 'Armamento', cost: { dados: 150 }, desc: '+15% de dano para todas as unidades e torres.' },
-  blindagem: { name: 'Blindagem', cost: { dados: 150 }, desc: '−13% de dano recebido por unidades e estruturas.' },
-  sensores:  { name: 'Sensores', cost: { dados: 100 }, desc: '+25% de alcance de sensores.' },
+  armamento: { name: 'Armamento', era: 3, cost: { dados: 150 }, desc: '+15% de dano para todas as unidades e torres.' },
+  blindagem: { name: 'Blindagem', era: 3, cost: { dados: 150 }, desc: '−13% de dano recebido por unidades e estruturas.' },
+  sensores:  { name: 'Sensores', era: 2, cost: { dados: 100 }, desc: '+25% de alcance de sensores.' },
 };
 
 for (const t of [BUILDINGS, UNITS]) for (const k in t) if (t[k].weapon) t[k].attack = WEAPONS[t[k].weapon];
+// 4.1d — Eras do Núcleo: a colônia evolui em três etapas; cada uma libera estruturas, unidades, módulos e poderes
+const ERAS = [null,
+  { n: 1, roman: 'I', name: 'Fundação', desc: 'Reator, Refinaria, Quartel, Torre, Nódulo e muros. Infantaria básica e Piratas.' },
+  { n: 2, roman: 'II', name: 'Expansão', cost: { minerio: 300, plasma: 80 }, time: 25, needs: ['quartel', 'refinaria'], desc: 'Libera Fábrica, Hangar e Laboratório, as unidades de meio de jogo, a Câmara de Fusão dos Reatores e a Academia do Quartel.' },
+  { n: 3, roman: 'III', name: 'Domínio', cost: { minerio: 400, plasma: 320, dados: 60 }, time: 40, needs: ['laboratorio'], needsAny: ['fabrica', 'hangar'], desc: 'Libera as unidades pesadas, a superarma, Armamento e Blindagem, a Bateria Pesada das Torres e a Ascensão da sua Raça.' },
+];
+const ERA_NUCLEO = { hp: 0.2, territory: 40, energy: 15 }; // por Era acima da I
+// Ascensão: o último passo de cada Raça (Laboratório, Era III); vira modificadores permanentes do jogador
+const ASCENSION = {
+  vehnar:  { name: 'Revolução Industrial', cost: { minerio: 300, plasma: 200, dados: 150 }, desc: 'Produção 25% mais rápida e Reatores queimam 30% menos Plasma.', mods: { prodMul: 1.25, burnMul: 0.7 } },
+  erevane: { name: 'Véu Total', cost: { minerio: 300, plasma: 200, dados: 150 }, desc: 'Unidades 15% mais rápidas, sensores +25% e superarma recarrega 30% mais rápido.', mods: { speedMul: 1.15, sensorMul: 1.25, superCdMul: 0.7 } },
+  tessara: { name: 'Florescer', cost: { minerio: 300, plasma: 200, dados: 150 }, desc: 'Unidades se regeneram fora de combate (4 de vida/s) e a coleta rende 20% mais.', mods: { regen: 4, harvestMul: 1.2 } },
+  quorith: { name: 'Coro Pleno', cost: { minerio: 300, plasma: 200, dados: 150 }, desc: 'O Elo de Sincronia sobe até 5 aliados (antes 3) e a energia rende 15% mais.', mods: { eloBonus: 2, energyMul: 1.15 } },
+  vorag:   { name: 'Fome Sem Fim', cost: { minerio: 300, plasma: 200, dados: 150 }, desc: 'Crias eclodem em trios e unidades se regeneram fora de combate (3 de vida/s).', mods: { brood: 3, regen: 3 } },
+};
+function eraOf(sim, pid) { const p = sim.players[pid]; return (p && p.era) || 1; }
+function hasBuiltAny(sim, pid, defs) { for (const d of defs) if (hasBuilt(sim, pid, d)) return true; return false; }
+// por que algo está trancado (texto para a interface) ou null quando liberado
+function lockReason(sim, pid, kind, def) {
+  const t = kind === 'unit' ? UNITS[def] : kind === 'building' ? BUILDINGS[def] : kind === 'research' ? RESEARCH[def] : kind === 'module' ? BUILDINGS[def] && BUILDINGS[def].module : null;
+  if (!t) return 'Desconhecido';
+  const era = t.era || 1; if (era > eraOf(sim, pid)) return 'Requer Era ' + ERAS[era].roman + ' (' + ERAS[era].name + ')';
+  for (const n of t.needs || []) if (!hasBuilt(sim, pid, n)) return 'Requer ' + BUILDINGS[n].name;
+  return null;
+}
+function territoryOf(sim, e) { const t = BUILDINGS[e.def].territory || 0; if (!t || e.def !== 'nucleo') return t; return t + ERA_NUCLEO.territory * (eraOf(sim, e.owner) - 1); }
+function eraBlock(sim, pid) { // o que falta para a próxima Era (null se pode evoluir)
+  const p = sim.players[pid]; const cur = eraOf(sim, pid); const nx = ERAS[cur + 1]; if (!nx) return 'Era máxima';
+  if (p.evolveT > 0) return 'Evoluindo';
+  for (const n of nx.needs || []) if (!hasBuilt(sim, pid, n)) return 'Requer ' + BUILDINGS[n].name;
+  if (nx.needsAny && !hasBuiltAny(sim, pid, nx.needsAny)) return 'Requer ' + nx.needsAny.map(n => BUILDINGS[n].name).join(' ou ');
+  return null;
+}
 const SUPER_COST = { dados: 300, plasma: 200 };
 const SUPER_CD = 600;
 const OVERCHARGE_COST = 200, OVERCHARGE_T = 60, OVERCHARGE_CD = 300;
@@ -219,7 +252,7 @@ const DIFFICULTY = {
   // 4.1a: Fácil de verdade (economia menor, constrói devagar, ataca tarde e com parte do exército, sem superarma); Brutal novo no topo
   facil:   { name: 'Fácil',   income: 0.55, attackAt: 1600, minAttack: 720, acceptP: 0.95, breakP: 0.0,  pirateEvery: 260, reserve: 300, buildEvery: 30, attackFrac: 0.6, research: 1, superweapon: false, maxProd: 1, prodEvery: 9, maxCol: 8 },
   normal:  { name: 'Normal',  income: 0.9,  attackAt: 1500, minAttack: 480, acceptP: 0.7,  breakP: 0.08, pirateEvery: 150, reserve: 180, buildEvery: 10, attackFrac: 0.85, research: 2, superweapon: true, maxProd: 2, prodEvery: 3, maxCol: 12 },
-  dificil: { name: 'Difícil', income: 1.15, attackAt: 1600, minAttack: 360, acceptP: 0.5,  breakP: 0.3,  pirateEvery: 100, reserve: 120, buildEvery: 0,  attackFrac: 1,   research: 3, superweapon: true, maxProd: 9 },
+  dificil: { name: 'Difícil', income: 1.0,  attackAt: 1600, minAttack: 420, acceptP: 0.5,  breakP: 0.3,  pirateEvery: 100, reserve: 120, buildEvery: 4,  attackFrac: 0.95, research: 3, superweapon: true, maxProd: 4, prodEvery: 1 }, // 4.1d: suavizado depois da correção da economia da IA
   brutal:  { name: 'Brutal',  income: 1.4,  attackAt: 1800, minAttack: 300, acceptP: 0.35, breakP: 0.45, pirateEvery: 80,  reserve: 90,  buildEvery: 0,  attackFrac: 1,   research: 3, superweapon: true, maxProd: 9 },
 };
 
@@ -257,7 +290,7 @@ function createSim(cfg) {
       res: { plasma: 300, minerio: 500, dados: 40 },
       energy: { prod: 40, cons: 0, ratio: 1, regime: 'pleno' },
       overchargeT: 0, overchargeCd: 0, superCd: 0, blackoutT: 0, speedBuffT: 0, golpeT: 0, unissonoT: 0,
-      research: {}, rep: 0, pacts: {}, jumpsLeft: fac.jumps, lastBaseAlert: -99, lastNucleoAlert: -99, saltoT: 0, traits: {}, traitXp: {},
+      era: Math.max(1, Math.min(3, pc.era | 0 || 1)), evolveT: 0, ascended: false, research: {}, rep: 0, pacts: {}, jumpsLeft: fac.jumps, lastBaseAlert: -99, lastNucleoAlert: -99, saltoT: 0, traits: {}, traitXp: {},
       stats: { collected: 0, stolen: 0, lost: 0, unitsKilled: 0, unitsLost: 0, buildingsDestroyed: 0, buildingsLost: 0, treaties: 0, betrayals: 0, dmg: 0 },
       startAngle: rot + (Math.PI * 2 * i) / n,
     };
@@ -540,7 +573,7 @@ function updateElo(sim) {
   for (const e of sim.ents) {
     if (!e.alive || e.kind !== 'unit') continue; const p = sim.players[e.owner]; const fac = FACTIONS[p.faction];
     if (!fac.elo || e.cls === 'civ') { e.elo = 0; continue; }
-    let cap = fac.elo.cap; for (const dp of sim.auras[e.owner].diapasoes) if (dist(dp.x, dp.y, e.x, e.y) <= UNITS.diapasao.aura.elo) { cap++; break; }
+    let cap = fac.elo.cap + ((sim.players[e.owner].mods && sim.players[e.owner].mods.eloBonus) || 0); for (const dp of sim.auras[e.owner].diapasoes) if (dist(dp.x, dp.y, e.x, e.y) <= UNITS.diapasao.aura.elo) { cap++; break; }
     if (p.unissonoT > 0) { e.elo = cap; continue; }
     let n = 0; queryGrid(sim, e.x, e.y, fac.elo.range + 40, o => { if (n >= cap || o === e || !o.alive || o.kind !== 'unit' || o.owner !== e.owner || o.cls === 'civ') return; if (dist(e.x, e.y, o.x, o.y) <= fac.elo.range) n++; });
     e.elo = n;
@@ -570,7 +603,7 @@ function speedOf(sim, u) {
 function inTerritory(sim, pid, x, y) {
   for (const e of sim.ents) {
     if (!e.alive || e.kind !== 'building' || e.owner !== pid || !e.built) continue;
-    const t = BUILDINGS[e.def].territory;
+    const t = territoryOf(sim, e);
     if (t && dist(x, y, e.x, e.y) <= t) return true;
   }
   return false;
@@ -578,7 +611,7 @@ function inTerritory(sim, pid, x, y) {
 function territoryOwner(sim, x, y) { // first owner whose territory covers; -1 if none
   for (const e of sim.ents) {
     if (!e.alive || e.kind !== 'building' || !e.built) continue;
-    const t = BUILDINGS[e.def].territory;
+    const t = territoryOf(sim, e);
     if (t && dist(x, y, e.x, e.y) <= t) return e.owner;
   }
   return -1;
@@ -657,6 +690,7 @@ function processCommand(sim, c) {
       break; }
     case 'build': {
       const d = BUILDINGS[c.def]; if (!d || !d.key) return;
+      { const lr = lockReason(sim, c.p, 'building', c.def); if (lr) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: lr }); return; } }
       const ok = canBuild(sim, c.p, c.def, c.x, c.y); if (!ok.ok) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: ok.why }); return; }
       if (!canAfford(p, d.cost)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Recursos insuficientes' }); return; }
       pay(p, d.cost); const nb = addBuilding(sim, c.p, c.def, c.x, c.y, false); if (typeof c.ang === 'number') nb.ang = c.ang;
@@ -665,6 +699,7 @@ function processCommand(sim, c) {
     case 'produce': {
       const b = sim.byId.get(c.id); if (!b || !b.alive || b.kind !== 'building' || b.owner !== c.p || !b.built) return;
       const bd = BUILDINGS[b.def]; if (!producesFor(b.def, p.faction).includes(c.def)) return;
+      { const lr = lockReason(sim, c.p, 'unit', c.def); if (lr) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: lr }); return; } }
       const n = Math.max(1, Math.min(50, c.n | 0 || 1)); // 4.1a: até 50 na fila; c.n enfileira várias de uma vez
       for (let k = 0; k < n && b.queue.length < 50; k++) b.queue.push({ def: c.def, t: 0, total: UNITS[c.def].time, mult: 1, paid: false });
       if (p.human && !canAfford(p, UNITS[c.def].cost) && b.queue.length > 1) emit(sim, { t: 'notice', p: c.p, text: 'Na fila: cada unidade é paga quando começa a ser produzida' });
@@ -681,6 +716,7 @@ function processCommand(sim, c) {
     case 'research': {
       const r = RESEARCH[c.key]; if (!r || p.research[c.key]) return;
       if (!hasBuilt(sim, c.p, 'laboratorio')) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Requer Laboratório' }); return; }
+      { const lr = lockReason(sim, c.p, 'research', c.key); if (lr) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: lr }); return; } }
       if (!canAfford(p, r.cost)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Fragmentos de Dados insuficientes' }); return; }
       pay(p, r.cost); p.research[c.key] = true; alertTo(sim, c.p, 'Pesquisa concluída: ' + r.name, null, null, 'good');
       break; }
@@ -689,9 +725,31 @@ function processCommand(sim, c) {
       p.res.plasma -= OVERCHARGE_COST; p.overchargeT = OVERCHARGE_T; p.overchargeCd = sim.time + OVERCHARGE_CD;
       alertTo(sim, c.p, 'Sobrecarga: +50% de energia por 60 s', null, null, 'good');
       break; }
+    case 'evolve': { // 4.1d: Núcleo evolui para a próxima Era
+      const n = nucleoOf(sim, c.p); if (!n || n.jumpT > 0) return; const nx = ERAS[eraOf(sim, c.p) + 1];
+      const why = eraBlock(sim, c.p); if (why) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: why }); return; }
+      if (!canAfford(p, nx.cost)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Recursos insuficientes para a Era ' + nx.roman }); return; }
+      pay(p, nx.cost); p.evolveT = nx.time; alertTo(sim, c.p, 'Núcleo evoluindo para a Era ' + nx.roman + ' (' + nx.name + ')', n.x, n.y, 'good');
+      break; }
+    case 'upgrade': { // 4.1d: módulo de uma estrutura (Câmara de Fusão, Academia, Bateria Pesada)
+      const b = sim.byId.get(c.id); if (!b || !b.alive || b.kind !== 'building' || b.owner !== c.p || !b.built || b.mod || b.upT > 0) return; const md = BUILDINGS[b.def].module; if (!md) return;
+      { const lr = lockReason(sim, c.p, 'module', b.def); if (lr) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: lr }); return; } }
+      if (!canAfford(p, md.cost)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Recursos insuficientes' }); return; }
+      pay(p, md.cost); b.upT = md.time;
+      break; }
+    case 'ascend': { // 4.1d: Ascensão da Raça (Laboratório, Era III)
+      const asc = ASCENSION[p.faction]; if (!asc || p.ascended) return;
+      if (!hasBuilt(sim, c.p, 'laboratorio')) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Requer Laboratório' }); return; }
+      if (eraOf(sim, c.p) < 3) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Requer Era III (Domínio)' }); return; }
+      if (!canAfford(p, asc.cost)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Recursos insuficientes' }); return; }
+      pay(p, asc.cost); p.ascended = true; p.mods = p.mods || {};
+      for (const k in asc.mods) { const v = asc.mods[k]; if (k === 'regen' || k === 'eloBonus' || k === 'brood') p.mods[k] = Math.max(p.mods[k] || 0, v); else p.mods[k] = (p.mods[k] || 1) * v; }
+      emit(sim, { t: 'ascend', p: c.p }); for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Ascensão: ' + asc.name + '. ' + asc.desc : p.name + ' alcançou a Ascensão (' + asc.name + ')!', null, null, q.id === c.p ? 'good' : 'warn');
+      break; }
     case 'super': {
       const fac = facOf(sim, c.p);
       if (!hasBuilt(sim, c.p, 'laboratorio')) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Requer Laboratório' }); return; }
+      if (eraOf(sim, c.p) < 3) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Superarma requer Era III (Domínio)' }); return; }
       if (sim.time < p.superCd) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Superarma em recarga' }); return; }
       if (!canAfford(p, SUPER_COST)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Requer 300 Dados e 200 Plasma' }); return; }
       if (fac.superKey === 'fundicao') {
@@ -783,9 +841,9 @@ function computeEnergy(sim, p, dt) {
       const d = BUILDINGS[e.def];
       if (!e.built) continue;
       if (d.energyProd) {
-        if (d.plasmaBurn) { if (p.res.plasma > 0) { prod += d.energyProd; p.res.plasma = Math.max(0, p.res.plasma - d.plasmaBurn * dt * (p.mods && p.mods.burnMul || 1)); } }
-        else if (e.def === 'nucleo' && FACTIONS[p.faction].photosynthesis) { const nt = (1 - DM.cos(Math.PI * 2 * sim.time / 750)) / 2; prod += 95 - 50 * nt; }
-        else prod += d.energyProd;
+        if (d.plasmaBurn) { if (p.res.plasma > 0) { prod += d.energyProd * (e.mod === 1 && e.def === 'reator' ? 1.6 : 1); p.res.plasma = Math.max(0, p.res.plasma - d.plasmaBurn * dt * (p.mods && p.mods.burnMul || 1)); } }
+        else if (e.def === 'nucleo' && FACTIONS[p.faction].photosynthesis) { const nt = (1 - DM.cos(Math.PI * 2 * sim.time / 750)) / 2; prod += 95 - 50 * nt + ERA_NUCLEO.energy * ((p.era || 1) - 1); }
+        else prod += d.energyProd + (e.def === 'nucleo' ? ERA_NUCLEO.energy * ((p.era || 1) - 1) : 0);
       }
       cons += d.energyUse || 0;
     } else if (e.kind === 'unit') cons += UNITS[e.def].energyUse || 0;
@@ -812,7 +870,7 @@ function unitCost(def) { const c = (UNITS[def] || BUILDINGS[def] || {}).cost || 
 function damageMult(sim, a) { // multiplicadores do atacante (pesquisa, Golpe de Traição, regime das torres, veterância)
   const p = sim.players[a.owner]; let m = 1;
   if (p.research.armamento) m *= 1.15; if (p.golpeT > 0) m *= 1.2;
-  if (a.kind === 'building') m *= regimeOf(sim, a.owner).defF;
+  if (a.kind === 'building') { m *= regimeOf(sim, a.owner).defF; if (a.mod === 1 && a.def === 'torre') m *= 1.3; }
   if (a.kind === 'unit') m *= 1 + 0.1 * (a.rank || 0);
   if (p.saltoT > 0) m *= 1.35;
   if (a.kind === 'unit' && a.elo > 0) m *= 1 + FACTIONS[p.faction].elo.dmg * a.elo; // Elo de Sincronia (Quorith)
@@ -1137,6 +1195,13 @@ function updateBuilding(sim, b, dt) {
     }
     return; // no production while jumping
   }
+  if (b.def === 'nucleo' && p.evolveT > 0) { // 4.1d: evolução da Era em curso
+    p.evolveT -= dt * reg.prodF;
+    if (p.evolveT <= 0) { p.evolveT = 0; p.era = Math.min(3, (p.era || 1) + 1); const k = 1 + ERA_NUCLEO.hp * (p.era - 1), k0 = 1 + ERA_NUCLEO.hp * (p.era - 2); b.maxHp = BUILDINGS.nucleo.hp * k; b.hp = Math.min(b.maxHp, b.hp * k / k0 + BUILDINGS.nucleo.hp * 0.1);
+      emit(sim, { t: 'era', p: b.owner, era: p.era, x: b.x, y: b.y }); alertTo(sim, b.owner, 'Era ' + ERAS[p.era].roman + ' — ' + ERAS[p.era].name + ': ' + ERAS[p.era].desc, b.x, b.y, 'good');
+      for (const q of sim.players) if (q.alive && q.id !== b.owner) alertTo(sim, q.id, p.name + ' chegou à Era ' + ERAS[p.era].roman, b.x, b.y, 'warn'); }
+  }
+  if (b.upT > 0) { b.upT -= dt * reg.prodF; if (b.upT <= 0) { b.upT = 0; b.mod = 1; const md = d.module; if (b.def === 'torre') { b.maxHp *= 1.4; b.hp *= 1.4; } emit(sim, { t: 'module', p: b.owner, def: b.def, x: b.x, y: b.y }); alertTo(sim, b.owner, md.name + ' pronta: ' + md.desc, b.x, b.y, 'good'); } }
   if (b.queue.length) {
     let mult = reg.prodF; if (p.mods && p.mods.prodMul) mult *= p.mods.prodMul;
     if (facOf(sim, b.owner).lineBonus && d.produces && b.def !== 'nucleo') {
@@ -1153,7 +1218,9 @@ function updateBuilding(sim, b, dt) {
       const ang = b.rally ? DM.atan2(b.rally.y - b.y, b.rally.x - b.x) : DM.atan2(CY - b.y, CX - b.x);
       const u = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang) * (b.r + 14), b.y + DM.sin(ang) * (b.r + 14));
       if (b.rally) { u.state = 'move'; u.tx = b.rally.x + (sim.rand() - 0.5) * 30; u.ty = b.rally.y + (sim.rand() - 0.5) * 30; }
+      if (b.mod === 1 && b.def === 'quartel' && u.cls === 'inf') { u.rank = 1; u.xp = Math.max(50, unitCost(it.def)) * VET_RANKS[1]; } // Academia
       emit(sim, { t: 'spawn', p: b.owner, x: u.x, y: u.y, def: it.def });
+      if (UNITS[it.def].pair && p.mods && p.mods.brood >= 3) { const u3 = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang - 0.5) * (b.r + 14), b.y + DM.sin(ang - 0.5) * (b.r + 14)); if (b.rally) { u3.state = 'move'; u3.tx = b.rally.x + (sim.rand() - 0.5) * 30; u3.ty = b.rally.y + (sim.rand() - 0.5) * 30; } emit(sim, { t: 'spawn', p: b.owner, x: u3.x, y: u3.y, def: it.def }); } // Fome Sem Fim: trios
       if (UNITS[it.def].pair) { const u2 = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang + 0.5) * (b.r + 14), b.y + DM.sin(ang + 0.5) * (b.r + 14)); if (b.rally) { u2.state = 'move'; u2.tx = b.rally.x + (sim.rand() - 0.5) * 30; u2.ty = b.rally.y + (sim.rand() - 0.5) * 30; } emit(sim, { t: 'spawn', p: b.owner, x: u2.x, y: u2.y, def: it.def }); }
     }
   }
@@ -1377,6 +1444,6 @@ ARD.sim = {
   SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS, RACE_SHADES, assignColors, FACTION_EXTRAS, producesFor,
   NAV, NW, TILE, TILES, BIOMES, navIdx, passable, flowField, lineFree, inStorm,
   DM,
-  createSim, step, enqueue, snapshot, restore, jsonSafe, jsonBack, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint, spawnUnit, forceStorm,
+  createSim, step, enqueue, snapshot, restore, jsonSafe, jsonBack, ERAS, ASCENSION, eraOf, lockReason, eraBlock, territoryOf, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint, spawnUnit, forceStorm,
 };
 })(globalThis.ARD = globalThis.ARD || {});

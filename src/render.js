@@ -167,7 +167,7 @@ function create(canvas, mini) {
     const wx0 = Math.min(...corners.map(p => p[0])) - 80, wx1 = Math.max(...corners.map(p => p[0])) + 80, wy0 = Math.min(...corners.map(p => p[1])) - 80, wy1 = Math.max(...corners.map(p => p[1])) + 80;
     const inView = (x, y, m) => x > wx0 - m && x < wx1 + m && y > wy0 - m && y < wy1 + m;
     const terr = [];
-    for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const t = S.BUILDINGS[e.def].territory; if (!t) continue; if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue; terr.push({ x: e.x, y: e.y, r: t, col: sim.players[e.owner].color }); }
+    for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const t = S.territoryOf(sim, e); if (!t) continue; if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue; terr.push({ x: e.x, y: e.y, r: t, col: sim.players[e.owner].color }); }
     // terreno
     const tw = TILE * k * 2, th = TILE * k; const unexplored = [];
     const tx0 = Math.max(0, Math.floor(wx0 / TILE)), tx1 = Math.min(TILES - 1, Math.ceil(wx1 / TILE)), ty0 = Math.max(0, Math.floor(wy0 / TILE)), ty1 = Math.min(TILES - 1, Math.ceil(wy1 / TILE));
@@ -337,7 +337,7 @@ function create(canvas, mini) {
       if (e.kind !== 'unit' && e.kind !== 'building') continue;
       const own = e.owner === human; if (!(own || vis.has(e.id))) continue;
       const col = sim.players[e.owner].color; const p = M(e.x, e.y);
-      if (e.kind === 'building') { const t = S.BUILDINGS[e.def].territory; if (t && e.built) { c.fillStyle = rgba(col, 0.1); c.beginPath(); c.ellipse(p[0], p[1], t * m, t * m * 0.5, 0, 0, TAU); c.fill(); } c.fillStyle = col; const r = e.def === 'nucleo' ? 4 : S.BUILDINGS[e.def].wall ? 1.5 : 2.5; c.fillRect(p[0] - r, p[1] - r, r * 2, r * 2); }
+      if (e.kind === 'building') { const t = S.territoryOf(sim, e); if (t && e.built) { c.fillStyle = rgba(col, 0.1); c.beginPath(); c.ellipse(p[0], p[1], t * m, t * m * 0.5, 0, 0, TAU); c.fill(); } c.fillStyle = col; const r = e.def === 'nucleo' ? 4 : S.BUILDINGS[e.def].wall ? 1.5 : 2.5; c.fillRect(p[0] - r, p[1] - r, r * 2, r * 2); }
       else { c.fillStyle = col; c.fillRect(p[0] - 1, p[1] - 1, 2, 2); }
     }
     for (const [id, mm] of view.memory) if (!vis.has(id)) { const p = M(mm.x, mm.y); c.fillStyle = rgba(sim.players[mm.owner].color, 0.5); c.fillRect(p[0] - 2, p[1] - 2, 4, 4); }

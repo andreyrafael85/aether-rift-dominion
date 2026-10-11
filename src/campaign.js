@@ -47,12 +47,12 @@ M.push({ id: 'p1', act: 'prologo', title: 'Acorde', place: 'Planalto de Ísk', x
 M.push({ id: 'p2', act: 'prologo', title: 'Energia e regimes', place: 'Vale das Turbinas', xp: 350,
   brief: [['self', 1, 'Toda estrutura consome energia. Abaixo de 100% entramos em racionamento: produção, sensores e torres pioram.'], ['self', 2, 'Abaixo de 70% é colapso. Não quero ver isso no meu painel.']],
   setup: { seed: 4207, enemies: [{ race: 'rival', name: 'Ruínas de Vey', passive: true }] },
-  objectives: [{ id: 'quartel', text: 'Construir um Quartel', test: c => c.built('quartel') >= 1 }, { id: 'fabrica', text: 'Construir uma Fábrica de Veículos', test: c => c.built('fabrica') >= 1 },
+  objectives: [{ id: 'quartel', text: 'Construir um Quartel', test: c => c.built('quartel') >= 1 }, { id: 'era2', text: 'Evoluir o Núcleo para a Era II (selecione o Núcleo › Evoluir)', test: c => (c.me.era || 1) >= 2 }, { id: 'fabrica', text: 'Construir uma Fábrica de Veículos', test: c => c.built('fabrica') >= 1 },
     { id: 'pleno', text: 'Manter energia Plena por 60 s com Quartel e Fábrica de pé', test: c => c.hold('pleno', c.me.energy.regime === 'pleno' && c.built('quartel') && c.built('fabrica'), 60), progress: c => Math.floor(c.held('pleno')) + '/60 s' },
     { id: 'pesquisa', text: 'Pesquisar uma tecnologia no Laboratório', test: c => Object.keys(c.me.research).length >= 1 },
     { id: 'b-sem-colapso', bonus: true, final: true, text: 'Nunca entrar em colapso de energia', test: c => !c.st.colapso }, { id: 'b-sobrecarga', bonus: true, text: 'Usar a Sobrecarga uma vez', test: c => c.me.overchargeCd > 0 }],
   tick: c => { if (c.me.energy.regime === 'colapso') c.st.colapso = true; },
-  script: [{ at: 4, say: ['self', 1, 'Cada Reator dá +35 de energia queimando Plasma. Fique de olho no medidor ⚡ lá em cima.'] }, { when: c => c.me.energy.regime === 'racionado', once: true, say: ['self', 2, 'Racionamento! Mais Reatores, Comandante.'] }, { when: c => c.done('pleno'), say: ['self', 3, 'Rede estável. Agora o Laboratório: conhecimento é a moeda da Fenda.'] }] });
+  script: [{ at: 4, say: ['self', 1, 'Cada Reator dá +35 de energia queimando Plasma. Fique de olho no medidor ⚡ lá em cima.'] }, { when: c => c.done('quartel') && !c.done('era2'), say: ['self', 1, 'Quartel e Refinaria de pé: o Núcleo já pode evoluir para a Era II. Selecione-o e toque em Evoluir. Fábrica, Hangar e Laboratório vêm depois disso.'] }, { when: c => c.done('era2'), say: ['self', 3, 'Era II! A colônia cresceu. Agora a Fábrica.'] }, { when: c => c.me.energy.regime === 'racionado', once: true, say: ['self', 2, 'Racionamento! Mais Reatores, Comandante.'] }, { when: c => c.done('pleno'), say: ['self', 3, 'Rede estável. Agora o Laboratório: conhecimento é a moeda da Fenda.'] }] });
 M.push({ id: 'p3', act: 'prologo', title: 'A primeira tempestade', place: 'Bordas da Fenda', xp: 400, relic: 'cofre-fendido',
   brief: [['self', 1, 'O Éter está se acumulando. Quando a tempestade cai, drones e sensores sofrem, mas o Plasma rende em dobro lá dentro.'], ['enemy', 2, 'Vocês chegaram tarde. Esta borda é nossa.'], ['self', 2, 'Construa uma Torre. Eles virão quando o céu escurecer.']],
   setup: { seed: 4313, enemies: [{ race: 'rival', name: 'Saqueadores da Borda', passive: true }] },
@@ -200,7 +200,8 @@ function prepare(id, o) {
     const step = { facil: 'facil', normal: 'normal', dificil: 'dificil', fenda: 'brutal' }; // inimigos 'hard' seguem a dificuldade escolhida (o chefe já pesa)
     players.push({ name: e.name === 'auto' ? AI_NAMES[r][players.length % 3] : e.name, faction: r, difficulty: e.hard ? step[o.difficulty || 'normal'] : diff.ai, passive: !!e.passive, ally: !!e.ally }); }
   { const hostile = players.slice(1).filter(p => !p.passive).length; if (hostile >= 2) { const bonus = { facil: [700, 350], normal: [300, 150], dificil: [0, 0], fenda: [0, 0] }[o.difficulty || 'normal'] || [0, 0]; if (bonus[0]) { const m0 = players[0].mods = players[0].mods || {}; m0.startRes = Object.assign({}, m0.startRes); m0.startRes.minerio = (m0.startRes.minerio || 0) + bonus[0]; m0.startRes.plasma = (m0.startRes.plasma || 0) + bonus[1]; } } } // missões com vários inimigos ativos: reforço inicial no Fácil e no Normal
-  return { mission: m, diff, difficulty: o.difficulty || 'normal', race, cfg: { seed: m.setup.seed, players, minutes: (m.setup.minutes || 25) + (m.startTime ? Math.ceil(m.startTime / 60) : 0) } };
+  const era = m.setup.era || (m.id === 'p1' || m.id === 'p2' ? 1 : 2); for (const pl of players) pl.era = era; // 4.1d: Era inicial da missão (todos começam iguais; a IA evolui sozinha)
+  return { mission: m, diff, difficulty: o.difficulty || 'normal', race, era, cfg: { seed: m.setup.seed, players, minutes: (m.setup.minutes || 25) + (m.startTime ? Math.ceil(m.startTime / 60) : 0) } };
 }
 
 // ---------- executor ----------

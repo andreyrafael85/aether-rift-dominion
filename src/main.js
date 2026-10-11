@@ -17,7 +17,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.1c';
+const VERSION = '4.1d';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -404,6 +404,9 @@ function startGame(cfg, netCtx) {
       else if (e.t === 'trait' && e.owner === human && !silent) AU.sfx('promote');
       else if (e.t === 'end') { if (!G.camp) endGame(e.result); }
       else if (e.t === 'regime' && e.p === human && !silent) notice('Energia: ' + S.REGIME[e.regime].name);
+      else if (e.t === 'era' && e.p === human && !silent) { const er = S.ERAS[e.era]; banner('Era ' + er.roman + ' — ' + er.name, er.desc, 'good', 7000); leaderMood(3); AU.sfx('promote'); G.selKey = ''; }
+      else if (e.t === 'ascend' && e.p === human && !silent) { const a = S.ASCENSION[sim.players[human].faction]; banner('Ascensão: ' + a.name, a.desc, 'good', 8000); leaderMood(3); AU.sfx('promote'); }
+      else if (e.t === 'module' && e.p === human && !silent) { G.selKey = ''; AU.sfx('promote'); }
     }
   }
   function pushAlert(e) {
@@ -464,6 +467,7 @@ function startGame(cfg, netCtx) {
     $('e-text').textContent = `${Math.round(en.prod)} / ${Math.round(en.cons)}`; $('e-regime').textContent = S.REGIME[en.regime].name + (p.overchargeT > 0 ? ' · Sobrecarga' : '') + (p.blackoutT > 0 ? ' · BLECAUTE' : '');
     $('e-bar').style.width = Math.min(100, en.ratio * 100 / 1.5) + '%';
     $('clock').textContent = mmss(sim.time) + ' / ' + mmss(sim.maxTime);
+    { const eb = $('era-badge'); if (eb) { const er = p.era || 1; const nx = S.ERAS[er + 1]; eb.textContent = 'Era ' + S.ERAS[er].roman + (p.evolveT > 0 && nx ? ' → ' + nx.roman + ' ' + Math.ceil(p.evolveT) + ' s' : '') + (p.ascended ? ' ✦' : ''); eb.title = S.ERAS[er].name + ': ' + S.ERAS[er].desc + (p.ascended ? ' · Ascensão: ' + S.ASCENSION[p.faction].name : ''); eb.className = 'era e' + er + (p.evolveT > 0 ? ' evolving' : '') + (p.ascended ? ' asc' : ''); } }
     $('rep').textContent = S.REP_NAMES[p.rep];
     const enemies = sim.players.filter(x => x.alive && x.id !== human && !S.hasPact(sim, human, x.id)).length; $('enemies').textContent = enemies;
     for (const b of document.querySelectorAll('[data-speed]')) b.classList.toggle('on', parseFloat(b.dataset.speed) === G.speed && !G.paused);
@@ -476,10 +480,12 @@ function startGame(cfg, netCtx) {
   }
   function liveUpdate(ents) { // atualiza barras de vida, texto de vida/construção e progresso da fila sem recriar o painel
     const panel = $('panel'); for (const e of ents) { const bar = panel.querySelector('[data-live="' + e.id + '"] i'); if (bar) bar.style.width = (100 * e.hp / e.maxHp) + '%'; const tx = panel.querySelector('[data-livetxt="' + e.id + '"]'); if (tx) tx.textContent = fmt(e.hp) + ' / ' + fmt(e.maxHp) + (e.kind === 'building' && !e.built ? ' · construção ' + Math.round(e.progress * 100) + '%' : '');
-      const qp = panel.querySelector('[data-liveq="' + e.id + '"]'); if (qp && e.queue && e.queue[0]) qp.textContent = Math.round(100 * e.queue[0].t / e.queue[0].total) + '%'; } }
+      const qp = panel.querySelector('[data-liveq="' + e.id + '"]'); if (qp && e.queue && e.queue[0]) qp.textContent = Math.round(100 * e.queue[0].t / e.queue[0].total) + '%';
+      if (e.def === 'nucleo') { const pl = sim.players[human]; const nx = S.ERAS[(pl.era || 1) + 1]; const eb = panel.querySelector('[data-evobar] i'), et = panel.querySelector('[data-evotxt]'); if (nx && pl.evolveT > 0) { if (eb) eb.style.width = Math.round(100 * (1 - pl.evolveT / nx.time)) + '%'; if (et) et.textContent = Math.ceil(pl.evolveT) + ' s'; } }
+      if (e.upT > 0) { const md = S.BUILDINGS[e.def].module; const ub = panel.querySelector('[data-upbar] i'), ut = panel.querySelector('[data-uptxt]'); if (md && ub) ub.style.width = Math.round(100 * (1 - e.upT / md.time)) + '%'; if (ut) ut.textContent = Math.ceil(e.upT) + ' s'; } } } // 4.1d: evolução e módulo também andam no lugar
   function refreshPanel(force) {
     const ents = selectionSummary();
-    const key = ents.map(e => e.id + ':' + (ents.length > 1 ? Math.round(e.hp) : '') + ':' + (e.queue ? e.queue.length + ':' + (e.queue[0] ? (e.queue[0].waiting ? 'w' : 'p') : '') : '') + ':' + (e.built ? 1 : Math.floor(e.progress * 20)) + ':' + (e.amount != null ? Math.floor(e.amount) : '')).join('|') + '|' + I.buildMenu + '|' + I.mode + '|' + Object.keys(sim.players[human].research).length;
+    const key = ents.map(e => e.id + ':' + (ents.length > 1 ? Math.round(e.hp) : '') + ':' + (e.queue ? e.queue.length + ':' + (e.queue[0] ? (e.queue[0].waiting ? 'w' : 'p') : '') : '') + ':' + (e.built ? 1 : Math.floor(e.progress * 20)) + ':' + (e.amount != null ? Math.floor(e.amount) : '')).join('|') + '|' + I.buildMenu + '|' + I.mode + '|' + Object.keys(sim.players[human].research).length + '|' + (sim.players[human].era || 1) + (sim.players[human].evolveT > 0 ? 'e' : '') + (sim.players[human].ascended ? 'a' : '') + '|' + ents.map(e => (e.mod ? 'm' : '') + (e.upT > 0 ? 'u' : '')).join('');
     if (!force && key === G.selKey) { liveUpdate(ents); return; } G.selKey = key; // 4.1a: vida e progresso mudam no lugar; redesenhar só quando a estrutura do painel muda (cliques não se perdem)
     const panel = $('panel'); const p = sim.players[human]; const fac = S.FACTIONS[p.faction];
     if (!ents.length || I.buildMenu) { panel.innerHTML = buildMenuHTML(p); bindBuildMenu(); return; }
@@ -492,30 +498,47 @@ function startGame(cfg, netCtx) {
       return;
     }
     if (e.kind === 'building' && ents.length === 1) {
-      const d = S.BUILDINGS[e.def]; let h = `<div class="ph"><span class="dot" style="background:${p.color}"></span><b>${esc(d.name)}</b></div><div class="hp" data-live="${e.id}"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="muted small"><span data-livetxt="${e.id}">${fmt(e.hp)} / ${fmt(e.maxHp)}${e.built ? '' : ' · construção ' + Math.round(e.progress * 100) + '%'}</span>${d.energyProd ? ' · +' + d.energyProd + ' energia' : ''}${d.energyUse ? ' · −' + d.energyUse + ' energia' : ''}</div><div class="muted small">${esc(d.desc)}</div>`;
+      const d = S.BUILDINGS[e.def]; let h = `<div class="ph"><span class="dot" style="background:${p.color}"></span><b>${esc(d.name)}</b></div><div class="hp" data-live="${e.id}"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="muted small"><span data-livetxt="${e.id}">${fmt(e.hp)} / ${fmt(e.maxHp)}${e.built ? '' : ' · construção ' + Math.round(e.progress * 100) + '%'}</span>${d.energyProd ? ' · +' + (d.energyProd * (e.mod === 1 && e.def === 'reator' ? 1.6 : 1) + (e.def === 'nucleo' ? 15 * ((p.era || 1) - 1) : 0)) + ' energia' : ''}${d.energyUse ? ' · −' + d.energyUse + ' energia' : ''}</div><div class="muted small">${esc(d.desc)}</div>`;
       const prodList = S.producesFor(e.def, p.faction);
       if (e.built && prodList.length) {
         h += '<div class="grid">';
-        for (const ud of prodList) { const u = S.UNITS[ud]; const name = S.unitName(fac.id, ud); const qn = e.queue.filter(q => q.def === ud).length; h += `<button class="act" data-prod="${ud}" title="${esc(u.desc)} · clique +1, Shift +5, Ctrl +10${G.isTouch ? ', segurar +5' : ''}"><img class="ico" alt="" src="${R.icon(ud, human)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span>${qn ? `<span class="qn">×${qn}</span>` : ''}</button>`; }
+        for (const ud of prodList) { const u = S.UNITS[ud]; const name = S.unitName(fac.id, ud); const qn = e.queue.filter(q => q.def === ud).length; const lk = S.lockReason(sim, human, 'unit', ud); h += `<button class="act ${lk ? 'locked' : ''}" data-prod="${ud}" ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc((lk ? '🔒 ' + lk + ' · ' : '') + u.desc)} · clique +1, Shift +5, Ctrl +10${G.isTouch ? ', segurar +5' : ''}">${lk ? `<span class="lockb">${u.era && u.era > (p.era || 1) ? S.ERAS[u.era].roman : '🔒'}</span>` : ''}<img class="ico" alt="" src="${R.icon(ud, human)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span>${qn ? `<span class="qn">×${qn}</span>` : ''}</button>`; }
         h += '</div>';
         if (e.queue.length) { h += `<div class="queue"><span class="qtot">Fila ${e.queue.length}/50</span>`; for (let i = 0; i < e.queue.length;) { const q = e.queue[i]; let j = i; while (j < e.queue.length && e.queue[j].def === q.def) j++; const n = j - i; h += `<button class="q" data-cancel="${j - 1}" data-def="${q.def}" title="Clique cancela 1 · Shift cancela todas deste tipo">${esc(S.unitName(fac.id, q.def))}${n > 1 ? ` <b>×${n}</b>` : ''}${i === 0 ? (q.waiting ? ' <i class="wait">aguardando recursos</i>' : ` <i data-liveq="${e.id}">${Math.round(100 * q.t / q.total)}%</i>`) : ''} ✕</button>`; i = j; } h += '</div>'; }
         h += `<div class="row"><button class="act sm" data-mode="rally">Ponto de reunião</button>${e.def === 'nucleo' ? `<button class="act sm" data-mode="jump" ${p.jumpsLeft > 0 && e.jumpT <= 0 ? '' : 'disabled'}>Salto de Núcleo (${p.jumpsLeft})</button>` : ''}</div>`;
       }
+      if (e.built && e.def === 'nucleo') { // 4.1d: Eras
+        const er = p.era || 1; const nx = S.ERAS[er + 1];
+        h += `<div class="erabox"><div class="eb-h"><b>Era ${S.ERAS[er].roman} · ${esc(S.ERAS[er].name)}</b>${p.ascended ? ' <span class="asc">✦ ' + esc(S.ASCENSION[p.faction].name) + '</span>' : ''}</div>`;
+        if (nx && p.evolveT > 0) h += `<div class="small">Evoluindo para a Era ${nx.roman} · <span data-evotxt>${Math.ceil(p.evolveT)} s</span></div><div class="hp evo" data-evobar><i style="width:${Math.round(100 * (1 - p.evolveT / nx.time))}%"></i></div>`;
+        else if (nx) { const why = S.eraBlock(sim, human); const reqs = (nx.needs || []).map(n => (S.hasBuilt(sim, human, n) ? '✓ ' : '✗ ') + S.BUILDINGS[n].name).concat(nx.needsAny ? [(nx.needsAny.some(n => S.hasBuilt(sim, human, n)) ? '✓ ' : '✗ ') + nx.needsAny.map(n => S.BUILDINGS[n].name).join(' ou ')] : []);
+          h += `<button class="act evolve" data-evolve="1" ${why ? `data-lock="${esc(why)}"` : ''} title="${esc(nx.desc)}"><span class="n">Evoluir para a Era ${nx.roman} · ${esc(nx.name)}</span><span class="cost">${costStr(nx.cost)} · ${nx.time} s</span></button><div class="small muted">${reqs.join(' · ')} — ${esc(nx.desc)}</div>`; }
+        else h += '<div class="small muted">Era máxima. A Ascensão da Raça fica no Laboratório.</div>';
+        h += '</div>';
+      }
+      { const md = e.built && S.BUILDINGS[e.def].module; if (md) { // 4.1d: módulo da estrutura
+        if (e.mod) h += `<div class="tip">✓ ${esc(md.name)}: ${esc(md.desc)}</div>`;
+        else if (e.upT > 0) h += `<div class="small">Instalando ${esc(md.name)} · <span data-uptxt>${Math.ceil(e.upT)} s</span></div><div class="hp evo" data-upbar><i style="width:${Math.round(100 * (1 - e.upT / md.time))}%"></i></div>`;
+        else { const lk = S.lockReason(sim, human, 'module', e.def); h += `<button class="act module ${lk ? 'locked' : ''}" data-upgrade="1" ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc((lk ? '🔒 ' + lk + ' · ' : '') + md.desc)}"><span class="n">Módulo: ${esc(md.name)}</span><span class="cost">${lk ? '🔒 ' + esc(lk) : costStr(md.cost) + ' · ' + md.time + ' s'}</span></button>`; } } }
       if (e.built && e.def === 'laboratorio') {
         h += '<div class="grid">';
-        for (const k in S.RESEARCH) { const r = S.RESEARCH[k]; h += `<button class="act" data-research="${k}" ${p.research[k] ? 'disabled' : ''} title="${esc(r.desc)}"><span class="n">${esc(r.name)}${p.research[k] ? ' ✓' : ''}</span><span class="cost">${costStr(r.cost)}</span></button>`; }
+        for (const k in S.RESEARCH) { const r = S.RESEARCH[k]; const lk = !p.research[k] && S.lockReason(sim, human, 'research', k); h += `<button class="act ${lk ? 'locked' : ''}" data-research="${k}" ${p.research[k] ? 'disabled' : ''} ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc((lk ? '🔒 ' + lk + ' · ' : '') + r.desc)}"><span class="n">${esc(r.name)}${p.research[k] ? ' ✓' : ''}</span><span class="cost">${lk ? '🔒 Era ' + S.ERAS[r.era].roman : costStr(r.cost)}</span></button>`; }
         h += '</div>';
+        { const a = S.ASCENSION[p.faction]; if (a) { const lk = p.ascended ? null : (p.era || 1) < 3 ? 'Requer Era III (Domínio)' : null; h += `<button class="act ascend ${lk ? 'locked' : ''}" data-ascend="1" ${p.ascended ? 'disabled' : ''} ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc(a.desc)}"><span class="n">✦ Ascensão: ${esc(a.name)}${p.ascended ? ' ✓' : ''}</span><span class="cost">${lk ? '🔒 Era III' : p.ascended ? esc(a.desc) : costStr(a.cost)}</span></button>`; } }
         const cd = Math.max(0, p.superCd - sim.time);
         h += `<button class="act super" data-super="1" ${cd > 0 ? 'disabled' : ''} title="${esc(fac.superDesc)}"><span class="n">${esc(fac.superName)}${cd > 0 ? ' · ' + mmss(cd) : ''}</span><span class="cost">${costStr(S.SUPER_COST)}</span></button>`;
       }
       if (e.jumpT > 0) h += `<div class="tip">Salto em ${Math.ceil(e.jumpT)} s. O Núcleo está visível para todos.</div>`;
       panel.innerHTML = h;
       panel.querySelectorAll('[data-prod]').forEach(b => { let lp = null, fired = false; // 4.1a: +1 clique, +5 Shift ou segurar no toque, +10 Ctrl
-        b.addEventListener('pointerdown', ev => { if (ev.pointerType !== 'touch') return; fired = false; lp = setTimeout(() => { fired = true; I.cmd({ t: 'produce', id: e.id, def: b.dataset.prod, n: 5 }); if (navigator.vibrate) navigator.vibrate(15); notice('+5 na fila'); }, 480); });
+        b.addEventListener('pointerdown', ev => { if (ev.pointerType !== 'touch' || b.dataset.lock) return; fired = false; lp = setTimeout(() => { fired = true; I.cmd({ t: 'produce', id: e.id, def: b.dataset.prod, n: 5 }); if (navigator.vibrate) navigator.vibrate(15); notice('+5 na fila'); }, 480); });
         b.addEventListener('pointerup', () => clearTimeout(lp)); b.addEventListener('pointerleave', () => clearTimeout(lp));
-        b.addEventListener('click', ev => { if (fired) { fired = false; return; } I.cmd({ t: 'produce', id: e.id, def: b.dataset.prod, n: ev.ctrlKey || ev.metaKey ? 10 : ev.shiftKey ? 5 : 1 }); }); });
+        b.addEventListener('click', ev => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } if (fired) { fired = false; return; } I.cmd({ t: 'produce', id: e.id, def: b.dataset.prod, n: ev.ctrlKey || ev.metaKey ? 10 : ev.shiftKey ? 5 : 1 }); }); });
       panel.querySelectorAll('[data-cancel]').forEach(b => b.addEventListener('click', ev => I.cmd({ t: 'cancel', id: e.id, def: b.dataset.def, all: ev.shiftKey })));
-      panel.querySelectorAll('[data-research]').forEach(b => b.addEventListener('click', () => I.cmd({ t: 'research', key: b.dataset.research })));
+      panel.querySelectorAll('[data-research]').forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.cmd({ t: 'research', key: b.dataset.research }); }));
+      panel.querySelectorAll('[data-evolve]').forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.cmd({ t: 'evolve' }); }));
+      panel.querySelectorAll('[data-upgrade]').forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.cmd({ t: 'upgrade', id: e.id }); }));
+      panel.querySelectorAll('[data-ascend]').forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.cmd({ t: 'ascend' }); }));
       panel.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => { if (b.dataset.mode === 'jump') I.setMode('jump'); else I.setMode('rally'); notice(b.dataset.mode === 'jump' ? 'Clique no mapa para escolher o destino do Salto' : 'Clique no mapa para definir o ponto de reunião'); }));
       const sb = panel.querySelector('[data-super]'); if (sb) sb.addEventListener('click', () => superClick(fac));
       return;
@@ -535,19 +558,19 @@ function startGame(cfg, netCtx) {
   }
   function buildMenuHTML(p) {
     let h = `<div class="ph"><b>Construir</b> <span class="muted small">(B, depois a tecla)</span></div><div class="grid">`;
-    for (const k in S.BUILDINGS) { const d = S.BUILDINGS[k]; if (!d.key) continue; const can = S.canAfford(p, d.cost); h += `<button class="act ${can ? '' : 'poor'} ${view.ghost && view.ghost.def === k ? 'on' : ''}" data-build="${k}" title="${esc(d.desc)}"><img class="ico" alt="" src="${R.icon(k, human)}"><span class="k">${d.key}</span><span class="n">${esc(d.name)}</span><span class="cost">${costStr(d.cost)}</span></button>`; }
+    for (const k in S.BUILDINGS) { const d = S.BUILDINGS[k]; if (!d.key) continue; const can = S.canAfford(p, d.cost); const lk = S.lockReason(sim, human, 'building', k); h += `<button class="act ${can ? '' : 'poor'} ${lk ? 'locked' : ''} ${view.ghost && view.ghost.def === k ? 'on' : ''}" data-build="${k}" ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc((lk ? '🔒 ' + lk + ' · ' : '') + d.desc)}">${lk ? `<span class="lockb">${S.ERAS[d.era || 1].roman}</span>` : ''}<img class="ico" alt="" src="${R.icon(k, human)}"><span class="k">${d.key}</span><span class="n">${esc(d.name)}</span><span class="cost">${costStr(d.cost)}</span></button>`; }
     h += '</div>';
     if (!view.sel.size) h += '<div class="tip">Nada selecionado. Clique em unidades ou arraste uma caixa. F1 seleciona o Núcleo, F2 o exército.</div>';
     return h;
   }
-  function bindBuildMenu() { $('panel').querySelectorAll('[data-build]').forEach(b => b.addEventListener('click', () => { I.buildMenu = false; I.setMode('build', b.dataset.build); notice(G.isTouch ? 'Arraste para posicionar e toque em ✓ Construir aqui' : 'Posicione e clique para construir. Shift mantém o modo.'); })); }
+  function bindBuildMenu() { $('panel').querySelectorAll('[data-build]').forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.buildMenu = false; I.setMode('build', b.dataset.build); notice(G.isTouch ? 'Arraste para posicionar e toque em ✓ Construir aqui' : 'Posicione e clique para construir. Shift mantém o modo.'); })); }
   function refreshQuick() {
     const p = sim.players[human]; const fac = S.FACTIONS[p.faction];
     const oc = $('btn-over'); const cd = Math.max(0, p.overchargeCd - sim.time);
     oc.disabled = cd > 0 || p.res.plasma < S.OVERCHARGE_COST; oc.querySelector('.sub').textContent = cd > 0 ? 'recarga ' + mmss(cd) : '200 Plasma · +50% energia 60 s';
     const sp = $('btn-super'); const lab = S.hasBuilt(sim, human, 'laboratorio'); const scd = Math.max(0, p.superCd - sim.time);
-    sp.querySelector('.n').textContent = fac.superName; sp.disabled = !lab || scd > 0 || !S.canAfford(p, S.SUPER_COST);
-    sp.querySelector('.sub').textContent = !lab ? 'requer Laboratório' : scd > 0 ? 'recarga ' + mmss(scd) : '300 Dados · 200 Plasma';
+    sp.querySelector('.n').textContent = fac.superName; const era3 = (p.era || 1) >= 3; sp.disabled = !lab || !era3 || scd > 0 || !S.canAfford(p, S.SUPER_COST);
+    sp.querySelector('.sub').textContent = !lab ? 'requer Laboratório' : !era3 ? 'requer Era III' : scd > 0 ? 'recarga ' + mmss(scd) : '300 Dados · 200 Plasma';
     const dp = $('btn-diplo'); dp.classList.toggle('attn', !!G.pendingFor);
     $('btn-build').classList.toggle('on', I.buildMenu || I.mode === 'build');
     $('btn-attack').classList.toggle('on', I.mode === 'attackmove');

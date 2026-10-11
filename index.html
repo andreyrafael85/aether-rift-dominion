@@ -216,6 +216,12 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 .foot-logo{width:30px;height:30px;border-radius:50%;vertical-align:middle;margin-right:.45rem;border:1px solid var(--line)}
 .dp-lead{width:42px;height:42px;border-radius:8px;object-fit:cover;vertical-align:middle;margin-right:.45rem;border:1px solid var(--line)}
 /* 4.0e — campanha, briefing, Hangar e HUD de missão */
+/* 4.1d — Eras, módulos e Ascensão */
+.era{font:600 .78rem/1 var(--fm, monospace);padding:.25rem .5rem;border-radius:6px;border:1px solid var(--line);color:var(--fg2);white-space:nowrap}.era.e2{color:#9fd8ff;border-color:#2e5f7e}.era.e3{color:#ffd27a;border-color:#7a5a20}.era.evolving{animation:eraPulse 1.2s ease-in-out infinite}.era.asc{box-shadow:0 0 12px color-mix(in srgb,var(--race,#ffd27a) 60%,transparent)}
+@keyframes eraPulse{50%{background:rgba(255,210,122,.16)}}@media (prefers-reduced-motion:reduce){.era.evolving{animation:none}}
+.act.locked{opacity:.55;filter:grayscale(.7);position:relative}.act .lockb{position:absolute;top:4px;right:4px;font:700 .62rem/1 var(--fm, monospace);padding:.15rem .3rem;border-radius:4px;background:#2a2f3a;color:#ffd27a;border:1px solid #4a4030}
+.erabox{border:1px solid #4a4030;border-radius:8px;padding:.5rem .6rem;margin:.4rem 0;background:linear-gradient(90deg,rgba(255,210,122,.08),transparent)}.erabox .eb-h{margin-bottom:.35rem}.erabox .asc{color:#ffd27a}
+.act.evolve,.act.ascend{width:100%;border-color:#7a5a20}.act.module{width:100%;margin-top:.35rem}.hp.evo i{background:linear-gradient(90deg,#ffb84d,#ffe7a3)}
 /* 4.1c — salvamentos */
 .resume{display:flex;gap:.8rem;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:.8rem 1rem;background:linear-gradient(90deg,color-mix(in srgb,var(--race) 26%,#14171d),#14171d 80%);border-bottom:1px solid color-mix(in srgb,var(--race) 50%,var(--line));animation:rsPulse 2.4s ease-in-out infinite}
 .resume b{font-family:var(--fd);font-size:1.35rem;text-transform:uppercase;letter-spacing:.02em}.rs-btns{display:flex;gap:.5rem}.rs-txt{min-width:0}
@@ -283,7 +289,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
 <div id="start" class="screen">
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Versão 4.1c · build 2026-10-11 02:58Z · salvamento automático · volta à sala · O Grande Alinhamento · multiplayer 2 a 4</div>
+    <div class="eyebrow">Versão 4.1d · build 2026-10-11 03:43Z · Eras do Núcleo · módulos · Ascensão · salvamento automático · multiplayer 2 a 4</div>
     <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div><h1>Aether Rift<br><span>Dominion</span></h1></div></div>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -330,8 +336,9 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
     </div>
     <div class="notes">
       <div class="choose">Notas da versão</div>
+      <p class="start-notes"><b>4.1d — Evolução: as Eras do Núcleo:</b> a colônia agora cresce em três <b>Eras</b>. Na <b>Era I (Fundação)</b> você tem Reator, Refinaria, Quartel, Torre, Nódulo, muros, a infantaria básica e os Piratas. Com Quartel e Refinaria de pé, selecione o Núcleo e toque em <b>Evoluir</b>. A <b>Era II (Expansão)</b> libera Fábrica, Hangar, Laboratório e as unidades de meio de jogo. A <b>Era III (Domínio)</b> pede Laboratório e Fábrica ou Hangar, e libera as unidades pesadas (Prensa, Colosso, Monólito, Brutamonte), a superarma, Armamento e Blindagem. A cada Era o Núcleo fica maior, mais forte, gera mais energia e amplia o território. As estruturas ganharam <b>módulos</b>: a <b>Câmara de Fusão</b> dá +60% de energia ao Reator, a <b>Academia</b> faz o Quartel formar infantaria já Veterana depois que você tem Laboratório, e a <b>Bateria Pesada</b> reforça a Torre. No fim, cada Raça tem sua <b>Ascensão</b> no Laboratório: Revolução Industrial (Vehnar), Véu Total (Erevane), Florescer (Tessara), Coro Pleno (Quorith) e Fome Sem Fim (Vorag), com Crias em trios. Itens com 🔒 dizem exatamente o que falta. A IA também evolui, no ritmo da dificuldade. Ela também aprendeu a <b>expandir quando os nós secam</b>: antes ela esgotava o território por volta dos 4 minutos e ficava parada. Na campanha, "Energia e regimes" ensina a evoluir, e os Atos começam na Era II.</p>
+      <details class="oldnotes"><summary>Histórico das versões anteriores (4.1c → 2.0)</summary>
       <p class="start-notes"><b>4.1c — A partida não se perde:</b> o jogo agora <b>salva sozinho</b> a cada 10 segundos e sempre que você sai da aba, tanto na escaramuça quanto na campanha. Se a internet, a energia ou o navegador caírem e você abrir o jogo de novo em até 30 segundos, ele <b>volta direto para a partida</b>, pausado, no mesmo segundo em que parou. Depois disso, a tela inicial mostra o cartão <b>"Partida interrompida"</b> com o botão Retomar. O salvamento é uma fotografia exata do mundo, da IA e do roteiro da missão; não há replay. Ele ocupa cerca de 10 a 40 KB no aparelho. O botão <b>💾</b> (ou Ctrl+S) abre <b>três espaços de salvamento</b>, também na campanha. Também dá para <b>pausar e sair para continuar depois</b>. Na dificuldade Fenda não há salvamento manual, mas o automático continua valendo contra quedas. No <b>multiplayer</b>, quem cair tem <b>2 minutos para voltar</b> ao mesmo lugar: a reconexão é automática, mesmo depois de recarregar a página, e o anfitrião manda o estado da partida para quem voltou. Enquanto isso, as unidades de quem caiu ficam paradas. Cada salvamento é conferido: nos testes, partidas e as 20 missões retomadas seguiram idênticas às originais.</p>
-      <details class="oldnotes"><summary>Histórico das versões anteriores (4.1b → 2.0)</summary>
       <p class="start-notes"><b>4.1b — Painel de comando e O Grande Alinhamento:</b> o menu ao lado das Raças virou um <b>painel com abas</b> por modo de jogo: <b>Jogar</b> (escaramuça contra a IA), <b>Campanha</b>, <b>Multiplayer</b> e <b>Ajustes</b>. Cada aba mostra só o que importa para aquele modo, e o jogo lembra a última aba usada. A campanha mudou de nome: <b>O Grande Alinhamento</b>. De tempos em tempos os cinco mundos ficam em fila, como no logo, a Fenda se abre e o Domínio troca de mãos. Os atos agora são Primeira Luz, Penumbra, Rotas de Éter, Coro e Fome e Eclipse Total. Na aba Campanha, o botão <b>Continuar</b> começa a próxima missão em um clique, com a Raça escolhida ao lado e a dificuldade lembrada. No fim da missão, "Próxima missão" e "Repetir missão" também começam direto, sem passar de novo pelo briefing; os diálogos aparecem durante a partida. O <b>minimapa virou um radar redondo</b> que gira junto com a câmera: relevo sombreado, territórios, névoa, tempestades, varredura e o "N" apontando o norte. Tocar ou clicar no radar continua levando a câmera ao ponto certo. No multiplayer, a sala tem o próprio botão de início na aba Multiplayer.</p>
       <p class="start-notes"><b>4.1a — Jogabilidade de campo:</b> no celular, com unidades selecionadas, tocar no chão ou numa construção sua <b>move o grupo</b> (antes o toque perto da base virava seleção). Construir no toque ficou em dois passos: <b>arraste o fantasma</b>, que fica acima do dedo, e <b>confirme no ✓</b>. A câmera abre mais com o celular em pé, o zoom vai mais longe e a barra inferior virou uma linha com botões grandes, sem esconder o painel. <b>Fila de produção de até 50</b>, agrupada com contador ×N e paga quando cada unidade começa: clique +1, Shift +5, Ctrl +10 e segurar +5 no toque; no chip, clique cancela uma e Shift cancela todas daquele tipo. <b>Dificuldades refeitas e medidas</b>: no Fácil a IA constrói e produz devagar, ataca só depois dos 12 minutos com parte do exército e não usa superarma; novo nível <b>Brutal</b>. <b>Cores ligadas à Raça</b> em solo, campanha e multiplayer, com o tom escolhido no <b>Hangar</b>, que agora sempre abre o 3D e mostra unidades típicas da Raça; o campo Título saiu e o título aparece sozinho. Noites mais legíveis, com luz de lua.</p>
       <p class="start-notes"><b>O que este beta testa:</b> construção com energia dinâmica, três recursos, Nódulos de território, roubo por Sifão, tabela de contras, névoa de guerra com camuflagem, diplomacia com Caução, superarmas e salas multiplayer P2P de 2 a 4 jogadores. Partidas de até 25 minutos.</p>
@@ -359,7 +366,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
     <div id="top">
       <div class="res"><span class="c-plasma">◆ <b id="r-plasma">0</b></span><span class="c-minerio">▣ <b id="r-minerio">0</b></span><span class="c-dados">◈ <b id="r-dados">0</b></span></div>
       <div id="energy" class="energy pleno"><div class="row"><span>⚡ <span id="e-text">0 / 0</span></span><span id="e-regime">Pleno</span></div><div class="bar"><i id="e-bar"></i></div></div>
-      <span id="clock">00:00</span>
+      <span id="clock">00:00</span><span id="era-badge" class="era e1">Era I</span>
       <span class="muted">Rep.: <span id="rep">Neutro</span></span>
       <span class="muted">Inimigos: <b id="enemies">0</b></span>
       <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-sound" class="tb" title="Som">♪</button><button id="btn-voice" class="tb" title="Voz do sistema">🗣</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-save" class="tb" title="Salvar partida (Ctrl+S)">💾</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
@@ -443,6 +450,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
   <tr><td>Q / E</td><td>Girar a câmera (modo 3D); no celular, o botão ⟳</td></tr>
   <tr><td>PageUp / PageDown, Ctrl + roda, botão ◢</td><td>Inclinar a câmera até o horizonte (o planeta-mãe da sua Raça aparece no céu); Home volta à visão tática</td></tr>
   <tr><td>P / H / Esc</td><td>Pausar / ajuda / cancelar</td></tr>
+  <tr><td>Eras</td><td>Selecione o Núcleo e toque em Evoluir. Era II libera Fábrica, Hangar, Laboratório e módulos; Era III libera pesados, superarma e a Ascensão da Raça (no Laboratório). Itens com 🔒 mostram o que falta</td></tr>
   <tr><td>Ctrl+S ou 💾</td><td>Salvar a partida (3 espaços). O jogo também salva sozinho a cada 10 s; se a internet ou a energia cair, volta de onde parou</td></tr></table>
   <h3>Toque</h3>
   <table><tr><td>Toque</td><td>Toque em uma unidade sua para selecionar; duplo toque seleciona todas do tipo. Com unidades selecionadas: toque no chão move, toque no inimigo ataca, toque em nó ou carcaça colhe, toque em Refinaria inimiga com Pirata sifona.</td></tr><tr><td>Barra inferior</td><td>Núcleo, Exército, Na tela (seleciona o que aparece), Construir, Atacar (o modo fica ligado até desligar), Parar, Caixa (arrastar seleciona) e ✕ (limpar seleção).</td></tr><tr><td>Arrastar / dois dedos</td><td>Câmera / zoom; girar os dois dedos gira a câmera. Em modo Construir com Muro, arrastar desenha o muro. O botão ◢ inclina a câmera.</td></tr></table>
@@ -569,14 +577,14 @@ const FACTIONS = {
 
 const BUILDINGS = {
   nucleo:      { name: 'Núcleo de Domínio', key: '', hp: 8000, r: 38, cost: {}, buildTime: 0, energyProd: 60, energyUse: 0, sensor: 420, detect: 120, deposit: true, territory: 380, produces: ['coletor'], desc: 'Centro da colônia. Produz coletores. Se cair, você é eliminado.' },
-  reator:      { name: 'Reator', key: 'R', hp: 700, r: 20, cost: { minerio: 120 }, buildTime: 12, energyProd: 35, plasmaBurn: 0.3, energyUse: 0, sensor: 120, desc: '+35 de energia queimando 0,3 Plasma/s. Vehnar: emite Fumaça visível a todos.' },
+  reator:      { name: 'Reator', key: 'R', hp: 700, r: 20, cost: { minerio: 120 }, buildTime: 12, energyProd: 35, plasmaBurn: 0.3, energyUse: 0, sensor: 120, module: { name: 'Câmara de Fusão', era: 2, cost: { minerio: 120, plasma: 40 }, time: 15, desc: '+60% de energia neste Reator, sem queimar mais Plasma.' }, desc: '+35 de energia queimando 0,3 Plasma/s. Vehnar: emite Fumaça visível a todos.' },
   refinaria:   { name: 'Refinaria', key: 'F', hp: 1000, r: 24, cost: { minerio: 150 }, buildTime: 15, energyUse: 6, sensor: 140, deposit: true, desc: 'Ponto de entrega perto dos nós. Alvo de Sifão.' },
-  quartel:     { name: 'Quartel Orbital', key: 'Q', hp: 1150, r: 26, cost: { minerio: 200 }, buildTime: 18, energyUse: 8, sensor: 140, produces: ['infantaria', 'suporte', 'pirata'], desc: 'Produz Infantaria, Suporte/Hack e Piratas.' },
-  fabrica:     { name: 'Fábrica de Veículos', key: 'V', hp: 1300, r: 28, cost: { minerio: 300, plasma: 60 }, buildTime: 22, energyUse: 12, sensor: 140, produces: ['veiculo'], desc: 'Produz Veículos Pesados.' },
-  hangar:      { name: 'Hangar de Drones', key: 'H', hp: 1150, r: 26, cost: { minerio: 280, plasma: 60 }, buildTime: 22, energyUse: 12, sensor: 160, produces: ['drone'], desc: 'Produz Drones Aéreos.' },
-  torre:       { name: 'Torre de Defesa', key: 'T', hp: 1100, r: 16, cost: { minerio: 180, plasma: 40 }, buildTime: 14, energyUse: 10, sensor: 260, detect: 140, weapon: 'obus', desc: 'Forte vs Infantaria e Drones. Detecta camuflagem em 140.' },
+  quartel:     { name: 'Quartel Orbital', key: 'Q', hp: 1150, r: 26, cost: { minerio: 200 }, buildTime: 18, energyUse: 8, sensor: 140, module: { name: 'Academia', era: 2, needs: ['laboratorio'], cost: { minerio: 160, plasma: 60, dados: 30 }, time: 20, desc: 'A infantaria deste Quartel já sai Veterana (★): +10% de dano e −7% de dano recebido.' }, produces: ['infantaria', 'suporte', 'pirata'], desc: 'Produz Infantaria, Suporte/Hack e Piratas.' },
+  fabrica:     { name: 'Fábrica de Veículos', key: 'V', era: 2, hp: 1300, r: 28, cost: { minerio: 300, plasma: 60 }, buildTime: 22, energyUse: 12, sensor: 140, produces: ['veiculo'], desc: 'Produz Veículos Pesados.' },
+  hangar:      { name: 'Hangar de Drones', key: 'H', era: 2, hp: 1150, r: 26, cost: { minerio: 280, plasma: 60 }, buildTime: 22, energyUse: 12, sensor: 160, produces: ['drone'], desc: 'Produz Drones Aéreos.' },
+  torre:       { name: 'Torre de Defesa', key: 'T', hp: 1100, r: 16, cost: { minerio: 180, plasma: 40 }, buildTime: 14, energyUse: 10, sensor: 260, detect: 140, weapon: 'obus', module: { name: 'Bateria Pesada', era: 3, cost: { minerio: 150, plasma: 60 }, time: 15, desc: '+40% de vida e +30% de dano nesta Torre.' }, desc: 'Forte vs Infantaria e Drones. Detecta camuflagem em 140.' },
   nodulo:      { name: 'Nódulo de Avanço', key: 'N', hp: 650, r: 16, cost: { minerio: 120, plasma: 20 }, buildTime: 10, energyUse: 4, sensor: 260, territory: 320, desc: 'Reclama território em 320 e libera nós para coleta automática. Pode ser colocado até 650 de qualquer estrutura sua.' },
-  laboratorio: { name: 'Laboratório', key: 'L', hp: 900, r: 24, cost: { minerio: 220, plasma: 60, dados: 40 }, buildTime: 20, energyUse: 10, sensor: 140, desc: 'Pesquisas e superarma, pagas com Fragmentos de Dados.' },
+  laboratorio: { name: 'Laboratório', key: 'L', era: 2, hp: 900, r: 24, cost: { minerio: 220, plasma: 60, dados: 40 }, buildTime: 20, energyUse: 10, sensor: 140, desc: 'Pesquisas e superarma, pagas com Fragmentos de Dados.' },
   muro:        { name: 'Muro', key: 'M', hp: 450, r: 8, cost: { minerio: 20 }, buildTime: 3, energyUse: 0, sensor: 50, wall: true, desc: 'Barreira barata. Arraste para desenhar uma linha. Bloqueia unidades e absorve tiros.' },
   portao:      { name: 'Portão', key: 'G', hp: 600, r: 8, cost: { minerio: 40 }, buildTime: 4, energyUse: 0, sensor: 60, wall: true, gate: true, desc: 'Trecho de muro que suas unidades atravessam. Inimigos precisam derrubá-lo.' },
   bastiao:     { name: 'Bastião', key: '', hp: 2200, r: 24, cost: {}, buildTime: 3, energyUse: 12, sensor: 300, detect: 160, weapon: 'bombarda', desc: 'Fortaleza da Fundição Orbital.' },
@@ -587,35 +595,35 @@ const UNITS = {
   infantaria: { name: 'Infantaria Orbital', key: 'I', cls: 'inf', hp: 120, r: 7, speed: 90, cost: { minerio: 50 }, time: 6, energyUse: 1, weapon: 'fuzil', sensor: 160, desc: 'Forte vs Drones e Suporte. Fraca vs Veículos e Estruturas.' },
   veiculo:    { name: 'Veículo Pesado', key: 'V', cls: 'vei', hp: 420, r: 12, speed: 65, cost: { minerio: 160, plasma: 40 }, time: 12, energyUse: 3, weapon: 'canhao', sensor: 170, turret: true, desc: 'Forte vs Infantaria e Estruturas. Fraco vs Drones e Suporte.' },
   drone:      { name: 'Drone Aéreo', key: 'D', cls: 'dro', hp: 160, r: 8, speed: 150, cost: { minerio: 120, plasma: 50 }, time: 10, energyUse: 2, flying: true, weapon: 'metralha', sensor: 220, desc: 'Forte vs Veículos e Suporte. Fraco vs Infantaria e Estruturas. Sobrevoa a Fenda.' },
-  suporte:    { name: 'Suporte / Hack', key: 'S', cls: 'sup', hp: 100, r: 8, speed: 80, cost: { minerio: 90, dados: 20 }, time: 9, energyUse: 2, weapon: 'pulso', sensor: 200, desc: 'Forte vs Veículos e Estruturas, e os atrasa. Fraco vs Infantaria e Drones.' },
+  suporte:    { name: 'Suporte / Hack', key: 'S', era: 2, needs: ['laboratorio'], cls: 'sup', hp: 100, r: 8, speed: 80, cost: { minerio: 90, dados: 20 }, time: 9, energyUse: 2, weapon: 'pulso', sensor: 200, desc: 'Forte vs Veículos e Estruturas, e os atrasa. Fraco vs Infantaria e Drones.' },
   pirata:     { name: 'Pirata de Extração', key: 'P', cls: 'sup', hp: 140, r: 9, speed: 100, cost: { minerio: 120, plasma: 30 }, time: 10, energyUse: 2, sensor: 180, siphonRange: 46, siphonRate: 7, siphonMax: 40, cargoCap: 300, desc: 'Sifona Refinarias e Reatores inimigos por até 40 s. Erevane: camuflado e +20% no roubo. Vehnar: Rebocador, lento e resistente, carrega 2x.' },
   // --- Vehnar
   soldador:   { name: 'Soldador', key: 'O', cls: 'inf', hp: 170, r: 8, speed: 75, cost: { minerio: 90, plasma: 15 }, time: 8, energyUse: 1, weapon: 'chama', sensor: 150, faction: 'vehnar', desc: 'Lança-chamas de curto alcance com dano em área. Devastador contra infantaria; fraco contra veículos.' },
-  guindaste:  { name: 'Guindaste Armado', key: 'U', cls: 'sup', hp: 320, r: 11, speed: 60, cost: { minerio: 180, plasma: 40 }, time: 12, energyUse: 3, sensor: 170, faction: 'vehnar', heal: { range: 90, unit: 4, building: 9 }, desc: 'Sem armas. Repara unidades e estruturas suas por perto, continuamente.' },
+  guindaste:  { name: 'Guindaste Armado', key: 'U', era: 2, cls: 'sup', hp: 320, r: 11, speed: 60, cost: { minerio: 180, plasma: 40 }, time: 12, energyUse: 3, sensor: 170, faction: 'vehnar', heal: { range: 90, unit: 4, building: 9 }, desc: 'Sem armas. Repara unidades e estruturas suas por perto, continuamente.' },
   tratorzao:  { name: 'Tratorzão', key: 'T', cls: 'vei', hp: 220, r: 10, speed: 135, cost: { minerio: 110, plasma: 20 }, time: 8, energyUse: 2, weapon: 'metralha', sensor: 320, faction: 'vehnar', desc: 'Veículo leve e rápido de reconhecimento, com sensores longos e metralhadora.' },
-  prensa:     { name: 'Prensa', key: 'R', cls: 'vei', hp: 900, r: 15, speed: 50, cost: { minerio: 320, plasma: 80 }, time: 18, energyUse: 5, weapon: 'prensa', sensor: 170, faction: 'vehnar', desc: 'Mech bípede de cerco: canhões duplos com grande área. Lento e caro.' },
+  prensa:     { name: 'Prensa', key: 'R', era: 3, cls: 'vei', hp: 900, r: 15, speed: 50, cost: { minerio: 320, plasma: 80 }, time: 18, energyUse: 5, weapon: 'prensa', sensor: 170, faction: 'vehnar', desc: 'Mech bípede de cerco: canhões duplos com grande área. Lento e caro.' },
   // --- Erevane
-  atirador:   { name: 'Atirador de Fenda', key: 'A', cls: 'inf', hp: 100, r: 7, speed: 85, cost: { minerio: 100, dados: 10 }, time: 9, energyUse: 1, weapon: 'fuzil_longo', sensor: 260, faction: 'erevane', desc: 'Camuflado quando parado. Tiro longo e letal contra infantaria e suporte; quase inútil contra estruturas.' },
+  atirador:   { name: 'Atirador de Fenda', key: 'A', era: 2, cls: 'inf', hp: 100, r: 7, speed: 85, cost: { minerio: 100, dados: 10 }, time: 9, energyUse: 1, weapon: 'fuzil_longo', sensor: 260, faction: 'erevane', desc: 'Camuflado quando parado. Tiro longo e letal contra infantaria e suporte; quase inútil contra estruturas.' },
   lamina:     { name: 'Lâmina Rodante', key: 'L', cls: 'vei', hp: 300, r: 11, speed: 145, cost: { minerio: 140, plasma: 30 }, time: 10, energyUse: 2, weapon: 'laminas', sensor: 180, faction: 'erevane', desc: 'Veículo baixo e rápido de ataque corpo a corpo. Bata e fuja.' },
   mosquito:   { name: 'Mosquito', key: 'M', cls: 'dro', hp: 65, r: 5, speed: 175, cost: { minerio: 45, plasma: 15 }, time: 4, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 200, faction: 'erevane', desc: 'Microdrone barato e frágil. Em enxame, pica veículos e suporte.' },
-  ancora:     { name: 'Âncora', key: 'N', cls: 'sup', hp: 160, r: 9, speed: 70, cost: { minerio: 140, plasma: 30, dados: 20 }, time: 11, energyUse: 3, sensor: 200, faction: 'erevane', aura: { cloak: 110 }, desc: 'Sem armas. Campo de Estática: suas unidades a até 110 dela ficam camufladas.' },
+  ancora:     { name: 'Âncora', key: 'N', era: 2, needs: ['laboratorio'], cls: 'sup', hp: 160, r: 9, speed: 70, cost: { minerio: 140, plasma: 30, dados: 20 }, time: 11, energyUse: 3, sensor: 200, faction: 'erevane', aura: { cloak: 110 }, desc: 'Sem armas. Campo de Estática: suas unidades a até 110 dela ficam camufladas.' },
   // --- Tessara
   quimera:    { name: 'Quimera', key: 'I', cls: 'inf', hp: 140, r: 7, speed: 88, cost: { minerio: 55 }, time: 6, energyUse: 1, weapon: 'fuzil', sensor: 170, faction: 'tessara', desc: 'Infantaria adaptativa. Ganha Traços contra as classes que mais combate.' },
   esporo:     { name: 'Esporo-sentinela', key: 'E', cls: 'dro', hp: 90, r: 6, speed: 160, cost: { minerio: 70, plasma: 20 }, time: 6, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 330, faction: 'tessara', desc: 'Drone de reconhecimento com sensores muito longos.' },
-  molde:      { name: 'Molde', key: 'O', cls: 'sup', hp: 150, r: 9, speed: 75, cost: { minerio: 130, plasma: 20, dados: 20 }, time: 10, energyUse: 2, sensor: 200, faction: 'tessara', aura: { buff: 100 }, desc: 'Sem armas. Suas unidades a até 100 dele causam +15% de dano.' },
-  colosso:    { name: 'Colosso Cambiante', key: 'C', cls: 'vei', hp: 1150, r: 16, speed: 50, cost: { minerio: 320, plasma: 80, dados: 25 }, time: 20, energyUse: 6, weapon: 'colosso', sensor: 180, faction: 'tessara', desc: 'Pesado de cerco com canhão de área. Ganha Traços como as outras unidades Tessara.' },
+  molde:      { name: 'Molde', key: 'O', era: 2, needs: ['laboratorio'], cls: 'sup', hp: 150, r: 9, speed: 75, cost: { minerio: 130, plasma: 20, dados: 20 }, time: 10, energyUse: 2, sensor: 200, faction: 'tessara', aura: { buff: 100 }, desc: 'Sem armas. Suas unidades a até 100 dele causam +15% de dano.' },
+  colosso:    { name: 'Colosso Cambiante', key: 'C', era: 3, cls: 'vei', hp: 1150, r: 16, speed: 50, cost: { minerio: 320, plasma: 80, dados: 25 }, time: 20, energyUse: 6, weapon: 'colosso', sensor: 180, faction: 'tessara', desc: 'Pesado de cerco com canhão de área. Ganha Traços como as outras unidades Tessara.' },
   // --- Quorith (4.0c)
   voz:        { name: 'Voz', key: 'Z', cls: 'inf', hp: 95, r: 7, speed: 92, cost: { minerio: 55, dados: 5 }, time: 6, energyUse: 1, weapon: 'pulso_voz', sensor: 170, faction: 'quorith', desc: 'Pulso básico do Coro. Fraca sozinha; em acorde (Elo: +3,5% de dano e +2,5% de armadura por aliado Quorith a até 90, máx. 3) fica letal.' },
-  agulha:     { name: 'Agulha', key: 'G', cls: 'inf', hp: 110, r: 7, speed: 85, cost: { minerio: 100, plasma: 25 }, time: 8, energyUse: 1, weapon: 'agulha', sensor: 220, faction: 'quorith', desc: 'Antiaérea: agulhas ressonantes que estilhaçam drones. Fraca contra veículos e estruturas.' },
-  diapasao:   { name: 'Diapasão', key: 'D', cls: 'sup', hp: 170, r: 9, speed: 72, cost: { minerio: 140, plasma: 20, dados: 30 }, time: 11, energyUse: 3, sensor: 210, faction: 'quorith', aura: { elo: 100 }, desc: 'Sem armas. Amplia o Elo: aliados a até 100 dele aceitam um quarto vizinho no acorde.' },
+  agulha:     { name: 'Agulha', key: 'G', era: 2, cls: 'inf', hp: 110, r: 7, speed: 85, cost: { minerio: 100, plasma: 25 }, time: 8, energyUse: 1, weapon: 'agulha', sensor: 220, faction: 'quorith', desc: 'Antiaérea: agulhas ressonantes que estilhaçam drones. Fraca contra veículos e estruturas.' },
+  diapasao:   { name: 'Diapasão', key: 'D', era: 2, needs: ['laboratorio'], cls: 'sup', hp: 170, r: 9, speed: 72, cost: { minerio: 140, plasma: 20, dados: 30 }, time: 11, energyUse: 3, sensor: 210, faction: 'quorith', aura: { elo: 100 }, desc: 'Sem armas. Amplia o Elo: aliados a até 100 dele aceitam um quarto vizinho no acorde.' },
   prisma:     { name: 'Prisma', key: 'P', cls: 'vei', hp: 520, r: 12, speed: 60, cost: { minerio: 190, plasma: 50, dados: 10 }, time: 13, energyUse: 3, weapon: 'refrator', sensor: 170, faction: 'quorith', desc: 'Tanque refrator: concentra a onda do Coro num feixe de área.' },
-  monolito:   { name: 'Monólito', key: 'O', cls: 'vei', hp: 780, r: 15, speed: 45, cost: { minerio: 330, plasma: 80, dados: 40 }, time: 19, energyUse: 5, weapon: 'ressonancia', sensor: 190, faction: 'quorith', desc: 'Cerco ressonante: onda lenta e longa que racha estruturas. Quase inútil contra drones.' },
+  monolito:   { name: 'Monólito', key: 'O', era: 3, cls: 'vei', hp: 780, r: 15, speed: 45, cost: { minerio: 330, plasma: 80, dados: 40 }, time: 19, energyUse: 5, weapon: 'ressonancia', sensor: 190, faction: 'quorith', desc: 'Cerco ressonante: onda lenta e longa que racha estruturas. Quase inútil contra drones.' },
   harmonico:  { name: 'Harmônico', key: 'H', cls: 'dro', hp: 120, r: 7, speed: 150, cost: { minerio: 110, plasma: 45, dados: 10 }, time: 9, energyUse: 2, flying: true, weapon: 'harmonico', sensor: 230, faction: 'quorith', desc: 'Voador do Coro: acorde aéreo que persegue veículos e suporte.' },
   // --- Vorag (4.0c)
   cria:       { name: 'Cria', key: 'K', cls: 'inf', hp: 82, r: 6, speed: 122, cost: { minerio: 22, plasma: 12 }, time: 4.5, energyUse: 0.5, weapon: 'mordida', sensor: 150, faction: 'vorag', pair: true, desc: 'Enxame corpo a corpo; eclode em pares. Fome: fora do seu território perde vida devagar (até 40%).' },
   cuspidor:   { name: 'Cuspidor', key: 'U', cls: 'inf', hp: 95, r: 7, speed: 90, cost: { minerio: 40, plasma: 30 }, time: 5, energyUse: 1, weapon: 'acido', sensor: 170, faction: 'vorag', desc: 'Cospe ácido a média distância; corrói veículos e estruturas.' },
   escaravelho: { name: 'Escaravelho', key: 'E', cls: 'vei', hp: 300, r: 11, speed: 120, cost: { minerio: 70, plasma: 60 }, time: 8, energyUse: 2, weapon: 'chifrada', sensor: 190, faction: 'vorag', desc: 'Besta de carga blindada: investida rápida que atropela infantaria.' },
-  brutamonte: { name: 'Brutamonte', key: 'B', cls: 'vei', hp: 1000, r: 16, speed: 52, cost: { minerio: 160, plasma: 130 }, time: 15, energyUse: 4, weapon: 'brutamonte', sensor: 170, faction: 'vorag', desc: 'Tanque biológico: carapaça grossa e golpe de área.' },
+  brutamonte: { name: 'Brutamonte', key: 'B', era: 3, cls: 'vei', hp: 1000, r: 16, speed: 52, cost: { minerio: 160, plasma: 130 }, time: 15, energyUse: 4, weapon: 'brutamonte', sensor: 170, faction: 'vorag', desc: 'Tanque biológico: carapaça grossa e golpe de área.' },
   // --- épicos de campanha (4.0e): não são produzidos; os roteiros do Ato 4 os criam
   catedral:   { name: 'Catedral Errante', key: '', cls: 'vei', hp: 9000, r: 30, speed: 26, cost: { minerio: 1600, plasma: 400 }, time: 60, energyUse: 0, weapon: 'catedral', sensor: 320, faction: 'quorith', epic: true, desc: 'Épico do Coro: uma catedral de cristal que caminha cantando. Onda de ressonância em área.' },
   matriarca:  { name: 'Matriarca', key: '', cls: 'vei', hp: 8000, r: 28, speed: 34, cost: { minerio: 1600, plasma: 400 }, time: 60, energyUse: 0, weapon: 'matriarca', sensor: 300, faction: 'vorag', epic: true, desc: 'Épica da Prole: a rainha que choca Crias sem parar.' },
@@ -672,12 +680,45 @@ const VET_RANKS = [0, 0.8, 2.4, 5.0]; // multiplicador do custo da unidade em XP
 const CLASS_NAMES = { inf: 'Infantaria', vei: 'Veículos', dro: 'Drones', est: 'Estruturas', sup: 'Suporte/Hack', civ: 'Civil' };
 
 const RESEARCH = {
-  armamento: { name: 'Armamento', cost: { dados: 150 }, desc: '+15% de dano para todas as unidades e torres.' },
-  blindagem: { name: 'Blindagem', cost: { dados: 150 }, desc: '−13% de dano recebido por unidades e estruturas.' },
-  sensores:  { name: 'Sensores', cost: { dados: 100 }, desc: '+25% de alcance de sensores.' },
+  armamento: { name: 'Armamento', era: 3, cost: { dados: 150 }, desc: '+15% de dano para todas as unidades e torres.' },
+  blindagem: { name: 'Blindagem', era: 3, cost: { dados: 150 }, desc: '−13% de dano recebido por unidades e estruturas.' },
+  sensores:  { name: 'Sensores', era: 2, cost: { dados: 100 }, desc: '+25% de alcance de sensores.' },
 };
 
 for (const t of [BUILDINGS, UNITS]) for (const k in t) if (t[k].weapon) t[k].attack = WEAPONS[t[k].weapon];
+// 4.1d — Eras do Núcleo: a colônia evolui em três etapas; cada uma libera estruturas, unidades, módulos e poderes
+const ERAS = [null,
+  { n: 1, roman: 'I', name: 'Fundação', desc: 'Reator, Refinaria, Quartel, Torre, Nódulo e muros. Infantaria básica e Piratas.' },
+  { n: 2, roman: 'II', name: 'Expansão', cost: { minerio: 300, plasma: 80 }, time: 25, needs: ['quartel', 'refinaria'], desc: 'Libera Fábrica, Hangar e Laboratório, as unidades de meio de jogo, a Câmara de Fusão dos Reatores e a Academia do Quartel.' },
+  { n: 3, roman: 'III', name: 'Domínio', cost: { minerio: 400, plasma: 320, dados: 60 }, time: 40, needs: ['laboratorio'], needsAny: ['fabrica', 'hangar'], desc: 'Libera as unidades pesadas, a superarma, Armamento e Blindagem, a Bateria Pesada das Torres e a Ascensão da sua Raça.' },
+];
+const ERA_NUCLEO = { hp: 0.2, territory: 40, energy: 15 }; // por Era acima da I
+// Ascensão: o último passo de cada Raça (Laboratório, Era III); vira modificadores permanentes do jogador
+const ASCENSION = {
+  vehnar:  { name: 'Revolução Industrial', cost: { minerio: 300, plasma: 200, dados: 150 }, desc: 'Produção 25% mais rápida e Reatores queimam 30% menos Plasma.', mods: { prodMul: 1.25, burnMul: 0.7 } },
+  erevane: { name: 'Véu Total', cost: { minerio: 300, plasma: 200, dados: 150 }, desc: 'Unidades 15% mais rápidas, sensores +25% e superarma recarrega 30% mais rápido.', mods: { speedMul: 1.15, sensorMul: 1.25, superCdMul: 0.7 } },
+  tessara: { name: 'Florescer', cost: { minerio: 300, plasma: 200, dados: 150 }, desc: 'Unidades se regeneram fora de combate (4 de vida/s) e a coleta rende 20% mais.', mods: { regen: 4, harvestMul: 1.2 } },
+  quorith: { name: 'Coro Pleno', cost: { minerio: 300, plasma: 200, dados: 150 }, desc: 'O Elo de Sincronia sobe até 5 aliados (antes 3) e a energia rende 15% mais.', mods: { eloBonus: 2, energyMul: 1.15 } },
+  vorag:   { name: 'Fome Sem Fim', cost: { minerio: 300, plasma: 200, dados: 150 }, desc: 'Crias eclodem em trios e unidades se regeneram fora de combate (3 de vida/s).', mods: { brood: 3, regen: 3 } },
+};
+function eraOf(sim, pid) { const p = sim.players[pid]; return (p && p.era) || 1; }
+function hasBuiltAny(sim, pid, defs) { for (const d of defs) if (hasBuilt(sim, pid, d)) return true; return false; }
+// por que algo está trancado (texto para a interface) ou null quando liberado
+function lockReason(sim, pid, kind, def) {
+  const t = kind === 'unit' ? UNITS[def] : kind === 'building' ? BUILDINGS[def] : kind === 'research' ? RESEARCH[def] : kind === 'module' ? BUILDINGS[def] && BUILDINGS[def].module : null;
+  if (!t) return 'Desconhecido';
+  const era = t.era || 1; if (era > eraOf(sim, pid)) return 'Requer Era ' + ERAS[era].roman + ' (' + ERAS[era].name + ')';
+  for (const n of t.needs || []) if (!hasBuilt(sim, pid, n)) return 'Requer ' + BUILDINGS[n].name;
+  return null;
+}
+function territoryOf(sim, e) { const t = BUILDINGS[e.def].territory || 0; if (!t || e.def !== 'nucleo') return t; return t + ERA_NUCLEO.territory * (eraOf(sim, e.owner) - 1); }
+function eraBlock(sim, pid) { // o que falta para a próxima Era (null se pode evoluir)
+  const p = sim.players[pid]; const cur = eraOf(sim, pid); const nx = ERAS[cur + 1]; if (!nx) return 'Era máxima';
+  if (p.evolveT > 0) return 'Evoluindo';
+  for (const n of nx.needs || []) if (!hasBuilt(sim, pid, n)) return 'Requer ' + BUILDINGS[n].name;
+  if (nx.needsAny && !hasBuiltAny(sim, pid, nx.needsAny)) return 'Requer ' + nx.needsAny.map(n => BUILDINGS[n].name).join(' ou ');
+  return null;
+}
 const SUPER_COST = { dados: 300, plasma: 200 };
 const SUPER_CD = 600;
 const OVERCHARGE_COST = 200, OVERCHARGE_T = 60, OVERCHARGE_CD = 300;
@@ -695,7 +736,7 @@ const DIFFICULTY = {
   // 4.1a: Fácil de verdade (economia menor, constrói devagar, ataca tarde e com parte do exército, sem superarma); Brutal novo no topo
   facil:   { name: 'Fácil',   income: 0.55, attackAt: 1600, minAttack: 720, acceptP: 0.95, breakP: 0.0,  pirateEvery: 260, reserve: 300, buildEvery: 30, attackFrac: 0.6, research: 1, superweapon: false, maxProd: 1, prodEvery: 9, maxCol: 8 },
   normal:  { name: 'Normal',  income: 0.9,  attackAt: 1500, minAttack: 480, acceptP: 0.7,  breakP: 0.08, pirateEvery: 150, reserve: 180, buildEvery: 10, attackFrac: 0.85, research: 2, superweapon: true, maxProd: 2, prodEvery: 3, maxCol: 12 },
-  dificil: { name: 'Difícil', income: 1.15, attackAt: 1600, minAttack: 360, acceptP: 0.5,  breakP: 0.3,  pirateEvery: 100, reserve: 120, buildEvery: 0,  attackFrac: 1,   research: 3, superweapon: true, maxProd: 9 },
+  dificil: { name: 'Difícil', income: 1.0,  attackAt: 1600, minAttack: 420, acceptP: 0.5,  breakP: 0.3,  pirateEvery: 100, reserve: 120, buildEvery: 4,  attackFrac: 0.95, research: 3, superweapon: true, maxProd: 4, prodEvery: 1 }, // 4.1d: suavizado depois da correção da economia da IA
   brutal:  { name: 'Brutal',  income: 1.4,  attackAt: 1800, minAttack: 300, acceptP: 0.35, breakP: 0.45, pirateEvery: 80,  reserve: 90,  buildEvery: 0,  attackFrac: 1,   research: 3, superweapon: true, maxProd: 9 },
 };
 
@@ -733,7 +774,7 @@ function createSim(cfg) {
       res: { plasma: 300, minerio: 500, dados: 40 },
       energy: { prod: 40, cons: 0, ratio: 1, regime: 'pleno' },
       overchargeT: 0, overchargeCd: 0, superCd: 0, blackoutT: 0, speedBuffT: 0, golpeT: 0, unissonoT: 0,
-      research: {}, rep: 0, pacts: {}, jumpsLeft: fac.jumps, lastBaseAlert: -99, lastNucleoAlert: -99, saltoT: 0, traits: {}, traitXp: {},
+      era: Math.max(1, Math.min(3, pc.era | 0 || 1)), evolveT: 0, ascended: false, research: {}, rep: 0, pacts: {}, jumpsLeft: fac.jumps, lastBaseAlert: -99, lastNucleoAlert: -99, saltoT: 0, traits: {}, traitXp: {},
       stats: { collected: 0, stolen: 0, lost: 0, unitsKilled: 0, unitsLost: 0, buildingsDestroyed: 0, buildingsLost: 0, treaties: 0, betrayals: 0, dmg: 0 },
       startAngle: rot + (Math.PI * 2 * i) / n,
     };
@@ -1016,7 +1057,7 @@ function updateElo(sim) {
   for (const e of sim.ents) {
     if (!e.alive || e.kind !== 'unit') continue; const p = sim.players[e.owner]; const fac = FACTIONS[p.faction];
     if (!fac.elo || e.cls === 'civ') { e.elo = 0; continue; }
-    let cap = fac.elo.cap; for (const dp of sim.auras[e.owner].diapasoes) if (dist(dp.x, dp.y, e.x, e.y) <= UNITS.diapasao.aura.elo) { cap++; break; }
+    let cap = fac.elo.cap + ((sim.players[e.owner].mods && sim.players[e.owner].mods.eloBonus) || 0); for (const dp of sim.auras[e.owner].diapasoes) if (dist(dp.x, dp.y, e.x, e.y) <= UNITS.diapasao.aura.elo) { cap++; break; }
     if (p.unissonoT > 0) { e.elo = cap; continue; }
     let n = 0; queryGrid(sim, e.x, e.y, fac.elo.range + 40, o => { if (n >= cap || o === e || !o.alive || o.kind !== 'unit' || o.owner !== e.owner || o.cls === 'civ') return; if (dist(e.x, e.y, o.x, o.y) <= fac.elo.range) n++; });
     e.elo = n;
@@ -1046,7 +1087,7 @@ function speedOf(sim, u) {
 function inTerritory(sim, pid, x, y) {
   for (const e of sim.ents) {
     if (!e.alive || e.kind !== 'building' || e.owner !== pid || !e.built) continue;
-    const t = BUILDINGS[e.def].territory;
+    const t = territoryOf(sim, e);
     if (t && dist(x, y, e.x, e.y) <= t) return true;
   }
   return false;
@@ -1054,7 +1095,7 @@ function inTerritory(sim, pid, x, y) {
 function territoryOwner(sim, x, y) { // first owner whose territory covers; -1 if none
   for (const e of sim.ents) {
     if (!e.alive || e.kind !== 'building' || !e.built) continue;
-    const t = BUILDINGS[e.def].territory;
+    const t = territoryOf(sim, e);
     if (t && dist(x, y, e.x, e.y) <= t) return e.owner;
   }
   return -1;
@@ -1133,6 +1174,7 @@ function processCommand(sim, c) {
       break; }
     case 'build': {
       const d = BUILDINGS[c.def]; if (!d || !d.key) return;
+      { const lr = lockReason(sim, c.p, 'building', c.def); if (lr) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: lr }); return; } }
       const ok = canBuild(sim, c.p, c.def, c.x, c.y); if (!ok.ok) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: ok.why }); return; }
       if (!canAfford(p, d.cost)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Recursos insuficientes' }); return; }
       pay(p, d.cost); const nb = addBuilding(sim, c.p, c.def, c.x, c.y, false); if (typeof c.ang === 'number') nb.ang = c.ang;
@@ -1141,6 +1183,7 @@ function processCommand(sim, c) {
     case 'produce': {
       const b = sim.byId.get(c.id); if (!b || !b.alive || b.kind !== 'building' || b.owner !== c.p || !b.built) return;
       const bd = BUILDINGS[b.def]; if (!producesFor(b.def, p.faction).includes(c.def)) return;
+      { const lr = lockReason(sim, c.p, 'unit', c.def); if (lr) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: lr }); return; } }
       const n = Math.max(1, Math.min(50, c.n | 0 || 1)); // 4.1a: até 50 na fila; c.n enfileira várias de uma vez
       for (let k = 0; k < n && b.queue.length < 50; k++) b.queue.push({ def: c.def, t: 0, total: UNITS[c.def].time, mult: 1, paid: false });
       if (p.human && !canAfford(p, UNITS[c.def].cost) && b.queue.length > 1) emit(sim, { t: 'notice', p: c.p, text: 'Na fila: cada unidade é paga quando começa a ser produzida' });
@@ -1157,6 +1200,7 @@ function processCommand(sim, c) {
     case 'research': {
       const r = RESEARCH[c.key]; if (!r || p.research[c.key]) return;
       if (!hasBuilt(sim, c.p, 'laboratorio')) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Requer Laboratório' }); return; }
+      { const lr = lockReason(sim, c.p, 'research', c.key); if (lr) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: lr }); return; } }
       if (!canAfford(p, r.cost)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Fragmentos de Dados insuficientes' }); return; }
       pay(p, r.cost); p.research[c.key] = true; alertTo(sim, c.p, 'Pesquisa concluída: ' + r.name, null, null, 'good');
       break; }
@@ -1165,9 +1209,31 @@ function processCommand(sim, c) {
       p.res.plasma -= OVERCHARGE_COST; p.overchargeT = OVERCHARGE_T; p.overchargeCd = sim.time + OVERCHARGE_CD;
       alertTo(sim, c.p, 'Sobrecarga: +50% de energia por 60 s', null, null, 'good');
       break; }
+    case 'evolve': { // 4.1d: Núcleo evolui para a próxima Era
+      const n = nucleoOf(sim, c.p); if (!n || n.jumpT > 0) return; const nx = ERAS[eraOf(sim, c.p) + 1];
+      const why = eraBlock(sim, c.p); if (why) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: why }); return; }
+      if (!canAfford(p, nx.cost)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Recursos insuficientes para a Era ' + nx.roman }); return; }
+      pay(p, nx.cost); p.evolveT = nx.time; alertTo(sim, c.p, 'Núcleo evoluindo para a Era ' + nx.roman + ' (' + nx.name + ')', n.x, n.y, 'good');
+      break; }
+    case 'upgrade': { // 4.1d: módulo de uma estrutura (Câmara de Fusão, Academia, Bateria Pesada)
+      const b = sim.byId.get(c.id); if (!b || !b.alive || b.kind !== 'building' || b.owner !== c.p || !b.built || b.mod || b.upT > 0) return; const md = BUILDINGS[b.def].module; if (!md) return;
+      { const lr = lockReason(sim, c.p, 'module', b.def); if (lr) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: lr }); return; } }
+      if (!canAfford(p, md.cost)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Recursos insuficientes' }); return; }
+      pay(p, md.cost); b.upT = md.time;
+      break; }
+    case 'ascend': { // 4.1d: Ascensão da Raça (Laboratório, Era III)
+      const asc = ASCENSION[p.faction]; if (!asc || p.ascended) return;
+      if (!hasBuilt(sim, c.p, 'laboratorio')) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Requer Laboratório' }); return; }
+      if (eraOf(sim, c.p) < 3) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Requer Era III (Domínio)' }); return; }
+      if (!canAfford(p, asc.cost)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Recursos insuficientes' }); return; }
+      pay(p, asc.cost); p.ascended = true; p.mods = p.mods || {};
+      for (const k in asc.mods) { const v = asc.mods[k]; if (k === 'regen' || k === 'eloBonus' || k === 'brood') p.mods[k] = Math.max(p.mods[k] || 0, v); else p.mods[k] = (p.mods[k] || 1) * v; }
+      emit(sim, { t: 'ascend', p: c.p }); for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Ascensão: ' + asc.name + '. ' + asc.desc : p.name + ' alcançou a Ascensão (' + asc.name + ')!', null, null, q.id === c.p ? 'good' : 'warn');
+      break; }
     case 'super': {
       const fac = facOf(sim, c.p);
       if (!hasBuilt(sim, c.p, 'laboratorio')) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Requer Laboratório' }); return; }
+      if (eraOf(sim, c.p) < 3) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Superarma requer Era III (Domínio)' }); return; }
       if (sim.time < p.superCd) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Superarma em recarga' }); return; }
       if (!canAfford(p, SUPER_COST)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Requer 300 Dados e 200 Plasma' }); return; }
       if (fac.superKey === 'fundicao') {
@@ -1259,9 +1325,9 @@ function computeEnergy(sim, p, dt) {
       const d = BUILDINGS[e.def];
       if (!e.built) continue;
       if (d.energyProd) {
-        if (d.plasmaBurn) { if (p.res.plasma > 0) { prod += d.energyProd; p.res.plasma = Math.max(0, p.res.plasma - d.plasmaBurn * dt * (p.mods && p.mods.burnMul || 1)); } }
-        else if (e.def === 'nucleo' && FACTIONS[p.faction].photosynthesis) { const nt = (1 - DM.cos(Math.PI * 2 * sim.time / 750)) / 2; prod += 95 - 50 * nt; }
-        else prod += d.energyProd;
+        if (d.plasmaBurn) { if (p.res.plasma > 0) { prod += d.energyProd * (e.mod === 1 && e.def === 'reator' ? 1.6 : 1); p.res.plasma = Math.max(0, p.res.plasma - d.plasmaBurn * dt * (p.mods && p.mods.burnMul || 1)); } }
+        else if (e.def === 'nucleo' && FACTIONS[p.faction].photosynthesis) { const nt = (1 - DM.cos(Math.PI * 2 * sim.time / 750)) / 2; prod += 95 - 50 * nt + ERA_NUCLEO.energy * ((p.era || 1) - 1); }
+        else prod += d.energyProd + (e.def === 'nucleo' ? ERA_NUCLEO.energy * ((p.era || 1) - 1) : 0);
       }
       cons += d.energyUse || 0;
     } else if (e.kind === 'unit') cons += UNITS[e.def].energyUse || 0;
@@ -1288,7 +1354,7 @@ function unitCost(def) { const c = (UNITS[def] || BUILDINGS[def] || {}).cost || 
 function damageMult(sim, a) { // multiplicadores do atacante (pesquisa, Golpe de Traição, regime das torres, veterância)
   const p = sim.players[a.owner]; let m = 1;
   if (p.research.armamento) m *= 1.15; if (p.golpeT > 0) m *= 1.2;
-  if (a.kind === 'building') m *= regimeOf(sim, a.owner).defF;
+  if (a.kind === 'building') { m *= regimeOf(sim, a.owner).defF; if (a.mod === 1 && a.def === 'torre') m *= 1.3; }
   if (a.kind === 'unit') m *= 1 + 0.1 * (a.rank || 0);
   if (p.saltoT > 0) m *= 1.35;
   if (a.kind === 'unit' && a.elo > 0) m *= 1 + FACTIONS[p.faction].elo.dmg * a.elo; // Elo de Sincronia (Quorith)
@@ -1613,6 +1679,13 @@ function updateBuilding(sim, b, dt) {
     }
     return; // no production while jumping
   }
+  if (b.def === 'nucleo' && p.evolveT > 0) { // 4.1d: evolução da Era em curso
+    p.evolveT -= dt * reg.prodF;
+    if (p.evolveT <= 0) { p.evolveT = 0; p.era = Math.min(3, (p.era || 1) + 1); const k = 1 + ERA_NUCLEO.hp * (p.era - 1), k0 = 1 + ERA_NUCLEO.hp * (p.era - 2); b.maxHp = BUILDINGS.nucleo.hp * k; b.hp = Math.min(b.maxHp, b.hp * k / k0 + BUILDINGS.nucleo.hp * 0.1);
+      emit(sim, { t: 'era', p: b.owner, era: p.era, x: b.x, y: b.y }); alertTo(sim, b.owner, 'Era ' + ERAS[p.era].roman + ' — ' + ERAS[p.era].name + ': ' + ERAS[p.era].desc, b.x, b.y, 'good');
+      for (const q of sim.players) if (q.alive && q.id !== b.owner) alertTo(sim, q.id, p.name + ' chegou à Era ' + ERAS[p.era].roman, b.x, b.y, 'warn'); }
+  }
+  if (b.upT > 0) { b.upT -= dt * reg.prodF; if (b.upT <= 0) { b.upT = 0; b.mod = 1; const md = d.module; if (b.def === 'torre') { b.maxHp *= 1.4; b.hp *= 1.4; } emit(sim, { t: 'module', p: b.owner, def: b.def, x: b.x, y: b.y }); alertTo(sim, b.owner, md.name + ' pronta: ' + md.desc, b.x, b.y, 'good'); } }
   if (b.queue.length) {
     let mult = reg.prodF; if (p.mods && p.mods.prodMul) mult *= p.mods.prodMul;
     if (facOf(sim, b.owner).lineBonus && d.produces && b.def !== 'nucleo') {
@@ -1629,7 +1702,9 @@ function updateBuilding(sim, b, dt) {
       const ang = b.rally ? DM.atan2(b.rally.y - b.y, b.rally.x - b.x) : DM.atan2(CY - b.y, CX - b.x);
       const u = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang) * (b.r + 14), b.y + DM.sin(ang) * (b.r + 14));
       if (b.rally) { u.state = 'move'; u.tx = b.rally.x + (sim.rand() - 0.5) * 30; u.ty = b.rally.y + (sim.rand() - 0.5) * 30; }
+      if (b.mod === 1 && b.def === 'quartel' && u.cls === 'inf') { u.rank = 1; u.xp = Math.max(50, unitCost(it.def)) * VET_RANKS[1]; } // Academia
       emit(sim, { t: 'spawn', p: b.owner, x: u.x, y: u.y, def: it.def });
+      if (UNITS[it.def].pair && p.mods && p.mods.brood >= 3) { const u3 = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang - 0.5) * (b.r + 14), b.y + DM.sin(ang - 0.5) * (b.r + 14)); if (b.rally) { u3.state = 'move'; u3.tx = b.rally.x + (sim.rand() - 0.5) * 30; u3.ty = b.rally.y + (sim.rand() - 0.5) * 30; } emit(sim, { t: 'spawn', p: b.owner, x: u3.x, y: u3.y, def: it.def }); } // Fome Sem Fim: trios
       if (UNITS[it.def].pair) { const u2 = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang + 0.5) * (b.r + 14), b.y + DM.sin(ang + 0.5) * (b.r + 14)); if (b.rally) { u2.state = 'move'; u2.tx = b.rally.x + (sim.rand() - 0.5) * 30; u2.ty = b.rally.y + (sim.rand() - 0.5) * 30; } emit(sim, { t: 'spawn', p: b.owner, x: u2.x, y: u2.y, def: it.def }); }
     }
   }
@@ -1853,7 +1928,7 @@ ARD.sim = {
   SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS, RACE_SHADES, assignColors, FACTION_EXTRAS, producesFor,
   NAV, NW, TILE, TILES, BIOMES, navIdx, passable, flowField, lineFree, inStorm,
   DM,
-  createSim, step, enqueue, snapshot, restore, jsonSafe, jsonBack, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint, spawnUnit, forceStorm,
+  createSim, step, enqueue, snapshot, restore, jsonSafe, jsonBack, ERAS, ASCENSION, eraOf, lockReason, eraBlock, territoryOf, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint, spawnUnit, forceStorm,
 };
 })(globalThis.ARD = globalThis.ARD || {});
 
@@ -1882,7 +1957,7 @@ const CLASS_W = { voz: 'infantaria', agulha: 'infantaria', cria: 'infantaria', c
 const VALUE = { refinaria: 3, nodulo: 2.5, reator: 2, laboratorio: 2, quartel: 1.5, fabrica: 1.5, hangar: 1.5, torre: 1, bastiao: 0.8, nucleo: 1.2, muro: 0.1, portao: 0.2 };
 
 function create(pid, difficulty) {
-  return { pid, diff: S.DIFFICULTY[difficulty] || S.DIFFICULTY.normal, bo: 0, mode: 'defend', attackStart: 0, target: null, known: new Map(),
+  return { pid, dn: S.DIFFICULTY[difficulty] ? difficulty : 'normal', diff: S.DIFFICULTY[difficulty] || S.DIFFICULTY.normal, bo: 0, mode: 'defend', attackStart: 0, target: null, known: new Map(),
     lastPirate: 0, lastPropose: -999, lastExtra: 0, enemySeen: { inf: 0, vei: 0, dro: 0, est: 0, sup: 0 }, lastAttackOrder: -99,
     strategy: null, lastStrategic: -999, lostRecent: 0, armyPrev: 0, lastScout: -999, wallsBuilt: false, towersWanted: 0 };
 }
@@ -1941,6 +2016,7 @@ function think(sim, mem) {
   const t = sim.time; const D = mem.diff; const mine = own(sim, mem.pid);
   const nuc = mine.find(e => e.kind === 'building' && e.def === 'nucleo'); if (!nuc) return cmds;
   const builds = mine.filter(e => e.kind === 'building'); const units = mine.filter(e => e.kind === 'unit');
+  const era = p.era || 1; const ERA_AT = { facil: [0, 0, 300, 600], normal: [0, 0, 200, 420], dificil: [0, 0, 150, 330], brutal: [0, 0, 120, 280] }[mem.dn || 'normal'] || [0, 0, 200, 420];
   const collectors = units.filter(u => u.def === 'coletor'); const pirates = units.filter(u => u.def === 'pirata'); const army = units.filter(u => S.UNITS[u.def].attack && !u.scripted); // 4.0e: chefes de campanha obedecem só ao roteiro
   const nodulos = count(builds, b => b.def === 'nodulo'); const underConstruction = count(builds, b => !b.built);
   updateKnown(sim, mem);
@@ -1959,7 +2035,13 @@ function think(sim, mem) {
   if (human && t > 180 && !S.hasPact(sim, mem.pid, human.id) && t - mem.lastPropose > 150 && S.armyValue(sim, mem.pid) < S.armyValue(sim, human.id) * 0.6 && sim.rand() < 0.5) { mem.lastPropose = t; emitC({ t: 'propose', to: human.id }); }
   for (const k in p.pacts) { const pact = p.pacts[k]; const q = sim.players[k]; if (!q.alive) continue; if (D.breakP > 0 && t - pact.since > 180 && S.armyValue(sim, mem.pid) > S.armyValue(sim, q.id) * 1.6 && sim.rand() < D.breakP / 60) { emitC({ t: 'break', with: q.id }); mem.mode = 'attack'; mem.attackStart = S.armyValue(sim, mem.pid); mem.target = null; } }
 
+  // --- 4.1d: evolução da Era (antes de gastar com o resto)
+  if (era < 3 && !(p.evolveT > 0) && t >= ERA_AT[era + 1] && !S.eraBlock(sim, mem.pid)) { const nx = S.ERAS[era + 1]; const c = Object.assign({}, nx.cost); c.minerio = (c.minerio || 0) + 60; if (S.canAfford(p, c)) emitC({ t: 'evolve' }); }
+  const eraDue = era < 3 && !(p.evolveT > 0) && t >= ERA_AT[era + 1] && !S.eraBlock(sim, mem.pid); const eraHold = eraDue ? S.ERAS[era + 1].cost.minerio + 60 : 0; // 4.1d: hora de evoluir: o resto espera o Núcleo
   // --- economia
+  let terrNodes = 0, terrAmt = 0, terrMin = 0; for (const e of sim.ents) if (e.alive && e.kind === 'node' && e.amount > 0 && S.inTerritory(sim, mem.pid, e.x, e.y)) { terrNodes++; terrAmt += e.amount; if (e.res === 'minerio') terrMin += e.amount; }
+  const lowNodes = terrAmt < 2500 || terrMin < 1200; // 4.1d: o território está secando: expandir já (antes a IA esgotava os nós aos 4 min e parava)
+  if (!terrNodes && t - (mem.lastFar || -99) > 8) { mem.lastFar = t; const idle = collectors.filter(u => u.state === 'idle'); if (idle.length) { let best = null, bd = Infinity; for (const e of sim.ents) { if (!e.alive || e.amount <= 0 || (e.kind !== 'node' && e.kind !== 'wreck')) continue; const ow = S.territoryOwner(sim, e.x, e.y); if (ow !== -1 && ow !== mem.pid && S.isEnemy(sim, mem.pid, ow)) continue; const want = p.res.minerio < 400 ? 'minerio' : null; const d = S.dist(nuc.x, nuc.y, e.x, e.y) * (want && e.kind === 'node' && e.res !== want ? 3 : 1); if (d < bd) { bd = d; best = e; } } if (best) emitC({ t: 'harvest', ids: idle.map(u => u.id), target: best.id }); } } // 4.1d: nunca parar a renda
   const wantCol = Math.min(D.maxCol || 16, 6 + nodulos * 2 + strat.col);
   if (collectors.length + count(nuc.queue, q => q.def === 'coletor') < wantCol && nuc.queue.length < 2 && S.canAfford(p, S.UNITS.coletor.cost) && nuc.jumpT <= 0) emitC({ t: 'produce', id: nuc.id, def: 'coletor' });
   const reactors = count(builds, b => b.def === 'reator'); const towers = count(builds, b => b.def === 'torre');
@@ -1968,23 +2050,26 @@ function think(sim, mem) {
   const paced = !D.buildEvery || t - (mem.lastBuild == null ? -999 : mem.lastBuild) >= D.buildEvery; // 4.1a: o ritmo vale para tudo, Reatores inclusive
   if (needEnergy && paced && S.canAfford(p, { minerio: S.BUILDINGS.reator.cost.minerio + reserve })) { const s = findSpot(sim, mem.pid, 'reator', nuc.x, nuc.y, 70, 260, 30); if (s) { emitC({ t: 'build', def: 'reator', x: s.x, y: s.y }); mem.lastBuild = t; } }
   else if (underConstruction < 2 && paced) { // 4.1a: Fácil/Normal constroem num ritmo humano
-    const order = BUILD_ORDERS[p.faction] || BUILD_ORDERS.vehnar; let def = order[mem.bo];
+    const order = mem.order || (mem.order = (BUILD_ORDERS[p.faction] || BUILD_ORDERS.vehnar).slice()); let def = order[mem.bo];
+    if (def && S.lockReason(sim, mem.pid, 'building', def)) { let j = mem.bo + 1; while (j < order.length && S.lockReason(sim, mem.pid, 'building', order[j])) j++; if (j < order.length) { const tmp = order[mem.bo]; order[mem.bo] = order[j]; order[j] = tmp; def = order[mem.bo]; } } // 4.1d: o trancado espera; adianta o próximo liberado
+    if (lowNodes && nodulos < 7 && t > 60 && def !== 'nodulo' && t - (mem.lastExpand || -99) > 25) { def = 'nodulo'; mem.emergency = true; } // território secando: expandir antes de tudo
     if (!def || mem.bo >= order.length) {
       if (towers < mem.towersWanted && t - mem.lastExtra > 45) { def = 'torre'; mem.lastExtra = t; }
       else if (nodulos < 2 + strat.nodulos + Math.floor(t / 500) && t - mem.lastExtra > 60) { def = 'nodulo'; mem.lastExtra = t; }
-      else if (t - mem.lastExtra > 90) { def = sim.rand() < 0.5 ? (p.faction === 'vehnar' ? 'fabrica' : 'hangar') : 'quartel'; mem.lastExtra = t; }
+      else if (t - mem.lastExtra > 90 && era >= 2) { def = sim.rand() < 0.5 ? (p.faction === 'vehnar' ? 'fabrica' : 'hangar') : 'quartel'; mem.lastExtra = t; }
       else def = null;
     }
+    if (def && S.lockReason(sim, mem.pid, 'building', def)) def = null; // 4.1d: tudo o que resta está trancado: espera a Era
     if (def) {
-      const bd = S.BUILDINGS[def]; const cost = Object.assign({}, bd.cost); cost.minerio = (cost.minerio || 0) + (t < 240 ? 40 : 0);
+      const bd = S.BUILDINGS[def]; const cost = Object.assign({}, bd.cost); cost.minerio = (cost.minerio || 0) + (t < 240 ? 40 : 0) + (def === 'nodulo' && lowNodes ? 0 : eraHold);
       if (S.canAfford(p, cost)) {
         let s = null;
         if (def === 'nodulo') { let best = null, bdist = Infinity; for (const e of sim.ents) { if (!e.alive || e.kind !== 'node' || e.amount <= 0 || S.territoryOwner(sim, e.x, e.y) !== -1) continue; const d = S.dist(nuc.x, nuc.y, e.x, e.y); if (d < bdist) { bdist = d; best = e; } } if (best) s = findSpot(sim, mem.pid, 'nodulo', best.x, best.y, 60, 140, 30); if (!s) s = findSpot(sim, mem.pid, 'nodulo', nuc.x, nuc.y, 380, 600, 30); }
         else if (def === 'refinaria') { let sx = 0, sy = 0, n = 0; for (const e of sim.ents) if (e.alive && e.kind === 'node' && S.inTerritory(sim, mem.pid, e.x, e.y)) { sx += e.x; sy += e.y; n++; } if (n) s = findSpot(sim, mem.pid, 'refinaria', sx / n, sy / n, 50, 160, 30); if (!s) s = findSpot(sim, mem.pid, 'refinaria', nuc.x, nuc.y, 90, 300, 30); }
         else if (def === 'torre') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = S.DM.atan2(en.y - nuc.y, en.x - nuc.x) + (sim.rand() - 0.5) * 1.2; s = findSpot(sim, mem.pid, 'torre', nuc.x + S.DM.cos(a) * 250, nuc.y + S.DM.sin(a) * 250, 0, 110, 30); } if (!s) s = findSpot(sim, mem.pid, 'torre', nuc.x, nuc.y, 150, 330, 30); }
         else s = findSpot(sim, mem.pid, def, nuc.x, nuc.y, 90, 320, 40);
-        if (s) { emitC({ t: 'build', def, x: s.x, y: s.y }); mem.lastBuild = t; if (mem.bo < order.length) mem.bo++; }
-        else if (mem.bo < order.length) mem.bo++;
+        const inOrder = order[mem.bo] === def && !mem.emergency; mem.emergency = false; if (s) { emitC({ t: 'build', def, x: s.x, y: s.y }); mem.lastBuild = t; if (def === 'nodulo') mem.lastExpand = t; if (inOrder && mem.bo < order.length) mem.bo++; }
+        else if (inOrder && mem.bo < order.length) mem.bo++;
       }
     }
   }
@@ -1997,23 +2082,26 @@ function think(sim, mem) {
   }
   // --- pesquisa, superarma, sobrecarga
   if (S.hasBuilt(sim, mem.pid, 'laboratorio')) {
-    if (Object.keys(p.research).length < (D.research == null ? 3 : D.research)) for (const key of ['armamento', 'blindagem', 'sensores']) if (!p.research[key] && S.canAfford(p, S.RESEARCH[key].cost) && p.res.dados > 160) { emitC({ t: 'research', key }); break; }
+    if (Object.keys(p.research).length < (D.research == null ? 3 : D.research)) for (const key of ['armamento', 'blindagem', 'sensores']) if (!p.research[key] && !S.lockReason(sim, mem.pid, 'research', key) && S.canAfford(p, S.RESEARCH[key].cost) && p.res.dados > 160) { emitC({ t: 'research', key }); break; }
+    if (era >= 3 && !p.ascended && (D.research == null ? 3 : D.research) >= 2 && S.ASCENSION[p.faction] && S.canAfford(p, { minerio: S.ASCENSION[p.faction].cost.minerio + 150, plasma: S.ASCENSION[p.faction].cost.plasma + 60, dados: S.ASCENSION[p.faction].cost.dados })) emitC({ t: 'ascend' });
     if (D.superweapon !== false && t >= p.superCd && S.canAfford(p, { dados: 300, plasma: 300 })) { const fac = S.FACTIONS[p.faction]; if (fac.superKey === 'fundicao') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = S.DM.atan2(en.y - nuc.y, en.x - nuc.x); const s = findSpot(sim, mem.pid, 'bastiao', nuc.x + S.DM.cos(a) * 300, nuc.y + S.DM.sin(a) * 300, 0, 80, 30); if (s && S.inTerritory(sim, mem.pid, s.x, s.y)) emitC({ t: 'super', x: s.x, y: s.y }); } } else if (fac.superKey === 'eclosao') { if (mem.mode === 'attack' && mem.target) emitC({ t: 'super', x: mem.target.x, y: mem.target.y }); } else if (mem.mode === 'attack') emitC({ t: 'super' }); }
   }
   if (p.energy.regime !== 'pleno' && p.res.plasma > 450 && t >= p.overchargeCd) emitC({ t: 'overcharge' });
+  // 4.1d: módulos (um por vez): Fusão nos Reatores, Academia no Quartel, Bateria Pesada nas Torres
+  if (era >= 2 && !eraDue && !(mem.lastModule > t - 20) && p.res.minerio > 400) { const cand = builds.find(b => b.built && !b.mod && !(b.upT > 0) && S.BUILDINGS[b.def].module && !S.lockReason(sim, mem.pid, 'module', b.def) && S.canAfford(p, S.BUILDINGS[b.def].module.cost) && (b.def !== 'reator' || p.energy.ratio < 1.4)); if (cand) { emitC({ t: 'upgrade', id: cand.id }); mem.lastModule = t; } }
 
   // --- produção: estratégia + contras do que foi visto
   const prodBuildings = builds.filter(b => b.built && S.BUILDINGS[b.def].produces && b.def !== 'nucleo');
   const seen = mem.enemySeen; const total = seen.inf + seen.vei + seen.dro + seen.est + seen.sup + 0.01;
   const w = Object.assign({}, strat.prod);
   w.veiculo += 0.5 * (seen.inf + seen.est) / total; w.drone += 0.5 * (seen.vei + seen.sup) / total; w.infantaria += 0.5 * (seen.dro + seen.sup) / total; w.suporte += 0.3 * (seen.vei + seen.est) / total;
-  const reserveArmy = t < 240 ? D.reserve : 40;
+  const reserveArmy = (t < 240 ? D.reserve : 40) + (lowNodes && nodulos < 7 ? 140 : 0) + eraHold; // 4.1d: guarda para expandir e para a Era
   let prodOrders = 0; const prodPaced = !D.prodEvery || t - (mem.lastProd == null ? -999 : mem.lastProd) >= D.prodEvery; // 4.1a: ritmo de produção por nível
   for (const b of prodBuildings) {
-    if (!prodPaced || b.queue.length >= 2 || prodOrders >= (D.maxProd || 9)) continue; const opts = S.producesFor(b.def, p.faction).filter(u => u !== 'pirata' && u !== 'coletor');
+    if (!prodPaced || b.queue.length >= 2 || prodOrders >= (D.maxProd || 9)) continue; const opts = S.producesFor(b.def, p.faction).filter(u => u !== 'pirata' && u !== 'coletor' && !S.lockReason(sim, mem.pid, 'unit', u));
     let pick = null, best = -1;
     for (const u of opts) { const ud = S.UNITS[u]; const cls = CLASS_W[u] || 'infantaria'; let sc = (w[cls] || 0.1) * (0.7 + sim.rand() * 0.6); if (!ud.attack) sc *= 0.35; if (ud.cost.dados && p.res.dados < (ud.cost.dados + 40)) sc = 0; if (S.unitCost(u) > 300 && t < 420) sc *= 0.3; if (sc > best) { best = sc; pick = u; } }
-    if (pick === 'suporte' && p.res.dados < 60) pick = 'infantaria';
+    if (pick === 'suporte' && p.res.dados < 60) pick = opts.includes('infantaria') ? 'infantaria' : null;
     if (pick) { const c = Object.assign({}, S.UNITS[pick].cost); c.minerio = (c.minerio || 0) + reserveArmy; if (S.canAfford(p, c)) { emitC({ t: 'produce', id: b.id, def: pick }); prodOrders++; mem.lastProd = t; } }
   }
   // --- piratas (raids) e batedores
@@ -2053,7 +2141,7 @@ function think(sim, mem) {
 }
 // 4.1c: memória da IA no salvamento (a tabela de dificuldade volta pelo nome; o mapa de prédios conhecidos vira lista)
 function snapshot(mem) { const o = S.jsonSafe(Object.assign({}, mem, { diff: null, known: null })); o.dn = Object.keys(S.DIFFICULTY).find(k => S.DIFFICULTY[k] === mem.diff) || 'normal'; o.known = [...mem.known].map(([id, k]) => [id, S.jsonSafe(k)]); return o; }
-function restore(o) { const mem = S.jsonBack(Object.assign({}, o, { known: null })); delete mem.dn; mem.diff = S.DIFFICULTY[o.dn] || S.DIFFICULTY.normal; mem.known = new Map(o.known.map(([id, k]) => [id, S.jsonBack(k)])); return mem; }
+function restore(o) { const mem = S.jsonBack(Object.assign({}, o, { known: null })); mem.diff = S.DIFFICULTY[o.dn] || S.DIFFICULTY.normal; mem.known = new Map(o.known.map(([id, k]) => [id, S.jsonBack(k)])); return mem; }
 ARD.ai = { create, think, STRATS, snapshot, restore };
 })(globalThis.ARD = globalThis.ARD || {});
 
@@ -3216,12 +3304,12 @@ M.push({ id: 'p1', act: 'prologo', title: 'Acorde', place: 'Planalto de Ísk', x
 M.push({ id: 'p2', act: 'prologo', title: 'Energia e regimes', place: 'Vale das Turbinas', xp: 350,
   brief: [['self', 1, 'Toda estrutura consome energia. Abaixo de 100% entramos em racionamento: produção, sensores e torres pioram.'], ['self', 2, 'Abaixo de 70% é colapso. Não quero ver isso no meu painel.']],
   setup: { seed: 4207, enemies: [{ race: 'rival', name: 'Ruínas de Vey', passive: true }] },
-  objectives: [{ id: 'quartel', text: 'Construir um Quartel', test: c => c.built('quartel') >= 1 }, { id: 'fabrica', text: 'Construir uma Fábrica de Veículos', test: c => c.built('fabrica') >= 1 },
+  objectives: [{ id: 'quartel', text: 'Construir um Quartel', test: c => c.built('quartel') >= 1 }, { id: 'era2', text: 'Evoluir o Núcleo para a Era II (selecione o Núcleo › Evoluir)', test: c => (c.me.era || 1) >= 2 }, { id: 'fabrica', text: 'Construir uma Fábrica de Veículos', test: c => c.built('fabrica') >= 1 },
     { id: 'pleno', text: 'Manter energia Plena por 60 s com Quartel e Fábrica de pé', test: c => c.hold('pleno', c.me.energy.regime === 'pleno' && c.built('quartel') && c.built('fabrica'), 60), progress: c => Math.floor(c.held('pleno')) + '/60 s' },
     { id: 'pesquisa', text: 'Pesquisar uma tecnologia no Laboratório', test: c => Object.keys(c.me.research).length >= 1 },
     { id: 'b-sem-colapso', bonus: true, final: true, text: 'Nunca entrar em colapso de energia', test: c => !c.st.colapso }, { id: 'b-sobrecarga', bonus: true, text: 'Usar a Sobrecarga uma vez', test: c => c.me.overchargeCd > 0 }],
   tick: c => { if (c.me.energy.regime === 'colapso') c.st.colapso = true; },
-  script: [{ at: 4, say: ['self', 1, 'Cada Reator dá +35 de energia queimando Plasma. Fique de olho no medidor ⚡ lá em cima.'] }, { when: c => c.me.energy.regime === 'racionado', once: true, say: ['self', 2, 'Racionamento! Mais Reatores, Comandante.'] }, { when: c => c.done('pleno'), say: ['self', 3, 'Rede estável. Agora o Laboratório: conhecimento é a moeda da Fenda.'] }] });
+  script: [{ at: 4, say: ['self', 1, 'Cada Reator dá +35 de energia queimando Plasma. Fique de olho no medidor ⚡ lá em cima.'] }, { when: c => c.done('quartel') && !c.done('era2'), say: ['self', 1, 'Quartel e Refinaria de pé: o Núcleo já pode evoluir para a Era II. Selecione-o e toque em Evoluir. Fábrica, Hangar e Laboratório vêm depois disso.'] }, { when: c => c.done('era2'), say: ['self', 3, 'Era II! A colônia cresceu. Agora a Fábrica.'] }, { when: c => c.me.energy.regime === 'racionado', once: true, say: ['self', 2, 'Racionamento! Mais Reatores, Comandante.'] }, { when: c => c.done('pleno'), say: ['self', 3, 'Rede estável. Agora o Laboratório: conhecimento é a moeda da Fenda.'] }] });
 M.push({ id: 'p3', act: 'prologo', title: 'A primeira tempestade', place: 'Bordas da Fenda', xp: 400, relic: 'cofre-fendido',
   brief: [['self', 1, 'O Éter está se acumulando. Quando a tempestade cai, drones e sensores sofrem, mas o Plasma rende em dobro lá dentro.'], ['enemy', 2, 'Vocês chegaram tarde. Esta borda é nossa.'], ['self', 2, 'Construa uma Torre. Eles virão quando o céu escurecer.']],
   setup: { seed: 4313, enemies: [{ race: 'rival', name: 'Saqueadores da Borda', passive: true }] },
@@ -3369,7 +3457,8 @@ function prepare(id, o) {
     const step = { facil: 'facil', normal: 'normal', dificil: 'dificil', fenda: 'brutal' }; // inimigos 'hard' seguem a dificuldade escolhida (o chefe já pesa)
     players.push({ name: e.name === 'auto' ? AI_NAMES[r][players.length % 3] : e.name, faction: r, difficulty: e.hard ? step[o.difficulty || 'normal'] : diff.ai, passive: !!e.passive, ally: !!e.ally }); }
   { const hostile = players.slice(1).filter(p => !p.passive).length; if (hostile >= 2) { const bonus = { facil: [700, 350], normal: [300, 150], dificil: [0, 0], fenda: [0, 0] }[o.difficulty || 'normal'] || [0, 0]; if (bonus[0]) { const m0 = players[0].mods = players[0].mods || {}; m0.startRes = Object.assign({}, m0.startRes); m0.startRes.minerio = (m0.startRes.minerio || 0) + bonus[0]; m0.startRes.plasma = (m0.startRes.plasma || 0) + bonus[1]; } } } // missões com vários inimigos ativos: reforço inicial no Fácil e no Normal
-  return { mission: m, diff, difficulty: o.difficulty || 'normal', race, cfg: { seed: m.setup.seed, players, minutes: (m.setup.minutes || 25) + (m.startTime ? Math.ceil(m.startTime / 60) : 0) } };
+  const era = m.setup.era || (m.id === 'p1' || m.id === 'p2' ? 1 : 2); for (const pl of players) pl.era = era; // 4.1d: Era inicial da missão (todos começam iguais; a IA evolui sozinha)
+  return { mission: m, diff, difficulty: o.difficulty || 'normal', race, era, cfg: { seed: m.setup.seed, players, minutes: (m.setup.minutes || 25) + (m.startTime ? Math.ceil(m.startTime / 60) : 0) } };
 }
 
 // ---------- executor ----------
@@ -3875,7 +3964,7 @@ function create(canvas, mini) {
     const wx0 = Math.min(...corners.map(p => p[0])) - 80, wx1 = Math.max(...corners.map(p => p[0])) + 80, wy0 = Math.min(...corners.map(p => p[1])) - 80, wy1 = Math.max(...corners.map(p => p[1])) + 80;
     const inView = (x, y, m) => x > wx0 - m && x < wx1 + m && y > wy0 - m && y < wy1 + m;
     const terr = [];
-    for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const t = S.BUILDINGS[e.def].territory; if (!t) continue; if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue; terr.push({ x: e.x, y: e.y, r: t, col: sim.players[e.owner].color }); }
+    for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const t = S.territoryOf(sim, e); if (!t) continue; if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue; terr.push({ x: e.x, y: e.y, r: t, col: sim.players[e.owner].color }); }
     // terreno
     const tw = TILE * k * 2, th = TILE * k; const unexplored = [];
     const tx0 = Math.max(0, Math.floor(wx0 / TILE)), tx1 = Math.min(TILES - 1, Math.ceil(wx1 / TILE)), ty0 = Math.max(0, Math.floor(wy0 / TILE)), ty1 = Math.min(TILES - 1, Math.ceil(wy1 / TILE));
@@ -4045,7 +4134,7 @@ function create(canvas, mini) {
       if (e.kind !== 'unit' && e.kind !== 'building') continue;
       const own = e.owner === human; if (!(own || vis.has(e.id))) continue;
       const col = sim.players[e.owner].color; const p = M(e.x, e.y);
-      if (e.kind === 'building') { const t = S.BUILDINGS[e.def].territory; if (t && e.built) { c.fillStyle = rgba(col, 0.1); c.beginPath(); c.ellipse(p[0], p[1], t * m, t * m * 0.5, 0, 0, TAU); c.fill(); } c.fillStyle = col; const r = e.def === 'nucleo' ? 4 : S.BUILDINGS[e.def].wall ? 1.5 : 2.5; c.fillRect(p[0] - r, p[1] - r, r * 2, r * 2); }
+      if (e.kind === 'building') { const t = S.territoryOf(sim, e); if (t && e.built) { c.fillStyle = rgba(col, 0.1); c.beginPath(); c.ellipse(p[0], p[1], t * m, t * m * 0.5, 0, 0, TAU); c.fill(); } c.fillStyle = col; const r = e.def === 'nucleo' ? 4 : S.BUILDINGS[e.def].wall ? 1.5 : 2.5; c.fillRect(p[0] - r, p[1] - r, r * 2, r * 2); }
       else { c.fillStyle = col; c.fillRect(p[0] - 1, p[1] - 1, 2, 2); }
     }
     for (const [id, mm] of view.memory) if (!vis.has(id)) { const p = M(mm.x, mm.y); c.fillStyle = rgba(sim.players[mm.owner].color, 0.5); c.fillRect(p[0] - 2, p[1] - 2, 4, 4); }
@@ -4456,7 +4545,7 @@ function create(canvas, overlay, mini) {
     else fogData.fill(255);
     fogTex.needsUpdate = true;
     terrData.fill(0);
-    for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const t = S.BUILDINGS[e.def].territory; if (!t) continue; if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue; const col = hexToRgb(sim.players[e.owner].color); const x0 = Math.max(0, ((e.x - t) / TILE) | 0), x1 = Math.min(TILES - 1, ((e.x + t) / TILE) | 0), y0 = Math.max(0, ((e.y - t) / TILE) | 0), y1 = Math.min(TILES - 1, ((e.y + t) / TILE) | 0); for (let iy = y0; iy <= y1; iy++) for (let ix = x0; ix <= x1; ix++) { if (Math.hypot((ix + 0.5) * TILE - e.x, (iy + 0.5) * TILE - e.y) <= t) { const i = (iy * TILES + ix) * 4; terrData[i] = col[0]; terrData[i + 1] = col[1]; terrData[i + 2] = col[2]; terrData[i + 3] = 255; } } }
+    for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const t = S.territoryOf(sim, e); if (!t) continue; if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue; const col = hexToRgb(sim.players[e.owner].color); const x0 = Math.max(0, ((e.x - t) / TILE) | 0), x1 = Math.min(TILES - 1, ((e.x + t) / TILE) | 0), y0 = Math.max(0, ((e.y - t) / TILE) | 0), y1 = Math.min(TILES - 1, ((e.y + t) / TILE) | 0); for (let iy = y0; iy <= y1; iy++) for (let ix = x0; ix <= x1; ix++) { if (Math.hypot((ix + 0.5) * TILE - e.x, (iy + 0.5) * TILE - e.y) <= t) { const i = (iy * TILES + ix) * 4; terrData[i] = col[0]; terrData[i + 1] = col[1]; terrData[i + 2] = col[2]; terrData[i + 3] = 255; } } }
     terrTex.needsUpdate = true;
     // instâncias
     for (const it of R.inst.values()) it.n = 0;
@@ -4470,7 +4559,7 @@ function create(canvas, overlay, mini) {
       if (e.kind === 'proj') { if (!own && !vis.has(e.id)) continue; const w = S.WEAPONS[e.weapon]; const [wx, wy] = lerp(e, alpha); if (w.proj === 'shell') { if (nShell < 256) { _p.set(wx, H(wx, wy) + e.z, -wy); _s.setScalar(1); _q.identity(); _m.compose(_p, _q, _s); shells.setMatrixAt(nShell++, _m); } } else if (nBul < BL) { const o = nBul * 6; blPos[o] = wx - e.vx * 0.03; blPos[o + 1] = H(wx, wy) + e.z; blPos[o + 2] = -(wy - e.vy * 0.03); blPos[o + 3] = wx; blPos[o + 4] = H(wx, wy) + e.z; blPos[o + 5] = -wy; nBul++; } continue; }
       if (!own && !vis.has(e.id)) continue;
       const isUnit = e.kind === 'unit'; const [wx, wy] = isUnit ? lerp(e, alpha) : [e.x, e.y]; const ud = isUnit ? S.UNITS[e.def] : S.BUILDINGS[e.def];
-      const parts = MD.PARTS[e.def]; const hullDef = parts ? parts.hull : e.def; const it = instOf(hullDef, e.owner, (e.def === 'nucleo' && R.skins && R.skins[e.owner]) || 0); /* 4.0e: Núcleo do Hangar */ const g = it.geo; const fit = fitOf(e, g);
+      const parts = MD.PARTS[e.def]; const hullDef = parts ? parts.hull : e.def; const it = instOf(hullDef, e.owner, (e.def === 'nucleo' && R.skins && R.skins[e.owner]) || 0); /* 4.0e: Núcleo do Hangar */ const g = it.geo; let fit = fitOf(e, g); if (e.def === 'nucleo') { const op = sim.players[e.owner] || {}; fit *= 1 + 0.12 * ((op.era || 1) - 1) + (op.evolveT > 0 ? 0.025 * Math.sin(R.time * 6) : 0); } /* 4.1d: o Núcleo cresce a cada Era e pulsa enquanto evolui */
       const zz = isUnit && ud.flying ? 14 : 0; const moving = isUnit && (e.x !== e.px || e.y !== e.py); const bob = moving && (e.def === 'infantaria' || e.def === 'quimera' || e.def === 'soldador' || e.def === 'atirador' || e.def === 'agulha') ? Math.abs(Math.sin(R.time * 11 + e.id)) * 1.2 : moving && (e.def === 'cria' || e.def === 'cuspidor') ? Math.abs(Math.sin(R.time * 15 + e.id)) * 1.0 : moving && (e.def === 'prensa' || e.def === 'colosso' || e.def === 'brutamonte') ? Math.abs(Math.sin(R.time * 5 + e.id)) * 2.2 : (e.def === 'voz' || e.def === 'diapasao' || e.def === 'monolito' || e.def === 'prisma') ? 2 + Math.sin(R.time * 2.5 + e.id) * 1.2 : 0;
       const dmg = !isUnit && e.built && e.hp < e.maxHp * 0.5; const tint = e.cloaked ? 0.55 : dmg ? 0.6 : 1;
       if (!isUnit && !e.built) { // 4.0a — nascimento de construção com assinatura por Raça
@@ -4512,7 +4601,7 @@ function create(canvas, overlay, mini) {
     if (R.beaconPt) { nSel = ring(nSel, R.beaconPt.x, R.beaconPt.y, 70); nSel = ring(nSel, R.beaconPt.x, R.beaconPt.y, 52 + 10 * Math.sin(R.time * 3)); if (!R.beaconMesh) { R.beaconMesh = new THREE.Mesh(new THREE.CylinderGeometry(7, 12, 260, 16, 1, true).translate(0, 130, 0), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.6, 1.25, 0.5), transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); scene.add(R.beaconMesh); } R.beaconMesh.visible = true; R.beaconMesh.position.set(R.beaconPt.x, H(R.beaconPt.x, R.beaconPt.y), -R.beaconPt.y); } else if (R.beaconMesh) R.beaconMesh.visible = false;
     for (const [id, m] of view.memory) { if (vis.has(id)) continue; const it = instOf(MD.PARTS[m.def] ? MD.PARTS[m.def].hull : m.def, m.owner, 0); put(it, m.x, m.y, 0, 0, 2 * S.BUILDINGS[m.def].r * 1.25 / it.geo.width, 1, 0.45); }
     // 4.0b — props de território: a geografia da Raça cresce em volta do Núcleo e dos Nódulos (visual, determinístico por id)
-    for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const bd = S.BUILDINGS[e.def]; const tr = bd && bd.territory; if (!tr) continue; const fac = (sim.players[e.owner] || {}).faction; if (!MD.props[fac]) continue;
+    for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const bd = S.BUILDINGS[e.def]; const tr = bd && S.territoryOf(sim, e); if (!tr) continue; const fac = (sim.players[e.owner] || {}).faction; if (!MD.props[fac]) continue;
       if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue;
       const K = e.def === 'nucleo' ? 10 : 5; for (let i = 0; i < K; i++) { const hsh = ((e.id * 2654435761 + i * 40503) >>> 0) / 4294967296; const a = (i / K) * TAU + hsh * 0.9; const rr = tr * (0.52 + 0.4 * ((hsh * 7) % 1)); const px = e.x + Math.cos(a) * rr, py = e.y + Math.sin(a) * rr; if (px < 20 || py < 20 || px > S.WORLD - 20 || py > S.WORLD - 20) continue; if (!view.reveal && !explored[((py / TILE) | 0) * TILES + ((px / TILE) | 0)]) continue; const it = instOf('prop_' + fac, -1, (e.id + i) % 4); put(it, px, py, 0, hsh * TAU, 15 / it.geo.width); if (fac === 'vehnar' && Math.random() < 0.012 * R.quality.particles) smoke(px, py, 9, [0.5, 0.5, 0.52], 2, 11); } }
     if (sim.props) for (const pr of sim.props) { if (!view.reveal && !explored[((pr.y / TILE) | 0) * TILES + ((pr.x / TILE) | 0)]) continue; const it = instOf(pr.kind, -1, pr.seed % 6); put(it, pr.x, pr.y, 0, (pr.seed % 7) * 0.9, 34 * pr.scale / it.geo.width); }
@@ -4560,7 +4649,7 @@ function create(canvas, overlay, mini) {
     c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, size, size); c.save(); c.beginPath(); c.arc(f.cx, f.cy, size / 2 - 1, 0, TAU); c.clip();
     const bgG = c.createRadialGradient(f.cx, f.cy, size * 0.1, f.cx, f.cy, size * 0.5); bgG.addColorStop(0, '#10141b'); bgG.addColorStop(1, '#05070a'); c.fillStyle = bgG; c.fillRect(0, 0, size, size);
     c.setTransform(A, B, C, D, E, F); c.imageSmoothingEnabled = true; c.drawImage(R.miniBase, 0, 0, S.WORLD, S.WORLD);
-    for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const t = S.BUILDINGS[e.def].territory; if (!t) continue; if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue; c.fillStyle = rgba(sim.players[e.owner].color, 0.16); c.beginPath(); c.arc(e.x, e.y, t, 0, TAU); c.fill(); c.strokeStyle = rgba(sim.players[e.owner].color, 0.35); c.lineWidth = 14; c.stroke(); }
+    for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const t = S.territoryOf(sim, e); if (!t) continue; if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue; c.fillStyle = rgba(sim.players[e.owner].color, 0.16); c.beginPath(); c.arc(e.x, e.y, t, 0, TAU); c.fill(); c.strokeStyle = rgba(sim.players[e.owner].color, 0.35); c.lineWidth = 14; c.stroke(); }
     { const g = c.createRadialGradient(S.CX, S.CY, S.RIFT_R * 0.3, S.CX, S.CY, S.RIFT_R * 1.5); const pulse = 0.55 + 0.25 * Math.sin(R.time * 2.2); g.addColorStop(0, `rgba(255,120,70,${pulse})`); g.addColorStop(0.55, 'rgba(178,60,255,0.25)'); g.addColorStop(1, 'rgba(178,60,255,0)'); c.fillStyle = g; c.beginPath(); c.arc(S.CX, S.CY, S.RIFT_R * 1.5, 0, TAU); c.fill(); }
     if (sim.storm) { c.strokeStyle = sim.storm.phase === 'active' ? 'rgba(178,60,255,0.95)' : `rgba(178,60,255,${0.4 + 0.4 * Math.sin(R.time * 6)})`; c.lineWidth = 26; c.beginPath(); c.arc(sim.storm.x, sim.storm.y, sim.storm.r, 0, TAU); c.stroke(); }
     // névoa: explorado escurece, inexplorado quase preto, sensores limpam
@@ -5079,12 +5168,12 @@ const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-11 02:58Z';
+const BUILD = '2026-10-11 03:43Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.1c';
+const VERSION = '4.1d';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -5471,6 +5560,9 @@ function startGame(cfg, netCtx) {
       else if (e.t === 'trait' && e.owner === human && !silent) AU.sfx('promote');
       else if (e.t === 'end') { if (!G.camp) endGame(e.result); }
       else if (e.t === 'regime' && e.p === human && !silent) notice('Energia: ' + S.REGIME[e.regime].name);
+      else if (e.t === 'era' && e.p === human && !silent) { const er = S.ERAS[e.era]; banner('Era ' + er.roman + ' — ' + er.name, er.desc, 'good', 7000); leaderMood(3); AU.sfx('promote'); G.selKey = ''; }
+      else if (e.t === 'ascend' && e.p === human && !silent) { const a = S.ASCENSION[sim.players[human].faction]; banner('Ascensão: ' + a.name, a.desc, 'good', 8000); leaderMood(3); AU.sfx('promote'); }
+      else if (e.t === 'module' && e.p === human && !silent) { G.selKey = ''; AU.sfx('promote'); }
     }
   }
   function pushAlert(e) {
@@ -5531,6 +5623,7 @@ function startGame(cfg, netCtx) {
     $('e-text').textContent = `${Math.round(en.prod)} / ${Math.round(en.cons)}`; $('e-regime').textContent = S.REGIME[en.regime].name + (p.overchargeT > 0 ? ' · Sobrecarga' : '') + (p.blackoutT > 0 ? ' · BLECAUTE' : '');
     $('e-bar').style.width = Math.min(100, en.ratio * 100 / 1.5) + '%';
     $('clock').textContent = mmss(sim.time) + ' / ' + mmss(sim.maxTime);
+    { const eb = $('era-badge'); if (eb) { const er = p.era || 1; const nx = S.ERAS[er + 1]; eb.textContent = 'Era ' + S.ERAS[er].roman + (p.evolveT > 0 && nx ? ' → ' + nx.roman + ' ' + Math.ceil(p.evolveT) + ' s' : '') + (p.ascended ? ' ✦' : ''); eb.title = S.ERAS[er].name + ': ' + S.ERAS[er].desc + (p.ascended ? ' · Ascensão: ' + S.ASCENSION[p.faction].name : ''); eb.className = 'era e' + er + (p.evolveT > 0 ? ' evolving' : '') + (p.ascended ? ' asc' : ''); } }
     $('rep').textContent = S.REP_NAMES[p.rep];
     const enemies = sim.players.filter(x => x.alive && x.id !== human && !S.hasPact(sim, human, x.id)).length; $('enemies').textContent = enemies;
     for (const b of document.querySelectorAll('[data-speed]')) b.classList.toggle('on', parseFloat(b.dataset.speed) === G.speed && !G.paused);
@@ -5543,10 +5636,12 @@ function startGame(cfg, netCtx) {
   }
   function liveUpdate(ents) { // atualiza barras de vida, texto de vida/construção e progresso da fila sem recriar o painel
     const panel = $('panel'); for (const e of ents) { const bar = panel.querySelector('[data-live="' + e.id + '"] i'); if (bar) bar.style.width = (100 * e.hp / e.maxHp) + '%'; const tx = panel.querySelector('[data-livetxt="' + e.id + '"]'); if (tx) tx.textContent = fmt(e.hp) + ' / ' + fmt(e.maxHp) + (e.kind === 'building' && !e.built ? ' · construção ' + Math.round(e.progress * 100) + '%' : '');
-      const qp = panel.querySelector('[data-liveq="' + e.id + '"]'); if (qp && e.queue && e.queue[0]) qp.textContent = Math.round(100 * e.queue[0].t / e.queue[0].total) + '%'; } }
+      const qp = panel.querySelector('[data-liveq="' + e.id + '"]'); if (qp && e.queue && e.queue[0]) qp.textContent = Math.round(100 * e.queue[0].t / e.queue[0].total) + '%';
+      if (e.def === 'nucleo') { const pl = sim.players[human]; const nx = S.ERAS[(pl.era || 1) + 1]; const eb = panel.querySelector('[data-evobar] i'), et = panel.querySelector('[data-evotxt]'); if (nx && pl.evolveT > 0) { if (eb) eb.style.width = Math.round(100 * (1 - pl.evolveT / nx.time)) + '%'; if (et) et.textContent = Math.ceil(pl.evolveT) + ' s'; } }
+      if (e.upT > 0) { const md = S.BUILDINGS[e.def].module; const ub = panel.querySelector('[data-upbar] i'), ut = panel.querySelector('[data-uptxt]'); if (md && ub) ub.style.width = Math.round(100 * (1 - e.upT / md.time)) + '%'; if (ut) ut.textContent = Math.ceil(e.upT) + ' s'; } } } // 4.1d: evolução e módulo também andam no lugar
   function refreshPanel(force) {
     const ents = selectionSummary();
-    const key = ents.map(e => e.id + ':' + (ents.length > 1 ? Math.round(e.hp) : '') + ':' + (e.queue ? e.queue.length + ':' + (e.queue[0] ? (e.queue[0].waiting ? 'w' : 'p') : '') : '') + ':' + (e.built ? 1 : Math.floor(e.progress * 20)) + ':' + (e.amount != null ? Math.floor(e.amount) : '')).join('|') + '|' + I.buildMenu + '|' + I.mode + '|' + Object.keys(sim.players[human].research).length;
+    const key = ents.map(e => e.id + ':' + (ents.length > 1 ? Math.round(e.hp) : '') + ':' + (e.queue ? e.queue.length + ':' + (e.queue[0] ? (e.queue[0].waiting ? 'w' : 'p') : '') : '') + ':' + (e.built ? 1 : Math.floor(e.progress * 20)) + ':' + (e.amount != null ? Math.floor(e.amount) : '')).join('|') + '|' + I.buildMenu + '|' + I.mode + '|' + Object.keys(sim.players[human].research).length + '|' + (sim.players[human].era || 1) + (sim.players[human].evolveT > 0 ? 'e' : '') + (sim.players[human].ascended ? 'a' : '') + '|' + ents.map(e => (e.mod ? 'm' : '') + (e.upT > 0 ? 'u' : '')).join('');
     if (!force && key === G.selKey) { liveUpdate(ents); return; } G.selKey = key; // 4.1a: vida e progresso mudam no lugar; redesenhar só quando a estrutura do painel muda (cliques não se perdem)
     const panel = $('panel'); const p = sim.players[human]; const fac = S.FACTIONS[p.faction];
     if (!ents.length || I.buildMenu) { panel.innerHTML = buildMenuHTML(p); bindBuildMenu(); return; }
@@ -5559,30 +5654,47 @@ function startGame(cfg, netCtx) {
       return;
     }
     if (e.kind === 'building' && ents.length === 1) {
-      const d = S.BUILDINGS[e.def]; let h = `<div class="ph"><span class="dot" style="background:${p.color}"></span><b>${esc(d.name)}</b></div><div class="hp" data-live="${e.id}"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="muted small"><span data-livetxt="${e.id}">${fmt(e.hp)} / ${fmt(e.maxHp)}${e.built ? '' : ' · construção ' + Math.round(e.progress * 100) + '%'}</span>${d.energyProd ? ' · +' + d.energyProd + ' energia' : ''}${d.energyUse ? ' · −' + d.energyUse + ' energia' : ''}</div><div class="muted small">${esc(d.desc)}</div>`;
+      const d = S.BUILDINGS[e.def]; let h = `<div class="ph"><span class="dot" style="background:${p.color}"></span><b>${esc(d.name)}</b></div><div class="hp" data-live="${e.id}"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="muted small"><span data-livetxt="${e.id}">${fmt(e.hp)} / ${fmt(e.maxHp)}${e.built ? '' : ' · construção ' + Math.round(e.progress * 100) + '%'}</span>${d.energyProd ? ' · +' + (d.energyProd * (e.mod === 1 && e.def === 'reator' ? 1.6 : 1) + (e.def === 'nucleo' ? 15 * ((p.era || 1) - 1) : 0)) + ' energia' : ''}${d.energyUse ? ' · −' + d.energyUse + ' energia' : ''}</div><div class="muted small">${esc(d.desc)}</div>`;
       const prodList = S.producesFor(e.def, p.faction);
       if (e.built && prodList.length) {
         h += '<div class="grid">';
-        for (const ud of prodList) { const u = S.UNITS[ud]; const name = S.unitName(fac.id, ud); const qn = e.queue.filter(q => q.def === ud).length; h += `<button class="act" data-prod="${ud}" title="${esc(u.desc)} · clique +1, Shift +5, Ctrl +10${G.isTouch ? ', segurar +5' : ''}"><img class="ico" alt="" src="${R.icon(ud, human)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span>${qn ? `<span class="qn">×${qn}</span>` : ''}</button>`; }
+        for (const ud of prodList) { const u = S.UNITS[ud]; const name = S.unitName(fac.id, ud); const qn = e.queue.filter(q => q.def === ud).length; const lk = S.lockReason(sim, human, 'unit', ud); h += `<button class="act ${lk ? 'locked' : ''}" data-prod="${ud}" ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc((lk ? '🔒 ' + lk + ' · ' : '') + u.desc)} · clique +1, Shift +5, Ctrl +10${G.isTouch ? ', segurar +5' : ''}">${lk ? `<span class="lockb">${u.era && u.era > (p.era || 1) ? S.ERAS[u.era].roman : '🔒'}</span>` : ''}<img class="ico" alt="" src="${R.icon(ud, human)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span>${qn ? `<span class="qn">×${qn}</span>` : ''}</button>`; }
         h += '</div>';
         if (e.queue.length) { h += `<div class="queue"><span class="qtot">Fila ${e.queue.length}/50</span>`; for (let i = 0; i < e.queue.length;) { const q = e.queue[i]; let j = i; while (j < e.queue.length && e.queue[j].def === q.def) j++; const n = j - i; h += `<button class="q" data-cancel="${j - 1}" data-def="${q.def}" title="Clique cancela 1 · Shift cancela todas deste tipo">${esc(S.unitName(fac.id, q.def))}${n > 1 ? ` <b>×${n}</b>` : ''}${i === 0 ? (q.waiting ? ' <i class="wait">aguardando recursos</i>' : ` <i data-liveq="${e.id}">${Math.round(100 * q.t / q.total)}%</i>`) : ''} ✕</button>`; i = j; } h += '</div>'; }
         h += `<div class="row"><button class="act sm" data-mode="rally">Ponto de reunião</button>${e.def === 'nucleo' ? `<button class="act sm" data-mode="jump" ${p.jumpsLeft > 0 && e.jumpT <= 0 ? '' : 'disabled'}>Salto de Núcleo (${p.jumpsLeft})</button>` : ''}</div>`;
       }
+      if (e.built && e.def === 'nucleo') { // 4.1d: Eras
+        const er = p.era || 1; const nx = S.ERAS[er + 1];
+        h += `<div class="erabox"><div class="eb-h"><b>Era ${S.ERAS[er].roman} · ${esc(S.ERAS[er].name)}</b>${p.ascended ? ' <span class="asc">✦ ' + esc(S.ASCENSION[p.faction].name) + '</span>' : ''}</div>`;
+        if (nx && p.evolveT > 0) h += `<div class="small">Evoluindo para a Era ${nx.roman} · <span data-evotxt>${Math.ceil(p.evolveT)} s</span></div><div class="hp evo" data-evobar><i style="width:${Math.round(100 * (1 - p.evolveT / nx.time))}%"></i></div>`;
+        else if (nx) { const why = S.eraBlock(sim, human); const reqs = (nx.needs || []).map(n => (S.hasBuilt(sim, human, n) ? '✓ ' : '✗ ') + S.BUILDINGS[n].name).concat(nx.needsAny ? [(nx.needsAny.some(n => S.hasBuilt(sim, human, n)) ? '✓ ' : '✗ ') + nx.needsAny.map(n => S.BUILDINGS[n].name).join(' ou ')] : []);
+          h += `<button class="act evolve" data-evolve="1" ${why ? `data-lock="${esc(why)}"` : ''} title="${esc(nx.desc)}"><span class="n">Evoluir para a Era ${nx.roman} · ${esc(nx.name)}</span><span class="cost">${costStr(nx.cost)} · ${nx.time} s</span></button><div class="small muted">${reqs.join(' · ')} — ${esc(nx.desc)}</div>`; }
+        else h += '<div class="small muted">Era máxima. A Ascensão da Raça fica no Laboratório.</div>';
+        h += '</div>';
+      }
+      { const md = e.built && S.BUILDINGS[e.def].module; if (md) { // 4.1d: módulo da estrutura
+        if (e.mod) h += `<div class="tip">✓ ${esc(md.name)}: ${esc(md.desc)}</div>`;
+        else if (e.upT > 0) h += `<div class="small">Instalando ${esc(md.name)} · <span data-uptxt>${Math.ceil(e.upT)} s</span></div><div class="hp evo" data-upbar><i style="width:${Math.round(100 * (1 - e.upT / md.time))}%"></i></div>`;
+        else { const lk = S.lockReason(sim, human, 'module', e.def); h += `<button class="act module ${lk ? 'locked' : ''}" data-upgrade="1" ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc((lk ? '🔒 ' + lk + ' · ' : '') + md.desc)}"><span class="n">Módulo: ${esc(md.name)}</span><span class="cost">${lk ? '🔒 ' + esc(lk) : costStr(md.cost) + ' · ' + md.time + ' s'}</span></button>`; } } }
       if (e.built && e.def === 'laboratorio') {
         h += '<div class="grid">';
-        for (const k in S.RESEARCH) { const r = S.RESEARCH[k]; h += `<button class="act" data-research="${k}" ${p.research[k] ? 'disabled' : ''} title="${esc(r.desc)}"><span class="n">${esc(r.name)}${p.research[k] ? ' ✓' : ''}</span><span class="cost">${costStr(r.cost)}</span></button>`; }
+        for (const k in S.RESEARCH) { const r = S.RESEARCH[k]; const lk = !p.research[k] && S.lockReason(sim, human, 'research', k); h += `<button class="act ${lk ? 'locked' : ''}" data-research="${k}" ${p.research[k] ? 'disabled' : ''} ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc((lk ? '🔒 ' + lk + ' · ' : '') + r.desc)}"><span class="n">${esc(r.name)}${p.research[k] ? ' ✓' : ''}</span><span class="cost">${lk ? '🔒 Era ' + S.ERAS[r.era].roman : costStr(r.cost)}</span></button>`; }
         h += '</div>';
+        { const a = S.ASCENSION[p.faction]; if (a) { const lk = p.ascended ? null : (p.era || 1) < 3 ? 'Requer Era III (Domínio)' : null; h += `<button class="act ascend ${lk ? 'locked' : ''}" data-ascend="1" ${p.ascended ? 'disabled' : ''} ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc(a.desc)}"><span class="n">✦ Ascensão: ${esc(a.name)}${p.ascended ? ' ✓' : ''}</span><span class="cost">${lk ? '🔒 Era III' : p.ascended ? esc(a.desc) : costStr(a.cost)}</span></button>`; } }
         const cd = Math.max(0, p.superCd - sim.time);
         h += `<button class="act super" data-super="1" ${cd > 0 ? 'disabled' : ''} title="${esc(fac.superDesc)}"><span class="n">${esc(fac.superName)}${cd > 0 ? ' · ' + mmss(cd) : ''}</span><span class="cost">${costStr(S.SUPER_COST)}</span></button>`;
       }
       if (e.jumpT > 0) h += `<div class="tip">Salto em ${Math.ceil(e.jumpT)} s. O Núcleo está visível para todos.</div>`;
       panel.innerHTML = h;
       panel.querySelectorAll('[data-prod]').forEach(b => { let lp = null, fired = false; // 4.1a: +1 clique, +5 Shift ou segurar no toque, +10 Ctrl
-        b.addEventListener('pointerdown', ev => { if (ev.pointerType !== 'touch') return; fired = false; lp = setTimeout(() => { fired = true; I.cmd({ t: 'produce', id: e.id, def: b.dataset.prod, n: 5 }); if (navigator.vibrate) navigator.vibrate(15); notice('+5 na fila'); }, 480); });
+        b.addEventListener('pointerdown', ev => { if (ev.pointerType !== 'touch' || b.dataset.lock) return; fired = false; lp = setTimeout(() => { fired = true; I.cmd({ t: 'produce', id: e.id, def: b.dataset.prod, n: 5 }); if (navigator.vibrate) navigator.vibrate(15); notice('+5 na fila'); }, 480); });
         b.addEventListener('pointerup', () => clearTimeout(lp)); b.addEventListener('pointerleave', () => clearTimeout(lp));
-        b.addEventListener('click', ev => { if (fired) { fired = false; return; } I.cmd({ t: 'produce', id: e.id, def: b.dataset.prod, n: ev.ctrlKey || ev.metaKey ? 10 : ev.shiftKey ? 5 : 1 }); }); });
+        b.addEventListener('click', ev => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } if (fired) { fired = false; return; } I.cmd({ t: 'produce', id: e.id, def: b.dataset.prod, n: ev.ctrlKey || ev.metaKey ? 10 : ev.shiftKey ? 5 : 1 }); }); });
       panel.querySelectorAll('[data-cancel]').forEach(b => b.addEventListener('click', ev => I.cmd({ t: 'cancel', id: e.id, def: b.dataset.def, all: ev.shiftKey })));
-      panel.querySelectorAll('[data-research]').forEach(b => b.addEventListener('click', () => I.cmd({ t: 'research', key: b.dataset.research })));
+      panel.querySelectorAll('[data-research]').forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.cmd({ t: 'research', key: b.dataset.research }); }));
+      panel.querySelectorAll('[data-evolve]').forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.cmd({ t: 'evolve' }); }));
+      panel.querySelectorAll('[data-upgrade]').forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.cmd({ t: 'upgrade', id: e.id }); }));
+      panel.querySelectorAll('[data-ascend]').forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.cmd({ t: 'ascend' }); }));
       panel.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => { if (b.dataset.mode === 'jump') I.setMode('jump'); else I.setMode('rally'); notice(b.dataset.mode === 'jump' ? 'Clique no mapa para escolher o destino do Salto' : 'Clique no mapa para definir o ponto de reunião'); }));
       const sb = panel.querySelector('[data-super]'); if (sb) sb.addEventListener('click', () => superClick(fac));
       return;
@@ -5602,19 +5714,19 @@ function startGame(cfg, netCtx) {
   }
   function buildMenuHTML(p) {
     let h = `<div class="ph"><b>Construir</b> <span class="muted small">(B, depois a tecla)</span></div><div class="grid">`;
-    for (const k in S.BUILDINGS) { const d = S.BUILDINGS[k]; if (!d.key) continue; const can = S.canAfford(p, d.cost); h += `<button class="act ${can ? '' : 'poor'} ${view.ghost && view.ghost.def === k ? 'on' : ''}" data-build="${k}" title="${esc(d.desc)}"><img class="ico" alt="" src="${R.icon(k, human)}"><span class="k">${d.key}</span><span class="n">${esc(d.name)}</span><span class="cost">${costStr(d.cost)}</span></button>`; }
+    for (const k in S.BUILDINGS) { const d = S.BUILDINGS[k]; if (!d.key) continue; const can = S.canAfford(p, d.cost); const lk = S.lockReason(sim, human, 'building', k); h += `<button class="act ${can ? '' : 'poor'} ${lk ? 'locked' : ''} ${view.ghost && view.ghost.def === k ? 'on' : ''}" data-build="${k}" ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc((lk ? '🔒 ' + lk + ' · ' : '') + d.desc)}">${lk ? `<span class="lockb">${S.ERAS[d.era || 1].roman}</span>` : ''}<img class="ico" alt="" src="${R.icon(k, human)}"><span class="k">${d.key}</span><span class="n">${esc(d.name)}</span><span class="cost">${costStr(d.cost)}</span></button>`; }
     h += '</div>';
     if (!view.sel.size) h += '<div class="tip">Nada selecionado. Clique em unidades ou arraste uma caixa. F1 seleciona o Núcleo, F2 o exército.</div>';
     return h;
   }
-  function bindBuildMenu() { $('panel').querySelectorAll('[data-build]').forEach(b => b.addEventListener('click', () => { I.buildMenu = false; I.setMode('build', b.dataset.build); notice(G.isTouch ? 'Arraste para posicionar e toque em ✓ Construir aqui' : 'Posicione e clique para construir. Shift mantém o modo.'); })); }
+  function bindBuildMenu() { $('panel').querySelectorAll('[data-build]').forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.buildMenu = false; I.setMode('build', b.dataset.build); notice(G.isTouch ? 'Arraste para posicionar e toque em ✓ Construir aqui' : 'Posicione e clique para construir. Shift mantém o modo.'); })); }
   function refreshQuick() {
     const p = sim.players[human]; const fac = S.FACTIONS[p.faction];
     const oc = $('btn-over'); const cd = Math.max(0, p.overchargeCd - sim.time);
     oc.disabled = cd > 0 || p.res.plasma < S.OVERCHARGE_COST; oc.querySelector('.sub').textContent = cd > 0 ? 'recarga ' + mmss(cd) : '200 Plasma · +50% energia 60 s';
     const sp = $('btn-super'); const lab = S.hasBuilt(sim, human, 'laboratorio'); const scd = Math.max(0, p.superCd - sim.time);
-    sp.querySelector('.n').textContent = fac.superName; sp.disabled = !lab || scd > 0 || !S.canAfford(p, S.SUPER_COST);
-    sp.querySelector('.sub').textContent = !lab ? 'requer Laboratório' : scd > 0 ? 'recarga ' + mmss(scd) : '300 Dados · 200 Plasma';
+    sp.querySelector('.n').textContent = fac.superName; const era3 = (p.era || 1) >= 3; sp.disabled = !lab || !era3 || scd > 0 || !S.canAfford(p, S.SUPER_COST);
+    sp.querySelector('.sub').textContent = !lab ? 'requer Laboratório' : !era3 ? 'requer Era III' : scd > 0 ? 'recarga ' + mmss(scd) : '300 Dados · 200 Plasma';
     const dp = $('btn-diplo'); dp.classList.toggle('attn', !!G.pendingFor);
     $('btn-build').classList.toggle('on', I.buildMenu || I.mode === 'build');
     $('btn-attack').classList.toggle('on', I.mode === 'attackmove');
