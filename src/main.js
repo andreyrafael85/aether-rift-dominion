@@ -7,7 +7,7 @@ const AU = ARD.audio;
 const fmt = n => Math.floor(n).toLocaleString('pt-BR');
 const mmss = t => { t = Math.max(0, Math.floor(t)); return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
-const RES_ICON = { plasma: '◆', minerio: '▣', dados: '◈' };
+const RES_ICON = { plasma: '<svg class="ri xs"><use href="#ic-plasma"/></svg>', minerio: '<svg class="ri xs"><use href="#ic-minerio"/></svg>', dados: '<svg class="ri xs"><use href="#ic-dados"/></svg>' }; // 4.2f: ícones desenhados (antes ◆ ▣ ◈)
 const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
@@ -17,7 +17,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.2e';
+const VERSION = '4.2f';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -311,7 +311,7 @@ function startGame(cfg, netCtx) {
   G.save30 = !!(loadPrefs() || {}).bateria; G.lastDraw = 0; G.haptics = isTouch && !!navigator.vibrate; G.lastBuzz = 0;
   G.perf = { start: performance.now(), t0: performance.now(), frames: 0, low: 0, high: 0, down: false, up: false, auto: R.is3d && !params.get('q') && (cfg.quality || 'auto') === 'auto' };
   if (isTouch && navigator.getBattery && !G.save30) navigator.getBattery().then(b => { if (b && !b.charging && b.level < 0.2) { G.save30 = true; notice('Bateria baixa: limitando a 30 fps para economizar'); } }).catch(() => {});
-  document.addEventListener('visibilitychange', () => { if (!G || G.sim !== sim || G.ended) return; if (document.hidden) { if (!net && !G.paused) { G.paused = true; G.autoPaused = true; } } else { if (G.autoPaused) { G.autoPaused = false; notice('Pausado enquanto a aba estava em segundo plano · P ou ❚❚ para continuar'); refreshTop(); } else if (net) banner('Você voltou à partida', 'Com a aba em segundo plano o jogo não envia comandos; depois de 8 s a sala pode seguir sem você.', 'warn'); } });
+  document.addEventListener('visibilitychange', () => { if (!G || G.sim !== sim || G.ended) return; if (document.hidden) { if (!net && !G.paused) { G.paused = true; G.autoPaused = true; G.pauseWhy = 'O jogo pausou sozinho porque a aba ficou em segundo plano. Nada se perdeu.'; } } else { if (G.autoPaused) { G.autoPaused = false; refreshTop(); } else if (net) banner('Você voltou à partida', 'Com a aba em segundo plano o jogo não envia comandos; depois de 8 s a sala pode seguir sem você.', 'warn'); } });
   G.camp = cfg.campaign && ARD.campUI ? ARD.campUI.begin(sim, cfg.campaign, cfg.resume ? cfg.resume.run : null) : null; // 4.0e: missão da campanha (4.1c: ou a retomada dela)
   G.cfg = cfg; setupSaves();
   if (R.is3d && ARD.campUI) R.skins = { [human]: ARD.campUI.skinOf(sim.players[human].faction) };
@@ -327,7 +327,7 @@ function startGame(cfg, netCtx) {
     if (cfg.resume && cfg.resume.view) { const v = cfg.resume.view; Object.assign(view.cam, v.cam || {}); view.cam.pitchT = view.cam.pitch; if (v.memory) view.memory = new Map(v.memory); }
     if (cfg.bench) setupBench();
     if (cfg.resume && net) { net.sentFor = sim.tick - 1; G.pending = []; banner('De volta à sala', 'Partida sincronizada com o anfitrião no tempo ' + ARD.saves.mmss(sim.time) + '.', 'good', 7000); }
-    else if (cfg.resume) { const fenda = G.camp && G.camp.noPause; if (!fenda) { G.paused = true; refreshTop(); } banner('Partida retomada', (cfg.resumeAuto ? 'Você voltou em ' + cfg.resumeAuto + ' s, ' : 'Salvamento de ' + ARD.saves.ago(cfg.resumeAt || Date.now()) + ', ') + 'no tempo ' + ARD.saves.mmss(sim.time) + ' de jogo.' + (fenda ? '' : ' Pausado: toque em ❚❚ ou P para continuar.'), 'info', 9000); }
+    else if (cfg.resume) { const fenda = G.camp && G.camp.noPause; if (!fenda) { G.paused = true; G.pauseWhy = 'Partida retomada de onde parou.'; refreshTop(); } banner('Partida retomada', (cfg.resumeAuto ? 'Você voltou em ' + cfg.resumeAuto + ' s, ' : 'Salvamento de ' + ARD.saves.ago(cfg.resumeAt || Date.now()) + ', ') + 'no tempo ' + ARD.saves.mmss(sim.time) + ' de jogo.' + (fenda ? '' : ' Pausado: toque em ❚❚ ou P para continuar.'), 'info', 9000); }
     for (let i = 0; i < ff * 10; i++) tickOnce(true);
     if (net) setupNet();
     if (params.get('speed')) G.speed = parseFloat(params.get('speed')) || 1;
@@ -539,6 +539,9 @@ function startGame(cfg, netCtx) {
   function refreshTop() {
     const p = sim.players[human];
     $('r-plasma').textContent = fmt(p.res.plasma); $('r-minerio').textContent = fmt(p.res.minerio); $('r-dados').textContent = fmt(p.res.dados);
+    { const H = G.resHist || (G.resHist = []); if (!H.length || sim.time - H[H.length - 1].t >= 1) { H.push({ t: sim.time, r: Object.assign({}, p.res) }); while (H.length > 32) H.shift(); } // 4.2f: variação por minuto (janela de 30 s)
+      const old = H[0]; const span = sim.time - old.t; for (const k of ['plasma', 'minerio', 'dados']) { const el = $('rr-' + k); if (!el) continue; if (span < 8) { el.textContent = ''; continue; } const v = Math.round((p.res[k] - old.r[k]) * 60 / span); el.textContent = Math.abs(v) < 1 ? '' : (v > 0 ? '+' : '−') + fmt(Math.abs(v)); el.className = v > 0 ? 'up' : 'dn'; } }
+    { const pb = $('pausebox'); if (pb) { const show = !!G.paused && !G.ended && !net && !G.bench && $('savebox').hidden; if (pb.hidden === show) pb.hidden = !show; if (show) $('pause-why').textContent = G.pauseWhy || 'Partida pausada.'; } }
     const en = p.energy; const reg = $('energy'); reg.className = 'energy ' + en.regime;
     $('e-text').textContent = `${Math.round(en.prod)} / ${Math.round(en.cons)}`; $('e-regime').textContent = S.REGIME[en.regime].name + (p.overchargeT > 0 ? ' · Sobrecarga' : '') + (p.blackoutT > 0 ? ' · BLECAUTE' : '');
     $('e-bar').style.width = Math.min(100, en.ratio * 100 / 1.5) + '%';
@@ -661,6 +664,7 @@ function startGame(cfg, netCtx) {
     $('btn-help').addEventListener('click', () => toggleHelp(true));
     $('btn-menu').addEventListener('click', () => ui.confirm('Encerrar esta partida e voltar ao início?' + (G.autoSave ? ' Para continuar depois, use 💾 › Pausar e sair.' : ''), () => { const go = () => location.reload(); if (net) mpSession.clear(); if (G.autoSave && ARD.saves) ARD.saves.del('auto').then(go, go); else go(); }));
     if ($('btn-save')) $('btn-save').addEventListener('click', () => openSaveBox());
+    if ($('pausebox')) $('pausebox').addEventListener('click', () => { if (G.paused && !G.ended) { G.paused = false; G.autoPaused = false; G.pauseWhy = null; refreshTop(); notice('Continuando'); } }); // 4.2f: pausa visível; clique continua
     $('btn-build').addEventListener('click', () => { I.buildMenu = !I.buildMenu; view.sel = new Set(); ui.buildMenuChanged(I.buildMenu); });
     $('btn-attack').addEventListener('click', () => I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'));
     $('btn-box').addEventListener('click', () => { I.touchBox = !I.touchBox; refreshQuick(); notice(I.touchBox ? 'Arraste para selecionar em caixa' : 'Arraste para mover a câmera'); });
@@ -799,7 +803,7 @@ function startGame(cfg, netCtx) {
       notice, confirm: confirmModal, modalOpen() { return !$('diplo').hidden || !$('help').hidden || !$('confirm').hidden; },
       enqueue(c) { if (net) G.pending.push(c); else S.enqueue(sim, c); },
       closeModals() { $('diplo').hidden = true; $('help').hidden = true; $('confirm').hidden = true; },
-      toggleHelp() { toggleHelp(); }, togglePause() { if (net) { notice('Sem pausa no multiplayer'); return; } if (G.camp && G.camp.noPause) { notice('Sem pausa na dificuldade Fenda'); return; } G.paused = !G.paused; refreshTop(); notice(G.paused ? 'Pausado' : 'Continuando'); },
+      toggleHelp() { toggleHelp(); }, togglePause() { if (net) { notice('Sem pausa no multiplayer'); return; } if (G.camp && G.camp.noPause) { notice('Sem pausa na dificuldade Fenda'); return; } G.paused = !G.paused; if (!G.paused) G.pauseWhy = null; else G.pauseWhy = 'Partida pausada.'; refreshTop(); if (!G.paused) notice('Continuando'); },
     };
   }
   function confirmModal(text, onYes) { const m = $('confirm'); m.hidden = false; $('confirm-text').textContent = text; $('confirm-yes').onclick = () => { m.hidden = true; onYes(); }; $('confirm-no').onclick = () => { m.hidden = true; }; }

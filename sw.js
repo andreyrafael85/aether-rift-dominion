@@ -1,6 +1,6 @@
 /* Aether Rift: Dominion — service worker (4.0f): campanha e partidas solo funcionam offline depois da primeira visita.
-   Build 202610111631Z. Página: rede primeiro (atualiza quando online). Three.js, PeerJS e fontes: cache primeiro (URLs versionadas). */
-const CACHE = 'ard-202610111631Z';
+   Build 202610111748Z. Página: rede primeiro (atualiza quando online). Three.js, PeerJS e fontes: cache primeiro (URLs versionadas). */
+const CACHE = 'ard-202610111748Z';
 const CORE = ['./', './index.html', './manifest.webmanifest', './assets/hero-belt.webp', './assets/favicon-64.png', './assets/favicon-32.png', './assets/apple-touch-icon.png', './assets/icon-192.png', './assets/icon-512.png', './assets/icon-maskable-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => Promise.all(CORE.map(u => c.add(u).catch(() => null)))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('ard-') && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
