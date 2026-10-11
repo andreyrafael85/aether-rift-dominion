@@ -19,10 +19,12 @@ const game = bundle('src/index.tpl.html', ['src/sim.js', 'src/ai.js', 'src/voxel
 writeFileSync(root + 'dist/aether-rift-beta.html', game); writeFileSync(root + 'index.html', wrap(game));
 // Cópia para testes headless com three vendorizado (node tools/vendor.mjs); carrega sem rede.
 import { existsSync } from 'node:fs';
-mkdirSync(root + 'dist/assets', { recursive: true }); for (const f of ['hero-belt.jpg', 'hero-belt.webp', 'favicon-64.png', 'favicon-32.png', 'apple-touch-icon.png']) if (existsSync(root + 'assets/' + f)) writeFileSync(root + 'dist/assets/' + f, readFileSync(root + 'assets/' + f)); // servidos como arquivos (assets/)
+mkdirSync(root + 'dist/assets', { recursive: true }); for (const f of ['hero-belt.jpg', 'hero-belt.webp', 'favicon-64.png', 'favicon-32.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png']) if (existsSync(root + 'assets/' + f)) writeFileSync(root + 'dist/assets/' + f, readFileSync(root + 'assets/' + f)); // servidos como arquivos (assets/)
 if (existsSync(root + 'dist/vendor/three/build/three.module.min.js')) writeFileSync(root + 'dist/local.html', wrap(game).replace('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js', './vendor/three/build/three.module.min.js').replace('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/', './vendor/three/examples/jsm/'));
 const style = bundle('style/index.tpl.html', ['src/voxel.js', 'src/models.js', 'style/scene.js', 'style/boot.js']);
 writeFileSync(root + 'dist/estilo.html', style); writeFileSync(root + 'estilo.html', wrap(style));
 const s3 = bundle('style3d/index.tpl.html', ['src/voxel.js', 'src/models.js', 'src/vox3d.js', 'style3d/scene3d.js', 'style3d/boot.js']);
 writeFileSync(root + 'dist/estilo3d.html', s3); writeFileSync(root + 'estilo3d.html', wrap(s3));
 console.log('build', BUILD, '· jogo', game.length, 'bytes · estilo', style.length, 'bytes · estilo3d', s3.length, 'bytes');
+// 4.0f — PWA: service worker com o carimbo do build (cache novo a cada versão) e manifesto ao lado da página
+writeFileSync(root + 'sw.js', read('tools/sw.tpl.js').replace(/__BUILD__/g, BUILD.replace(/[^0-9TZ]/g, ''))); writeFileSync(root + 'dist/sw.js', readFileSync(root + 'sw.js')); writeFileSync(root + 'dist/manifest.webmanifest', readFileSync(root + 'manifest.webmanifest'));

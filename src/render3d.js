@@ -74,9 +74,17 @@ function create(canvas, overlay, mini) {
     else console.error('[ARD] Renderização 3D falhou mesmo sem efeitos (GPU: ' + R.gpu + ')');
     if (R.onDegrade) R.onDegrade(what, reason);
   }
+  function autoTier() { // GPUs de software ficam no Baixa; celulares fortes no Média; placas dedicadas, Apple M e Intel Arc no Alta
+    const forced = new URLSearchParams(location.search).get('tier'); if (forced) return forced; // teste do ajuste automático
+    const g = String(R.gpu || '').toLowerCase(); const mem = navigator.deviceMemory || 4, cores = navigator.hardwareConcurrency || 4;
+    if (/swiftshader|llvmpipe|software|basic render/.test(g)) return 'baixa';
+    if (isTouch) return mem >= 6 && cores >= 8 && /adreno \(tm\) (6[4-9]\d|7\d\d|8\d\d)|mali-g(7[1-9]|[6-9]\d\d)|immortalis|apple/.test(g) ? 'media' : 'baixa';
+    if (/nvidia|geforce|rtx|gtx|radeon rx|radeon pro|apple m\d|\barc\b/.test(g)) return 'alta';
+    return 'media'; }
+  R.autoTier = autoTier;
   R.setQuality = function (name, over) {
     const q = R.quality; q.name = name; over = over || {};
-    if (name === 'auto') name = isTouch ? 'baixa' : 'media';
+    if (name === 'auto') name = autoTier(); q.resolved = name; // 4.0f: escolha pela GPU, memória e núcleos; o ajuste por FPS corrige depois
     if (name === 'baixa') { q.shadows = false; q.post = false; q.ssao = false; q.msaa = false; q.pr = 1; q.particles = 0.5; }
     else if (name === 'alta' || name === 'ultra') { q.shadows = true; q.shadowMap = 4096; q.post = !!ADD; q.ssao = name === 'ultra' && !!ADD; q.msaa = !!ADD && !isTouch && !!(renderer.capabilities && renderer.capabilities.isWebGL2); q.pr = Math.min(2, window.devicePixelRatio || 1); q.particles = 1; }
     else { q.shadows = !isTouch; q.shadowMap = 2048; q.post = !!ADD; q.ssao = false; q.msaa = false; q.pr = Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1); q.particles = 1; }

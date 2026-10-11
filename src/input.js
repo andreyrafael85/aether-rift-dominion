@@ -144,7 +144,7 @@ function create(o) {
     canvas.setPointerCapture(e.pointerId);
     I.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, type: e.pointerType });
     const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top;
-    if (I.pointers.size === 2) { const pts = [...I.pointers.values()]; I.pinch = { d: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y), zoom: cam.zoom, cx: (pts[0].x + pts[1].x) / 2, cy: (pts[0].y + pts[1].y) / 2, camx: cam.x, camy: cam.y }; I.down = null; view.box = null; clearTimeout(I.longPress); return; }
+    if (I.pointers.size === 2) { const pts = [...I.pointers.values()]; I.pinch = { a: Math.atan2(pts[1].y - pts[0].y, pts[1].x - pts[0].x), yaw: cam.yaw || 0, rot: false, d: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y), zoom: cam.zoom, cx: (pts[0].x + pts[1].x) / 2, cy: (pts[0].y + pts[1].y) / 2, camx: cam.x, camy: cam.y }; I.down = null; view.box = null; clearTimeout(I.longPress); return; }
     I.lastType = e.pointerType;
     I.down = { sx, sy, button: e.button, type: e.pointerType, moved: false, camx: cam.x, camy: cam.y, shift: e.shiftKey, t: performance.now() };
     if (e.button === 0 && I.mode === 'build' && view.ghost && S.BUILDINGS[view.ghost.def].wall) { const [wx0, wy0] = R.screenToWorld(cam, sx, sy); I.wallDrag = { x: wx0, y: wy0 }; }
@@ -153,7 +153,7 @@ function create(o) {
   canvas.addEventListener('pointermove', e => {
     const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top; I.lastSX = sx; I.lastSY = sy;
     const p = I.pointers.get(e.pointerId); if (p) { p.x = e.clientX; p.y = e.clientY; }
-    if (I.pinch && I.pointers.size === 2) { const pts = [...I.pointers.values()]; const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y); const cx = (pts[0].x + pts[1].x) / 2, cy = (pts[0].y + pts[1].y) / 2; cam.zoom = I.pinch.zoom * (d / I.pinch.d); clampCam(); const [pwx, pwy] = R.screenDeltaToWorld(cam, cx - I.pinch.cx, cy - I.pinch.cy); cam.x = I.pinch.camx - pwx; cam.y = I.pinch.camy - pwy; clampCam(); return; }
+    if (I.pinch && I.pointers.size === 2) { const pts = [...I.pointers.values()]; const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y); const cx = (pts[0].x + pts[1].x) / 2, cy = (pts[0].y + pts[1].y) / 2; cam.zoom = I.pinch.zoom * (d / I.pinch.d); clampCam(); if (R.supportsYaw) { let da = Math.atan2(pts[1].y - pts[0].y, pts[1].x - pts[0].x) - I.pinch.a; da = Math.atan2(Math.sin(da), Math.cos(da)); if (!I.pinch.rot && Math.abs(da) > 0.14) I.pinch.rot = true; if (I.pinch.rot) cam.yaw = I.pinch.yaw - da; } /* 4.0f: dois dedos giram */ const [pwx, pwy] = R.screenDeltaToWorld(cam, cx - I.pinch.cx, cy - I.pinch.cy); cam.x = I.pinch.camx - pwx; cam.y = I.pinch.camy - pwy; clampCam(); return; }
     if (view.ghost) updateGhost(sx, sy);
     const d = I.down; if (!d) { const t = pick(sx, sy, 8); view.hover = t ? t.id : null; return; }
     if (!d.moved && Math.hypot(sx - d.sx, sy - d.sy) > 7) { d.moved = true; clearTimeout(I.longPress); }
