@@ -54,7 +54,8 @@ function launch(id, race, diff) {
   const $ = D.$; const m = C.BY_ID[id]; if (!m) return; race = m.race || race || D.selectedRace(); diff = diff || 'normal';
   const prep = C.prepare(id, { race, difficulty: diff, relics: P.load().relics.equipped, name: ($('opt-name').value.trim() || P.load().commander.name || 'Comandante').slice(0, 18), color: colorFor(race) });
   try { const pf = JSON.parse(localStorage.getItem('ard-beta-prefs') || '{}'); pf.campDiff = diff; localStorage.setItem('ard-beta-prefs', JSON.stringify(pf)); } catch (e) {}
-  D.startGame({ name: prep.cfg.players[0].name, faction: race, seed: prep.cfg.seed, minutes: prep.cfg.minutes, players: prep.cfg.players, campaign: prep, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value });
+  const campArgs = { id, opts: { race, difficulty: diff, relics: P.load().relics.equipped.slice(), name: prep.cfg.players[0].name, color: colorFor(race) } };
+  D.startGame({ name: prep.cfg.players[0].name, faction: race, seed: prep.cfg.seed, minutes: prep.cfg.minutes, players: prep.cfg.players, campaign: prep, campArgs, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value });
 }
 // próxima missão a jogar: a primeira liberada ainda sem vitória; com tudo vencido, a última liberada
 function currentMission() { const s = P.load(); let last = null; for (const m of C.MISSIONS) { if (!C.unlocked(m.id, s)) continue; const pr = s.missions[m.id] || {}; if (!pr.won && !(pr.stars > 0)) return m; last = m; } return last || C.MISSIONS[0]; }
@@ -115,7 +116,8 @@ function applyHangar() { const h = P.load().hangar; for (const r of RACES) D.LEA
 function tracker(sim, human) {
   const st = { cls: new Set(), walls: 0, dmgAt600: null, pactDone: false };
   return { st, tick(ev) { for (const e of ev) { if (e.t === 'spawn' && e.p === human) { const u = S.UNITS[e.def]; if (u && u.attack) st.cls.add(u.cls); } else if (e.t === 'built' && e.p === human && e.def === 'muro') st.walls++; else if (e.t === 'alert' && e.p === human && typeof e.text === 'string' && e.text.startsWith('Pacto cumprido')) st.pactDone = true; }
-    if (st.dmgAt600 === null && sim.time >= 600) st.dmgAt600 = sim.players[human].stats.dmg; } };
+    if (st.dmgAt600 === null && sim.time >= 600) st.dmgAt600 = sim.players[human].stats.dmg; },
+    save: () => ({ cls: [...st.cls], walls: st.walls, dmgAt600: st.dmgAt600, pactDone: st.pactDone }), load(o) { if (!o) return; st.cls = new Set(o.cls || []); st.walls = o.walls || 0; st.dmgAt600 = o.dmgAt600 == null ? null : o.dmgAt600; st.pactDone = !!o.pactDone; } };
 }
 function evalAchievements(won, sim, human, tr, camp) {
   const p = sim.players[human]; const n = S.nucleoOf(sim, human); const out = []; const u = id => { if (P.unlock(id)) out.push(id); };
@@ -129,12 +131,12 @@ function evalAchievements(won, sim, human, tr, camp) {
 function grantXp(xp) { const lv = P.addXp(xp); const out = { xp, from: lv.from, to: lv.to, relics: [], ach: [] }; for (let l = lv.from + 1; l <= lv.to; l++) { const rid = C.RELIC_BY_LEVEL[l]; if (rid && P.grantRelic(rid)) out.relics.push(rid); } if (lv.to >= 10 && P.unlock('comandante-10')) out.ach.push('comandante-10'); if (lv.to >= 30 && P.unlock('comandante-30')) out.ach.push('comandante-30'); return out; }
 
 // ---------- sessão de missão (HUD) ----------
-function begin(sim, prep) {
-  const $ = D.$; const run = C.start(sim, prep); const queue = []; let showing = null, until = 0;
+function begin(sim, prep, saved) {
+  const $ = D.$; const run = C.start(sim, prep, saved || null); const queue = []; let showing = null, until = 0;
   const comms = () => { const now = performance.now(); if (showing && now < until) return; if (!queue.length) { if (showing) { $('comms').hidden = true; showing = null; } return; } showing = queue.shift(); until = now + Math.max(4200, 1800 + showing.text.length * 55);
     const art = D.leaderArt(showing.race, showing.mood); $('comms-img').src = art || ''; $('comms-img').hidden = !art; $('comms-name').textContent = (D.LEADER_NAME[showing.race] || raceName(showing.race)) + ' · ' + raceName(showing.race); $('comms-text').textContent = showing.text; $('comms').style.setProperty('--cc', D.RACE_COLORS[showing.race] || '#FF5E3A'); $('comms').hidden = false; };
   const hud = () => { $('ob-title').textContent = prep.mission.title; $('ob-list').innerHTML = run.objectives.map(o => `<li class="${o.done ? 'ok' : ''} ${o.bonus ? 'bn' : ''}"><span>${o.done ? '✓' : o.bonus ? '★' : '○'}</span><span>${esc(o.text.replace(/^Bônus: /, ''))}</span>${o.progress && !o.done ? `<span class="pg">${esc(o.progress)}</span>` : ''}</li>`).join(''); };
-  for (const sd of run.brief()) queue.push(sd); $('objectives').hidden = false; hud();
+  if (!saved) for (const sd of run.brief()) queue.push(sd); else queue.push({ race: sim.players[0].faction, mood: 1, text: 'De volta ao comando. A missão continua de onde parou.' }); $('objectives').hidden = false; hud();
   const sess = { prep, run, hud, noPause: !!prep.diff.noPause,
     tick(ev) { run.tick(ev); for (const sd of run.takeSaid()) queue.push(sd); comms(); return run.result; },
     frame() { comms(); hud(); },

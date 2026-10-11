@@ -204,10 +204,10 @@ function prepare(id, o) {
 }
 
 // ---------- executor ----------
-function start(sim, prep) {
+function start(sim, prep, saved) { // saved (4.1c): estado do roteiro gravado; o sim já vem restaurado
   const m = prep.mission, D = prep.diff; const me = sim.players[0]; const en = sim.players.slice(1).map(p => p.id);
-  if (m.startTime) { sim.time = m.startTime; sim.tick = Math.round(m.startTime / S.TICK); sim.nextStorm += m.startTime; }
-  const t0 = sim.time; const said = []; const objectives = m.objectives.map(o => ({ id: o.id, text: o.text, bonus: !!o.bonus, final: !!o.final, done: false, progress: '' }));
+  if (m.startTime && !saved) { sim.time = m.startTime; sim.tick = Math.round(m.startTime / S.TICK); sim.nextStorm += m.startTime; }
+  let t0 = sim.time; const said = []; const objectives = m.objectives.map(o => ({ id: o.id, text: o.text, bonus: !!o.bonus, final: !!o.final, done: false, progress: '' }));
   const c = { sim, me, en, D, st: { waves: 0, crates: 0, produced: 0 }, kills: {}, lost: {}, t: 0, waveIds: {}, holds: {}, lastEvery: {} };
   const ob = id => objectives.find(o => o.id === id);
   Object.assign(c, {
@@ -278,7 +278,12 @@ function start(sim, prep) {
       else if (sim.result && !result) result = { won: false, reason: sim.result.reason || 'O tempo acabou.', stars: 0, time: c.t };
     },
     takeSaid() { return said.splice(0); },
+    // 4.1c: tudo o que o roteiro guarda entre os passos (objetivos, contadores, gatilhos já disparados)
+    save() { const cs = {}; for (const k of Object.keys(c)) { if (['sim', 'me', 'en', 'D'].includes(k) || typeof c[k] === 'function') continue; cs[k] = S.jsonSafe(c[k]); }
+      return { t0, objectives: S.jsonSafe(objectives), c: cs, fired: [...fired], result: S.jsonSafe(result), lastEval }; },
+    load(st) { t0 = st.t0; st.objectives.forEach((o, i) => { if (objectives[i] && objectives[i].id === o.id) Object.assign(objectives[i], S.jsonBack(o)); }); for (const k in st.c) c[k] = S.jsonBack(st.c[k]); fired.clear(); for (const f of st.fired) fired.add(f); result = S.jsonBack(st.result); lastEval = st.lastEval; },
   };
+  if (saved) runner.load(saved);
   return runner;
 }
 function missionsOfAct(act) { return M.filter(m => m.act === act); }

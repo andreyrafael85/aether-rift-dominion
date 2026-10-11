@@ -225,13 +225,15 @@ const DIFFICULTY = {
 
 function mulberry32(seed) {
   let a = seed >>> 0;
-  return function () {
+  const r = function () {
     a = (a + 0x6D2B79F5) >>> 0;
     let t = a;
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+  r.state = () => a; r.setState = v => { a = v >>> 0; }; // 4.1c: estado do gerador entra no salvamento
+  return r;
 }
 function dist(ax, ay, bx, by) { return DM.hypot(ax - bx, ay - by); }
 function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
@@ -1330,11 +1332,51 @@ function hash(sim) { // cheap state hash for determinism tests
   return h >>> 0;
 }
 
+// ---------- 4.1c: salvamento e retomada (fotografia exata do estado) ----------
+// Só o que muda durante a partida: o mapa estático (biomas, adereços) é refeito pelo createSim com o mesmo cfg.
+// Índices derivados (byId, grade espacial, campos de fluxo) são reconstruídos; números especiais (-0, ±Infinity, NaN) viajam marcados.
+const b64 = u8 => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return (typeof btoa === 'function' ? btoa(s) : Buffer.from(s, 'binary').toString('base64')); };
+const unb64 = str => { const s = typeof atob === 'function' ? atob(str) : Buffer.from(str, 'base64').toString('binary'); const u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; };
+function jsonSafe(v) { // cópia profunda só com JSON puro; preserva -0, ±Infinity e NaN
+  if (typeof v === 'number') { if (Number.isFinite(v)) return Object.is(v, -0) ? { $n: '-0' } : v; return { $n: String(v) }; }
+  if (v === null || typeof v !== 'object') return typeof v === 'function' ? undefined : v;
+  if (Array.isArray(v)) return v.map(jsonSafe);
+  const o = {}; for (const k of Object.keys(v)) { const x = v[k]; if (x === undefined || typeof x === 'function') continue; o[k] = jsonSafe(x); } return o;
+}
+function jsonBack(v) {
+  if (v === null || typeof v !== 'object') return v;
+  if (Array.isArray(v)) return v.map(jsonBack);
+  if (typeof v.$n === 'string' && Object.keys(v).length === 1) return v.$n === '-0' ? -0 : Number(v.$n);
+  const o = {}; for (const k of Object.keys(v)) o[k] = jsonBack(v[k]); return o;
+}
+function snapshot(sim) {
+  const nav = sim.nav;
+  return { v: 1, hash: hash(sim), tick: sim.tick, time: sim.time, seed: sim.seed, nextId: sim.nextId, maxTime: sim.maxTime, rand: sim.rand.state(),
+    ents: jsonSafe(sim.ents), players: jsonSafe(sim.players), cmdQueue: jsonSafe(sim.cmdQueue), pending: jsonSafe(sim.pending), result: jsonSafe(sim.result),
+    storm: jsonSafe(sim.storm), nextStorm: jsonSafe(sim.nextStorm), vis: sim.vis.map(st => [...st]), explored: sim.explored.map(b64),
+    navDirty: !!sim.navDirty, nav: { blocked: b64(nav.blocked), gates: [...nav.gates], gatePos: [...nav.gatePos].map(([i, e]) => [i, e.id]), version: nav.version },
+    auras: sim.auras ? sim.auras.map(a => ({ anchors: a.anchors.map(e => e.id), moldes: a.moldes.map(e => e.id), diapasoes: a.diapasoes.map(e => e.id) })) : null };
+}
+// aplica a fotografia num sim recém-criado com o mesmo cfg (createSim) e devolve o mesmo objeto
+function restore(sim, snap) {
+  if (!snap || snap.v !== 1) throw new Error('salvamento em formato desconhecido');
+  sim.tick = snap.tick; sim.time = snap.time; sim.seed = snap.seed; sim.nextId = snap.nextId; sim.maxTime = snap.maxTime; sim.rand.setState(snap.rand);
+  sim.ents = jsonBack(snap.ents); sim.players = jsonBack(snap.players); sim.cmdQueue = jsonBack(snap.cmdQueue); sim.pending = jsonBack(snap.pending); sim.result = jsonBack(snap.result);
+  sim.storm = jsonBack(snap.storm); sim.nextStorm = jsonBack(snap.nextStorm); sim.vis = snap.vis.map(a => new Set(a)); sim.explored = snap.explored.map(unb64);
+  sim.byId = new Map(); for (const e of sim.ents) sim.byId.set(e.id, e);
+  const nav = sim.nav; nav.blocked = unb64(snap.nav.blocked); nav.gates = new Map(snap.nav.gates); nav.gatePos = new Map(snap.nav.gatePos.map(([i, id]) => [i, sim.byId.get(id)]).filter(x => x[1])); nav.fields = new Map(); nav.version = snap.nav.version; sim.navDirty = snap.navDirty;
+  sim.grid = new Map(); rebuildGrid(sim);
+  if (snap.auras) sim.auras = snap.auras.map(a => ({ anchors: a.anchors.map(id => sim.byId.get(id)).filter(Boolean), moldes: a.moldes.map(id => sim.byId.get(id)).filter(Boolean), diapasoes: a.diapasoes.map(id => sim.byId.get(id)).filter(Boolean) }));
+  sim.events = []; sim._evRet = 0;
+  const h = hash(sim); if (h !== snap.hash) console.warn('[ARD] retomada: hash ' + h + ' difere do salvo ' + snap.hash);
+  return sim;
+}
+
 ARD.sim = {
   TICK, WORLD, CX, CY, RIFT_R, FACTIONS, BUILDINGS, UNITS, WEAPONS, COUNTER, CLASS_NAMES, VET_RANKS, unitCost, RESEARCH, REGIME, DIFFICULTY, REP_NAMES,
   SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS, RACE_SHADES, assignColors, FACTION_EXTRAS, producesFor,
   NAV, NW, TILE, TILES, BIOMES, navIdx, passable, flowField, lineFree, inStorm,
   DM,
-  createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint, spawnUnit, forceStorm,
+  createSim, step, enqueue, snapshot, restore, jsonSafe, jsonBack, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint, spawnUnit, forceStorm,
 };
 })(globalThis.ARD = globalThis.ARD || {});

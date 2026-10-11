@@ -216,6 +216,13 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 .foot-logo{width:30px;height:30px;border-radius:50%;vertical-align:middle;margin-right:.45rem;border:1px solid var(--line)}
 .dp-lead{width:42px;height:42px;border-radius:8px;object-fit:cover;vertical-align:middle;margin-right:.45rem;border:1px solid var(--line)}
 /* 4.0e — campanha, briefing, Hangar e HUD de missão */
+/* 4.1c — salvamentos */
+.resume{display:flex;gap:.8rem;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:.8rem 1rem;background:linear-gradient(90deg,color-mix(in srgb,var(--race) 26%,#14171d),#14171d 80%);border-bottom:1px solid color-mix(in srgb,var(--race) 50%,var(--line));animation:rsPulse 2.4s ease-in-out infinite}
+.resume b{font-family:var(--fd);font-size:1.35rem;text-transform:uppercase;letter-spacing:.02em}.rs-btns{display:flex;gap:.5rem}.rs-txt{min-width:0}
+@keyframes rsPulse{50%{box-shadow:inset 0 0 22px color-mix(in srgb,var(--race) 30%,transparent)}}@media (prefers-reduced-motion:reduce){.resume{animation:none}}
+.saved{display:grid;gap:.4rem;border-top:1px solid var(--line);padding-top:.6rem}.saved .sh{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--fg2)}
+.svrow{display:flex;gap:.5rem;align-items:center;border:1px solid var(--line);border-radius:8px;padding:.45rem .6rem;background:#11141a}.svrow .sv-t{flex:1;min-width:0;font-size:.84rem}.svrow .sv-t small{display:block;color:var(--fg2)}.svrow .btn{min-height:36px;padding:.3rem .7rem}
+.slots{display:grid;gap:.5rem;margin:.6rem 0}.slot{display:grid;grid-template-columns:auto 1fr;gap:.8rem;align-items:center;text-align:left;background:#11141a;border:1px solid var(--line);border-radius:10px;padding:.7rem .8rem;color:var(--fg);cursor:pointer;font:inherit}.slot:hover:not(:disabled){border-color:var(--race)}.slot b{font-family:var(--fd);font-size:1.2rem;text-transform:uppercase}.slot small{color:var(--fg2)}.slot:disabled{opacity:.5;cursor:default}
 /* 4.1b — painel de comando com abas */
 .console{padding:0;overflow:hidden;border-color:color-mix(in srgb,var(--race) 45%,var(--line));box-shadow:0 0 0 1px rgba(0,0,0,.5),0 18px 40px rgba(0,0,0,.35),0 0 34px color-mix(in srgb,var(--race) 14%,transparent)}
 .ctabs{display:grid;grid-template-columns:repeat(4,1fr);background:#0f1217;border-bottom:1px solid var(--line)}
@@ -276,12 +283,13 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
 <div id="start" class="screen">
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Versão 4.1b · build __BUILD__ · painel com abas · O Grande Alinhamento · radar · multiplayer 2 a 4</div>
+    <div class="eyebrow">Versão 4.1c · build __BUILD__ · salvamento automático · volta à sala · O Grande Alinhamento · multiplayer 2 a 4</div>
     <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div><h1>Aether Rift<br><span>Dominion</span></h1></div></div>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
       <div><div class="choose">Escolha sua Raça</div><div class="fac-cards" id="fac-cards" style="margin-top:1rem"></div></div>
       <div class="opts console">
+        <div id="resume-card" class="resume" hidden><div class="rs-txt"><div class="eyebrow">Partida interrompida</div><b id="resume-title"></b><div class="small muted" id="resume-sub"></div></div><div class="rs-btns"><button class="btn primary" id="btn-resume">Retomar</button><button class="btn ghost" id="btn-resume-drop">Descartar</button></div></div>
         <div class="ctabs" role="tablist" aria-label="Modos de jogo">
           <button class="ctab on" data-tab="jogar" role="tab" aria-selected="true"><span class="ci">⚔</span>Jogar</button><button class="ctab" data-tab="campanha" role="tab" aria-selected="false"><span class="ci">✦</span>Campanha</button><button class="ctab" data-tab="multi" role="tab" aria-selected="false"><span class="ci">⇄</span>Multiplayer</button><button class="ctab" data-tab="ajustes" role="tab" aria-selected="false"><span class="ci">⚙</span>Ajustes</button>
         </div>
@@ -292,6 +300,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
           <details class="adv"><summary>Mapa e clima</summary><div class="opt"><label for="opt-seed">Semente do mapa</label><input id="opt-seed" inputmode="numeric"></div><div class="opt"><label for="opt-clima">Clima do campo (efeito dentro da partida)</label><select id="opt-clima"><option value="auto">Automático (pelo bioma)</option><option value="toxica">Névoa tóxica</option><option value="plasma">Tempestade de plasma</option><option value="cristais">Chuva de cristais</option><option value="aurora">Aurora da Fenda</option><option value="acida">Chuva ácida</option></select></div></details>
           <button id="btn-start" class="btn primary big">Iniciar partida</button>
           <div class="row"><button id="btn-help-start" class="btn ghost">Como jogar</button></div>
+          <div class="saved" id="saved-solo" hidden></div>
         </div>
         <div class="cpane" data-pane="campanha" role="tabpanel" hidden>
           <div class="ccard" id="camp-card"><img id="camp-card-img" alt=""><div style="flex:1;min-width:0"><div class="cc-top"><b id="camp-card-name">Comandante</b><span class="lvb" id="camp-card-lv">Nv 1</span></div><div class="xpbar"><i id="camp-card-xp"></i></div><div class="small muted" id="cmdr-mini"></div></div></div>
@@ -299,6 +308,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
           <div class="cgrid"><div class="opt"><label for="camp-diff">Dificuldade da missão</label><select id="camp-diff"><option value="facil">Fácil</option><option value="normal" selected>Normal</option><option value="dificil">Difícil</option><option value="fenda">Fenda (sem pausa)</option></select></div><div class="opt"><label>Raça</label><div class="small" id="camp-race-note">a escolhida ao lado</div></div></div>
           <button id="btn-camp-continue" class="btn primary big">Continuar campanha</button>
           <div class="row"><button id="btn-campaign" class="btn">Todas as missões</button><button id="btn-hangar" class="btn">Hangar</button></div>
+          <div class="saved" id="saved-camp" hidden></div>
         </div>
         <div class="cpane" data-pane="multi" role="tabpanel" hidden>
           <div class="chead"><b>Sala entre amigos</b><span>2 a 4 jogadores humanos, sem IAs</span></div><p class="cdesc">Crie a sala e mande o código, ou digite o código de um amigo e toque em Entrar.</p>
@@ -320,8 +330,9 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
     </div>
     <div class="notes">
       <div class="choose">Notas da versão</div>
+      <p class="start-notes"><b>4.1c — A partida não se perde:</b> o jogo agora <b>salva sozinho</b> a cada 10 segundos e sempre que você sai da aba, tanto na escaramuça quanto na campanha. Se a internet, a energia ou o navegador caírem e você abrir o jogo de novo em até 30 segundos, ele <b>volta direto para a partida</b>, pausado, no mesmo segundo em que parou. Depois disso, a tela inicial mostra o cartão <b>"Partida interrompida"</b> com o botão Retomar. O salvamento é uma fotografia exata do mundo, da IA e do roteiro da missão; não há replay. Ele ocupa cerca de 10 a 40 KB no aparelho. O botão <b>💾</b> (ou Ctrl+S) abre <b>três espaços de salvamento</b>, também na campanha. Também dá para <b>pausar e sair para continuar depois</b>. Na dificuldade Fenda não há salvamento manual, mas o automático continua valendo contra quedas. No <b>multiplayer</b>, quem cair tem <b>2 minutos para voltar</b> ao mesmo lugar: a reconexão é automática, mesmo depois de recarregar a página, e o anfitrião manda o estado da partida para quem voltou. Enquanto isso, as unidades de quem caiu ficam paradas. Cada salvamento é conferido: nos testes, partidas e as 20 missões retomadas seguiram idênticas às originais.</p>
+      <details class="oldnotes"><summary>Histórico das versões anteriores (4.1b → 2.0)</summary>
       <p class="start-notes"><b>4.1b — Painel de comando e O Grande Alinhamento:</b> o menu ao lado das Raças virou um <b>painel com abas</b> por modo de jogo: <b>Jogar</b> (escaramuça contra a IA), <b>Campanha</b>, <b>Multiplayer</b> e <b>Ajustes</b>. Cada aba mostra só o que importa para aquele modo, e o jogo lembra a última aba usada. A campanha mudou de nome: <b>O Grande Alinhamento</b>. De tempos em tempos os cinco mundos ficam em fila, como no logo, a Fenda se abre e o Domínio troca de mãos. Os atos agora são Primeira Luz, Penumbra, Rotas de Éter, Coro e Fome e Eclipse Total. Na aba Campanha, o botão <b>Continuar</b> começa a próxima missão em um clique, com a Raça escolhida ao lado e a dificuldade lembrada. No fim da missão, "Próxima missão" e "Repetir missão" também começam direto, sem passar de novo pelo briefing; os diálogos aparecem durante a partida. O <b>minimapa virou um radar redondo</b> que gira junto com a câmera: relevo sombreado, territórios, névoa, tempestades, varredura e o "N" apontando o norte. Tocar ou clicar no radar continua levando a câmera ao ponto certo. No multiplayer, a sala tem o próprio botão de início na aba Multiplayer.</p>
-      <details class="oldnotes"><summary>Histórico das versões anteriores (4.1a → 2.0)</summary>
       <p class="start-notes"><b>4.1a — Jogabilidade de campo:</b> no celular, com unidades selecionadas, tocar no chão ou numa construção sua <b>move o grupo</b> (antes o toque perto da base virava seleção). Construir no toque ficou em dois passos: <b>arraste o fantasma</b>, que fica acima do dedo, e <b>confirme no ✓</b>. A câmera abre mais com o celular em pé, o zoom vai mais longe e a barra inferior virou uma linha com botões grandes, sem esconder o painel. <b>Fila de produção de até 50</b>, agrupada com contador ×N e paga quando cada unidade começa: clique +1, Shift +5, Ctrl +10 e segurar +5 no toque; no chip, clique cancela uma e Shift cancela todas daquele tipo. <b>Dificuldades refeitas e medidas</b>: no Fácil a IA constrói e produz devagar, ataca só depois dos 12 minutos com parte do exército e não usa superarma; novo nível <b>Brutal</b>. <b>Cores ligadas à Raça</b> em solo, campanha e multiplayer, com o tom escolhido no <b>Hangar</b>, que agora sempre abre o 3D e mostra unidades típicas da Raça; o campo Título saiu e o título aparece sozinho. Noites mais legíveis, com luz de lua.</p>
       <p class="start-notes"><b>O que este beta testa:</b> construção com energia dinâmica, três recursos, Nódulos de território, roubo por Sifão, tabela de contras, névoa de guerra com camuflagem, diplomacia com Caução, superarmas e salas multiplayer P2P de 2 a 4 jogadores. Partidas de até 25 minutos.</p>
       <p class="start-notes"><b>4.0f — Beta aberto, celular e app instalável:</b> o jogo vira um <b>app</b> (manifesto e ícones; no Chrome e no Android aparece "Instalar o jogo"), com <b>service worker</b>: depois da primeira visita, a campanha e as partidas solo abrem e rodam <b>sem internet</b> (o multiplayer avisa que precisa de rede). A <b>qualidade 3D automática</b> agora lê a GPU, a memória e os núcleos (placas dedicadas, Apple M e Intel Arc começam no Alta; celulares fortes no Média) e <b>se ajusta sozinha</b> pelo FPS medido, descendo um degrau quando a partida fica abaixo de ~26 fps. Nova opção <b>Economia de bateria (30 fps)</b>, ligada sozinha no celular com bateria abaixo de 20%. No toque, <b>girar dois dedos gira a câmera</b> e alertas de perigo e superarmas <b>vibram</b>. Trocar de aba <b>pausa</b> a partida solo; no multiplayer o jogo avisa ao voltar. O botão <b>Feedback</b> abre uma issue no GitHub já com versão, build, navegador, GPU, qualidade, FPS, Raça e semente.</p>
@@ -351,7 +362,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
       <span id="clock">00:00</span>
       <span class="muted">Rep.: <span id="rep">Neutro</span></span>
       <span class="muted">Inimigos: <b id="enemies">0</b></span>
-      <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-sound" class="tb" title="Som">♪</button><button id="btn-voice" class="tb" title="Voz do sistema">🗣</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
+      <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-sound" class="tb" title="Som">♪</button><button id="btn-voice" class="tb" title="Voz do sistema">🗣</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-save" class="tb" title="Salvar partida (Ctrl+S)">💾</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
     </div>
     <div id="leader" hidden><div class="lframe"><img id="leader-img" class="lport" alt=""><div class="lscan"></div><img id="leader-badge" class="lbadge" alt="" hidden></div><div class="lname" id="leader-name"></div><div class="lsub" id="leader-sub">● em chamada</div></div>
     <div id="hints"><button id="hints-close" aria-label="Fechar dicas">✕</button><div id="hints-body"></div></div>
@@ -402,6 +413,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
   <div class="small muted" id="br-relics"></div>
   <div class="row"><button id="br-start" class="btn primary">Iniciar missão</button><button class="btn" data-close>Voltar</button></div>
 </div></div>
+<div id="savebox" class="modal" hidden><div class="box"><button class="mclose" data-close aria-label="Fechar">✕</button><div class="eyebrow">Partida</div><h2>Salvar partida</h2><p class="muted small" id="save-note"></p><div id="save-slots" class="slots"></div><div class="row"><button class="btn" id="save-park">Pausar e sair · continuar depois</button><button class="btn ghost" data-close>Voltar ao jogo</button></div></div></div>
 <div id="hangar" class="modal" hidden><div class="box wide"><button class="mclose" data-close aria-label="Fechar">✕</button>
   <div class="eyebrow">Personalização</div><h2>Hangar</h2>
   <div class="hg"><div class="hg-stage"><canvas id="hg-view" width="640" height="480"></canvas><div id="hg-loading" class="hg-loading" hidden>Carregando o 3D…</div></div><div class="hg-opts">
@@ -430,7 +442,8 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
   <tr><td>Segurar o botão direito e arrastar</td><td>Mover o mapa (o clique curto continua sendo o comando de mover/atacar)</td></tr>
   <tr><td>Q / E</td><td>Girar a câmera (modo 3D); no celular, o botão ⟳</td></tr>
   <tr><td>PageUp / PageDown, Ctrl + roda, botão ◢</td><td>Inclinar a câmera até o horizonte (o planeta-mãe da sua Raça aparece no céu); Home volta à visão tática</td></tr>
-  <tr><td>P / H / Esc</td><td>Pausar / ajuda / cancelar</td></tr></table>
+  <tr><td>P / H / Esc</td><td>Pausar / ajuda / cancelar</td></tr>
+  <tr><td>Ctrl+S ou 💾</td><td>Salvar a partida (3 espaços). O jogo também salva sozinho a cada 10 s; se a internet ou a energia cair, volta de onde parou</td></tr></table>
   <h3>Toque</h3>
   <table><tr><td>Toque</td><td>Toque em uma unidade sua para selecionar; duplo toque seleciona todas do tipo. Com unidades selecionadas: toque no chão move, toque no inimigo ataca, toque em nó ou carcaça colhe, toque em Refinaria inimiga com Pirata sifona.</td></tr><tr><td>Barra inferior</td><td>Núcleo, Exército, Na tela (seleciona o que aparece), Construir, Atacar (o modo fica ligado até desligar), Parar, Caixa (arrastar seleciona) e ✕ (limpar seleção).</td></tr><tr><td>Arrastar / dois dedos</td><td>Câmera / zoom; girar os dois dedos gira a câmera. Em modo Construir com Muro, arrastar desenha o muro. O botão ◢ inclina a câmera.</td></tr></table>
   <h3>Contras (atacante → alvo)</h3>

@@ -192,5 +192,8 @@ function think(sim, mem) {
   }
   return cmds;
 }
-ARD.ai = { create, think, STRATS };
+// 4.1c: memória da IA no salvamento (a tabela de dificuldade volta pelo nome; o mapa de prédios conhecidos vira lista)
+function snapshot(mem) { const o = S.jsonSafe(Object.assign({}, mem, { diff: null, known: null })); o.dn = Object.keys(S.DIFFICULTY).find(k => S.DIFFICULTY[k] === mem.diff) || 'normal'; o.known = [...mem.known].map(([id, k]) => [id, S.jsonSafe(k)]); return o; }
+function restore(o) { const mem = S.jsonBack(Object.assign({}, o, { known: null })); delete mem.dn; mem.diff = S.DIFFICULTY[o.dn] || S.DIFFICULTY.normal; mem.known = new Map(o.known.map(([id, k]) => [id, S.jsonBack(k)])); return mem; }
+ARD.ai = { create, think, STRATS, snapshot, restore };
 })(globalThis.ARD = globalThis.ARD || {});

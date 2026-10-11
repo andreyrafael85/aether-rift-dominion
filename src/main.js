@@ -17,7 +17,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.1b';
+const VERSION = '4.1c';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -97,6 +97,47 @@ function initStart() {
   { const pb = loadPrefs(); $('opt-bateria').checked = !!pb.bateria; $('opt-bateria').addEventListener('change', () => savePrefs(Object.assign(loadPrefs() || {}, { bateria: $('opt-bateria').checked }))); }
   // 4.0e — campanha, Hangar e progresso do Comandante
   if (ARD.campUI && ARD.campaign && ARD.progress) { try { ARD.campUI.init({ $, leaderArt, LEADER_NAME, RACE_COLORS, LEADER_FACE, startGame: cfg => { savePrefs(Object.assign(loadPrefs() || {}, { gfx: cfg.gfx, quality: cfg.quality, clima: cfg.clima, name: cfg.name })); startGame(cfg); }, selectedRace: () => (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar' }); if (params.get('campanha')) ARD.campUI.openCampaign(); } catch (e) { console.warn('[ARD] campanha indisponível:', e); } }
+  // 4.1c — retomada: cartão "Partida interrompida", listas de salvamentos e volta automática depois de uma queda curta (< 30 s)
+  const RESUME_AUTO_S = 30;
+  async function resumeFrom(slot, auto) {
+    let rec = null; try { rec = await ARD.saves.get(slot); } catch (e) { console.warn('[ARD] retomada: leitura falhou', e); }
+    if (!rec || !rec.data || !rec.data.sim) { refreshSaved(); return false; }
+    const d = rec.data; const cfg = Object.assign({}, d.cfg, { players: d.simCfg.players, seed: d.simCfg.seed, minutes: d.simCfg.minutes || d.cfg.minutes, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: d.cfg.clima || $('opt-clima').value, resume: d, resumeAt: rec.meta.savedAt, resumeAuto: auto ? Math.max(1, Math.round((Date.now() - rec.meta.savedAt) / 1000)) : 0 });
+    if (d.camp && ARD.campaign) { try { cfg.campaign = ARD.campaign.prepare(d.camp.id, d.camp.opts); cfg.campArgs = d.camp; } catch (e) { console.warn('[ARD] retomada: missão indisponível', e); return false; } }
+    try { startGame(cfg); return true; } catch (e) { console.error('[ARD] retomada falhou:', e); alert('Não foi possível retomar esta partida (' + e.message + '). Ela continua salva; envie o feedback.'); location.reload(); return false; }
+  }
+  function refreshSaved() {
+    if (!ARD.saves) return;
+    ARD.saves.list().then(list => {
+      const auto = list.find(m => m.slot === 'auto'); const card = $('resume-card');
+      if (card) { if (auto) { $('resume-title').textContent = auto.title; $('resume-sub').textContent = auto.sub + ' · ' + (auto.parked ? 'pausada ' : 'interrompida ') + ARD.saves.ago(auto.savedAt) + (auto.version !== VERSION ? ' · salva na versão ' + auto.version : ''); card.hidden = false; } else card.hidden = true; }
+      for (const [id, kind] of [['saved-solo', 'solo'], ['saved-camp', 'campanha']]) { const el = $(id); if (!el) continue; const rows = list.filter(m => m.slot !== 'auto' && m.kind === kind); el.hidden = !rows.length;
+        el.innerHTML = rows.length ? '<div class="sh">Partidas salvas</div>' + rows.map(m => `<div class="svrow"><div class="sv-t">${esc(m.title)}<small>${esc(m.sub)} · espaço ${m.slot.slice(1)} · ${ARD.saves.ago(m.savedAt)}</small></div><button class="btn" data-load="${m.slot}">Carregar</button><button class="btn ghost" data-del="${m.slot}" aria-label="Apagar">🗑</button></div>`).join('') : '';
+        el.querySelectorAll('[data-load]').forEach(b => b.onclick = () => resumeFrom(b.dataset.load, false));
+        el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (b.dataset.armed) ARD.saves.del(b.dataset.del).then(refreshSaved); else { b.dataset.armed = '1'; b.textContent = 'Apagar?'; setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = '🗑'; } }, 3000); } }); }
+    }).catch(e => console.warn('[ARD] salvamentos indisponíveis:', e));
+  }
+  if ($('btn-resume')) { $('btn-resume').addEventListener('click', () => resumeFrom('auto', false)); $('btn-resume-drop').addEventListener('click', e => { const b = e.currentTarget; if (b.dataset.armed) ARD.saves.del('auto').then(refreshSaved); else { b.dataset.armed = '1'; b.textContent = 'Descartar mesmo?'; setTimeout(() => { delete b.dataset.armed; b.textContent = 'Descartar'; }, 3000); } }); }
+  // 4.1c — convidado que recarregou a página (queda de energia, aba fechada) volta sozinho à sala em até 2 minutos
+  function rejoinAfterReload(ms) {
+    const card = $('resume-card'); const N = ARD.net.create(); let done = false; const t0 = Date.now();
+    const show = (t, sub, canCancel) => { if (!card) return; card.hidden = false; $('resume-title').textContent = t; $('resume-sub').textContent = sub; $('btn-resume').hidden = true; $('btn-resume-drop').textContent = canCancel ? 'Cancelar' : 'Fechar'; };
+    show('Voltando à sala ' + ms.code, 'Sua partida multiplayer caiu ' + ARD.saves.ago(ms.at) + '. Reconectando…', true);
+    $('btn-resume-drop').onclick = () => { done = true; mpSession.clear(); try { N.close(); } catch (e) {} card.hidden = true; $('btn-resume').hidden = false; $('btn-resume-drop').onclick = null; $('btn-resume-drop').textContent = 'Descartar'; refreshSaved(); };
+    N.on('state', st => { if (done) return; done = true; startGame(Object.assign({}, ms.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value, resume: { sim: st.snap, ais: [] } }), { net: N, myId: ms.id }); });
+    N.on('rejoin-no', d => { done = true; mpSession.clear(); show('Não deu para voltar à sala ' + ms.code, 'O anfitrião recusou: ' + (d.why || '?') + '.', false); });
+    N.on('error', () => {}); N.on('close', () => {}); N.on('rejoin-fail', () => {});
+    const attempt = first => { if (done) return; if (Date.now() - t0 > 120000) { done = true; mpSession.clear(); show('Não deu para voltar à sala ' + ms.code, 'A sala não respondeu em 2 minutos.', false); return; }
+      if (first || N.state !== 'connected') { N.rejoin(first ? { code: ms.code, id: ms.id, token: ms.token, me: Object.assign({}, ms.me, { build: BUILD }) } : null); $('resume-sub').textContent = 'Reconectando… tentativa ' + Math.ceil((Date.now() - t0 + 1) / 6000) + (navigator.onLine ? '' : ' (sem internet)'); }
+      setTimeout(() => attempt(false), 6000); };
+    attempt(true);
+  }
+  const msess = mpSession.load();
+  if (msess && msess.token && Date.now() - msess.at < 120000 && !params.get('autostart') && !params.get('novo')) rejoinAfterReload(msess);
+  else if (ARD.saves && !params.get('autostart') && !params.get('missao') && !params.get('novo') && !params.get('campanha'))
+    ARD.saves.meta('auto').then(m => { if (m && !m.parked && (params.get('retomar') || Date.now() - m.savedAt < RESUME_AUTO_S * 1000)) resumeFrom('auto', true).then(ok => { if (!ok) refreshSaved(); }); else refreshSaved(); }).catch(() => refreshSaved());
+  else refreshSaved();
+  if (msess && Date.now() - msess.at >= 120000) mpSession.clear();
   // a ajuda tambem precisa fechar na tela inicial (antes só era ligada dentro da partida); X e Esc fecham qualquer janela
   document.querySelectorAll('#help [data-close]').forEach(b => b.addEventListener('click', () => { $('help').hidden = true; }));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') for (const id of ['help', 'termos', 'priv', 'campaign', 'briefing', 'hangar']) { const m = $(id); if (m && !m.hidden) { m.hidden = true; e.stopPropagation(); } } }, true);
@@ -168,7 +209,7 @@ function initStart() {
     N.on('full', () => { mpStatus('A sala ' + code + ' está cheia ou a partida já começou.'); leaveLobby(); });
     N.on('close', () => { if (!lobby || lobby.N !== N || lobby.started) return; mpStatus('O anfitrião saiu da sala ' + code + '.'); leaveLobby(); });
     N.on('lobby', d => { if (!lobby || lobby.N !== N) return; lobby.size = d.size; renderLobby(d.players, d.size); mpStatus('Na sala ' + code + ' como ' + me.name + ' (' + d.players.length + '/' + d.size + '). A partida começa quando o anfitrião iniciar.'); });
-    N.on('start', d => { if (!lobby || lobby.N !== N) return; lobby.started = true; if (lobby.timer) clearInterval(lobby.timer); startGame(Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }), { net: N, myId: d.you }); });
+    N.on('start', d => { if (!lobby || lobby.N !== N) return; lobby.started = true; if (lobby.timer) clearInterval(lobby.timer); mpSession.save({ code: N.code, id: d.you, token: d.token || null, cfg: d.cfg, me }); startGame(Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }), { net: N, myId: d.you }); });
     N.join(code, me);
   }
   $('btn-join').addEventListener('click', () => joinRoom($('opt-code').value));
@@ -188,6 +229,14 @@ function initStart() {
   if (params.get('autostart')) { startGame({ name: 'Teste', faction: params.get('faction') || 'erevane', opp: params.get('opp') || '2', diff: params.get('diff') || 'normal', seed: parseInt(params.get('seed') || '5', 10), gfx: params.get('r') === '2d' ? '2d' : '3d' }); }
 }
 
+// 4.1c — sessão multiplayer do convidado: código, lugar e ficha para voltar à sala depois de recarregar a página
+const mpSession = {
+  KEY: 'ard-mp-session',
+  save(o) { try { localStorage.setItem(this.KEY, JSON.stringify(Object.assign({}, o, { at: Date.now() }))); } catch (e) {} },
+  load() { try { return JSON.parse(localStorage.getItem(this.KEY) || 'null'); } catch (e) { return null; } },
+  touch() { const o = this.load(); if (o) this.save(o); },
+  clear() { try { localStorage.removeItem(this.KEY); } catch (e) {} },
+};
 // ---------- game ----------
 function startGame(cfg, netCtx) {
   if (ARD.logo3d) ARD.logo3d.stop(); // libera o contexto WebGL do logo vivo antes da partida
@@ -201,6 +250,7 @@ function startGame(cfg, netCtx) {
   if (!cfg.players) for (let i = 0; i < parseInt(cfg.opp, 10); i++) { const f = facsAll[i % facsAll.length]; players.push({ name: aiNames[f][i % 3], faction: f, difficulty: cfg.diff }); }
   if (!netCtx && !cfg.campaign && ARD.campUI) ARD.campUI.applyColor(players); // tom da Raça escolhido no Hangar (solo)
   const sim = S.createSim({ seed: cfg.seed, players, minutes: cfg.minutes || 25 });
+  if (cfg.resume) S.restore(sim, cfg.resume.sim); // 4.1c: retomada a partir do salvamento (estado exato)
   const human = netCtx ? netCtx.myId : 0;
   const canvas = $('world'), mini = $('minimap'), overlay = $('overlay');
   $('start').hidden = true; $('game').hidden = false; $('end').hidden = true;
@@ -228,17 +278,19 @@ function startGame(cfg, netCtx) {
   const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.7 : 1.0, yaw: Math.PI / 4, pitch: 0.95, pitchT: 0.95 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
   const ui = makeUI(); // closures below
   const I = ARD.input.create({ canvas, sim, view, R, human, ui });
-  const ais = sim.players.filter(p => (!p.human && !(players[p.id] && players[p.id].passive)) || (!netCtx && params.get('ia') === 'todos')).map(p => ARD.ai.create(p.id, p.difficulty)); // ?ia=todos: a IA joga também pelo humano (capturas e testes)
+  const ais = cfg.resume ? cfg.resume.ais.map(ARD.ai.restore) : sim.players.filter(p => (!p.human && !(players[p.id] && players[p.id].passive)) || (!netCtx && params.get('ia') === 'todos')).map(p => ARD.ai.create(p.id, p.difficulty)); // ?ia=todos: a IA joga também pelo humano (capturas e testes)
   G = { sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null, net, pending: [], waiting: false, waitT: 0 };
   if (params.get('debug')) window.__ARDG = G; // testes automatizados
   G.track = ARD.campUI ? ARD.campUI.tracker(sim, human) : null; // conquistas valem em qualquer partida
+  if (cfg.resume && G.track && G.track.load) G.track.load(cfg.resume.track);
   { const pb = $('placebar'); if (pb) { $('pb-ok').onclick = () => I.confirmPlace(); $('pb-no').onclick = () => I.setMode('normal'); } } // 4.1a: confirmar construção no toque
   const measureBar = () => { const bar = $('bar'); if (bar && isTouch) document.documentElement.style.setProperty('--barh', bar.offsetHeight + 'px'); }; window.addEventListener('resize', measureBar); setTimeout(measureBar, 50);
   G.save30 = !!(loadPrefs() || {}).bateria; G.lastDraw = 0; G.haptics = isTouch && !!navigator.vibrate; G.lastBuzz = 0;
   G.perf = { start: performance.now(), t0: performance.now(), frames: 0, low: 0, high: 0, down: false, up: false, auto: R.is3d && !params.get('q') && (cfg.quality || 'auto') === 'auto' };
   if (isTouch && navigator.getBattery && !G.save30) navigator.getBattery().then(b => { if (b && !b.charging && b.level < 0.2) { G.save30 = true; notice('Bateria baixa: limitando a 30 fps para economizar'); } }).catch(() => {});
   document.addEventListener('visibilitychange', () => { if (!G || G.sim !== sim || G.ended) return; if (document.hidden) { if (!net && !G.paused) { G.paused = true; G.autoPaused = true; } } else { if (G.autoPaused) { G.autoPaused = false; notice('Pausado enquanto a aba estava em segundo plano · P ou ❚❚ para continuar'); refreshTop(); } else if (net) banner('Você voltou à partida', 'Com a aba em segundo plano o jogo não envia comandos; depois de 8 s a sala pode seguir sem você.', 'warn'); } });
-  G.camp = cfg.campaign && ARD.campUI ? ARD.campUI.begin(sim, cfg.campaign) : null; // 4.0e: missão da campanha
+  G.camp = cfg.campaign && ARD.campUI ? ARD.campUI.begin(sim, cfg.campaign, cfg.resume ? cfg.resume.run : null) : null; // 4.0e: missão da campanha (4.1c: ou a retomada dela)
+  G.cfg = cfg; setupSaves();
   if (R.is3d && ARD.campUI) R.skins = { [human]: ARD.campUI.skinOf(sim.players[human].faction) };
   window.addEventListener('resize', () => R.resize());
   document.body.classList.toggle('touch', isTouch);
@@ -248,7 +300,10 @@ function startGame(cfg, netCtx) {
   R.humanId = human;
   R.prepare(sim, f => { $('load-bar').style.width = Math.round(f * 100) + '%'; }, () => {
     $('loading').hidden = true;
-    const ff = net ? 0 : parseInt(params.get('ff') || '0', 10);
+    const ff = net || cfg.resume ? 0 : parseInt(params.get('ff') || '0', 10);
+    if (cfg.resume && cfg.resume.view) { const v = cfg.resume.view; Object.assign(view.cam, v.cam || {}); view.cam.pitchT = view.cam.pitch; if (v.memory) view.memory = new Map(v.memory); }
+    if (cfg.resume && net) { net.sentFor = sim.tick - 1; G.pending = []; banner('De volta à sala', 'Partida sincronizada com o anfitrião no tempo ' + ARD.saves.mmss(sim.time) + '.', 'good', 7000); }
+    else if (cfg.resume) { const fenda = G.camp && G.camp.noPause; if (!fenda) { G.paused = true; refreshTop(); } banner('Partida retomada', (cfg.resumeAuto ? 'Você voltou em ' + cfg.resumeAuto + ' s, ' : 'Salvamento de ' + ARD.saves.ago(cfg.resumeAt || Date.now()) + ', ') + 'no tempo ' + ARD.saves.mmss(sim.time) + ' de jogo.' + (fenda ? '' : ' Pausado: toque em ❚❚ ou P para continuar.'), 'info', 9000); }
     for (let i = 0; i < ff * 10; i++) tickOnce(true);
     if (net) setupNet();
     if (params.get('speed')) G.speed = parseFloat(params.get('speed')) || 1;
@@ -266,7 +321,7 @@ function startGame(cfg, netCtx) {
   function tickOnce(silent) {
     const sim = G.sim; const tick = sim.tick;
     if (net) {
-      if (net.sentFor == null || net.sentFor < tick) { net.scheduleLocal(tick + net.DELAY, G.pending); G.pending = []; net.sentFor = tick; }
+      if (net.sentFor == null || net.sentFor < tick) { if (net.scheduleLocal(tick + net.DELAY, G.pending) !== false) G.pending = []; net.sentFor = tick; }
       if (!net.canAdvance(tick)) { G.waiting = true; return false; }
       G.waiting = false;
     }
@@ -291,13 +346,14 @@ function startGame(cfg, netCtx) {
         else { pf.low = 0; pf.high = 0; } } } }
     let dt = Math.min(0.25, (now - G.last) / 1000); G.last = now;
     if (!G.paused && !G.ended) { G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { if (tickOnce(false) === false) { G.acc = Math.min(G.acc, S.TICK); break; } G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; }
-    if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; $('mp-wait').hidden = G.waitT < 0.8; if (G.waitT >= 0.8) $('mp-wait').textContent = net.state === 'lost' ? 'Conexão perdida.' : 'Aguardando os outros jogadores… (' + G.waitT.toFixed(0) + ' s)'; }
+    if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; $('mp-wait').hidden = G.waitT < 0.8; if (G.waitT >= 0.8) $('mp-wait').textContent = net.state === 'rejoining' || G.rejoin ? 'Reconectando à sala ' + net.code + '… (' + Math.round((performance.now() - (G.rejoin ? G.rejoin.since : performance.now())) / 1000) + ' s)' : net.state === 'lost' ? 'Conexão perdida.' : 'Aguardando os outros jogadores… (' + G.waitT.toFixed(0) + ' s)'; }
     I.update(dt);
     if (G.frameN % 3 === 0) refreshTop();
     if (G.frameN++ % 2 === 0) { refreshPanel(false); refreshQuick(); } // 4.1a: barato agora (vida e progresso atualizam no lugar)
     if (G.frameN % 30 === 0) refreshHints();
     if (G.camp && G.frameN % 10 === 0) { G.camp.frame(); if (R.setBeacon) R.setBeacon(G.camp.beacon(), G.camp.vip()); }
     R.draw(sim, view, G.paused ? 1 : Math.min(1, G.acc / S.TICK), dt);
+    if (G.autoSave && !G.ended && sim.tick !== G.savedTick && now - (G.lastSave || 0) > 10000) { G.lastSave = now; G.savedTick = sim.tick; (window.requestIdleCallback || ((f) => setTimeout(f, 0)))(() => G.saveNow('auto'), { timeout: 2000 }); }
     requestAnimationFrame(frame);
   }
   G.frameN = 0;
@@ -359,7 +415,45 @@ function startGame(cfg, netCtx) {
     const log = $('log'); const li = document.createElement('div'); li.textContent = mmss(sim.time) + ' · ' + e.text; log.prepend(li); while (log.children.length > 40) log.lastChild.remove();
   }
   function leaderMood(mood, ms) { const fac = sim.players[human].faction; const art = leaderArt(fac, mood); const L = $('leader'); if (!art || !L || L.hidden) return; $('leader-img').src = art; L.classList.remove('mood'); void L.offsetWidth; L.classList.add('mood'); clearTimeout(G.moodT); G.moodT = setTimeout(() => { $('leader-img').src = leaderArt(fac); }, ms || 4500); }
-  function banner(title, sub, kind) { const L = $('leader'); if (L && !L.hidden) { L.classList.remove('talk'); void L.offsetWidth; L.classList.add('talk'); } if (kind === 'danger' || kind === 'warn') leaderMood(2); else if (kind === 'good') leaderMood(3); const b = $('banner'); $('banner-title').textContent = title; $('banner-sub').textContent = sub || ''; b.className = 'banner ' + (kind || 'info'); b.hidden = false; clearTimeout(G.bannerT); G.bannerT = setTimeout(() => { b.hidden = true; }, 5000); }
+  // ---------- 4.1c: salvamento ----------
+  function setupSaves() {
+    G.autoSave = !net && !!ARD.saves && !params.get('semsalvar');
+    G.saveNow = (slot, extra) => { if (!G.autoSave || G.ended) return Promise.resolve(null);
+      let data, meta; try { data = buildSave(); meta = saveMeta(extra); } catch (e) { console.warn('[ARD] salvamento: fotografia falhou', e); return Promise.resolve(null); }
+      return ARD.saves.put(slot, meta, data).catch(e => { console.warn('[ARD] salvamento falhou:', e); return null; }); };
+    if (!G.autoSave) return;
+    document.addEventListener('visibilitychange', () => { if (document.hidden && G && G.sim === sim && !G.ended) G.saveNow('auto'); });
+    window.addEventListener('pagehide', () => { if (G && G.sim === sim && !G.ended) G.saveNow('auto'); });
+    window.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S') && G && G.sim === sim && !G.ended) { e.preventDefault(); openSaveBox(); } });
+  }
+  function buildSave() {
+    const c = view.cam;
+    return { v: 1, version: VERSION, build: BUILD, human, simCfg: S.jsonSafe(sim.cfg), cfg: { name: cfg.name, faction: sim.players[human].faction, opp: cfg.opp, diff: cfg.diff, seed: sim.seed, minutes: cfg.minutes || 25, clima: cfg.clima },
+      camp: cfg.campArgs || null, sim: S.snapshot(sim), ais: G.ais.map(ARD.ai.snapshot), run: G.camp ? G.camp.run.save() : null, track: G.track && G.track.save ? G.track.save() : null,
+      view: { cam: { x: c.x, y: c.y, zoom: c.zoom, yaw: c.yaw, pitch: c.pitch }, memory: [...view.memory] } };
+  }
+  function saveMeta(extra) {
+    const me = sim.players[human]; const fac = (S.FACTIONS[me.faction] || {}).name || me.faction; const foes = sim.players.filter(q => q.id !== human);
+    const dl = { facil: 'Fácil', normal: 'Normal', dificil: 'Difícil', brutal: 'Brutal', fenda: 'Fenda' };
+    const title = G.camp ? 'Campanha · ' + G.camp.prep.mission.title : 'Escaramuça · ' + fac + ' contra ' + foes.length + (foes.length > 1 ? ' IAs' : ' IA');
+    const sub = (G.camp ? fac + ' · ' + G.camp.prep.diff.label : (dl[cfg.diff] || cfg.diff || '')) + ' · ' + ARD.saves.mmss(sim.time) + ' de jogo' + ' · ' + foes.filter(q => q.alive).length + ' adversário(s) de pé';
+    return Object.assign({ kind: G.camp ? 'campanha' : 'solo', title, sub, gameTime: sim.time, faction: me.faction, version: VERSION, noPause: !!(G.camp && G.camp.noPause) }, extra || {});
+  }
+  function openSaveBox() {
+    const box = $('savebox'); if (!box) return; if (!G.autoSave) { notice('Sem salvamento no multiplayer'); return; }
+    const fenda = G.camp && G.camp.noPause; const wasPaused = G.paused; if (!fenda && !G.paused) { G.paused = true; refreshTop(); }
+    const close = () => { box.hidden = true; if (!fenda && !wasPaused) { G.paused = false; refreshTop(); } };
+    box.querySelectorAll('[data-close]').forEach(b => { b.onclick = close; });
+    $('save-note').textContent = fenda ? 'Na dificuldade Fenda não há salvamento manual. O salvamento automático continua protegendo contra queda de internet ou energia.' : 'O jogo também salva sozinho a cada 10 segundos e ao sair da aba. Se a internet ou a energia cair, ele volta de onde parou.';
+    const draw = () => ARD.saves.list().then(list => { const by = {}; for (const m of list) by[m.slot] = m;
+      $('save-slots').innerHTML = ['m1', 'm2', 'm3'].map((sl, i) => { const m = by[sl]; return `<button class="slot" data-slot="${sl}" ${fenda ? 'disabled' : ''}><b>Espaço ${i + 1}</b><span>${m ? esc(m.title) + '<br><small>' + esc(m.sub) + ' · salvo ' + ARD.saves.ago(m.savedAt) + '</small>' : '<small>vazio</small>'}</span></button>`; }).join('');
+      $('save-slots').querySelectorAll('[data-slot]').forEach(b => b.onclick = () => { const sl = b.dataset.slot; const go = () => G.saveNow(sl).then(m => { if (m) { notice('Partida salva no espaço ' + sl.slice(1)); draw(); } else notice('Não foi possível salvar neste aparelho'); });
+        if (by[sl]) ui.confirm('Substituir o que está no espaço ' + sl.slice(1) + '?', go); else go(); }); });
+    draw();
+    $('save-park').onclick = () => G.saveNow('auto', { parked: true }).then(m => { if (m) location.reload(); else notice('Não foi possível salvar neste aparelho'); });
+    box.hidden = false;
+  }
+  function banner(title, sub, kind, ms) { const L = $('leader'); if (L && !L.hidden) { L.classList.remove('talk'); void L.offsetWidth; L.classList.add('talk'); } if (kind === 'danger' || kind === 'warn') leaderMood(2); else if (kind === 'good') leaderMood(3); const b = $('banner'); $('banner-title').textContent = title; $('banner-sub').textContent = sub || ''; b.className = 'banner ' + (kind || 'info'); b.hidden = false; clearTimeout(G.bannerT); G.bannerT = setTimeout(() => { b.hidden = true; }, ms || 5000); }
   function notice(text) { const n = $('notice'); n.textContent = text; n.classList.add('show'); clearTimeout(G.noticeT); G.noticeT = setTimeout(() => n.classList.remove('show'), 2200); }
 
   // ---------- HUD ----------
@@ -466,7 +560,8 @@ function startGame(cfg, netCtx) {
     $('btn-super').addEventListener('click', () => superClick(fac()));
     $('btn-diplo').addEventListener('click', () => openDiplo());
     $('btn-help').addEventListener('click', () => toggleHelp(true));
-    $('btn-menu').addEventListener('click', () => ui.confirm('Encerrar esta partida e voltar ao início?', () => location.reload()));
+    $('btn-menu').addEventListener('click', () => ui.confirm('Encerrar esta partida e voltar ao início?' + (G.autoSave ? ' Para continuar depois, use 💾 › Pausar e sair.' : ''), () => { const go = () => location.reload(); if (net) mpSession.clear(); if (G.autoSave && ARD.saves) ARD.saves.del('auto').then(go, go); else go(); }));
+    if ($('btn-save')) $('btn-save').addEventListener('click', () => openSaveBox());
     $('btn-build').addEventListener('click', () => { I.buildMenu = !I.buildMenu; view.sel = new Set(); ui.buildMenuChanged(I.buildMenu); });
     $('btn-attack').addEventListener('click', () => I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'));
     $('btn-box').addEventListener('click', () => { I.touchBox = !I.touchBox; refreshQuick(); notice(I.touchBox ? 'Arraste para selecionar em caixa' : 'Arraste para mover a câmera'); });
@@ -547,14 +642,23 @@ function startGame(cfg, netCtx) {
     log('', 'Sala ' + net.code + ': ' + sim.players.map(p => p.name).join(', ') + '.');
     $('chat-in').addEventListener('keydown', e => { if (e.key === 'Enter') { const t = $('chat-in').value.trim(); if (t) { net.chat(t); log(myName, t); } $('chat-in').value = ''; e.stopPropagation(); } e.stopPropagation(); });
     net.on('chat', d => { const nm = d.name || (sim.players[d.id] || {}).name || '?'; const tx = String(d.text || '').slice(0, 120); log(nm, tx); notice(nm + ': ' + tx.slice(0, 60)); AU.sfx('click'); });
-    net.on('left', d => { const nm = (sim.players[d.id] || {}).name || d.name || 'Um jogador'; banner('Jogador desconectado', nm + ' saiu da partida; as unidades dele ficam paradas.', 'warn'); log('', nm + ' desconectou.'); });
-    net.on('close', () => { if (net.role === 'guest') { banner('Conexão perdida', 'A ligação com o anfitrião caiu; a partida não pode continuar.', 'danger'); log('', 'Conexão perdida com o anfitrião.'); } });
+    net.on('left', d => { const nm = (sim.players[d.id] || {}).name || d.name || 'Um jogador'; banner('Jogador desconectado', nm + ' caiu; as unidades dele ficam paradas. Se voltar em até 2 minutos, retoma o comando.', 'warn'); log('', nm + ' desconectou.'); });
+    // 4.1c: queda curta não encerra a partida. O convidado tenta voltar à sala por até 2 min; o anfitrião guarda o lugar e manda o estado.
+    const tryRejoin = () => { if (!G.rejoin || G.ended || G.sim !== sim) return; if (performance.now() - G.rejoin.since > 120000) { G.rejoin = null; banner('Não foi possível voltar à sala', 'O anfitrião não respondeu em 2 minutos. A partida terminou para você.', 'danger', 12000); log('', 'Volta à sala esgotada.'); return; }
+      G.rejoin.tries++; net.rejoin(); clearTimeout(G.rejoin.t); G.rejoin.t = setTimeout(() => { if (G.rejoin && net.state !== 'connected') tryRejoin(); }, 6000); };
+    net.on('close', () => { if (net.role !== 'guest' || G.ended) return; if (!G.rejoin) { G.rejoin = { since: performance.now(), tries: 0 }; banner('Conexão perdida', 'Tentando voltar à sala… a partida continua de onde parou.', 'warn', 8000); log('', 'Conexão perdida com o anfitrião; reconectando.'); setTimeout(tryRejoin, 1500); } });
+    net.on('rejoin-fail', () => {});
+    net.on('rejoin-no', d => { if (G.rejoin) clearTimeout(G.rejoin.t); G.rejoin = null; mpSession.clear(); banner('A sala recusou a volta', 'Motivo: ' + (d.why || '?') + '.', 'danger', 12000); log('', 'Volta recusada: ' + (d.why || '?')); });
+    net.on('state', st => { if (G.rejoin) clearTimeout(G.rejoin.t); G.rejoin = null; try { S.restore(sim, st.snap); } catch (e) { banner('Falha ao sincronizar', String(e.message || e), 'danger'); return; } net.sentFor = sim.tick - 1; G.pending = []; G.acc = 0; G.waiting = false; banner('De volta à sala', 'Partida sincronizada no tempo ' + ARD.saves.mmss(sim.time) + '.', 'good', 6000); log('', 'Reconectado à sala ' + net.code + '.'); });
+    net.on('rejoin-request', () => ({ tick: sim.tick, snap: S.snapshot(sim) }));
+    net.on('back', d => { const nm = (sim.players[d.id] || {}).name || d.name || 'Um jogador'; banner('Jogador voltou', nm + ' voltou à partida.', 'good'); log('', nm + ' voltou.'); });
+    if (net.role === 'guest') { mpSession.touch(); setInterval(() => { if (!G.ended && net.state === 'connected') mpSession.touch(); }, 5000); }
     net.on('desync', d => { banner('Dessincronização', 'Os mundos divergiram no tick ' + d.tick + '. Isto não deveria acontecer; exporte o resultado no fim e envie o feedback com os navegadores usados.', 'danger'); log('', 'Dessincronização no tick ' + d.tick + ' (jogador ' + ((sim.players[d.id] || {}).name || d.id) + ').'); });
     if (net.role === 'host') setInterval(() => net.ping(), 5000);
   }
   // ---------- end ----------
   function endGame(result) {
-    if (G.ended) return; G.ended = true;
+    if (G.ended) return; G.ended = true; if (G.autoSave && ARD.saves) ARD.saves.del('auto'); if (net) mpSession.clear(); // partida terminada não volta
     if (result.campaign) { // 4.0e: fim de missão
       const r = result.campaign; const prep = G.camp.prep; const scores = sim.players.map(q => ({ id: q.id, name: q.name, score: q.alive ? S.score(sim, q) : 0, alive: q.alive }));
       result = { outcome: r.won ? 'victory' : 'defeat', reason: r.reason, scores };

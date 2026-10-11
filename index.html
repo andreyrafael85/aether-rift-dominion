@@ -216,6 +216,13 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 .foot-logo{width:30px;height:30px;border-radius:50%;vertical-align:middle;margin-right:.45rem;border:1px solid var(--line)}
 .dp-lead{width:42px;height:42px;border-radius:8px;object-fit:cover;vertical-align:middle;margin-right:.45rem;border:1px solid var(--line)}
 /* 4.0e — campanha, briefing, Hangar e HUD de missão */
+/* 4.1c — salvamentos */
+.resume{display:flex;gap:.8rem;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:.8rem 1rem;background:linear-gradient(90deg,color-mix(in srgb,var(--race) 26%,#14171d),#14171d 80%);border-bottom:1px solid color-mix(in srgb,var(--race) 50%,var(--line));animation:rsPulse 2.4s ease-in-out infinite}
+.resume b{font-family:var(--fd);font-size:1.35rem;text-transform:uppercase;letter-spacing:.02em}.rs-btns{display:flex;gap:.5rem}.rs-txt{min-width:0}
+@keyframes rsPulse{50%{box-shadow:inset 0 0 22px color-mix(in srgb,var(--race) 30%,transparent)}}@media (prefers-reduced-motion:reduce){.resume{animation:none}}
+.saved{display:grid;gap:.4rem;border-top:1px solid var(--line);padding-top:.6rem}.saved .sh{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--fg2)}
+.svrow{display:flex;gap:.5rem;align-items:center;border:1px solid var(--line);border-radius:8px;padding:.45rem .6rem;background:#11141a}.svrow .sv-t{flex:1;min-width:0;font-size:.84rem}.svrow .sv-t small{display:block;color:var(--fg2)}.svrow .btn{min-height:36px;padding:.3rem .7rem}
+.slots{display:grid;gap:.5rem;margin:.6rem 0}.slot{display:grid;grid-template-columns:auto 1fr;gap:.8rem;align-items:center;text-align:left;background:#11141a;border:1px solid var(--line);border-radius:10px;padding:.7rem .8rem;color:var(--fg);cursor:pointer;font:inherit}.slot:hover:not(:disabled){border-color:var(--race)}.slot b{font-family:var(--fd);font-size:1.2rem;text-transform:uppercase}.slot small{color:var(--fg2)}.slot:disabled{opacity:.5;cursor:default}
 /* 4.1b — painel de comando com abas */
 .console{padding:0;overflow:hidden;border-color:color-mix(in srgb,var(--race) 45%,var(--line));box-shadow:0 0 0 1px rgba(0,0,0,.5),0 18px 40px rgba(0,0,0,.35),0 0 34px color-mix(in srgb,var(--race) 14%,transparent)}
 .ctabs{display:grid;grid-template-columns:repeat(4,1fr);background:#0f1217;border-bottom:1px solid var(--line)}
@@ -276,12 +283,13 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
 <div id="start" class="screen">
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Versão 4.1b · build 2026-10-11 02:19Z · painel com abas · O Grande Alinhamento · radar · multiplayer 2 a 4</div>
+    <div class="eyebrow">Versão 4.1c · build 2026-10-11 02:58Z · salvamento automático · volta à sala · O Grande Alinhamento · multiplayer 2 a 4</div>
     <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div><h1>Aether Rift<br><span>Dominion</span></h1></div></div>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
       <div><div class="choose">Escolha sua Raça</div><div class="fac-cards" id="fac-cards" style="margin-top:1rem"></div></div>
       <div class="opts console">
+        <div id="resume-card" class="resume" hidden><div class="rs-txt"><div class="eyebrow">Partida interrompida</div><b id="resume-title"></b><div class="small muted" id="resume-sub"></div></div><div class="rs-btns"><button class="btn primary" id="btn-resume">Retomar</button><button class="btn ghost" id="btn-resume-drop">Descartar</button></div></div>
         <div class="ctabs" role="tablist" aria-label="Modos de jogo">
           <button class="ctab on" data-tab="jogar" role="tab" aria-selected="true"><span class="ci">⚔</span>Jogar</button><button class="ctab" data-tab="campanha" role="tab" aria-selected="false"><span class="ci">✦</span>Campanha</button><button class="ctab" data-tab="multi" role="tab" aria-selected="false"><span class="ci">⇄</span>Multiplayer</button><button class="ctab" data-tab="ajustes" role="tab" aria-selected="false"><span class="ci">⚙</span>Ajustes</button>
         </div>
@@ -292,6 +300,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
           <details class="adv"><summary>Mapa e clima</summary><div class="opt"><label for="opt-seed">Semente do mapa</label><input id="opt-seed" inputmode="numeric"></div><div class="opt"><label for="opt-clima">Clima do campo (efeito dentro da partida)</label><select id="opt-clima"><option value="auto">Automático (pelo bioma)</option><option value="toxica">Névoa tóxica</option><option value="plasma">Tempestade de plasma</option><option value="cristais">Chuva de cristais</option><option value="aurora">Aurora da Fenda</option><option value="acida">Chuva ácida</option></select></div></details>
           <button id="btn-start" class="btn primary big">Iniciar partida</button>
           <div class="row"><button id="btn-help-start" class="btn ghost">Como jogar</button></div>
+          <div class="saved" id="saved-solo" hidden></div>
         </div>
         <div class="cpane" data-pane="campanha" role="tabpanel" hidden>
           <div class="ccard" id="camp-card"><img id="camp-card-img" alt=""><div style="flex:1;min-width:0"><div class="cc-top"><b id="camp-card-name">Comandante</b><span class="lvb" id="camp-card-lv">Nv 1</span></div><div class="xpbar"><i id="camp-card-xp"></i></div><div class="small muted" id="cmdr-mini"></div></div></div>
@@ -299,6 +308,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
           <div class="cgrid"><div class="opt"><label for="camp-diff">Dificuldade da missão</label><select id="camp-diff"><option value="facil">Fácil</option><option value="normal" selected>Normal</option><option value="dificil">Difícil</option><option value="fenda">Fenda (sem pausa)</option></select></div><div class="opt"><label>Raça</label><div class="small" id="camp-race-note">a escolhida ao lado</div></div></div>
           <button id="btn-camp-continue" class="btn primary big">Continuar campanha</button>
           <div class="row"><button id="btn-campaign" class="btn">Todas as missões</button><button id="btn-hangar" class="btn">Hangar</button></div>
+          <div class="saved" id="saved-camp" hidden></div>
         </div>
         <div class="cpane" data-pane="multi" role="tabpanel" hidden>
           <div class="chead"><b>Sala entre amigos</b><span>2 a 4 jogadores humanos, sem IAs</span></div><p class="cdesc">Crie a sala e mande o código, ou digite o código de um amigo e toque em Entrar.</p>
@@ -320,8 +330,9 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
     </div>
     <div class="notes">
       <div class="choose">Notas da versão</div>
+      <p class="start-notes"><b>4.1c — A partida não se perde:</b> o jogo agora <b>salva sozinho</b> a cada 10 segundos e sempre que você sai da aba, tanto na escaramuça quanto na campanha. Se a internet, a energia ou o navegador caírem e você abrir o jogo de novo em até 30 segundos, ele <b>volta direto para a partida</b>, pausado, no mesmo segundo em que parou. Depois disso, a tela inicial mostra o cartão <b>"Partida interrompida"</b> com o botão Retomar. O salvamento é uma fotografia exata do mundo, da IA e do roteiro da missão; não há replay. Ele ocupa cerca de 10 a 40 KB no aparelho. O botão <b>💾</b> (ou Ctrl+S) abre <b>três espaços de salvamento</b>, também na campanha. Também dá para <b>pausar e sair para continuar depois</b>. Na dificuldade Fenda não há salvamento manual, mas o automático continua valendo contra quedas. No <b>multiplayer</b>, quem cair tem <b>2 minutos para voltar</b> ao mesmo lugar: a reconexão é automática, mesmo depois de recarregar a página, e o anfitrião manda o estado da partida para quem voltou. Enquanto isso, as unidades de quem caiu ficam paradas. Cada salvamento é conferido: nos testes, partidas e as 20 missões retomadas seguiram idênticas às originais.</p>
+      <details class="oldnotes"><summary>Histórico das versões anteriores (4.1b → 2.0)</summary>
       <p class="start-notes"><b>4.1b — Painel de comando e O Grande Alinhamento:</b> o menu ao lado das Raças virou um <b>painel com abas</b> por modo de jogo: <b>Jogar</b> (escaramuça contra a IA), <b>Campanha</b>, <b>Multiplayer</b> e <b>Ajustes</b>. Cada aba mostra só o que importa para aquele modo, e o jogo lembra a última aba usada. A campanha mudou de nome: <b>O Grande Alinhamento</b>. De tempos em tempos os cinco mundos ficam em fila, como no logo, a Fenda se abre e o Domínio troca de mãos. Os atos agora são Primeira Luz, Penumbra, Rotas de Éter, Coro e Fome e Eclipse Total. Na aba Campanha, o botão <b>Continuar</b> começa a próxima missão em um clique, com a Raça escolhida ao lado e a dificuldade lembrada. No fim da missão, "Próxima missão" e "Repetir missão" também começam direto, sem passar de novo pelo briefing; os diálogos aparecem durante a partida. O <b>minimapa virou um radar redondo</b> que gira junto com a câmera: relevo sombreado, territórios, névoa, tempestades, varredura e o "N" apontando o norte. Tocar ou clicar no radar continua levando a câmera ao ponto certo. No multiplayer, a sala tem o próprio botão de início na aba Multiplayer.</p>
-      <details class="oldnotes"><summary>Histórico das versões anteriores (4.1a → 2.0)</summary>
       <p class="start-notes"><b>4.1a — Jogabilidade de campo:</b> no celular, com unidades selecionadas, tocar no chão ou numa construção sua <b>move o grupo</b> (antes o toque perto da base virava seleção). Construir no toque ficou em dois passos: <b>arraste o fantasma</b>, que fica acima do dedo, e <b>confirme no ✓</b>. A câmera abre mais com o celular em pé, o zoom vai mais longe e a barra inferior virou uma linha com botões grandes, sem esconder o painel. <b>Fila de produção de até 50</b>, agrupada com contador ×N e paga quando cada unidade começa: clique +1, Shift +5, Ctrl +10 e segurar +5 no toque; no chip, clique cancela uma e Shift cancela todas daquele tipo. <b>Dificuldades refeitas e medidas</b>: no Fácil a IA constrói e produz devagar, ataca só depois dos 12 minutos com parte do exército e não usa superarma; novo nível <b>Brutal</b>. <b>Cores ligadas à Raça</b> em solo, campanha e multiplayer, com o tom escolhido no <b>Hangar</b>, que agora sempre abre o 3D e mostra unidades típicas da Raça; o campo Título saiu e o título aparece sozinho. Noites mais legíveis, com luz de lua.</p>
       <p class="start-notes"><b>O que este beta testa:</b> construção com energia dinâmica, três recursos, Nódulos de território, roubo por Sifão, tabela de contras, névoa de guerra com camuflagem, diplomacia com Caução, superarmas e salas multiplayer P2P de 2 a 4 jogadores. Partidas de até 25 minutos.</p>
       <p class="start-notes"><b>4.0f — Beta aberto, celular e app instalável:</b> o jogo vira um <b>app</b> (manifesto e ícones; no Chrome e no Android aparece "Instalar o jogo"), com <b>service worker</b>: depois da primeira visita, a campanha e as partidas solo abrem e rodam <b>sem internet</b> (o multiplayer avisa que precisa de rede). A <b>qualidade 3D automática</b> agora lê a GPU, a memória e os núcleos (placas dedicadas, Apple M e Intel Arc começam no Alta; celulares fortes no Média) e <b>se ajusta sozinha</b> pelo FPS medido, descendo um degrau quando a partida fica abaixo de ~26 fps. Nova opção <b>Economia de bateria (30 fps)</b>, ligada sozinha no celular com bateria abaixo de 20%. No toque, <b>girar dois dedos gira a câmera</b> e alertas de perigo e superarmas <b>vibram</b>. Trocar de aba <b>pausa</b> a partida solo; no multiplayer o jogo avisa ao voltar. O botão <b>Feedback</b> abre uma issue no GitHub já com versão, build, navegador, GPU, qualidade, FPS, Raça e semente.</p>
@@ -351,7 +362,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
       <span id="clock">00:00</span>
       <span class="muted">Rep.: <span id="rep">Neutro</span></span>
       <span class="muted">Inimigos: <b id="enemies">0</b></span>
-      <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-sound" class="tb" title="Som">♪</button><button id="btn-voice" class="tb" title="Voz do sistema">🗣</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
+      <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-sound" class="tb" title="Som">♪</button><button id="btn-voice" class="tb" title="Voz do sistema">🗣</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-save" class="tb" title="Salvar partida (Ctrl+S)">💾</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
     </div>
     <div id="leader" hidden><div class="lframe"><img id="leader-img" class="lport" alt=""><div class="lscan"></div><img id="leader-badge" class="lbadge" alt="" hidden></div><div class="lname" id="leader-name"></div><div class="lsub" id="leader-sub">● em chamada</div></div>
     <div id="hints"><button id="hints-close" aria-label="Fechar dicas">✕</button><div id="hints-body"></div></div>
@@ -402,6 +413,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
   <div class="small muted" id="br-relics"></div>
   <div class="row"><button id="br-start" class="btn primary">Iniciar missão</button><button class="btn" data-close>Voltar</button></div>
 </div></div>
+<div id="savebox" class="modal" hidden><div class="box"><button class="mclose" data-close aria-label="Fechar">✕</button><div class="eyebrow">Partida</div><h2>Salvar partida</h2><p class="muted small" id="save-note"></p><div id="save-slots" class="slots"></div><div class="row"><button class="btn" id="save-park">Pausar e sair · continuar depois</button><button class="btn ghost" data-close>Voltar ao jogo</button></div></div></div>
 <div id="hangar" class="modal" hidden><div class="box wide"><button class="mclose" data-close aria-label="Fechar">✕</button>
   <div class="eyebrow">Personalização</div><h2>Hangar</h2>
   <div class="hg"><div class="hg-stage"><canvas id="hg-view" width="640" height="480"></canvas><div id="hg-loading" class="hg-loading" hidden>Carregando o 3D…</div></div><div class="hg-opts">
@@ -430,7 +442,8 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
   <tr><td>Segurar o botão direito e arrastar</td><td>Mover o mapa (o clique curto continua sendo o comando de mover/atacar)</td></tr>
   <tr><td>Q / E</td><td>Girar a câmera (modo 3D); no celular, o botão ⟳</td></tr>
   <tr><td>PageUp / PageDown, Ctrl + roda, botão ◢</td><td>Inclinar a câmera até o horizonte (o planeta-mãe da sua Raça aparece no céu); Home volta à visão tática</td></tr>
-  <tr><td>P / H / Esc</td><td>Pausar / ajuda / cancelar</td></tr></table>
+  <tr><td>P / H / Esc</td><td>Pausar / ajuda / cancelar</td></tr>
+  <tr><td>Ctrl+S ou 💾</td><td>Salvar a partida (3 espaços). O jogo também salva sozinho a cada 10 s; se a internet ou a energia cair, volta de onde parou</td></tr></table>
   <h3>Toque</h3>
   <table><tr><td>Toque</td><td>Toque em uma unidade sua para selecionar; duplo toque seleciona todas do tipo. Com unidades selecionadas: toque no chão move, toque no inimigo ataca, toque em nó ou carcaça colhe, toque em Refinaria inimiga com Pirata sifona.</td></tr><tr><td>Barra inferior</td><td>Núcleo, Exército, Na tela (seleciona o que aparece), Construir, Atacar (o modo fica ligado até desligar), Parar, Caixa (arrastar seleciona) e ✕ (limpar seleção).</td></tr><tr><td>Arrastar / dois dedos</td><td>Câmera / zoom; girar os dois dedos gira a câmera. Em modo Construir com Muro, arrastar desenha o muro. O botão ◢ inclina a câmera.</td></tr></table>
   <h3>Contras (atacante → alvo)</h3>
@@ -688,13 +701,15 @@ const DIFFICULTY = {
 
 function mulberry32(seed) {
   let a = seed >>> 0;
-  return function () {
+  const r = function () {
     a = (a + 0x6D2B79F5) >>> 0;
     let t = a;
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+  r.state = () => a; r.setState = v => { a = v >>> 0; }; // 4.1c: estado do gerador entra no salvamento
+  return r;
 }
 function dist(ax, ay, bx, by) { return DM.hypot(ax - bx, ay - by); }
 function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
@@ -1793,12 +1808,52 @@ function hash(sim) { // cheap state hash for determinism tests
   return h >>> 0;
 }
 
+// ---------- 4.1c: salvamento e retomada (fotografia exata do estado) ----------
+// Só o que muda durante a partida: o mapa estático (biomas, adereços) é refeito pelo createSim com o mesmo cfg.
+// Índices derivados (byId, grade espacial, campos de fluxo) são reconstruídos; números especiais (-0, ±Infinity, NaN) viajam marcados.
+const b64 = u8 => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return (typeof btoa === 'function' ? btoa(s) : Buffer.from(s, 'binary').toString('base64')); };
+const unb64 = str => { const s = typeof atob === 'function' ? atob(str) : Buffer.from(str, 'base64').toString('binary'); const u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; };
+function jsonSafe(v) { // cópia profunda só com JSON puro; preserva -0, ±Infinity e NaN
+  if (typeof v === 'number') { if (Number.isFinite(v)) return Object.is(v, -0) ? { $n: '-0' } : v; return { $n: String(v) }; }
+  if (v === null || typeof v !== 'object') return typeof v === 'function' ? undefined : v;
+  if (Array.isArray(v)) return v.map(jsonSafe);
+  const o = {}; for (const k of Object.keys(v)) { const x = v[k]; if (x === undefined || typeof x === 'function') continue; o[k] = jsonSafe(x); } return o;
+}
+function jsonBack(v) {
+  if (v === null || typeof v !== 'object') return v;
+  if (Array.isArray(v)) return v.map(jsonBack);
+  if (typeof v.$n === 'string' && Object.keys(v).length === 1) return v.$n === '-0' ? -0 : Number(v.$n);
+  const o = {}; for (const k of Object.keys(v)) o[k] = jsonBack(v[k]); return o;
+}
+function snapshot(sim) {
+  const nav = sim.nav;
+  return { v: 1, hash: hash(sim), tick: sim.tick, time: sim.time, seed: sim.seed, nextId: sim.nextId, maxTime: sim.maxTime, rand: sim.rand.state(),
+    ents: jsonSafe(sim.ents), players: jsonSafe(sim.players), cmdQueue: jsonSafe(sim.cmdQueue), pending: jsonSafe(sim.pending), result: jsonSafe(sim.result),
+    storm: jsonSafe(sim.storm), nextStorm: jsonSafe(sim.nextStorm), vis: sim.vis.map(st => [...st]), explored: sim.explored.map(b64),
+    navDirty: !!sim.navDirty, nav: { blocked: b64(nav.blocked), gates: [...nav.gates], gatePos: [...nav.gatePos].map(([i, e]) => [i, e.id]), version: nav.version },
+    auras: sim.auras ? sim.auras.map(a => ({ anchors: a.anchors.map(e => e.id), moldes: a.moldes.map(e => e.id), diapasoes: a.diapasoes.map(e => e.id) })) : null };
+}
+// aplica a fotografia num sim recém-criado com o mesmo cfg (createSim) e devolve o mesmo objeto
+function restore(sim, snap) {
+  if (!snap || snap.v !== 1) throw new Error('salvamento em formato desconhecido');
+  sim.tick = snap.tick; sim.time = snap.time; sim.seed = snap.seed; sim.nextId = snap.nextId; sim.maxTime = snap.maxTime; sim.rand.setState(snap.rand);
+  sim.ents = jsonBack(snap.ents); sim.players = jsonBack(snap.players); sim.cmdQueue = jsonBack(snap.cmdQueue); sim.pending = jsonBack(snap.pending); sim.result = jsonBack(snap.result);
+  sim.storm = jsonBack(snap.storm); sim.nextStorm = jsonBack(snap.nextStorm); sim.vis = snap.vis.map(a => new Set(a)); sim.explored = snap.explored.map(unb64);
+  sim.byId = new Map(); for (const e of sim.ents) sim.byId.set(e.id, e);
+  const nav = sim.nav; nav.blocked = unb64(snap.nav.blocked); nav.gates = new Map(snap.nav.gates); nav.gatePos = new Map(snap.nav.gatePos.map(([i, id]) => [i, sim.byId.get(id)]).filter(x => x[1])); nav.fields = new Map(); nav.version = snap.nav.version; sim.navDirty = snap.navDirty;
+  sim.grid = new Map(); rebuildGrid(sim);
+  if (snap.auras) sim.auras = snap.auras.map(a => ({ anchors: a.anchors.map(id => sim.byId.get(id)).filter(Boolean), moldes: a.moldes.map(id => sim.byId.get(id)).filter(Boolean), diapasoes: a.diapasoes.map(id => sim.byId.get(id)).filter(Boolean) }));
+  sim.events = []; sim._evRet = 0;
+  const h = hash(sim); if (h !== snap.hash) console.warn('[ARD] retomada: hash ' + h + ' difere do salvo ' + snap.hash);
+  return sim;
+}
+
 ARD.sim = {
   TICK, WORLD, CX, CY, RIFT_R, FACTIONS, BUILDINGS, UNITS, WEAPONS, COUNTER, CLASS_NAMES, VET_RANKS, unitCost, RESEARCH, REGIME, DIFFICULTY, REP_NAMES,
   SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS, RACE_SHADES, assignColors, FACTION_EXTRAS, producesFor,
   NAV, NW, TILE, TILES, BIOMES, navIdx, passable, flowField, lineFree, inStorm,
   DM,
-  createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint, spawnUnit, forceStorm,
+  createSim, step, enqueue, snapshot, restore, jsonSafe, jsonBack, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint, spawnUnit, forceStorm,
 };
 })(globalThis.ARD = globalThis.ARD || {});
 
@@ -1996,7 +2051,10 @@ function think(sim, mem) {
   }
   return cmds;
 }
-ARD.ai = { create, think, STRATS };
+// 4.1c: memória da IA no salvamento (a tabela de dificuldade volta pelo nome; o mapa de prédios conhecidos vira lista)
+function snapshot(mem) { const o = S.jsonSafe(Object.assign({}, mem, { diff: null, known: null })); o.dn = Object.keys(S.DIFFICULTY).find(k => S.DIFFICULTY[k] === mem.diff) || 'normal'; o.known = [...mem.known].map(([id, k]) => [id, S.jsonSafe(k)]); return o; }
+function restore(o) { const mem = S.jsonBack(Object.assign({}, o, { known: null })); delete mem.dn; mem.diff = S.DIFFICULTY[o.dn] || S.DIFFICULTY.normal; mem.known = new Map(o.known.map(([id, k]) => [id, S.jsonBack(k)])); return mem; }
+ARD.ai = { create, think, STRATS, snapshot, restore };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Teste de estilo: pipeline de sprites voxel pré-renderizados em isométrico (2:1), gerados em tempo de carga. Sem assets externos. */
@@ -3054,6 +3112,61 @@ function reset() { state = blank(); save(); return state; }
 ARD.progress = { KEY, MAX_LEVEL, LEVEL_XP, load, save, levelOf, levelInfo, addXp, mission, completeMission, unlock, has, grantRelic, equipRelic, setHangar, setName, addPlayTime, exportCode, importCode, reset, _blank: blank };
 })(globalThis.ARD = globalThis.ARD || {});
 
+/* Aether Rift: Dominion — salvamentos (4.1c).
+   Guarda partidas solo e de campanha no aparelho: um espaço automático ("auto", gravado a cada poucos segundos e ao sair
+   da aba) e três espaços manuais. Cada registro tem um resumo (meta) para listar rápido e os dados da partida comprimidos
+   com gzip quando o navegador tem CompressionStream. Usa IndexedDB; sem ele, cai para o localStorage. */
+(function (ARD) {
+'use strict';
+const DB_NAME = 'ard-saves', STORE = 'saves', LS_PREFIX = 'ard-save-';
+const SLOTS = ['auto', 'm1', 'm2', 'm3'];
+let dbp = null;
+function openDb() {
+  if (dbp) return dbp;
+  dbp = new Promise((res, rej) => {
+    try {
+      if (!('indexedDB' in globalThis) || !indexedDB) { rej(new Error('sem IndexedDB')); return; }
+      const rq = indexedDB.open(DB_NAME, 1);
+      rq.onupgradeneeded = () => { const db = rq.result; if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE); };
+      rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error || new Error('IndexedDB falhou')); rq.onblocked = () => rej(new Error('IndexedDB bloqueado'));
+    } catch (e) { rej(e); }
+  });
+  dbp.catch(() => { dbp = null; });
+  return dbp;
+}
+function tx(mode, fn) { return openDb().then(db => new Promise((res, rej) => { const t = db.transaction(STORE, mode); const st = t.objectStore(STORE); let out; const r = fn(st); if (r) r.onsuccess = () => { out = r.result; }; t.oncomplete = () => res(out); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error || new Error('transação abortada')); })); }
+const canGzip = typeof CompressionStream === 'function' && typeof DecompressionStream === 'function' && typeof Blob === 'function' && typeof Response === 'function';
+async function pack(obj) {
+  const json = JSON.stringify(obj);
+  if (!canGzip) return { enc: 'json', body: json, size: json.length };
+  try { const blob = await new Response(new Blob([json]).stream().pipeThrough(new CompressionStream('gzip'))).blob(); return { enc: 'gzip', body: blob, size: blob.size, raw: json.length }; }
+  catch (e) { return { enc: 'json', body: json, size: json.length }; }
+}
+async function unpack(rec) {
+  if (rec.enc === 'gzip') { const txt = await new Response(rec.body.stream().pipeThrough(new DecompressionStream('gzip'))).text(); return JSON.parse(txt); }
+  return JSON.parse(rec.body);
+}
+// localStorage: só texto; sem gzip (o tamanho cabe: 60–300 KB por partida)
+const ls = {
+  put(slot, meta, data) { localStorage.setItem(LS_PREFIX + slot, JSON.stringify({ meta, enc: 'json', body: JSON.stringify(data) })); },
+  get(slot) { const t = localStorage.getItem(LS_PREFIX + slot); return t ? JSON.parse(t) : null; },
+  del(slot) { localStorage.removeItem(LS_PREFIX + slot); },
+};
+async function put(slot, meta, data) {
+  meta = Object.assign({}, meta, { slot, savedAt: Date.now() });
+  try { const p = await pack(data); meta.bytes = p.size; await tx('readwrite', st => st.put({ meta, enc: p.enc, body: p.body }, slot)); try { ls.del(slot); } catch (e) {} return meta; }
+  catch (e) { ls.put(slot, meta, data); meta.bytes = (localStorage.getItem(LS_PREFIX + slot) || '').length; return meta; }
+}
+async function getRec(slot) { try { const r = await tx('readonly', st => st.get(slot)); if (r) return r; } catch (e) {} try { return ls.get(slot); } catch (e) { return null; } }
+async function get(slot) { const r = await getRec(slot); if (!r) return null; return { meta: r.meta, data: await unpack(r) }; }
+async function meta(slot) { const r = await getRec(slot); return r ? r.meta : null; }
+async function list() { const out = []; for (const s of SLOTS) { try { const m = await meta(s); if (m) out.push(m); } catch (e) {} } return out; }
+async function del(slot) { try { await tx('readwrite', st => st.delete(slot)); } catch (e) {} try { ls.del(slot); } catch (e) {} }
+function ago(ts) { const s = Math.max(0, Math.round((Date.now() - ts) / 1000)); if (s < 60) return 'há ' + s + ' s'; const m = Math.round(s / 60); if (m < 60) return 'há ' + m + ' min'; const h = Math.round(m / 60); if (h < 48) return 'há ' + h + ' h'; return 'há ' + Math.round(h / 24) + ' dias'; }
+const mmss = t => Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0');
+ARD.saves = { SLOTS, put, get, meta, list, del, ago, mmss, gzip: canGzip };
+})(globalThis.ARD = globalThis.ARD || {});
+
 /* Aether Rift: Dominion — Campanha "O Grande Alinhamento" (4.0e; renomeada na 4.1b): atos, missões com roteiro, conquistas, relíquias e o executor.
    Missões são partidas solo com objetivos (principais e bônus), falas dos líderes e eventos roteirizados (ondas, comboios,
    pactos forçados, tempestades, escolta). O executor roda depois de cada passo da simulação e só usa comandos e utilitários
@@ -3260,10 +3373,10 @@ function prepare(id, o) {
 }
 
 // ---------- executor ----------
-function start(sim, prep) {
+function start(sim, prep, saved) { // saved (4.1c): estado do roteiro gravado; o sim já vem restaurado
   const m = prep.mission, D = prep.diff; const me = sim.players[0]; const en = sim.players.slice(1).map(p => p.id);
-  if (m.startTime) { sim.time = m.startTime; sim.tick = Math.round(m.startTime / S.TICK); sim.nextStorm += m.startTime; }
-  const t0 = sim.time; const said = []; const objectives = m.objectives.map(o => ({ id: o.id, text: o.text, bonus: !!o.bonus, final: !!o.final, done: false, progress: '' }));
+  if (m.startTime && !saved) { sim.time = m.startTime; sim.tick = Math.round(m.startTime / S.TICK); sim.nextStorm += m.startTime; }
+  let t0 = sim.time; const said = []; const objectives = m.objectives.map(o => ({ id: o.id, text: o.text, bonus: !!o.bonus, final: !!o.final, done: false, progress: '' }));
   const c = { sim, me, en, D, st: { waves: 0, crates: 0, produced: 0 }, kills: {}, lost: {}, t: 0, waveIds: {}, holds: {}, lastEvery: {} };
   const ob = id => objectives.find(o => o.id === id);
   Object.assign(c, {
@@ -3334,7 +3447,12 @@ function start(sim, prep) {
       else if (sim.result && !result) result = { won: false, reason: sim.result.reason || 'O tempo acabou.', stars: 0, time: c.t };
     },
     takeSaid() { return said.splice(0); },
+    // 4.1c: tudo o que o roteiro guarda entre os passos (objetivos, contadores, gatilhos já disparados)
+    save() { const cs = {}; for (const k of Object.keys(c)) { if (['sim', 'me', 'en', 'D'].includes(k) || typeof c[k] === 'function') continue; cs[k] = S.jsonSafe(c[k]); }
+      return { t0, objectives: S.jsonSafe(objectives), c: cs, fired: [...fired], result: S.jsonSafe(result), lastEval }; },
+    load(st) { t0 = st.t0; st.objectives.forEach((o, i) => { if (objectives[i] && objectives[i].id === o.id) Object.assign(objectives[i], S.jsonBack(o)); }); for (const k in st.c) c[k] = S.jsonBack(st.c[k]); fired.clear(); for (const f of st.fired) fired.add(f); result = S.jsonBack(st.result); lastEval = st.lastEval; },
   };
+  if (saved) runner.load(saved);
   return runner;
 }
 function missionsOfAct(act) { return M.filter(m => m.act === act); }
@@ -3399,7 +3517,8 @@ function launch(id, race, diff) {
   const $ = D.$; const m = C.BY_ID[id]; if (!m) return; race = m.race || race || D.selectedRace(); diff = diff || 'normal';
   const prep = C.prepare(id, { race, difficulty: diff, relics: P.load().relics.equipped, name: ($('opt-name').value.trim() || P.load().commander.name || 'Comandante').slice(0, 18), color: colorFor(race) });
   try { const pf = JSON.parse(localStorage.getItem('ard-beta-prefs') || '{}'); pf.campDiff = diff; localStorage.setItem('ard-beta-prefs', JSON.stringify(pf)); } catch (e) {}
-  D.startGame({ name: prep.cfg.players[0].name, faction: race, seed: prep.cfg.seed, minutes: prep.cfg.minutes, players: prep.cfg.players, campaign: prep, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value });
+  const campArgs = { id, opts: { race, difficulty: diff, relics: P.load().relics.equipped.slice(), name: prep.cfg.players[0].name, color: colorFor(race) } };
+  D.startGame({ name: prep.cfg.players[0].name, faction: race, seed: prep.cfg.seed, minutes: prep.cfg.minutes, players: prep.cfg.players, campaign: prep, campArgs, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value });
 }
 // próxima missão a jogar: a primeira liberada ainda sem vitória; com tudo vencido, a última liberada
 function currentMission() { const s = P.load(); let last = null; for (const m of C.MISSIONS) { if (!C.unlocked(m.id, s)) continue; const pr = s.missions[m.id] || {}; if (!pr.won && !(pr.stars > 0)) return m; last = m; } return last || C.MISSIONS[0]; }
@@ -3460,7 +3579,8 @@ function applyHangar() { const h = P.load().hangar; for (const r of RACES) D.LEA
 function tracker(sim, human) {
   const st = { cls: new Set(), walls: 0, dmgAt600: null, pactDone: false };
   return { st, tick(ev) { for (const e of ev) { if (e.t === 'spawn' && e.p === human) { const u = S.UNITS[e.def]; if (u && u.attack) st.cls.add(u.cls); } else if (e.t === 'built' && e.p === human && e.def === 'muro') st.walls++; else if (e.t === 'alert' && e.p === human && typeof e.text === 'string' && e.text.startsWith('Pacto cumprido')) st.pactDone = true; }
-    if (st.dmgAt600 === null && sim.time >= 600) st.dmgAt600 = sim.players[human].stats.dmg; } };
+    if (st.dmgAt600 === null && sim.time >= 600) st.dmgAt600 = sim.players[human].stats.dmg; },
+    save: () => ({ cls: [...st.cls], walls: st.walls, dmgAt600: st.dmgAt600, pactDone: st.pactDone }), load(o) { if (!o) return; st.cls = new Set(o.cls || []); st.walls = o.walls || 0; st.dmgAt600 = o.dmgAt600 == null ? null : o.dmgAt600; st.pactDone = !!o.pactDone; } };
 }
 function evalAchievements(won, sim, human, tr, camp) {
   const p = sim.players[human]; const n = S.nucleoOf(sim, human); const out = []; const u = id => { if (P.unlock(id)) out.push(id); };
@@ -3474,12 +3594,12 @@ function evalAchievements(won, sim, human, tr, camp) {
 function grantXp(xp) { const lv = P.addXp(xp); const out = { xp, from: lv.from, to: lv.to, relics: [], ach: [] }; for (let l = lv.from + 1; l <= lv.to; l++) { const rid = C.RELIC_BY_LEVEL[l]; if (rid && P.grantRelic(rid)) out.relics.push(rid); } if (lv.to >= 10 && P.unlock('comandante-10')) out.ach.push('comandante-10'); if (lv.to >= 30 && P.unlock('comandante-30')) out.ach.push('comandante-30'); return out; }
 
 // ---------- sessão de missão (HUD) ----------
-function begin(sim, prep) {
-  const $ = D.$; const run = C.start(sim, prep); const queue = []; let showing = null, until = 0;
+function begin(sim, prep, saved) {
+  const $ = D.$; const run = C.start(sim, prep, saved || null); const queue = []; let showing = null, until = 0;
   const comms = () => { const now = performance.now(); if (showing && now < until) return; if (!queue.length) { if (showing) { $('comms').hidden = true; showing = null; } return; } showing = queue.shift(); until = now + Math.max(4200, 1800 + showing.text.length * 55);
     const art = D.leaderArt(showing.race, showing.mood); $('comms-img').src = art || ''; $('comms-img').hidden = !art; $('comms-name').textContent = (D.LEADER_NAME[showing.race] || raceName(showing.race)) + ' · ' + raceName(showing.race); $('comms-text').textContent = showing.text; $('comms').style.setProperty('--cc', D.RACE_COLORS[showing.race] || '#FF5E3A'); $('comms').hidden = false; };
   const hud = () => { $('ob-title').textContent = prep.mission.title; $('ob-list').innerHTML = run.objectives.map(o => `<li class="${o.done ? 'ok' : ''} ${o.bonus ? 'bn' : ''}"><span>${o.done ? '✓' : o.bonus ? '★' : '○'}</span><span>${esc(o.text.replace(/^Bônus: /, ''))}</span>${o.progress && !o.done ? `<span class="pg">${esc(o.progress)}</span>` : ''}</li>`).join(''); };
-  for (const sd of run.brief()) queue.push(sd); $('objectives').hidden = false; hud();
+  if (!saved) for (const sd of run.brief()) queue.push(sd); else queue.push({ race: sim.players[0].faction, mood: 1, text: 'De volta ao comando. A missão continua de onde parou.' }); $('objectives').hidden = false; hud();
   const sess = { prep, run, hud, noPause: !!prep.diff.noPause,
     tick(ev) { run.tick(ev); for (const sd of run.takeSaid()) queue.push(sd); comms(); return run.result; },
     frame() { comms(); hud(); },
@@ -4536,16 +4656,18 @@ ARD.audio = A;
    tick T sem o pacote. Também: sala por código, lista de jogadores, checksums por tick, chat e aviso de desconexão. */
 (function (ARD) {
 'use strict';
-const PROTO = 2; // versão do protocolo: anfitrião e convidados precisam coincidir
+const PROTO = 3; // versão do protocolo: anfitrião e convidados precisam coincidir (3: volta à sala depois de queda, 4.1c)
 const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function makeCode() { let c = ''; for (let i = 0; i < 6; i++) c += ALPHA[Math.floor(Math.random() * ALPHA.length)]; return c; }
 const errText = t => ({ 'peer-unavailable': 'sala não encontrada (código errado ou anfitrião offline)', 'network': 'sem conexão com o servidor de sinalização', 'server-error': 'servidor de sinalização indisponível', 'browser-incompatible': 'navegador sem WebRTC', 'unavailable-id': 'código em uso' }[t] || t);
 function create() {
-  const N = { state: 'idle', role: null, code: null, size: 2, id: 0, me: null, started: false, peer: null, hostConn: null, guests: [], players: [], handlers: {}, DELAY: 3, bundles: new Map(), collect: new Map(), hashes: new Map(), desync: false, dropped: new Set(), rtt: 0 };
+  const N = { state: 'idle', role: null, code: null, size: 2, id: 0, me: null, started: false, peer: null, hostConn: null, guests: [], players: [], handlers: {}, DELAY: 3, bundles: new Map(), collect: new Map(), hashes: new Map(), desync: false, dropped: new Set(), rtt: 0, tokens: {}, droppedAt: {}, activeFrom: {}, grace: {}, holdUntil: 0, REJOIN_MS: 120000 };
+  const mkToken = () => { let t = ''; for (let i = 0; i < 16; i++) t += ALPHA[Math.floor(Math.random() * ALPHA.length)]; return t; };
+  const PART = 6000; // pedaços do estado na volta de um jogador: o canal JSON do PeerJS recusa mensagens de 16 KB ou mais (aspas escapadas e acentos quase dobram o tamanho)
   N.on = (t, fn) => { N.handlers[t] = fn; };
   function fire(t, p) { if (N.handlers[t]) N.handlers[t](p); }
   function sendTo(conn, msg) { try { conn.send(msg); } catch (e) {} }
-  function broadcast(msg, except) { for (const g of N.guests) if (g.open && g.conn !== except) sendTo(g.conn, msg); }
+  function broadcast(msg, except) { for (const g of N.guests) if (g.open && (g.ready || !N.started) && g.conn !== except) sendTo(g.conn, msg); }
   const readyGuests = () => N.guests.filter(g => g.ready);
   N.roster = () => N.role === 'host' ? [{ id: 0, name: N.me.name, faction: N.me.faction, color: N.me.color || null }].concat(readyGuests().map((g, i) => ({ id: i + 1, name: g.name, faction: g.faction, color: g.color || null }))) : N.players;
   function lobbyMsg() { return { t: 'lobby', players: N.roster(), size: N.size }; }
@@ -4555,7 +4677,7 @@ function create() {
     const g = { conn, name: '', faction: 'vehnar', ready: false, open: false, id: -1, rtt: 0 };
     N.guests.push(g);
     const full = () => N.started || readyGuests().length >= N.size - 1;
-    conn.on('open', () => { g.open = true; if (full()) { sendTo(conn, { t: 'full' }); setTimeout(() => { try { conn.close(); } catch (e) {} }, 400); } });
+    conn.on('open', () => { g.open = true; if (!N.started && full()) { sendTo(conn, { t: 'full' }); setTimeout(() => { try { conn.close(); } catch (e) {} }, 400); } }); // partida em andamento: espera o primeiro recado (pode ser a volta de quem caiu)
     conn.on('data', d => {
       if (!d || typeof d !== 'object') return;
       if (d.t === 'hello') {
@@ -4566,17 +4688,30 @@ function create() {
         if (d.build && N.me.build && d.build !== N.me.build) fire('warn', { message: 'build diferente em ' + g.name + ' (' + d.build + ' × ' + N.me.build + '); se algo falhar, Ctrl+F5 nos dois lados' });
         sendTo(conn, { t: 'welcome', size: N.size, v: PROTO, build: N.me.build || '' }); pushLobby();
       }
-      else if (d.t === 'cmds') { if (g.id >= 0 && !N.dropped.has(g.id)) { put(d.tick, g.id, d.cmds || []); tryBundle(d.tick); } }
+      else if (d.t === 'rejoin') { // 4.1c: jogador que caiu volta para o mesmo lugar com a ficha que recebeu no início
+        const id = d.id | 0; const okTok = N.started && N.tokens[id] && d.token === N.tokens[id];
+        if (okTok && !N.dropped.has(id)) { const old = N.guests.find(x => x !== g && x.id === id); if (old) { old.replaced = true; old.ready = false; old.open = false; const k = N.guests.indexOf(old); if (k >= 0) N.guests.splice(k, 1); try { old.conn.close(); } catch (e) {} } N.dropped.add(id); N.droppedAt[id] = Date.now(); const lm = { t: 'left', id, name: old ? old.name : '' }; broadcast(lm, conn); fire('left', lm); } // a conexão antiga ainda não tinha caído: a ficha assume o lugar
+        const fresh = N.droppedAt[id] != null && Date.now() - N.droppedAt[id] < N.REJOIN_MS;
+        if (d.v !== PROTO || !okTok || !N.dropped.has(id) || !fresh) { sendTo(conn, { t: 'rejoin-no', why: !okTok ? 'ficha inválida' : !fresh ? 'tempo de volta esgotado' : d.v !== PROTO ? 'versão diferente' : 'lugar ocupado' }); setTimeout(() => { try { conn.close(); } catch (e) {} }, 500); return; }
+        const info = (N.players || []).find(x => x.id === id) || {}; g.id = id; g.name = info.name || 'Jogador'; g.faction = info.faction || 'vehnar'; g.ready = true; g.open = true;
+        const st = N.handlers['rejoin-request'] ? N.handlers['rejoin-request']({ id }) : null; if (!st) { sendTo(conn, { t: 'rejoin-no', why: 'partida indisponível' }); return; }
+        const from = st.tick + N.DELAY + 1; N.dropped.delete(id); delete N.droppedAt[id]; N.activeFrom[id] = from; N.grace[id] = Date.now() + 30000; // quem volta pode levar alguns segundos carregando o 3D
+        const bundles = []; for (const [t, cmds] of N.bundles) if (t >= st.tick) bundles.push([t, cmds]);
+        const body = JSON.stringify({ tick: st.tick, snap: st.snap, bundles, from, players: N.players }); const n = Math.ceil(body.length / PART);
+        for (let i = 0; i < n; i++) sendTo(conn, { t: 'state-part', i, n, s: body.slice(i * PART, (i + 1) * PART) });
+        const m = { t: 'back', id, name: g.name }; broadcast(m, conn); fire('back', m);
+      }
+      else if (d.t === 'cmds') { if (g.id >= 0 && !N.dropped.has(g.id) && !(N.activeFrom[g.id] > d.tick)) { put(d.tick, g.id, d.cmds || []); tryBundle(d.tick); } }
       else if (d.t === 'hash') { if (g.id >= 0) checkHash(d.tick, d.h, g.id); }
       else if (d.t === 'chat') { const m = { t: 'chat', id: g.id, name: g.name, text: String(d.text || '').slice(0, 120) }; broadcast(m, conn); fire('chat', m); }
       else if (d.t === 'pong') { g.rtt = performance.now() - d.s; N.rtt = Math.max.apply(null, N.guests.map(x => x.rtt || 0)); }
     });
     let gone = false;
     const onGone = () => {
-      if (gone) return; gone = true; const wasReady = g.ready; g.open = false; g.ready = false;
+      if (gone || g.replaced) return; gone = true; const wasReady = g.ready; g.open = false; g.ready = false;
       const i = N.guests.indexOf(g); if (i >= 0) N.guests.splice(i, 1);
       console.warn('[ARD] rede: conexão fechada de ' + (g.name || '?') + ' (id ' + g.id + ', started=' + N.started + ')');
-      if (N.started) { if (g.id >= 0 && !N.dropped.has(g.id)) { N.dropped.add(g.id); const m = { t: 'left', id: g.id, name: g.name }; broadcast(m); fire('left', m); for (const t of Array.from(N.collect.keys())) tryBundle(t); } }
+      if (N.started) { if (g.id >= 0 && !N.dropped.has(g.id)) { N.dropped.add(g.id); N.droppedAt[g.id] = Date.now(); const m = { t: 'left', id: g.id, name: g.name }; broadcast(m); fire('left', m); for (const t of Array.from(N.collect.keys())) tryBundle(t); } }
       else if (wasReady) pushLobby();
     };
     conn.on('close', onGone); conn.on('error', onGone);
@@ -4590,6 +4725,7 @@ function create() {
       N.peer = new Peer('aether-rift-' + N.code.toLowerCase(), { debug: 0 });
       N.peer.on('open', () => { if (onReady) onReady(N.code); });
       N.peer.on('connection', conn => bindGuest(conn));
+      N.peer.on('disconnected', () => { setTimeout(() => { try { if (N.peer && !N.peer.destroyed) N.peer.reconnect(); } catch (e) {} }, 1500); });
       N.peer.on('error', e => { const type = String(e && e.type || e); if (type === 'unavailable-id' && tries++ < 3) { try { N.peer.destroy(); } catch (x) {} open(); return; } fire('error', { message: errText(type) }); });
     };
     open();
@@ -4598,46 +4734,63 @@ function create() {
     N.me = { name: cfg.players[0].name, faction: cfg.players[0].faction, color: cfg.players[0].color || null };
     const rg = readyGuests(); rg.forEach((g, i) => { g.id = i + 1; });
     N.players = N.roster(); N.started = true;
-    for (const g of rg) sendTo(g.conn, { t: 'start', cfg, you: g.id, players: N.players });
+    for (const g of rg) { N.tokens[g.id] = mkToken(); sendTo(g.conn, { t: 'start', cfg, you: g.id, players: N.players, token: N.tokens[g.id] }); }
     for (const g of N.guests) if (!g.ready && g.open) { sendTo(g.conn, { t: 'full' }); }
   };
   // ---- convidado
   function send(msg) { if (N.hostConn && N.state === 'connected') try { N.hostConn.send(msg); } catch (e) {} }
+  function bindHost(conn, rejoin) {
+    N.hostConn = conn; let parts = null;
+    conn.on('open', () => { N.state = 'connected'; if (rejoin) send({ t: 'rejoin', id: N.id, token: N.token, v: PROTO }); else send({ t: 'hello', name: N.me.name, faction: N.me.faction, color: N.me.color || null, v: PROTO, build: N.me.build || '' }); fire('open', { rejoin: !!rejoin }); });
+    conn.on('data', d => {
+      if (!d || typeof d !== 'object' || N.hostConn !== conn) return;
+      if (d.t === 'welcome') { if (d.v !== PROTO) { N.state = 'lost'; fire('error', { message: 'versão do jogo diferente da do anfitrião; atualizem a página (Ctrl+F5) nos dois lados' }); try { conn.close(); } catch (e) {} return; } N.size = d.size; if (d.build && N.me.build && d.build !== N.me.build) fire('warn', { message: 'build diferente do anfitrião (' + d.build + ' × ' + N.me.build + '); se algo falhar, Ctrl+F5 nos dois lados' }); }
+      else if (d.t === 'bad-version') { N.state = 'lost'; fire('error', { message: 'versão do jogo diferente da do anfitrião; atualizem a página (Ctrl+F5) nos dois lados' }); }
+      else if (d.t === 'lobby') { N.players = d.players; N.size = d.size; fire('lobby', d); }
+      else if (d.t === 'full') { N.state = 'full'; fire('full', {}); }
+      else if (d.t === 'start') { N.started = true; N.id = d.you; N.players = d.players; N.token = d.token || null; fire('start', d); }
+      else if (d.t === 'tick') N.bundles.set(d.tick, d.cmds || []);
+      else if (d.t === 'chat') fire('chat', d);
+      else if (d.t === 'left') { N.dropped.add(d.id); fire('left', d); }
+      else if (d.t === 'back') { N.dropped.delete(d.id); fire('back', d); }
+      else if (d.t === 'desync') { N.desync = true; fire('desync', d); }
+      else if (d.t === 'ping') send({ t: 'pong', s: d.s });
+      else if (d.t === 'rejoin-no') { N.state = 'refused'; fire('rejoin-no', d); }
+      else if (d.t === 'state-part') { // 4.1c: estado da partida para quem voltou
+        if (!parts || parts.n !== d.n) parts = { n: d.n, got: 0, s: new Array(d.n) }; if (parts.s[d.i] == null) { parts.s[d.i] = d.s; parts.got++; }
+        if (parts.got === parts.n) { const st = JSON.parse(parts.s.join('')); parts = null; N.started = true; N.bundles = new Map(st.bundles); N.holdUntil = st.from; N.players = st.players || N.players; N.dropped.delete(N.id); fire('state', st); }
+      }
+    });
+    conn.on('close', () => { if (N.hostConn !== conn) return; if (N.state !== 'full' && N.state !== 'refused') N.state = 'lost'; fire('close', {}); });
+    conn.on('error', e => { if (N.hostConn !== conn) return; N.state = 'lost'; fire('error', { message: String(e && e.message || e) }); });
+  }
   N.join = function (code, me) {
     if (typeof Peer === 'undefined') { fire('error', { message: 'PeerJS não carregou' }); return; }
     N.role = 'guest'; N.me = me; N.code = code.trim().toUpperCase(); N.state = 'joining';
     N.peer = new Peer({ debug: 0 });
-    N.peer.on('open', () => {
-      const conn = N.peer.connect('aether-rift-' + N.code.toLowerCase(), { reliable: true, serialization: 'json' }); N.hostConn = conn;
-      conn.on('open', () => { N.state = 'connected'; send({ t: 'hello', name: me.name, faction: me.faction, color: me.color || null, v: PROTO, build: me.build || '' }); fire('open', {}); });
-      conn.on('data', d => {
-        if (!d || typeof d !== 'object') return;
-        if (d.t === 'welcome') { if (d.v !== PROTO) { N.state = 'lost'; fire('error', { message: 'versão do jogo diferente da do anfitrião; atualizem a página (Ctrl+F5) nos dois lados' }); try { conn.close(); } catch (e) {} return; } N.size = d.size; if (d.build && me.build && d.build !== me.build) fire('warn', { message: 'build diferente do anfitrião (' + d.build + ' × ' + me.build + '); se algo falhar, Ctrl+F5 nos dois lados' }); }
-        else if (d.t === 'bad-version') { N.state = 'lost'; fire('error', { message: 'versão do jogo diferente da do anfitrião; atualizem a página (Ctrl+F5) nos dois lados' }); }
-        else if (d.t === 'lobby') { N.players = d.players; N.size = d.size; fire('lobby', d); }
-        else if (d.t === 'full') { N.state = 'full'; fire('full', {}); }
-        else if (d.t === 'start') { N.started = true; N.id = d.you; N.players = d.players; fire('start', d); }
-        else if (d.t === 'tick') N.bundles.set(d.tick, d.cmds || []);
-        else if (d.t === 'chat') fire('chat', d);
-        else if (d.t === 'left') { N.dropped.add(d.id); fire('left', d); }
-        else if (d.t === 'desync') { N.desync = true; fire('desync', d); }
-        else if (d.t === 'ping') send({ t: 'pong', s: d.s });
-      });
-      conn.on('close', () => { if (N.state !== 'full') N.state = 'lost'; fire('close', {}); });
-      conn.on('error', e => { N.state = 'lost'; fire('error', { message: String(e && e.message || e) }); });
-    });
+    N.peer.on('open', () => bindHost(N.peer.connect('aether-rift-' + N.code.toLowerCase(), { reliable: true, serialization: 'json' }), false));
     N.peer.on('error', e => { fire('error', { message: errText(String(e && e.type || e)) }); });
+  };
+  // 4.1c: volta à sala depois de queda curta (mesma página ou página recarregada): id e ficha recebidos no início
+  N.rejoin = function (session) {
+    if (typeof Peer === 'undefined') { fire('error', { message: 'PeerJS não carregou' }); return; }
+    if (session) { N.role = 'guest'; N.code = session.code; N.id = session.id; N.token = session.token; N.me = session.me || N.me; N.started = true; }
+    try { if (N.hostConn) N.hostConn.close(); } catch (e) {} try { if (N.peer) N.peer.destroy(); } catch (e) {}
+    N.hostConn = null; N.state = 'rejoining';
+    N.peer = new Peer({ debug: 0 });
+    N.peer.on('open', () => bindHost(N.peer.connect('aether-rift-' + N.code.toLowerCase(), { reliable: true, serialization: 'json' }), true));
+    N.peer.on('error', e => { if (N.state === 'rejoining') fire('rejoin-fail', { message: errText(String(e && e.type || e)) }); });
   };
   // ---- lockstep (anfitrião junta; todos consomem)
   function put(tick, id, cmds) { let m = N.collect.get(tick); if (!m) { m = new Map(); N.collect.set(tick, m); } m.set(id, cmds); }
-  function activeIds() { const ids = [0]; for (const g of N.guests) if (g.id >= 0 && !N.dropped.has(g.id)) ids.push(g.id); return ids.sort((a, b) => a - b); }
+  function activeIds(tick) { const ids = [0]; for (const g of N.guests) if (g.id >= 0 && !N.dropped.has(g.id) && !(tick != null && N.activeFrom[g.id] > tick)) ids.push(g.id); return ids.sort((a, b) => a - b); }
   function tryBundle(tick) {
     if (N.bundles.has(tick)) return; const m = N.collect.get(tick); if (!m) return;
-    const ids = activeIds(); for (const id of ids) if (!m.has(id)) return;
+    const ids = activeIds(tick); for (const id of ids) if (!m.has(id)) return;
     const arr = []; for (const id of ids) for (const c of m.get(id)) arr.push(Object.assign({}, c));
     N.collect.delete(tick); N.bundles.set(tick, arr); broadcast({ t: 'tick', tick, cmds: arr });
   }
-  N.scheduleLocal = function (tick, cmds) { if (N.role === 'host') { put(tick, 0, cmds); tryBundle(tick); } else send({ t: 'cmds', tick, cmds }); };
+  N.scheduleLocal = function (tick, cmds) { if (N.role === 'host') { put(tick, 0, cmds); tryBundle(tick); return true; } if (N.holdUntil && tick < N.holdUntil) return false; send({ t: 'cmds', tick, cmds }); return true; }; // false: guarde os comandos (volta à sala antes do tick combinado)
   // Se um convidado some sem o WebRTC avisar, o anfitrião espera no máximo DROP_MS pelos comandos dele e então o marca como caído.
   N.DROP_MS = 8000; N.waitSince = 0;
   N.canAdvance = function (tick) {
@@ -4645,7 +4798,9 @@ function create() {
     if (N.role === 'host') {
       const now = performance.now(); if (!N.waitSince) N.waitSince = now;
       if (now - N.waitSince > 3000 && (!N.waitLog || now - N.waitLog > 3000)) { N.waitLog = now; const m0 = N.collect.get(tick); console.warn('[ARD] rede: anfitrião esperando tick ' + tick + ' há ' + ((now - N.waitSince) / 1000).toFixed(1) + ' s; recebidos de ' + (m0 ? Array.from(m0.keys()).join(',') : 'ninguém') + '; ativos ' + activeIds().join(',')); }
-      if (now - N.waitSince > N.DROP_MS) { console.warn('[ARD] rede: timeout, derrubando quem não mandou o tick ' + tick); const m = N.collect.get(tick) || new Map(); for (const g of N.guests.slice()) if (g.id >= 0 && !N.dropped.has(g.id) && !m.has(g.id)) { N.dropped.add(g.id); const msg = { t: 'left', id: g.id, name: g.name }; broadcast(msg, g.conn); fire('left', msg); try { g.conn.close(); } catch (e) {} } N.waitSince = 0; for (const t of Array.from(N.collect.keys())) tryBundle(t); tryBundle(tick); return N.bundles.has(tick); }
+      if (now - N.waitSince > N.DROP_MS) { const m = N.collect.get(tick) || new Map(); if (N.guests.some(g => g.id >= 0 && !N.dropped.has(g.id) && !m.has(g.id) && N.grace[g.id] > Date.now())) return false; // ainda na carência de volta (quem voltou pode estar carregando)
+        console.warn('[ARD] rede: timeout, derrubando quem não mandou o tick ' + tick);
+        for (const g of N.guests.slice()) if (g.id >= 0 && !N.dropped.has(g.id) && !m.has(g.id) && !(N.activeFrom[g.id] > tick)) { N.dropped.add(g.id); N.droppedAt[g.id] = Date.now(); const msg = { t: 'left', id: g.id, name: g.name }; broadcast(msg, g.conn); fire('left', msg); try { g.conn.close(); } catch (e) {} } N.waitSince = 0; for (const t of Array.from(N.collect.keys())) tryBundle(t); tryBundle(tick); return N.bundles.has(tick); }
     }
     return false;
   };
@@ -4924,12 +5079,12 @@ const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-11 02:19Z';
+const BUILD = '2026-10-11 02:58Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.1b';
+const VERSION = '4.1c';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -5009,6 +5164,47 @@ function initStart() {
   { const pb = loadPrefs(); $('opt-bateria').checked = !!pb.bateria; $('opt-bateria').addEventListener('change', () => savePrefs(Object.assign(loadPrefs() || {}, { bateria: $('opt-bateria').checked }))); }
   // 4.0e — campanha, Hangar e progresso do Comandante
   if (ARD.campUI && ARD.campaign && ARD.progress) { try { ARD.campUI.init({ $, leaderArt, LEADER_NAME, RACE_COLORS, LEADER_FACE, startGame: cfg => { savePrefs(Object.assign(loadPrefs() || {}, { gfx: cfg.gfx, quality: cfg.quality, clima: cfg.clima, name: cfg.name })); startGame(cfg); }, selectedRace: () => (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar' }); if (params.get('campanha')) ARD.campUI.openCampaign(); } catch (e) { console.warn('[ARD] campanha indisponível:', e); } }
+  // 4.1c — retomada: cartão "Partida interrompida", listas de salvamentos e volta automática depois de uma queda curta (< 30 s)
+  const RESUME_AUTO_S = 30;
+  async function resumeFrom(slot, auto) {
+    let rec = null; try { rec = await ARD.saves.get(slot); } catch (e) { console.warn('[ARD] retomada: leitura falhou', e); }
+    if (!rec || !rec.data || !rec.data.sim) { refreshSaved(); return false; }
+    const d = rec.data; const cfg = Object.assign({}, d.cfg, { players: d.simCfg.players, seed: d.simCfg.seed, minutes: d.simCfg.minutes || d.cfg.minutes, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: d.cfg.clima || $('opt-clima').value, resume: d, resumeAt: rec.meta.savedAt, resumeAuto: auto ? Math.max(1, Math.round((Date.now() - rec.meta.savedAt) / 1000)) : 0 });
+    if (d.camp && ARD.campaign) { try { cfg.campaign = ARD.campaign.prepare(d.camp.id, d.camp.opts); cfg.campArgs = d.camp; } catch (e) { console.warn('[ARD] retomada: missão indisponível', e); return false; } }
+    try { startGame(cfg); return true; } catch (e) { console.error('[ARD] retomada falhou:', e); alert('Não foi possível retomar esta partida (' + e.message + '). Ela continua salva; envie o feedback.'); location.reload(); return false; }
+  }
+  function refreshSaved() {
+    if (!ARD.saves) return;
+    ARD.saves.list().then(list => {
+      const auto = list.find(m => m.slot === 'auto'); const card = $('resume-card');
+      if (card) { if (auto) { $('resume-title').textContent = auto.title; $('resume-sub').textContent = auto.sub + ' · ' + (auto.parked ? 'pausada ' : 'interrompida ') + ARD.saves.ago(auto.savedAt) + (auto.version !== VERSION ? ' · salva na versão ' + auto.version : ''); card.hidden = false; } else card.hidden = true; }
+      for (const [id, kind] of [['saved-solo', 'solo'], ['saved-camp', 'campanha']]) { const el = $(id); if (!el) continue; const rows = list.filter(m => m.slot !== 'auto' && m.kind === kind); el.hidden = !rows.length;
+        el.innerHTML = rows.length ? '<div class="sh">Partidas salvas</div>' + rows.map(m => `<div class="svrow"><div class="sv-t">${esc(m.title)}<small>${esc(m.sub)} · espaço ${m.slot.slice(1)} · ${ARD.saves.ago(m.savedAt)}</small></div><button class="btn" data-load="${m.slot}">Carregar</button><button class="btn ghost" data-del="${m.slot}" aria-label="Apagar">🗑</button></div>`).join('') : '';
+        el.querySelectorAll('[data-load]').forEach(b => b.onclick = () => resumeFrom(b.dataset.load, false));
+        el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (b.dataset.armed) ARD.saves.del(b.dataset.del).then(refreshSaved); else { b.dataset.armed = '1'; b.textContent = 'Apagar?'; setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = '🗑'; } }, 3000); } }); }
+    }).catch(e => console.warn('[ARD] salvamentos indisponíveis:', e));
+  }
+  if ($('btn-resume')) { $('btn-resume').addEventListener('click', () => resumeFrom('auto', false)); $('btn-resume-drop').addEventListener('click', e => { const b = e.currentTarget; if (b.dataset.armed) ARD.saves.del('auto').then(refreshSaved); else { b.dataset.armed = '1'; b.textContent = 'Descartar mesmo?'; setTimeout(() => { delete b.dataset.armed; b.textContent = 'Descartar'; }, 3000); } }); }
+  // 4.1c — convidado que recarregou a página (queda de energia, aba fechada) volta sozinho à sala em até 2 minutos
+  function rejoinAfterReload(ms) {
+    const card = $('resume-card'); const N = ARD.net.create(); let done = false; const t0 = Date.now();
+    const show = (t, sub, canCancel) => { if (!card) return; card.hidden = false; $('resume-title').textContent = t; $('resume-sub').textContent = sub; $('btn-resume').hidden = true; $('btn-resume-drop').textContent = canCancel ? 'Cancelar' : 'Fechar'; };
+    show('Voltando à sala ' + ms.code, 'Sua partida multiplayer caiu ' + ARD.saves.ago(ms.at) + '. Reconectando…', true);
+    $('btn-resume-drop').onclick = () => { done = true; mpSession.clear(); try { N.close(); } catch (e) {} card.hidden = true; $('btn-resume').hidden = false; $('btn-resume-drop').onclick = null; $('btn-resume-drop').textContent = 'Descartar'; refreshSaved(); };
+    N.on('state', st => { if (done) return; done = true; startGame(Object.assign({}, ms.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value, resume: { sim: st.snap, ais: [] } }), { net: N, myId: ms.id }); });
+    N.on('rejoin-no', d => { done = true; mpSession.clear(); show('Não deu para voltar à sala ' + ms.code, 'O anfitrião recusou: ' + (d.why || '?') + '.', false); });
+    N.on('error', () => {}); N.on('close', () => {}); N.on('rejoin-fail', () => {});
+    const attempt = first => { if (done) return; if (Date.now() - t0 > 120000) { done = true; mpSession.clear(); show('Não deu para voltar à sala ' + ms.code, 'A sala não respondeu em 2 minutos.', false); return; }
+      if (first || N.state !== 'connected') { N.rejoin(first ? { code: ms.code, id: ms.id, token: ms.token, me: Object.assign({}, ms.me, { build: BUILD }) } : null); $('resume-sub').textContent = 'Reconectando… tentativa ' + Math.ceil((Date.now() - t0 + 1) / 6000) + (navigator.onLine ? '' : ' (sem internet)'); }
+      setTimeout(() => attempt(false), 6000); };
+    attempt(true);
+  }
+  const msess = mpSession.load();
+  if (msess && msess.token && Date.now() - msess.at < 120000 && !params.get('autostart') && !params.get('novo')) rejoinAfterReload(msess);
+  else if (ARD.saves && !params.get('autostart') && !params.get('missao') && !params.get('novo') && !params.get('campanha'))
+    ARD.saves.meta('auto').then(m => { if (m && !m.parked && (params.get('retomar') || Date.now() - m.savedAt < RESUME_AUTO_S * 1000)) resumeFrom('auto', true).then(ok => { if (!ok) refreshSaved(); }); else refreshSaved(); }).catch(() => refreshSaved());
+  else refreshSaved();
+  if (msess && Date.now() - msess.at >= 120000) mpSession.clear();
   // a ajuda tambem precisa fechar na tela inicial (antes só era ligada dentro da partida); X e Esc fecham qualquer janela
   document.querySelectorAll('#help [data-close]').forEach(b => b.addEventListener('click', () => { $('help').hidden = true; }));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') for (const id of ['help', 'termos', 'priv', 'campaign', 'briefing', 'hangar']) { const m = $(id); if (m && !m.hidden) { m.hidden = true; e.stopPropagation(); } } }, true);
@@ -5080,7 +5276,7 @@ function initStart() {
     N.on('full', () => { mpStatus('A sala ' + code + ' está cheia ou a partida já começou.'); leaveLobby(); });
     N.on('close', () => { if (!lobby || lobby.N !== N || lobby.started) return; mpStatus('O anfitrião saiu da sala ' + code + '.'); leaveLobby(); });
     N.on('lobby', d => { if (!lobby || lobby.N !== N) return; lobby.size = d.size; renderLobby(d.players, d.size); mpStatus('Na sala ' + code + ' como ' + me.name + ' (' + d.players.length + '/' + d.size + '). A partida começa quando o anfitrião iniciar.'); });
-    N.on('start', d => { if (!lobby || lobby.N !== N) return; lobby.started = true; if (lobby.timer) clearInterval(lobby.timer); startGame(Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }), { net: N, myId: d.you }); });
+    N.on('start', d => { if (!lobby || lobby.N !== N) return; lobby.started = true; if (lobby.timer) clearInterval(lobby.timer); mpSession.save({ code: N.code, id: d.you, token: d.token || null, cfg: d.cfg, me }); startGame(Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }), { net: N, myId: d.you }); });
     N.join(code, me);
   }
   $('btn-join').addEventListener('click', () => joinRoom($('opt-code').value));
@@ -5100,6 +5296,14 @@ function initStart() {
   if (params.get('autostart')) { startGame({ name: 'Teste', faction: params.get('faction') || 'erevane', opp: params.get('opp') || '2', diff: params.get('diff') || 'normal', seed: parseInt(params.get('seed') || '5', 10), gfx: params.get('r') === '2d' ? '2d' : '3d' }); }
 }
 
+// 4.1c — sessão multiplayer do convidado: código, lugar e ficha para voltar à sala depois de recarregar a página
+const mpSession = {
+  KEY: 'ard-mp-session',
+  save(o) { try { localStorage.setItem(this.KEY, JSON.stringify(Object.assign({}, o, { at: Date.now() }))); } catch (e) {} },
+  load() { try { return JSON.parse(localStorage.getItem(this.KEY) || 'null'); } catch (e) { return null; } },
+  touch() { const o = this.load(); if (o) this.save(o); },
+  clear() { try { localStorage.removeItem(this.KEY); } catch (e) {} },
+};
 // ---------- game ----------
 function startGame(cfg, netCtx) {
   if (ARD.logo3d) ARD.logo3d.stop(); // libera o contexto WebGL do logo vivo antes da partida
@@ -5113,6 +5317,7 @@ function startGame(cfg, netCtx) {
   if (!cfg.players) for (let i = 0; i < parseInt(cfg.opp, 10); i++) { const f = facsAll[i % facsAll.length]; players.push({ name: aiNames[f][i % 3], faction: f, difficulty: cfg.diff }); }
   if (!netCtx && !cfg.campaign && ARD.campUI) ARD.campUI.applyColor(players); // tom da Raça escolhido no Hangar (solo)
   const sim = S.createSim({ seed: cfg.seed, players, minutes: cfg.minutes || 25 });
+  if (cfg.resume) S.restore(sim, cfg.resume.sim); // 4.1c: retomada a partir do salvamento (estado exato)
   const human = netCtx ? netCtx.myId : 0;
   const canvas = $('world'), mini = $('minimap'), overlay = $('overlay');
   $('start').hidden = true; $('game').hidden = false; $('end').hidden = true;
@@ -5140,17 +5345,19 @@ function startGame(cfg, netCtx) {
   const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.7 : 1.0, yaw: Math.PI / 4, pitch: 0.95, pitchT: 0.95 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
   const ui = makeUI(); // closures below
   const I = ARD.input.create({ canvas, sim, view, R, human, ui });
-  const ais = sim.players.filter(p => (!p.human && !(players[p.id] && players[p.id].passive)) || (!netCtx && params.get('ia') === 'todos')).map(p => ARD.ai.create(p.id, p.difficulty)); // ?ia=todos: a IA joga também pelo humano (capturas e testes)
+  const ais = cfg.resume ? cfg.resume.ais.map(ARD.ai.restore) : sim.players.filter(p => (!p.human && !(players[p.id] && players[p.id].passive)) || (!netCtx && params.get('ia') === 'todos')).map(p => ARD.ai.create(p.id, p.difficulty)); // ?ia=todos: a IA joga também pelo humano (capturas e testes)
   G = { sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null, net, pending: [], waiting: false, waitT: 0 };
   if (params.get('debug')) window.__ARDG = G; // testes automatizados
   G.track = ARD.campUI ? ARD.campUI.tracker(sim, human) : null; // conquistas valem em qualquer partida
+  if (cfg.resume && G.track && G.track.load) G.track.load(cfg.resume.track);
   { const pb = $('placebar'); if (pb) { $('pb-ok').onclick = () => I.confirmPlace(); $('pb-no').onclick = () => I.setMode('normal'); } } // 4.1a: confirmar construção no toque
   const measureBar = () => { const bar = $('bar'); if (bar && isTouch) document.documentElement.style.setProperty('--barh', bar.offsetHeight + 'px'); }; window.addEventListener('resize', measureBar); setTimeout(measureBar, 50);
   G.save30 = !!(loadPrefs() || {}).bateria; G.lastDraw = 0; G.haptics = isTouch && !!navigator.vibrate; G.lastBuzz = 0;
   G.perf = { start: performance.now(), t0: performance.now(), frames: 0, low: 0, high: 0, down: false, up: false, auto: R.is3d && !params.get('q') && (cfg.quality || 'auto') === 'auto' };
   if (isTouch && navigator.getBattery && !G.save30) navigator.getBattery().then(b => { if (b && !b.charging && b.level < 0.2) { G.save30 = true; notice('Bateria baixa: limitando a 30 fps para economizar'); } }).catch(() => {});
   document.addEventListener('visibilitychange', () => { if (!G || G.sim !== sim || G.ended) return; if (document.hidden) { if (!net && !G.paused) { G.paused = true; G.autoPaused = true; } } else { if (G.autoPaused) { G.autoPaused = false; notice('Pausado enquanto a aba estava em segundo plano · P ou ❚❚ para continuar'); refreshTop(); } else if (net) banner('Você voltou à partida', 'Com a aba em segundo plano o jogo não envia comandos; depois de 8 s a sala pode seguir sem você.', 'warn'); } });
-  G.camp = cfg.campaign && ARD.campUI ? ARD.campUI.begin(sim, cfg.campaign) : null; // 4.0e: missão da campanha
+  G.camp = cfg.campaign && ARD.campUI ? ARD.campUI.begin(sim, cfg.campaign, cfg.resume ? cfg.resume.run : null) : null; // 4.0e: missão da campanha (4.1c: ou a retomada dela)
+  G.cfg = cfg; setupSaves();
   if (R.is3d && ARD.campUI) R.skins = { [human]: ARD.campUI.skinOf(sim.players[human].faction) };
   window.addEventListener('resize', () => R.resize());
   document.body.classList.toggle('touch', isTouch);
@@ -5160,7 +5367,10 @@ function startGame(cfg, netCtx) {
   R.humanId = human;
   R.prepare(sim, f => { $('load-bar').style.width = Math.round(f * 100) + '%'; }, () => {
     $('loading').hidden = true;
-    const ff = net ? 0 : parseInt(params.get('ff') || '0', 10);
+    const ff = net || cfg.resume ? 0 : parseInt(params.get('ff') || '0', 10);
+    if (cfg.resume && cfg.resume.view) { const v = cfg.resume.view; Object.assign(view.cam, v.cam || {}); view.cam.pitchT = view.cam.pitch; if (v.memory) view.memory = new Map(v.memory); }
+    if (cfg.resume && net) { net.sentFor = sim.tick - 1; G.pending = []; banner('De volta à sala', 'Partida sincronizada com o anfitrião no tempo ' + ARD.saves.mmss(sim.time) + '.', 'good', 7000); }
+    else if (cfg.resume) { const fenda = G.camp && G.camp.noPause; if (!fenda) { G.paused = true; refreshTop(); } banner('Partida retomada', (cfg.resumeAuto ? 'Você voltou em ' + cfg.resumeAuto + ' s, ' : 'Salvamento de ' + ARD.saves.ago(cfg.resumeAt || Date.now()) + ', ') + 'no tempo ' + ARD.saves.mmss(sim.time) + ' de jogo.' + (fenda ? '' : ' Pausado: toque em ❚❚ ou P para continuar.'), 'info', 9000); }
     for (let i = 0; i < ff * 10; i++) tickOnce(true);
     if (net) setupNet();
     if (params.get('speed')) G.speed = parseFloat(params.get('speed')) || 1;
@@ -5178,7 +5388,7 @@ function startGame(cfg, netCtx) {
   function tickOnce(silent) {
     const sim = G.sim; const tick = sim.tick;
     if (net) {
-      if (net.sentFor == null || net.sentFor < tick) { net.scheduleLocal(tick + net.DELAY, G.pending); G.pending = []; net.sentFor = tick; }
+      if (net.sentFor == null || net.sentFor < tick) { if (net.scheduleLocal(tick + net.DELAY, G.pending) !== false) G.pending = []; net.sentFor = tick; }
       if (!net.canAdvance(tick)) { G.waiting = true; return false; }
       G.waiting = false;
     }
@@ -5203,13 +5413,14 @@ function startGame(cfg, netCtx) {
         else { pf.low = 0; pf.high = 0; } } } }
     let dt = Math.min(0.25, (now - G.last) / 1000); G.last = now;
     if (!G.paused && !G.ended) { G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { if (tickOnce(false) === false) { G.acc = Math.min(G.acc, S.TICK); break; } G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; }
-    if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; $('mp-wait').hidden = G.waitT < 0.8; if (G.waitT >= 0.8) $('mp-wait').textContent = net.state === 'lost' ? 'Conexão perdida.' : 'Aguardando os outros jogadores… (' + G.waitT.toFixed(0) + ' s)'; }
+    if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; $('mp-wait').hidden = G.waitT < 0.8; if (G.waitT >= 0.8) $('mp-wait').textContent = net.state === 'rejoining' || G.rejoin ? 'Reconectando à sala ' + net.code + '… (' + Math.round((performance.now() - (G.rejoin ? G.rejoin.since : performance.now())) / 1000) + ' s)' : net.state === 'lost' ? 'Conexão perdida.' : 'Aguardando os outros jogadores… (' + G.waitT.toFixed(0) + ' s)'; }
     I.update(dt);
     if (G.frameN % 3 === 0) refreshTop();
     if (G.frameN++ % 2 === 0) { refreshPanel(false); refreshQuick(); } // 4.1a: barato agora (vida e progresso atualizam no lugar)
     if (G.frameN % 30 === 0) refreshHints();
     if (G.camp && G.frameN % 10 === 0) { G.camp.frame(); if (R.setBeacon) R.setBeacon(G.camp.beacon(), G.camp.vip()); }
     R.draw(sim, view, G.paused ? 1 : Math.min(1, G.acc / S.TICK), dt);
+    if (G.autoSave && !G.ended && sim.tick !== G.savedTick && now - (G.lastSave || 0) > 10000) { G.lastSave = now; G.savedTick = sim.tick; (window.requestIdleCallback || ((f) => setTimeout(f, 0)))(() => G.saveNow('auto'), { timeout: 2000 }); }
     requestAnimationFrame(frame);
   }
   G.frameN = 0;
@@ -5271,7 +5482,45 @@ function startGame(cfg, netCtx) {
     const log = $('log'); const li = document.createElement('div'); li.textContent = mmss(sim.time) + ' · ' + e.text; log.prepend(li); while (log.children.length > 40) log.lastChild.remove();
   }
   function leaderMood(mood, ms) { const fac = sim.players[human].faction; const art = leaderArt(fac, mood); const L = $('leader'); if (!art || !L || L.hidden) return; $('leader-img').src = art; L.classList.remove('mood'); void L.offsetWidth; L.classList.add('mood'); clearTimeout(G.moodT); G.moodT = setTimeout(() => { $('leader-img').src = leaderArt(fac); }, ms || 4500); }
-  function banner(title, sub, kind) { const L = $('leader'); if (L && !L.hidden) { L.classList.remove('talk'); void L.offsetWidth; L.classList.add('talk'); } if (kind === 'danger' || kind === 'warn') leaderMood(2); else if (kind === 'good') leaderMood(3); const b = $('banner'); $('banner-title').textContent = title; $('banner-sub').textContent = sub || ''; b.className = 'banner ' + (kind || 'info'); b.hidden = false; clearTimeout(G.bannerT); G.bannerT = setTimeout(() => { b.hidden = true; }, 5000); }
+  // ---------- 4.1c: salvamento ----------
+  function setupSaves() {
+    G.autoSave = !net && !!ARD.saves && !params.get('semsalvar');
+    G.saveNow = (slot, extra) => { if (!G.autoSave || G.ended) return Promise.resolve(null);
+      let data, meta; try { data = buildSave(); meta = saveMeta(extra); } catch (e) { console.warn('[ARD] salvamento: fotografia falhou', e); return Promise.resolve(null); }
+      return ARD.saves.put(slot, meta, data).catch(e => { console.warn('[ARD] salvamento falhou:', e); return null; }); };
+    if (!G.autoSave) return;
+    document.addEventListener('visibilitychange', () => { if (document.hidden && G && G.sim === sim && !G.ended) G.saveNow('auto'); });
+    window.addEventListener('pagehide', () => { if (G && G.sim === sim && !G.ended) G.saveNow('auto'); });
+    window.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S') && G && G.sim === sim && !G.ended) { e.preventDefault(); openSaveBox(); } });
+  }
+  function buildSave() {
+    const c = view.cam;
+    return { v: 1, version: VERSION, build: BUILD, human, simCfg: S.jsonSafe(sim.cfg), cfg: { name: cfg.name, faction: sim.players[human].faction, opp: cfg.opp, diff: cfg.diff, seed: sim.seed, minutes: cfg.minutes || 25, clima: cfg.clima },
+      camp: cfg.campArgs || null, sim: S.snapshot(sim), ais: G.ais.map(ARD.ai.snapshot), run: G.camp ? G.camp.run.save() : null, track: G.track && G.track.save ? G.track.save() : null,
+      view: { cam: { x: c.x, y: c.y, zoom: c.zoom, yaw: c.yaw, pitch: c.pitch }, memory: [...view.memory] } };
+  }
+  function saveMeta(extra) {
+    const me = sim.players[human]; const fac = (S.FACTIONS[me.faction] || {}).name || me.faction; const foes = sim.players.filter(q => q.id !== human);
+    const dl = { facil: 'Fácil', normal: 'Normal', dificil: 'Difícil', brutal: 'Brutal', fenda: 'Fenda' };
+    const title = G.camp ? 'Campanha · ' + G.camp.prep.mission.title : 'Escaramuça · ' + fac + ' contra ' + foes.length + (foes.length > 1 ? ' IAs' : ' IA');
+    const sub = (G.camp ? fac + ' · ' + G.camp.prep.diff.label : (dl[cfg.diff] || cfg.diff || '')) + ' · ' + ARD.saves.mmss(sim.time) + ' de jogo' + ' · ' + foes.filter(q => q.alive).length + ' adversário(s) de pé';
+    return Object.assign({ kind: G.camp ? 'campanha' : 'solo', title, sub, gameTime: sim.time, faction: me.faction, version: VERSION, noPause: !!(G.camp && G.camp.noPause) }, extra || {});
+  }
+  function openSaveBox() {
+    const box = $('savebox'); if (!box) return; if (!G.autoSave) { notice('Sem salvamento no multiplayer'); return; }
+    const fenda = G.camp && G.camp.noPause; const wasPaused = G.paused; if (!fenda && !G.paused) { G.paused = true; refreshTop(); }
+    const close = () => { box.hidden = true; if (!fenda && !wasPaused) { G.paused = false; refreshTop(); } };
+    box.querySelectorAll('[data-close]').forEach(b => { b.onclick = close; });
+    $('save-note').textContent = fenda ? 'Na dificuldade Fenda não há salvamento manual. O salvamento automático continua protegendo contra queda de internet ou energia.' : 'O jogo também salva sozinho a cada 10 segundos e ao sair da aba. Se a internet ou a energia cair, ele volta de onde parou.';
+    const draw = () => ARD.saves.list().then(list => { const by = {}; for (const m of list) by[m.slot] = m;
+      $('save-slots').innerHTML = ['m1', 'm2', 'm3'].map((sl, i) => { const m = by[sl]; return `<button class="slot" data-slot="${sl}" ${fenda ? 'disabled' : ''}><b>Espaço ${i + 1}</b><span>${m ? esc(m.title) + '<br><small>' + esc(m.sub) + ' · salvo ' + ARD.saves.ago(m.savedAt) + '</small>' : '<small>vazio</small>'}</span></button>`; }).join('');
+      $('save-slots').querySelectorAll('[data-slot]').forEach(b => b.onclick = () => { const sl = b.dataset.slot; const go = () => G.saveNow(sl).then(m => { if (m) { notice('Partida salva no espaço ' + sl.slice(1)); draw(); } else notice('Não foi possível salvar neste aparelho'); });
+        if (by[sl]) ui.confirm('Substituir o que está no espaço ' + sl.slice(1) + '?', go); else go(); }); });
+    draw();
+    $('save-park').onclick = () => G.saveNow('auto', { parked: true }).then(m => { if (m) location.reload(); else notice('Não foi possível salvar neste aparelho'); });
+    box.hidden = false;
+  }
+  function banner(title, sub, kind, ms) { const L = $('leader'); if (L && !L.hidden) { L.classList.remove('talk'); void L.offsetWidth; L.classList.add('talk'); } if (kind === 'danger' || kind === 'warn') leaderMood(2); else if (kind === 'good') leaderMood(3); const b = $('banner'); $('banner-title').textContent = title; $('banner-sub').textContent = sub || ''; b.className = 'banner ' + (kind || 'info'); b.hidden = false; clearTimeout(G.bannerT); G.bannerT = setTimeout(() => { b.hidden = true; }, ms || 5000); }
   function notice(text) { const n = $('notice'); n.textContent = text; n.classList.add('show'); clearTimeout(G.noticeT); G.noticeT = setTimeout(() => n.classList.remove('show'), 2200); }
 
   // ---------- HUD ----------
@@ -5378,7 +5627,8 @@ function startGame(cfg, netCtx) {
     $('btn-super').addEventListener('click', () => superClick(fac()));
     $('btn-diplo').addEventListener('click', () => openDiplo());
     $('btn-help').addEventListener('click', () => toggleHelp(true));
-    $('btn-menu').addEventListener('click', () => ui.confirm('Encerrar esta partida e voltar ao início?', () => location.reload()));
+    $('btn-menu').addEventListener('click', () => ui.confirm('Encerrar esta partida e voltar ao início?' + (G.autoSave ? ' Para continuar depois, use 💾 › Pausar e sair.' : ''), () => { const go = () => location.reload(); if (net) mpSession.clear(); if (G.autoSave && ARD.saves) ARD.saves.del('auto').then(go, go); else go(); }));
+    if ($('btn-save')) $('btn-save').addEventListener('click', () => openSaveBox());
     $('btn-build').addEventListener('click', () => { I.buildMenu = !I.buildMenu; view.sel = new Set(); ui.buildMenuChanged(I.buildMenu); });
     $('btn-attack').addEventListener('click', () => I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'));
     $('btn-box').addEventListener('click', () => { I.touchBox = !I.touchBox; refreshQuick(); notice(I.touchBox ? 'Arraste para selecionar em caixa' : 'Arraste para mover a câmera'); });
@@ -5459,14 +5709,23 @@ function startGame(cfg, netCtx) {
     log('', 'Sala ' + net.code + ': ' + sim.players.map(p => p.name).join(', ') + '.');
     $('chat-in').addEventListener('keydown', e => { if (e.key === 'Enter') { const t = $('chat-in').value.trim(); if (t) { net.chat(t); log(myName, t); } $('chat-in').value = ''; e.stopPropagation(); } e.stopPropagation(); });
     net.on('chat', d => { const nm = d.name || (sim.players[d.id] || {}).name || '?'; const tx = String(d.text || '').slice(0, 120); log(nm, tx); notice(nm + ': ' + tx.slice(0, 60)); AU.sfx('click'); });
-    net.on('left', d => { const nm = (sim.players[d.id] || {}).name || d.name || 'Um jogador'; banner('Jogador desconectado', nm + ' saiu da partida; as unidades dele ficam paradas.', 'warn'); log('', nm + ' desconectou.'); });
-    net.on('close', () => { if (net.role === 'guest') { banner('Conexão perdida', 'A ligação com o anfitrião caiu; a partida não pode continuar.', 'danger'); log('', 'Conexão perdida com o anfitrião.'); } });
+    net.on('left', d => { const nm = (sim.players[d.id] || {}).name || d.name || 'Um jogador'; banner('Jogador desconectado', nm + ' caiu; as unidades dele ficam paradas. Se voltar em até 2 minutos, retoma o comando.', 'warn'); log('', nm + ' desconectou.'); });
+    // 4.1c: queda curta não encerra a partida. O convidado tenta voltar à sala por até 2 min; o anfitrião guarda o lugar e manda o estado.
+    const tryRejoin = () => { if (!G.rejoin || G.ended || G.sim !== sim) return; if (performance.now() - G.rejoin.since > 120000) { G.rejoin = null; banner('Não foi possível voltar à sala', 'O anfitrião não respondeu em 2 minutos. A partida terminou para você.', 'danger', 12000); log('', 'Volta à sala esgotada.'); return; }
+      G.rejoin.tries++; net.rejoin(); clearTimeout(G.rejoin.t); G.rejoin.t = setTimeout(() => { if (G.rejoin && net.state !== 'connected') tryRejoin(); }, 6000); };
+    net.on('close', () => { if (net.role !== 'guest' || G.ended) return; if (!G.rejoin) { G.rejoin = { since: performance.now(), tries: 0 }; banner('Conexão perdida', 'Tentando voltar à sala… a partida continua de onde parou.', 'warn', 8000); log('', 'Conexão perdida com o anfitrião; reconectando.'); setTimeout(tryRejoin, 1500); } });
+    net.on('rejoin-fail', () => {});
+    net.on('rejoin-no', d => { if (G.rejoin) clearTimeout(G.rejoin.t); G.rejoin = null; mpSession.clear(); banner('A sala recusou a volta', 'Motivo: ' + (d.why || '?') + '.', 'danger', 12000); log('', 'Volta recusada: ' + (d.why || '?')); });
+    net.on('state', st => { if (G.rejoin) clearTimeout(G.rejoin.t); G.rejoin = null; try { S.restore(sim, st.snap); } catch (e) { banner('Falha ao sincronizar', String(e.message || e), 'danger'); return; } net.sentFor = sim.tick - 1; G.pending = []; G.acc = 0; G.waiting = false; banner('De volta à sala', 'Partida sincronizada no tempo ' + ARD.saves.mmss(sim.time) + '.', 'good', 6000); log('', 'Reconectado à sala ' + net.code + '.'); });
+    net.on('rejoin-request', () => ({ tick: sim.tick, snap: S.snapshot(sim) }));
+    net.on('back', d => { const nm = (sim.players[d.id] || {}).name || d.name || 'Um jogador'; banner('Jogador voltou', nm + ' voltou à partida.', 'good'); log('', nm + ' voltou.'); });
+    if (net.role === 'guest') { mpSession.touch(); setInterval(() => { if (!G.ended && net.state === 'connected') mpSession.touch(); }, 5000); }
     net.on('desync', d => { banner('Dessincronização', 'Os mundos divergiram no tick ' + d.tick + '. Isto não deveria acontecer; exporte o resultado no fim e envie o feedback com os navegadores usados.', 'danger'); log('', 'Dessincronização no tick ' + d.tick + ' (jogador ' + ((sim.players[d.id] || {}).name || d.id) + ').'); });
     if (net.role === 'host') setInterval(() => net.ping(), 5000);
   }
   // ---------- end ----------
   function endGame(result) {
-    if (G.ended) return; G.ended = true;
+    if (G.ended) return; G.ended = true; if (G.autoSave && ARD.saves) ARD.saves.del('auto'); if (net) mpSession.clear(); // partida terminada não volta
     if (result.campaign) { // 4.0e: fim de missão
       const r = result.campaign; const prep = G.camp.prep; const scores = sim.players.map(q => ({ id: q.id, name: q.name, score: q.alive ? S.score(sim, q) : 0, alive: q.alive }));
       result = { outcome: r.won ? 'victory' : 'defeat', reason: r.reason, scores };
