@@ -15,7 +15,7 @@ function artBundle() { // arte aprovada (assets/*.jpg) vira ARD.ART no bundle do
 }
 function bundle(tpl, scripts) { return read(tpl).replace('<!--SCRIPTS-->', (tpl === 'src/index.tpl.html' ? artBundle() : '') + '<script>\n' + scripts.map(read).join('\n') + '\n</script>').replace(/__BUILD__/g, BUILD); }
 mkdirSync(root + 'dist', { recursive: true });
-const game = bundle('src/index.tpl.html', ['src/sim.js', 'src/ai.js', 'src/voxel.js', 'src/models.js', 'src/vox3d.js', 'src/meshes.js', 'src/world3d.js', 'src/logo3d.js', 'src/progress.js', 'src/saves.js', 'src/campaign.js', 'src/campaign-ui.js', 'src/leaders.js', 'src/render.js', 'src/render3d.js', 'src/audio.js', 'src/net.js', 'src/input.js', 'src/main.js']);
+const game = bundle('src/index.tpl.html', ['src/sim.js', 'src/ai.js', 'src/voxel.js', 'src/models.js', 'src/vox3d.js', 'src/meshes.js', 'src/world3d.js', 'src/logo3d.js', 'src/leaders3d.js', 'src/progress.js', 'src/saves.js', 'src/campaign.js', 'src/campaign-ui.js', 'src/leaders.js', 'src/render.js', 'src/render3d.js', 'src/audio.js', 'src/net.js', 'src/input.js', 'src/main.js']);
 writeFileSync(root + 'dist/aether-rift-beta.html', game); writeFileSync(root + 'index.html', wrap(game));
 // Cópia para testes headless com three vendorizado (node tools/vendor.mjs); carrega sem rede.
 import { existsSync } from 'node:fs';

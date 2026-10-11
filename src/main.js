@@ -17,7 +17,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.1d';
+const VERSION = '4.1e';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -52,6 +52,19 @@ function initStart() {
     facWrap.appendChild(el);
   }
   setRace(raceColor);
+  // 4.1e — líderes vivos nos cartões: cada busto olha para o ponteiro, pisca e respira; ao escolher a Raça, o líder acena
+  const cardHeads = {};
+  const mountCardHeads = () => { if (!ARD.leaders3d || matchMedia('(pointer: coarse)').matches || params.get('logo') === 'estatico' || !ARD.leaders3d.canUse()) return;
+    for (const card of facWrap.querySelectorAll('.fac-card')) { const id = card.dataset.id; const img = card.querySelector('img.fac-lead'); if (!img || cardHeads[id]) continue;
+      const cv = document.createElement('canvas'); cv.className = 'fac-lead fac-lead3d'; cv.width = 168; cv.height = 168; cv.setAttribute('aria-hidden', 'true');
+      const sel = (document.querySelector('input[name=fac]:checked') || {}).value === id;
+      const it = ARD.leaders3d.mount(cv, id, { framing: 'card', fps: sel ? 24 : 14, mood: 1, yaw: 0.18 }); if (!it) return;
+      img.after(cv); img.hidden = true; cardHeads[id] = it;
+      card.addEventListener('pointermove', ev => { const r = cv.getBoundingClientRect(); ARD.leaders3d.gaze(it, (ev.clientX - (r.left + r.width / 2)) / 160, -(ev.clientY - (r.top + r.height / 2)) / 120, 900); });
+      card.addEventListener('pointerenter', () => { it.fps = 24; });
+      card.addEventListener('pointerleave', () => { it.fps = (document.querySelector('input[name=fac]:checked') || {}).value === id ? 24 : 14; });
+      card.querySelector('input').addEventListener('change', () => { for (const k in cardHeads) cardHeads[k].fps = k === id ? 24 : 14; ARD.leaders3d.mood(it, 3, 1800); ARD.leaders3d.react(it, 'nod'); ARD.leaders3d.react(it, 'talk', 1.1); }); } };
+  if (window.THREE) setTimeout(mountCardHeads, 400); else window.addEventListener('three-ready', () => setTimeout(mountCardHeads, 400), { once: true });
   if (ART && ART.logo) for (const id of ['logo-img', 'load-logo', 'foot-logo']) { const el = $(id); if (el) { el.src = ART.logo; el.hidden = false; } }
   // 4.0d — logo vivo: a mesma Final 2 em 3D com a órbita girando (desktop; celular e movimento reduzido ficam com a imagem)
   if (ARD.logo3d && $('logo-img')) { const tryLogo = () => { const im = $('logo-img'); if (im && !im.hidden && !(document.getElementById('start') || {}).hidden) ARD.logo3d.mount(im); }; if (window.THREE) setTimeout(tryLogo, 300); else window.addEventListener('three-ready', () => setTimeout(tryLogo, 300), { once: true }); }
@@ -240,6 +253,7 @@ const mpSession = {
 // ---------- game ----------
 function startGame(cfg, netCtx) {
   if (ARD.logo3d) ARD.logo3d.stop(); // libera o contexto WebGL do logo vivo antes da partida
+  if (ARD.leaders3d) ARD.leaders3d.stopAll(); // 4.1e: bustos dos cartões
   const want3dEarly = (cfg.gfx || '3d') === '3d' && params.get('r') !== '2d';
   if (want3dEarly && !window.THREE && !window.__threeFailed) { $('start').hidden = true; $('game').hidden = false; $('loading').hidden = false; $('load-bar').style.width = '5%'; whenThree(() => startGame(cfg, netCtx)); return; }
   const net = netCtx ? netCtx.net : null;
@@ -267,7 +281,8 @@ function startGame(cfg, netCtx) {
     if (L) { const art = leaderArt(fac); if (art) { $('leader-img').src = art; $('leader-img').className = 'lport'; } else if (ARD.leaders && ARD.leaders[fac]) { const sp = ARD.vox.renderSprite(ARD.leaders[fac](), 0.62, 3, {}); $('leader-img').src = sp.canvas.toDataURL(); $('leader-img').className = 'lvox'; }
       $('leader-name').textContent = LEADER_NAME[fac] || ('Líder ' + (S.FACTIONS[fac].short || fac)); $('leader-sub').textContent = '● em chamada · ' + (S.FACTIONS[fac].short || fac); L.style.setProperty('--pc', RACE_COLORS[fac] || '#FF5E3A');
       if (ART && ART.insignia && ART.insignia[fac]) { $('leader-badge').src = ART.insignia[fac]; $('leader-badge').hidden = false; }
-      L.hidden = false; G && (G.leaderFac = fac); }
+      L.hidden = false; G && (G.leaderFac = fac);
+      if (ARD.leaders3d && R.is3d && !(R.quality && R.quality.resolved === 'baixa') && !(matchMedia('(pointer: coarse)').matches || params.get('touch')) && ARD.leaders3d.canUse()) { /* 4.1e: só com o 3D ligado e acima da qualidade Baixa */ const fr = L.querySelector('.lframe'); const cv = document.createElement('canvas'); cv.id = 'leader-cv'; cv.width = 236; cv.height = 236; const it = ARD.leaders3d.mount(cv, fac, { framing: 'hud', fps: 24, mood: 1, yaw: 0.2 }); if (it) { fr.insertBefore(cv, fr.firstChild); $('leader-img').hidden = true; window.__lead3d = it; } } }
     if (ART && ART.world && ART.world[fac]) { $('loading').style.backgroundImage = `linear-gradient(rgba(13,15,19,.55), rgba(13,15,19,.88)), url(${ART.world[fac]})`; $('loading').style.backgroundSize = 'cover'; $('loading').style.backgroundPosition = 'center'; }
     if (leaderArt(fac)) { $('load-leader').src = leaderArt(fac); $('load-leader').hidden = false; }
   } catch (e) { console.warn('[ARD] retrato do líder indisponível:', e); }
@@ -279,9 +294,10 @@ function startGame(cfg, netCtx) {
   const ui = makeUI(); // closures below
   const I = ARD.input.create({ canvas, sim, view, R, human, ui });
   const ais = cfg.resume ? cfg.resume.ais.map(ARD.ai.restore) : sim.players.filter(p => (!p.human && !(players[p.id] && players[p.id].passive)) || (!netCtx && params.get('ia') === 'todos')).map(p => ARD.ai.create(p.id, p.difficulty)); // ?ia=todos: a IA joga também pelo humano (capturas e testes)
-  G = { sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null, net, pending: [], waiting: false, waitT: 0 };
+  G = { lead3d: window.__lead3d || null, sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null, net, pending: [], waiting: false, waitT: 0 };
   if (params.get('debug')) window.__ARDG = G; // testes automatizados
   G.track = ARD.campUI ? ARD.campUI.tracker(sim, human) : null; // conquistas valem em qualquer partida
+  if (G.lead3d) { let lastG = 0; window.addEventListener('pointermove', ev => { const now = performance.now(); if (now - lastG < 120 || !G.lead3d || ev.pointerType === 'touch') return; lastG = now; ARD.leaders3d.gaze(G.lead3d, (ev.clientX - 80) / Math.max(400, innerWidth * 0.6), -(ev.clientY - 110) / Math.max(300, innerHeight * 0.6), 1200); }, { passive: true }); $('leader').addEventListener('click', () => { if (G.lead3d) { ARD.leaders3d.mood(G.lead3d, 3, 1600); ARD.leaders3d.react(G.lead3d, 'nod'); ARD.leaders3d.react(G.lead3d, 'talk', 0.9); } }); } // 4.1e: o líder olha para onde você aponta; clicar nele arranca um aceno
   if (cfg.resume && G.track && G.track.load) G.track.load(cfg.resume.track);
   { const pb = $('placebar'); if (pb) { $('pb-ok').onclick = () => I.confirmPlace(); $('pb-no').onclick = () => I.setMode('normal'); } } // 4.1a: confirmar construção no toque
   const measureBar = () => { const bar = $('bar'); if (bar && isTouch) document.documentElement.style.setProperty('--barh', bar.offsetHeight + 'px'); }; window.addEventListener('resize', measureBar); setTimeout(measureBar, 50);
@@ -351,6 +367,7 @@ function startGame(cfg, netCtx) {
     if (G.frameN % 3 === 0) refreshTop();
     if (G.frameN++ % 2 === 0) { refreshPanel(false); refreshQuick(); } // 4.1a: barato agora (vida e progresso atualizam no lugar)
     if (G.frameN % 30 === 0) refreshHints();
+    if (G.lead3d && ARD.leaders3d && G.frameN % 300 === 0) { const n = S.nucleoOf(sim, human); const mine = S.armyValue(sim, human); let foe = 0; for (const q of sim.players) if (q.alive && q.id !== human && !S.hasPact(sim, human, q.id)) foe = Math.max(foe, S.armyValue(sim, q.id)); ARD.leaders3d.baseMood(G.lead3d, !n || n.hp < n.maxHp * 0.5 || (foe > 600 && mine < foe * 0.45) ? 4 : (mine > 1500 && mine > foe * 1.8) ? 3 : 1); }
     if (G.camp && G.frameN % 10 === 0) { G.camp.frame(); if (R.setBeacon) R.setBeacon(G.camp.beacon(), G.camp.vip()); }
     R.draw(sim, view, G.paused ? 1 : Math.min(1, G.acc / S.TICK), dt);
     if (G.autoSave && !G.ended && sim.tick !== G.savedTick && now - (G.lastSave || 0) > 10000) { G.lastSave = now; G.savedTick = sim.tick; (window.requestIdleCallback || ((f) => setTimeout(f, 0)))(() => G.saveNow('auto'), { timeout: 2000 }); }
@@ -396,6 +413,7 @@ function startGame(cfg, netCtx) {
   function handleEvents(ev, silent) {
     for (const e of ev) {
       if (!silent) audioFor(e);
+      if (e.t === 'alert' && e.p === human && !silent && G.lead3d && ARD.leaders3d) { if (e.kind === 'danger') { ARD.leaders3d.react(G.lead3d, 'jolt'); ARD.leaders3d.mood(G.lead3d, 2, 3000); } else if (e.kind === 'good') ARD.leaders3d.react(G.lead3d, 'nod'); if (e.x != null && R.worldToScreen) { const sp = R.worldToScreen(view.cam, e.x, e.y); if (sp) ARD.leaders3d.gaze(G.lead3d, (sp[0] - 80) / 500, -(sp[1] - 110) / 400, 1600); } }
       if (e.t === 'alert' && e.p === human) { if (e.x != null) view.lastAlert = { x: e.x, y: e.y }; if (!silent) pushAlert(e); if (!silent && G.haptics && e.kind === 'danger' && performance.now() - G.lastBuzz > 2500) { G.lastBuzz = performance.now(); try { navigator.vibrate(30); } catch (er) {} } }
       if (!silent && G.haptics && e.t === 'super' && e.p === human) { try { navigator.vibrate([20, 40, 20]); } catch (er) {} }
       else if (e.t === 'notice' && e.p === human && !silent) notice(e.text);
@@ -417,7 +435,7 @@ function startGame(cfg, netCtx) {
     setTimeout(() => { el.classList.add('fade'); }, 9000); setTimeout(() => el.remove(), 14000);
     const log = $('log'); const li = document.createElement('div'); li.textContent = mmss(sim.time) + ' · ' + e.text; log.prepend(li); while (log.children.length > 40) log.lastChild.remove();
   }
-  function leaderMood(mood, ms) { const fac = sim.players[human].faction; const art = leaderArt(fac, mood); const L = $('leader'); if (!art || !L || L.hidden) return; $('leader-img').src = art; L.classList.remove('mood'); void L.offsetWidth; L.classList.add('mood'); clearTimeout(G.moodT); G.moodT = setTimeout(() => { $('leader-img').src = leaderArt(fac); }, ms || 4500); }
+  function leaderMood(mood, ms) { if (G.lead3d && ARD.leaders3d) { ARD.leaders3d.mood(G.lead3d, mood, ms || 4500); if (mood === 3) ARD.leaders3d.react(G.lead3d, 'nod'); else if (mood === 2) ARD.leaders3d.react(G.lead3d, 'shake'); } const fac = sim.players[human].faction; const art = leaderArt(fac, mood); const L = $('leader'); if (!art || !L || L.hidden) return; $('leader-img').src = art; L.classList.remove('mood'); void L.offsetWidth; L.classList.add('mood'); clearTimeout(G.moodT); G.moodT = setTimeout(() => { $('leader-img').src = leaderArt(fac); }, ms || 4500); }
   // ---------- 4.1c: salvamento ----------
   function setupSaves() {
     G.autoSave = !net && !!ARD.saves && !params.get('semsalvar');
@@ -456,7 +474,7 @@ function startGame(cfg, netCtx) {
     $('save-park').onclick = () => G.saveNow('auto', { parked: true }).then(m => { if (m) location.reload(); else notice('Não foi possível salvar neste aparelho'); });
     box.hidden = false;
   }
-  function banner(title, sub, kind, ms) { const L = $('leader'); if (L && !L.hidden) { L.classList.remove('talk'); void L.offsetWidth; L.classList.add('talk'); } if (kind === 'danger' || kind === 'warn') leaderMood(2); else if (kind === 'good') leaderMood(3); const b = $('banner'); $('banner-title').textContent = title; $('banner-sub').textContent = sub || ''; b.className = 'banner ' + (kind || 'info'); b.hidden = false; clearTimeout(G.bannerT); G.bannerT = setTimeout(() => { b.hidden = true; }, ms || 5000); }
+  function banner(title, sub, kind, ms) { const L = $('leader'); if (L && !L.hidden) { L.classList.remove('talk'); void L.offsetWidth; L.classList.add('talk'); } if (G.lead3d && ARD.leaders3d) ARD.leaders3d.react(G.lead3d, 'talk', Math.min(3.2, 1 + String(sub || '').length / 45)); if (kind === 'danger' || kind === 'warn') leaderMood(2); else if (kind === 'good') leaderMood(3); const b = $('banner'); $('banner-title').textContent = title; $('banner-sub').textContent = sub || ''; b.className = 'banner ' + (kind || 'info'); b.hidden = false; clearTimeout(G.bannerT); G.bannerT = setTimeout(() => { b.hidden = true; }, ms || 5000); }
   function notice(text) { const n = $('notice'); n.textContent = text; n.classList.add('show'); clearTimeout(G.noticeT); G.noticeT = setTimeout(() => n.classList.remove('show'), 2200); }
 
   // ---------- HUD ----------

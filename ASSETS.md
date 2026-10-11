@@ -8,6 +8,7 @@ Todo arquivo de arte ou biblioteca externa entra aqui com origem e licença. Sem
 | Malhas 3D por Raça (src/meshes.js, 4.0d) | próprias, geradas em código a partir de primitivas do Three.js | equipe | todos os direitos reservados | jogo (modo 3D), ícones do HUD, catálogo 3D |
 | Céu, planeta-mãe, horizonte e textura de detalhe do terreno (src/world3d.js) | procedurais (ruído fBm), paletas dos mundos aprovados | equipe | todos os direitos reservados | jogo (modo 3D) |
 | Logo vivo (src/logo3d.js) | cena procedural da Final 2 aprovada | equipe | todos os direitos reservados | tela inicial (desktop) |
+| Líderes vivos (src/leaders3d.js, 4.1e) | bustos procedurais em código, portados de tools/arte3d.html (arte de identidade aprovada) | equipe | todos os direitos reservados | tela inicial e retrato do HUD (desktop) |
 | Ícones do app e favicons (assets/icon-*.png, favicon-*.png, apple-touch-icon.png) | recortes do render da Final 2 aprovada | equipe | todos os direitos reservados | manifesto PWA, aba do navegador, tela inicial do celular |
 | Texturas de terreno | procedurais (src/render.js) | equipe | todos os direitos reservados | jogo |
 | Efeitos sonoros | sintetizados em tempo real (src/audio.js) | equipe | todos os direitos reservados | jogo |
