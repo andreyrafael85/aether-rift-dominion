@@ -1,0 +1,43 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Folha de animação</title>
+<style>html,body{margin:0;background:#0e1116;overflow:hidden;font-family:system-ui,sans-serif}#lab{position:absolute;inset:0;pointer-events:none}.l{position:absolute;color:#dfe6ee;font:600 13px/1.1 system-ui;text-shadow:0 1px 3px #000,0 0 8px #000;white-space:nowrap}.h{position:absolute;color:#9aa8b8;font:600 12px/1.1 system-ui}</style>
+<script type="importmap">{"imports":{"three":"../dist/vendor/three/build/three.module.min.js","three/addons/":"../dist/vendor/three/examples/jsm/"}}</script>
+</head><body><div id="lab"></div>
+<script src="../src/sim.js"></script><script src="../src/meshes.js"></script>
+<script type="module">
+// 4.2b — folha de animação: cada modelo com peças animadas aparece em 5 poses lado a lado (instâncias com aInst diferente),
+// para conferir pivôs (roda gira no lugar, perna balança do quadril, rotor gira no centro, cano recua) numa imagem parada.
+// Parâmetros: race, view=u|b|n, w, h, yaw, pitch, only=def1,def2
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+window.THREE = THREE;
+const q = new URLSearchParams(location.search); const race = q.get('race') || 'vehnar', view = q.get('view') || 'u'; const W = +(q.get('w') || 1500), Hh = +(q.get('h') || 1000);
+const S = ARD.sim, M = ARD.meshes; const tc = q.get('color') || '#FF8C1A';
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); renderer.setSize(W, Hh); renderer.setPixelRatio(1); document.body.appendChild(renderer.domElement);
+renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping;
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x1a2029); const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+scene.add(new THREE.HemisphereLight(0x9fb8d6, 0x2a2a30, 0.7)); const sun = new THREE.DirectionalLight(0xffe9c4, 1.8); sun.position.set(-300, 520, 360); scene.add(sun);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(8000, 8000).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x4f5660, roughness: 0.95 })); scene.add(ground);
+const mat = M.material({ env: 0.55, key: 'folha' }); const matEm = new THREE.MeshBasicMaterial({ vertexColors: true }); matEm.onBeforeCompile = sh => M.animShader(sh); matEm.defaultAttributeValues = Object.assign({}, matEm.defaultAttributeValues, M.ANIM_DEFAULTS); matEm.customProgramCacheKey = () => 'folha-em';
+let defs, rOf;
+if (view === 'b') { defs = M.BUILDING_DEFS.concat(['veiculo_turret', 'torre_turret', 'bastiao_turret']); rOf = d => (S.BUILDINGS[d] || { r: 16 }).r; }
+else if (view === 'n') { defs = M.NEUTRAL_DEFS.map(d => d).concat(M.PROP_RACES.map(r => 'prop_' + r)); rOf = d => d === 'crate' ? 9 : d === 'wreck' ? 12 : d.startsWith('prop_') ? 8 : 18; }
+else { defs = M.unitsOf(race).concat(['veiculo_hull', 'veiculo_turret']); rOf = d => (S.UNITS[d] || S.UNITS.veiculo).r; }
+if (q.get('only')) defs = defs.filter(d => q.get('only').split(',').includes(d));
+const built = defs.map((d, i) => ({ d, g: M.build(d, view === 'n' ? null : race, tc, i) })).filter(x => x.g && x.g.anim);
+const POSES = 5; const cell = 60; const labels = []; // cada modelo ocupa o mesmo espaço na folha (tamanho normalizado)
+// pose k: distância rodada, tempo, movimento, recuo
+const pose = (k, fit) => [k * 1.6, k * 0.21, 1, k === POSES - 1 ? 1 : k === POSES - 2 ? 0.5 : 0]; // distância em unidades do modelo
+built.forEach((x, row) => { const g = x.g; const fit = cell * 0.62 / Math.max(g.width, g.height); const n = POSES;
+  const ia = new THREE.InstancedBufferAttribute(new Float32Array(n * 4), 4); const ic = new THREE.InstancedBufferAttribute(new Float32Array(n), 1); for (const gg of [g.main, g.em]) if (gg) { gg.setAttribute('aInst', ia); gg.setAttribute('aInstC', ic); }
+  const mk = (geo, m) => { const im = new THREE.InstancedMesh(geo, m, n); im.frustumCulled = false; scene.add(im); return im; }; const a = mk(g.main, mat), e = g.em ? mk(g.em, matEm) : null;
+  const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(fit, fit, fit), _p = new THREE.Vector3();
+  for (let k = 0; k < n; k++) { _p.set((k - (n - 1) / 2) * cell, (built.length - 1 - row) * cell * 0.85, 0); /* linhas empilhadas na vertical: vista de lado sem sobreposição */ _m.compose(_p, _q, _s); a.setMatrixAt(k, _m); if (e) e.setMatrixAt(k, _m); const v = pose(k, fit); ia.array.set(v, k * 4); ic.array[k] = k * 0.6; } ic.needsUpdate = true;
+  ia.needsUpdate = true; labels.push({ d: x.d, p: new THREE.Vector3(-(n / 2 + 0.2) * cell, (built.length - 1 - row) * cell * 0.85 + cell * 0.2, 0) }); });
+const rows = built.length; const yc = (rows - 1) * cell * 0.85 / 2 + cell * 0.2; const span = Math.max(POSES * cell * 1.05 * Hh / W, rows * cell * 0.9); const cam = new THREE.PerspectiveCamera(28, W / Hh, 10, 30000); const pitch = +(q.get('pitch') || 0.22), yaw = +(q.get('yaw') || 0.1); const dist = span * 2.1 + cell;
+cam.position.set(Math.sin(yaw) * Math.cos(pitch) * dist, yc + Math.sin(pitch) * dist, Math.cos(yaw) * Math.cos(pitch) * dist); cam.lookAt(0, yc, 0); ground.visible = false;
+renderer.render(scene, cam);
+const lab = document.getElementById('lab'); const names = Object.assign({}, ...Object.keys(S.UNITS).map(k => ({ [k]: S.UNITS[k].name })), ...Object.keys(S.BUILDINGS).map(k => ({ [k]: S.BUILDINGS[k].name })));
+for (const L of labels) { const v = L.p.clone().project(cam); const el = document.createElement('div'); el.className = 'l'; el.style.left = ((v.x + 1) / 2 * W - 150) + 'px'; el.style.top = ((1 - v.y) / 2 * Hh - 8) + 'px'; el.textContent = names[L.d] || L.d; lab.appendChild(el); }
+const hd = document.createElement('div'); hd.className = 'h'; hd.style.left = '12px'; hd.style.top = '10px'; hd.textContent = race + ' · ' + view + ' · ' + rows + ' modelos animados · poses: rodando 0→4, recuo nas duas últimas'; lab.appendChild(hd);
+window.__rows = rows; window.__done = true;
+</script></body></html>
