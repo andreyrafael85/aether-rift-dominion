@@ -17,7 +17,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.1e';
+const VERSION = '4.2a';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -30,7 +30,10 @@ function whenThree(cb) {
   window.addEventListener('three-ready', () => { if (!done) { done = true; clearTimeout(t); cb(true); } }, { once: true });
 }
 // 4.0f — diagnóstico para o feedback do beta: versão, build, navegador, GPU, qualidade 3D e FPS medido
-function diagInfo() { const g = G || {}; const R = g.R || {}; const q = R.quality || {}; const p = g.sim && g.sim.players[g.human || 0]; return { versao: VERSION, build: BUILD, navegador: navigator.userAgent, tela: screen.width + 'x' + screen.height + ' @' + (window.devicePixelRatio || 1), gpu: R.gpu || '?', qualidade: q.name ? q.name + (q.resolved && q.name === 'auto' ? ' → ' + q.resolved : '') : '—', fps: g.fps ? Math.round(g.fps) : null, raca: p ? p.faction : null, semente: g.sim ? g.sim.seed : null, tempo: g.sim ? Math.round(g.sim.time) : null, missao: g.camp ? g.camp.prep.mission.id : null, memoria: navigator.deviceMemory || null, nucleos: navigator.hardwareConcurrency || null }; }
+function diagInfo() { const g = G || {}; const R = g.R || {}; const q = R.quality || {}; const p = g.sim && g.sim.players[g.human || 0]; return { versao: VERSION, build: BUILD, navegador: navigator.userAgent, tela: screen.width + 'x' + screen.height + ' @' + (window.devicePixelRatio || 1), gpu: R.gpu || '?', qualidade: q.name ? q.name + (q.resolved && q.name === 'auto' ? ' → ' + q.resolved : '') : '—', fps: g.fps ? Math.round(g.fps) : null, raca: p ? p.faction : null, semente: g.sim ? g.sim.seed : null, tempo: g.sim ? Math.round(g.sim.time) : null, missao: g.camp ? g.camp.prep.mission.id : null, memoria: navigator.deviceMemory || null, nucleos: navigator.hardwareConcurrency || null, teste_desempenho: benchSummary() }; }
+// 4.2a — teste de desempenho: o último resultado fica no aparelho e vai junto no Feedback
+function benchLoad() { try { return JSON.parse(localStorage.getItem('ard-bench-last') || 'null'); } catch (e) { return null; } }
+function benchSummary() { const b = benchLoad(); return b ? b.fps + ' fps médio, 1% ' + b.p1 + ' fps, 5% ' + b.p5 + ' fps, ' + b.stutters + ' travadas (' + b.quality + ', ' + b.res + ', ' + b.version + ')' : null; }
 function feedbackUrl(extra) { const d = diagInfo(); const body = '**O que aconteceu:**\n\n**O que você esperava:**\n\n**Passos para repetir (se for um erro):**\n\n---\n**Diagnóstico automático:**\n' + Object.entries(Object.assign(d, extra || {})).filter(([, v]) => v != null).map(([k, v]) => '- ' + k + ': ' + v).join('\n'); return 'https://github.com/andreyrafael85/aether-rift-dominion/issues/new?labels=feedback&title=' + encodeURIComponent('[Beta ' + VERSION + '] ') + '&body=' + encodeURIComponent(body); }
 function loadPrefs() { try { return JSON.parse(localStorage.getItem('ard-beta-prefs') || '{}') || {}; } catch (e) { return {}; } }
 function savePrefs(p) { try { localStorage.setItem('ard-beta-prefs', JSON.stringify(p)); } catch (e) {} }
@@ -133,21 +136,21 @@ function initStart() {
   if ($('btn-resume')) { $('btn-resume').addEventListener('click', () => resumeFrom('auto', false)); $('btn-resume-drop').addEventListener('click', e => { const b = e.currentTarget; if (b.dataset.armed) ARD.saves.del('auto').then(refreshSaved); else { b.dataset.armed = '1'; b.textContent = 'Descartar mesmo?'; setTimeout(() => { delete b.dataset.armed; b.textContent = 'Descartar'; }, 3000); } }); }
   // 4.1c — convidado que recarregou a página (queda de energia, aba fechada) volta sozinho à sala em até 2 minutos
   function rejoinAfterReload(ms) {
-    const card = $('resume-card'); const N = ARD.net.create(); let done = false; const t0 = Date.now();
+    const card = $('resume-card'); const N = ARD.net.create(); let done = false; const t0 = Date.now(); window.__rejoining = true; // 4.2a: o teste de desempenho espera
     const show = (t, sub, canCancel) => { if (!card) return; card.hidden = false; $('resume-title').textContent = t; $('resume-sub').textContent = sub; $('btn-resume').hidden = true; $('btn-resume-drop').textContent = canCancel ? 'Cancelar' : 'Fechar'; };
     show('Voltando à sala ' + ms.code, 'Sua partida multiplayer caiu ' + ARD.saves.ago(ms.at) + '. Reconectando…', true);
-    $('btn-resume-drop').onclick = () => { done = true; mpSession.clear(); try { N.close(); } catch (e) {} card.hidden = true; $('btn-resume').hidden = false; $('btn-resume-drop').onclick = null; $('btn-resume-drop').textContent = 'Descartar'; refreshSaved(); };
+    $('btn-resume-drop').onclick = () => { done = true; window.__rejoining = false; mpSession.clear(); try { N.close(); } catch (e) {} card.hidden = true; $('btn-resume').hidden = false; $('btn-resume-drop').onclick = null; $('btn-resume-drop').textContent = 'Descartar'; refreshSaved(); };
     N.on('state', st => { if (done) return; done = true; startGame(Object.assign({}, ms.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value, resume: { sim: st.snap, ais: [] } }), { net: N, myId: ms.id }); });
-    N.on('rejoin-no', d => { done = true; mpSession.clear(); show('Não deu para voltar à sala ' + ms.code, 'O anfitrião recusou: ' + (d.why || '?') + '.', false); });
+    N.on('rejoin-no', d => { done = true; window.__rejoining = false; mpSession.clear(); show('Não deu para voltar à sala ' + ms.code, 'O anfitrião recusou: ' + (d.why || '?') + '.', false); });
     N.on('error', () => {}); N.on('close', () => {}); N.on('rejoin-fail', () => {});
-    const attempt = first => { if (done) return; if (Date.now() - t0 > 120000) { done = true; mpSession.clear(); show('Não deu para voltar à sala ' + ms.code, 'A sala não respondeu em 2 minutos.', false); return; }
+    const attempt = first => { if (done) return; if (Date.now() - t0 > 120000) { done = true; window.__rejoining = false; mpSession.clear(); show('Não deu para voltar à sala ' + ms.code, 'A sala não respondeu em 2 minutos.', false); return; }
       if (first || N.state !== 'connected') { N.rejoin(first ? { code: ms.code, id: ms.id, token: ms.token, me: Object.assign({}, ms.me, { build: BUILD }) } : null); $('resume-sub').textContent = 'Reconectando… tentativa ' + Math.ceil((Date.now() - t0 + 1) / 6000) + (navigator.onLine ? '' : ' (sem internet)'); }
       setTimeout(() => attempt(false), 6000); };
     attempt(true);
   }
   const msess = mpSession.load();
-  if (msess && msess.token && Date.now() - msess.at < 120000 && !params.get('autostart') && !params.get('novo')) rejoinAfterReload(msess);
-  else if (ARD.saves && !params.get('autostart') && !params.get('missao') && !params.get('novo') && !params.get('campanha'))
+  if (msess && msess.token && Date.now() - msess.at < 120000 && !params.get('autostart') && !params.get('novo') && !params.get('bench')) rejoinAfterReload(msess);
+  else if (ARD.saves && !params.get('autostart') && !params.get('missao') && !params.get('novo') && !params.get('campanha') && !params.get('bench'))
     ARD.saves.meta('auto').then(m => { if (m && !m.parked && (params.get('retomar') || Date.now() - m.savedAt < RESUME_AUTO_S * 1000)) resumeFrom('auto', true).then(ok => { if (!ok) refreshSaved(); }); else refreshSaved(); }).catch(() => refreshSaved());
   else refreshSaved();
   if (msess && Date.now() - msess.at >= 120000) mpSession.clear();
@@ -239,7 +242,10 @@ function initStart() {
     savePrefs(Object.assign(loadPrefs() || {}, cfg)); startGame(cfg);
   });
   $('btn-help-start').addEventListener('click', () => toggleHelp(true));
-  if (params.get('autostart')) { startGame({ name: 'Teste', faction: params.get('faction') || 'erevane', opp: params.get('opp') || '2', diff: params.get('diff') || 'normal', seed: parseInt(params.get('seed') || '5', 10), gfx: params.get('r') === '2d' ? '2d' : '3d' }); }
+  { const bb = $('btn-bench'); if (bb) { const show = () => { const b = benchLoad(); $('bench-last').textContent = b ? 'Último teste: ' + b.fps + ' fps médio · 1% ' + b.p1 + ' fps · qualidade ' + b.quality + ' · ' + new Date(b.at).toLocaleDateString('pt-BR') : 'Ainda sem teste neste aparelho.'; }; show();
+    bb.addEventListener('click', () => { if (lobby || window.__rejoining) { showTab('multi', true); mpStatus(lobby ? 'Saia da sala multiplayer (recarregue a página) antes de testar o desempenho.' : 'Aguarde a volta à sala multiplayer terminar antes de testar o desempenho.'); return; } startGame({ name: 'Teste', faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar', opp: '1', diff: 'normal', seed: 4242, gfx: '3d', quality: $('opt-quality').value, clima: 'auto', bench: true }); }); } }
+  if (params.get('bench')) { startGame({ name: 'Teste', faction: params.get('faction') || 'vehnar', opp: '1', diff: 'normal', seed: 4242, gfx: params.get('r') === '2d' ? '2d' : '3d', quality: params.get('q') || $('opt-quality').value, clima: params.get('clima') || 'auto', bench: true }); }
+  else if (params.get('autostart')) { startGame({ name: 'Teste', faction: params.get('faction') || 'erevane', opp: params.get('opp') || '2', diff: params.get('diff') || 'normal', seed: parseInt(params.get('seed') || '5', 10), gfx: params.get('r') === '2d' ? '2d' : '3d' }); }
 }
 
 // 4.1c — sessão multiplayer do convidado: código, lugar e ficha para voltar à sala depois de recarregar a página
@@ -254,6 +260,7 @@ const mpSession = {
 function startGame(cfg, netCtx) {
   if (ARD.logo3d) ARD.logo3d.stop(); // libera o contexto WebGL do logo vivo antes da partida
   if (ARD.leaders3d) ARD.leaders3d.stopAll(); // 4.1e: bustos dos cartões
+  if (!cfg.bench) document.body.classList.remove('bench'); // 4.2a
   const want3dEarly = (cfg.gfx || '3d') === '3d' && params.get('r') !== '2d';
   if (want3dEarly && !window.THREE && !window.__threeFailed) { $('start').hidden = true; $('game').hidden = false; $('loading').hidden = false; $('load-bar').style.width = '5%'; whenThree(() => startGame(cfg, netCtx)); return; }
   const net = netCtx ? netCtx.net : null;
@@ -293,7 +300,7 @@ function startGame(cfg, netCtx) {
   const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.7 : 1.0, yaw: Math.PI / 4, pitch: 0.95, pitchT: 0.95 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
   const ui = makeUI(); // closures below
   const I = ARD.input.create({ canvas, sim, view, R, human, ui });
-  const ais = cfg.resume ? cfg.resume.ais.map(ARD.ai.restore) : sim.players.filter(p => (!p.human && !(players[p.id] && players[p.id].passive)) || (!netCtx && params.get('ia') === 'todos')).map(p => ARD.ai.create(p.id, p.difficulty)); // ?ia=todos: a IA joga também pelo humano (capturas e testes)
+  const ais = cfg.resume ? cfg.resume.ais.map(ARD.ai.restore) : sim.players.filter(p => (!p.human && !(players[p.id] && players[p.id].passive)) || (!netCtx && params.get('ia') === 'todos')).filter(() => !cfg.bench).map(p => ARD.ai.create(p.id, p.difficulty)); // 4.2a: no teste ninguém pensa por cima do roteiro da batalha // ?ia=todos: a IA joga também pelo humano (capturas e testes)
   G = { lead3d: window.__lead3d || null, sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null, net, pending: [], waiting: false, waitT: 0 };
   if (params.get('debug')) window.__ARDG = G; // testes automatizados
   G.track = ARD.campUI ? ARD.campUI.tracker(sim, human) : null; // conquistas valem em qualquer partida
@@ -318,6 +325,7 @@ function startGame(cfg, netCtx) {
     $('loading').hidden = true;
     const ff = net || cfg.resume ? 0 : parseInt(params.get('ff') || '0', 10);
     if (cfg.resume && cfg.resume.view) { const v = cfg.resume.view; Object.assign(view.cam, v.cam || {}); view.cam.pitchT = view.cam.pitch; if (v.memory) view.memory = new Map(v.memory); }
+    if (cfg.bench) setupBench();
     if (cfg.resume && net) { net.sentFor = sim.tick - 1; G.pending = []; banner('De volta à sala', 'Partida sincronizada com o anfitrião no tempo ' + ARD.saves.mmss(sim.time) + '.', 'good', 7000); }
     else if (cfg.resume) { const fenda = G.camp && G.camp.noPause; if (!fenda) { G.paused = true; refreshTop(); } banner('Partida retomada', (cfg.resumeAuto ? 'Você voltou em ' + cfg.resumeAuto + ' s, ' : 'Salvamento de ' + ARD.saves.ago(cfg.resumeAt || Date.now()) + ', ') + 'no tempo ' + ARD.saves.mmss(sim.time) + ' de jogo.' + (fenda ? '' : ' Pausado: toque em ❚❚ ou P para continuar.'), 'info', 9000); }
     for (let i = 0; i < ff * 10; i++) tickOnce(true);
@@ -364,6 +372,7 @@ function startGame(cfg, netCtx) {
     if (!G.paused && !G.ended) { G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { if (tickOnce(false) === false) { G.acc = Math.min(G.acc, S.TICK); break; } G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; }
     if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; $('mp-wait').hidden = G.waitT < 0.8; if (G.waitT >= 0.8) $('mp-wait').textContent = net.state === 'rejoining' || G.rejoin ? 'Reconectando à sala ' + net.code + '… (' + Math.round((performance.now() - (G.rejoin ? G.rejoin.since : performance.now())) / 1000) + ' s)' : net.state === 'lost' ? 'Conexão perdida.' : 'Aguardando os outros jogadores… (' + G.waitT.toFixed(0) + ' s)'; }
     I.update(dt);
+    if (G.bench) benchFrame(now, dt);
     if (G.frameN % 3 === 0) refreshTop();
     if (G.frameN++ % 2 === 0) { refreshPanel(false); refreshQuick(); } // 4.1a: barato agora (vida e progresso atualizam no lugar)
     if (G.frameN % 30 === 0) refreshHints();
@@ -436,9 +445,58 @@ function startGame(cfg, netCtx) {
     const log = $('log'); const li = document.createElement('div'); li.textContent = mmss(sim.time) + ' · ' + e.text; log.prepend(li); while (log.children.length > 40) log.lastChild.remove();
   }
   function leaderMood(mood, ms) { if (G.lead3d && ARD.leaders3d) { ARD.leaders3d.mood(G.lead3d, mood, ms || 4500); if (mood === 3) ARD.leaders3d.react(G.lead3d, 'nod'); else if (mood === 2) ARD.leaders3d.react(G.lead3d, 'shake'); } const fac = sim.players[human].faction; const art = leaderArt(fac, mood); const L = $('leader'); if (!art || !L || L.hidden) return; $('leader-img').src = art; L.classList.remove('mood'); void L.offsetWidth; L.classList.add('mood'); clearTimeout(G.moodT); G.moodT = setTimeout(() => { $('leader-img').src = leaderArt(fac); }, ms || 4500); }
+  // ---------- 4.2a: teste de desempenho ----------
+  // Batalha fixa (semente 4242, dois exércitos no centro) e 3 s de aquecimento; depois, 30 s de câmera roteirizada.
+  // Mede FPS médio, piores 1% e 5% dos quadros e travadas (quadros acima de 50 ms). O ajuste automático de qualidade fica desligado.
+  function setupBench() {
+    const ns = sim.players.map(p => S.nucleoOf(sim, p.id)); const a = ns[0], b = ns[1] || { x: S.CX, y: S.CY };
+    const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L; const mx = a.x + (S.CX - a.x) * 0.5, my = a.y + (S.CY - a.y) * 0.5; // campo aberto entre a base A e a Fenda (a cratera fica fora)
+    for (const p of sim.players) { p.res.minerio += 4000; p.res.plasma += 2000; p.res.dados += 600; p.era = 3; const fac = S.FACTIONS[p.faction] ? p.faction : 'vehnar';
+      const own = Object.keys(S.UNITS).filter(d => !S.UNITS[d].epic && S.UNITS[d].attack && (!S.UNITS[d].faction || S.UNITS[d].faction === fac)); const side = p.id === 0 ? -1 : 1; const ids = [];
+      for (let i = 0; i < 30; i++) { const d = own[i % own.length]; const row = Math.floor(i / 6), col = i % 6; const px = mx + ux * side * (80 + row * 24) + -uy * (col - 2.5) * 28, py = my + uy * side * (80 + row * 24) + ux * (col - 2.5) * 28; const u = S.spawnUnit(sim, p.id, d, px, py); if (u) ids.push(u.id); }
+      S.enqueue(sim, { t: 'attackmove', p: p.id, ids, x: mx - ux * side * 400, y: my - uy * side * 400 }); }
+    const wave = () => { for (const p of sim.players) { const fac = S.FACTIONS[p.faction] ? p.faction : 'vehnar'; const own = Object.keys(S.UNITS).filter(d => !S.UNITS[d].epic && S.UNITS[d].attack && (!S.UNITS[d].faction || S.UNITS[d].faction === fac)); const side = p.id === 0 ? -1 : 1; const alive = sim.ents.filter(e => e.alive && e.kind === 'unit' && e.owner === p.id); const ids = alive.map(e => e.id);
+        for (let i = 0; i < Math.max(0, 30 - alive.length) && i < 8; i++) { const d = own[(i + Math.floor(sim.time)) % own.length]; const px = mx + ux * side * 260 + -uy * (i - 3.5) * 26, py = my + uy * side * 260 + ux * (i - 3.5) * 26; const u = S.spawnUnit(sim, p.id, d, px, py); if (u) ids.push(u.id); }
+        if (ids.length) S.enqueue(sim, { t: 'attackmove', p: p.id, ids, x: mx - ux * side * 120, y: my - uy * side * 120 }); } };
+    G.benchWave = wave; // reforço a cada 4 s de jogo: a batalha dura a janela inteira
+    view.reveal = true; R.forceDay = !params.get('noite'); G.perf.auto = false; G.speed = 1; document.body.classList.add('bench'); view.sel.clear(); I.buildMenu = false;
+    G.bench = { t0: performance.now(), mt: 0, warm: 3000, dur: 30000, frames: [], a, b, mx, my, yaw0: view.cam.yaw, done: false, nextWave: sim.time + 4 }; G.save30 = false; // 4.2a: economia de bateria não limita o teste
+    try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(l => { G.benchLock = l; }).catch(() => {}); } catch (e) {} // tela acesa durante o teste
+    banner('Teste de desempenho', 'Batalha fixa por 30 s com a câmera passeando pelo mapa. Não mexa no jogo até terminar.', 'info', 6000);
+  }
+  function benchFrame(now, dt) {
+    const B = G.bench; if (B.done) return; if (G.paused || document.hidden) { B.last = 0; B.wasPaused = true; return; } /* pausado: câmera parada e sem contar quadros */
+    if (B.last) B.mt += Math.min(250, now - B.last); /* relógio do teste: só avança com o jogo rodando */
+    const t = params.get('benchpasso') ? (B.vt = (B.vt || 0) + (+params.get('benchpasso') > 1 ? +params.get('benchpasso') : 1000 / 30)) : B.mt; /* ?benchpasso=1: tempo virtual por quadro (capturas iguais em qualquer máquina) */
+    if (sim.time >= B.nextWave && G.benchWave) { B.nextWave = sim.time + 4; G.benchWave(); }
+    if (t > B.warm && B.last) B.frames.push(now - B.last); B.last = now; // intervalo real entre quadros (o dt do jogo é limitado a 250 ms)
+    const k = Math.max(0, Math.min(1, (t - B.warm) / B.dur)); const sm = x => x * x * (3 - 2 * x); const lerp = (p, q, f) => p + (q - p) * f;
+    // trajeto: base A → batalha de perto → volta em órbita → panorama alto → base B
+    const c = view.cam; let x, y, z, yaw, pitch;
+    if (k < 0.25) { const f = sm(k / 0.25); x = lerp(B.a.x, B.mx, f); y = lerp(B.a.y, B.my, f); z = lerp(1.0, 1.5, f); yaw = B.yaw0; pitch = lerp(0.95, 0.7, f); }
+    else if (k < 0.55) { const f = (k - 0.25) / 0.3; x = B.mx; y = B.my; z = 1.5; yaw = B.yaw0 + sm(f) * Math.PI * 0.9; pitch = 0.7; }
+    else if (k < 0.75) { const f = sm((k - 0.55) / 0.2); x = B.mx; y = B.my; z = lerp(1.5, 0.45, f); yaw = B.yaw0 + Math.PI * 0.9; pitch = lerp(0.7, 1.05, f); }
+    else { const f = sm((k - 0.75) / 0.25); x = lerp(B.mx, B.b.x, f); y = lerp(B.my, B.b.y, f); z = lerp(0.45, 1.0, f); yaw = B.yaw0 + Math.PI * 0.9; pitch = lerp(1.05, 0.95, f); }
+    c.x = x; c.y = y; c.zoom = z; c.yaw = yaw; c.pitch = c.pitchT = pitch; B.k = k;
+    if (t >= B.warm + B.dur) benchDone();
+  }
+  function benchDone() {
+    const B = G.bench; B.done = true; if (G.benchLock) { try { G.benchLock.release(); } catch (e) {} } const fr = B.frames.slice(); const total = fr.reduce((s, v) => s + v, 0); const sorted = fr.slice().sort((p, q) => q - p);
+    if (!fr.length || (!params.get('benchpasso') && (fr.length < 20 || total < B.dur * 0.6))) { G.paused = true; refreshTop(); window.__benchResult = { aborted: true, frames: fr.length }; showBench(null); return; } // pouco medido (aba escondida, tela bloqueada): não salva
+    const pct = q => { const n = Math.max(1, Math.floor(sorted.length * q)); let s = 0; for (let i = 0; i < n; i++) s += sorted[i]; return Math.round(1000 / (s / n)); };
+    const res = { fps: Math.round(fr.length * 1000 / Math.max(1, total)), p1: pct(0.01), p5: pct(0.05), worst: Math.round(sorted[0] || 0), stutters: fr.filter(v => v > 50).length, frames: fr.length, quality: (R.quality && R.quality.name === 'auto' ? 'auto → ' + R.quality.resolved : (R.quality && R.quality.name) || '2d'), res: Math.round(R.w * (R.quality ? R.quality.pr : 1)) + 'x' + Math.round(R.h * (R.quality ? R.quality.pr : 1)), gpu: R.gpu || '?', version: VERSION, at: Date.now() };
+    try { localStorage.setItem('ard-bench-last', JSON.stringify(res)); } catch (e) {}
+    G.paused = true; refreshTop(); window.__benchResult = res; showBench(res);
+  }
+  function showBench(res) {
+    const box = $('benchbox'); if (!box) return; if (!res) { $('bench-verdict').textContent = 'Teste interrompido'; $('bench-verdict').className = 'bv warn'; $('bench-tip').textContent = 'O jogo ficou pausado ou em segundo plano durante a medição. Rode de novo com a tela acesa e sem trocar de aba.'; $('bench-table').innerHTML = ''; $('bench-feedback').hidden = true; $('bench-back').onclick = () => location.href = location.pathname; box.hidden = false; return; } $('bench-feedback').hidden = false; const verdict = res.fps >= 55 && res.p1 >= 35 ? ['Ótimo', 'good', 'Pode subir a qualidade.'] : res.fps >= 40 ? ['Bom', 'good', 'Fluido para jogar.'] : res.fps >= 26 ? ['Jogável', 'warn', 'Se travar em batalhas grandes, desça um degrau de qualidade.'] : ['Pesado', 'danger', 'Use a qualidade Baixa ou o modo 2D neste aparelho.'];
+    $('bench-verdict').textContent = verdict[0]; $('bench-verdict').className = 'bv ' + verdict[1]; $('bench-tip').textContent = verdict[2];
+    $('bench-table').innerHTML = [['FPS médio', res.fps], ['Piores 1% dos quadros', res.p1 + ' fps'], ['Piores 5% dos quadros', res.p5 + ' fps'], ['Pior quadro', res.worst + ' ms'], ['Travadas (> 50 ms)', res.stutters + ' de ' + res.frames], ['Qualidade', res.quality], ['Resolução interna', res.res], ['GPU', res.gpu]].map(([k, v]) => `<div class="stat"><span>${esc(k)}</span><b>${esc(String(v))}</b></div>`).join('');
+    $('bench-feedback').href = feedbackUrl({ teste_desempenho_detalhe: JSON.stringify(res) }); $('bench-back').onclick = () => location.href = location.pathname; box.hidden = false;
+  }
   // ---------- 4.1c: salvamento ----------
   function setupSaves() {
-    G.autoSave = !net && !!ARD.saves && !params.get('semsalvar');
+    G.autoSave = !net && !!ARD.saves && !params.get('semsalvar') && !cfg.bench;
     G.saveNow = (slot, extra) => { if (!G.autoSave || G.ended) return Promise.resolve(null);
       let data, meta; try { data = buildSave(); meta = saveMeta(extra); } catch (e) { console.warn('[ARD] salvamento: fotografia falhou', e); return Promise.resolve(null); }
       return ARD.saves.put(slot, meta, data).catch(e => { console.warn('[ARD] salvamento falhou:', e); return null; }); };
