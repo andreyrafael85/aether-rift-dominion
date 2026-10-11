@@ -4,14 +4,15 @@
 (function (ARD) {
 'use strict';
 const S = ARD.sim, C = ARD.campaign, P = ARD.progress; const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'];
-const COLORS = ['#FF8C1A', '#F2C230', '#FF4F6E', '#E8ECF2', '#4F8BFF', '#38D1E0', '#B98BFF', '#7FE3A1'];
+const SHADES = r => (S.RACE_SHADES && S.RACE_SHADES[r]) || ['#FF8C1A']; // 4.1a: cores do Hangar ligadas à Raça
 const SKINS = [{ n: 'Padrão', lv: 1 }, { n: 'Fortaleza', lv: 10 }, { n: 'Santuário', lv: 20 }];
 let D = null; // dependências de main.js: { $, leaderArt, LEADER_NAME, RACE_COLORS, LEADER_FACE, startGame, loadPrefs, savePrefs, selectedRace }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const stars = n => '<span class="stars">' + [0, 1, 2].map(i => i < n ? '★' : '<span class="off">★</span>').join('') + '</span>';
 function raceName(r) { return (S.FACTIONS[r] || {}).name || r; }
 function totalStars() { const s = P.load(); return Object.values(s.missions).reduce((a, m) => a + (m.stars || 0), 0); }
-function titleOf() { const h = P.load().hangar; return h.title || ''; }
+function titleOf() { const a = P.load().achievements; let best = '', t = 0; for (const id in a) if (C.TITLES[id] && a[id] >= t) { t = a[id]; best = C.TITLES[id]; } return best; } // título automático: o da conquista mais recente que dá título
+function colorFor(race) { const h = P.load().hangar; return (h.colors && h.colors[race]) || null; }
 function refreshMini() { const el = D.$('cmdr-mini'); if (!el) return; const li = P.levelInfo(); const s = P.load(); el.textContent = 'Comandante nível ' + li.level + ' · ' + li.xp.toLocaleString('pt-BR') + ' XP · ' + totalStars() + ' ★ na campanha' + (titleOf() ? ' · "' + titleOf() + '"' : '') + (s.relics.equipped.some(Boolean) ? ' · relíquias: ' + s.relics.equipped.filter(Boolean).map(id => (C.RELICS.find(r => r.id === id) || {}).name).join(', ') : ''); }
 
 // ---------- tela da campanha ----------
@@ -44,7 +45,7 @@ function openBriefing(id, opts) {
     $('br-obj').innerHTML = m.objectives.map(o => `<li class="${o.bonus ? 'bn' : ''}">${o.bonus ? '★ Bônus: ' : ''}${esc(o.text.replace(/^Bônus: /, ''))}</li>`).join('');
     const eq = P.load().relics.equipped.filter(Boolean).map(rid => (C.RELICS.find(r => r.id === rid) || {}).name); $('br-relics').textContent = (eq.length ? 'Relíquias equipadas: ' + eq.join(', ') + '. ' : 'Nenhuma relíquia equipada. ') + (m.relic && !P.load().relics.owned.includes(m.relic) ? 'Recompensa: relíquia ' + (C.RELICS.find(r => r.id === m.relic) || {}).name + '. ' : '') + 'Melhor resultado: ' + ((pr.stars || 0) ? (pr.stars + ' ★') : 'ainda não concluída') + '.'; };
   raceSel.onchange = draw; $('br-diff').onchange = draw; draw();
-  $('br-start').onclick = () => { const race = raceSel.value, diff = $('br-diff').value; const hg = P.load().hangar; const prep = C.prepare(id, { race, difficulty: diff, relics: P.load().relics.equipped, name: ($('opt-name').value.trim() || P.load().commander.name || 'Comandante').slice(0, 18), color: hg.color });
+  $('br-start').onclick = () => { const race = raceSel.value, diff = $('br-diff').value; const prep = C.prepare(id, { race, difficulty: diff, relics: P.load().relics.equipped, name: ($('opt-name').value.trim() || P.load().commander.name || 'Comandante').slice(0, 18), color: colorFor(race) });
     $('briefing').hidden = true; D.startGame({ name: prep.cfg.players[0].name, faction: race, seed: prep.cfg.seed, minutes: prep.cfg.minutes, players: prep.cfg.players, campaign: prep, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }); };
   $('briefing').hidden = false;
 }
@@ -52,38 +53,44 @@ function openBriefing(id, opts) {
 // ---------- Hangar ----------
 let hg = null;
 function openHangar() {
-  const $ = D.$; const s = P.load(); const li = P.levelInfo(); const st = { race: D.selectedRace(), color: s.hangar.color || COLORS[0], skin: Object.assign({}, s.hangar.skin), portrait: Object.assign({}, s.hangar.portrait), title: s.hangar.title || '' };
+  const $ = D.$; const s = P.load(); const li = P.levelInfo(); const st = { race: D.selectedRace(), colors: Object.assign({}, s.hangar.colors || {}), skin: Object.assign({}, s.hangar.skin), portrait: Object.assign({}, s.hangar.portrait) };
   $('hg-race').innerHTML = RACES.map(r => `<option value="${r}">${esc(raceName(r))}</option>`).join(''); $('hg-race').value = st.race;
-  const titles = [''].concat(Object.keys(s.achievements).map(id => C.TITLES[id]).filter(Boolean)); $('hg-title').innerHTML = titles.map(t => `<option value="${esc(t)}">${t ? esc(t) : '— sem título —'}</option>`).join(''); $('hg-title').value = titles.includes(st.title) ? st.title : '';
-  const draw = () => { $('hg-colors').innerHTML = COLORS.map(c => `<button class="swatch ${c === st.color ? 'on' : ''}" style="background:${c}" data-c="${c}" aria-label="cor ${c}"></button>`).join('');
+  const cur = () => st.colors[st.race] || SHADES(st.race)[0];
+  const draw = () => { $('hg-colors').innerHTML = SHADES(st.race).map(c => `<button class="swatch ${c === cur() ? 'on' : ''}" style="background:${c}" data-c="${c}" aria-label="tom ${c}"></button>`).join('');
     $('hg-skins').innerHTML = SKINS.map((k, i) => `<button class="chip2 ${(st.skin[st.race] || 0) === i ? 'on' : ''}" data-skin="${i}" ${li.level >= k.lv ? '' : 'disabled'}>${k.n}${li.level >= k.lv ? '' : ' · nível ' + k.lv}</button>`).join('');
     $('hg-portraits').innerHTML = [1, 2, 3].map(i => `<button class="chip2 ${(st.portrait[st.race] || D.LEADER_FACE_DEFAULT[st.race]) === i ? 'on' : ''}" data-por="${i}">${['Sereno', 'Furioso', 'Triunfante'][i - 1]}</button>`).join('');
-    $('hg-note').textContent = 'A cor vale nas partidas solo e na campanha (no multiplayer cada vaga tem cor fixa). O Núcleo e o retrato aparecem nas suas partidas.';
-    $('hg-colors').querySelectorAll('[data-c]').forEach(b => b.onclick = () => { st.color = b.dataset.c; draw(); view(); });
+    $('hg-note').textContent = 'Os tons são da paleta da ' + raceName(st.race) + ' e valem no solo, na campanha e no multiplayer (se dois jogadores escolherem tons parecidos, o segundo recebe o próximo tom). O Núcleo e o retrato aparecem nas suas partidas.';
+    $('hg-colors').querySelectorAll('[data-c]').forEach(b => b.onclick = () => { st.colors[st.race] = b.dataset.c; draw(); view(); });
     $('hg-skins').querySelectorAll('[data-skin]').forEach(b => b.onclick = () => { st.skin[st.race] = +b.dataset.skin; draw(); view(); });
     $('hg-portraits').querySelectorAll('[data-por]').forEach(b => b.onclick = () => { st.portrait[st.race] = +b.dataset.por; draw(); }); };
   $('hg-race').onchange = () => { st.race = $('hg-race').value; draw(); view(); };
-  $('hg-save').onclick = () => { P.setHangar({ color: st.color, skin: st.skin, portrait: st.portrait, title: $('hg-title').value }); applyHangar(); refreshMini(); $('hangar').hidden = true; stopViewer(); };
-  const view = () => startViewer(st.race, st.color, st.skin[st.race] || 0);
+  $('hg-save').onclick = () => { P.setHangar({ colors: st.colors, skin: st.skin, portrait: st.portrait }); applyHangar(); refreshMini(); $('hangar').hidden = true; pauseViewer(); };
+  const view = () => startViewer(st.race, cur(), st.skin[st.race] || 0);
   draw(); $('hangar').hidden = false; view();
-  const closeObs = new MutationObserver(() => { if ($('hangar').hidden) { stopViewer(); closeObs.disconnect(); } }); closeObs.observe($('hangar'), { attributes: true, attributeFilter: ['hidden'] });
+  const closeObs = new MutationObserver(() => { if ($('hangar').hidden) { pauseViewer(); closeObs.disconnect(); } }); closeObs.observe($('hangar'), { attributes: true, attributeFilter: ['hidden'] });
 }
-function startViewer(race, color, skin) {
-  const THREE = window.THREE, ME = ARD.meshes, ADD = window.THREE_ADDONS || {}; const cv = D.$('hg-view'); if (!THREE || !ME || !cv) return;
+const SIGNATURE = { vehnar: ['prensa', 'soldador'], erevane: ['lamina', 'atirador'], tessara: ['colosso', 'quimera'], quorith: ['monolito', 'voz'], vorag: ['brutamonte', 'cria'] };
+let hgPending = null;
+function startViewer(race, color, skin) { // 4.1a: um renderizador só, reaproveitado entre aberturas (antes o contexto era descartado e a reabertura ficava em branco)
+  const THREE = window.THREE, ME = ARD.meshes, ADD = window.THREE_ADDONS || {}; const cv = D.$('hg-view'); if (!cv) return;
+  const note = D.$('hg-loading'); if (!THREE || !ME) { if (note) note.hidden = false; if (!hgPending) { hgPending = () => { hgPending = null; if (!D.$('hangar').hidden) startViewer(race, color, skin); }; window.addEventListener('three-ready', hgPending, { once: true }); } return; }
+  if (note) note.hidden = true;
   try {
-    if (!hg) { const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); r.setSize(cv.clientWidth || 480, cv.clientHeight || 360, false); r.outputColorSpace = THREE.SRGBColorSpace; r.toneMapping = THREE.ACESFilmicToneMapping; r.shadowMap.enabled = true;
+    if (!hg) { const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); r.outputColorSpace = THREE.SRGBColorSpace; r.toneMapping = THREE.ACESFilmicToneMapping; r.shadowMap.enabled = true;
       const sc = new THREE.Scene(); sc.background = new THREE.Color(0x0b0d11); if (ADD.RoomEnvironment) { const pm = new THREE.PMREMGenerator(r); sc.environment = pm.fromScene(new ADD.RoomEnvironment(), 0.04).texture; pm.dispose(); }
-      sc.add(new THREE.HemisphereLight(0x9fb8d6, 0x2a2a30, 0.7)); const sun = new THREE.DirectionalLight(0xffe9c4, 1.8); sun.position.set(-60, 90, 70); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024); Object.assign(sun.shadow.camera, { left: -60, right: 60, top: 60, bottom: -60 }); sc.add(sun);
-      const ground = new THREE.Mesh(new THREE.CircleGeometry(70, 64).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x2c3038, roughness: 0.95 })); ground.receiveShadow = true; sc.add(ground);
-      const cam = new THREE.PerspectiveCamera(32, (cv.clientWidth || 4) / (cv.clientHeight || 3), 1, 2000); cam.position.set(104, 74, 104); cam.lookAt(0, 6, 0);
-      hg = { r, sc, cam, grp: null, mat: ME.material({ env: 0.75, key: 'hangar' }), em: new THREE.MeshBasicMaterial({ vertexColors: true }), raf: 0, t0: performance.now() };
-      const loop = now => { if (!hg) return; hg.raf = requestAnimationFrame(loop); if (hg.grp) hg.grp.rotation.y = (now - hg.t0) / 1000 * 0.35; hg.r.render(hg.sc, hg.cam); }; hg.raf = requestAnimationFrame(loop); }
+      sc.add(new THREE.HemisphereLight(0x9fb8d6, 0x2a2a30, 0.75)); const sun = new THREE.DirectionalLight(0xffe9c4, 1.8); sun.position.set(-60, 90, 70); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024); Object.assign(sun.shadow.camera, { left: -70, right: 70, top: 70, bottom: -70 }); sc.add(sun);
+      const ground = new THREE.Mesh(new THREE.CircleGeometry(80, 64).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x2c3038, roughness: 0.95 })); ground.receiveShadow = true; sc.add(ground);
+      const cam = new THREE.PerspectiveCamera(32, 4 / 3, 1, 2000); cam.position.set(104, 74, 104); cam.lookAt(0, 6, 0);
+      hg = { r, sc, cam, grp: null, mat: ME.material({ env: 0.75, key: 'hangar' }), em: new THREE.MeshBasicMaterial({ vertexColors: true }), raf: 0, t0: performance.now(), run: false };
+    }
+    const w = cv.clientWidth || 480, h = cv.clientHeight || 360; hg.r.setSize(w, h, false); hg.cam.aspect = w / h; hg.cam.updateProjectionMatrix();
     if (hg.grp) { hg.sc.remove(hg.grp); hg.grp.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
     const grp = new THREE.Group(); const add = (def, x, z, size, sk) => { const g = ME.build(def, race, color, sk || 0); if (!g) return; const k = size / g.width; const m = new THREE.Mesh(g.main, hg.mat); m.castShadow = m.receiveShadow = true; m.scale.setScalar(k); m.position.set(x, 0, z); grp.add(m); if (g.em) { const e = new THREE.Mesh(g.em, hg.em); e.scale.setScalar(k); e.position.set(x, 0, z); grp.add(e); } };
-    add('nucleo', 0, 0, 62, skin); add('veiculo', 34, 30, 16); add('infantaria', 18, 40, 7); add('coletor', -32, 34, 11); hg.grp = grp; hg.sc.add(grp);
-  } catch (e) { console.warn('[ARD] Hangar 3D indisponível: ' + e.message); }
+    const sig = SIGNATURE[race] || ['veiculo', 'infantaria']; add('nucleo', 0, 0, 62, skin); add(sig[0], 36, 30, 20); add(sig[1], 18, 42, 8); add('coletor', -34, 34, 11); hg.grp = grp; hg.sc.add(grp);
+    if (!hg.run) { hg.run = true; const loop = now => { if (!hg || !hg.run) return; hg.raf = requestAnimationFrame(loop); if (hg.grp) hg.grp.rotation.y = (now - hg.t0) / 1000 * 0.35; hg.r.render(hg.sc, hg.cam); }; hg.raf = requestAnimationFrame(loop); }
+  } catch (e) { console.warn('[ARD] Hangar 3D indisponível: ' + e.message); if (note) { note.hidden = false; note.textContent = 'Visualização 3D indisponível neste navegador.'; } }
 }
-function stopViewer() { if (!hg) return; cancelAnimationFrame(hg.raf); try { hg.r.dispose(); hg.r.forceContextLoss(); } catch (e) {} hg = null; }
+function pauseViewer() { if (!hg) return; hg.run = false; cancelAnimationFrame(hg.raf); }
 function applyHangar() { const h = P.load().hangar; for (const r of RACES) D.LEADER_FACE[r] = h.portrait[r] || D.LEADER_FACE_DEFAULT[r]; }
 
 // ---------- rastreio de conquistas (qualquer partida) ----------
@@ -144,7 +151,7 @@ function init(deps) {
   refreshMini();
   const q = new URLSearchParams(location.search); if (q.get('missao') && C.BY_ID[q.get('missao')]) setTimeout(() => openBriefing(q.get('missao'), { diff: q.get('dif') || undefined, race: q.get('raca') || undefined }), 200);
 }
-function applyColor(players) { const c = P.load().hangar.color; if (!c || !players || !players[0]) return; if (players.slice(1).some((pl, i) => (S.PLAYER_COLORS[(i + 1) % 4] || '').toLowerCase() === c.toLowerCase())) return; players[0].color = c; }
+function applyColor(players) { if (!players || !players[0]) return; const c = colorFor(players[0].faction); if (c) players[0].color = c; }
 function skinOf(race) { return P.load().hangar.skin[race] || 0; }
-ARD.campUI = { init, begin, finish, tracker, refreshMini, openCampaign, openBriefing, openHangar, applyColor, skinOf };
+ARD.campUI = { init, begin, finish, tracker, refreshMini, openCampaign, openBriefing, openHangar, applyColor, skinOf, colorFor };
 })(globalThis.ARD = globalThis.ARD || {});

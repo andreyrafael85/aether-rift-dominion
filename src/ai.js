@@ -101,13 +101,14 @@ function think(sim, mem) {
   for (const k in p.pacts) { const pact = p.pacts[k]; const q = sim.players[k]; if (!q.alive) continue; if (D.breakP > 0 && t - pact.since > 180 && S.armyValue(sim, mem.pid) > S.armyValue(sim, q.id) * 1.6 && sim.rand() < D.breakP / 60) { emitC({ t: 'break', with: q.id }); mem.mode = 'attack'; mem.attackStart = S.armyValue(sim, mem.pid); mem.target = null; } }
 
   // --- economia
-  const wantCol = Math.min(16, 6 + nodulos * 2 + strat.col);
+  const wantCol = Math.min(D.maxCol || 16, 6 + nodulos * 2 + strat.col);
   if (collectors.length + count(nuc.queue, q => q.def === 'coletor') < wantCol && nuc.queue.length < 2 && S.canAfford(p, S.UNITS.coletor.cost) && nuc.jumpT <= 0) emitC({ t: 'produce', id: nuc.id, def: 'coletor' });
   const reactors = count(builds, b => b.def === 'reator'); const towers = count(builds, b => b.def === 'torre');
   const needEnergy = p.energy.ratio < 1.1 && reactors < 8 && underConstruction < 2;
   const reserve = t < 240 ? D.reserve : 60;
-  if (needEnergy && S.canAfford(p, { minerio: S.BUILDINGS.reator.cost.minerio + reserve })) { const s = findSpot(sim, mem.pid, 'reator', nuc.x, nuc.y, 70, 260, 30); if (s) emitC({ t: 'build', def: 'reator', x: s.x, y: s.y }); }
-  else if (underConstruction < 2) {
+  const paced = !D.buildEvery || t - (mem.lastBuild == null ? -999 : mem.lastBuild) >= D.buildEvery; // 4.1a: o ritmo vale para tudo, Reatores inclusive
+  if (needEnergy && paced && S.canAfford(p, { minerio: S.BUILDINGS.reator.cost.minerio + reserve })) { const s = findSpot(sim, mem.pid, 'reator', nuc.x, nuc.y, 70, 260, 30); if (s) { emitC({ t: 'build', def: 'reator', x: s.x, y: s.y }); mem.lastBuild = t; } }
+  else if (underConstruction < 2 && paced) { // 4.1a: Fácil/Normal constroem num ritmo humano
     const order = BUILD_ORDERS[p.faction] || BUILD_ORDERS.vehnar; let def = order[mem.bo];
     if (!def || mem.bo >= order.length) {
       if (towers < mem.towersWanted && t - mem.lastExtra > 45) { def = 'torre'; mem.lastExtra = t; }
@@ -123,7 +124,7 @@ function think(sim, mem) {
         else if (def === 'refinaria') { let sx = 0, sy = 0, n = 0; for (const e of sim.ents) if (e.alive && e.kind === 'node' && S.inTerritory(sim, mem.pid, e.x, e.y)) { sx += e.x; sy += e.y; n++; } if (n) s = findSpot(sim, mem.pid, 'refinaria', sx / n, sy / n, 50, 160, 30); if (!s) s = findSpot(sim, mem.pid, 'refinaria', nuc.x, nuc.y, 90, 300, 30); }
         else if (def === 'torre') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = S.DM.atan2(en.y - nuc.y, en.x - nuc.x) + (sim.rand() - 0.5) * 1.2; s = findSpot(sim, mem.pid, 'torre', nuc.x + S.DM.cos(a) * 250, nuc.y + S.DM.sin(a) * 250, 0, 110, 30); } if (!s) s = findSpot(sim, mem.pid, 'torre', nuc.x, nuc.y, 150, 330, 30); }
         else s = findSpot(sim, mem.pid, def, nuc.x, nuc.y, 90, 320, 40);
-        if (s) { emitC({ t: 'build', def, x: s.x, y: s.y }); if (mem.bo < order.length) mem.bo++; }
+        if (s) { emitC({ t: 'build', def, x: s.x, y: s.y }); mem.lastBuild = t; if (mem.bo < order.length) mem.bo++; }
         else if (mem.bo < order.length) mem.bo++;
       }
     }
@@ -137,8 +138,8 @@ function think(sim, mem) {
   }
   // --- pesquisa, superarma, sobrecarga
   if (S.hasBuilt(sim, mem.pid, 'laboratorio')) {
-    for (const key of ['armamento', 'blindagem', 'sensores']) if (!p.research[key] && S.canAfford(p, S.RESEARCH[key].cost) && p.res.dados > 160) { emitC({ t: 'research', key }); break; }
-    if (t >= p.superCd && S.canAfford(p, { dados: 300, plasma: 300 })) { const fac = S.FACTIONS[p.faction]; if (fac.superKey === 'fundicao') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = S.DM.atan2(en.y - nuc.y, en.x - nuc.x); const s = findSpot(sim, mem.pid, 'bastiao', nuc.x + S.DM.cos(a) * 300, nuc.y + S.DM.sin(a) * 300, 0, 80, 30); if (s && S.inTerritory(sim, mem.pid, s.x, s.y)) emitC({ t: 'super', x: s.x, y: s.y }); } } else if (fac.superKey === 'eclosao') { if (mem.mode === 'attack' && mem.target) emitC({ t: 'super', x: mem.target.x, y: mem.target.y }); } else if (mem.mode === 'attack') emitC({ t: 'super' }); }
+    if (Object.keys(p.research).length < (D.research == null ? 3 : D.research)) for (const key of ['armamento', 'blindagem', 'sensores']) if (!p.research[key] && S.canAfford(p, S.RESEARCH[key].cost) && p.res.dados > 160) { emitC({ t: 'research', key }); break; }
+    if (D.superweapon !== false && t >= p.superCd && S.canAfford(p, { dados: 300, plasma: 300 })) { const fac = S.FACTIONS[p.faction]; if (fac.superKey === 'fundicao') { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en) { const a = S.DM.atan2(en.y - nuc.y, en.x - nuc.x); const s = findSpot(sim, mem.pid, 'bastiao', nuc.x + S.DM.cos(a) * 300, nuc.y + S.DM.sin(a) * 300, 0, 80, 30); if (s && S.inTerritory(sim, mem.pid, s.x, s.y)) emitC({ t: 'super', x: s.x, y: s.y }); } } else if (fac.superKey === 'eclosao') { if (mem.mode === 'attack' && mem.target) emitC({ t: 'super', x: mem.target.x, y: mem.target.y }); } else if (mem.mode === 'attack') emitC({ t: 'super' }); }
   }
   if (p.energy.regime !== 'pleno' && p.res.plasma > 450 && t >= p.overchargeCd) emitC({ t: 'overcharge' });
 
@@ -148,12 +149,13 @@ function think(sim, mem) {
   const w = Object.assign({}, strat.prod);
   w.veiculo += 0.5 * (seen.inf + seen.est) / total; w.drone += 0.5 * (seen.vei + seen.sup) / total; w.infantaria += 0.5 * (seen.dro + seen.sup) / total; w.suporte += 0.3 * (seen.vei + seen.est) / total;
   const reserveArmy = t < 240 ? D.reserve : 40;
+  let prodOrders = 0; const prodPaced = !D.prodEvery || t - (mem.lastProd == null ? -999 : mem.lastProd) >= D.prodEvery; // 4.1a: ritmo de produção por nível
   for (const b of prodBuildings) {
-    if (b.queue.length >= 2) continue; const opts = S.producesFor(b.def, p.faction).filter(u => u !== 'pirata' && u !== 'coletor');
+    if (!prodPaced || b.queue.length >= 2 || prodOrders >= (D.maxProd || 9)) continue; const opts = S.producesFor(b.def, p.faction).filter(u => u !== 'pirata' && u !== 'coletor');
     let pick = null, best = -1;
     for (const u of opts) { const ud = S.UNITS[u]; const cls = CLASS_W[u] || 'infantaria'; let sc = (w[cls] || 0.1) * (0.7 + sim.rand() * 0.6); if (!ud.attack) sc *= 0.35; if (ud.cost.dados && p.res.dados < (ud.cost.dados + 40)) sc = 0; if (S.unitCost(u) > 300 && t < 420) sc *= 0.3; if (sc > best) { best = sc; pick = u; } }
     if (pick === 'suporte' && p.res.dados < 60) pick = 'infantaria';
-    if (pick) { const c = Object.assign({}, S.UNITS[pick].cost); c.minerio = (c.minerio || 0) + reserveArmy; if (S.canAfford(p, c)) emitC({ t: 'produce', id: b.id, def: pick }); }
+    if (pick) { const c = Object.assign({}, S.UNITS[pick].cost); c.minerio = (c.minerio || 0) + reserveArmy; if (S.canAfford(p, c)) { emitC({ t: 'produce', id: b.id, def: pick }); prodOrders++; mem.lastProd = t; } }
   }
   // --- piratas (raids) e batedores
   const quartel = prodBuildings.find(b => b.def === 'quartel');
@@ -184,7 +186,7 @@ function think(sim, mem) {
     if (value < mem.attackStart * 0.35 || ids.length === 0) { mem.mode = 'defend'; if (ids.length) emitC({ t: 'move', ids, x: rally.x, y: rally.y }); }
     else {
       if (!mem.target || (mem.target.def !== 'nucleo' && ![...mem.known.values()].some(k => k.x === mem.target.x && k.y === mem.target.y))) mem.target = assessTargets(sim, mem, nuc);
-      if (mem.target && t - mem.lastAttackOrder > 5) { mem.lastAttackOrder = t; emitC({ t: 'attackmove', ids, x: mem.target.x, y: mem.target.y }); }
+      if (mem.target && t - mem.lastAttackOrder > 5) { mem.lastAttackOrder = t; const frac = D.attackFrac == null ? 1 : D.attackFrac; const sent = frac >= 1 ? ids : ids.filter((id, i) => (i % 10) < Math.round(frac * 10)); if (sent.length) emitC({ t: 'attackmove', ids: sent, x: mem.target.x, y: mem.target.y }); }
       if (!mem.target) mem.mode = 'defend';
     }
   }

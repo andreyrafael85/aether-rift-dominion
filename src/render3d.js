@@ -16,7 +16,7 @@ function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 2
 function rgba(h, a) { const c = hexToRgb(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
 function create(canvas, overlay, mini) {
   const _v = new THREE.Vector3(), _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3(), _c = new THREE.Color(); const UP = new THREE.Vector3(0, 1, 0);
-  const R = { canvas, w: 0, h: 0, dpr: 1, K: 1.7, zoomMin: 0.55, zoomMax: 2.4, supportsYaw: true, fx: { floats: [], rings: [] }, time: 0, shake: 0, icons: new Map(), geos: new Map(), inst: new Map(), sim: null, night: 0, spriteCache: new Map(), is3d: true };
+  const R = { canvas, w: 0, h: 0, dpr: 1, K: 1.7, zoomMin: matchMedia('(pointer: coarse)').matches ? 0.3 : 0.42, zoomMax: 2.4, supportsYaw: true, fx: { floats: [], rings: [] }, time: 0, shake: 0, icons: new Map(), geos: new Map(), inst: new Map(), sim: null, night: 0, spriteCache: new Map(), is3d: true };
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
   R.gpu = '?'; R.shaderErrors = []; R.degraded = [];
   try { const gl = renderer.getContext(); const ext = gl.getExtension('WEBGL_debug_renderer_info'); R.gpu = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); } catch (e) {}
@@ -256,7 +256,8 @@ function create(canvas, overlay, mini) {
   };
   // ---------- projeção ----------
   function updateCamera(cam) {
-    const d = CAM.baseDist / cam.zoom; const yaw = cam.yaw == null ? Math.PI / 4 : cam.yaw; const ty = H(cam.x, cam.y); const pitch = cam.pitch == null ? CAM.pitch : Math.max(CAM.minPitch, Math.min(CAM.maxPitch, cam.pitch));
+    const portrait = R.h > R.w * 1.05; const frame = portrait ? 1 + Math.min(0.85, (R.h / R.w - 1) * 0.6) : 1; R.camDist = CAM.baseDist * frame / cam.zoom; // 4.1a: celular em pé enxerga mais
+    const d = R.camDist; const yaw = cam.yaw == null ? Math.PI / 4 : cam.yaw; const ty = H(cam.x, cam.y); const pitch = cam.pitch == null ? CAM.pitch : Math.max(CAM.minPitch, Math.min(CAM.maxPitch, cam.pitch));
     camera.position.set(cam.x + Math.sin(yaw) * Math.cos(pitch) * d + R.shakeX, ty + Math.sin(pitch) * d, -cam.y + Math.cos(yaw) * Math.cos(pitch) * d + R.shakeY);
     camera.lookAt(cam.x, ty, -cam.y); camera.updateMatrixWorld(); camera.updateProjectionMatrix();
     if (sky) sky.position.copy(camera.position); if (home) { home.position.set(camera.position.x - 0.36 * 4200, camera.position.y * 0.15 + 4200 * 0.06, camera.position.z - 0.93 * 4200); }
@@ -272,7 +273,7 @@ function create(canvas, overlay, mini) {
   function miniM() { return mini.width / (2 * S.WORLD); }
   R.worldToMini = function (x, y) { const m = miniM(); return [(x - y) * m + mini.width / 2, (x + y) * m / 2 + mini.width / 4]; };
   R.miniToWorld = function (nx, ny) { const m = miniM(); const X2 = (nx * mini.width - mini.width / 2) / m, Y2 = (ny * mini.width - mini.width / 4) * 2 / m; return [(X2 + Y2) / 2, (Y2 - X2) / 2]; };
-  R.resize = function () { const dpr = Math.min(2, window.devicePixelRatio || 1); const w = canvas.clientWidth, h = canvas.clientHeight; R.w = w; R.h = h; R.dpr = dpr; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); if (composer) { composer.setSize(w, h); if (ssaoPass) ssaoPass.setSize(w, h); } if (overlay.width !== Math.round(w * dpr)) { overlay.width = Math.round(w * dpr); overlay.height = Math.round(h * dpr); } const ms = mini.clientWidth || 184; if (mini.width !== ms * dpr) { mini.width = ms * dpr; mini.height = ms * dpr; mfog.width = mini.width; mfog.height = mini.height; } };
+  R.resize = function () { const dpr = Math.min(2, window.devicePixelRatio || 1); const w = canvas.clientWidth, h = canvas.clientHeight; R.w = w; R.h = h; R.dpr = dpr; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = h > w * 1.05 ? 46 : 38; camera.updateProjectionMatrix(); if (composer) { composer.setSize(w, h); if (ssaoPass) ssaoPass.setSize(w, h); } if (overlay.width !== Math.round(w * dpr)) { overlay.width = Math.round(w * dpr); overlay.height = Math.round(h * dpr); } const ms = mini.clientWidth || 184; if (mini.width !== ms * dpr) { mini.width = ms * dpr; mini.height = ms * dpr; mfog.width = mini.width; mfog.height = mini.height; } };
 
   // ---------- 4.0d: bandeiras com a Insígnia da Raça no Núcleo e nos Nódulos ----------
   const FLAG = { poleGeo: new THREE.CylinderGeometry(0.06, 0.08, 1, 6).translate(0, 0.5, 0), clothGeo: new THREE.PlaneGeometry(1, 0.66, 10, 4).translate(0.5, 0, 0), poles: null, cloth: new Map(), uTime: { value: 0 } };
@@ -364,11 +365,11 @@ function create(canvas, overlay, mini) {
     R.shakeX = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0; R.shakeY = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0;
     updateCamera(cam);
     // dia e noite
-    const nt = R.night; for (const m of envMats) m.envMapIntensity = m.userData.env * (1 - 0.72 * nt); sun.intensity = 1.6 * (1 - nt) + 0.14 * nt; sun.color.setRGB(1 - 0.45 * nt, 0.91 - 0.3 * nt, 0.77 + 0.2 * nt); hemi.intensity = 0.55 * (1 - nt) + 0.2 * nt + lightning * 0.5; amb.intensity = 0.22 * (1 - nt) + 0.1 * nt + lightning * 0.6;
-    const bg = new THREE.Color().setRGB(0.62 * (1 - nt) + 0.02 * nt, 0.69 * (1 - nt) + 0.03 * nt, 0.77 * (1 - nt) + 0.06 * nt);
+    const nt = R.night; for (const m of envMats) m.envMapIntensity = m.userData.env * (1 - 0.72 * nt); sun.intensity = 1.6 * (1 - nt) + 0.55 * nt; sun.color.setRGB(1 - 0.48 * nt, 0.91 - 0.24 * nt, 0.77 + 0.2 * nt); hemi.intensity = 0.55 * (1 - nt) + 0.42 * nt + lightning * 0.5; amb.intensity = 0.22 * (1 - nt) + 0.26 * nt + lightning * 0.6; // 4.1a: lua azulada; a noite fica escura mas jogável
+    const bg = new THREE.Color().setRGB(0.62 * (1 - nt) + 0.07 * nt, 0.69 * (1 - nt) + 0.09 * nt, 0.77 * (1 - nt) + 0.16 * nt);
     const cl = R.climateCfg;
     if (cl) {
-      const camD = CAM.baseDist / Math.max(0.3, cam.zoom); scene.fog.near = camD * cl.fogN; scene.fog.far = camD * cl.fogF;
+      const camD = (R.camDist || CAM.baseDist / Math.max(0.3, cam.zoom)); scene.fog.near = camD * cl.fogN; scene.fog.far = camD * cl.fogF;
       bg.lerp(_cc.setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), cl.mix * (1 - nt * 0.45));
       if (cl.sun) sun.color.lerp(_cc.set(cl.sun), 0.5);
       if (cl.aurora) { const ka = (Math.sin(R.time * 0.3) + 1) / 2; bg.lerp(_cc.setRGB(cl.aurora[0], cl.aurora[1], cl.aurora[2]), 0.14 + 0.2 * ka); hemi.intensity += 0.15 * ka; }

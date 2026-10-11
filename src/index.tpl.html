@@ -119,17 +119,22 @@ body.touch #chat{width:170px;bottom:calc(9.5rem + env(safe-area-inset-bottom,0))
 .qb:disabled{opacity:.5;cursor:default}
 #bar{position:absolute;left:0;right:0;bottom:calc(.5rem + env(safe-area-inset-bottom,0));display:none;justify-content:center;gap:.4rem;padding:0 .5rem}
 body.touch #bar{display:flex}
-body.touch #panel{width:calc(100vw - 1.5rem);max-height:34vh;bottom:calc(3.6rem + env(safe-area-inset-bottom,0))}
+body.touch #panel{width:calc(100vw - 1.5rem);max-height:36vh;bottom:calc(var(--barh,3.4rem) + 1rem + env(safe-area-inset-bottom,0))}
 body.touch #right{width:120px} body.touch #minimap{width:120px;height:120px} body.touch #alerts{display:none} body.touch #log{display:none}
 body.touch .quick{font-size:11px}
-body.touch #top{gap:.3rem .6rem;padding:.3rem .5rem;font-size:12px}
+body.touch #top{gap:.25rem .5rem;padding:.25rem .45rem;font-size:11px}body.touch #top .energy{min-width:120px}
 body.touch #top .muted{display:none}
 body.touch .speed{margin-left:0}
 body.touch .speed button,body.touch .tb{padding:.2rem .4rem}
 body.touch #hints{top:calc(5.6rem + env(safe-area-inset-top,0));padding:.35rem .6rem;font-size:12px;width:calc(100vw - 130px)}
-body.touch #bar{flex-wrap:wrap;gap:.3rem}
-body.touch #bar .tb{min-width:0;flex:1 1 auto;padding:.3rem .35rem;font-size:12px}
-body.touch #panel{max-height:30vh;padding:.5rem}
+body.touch #bar{flex-wrap:nowrap;gap:.3rem;overflow-x:auto;justify-content:flex-start;scrollbar-width:none;-webkit-overflow-scrolling:touch}body.touch #bar::-webkit-scrollbar{display:none}
+body.touch #bar .tb{min-width:44px;min-height:44px;flex:0 0 auto;padding:.3rem .55rem;font-size:12px}
+body.touch #panel{max-height:36vh;padding:.5rem}
+#placebar{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(var(--barh,3.4rem) + 1rem + env(safe-area-inset-bottom,0));display:flex;gap:.5rem;align-items:center;background:rgba(15,17,22,.94);border:1px solid var(--line);border-radius:10px;padding:.45rem .6rem;z-index:4;max-width:calc(100vw - 1rem);font-size:12px}
+#placebar .act{min-height:44px;white-space:nowrap}#placebar #pb-text{flex:1;line-height:1.25}body.touch #placebar{width:calc(100vw - 1rem)}body.touch.placing #panel{display:none}
+.act .qn{position:absolute;top:4px;right:6px;background:var(--rift1);color:#14161A;border-radius:9px;padding:0 .35rem;font:700 11px/1.5 var(--fm)}.act{position:relative}
+.queue .qtot{font:600 11px var(--fm);color:var(--fg2);align-self:center;margin-right:.3rem}.queue .q b{color:#fff}.queue .q i.wait{color:#F2C230;font-style:normal}
+body.touch #objectives{top:calc(5.4rem + env(safe-area-inset-top,0));bottom:auto;max-height:96px;width:min(250px,60vw);font-size:.72rem}
 body.touch .grid{grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
 body.touch .act{min-height:40px;padding:.3rem .4rem}
 body.touch .act .ico{width:28px;height:28px}
@@ -233,6 +238,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 .stars{font-size:1.9rem;letter-spacing:.2em;color:#F2C230}.stars .off{color:#3a3f48}
 .unlock{border:1px dashed var(--race);border-radius:8px;padding:.45rem .6rem;font-size:.88rem}
 .hg{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:.9rem}.hg canvas{width:100%;aspect-ratio:4/3;border-radius:10px;border:1px solid var(--line);background:#0b0d11;display:block}
+.hg-stage{position:relative}.hg-loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--fg2);font-size:.9rem}
 .hg-opts{display:grid;gap:.45rem;align-content:start}.swatches{display:flex;flex-wrap:wrap;gap:.4rem}.swatch{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);cursor:pointer}.swatch.on{border-color:#fff;box-shadow:0 0 0 2px var(--race)}
 .chips2{display:flex;flex-wrap:wrap;gap:.35rem}.chip2{border:1px solid var(--line);border-radius:6px;padding:.3rem .55rem;background:var(--panel2);cursor:pointer;font-size:.85rem;color:var(--fg)}.chip2.on{border-color:var(--race);color:#fff}.chip2[disabled]{opacity:.4;cursor:not-allowed}
 .cmdr-mini{font-size:.8rem;color:var(--fg2)}
@@ -250,7 +256,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 <div id="start" class="screen">
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Versão 4.0f · build __BUILD__ · beta aberto · app instalável · Campanha · Engine gráfica 2 · multiplayer 2 a 4</div>
+    <div class="eyebrow">Versão 4.1a · build __BUILD__ · jogabilidade de campo · celular · Campanha · multiplayer 2 a 4</div>
     <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div><h1>Aether Rift<br><span>Dominion</span></h1></div></div>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -258,7 +264,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
       <div class="opts">
         <div class="opt"><label for="opt-name">Nome</label><input id="opt-name" maxlength="18"></div>
         <div class="opt"><label for="opt-opp">Oponentes de IA (só no modo solo)</label><select id="opt-opp"><option value="1">1 IA (1v1)</option><option value="2">2 IAs (FFA 3)</option><option value="3">3 IAs (FFA 4)</option></select></div>
-        <div class="opt"><label for="opt-diff">Dificuldade</label><select id="opt-diff"><option value="facil">Fácil</option><option value="normal">Normal</option><option value="dificil">Difícil</option></select></div>
+        <div class="opt"><label for="opt-diff">Dificuldade</label><select id="opt-diff"><option value="facil">Fácil</option><option value="normal">Normal</option><option value="dificil">Difícil</option><option value="brutal">Brutal</option></select></div>
         <div class="opt"><label for="opt-seed">Semente do mapa</label><input id="opt-seed" inputmode="numeric"></div>
         <div class="opt"><label for="opt-gfx">Gráficos</label><select id="opt-gfx"><option value="3d">3D (Three.js, luz e relevo)</option><option value="2d">2D isométrico (leve, para celulares fracos)</option></select></div>
         <div class="opt"><label for="opt-quality">Qualidade 3D</label><select id="opt-quality"><option value="auto">Automática</option><option value="baixa">Baixa (sem sombras e efeitos)</option><option value="media">Média (sombras e bloom)</option><option value="alta">Alta (sombras 4K, bloom e anti-aliasing MSAA 4×)</option><option value="ultra">Ultra (Alta + oclusão ambiente, experimental)</option></select></div>
@@ -278,13 +284,14 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     </div>
     <div class="notes">
       <div class="choose">Notas da versão</div>
+      <p class="start-notes"><b>4.1a — Jogabilidade de campo:</b> no celular, com unidades selecionadas, tocar no chão ou numa construção sua <b>move o grupo</b> (antes o toque perto da base virava seleção). Construir no toque ficou em dois passos: <b>arraste o fantasma</b>, que fica acima do dedo, e <b>confirme no ✓</b>. A câmera abre mais com o celular em pé, o zoom vai mais longe e a barra inferior virou uma linha com botões grandes, sem esconder o painel. <b>Fila de produção de até 50</b>, agrupada com contador ×N e paga quando cada unidade começa: clique +1, Shift +5, Ctrl +10 e segurar +5 no toque; no chip, clique cancela uma e Shift cancela todas daquele tipo. <b>Dificuldades refeitas e medidas</b>: no Fácil a IA constrói e produz devagar, ataca só depois dos 12 minutos com parte do exército e não usa superarma; novo nível <b>Brutal</b>. <b>Cores ligadas à Raça</b> em solo, campanha e multiplayer, com o tom escolhido no <b>Hangar</b>, que agora sempre abre o 3D e mostra unidades típicas da Raça; o campo Título saiu e o título aparece sozinho. Noites mais legíveis, com luz de lua.</p>
+      <p class="start-notes"><b>O que este beta testa:</b> construção com energia dinâmica, três recursos, Nódulos de território, roubo por Sifão, tabela de contras, névoa de guerra com camuflagem, diplomacia com Caução, superarmas e salas multiplayer P2P de 2 a 4 jogadores. Partidas de até 25 minutos.</p>
+      <details class="oldnotes"><summary>Histórico das versões anteriores (4.0f → 2.0)</summary>
       <p class="start-notes"><b>4.0f — Beta aberto, celular e app instalável:</b> o jogo vira um <b>app</b> (manifesto e ícones; no Chrome e no Android aparece "Instalar o jogo"), com <b>service worker</b>: depois da primeira visita, a campanha e as partidas solo abrem e rodam <b>sem internet</b> (o multiplayer avisa que precisa de rede). A <b>qualidade 3D automática</b> agora lê a GPU, a memória e os núcleos (placas dedicadas, Apple M e Intel Arc começam no Alta; celulares fortes no Média) e <b>se ajusta sozinha</b> pelo FPS medido, descendo um degrau quando a partida fica abaixo de ~26 fps. Nova opção <b>Economia de bateria (30 fps)</b>, ligada sozinha no celular com bateria abaixo de 20%. No toque, <b>girar dois dedos gira a câmera</b> e alertas de perigo e superarmas <b>vibram</b>. Trocar de aba <b>pausa</b> a partida solo; no multiplayer o jogo avisa ao voltar. O botão <b>Feedback</b> abre uma issue no GitHub já com versão, build, navegador, GPU, qualidade, FPS, Raça e semente.</p>
       <p class="start-notes"><b>4.0e — Campanha "O Ciclo da Maré" e progresso:</b> 20 missões com roteiro: Prólogo (Acorde, Energia e regimes, A primeira tempestade), Ato 1 (Cerco, Caça a comboios, Sobrevivência noturna), Ato 2 (Roubo e contrarroubo, Diplomacia forçada, Escolta sob tempestade), Ato 3 (Primeiro contato, A Prole devora um aliado, Aliança tripla instável), Ato 4 (Assalto à Catedral Errante, Matriarca encurralada, A Fenda aberta) e uma <b>Missão de Identidade</b> por Raça. Briefing com os líderes falando, objetivos principais e bônus na tela, transmissões durante a missão, ondas, comboios, pactos forçados e traições, escolta com farol de extração, tempestades roteirizadas e dois chefes épicos (Catedral Errante e Matriarca). Quatro dificuldades (Fácil, Normal, Difícil e Fenda, sem pausa). <b>Comandante</b> do nível 1 ao 30 com XP em missões, escaramuças e multiplayer, estrelas por missão, 19 <b>conquistas</b> com títulos, 6 <b>relíquias</b> equipáveis (2 espaços) e o <b>Hangar</b> com visualizador 3D: cor da equipe, três estilos de Núcleo (Padrão, Fortaleza no nível 10, Santuário no nível 20), retrato do líder e título. O progresso fica no navegador e pode ser copiado e restaurado por um código de backup.</p>
       <p class="start-notes"><b>4.0d — Engine gráfica 2 (restilização 3D):</b> as cinco Raças ganharam <b>modelos 3D de verdade</b>, suaves e com materiais físicos (cor, rugosidade e metal por peça, reflexo do ambiente): aço chanfrado com faixas de equipe e chaminés acesas no Vehnar, placas angulares de vidro escuro com costuras luminosas na Erevane, cascos orgânicos cor de osso com nervuras e bulbos na Tessara, cristal facetado com anéis flutuantes no Quorith e quitina úmida com espinhos e sacos membranosos na Vorag. São 191 modelos (construções, unidades, nós de recurso, rochas, ruínas e adereços), com nível de detalhe menor no celular. Os ícones do HUD agora são renderizados a partir dos modelos 3D. O mundo ganhou <b>céu</b> com sol e estrelas, o <b>planeta-mãe da sua Raça</b> e uma lua no horizonte, <b>cordilheiras além da borda do mapa</b> e terreno com textura de detalhe, rachaduras e relevo fino. Nova <b>inclinação livre da câmera</b> (◢, PageUp/PageDown ou Ctrl + roda) até a visão de horizonte. <b>Bandeiras</b> com a Insígnia Cristal da Raça tremulam no Núcleo e nos Nódulos, e o <b>logo da tela inicial é 3D ao vivo</b>, com os cinco mundos girando na órbita. Balanceamento: Erevane e Tessara mais fortes (Lâmina, Atirador, Mosquito, Quimera, Colosso e Traços mais rápidos).</p>
       <p class="start-notes"><b>4.0c — Coro Quorith e Prole Vorag jogáveis:</b> cinco Raças na tela inicial e nas salas multiplayer. O <b>Coro Quorith</b> luta em acorde: o <b>Elo de Sincronia</b> dá +3,5% de dano e +2,5% de armadura por aliado a até 90 (máx. 3; o <b>Diapasão</b> aceita um quarto), pactos custam metade da Caução e rendem o dobro de reputação, o <b>Ressonador</b> emudece torres enquanto sifona e o <b>Uníssono</b> fecha o acorde inteiro por 20 s. Unidades: Voz, Agulha (antiaérea), Diapasão, Prisma, Monólito (cerco) e Harmônico (voador). A <b>Prole Vorag</b> é massa barata: <b>Crias</b> eclodem em pares, sentem <b>Fome</b> fora do território, o <b>Carniceiro</b> devora carcaças (150% do valor) e corrói Nódulos inimigos em biomassa, e a <b>Eclosão</b> solta 8 Crias num ponto visível. Unidades: Cria, Cuspidor (ácido), Escaravelho, Brutamonte, Ferroada (voadora). Cada Raça nasce do chão à sua maneira: cristal que afina em facetas, casulo que pulsa e rompe. IAs novas: Coro de Zayin, Acorde Sétimo, Silêncio de Quor, Prole Velk, Ninhada Cega, Fome de Oru. Engine: <b>anti-aliasing MSAA 4×</b> nos presets Alta e Ultra (o vigia de tela preta desliga sozinho se a GPU não aguentar) e a Diplomacia abre com os dois líderes <b>frente a frente</b>, sereno em pacto, furioso em guerra. Controles no PC: a câmera continua rolando quando o mouse encosta na barra do navegador ou na barra do Windows, e <b>segurar o botão direito e arrastar</b> move o mapa (toque no celular segue igual: arrastar move, pinça aproxima).</p>
       <p class="start-notes"><b>4.0a — Identidade das Raças:</b> o jogo agora fala em <b>Raças</b>; portais na tela inicial com fundo vivo que acompanha a escolha; materiais 3D próprios por Raça (metal Vehnar, vidro furtivo Erevane, pele viva Tessara); cada Raça constrói com um <b>nascimento</b> próprio: módulos soldados em degraus, origami que cintila até camuflar, casulo que pulsa e floresce; presets de <b>clima</b> dentro da partida (névoa tóxica, tempestade de plasma, chuva de cristais, aurora, chuva ácida).</p>
-      <p class="start-notes"><b>O que este beta testa:</b> construção com energia dinâmica, três recursos, Nódulos de território, roubo por Sifão, tabela de contras, névoa de guerra com camuflagem, diplomacia com Caução, superarmas e salas multiplayer P2P de 2 a 4 jogadores. Partidas de até 25 minutos.</p>
-      <details class="oldnotes"><summary>Histórico das versões anteriores (3.0 → 2.0)</summary>
       <p class="start-notes"><b>No 3.0d:</b> salas multiplayer de 2 a 4 jogadores humanos por código, com lista de quem entrou; o anfitrião é o relé do lockstep e quem cair é retirado em 8 s sem travar a partida; simulação idêntica em Chrome, Firefox e Safari (matemática determinística); unidades atravessam o próprio Portão; presets Alta/Ultra com proteção contra tela preta. <b>No 3.0c:</b> a Raça Tessara (Traços, Fotossíntese, Salto Evolutivo) e oito unidades novas; banner de eliminação e contador de inimigos. <b>No 3.0b:</b> bloom, oclusão ambiente, névoa volumétrica, lagos de plasma, presets de qualidade e multiplayer P2P por código de sala. <b>No 3.0a:</b> o jogo inteiro em 3D com os mesmos modelos voxel, câmera com rotação, relevo, sombras e névoa de guerra projetada no terreno. <b>No 2.0:</b> projéteis com área e erro, torretas, veterância, carcaças, caminhos ao redor de muros, três camadas de névoa, Tempestade de Éter, som e voz, IA com estratégias e raids, controles de toque. <b>Próxima etapa de rede:</b> servidor dedicado, reconexão e relé TURN; hoje a sala é P2P direta (STUN).</p>
       </details>
     </div>
@@ -326,6 +333,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     </div>
     <div id="chat" hidden><div id="chat-log"></div><input id="chat-in" placeholder="Mensagem (Enter)" maxlength="120"></div>
     <div id="mp-wait" hidden>Aguardando o outro jogador…</div>
+    <div id="placebar" hidden><span id="pb-text"></span><button id="pb-ok" class="act good">✓ Construir aqui</button><button id="pb-no" class="act">✕</button></div>
     <div id="objectives" hidden><div class="oh" id="ob-title">Objetivos</div><ul id="ob-list"></ul></div>
     <div id="comms" hidden><img id="comms-img" alt=""><div><div class="nm" id="comms-name"></div><div class="tx" id="comms-text"></div></div></div>
     <div id="banner" class="banner" hidden><div id="banner-title"></div><div id="banner-sub"></div></div>
@@ -359,12 +367,11 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 </div></div>
 <div id="hangar" class="modal" hidden><div class="box wide"><button class="mclose" data-close aria-label="Fechar">✕</button>
   <div class="eyebrow">Personalização</div><h2>Hangar</h2>
-  <div class="hg"><canvas id="hg-view" width="640" height="480"></canvas><div class="hg-opts">
+  <div class="hg"><div class="hg-stage"><canvas id="hg-view" width="640" height="480"></canvas><div id="hg-loading" class="hg-loading" hidden>Carregando o 3D…</div></div><div class="hg-opts">
     <label class="small">Raça <select id="hg-race"></select></label>
-    <div class="small muted">Cor da equipe (solo e campanha)</div><div class="swatches" id="hg-colors"></div>
+    <div class="small muted">Tom da sua Raça</div><div class="swatches" id="hg-colors"></div>
     <div class="small muted">Núcleo</div><div class="chips2" id="hg-skins"></div>
     <div class="small muted">Retrato do líder no HUD</div><div class="chips2" id="hg-portraits"></div>
-    <div class="small muted">Título</div><select id="hg-title"></select>
     <div class="small muted" id="hg-note"></div>
   </div></div>
   <div class="row"><button id="hg-save" class="btn primary">Salvar</button><button class="btn" data-close>Fechar</button></div>

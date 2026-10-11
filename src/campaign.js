@@ -10,7 +10,7 @@ const ACTS = [
   { id: 'prologo', name: 'Prólogo — Acorde' }, { id: 'ato1', name: 'Ato 1 — Despertar da Maré' }, { id: 'ato2', name: 'Ato 2 — Rotas de Saque' },
   { id: 'ato3', name: 'Ato 3 — Coro e Fome' }, { id: 'ato4', name: 'Ato 4 — Domínio' }, { id: 'identidade', name: 'Missões de Identidade' },
 ];
-const DIFF = { facil: { ai: 'facil', wave: 0.7, xp: 0.8, label: 'Fácil' }, normal: { ai: 'normal', wave: 1, xp: 1, label: 'Normal' }, dificil: { ai: 'dificil', wave: 1.35, xp: 1.25, label: 'Difícil' }, fenda: { ai: 'dificil', wave: 1.7, xp: 1.5, storms: true, noPause: true, label: 'Fenda' } };
+const DIFF = { facil: { ai: 'facil', wave: 0.7, xp: 0.8, label: 'Fácil' }, normal: { ai: 'normal', wave: 1, xp: 1, label: 'Normal' }, dificil: { ai: 'dificil', wave: 1.35, xp: 1.25, label: 'Difícil' }, fenda: { ai: 'brutal', wave: 1.7, xp: 1.5, storms: true, noPause: true, label: 'Fenda' } };
 const RELICS = [
   { id: 'cofre-fendido', name: 'Cofre Fendido', desc: '+300 Minério e +150 Plasma no início; −8% na coleta.', mods: { startRes: { minerio: 300, plasma: 150 }, harvestMul: 0.92 } },
   { id: 'lente-de-eter', name: 'Lente de Éter', desc: '+20% de visão para tudo; torres com −10% de vida.', mods: { sensorMul: 1.2, towerHpMul: 0.9 } },
@@ -197,10 +197,9 @@ function prepare(id, o) {
   const used = new Set([race]); const AI_NAMES = { vehnar: ['Fundição Kessari', 'Consórcio Oryn', 'Estaleiro Vey'], erevane: ['Clã Sombrio', 'Náufragos de Ísk', 'Corsários da Faixa'], tessara: ['Linhagem Oriel', 'Ordem do Molde', 'Enxerto Vassi'], quorith: ['Coro de Zayin', 'Acorde Sétimo', 'Silêncio de Quor'], vorag: ['Prole Velk', 'Ninhada Cega', 'Fome de Oru'] };
   const players = [{ name: o.name || 'Comandante', faction: race, human: true, color: o.color || undefined, mods: Object.keys(mods).length ? mods : undefined }];
   for (const e of m.setup.enemies) { let r = e.race; if (r === 'rival') r = rivalOf(race, oi++); else if (r === 'others') { r = RACES.find(x => !used.has(x)) || rivalOf(race, oi++); } else if (r === race && !m.race) r = rivalOf(race, oi++); used.add(r);
-    const step = { facil: 'facil', normal: 'normal', dificil: 'dificil', fenda: 'dificil' }; // inimigos 'hard' seguem a dificuldade escolhida (o chefe já pesa)
+    const step = { facil: 'facil', normal: 'normal', dificil: 'dificil', fenda: 'brutal' }; // inimigos 'hard' seguem a dificuldade escolhida (o chefe já pesa)
     players.push({ name: e.name === 'auto' ? AI_NAMES[r][players.length % 3] : e.name, faction: r, difficulty: e.hard ? step[o.difficulty || 'normal'] : diff.ai, passive: !!e.passive, ally: !!e.ally }); }
   { const hostile = players.slice(1).filter(p => !p.passive).length; if (hostile >= 2) { const bonus = { facil: [700, 350], normal: [300, 150], dificil: [0, 0], fenda: [0, 0] }[o.difficulty || 'normal'] || [0, 0]; if (bonus[0]) { const m0 = players[0].mods = players[0].mods || {}; m0.startRes = Object.assign({}, m0.startRes); m0.startRes.minerio = (m0.startRes.minerio || 0) + bonus[0]; m0.startRes.plasma = (m0.startRes.plasma || 0) + bonus[1]; } } } // missões com vários inimigos ativos: reforço inicial no Fácil e no Normal
-  if (players[0].color) for (let i = 1; i < players.length; i++) if (S.PLAYER_COLORS[i % 4] && S.PLAYER_COLORS[i % 4].toLowerCase() === players[0].color.toLowerCase()) players[0].color = undefined; // cor repetida volta à padrão
   return { mission: m, diff, difficulty: o.difficulty || 'normal', race, cfg: { seed: m.setup.seed, players, minutes: (m.setup.minutes || 25) + (m.startTime ? Math.ceil(m.startTime / 60) : 0) } };
 }
 

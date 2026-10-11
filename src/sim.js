@@ -8,6 +8,18 @@ const WORLD = 3200;
 const CX = WORLD / 2, CY = WORLD / 2;
 const RIFT_R = 170;
 const PLAYER_COLORS = ['#FF8C1A', '#38D1E0', '#B98BFF', '#7FE3A1'];
+// 4.1a: tons por Raça (o Hangar escolhe um deles); a sim distribui sem repetir tons próximos — igual em todos os clientes
+const RACE_SHADES = {
+  vehnar:  ['#FF7733', '#FFB13D', '#E8562A', '#FFCF6E', '#C9762C', '#FF9A5C'],
+  erevane: ['#33FFD0', '#38B8FF', '#7CF2FF', '#1FC2A0', '#9AD8FF', '#5EEFB0'],
+  tessara: ['#55E68A', '#A4E84E', '#2FBF71', '#D2F27A', '#4FD1A5', '#86C93F'],
+  quorith: ['#B388FF', '#8C6BFF', '#D9B8FF', '#7A5CE6', '#E0A8FF', '#9FA0FF'],
+  vorag:   ['#E6455A', '#FF6B4A', '#C2304A', '#FF8A8A', '#A3203A', '#FF5A8A'],
+};
+function hexRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function colorDist(a, b) { const x = hexRgb(a), y = hexRgb(b); return Math.sqrt((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2 + (x[2] - y[2]) ** 2); }
+function assignColors(pcs) { const out = []; pcs.forEach((pc, i) => { const shades = RACE_SHADES[pc.faction] || PLAYER_COLORS; const want = pc.color && /^#[0-9a-fA-F]{6}$/.test(pc.color) ? [pc.color] : []; let pick = null;
+  for (const c of want.concat(shades)) if (out.every(o => colorDist(o, c) >= 80)) { pick = c; break; } out.push(pick || PLAYER_COLORS[i % PLAYER_COLORS.length]); }); return out; }
 const NAV = 32, NW = WORLD / NAV;          // grade de navegação 100×100
 const TILE = 64, TILES = WORLD / TILE;      // grade de exploração 50×50
 const DX8 = [1, 1, 0, -1, -1, -1, 0, 1], DY8 = [0, 1, 1, 1, 0, -1, -1, -1];
@@ -204,9 +216,11 @@ const REGIME = {
 };
 
 const DIFFICULTY = {
-  facil:   { name: 'Fácil',   income: 0.85, attackAt: 1500, minAttack: 600, acceptP: 0.8,  breakP: 0.0,  pirateEvery: 150, reserve: 200 },
-  normal:  { name: 'Normal',  income: 1.0,  attackAt: 1100, minAttack: 420, acceptP: 0.65, breakP: 0.12, pirateEvery: 100, reserve: 150 },
-  dificil: { name: 'Difícil', income: 1.2,  attackAt: 850,  minAttack: 240, acceptP: 0.5,  breakP: 0.35, pirateEvery: 70,  reserve: 100 },
+  // 4.1a: Fácil de verdade (economia menor, constrói devagar, ataca tarde e com parte do exército, sem superarma); Brutal novo no topo
+  facil:   { name: 'Fácil',   income: 0.55, attackAt: 1600, minAttack: 720, acceptP: 0.95, breakP: 0.0,  pirateEvery: 260, reserve: 300, buildEvery: 30, attackFrac: 0.6, research: 1, superweapon: false, maxProd: 1, prodEvery: 9, maxCol: 8 },
+  normal:  { name: 'Normal',  income: 0.9,  attackAt: 1500, minAttack: 480, acceptP: 0.7,  breakP: 0.08, pirateEvery: 150, reserve: 180, buildEvery: 10, attackFrac: 0.85, research: 2, superweapon: true, maxProd: 2, prodEvery: 3, maxCol: 12 },
+  dificil: { name: 'Difícil', income: 1.15, attackAt: 1600, minAttack: 360, acceptP: 0.5,  breakP: 0.3,  pirateEvery: 100, reserve: 120, buildEvery: 0,  attackFrac: 1,   research: 3, superweapon: true, maxProd: 9 },
+  brutal:  { name: 'Brutal',  income: 1.4,  attackAt: 1800, minAttack: 300, acceptP: 0.35, breakP: 0.45, pirateEvery: 80,  reserve: 90,  buildEvery: 0,  attackFrac: 1,   research: 3, superweapon: true, maxProd: 9 },
 };
 
 function mulberry32(seed) {
@@ -231,12 +245,12 @@ function createSim(cfg) {
   };
   sim.rand = mulberry32(sim.seed);
   const n = cfg.players.length;
-  const rot = sim.rand() * Math.PI * 2;
+  const rot = sim.rand() * Math.PI * 2; const colors = assignColors(cfg.players);
   for (let i = 0; i < n; i++) {
     const pc = cfg.players[i];
     const fac = FACTIONS[pc.faction] || FACTIONS.vehnar;
     const p = {
-      id: i, name: pc.name || (pc.human ? 'Você' : 'IA ' + i), faction: fac.id, color: PLAYER_COLORS[i % PLAYER_COLORS.length],
+      id: i, name: pc.name || (pc.human ? 'Você' : 'IA ' + i), faction: fac.id, color: colors[i],
       human: !!pc.human, difficulty: pc.difficulty || 'normal', alive: true,
       res: { plasma: 300, minerio: 500, dados: 40 },
       energy: { prod: 40, cons: 0, ratio: 1, regime: 'pleno' },
@@ -245,7 +259,6 @@ function createSim(cfg) {
       stats: { collected: 0, stolen: 0, lost: 0, unitsKilled: 0, unitsLost: 0, buildingsDestroyed: 0, buildingsLost: 0, treaties: 0, betrayals: 0, dmg: 0 },
       startAngle: rot + (Math.PI * 2 * i) / n,
     };
-    if (pc.color && /^#[0-9a-fA-F]{6}$/.test(pc.color)) p.color = pc.color; // 4.0e: cor escolhida no Hangar (solo e campanha)
     if (pc.mods) { p.mods = Object.assign({}, pc.mods); const sr = p.mods.startRes || {}; for (const k in sr) if (p.res[k] != null) p.res[k] += sr[k]; if (p.mods.extraJumps) p.jumpsLeft += p.mods.extraJumps; } // 4.0e: relíquias
     sim.players.push(p);
     sim.vis.push(new Set());
@@ -650,15 +663,17 @@ function processCommand(sim, c) {
     case 'produce': {
       const b = sim.byId.get(c.id); if (!b || !b.alive || b.kind !== 'building' || b.owner !== c.p || !b.built) return;
       const bd = BUILDINGS[b.def]; if (!producesFor(b.def, p.faction).includes(c.def)) return;
-      if (b.queue.length >= 6) return;
-      const ud = UNITS[c.def]; let mult = 1;
-      if (facOf(sim, c.p).lotes) { const same = b.queue.filter(q => q.def === c.def).length; if (same >= 4) mult = 0.5; }
-      if (!canAfford(p, scaleCost(ud.cost, mult))) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Recursos insuficientes' }); return; }
-      pay(p, ud.cost, mult); b.queue.push({ def: c.def, t: 0, total: ud.time, mult });
+      const n = Math.max(1, Math.min(50, c.n | 0 || 1)); // 4.1a: até 50 na fila; c.n enfileira várias de uma vez
+      for (let k = 0; k < n && b.queue.length < 50; k++) b.queue.push({ def: c.def, t: 0, total: UNITS[c.def].time, mult: 1, paid: false });
+      if (p.human && !canAfford(p, UNITS[c.def].cost) && b.queue.length > 1) emit(sim, { t: 'notice', p: c.p, text: 'Na fila: cada unidade é paga quando começa a ser produzida' });
       break; }
     case 'cancel': {
       const b = sim.byId.get(c.id); if (!b || !b.alive || b.owner !== c.p) return;
-      const it = b.queue[c.index]; if (!it) return; refund(p, UNITS[it.def].cost, it.mult); b.queue.splice(c.index, 1);
+      if (c.def && UNITS[c.def]) { // 4.1a: por tipo — a última unidade desse tipo (clique) ou todas (Shift); não depende de índice, que muda quando uma unidade fica pronta
+        for (let i = b.queue.length - 1; i >= 0; i--) { const it = b.queue[i]; if (it.def !== c.def) continue; if (it.paid) refund(p, UNITS[it.def].cost, it.mult); b.queue.splice(i, 1); if (!c.all) break; }
+        break; }
+      const n = Math.max(1, Math.min(50, c.n | 0 || 1)); const def0 = b.queue[c.index] && b.queue[c.index].def;
+      for (let k = 0; k < n; k++) { const it = b.queue[c.index]; if (!it || it.def !== def0) break; if (it.paid) refund(p, UNITS[it.def].cost, it.mult); b.queue.splice(c.index, 1); }
       break; }
     case 'rally': { const b = sim.byId.get(c.id); if (b && b.alive && b.owner === c.p && b.kind === 'building') b.rally = { x: c.x, y: c.y }; break; }
     case 'research': {
@@ -1126,7 +1141,11 @@ function updateBuilding(sim, b, dt) {
       let n = 0; queryGrid(sim, b.x, b.y, 160, e => { if (e !== b && e.kind === 'building' && e.owner === b.owner && e.built && BUILDINGS[e.def].produces && e.def !== 'nucleo' && dist(e.x, e.y, b.x, b.y) <= 150) n++; });
       mult *= 1 + 0.12 * Math.min(4, n);
     }
-    const it = b.queue[0]; it.t += dt * mult;
+    const it = b.queue[0];
+    if (!it.paid) { // 4.1a: paga ao começar; Lotes Vehnar (4+ iguais na fila) saem pela metade
+      if (facOf(sim, b.owner).lotes) { let same = 0; for (const q of b.queue) if (q.def === it.def) same++; it.mult = same >= 4 ? 0.5 : 1; }
+      const cost = scaleCost(UNITS[it.def].cost, it.mult); if (!canAfford(p, cost)) { it.waiting = true; mult = 0; } else { pay(p, UNITS[it.def].cost, it.mult); it.paid = true; it.waiting = false; } }
+    it.t += dt * mult;
     if (it.t >= it.total) {
       b.queue.shift();
       const ang = b.rally ? DM.atan2(b.rally.y - b.y, b.rally.x - b.x) : DM.atan2(CY - b.y, CX - b.x);
@@ -1313,7 +1332,7 @@ function hash(sim) { // cheap state hash for determinism tests
 
 ARD.sim = {
   TICK, WORLD, CX, CY, RIFT_R, FACTIONS, BUILDINGS, UNITS, WEAPONS, COUNTER, CLASS_NAMES, VET_RANKS, unitCost, RESEARCH, REGIME, DIFFICULTY, REP_NAMES,
-  SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS, FACTION_EXTRAS, producesFor,
+  SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS, RACE_SHADES, assignColors, FACTION_EXTRAS, producesFor,
   NAV, NW, TILE, TILES, BIOMES, navIdx, passable, flowField, lineFree, inStorm,
   DM,
   createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint, spawnUnit, forceStorm,

@@ -10,9 +10,13 @@ function create(o) {
 
   function clampCam() { cam.zoom = Math.max(R.zoomMin || 0.3, Math.min(R.zoomMax || 1.8, cam.zoom)); const m = 200; cam.x = Math.max(-m, Math.min(S.WORLD + m, cam.x)); cam.y = Math.max(-m, Math.min(S.WORLD + m, cam.y)); }
   I.center = function (x, y) { cam.x = x; cam.y = y; clampCam(); };
+  I.confirmPlace = function () { // 4.1a: ✓ da barra de posicionamento no toque
+    const g = view.ghost; if (I.mode !== 'build' || !g) return; const ok = S.canBuild(sim, human, g.def, g.x, g.y);
+    if (!ok.ok) { ui.notice(ok.why); return; } if (!S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost)) { ui.notice('Recursos insuficientes'); return; }
+    cmd({ t: 'build', def: g.def, x: g.x, y: g.y }); view.marker = { x: g.x, y: g.y, t: R.time, col: '#7FE3A1' }; I.setMode('normal'); };
   I.setMode = function (mode, data) {
     I.mode = mode; view.mode = mode; view.ghost = null;
-    if (mode === 'build') { view.ghost = { def: data, x: cam.x, y: cam.y, ok: false }; updateGhost(I.lastSX || R.w / 2, I.lastSY || R.h / 2); }
+    if (mode === 'build') { view.ghost = { def: data, x: cam.x, y: cam.y, ok: false }; if (I.lastType === 'touch') updateGhost(R.w / 2, R.h * 0.42); else updateGhost(I.lastSX || R.w / 2, I.lastSY || R.h / 2); }
     canvas.style.cursor = mode === 'normal' ? 'default' : 'crosshair';
     ui.modeChanged(mode, data);
   };
@@ -101,13 +105,13 @@ function create(o) {
     if (mode === 'super') { cmd({ t: 'super', x: wx, y: wy }); I.setMode('normal'); return; }
     if (mode === 'jump') { ui.confirm('Saltar o Núcleo para este ponto? Custa ' + Math.round(S.FACTIONS[sim.players[human].faction].jumpCostFrac * 100) + '% de cada recurso e 60 s de canalização visível a todos.', () => cmd({ t: 'jump', x: wx, y: wy })); I.setMode('normal'); return; }
     if (mode === 'rally') { const b = ownSelectedBuilding(); if (b) cmd({ t: 'rally', id: b.id, x: wx, y: wy }); I.setMode('normal'); return; }
-    // normal: select
-    const t = pick(sx, sy, I.lastType === 'touch' ? 26 : 8);
+    // normal: select (4.1a: no toque, com unidades selecionadas, a área das suas unidades encolhe para o toque no chão virar movimento)
+    const selUnits = I.lastType === 'touch' ? ownSelectedUnits() : []; const t = pick(sx, sy, I.lastType === 'touch' ? (selUnits.length ? 10 : 26) : 8);
     const now = performance.now();
     if (I.lastType === 'touch') { // toque: com unidades selecionadas, tocar no chão move e tocar em alvo comanda
       const units = ownSelectedUnits();
       if (units.length && t && (t.owner !== human && t.owner >= 0 || t.kind === 'node' || t.kind === 'crate' || t.kind === 'wreck')) { contextCommand(wx, wy, sx, sy); return; }
-      if (units.length && !t) { cmd({ t: 'move', ids: units.map(u => u.id), x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#E8E2D6' }; return; }
+      if (units.length && (!t || (t.owner === human && (t.kind === 'building' || view.sel.has(t.id))))) { cmd({ t: 'move', ids: units.map(u => u.id), x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#E8E2D6' }; return; } // tocar numa construção sua ou no próprio grupo também move
       if (!units.length && !t) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice('Ponto de reunião definido'); return; } }
     }
     if (t && t.kind !== 'node' && t.kind !== 'crate') {
@@ -154,11 +158,13 @@ function create(o) {
     const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top; I.lastSX = sx; I.lastSY = sy;
     const p = I.pointers.get(e.pointerId); if (p) { p.x = e.clientX; p.y = e.clientY; }
     if (I.pinch && I.pointers.size === 2) { const pts = [...I.pointers.values()]; const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y); const cx = (pts[0].x + pts[1].x) / 2, cy = (pts[0].y + pts[1].y) / 2; cam.zoom = I.pinch.zoom * (d / I.pinch.d); clampCam(); if (R.supportsYaw) { let da = Math.atan2(pts[1].y - pts[0].y, pts[1].x - pts[0].x) - I.pinch.a; da = Math.atan2(Math.sin(da), Math.cos(da)); if (!I.pinch.rot && Math.abs(da) > 0.14) I.pinch.rot = true; if (I.pinch.rot) cam.yaw = I.pinch.yaw - da; } /* 4.0f: dois dedos giram */ const [pwx, pwy] = R.screenDeltaToWorld(cam, cx - I.pinch.cx, cy - I.pinch.cy); cam.x = I.pinch.camx - pwx; cam.y = I.pinch.camy - pwy; clampCam(); return; }
-    if (view.ghost) updateGhost(sx, sy);
+    const touchPlace = I.mode === 'build' && view.ghost && I.lastType === 'touch' && !S.BUILDINGS[view.ghost.def].wall;
+    if (view.ghost && !touchPlace) updateGhost(sx, sy);
     const d = I.down; if (!d) { const t = pick(sx, sy, 8); view.hover = t ? t.id : null; return; }
     if (!d.moved && Math.hypot(sx - d.sx, sy - d.sy) > 7) { d.moved = true; clearTimeout(I.longPress); }
     if (!d.moved) return;
     if (I.wallDrag) { const [wx1, wy1] = R.screenToWorld(cam, sx, sy); view.wallGhost = wallSegments(I.wallDrag.x, I.wallDrag.y, wx1, wy1, view.ghost.def); return; }
+    if (touchPlace && d.type === 'touch') { updateGhost(sx, sy - 70); ui.placeChanged && ui.placeChanged(); return; } // 4.1a: arrastar leva o fantasma acima do dedo
     const panning = d.button === 1 || d.button === 2 || (d.type === 'touch' && !I.touchBox) || (d.button === 0 && I.keys.has('Space')); // 4.0c: botão direito arrastando também move o mapa
     if (panning) { const [dwx, dwy] = R.screenDeltaToWorld(cam, sx - d.sx, sy - d.sy); cam.x = d.camx - dwx; cam.y = d.camy - dwy; clampCam(); view.box = null; }
     else if (d.button === 0 && I.mode === 'normal') view.box = { x0: d.sx, y0: d.sy, x1: sx, y1: sy };
@@ -172,6 +178,7 @@ function create(o) {
     const [wx, wy] = R.screenToWorld(cam, sx, sy);
     if (I.wallDrag) { const segs = view.wallGhost; I.wallDrag = null; view.wallGhost = null; if (d.moved && segs && segs.length && view.ghost) { let n = 0; for (const g of segs) if (g.ok) { cmd({ t: 'build', def: view.ghost.def, x: g.x, y: g.y, ang: g.ang }); n++; } if (n) view.marker = { x: segs[0].x, y: segs[0].y, t: R.time, col: '#7FE3A1' }; if (!d.shift) I.setMode('normal'); return; } }
     if (view.box) { const b = view.box; view.box = null; boxSelect(b, d.shift); return; }
+    if (I.mode === 'build' && view.ghost && d.type === 'touch' && !S.BUILDINGS[view.ghost.def].wall) { if (!d.moved) updateGhost(sx, sy); ui.placeChanged && ui.placeChanged(); return; } // toque só reposiciona; o ✓ confirma
     if (d.moved) return;
     if (d.button === 2) { if (I.mode !== 'normal') I.setMode('normal'); else contextCommand(wx, wy, sx, sy); return; }
     if (d.button === 0) {
@@ -200,7 +207,7 @@ function create(o) {
     if (k === 'B' && !e.ctrlKey) { I.buildMenu = !I.buildMenu; ui.buildMenuChanged(I.buildMenu); return; }
     if (I.buildMenu && BUILD_KEYS[k]) { I.buildMenu = false; ui.buildMenuChanged(false); I.setMode('build', BUILD_KEYS[k]); return; }
     const b = ownSelectedBuilding(); const units = ownSelectedUnits();
-    if (b && !units.length && S.BUILDINGS[b.def].produces && PROD_KEYS[k] && S.BUILDINGS[b.def].produces.includes(PROD_KEYS[k])) { cmd({ t: 'produce', id: b.id, def: PROD_KEYS[k] }); return; }
+    if (b && !units.length && S.BUILDINGS[b.def].produces && PROD_KEYS[k] && S.BUILDINGS[b.def].produces.includes(PROD_KEYS[k])) { cmd({ t: 'produce', id: b.id, def: PROD_KEYS[k], n: e.shiftKey ? 5 : 1 }); return; }
     if (k === 'A' && units.length) { I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'); return; }
     if (k === 'S' && units.length) { cmd({ t: 'stop', ids: units.map(u => u.id) }); return; }
     if (k === 'F' && view.sel.size) { const en = sim.byId.get([...view.sel][0]); if (en) I.center(en.x, en.y); return; }

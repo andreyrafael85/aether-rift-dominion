@@ -14,7 +14,7 @@ function create() {
   function sendTo(conn, msg) { try { conn.send(msg); } catch (e) {} }
   function broadcast(msg, except) { for (const g of N.guests) if (g.open && g.conn !== except) sendTo(g.conn, msg); }
   const readyGuests = () => N.guests.filter(g => g.ready);
-  N.roster = () => N.role === 'host' ? [{ id: 0, name: N.me.name, faction: N.me.faction }].concat(readyGuests().map((g, i) => ({ id: i + 1, name: g.name, faction: g.faction }))) : N.players;
+  N.roster = () => N.role === 'host' ? [{ id: 0, name: N.me.name, faction: N.me.faction, color: N.me.color || null }].concat(readyGuests().map((g, i) => ({ id: i + 1, name: g.name, faction: g.faction, color: g.color || null }))) : N.players;
   function lobbyMsg() { return { t: 'lobby', players: N.roster(), size: N.size }; }
   function pushLobby() { const m = lobbyMsg(); broadcast(m); fire('lobby', m); }
   // ---- anfitrião
@@ -29,7 +29,7 @@ function create() {
         if (g.ready) return;
         if (d.v !== PROTO) { sendTo(conn, { t: 'bad-version', v: PROTO, build: N.me.build || '' }); fire('error', { message: 'o convidado ' + String(d.name || '?').slice(0, 18) + ' está com outra versão do jogo; peça para atualizar a página (Ctrl+F5)' }); setTimeout(() => { try { conn.close(); } catch (e) {} }, 500); return; }
         if (full()) { sendTo(conn, { t: 'full' }); return; }
-        g.name = String(d.name || 'Convidado').slice(0, 18); g.faction = String(d.faction || 'vehnar'); g.ready = true;
+        g.name = String(d.name || 'Convidado').slice(0, 18); g.faction = String(d.faction || 'vehnar'); g.color = /^#[0-9a-fA-F]{6}$/.test(d.color || '') ? d.color : null; g.ready = true;
         if (d.build && N.me.build && d.build !== N.me.build) fire('warn', { message: 'build diferente em ' + g.name + ' (' + d.build + ' × ' + N.me.build + '); se algo falhar, Ctrl+F5 nos dois lados' });
         sendTo(conn, { t: 'welcome', size: N.size, v: PROTO, build: N.me.build || '' }); pushLobby();
       }
@@ -62,7 +62,7 @@ function create() {
     open();
   };
   N.start = function (cfg) { // só o anfitrião: fixa os ids finais e avisa todos
-    N.me = { name: cfg.players[0].name, faction: cfg.players[0].faction };
+    N.me = { name: cfg.players[0].name, faction: cfg.players[0].faction, color: cfg.players[0].color || null };
     const rg = readyGuests(); rg.forEach((g, i) => { g.id = i + 1; });
     N.players = N.roster(); N.started = true;
     for (const g of rg) sendTo(g.conn, { t: 'start', cfg, you: g.id, players: N.players });
@@ -76,7 +76,7 @@ function create() {
     N.peer = new Peer({ debug: 0 });
     N.peer.on('open', () => {
       const conn = N.peer.connect('aether-rift-' + N.code.toLowerCase(), { reliable: true, serialization: 'json' }); N.hostConn = conn;
-      conn.on('open', () => { N.state = 'connected'; send({ t: 'hello', name: me.name, faction: me.faction, v: PROTO, build: me.build || '' }); fire('open', {}); });
+      conn.on('open', () => { N.state = 'connected'; send({ t: 'hello', name: me.name, faction: me.faction, color: me.color || null, v: PROTO, build: me.build || '' }); fire('open', {}); });
       conn.on('data', d => {
         if (!d || typeof d !== 'object') return;
         if (d.t === 'welcome') { if (d.v !== PROTO) { N.state = 'lost'; fire('error', { message: 'versão do jogo diferente da do anfitrião; atualizem a página (Ctrl+F5) nos dois lados' }); try { conn.close(); } catch (e) {} return; } N.size = d.size; if (d.build && me.build && d.build !== me.build) fire('warn', { message: 'build diferente do anfitrião (' + d.build + ' × ' + me.build + '); se algo falhar, Ctrl+F5 nos dois lados' }); }
