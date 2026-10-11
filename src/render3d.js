@@ -26,10 +26,14 @@ function create(canvas, overlay, mini) {
   const isTouch = matchMedia('(pointer: coarse)').matches;
   renderer.setPixelRatio(Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1));
   renderer.shadowMap.enabled = !isTouch; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
-  const ADD = window.THREE_ADDONS || null; let composer = null, bloomPass = null, ssaoPass = null;
+  const ADD = window.THREE_ADDONS || null; let composer = null, bloomPass = null, ssaoPass = null, gradePass = null;
+  // 4.2d: gradação de cor (linear, antes do tone mapping): ganho por canal, saturação, contraste e vinheta; muda com o clima, a noite e a Raça
+  const GRADE = { uniforms: { tDiffuse: { value: null }, uGain: { value: new THREE.Vector3(1.03, 1.0, 0.97) }, uLift: { value: new THREE.Vector3(0, 0, 0.004) }, uSat: { value: 1.08 }, uCon: { value: 1.06 }, uVig: { value: 0.28 } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'uniform sampler2D tDiffuse; uniform vec3 uGain; uniform vec3 uLift; uniform float uSat; uniform float uCon; uniform float uVig; varying vec2 vUv; void main(){ vec4 c = texture2D(tDiffuse, vUv); vec3 col = c.rgb * uGain + uLift; float l = dot(col, vec3(0.2126, 0.7152, 0.0722)); col = mix(vec3(l), col, uSat); col = 0.18 * pow(max(col / 0.18, vec3(0.0)), vec3(uCon)); float d = distance(vUv, vec2(0.5)); col *= 1.0 - uVig * smoothstep(0.35, 0.85, d); gl_FragColor = vec4(col, c.a); }' };
   R.quality = { name: 'media', shadows: !isTouch, shadowMap: 2048, post: !!ADD && !isTouch, ssao: false, pr: Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1), particles: 1 };
   function buildComposer() {
-    if (composer) { composer.dispose && composer.dispose(); composer = null; bloomPass = null; ssaoPass = null; }
+    if (composer) { composer.dispose && composer.dispose(); composer = null; bloomPass = null; ssaoPass = null; } gradePass = null;
     if (!ADD || !R.quality.post) return;
     // 4.0c: MSAA 4x no alvo do composer (mesma técnica do hero da galeria) nos presets Alta/Ultra; o watchdog desliga se a GPU não aguentar
     const rt = R.quality.msaa ? new THREE.WebGLRenderTarget(R.w || 800, R.h || 600, { type: THREE.HalfFloatType, samples: 4 }) : undefined;
@@ -41,6 +45,7 @@ function create(canvas, overlay, mini) {
       [ssaoPass.ssaoMaterial, ssaoPass.blurMaterial].forEach(m => { m.depthTest = false; m.depthWrite = false; });
       composer.addPass(ssaoPass); }
     bloomPass = new ADD.UnrealBloomPass(new THREE.Vector2(R.w || 800, R.h || 600), 0.42, 0.5, 1.3); composer.addPass(bloomPass);
+    gradePass = ADD.ShaderPass ? new ADD.ShaderPass(GRADE) : null; if (gradePass) composer.addPass(gradePass);
     composer.addPass(new ADD.OutputPass());
     if (R.w) composer.setSize(R.w, R.h);
   }
@@ -89,7 +94,7 @@ function create(canvas, overlay, mini) {
     else if (name === 'alta' || name === 'ultra') { q.shadows = true; q.shadowMap = 4096; q.post = !!ADD; q.ssao = name === 'ultra' && !!ADD; q.msaa = !!ADD && !isTouch && !!(renderer.capabilities && renderer.capabilities.isWebGL2); q.pr = Math.min(2, window.devicePixelRatio || 1); q.particles = 1; }
     else { q.shadows = !isTouch; q.shadowMap = 2048; q.post = !!ADD; q.ssao = false; q.msaa = false; q.pr = Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1); q.particles = 1; }
     if (over.ssao != null) q.ssao = over.ssao && !!ADD; if (over.msaa != null) q.msaa = over.msaa && !!ADD; if (over.shadowMap) q.shadowMap = over.shadowMap; if (over.post != null) q.post = over.post && !!ADD;
-    renderer.setPixelRatio(q.pr); applyShadows(); buildComposer(); armWatchdog(); if (R.FX) R.FX.mult = q.particles;
+    renderer.setPixelRatio(q.pr); applyShadows(); buildComposer(); armWatchdog(); if (R.FX) R.FX.mult = q.particles; if (R.DR && R.sim && R.H) { try { R.DR.build(R.sim, R.H, dressDensity()); } catch (e) {} }
   };
   const octx = overlay.getContext('2d'); const mctx = mini.getContext('2d'); const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
   const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(38, 1, 30, 6000);
@@ -122,6 +127,8 @@ function create(canvas, overlay, mini) {
   const terrData = new Uint8Array(TILES * TILES * 4); const terrTex = new THREE.DataTexture(terrData, TILES, TILES, THREE.RGBAFormat); terrTex.magFilter = THREE.LinearFilter; terrTex.minFilter = THREE.LinearFilter; terrTex.colorSpace = THREE.NoColorSpace;
   const detailTex = W3 ? W3.detailTexture(THREE) : null; if (detailTex) { detailTex.repeat.set(44, 44); if (!/swiftshader|llvmpipe|software/i.test(R.gpu)) detailTex.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy()); } // anisotropia só em GPU de verdade (no SwiftShader custa 10×)
   let terrain = null, horizon = null, sky = null, home = null; R.poolLights = []; R.mist = [];
+  const DR = ARD.dress3d ? ARD.dress3d.create(THREE, scene, { fogTex }) : null; R.DR = DR; let dressT = 0; // 4.2d
+  const dressDensity = () => { const q = R.quality.resolved || R.quality.name; return q === 'ultra' ? 1.6 : q === 'alta' ? 1.25 : q === 'media' ? 0.8 : isTouch ? 0 : 0.35; };
   function buildTerrain(sim) {
     const seed = sim.seed; const hash = (ix, iy) => { let n = (ix * 374761393 + iy * 668265263 + seed * 1274126177) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); n ^= n >>> 16; return (n >>> 0) / 4294967296; };
     const sm = t => t * t * (3 - 2 * t); const val = (x, y) => { const ix = Math.floor(x), iy = Math.floor(y); const fx = sm(x - ix), fy = sm(y - iy); const a = hash(ix, iy), b = hash(ix + 1, iy), c = hash(ix, iy + 1), d = hash(ix + 1, iy + 1); return (a * (1 - fx) + b * fx) * (1 - fy) + (c * (1 - fx) + d * fx) * fy; };
@@ -174,6 +181,12 @@ function create(canvas, overlay, mini) {
     for (let i = 0; i < 16; i++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: mistTex, color: i % 2 ? 0xff7a4a : 0xb23cff, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false })); const a = Math.random() * TAU, rr = Math.random() * 300; sp.userData = { x: S.CX + Math.cos(a) * rr, y: S.CY + Math.sin(a) * rr, z: 10 + Math.random() * 60, s: 120 + Math.random() * 160, ph: Math.random() * TAU, kind: 'rift' }; scene.add(sp); R.mist.push(sp); }
     for (let i = 0; i < 16; i++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: mistTex, color: 0x9a7cff, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, depthWrite: false })); sp.visible = false; sp.userData = { kind: 'storm', ph: Math.random() * TAU, ox: Math.random(), oy: Math.random(), z: 20 + Math.random() * 60, s: 160 + Math.random() * 160 }; scene.add(sp); R.mist.push(sp); }
     const rl = new THREE.PointLight(0xff5e3a, 2500, 900, 2); rl.position.set(S.CX, H(S.CX, S.CY) + 60, -S.CY); scene.add(rl);
+    if (DR) { try { DR.build(sim, H, dressDensity()); } catch (err) { console.warn('[ARD] adereços indisponíveis: ' + err.message); } }
+    // 4.2d: feixes de luz subindo da Fenda (cones abertos, aditivos, com faixas que sobem devagar)
+    if (!R.riftRays) { const rayMat = new THREE.ShaderMaterial({ uniforms: { uTime: { value: 0 }, uNight: { value: 0 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false,
+        vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+        fragmentShader: 'uniform float uTime; uniform float uNight; varying vec2 vUv; float h(float x){ return fract(sin(x * 127.1) * 43758.5453); } float n(float x){ float i = floor(x), f = fract(x); f = f*f*(3.0-2.0*f); return mix(h(i), h(i + 1.0), f); } void main(){ float streak = n(vUv.x * 40.0) * 0.6 + n(vUv.x * 13.0 + uTime * 0.2) * 0.4; float rise = 0.6 + 0.4 * sin(vUv.y * 9.0 - uTime * 1.2 + vUv.x * 20.0); float fade = smoothstep(0.0, 0.12, vUv.y) * (1.0 - smoothstep(0.35, 1.0, vUv.y)); float a = streak * rise * fade * (0.05 + 0.08 * uNight); gl_FragColor = vec4(vec3(1.0, 0.45, 0.9) * a, a); }' });
+      R.riftRays = []; for (let i = 0; i < 3; i++) { const m = new THREE.Mesh(new THREE.CylinderGeometry(80 + i * 40, 150 + i * 30, 480 - i * 80, 32, 1, true).translate(0, (480 - i * 80) / 2, 0), rayMat); m.position.set(S.CX, H(S.CX, S.CY) - 10, -S.CY); m.rotation.y = i * 1.3; m.renderOrder = 5; scene.add(m); R.riftRays.push(m); } R.riftRayMat = rayMat; }
   }
   // ---------- geometrias e instancing ----------
   const envMats = []; // materiais que refletem o ambiente; a intensidade cai à noite
@@ -303,6 +316,12 @@ function create(canvas, overlay, mini) {
     FLAG.poles.count = np; FLAG.poles.instanceMatrix.needsUpdate = true; for (const it of FLAG.cloth.values()) if (it) it.instanceMatrix.needsUpdate = true;
   }
 
+  // ---------- 4.2d: faróis ----------
+  const beamGeo2 = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2).translate(0, 0, -0.5); // começa no veículo e se abre para a frente (−z local)
+  const beamMat2 = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -3, uniforms: { uK: { value: 0 } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'uniform float uK; varying vec2 vUv; void main(){ float along = vUv.y; float w = abs(vUv.x - 0.5) * 2.0; float cone = 1.0 - smoothstep(0.25 + 0.75 * along, 0.3 + 0.8 * along, w); float a = cone * (1.0 - along) * smoothstep(0.0, 0.1, along) * uK; gl_FragColor = vec4(vec3(1.0, 0.86, 0.6) * a, a); }' });
+  const headlights = new THREE.InstancedMesh(beamGeo2, beamMat2, 160); headlights.count = 0; headlights.frustumCulled = false; headlights.renderOrder = 3; scene.add(headlights);
   // ---------- efeitos ----------
   // 4.2c: partículas na GPU (src/fx3d.js); os pontos antigos ficam só para neve/chuva do clima
   const FX = ARD.fx3d ? ARD.fx3d.create(THREE, scene, { cap: isTouch ? 2048 : 4096 }) : null; R.FX = FX;
@@ -420,6 +439,12 @@ function create(canvas, overlay, mini) {
       if (cl.sparkle && Math.random() < 0.35 * R.quality.particles) { const zf = Math.max(0.6, cam.zoom); spark(cam.x + (Math.random() - .5) * 1300 / zf, cam.y + (Math.random() - .5) * 950 / zf, 2, [0.75, 0.95, 1], 18, false); }
     }
     scene.background = bg; scene.fog.color.copy(bg);
+    matEm.color.setScalar(1 + 0.9 * nt); // 4.2d: janelas e luzes das estruturas acendem à noite
+    if (gradePass) { const u = gradePass.uniforms; const fac = me ? me.faction : 'vehnar'; const acc = { vehnar: [1.04, 1.0, 0.95], erevane: [0.97, 1.01, 1.04], tessara: [1.0, 1.03, 0.96], quorith: [1.02, 0.98, 1.05], vorag: [1.05, 0.98, 0.97] }[fac] || [1, 1, 1];
+      let gx = acc[0], gy = acc[1], gz = acc[2]; if (cl && cl.tint) { gx *= 0.92 + cl.tint[0] * 0.2; gy *= 0.92 + cl.tint[1] * 0.2; gz *= 0.92 + cl.tint[2] * 0.2; } gx = gx * (1 - 0.1 * nt); gy = gy * (1 - 0.05 * nt); gz = gz * (1 + 0.08 * nt);
+      u.uGain.value.set(gx, gy, gz); u.uSat.value = 1.08 - 0.22 * nt; u.uCon.value = 1.06 + 0.04 * nt; u.uVig.value = 0.26 + 0.12 * nt; }
+    if (R.riftRays) { R.riftRayMat.uniforms.uTime.value = R.time; R.riftRayMat.uniforms.uNight.value = nt; for (let i = 0; i < R.riftRays.length; i++) R.riftRays[i].rotation.y += dt * (0.02 + i * 0.012); }
+    if (DR && (dressT -= dt) <= 0) { dressT = 1; try { DR.hideUnder(sim, H); DR.updateRoads(sim, H); } catch (e) {} } if (DR) DR.update(R.time);
     const pitchNow = cam.pitch == null ? CAM.pitch : cam.pitch; const tilt = Math.max(0, Math.min(1, (CAM.pitch - pitchNow) / (CAM.pitch - CAM.minPitch)));
     if (tilt > 0) { scene.fog.near = Math.max(scene.fog.near, 900 + 1400 * tilt); scene.fog.far = Math.max(scene.fog.far, 3200 + 3800 * tilt); }
     if (sky) { const u = sky.userData.mat.uniforms; u.uHor.value.copy(bg); u.uTop.value.copy(bg).multiplyScalar(0.55).lerp(_cc.setRGB(0.12, 0.2, 0.36), 0.5 * (1 - nt)); u.uBot.value.copy(bg).multiplyScalar(0.4); u.uNight.value = nt; u.uTime.value = R.time; u.uSunDir.value.set(-420, 760, 520).normalize(); u.uSunCol.value.copy(sun.color); }
@@ -481,6 +506,9 @@ function create(canvas, overlay, mini) {
       if (isUnit && (e.state === 'siphon' || e.state === 'devour') && nBeam < BEAMS) { const t = sim.byId.get(e.target); if (t && S.dist(e.x, e.y, t.x, t.y) <= (e.state === 'devour' ? 44 : S.UNITS.pirata.siphonRange) + t.r + 2) { const l = beams[nBeam++]; l.visible = true; const pa = l.geometry.attributes.position; pa.setXYZ(0, wx, H(wx, wy) + 5, -wy); pa.setXYZ(1, t.x, H(t.x, t.y) + t.r * 0.6, -t.y); pa.needsUpdate = true; if (Math.random() < 0.4) spark(t.x, t.y, t.r * 0.6, e.state === 'devour' ? [1, 0.35, 0.4] : [0.85, 0.5, 1], 12, true); } }
     }
     for (let i = nBeam; i < BEAMS; i++) beams[i].visible = false;
+    { let nh = 0; beamMat2.uniforms.uK.value = Math.max(0, (nt - 0.25) / 0.75) * 0.55; if (nt > 0.25) for (const e of sim.ents) { if (nh >= 160) break; if (!e.alive || e.kind !== 'unit') continue; const ud = S.UNITS[e.def]; if (!ud || ud.flying || (ud.cls !== 'vei' && e.def !== 'coletor' && e.def !== 'pirata')) continue; if (e.owner !== human && !vis.has(e.id)) continue;
+        const a = e.ang || 0; const len = 46 + e.r * 2, wid = 26 + e.r; const x = e.x + Math.cos(a) * e.r * 0.8, y = e.y + Math.sin(a) * e.r * 0.8; _p.set(x, H(x, y) + 0.5, -y); _q.setFromAxisAngle(UP, a - Math.PI / 2); _s.set(wid, 1, len); _m.compose(_p, _q, _s); headlights.setMatrixAt(nh++, _m); }
+      headlights.count = nh; headlights.instanceMatrix.needsUpdate = true; }
     if ((anSweep += dt) > 5) { anSweep = 0; for (const [id, st] of AN) if (R.time - st.seen > 4) AN.delete(id); }
     drawFlags(flags, sim, cam.yaw);
     if (R.beaconPt) { nSel = ring(nSel, R.beaconPt.x, R.beaconPt.y, 70); nSel = ring(nSel, R.beaconPt.x, R.beaconPt.y, 52 + 10 * Math.sin(R.time * 3)); if (!R.beaconMesh) { R.beaconMesh = new THREE.Mesh(new THREE.CylinderGeometry(7, 12, 260, 16, 1, true).translate(0, 130, 0), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.6, 1.25, 0.5), transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); scene.add(R.beaconMesh); } R.beaconMesh.visible = true; R.beaconMesh.position.set(R.beaconPt.x, H(R.beaconPt.x, R.beaconPt.y), -R.beaconPt.y); } else if (R.beaconMesh) R.beaconMesh.visible = false;

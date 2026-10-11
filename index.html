@@ -294,7 +294,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
 <div id="start" class="screen">
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Versão 4.2c · build 2026-10-11 15:21Z · efeitos na GPU · movimento vivo · teste de desempenho · multiplayer 2 a 4</div>
+    <div class="eyebrow">Versão 4.2d · build 2026-10-11 15:47Z · mundo vestido · luz noturna · efeitos na GPU · movimento vivo · multiplayer 2 a 4</div>
     <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div><h1>Aether Rift<br><span>Dominion</span></h1></div></div>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -342,8 +342,9 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
     </div>
     <div class="notes">
       <div class="choose">Notas da versão</div>
+      <p class="start-notes"><b>4.2d — Mundo vestido e luz:</b> o chão ganhou vida por bioma. O gelo tem <b>cristais</b>, a rocha tem seixos e pedregulhos, a tundra tem <b>tufos de capim e arbustos que balançam ao vento</b> e o basalto tem cinza e brasas. Tudo some debaixo das estruturas e escurece na névoa de guerra, como o terreno. Cada base passa a ter <b>estradas de terra</b> ligando o Núcleo às suas estruturas, que crescem conforme você constrói. À noite, as luzes e janelas das estruturas <b>acendem</b>, os veículos ligam <b>faróis</b> que iluminam o chão à frente e <b>feixes de luz</b> sobem da Fenda. Uma <b>gradação de cor</b> suave acompanha o clima, a hora do dia e a sua Raça: mais quente no Vehnar, mais fria na Erevane, violeta no Coro. A quantidade de adereços segue a qualidade: Alta e Ultra têm mais, e no celular na qualidade Baixa eles ficam de fora.</p>
+      <details class="oldnotes"><summary>Histórico das versões anteriores (4.2c → 2.0)</summary>
       <p class="start-notes"><b>4.2c — Efeitos:</b> as explosões foram refeitas em <b>camadas</b>: clarão, bolas de fogo que sobem e esfriam do branco ao vermelho, faíscas esticadas pela velocidade, destroços que caem e fumaça macia que fica no ar. As grandes ainda soltam uma <b>onda de choque</b> no chão, poeira e uma luz curta que ilumina o entorno. Cada disparo tem <b>clarão na boca do cano</b>, os obuses deixam <b>rastro de fumaça</b> e as estruturas destruídas explodem em sequência e queimam por alguns segundos. A cor das explosões puxa para a Raça de quem cai. A fumaça das chaminés, das carcaças e das estruturas avariadas deixou de ser feita de quadradinhos: agora é fumaça de verdade. As superarmas ganharam assinatura própria. A Fundição Orbital desce em coluna de luz, a Eclosão estoura em vermelho e o Salto Evolutivo acende as tropas em verde. O Uníssono solta anéis violeta e o Blecaute marca os Núcleos inimigos. A chegada de uma Era, a Ascensão e os módulos também têm efeito. Tudo roda na placa de vídeo: a CPU só escreve quando uma partícula nasce. Na qualidade Baixa saem metade das partículas.</p>
-      <details class="oldnotes"><summary>Histórico das versões anteriores (4.2b → 2.0)</summary>
       <p class="start-notes"><b>4.2b — Movimento vivo:</b> as unidades e estruturas ganharam <b>animação procedural</b> na placa de vídeo. Rodas giram conforme o caminho percorrido, e pernas de mechs, infantaria e insetos andam com passada alternada. Rotores de drones giram e asas da Prole e dos esporos batem. <b>Canos recuam</b> a cada disparo e antenas, caudas, cabos de guindaste e tentáculos balançam. Os anéis, cúpulas e cristais das estruturas giram devagar, e mais devagar ainda quando a energia está racionada ou em colapso. Mais de cem peças foram marcadas nos modelos das cinco Raças, cada uma no ponto certo (quadril, centro do rotor, raiz da asa). Tudo foi conferido em folhas de poses por verificadores independentes, com teste numérico de colisão. Nada disso muda a simulação: o multiplayer e os salvamentos continuam idênticos.</p>
       <p class="start-notes"><b>4.2a — Teste de desempenho:</b> começa a v4.2, a Engine gráfica 3. Antes de deixar o jogo mais bonito, ele precisa saber quanto o seu aparelho aguenta. Na aba <b>Ajustes</b> há o botão <b>Testar desempenho (30 s)</b>. Ele monta uma batalha fixa, sempre igual, com dois exércitos de 30 unidades. Depois leva a câmera por um trajeto: base, batalha de perto, volta em órbita, panorama alto e a base inimiga. No fim mostra o <b>FPS médio</b>, os <b>piores 1% e 5% dos quadros</b>, o pior quadro e as <b>travadas</b> acima de 50 ms. O resultado vem com uma recomendação de qualidade e um botão <b>Enviar no Feedback</b>. O último resultado fica guardado no aparelho e vai junto, sozinho, em qualquer feedback. Com esses números dos testadores, cada próximo incremento da v4.2 tem um limite claro de custo. Rode o teste uma vez em cada aparelho que você usa.</p>
       <p class="start-notes"><b>4.1e — Líderes vivos:</b> os cinco líderes ganharam <b>bustos 3D animados</b>, os mesmos da arte de identidade. Na tela inicial cada um respira, pisca, espia em volta e <b>olha para o seu ponteiro</b>. Quando você escolhe a Raça, o líder acena e sorri. Na partida, o retrato do canto vira o líder ao vivo, e ele <b>reage ao que acontece</b>. Ele leva um susto e fecha a cara quando a base é atacada, e comemora acenando quando uma Era chega, um inimigo cai ou uma pesquisa termina. Ele mexe a boca enquanto os avisos aparecem e acompanha o cursor pelo mapa. Quando o Núcleo está mal ou o seu exército é muito menor, ele fica <b>preocupado</b>; quando você domina, fica confiante. Clicar no retrato arranca um aceno. Cada Raça tem seu detalhe: brasas nas chaminés do Barão-Forja, frondes que balançam em Sylva Oriel, cristais que orbitam Zayin Coral e mandíbulas que tremem em Oru Voraz. No celular e com "reduzir movimento" fica o retrato ilustrado, que também muda de humor.</p>
@@ -486,8 +487,9 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-window.THREE = THREE; window.THREE_ADDONS = { EffectComposer, RenderPass, UnrealBloomPass, OutputPass, SSAOPass, RoomEnvironment };
+window.THREE = THREE; window.THREE_ADDONS = { EffectComposer, RenderPass, UnrealBloomPass, OutputPass, SSAOPass, ShaderPass, RoomEnvironment };
 window.dispatchEvent(new Event('three-ready'));
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
@@ -4525,6 +4527,106 @@ void main() {
 ARD.fx3d = { create };
 })(globalThis.ARD = globalThis.ARD || {});
 
+/* Aether Rift: Dominion — mundo vestido (4.2d).
+   Adereços pequenos espalhados por bioma (cristais de gelo, seixos, tufos de capim, respiros de lava), instanciados e
+   determinísticos pela semente do mapa, escurecidos pela névoa de guerra como o terreno, com vento nos tufos; e estradas de
+   terra ligando cada Núcleo às próprias estruturas. Só visual: a simulação não muda. */
+(function (ARD) {
+'use strict';
+const S = ARD.sim;
+// tipos por bioma: [nome, quantidade relativa]
+const BY_BIOME = { gelo: [['shard', 1.1], ['stone', 0.35]], rocha: [['pebble', 0.9], ['boulder', 0.3]], tundra: [['tuft', 2.2], ['shrub', 0.6], ['pebble', 0.3]], basalto: [['vent', 0.35], ['ash', 0.8]] };
+function create(THREE, scene, opts) {
+  opts = opts || {}; const D = { meshes: [], uTime: { value: 0 }, sig: '', roadSig: '' };
+  const uni = { fogMap: { value: opts.fogTex }, worldSize: { value: S.WORLD }, uTime: D.uTime };
+  // materiais com névoa de guerra (mesmo critério do terreno) e vento opcional
+  function mat(params, o) {
+    const m = new THREE.MeshStandardMaterial(params); o = o || {};
+    m.onBeforeCompile = sh => { Object.assign(sh.uniforms, uni);
+      sh.vertexShader = 'uniform float worldSize; uniform float uTime; varying vec2 vDWuv;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n' + (o.wind ? '{ vec4 iw = instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0); float k = max(0.0, position.y); transformed.x += sin(uTime * 1.7 + iw.x * 0.05 + iw.z * 0.03) * 0.09 * k; transformed.z += cos(uTime * 1.3 + iw.z * 0.05) * 0.06 * k; }\n' : ''))
+        .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n{ vec4 wp = modelMatrix * instanceMatrix * vec4(transformed, 1.0); vDWuv = vec2(wp.x / worldSize, -wp.z / worldSize); }');
+      sh.fragmentShader = 'uniform sampler2D fogMap; varying vec2 vDWuv;\n' + sh.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>\nfloat dFog = texture2D(fogMap, vDWuv).r; diffuseColor.rgb *= mix(0.06, 1.0, dFog);').replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance *= dFog * dFog;');
+    };
+    m.customProgramCacheKey = () => 'ard-dress-' + (o.wind ? 'w' : 'n') + (params.emissive ? 'e' : ''); return m;
+  }
+  const g = {
+    shard: new THREE.OctahedronGeometry(1, 0).scale(0.45, 1.6, 0.45).translate(0, 1.1, 0),
+    stone: new THREE.IcosahedronGeometry(1, 0).scale(1, 0.6, 0.9).translate(0, 0.3, 0),
+    pebble: new THREE.IcosahedronGeometry(1, 0).scale(1, 0.55, 0.85).translate(0, 0.25, 0),
+    boulder: new THREE.IcosahedronGeometry(1, 1).scale(1.1, 0.8, 1).translate(0, 0.45, 0),
+    tuft: (() => { const parts = []; for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; const c = new THREE.ConeGeometry(0.12, 1.4 + (i % 3) * 0.3, 4).translate(0, 0.7, 0); c.rotateZ(0.35 * Math.cos(a)); c.rotateX(0.35 * Math.sin(a)); c.translate(Math.cos(a) * 0.25, 0, Math.sin(a) * 0.25); parts.push(c.index ? c.toNonIndexed() : c); } return merge(THREE, parts); })(),
+    shrub: (() => { const parts = []; for (let i = 0; i < 4; i++) { const s = new THREE.IcosahedronGeometry(0.55 + (i % 2) * 0.2, 0).translate(Math.cos(i * 1.7) * 0.5, 0.55 + (i % 2) * 0.25, Math.sin(i * 1.7) * 0.5); parts.push(s.index ? s.toNonIndexed() : s); } return merge(THREE, parts); })(),
+    vent: new THREE.IcosahedronGeometry(1, 0).scale(1.3, 0.35, 1.1).translate(0, 0.15, 0),
+    ash: new THREE.IcosahedronGeometry(1, 0).scale(0.9, 0.4, 0.8).translate(0, 0.18, 0),
+  };
+  for (const k in g) g[k].computeVertexNormals();
+  const mats = {
+    shard: mat({ color: 0xbfe6ff, roughness: 0.12, metalness: 0.1, emissive: 0x3f7fa0, emissiveIntensity: 0.25, flatShading: true }),
+    stone: mat({ color: 0xa3acb8, roughness: 0.85, flatShading: true }),
+    pebble: mat({ color: 0x77797e, roughness: 0.95, flatShading: true }),
+    boulder: mat({ color: 0x6d7077, roughness: 0.95, flatShading: true }),
+    tuft: mat({ color: 0x7d8f4f, roughness: 0.85, side: THREE.DoubleSide }, { wind: true }),
+    shrub: mat({ color: 0x4f6a3d, roughness: 0.9, flatShading: true }, { wind: true }),
+    vent: mat({ color: 0x241f20, roughness: 0.9, emissive: 0x8a2a0c, emissiveIntensity: 0.35, flatShading: true }), // brasa discreta: rocha escura que mal brilha
+    ash: mat({ color: 0x3a3537, roughness: 0.95, flatShading: true }),
+  };
+  const SIZE = { shard: [3, 7], stone: [2.5, 5], pebble: [1.6, 3.8], boulder: [6, 11], tuft: [3, 6], shrub: [3, 6], vent: [4, 8], ash: [1.8, 3.4] };
+  const COLJ = { shard: 0.12, stone: 0.08, pebble: 0.14, boulder: 0.1, tuft: 0.22, shrub: 0.18, vent: 0.1, ash: 0.1 };
+  // posições determinísticas por tile
+  function hash(a, b, c) { let n = (a * 374761393 + b * 668265263 + c * 1274126177) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); n ^= n >>> 16; return (n >>> 0) / 4294967296; }
+  D.build = function (sim, H, density) {
+    for (const m of D.meshes) { scene.remove(m.mesh); m.mesh.dispose(); } D.meshes = []; if (!density) return;
+    const lists = {}; const TILE = 64, TILES = S.WORLD / TILE; const seed = sim.seed;
+    const blockers = sim.ents.filter(e => e.alive && (e.kind === 'node' || e.kind === 'rock')).map(e => ({ x: e.x, y: e.y, r: e.r + 10 }));
+    for (const p of sim.players) { const n = S.nucleoOf(sim, p.id); if (n) blockers.push({ x: n.x, y: n.y, r: 110 }); }
+    for (let ty = 0; ty < TILES; ty++) for (let tx = 0; tx < TILES; tx++) {
+      const ti = ty * TILES + tx; const b1 = S.BIOMES[sim.biome[ti]], b2 = S.BIOMES[sim.biome2[ti]]; const mix = sim.biomeMix[ti];
+      for (let j = 0; j < 8; j++) { const r0 = hash(tx, ty, seed + j * 31); const biome = r0 < mix ? b2 : b1; const kinds = BY_BIOME[biome]; if (!kinds) continue;
+        const kk = kinds[(hash(tx, ty, seed + j * 17 + 5) * kinds.length) | 0]; if (hash(tx, ty, seed + j * 7 + 3) > kk[1] * density * 0.22) continue;
+        const x = (tx + hash(tx, ty, seed + j * 11 + 1)) * TILE, y = (ty + hash(tx, ty, seed + j * 13 + 2)) * TILE;
+        if (Math.hypot(x - S.CX, y - S.CY) < S.RIFT_R + 70) continue; if (blockers.some(o => Math.hypot(x - o.x, y - o.y) < o.r)) continue;
+        (lists[kk[0]] = lists[kk[0]] || []).push({ x, y, s: hash(tx, ty, seed + j * 19 + 4), a: hash(tx, ty, seed + j * 23 + 6) * Math.PI * 2, c: hash(tx, ty, seed + j * 29 + 8) });
+      }
+    }
+    const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0), _c = new THREE.Color();
+    for (const k in lists) { const L = lists[k]; const im = new THREE.InstancedMesh(g[k], mats[k], L.length); im.frustumCulled = false; im.receiveShadow = true; im.castShadow = false;
+      const [s0, s1] = SIZE[k]; L.forEach((o, i) => { const sc = s0 + (s1 - s0) * o.s; _p.set(o.x, H(o.x, o.y) - 0.2, -o.y); _q.setFromAxisAngle(UP, o.a); _s.set(sc, sc * (0.8 + 0.4 * o.s), sc); _m.compose(_p, _q, _s); im.setMatrixAt(i, _m); _c.setScalar(1 - COLJ[k] + 2 * COLJ[k] * o.c); im.setColorAt(i, _c); });
+      im.userData = { kind: k, list: L, s0, s1 }; scene.add(im); D.meshes.push({ mesh: im, kind: k, list: L }); }
+    D.sig = '';
+  };
+  // esconde adereços que ficaram debaixo de estruturas (chamado quando o conjunto de estruturas muda)
+  D.hideUnder = function (sim, H) {
+    const bs = sim.ents.filter(e => e.alive && e.kind === 'building'); const sig = bs.length + ':' + (bs.length ? bs[bs.length - 1].id : 0); if (sig === D.sig) return; D.sig = sig;
+    const cell = 128, grid = new Map(); for (const b of bs) { const k = ((b.x / cell) | 0) + ',' + ((b.y / cell) | 0); (grid.get(k) || grid.set(k, []).get(k)).push(b); }
+    const _m = new THREE.Matrix4(); const Z = new THREE.Matrix4().makeScale(0, 0, 0); const _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0);
+    for (const m of D.meshes) { const im = m.mesh, { s0, s1 } = im.userData; let changed = false;
+      m.list.forEach((o, i) => { let hide = false; const cx = (o.x / cell) | 0, cy = (o.y / cell) | 0; for (let dy = -1; dy <= 1 && !hide; dy++) for (let dx = -1; dx <= 1 && !hide; dx++) { const L = grid.get((cx + dx) + ',' + (cy + dy)); if (L) for (const b of L) if (Math.hypot(o.x - b.x, o.y - b.y) < b.r + 6) { hide = true; break; } }
+        if (hide !== !!o.hid) { o.hid = hide; changed = true; if (hide) im.setMatrixAt(i, Z); else { const sc = s0 + (s1 - s0) * o.s; _p.set(o.x, H(o.x, o.y) - 0.2, -o.y); _q.setFromAxisAngle(UP, o.a); _s.set(sc, sc * (0.8 + 0.4 * o.s), sc); _m.compose(_p, _q, _s); im.setMatrixAt(i, _m); } } });
+      if (changed) im.instanceMatrix.needsUpdate = true; }
+  };
+  // estradas de terra: do Núcleo até cada estrutura pronta dentro do território (pedaços curtos que acompanham o relevo)
+  const roadGeo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
+  const roadMat = new THREE.ShaderMaterial({ uniforms: { fogMap: uni.fogMap, worldSize: uni.worldSize }, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2,
+    vertexShader: 'uniform float worldSize; varying vec2 vUv; varying vec2 vW; void main(){ vUv = uv; vec4 wp = modelMatrix * instanceMatrix * vec4(position, 1.0); vW = vec2(wp.x / worldSize, -wp.z / worldSize); gl_Position = projectionMatrix * viewMatrix * wp; }',
+    fragmentShader: 'uniform sampler2D fogMap; varying vec2 vUv; varying vec2 vW; float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); } float n(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f); return mix(mix(h(i), h(i+vec2(1,0)), f.x), mix(h(i+vec2(0,1)), h(i+vec2(1,1)), f.x), f.y); } void main(){ float side = abs(vUv.x - 0.5) * 2.0; float nz = n(vW * 900.0); float edge = 1.0 - smoothstep(0.55 + nz * 0.25, 1.0, side); float rut = smoothstep(0.08, 0.0, abs(side - 0.45)) * 0.18; vec3 col = mix(vec3(0.33, 0.29, 0.24), vec3(0.42, 0.37, 0.3), nz) * (1.0 - rut); float fl = texture2D(fogMap, vW).r; gl_FragColor = vec4(col * mix(0.06, 1.0, fl), edge * 0.62); }' });
+  const roads = new THREE.InstancedMesh(roadGeo, roadMat, 2048); roads.count = 0; roads.frustumCulled = false; roads.renderOrder = 2; scene.add(roads); D.roads = roads;
+  D.updateRoads = function (sim, H, vis) {
+    const bs = sim.ents.filter(e => e.alive && e.kind === 'building' && e.built && e.def !== 'muro' && e.def !== 'portao' && e.def !== 'nucleo');
+    const sig = bs.length + ':' + bs.reduce((s, b) => (s + b.id * 7) % 1000003, 0); if (sig === D.roadSig) return; D.roadSig = sig;
+    const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0); let n = 0;
+    for (const p of sim.players) { const nu = S.nucleoOf(sim, p.id); if (!nu) continue; const terr = S.territoryOf(sim, nu);
+      for (const b of bs) { if (b.owner !== p.id) continue; const d = Math.hypot(b.x - nu.x, b.y - nu.y); if (d > terr || d < nu.r + b.r + 8) continue;
+        const ang = Math.atan2(b.y - nu.y, b.x - nu.x); const x0 = nu.x + Math.cos(ang) * (nu.r + 4), y0 = nu.y + Math.sin(ang) * (nu.r + 4), x1 = b.x - Math.cos(ang) * (b.r + 2), y1 = b.y - Math.sin(ang) * (b.r + 2); const L = Math.hypot(x1 - x0, y1 - y0); const pieces = Math.max(1, Math.ceil(L / 36));
+        for (let i = 0; i < pieces && n < 2048; i++) { const f = (i + 0.5) / pieces; const px = x0 + (x1 - x0) * f, py = y0 + (y1 - y0) * f; _p.set(px, H(px, py) + 0.35, -py); _q.setFromAxisAngle(UP, ang + Math.PI / 2); _s.set(11, 1, L / pieces + 2); _m.compose(_p, _q, _s); roads.setMatrixAt(n++, _m); } } }
+    roads.count = n; roads.instanceMatrix.needsUpdate = true;
+  };
+  D.update = function (time) { D.uTime.value = time; };
+  return D;
+}
+function merge(THREE, parts) { let n = 0; for (const p of parts) n += p.attributes.position.count; const pos = new Float32Array(n * 3); let k = 0; for (const p of parts) { pos.set(p.attributes.position.array, k * 3); k += p.attributes.position.count; } const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); return g; }
+ARD.dress3d = { create };
+})(globalThis.ARD = globalThis.ARD || {});
+
 /* Renderizador 3D do jogo (Three.js, v3.0a): mesma interface do renderizador 2D. Câmera RTS, instancing por modelo,
    relevo real (biomas, cordilheiras, Fenda), névoa projetada no terreno, sombras, dia e noite, efeitos. Só lê a simulação. */
 (function (ARD) {
@@ -4553,10 +4655,14 @@ function create(canvas, overlay, mini) {
   const isTouch = matchMedia('(pointer: coarse)').matches;
   renderer.setPixelRatio(Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1));
   renderer.shadowMap.enabled = !isTouch; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
-  const ADD = window.THREE_ADDONS || null; let composer = null, bloomPass = null, ssaoPass = null;
+  const ADD = window.THREE_ADDONS || null; let composer = null, bloomPass = null, ssaoPass = null, gradePass = null;
+  // 4.2d: gradação de cor (linear, antes do tone mapping): ganho por canal, saturação, contraste e vinheta; muda com o clima, a noite e a Raça
+  const GRADE = { uniforms: { tDiffuse: { value: null }, uGain: { value: new THREE.Vector3(1.03, 1.0, 0.97) }, uLift: { value: new THREE.Vector3(0, 0, 0.004) }, uSat: { value: 1.08 }, uCon: { value: 1.06 }, uVig: { value: 0.28 } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'uniform sampler2D tDiffuse; uniform vec3 uGain; uniform vec3 uLift; uniform float uSat; uniform float uCon; uniform float uVig; varying vec2 vUv; void main(){ vec4 c = texture2D(tDiffuse, vUv); vec3 col = c.rgb * uGain + uLift; float l = dot(col, vec3(0.2126, 0.7152, 0.0722)); col = mix(vec3(l), col, uSat); col = 0.18 * pow(max(col / 0.18, vec3(0.0)), vec3(uCon)); float d = distance(vUv, vec2(0.5)); col *= 1.0 - uVig * smoothstep(0.35, 0.85, d); gl_FragColor = vec4(col, c.a); }' };
   R.quality = { name: 'media', shadows: !isTouch, shadowMap: 2048, post: !!ADD && !isTouch, ssao: false, pr: Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1), particles: 1 };
   function buildComposer() {
-    if (composer) { composer.dispose && composer.dispose(); composer = null; bloomPass = null; ssaoPass = null; }
+    if (composer) { composer.dispose && composer.dispose(); composer = null; bloomPass = null; ssaoPass = null; } gradePass = null;
     if (!ADD || !R.quality.post) return;
     // 4.0c: MSAA 4x no alvo do composer (mesma técnica do hero da galeria) nos presets Alta/Ultra; o watchdog desliga se a GPU não aguentar
     const rt = R.quality.msaa ? new THREE.WebGLRenderTarget(R.w || 800, R.h || 600, { type: THREE.HalfFloatType, samples: 4 }) : undefined;
@@ -4568,6 +4674,7 @@ function create(canvas, overlay, mini) {
       [ssaoPass.ssaoMaterial, ssaoPass.blurMaterial].forEach(m => { m.depthTest = false; m.depthWrite = false; });
       composer.addPass(ssaoPass); }
     bloomPass = new ADD.UnrealBloomPass(new THREE.Vector2(R.w || 800, R.h || 600), 0.42, 0.5, 1.3); composer.addPass(bloomPass);
+    gradePass = ADD.ShaderPass ? new ADD.ShaderPass(GRADE) : null; if (gradePass) composer.addPass(gradePass);
     composer.addPass(new ADD.OutputPass());
     if (R.w) composer.setSize(R.w, R.h);
   }
@@ -4616,7 +4723,7 @@ function create(canvas, overlay, mini) {
     else if (name === 'alta' || name === 'ultra') { q.shadows = true; q.shadowMap = 4096; q.post = !!ADD; q.ssao = name === 'ultra' && !!ADD; q.msaa = !!ADD && !isTouch && !!(renderer.capabilities && renderer.capabilities.isWebGL2); q.pr = Math.min(2, window.devicePixelRatio || 1); q.particles = 1; }
     else { q.shadows = !isTouch; q.shadowMap = 2048; q.post = !!ADD; q.ssao = false; q.msaa = false; q.pr = Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1); q.particles = 1; }
     if (over.ssao != null) q.ssao = over.ssao && !!ADD; if (over.msaa != null) q.msaa = over.msaa && !!ADD; if (over.shadowMap) q.shadowMap = over.shadowMap; if (over.post != null) q.post = over.post && !!ADD;
-    renderer.setPixelRatio(q.pr); applyShadows(); buildComposer(); armWatchdog(); if (R.FX) R.FX.mult = q.particles;
+    renderer.setPixelRatio(q.pr); applyShadows(); buildComposer(); armWatchdog(); if (R.FX) R.FX.mult = q.particles; if (R.DR && R.sim && R.H) { try { R.DR.build(R.sim, R.H, dressDensity()); } catch (e) {} }
   };
   const octx = overlay.getContext('2d'); const mctx = mini.getContext('2d'); const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
   const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(38, 1, 30, 6000);
@@ -4649,6 +4756,8 @@ function create(canvas, overlay, mini) {
   const terrData = new Uint8Array(TILES * TILES * 4); const terrTex = new THREE.DataTexture(terrData, TILES, TILES, THREE.RGBAFormat); terrTex.magFilter = THREE.LinearFilter; terrTex.minFilter = THREE.LinearFilter; terrTex.colorSpace = THREE.NoColorSpace;
   const detailTex = W3 ? W3.detailTexture(THREE) : null; if (detailTex) { detailTex.repeat.set(44, 44); if (!/swiftshader|llvmpipe|software/i.test(R.gpu)) detailTex.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy()); } // anisotropia só em GPU de verdade (no SwiftShader custa 10×)
   let terrain = null, horizon = null, sky = null, home = null; R.poolLights = []; R.mist = [];
+  const DR = ARD.dress3d ? ARD.dress3d.create(THREE, scene, { fogTex }) : null; R.DR = DR; let dressT = 0; // 4.2d
+  const dressDensity = () => { const q = R.quality.resolved || R.quality.name; return q === 'ultra' ? 1.6 : q === 'alta' ? 1.25 : q === 'media' ? 0.8 : isTouch ? 0 : 0.35; };
   function buildTerrain(sim) {
     const seed = sim.seed; const hash = (ix, iy) => { let n = (ix * 374761393 + iy * 668265263 + seed * 1274126177) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); n ^= n >>> 16; return (n >>> 0) / 4294967296; };
     const sm = t => t * t * (3 - 2 * t); const val = (x, y) => { const ix = Math.floor(x), iy = Math.floor(y); const fx = sm(x - ix), fy = sm(y - iy); const a = hash(ix, iy), b = hash(ix + 1, iy), c = hash(ix, iy + 1), d = hash(ix + 1, iy + 1); return (a * (1 - fx) + b * fx) * (1 - fy) + (c * (1 - fx) + d * fx) * fy; };
@@ -4701,6 +4810,12 @@ function create(canvas, overlay, mini) {
     for (let i = 0; i < 16; i++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: mistTex, color: i % 2 ? 0xff7a4a : 0xb23cff, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false })); const a = Math.random() * TAU, rr = Math.random() * 300; sp.userData = { x: S.CX + Math.cos(a) * rr, y: S.CY + Math.sin(a) * rr, z: 10 + Math.random() * 60, s: 120 + Math.random() * 160, ph: Math.random() * TAU, kind: 'rift' }; scene.add(sp); R.mist.push(sp); }
     for (let i = 0; i < 16; i++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: mistTex, color: 0x9a7cff, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, depthWrite: false })); sp.visible = false; sp.userData = { kind: 'storm', ph: Math.random() * TAU, ox: Math.random(), oy: Math.random(), z: 20 + Math.random() * 60, s: 160 + Math.random() * 160 }; scene.add(sp); R.mist.push(sp); }
     const rl = new THREE.PointLight(0xff5e3a, 2500, 900, 2); rl.position.set(S.CX, H(S.CX, S.CY) + 60, -S.CY); scene.add(rl);
+    if (DR) { try { DR.build(sim, H, dressDensity()); } catch (err) { console.warn('[ARD] adereços indisponíveis: ' + err.message); } }
+    // 4.2d: feixes de luz subindo da Fenda (cones abertos, aditivos, com faixas que sobem devagar)
+    if (!R.riftRays) { const rayMat = new THREE.ShaderMaterial({ uniforms: { uTime: { value: 0 }, uNight: { value: 0 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false,
+        vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+        fragmentShader: 'uniform float uTime; uniform float uNight; varying vec2 vUv; float h(float x){ return fract(sin(x * 127.1) * 43758.5453); } float n(float x){ float i = floor(x), f = fract(x); f = f*f*(3.0-2.0*f); return mix(h(i), h(i + 1.0), f); } void main(){ float streak = n(vUv.x * 40.0) * 0.6 + n(vUv.x * 13.0 + uTime * 0.2) * 0.4; float rise = 0.6 + 0.4 * sin(vUv.y * 9.0 - uTime * 1.2 + vUv.x * 20.0); float fade = smoothstep(0.0, 0.12, vUv.y) * (1.0 - smoothstep(0.35, 1.0, vUv.y)); float a = streak * rise * fade * (0.05 + 0.08 * uNight); gl_FragColor = vec4(vec3(1.0, 0.45, 0.9) * a, a); }' });
+      R.riftRays = []; for (let i = 0; i < 3; i++) { const m = new THREE.Mesh(new THREE.CylinderGeometry(80 + i * 40, 150 + i * 30, 480 - i * 80, 32, 1, true).translate(0, (480 - i * 80) / 2, 0), rayMat); m.position.set(S.CX, H(S.CX, S.CY) - 10, -S.CY); m.rotation.y = i * 1.3; m.renderOrder = 5; scene.add(m); R.riftRays.push(m); } R.riftRayMat = rayMat; }
   }
   // ---------- geometrias e instancing ----------
   const envMats = []; // materiais que refletem o ambiente; a intensidade cai à noite
@@ -4830,6 +4945,12 @@ function create(canvas, overlay, mini) {
     FLAG.poles.count = np; FLAG.poles.instanceMatrix.needsUpdate = true; for (const it of FLAG.cloth.values()) if (it) it.instanceMatrix.needsUpdate = true;
   }
 
+  // ---------- 4.2d: faróis ----------
+  const beamGeo2 = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2).translate(0, 0, -0.5); // começa no veículo e se abre para a frente (−z local)
+  const beamMat2 = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -3, uniforms: { uK: { value: 0 } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'uniform float uK; varying vec2 vUv; void main(){ float along = vUv.y; float w = abs(vUv.x - 0.5) * 2.0; float cone = 1.0 - smoothstep(0.25 + 0.75 * along, 0.3 + 0.8 * along, w); float a = cone * (1.0 - along) * smoothstep(0.0, 0.1, along) * uK; gl_FragColor = vec4(vec3(1.0, 0.86, 0.6) * a, a); }' });
+  const headlights = new THREE.InstancedMesh(beamGeo2, beamMat2, 160); headlights.count = 0; headlights.frustumCulled = false; headlights.renderOrder = 3; scene.add(headlights);
   // ---------- efeitos ----------
   // 4.2c: partículas na GPU (src/fx3d.js); os pontos antigos ficam só para neve/chuva do clima
   const FX = ARD.fx3d ? ARD.fx3d.create(THREE, scene, { cap: isTouch ? 2048 : 4096 }) : null; R.FX = FX;
@@ -4947,6 +5068,12 @@ function create(canvas, overlay, mini) {
       if (cl.sparkle && Math.random() < 0.35 * R.quality.particles) { const zf = Math.max(0.6, cam.zoom); spark(cam.x + (Math.random() - .5) * 1300 / zf, cam.y + (Math.random() - .5) * 950 / zf, 2, [0.75, 0.95, 1], 18, false); }
     }
     scene.background = bg; scene.fog.color.copy(bg);
+    matEm.color.setScalar(1 + 0.9 * nt); // 4.2d: janelas e luzes das estruturas acendem à noite
+    if (gradePass) { const u = gradePass.uniforms; const fac = me ? me.faction : 'vehnar'; const acc = { vehnar: [1.04, 1.0, 0.95], erevane: [0.97, 1.01, 1.04], tessara: [1.0, 1.03, 0.96], quorith: [1.02, 0.98, 1.05], vorag: [1.05, 0.98, 0.97] }[fac] || [1, 1, 1];
+      let gx = acc[0], gy = acc[1], gz = acc[2]; if (cl && cl.tint) { gx *= 0.92 + cl.tint[0] * 0.2; gy *= 0.92 + cl.tint[1] * 0.2; gz *= 0.92 + cl.tint[2] * 0.2; } gx = gx * (1 - 0.1 * nt); gy = gy * (1 - 0.05 * nt); gz = gz * (1 + 0.08 * nt);
+      u.uGain.value.set(gx, gy, gz); u.uSat.value = 1.08 - 0.22 * nt; u.uCon.value = 1.06 + 0.04 * nt; u.uVig.value = 0.26 + 0.12 * nt; }
+    if (R.riftRays) { R.riftRayMat.uniforms.uTime.value = R.time; R.riftRayMat.uniforms.uNight.value = nt; for (let i = 0; i < R.riftRays.length; i++) R.riftRays[i].rotation.y += dt * (0.02 + i * 0.012); }
+    if (DR && (dressT -= dt) <= 0) { dressT = 1; try { DR.hideUnder(sim, H); DR.updateRoads(sim, H); } catch (e) {} } if (DR) DR.update(R.time);
     const pitchNow = cam.pitch == null ? CAM.pitch : cam.pitch; const tilt = Math.max(0, Math.min(1, (CAM.pitch - pitchNow) / (CAM.pitch - CAM.minPitch)));
     if (tilt > 0) { scene.fog.near = Math.max(scene.fog.near, 900 + 1400 * tilt); scene.fog.far = Math.max(scene.fog.far, 3200 + 3800 * tilt); }
     if (sky) { const u = sky.userData.mat.uniforms; u.uHor.value.copy(bg); u.uTop.value.copy(bg).multiplyScalar(0.55).lerp(_cc.setRGB(0.12, 0.2, 0.36), 0.5 * (1 - nt)); u.uBot.value.copy(bg).multiplyScalar(0.4); u.uNight.value = nt; u.uTime.value = R.time; u.uSunDir.value.set(-420, 760, 520).normalize(); u.uSunCol.value.copy(sun.color); }
@@ -5008,6 +5135,9 @@ function create(canvas, overlay, mini) {
       if (isUnit && (e.state === 'siphon' || e.state === 'devour') && nBeam < BEAMS) { const t = sim.byId.get(e.target); if (t && S.dist(e.x, e.y, t.x, t.y) <= (e.state === 'devour' ? 44 : S.UNITS.pirata.siphonRange) + t.r + 2) { const l = beams[nBeam++]; l.visible = true; const pa = l.geometry.attributes.position; pa.setXYZ(0, wx, H(wx, wy) + 5, -wy); pa.setXYZ(1, t.x, H(t.x, t.y) + t.r * 0.6, -t.y); pa.needsUpdate = true; if (Math.random() < 0.4) spark(t.x, t.y, t.r * 0.6, e.state === 'devour' ? [1, 0.35, 0.4] : [0.85, 0.5, 1], 12, true); } }
     }
     for (let i = nBeam; i < BEAMS; i++) beams[i].visible = false;
+    { let nh = 0; beamMat2.uniforms.uK.value = Math.max(0, (nt - 0.25) / 0.75) * 0.55; if (nt > 0.25) for (const e of sim.ents) { if (nh >= 160) break; if (!e.alive || e.kind !== 'unit') continue; const ud = S.UNITS[e.def]; if (!ud || ud.flying || (ud.cls !== 'vei' && e.def !== 'coletor' && e.def !== 'pirata')) continue; if (e.owner !== human && !vis.has(e.id)) continue;
+        const a = e.ang || 0; const len = 46 + e.r * 2, wid = 26 + e.r; const x = e.x + Math.cos(a) * e.r * 0.8, y = e.y + Math.sin(a) * e.r * 0.8; _p.set(x, H(x, y) + 0.5, -y); _q.setFromAxisAngle(UP, a - Math.PI / 2); _s.set(wid, 1, len); _m.compose(_p, _q, _s); headlights.setMatrixAt(nh++, _m); }
+      headlights.count = nh; headlights.instanceMatrix.needsUpdate = true; }
     if ((anSweep += dt) > 5) { anSweep = 0; for (const [id, st] of AN) if (R.time - st.seen > 4) AN.delete(id); }
     drawFlags(flags, sim, cam.yaw);
     if (R.beaconPt) { nSel = ring(nSel, R.beaconPt.x, R.beaconPt.y, 70); nSel = ring(nSel, R.beaconPt.x, R.beaconPt.y, 52 + 10 * Math.sin(R.time * 3)); if (!R.beaconMesh) { R.beaconMesh = new THREE.Mesh(new THREE.CylinderGeometry(7, 12, 260, 16, 1, true).translate(0, 130, 0), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.6, 1.25, 0.5), transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); scene.add(R.beaconMesh); } R.beaconMesh.visible = true; R.beaconMesh.position.set(R.beaconPt.x, H(R.beaconPt.x, R.beaconPt.y), -R.beaconPt.y); } else if (R.beaconMesh) R.beaconMesh.visible = false;
@@ -5581,12 +5711,12 @@ const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-11 15:21Z';
+const BUILD = '2026-10-11 15:47Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.2c';
+const VERSION = '4.2d';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
