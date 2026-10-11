@@ -271,8 +271,11 @@ function create(canvas, overlay, mini) {
   R.screenToWorld = function (cam, sx, sy) { ndc.set(sx / R.w * 2 - 1, 1 - sy / R.h * 2); ray.setFromCamera(ndc, camera); plane.constant = 0; if (!ray.ray.intersectPlane(plane, hit)) { const dir = ray.ray.direction; const hl = Math.hypot(dir.x, dir.z) || 1; return [camera.position.x + dir.x / hl * 3000, -(camera.position.z + dir.z / hl * 3000)]; } let wx = hit.x, wy = -hit.z; plane.constant = -H(wx, wy); if (ray.ray.intersectPlane(plane, hit)) { wx = hit.x; wy = -hit.z; } return [wx, wy]; };
   R.screenDeltaToWorld = function (cam, dx, dy) { const a = R.screenToWorld(cam, R.w / 2, R.h / 2), b = R.screenToWorld(cam, R.w / 2 + dx, R.h / 2 + dy); return [b[0] - a[0], b[1] - a[1]]; };
   function miniM() { return mini.width / (2 * S.WORLD); }
-  R.worldToMini = function (x, y) { const m = miniM(); return [(x - y) * m + mini.width / 2, (x + y) * m / 2 + mini.width / 4]; };
-  R.miniToWorld = function (nx, ny) { const m = miniM(); const X2 = (nx * mini.width - mini.width / 2) / m, Y2 = (ny * mini.width - mini.width / 4) * 2 / m; return [(X2 + Y2) / 2, (Y2 - X2) / 2]; };
+  // 4.1b: minimapa em radar circular que gira com a câmera (o alto do radar é para onde a câmera olha); o mapa inteiro cabe em qualquer giro
+  let miniYaw = Math.PI / 4;
+  function miniXf() { const size = mini.width || 184; const sc = size / (S.WORLD * Math.SQRT2) * 0.97; return { size, sc, co: Math.cos(miniYaw), si: Math.sin(miniYaw), cx: size / 2, cy: size / 2 }; }
+  R.worldToMini = function (x, y) { const f = miniXf(); const vx = x - S.CX, vy = y - S.CY; return [f.cx + f.sc * (vx * f.co + vy * f.si), f.cy + f.sc * (vx * f.si - vy * f.co)]; };
+  R.miniToWorld = function (nx, ny) { const f = miniXf(); const a = (nx * f.size - f.cx) / f.sc, b = (ny * f.size - f.cy) / f.sc; return [S.CX + a * f.co + b * f.si, S.CY + a * f.si - b * f.co]; }; // a matriz do giro é a própria inversa
   R.resize = function () { const dpr = Math.min(2, window.devicePixelRatio || 1); const w = canvas.clientWidth, h = canvas.clientHeight; R.w = w; R.h = h; R.dpr = dpr; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = h > w * 1.05 ? 46 : 38; camera.updateProjectionMatrix(); if (composer) { composer.setSize(w, h); if (ssaoPass) ssaoPass.setSize(w, h); } if (overlay.width !== Math.round(w * dpr)) { overlay.width = Math.round(w * dpr); overlay.height = Math.round(h * dpr); } const ms = mini.clientWidth || 184; if (mini.width !== ms * dpr) { mini.width = ms * dpr; mini.height = ms * dpr; mfog.width = mini.width; mfog.height = mini.height; } };
 
   // ---------- 4.0d: bandeiras com a Insígnia da Raça no Núcleo e nos Nódulos ----------
@@ -474,23 +477,46 @@ function create(canvas, overlay, mini) {
     const reg = me.energy.regime; if (reg !== 'pleno') { const col = reg === 'colapso' ? '255,94,58' : '242,194,48'; const a = reg === 'colapso' ? 0.25 + 0.15 * Math.sin(R.time * 5) : 0.15; const g = c.createRadialGradient(R.w / 2, R.h / 2, Math.min(R.w, R.h) * 0.35, R.w / 2, R.h / 2, Math.max(R.w, R.h) * 0.75); g.addColorStop(0, `rgba(${col},0)`); g.addColorStop(1, `rgba(${col},${a})`); c.fillStyle = g; c.fillRect(0, 0, R.w, R.h); }
     if (me.blackoutT > 0) { c.fillStyle = 'rgba(0,0,0,0.5)'; c.fillRect(0, 0, R.w, R.h); }
   }
+  function miniBaseImage(sim) { // relevo sombreado e biomas, no sentido do mundo (x para a direita, y para baixo)
+    const N = 256, cv = document.createElement('canvas'); cv.width = cv.height = N; const c = cv.getContext('2d'); const img = c.createImageData(N, N); const d = img.data; const k = S.WORLD / N;
+    const hexc = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; const pal = {}; for (const b in BIOME_MINI) pal[b] = hexc(BIOME_MINI[b]);
+    for (let py = 0; py < N; py++) for (let px = 0; px < N; px++) { const x = (px + 0.5) * k, y = (py + 0.5) * k; const tx = Math.min(TILES - 1, (x / TILE) | 0), ty = Math.min(TILES - 1, (y / TILE) | 0); const ti = ty * TILES + tx;
+      const b1 = pal[S.BIOMES[sim.biome[ti]]], b2 = pal[S.BIOMES[sim.biome2[ti]]], mix = sim.biomeMix[ti]; const hx = H(x + k, y) - H(x - k, y), hy = H(x, y + k) - H(x, y - k); const shade = Math.max(0.55, Math.min(1.45, 1 + (-hx * 0.6 - hy * 0.8) / (2 * k) * 6));
+      const dr = Math.hypot(x - S.CX, y - S.CY); const rift = dr < S.RIFT_R * 1.6 ? 1 - dr / (S.RIFT_R * 1.6) : 0; const i = (py * N + px) * 4;
+      for (let ch = 0; ch < 3; ch++) { let v = (b1[ch] * (1 - mix) + b2[ch] * mix) * 1.25 * shade; v = v * (1 - rift * 0.75) + [255, 94, 58][ch] * rift * 0.55; d[i + ch] = Math.max(0, Math.min(255, v)); } d[i + 3] = 255; }
+    c.putImageData(img, 0, 0); return cv;
+  }
   function drawMinimap(sim, view) {
-    const c = mctx; const size = mini.width; const human = view.human; const vis = view.reveal ? { has: () => true } : sim.vis[human]; const m = miniM(); const ex = sim.explored[human]; const M = (x, y) => R.worldToMini(x, y);
-    const dia = (ctx2, px, py, hw, hh) => { ctx2.beginPath(); ctx2.moveTo(px, py - hh); ctx2.lineTo(px + hw, py); ctx2.lineTo(px, py + hh); ctx2.lineTo(px - hw, py); ctx2.closePath(); };
-    c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#0B0D11'; c.fillRect(0, 0, size, size);
-    if (!R.miniBase || R.miniBase.width !== size) { const mb = document.createElement('canvas'); mb.width = size; mb.height = size; const bc = mb.getContext('2d'); const tm = TILE * m; for (let ty = 0; ty < TILES; ty++) for (let tx = 0; tx < TILES; tx++) { const d = Math.hypot((tx + 0.5) * TILE - S.CX, (ty + 0.5) * TILE - S.CY); if (d < S.RIFT_R + 24) continue; const p = M((tx + 0.5) * TILE, (ty + 0.5) * TILE); bc.fillStyle = BIOME_MINI[S.BIOMES[sim.biome[ty * TILES + tx]]] || '#15181F'; dia(bc, p[0], p[1], tm + 0.6, tm * 0.5 + 0.6); bc.fill(); } for (const e of sim.ents) if (e.alive && e.kind === 'rock') { const p = M(e.x, e.y); bc.fillStyle = '#8A9098'; bc.fillRect(p[0] - 1, p[1] - 1, 2, 2); } R.miniBase = mb; }
-    c.drawImage(R.miniBase, 0, 0);
-    { const p = M(S.CX, S.CY); c.fillStyle = 'rgba(255,94,58,0.35)'; c.beginPath(); c.ellipse(p[0], p[1], S.RIFT_R * 2 * m, S.RIFT_R * m, 0, 0, TAU); c.fill(); c.fillStyle = '#05040A'; c.beginPath(); c.ellipse(p[0], p[1], S.RIFT_R * m, S.RIFT_R * m * 0.5, 0, 0, TAU); c.fill(); }
-    for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'node') { const p = M(e.x, e.y); c.fillStyle = NODE_COLOR[e.res]; c.fillRect(p[0] - 1.5, p[1] - 1.5, 3, 3); continue; } if (e.kind !== 'unit' && e.kind !== 'building') continue; const own = e.owner === human; if (!(own || vis.has(e.id))) continue; const col = sim.players[e.owner].color; const p = M(e.x, e.y); if (e.kind === 'building') { const t = S.BUILDINGS[e.def].territory; if (t && e.built) { c.fillStyle = rgba(col, 0.1); c.beginPath(); c.ellipse(p[0], p[1], t * m, t * m * 0.5, 0, 0, TAU); c.fill(); } c.fillStyle = col; const r = e.def === 'nucleo' ? 4 : S.BUILDINGS[e.def].wall ? 1.5 : 2.5; c.fillRect(p[0] - r, p[1] - r, r * 2, r * 2); } else { c.fillStyle = col; c.fillRect(p[0] - 1, p[1] - 1, 2, 2); } }
-    for (const [id, mm] of view.memory) if (!vis.has(id)) { const p = M(mm.x, mm.y); c.fillStyle = rgba(sim.players[mm.owner].color, 0.5); c.fillRect(p[0] - 2, p[1] - 2, 4, 4); }
-    if (sim.storm) { const p = M(sim.storm.x, sim.storm.y); c.strokeStyle = sim.storm.phase === 'active' ? 'rgba(178,60,255,0.9)' : `rgba(178,60,255,${0.4 + 0.4 * Math.sin(R.time * 6)})`; c.lineWidth = 1.5; c.beginPath(); c.ellipse(p[0], p[1], sim.storm.r * m, sim.storm.r * m * 0.5, 0, 0, TAU); c.stroke(); }
-    mfctx.setTransform(1, 0, 0, 1, 0, 0); mfctx.globalCompositeOperation = 'source-over'; mfctx.clearRect(0, 0, size, size); mfctx.fillStyle = 'rgba(6,8,12,0.72)'; dia(mfctx, size / 2, size / 2, size / 2, size / 4); mfctx.fill();
-    if (!view.reveal) { mfctx.fillStyle = 'rgba(2,3,6,0.8)'; const tm = TILE * m; for (let ty = 0; ty < TILES; ty++) for (let tx = 0; tx < TILES; tx++) { if (ex[ty * TILES + tx]) continue; const p = M((tx + 0.5) * TILE, (ty + 0.5) * TILE); dia(mfctx, p[0], p[1], tm + 0.5, tm * 0.5 + 0.5); mfctx.fill(); } }
-    mfctx.globalCompositeOperation = 'destination-out'; for (const e of sim.ents) { if (!e.alive || e.owner !== human || (e.kind !== 'unit' && e.kind !== 'building')) continue; const r = S.sensorRadius(sim, e) * m; const p = M(e.x, e.y); mfctx.beginPath(); mfctx.ellipse(p[0], p[1], r, r * 0.5, 0, 0, TAU); mfctx.fill(); }
-    c.drawImage(mfog, 0, 0);
-    for (const r of R.fx.rings) if (r.ping) { const kk = r.t / r.life; const p = M(r.x, r.y); c.strokeStyle = rgba(r.col, 1 - kk); c.lineWidth = 1.5; c.beginPath(); c.arc(p[0], p[1], 3 + 10 * kk, 0, TAU); c.stroke(); }
+    miniYaw = view.cam.yaw == null ? Math.PI / 4 : view.cam.yaw; const f = miniXf(); const size = f.size; const human = view.human; const vis = view.reveal ? { has: () => true } : sim.vis[human]; const ex = sim.explored[human]; const M = (x, y) => R.worldToMini(x, y); const c = mctx;
+    if (!R.miniBase || R.miniBaseSim !== sim) { R.miniBase = miniBaseImage(sim); R.miniBaseSim = sim; }
+    const A = f.sc * f.co, B = f.sc * f.si, C = f.sc * f.si, D = -f.sc * f.co, E = f.cx - A * S.CX - C * S.CY, F = f.cy - B * S.CX - D * S.CY; // mundo → radar
+    c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, size, size); c.save(); c.beginPath(); c.arc(f.cx, f.cy, size / 2 - 1, 0, TAU); c.clip();
+    const bgG = c.createRadialGradient(f.cx, f.cy, size * 0.1, f.cx, f.cy, size * 0.5); bgG.addColorStop(0, '#10141b'); bgG.addColorStop(1, '#05070a'); c.fillStyle = bgG; c.fillRect(0, 0, size, size);
+    c.setTransform(A, B, C, D, E, F); c.imageSmoothingEnabled = true; c.drawImage(R.miniBase, 0, 0, S.WORLD, S.WORLD);
+    for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const t = S.BUILDINGS[e.def].territory; if (!t) continue; if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue; c.fillStyle = rgba(sim.players[e.owner].color, 0.16); c.beginPath(); c.arc(e.x, e.y, t, 0, TAU); c.fill(); c.strokeStyle = rgba(sim.players[e.owner].color, 0.35); c.lineWidth = 14; c.stroke(); }
+    { const g = c.createRadialGradient(S.CX, S.CY, S.RIFT_R * 0.3, S.CX, S.CY, S.RIFT_R * 1.5); const pulse = 0.55 + 0.25 * Math.sin(R.time * 2.2); g.addColorStop(0, `rgba(255,120,70,${pulse})`); g.addColorStop(0.55, 'rgba(178,60,255,0.25)'); g.addColorStop(1, 'rgba(178,60,255,0)'); c.fillStyle = g; c.beginPath(); c.arc(S.CX, S.CY, S.RIFT_R * 1.5, 0, TAU); c.fill(); }
+    if (sim.storm) { c.strokeStyle = sim.storm.phase === 'active' ? 'rgba(178,60,255,0.95)' : `rgba(178,60,255,${0.4 + 0.4 * Math.sin(R.time * 6)})`; c.lineWidth = 26; c.beginPath(); c.arc(sim.storm.x, sim.storm.y, sim.storm.r, 0, TAU); c.stroke(); }
+    // névoa: explorado escurece, inexplorado quase preto, sensores limpam
+    mfog.width = size; mfog.height = size; mfctx.setTransform(A, B, C, D, E, F); mfctx.globalCompositeOperation = 'source-over'; if (!view.reveal) { mfctx.fillStyle = 'rgba(4,6,9,0.55)'; mfctx.fillRect(-200, -200, S.WORLD + 400, S.WORLD + 400); mfctx.fillStyle = 'rgba(2,3,5,0.82)'; for (let ty = 0; ty < TILES; ty++) for (let tx = 0; tx < TILES; tx++) if (!ex[ty * TILES + tx]) mfctx.fillRect(tx * TILE - 1, ty * TILE - 1, TILE + 2, TILE + 2);
+      mfctx.globalCompositeOperation = 'destination-out'; for (const e of sim.ents) { if (!e.alive || e.owner !== human || (e.kind !== 'unit' && e.kind !== 'building')) continue; mfctx.beginPath(); mfctx.arc(e.x, e.y, S.sensorRadius(sim, e), 0, TAU); mfctx.fill(); } }
+    c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(mfog, 0, 0);
+    // pontos: nós de recurso, construções (quadrados), unidades (pontos), memória de construções inimigas
+    const px = Math.max(1, size / 92);
+    for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'node') { if (!view.reveal && !ex[Math.min(TILES - 1, (e.y / TILE) | 0) * TILES + Math.min(TILES - 1, (e.x / TILE) | 0)]) continue; const p = M(e.x, e.y); c.fillStyle = NODE_COLOR[e.res]; c.fillRect(p[0] - px * 0.8, p[1] - px * 0.8, px * 1.6, px * 1.6); continue; }
+      if (e.kind !== 'unit' && e.kind !== 'building') continue; const own = e.owner === human; if (!(own || vis.has(e.id))) continue; const col = sim.players[e.owner].color; const p = M(e.x, e.y);
+      if (e.kind === 'building') { const r = e.def === 'nucleo' ? px * 3.2 : px * 1.9; c.fillStyle = col; c.fillRect(p[0] - r, p[1] - r, r * 2, r * 2); c.strokeStyle = 'rgba(0,0,0,0.6)'; c.lineWidth = 1; c.strokeRect(p[0] - r, p[1] - r, r * 2, r * 2); }
+      else { c.fillStyle = own ? col : rgba(col, 0.95); c.beginPath(); c.arc(p[0], p[1], own ? px * 1.05 : px * 1.2, 0, TAU); c.fill(); if (!own) { c.strokeStyle = 'rgba(0,0,0,0.7)'; c.lineWidth = 1; c.stroke(); } } }
+    for (const [id, mm] of view.memory) if (!vis.has(id)) { const p = M(mm.x, mm.y); c.fillStyle = rgba(sim.players[mm.owner].color, 0.45); c.fillRect(p[0] - px * 1.6, p[1] - px * 1.6, px * 3.2, px * 3.2); }
+    for (const r of R.fx.rings) if (r.ping) { const kk = r.t / r.life; const p = M(r.x, r.y); c.strokeStyle = rgba(r.col, 1 - kk); c.lineWidth = Math.max(1.5, px); c.beginPath(); c.arc(p[0], p[1], px * 3 + px * 12 * kk, 0, TAU); c.stroke(); }
+    // varredura do radar e visão da câmera
+    { const a = R.time * 0.8; const L = size / 2; for (let k2 = 0; k2 < 14; k2++) { const aa = a - k2 * 0.035; c.strokeStyle = `rgba(127,227,161,${0.16 * (1 - k2 / 14)})`; c.lineWidth = 2; c.beginPath(); c.moveTo(f.cx, f.cy); c.lineTo(f.cx + Math.cos(aa) * L, f.cy + Math.sin(aa) * L); c.stroke(); } }
     const cam = view.cam; const cs = [R.screenToWorld(cam, 0, 0), R.screenToWorld(cam, R.w, 0), R.screenToWorld(cam, R.w, R.h), R.screenToWorld(cam, 0, R.h)].map(p => M(p[0], p[1]));
-    c.strokeStyle = 'rgba(255,255,255,0.75)'; c.lineWidth = 1; c.beginPath(); cs.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.closePath(); c.stroke();
+    c.fillStyle = 'rgba(255,255,255,0.07)'; c.strokeStyle = 'rgba(255,255,255,0.85)'; c.lineWidth = Math.max(1, px * 0.7); c.beginPath(); cs.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.closePath(); c.fill(); c.stroke();
+    c.restore();
+    // aro com marcas e o norte do mundo
+    c.setTransform(1, 0, 0, 1, 0, 0); c.strokeStyle = 'rgba(255,255,255,0.18)'; c.lineWidth = Math.max(1, px * 0.6); c.beginPath(); c.arc(f.cx, f.cy, size / 2 - px * 1.2, 0, TAU); c.stroke();
+    for (let k2 = 0; k2 < 24; k2++) { const aa = k2 / 24 * TAU; const r1 = size / 2 - px * (k2 % 6 === 0 ? 3.4 : 2.2), r2 = size / 2 - px * 1.2; c.strokeStyle = k2 % 6 === 0 ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.18)'; c.beginPath(); c.moveTo(f.cx + Math.cos(aa) * r1, f.cy + Math.sin(aa) * r1); c.lineTo(f.cx + Math.cos(aa) * r2, f.cy + Math.sin(aa) * r2); c.stroke(); }
+    { const nx = -f.sc * f.si, ny = f.sc * f.co; const nl = Math.hypot(nx, ny) || 1; const rr = size / 2 - px * 6; const qx = f.cx + nx / nl * rr, qy = f.cy + ny / nl * rr; c.fillStyle = '#FF5E3A'; c.font = `700 ${Math.round(px * 5)}px ui-monospace, monospace`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('N', qx, qy); }
   }
   return R;
 }

@@ -1256,7 +1256,7 @@ function checkEnd(sim) {
   const scores = sim.players.map(p => ({ id: p.id, name: p.name, score: p.alive ? score(sim, p) : 0, alive: p.alive }));
   if (humans.length >= 2) { // multiplayer: a partida acaba quando sobra um jogador ou o tempo termina; cada cliente decide o próprio resultado
     const aliveN = sim.players.filter(p => p.alive).length;
-    if (aliveN <= 1 || sim.time >= sim.maxTime) { const best = scores.filter(s2 => s2.alive).sort((a, b) => b.score - a.score)[0]; sim.result = { outcome: 'over', reason: aliveN <= 1 ? 'Último Núcleo de pé.' : 'Fim do Ciclo de Maré: vitória por Domínio.', scores, winner: best ? best.id : -1 }; emit(sim, { t: 'end', result: sim.result }); }
+    if (aliveN <= 1 || sim.time >= sim.maxTime) { const best = scores.filter(s2 => s2.alive).sort((a, b) => b.score - a.score)[0]; sim.result = { outcome: 'over', reason: aliveN <= 1 ? 'Último Núcleo de pé.' : 'Fim do Alinhamento: vitória por Domínio.', scores, winner: best ? best.id : -1 }; emit(sim, { t: 'end', result: sim.result }); }
     return;
   }
   if (humans.length === 0) { // headless mode: last one standing or time
@@ -1271,7 +1271,7 @@ function checkEnd(sim) {
   else if (sim.time >= sim.maxTime) {
     const best = scores.slice().sort((a, b) => b.score - a.score)[0];
     const h = humans[0];
-    sim.result = { outcome: best.id === h.id ? 'victory' : 'defeat', reason: 'Fim do Ciclo de Maré: vitória por Domínio de ' + best.name + '.', scores };
+    sim.result = { outcome: best.id === h.id ? 'victory' : 'defeat', reason: 'Fim do Alinhamento: vitória por Domínio de ' + best.name + '.', scores };
   }
   if (sim.result) emit(sim, { t: 'end', result: sim.result });
 }

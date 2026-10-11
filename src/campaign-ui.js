@@ -1,4 +1,4 @@
-/* Aether Rift: Dominion — interface da campanha e do progresso (4.0e): tela "O Ciclo da Maré" (Comandante, atos, relíquias,
+/* Aether Rift: Dominion — interface da campanha e do progresso (4.0e): tela "O Grande Alinhamento" (Comandante, atos, relíquias,
    conquistas, backup), briefing com os líderes, HUD de missão (objetivos e transmissões), Hangar com visualizador 3D,
    rastreio de conquistas em qualquer partida e o fechamento com XP, estrelas e desbloqueios no ProgressStore. */
 (function (ARD) {
@@ -13,7 +13,7 @@ function raceName(r) { return (S.FACTIONS[r] || {}).name || r; }
 function totalStars() { const s = P.load(); return Object.values(s.missions).reduce((a, m) => a + (m.stars || 0), 0); }
 function titleOf() { const a = P.load().achievements; let best = '', t = 0; for (const id in a) if (C.TITLES[id] && a[id] >= t) { t = a[id]; best = C.TITLES[id]; } return best; } // título automático: o da conquista mais recente que dá título
 function colorFor(race) { const h = P.load().hangar; return (h.colors && h.colors[race]) || null; }
-function refreshMini() { const el = D.$('cmdr-mini'); if (!el) return; const li = P.levelInfo(); const s = P.load(); el.textContent = 'Comandante nível ' + li.level + ' · ' + li.xp.toLocaleString('pt-BR') + ' XP · ' + totalStars() + ' ★ na campanha' + (titleOf() ? ' · "' + titleOf() + '"' : '') + (s.relics.equipped.some(Boolean) ? ' · relíquias: ' + s.relics.equipped.filter(Boolean).map(id => (C.RELICS.find(r => r.id === id) || {}).name).join(', ') : ''); }
+function refreshMini() { try { refreshCard(); } catch (e) { console.warn('[ARD] cartão da campanha:', e); } const el = D.$('cmdr-mini'); if (!el) return; const li = P.levelInfo(); const s = P.load(); el.textContent = 'Comandante nível ' + li.level + ' · ' + li.xp.toLocaleString('pt-BR') + ' XP · ' + totalStars() + ' ★ na campanha' + (titleOf() ? ' · "' + titleOf() + '"' : '') + (s.relics.equipped.some(Boolean) ? ' · relíquias: ' + s.relics.equipped.filter(Boolean).map(id => (C.RELICS.find(r => r.id === id) || {}).name).join(', ') : ''); }
 
 // ---------- tela da campanha ----------
 function openCampaign() {
@@ -45,10 +45,28 @@ function openBriefing(id, opts) {
     $('br-obj').innerHTML = m.objectives.map(o => `<li class="${o.bonus ? 'bn' : ''}">${o.bonus ? '★ Bônus: ' : ''}${esc(o.text.replace(/^Bônus: /, ''))}</li>`).join('');
     const eq = P.load().relics.equipped.filter(Boolean).map(rid => (C.RELICS.find(r => r.id === rid) || {}).name); $('br-relics').textContent = (eq.length ? 'Relíquias equipadas: ' + eq.join(', ') + '. ' : 'Nenhuma relíquia equipada. ') + (m.relic && !P.load().relics.owned.includes(m.relic) ? 'Recompensa: relíquia ' + (C.RELICS.find(r => r.id === m.relic) || {}).name + '. ' : '') + 'Melhor resultado: ' + ((pr.stars || 0) ? (pr.stars + ' ★') : 'ainda não concluída') + '.'; };
   raceSel.onchange = draw; $('br-diff').onchange = draw; draw();
-  $('br-start').onclick = () => { const race = raceSel.value, diff = $('br-diff').value; const prep = C.prepare(id, { race, difficulty: diff, relics: P.load().relics.equipped, name: ($('opt-name').value.trim() || P.load().commander.name || 'Comandante').slice(0, 18), color: colorFor(race) });
-    $('briefing').hidden = true; D.startGame({ name: prep.cfg.players[0].name, faction: race, seed: prep.cfg.seed, minutes: prep.cfg.minutes, players: prep.cfg.players, campaign: prep, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }); };
+  $('br-start').onclick = () => { $('briefing').hidden = true; launch(id, raceSel.value, $('br-diff').value); };
   $('briefing').hidden = false;
 }
+
+// 4.1b: início direto de uma missão (briefing, botão Continuar e links do fim de partida usam o mesmo caminho)
+function launch(id, race, diff) {
+  const $ = D.$; const m = C.BY_ID[id]; if (!m) return; race = m.race || race || D.selectedRace(); diff = diff || 'normal';
+  const prep = C.prepare(id, { race, difficulty: diff, relics: P.load().relics.equipped, name: ($('opt-name').value.trim() || P.load().commander.name || 'Comandante').slice(0, 18), color: colorFor(race) });
+  try { const pf = JSON.parse(localStorage.getItem('ard-beta-prefs') || '{}'); pf.campDiff = diff; localStorage.setItem('ard-beta-prefs', JSON.stringify(pf)); } catch (e) {}
+  D.startGame({ name: prep.cfg.players[0].name, faction: race, seed: prep.cfg.seed, minutes: prep.cfg.minutes, players: prep.cfg.players, campaign: prep, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value });
+}
+// próxima missão a jogar: a primeira liberada ainda sem vitória; com tudo vencido, a última liberada
+function currentMission() { const s = P.load(); let last = null; for (const m of C.MISSIONS) { if (!C.unlocked(m.id, s)) continue; const pr = s.missions[m.id] || {}; if (!pr.won && !(pr.stars > 0)) return m; last = m; } return last || C.MISSIONS[0]; }
+function campDiff() { try { return JSON.parse(localStorage.getItem('ard-beta-prefs') || '{}').campDiff || null; } catch (e) { return null; } }
+function refreshCard() { const $ = D.$; if (!$('camp-card')) return; const s = P.load(); const li = P.levelInfo(); const m = currentMission(); const race = m.race || D.selectedRace();
+  const nm = ($('opt-name') && $('opt-name').value.trim()) || s.commander.name || 'Comandante';
+  $('camp-card-img').src = D.leaderArt(race, D.LEADER_FACE[race]) || ''; $('camp-card-name').textContent = nm; $('camp-card-lv').textContent = 'Nv ' + li.level; $('camp-card-xp').style.width = (li.max ? 100 : Math.round(100 * li.into / li.need)) + '%';
+  const act = C.ACTS.find(a => a.id === m.act) || {}; const done = C.MISSIONS.filter(x => (s.missions[x.id] || {}).won || (s.missions[x.id] || {}).stars > 0).length;
+  $('camp-next-act').textContent = (act.name || 'Campanha') + ' · ' + done + '/' + C.MISSIONS.length + ' missões'; $('camp-next-title').textContent = m.title; $('camp-next-place').textContent = m.place + (m.race ? ' · missão da Raça ' + raceName(m.race) : '');
+  $('camp-race-note').textContent = m.race ? raceName(m.race) + ' (fixa nesta missão)' : raceName(race) + ' · troque ao lado';
+  const pr = s.missions[m.id] || {}; if (!$('camp-diff').dataset.touched) $('camp-diff').value = campDiff() || pr.lastDifficulty || 'normal';
+  $('btn-camp-continue').textContent = done ? 'Continuar: ' + m.title : 'Começar a campanha'; $('btn-camp-continue').dataset.mission = m.id; }
 
 // ---------- Hangar ----------
 let hg = null;
@@ -148,10 +166,11 @@ function init(deps) {
   $('camp-export').addEventListener('click', () => { const code = P.exportCode(); const ta = $('camp-code'); ta.hidden = false; ta.value = code; ta.select(); try { navigator.clipboard.writeText(code); } catch (e) {} $('camp-export').textContent = 'Código copiado'; setTimeout(() => { $('camp-export').textContent = 'Copiar código de backup'; }, 2500); });
   $('camp-import').addEventListener('click', () => { const ta = $('camp-code'); if (ta.hidden || !ta.value.trim()) { ta.hidden = false; ta.value = ''; ta.focus(); return; } try { P.importCode(ta.value); applyHangar(); refreshMini(); openCampaign(); $('camp-import').textContent = 'Progresso importado'; } catch (e) { $('camp-import').textContent = e.message; } setTimeout(() => { $('camp-import').textContent = 'Importar código'; }, 3000); });
   for (const id of ['campaign', 'briefing', 'hangar']) $(id).querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => { $(id).hidden = true; }));
+  if ($('btn-camp-continue')) { $('btn-camp-continue').addEventListener('click', () => launch($('btn-camp-continue').dataset.mission || currentMission().id, D.selectedRace(), $('camp-diff').value)); $('camp-diff').addEventListener('change', () => { $('camp-diff').dataset.touched = '1'; try { const pf = JSON.parse(localStorage.getItem('ard-beta-prefs') || '{}'); pf.campDiff = $('camp-diff').value; localStorage.setItem('ard-beta-prefs', JSON.stringify(pf)); } catch (e) {} }); }
   refreshMini();
-  const q = new URLSearchParams(location.search); if (q.get('missao') && C.BY_ID[q.get('missao')]) setTimeout(() => openBriefing(q.get('missao'), { diff: q.get('dif') || undefined, race: q.get('raca') || undefined }), 200);
+  const q = new URLSearchParams(location.search); if (q.get('missao') && C.BY_ID[q.get('missao')]) setTimeout(() => { if (q.get('iniciar')) launch(q.get('missao'), q.get('raca') || undefined, q.get('dif') || undefined); else openBriefing(q.get('missao'), { diff: q.get('dif') || undefined, race: q.get('raca') || undefined }); }, 200);
 }
 function applyColor(players) { if (!players || !players[0]) return; const c = colorFor(players[0].faction); if (c) players[0].color = c; }
 function skinOf(race) { return P.load().hangar.skin[race] || 0; }
-ARD.campUI = { init, begin, finish, tracker, refreshMini, openCampaign, openBriefing, openHangar, applyColor, skinOf, colorFor };
+ARD.campUI = { init, begin, finish, tracker, refreshMini, openCampaign, openBriefing, openHangar, applyColor, skinOf, colorFor, launch, currentMission };
 })(globalThis.ARD = globalThis.ARD || {});

@@ -117,22 +117,22 @@ Regra de ouro: cada técnica nova no renderizador da galeria vira um módulo do 
 - **Rodapé profissional**: logo + nome; links essenciais; **"Aether Rift Dominion — Versão 4.0 | Lançamento Global 2026"**; créditos, Discord, GitHub, Termos de Uso e Política de Privacidade (páginas estáticas próprias).
 - **Mobile-first**: portais em carrossel com swipe, alvos ≥ 44 px, gutter 16 px, sem scroll horizontal.
 
-## 4. Modo História — "O Ciclo da Maré"
+## 4. Modo História — "O Grande Alinhamento" (até a 4.1a: "O Ciclo da Maré")
 
-**Arco**: a Fenda pulsa em Marés. A cada Maré, o Domínio — o direito de ditar o que a Fenda cospe — troca de mãos. Cinco Raças, uma vaga.
+**Arco**: de tempos em tempos os cinco mundos do sistema ficam em fila, como no logo. O alinhamento rasga a Fenda e o Domínio — o direito de ditar o que a Fenda cospe — troca de mãos. Cinco Raças, uma vaga. O nome antigo lembrava mar; o novo é cósmico e combina com os eclipses e as tempestades de Éter das missões.
 
 **Estrutura**: Prólogo (3 missões-tutorial) + 4 Atos × 3 missões + 5 Missões de Identidade (uma por Raça) = **20 missões**. Campanha principal jogável com qualquer Raça; diálogos e objetivos secundários variam por Raça (matriz missão × Raça na narrativa).
 
-- **Prólogo — "Acorde"**: M1 base e coleta · M2 energia e regimes · M3 primeira tempestade do Éter.
-- **Ato 1 — "Despertar da Maré"**: M4 cerco com muros e portões · M5 caça a comboios (caixas) · M6 sobrevivência noturna.
-- **Ato 2 — "Rotas de Saque"**: M7 roubo e contrarroubo (Erevane em destaque) · M8 diplomacia forçada (pacto obrigatório que será traído) · M9 escolta sob tempestade.
+- **Prólogo — "Primeira Luz"**: M1 base e coleta · M2 energia e regimes · M3 primeira tempestade do Éter.
+- **Ato 1 — "Penumbra"**: M4 cerco com muros e portões · M5 caça a comboios (caixas) · M6 sobrevivência noturna.
+- **Ato 2 — "Rotas de Éter"**: M7 roubo e contrarroubo (Erevane em destaque) · M8 diplomacia forçada (pacto obrigatório que será traído) · M9 escolta sob tempestade.
 - **Ato 3 — "Coro e Fome"**: M10 primeiro contato Quorith (defesa contra acordes) · M11 a Prole devora um aliado (corrida contra Carniceiros) · M12 aliança tripla instável.
-- **Ato 4 — "Domínio"**: M13 assalto à Catedral Errante · M14 Matriarca encurralada · M15 a Fenda aberta (final com as 5 Raças no mapa).
+- **Ato 4 — "Eclipse Total"**: M13 assalto à Catedral Errante · M14 Matriarca encurralada · M15 a Fenda aberta (final com as 5 Raças no mapa).
 - **Missões de Identidade**: I-Vehnar produção sob sabotagem · I-Erevane só furtividade, sem exército · I-Tessara vencer começando à noite · I-Quorith vencer sem nenhuma unidade isolada · I-Vorag consumir X de biomassa antes do tempo.
 
 **Dificuldades**: Fácil → Normal → Difícil → **Fenda** (IA mais agressiva, tempestades mais frequentes, névoa fechada, sem pausa). Modificadores declarados na tela de missão.
 
-**Progressão**: XP por missão e por estrelas (até 3: objetivo principal + 2 bônus). Nível de Comandante 1–30. Recompensas: passivas por Raça (PvE, fichas acima), módulos de construção, variantes de unidade (sidegrades), cosméticos, **Relíquias** (modificadores de campanha equipáveis, 2 slots, ex.: "Âncora de Maré: +1 uso de superarma, -10% energia"). **Conquistas permanentes** (ex.: "Núcleo intacto", "Vitória só com infantaria", "Pacifista até o minuto 10").
+**Progressão**: XP por missão e por estrelas (até 3: objetivo principal + 2 bônus). Nível de Comandante 1–30. Recompensas: passivas por Raça (PvE, fichas acima), módulos de construção, variantes de unidade (sidegrades), cosméticos, **Relíquias** (modificadores de campanha equipáveis, 2 slots, ex.: "Âncora de Órbita: superarma recarrega 30% mais rápido, −10% de energia"). **Conquistas permanentes** (ex.: "Núcleo intacto", "Vitória só com infantaria", "Pacifista até o minuto 10").
 
 **Persistência**: ProgressStore v1 (localStorage + código de exportação/backup). A v5.0 importa esse formato na criação da conta.
 
@@ -189,7 +189,7 @@ Regra de ouro: cada técnica nova no renderizador da galeria vira um módulo do 
 
 **v4.1 — Feedback de campo (2026-10-11), cinco incrementos a partir dos testes no celular e no PC:**
 - **4.1a — Jogabilidade** ✔: toque perto da base move o grupo; construir no toque com arrastar e ✓; câmera aberta no celular em pé; barra inferior de uma linha com alvos de 44 px; fila de produção até 50 agrupada (×N, pago ao começar, +1/+5/+10); dificuldades refeitas e medidas por um jogador defensivo de referência (tools/difficulty-test.cjs) e nível Brutal; cores por Raça em todos os modos e Hangar corrigido; noites legíveis; notas enxutas. *Medido (10 partidas por nível, Raças espelhadas, 20 min): o defensor cai 0/10 no Fácil, 1/10 no Normal, 2/10 no Difícil e 7/10 no Brutal; primeiro ataque aos 12, 8, 6 e 5 min.*
-- **4.1b — Interface e campanha**: tela inicial com abas (Jogar, Campanha, Multiplayer, Ajustes); campanha renomeada para "O Grande Alinhamento" (os cinco mundos alinhados abrem a Fenda, como no logo), com "Continuar" de um clique; minimapa novo, que gira com a câmera.
+- **4.1b — Interface e campanha** ✔: tela inicial com abas (Jogar, Campanha, Multiplayer, Ajustes), aba lembrada; campanha renomeada para "O Grande Alinhamento" (os cinco mundos alinhados abrem a Fenda, como no logo), atos Primeira Luz, Penumbra, Rotas de Éter, Coro e Fome, Eclipse Total; "Continuar" de um clique e "Próxima/Repetir missão" sem briefing; minimapa em radar redondo que gira com a câmera; botão de início próprio da sala multiplayer.
 - **4.1c — Persistência**: salvamento automático e retomada (solo e campanha) por registro de comandos com reprodução rápida; espaços de salvamento manuais; retorno ao multiplayer depois de queda curta.
 - **4.1d — Evolução**: Núcleo com níveis I–III que liberam construções, unidades e poderes por etapa, mais uma Ascensão própria por Raça; IA e campanha adaptadas.
 - **4.1e — Líderes vivos**: líderes 3D animados nos portais da tela inicial e no HUD, reagindo à partida (ataque, perdas, vitórias), com retrato animado em 2D no celular.

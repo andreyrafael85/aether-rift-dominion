@@ -17,7 +17,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.1a';
+const VERSION = '4.1b';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -48,7 +48,7 @@ function initStart() {
     const el = document.createElement('label'); el.className = 'fac-card'; el.dataset.id = id; el.style.setProperty('--rc', RACE_UI[id] || '#FF5E3A');
     el.innerHTML = `<input type="radio" name="fac" value="${id}" ${((prefs.faction || 'vehnar') === id) ? 'checked' : ''}><div class="fac-body"><div class="fac-name">${f.name}</div><div class="fac-tag">${f.tagline}</div><div class="fac-sup"><b>Líder:</b> ${LEADER_NAME[id] || '—'}. <b>Superarma:</b> ${f.superName}. <b>Pirata:</b> ${f.pirateName}.</div></div>${leaderArt(id) ? `<img class="fac-lead" src="${leaderArt(id)}" alt="">` : ''}`;
     if (ART && ART.world && ART.world[id]) el.style.backgroundImage = `linear-gradient(90deg, rgba(20,23,29,.96) 48%, rgba(20,23,29,.55)), url(${ART.world[id]})`;
-    el.querySelector('input').addEventListener('change', () => setRace(RACE_UI[id] || '#FF5E3A'));
+    el.querySelector('input').addEventListener('change', () => { setRace(RACE_UI[id] || '#FF5E3A'); if (ARD.campUI) try { ARD.campUI.refreshMini(); } catch (e) {} });
     facWrap.appendChild(el);
   }
   setRace(raceColor);
@@ -87,7 +87,13 @@ function initStart() {
   try { if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost') && !/claude\.ai|claudeusercontent|anthropic/.test(location.hostname)) navigator.serviceWorker.register('sw.js').catch(e => console.warn('[ARD] service worker:', e.message)); } catch (e) {}
   { let deferred = null; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; $('btn-install').hidden = false; }); $('btn-install').addEventListener('click', async () => { if (!deferred) return; deferred.prompt(); try { await deferred.userChoice; } catch (e) {} deferred = null; $('btn-install').hidden = true; }); }
   const netState = () => { const el = $('net-state'); if (el) el.textContent = navigator.onLine ? '' : 'Sem internet: campanha e partidas solo funcionam; o multiplayer precisa de rede.'; }; window.addEventListener('online', netState); window.addEventListener('offline', netState); netState();
-  { const fb = $('foot-feedback'); if (fb) fb.href = feedbackUrl(null); }
+  { const fb = $('foot-feedback'); if (fb) fb.href = feedbackUrl(null); const cf = $('cfg-feedback'); if (cf) cf.href = feedbackUrl(null); }
+  // 4.1b — painel de comando com abas por modo de jogo (a aba escolhida fica lembrada)
+  const showTab = (tab, save) => { const tabs = document.querySelectorAll('.ctab'); if (!tabs.length) return; if (![...tabs].some(t => t.dataset.tab === tab)) tab = 'jogar';
+    tabs.forEach(t => { const on = t.dataset.tab === tab; t.classList.toggle('on', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    document.querySelectorAll('.cpane').forEach(pn => { pn.hidden = pn.dataset.pane !== tab; }); if (save) savePrefs(Object.assign(loadPrefs() || {}, { tab })); if (tab === 'campanha' && ARD.campUI) try { ARD.campUI.refreshMini(); } catch (e) {} };
+  document.querySelectorAll('.ctab').forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab, true)));
+  showTab(params.get('aba') || (params.get('campanha') ? 'campanha' : prefs.tab) || 'jogar', false);
   { const pb = loadPrefs(); $('opt-bateria').checked = !!pb.bateria; $('opt-bateria').addEventListener('change', () => savePrefs(Object.assign(loadPrefs() || {}, { bateria: $('opt-bateria').checked }))); }
   // 4.0e — campanha, Hangar e progresso do Comandante
   if (ARD.campUI && ARD.campaign && ARD.progress) { try { ARD.campUI.init({ $, leaderArt, LEADER_NAME, RACE_COLORS, LEADER_FACE, startGame: cfg => { savePrefs(Object.assign(loadPrefs() || {}, { gfx: cfg.gfx, quality: cfg.quality, clima: cfg.clima, name: cfg.name })); startGame(cfg); }, selectedRace: () => (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar' }); if (params.get('campanha')) ARD.campUI.openCampaign(); } catch (e) { console.warn('[ARD] campanha indisponível:', e); } }
@@ -112,12 +118,14 @@ function initStart() {
     for (let i = players.length; i < size; i++) { const d = document.createElement('div'); d.className = 'muted'; d.textContent = '• vaga livre'; el.appendChild(d); }
     if (lobby && lobby.warn) { const d = document.createElement('div'); d.className = 'warn'; d.textContent = '⚠ ' + lobby.warn; el.appendChild(d); }
   }
-  function setStartButton() {
-    const b = $('btn-start');
+  function setStartButton() { // 4.1b: Iniciar partida (aba Jogar) é só solo; a sala tem o próprio botão na aba Multiplayer
+    const b = $('btn-start'), m = $('btn-mp-start');
     $('opt-opp').disabled = !!lobby; $('opt-diff').disabled = !!lobby;
-    if (!lobby) { const typed = $('opt-code').value.trim(); b.disabled = false; b.textContent = typed.length >= 4 ? 'Entrar na sala ' + typed.toUpperCase() : 'Iniciar partida'; return; }
-    if (lobby.role === 'host') { const n = lobby.N.roster().length; b.disabled = n < 2 || lobby.started; b.textContent = n < 2 ? 'Aguardando jogadores…' : 'Iniciar partida (' + n + '/' + lobby.size + ')'; }
-    else { b.disabled = true; b.textContent = 'Aguardando o anfitrião…'; }
+    b.disabled = false; b.textContent = lobby ? 'Você está numa sala · ver Multiplayer' : 'Iniciar partida';
+    if (!lobby) { const typed = $('opt-code').value.trim(); m.hidden = typed.length < 4; m.disabled = false; m.textContent = 'Entrar na sala ' + typed.toUpperCase(); return; }
+    m.hidden = false;
+    if (lobby.role === 'host') { const n = lobby.N.roster().length; m.disabled = n < 2 || lobby.started; m.textContent = n < 2 ? 'Aguardando jogadores…' : 'Iniciar partida da sala (' + n + '/' + lobby.size + ')'; }
+    else { m.disabled = true; m.textContent = 'Aguardando o anfitrião…'; }
   }
   function leaveLobby() { if (lobby) { if (lobby.timer) clearInterval(lobby.timer); if (lobby.role === 'host') $('opt-code').value = ''; try { lobby.N.close(); } catch (e) {} lobby = null; } $('mp-players').innerHTML = ''; setStartButton(); }
   function startHosted() {
@@ -139,7 +147,7 @@ function initStart() {
     mpStatus('Criando sala…'); setStartButton();
     N.on('error', e => mpStatus('Erro de rede: ' + e.message));
     N.on('warn', w => { if (lobby) { lobby.warn = w.message; renderLobby(N.roster(), lobby.size); } });
-    N.on('lobby', d => { renderLobby(d.players, d.size); setStartButton(); if (lobby && !lobby.started) { if (d.players.length >= d.size) { mpStatus('Sala completa. Iniciando…'); setTimeout(startHosted, 500); } else mpStatus('Sala ' + lobby.code + ': ' + d.players.length + '/' + d.size + ' jogadores. A partida começa quando a sala encher, ou clique em Iniciar partida com 2 ou mais.'); } });
+    N.on('lobby', d => { renderLobby(d.players, d.size); setStartButton(); if (lobby && !lobby.started) { if (d.players.length >= d.size) { mpStatus('Sala completa. Iniciando…'); setTimeout(startHosted, 500); } else mpStatus('Sala ' + lobby.code + ': ' + d.players.length + '/' + d.size + ' jogadores. A partida começa quando a sala encher, ou toque em Iniciar partida da sala com 2 ou mais.'); } });
     N.host({ size, me, code: (loadPrefs() || {}).room }, code => { lobby.code = code; $('opt-code').value = code; savePrefs(Object.assign(loadPrefs() || {}, { room: code })); renderLobby(N.roster(), size); mpStatus('Sala ' + code + ' criada para ' + size + ' jogadores. Envie o código aos amigos e aguarde a entrada deles.'); });
   });
   function joinRoom(code, attempt) {
@@ -166,9 +174,12 @@ function initStart() {
   $('btn-join').addEventListener('click', () => joinRoom($('opt-code').value));
   $('opt-code').addEventListener('input', () => { if (!lobby) setStartButton(); });
   $('opt-code').addEventListener('keydown', e => { if (e.key === 'Enter' && !lobby) { e.preventDefault(); joinRoom($('opt-code').value); } });
-  $('btn-start').addEventListener('click', () => {
+  $('btn-mp-start').addEventListener('click', () => {
     if (lobby) { if (lobby.role === 'host') startHosted(); else mpStatus('Aguarde o anfitrião iniciar a partida.'); return; }
-    const typed = $('opt-code').value.trim(); if (typed.length >= 4) { joinRoom(typed); return; } // código digitado: entra na sala, nunca inicia partida solo
+    const typed = $('opt-code').value.trim(); if (typed.length >= 4) joinRoom(typed);
+  });
+  $('btn-start').addEventListener('click', () => {
+    if (lobby) { showTab('multi', true); return; } // numa sala, o início é pela aba Multiplayer
     const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar';
     const cfg = { name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value };
     savePrefs(Object.assign(loadPrefs() || {}, cfg)); startGame(cfg);
@@ -549,14 +560,14 @@ function startGame(cfg, netCtx) {
       result = { outcome: r.won ? 'victory' : 'defeat', reason: r.reason, scores };
       const fin = ARD.campUI.finish(G.camp, r.won, sim, human, G.track, 'campanha'); $('objectives').hidden = true; $('comms').hidden = true;
       $('end-eyebrow').textContent = 'Campanha · ' + prep.mission.title + ' · ' + prep.diff.label; $('end-camp').innerHTML = fin.html; $('end-camp').hidden = false;
-      const base = location.pathname; const keep = new URLSearchParams(location.search); for (const k of ['missao', 'dif', 'raca', 'campanha', 'autostart']) keep.delete(k); const q = k => base + '?' + new URLSearchParams(Object.assign(Object.fromEntries(keep), k)).toString();
-      $('btn-next').hidden = !fin.next; if (fin.next) $('btn-next').onclick = () => { location.href = q({ missao: fin.next, dif: prep.difficulty, raca: prep.race }); };
+      const base = location.pathname; const keep = new URLSearchParams(location.search); for (const k of ['missao', 'dif', 'raca', 'campanha', 'autostart', 'iniciar']) keep.delete(k); const q = k => base + '?' + new URLSearchParams(Object.assign(Object.fromEntries(keep), k)).toString();
+      $('btn-next').hidden = !fin.next; if (fin.next) $('btn-next').onclick = () => { location.href = q({ missao: fin.next, dif: prep.difficulty, raca: prep.race, iniciar: '1' }); };
       { const fb = $('end-feedback'); if (fb) fb.href = feedbackUrl({ resultado: r.won ? 'missão cumprida' : 'missão falhou', estrelas: r.stars }); }
       $('btn-camp-menu').hidden = false; $('btn-camp-menu').onclick = () => { location.href = q({ campanha: '1' }); };
       { const art = leaderArt(sim.players[human].faction, r.won ? 3 : 2); if (art) { $('end-leader').src = art; $('end-leader').hidden = false; } }
       $('end').hidden = false; $('end-title').textContent = r.won ? 'MISSÃO CUMPRIDA' : 'MISSÃO FALHOU'; $('end-title').className = result.outcome; $('end-reason').textContent = r.reason;
       $('end-scores').innerHTML = ''; const st = sim.players[human].stats; $('end-stats').innerHTML = [['Tempo', mmss(r.time || sim.time)], ['Coletado', fmt(st.collected)], ['Roubado', fmt(st.stolen)], ['Unidades abatidas', st.unitsKilled], ['Unidades perdidas', st.unitsLost], ['Estruturas destruídas', st.buildingsDestroyed]].map(([k, v]) => `<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');
-      $('btn-again').textContent = 'Repetir missão'; $('btn-again').onclick = () => { location.href = q({ missao: prep.mission.id, dif: prep.difficulty, raca: prep.race }); };
+      $('btn-again').textContent = 'Repetir missão'; $('btn-again').onclick = () => { location.href = q({ missao: prep.mission.id, dif: prep.difficulty, raca: prep.race, iniciar: '1' }); };
       $('btn-copy').onclick = () => { const ta = $('end-json'); ta.hidden = false; ta.value = JSON.stringify({ versao: VERSION, missao: prep.mission.id, dificuldade: prep.difficulty, raca: prep.race, resultado: r, objetivos: G.camp.run.objectives.map(o => ({ id: o.id, feito: o.done })) }, null, 2); ta.select(); };
       return;
     }

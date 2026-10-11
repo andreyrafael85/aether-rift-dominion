@@ -1,4 +1,4 @@
-/* Aether Rift: Dominion — Campanha "O Ciclo da Maré" (4.0e): atos, missões com roteiro, conquistas, relíquias e o executor.
+/* Aether Rift: Dominion — Campanha "O Grande Alinhamento" (4.0e; renomeada na 4.1b): atos, missões com roteiro, conquistas, relíquias e o executor.
    Missões são partidas solo com objetivos (principais e bônus), falas dos líderes e eventos roteirizados (ondas, comboios,
    pactos forçados, tempestades, escolta). O executor roda depois de cada passo da simulação e só usa comandos e utilitários
    determinísticos da sim (spawnUnit, forceStorm, enqueue), então a mesma semente reproduz a mesma missão. */
@@ -7,8 +7,8 @@
 const S = ARD.sim;
 const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'];
 const ACTS = [
-  { id: 'prologo', name: 'Prólogo — Acorde' }, { id: 'ato1', name: 'Ato 1 — Despertar da Maré' }, { id: 'ato2', name: 'Ato 2 — Rotas de Saque' },
-  { id: 'ato3', name: 'Ato 3 — Coro e Fome' }, { id: 'ato4', name: 'Ato 4 — Domínio' }, { id: 'identidade', name: 'Missões de Identidade' },
+  { id: 'prologo', name: 'Prólogo — Primeira Luz' }, { id: 'ato1', name: 'Ato 1 — Penumbra' }, { id: 'ato2', name: 'Ato 2 — Rotas de Éter' },
+  { id: 'ato3', name: 'Ato 3 — Coro e Fome' }, { id: 'ato4', name: 'Ato 4 — Eclipse Total' }, { id: 'identidade', name: 'Missões de Identidade' },
 ];
 const DIFF = { facil: { ai: 'facil', wave: 0.7, xp: 0.8, label: 'Fácil' }, normal: { ai: 'normal', wave: 1, xp: 1, label: 'Normal' }, dificil: { ai: 'dificil', wave: 1.35, xp: 1.25, label: 'Difícil' }, fenda: { ai: 'brutal', wave: 1.7, xp: 1.5, storms: true, noPause: true, label: 'Fenda' } };
 const RELICS = [
@@ -16,7 +16,7 @@ const RELICS = [
   { id: 'lente-de-eter', name: 'Lente de Éter', desc: '+20% de visão para tudo; torres com −10% de vida.', mods: { sensorMul: 1.2, towerHpMul: 0.9 } },
   { id: 'semente-viva', name: 'Semente Viva', desc: 'Unidades regeneram 1,5 de vida/s fora de combate; −6% de velocidade.', mods: { regen: 1.5, speedMul: 0.94 } },
   { id: 'coracao-de-forja', name: 'Coração de Forja', desc: 'Produção 12% mais rápida; Reatores queimam 25% mais Plasma.', mods: { prodMul: 1.12, burnMul: 1.25 } },
-  { id: 'ancora-de-mare', name: 'Âncora de Maré', desc: 'Superarma recarrega 30% mais rápido; −10% de energia.', mods: { superCdMul: 0.7, energyMul: 0.9 } },
+  { id: 'ancora-de-mare', name: 'Âncora de Órbita', desc: 'Superarma recarrega 30% mais rápido; −10% de energia.', mods: { superCdMul: 0.7, energyMul: 0.9 } },
   { id: 'eco-do-coro', name: 'Eco do Coro', desc: '+1 Salto de Núcleo e +10% de energia; −8% na coleta.', mods: { extraJumps: 1, energyMul: 1.1, harvestMul: 0.92 } },
 ];
 const RELIC_BY_LEVEL = { 5: 'lente-de-eter', 10: 'coracao-de-forja', 15: 'eco-do-coro' };
@@ -28,9 +28,9 @@ const ACHIEVEMENTS = [
   { id: 'nucleo-intacto', name: 'Núcleo intacto', desc: 'Vencer com o Núcleo acima de 90% de vida.' }, { id: 'so-infantaria', name: 'Só infantaria', desc: 'Vencer usando apenas Infantaria em combate.' },
   { id: 'pacifista-10', name: 'Pacifista até o minuto 10', desc: 'Vencer uma partida sem causar dano nos primeiros 10 minutos.' }, { id: 'primeiro-sifao', name: 'Mão leve', desc: 'Roubar recursos com um Pirata.' },
   { id: 'muralha', name: 'Muralha', desc: 'Construir 20 Muros numa partida.' }, { id: 'traidor', name: 'Golpe de Traição', desc: 'Quebrar um pacto.' }, { id: 'diplomata', name: 'Palavra dada', desc: 'Cumprir um pacto até o fim.' },
-  { id: 'cinco-racas', name: 'Cinco Marés', desc: 'Vencer uma partida com cada Raça.' }, { id: 'comandante-10', name: 'Comandante veterano', desc: 'Chegar ao nível 10.' }, { id: 'comandante-30', name: 'Lenda da Fenda', desc: 'Chegar ao nível 30.' },
+  { id: 'cinco-racas', name: 'Cinco Mundos', desc: 'Vencer uma partida com cada Raça.' }, { id: 'comandante-10', name: 'Comandante veterano', desc: 'Chegar ao nível 10.' }, { id: 'comandante-30', name: 'Lenda da Fenda', desc: 'Chegar ao nível 30.' },
 ];
-const TITLES = { 'primeiro-passo': 'Recruta da Maré', prologo: 'Desperto', 'ato-1': 'Guardião do Cerco', 'ato-2': 'Senhor das Rotas', 'ato-3': 'Ouvido do Coro', 'ato-4': 'Dominador', identidade: 'Cinco Vozes', 'tres-estrelas': 'Perfeccionista', fenda: 'Filho da Fenda', 'nucleo-intacto': 'Inabalável', 'cinco-racas': 'Senhor das Cinco Marés', 'comandante-30': 'Lenda da Fenda' };
+const TITLES = { 'primeiro-passo': 'Recruta do Alinhamento', prologo: 'Desperto', 'ato-1': 'Guardião do Cerco', 'ato-2': 'Senhor das Rotas', 'ato-3': 'Ouvido do Coro', 'ato-4': 'Dominador', identidade: 'Cinco Vozes', 'tres-estrelas': 'Perfeccionista', fenda: 'Filho da Fenda', 'nucleo-intacto': 'Inabalável', 'cinco-racas': 'Senhor dos Cinco Mundos', 'comandante-30': 'Lenda da Fenda' };
 
 // ---------- missões ----------
 // who: 'self' (líder da sua Raça), 'enemy' (primeiro inimigo), 'ally' (primeiro aliado) ou um id de Raça. mood: 1 sereno, 2 furioso, 3 triunfante.
@@ -38,7 +38,7 @@ const M = [];
 const W = (comp, from, opts) => Object.assign({ comp, from: from || 0 }, opts || {}); // onda: composição { def: n }, de qual inimigo
 // Prólogo
 M.push({ id: 'p1', act: 'prologo', title: 'Acorde', place: 'Planalto de Ísk', xp: 300,
-  brief: [['self', 1, 'Comandante, a Maré baixou e a Fenda abriu um planalto inteiro. O Núcleo está de pé; agora precisamos de energia e de quem colha.'], ['self', 3, 'Siga as ordens na tela. Ninguém por perto vai incomodar. Por enquanto.']],
+  brief: [['self', 1, 'Comandante, os cinco mundos começaram a se alinhar e a Fenda abriu um planalto inteiro. O Núcleo está de pé; agora precisamos de energia e de quem colha.'], ['self', 3, 'Siga as ordens na tela. Ninguém por perto vai incomodar. Por enquanto.']],
   setup: { seed: 4101, enemies: [{ race: 'rival', name: 'Ninho Dormente', passive: true }] },
   objectives: [{ id: 'reator', text: 'Construir um Reator', test: c => c.built('reator') >= 1 }, { id: 'refinaria', text: 'Construir uma Refinaria', test: c => c.built('refinaria') >= 1 },
     { id: 'coletores', text: 'Ter 5 Coletores', test: c => c.units('coletor') >= 5, progress: c => c.units('coletor') + '/5' }, { id: 'coleta', text: 'Coletar 800 em recursos', test: c => c.me.stats.collected >= 800, progress: c => c.n(c.me.stats.collected) + '/800' },
@@ -148,7 +148,7 @@ M.push({ id: 'a4m2', act: 'ato4', title: 'Matriarca encurralada', place: 'Ninho 
   events: [{ at: 2, do: c => c.spawnBoss('matriarca', 0) }],
   tick: c => { c.bossPatrol(0, 420); const b = c.boss(); if (b && c.t > 60 && c.every(25)) for (let i = 0; i < Math.round(3 * c.D.wave); i++) { const u = S.spawnUnit(c.sim, b.owner, 'cria', b.x + (c.sim.rand() - 0.5) * 60, b.y + (c.sim.rand() - 0.5) * 60); if (u) { u.state = 'attackmove'; const t = c.myNucleo(); if (t) { u.tx = t.x; u.ty = t.y; } } } } });
 M.push({ id: 'a4m3', act: 'ato4', title: 'A Fenda aberta', place: 'O Coração da Fenda', xp: 1100,
-  brief: [['self', 1, 'Cinco Raças, uma vaga. A Maré decide hoje quem dita o que a Fenda cospe.'], ['vorag', 2, 'Fome.'], ['quorith', 1, 'Silêncio.'], ['self', 3, 'Domínio.']],
+  brief: [['self', 1, 'Cinco Raças, uma vaga. O Alinhamento se fecha hoje: quem ficar de pé dita o que a Fenda cospe.'], ['vorag', 2, 'Fome.'], ['quorith', 1, 'Silêncio.'], ['self', 3, 'Domínio.']],
   setup: { seed: 8311, minutes: 25, enemies: [{ race: 'others', name: 'auto' }, { race: 'others', name: 'auto' }, { race: 'others', name: 'auto' }] },
   objectives: [{ id: 'dominio', text: 'Vencer: último Núcleo de pé ou maior Domínio aos 25:00', test: c => c.st.matchWon },
     { id: 'b-nucleos', bonus: true, text: 'Destruir 2 Núcleos', test: c => c.me.stats.buildingsDestroyed >= 2 && c.enemiesDead() >= 2 }, { id: 'b-nodulos', bonus: true, final: true, text: 'Terminar com 3 Nódulos', test: c => c.built('nodulo') >= 3 }] });
@@ -179,11 +179,11 @@ M.push({ id: 'i-quorith', act: 'identidade', race: 'quorith', title: 'Nenhuma vo
   extraObjectives: [{ id: 'b-acorde', bonus: true, final: true, text: 'Nunca deixar uma unidade de combate isolada por 15 s', test: c => !c.st.isolated }, { id: 'b-unissono', bonus: true, text: 'Usar o Uníssono', test: c => c.me.unissonoT > 0 || c.st.usedSuper }],
   tick: c => { if (!c.every(1)) return; c.st.iso = c.st.iso || {}; for (const e of c.sim.ents) { if (!e.alive || e.kind !== 'unit' || e.owner !== 0 || e.cls === 'civ' || e.def === 'pirata' || !S.UNITS[e.def].attack) continue; const n = c.myNucleo(); if (n && S.dist(e.x, e.y, n.x, n.y) < 420) { c.st.iso[e.id] = 0; continue; } c.st.iso[e.id] = e.elo > 0 ? 0 : (c.st.iso[e.id] || 0) + 1; if (c.st.iso[e.id] >= 15) c.st.isolated = true; } } });
 M.push({ id: 'i-vorag', act: 'identidade', race: 'vorag', title: 'A fome que floresce', place: 'Campo de Carcaças', xp: 700,
-  brief: [['vorag', 2, 'Carcaças por toda parte. Nódulos gordos do outro lado.'], ['vorag', 3, 'Devorar. Dois mil de biomassa antes de a Maré virar.']],
+  brief: [['vorag', 2, 'Carcaças por toda parte. Nódulos gordos do outro lado.'], ['vorag', 3, 'Devorar. Dois mil de biomassa antes de o eclipse passar.']],
   setup: { seed: 9511, enemies: [{ race: 'rival', name: 'Ordem do Molde' }] },
   objectives: [{ id: 'biomassa', text: 'Devorar 2000 de biomassa com Carniceiros em 14 min', test: c => c.devoured() >= 2000 && c.t <= 840, progress: c => c.n(c.devoured()) + '/2000' }],
   extraObjectives: [{ id: 'b-nodulos', bonus: true, text: 'Destruir 2 Nódulos inimigos', test: c => (c.kills.nodulo || 0) >= 2 }, { id: 'b-eclosao', bonus: true, text: 'Usar a Eclosão', test: c => c.st.usedSuper }],
-  fail: c => c.t > 840 && c.devoured() < 2000 ? 'A Maré virou antes da colheita.' : null,
+  fail: c => c.t > 840 && c.devoured() < 2000 ? 'O eclipse passou antes da colheita.' : null,
   events: [{ at: 1, do: c => c.scatterWrecks(14) }] });
 for (const m of M) if (m.extraObjectives) m.objectives = m.objectives.concat(m.extraObjectives);
 const BY_ID = Object.fromEntries(M.map(m => [m.id, m]));
