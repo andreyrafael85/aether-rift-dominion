@@ -89,7 +89,7 @@ function create(canvas, overlay, mini) {
     else if (name === 'alta' || name === 'ultra') { q.shadows = true; q.shadowMap = 4096; q.post = !!ADD; q.ssao = name === 'ultra' && !!ADD; q.msaa = !!ADD && !isTouch && !!(renderer.capabilities && renderer.capabilities.isWebGL2); q.pr = Math.min(2, window.devicePixelRatio || 1); q.particles = 1; }
     else { q.shadows = !isTouch; q.shadowMap = 2048; q.post = !!ADD; q.ssao = false; q.msaa = false; q.pr = Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1); q.particles = 1; }
     if (over.ssao != null) q.ssao = over.ssao && !!ADD; if (over.msaa != null) q.msaa = over.msaa && !!ADD; if (over.shadowMap) q.shadowMap = over.shadowMap; if (over.post != null) q.post = over.post && !!ADD;
-    renderer.setPixelRatio(q.pr); applyShadows(); buildComposer(); armWatchdog();
+    renderer.setPixelRatio(q.pr); applyShadows(); buildComposer(); armWatchdog(); if (R.FX) R.FX.mult = q.particles;
   };
   const octx = overlay.getContext('2d'); const mctx = mini.getContext('2d'); const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
   const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(38, 1, 30, 6000);
@@ -304,13 +304,18 @@ function create(canvas, overlay, mini) {
   }
 
   // ---------- efeitos ----------
+  // 4.2c: partículas na GPU (src/fx3d.js); os pontos antigos ficam só para neve/chuva do clima
+  const FX = ARD.fx3d ? ARD.fx3d.create(THREE, scene, { cap: isTouch ? 2048 : 4096 }) : null; R.FX = FX;
+  const RACE_TINT = { vehnar: [1, 1, 1], erevane: [0.75, 1.05, 1.15], tessara: [0.95, 1.1, 0.8], quorith: [1.05, 0.85, 1.25], vorag: [1.15, 0.8, 0.8] };
+  const boomLights = []; for (let i = 0; i < 3; i++) { const l = new THREE.PointLight(0xffa860, 0, 260, 2); scene.add(l); boomLights.push({ l, t: 0, k: 0 }); } let boomLi = 0;
+  function boomLight(x, y, z, k) { if (R.quality.name === 'baixa' || R.quality.resolved === 'baixa') return; const b = boomLights[boomLi++ % boomLights.length]; b.l.position.set(x, y + 18, z); b.t = 0.35; b.k = k; }
   const PN = 2200; const pPos = new Float32Array(PN * 3), pCol = new Float32Array(PN * 3); const P = { x: new Float32Array(PN), y: new Float32Array(PN), z: new Float32Array(PN), vx: new Float32Array(PN), vy: new Float32Array(PN), vz: new Float32Array(PN), t: new Float32Array(PN), life: new Float32Array(PN), kind: new Uint8Array(PN), i: 0 };
   const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3)); pGeo.setAttribute('color', new THREE.BufferAttribute(pCol, 3));
   const smokePts = new THREE.Points(pGeo, new THREE.PointsMaterial({ size: 9, vertexColors: true, transparent: true, opacity: 0.5, depthWrite: false, sizeAttenuation: true })); smokePts.frustumCulled = false; scene.add(smokePts);
   const SN = 600; const sPos = new Float32Array(SN * 3), sCol = new Float32Array(SN * 3); const SP = { x: new Float32Array(SN), y: new Float32Array(SN), z: new Float32Array(SN), vx: new Float32Array(SN), vy: new Float32Array(SN), vz: new Float32Array(SN), t: new Float32Array(SN), life: new Float32Array(SN), i: 0 };
   const sGeo = new THREE.BufferGeometry(); sGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3)); sGeo.setAttribute('color', new THREE.BufferAttribute(sCol, 3));
   const sparkPts = new THREE.Points(sGeo, new THREE.PointsMaterial({ size: 3.2, vertexColors: true, transparent: true, opacity: 0.95, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })); sparkPts.frustumCulled = false; scene.add(sparkPts);
-  function smoke(x, y, z, col, life, vz) { const i = P.i++ % PN; P.x[i] = x; P.y[i] = y; P.z[i] = z; P.vx[i] = (Math.random() - .5) * 6; P.vy[i] = (Math.random() - .5) * 6; P.vz[i] = vz == null ? 14 : vz; P.t[i] = 0; P.life[i] = life || 2.5; P.kind[i] = 0; pCol[i * 3] = col[0]; pCol[i * 3 + 1] = col[1]; pCol[i * 3 + 2] = col[2]; }
+  function smoke(x, y, z, col, life, vz) { if (FX) { FX.smoke(x, H(x, y) + z, -y, col, life, vz, 5 + (life || 2.5) * 1.6); return; } const i = P.i++ % PN; P.x[i] = x; P.y[i] = y; P.z[i] = z; P.vx[i] = (Math.random() - .5) * 6; P.vy[i] = (Math.random() - .5) * 6; P.vz[i] = vz == null ? 14 : vz; P.t[i] = 0; P.life[i] = life || 2.5; P.kind[i] = 0; pCol[i * 3] = col[0]; pCol[i * 3 + 1] = col[1]; pCol[i * 3 + 2] = col[2]; }
   function snow(x, y, col, vz, vx, life) { const i = P.i++ % PN; P.x[i] = x; P.y[i] = y; P.z[i] = 90 + Math.random() * 40; P.vx[i] = vx == null ? 25 : vx; P.vy[i] = 8; P.vz[i] = vz == null ? -45 : vz; P.t[i] = 0; P.life[i] = life || 3.2; P.kind[i] = 1; const c = col || [0.9, 0.93, 1]; pCol[i * 3] = c[0]; pCol[i * 3 + 1] = c[1]; pCol[i * 3 + 2] = c[2]; }
   // 4.0a — presets de clima local (só visual; a simulação não muda): tinge céu/névoa, luz ambiente e solta partículas.
   // fogN/fogF multiplicam a distância atual da câmera: perto a névoa fecha, no zoom longe o mundo segue legível.
@@ -323,7 +328,7 @@ function create(canvas, overlay, mini) {
   };
   const _cc = new THREE.Color();
   R.setClimate = function (name) { const c = CLIMATES[name] || null; R.climateCfg = c; if (!c) { scene.fog.near = 1500; scene.fog.far = 3200; } hemi.color.set(c ? c.hemi : 0x9fb8d6); };
-  function spark(x, y, z, col, sp, g) { const i = SP.i++ % SN; const a = Math.random() * TAU; SP.x[i] = x; SP.y[i] = y; SP.z[i] = z; SP.vx[i] = Math.cos(a) * sp * Math.random(); SP.vy[i] = Math.sin(a) * sp * Math.random(); SP.vz[i] = sp * (0.4 + Math.random() * 0.8); SP.t[i] = 0; SP.life[i] = 0.4 + Math.random() * 0.6; sCol[i * 3] = col[0]; sCol[i * 3 + 1] = col[1]; sCol[i * 3 + 2] = col[2]; }
+  function spark(x, y, z, col, sp, g) { if (FX) { FX.spark(x, H(x, y) + z, -y, [col[0] * 1.5, col[1] * 1.4, col[2] * 1.3], sp, 1); return; } const i = SP.i++ % SN; const a = Math.random() * TAU; SP.x[i] = x; SP.y[i] = y; SP.z[i] = z; SP.vx[i] = Math.cos(a) * sp * Math.random(); SP.vy[i] = Math.sin(a) * sp * Math.random(); SP.vz[i] = sp * (0.4 + Math.random() * 0.8); SP.t[i] = 0; SP.life[i] = 0.4 + Math.random() * 0.6; sCol[i * 3] = col[0]; sCol[i * 3 + 1] = col[1]; sCol[i * 3 + 2] = col[2]; }
   const boomGeo = new THREE.SphereGeometry(1, 10, 8); const boomMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 1.5, 0.8), transparent: true, opacity: 0.8, depthWrite: false }); const booms = new THREE.InstancedMesh(boomGeo, boomMat, 48); booms.count = 0; booms.frustumCulled = false; scene.add(booms); const boomList = [];
   const decalGeo = new THREE.CircleGeometry(1, 18); decalGeo.rotateX(-Math.PI / 2); const decals = new THREE.InstancedMesh(decalGeo, new THREE.MeshBasicMaterial({ color: 0x0b0908, transparent: true, opacity: 0.55, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }), 160); decals.count = 0; decals.frustumCulled = false; scene.add(decals); const decalList = [];
   const ringGeo = new THREE.RingGeometry(0.82, 1, 28); ringGeo.rotateX(-Math.PI / 2); const selRings = new THREE.InstancedMesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 }), 256); selRings.count = 0; selRings.frustumCulled = false; scene.add(selRings);
@@ -335,24 +340,45 @@ function create(canvas, overlay, mini) {
   let lightning = 0;
   function addDecal(x, y, r) { decalList.push({ x, y, r, t: 0, life: 200 }); if (decalList.length > 160) decalList.shift(); }
 
+  // 4.2c: efeitos só onde o jogador enxerga agora (grade da névoa do último quadro; O(1) por evento) — nada de revelar inimigos escondidos
+  const seenAt = (x, y) => R.revealAll || (x >= 0 && y >= 0 && x < S.WORLD && y < S.WORLD && fogData[(((y / FOGC) | 0) * FOGN + ((x / FOGC) | 0)) * 4] >= 180);
   R.onEvents = function (events, sim, human) {
     for (const e of events) {
+      if ((e.t === 'shot' && !seenAt(e.x1, e.y1) && !seenAt(e.x2, e.y2)) || ((e.t === 'impact' || e.t === 'death') && !seenAt(e.x, e.y))) continue;
       switch (e.t) {
-        case 'shot': if (e.id != null) { const st = AN.get(e.id); if (st) st.rec = 1; } flashLight.position.set(e.x1, H(e.x1, e.y1) + 8, -e.y1); flashT = 0.06; if (e.beam) R.fx.rings.push({ x: e.x2, y: e.y2, r0: 4, r1: 18, col: '#9FE8FF', t: 0, life: 0.2 }); break;
-        case 'impact': { const big = e.splash > 0; for (let i = 0; i < (big ? 14 : 4); i++) spark(e.x, e.y, 3, [1, 0.75, 0.4], big ? 90 : 50, true); if (big) { boomList.push({ x: e.x, y: e.y, t: 0 }); smoke(e.x, e.y, 5, [0.35, 0.32, 0.3], 1.6, 20); if (!e.hit) addDecal(e.x, e.y, e.splash * 0.7); } break; }
-        case 'death': { const big = e.kind === 'building'; const col = e.owner >= 0 ? hexToRgb(sim.players[e.owner].color).map(v => v / 255) : [0.7, 0.7, 0.7]; for (let i = 0; i < (big ? 36 : 12); i++) spark(e.x, e.y, 4, Math.random() < 0.5 ? col : [1, 0.6, 0.35], big ? 160 : 80, true); for (let i = 0; i < (big ? 8 : 2); i++) smoke(e.x + (Math.random() - .5) * e.r, e.y + (Math.random() - .5) * e.r, 6, [0.16, 0.16, 0.18], 2 + Math.random() * 2, 25); boomList.push({ x: e.x, y: e.y, t: 0, big }); addDecal(e.x, e.y, big ? e.r * 1.3 : e.r * 1.2); if (big && e.owner === human) R.shake = Math.min(1, R.shake + 0.5); break; }
+        case 'shot': if (e.id != null) { const st = AN.get(e.id); if (st) st.rec = 1; } flashLight.position.set(e.x1, H(e.x1, e.y1) + 8, -e.y1); flashT = 0.06; if (e.beam) R.fx.rings.push({ x: e.x2, y: e.y2, r0: 4, r1: 18, col: '#9FE8FF', t: 0, life: 0.2 });
+          if (FX && Math.random() < 0.85 * FX.mult && seenAt(e.x1, e.y1)) { const sh = e.id != null && sim.byId.get(e.id); const hz = sh ? (sh.kind === 'building' ? 14 : (S.UNITS[sh.def] && S.UNITS[sh.def].flying ? 16 : 5)) : 6; const dx = e.x2 - e.x1, dy = e.y2 - e.y1, L = Math.hypot(dx, dy) || 1; const mx = e.x1 + dx / L * (sh ? sh.r * 0.9 : 6), my = e.y1 + dy / L * (sh ? sh.r * 0.9 : 6); FX.muzzle(mx, H(mx, my) + hz, -my, e.beam ? [0.9, 1.3, 1.7] : [1.6, 1.15, 0.6], e.cls === 'vei' || e.cls === 'est' ? 5 : 3); }
+          break;
+        case 'impact': { const big = e.splash > 0; if (FX) { FX.impact(e.x, H(e.x, e.y), -e.y, e.splash || 0); if (big) { if (!e.hit) addDecal(e.x, e.y, e.splash * 0.7); if (e.splash >= 24) boomLight(e.x, H(e.x, e.y), -e.y, 0.5); } break; } for (let i = 0; i < (big ? 14 : 4); i++) spark(e.x, e.y, 3, [1, 0.75, 0.4], big ? 90 : 50, true); if (big) { boomList.push({ x: e.x, y: e.y, t: 0 }); smoke(e.x, e.y, 5, [0.35, 0.32, 0.3], 1.6, 20); if (!e.hit) addDecal(e.x, e.y, e.splash * 0.7); } break; }
+        case 'death': if (FX && (e.kind === 'unit' || e.kind === 'building')) { const big = e.kind === 'building'; const fac = e.owner >= 0 && sim.players[e.owner] ? sim.players[e.owner].faction : 'vehnar'; const tint = RACE_TINT[fac] || [1, 1, 1]; const gx = e.x, gy = H(e.x, e.y), gz = -e.y; const r = e.r || 8;
+            if (big) { FX.explosion(gx, gy, gz, r * 1.1, { tint, wave: true }); for (let i = 1; i <= 3; i++) { const a = Math.random() * Math.PI * 2, d = r * 0.6 * Math.random(); FX.explosion(gx + Math.cos(a) * d, gy + r * 0.3, gz + Math.sin(a) * d, r * (0.5 + Math.random() * 0.3), { tint, delay: i * 0.22 }); } for (let i = 0; i < Math.round(10 * FX.mult); i++) FX.smoke(gx + (Math.random() - .5) * r, gy + r * 0.5, gz + (Math.random() - .5) * r, [0.12, 0.11, 0.12], 4 + Math.random() * 3, 10 + Math.random() * 8, r * 0.9); boomLight(gx, gy, gz, 1.2); if (e.owner === human) R.shake = Math.min(1, R.shake + 0.5); }
+            else { FX.explosion(gx, gy + 2, gz, Math.max(5, r * 1.05), { tint }); if (r >= 12) boomLight(gx, gy, gz, 0.6); }
+            addDecal(e.x, e.y, big ? r * 1.3 : r * 1.2); break; }
+          { const big = e.kind === 'building'; const col = e.owner >= 0 ? hexToRgb(sim.players[e.owner].color).map(v => v / 255) : [0.7, 0.7, 0.7]; for (let i = 0; i < (big ? 36 : 12); i++) spark(e.x, e.y, 4, Math.random() < 0.5 ? col : [1, 0.6, 0.35], big ? 160 : 80, true); for (let i = 0; i < (big ? 8 : 2); i++) smoke(e.x + (Math.random() - .5) * e.r, e.y + (Math.random() - .5) * e.r, 6, [0.16, 0.16, 0.18], 2 + Math.random() * 2, 25); boomList.push({ x: e.x, y: e.y, t: 0, big }); addDecal(e.x, e.y, big ? e.r * 1.3 : e.r * 1.2); if (big && e.owner === human) R.shake = Math.min(1, R.shake + 0.5); break; }
         case 'float': if (e.owner === human || e.kind === 'steal') R.fx.floats.push({ x: e.x, y: e.y, text: e.text, col: e.kind === 'steal' ? '#FF6A3D' : '#E8E2D6', t: 0, life: 1.3 }); break;
         case 'promote': if (e.owner === human) R.fx.floats.push({ x: e.x, y: e.y, text: ['', '★ Veterano', '★★ Elite', '★★★ Lenda'][e.rank], col: '#F2C230', t: 0, life: 1.8 }); break;
         case 'alert': if (e.p === human && e.x != null) R.fx.rings.push({ x: e.x, y: e.y, r0: 20, r1: 170, col: e.kind === 'danger' ? '#FF5E3A' : e.kind === 'good' ? '#7FE3A1' : '#F2C230', t: 0, life: 1.6, ping: true }); break;
-        case 'super': if (e.kind === 'fundicao') R.fx.rings.push({ x: e.x, y: e.y, r0: 10, r1: 240, col: '#FF8C1A', t: 0, life: 3, ping: true }); else R.shake = 1; break;
-        case 'jump': R.fx.rings.push({ x: e.from.x, y: e.from.y, r0: 40, r1: 300, col: '#B23CFF', t: 0, life: 1.2 }); R.fx.rings.push({ x: e.to.x, y: e.to.y, r0: 300, r1: 40, col: '#B23CFF', t: 0, life: 1.2 }); break;
-        case 'built': if (e.p === human) R.fx.rings.push({ x: e.x, y: e.y, r0: 10, r1: 60, col: '#7FE3A1', t: 0, life: 0.6 }); break;
+        case 'super': if (e.kind === 'fundicao') R.fx.rings.push({ x: e.x, y: e.y, r0: 10, r1: 240, col: '#FF8C1A', t: 0, life: 3, ping: true }); else R.shake = 1;
+          if (FX) superFx(e, sim); break;
+        case 'era': if (FX) { const n = S.nucleoOf(sim, e.p); if (n) { const gy = H(n.x, n.y); FX.pulse(n.x, gy, -n.y, [1.6, 1.25, 0.55], n.r * 5, 1.6); for (let i = 0; i < 14; i++) FX.glow(n.x + (Math.random() - .5) * n.r, gy + 10 + Math.random() * 20, -n.y + (Math.random() - .5) * n.r, [1.5, 1.2, 0.5], 4 + Math.random() * 4, 1.6, 18 + Math.random() * 20); } } break;
+        case 'ascend': if (FX) { const n = S.nucleoOf(sim, e.p); const pl = sim.players[e.p]; if (n && pl) { const c = hexToRgb(pl.color).map(v => v / 255 * 1.6); FX.pulse(n.x, H(n.x, n.y), -n.y, c, n.r * 8, 2.2); FX.ring(n.x, H(n.x, n.y) + 30, -n.y, c, n.r * 3, 1.5); } } break;
+        case 'module': if (FX) { for (let i = 0; i < 8; i++) FX.spark(e.x, H(e.x, e.y) + 10, -e.y, [1.4, 1.2, 0.6], 40, 1); FX.pulse(e.x, H(e.x, e.y), -e.y, [1.3, 1.1, 0.5], 40, 0.8); } break;
+        case 'jump': if (FX) { FX.pulse(e.from.x, H(e.from.x, e.from.y), -e.from.y, [1.1, 0.5, 1.6], 220, 1.2); FX.pulse(e.to.x, H(e.to.x, e.to.y), -e.to.y, [1.1, 0.5, 1.6], 220, 1.2); FX.explosion(e.to.x, H(e.to.x, e.to.y), -e.to.y, 18, { tint: [0.9, 0.6, 1.3], wave: true }); } R.fx.rings.push({ x: e.from.x, y: e.from.y, r0: 40, r1: 300, col: '#B23CFF', t: 0, life: 1.2 }); R.fx.rings.push({ x: e.to.x, y: e.to.y, r0: 300, r1: 40, col: '#B23CFF', t: 0, life: 1.2 }); break;
+        case 'built': if (FX) for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; FX.smoke(e.x + Math.cos(a) * 14, H(e.x, e.y) + 1, -(e.y + Math.sin(a) * 14), [0.42, 0.4, 0.37], 1.2, 4, 8); } if (e.p === human) R.fx.rings.push({ x: e.x, y: e.y, r0: 10, r1: 60, col: '#7FE3A1', t: 0, life: 0.6 }); break;
         case 'place': for (let i = 0; i < 6; i++) smoke(e.x + (Math.random() - .5) * 30, e.y + (Math.random() - .5) * 30, 1, [0.6, 0.6, 0.6], 1.2, 18); break;
         case 'crate': R.fx.rings.push({ x: e.x, y: e.y, r0: 5, r1: 50, col: '#F2C230', t: 0, life: 0.8 }); break;
         case 'storm': if (e.phase === 'active') lightning = 0.6; break;
       }
     }
   };
+  function superFx(e, sim) { // 4.2c: assinatura visual de cada superarma
+    const own = sim.ents.filter(u => u.alive && u.kind === 'unit' && u.owner === e.p).slice(0, 40); const pl = sim.players[e.p]; const pc = pl ? hexToRgb(pl.color).map(v => v / 255 * 1.6) : [1.4, 1, 0.5];
+    if (e.kind === 'fundicao' && e.x != null) { const gx = e.x, gy = H(e.x, e.y), gz = -e.y; for (let i = 0; i < 18; i++) FX.glow(gx, gy + 400 - i * 22, gz, [1.7, 1.1, 0.5], 14 - i * 0.4, 0.5, -500); FX.explosion(gx, gy, gz, 36, { tint: [1.1, 0.95, 0.8], wave: true, delay: 0.45 }); FX.pulse(gx, gy, gz, [1.6, 0.9, 0.4], 240, 2.4); boomLight(gx, gy, gz, 2); }
+    else if (e.kind === 'eclosao' && e.x != null) { const gx = e.x, gy = H(e.x, e.y), gz = -e.y; FX.explosion(gx, gy, gz, 20, { tint: [1.2, 0.55, 0.6], wave: true }); for (let i = 0; i < 24; i++) FX.spark(gx, gy + 6, gz, [1.5, 0.4, 0.5], 90, 1); FX.pulse(gx, gy, gz, [1.5, 0.35, 0.45], 140, 1.6); }
+    else if (e.kind === 'salto') { for (const u of own) FX.glow(u.x, H(u.x, u.y) + 8, -u.y, [0.6, 1.6, 0.8], 10, 1.4, 16); const n = S.nucleoOf(sim, e.p); if (n) FX.pulse(n.x, H(n.x, n.y), -n.y, [0.6, 1.6, 0.8], 300, 2); }
+    else if (e.kind === 'unissono') { for (const u of own) FX.ring(u.x, H(u.x, u.y) + 10, -u.y, [1.2, 0.7, 1.7], 16, 1.2); const n = S.nucleoOf(sim, e.p); if (n) FX.pulse(n.x, H(n.x, n.y), -n.y, [1.2, 0.7, 1.7], 300, 2); }
+    else if (e.kind === 'blecaute') { for (const q of sim.players) { if (q.id === e.p || !q.alive) continue; const n = S.nucleoOf(sim, q.id); if (n) { FX.pulse(n.x, H(n.x, n.y), -n.y, [0.3, 1.2, 1.4], 260, 2.2); FX.ring(n.x, H(n.x, n.y) + 20, -n.y, [0.3, 1.2, 1.4], 60, 1.4); } } }
+  }
   function updateFx(dt) {
     for (const arr of [R.fx.floats, R.fx.rings]) for (let i = arr.length - 1; i >= 0; i--) { const o = arr[i]; o.t += dt; if (o.t >= o.life) arr.splice(i, 1); }
     for (let i = 0; i < PN; i++) { if (P.t[i] >= P.life[i]) { pPos[i * 3 + 1] = -9999; continue; } P.t[i] += dt; P.x[i] += P.vx[i] * dt; P.y[i] += P.vy[i] * dt; P.z[i] += P.vz[i] * dt; if (P.kind[i] === 0) P.vz[i] = Math.max(6, P.vz[i] - dt * 5); else if (P.z[i] <= 0) P.t[i] = P.life[i]; pPos[i * 3] = P.x[i]; pPos[i * 3 + 1] = H(P.x[i], P.y[i]) + P.z[i]; pPos[i * 3 + 2] = -P.y[i]; }
@@ -360,6 +386,7 @@ function create(canvas, overlay, mini) {
     pGeo.attributes.position.needsUpdate = true; pGeo.attributes.color.needsUpdate = true; sGeo.attributes.position.needsUpdate = true; sGeo.attributes.color.needsUpdate = true;
     let n = 0; for (let i = boomList.length - 1; i >= 0; i--) { const b = boomList[i]; b.t += dt; const k = b.t / 0.35; if (k >= 1) { boomList.splice(i, 1); continue; } if (n < 48) { _p.set(b.x, H(b.x, b.y) + 3, -b.y); _s.setScalar((b.big ? 6 : 3) + k * (b.big ? 26 : 12)); _q.identity(); _m.compose(_p, _q, _s); booms.setMatrixAt(n++, _m); } } booms.count = n; booms.instanceMatrix.needsUpdate = true; boomMat.opacity = 0.6;
     n = 0; for (let i = decalList.length - 1; i >= 0; i--) { const d = decalList[i]; d.t += dt; if (d.t > d.life) { decalList.splice(i, 1); continue; } _p.set(d.x, H(d.x, d.y) + 0.5, -d.y); _s.set(d.r, 1, d.r); _q.identity(); _m.compose(_p, _q, _s); decals.setMatrixAt(n++, _m); } decals.count = n; decals.instanceMatrix.needsUpdate = true;
+    for (const b of boomLights) { if (b.t > 0) { b.t -= dt; b.l.intensity = Math.max(0, b.t / 0.35) * 2600 * b.k; } else b.l.intensity = 0; }
     R.shake = Math.max(0, R.shake - dt * 2); lightning = Math.max(0, lightning - dt * 3); if (flashT > 0) { flashT -= dt; flashLight.intensity = flashT > 0 ? 400 : 0; }
   }
   function lerp(e, a) { return [e.px + (e.x - e.px) * a, e.py + (e.y - e.py) * a]; }
@@ -375,7 +402,7 @@ function create(canvas, overlay, mini) {
 
   // ---------- quadro ----------
   R.draw = function (sim, view, alpha, dt) {
-    R.sim = sim; R.time += dt; updateFx(dt); if (R.terrShader) R.terrShader.uniforms.uCloudT.value = R.time;
+    R.sim = sim; R.time += dt; R.revealAll = !!view.reveal; updateFx(dt); if (R.terrShader) R.terrShader.uniforms.uCloudT.value = R.time;
     const cam = view.cam, human = view.human, me = sim.players[human]; const vis = view.reveal ? { has: () => true } : sim.vis[human]; const explored = sim.explored[human];
     R.night = R.forceDay ? 0 : (1 - Math.cos(TAU * sim.time / 750)) / 2;
     R.shakeX = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0; R.shakeY = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0;
@@ -413,7 +440,7 @@ function create(canvas, overlay, mini) {
       if (e.kind === 'rock') { const it = instOf('rocks', -1, e.seed % 6); put(it, e.x, e.y, 0, (e.seed % 8) * 0.8, fitOf(e, it.geo)); continue; }
       if (e.kind === 'crate') { if (!vis.has(e.id)) continue; const it = instOf('crate', -1, 0); put(it, e.x, e.y, 0, R.time, (2 * e.r * 1.6) / it.geo.width); continue; }
       if (e.kind === 'wreck') { if (!vis.has(e.id)) continue; const it = instOf('wreck', -1, 0); put(it, e.x, e.y, 0, e.ang || 0, fitOf(e, it.geo), 1, 0.6 + 0.4 * (e.max ? e.amount / e.max : 1)); if (sim.time - e.bornT < 25 && Math.random() < 0.25) { smoke(e.x, e.y, 6, [0.2, 0.2, 0.22], 1.6, 16); spark(e.x, e.y, 3, [1, 0.5, 0.2], 20, true); } if (view.sel.has(e.id)) nSel = ring(nSel, e.x, e.y, e.r + 6); continue; }
-      if (e.kind === 'proj') { if (!own && !vis.has(e.id)) continue; const w = S.WEAPONS[e.weapon]; const [wx, wy] = lerp(e, alpha); if (w.proj === 'shell') { if (nShell < 256) { _p.set(wx, H(wx, wy) + e.z, -wy); _s.setScalar(1); _q.identity(); _m.compose(_p, _q, _s); shells.setMatrixAt(nShell++, _m); } } else if (nBul < BL) { const o = nBul * 6; blPos[o] = wx - e.vx * 0.03; blPos[o + 1] = H(wx, wy) + e.z; blPos[o + 2] = -(wy - e.vy * 0.03); blPos[o + 3] = wx; blPos[o + 4] = H(wx, wy) + e.z; blPos[o + 5] = -wy; nBul++; } continue; }
+      if (e.kind === 'proj') { if (!own && !vis.has(e.id)) continue; const w = S.WEAPONS[e.weapon]; const [wx, wy] = lerp(e, alpha); if (w.proj === 'shell') { if (FX && Math.random() < 0.45 * FX.mult) FX.trail(wx, H(wx, wy) + e.z, -wy); if (nShell < 256) { _p.set(wx, H(wx, wy) + e.z, -wy); _s.setScalar(1); _q.identity(); _m.compose(_p, _q, _s); shells.setMatrixAt(nShell++, _m); } } else if (nBul < BL) { const o = nBul * 6; blPos[o] = wx - e.vx * 0.03; blPos[o + 1] = H(wx, wy) + e.z; blPos[o + 2] = -(wy - e.vy * 0.03); blPos[o + 3] = wx; blPos[o + 4] = H(wx, wy) + e.z; blPos[o + 5] = -wy; nBul++; } continue; }
       if (!own && !vis.has(e.id)) continue;
       const isUnit = e.kind === 'unit'; const [wx, wy] = isUnit ? lerp(e, alpha) : [e.x, e.y]; const ud = isUnit ? S.UNITS[e.def] : S.BUILDINGS[e.def];
       const parts = MD.PARTS[e.def]; const hullDef = parts ? parts.hull : e.def; const it = instOf(hullDef, e.owner, (e.def === 'nucleo' && R.skins && R.skins[e.owner]) || 0); /* 4.0e: Núcleo do Hangar */ const g = it.geo; let fit = fitOf(e, g); if (e.def === 'nucleo') { const op = sim.players[e.owner] || {}; fit *= 1 + 0.12 * ((op.era || 1) - 1) + (op.evolveT > 0 ? 0.025 * Math.sin(R.time * 6) : 0); } /* 4.1d: o Núcleo cresce a cada Era e pulsa enquanto evolui */
@@ -474,6 +501,7 @@ function create(canvas, overlay, mini) {
     const st = sim.storm; if (st && st.phase === 'active') { stormDisc.visible = true; stormDisc.position.set(st.x, H(st.x, st.y) + 2, -st.y); stormDisc.scale.set(st.r, 1, st.r); for (let i = 0; i < 8 * R.quality.particles; i++) { const a = Math.random() * TAU, rr = Math.sqrt(Math.random()) * st.r; snow(st.x + Math.cos(a) * rr, st.y + Math.sin(a) * rr); } if (Math.random() < 0.012) lightning = 1; } else stormDisc.visible = false;
     if (R.poolMat) R.poolMat.uniforms.uTime.value = R.time; for (const pl of R.poolLights) pl.intensity = 120 * nt + 20;
     for (const sp of R.mist) { const u = sp.userData; if (u.kind === 'rift') { const zz = u.z + Math.sin(R.time * 0.3 + u.ph) * 8; sp.position.set(u.x + Math.sin(R.time * 0.2 + u.ph) * 20, H(u.x, u.y) + zz, -u.y); sp.scale.set(u.s, u.s * 0.7, 1); sp.material.opacity = 0.16 + 0.1 * nt; } else { if (st && st.phase === 'active') { sp.visible = true; const a = u.ox * TAU + R.time * 0.05, rr = u.oy * st.r * 0.9; const px = st.x + Math.cos(a) * rr, py = st.y + Math.sin(a) * rr; sp.position.set(px, H(px, py) + u.z, -py); sp.scale.set(u.s, u.s * 0.6, 1); } else sp.visible = false; } }
+    if (FX) FX.update(R.time, camera);
     if (composer) { composer.render(); } else renderer.render(scene, camera);
     if (R.testBlack && R.quality.ssao) { const pc = renderer.getClearColor(new THREE.Color()), pa = renderer.getClearAlpha(); renderer.setClearColor(0x000000, 1); renderer.clear(true, false, false); renderer.setClearColor(pc, pa); } // ?testblack=1: simula falha da GPU enquanto o SSAO está ligado
     checkFrame();
