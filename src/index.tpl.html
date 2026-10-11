@@ -210,6 +210,32 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 .load-logo{width:44px;height:44px;border-radius:50%;vertical-align:middle;margin-right:.5rem;border:1px solid var(--line)}
 .foot-logo{width:30px;height:30px;border-radius:50%;vertical-align:middle;margin-right:.45rem;border:1px solid var(--line)}
 .dp-lead{width:42px;height:42px;border-radius:8px;object-fit:cover;vertical-align:middle;margin-right:.45rem;border:1px solid var(--line)}
+/* 4.0e — campanha, briefing, Hangar e HUD de missão */
+.modal .box.wide{max-width:920px}
+.modal select{background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:.35rem .5rem;font:inherit}
+.cmdr{display:flex;gap:.9rem;align-items:center;border:1px solid var(--line);border-radius:10px;padding:.7rem .8rem;background:linear-gradient(90deg,color-mix(in srgb,var(--race) 16%,transparent),transparent 60%)}
+.cmdr img{width:64px;height:64px;border-radius:10px;object-fit:cover;border:2px solid var(--line)}
+.cmdr .lv{font-family:var(--fd);font-size:1.6rem;line-height:1}.xpbar{height:8px;border-radius:5px;background:#0c0e12;border:1px solid var(--line);overflow:hidden;margin:.35rem 0 .2rem}.xpbar i{display:block;height:100%;background:linear-gradient(90deg,var(--rift1),var(--race))}
+.acts{display:grid;gap:.8rem}.act h3{margin:.2rem 0 .4rem;font-family:var(--fd);text-transform:uppercase;letter-spacing:.04em;font-size:1.05rem;color:var(--fg2)}
+.mlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.5rem}
+.mcard{display:grid;gap:.15rem;text-align:left;border:1px solid var(--line);border-radius:8px;padding:.55rem .65rem;background:var(--panel2);cursor:pointer;color:var(--fg)}
+.mcard:hover:not([disabled]){border-color:var(--race)}.mcard[disabled]{opacity:.45;cursor:not-allowed}.mcard b{font-size:.95rem}.mcard .st{color:#F2C230;letter-spacing:.12em}.mcard .pl{font-size:.78rem;color:var(--fg2)}
+.relics,.achs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.45rem}
+.relic,.ach{border:1px solid var(--line);border-radius:8px;padding:.5rem .6rem;font-size:.85rem;display:grid;gap:.25rem;background:#12151A}.relic.on{border-color:var(--race);box-shadow:0 0 0 1px var(--race) inset}.relic.locked,.ach.locked{opacity:.45}.ach b,.relic b{font-size:.9rem}
+.brdlg{display:grid;gap:.5rem}.brl{display:flex;gap:.7rem;align-items:flex-start}.brl img{width:54px;height:54px;border-radius:9px;object-fit:cover;border:1px solid var(--line);flex:none}.brl .nm{font-weight:700;font-size:.82rem;color:var(--fg2)}
+.obj-list{margin:.2rem 0;padding-left:1.1rem}.obj-list li{margin:.15rem 0}.obj-list .bn{color:var(--fg2)}
+#objectives{position:absolute;left:12px;top:236px;width:min(290px,42vw);max-height:160px;overflow:auto;background:rgba(15,17,22,.88);border:1px solid var(--line);border-radius:9px;padding:.4rem .6rem;font-size:.76rem;line-height:1.3;z-index:3;backdrop-filter:blur(4px)}
+#objectives .oh{font-family:var(--fd);text-transform:uppercase;letter-spacing:.04em;font-size:.95rem;margin-bottom:.2rem}
+#objectives ul{list-style:none;margin:0;padding:0;display:grid;gap:.18rem}#objectives li{display:flex;gap:.35rem}#objectives li.ok{color:#7FE3A1}#objectives li.bn{color:var(--fg2)}#objectives li.bn.ok{color:#c9f2d4}#objectives .pg{margin-left:auto;font-family:var(--fm);font-size:.72rem;color:var(--fg2);white-space:nowrap}
+#comms{position:absolute;left:50%;transform:translateX(-50%);top:118px;display:flex;gap:.7rem;align-items:center;max-width:min(560px,92vw);background:rgba(15,17,22,.92);border:1px solid var(--line);border-left:3px solid var(--cc,#FF5E3A);border-radius:9px;padding:.5rem .7rem;z-index:4;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+#comms img{width:52px;height:52px;border-radius:8px;object-fit:cover;flex:none}#comms .nm{font-size:.75rem;color:var(--fg2);font-weight:700;letter-spacing:.04em;text-transform:uppercase}#comms .tx{font-size:.92rem}
+.stars{font-size:1.9rem;letter-spacing:.2em;color:#F2C230}.stars .off{color:#3a3f48}
+.unlock{border:1px dashed var(--race);border-radius:8px;padding:.45rem .6rem;font-size:.88rem}
+.hg{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:.9rem}.hg canvas{width:100%;aspect-ratio:4/3;border-radius:10px;border:1px solid var(--line);background:#0b0d11;display:block}
+.hg-opts{display:grid;gap:.45rem;align-content:start}.swatches{display:flex;flex-wrap:wrap;gap:.4rem}.swatch{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);cursor:pointer}.swatch.on{border-color:#fff;box-shadow:0 0 0 2px var(--race)}
+.chips2{display:flex;flex-wrap:wrap;gap:.35rem}.chip2{border:1px solid var(--line);border-radius:6px;padding:.3rem .55rem;background:var(--panel2);cursor:pointer;font-size:.85rem;color:var(--fg)}.chip2.on{border-color:var(--race);color:#fff}.chip2[disabled]{opacity:.4;cursor:not-allowed}
+.cmdr-mini{font-size:.8rem;color:var(--fg2)}
+@media (max-width:720px){.hg{grid-template-columns:1fr}#objectives{top:auto;bottom:96px;left:8px}#comms{top:64px}}
 .dp-scene{display:flex;align-items:center;justify-content:space-between;gap:.8rem;margin:.2rem 0 .9rem;padding:.7rem .8rem;border:1px solid var(--line);border-radius:12px;background:linear-gradient(90deg,color-mix(in srgb,var(--race) 22%,transparent),transparent 45%,color-mix(in srgb,var(--rc2,#888) 22%,transparent))}
 .dp-side{display:flex;align-items:center;gap:.6rem;min-width:0}
 .dp-side img{width:92px;height:92px;border-radius:12px;object-fit:cover;border:2px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.45);background:#0d0f13}
@@ -223,7 +249,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 <div id="start" class="screen">
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Versão 4.0d · build __BUILD__ · Engine gráfica 2 · cinco Raças · multiplayer 2 a 4</div>
+    <div class="eyebrow">Versão 4.0e · build __BUILD__ · Campanha O Ciclo da Maré · Engine gráfica 2 · multiplayer 2 a 4</div>
     <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div><h1>Aether Rift<br><span>Dominion</span></h1></div></div>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -237,6 +263,8 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         <div class="opt"><label for="opt-quality">Qualidade 3D</label><select id="opt-quality"><option value="auto">Automática</option><option value="baixa">Baixa (sem sombras e efeitos)</option><option value="media">Média (sombras e bloom)</option><option value="alta">Alta (sombras 4K, bloom e anti-aliasing MSAA 4×)</option><option value="ultra">Ultra (Alta + oclusão ambiente, experimental)</option></select></div>
         <div class="opt"><label for="opt-clima">Clima do campo (efeito dentro da partida)</label><select id="opt-clima"><option value="auto">Automático (pelo bioma)</option><option value="toxica">Névoa tóxica</option><option value="plasma">Tempestade de plasma</option><option value="cristais">Chuva de cristais</option><option value="aurora">Aurora da Fenda</option><option value="acida">Chuva ácida</option></select></div>
         <div class="row"><button id="btn-start" class="btn primary">Iniciar partida</button><button id="btn-help-start" class="btn">Como jogar</button></div>
+        <div class="row"><button id="btn-campaign" class="btn">Campanha · O Ciclo da Maré</button><button id="btn-hangar" class="btn">Hangar</button></div>
+        <div id="cmdr-mini" class="cmdr-mini"></div>
         <div class="mp">
           <div class="opt"><label for="opt-room">Multiplayer P2P (beta): sala só com os jogadores humanos, sem IAs</label><select id="opt-room"><option value="2">2 jogadores na sala</option><option value="3">3 jogadores na sala</option><option value="4">4 jogadores na sala</option></select></div>
           <div class="row"><button id="btn-host" class="btn">Criar sala</button><input id="opt-code" placeholder="CÓDIGO" maxlength="6" style="width:7.5em;text-transform:uppercase"><button id="btn-join" class="btn">Entrar</button></div>
@@ -247,6 +275,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     </div>
     <div class="notes">
       <div class="choose">Notas da versão</div>
+      <p class="start-notes"><b>4.0e — Campanha "O Ciclo da Maré" e progresso:</b> 20 missões com roteiro: Prólogo (Acorde, Energia e regimes, A primeira tempestade), Ato 1 (Cerco, Caça a comboios, Sobrevivência noturna), Ato 2 (Roubo e contrarroubo, Diplomacia forçada, Escolta sob tempestade), Ato 3 (Primeiro contato, A Prole devora um aliado, Aliança tripla instável), Ato 4 (Assalto à Catedral Errante, Matriarca encurralada, A Fenda aberta) e uma <b>Missão de Identidade</b> por Raça. Briefing com os líderes falando, objetivos principais e bônus na tela, transmissões durante a missão, ondas, comboios, pactos forçados e traições, escolta com farol de extração, tempestades roteirizadas e dois chefes épicos (Catedral Errante e Matriarca). Quatro dificuldades (Fácil, Normal, Difícil e Fenda, sem pausa). <b>Comandante</b> do nível 1 ao 30 com XP em missões, escaramuças e multiplayer, estrelas por missão, 19 <b>conquistas</b> com títulos, 6 <b>relíquias</b> equipáveis (2 espaços) e o <b>Hangar</b> com visualizador 3D: cor da equipe, três estilos de Núcleo (Padrão, Fortaleza no nível 10, Santuário no nível 20), retrato do líder e título. O progresso fica no navegador e pode ser copiado e restaurado por um código de backup.</p>
       <p class="start-notes"><b>4.0d — Engine gráfica 2 (restilização 3D):</b> as cinco Raças ganharam <b>modelos 3D de verdade</b>, suaves e com materiais físicos (cor, rugosidade e metal por peça, reflexo do ambiente): aço chanfrado com faixas de equipe e chaminés acesas no Vehnar, placas angulares de vidro escuro com costuras luminosas na Erevane, cascos orgânicos cor de osso com nervuras e bulbos na Tessara, cristal facetado com anéis flutuantes no Quorith e quitina úmida com espinhos e sacos membranosos na Vorag. São 191 modelos (construções, unidades, nós de recurso, rochas, ruínas e adereços), com nível de detalhe menor no celular. Os ícones do HUD agora são renderizados a partir dos modelos 3D. O mundo ganhou <b>céu</b> com sol e estrelas, o <b>planeta-mãe da sua Raça</b> e uma lua no horizonte, <b>cordilheiras além da borda do mapa</b> e terreno com textura de detalhe, rachaduras e relevo fino. Nova <b>inclinação livre da câmera</b> (◢, PageUp/PageDown ou Ctrl + roda) até a visão de horizonte. <b>Bandeiras</b> com a Insígnia Cristal da Raça tremulam no Núcleo e nos Nódulos, e o <b>logo da tela inicial é 3D ao vivo</b>, com os cinco mundos girando na órbita. Balanceamento: Erevane e Tessara mais fortes (Lâmina, Atirador, Mosquito, Quimera, Colosso e Traços mais rápidos).</p>
       <p class="start-notes"><b>4.0c — Coro Quorith e Prole Vorag jogáveis:</b> cinco Raças na tela inicial e nas salas multiplayer. O <b>Coro Quorith</b> luta em acorde: o <b>Elo de Sincronia</b> dá +3,5% de dano e +2,5% de armadura por aliado a até 90 (máx. 3; o <b>Diapasão</b> aceita um quarto), pactos custam metade da Caução e rendem o dobro de reputação, o <b>Ressonador</b> emudece torres enquanto sifona e o <b>Uníssono</b> fecha o acorde inteiro por 20 s. Unidades: Voz, Agulha (antiaérea), Diapasão, Prisma, Monólito (cerco) e Harmônico (voador). A <b>Prole Vorag</b> é massa barata: <b>Crias</b> eclodem em pares, sentem <b>Fome</b> fora do território, o <b>Carniceiro</b> devora carcaças (150% do valor) e corrói Nódulos inimigos em biomassa, e a <b>Eclosão</b> solta 8 Crias num ponto visível. Unidades: Cria, Cuspidor (ácido), Escaravelho, Brutamonte, Ferroada (voadora). Cada Raça nasce do chão à sua maneira: cristal que afina em facetas, casulo que pulsa e rompe. IAs novas: Coro de Zayin, Acorde Sétimo, Silêncio de Quor, Prole Velk, Ninhada Cega, Fome de Oru. Engine: <b>anti-aliasing MSAA 4×</b> nos presets Alta e Ultra (o vigia de tela preta desliga sozinho se a GPU não aguentar) e a Diplomacia abre com os dois líderes <b>frente a frente</b>, sereno em pacto, furioso em guerra. Controles no PC: a câmera continua rolando quando o mouse encosta na barra do navegador ou na barra do Windows, e <b>segurar o botão direito e arrastar</b> move o mapa (toque no celular segue igual: arrastar move, pinça aproxima).</p>
       <p class="start-notes"><b>4.0a — Identidade das Raças:</b> o jogo agora fala em <b>Raças</b>; portais na tela inicial com fundo vivo que acompanha a escolha; materiais 3D próprios por Raça (metal Vehnar, vidro furtivo Erevane, pele viva Tessara); cada Raça constrói com um <b>nascimento</b> próprio: módulos soldados em degraus, origami que cintila até camuflar, casulo que pulsa e floresce; presets de <b>clima</b> dentro da partida (névoa tóxica, tempestade de plasma, chuva de cristais, aurora, chuva ácida).</p>
@@ -293,6 +322,8 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     </div>
     <div id="chat" hidden><div id="chat-log"></div><input id="chat-in" placeholder="Mensagem (Enter)" maxlength="120"></div>
     <div id="mp-wait" hidden>Aguardando o outro jogador…</div>
+    <div id="objectives" hidden><div class="oh" id="ob-title">Objetivos</div><ul id="ob-list"></ul></div>
+    <div id="comms" hidden><img id="comms-img" alt=""><div><div class="nm" id="comms-name"></div><div class="tx" id="comms-text"></div></div></div>
     <div id="banner" class="banner" hidden><div id="banner-title"></div><div id="banner-sub"></div></div>
     <div id="notice"></div>
     <div id="proposal" hidden><div id="proposal-text"></div><div class="row"><button id="prop-yes" class="act sm good">Aceitar pacto</button><button id="prop-no" class="act sm">Recusar</button></div></div>
@@ -301,9 +332,39 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <div id="loading" class="modal" hidden><div class="box" style="max-width:360px"><img id="load-leader" alt="" hidden style="width:96px;height:96px;border-radius:12px;object-fit:cover;float:right;margin:0 0 .5rem .8rem;border:2px solid var(--line)"><div class="eyebrow"><img id="load-logo" class="load-logo" alt="" hidden>Preparando o campo</div><h2>Gerando sprites</h2><p class="muted small">Modelos voxel renderizados em 8 direções com iluminação, só nesta primeira vez.</p><div class="loadbar"><i id="load-bar"></i></div></div></div>
   <div id="diplo" class="modal" hidden><div class="box"><h2>Diplomacia</h2><div id="diplo-body"></div><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
   <div id="confirm" class="modal" hidden><div class="box"><h2>Confirmar</h2><p id="confirm-text"></p><div class="row"><button id="confirm-yes" class="btn primary">Confirmar</button><button id="confirm-no" class="btn">Cancelar</button></div></div></div>
-  <div id="end" class="modal" hidden><div class="box"><img id="end-leader" alt="" hidden style="width:110px;height:110px;border-radius:14px;object-fit:cover;float:right;margin:0 0 .5rem 1rem;border:2px solid var(--line)"><div class="eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-again" class="btn primary">Jogar de novo</button><button id="btn-copy" class="btn">Copiar resultado (JSON)</button><a class="btn" href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Enviar feedback</a></div><textarea id="end-json" hidden rows="6" style="width:100%;font-family:var(--fm);font-size:11px;background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px"></textarea></div></div>
+  <div id="end" class="modal" hidden><div class="box"><img id="end-leader" alt="" hidden style="width:110px;height:110px;border-radius:14px;object-fit:cover;float:right;margin:0 0 .5rem 1rem;border:2px solid var(--line)"><div class="eyebrow" id="end-eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-camp" hidden></div><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-next" class="btn primary" hidden>Próxima missão</button><button id="btn-again" class="btn primary">Jogar de novo</button><button id="btn-camp-menu" class="btn" hidden>Campanha</button><button id="btn-copy" class="btn">Copiar resultado (JSON)</button><a class="btn" href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Enviar feedback</a></div><textarea id="end-json" hidden rows="6" style="width:100%;font-family:var(--fm);font-size:11px;background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px"></textarea></div></div>
 </div>
 
+  <div id="campaign" class="modal" hidden><div class="box wide"><button class="mclose" data-close aria-label="Fechar">✕</button>
+  <div class="eyebrow">Campanha</div><h2>O Ciclo da Maré</h2>
+  <div class="cmdr"><img id="cmdr-img" alt=""><div style="flex:1"><div><b id="cmdr-name"></b> <span class="muted small" id="cmdr-title"></span></div><div class="xpbar"><i id="cmdr-xp"></i></div><div class="small muted" id="cmdr-lv"></div></div><div class="lv" id="cmdr-lvn"></div></div>
+  <p class="muted small">A Fenda pulsa em Marés. A cada Maré, o Domínio troca de mãos. Jogue com a Raça escolhida na tela inicial; as Missões de Identidade usam a própria Raça e abrem depois do Prólogo. Estrelas: 1 pela missão e +1 por bônus cumprido.</p>
+  <div class="acts" id="camp-acts"></div>
+  <h3>Relíquias <span class="muted small">(até 2 equipadas, valem só na campanha)</span></h3><div class="relics" id="camp-relics"></div>
+  <h3>Conquistas</h3><div class="achs" id="camp-ach"></div>
+  <div class="row"><button id="camp-hangar" class="btn">Hangar</button><button id="camp-export" class="btn">Copiar código de backup</button><button id="camp-import" class="btn">Importar código</button><button class="btn" data-close>Fechar</button></div>
+  <textarea id="camp-code" hidden rows="3" style="width:100%;font-family:var(--fm);font-size:11px;background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px" placeholder="Cole aqui o código de backup (ARD1-…) e clique em Importar código"></textarea>
+</div></div>
+<div id="briefing" class="modal" hidden><div class="box wide"><button class="mclose" data-close aria-label="Fechar">✕</button>
+  <div class="eyebrow" id="br-act"></div><h2 id="br-title"></h2><div class="muted small" id="br-place"></div>
+  <div class="brdlg" id="br-dialog"></div>
+  <h3>Objetivos</h3><ul class="obj-list" id="br-obj"></ul>
+  <div class="row"><label class="small">Raça <select id="br-race"></select></label><label class="small">Dificuldade <select id="br-diff"><option value="facil">Fácil</option><option value="normal" selected>Normal</option><option value="dificil">Difícil</option><option value="fenda">Fenda (sem pausa, tempestades frequentes)</option></select></label></div>
+  <div class="small muted" id="br-relics"></div>
+  <div class="row"><button id="br-start" class="btn primary">Iniciar missão</button><button class="btn" data-close>Voltar</button></div>
+</div></div>
+<div id="hangar" class="modal" hidden><div class="box wide"><button class="mclose" data-close aria-label="Fechar">✕</button>
+  <div class="eyebrow">Personalização</div><h2>Hangar</h2>
+  <div class="hg"><canvas id="hg-view" width="640" height="480"></canvas><div class="hg-opts">
+    <label class="small">Raça <select id="hg-race"></select></label>
+    <div class="small muted">Cor da equipe (solo e campanha)</div><div class="swatches" id="hg-colors"></div>
+    <div class="small muted">Núcleo</div><div class="chips2" id="hg-skins"></div>
+    <div class="small muted">Retrato do líder no HUD</div><div class="chips2" id="hg-portraits"></div>
+    <div class="small muted">Título</div><select id="hg-title"></select>
+    <div class="small muted" id="hg-note"></div>
+  </div></div>
+  <div class="row"><button id="hg-save" class="btn primary">Salvar</button><button class="btn" data-close>Fechar</button></div>
+</div></div>
 <div id="termos" class="modal" hidden><div class="box"><button class="mclose" data-close aria-label="Fechar">✕</button><h2>Termos de Uso</h2><p class="muted small">Aether Rift: Dominion é um beta gratuito, em testes. O jogo é fornecido como está, sem garantias. Não reutilize os assets em outros projetos sem autorização. Nas partidas multiplayer, somas de verificação detectam divergências; trapaças encerram a partida para todos. Problemas e sugestões: use o link de feedback.</p><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
 <div id="priv" class="modal" hidden><div class="box"><button class="mclose" data-close aria-label="Fechar">✕</button><h2>Política de Privacidade</h2><p class="muted small">O jogo não tem contas e não coleta dados pessoais. Preferências e progresso ficam no armazenamento local do seu navegador e podem ser apagados por você. No multiplayer, a conexão é direta entre os jogadores (WebRTC via PeerJS); o código da sala serve apenas para o pareamento e nenhuma partida passa por servidores nossos. O link de feedback leva ao GitHub, que tem políticas próprias.</p><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
 <div id="help" class="modal help" hidden><div class="box"><button class="mclose" data-close aria-label="Fechar">✕</button>

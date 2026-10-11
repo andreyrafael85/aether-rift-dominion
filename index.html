@@ -210,6 +210,32 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 .load-logo{width:44px;height:44px;border-radius:50%;vertical-align:middle;margin-right:.5rem;border:1px solid var(--line)}
 .foot-logo{width:30px;height:30px;border-radius:50%;vertical-align:middle;margin-right:.45rem;border:1px solid var(--line)}
 .dp-lead{width:42px;height:42px;border-radius:8px;object-fit:cover;vertical-align:middle;margin-right:.45rem;border:1px solid var(--line)}
+/* 4.0e — campanha, briefing, Hangar e HUD de missão */
+.modal .box.wide{max-width:920px}
+.modal select{background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:.35rem .5rem;font:inherit}
+.cmdr{display:flex;gap:.9rem;align-items:center;border:1px solid var(--line);border-radius:10px;padding:.7rem .8rem;background:linear-gradient(90deg,color-mix(in srgb,var(--race) 16%,transparent),transparent 60%)}
+.cmdr img{width:64px;height:64px;border-radius:10px;object-fit:cover;border:2px solid var(--line)}
+.cmdr .lv{font-family:var(--fd);font-size:1.6rem;line-height:1}.xpbar{height:8px;border-radius:5px;background:#0c0e12;border:1px solid var(--line);overflow:hidden;margin:.35rem 0 .2rem}.xpbar i{display:block;height:100%;background:linear-gradient(90deg,var(--rift1),var(--race))}
+.acts{display:grid;gap:.8rem}.act h3{margin:.2rem 0 .4rem;font-family:var(--fd);text-transform:uppercase;letter-spacing:.04em;font-size:1.05rem;color:var(--fg2)}
+.mlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.5rem}
+.mcard{display:grid;gap:.15rem;text-align:left;border:1px solid var(--line);border-radius:8px;padding:.55rem .65rem;background:var(--panel2);cursor:pointer;color:var(--fg)}
+.mcard:hover:not([disabled]){border-color:var(--race)}.mcard[disabled]{opacity:.45;cursor:not-allowed}.mcard b{font-size:.95rem}.mcard .st{color:#F2C230;letter-spacing:.12em}.mcard .pl{font-size:.78rem;color:var(--fg2)}
+.relics,.achs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.45rem}
+.relic,.ach{border:1px solid var(--line);border-radius:8px;padding:.5rem .6rem;font-size:.85rem;display:grid;gap:.25rem;background:#12151A}.relic.on{border-color:var(--race);box-shadow:0 0 0 1px var(--race) inset}.relic.locked,.ach.locked{opacity:.45}.ach b,.relic b{font-size:.9rem}
+.brdlg{display:grid;gap:.5rem}.brl{display:flex;gap:.7rem;align-items:flex-start}.brl img{width:54px;height:54px;border-radius:9px;object-fit:cover;border:1px solid var(--line);flex:none}.brl .nm{font-weight:700;font-size:.82rem;color:var(--fg2)}
+.obj-list{margin:.2rem 0;padding-left:1.1rem}.obj-list li{margin:.15rem 0}.obj-list .bn{color:var(--fg2)}
+#objectives{position:absolute;left:12px;top:236px;width:min(290px,42vw);max-height:160px;overflow:auto;background:rgba(15,17,22,.88);border:1px solid var(--line);border-radius:9px;padding:.4rem .6rem;font-size:.76rem;line-height:1.3;z-index:3;backdrop-filter:blur(4px)}
+#objectives .oh{font-family:var(--fd);text-transform:uppercase;letter-spacing:.04em;font-size:.95rem;margin-bottom:.2rem}
+#objectives ul{list-style:none;margin:0;padding:0;display:grid;gap:.18rem}#objectives li{display:flex;gap:.35rem}#objectives li.ok{color:#7FE3A1}#objectives li.bn{color:var(--fg2)}#objectives li.bn.ok{color:#c9f2d4}#objectives .pg{margin-left:auto;font-family:var(--fm);font-size:.72rem;color:var(--fg2);white-space:nowrap}
+#comms{position:absolute;left:50%;transform:translateX(-50%);top:118px;display:flex;gap:.7rem;align-items:center;max-width:min(560px,92vw);background:rgba(15,17,22,.92);border:1px solid var(--line);border-left:3px solid var(--cc,#FF5E3A);border-radius:9px;padding:.5rem .7rem;z-index:4;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+#comms img{width:52px;height:52px;border-radius:8px;object-fit:cover;flex:none}#comms .nm{font-size:.75rem;color:var(--fg2);font-weight:700;letter-spacing:.04em;text-transform:uppercase}#comms .tx{font-size:.92rem}
+.stars{font-size:1.9rem;letter-spacing:.2em;color:#F2C230}.stars .off{color:#3a3f48}
+.unlock{border:1px dashed var(--race);border-radius:8px;padding:.45rem .6rem;font-size:.88rem}
+.hg{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:.9rem}.hg canvas{width:100%;aspect-ratio:4/3;border-radius:10px;border:1px solid var(--line);background:#0b0d11;display:block}
+.hg-opts{display:grid;gap:.45rem;align-content:start}.swatches{display:flex;flex-wrap:wrap;gap:.4rem}.swatch{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);cursor:pointer}.swatch.on{border-color:#fff;box-shadow:0 0 0 2px var(--race)}
+.chips2{display:flex;flex-wrap:wrap;gap:.35rem}.chip2{border:1px solid var(--line);border-radius:6px;padding:.3rem .55rem;background:var(--panel2);cursor:pointer;font-size:.85rem;color:var(--fg)}.chip2.on{border-color:var(--race);color:#fff}.chip2[disabled]{opacity:.4;cursor:not-allowed}
+.cmdr-mini{font-size:.8rem;color:var(--fg2)}
+@media (max-width:720px){.hg{grid-template-columns:1fr}#objectives{top:auto;bottom:96px;left:8px}#comms{top:64px}}
 .dp-scene{display:flex;align-items:center;justify-content:space-between;gap:.8rem;margin:.2rem 0 .9rem;padding:.7rem .8rem;border:1px solid var(--line);border-radius:12px;background:linear-gradient(90deg,color-mix(in srgb,var(--race) 22%,transparent),transparent 45%,color-mix(in srgb,var(--rc2,#888) 22%,transparent))}
 .dp-side{display:flex;align-items:center;gap:.6rem;min-width:0}
 .dp-side img{width:92px;height:92px;border-radius:12px;object-fit:cover;border:2px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.45);background:#0d0f13}
@@ -223,7 +249,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 <div id="start" class="screen">
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Versão 4.0d · build 2026-10-10 23:16Z · Engine gráfica 2 · cinco Raças · multiplayer 2 a 4</div>
+    <div class="eyebrow">Versão 4.0e · build 2026-10-11 00:11Z · Campanha O Ciclo da Maré · Engine gráfica 2 · multiplayer 2 a 4</div>
     <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div><h1>Aether Rift<br><span>Dominion</span></h1></div></div>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -237,6 +263,8 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
         <div class="opt"><label for="opt-quality">Qualidade 3D</label><select id="opt-quality"><option value="auto">Automática</option><option value="baixa">Baixa (sem sombras e efeitos)</option><option value="media">Média (sombras e bloom)</option><option value="alta">Alta (sombras 4K, bloom e anti-aliasing MSAA 4×)</option><option value="ultra">Ultra (Alta + oclusão ambiente, experimental)</option></select></div>
         <div class="opt"><label for="opt-clima">Clima do campo (efeito dentro da partida)</label><select id="opt-clima"><option value="auto">Automático (pelo bioma)</option><option value="toxica">Névoa tóxica</option><option value="plasma">Tempestade de plasma</option><option value="cristais">Chuva de cristais</option><option value="aurora">Aurora da Fenda</option><option value="acida">Chuva ácida</option></select></div>
         <div class="row"><button id="btn-start" class="btn primary">Iniciar partida</button><button id="btn-help-start" class="btn">Como jogar</button></div>
+        <div class="row"><button id="btn-campaign" class="btn">Campanha · O Ciclo da Maré</button><button id="btn-hangar" class="btn">Hangar</button></div>
+        <div id="cmdr-mini" class="cmdr-mini"></div>
         <div class="mp">
           <div class="opt"><label for="opt-room">Multiplayer P2P (beta): sala só com os jogadores humanos, sem IAs</label><select id="opt-room"><option value="2">2 jogadores na sala</option><option value="3">3 jogadores na sala</option><option value="4">4 jogadores na sala</option></select></div>
           <div class="row"><button id="btn-host" class="btn">Criar sala</button><input id="opt-code" placeholder="CÓDIGO" maxlength="6" style="width:7.5em;text-transform:uppercase"><button id="btn-join" class="btn">Entrar</button></div>
@@ -247,6 +275,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     </div>
     <div class="notes">
       <div class="choose">Notas da versão</div>
+      <p class="start-notes"><b>4.0e — Campanha "O Ciclo da Maré" e progresso:</b> 20 missões com roteiro: Prólogo (Acorde, Energia e regimes, A primeira tempestade), Ato 1 (Cerco, Caça a comboios, Sobrevivência noturna), Ato 2 (Roubo e contrarroubo, Diplomacia forçada, Escolta sob tempestade), Ato 3 (Primeiro contato, A Prole devora um aliado, Aliança tripla instável), Ato 4 (Assalto à Catedral Errante, Matriarca encurralada, A Fenda aberta) e uma <b>Missão de Identidade</b> por Raça. Briefing com os líderes falando, objetivos principais e bônus na tela, transmissões durante a missão, ondas, comboios, pactos forçados e traições, escolta com farol de extração, tempestades roteirizadas e dois chefes épicos (Catedral Errante e Matriarca). Quatro dificuldades (Fácil, Normal, Difícil e Fenda, sem pausa). <b>Comandante</b> do nível 1 ao 30 com XP em missões, escaramuças e multiplayer, estrelas por missão, 19 <b>conquistas</b> com títulos, 6 <b>relíquias</b> equipáveis (2 espaços) e o <b>Hangar</b> com visualizador 3D: cor da equipe, três estilos de Núcleo (Padrão, Fortaleza no nível 10, Santuário no nível 20), retrato do líder e título. O progresso fica no navegador e pode ser copiado e restaurado por um código de backup.</p>
       <p class="start-notes"><b>4.0d — Engine gráfica 2 (restilização 3D):</b> as cinco Raças ganharam <b>modelos 3D de verdade</b>, suaves e com materiais físicos (cor, rugosidade e metal por peça, reflexo do ambiente): aço chanfrado com faixas de equipe e chaminés acesas no Vehnar, placas angulares de vidro escuro com costuras luminosas na Erevane, cascos orgânicos cor de osso com nervuras e bulbos na Tessara, cristal facetado com anéis flutuantes no Quorith e quitina úmida com espinhos e sacos membranosos na Vorag. São 191 modelos (construções, unidades, nós de recurso, rochas, ruínas e adereços), com nível de detalhe menor no celular. Os ícones do HUD agora são renderizados a partir dos modelos 3D. O mundo ganhou <b>céu</b> com sol e estrelas, o <b>planeta-mãe da sua Raça</b> e uma lua no horizonte, <b>cordilheiras além da borda do mapa</b> e terreno com textura de detalhe, rachaduras e relevo fino. Nova <b>inclinação livre da câmera</b> (◢, PageUp/PageDown ou Ctrl + roda) até a visão de horizonte. <b>Bandeiras</b> com a Insígnia Cristal da Raça tremulam no Núcleo e nos Nódulos, e o <b>logo da tela inicial é 3D ao vivo</b>, com os cinco mundos girando na órbita. Balanceamento: Erevane e Tessara mais fortes (Lâmina, Atirador, Mosquito, Quimera, Colosso e Traços mais rápidos).</p>
       <p class="start-notes"><b>4.0c — Coro Quorith e Prole Vorag jogáveis:</b> cinco Raças na tela inicial e nas salas multiplayer. O <b>Coro Quorith</b> luta em acorde: o <b>Elo de Sincronia</b> dá +3,5% de dano e +2,5% de armadura por aliado a até 90 (máx. 3; o <b>Diapasão</b> aceita um quarto), pactos custam metade da Caução e rendem o dobro de reputação, o <b>Ressonador</b> emudece torres enquanto sifona e o <b>Uníssono</b> fecha o acorde inteiro por 20 s. Unidades: Voz, Agulha (antiaérea), Diapasão, Prisma, Monólito (cerco) e Harmônico (voador). A <b>Prole Vorag</b> é massa barata: <b>Crias</b> eclodem em pares, sentem <b>Fome</b> fora do território, o <b>Carniceiro</b> devora carcaças (150% do valor) e corrói Nódulos inimigos em biomassa, e a <b>Eclosão</b> solta 8 Crias num ponto visível. Unidades: Cria, Cuspidor (ácido), Escaravelho, Brutamonte, Ferroada (voadora). Cada Raça nasce do chão à sua maneira: cristal que afina em facetas, casulo que pulsa e rompe. IAs novas: Coro de Zayin, Acorde Sétimo, Silêncio de Quor, Prole Velk, Ninhada Cega, Fome de Oru. Engine: <b>anti-aliasing MSAA 4×</b> nos presets Alta e Ultra (o vigia de tela preta desliga sozinho se a GPU não aguentar) e a Diplomacia abre com os dois líderes <b>frente a frente</b>, sereno em pacto, furioso em guerra. Controles no PC: a câmera continua rolando quando o mouse encosta na barra do navegador ou na barra do Windows, e <b>segurar o botão direito e arrastar</b> move o mapa (toque no celular segue igual: arrastar move, pinça aproxima).</p>
       <p class="start-notes"><b>4.0a — Identidade das Raças:</b> o jogo agora fala em <b>Raças</b>; portais na tela inicial com fundo vivo que acompanha a escolha; materiais 3D próprios por Raça (metal Vehnar, vidro furtivo Erevane, pele viva Tessara); cada Raça constrói com um <b>nascimento</b> próprio: módulos soldados em degraus, origami que cintila até camuflar, casulo que pulsa e floresce; presets de <b>clima</b> dentro da partida (névoa tóxica, tempestade de plasma, chuva de cristais, aurora, chuva ácida).</p>
@@ -293,6 +322,8 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
     </div>
     <div id="chat" hidden><div id="chat-log"></div><input id="chat-in" placeholder="Mensagem (Enter)" maxlength="120"></div>
     <div id="mp-wait" hidden>Aguardando o outro jogador…</div>
+    <div id="objectives" hidden><div class="oh" id="ob-title">Objetivos</div><ul id="ob-list"></ul></div>
+    <div id="comms" hidden><img id="comms-img" alt=""><div><div class="nm" id="comms-name"></div><div class="tx" id="comms-text"></div></div></div>
     <div id="banner" class="banner" hidden><div id="banner-title"></div><div id="banner-sub"></div></div>
     <div id="notice"></div>
     <div id="proposal" hidden><div id="proposal-text"></div><div class="row"><button id="prop-yes" class="act sm good">Aceitar pacto</button><button id="prop-no" class="act sm">Recusar</button></div></div>
@@ -301,9 +332,39 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
   <div id="loading" class="modal" hidden><div class="box" style="max-width:360px"><img id="load-leader" alt="" hidden style="width:96px;height:96px;border-radius:12px;object-fit:cover;float:right;margin:0 0 .5rem .8rem;border:2px solid var(--line)"><div class="eyebrow"><img id="load-logo" class="load-logo" alt="" hidden>Preparando o campo</div><h2>Gerando sprites</h2><p class="muted small">Modelos voxel renderizados em 8 direções com iluminação, só nesta primeira vez.</p><div class="loadbar"><i id="load-bar"></i></div></div></div>
   <div id="diplo" class="modal" hidden><div class="box"><h2>Diplomacia</h2><div id="diplo-body"></div><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
   <div id="confirm" class="modal" hidden><div class="box"><h2>Confirmar</h2><p id="confirm-text"></p><div class="row"><button id="confirm-yes" class="btn primary">Confirmar</button><button id="confirm-no" class="btn">Cancelar</button></div></div></div>
-  <div id="end" class="modal" hidden><div class="box"><img id="end-leader" alt="" hidden style="width:110px;height:110px;border-radius:14px;object-fit:cover;float:right;margin:0 0 .5rem 1rem;border:2px solid var(--line)"><div class="eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-again" class="btn primary">Jogar de novo</button><button id="btn-copy" class="btn">Copiar resultado (JSON)</button><a class="btn" href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Enviar feedback</a></div><textarea id="end-json" hidden rows="6" style="width:100%;font-family:var(--fm);font-size:11px;background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px"></textarea></div></div>
+  <div id="end" class="modal" hidden><div class="box"><img id="end-leader" alt="" hidden style="width:110px;height:110px;border-radius:14px;object-fit:cover;float:right;margin:0 0 .5rem 1rem;border:2px solid var(--line)"><div class="eyebrow" id="end-eyebrow">Fim do Ciclo de Maré</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-camp" hidden></div><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-next" class="btn primary" hidden>Próxima missão</button><button id="btn-again" class="btn primary">Jogar de novo</button><button id="btn-camp-menu" class="btn" hidden>Campanha</button><button id="btn-copy" class="btn">Copiar resultado (JSON)</button><a class="btn" href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Enviar feedback</a></div><textarea id="end-json" hidden rows="6" style="width:100%;font-family:var(--fm);font-size:11px;background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px"></textarea></div></div>
 </div>
 
+  <div id="campaign" class="modal" hidden><div class="box wide"><button class="mclose" data-close aria-label="Fechar">✕</button>
+  <div class="eyebrow">Campanha</div><h2>O Ciclo da Maré</h2>
+  <div class="cmdr"><img id="cmdr-img" alt=""><div style="flex:1"><div><b id="cmdr-name"></b> <span class="muted small" id="cmdr-title"></span></div><div class="xpbar"><i id="cmdr-xp"></i></div><div class="small muted" id="cmdr-lv"></div></div><div class="lv" id="cmdr-lvn"></div></div>
+  <p class="muted small">A Fenda pulsa em Marés. A cada Maré, o Domínio troca de mãos. Jogue com a Raça escolhida na tela inicial; as Missões de Identidade usam a própria Raça e abrem depois do Prólogo. Estrelas: 1 pela missão e +1 por bônus cumprido.</p>
+  <div class="acts" id="camp-acts"></div>
+  <h3>Relíquias <span class="muted small">(até 2 equipadas, valem só na campanha)</span></h3><div class="relics" id="camp-relics"></div>
+  <h3>Conquistas</h3><div class="achs" id="camp-ach"></div>
+  <div class="row"><button id="camp-hangar" class="btn">Hangar</button><button id="camp-export" class="btn">Copiar código de backup</button><button id="camp-import" class="btn">Importar código</button><button class="btn" data-close>Fechar</button></div>
+  <textarea id="camp-code" hidden rows="3" style="width:100%;font-family:var(--fm);font-size:11px;background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px" placeholder="Cole aqui o código de backup (ARD1-…) e clique em Importar código"></textarea>
+</div></div>
+<div id="briefing" class="modal" hidden><div class="box wide"><button class="mclose" data-close aria-label="Fechar">✕</button>
+  <div class="eyebrow" id="br-act"></div><h2 id="br-title"></h2><div class="muted small" id="br-place"></div>
+  <div class="brdlg" id="br-dialog"></div>
+  <h3>Objetivos</h3><ul class="obj-list" id="br-obj"></ul>
+  <div class="row"><label class="small">Raça <select id="br-race"></select></label><label class="small">Dificuldade <select id="br-diff"><option value="facil">Fácil</option><option value="normal" selected>Normal</option><option value="dificil">Difícil</option><option value="fenda">Fenda (sem pausa, tempestades frequentes)</option></select></label></div>
+  <div class="small muted" id="br-relics"></div>
+  <div class="row"><button id="br-start" class="btn primary">Iniciar missão</button><button class="btn" data-close>Voltar</button></div>
+</div></div>
+<div id="hangar" class="modal" hidden><div class="box wide"><button class="mclose" data-close aria-label="Fechar">✕</button>
+  <div class="eyebrow">Personalização</div><h2>Hangar</h2>
+  <div class="hg"><canvas id="hg-view" width="640" height="480"></canvas><div class="hg-opts">
+    <label class="small">Raça <select id="hg-race"></select></label>
+    <div class="small muted">Cor da equipe (solo e campanha)</div><div class="swatches" id="hg-colors"></div>
+    <div class="small muted">Núcleo</div><div class="chips2" id="hg-skins"></div>
+    <div class="small muted">Retrato do líder no HUD</div><div class="chips2" id="hg-portraits"></div>
+    <div class="small muted">Título</div><select id="hg-title"></select>
+    <div class="small muted" id="hg-note"></div>
+  </div></div>
+  <div class="row"><button id="hg-save" class="btn primary">Salvar</button><button class="btn" data-close>Fechar</button></div>
+</div></div>
 <div id="termos" class="modal" hidden><div class="box"><button class="mclose" data-close aria-label="Fechar">✕</button><h2>Termos de Uso</h2><p class="muted small">Aether Rift: Dominion é um beta gratuito, em testes. O jogo é fornecido como está, sem garantias. Não reutilize os assets em outros projetos sem autorização. Nas partidas multiplayer, somas de verificação detectam divergências; trapaças encerram a partida para todos. Problemas e sugestões: use o link de feedback.</p><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
 <div id="priv" class="modal" hidden><div class="box"><button class="mclose" data-close aria-label="Fechar">✕</button><h2>Política de Privacidade</h2><p class="muted small">O jogo não tem contas e não coleta dados pessoais. Preferências e progresso ficam no armazenamento local do seu navegador e podem ser apagados por você. No multiplayer, a conexão é direta entre os jogadores (WebRTC via PeerJS); o código da sala serve apenas para o pareamento e nenhuma partida passa por servidores nossos. O link de feedback leva ao GitHub, que tem políticas próprias.</p><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
 <div id="help" class="modal help" hidden><div class="box"><button class="mclose" data-close aria-label="Fechar">✕</button>
@@ -482,6 +543,9 @@ const UNITS = {
   cuspidor:   { name: 'Cuspidor', key: 'U', cls: 'inf', hp: 95, r: 7, speed: 90, cost: { minerio: 40, plasma: 30 }, time: 5, energyUse: 1, weapon: 'acido', sensor: 170, faction: 'vorag', desc: 'Cospe ácido a média distância; corrói veículos e estruturas.' },
   escaravelho: { name: 'Escaravelho', key: 'E', cls: 'vei', hp: 300, r: 11, speed: 120, cost: { minerio: 70, plasma: 60 }, time: 8, energyUse: 2, weapon: 'chifrada', sensor: 190, faction: 'vorag', desc: 'Besta de carga blindada: investida rápida que atropela infantaria.' },
   brutamonte: { name: 'Brutamonte', key: 'B', cls: 'vei', hp: 1000, r: 16, speed: 52, cost: { minerio: 160, plasma: 130 }, time: 15, energyUse: 4, weapon: 'brutamonte', sensor: 170, faction: 'vorag', desc: 'Tanque biológico: carapaça grossa e golpe de área.' },
+  // --- épicos de campanha (4.0e): não são produzidos; os roteiros do Ato 4 os criam
+  catedral:   { name: 'Catedral Errante', key: '', cls: 'vei', hp: 9000, r: 30, speed: 26, cost: { minerio: 1600, plasma: 400 }, time: 60, energyUse: 0, weapon: 'catedral', sensor: 320, faction: 'quorith', epic: true, desc: 'Épico do Coro: uma catedral de cristal que caminha cantando. Onda de ressonância em área.' },
+  matriarca:  { name: 'Matriarca', key: '', cls: 'vei', hp: 8000, r: 28, speed: 34, cost: { minerio: 1600, plasma: 400 }, time: 60, energyUse: 0, weapon: 'matriarca', sensor: 300, faction: 'vorag', epic: true, desc: 'Épica da Prole: a rainha que choca Crias sem parar.' },
   ferroada:   { name: 'Ferroada', key: 'F', cls: 'dro', hp: 80, r: 6, speed: 170, cost: { minerio: 30, plasma: 50 }, time: 5, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 210, faction: 'vorag', desc: 'Voadora barata com ferrão; em enxame, pica veículos e suporte.' },
 };
 // o que cada estrutura produz, por Raça
@@ -519,6 +583,8 @@ const WEAPONS = {
   mordida:   { dmg: 12, range: 26, cd: 0.5, proj: 'beam', speed: 0, inacc: 0, splash: 0, cls: 'inf', versusOverride: { inf: 1.3, vei: 0.8, dro: 0.4, est: 0.9, sup: 1.4 } },
   acido:     { dmg: 18, range: 130, cd: 1.1, proj: 'shell', speed: 260, inacc: 8, splash: 14, cls: 'inf', versusOverride: { inf: 1.2, vei: 1.1, dro: 0.5, est: 1.1, sup: 1.2 } },
   chifrada:  { dmg: 30, range: 30, cd: 0.9, proj: 'beam', speed: 0, inacc: 0, splash: 0, cls: 'vei' },
+  catedral:  { dmg: 90, range: 240, cd: 2.2, proj: 'shell', speed: 280, inacc: 10, splash: 40, cls: 'vei' },
+  matriarca: { dmg: 70, range: 160, cd: 1.6, proj: 'shell', speed: 300, inacc: 10, splash: 34, cls: 'vei' },
   brutamonte: { dmg: 55, range: 120, cd: 1.7, proj: 'shell', speed: 300, inacc: 12, splash: 26, cls: 'vei' },
 };
 const COUNTER = {
@@ -594,6 +660,8 @@ function createSim(cfg) {
       stats: { collected: 0, stolen: 0, lost: 0, unitsKilled: 0, unitsLost: 0, buildingsDestroyed: 0, buildingsLost: 0, treaties: 0, betrayals: 0, dmg: 0 },
       startAngle: rot + (Math.PI * 2 * i) / n,
     };
+    if (pc.color && /^#[0-9a-fA-F]{6}$/.test(pc.color)) p.color = pc.color; // 4.0e: cor escolhida no Hangar (solo e campanha)
+    if (pc.mods) { p.mods = Object.assign({}, pc.mods); const sr = p.mods.startRes || {}; for (const k in sr) if (p.res[k] != null) p.res[k] += sr[k]; if (p.mods.extraJumps) p.jumpsLeft += p.mods.extraJumps; } // 4.0e: relíquias
     sim.players.push(p);
     sim.vis.push(new Set());
     sim.explored.push(new Uint8Array(TILES * TILES));
@@ -733,6 +801,7 @@ function addBuilding(sim, owner, def, x, y, built) {
     maxHp: d.hp, hp: built ? d.hp : d.hp * 0.3, built: !!built, progress: built ? 1 : 0, queue: [], cd: 0,
     alive: true, lastHitT: -99, lastAttack: -99, cloaked: false, revealT: 0, rally: null, jumpT: 0, jumpTo: null, lotes: {}, ang: 0, aimAng: 0,
   };
+  { const pm = sim.players[owner] && sim.players[owner].mods; if (pm && pm.towerHpMul && (def === 'torre' || def === 'bastiao')) { e.maxHp *= pm.towerHpMul; e.hp *= pm.towerHpMul; } }
   sim.ents.push(e); sim.byId.set(e.id, e); sim.navDirty = true; return e;
 }
 function addUnit(sim, owner, def, x, y) {
@@ -859,6 +928,9 @@ function canAfford(p, cost) { for (const k in cost) if ((p.res[k] || 0) < cost[k
 function pay(p, cost, mult) { mult = mult || 1; for (const k in cost) p.res[k] = Math.max(0, p.res[k] - cost[k] * mult); }
 function refund(p, cost, mult) { mult = mult || 1; for (const k in cost) p.res[k] += cost[k] * mult; }
 function hasPact(sim, a, b) { return !!sim.players[a].pacts[b]; }
+// 4.0e — roteiros de missão: criar unidades e forçar tempestades (só a campanha solo usa; determinístico)
+function spawnUnit(sim, owner, def, x, y) { if (!UNITS[def] || !sim.players[owner]) return null; const u = addUnit(sim, owner, def, clamp(x, 30, WORLD - 30), clamp(y, 30, WORLD - 30)); emit(sim, { t: 'spawn', p: owner, x: u.x, y: u.y, def }); return u; }
+function forceStorm(sim, x, y, warn, dur, r) { sim.storm = { x: clamp(x, 200, WORLD - 200), y: clamp(y, 200, WORLD - 200), r: r || 420, t: 0, phase: 'warn', warn: warn == null ? 20 : warn, dur: dur || 90 }; for (const q of sim.players) if (q.alive) alertTo(sim, q.id, 'Tempestade de Éter se aproximando (' + Math.round(sim.storm.warn) + ' s)', sim.storm.x, sim.storm.y, 'warn'); emit(sim, { t: 'storm', phase: 'warn', x: sim.storm.x, y: sim.storm.y, r: sim.storm.r }); return sim.storm; }
 function pactCost(p) { return FACTIONS[p.faction].pactHalf ? PACT_CAUCAO / 2 : PACT_CAUCAO; }
 function repGain(p) { return FACTIONS[p.faction].pactHalf ? 2 : 1; }
 function unitName(faction, def) { const f = FACTIONS[faction]; return (f && f.names && f.names[def]) || (def === 'pirata' && f ? f.pirateName : UNITS[def].name); }
@@ -882,6 +954,7 @@ function sensorRadius(sim, e) {
   let r = e.kind === 'building' && !e.built ? 60 : d.sensor;
   r *= regimeOf(sim, e.owner).sensF;
   if (p.research.sensores) r *= 1.25;
+  if (p.mods && p.mods.sensorMul) r *= p.mods.sensorMul;
   if (p.blackoutT > 0) r *= 0.15;
   if (inStorm(sim, e.x, e.y)) r *= 0.5;
   return r;
@@ -890,6 +963,7 @@ function speedOf(sim, u) {
   const p = sim.players[u.owner];
   let s = u.speed;
   if (p.speedBuffT > 0) s *= 1.3;
+  if (p.mods && p.mods.speedMul) s *= p.mods.speedMul;
   if (UNITS[u.def].flying && inStorm(sim, u.x, u.y)) s *= 0.5;
   return s;
 }
@@ -1021,28 +1095,28 @@ function processCommand(sim, c) {
       if (fac.superKey === 'fundicao') {
         const ok = canBuild(sim, c.p, 'bastiao', c.x, c.y);
         if (!ok.ok || !inTerritory(sim, c.p, c.x, c.y)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: ok.ok ? 'Fora do seu território' : ok.why }); return; }
-        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD;
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD * (p.mods && p.mods.superCdMul || 1);
         addBuilding(sim, c.p, 'bastiao', c.x, c.y, false);
         emit(sim, { t: 'super', p: c.p, kind: 'fundicao', x: c.x, y: c.y });
         for (const q of sim.players) if (q.alive) alertTo(sim, q.id, (q.id === c.p ? 'Fundição Orbital a caminho' : p.name + ' ativou Fundição Orbital!'), c.x, c.y, q.id === c.p ? 'good' : 'danger');
       } else if (fac.superKey === 'salto') {
-        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD; p.saltoT = 45;
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD * (p.mods && p.mods.superCdMul || 1); p.saltoT = 45;
         for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Salto Evolutivo: +35% de dano por 45 s' : p.name + ' ativou o Salto Evolutivo!', null, null, q.id === c.p ? 'good' : 'danger');
         emit(sim, { t: 'super', p: c.p, kind: 'salto' });
       } else if (fac.superKey === 'unissono') {
-        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD; p.unissonoT = 20;
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD * (p.mods && p.mods.superCdMul || 1); p.unissonoT = 20;
         for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Uníssono: acorde cheio e 25% menos dano por 20 s' : p.name + ' ativou o Uníssono!', null, null, q.id === c.p ? 'good' : 'danger');
         emit(sim, { t: 'super', p: c.p, kind: 'unissono' });
       } else if (fac.superKey === 'eclosao') {
         if (typeof c.x !== 'number' || typeof c.y !== 'number') return;
         const ex = clamp(c.x, 40, WORLD - 40), ey = clamp(c.y, 40, WORLD - 40);
         if (!inTerritory(sim, c.p, ex, ey) && !seesPoint(sim, c.p, ex, ey)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Escolha um ponto visível' }); return; }
-        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD;
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD * (p.mods && p.mods.superCdMul || 1);
         for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; const u = addUnit(sim, c.p, 'cria', ex + DM.cos(a) * 22, ey + DM.sin(a) * 22); u.tempUntil = sim.time + 30; u.state = 'attackmove'; u.tx = ex; u.ty = ey; }
         emit(sim, { t: 'super', p: c.p, kind: 'eclosao', x: ex, y: ey });
         for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Eclosão: 8 Crias por 30 s' : p.name + ' ativou a Eclosão!', ex, ey, q.id === c.p ? 'good' : 'danger');
       } else {
-        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD; p.speedBuffT = 20;
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD * (p.mods && p.mods.superCdMul || 1); p.speedBuffT = 20;
         for (const q of sim.players) if (q.alive && q.id !== c.p) { q.blackoutT = 20; alertTo(sim, q.id, p.name + ' ativou Blecaute! Sensores e energia a zero por 20 s', null, null, 'danger'); }
         alertTo(sim, c.p, 'Blecaute ativo: inimigos cegos por 20 s', null, null, 'good');
         emit(sim, { t: 'super', p: c.p, kind: 'blecaute' });
@@ -1107,7 +1181,7 @@ function computeEnergy(sim, p, dt) {
       const d = BUILDINGS[e.def];
       if (!e.built) continue;
       if (d.energyProd) {
-        if (d.plasmaBurn) { if (p.res.plasma > 0) { prod += d.energyProd; p.res.plasma = Math.max(0, p.res.plasma - d.plasmaBurn * dt); } }
+        if (d.plasmaBurn) { if (p.res.plasma > 0) { prod += d.energyProd; p.res.plasma = Math.max(0, p.res.plasma - d.plasmaBurn * dt * (p.mods && p.mods.burnMul || 1)); } }
         else if (e.def === 'nucleo' && FACTIONS[p.faction].photosynthesis) { const nt = (1 - DM.cos(Math.PI * 2 * sim.time / 750)) / 2; prod += 95 - 50 * nt; }
         else prod += d.energyProd;
       }
@@ -1115,6 +1189,7 @@ function computeEnergy(sim, p, dt) {
     } else if (e.kind === 'unit') cons += UNITS[e.def].energyUse || 0;
   }
   if (p.overchargeT > 0) prod *= 1.5;
+  if (p.mods && p.mods.energyMul) prod *= p.mods.energyMul;
   if (p.blackoutT > 0) prod = 0;
   const ratio = cons > 0 ? prod / cons : 1;
   p.energy.prod = prod; p.energy.cons = cons; p.energy.ratio = ratio;
@@ -1317,7 +1392,7 @@ function deliver(sim, u) {
   let total = 0;
   for (const k in u.cargo) {
     let v = u.cargo[k];
-    if (u.stolen) v *= facOf(sim, u.owner).stolenMult; else v *= mult;
+    if (u.stolen) v *= facOf(sim, u.owner).stolenMult; else v *= mult * (p.mods && p.mods.harvestMul || 1);
     p.res[k] += v; total += v;
   }
   if (u.stolen) {
@@ -1341,6 +1416,7 @@ function updateUnit(sim, u, dt) {
   if (u.revealT > 0) u.revealT -= dt;
   const fac = facOf(sim, u.owner);
   if (u.tempUntil && sim.time >= u.tempUntil) { kill(sim, u, -1); return; } // Crias da Eclosão
+  { const pm = sim.players[u.owner].mods; if (pm && pm.regen && u.hp < u.maxHp && sim.time - u.lastHitT > 5) u.hp = Math.min(u.maxHp, u.hp + pm.regen * dt); }
   if (fac.hunger && u.def === fac.hunger.def && !u.tempUntil && sim.tick % 10 === 0 && !inTerritory(sim, u.owner, u.x, u.y)) { const floor = u.maxHp * fac.hunger.floor; if (u.hp > floor) u.hp = Math.max(floor, u.hp - fac.hunger.rate); }
   u.cloaked = !!fac.cloak[u.def] && u.state !== 'siphon' && (sim.time - u.lastAttack) > 3;
   if (!u.cloaked && u.def !== 'ancora' && sim.auras && sim.auras[u.owner].anchors.length && (sim.time - u.lastAttack) > 3) { for (const an of sim.auras[u.owner].anchors) if (dist(an.x, an.y, u.x, u.y) <= UNITS.ancora.aura.cloak) { u.cloaked = true; break; } }
@@ -1460,7 +1536,7 @@ function updateBuilding(sim, b, dt) {
     return; // no production while jumping
   }
   if (b.queue.length) {
-    let mult = reg.prodF;
+    let mult = reg.prodF; if (p.mods && p.mods.prodMul) mult *= p.mods.prodMul;
     if (facOf(sim, b.owner).lineBonus && d.produces && b.def !== 'nucleo') {
       let n = 0; queryGrid(sim, b.x, b.y, 160, e => { if (e !== b && e.kind === 'building' && e.owner === b.owner && e.built && BUILDINGS[e.def].produces && e.def !== 'nucleo' && dist(e.x, e.y, b.x, b.y) <= 150) n++; });
       mult *= 1 + 0.12 * Math.min(4, n);
@@ -1598,8 +1674,8 @@ function checkEnd(sim) {
 
 function step(sim) {
   const dt = TICK;
-  sim.events = [];
-  if (sim.result) return sim.events;
+  sim.events = sim.events ? sim.events.slice(sim._evRet || 0) : []; // 4.0e: só os eventos emitidos depois do último retorno (roteiros da campanha) seguem para este passo; saída apenas, fora do hash
+  if (sim.result) { sim._evRet = sim.events.length; return sim.events; }
   for (const e of sim.ents) if (e.kind !== 'node') { e.px = e.x; e.py = e.y; }
   if (sim.navDirty) rebuildNav(sim);
   rebuildGrid(sim);
@@ -1632,14 +1708,14 @@ function step(sim) {
   if (sim.tick % 3 === 0) markExplored(sim);
   sim.tick++; sim.time = sim.tick * TICK;
   checkEnd(sim);
-  return sim.events;
+  sim._evRet = sim.events.length; return sim.events;
 }
 
 // ---------- queries for UI/AI ----------
 function entitiesOf(sim, pid) { const out = []; for (const e of sim.ents) if (e.alive && e.owner === pid) out.push(e); return out; }
 function armyValue(sim, pid) {
   let v = 0;
-  for (const e of sim.ents) if (e.alive && e.owner === pid && e.kind === 'unit' && UNITS[e.def].attack) { const c = UNITS[e.def].cost; v += (c.minerio || 0) + (c.plasma || 0) + (c.dados || 0); }
+  for (const e of sim.ents) if (e.alive && e.owner === pid && e.kind === 'unit' && UNITS[e.def].attack && !UNITS[e.def].epic) { const c = UNITS[e.def].cost; v += (c.minerio || 0) + (c.plasma || 0) + (c.dados || 0); }
   return v;
 }
 function hash(sim) { // cheap state hash for determinism tests
@@ -1655,7 +1731,7 @@ ARD.sim = {
   SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS, FACTION_EXTRAS, producesFor,
   NAV, NW, TILE, TILES, BIOMES, navIdx, passable, flowField, lineFree, inStorm,
   DM,
-  createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint,
+  createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint, spawnUnit, forceStorm,
 };
 })(globalThis.ARD = globalThis.ARD || {});
 
@@ -1743,7 +1819,7 @@ function think(sim, mem) {
   const t = sim.time; const D = mem.diff; const mine = own(sim, mem.pid);
   const nuc = mine.find(e => e.kind === 'building' && e.def === 'nucleo'); if (!nuc) return cmds;
   const builds = mine.filter(e => e.kind === 'building'); const units = mine.filter(e => e.kind === 'unit');
-  const collectors = units.filter(u => u.def === 'coletor'); const pirates = units.filter(u => u.def === 'pirata'); const army = units.filter(u => S.UNITS[u.def].attack);
+  const collectors = units.filter(u => u.def === 'coletor'); const pirates = units.filter(u => u.def === 'pirata'); const army = units.filter(u => S.UNITS[u.def].attack && !u.scripted); // 4.0e: chefes de campanha obedecem só ao roteiro
   const nodulos = count(builds, b => b.def === 'nodulo'); const underConstruction = count(builds, b => !b.built);
   updateKnown(sim, mem);
   const emitC = c => { c.p = mem.pid; cmds.push(c); };
@@ -2496,7 +2572,13 @@ KITS.vorag = {
 // ---------- receitas de construção: mesma planta para todas as Raças, formas do kit da Raça ----------
 const QUAD = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
 const BLD = {
-  nucleo(K, k, P, tc) { k.pad(K, P, tc, 0, 0, 30, 30); k.block(K, P, tc, 0, 0, 22, 22, 7, 0.6); k.block(K, P, tc, 0, 0, 13, 13, 5.5, 7.8); k.crown(K, P, tc, 0, 0, 13.6, 1); for (const [sx, sz] of QUAD) k.tower(K, P, tc, sx * 12.2, sz * 12.2, 1.3, 8, 0.6); k.door(K, P, tc, 11.4, 0, 5, 4.2, 0.6); k.ring(K, P, tc, 0, 0, 9.4, 8.3); },
+  nucleo(K, k, P, tc, skin) { // 4.0e: três estilos de Núcleo no Hangar — 0 Padrão, 1 Fortaleza (nível 10), 2 Santuário (nível 20)
+    skin = skin || 0; k.pad(K, P, tc, 0, 0, skin === 2 ? 32 : 30, skin === 2 ? 32 : 30); k.block(K, P, tc, 0, 0, 22, 22, skin === 1 ? 8.5 : 7, 0.6); const top = skin === 1 ? 9.3 : 7.8; k.block(K, P, tc, 0, 0, 13, 13, skin === 1 ? 6.5 : 5.5, top);
+    k.crown(K, P, tc, 0, 0, top + (skin === 1 ? 6.5 : 5.8), skin === 2 ? 1.35 : 1);
+    for (const [sx, sz] of QUAD) k.tower(K, P, tc, sx * 12.2, sz * 12.2, skin === 1 ? 1.9 : 1.3, skin === 1 ? 12 : 8, 0.6);
+    if (skin === 1) for (const [sx, sz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) k.tower(K, P, tc, sx * 12.6, sz * 12.6, 1.1, 7, 0.6);
+    k.door(K, P, tc, 11.4, 0, 5, 4.2, 0.6); k.ring(K, P, tc, 0, 0, 9.4, top + 0.5);
+    if (skin === 2) { k.ring(K, P, tc, 0, 0, 13.6, 1.1); K.tor(0, 0.75, 0, 15.2, 0.22, tc, null, { e: 1.8, ts: 48 }); } },
   reator(K, k, P, tc) { k.reactor(K, P, tc); },
   refinaria(K, k, P, tc) { k.pad(K, P, tc, 0, 0, 24, 20); k.block(K, P, tc, -5, 0, 10, 14, 5.2, 0.6); k.tank(K, P, tc, 5, -4.6, 2.9, 6, 0.6); k.tank(K, P, tc, 5, 4.6, 2.9, 6, 0.6); k.pipe(K, P, tc, [[-1.5, 4.2, -2.5], [1.2, 6.8, -3.6], [3.4, 7.4, -4.6]]); k.pipe(K, P, tc, [[-1.5, 4.2, 2.5], [1.2, 6.8, 3.6], [3.4, 7.4, 4.6]]); k.door(K, P, tc, 0.2, 0, 4, 3, 0.6); },
   quartel(K, k, P, tc) { k.pad(K, P, tc, 0, 0, 26, 22); k.block(K, P, tc, -2, 0, 18, 14, 6, 0.6); k.block(K, P, tc, -4, 0, 9, 8, 3.2, 6.8); k.door(K, P, tc, 7.2, 0, 5, 4, 0.6); k.banner(K, P, tc, 9.4, 6.6, 7.4); k.banner(K, P, tc, 9.4, -6.6, 7.4); k.tower(K, P, tc, -10.6, -8.4, 1.1, 6.5, 0.6); },
@@ -2632,6 +2714,11 @@ U.quorith = {
   monolito(K, P, tc) { K.prism(0, 0, 0, 1, 0.8, 6, P.d, 'gloss', { sx: 5.4, sz: 4 }); K.tor(0, 1.2, 0, 3.2, 0.16, P.l, null, { e: 2.4, ts: 6 }); K.box(0, 1.8, 0, 3.6, 13, 2.6, P.a, 'crystal', { b: 0.2, bs: 1 });
     K.box(0, 3, 1.33, 0.3, 10, 0.06, P.c, null, { e: 2.6 }); K.box(0, 3, -1.33, 0.3, 10, 0.06, P.c, null, { e: 2.6 }); K.box(1.83, 3, 0, 0.06, 10, 0.3, P.c, null, { e: 2.6 }); K.oct(0, 14.8, 0, 1.2, 2.8, P.b, 'crystal');
     ringOf(4, 4.2, (cx, cz) => K.oct(cx, 0.6, cz, 0.7, 3.2, P.b, 'crystal', { rz: -cx * 0.08, rx: cz * 0.08 })); K.oct(0, 18.2, 0, 0.4, 1, tc, null, { e: 2 }); },
+  catedral(K, P, tc) { // épico: catedral de cristal que caminha sobre três pilares flutuantes, com sinos de cristal e coro aceso
+    K.prism(0, 0, 0, 1, 1.2, 6, P.d, 'gloss', { sx: 12, sz: 10 }); ringOf(3, 8, (cx, cz) => K.oct(cx, 0.6, cz, 2.2, 9, P.b, 'crystal'));
+    K.prism(0, 4, 0, 1, 7, 6, P.a, 'crystal', { sx: 9, sz: 7.5, top: 0.8 }); K.prism(0, 11, 0, 0.8, 5, 6, P.b, 'crystal', { sx: 9, sz: 7.5, top: 0.4 }); K.prism(0, 7.4, 0, 1.01, 0.4, 6, P.c, null, { e: 2.4, sx: 9, sz: 7.5, top: 1 });
+    K.oct(0, 15, 0, 3, 14, P.a, 'crystal', { ry: PI / 6 }); K.oct(0, 19, 0, 1.4, 6, P.c, null, { e: 2.8 }); for (const [x, z, h] of [[-5, -4, 10], [5, -4, 9], [-5, 4, 9], [5, 4, 10], [0, 6.5, 8]]) { K.oct(x, 10, z, 1.4, h, P.a, 'crystal'); K.oct(x, 10 + h * 0.55, z, 0.5, 2, P.l, null, { e: 2.6 }); }
+    K.tor(0, 22, 0, 6.5, 0.4, P.t, 'crystal', { rx: 0.3, ts: 6 }); K.tor(0, 22, 0, 6, 0.25, P.l, null, { e: 2.4, rz: 0.4, ts: 6 }); K.tor(0, 2.2, 0, 10, 0.3, tc, null, { e: 1.8, ts: 6 }); },
   harmonico(K, P, tc) { ringOf(3, 1.8, (cx, cz, a) => K.oct(cx, 1, cz, 0.7, 3.4, P.a, 'crystal', { rx: Math.sin(a) * 0.4, rz: -Math.cos(a) * 0.4 })); K.oct(0, 1.6, 0, 0.5, 1.8, P.c, null, { e: 2.8 }); K.tor(0, 2.4, 0, 2.8, 0.1, P.l, null, { e: 2.4, ts: 6 }); K.tor(0, 2.4, 0, 2.2, 0.08, tc, null, { e: 2, ts: 6 }); },
 };
 U.vorag = {
@@ -2665,6 +2752,12 @@ U.vorag = {
     K.sph(8.2, 3.6, 0, 2.4, P.b, 'chitin', { sx: 1.1, seg: 14 }); for (const s of [-1, 1]) { K.seg([9.4, 3, s * 1.4], [12, 4.6, s * 2.2], 0.5, P.bo, 'bone', { taper: 0.25 }); K.light(10.6, 4.6, s * 0.8, 0.32, P.l); }
     K.sph(-4, 7.6, 0, 0.9, tc, 'wet', { seg: 10 }); K.sph(-6.6, 5.4, 0, 1.8, P.m, 'wet', { seg: 12 }); },
   ferroada(K, P, tc) { U.vorag.drone(K, P, tc, { sting: 2.6, wings4: true }); },
+  matriarca(K, P, tc) { // épica: rainha da Prole, abdômen enorme de ovos e coroa de espinhos
+    K.sph(-7, 4.6, 0, 1, P.m, 'wet', { sx: 9, sy: 5, sz: 6.5, seg: 22 }); for (let i = 0; i < 4; i++) arch(K, -7, 0.4, 0, 9.1, 9.2, 6.6, i * PI / 4, 0.3, '#FF8A8A', null, { e: 1.4, ts: 16 }); ringOf(7, 1, (cx, cz) => K.sph(-7 + cx * 7, 4 + Math.abs(cz) * 2, cz * 5, 1.2, P.bo, 'bone', { sy: 1.4, seg: 10 }));
+    K.sph(2, 5, 0, 1, P.a, 'chitin', { sx: 5.5, sy: 4.4, sz: 5, seg: 20 }); for (let i = 0; i < 3; i++) K.sph(0 + i * 2.4, 8.4, 0, 1, P.b, 'chitin', { sx: 1.6, sy: 1, sz: 4.4, seg: 12 });
+    for (const x of [-1, 2, 5]) for (const s of [-1, 1]) leg(K, [x, 4, s * 4], [x + 1.6, 4.4, s * 8], [x + 1, 0, s * 9], 0.9, P.b, 'chitin');
+    K.sph(8.4, 6, 0, 2.6, P.b, 'chitin', { seg: 16 }); ringOf(6, 2.2, (cx, cz) => K.cone(8 + cx * 0.4, 8, cz, 0.45, 3.6, P.bo, 'bone', { seg: 8, rz: -cx * 0.25, rx: cz * 0.25 })); for (const s of [-1, 1]) { K.seg([10, 5.4, s * 1.4], [13.6, 3, s * 2.6], 0.6, P.bo, 'bone', { taper: 0.2 }); K.light(10.8, 6.8, s * 1, 0.45, P.l); }
+    K.sph(-1, 9.6, 0, 1.1, tc, 'wet', { seg: 10 }); },
 };
 
 // ---------- cenário neutro: nós de recurso, rochas, ruínas, caixas, carcaças e adereços de território ----------
@@ -2694,7 +2787,7 @@ const PROPS = {
 const FULL = { veiculo: ['veiculo_hull', 'veiculo_turret'], torre: ['torre_base', 'torre_turret'], bastiao: ['bastiao_base', 'bastiao_turret'] };
 function recipe(race, def) {
   const u = U[race]; if (u && u[def]) return (K, P, tc) => u[def](K, P, tc);
-  if (BLD[def]) return (K, P, tc) => BLD[def](K, KITS[race] || KITS.vehnar, P, tc);
+  if (BLD[def]) return (K, P, tc, seed) => BLD[def](K, KITS[race] || KITS.vehnar, P, tc, seed);
   for (const r in U) if (U[r][def]) return (K, P, tc) => U[r][def](K, P, tc);
   return null;
 }
@@ -2706,7 +2799,7 @@ function build(def, race, color, seed) {
     if (def.startsWith('prop_')) { const f = PROPS[def.slice(5)]; if (!f) return null; f(K, seed | 0); return K.finish(); }
     race = PAL[race] ? race : 'vehnar'; const P = PAL[race]; const tc = color || '#FF8C1A';
     if (FULL[def]) { const a = recipe(race, FULL[def][0]), b = recipe(race, FULL[def][1]); if (!a || !b) return null; a(K, P, tc); const m = K.mount || 0; K.mount = null; K.oy = m; b(K, P, tc); K.oy = 0; return K.finish({ pivot: [0, 0] }); }
-    const f = recipe(race, def); if (!f) return null; f(K, P, tc); return K.finish({ pivot: [0, 0] });
+    const f = recipe(race, def); if (!f) return null; f(K, P, tc, seed | 0); return K.finish({ pivot: [0, 0] });
   } catch (err) { console.warn('[ARD] malha ' + def + '/' + race + ' falhou: ' + err.message); return null; }
 }
 // material padrão das malhas: rugosidade e metal vêm do atributo rm por vértice; rim opcional por Raça
@@ -2852,6 +2945,485 @@ function mount(img) {
 }
 function stop() { if (!st) return; cancelAnimationFrame(st.raf); if (st.io) st.io.disconnect(); try { st.renderer.dispose(); st.renderer.forceContextLoss(); } catch (e) {} if (st.cv.parentNode) st.cv.parentNode.removeChild(st.cv); st.img.hidden = false; st = null; }
 ARD.logo3d = { mount, stop, active: () => !!st };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Aether Rift: Dominion — ProgressStore v1 (4.0e): progresso local da campanha — Comandante (nível 1–30), missões e estrelas,
+   conquistas, relíquias e escolhas do Hangar. Formato estável e versionado; a v5.0 importa este JSON na criação da conta.
+   Exporta e importa por código de backup (ARD1-<soma>-<base64>). Sem DOM além do localStorage; roda no Node para testes. */
+(function (ARD) {
+'use strict';
+const KEY = 'ard-progress-v1'; const MAX_LEVEL = 30;
+const LEVEL_XP = n => 260 * n + 30 * n * n; // XP acumulado para sair do nível n
+function blank() { return { v: 1, created: Date.now(), commander: { name: '', xp: 0, level: 1 }, missions: {}, achievements: {}, relics: { owned: [], equipped: [null, null] }, hangar: { color: null, skin: {}, portrait: {}, title: '' }, stats: { missions: 0, wins: 0, losses: 0, playSec: 0 } }; }
+function merge(base, src) { if (!src || typeof src !== 'object' || Array.isArray(src)) return src === undefined ? base : src; const out = Array.isArray(base) ? base.slice() : Object.assign({}, base); for (const k in src) out[k] = (base && typeof base[k] === 'object' && base[k] !== null && !Array.isArray(base[k])) ? merge(base[k], src[k]) : src[k]; return out; }
+let state = null; let mem = null; // mem: armazenamento em memória quando localStorage não existe (Node, modo privado)
+const storage = () => { try { if (typeof localStorage !== 'undefined') { localStorage.getItem(KEY); return localStorage; } } catch (e) {} if (!mem) { const m = new Map(); mem = { getItem: k => m.has(k) ? m.get(k) : null, setItem: (k, v) => m.set(k, String(v)), removeItem: k => m.delete(k) }; } return mem; };
+function migrate(s) { if (!s || s.v !== 1) return blank(); const out = merge(blank(), s); out.commander.level = levelOf(out.commander.xp); if (!Array.isArray(out.relics.equipped) || out.relics.equipped.length !== 2) out.relics.equipped = [null, null]; return out; }
+function load() { if (state) return state; try { const raw = storage().getItem(KEY); state = raw ? migrate(JSON.parse(raw)) : blank(); } catch (e) { state = blank(); } return state; }
+function save() { try { storage().setItem(KEY, JSON.stringify(state)); return true; } catch (e) { return false; } }
+function levelOf(xp) { let n = 1; while (n < MAX_LEVEL && xp >= LEVEL_XP(n)) n++; return n; }
+function levelInfo() { const s = load(); const lv = s.commander.level; const lo = lv > 1 ? LEVEL_XP(lv - 1) : 0, hi = lv < MAX_LEVEL ? LEVEL_XP(lv) : lo; return { level: lv, xp: s.commander.xp, into: s.commander.xp - lo, need: Math.max(1, hi - lo), max: lv >= MAX_LEVEL }; }
+function addXp(n) { const s = load(); const from = s.commander.level; s.commander.xp += Math.max(0, Math.round(n)); s.commander.level = levelOf(s.commander.xp); save(); return { from, to: s.commander.level }; }
+function mission(id) { return load().missions[id] || null; }
+function completeMission(id, r) { // r: { stars, won, difficulty, time, race }
+  const s = load(); const prev = s.missions[id] || { stars: 0, done: false, plays: 0 }; const cur = Object.assign({}, prev); cur.plays = (prev.plays || 0) + 1;
+  if (r.won) { cur.done = true; if ((r.stars || 0) > (prev.stars || 0)) cur.stars = r.stars; if (!prev.bestTime || r.time < prev.bestTime) cur.bestTime = Math.round(r.time); cur.lastDifficulty = r.difficulty; cur.race = r.race; s.stats.wins++; } else s.stats.losses++;
+  s.missions[id] = cur; s.stats.missions++; save(); return { newStars: Math.max(0, (cur.stars || 0) - (prev.stars || 0)), first: !prev.done && cur.done }; }
+function unlock(id) { const s = load(); if (s.achievements[id]) return false; s.achievements[id] = Date.now(); save(); return true; }
+function has(id) { return !!load().achievements[id]; }
+function grantRelic(id) { const s = load(); if (s.relics.owned.includes(id)) return false; s.relics.owned.push(id); save(); return true; }
+function equipRelic(slot, id) { const s = load(); if (slot !== 0 && slot !== 1) return false; if (id != null && !s.relics.owned.includes(id)) return false; if (id != null && s.relics.equipped[1 - slot] === id) s.relics.equipped[1 - slot] = null; s.relics.equipped[slot] = id == null ? null : id; save(); return true; }
+function setHangar(patch) { const s = load(); s.hangar = merge(s.hangar, patch); save(); return s.hangar; }
+function setName(n) { const s = load(); s.commander.name = String(n || '').slice(0, 24); save(); }
+function addPlayTime(sec) { const s = load(); s.stats.playSec += Math.max(0, Math.round(sec)); save(); }
+function checksum(str) { let h = 2166136261 >>> 0; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h.toString(36); }
+const b64e = s => typeof btoa !== 'undefined' ? btoa(unescape(encodeURIComponent(s))) : Buffer.from(s, 'utf8').toString('base64');
+const b64d = s => typeof atob !== 'undefined' ? decodeURIComponent(escape(atob(s))) : Buffer.from(s, 'base64').toString('utf8');
+function exportCode() { const json = JSON.stringify(load()); return 'ARD1-' + checksum(json) + '-' + b64e(json); }
+function importCode(code) { const m = /^ARD1-([0-9a-z]+)-([A-Za-z0-9+/=]+)$/.exec(String(code || '').trim()); if (!m) throw new Error('Código inválido'); const json = b64d(m[2]); if (checksum(json) !== m[1]) throw new Error('Código corrompido (soma não confere)'); state = migrate(JSON.parse(json)); save(); return state; }
+function reset() { state = blank(); save(); return state; }
+ARD.progress = { KEY, MAX_LEVEL, LEVEL_XP, load, save, levelOf, levelInfo, addXp, mission, completeMission, unlock, has, grantRelic, equipRelic, setHangar, setName, addPlayTime, exportCode, importCode, reset, _blank: blank };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Aether Rift: Dominion — Campanha "O Ciclo da Maré" (4.0e): atos, missões com roteiro, conquistas, relíquias e o executor.
+   Missões são partidas solo com objetivos (principais e bônus), falas dos líderes e eventos roteirizados (ondas, comboios,
+   pactos forçados, tempestades, escolta). O executor roda depois de cada passo da simulação e só usa comandos e utilitários
+   determinísticos da sim (spawnUnit, forceStorm, enqueue), então a mesma semente reproduz a mesma missão. */
+(function (ARD) {
+'use strict';
+const S = ARD.sim;
+const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'];
+const ACTS = [
+  { id: 'prologo', name: 'Prólogo — Acorde' }, { id: 'ato1', name: 'Ato 1 — Despertar da Maré' }, { id: 'ato2', name: 'Ato 2 — Rotas de Saque' },
+  { id: 'ato3', name: 'Ato 3 — Coro e Fome' }, { id: 'ato4', name: 'Ato 4 — Domínio' }, { id: 'identidade', name: 'Missões de Identidade' },
+];
+const DIFF = { facil: { ai: 'facil', wave: 0.7, xp: 0.8, label: 'Fácil' }, normal: { ai: 'normal', wave: 1, xp: 1, label: 'Normal' }, dificil: { ai: 'dificil', wave: 1.35, xp: 1.25, label: 'Difícil' }, fenda: { ai: 'dificil', wave: 1.7, xp: 1.5, storms: true, noPause: true, label: 'Fenda' } };
+const RELICS = [
+  { id: 'cofre-fendido', name: 'Cofre Fendido', desc: '+300 Minério e +150 Plasma no início; −8% na coleta.', mods: { startRes: { minerio: 300, plasma: 150 }, harvestMul: 0.92 } },
+  { id: 'lente-de-eter', name: 'Lente de Éter', desc: '+20% de visão para tudo; torres com −10% de vida.', mods: { sensorMul: 1.2, towerHpMul: 0.9 } },
+  { id: 'semente-viva', name: 'Semente Viva', desc: 'Unidades regeneram 1,5 de vida/s fora de combate; −6% de velocidade.', mods: { regen: 1.5, speedMul: 0.94 } },
+  { id: 'coracao-de-forja', name: 'Coração de Forja', desc: 'Produção 12% mais rápida; Reatores queimam 25% mais Plasma.', mods: { prodMul: 1.12, burnMul: 1.25 } },
+  { id: 'ancora-de-mare', name: 'Âncora de Maré', desc: 'Superarma recarrega 30% mais rápido; −10% de energia.', mods: { superCdMul: 0.7, energyMul: 0.9 } },
+  { id: 'eco-do-coro', name: 'Eco do Coro', desc: '+1 Salto de Núcleo e +10% de energia; −8% na coleta.', mods: { extraJumps: 1, energyMul: 1.1, harvestMul: 0.92 } },
+];
+const RELIC_BY_LEVEL = { 5: 'lente-de-eter', 10: 'coracao-de-forja', 15: 'eco-do-coro' };
+const ACHIEVEMENTS = [
+  { id: 'primeiro-passo', name: 'Primeiro passo', desc: 'Concluir a primeira missão da campanha.' },
+  { id: 'prologo', name: 'Acordado', desc: 'Concluir o Prólogo.' }, { id: 'ato-1', name: 'Despertar', desc: 'Concluir o Ato 1.' }, { id: 'ato-2', name: 'Senhor das rotas', desc: 'Concluir o Ato 2.' },
+  { id: 'ato-3', name: 'Ouvido do Coro', desc: 'Concluir o Ato 3.' }, { id: 'ato-4', name: 'Domínio', desc: 'Concluir o Ato 4.' }, { id: 'identidade', name: 'Cinco vozes', desc: 'Concluir todas as Missões de Identidade.' },
+  { id: 'tres-estrelas', name: 'Perfeccionista', desc: 'Conseguir 3 estrelas numa missão.' }, { id: 'fenda', name: 'Filho da Fenda', desc: 'Vencer uma missão na dificuldade Fenda.' },
+  { id: 'nucleo-intacto', name: 'Núcleo intacto', desc: 'Vencer com o Núcleo acima de 90% de vida.' }, { id: 'so-infantaria', name: 'Só infantaria', desc: 'Vencer usando apenas Infantaria em combate.' },
+  { id: 'pacifista-10', name: 'Pacifista até o minuto 10', desc: 'Vencer uma partida sem causar dano nos primeiros 10 minutos.' }, { id: 'primeiro-sifao', name: 'Mão leve', desc: 'Roubar recursos com um Pirata.' },
+  { id: 'muralha', name: 'Muralha', desc: 'Construir 20 Muros numa partida.' }, { id: 'traidor', name: 'Golpe de Traição', desc: 'Quebrar um pacto.' }, { id: 'diplomata', name: 'Palavra dada', desc: 'Cumprir um pacto até o fim.' },
+  { id: 'cinco-racas', name: 'Cinco Marés', desc: 'Vencer uma partida com cada Raça.' }, { id: 'comandante-10', name: 'Comandante veterano', desc: 'Chegar ao nível 10.' }, { id: 'comandante-30', name: 'Lenda da Fenda', desc: 'Chegar ao nível 30.' },
+];
+const TITLES = { 'primeiro-passo': 'Recruta da Maré', prologo: 'Desperto', 'ato-1': 'Guardião do Cerco', 'ato-2': 'Senhor das Rotas', 'ato-3': 'Ouvido do Coro', 'ato-4': 'Dominador', identidade: 'Cinco Vozes', 'tres-estrelas': 'Perfeccionista', fenda: 'Filho da Fenda', 'nucleo-intacto': 'Inabalável', 'cinco-racas': 'Senhor das Cinco Marés', 'comandante-30': 'Lenda da Fenda' };
+
+// ---------- missões ----------
+// who: 'self' (líder da sua Raça), 'enemy' (primeiro inimigo), 'ally' (primeiro aliado) ou um id de Raça. mood: 1 sereno, 2 furioso, 3 triunfante.
+const M = [];
+const W = (comp, from, opts) => Object.assign({ comp, from: from || 0 }, opts || {}); // onda: composição { def: n }, de qual inimigo
+// Prólogo
+M.push({ id: 'p1', act: 'prologo', title: 'Acorde', place: 'Planalto de Ísk', xp: 300,
+  brief: [['self', 1, 'Comandante, a Maré baixou e a Fenda abriu um planalto inteiro. O Núcleo está de pé; agora precisamos de energia e de quem colha.'], ['self', 3, 'Siga as ordens na tela. Ninguém por perto vai incomodar. Por enquanto.']],
+  setup: { seed: 4101, enemies: [{ race: 'rival', name: 'Ninho Dormente', passive: true }] },
+  objectives: [{ id: 'reator', text: 'Construir um Reator', test: c => c.built('reator') >= 1 }, { id: 'refinaria', text: 'Construir uma Refinaria', test: c => c.built('refinaria') >= 1 },
+    { id: 'coletores', text: 'Ter 5 Coletores', test: c => c.units('coletor') >= 5, progress: c => c.units('coletor') + '/5' }, { id: 'coleta', text: 'Coletar 800 em recursos', test: c => c.me.stats.collected >= 800, progress: c => c.n(c.me.stats.collected) + '/800' },
+    { id: 'b-nodulo', bonus: true, text: 'Construir um Nódulo de Avanço', test: c => c.built('nodulo') >= 1 }, { id: 'b-rapido', bonus: true, final: true, text: 'Concluir em menos de 7 min', test: c => c.t < 420 }],
+  script: [{ at: 4, say: ['self', 1, 'Selecione o Núcleo (F1) e produza Coletores (C). Depois, B e R para um Reator.'] }, { when: c => c.built('reator') >= 1, say: ['self', 3, 'Energia estável. Uma Refinaria perto dos nós de Minério encurta a viagem dos Coletores.'] }, { when: c => c.done('coletores'), say: ['self', 1, 'Coletores colhem sozinhos dentro do seu território. Um Nódulo de Avanço amplia esse território.'] }] });
+M.push({ id: 'p2', act: 'prologo', title: 'Energia e regimes', place: 'Vale das Turbinas', xp: 350,
+  brief: [['self', 1, 'Toda estrutura consome energia. Abaixo de 100% entramos em racionamento: produção, sensores e torres pioram.'], ['self', 2, 'Abaixo de 70% é colapso. Não quero ver isso no meu painel.']],
+  setup: { seed: 4207, enemies: [{ race: 'rival', name: 'Ruínas de Vey', passive: true }] },
+  objectives: [{ id: 'quartel', text: 'Construir um Quartel', test: c => c.built('quartel') >= 1 }, { id: 'fabrica', text: 'Construir uma Fábrica de Veículos', test: c => c.built('fabrica') >= 1 },
+    { id: 'pleno', text: 'Manter energia Plena por 60 s com Quartel e Fábrica de pé', test: c => c.hold('pleno', c.me.energy.regime === 'pleno' && c.built('quartel') && c.built('fabrica'), 60), progress: c => Math.floor(c.held('pleno')) + '/60 s' },
+    { id: 'pesquisa', text: 'Pesquisar uma tecnologia no Laboratório', test: c => Object.keys(c.me.research).length >= 1 },
+    { id: 'b-sem-colapso', bonus: true, final: true, text: 'Nunca entrar em colapso de energia', test: c => !c.st.colapso }, { id: 'b-sobrecarga', bonus: true, text: 'Usar a Sobrecarga uma vez', test: c => c.me.overchargeCd > 0 }],
+  tick: c => { if (c.me.energy.regime === 'colapso') c.st.colapso = true; },
+  script: [{ at: 4, say: ['self', 1, 'Cada Reator dá +35 de energia queimando Plasma. Fique de olho no medidor ⚡ lá em cima.'] }, { when: c => c.me.energy.regime === 'racionado', once: true, say: ['self', 2, 'Racionamento! Mais Reatores, Comandante.'] }, { when: c => c.done('pleno'), say: ['self', 3, 'Rede estável. Agora o Laboratório: conhecimento é a moeda da Fenda.'] }] });
+M.push({ id: 'p3', act: 'prologo', title: 'A primeira tempestade', place: 'Bordas da Fenda', xp: 400, relic: 'cofre-fendido',
+  brief: [['self', 1, 'O Éter está se acumulando. Quando a tempestade cai, drones e sensores sofrem, mas o Plasma rende em dobro lá dentro.'], ['enemy', 2, 'Vocês chegaram tarde. Esta borda é nossa.'], ['self', 2, 'Construa uma Torre. Eles virão quando o céu escurecer.']],
+  setup: { seed: 4313, enemies: [{ race: 'rival', name: 'Saqueadores da Borda', passive: true }] },
+  objectives: [{ id: 'plasma', text: 'Juntar 600 de Plasma', test: c => c.me.res.plasma >= 600, progress: c => c.n(c.me.res.plasma) + '/600' }, { id: 'torre', text: 'Construir uma Torre de Defesa', test: c => c.built('torre') >= 1 },
+    { id: 'raid', text: 'Repelir o ataque da tempestade', test: c => c.st.raidSpawned && c.waveAlive('raid') === 0 },
+    { id: 'b-coletores', bonus: true, final: true, text: 'Não perder nenhum Coletor', test: c => (c.lost.coletor || 0) === 0 }, { id: 'b-torre-cedo', bonus: true, text: 'Torre pronta antes das 3:30', test: c => c.built('torre') >= 1 && c.t < 210 }],
+  events: [{ at: 75, do: c => { const n = c.myNucleo(); if (n) S.forceStorm(c.sim, (n.x + S.CX) / 2, (n.y + S.CY) / 2, 30, 100); } }, { at: 240, do: c => { c.wave('raid', W({ infantaria: 4, drone: 2 }, 0)); c.st.raidSpawned = true; }, say: ['enemy', 2, 'Agora! Enquanto os sensores deles estão cegos!'] }],
+  script: [{ when: c => c.st.raidSpawned && c.done('raid'), say: ['self', 3, 'Eles fugiram para dentro da tempestade. Boa leitura do céu, Comandante.'] }] });
+// Ato 1
+M.push({ id: 'a1m1', act: 'ato1', title: 'Cerco', place: 'Passo de Kessari', xp: 450,
+  brief: [['self', 2, 'A Prole sentiu o cheiro do nosso Plasma. Ondas virão pelo passo leste.'], ['self', 1, 'Muros são baratos e um Portão deixa as nossas tropas passarem. Feche o passo antes da primeira onda.']],
+  setup: { seed: 5107, enemies: [{ race: 'vorag', name: 'Horda de Velk', passive: true }] },
+  objectives: [{ id: 'muros', text: 'Construir 10 Muros e 1 Portão', test: c => c.built('muro') >= 10 && c.built('portao') >= 1, progress: c => c.built('muro') + '/10 muros, ' + c.built('portao') + '/1 portão' },
+    { id: 'ondas', text: 'Sobreviver às 5 ondas (até 9:00)', test: c => c.t >= 540 && c.st.waves >= 5 && c.waveAlive() === 0, progress: c => (c.st.waves || 0) + '/5 ondas' },
+    { id: 'b-nucleo', bonus: true, final: true, text: 'Núcleo acima de 80% no fim', test: c => c.nucleoFrac() >= 0.8 }, { id: 'b-abates', bonus: true, text: 'Abater 40 inimigos', test: c => c.killed() >= 40, progress: c => c.killed() + '/40' }],
+  events: [120, 210, 300, 390, 480].map((at, i) => ({ at, do: c => { c.wave('w' + i, W({ cria: 6 + i * 3, cuspidor: 1 + i, escaravelho: i >= 2 ? i - 1 : 0, brutamonte: i === 4 ? 1 : 0 }, 0)); c.st.waves = (c.st.waves || 0) + 1; }, say: i === 0 ? ['vorag', 2, 'Fome! Fome! Abram!'] : i === 4 ? ['self', 2, 'A última onda trouxe um Brutamonte. Segure o Portão!'] : null })),
+  script: [{ at: 6, say: ['self', 1, 'Arraste com o Muro selecionado (B, M) para desenhar uma linha inteira.'] }] });
+M.push({ id: 'a1m2', act: 'ato1', title: 'Caça a comboios', place: 'Rota das Dunas', xp: 450,
+  brief: [['self', 1, 'Comboios do Consórcio atravessam a rota a cada minuto. Cada Rebocador carrega Minério.'], ['self', 3, 'Derrube os Rebocadores e recolha as Caixas antes que esfriem.']],
+  setup: { seed: 5213, enemies: [{ race: 'vehnar', name: 'Consórcio Oryn', passive: true }] },
+  objectives: [{ id: 'caixas', text: 'Recolher 4 Caixas dos comboios', test: c => c.st.crates >= 4, progress: c => (c.st.crates || 0) + '/4' },
+    { id: 'b-sem-fuga', bonus: true, final: true, text: 'Nenhum comboio escapar', test: c => !(c.st.escaped > 0) }, { id: 'b-rapido', bonus: true, final: true, text: 'Concluir em menos de 10 min', test: c => c.t < 600 }],
+  events: [60, 140, 220, 300, 380, 460, 540, 620].map(at => ({ at, do: c => c.convoy() })),
+  script: [{ at: 50, say: ['self', 1, 'Primeiro comboio entrando na rota. Use Atacar-mover (A) no caminho deles.'] }, { when: c => c.st.crates >= 1, once: true, say: ['self', 3, 'Caixa recolhida. Mais três.'] }] });
+M.push({ id: 'a1m3', act: 'ato1', title: 'Sobrevivência noturna', place: 'Pântano Negro', xp: 500, relic: 'semente-viva', startTime: 330,
+  brief: [['self', 2, 'A noite cai e a Ninhada Cega caça no escuro. Não temos como ver longe.'], ['vorag', 2, 'Escuro. Quente. Comida.'], ['self', 1, 'Torres e luz. Aguente até o amanhecer.']],
+  setup: { seed: 5319, enemies: [{ race: 'vorag', name: 'Ninhada Cega', passive: true }] },
+  objectives: [{ id: 'amanhecer', text: 'Sobreviver até o amanhecer (11:40)', test: c => c.sim.time >= 700, progress: c => 'faltam ' + c.mmss(Math.max(0, 700 - c.sim.time)) },
+    { id: 'b-predios', bonus: true, final: true, text: 'Não perder nenhuma construção', test: c => c.me.stats.buildingsLost === 0 }, { id: 'b-torres', bonus: true, text: 'Ter 3 Torres de Defesa', test: c => c.built('torre') >= 3 }],
+  events: [380, 440, 500, 560, 620, 670].map((at, i) => ({ at, do: c => c.wave('n' + i, W({ cria: 8 + i * 2, cuspidor: 2 + i, ferroada: i >= 3 ? 3 : 0 }, 0)) })) });
+// Ato 2
+M.push({ id: 'a2m1', act: 'ato2', title: 'Roubo e contrarroubo', place: 'Refinarias de Ísk', xp: 550,
+  brief: [['erevane', 1, 'Tudo que vocês refinam também é nosso. Só ainda não sabem.'], ['self', 2, 'Então jogamos o jogo deles. Piratas nas Refinarias inimigas, Torres nas nossas.']],
+  setup: { seed: 6101, enemies: [{ race: 'erevane', name: 'Clã Sombrio' }] },
+  objectives: [{ id: 'roubo', text: 'Roubar 800 em recursos com Piratas', test: c => c.me.stats.stolen >= 800, progress: c => c.n(c.me.stats.stolen) + '/800' }, { id: 'piratas', text: 'Abater 3 Piratas inimigos', test: c => (c.kills.pirata || 0) >= 3, progress: c => (c.kills.pirata || 0) + '/3' },
+    { id: 'b-perda', bonus: true, final: true, text: 'Perder menos de 300 para roubo', test: c => c.me.stats.lost < 300 }, { id: 'b-rapido', bonus: true, final: true, text: 'Concluir em menos de 12 min', test: c => c.t < 720 }],
+  script: [{ at: 5, say: ['self', 1, 'Pirata: clique direito numa Refinaria ou Reator inimigo para Sifonar. Volte à base para entregar.'] }, { when: c => c.me.stats.stolen > 0, once: true, say: ['self', 3, 'O primeiro sifão é o mais doce.'] }] });
+M.push({ id: 'a2m2', act: 'ato2', title: 'Diplomacia forçada', place: 'Mesa de Kessari', xp: 600,
+  brief: [['vehnar', 1, 'Pacto de Não-agressão, Comandante. Juntos esmagamos a Ordem do Molde.'], ['self', 2, 'Assine. E não confie. O Consórcio já quebrou pactos por menos.']],
+  setup: { seed: 6211, enemies: [{ race: 'vehnar', name: 'Fundição Kessari' }, { race: 'tessara', name: 'Ordem do Molde' }] },
+  objectives: [{ id: 'molde', text: 'Destruir o Núcleo da Ordem do Molde', test: c => c.enemyDead(1) }, { id: 'traicao', text: 'Sobreviver à traição (Núcleo de pé aos 9:00)', test: c => c.t >= 540 && !!c.myNucleo() },
+    { id: 'b-traidor', bonus: true, text: 'Destruir também o Núcleo do traidor', test: c => c.enemyDead(0) }, { id: 'b-palavra', bonus: true, final: true, text: 'Não quebrar nenhum pacto', test: c => c.me.stats.betrayals === 0 }],
+  events: [{ at: 3, do: c => S.enqueue(c.sim, { t: 'propose', p: c.en[0], to: 0 }) }, { at: 4, do: c => S.enqueue(c.sim, { t: 'respond', p: 0, to: c.en[0], accept: true }) },
+    { at: 330, do: () => {}, say: ['self', 2, 'Batedores viram o Consórcio juntando blindados na fronteira. Torres no flanco deles, agora.'] },
+    { at: 420, do: c => { if (S.hasPact(c.sim, 0, c.en[0])) S.enqueue(c.sim, { t: 'break', p: c.en[0], with: 0 }); c.wave('trai', W({ veiculo: 2, soldador: 3 }, 0)); }, say: ['vehnar', 2, 'Negócios, Comandante. Só negócios.'] }],
+  script: [{ at: 6, say: ['self', 1, 'Pacto ativo com a Fundição Kessari. Concentre o ataque na Ordem do Molde.'] }] });
+M.push({ id: 'a2m3', act: 'ato2', title: 'Escolta sob tempestade', place: 'Travessia do Éter', xp: 650, relic: 'ancora-de-mare',
+  brief: [['self', 1, 'A Arca de Dados precisa cruzar a Travessia até o ponto de extração. Ela é lenta e não atira.'], ['erevane', 1, 'Que bela carga. Seria uma pena se a tempestade a escondesse de vocês.']],
+  setup: { seed: 6317, enemies: [{ race: 'erevane', name: 'Corsários da Faixa', passive: true }] },
+  objectives: [{ id: 'chegar', text: 'Levar a Arca de Dados até o ponto de extração', test: c => c.st.vipArrived, progress: c => c.vip() ? Math.round(S.dist(c.vip().x, c.vip().y, c.st.ex, c.st.ey)) + ' de distância' : '—' },
+    { id: 'b-vida', bonus: true, final: true, text: 'Arca acima de 50% de vida', test: c => c.vip() && c.vip().hp >= c.vip().maxHp * 0.5 }, { id: 'b-rapido', bonus: true, final: true, text: 'Concluir em menos de 10 min', test: c => c.t < 600 }],
+  fail: c => c.st.vipId && !c.vip() && !c.st.vipArrived ? 'A Arca de Dados foi destruída.' : null,
+  events: [{ at: 1, do: c => c.spawnVip() }, { at: 90, do: c => c.stormOnRoute(0.35) }, { at: 120, do: c => c.ambush('e1', W({ lamina: 2, atirador: 3 }, 0), 0.4) }, { at: 230, do: c => c.stormOnRoute(0.65) }, { at: 260, do: c => c.ambush('e2', W({ lamina: 3, mosquito: 6 }, 0), 0.7) }, { at: 380, do: c => c.ambush('e3', W({ lamina: 3, atirador: 4, mosquito: 4 }, 0), 0.9) }],
+  tick: c => { const v = c.vip(); if (v && S.dist(v.x, v.y, c.st.ex, c.st.ey) < 110) c.st.vipArrived = true; },
+  script: [{ at: 3, say: ['self', 1, 'A Arca (anel dourado) está ao lado do Núcleo. Selecione-a e mande até o marcador de extração; leve escolta.'] }] });
+// Ato 3
+M.push({ id: 'a3m1', act: 'ato3', title: 'Primeiro contato', place: 'Cavernas de Quor', xp: 700,
+  brief: [['quorith', 1, 'Vocês fazem barulho. O Coro não suporta barulho.'], ['self', 2, 'Eles atacam em acorde: muitos juntos ficam fortes. Separe-os e derrube um de cada vez.']],
+  setup: { seed: 7103, enemies: [{ race: 'quorith', name: 'Acorde Sétimo' }] },
+  objectives: [{ id: 'resistir', text: 'Resistir aos acordes até 9:00', test: c => c.t >= 540 && !!c.myNucleo(), progress: c => 'faltam ' + c.mmss(Math.max(0, 540 - c.t)) }, { id: 'abates', text: 'Silenciar 30 unidades do Coro', test: c => c.killed() >= 30, progress: c => c.killed() + '/30' },
+    { id: 'b-nucleo', bonus: true, text: 'Destruir o Núcleo do Coro', test: c => c.enemyDead(0) }, { id: 'b-perdas', bonus: true, final: true, text: 'Perder menos de 15 unidades', test: c => c.me.stats.unitsLost < 15 }],
+  events: [150, 270, 390, 480].map((at, i) => ({ at, do: c => c.wave('ac' + i, W({ voz: 6 + i * 2, diapasao: 1, prisma: i >= 2 ? 2 : 0 }, 0)), say: i === 0 ? ['quorith', 2, 'Uníssono.'] : null })) });
+M.push({ id: 'a3m2', act: 'ato3', title: 'A Prole devora um aliado', place: 'Jardins de Oriel', xp: 750,
+  brief: [['tessara', 2, 'Os Carniceiros estão comendo nossos Nódulos vivos. Precisamos de vocês!'], ['self', 1, 'Pacto com a Linhagem Oriel. Mate os Carniceiros primeiro: são eles que devoram.']],
+  setup: { seed: 7211, enemies: [{ race: 'tessara', name: 'Linhagem Oriel', ally: true }, { race: 'vorag', name: 'Prole Velk' }] },
+  objectives: [{ id: 'aliado', text: 'Manter o Núcleo da Linhagem Oriel de pé até 10:00', test: c => c.t >= 600 && !c.enemyDead(0), progress: c => 'faltam ' + c.mmss(Math.max(0, 600 - c.t)) }, { id: 'carniceiros', text: 'Abater 6 Carniceiros', test: c => (c.kills.pirata || 0) >= 6, progress: c => (c.kills.pirata || 0) + '/6' },
+    { id: 'b-prole', bonus: true, text: 'Destruir o Núcleo da Prole', test: c => c.enemyDead(1) }, { id: 'b-nodulos', bonus: true, final: true, text: 'O aliado perder no máximo 2 Nódulos', test: c => (c.st.allyNodLost || 0) <= 2 }],
+  fail: c => c.enemyDead(0) && c.t < 600 ? 'A Linhagem Oriel foi devorada.' : null,
+  events: [{ at: 2, do: c => S.enqueue(c.sim, { t: 'propose', p: c.en[0], to: 0 }) }, { at: 3, do: c => S.enqueue(c.sim, { t: 'respond', p: 0, to: c.en[0], accept: true }) },
+    ...[120, 240, 360, 480].map((at, i) => ({ at, do: c => c.wave('pv' + i, W({ pirata: 2 + (i >> 1), cria: 6 + i * 2, cuspidor: 2 }, 1), { target: 'ally0' }) }))],
+  onDeath: (c, e) => { if (e.kind === 'building' && e.def === 'nodulo' && e.owner === c.en[0]) c.st.allyNodLost = (c.st.allyNodLost || 0) + 1; } });
+M.push({ id: 'a3m3', act: 'ato3', title: 'Aliança tripla instável', place: 'Fenda Menor', xp: 800,
+  brief: [['vehnar', 1, 'Três contra a Prole. Simples.'], ['quorith', 1, 'O Coro aceita. Por ora.'], ['self', 2, 'Dois pactos, dois punhais. Destrua a Prole antes que os aliados mudem de ideia.']],
+  setup: { seed: 7307, minutes: 30, enemies: [{ race: 'vehnar', name: 'Estaleiro Vey', ally: true }, { race: 'quorith', name: 'Silêncio de Quor', ally: true }, { race: 'vorag', name: 'Fome de Oru', hard: true }] },
+  objectives: [{ id: 'prole', text: 'Destruir o Núcleo da Prole', test: c => c.enemyDead(2) },
+    { id: 'b-pactos', bonus: true, text: 'Os dois pactos de pé até 8:00', test: c => c.t >= 480 && S.hasPact(c.sim, 0, c.en[0]) && S.hasPact(c.sim, 0, c.en[1]) }, { id: 'b-rep', bonus: true, final: true, text: 'Terminar sem quebrar pactos', test: c => c.me.stats.betrayals === 0 }],
+  events: [{ at: 2, do: c => { S.enqueue(c.sim, { t: 'propose', p: c.en[0], to: 0 }); S.enqueue(c.sim, { t: 'propose', p: c.en[1], to: 0 }); } }, { at: 3, do: c => { S.enqueue(c.sim, { t: 'respond', p: 0, to: c.en[0], accept: true }); S.enqueue(c.sim, { t: 'respond', p: 0, to: c.en[1], accept: true }); } },
+    { at: 480, do: () => {}, say: ['quorith', 1, 'O Estaleiro afina outra canção. Cuidado com o flanco do aço.'] },
+    { at: 540, do: c => { if (S.hasPact(c.sim, 0, c.en[0])) S.enqueue(c.sim, { t: 'break', p: c.en[0], with: 0 }); }, say: ['vehnar', 2, 'O Estaleiro tem outros planos.'] }] });
+// Ato 4
+M.push({ id: 'a4m1', act: 'ato4', title: 'Assalto à Catedral Errante', place: 'Planície do Uníssono', xp: 900,
+  brief: [['quorith', 3, 'A Catedral canta. Quem ouve, ajoelha.'], ['self', 2, 'Uma estrutura viva, armada e andando. Derrube a Catedral Errante e o Coro perde a voz.']],
+  setup: { seed: 8101, minutes: 30, enemies: [{ race: 'quorith', name: 'Coro de Zayin', hard: true }] },
+  objectives: [{ id: 'catedral', text: 'Destruir a Catedral Errante', test: c => c.st.bossSpawned && !c.boss(), progress: c => c.boss() ? c.n(c.boss().hp) + ' de vida' : '—' },
+    { id: 'b-rapido', bonus: true, final: true, text: 'Concluir em menos de 16 min', test: c => c.t < 960 }, { id: 'b-nucleo', bonus: true, final: true, text: 'Núcleo acima de 70% no fim', test: c => c.nucleoFrac() >= 0.7 }],
+  events: [{ at: 2, do: c => c.spawnBoss('catedral', 0) }],
+  tick: c => c.bossPatrol(0, 520) });
+M.push({ id: 'a4m2', act: 'ato4', title: 'Matriarca encurralada', place: 'Ninho de Velk', xp: 950,
+  brief: [['vorag', 3, 'Mãe. Mãe. Mãe.'], ['self', 2, 'A Matriarca choca Crias sem parar. Mate a mãe e o enxame desmonta.']],
+  setup: { seed: 8203, minutes: 30, enemies: [{ race: 'vorag', name: 'Prole Velk', hard: true }] },
+  objectives: [{ id: 'matriarca', text: 'Abater a Matriarca', test: c => c.st.bossSpawned && !c.boss(), progress: c => c.boss() ? c.n(c.boss().hp) + ' de vida' : '—' },
+    { id: 'b-crias', bonus: true, text: 'Abater 60 Crias', test: c => (c.kills.cria || 0) >= 60, progress: c => (c.kills.cria || 0) + '/60' }, { id: 'b-predios', bonus: true, final: true, text: 'Não perder nenhuma construção', test: c => c.me.stats.buildingsLost === 0 }],
+  events: [{ at: 2, do: c => c.spawnBoss('matriarca', 0) }],
+  tick: c => { c.bossPatrol(0, 420); const b = c.boss(); if (b && c.t > 60 && c.every(25)) for (let i = 0; i < Math.round(3 * c.D.wave); i++) { const u = S.spawnUnit(c.sim, b.owner, 'cria', b.x + (c.sim.rand() - 0.5) * 60, b.y + (c.sim.rand() - 0.5) * 60); if (u) { u.state = 'attackmove'; const t = c.myNucleo(); if (t) { u.tx = t.x; u.ty = t.y; } } } } });
+M.push({ id: 'a4m3', act: 'ato4', title: 'A Fenda aberta', place: 'O Coração da Fenda', xp: 1100,
+  brief: [['self', 1, 'Cinco Raças, uma vaga. A Maré decide hoje quem dita o que a Fenda cospe.'], ['vorag', 2, 'Fome.'], ['quorith', 1, 'Silêncio.'], ['self', 3, 'Domínio.']],
+  setup: { seed: 8311, minutes: 25, enemies: [{ race: 'others', name: 'auto' }, { race: 'others', name: 'auto' }, { race: 'others', name: 'auto' }] },
+  objectives: [{ id: 'dominio', text: 'Vencer: último Núcleo de pé ou maior Domínio aos 25:00', test: c => c.st.matchWon },
+    { id: 'b-nucleos', bonus: true, text: 'Destruir 2 Núcleos', test: c => c.me.stats.buildingsDestroyed >= 2 && c.enemiesDead() >= 2 }, { id: 'b-nodulos', bonus: true, final: true, text: 'Terminar com 3 Nódulos', test: c => c.built('nodulo') >= 3 }] });
+// Missões de Identidade (uma por Raça; jogadas com a própria Raça)
+M.push({ id: 'i-vehnar', act: 'identidade', race: 'vehnar', title: 'Produção sob sabotagem', place: 'Fundição Kessari', xp: 700,
+  brief: [['vehnar', 2, 'Sifonadores nos Reatores a cada minuto. Isso é sabotagem, e sabotagem tem preço.'], ['vehnar', 3, 'Linhas de Montagem cheias. Vinte e cinco unidades de combate antes do turno acabar.']],
+  setup: { seed: 9101, enemies: [{ race: 'erevane', name: 'Náufragos de Ísk', passive: true }] },
+  objectives: [{ id: 'producao', text: 'Produzir 25 unidades de combate em 12 min', test: c => c.st.produced >= 25 && c.t <= 720, progress: c => (c.st.produced || 0) + '/25' }],
+  bonus2: true, extraObjectives: [{ id: 'b-roubo', bonus: true, final: true, text: 'Perder menos de 400 para roubo', test: c => c.me.stats.lost < 400 }, { id: 'b-fabricas', bonus: true, text: 'Ter 6 estruturas de produção', test: c => c.built('quartel') + c.built('fabrica') + c.built('hangar') >= 6 }],
+  fail: c => c.t > 720 && !(c.st.produced >= 25) ? 'O turno acabou antes da meta de produção.' : null,
+  events: [60, 120, 180, 240, 300, 360, 420, 480, 540, 600].map(at => ({ at, do: c => c.raid('sab' + at, 0) })) });
+M.push({ id: 'i-erevane', act: 'identidade', race: 'erevane', title: 'Só furtividade', place: 'Arquipélago de Ísk', xp: 700,
+  brief: [['erevane', 1, 'Sem exército. Sem barulho. Só mãos leves e um bom esconderijo.'], ['erevane', 3, 'Mil e quinhentos em recursos roubados e nenhum blindado nosso no mapa.']],
+  setup: { seed: 9203, enemies: [{ race: 'vehnar', name: 'Consórcio Oryn' }] },
+  objectives: [{ id: 'roubo', text: 'Roubar 1500 em recursos', test: c => c.me.stats.stolen >= 1500, progress: c => c.n(c.me.stats.stolen) + '/1500' }],
+  extraObjectives: [{ id: 'b-piratas', bonus: true, final: true, text: 'Não perder nenhum Sifonador', test: c => (c.lost.pirata || 0) === 0 }, { id: 'b-rapido', bonus: true, final: true, text: 'Concluir em menos de 12 min', test: c => c.t < 720 }],
+  fail: c => c.st.army ? 'Você colocou um exército no mapa. A furtividade acabou.' : null,
+  onSpawn: (c, ev) => { if (ev.p === 0 && ['veiculo', 'lamina', 'drone', 'mosquito', 'infantaria'].includes(ev.def)) c.st.army = true; } });
+M.push({ id: 'i-tessara', act: 'identidade', race: 'tessara', title: 'Nascer na noite', place: 'Estufas de Oriel', xp: 700, startTime: 330,
+  brief: [['tessara', 2, 'Começamos no escuro: sem sol, a Fotossíntese do Núcleo rende pouco.'], ['tessara', 1, 'Adapte-se. Ganhe Traços. Quando o dia chegar, floresça e vença.']],
+  setup: { seed: 9307, enemies: [{ race: 'rival', name: 'Clã Sombrio' }] },
+  objectives: [{ id: 'vencer', text: 'Destruir o Núcleo inimigo', test: c => c.enemyDead(0) }],
+  extraObjectives: [{ id: 'b-tracos', bonus: true, text: 'Conquistar 3 Traços', test: c => Object.values(c.me.traits).reduce((a, t) => a + Object.keys(t).length, 0) >= 3 }, { id: 'b-rapido', bonus: true, final: true, text: 'Vencer antes das 20:00', test: c => c.sim.time < 1200 }] });
+M.push({ id: 'i-quorith', act: 'identidade', race: 'quorith', title: 'Nenhuma voz sozinha', place: 'Catedral Partida', xp: 700,
+  brief: [['quorith', 1, 'Uma voz isolada é quase silêncio. O Coro só vence em acorde.'], ['quorith', 3, 'Destrua o inimigo sem deixar nenhuma voz sozinha no campo.']],
+  setup: { seed: 9409, enemies: [{ race: 'rival', name: 'Prole Velk' }] },
+  objectives: [{ id: 'vencer', text: 'Destruir o Núcleo inimigo', test: c => c.enemyDead(0) }],
+  extraObjectives: [{ id: 'b-acorde', bonus: true, final: true, text: 'Nunca deixar uma unidade de combate isolada por 15 s', test: c => !c.st.isolated }, { id: 'b-unissono', bonus: true, text: 'Usar o Uníssono', test: c => c.me.unissonoT > 0 || c.st.usedSuper }],
+  tick: c => { if (!c.every(1)) return; c.st.iso = c.st.iso || {}; for (const e of c.sim.ents) { if (!e.alive || e.kind !== 'unit' || e.owner !== 0 || e.cls === 'civ' || e.def === 'pirata' || !S.UNITS[e.def].attack) continue; const n = c.myNucleo(); if (n && S.dist(e.x, e.y, n.x, n.y) < 420) { c.st.iso[e.id] = 0; continue; } c.st.iso[e.id] = e.elo > 0 ? 0 : (c.st.iso[e.id] || 0) + 1; if (c.st.iso[e.id] >= 15) c.st.isolated = true; } } });
+M.push({ id: 'i-vorag', act: 'identidade', race: 'vorag', title: 'A fome que floresce', place: 'Campo de Carcaças', xp: 700,
+  brief: [['vorag', 2, 'Carcaças por toda parte. Nódulos gordos do outro lado.'], ['vorag', 3, 'Devorar. Dois mil de biomassa antes de a Maré virar.']],
+  setup: { seed: 9511, enemies: [{ race: 'rival', name: 'Ordem do Molde' }] },
+  objectives: [{ id: 'biomassa', text: 'Devorar 2000 de biomassa com Carniceiros em 14 min', test: c => c.devoured() >= 2000 && c.t <= 840, progress: c => c.n(c.devoured()) + '/2000' }],
+  extraObjectives: [{ id: 'b-nodulos', bonus: true, text: 'Destruir 2 Nódulos inimigos', test: c => (c.kills.nodulo || 0) >= 2 }, { id: 'b-eclosao', bonus: true, text: 'Usar a Eclosão', test: c => c.st.usedSuper }],
+  fail: c => c.t > 840 && c.devoured() < 2000 ? 'A Maré virou antes da colheita.' : null,
+  events: [{ at: 1, do: c => c.scatterWrecks(14) }] });
+for (const m of M) if (m.extraObjectives) m.objectives = m.objectives.concat(m.extraObjectives);
+const BY_ID = Object.fromEntries(M.map(m => [m.id, m]));
+
+// ---------- preparação ----------
+function rivalOf(race, i) { const others = RACES.filter(r => r !== race); return others[i % others.length]; }
+function prepare(id, o) {
+  const m = BY_ID[id]; if (!m) throw new Error('missão desconhecida ' + id);
+  const diff = DIFF[o.difficulty] || DIFF.normal; const race = m.race || o.race || 'vehnar'; let oi = 0;
+  const mods = {}; for (const rid of (o.relics || []).filter(Boolean)) { const r = RELICS.find(x => x.id === rid); if (!r) continue; for (const k in r.mods) { const v = r.mods[k]; if (k === 'startRes') { mods.startRes = mods.startRes || {}; for (const kk in v) mods.startRes[kk] = (mods.startRes[kk] || 0) + v[kk]; } else if (k === 'extraJumps' || k === 'regen') mods[k] = (mods[k] || 0) + v; else mods[k] = (mods[k] || 1) * v; } }
+  const used = new Set([race]); const AI_NAMES = { vehnar: ['Fundição Kessari', 'Consórcio Oryn', 'Estaleiro Vey'], erevane: ['Clã Sombrio', 'Náufragos de Ísk', 'Corsários da Faixa'], tessara: ['Linhagem Oriel', 'Ordem do Molde', 'Enxerto Vassi'], quorith: ['Coro de Zayin', 'Acorde Sétimo', 'Silêncio de Quor'], vorag: ['Prole Velk', 'Ninhada Cega', 'Fome de Oru'] };
+  const players = [{ name: o.name || 'Comandante', faction: race, human: true, color: o.color || undefined, mods: Object.keys(mods).length ? mods : undefined }];
+  for (const e of m.setup.enemies) { let r = e.race; if (r === 'rival') r = rivalOf(race, oi++); else if (r === 'others') { r = RACES.find(x => !used.has(x)) || rivalOf(race, oi++); } else if (r === race && !m.race) r = rivalOf(race, oi++); used.add(r);
+    const step = { facil: 'facil', normal: 'normal', dificil: 'dificil', fenda: 'dificil' }; // inimigos 'hard' seguem a dificuldade escolhida (o chefe já pesa)
+    players.push({ name: e.name === 'auto' ? AI_NAMES[r][players.length % 3] : e.name, faction: r, difficulty: e.hard ? step[o.difficulty || 'normal'] : diff.ai, passive: !!e.passive, ally: !!e.ally }); }
+  { const hostile = players.slice(1).filter(p => !p.passive).length; if (hostile >= 2) { const bonus = { facil: [700, 350], normal: [300, 150], dificil: [0, 0], fenda: [0, 0] }[o.difficulty || 'normal'] || [0, 0]; if (bonus[0]) { const m0 = players[0].mods = players[0].mods || {}; m0.startRes = Object.assign({}, m0.startRes); m0.startRes.minerio = (m0.startRes.minerio || 0) + bonus[0]; m0.startRes.plasma = (m0.startRes.plasma || 0) + bonus[1]; } } } // missões com vários inimigos ativos: reforço inicial no Fácil e no Normal
+  if (players[0].color) for (let i = 1; i < players.length; i++) if (S.PLAYER_COLORS[i % 4] && S.PLAYER_COLORS[i % 4].toLowerCase() === players[0].color.toLowerCase()) players[0].color = undefined; // cor repetida volta à padrão
+  return { mission: m, diff, difficulty: o.difficulty || 'normal', race, cfg: { seed: m.setup.seed, players, minutes: (m.setup.minutes || 25) + (m.startTime ? Math.ceil(m.startTime / 60) : 0) } };
+}
+
+// ---------- executor ----------
+function start(sim, prep) {
+  const m = prep.mission, D = prep.diff; const me = sim.players[0]; const en = sim.players.slice(1).map(p => p.id);
+  if (m.startTime) { sim.time = m.startTime; sim.tick = Math.round(m.startTime / S.TICK); sim.nextStorm += m.startTime; }
+  const t0 = sim.time; const said = []; const objectives = m.objectives.map(o => ({ id: o.id, text: o.text, bonus: !!o.bonus, final: !!o.final, done: false, progress: '' }));
+  const c = { sim, me, en, D, st: { waves: 0, crates: 0, produced: 0 }, kills: {}, lost: {}, t: 0, waveIds: {}, holds: {}, lastEvery: {} };
+  const ob = id => objectives.find(o => o.id === id);
+  Object.assign(c, {
+    n: v => Math.round(v).toLocaleString('pt-BR'), mmss: s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0'),
+    built: (def, pid) => { let k = 0; for (const e of sim.ents) if (e.alive && e.kind === 'building' && e.owner === (pid || 0) && e.def === def && e.built) k++; return k; },
+    units: (def, pid) => { let k = 0; for (const e of sim.ents) if (e.alive && e.kind === 'unit' && e.owner === (pid || 0) && e.def === def) k++; return k; },
+    done: id => !!(ob(id) && ob(id).done), myNucleo: () => S.nucleoOf(sim, 0), enemyDead: i => !sim.players[en[i]].alive || !S.nucleoOf(sim, en[i]),
+    enemiesDead: () => en.filter(id => !sim.players[id].alive).length, nucleoFrac: () => { const n = S.nucleoOf(sim, 0); return n ? n.hp / n.maxHp : 0; },
+    killed: () => Object.values(c.kills).reduce((a, b) => a + b, 0), devoured: () => c.st.devoured || 0,
+    hold: (key, cond, sec) => { c.holds[key] = cond ? (c.holds[key] || 0) + 0.5 : 0; return c.holds[key] >= sec; }, held: key => c.holds[key] || 0,
+    every: sec => { const k = Math.floor(sim.time / sec); if (c.lastEvery[sec] === k) return false; c.lastEvery[sec] = k; return true; },
+    say: (who, mood, text) => { const race = who === 'self' ? me.faction : who === 'enemy' ? sim.players[en.find(i => !sim.players[i].ally) ?? en[0]].faction : who === 'ally' ? sim.players[en.find(i => sim.players[i].ally) ?? en[0]].faction : who; said.push({ race, mood, text, t: sim.time }); },
+    waveAlive: tag => { let k = 0; for (const [id, tg] of Object.entries(c.waveIds)) { if (tag && tg !== tag) continue; const e = sim.byId.get(+id); if (e && e.alive) k++; } return k; },
+    targetFor: opt => { if (opt && opt.target === 'ally0') { const n = S.nucleoOf(sim, en[0]); if (n) return n; } return S.nucleoOf(sim, 0) || { x: S.CX, y: S.CY }; },
+    spawnPoint: fromIdx => { const n = S.nucleoOf(sim, en[fromIdx]); const t = S.nucleoOf(sim, 0) || { x: S.CX, y: S.CY }; if (n) { const a = S.DM.atan2(t.y - n.y, t.x - n.x); return { x: n.x + S.DM.cos(a) * 160, y: n.y + S.DM.sin(a) * 160 }; } const a = sim.players[en[fromIdx]].startAngle; return { x: S.CX + S.DM.cos(a) * 1300, y: S.CY + S.DM.sin(a) * 1300 }; },
+    wave: (tag, w, extra) => { const owner = en[w.from || 0]; if (!sim.players[owner] || !sim.players[owner].alive) return; const sp = c.spawnPoint(w.from || 0); const tgt = c.targetFor(Object.assign({}, w, extra)); const ids = [];
+      for (const def in w.comp) { const n = Math.round(w.comp[def] * D.wave); for (let i = 0; i < n; i++) { const u = S.spawnUnit(sim, owner, def, sp.x + (sim.rand() - 0.5) * 120, sp.y + (sim.rand() - 0.5) * 120); if (u) { ids.push(u.id); c.waveIds[u.id] = tag; } } }
+      if (ids.length) S.enqueue(sim, { t: 'attackmove', p: owner, ids, x: tgt.x, y: tgt.y }); },
+    convoy: () => { const owner = en[0]; if (!sim.players[owner].alive) return; const a = me.startAngle + Math.PI / 2; const ax = S.CX + S.DM.cos(a) * 1450, ay = S.CY + S.DM.sin(a) * 1450, bx = S.CX - S.DM.cos(a) * 1450, by = S.CY - S.DM.sin(a) * 1450; const ids = [], esc = [];
+      for (let i = 0; i < 2; i++) { const u = S.spawnUnit(sim, owner, 'pirata', ax + i * 30, ay); if (u) { u.cargo.minerio = 250; u.cargoTotal = 250; u.convoy = { x: bx, y: by }; ids.push(u.id); } }
+      for (let i = 0; i < Math.round(2 * D.wave); i++) { const u = S.spawnUnit(sim, owner, 'infantaria', ax - 30 - i * 20, ay + 20); if (u) esc.push(u.id); }
+      S.enqueue(sim, { t: 'move', p: owner, ids, x: bx, y: by }); if (esc.length) S.enqueue(sim, { t: 'attackmove', p: owner, ids: esc, x: bx, y: by }); },
+    raid: (tag, from) => { const owner = en[from]; if (!sim.players[owner].alive) return; const sp = c.spawnPoint(from); let best = null, bd = 1e9; for (const e of sim.ents) if (e.alive && e.kind === 'building' && e.owner === 0 && (e.def === 'reator' || e.def === 'refinaria')) { const d = S.dist(e.x, e.y, sp.x, sp.y); if (d < bd) { bd = d; best = e; } } if (!best) return; const ids = []; for (let i = 0; i < Math.round(2 * D.wave); i++) { const u = S.spawnUnit(sim, owner, 'pirata', sp.x + i * 20, sp.y); if (u) ids.push(u.id); } if (ids.length) S.enqueue(sim, { t: 'siphon', p: owner, ids, target: best.id }); },
+    vip: () => { const e = c.st.vipId && sim.byId.get(c.st.vipId); return e && e.alive ? e : null; },
+    spawnVip: () => { const n = S.nucleoOf(sim, 0); if (!n) return; const u = S.spawnUnit(sim, 0, 'veiculo', n.x + 70, n.y + 40); if (!u) return; u.maxHp = u.hp = Math.round(2600 / Math.max(0.8, D.wave)); u.vip = true; u.speed = 62; c.st.vipId = u.id; const a = me.startAngle + Math.PI * 0.75; c.st.ex = S.CX + S.DM.cos(a) * 1250; c.st.ey = S.CY + S.DM.sin(a) * 1250; c.st.sx = n.x; c.st.sy = n.y; c.marker = { x: c.st.ex, y: c.st.ey }; },
+    routePoint: f => ({ x: c.st.sx + (c.st.ex - c.st.sx) * f, y: c.st.sy + (c.st.ey - c.st.sy) * f }),
+    stormOnRoute: f => { const p = c.routePoint(f); S.forceStorm(sim, p.x, p.y, 15, 80, 360); },
+    ambush: (tag, w, f) => { const owner = en[w.from || 0]; const p = c.routePoint(f); const ids = []; for (const def in w.comp) for (let i = 0; i < Math.round(w.comp[def] * D.wave); i++) { const u = S.spawnUnit(sim, owner, def, p.x + 260 + (sim.rand() - 0.5) * 140, p.y + (sim.rand() - 0.5) * 220); if (u) { ids.push(u.id); c.waveIds[u.id] = tag; } } const v = c.vip(); if (ids.length) S.enqueue(sim, { t: 'attackmove', p: owner, ids, x: v ? v.x : p.x, y: v ? v.y : p.y }); },
+    boss: () => { const e = c.st.bossId && sim.byId.get(c.st.bossId); return e && e.alive ? e : null; },
+    spawnBoss: (def, from) => { const n = S.nucleoOf(sim, en[from]); if (!n) return; const u = S.spawnUnit(sim, en[from], def, n.x + 140, n.y + 60); if (u) { u.maxHp = u.hp = Math.round(u.maxHp * Math.min(1.4, Math.max(0.75, D.wave))); u.scripted = true; c.st.bossId = u.id; c.st.bossSpawned = true; c.st.bossHome = { x: n.x, y: n.y }; } },
+    bossPatrol: (from, R) => { const b = c.boss(); if (!b || !c.every(12)) return; if (b.state === 'attack') return; const h = c.st.bossHome; const a = sim.rand() * Math.PI * 2; S.enqueue(sim, { t: 'attackmove', p: b.owner, ids: [b.id], x: h.x + S.DM.cos(a) * R, y: h.y + S.DM.sin(a) * R }); },
+    scatterWrecks: n => { for (let i = 0; i < n; i++) { const a = sim.rand() * Math.PI * 2, r = 300 + sim.rand() * 900; const x = S.CX + S.DM.cos(a) * r, y = S.CY + S.DM.sin(a) * r; const wr = { id: sim.nextId++, kind: 'wreck', x, y, r: 12, ang: a, alive: true, owner: -1, res: 'minerio', amount: 160, max: 160, bornT: sim.time + 600, def: 'veiculo' }; sim.ents.push(wr); sim.byId.set(wr.id, wr); } },
+  });
+  const fired = new Set(); let result = null; let lastEval = -1;
+  function evalObjectives(final) {
+    let changed = false; for (const o of objectives) { const def = m.objectives.find(x => x.id === o.id); if (def.progress) { try { o.progress = def.progress(c); } catch (e) {} }
+      if (o.done || (def.final && !final)) continue; let ok = false; try { ok = !!def.test(c); } catch (e) { ok = false; } if (ok) { o.done = true; changed = true; if (!o.bonus && !final) c.say('self', 3, 'Objetivo concluído: ' + o.text + '.'); } }
+    return changed;
+  }
+  const runner = {
+    mission: m, objectives, said, ctx: c, get result() { return result; }, marker: () => c.marker || null, vipId: () => c.st.vipId || null,
+    brief() { const out = []; for (const [who, mood, text] of m.brief) { c.say(who, mood, text); } const s = said.splice(0); return s; },
+    tick(events) {
+      if (result) return; c.t = sim.time - t0;
+      for (const ev of events) {
+        if (ev.t === 'death') { if (ev.owner !== 0 && ev.owner >= 0 && (ev.kind === 'unit' || ev.kind === 'building')) c.kills[ev.def] = (c.kills[ev.def] || 0) + 1; if (ev.owner === 0) c.lost[ev.def] = (c.lost[ev.def] || 0) + 1; if (m.onDeath) m.onDeath(c, ev); }
+        else if (ev.t === 'float' && ev.owner === 0 && typeof ev.text === 'string' && ev.text.startsWith('CAIXA')) c.st.crates++;
+        else if (ev.t === 'spawn' && ev.p === 0) { const ud = S.UNITS[ev.def]; if (ud && ud.attack) c.st.produced++; if (m.onSpawn) m.onSpawn(c, ev); }
+        else if (ev.t === 'super' && ev.p === 0) c.st.usedSuper = true;
+      }
+      // comboios que chegaram ao destino saem do mapa (contam como fuga)
+      for (const e of sim.ents) if (e.alive && e.convoy && S.dist(e.x, e.y, e.convoy.x, e.convoy.y) < 120) { e.alive = false; e.cargoTotal = 0; c.st.escaped = (c.st.escaped || 0) + 1; }
+      { let dv = 0; for (const e of sim.ents) if (e.kind === 'unit' && e.owner === 0 && e.devoured) dv += e.devoured; c.st.devouredLive = dv; c.st.devoured = Math.max(c.st.devoured || 0, (c.st.devouredBank || 0) + dv); }
+      for (const ev of events) if (ev.t === 'death' && ev.owner === 0 && ev.def === 'pirata') c.st.devouredBank = c.st.devoured; // carniceiro morto: guarda o que já tinha devorado
+      if (m.tick) { try { m.tick(c); } catch (err) { console.warn('[ARD] roteiro ' + m.id + ': ' + err.message); } }
+      if (D.storms && !sim.storm && c.every(240)) { const n = S.nucleoOf(sim, 0); if (n) S.forceStorm(sim, (n.x + S.CX) / 2, (n.y + S.CY) / 2, 25, 80); }
+      (m.events || []).forEach((ev, i) => { if (fired.has('e' + i) || c.t < ev.at) return; fired.add('e' + i); try { ev.do(c); } catch (err) { console.warn('[ARD] evento ' + m.id + '#' + i + ': ' + err.message); } if (ev.say) c.say(...ev.say); });
+      (m.script || []).forEach((sc, i) => { if (fired.has('s' + i)) return; let go = false; try { go = sc.at != null ? c.t >= sc.at : !!sc.when(c); } catch (e) {} if (go) { fired.add('s' + i); if (sc.say) c.say(...sc.say); } });
+      if (sim.tick % 5 === 0 && sim.time !== lastEval) { lastEval = sim.time; evalObjectives(false); }
+      // fim: vitória quando todos os principais estão feitos; derrota com o Núcleo perdido ou falha do roteiro
+      let fail = null; try { fail = m.fail ? m.fail(c) : null; } catch (e) {}
+      if (!S.nucleoOf(sim, 0) || !me.alive) fail = 'Seu Núcleo foi destruído.';
+      if (sim.result && sim.result.outcome !== 'victory' && m.id === 'a4m3') { const top = sim.result.scores ? sim.result.scores.slice().sort((a, b) => b.score - a.score)[0] : null; if (top && top.id === 0 && me.alive) c.st.matchWon = true; else fail = fail || 'Outra Raça ficou com o Domínio.'; }
+      if (sim.result && sim.result.outcome === 'victory') c.st.matchWon = true;
+      if (fail) { result = { won: false, reason: fail, stars: 0, time: c.t }; return; }
+      const allEnemiesDown = sim.result && sim.result.outcome === 'victory'; // todos os inimigos caíram: a missão está ganha mesmo sem os objetivos de etapa
+      if (allEnemiesDown || objectives.filter(o => !o.bonus).every(o => o.done)) { evalObjectives(true); if (allEnemiesDown) for (const o of objectives) if (!o.bonus) o.done = true; const bonus = objectives.filter(o => o.bonus && o.done).length; result = { won: true, reason: 'Missão cumprida: ' + m.title + '.', stars: Math.min(3, 1 + bonus), time: c.t }; }
+      else if (sim.result && !result) result = { won: false, reason: sim.result.reason || 'O tempo acabou.', stars: 0, time: c.t };
+    },
+    takeSaid() { return said.splice(0); },
+  };
+  return runner;
+}
+function missionsOfAct(act) { return M.filter(m => m.act === act); }
+function unlocked(id, prog) { const i = M.findIndex(m => m.id === id); if (i < 0) return false; const m = M[i]; if (m.act === 'identidade') return !!(prog.missions.p3 && prog.missions.p3.done); if (i === 0) return true; let k = i - 1; while (k >= 0 && M[k].act === 'identidade') k--; return k < 0 || !!(prog.missions[M[k].id] && prog.missions[M[k].id].done); }
+function xpFor(m, diffKey, stars, won) { const d = DIFF[diffKey] || DIFF.normal; return won ? Math.round((m.xp + 100 * stars) * d.xp) : Math.round(m.xp * 0.15); }
+ARD.campaign = { ACTS, DIFF, RELICS, RELIC_BY_LEVEL, ACHIEVEMENTS, TITLES, MISSIONS: M, BY_ID, prepare, start, missionsOfAct, unlocked, xpFor, rivalOf };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Aether Rift: Dominion — interface da campanha e do progresso (4.0e): tela "O Ciclo da Maré" (Comandante, atos, relíquias,
+   conquistas, backup), briefing com os líderes, HUD de missão (objetivos e transmissões), Hangar com visualizador 3D,
+   rastreio de conquistas em qualquer partida e o fechamento com XP, estrelas e desbloqueios no ProgressStore. */
+(function (ARD) {
+'use strict';
+const S = ARD.sim, C = ARD.campaign, P = ARD.progress; const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'];
+const COLORS = ['#FF8C1A', '#F2C230', '#FF4F6E', '#E8ECF2', '#4F8BFF', '#38D1E0', '#B98BFF', '#7FE3A1'];
+const SKINS = [{ n: 'Padrão', lv: 1 }, { n: 'Fortaleza', lv: 10 }, { n: 'Santuário', lv: 20 }];
+let D = null; // dependências de main.js: { $, leaderArt, LEADER_NAME, RACE_COLORS, LEADER_FACE, startGame, loadPrefs, savePrefs, selectedRace }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const stars = n => '<span class="stars">' + [0, 1, 2].map(i => i < n ? '★' : '<span class="off">★</span>').join('') + '</span>';
+function raceName(r) { return (S.FACTIONS[r] || {}).name || r; }
+function totalStars() { const s = P.load(); return Object.values(s.missions).reduce((a, m) => a + (m.stars || 0), 0); }
+function titleOf() { const h = P.load().hangar; return h.title || ''; }
+function refreshMini() { const el = D.$('cmdr-mini'); if (!el) return; const li = P.levelInfo(); const s = P.load(); el.textContent = 'Comandante nível ' + li.level + ' · ' + li.xp.toLocaleString('pt-BR') + ' XP · ' + totalStars() + ' ★ na campanha' + (titleOf() ? ' · "' + titleOf() + '"' : '') + (s.relics.equipped.some(Boolean) ? ' · relíquias: ' + s.relics.equipped.filter(Boolean).map(id => (C.RELICS.find(r => r.id === id) || {}).name).join(', ') : ''); }
+
+// ---------- tela da campanha ----------
+function openCampaign() {
+  const $ = D.$; const s = P.load(); const li = P.levelInfo(); const race = D.selectedRace();
+  const nm = ($('opt-name') && $('opt-name').value.trim()) || s.commander.name || 'Comandante'; if (nm !== s.commander.name) P.setName(nm);
+  $('cmdr-img').src = D.leaderArt(race, D.LEADER_FACE[race]) || ''; $('cmdr-name').textContent = nm; $('cmdr-title').textContent = titleOf() ? '"' + titleOf() + '"' : ''; $('cmdr-lvn').textContent = 'Nv ' + li.level;
+  $('cmdr-xp').style.width = (li.max ? 100 : Math.round(100 * li.into / li.need)) + '%'; $('cmdr-lv').textContent = li.max ? 'Nível máximo · ' + li.xp.toLocaleString('pt-BR') + ' XP' : li.into + ' / ' + li.need + ' XP para o nível ' + (li.level + 1) + ' · ' + totalStars() + ' ★';
+  let h = ''; for (const act of C.ACTS) { h += `<div class="act"><h3>${esc(act.name)}</h3><div class="mlist">`;
+    for (const m of C.missionsOfAct(act.id)) { const pr = s.missions[m.id] || {}; const ok = C.unlocked(m.id, s); h += `<button class="mcard" data-mission="${m.id}" ${ok ? '' : 'disabled title="Conclua a missão anterior"'}><b>${esc(m.title)}</b><span class="pl">${esc(m.place)}${m.race ? ' · só ' + esc(raceName(m.race)) : ''}</span>${stars(pr.stars || 0)}</button>`; }
+    h += '</div></div>'; }
+  $('camp-acts').innerHTML = h; $('camp-acts').querySelectorAll('[data-mission]').forEach(b => b.addEventListener('click', () => { $('campaign').hidden = true; openBriefing(b.dataset.mission); }));
+  renderRelics(); renderAchievements(); $('campaign').hidden = false;
+}
+function renderRelics() { const $ = D.$; const s = P.load(); let h = '';
+  for (const r of C.RELICS) { const own = s.relics.owned.includes(r.id); const on = s.relics.equipped.includes(r.id); const how = Object.entries(C.RELIC_BY_LEVEL).find(([, id]) => id === r.id); const src = how ? 'nível ' + how[0] : 'missão ' + ((C.MISSIONS.find(m => m.relic === r.id) || {}).title || '');
+    h += `<div class="relic ${own ? '' : 'locked'} ${on ? 'on' : ''}"><b>${esc(r.name)}</b><span class="small">${esc(r.desc)}</span>${own ? `<button class="chip2 ${on ? 'on' : ''}" data-relic="${r.id}">${on ? 'Equipada · tirar' : 'Equipar'}</button>` : `<span class="small muted">Desbloqueia: ${esc(src)}</span>`}</div>`; }
+  $('camp-relics').innerHTML = h; $('camp-relics').querySelectorAll('[data-relic]').forEach(b => b.addEventListener('click', () => { const id = b.dataset.relic; const eq = P.load().relics.equipped; const i = eq.indexOf(id); if (i >= 0) P.equipRelic(i, null); else P.equipRelic(eq[0] ? (eq[1] ? 0 : 1) : 0, id); renderRelics(); refreshMini(); })); }
+function renderAchievements() { const $ = D.$; const s = P.load(); $('camp-ach').innerHTML = C.ACHIEVEMENTS.map(a => `<div class="ach ${s.achievements[a.id] ? '' : 'locked'}"><b>${s.achievements[a.id] ? '🏅 ' : ''}${esc(a.name)}</b><span class="small">${esc(a.desc)}</span></div>`).join(''); }
+
+// ---------- briefing ----------
+let brMission = null;
+function openBriefing(id, opts) {
+  const $ = D.$; const m = C.BY_ID[id]; if (!m) return; brMission = id; const s = P.load(); opts = opts || {};
+  const raceSel = $('br-race'); raceSel.innerHTML = RACES.map(r => `<option value="${r}">${esc(raceName(r))}</option>`).join(''); raceSel.value = m.race || opts.race || D.selectedRace(); raceSel.disabled = !!m.race;
+  const pr = s.missions[id] || {}; $('br-diff').value = opts.diff || pr.lastDifficulty || 'normal';
+  const draw = () => { const race = raceSel.value; const prep = C.prepare(id, { race, difficulty: $('br-diff').value }); const who = w => w === 'self' ? race : w === 'enemy' ? prep.cfg.players.find((p, i) => i > 0 && !p.ally).faction : w === 'ally' ? (prep.cfg.players.find((p, i) => i > 0 && p.ally) || prep.cfg.players[1]).faction : w;
+    $('br-act').textContent = (C.ACTS.find(a => a.id === m.act) || {}).name || ''; $('br-title').textContent = m.title; $('br-place').textContent = m.place + ' · adversários: ' + prep.cfg.players.slice(1).map(p => p.name + ' (' + raceName(p.faction) + (p.ally ? ', aliado' : '') + ')').join(', ');
+    $('br-dialog').innerHTML = m.brief.map(([w, mood, text]) => { const r = who(w); const art = D.leaderArt(r, mood); return `<div class="brl">${art ? `<img src="${art}" alt="">` : ''}<div><div class="nm">${esc(D.LEADER_NAME[r] || raceName(r))} · ${esc(raceName(r))}</div><div>${esc(text)}</div></div></div>`; }).join('');
+    $('br-obj').innerHTML = m.objectives.map(o => `<li class="${o.bonus ? 'bn' : ''}">${o.bonus ? '★ Bônus: ' : ''}${esc(o.text.replace(/^Bônus: /, ''))}</li>`).join('');
+    const eq = P.load().relics.equipped.filter(Boolean).map(rid => (C.RELICS.find(r => r.id === rid) || {}).name); $('br-relics').textContent = (eq.length ? 'Relíquias equipadas: ' + eq.join(', ') + '. ' : 'Nenhuma relíquia equipada. ') + (m.relic && !P.load().relics.owned.includes(m.relic) ? 'Recompensa: relíquia ' + (C.RELICS.find(r => r.id === m.relic) || {}).name + '. ' : '') + 'Melhor resultado: ' + ((pr.stars || 0) ? (pr.stars + ' ★') : 'ainda não concluída') + '.'; };
+  raceSel.onchange = draw; $('br-diff').onchange = draw; draw();
+  $('br-start').onclick = () => { const race = raceSel.value, diff = $('br-diff').value; const hg = P.load().hangar; const prep = C.prepare(id, { race, difficulty: diff, relics: P.load().relics.equipped, name: ($('opt-name').value.trim() || P.load().commander.name || 'Comandante').slice(0, 18), color: hg.color });
+    $('briefing').hidden = true; D.startGame({ name: prep.cfg.players[0].name, faction: race, seed: prep.cfg.seed, minutes: prep.cfg.minutes, players: prep.cfg.players, campaign: prep, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }); };
+  $('briefing').hidden = false;
+}
+
+// ---------- Hangar ----------
+let hg = null;
+function openHangar() {
+  const $ = D.$; const s = P.load(); const li = P.levelInfo(); const st = { race: D.selectedRace(), color: s.hangar.color || COLORS[0], skin: Object.assign({}, s.hangar.skin), portrait: Object.assign({}, s.hangar.portrait), title: s.hangar.title || '' };
+  $('hg-race').innerHTML = RACES.map(r => `<option value="${r}">${esc(raceName(r))}</option>`).join(''); $('hg-race').value = st.race;
+  const titles = [''].concat(Object.keys(s.achievements).map(id => C.TITLES[id]).filter(Boolean)); $('hg-title').innerHTML = titles.map(t => `<option value="${esc(t)}">${t ? esc(t) : '— sem título —'}</option>`).join(''); $('hg-title').value = titles.includes(st.title) ? st.title : '';
+  const draw = () => { $('hg-colors').innerHTML = COLORS.map(c => `<button class="swatch ${c === st.color ? 'on' : ''}" style="background:${c}" data-c="${c}" aria-label="cor ${c}"></button>`).join('');
+    $('hg-skins').innerHTML = SKINS.map((k, i) => `<button class="chip2 ${(st.skin[st.race] || 0) === i ? 'on' : ''}" data-skin="${i}" ${li.level >= k.lv ? '' : 'disabled'}>${k.n}${li.level >= k.lv ? '' : ' · nível ' + k.lv}</button>`).join('');
+    $('hg-portraits').innerHTML = [1, 2, 3].map(i => `<button class="chip2 ${(st.portrait[st.race] || D.LEADER_FACE_DEFAULT[st.race]) === i ? 'on' : ''}" data-por="${i}">${['Sereno', 'Furioso', 'Triunfante'][i - 1]}</button>`).join('');
+    $('hg-note').textContent = 'A cor vale nas partidas solo e na campanha (no multiplayer cada vaga tem cor fixa). O Núcleo e o retrato aparecem nas suas partidas.';
+    $('hg-colors').querySelectorAll('[data-c]').forEach(b => b.onclick = () => { st.color = b.dataset.c; draw(); view(); });
+    $('hg-skins').querySelectorAll('[data-skin]').forEach(b => b.onclick = () => { st.skin[st.race] = +b.dataset.skin; draw(); view(); });
+    $('hg-portraits').querySelectorAll('[data-por]').forEach(b => b.onclick = () => { st.portrait[st.race] = +b.dataset.por; draw(); }); };
+  $('hg-race').onchange = () => { st.race = $('hg-race').value; draw(); view(); };
+  $('hg-save').onclick = () => { P.setHangar({ color: st.color, skin: st.skin, portrait: st.portrait, title: $('hg-title').value }); applyHangar(); refreshMini(); $('hangar').hidden = true; stopViewer(); };
+  const view = () => startViewer(st.race, st.color, st.skin[st.race] || 0);
+  draw(); $('hangar').hidden = false; view();
+  const closeObs = new MutationObserver(() => { if ($('hangar').hidden) { stopViewer(); closeObs.disconnect(); } }); closeObs.observe($('hangar'), { attributes: true, attributeFilter: ['hidden'] });
+}
+function startViewer(race, color, skin) {
+  const THREE = window.THREE, ME = ARD.meshes, ADD = window.THREE_ADDONS || {}; const cv = D.$('hg-view'); if (!THREE || !ME || !cv) return;
+  try {
+    if (!hg) { const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); r.setSize(cv.clientWidth || 480, cv.clientHeight || 360, false); r.outputColorSpace = THREE.SRGBColorSpace; r.toneMapping = THREE.ACESFilmicToneMapping; r.shadowMap.enabled = true;
+      const sc = new THREE.Scene(); sc.background = new THREE.Color(0x0b0d11); if (ADD.RoomEnvironment) { const pm = new THREE.PMREMGenerator(r); sc.environment = pm.fromScene(new ADD.RoomEnvironment(), 0.04).texture; pm.dispose(); }
+      sc.add(new THREE.HemisphereLight(0x9fb8d6, 0x2a2a30, 0.7)); const sun = new THREE.DirectionalLight(0xffe9c4, 1.8); sun.position.set(-60, 90, 70); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024); Object.assign(sun.shadow.camera, { left: -60, right: 60, top: 60, bottom: -60 }); sc.add(sun);
+      const ground = new THREE.Mesh(new THREE.CircleGeometry(70, 64).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x2c3038, roughness: 0.95 })); ground.receiveShadow = true; sc.add(ground);
+      const cam = new THREE.PerspectiveCamera(32, (cv.clientWidth || 4) / (cv.clientHeight || 3), 1, 2000); cam.position.set(104, 74, 104); cam.lookAt(0, 6, 0);
+      hg = { r, sc, cam, grp: null, mat: ME.material({ env: 0.75, key: 'hangar' }), em: new THREE.MeshBasicMaterial({ vertexColors: true }), raf: 0, t0: performance.now() };
+      const loop = now => { if (!hg) return; hg.raf = requestAnimationFrame(loop); if (hg.grp) hg.grp.rotation.y = (now - hg.t0) / 1000 * 0.35; hg.r.render(hg.sc, hg.cam); }; hg.raf = requestAnimationFrame(loop); }
+    if (hg.grp) { hg.sc.remove(hg.grp); hg.grp.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
+    const grp = new THREE.Group(); const add = (def, x, z, size, sk) => { const g = ME.build(def, race, color, sk || 0); if (!g) return; const k = size / g.width; const m = new THREE.Mesh(g.main, hg.mat); m.castShadow = m.receiveShadow = true; m.scale.setScalar(k); m.position.set(x, 0, z); grp.add(m); if (g.em) { const e = new THREE.Mesh(g.em, hg.em); e.scale.setScalar(k); e.position.set(x, 0, z); grp.add(e); } };
+    add('nucleo', 0, 0, 62, skin); add('veiculo', 34, 30, 16); add('infantaria', 18, 40, 7); add('coletor', -32, 34, 11); hg.grp = grp; hg.sc.add(grp);
+  } catch (e) { console.warn('[ARD] Hangar 3D indisponível: ' + e.message); }
+}
+function stopViewer() { if (!hg) return; cancelAnimationFrame(hg.raf); try { hg.r.dispose(); hg.r.forceContextLoss(); } catch (e) {} hg = null; }
+function applyHangar() { const h = P.load().hangar; for (const r of RACES) D.LEADER_FACE[r] = h.portrait[r] || D.LEADER_FACE_DEFAULT[r]; }
+
+// ---------- rastreio de conquistas (qualquer partida) ----------
+function tracker(sim, human) {
+  const st = { cls: new Set(), walls: 0, dmgAt600: null, pactDone: false };
+  return { st, tick(ev) { for (const e of ev) { if (e.t === 'spawn' && e.p === human) { const u = S.UNITS[e.def]; if (u && u.attack) st.cls.add(u.cls); } else if (e.t === 'built' && e.p === human && e.def === 'muro') st.walls++; else if (e.t === 'alert' && e.p === human && typeof e.text === 'string' && e.text.startsWith('Pacto cumprido')) st.pactDone = true; }
+    if (st.dmgAt600 === null && sim.time >= 600) st.dmgAt600 = sim.players[human].stats.dmg; } };
+}
+function evalAchievements(won, sim, human, tr, camp) {
+  const p = sim.players[human]; const n = S.nucleoOf(sim, human); const out = []; const u = id => { if (P.unlock(id)) out.push(id); };
+  if (p.stats.stolen > 0) u('primeiro-sifao'); if (p.stats.betrayals > 0) u('traidor'); if (tr && tr.st.pactDone) u('diplomata'); if (tr && tr.st.walls >= 20) u('muralha');
+  if (won) { if (n && n.hp >= n.maxHp * 0.9) u('nucleo-intacto'); if (tr && tr.st.cls.size === 1 && tr.st.cls.has('inf')) u('so-infantaria'); if (tr && sim.time >= 600 && tr.st.dmgAt600 === 0) u('pacifista-10');
+    const s = P.load(); s.stats.racesWon = s.stats.racesWon || {}; s.stats.racesWon[p.faction] = true; P.save(); if (RACES.every(r => s.stats.racesWon[r])) u('cinco-racas'); }
+  if (camp && camp.won) { u('primeiro-passo'); if (camp.stars >= 3) u('tres-estrelas'); if (camp.difficulty === 'fenda') u('fenda'); const s = P.load();
+    for (const [act, ach] of [['prologo', 'prologo'], ['ato1', 'ato-1'], ['ato2', 'ato-2'], ['ato3', 'ato-3'], ['ato4', 'ato-4'], ['identidade', 'identidade']]) if (C.missionsOfAct(act).every(m => s.missions[m.id] && s.missions[m.id].done)) u(ach); }
+  return out;
+}
+function grantXp(xp) { const lv = P.addXp(xp); const out = { xp, from: lv.from, to: lv.to, relics: [], ach: [] }; for (let l = lv.from + 1; l <= lv.to; l++) { const rid = C.RELIC_BY_LEVEL[l]; if (rid && P.grantRelic(rid)) out.relics.push(rid); } if (lv.to >= 10 && P.unlock('comandante-10')) out.ach.push('comandante-10'); if (lv.to >= 30 && P.unlock('comandante-30')) out.ach.push('comandante-30'); return out; }
+
+// ---------- sessão de missão (HUD) ----------
+function begin(sim, prep) {
+  const $ = D.$; const run = C.start(sim, prep); const queue = []; let showing = null, until = 0;
+  const comms = () => { const now = performance.now(); if (showing && now < until) return; if (!queue.length) { if (showing) { $('comms').hidden = true; showing = null; } return; } showing = queue.shift(); until = now + Math.max(4200, 1800 + showing.text.length * 55);
+    const art = D.leaderArt(showing.race, showing.mood); $('comms-img').src = art || ''; $('comms-img').hidden = !art; $('comms-name').textContent = (D.LEADER_NAME[showing.race] || raceName(showing.race)) + ' · ' + raceName(showing.race); $('comms-text').textContent = showing.text; $('comms').style.setProperty('--cc', D.RACE_COLORS[showing.race] || '#FF5E3A'); $('comms').hidden = false; };
+  const hud = () => { $('ob-title').textContent = prep.mission.title; $('ob-list').innerHTML = run.objectives.map(o => `<li class="${o.done ? 'ok' : ''} ${o.bonus ? 'bn' : ''}"><span>${o.done ? '✓' : o.bonus ? '★' : '○'}</span><span>${esc(o.text.replace(/^Bônus: /, ''))}</span>${o.progress && !o.done ? `<span class="pg">${esc(o.progress)}</span>` : ''}</li>`).join(''); };
+  for (const sd of run.brief()) queue.push(sd); $('objectives').hidden = false; hud();
+  const sess = { prep, run, hud, noPause: !!prep.diff.noPause,
+    tick(ev) { run.tick(ev); for (const sd of run.takeSaid()) queue.push(sd); comms(); return run.result; },
+    frame() { comms(); hud(); },
+    beacon() { return run.marker(); }, vip: () => run.vipId() };
+  return sess;
+}
+// fechamento: grava progresso, calcula XP e desbloqueios; devolve o HTML do bloco de campanha no fim de partida
+function finish(sess, won, sim, human, tr, mode) {
+  let html = ''; const p = sim.players[human];
+  if (sess) { const r = sess.run.result || { won, stars: 0, time: sim.time }; const m = sess.prep.mission; const before = P.mission(m.id) || {}; P.completeMission(m.id, { stars: r.stars, won: r.won, difficulty: sess.prep.difficulty, time: r.time, race: p.faction });
+    const g = grantXp(C.xpFor(m, sess.prep.difficulty, r.stars, r.won)); let relic = null; if (r.won && m.relic && P.grantRelic(m.relic)) relic = m.relic;
+    const ach = evalAchievements(r.won, sim, human, tr, { won: r.won, stars: r.stars, difficulty: sess.prep.difficulty }).concat(g.ach);
+    html += r.won ? `<div>${stars(r.stars)} <span class="muted small">${r.stars > (before.stars || 0) ? 'novo recorde' : 'melhor: ' + (before.stars || 0) + ' ★'}</span></div>` : '';
+    html += `<ul class="obj-list">${sess.run.objectives.map(o => `<li class="${o.bonus ? 'bn' : ''}">${o.done ? '✓' : '✗'} ${esc(o.text.replace(/^Bônus: /, o.bonus ? '★ ' : ''))}</li>`).join('')}</ul>`;
+    html += unlocksHtml(g, ach, relic);
+    return { html, won: r.won, next: r.won ? nextMission(m.id) : null };
+  }
+  const opp = sim.players.filter(q => q.id !== human).length; const g = grantXp(won ? 150 + 50 * opp : 40); const ach = evalAchievements(won, sim, human, tr, null).concat(g.ach); html += unlocksHtml(g, ach, null); return { html, won, next: null };
+}
+function unlocksHtml(g, ach, relic) { const li = P.levelInfo(); let h = `<div class="unlock">+${g.xp.toLocaleString('pt-BR')} XP · Comandante nível ${li.level}${g.to > g.from ? ' <b>(subiu de nível!)</b>' : ''} · ${li.max ? 'nível máximo' : li.into + '/' + li.need + ' XP'}</div>`;
+  for (const rid of g.relics.concat(relic ? [relic] : [])) { const r = C.RELICS.find(x => x.id === rid); if (r) h += `<div class="unlock">Relíquia desbloqueada: <b>${esc(r.name)}</b> — ${esc(r.desc)} (equipe na tela da campanha)</div>`; }
+  for (const id of ach) { const a = C.ACHIEVEMENTS.find(x => x.id === id); if (a) h += `<div class="unlock">🏅 Conquista: <b>${esc(a.name)}</b> — ${esc(a.desc)}${C.TITLES[id] ? ' · título "' + esc(C.TITLES[id]) + '" no Hangar' : ''}</div>`; }
+  return h; }
+function nextMission(id) { const i = C.MISSIONS.findIndex(m => m.id === id); for (let k = i + 1; k < C.MISSIONS.length; k++) if (C.unlocked(C.MISSIONS[k].id, P.load())) return C.MISSIONS[k].id; return null; }
+
+function init(deps) {
+  D = deps; D.LEADER_FACE_DEFAULT = Object.assign({}, D.LEADER_FACE); applyHangar(); const $ = D.$;
+  $('btn-campaign').addEventListener('click', openCampaign); $('btn-hangar').addEventListener('click', openHangar); $('camp-hangar').addEventListener('click', () => { $('campaign').hidden = true; openHangar(); });
+  $('camp-export').addEventListener('click', () => { const code = P.exportCode(); const ta = $('camp-code'); ta.hidden = false; ta.value = code; ta.select(); try { navigator.clipboard.writeText(code); } catch (e) {} $('camp-export').textContent = 'Código copiado'; setTimeout(() => { $('camp-export').textContent = 'Copiar código de backup'; }, 2500); });
+  $('camp-import').addEventListener('click', () => { const ta = $('camp-code'); if (ta.hidden || !ta.value.trim()) { ta.hidden = false; ta.value = ''; ta.focus(); return; } try { P.importCode(ta.value); applyHangar(); refreshMini(); openCampaign(); $('camp-import').textContent = 'Progresso importado'; } catch (e) { $('camp-import').textContent = e.message; } setTimeout(() => { $('camp-import').textContent = 'Importar código'; }, 3000); });
+  for (const id of ['campaign', 'briefing', 'hangar']) $(id).querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => { $(id).hidden = true; }));
+  refreshMini();
+  const q = new URLSearchParams(location.search); if (q.get('missao') && C.BY_ID[q.get('missao')]) setTimeout(() => openBriefing(q.get('missao'), { diff: q.get('dif') || undefined, race: q.get('raca') || undefined }), 200);
+}
+function applyColor(players) { const c = P.load().hangar.color; if (!c || !players || !players[0]) return; if (players.slice(1).some((pl, i) => (S.PLAYER_COLORS[(i + 1) % 4] || '').toLowerCase() === c.toLowerCase())) return; players[0].color = c; }
+function skinOf(race) { return P.load().hangar.skin[race] || 0; }
+ARD.campUI = { init, begin, finish, tracker, refreshMini, openCampaign, openBriefing, openHangar, applyColor, skinOf };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Líderes das Raças: bustos voxel usados no HUD (retrato 2.5D) e na arte da galeria. Mesma API Model do jogo (+x é a frente). */
@@ -3537,6 +4109,7 @@ function create(canvas, overlay, mini) {
     const sc = sun.shadow.camera; const ext = Math.min(900, d * 1.1); sc.left = -ext; sc.right = ext; sc.top = ext; sc.bottom = -ext; sc.near = 100; sc.far = 2200; sc.updateProjectionMatrix();
   }
   R.shakeX = 0; R.shakeY = 0;
+  R.setBeacon = function (pt) { R.beaconPt = pt || null; }; // 4.0e: farol do ponto de extração da missão
   R.worldToScreen = function (cam, x, y, z) { _v.set(x, H(x, y) + (z || 0), -y).project(camera); return [(_v.x + 1) / 2 * R.w, (1 - _v.y) / 2 * R.h]; };
   const ray = new THREE.Raycaster(); const plane = new THREE.Plane(UP, 0); const hit = new THREE.Vector3(); const ndc = new THREE.Vector2();
   R.screenToWorld = function (cam, sx, sy) { ndc.set(sx / R.w * 2 - 1, 1 - sy / R.h * 2); ray.setFromCamera(ndc, camera); plane.constant = 0; if (!ray.ray.intersectPlane(plane, hit)) { const dir = ray.ray.direction; const hl = Math.hypot(dir.x, dir.z) || 1; return [camera.position.x + dir.x / hl * 3000, -(camera.position.z + dir.z / hl * 3000)]; } let wx = hit.x, wy = -hit.z; plane.constant = -H(wx, wy); if (ray.ray.intersectPlane(plane, hit)) { wx = hit.x; wy = -hit.z; } return [wx, wy]; };
@@ -3671,7 +4244,7 @@ function create(canvas, overlay, mini) {
       if (e.kind === 'proj') { if (!own && !vis.has(e.id)) continue; const w = S.WEAPONS[e.weapon]; const [wx, wy] = lerp(e, alpha); if (w.proj === 'shell') { if (nShell < 256) { _p.set(wx, H(wx, wy) + e.z, -wy); _s.setScalar(1); _q.identity(); _m.compose(_p, _q, _s); shells.setMatrixAt(nShell++, _m); } } else if (nBul < BL) { const o = nBul * 6; blPos[o] = wx - e.vx * 0.03; blPos[o + 1] = H(wx, wy) + e.z; blPos[o + 2] = -(wy - e.vy * 0.03); blPos[o + 3] = wx; blPos[o + 4] = H(wx, wy) + e.z; blPos[o + 5] = -wy; nBul++; } continue; }
       if (!own && !vis.has(e.id)) continue;
       const isUnit = e.kind === 'unit'; const [wx, wy] = isUnit ? lerp(e, alpha) : [e.x, e.y]; const ud = isUnit ? S.UNITS[e.def] : S.BUILDINGS[e.def];
-      const parts = MD.PARTS[e.def]; const hullDef = parts ? parts.hull : e.def; const it = instOf(hullDef, e.owner, 0); const g = it.geo; const fit = fitOf(e, g);
+      const parts = MD.PARTS[e.def]; const hullDef = parts ? parts.hull : e.def; const it = instOf(hullDef, e.owner, (e.def === 'nucleo' && R.skins && R.skins[e.owner]) || 0); /* 4.0e: Núcleo do Hangar */ const g = it.geo; const fit = fitOf(e, g);
       const zz = isUnit && ud.flying ? 14 : 0; const moving = isUnit && (e.x !== e.px || e.y !== e.py); const bob = moving && (e.def === 'infantaria' || e.def === 'quimera' || e.def === 'soldador' || e.def === 'atirador' || e.def === 'agulha') ? Math.abs(Math.sin(R.time * 11 + e.id)) * 1.2 : moving && (e.def === 'cria' || e.def === 'cuspidor') ? Math.abs(Math.sin(R.time * 15 + e.id)) * 1.0 : moving && (e.def === 'prensa' || e.def === 'colosso' || e.def === 'brutamonte') ? Math.abs(Math.sin(R.time * 5 + e.id)) * 2.2 : (e.def === 'voz' || e.def === 'diapasao' || e.def === 'monolito' || e.def === 'prisma') ? 2 + Math.sin(R.time * 2.5 + e.id) * 1.2 : 0;
       const dmg = !isUnit && e.built && e.hp < e.maxHp * 0.5; const tint = e.cloaked ? 0.55 : dmg ? 0.6 : 1;
       if (!isUnit && !e.built) { // 4.0a — nascimento de construção com assinatura por Raça
@@ -3703,12 +4276,14 @@ function create(canvas, overlay, mini) {
       if (view.sel.has(e.id)) { nSel = ring(nSel, wx, wy, e.r + 5); if (!isUnit && ud.attack && nRange < 32) { _p.set(wx, H(wx, wy) + 0.6, -wy); _s.set(ud.attack.range, 1, ud.attack.range); _q.identity(); _m.compose(_p, _q, _s); rangeRings.setMatrixAt(nRange++, _m); } }
       if (e.hp < e.maxHp - 0.5 || view.sel.has(e.id) || (isUnit && e.rank > 0)) hpList.push({ x: wx, y: wy, z: zz + g.height * fit + 4, w: Math.max(16, e.r * 1.4), frac: e.hp / e.maxHp, rank: isUnit ? e.rank : 0, cloak: e.cloaked && own, r: e.r });
       if (!isUnit && e.built && (e.def === 'nucleo' || e.def === 'nodulo')) flags.push(e);
+      if (isUnit && e.vip) nSel = ring(nSel, wx, wy, e.r + 10); // 4.0e: Arca da escolta
       if (!isUnit && e.built && (e.def === 'nucleo' || e.def === 'reator' || e.def === 'laboratorio' || e.def === 'bastiao')) emitters.push({ x: wx, y: wy, z: e.def === 'nucleo' ? 40 * fit / 1 : g.height * fit * 0.9, col: e.def === 'reator' ? 0xff8c1a : e.def === 'laboratorio' ? 0x7fe3a1 : 0xff6a3d, d: Math.hypot(wx - cam.x, wy - cam.y) });
       if (!isUnit && e.built && (e.def === 'reator' && Math.random() < 0.1 || dmg && Math.random() < 0.08)) smoke(wx + (e.def === 'reator' ? e.r * 0.35 : (Math.random() - .5) * e.r), wy - (e.def === 'reator' ? e.r * 0.3 : (Math.random() - .5) * e.r), e.def === 'reator' ? e.r * 1.1 : e.r * 0.6, dmg ? [0.15, 0.15, 0.17] : [0.4, 0.42, 0.46], 2.2 + Math.random(), 16);
       if (isUnit && (e.state === 'siphon' || e.state === 'devour') && nBeam < BEAMS) { const t = sim.byId.get(e.target); if (t && S.dist(e.x, e.y, t.x, t.y) <= (e.state === 'devour' ? 44 : S.UNITS.pirata.siphonRange) + t.r + 2) { const l = beams[nBeam++]; l.visible = true; const pa = l.geometry.attributes.position; pa.setXYZ(0, wx, H(wx, wy) + 5, -wy); pa.setXYZ(1, t.x, H(t.x, t.y) + t.r * 0.6, -t.y); pa.needsUpdate = true; if (Math.random() < 0.4) spark(t.x, t.y, t.r * 0.6, e.state === 'devour' ? [1, 0.35, 0.4] : [0.85, 0.5, 1], 12, true); } }
     }
     for (let i = nBeam; i < BEAMS; i++) beams[i].visible = false;
     drawFlags(flags, sim, cam.yaw);
+    if (R.beaconPt) { nSel = ring(nSel, R.beaconPt.x, R.beaconPt.y, 70); nSel = ring(nSel, R.beaconPt.x, R.beaconPt.y, 52 + 10 * Math.sin(R.time * 3)); if (!R.beaconMesh) { R.beaconMesh = new THREE.Mesh(new THREE.CylinderGeometry(7, 12, 260, 16, 1, true).translate(0, 130, 0), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.6, 1.25, 0.5), transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); scene.add(R.beaconMesh); } R.beaconMesh.visible = true; R.beaconMesh.position.set(R.beaconPt.x, H(R.beaconPt.x, R.beaconPt.y), -R.beaconPt.y); } else if (R.beaconMesh) R.beaconMesh.visible = false;
     for (const [id, m] of view.memory) { if (vis.has(id)) continue; const it = instOf(MD.PARTS[m.def] ? MD.PARTS[m.def].hull : m.def, m.owner, 0); put(it, m.x, m.y, 0, 0, 2 * S.BUILDINGS[m.def].r * 1.25 / it.geo.width, 1, 0.45); }
     // 4.0b — props de território: a geografia da Raça cresce em volta do Núcleo e dos Nódulos (visual, determinístico por id)
     for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const bd = S.BUILDINGS[e.def]; const tr = bd && bd.territory; if (!tr) continue; const fac = (sim.players[e.owner] || {}).faction; if (!MD.props[fac]) continue;
@@ -4213,11 +4788,12 @@ const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-10 23:16Z';
+const BUILD = '2026-10-11 00:11Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
+const VERSION = '4.0e';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -4280,9 +4856,11 @@ function initStart() {
   // rodapé: Termos, Privacidade e atalho do tutorial
   const wireModal = (btn, modal) => { const b = $(btn), m = $(modal); if (!b || !m) return; b.addEventListener('click', () => { m.hidden = false; }); m.querySelectorAll('[data-close]').forEach(x => x.addEventListener('click', () => { m.hidden = true; })); };
   wireModal('foot-termos', 'termos'); wireModal('foot-priv', 'priv');
+  // 4.0e — campanha, Hangar e progresso do Comandante
+  if (ARD.campUI && ARD.campaign && ARD.progress) { try { ARD.campUI.init({ $, leaderArt, LEADER_NAME, RACE_COLORS, LEADER_FACE, startGame: cfg => { savePrefs(Object.assign(loadPrefs() || {}, { gfx: cfg.gfx, quality: cfg.quality, clima: cfg.clima, name: cfg.name })); startGame(cfg); }, selectedRace: () => (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar' }); if (params.get('campanha')) ARD.campUI.openCampaign(); } catch (e) { console.warn('[ARD] campanha indisponível:', e); } }
   // a ajuda tambem precisa fechar na tela inicial (antes só era ligada dentro da partida); X e Esc fecham qualquer janela
   document.querySelectorAll('#help [data-close]').forEach(b => b.addEventListener('click', () => { $('help').hidden = true; }));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') for (const id of ['help', 'termos', 'priv']) { const m = $(id); if (m && !m.hidden) { m.hidden = true; e.stopPropagation(); } } }, true);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') for (const id of ['help', 'termos', 'priv', 'campaign', 'briefing', 'hangar']) { const m = $(id); if (m && !m.hidden) { m.hidden = true; e.stopPropagation(); } } }, true);
   if ($('foot-help')) $('foot-help').addEventListener('click', () => toggleHelp(true));
   $('opt-name').value = prefs.name || 'Comandante';
   $('opt-opp').value = prefs.opp || '2';
@@ -4375,7 +4953,8 @@ function startGame(cfg, netCtx) {
   const aiNames = { vehnar: ['Fundição Kessari', 'Consórcio Oryn', 'Estaleiro Vey'], erevane: ['Clã Sombrio', 'Náufragos de Ísk', 'Corsários da Faixa'], tessara: ['Linhagem Oriel', 'Ordem do Molde', 'Enxerto Vassi'], quorith: ['Coro de Zayin', 'Acorde Sétimo', 'Silêncio de Quor'], vorag: ['Prole Velk', 'Ninhada Cega', 'Fome de Oru'] };
   const facsAll = Object.keys(S.FACTIONS).filter(f => f !== cfg.faction).concat([cfg.faction]);
   if (!cfg.players) for (let i = 0; i < parseInt(cfg.opp, 10); i++) { const f = facsAll[i % facsAll.length]; players.push({ name: aiNames[f][i % 3], faction: f, difficulty: cfg.diff }); }
-  const sim = S.createSim({ seed: cfg.seed, players, minutes: 25 });
+  if (!netCtx && !cfg.campaign && ARD.campUI) ARD.campUI.applyColor(players); // cor do Hangar nas partidas solo
+  const sim = S.createSim({ seed: cfg.seed, players, minutes: cfg.minutes || 25 });
   const human = netCtx ? netCtx.myId : 0;
   const canvas = $('world'), mini = $('minimap'), overlay = $('overlay');
   $('start').hidden = true; $('game').hidden = false; $('end').hidden = true;
@@ -4403,8 +4982,11 @@ function startGame(cfg, netCtx) {
   const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.9 : 1.0, yaw: Math.PI / 4, pitch: 0.95, pitchT: 0.95 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
   const ui = makeUI(); // closures below
   const I = ARD.input.create({ canvas, sim, view, R, human, ui });
-  const ais = sim.players.filter(p => !p.human || (!netCtx && params.get('ia') === 'todos')).map(p => ARD.ai.create(p.id, p.difficulty)); // ?ia=todos: a IA joga também pelo humano (capturas e testes)
+  const ais = sim.players.filter(p => (!p.human && !(players[p.id] && players[p.id].passive)) || (!netCtx && params.get('ia') === 'todos')).map(p => ARD.ai.create(p.id, p.difficulty)); // ?ia=todos: a IA joga também pelo humano (capturas e testes)
   G = { sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null, net, pending: [], waiting: false, waitT: 0 };
+  G.track = ARD.campUI ? ARD.campUI.tracker(sim, human) : null; // conquistas valem em qualquer partida
+  G.camp = cfg.campaign && ARD.campUI ? ARD.campUI.begin(sim, cfg.campaign) : null; // 4.0e: missão da campanha
+  if (R.is3d && ARD.campUI) R.skins = { [human]: ARD.campUI.skinOf(sim.players[human].faction) };
   window.addEventListener('resize', () => R.resize());
   document.body.classList.toggle('touch', isTouch);
 
@@ -4441,6 +5023,8 @@ function startGame(cfg, netCtx) {
     if (net && sim.tick % 10 === 0) { const h = S.hash(sim); net.sendHash(sim.tick, h); (G.hashLog = G.hashLog || {})[sim.tick] = h; const ks = Object.keys(G.hashLog); if (ks.length > 80) delete G.hashLog[ks[0]]; }
     if (!silent) G.R.onEvents(ev, sim, human);
     handleEvents(ev, silent);
+    if (G.track) G.track.tick(ev);
+    if (G.camp) { const r = G.camp.tick(ev); if (r && !G.ended) endGame({ campaign: r }); }
     if (sim.tick % 10 === 0) updateMemory();
   }
   function frame(now) {
@@ -4452,6 +5036,7 @@ function startGame(cfg, netCtx) {
     if (G.frameN % 3 === 0) refreshTop();
     if (G.frameN++ % 6 === 0) { refreshPanel(false); refreshQuick(); }
     if (G.frameN % 30 === 0) refreshHints();
+    if (G.camp && G.frameN % 10 === 0) { G.camp.frame(); if (R.setBeacon) R.setBeacon(G.camp.beacon(), G.camp.vip()); }
     R.draw(sim, view, G.paused ? 1 : Math.min(1, G.acc / S.TICK), dt);
     requestAnimationFrame(frame);
   }
@@ -4500,7 +5085,7 @@ function startGame(cfg, netCtx) {
       else if (e.t === 'proposal' && e.p === human && !silent) { G.pendingFor = e.from; showProposal(e.from); }
       else if (e.t === 'eliminated' && !silent) { const q = sim.players[e.p]; const left = sim.players.filter(x => x.alive && x.id !== human).length; if (e.p !== human) { banner(q.name + ' eliminado', left > 0 ? left + (left > 1 ? ' inimigos restantes' : ' inimigo restante') + ' · destrua todos os Núcleos ou vença por Domínio aos 25:00' : 'Todos os Núcleos inimigos caíram', 'good'); AU.sfx('promote'); AU.say(q.name + ' eliminado. ' + (left > 0 ? left + (left > 1 ? ' inimigos restantes' : ' inimigo restante') : ''), 'elim', 0); } }
       else if (e.t === 'trait' && e.owner === human && !silent) AU.sfx('promote');
-      else if (e.t === 'end') endGame(e.result);
+      else if (e.t === 'end') { if (!G.camp) endGame(e.result); }
       else if (e.t === 'regime' && e.p === human && !silent) notice('Energia: ' + S.REGIME[e.regime].name);
     }
   }
@@ -4703,6 +5288,21 @@ function startGame(cfg, netCtx) {
   // ---------- end ----------
   function endGame(result) {
     if (G.ended) return; G.ended = true;
+    if (result.campaign) { // 4.0e: fim de missão
+      const r = result.campaign; const prep = G.camp.prep; const scores = sim.players.map(q => ({ id: q.id, name: q.name, score: q.alive ? S.score(sim, q) : 0, alive: q.alive }));
+      result = { outcome: r.won ? 'victory' : 'defeat', reason: r.reason, scores };
+      const fin = ARD.campUI.finish(G.camp, r.won, sim, human, G.track, 'campanha'); $('objectives').hidden = true; $('comms').hidden = true;
+      $('end-eyebrow').textContent = 'Campanha · ' + prep.mission.title + ' · ' + prep.diff.label; $('end-camp').innerHTML = fin.html; $('end-camp').hidden = false;
+      const base = location.pathname; const keep = new URLSearchParams(location.search); for (const k of ['missao', 'dif', 'raca', 'campanha', 'autostart']) keep.delete(k); const q = k => base + '?' + new URLSearchParams(Object.assign(Object.fromEntries(keep), k)).toString();
+      $('btn-next').hidden = !fin.next; if (fin.next) $('btn-next').onclick = () => { location.href = q({ missao: fin.next, dif: prep.difficulty, raca: prep.race }); };
+      $('btn-camp-menu').hidden = false; $('btn-camp-menu').onclick = () => { location.href = q({ campanha: '1' }); };
+      { const art = leaderArt(sim.players[human].faction, r.won ? 3 : 2); if (art) { $('end-leader').src = art; $('end-leader').hidden = false; } }
+      $('end').hidden = false; $('end-title').textContent = r.won ? 'MISSÃO CUMPRIDA' : 'MISSÃO FALHOU'; $('end-title').className = result.outcome; $('end-reason').textContent = r.reason;
+      $('end-scores').innerHTML = ''; const st = sim.players[human].stats; $('end-stats').innerHTML = [['Tempo', mmss(r.time || sim.time)], ['Coletado', fmt(st.collected)], ['Roubado', fmt(st.stolen)], ['Unidades abatidas', st.unitsKilled], ['Unidades perdidas', st.unitsLost], ['Estruturas destruídas', st.buildingsDestroyed]].map(([k, v]) => `<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');
+      $('btn-again').textContent = 'Repetir missão'; $('btn-again').onclick = () => { location.href = q({ missao: prep.mission.id, dif: prep.difficulty, raca: prep.race }); };
+      $('btn-copy').onclick = () => { const ta = $('end-json'); ta.hidden = false; ta.value = JSON.stringify({ versao: VERSION, missao: prep.mission.id, dificuldade: prep.difficulty, raca: prep.race, resultado: r, objetivos: G.camp.run.objectives.map(o => ({ id: o.id, feito: o.done })) }, null, 2); ta.select(); };
+      return;
+    }
     if (result.outcome === 'over') { const me = sim.players[human]; result = Object.assign({}, result, { outcome: me.alive && result.winner === human ? 'victory' : 'defeat', reason: result.reason + (result.winner >= 0 ? ' Vencedor: ' + sim.players[result.winner].name + '.' : '') }); }
     const p = sim.players[human]; const st = p.stats;
     { const art = leaderArt(p.faction, result.outcome === 'victory' ? 3 : 2); if (art) { $('end-leader').src = art; $('end-leader').hidden = false; } }
@@ -4711,8 +5311,9 @@ function startGame(cfg, netCtx) {
     const rows = result.scores.slice().sort((a, b) => b.score - a.score).map((s, i) => `<tr><td>${i + 1}</td><td><span class="dot" style="background:${sim.players[s.id].color}"></span>${esc(s.name)}</td><td>${s.alive ? fmt(s.score) : 'eliminado'}</td></tr>`).join('');
     $('end-scores').innerHTML = `<table><thead><tr><th>#</th><th>Jogador</th><th>Domínio</th></tr></thead><tbody>${rows}</tbody></table>`;
     $('end-stats').innerHTML = [['Coletado', fmt(st.collected)], ['Roubado', fmt(st.stolen)], ['Perdido para roubo', fmt(st.lost)], ['Unidades abatidas', st.unitsKilled], ['Unidades perdidas', st.unitsLost], ['Estruturas destruídas', st.buildingsDestroyed], ['Tratados', st.treaties], ['Traições', st.betrayals], ['Reputação final', S.REP_NAMES[p.rep]]].map(([k, v]) => `<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');
+    if (ARD.campUI) { try { const fin = ARD.campUI.finish(null, result.outcome === 'victory', sim, human, G.track, net ? 'multiplayer' : 'escaramuca'); $('end-camp').innerHTML = fin.html; $('end-camp').hidden = false; } catch (e) { console.warn('[ARD] progresso indisponível:', e); } }
     $('btn-again').onclick = () => location.reload();
-    $('btn-copy').onclick = () => { const data = { versao: '4.0d', data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
+    $('btn-copy').onclick = () => { const data = { versao: VERSION, data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
   }
 
   // ---------- UI bridge for input ----------
@@ -4725,7 +5326,7 @@ function startGame(cfg, netCtx) {
       notice, confirm: confirmModal, modalOpen() { return !$('diplo').hidden || !$('help').hidden || !$('confirm').hidden; },
       enqueue(c) { if (net) G.pending.push(c); else S.enqueue(sim, c); },
       closeModals() { $('diplo').hidden = true; $('help').hidden = true; $('confirm').hidden = true; },
-      toggleHelp() { toggleHelp(); }, togglePause() { if (net) { notice('Sem pausa no multiplayer'); return; } G.paused = !G.paused; refreshTop(); notice(G.paused ? 'Pausado' : 'Continuando'); },
+      toggleHelp() { toggleHelp(); }, togglePause() { if (net) { notice('Sem pausa no multiplayer'); return; } if (G.camp && G.camp.noPause) { notice('Sem pausa na dificuldade Fenda'); return; } G.paused = !G.paused; refreshTop(); notice(G.paused ? 'Pausado' : 'Continuando'); },
     };
   }
   function confirmModal(text, onYes) { const m = $('confirm'); m.hidden = false; $('confirm-text').textContent = text; $('confirm-yes').onclick = () => { m.hidden = true; onYes(); }; $('confirm-no').onclick = () => { m.hidden = true; }; }

@@ -6,12 +6,14 @@ const run = (cmd, args, opts) => spawnSync(cmd, args, Object.assign({ cwd: root,
 // 1) sintaxe de todo JS do projeto
 { const files = []; for (const d of ['src', 'tools']) for (const f of fs.readdirSync(path.join(root, d))) if (/\.(c?js|mjs)$/.test(f)) files.push(path.join(d, f)); let ok = 0; const bad = []; for (const f of files) { const r = run(process.execPath, ['--check', f]); if (r.status === 0) ok++; else bad.push(f + ': ' + (r.stderr || '').split('\n').slice(0, 2).join(' ')); } R.sintaxe = { ok, total: files.length, bad }; }
 // 2) build
-{ const r = run(process.execPath, ['tools/build.mjs']); const m = (r.stdout || '').match(/build (\S+ \S+Z) · jogo (\d+) bytes/); const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8'); const ver = (html.match(/Versão (\d+\.\d+[a-z]?) · build/) || [])[1]; const verJs = (fs.readFileSync(path.join(root, 'src/main.js'), 'utf8').match(/versao: '([^']+)'/) || [])[1];
+{ const r = run(process.execPath, ['tools/build.mjs']); const m = (r.stdout || '').match(/build (\S+ \S+Z) · jogo (\d+) bytes/); const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8'); const ver = (html.match(/Versão (\d+\.\d+[a-z]?) · build/) || [])[1]; const mainSrc = fs.readFileSync(path.join(root, 'src/main.js'), 'utf8'); const verJs = (mainSrc.match(/const VERSION = '([^']+)'/) || mainSrc.match(/versao: '([^']+)'/) || [])[1];
   R.build = { ok: r.status === 0 && !!m && !html.includes('__BUILD__'), stamp: m && m[1], bytes: m && +m[2] }; R.versao = { ok: !!ver && ver === verJs, html: ver, js: verJs }; }
 // 3) malhas 3D (5 Raças + cenário) no Node
 { const r = run(process.execPath, ['tools/meshes-test.mjs']); const m = (r.stdout || '').match(/malhas: (\d+) ok, (\d+) falhas/); R.malhas = { ok: m ? +m[1] : 0, falhas: m ? +m[2] : -1 }; }
 // 4) testes headless da simulação (cada linha com OK/FAIL conta)
 { const r = run(process.execPath, ['tools/test.cjs']); const out = (r.stdout || '') + (r.stderr || ''); const oks = (out.match(/\bOK\b/g) || []).length, fails = (out.match(/\bFAIL\b/g) || []).length; R.testes = { ok: oks, falhas: fails + (r.status === 0 ? 0 : 1), status: r.status }; }
+// 4b) campanha: as 20 missões com a IA jogando pelo humano (roteiros, objetivos e fim sem exceções)
+{ const r = run(process.execPath, ['tools/missions-test.cjs', 'todas', '6']); const out = r.stdout || ''; const lines = out.split('\n').filter(l => /^\S+\s+(VENCEU|perdeu|em andamento|ERRO)/.test(l)); R.missoes = { ok: lines.filter(l => !l.includes('ERRO')).length, total: lines.length, status: r.status }; }
 // 5) determinismo entre motores (Node, Chromium, Firefox, WebKit)
 if (!rapido) { const r = run(process.execPath, ['tools/det-test.cjs', '7', '2000']); const out = r.stdout || ''; const iguais = (out.match(/IGUAL ao Node/g) || []).length; R.determinismo = { ok: iguais + (out.includes('node (V8)') ? 1 : 0), total: 4, out: out.trim().split('\n') }; }
 // 6) smoke no navegador: tela inicial (ajuda abre e fecha, logo) e uma partida por Raça sem erro
@@ -31,7 +33,8 @@ if (!rapido) { const r = run(process.execPath, ['tools/det-test.cjs', '7', '2000
 const ck = b => b ? '✅' : '❌'; const sm = R.smoke && R.smoke.racas ? Object.values(R.smoke.racas).filter(x => x.ok).length : 0;
 const parts = [`sintaxe ${ck(R.sintaxe.ok === R.sintaxe.total)} ${R.sintaxe.ok}/${R.sintaxe.total}`, `malhas 3D ${ck(R.malhas.falhas === 0)} ${R.malhas.ok}/${R.malhas.ok + Math.max(0, R.malhas.falhas)}`, `testes ${ck(R.testes.falhas === 0)} ${R.testes.ok}/${R.testes.ok + R.testes.falhas}`];
 if (R.determinismo) parts.push(`determinismo ${ck(R.determinismo.ok === 4)} ${R.determinismo.ok}/4 motores`);
+parts.splice(3, 0, `missões ${ck(R.missoes && R.missoes.ok === R.missoes.total && R.missoes.total > 0)} ${R.missoes ? R.missoes.ok + '/' + R.missoes.total : '—'}`);
 parts.push(`smoke ${ck(sm === 5 && R.smoke.inicio && R.smoke.inicio.ok)} ${sm}/5 Raças + tela inicial ${R.smoke && R.smoke.inicio && R.smoke.inicio.ok ? 'ok' : 'falhou'}`, `build ${ck(R.build.ok)} ${R.build.stamp} (${Math.round((R.build.bytes || 0) / 1024)} KB)`, `versão ${ck(R.versao.ok)} ${R.versao.html}`);
 fs.mkdirSync(path.join(root, 'dist'), { recursive: true }); fs.writeFileSync(path.join(root, 'dist/qa.json'), JSON.stringify(R, null, 2));
 console.log('Qualidade e deploy: ' + parts.join(' · ')); console.log('tempo ' + Math.round((Date.now() - t0) / 1000) + ' s · detalhes em dist/qa.json');
-const fail = R.sintaxe.ok !== R.sintaxe.total || R.malhas.falhas !== 0 || R.testes.falhas !== 0 || (R.determinismo && R.determinismo.ok !== 4) || sm !== 5 || !R.build.ok || !R.versao.ok; process.exit(fail ? 1 : 0);
+const fail = !(R.missoes && R.missoes.ok === R.missoes.total && R.missoes.total > 0) || R.sintaxe.ok !== R.sintaxe.total || R.malhas.falhas !== 0 || R.testes.falhas !== 0 || (R.determinismo && R.determinismo.ok !== 4) || sm !== 5 || !R.build.ok || !R.versao.ok; process.exit(fail ? 1 : 0);

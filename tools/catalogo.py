@@ -21,7 +21,7 @@ for rid, name, col, desc in RACES:
     sec.append(f'<section class="race" style="--rc:{col}"><h2>{name}</h2><p class="desc">{desc}</p><figure><img src="{b}" alt="Construções 3D: {name}" loading="lazy"><figcaption>Construções (Núcleo, Reator, Refinaria, Quartel, Fábrica, Hangar, Torre, Nódulo, Laboratório, Muro, Portão, Bastião)</figcaption></figure><figure><img src="{u}" alt="Unidades 3D: {name}" loading="lazy"><figcaption>Unidades (gerais e exclusivas da Raça)</figcaption></figure></section>')
 cen = img('cenario')
 if cen: sec.append(f'<section class="race" style="--rc:#9fb0c4"><h2>Cenário neutro</h2><p class="desc">Nós de Plasma, Minério e Dados, rochas, ruínas, caixas, carcaças e os adereços de território de cada Raça.</p><figure><img src="{cen}" alt="Cenário neutro 3D" loading="lazy"></figure></section>')
-shots = [(n, img(n, 1280)) for n in ['jogo-vehnar', 'jogo-erevane', 'jogo-tessara', 'jogo-horizonte']]
+shots = [(n, img(n, 1280)) for n in ['jogo-vehnar', 'jogo-erevane', 'jogo-tessara', 'jogo-quorith', 'jogo-vorag', 'jogo-horizonte']]
 shots = [(n, d) for n, d in shots if d]
 if shots: sec.append('<section class="race" style="--rc:#FF5E3A"><h2>Dentro da partida</h2><p class="desc">Os mesmos modelos no jogo, com céu, terreno detalhado, bandeiras e a inclinação de horizonte (planeta-mãe no céu).</p>' + ''.join(f'<figure><img src="{d}" alt="{n}" loading="lazy"></figure>' for n, d in shots) + '</section>')
 html = f'''<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Catálogo 3D das Raças</title>

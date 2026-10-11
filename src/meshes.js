@@ -190,7 +190,13 @@ KITS.vorag = {
 // ---------- receitas de construção: mesma planta para todas as Raças, formas do kit da Raça ----------
 const QUAD = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
 const BLD = {
-  nucleo(K, k, P, tc) { k.pad(K, P, tc, 0, 0, 30, 30); k.block(K, P, tc, 0, 0, 22, 22, 7, 0.6); k.block(K, P, tc, 0, 0, 13, 13, 5.5, 7.8); k.crown(K, P, tc, 0, 0, 13.6, 1); for (const [sx, sz] of QUAD) k.tower(K, P, tc, sx * 12.2, sz * 12.2, 1.3, 8, 0.6); k.door(K, P, tc, 11.4, 0, 5, 4.2, 0.6); k.ring(K, P, tc, 0, 0, 9.4, 8.3); },
+  nucleo(K, k, P, tc, skin) { // 4.0e: três estilos de Núcleo no Hangar — 0 Padrão, 1 Fortaleza (nível 10), 2 Santuário (nível 20)
+    skin = skin || 0; k.pad(K, P, tc, 0, 0, skin === 2 ? 32 : 30, skin === 2 ? 32 : 30); k.block(K, P, tc, 0, 0, 22, 22, skin === 1 ? 8.5 : 7, 0.6); const top = skin === 1 ? 9.3 : 7.8; k.block(K, P, tc, 0, 0, 13, 13, skin === 1 ? 6.5 : 5.5, top);
+    k.crown(K, P, tc, 0, 0, top + (skin === 1 ? 6.5 : 5.8), skin === 2 ? 1.35 : 1);
+    for (const [sx, sz] of QUAD) k.tower(K, P, tc, sx * 12.2, sz * 12.2, skin === 1 ? 1.9 : 1.3, skin === 1 ? 12 : 8, 0.6);
+    if (skin === 1) for (const [sx, sz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) k.tower(K, P, tc, sx * 12.6, sz * 12.6, 1.1, 7, 0.6);
+    k.door(K, P, tc, 11.4, 0, 5, 4.2, 0.6); k.ring(K, P, tc, 0, 0, 9.4, top + 0.5);
+    if (skin === 2) { k.ring(K, P, tc, 0, 0, 13.6, 1.1); K.tor(0, 0.75, 0, 15.2, 0.22, tc, null, { e: 1.8, ts: 48 }); } },
   reator(K, k, P, tc) { k.reactor(K, P, tc); },
   refinaria(K, k, P, tc) { k.pad(K, P, tc, 0, 0, 24, 20); k.block(K, P, tc, -5, 0, 10, 14, 5.2, 0.6); k.tank(K, P, tc, 5, -4.6, 2.9, 6, 0.6); k.tank(K, P, tc, 5, 4.6, 2.9, 6, 0.6); k.pipe(K, P, tc, [[-1.5, 4.2, -2.5], [1.2, 6.8, -3.6], [3.4, 7.4, -4.6]]); k.pipe(K, P, tc, [[-1.5, 4.2, 2.5], [1.2, 6.8, 3.6], [3.4, 7.4, 4.6]]); k.door(K, P, tc, 0.2, 0, 4, 3, 0.6); },
   quartel(K, k, P, tc) { k.pad(K, P, tc, 0, 0, 26, 22); k.block(K, P, tc, -2, 0, 18, 14, 6, 0.6); k.block(K, P, tc, -4, 0, 9, 8, 3.2, 6.8); k.door(K, P, tc, 7.2, 0, 5, 4, 0.6); k.banner(K, P, tc, 9.4, 6.6, 7.4); k.banner(K, P, tc, 9.4, -6.6, 7.4); k.tower(K, P, tc, -10.6, -8.4, 1.1, 6.5, 0.6); },
@@ -326,6 +332,11 @@ U.quorith = {
   monolito(K, P, tc) { K.prism(0, 0, 0, 1, 0.8, 6, P.d, 'gloss', { sx: 5.4, sz: 4 }); K.tor(0, 1.2, 0, 3.2, 0.16, P.l, null, { e: 2.4, ts: 6 }); K.box(0, 1.8, 0, 3.6, 13, 2.6, P.a, 'crystal', { b: 0.2, bs: 1 });
     K.box(0, 3, 1.33, 0.3, 10, 0.06, P.c, null, { e: 2.6 }); K.box(0, 3, -1.33, 0.3, 10, 0.06, P.c, null, { e: 2.6 }); K.box(1.83, 3, 0, 0.06, 10, 0.3, P.c, null, { e: 2.6 }); K.oct(0, 14.8, 0, 1.2, 2.8, P.b, 'crystal');
     ringOf(4, 4.2, (cx, cz) => K.oct(cx, 0.6, cz, 0.7, 3.2, P.b, 'crystal', { rz: -cx * 0.08, rx: cz * 0.08 })); K.oct(0, 18.2, 0, 0.4, 1, tc, null, { e: 2 }); },
+  catedral(K, P, tc) { // épico: catedral de cristal que caminha sobre três pilares flutuantes, com sinos de cristal e coro aceso
+    K.prism(0, 0, 0, 1, 1.2, 6, P.d, 'gloss', { sx: 12, sz: 10 }); ringOf(3, 8, (cx, cz) => K.oct(cx, 0.6, cz, 2.2, 9, P.b, 'crystal'));
+    K.prism(0, 4, 0, 1, 7, 6, P.a, 'crystal', { sx: 9, sz: 7.5, top: 0.8 }); K.prism(0, 11, 0, 0.8, 5, 6, P.b, 'crystal', { sx: 9, sz: 7.5, top: 0.4 }); K.prism(0, 7.4, 0, 1.01, 0.4, 6, P.c, null, { e: 2.4, sx: 9, sz: 7.5, top: 1 });
+    K.oct(0, 15, 0, 3, 14, P.a, 'crystal', { ry: PI / 6 }); K.oct(0, 19, 0, 1.4, 6, P.c, null, { e: 2.8 }); for (const [x, z, h] of [[-5, -4, 10], [5, -4, 9], [-5, 4, 9], [5, 4, 10], [0, 6.5, 8]]) { K.oct(x, 10, z, 1.4, h, P.a, 'crystal'); K.oct(x, 10 + h * 0.55, z, 0.5, 2, P.l, null, { e: 2.6 }); }
+    K.tor(0, 22, 0, 6.5, 0.4, P.t, 'crystal', { rx: 0.3, ts: 6 }); K.tor(0, 22, 0, 6, 0.25, P.l, null, { e: 2.4, rz: 0.4, ts: 6 }); K.tor(0, 2.2, 0, 10, 0.3, tc, null, { e: 1.8, ts: 6 }); },
   harmonico(K, P, tc) { ringOf(3, 1.8, (cx, cz, a) => K.oct(cx, 1, cz, 0.7, 3.4, P.a, 'crystal', { rx: Math.sin(a) * 0.4, rz: -Math.cos(a) * 0.4 })); K.oct(0, 1.6, 0, 0.5, 1.8, P.c, null, { e: 2.8 }); K.tor(0, 2.4, 0, 2.8, 0.1, P.l, null, { e: 2.4, ts: 6 }); K.tor(0, 2.4, 0, 2.2, 0.08, tc, null, { e: 2, ts: 6 }); },
 };
 U.vorag = {
@@ -359,6 +370,12 @@ U.vorag = {
     K.sph(8.2, 3.6, 0, 2.4, P.b, 'chitin', { sx: 1.1, seg: 14 }); for (const s of [-1, 1]) { K.seg([9.4, 3, s * 1.4], [12, 4.6, s * 2.2], 0.5, P.bo, 'bone', { taper: 0.25 }); K.light(10.6, 4.6, s * 0.8, 0.32, P.l); }
     K.sph(-4, 7.6, 0, 0.9, tc, 'wet', { seg: 10 }); K.sph(-6.6, 5.4, 0, 1.8, P.m, 'wet', { seg: 12 }); },
   ferroada(K, P, tc) { U.vorag.drone(K, P, tc, { sting: 2.6, wings4: true }); },
+  matriarca(K, P, tc) { // épica: rainha da Prole, abdômen enorme de ovos e coroa de espinhos
+    K.sph(-7, 4.6, 0, 1, P.m, 'wet', { sx: 9, sy: 5, sz: 6.5, seg: 22 }); for (let i = 0; i < 4; i++) arch(K, -7, 0.4, 0, 9.1, 9.2, 6.6, i * PI / 4, 0.3, '#FF8A8A', null, { e: 1.4, ts: 16 }); ringOf(7, 1, (cx, cz) => K.sph(-7 + cx * 7, 4 + Math.abs(cz) * 2, cz * 5, 1.2, P.bo, 'bone', { sy: 1.4, seg: 10 }));
+    K.sph(2, 5, 0, 1, P.a, 'chitin', { sx: 5.5, sy: 4.4, sz: 5, seg: 20 }); for (let i = 0; i < 3; i++) K.sph(0 + i * 2.4, 8.4, 0, 1, P.b, 'chitin', { sx: 1.6, sy: 1, sz: 4.4, seg: 12 });
+    for (const x of [-1, 2, 5]) for (const s of [-1, 1]) leg(K, [x, 4, s * 4], [x + 1.6, 4.4, s * 8], [x + 1, 0, s * 9], 0.9, P.b, 'chitin');
+    K.sph(8.4, 6, 0, 2.6, P.b, 'chitin', { seg: 16 }); ringOf(6, 2.2, (cx, cz) => K.cone(8 + cx * 0.4, 8, cz, 0.45, 3.6, P.bo, 'bone', { seg: 8, rz: -cx * 0.25, rx: cz * 0.25 })); for (const s of [-1, 1]) { K.seg([10, 5.4, s * 1.4], [13.6, 3, s * 2.6], 0.6, P.bo, 'bone', { taper: 0.2 }); K.light(10.8, 6.8, s * 1, 0.45, P.l); }
+    K.sph(-1, 9.6, 0, 1.1, tc, 'wet', { seg: 10 }); },
 };
 
 // ---------- cenário neutro: nós de recurso, rochas, ruínas, caixas, carcaças e adereços de território ----------
@@ -388,7 +405,7 @@ const PROPS = {
 const FULL = { veiculo: ['veiculo_hull', 'veiculo_turret'], torre: ['torre_base', 'torre_turret'], bastiao: ['bastiao_base', 'bastiao_turret'] };
 function recipe(race, def) {
   const u = U[race]; if (u && u[def]) return (K, P, tc) => u[def](K, P, tc);
-  if (BLD[def]) return (K, P, tc) => BLD[def](K, KITS[race] || KITS.vehnar, P, tc);
+  if (BLD[def]) return (K, P, tc, seed) => BLD[def](K, KITS[race] || KITS.vehnar, P, tc, seed);
   for (const r in U) if (U[r][def]) return (K, P, tc) => U[r][def](K, P, tc);
   return null;
 }
@@ -400,7 +417,7 @@ function build(def, race, color, seed) {
     if (def.startsWith('prop_')) { const f = PROPS[def.slice(5)]; if (!f) return null; f(K, seed | 0); return K.finish(); }
     race = PAL[race] ? race : 'vehnar'; const P = PAL[race]; const tc = color || '#FF8C1A';
     if (FULL[def]) { const a = recipe(race, FULL[def][0]), b = recipe(race, FULL[def][1]); if (!a || !b) return null; a(K, P, tc); const m = K.mount || 0; K.mount = null; K.oy = m; b(K, P, tc); K.oy = 0; return K.finish({ pivot: [0, 0] }); }
-    const f = recipe(race, def); if (!f) return null; f(K, P, tc); return K.finish({ pivot: [0, 0] });
+    const f = recipe(race, def); if (!f) return null; f(K, P, tc, seed | 0); return K.finish({ pivot: [0, 0] });
   } catch (err) { console.warn('[ARD] malha ' + def + '/' + race + ' falhou: ' + err.message); return null; }
 }
 // material padrão das malhas: rugosidade e metal vêm do atributo rm por vértice; rim opcional por Raça

@@ -128,6 +128,9 @@ const UNITS = {
   cuspidor:   { name: 'Cuspidor', key: 'U', cls: 'inf', hp: 95, r: 7, speed: 90, cost: { minerio: 40, plasma: 30 }, time: 5, energyUse: 1, weapon: 'acido', sensor: 170, faction: 'vorag', desc: 'Cospe ácido a média distância; corrói veículos e estruturas.' },
   escaravelho: { name: 'Escaravelho', key: 'E', cls: 'vei', hp: 300, r: 11, speed: 120, cost: { minerio: 70, plasma: 60 }, time: 8, energyUse: 2, weapon: 'chifrada', sensor: 190, faction: 'vorag', desc: 'Besta de carga blindada: investida rápida que atropela infantaria.' },
   brutamonte: { name: 'Brutamonte', key: 'B', cls: 'vei', hp: 1000, r: 16, speed: 52, cost: { minerio: 160, plasma: 130 }, time: 15, energyUse: 4, weapon: 'brutamonte', sensor: 170, faction: 'vorag', desc: 'Tanque biológico: carapaça grossa e golpe de área.' },
+  // --- épicos de campanha (4.0e): não são produzidos; os roteiros do Ato 4 os criam
+  catedral:   { name: 'Catedral Errante', key: '', cls: 'vei', hp: 9000, r: 30, speed: 26, cost: { minerio: 1600, plasma: 400 }, time: 60, energyUse: 0, weapon: 'catedral', sensor: 320, faction: 'quorith', epic: true, desc: 'Épico do Coro: uma catedral de cristal que caminha cantando. Onda de ressonância em área.' },
+  matriarca:  { name: 'Matriarca', key: '', cls: 'vei', hp: 8000, r: 28, speed: 34, cost: { minerio: 1600, plasma: 400 }, time: 60, energyUse: 0, weapon: 'matriarca', sensor: 300, faction: 'vorag', epic: true, desc: 'Épica da Prole: a rainha que choca Crias sem parar.' },
   ferroada:   { name: 'Ferroada', key: 'F', cls: 'dro', hp: 80, r: 6, speed: 170, cost: { minerio: 30, plasma: 50 }, time: 5, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 210, faction: 'vorag', desc: 'Voadora barata com ferrão; em enxame, pica veículos e suporte.' },
 };
 // o que cada estrutura produz, por Raça
@@ -165,6 +168,8 @@ const WEAPONS = {
   mordida:   { dmg: 12, range: 26, cd: 0.5, proj: 'beam', speed: 0, inacc: 0, splash: 0, cls: 'inf', versusOverride: { inf: 1.3, vei: 0.8, dro: 0.4, est: 0.9, sup: 1.4 } },
   acido:     { dmg: 18, range: 130, cd: 1.1, proj: 'shell', speed: 260, inacc: 8, splash: 14, cls: 'inf', versusOverride: { inf: 1.2, vei: 1.1, dro: 0.5, est: 1.1, sup: 1.2 } },
   chifrada:  { dmg: 30, range: 30, cd: 0.9, proj: 'beam', speed: 0, inacc: 0, splash: 0, cls: 'vei' },
+  catedral:  { dmg: 90, range: 240, cd: 2.2, proj: 'shell', speed: 280, inacc: 10, splash: 40, cls: 'vei' },
+  matriarca: { dmg: 70, range: 160, cd: 1.6, proj: 'shell', speed: 300, inacc: 10, splash: 34, cls: 'vei' },
   brutamonte: { dmg: 55, range: 120, cd: 1.7, proj: 'shell', speed: 300, inacc: 12, splash: 26, cls: 'vei' },
 };
 const COUNTER = {
@@ -240,6 +245,8 @@ function createSim(cfg) {
       stats: { collected: 0, stolen: 0, lost: 0, unitsKilled: 0, unitsLost: 0, buildingsDestroyed: 0, buildingsLost: 0, treaties: 0, betrayals: 0, dmg: 0 },
       startAngle: rot + (Math.PI * 2 * i) / n,
     };
+    if (pc.color && /^#[0-9a-fA-F]{6}$/.test(pc.color)) p.color = pc.color; // 4.0e: cor escolhida no Hangar (solo e campanha)
+    if (pc.mods) { p.mods = Object.assign({}, pc.mods); const sr = p.mods.startRes || {}; for (const k in sr) if (p.res[k] != null) p.res[k] += sr[k]; if (p.mods.extraJumps) p.jumpsLeft += p.mods.extraJumps; } // 4.0e: relíquias
     sim.players.push(p);
     sim.vis.push(new Set());
     sim.explored.push(new Uint8Array(TILES * TILES));
@@ -379,6 +386,7 @@ function addBuilding(sim, owner, def, x, y, built) {
     maxHp: d.hp, hp: built ? d.hp : d.hp * 0.3, built: !!built, progress: built ? 1 : 0, queue: [], cd: 0,
     alive: true, lastHitT: -99, lastAttack: -99, cloaked: false, revealT: 0, rally: null, jumpT: 0, jumpTo: null, lotes: {}, ang: 0, aimAng: 0,
   };
+  { const pm = sim.players[owner] && sim.players[owner].mods; if (pm && pm.towerHpMul && (def === 'torre' || def === 'bastiao')) { e.maxHp *= pm.towerHpMul; e.hp *= pm.towerHpMul; } }
   sim.ents.push(e); sim.byId.set(e.id, e); sim.navDirty = true; return e;
 }
 function addUnit(sim, owner, def, x, y) {
@@ -505,6 +513,9 @@ function canAfford(p, cost) { for (const k in cost) if ((p.res[k] || 0) < cost[k
 function pay(p, cost, mult) { mult = mult || 1; for (const k in cost) p.res[k] = Math.max(0, p.res[k] - cost[k] * mult); }
 function refund(p, cost, mult) { mult = mult || 1; for (const k in cost) p.res[k] += cost[k] * mult; }
 function hasPact(sim, a, b) { return !!sim.players[a].pacts[b]; }
+// 4.0e — roteiros de missão: criar unidades e forçar tempestades (só a campanha solo usa; determinístico)
+function spawnUnit(sim, owner, def, x, y) { if (!UNITS[def] || !sim.players[owner]) return null; const u = addUnit(sim, owner, def, clamp(x, 30, WORLD - 30), clamp(y, 30, WORLD - 30)); emit(sim, { t: 'spawn', p: owner, x: u.x, y: u.y, def }); return u; }
+function forceStorm(sim, x, y, warn, dur, r) { sim.storm = { x: clamp(x, 200, WORLD - 200), y: clamp(y, 200, WORLD - 200), r: r || 420, t: 0, phase: 'warn', warn: warn == null ? 20 : warn, dur: dur || 90 }; for (const q of sim.players) if (q.alive) alertTo(sim, q.id, 'Tempestade de Éter se aproximando (' + Math.round(sim.storm.warn) + ' s)', sim.storm.x, sim.storm.y, 'warn'); emit(sim, { t: 'storm', phase: 'warn', x: sim.storm.x, y: sim.storm.y, r: sim.storm.r }); return sim.storm; }
 function pactCost(p) { return FACTIONS[p.faction].pactHalf ? PACT_CAUCAO / 2 : PACT_CAUCAO; }
 function repGain(p) { return FACTIONS[p.faction].pactHalf ? 2 : 1; }
 function unitName(faction, def) { const f = FACTIONS[faction]; return (f && f.names && f.names[def]) || (def === 'pirata' && f ? f.pirateName : UNITS[def].name); }
@@ -528,6 +539,7 @@ function sensorRadius(sim, e) {
   let r = e.kind === 'building' && !e.built ? 60 : d.sensor;
   r *= regimeOf(sim, e.owner).sensF;
   if (p.research.sensores) r *= 1.25;
+  if (p.mods && p.mods.sensorMul) r *= p.mods.sensorMul;
   if (p.blackoutT > 0) r *= 0.15;
   if (inStorm(sim, e.x, e.y)) r *= 0.5;
   return r;
@@ -536,6 +548,7 @@ function speedOf(sim, u) {
   const p = sim.players[u.owner];
   let s = u.speed;
   if (p.speedBuffT > 0) s *= 1.3;
+  if (p.mods && p.mods.speedMul) s *= p.mods.speedMul;
   if (UNITS[u.def].flying && inStorm(sim, u.x, u.y)) s *= 0.5;
   return s;
 }
@@ -667,28 +680,28 @@ function processCommand(sim, c) {
       if (fac.superKey === 'fundicao') {
         const ok = canBuild(sim, c.p, 'bastiao', c.x, c.y);
         if (!ok.ok || !inTerritory(sim, c.p, c.x, c.y)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: ok.ok ? 'Fora do seu território' : ok.why }); return; }
-        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD;
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD * (p.mods && p.mods.superCdMul || 1);
         addBuilding(sim, c.p, 'bastiao', c.x, c.y, false);
         emit(sim, { t: 'super', p: c.p, kind: 'fundicao', x: c.x, y: c.y });
         for (const q of sim.players) if (q.alive) alertTo(sim, q.id, (q.id === c.p ? 'Fundição Orbital a caminho' : p.name + ' ativou Fundição Orbital!'), c.x, c.y, q.id === c.p ? 'good' : 'danger');
       } else if (fac.superKey === 'salto') {
-        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD; p.saltoT = 45;
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD * (p.mods && p.mods.superCdMul || 1); p.saltoT = 45;
         for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Salto Evolutivo: +35% de dano por 45 s' : p.name + ' ativou o Salto Evolutivo!', null, null, q.id === c.p ? 'good' : 'danger');
         emit(sim, { t: 'super', p: c.p, kind: 'salto' });
       } else if (fac.superKey === 'unissono') {
-        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD; p.unissonoT = 20;
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD * (p.mods && p.mods.superCdMul || 1); p.unissonoT = 20;
         for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Uníssono: acorde cheio e 25% menos dano por 20 s' : p.name + ' ativou o Uníssono!', null, null, q.id === c.p ? 'good' : 'danger');
         emit(sim, { t: 'super', p: c.p, kind: 'unissono' });
       } else if (fac.superKey === 'eclosao') {
         if (typeof c.x !== 'number' || typeof c.y !== 'number') return;
         const ex = clamp(c.x, 40, WORLD - 40), ey = clamp(c.y, 40, WORLD - 40);
         if (!inTerritory(sim, c.p, ex, ey) && !seesPoint(sim, c.p, ex, ey)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Escolha um ponto visível' }); return; }
-        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD;
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD * (p.mods && p.mods.superCdMul || 1);
         for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; const u = addUnit(sim, c.p, 'cria', ex + DM.cos(a) * 22, ey + DM.sin(a) * 22); u.tempUntil = sim.time + 30; u.state = 'attackmove'; u.tx = ex; u.ty = ey; }
         emit(sim, { t: 'super', p: c.p, kind: 'eclosao', x: ex, y: ey });
         for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Eclosão: 8 Crias por 30 s' : p.name + ' ativou a Eclosão!', ex, ey, q.id === c.p ? 'good' : 'danger');
       } else {
-        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD; p.speedBuffT = 20;
+        pay(p, SUPER_COST); p.superCd = sim.time + SUPER_CD * (p.mods && p.mods.superCdMul || 1); p.speedBuffT = 20;
         for (const q of sim.players) if (q.alive && q.id !== c.p) { q.blackoutT = 20; alertTo(sim, q.id, p.name + ' ativou Blecaute! Sensores e energia a zero por 20 s', null, null, 'danger'); }
         alertTo(sim, c.p, 'Blecaute ativo: inimigos cegos por 20 s', null, null, 'good');
         emit(sim, { t: 'super', p: c.p, kind: 'blecaute' });
@@ -753,7 +766,7 @@ function computeEnergy(sim, p, dt) {
       const d = BUILDINGS[e.def];
       if (!e.built) continue;
       if (d.energyProd) {
-        if (d.plasmaBurn) { if (p.res.plasma > 0) { prod += d.energyProd; p.res.plasma = Math.max(0, p.res.plasma - d.plasmaBurn * dt); } }
+        if (d.plasmaBurn) { if (p.res.plasma > 0) { prod += d.energyProd; p.res.plasma = Math.max(0, p.res.plasma - d.plasmaBurn * dt * (p.mods && p.mods.burnMul || 1)); } }
         else if (e.def === 'nucleo' && FACTIONS[p.faction].photosynthesis) { const nt = (1 - DM.cos(Math.PI * 2 * sim.time / 750)) / 2; prod += 95 - 50 * nt; }
         else prod += d.energyProd;
       }
@@ -761,6 +774,7 @@ function computeEnergy(sim, p, dt) {
     } else if (e.kind === 'unit') cons += UNITS[e.def].energyUse || 0;
   }
   if (p.overchargeT > 0) prod *= 1.5;
+  if (p.mods && p.mods.energyMul) prod *= p.mods.energyMul;
   if (p.blackoutT > 0) prod = 0;
   const ratio = cons > 0 ? prod / cons : 1;
   p.energy.prod = prod; p.energy.cons = cons; p.energy.ratio = ratio;
@@ -963,7 +977,7 @@ function deliver(sim, u) {
   let total = 0;
   for (const k in u.cargo) {
     let v = u.cargo[k];
-    if (u.stolen) v *= facOf(sim, u.owner).stolenMult; else v *= mult;
+    if (u.stolen) v *= facOf(sim, u.owner).stolenMult; else v *= mult * (p.mods && p.mods.harvestMul || 1);
     p.res[k] += v; total += v;
   }
   if (u.stolen) {
@@ -987,6 +1001,7 @@ function updateUnit(sim, u, dt) {
   if (u.revealT > 0) u.revealT -= dt;
   const fac = facOf(sim, u.owner);
   if (u.tempUntil && sim.time >= u.tempUntil) { kill(sim, u, -1); return; } // Crias da Eclosão
+  { const pm = sim.players[u.owner].mods; if (pm && pm.regen && u.hp < u.maxHp && sim.time - u.lastHitT > 5) u.hp = Math.min(u.maxHp, u.hp + pm.regen * dt); }
   if (fac.hunger && u.def === fac.hunger.def && !u.tempUntil && sim.tick % 10 === 0 && !inTerritory(sim, u.owner, u.x, u.y)) { const floor = u.maxHp * fac.hunger.floor; if (u.hp > floor) u.hp = Math.max(floor, u.hp - fac.hunger.rate); }
   u.cloaked = !!fac.cloak[u.def] && u.state !== 'siphon' && (sim.time - u.lastAttack) > 3;
   if (!u.cloaked && u.def !== 'ancora' && sim.auras && sim.auras[u.owner].anchors.length && (sim.time - u.lastAttack) > 3) { for (const an of sim.auras[u.owner].anchors) if (dist(an.x, an.y, u.x, u.y) <= UNITS.ancora.aura.cloak) { u.cloaked = true; break; } }
@@ -1106,7 +1121,7 @@ function updateBuilding(sim, b, dt) {
     return; // no production while jumping
   }
   if (b.queue.length) {
-    let mult = reg.prodF;
+    let mult = reg.prodF; if (p.mods && p.mods.prodMul) mult *= p.mods.prodMul;
     if (facOf(sim, b.owner).lineBonus && d.produces && b.def !== 'nucleo') {
       let n = 0; queryGrid(sim, b.x, b.y, 160, e => { if (e !== b && e.kind === 'building' && e.owner === b.owner && e.built && BUILDINGS[e.def].produces && e.def !== 'nucleo' && dist(e.x, e.y, b.x, b.y) <= 150) n++; });
       mult *= 1 + 0.12 * Math.min(4, n);
@@ -1244,8 +1259,8 @@ function checkEnd(sim) {
 
 function step(sim) {
   const dt = TICK;
-  sim.events = [];
-  if (sim.result) return sim.events;
+  sim.events = sim.events ? sim.events.slice(sim._evRet || 0) : []; // 4.0e: só os eventos emitidos depois do último retorno (roteiros da campanha) seguem para este passo; saída apenas, fora do hash
+  if (sim.result) { sim._evRet = sim.events.length; return sim.events; }
   for (const e of sim.ents) if (e.kind !== 'node') { e.px = e.x; e.py = e.y; }
   if (sim.navDirty) rebuildNav(sim);
   rebuildGrid(sim);
@@ -1278,14 +1293,14 @@ function step(sim) {
   if (sim.tick % 3 === 0) markExplored(sim);
   sim.tick++; sim.time = sim.tick * TICK;
   checkEnd(sim);
-  return sim.events;
+  sim._evRet = sim.events.length; return sim.events;
 }
 
 // ---------- queries for UI/AI ----------
 function entitiesOf(sim, pid) { const out = []; for (const e of sim.ents) if (e.alive && e.owner === pid) out.push(e); return out; }
 function armyValue(sim, pid) {
   let v = 0;
-  for (const e of sim.ents) if (e.alive && e.owner === pid && e.kind === 'unit' && UNITS[e.def].attack) { const c = UNITS[e.def].cost; v += (c.minerio || 0) + (c.plasma || 0) + (c.dados || 0); }
+  for (const e of sim.ents) if (e.alive && e.owner === pid && e.kind === 'unit' && UNITS[e.def].attack && !UNITS[e.def].epic) { const c = UNITS[e.def].cost; v += (c.minerio || 0) + (c.plasma || 0) + (c.dados || 0); }
   return v;
 }
 function hash(sim) { // cheap state hash for determinism tests
@@ -1301,6 +1316,6 @@ ARD.sim = {
   SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS, FACTION_EXTRAS, producesFor,
   NAV, NW, TILE, TILES, BIOMES, navIdx, passable, flowField, lineFree, inStorm,
   DM,
-  createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint,
+  createSim, step, enqueue, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint, spawnUnit, forceStorm,
 };
 })(globalThis.ARD = globalThis.ARD || {});
