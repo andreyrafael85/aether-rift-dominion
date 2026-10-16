@@ -65,5 +65,19 @@ function makeHorizon(THREE, WORLD, H, seed, tint) {
   geo.setAttribute('color', new THREE.BufferAttribute(col, 3)); geo.computeVertexNormals();
   const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.96, metalness: 0, envMapIntensity: 0.15, flatShading: true })); m.position.set(WORLD / 2, 0, -WORLD / 2); m.receiveShadow = false; return m;
 }
-ARD.world3d = { PLANETS, detailTexture, planetTexture, makeSky, makeHomeWorld, makeHorizon, fbm };
+function microTexture(THREE) { /* 4.3a: microdetalhe do chão (R altura de seixos + grão, G tom, B fendas), repetível, 512² */
+  const N = 512; const cv = document.createElement('canvas'); cv.width = cv.height = N; const c = cv.getContext('2d'); const img = c.createImageData(N, N); const d = img.data;
+  let s = 987654321; const rnd = () => { s = (Math.imul(s, 1103515245) + 12345) >>> 0; return (s >>> 8) / 16777216; };
+  const G = 18, pts = []; for (let j = 0; j < G; j++) for (let i = 0; i < G; i++) pts.push([(i + 0.15 + rnd() * 0.7) / G, (j + 0.15 + rnd() * 0.7) / G, 0.25 + rnd() * 0.75, rnd()]);
+  const G2 = 6, crk = []; for (let j = 0; j < G2; j++) for (let i = 0; i < G2; i++) crk.push([(i + rnd()) / G2, (j + rnd()) / G2]);
+  const wrap = v => v - Math.floor(v); const dw = (a, b) => { let x = Math.abs(a - b); return x > 0.5 ? 1 - x : x; };
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const u = x / N, v = y / N; const ci = Math.floor(u * G), cj = Math.floor(v * G);
+    let best = 9, bs = 0, bt = 0; for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) { const p = pts[((cj + oy + G) % G) * G + ((ci + ox + G) % G)]; const dx = dw(u, p[0]) * G, dy = dw(v, p[1]) * G; const dd = Math.sqrt(dx * dx + dy * dy) / (0.28 + 0.3 * p[2]); if (dd < best) { best = dd; bs = p[2]; bt = p[3]; } }
+    const peb = best < 1 ? Math.sqrt(1 - best * best) : 0; const k1 = Math.floor(u * G2), k2 = Math.floor(v * G2); let f1 = 9, f2 = 9;
+    for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) { const p = crk[((k2 + oy + G2) % G2) * G2 + ((k1 + ox + G2) % G2)]; const dx = dw(u, p[0]) * G2, dy = dw(v, p[1]) * G2; const dd = Math.sqrt(dx * dx + dy * dy); if (dd < f1) { f2 = f1; f1 = dd; } else if (dd < f2) f2 = dd; }
+    const crack = Math.max(0, 1 - (f2 - f1) / 0.05); const grit = hash3(x, y, 77);
+    const i = (y * N + x) * 4; d[i] = 255 * Math.min(1, peb * (0.5 + 0.5 * bs) * 0.85 + grit * 0.15); d[i + 1] = 255 * (peb > 0 ? 0.35 + 0.5 * bt : 0.45 + 0.2 * grit); d[i + 2] = 255 * crack * (1 - peb); d[i + 3] = 255; }
+  c.putImageData(img, 0, 0); const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.NoColorSpace; return t;
+}
+ARD.world3d = { PLANETS, detailTexture, microTexture, planetTexture, makeSky, makeHomeWorld, makeHorizon, fbm };
 })(globalThis.ARD = globalThis.ARD || {});

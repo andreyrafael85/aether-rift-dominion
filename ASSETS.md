@@ -5,7 +5,7 @@ Todo arquivo de arte ou biblioteca externa entra aqui com origem e licença. Sem
 | Item | Origem | Autor | Licença | Uso |
 |---|---|---|---|---|
 | Modelos voxel (src/models.js) | próprios, definidos em código | equipe | todos os direitos reservados | modo 2D, ícones de reserva, estilo 2D e 3D |
-| Malhas 3D por Raça (src/meshes.js, 4.0d) | próprias, geradas em código a partir de primitivas do Three.js | equipe | todos os direitos reservados | jogo (modo 3D), ícones do HUD, catálogo 3D |
+| Malhas 3D por Raça (src/meshes.js, 4.0d) | próprias, geradas em código a partir de primitivas do Three.js (4.3a: coletores das 5 Raças remodelados; detalhe de superfície e microdetalhe do chão procedurais, sem texturas externas) | equipe | todos os direitos reservados | jogo (modo 3D), ícones do HUD, catálogo 3D |
 | Céu, planeta-mãe, horizonte e textura de detalhe do terreno (src/world3d.js) | procedurais (ruído fBm), paletas dos mundos aprovados | equipe | todos os direitos reservados | jogo (modo 3D) |
 | Logo vivo (src/logo3d.js) | cena procedural da Final 2 aprovada | equipe | todos os direitos reservados | tela inicial (desktop) |
 | Adereços do terreno e estradas (src/dress3d.js, 4.2d) | geometria procedural do Three.js e shader próprio, sem texturas | equipe | todos os direitos reservados | jogo (modo 3D) |

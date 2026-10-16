@@ -310,7 +310,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
 <div id="start" class="screen">
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Versão 4.2h · build 2026-10-16 01:39Z · Engine gráfica 3 · minério à vista · caminhos livres · multiplayer 2 a 4</div>
+    <div class="eyebrow">Versão 4.3a · build 2026-10-16 03:03Z · Engine gráfica 4 · de perto · coletores novos · multiplayer 2 a 4</div>
     <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div><h1>Aether Rift<br><span>Dominion</span></h1></div></div>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -358,8 +358,9 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
     </div>
     <div class="notes">
       <div class="choose">Notas da versão</div>
+      <p class="start-notes"><b>4.3a — De perto: coletores e chão:</b> começa a v4.3, a Engine gráfica 4, que leva o jogo inteiro a um nível de detalhe de quem chega com a câmera colada. A câmera agora <b>aproxima até 6×</b> (4× no celular). Os <b>coletores das cinco Raças foram refeitos do zero</b>, cada um com dezenas de peças. O Vehnar virou um carregador pesado com rodas-tambor, caçamba de minério, motor com chaminés em brasa e cabeça de mineração. O Erevane é um esquife flutuante facetado com bico-sifão, e o Tessara uma colhedeira viva com flor-mandíbula e sacos de seiva. O Quorith é uma nave de cristal com diapasão e lente focal, e o Vorag um Semeador com saco digestivo aceso e mandíbulas de osso. Ao colher, o coletor se vira para o nó e solta um <b>feixe de mineração</b> na cor do recurso, com brilho, faíscas e poeira no contato. Todos os modelos ganharam <b>detalhe de superfície</b>: painéis com costuras, rebites e grades nos metais, sulcos na borracha, poros no osso e células na quitina. Esse detalhe aparece de perto e some sozinho de longe, sem cintilar. De perto, o chão ganha seixos, fendas e grão. Só o que a câmera vê é desenhado, então os modelos novos não pesam fora da tela.</p>
+      <details class="oldnotes"><summary>Histórico das versões anteriores (4.2h → 2.0)</summary>
       <p class="start-notes"><b>4.2h — Minério à vista:</b> o <b>Minério virou cristal azul-elétrico com brilho próprio</b>, e azul aceso agora é só dele: pedras, gelo e ruínas do cenário perderam o brilho e as cores de recurso, e os lagos laranja decorativos saíram. Cada nó tem um <b>halo no chão</b> na cor do recurso, que encolhe conforme o nó esvazia e pisca quando está acabando; nó esgotado fica apagado. No radar cada recurso tem seu símbolo, do tamanho do que resta: <b>losango</b> para Minério, <b>hexágono</b> para Plasma e <b>triângulo</b> para Dados. Nós ainda não explorados aparecem apagados. Os recursos continuam finitos (cada nó tem uma quantidade fixa), mas agora o jogo <b>avisa quando o Minério ou o Plasma do seu território acaba</b> e aponta o campo livre mais perto. Um chip na barra mostra os <b>coletores parados</b> e seleciona todos com um clique. A partir dos 9 min surgem <b>veios de Minério</b> no meio do mapa a cada 3,5 min, longe das bases. A Tempestade de Éter passou a render 2× de verdade no Plasma, e o nó de Dados perto da base entra no território já na Era II.</p>
-      <details class="oldnotes"><summary>Histórico das versões anteriores (4.2g → 2.0)</summary>
       <p class="start-notes"><b>4.2g — Caminhos livres e campanha destravada:</b> correções pedidas pelos testes da campanha. As unidades <b>pararam de travar em muros e rochas</b>: veículos, coletores e infantaria contornam cristas de pedra e linhas de muro e passam pelos <b>Portões mesmo em muro na diagonal da tela</b>. Se o ponto clicado cai dentro de uma rocha, de um prédio ou da Fenda, elas param no ponto livre mais perto, e uma unidade que não consegue sair do lugar desiste em vez de empurrar para sempre. Coletores carregados acham o caminho até a Refinaria ou o Núcleo. Grupos grandes pesam menos: o grupo segue um caminho só até perto do destino. <b>Coletores mandados a outro lugar</b> (clique direito no chão ou num nó) colhem os nós em volta, mesmo fora do território, e entregam sozinhos; parado com carga, o coletor vai entregar. O clique direito num nó com coletores em cima vale como ordem de colher, e a seleção em caixa só deixa os coletores de fora quando o exército é maioria. Na <b>missão 6 (Roubo e contrarroubo)</b> o Pirata de qualquer Raça rouba. O Sifonador Erevane fica camuflado no caminho e só aparece quando começa a drenar, e o Pirata mandado de volta entrega ao chegar perto da Refinaria ou do Núcleo. Recuperar o próprio recurso numa caixa não conta como roubo, o inimigo sempre manda Piratas para o contrarroubo e as instruções dizem qual é o seu Pirata e onde atacar. <b>Salvar por cima</b> de um espaço ocupado voltou a funcionar (a confirmação ficava escondida atrás da janela), e <b>Sair</b> ou <b>Pausar e sair</b> levam ao início sem recomeçar a missão. Ctrl+S não manda as unidades pararem, e em telas de 1280 px a barra superior não fica embaixo do radar. O multiplayer pede esta mesma versão nos dois lados.</p>
       <p class="start-notes"><b>4.2f — Barra nova, pausa clara e Tessara vilã:</b> rodada de ajustes pedida pelos testes. A <b>barra superior</b> foi refeita: Plasma, Minério e Fragmentos de Dados ganharam ícones desenhados (chama, bloco de minério e cristal de dados) em pílulas com a cor de cada recurso, e cada uma mostra quanto o recurso <b>subiu ou caiu por minuto</b> nos últimos 30 s. A Energia virou um medidor com raio e barra, e tempo, Era, reputação e inimigos viraram etiquetas com ícone. Os custos nos botões de construção usam os mesmos ícones. No celular a barra fica compacta. A <b>pausa ficou visível</b>: quando você troca de aba, o jogo continua pausando sozinho para nada se perder, mas agora mostra um painel <b>"Pausado"</b> explicando o motivo, com o botão <b>Continuar</b>. Um clique ou toque em qualquer lugar (ou P / ❚❚) volta a partida. Antes só aparecia um aviso rápido, e parecia que as unidades tinham travado. A <b>Tessara</b> (Sylva Oriel) ficou com cara de vilã: sobrancelhas em V, olhos semicerrados amarelo-tóxicos com pupila em fenda, órbitas escuras, espinhos no lugar das bochechas e um sorriso torto com presas. Vale para o busto 3D da tela inicial e da partida e para os retratos da campanha.</p>
       <p class="start-notes"><b>4.2e — Veteranos, avarias e épicos:</b> fecha a v4.2, a Engine gráfica 3. Unidades <b>Elite (★★)</b> ganham um anel dourado no chão, e as <b>Lendas (★★★)</b> fazem o anel pulsar e soltam faíscas douradas. Unidades muito feridas <b>soltam fumaça e faíscas</b>, e estruturas quase destruídas <b>pegam fogo</b>. Assim dá para ler a batalha sem abrir o painel. Os chefes da campanha ficaram mais imponentes. A <b>Catedral Errante</b> ganhou contrafortes de cristal, uma auréola de cristais que orbita o topo, estandartes de luz que balançam e uma faixa na cor do dono. A <b>Matriarca</b> ganhou sacos de ovos que brilham, veias acesas no abdômen e placas de carapaça no tórax. A luz curta das explosões ficou mais suave, para não estourar as unidades por perto.</p>
@@ -2818,7 +2819,7 @@ function rng(seed) { let r = ((seed | 0) * 7919 + 104729) >>> 0; return () => { 
 
 // ---------- construtor ----------
 class Kit {
-  constructor() { this.main = []; this.emi = []; this.mount = null; this.ox = 0; this.oy = 0; this.oz = 0; this._anim = null; }
+  constructor() { this.main = []; this.emi = []; this.mount = null; this.beam = null; this.ox = 0; this.oy = 0; this.oz = 0; this._anim = null; } // beam (4.3a): emissor do feixe de mineração, nas coordenadas da receita
   // 4.2b: tudo o que for desenhado dentro de fn ganha a mesma animação (spec.t: wheel, spin, leg, recoil, bob, flap, sway, tread; spec.p = pivô)
   anim(spec, fn) { const prev = this._anim; this._anim = spec; try { fn(); } finally { this._anim = prev; } return this; }
   _push(geo, col, mat, o) {
@@ -2830,7 +2831,7 @@ class Kit {
     geo.applyMatrix4(m); if (o.flat) geo.computeVertexNormals();
     const c = new T.Color(col); const an = animOf(o.anim || this._anim, this);
     if (o.e) { c.multiplyScalar(o.e === true ? 2.4 : o.e); this.emi.push({ geo, c, an }); }
-    else this.main.push({ geo, c, rm: Array.isArray(mat) ? mat : (MAT[mat] || MAT.paint), an });
+    else this.main.push({ geo, c, rm: Array.isArray(mat) ? mat : (MAT[mat] || MAT.paint), an, pt: o.pat != null ? o.pat : (typeof mat === 'string' ? (PAT[mat] || 0) : 1) });
     return this;
   }
   // caixa com base em y; o.b = chanfro (cantos arredondados na planta, bordas chanfradas em cima e embaixo)
@@ -2858,14 +2859,14 @@ class Kit {
     const hasAnim = all.some(p => p.an); // 4.2b
     const mk = (list, withRM) => {
       if (!list.length) return null; let n = 0; for (const p of list) n += p.geo.attributes.position.count;
-      const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), col = new Float32Array(n * 3), rm = withRM ? new Float32Array(n * 2) : null; let k = 0;
+      const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), col = new Float32Array(n * 3), rm = withRM ? new Float32Array(n * 2) : null, pt = withRM ? new Float32Array(n) : null; let k = 0;
       const aa = hasAnim ? new Float32Array(n * 4) : null, ab = hasAnim ? new Float32Array(n * 4) : null;
-      for (const p of list) { const c = p.geo.attributes.position.count; pos.set(p.geo.attributes.position.array, k * 3); nor.set(p.geo.attributes.normal.array, k * 3); for (let i = 0; i < c; i++) { const j = k + i; pos[j * 3] -= cx; pos[j * 3 + 1] -= y0; pos[j * 3 + 2] -= cz; col[j * 3] = p.c.r; col[j * 3 + 1] = p.c.g; col[j * 3 + 2] = p.c.b; if (rm) { rm[j * 2] = p.rm[0]; rm[j * 2 + 1] = p.rm[1]; }
+      for (const p of list) { const c = p.geo.attributes.position.count; pos.set(p.geo.attributes.position.array, k * 3); nor.set(p.geo.attributes.normal.array, k * 3); for (let i = 0; i < c; i++) { const j = k + i; pos[j * 3] -= cx; pos[j * 3 + 1] -= y0; pos[j * 3 + 2] -= cz; col[j * 3] = p.c.r; col[j * 3 + 1] = p.c.g; col[j * 3 + 2] = p.c.b; if (pt) pt[j] = p.pt || 0; if (rm) { rm[j * 2] = p.rm[0]; rm[j * 2 + 1] = p.rm[1]; }
           if (aa && p.an) { aa[j * 4] = p.an.t; aa[j * 4 + 1] = p.an.p[0] - cx; aa[j * 4 + 2] = p.an.p[1] - y0; aa[j * 4 + 3] = p.an.p[2] - cz; ab[j * 4] = p.an.b[0]; ab[j * 4 + 1] = p.an.b[1]; ab[j * 4 + 2] = p.an.b[2]; ab[j * 4 + 3] = p.an.b[3]; } } k += c; p.geo.dispose(); }
-      const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(pos, 3)); g.setAttribute('normal', new T.BufferAttribute(nor, 3)); g.setAttribute('color', new T.BufferAttribute(col, 3)); if (rm) g.setAttribute('rm', new T.BufferAttribute(rm, 2));
+      const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(pos, 3)); g.setAttribute('normal', new T.BufferAttribute(nor, 3)); g.setAttribute('color', new T.BufferAttribute(col, 3)); if (rm) g.setAttribute('rm', new T.BufferAttribute(rm, 2)); if (pt) g.setAttribute('pt', new T.BufferAttribute(pt, 1));
       if (aa) { g.setAttribute('aAnim', new T.BufferAttribute(aa, 4)); g.setAttribute('aAnimB', new T.BufferAttribute(ab, 4)); } g.computeBoundingSphere(); return g;
     };
-    const out = { main: mk(this.main, true), em: mk(this.emi, false), width: Math.max(bb.max.x - bb.min.x, bb.max.z - bb.min.z), height: bb.max.y - bb.min.y, mount: this.mount == null ? null : this.mount - y0, mesh: true, anim: hasAnim };
+    const out = { main: mk(this.main, true), em: mk(this.emi, false), width: Math.max(bb.max.x - bb.min.x, bb.max.z - bb.min.z), height: bb.max.y - bb.min.y, mount: this.mount == null ? null : this.mount - y0, beam: this.beam ? [this.beam[0] - cx, this.beam[1] - y0, this.beam[2] - cz] : null, mesh: true, anim: hasAnim };
     if (!out.main) { const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(new Float32Array(9), 3)); g.setAttribute('normal', new T.BufferAttribute(new Float32Array(9), 3)); g.setAttribute('color', new T.BufferAttribute(new Float32Array(9), 3)); g.setAttribute('rm', new T.BufferAttribute(new Float32Array(6), 2)); out.main = g; }
     return out;
   }
@@ -2914,7 +2915,34 @@ function animShader(sh) {
   if (sh.vertexShader.includes('#include <beginnormal_vertex>')) sh.vertexShader = sh.vertexShader.replace('#include <beginnormal_vertex>', '#include <beginnormal_vertex>\n{ mat3 ardR; vec3 ardT; ardAnim(ardR, ardT); objectNormal = ardR * objectNormal; }');
   sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n{ mat3 ardR; vec3 ardT; ardAnim(ardR, ardT); transformed = ardR * (transformed - aAnim.yzw) + aAnim.yzw + ardT; }');
 }
-const ANIM_DEFAULTS = { aAnim: [0, 0, 0, 0], aAnimB: [0, 0, 0, 0], aInst: [0, 0, 0, 0], aInstC: [0] }; // geometria sem as peças animadas lê zeros (sem animação)
+const ANIM_DEFAULTS = { aAnim: [0, 0, 0, 0], aAnimB: [0, 0, 0, 0], aInst: [0, 0, 0, 0], aInstC: [0] };
+// 4.3a — detalhe de superfície (pt por peça: 1 painéis, 2 borracha, 3 poros, 4 quitina, 5 pedra; 0 liso). uDet é global (qualidade).
+const DET = { value: 1 }; const PAT = { steel: 1, metal: 1, paint: 1, dark: 1, gloss: 1, rubber: 2, bone: 3, skin: 3, chitin: 4, wet: 4, stone: 5, matte: 5 };
+const SURF_GLSL = `uniform float uDet; varying float vPt; varying vec3 vLoc; varying vec3 vLocN;
+float ardH2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float ardVN(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(ardH2(i), ardH2(i + vec2(1.0, 0.0)), f.x), mix(ardH2(i + vec2(0.0, 1.0)), ardH2(i + vec2(1.0, 1.0)), f.x), f.y); }
+vec3 ardPerturb(vec3 sp, vec3 sn, vec2 dh, float fd) { vec3 sx = normalize(dFdx(sp)), sy = normalize(dFdy(sp)); vec3 r1 = cross(sy, sn), r2 = cross(sn, sx); float det = dot(sx, r1) * fd; vec3 g = sign(det) * (dh.x * r1 + dh.y * r2); return normalize(abs(det) * sn - g); }
+void ardSurf(out float h, out float alb, out float rgh) {
+  h = 0.0; alb = 1.0; rgh = 0.0; int pt = int(vPt + 0.5); if (pt == 0 || uDet <= 0.0) return;
+  vec3 an = abs(vLocN); vec2 uv = an.x >= an.y && an.x >= an.z ? vLoc.zy : (an.y >= an.z ? vLoc.xz : vLoc.xy);
+  float fw = max(fwidth(uv.x), fwidth(uv.y)); float k = (1.0 - smoothstep(0.035, 0.11, fw)) * uDet; if (k <= 0.0) return;
+  if (pt == 1) { vec2 cs = vec2(2.6, 1.6); vec2 c = uv / cs; c.x += 0.37 * mod(floor(c.y), 3.0); vec2 id = floor(c); vec2 f = fract(c);
+    float hv = ardH2(id), hw = ardH2(id + 7.3); vec2 e = min(f, 1.0 - f) * cs; float ex = hw < 0.45 ? 9.0 : e.x; /* placas unidas: sem costura vertical */
+    float seam = 1.0 - smoothstep(0.012, 0.04, min(ex, e.y));
+    vec2 q = abs(f - 0.5) * cs - (cs * 0.5 - 0.16); float rv = hv > 0.55 ? 1.0 - smoothstep(0.025, 0.045, length(q)) : 0.0;
+    float vent = hv < 0.12 ? smoothstep(0.35, 0.5, abs(fract(f.y * 7.0) - 0.5)) * step(0.18, f.x) * step(f.x, 0.82) * step(0.15, f.y) * step(f.y, 0.85) : 0.0;
+    float pv = hv - 0.5; float grime = ardVN(uv * 3.1) * (1.0 - smoothstep(0.0, 2.4, vLoc.y)) + 0.35 * ardVN(uv * 11.0) * ardVN(uv * 0.9);
+    h = -seam * 0.6 + rv * 0.35 - vent * 0.5; alb = (1.0 + pv * 0.09 - seam * 0.26 + rv * 0.08 - vent * 0.3) * (1.0 - 0.2 * grime); rgh = pv * 0.12 + seam * 0.1 + 0.18 * grime; }
+  else if (pt == 2) { float g = abs(fract(uv.x * 1.8 + uv.y * 0.2) - 0.5); float gr = smoothstep(0.3, 0.44, g); h = -gr * 0.7; alb = 1.0 - 0.18 * gr; rgh = 0.05 * gr; }
+  else if (pt == 3 || pt == 4) { vec2 p = uv * (pt == 3 ? 2.6 : 1.5); vec2 i = floor(p), f = fract(p); float d1 = 8.0, d2 = 8.0;
+    for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) { vec2 o = vec2(float(x), float(y)); vec2 r = o + vec2(ardH2(i + o), ardH2(i + o + 17.0)) - f; float d = dot(r, r); if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) d2 = d; }
+    d1 = sqrt(d1); d2 = sqrt(d2);
+    if (pt == 3) { float pore = 1.0 - smoothstep(0.0, 0.16, d1); h = -pore * 0.6 + ardVN(uv * 7.0) * 0.25; alb = 1.0 - 0.2 * pore; rgh = 0.1 * pore; }
+    else { float edge = 1.0 - smoothstep(0.0, 0.09, d2 - d1); h = -edge * 0.7 + d1 * 0.3; alb = 0.92 + 0.14 * d1 - 0.22 * edge; rgh = -0.08 + 0.18 * edge; } }
+  else if (pt == 5) { float n = ardVN(uv * 2.4) * 0.6 + ardVN(uv * 6.5) * 0.4; h = n * 0.8; alb = 0.84 + 0.32 * n; rgh = 0.05 * n; }
+  h *= k; alb = mix(1.0, alb, k); rgh *= k;
+}
+`; // geometria sem as peças animadas lê zeros (sem animação)
 function roundBox(w, h, d, b, segs) {
   b = Math.max(0.01, Math.min(b, w / 2 - 0.02, d / 2 - 0.02, h / 2 - 0.02)); const iw = w - 2 * b, id = d - 2 * b, rc = Math.min(b, iw / 2, id / 2) * 0.8;
   const s = new T.Shape(); const x0 = -iw / 2, x1 = iw / 2, y0 = -id / 2, y1 = id / 2;
@@ -3069,11 +3097,74 @@ U.vehnar = {
     K.box(-1.55, 3.4, 0, 1.2, 2.6, 2.2, P.b, 'steel', { b: 0.3 }); K.sph(0.1, 6.9, 0, 1.15, P.b, 'steel', { seg: 14 }); K.box(1.15, 6.62, 0, 0.5, 0.5, 1.5, P.g, null, { e: 1.8 });
     K.seg([0.1, 5.5, 1.5], [1.3, 4.6, 1.0], 0.38, P.a, 'steel'); K.seg([0.1, 5.5, -1.5], [1.7, 4.6, 0.3], 0.38, P.a, 'steel');
     if (!o.noRifle) K.anim({ t: 'recoil', dist: 0.4 }, () => { K.box(2.2, 4.3, 0.95, 4, 0.55, 0.55, P.d, 'metal', { b: 0.12 }); K.box(3.7, 4.15, 0.95, 1.4, 0.85, 0.5, P.b, 'metal'); }); },
-  coletor(K, P, tc) { for (const x of [-3.5, 0, 3.5]) for (const s of [-1, 1]) wheel(K, P, x, 1.1, s * 3.2, 1.1, 0.9);
-    K.box(0, 1.1, 0, 10, 1.4, 5.6, P.d, 'dark', { b: 0.3 }); K.box(3.4, 2.5, 0, 3.2, 3, 5, P.a, 'steel', { b: 0.5 }); K.box(4.75, 3.6, 0, 0.9, 1.4, 4.2, P.g, 'glass', { b: 0.2 });
-    K.box(-1.6, 2.5, 0, 6, 2.6, 5.4, tc, 'paint', { b: 0.4 }); K.box(-1.6, 5.1, 0, 5.4, 0.3, 4.8, P.b, 'steel');
-    K.poly([[0, 0], [1.6, 0.4], [1.6, 2.4], [0, 2.8]], 5.8, P.t, 'metal', { x: 5.2, y: 0.4 });
-    K.light(5.05, 4.9, 1.8, 0.4, P.l); K.light(5.05, 4.9, -1.8, 0.4, P.l); K.light(-4.7, 2.8, 0, 0.5, '#FF4040'); },
+  coletor(K, P, tc) { // 4.3a: carregador de minério pesado — rodas-tambor duplas, chassi chanfrado, motor com chaminés em brasa, caçamba com minério, cabine blindada e cabeça de mineração com emissores gêmeos
+    const FO = '#FF7A2E', PK = '#FF5FD2', RED = '#FF4040', ORE = '#3A3F48', CRY = '#3FA9E0', AY = 1.52, ZW = 2.68, AX = [-3.9, 2.45];
+    // caixa chanfrada barata: perfil octogonal (cantos cortados em b) extrudado com chanfro nas pontas; base em y, centro em x/z
+    const cb = (x, y, z, w, h, d, b, col, mat, o) => { const c = b * 0.6, hw = w / 2 - c, hh = h / 2 - c; K.poly([[-hw + b, -hh], [hw - b, -hh], [hw, -hh + b], [hw, hh - b], [hw - b, hh], [-hw + b, hh], [-hw, hh - b], [-hw, -hh + b]], d - 2 * c, col, mat, Object.assign({ x, y: y + h / 2, z, b: c }, o)); };
+    // faixa de perigo: listras amarelas e pretas inclinadas; dir = 'tx' (tampo, ao longo de x), 'tz' (tampo, ao longo de z), 'fz' (face ±x), 'sx' (face ±z)
+    const haz = (x, y, z, len, wid, n, dir) => { const o = { tx: { rx: -H }, tz: { rx: -H, ry: H }, fz: { ry: -H }, sx: {} }[dir]; const q = len / (2 * n), sk = Math.min(wid * 0.7, q);
+      for (let i = 0; i < 2 * n; i++) { const u = -len / 2 - sk / 2 + i * q; K.poly([[u, -wid / 2], [u + q, -wid / 2], [u + q + sk, wid / 2], [u + sk, wid / 2]], 0.05, i % 2 ? P.d : P.h, 'paint', Object.assign({ x, y, z, pat: 0 }, o)); } };
+    // roda-tambor: dois pneus com garras desencontradas, cinta da cor do time no meio, cubo com parafusos e trava amarela (o giro aparece)
+    const drum = (x, s) => { const z = s * ZW; K.anim({ t: 'wheel', p: [x, AY, z], r: AY }, () => {
+      for (const k of [-1, 1]) { const zt = z + k * 0.4; K.cyl(x, AY, zt - 0.3, 1.4, 1.4, 0.6, P.d, 'rubber', { rx: H, seg: 14 });
+        for (let i = 0; i < 6; i++) { const a = (i + (k > 0 ? 0.5 : 0)) / 6 * PI * 2; K.box(x + Math.cos(a) * 1.33, AY + Math.sin(a) * 1.33, zt, 0.56, 0.19, 0.62, P.d, 'rubber', { rz: a - H }); } }
+      K.cyl(x, AY, z - 0.12, 1.12, 1.12, 0.24, tc, 'paint', { rx: H, seg: 14 });
+      const zo = z + s * 0.7; K.cyl(x, AY, zo, 0.98, 0.98, 0.1, P.b, 'metal', { rx: s * H, seg: 14 }); K.cyl(x, AY, zo + s * 0.1, 0.42, 0.62, 0.17, P.t, 'metal', { rx: s * H, seg: 10 });
+      for (let i = 0; i < 5; i++) { const a = i / 5 * PI * 2; K.box(x + Math.cos(a) * 0.8, AY + Math.sin(a) * 0.8 - 0.06, zo + s * 0.12, 0.14, 0.12, 0.08, P.d, 'metal'); }
+      K.box(x, AY - 0.08, zo + s * 0.28, 0.56, 0.16, 0.05, P.h, 'paint'); }); };
+    for (const x of AX) for (const s of [-1, 1]) drum(x, s);
+    // chassi: longarinas escuras, eixos
+    cb(-0.85, 0.85, 0, 10.2, 1.0, 3.3, 0.25, P.d, 'dark'); for (const x of AX) K.box(x, 1.12, 0, 0.9, 0.8, 4.3, P.b, 'metal');
+    // motor (traseira): bloco chanfrado, ventoinha que gira no tampo, venezianas com brasa, chaminés, corrimão, grade, lanternas, para-choque com faixa
+    cb(-4.4, 1.85, 0, 2.8, 2.0, 3.7, 0.3, P.a, 'steel'); K.box(-4.5, 3.8, 0, 2.1, 0.1, 2.9, P.b, 'steel');
+    K.cyl(-4.75, 3.86, 0, 0.92, 0.92, 0.1, P.d, 'dark', { seg: 16 }); K.tor(-4.75, 3.98, 0, 0.92, 0.07, P.b, 'metal', { ts: 12, rs: 3 });
+    K.anim({ t: 'spin', p: [-4.75, 3.93, 0], speed: 7 }, () => { for (let i = 0; i < 3; i++) K.box(-4.75, 3.92, 0, 1.7, 0.04, 0.32, P.t, 'metal', { ry: i / 3 * PI + 0.3 }); });
+    K.box(-4.75, 4.0, 0, 0.08, 0.05, 1.84, P.d, 'dark'); K.box(-4.75, 4.0, 0, 1.84, 0.05, 0.08, P.d, 'dark'); for (const z of [-1.3, -1.08, 1.08, 1.3]) K.box(-4.85, 3.88, z, 1.5, 0.04, 0.12, FO, null, { e: 1.8 });
+    for (const s of [-1, 1]) { K.box(-4.55, 2.25, s * 1.86, 1.8, 1.0, 0.06, FO, null, { e: 1.3 }); for (let i = 0; i < 4; i++) K.box(-4.55, 2.31 + i * 0.24, s * 1.9, 1.9, 0.1, 0.12, P.d, 'dark', { rx: s * 0.5 });
+      const ex = -3.55, ez = s * 1.35; K.cyl(ex, 3.85, ez, 0.3, 0.34, 1.75, P.r, 'metal', { seg: 10 }); K.cyl(ex, 4.3, ez, 0.39, 0.39, 0.75, P.b, 'metal', { seg: 10 }); K.cyl(ex, 5.6, ez, 0.36, 0.3, 0.2, P.d, 'dark', { seg: 10 }); K.cyl(ex, 5.64, ez, 0.24, 0.24, 0.18, FO, null, { e: 2.4, seg: 8 });
+      K.seg([-5.55, 3.85, s * 1.6], [-5.55, 4.45, s * 1.6], 0.05, P.h, 'paint'); K.seg([-5.55, 4.45, s * 1.6], [-4.1, 4.45, s * 1.6], 0.05, P.h, 'paint'); K.seg([-4.1, 3.85, s * 1.6], [-4.1, 4.45, s * 1.6], 0.05, P.h, 'paint');
+      K.light(-5.85, 3.25, s * 1.45, 0.3, RED); K.light(-5.85, 2.8, s * 1.45, 0.24, '#FFA03A'); }
+    K.seg([-5.55, 4.45, -1.6], [-5.55, 4.45, 1.6], 0.05, P.h, 'paint');
+    K.box(-5.78, 2.05, 0, 0.12, 1.5, 2.5, P.d, 'dark'); K.box(-5.86, 2.12, 0, 0.02, 1.36, 2.3, FO, null, { e: 1.1 }); for (let i = 0; i < 5; i++) K.box(-5.92, 2.15 + i * 0.28, 0, 0.08, 0.13, 2.4, P.b, 'metal');
+    cb(-5.75, 0.75, 0, 0.55, 0.7, 4.0, 0.12, P.d, 'dark'); haz(-6.05, 1.1, 0, 3.6, 0.5, 5, 'fz');
+    // caçamba: berço, corpo da cor do time com nervuras e faixa de aço, aro grosso, pilares claros nos cantos, minério com cristais
+    cb(-0.9, 1.85, 0, 4.0, 1.1, 3.4, 0.15, P.b, 'steel'); K.poly([[-2.55, 3.1], [0.75, 3.1], [1.2, 4.8], [-3.0, 4.8]], 4.2, tc, 'paint', { b: 0.15 });
+    for (const s of [-1, 1]) { for (const x of [-2.0, -0.9, 0.2]) K.box(x, 3.0, s * 2.27, 0.22, 1.85, 0.14, P.a, 'steel');
+      K.box(-0.9, 3.0, s * 2.28, 3.45, 0.3, 0.12, P.b, 'steel'); K.box(-0.9, 4.85, s * 2.08, 4.0, 0.3, 0.42, tc, 'paint');
+      K.box(-0.35, 3.85, s * 2.28, 0.8, 0.5, 0.06, P.t, 'paint'); for (const y of [3.95, 4.15]) K.box(-0.35, y, s * 2.31, 0.6, 0.1, 0.04, P.d, 'dark'); }
+    for (const [x, y] of [[-2.9, 3.55], [-3.06, 4.25]]) K.box(x, y, 0, 0.14, 0.18, 3.74, P.a, 'steel');
+    K.box(1.1, 4.85, 0, 0.42, 0.3, 4.58, tc, 'paint'); K.box(-2.9, 4.85, 0, 0.42, 0.3, 4.58, tc, 'paint');
+    for (const [sx, sz] of QUAD) cb(sx > 0 ? 1.17 : -2.97, 2.8, sz * 2.12, 0.5, 2.35, 0.5, 0.1, P.t, 'steel', { rz: -sx * 0.22 });
+    K.box(-0.9, 4.86, 0, 3.6, 0.12, 3.75, '#2E3138', 'stone'); K.sph(-0.9, 4.95, 0, 1, ORE, 'stone', { half: true, sx: 1.7, sy: 0.45, sz: 1.55, seg: 12 });
+    for (const [x, z, r, sd] of [[-2.1, -1.1, 0.55, 1], [-1.5, 0.9, 0.6, 2], [-0.4, -0.2, 0.7, 3], [0.4, 1.1, 0.5, 4], [0.3, -1.2, 0.55, 5], [-2.3, 0.4, 0.45, 6], [-1.0, -1.3, 0.45, 7]]) K.rock(x, 5.1, z, r, sd % 2 ? ORE : '#454B55', 'stone', { seed: sd, detail: 0, sy: 0.7 });
+    for (const [x, z, h, a] of [[-1.3, 0.1, 0.9, 0.3], [0.0, 0.5, 0.75, -0.4], [-2.2, -0.4, 0.6, 0.5], [0.6, -0.5, 0.55, -0.2]]) K.prism(x, 5.0, z, 0.22, h, 6, CRY, 'crystal', { top: 0.15, rz: a, rx: a * 0.6 });
+    // laterais entre as rodas: tanque de combustível com cintas (esquerda), caixa de ferramentas com faixa (direita)
+    K.cyl(-2.2, 2.05, -2.55, 0.52, 0.52, 2.9, P.t, 'metal', { rz: -H, seg: 12 }); for (const x of [-1.5, -0.1]) K.cyl(x, 2.05, -2.55, 0.55, 0.55, 0.1, P.d, 'dark', { rz: -H, seg: 12 }); K.cyl(-0.8, 2.52, -2.55, 0.12, 0.12, 0.12, P.h, 'paint', { seg: 8 });
+    cb(-0.75, 1.35, 2.5, 2.9, 1.25, 1.0, 0.1, P.a, 'steel'); haz(-0.75, 1.75, 3.01, 2.6, 0.35, 5, 'sx'); for (let i = 0; i < 3; i++) K.box(-1.6 + i * 0.25, 2.12, 3.02, 0.1, 0.3, 0.04, P.d, 'dark');
+    // cabine: base escura, cabine clara com para-brisa inclinado e grade, janelas, teto com painel elevado da cor do time, barra de luzes, giroflex, antena, pré-filtro de ar, retrovisores, degrau e pega-mão
+    cb(2.65, 1.85, 0, 2.6, 1.15, 3.3, 0.2, P.b, 'steel');
+    K.poly([[1.4, 2.95], [3.95, 2.95], [3.45, 4.55], [1.45, 4.55]], 3.0, P.t, 'steel', { b: 0.12 });
+    K.poly([[4.07, 3.08], [3.65, 4.42], [3.53, 4.42], [3.95, 3.08]], 2.7, P.g, 'glass', { pat: 0 }); K.poly([[1.8, 3.2], [3.6, 3.2], [3.31, 4.15], [1.8, 4.15]], 3.3, P.g, 'glass', { pat: 0 });
+    for (const z of [-0.9, 0, 0.9]) K.seg([4.12, 3.0, z], [3.66, 4.5, z], 0.045, P.d, 'metal');
+    K.box(2.35, 4.6, 0, 1.85, 0.08, 2.9, P.d, 'dark'); K.box(2.3, 4.66, 0, 1.6, 0.1, 2.6, tc, 'paint'); K.box(3.25, 4.6, 0, 0.3, 0.2, 2.7, P.d, 'dark'); for (const z of [-1.0, -0.35, 0.35, 1.0]) K.light(3.38, 4.62, z, 0.17, P.l, 2.4);
+    K.cyl(1.75, 4.74, -1.0, 0.16, 0.2, 0.12, P.d, 'dark', { seg: 8 }); K.sph(1.75, 4.86, -1.0, 0.17, '#FFA03A', null, { e: 2.2, seg: 8 }); K.seg([1.65, 4.74, 1.05], [1.55, 5.8, 1.1], 0.03, P.d, 'metal');
+    K.cyl(1.9, 3.6, 1.72, 0.17, 0.17, 1.35, P.b, 'metal', { seg: 8 }); K.cyl(1.9, 4.95, 1.72, 0.26, 0.24, 0.24, P.d, 'dark', { seg: 8 });
+    for (const s of [-1, 1]) { K.seg([3.4, 4.0, s * 1.62], [3.65, 4.1, s * 2.05], 0.04, P.d, 'metal'); K.box(3.65, 3.75, s * 2.08, 0.12, 0.45, 0.25, P.d, 'dark');
+      K.box(2.6, 1.45, s * 1.78, 0.9, 0.1, 0.4, P.d, 'dark'); K.seg([1.6, 2.2, s * 1.72], [1.6, 3.9, s * 1.72], 0.04, P.h, 'paint'); }
+    // cabeça de mineração: suporte, carcaça com boca dentada e grade da cor do time no tampo, faixa de perigo, bochechas claras que protegem dois emissores aletados com lente acesa e anel de foco entre eles
+    cb(4.2, 0.75, 0, 1.0, 1.25, 2.4, 0.12, P.d, 'dark'); cb(4.8, 0.7, 0, 1.3, 1.95, 3.0, 0.18, P.a, 'steel');
+    K.box(4.68, 2.63, 0, 0.62, 0.05, 1.5, P.d, 'dark'); for (const z of [-0.54, -0.18, 0.18, 0.54]) K.box(4.68, 2.64, z, 0.72, 0.13, 0.13, tc, 'paint'); haz(5.13, 2.66, 0, 2.6, 0.24, 4, 'tz');
+    K.box(5.5, 0.42, 0, 0.42, 0.3, 3.2, P.d, 'metal'); haz(5.72, 0.57, 0, 3.0, 0.24, 6, 'fz'); K.box(5.43, 0.85, 0, 0.1, 0.6, 1.4, P.d, 'dark'); for (let i = 0; i < 5; i++) K.cone(5.44, 0.95 + (i % 2) * 0.25, -0.56 + i * 0.28, 0.1, 0.25, P.t, 'metal', { seg: 4, rz: -H });
+    for (const s of [-1, 1]) { const ez = s * 0.95, ey = 1.85;
+      K.poly([[4.2, 0.8], [5.8, 0.8], [6.25, 1.25], [6.25, 2.2], [5.75, 2.65], [4.2, 2.65]], 0.22, P.t, 'steel', { z: s * 1.62, b: 0.04 }); haz(5.0, 2.7, s * 1.62, 1.4, 0.2, 3, 'tx');
+      K.light(5.6, 1.95, s * 1.82, 0.24, P.l); K.light(6.2, 1.5, s * 1.62, 0.22, P.l);
+      K.box(4.05, 1.05, s * 1.5, 0.34, 0.42, 0.75, P.d, 'dark'); K.seg([4.05, 1.3, s * 1.88], [4.85, 2.05, s * 1.88], 0.12, P.h, 'paint'); K.seg([4.85, 2.05, s * 1.88], [5.3, 2.47, s * 1.88], 0.055, P.t, 'metal'); for (const [bx, by] of [[4.45, 2.4], [5.65, 1.05], [4.45, 0.95]]) K.box(bx, by, s * 1.79, 0.1, 0.1, 0.05, P.d, 'metal');
+      K.cyl(5.4, ey, ez, 0.5, 0.5, 0.22, P.d, 'dark', { rz: -H, seg: 12 }); K.cyl(5.6, ey, ez, 0.34, 0.38, 0.55, P.b, 'metal', { rz: -H, seg: 12 });
+      for (const fx of [5.7, 6.0]) K.cyl(fx, ey, ez, 0.48, 0.48, 0.07, P.t, 'metal', { rz: -H, seg: 10 }); K.cyl(5.82, ey, ez, 0.44, 0.44, 0.12, PK, null, { e: 1.7, rz: -H, seg: 10 });
+      K.cyl(6.12, ey, ez, 0.4, 0.33, 0.16, P.d, 'dark', { rz: -H, seg: 12 }); K.cyl(6.24, ey, ez, 0.26, 0.26, 0.06, PK, null, { e: 2.6, rz: -H, seg: 10 });
+      K.seg([6.05, ey, s * 0.6], [6.05, ey, s * 0.28], 0.06, P.d, 'metal'); }
+    K.anim({ t: 'spin', p: [6.08, 1.85, 0], speed: 3, axis: 'x' }, () => { K.tor(6.08, 1.85, 0, 0.26, 0.06, P.t, 'metal', { rz: H, ts: 12, rs: 4 }); for (let i = 0; i < 3; i++) { const a = i / 3 * PI * 2; K.box(6.06, 1.85 + Math.sin(a) * 0.3 - 0.05, Math.cos(a) * 0.3, 0.1, 0.1, 0.1, P.h, 'paint'); } }); K.sph(6.1, 1.85, 0, 0.13, '#FFC4F2', null, { e: 3, seg: 6 }); K.beam = [6.25, 1.85, 0];
+  },
   veiculo_hull(K, P, tc) { for (const s of [-1, 1]) track(K, P, 0, s * 3.5, 13, 2.4, 2.2);
     K.poly([[-6.2, 1.2], [5.2, 1.2], [6.6, 2.6], [5.4, 4.0], [-5.6, 4.0], [-6.4, 2.8]], 5.2, P.a, 'steel', { b: 0.3 });
     K.box(-0.4, 4.25, 0, 7.6, 0.2, 5, tc, 'paint'); K.light(6.25, 3.1, 2, 0.45, P.l); K.light(6.25, 3.1, -2, 0.45, P.l); K.light(-6.45, 3.0, 0, 0.5, '#FF4040'); K.mount = 4.3; },
@@ -3112,8 +3203,117 @@ U.erevane = {
     K.oct(0.1, 6.2, 0, 0.95, 1.9, P.b, 'gloss'); K.box(0.8, 7.05, 0, 0.3, 0.16, 1.1, P.l, null, { e: 3 }); K.poly([[0, 0], [-1.6, -2.6], [-0.4, -2.8]], 0.12, P.d, 'gloss', { x: -1, y: 6.2, anim: { t: 'sway', p: [-1, 6.2, 0], amp: 0.12, speed: 2.5 } });
     K.seg([0.1, 6, 1.3], [1.3, 4.9, 0.95], 0.3, P.a, 'gloss'); K.seg([0.1, 6, -1.3], [1.6, 4.9, 0.3], 0.3, P.a, 'gloss');
     if (!o.noRifle) K.anim({ t: 'recoil', dist: 0.35 }, () => { K.box(2.4, 4.6, 0.9, 4.6, 0.36, 0.36, P.d, 'metal'); K.box(4.8, 4.6, 0.9, 0.5, 0.2, 0.2, P.c, null, { e: 2.2 }); }); },
-  coletor(K, P, tc) { K.poly([[-5, 0.8], [4, 0.8], [5.4, 1.8], [3.4, 3.2], [-4.6, 3.2]], 5, P.a, 'gloss', { b: 0.2 }); K.box(0, 0.2, 0, 8, 0.25, 4, P.c, null, { e: 1.6, anim: { t: 'bob', amp: 0.12, speed: 3 } });
-    K.prism(-1.6, 3.2, 0, 1.5, 2.2, 6, P.g, 'glass', { top: 0.85 }); K.tor(-1.6, 4.4, 0, 1.42, 0.08, tc, null, { e: 2.2, ts: 6, anim: { t: 'spin', p: [-1.6, 4.4, 0], speed: 1 } }); K.box(4.45, 2, 0, 0.2, 0.5, 4.2, P.l, null, { e: 2.4 }); },
+  coletor(K, P, tc) { // 4.3: esquife-sifão Erevane — casco facetado flutuante, bico sifão com mandíbulas, cabine de vidro fumê, carga em tanques laterais
+    const TP = (pts, y, th, col, mat, o) => K.poly(pts.map(p => [p[0], -p[1]]), th, col, mat, Object.assign({ rx: -H, y }, o)); // placa vista de cima: contorno (x, z), centro em y, espessura th + 2b
+    const SYM = h => h.concat(h.filter(p => p[1] !== 0).reverse().map(p => [p[0], -p[1]])); // meio contorno (z >= 0, da frente para trás) -> contorno simétrico
+    const XC = (x, y, z, rt, rb, h, col, mat, o) => K.cyl(x, y, z, rt, rb, h, col, mat, Object.assign({ rz: -H }, o)); // cilindro ao longo de +x (base rb em x, topo rt em x + h)
+    const XP = (x, y, z, r, h, n, col, mat, o) => K.prism(x, y, z, r, h, n, col, mat, Object.assign({ rz: -H }, o));
+    const bolt = (x, y, z) => K.cyl(x, y, z, 0.055, 0.065, 0.05, P.t, 'metal', { seg: 6, pat: 0 });
+    const bolt2 = (x, y, z, s) => K.cyl(x, y, z, 0.055, 0.065, 0.05, P.t, 'metal', { seg: 6, pat: 0, rx: s * H }); // parafuso em face lateral
+    const vent = (x, y, z, w, h, s, n) => { K.box(x, y, z, w, h, 0.06, P.d, 'dark', { pat: 0 }); for (let i = 0; i < n; i++) K.box(x, y + (i + 0.5) * h / n - 0.025, z + s * 0.035, w * 0.92, 0.05, 0.05, P.b, 'metal', { pat: 0 }); }; // grade lateral com aletas
+    const pod = (x, z, r, top) => { // casulo antigravidade: carcaça octogonal, anel de latão, aletas, lente teal embaixo, suporte chanfrado
+      K.cyl(x, 0.56, z, r, r * 0.78, top - 0.56, P.d, 'dark', { seg: 8, facet: true });
+      K.cyl(x, 0.8, z, r * 1.07, r * 1.07, 0.09, P.t, 'metal', { seg: 8, facet: true });
+      for (let i = 0; i < 4; i++) K.box(x, 0.6, z, 0.05, 0.42, r * 2.25, P.b, 'gloss', { ry: i * PI / 4 + PI / 8, pat: 0 });
+      K.cyl(x, 0.42, z, r * 0.7, r * 0.5, 0.14, P.c, null, { e: 2.4, seg: 8 });
+      K.box(x, top - 0.05, z, r * 1.1, 0.32, r * 0.5, P.b, 'gloss', { b: 0.05, bs: 1 });
+    };
+    const NY = 1.65; // eixo do bico sifão
+    K.anim({ t: 'bob', amp: 0.12, speed: 2.4 }, () => {
+      // ---- casco: laje facetada (chanfros de 45°), ventre escuro, quilhas com fio teal ----
+      TP(SYM([[4.3, 0], [3.8, 0.75], [2.9, 1.1], [-4.8, 1.1], [-5.3, 0.65]]), 1.55, 0.4, P.b, 'dark', { b: 0.36 }); // chassi acetinado: as placas brilhantes por cima se destacam
+      TP(SYM([[3.4, 0], [3.0, 0.55], [-4.5, 0.7], [-4.9, 0.35]]), 0.9, 0.08, P.d, 'dark', { b: 0.05 });
+      for (const s of [-1, 1]) { K.poly([[-3.6, 0.95], [2.4, 0.95], [1.7, 0.62], [-3.1, 0.62]], 0.1, P.d, 'dark', { z: s * 0.55 }); K.box(-0.6, 0.6, s * 0.55, 4.4, 0.05, 0.13, P.c, null, { e: 2 }); }
+      for (const s of [-1, 1]) TP([[4.15, s * 0.12], [3.75, s * 0.78], [3.3, s * 0.9], [3.62, s * 0.18]], 2.12, 0.03, P.a, 'gloss', { b: 0.03 }); // chevrons do nariz
+      // saias laterais inclinadas (perfil local em torno de y = 0) com grades e fio de energia
+      for (const s of [-1, 1]) {
+        K.poly([[-4.7, -0.3], [3.0, -0.3], [3.5, 0], [3.0, 0.32], [-4.7, 0.32], [-5.0, 0]], 0.12, P.a, 'gloss', { y: 1.52, z: s * 1.52, rx: s * 0.28, b: 0.04 });
+        K.box(-0.8, 1.2, s * 1.6, 7.2, 0.06, 0.05, P.c, null, { e: 2.2 });
+        vent(1.5, 1.36, s * 1.66, 1.1, 0.34, s, 3); vent(-3.6, 1.36, s * 1.66, 0.9, 0.34, s, 3);
+      }
+      // ---- queixo e faróis ----
+      K.poly([[3.2, 0.95], [4.2, 1.05], [4.75, 1.35], [4.6, 1.5], [3.2, 1.5]], 1.5, P.d, 'dark', { b: 0.06 });
+      for (const s of [-1, 1]) { XC(4.15, 1.72, s * 0.78, 0.14, 0.16, 0.3, P.t, 'metal', { seg: 8 }); K.box(4.44, 1.64, s * 0.78, 0.04, 0.16, 0.2, P.l, null, { e: 3 }); }
+      // ---- cabine: carenagem com juntas, tomadas de ar, aro de latão, vidro fumê facetado com montantes, periscópio ----
+      TP(SYM([[3.9, 0], [3.2, 0.62], [1.4, 0.88], [-0.8, 0.88], [-1.1, 0.5]]), 2.3, 0.2, P.a, 'gloss', { b: 0.22 });
+      for (const s of [-1, 1]) { K.box(3.15, 2.6, s * 0.72, 0.5, 0.04, 0.05, P.d, 'metal', { ry: s * 0.6 }); K.box(-0.55, 2.6, s * 0.6, 0.05, 0.04, 0.5, P.d, 'metal'); bolt(3.45, 2.6, s * 0.3); bolt(-0.9, 2.6, s * 0.3); }
+      TP(SYM([[3.05, 0], [2.45, 0.52], [0.3, 0.64], [-0.4, 0.38]]), 2.66, 0.04, P.t, 'metal', { b: 0.03 });
+      TP(SYM([[2.8, 0], [2.25, 0.36], [0.4, 0.44], [-0.1, 0.24]]), 2.97, 0.22, P.g, 'glass', { b: 0.26 });
+      K.box(1.3, 3.33, 0, 2.7, 0.04, 0.14, P.d, 'metal', { pat: 0 }); K.box(1.3, 3.36, 0, 2.4, 0.03, 0.06, P.l, null, { e: 2.2 }); for (const [x, w] of [[0.55, 0.82], [1.75, 0.72]]) K.box(x, 3.33, 0, 0.08, 0.04, w, P.d, 'metal', { pat: 0 }); // montantes sobre a face de cima do vidro (y 3.34)
+      for (const s of [-1, 1]) { TP([[0.9, s * 0.9], [0.5, s * 1.12], [-0.7, s * 1.12], [-0.9, s * 0.9]], 2.42, 0.2, P.d, 'dark', { b: 0.05 }); for (let i = 0; i < 3; i++) K.box(0.2 - i * 0.35, 2.58, s * 1.0, 0.1, 0.06, 0.22, P.b, 'metal'); }
+      K.light(3.55, 2.5, 0, 0.12, P.l);
+      for (const s of [-1, 1]) { K.box(0.25, 2.1, s * 1.1, 2.6, 0.06, 0.05, P.c, null, { e: 2.2 }); K.box(2.35, 2.1, s * 1.02, 1.9, 0.06, 0.05, P.c, null, { e: 2.2, ry: s * 0.14 }); K.box(3.72, 2.1, s * 0.52, 1.0, 0.06, 0.05, P.c, null, { e: 2.2, ry: s * 0.73 }); }
+      K.cyl(-0.75, 2.6, 0.42, 0.16, 0.2, 0.24, P.b, 'gloss', { seg: 8 }); K.sph(-0.75, 2.84, 0.42, 0.13, P.g, 'glass', { half: true, seg: 8 });
+      // ---- bico sifão: carcaça octogonal, colar de latão, cano com bobinas teal e anéis, cabeça emissora ----
+      XP(3.75, NY, 0, 0.62, 0.85, 8, P.a, 'gloss', { top: 0.78 });
+      XC(4.6, NY, 0, 0.5, 0.5, 0.12, P.t, 'metal', { seg: 8, facet: true });
+      XC(4.72, NY, 0, 0.17, 0.3, 1.3, P.b, 'gloss', { seg: 10 });
+      for (const [x, r] of [[4.95, 0.33], [5.65, 0.24]]) XC(x, NY, 0, r, r, 0.08, P.t, 'metal', { seg: 10 });
+      for (const [x, r] of [[5.18, 0.3], [5.4, 0.28]]) XC(x, NY, 0, r, r, 0.07, P.c, null, { e: 2.4, seg: 8 });
+      for (const a of [0, H]) K.box(5.3, NY - 0.02, 0, 0.75, 0.04, 0.78, P.d, 'metal', { rx: a });
+      XP(6.0, NY, 0, 0.2, 0.2, 6, P.d, 'dark', { top: 1.35 });
+      XC(6.18, NY, 0, 0.24, 0.24, 0.03, P.c, null, { e: 2.6, seg: 8 });
+      for (let i = 0; i < 3; i++) { const a = i * 2 * PI / 3 + H; K.seg([5.95, NY + Math.sin(a) * 0.24, Math.cos(a) * 0.24], [6.3, NY + Math.sin(a) * 0.3, Math.cos(a) * 0.3], 0.03, P.t, 'metal', { seg: 6 }); }
+      K.cone(6.15, NY, 0, 0.15, 0.27, P.l, null, { e: 3, rz: -H, seg: 8 });
+      K.beam = [6.42, NY, 0];
+      // mandíbulas do sifão: lâminas com fio de latão, pistões e ponta acesa
+      for (const s of [-1, 1]) {
+        TP([[3.4, s * 1.0], [4.5, s * 1.22], [6.1, s * 0.6], [6.0, s * 0.44], [4.4, s * 0.7], [3.4, s * 0.62]], NY + 0.12, 0.14, P.a, 'gloss', { b: 0.06 });
+        K.seg([4.5, NY + 0.24, s * 1.24], [6.08, NY + 0.24, s * 0.6], 0.035, P.t, 'metal', { seg: 6 });
+        K.box(4.4, NY + 0.27, s * 0.78, 1.4, 0.03, 0.05, P.c, null, { e: 2.4, ry: s * 0.36 });
+        K.seg([3.5, NY - 0.12, s * 0.62], [4.9, NY - 0.02, s * 0.6], 0.06, P.d, 'metal', { seg: 6 }); K.seg([4.2, NY - 0.09, s * 0.61], [5.0, NY - 0.02, s * 0.6], 0.035, P.t, 'metal', { seg: 6 });
+        K.light(6.0, NY + 0.1, s * 0.52, 0.14, P.l);
+      }
+      // ---- asas dianteiras: placa enflechada, painel interno com grade, faixa do time, bordo de latão, casulo ----
+      for (const s of [-1, 1]) {
+        TP([[3.5, s * 1.0], [1.7, s * 2.75], [0.3, s * 2.8], [-0.3, s * 1.0]], 1.6, 0.12, P.a, 'gloss', { b: 0.14 });
+        TP([[3.0, s * 1.2], [1.6, s * 2.5], [1.0, s * 2.52], [2.35, s * 1.2]], 1.85, 0.03, tc, 'paint', { b: 0.02 });
+        TP([[1.9, s * 1.2], [0.75, s * 2.35], [0.35, s * 2.4], [0.1, s * 1.2]], 1.84, 0.03, P.b, 'gloss', { b: 0.02 });
+        for (let i = 0; i < 3; i++) K.box(0.75 - i * 0.22, 1.89, s * 1.75, 0.09, 0.04, 0.7, P.d, 'metal', { pat: 0 });
+        TP([[3.58, s * 0.98], [1.74, s * 2.83], [1.6, s * 2.8], [3.4, s * 0.98]], 1.82, 0.04, P.t, 'metal', { b: 0.02 });
+        bolt(2.55, 1.88, s * 1.35); bolt(1.35, 1.88, s * 2.35); bolt(0.4, 1.79, s * 2.55);
+        K.light(1.62, 1.66, s * 2.86, 0.14, P.l);
+        pod(1.2, s * 2.15, 0.62, 1.42);
+      }
+      // ---- caçamba central: placas da cor do time com parafusos, cintas, trilhos, canal de carga aceso, grades ----
+      TP(SYM([[-0.5, 0.75], [-0.9, 1.0], [-4.6, 1.0]]), 2.6, 0.6, P.a, 'gloss', { b: 0.25 });
+      for (const s of [-1, 1]) for (const [x0, x1] of [[-1.0, -2.6], [-2.82, -4.4]]) { TP([[x0, s * 0.22], [x0 - 0.2, s * 0.84], [x1, s * 0.84], [x1, s * 0.22]], 3.24, 0.08, tc, 'paint', { b: 0.05 }); bolt(x0 - 0.22, 3.32, s * 0.36); bolt(x1 + 0.14, 3.32, s * 0.36); bolt(x1 + 0.14, 3.32, s * 0.7); }
+      K.box(-2.7, 3.1, 0, 3.6, 0.12, 0.36, P.d, 'dark');
+      for (let i = 0; i < 4; i++) K.box(-1.32 - i * 0.84, 3.17, 0, 0.6, 0.06, 0.2, P.c, null, { e: 2.2 });
+      for (const x of [-0.78, -2.71]) { K.box(x, 3.12, 0, 0.16, 0.2, 2.3, P.d, 'metal'); for (const s of [-1, 1]) K.box(x, 2.15, s * 1.27, 0.16, 1.1, 0.07, P.d, 'metal'); }
+      for (const s of [-1, 1]) { K.seg([-0.7, 3.24, s * 1.12], [-4.55, 3.24, s * 1.12], 0.05, P.t, 'metal', { seg: 6 }); vent(-1.75, 2.25, s * 1.28, 0.8, 0.5, s, 4); vent(-3.65, 2.25, s * 1.28, 0.8, 0.5, s, 4); }
+      // ---- tanques de carga laterais: casco sextavado, placas nas faces, tampas, faixas do time, visor de carga, braçadeiras ----
+      for (const s of [-1, 1]) {
+        const z = s * 2.45, cy = 2.0, r = 0.8;
+        XP(-5.0, cy, z, r, 4.4, 6, P.a, 'gloss');
+        for (const k of [-1, 1]) { K.box(-2.9, cy + 0.433 * r, z + k * 0.75 * r, 2.1, 0.05, r * 0.72, P.b, 'gloss', { rx: k * PI / 3 }); K.box(-2.9, cy - 0.433 * r, z + k * 0.75 * r, 2.1, 0.05, r * 0.72, P.b, 'gloss', { rx: k * 2 * PI / 3 }); }
+        XP(-0.6, cy, z, r, 0.5, 6, P.b, 'gloss', { top: 0.58 }); XC(-0.62, cy, z, 0.84, 0.84, 0.08, P.t, 'metal', { seg: 6 }); K.light(-0.06, cy, z, 0.16, P.l);
+        XP(-5.4, cy, z, 0.6, 0.4, 6, P.d, 'dark', { top: 1.33 }); XC(-5.08, cy, z, 0.84, 0.84, 0.08, P.t, 'metal', { seg: 6 }); XC(-5.43, cy, z, 0.3, 0.3, 0.03, P.l, null, { e: 2, seg: 6 });
+        for (const x of [-4.4, -1.6]) { XP(x, cy, z, 0.86, 0.34, 6, tc, 'paint'); bolt(x + 0.17, cy + 0.745, z); }
+        K.box(-2.9, cy + 0.69, z, 2.0, 0.06, 0.28, P.c, null, { e: 2.2 }); K.box(-2.9, cy + 0.68, z, 2.2, 0.05, 0.42, P.d, 'metal'); for (const x of [-3.42, -2.9, -2.38]) K.box(x, cy + 0.69, z, 0.07, 0.09, 0.4, P.d, 'metal', { pat: 0 });
+        for (const x of [-4.0, -1.8]) { K.box(x, cy - 0.3, s * 1.62, 0.5, 0.5, 0.62, P.d, 'metal', { b: 0.06, bs: 1 }); K.box(x, cy + 0.05, s * 1.6, 0.34, 0.14, 0.8, P.b, 'metal'); bolt(x, cy + 0.19, s * 1.4); }
+        pod(-2.9, z, 0.66, 1.42);
+      }
+      // ---- motor traseiro: convés inclinado rente à caçamba, bocais violeta, grade de exaustão, lemes em V da cor do time ----
+      K.poly([[-5.9, 1.1], [-4.5, 1.1], [-4.5, 3.03], [-5.15, 3.03], [-5.95, 2.3]], 2.4, P.a, 'gloss', { b: 0.16 });
+      K.poly([[-5.95, 2.2], [-5.2, 2.95], [-5.12, 3.0], [-5.9, 2.25]], 1.6, P.b, 'gloss', { b: 0.04, x: -0.07, y: 0.09 });
+      K.box(-6.1, 2.0, 0, 0.06, 0.07, 2.0, tc, null, { e: 2.4 }); for (const s of [-1, 1]) K.light(-6.06, 2.35, s * 1.05, 0.13, P.l);
+      K.box(-6.1, 1.35, 0, 0.06, 0.55, 0.55, P.d, 'dark', { pat: 0 }); for (let i = 0; i < 3; i++) K.box(-6.14, 1.42 + i * 0.16, 0, 0.04, 0.05, 0.5, P.b, 'metal', { pat: 0 });
+      for (const s of [-1, 1]) { XC(-6.35, 1.7, s * 0.6, 0.27, 0.33, 0.4, P.d, 'dark', { seg: 8 }); XC(-6.12, 1.7, s * 0.6, 0.35, 0.35, 0.06, P.t, 'metal', { seg: 8 }); XC(-6.37, 1.7, s * 0.6, 0.24, 0.24, 0.03, P.l, null, { e: 2.2, seg: 6 }); vent(-5.3, 1.5, s * 1.37, 0.8, 0.6, s, 4); }
+      K.box(-4.62, 3.12, 0, 0.16, 0.12, 2.3, P.d, 'metal');
+      for (const s of [-1, 1]) { K.poly([[-5.75, 2.25], [-4.65, 2.25], [-4.65, 2.85], [-5.2, 2.85], [-5.6, 2.55]], 0.06, P.b, 'gloss', { z: s * 1.37, b: 0.02 }); bolt2(-4.85, 2.7, s * 1.42, s); bolt2(-5.35, 2.4, s * 1.42, s); K.seg([-4.9, 3.24, s * 0.35], [-5.3, 3.24, s * 0.35], 0.03, P.t, 'metal', { seg: 6 }); }
+      for (let i = 0; i < 5; i++) K.box(-4.8 - i * 0.14, 3.15, 0, 0.07, 0.05, 1.1, P.d, 'metal', { pat: 0 });
+      for (const s of [-1, 1]) {
+        K.poly([[-5.6, 0], [-4.55, 0], [-5.3, 0.85], [-5.75, 0.85]], 0.08, P.a, 'gloss', { y: 3.1, z: s * 0.8, rx: s * 0.4, b: 0.03 });
+        K.poly([[-5.45, 0.12], [-4.85, 0.12], [-5.3, 0.62], [-5.6, 0.62]], 0.02, tc, 'paint', { y: 3.13, z: s * 0.726, rx: s * 0.4, b: 0.02 }); // na face interna (vista de cima)
+        K.seg([-4.55, 3.12, s * 0.8], [-5.3, 3.12 + 0.88 * Math.cos(0.4), s * (0.8 + 0.88 * Math.sin(0.4))], 0.04, tc, null, { e: 2.4, seg: 6 });
+      }
+      // mastros de sensor
+      K.seg([-0.4, 2.6, -0.62], [-0.8, 4.0, -0.62], 0.05, P.d, 'metal', { seg: 6 }); K.light(-0.8, 4.0, -0.62, 0.14, P.l);
+      K.seg([-5.0, 3.1, 0], [-5.3, 3.75, 0], 0.035, P.d, 'metal', { seg: 6 }); K.light(-5.3, 3.75, 0, 0.1, P.c);
+    });
+    K.box(-1, 0, 0, 0.08, 0.004, 0.08, P.d, 'dark', { pat: 0 }); // âncora no chão (escondida): mantém o vão de flutuação
+  },
   veiculo_hull(K, P, tc) { K.poly([[-6.6, 1.4], [5, 1.4], [7, 2.4], [4.6, 3.6], [-5.4, 3.6], [-6.8, 2.6]], 7.4, P.a, 'gloss', { b: 0.25 });
     for (const [x, s] of [[-4, 1], [-4, -1], [3.4, 1], [3.4, -1]]) K.anim({ t: 'bob', amp: 0.12, speed: 3, ph: (x > 0 ? 0 : PI) + (s > 0 ? 0 : H) }, () => { K.cyl(x, 0.6, s * 3, 1.3, 1.5, 0.8, P.d, 'dark'); K.cyl(x, 0.45, s * 3, 1.1, 1.1, 0.16, P.c, null, { e: 2 }); });
     K.box(-0.6, 3.62, 3.9, 9, 0.12, 0.12, tc, null, { e: 1.8 }); K.box(-0.6, 3.62, -3.9, 9, 0.12, 0.12, tc, null, { e: 1.8 }); K.mount = 3.75; },
@@ -3138,9 +3338,74 @@ U.tessara = {
     K.sph(0.4, 6.8, 0, 0.85, P.a, 'bone', { sx: 1.2, seg: 12 }); K.light(1.35, 6.95, 0.35, 0.22, P.l); K.light(1.35, 6.95, -0.35, 0.22, P.l); K.box(0.6, 5.7, 0, 0.5, 0.5, 2.5, tc, 'skin', { b: 0.2 });
     K.seg([0.2, 5.6, 1.3], [1.3, 4.7, 1.1], 0.32, P.b, 'bone'); K.seg([0.2, 5.6, -1.3], [1.6, 4.7, 0.4], 0.32, P.b, 'bone');
     if (!o.noRifle) { K.seg([0.6, 4.6, 1.1], [4.2, 4.8, 1.1], 0.3, P.t, 'bone', { taper: 0.7, anim: { t: 'recoil', dist: 0.35 } }); K.sph(1.2, 4.6, 1.1, 0.55, P.l, null, { e: 1.4, seg: 10 }); } },
-  coletor(K, P, tc) { K.sph(0, 1.2, 0, 1, P.a, 'bone', { half: true, sx: 5, sy: 3.2, sz: 3.4, seg: 18 }); K.sph(0, 1.2, 0, 1, P.d, 'matte', { half: true, sx: 5.15, sy: 0.6, sz: 3.55, seg: 18 });
-    for (const x of [-2.6, 0, 2.6]) for (const s of [-1, 1]) K.seg([x, 1.6, s * 2.8], [x + 0.6, 0, s * 4.4], 0.3, P.d, 'bone', { anim: legSpec([x, 1.6, s * 2.8], { amp: 0.35, stride: 5 }) });
-    K.sph(-3, 3.4, 0, 1.5, '#9EE6B0', null, { e: 1.1, seg: 12 }); K.sph(4.8, 1.6, 0, 1.4, P.b, 'bone', { sx: 1.2, seg: 12 }); for (const s of [-1, 1]) K.seg([5.6, 1.2, s * 0.8], [7, 0.4, s * 1.2], 0.25, P.t, 'bone', { taper: 0.4, anim: { t: 'sway', p: [5.6, 1.2, s * 0.8], amp: 0.12, speed: 3, ph: s > 0 ? 0 : PI } }); K.box(0, 4.35, 0, 4, 0.3, 1.2, tc, 'skin', { b: 0.1 }); },
+  coletor(K, P, tc) { // 4.3: colhedeira viva — flor-mandíbula na frente, carapaça de osso sobre a membrana do time, roseta de folhas no dorso, sacos de seiva âmbar na garupa, seis pernas-raiz
+    const LF = '#5DA865', LF2 = '#7CC47F', VN = '#5E7D44';
+    const TH = [1.2, 2.45, 2.7, 1.95, 2.4], BR = [3.35, 2.95, 0.95, 0.9, 1.6]; // elipsoides [cx, cy, ax, ay, az] do tórax e da testa
+    const on = (x, z, up, E) => { E = E || TH; return [x, E[1] + (E[3] + up) * Math.sqrt(Math.max(0, 1 - ((x - E[0]) / E[2]) ** 2 - (z / E[4]) ** 2)), z]; }; // ponto no topo do elipsoide
+    const thorn = (x, y, z, h, rz) => K.cone(x, y, z, 0.11, h, P.t, 'bone', { rz, seg: 5 });
+    const spike = (a, b, r, col) => { const dx = b[0] - a[0], dy = b[1] - a[1], dz = b[2] - a[2], L = Math.hypot(dx, dy, dz); K.cone(a[0], a[1], a[2], r, L, col || P.t, 'bone', { rz: -Math.asin(dx / L), rx: Math.atan2(dz, dy), seg: 5 }); }; // cone de a apontando para b
+    // corpo mole sob as placas
+    K.sph(-0.9, 2.1, 0, 1, P.d, 'skin', { sx: 4.85, sy: 1.05, sz: 2.15, seg: 12 });
+    // tórax: membrana do time, aba e quilha de osso, nervuras em espinha de peixe, vértebras com espinhos
+    K.sph(TH[0], TH[1], 0, 1, tc, 'skin', { half: true, sx: TH[2], sy: TH[3], sz: TH[4], seg: 16 });
+    K.sph(TH[0], TH[1] - 0.15, 0, 1, P.b, 'bone', { half: true, sx: TH[2] + 0.25, sy: 0.42, sz: TH[4] + 0.25, seg: 14 });
+    K.sph(TH[0], TH[1], 0, 1, P.a, 'bone', { half: true, sx: TH[2] * 1.03, sy: TH[3] * 1.06, sz: 0.55, seg: 12 });
+    for (const s of [-1, 1]) for (const x0 of [3.0, 1.9, 0.8, -0.3]) K.tube([0, 0.33, 0.66, 1].map(t => on(x0 - 0.65 * t, s * (0.45 + 1.8 * t), 0.06)), 0.1, P.a, 'bone', { ts: 6, rs: 4 });
+    for (const x of [2.9, 1.9, 0.9, -0.1]) { const p = on(x, 0, 0.12); K.sph(p[0], p[1], 0, 0.2, P.b, 'bone', { sy: 0.7, sx: 1.4, seg: 6 }); thorn(p[0] - 0.05, p[1] + 0.08, 0, 0.42, 0.5); }
+    for (const s of [-1, 1]) K.sph(2.45, 2.55, s * 1.95, 1, P.a, 'bone', { half: true, sx: 1.0, sy: 0.6, sz: 0.8, rx: s * 0.55, seg: 8 });
+    for (const s of [-1, 1]) for (const [x, z] of [[1.89, 1.97], [0.79, 2.02], [-0.25, 1.72]]) { const p = on(x, s * z, 0); K.oct(x, p[1] - 0.12, p[2], 0.17, 0.34, P.l, null, { e: 2.1 }); } // fotóforos entre as nervuras
+    // cabeça: testa de osso, viseira de vidro verde, olhos em fileira
+    K.sph(3.55, 2.5, 0, 1, P.a, 'bone', { sx: 1.0, sy: 1.25, sz: 1.5, seg: 12 });
+    K.sph(BR[0], BR[1], 0, 1, P.b, 'bone', { half: true, sx: BR[2], sy: BR[3], sz: BR[4], seg: 12 });
+    K.sph(3.85, 3.05, 0, 1, P.g, 'glass', { sx: 0.7, sy: 0.55, sz: 1.0, seg: 12 });
+    for (const s of [-1, 1]) spike([3.35, 3.5, s * 0.7], [2.15, 4.45, s * 1.2], 0.15, P.b);
+    for (const s of [-1, 1]) for (const [x, z] of [[3.42, 0.95], [3.7, 0.86], [3.95, 0.72], [3.62, 0.55]]) { const p = on(x, s * z, 0, BR); K.oct(x, p[1] - 0.06, p[2], 0.1, 0.2, P.l, null, { e: 2.2 }); }
+    // órgão de colheita: pescoço, cálice inclinado para cima (de cima se vê dentro da flor), pétalas de osso, corola interna da cor do time, estames acesos, mandíbulas-pá
+    const FX = 4.55, FY = 2.4, TL = 0.45, cT = Math.cos(TL), sT = Math.sin(TL);
+    const fp = (lx, ly, lz) => [FX + lx * cT - ly * sT, FY + lx * sT + ly * cT, lz]; // eixo da flor (x local para fora) → modelo
+    K.seg([3.85, 2.5, 0], [FX, FY, 0], 0.55, P.b, 'bone', { taper: 0.9, seg: 10 });
+    K.tor(4.2, 2.46, 0, 0.58, 0.11, P.t, 'bone', { rz: H, ts: 10, rs: 4 });
+    K.anim({ t: 'sway', p: [FX, FY, 0], amp: 0.06, speed: 1.7 }, () => {
+      const c0 = fp(0.12, 0, 0); K.sph(c0[0], c0[1], 0, 0.9, P.t, 'bone', { sx: 0.6, rz: TL, seg: 10 });
+      const pet = (al, ph, L, W, col, sg, b) => { const c = fp(b + Math.cos(al) * L, -Math.sin(al) * Math.sin(ph) * L, Math.sin(al) * Math.cos(ph) * L); K.sph(c[0], c[1], c[2], 1, col, 'bone', { sx: L, sy: W, sz: 0.1, ry: -al, rx: ph, rz: TL, order: 'ZXY', seg: sg }); };
+      for (let i = 0; i < 6; i++) pet(1.05, -H + i * PI / 3, 0.95, 0.62, i % 2 ? P.a : '#E6DCC4', 8, 0.15);
+      for (let i = 0; i < 5; i++) pet(0.72, -H + PI / 5 + i * PI * 0.4, 0.6, 0.38, tc, 6, 0.3);
+      const core = fp(0.62, 0, 0); K.sph(core[0], core[1], 0, 0.46, P.l, null, { e: 2.4, seg: 8 });
+      for (let i = 0; i < 5; i++) { const a = i * PI * 0.4, b0 = fp(0.85, Math.cos(a) * 0.15, Math.sin(a) * 0.15), tip = fp(1.6, Math.cos(a) * 0.45, Math.sin(a) * 0.45); K.seg(b0, tip, 0.045, P.b, 'bone', { seg: 5 }); K.light(tip[0], tip[1] - 0.08, tip[2], 0.16, P.l, 2.8); } });
+    for (const s of [-1, 1]) K.anim({ t: 'sway', p: [4.35, 1.8, s * 0.62], amp: 0.1, speed: 3, ph: s > 0 ? 0 : PI }, () => { const m = [[4.35, 1.8, s * 0.62], [5.1, 1.1, s * 1.5], [5.8, 0.85, s * 1.62], [6.28, 0.78, s * 1.05]];
+      K.seg(m[0], m[1], 0.21, P.b, 'bone', { taper: 0.85, seg: 7 }); K.seg(m[1], m[2], 0.18, P.b, 'bone', { taper: 0.8, seg: 7 }); K.seg(m[2], m[3], 0.15, P.a, 'bone', { taper: 0.15, seg: 7 }); K.cone(5.45, 0.95, s * 1.42, 0.08, 0.42, P.a, 'bone', { rx: s * 2.2, seg: 5 }); });
+    K.beam = fp(1.1, 0, 0);
+    // roseta de folhas fotossintéticas com broto aceso no meio
+    K.sph(-1.55, 3.55, 0, 0.55, P.b, 'bone', { sy: 0.9, seg: 8 });
+    const leaf = (bx, by, bz, az, el, len, wid, col, ph) => { const c = Math.cos(el), ux = c * Math.cos(az), uy = Math.sin(el), uz = c * Math.sin(az), th = -az;
+      K.anim({ t: 'sway', p: [bx, by, bz], amp: 0.05, speed: 1.5, ph }, () => { K.sph(bx + ux * len, by + uy * len, bz + uz * len, 1, col, 'wet', { sx: len, sy: 0.07, sz: wid, ry: th, rz: el, seg: 8 });
+        K.seg([bx, by + 0.05, bz], [bx + ux * len * 1.85, by + uy * len * 1.85 + 0.06, bz + uz * len * 1.85], 0.045, '#A9D98F', 'bone', { taper: 0.3, seg: 5 }); }); };
+    for (const [az, el, len, wid, col] of [[H, 0.62, 1.2, 0.6, LF], [-H, 0.62, 1.2, 0.6, LF], [PI * 0.78, 0.85, 1.05, 0.52, LF2], [-PI * 0.78, 0.85, 1.05, 0.52, LF2], [0.4, 1.0, 0.85, 0.44, LF2], [-0.4, 1.0, 0.85, 0.44, LF]]) leaf(-1.55, 4.05, 0, az, el, len, wid, col, az);
+    K.sph(-1.55, 4.3, 0, 0.32, P.l, null, { e: 1.8, sy: 1.4, seg: 8 });
+    // carga: sacos de seiva âmbar (vidro brilhante com miolo aceso aparecendo no topo) num berço de costelas de osso
+    const sac = (x, y, z, sx, sy, sz, sg) => { K.sph(x, y, z, 1, P.am, 'glass', { sx, sy, sz, seg: sg }); K.sph(x, y + 0.1, z, 1, P.am, null, { e: 1.6, sx: sx * 0.78, sy, sz: sz * 0.78, seg: sg > 10 ? 10 : 6 }); };
+    for (const s of [-1, 1]) sac(-3.15, 2.95, s * 1.05, 1.45, 1.0, 0.95, 12);
+    sac(-4.75, 2.8, 0, 0.92, 0.95, 1.3, 12);
+    for (const s of [-1, 1]) sac(-4.65, 2.4, s * 1.85, 0.55, 0.55, 0.55, 10);
+    for (const [x, D, Hh] of [[-2.0, 2.15, 2.0], [-3.75, 2.2, 1.95], [-5.3, 1.7, 1.6]]) arch(K, x, 2.3, 0, 0.01, Hh, D, H, 0.15, P.a, 'bone', { ts: 12, rs: 5 });
+    K.tube([[-2.0, 4.25, 0], [-3.0, 4.2, 0], [-4.1, 4.05, 0], [-4.9, 3.95, 0], [-5.5, 3.4, 0], [-5.75, 2.7, 0]], 0.16, P.a, 'bone', { ts: 12, rs: 6 });
+    for (const [x, y] of [[-2.55, 4.3], [-3.2, 4.28], [-4.4, 4.12]]) thorn(x, y, 0, 0.45, 0.45);
+    for (const s of [-1, 1]) K.tube([[-1.5, 2.5, s * 2.05], [-3.1, 2.35, s * 2.2], [-4.5, 2.45, s * 2.15], [-5.6, 2.7, s * 1.2]], 0.13, P.b, 'bone', { ts: 7, rs: 4 });
+    for (const z of [1.05, -1.05]) K.tube([[-4.3, 3.5, z], [-3.45, 3.95, z + 0.12], [-2.55, 3.88, z - 0.1], [-1.95, 3.45, z]], 0.05, P.t, 'bone', { ts: 8, rs: 4 });
+    // cauda: casulo e bico de descarga
+    K.sph(-5.6, 2.35, 0, 0.62, P.b, 'bone', { sx: 0.8, seg: 10 });
+    K.cyl(-5.9, 2.3, 0, 0.28, 0.38, 0.25, P.t, 'bone', { rz: H, seg: 8 });
+    K.light(-6.18, 2.3, 0, 0.24, P.am, 2.4);
+    // trepadeiras pelos flancos
+    for (const s of [-1, 1]) K.tube([[4.2, 1.9, s * 0.6], [3.4, 1.8, s * 1.45], [2.2, 2.25, s * 2.45], [0.6, 2.6, s * 2.62], [-1.0, 2.3, s * 2.35], [-2.3, 3.15, s * 2.12], [-3.3, 2.35, s * 2.3], [-4.3, 3.05, s * 1.95], [-5.1, 2.45, s * 1.45], [-5.5, 2.6, s * 0.7]], 0.11, VN, 'skin', { ts: 20, rs: 4 });
+    for (const s of [-1, 1]) for (const [x, y, z, ry] of [[-2.75, 3.05, 2.35, 0.5], [-4.75, 2.95, 2.0, -0.6]]) K.sph(x, y, s * z, 1, LF, 'wet', { sx: 0.55, sy: 0.05, sz: 0.26, ry: s * ry, rx: s * 0.6, seg: 6 });
+    // pernas-raiz grossas de casca sulcada, nó aceso no joelho (trípode: dianteira e traseira juntas, a do meio oposta)
+    for (const [hx, hz, kdx, fdx, ph] of [[2.5, 1.55, 0.6, 1.5, 0], [-0.3, 1.9, 0.1, 0.3, PI], [-3.3, 1.8, -0.5, -1.5, 0]]) for (const s of [-1, 1]) {
+      const hip = [hx, 2.0, s * hz], knee = [hx + kdx, 2.8, s * 2.95], foot = [hx + fdx, 0.35, s * 3.3];
+      K.anim(legSpec(hip, { amp: 0.28, stride: 6, ph: (s > 0 ? 0 : PI) + ph }), () => {
+        K.seg(hip, knee, 0.44, P.t, 'rubber', { taper: 0.75, seg: 8 }); K.sph(knee[0], knee[1], knee[2], 0.37, P.t, 'bone', { seg: 6 }); K.oct(knee[0], knee[1] + 0.27, knee[2], 0.14, 0.28, P.l, null, { e: 2.1 });
+        K.seg(knee, foot, 0.33, P.t, 'rubber', { taper: 0.45, seg: 8 }); spike(knee, [knee[0] + 0.3, 1.2, s * 3.55], 0.12);
+        for (const t of [-1, 0, 1]) spike([foot[0], 0.45, foot[2]], [foot[0] + t * 0.62, 0, foot[2] + s * (0.28 - Math.abs(t) * 0.12)], 0.13); }); } },
   veiculo_hull(K, P, tc) { K.sph(0, 1.4, 0, 1, P.a, 'bone', { half: true, sx: 6.4, sy: 3.2, sz: 4.4, seg: 20 }); for (let i = 0; i < 3; i++) arch(K, 0, 1.4, 0, 6.5, 3.25, 4.5, i * PI / 3 + PI / 6, 0.2, P.t, 'bone');
     K.tor(0, 1.5, 0, 6.2, 0.4, P.d, 'matte', { sz: 0.7, ts: 30 }); for (const [x, s] of [[-3.6, 1], [-3.6, -1], [3.2, 1], [3.2, -1]]) leg(K, [x, 2, s * 3.6], [x + 0.6, 1.4, s * 5], [x + 0.4, 0, s * 5.2], 0.7, P.b, 'bone');
     K.sph(6.4, 2, 0, 1.5, P.b, 'bone', { sx: 1.2, seg: 12 }); K.light(7.75, 2.4, 0.6, 0.3, P.l); K.light(7.75, 2.4, -0.6, 0.3, P.l); K.box(-1, 4.4, 0, 5, 0.3, 2, tc, 'skin', { b: 0.12 }); K.mount = 4.4; },
@@ -3163,8 +3428,83 @@ U.tessara = {
 };
 U.quorith = {
   infantaria(K, P, tc) { K.prism(0, 0, 0, 1.4, 0.3, 6, P.c, null, { e: 1.6 }); K.oct(0, 1.2, 0, 1.3, 5.2, P.a, 'crystal'); K.tor(0, 3.8, 0, 1.12, 0.1, P.c, null, { e: 2.6, ts: 6 }); for (const s of [-1, 1]) K.oct(0.3, 3, s * 2, 0.45, 1.8, P.b, 'crystal', { rx: s * 0.3, anim: { t: 'bob', amp: 0.3, speed: 3, ph: s > 0 ? 0 : PI } }); K.oct(1.4, 3.4, 0, 0.3, 1.4, tc, null, { e: 1.8, rz: -H, anim: { t: 'recoil', dist: 0.4 } }); },
-  coletor(K, P, tc) { K.prism(0, 2.2, 0, 2.6, 2.4, 6, P.a, 'crystal', { top: 0.7 }); K.cone(0, 4.6, 0, 1.82, 1.8, P.b, 'crystal', { seg: 6, flat: true }); K.cone(0, 2.2, 0, 2.6, 1.8, P.b, 'crystal', { seg: 6, flat: true, rx: PI });
-    K.prism(0, 3.2, 0, 2.47, 0.2, 6, P.c, null, { e: 2.2, top: 1 }); K.tor(0, 0.8, 0, 2.4, 0.16, P.l, null, { e: 2.6, ts: 6, anim: { t: 'spin', p: [0, 0.8, 0], speed: 1.2 } }); K.tor(0, 1.1, 0, 3.2, 0.12, tc, null, { e: 1.8, ts: 6, anim: { t: 'spin', p: [0, 1.1, 0], speed: -0.9 } }); K.oct(2.6, 2.6, 0, 0.6, 2.2, P.b, 'crystal', { rz: -H }); },
+  coletor(K, P, tc) { // 4.3: colhedor de cristal levitante — núcleo escuro entre placas facetadas, diapasão com lente focal (feixe), cápsulas de ressonância na cor do time, gaiola de carga acesa, aletas harmônicas e lascas em órbita
+    const L6 = (x, y, z, L, W, h, top, col, mat, o) => K.prism(x, y, z, 1, h, 6, col, mat, Object.assign({ top, sz: L, sx: W / 0.866, ry: H }, o)); // losango hexagonal ao longo de x (pontas na frente e atrás)
+    const X6 = (x, y, z, r, h, col, mat, o) => K.prism(x, y, z, r, h, 6, col, mat, Object.assign({ rz: -H }, o)); // prisma deitado, de x para a frente
+    const bar = (a, b, r, col, mat, n) => K.seg(a, b, r, col, mat, { seg: n || 5, flat: true });
+    const glo = (a, b, r, col, k) => K.seg(a, b, r, col, null, { e: k || 2.2, seg: 5 });
+    const dot = (x, y, z, r, col, k) => K.oct(x, y - r, z, r, r * 2, col, null, { e: k || 2.6 }); // luz facetada
+    // planta do dorso (x, meia-largura) e placas: polígono deitado, inclinado para fora a partir da borda interna
+    const OUT = [[-2.3, 0], [-1.6, 1.15], [-0.6, 1.85], [1.4, 1.85], [2.6, 1.15], [3.3, 0]];
+    const zOut = x => { for (let i = 1; i < OUT.length; i++) if (x <= OUT[i][0]) { const [xa, za] = OUT[i - 1], [xb, zb] = OUT[i]; return za + (zb - za) * (x - xa) / (xb - xa); } return 0; };
+    const band = (x0, x1, za, zb, m) => { m = m || 0; const xs = [x0, x1]; for (const [x] of OUT) if (x > x0 && x < x1) xs.push(x); // faixa za..min(zb, contorno − m) entre x0 e x1, como (x, distância da borda interna)
+      for (let i = 1; i < OUT.length; i++) { const [xa, z1] = OUT[i - 1], [xb, z2] = OUT[i]; if ((z1 - m - zb) * (z2 - m - zb) < 0) { const xc = xa + (zb + m - z1) / (z2 - z1) * (xb - xa); if (xc > x0 && xc < x1) xs.push(xc); } }
+      xs.sort((a, b) => b - a); return [[x0, 0], [x1, 0]].concat(xs.map(x => [x, Math.min(zb, zOut(x) - m) - za])); };
+    const plate = (pts, s, y, zi, d, c, col, mat, b) => K.poly(pts.map(([x, w]) => [x, -s * w]), d, col, mat, { y, z: s * zi, rx: -H + s * c, b: b == null ? 0.06 : b, flat: true });
+    const fin = (x, y, z, s, th, len, w, col) => K.cone(x, y, z, 1, len, col, 'crystal', { seg: 4, flat: true, rz: H, sx: 0.09, sz: w / 2, ry: s * th }); // lâmina: larga na raiz, ponta para trás
+    L6(0.5, 0, 0, 1.5, 0.6, 0.03, 1, P.c, null, { e: 1.1 }); // foco do campo de levitação no chão, sob a quilha
+    K.anim({ t: 'spin', p: [0.5, 0, 0], speed: -0.8 }, () => ringOf(8, 3.0, (dx, dz, a, i) => K.oct(0.5 + dx, 0.35, dz, 0.12, 0.75, i % 2 ? P.t : P.a, 'crystal'))); // lascas baixas em órbita
+    K.anim({ t: 'bob', amp: 0.14, speed: 1.6 }, () => {
+      // casco: quilha, emissores de levitação, pavilhão e núcleo escuro com costura acesa e nervuras
+      K.oct(0.5, 0.55, 0, 0.42, 1.3, P.t, 'crystal', { sx: 3 }); dot(0.5, 0.65, 0, 0.12, P.c);
+      for (const [x, z] of [[-0.9, 0.85], [-0.9, -0.85], [1.9, 0.85], [1.9, -0.85]]) { K.cone(x, 1.25, z, 0.26, 0.5, P.t, 'crystal', { seg: 6, flat: true, rx: PI }); dot(x, 0.78, z, 0.09, P.c, 2.2); }
+      L6(0.5, 0.85, 0, 1.6, 1.0, 0.6, 1.75, P.d, 'gloss'); L6(0.5, 1.45, 0, 2.8, 1.75, 1.85, 0.94, P.d, 'gloss');
+      L6(0.5, 2.0, 0, 2.86, 1.8, 0.12, 1, P.c, null, { e: 1.8 });
+      for (const s of [-1, 1]) for (let x = -0.7; x < 1.8; x += 0.4) K.box(x, 1.5, s * 1.72, 0.1, 1.25, 0.24, P.t, 'crystal');
+      // casca de cristal do dorso: duas fileiras de placas por lado (a de fora mais inclinada), frestas com o núcleo aceso, friso violeta e canal central escuro
+      const zi = 0.36, zm = 1.12, zo = 1.22, c1 = 0.14, c2 = 0.55, yi = 3.42, yo = 3.27;
+      const rim = (pts, s, y, zp, c, cap) => { const q = pts.slice(2); for (let i = 0; i < q.length - 1; i++) { const [xa, wa] = q[i], [xb, wb] = q[i + 1]; if (cap && wa > cap - 0.01 && wb > cap - 0.01) continue; bar([xa, y - wa * Math.sin(c), s * (zp + wa * Math.cos(c))], [xb, y - wb * Math.sin(c), s * (zp + wb * Math.cos(c))], 0.055, P.t, 'crystal'); } };
+      for (const s of [-1, 1]) for (const [x0, x1] of [[-2.0, -0.75], [-0.45, 1.05], [1.35, 3.0]]) {
+        const pi = band(x0, x1, zi, zm); plate(pi, s, yi, zi, 0.22, c1, P.b, 'crystal'); rim(pi, s, yi, zi, c1, zm - zi);
+        plate(band(x0 + 0.2, x1 - 0.2, zi + 0.15, zm - 0.12, 0.2), s, yi + 0.2, zi + 0.15, 0.07, c1, P.a, 'crystal', 0.05);
+        const xg = (x0 + x1) / 2, wg = Math.min(zm, zOut(xg) - 0.2) - zi; L6(xg, yi + 0.3 - (wg * 0.5) * Math.sin(c1), s * (zi + wg * 0.5), Math.min(0.4, (x1 - x0) * 0.22), Math.min(0.2, wg * 0.28), 0.12, 0.55, P.l, 'crystal', { rz: s * c1 });
+        const xa = Math.max(x0, -1.3), xb = Math.min(x1, 2.25); if (xb - xa > 0.3) { const po = band(xa, xb, zo, 9); plate(po, s, yo, zo, 0.18, c2, P.b, 'crystal'); rim(po, s, yo, zo, c2); }
+      }
+      for (const s of [-1, 1]) dot(3.05, 3.55, s * 0.5, 0.07, P.l, 2.4);
+      L6(0.5, 3.15, 0, 2.6, 0.32, 0.62, 0.35, tc, 'crystal'); for (const s of [-1, 1]) K.box(0.45, 3.22, s * 0.3, 4.3, 0.12, 0.1, tc, null, { e: 1.2 }); // crista na cor do time entre dois filetes acesos
+      K.oct(-1.95, 3.3, 0, 0.16, 1.3, P.t, 'crystal', { rz: H }); // espinho de cauda apontando para a carga
+      for (const x of [-0.6, 1.2]) { K.box(x, 3.2, 0, 0.09, 0.12, 3.3, P.c, null, { e: 2.2 }); K.box(x, 3.42, 0, 0.18, 0.4, 0.66, P.t, 'crystal'); }
+      // cápsulas de ressonância: aduelas de cristal em volta de um núcleo na cor do time (janela aberta em cima) e aletas harmônicas na cauda
+      for (const s of [-1, 1]) { const z = s * 2.8, y = 2.25;
+        X6(-1.05, y, z, 0.36, 3.3, tc, null, { e: 1.15 });
+        for (let i = 1; i < 6; i++) { const f = i * PI / 3; K.box(0.6, y + 0.42 * Math.cos(f), z + 0.42 * Math.sin(f), 3.0, 0.11, 0.38, P.a, 'crystal', { rx: f }); }
+        K.cone(2.1, y, z, 0.55, 1.3, P.a, 'crystal', { seg: 6, flat: true, rz: -H }); K.cone(2.1, y, z, 0.5, 1.1, P.b, 'crystal', { seg: 6, flat: true, rz: -H, rx: PI / 6 }); K.cone(-0.9, y, z, 0.55, 0.8, P.b, 'crystal', { seg: 6, flat: true, rz: H });
+        for (const x of [-0.95, 0.55, 1.95]) X6(x, y, z, 0.6, 0.16, P.t, 'crystal');
+        dot(3.45, y, z, 0.12, P.l);
+        for (const x of [0, 1.4]) bar([x, y, s * 1.55], [x, y, s * 2.3], 0.12, P.t, 'crystal');
+        fin(-0.7, 2.05, s * 3.05, s, 0.32, 1.8, 0.8, P.b); fin(-0.8, 2.35, s * 2.9, s, 0.16, 2.3, 0.9, P.a); fin(-0.9, 2.65, s * 2.7, s, 0.02, 1.6, 0.6, P.t);
+        glo([-0.8, 2.4, s * 2.9], [-0.8 - 1.9 * Math.cos(0.16), 2.4, s * (2.9 + 1.9 * Math.sin(0.16))], 0.03, P.c, 2); dot(-0.8 - 2.25 * Math.cos(0.16), 2.4, s * (2.9 + 2.25 * Math.sin(0.16)), 0.07, P.l, 2.4);
+      }
+      // diapasão: câmara de ressonância, duas hastes com dentes e a lente focal presa no anel pela cintura
+      L6(3.3, 1.5, 0, 0.72, 1.2, 1.3, 0.8, P.d, 'gloss'); L6(3.75, 1.45, 0, 0.42, 0.5, 0.75, 0.55, P.t, 'crystal'); L6(3.3, 2.78, 0, 0.62, 0.95, 0.22, 0.6, P.t, 'crystal'); K.oct(3.3, 2.9, 0, 0.3, 0.8, tc, 'crystal');
+      X6(3.98, 2.25, 0, 0.24, 0.07, P.c, null, { e: 2.2 });
+      for (const s of [-1, 1]) { const z = s * 1.12;
+        X6(3.15, 2.25, z, 0.46, 0.75, P.b, 'crystal', { top: 0.75 }); X6(3.05, 2.25, z, 0.5, 0.12, P.t, 'crystal'); X6(3.8, 2.25, z, 0.3, 2.5, P.a, 'crystal', { top: 0.5 }); dot(6.3, 2.25, z, 0.1, P.l);
+        for (const x of [4.3, 4.85]) X6(x, 2.25, z, 0.31, 0.16, P.t, 'crystal'); X6(5.75, 2.25, z, 0.22, 0.08, P.c, null, { e: 2.4 });
+        for (const x of [4.6, 5.15]) K.oct(x, 2.25, s * 0.9, 0.07, 0.3, P.l, 'crystal', { rx: -s * H });
+        bar([5.4, 2.25, s * 0.78], [5.4, 2.25, s * 0.95], 0.05, P.t, 'crystal');
+        [0.75, 0.6, 0.45].forEach((h, k) => K.oct(4.5 + k * 0.33, 2.32, z, 0.14, h, k % 2 ? P.l : P.b, 'crystal', { sz: 0.4, rz: 0.45 })); // lâminas harmônicas escalonadas
+      }
+      K.tor(5.4, 2.25, 0, 0.72, 0.08, P.t, 'crystal', { rz: H, ts: 6, rs: 4 }); for (let i = 0; i < 3; i++) { const a = i * PI * 2 / 3 + H; bar([5.4, 2.25 + Math.sin(a) * 0.66, Math.cos(a) * 0.66], [5.4, 2.25 + Math.sin(a) * 0.44, Math.cos(a) * 0.44], 0.035, P.a, 'crystal'); }
+      K.oct(4.5, 2.25, 0, 0.5, 1.8, P.l, 'crystal', { rz: -H }); K.oct(4.5, 2.25, 0, 0.5, 1.8, P.c, null, { e: 2.4, rz: -H, rx: PI / 4 }); glo([4.0, 2.25, 0], [4.6, 2.25, 0], 0.06, P.c);
+      K.tor(5.95, 2.25, 0, 0.36, 0.035, P.c, null, { e: 2.2, rz: H, ts: 6, rs: 3 });
+      K.beam = [6.3, 2.25, 0];
+      K.anim({ t: 'spin', p: [6.0, 2.25, 0], axis: 'x', speed: 3 }, () => ringOf(3, 0.6, (dy, dz) => K.oct(5.75, 2.25 + dy, dz, 0.07, 0.5, P.l, null, { e: 2.4, rz: -H })));
+      // gaiola de carga: cesto aberto de costelas de cristal em arco (treliça) com a colheita acesa dentro, preso ao casco por um pescoço
+      const cx = -4.15;
+      L6(-2.3, 1.2, 0, 0.6, 0.5, 1.2, 0.8, P.d, 'gloss');
+      L6(cx, 0.75, 0, 0.95, 0.85, 0.7, 1.85, P.d, 'gloss'); L6(cx, 1.43, 0, 1.8, 1.62, 0.12, 1, P.t, 'crystal'); L6(cx, 1.5, 0, 1.5, 1.35, 0.06, 1, P.d, 'gloss'); K.prism(cx, 1.54, 0, 0.9, 0.05, 6, P.c, null, { e: 1.6 });
+      K.oct(cx, 0.4, 0, 0.3, 1.1, P.t, 'crystal', { sx: 1.4 }); dot(cx, 0.5, 0, 0.1, P.c);
+      for (const [vx, vz] of [[1.8, 0], [0.9, 1.62], [-0.9, 1.62], [-1.8, 0], [-0.9, -1.62], [0.9, -1.62]]) K.oct(cx + vx, 1.45, vz, 0.11, 0.42, P.a, 'crystal');
+      const RB = [[1.45, 1.5], [1.72, 2.55], [1.5, 3.6], [0.85, 4.3]], NR = 6; const rp = (i, k) => { const a = (i + 0.5) / NR * PI * 2; return [cx + Math.cos(a) * RB[k][0], RB[k][1], Math.sin(a) * RB[k][0]]; };
+      K.tor(cx, RB[1][1], 0, RB[1][0], 0.05, P.t, 'crystal', { ts: 6, rs: 3, ry: PI / 6 }); K.tor(cx, RB[2][1], 0, RB[2][0], 0.04, P.c, null, { e: 2.2, ts: 6, rs: 3, ry: PI / 6 });
+      for (let i = 0; i < NR; i++) { for (let k = 0; k < 3; k++) bar(rp(i, k), rp(i, k + 1), 0.1 - k * 0.015, P.b, 'crystal', 6);
+        for (const k of [1, 2]) { const [x, y, z] = rp(i, k); K.oct(x, y - 0.18, z, 0.12, 0.36, P.a, 'crystal'); }
+        const [x, y, z] = rp(i, 3); dot(x, y + 0.05, z, 0.08, P.l, 2.4); }
+      K.anim({ t: 'spin', p: [cx, 0, 0], speed: 0.7 }, () => { K.oct(cx, 1.7, 0, 0.55, 2.5, P.c, null, { e: 1.4 }); ringOf(5, 0.8, (dx, dz, a, i) => K.oct(cx + dx, 1.7, dz, 0.28, 1.1 + (i % 2) * 0.5, i % 2 ? P.t : P.l, 'crystal', { e: i % 2 ? 0 : 1.8, rz: -dx * 0.45, rx: dz * 0.45 })); ringOf(3, 0.45, (dx, dz) => K.oct(cx + dx, 3.4, dz, 0.1, 0.5, P.l, null, { e: 2.6 })); });
+    });
+    K.anim({ t: 'spin', p: [-4.15, 0, 0], speed: 0.9 }, () => { K.tor(-4.15, 4.8, 0, 2.0, 0.09, tc, null, { e: 1.3, ts: 6, rs: 3 }); ringOf(6, 2.0, (dx, dz, a, i) => { K.oct(-4.15 + dx, 4.4, dz, 0.16, 0.8, P.a, 'crystal'); K.oct(-4.15 + dx * 0.9, 4.55, dz * 0.9, 0.08, 0.42, i % 2 ? P.l : P.t, 'crystal', { rz: -Math.cos(a) * 0.5, rx: Math.sin(a) * 0.5 }); }); }); // anel de lascas em órbita sobre a carga
+  },
   veiculo_hull(K, P, tc) { K.prism(0, 1.6, 0, 1, 1.6, 6, P.a, 'crystal', { sx: 6.4, sz: 4.2, top: 0.82 }); K.cone(0, 1.6, 0, 1, 1.4, P.b, 'crystal', { seg: 6, flat: true, rx: PI, sx: 6.4, sz: 4.2 }); K.prism(0, 2.3, 0, 1.01, 0.2, 6, tc, null, { e: 1.8, sx: 6.4, sz: 4.2, top: 1 }); K.tor(0, 0.4, 0, 2.2, 0.14, P.l, null, { e: 2.4, ts: 6, anim: { t: 'spin', p: [0, 0.4, 0], speed: 1.4 } }); K.mount = 3.2; },
   veiculo_turret(K, P, tc) { KITS.quorith.turret(K, P, tc, 0.85, false); },
   drone(K, P, tc) { K.oct(-2, 1.6, 0, 1.1, 4.4, P.a, 'crystal', { rz: -H }); for (const s of [-1, 1]) K.oct(-1.6, 1.6, s * 2.4, 0.6, 2.6, P.b, 'crystal', { rz: -H, ry: s * 0.25, anim: { t: 'bob', amp: 0.2, speed: 4, ph: s > 0 ? 0 : PI } }); K.tor(0, 1.6, 0, 2.6, 0.1, P.l, null, { e: 2.4, ts: 6, rx: 0.4, anim: { t: 'sway', p: [0, 1.6, 0], amp: 0.15, speed: 3 } }); K.oct(0.2, 2.6, 0, 0.35, 1, tc, null, { e: 2 }); },
@@ -3195,9 +3535,65 @@ U.vorag = {
     K.sph(-0.3, 4.4, 0, 1.5, P.a, 'chitin', { sx: 1.3, sy: 1.1, seg: 14, rz: 0.4 }); K.sph(1.4, 5.6, 0, 0.95, P.a, 'chitin', { sx: 1.3, seg: 12 });
     for (const s of [-1, 1]) { K.cone(2.4, 5.2, s * 0.45, 0.22, 1.2, P.bo, 'bone', { rz: -2, seg: 6, anim: { t: 'sway', p: [2.4, 5.2, s * 0.45], amp: 0.16, speed: 6, ph: s > 0 ? 0 : PI } }); K.light(2.35, 6, s * 0.5, 0.22, P.l); K.anim({ t: 'sway', p: [0.6, 5, s * 1.3], amp: 0.14, speed: 3.5, ph: s > 0 ? 0 : PI }, () => { K.seg([0.6, 5, s * 1.3], [2.6, 3.6, s * 1.4], 0.26, P.b, 'chitin'); K.cone(2.6, 3.6, s * 1.4, 0.24, 1.4, P.bo, 'bone', { rz: -2.2, seg: 6 }); }); }
     ringOf(3, 0.6, (cx, cz) => K.cone(-1 + cx, 5.4, cz, 0.22, 1.4, P.bo, 'bone', { rz: 0.6, seg: 6 })); K.sph(-1.25, 4.6, 0, 0.6, tc, 'wet', { seg: 10 }); },
-  coletor(K, P, tc) { K.sph(0, 1.8, 0, 1, P.a, 'chitin', { sx: 4.4, sy: 1.6, sz: 3, seg: 16 }); K.sph(-1, 3.4, 0, 2.2, P.m, 'wet', { sy: 0.9, seg: 16 }); for (let i = 0; i < 3; i++) arch(K, -1, 2.4, 0, 2.25, 2, 2.25, i * PI / 3, 0.1, '#FF8A8A', null, { e: 1.3, ts: 10 });
-    for (const x of [-2.6, 0, 2.6]) for (const s of [-1, 1]) leg(K, [x, 1.8, s * 2.4], [x + 0.6, 1.6, s * 3.8], [x + 0.2, 0, s * 4.2], 0.28, P.b, 'chitin');
-    K.sph(4, 1.8, 0, 1.2, P.b, 'chitin', { sx: 1.2, seg: 12 }); for (const s of [-1, 1]) { K.cone(4.8, 1.4, s * 0.6, 0.25, 1.4, P.bo, 'bone', { rz: -2, seg: 6, anim: { t: 'sway', p: [4.8, 1.4, s * 0.6], amp: 0.15, speed: 5, ph: s > 0 ? 0 : PI } }); K.light(5.15, 2.2, s * 0.5, 0.22, P.l); } K.box(1.4, 3.3, 0, 1.6, 0.25, 1.4, tc, 'wet'); },
+  coletor(K, P, tc) { // 4.3 — Semeador: abdômen em placas de quitina sobrepostas, saco digestivo aceso nas costas preso por dedos de osso, sela de placas na cor do time, mandíbulas serrilhadas e goela de ácido (emissor do feixe)
+    const SX = -2.2, SY = 3.6, AX = 2.55, AY = 1.75, AZ = 1.85, S2 = [-1, 1];
+    const fr = x => Math.sqrt(Math.max(0, 1 - ((x - SX) / AX) ** 2)); // corte do saco em x
+    const MX = SX + 0.1, MY = SY + 0.45, BX = AX * 0.86, BY = AY * 0.86, BZ = AZ * 0.84; // miolo aceso (sobressai da membrana no topo)
+    const rad = (x, a) => { const f = fr(x), c = Math.cos(a), sn = Math.sin(a); let t = 1 / Math.sqrt((c / (AY * f)) ** 2 + (sn / (AZ * f)) ** 2); const g = 1 - ((x - MX) / BX) ** 2;
+      if (g > 0) { const by = BY * Math.sqrt(g), bz = BZ * Math.sqrt(g), oy = MY - SY, A = (c / by) ** 2 + (sn / bz) ** 2, B = oy * c / by ** 2, D = B * B - A * ((oy / by) ** 2 - 1); if (D > 0) t = Math.max(t, (B + Math.sqrt(D)) / A); } return t; }; // raio da pele visível (membrana ∪ miolo)
+    const on = (x, a, d) => { const t = rad(x, a) + d; return [x, SY + t * Math.cos(a), t * Math.sin(a)]; }; // ponto na pele do saco (a = 0 topo, ±H lados)
+    const spike = (a, b, r) => K.seg(a, b, r, P.bo, 'bone', { taper: 0.06, seg: 5 });
+    const plate = (x, y, lx, h, wz, col, tilt) => { K.sph(x - 0.08, y - 0.03, 0, 1, P.d, 'chitin', { half: true, sx: lx + 0.07, sy: h * 0.95, sz: wz + 0.05, rz: tilt, seg: 10 }); K.sph(x, y, 0, 1, col, 'chitin', { half: true, sx: lx, sy: h, sz: wz, rz: tilt, seg: 11 }); };
+    // abdômen: base e cinco placas sobrepostas com espinhos laterais e espiráculos acesos
+    K.sph(-2.3, 2.0, 0, 1, P.a, 'chitin', { sx: 3.45, sy: 1.15, sz: 2.2, seg: 14 });
+    for (let i = 0; i < 5; i++) { const x = 0.35 - 1.2 * i, g = Math.sqrt(1 - ((x + 2.3) / 3.7) ** 2); plate(x, 1.75, 0.8, 1.5 * g, 2.45 * g, i % 2 ? P.b : P.a, -0.12);
+      if (i > 0) for (const s of S2) { spike([x - 0.2, 2.45, s * 2.25 * g], [x - 0.55, 2.3, s * (2.25 * g + 0.75)], 0.14); if (i < 4) K.light(x - 0.62, 1.95, s * 2.2 * g, 0.16, P.l, 2.2); } }
+    // ventre e tórax
+    K.sph(1.7, 1.9, 0, 1, P.b, 'chitin', { sx: 2.3, sy: 0.8, sz: 1.4, seg: 12 });
+    K.sph(2.0, 2.5, 0, 1, P.a, 'chitin', { sx: 1.7, sy: 1.05, sz: 1.8, seg: 12 });
+    // saco digestivo nas costas: membrana acesa em dois tons e um brilho no topo (luz própria com volume)
+    K.sph(SX, SY, 0, 1, '#5E9A22', null, { e: 1, sx: AX, sy: AY, sz: AZ, seg: 16 });
+    K.anim({ t: 'bob', amp: 0.08, speed: 2.2 }, () => { K.sph(MX, MY, 0, 1, '#AEE64C', null, { e: 1.12, sx: BX, sy: BY, sz: BZ, seg: 14 }); // miolo pulsa dentro da membrana (com as veias)
+      K.sph(SX + 0.35, MY + BY - 0.1, 0, 1, '#DDFF95', null, { e: 1.16, sx: 0.7, sy: 0.15, sz: 0.45, seg: 10 });
+      for (const s of S2) { K.tube([on(0.2, s * 0.35, 0.02), on(-0.7, s * 0.55, 0.03), on(-1.6, s * 0.3, 0.03), on(-2.8, s * 0.5, 0.03), on(-3.9, s * 0.35, 0.03), on(-4.6, s * 0.12, 0.02)], 0.05, '#2E5216', 'wet', { ts: 12, rs: 4 });
+        K.tube([on(-1.6, s * 0.3, 0.03), on(-2.0, s * 0.85, 0.03), on(-2.7, s * 1.3, 0.02)], 0.04, '#2E5216', 'wet', { ts: 8, rs: 4 }); K.tube([on(-2.8, s * 0.5, 0.03), on(-3.4, s * 0.95, 0.02)], 0.035, '#2E5216', 'wet', { ts: 6, rs: 4 }); } });
+    // dedos de osso curvos segurando o saco (folga para o pulso do miolo)
+    for (const [x, k] of [[-0.9, 1], [-2.2, 1.1], [-3.5, 0.9]]) for (const s of S2) { const a = on(x + 0.25, s * 1.95, 0.08), b = on(x, s * 1.3, 0.12), c = on(x - 0.35, s * 0.75, 0.13), d = on(x - 0.75, s * 0.32, 0.11);
+      K.seg(a, b, 0.17 * k, P.bo, 'bone', { taper: 0.85, seg: 6 }); K.seg(b, c, 0.145 * k, P.bo, 'bone', { taper: 0.7, seg: 6 }); K.seg(c, d, 0.1 * k, P.bo, 'bone', { taper: 0.1, seg: 5 }); }
+    // dutos de carne do saco até a boca
+    for (const s of S2) K.tube([[-0.3, 2.75, s * 1.35], [0.9, 2.45, s * 1.9], [2.3, 2.5, s * 1.9], [3.4, 2.2, s * 1.45], [4.3, 1.9, s * 1.08]], 0.11, P.m, 'wet', { ts: 12, rs: 5 });
+    // cauda
+    K.sph(-5.45, 2.3, 0, 1, P.b, 'chitin', { half: true, sx: 0.9, sy: 0.7, sz: 1.0, rz: H, seg: 10 });
+    spike([-5.4, 2.9, 0], [-5.95, 3.9, 0], 0.2); for (const s of S2) spike([-5.5, 2.2, s * 0.55], [-6.05, 2.0, s * 1.1], 0.12);
+    K.oct(-5.92, 1.83, 0, 0.22, 0.44, P.ac, null, { e: 2.2 });
+    // tórax: três placas sobrepostas (as de trás na cor do time) com quilhas e espinhos laterais
+    plate(1.05, 2.9, 0.95, 1.05, 1.95, tc, -0.12);
+    plate(2.0, 2.95, 0.95, 1.05, 1.95, tc, -0.12);
+    plate(2.95, 3.0, 0.95, 0.95, 1.75, P.a, -0.12);
+    for (const x of [1.0, 1.95, 2.9]) K.sph(x, 3.82 + (x > 2.5 ? 0 : 0.08), 0, 1, P.a, 'chitin', { sx: 0.8, sy: 0.2, sz: 0.16, rz: -0.12, seg: 8 });
+    for (const s of S2) { spike([2.95, 3.3, s * 1.55], [3.55, 3.6, s * 2.45], 0.14); spike([2.0, 3.2, s * 1.75], [2.15, 3.5, s * 2.65], 0.14); }
+    // cabeça: cápsula achatada, escudo com crista, clípeo sobre a boca, olhos em cacho e chifres
+    K.sph(4.0, 2.25, 0, 1, P.a, 'chitin', { sx: 1.2, sy: 0.85, sz: 1.35, seg: 12 });
+    K.sph(3.85, 2.55, 0, 1, P.b, 'chitin', { half: true, sx: 1.25, sy: 0.8, sz: 1.3, rz: -0.2, seg: 11 });
+    K.sph(4.85, 2.3, 0, 1, P.a, 'chitin', { half: true, sx: 0.55, sy: 0.35, sz: 0.85, rz: -0.55, seg: 10 });
+    K.sph(3.7, 3.25, 0, 1, P.a, 'chitin', { sx: 0.85, sy: 0.17, sz: 0.13, rz: -0.22, seg: 8 });
+    for (const s of S2) { K.oct(4.76, 2.5, s * 0.62, 0.21, 0.4, P.l, null, { e: 1.7, ry: PI / 4 }); K.sph(4.56, 2.95, s * 0.6, 1, P.b, 'chitin', { sx: 0.36, sy: 0.1, sz: 0.24, ry: s * 0.5, rz: -0.3, seg: 8 });
+      for (const [ex, ey, ez, er] of [[4.45, 3.06, 0.3, 0.12], [4.22, 3.2, 0.46, 0.1], [4.95, 2.42, 0.92, 0.12]]) K.oct(ex, ey - er, s * ez, er, er * 2, P.l, null, { e: 2 });
+      spike([3.55, 3.15, s * 0.6], [2.85, 4.2, s * 1.0], 0.17); }
+    // goela de ácido entre as mandíbulas (emissor do feixe), anel de dentes e maxilas
+    K.tor(5.2, 1.75, 0, 0.36, 0.12, P.d, 'wet', { rz: H, ts: 12, rs: 5 });
+    K.sph(5.17, 1.75, 0, 0.32, P.ac, null, { e: 2, seg: 6 });
+    for (let k = 0; k < 6; k++) { const a = k * PI / 3 + PI / 6; K.seg([5.24, 1.75 + 0.33 * Math.cos(a), 0.33 * Math.sin(a)], [5.36, 1.75 + 0.1 * Math.cos(a), 0.1 * Math.sin(a)], 0.06, P.bo, 'bone', { taper: 0.05, seg: 4 }); }
+    for (const s of S2) K.anim({ t: 'sway', p: [5.15, 1.5, s * 0.36], amp: 0.2, speed: 6, ph: s > 0 ? 0 : PI }, () => K.seg([5.15, 1.5, s * 0.36], [5.75, 1.1, s * 0.28], 0.1, P.bo, 'bone', { taper: 0.2, seg: 5 }));
+    K.beam = [5.55, 1.75, 0];
+    // mandíbulas serrilhadas em foice, abertas
+    const JAW = [[0, 0.3], [0.45, 0.52], [1.0, 0.56], [1.45, 0.42], [1.8, 0.14], [1.98, -0.2], [1.76, -0.04], [1.67, 0.08], [1.49, 0.05], [1.4, 0.2], [1.17, 0.16], [1.08, 0.3], [0.85, 0.25], [0.55, 0.14], [0.27, 0.02], [0, 0]];
+    for (const s of S2) { K.sph(4.55, 1.85, s * 1.0, 0.38, P.a, 'chitin', { seg: 8 });
+      K.anim({ t: 'sway', p: [4.55, 1.85, s * 1.0], amp: 0.12, speed: 4, ph: s > 0 ? 0 : PI }, () => K.poly(JAW.map(([u, v]) => [u, s * v]), 0.26, P.bo, 'bone', { x: 4.55, y: 1.85, z: s * 1.0, rx: H, b: 0.05 })); }
+    // oito patas articuladas: fêmur, joelho com espinho, tíbia e tarso com garra
+    [[2.9, 1.3, 1.3, 1.1], [1.6, 0.3, 1.35, 1], [0.3, -0.9, 1.5, 0.95], [-1.1, -2.1, 1.85, 0.9]].forEach(([hx, dx, hz, w], i) => { for (const s of S2) { const fx = hx + dx, hip = [hx, 2.1, s * hz], knee = [hx + dx * 0.6, 3.5, s * 2.85], ank = [fx + dx * 0.1, 1.2, s * 3.3], foot = [fx + dx * 0.15, 0, s * 3.45];
+      K.anim(legSpec(hip, { ph: (s > 0 ? 0 : PI) + (i % 2 ? PI : 0) }), () => { K.seg(hip, knee, 0.3 * w, P.b, 'chitin', { seg: 7 }); K.sph(knee[0], knee[1], knee[2], 0.3 * w, P.a, 'chitin', { seg: 6 }); spike(knee, [knee[0] - 0.2, knee[1] + 0.75, knee[2] + s * 0.25], 0.12);
+        K.seg(knee, ank, 0.24 * w, P.b, 'chitin', { taper: 0.7, seg: 7 }); K.seg(ank, foot, 0.16 * w, P.d, 'chitin', { taper: 0.3, seg: 6 }); }); } }); },
   veiculo_hull(K, P, tc) { K.sph(0, 2.2, 0, 1, P.a, 'chitin', { sx: 6.4, sy: 2.4, sz: 4, seg: 18 }); for (let i = 0; i < 4; i++) K.sph(-3.6 + i * 2.4, 3.6, 0, 1, P.b, 'chitin', { sx: 1.6, sy: 0.9, sz: 3.6, seg: 12 });
     for (const x of [-4, -1.2, 1.6, 4.2]) for (const s of [-1, 1]) leg(K, [x, 2, s * 3.2], [x + 0.8, 1.8, s * 4.8], [x + 0.4, 0, s * 5], 0.42, P.b, 'chitin');
     K.sph(6.6, 2.4, 0, 1.6, P.a, 'chitin', { sx: 1.2, seg: 12 }); for (const s of [-1, 1]) { K.cone(7.6, 2, s * 0.8, 0.35, 2, P.bo, 'bone', { rz: -2, seg: 6, anim: { t: 'sway', p: [7.6, 2, s * 0.8], amp: 0.12, speed: 4, ph: s > 0 ? 0 : PI } }); K.light(8.4, 2.9, s * 0.6, 0.26, P.l); } K.sph(-3, 4.4, 0, 0.6, tc, 'wet', { seg: 8 }); K.mount = 4.4; },
@@ -3279,16 +3675,17 @@ function build(def, race, color, seed) {
 // material padrão das malhas: rugosidade e metal vêm do atributo rm por vértice; rim opcional por Raça
 function material(o) { T = T || globalThis.THREE; o = o || {}; const m = new T.MeshStandardMaterial(Object.assign({ vertexColors: true, roughness: 1, metalness: 1, envMapIntensity: o.env == null ? 1 : o.env }, o.params || {}));
   m.onBeforeCompile = sh => {
-    sh.vertexShader = 'attribute vec2 rm;\nvarying vec2 vRM;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvRM = rm;'); if (!o.noAnim) animShader(sh); // 4.2b
-    sh.fragmentShader = 'varying vec2 vRM;\n' + sh.fragmentShader.replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = vRM.x;').replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor = vRM.y;');
+    sh.uniforms.uDet = DET; // 4.3a
+    sh.vertexShader = 'attribute vec2 rm;\nattribute float pt;\nvarying vec2 vRM;\nvarying float vPt; varying vec3 vLoc; varying vec3 vLocN;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvRM = rm; vPt = pt; vLoc = position; vLocN = normal;'); if (!o.noAnim) animShader(sh); // 4.2b; 4.3a: padrão preso à peça (posição de repouso)
+    sh.fragmentShader = 'varying vec2 vRM;\n' + SURF_GLSL + sh.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>\nfloat ardHh = 0.0, ardAlb = 1.0, ardRg = 0.0; ardSurf(ardHh, ardAlb, ardRg); diffuseColor.rgb *= ardAlb;').replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = clamp(vRM.x + ardRg, 0.04, 1.0);').replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor = vRM.y;').replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\nif (ardHh != 0.0) normal = ardPerturb(-vViewPosition, normal, vec2(dFdx(ardHh), dFdy(ardHh)) * 0.9, faceDirection);');
     if (o.rim) sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n{ float rim = pow(1.0 - abs(dot(normalize(normal), normalize(vViewPosition))), ' + o.rim.pow.toFixed(2) + '); totalEmissiveRadiance += vec3(' + o.rim.col.map(v => v.toFixed(3)).join(', ') + ') * (rim * ' + o.rim.amt.toFixed(3) + '); }');
     if (o.onShader) o.onShader(sh);
   };
-  m.defaultAttributeValues = Object.assign({}, m.defaultAttributeValues, ANIM_DEFAULTS); m.customProgramCacheKey = () => 'ard-mesh-' + (o.key || 'base') + (o.noAnim ? '-sem-anim' : ''); return m; }
+  m.defaultAttributeValues = Object.assign({}, m.defaultAttributeValues, ANIM_DEFAULTS, { pt: [0] }); m.customProgramCacheKey = () => 'ard-mesh-v43-' + (o.key || 'base') + (o.noAnim ? '-sem-anim' : ''); return m; }
 const BUILDING_DEFS = ['nucleo', 'reator', 'refinaria', 'quartel', 'fabrica', 'hangar', 'torre', 'nodulo', 'laboratorio', 'muro', 'portao', 'bastiao'];
 const GENERIC_UNITS = ['coletor', 'infantaria', 'veiculo', 'drone', 'suporte', 'pirata'];
 function unitsOf(race) { return GENERIC_UNITS.concat(Object.keys(U[race] || {}).filter(d => !GENERIC_UNITS.includes(d) && !d.startsWith('veiculo_'))); }
-ARD.meshes = { setLod(v) { LOD = Math.max(0.4, Math.min(1, v)); }, build, material, animShader, ANIM_DEFAULTS, ANIM_T, PAL, MAT, BUILDING_DEFS, GENERIC_UNITS, unitsOf, NEUTRAL_DEFS: Object.keys(NEUTRAL), PROP_RACES: Object.keys(PROPS), FULL };
+ARD.meshes = { setLod(v) { LOD = Math.max(0.4, Math.min(1, v)); }, setDetail(v) { DET.value = Math.max(0, Math.min(1, v)); }, /* 4.3a: detalhe de superfície pela qualidade */ build, material, animShader, ANIM_DEFAULTS, ANIM_T, PAL, MAT, BUILDING_DEFS, GENERIC_UNITS, unitsOf, NEUTRAL_DEFS: Object.keys(NEUTRAL), PROP_RACES: Object.keys(PROPS), FULL };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Aether Rift: Dominion — Engine gráfica 2 (4.0d): céu, planeta-mãe, horizonte além do mapa e detalhe do terreno.
@@ -3358,7 +3755,21 @@ function makeHorizon(THREE, WORLD, H, seed, tint) {
   geo.setAttribute('color', new THREE.BufferAttribute(col, 3)); geo.computeVertexNormals();
   const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.96, metalness: 0, envMapIntensity: 0.15, flatShading: true })); m.position.set(WORLD / 2, 0, -WORLD / 2); m.receiveShadow = false; return m;
 }
-ARD.world3d = { PLANETS, detailTexture, planetTexture, makeSky, makeHomeWorld, makeHorizon, fbm };
+function microTexture(THREE) { /* 4.3a: microdetalhe do chão (R altura de seixos + grão, G tom, B fendas), repetível, 512² */
+  const N = 512; const cv = document.createElement('canvas'); cv.width = cv.height = N; const c = cv.getContext('2d'); const img = c.createImageData(N, N); const d = img.data;
+  let s = 987654321; const rnd = () => { s = (Math.imul(s, 1103515245) + 12345) >>> 0; return (s >>> 8) / 16777216; };
+  const G = 18, pts = []; for (let j = 0; j < G; j++) for (let i = 0; i < G; i++) pts.push([(i + 0.15 + rnd() * 0.7) / G, (j + 0.15 + rnd() * 0.7) / G, 0.25 + rnd() * 0.75, rnd()]);
+  const G2 = 6, crk = []; for (let j = 0; j < G2; j++) for (let i = 0; i < G2; i++) crk.push([(i + rnd()) / G2, (j + rnd()) / G2]);
+  const wrap = v => v - Math.floor(v); const dw = (a, b) => { let x = Math.abs(a - b); return x > 0.5 ? 1 - x : x; };
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const u = x / N, v = y / N; const ci = Math.floor(u * G), cj = Math.floor(v * G);
+    let best = 9, bs = 0, bt = 0; for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) { const p = pts[((cj + oy + G) % G) * G + ((ci + ox + G) % G)]; const dx = dw(u, p[0]) * G, dy = dw(v, p[1]) * G; const dd = Math.sqrt(dx * dx + dy * dy) / (0.28 + 0.3 * p[2]); if (dd < best) { best = dd; bs = p[2]; bt = p[3]; } }
+    const peb = best < 1 ? Math.sqrt(1 - best * best) : 0; const k1 = Math.floor(u * G2), k2 = Math.floor(v * G2); let f1 = 9, f2 = 9;
+    for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) { const p = crk[((k2 + oy + G2) % G2) * G2 + ((k1 + ox + G2) % G2)]; const dx = dw(u, p[0]) * G2, dy = dw(v, p[1]) * G2; const dd = Math.sqrt(dx * dx + dy * dy); if (dd < f1) { f2 = f1; f1 = dd; } else if (dd < f2) f2 = dd; }
+    const crack = Math.max(0, 1 - (f2 - f1) / 0.05); const grit = hash3(x, y, 77);
+    const i = (y * N + x) * 4; d[i] = 255 * Math.min(1, peb * (0.5 + 0.5 * bs) * 0.85 + grit * 0.15); d[i + 1] = 255 * (peb > 0 ? 0.35 + 0.5 * bt : 0.45 + 0.2 * grit); d[i + 2] = 255 * crack * (1 - peb); d[i + 3] = 255; }
+  c.putImageData(img, 0, 0); const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.NoColorSpace; return t;
+}
+ARD.world3d = { PLANETS, detailTexture, microTexture, planetTexture, makeSky, makeHomeWorld, makeHorizon, fbm };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Aether Rift: Dominion — logo vivo (4.0d): a Final 2 "Escudo-Órbita" aprovada, renderizada em tempo real com os cinco
@@ -4868,8 +5279,9 @@ const BIOME_MINI = { gelo: '#5C6B7A', rocha: '#4A4E56', tundra: '#3E5242', basal
 function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
 function rgba(h, a) { const c = hexToRgb(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
 function create(canvas, overlay, mini) {
+  const _frus = new THREE.Frustum(), _pmF = new THREE.Matrix4(), _sph = new THREE.Sphere(); /* 4.3a: corte por câmera */
   const _v = new THREE.Vector3(), _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3(), _c = new THREE.Color(); const UP = new THREE.Vector3(0, 1, 0);
-  const R = { canvas, w: 0, h: 0, dpr: 1, K: 1.7, zoomMin: matchMedia('(pointer: coarse)').matches ? 0.3 : 0.42, zoomMax: 2.4, supportsYaw: true, fx: { floats: [], rings: [] }, time: 0, shake: 0, icons: new Map(), geos: new Map(), inst: new Map(), sim: null, night: 0, spriteCache: new Map(), is3d: true };
+  const R = { canvas, w: 0, h: 0, dpr: 1, K: 1.7, zoomMin: matchMedia('(pointer: coarse)').matches ? 0.3 : 0.42, zoomMax: matchMedia('(pointer: coarse)').matches ? 4 : 6, /* 4.3a: chega perto para ver o detalhe */ supportsYaw: true, fx: { floats: [], rings: [] }, time: 0, shake: 0, icons: new Map(), geos: new Map(), inst: new Map(), sim: null, night: 0, spriteCache: new Map(), is3d: true };
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
   R.gpu = '?'; R.shaderErrors = []; R.degraded = [];
   try { const gl = renderer.getContext(); const ext = gl.getExtension('WEBGL_debug_renderer_info'); R.gpu = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); } catch (e) {}
@@ -4947,6 +5359,7 @@ function create(canvas, overlay, mini) {
     else if (name === 'alta' || name === 'ultra') { q.shadows = true; q.shadowMap = 4096; q.post = !!ADD; q.ssao = name === 'ultra' && !!ADD; q.msaa = !!ADD && !isTouch && !!(renderer.capabilities && renderer.capabilities.isWebGL2); q.pr = Math.min(2, window.devicePixelRatio || 1); q.particles = 1; }
     else { q.shadows = !isTouch; q.shadowMap = 2048; q.post = !!ADD; q.ssao = false; q.msaa = false; q.pr = Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1); q.particles = 1; }
     if (over.ssao != null) q.ssao = over.ssao && !!ADD; if (over.msaa != null) q.msaa = over.msaa && !!ADD; if (over.shadowMap) q.shadowMap = over.shadowMap; if (over.post != null) q.post = over.post && !!ADD;
+    q.detail = name === 'baixa' || isTouch ? 0 : name === 'media' ? 0.75 : 1; if (ME && ME.setDetail) ME.setDetail(q.detail); /* 4.3a: detalhe de superfície dos modelos */
     renderer.setPixelRatio(q.pr); applyShadows(); buildComposer(); armWatchdog(); if (R.FX) R.FX.mult = q.particles; if (R.DR && R.sim && R.H) { try { R.DR.build(R.sim, R.H, dressDensity()); } catch (e) {} }
   };
   const octx = overlay.getContext('2d'); const mctx = mini.getContext('2d'); const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
@@ -4978,6 +5391,7 @@ function create(canvas, overlay, mini) {
     c.putImageData(img, 0, 0); const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.NoColorSpace; return t; })();
   const fogData = new Uint8Array(FOGN * FOGN * 4); const fogTex = new THREE.DataTexture(fogData, FOGN, FOGN, THREE.RGBAFormat); fogTex.magFilter = THREE.LinearFilter; fogTex.minFilter = THREE.LinearFilter; fogTex.colorSpace = THREE.NoColorSpace;
   const terrData = new Uint8Array(TILES * TILES * 4); const terrTex = new THREE.DataTexture(terrData, TILES, TILES, THREE.RGBAFormat); terrTex.magFilter = THREE.LinearFilter; terrTex.minFilter = THREE.LinearFilter; terrTex.colorSpace = THREE.NoColorSpace;
+  const microTex = W3 && W3.microTexture && !isTouch ? W3.microTexture(THREE) : null; /* 4.3a */
   const detailTex = W3 ? W3.detailTexture(THREE) : null; if (detailTex) { detailTex.repeat.set(44, 44); if (!/swiftshader|llvmpipe|software/i.test(R.gpu)) detailTex.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy()); } // anisotropia só em GPU de verdade (no SwiftShader custa 10×)
   let terrain = null, horizon = null, sky = null, home = null; R.poolLights = []; R.mist = [];
   const DR = ARD.dress3d ? ARD.dress3d.create(THREE, scene, { fogTex }) : null; R.DR = DR; let dressT = 0; // 4.2d
@@ -5008,10 +5422,11 @@ function create(canvas, overlay, mini) {
     const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0.02, envMapIntensity: 0.22 }); mat.userData.env = 0.22; envMats.push(mat);
     if (detailTex && !DBG_OFF.has('relevo')) { mat.bumpMap = detailTex; mat.bumpScale = 1.4; }
     mat.onBeforeCompile = sh => {
-      sh.uniforms.fogMap = { value: fogTex }; sh.uniforms.terrMap = { value: terrTex }; sh.uniforms.worldSize = { value: S.WORLD }; sh.uniforms.cloudMap = { value: cloudTex }; sh.uniforms.uCloudT = { value: 0 }; sh.uniforms.detailMap = { value: detailTex || cloudTex }; R.terrShader = sh; const useDet = !!detailTex && !DBG_OFF.has('detalhe');
+      sh.uniforms.fogMap = { value: fogTex }; sh.uniforms.terrMap = { value: terrTex }; sh.uniforms.worldSize = { value: S.WORLD }; sh.uniforms.cloudMap = { value: cloudTex }; sh.uniforms.uCloudT = { value: 0 }; sh.uniforms.detailMap = { value: detailTex || cloudTex }; sh.uniforms.microMap = { value: microTex || detailTex || cloudTex }; sh.uniforms.uNear = { value: 0 }; R.terrShader = sh; const useDet = !!detailTex && !DBG_OFF.has('detalhe');
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vWuv; varying float vNy;').replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n{ vec4 wp = modelMatrix * vec4(position, 1.0); vWuv = vec2(wp.x / worldSize, -wp.z / worldSize); vNy = normal.y; }');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\nif (ardMh != 0.0) normal = ardTPerturb(-vViewPosition, normal, vec2(dFdx(ardMh), dFdy(ardMh)) * 1.4, faceDirection);'); /* 4.3a: relevo fino só perto */
       sh.vertexShader = sh.vertexShader.replace('uniform float worldSize', 'uniform float worldSize'); if (!sh.vertexShader.includes('uniform float worldSize')) sh.vertexShader = 'uniform float worldSize;\n' + sh.vertexShader;
-      sh.fragmentShader = ('uniform sampler2D fogMap; uniform sampler2D terrMap; uniform sampler2D cloudMap; uniform sampler2D detailMap; uniform float uCloudT; varying vec2 vWuv; varying float vNy;\n' + sh.fragmentShader).replace('#include <color_fragment>', '#include <color_fragment>\n' + (useDet ? '' : '#define NO_DET\n') + '#ifndef NO_DET\n{ vec3 dn = texture2D(detailMap, vWuv * 44.0).rgb; vec3 dm = texture2D(detailMap, vWuv * 7.0 + 0.37).rgb; float det = dn.r * 0.5 + dm.g * 0.5; diffuseColor.rgb *= 0.8 + 0.4 * det; diffuseColor.rgb *= 1.0 - 0.2 * dn.b * smoothstep(0.35, 0.65, dm.r); float slope = 1.0 - clamp(vNy, 0.0, 1.0); diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.30, 0.29, 0.31) * (0.75 + 0.5 * dm.r), smoothstep(0.06, 0.2, slope)); }\n#endif\n{ vec4 tc = texture2D(terrMap, vWuv); diffuseColor.rgb = mix(diffuseColor.rgb, tc.rgb, tc.a * 0.2); float fl = texture2D(fogMap, vWuv).r; diffuseColor.rgb *= mix(0.06, 1.0, fl); float cl = texture2D(cloudMap, vWuv * 5.0 + vec2(uCloudT * 0.006, uCloudT * 0.0035)).r; diffuseColor.rgb *= 0.8 + 0.2 * cl; }');
+      sh.fragmentShader = ('uniform sampler2D fogMap; uniform sampler2D terrMap; uniform sampler2D cloudMap; uniform sampler2D detailMap; uniform sampler2D microMap; uniform float uNear; uniform float uCloudT; varying vec2 vWuv; varying float vNy;\n' + 'vec3 ardTPerturb(vec3 sp, vec3 sn, vec2 dh, float fd) { vec3 sx = normalize(dFdx(sp)), sy = normalize(dFdy(sp)); vec3 r1 = cross(sy, sn), r2 = cross(sn, sx); float det = dot(sx, r1) * fd; vec3 g = sign(det) * (dh.x * r1 + dh.y * r2); return normalize(abs(det) * sn - g); }\n' + sh.fragmentShader).replace('#include <color_fragment>', '#include <color_fragment>\n' + (useDet ? '' : '#define NO_DET\n') + '#ifndef NO_DET\n{ vec3 dn = texture2D(detailMap, vWuv * 44.0).rgb; vec3 dm = texture2D(detailMap, vWuv * 7.0 + 0.37).rgb; float det = dn.r * 0.5 + dm.g * 0.5; diffuseColor.rgb *= 0.8 + 0.4 * det; diffuseColor.rgb *= 1.0 - 0.2 * dn.b * smoothstep(0.35, 0.65, dm.r); float slope = 1.0 - clamp(vNy, 0.0, 1.0); diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.30, 0.29, 0.31) * (0.75 + 0.5 * dm.r), smoothstep(0.06, 0.2, slope)); }\n#endif\nfloat ardMh = 0.0; if (uNear > 0.0) { vec3 m1 = texture2D(microMap, vWuv * 260.0).rgb; vec3 m2 = texture2D(microMap, vWuv * 84.0 + 0.31).rgb; float pe = max(m1.r * 0.6, m2.r); diffuseColor.rgb *= mix(1.0, (0.82 + 0.36 * mix(m1.g, m2.g, step(0.25, m2.r))) * (1.0 - 0.45 * max(m1.b, m2.b * 0.8)) * (1.0 + 0.12 * pe), uNear); ardMh = (m1.r * 0.35 + m2.r * 0.9 - (m1.b + m2.b) * 0.3) * uNear; }\n{ vec4 tc = texture2D(terrMap, vWuv); diffuseColor.rgb = mix(diffuseColor.rgb, tc.rgb, tc.a * 0.2); float fl = texture2D(fogMap, vWuv).r; diffuseColor.rgb *= mix(0.06, 1.0, fl); float cl = texture2D(cloudMap, vWuv * 5.0 + vec2(uCloudT * 0.006, uCloudT * 0.0035)).r; diffuseColor.rgb *= 0.8 + 0.2 * cl; }');
     };
     if (terrain) scene.remove(terrain);
     terrain = new THREE.Mesh(geo, mat); terrain.position.set(S.WORLD / 2, 0, -S.WORLD / 2); terrain.receiveShadow = true; scene.add(terrain);
@@ -5123,7 +5538,7 @@ function create(canvas, overlay, mini) {
   // ---------- projeção ----------
   function updateCamera(cam) {
     const portrait = R.h > R.w * 1.05; const frame = portrait ? 1 + Math.min(0.85, (R.h / R.w - 1) * 0.6) : 1; R.camDist = CAM.baseDist * frame / cam.zoom; // 4.1a: celular em pé enxerga mais
-    const d = R.camDist; const yaw = cam.yaw == null ? Math.PI / 4 : cam.yaw; const ty = H(cam.x, cam.y); const pitch = cam.pitch == null ? CAM.pitch : Math.max(CAM.minPitch, Math.min(CAM.maxPitch, cam.pitch));
+    const d = R.camDist; const yaw = cam.yaw == null ? Math.PI / 4 : cam.yaw; if (R.terrShader && R.terrShader.uniforms.uNear) R.terrShader.uniforms.uNear.value = microTex ? Math.max(0, Math.min(1, (400 - d) / 240)) : 0; /* 4.3a */ const ty = H(cam.x, cam.y); const pitch = cam.pitch == null ? CAM.pitch : Math.max(CAM.minPitch, Math.min(CAM.maxPitch, cam.pitch));
     camera.position.set(cam.x + Math.sin(yaw) * Math.cos(pitch) * d + R.shakeX, ty + Math.sin(pitch) * d, -cam.y + Math.cos(yaw) * Math.cos(pitch) * d + R.shakeY);
     camera.lookAt(cam.x, ty, -cam.y); camera.updateMatrixWorld(); camera.updateProjectionMatrix();
     if (sky) sky.position.copy(camera.position); if (home) { home.position.set(camera.position.x - 0.36 * 4200, camera.position.y * 0.15 + 4200 * 0.06, camera.position.z - 0.93 * 4200); }
@@ -5200,6 +5615,10 @@ function create(canvas, overlay, mini) {
   const boomGeo = new THREE.SphereGeometry(1, 10, 8); const boomMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 1.5, 0.8), transparent: true, opacity: 0.8, depthWrite: false }); const booms = new THREE.InstancedMesh(boomGeo, boomMat, 48); booms.count = 0; booms.frustumCulled = false; scene.add(booms); const boomList = [];
   const decalGeo = new THREE.CircleGeometry(1, 18); decalGeo.rotateX(-Math.PI / 2); const decals = new THREE.InstancedMesh(decalGeo, new THREE.MeshBasicMaterial({ color: 0x0b0908, transparent: true, opacity: 0.55, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }), 160); decals.count = 0; decals.frustumCulled = false; scene.add(decals); const decalList = [];
   const ringGeo = new THREE.RingGeometry(0.82, 1, 28); ringGeo.rotateX(-Math.PI / 2); const selRings = new THREE.InstancedMesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 }), 256); selRings.count = 0; selRings.frustumCulled = false; scene.add(selRings);
+  /* 4.3a: feixe de mineração do coletor até o nó: dois raios na cor do recurso (núcleo fino e halo), tremulando, com brilho, faíscas e poeira no contato */
+  const mineBeams = new THREE.InstancedMesh(new THREE.CylinderGeometry(1, 1, 1, 6, 1, true).translate(0, 0.5, 0), new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }), 256); mineBeams.setColorAt(0, new THREE.Color(0, 0, 0)); mineBeams.count = 0; mineBeams.frustumCulled = false; mineBeams.renderOrder = 3; scene.add(mineBeams);
+  const BEAM_COL = { minerio: [0.5, 1.35, 2.0], plasma: [2.0, 0.75, 0.35], dados: [0.6, 2.0, 1.0] }; const _bA = new THREE.Vector3(), _bB = new THREE.Vector3(), _bD = new THREE.Vector3();
+  function beamTo(n, ax, ay, az, bx, by, bz, r, col, k) { if (n >= 256) return n; _bA.set(ax, ay, az); _bB.set(bx, by, bz); _bD.subVectors(_bB, _bA); const len = _bD.length(); if (len < 0.01) return n; _bD.multiplyScalar(1 / len); _q.setFromUnitVectors(UP, _bD); _s.set(r, len, r); _m.compose(_bA, _q, _s); mineBeams.setMatrixAt(n, _m); _c.setRGB(col[0] * k, col[1] * k, col[2] * k); mineBeams.setColorAt(n, _c); return n + 1; }
   const vetRings = new THREE.InstancedMesh(new THREE.RingGeometry(0.84, 1, 28).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.5, 1.12, 0.35), transparent: true, opacity: 0.7, depthWrite: false, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -3 }), 256); vetRings.count = 0; vetRings.frustumCulled = false; scene.add(vetRings); // 4.2e: veteranos
   // 4.2h: halo de recurso no chão (cor do recurso, pulso lento, tamanho e brilho pelo que resta; deitado no relevo); um draw call para todos os nós
   const glowTex = (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 64; const gc = cv.getContext('2d'); const gr = gc.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.3, 'rgba(255,255,255,0.6)'); gr.addColorStop(0.65, 'rgba(255,255,255,0.16)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); gc.fillStyle = gr; gc.fillRect(0, 0, 64, 64); const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; })();
@@ -5314,7 +5733,8 @@ function create(canvas, overlay, mini) {
     terrTex.needsUpdate = true;
     // instâncias
     for (const it of R.inst.values()) it.n = 0;
-    let nSel = 0, nRange = 0, nShell = 0, nBul = 0, nBeam = 0, nVet = 0, nGlow = 0; const hpList = []; const emitters = []; const flags = [];
+    _frus.setFromProjectionMatrix(_pmF.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)); /* 4.3a: só desenha unidades e estruturas que a câmera vê (com margem para as sombras); os modelos ficaram pesados */
+    let nSel = 0, nRange = 0, nShell = 0, nBul = 0, nBeam = 0, nVet = 0, nGlow = 0, nMine = 0; const hpList = []; const emitters = []; const flags = [];
     for (const e of sim.ents) {
       if (!e.alive) continue; const own = e.owner === human;
       if (e.kind === 'node') { const it = instOf(e.res, -1, e.id % 4); const g = it.geo; const f = e.max ? Math.max(0, e.amount) / e.max : 1; const dry = e.amount <= 0; // 4.2h
@@ -5330,9 +5750,11 @@ function create(canvas, overlay, mini) {
       if (e.kind === 'proj') { if (!own && !vis.has(e.id)) continue; const w = S.WEAPONS[e.weapon]; const [wx, wy] = lerp(e, alpha); if (w.proj === 'shell') { if (FX && Math.random() < 0.45 * FX.mult) FX.trail(wx, H(wx, wy) + e.z, -wy); if (nShell < 256) { _p.set(wx, H(wx, wy) + e.z, -wy); _s.setScalar(1); _q.identity(); _m.compose(_p, _q, _s); shells.setMatrixAt(nShell++, _m); } } else if (nBul < BL) { const o = nBul * 6; blPos[o] = wx - e.vx * 0.03; blPos[o + 1] = H(wx, wy) + e.z; blPos[o + 2] = -(wy - e.vy * 0.03); blPos[o + 3] = wx; blPos[o + 4] = H(wx, wy) + e.z; blPos[o + 5] = -wy; nBul++; } continue; }
       if (!own && !vis.has(e.id)) continue;
       const isUnit = e.kind === 'unit'; const [wx, wy] = isUnit ? lerp(e, alpha) : [e.x, e.y]; const ud = isUnit ? S.UNITS[e.def] : S.BUILDINGS[e.def];
+      _sph.center.set(wx, H(wx, wy) + 6, -wy); _sph.radius = e.r * 1.6 + (isUnit ? 45 : 80); if (!_frus.intersectsSphere(_sph) && !view.sel.has(e.id)) continue;
       const parts = MD.PARTS[e.def]; const hullDef = parts ? parts.hull : e.def; const it = instOf(hullDef, e.owner, (e.def === 'nucleo' && R.skins && R.skins[e.owner]) || 0); /* 4.0e: Núcleo do Hangar */ const g = it.geo; let fit = fitOf(e, g); if (e.def === 'nucleo') { const op = sim.players[e.owner] || {}; fit *= 1 + 0.12 * ((op.era || 1) - 1) + (op.evolveT > 0 ? 0.025 * Math.sin(R.time * 6) : 0); } /* 4.1d: o Núcleo cresce a cada Era e pulsa enquanto evolui */
       const zz = isUnit && ud.flying ? 14 : 0; const moving = isUnit && (e.x !== e.px || e.y !== e.py); const bob = moving && (e.def === 'infantaria' || e.def === 'quimera' || e.def === 'soldador' || e.def === 'atirador' || e.def === 'agulha') ? Math.abs(Math.sin(R.time * 11 + e.id)) * 1.2 : moving && (e.def === 'cria' || e.def === 'cuspidor') ? Math.abs(Math.sin(R.time * 15 + e.id)) * 1.0 : moving && (e.def === 'prensa' || e.def === 'colosso' || e.def === 'brutamonte') ? Math.abs(Math.sin(R.time * 5 + e.id)) * 2.2 : (e.def === 'voz' || e.def === 'diapasao' || e.def === 'monolito' || e.def === 'prisma') ? 2 + Math.sin(R.time * 2.5 + e.id) * 1.2 : 0;
       const dmg = !isUnit && e.built && e.hp < e.maxHp * 0.5; const tint = e.cloaked ? 0.55 : dmg ? 0.6 : 1;
+      let hvN = null; if (isUnit && e.def === 'coletor' && e.state === 'harvest') { const nd = sim.byId.get(e.node); if (nd && nd.alive && nd.amount > 0 && Math.hypot(nd.x - wx, nd.y - wy) <= e.r + nd.r + 12) hvN = nd; } /* 4.3a: colhendo, olha para o nó (só visual) */
       if (!isUnit && !e.built) { // 4.0a — nascimento de construção com assinatura por Raça
         const pr = Math.min(1, Math.max(0.04, e.progress || 0)); const fac2 = (sim.players[e.owner] || {}).faction; const pp = R.quality.particles;
         if (fac2 === 'erevane') { // origami: abre no plano e cintila até a camuflagem assentar
@@ -5357,7 +5779,11 @@ function create(canvas, overlay, mini) {
           if (Math.random() < 0.2 * pp) spark(wx + (Math.random() - .5) * e.r * 1.3, wy + (Math.random() - .5) * e.r * 1.3, ((k + fr) / 5) * g.height * fit * 0.9 + 2, [1, 0.82, 0.45], 42, true);
           if (Math.random() < 0.07 * pp) smoke(wx, wy, 4, [0.5, 0.5, 0.52], 1.5, 14);
         }
-      } else put(it, wx, wy, zz + bob, (isUnit || ud.wall ? (e.ang || 0) : 0) + (isUnit && SPIN[e.def] ? R.time * SPIN[e.def] : 0), fit, 1, tint, (it.anim || parts) ? animFor(e, wx, wy, fit, dt, sim) : null);
+      } else put(it, wx, wy, zz + bob, (hvN ? Math.atan2(hvN.y - wy, hvN.x - wx) : (isUnit || ud.wall ? (e.ang || 0) : 0)) + (isUnit && SPIN[e.def] ? R.time * SPIN[e.def] : 0), fit, 1, tint, (it.anim || parts) ? animFor(e, wx, wy, fit, dt, sim) : null);
+      if (hvN && nMine < 252) { const nd = hvN; { /* 4.3a: colhendo */
+        const bm = g.beam || [g.width * 0.48, g.height * 0.45, 0]; const a = Math.atan2(nd.y - wy, nd.x - wx), ca = Math.cos(a), sa = Math.sin(a); const gy = H(wx, wy) + zz; const tx = nd.x + Math.sin(R.time * 1.7 + e.id) * nd.r * 0.25, ty = nd.y + Math.cos(R.time * 1.3 + e.id) * nd.r * 0.25, th = H(nd.x, nd.y) + 3.2; const col = BEAM_COL[nd.res] || BEAM_COL.minerio; const fl = 0.8 + 0.2 * Math.sin(R.time * 37 + e.id * 3);
+        for (const side of [-0.45, 0.45]) { const lx = bm[0], lz = bm[2] + side; const ex = wx + (lx * ca + lz * sa) * fit, ez = -wy + (-lx * sa + lz * ca) * fit, ey = gy + bm[1] * fit; nMine = beamTo(nMine, ex, ey, ez, tx, th, -ty, 0.22, col, 1.7 * fl); nMine = beamTo(nMine, ex, ey, ez, tx, th, -ty, 0.75, col, 0.34 * fl); }
+        if (FX) { const pp = R.quality.particles; if (Math.random() < 0.35 * pp) FX.glow(tx, th, -ty, col, 3.4, 0.24); if (Math.random() < 0.09 * pp) FX.spark(tx, th, -ty, col, 22, 2); if (Math.random() < 0.05 * pp) FX.smoke(tx, H(tx, ty) + 1, -ty, [0.42, 0.36, 0.3], 1.4, 5, 3); } } }
       if (parts && (isUnit || e.built)) { const tt = instOf(parts.turret, e.owner, 0); put(tt, wx, wy, zz + bob + (g.mount != null ? g.mount : parts.z) * fit, e.aimAng != null ? e.aimAng : (e.ang || 0), fit, 1, tint, tt.anim ? animFor(e, wx, wy, fit, 0, sim) : null); }
       if (view.sel.has(e.id)) { nSel = ring(nSel, wx, wy, e.r + 5); if (!isUnit && ud.attack && nRange < 32) { _p.set(wx, H(wx, wy) + 0.6, -wy); _s.set(ud.attack.range, 1, ud.attack.range); _q.identity(); _m.compose(_p, _q, _s); rangeRings.setMatrixAt(nRange++, _m); } }
       if (e.hp < e.maxHp - 0.5 || view.sel.has(e.id) || (isUnit && e.rank > 0)) hpList.push({ x: wx, y: wy, z: zz + g.height * fit + 4, w: Math.max(16, e.r * 1.4), frac: e.hp / e.maxHp, rank: isUnit ? e.rank : 0, cloak: e.cloaked && own, r: e.r });
@@ -5385,6 +5811,7 @@ function create(canvas, overlay, mini) {
     if (view.ghost) { const gh = view.ghost; const d = S.BUILDINGS[gh.def]; const it = instOf(MD.PARTS[gh.def] ? MD.PARTS[gh.def].hull : gh.def, human, 0, true); put(it, gh.x, gh.y, 0, gh.ang || 0, 2 * d.r * 1.25 / it.geo.width, 1, gh.ok ? 1 : 0.5); nSel = ring(nSel, gh.x, gh.y, d.r + 4); if (d.territory && nRange < 32) { _p.set(gh.x, H(gh.x, gh.y) + 0.6, -gh.y); _s.set(d.territory, 1, d.territory); _q.identity(); _m.compose(_p, _q, _s); rangeRings.setMatrixAt(nRange++, _m); } }
     if (view.wallGhost && view.ghost) for (const g2 of view.wallGhost) { const it = instOf(view.ghost.def, human, 0, true); put(it, g2.x, g2.y, 0, g2.ang, 20 / it.geo.width, 1, g2.ok ? 1 : 0.5); }
     for (const it of R.inst.values()) { if (it.anim && it.n) { it.ia.needsUpdate = true; it.ic.needsUpdate = true; } it.main.count = it.n; it.main.instanceMatrix.needsUpdate = true; if (it.main.instanceColor) it.main.instanceColor.needsUpdate = true; if (it.em) { it.em.count = it.n; it.em.instanceMatrix.needsUpdate = true; if (it.em.instanceColor) it.em.instanceColor.needsUpdate = true; } }
+    mineBeams.count = nMine; mineBeams.instanceMatrix.needsUpdate = true; if (mineBeams.instanceColor) mineBeams.instanceColor.needsUpdate = true; /* 4.3a */
     nodeGlow.count = nGlow; nodeGlow.instanceMatrix.needsUpdate = true; if (nodeGlow.instanceColor) nodeGlow.instanceColor.needsUpdate = true; // 4.2h
     selRings.count = nSel; selRings.instanceMatrix.needsUpdate = true; vetRings.count = nVet; vetRings.instanceMatrix.needsUpdate = true; rangeRings.count = nRange; rangeRings.instanceMatrix.needsUpdate = true; shells.count = nShell; shells.instanceMatrix.needsUpdate = true;
     for (let i = nBul * 6; i < BL * 6; i++) blPos[i] = -9999; blGeo.attributes.position.needsUpdate = true; blGeo.setDrawRange(0, nBul * 2);
@@ -5952,12 +6379,12 @@ const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-16 01:39Z';
+const BUILD = '2026-10-16 03:03Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.2h';
+const VERSION = '4.3a';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }

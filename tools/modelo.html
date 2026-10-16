@@ -1,0 +1,37 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Modelo de perto</title>
+<style>html,body{margin:0;background:#0e1116;overflow:hidden;font-family:system-ui,sans-serif}#lab{position:absolute;inset:0;pointer-events:none}.l{position:absolute;color:#dfe6ee;font:600 13px/1.2 system-ui;text-shadow:0 1px 3px #000}</style>
+<script type="importmap">{"imports":{"three":"../dist/vendor/three/build/three.module.min.js","three/addons/":"../dist/vendor/three/examples/jsm/"}}</script>
+</head><body><div id="lab"></div>
+<script src="../src/sim.js"></script><script src="../src/meshes.js"></script>
+<script type="module">
+// v4.3 — um modelo de perto, em quatro ângulos (de cima como na partida, 3/4, lado, frente), com a luz do jogo, sombra e reflexo de ambiente.
+// Parâmetros: race, def, color (cor do time), w, h, ground (1 = chão de regolito), anim (pose: 0..1 do ciclo), only=3q para um ângulo só.
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+window.THREE = THREE;
+const q = new URLSearchParams(location.search); const race = q.get('race') || 'vehnar', def = q.get('def') || 'coletor'; const W = +(q.get('w') || 1600), Hh = +(q.get('h') || 1000); const tc = q.get('color') || '#FF8C1A';
+const S = ARD.sim, M = ARD.meshes;
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); renderer.setSize(W, Hh); renderer.setPixelRatio(1); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.setScissorTest(true); document.body.appendChild(renderer.domElement);
+renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x14181f); const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+scene.add(new THREE.HemisphereLight(0x9fb8d6, 0x2a2622, 0.55)); const sun = new THREE.DirectionalLight(0xffe9c4, 2.2); sun.position.set(-30, 60, 40); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0004; const sc = sun.shadow.camera; sc.left = sc.bottom = -20; sc.right = sc.top = 20; sc.near = 1; sc.far = 200; scene.add(sun);
+// chão: regolito simples (ruído de valor em canvas) para julgar contraste e sombra
+const gcv = document.createElement('canvas'); gcv.width = gcv.height = 256; const gc = gcv.getContext('2d'); const img = gc.createImageData(256, 256); for (let i = 0; i < 256 * 256; i++) { const v = 0.55 + 0.25 * Math.random() * Math.random(); img.data[i * 4] = 140 * v; img.data[i * 4 + 1] = 100 * v; img.data[i * 4 + 2] = 72 * v; img.data[i * 4 + 3] = 255; } gc.putImageData(img, 0, 0);
+const gt = new THREE.CanvasTexture(gcv); gt.wrapS = gt.wrapT = THREE.RepeatWrapping; gt.repeat.set(6, 6); gt.colorSpace = THREE.SRGBColorSpace;
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ map: gt, roughness: 0.95 })); ground.receiveShadow = true; if (q.get('ground') !== '0') scene.add(ground);
+const mat = M.material({ env: 0.55, key: 'modelo' }); const matEm = new THREE.MeshBasicMaterial({ vertexColors: true }); matEm.onBeforeCompile = sh => M.animShader(sh); matEm.defaultAttributeValues = Object.assign({}, matEm.defaultAttributeValues, M.ANIM_DEFAULTS); matEm.customProgramCacheKey = () => 'modelo-em';
+const g = M.build(def, race, tc, 0); const info = { def, race, tris: 0, emTris: 0, width: g.width, height: g.height, beam: g.beam || null, parts: null };
+const fit = 14 / Math.max(g.width, g.height * 1.2); // o modelo ocupa ~14 unidades: tamanho de close
+const grp = new THREE.Group(); grp.scale.setScalar(fit); scene.add(grp);
+const addMesh = (geo, m) => { if (!geo) return null; const ia = new THREE.InstancedBufferAttribute(new Float32Array([0, +(q.get('anim') || 0) * 3, 0, 0]), 4); const ic = new THREE.InstancedBufferAttribute(new Float32Array([+(q.get('anim') || 0) * 2]), 1); geo.setAttribute('aInst', ia); geo.setAttribute('aInstC', ic); const im = new THREE.InstancedMesh(geo, m, 1); im.setMatrixAt(0, new THREE.Matrix4()); im.castShadow = true; im.receiveShadow = true; im.frustumCulled = false; grp.add(im); return im; };
+addMesh(g.main, mat); addMesh(g.em, matEm); info.tris = g.main.attributes.position.count / 3; info.emTris = g.em ? g.em.attributes.position.count / 3 : 0;
+if (g.beam) { const b = new THREE.Mesh(new THREE.SphereGeometry(0.25 / fit * 3, 10, 8), new THREE.MeshBasicMaterial({ color: 0xff40ff })); b.position.set(g.beam[0], g.beam[1], g.beam[2]); grp.add(b); }
+const H = g.height * fit; const views = [['de cima (partida)', 1.12, Math.PI / 4, 34], ['3/4', 0.62, Math.PI * 0.8, 26], ['lado', 0.12, Math.PI / 2, 24], ['frente', 0.3, 0.02, 24]].filter(v => !q.get('only') || q.get('only') === v[0].slice(0, 3));
+const cols = views.length > 1 ? 2 : 1, rows = Math.ceil(views.length / cols); const vw = W / cols, vh = Hh / rows; const lab = document.getElementById('lab');
+views.forEach(([name, pitch, yaw, dist], k) => { const cx = (k % cols) * vw, cy = Math.floor(k / cols) * vh; const cam = new THREE.PerspectiveCamera(32, vw / vh, 0.5, 500);
+  cam.position.set(Math.cos(pitch) * Math.cos(yaw) * dist, H * 0.4 + Math.sin(pitch) * dist, Math.cos(pitch) * Math.sin(yaw) * dist); cam.lookAt(0, H * 0.4, 0);
+  renderer.setViewport(cx, Hh - cy - vh, vw, vh); renderer.setScissor(cx, Hh - cy - vh, vw, vh); renderer.render(scene, cam);
+  const el = document.createElement('div'); el.className = 'l'; el.style.left = (cx + 10) + 'px'; el.style.top = (cy + 8) + 'px'; el.textContent = race + ' · ' + def + ' · ' + name; lab.appendChild(el); });
+const t = document.createElement('div'); t.className = 'l'; t.style.right = '10px'; t.style.bottom = '8px'; t.textContent = Math.round(info.tris) + ' tri + ' + Math.round(info.emTris) + ' emissivos · largura ' + info.width.toFixed(1) + ' · altura ' + info.height.toFixed(1) + (info.beam ? ' · emissor do feixe ' + info.beam.map(v => v.toFixed(1)).join(',') : ''); lab.appendChild(t);
+window.__info = info; window.__done = true;
+</script></body></html>
