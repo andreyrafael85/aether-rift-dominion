@@ -25,11 +25,11 @@ function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 2
 function rgba(h, a) { const c = hexToRgb(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
 function create(canvas, overlay, mini) {
   const _frus = new THREE.Frustum(), _pmF = new THREE.Matrix4(), _sph = new THREE.Sphere(); /* 4.3a: corte por câmera */
-  const _lp = new THREE.Vector3(), LOD_D2 = 560 * 560, LOD_ON = !!(ME && ME.build) && /[?&]lod=1/.test(location.search); /* 4.3d: nível de detalhe das unidades pela distância (ligado de vez quando a frota nova entrar; por ora só com ?lod=1) */
+  const _lp = new THREE.Vector3(), LOD_D2 = 560 * 560, LOD_ON = !!(ME && ME.build) && !/sem=[^&]*lod/.test(location.search); /* 4.3d: nível de detalhe das unidades pela distância (?sem=lod desliga) */
   const _v = new THREE.Vector3(), _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3(), _c = new THREE.Color(); const UP = new THREE.Vector3(0, 1, 0);
   const R = { canvas, w: 0, h: 0, dpr: 1, K: 1.7, zoomMin: matchMedia('(pointer: coarse)').matches ? 0.3 : 0.42, zoomMax: matchMedia('(pointer: coarse)').matches ? 4 : 6, /* 4.3a: chega perto para ver o detalhe */ supportsYaw: true, fx: { floats: [], rings: [] }, time: 0, shake: 0, icons: new Map(), geos: new Map(), inst: new Map(), sim: null, night: 0, spriteCache: new Map(), is3d: true };
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-  R.gpu = '?'; R.shaderErrors = []; R.degraded = []; R.glInfo = () => ({ programs: renderer.info.programs ? renderer.info.programs.length : null, calls: renderer.info.render.calls, tris: renderer.info.render.triangles, geos: renderer.info.memory.geometries, texs: renderer.info.memory.textures }); /* 4.3d: diagnóstico */
+  R.gpu = '?'; R.shaderErrors = []; R.degraded = []; R.glInfo = () => { R.measureGL = true; let instT = 0, instN = 0; for (const it of R.inst.values()) { if (!it.n) continue; instN += it.n; instT += it.n * ((it.geo.main ? it.geo.main.attributes.position.count : 0) + (it.geo.em ? it.geo.em.attributes.position.count : 0)) / 3; } return Object.assign({ programs: renderer.info.programs ? renderer.info.programs.length : null, geos: renderer.info.memory.geometries, texs: renderer.info.memory.textures, instN, instT: Math.round(instT), frame: renderer.info.render.frame }, R.lastGL || {}); }; /* 4.3d: diagnóstico (a partir da primeira chamada, soma chamadas e triângulos do quadro inteiro, com sombras e pós) */
   try { const gl = renderer.getContext(); const ext = gl.getExtension('WEBGL_debug_renderer_info'); R.gpu = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); } catch (e) {}
   // Erros de shader viram mensagens legíveis (three cala o console.error próprio quando este hook existe).
   renderer.debug.onShaderError = (gl, program, vs, fs) => { let src = '', log = ''; try { src = gl.getShaderSource(fs) || ''; log = (gl.getProgramInfoLog(program) || gl.getShaderInfoLog(fs) || gl.getShaderInfoLog(vs) || '').trim(); } catch (e) {} const tag = src.includes('kernelRadius') ? 'SSAO' : src.includes('fogMap') ? 'terreno' : src.includes('luminosityThreshold') || src.includes('blurTexture') ? 'bloom' : 'material'; const msg = 'Shader (' + tag + '): ' + (log || 'falha de compilação').slice(0, 300); R.shaderErrors.push(msg); console.error('[ARD] ' + msg); };
@@ -509,6 +509,7 @@ function create(canvas, overlay, mini) {
 
   // ---------- quadro ----------
   R.draw = function (sim, view, alpha, dt) {
+    if (R.measureGL) { renderer.info.autoReset = false; renderer.info.reset(); }
     R.sim = sim; R.time += dt; R.revealAll = !!view.reveal; updateFx(dt); if (R.terrShader) R.terrShader.uniforms.uCloudT.value = R.time; if (terrU) terrU.uTime.value = R.time; /* 4.3c */
     const cam = view.cam, human = view.human, me = sim.players[human]; const vis = view.reveal ? { has: () => true } : sim.vis[human]; const explored = sim.explored[human];
     R.night = R.forceDay ? 0 : (1 - Math.cos(TAU * sim.time / 750)) / 2;
@@ -645,6 +646,7 @@ function create(canvas, overlay, mini) {
     if (FX) FX.update(R.time, camera);
     if (atmoFx) { atmoFx.U.uAtProjInv.value.copy(camera.projectionMatrixInverse); atmoFx.U.uAtCamWorld.value.copy(camera.matrixWorld); } /* 4.3b */
     if (composer) { composer.render(dt); } else renderer.render(scene, camera);
+    if (R.measureGL) R.lastGL = { calls: renderer.info.render.calls, tris: renderer.info.render.triangles };
     if (R.testBlack && R.quality.ssao) { const pc = renderer.getClearColor(new THREE.Color()), pa = renderer.getClearAlpha(); renderer.setClearColor(0x000000, 1); renderer.clear(true, false, false); renderer.setClearColor(pc, pa); } // ?testblack=1: simula falha da GPU enquanto o SSAO está ligado
     checkFrame();
     drawOverlay(sim, view, hpList, me);

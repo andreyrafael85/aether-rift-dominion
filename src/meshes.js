@@ -543,36 +543,267 @@ U.vehnar = {
       K.seg([6.05, ey, s * 0.6], [6.05, ey, s * 0.28], 0.06, P.d, 'metal'); }
     K.anim({ t: 'spin', p: [6.08, 1.85, 0], speed: 3, axis: 'x' }, () => { K.tor(6.08, 1.85, 0, 0.26, 0.06, P.t, 'metal', { rz: H, ts: 12, rs: 4 }); for (let i = 0; i < 3; i++) { const a = i / 3 * PI * 2; K.box(6.06, 1.85 + Math.sin(a) * 0.3 - 0.05, Math.cos(a) * 0.3, 0.1, 0.1, 0.1, P.h, 'paint'); } }); K.sph(6.1, 1.85, 0, 0.13, '#FFC4F2', null, { e: 3, seg: 6 }); K.beam = [6.25, 1.85, 0];
   },
-  veiculo_hull(K, P, tc) { for (const s of [-1, 1]) track(K, P, 0, s * 3.5, 13, 2.4, 2.2);
-    K.poly([[-6.2, 1.2], [5.2, 1.2], [6.6, 2.6], [5.4, 4.0], [-5.6, 4.0], [-6.4, 2.8]], 5.2, P.a, 'steel', { b: 0.3 });
-    K.box(-0.4, 4.25, 0, 7.6, 0.2, 5, tc, 'paint'); K.light(6.25, 3.1, 2, 0.45, P.l); K.light(6.25, 3.1, -2, 0.45, P.l); K.light(-6.45, 3.0, 0, 0.5, '#FF4040'); K.mount = 4.3; },
-  veiculo_turret(K, P, tc) { KITS.vehnar.turret(K, P, tc, 0.85, false); },
-  drone(K, P, tc) { K.box(0, 1.2, 0, 4, 1.6, 3, P.a, 'steel', { b: 0.5 }); K.box(0.4, 2.8, 0, 2, 0.5, 2, tc, 'paint', { b: 0.2 });
-    for (const [sx, sz] of QUAD) { K.seg([0, 2, 0], [sx * 3.4, 2.3, sz * 3.4], 0.25, P.d, 'metal'); K.anim({ t: 'spin', p: [sx * 3.4, 2.3, sz * 3.4], speed: sx * sz * 26 }, () => { K.tor(sx * 3.4, 2.3, sz * 3.4, 1.6, 0.14, P.d, 'metal', { ts: 20 }); K.cyl(sx * 3.4, 2.15, sz * 3.4, 1.5, 1.5, 0.06, '#9AA3AD', 'glass'); K.light(sx * 3.4, 2.5, sz * 3.4, 0.3, P.l); }); }
-    K.box(1.6, 0, 0, 1.4, 1.2, 0.8, P.d, 'metal'); K.seg([2.2, 0.5, 0], [4.2, 0.5, 0], 0.18, P.d, 'metal', { anim: { t: 'recoil', dist: 0.4 } }); K.light(-2.1, 1.8, 0, 0.4, '#FF4040'); },
-  suporte(K, P, tc) { K.box(0, 0.6, 0, 7, 1.8, 5, P.a, 'steel', { b: 0.5 }); K.box(0, 2.4, 0, 5, 0.6, 3.6, tc, 'paint', { b: 0.2 });
-    K.cyl(-0.5, 3, 0, 0.4, 0.5, 2.2, P.b, 'metal'); K.anim({ t: 'spin', p: [-0.5, 5.2, 0], speed: 1.2 }, () => { K.lathe([[0.2, 0], [1.4, 0.35], [2.4, 1.1], [2.6, 1.3], [2.4, 1.38], [1.3, 0.62], [0, 0.32]], -0.5, 5.2, 0, P.t, 'metal', { rz: -0.5 }); K.sph(-0.2, 5.8, 0, 0.35, '#7FE3A1', null, { e: 2.6 }); });
-    for (const s of [-1, 1]) K.cyl(0, 0, s * 1.8, 1.2, 1.4, 0.6, '#3FE6CF', null, { e: 1.4, anim: { t: 'bob', amp: 0.1, speed: 4, ph: s > 0 ? 0 : PI } }); K.light(3.6, 1.6, 0, 0.45, P.l); },
-  pirata(K, P, tc) { for (const x of [-4, -1.2, 3.6]) for (const s of [-1, 1]) wheel(K, P, x, 1.3, s * 3.6, 1.3, 1.1);
-    K.box(0, 1.2, 0, 12, 1.4, 6, P.d, 'dark', { b: 0.3 }); K.box(3.8, 2.6, 0, 3.6, 3.4, 5.6, tc, 'paint', { b: 0.5 }); K.box(5.25, 3.8, 0, 0.9, 1.6, 4.6, P.g, 'glass', { b: 0.2 });
-    K.box(-2, 2.6, 0, 6, 1.2, 5.6, P.a, 'steel', { b: 0.3 }); K.cyl(-3.4, 3.8, 0, 1.1, 1.3, 1.2, P.b, 'metal'); K.seg([-3.4, 4.6, 0], [-6.8, 8.4, 0], 0.45, P.h, 'paint'); K.anim({ t: 'sway', p: [-6.8, 8.4, 0], amp: 0.15, speed: 2.2 }, () => { K.seg([-6.8, 8.4, 0], [-7.4, 5.4, 0], 0.1, P.d, 'metal'); K.tor(-7.4, 5.0, 0, 0.5, 0.14, P.t, 'metal', { rx: H }); });
-    K.light(5.65, 5.6, 1.9, 0.4, P.l); K.light(5.65, 5.6, -1.9, 0.4, P.l); K.light(5.65, 5.6, 0, 0.4, '#FFA03A'); },
+  /* ---------- 4.3d: frota Vehnar no nível do coletor 4.3a. Ajudantes internos da Raça (nome com _; chamados como U.vehnar._nome) ---------- */
+  _cb(K, x, y, z, w, h, d, b, col, mat, o) { /* 4.3d: caixa chanfrada (perfil octogonal extrudado em z, como no coletor); base em y, centro em x/z, gira pelo centro; na versão leve vira caixa reta (12 triângulos) */
+    if (K.lite) return K.poly([[-w / 2, -h / 2], [w / 2, -h / 2], [w / 2, h / 2], [-w / 2, h / 2]], d, col, mat, Object.assign({ x, y: y + h / 2, z }, o));
+    const c = b * 0.6, hw = w / 2 - c, hh = h / 2 - c; return K.poly([[-hw + b, -hh], [hw - b, -hh], [hw, -hh + b], [hw, hh - b], [hw - b, hh], [-hw + b, hh], [-hw, hh - b], [-hw, -hh + b]], Math.max(0.02, d - 2 * c), col, mat, Object.assign({ x, y: y + h / 2, z, b: c }, o)); },
+  _viga(K, a, b, t, d, bv, col, mat, o) { const dx = b[0] - a[0], dy = b[1] - a[1]; /* 4.3d: viga chanfrada de a até b no plano z = a[2] (t = espessura no plano, d = profundidade em z) */
+    return U.vehnar._cb(K, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2 - t / 2, a[2], Math.hypot(dx, dy), t, d, bv, col, mat, Object.assign({ rz: Math.atan2(dy, dx) }, o)); },
+  _haz(K, P, x, y, z, len, wid, n, dir, ex) { const o = Object.assign({ tx: { rx: -H }, tz: { rx: -H, ry: H }, fz: { ry: -H }, sx: {} }[dir], ex); /* 4.3d: faixa de perigo amarela e preta (dir como no coletor); de longe, uma faixa amarela só */
+    if (K.lite) return K.poly([[-len / 2, -wid / 2], [len / 2, -wid / 2], [len / 2, wid / 2], [-len / 2, wid / 2]], 0.05, P.h, 'paint', Object.assign({ x, y, z, pat: 0 }, o));
+    const q = len / (2 * n), sk = Math.min(wid * 0.7, q); for (let i = 0; i < 2 * n; i++) { const u = -len / 2 - sk / 2 + i * q; K.poly([[u, -wid / 2], [u + q, -wid / 2], [u + q + sk, wid / 2], [u + sk, wid / 2]], 0.05, i % 2 ? P.d : P.h, 'paint', Object.assign({ x, y, z, pat: 0 }, o)); } },
+  _pistao(K, P, a, b, r, o) { o = o || {}; const k = o.k || 0.55, m = [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k]; /* 4.3d: pistão hidráulico — camisa de aço e haste cromada; colar e olhais só de perto */
+    K.seg(a, m, r, o.col || P.b, 'metal', { seg: o.seg || 10 }); K.seg(m, b, r * 0.5, P.t, 'gloss', { seg: 8 });
+    K.fine(() => { const e = [m[0] + (b[0] - a[0]) * 0.05, m[1] + (b[1] - a[1]) * 0.05, m[2] + (b[2] - a[2]) * 0.05]; K.seg(m, e, r * 1.14, P.d, 'dark', { seg: 8 }); for (const p of [a, b]) K.box(p[0], p[1] - r * 0.7, p[2], r * 1.5, r * 1.4, r * 1.5, P.d, 'metal'); }); },
+  _escape(K, P, x, y, z, h, r) { /* 4.3d: escapamento da Raça — cano enferrujado, cinta de aço, boca escura e brasa da fornalha (como no coletor) */
+    K.cyl(x, y, z, r, r * 1.08, h, P.r, 'metal', { seg: 10 }); K.cyl(x, y + h * 0.42, z, r * 1.3, r * 1.3, h * 0.3, P.b, 'metal', { seg: 10 });
+    K.cyl(x, y + h, z, r * 1.24, r * 1.02, r * 0.55, P.d, 'dark', { seg: 10 }); K.cyl(x, y + h + r * 0.12, z, r * 0.84, r * 0.84, r * 0.5, '#FF7A2E', null, { e: 2.4, seg: 8 });
+    K.fine(() => { K.box(x, y + h * 0.18, z, r * 2.7, r * 0.5, r * 0.6, P.d, 'dark'); K.cyl(x, y + h * 0.37, z, r * 1.38, r * 1.38, h * 0.05, P.d, 'dark', { seg: 10 }); }); },
+  _roda(K, P, tc, x, y, z, r, w, s, o) { o = o || {}; const nl = K.q(o.lugs || 10), rt = r * 0.88, zo = z + s * w / 2; /* 4.3d: roda da família do coletor — pneu com garras em espinha de peixe, faixa da cor do time, aro de aço, cubo claro com trava amarela (o giro aparece); y = raio; s = lado de fora */
+    K.anim({ t: 'wheel', p: [x, y, z], r }, () => {
+      K.cyl(x, y, z - w / 2, rt, rt, w, P.d, 'rubber', { rx: H, seg: 12 });
+      for (let i = 0; i < nl; i++) { const a = (i + 0.25) / nl * PI * 2; K.box(x + Math.cos(a) * (rt - 0.05), y + Math.sin(a) * (rt - 0.05), z, r * 0.3, r - rt + 0.05, w * (K.lite ? 0.96 : 0.84), P.d, 'rubber', { rz: a - H, ry: K.lite ? 0 : (i % 2 ? 0.32 : -0.32), order: 'ZXY' }); }
+      if (!K.lite) { K.cyl(x, y, zo - s * 0.04, r * 0.7, r * 0.7, 0.1, tc, 'paint', { rx: s * H, seg: 12 }); K.cyl(x, y, zo, r * 0.5, r * 0.54, 0.1, P.b, 'metal', { rx: s * H, seg: 10 }); }
+      K.cyl(x, y, zo + s * 0.06, r * 0.24, r * 0.34, 0.16, P.t, 'metal', { rx: s * H, seg: 8 }); K.box(x, y - r * 0.07, zo + s * 0.24, r * 0.66, r * 0.14, 0.05, P.h, 'paint');
+      K.fine(() => { for (let i = 0; i < 4; i++) { const a = i / 4 * PI * 2 + 0.3; K.box(x + Math.cos(a) * r * 0.42, y + Math.sin(a) * r * 0.42 - 0.04, zo + s * 0.12, 0.09, 0.08, 0.06, P.d, 'metal'); } });
+    }); },
+  _cabine(K, P, tc, xb, xf, y0, y1, wz, o) { o = o || {}; const z0 = o.z || 0, h = y1 - y0, sl = h * 0.3, bv = 0.12, xF = y => xf + bv - sl * (y - y0) / h, ya = y0 + h * 0.16, yb = y1 - h * 0.08; /* 4.3d: cabine clara da família do coletor — para-brisa inclinado, janelas, teto da cor do time, barra de luzes; o.visor = venezianas blindadas, o.ambar = giroflex */
+    K.poly([[xb, y0], [xf, y0], [xf - sl, y1], [xb, y1]], wz - 2 * bv, P.t, 'steel', { b: bv, z: z0 });
+    K.poly([[xF(ya) + 0.03, ya], [xF(yb) + 0.03, yb], [xF(yb) - 0.09, yb], [xF(ya) - 0.09, ya]], wz - 0.62, P.g, 'glass', { pat: 0, z: z0 });
+    const ys = y0 + h * 0.3, xs = xb + (xf - xb) * 0.2; K.poly([[xs, ys], [xF(ys) - 0.4, ys], [xF(yb) - 0.4, yb - 0.04], [xs, yb - 0.04]], wz + 0.06, P.g, 'glass', { pat: 0, z: z0 });
+    if (o.visor) for (let i = 0; i < 3; i++) { const yy = ya + (yb - ya) * (i + 0.5) / 3; K.box(xF(yy) + 0.06, yy - 0.06, z0, 0.12, 0.12, wz - 0.42, P.d, 'dark'); }
+    else K.fine(() => { for (const k of [-0.28, 0, 0.28]) K.seg([xF(ya) + 0.06, ya - 0.04, z0 + k * wz], [xF(yb) + 0.06, yb + 0.04, z0 + k * wz], 0.04, P.d, 'metal', { seg: 5 }); });
+    const xr = (xb + xf - sl) / 2, lr = xf - sl - xb; K.box(xr, y1 + bv - 0.04, z0, lr * 0.92, 0.08, wz * 0.9, P.d, 'dark'); K.box(xr - 0.05, y1 + bv + 0.02, z0, lr * 0.76, 0.1, wz * 0.78, tc, 'paint');
+    if (o.luz !== false) { const xl = xf - sl - 0.12; K.box(xl, y1 + bv - 0.02, z0, 0.3, 0.2, wz * 0.84, P.d, 'dark'); for (const k of (K.lite ? [-0.24, 0.24] : [-0.36, -0.12, 0.12, 0.36])) K.light(xl + 0.12, y1 + bv + 0.03, z0 + k * wz, 0.17, P.l, 2.4); }
+    if (o.ambar) for (const s of [-1, 1]) { K.cyl(xb + 0.32, y1 + bv + 0.02, z0 + s * wz * 0.36, 0.17, 0.2, 0.12, P.d, 'dark', { seg: 8 }); K.sph(xb + 0.32, y1 + bv + 0.2, z0 + s * wz * 0.36, 0.19, '#FFA03A', null, { e: 2.2, seg: 8 }); }
+    K.fine(() => { for (const s of [-1, 1]) { const zw = z0 + s * wz / 2; K.seg([xF(y0 + h * 0.55) - 0.1, y0 + h * 0.55, zw], [xF(y0 + h * 0.55) + 0.1, y0 + h * 0.62, zw + s * 0.38], 0.035, P.d, 'metal', { seg: 5 }); K.box(xF(y0 + h * 0.55) + 0.12, y0 + h * 0.42, zw + s * 0.42, 0.1, 0.4, 0.24, P.d, 'dark'); K.seg([xb + 0.18, y0 + 0.25, zw + s * 0.05], [xb + 0.18, y1 - 0.25, zw + s * 0.05], 0.035, P.h, 'paint', { seg: 5 }); }
+      K.seg([xb + 0.3, y1 + bv, z0 - wz * 0.38], [xb + 0.2, y1 + bv + 1.0, z0 - wz * 0.38], 0.025, P.d, 'metal', { seg: 5 }); }); },
+  _lagarta(K, P, tc, z, s, o) { const L = o.L, Ht = o.Ht, w = o.w, R = o.R, xa = L / 2 - R, cy = Ht - R, xb = o.xb, rw = o.rw, nA = K.lite ? 3 : 6, zo = z + s * w / 2; /* 4.3d: lagarta larga — banda de borracha (sulcos do padrão), rodas de apoio, roda motriz dentada atrás e roda-guia na frente (giram), sapatas do ramo de cima que rolam (tread) */
+    const pts = [[-xb, 0], [xb, 0]]; for (let i = 0; i <= nA; i++) { const a = -0.9 + (PI / 2 + 0.9) * i / nA; pts.push([xa + Math.cos(a) * R, cy + Math.sin(a) * R]); } for (let i = 0; i <= nA; i++) { const a = PI / 2 + (PI / 2 + 0.9) * i / nA; pts.push([-xa + Math.cos(a) * R, cy + Math.sin(a) * R]); }
+    K.poly(pts, w - 0.16, P.d, 'rubber', { z, b: 0.08 });
+    const nr = K.q(6), x0 = -xb + 0.35, x1 = xb - 0.35, wy = rw + 0.24;
+    for (let i = 0; i < nr; i++) { const x = x0 + (x1 - x0) * i / (nr - 1); K.anim({ t: 'wheel', p: [x, wy, z], r: rw }, () => {
+      K.cyl(x, wy, zo - s * 0.22, rw, rw, 0.32, '#202329', 'rubber', { rx: s * H, seg: 11 }); K.cyl(x, wy, zo + s * 0.08, rw * 0.74, rw * 0.8, 0.1, P.b, 'metal', { rx: s * H, seg: 9 });
+      K.fine(() => { K.cyl(x, wy, zo + s * 0.16, rw * 0.2, rw * 0.3, 0.12, P.t, 'metal', { rx: s * H, seg: 6 }); K.box(x, wy - 0.06, zo + s * 0.2, rw * 1.2, 0.12, 0.04, P.d, 'dark'); }); }); }
+    K.anim({ t: 'wheel', p: [-xa, cy, z], r: R }, () => { const sr = R - 0.24, nt = K.q(10);
+      K.cyl(-xa, cy, zo - s * 0.2, sr, sr, 0.32, P.b, 'metal', { rx: s * H, seg: 12 });
+      for (let i = 0; i < nt; i++) { const a = i / nt * PI * 2; K.box(-xa + Math.cos(a) * (sr - 0.04), cy + Math.sin(a) * (sr - 0.04), zo - s * 0.04, 0.26, 0.3, 0.26, P.d, 'metal', { rz: a - H }); }
+      K.cyl(-xa, cy, zo + s * 0.1, sr * 0.42, sr * 0.55, 0.16, P.t, 'metal', { rx: s * H, seg: 8 }); });
+    K.anim({ t: 'wheel', p: [xa, cy, z], r: R }, () => { const ir = R - 0.26;
+      K.cyl(xa, cy, zo - s * 0.2, ir, ir, 0.32, P.b, 'metal', { rx: s * H, seg: 12 }); K.cyl(xa, cy, zo + s * 0.1, ir * 0.4, ir * 0.5, 0.14, P.t, 'metal', { rx: s * H, seg: 8 });
+      for (const a of [0.4, 0.4 + PI]) K.box(xa + Math.cos(a) * ir * 0.66, cy + Math.sin(a) * ir * 0.66 - 0.1, zo + s * 0.1, 0.2, 0.2, 0.06, P.d, 'dark'); });
+    const ng = K.q(Math.round(2 * xa / 0.75)), sp = 2 * xa / ng;
+    K.anim({ t: 'tread', spacing: sp }, () => { for (let i = 0; i < ng; i++) K.box(-xa + (i + 0.5) * sp, Ht - 0.06, z, 0.3, 0.15, w + 0.04, P.b, 'metal'); }); },
+  veiculo_hull(K, P, tc) { /* 4.3d: casco do tanque pesado — lagartas largas (rodas que giram, sapatas que rolam), casco chanfrado com glacis, convés do motor com ventoinha e grelhas em brasa, escapamentos gêmeos, para-lamas com faixa de perigo, faróis, faixas da cor do time no convés */
+    const V = U.vehnar, FO = '#FF7A2E', RED = '#FF4040';
+    for (const s of [-1, 1]) V._lagarta(K, P, tc, s * 3.6, s, { L: 13.4, Ht: 2.6, w: 2.3, R: 1.15, xb: 4.8, rw: 0.8 });
+    K.poly([[-6.2, 0.75], [5.0, 0.75], [6.25, 1.55], [6.25, 2.55], [-6.2, 2.55]], 4.6, P.d, 'dark', { b: 0.12 });
+    K.poly([[-6.3, 2.5], [6.2, 2.5], [6.55, 2.75], [4.2, 3.6], [-5.45, 3.6], [-6.3, 3.0]], 6.0, P.a, 'steel', { b: 0.2 });
+    K.cyl(0, 3.73, 0, 2.55, 2.6, 0.14, P.d, 'dark', { seg: 22 });
+    for (const s of [-1, 1]) { K.box(0.4, 3.75, s * 2.78, 7.2, 0.1, 0.66, tc, 'paint');
+      V._cb(K, 6.0, 2.62, s * 4.0, 1.7, 0.15, 1.65, 0.05, P.b, 'steel'); V._haz(K, P, 6.12, 2.8, s * 4.0, 1.45, 1.25, 3, 'tz');
+      V._cb(K, -6.0, 2.62, s * 4.0, 1.7, 0.15, 1.65, 0.05, P.b, 'steel'); K.box(-6.78, 1.35, s * 4.0, 0.08, 1.3, 1.5, P.d, 'rubber');
+      V._cb(K, 5.62, 3.05, s * 2.5, 0.6, 0.55, 0.72, 0.08, P.d, 'dark'); K.box(5.93, 3.13, s * 2.5, 0.05, 0.36, 0.5, P.l, null, { e: 2.4 });
+      K.light(-6.55, 3.05, s * 2.4, 0.28, RED, 2.4); K.light(-6.55, 2.66, s * 2.4, 0.22, '#FFA03A', 2.2);
+      V._escape(K, P, -5.9, 2.95, s * 2.72, 1.3, 0.3); /* 4.3d: baixo o bastante para o cano passar por cima quando a torre mira para trás */
+      K.box(-4.3, 3.75, s * 1.75, 2.3, 0.08, 1.05, P.d, 'dark'); K.box(-4.3, 3.81, s * 1.75, 2.05, 0.04, 0.8, FO, null, { e: 1.2 });
+      for (let i = 0; i < (K.lite ? 2 : 5); i++) K.box(K.lite ? -4.85 + i * 1.1 : -5.2 + i * 0.45, 3.85, s * 1.75, 0.14, 0.1, 0.92, P.b, 'metal', { rz: 0.5 });
+      K.fine(() => { for (const x of [5.45, 5.8]) K.box(x, 3.6, s * 2.5, 0.05, 0.05, 0.84, P.d, 'metal'); K.box(6.5, 1.25, s * 1.7, 0.3, 0.3, 0.16, P.d, 'metal'); K.box(-6.6, 1.15, s * 1.6, 0.3, 0.3, 0.16, P.d, 'metal'); K.tube([[-4.9, 3.77, s * 2.25], [-5.5, 3.62, s * 2.6], [-5.9, 3.3, s * 2.72]], 0.13, P.r, 'metal', { ts: 6, rs: 5 }); }); }
+    K.cyl(-4.3, 3.73, 0, 0.98, 0.98, 0.12, P.d, 'dark', { seg: 16 });
+    K.anim({ t: 'spin', p: [-4.3, 3.81, 0], speed: 6 }, () => { for (let i = 0; i < 3; i++) K.box(-4.3, 3.81, 0, 1.75, 0.04, 0.3, P.t, 'metal', { ry: i / 3 * PI + 0.3 }); });
+    K.fine(() => { K.box(-4.3, 3.93, 0, 0.07, 0.05, 1.9, P.d, 'dark'); K.box(-4.3, 3.93, 0, 1.9, 0.05, 0.07, P.d, 'dark'); });
+    V._haz(K, P, 6.42, 2.05, 0, 4.2, 0.5, 6, 'fz'); V._haz(K, P, -6.52, 2.2, 0, 2.4, 0.34, 4, 'fz');
+    V._cb(K, -6.55, 1.55, 0, 0.42, 0.62, 3.2, 0.08, P.b, 'steel');
+    K.cyl(4.75, 3.42, 1.2, 0.5, 0.56, 0.16, P.b, 'steel', { seg: 12, rz: -0.27 }); for (const dz of [-0.26, 0.26]) K.box(5.3, 3.28, 1.2 + dz, 0.18, 0.15, 0.3, P.g, 'glass', { pat: 0, rz: -0.27 });
+    K.fine(() => { for (let i = 0; i < 4; i++) K.box(5.55, 3.18, -1.7 + i * 0.52, 0.85, 0.1, 0.42, P.d, 'rubber', { rz: -0.27 }); K.cyl(4.2, 3.72, -1.5, 0.08, 0.08, 0.5, P.d, 'metal', { rz: -H, seg: 6 }); for (let i = 0; i < 6; i++) K.box(-2.6 + i * 1.0, 3.77, 2.05, 0.14, 0.06, 0.14, P.d, 'metal'); });
+    K.mount = 3.85; },
+  veiculo_turret(K, P, tc) { /* 4.3d: torre soldada em cunha — teto da cor do time e placas laterais claras, mantelete com pistões de elevação, canhão longo com evacuador (faixa da cor do time) e freio de boca que recuam, metralhadora coaxial, cúpula do comandante, lança-fumaças, cesto traseiro com caixas, holofote e antena que balança */
+    const V = U.vehnar, sh = [[2.2, 0.9], [1.4, 1.85], [-1.7, 1.95], [-2.6, 1.35], [-2.6, -1.35], [-1.7, -1.95], [1.4, -1.85], [2.2, -0.9]];
+    K.cyl(0, -0.3, 0, 2.25, 2.4, 0.5, P.d, 'dark', { seg: 18 });
+    K.poly(sh, 1.05, P.a, 'steel', { rx: -H, y: 0.925, b: 0.2 });
+    K.poly(sh.map(p => [p[0] * 0.82 - 0.12, p[1] * 0.8]), 0.08, tc, 'paint', { rx: -H, y: 1.72, b: 0.03 });
+    for (const s of [-1, 1]) V._cb(K, -0.15, 0.35, s * 2.24, 3.1, 1.05, 0.2, 0.07, P.t, 'steel', { ry: s * 0.032 });
+    V._cb(K, 2.65, 0.3, 0, 0.9, 1.3, 1.75, 0.2, P.b, 'steel');
+    K.anim({ t: 'recoil', dist: 1.0 }, () => {
+      K.cyl(2.95, 0.95, 0, 0.4, 0.44, 0.85, P.d, 'dark', { rz: -H, seg: 12 }); K.seg([3.75, 0.95, 0], [8.75, 0.95, 0], 0.27, P.b, 'metal', { taper: 0.82, seg: 12 });
+      K.cyl(5.2, 0.95, 0, 0.41, 0.41, 1.2, P.a, 'steel', { rz: -H, seg: 12 }); K.cyl(5.62, 0.95, 0, 0.43, 0.43, 0.36, tc, 'paint', { rz: -H, seg: 12 });
+      V._cb(K, 9.1, 0.68, 0, 0.8, 0.54, 0.84, 0.14, P.d, 'dark'); K.cyl(9.5, 0.95, 0, 0.17, 0.17, 0.03, '#0B0B0E', 'dark', { rz: -H, seg: 8 });
+      K.fine(() => { for (const s of [-1, 1]) for (const dx of [-0.16, 0.16]) K.box(9.1 + dx, 0.78, s * 0.43, 0.12, 0.34, 0.03, '#121317', 'dark'); }); });
+    K.cyl(-0.85, 1.7, 0.95, 0.6, 0.68, 0.42, P.b, 'steel', { seg: 14 }); K.cyl(-0.85, 2.12, 0.95, 0.5, 0.56, 0.13, P.a, 'steel', { seg: 14 });
+    K.cyl(-0.45, 1.73, -0.95, 0.44, 0.47, 0.1, P.b, 'steel', { seg: 12 });
+    V._cb(K, -3.25, 0.4, 0.62, 0.9, 0.8, 1.05, 0.08, P.b, 'steel'); V._cb(K, -3.2, 0.4, -0.62, 0.8, 0.72, 0.95, 0.08, '#6E6248', 'paint');
+    K.cyl(1.55, 1.9, 1.4, 0.2, 0.2, 0.42, P.d, 'dark', { rz: -H, seg: 8 }); K.cyl(1.97, 1.9, 1.4, 0.17, 0.17, 0.04, P.l, null, { e: 2.4, rz: -H, seg: 8 });
+    K.cyl(-2.15, 1.6, -1.3, 0.13, 0.15, 0.2, P.d, 'dark', { seg: 8 });
+    K.anim({ t: 'sway', p: [-2.15, 1.75, -1.3], amp: 0.12, speed: 2.6 }, () => { K.seg([-2.15, 1.75, -1.3], [-2.3, 4.25, -1.3], 0.035, P.d, 'metal', { seg: 5 }); K.box(-2.3, 4.21, -1.3, 0.1, 0.12, 0.1, '#FF4040', null, { e: 2.2 }); });
+    K.fine(() => { K.seg([3.0, 1.3, 0.62], [4.3, 1.3, 0.62], 0.07, P.d, 'metal', { seg: 6 }); for (const z of [-0.5, 0.5]) V._pistao(K, P, [1.25, 1.8, z], [2.7, 1.51, z], 0.12);
+      for (const s of [-1, 1]) for (let i = 0; i < 3; i++) K.cyl(1.0 + i * 0.05, 1.15 + i * 0.22, s * 2.12, 0.09, 0.09, 0.42, P.d, 'dark', { rz: -0.9, seg: 6 });
+      ringOf(5, 0.64, (cx, cz, a) => K.box(-0.85 + cx, 1.83, 0.95 + cz, 0.14, 0.14, 0.24, P.g, 'glass', { ry: -a, pat: 0 })); K.seg([-0.4, 2.27, 0.95], [0.55, 2.31, 0.95], 0.05, P.d, 'metal', { seg: 5 });
+      for (const z of [-1.15, 1.15]) K.seg([-2.8, 1.3, z], [-3.75, 1.3, z], 0.05, P.d, 'metal', { seg: 5 }); K.seg([-3.75, 1.3, -1.15], [-3.75, 1.3, 1.15], 0.05, P.d, 'metal', { seg: 5 });
+      for (const s of [-1, 1]) for (let i = 0; i < 4; i++) K.box(-1.3 + i * 0.75, 1.15, s * 2.36, 0.1, 0.1, 0.05, P.d, 'metal'); }); },
+  drone(K, P, tc) { /* 4.3d: drone de ataque pesado — quatro dutos com hélices que giram (sentidos alternados), braços em X e dorso da cor do time, corpo blindado chanfrado, metralhadora rotativa no queixo (gira), olho de sensor, escapamentos gêmeos com brasa, esquis e antena que balança */
+    const V = U.vehnar, FO = '#FF7A2E', RED = '#FF4040', DX = 2.95, DZ = 2.95, DY = 1.45;
+    K.poly([[-2.5, 1.05], [1.8, 1.05], [2.65, 1.45], [2.6, 1.95], [1.65, 2.4], [-1.95, 2.4], [-2.6, 1.95]], 2.0, P.a, 'steel', { b: 0.17 });
+    V._cb(K, -0.25, 2.5, 0, 3.0, 0.3, 1.55, 0.1, tc, 'paint'); V._cb(K, -0.4, 0.72, 0, 2.6, 0.42, 1.5, 0.1, P.d, 'dark');
+    for (const [sx, sz] of QUAD) { const cx = sx * DX, cz = sz * DZ, ax = sx * 0.7, az = sz * 0.75, L = Math.hypot(cx - ax, cz - az);
+      K.box((ax + cx) / 2, 2.12, (az + cz) / 2, L, 0.3, 0.52, tc, 'paint', { ry: Math.atan2(-(cz - az), cx - ax) });
+      K.lathe([[1.22, 0.74], [1.22, 0.04], [1.54, 0.0], [1.58, 0.62], [1.38, 0.8], [1.22, 0.74]], cx, DY, cz, P.a, 'steel', { seg: 18, flat: true }); /* 4.3d: duto facetado (aço usinado) */
+      K.fine(() => K.cyl(cx, DY + 0.15, cz, 0.3, 0.36, 0.55, P.d, 'dark', { seg: 8 }));
+      K.anim({ t: 'spin', p: [cx, DY, cz], speed: sx * sz * 21 }, () => { const nb = K.q(3); for (let i = 0; i < nb; i++) { const a = i / nb * PI * 2 + 0.4; K.box(cx + Math.cos(a) * 0.66, DY + 0.46, cz - Math.sin(a) * 0.66, 1.02, 0.05, 0.3, '#3A3E46', 'metal', { ry: a, rx: 0.35 }); } K.fine(() => K.cyl(cx, DY + 0.55, cz, 0.16, 0.2, 0.1, P.t, 'metal', { seg: 6 })); });
+      K.fine(() => { K.light(cx + sx * 0.4, DY + 0.38, cz + sz * 1.5, 0.16, sz > 0 ? RED : '#FFE2A8', 2.2); for (const a of [PI / 4, -PI / 4]) K.box(cx, DY + 0.2, cz, 2.38, 0.07, 0.1, P.d, 'metal', { ry: a }); K.box(cx + sx * 0.85, DY + 0.8, cz + sz * 0.85, 0.5, 0.06, 0.16, P.h, 'paint', { ry: -sx * sz * PI / 4 }); }); }
+    K.sph(1.85, 0.8, 0, 0.48, P.b, 'steel', { seg: 9 });
+    K.anim({ t: 'spin', p: [2.1, 0.74, 0], axis: 'x', speed: 9 }, () => { const nb = K.q(6); for (let i = 0; i < nb; i++) { const a = i / nb * PI * 2; K.seg([2.1, 0.74 + Math.sin(a) * 0.13, Math.cos(a) * 0.13], [3.75, 0.74 + Math.sin(a) * 0.13, Math.cos(a) * 0.13], 0.05, P.d, 'metal', { seg: 5 }); }
+      K.cyl(2.85, 0.74, 0, 0.23, 0.23, 0.1, P.b, 'metal', { rz: -H, seg: 8 }); K.cyl(3.55, 0.74, 0, 0.22, 0.22, 0.12, P.b, 'metal', { rz: -H, seg: 8 }); });
+    K.fine(() => K.cyl(2.62, 1.68, 0, 0.3, 0.34, 0.18, P.d, 'dark', { rz: -H, seg: 10 })); K.cyl(2.78, 1.68, 0, 0.2, 0.2, 0.06, '#FF3A2A', null, { e: 2.6, rz: -H, seg: 8 });
+    for (const s of [-1, 1]) { K.cyl(-2.2, 2.05, s * 0.62, 0.2, 0.25, 0.9, P.r, 'metal', { rz: H - 0.4, seg: 8 }); K.cyl(-3.03, 2.4, s * 0.62, 0.15, 0.15, 0.08, FO, null, { e: 2.4, rz: H - 0.4, seg: 8 });
+      K.box(-0.35, 0, s * 1.05, 4.0, 0.13, 0.17, P.d, 'dark'); K.fine(() => { K.seg([1.6, 0.07, s * 1.05], [2.05, 0.32, s * 1.05], 0.07, P.d, 'dark', { seg: 5 }); for (const x of [-1.4, 0.8]) K.seg([x, 0.1, s * 1.05], [x + 0.15, 0.95, s * 0.8], 0.065, P.b, 'metal', { seg: 5 }); }); }
+    K.light(-2.74, 1.85, 0, 0.2, RED, 2.4);
+    K.anim({ t: 'sway', p: [-1.55, 2.8, 0.45], amp: 0.16, speed: 3.2 }, () => K.seg([-1.55, 2.8, 0.45], [-1.85, 3.95, 0.45], 0.03, P.d, 'metal', { seg: 5 }));
+    K.fine(() => { K.cyl(0.55, 0.62, -0.95, 0.36, 0.36, 0.55, P.b, 'metal', { rx: H, seg: 10 }); K.tube([[0.9, 0.7, -0.6], [1.4, 0.62, -0.3], [1.8, 0.72, -0.1]], 0.08, P.d, 'metal', { ts: 6, rs: 4 });
+      for (const s of [-1, 1]) for (let i = 0; i < 3; i++) K.box(-1.6 + i * 1.1, 2.0, s * 1.19, 0.6, 0.08, 0.04, P.d, 'dark'); K.box(-0.25, 2.82, 0, 1.2, 0.06, 0.12, P.h, 'paint'); K.cyl(0.9, 2.8, 0, 0.22, 0.26, 0.14, P.g, 'glass', { seg: 8 }); }); },
+  suporte(K, P, tc) { /* 4.3d: Interferidor — caminhão 4×4 da família do coletor: cabine clara, módulo de equipamento com painéis da cor do time, mesa giratória com antena parabólica (gira como radar, borda da cor do time) e bobina de pulso acesa no foco, macacos hidráulicos atrás, escapamentos gêmeos com brasa, antenas que balançam */
+    const V = U.vehnar, PK = '#FF5FD2', RED = '#FF4040', TL = -0.6, DPX = -1.45, DPY = 4.3, c = Math.cos(TL), sn = Math.sin(TL);
+    const tl = (lx, ly, lz) => [DPX + lx * c - ly * sn, DPY + lx * sn + ly * c, lz]; /* ponto no referencial da antena (inclinada em z por TL) */
+    for (const x of [-2.2, 2.35]) for (const s of [-1, 1]) V._roda(K, P, tc, x, 1.05, s * 2.2, 1.05, 0.95, s, { lugs: 9 });
+    V._cb(K, 0.0, 0.7, 0, 7.4, 0.8, 2.8, 0.2, P.d, 'dark');
+    V._cb(K, 2.55, 1.4, 0, 2.3, 1.0, 3.3, 0.2, P.b, 'steel'); V._cabine(K, P, tc, 1.5, 3.5, 2.4, 3.85, 3.0, {});
+    V._cb(K, 3.85, 0.72, 0, 0.42, 0.62, 3.1, 0.1, P.a, 'steel'); V._haz(K, P, 4.08, 1.03, 0, 2.7, 0.4, 5, 'fz');
+    V._cb(K, -1.35, 1.4, 0, 4.5, 1.4, 3.3, 0.22, P.a, 'steel');
+    for (const s of [-1, 1]) { K.box(-1.45, 1.72, s * 1.66, 3.3, 0.74, 0.06, tc, 'paint'); V._haz(K, P, -1.45, 1.6, s * 1.69, 3.3, 0.2, 6, 'sx');
+      K.box(3.69, 1.62, s * 1.15, 0.08, 0.36, 0.55, P.d, 'dark'); K.box(3.72, 1.68, s * 1.15, 0.03, 0.24, 0.42, P.l, null, { e: 2.4 });
+      V._escape(K, P, 1.15, 2.4, s * 1.3, 1.6, 0.2);
+      K.box(-3.75, 2.15, s * 1.3, 0.5, 0.35, 0.55, P.d, 'dark'); V._pistao(K, P, [-3.95, 2.55, s * 1.3], [-3.95, 0.82, s * 1.3], 0.15); K.box(-3.95, 0.62, s * 1.3, 0.7, 0.2, 0.7, P.d, 'dark');
+      K.light(-3.66, 2.45, s * 0.85, 0.24, RED, 2.4);
+      K.anim({ t: 'sway', p: [-3.55, 2.8, s * 1.6], amp: 0.13, speed: 2.4, ph: s }, () => { K.seg([-3.55, 2.8, s * 1.6], [-3.7, 5.5, s * 1.6], 0.03, P.d, 'metal', { seg: 5 }); K.box(-3.7, 5.45, s * 1.6, 0.09, 0.12, 0.09, RED, null, { e: 2.2 }); }); }
+    V._haz(K, P, -3.62, 1.65, 0, 1.6, 0.36, 3, 'fz');
+    K.cyl(DPX, 2.8, 0, 1.25, 1.35, 0.22, P.d, 'dark', { seg: 18 });
+    K.anim({ t: 'spin', p: [DPX, 3.0, 0], speed: 0.9 }, () => {
+      K.cyl(DPX, 3.0, 0, 1.0, 1.1, 0.32, P.b, 'steel', { seg: 16 }); for (const s of [-1, 1]) V._cb(K, DPX, 3.25, s * 0.74, 0.62, 1.3, 0.22, 0.07, P.a, 'steel');
+      K.cyl(DPX, DPY, -0.86, 0.18, 0.18, 1.72, P.d, 'dark', { rx: H, seg: 8 });
+      K.lathe([[0, 0], [1.03, 0.11], [1.84, 0.48], [2.24, 0.76], [2.16, 0.86], [1.72, 0.6], [0.98, 0.31], [0, 0.2]], DPX, DPY, 0, P.t, 'metal', { seg: 20, rz: TL });
+      const rc = tl(0, 0.8, 0); K.tor(rc[0], rc[1], 0, 2.22, 0.09, tc, 'paint', { rz: TL, ts: 20, rs: 4 });
+      const f = tl(0, 1.75, 0), hb = tl(0, 1.1, 0); for (const a of [H, H + PI * 2 / 3, H + PI * 4 / 3]) K.seg(tl(Math.cos(a) * 2.12, 0.78, Math.sin(a) * 2.12), f, 0.035, P.d, 'metal', { seg: 4 });
+      K.cyl(hb[0], hb[1], 0, 0.16, 0.2, 0.42, P.d, 'dark', { rz: TL, seg: 8 }); K.sph(f[0], f[1], 0, 0.26, PK, null, { e: 2.6, seg: 8 });
+      K.fine(() => { for (let i = 0; i < 3; i++) { const q = tl(0, 1.4 + i * 0.13, 0); K.tor(q[0], q[1], 0, 0.3 - i * 0.04, 0.035, P.r, 'metal', { rz: TL, ts: 10, rs: 3 }); } for (const s of [-1, 1]) K.tube([[DPX, 3.35, s * 0.62], [DPX - 0.3, 3.9, s * 0.4], hb.slice(0, 2).concat([s * 0.1])], 0.05, P.d, 'rubber', { ts: 6, rs: 4 }); }); });
+    K.fine(() => { for (const s of [-1, 1]) { K.cyl(-0.2, 2.1, s * 1.72, 0.32, 0.32, 0.18, P.d, 'dark', { rx: s * H, seg: 10 }); K.box(-2.9, 2.82, s * 1.2, 0.5, 0.16, 0.5, P.b, 'metal'); } for (let i = 0; i < 4; i++) K.box(-3.1 + i * 0.32, 2.82, 0, 0.1, 0.05, 1.6, P.h, 'paint'); }); },
+  pirata(K, P, tc) { /* 4.3d: Rebocador — caminhão 6×6 blindado: cabine clara com venezianas e giroflex âmbar, para-choque aríete com faixa de perigo, tanque da carga roubada com cintas da cor do time, braço sifão com bocal aceso (violeta, como o feixe do roubo), lança de reboque em A erguida por pistão, gancho que balança, guincho, caixas de carga, escapamentos gêmeos */
+    const V = U.vehnar, PK = '#FF5FD2', RED = '#FF4040', TY = 3.95, TR = 1.72;
+    for (const x of [-4.6, -1.85, 3.9]) for (const s of [-1, 1]) V._roda(K, P, tc, x, 1.3, s * 3.0, 1.3, 1.1, s, { lugs: 10 });
+    V._cb(K, -0.5, 0.85, 0, 12.6, 1.0, 3.6, 0.25, P.d, 'dark');
+    V._cb(K, 4.2, 1.8, 0, 3.4, 1.3, 4.6, 0.25, P.b, 'steel'); V._cabine(K, P, tc, 2.7, 5.4, 3.1, 4.75, 4.0, { visor: true, ambar: true });
+    V._cb(K, 6.15, 0.75, 0, 0.75, 1.35, 5.0, 0.18, P.a, 'steel'); V._haz(K, P, 6.55, 1.42, 0, 4.6, 0.7, 6, 'fz');
+    for (const s of [-1, 1]) { V._cb(K, 3.9, 2.72, s * 3.0, 2.95, 0.2, 1.4, 0.06, P.a, 'steel'); V._haz(K, P, 3.9, 2.945, s * 3.0, 2.6, 0.5, 4, 'tx');
+      K.box(5.88, 2.05, s * 1.75, 0.1, 0.5, 0.62, P.d, 'dark'); K.box(5.92, 2.12, s * 1.75, 0.04, 0.36, 0.48, P.l, null, { e: 2.4 });
+      V._escape(K, P, 2.32, 3.0, s * 1.68, 2.2, 0.24);
+      K.light(-6.95, 1.25, s * 1.4, 0.26, RED, 2.4);
+      V._cb(K, 0.9 - 3.8 * (s < 0 ? 1 : 0), 1.8, 0, 0.6, 0.75, 3.3, 0.12, P.d, 'dark');
+      K.seg([-4.15, 1.85, s * 1.55], [-6.05, 6.75, s * 0.42], 0.2, P.h, 'paint', { seg: 8 }); }
+    K.cyl(-3.7, TY, 0, TR, TR, 5.4, P.t, 'steel', { rz: -H, seg: 18 });
+    for (const [x, dir] of [[1.7, 1], [-3.7, -1]]) K.lathe([[TR, 0], [TR * 0.86, 0.34], [TR * 0.52, 0.6], [0, 0.68]], x, TY, 0, P.t, 'steel', { seg: 18, rz: -dir * H });
+    for (const x of [-2.75, 0.45]) K.cyl(x, TY, 0, TR + 0.05, TR + 0.05, 0.6, tc, 'paint', { rz: -H, seg: 18 });
+    K.cyl(-1.15, TY + TR - 0.08, 0, 0.5, 0.55, 0.2, P.b, 'steel', { seg: 12 });
+    K.cyl(0.95, TY + TR - 0.2, 0, 0.55, 0.65, 0.45, P.b, 'steel', { seg: 12 }); V._viga(K, [0.95, 6.05, 0], [2.45, 6.95, 0], 0.42, 0.46, 0.08, P.h, 'paint');
+    K.cyl(2.45, 6.95, 0, 0.36, 0.24, 0.9, P.d, 'dark', { rz: -H - 0.55, seg: 10 }); const nz = [2.45 + 0.9 * Math.cos(-0.55), 6.95 + 0.9 * Math.sin(-0.55)];
+    K.tor(nz[0], nz[1], 0, 0.3, 0.07, PK, null, { e: 2.6, rz: -H - 0.55, ts: 12, rs: 4 }); K.sph(nz[0] + 0.05, nz[1] - 0.03, 0, 0.16, '#FFC4F2', null, { e: 3, seg: 6 });
+    V._cb(K, -6.1, 6.45, 0, 0.85, 0.75, 1.3, 0.1, P.d, 'dark'); V._pistao(K, P, [-3.35, 2.0, 0], [-5.75, 6.3, 0], 0.22);
+    K.cyl(-6.35, 1.6, -1.05, 0.45, 0.45, 2.1, P.b, 'metal', { rx: H, seg: 12 }); K.cyl(-6.35, 1.6, -0.6, 0.5, 0.5, 1.2, P.r, 'metal', { rx: H, seg: 12 });
+    K.anim({ t: 'sway', p: [-6.4, 6.45, 0], amp: 0.16, speed: 2.1 }, () => { K.seg([-6.4, 6.45, 0], [-6.4, 3.75, 0], 0.045, P.d, 'metal', { seg: 5 }); V._cb(K, -6.4, 3.05, 0, 0.62, 0.72, 0.52, 0.08, P.h, 'paint'); K.tor(-6.4, 2.68, 0, 0.32, 0.09, P.d, 'metal', { rx: H, ts: 10, rs: 4, arc: PI * 1.4 }); });
+    V._cb(K, -5.0, 1.85, 1.0, 1.45, 1.1, 1.5, 0.1, '#7A6A44', 'paint'); V._cb(K, -5.1, 1.85, -1.0, 1.2, 1.3, 1.4, 0.1, P.b, 'steel');
+    V._haz(K, P, -6.86, 1.1, 0, 2.6, 0.4, 4, 'fz');
+    K.fine(() => { K.tube([[0.95, 5.95, 0.4], [1.9, 6.6, 0.42], [2.6, 6.75, 0.3]], 0.09, P.d, 'rubber', { ts: 8, rs: 4 }); for (const s of [-1, 1]) { K.seg([-3.6, TY + TR + 0.25, s * 0.55], [1.5, TY + TR + 0.25, s * 0.55], 0.04, P.h, 'paint', { seg: 4 }); for (const x of [-3.2, -1.2, 0.8]) K.seg([x, TY + TR - 0.1, s * 0.55], [x, TY + TR + 0.25, s * 0.55], 0.035, P.h, 'paint', { seg: 4 }); K.box(-5.0, 2.95, s * 0.3, 1.5, 0.05, 0.06, tc, 'paint'); }
+      K.cyl(-4.38, TY - 0.5, 0, 0.18, 0.18, 0.3, P.d, 'dark', { rz: H, seg: 8 }); K.tor(-4.62, TY - 0.5, 0, 0.26, 0.04, RED, 'paint', { rz: H, ts: 10, rs: 3 }); for (let i = 0; i < 5; i++) K.box(6.6, 0.95, -1.6 + i * 0.8, 0.12, 0.95, 0.14, P.d, 'metal'); }); },
   soldador(K, P, tc) { U.vehnar.infantaria(K, P, tc, { noRifle: true }); for (const s of [-1, 1]) K.cyl(-1.95, 3.1, s * 0.7, 0.62, 0.62, 3.4, P.h, 'paint', { seg: 12 });
     K.anim({ t: 'recoil', dist: 0.3 }, () => { K.seg([1, 4.3, 1], [4.4, 4.1, 1], 0.32, P.d, 'metal'); K.cyl(4.4, 4.1, 1, 0.52, 0.34, 0.9, P.b, 'metal', { rz: -H }); K.light(5.45, 4.1, 1, 0.34, '#FF7A2E', 3); }); K.tube([[-1.9, 3.6, 0.6], [-0.6, 3, 1.4], [1, 4.1, 1.1]], 0.15, P.d, 'rubber'); },
-  guindaste(K, P, tc) { for (const x of [-4, 0, 4]) for (const s of [-1, 1]) wheel(K, P, x, 1.2, s * 3.5, 1.2, 1);
-    K.box(0, 1.1, 0, 12, 1.4, 6, P.d, 'dark', { b: 0.3 }); K.box(4.2, 2.5, 0, 3.4, 3.2, 5.6, P.h, 'paint', { b: 0.5 }); K.box(5.55, 3.6, 0, 0.9, 1.5, 4.6, P.g, 'glass', { b: 0.2 });
-    K.cyl(-2, 2.5, 0, 1.6, 1.9, 1.4, P.b, 'metal'); K.seg([-2, 3.6, 0], [-7, 10, 0], 0.5, P.h, 'paint'); K.seg([-2.4, 3.6, 0.5], [-6.8, 9.6, 0.5], 0.14, P.d, 'metal'); K.seg([-7, 10, 0], [-7, 6.4, 0], 0.08, P.d, 'metal', { anim: { t: 'sway', p: [-7, 10, 0], amp: 0.14, speed: 2 } });
-    K.anim({ t: 'sway', p: [-7, 10, 0], amp: 0.14, speed: 2 }, () => { K.box(-7, 5.4, 0, 1.2, 1, 1.2, P.d, 'metal'); K.sph(-7, 5.2, 0, 0.45, '#7FE3A1', null, { e: 2.2 }); }); K.box(-3, 2.5, 0, 5, 0.8, 5.4, tc, 'paint', { b: 0.2 });
-    K.light(6.05, 5.4, 2, 0.4, P.l); K.light(6.05, 5.4, -2, 0.4, P.l); K.light(4.2, 5.9, 0, 0.5, '#FFA03A'); },
-  tratorzao(K, P, tc) { for (const x of [-3, 3]) for (const s of [-1, 1]) wheel(K, P, x, 1.6, s * 3.4, 1.6, 1.3);
-    K.box(0, 1.4, 0, 8.4, 1.2, 4.4, P.a, 'steel', { b: 0.4 }); K.box(1.6, 2.6, 0, 2.4, 0.4, 4, tc, 'paint', { b: 0.15 });
-    for (const s of [-1, 1]) { K.seg([-2.4, 2.6, s * 1.8], [-1, 5, s * 1.6], 0.16, P.d, 'metal'); K.seg([1.4, 2.6, s * 1.8], [-0.2, 5, s * 1.6], 0.16, P.d, 'metal'); }
-    K.seg([-1, 5, -1.6], [-1, 5, 1.6], 0.16, P.d, 'metal'); K.seg([-0.2, 5, -1.6], [-0.2, 5, 1.6], 0.16, P.d, 'metal'); K.box(-0.6, 5.1, 0, 1.2, 0.6, 1, P.b, 'metal'); K.seg([0, 5.5, 0], [2.8, 5.5, 0], 0.16, P.d, 'metal', { anim: { t: 'recoil', dist: 0.4 } });
-    K.light(4.3, 2.2, 1.4, 0.4, P.l); K.light(4.3, 2.2, -1.4, 0.4, P.l); },
-  prensa(K, P, tc) { for (const s of [-1, 1]) { leg(K, [0, 6.4, s * 2.4], [1.4, 3.4, s * 2.8], [0, 0.6, s * 2.8], 0.8, P.b, 'steel'); K.anim(legSpec([0, 6.4, s * 2.4]), () => K.box(0.6, 0, s * 2.8, 3.2, 0.8, 2, P.d, 'dark', { b: 0.3 })); }
-    K.box(0, 6, 0, 4, 1.6, 5.4, P.d, 'dark', { b: 0.4 }); K.box(0, 7.4, 0, 5.4, 3.8, 5, P.a, 'steel', { b: 0.6 }); K.box(2.65, 8.6, 0, 0.6, 1.2, 3, P.g, 'glass', { b: 0.2 }); K.box(-0.4, 11.2, 0, 3.6, 0.5, 3.6, tc, 'paint', { b: 0.2 });
-    for (const s of [-1, 1]) { K.box(0.4, 8.2, s * 3.4, 3, 2, 1.6, P.b, 'steel', { b: 0.3 }); K.anim({ t: 'recoil', dist: 0.9 }, () => { K.seg([1.8, 9.1, s * 3.4], [7.4, 9.1, s * 3.4], 0.42, P.d, 'metal'); K.cyl(7.4, 9.1, s * 3.4, 0.6, 0.6, 0.9, P.d, 'dark', { rz: -H }); }); }
-    K.light(-2.85, 9.6, 0, 0.5, '#FF4040'); },
+  guindaste(K, P, tc) { /* 4.3d: Guindaste Armado — chassi 8×8 com para-lamas, cabine clara deslocada à esquerda e gerador com ventoinha (gira), estabilizadores amarelos com macacos hidráulicos, superestrutura com cabine do operador, contrapeso com faixas de perigo e topo da cor do time, escapamentos gêmeos, lança telescópica amarela (cinta da cor do time) erguida por pistão hidráulico, moitão com cabeça de solda acesa que balança */
+    const V = U.vehnar, RED = '#FF4040', WLD = '#FFF1C4', th = 0.62, c = Math.cos(th), sn = Math.sin(th), BP = [-3.4, 5.0];
+    const at = (d, n) => [BP[0] + c * d - sn * n, BP[1] + sn * d + c * n]; /* ponto ao longo da lança (d) com desvio normal (n) */
+    for (const x of [4.75, 2.35, -2.35, -4.75]) for (const s of [-1, 1]) V._roda(K, P, tc, x, 1.15, s * 2.95, 1.15, 0.95, s, { lugs: 8 });
+    V._cb(K, -0.1, 0.8, 0, 13.0, 1.05, 3.5, 0.25, P.d, 'dark'); V._cb(K, -0.1, 1.85, 0, 12.6, 0.45, 4.6, 0.12, P.b, 'steel');
+    for (const s of [-1, 1]) { for (const xc of [3.55, -3.55]) V._cb(K, xc, 2.36, s * 2.95, 4.95, 0.14, 1.2, 0.05, P.a, 'steel');
+      V._cb(K, 0.0, 2.3, s * 2.3, 1.15, 0.5, 1.4, 0.08, P.h, 'paint'); V._pistao(K, P, [0.0, 2.8, s * 2.95], [0.0, 0.75, s * 2.95], 0.2); K.cyl(0.0, 0.52, s * 2.95, 0.5, 0.56, 0.22, P.d, 'dark', { seg: 10 });
+      V._cb(K, -6.35, 1.55, s * 2.0, 0.7, 0.65, 1.6, 0.08, P.h, 'paint'); V._pistao(K, P, [-6.45, 2.2, s * 2.55], [-6.45, 0.75, s * 2.55], 0.17); K.cyl(-6.45, 0.52, s * 2.55, 0.42, 0.48, 0.22, P.d, 'dark', { seg: 10 });
+      K.light(-6.66, 1.85, s * 1.15, 0.24, RED, 2.4); V._cb(K, -3.1, 3.95, s * 0.74, 1.6, 1.6, 0.22, 0.08, P.b, 'steel');
+      V._escape(K, P, -4.75, 4.1, s * 1.55, 1.55, 0.22); }
+    V._cabine(K, P, tc, 4.2, 6.3, 2.3, 4.1, 2.3, { z: 1.05 }); K.box(6.33, 2.55, 1.05, 0.08, 0.32, 1.7, P.l, null, { e: 2.4 });
+    V._cb(K, 5.15, 2.3, -1.2, 2.1, 1.1, 1.9, 0.14, P.a, 'steel'); K.cyl(5.15, 3.38, -1.2, 0.66, 0.66, 0.08, P.d, 'dark', { seg: 14 });
+    K.anim({ t: 'spin', p: [5.15, 3.44, -1.2], speed: 7 }, () => { for (let i = 0; i < 3; i++) K.box(5.15, 3.44, -1.2, 1.15, 0.04, 0.24, P.t, 'metal', { ry: i / 3 * PI + 0.2 }); });
+    V._cb(K, 6.6, 1.0, 0, 0.45, 0.7, 4.4, 0.1, P.a, 'steel'); V._haz(K, P, 6.84, 1.35, 0, 4.0, 0.45, 6, 'fz');
+    K.cyl(-2.3, 2.3, 0, 2.0, 2.15, 0.35, P.d, 'dark', { seg: 20 }); V._cb(K, -3.45, 2.65, 0, 4.2, 1.45, 4.0, 0.3, P.a, 'steel');
+    V._cb(K, -3.6, 4.1, 0.55, 2.9, 0.14, 2.3, 0.05, tc, 'paint');
+    V._cabine(K, P, tc, -1.3, 0.5, 2.6, 4.35, 1.35, { z: -1.45, luz: false });
+    V._cb(K, -6.0, 2.6, 0, 1.6, 2.0, 4.3, 0.25, P.d, 'dark'); V._haz(K, P, -6.83, 3.15, 0, 3.9, 0.9, 6, 'fz'); V._cb(K, -5.95, 4.6, 0, 1.25, 0.14, 3.9, 0.05, tc, 'paint');
+    K.cyl(BP[0], BP[1], -0.95, 0.24, 0.24, 1.9, P.d, 'dark', { rx: H, seg: 10 });
+    for (const [d0, d1, hh, ww] of [[-0.3, 4.8, 1.05, 1.15], [4.45, 7.85, 0.84, 0.94], [7.55, 10.0, 0.66, 0.76]]) { const m = at((d0 + d1) / 2, 0); V._cb(K, m[0], m[1] - hh / 2, 0, d1 - d0, hh, ww, 0.12, P.h, 'paint', { rz: th }); }
+    { const m = at(2.7, 0); V._cb(K, m[0], m[1] - 0.6, 0, 0.7, 1.2, 1.3, 0.1, tc, 'paint', { rz: th }); }
+    const pb = at(3.9, -0.62); V._cb(K, -0.35, 3.3, 0, 0.9, 0.9, 1.0, 0.1, P.b, 'steel'); V._pistao(K, P, [-0.35, 3.8, 0], [pb[0], pb[1], 0], 0.3, { k: 0.5 });
+    const tp = at(9.95, 0); K.cyl(tp[0], tp[1], -0.43, 0.38, 0.38, 0.86, P.d, 'dark', { rx: H, seg: 12 }); K.light(tp[0] - 0.1, tp[1] + 0.38, 0, 0.2, RED, 2.6);
+    const cx = tp[0] + 0.15, cy = tp[1] - 0.4;
+    K.anim({ t: 'sway', p: [cx, cy, 0], amp: 0.13, speed: 1.9 }, () => { K.seg([cx, cy, 0], [cx, 7.3, 0], 0.045, P.d, 'metal', { seg: 5 }); V._cb(K, cx, 6.45, 0, 0.75, 0.85, 0.65, 0.1, P.h, 'paint');
+      K.cyl(cx, 6.07, 0, 0.12, 0.12, 0.4, P.d, 'metal', { seg: 6 }); V._cb(K, cx, 5.55, 0, 1.2, 0.55, 0.5, 0.08, P.d, 'dark');
+      for (const s of [-1, 1]) { K.seg([cx + s * 0.45, 5.6, 0], [cx + s * 0.75, 5.1, 0], 0.08, P.b, 'metal', { seg: 6 }); K.sph(cx + s * 0.77, 5.07, 0, 0.13, WLD, null, { e: 3, seg: 6 }); }
+      K.fine(() => { for (let i = 0; i < 6; i++) { const a = i * 1.7, s = i % 2 ? 1 : -1; K.box(cx + s * (0.8 + 0.25 * Math.cos(a)), 4.9 - 0.18 * (i % 3), 0.25 * Math.sin(a), 0.05, 0.05, 0.05, '#FFD98A', null, { e: 2.6 }); } }); });
+    K.fine(() => { for (const d of [1.0, 1.9, 3.6, 4.4]) { const q = at(d, 0.53); K.box(q[0], q[1], 0, 0.5, 0.05, 1.0, P.d, 'paint', { rz: th }); } const w = at(0.8, 0.75); K.box(w[0], w[1], 0, 0.3, 0.25, 0.5, P.d, 'dark'); K.box(w[0] + 0.16, w[1] + 0.03, 0, 0.04, 0.18, 0.4, P.l, null, { e: 2.2 });
+      K.cyl(-1.8, 4.1, 1.4, 0.16, 0.19, 0.12, P.d, 'dark', { seg: 8 }); K.sph(-1.8, 4.25, 1.4, 0.17, '#FFA03A', null, { e: 2.2, seg: 8 }); }); },
+  tratorzao(K, P, tc) { /* 4.3d: Tratorzão — batedor de rodas gigantes com garras (giram), suspensão de braços com amortecedores hidráulicos amarelos à mostra, banheira blindada com capô e laterais da cor do time, gaiola com teto da cor do time e barra de faróis, metralhadora dupla na gaiola (recua), mastro de sensor longo com radar que gira e antena que balança, motor traseiro com grelha em brasa e escapamentos gêmeos */
+    const V = U.vehnar, FO = '#FF7A2E', RED = '#FF4040', WX = 2.95, WZ = 3.05, R = 1.75, WW = 1.45;
+    for (const x of [-WX, WX]) for (const s of [-1, 1]) { V._roda(K, P, tc, x, R, s * WZ, R, WW, s, { lugs: 12 });
+      K.seg([x * 0.5, 1.35, s * 1.5], [x, R - 0.35, s * (WZ - 0.78)], 0.11, P.d, 'metal', { seg: 6 }); K.seg([x * 0.58, 2.2, s * 1.5], [x, R + 0.3, s * (WZ - 0.78)], 0.09, P.d, 'metal', { seg: 6 });
+      K.cyl(x, R, s * (WZ - 1.0), 0.34, 0.34, 0.32, P.b, 'metal', { rx: H, seg: 8 }); V._pistao(K, P, [x * 0.66, 2.95, s * 1.45], [x * 0.92, R - 0.15, s * (WZ - 0.9)], 0.16, { col: P.h }); }
+    V._cb(K, 0, 1.0, 0, 6.4, 1.55, 3.2, 0.3, P.a, 'steel');
+    V._cb(K, 1.95, 2.45, 0, 2.6, 0.38, 2.9, 0.12, tc, 'paint', { rz: -0.07 });
+    V._cb(K, 3.3, 1.2, 0, 0.32, 1.25, 2.7, 0.08, P.d, 'dark');
+    for (let i = 0; i < (K.lite ? 2 : 4); i++) K.box(3.48, K.lite ? 1.45 + i * 0.5 : 1.38 + i * 0.25, 0, 0.06, 0.1, 2.35, P.b, 'metal');
+    for (const s of [-1, 1]) { K.box(3.47, 2.0, s * 1.05, 0.08, 0.3, 0.5, P.l, null, { e: 2.4 }); K.box(-0.2, 1.5, s * 1.62, 3.8, 0.62, 0.06, tc, 'paint');
+      K.seg([3.75, 0.95, s * 1.3], [3.42, 2.25, s * 1.2], 0.09, P.d, 'metal', { seg: 6 }); V._escape(K, P, -3.1, 2.25, s * 0.88, 1.75, 0.2); K.light(-3.25, 1.75, s * 1.3, 0.24, RED, 2.4); }
+    K.seg([3.75, 0.95, -1.3], [3.75, 0.95, 1.3], 0.1, P.d, 'metal', { seg: 6 });
+    V._cb(K, -0.25, 2.3, 0, 2.5, 0.5, 2.7, 0.1, P.d, 'dark');
+    V._cb(K, -2.35, 2.45, 0, 1.75, 0.75, 2.7, 0.14, P.b, 'steel'); K.box(-2.35, 3.2, 0, 1.4, 0.04, 1.9, FO, null, { e: 1.3 });
+    for (let i = 0; i < (K.lite ? 2 : 5); i++) K.box(K.lite ? -2.7 + i * 0.7 : -2.9 + i * 0.28, 3.22, 0, 0.12, 0.1, 2.1, P.d, 'dark', { rz: 0.5 });
+    const cg = [[1.4, 2.5, 1.45], [1.05, 4.3, 1.3], [-1.45, 4.3, 1.3], [-1.65, 2.5, 1.45]];
+    for (const s of [-1, 1]) { const p = cg.map(q => [q[0], q[1], q[2] * s]); for (let i = 0; i < 3; i++) K.seg(p[i], p[i + 1], 0.1, P.d, 'metal', { seg: 6 }); K.fine(() => K.seg(p[0], p[2], 0.07, P.d, 'metal', { seg: 5 })); }
+    for (const x of [1.05, -1.45]) K.seg([x, 4.3, -1.3], [x, 4.3, 1.3], 0.1, P.d, 'metal', { seg: 6 });
+    V._cb(K, -0.2, 4.3, 0, 2.3, 0.14, 2.45, 0.05, tc, 'paint');
+    K.box(1.12, 4.38, 0, 0.25, 0.22, 2.2, P.d, 'dark'); for (const k of (K.lite ? [-0.5, 0.5] : [-0.75, -0.25, 0.25, 0.75])) K.light(1.26, 4.42, k, 0.2, P.l, 2.4);
+    K.cyl(-0.25, 4.44, 0, 0.45, 0.5, 0.2, P.d, 'dark', { seg: 12 }); V._cb(K, 0.05, 4.62, 0, 1.1, 0.45, 0.7, 0.08, P.b, 'steel'); K.box(-0.4, 4.62, 0.55, 0.6, 0.45, 0.35, P.h, 'paint');
+    K.anim({ t: 'recoil', dist: 0.35 }, () => { for (const z of [-0.17, 0.17]) { K.seg([0.6, 4.85, z], [2.75, 4.85, z], 0.075, P.d, 'metal', { seg: 6 }); K.cyl(2.55, 4.85, z, 0.11, 0.11, 0.3, P.b, 'metal', { rz: -H, seg: 6 }); } });
+    K.seg([-2.0, 2.6, -1.15], [-2.0, 6.0, -1.15], 0.09, P.b, 'metal', { seg: 6 });
+    K.anim({ t: 'spin', p: [-2.0, 6.0, -1.15], speed: 2.6 }, () => { V._cb(K, -2.0, 6.0, -1.15, 0.3, 0.42, 1.9, 0.06, P.t, 'steel'); K.box(-1.83, 6.05, -1.15, 0.04, 0.32, 1.6, P.d, 'dark'); K.light(-2.0, 6.42, -1.15, 0.12, RED, 2.4); });
+    K.anim({ t: 'sway', p: [-2.6, 2.6, 1.2], amp: 0.18, speed: 3 }, () => K.seg([-2.6, 2.6, 1.2], [-2.8, 6.6, 1.2], 0.03, P.d, 'metal', { seg: 5 }));
+    K.fine(() => { for (const s of [-1, 1]) { V._cb(K, -0.75, 2.4, s * 0.6, 0.7, 0.5, 0.8, 0.08, P.r, 'paint'); V._cb(K, -1.05, 2.8, s * 0.6, 0.18, 0.75, 0.8, 0.05, P.r, 'paint'); }
+      K.tor(0.45, 3.0, 0.6, 0.25, 0.04, P.d, 'metal', { rz: 0.9, ts: 12, rs: 3 }); K.seg([-2.0, 4.5, -1.15], [-1.45, 4.3, -1.3], 0.04, P.d, 'metal', { seg: 4 }); K.tube([[-0.4, 4.85, 0.55], [0.0, 5.05, 0.3], [0.4, 4.9, 0.12]], 0.05, P.d, 'metal', { ts: 6, rs: 4 }); }); },
+  prensa(K, P, tc) { /* 4.3d: Prensa — mecha bípede de cerco: pernas com joelho blindado, pistão hidráulico atrás do joelho e pés largos com garras (passada do quadril), tronco-prensa chanfrado com peito claro e visor, teto da cor do time, ombros com canhões-prensa (camisa de aço e aríete cromado que recuam) e cilindros de recuo, tambores de munição, fornalha nas costas com chaminés gêmeas em brasa */
+    const V = U.vehnar, FO = '#FF7A2E', RED = '#FF4040', HX = -0.25, HY = 6.5, LZ = 2.75;
+    for (const s of [-1, 1]) { const z = s * LZ, hip = [HX, HY, z], knee = [1.45, 3.75, z], ank = [0.15, 1.1, z];
+      K.cyl(HX, HY, s * 2.0, 0.98, 0.98, 1.5, P.d, 'dark', { rx: s * H, seg: 14 }); K.cyl(HX, HY, s * 3.45, 0.62, 0.7, 0.18, P.b, 'metal', { rx: s * H, seg: 12 });
+      K.anim(legSpec(hip, { amp: 0.36, stride: 9.5 }), () => {
+        V._viga(K, hip, knee, 1.5, 1.15, 0.3, P.a, 'steel'); V._viga(K, [hip[0] + 0.2, hip[1] - 0.45, z + s * 0.62], [knee[0] - 0.05, knee[1] + 0.75, z + s * 0.62], 1.15, 0.2, 0.08, P.t, 'steel'); K.box((hip[0] + knee[0]) / 2 + 0.1, (hip[1] + knee[1]) / 2 + 0.1, z + s * 0.73, 0.5, 0.9, 0.04, tc, 'paint', { rz: Math.atan2(knee[1] - hip[1], knee[0] - hip[0]) + H });
+        K.cyl(knee[0], knee[1], z - 0.72, 0.75, 0.75, 1.44, P.d, 'dark', { rx: H, seg: 12 });
+        V._cb(K, knee[0] + 0.55, knee[1] - 0.95, z, 0.6, 1.95, 1.4, 0.16, P.t, 'steel', { rz: 0.12 }); V._haz(K, P, knee[0] + 0.88, knee[1] - 0.25, z, 1.2, 0.6, 3, 'fz', { rz: 0.12, order: 'ZXY' });
+        V._viga(K, knee, ank, 1.25, 1.05, 0.25, P.b, 'steel'); V._viga(K, [knee[0] + 0.1, knee[1] - 1.0, z], [ank[0] + 0.55, ank[1] + 0.45, z], 0.3, 1.25, 0.08, P.a, 'steel'); V._pistao(K, P, [HX - 0.75, HY - 0.75, z], [ank[0] - 0.55, ank[1] + 1.1, z], 0.26);
+        K.cyl(ank[0], ank[1], z - 0.65, 0.55, 0.55, 1.3, P.d, 'dark', { rx: H, seg: 10 }); K.cyl(knee[0], knee[1], z + s * 0.72, 0.42, 0.5, 0.14, P.t, 'metal', { rx: s * H, seg: 10 });
+        for (const dz of [-0.55, 0.55]) V._pistao(K, P, [ank[0] + 0.45, ank[1] + 0.9, z + dz], [1.35, 0.95, z + dz], 0.12, { seg: 8 });
+        V._cb(K, 0.35, 0.02, z, 3.4, 0.75, 2.15, 0.22, P.d, 'dark'); V._cb(K, 0.2, 0.72, z, 2.3, 0.55, 1.65, 0.16, P.a, 'steel');
+        for (const dz of [-0.58, 0.58]) V._cb(K, 2.22, 0.1, z + dz, 0.9, 0.5, 0.72, 0.12, P.b, 'steel', { rz: 0.16 }); V._cb(K, -1.7, 0.08, z, 0.8, 0.52, 1.0, 0.1, P.b, 'steel', { rz: -0.15 });
+        K.fine(() => { for (const p of [[0.5, 5.0], [0.95, 2.4]]) for (const dz of [-0.4, 0.4]) K.box(p[0], p[1], z + dz, 0.12, 0.12, 0.08, P.d, 'metal'); K.tube([[HX + 0.3, HY - 0.2, z + s * 0.55], [1.2, 4.6, z + s * 0.6], [1.05, 2.9, z + s * 0.5]], 0.07, P.d, 'rubber', { ts: 8, rs: 4 }); for (let i = 0; i < 4; i++) K.box(-0.6 + i * 0.6, 1.22, z, 0.12, 0.05, 1.5, P.d, 'dark'); }); }); }
+    V._cb(K, -0.3, 5.55, 0, 2.6, 1.6, 4.0, 0.3, P.d, 'dark'); V._cb(K, 1.05, 4.9, 0, 0.32, 1.7, 1.9, 0.08, P.b, 'steel', { rz: 0.1 }); V._haz(K, P, 1.24, 5.25, 0, 1.6, 0.5, 3, 'fz', { rz: 0.1, order: 'ZXY' });
+    V._cb(K, -0.35, 6.9, 0, 5.3, 3.7, 4.5, 0.55, P.a, 'steel'); V._cb(K, 1.95, 6.5, 0, 1.0, 1.05, 3.6, 0.2, P.a, 'steel', { rz: -0.25 });
+    for (const s of [-1, 1]) { V._cb(K, -0.6, 6.95, s * 2.33, 4.4, 1.2, 0.22, 0.08, P.b, 'steel'); V._cb(K, 0.75, 4.95, s * 1.55, 1.0, 1.55, 0.22, 0.08, P.b, 'steel', { rz: 0.12 }); V._cb(K, -0.6, 10.05, s * 2.95, 1.2, 0.12, 1.2, 0.04, tc, 'paint'); }
+    K.cyl(0.5, 10.85, -0.9, 0.55, 0.6, 0.28, P.b, 'steel', { seg: 12 }); K.cyl(-1.2, 10.85, 0.95, 0.18, 0.22, 0.75, P.d, 'dark', { seg: 8 });
+    K.anim({ t: 'spin', p: [-1.2, 11.6, 0.95], speed: 1.6 }, () => { V._cb(K, -1.2, 11.55, 0.95, 0.35, 0.5, 1.5, 0.06, P.t, 'steel'); K.box(-1.0, 11.62, 0.95, 0.04, 0.36, 1.2, P.d, 'dark'); });
+    V._cb(K, 2.25, 7.4, 0, 1.0, 2.6, 3.2, 0.3, P.t, 'steel', { rz: 0.12 }); K.box(2.75, 8.85, 0, 0.12, 0.36, 2.3, P.g, 'glass', { pat: 0, rz: 0.12 });
+    V._cb(K, -0.6, 10.55, 0, 3.9, 0.36, 3.5, 0.12, tc, 'paint');
+    for (const s of [-1, 1]) { const zc = s * 3.32;
+      V._cb(K, 0.15, 8.15, s * 2.95, 2.9, 1.9, 1.35, 0.28, P.b, 'steel'); K.box(0.15, 8.45, s * 3.64, 2.3, 1.0, 0.06, tc, 'paint');
+      K.cyl(0.55, 9.6, zc, 0.7, 0.7, 3.1, P.b, 'steel', { rz: -H, seg: 18 }); K.cyl(3.5, 9.6, zc, 0.78, 0.78, 0.35, P.d, 'dark', { rz: -H, seg: 18 }); V._cb(K, 2.0, 8.7, zc, 2.2, 0.5, 1.0, 0.1, P.d, 'dark'); V._haz(K, P, 2.05, 10.31, zc, 1.6, 0.6, 3, 'tx');
+      K.anim({ t: 'recoil', dist: 1.15 }, () => { K.cyl(3.6, 9.6, zc, 0.44, 0.44, 3.0, P.t, 'gloss', { rz: -H, seg: 16 }); V._cb(K, 7.0, 9.0, zc, 0.95, 1.2, 1.2, 0.2, P.d, 'dark'); K.cyl(7.47, 9.6, zc, 0.26, 0.26, 0.04, '#0B0B0E', 'dark', { rz: -H, seg: 8 }); K.fine(() => { for (const dy of [-0.34, 0.34]) K.box(7.0, 9.6 + dy - 0.06, zc, 0.6, 0.12, 1.24, '#141519', 'dark'); }); });
+      V._pistao(K, P, [0.7, 10.45, zc], [3.3, 10.45, zc], 0.17); K.cyl(-0.65, 8.85, s * 3.62, 0.72, 0.72, 0.55, P.b, 'metal', { rx: s * H, seg: 14 }); K.cyl(-0.65, 8.85, s * 3.79, 0.74, 0.74, 0.2, P.h, 'paint', { rx: s * H, seg: 14 });
+      K.cyl(2.2, 10.15, s * 1.75, 0.2, 0.22, 0.38, P.d, 'dark', { rz: -H, seg: 8 }); K.cyl(2.56, 10.15, s * 1.75, 0.17, 0.17, 0.04, P.l, null, { e: 2.4, rz: -H, seg: 8 });
+      V._escape(K, P, -2.65, 9.6, s * 1.45, 2.0, 0.32); }
+    V._cb(K, -3.3, 7.35, 0, 0.9, 2.3, 3.0, 0.2, P.d, 'dark'); K.box(-3.78, 7.7, 0, 0.05, 1.55, 2.3, FO, null, { e: 1.3 });
+    for (let i = 0; i < (K.lite ? 3 : 6); i++) K.box(-3.84, K.lite ? 7.85 + i * 0.5 : 7.78 + i * 0.25, 0, 0.08, 0.12, 2.5, P.b, 'metal');
+    K.light(-1.5, 10.9, 0, 0.25, RED, 2.4);
+    K.anim({ t: 'sway', p: [-2.3, 10.9, -0.6], amp: 0.12, speed: 2.2 }, () => K.seg([-2.3, 10.9, -0.6], [-2.5, 13.0, -0.6], 0.04, P.d, 'metal', { seg: 5 }));
+    K.fine(() => { for (let i = 0; i < 3; i++) K.box(2.86, 8.4 + i * 0.3, 0, 0.06, 0.06, 2.4, P.d, 'metal', { rz: 0.12 }); for (const s of [-1, 1]) { for (let i = 0; i < 4; i++) K.box(-2.0 + i * 0.85, 7.5, s * 2.27, 0.5, 1.6, 0.05, P.d, 'dark'); K.seg([-3.0, 8.0, s * 1.2], [-3.0, 10.3, s * 1.2], 0.05, P.h, 'paint', { seg: 4 }); K.tube([[-1.2, 9.4, s * 2.3], [-0.6, 9.9, s * 2.9], [0.4, 9.95, s * 3.0]], 0.09, P.d, 'rubber', { ts: 8, rs: 4 }); }
+      for (let i = 0; i < 5; i++) K.box(-3.0, 8.2 + i * 0.42, 0, 0.06, 0.05, 2.2, P.h, 'paint'); }); },
 };
 U.erevane = {
   infantaria(K, P, tc, o) { o = o || {};
@@ -692,22 +923,370 @@ U.erevane = {
     });
     K.box(-1, 0, 0, 0.08, 0.004, 0.08, P.d, 'dark', { pat: 0 }); // âncora no chão (escondida): mantém o vão de flutuação
   },
-  veiculo_hull(K, P, tc) { K.poly([[-6.6, 1.4], [5, 1.4], [7, 2.4], [4.6, 3.6], [-5.4, 3.6], [-6.8, 2.6]], 7.4, P.a, 'gloss', { b: 0.25 });
-    for (const [x, s] of [[-4, 1], [-4, -1], [3.4, 1], [3.4, -1]]) K.anim({ t: 'bob', amp: 0.12, speed: 3, ph: (x > 0 ? 0 : PI) + (s > 0 ? 0 : H) }, () => { K.cyl(x, 0.6, s * 3, 1.3, 1.5, 0.8, P.d, 'dark'); K.cyl(x, 0.45, s * 3, 1.1, 1.1, 0.16, P.c, null, { e: 2 }); });
-    K.box(-0.6, 3.62, 3.9, 9, 0.12, 0.12, tc, null, { e: 1.8 }); K.box(-0.6, 3.62, -3.9, 9, 0.12, 0.12, tc, null, { e: 1.8 }); K.mount = 3.75; },
-  veiculo_turret(K, P, tc) { KITS.erevane.turret(K, P, tc, 0.8, false); },
-  drone(K, P, tc) { K.anim({ t: 'bob', amp: 0.35, speed: 2.4 }, () => { K.poly([[4, 0], [-2.6, 4.8], [-1.2, 0], [-2.6, -4.8]], 0.5, P.a, 'gloss', { rx: -H, y: 2, b: 0.1 }); K.oct(-0.4, 1.4, 0, 1, 1.6, P.b, 'glass', { sx: 1.8 });
-    for (const s of [-1, 1]) K.seg([4, 2.25, 0], [-2.6, 2.25, s * 4.8], 0.08, tc, null, { e: 2 }); K.light(-1.2, 2.5, 0, 0.4, P.l); }); },
-  suporte(K, P, tc) { const hv = { t: 'bob', amp: 0.22, speed: 2.2 }; K.anim(hv, () => { K.prism(0, 1.4, 0, 2.8, 2.2, 3, P.a, 'gloss', { top: 0.6 }); K.cone(0, 3.6, 0, 0.5, 3.4, P.b, 'gloss', { seg: 4 }); K.oct(0, 7.2, 0, 0.4, 0.8, P.l, null, { e: 3 }); }); K.cyl(0, 0.6, 0, 2, 2.2, 0.2, P.c, null, { e: 1.4 }); K.box(1.45, 2.6, 0, 0.12, 0.6, 1.6, tc, null, { e: 1.8, anim: hv }); },
-  pirata(K, P, tc) { K.poly([[-5.4, 0.9], [4.4, 0.9], [6, 1.8], [3, 3], [-4.8, 3]], 5.2, P.a, 'gloss', { b: 0.2 });
-    for (const x of [-3.4, 3]) for (const s of [-1, 1]) K.anim({ t: 'bob', amp: 0.1, speed: 3, ph: (x > 0 ? 0 : PI) + (s > 0 ? 0 : H) }, () => { K.cyl(x, 0.4, s * 2.7, 0.9, 1, 0.6, P.d, 'dark'); K.cyl(x, 0.3, s * 2.7, 0.75, 0.75, 0.12, P.c, null, { e: 1.8 }); });
-    K.cyl(-1.8, 3, 0, 1.4, 1.4, 2.2, P.g, 'glass', { seg: 6, facet: true }); K.tor(-1.8, 4.1, 0, 1.42, 0.08, P.l, null, { e: 2.4, ts: 6, anim: { t: 'spin', p: [-1.8, 4.1, 0], speed: 1 } }); K.anim({ t: 'sway', p: [-1.8, 5, 0], amp: 0.02, speed: 2.2 }, () => { K.tube([[-1.8, 5, 0], [1, 5.4, 0], [4, 3.6, 0], [6.2, 2.4, 0]], 0.22, P.d, 'rubber'); K.light(6.2, 2.2, 0, 0.4, P.l); }); },
+  /* ---------- 4.3d — Frota Erevane: ajudantes da Raça (nome com _ = ajudante, não é unidade). Mesma linguagem do coletor 4.3a: chapas facetadas em camadas
+     (chassi acetinado escuro, placas brilhantes por cima), frisos de latão, vidro fumê, fios teal emissivos, luzes violeta e casulos antigravidade.
+     Versão leve (K.lite): chapas finas sem chanfro, casulos e bocais sem anel nem aletas, detalhe miúdo em K.fine ---------- */
+  _tp(K, pts, y, th, col, mat, o) { if (K.lite && o && o.b && th <= 0.06) { const b = o.b; o = Object.assign({}, o, { b: 0 }); y += b / 2; th += b; } return K.poly(pts.map(p => [p[0], -p[1]]), th, col, mat, Object.assign({ rx: -H, y }, o)); }, /* placa vista de cima: contorno (x, z), centro em y, espessura th + 2b (na leve, chapa fina sem chanfro com o mesmo topo) */
+  _sym(h) { return h.concat(h.filter(p => p[1] !== 0).reverse().map(p => [p[0], -p[1]])); }, /* meio contorno (z >= 0, da frente para trás) -> contorno simétrico */
+  _xc(K, x, y, z, rt, rb, h, col, mat, o) { return K.cyl(x, y, z, rt, rb, h, col, mat, Object.assign({ rz: -H }, o)); }, /* cilindro ao longo de +x (base rb em x, topo rt em x + h) */
+  _xp(K, x, y, z, r, h, n, col, mat, o) { return K.prism(x, y, z, r, h, n, col, mat, Object.assign({ rz: -H }, o)); },
+  _zc(K, x, y, z, r, w, col, mat, o) { return K.cyl(x, y, z - w / 2, r, r, w, col, mat, Object.assign({ rx: H }, o)); }, /* disco ou eixo ao longo de z, centrado em z */
+  _bolt(K, P, x, y, z, s) { K.fine(() => K.cyl(x, y, z, 0.055, 0.065, 0.05, P.t, 'metal', { seg: 6, pat: 0, rx: s ? s * H : 0 })); }, /* parafuso (s = ±1: em face lateral ±z) */
+  _vent(K, P, x, y, z, w, h, s, n) { K.box(x, y, z, w, h, 0.06, P.d, 'dark', { pat: 0 }); K.fine(() => { for (let i = 0; i < n; i++) K.box(x, y + (i + 0.5) * h / n - 0.025, z + s * 0.035, w * 0.92, 0.05, 0.05, P.b, 'metal', { pat: 0 }); }); }, /* grade lateral com aletas */
+  _ventT(K, P, x, y, z, w, d, n) { K.box(x, y, z, w, 0.04, d, P.d, 'dark', { pat: 0 }); K.fine(() => { for (let i = 0; i < n; i++) K.box(x - w / 2 + (i + 0.5) * w / n, y + 0.03, z, 0.05, 0.05, d * 0.9, P.b, 'metal', { pat: 0 }); }); }, /* grade no tampo */
+  _seam(K, P, x, y, z, w, d) { K.fine(() => K.box(x, y, z, w, 0.015, d, P.d, 'metal', { pat: 0 })); }, /* junta de painel (friso escuro) */
+  _pod(K, P, x, y0, z, r, top) { /* casulo antigravidade (o do coletor): lente teal embaixo (y0), carcaça octogonal até top; na completa, anel de latão, aletas e suporte */
+    K.cyl(x, y0 + 0.14, z, r, r * 0.78, top - y0 - 0.14, P.d, 'dark', { seg: K.lite ? 6 : 8, facet: true });
+    K.cyl(x, y0, z, r * 0.7, r * 0.5, 0.14, P.c, null, { e: 2.4, seg: 8 });
+    K.fine(() => { K.cyl(x, y0 + 0.38, z, r * 1.07, r * 1.07, 0.09, P.t, 'metal', { seg: 8, facet: true }); for (let i = 0; i < 4; i++) K.box(x, y0 + 0.18, z, 0.05, 0.42, r * 2.25, P.b, 'gloss', { ry: i * PI / 4 + PI / 8, pat: 0 }); K.box(x, top - 0.28, z, r * 1.1, 0.32, r * 0.5, P.b, 'gloss', { b: 0.05, bs: 1 }); });
+  },
+  _bocal(K, P, x, y, z, r) { const E = U.erevane; E._xc(K, x, y, z, r * 0.82, r, 0.42, P.d, 'dark', { seg: 8 }); E._xc(K, x - 0.03, y, z, r * 0.72, r * 0.72, 0.03, P.l, null, { e: 2.4, seg: 6 }); K.fine(() => E._xc(K, x + 0.24, y, z, r * 1.06, r * 1.06, 0.07, P.t, 'metal', { seg: 8 })); }, /* bocal traseiro (voltado para -x): carcaça, disco violeta, anel de latão */
+  _antena(K, P, a, b, col) { K.anim({ t: 'sway', p: a, amp: 0.1, speed: 2.4, ph: a[0] + a[2] }, () => { K.seg(a, b, 0.03, P.d, 'metal', { seg: 5 }); K.light(b[0], b[1] - 0.05, b[2], 0.1, col || P.l); }); }, /* antena fina que balança, com luz na ponta */
+  veiculo_hull(K, P, tc) { /* 4.3d: tanque flutuante — casco em cunha facetado em camadas, convés com anel da torre, faixas do time nas bordas, para-lamas angulares com casulos antigravidade (balançam como suspensão), queixo com faróis violeta, motor traseiro duplo */
+    const E = U.erevane, TP = (pts, y, th, col, mat, o) => E._tp(K, pts, y, th, col, mat, o), SYM = E._sym, XC = (...a) => E._xc(K, ...a);
+    K.box(0, 0, 0, 0.08, 0.004, 0.08, P.d, 'dark', { pat: 0 }); /* âncora no chão (escondida): mantém o vão de flutuação igual nas duas versões */
+    /* ventre, quilha, chassi acetinado, casco superior brilhante e convés */
+    TP(SYM([[5.4, 0], [4.2, 1.5], [-5.0, 1.9], [-5.8, 1.2], [-5.9, 0]]), 1.0, 0.14, P.d, 'dark', { b: 0.05 });
+    for (const s of [-1, 1]) K.box(-0.3, 0.84, s * 1.7, 8.4, 0.05, 0.06, P.c, null, { e: 2.2 });
+    TP(SYM([[7.0, 0], [6.2, 0.9], [4.4, 2.3], [3.0, 2.8], [-5.4, 2.8], [-6.4, 2.2], [-6.6, 0]]), 1.5, 0.5, P.b, 'dark', { b: 0.3 });
+    TP(SYM([[6.3, 0], [4.9, 1.25], [2.8, 2.3], [-4.9, 2.35], [-5.9, 1.8], [-6.0, 0]]), 2.15, 0.36, P.a, 'gloss', { b: 0.22 });
+    TP(SYM([[3.4, 0], [2.6, 1.7], [-3.6, 1.75], [-4.5, 1.2], [-4.6, 0]]), 2.72, 0.16, P.b, 'gloss', { b: 0.08 });
+    for (const s of [-1, 1]) {
+      TP([[2.6, s * 1.95], [2.2, s * 2.4], [-4.7, s * 2.45], [-5.0, s * 1.95]], 2.58, 0.04, tc, 'paint', { b: 0.03 }); /* faixa do time na borda do casco */
+      K.box(-1.0, 2.1, s * 2.6, 7.4, 0.05, 0.05, P.c, null, { e: 2.2 }); /* fio teal na lateral do casco */
+      TP([[6.2, s * 0.12], [5.5, s * 0.95], [5.25, s * 0.98], [5.95, s * 0.12]], 2.57, 0.02, P.t, 'metal', { b: 0.02 }); /* divisas de latão na proa */
+      K.fine(() => { for (const x of [-1.2, 1.0]) E._seam(K, P, x, 2.66, s * 2.2, 0.04, 0.5); E._seam(K, P, 1.2, 2.55, s * 2.65, 3.4, 0.03); K.seg([5.6, 2.6, s * 0.55], [4.7, 2.6, s * 1.1], 0.035, P.t, 'metal', { seg: 5 }); });
+    }
+    K.cyl(0, 2.5, 0, 2.0, 2.12, 0.6, P.d, 'dark', { seg: 16 }); K.mount = 3.1; /* anel da torre */
+    K.fine(() => { K.cyl(0, 3.03, 0, 2.16, 2.16, 0.07, P.t, 'metal', { seg: 16 }); for (let i = 0; i < 8; i++) { const a = i / 8 * PI * 2 + PI / 8; K.box(Math.cos(a) * 2.06, 2.62, Math.sin(a) * 2.06, 0.16, 0.36, 0.16, P.b, 'metal', { ry: -a }); } });
+    /* sensor de proa (olho violeta) e juntas do glacis */
+    K.prism(5.0, 2.48, 0, 0.36, 0.22, 6, P.b, 'gloss', { top: 0.7 }); K.light(5.3, 2.56, 0, 0.12, P.l, 3);
+    K.fine(() => { E._seam(K, P, 4.4, 2.56, 0, 0.04, 2.0); E._seam(K, P, -5.3, 2.56, 0, 0.04, 2.6); });
+    /* para-lamas angulares nos quatro cantos, com placa do time, e os casulos antigravidade embaixo (balançam como suspensão) */
+    for (const s of [-1, 1]) {
+      TP([[4.9, s * 2.3], [4.4, s * 3.75], [2.5, s * 3.9], [2.0, s * 2.3]], 1.62, 0.14, P.a, 'gloss', { b: 0.12 });
+      TP([[4.5, s * 2.95], [4.2, s * 3.62], [2.7, s * 3.72], [2.5, s * 2.95]], 1.84, 0.03, tc, 'paint', { b: 0.02 });
+      TP([[-3.0, s * 2.3], [-3.3, s * 3.9], [-5.3, s * 3.8], [-5.8, s * 2.3]], 1.62, 0.14, P.a, 'gloss', { b: 0.12 });
+      TP([[-3.4, s * 2.95], [-3.6, s * 3.67], [-5.1, s * 3.6], [-5.35, s * 2.95]], 1.84, 0.03, tc, 'paint', { b: 0.02 });
+      K.light(4.62, 1.66, s * 3.72, 0.14, P.l);
+      K.fine(() => { TP([[4.98, s * 2.3], [4.48, s * 3.82], [4.3, s * 3.82], [4.78, s * 2.3]], 1.83, 0.02, P.t, 'metal', { b: 0.02 }); TP([[-5.45, s * 2.3], [-5.0, s * 3.85], [-5.2, s * 3.85], [-5.65, s * 2.3]], 1.83, 0.02, P.t, 'metal', { b: 0.02 });
+        for (const [x, z] of [[3.0, 3.5], [3.9, 3.0], [-3.8, 3.5], [-4.8, 3.05]]) E._bolt(K, P, x, 1.86, s * z);
+        K.box(-4.25, 1.88, s * 3.35, 0.7, 0.32, 0.5, P.d, 'dark'); K.box(-4.25, 2.2, s * 3.35, 0.5, 0.04, 0.3, P.b, 'metal'); K.light(-3.88, 1.98, s * 3.35, 0.08, P.c, 2); });
+    }
+    for (const [x, s] of [[3.45, 1], [3.45, -1], [-4.3, 1], [-4.3, -1]]) K.anim({ t: 'bob', amp: 0.08, speed: 3, ph: (x > 0 ? 0 : PI) + (s > 0 ? 0 : H) }, () => E._pod(K, P, x, 0.34, s * 3.25, 0.68, 1.6));
+    /* blindagem lateral vertical entre os para-lamas, com grades e fio de energia */
+    for (const s of [-1, 1]) {
+      K.poly([[-3.0, 1.05], [2.0, 1.05], [2.3, 1.4], [2.0, 1.85], [-3.0, 1.85], [-3.3, 1.4]], 0.1, P.a, 'gloss', { z: s * 3.18, b: 0.03 });
+      K.box(-0.5, 0.98, s * 3.24, 4.6, 0.05, 0.05, P.c, null, { e: 2.2 });
+      E._vent(K, P, 0.9, 1.22, s * 3.27, 1.1, 0.42, s, 3); E._vent(K, P, -1.9, 1.22, s * 3.27, 1.1, 0.42, s, 3);
+      K.fine(() => { for (const x of [-2.75, -0.5, 1.75]) { E._bolt(K, P, x, 1.72, s * 3.27, s); E._bolt(K, P, x, 1.12, s * 3.27, s); } K.seg([-2.6, 1.9, s * 3.12], [1.6, 1.9, s * 3.12], 0.035, P.t, 'metal', { seg: 5 }); });
+    }
+    /* queixo com faróis violeta, para-choque e ganchos; escotilha do piloto com periscópios */
+    K.poly([[5.5, 0.95], [6.9, 1.05], [7.6, 1.45], [7.3, 1.8], [5.5, 1.8]], 2.0, P.d, 'dark', { b: 0.06 });
+    for (const s of [-1, 1]) { K.box(7.27, 1.54, s * 0.72, 0.04, 0.16, 0.2, P.l, null, { e: 3 }); K.fine(() => XC(6.95, 1.62, s * 0.72, 0.13, 0.15, 0.3, P.t, 'metal', { seg: 8 })); }
+    K.fine(() => { for (const s of [-1, 1]) K.box(7.0, 1.0, s * 0.4, 0.5, 0.14, 0.12, P.t, 'metal'); K.seg([7.25, 1.15, -1.0], [7.25, 1.15, 1.0], 0.05, P.t, 'metal', { seg: 6 }); K.prism(4.0, 2.5, 0.0, 0.42, 0.1, 6, P.b, 'gloss'); for (const s of [-1, 1]) K.box(4.45, 2.55, s * 0.24, 0.16, 0.12, 0.18, P.g, 'glass'); E._bolt(K, P, 3.7, 2.6, 0.28); E._bolt(K, P, 3.7, 2.6, -0.28); });
+    /* motor traseiro: bloco inclinado, grade de exaustão, chaminés curtas, bocais duplos, luzes, empenas em V com a cor do time */
+    K.poly([[-7.0, 1.25], [-5.1, 1.25], [-4.75, 2.95], [-6.3, 2.95], [-7.1, 2.25]], 3.2, P.a, 'gloss', { b: 0.12 });
+    E._ventT(K, P, -5.7, 3.07, 0, 1.3, 2.4, 6);
+    for (const s of [-1, 1]) {
+      E._bocal(K, P, -7.6, 1.85, s * 0.85, 0.42);
+      K.light(-7.18, 2.4, s * 1.4, 0.14, P.l);
+      K.poly([[-6.9, 0], [-5.6, 0], [-6.3, 0.75], [-6.9, 0.75]], 0.08, P.a, 'gloss', { y: 3.0, z: s * 1.5, rx: s * 0.4, b: 0.03 });
+      K.poly([[-6.75, 0.1], [-5.95, 0.1], [-6.35, 0.55], [-6.75, 0.55]], 0.02, tc, 'paint', { y: 3.03, z: s * 1.43, rx: s * 0.4, b: K.lite ? 0 : 0.02 });
+      K.seg([-5.6, 3.0, s * 1.5], [-6.3, 3.0 + 0.75 * Math.cos(0.4), s * (1.5 + 0.75 * Math.sin(0.4))], 0.035, tc, null, { e: 2.4, seg: 5 });
+      K.fine(() => { K.cyl(-6.55, 2.6, s * 0.55, 0.13, 0.16, 0.42, P.d, 'metal', { seg: 8 }); K.cyl(-6.55, 3.0, s * 0.55, 0.15, 0.15, 0.05, P.t, 'metal', { seg: 8 }); });
+    }
+    K.fine(() => { for (const s of [-1, 1]) { K.box(-5.0, 2.95, s * 1.85, 0.9, 0.25, 0.3, P.d, 'dark'); K.box(-5.0, 3.2, s * 1.85, 0.7, 0.04, 0.2, P.c, null, { e: 2 }); } K.seg([-6.9, 1.2, -1.2], [-6.9, 1.2, 1.2], 0.05, P.t, 'metal', { seg: 6 }); });
+    E._antena(K, P, [-5.5, 3.05, -1.25], [-6.05, 5.1, -1.25]);
+  },
+  veiculo_turret(K, P, tc) { /* 4.3d: torre baixa facetada (saia escura, corpo brilhante com bochechas inclinadas, teto com placa do time, cúpula fumê, nicho traseiro), mantelete e canhão de trilhos que recua: núcleo teal entre dois trilhos, capa com aletas, cintas de latão, boca sextavada com ponta violeta */
+    const E = U.erevane, TP = (pts, y, th, col, mat, o) => E._tp(K, pts, y, th, col, mat, o), SYM = E._sym, XC = (...a) => E._xc(K, ...a), XP = (...a) => E._xp(K, ...a);
+    K.prism(0, 0, 0, 1.95, 0.34, 8, P.d, 'dark', { ry: PI / 8 });
+    TP(SYM([[2.3, 0], [1.9, 1.15], [-1.5, 1.5], [-2.6, 1.15], [-2.8, 0]]), 0.55, 0.3, P.b, 'dark', { b: 0.14 });
+    TP(SYM([[2.1, 0], [1.6, 1.0], [-1.4, 1.3], [-2.4, 1.0], [-2.6, 0]]), 1.02, 0.56, P.a, 'gloss', { b: 0.2 });
+    TP(SYM([[1.3, 0], [0.95, 0.75], [-1.3, 0.95], [-2.0, 0.7], [-2.1, 0]]), 1.58, 0.1, P.b, 'gloss', { b: 0.1 });
+    TP(SYM([[1.1, 0], [0.8, 0.66], [-0.6, 0.82], [-1.2, 0.6], [-1.3, 0]]), 1.77, 0.03, tc, 'paint', { b: 0.03 });
+    TP(SYM([[-2.3, 0.3], [-2.45, 1.0], [-3.25, 0.85], [-3.4, 0.3]]), 0.95, 0.36, P.b, 'gloss', { b: 0.1 }); /* nicho traseiro */
+    for (const s of [-1, 1]) {
+      K.poly([[-1.5, 0.42], [1.3, 0.42], [1.9, 0.85], [1.3, 1.36], [-1.5, 1.36], [-1.9, 0.9]], 0.07, P.a, 'gloss', { z: s * 1.56, rx: -s * 0.2, b: 0.03 }); /* bochecha inclinada */
+      K.box(0.0, 1.4, s * 1.5, 2.6, 0.05, 0.05, P.c, null, { e: 2.2, ry: s * 0.05 }); /* fio teal na borda da bochecha */
+      K.fine(() => { E._bolt(K, P, -1.2, 1.0, s * 1.68, s); E._bolt(K, P, 1.0, 1.0, s * 1.68, s); E._seam(K, P, -0.2, 1.6, s * 0.88, 1.6, 0.03); });
+    }
+    K.light(-3.48, 1.0, 0, 0.12, P.l);
+    /* mantelete e canhão de trilhos (recua) */
+    K.poly([[1.8, 0.45], [2.75, 0.56], [3.0, 1.0], [2.75, 1.42], [1.8, 1.52]], 1.3, P.d, 'dark', { b: 0.06 });
+    const BY = 1.0;
+    K.fine(() => { E._xc(K, 2.85, 0.62, 0.48, 0.055, 0.065, 0.95, P.d, 'metal', { seg: 6 }); K.box(2.6, 0.5, 0.48, 0.5, 0.22, 0.22, P.b, 'gloss'); }); /* metralhadora coaxial */
+    K.anim({ t: 'recoil', dist: 0.75 }, () => {
+      XC(2.7, BY, 0, 0.3, 0.36, 1.0, P.b, 'gloss', { seg: 8 });
+      for (const s of [-1, 1]) K.box(5.95, BY - 0.17, s * 0.2, 5.5, 0.34, 0.13, P.d, 'metal');
+      K.box(5.8, BY - 0.07, 0, 5.1, 0.14, 0.27, P.c, null, { e: 2.0 });
+      K.box(4.4, BY + 0.17, 0, 2.6, 0.06, 0.56, P.a, 'gloss');
+      for (const x of K.lite ? [3.9, 7.6] : [3.9, 5.2, 6.5, 7.6]) K.box(x, BY - 0.24, 0, 0.14, 0.48, 0.62, P.t, 'metal');
+      XP(8.65, BY, 0, 0.28, 0.5, 6, P.d, 'dark', { top: 1.3 });
+      XC(9.13, BY, 0, 0.2, 0.2, 0.04, P.l, null, { e: 2.6, seg: 6 });
+      K.fine(() => { XC(3.4, BY - 0.36, 0, 0.07, 0.07, 3.6, P.b, 'metal', { seg: 6 }); for (const x of [3.6, 6.8]) K.box(x, BY - 0.42, 0, 0.12, 0.12, 0.12, P.t, 'metal'); for (let i = 0; i < 6; i++) K.box(3.5 + i * 0.36, BY + 0.23, 0, 0.05, 0.1, 0.46, P.d, 'metal', { pat: 0 }); for (const s of [-1, 1]) K.box(8.9, BY - 0.06, s * 0.33, 0.24, 0.12, 0.04, P.d, 'dark', { pat: 0 }); });
+    });
+    /* sensor no teto (esquerda), lançadores de fumaça (direita), cúpula fumê, escotilha, antena */
+    K.box(-1.0, 1.7, -0.62, 0.7, 0.26, 0.36, P.d, 'dark'); K.box(-0.64, 1.76, -0.62, 0.03, 0.14, 0.24, P.l, null, { e: 2.6 });
+    K.prism(-1.75, 1.7, 0.55, 0.34, 0.24, 6, P.g, 'glass', { top: 0.72 });
+    K.fine(() => { K.cyl(-1.75, 1.68, 0.55, 0.39, 0.39, 0.05, P.t, 'metal', { seg: 6 }); for (let i = 0; i < 3; i++) K.seg([-0.55 + i * 0.3, 1.15, 1.52], [-0.3 + i * 0.3, 1.42, 1.8], 0.08, P.b, 'metal', { seg: 6 }); for (const [x, z] of [[0.9, 0.5], [0.9, -0.5]]) E._bolt(K, P, x, 1.73, z);
+      K.prism(-1.75, 1.68, -0.1, 0.3, 0.07, 6, P.b, 'gloss'); K.box(-1.75, 1.75, -0.1, 0.4, 0.04, 0.05, P.t, 'metal'); E._ventT(K, P, -2.85, 1.24, 0, 0.7, 1.1, 4); });
+    E._antena(K, P, [-2.9, 1.24, -0.6], [-3.5, 2.9, -0.6]);
+  },
+  drone(K, P, tc) { /* 4.3d: drone de asa voadora — fuselagem facetada com domo-sensor fumê e tomada de ar, asas enflechadas com bordo de latão e placas do time, duas ventoinhas de sustentação (giram em sentidos opostos), metralhadora dupla no ventre (recua), mísseis sob as asas, empenas com fio teal, bocais violeta */
+    const E = U.erevane, TP = (pts, y, th, col, mat, o) => E._tp(K, pts, y, th, col, mat, o), SYM = E._sym, XC = (...a) => E._xc(K, ...a);
+    TP(SYM([[3.4, 0], [1.6, 0.62], [-1.9, 0.62], [-2.3, 0]]), 0.86, 0.14, P.d, 'dark', { b: 0.08 });
+    TP(SYM([[4.3, 0], [3.3, 0.55], [1.0, 0.95], [-2.3, 0.9], [-2.8, 0]]), 1.3, 0.42, P.a, 'gloss', { b: 0.2 });
+    TP(SYM([[2.6, 0], [1.8, 0.45], [-1.6, 0.55], [-2.2, 0]]), 1.86, 0.18, P.b, 'gloss', { b: 0.16 });
+    TP(SYM([[2.95, 0], [2.35, 0.42], [0.95, 0.48], [0.45, 0]]), 2.1, 0.04, P.t, 'metal', { b: 0.03 });
+    TP(SYM([[2.75, 0], [2.25, 0.27], [1.1, 0.32], [0.65, 0]]), 2.18, 0.1, P.g, 'glass', { b: 0.14 });
+    K.poly([[-0.2, 1.95], [0.5, 1.95], [0.3, 2.26], [-0.2, 2.26]], 0.5, P.d, 'dark', { b: 0.03 }); /* tomada de ar dorsal */
+    for (const s of [-1, 1]) K.box(0.2, 0.68, s * 0.55, 4.0, 0.04, 0.05, P.c, null, { e: 2 });
+    K.fine(() => { E._ventT(K, P, -1.1, 2.1, 0, 1.0, 0.6, 5); for (const s of [-1, 1]) { E._bolt(K, P, 0.4, 2.12, s * 0.42); E._bolt(K, P, -1.7, 2.12, s * 0.42); E._seam(K, P, 3.0, 1.72, s * 0.35, 0.9, 0.03); } E._seam(K, P, -1.9, 2.12, 0, 0.03, 0.7); K.light(-2.95, 1.72, 0, 0.1, P.l); });
+    /* asas: placa enflechada, intradorso escuro, bordo de ataque de latão, placa do time, ventoinha, empena, luz de navegação, flape, míssil */
+    for (const s of [-1, 1]) {
+      TP([[2.4, s * 0.9], [0.5, s * 3.6], [-0.5, s * 4.7], [-1.4, s * 4.85], [-1.85, s * 4.4], [-1.7, s * 0.9]], 1.28, 0.1, P.a, 'gloss', { b: 0.1 });
+      TP([[2.0, s * 0.95], [0.3, s * 3.4], [-0.6, s * 4.4], [-1.5, s * 4.3], [-1.5, s * 0.95]], 1.07, 0.06, P.d, 'dark', { b: 0.04 });
+      TP([[2.48, s * 0.86], [0.57, s * 3.62], [-0.45, s * 4.76], [-0.62, s * 4.62], [0.38, s * 3.5], [2.2, s * 0.86]], 1.45, 0.03, P.t, 'metal', { b: 0.02 });
+      TP([[0.95, s * 2.8], [0.05, s * 3.95], [-0.75, s * 4.15], [-1.25, s * 2.8]], 1.46, 0.03, tc, 'paint', { b: 0.02 });
+      const fx = -0.35, fz = s * 1.95;
+      K.cyl(fx, 1.3, fz, 0.84, 0.9, 0.38, P.b, 'gloss', { seg: 16 }); K.cyl(fx, 1.68, fz, 0.66, 0.66, 0.02, P.d, 'dark', { seg: 16 });
+      K.fine(() => { K.tor(fx, 1.69, fz, 0.76, 0.05, P.t, 'metal', { ts: 24, rs: 4 }); for (let i = 0; i < 4; i++) { const a = i / 4 * PI * 2 + PI / 4; K.box(fx + Math.cos(a) * 0.4, 1.66, fz + Math.sin(a) * 0.4, 0.5, 0.03, 0.05, P.d, 'metal', { ry: -a }); } });
+      K.anim({ t: 'spin', p: [fx, 1.72, fz], speed: s * 18 }, () => { K.cyl(fx, 1.7, fz, 0.16, 0.18, 0.1, P.t, 'metal', { seg: 8 }); const nb = K.q(6); for (let i = 0; i < nb; i++) { const a = i / nb * PI * 2; K.box(fx + Math.cos(a) * 0.36, 1.71, fz + Math.sin(a) * 0.36, 0.56, 0.03, 0.17, P.b, 'metal', { ry: -a, rx: 0.35 }); } });
+      K.poly([[-0.4, 0], [-1.55, 0], [-1.95, 1.05], [-1.5, 1.05]], 0.08, P.a, 'gloss', { y: 1.38, z: s * 4.62, rx: s * 0.22, b: 0.03 });
+      K.seg([-0.45, 1.42, s * 4.63], [-1.5, 2.41, s * 4.85], 0.035, P.c, null, { e: 2.4, seg: 5 });
+      K.light(-1.45, 1.3, s * 4.86, 0.12, s > 0 ? P.c : P.l);
+      E._bocal(K, P, -3.15, 1.3, s * 0.42, 0.24);
+      K.fine(() => { for (let i = 0; i < 3; i++) E._seam(K, P, -0.2 - i * 0.45, 1.44, s * (3.15 + i * 0.25), 0.05, 0.9); E._bolt(K, P, 1.6, 1.46, s * 1.5); E._bolt(K, P, -1.4, 1.46, s * 1.2);
+        TP([[-1.55, s * 1.2], [-1.6, s * 2.6], [-2.0, s * 2.55], [-1.95, s * 1.2]], 1.27, 0.05, P.b, 'gloss', { b: 0.02 }); /* flape */
+        K.box(0.6, 0.86, s * 3.05, 1.4, 0.14, 0.12, P.d, 'dark'); for (const dz of [-0.16, 0.16]) { XC(-0.2, 0.72, s * 3.05 + dz, 0.08, 0.08, 1.4, P.b, 'gloss', { seg: 6 }); K.cone(1.2, 0.72, s * 3.05 + dz, 0.08, 0.26, P.t, 'metal', { rz: -H, seg: 6 }); } });
+      E._antena(K, P, [-1.9, 2.05, s * 0.32], [-3.1, 2.4, s * 0.45], P.c);
+    }
+    /* casulo da arma no ventre e metralhadora dupla (recua); sensor sob o nariz */
+    K.box(2.0, 0.5, 0, 1.5, 0.3, 0.62, P.d, 'dark');
+    K.anim({ t: 'recoil', dist: 0.35 }, () => { for (const s of [-1, 1]) { XC(2.7, 0.66, s * 0.17, 0.065, 0.075, 1.5, P.d, 'metal', { seg: 6 }); K.fine(() => XC(4.1, 0.66, s * 0.17, 0.09, 0.09, 0.16, P.t, 'metal', { seg: 6 })); } });
+    K.fine(() => { K.sph(3.55, 0.82, 0, 0.2, P.g, 'glass', { seg: 10 }); for (const s of [-1, 1]) K.box(2.0, 0.6, s * 0.33, 1.1, 0.12, 0.04, P.b, 'metal', { pat: 0 }); }); K.light(3.72, 0.74, 0, 0.12, P.l, 3);
+  },
+  suporte(K, P, tc) { /* 4.3d: suporte/hack — trenó flutuante compacto com aletas traseiras da cor do time e agulha de pulso facetada (coluna sextavada, aletas cruzadas com fio teal), dois anéis hexagonais em sentidos opostos (latão com nós teal; cor do time), cristal violeta flutuando na ponta, prato de varredura que gira, quatro casulos */
+    const E = U.erevane, TP = (pts, y, th, col, mat, o) => E._tp(K, pts, y, th, col, mat, o), SYM = E._sym;
+    K.box(0, 0, 0, 0.08, 0.004, 0.08, P.d, 'dark', { pat: 0 });
+    TP(SYM([[2.0, 0], [1.4, 0.95], [-1.8, 1.15], [-2.2, 0]]), 0.92, 0.12, P.d, 'dark', { b: 0.05 });
+    TP(SYM([[2.5, 0], [1.9, 1.0], [0.9, 1.55], [-1.8, 1.6], [-2.4, 1.1], [-2.5, 0]]), 1.3, 0.4, P.b, 'dark', { b: 0.26 });
+    TP(SYM([[2.05, 0], [1.5, 0.88], [-1.5, 1.2], [-2.1, 0.8], [-2.15, 0]]), 1.92, 0.2, P.a, 'gloss', { b: 0.18 });
+    for (const s of [-1, 1]) {
+      TP([[1.75, s * 0.3], [1.45, s * 0.82], [0.8, s * 0.98], [0.8, s * 0.3]], 2.24, 0.03, tc, 'paint', { b: 0.03 });
+      TP([[-0.95, s * 1.38], [-1.45, s * 2.38], [-2.2, s * 2.33], [-2.25, s * 1.38]], 1.62, 0.08, P.a, 'gloss', { b: 0.06 }); /* aleta traseira */
+      TP([[-1.15, s * 1.66], [-1.55, s * 2.22], [-2.05, s * 2.2], [-2.08, s * 1.66]], 1.76, 0.02, tc, 'paint', { b: 0.02 });
+      K.box(-1.6, 1.62, s * 2.4, 0.85, 0.05, 0.05, P.c, null, { e: 2.2, ry: s * 0.06 });
+      K.box(-0.4, 1.77, s * 1.8, 3.2, 0.05, 0.05, P.c, null, { e: 2.2 });
+      E._vent(K, P, 0.45, 1.0, s * 1.88, 0.9, 0.5, s, 3);
+      K.light(2.45, 1.3, s * 0.45, 0.13, P.l);
+      E._bocal(K, P, -2.82, 1.35, s * 0.6, 0.26);
+      E._antena(K, P, [-1.75, 2.2, s * 0.62], [-2.2, 3.6, s * 0.7]);
+      K.fine(() => { for (const x of [1.3, -1.7]) E._bolt(K, P, x, 2.24, s * 1.05); E._vent(K, P, -1.15, 1.0, s * 1.88, 0.8, 0.5, s, 3); E._bolt(K, P, -1.95, 1.72, s * 2.05); E._seam(K, P, 0.4, 2.21, s * 0.7, 0.03, 0.55); });
+    }
+    for (const [x, s] of [[1.6, 1], [1.6, -1], [-1.65, 1], [-1.65, -1]]) K.anim({ t: 'bob', amp: 0.08, speed: 3, ph: (x > 0 ? 0 : PI) + (s > 0 ? 0 : H) }, () => E._pod(K, P, x, 0.3, s * 1.32, 0.48, 1.1));
+    /* agulha de pulso: colar, coluna sextavada com faixa do time, agulha de 4 faces com aletas cruzadas e fios teal */
+    const SX = -0.3;
+    K.prism(SX, 2.1, 0, 0.98, 0.42, 8, P.d, 'dark', { top: 0.86, ry: PI / 8 });
+    K.prism(SX, 2.5, 0, 0.72, 1.3, 6, P.a, 'gloss', { top: 0.82 }); K.prism(SX, 2.95, 0, 0.7, 0.3, 6, tc, 'paint', { top: 0.97 });
+    K.prism(SX, 3.8, 0, 0.5, 3.7, 4, P.a, 'gloss', { top: 0.09, ry: PI / 4 });
+    for (const a of [PI / 4, 3 * PI / 4]) K.poly([[-1.2, 0], [1.2, 0], [0, 3.4]], 0.08, P.b, 'gloss', { x: SX, y: 2.5, ry: a, b: 0.02 });
+    for (const a of [PI / 4, 3 * PI / 4, 5 * PI / 4, 7 * PI / 4]) K.seg([SX + Math.cos(a) * 1.17, 2.55, Math.sin(a) * 1.17], [SX + Math.cos(a) * 0.06, 7.4, Math.sin(a) * 0.06], 0.03, P.c, null, { e: 2.2, seg: 4 });
+    K.fine(() => { K.cyl(SX, 2.48, 0, 0.9, 0.9, 0.07, P.t, 'metal', { seg: 8, facet: true, ry: PI / 8 }); K.cyl(SX, 3.78, 0, 0.62, 0.62, 0.06, P.t, 'metal', { seg: 6, facet: true }); for (let i = 0; i < 6; i++) { const a = i / 6 * PI * 2; K.light(SX + Math.cos(a) * 0.9, 2.3, Math.sin(a) * 0.9, 0.09, P.c, 2); } for (let i = 0; i < 4; i++) { const a = i * H; K.box(SX + Math.cos(a) * 0.78, 2.55, Math.sin(a) * 0.78, 0.26, 1.1, 0.06, P.t, 'metal', { ry: -a }); }
+      for (const s of [-1, 1]) { K.seg([1.75, 2.22, s * 0.48], [2.25, 2.75, s * 0.6], 0.035, P.t, 'metal', { seg: 5 }); K.light(2.25, 2.7, s * 0.6, 0.08, P.l, 2.6); } });
+    K.anim({ t: 'spin', p: [SX, 4.25, 0], speed: 1.6 }, () => { K.tor(SX, 4.25, 0, 1.4, 0.09, P.t, 'metal', { ts: 6, rs: 4 }); ringOf(6, 1.4, (cx, cz) => K.light(SX + cx, 4.17, cz, 0.17, P.c, 2.4)); });
+    K.anim({ t: 'spin', p: [SX, 5.55, 0], speed: -2.3 }, () => { K.tor(SX, 5.55, 0, 0.95, 0.07, tc, null, { e: 2, ts: 6, rs: 4 }); ringOf(3, 0.95, (cx, cz) => K.light(SX + cx, 5.48, cz, 0.14, P.l, 2.6)); });
+    K.anim({ t: 'bob', amp: 0.16, speed: 2.6 }, () => K.oct(SX, 7.65, 0, 0.34, 0.95, P.l, null, { e: 3 }));
+    /* prato de varredura (gira devagar sobre o mastro): costas brilhantes, concha escura, antena do foco; cabo até a agulha */
+    K.anim({ t: 'spin', p: [1.3, 2.2, 0], speed: 0.9 }, () => {
+      K.cyl(1.3, 2.2, 0, 0.11, 0.15, 0.6, P.d, 'metal', { seg: 8 });
+      const dp = [[0.02, 0], [0.3, 0.06], [0.52, 0.18], [0.64, 0.32]];
+      K.lathe(dp, 1.35, 2.8, 0, P.b, 'gloss', { seg: 14, rz: -H + 0.35 }); K.lathe(dp.slice().reverse().map(p => [p[0], p[1] + 0.025]), 1.35, 2.8, 0, P.d, 'dark', { seg: 14, rz: -H + 0.35 });
+      K.seg([1.37, 2.81, 0], [1.93, 3.0, 0], 0.03, P.t, 'metal', { seg: 5 }); K.light(1.93, 2.95, 0, 0.1, P.l);
+    });
+    K.fine(() => K.tube([[1.15, 2.25, 0.2], [0.75, 2.3, 0.45], [0.2, 2.45, 0.62]], 0.045, P.d, 'rubber', { ts: 8, rs: 5 }));
+  },
+  pirata(K, P, tc) { /* 4.3d: Sifonador Erevane — casco longo e baixo de ladrão com cabine-fenda, probóscide-sifão articulada (acena ao andar) com bobinas teal e ponta violeta, dois tanques-bexiga de carga com cintas de latão, faixa do time e janela violeta, vela de camuflagem com fio teal, empenas em V, quatro casulos */
+    const E = U.erevane, TP = (pts, y, th, col, mat, o) => E._tp(K, pts, y, th, col, mat, o), SYM = E._sym, XC = (...a) => E._xc(K, ...a), XP = (...a) => E._xp(K, ...a);
+    K.box(0, 0, 0, 0.08, 0.004, 0.08, P.d, 'dark', { pat: 0 });
+    TP(SYM([[3.4, 0], [2.6, 0.75], [-4.0, 1.15], [-4.6, 0.6], [-4.7, 0]]), 0.92, 0.12, P.d, 'dark', { b: 0.05 });
+    for (const s of [-1, 1]) K.box(-0.6, 0.77, s * 1.0, 6.2, 0.04, 0.05, P.c, null, { e: 2.2 });
+    TP(SYM([[4.2, 0], [3.4, 0.7], [1.4, 1.35], [-3.9, 1.55], [-5.0, 1.05], [-5.2, 0]]), 1.32, 0.4, P.b, 'dark', { b: 0.28 });
+    TP(SYM([[3.7, 0], [2.8, 0.62], [0.9, 1.0], [-0.3, 1.0], [-0.6, 0]]), 1.96, 0.24, P.a, 'gloss', { b: 0.2 });
+    TP(SYM([[-0.3, 0.9], [-0.6, 1.35], [-4.4, 1.4], [-5.0, 0.85], [-5.05, 0]]), 1.92, 0.18, P.a, 'gloss', { b: 0.14 });
+    TP(SYM([[3.3, 0], [2.7, 0.44], [1.15, 0.54], [0.7, 0]]), 2.27, 0.04, P.t, 'metal', { b: 0.03 });
+    TP(SYM([[3.05, 0], [2.55, 0.3], [1.3, 0.4], [0.9, 0]]), 2.36, 0.1, P.g, 'glass', { b: 0.16 });
+    K.fine(() => { E._seam(K, P, 3.3, 2.3, 0, 0.03, 0.5); K.cyl(0.55, 2.28, 0, 0.13, 0.15, 0.22, P.b, 'gloss', { seg: 8 }); K.sph(0.55, 2.5, 0, 0.11, P.g, 'glass', { seg: 8, half: true }); E._ventT(K, P, -4.7, 2.15, 0, 0.5, 1.4, 4); });
+    for (const s of [-1, 1]) {
+      TP([[2.45, s * 0.58], [2.1, s * 0.86], [0.4, s * 1.1], [0.6, s * 0.6]], 2.31, 0.03, tc, 'paint', { b: 0.03 });
+      K.box(-1.6, 1.82, s * 1.72, 6.0, 0.05, 0.05, P.c, null, { e: 2.2 });
+      K.light(4.05, 1.4, s * 0.55, 0.12, P.l);
+      E._vent(K, P, 0.4, 1.0, s * 1.68, 1.1, 0.5, s, 3);
+      K.fine(() => { E._vent(K, P, -2.6, 1.0, s * 1.86, 1.0, 0.5, s, 3); for (const x of [1.9, 0.9]) E._bolt(K, P, x, 2.34, s * 0.98); for (const x of [-1.2, -3.8]) E._bolt(K, P, x, 1.6, s * 1.86, s); E._seam(K, P, -1.5, 2.16, s * 1.25, 4.2, 0.03); K.light(-4.6, 1.6, s * 1.6, 0.09, P.c, 2); });
+    }
+    /* tanques-bexiga de carga sobre o convés: cintas de latão, faixa do time, janela violeta, válvulas, mangueiras até a probóscide */
+    for (const s of [-1, 1]) {
+      const z = s * 0.86, ty = 2.86;
+      K.cap(-2.45, ty, z, 0.7, 2.36, P.g, 'glass', { rz: H, seg: 12 });
+      XC(-2.85, ty, z, 0.725, 0.725, 0.5, tc, 'paint', { seg: 12 });
+      K.box(-1.82, ty + 0.68, z, 0.95, 0.05, 0.15, P.l, null, { e: 1.8 });
+      K.fine(() => { for (const x of [-3.75, -1.25]) XC(x, ty, z, 0.75, 0.75, 0.12, P.t, 'metal', { seg: 12 }); XC(-0.62, ty, z, 0.16, 0.2, 0.22, P.t, 'metal', { seg: 8 }); XC(-4.5, ty, z, 0.2, 0.16, 0.22, P.t, 'metal', { seg: 8 }); K.box(-3.0, 2.1, z, 0.22, 0.2, 0.9, P.d, 'metal'); K.box(-1.9, 2.1, z, 0.22, 0.2, 0.9, P.d, 'metal');
+        K.tube([[-0.5, ty, z], [0.3, 2.45, s * 1.25], [2.2, 2.0, s * 1.15], [3.6, 1.8, s * 0.5]], 0.05, P.d, 'rubber', { ts: 10, rs: 5 }); K.cyl(-3.3, ty + 0.66, z, 0.08, 0.1, 0.12, P.t, 'metal', { seg: 6 }); });
+    }
+    /* véus de camuflagem enflechados nas laterais (caídos para fora), com faixa do time e fio teal no bordo */
+    for (const s of [-1, 1]) {
+      TP([[0.9, s * 1.3], [-2.9, s * 3.2], [-4.55, s * 3.35], [-4.35, s * 2.5], [-4.8, s * 1.4]], 1.5, 0.06, P.b, 'glass', { b: 0.05, rx: -H + s * 0.12 });
+      TP([[-0.1, s * 1.8], [-2.7, s * 3.0], [-3.5, s * 3.05], [-1.2, s * 1.8]], 1.62, 0.02, tc, 'paint', { b: 0.02, rx: -H + s * 0.12 });
+      K.seg([0.95, 1.43, s * 1.3], [-2.9, 1.2, s * 3.27], 0.035, P.c, null, { e: 2.4, seg: 5 });
+      K.fine(() => { K.seg([-2.9, 1.2, s * 3.27], [-4.55, 1.18, s * 3.42], 0.03, P.t, 'metal', { seg: 5 }); for (let k = 0; k < 3; k++) E._seam(K, P, -1.3 - k * 0.9, 1.56 - (2.0 + k * 0.35) * 0.12 + 0.02, s * (2.0 + k * 0.35), 0.03, 0.6); K.light(-4.5, 1.12, s * 3.38, 0.1, s > 0 ? P.c : P.l); });
+    }
+    /* vela de camuflagem entre os tanques, com fio teal na borda */
+    K.poly([[-4.3, 0], [-0.9, 0], [-1.7, 1.75], [-3.5, 2.2], [-4.6, 1.3]], 0.08, P.b, 'glass', { y: 2.12, b: 0.02 });
+    K.seg([-1.0, 2.15, 0], [-1.7, 3.87, 0], 0.03, P.c, null, { e: 2.4, seg: 4 }); K.seg([-1.7, 3.87, 0], [-3.5, 4.32, 0], 0.03, P.c, null, { e: 2.4, seg: 4 });
+    K.fine(() => { for (const x of [-1.9, -2.6, -3.3]) K.box(x, 2.4, 0, 0.04, 1.3, 0.12, P.t, 'metal', { pat: 0 }); K.light(-3.5, 4.3, 0, 0.1, P.l, 2.6); });
+    /* probóscide-sifão: soquete facetado, colar, bainha com bobinas teal e anéis de latão, agulha com ponta violeta (acena ao andar) */
+    XP(3.65, 1.62, 0, 0.44, 0.62, 8, P.a, 'gloss', { top: 0.72 }); XC(4.22, 1.62, 0, 0.36, 0.36, 0.08, P.t, 'metal', { seg: 8 });
+    K.anim({ t: 'sway', p: [4.3, 1.62, 0], amp: 0.07, speed: 1.6 }, () => {
+      XC(4.3, 1.62, 0, 0.17, 0.27, 1.25, P.b, 'gloss', { seg: 8 });
+      for (const [x, r] of [[4.8, 0.27], [5.0, 0.25]]) XC(x, 1.62, 0, r, r, 0.06, P.c, null, { e: 2.4, seg: 8 });
+      XC(5.5, 1.62, 0, 0.045, 0.12, 1.15, P.d, 'metal', { seg: 6 });
+      K.cone(6.65, 1.62, 0, 0.07, 0.2, P.l, null, { e: 3, rz: -H, seg: 6 });
+      K.fine(() => { for (const [x, r] of [[4.55, 0.3], [5.25, 0.22]]) XC(x, 1.62, 0, r, r, 0.07, P.t, 'metal', { seg: 8 }); for (const x of [5.85, 6.2]) XC(x, 1.62, 0, 0.09, 0.09, 0.05, P.t, 'metal', { seg: 6 }); });
+    });
+    K.fine(() => { for (const s of [-1, 1]) K.anim({ t: 'sway', p: [3.9, 1.45, s * 0.42], amp: 0.12, speed: 2.6, ph: s }, () => K.tube([[3.9, 1.45, s * 0.42], [4.6, 1.3, s * 0.62], [5.3, 1.38, s * 0.5]], 0.035, P.t, 'metal', { ts: 6, rs: 4 })); });
+    /* quatro casulos antigravidade (balançam), popa com bocais violeta, faixa do time acesa e empenas em V */
+    for (const [x, s, z] of [[2.4, 1, 1.05], [2.4, -1, 1.05], [-3.6, 1, 2.55], [-3.6, -1, 2.55]]) K.anim({ t: 'bob', amp: 0.08, speed: 3, ph: (x > 0 ? 0 : PI) + (s > 0 ? 0 : H) }, () => E._pod(K, P, x, 0.3, s * z, 0.48, 1.05));
+    for (const s of [-1, 1]) {
+      E._bocal(K, P, -5.62, 1.4, s * 0.55, 0.3);
+      K.poly([[-5.5, 0], [-4.5, 0], [-5.1, 0.8], [-5.55, 0.8]], 0.08, P.a, 'gloss', { y: 2.12, z: s * 1.05, rx: s * 0.45, b: 0.03 });
+      K.poly([[-5.4, 0.1], [-4.85, 0.1], [-5.15, 0.55], [-5.4, 0.55]], 0.02, tc, 'paint', { y: 2.15, z: s * 0.98, rx: s * 0.45, b: K.lite ? 0 : 0.02 });
+      K.seg([-4.5, 2.12, s * 1.05], [-5.1, 2.12 + 0.8 * Math.cos(0.45), s * (1.05 + 0.8 * Math.sin(0.45))], 0.035, tc, null, { e: 2.4, seg: 5 });
+    }
+    K.box(-5.47, 1.86, 0, 0.06, 0.07, 1.4, tc, null, { e: 2.2 });
+    E._antena(K, P, [-0.2, 2.2, -1.05], [-0.65, 3.7, -1.1]);
+  },
+  lamina(K, P, tc) { /* 4.3d: Lâmina Rodante — dardo baixo sobre duas rodas-lâmina serrilhadas que tocam o chão (giram: rodam e cortam), aríete de latão em cunha na proa, para-lamas em arco com faixa do time presos por escoras, cabine fumê, casulo traseiro e bocais violeta */
+    const E = U.erevane, TP = (pts, y, th, col, mat, o) => E._tp(K, pts, y, th, col, mat, o), SYM = E._sym, ZC = (...a) => E._zc(K, ...a);
+    K.box(0, 0, 0, 0.08, 0.004, 0.08, P.d, 'dark', { pat: 0 }); /* âncora: a base fica igual nas duas versões (os dentes mudam de número) */
+    const BX = 0.7, BY = 2.1, BZ = 2.55, BR = 2.1; /* centro e raio das rodas-lâmina */
+    const arc = (r0, r1, a0, a1, n) => { const p = []; for (let i = 0; i <= n; i++) { const a = a0 + i / n * (a1 - a0); p.push([Math.cos(a) * r1, Math.sin(a) * r1]); } for (let i = n; i >= 0; i--) { const a = a0 + i / n * (a1 - a0); p.push([Math.cos(a) * r0, Math.sin(a) * r0]); } return p; };
+    for (const s of [-1, 1]) {
+      K.anim({ t: 'spin', p: [BX, BY, s * BZ], axis: 'z', speed: -16 }, () => {
+        const n = K.q(20), pts = []; for (let i = 0; i < n; i++) { const a = i / n * PI * 2; pts.push([Math.cos(a) * BR * 0.87, Math.sin(a) * BR * 0.87]); const a2 = a + PI * 2 / n * 0.62; pts.push([Math.cos(a2) * BR, Math.sin(a2) * BR]); }
+        K.poly(pts, 0.1, '#A9B2BC', 'metal', { x: BX, y: BY, z: s * BZ });
+        ZC(BX, BY, s * BZ, 1.5, 0.18, P.b, 'gloss', { seg: 16 });
+        ZC(BX, BY, s * BZ, 0.6, 0.42, P.t, 'metal', { seg: 10 });
+        K.tor(BX, BY, s * BZ, 1.66, 0.07, P.c, null, { e: 2.2, rx: H, ts: 24, rs: 4 });
+        K.fine(() => { for (let i = 0; i < 5; i++) { const a = i / 5 * PI * 2; K.box(BX + Math.cos(a) * 1.05, BY + Math.sin(a) * 1.05, s * (BZ + 0.1), 0.62, 0.05, 0.04, P.t, 'metal', { rz: a + H }); K.box(BX + Math.cos(a + 0.6) * 1.05, BY + Math.sin(a + 0.6) * 1.05, s * (BZ - 0.1), 0.62, 0.05, 0.04, P.t, 'metal', { rz: a + 0.6 + H }); } ZC(BX, BY, s * (BZ + 0.24), 0.3, 0.1, P.d, 'metal', { seg: 8 }); });
+      });
+      ZC(BX, BY, s * 1.85, 0.24, 1.15, P.d, 'metal', { seg: 10 });
+      K.poly(arc(2.22, 2.44, 0.8, 2.65, K.q(8)), 0.56, P.a, 'gloss', { x: BX, y: BY, z: s * BZ, b: 0.04 });
+      K.poly(arc(2.44, 2.5, 0.9, 2.55, K.q(8)), 0.4, tc, 'paint', { x: BX, y: BY, z: s * BZ });
+      K.seg([-0.55, 2.4, s * 1.25], [-0.95, 3.72, s * 2.3], 0.07, P.b, 'gloss', { seg: 6 }); K.seg([1.6, 2.3, s * 1.2], [2.25, 3.92, s * 2.3], 0.07, P.b, 'gloss', { seg: 6 }); /* escoras do para-lama */
+      K.fine(() => { ZC(BX, BY, s * 1.3, 0.36, 0.12, P.t, 'metal', { seg: 10 }); for (const [x, y] of [[-0.95, 3.72], [2.25, 3.92]]) K.sph(x, y, s * 2.3, 0.12, P.t, 'metal', { seg: 8 }); K.light(BX - 2.0, BY + 1.25, s * 2.55, 0.1, P.l); });
+    }
+    /* casco: chassi acetinado, casco brilhante, cabine fumê com aro de latão, placas do time no convés */
+    TP(SYM([[5.0, 0], [3.9, 0.55], [2.0, 1.0], [-3.4, 1.15], [-4.5, 0.8], [-4.7, 0]]), 1.45, 0.4, P.b, 'dark', { b: 0.26 });
+    TP(SYM([[4.2, 0], [3.1, 0.5], [1.3, 0.85], [-3.0, 0.95], [-3.9, 0.6], [-4.0, 0]]), 2.1, 0.3, P.a, 'gloss', { b: 0.18 });
+    TP(SYM([[2.55, 0], [2.05, 0.48], [0.2, 0.58], [-0.3, 0]]), 2.47, 0.04, P.t, 'metal', { b: 0.03 });
+    TP(SYM([[2.3, 0], [1.85, 0.34], [0.35, 0.44], [-0.1, 0]]), 2.58, 0.12, P.g, 'glass', { b: 0.16 });
+    K.fine(() => { E._seam(K, P, 1.25, 2.8, 0, 0.04, 0.7); E._ventT(K, P, -3.45, 2.44, 0, 0.5, 0.9, 4); K.box(3.1, 2.42, 0, 0.6, 0.06, 0.3, P.d, 'dark'); });
+    for (const s of [-1, 1]) {
+      TP([[-0.5, s * 0.22], [-0.7, s * 0.8], [-2.9, s * 0.85], [-3.1, s * 0.22]], 2.48, 0.03, tc, 'paint', { b: 0.03 });
+      K.box(-0.8, 1.93, s * 1.3, 5.6, 0.05, 0.05, P.c, null, { e: 2.2 });
+      K.light(4.3, 1.55, s * 0.6, 0.12, P.l); K.light(-4.95, 1.95, s * 0.85, 0.12, P.l);
+      E._bocal(K, P, -5.15, 1.5, s * 0.5, 0.3);
+      K.fine(() => { K.poly([[0, 0], [2.2, 0.25], [2.0, 0.42], [0, 0.2]], 0.05, '#A9B2BC', 'metal', { x: -3.4, y: 1.2, z: s * 1.42 }); E._vent(K, P, -2.4, 1.15, s * 1.43, 0.9, 0.45, s, 3); E._bolt(K, P, -1.6, 2.5, s * 0.6); E._bolt(K, P, 2.6, 2.4, s * 0.62); E._seam(K, P, -1.8, 2.44, s * 0.95, 2.4, 0.03); E._bolt(K, P, 3.2, 1.6, s * 1.0, s); });
+    }
+    /* aríete: lâmina de latão em quilha e abas em cunha */
+    K.poly([[3.9, 1.0], [6.0, 1.3], [6.3, 1.55], [5.9, 1.95], [3.9, 2.1]], 0.16, P.t, 'metal', { b: 0.03 });
+    for (const s of [-1, 1]) K.poly([[-0.9, 0.95], [0.9, 1.2], [0.6, 1.9], [-0.9, 2.0]], 0.1, P.a, 'gloss', { x: 4.3, z: s * 0.45, ry: s * 0.5, b: 0.03 });
+    K.fine(() => { for (const x of [4.6, 5.3]) K.cyl(x, 1.55, 0.12, 0.05, 0.06, 0.04, P.d, 'metal', { seg: 6, rx: H }); });
+    /* aerofólio traseiro sobre duas escoras (placa do time e fio teal), casulo traseiro (balança) e antena */
+    for (const s of [-1, 1]) K.seg([-3.55, 2.3, s * 0.55], [-3.85, 2.98, s * 0.75], 0.06, P.d, 'metal', { seg: 6 });
+    TP([[-3.45, 0], [-3.6, 1.25], [-4.3, 1.3], [-4.45, 0], [-4.3, -1.3], [-3.6, -1.25]], 3.04, 0.08, P.a, 'gloss', { b: 0.05 });
+    TP([[-3.6, 0], [-3.72, 1.05], [-4.2, 1.1], [-4.3, 0], [-4.2, -1.1], [-3.72, -1.05]], 3.17, 0.02, tc, 'paint', { b: 0.02 });
+    K.box(-3.5, 2.98, 0, 0.05, 0.05, 2.4, P.c, null, { e: 2.2 });
+    K.anim({ t: 'bob', amp: 0.08, speed: 3 }, () => E._pod(K, P, -3.6, 0.3, 0, 0.55, 1.1));
+    E._antena(K, P, [-2.9, 2.45, 0.55], [-3.3, 3.9, 0.6]);
+  },
+  mosquito(K, P, tc) { /* 4.3d: microdrone-inseto — tórax facetado com placa do time e frisos de latão, cabeça com olhos violeta e ferrão que estoca (recua ao picar), abdome em gomos com faixas do time e luz teal, dois pares de asas de vidro com nervura de latão (batem), bolsa de veneno, patinhas e antenas */
+    const E = U.erevane, TP = (pts, y, th, col, mat, o) => E._tp(K, pts, y, th, col, mat, o), SYM = E._sym, XC = (...a) => E._xc(K, ...a), XP = (...a) => E._xp(K, ...a);
+    K.box(0, 0, 0, 0.06, 0.004, 0.06, P.d, 'dark', { pat: 0 }); /* âncora: base igual nas duas versões (as patinhas só existem na completa) */
+    TP(SYM([[0.7, 0], [0.45, 0.4], [-0.5, 0.45], [-0.75, 0]]), 1.05, 0.24, P.b, 'dark', { b: 0.1 });
+    TP(SYM([[0.55, 0], [0.3, 0.3], [-0.45, 0.34], [-0.65, 0]]), 1.38, 0.12, P.a, 'gloss', { b: 0.1 });
+    TP(SYM([[0.35, 0], [0.15, 0.2], [-0.35, 0.22], [-0.45, 0]]), 1.56, 0.02, tc, 'paint', { b: 0.02 });
+    K.oct(0.95, 0.88, 0, 0.32, 0.56, P.b, 'gloss', { sx: 1.25 });
+    for (const s of [-1, 1]) K.sph(1.02, 1.18, s * 0.2, 0.13, P.l, null, { e: 2.4, seg: 8 });
+    XC(1.25, 1.02, 0, 0.06, 0.1, 0.5, P.t, 'metal', { seg: 6 });
+    K.anim({ t: 'recoil', dist: 0.4 }, () => { K.seg([1.7, 1.02, 0], [3.0, 0.93, 0], 0.045, P.d, 'metal', { taper: 0.15, seg: 6 }); K.fine(() => { K.sph(2.95, 0.935, 0, 0.035, P.l, null, { e: 3, seg: 6 }); for (const x of [1.85, 2.15]) XC(x, 1.01 - (x - 1.7) * 0.07, 0, 0.06, 0.06, 0.04, P.t, 'metal', { seg: 6 }); }); });
+    /* abdome em gomos: faixas do time alternadas, luz teal na ponta */
+    XP(-0.95, 1.12, 0, 0.4, 0.42, 6, tc, 'paint', { top: 1.05 });
+    XP(-1.42, 1.1, 0, 0.36, 0.46, 6, P.a, 'gloss', { top: 1.1 });
+    XP(-1.86, 1.07, 0, 0.27, 0.43, 6, tc, 'paint', { top: 1.3 });
+    XP(-2.25, 1.03, 0, 0.1, 0.38, 6, P.a, 'gloss', { top: 2.6 });
+    K.light(-2.32, 0.98, 0, 0.1, P.c, 2.6);
+    K.fine(() => { for (const [x, r, y] of [[-0.98, 0.43, 1.12], [-1.46, 0.4, 1.1], [-1.89, 0.3, 1.07]]) XC(x, y, 0, r, r, 0.05, P.t, 'metal', { seg: 6 }); K.sph(-0.4, 0.72, 0, 0.22, P.g, 'glass', { seg: 10 }); K.light(-0.4, 0.5, 0, 0.08, P.l, 2.6);
+      for (const s of [-1, 1]) { K.box(0.0, 1.06, s * 0.52, 0.7, 0.22, 0.03, P.t, 'metal'); K.box(0.95, 1.3, s * 0.12, 0.4, 0.05, 0.05, P.t, 'metal', { ry: s * 0.2 }); } K.box(-0.1, 0.78, 0, 0.6, 0.12, 0.34, P.d, 'dark'); K.light(0.2, 0.74, 0, 0.08, P.l); });
+    /* asas: dois pares de vidro fumê com nervura de latão no bordo e fio teal na ponta (batem; o par de trás defasado) */
+    for (const s of [-1, 1]) {
+      K.anim({ t: 'flap', p: [0.15, 1.5, s * 0.3], amp: 0.6, speed: 30, side: -s }, () => {
+        TP([[0.4, s * 0.3], [0.15, s * 1.5], [-0.4, s * 2.6], [-0.85, s * 2.55], [-0.65, s * 1.2], [-0.25, s * 0.3]], 1.5, 0.02, P.g, 'glass', { b: 0.015 });
+        K.seg([0.38, 1.53, s * 0.3], [0.13, 1.53, s * 1.5], 0.035, P.t, 'metal', { seg: 5 }); K.seg([0.13, 1.53, s * 1.5], [-0.42, 1.53, s * 2.62], 0.03, P.t, 'metal', { seg: 5 });
+        K.box(-0.62, 1.51, s * 2.5, 0.42, 0.03, 0.05, P.c, null, { e: 2.2, ry: s * 0.45 });
+        K.fine(() => { K.seg([0.0, 1.53, s * 0.4], [-0.7, 1.53, s * 2.35], 0.015, P.d, 'metal', { seg: 4 }); K.seg([-0.15, 1.53, s * 0.9], [-0.6, 1.53, s * 1.2], 0.015, P.d, 'metal', { seg: 4 }); K.seg([-0.3, 1.53, s * 1.6], [-0.75, 1.53, s * 1.9], 0.015, P.d, 'metal', { seg: 4 }); });
+      });
+      K.anim({ t: 'flap', p: [-0.35, 1.45, s * 0.3], amp: 0.5, speed: 30, ph: 1.6, side: -s }, () => {
+        TP([[-0.2, s * 0.3], [-0.4, s * 1.2], [-0.8, s * 1.9], [-1.15, s * 1.8], [-0.95, s * 0.9], [-0.6, s * 0.3]], 1.45, 0.02, P.g, 'glass', { b: 0.015 });
+        K.seg([-0.22, 1.48, s * 0.3], [-0.82, 1.48, s * 1.92], 0.03, P.t, 'metal', { seg: 5 });
+        K.fine(() => K.seg([-0.5, 1.48, s * 0.45], [-1.05, 1.48, s * 1.7], 0.015, P.d, 'metal', { seg: 4 }));
+      });
+      /* patinhas penduradas (balançam) e antenas */
+      K.fine(() => { for (let i = 0; i < 3; i++) { const x = 0.35 - i * 0.35, hip = [x, 0.86, s * 0.3]; K.anim({ t: 'sway', p: hip, amp: 0.18, speed: 3, ph: i * 1.3 + s }, () => { K.seg(hip, [x + 0.12, 0.48, s * 0.72], 0.03, P.d, 'metal', { seg: 4 }); K.seg([x + 0.12, 0.48, s * 0.72], [x + (i - 1) * 0.25, 0.06, s * 0.88], 0.022, P.d, 'metal', { seg: 4 }); K.sph(x + 0.12, 0.48, s * 0.72, 0.045, P.t, 'metal', { seg: 6 }); }); }
+        K.anim({ t: 'sway', p: [1.1, 1.36, s * 0.12], amp: 0.15, speed: 3.4, ph: s }, () => { K.seg([1.1, 1.36, s * 0.12], [1.62, 1.88, s * 0.42], 0.02, P.d, 'metal', { seg: 4 }); K.light(1.62, 1.84, s * 0.42, 0.06, P.l); }); });
+    }
+  },
+  ancora(K, P, tc) { /* 4.3d: Âncora — tripé que crava estacas no chão (coxas blindadas com placa do time, joelhos de latão, canelas com pistão e caneleira, pés com estaca, garras e anel teal), prumo de campo pendurado sob o corpo (pêndulo), núcleo violeta em gaiola de latão, halo hexagonal largo com nós teal (gira devagar), anel do time inclinado (bamboleia), mastro com ponta violeta */
+    const E = U.erevane;
+    K.base = 0; /* as estacas dos pés afundam no chão */
+    const HIP = 4.3;
+    [0, 2 * PI / 3, 4 * PI / 3].forEach((a, i) => {
+      const ca = Math.cos(a), sa = Math.sin(a), at = (r, y) => [ca * r, y, sa * r];
+      const hip = at(0.85, HIP), knee = at(2.75, 5.35), ankle = at(3.4, 0.75), mid = at(1.8, 4.98), shin = at(3.12, 2.9);
+      K.anim({ t: 'leg', p: hip, amp: 0.18, stride: 7, ph: i * 2 * PI / 3 }, () => {
+        K.seg(hip, knee, 0.3, P.a, 'gloss', { seg: 6 });
+        K.box(mid[0], mid[1], mid[2], 2.0, 0.12, 0.62, P.b, 'gloss', { rz: 0.505, ry: -a }); /* blindagem da coxa */
+        K.box(mid[0] - ca * 0.04, mid[1] + 0.12, mid[2] - sa * 0.04, 1.6, 0.04, 0.46, tc, 'paint', { rz: 0.505, ry: -a }); /* placa do time */
+        K.sph(knee[0], knee[1], knee[2], 0.38, P.t, 'metal', { seg: 10 });
+        K.seg(knee, ankle, 0.22, P.b, 'gloss', { seg: 6, taper: 0.7 });
+        K.box(shin[0] + ca * 0.16, shin[1], shin[2] + sa * 0.16, 0.08, 1.7, 0.4, P.a, 'gloss', { rz: -0.14, ry: -a }); /* caneleira */
+        K.prism(ankle[0], 0.15, ankle[2], 0.42, 0.6, 6, P.d, 'dark', { top: 0.7 });
+        K.cone(ankle[0], 0.2, ankle[2], 0.18, 0.75, P.d, 'metal', { rz: PI, seg: 6 });
+        K.tor(ankle[0], 0.06, ankle[2], 0.5, 0.05, P.c, null, { e: 2.2, ts: 6, rs: 4 });
+        K.fine(() => { K.seg(at(1.6, 4.95), at(3.15, 2.6), 0.07, P.t, 'metal', { seg: 5 }); K.seg(at(1.6, 4.95), at(2.3, 4.0), 0.1, P.d, 'metal', { seg: 6 }); for (let k = 0; k < 3; k++) { const b = a + (k - 1) * 0.9; K.seg([ankle[0] + Math.cos(b) * 0.3, 0.2, ankle[2] + Math.sin(b) * 0.3], [ankle[0] + Math.cos(b) * 0.62, -0.15, ankle[2] + Math.sin(b) * 0.62], 0.05, P.d, 'metal', { taper: 0.3, seg: 4 }); }
+          K.cyl(ankle[0], 0.72, ankle[2], 0.3, 0.3, 0.06, P.t, 'metal', { seg: 6 }); K.light(knee[0] + ca * 0.3, knee[1] + 0.2, knee[2] + sa * 0.3, 0.09, P.c, 2); K.box(knee[0], knee[1] + 0.3, knee[2], 0.5, 0.08, 0.42, P.a, 'gloss', { ry: -a }); });
+      });
+      K.fine(() => { K.cyl(hip[0], hip[1] - 0.2, hip[2], 0.32, 0.32, 0.4, P.t, 'metal', { seg: 8 }); K.tube([at(1.0, 5.2), at(1.9, 5.7), at(2.6, 5.75)], 0.045, P.d, 'rubber', { ts: 8, rs: 5 }); });
+    });
+    /* corpo: cubo, carcaça sextavada com faixa do time, colar de latão, gaiola com o núcleo violeta (gira), tampa e mastro */
+    K.prism(0, 3.7, 0, 0.95, 0.75, 6, P.d, 'dark', { top: 1.35 });
+    K.prism(0, 4.45, 0, 1.55, 0.95, 6, P.a, 'gloss', { top: 0.76 });
+    K.prism(0, 4.72, 0, 1.47, 0.32, 6, tc, 'paint', { top: 0.95 });
+    K.prism(0, 5.38, 0, 1.2, 0.12, 6, P.t, 'metal');
+    for (let i = 0; i < 6; i++) { const a = i / 6 * PI * 2 + PI / 6; K.seg([Math.cos(a) * 1.05, 5.45, Math.sin(a) * 1.05], [Math.cos(a) * 0.72, 7.55, Math.sin(a) * 0.72], 0.065, P.t, 'metal', { seg: 5 }); }
+    K.anim({ t: 'spin', p: [0, 6.5, 0], speed: 1.3 }, () => K.oct(0, 5.6, 0, 0.62, 1.85, P.l, null, { e: 2.6 }));
+    K.prism(0, 7.5, 0, 0.85, 0.24, 6, P.a, 'gloss', { top: 0.65 });
+    K.anim({ t: 'sway', p: [0, 7.74, 0], amp: 0.05, speed: 2.2 }, () => { K.prism(0, 7.74, 0, 0.16, 1.5, 4, P.b, 'gloss', { top: 0.35, ry: PI / 4 }); K.oct(0, 9.3, 0, 0.2, 0.55, P.l, null, { e: 3 }); });
+    K.fine(() => { for (let i = 0; i < 6; i++) { const a = i / 6 * PI * 2; K.light(Math.cos(a) * 1.5, 4.55, Math.sin(a) * 1.5, 0.12, P.l); E._bolt(K, P, Math.cos(a + 0.5) * 1.12, 5.5, Math.sin(a + 0.5) * 1.12); K.box(Math.cos(a + PI / 6) * 1.3, 5.05, Math.sin(a + PI / 6) * 1.3, 0.05, 0.25, 0.5, P.d, 'metal', { ry: -(a + PI / 6), pat: 0 }); } K.prism(0, 7.74, 0, 0.6, 0.08, 6, P.t, 'metal'); K.prism(0, 3.64, 0, 1.0, 0.07, 6, P.t, 'metal'); for (let i = 0; i < 3; i++) { const a = i / 3 * PI * 2 + PI / 3; K.seg([Math.cos(a) * 0.5, 7.7, Math.sin(a) * 0.5], [Math.cos(a) * 0.6, 8.6, Math.sin(a) * 0.6], 0.03, P.d, 'metal', { seg: 4 }); K.light(Math.cos(a) * 0.6, 8.55, Math.sin(a) * 0.6, 0.08, P.c, 2.4); } });
+    /* prumo de campo pendurado sob o corpo (pêndulo): haste de latão, peso facetado, ponta teal que fixa o campo */
+    K.anim({ t: 'sway', p: [0, 3.7, 0], amp: 0.06, speed: 1.4 }, () => { K.seg([0, 3.7, 0], [0, 2.35, 0], 0.07, P.t, 'metal', { seg: 6 }); K.oct(0, 1.2, 0, 0.36, 1.2, P.a, 'gloss'); K.oct(0, 0.95, 0, 0.13, 0.4, P.c, null, { e: 2.6 }); K.fine(() => { K.cyl(0, 2.25, 0, 0.2, 0.2, 0.08, P.t, 'metal', { seg: 6 }); K.cyl(0, 1.78, 0, 0.3, 0.3, 0.05, P.c, null, { e: 2, seg: 6 }); }); });
+    /* halo hexagonal largo com nós teal (gira devagar) e anel do time inclinado (bamboleia) */
+    K.anim({ t: 'spin', p: [0, 6.4, 0], speed: 0.6 }, () => { K.tor(0, 6.4, 0, 3.25, 0.14, P.b, 'gloss', { ts: 6, rs: 4 }); K.tor(0, 6.52, 0, 3.25, 0.05, P.c, null, { e: 2.2, ts: 6, rs: 4 }); ringOf(6, 3.25, (cx, cz) => { K.light(cx, 6.6, cz, 0.18, P.c, 2.4); K.fine(() => { K.prism(cx, 6.2, cz, 0.24, 0.4, 6, P.t, 'metal'); K.prism(cx, 6.1, cz, 0.12, 0.1, 6, P.c, null, { e: 2 }); }); }); });
+    K.anim({ t: 'spin', p: [0, 6.9, 0], speed: -1.1 }, () => K.tor(0, 6.9, 0, 1.7, 0.06, tc, null, { e: 1.8, ts: 12, rs: 4, rz: 0.32 }));
+  },
   atirador(K, P, tc) { U.erevane.infantaria(K, P, tc, { noRifle: true }); K.anim({ t: 'recoil', dist: 0.5 }, () => { K.box(3.2, 4.7, 0.9, 7.4, 0.3, 0.3, P.d, 'metal'); K.cyl(1.6, 5.05, 0.9, 0.22, 0.22, 1.6, P.b, 'gloss', { rz: -H }); K.box(6.95, 4.7, 0.9, 0.5, 0.18, 0.18, P.c, null, { e: 2.4 }); K.box(-0.2, 4.5, 0.9, 1.2, 0.8, 0.4, P.b, 'gloss'); }); },
-  lamina(K, P, tc) { K.poly([[-5, 0.8], [3.4, 0.8], [6.4, 1.2], [2, 2.8], [-4.4, 2.6]], 4.4, P.a, 'gloss', { b: 0.2 });
-    for (const s of [-1, 1]) K.anim({ t: 'spin', p: [1.2, 1.6, s * 2.75], axis: 'z', speed: -22 }, () => { K.cyl(1.2, 1.6, s * 2.75 - 0.15, 2.2, 2.2, 0.3, '#7D8794', 'metal', { rx: H, seg: 20 }); K.tor(1.2, 1.6, s * 2.75, 2.25, 0.08, P.l, null, { e: 2.4, rx: H, ts: 24 }); });
-    K.box(-1.6, 2.75, 0, 3, 0.2, 2, tc, null, { e: 1.6 }); K.cyl(-3.6, 0.3, 0, 1.2, 1.2, 0.2, P.c, null, { e: 1.6 }); },
-  mosquito(K, P, tc) { K.oct(0, 1.2, 0, 0.8, 1.2, P.a, 'gloss', { sx: 2 }); for (const s of [-1, 1]) K.poly([[0, 0], [-1.6, s * 2.6], [-0.4, s * 2.8]], 0.08, P.b, 'glass', { rx: -H, y: 1.8, anim: { t: 'flap', p: [0, 1.8, -s * 0.6], amp: 0.5, speed: 28, side: -s } }); K.light(1.45, 1.7, 0, 0.3, P.l); K.light(-1.45, 1.7, 0, 0.25, tc); },
-  ancora(K, P, tc) { ringOf(3, 2.8, (cx, cz) => K.seg([cx, 0, cz], [cx * 0.25, 5.2, cz * 0.25], 0.32, P.d, 'gloss', { anim: legSpec([cx * 0.25, 5.2, cz * 0.25], { amp: 0.22 }) })); K.sph(0, 6.4, 0, 1.7, P.b, 'glass', { seg: 16 }); K.tor(0, 6.4, 0, 3, 0.12, P.l, null, { e: 2.6, rx: 0.3, ts: 32, anim: { t: 'spin', p: [0, 6.4, 0], speed: 2.4 } }); K.tor(0, 6.4, 0, 2.6, 0.08, tc, null, { e: 2, rz: 0.5, ts: 32, anim: { t: 'spin', p: [0, 6.4, 0], speed: -3 } }); K.anim({ t: 'sway', p: [0, 7.9, 0], amp: 0.08, speed: 2.4 }, () => { K.cone(0, 7.9, 0, 0.35, 2.4, P.a, 'gloss', { seg: 4 }); K.oct(0, 10.4, 0, 0.3, 0.7, P.l, null, { e: 3 }); }); },
 };
 U.tessara = {
   infantaria(K, P, tc, o) { o = o || {};
@@ -784,25 +1363,249 @@ U.tessara = {
         K.seg(hip, knee, 0.44, P.t, 'rubber', { taper: 0.75, seg: 8 }); K.sph(knee[0], knee[1], knee[2], 0.37, P.t, 'bone', { seg: 6 }); K.oct(knee[0], knee[1] + 0.27, knee[2], 0.14, 0.28, P.l, null, { e: 2.1 });
         K.seg(knee, foot, 0.33, P.t, 'rubber', { taper: 0.45, seg: 8 }); spike(knee, [knee[0] + 0.3, 1.2, s * 3.55], 0.12);
         for (const t of [-1, 0, 1]) spike([foot[0], 0.45, foot[2]], [foot[0] + t * 0.62, 0, foot[2] + s * (0.28 - Math.abs(t) * 0.12)], 0.13); }); } },
-  veiculo_hull(K, P, tc) { K.sph(0, 1.4, 0, 1, P.a, 'bone', { half: true, sx: 6.4, sy: 3.2, sz: 4.4, seg: 20 }); for (let i = 0; i < 3; i++) arch(K, 0, 1.4, 0, 6.5, 3.25, 4.5, i * PI / 3 + PI / 6, 0.2, P.t, 'bone');
-    K.tor(0, 1.5, 0, 6.2, 0.4, P.d, 'matte', { sz: 0.7, ts: 30 }); for (const [x, s] of [[-3.6, 1], [-3.6, -1], [3.2, 1], [3.2, -1]]) leg(K, [x, 2, s * 3.6], [x + 0.6, 1.4, s * 5], [x + 0.4, 0, s * 5.2], 0.7, P.b, 'bone');
-    K.sph(6.4, 2, 0, 1.5, P.b, 'bone', { sx: 1.2, seg: 12 }); K.light(7.75, 2.4, 0.6, 0.3, P.l); K.light(7.75, 2.4, -0.6, 0.3, P.l); K.box(-1, 4.4, 0, 5, 0.3, 2, tc, 'skin', { b: 0.12 }); K.mount = 4.4; },
-  veiculo_turret(K, P, tc) { KITS.tessara.turret(K, P, tc, 0.8, false); },
-  drone(K, P, tc) { K.sph(0, 2, 0, 1.3, P.a, 'bone', { sx: 2, seg: 14 }); K.sph(2.4, 2.2, 0, 0.8, P.b, 'bone', { seg: 10 }); K.light(3.15, 2.4, 0.35, 0.22, P.l); K.light(3.15, 2.4, -0.35, 0.22, P.l);
-    for (const s of [-1, 1]) { K.sph(0.4, 2.8, s * 2.6, 1, '#CFF3D8', 'wet', { sx: 1.1, sy: 0.08, sz: 2.4, ry: s * 0.3, seg: 12, anim: { t: 'flap', p: [0.4, 2.8, s * 0.9], amp: 0.6, speed: 24, side: s } }); K.sph(-1.2, 2.6, s * 2.2, 1, '#BFE8C8', 'wet', { sx: 0.8, sy: 0.07, sz: 1.8, ry: -s * 0.4, seg: 12, anim: { t: 'flap', p: [-1.2, 2.6, s * 0.9], amp: 0.5, speed: 24, ph: 1.2, side: s } }); }
-    K.sph(-2.3, 2, 0, 0.6, P.l, null, { e: 1.6, seg: 10 }); K.box(0, 3.2, 0, 1.6, 0.2, 0.6, tc, 'skin'); },
-  suporte(K, P, tc) { K.sph(0, 2.4, 0, 1.8, P.a, 'bone', { sy: 1.2, seg: 14 }); ringOf(5, 1.9, (cx, cz, a) => K.sph(cx, 3.6, cz, 1.2, '#8FD8A0', 'skin', { sx: 0.35, sy: 1.5, sz: 0.8, ry: -a, seg: 10, anim: { t: 'sway', p: [cx, 2.4, cz], amp: 0.12, speed: 2.2, ph: a } })); K.sph(0, 4.6, 0, 0.8, P.l, null, { e: 2.2, seg: 12 }); K.cyl(0, 0.5, 0, 1.6, 1.8, 0.2, P.l, null, { e: 1.2 }); K.box(0, 1.2, 0, 2, 0.3, 2, tc, 'skin', { b: 0.1 }); },
-  pirata(K, P, tc) { K.sph(0, 1.2, 0, 1, P.a, 'bone', { half: true, sx: 4.4, sy: 2.6, sz: 3, seg: 16 }); for (const x of [-2.4, 0, 2.4]) for (const s of [-1, 1]) leg(K, [x, 1.6, s * 2.4], [x + 0.6, 1.4, s * 3.8], [x + 0.4, 0, s * 4], 0.3, P.b, 'bone');
-    K.sph(-2, 3.3, 0, 1.4, '#9EE6B0', null, { e: 1.1, seg: 12 }); K.anim({ t: 'sway', p: [1.4, 3.4, 0], amp: 0.08, speed: 2.4 }, () => { K.tube([[1.4, 3.4, 0], [3, 5.6, 0], [5.4, 5.4, 0], [6.4, 3.2, 0]], 0.3, P.t, 'bone', { ts: 14 }); K.cone(6.4, 3.4, 0, 0.45, 1.6, P.l, null, { e: 2, rz: PI }); }); K.box(0, 3.8, 0, 3, 0.3, 1.4, tc, 'skin'); },
+  /* ---------- 4.3d: frota Tessara no nível do coletor 4.3a (veículo, drone, suporte, Enxerto, esporo, molde, colosso). Ajudantes com '_' ficam neste bloco (U.tessara._nome) e não viram unidade ---------- */
+  // 4.3d: fotóforo (octaedro aceso no verde da Raça; pequeno de propósito: brilho verde grande lê como o recurso Dados)
+  _foto(K, P, x, y, z, s, k) { K.oct(x, y - s, z, s * 0.5, s * 2, P.l, null, { e: k || 2.1 }); },
+  // 4.3d: espinho de osso de a até b (pirâmide de 4 lados, escura na base e clara na ponta; barato, fica nas duas versões)
+  _espinho(K, P, a, b, r, c0) { K.spike(a, b, r, '#FFFFFF', 'bone', { n: 4, c0: c0 || P.t, c1: '#EDE4CC' }); },
+  // 4.3d: saco de seiva âmbar (vidro com o miolo aceso aparecendo no topo, como no coletor)
+  _saco(K, P, x, y, z, sx, sy, sz, sg, k, col) { K.sph(x, y, z, 1, P.am, 'glass', { sx, sy, sz, seg: sg }); K.sph(x, y + sy * 0.12, z, 1, col || P.am, null, { e: k || 1.5, sx: sx * 0.76, sy, sz: sz * 0.76, seg: Math.max(6, sg - 4) }); },
+  // 4.3d: cano liso (curva Catmull-Rom amostrada) montado com trunk: mais barato que tube e com menos lados e trechos na versão leve; raio r → o.r1, o.n lados, o.k amostras por trecho
+  _cano(K, pts, r, col, mat, o) { o = o || {}; const c = new T.CatmullRomCurve3(pts.map(p => new T.Vector3(p[0], p[1], p[2]))), m = Math.max(2, Math.round((pts.length - 1) * (o.k || 3) * (K.lite ? 0.5 : 1))), r1 = o.r1 == null ? r : o.r1;
+    K.trunk(c.getPoints(m).map((v, i) => [v.x, v.y, v.z, r + (r1 - r) * i / m]), col, mat, { n: o.n || 5, c0: o.c0, c1: o.c1, e: o.e }); },
+  // 4.3d: arco (meia elipse em pé no plano de azimute phi; A e D semi-eixos na horizontal, Hh altura, negativo desce) feito com _cano
+  _arco(K, x, y, z, A, Hh, D, phi, r, col, mat, o) { const pts = []; for (let i = 0; i <= 6; i++) { const th = i / 6 * PI; pts.push([x + A * Math.cos(th) * Math.cos(phi), y + Hh * Math.sin(th), z + D * Math.cos(th) * Math.sin(phi)]); } U.tessara._cano(K, pts, r, col, mat, Object.assign({ k: 1.3, n: 5 }, o)); },
+  // 4.3d: veio aceso (cano fino verde-esmeralda); só na versão completa
+  _veio(K, pts, r, k) { K.fine(() => U.tessara._cano(K, pts, r || 0.05, '#55E68A', null, { e: k || 1.5, n: 3, k: 2 })); },
+  // 4.3d: folha fotossintética (elipsoide achatado de bx,by,bz no azimute az e elevação el, com nervura) que balança da base
+  _folha(K, bx, by, bz, az, el, len, wid, col, o) { o = o || {}; const c = Math.cos(el), ux = c * Math.cos(az), uy = Math.sin(el), uz = c * Math.sin(az);
+    const f = () => { K.sph(bx + ux * len, by + uy * len, bz + uz * len, 1, col, 'wet', { sx: len, sy: 0.07, sz: wid, ry: -az, rz: el, seg: 8 }); K.fine(() => K.seg([bx, by + 0.05, bz], [bx + ux * len * 1.85, by + uy * len * 1.85 + 0.06, bz + uz * len * 1.85], 0.035, '#A9D98F', 'bone', { taper: 0.3, seg: 4 })); };
+    if (o.sway === false) f(); else K.anim({ t: 'sway', p: [bx, by, bz], amp: o.amp || 0.06, speed: o.speed || 1.5, ph: o.ph != null ? o.ph : az }, f); },
+  // 4.3d: escudo de osso hexagonal (placa de casco) assentado no ponto p com a normal n: raio r, espessura h (chanfrado no topo)
+  _escudo(K, P, p, n, r, h, col) { const L = Math.hypot(n[0], n[1], n[2]) || 1, nx = n[0] / L, ny = n[1] / L, nz = n[2] / L; K.prism(p[0] - nx * h * 0.35, p[1] - ny * h * 0.35, p[2] - nz * h * 0.35, r, h, 6, col || P.a, 'bone', { top: 0.74, rz: -Math.asin(nx), rx: Math.atan2(nz, ny) }); },
+  // 4.3d: casco de escudos hexagonais em grade sobre o domo elipsoide MB = [cx, cy, A, B, C]; ok(x, z, q) escolhe as células, f(p, n, q, i, j) enfeita cada uma
+  _escudos(K, P, MB, R, h, ok, f) { const DX = Math.sqrt(3) * R * 1.1, DZ = 1.5 * R * 1.1, nj = Math.ceil(MB[4] / DZ), ni = Math.ceil(MB[2] / DX) + 1;
+    for (let j = -nj; j <= nj; j++) for (let i = -ni; i <= ni; i++) { const x = MB[0] + (i + (j & 1 ? 0.5 : 0)) * DX, z = j * DZ, u = (x - MB[0]) / MB[2], w = z / MB[4], q = u * u + w * w; if (q > 1.04 || !ok(x, z, q)) continue;
+      const y = MB[1] + MB[3] * Math.sqrt(Math.max(0, 1 - q)), n = [u / MB[2], (y - MB[1]) / (MB[3] * MB[3]), w / MB[4]]; U.tessara._escudo(K, P, [x, y, z], n, R * (q > 0.7 ? 0.84 : 1), h, q > 0.7 ? '#E6DCC4' : (i + j) & 1 ? P.a : P.b); if (f) f([x, y, z], n, q, i, j); } },
+  // 4.3d: perna-raiz (família do coletor): coxa de casca sulcada, joelho de osso com fotóforo, canela afinando e garras; balança do quadril (leg)
+  _perna(K, P, hip, knee, foot, r, o) { o = o || {}; const s = foot[2] >= 0 ? 1 : -1, X = U.tessara;
+    K.anim(legSpec(hip, { amp: o.amp || 0.3, stride: o.stride || 6, ph: o.ph != null ? o.ph : (s > 0 ? 0 : PI) }), () => {
+      K.seg(hip, knee, r, o.col || P.t, 'rubber', { taper: 0.8, seg: 8 }); if (K.lite) K.oct(knee[0], knee[1] - r * 0.9, knee[2], r * 0.95, r * 1.8, P.b, 'bone', { ry: 0.4 }); else K.sph(knee[0], knee[1], knee[2], r * 0.92, P.b, 'bone', { seg: 7 }); if (o.foto !== false) X._foto(K, P, knee[0], knee[1] + r * 0.95, knee[2], Math.max(0.09, r * 0.3));
+      K.seg(knee, foot, r * 0.8, o.col || P.t, 'rubber', { taper: 0.5, seg: 8 });
+      const cl = o.claws == null ? 3 : o.claws; for (let i = 0; i < cl; i++) { const t = cl > 1 ? i / (cl - 1) * 2 - 1 : 0; X._espinho(K, P, [foot[0], foot[1] + r * 0.4, foot[2]], [foot[0] + (t * 1.4 + 0.5) * r, 0, foot[2] + s * (0.6 - Math.abs(t) * 0.35) * r * (cl > 1 ? 1 : 0.2)], r * 0.36); }
+      K.fine(() => X._espinho(K, P, knee, [knee[0] - r * 0.5, knee[1] + r * 1.7, knee[2] + s * r * 0.9], r * 0.3)); }); },
+  // 4.3d: esteira de músculo — banda de carne em estádio (perfil lateral extrudado em z) com garras de chifre no trecho de cima que rolam com a distância (tread),
+  // 4.3d: cubos de osso com raios nas pontas que giram (wheel), capas de chifre sobre as pontas (escondem o salto das garras) e tendão no flanco
+  _esteira(K, P, z, L, h, w, o) { o = o || {}; const s = z > 0 ? 1 : -1, r = h / 2, xe = L / 2 - r, b = 0.12, n = K.lite ? 4 : 7, pts = [], X = U.tessara;
+    for (let i = 0; i <= n; i++) { const a = -H + i / n * PI; pts.push([xe + Math.cos(a) * (r - b), r + Math.sin(a) * (r - b)]); }
+    for (let i = 0; i <= n; i++) { const a = H + i / n * PI; pts.push([-xe + Math.cos(a) * (r - b), r + Math.sin(a) * (r - b)]); }
+    K.poly(pts, w - 2 * b, P.d, 'skin', { z, b });
+    const nc = K.q(Math.max(4, Math.round(2 * xe / (o.sp || 1.0)))), sp = 2 * xe / nc;
+    K.anim({ t: 'tread', spacing: sp }, () => { for (let i = 0; i < nc; i++) K.prism(-xe + (i + 0.5) * sp, h - 0.2, z - (w + 0.1) / 2, 0.24, w + 0.1, K.lite ? 4 : 5, P.t, 'bone', { rx: H }); });
+    for (const x of [-xe, xe]) { K.anim({ t: 'wheel', p: [x, r, z], r }, () => { const zo = z + s * (w / 2 - 0.02);
+        K.cyl(x, r, zo, r * 0.58, r * 0.66, 0.14, P.b, 'bone', { rx: s * H, seg: 10 });
+        for (let i = 0; i < (K.lite ? 1 : 3); i++) { const a = i / 3 * PI * 2 + 0.3; K.box(x + Math.cos(a) * r * 0.3, r + Math.sin(a) * r * 0.3 - 0.06, zo + s * 0.1, r * 0.62, 0.13, 0.12, P.t, 'bone', { rz: a }); }
+        K.oct(x, r - r * 0.18, zo + s * 0.16, r * 0.2, r * 0.36, P.t, 'bone', { rx: H }); });
+      K.fine(() => K.sph(x + Math.sign(x) * 0.35, h - 0.1, z, 1, P.d, 'bone', { sx: r * 0.62, sy: 0.3, sz: w * 0.54, seg: 8 })); }
+    K.fine(() => X._cano(K, [[-xe, r + 0.05, z + s * (w / 2 + 0.03)], [0, r + 0.14, z + s * (w / 2 + 0.07)], [xe, r + 0.05, z + s * (w / 2 + 0.03)]], 0.08, P.t, 'skin', { n: 4, k: 3 })); },
+  // 4.3d: corpo baixo de quatro pernas-raiz (suporte e molde): ventre de carne, casco de osso, faixas da cor do time, cabecinha com viseira e olhos
+  _base4(K, P, tc, k) { k = k || 1; const X = U.tessara, Y = 1.75 * k;
+    K.sph(0, Y, 0, 1, P.d, 'skin', { sx: 2.05 * k, sy: 0.95 * k, sz: 1.5 * k, seg: 12 });
+    K.sph(0.05 * k, Y + 0.2 * k, 0, 1, P.a, 'bone', { half: true, sx: 1.95 * k, sy: 0.9 * k, sz: 1.42 * k, seg: 12 });
+    for (const s of [-1, 1]) K.sph(-0.1 * k, Y + 0.35 * k, s * 1.12 * k, 1, tc, 'skin', { sx: 1.45 * k, sy: 0.32 * k, sz: 0.3 * k, rx: s * 0.5, seg: 10 });
+    K.sph(1.85 * k, Y + 0.1 * k, 0, 1, P.b, 'bone', { sx: 0.62 * k, sy: 0.6 * k, sz: 0.7 * k, seg: 10 }); K.sph(2.3 * k, Y + 0.2 * k, 0, 1, P.g, 'glass', { sx: 0.24 * k, sy: 0.3 * k, sz: 0.5 * k, seg: 8 });
+    for (const s of [-1, 1]) X._foto(K, P, 2.15 * k, Y + 0.57 * k, s * 0.34 * k, 0.1 * k);
+    for (const [hx, kx, fx, ph] of [[1.05, 1.8, 2.3, 0], [-1.05, -1.75, -2.25, PI]]) for (const s of [-1, 1]) X._perna(K, P, [hx * k, Y - 0.05 * k, s * 1.0 * k], [kx * k, Y + 0.75 * k, s * 2.0 * k], [fx * k, 0.2 * k, s * 2.3 * k], 0.32 * k, { ph: (s > 0 ? 0 : PI) + ph, amp: 0.34, stride: 5 * k });
+    for (const s of [-1, 1]) for (const x of [0.9, 0, -0.9]) X._espinho(K, P, [x * k, Y + 1.0 * k, s * 0.75 * k], [(x - 0.35) * k, Y + 1.45 * k, s * 1.0 * k], 0.09 * k); },
+  veiculo_hull(K, P, tc) { /* 4.3d: besta-tanque — esteiras de músculo com garras de chifre que rolam, ventre de carne, glacis de osso com quilha e espinhos, membrana do time com costelas grossas em volta do colar da torre, cabeça-aríete com presas e viseira, vinhas com folhas nas bordas, sacos de seiva âmbar na garupa */
+    const X = U.tessara, VN = '#4F6B3A', LF = '#5DA865', LF2 = '#7CC47F', ZT = 3.85, TW = 1.9, TH = 2.3, TL = 12.4;
+    for (const s of [-1, 1]) X._esteira(K, P, s * ZT, TL, TH, TW);
+    // 4.3d: corpo: ventre de carne e membrana do time em domo baixo
+    K.sph(-0.2, 1.95, 0, 1, P.d, 'skin', { sx: 6.0, sy: 1.35, sz: 2.95, seg: 14 });
+    const MB = [-0.6, 2.35, 5.2, 1.6, 2.8], on = (x, z, up) => [x, MB[1] + (MB[3] + (up || 0)) * Math.sqrt(Math.max(0, 1 - ((x - MB[0]) / MB[2]) ** 2 - (z / MB[4]) ** 2)), z];
+    K.sph(MB[0], MB[1], 0, 1, tc, 'skin', { half: true, sx: MB[2], sy: MB[3], sz: MB[4], seg: 16 });
+    // 4.3d: glacis: escudos hexagonais de osso sobre a membrana (família do colosso), com espinhos no meio
+    X._escudos(K, P, MB, 0.72, 0.36, (x, z) => x > 1.8 && Math.hypot(x, z) > 2.35, (pp, n, q, i, j) => { if (Math.abs(pp[2]) < 0.1) X._espinho(K, P, [pp[0] + 0.1, pp[1] + 0.25, 0], [pp[0] - 0.4, pp[1] + 0.85, 0], 0.15);
+      K.fine(() => { if ((i + j) & 1) X._cano(K, [[pp[0] + 0.7, pp[1] - 0.1, pp[2] - 0.15], [pp[0] + 0.1, pp[1] - 0.04, pp[2] + 0.72], [pp[0] - 0.65, pp[1] - 0.1, pp[2] + 0.3]], 0.035, '#55E68A', null, { e: 1.5, n: 3, k: 2 }); }); });
+    // 4.3d: costelas grossas em arco sobre a membrana atrás e dos lados do colar
+    for (const x of (K.lite ? [-2.45, -3.85] : [-2.2, -3.0, -3.8])) { const p = on(x, 0, 0); X._arco(K, x, MB[1], 0, 0.01, p[1] - MB[1] + 0.12, MB[4] * Math.sqrt(Math.max(0.05, 1 - ((x - MB[0]) / MB[2]) ** 2)) + 0.1, H, 0.2, P.a, 'bone'); }
+    for (const s of [-1, 1]) for (const x0 of (K.lite ? [1.1, -0.9] : [1.55, 0.5, -0.55, -1.5])) X._cano(K, [0, 0.5, 1].map(t => on(x0 - 0.35 * t, s * (2.05 + 0.75 * t), 0.08)), 0.12, P.a, 'bone', { n: 4, k: 2 });
+    // 4.3d: colar da torre (anel de carne com aro de osso)
+    K.cyl(0, 3.3, 0, 1.95, 2.15, 0.62, P.d, 'skin', { seg: 16 }); K.tor(0, 3.88, 0, 1.98, 0.17, P.t, 'bone', { ts: 16, rs: 5 }); K.mount = 3.92;
+    // 4.3d: vinhas escuras nas bordas com folhas, fotóforos e veios no flanco
+    for (const s of [-1, 1]) { X._cano(K, [[5.4, 2.35, s * 1.85], [4.3, 2.75, s * 2.35], [2.8, 2.95, s * 2.62], [1.2, 2.9, s * 2.72], [-0.7, 2.98, s * 2.7], [-2.5, 2.92, s * 2.62], [-4.0, 2.75, s * 2.45], [-5.4, 2.35, s * 1.95]], 0.09, VN, 'skin', { n: 4, k: 2 });
+      for (const [x, y, z, az, col] of [[3.4, 2.98, 2.58, 0.6, LF], [-1.5, 2.98, 2.72, 1.4, LF2], [-4.5, 2.7, 2.35, 2.2, LF]]) X._folha(K, x, y, s * z, s * az, 0.35, 0.42, 0.24, col, { ph: x });
+      for (const x of [2.0, -1.0]) X._foto(K, P, x, 2.75, s * 2.82, 0.13); X._veio(K, [[4.2, 2.3, s * 2.6], [2.2, 2.55, s * 2.85], [0, 2.5, s * 2.92], [-2.2, 2.55, s * 2.85], [-4.3, 2.3, s * 2.55]], 0.05); }
+    // 4.3d: cabeça-aríete: massa de osso, testa, viseira de vidro, olhos, presas e mandíbulas que balançam
+    K.sph(5.75, 1.75, 0, 1, P.b, 'bone', { sx: 1.15, sy: 0.98, sz: 1.3, seg: 12 }); K.sph(5.8, 2.28, 0, 1, P.a, 'bone', { sx: 1.2, sy: 0.55, sz: 1.42, rz: -0.32, seg: 12 });
+    K.sph(6.68, 1.95, 0, 1, P.g, 'glass', { sx: 0.4, sy: 0.34, sz: 0.85, seg: 10 }); K.sph(6.55, 1.32, 0, 1, P.d, 'skin', { sx: 0.55, sy: 0.38, sz: 0.75, seg: 8 });
+    for (const s of [-1, 1]) { for (const [x, y, z] of [[6.4, 2.55, 0.42], [6.12, 2.7, 0.8], [5.75, 2.76, 1.13]]) X._foto(K, P, x, y, s * z, 0.11);
+      K.trunk([[6.45, 1.35, s * 0.95, 0.34], [7.35, 1.35, s * 1.25, 0.24], [8.05, 1.85, s * 1.45, 0.1], [8.3, 2.3, s * 1.45, 0]], '#FFFFFF', 'bone', { n: 7, c0: P.b, c1: '#EDE4CC' });
+      K.anim({ t: 'sway', p: [6.6, 1.05, s * 0.5], amp: 0.1, speed: 2.6, ph: s > 0 ? 0 : PI }, () => K.trunk([[6.5, 1.05, s * 0.5, 0.17], [7.3, 0.8, s * 0.42, 0.12], [7.75, 0.95, s * 0.12, 0.02]], P.t, 'bone', { n: 5 })); }
+    // 4.3d: garupa: dois sacos de seiva âmbar num berço de costelas, espinhaço até a cauda, respiro aceso
+    for (const s of [-1, 1]) X._saco(K, P, -4.8, 2.85, s * 1.12, 1.05, 0.85, 0.92, 12);
+    X._arco(K, -5.55, 2.4, 0, 0.01, 1.4, 2.05, H, 0.13, P.a, 'bone');
+    X._cano(K, [[-2.0, 3.98, 0], [-3.4, 3.98, 0], [-4.8, 3.78, 0], [-5.75, 3.05, 0], [-6.15, 2.25, 0]], 0.15, P.b, 'bone', { n: 5, k: 2 });
+    K.cyl(-6.0, 1.95, 0, 0.32, 0.46, 0.45, P.t, 'bone', { rz: H, seg: 10 }); K.light(-6.5, 1.95, 0, 0.3, P.am, 2.0);
+    K.fine(() => { for (const s of [-1, 1]) X._cano(K, [[-3.2, 2.55, s * 2.3], [-4.3, 2.15, s * 2.25], [-5.6, 2.35, s * 1.7]], 0.07, P.t, 'skin', { n: 4, k: 2 }); }); },
+  veiculo_turret(K, P, tc) { /* 4.3d: canhão vivo — colar de carne, crânio de osso com crista da cor do time e chifres, cano de chifre escuro em anéis com boca de dentes e miolo aceso (recua), sacos de seiva que alimentam o tiro, bulbo de esporos atrás */
+    const X = U.tessara;
+    K.cyl(0, 0, 0, 1.72, 1.95, 0.5, P.d, 'skin', { seg: 16 }); K.tor(0, 0.44, 0, 1.76, 0.15, P.t, 'bone', { ts: 16, rs: 5 });
+    K.sph(-0.1, 0.95, 0, 1, P.a, 'bone', { sx: 2.35, sy: 1.15, sz: 1.95, seg: 16 });
+    K.sph(-0.15, 1.82, 0, 1, tc, 'skin', { half: true, sx: 1.8, sy: 0.55, sz: 0.72, seg: 12 });
+    K.fine(() => { for (const s of [-1, 1]) for (let i = 0; i < 5; i++) { const x = 1.3 - i * 0.75, y = 1.95 - Math.abs(x + 0.15) * 0.18; K.oct(x, y - 0.1, s * 1.22, 0.12, 0.2, P.b, 'bone'); } for (const s of [-1, 1]) for (let i = 0; i < 3; i++) K.box(-0.4 - i * 0.42, 0.75, s * 1.9, 0.12, 0.42, 0.1, P.d, 'skin', { ry: s * 0.15 }); });
+    for (const s of [-1, 1]) { X._cano(K, [[1.85, 1.45, s * 0.86], [0.6, 2.1, s * 0.98], [-0.9, 2.08, s * 0.98], [-2.15, 1.45, s * 0.8]], 0.15, P.b, 'bone', { n: 5, k: 2 }); X._espinho(K, P, [-1.35, 1.95, s * 0.85], [-2.35, 2.6, s * 1.15], 0.16); }
+    K.sph(1.9, 1.42, 0, 1, P.g, 'glass', { sx: 0.3, sy: 0.3, sz: 0.62, rz: -0.5, seg: 10 }); for (const s of [-1, 1]) { X._foto(K, P, 1.72, 1.66, s * 0.66, 0.11); X._foto(K, P, 1.4, 1.86, s * 0.98, 0.1); }
+    K.sph(1.95, 0.85, 0, 1, P.d, 'skin', { sx: 0.72, sy: 0.64, sz: 0.78, seg: 10 });
+    K.anim({ t: 'recoil', dist: 0.7 }, () => {
+      K.trunk([[1.9, 0.95, 0, 0.55], [3.1, 1.0, 0, 0.47], [4.35, 1.05, 0, 0.42], [5.35, 1.1, 0, 0.4], [5.75, 1.1, 0, 0.52]], '#FFFFFF', 'bone', { n: 10, c0: P.t, c1: P.b });
+      for (const x of [2.75, 3.85, 4.95]) { const rr = 0.56 - (x - 2.75) * 0.035; K.cyl(x - 0.1, 1.02 + (x - 2.75) * 0.04, 0, rr, rr, 0.2, P.a, 'bone', { rz: -H, seg: 10 }); }
+      for (let i = 0; i < K.q(6); i++) { const a = i / K.q(6) * PI * 2 + 0.5; X._espinho(K, P, [5.7, 1.1 + Math.cos(a) * 0.42, Math.sin(a) * 0.42], [6.35, 1.1 + Math.cos(a) * 0.72, Math.sin(a) * 0.72], 0.13); }
+      K.sph(5.8, 1.1, 0, 0.3, P.am, null, { e: 2.3, seg: 8 }); X._veio(K, [[2.1, 1.56, 0], [3.8, 1.55, 0], [5.4, 1.56, 0]], 0.05); });
+    for (const s of [-1, 1]) { X._saco(K, P, -0.55, 0.72, s * 1.85, 0.8, 0.58, 0.55, 10); X._cano(K, [[-0.2, 0.95, s * 1.62], [0.9, 1.12, s * 1.05], [1.75, 1.0, s * 0.5]], 0.09, P.t, 'skin', { n: 4, k: 2 }); }
+    K.bulb([[0.62, 0], [0.88, 0.32], [0.9, 0.75], [0.66, 1.12], [0.26, 1.38], [0, 1.42]], -2.0, 0.95, 0, P.b, 'bone', { n: 10, ribs: 5, rk: 0.08, rz: H });
+    K.light(-3.45, 0.95, 0, 0.22, P.am, 2.0); },
+  drone(K, P, tc) { /* 4.3d: planador vivo — fuselagem de osso com faixa do time e folhinhas no dorso, asas-folha com dedos de osso e membrana da cor do time (batem), asas de trás de folha, cauda com barbatana que balança, mandíbulas-metralha que recuam, saco de seiva e gavinhas penduradas */
+    const X = U.tessara, LF = '#5DA865', LF2 = '#7CC47F';
+    K.sph(0, 1.5, 0, 1, P.d, 'skin', { sx: 2.3, sy: 0.68, sz: 0.8, seg: 12 }); K.sph(0.15, 1.62, 0, 1, P.a, 'bone', { half: true, sx: 2.2, sy: 0.72, sz: 0.78, seg: 12 });
+    K.sph(-0.35, 2.05, 0, 1, tc, 'skin', { half: true, sx: 1.5, sy: 0.32, sz: 0.42, seg: 10 });
+    K.sph(2.2, 1.6, 0, 1, P.b, 'bone', { sx: 0.75, sy: 0.62, sz: 0.66, seg: 10 }); K.sph(2.2, 1.95, 0, 1, P.a, 'bone', { half: true, sx: 0.62, sy: 0.3, sz: 0.68, seg: 8 });
+    K.sph(2.82, 1.62, 0, 1, P.g, 'glass', { sx: 0.24, sy: 0.3, sz: 0.48, seg: 8 }); for (const s of [-1, 1]) X._foto(K, P, 2.62, 2.0, s * 0.36, 0.1);
+    K.anim({ t: 'recoil', dist: 0.35 }, () => { for (const s of [-1, 1]) { K.trunk([[2.45, 1.2, s * 0.38, 0.17], [3.35, 1.14, s * 0.36, 0.13], [3.85, 1.14, s * 0.34, 0.11]], P.t, 'bone', { n: 6 }); K.light(3.9, 1.08, s * 0.34, 0.17, P.am, 2.2); } });
+    for (const s of [-1, 1]) {
+      K.anim({ t: 'flap', p: [0.4, 1.95, s * 0.7], amp: 0.32, speed: 7, side: s }, () => {
+        if (K.lite) K.sph(-0.05, 2.0, s * 2.9, 1, tc, 'skin', { sx: 1.5, sy: 0.06, sz: 2.35, ry: -s * 0.22, seg: 12 });
+        else for (const [x, z, sx, sz, ry] of [[0.25, 4.15, 0.95, 1.25, -0.5], [-0.05, 2.95, 1.25, 1.1, -0.15], [-0.15, 1.6, 1.15, 0.95, 0.15]]) K.sph(x, 2.0, s * z, 1, tc, 'skin', { sx, sy: 0.06, sz, ry: s * ry, seg: 10 });
+        X._cano(K, [[0.4, 2.02, s * 0.75], [0.8, 2.14, s * 2.6], [0.3, 2.1, s * 4.4], [-0.25, 2.04, s * 5.2]], 0.11, P.t, 'bone', { n: 5, k: 2, r1: 0.04 });
+        for (const [x, z] of [[-0.55, 4.25], [-1.15, 2.7]]) X._cano(K, [[0.35, 2.03, s * 0.8], [(0.35 + x) / 2, 2.07, s * (0.8 + z) / 2], [x, 2.03, s * z]], 0.07, P.b, 'bone', { n: 4, k: 1.5, r1: 0.03 });
+        X._foto(K, P, 0.82, 2.25, s * 2.6, 0.11); X._espinho(K, P, [0.8, 2.12, s * 2.6], [1.35, 2.2, s * 2.75], 0.08);
+        X._veio(K, [[0.5, 2.09, s * 1.2], [0.1, 2.08, s * 2.8], [-0.4, 2.07, s * 4.2]], 0.035, 1.6); });
+      K.anim({ t: 'flap', p: [-1.3, 1.85, s * 0.5], amp: 0.4, speed: 9, ph: 1.3, side: s }, () => {
+        K.sph(-1.65, 1.85, s * 1.55, 1, LF2, 'wet', { sx: 0.72, sy: 0.05, sz: 1.12, ry: -s * 0.4, seg: 8 });
+        X._cano(K, [[-1.3, 1.88, s * 0.5], [-1.6, 1.9, s * 1.6], [-2.15, 1.88, s * 2.5]], 0.06, P.b, 'bone', { n: 4, k: 1.5, r1: 0.03 }); }); }
+    K.anim({ t: 'sway', p: [-2.0, 1.6, 0], amp: 0.12, speed: 2.4 }, () => { K.trunk([[-1.9, 1.6, 0, 0.32], [-2.9, 1.55, 0, 0.22], [-3.8, 1.7, 0, 0.11], [-4.25, 1.82, 0, 0]], '#FFFFFF', 'bone', { n: 6, c0: P.b, c1: P.a });
+      K.sph(-3.95, 1.95, 0, 1, LF, 'wet', { sx: 0.55, sy: 0.34, sz: 0.05, rz: 0.3, seg: 8 }); K.fine(() => { for (const s of [-1, 1]) K.sph(-3.85, 1.74, s * 0.32, 1, LF2, 'wet', { sx: 0.42, sy: 0.04, sz: 0.3, ry: -s * 0.3, seg: 6 }); }); });
+    K.fine(() => { for (const [x, az] of [[0.55, 2.4], [-0.95, -2.5]]) X._folha(K, x, 2.15, 0, az, 0.55, 0.36, 0.2, LF, { sway: false }); });
+    X._saco(K, P, -0.3, 1.0, 0, 0.75, 0.45, 0.55, 10);
+    for (const s of [-1, 1]) { K.cyl(-1.75, 1.5, s * 0.42, 0.17, 0.22, 0.3, P.t, 'bone', { rz: H, seg: 8 }); K.light(-2.1, 1.5, s * 0.42, 0.2, P.am, 2.0); }
+    for (const [z, ph] of [[0, 0], [0.4, 1.7], [-0.4, 3.1]]) K.anim({ t: 'sway', p: [0.1, 0.95, z], amp: 0.22, speed: 3.2, ph }, () => X._cano(K, [[0.1, 0.95, z], [0.0, 0.35, z * 1.2], [-0.35, -0.35, z * 1.4]], 0.06, P.t, 'skin', { n: 4, k: 2, r1: 0.02 }));
+    X._espinho(K, P, [0.9, 2.15, 0], [0.4, 2.65, 0], 0.1); },
+  suporte(K, P, tc) { /* 4.3d: suporte/hack vivo — corpo baixo de quatro pernas-raiz, flor-antena virada para cima que gira devagar (pétalas de osso, corola da cor do time, estames e miolo acesos: o emissor do pulso), cérebro com faixas de osso e veios atrás, antenas que balançam */
+    const X = U.tessara; X._base4(K, P, tc);
+    K.trunk([[-0.2, 2.5, 0, 0.42], [-0.05, 3.25, 0, 0.32], [0.1, 3.95, 0, 0.28]], '#FFFFFF', 'bone', { n: 8, c0: P.t, c1: P.b });
+    K.anim({ t: 'spin', p: [0.1, 4.1, 0], speed: 0.8 }, () => { const cx = 0.1, cy = 4.1;
+      K.sph(cx, cy, 0, 1, P.b, 'bone', { sx: 0.72, sy: 0.36, sz: 0.72, seg: 10 });
+      const np = K.lite ? 6 : 8; for (let i = 0; i < np; i++) { const a = i / np * PI * 2; K.sph(cx + Math.cos(a) * 1.22, cy + 0.42, Math.sin(a) * 1.22, 1, i % 2 ? P.a : '#E6DCC4', 'bone', { sx: 1.0, sy: 0.08, sz: 0.44, ry: -a, rz: 0.42, seg: 8 }); }
+      if (K.lite) K.sph(cx, cy + 0.62, 0, 1, tc, 'skin', { sx: 0.95, sy: 0.22, sz: 0.95, seg: 10 }); else for (let i = 0; i < 6; i++) { const a = (i + 0.5) / 6 * PI * 2; K.sph(cx + Math.cos(a) * 0.62, cy + 0.42, Math.sin(a) * 0.62, 1, tc, 'skin', { sx: 0.62, sy: 0.07, sz: 0.3, ry: -a, rz: 0.75, seg: 6 }); }
+      K.fine(() => { for (let i = 0; i < 8; i++) { const a = i / 8 * PI * 2, c = Math.cos(a), sn = Math.sin(a); X._cano(K, [[cx + c * 0.45, cy + 0.12, sn * 0.45], [cx + c * 1.2, cy + 0.5, sn * 1.2], [cx + c * 1.9, cy + 0.85, sn * 1.9]], 0.025, '#55E68A', null, { e: 1.3, n: 3, k: 1 });
+        X._folha(K, cx + c * 0.4, cy - 0.15, sn * 0.4, a + PI / 8, -0.35, 0.6, 0.22, i % 2 ? '#5DA865' : '#7CC47F', { sway: false }); } });
+      K.sph(cx, cy + 0.5, 0, 0.36, P.am, null, { e: 2.0, seg: 8 });
+      for (let i = 0; i < K.q(5); i++) { const a = i / K.q(5) * PI * 2 + 0.3, tip = [cx + Math.cos(a) * 0.5, cy + 1.25, Math.sin(a) * 0.5]; K.seg([cx, cy + 0.5, 0], tip, 0.04, P.b, 'bone', { seg: 5 }); K.light(tip[0], tip[1] - 0.07, tip[2], 0.14, '#F6D27A', 2.6); } });
+    K.sph(-1.55, 2.7, 0, 1, '#C9A58C', 'wet', { sx: 0.95, sy: 0.72, sz: 0.85, rz: 0.35, seg: 12 }); for (const x of [-1.25, -1.85]) X._arco(K, x, 2.4, 0, 0.01, 0.95, 0.88, H, 0.07, P.b, 'bone', { n: 4 });
+    X._veio(K, [[-1.0, 2.65, 0.35], [-1.75, 3.1, 0.3], [-2.25, 2.9, 0.15]], 0.04); X._veio(K, [[-1.0, 2.65, -0.35], [-1.75, 3.1, -0.3], [-2.25, 2.9, -0.15]], 0.04);
+    for (const s of [-1, 1]) K.anim({ t: 'sway', p: [2.0, 2.35, s * 0.3], amp: 0.14, speed: 2.8, ph: s > 0 ? 0 : 1.4 }, () => { X._cano(K, [[2.0, 2.35, s * 0.3], [2.4, 3.35, s * 0.6], [2.55, 4.2, s * 0.95]], 0.06, P.t, 'bone', { n: 4, k: 2, r1: 0.03 }); X._foto(K, P, 2.55, 4.32, s * 0.95, 0.11, 2.4); }); },
+  pirata(K, P, tc) { /* 4.3d: Enxerto — parasita-carrapato que suga recursos: escudo dorsal da cor do time, abdome inchado de seiva roubada (vidro âmbar com miolo aceso) em gaiola de costelas, probóscide-raiz que balança com ventosa acesa, oito pernas finas escuras, raízes de enxerto arrastando */
+    const X = U.tessara, VN = '#4F6B3A';
+    // 4.3d: abdome: saco de seiva roubada e costelas
+    K.sph(-1.4, 2.0, 0, 1, P.d, 'skin', { sx: 2.4, sy: 1.15, sz: 2.05, seg: 12 });
+    X._saco(K, P, -1.45, 2.55, 0, 2.3, 1.55, 2.0, 16, 1.25);
+    for (const x of (K.lite ? [-0.6, -2.3] : [-0.35, -1.4, -2.45, -3.3])) { const k = Math.sqrt(Math.max(0.05, 1 - ((x + 1.45) / 2.3) ** 2)); X._arco(K, x, 2.55, 0, 0.01, 1.55 * k + 0.12, 2.0 * k + 0.12, H, 0.12, P.a, 'bone'); }
+    X._cano(K, [[-0.2, 4.0, 0], [-1.4, 4.25, 0], [-2.6, 4.0, 0], [-3.55, 3.15, 0], [-3.85, 2.2, 0]], 0.13, P.b, 'bone', { n: 5, k: 2 });
+    for (const x of [-0.6, -1.6, -2.6]) X._espinho(K, P, [x, 4.05 + (x === -1.6 ? 0.2 : 0), 0], [x - 0.5, 4.7, 0], 0.12);
+    // 4.3d: escudo dorsal (cor do time) com aro de osso, cabeça e olhos
+    K.sph(1.15, 2.05, 0, 1, P.b, 'bone', { sx: 1.75, sy: 0.95, sz: 1.68, seg: 12 }); K.sph(1.15, 2.2, 0, 1, tc, 'skin', { half: true, sx: 1.55, sy: 1.0, sz: 1.5, seg: 14 });
+    for (const s of [-1, 1]) X._cano(K, [[2.3, 2.6, s * 0.4], [1.3, 3.1, s * 0.85], [0.1, 2.75, s * 1.25]], 0.07, P.b, 'bone', { n: 4, k: 2 });
+    K.sph(2.8, 2.0, 0, 1, P.b, 'bone', { sx: 0.8, sy: 0.62, sz: 0.78, seg: 10 }); for (const s of [-1, 1]) { X._foto(K, P, 3.05, 2.5, s * 0.36, 0.1); X._foto(K, P, 2.75, 2.62, s * 0.58, 0.08); }
+    for (const s of [-1, 1]) K.anim({ t: 'sway', p: [3.2, 1.75, s * 0.42], amp: 0.16, speed: 3.4, ph: s > 0 ? 0 : 1.6 }, () => K.trunk([[3.2, 1.75, s * 0.42, 0.11], [3.75, 1.35, s * 0.6, 0.07], [4.0, 0.95, s * 0.5, 0.02]], P.t, 'bone', { n: 5 }));
+    // 4.3d: probóscide-raiz que balança: anéis, garras e ventosa acesa
+    K.anim({ t: 'sway', p: [3.3, 2.1, 0], amp: 0.07, speed: 2.1 }, () => {
+      X._cano(K, [[3.2, 2.1, 0], [4.45, 2.5, 0], [5.55, 2.1, 0], [6.25, 1.2, 0], [6.5, 0.6, 0]], 0.3, '#FFFFFF', 'rubber', { n: 8, k: 2.5, r1: 0.14, c0: P.t, c1: VN });
+      K.fine(() => { for (const [x, y, a] of [[4.0, 2.42, 0.2], [4.9, 2.38, -0.15], [5.75, 1.85, -0.75]]) K.cyl(x, y, 0, 0.3, 0.3, 0.12, P.b, 'bone', { rz: a - H, seg: 10 }); });
+      for (let i = 0; i < 4; i++) { const a = i / 4 * PI * 2 + 0.4; X._espinho(K, P, [6.45, 0.6, 0], [6.5 + Math.cos(a) * 0.45, 0.12, Math.sin(a) * 0.45], 0.08); }
+      K.sph(6.5, 0.5, 0, 0.2, P.am, null, { e: 2.3, seg: 8 }); X._veio(K, [[3.5, 2.45, 0], [4.6, 2.78, 0], [5.6, 2.35, 0], [6.25, 1.45, 0]], 0.04); });
+    X._veio(K, [[2.4, 2.7, 0.2], [1.2, 3.25, 0.25], [-0.3, 4.05, 0.3], [-1.4, 4.15, 0.45]], 0.045); X._veio(K, [[2.4, 2.7, -0.2], [1.2, 3.25, -0.25], [-0.3, 4.05, -0.3], [-1.4, 4.15, -0.45]], 0.045);
+    // 4.3d: oito pernas finas (andar em tetrápode)
+    for (const s of [-1, 1]) [[2.0, 0.85, 1.9], [1.15, 0.3, 0.6], [0.25, -0.3, -0.7], [-0.65, -0.85, -1.9]].forEach(([hx, kdx, fdx], i) => X._perna(K, P, [hx, 1.95, s * 1.15], [hx + kdx, 3.05, s * 2.75], [hx + fdx, 0.15, s * 3.65], 0.19, { claws: 1, foto: i % 2 === 0, ph: (s > 0 ? 0 : PI) + (i % 2 ? PI : 0), amp: 0.32, stride: 4.5, col: P.d }));
+    // 4.3d: raízes de enxerto arrastando atrás
+    for (const [z, ph] of [[0, 0], [0.75, 1.3], [-0.75, 2.4]]) K.anim({ t: 'sway', p: [-3.2, 1.5, z], amp: 0.12, speed: 1.8, ph }, () => { K.trunk([[-3.2, 1.55, z, 0.13], [-3.85, 0.8, z * 1.3, 0.1], [-4.4, 0.25, z * 1.6, 0.07], [-4.85, 0.08, z * 1.85, 0.02]], VN, 'rubber', { n: 5 }); }); },
   quimera(K, P, tc) { U.tessara.infantaria(K, P, tc); for (const s of [-1, 1]) K.cone(-0.7, 5.6, s * 1.1, 0.3, 1.8, P.t, 'bone', { rx: s * -0.6, rz: 0.5, seg: 8 }); K.cone(-0.2, 7.4, 0, 0.25, 1.4, P.t, 'bone', { rz: 0.4, seg: 8 }); },
-  esporo(K, P, tc) { K.sph(0, 2.6, 0, 1.8, '#CFEFD6', 'wet', { seg: 14 }); ringOf(6, 1.62, (cx, cz, a) => K.sph(cx, 2.6 + (cx > 0 ? 0.5 : -0.4), cz, 0.35, P.l, null, { e: 1.8, seg: 8, anim: { t: 'bob', amp: 0.1, speed: 3, ph: a * 2 } }));
-    for (let i = 0; i < 4; i++) { const a = i * H; K.tube([[Math.cos(a) * 0.8, 1.2, Math.sin(a) * 0.8], [Math.cos(a + 0.4) * 1.3, 0.4, Math.sin(a + 0.4) * 1.3], [Math.cos(a + 0.8) * 1.5, -0.6, Math.sin(a + 0.8) * 1.5]], 0.12, P.t, 'bone', { ts: 8, anim: { t: 'sway', p: [Math.cos(a) * 0.8, 1.2, Math.sin(a) * 0.8], amp: 0.16, speed: 2.6, ph: i * 1.6 } }); } K.box(0, 4.3, 0, 1, 0.3, 1, tc, 'skin', { b: 0.1 }); },
-  molde(K, P, tc) { U.tessara.suporte(K, P, tc); K.tor(0, 2.4, 0, 2.6, 0.18, P.l, null, { e: 1.8, ts: 28, anim: { t: 'bob', amp: 0.3, speed: 2 } }); K.sph(0, 5.6, 0, 0.5, P.am, null, { e: 2.4, seg: 10 }); },
-  colosso(K, P, tc) { for (const s of [-1, 1]) { leg(K, [0, 7, s * 3], [1.8, 3.8, s * 3.6], [0.4, 0.4, s * 3.6], 1.1, P.b, 'bone'); K.sph(0.8, 0.2, s * 3.6, 1.4, P.d, 'matte', { half: true, sx: 1.6, seg: 12, anim: legSpec([0, 7, s * 3]) }); }
-    K.sph(0, 9, 0, 3.6, P.a, 'bone', { sx: 1.25, sy: 0.95, seg: 18 }); for (let i = 0; i < 3; i++) arch(K, 0, 8.4, 0, 4.6, 4, 3.7, i * PI / 3 + PI / 6, 0.22, P.t, 'bone');
-    K.sph(3.8, 9.8, 0, 1.4, P.b, 'bone', { seg: 12 }); K.light(5.05, 10.2, 0.5, 0.3, P.l); K.light(5.05, 10.2, -0.5, 0.3, P.l);
-    for (const s of [-1, 1]) K.anim({ t: 'recoil', dist: 0.9 }, () => { K.seg([1, 9, s * 4.2], [8.2, 9.4, s * 4.2], 0.9, P.b, 'bone', { taper: 0.6, seg: 12 }); K.sph(8.2, 9.4, s * 4.2, 0.6, P.l, null, { e: 2.2, seg: 10 }); });
-    K.sph(-2.6, 11.4, 0, 1.6, '#9EE6B0', null, { e: 1.2, seg: 12 }); K.box(0, 12.2, 0, 3, 0.4, 2, tc, 'skin', { b: 0.15 }); },
+  esporo(K, P, tc) { /* 4.3d: esporo-sentinela — bexiga de gás em gaiola de costelas de osso, coroa de papilho que gira (de cima lê como estrela) com colar da cor do time, olho-sentinela de vidro com íris acesa, olhos em pedúnculo, ferrão e gavinhas pendurados, esporos-satélite que flutuam */
+    const X = U.tessara, BX = '#CFEFD6', C = [0, 2.6, 0];
+    K.sph(0, C[1], 0, 1, BX, 'wet', { sx: 1.35, sy: 1.5, sz: 1.35, seg: 16 }); K.sph(0, C[1] + 0.35, 0, 1, tc, 'skin', { half: true, sx: 1.33, sy: 1.18, sz: 1.33, seg: 14 });
+    const nm = K.q(3); for (let i = 0; i < nm; i++) { const a = i / nm * PI + 0.3; for (const hh of [1.58, -1.58]) X._arco(K, 0, C[1], 0, 1.42, hh, 1.42, a, 0.075, P.a, 'bone', { n: 4 }); }
+    K.tor(0, C[1], 0, 1.4, 0.11, P.t, 'bone', { ts: 20, rs: 5 });
+    for (let i = 0; i < K.q(6); i++) { const a = (i + 0.5) / K.q(6) * PI * 2; X._foto(K, P, Math.cos(a) * 1.2, C[1] + 0.75, Math.sin(a) * 1.2, 0.1); }
+    // 4.3d: coroa de papilho (gira) com colar da cor do time
+    K.anim({ t: 'spin', p: [0, 4.1, 0], speed: 1.1 }, () => {
+      K.sph(0, 4.05, 0, 1, P.b, 'bone', { sx: 0.45, sy: 0.3, sz: 0.45, seg: 10 }); K.tor(0, 4.08, 0, 0.5, 0.14, tc, 'skin', { ts: 14, rs: 5 });
+      const nf = K.q(12); for (let i = 0; i < nf; i++) { const a = i / nf * PI * 2, tip = [Math.cos(a) * 1.5, 4.7, Math.sin(a) * 1.5]; K.spike([Math.cos(a) * 0.3, 4.2, Math.sin(a) * 0.3], tip, 0.09, P.a, 'bone', { n: 3 }); for (const d of [-0.55, 0, 0.55]) K.spike(tip, [tip[0] + Math.cos(a + d) * 0.4, tip[1] + 0.26, tip[2] + Math.sin(a + d) * 0.4], 0.085, '#FBF7EA', 'bone', { n: 3 }); } });
+    // 4.3d: olho-sentinela e olhos em pedúnculo
+    K.sph(1.22, 2.5, 0, 1, P.g, 'glass', { sx: 0.4, sy: 0.55, sz: 0.58, seg: 10 }); K.sph(1.5, 2.5, 0, 0.2, P.am, null, { e: 2.4, seg: 8 }); K.cyl(1.05, 2.5, 0, 0.66, 0.6, 0.22, P.b, 'bone', { rz: -H, seg: 12 });
+    for (const s of [-1, 1]) K.anim({ t: 'sway', p: [-0.6, 3.3, s * 0.9], amp: 0.14, speed: 2.2, ph: s > 0 ? 0 : 2 }, () => { K.trunk([[-0.6, 3.3, s * 0.9, 0.12], [-1.1, 4.0, s * 1.35, 0.08], [-1.35, 4.35, s * 1.55, 0.06]], P.t, 'bone', { n: 5 }); K.sph(-1.4, 4.45, s * 1.6, 0.2, P.g, 'glass', { seg: 8 }); X._foto(K, P, -1.32, 4.66, s * 1.6, 0.08, 2.4); });
+    // 4.3d: ferrão e gavinhas
+    K.anim({ t: 'sway', p: [0, 1.15, 0], amp: 0.1, speed: 1.9 }, () => { K.trunk([[0, 1.25, 0, 0.26], [0.05, 0.55, 0, 0.15], [0.2, -0.25, 0, 0]], '#FFFFFF', 'bone', { n: 6, c0: P.t, c1: '#EDE4CC' }); K.light(0.12, 0.05, 0, 0.14, P.am, 2.4); });
+    for (let i = 0; i < 4; i++) { const a = i / 4 * PI * 2 + PI / 4; K.anim({ t: 'sway', p: [Math.cos(a) * 0.85, 1.35, Math.sin(a) * 0.85], amp: 0.2, speed: 2.6, ph: i * 1.6 }, () => X._cano(K, [[Math.cos(a) * 0.85, 1.35, Math.sin(a) * 0.85], [Math.cos(a + 0.35) * 1.15, 0.6, Math.sin(a + 0.35) * 1.15], [Math.cos(a + 0.7) * 1.3, -0.15, Math.sin(a + 0.7) * 1.3]], 0.07, P.t, 'skin', { n: 4, k: 2, r1: 0.025 })); }
+    // 4.3d: esporos-satélite (flutuam)
+    for (let i = 0; i < 3; i++) { const a = i / 3 * PI * 2 + 0.9; K.anim({ t: 'bob', amp: 0.25, speed: 2.2, ph: i * 2.1 }, () => { K.sph(Math.cos(a) * 1.72, 1.85 + i * 0.3, Math.sin(a) * 1.72, 0.2, P.a, 'bone', { seg: 6 }); K.fine(() => X._foto(K, P, Math.cos(a) * 1.72, 2.1 + i * 0.3, Math.sin(a) * 1.72, 0.07, 2.4)); }); } },
+  molde(K, P, tc) { /* 4.3d: molde — forma própria sobre a base do suporte (mesmo corpo de quatro pernas): útero de seiva clara com broto aceso dentro, mãos de osso que o moldam, halo da cor do time com espinhos e fotóforos que gira (a aura de +15% de dano), braços-espátula que balançam */
+    const X = U.tessara, k = 1.1, W = [-0.15, 3.75, 0]; X._base4(K, P, tc, k);
+    K.trunk([[-0.15, 2.55, 0, 0.62], [-0.15, 3.05, 0, 0.5]], P.d, 'skin', { n: 10 });
+    X._saco(K, P, W[0], W[1], 0, 1.3, 1.22, 1.3, 16, 1.35, '#F6D27A');
+    for (let i = 0; i < 4; i++) { const a = i / 4 * PI * 2 + PI / 4, c = Math.cos(a), sn = Math.sin(a); X._cano(K, [[W[0] + c * 0.55, 2.75, sn * 0.55], [W[0] + c * 1.45, 3.45, sn * 1.45], [W[0] + c * 1.32, 4.55, sn * 1.32], [W[0] + c * 0.72, 5.05, sn * 0.72]], 0.13, P.a, 'bone', { n: 5, k: 2, r1: 0.08 }); X._espinho(K, P, [W[0] + c * 0.72, 5.05, sn * 0.72], [W[0] + c * 0.3, 5.35, sn * 0.3], 0.1); }
+    K.anim({ t: 'spin', p: [W[0], 3.6, 0], speed: 0.6 }, () => { K.tor(W[0], 3.6, 0, 2.45, 0.2, tc, 'skin', { ts: 28, rs: 6 });
+      for (let i = 0; i < 6; i++) { const a = i / 6 * PI * 2, c = Math.cos(a), sn = Math.sin(a); X._espinho(K, P, [W[0] + c * 2.5, 3.6, sn * 2.5], [W[0] + c * 2.88, 3.98, sn * 2.88], 0.16); X._foto(K, P, W[0] + Math.cos(a + PI / 6) * 2.45, 3.92, Math.sin(a + PI / 6) * 2.45, 0.12, 2.3); } });
+    for (const s of [-1, 1]) K.anim({ t: 'sway', p: [1.75, 2.35, s * 0.7], amp: 0.16, speed: 2.0, ph: s > 0 ? 0 : PI }, () => { K.trunk([[1.75, 2.35, s * 0.7, 0.16], [2.4, 2.95, s * 0.95, 0.12], [2.85, 3.15, s * 1.05, 0.09]], P.t, 'bone', { n: 6 }); K.sph(3.05, 3.2, s * 1.08, 1, P.a, 'bone', { sx: 0.32, sy: 0.08, sz: 0.24, rz: 0.4, seg: 8 }); });
+    K.fine(() => { for (let i = 0; i < 6; i++) { const a = i / 6 * PI * 2 + 0.25, c = Math.cos(a), sn = Math.sin(a); X._cano(K, [[W[0] + c * 1.05, W[1] - 0.7, sn * 1.05], [W[0] + c * 1.34, W[1] + 0.05, sn * 1.34], [W[0] + c * 1.08, W[1] + 0.75, sn * 1.08], [W[0] + c * 0.45, W[1] + 1.2, sn * 0.45]], 0.035, '#55E68A', null, { e: 1.4, n: 3, k: 2 }); }
+      for (let i = 0; i < 12; i++) { const a = (i + 0.5) / 12 * PI * 2; K.sph(W[0] + Math.cos(a) * 2.45, 3.6, Math.sin(a) * 2.45, 0.12, P.b, 'bone', { seg: 6, anim: { t: 'spin', p: [W[0], 3.6, 0], speed: 0.6 } }); } });
+    X._veio(K, [[-0.15, 2.7, 1.05], [-0.15, 3.15, 1.3], [-0.15, 4.1, 1.32]], 0.04); X._veio(K, [[-0.15, 2.7, -1.05], [-0.15, 3.15, -1.3], [-0.15, 4.1, -1.32]], 0.04); },
+  colosso(K, P, tc) { /* 4.3d: colosso cambiante — tartaruga-titã de cerco: casco em domo de escudos hexagonais de osso com a membrana do time nas juntas, quatro pernas-coluna (coxa de músculo, canela de casca, pé largo com unhas), cabeça de bico com presas, morteiro de chifre anelado no topo (recua), sacos de seiva em alforje, jardim de folhas na garupa */
+    const X = U.tessara, LF = '#5DA865', LF2 = '#7CC47F';
+    // 4.3d: ventre de carne e domo da membrana do time
+    K.sph(-0.3, 6.3, 0, 1, P.d, 'skin', { sx: 5.0, sy: 2.2, sz: 3.15, seg: 16 });
+    const MB = [-0.4, 6.8, 4.9, 2.35, 3.2], on = (x, z) => { const u = (x - MB[0]) / MB[2], w = z / MB[4], y = MB[1] + MB[3] * Math.sqrt(Math.max(0, 1 - u * u - w * w)); return [[x, y, z], [u / MB[2], (y - MB[1]) / (MB[3] * MB[3]), w / MB[4]]]; };
+    K.sph(MB[0], MB[1], 0, 1, tc, 'skin', { half: true, sx: MB[2], sy: MB[3], sz: MB[4], seg: 18 });
+    // 4.3d: escudos hexagonais em grade sobre o domo (a membrana aparece nas juntas); o do meio dá lugar ao morteiro
+    X._escudos(K, P, MB, 0.9, 0.46, (x, z) => Math.hypot(x + 0.5, z) >= 1.3, (pp, n, q, i, j) => { if (q < 0.45) X._espinho(K, P, [pp[0] + n[0] * 0.5, pp[1] + 0.3, pp[2] + n[2] * 0.5], [pp[0] - 0.25, pp[1] + 0.72, pp[2] + n[2] * 0.8], 0.16);
+      K.fine(() => { if (q < 0.8 && (i + j) % 3 === 0) X._cano(K, [[pp[0] + 0.95, pp[1] - 0.12, pp[2] - 0.2], [pp[0] + 0.15, pp[1] - 0.05, pp[2] + 0.9], [pp[0] - 0.8, pp[1] - 0.1, pp[2] + 0.4]], 0.04, '#55E68A', null, { e: 1.5, n: 3, k: 2 }); }); });
+    for (const s of [-1, 1]) { for (const x of [2.6, 0.4, -2.0]) X._foto(K, P, x, 6.55, s * 3.08, 0.16); X._veio(K, [[3.8, 6.2, s * 2.7], [1.8, 6.65, s * 3.12], [-0.3, 6.5, s * 3.2], [-2.5, 6.65, s * 3.1], [-4.3, 6.2, s * 2.55]], 0.06); }
+    K.fine(() => { for (const [x, z, az] of [[1.9, 1.15, 0.9], [-1.6, -1.25, -2.0], [2.9, -0.75, -0.5], [-3.0, 1.0, 2.4], [0.6, -2.0, -1.4], [-1.2, 2.1, 1.7]]) { const [pp] = on(x, z); X._folha(K, pp[0], pp[1] + 0.05, pp[2], az, 0.5, 0.42, 0.22, az > 0 ? LF : LF2, { sway: false }); }
+      for (let i = 0; i < 8; i++) { const a = (i + 0.5) / 8 * PI * 2; X._foto(K, P, -0.4 + Math.cos(a) * 4.75, 6.95, Math.sin(a) * 3.1, 0.12, 1.8); } });
+    // 4.3d: quatro pernas-coluna: coxa de músculo escuro, joelheira de osso, canela de casca sulcada, pé largo com unhas de osso
+    for (const [hx, kdx, ph] of [[2.75, 0.5, 0], [-2.95, -0.5, PI]]) for (const s of [-1, 1]) { const hip = [hx, 6.1, s * 2.35], knee = [hx + kdx, 3.35, s * 3.05], foot = [hx + kdx * 0.3, 0, s * 3.2], dk = Math.sign(kdx);
+      K.anim(legSpec(hip, { amp: 0.25, stride: 12, ph: (s > 0 ? 0 : PI) + ph }), () => {
+        K.trunk([[hip[0], hip[1], hip[2], 1.3], [(hip[0] * 0.55 + knee[0] * 0.45), (hip[1] * 0.55 + knee[1] * 0.45), (hip[2] * 0.55 + knee[2] * 0.45), 1.42], [knee[0], knee[1], knee[2], 0.98]], P.d, 'skin', { n: 10 });
+        K.sph(knee[0] + dk * 0.5, knee[1] + 0.15, knee[2], 1, P.a, 'bone', { sx: 0.45, sy: 0.85, sz: 0.85, seg: 10 }); X._foto(K, P, knee[0], knee[1] + 0.35, knee[2] + s * 0.95, 0.15);
+        K.trunk([[knee[0], knee[1], knee[2], 0.95], [(knee[0] + foot[0]) / 2, 1.9, (knee[2] + foot[2]) / 2, 0.84], [foot[0], 0.75, foot[2], 0.92]], '#FFFFFF', 'rubber', { n: 10, c0: P.t, c1: '#6E5236' });
+        K.cyl(foot[0], 0, foot[2], 1.02, 1.22, 0.82, P.d, 'skin', { seg: 12 });
+        K.fine(() => { for (let i = 0; i < 4; i++) { const a = i / 4 * PI * 2 + 0.4, c = Math.cos(a), sn = Math.sin(a); K.trunk([[knee[0] + c * 0.86, knee[1] - 0.2, knee[2] + sn * 0.86, 0.13], [(knee[0] + foot[0]) / 2 + c * 0.8, 1.9, (knee[2] + foot[2]) / 2 + sn * 0.8, 0.15], [foot[0] + c * 0.88, 0.9, foot[2] + sn * 0.88, 0.1]], '#6E5236', 'rubber', { n: 4 }); } });
+        for (let i = 0; i < K.q(4); i++) { const a = (K.q(4) > 2 ? -0.75 + i * 0.5 : -0.35 + i * 0.7); K.oct(foot[0] + Math.cos(a) * 1.16, 0.02, foot[2] + Math.sin(a) * 1.16, 0.26, 0.62, '#EDE4CC', 'bone', { sx: 1.25, sz: 0.85, ry: -a, rz: -0.25 }); }
+        X._espinho(K, P, [knee[0] + dk * 0.3, knee[1] + 0.7, knee[2] + s * 0.3], [knee[0] - dk * 0.2, knee[1] + 1.8, knee[2] + s * 1.0], 0.2);
+        K.fine(() => X._cano(K, [[foot[0] - 0.9, 0.5, foot[2]], [foot[0] - 1.3, 0.24, foot[2] + s * 0.35], [foot[0] - 1.55, 0.12, foot[2] + s * 0.7]], 0.09, P.t, 'rubber', { n: 4, k: 2, r1: 0.05 })); }); }
+    // 4.3d: cabeça de bico: pescoço de carne, crânio, testa, bico em gancho, mandíbula que balança, presas e olhos
+    K.trunk([[3.9, 6.25, 0, 1.45], [4.75, 5.75, 0, 1.15], [5.35, 5.45, 0, 0.95]], P.d, 'skin', { n: 10 }); K.fine(() => { for (const [x, y, r] of [[4.45, 5.95, 1.3], [4.95, 5.65, 1.12]]) K.tor(x, y, 0, r, 0.1, P.d, 'skin', { rz: H - 0.55, ts: 16, rs: 4 }); });
+    K.sph(5.5, 5.45, 0, 1, P.b, 'bone', { sx: 1.25, sy: 1.05, sz: 1.15, seg: 12 }); K.sph(5.6, 6.1, 0, 1, P.a, 'bone', { sx: 1.15, sy: 0.45, sz: 1.25, rz: -0.25, seg: 10 });
+    K.trunk([[6.25, 5.55, 0, 0.66], [6.95, 5.25, 0, 0.45], [7.35, 4.75, 0, 0.14], [7.42, 4.45, 0, 0]], '#FFFFFF', 'bone', { n: 8, c0: P.a, c1: '#EDE4CC' });
+    K.anim({ t: 'sway', p: [5.8, 4.85, 0], amp: 0.08, speed: 1.8 }, () => { K.trunk([[5.8, 4.85, 0, 0.6], [6.6, 4.6, 0, 0.38], [7.0, 4.55, 0, 0.1]], P.d, 'skin', { n: 7 }); K.fine(() => { for (const z of [-0.3, 0, 0.3]) K.trunk([[6.1, 4.45, z, 0.07], [6.15, 3.9, z * 1.3, 0.05], [6.0, 3.45, z * 1.5, 0.01]], '#4F6B3A', 'rubber', { n: 4 }); }); });
+    for (const s of [-1, 1]) { for (const [x, y, z] of [[6.15, 5.78, 0.82], [5.85, 6.0, 1.02]]) X._foto(K, P, x, y, s * z, 0.15);
+      K.trunk([[6.0, 4.85, s * 0.8, 0.36], [6.95, 4.55, s * 1.3, 0.27], [7.65, 5.0, s * 1.55, 0.13], [7.85, 5.6, s * 1.55, 0]], '#FFFFFF', 'bone', { n: 7, c0: P.b, c1: '#EDE4CC' }); }
+    // 4.3d: morteiro de chifre: monte de carne com aro, cano anelado inclinado para cima (escuro na base, claro na boca), lábio e dentes, miolo aceso, culatra de esporos; recua inteiro
+    K.sph(-0.5, 9.0, 0, 1, P.d, 'skin', { sx: 1.6, sy: 0.9, sz: 1.6, seg: 12 }); K.tor(-0.5, 9.55, 0, 1.4, 0.26, P.t, 'bone', { ts: 18, rs: 5 });
+    const BA = 0.38, cb = Math.cos(BA), sb = Math.sin(BA), bp = d => [-0.5 + cb * d, 10.05 + sb * d, 0];
+    K.anim({ t: 'recoil', dist: 1.0 }, () => {
+      const nb = K.lite ? 6 : 12; K.trunk(Array.from({ length: nb + 1 }, (_, i) => { const d = i / nb * 6.0; return bp(d).concat([1.02 - d * 0.03 + (K.lite ? 0 : (i % 2 ? -0.06 : 0.05))]); }), '#FFFFFF', 'bone', { n: 12, c0: P.t, c1: P.a });
+      const m = bp(6.0); K.cyl(m[0], m[1], 0, 1.18, 0.9, 0.42, P.a, 'bone', { rz: BA - H, seg: 12 });
+      for (let i = 0; i < K.q(7); i++) { const a = i / K.q(7) * PI * 2, ox = -sb * Math.cos(a), oy = cb * Math.cos(a), oz = Math.sin(a); X._espinho(K, P, [m[0] + cb * 0.3 + ox * 0.95, m[1] + sb * 0.3 + oy * 0.95, oz * 0.95], [m[0] + cb * 0.95 + ox * 1.35, m[1] + sb * 0.95 + oy * 1.35, oz * 1.35], 0.2); }
+      K.sph(m[0] + cb * 0.3, m[1] + sb * 0.3, 0, 0.62, P.am, null, { e: 2.3, seg: 10 });
+      K.bulb([[0.95, 0], [1.25, 0.45], [1.25, 1.05], [0.9, 1.55], [0.35, 1.85], [0, 1.9]], -0.75, 9.85, 0, P.b, 'bone', { n: 12, ribs: 6, rk: 0.08, rz: H + BA });
+      X._veio(K, [0.6, 3.0, 5.4].map(d => { const c = bp(d), rr = 1.02 - d * 0.03 + 0.12; return [c[0] - sb * rr, c[1] + cb * rr, 0]; }), 0.07); });
+    // 4.3d: sacos de seiva em alforje nos flancos, com tubos até o morteiro e cinta de osso
+    for (const s of [-1, 1]) { X._saco(K, P, -0.55, 6.0, s * 3.3, 1.25, 1.0, 0.72, 12); X._cano(K, [[-0.55, 6.9, s * 3.15], [-0.55, 8.4, s * 2.35], [-0.5, 9.35, s * 1.2]], 0.14, P.t, 'skin', { n: 5, k: 2 }); X._arco(K, -0.55, 5.7, s * 3.3, 0.01, 1.15, 0.85, H, 0.1, P.b, 'bone', { n: 4 }); }
+    // 4.3d: jardim de folhas fotossintéticas na garupa, broto aceso
+    const g = on(-3.5, 0)[0]; K.sph(g[0], g[1] + 0.2, 0, 0.5, P.b, 'bone', { sy: 0.8, seg: 8 });
+    for (const [az, el, len, wid, col] of [[PI, 0.55, 1.3, 0.58, LF], [PI * 0.72, 0.75, 1.05, 0.48, LF2], [-PI * 0.72, 0.75, 1.05, 0.48, LF2], [PI * 0.5, 0.95, 0.85, 0.4, LF], [-PI * 0.5, 0.95, 0.85, 0.4, LF]]) X._folha(K, g[0], g[1] + 0.5, 0, az, el, len, wid, col, { amp: 0.06, speed: 1.4 });
+    K.sph(g[0], g[1] + 0.8, 0, 0.3, P.l, null, { e: 1.8, sy: 1.4, seg: 8 });
+    // 4.3d: cauda curta que balança
+    K.anim({ t: 'sway', p: [-5.0, 6.2, 0], amp: 0.1, speed: 1.6 }, () => { K.trunk([[-4.9, 6.3, 0, 0.6], [-5.8, 5.8, 0, 0.42], [-6.4, 4.95, 0, 0.18], [-6.55, 4.35, 0, 0]], '#FFFFFF', 'bone', { n: 8, c0: P.b, c1: P.a }); K.fine(() => { for (const [x, y] of [[-5.3, 6.55], [-5.95, 6.0], [-6.4, 5.25]]) X._espinho(K, P, [x, y, 0], [x - 0.45, y + 0.45, 0], 0.14); }); }); },
 };
 U.quorith = {
   infantaria(K, P, tc) { K.prism(0, 0, 0, 1.4, 0.3, 6, P.c, null, { e: 1.6 }); K.oct(0, 1.2, 0, 1.3, 5.2, P.a, 'crystal'); K.tor(0, 3.8, 0, 1.12, 0.1, P.c, null, { e: 2.6, ts: 6 }); for (const s of [-1, 1]) K.oct(0.3, 3, s * 2, 0.45, 1.8, P.b, 'crystal', { rx: s * 0.3, anim: { t: 'bob', amp: 0.3, speed: 3, ph: s > 0 ? 0 : PI } }); K.oct(1.4, 3.4, 0, 0.3, 1.4, tc, null, { e: 1.8, rz: -H, anim: { t: 'recoil', dist: 0.4 } }); },
@@ -883,20 +1686,299 @@ U.quorith = {
     });
     K.anim({ t: 'spin', p: [-4.15, 0, 0], speed: 0.9 }, () => { K.tor(-4.15, 4.8, 0, 2.0, 0.09, tc, null, { e: 1.3, ts: 6, rs: 3 }); ringOf(6, 2.0, (dx, dz, a, i) => { K.oct(-4.15 + dx, 4.4, dz, 0.16, 0.8, P.a, 'crystal'); K.oct(-4.15 + dx * 0.9, 4.55, dz * 0.9, 0.08, 0.42, i % 2 ? P.l : P.t, 'crystal', { rz: -Math.cos(a) * 0.5, rx: Math.sin(a) * 0.5 }); }); }); // anel de lascas em órbita sobre a carga
   },
-  veiculo_hull(K, P, tc) { K.prism(0, 1.6, 0, 1, 1.6, 6, P.a, 'crystal', { sx: 6.4, sz: 4.2, top: 0.82 }); K.cone(0, 1.6, 0, 1, 1.4, P.b, 'crystal', { seg: 6, flat: true, rx: PI, sx: 6.4, sz: 4.2 }); K.prism(0, 2.3, 0, 1.01, 0.2, 6, tc, null, { e: 1.8, sx: 6.4, sz: 4.2, top: 1 }); K.tor(0, 0.4, 0, 2.2, 0.14, P.l, null, { e: 2.4, ts: 6, anim: { t: 'spin', p: [0, 0.4, 0], speed: 1.4 } }); K.mount = 3.2; },
-  veiculo_turret(K, P, tc) { KITS.quorith.turret(K, P, tc, 0.85, false); },
-  drone(K, P, tc) { K.oct(-2, 1.6, 0, 1.1, 4.4, P.a, 'crystal', { rz: -H }); for (const s of [-1, 1]) K.oct(-1.6, 1.6, s * 2.4, 0.6, 2.6, P.b, 'crystal', { rz: -H, ry: s * 0.25, anim: { t: 'bob', amp: 0.2, speed: 4, ph: s > 0 ? 0 : PI } }); K.tor(0, 1.6, 0, 2.6, 0.1, P.l, null, { e: 2.4, ts: 6, rx: 0.4, anim: { t: 'sway', p: [0, 1.6, 0], amp: 0.15, speed: 3 } }); K.oct(0.2, 2.6, 0, 0.35, 1, tc, null, { e: 2 }); },
-  suporte(K, P, tc) { K.prism(0, 0.6, 0, 1.8, 0.5, 6, P.d, 'gloss'); K.prism(0, 1.1, 0, 0.6, 2.4, 6, P.b, 'crystal'); K.box(0, 3.4, 0, 0.5, 0.5, 2.6, P.a, 'crystal'); for (const s of [-1, 1]) K.anim({ t: 'flap', p: [0, 3.4, s * 1.1], amp: 0.05, speed: 12, side: s }, () => { K.prism(0, 3.4, s * 1.1, 0.4, 4.6, 6, P.a, 'crystal', { top: 0.5 }); K.oct(0, 8.2, s * 1.1, 0.3, 0.8, P.l, null, { e: 2.6 }); }); K.tor(0, 0.3, 0, 1.6, 0.12, tc, null, { e: 1.8, ts: 6, anim: { t: 'spin', p: [0, 0.3, 0], speed: 1.2 } }); },
-  pirata(K, P, tc) { K.prism(0, 1, 0, 1, 1.4, 6, P.a, 'crystal', { sx: 5, sz: 3.2, top: 0.8 }); K.cone(0, 1, 0, 1, 0.9, P.b, 'crystal', { seg: 6, flat: true, rx: PI, sx: 5, sz: 3.2 }); K.anim({ t: 'recoil', dist: 0.8 }, () => { K.oct(4.4, 1.6, 0, 1, 4, P.b, 'crystal', { rz: -H }); K.oct(8.3, 1.6, 0, 0.35, 1.2, P.c, null, { e: 2.6, rz: -H }); });
-    K.oct(-1.4, 2.4, 0, 0.9, 2.6, P.a, 'crystal'); K.oct(-1.4, 5.1, 0, 0.3, 0.9, P.c, null, { e: 2.4 }); K.prism(0, 1.9, 0, 1.01, 0.18, 6, tc, null, { e: 1.8, sx: 5, sz: 3.2, top: 1 }); K.tor(0, 0.2, 0, 1.8, 0.12, P.l, null, { e: 2, ts: 6, anim: { t: 'spin', p: [0, 0.2, 0], speed: 1.4 } }); },
+  /* 4.3d — frota do Coro: ajudantes internos (nome com _ não vira unidade; chame como U.quorith._nome). Frente em +x, chão em y = 0. */
+  _L6(K, x, y, z, L, W, h, top, col, mat, o) { return K.prism(x, y, z, 1, h, 6, col, mat, Object.assign({ top, sz: L, sx: W / 0.866, ry: H }, o)); }, /* losango sextavado deitado: pontas em x ± L, faces retas em z ± W */
+  _X6(K, x, y, z, r, h, col, mat, o) { return K.prism(x, y, z, r, h, 6, col, mat, Object.assign({ rz: -H }, o)); }, /* prisma sextavado deitado, de x até x + h */
+  _bar(K, a, b, r, col, mat, n) { return K.seg(a, b, r, col, mat, { seg: n || 5, flat: true }); },
+  _glo(K, a, b, r, col, k) { return K.seg(a, b, r, col, null, { e: k || 2.2, seg: 5 }); }, /* filete aceso */
+  _dot(K, x, y, z, r, col, k) { return K.oct(x, y - r, z, r, r * 2, col, null, { e: k || 2.6 }); }, /* luz facetada centrada em y */
+  _fin(K, x, y, z, len, w, col, o) { return K.cone(x, y, z, 1, len, col, 'crystal', Object.assign({ seg: 4, flat: true, rz: H, sx: w / 2, sz: 0.08 }, o)); }, /* lâmina em pé: raiz em x, ponta para trás (-x) */
+  _placa(K, pts, d, y, zi, s, c, col, mat, o) { return K.poly(pts.map(([x, w]) => [x, -s * w]), d, col, mat, Object.assign({ y, z: s * zi, rx: -H + s * c, b: K.lite ? 0 : 0.05, flat: true }, o)); }, /* placa deitada: contorno em planta [x, w] (w para fora a partir de zi), caída c para fora */
+  _campo(K, P, x, z, L, W, k) { U.quorith._L6(K, x, 0, z, L, W, 0.03, 1, P.c, null, { e: k || 0.9 }); }, /* foco do campo de levitação no chão */
+  _pino(K, P, x, y, z, r, col) { K.prism(x, y, z, r, r * 0.5, 6, col || P.t, 'crystal', { top: 0.6 }); }, /* cravo sextavado (detalhe fino) */
+  _lev(K, P, x, y, z, r, sp, poca) { /* emissor de levitação: cone de cristal invertido, luz na ponta, poça de luz no chão e anel aceso que gira (anel só na completa) */
+    K.cone(x, y, z, r, r * 1.8, P.t, 'crystal', { seg: 6, flat: true, rx: PI }); U.quorith._dot(K, x, y - r * 1.8, z, r * 0.4, P.c, 2.4); if (poca !== false) K.prism(x, 0, z, r * 1.5, 0.02, 6, P.c, null, { e: 0.55 });
+    K.fine(() => K.tor(x, y - r * 0.75, z, r * 1.15, r * 0.1, P.l, null, { e: 1.7, ts: 6, rs: 3, anim: { t: 'spin', p: [x, y, z], speed: sp || 2.6 } })); },
+  _capsula(K, P, tc, x0, x1, y, z, r, o) { /* cápsula de ressonância deitada (x0 → x1): núcleo na cor do time, aduelas de cristal com janela aberta em cima (casca inteira na versão leve), bicos facetados e colares */
+    o = o || {}; const Q = U.quorith, L = x1 - x0;
+    Q._X6(K, x0, y, z, r * 0.6, L, tc, null, { e: o.k || 0.95 });
+    if (K.lite) { for (const s of [-1, 1]) K.box(x0 + L / 2, y - r * 0.55, z + s * r * 0.48, L * 0.94, r * 0.9, r * 0.36, P.b, 'crystal', { rx: s * 0.5 }); }
+    else for (let i = 1; i < 6; i++) { const f = i * PI / 3; K.box(x0 + L / 2, y + r * 0.7 * Math.cos(f), z + r * 0.7 * Math.sin(f), L * 0.94, r * 0.2, r * 0.8, i % 2 ? P.a : P.b, 'crystal', { rx: f }); }
+    K.cone(x1, y, z, r * 0.98, r * (o.nose || 1.9), P.a, 'crystal', { seg: 6, flat: true, rz: -H }); K.cone(x0, y, z, r * 0.98, r * 1.1, P.b, 'crystal', { seg: 6, flat: true, rz: H });
+    for (const f of K.lite ? [0.03, 0.97] : [0.03, 0.5, 0.97]) Q._X6(K, x0 + L * f - r * 0.14, y, z, r * 1.12, r * 0.28, P.t, 'crystal');
+    K.fine(() => { Q._dot(K, x1 + r * (o.nose || 1.9) + 0.04, y, z, r * 0.15, P.l, 2.4); for (const f of [0.27, 0.73]) Q._X6(K, x0 + L * f - 0.03, y, z, r * 0.9, 0.06, P.c, null, { e: 1.8 });
+      for (const s of [-1, 1]) Q._bar(K, [x0 + L * 0.05, y + r * 0.86, z + s * r * 0.42], [x1 - L * 0.05, y + r * 0.86, z + s * r * 0.42], r * 0.06, P.t, 'crystal', 4);
+      K.cone(x1 + r * 0.2, y, z, r * 0.7, r * (o.nose || 1.9) * 0.6, P.l, 'crystal', { seg: 6, flat: true, rz: -H, rx: PI / 6 }); }); },
+  _lascas(K, P, x, y, z, R, n, sp, s, o) { /* lascas em órbita (gira em y): n cristais no raio R, tamanho s */
+    o = o || {}; K.anim({ t: 'spin', p: [x, y, z], speed: sp }, () => ringOf(n, R, (dx, dz, a, i) => K.oct(x + dx, y - s * 0.5 + (o.wave ? Math.sin(a * 3) * o.wave : 0), z + dz, s * 0.22, s, i % 2 ? (o.c2 || P.t) : (o.c1 || P.a), 'crystal', { rz: -dx / R * (o.lean || 0.3), rx: dz / R * (o.lean || 0.3) }))); },
+  _drusa(K, P, x, y, z, s, a, seed) { /* drusa: tufo de três cristais (detalhe fino) */
+    const r = rng(seed || 1); for (let i = 0; i < 3; i++) { const t = a + (i - 1) * 0.9, h = s * (1 - i * 0.22 + r() * 0.2); K.oct(x + Math.cos(t) * s * 0.18, y - h * 0.15, z + Math.sin(t) * s * 0.18, s * 0.16, h, i === 1 ? P.l : P.a, 'crystal', { rz: -Math.cos(t) * 0.45, rx: Math.sin(t) * 0.45 }); } },
+  _casco(K, P, tc, o) { /* casco flutuante dos tanques (veiculo, prisma): quilha escura com costura acesa, cinta de ametista, glacis de gelo em degraus, cápsulas na cor do time, emissores de levitação, proa e aletas de popa; o.chao = false tira a luz do chão (unidade que o render já faz flutuar) */
+    o = o || {}; const Q = U.quorith, L = o.L || 5.6, W = o.W || 2.8, zc = o.zc || 3.75, rc = o.rc || 0.74, ch = o.chao !== false;
+    if (ch) Q._campo(K, P, 0.2, 0, L * 0.42, W * 0.5, 0.7);
+    Q._L6(K, 0.2, 0.62, 0, L * 0.7, W * 0.7, 0.7, 1.43, P.d, 'gloss');
+    Q._L6(K, 0.2, 1.32, 0, L + 0.02, W + 0.02, 0.1, 1, P.c, null, { e: 1.5 });
+    Q._L6(K, 0.2, 1.42, 0, L + 0.05, W + 0.05, 0.62, 0.98, P.t, 'crystal');
+    Q._L6(K, 0.2, 2.04, 0, L * 0.98, W * 0.98, 0.56, 0.84, P.b, 'crystal');
+    Q._L6(K, 0.2, 2.6, 0, L * 0.82, W * 0.82, 0.14, 0.92, P.d, 'gloss');
+    /* glacis: placas de gelo deitadas em degrau, chevrons da proa na cor do time, friso aceso e cravos entre as placas */
+    for (const s of [-1, 1]) {
+      Q._placa(K, [[-4.2, 0], [3.6, 0], [4.4, 0.9], [-3.6, 0.9]], 0.14, 2.62, W * 0.42, s, 0.32, P.a, 'crystal');
+      Q._placa(K, [[-4.6, 0], [-1.0, 0], [-1.5, 0.55], [-4.2, 0.55]], 0.1, 2.32, W * 0.78, s, 0.62, P.a, 'crystal');
+      Q._placa(K, [[3.0, 0], [5.0, 0], [5.7, 0.55], [3.6, 0.95]], 0.12, 2.36, W * 0.12, s, 0.48, tc, 'crystal');
+      K.fine(() => { Q._glo(K, [-3.9, 2.63, s * W * 0.4], [3.4, 2.63, s * W * 0.4], 0.03, P.c, 1.8); Q._glo(K, [-4.3, 2.47, s * W * 0.76], [-1.2, 2.47, s * W * 0.76], 0.025, P.l, 1.6);
+        for (let i = 0; i < 6; i++) Q._pino(K, P, -3.5 + i * 1.3, 2.68, s * W * 0.62, 0.11, i % 2 ? P.t : P.b);
+        for (const x of [3.3, 4.2]) Q._pino(K, P, x, 2.42, s * W * 0.25, 0.09, P.d); });
+    }
+    /* cápsulas laterais (núcleo na cor do time) presas por braços, com emissores de levitação embaixo */
+    if (o.caps !== false) for (const s of [-1, 1]) { const z = s * zc, y = o.yc || 1.6;
+      Q._capsula(K, P, tc, -3.7, 2.9, y, z, rc, { k: 0.95 });
+      for (const x of [-2.1, 1.2]) { Q._bar(K, [x, y + 0.1, s * (W - 0.1)], [x, y + 0.1, z - s * rc * 0.6], 0.16, P.t, 'crystal'); K.box(x, y - 0.1, s * (W + 0.25), 0.5, 0.4, 0.3, P.d, 'gloss'); }
+      for (const x of [-2.6, 1.8]) Q._lev(K, P, x, y - rc * 0.85, z, 0.32, 0, ch);
+      K.fine(() => { Q._glo(K, [-1.0, y + 0.42, s * (W + 0.02)], [-1.0, y + 0.42, z - s * rc * 0.8], 0.035, P.c, 2); for (const x of [-2.1, 1.2]) { Q._dot(K, x, y + 0.36, s * (W + 0.42), 0.06, P.l, 2.4); Q._bar(K, [x - 0.2, y - 0.25, s * (W + 0.1)], [x - 0.2, y - 0.25, z - s * rc * 0.7], 0.06, P.d, 'gloss', 4); } });
+    }
+    for (const x of [-3.2, 3.6]) Q._lev(K, P, x, 0.66, 0, 0.3, 0, ch);
+    /* proa: cunha de cristal em V com uma lente de foco */
+    for (const s of [-1, 1]) K.poly([[0, 0], [1.25, 0.45], [0, 1.1]], 0.16, P.a, 'crystal', { x: L - 0.45, y: 1.05, z: s * 0.55, ry: s * 0.62, b: K.lite ? 0 : 0.04, flat: true });
+    K.oct(L - 0.3, 1.55, 0, 0.34, 0.85, P.l, 'crystal', { rz: -H, sx: 0.8 }); Q._dot(K, L + 0.02, 1.55, 0, 0.12, P.c, 2.6);
+    /* popa: aletas harmônicas, respiros acesos e espinho */
+    for (const s of [-1, 1]) K.anim({ t: 'sway', p: [-L + 1.3, 2.35, s * 1.45], amp: 0.09, speed: 2.3, ph: s * 0.9 }, () => { Q._fin(K, -L + 1.3, 2.35, s * 1.45, 1.9, 1.5, P.b, { ry: -s * 0.25 }); K.fine(() => { Q._glo(K, [-L + 1.25, 2.6, s * 1.45], [-L - 0.35, 2.6, s * 1.45 + s * 0.42], 0.03, P.c, 2); Q._fin(K, -L + 1.0, 2.2, s * 2.0, 1.2, 0.9, P.t, { ry: -s * 0.45 }); }); }); /* aletas de popa vibram (também na versão leve) */
+    for (let i = -1; i <= 1; i++) K.box(-L + 0.75, 1.62, i * 0.62, 0.12, 0.42, 0.4, P.l, null, { e: 1.9 });
+    K.oct(-L + 0.5, 1.8, 0, 0.2, 0.9, P.t, 'crystal', { rz: H });
+    /* detalhe fino do convés: dentes de cristal na borda, drusas na popa e luzes de posição */
+    K.fine(() => { for (const s of [-1, 1]) { for (const x of [-3.4, -1.9, 1.6, 3.1]) K.oct(x, 2.55, s * (W * 0.86), 0.08, 0.34, P.l, 'crystal'); Q._dot(K, L - 0.9, 2.15, s * 1.15, 0.07, P.l, 2.6); Q._dot(K, -L + 0.6, 2.35, s * 2.1, 0.07, tc, 1.6); Q._drusa(K, P, -L + 1.6, 2.45, s * 2.25, 0.7, s * 1.2, 3 + s); } });
+  },
+  veiculo_hull(K, P, tc) { /* 4.3d: tanque de cristal — casco flutuante sextavado (_casco), cápsulas laterais na cor do time e anel de assento escuro para a torre */
+    U.quorith._casco(K, P, tc, {});
+    K.prism(0, 2.6, 0, 2.25, 0.18, 6, P.t, 'crystal', { ry: PI / 6 }); K.fine(() => ringOf(6, 2.05, (dx, dz) => K.box(dx, 2.74, dz, 0.16, 0.08, 0.16, P.c, null, { e: 2 })));
+    K.mount = 2.7; },
+  veiculo_turret(K, P, tc) { /* 4.3d: torre de ressonância — cabeça facetada com crista na cor do time, bochechas de ametista, câmara de eco na traseira e lança de cristal com garfo harmônico (recua inteira) */
+    const Q = U.quorith, yb = 0.92;
+    K.prism(0, 0, 0, 1.95, 0.3, 6, P.d, 'gloss', { ry: PI / 6 }); K.prism(0, 0.3, 0, 1.75, 0.08, 6, P.c, null, { e: 1.6, ry: PI / 6 });
+    Q._L6(K, 0.15, 0.38, 0, 2.45, 1.62, 0.78, 0.8, P.b, 'crystal'); Q._L6(K, 0.15, 1.16, 0, 1.96, 1.3, 0.34, 0.66, P.a, 'crystal');
+    Q._L6(K, 0.0, 1.5, 0, 1.25, 0.6, 0.14, 0.7, tc, 'crystal'); for (const s of [-1, 1]) K.box(0.05, 1.47, s * 0.68, 2.2, 0.08, 0.1, tc, null, { e: 1.1 });
+    /* bochechas: placas de ametista inclinadas sobre a cabeça */
+    for (const s of [-1, 1]) { Q._placa(K, [[-1.7, 0], [1.4, 0], [2.0, 0.5], [-1.3, 0.62]], 0.12, 1.02, 1.42, s, 0.75, P.t, 'crystal'); K.fine(() => { Q._glo(K, [-1.2, 1.0, s * 1.62], [1.3, 1.0, s * 1.62], 0.03, P.c, 1.8); for (const x of [-1.0, -0.2, 0.6]) Q._pino(K, P, x, 1.2, s * 1.18, 0.1, P.d); }); }
+    /* câmara de eco (contrapeso) com anéis acesos e garfo de antena */
+    Q._X6(K, -3.05, yb, 0, 0.62, 1.55, P.d, 'gloss'); K.cone(-3.05, yb, 0, 0.62, 0.55, P.t, 'crystal', { seg: 6, flat: true, rz: H });
+    for (const x of [-2.75, -2.15]) Q._X6(K, x, yb, 0, 0.7, 0.14, P.c, null, { e: 1.7 });
+    K.fine(() => { for (const s of [-1, 1]) K.anim({ t: 'sway', p: [-2.4, 1.5, s * 0.3], amp: 0.1, speed: 2.2, ph: s }, () => { Q._bar(K, [-2.4, 1.4, s * 0.3], [-2.75, 2.75, s * 0.3], 0.045, P.t, 'crystal'); Q._dot(K, -2.78, 2.85, s * 0.3, 0.08, P.l, 2.6); });
+      for (let i = 0; i < 6; i++) { const a = i * PI / 3 + PI / 6; K.box(-2.45, yb + Math.cos(a) * 0.6, Math.sin(a) * 0.6, 0.5, 0.07, 0.16, P.t, 'crystal', { rx: a }); } });
+    /* mantelete fixo e lança que recua */
+    Q._L6(K, 2.1, yb - 0.45, 0, 0.75, 0.62, 0.9, 0.7, P.t, 'crystal');
+    K.anim({ t: 'recoil', dist: 0.85 }, () => {
+      Q._X6(K, 1.9, yb, 0, 0.36, 4.3, P.a, 'crystal', { top: 0.82 });
+      for (const x of [2.55, 3.7, 4.85]) Q._X6(K, x, yb, 0, 0.47, 0.2, P.t, 'crystal');
+      Q._X6(K, 5.7, yb, 0, 0.5, 0.38, P.d, 'gloss'); K.cone(6.08, yb, 0, 0.42, 0.95, P.l, 'crystal', { seg: 6, flat: true, rz: -H }); Q._dot(K, 7.05, yb, 0, 0.13, P.c, 2.8);
+      for (const s of [-1, 1]) K.cone(3.3, yb, s * 0.56, 1, 3.2, P.b, 'crystal', { seg: 4, flat: true, rz: -H, sx: 0.14, sz: 0.06 });
+      K.fine(() => { for (const x of [3.12, 4.27]) Q._X6(K, x, yb, 0, 0.4, 0.07, P.c, null, { e: 2.2 }); for (const s of [-1, 1]) { Q._glo(K, [3.4, yb, s * 0.5], [6.3, yb, s * 0.5], 0.025, P.c, 2.2); Q._dot(K, 6.5, yb, s * 0.56, 0.06, P.l, 2.6); }
+        for (let i = 0; i < 4; i++) { const a = i * H + PI / 4; K.cone(5.25, yb + Math.cos(a) * 0.4, Math.sin(a) * 0.4, 1, 0.75, P.t, 'crystal', { seg: 4, flat: true, rz: H, sx: 0.16, sz: 0.04, rx: a }); } });
+    });
+    K.fine(() => { for (const s of [-1, 1]) Q._drusa(K, P, -0.9, 1.45, s * 0.95, 0.5, s * 1.5, 7 + s); Q._dot(K, 1.25, 1.42, 0, 0.08, P.l, 2.4); for (const s of [-1, 1]) K.poly([[0, 0], [0.9, 0.2], [0.75, 0.5], [0, 0.42]], 0.08, P.a, 'crystal', { x: 1.75, y: 0.62, z: s * 0.86, ry: s * 0.55, flat: true }); });
+  },
+  drone(K, P, tc) { /* 4.3d: drone de cristal — dardo facetado de asas em pena (gelo sobre ametista, faixa na cor do time), naceles com rotor de lascas e repetidor de estilhaços sob o bico */
+    const Q = U.quorith;
+    Q._L6(K, 0.2, 0.5, 0, 2.3, 0.62, 0.42, 1.35, P.d, 'gloss'); Q._L6(K, 0.2, 0.92, 0, 3.1, 0.84, 0.08, 1, P.c, null, { e: 1.6 });
+    Q._L6(K, 0.2, 1.0, 0, 3.1, 0.84, 0.42, 0.62, P.a, 'crystal'); Q._L6(K, 0.0, 1.42, 0, 1.6, 0.4, 0.2, 0.55, tc, 'crystal');
+    Q._L6(K, -0.4, 1.38, 0, 2.3, 0.16, 0.24, 0.4, P.t, 'crystal');
+    K.oct(3.15, 0.95, 0, 0.32, 1.2, P.l, 'crystal', { rz: -H, sx: 0.8 }); Q._dot(K, 3.5, 0.98, 0, 0.09, P.c, 2.6);
+    K.poly([[0.8, 0], [-2.2, 0], [-1.6, -0.75]], 0.1, P.t, 'crystal', { y: 0.55, b: K.lite ? 0 : 0.03, flat: true });
+    for (const s of [-1, 1]) {
+      /* asa em pena: lâmina de gelo por cima, lâmina de ametista por baixo e mais para trás, faixa na cor do time e bordo de ataque aceso */
+      K.poly([[1.0, 0], [-1.2, 0], [-2.1, 2.55], [-1.2, 2.75]].map(([x, w]) => [x, -s * w]), 0.12, P.a, 'crystal', { y: 1.0, z: s * 0.55, rx: -H - s * 0.1, b: K.lite ? 0 : 0.03, flat: true });
+      K.poly([[0.2, 0], [-1.9, 0], [-2.9, 2.2], [-2.2, 2.35]].map(([x, w]) => [x, -s * w]), 0.1, P.t, 'crystal', { y: 0.86, z: s * 0.5, rx: -H - s * 0.04, b: K.lite ? 0 : 0.03, flat: true });
+      K.poly([[0.2, 0], [-0.8, 0], [-1.55, 2.05], [-1.05, 2.15]].map(([x, w]) => [x, -s * w]), 0.06, tc, 'crystal', { y: 1.08, z: s * 0.62, rx: -H - s * 0.1, flat: true });
+      K.fine(() => { Q._glo(K, [0.95, 1.04, s * 0.6], [-1.2, 1.32, s * 3.25], 0.035, P.l, 2); Q._glo(K, [0.1, 0.9, s * 0.55], [-2.25, 1.08, s * 2.82], 0.025, P.c, 1.8); for (const k of [0.3, 0.55, 0.8]) K.oct(-0.15 - k * 1.25, 1.12 + k * 0.28, s * (0.6 + k * 2.4), 0.06, 0.26, P.l, 'crystal');
+        K.poly([[0.6, 0], [-0.6, 0], [-1.1, 0.9], [-0.3, 0.95]].map(([x, w]) => [x, -s * w]), 0.06, P.b, 'crystal', { y: 1.13, z: s * 0.5, rx: -H - s * 0.16, flat: true }); for (const k of [0.25, 0.5, 0.75]) Q._pino(K, P, 0.4 - k * 1.6, 1.13 + k * 0.2, s * (0.75 + k * 1.6), 0.07, P.d); });
+      /* nacele na ponta da asa com rotor de três lascas */
+      const zn = s * 3.25, yn = 1.18; Q._X6(K, -2.2, yn, zn, 0.26, 1.7, P.d, 'gloss'); K.cone(-0.5, yn, zn, 0.26, 0.6, P.a, 'crystal', { seg: 6, flat: true, rz: -H }); K.cone(-2.2, yn, zn, 0.26, 0.4, P.b, 'crystal', { seg: 6, flat: true, rz: H });
+      Q._X6(K, -1.6, yn, zn, 0.3, 0.5, tc, null, { e: 0.9 });
+      K.anim({ t: 'spin', p: [-1.35, yn, zn], speed: s * 9 }, () => { ringOf(3, 0.85, (dx, dz) => K.oct(-1.35 + dx, yn + 0.3, zn + dz, 0.07, 0.62, P.l, 'crystal', { rz: H, ry: Math.atan2(-dz, dx), sx: 2.2 })); K.fine(() => K.tor(-1.35, yn + 0.33, zn, 0.85, 0.025, P.c, null, { e: 1.6, ts: 6, rs: 3 })); });
+      Q._dot(K, -1.35, yn - 0.32, zn, 0.12, P.c, 2.2);
+      K.fine(() => { for (const x of [-2.0, -0.85]) Q._X6(K, x, yn, zn, 0.3, 0.08, P.t, 'crystal'); Q._fin(K, -2.0, yn + 0.15, zn, 0.8, 0.55, P.b, {}); Q._dot(K, -0.42, yn, zn, 0.05, P.l, 2.6); });
+      /* repetidor de estilhaços (recua) */
+      K.anim({ t: 'recoil', dist: 0.3 }, () => { Q._X6(K, 1.6, 0.55, s * 0.36, 0.11, 1.65, P.t, 'crystal'); K.fine(() => { Q._X6(K, 2.3, 0.55, s * 0.36, 0.15, 0.12, P.d, 'gloss'); Q._X6(K, 2.75, 0.55, s * 0.36, 0.14, 0.1, P.d, 'gloss'); }); Q._dot(K, 3.3, 0.55, s * 0.36, 0.07, P.l, 2.8); });
+      /* cauda: lâminas que balançam */
+      K.anim({ t: 'sway', p: [-2.6, 1.2, s * 0.35], amp: 0.12, speed: 3.4, ph: s }, () => { Q._fin(K, -2.5, 1.25, s * 0.38, 1.3, 0.7, P.b, { ry: -s * 0.3 }); K.fine(() => Q._dot(K, -3.75, 1.25, s * 0.75, 0.05, P.l, 2.4)); });
+    }
+    K.fine(() => { for (const s of [-1, 1]) { Q._dot(K, -1.95, 1.0, s * 0.62, 0.06, P.l, 2.4); Q._glo(K, [-1.6, 1.42, s * 0.3], [1.4, 1.42, s * 0.3], 0.02, P.c, 1.8); K.oct(2.35, 0.7, s * 0.45, 0.08, 0.7, P.l, 'crystal', { rz: -H + 0.15, ry: -s * 0.25 }); } K.oct(-2.95, 0.9, 0, 0.12, 0.8, P.t, 'crystal', { rz: H }); Q._drusa(K, P, -1.0, 1.5, 0, 0.45, 0, 11); });
+    K.fine(() => { for (const s of [-1, 1]) { const zn = s * 3.25; K.tor(-0.62, 1.18, zn, 0.31, 0.035, P.l, null, { e: 1.8, ts: 6, rs: 3, rz: H }); K.oct(-1.9, 1.18, s * 3.62, 0.06, 0.9, P.l, 'crystal', { rz: H, ry: s * 0.3 }); Q._L6(K, 0.5, 0.62, s * 0.66, 1.1, 0.08, 0.32, 0.8, P.b, 'crystal'); K.cone(-0.6, 0.86, s * 1.7, 0.2, 0.36, P.t, 'crystal', { seg: 6, flat: true, rx: PI }); Q._dot(K, -0.6, 0.48, s * 1.7, 0.07, P.c, 2.4); }
+      for (let i = 0; i < 3; i++) K.oct(0.9 - i * 0.55, 1.55, 0, 0.07, 0.3, i % 2 ? P.l : P.a, 'crystal'); K.anim({ t: 'spin', p: [-2.75, 1.0, 0], axis: 'x', speed: 3 }, () => K.tor(-2.75, 1.0, 0, 0.36, 0.03, P.c, null, { e: 2, ts: 6, rs: 3, rz: H })); });
+    K.anim({ t: 'bob', amp: 0.12, speed: 2.4 }, () => Q._dot(K, 0.2, 0.32, 0, 0.16, P.c, 2.2));
+  },
+  suporte(K, P, tc) { /* 4.3d: suporte/hack de cristal — trenó flutuante com prato de pétalas (gelo e ametista, forro na cor do time) que gira em volta de um núcleo de interferência, cápsulas de bloqueio e antenas que balançam */
+    const Q = U.quorith;
+    Q._campo(K, P, 0, 0, 1.6, 1.0, 0.7);
+    Q._L6(K, 0, 0.55, 0, 2.2, 1.3, 0.55, 1.35, P.d, 'gloss'); Q._L6(K, 0, 1.1, 0, 3.0, 1.78, 0.1, 1, P.c, null, { e: 1.5 });
+    Q._L6(K, 0, 1.2, 0, 3.05, 1.8, 0.5, 0.86, P.t, 'crystal'); Q._L6(K, 0, 1.7, 0, 2.6, 1.55, 0.12, 0.9, P.d, 'gloss');
+    for (const s of [-1, 1]) { Q._placa(K, [[-2.2, 0], [1.9, 0], [2.6, 0.55], [-1.6, 0.7]], 0.1, 1.62, 1.1, s, 0.42, P.a, 'crystal'); Q._lev(K, P, 1.5, 0.75, s * 1.0, 0.25); Q._lev(K, P, -1.5, 0.75, s * 1.0, 0.25); }
+    for (const s of [-1, 1]) K.poly([[0, 0], [0.9, 0.3], [0, 0.65]], 0.08, tc, 'crystal', { x: 2.05, y: 1.78, z: s * 0.42, rx: -H, flat: true });
+    /* mastro e prato de pétalas (gira devagar), núcleo de interferência aceso que pulsa */
+    K.prism(0, 1.82, 0, 0.55, 1.1, 6, P.b, 'crystal', { top: 0.7 }); K.prism(0, 2.2, 0, 0.62, 0.1, 6, P.c, null, { e: 1.8 }); K.fine(() => K.tor(0, 2.55, 0, 0.62, 0.03, P.l, null, { e: 1.8, ts: 6, rs: 3 }));
+    K.anim({ t: 'spin', p: [0, 3.2, 0], speed: 0.9 }, () => {
+      K.prism(0, 2.85, 0, 0.9, 0.25, 6, P.d, 'gloss', { top: 1.25 });
+      ringOf(6, 1.0, (dx, dz, a, i) => { K.poly([[-0.4, 0], [0.4, 0], [0.56, 1.3], [0, 1.65], [-0.56, 1.3]], 0.1, i % 2 ? P.t : P.a, 'crystal', { x: dx, y: 3.0, z: dz, ry: -a + H, rx: 0.58, b: K.lite ? 0 : 0.03, flat: true });
+        if (!(i % 2)) K.poly([[-0.24, 0.2], [0.24, 0.2], [0.34, 1.15], [0, 1.4], [-0.34, 1.15]], 0.03, tc, 'crystal', { x: dx * 0.96, y: 3.04, z: dz * 0.96, ry: -a + H, rx: 0.58, flat: true }); });
+      K.fine(() => ringOf(6, 1.0, (dx, dz, a, i) => { if (i % 2) Q._glo(K, [dx * 1.05, 3.2, dz * 1.05], [dx * 1.72, 4.3, dz * 1.72], 0.025, P.c, 1.9);
+        const tx = -Math.sin(a), tz = Math.cos(a); for (const k of [-1, 1]) Q._bar(K, [dx * 1.0 + tx * k * 0.42, 3.02, dz * 1.0 + tz * k * 0.42], [dx * 1.73 + tx * k * 0.58, 4.12, dz * 1.73 + tz * k * 0.58], 0.035, i % 2 ? P.a : P.t, 'crystal', 4);
+        const t1 = a + PI / 6, ct = Math.cos(t1), st = Math.sin(t1); Q._bar(K, [ct * 0.95, 2.95, st * 0.95], [ct * 1.55, 3.95, st * 1.55], 0.05, P.t, 'crystal', 4); Q._dot(K, ct * 1.58, 4.0, st * 1.58, 0.05, P.l, 2.4); K.oct(dx * 0.75, 2.62, dz * 0.75, 0.08, 0.36, P.a, 'crystal', { rx: Math.sin(a) * 2.6, rz: -Math.cos(a) * 2.6 }); }));
+      ringOf(6, 1.88, (dx, dz) => Q._dot(K, dx, 4.45, dz, 0.07, P.l, 2.6));
+    });
+    K.anim({ t: 'bob', amp: 0.18, speed: 2.6 }, () => { K.oct(0, 3.1, 0, 0.6, 1.5, P.l, 'crystal'); K.oct(0, 3.25, 0, 0.42, 1.2, P.c, null, { e: 2.4, ry: PI / 4 }); });
+    K.fine(() => K.anim({ t: 'spin', p: [0, 4.9, 0], speed: -2.2 }, () => ringOf(3, 0.5, (dx, dz) => K.oct(dx, 4.75, dz, 0.07, 0.32, P.l, null, { e: 2.2 }))));
+    /* projetor de interferência na proa (o pulso sai daqui): tubo sextavado, anéis acesos e lente */
+    Q._X6(K, 2.35, 1.55, 0, 0.3, 0.9, P.d, 'gloss'); K.cone(3.25, 1.55, 0, 0.3, 0.55, P.l, 'crystal', { seg: 6, flat: true, rz: -H }); Q._X6(K, 2.55, 1.55, 0, 0.4, 0.12, P.t, 'crystal');
+    K.fine(() => { for (const x of [2.85, 3.05]) Q._X6(K, x, 1.55, 0, 0.36, 0.05, P.c, null, { e: 2.2 }); Q._dot(K, 3.85, 1.55, 0, 0.07, P.c, 2.8); for (const s of [-1, 1]) { K.oct(2.6, 1.85, s * 0.3, 0.06, 0.5, P.l, 'crystal', { rz: -0.5 }); for (let i = 0; i < 3; i++) K.box(-1.2 + i * 1.1, 1.3, s * 1.86, 0.5, 0.08, 0.06, P.c, null, { e: 1.8, rx: s * 0.3 }); } });
+    K.fine(() => K.anim({ t: 'spin', p: [0, 4.2, 0], speed: -0.6 }, () => ringOf(3, 2.3, (dx, dz) => { K.oct(dx, 3.9, dz, 0.09, 0.5, P.l, 'crystal', { rz: -dx * 0.12, rx: dz * 0.12 }); K.oct(dx * 0.93, 3.95, dz * 0.93, 0.06, 0.32, P.c, null, { e: 2.2 }); })));
+    /* cápsulas de bloqueio nas laterais */
+    for (const s of [-1, 1]) { Q._capsula(K, P, tc, -1.3, 0.9, 1.15, s * 2.15, 0.42, { k: 0.95, nose: 1.4 }); Q._bar(K, [-0.2, 1.3, s * 1.7], [-0.2, 1.3, s * 1.85], 0.12, P.t, 'crystal'); }
+    /* antenas de cristal na popa (balançam) */
+    for (const s of [-1, 1]) K.anim({ t: 'sway', p: [-2.3, 1.7, s * 0.6], amp: 0.13, speed: 2.4, ph: s * 0.8 }, () => { Q._bar(K, [-2.3, 1.7, s * 0.6], [-2.75, 4.0, s * 0.75], 0.06, P.t, 'crystal'); K.oct(-2.78, 3.95, s * 0.76, 0.12, 0.55, P.l, 'crystal'); K.fine(() => { Q._dot(K, -2.78, 4.65, s * 0.76, 0.07, P.c, 2.6); K.oct(-2.55, 3.0, s * 0.68, 0.07, 0.3, P.l, 'crystal'); }); });
+    K.oct(3.15, 1.25, 0, 0.22, 0.7, P.l, 'crystal', { rz: -H });
+    K.fine(() => { for (const s of [-1, 1]) { Q._dot(K, 2.75, 1.5, s * 0.45, 0.07, P.l, 2.6); Q._glo(K, [-2.4, 1.78, s * 0.9], [2.2, 1.78, s * 0.9], 0.03, P.c, 1.6); Q._drusa(K, P, -1.9, 1.75, s * 1.1, 0.55, s, 21 + s);
+        for (let i = 0; i < 6; i++) Q._pino(K, P, -2.0 + i * 0.8, 1.82, s * 1.2, 0.08, i % 2 ? P.t : P.b); K.oct(2.9, 1.0, s * 0.85, 0.07, 0.42, P.l, 'crystal', { rz: -H + 0.4 }); } for (let i = 0; i < 6; i++) { const a = i * PI / 3; K.box(Math.cos(a) * 0.5, 2.45, Math.sin(a) * 0.5, 0.06, 0.35, 0.22, P.t, 'crystal', { ry: -a }); } });
+  },
+  pirata(K, P, tc) { /* 4.3d: Ressonador — corpo flutuante comprido com campânula de desafinação que gira na frente, espiral de lascas tortas, anel partido, células de carga roubada na cor do time e antena torta */
+    const Q = U.quorith;
+    Q._campo(K, P, -0.4, 0, 2.2, 1.0, 0.7);
+    Q._L6(K, -0.6, 0.55, 0, 3.0, 1.15, 0.55, 1.4, P.d, 'gloss'); Q._L6(K, -0.6, 1.1, 0, 4.25, 1.62, 0.1, 1, P.c, null, { e: 1.5 });
+    Q._L6(K, -0.6, 1.2, 0, 4.3, 1.66, 0.55, 0.8, P.t, 'crystal'); Q._L6(K, -0.8, 1.75, 0, 3.2, 1.2, 0.3, 0.7, tc, 'crystal');
+    for (const s of [-1, 1]) { Q._placa(K, [[-3.8, 0], [1.2, 0], [1.8, 0.55], [-3.1, 0.8]], 0.1, 1.7, 0.95, s, 0.5, P.a, 'crystal'); Q._placa(K, [[-4.3, 0], [0.4, 0], [0.9, 0.4], [-3.8, 0.45]], 0.08, 1.38, 1.5, s, 0.85, P.b, 'crystal'); Q._lev(K, P, 1.4, 0.75, s * 0.85, 0.24); Q._lev(K, P, -2.4, 0.75, s * 0.85, 0.24); Q._lev(K, P, -0.5, 0.72, s * 0.95, 0.2); }
+    /* campânula de desafinação: funil de pétalas (gelo e ametista) que gira em x, com espiral de lascas dentro */
+    const xb = 2.7, yb = 2.0;
+    Q._X6(K, 1.3, yb, 0, 0.42, 1.5, P.d, 'gloss'); for (const x of [1.6, 2.2]) Q._X6(K, x, yb, 0, 0.55, 0.16, x > 2 ? P.c : P.t, x > 2 ? null : 'crystal', x > 2 ? { e: 1.8 } : {});
+    K.anim({ t: 'spin', p: [xb, yb, 0], axis: 'x', speed: 1.4 }, () => {
+      for (let i = 0; i < 6; i++) { const a = i / 6 * PI * 2; K.poly([[0, -0.34], [0, 0.34], [2.3, 0.78], [2.6, 0], [2.3, -0.78]], 0.08, i % 2 ? P.a : P.t, 'crystal', { x: xb, y: yb + Math.cos(a) * 0.45, z: Math.sin(a) * 0.45, rx: a - H, ry: -0.55, order: 'XYZ', b: K.lite ? 0 : 0.03, flat: true }); }
+      K.fine(() => { for (let i = 0; i < 6; i++) { const a = (i + 0.5) / 6 * PI * 2, a0 = i / 6 * PI * 2; Q._bar(K, [xb + 0.3, yb + Math.cos(a0) * 0.62, Math.sin(a0) * 0.62], [xb + 2.0, yb + Math.cos(a0) * 1.62, Math.sin(a0) * 1.62], 0.03, i % 2 ? P.t : P.a, 'crystal', 4); Q._glo(K, [xb + 0.1, yb + Math.cos(a) * 0.5, Math.sin(a) * 0.5], [xb + 2.1, yb + Math.cos(a) * 1.55, Math.sin(a) * 1.55], 0.025, P.c, 2); K.oct(xb + 2.2, yb + Math.cos(a - 0.52) * 1.9, Math.sin(a - 0.52) * 1.9, 0.07, 0.36, P.l, 'crystal', { rx: a - 0.52 }); } });
+      K.tor(xb + 2.12, yb, 0, 1.66, 0.06, P.l, null, { e: 1.7, ts: 6, rs: 3, rz: H, rx: PI / 6 }); /* aro aceso na boca (a campânula fica aberta) */
+      K.fine(() => { for (let i = 0; i < 6; i++) { const a = (i + 0.5) / 6 * PI * 2; K.poly([[0, -0.22], [0, 0.22], [1.6, 0.42], [1.8, 0], [1.6, -0.42]], 0.05, P.b, 'crystal', { x: xb + 0.15, y: yb + Math.cos(a) * 0.3, z: Math.sin(a) * 0.3, rx: a - H, ry: -0.42, order: 'XYZ', flat: true }); } K.tor(xb + 2.1, yb, 0, 1.78, 0.04, P.t, 'crystal', { ts: 6, rs: 3, rz: H }); });
+    });
+    K.anim({ t: 'spin', p: [xb, yb, 0], axis: 'x', speed: -4 }, () => { for (let i = 0; i < K.q(5); i++) { const a = i * 2.1, r = 0.18 + i * 0.13; K.oct(xb + 0.5 + i * 0.34, yb + Math.cos(a) * r, Math.sin(a) * r, 0.07, 0.42, i % 2 ? P.l : P.c, null, { e: i % 2 ? 0 : 2.2, rz: -H + 0.4 }); } Q._dot(K, xb + 0.35, yb, 0, 0.16, P.l, 2.6); });
+    /* garras de agarrar dos lados da campânula (balançam): braço de ametista, cotovelo aceso e pinça de cristal */
+    for (const s of [-1, 1]) K.anim({ t: 'sway', p: [1.4, 1.4, s * 0.9], amp: 0.1, speed: 1.9, ph: s * 1.3 }, () => { Q._bar(K, [1.4, 1.4, s * 0.9], [2.6, 1.15, s * 1.45], 0.09, P.t, 'crystal'); Q._bar(K, [2.6, 1.15, s * 1.45], [3.7, 1.0, s * 1.2], 0.07, P.t, 'crystal'); K.oct(3.75, 1.0, s * 1.2, 0.12, 0.7, P.l, 'crystal', { rz: -H - 0.2, ry: s * 0.4 }); K.oct(3.6, 0.9, s * 1.32, 0.1, 0.55, P.a, 'crystal', { rz: -H + 0.4, ry: s * 0.7 }); K.fine(() => { Q._dot(K, 2.6, 1.15, s * 1.45, 0.08, P.c, 2.4); K.prism(1.4, 1.3, s * 0.9, 0.16, 0.2, 6, P.d, 'gloss'); }); });
+    /* anel partido (desafinado) que gira torto em volta do corpo */
+    K.anim({ t: 'spin', p: [-0.6, 2.2, 0], speed: 0.7 }, () => { K.tor(-0.6, 2.2, 0, 2.05, 0.05, P.l, null, { e: 1.6, ts: 8, rs: 3, arc: PI * 1.55, rx: 0.3, rz: 0.12 }); K.fine(() => K.oct(-0.6 + 2.05, 2.25, 0.2, 0.08, 0.36, P.c, null, { e: 2.2 })); });
+    /* células de carga roubada (na cor do time) num berço de ametista na popa */
+    for (const s of [-1, 1]) { K.oct(-2.6, 1.55, s * 1.05, 0.62, 1.6, P.a, 'crystal', { ry: PI / 4 }); K.oct(-2.6, 1.8, s * 1.05, 0.42, 1.1, tc, null, { e: 1.1, ry: PI / 4 }); K.fine(() => K.tor(-2.6, 2.35, s * 1.05, 0.62, 0.035, P.l, null, { e: 1.8, ts: 6, rs: 3 })); Q._bar(K, [-3.3, 1.75, 0], [-2.6, 1.75, s * 1.05], 0.1, P.t, 'crystal'); }
+    K.oct(-3.3, 1.75, 0, 0.75, 2.4, tc, 'crystal', { ry: PI / 4, sx: 0.8 }); K.oct(-3.3, 2.2, 0, 0.42, 1.5, P.c, null, { e: 1.8 });
+    K.oct(-4.9, 1.4, 0, 0.18, 0.9, P.t, 'crystal', { rz: H });
+    /* antena torta (desafinada) que balança */
+    K.anim({ t: 'sway', p: [-1.4, 2.0, 0.3], amp: 0.14, speed: 1.7 }, () => { Q._bar(K, [-1.4, 2.0, 0.3], [-1.8, 3.4, 0.55], 0.06, P.t, 'crystal'); Q._bar(K, [-1.8, 3.4, 0.55], [-1.5, 4.3, 0.2], 0.05, P.t, 'crystal'); K.oct(-1.52, 4.2, 0.2, 0.13, 0.6, P.l, 'crystal', { rz: 0.4 }); K.fine(() => Q._dot(K, -1.6, 3.45, 0.55, 0.06, P.c, 2.6)); });
+    K.fine(() => { for (const s of [-1, 1]) { Q._glo(K, [-3.9, 1.95, s * 0.7], [1.3, 1.95, s * 0.7], 0.03, P.c, 1.6); for (const x of [-1.9, -0.6, 0.6]) K.oct(x, 1.85, s * 1.42, 0.07, 0.3, P.l, 'crystal'); Q._drusa(K, P, 0.4, 1.9, s * 1.2, 0.5, s * 0.8, 31 + s);
+        for (let i = 0; i < 5; i++) Q._pino(K, P, -3.4 + i * 1.1, 1.78, s * 1.5, 0.08, i % 2 ? P.d : P.t); K.tube([[-3.6, 0.9, s * 0.95], [-1.2, 0.72, s * 1.1], [1.2, 0.95, s * 0.7]], 0.07, P.c, null, { e: 1.4, ts: 8, rs: 4 }); }
+      for (let i = 0; i < 4; i++) K.oct(-2.6 + i * 0.9, 2.05, 0, 0.1, 0.5, i % 2 ? P.l : P.a, 'crystal'); for (const s of [-1, 1]) { Q._fin(K, -4.1, 1.95, s * 0.6, 1.1, 0.8, P.b, { ry: -s * 0.35 }); Q._bar(K, [-3.95, 1.45, s * 1.05], [-1.9, 1.45, s * 1.05], 0.05, P.t, 'crystal', 4); for (let i = 0; i < 3; i++) K.oct(-3.0 + i * 0.4, 1.95, s * (0.55 + i * 0.12), 0.08, 0.36, i % 2 ? tc : P.l, 'crystal', { rz: s * 0.3 }); for (let i = 0; i < 4; i++) K.box(-2.9 + i * 1.1, 0.95, s * 1.12, 0.45, 0.06, 0.12, P.c, null, { e: 1.8, rx: s * 0.6 }); for (const x of [-2.95, -2.25]) Q._bar(K, [x, 1.2, s * 0.6], [x, 1.2, s * 1.5], 0.05, P.d, 'gloss', 4); } Q._bar(K, [-0.9, 2.0, -0.35], [-1.1, 3.0, -0.5], 0.04, P.t, 'crystal', 4); Q._dot(K, -1.1, 3.05, -0.5, 0.06, P.l, 2.6); Q._drusa(K, P, -1.6, 2.05, 0.1, 0.55, 0.5, 33); });
+  },
+  diapasao(K, P, tc) { /* 4.3d: Diapasão — garfo afinador alto sobre plataforma sextavada flutuante com garras; hastes vibram (flap), nota acesa sobe e desce entre elas, auréola na cor do time e anel de lascas do Elo (o render gira o modelo inteiro) */
+    const Q = U.quorith;
+    K.prism(0, 0.5, 0, 1.7, 0.5, 6, P.d, 'gloss', { top: 1.45 }); K.prism(0, 1.0, 0, 2.5, 0.1, 6, P.c, null, { e: 1.5 });
+    K.prism(0, 1.1, 0, 2.55, 0.42, 6, P.t, 'crystal', { top: 0.86 }); K.prism(0, 1.52, 0, 2.2, 0.2, 6, tc, 'crystal', { top: 0.8 });
+    ringOf(6, 2.0, (dx, dz) => Q._lev(K, P, dx, 0.62, dz, 0.22, 0, false)); /* o render faz flutuar: sem luz no chão */
+    /* garras de cristal em volta da haste (três, simetria radial) */
+    ringOf(3, 1.0, (dx, dz, a) => { const ca = Math.cos(a), sa = Math.sin(a); K.poly([[0, 0], [1.25, 0], [0.35, 2.7], [0, 2.4]], 0.16, P.b, 'crystal', { x: ca * 0.55, y: 1.65, z: sa * 0.55, ry: -a, b: K.lite ? 0 : 0.04, flat: true }); K.fine(() => { Q._glo(K, [ca * 1.6, 1.75, sa * 1.6], [ca * 0.95, 4.0, sa * 0.95], 0.025, P.c, 1.8); Q._drusa(K, P, Math.cos(a + PI / 3) * 1.6, 1.75, Math.sin(a + PI / 3) * 1.6, 0.6, a + PI / 3, 51); }); });
+    /* haste e colares */
+    K.prism(0, 1.72, 0, 0.72, 2.6, 6, P.a, 'crystal', { top: 0.8 }); for (const y of [2.25, 3.15, 4.0]) K.prism(0, y, 0, 0.74, 0.16, 6, y === 3.15 ? P.c : P.t, y === 3.15 ? null : 'crystal', y === 3.15 ? { e: 1.8 } : {});
+    /* forquilha e hastes que vibram */
+    Q._L6(K, 0, 4.25, 0, 0.62, 2.05, 0.55, 1.0, P.t, 'crystal'); Q._L6(K, 0, 4.8, 0, 0.56, 2.0, 0.14, 0.95, P.d, 'gloss');
+    K.fine(() => { for (const s of [-1, 1]) { Q._glo(K, [0.45, 4.55, s * 0.3], [0.45, 4.55, s * 1.75], 0.025, P.c, 2); Q._pino(K, P, 0, 4.94, s * 0.75, 0.12, P.b); K.prism(0, 4.94, s * 1.5, 0.56, 0.08, 6, P.c, null, { e: 2 }); K.oct(0, 4.5, s * 2.3, 0.1, 0.62, P.l, 'crystal', { rx: s * H }); Q._dot(K, -0.45, 4.55, s * 1.5, 0.07, P.l, 2.6); } });
+    for (const s of [-1, 1]) K.anim({ t: 'flap', p: [0, 4.9, s * 1.5], amp: 0.035, speed: 14, side: s }, () => {
+      K.prism(0, 4.92, s * 1.5, 0.5, 6.3, 6, P.a, 'crystal', { top: 0.6 }); K.prism(0, 11.22, s * 1.5, 0.3, 1.0, 6, P.l, 'crystal', { top: 0.01 });
+      for (const y of [6.5, 8.5]) K.prism(0, y, s * 1.5, 0.56, 0.16, 6, P.t, 'crystal');
+      Q._dot(K, 0, 11.5, s * 1.5, 0.1, P.c, 2.8); Q._glo(K, [0, 5.1, s * 1.08], [0, 10.9, s * 1.25], 0.06, P.c, 2.1);
+      K.fine(() => { for (const y of [7.5, 9.5]) K.prism(0, y, s * 1.5, 0.42, 0.05, 6, P.c, null, { e: 2 }); for (const y of [6.0, 8.0, 10.0]) K.oct(0.32, y, s * 1.78, 0.05, 0.26, P.l, 'crystal');
+        for (const y of [5.3, 7.0, 9.0]) for (const k of [-1, 1]) K.box(k * 0.38, y, s * 1.5, 0.05, 1.0, 0.36, P.b, 'crystal', { ry: 0 }); for (const y of [6.05, 8.05, 10.3]) K.tor(0, y, s * 1.5, y > 10 ? 0.4 : 0.52, 0.035, P.l, null, { e: 1.6, ts: 6, rs: 3 }); K.prism(0, 10.9, s * 1.5, 0.36, 0.14, 6, P.t, 'crystal'); });
+    });
+    K.fine(() => { ringOf(6, 0.74, (dx, dz, a) => { const b = a + PI / 6; Q._bar(K, [Math.cos(b) * 0.7, 1.75, Math.sin(b) * 0.7], [Math.cos(b) * 0.58, 4.2, Math.sin(b) * 0.58], 0.05, P.t, 'crystal', 4); }); for (const s of [-1, 1]) Q._drusa(K, P, 0.35, 4.92, s * 0.35, 0.45, s * 1.2, 71 + s); ringOf(3, 2.15, (dx, dz) => { K.prism(dx, 1.72, dz, 0.18, 0.75, 6, P.b, 'crystal', { top: 0.5 }); Q._dot(K, dx, 2.55, dz, 0.07, P.c, 2.6); }); });
+    K.fine(() => K.anim({ t: 'spin', p: [0, 5.4, 0], speed: -1.8 }, () => ringOf(6, 1.05, (dx, dz, a, i) => K.oct(dx, 5.25 + (i % 2) * 0.2, dz, 0.06, 0.3, i % 2 ? P.l : P.c, null, { e: 2.2 }))));
+    /* nota: cristal aceso que sobe e desce entre as hastes */
+    K.anim({ t: 'bob', amp: 0.45, speed: 2.2 }, () => { K.oct(0, 6.6, 0, 0.5, 1.7, P.l, 'crystal'); K.oct(0, 6.75, 0, 0.34, 1.4, P.c, null, { e: 2.6, ry: PI / 4 }); K.fine(() => ringOf(4, 0.62, (dx, dz) => K.oct(dx, 7.25, dz, 0.06, 0.3, P.l, null, { e: 2.2 }))); });
+    /* auréola na cor do time (gira inclinada) e anel de lascas do Elo */
+    K.anim({ t: 'spin', p: [0, 8.2, 0], speed: 1.3 }, () => { K.tor(0, 8.2, 0, 2.5, 0.07, tc, null, { e: 1.0, ts: 8, rs: 3, rx: 0.2 }); ringOf(K.q(4), 2.5, (dx, dz) => K.oct(dx, 8.2 + dz * 0.2 - 0.2, dz, 0.1, 0.4, P.l, null, { e: 2 })); K.fine(() => ringOf(8, 2.5, (dx, dz, a) => K.oct(dx * 1.05, 8.1 + dz * 0.2, dz * 1.05, 0.05, 0.22, P.a, 'crystal'))); });
+    Q._lascas(K, P, 0, 1.45, 0, 2.75, K.q(8), 0.7, 0.9, {});
+    K.fine(() => { ringOf(6, 2.3, (dx, dz) => Q._dot(K, dx, 1.47, dz, 0.07, P.l, 2.6)); ringOf(3, 0.75, (dx, dz) => K.oct(dx, 4.05, dz, 0.08, 0.5, P.l, 'crystal')); ringOf(12, 2.45, (dx, dz, a, i) => Q._pino(K, P, dx, 1.42, dz, 0.09, i % 2 ? P.a : P.d)); });
+  },
+  prisma(K, P, tc) { /* 4.3d: Prisma — casco do tanque (_casco, sem torre) com um grande prisma triangular em pé apontando para a frente (arestas de ametista, faces de gelo, luz por dentro), emissor na popa, lente e leque de raios refratados na proa */
+    const Q = U.quorith; Q._casco(K, P, tc, { chao: false }); /* o render faz o Prisma flutuar: sem luz no chão */
+    /* berço e prisma triangular: faces de gelo, arestas de ametista, fresta acesa no meio de cada face (segue a inclinação) */
+    const px = -0.4, y0 = 2.9, hp = 3.2, R0 = 2.7, R1 = 2.2, tl = Math.atan((R0 - R1) * 0.5 / hp);
+    K.prism(px, 2.6, 0, 2.0, 0.3, 6, P.d, 'gloss', { ry: PI / 6 });
+    K.prism(px, y0, 0, R0 * 0.93, hp, 3, P.a, 'crystal', { top: R1 / R0, ry: H });
+    ringOf(3, 1, (dx, dz, a) => { const c = Math.cos(a), sn = Math.sin(a); Q._bar(K, [px + c * R0, y0, sn * R0], [px + c * R1, y0 + hp, sn * R1], 0.22, P.t, 'crystal', 6); K.fine(() => Q._glo(K, [px + c * (R0 + 0.12), y0 + 0.2, sn * (R0 + 0.12)], [px + c * (R1 + 0.12), y0 + hp - 0.2, sn * (R1 + 0.12)], 0.04, P.l, 2.2));
+      const b = a + PI / 3, fc = Math.cos(b), fs = Math.sin(b), ap = R0 * 0.93 * 0.5 + 0.03; K.box(px + fc * ap, y0 + 0.3, fs * ap, 0.07, hp - 0.6, 0.34, P.c, null, { e: 2.2, ry: -b, rz: tl });
+      K.fine(() => { for (const k of [-1, 1]) { const w0 = R0 * 0.93 * 0.866 * 0.62, w1 = R1 * 0.93 * 0.866 * 0.62, a0 = R0 * 0.93 * 0.5 + 0.03, a1 = R1 * 0.93 * 0.5 + 0.03; Q._glo(K, [px + fc * a0 - fs * k * w0, y0 + 0.35, fs * a0 + fc * k * w0], [px + fc * a1 - fs * k * w1, y0 + hp - 0.35, fs * a1 + fc * k * w1], 0.025, P.l, 1.7); } }); });
+    K.prism(px, y0 + hp * 0.5 - 0.1, 0, R0 * 0.93 * (1 - (1 - R1 / R0) * 0.47) + 0.08, 0.2, 3, P.t, 'crystal', { ry: H });
+    K.prism(px, y0 + hp, 0, R1 * 0.98, 0.3, 3, tc, 'crystal', { top: 0.7, ry: H }); Q._dot(K, px, y0 + hp + 0.55, 0, 0.16, P.l, 2.6);
+    K.fine(() => ringOf(3, 1, (dx, dz) => K.oct(px + dx * R1 * 0.72, y0 + hp + 0.3, dz * R1 * 0.72, 0.1, 0.5, P.l, 'crystal')));
+    /* emissor na popa alimenta o prisma */
+    Q._X6(K, -4.7, 3.6, 0, 0.46, 2.2, P.d, 'gloss'); K.cone(-4.7, 3.6, 0, 0.46, 0.55, P.t, 'crystal', { seg: 6, flat: true, rz: H }); for (const x of [-4.2, -3.4]) Q._X6(K, x, 3.6, 0, 0.55, 0.14, P.c, null, { e: 1.8 }); Q._glo(K, [-2.5, 3.6, 0], [-1.7, 3.6, 0], 0.1, P.c, 2.4);
+    Q._bar(K, [-3.6, 2.7, 0], [-3.6, 3.2, 0], 0.18, P.t, 'crystal');
+    K.fine(() => { for (let i = 0; i < 4; i++) { const a = i * H + PI / 4; K.cone(-4.0, 3.6 + Math.cos(a) * 0.45, Math.sin(a) * 0.45, 1, 0.9, P.b, 'crystal', { seg: 4, flat: true, rz: H, sx: 0.2, sz: 0.04, rx: a }); } });
+    /* lente e leque de raios refratados na proa (recua ao disparar) */
+    K.anim({ t: 'recoil', dist: 0.45 }, () => {
+      Q._X6(K, 2.2, 3.6, 0, 0.36, 1.1, P.t, 'crystal'); K.oct(3.3, 3.6, 0, 0.62, 1.0, P.l, 'crystal', { rz: -H, sx: 0.6 });
+      for (let i = -2; i <= 2; i++) { const a = i * 0.2; K.cone(3.9, 3.6, 0, 0.1, 2.3 - Math.abs(i) * 0.3, P.c, null, { e: 2.2, seg: 4, rz: -H, ry: -a }); }
+      K.fine(() => { for (const s of [-1, 1]) K.oct(3.0, 3.6, s * 0.55, 0.12, 0.6, P.a, 'crystal', { rz: -H + s * 0.3 }); for (let i = -1; i <= 1; i += 2) K.cone(3.9, 3.6, 0, 0.05, 1.7, P.l, null, { e: 2.4, seg: 4, rz: -H, ry: -i * 0.3 }); Q._X6(K, 2.5, 3.6, 0, 0.42, 0.1, P.c, null, { e: 2 }); });
+    });
+    Q._bar(K, [2.4, 2.7, 0], [2.4, 3.3, 0], 0.2, P.t, 'crystal');
+    K.anim({ t: 'spin', p: [px, 4.5, 0], speed: 1.1 }, () => { K.tor(px, 4.5, 0, 3.05, 0.07, P.l, null, { e: 1.8, ts: 6, rs: 3, rx: 0.22 }); K.fine(() => ringOf(6, 3.05, (dx, dz, a, i) => K.oct(px + dx, 4.3 + dz * 0.22, dz, i % 2 ? 0.08 : 0.12, i % 2 ? 0.34 : 0.5, i % 2 ? P.l : P.a, 'crystal'))); });
+  },
+  monolito(K, P, tc) { /* 4.3d: Monólito — obelisco sextavado maciço em dois blocos com fresta acesa, sobre estrado em degraus escorado por cristais; ápice flutuante com coroa que gira, canais de notas acesas nas faces e três pedras de cerco em órbita (o render gira e balança o modelo) */
+    const Q = U.quorith;
+    /* estrado em degraus: escuro, costura acesa, cinta de ametista, faixa na cor do time e degrau escuro */
+    K.prism(0, 0.6, 0, 2.8, 0.6, 6, P.d, 'gloss', { top: 1.45 }); K.prism(0, 1.2, 0, 4.05, 0.12, 6, P.c, null, { e: 1.5 }); K.prism(0, 1.32, 0, 4.1, 0.5, 6, P.t, 'crystal', { top: 0.92 }); K.prism(0, 1.82, 0, 3.77, 0.2, 6, tc, 'crystal', { top: 0.94 });
+    K.prism(0, 2.02, 0, 3.2, 0.42, 6, P.d, 'gloss', { top: 0.88 }); K.prism(0, 2.44, 0, 2.86, 0.08, 6, P.c, null, { e: 1.6 });
+    ringOf(6, 3.2, (dx, dz) => Q._lev(K, P, dx, 0.7, dz, 0.36, 0, false)); /* o render faz flutuar: sem luz no chão */
+    /* escoras: cristais encostados nos cantos do obelisco, três grandes e três menores (simetria de 3) */
+    ringOf(6, 1, (dx, dz, a, i) => { const ar = a + PI / 6, cx = Math.cos(ar), cz = Math.sin(ar), big = !(i % 2), t = big ? 0.3 : 0.38;
+      K.oct(cx * (big ? 3.05 : 3.12), 1.7, cz * (big ? 3.05 : 3.12), big ? 0.86 : 0.6, big ? 5.2 : 3.6, big ? P.b : P.a, 'crystal', { rz: cx * t, rx: -cz * t });
+      K.fine(() => { K.oct(cx * 3.6, 1.9, cz * 3.6, 0.3, big ? 2.2 : 1.6, P.t, 'crystal', { rz: cx * 0.1, rx: -cz * 0.1 }); Q._glo(K, [cx * 3.65, 2.1, cz * 3.65], [cx * (big ? 2.5 : 2.7), big ? 6.2 : 4.9, cz * (big ? 2.5 : 2.7)], 0.03, P.c, 1.8); }); });
+    /* obelisco: dois blocos com fresta acesa e chanfro no topo; canal aceso com notas em cada face, frisos e placas em relevo (seguem a inclinação) */
+    const B = [[2.6, 2.5, 5.0, 2.32], [2.24, 7.8, 3.9, 1.95]];
+    B.forEach(([r, y, h, r2], k) => { const ap = f => (r + (r2 - r) * f) * 0.866, tl = Math.atan((r - r2) * 0.866 / h);
+      K.prism(0, y, 0, r, h, 6, P.a, 'crystal', { top: r2 / r });
+      ringOf(6, 1, (dx, dz, a, i) => { const rr = ap(0.1) + 0.03; K.box(dx * rr, y + h * 0.1, dz * rr, 0.08, h * 0.72, 0.13, P.c, null, { e: 2, ry: -a, rz: tl });
+        const ar = a + PI / 6, ca = Math.cos(ar), sa = Math.sin(ar), rv = r * 0.97; Q._bar(K, [ca * rv, y + 0.05, sa * rv], [ca * r2 * 0.97, y + h - 0.05, sa * r2 * 0.97], 0.1, k ? P.b : P.t, 'crystal', 4); });
+      K.fine(() => ringOf(6, 1, (dx, dz, a, i) => { const tx = -Math.sin(a), tz = Math.cos(a); for (let g = 0; g < 4; g++) { const f = 0.18 + g * 0.17 + (i % 2) * 0.06, rr = ap(f) + 0.05, sd = (g % 2 ? 1 : -1) * 0.22; K.oct(dx * rr + tx * sd, y + h * f - 0.12, dz * rr + tz * sd, 0.12, 0.26, g === 1 ? P.l : P.c, null, { e: 2, ry: -a + PI / 4 }); }
+        const rr = ap(0.9) + 0.05; K.box(dx * rr, y + h * 0.9, dz * rr, 0.14, 0.14, r * 0.92, P.t, 'crystal', { ry: -a, rz: tl });
+        if (i % 2) for (const k2 of [-1, 1]) { const rp = ap(0.5) + 0.04; K.box(dx * rp + tx * k2 * r * 0.3, y + h * 0.3, dz * rp + tz * k2 * r * 0.3, 0.06, h * 0.45, r * 0.22, P.b, 'crystal', { ry: -a, rz: tl }); } }));
+      K.prism(0, y + h, 0, r2, 0.3, 6, k ? P.l : P.b, 'crystal', { top: 0.8 });
+      if (!k) { K.prism(0, y + h + 0.3, 0, r2 * 0.82, 0.22, 6, P.c, null, { e: 2.4 }); K.prism(0, y + h + 0.52, 0, r2 * 0.92, 0.18, 6, tc, 'crystal'); }
+    });
+    /* ápice: cristal flutuante aceso por dentro, coroa de lascas que gira em volta */
+    K.anim({ t: 'bob', amp: 0.3, speed: 1.6 }, () => { K.oct(0, 12.45, 0, 1.15, 3.0, P.l, 'crystal', { ry: PI / 6 }); K.oct(0, 12.8, 0, 0.72, 2.3, P.c, null, { e: 2.4 }); K.fine(() => { ringOf(3, 0.85, (dx, dz) => K.oct(dx, 12.35, dz, 0.17, 0.95, P.a, 'crystal', { rz: dx * 0.5, rx: -dz * 0.5 })); Q._dot(K, 0, 15.62, 0, 0.15, P.c, 2.8); ringOf(3, 0.5, (dx, dz) => K.oct(dx, 14.6, dz, 0.06, 0.34, P.l, null, { e: 2.2 })); }); });
+    K.anim({ t: 'spin', p: [0, 13.4, 0], speed: -1.1 }, () => { K.tor(0, 13.4, 0, 2.3, 0.09, P.l, null, { e: 2, ts: 6, rs: 3 }); ringOf(6, 2.3, (dx, dz) => K.oct(dx, 13.0, dz, 0.15, 0.85, P.a, 'crystal')); K.fine(() => ringOf(6, 2.3, (dx, dz, a) => { const b = a + PI / 6; K.oct(Math.cos(b) * 2.3, 13.2, Math.sin(b) * 2.3, 0.07, 0.4, P.l, null, { e: 2.2 }); })); });
+    /* colar de palhetas de cristal que gira em volta do bloco de cima (o ressonador do cerco) */
+    K.anim({ t: 'spin', p: [0, 9.6, 0], speed: 0.45 }, () => ringOf(6, 2.7, (dx, dz, a, i) => { K.poly([[-0.45, 0], [0.45, 0], [0.32, 2.4], [0, 2.8], [-0.32, 2.4]], 0.14, i % 2 ? P.t : P.a, 'crystal', { x: dx, y: 8.3, z: dz, ry: -a + H, rx: -0.1, b: K.lite ? 0 : 0.04, flat: true });
+      K.fine(() => { Q._glo(K, [dx * 0.96, 8.5, dz * 0.96], [dx * 0.99, 10.7, dz * 0.99], 0.03, P.c, 2); Q._dot(K, dx * 1.02, 11.25, dz * 1.02, 0.07, P.l, 2.6); K.prism(dx * 0.93, 8.1, dz * 0.93, 0.2, 0.25, 6, P.d, 'gloss'); K.poly([[-0.25, 0], [0.25, 0], [0.18, 1.5], [0, 1.75], [-0.18, 1.5]], 0.08, i % 2 ? P.a : P.b, 'crystal', { x: dx * 0.9, y: 8.6, z: dz * 0.9, ry: -a + H, rx: -0.05, flat: true }); }); }));
+    K.fine(() => K.anim({ t: 'spin', p: [0, 8.0, 0], speed: -0.65 }, () => ringOf(14, 3.7, (dx, dz, a, i) => K.oct(dx, 7.6 + Math.sin(a * 3) * 0.5, dz, 0.1 + (i % 3) * 0.04, 0.45 + (i % 3) * 0.2, i % 2 ? P.a : P.t, 'crystal', { rz: dx * 0.2, rx: -dz * 0.2 }))));
+    K.fine(() => { ringOf(6, 2.98, (dx, dz) => Q._glo(K, [dx, 2.5, dz], [dx * 0.86, 8.3, dz * 0.86], 0.03, P.l, 1.7)); ringOf(12, 4.0, (dx, dz, a, i) => K.cone(dx, 1.2, dz, 0.16, 0.5, P.t, 'crystal', { seg: 6, flat: true, rx: PI })); ringOf(6, 1.72, (dx, dz, a, i) => { const b = a + PI / 6; K.prism(Math.cos(b) * 1.72, 11.95, Math.sin(b) * 1.72, 0.16, 0.6, 6, i % 2 ? P.l : P.a, 'crystal', { top: 0.3 }); });
+      K.tor(0, 11.9, 0, 1.25, 0.05, P.c, null, { e: 2, ts: 6, rs: 3 }); });
+    /* três pedras de cerco em órbita, cada uma um tufo de cristais com núcleo aceso, anel e satélites */
+    K.anim({ t: 'spin', p: [0, 7, 0], speed: 0.55 }, () => ringOf(3, 4.85, (dx, dz, a) => { const ca = Math.cos(a), sa = Math.sin(a);
+      K.prism(dx, 5.0, dz, 1.05, 2.6, 6, P.t, 'crystal', { top: 0.92, ry: a }); K.cone(dx, 7.6, dz, 0.97, 1.5, P.b, 'crystal', { seg: 6, flat: true, ry: a + PI / 6 }); K.cone(dx, 5.0, dz, 1.05, 1.6, P.t, 'crystal', { seg: 6, flat: true, rx: PI, ry: a + PI / 6 }); for (let j = -1; j <= 1; j++) { const t = a + j * PI / 3, ap = 1.05 * 0.866 + 0.025; K.box(dx + Math.cos(t) * ap, 5.15, dz + Math.sin(t) * ap, 0.07, 1.75, 0.12, P.c, null, { e: 1.9, ry: -t, rz: 0.028 }); } /* fraturas acesas nas faces de fora (sem pontos que pareçam olhos) */ K.oct(dx * 0.86, 4.8, dz * 0.86, 0.72, 2.8, P.a, 'crystal', { ry: a + 0.4, rz: -ca * 0.3, rx: sa * 0.3 }); K.oct(dx * 1.12, 4.5, dz * 1.12, 0.55, 2.2, P.b, 'crystal', { ry: a - 0.5, rz: ca * 0.35, rx: -sa * 0.35 });
+      K.fine(() => { K.tor(dx, 7.75, dz, 0.9, 0.05, P.l, null, { e: 1.8, ts: 6, rs: 3 }); for (const k of [-1, 1]) { K.oct(dx + Math.cos(a + k * 0.5) * 0.8, 3.6, dz + Math.sin(a + k * 0.5) * 0.8, 0.2, 1.0, P.b, 'crystal'); K.oct(dx - sa * k * 1.25, 6.4, dz + ca * k * 1.25, 0.12, 0.6, P.l, 'crystal'); K.oct(dx - sa * k * 0.7, 6.9, dz + ca * k * 0.7, 0.16, 0.9, P.a, 'crystal', { rz: -ca * k * 0.4, rx: sa * k * 0.4 }); } Q._dot(K, dx, 3.9, dz, 0.12, P.c, 2.4); Q._drusa(K, P, dx * 0.92, 6.3, dz * 0.92, 0.7, a, 61); Q._glo(K, [dx * 0.8, 5.7, dz * 0.8], [dx * 0.55, 5.9, dz * 0.55], 0.04, P.c, 2.2); Q._dot(K, dx * 0.54, 5.9, dz * 0.54, 0.09, P.l, 2.6); for (let j = 0; j < 4; j++) { const t = a + PI / 2 + j * PI / 2, rr = 1.15; K.prism(dx + Math.cos(t) * rr, 4.4 + (j % 2) * 1.6, dz + Math.sin(t) * rr, 0.16, 0.7, 6, j % 2 ? P.a : P.l, 'crystal', { top: 0.2, rz: Math.cos(t) * 0.5, rx: -Math.sin(t) * 0.5 }); } }); }));
+    Q._lascas(K, P, 0, 3.2, 0, 4.3, K.q(9), -0.8, 1.0, { lean: 0.4, c2: P.b });
+    K.fine(() => { ringOf(6, 3.8, (dx, dz) => Q._dot(K, dx, 1.84, dz, 0.09, P.l, 2.6)); ringOf(6, 3.0, (dx, dz, a) => Q._drusa(K, P, dx, 2.45, dz, 0.55, a, 41)); ringOf(6, 3.55, (dx, dz, a) => { const b = a + PI / 6; Q._drusa(K, P, Math.cos(b) * 3.75, 2.0, Math.sin(b) * 3.75, 0.5, b, 43); }); ringOf(6, 0.95, (dx, dz, a) => K.box(dx, 11.4, dz, 0.05, 0.42, 0.5, P.l, null, { e: 1.6, ry: -a })); ringOf(18, 3.95, (dx, dz, a, i) => Q._pino(K, P, dx, 1.8, dz, 0.1, i % 3 ? P.b : P.d)); ringOf(12, 2.95, (dx, dz, a, i) => Q._pino(K, P, dx, 2.44, dz, 0.08, i % 2 ? P.t : P.a)); ringOf(6, 2.98, (dx, dz) => { K.prism(dx, 2.02, dz, 0.2, 0.85, 6, P.b, 'crystal', { top: 0.55 }); Q._dot(K, dx, 2.95, dz, 0.07, P.c, 2.6); }); ringOf(6, 2.62, (dx, dz, a) => { const b = a + PI / 6; K.box(Math.cos(b) * 2.62, 2.44, Math.sin(b) * 2.62, 0.5, 0.05, 0.08, P.c, null, { e: 2, ry: -b + H }); }); });
+  },
+  harmonico(K, P, tc) { /* 4.3d: Harmônico — acorde voador compacto: três vozes de cristal num triângulo de ametista com juntas e filetes acesos, cubo escuro com núcleo na cor do time e anéis giroscópicos justos em sentidos opostos (o render gira o modelo inteiro) */
+    const Q = U.quorith, R = 1.75;
+    K.prism(0, 0.7, 0, 0.72, 0.42, 6, P.d, 'gloss', { top: 1.25 }); K.prism(0, 1.12, 0, 0.9, 0.08, 6, P.c, null, { e: 1.8 }); K.prism(0, 1.2, 0, 0.9, 0.3, 6, P.d, 'gloss', { top: 0.6 });
+    K.oct(0, 0.15, 0, 0.55, 2.6, tc, 'crystal', { ry: PI / 6 }); K.oct(0, 0.75, 0, 0.32, 1.4, P.l, null, { e: 2.2 });
+    ringOf(3, R, (dx, dz, a) => { const ca = Math.cos(a), sa = Math.sin(a);
+      K.oct(dx, -0.1, dz, 0.48, 2.8, P.a, 'crystal', { rz: -ca * 0.3, rx: sa * 0.3, ry: -a }); K.oct(dx * 1.02, 0.5, dz * 1.02, 0.28, 1.6, P.c, null, { e: 2, rz: -ca * 0.3, rx: sa * 0.3, ry: -a + PI / 4 }); K.oct(dx * 0.86, 0.1, dz * 0.86, 0.26, 1.5, P.t, 'crystal', { rz: -ca * 0.5, rx: sa * 0.5 });
+      K.prism(dx * 1.06, 1.25, dz * 1.06, 0.48, 0.18, 6, P.t, 'crystal');
+      Q._bar(K, [ca * 0.7, 1.1, sa * 0.7], [dx * 0.88, 1.2, dz * 0.88], 0.1, P.b, 'crystal');
+      const b = a + PI * 2 / 3, nx = Math.cos(b) * R, nz = Math.sin(b) * R; Q._bar(K, [dx, 1.32, dz], [nx, 1.32, nz], 0.14, P.t, 'crystal', 6); Q._glo(K, [dx, 1.5, dz], [nx, 1.5, nz], 0.035, P.c, 1.8);
+      K.fine(() => { Q._dot(K, dx * 1.16, 2.65, dz * 1.16, 0.08, P.l, 2.6); K.oct(dx * 1.3, 0.75, dz * 1.3, 0.08, 0.5, P.l, 'crystal', { rz: -ca * 0.6, rx: sa * 0.6 }); const mx = (dx + nx) / 2, mz = (dz + nz) / 2; K.oct(mx, 1.0, mz, 0.1, 0.62, P.a, 'crystal'); Q._dot(K, mx, 0.95, mz, 0.05, P.c, 2.4);
+        K.tor(dx * 1.06, 0.6, dz * 1.06, 0.42, 0.03, P.l, null, { e: 1.8, ts: 6, rs: 3 }); for (const k of [-1, 1]) K.oct(dx * 1.06 - sa * k * 0.42, 0.2, dz * 1.06 + ca * k * 0.42, 0.1, 0.62, P.b, 'crystal', { rx: ca * k * 0.5, rz: sa * k * 0.5 }); Q._bar(K, [mx, 1.15, mz], [mx * 0.44, 1.15, mz * 0.44], 0.05, P.b, 'crystal', 4);
+        K.box(dx * 0.42, 0.95, dz * 0.42, 0.5, 0.36, 0.06, P.t, 'crystal', { ry: -a }); K.prism(dx * 1.12, 2.3, dz * 1.12, 0.12, 0.42, 6, P.l, 'crystal', { top: 0.05 }); Q._glo(K, [dx * 0.94, 0.3, dz * 0.94], [dx * 1.1, 2.1, dz * 1.1], 0.025, P.l, 2); K.oct(dx * 1.12, 1.3, dz * 1.12, 0.07, 0.5, P.a, 'crystal', { rz: H, ry: -a }); K.cone(ca * 0.35, 1.5, sa * 0.35, 1, 0.6, P.b, 'crystal', { seg: 4, flat: true, sx: 0.04, sz: 0.2, ry: -a }); K.prism(dx, 1.22, dz, 0.24, 0.28, 6, P.d, 'gloss'); ringOf(3, 0.16, (ex, ez) => K.oct(dx * 1.16 + ex, 2.2, dz * 1.16 + ez, 0.05, 0.3, P.l, 'crystal')); Q._bar(K, [dx, 0.95, dz], [nx, 0.95, nz], 0.04, P.d, 'gloss', 4); });
+    });
+    K.anim({ t: 'spin', p: [0, 1.15, 0], speed: -3 }, () => K.tor(0, 1.15, 0, 1.05, 0.05, P.l, null, { e: 2, ts: 6, rs: 3, rx: 0.5 }));
+    K.anim({ t: 'spin', p: [0, 1.15, 0], speed: 2.4 }, () => { K.tor(0, 1.15, 0, 1.25, 0.06, tc, null, { e: 1.1, ts: 6, rs: 3, rz: 0.5 }); K.fine(() => ringOf(3, 1.25, (dx, dz) => K.oct(dx, 1.0 + dx * 0.22, dz, 0.07, 0.32, P.l, null, { e: 2 }))); });
+    K.anim({ t: 'bob', amp: 0.2, speed: 3 }, () => { K.oct(0, 1.75, 0, 0.24, 0.9, P.l, 'crystal'); K.fine(() => { Q._dot(K, 0, 2.8, 0, 0.08, P.c, 2.6); ringOf(3, 0.3, (dx, dz) => K.oct(dx, 1.6, dz, 0.06, 0.4, P.a, 'crystal')); }); });
+    K.fine(() => { Q._dot(K, 0, -0.2, 0, 0.12, P.c, 2.4); ringOf(6, 0.86, (dx, dz, a) => K.box(dx, 0.75, dz, 0.24, 0.36, 0.05, P.t, 'crystal', { ry: -a + H })); K.anim({ t: 'spin', p: [0, 1.3, 0], speed: -1.2 }, () => ringOf(6, 1.98, (dx, dz, a, i) => K.oct(dx, 1.05 + (i % 2) * 0.3, dz, 0.06, 0.34, i % 2 ? P.l : P.a, 'crystal'))); });
+  },
   voz(K, P, tc) { K.oct(0, 1.4, 0, 1.6, 6.2, P.a, 'crystal'); K.tor(0, 4.5, 0, 1.72, 0.12, P.c, null, { e: 2.6, ts: 6 }); ringOf(3, 2.6, (cx, cz, a) => K.oct(cx, 3.2 + (a > 3 ? 0.8 : 0), cz, 0.4, 1.4, P.b, 'crystal', { rz: 0.3, anim: { t: 'spin', p: [0, 3.2, 0], speed: 1.2 } })); K.tor(0, 0.4, 0, 1.4, 0.1, tc, null, { e: 2, ts: 6, anim: { t: 'spin', p: [0, 0.4, 0], speed: 1.4 } }); K.oct(0, 7.9, 0, 0.3, 0.8, P.c, null, { e: 2.6, anim: { t: 'bob', amp: 0.2, speed: 3 } }); },
   agulha(K, P, tc) { K.prism(0, 0.4, 0, 1.6, 0.5, 6, P.d, 'gloss'); K.oct(0, 0.9, 0, 1.3, 3.8, P.a, 'crystal'); for (const [x, z, a] of [[0.8, 0.8, 0.3], [0.8, -0.8, 0.3], [-0.8, 0.8, -0.3], [-0.8, -0.8, -0.3]]) K.oct(x, 2, z, 0.28, 5.4, P.b, 'crystal', { rz: -a, rx: z * 0.3 }); K.oct(1.2, 2.4, 0, 0.3, 4, P.l, null, { e: 2.4, rz: -1.1, anim: { t: 'recoil', dist: 0.5 } }); K.tor(0, 2.6, 0, 1.5, 0.1, tc, null, { e: 2, ts: 6, anim: { t: 'spin', p: [0, 2.6, 0], speed: 1.2 } }); },
-  diapasao(K, P, tc) { K.prism(0, 0, 0, 2.6, 0.6, 6, P.d, 'gloss'); K.prism(0, 0.6, 0, 1.6, 0.6, 6, P.b, 'crystal'); K.prism(0, 1.2, 0, 0.7, 3, 6, P.a, 'crystal'); K.box(0, 4.2, 0, 0.8, 0.8, 3.8, P.a, 'crystal');
-    for (const s of [-1, 1]) K.anim({ t: 'flap', p: [0, 4.2, s * 1.6], amp: 0.04, speed: 12, side: s }, () => { K.prism(0, 4.2, s * 1.6, 0.5, 8, 6, P.a, 'crystal', { top: 0.6 }); K.oct(0, 12.2, s * 1.6, 0.4, 1.2, P.l, null, { e: 2.8 }); }); K.oct(0, 5.4, 0, 0.45, 1.4, P.c, null, { e: 2.6, anim: { t: 'bob', amp: 0.35, speed: 2.2 } }); K.tor(0, 0.7, 0, 2.2, 0.12, tc, null, { e: 1.8, ts: 6, anim: { t: 'spin', p: [0, 0.7, 0], speed: -1.4 } }); },
-  prisma(K, P, tc) { U.quorith.veiculo_hull(K, P, tc); K.mount = null; K.oct(-0.6, 3, 0, 2.2, 6.4, P.a, 'crystal', { ry: PI / 4 }); K.anim({ t: 'recoil', dist: 0.8 }, () => { K.oct(2.4, 4.4, 0, 0.7, 6, P.b, 'crystal', { rz: -H }); K.oct(8.5, 4.4, 0, 0.3, 1.2, P.c, null, { e: 2.8, rz: -H }); }); K.tor(-0.6, 6, 0, 2.6, 0.12, P.l, null, { e: 2.4, ts: 6, rx: 0.3, anim: { t: 'spin', p: [-0.6, 6, 0], speed: 1.5 } }); },
-  monolito(K, P, tc) { K.prism(0, 0, 0, 1, 0.8, 6, P.d, 'gloss', { sx: 5.4, sz: 4 }); K.tor(0, 1.2, 0, 3.2, 0.16, P.l, null, { e: 2.4, ts: 6, anim: { t: 'spin', p: [0, 1.2, 0], speed: -0.8 } }); K.box(0, 1.8, 0, 3.6, 13, 2.6, P.a, 'crystal', { b: 0.2, bs: 1 });
-    K.box(0, 3, 1.33, 0.3, 10, 0.06, P.c, null, { e: 2.6 }); K.box(0, 3, -1.33, 0.3, 10, 0.06, P.c, null, { e: 2.6 }); K.box(1.83, 3, 0, 0.06, 10, 0.3, P.c, null, { e: 2.6 }); K.oct(0, 14.8, 0, 1.2, 2.8, P.b, 'crystal');
-    ringOf(4, 4.2, (cx, cz) => K.oct(cx, 0.6, cz, 0.7, 3.2, P.b, 'crystal', { rz: -cx * 0.08, rx: cz * 0.08, anim: { t: 'spin', p: [0, 0.6, 0], speed: 0.5 } })); K.oct(0, 18.2, 0, 0.4, 1, tc, null, { e: 2, anim: { t: 'bob', amp: 0.3, speed: 2 } }); },
   catedral(K, P, tc) { // épico: catedral de cristal que caminha sobre três pilares flutuantes, com sinos de cristal e coro aceso
     K.prism(0, 0, 0, 1, 1.2, 6, P.d, 'gloss', { sx: 12, sz: 10 }); ringOf(3, 8, (cx, cz, a) => K.oct(cx, 0.6, cz, 2.2, 9, P.b, 'crystal', { anim: { t: 'bob', amp: 0.5, speed: 2.4, ph: a } }));
     K.prism(0, 4, 0, 1, 7, 6, P.a, 'crystal', { sx: 9, sz: 7.5, top: 0.8 }); K.prism(0, 11, 0, 0.8, 5, 6, P.b, 'crystal', { sx: 9, sz: 7.5, top: 0.4 }); K.prism(0, 7.4, 0, 1.01, 0.4, 6, P.c, null, { e: 2.4, sx: 9, sz: 7.5, top: 1 });
@@ -906,7 +1988,6 @@ U.quorith = {
     K.prism(0, 10.7, 0, 1.03, 0.35, 6, tc, null, { e: 1.5, sx: 9, sz: 7.5, top: 1 }); // faixa na cor do dono
     K.anim({ t: 'spin', p: [0, 25, 0], speed: 0.8 }, () => ringOf(6, 8.5, (cx, cz) => K.oct(cx, 24, cz, 0.6, 2.6, P.l, null, { e: 2.4 }))); // auréola de cristais orbitando
     ringOf(3, 5.6, (cx, cz, a) => K.anim({ t: 'sway', p: [cx, 19.5, cz], amp: 0.06, speed: 1.2, ph: a }, () => K.box(cx, 13, cz, 0.14, 6.4, 1.7, P.c, null, { e: 1.5, ry: -a }))); }, // estandartes de luz
-  harmonico(K, P, tc) { ringOf(3, 1.8, (cx, cz, a) => K.oct(cx, 1, cz, 0.7, 3.4, P.a, 'crystal', { rx: Math.sin(a) * 0.4, rz: -Math.cos(a) * 0.4 })); K.oct(0, 1.6, 0, 0.5, 1.8, P.c, null, { e: 2.8, anim: { t: 'bob', amp: 0.25, speed: 3 } }); K.tor(0, 2.4, 0, 2.8, 0.1, P.l, null, { e: 2.4, ts: 6, anim: { t: 'spin', p: [0, 2.4, 0], speed: -1.8 } }); K.tor(0, 2.4, 0, 2.2, 0.08, tc, null, { e: 2, ts: 6, anim: { t: 'spin', p: [0, 2.4, 0], speed: 1.6 } }); },
 };
 U.vorag = {
   infantaria(K, P, tc) { for (const s of [-1, 1]) leg(K, [-0.4, 3.2, s * 0.9], [0.8, 1.8, s * 1.2], [-0.2, 0, s * 1.2], 0.42, P.b, 'chitin');
@@ -972,29 +2053,286 @@ U.vorag = {
     [[2.9, 1.3, 1.3, 1.1], [1.6, 0.3, 1.35, 1], [0.3, -0.9, 1.5, 0.95], [-1.1, -2.1, 1.85, 0.9]].forEach(([hx, dx, hz, w], i) => { for (const s of S2) { const fx = hx + dx, hip = [hx, 2.1, s * hz], knee = [hx + dx * 0.6, 3.5, s * 2.85], ank = [fx + dx * 0.1, 1.2, s * 3.3], foot = [fx + dx * 0.15, 0, s * 3.45];
       K.anim(legSpec(hip, { ph: (s > 0 ? 0 : PI) + (i % 2 ? PI : 0) }), () => { K.seg(hip, knee, 0.3 * w, P.b, 'chitin', { seg: 7 }); K.sph(knee[0], knee[1], knee[2], 0.3 * w, P.a, 'chitin', { seg: 6 }); spike(knee, [knee[0] - 0.2, knee[1] + 0.75, knee[2] + s * 0.25], 0.12);
         K.seg(knee, ank, 0.24 * w, P.b, 'chitin', { taper: 0.7, seg: 7 }); K.seg(ank, foot, 0.16 * w, P.d, 'chitin', { taper: 0.3, seg: 6 }); }); } }); },
-  veiculo_hull(K, P, tc) { K.sph(0, 2.2, 0, 1, P.a, 'chitin', { sx: 6.4, sy: 2.4, sz: 4, seg: 18 }); for (let i = 0; i < 4; i++) K.sph(-3.6 + i * 2.4, 3.6, 0, 1, P.b, 'chitin', { sx: 1.6, sy: 0.9, sz: 3.6, seg: 12 });
-    for (const x of [-4, -1.2, 1.6, 4.2]) for (const s of [-1, 1]) leg(K, [x, 2, s * 3.2], [x + 0.8, 1.8, s * 4.8], [x + 0.4, 0, s * 5], 0.42, P.b, 'chitin');
-    K.sph(6.6, 2.4, 0, 1.6, P.a, 'chitin', { sx: 1.2, seg: 12 }); for (const s of [-1, 1]) { K.cone(7.6, 2, s * 0.8, 0.35, 2, P.bo, 'bone', { rz: -2, seg: 6, anim: { t: 'sway', p: [7.6, 2, s * 0.8], amp: 0.12, speed: 4, ph: s > 0 ? 0 : PI } }); K.light(8.4, 2.9, s * 0.6, 0.26, P.l); } K.sph(-3, 4.4, 0, 0.6, tc, 'wet', { seg: 8 }); K.mount = 4.4; },
-  veiculo_turret(K, P, tc) { KITS.vorag.turret(K, P, tc, 0.85, false); },
-  drone(K, P, tc, o) { o = o || {}; K.sph(0, 2, 0, 1.2, P.a, 'chitin', { sx: 1.8, seg: 12 }); K.anim({ t: 'sway', p: [-1.2, 1.9, 0], amp: 0.1, speed: 3 }, () => { K.sph(-2.6, 1.8, 0, 1, P.b, 'chitin', { sx: 1.6, sy: 0.9, seg: 12 }); K.cone(-4.3, 1.7, 0, 0.3, o.sting || 1.6, P.bo, 'bone', { rz: H, seg: 6 }); }); K.sph(2.1, 2.2, 0, 0.75, P.a, 'chitin', { seg: 10 });
-    for (const s of [-1, 1]) { K.light(2.75, 2.5, s * 0.35, 0.22, P.l); K.sph(0.2, 2.9, s * 2.4, 1, '#E8A0A8', 'wet', { sx: 1, sy: 0.06, sz: 2.4, ry: s * 0.25, seg: 12, anim: { t: 'flap', p: [0, 2.9, s * 0.6], amp: 0.4, speed: 26, side: s } }); if (o.wings4) K.sph(-1, 2.8, s * 2, 1, '#E8A0A8', 'wet', { sx: 0.7, sy: 0.05, sz: 1.8, ry: -s * 0.35, seg: 12, anim: { t: 'flap', p: [-0.4, 2.8, s * 0.5], amp: 0.5, speed: 26, ph: 0.5, side: s } }); }
-    K.sph(0, 2.9, 0, 0.4, tc, 'wet', { seg: 8 }); },
-  suporte(K, P, tc) { K.sph(0, 3.2, 0, 2, P.m, 'wet', { sy: 0.85, seg: 16 }); for (let i = 0; i < 3; i++) arch(K, 0, 2.4, 0, 2.05, 1.7, 2.05, i * PI / 3, 0.1, '#FF8A8A', null, { e: 1.4, ts: 10 }); ringOf(5, 1.2, (cx, cz, a) => K.tube([[cx, 2, cz], [cx * 1.5, 1, cz * 1.5], [cx * 1.2, 0, cz * 1.2]], 0.14, P.b, 'wet', { ts: 8, anim: { t: 'sway', p: [cx, 2, cz], amp: 0.14, speed: 2.4, ph: a } })); K.sph(0, 4.8, 0, 0.5, P.l, null, { e: 2.4, seg: 10 }); K.tor(0, 2.4, 0, 2, 0.16, P.bo, 'bone', { ts: 20 }); K.sph(1.6, 3.6, 0, 0.45, tc, 'wet', { seg: 8 }); },
-  pirata(K, P, tc) { K.sph(-0.4, 3, 0, 2.4, P.a, 'chitin', { sx: 1.3, sy: 1.1, seg: 16 }); K.sph(-2.4, 4.2, 0, 1.6, P.m, 'wet', { seg: 14 }); for (const x of [-2, 0.4, 2.2]) for (const s of [-1, 1]) leg(K, [x, 2.4, s * 2], [x + 0.6, 2, s * 3.4], [x + 0.3, 0, s * 3.6], 0.36, P.b, 'chitin');
-    K.sph(2.6, 3, 0, 1.4, P.b, 'chitin', { sx: 1.3, seg: 12 }); for (const s of [-1, 1]) { K.seg([3.2, 2.6, s * 0.9], [5.2, 1.6, s * 0.5], 0.3, P.bo, 'bone', { taper: 0.3, anim: { t: 'sway', p: [3.2, 2.6, s * 0.9], amp: 0.14, speed: 5, ph: s > 0 ? 0 : PI } }); K.light(4.1, 3.6, s * 0.5, 0.24, P.l); }
-    ringOf(4, 1, (cx, cz) => K.cone(-0.6 + cx, 5.2, cz, 0.28, 1.8, P.bo, 'bone', { seg: 6, rz: 0.5 })); K.sph(-0.4, 5.4, 0, 0.5, tc, 'wet', { seg: 8 }); },
+  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
+  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
+  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
+  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
+  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
+  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
+  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
+  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
+  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
+  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
+  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
+  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
+  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
+  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
+  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
+  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
+  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
+  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
+  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
+  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
+  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
+  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
+  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
+  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
+  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
+  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
+  _el(c, a, u, v, d) { d = d || 0; return [c[0] + (a[0] + d) * Math.sin(v) * Math.cos(u), c[1] + (a[1] + d) * Math.cos(v), c[2] + (a[2] + d) * Math.sin(v) * Math.sin(u)]; },
+  // espinho de osso que afina até a ponta
+  _esp(K, P, a, b, r, col) { K.seg(a, b, r, col || P.bo, 'bone', { taper: 0.06, seg: 5 }); },
+  // placa de quitina sobreposta: a casca e, só no completo, a borda escura por baixo (camadas como no Semeador)
+  _placa(K, P, x, y, z, lx, h, wz, col, rz, o) { o = o || {}; const sg = o.seg || 10, rx = o.rx || 0, ry = o.ry || 0;
+    K.fine(() => K.sph(x - 0.08, y - 0.03, z, 1, P.d, 'chitin', { half: true, sx: lx + 0.07, sy: h * 0.95, sz: wz + 0.05, rx, ry, rz, seg: sg - 2 }));
+    K.sph(x, y, z, 1, col, o.mat || 'chitin', { half: true, sx: lx, sy: h, sz: wz, rx, ry, rz, seg: sg }); },
+  // pata articulada que balança do quadril (legSpec): fêmur, joelho, tíbia e tarso-garra; no completo, caneleira e esporão no joelho. w = espessura; o.ph, o.amp, o.stride
+  _pata(K, P, hip, knee, ank, foot, w, o) { o = o || {}; const sp = {}; for (const k of ['ph', 'amp', 'stride']) if (o[k] != null) sp[k] = o[k]; const s = hip[2] >= 0 ? 1 : -1, V = U.vorag;
+    K.anim(legSpec(hip, sp), () => { K.seg(hip, knee, 0.3 * w, P.b, 'chitin', { taper: 0.82, seg: 7 }); K.sph(knee[0], knee[1], knee[2], 0.27 * w, P.a, 'chitin', { seg: 6 });
+      K.seg(knee, ank, 0.23 * w, P.b, 'chitin', { taper: 0.72, seg: 7 }); K.seg(ank, foot, 0.16 * w, P.d, 'chitin', { taper: 0.18, seg: 6 });
+      K.fine(() => { const m = [hip[0] + (knee[0] - hip[0]) * 0.55, hip[1] + (knee[1] - hip[1]) * 0.55, hip[2] + (knee[2] - hip[2]) * 0.55]; K.seg(hip, m, 0.36 * w, P.a, 'chitin', { taper: 0.78, seg: 6 }); V._esp(K, P, knee, [knee[0] - 0.2 * w, knee[1] + 0.75 * w, knee[2] + s * 0.3 * w], 0.1 * w); }); }); },
+  // saco de membrana aceso: pele com brilho fraco, miolo que pulsa (bob) e sobressai no topo, reflexo e, no completo, veias escuras. cols = [pele, miolo, reflexo]
+  _saco(K, P, c, a, cols, o) { o = o || {}; const V = U.vorag, sg = o.seg || 16, up = o.up == null ? 0.2 : o.up;
+    K.sph(c[0], c[1], c[2], 1, cols[0], null, { e: o.e0 || 1, sx: a[0], sy: a[1], sz: a[2], seg: sg });
+    const ci = [c[0] + a[0] * 0.04, c[1] + a[1] * up, c[2]], ai = [a[0] * 0.86, a[1] * 0.86, a[2] * 0.84];
+    K.anim({ t: 'bob', amp: o.amp || 0.08, speed: o.speed || 2.2, ph: o.ph || 0 }, () => {
+      K.sph(ci[0], ci[1], ci[2], 1, cols[1], null, { e: o.e1 || 1.12, sx: ai[0], sy: ai[1], sz: ai[2], seg: sg - 2 });
+      K.sph(ci[0] + ai[0] * 0.18, ci[1] + ai[1] * 0.94, ci[2], 1, cols[2], null, { e: 1.16, sx: ai[0] * 0.32, sy: ai[1] * 0.1, sz: ai[2] * 0.3, seg: 10 });
+      K.fine(() => { const vc = o.vein || '#3A1420', n = o.veins || 5; for (let i = 0; i < n; i++) { const u = i / n * PI * 2 + 0.4; K.tube([V._el(ci, ai, u, 0.18, 0.01), V._el(ci, ai, u + 0.2, 0.42, 0.02), V._el(ci, ai, u + 0.05, 0.66, 0.02), V._el(ci, ai, u + 0.28, 0.86, 0.01)], 0.04 * (o.vr || 1), vc, 'wet', { ts: 8, rs: 4 }); } }); }); },
+  // olhos em cacho: um grande aceso e, no completo, três ocelos em volta
+  _olhos(K, P, x, y, z, s, sd) { K.oct(x, y - 0.2 * s, z, 0.21 * s, 0.42 * s, P.l, null, { e: 1.8, ry: PI / 4 });
+    K.fine(() => { for (const [dx, dy, dz, er] of [[-0.3, 0.38, -0.25, 0.12], [-0.52, 0.5, -0.08, 0.1], [0.15, -0.1, 0.3, 0.11]]) K.oct(x + dx * s, y + dy * s - er * s, z + sd * dz * s, er * s, er * 2 * s, P.l, null, { e: 2 }); }); },
+  // perfil de mandíbula (u para a frente, v para fora): a foice serrilhada do Semeador
+  _JAW: [[0, 0.3], [0.45, 0.52], [1.0, 0.56], [1.45, 0.42], [1.8, 0.14], [1.98, -0.2], [1.76, -0.04], [1.67, 0.08], [1.49, 0.05], [1.4, 0.2], [1.17, 0.16], [1.08, 0.3], [0.85, 0.25], [0.55, 0.14], [0.27, 0.02], [0, 0]],
+  // mandíbula deitada que morde subindo e descendo do pivô da base (sway); s escala, sd lado, o.ry abre para fora
+  _mand(K, P, x, y, z, s, sd, o) { o = o || {}; const J = o.J || U.vorag._JAW;
+    K.anim({ t: 'sway', p: [x, y, z], amp: o.amp || 0.12, speed: o.speed || 4, ph: sd > 0 ? 0 : PI }, () => K.poly(J.map(([u, v]) => [u * s, sd * v * s]), 0.26 * s * (o.th || 1), o.col || P.bo, 'bone', { x, y, z, rx: H, ry: -sd * (o.ry || 0), b: K.lite || o.b === false ? 0 : 0.05 * s })); },
+  // mandíbula trituradora em segmentos: gancho de osso que curva para dentro com dentes na face interna; morde (sway) do pivô da base. s escala, sd lado
+  _mandS(K, P, x, y, z, s, sd, o) { o = o || {}; const V = U.vorag, col = o.col || P.bo;
+    K.anim({ t: 'sway', p: [x, y, z], amp: o.amp || 0.14, speed: o.speed || 3, ph: sd > 0 ? 0 : PI }, () => { const p0 = [x, y, z], p1 = [x + 0.75 * s, y + 0.08 * s, z + sd * 0.42 * s], p2 = [x + 1.55 * s, y + 0.02 * s, z + sd * 0.3 * s], p3 = [x + 2.0 * s, y - 0.1 * s, z - sd * 0.22 * s];
+      K.seg(p0, p1, 0.3 * s, col, 'bone', { taper: 0.9, seg: 8 }); K.seg(p1, p2, 0.27 * s, col, 'bone', { taper: 0.8, seg: 8 }); K.seg(p2, p3, 0.22 * s, col, 'bone', { taper: 0.12, seg: 7 }); K.sph(p1[0], p1[1], p1[2], 0.27 * s, col, 'bone', { seg: 7 });
+      const nt = K.q(3); for (let i = 0; i < nt; i++) { const f = (i + 0.5) / nt, b = [p1[0] + (p2[0] - p1[0]) * f, p1[1] + (p2[1] - p1[1]) * f, p1[2] + (p2[2] - p1[2]) * f]; V._esp(K, P, b, [b[0] + 0.05 * s, b[1] - 0.05 * s, b[2] - sd * 0.42 * s], 0.09 * s, '#B9A88C'); } }); },
+  // asa de membrana com perfil de inseto e nervuras; nasce em r0 (pivô do bater), envergadura L, corda c, lado sd; o.sw varrida para trás, o.dh diedro
+  _ASA: [[0.12, 0], [0.32, 0.12], [0.42, 0.45], [0.4, 0.8], [0.26, 0.97], [0.05, 1], [-0.18, 0.93], [-0.36, 0.72], [-0.44, 0.42], [-0.34, 0.14], [-0.12, 0]],
+  _asa(K, P, r0, L, c, sd, o) { o = o || {}; const sw = o.sw || 0.3, dh = o.dh || 0.1, b = -sd * sw, cb = Math.cos(b), sb = Math.sin(b), sh = Math.sin(dh), ch = Math.cos(dh);
+    const W = (X, Y) => { const z = sd * Y * ch; return [r0[0] + X * cb + z * sb, r0[1] + Y * sh, r0[2] - X * sb + z * cb]; };
+    K.anim({ t: 'flap', p: r0, amp: o.amp || 0.45, speed: o.speed || 26, ph: o.ph || 0, side: sd }, () => {
+      K.poly(U.vorag._ASA.map(([u, v]) => [u * c, v * L]), 0.05, o.col || '#E3A0AA', 'wet', { x: r0[0], y: r0[1], z: r0[2], rx: sd * (H - dh), ry: b });
+      K.seg(W(0.3 * c, 0), W(0.36 * c, 0.86 * L), 0.075, P.d, 'chitin', { taper: 0.35, seg: 5 });
+      K.fine(() => { for (const [a0, a1, b0, b1] of [[0, 0.04, -0.12, 0.8], [-0.06, 0.06, -0.34, 0.52], [0.36, 0.5, -0.2, 0.64], [0.06, 0.3, -0.38, 0.32]]) K.seg(W(a0 * c, a1 * L), W(b0 * c, b1 * L), 0.035, P.b, 'chitin', { taper: 0.6, seg: 5 });
+        const t = W(0.28 * c, 0.8 * L); K.sph(t[0], t[1] + 0.03, t[2], 0.13, P.l, null, { e: 1.5, sx: 1.4, sy: 0.35, sz: 1.4, seg: 6 }); }); }); },
+  veiculo_hull(K, P, tc) { /* 4.3d — Besta de guerra: casco de seis placas sobrepostas (as duas de trás na cor do time), oito patas grossas e curtas, crânio blindado com presas e goela de ácido; o soquete de carne no dorso segura o órgão-arma (K.mount) */
+    const V = U.vorag, S2 = [-1, 1];
+    K.sph(-0.8, 2.25, 0, 1, P.a, 'chitin', { sx: 5.7, sy: 1.6, sz: 3.1, seg: 14 });
+    K.sph(-0.6, 1.45, 0, 1, P.d, 'chitin', { sx: 5.1, sy: 0.95, sz: 2.6, seg: 12 });
+    // carapaça: placas de trás para a frente, com esporões de borda e cravos na quilha (no completo)
+    const PX = [-5.5, -4.0, -2.5, -1.0, 0.5, 2.0], PC = [tc, tc, P.b, P.a, P.b, P.a], gx = x => Math.sqrt(1 - ((x + 1.75) / 4.95) ** 2);
+    PX.forEach((x, i) => { const g = gx(x); V._placa(K, P, x, 1.95, 0, 1.05, 2.15 * g, 3.9 * g, PC[i], -0.13, { seg: 10 });
+      if (i > 0 && i < 4) K.fine(() => { for (const s of S2) V._esp(K, P, [x - 0.3, 2.3, s * 3.6 * g], [x - 0.8, 2.15, s * (3.6 * g + 0.85)], 0.13); }); });
+    K.fine(() => { for (const x of [-5.3, -3.8]) V._esp(K, P, [x, 1.95 + 2.0 * gx(x), 0], [x - 0.5, 2.5 + 2.1 * gx(x), 0], 0.14); });
+    // soquete do órgão-arma: lábios de carne
+    K.tor(0, 3.85, 0, 2.5, 0.36, P.m, 'wet', { ts: 18, rs: 5 });
+    K.mount = 3.95;
+    // oito patas grossas e curtas em tripé alternado
+    [[-4.1, -1.1], [-1.7, -0.45], [0.7, 0.45], [3.0, 1.1]].forEach(([x, dx], i) => { for (const s of S2) V._pata(K, P, [x, 1.8, s * 2.5], [x + dx * 0.5, 3.15, s * 4.0], [x + dx, 1.3, s * 4.75], [x + dx * 1.15, 0, s * 4.95], 1.65, { ph: (s > 0 ? 0 : PI) + (i % 2 ? PI : 0), stride: 9, amp: 0.26 }); });
+    K.fine(() => { for (const x of [-3.3, -0.9, 1.4]) for (const s of S2) K.light(x, 1.55, s * 2.9, 0.2, P.l, 2.2); });
+    // pescoço e cabeça: cápsula larga, escudo com quilha, clípeo, olhos em cacho, presas de osso, goela de ácido e mandíbulas
+    K.sph(3.3, 2.0, 0, 1, P.b, 'chitin', { sx: 1.6, sy: 1.25, sz: 2.25, seg: 12 });
+    K.sph(5.0, 1.75, 0, 1, P.a, 'chitin', { sx: 1.6, sy: 1.05, sz: 1.95, seg: 12 });
+    V._placa(K, P, 4.7, 1.95, 0, 1.8, 1.2, 2.25, P.b, -0.28, { seg: 10 });
+    K.sph(4.5, 3.05, 0, 1, P.bo, 'bone', { sx: 1.35, sy: 0.24, sz: 0.2, rz: -0.32, seg: 8 });
+    V._placa(K, P, 6.2, 1.55, 0, 0.75, 0.6, 1.4, P.a, -0.8, { seg: 9 });
+    for (const s of S2) { V._olhos(K, P, 5.85, 2.3, s * 1.25, 1.1, s);
+      const t0 = [5.9, 1.4, s * 1.2], t1 = [7.1, 1.05, s * 1.55], t2 = [8.2, 1.15, s * 1.62], t3 = [8.85, 1.85, s * 1.4];
+      K.seg(t0, t1, 0.36, P.bo, 'bone', { taper: 0.85, seg: 8 }); K.seg(t1, t2, 0.31, P.bo, 'bone', { taper: 0.75, seg: 8 }); K.seg(t2, t3, 0.23, P.bo, 'bone', { taper: 0.08, seg: 7 });
+      K.fine(() => K.sph(t1[0], t1[1], t1[2], 0.3, P.bo, 'bone', { seg: 6 })); }
+    K.tor(6.75, 1.2, 0, 0.32, 0.11, P.d, 'wet', { rz: H, ts: 10, rs: 5 });
+    K.sph(6.72, 1.2, 0, 0.28, P.ac, null, { e: 1.9, seg: 7 });
+    for (const s of S2) V._mand(K, P, 6.3, 1.05, s * 0.72, 0.85, s, { ry: 0.15, amp: 0.1, speed: 3, b: false });
+    K.fine(() => { for (const s of S2) K.anim({ t: 'sway', p: [6.0, 2.5, s * 0.55], amp: 0.14, speed: 3, ph: s > 0 ? 0 : 1.3 }, () => { K.seg([6.0, 2.5, s * 0.55], [7.0, 3.3, s * 0.9], 0.07, P.d, 'chitin', { seg: 5 }); K.seg([7.0, 3.3, s * 0.9], [8.1, 3.5, s * 1.25], 0.05, P.d, 'chitin', { taper: 0.3, seg: 5 }); }); });
+    // cauda: placa terminal, ferrões e um poro aceso
+    K.sph(-6.55, 2.1, 0, 1, P.b, 'chitin', { half: true, sx: 1.0, sy: 0.8, sz: 1.35, rz: H * 0.9, seg: 8 });
+    V._esp(K, P, [-7.0, 2.6, 0], [-7.8, 3.5, 0], 0.2); for (const s of S2) V._esp(K, P, [-7.0, 2.1, s * 0.6], [-7.7, 1.9, s * 1.25], 0.15);
+    K.light(-7.35, 1.85, 0, 0.22, P.l, 2.2); },
+  veiculo_turret(K, P, tc) { /* 4.3d — órgão-arma: domo de músculo e quitina com escudo na cor do time, bexiga de sangue aceso atrás (munição que pulsa) presa por dedos de osso, manga de carne e cano grosso de anéis que recua, boca de ácido; olhos na frente */
+    const V = U.vorag, S2 = [-1, 1], SC = [-2.3, 1.65, 0], SA = [1.1, 0.95, 1.05], BY = 1.45;
+    K.tor(0, 0.25, 0, 2.42, 0.24, P.d, 'wet', { ts: 18, rs: 5 });
+    K.sph(0, 0.12, 0, 1, P.b, 'chitin', { half: true, sx: 2.6, sy: 1.95, sz: 2.4, seg: 14 });
+    V._placa(K, P, 0.2, 0.62, 0, 2.2, 1.5, 2.05, tc, -0.1, { seg: 12 });
+    K.fine(() => K.sph(0.35, 2.1, 0, 1, P.a, 'chitin', { sx: 1.6, sy: 0.16, sz: 0.14, rz: -0.1, seg: 6 }));
+    V._saco(K, P, SC, SA, ['#8E2234', '#FF5A5A', '#FFD0D0'], { seg: 12, amp: 0.06, speed: 3, vein: '#4A0A18', veins: 3 });
+    for (let k = 0; k < K.q(2); k++) for (const s of S2) { const u = s * (1.1 + k * 0.9), a = V._el(SC, SA, u, 2.0, 0.06), b = V._el(SC, SA, u + s * 0.2, 1.35, 0.1), c = V._el(SC, SA, u + s * 0.4, 0.85, 0.1);
+      K.seg(a, b, 0.15, P.bo, 'bone', { taper: 0.8, seg: 6 }); K.seg(b, c, 0.12, P.bo, 'bone', { taper: 0.2, seg: 6 }); }
+    // manga de carne fixa e o cano que recua dentro dela
+    K.seg([1.3, BY - 0.05, 0], [2.9, BY, 0], 0.78, P.m, 'wet', { taper: 0.82, seg: 12 });
+    K.anim({ t: 'recoil', dist: 0.95 }, () => { K.seg([1.5, BY, 0], [6.6, BY + 0.1, 0], 0.56, P.bo, 'bone', { taper: 0.8, seg: 12 });
+      const n = K.q(5); for (let i = 0; i < n; i++) { const f = 0.3 + 0.62 * i / Math.max(1, n - 1), x = 1.5 + 5.1 * f; K.cyl(x - 0.14, BY + 0.1 * f, 0, 0.61 - 0.112 * f, 0.61 - 0.112 * f, 0.28, P.a, 'chitin', { rz: -H, seg: 10 }); }
+      K.cyl(6.45, BY + 0.1, 0, 0.66, 0.46, 0.65, P.m, 'wet', { rz: -H, seg: 12 });
+      K.sph(7.05, BY + 0.1, 0, 0.32, P.ac, null, { e: 2.2, seg: 8 });
+      K.fine(() => { K.tube([[1.8, BY + 0.55, 0], [3.6, BY + 0.62, 0], [5.4, BY + 0.55, 0]], 0.11, P.m, 'wet', { ts: 8, rs: 5 }); for (const x of [3.0, 4.2, 5.4]) V._esp(K, P, [x, BY + 0.45, 0], [x - 0.4, BY + 1.05, 0], 0.09); }); });
+    for (const s of S2) { V._olhos(K, P, 2.2, 1.25, s * 0.95, 0.85, s); K.seg([0.6, 0.55, s * 1.75], [2.5, BY - 0.15, s * 0.62], 0.17, P.m, 'wet', { taper: 0.7, seg: 6 }); K.fine(() => K.sph(0.6, 0.55, s * 1.75, 0.24, P.bo, 'bone', { seg: 5 })); }
+    K.fine(() => { for (let i = 0; i < 3; i++) V._esp(K, P, [-0.85 - i * 0.55, 1.85 - i * 0.14, 0], [-1.15 - i * 0.6, 2.5 - i * 0.2, 0], 0.11); }); },
+  drone(K, P, tc) { /* 4.3d — Vespa de guerra: tórax blindado com escudo na cor do time, olhos compostos acesos, dois pares de asas de membrana com nervuras (batem), abdômen em gomos que balança e dois tubos de espinhos sob a cabeça que recuam a cada rajada */
+    const V = U.vorag, S2 = [-1, 1];
+    K.sph(0, 1.55, 0, 1, P.a, 'chitin', { sx: 1.45, sy: 1.0, sz: 1.1, seg: 14 });
+    V._placa(K, P, 0.25, 1.8, 0, 1.25, 0.95, 1.05, tc, -0.12, { seg: 12 });
+    V._placa(K, P, -0.95, 1.75, 0, 0.62, 0.72, 0.85, P.b, -0.15, { seg: 10 });
+    K.sph(1.8, 1.5, 0, 1, P.b, 'chitin', { sx: 0.72, sy: 0.68, sz: 0.82, seg: 12 });
+    for (const s of S2) K.sph(1.98, 1.66, s * 0.5, 1, P.l, null, { e: 1.5, sx: 0.42, sy: 0.5, sz: 0.36, seg: 10 });
+    K.fine(() => { for (const s of S2) K.anim({ t: 'sway', p: [2.2, 2.0, s * 0.25], amp: 0.16, speed: 4, ph: s > 0 ? 0 : 1 }, () => { K.seg([2.2, 2.0, s * 0.25], [3.0, 2.55, s * 0.55], 0.05, P.d, 'chitin', { seg: 5 }); K.seg([3.0, 2.55, s * 0.55], [3.8, 2.5, s * 0.8], 0.04, P.d, 'chitin', { taper: 0.3, seg: 5 }); }); });
+    // armas: glândula e tubo de espinhos que recua
+    for (const s of S2) { K.sph(1.0, 0.95, s * 0.52, 1, P.m, 'wet', { sx: 0.5, sy: 0.32, sz: 0.3, seg: 8 });
+      K.anim({ t: 'recoil', dist: 0.45 }, () => { K.seg([1.0, 0.9, s * 0.52], [3.05, 0.95, s * 0.4], 0.16, P.d, 'chitin', { taper: 0.72, seg: 8 }); K.sph(3.08, 0.95, s * 0.4, 0.13, P.ac, null, { e: 2.2, seg: 6 }); }); }
+    // abdômen em gomos (um na cor do time) que balança do pecíolo
+    K.anim({ t: 'sway', p: [-1.2, 1.5, 0], amp: 0.07, speed: 3 }, () => { K.seg([-0.9, 1.45, 0], [-1.7, 1.4, 0], 0.3, P.d, 'chitin', { seg: 8 });
+      K.sph(-3.3, 1.25, 0, 1, P.a, 'chitin', { sx: 1.95, sy: 0.82, sz: 0.88, rz: 0.12, seg: 14 });
+      const n = K.q(4); for (let i = 0; i < n; i++) { const f = n > 1 ? i / (n - 1) : 0, x = -1.95 - f * 2.4, g = Math.sqrt(Math.max(0.1, 1 - ((x + 3.3) / 2.05) ** 2)); V._placa(K, P, x, 1.25 + (x + 3.3) * 0.12 - 0.05, 0, 0.55 * 4 / n, 0.95 * g, 1.0 * g, i === 1 ? tc : (i % 2 ? P.b : P.a), -0.1, { seg: 10 }); }
+      K.fine(() => { V._esp(K, P, [-5.05, 1.05, 0], [-5.85, 0.85, 0], 0.14); K.sph(-5.15, 1.0, 0, 0.16, P.ac, null, { e: 2, seg: 6 }); }); });
+    // asas: par da frente maior, par de trás defasado
+    for (const s of S2) { V._asa(K, P, [0.45, 2.2, s * 0.7], 5.0, 1.75, s, { sw: 0.22, dh: 0.12, amp: 0.42, speed: 28 }); V._asa(K, P, [-0.45, 2.1, s * 0.62], 3.9, 1.35, s, { sw: 0.55, dh: 0.06, amp: 0.42, speed: 28, ph: 1.1 }); }
+    // patas dobradas sob o tórax
+    K.fine(() => { [[0.8, 0.5], [0.1, 0], [-0.6, -0.5]].forEach(([x, dx], i) => { for (const s of S2) K.anim({ t: 'sway', p: [x, 0.95, s * 0.55], amp: 0.12, speed: 2.4, ph: i + (s > 0 ? 0 : 1) }, () => { K.seg([x, 0.95, s * 0.55], [x + dx * 0.4, 0.75, s * 1.15], 0.09, P.b, 'chitin', { seg: 5 }); K.seg([x + dx * 0.4, 0.75, s * 1.15], [x + dx - 0.5, 0.5, s * 1.3], 0.07, P.d, 'chitin', { taper: 0.3, seg: 5 }); }); }); }); },
+  suporte(K, P, tc) { /* 4.3d — Bolsa de membrana: besta-carrapato de seis patas que carrega numa taça de quitina uma bexiga nervosa acesa (rosa) presa por costelas de osso, com anel na cor do time na borda; antenas de interferência e uma trombeta de carne na frente que dispara o pulso */
+    const V = U.vorag, S2 = [-1, 1], SC = [-0.2, 4.75, 0], SA = [3.0, 2.5, 2.75];
+    K.sph(0, 2.0, 0, 1, P.a, 'chitin', { sx: 3.3, sy: 1.3, sz: 2.6, seg: 14 });
+    K.sph(0.1, 1.35, 0, 1, P.d, 'chitin', { sx: 2.9, sy: 0.8, sz: 2.2, seg: 12 });
+    for (const s of S2) V._placa(K, P, -0.2, 1.7, s * 2.3, 2.2, 1.0, 0.75, P.b, 0, { seg: 9, rx: s * 0.5 });
+    V._placa(K, P, -3.0, 1.75, 0, 0.9, 1.0, 1.9, P.b, 0.35, { seg: 9 });
+    // bexiga numa taça de quitina; anel na cor do time na borda e costelas de osso por cima (o miolo pulsa por dentro)
+    V._saco(K, P, SC, SA, ['#8E2452', '#FF6FA6', '#FFD3E6'], { seg: 18, amp: 0.12, speed: 2.6, up: 0.18, vein: '#5A0F2E', veins: 6, vr: 1.4 });
+    K.sph(SC[0], 4.35, 0, 1, P.a, 'chitin', { half: true, rx: PI, sx: 3.2, sy: 2.05, sz: 2.95, seg: 16 });
+    K.tor(SC[0], 4.35, 0, 3.12, 0.3, tc, 'chitin', { ts: 28, rs: 5, sz: 0.93 });
+    const nr = K.q(6); for (let i = 0; i < nr; i++) { const u = i / nr * PI * 2 + PI / nr, p = [1.62, 1.3, 1.0, 0.72].map(v => V._el(SC, SA, u, v, 0.14));
+      for (let k = 0; k < 3; k++) K.seg(p[k], p[k + 1], 0.2 - k * 0.04, P.bo, 'bone', { taper: k === 2 ? 0.25 : 0.85, seg: 6 }); }
+    K.fine(() => ringOf(14, 3.3, (cx, cz) => V._esp(K, P, [cx + SC[0], 4.2, cz * 0.93], [(cx * 1.14) + SC[0], 3.7, cz * 1.06], 0.08)));
+    // antenas de interferência com pontas acesas
+    for (const s of S2) K.anim({ t: 'sway', p: [1.5, 4.3, s * 1.7], amp: 0.09, speed: 2.2, ph: s > 0 ? 0 : 1.6 }, () => { K.seg([1.5, 4.3, s * 1.7], [2.3, 7.0, s * 2.05], 0.12, P.d, 'chitin', { taper: 0.6, seg: 6 }); K.seg([2.3, 7.0, s * 2.05], [2.0, 8.7, s * 2.25], 0.07, P.d, 'chitin', { taper: 0.5, seg: 5 }); K.sph(2.0, 8.75, s * 2.25, 0.16, '#FF6FA6', null, { e: 2.2, seg: 6 }); });
+    K.fine(() => K.anim({ t: 'sway', p: [-2.6, 4.3, 0], amp: 0.1, speed: 1.8, ph: 0.7 }, () => { K.seg([-2.6, 4.3, 0], [-3.7, 7.2, 0], 0.1, P.d, 'chitin', { taper: 0.5, seg: 5 }); K.sph(-3.7, 7.25, 0, 0.14, '#FF6FA6', null, { e: 2.2, seg: 6 }); }));
+    // cabeça baixa, olhos e palpos
+    K.sph(3.45, 1.8, 0, 1, P.b, 'chitin', { sx: 1.0, sy: 0.8, sz: 1.2, seg: 12 });
+    V._placa(K, P, 3.3, 1.95, 0, 0.95, 0.75, 1.25, tc, -0.3, { seg: 10 });
+    for (const s of S2) V._olhos(K, P, 4.1, 2.05, s * 0.75, 0.75, s);
+    K.fine(() => { for (const s of S2) K.anim({ t: 'sway', p: [4.2, 1.4, s * 0.45], amp: 0.2, speed: 5, ph: s > 0 ? 0 : PI }, () => { K.seg([4.2, 1.4, s * 0.45], [4.85, 1.0, s * 0.55], 0.09, P.bo, 'bone', { seg: 5 }); K.seg([4.85, 1.0, s * 0.55], [5.1, 0.5, s * 0.4], 0.07, P.bo, 'bone', { taper: 0.3, seg: 5 }); }); });
+    // trombeta do pulso: tubo de carne com boca larga e anel aceso
+    K.seg([2.4, 3.1, 0], [3.7, 3.8, 0], 0.45, P.b, 'chitin', { taper: 0.85, seg: 10 });
+    K.lathe([[0.38, 0], [0.35, 0.55], [0.44, 1.0], [0.7, 1.3], [0.95, 1.42], [0.78, 1.46], [0.42, 1.3]], 3.55, 3.7, 0, P.m, 'wet', { rz: -H + 0.55, seg: 16 });
+    K.sph(4.58, 4.36, 0, 0.44, '#FF6FA6', null, { e: 2.2, sx: 0.5, seg: 10 });
+    // seis patas
+    [[-1.9, -0.9], [0, 0], [1.9, 0.9]].forEach(([x, dx], i) => { for (const s of S2) V._pata(K, P, [x, 1.8, s * 2.1], [x + dx * 0.4, 3.2, s * 3.6], [x + dx, 1.3, s * 4.2], [x + dx * 1.1, 0, s * 4.35], 1.25, { ph: (s > 0 ? 0 : PI) + (i % 2 ? PI : 0) }); }); },
+  pirata(K, P, tc) { /* 4.3d — Carniceiro: papo inchado na frente, pálido como carrapato cheio, com calombos e veias acesas, esticado por sucata engolida que fura a pele; mandíbulas trituradoras, moenda de dentes que gira na boca, braços-gancho que trazem uma chapa de destroço à boca e seis patas; abdômen com placas na cor do time */
+    const V = U.vorag, S2 = [-1, 1], CC = [1.15, 2.95, 0], CA = [2.15, 1.85, 2.35];
+    K.sph(-3.2, 2.1, 0, 1, P.a, 'chitin', { sx: 2.6, sy: 1.45, sz: 2.0, seg: 14 });
+    K.sph(-3.0, 1.5, 0, 1, P.d, 'chitin', { sx: 2.3, sy: 0.85, sz: 1.75, seg: 12 });
+    [-4.85, -3.85, -2.85, -1.85].forEach((x, i) => { const g = Math.sqrt(1 - ((x + 3.25) / 2.7) ** 2); V._placa(K, P, x, 1.85, 0, 0.75, 1.9 * g, 2.4 * g, [P.b, tc, tc, P.a][i], -0.14, { seg: 11 });
+      if (i > 0) K.fine(() => { for (const s of S2) V._esp(K, P, [x - 0.2, 2.4, s * 2.25 * g], [x - 0.6, 2.25, s * (2.25 * g + 0.7)], 0.12); }); });
+    K.sph(-0.75, 2.15, 0, 1, P.b, 'chitin', { sx: 1.3, sy: 1.15, sz: 1.65, seg: 12 });
+    V._placa(K, P, -0.9, 2.4, 0, 0.95, 1.05, 1.6, P.a, -0.12, { seg: 10 });
+    K.fine(() => { const r = rng(31); for (const [x, z] of [[-3.3, 0.6], [-2.3, -0.75]]) K.box(x, 3.1, z, 0.5 + r() * 0.3, 0.9, 0.12, '#5A5F68', 'metal', { rx: (r() - 0.5) * 0.8, rz: 0.5 + r() * 0.4, ry: r() * PI }); });
+    // papo inchado (como um carrapato cheio): pele pálida esticada que pulsa, calombos, veias acesas e sucata escura que fura a pele
+    K.anim({ t: 'bob', amp: 0.07, speed: 1.6 }, () => { K.sph(CC[0], CC[1], CC[2], 1, '#D8A49C', 'wet', { sx: CA[0], sy: CA[1], sz: CA[2], seg: 18 });
+      for (const [u, v, k] of [[1.9, 1.5, 0.95], [-2.0, 1.35, 0.85], [2.9, 1.2, 0.8]]) { const p = V._el(CC, CA, u, v, -0.35); K.sph(p[0], p[1], p[2], k, '#C98E88', 'wet', { sx: 1.1, sy: 0.85, seg: 10 }); }
+      const nv = K.q(7); for (let i = 0; i < nv; i++) { const u = i / nv * PI * 2 + 0.3; K.tube([V._el(CC, CA, u, 0.2, 0.01), V._el(CC, CA, u + 0.25, 0.6, 0.02), V._el(CC, CA, u + 0.05, 1.05, 0.02), V._el(CC, CA, u + 0.3, 1.5, 0.01)], 0.055, '#FF4A5E', null, { e: 1.6, ts: 8, rs: 4 }); }
+      K.fine(() => { for (let i = 0; i < 6; i++) { const u = i / 6 * PI * 2 + 0.75; K.tube([V._el(CC, CA, u, 0.85, 0.01), V._el(CC, CA, u + 0.2, 1.2, 0.02), V._el(CC, CA, u + 0.05, 1.55, 0.01)], 0.035, '#8E3A44', 'wet', { ts: 6, rs: 4 }); } }); });
+    { const r = rng(77), ns = K.q(7); for (let i = 0; i < ns; i++) { const u = -2.7 + i * (5.4 / Math.max(1, ns - 1)) + (r() - 0.5) * 0.4, v = 0.45 + r() * 0.8, p = V._el(CC, CA, u, v, -0.25), big = i % 3 === 1;
+      const col = ['#4E535C', '#6B7079', '#3A3E46'][i % 3], o = { rx: (r() - 0.5) * 1.1, ry: r() * PI, rz: (r() - 0.5) * 1.1 + Math.cos(u) * 0.4 };
+      if (big) K.prism(p[0], p[1], p[2], 0.5, 1.5, 3, col, 'metal', Object.assign({ top: 0.12 }, o)); else K.box(p[0], p[1], p[2], 0.45 + r() * 0.4, 0.95 + r() * 0.55, 0.12 + r() * 0.08, col, 'metal', o); }
+      const q = V._el(CC, CA, 0.5, 0.8, -0.25); K.fine(() => K.box(q[0], q[1], q[2], 0.8, 1.0, 0.14, '#E8B23A', 'paint', { rx: 0.3, rz: -0.5, ry: 0.4 })); }
+    for (let k = 0; k < K.q(2); k++) { const u = k ? 2.3 : -2.3; const p = [2.0, 1.45, 0.95, 0.6].map(v => V._el(CC, CA, u, v, 0.12)); for (let j = 0; j < 3; j++) K.seg(p[j], p[j + 1], 0.18 - j * 0.03, P.bo, 'bone', { taper: j === 2 ? 0.2 : 0.85, seg: 6 }); }
+    // cabeça larga e baixa, escudo, olhos
+    K.sph(4.05, 1.55, 0, 1, P.a, 'chitin', { sx: 1.25, sy: 0.95, sz: 1.7, seg: 12 });
+    V._placa(K, P, 3.9, 1.65, 0, 1.35, 1.0, 1.8, P.b, -0.32, { seg: 11 });
+    for (const s of S2) V._olhos(K, P, 4.6, 2.2, s * 1.0, 0.85, s);
+    // moenda de dentes que gira na boca e goela de ácido
+    K.sph(5.15, 1.4, 0, 0.38, P.ac, null, { e: 1.8, seg: 8 });
+    K.anim({ t: 'spin', p: [5.25, 1.4, 0], axis: 'x', speed: 3 }, () => { K.tor(5.25, 1.4, 0, 0.55, 0.13, P.d, 'wet', { rz: H, ts: 14, rs: 5 }); const n = K.q(8); for (let i = 0; i < n; i++) { const a = i / n * PI * 2; V._esp(K, P, [5.3, 1.4 + 0.52 * Math.cos(a), 0.52 * Math.sin(a)], [5.62, 1.4 + 0.2 * Math.cos(a + 0.5), 0.2 * Math.sin(a + 0.5)], 0.09); } });
+    // mandíbulas trituradoras
+    for (const s of S2) V._mandS(K, P, 4.75, 1.3, s * 1.0, 1.25, s, { col: '#D9C9AE' });
+    // braços-gancho: o esquerdo traz uma chapa de destroço à boca
+    for (const s of S2) K.anim({ t: 'sway', p: [3.3, 1.85, s * 1.5], amp: 0.13, speed: 2.4, ph: s > 0 ? 0 : 1.9 }, () => { const e = [4.5, 3.25, s * 2.35], w = [5.75, 2.45, s * 1.75];
+      K.seg([3.3, 1.85, s * 1.5], e, 0.24, P.b, 'chitin', { taper: 0.85, seg: 7 }); K.sph(e[0], e[1], e[2], 0.22, P.a, 'chitin', { seg: 6 }); K.seg(e, w, 0.19, P.b, 'chitin', { taper: 0.75, seg: 7 });
+      V._esp(K, P, w, [6.25, 1.85, s * 1.45], 0.14); K.fine(() => V._esp(K, P, [w[0] - 0.15, w[1], w[2]], [5.95, 1.6, s * 1.85], 0.1));
+      if (s < 0) K.box(6.05, 1.55, s * 1.3, 0.9, 1.25, 0.14, '#6B7079', 'metal', { rx: 0.5, ry: -0.6, rz: 0.35 }); });
+    // seis patas
+    [[-3.0, -1.0], [-1.4, -0.2], [0.2, 0.6]].forEach(([x, dx], i) => { for (const s of S2) V._pata(K, P, [x, 1.9, s * 1.85], [x + dx * 0.5, 3.3, s * 3.6], [x + dx, 1.2, s * 4.3], [x + dx * 1.1, 0, s * 4.5], 1.1, { ph: (s > 0 ? 0 : PI) + (i % 2 ? PI : 0) }); });
+    // cauda curta
+    K.sph(-5.7, 2.1, 0, 1, P.b, 'chitin', { half: true, sx: 0.75, sy: 0.6, sz: 0.9, rz: H * 0.9, seg: 9 }); V._esp(K, P, [-6.0, 2.4, 0], [-6.6, 3.1, 0], 0.15); },
+  escaravelho(K, P, tc) { /* 4.3d — Escaravelho: besta-transporte rápida — élitros na cor do time com quilhas, pronoto blindado com chifre torácico, chifre longo da cabeça para a investida, bolsas de carga com crias nos flancos e seis patas longas de corrida */
+    const V = U.vorag, S2 = [-1, 1];
+    K.sph(-0.6, 2.0, 0, 1, P.a, 'chitin', { sx: 4.4, sy: 1.5, sz: 2.5, seg: 16 });
+    K.sph(-0.4, 1.35, 0, 1, P.d, 'chitin', { sx: 4.0, sy: 0.8, sz: 2.1, seg: 12 });
+    // élitros (cor do time), costura escura e quilhas
+    for (const s of S2) { V._placa(K, P, -1.65, 2.0, s * 0.95, 3.85, 1.95, 1.75, tc, 0.04, { seg: 16, rx: s * 0.1 });
+      K.fine(() => { for (const k of [0.4, 0.78]) K.tube([-0.8, -0.45, 0, 0.45, 0.8].map(t => [-1.65 + t * 3.85, 2.02 + 1.95 * Math.sqrt(Math.max(0, 1 - t * t - k * k)), s * (0.95 + k * 1.75 + 0.1 * k * k)]), 0.07, P.b, 'chitin', { ts: 10, rs: 4 }); }); }
+    K.sph(-1.65, 3.5, 0, 1, P.d, 'chitin', { sx: 3.6, sy: 0.16, sz: 0.16, seg: 10 });
+    K.sph(-5.15, 1.95, 0, 1, P.b, 'chitin', { half: true, sx: 0.75, sy: 0.7, sz: 1.5, rz: H * 0.85, seg: 10 });
+    for (const s of S2) K.sph(-5.0, 2.55, s * 0.75, 1, '#E3A0AA', 'wet', { sx: 1.3, sy: 0.05, sz: 0.55, ry: s * 0.35, rz: 0.12, seg: 10 });
+    // pronoto e chifre torácico
+    V._placa(K, P, 2.25, 2.1, 0, 1.75, 1.55, 2.3, P.a, -0.2, { seg: 14 });
+    K.seg([2.45, 3.45, 0], [3.5, 4.25, 0], 0.3, P.bo, 'bone', { taper: 0.75, seg: 8 }); K.seg([3.5, 4.25, 0], [4.55, 4.35, 0], 0.22, P.bo, 'bone', { taper: 0.1, seg: 7 }); K.fine(() => K.sph(3.5, 4.25, 0, 0.22, P.bo, 'bone', { seg: 6 }));
+    // cabeça, chifre longo (investida), olhos, antenas e mandíbulas
+    K.sph(4.3, 1.55, 0, 1, P.b, 'chitin', { sx: 1.0, sy: 0.8, sz: 1.15, seg: 12 });
+    { const h0 = [4.85, 1.75, 0], h1 = [6.2, 2.15, 0], h2 = [7.3, 3.15, 0], h3 = [7.8, 4.55, 0]; K.seg(h0, h1, 0.42, P.bo, 'bone', { taper: 0.88, seg: 9 }); K.seg(h1, h2, 0.37, P.bo, 'bone', { taper: 0.75, seg: 9 }); K.seg(h2, h3, 0.28, P.bo, 'bone', { taper: 0.1, seg: 8 });
+      K.fine(() => { K.sph(h1[0], h1[1], h1[2], 0.37, P.bo, 'bone', { seg: 7 }); K.sph(h2[0], h2[1], h2[2], 0.28, P.bo, 'bone', { seg: 7 }); for (const s of S2) V._esp(K, P, [7.45, 3.6, 0], [7.95, 3.85, s * 0.45], 0.1); }); }
+    for (const s of S2) V._olhos(K, P, 4.85, 1.95, s * 0.8, 0.7, s);
+    K.fine(() => { for (const s of S2) { K.anim({ t: 'sway', p: [4.9, 1.6, s * 0.55], amp: 0.15, speed: 3.4, ph: s > 0 ? 0 : 1.2 }, () => { K.seg([4.9, 1.6, s * 0.55], [5.6, 2.1, s * 1.2], 0.05, P.d, 'chitin', { seg: 5 }); K.seg([5.6, 2.1, s * 1.2], [6.3, 2.05, s * 1.55], 0.04, P.d, 'chitin', { taper: 0.3, seg: 5 }); }); V._mand(K, P, 4.95, 1.2, s * 0.5, 0.55, s, { amp: 0.12, speed: 4 }); } });
+    // bolsas de carga com crias (acesas) presas nos flancos por ganchos de osso
+    for (const x of K.lite ? [-1.6] : [-2.6, -0.6]) for (const s of S2) { K.sph(x, 1.55, s * 2.65, 1, '#8E2234', null, { e: 1, sx: K.lite ? 1.6 : 0.85, sy: 0.62, sz: 0.5, seg: 10 }); K.sph(x + 0.05, 1.62, s * 2.75, 1, '#FF7A86', null, { e: 1.1, sx: K.lite ? 1.2 : 0.62, sy: 0.42, sz: 0.38, seg: 8 });
+      K.fine(() => { K.seg([x - 0.5, 2.5, s * 2.3], [x - 0.6, 1.1, s * 3.05], 0.08, P.bo, 'bone', { seg: 5 }); K.seg([x + 0.5, 2.5, s * 2.3], [x + 0.6, 1.1, s * 3.05], 0.08, P.bo, 'bone', { seg: 5 }); }); }
+    // seis patas longas de corrida
+    [[-1.8, -1.6], [0.4, -0.3], [2.2, 1.2]].forEach(([x, dx], i) => { for (const s of S2) V._pata(K, P, [x, 1.7, s * 1.9], [x + dx * 0.45, 3.2, s * 3.7], [x + dx, 1.1, s * 4.4], [x + dx * 1.15, 0, s * 4.6], 1.15, { ph: (s > 0 ? 0 : PI) + (i % 2 ? PI : 0), stride: 9, amp: 0.36 }); }); },
+  brutamonte(K, P, tc) { /* 4.3d — Brutamonte: tanque biológico da Era 3 — carapaça de seis placas enormes (duas na cor do time) com esporões, sacos de gás que pulsam nos flancos, crânio-aríete de osso com presas, dois braços-clava (golpe de área) e oito patas-pilar */
+    const V = U.vorag, S2 = [-1, 1];
+    K.sph(-0.8, 4.0, 0, 1, P.a, 'chitin', { sx: 7.6, sy: 3.0, sz: 5.0, seg: 20 });
+    K.sph(-0.6, 2.6, 0, 1, P.d, 'chitin', { sx: 7.0, sy: 1.7, sz: 4.3, seg: 14 });
+    const PX = [-7.4, -5.0, -2.6, -0.2, 2.2, 4.6], PC = [P.b, P.a, tc, tc, P.a, P.b];
+    PX.forEach((x, i) => { const g = Math.sqrt(1 - ((x + 1.4) / 7.2) ** 2); V._placa(K, P, x, 3.6, 0, 1.6, 4.2 * g, 6.0 * g, PC[i], -0.14, { seg: 14 });
+      V._esp(K, P, [x - 0.3, 3.4 + 4.0 * g, 0], [x - 1.1, 4.9 + 4.4 * g, 0], 0.32);
+      for (const s of S2) { V._esp(K, P, [x - 0.4, 4.4, s * 5.6 * g], [x - 1.2, 4.2, s * (5.6 * g + 1.5)], 0.24); K.fine(() => { V._esp(K, P, [x - 0.2, 3.4 + 3.1 * g, s * 3.6 * g], [x - 0.9, 4.6 + 3.5 * g, s * 4.4 * g], 0.17); if (PC[i] !== tc) K.oct(x + 0.1, 3.65 + 3.85 * g, s * 2.4 * g, 0.24, 0.48, P.l, null, { e: 2 }); }); } });
+    // sacos de gás que pulsam nos flancos (entre as placas)
+    for (const x of [-3.8, 1.0]) for (const s of S2) V._saco(K, P, [x, 4.6, s * 4.9], [1.2, 1.0, 0.9], ['#8E2234', '#FF5A5A', '#FFD0D0'], { seg: 12, amp: 0.12, speed: 2 + x * 0.1, ph: s + x, up: 0.1, veins: 3 });
+    // pescoço, crânio com elmo de quitina, aríete chato de osso com três chifres, presas e olhos
+    K.sph(6.6, 3.7, 0, 1, P.b, 'chitin', { sx: 2.0, sy: 2.0, sz: 3.4, seg: 14 });
+    K.sph(8.6, 3.3, 0, 1, P.a, 'chitin', { sx: 2.1, sy: 1.7, sz: 2.9, seg: 14 });
+    V._placa(K, P, 8.2, 3.7, 0, 2.3, 1.55, 3.15, P.b, -0.35, { seg: 12 });
+    K.sph(10.15, 3.3, 0, 1, '#D6C6AE', 'bone', { sx: 0.6, sy: 1.55, sz: 2.65, seg: 12 });
+    K.fine(() => { for (const z of [-1.2, 1.2]) K.sph(10.55, 3.3, z, 1, '#C4B39A', 'bone', { sx: 0.25, sy: 1.1, sz: 0.5, seg: 7 }); });
+    V._esp(K, P, [10.4, 4.0, 0], [12.2, 5.2, 0], 0.42, '#D6C6AE'); for (const s of S2) V._esp(K, P, [10.5, 3.6, s * 1.6], [12.0, 4.0, s * 2.1], 0.3, '#D6C6AE');
+    for (const s of S2) { const t0 = [9.9, 2.0, s * 1.7], t1 = [11.4, 1.6, s * 2.3], t2 = [12.4, 2.7, s * 2.35]; K.seg(t0, t1, 0.55, P.bo, 'bone', { taper: 0.8, seg: 9 }); K.seg(t1, t2, 0.44, P.bo, 'bone', { taper: 0.08, seg: 8 }); K.fine(() => K.sph(t1[0], t1[1], t1[2], 0.44, P.bo, 'bone', { seg: 7 }));
+      V._olhos(K, P, 9.35, 4.05, s * 2.35, 1.1, s); }
+    // braços-clava (golpe de área): sobem e descem do ombro
+    for (const s of S2) K.anim({ t: 'sway', p: [6.2, 3.4, s * 3.5], amp: 0.1, speed: 2.2, ph: s > 0 ? 0 : 1.4 }, () => { const sh = [6.2, 3.4, s * 3.5], el = [7.9, 5.7, s * 5.0], wr = [10.0, 3.5, s * 4.7];
+      K.seg(sh, el, 0.75, P.b, 'chitin', { taper: 0.85, seg: 9 }); K.sph(el[0], el[1], el[2], 0.68, P.a, 'chitin', { seg: 9 }); K.seg(el, wr, 0.6, P.b, 'chitin', { taper: 0.8, seg: 9 });
+      V._placa(K, P, 7.0, 4.6, s * 4.3, 1.4, 0.7, 0.8, P.a, -0.9, { seg: 9, rx: s * 0.6 });
+      K.rock(10.6, 3.2, s * 4.7, 1.55, P.b, 'chitin', { seed: s > 0 ? 3 : 4, amp: 0.16, detail: K.lite ? 0 : 1 });
+      const sp = K.q(5); for (let i = 0; i < sp; i++) { const a = i / sp * PI * 2; V._esp(K, P, [10.6 + 1.1 * Math.cos(a), 3.2 + 1.1 * Math.sin(a), s * 4.7], [10.6 + 2.5 * Math.cos(a), 3.2 + 2.5 * Math.sin(a), s * (4.7 + 0.35)], 0.3); } });
+    // oito patas-pilar
+    [[-5.6, -1.3], [-2.4, -0.5], [0.8, 0.5], [3.8, 1.2]].forEach(([x, dx], i) => { for (const s of S2) V._pata(K, P, [x, 3.0, s * 4.2], [x + dx * 0.45, 5.0, s * 6.1], [x + dx, 2.2, s * 6.85], [x + dx * 1.05, 0, s * 7.0], 2.75, { ph: (s > 0 ? 0 : PI) + (i % 2 ? PI : 0), stride: 13, amp: 0.2 }); });
+    K.fine(() => { for (const x of [-4.0, -0.8, 2.3]) for (const s of S2) K.light(x, 2.9, s * 4.55, 0.3, P.l, 2.2); });
+    // cauda com esporões
+    K.sph(-9.0, 3.6, 0, 1, P.b, 'chitin', { half: true, sx: 1.6, sy: 1.2, sz: 2.4, rz: H * 0.9, seg: 12 });
+    V._esp(K, P, [-9.8, 4.4, 0], [-11.0, 5.6, 0], 0.35); for (const s of S2) V._esp(K, P, [-9.9, 3.4, s * 1.1], [-11.0, 3.0, s * 2.2], 0.28); },
+  ferroada(K, P, tc) { /* 4.3d — Ferroada: forma própria (não deriva mais do drone) — voadora esguia de asas longas varridas, patas-foice dobradas, abdômen comprido em gomos que bombeia (sway) e ferrão de osso com gota de veneno acesa */
+    const V = U.vorag, S2 = [-1, 1];
+    K.sph(0.2, 1.5, 0, 1, P.a, 'chitin', { sx: 1.1, sy: 0.82, sz: 0.82, seg: 12 });
+    V._placa(K, P, 0.35, 1.72, 0, 0.95, 0.78, 0.78, tc, -0.12, { seg: 11 });
+    K.sph(1.55, 1.48, 0, 1, P.b, 'chitin', { sx: 0.6, sy: 0.55, sz: 0.66, seg: 10 });
+    for (const s of S2) K.sph(1.7, 1.6, s * 0.4, 1, P.l, null, { e: 1.6, sx: 0.34, sy: 0.42, sz: 0.3, seg: 9 });
+    K.fine(() => { for (const s of S2) K.anim({ t: 'sway', p: [1.85, 1.9, s * 0.2], amp: 0.18, speed: 4.5, ph: s > 0 ? 0 : 1 }, () => K.seg([1.85, 1.9, s * 0.2], [2.9, 2.35, s * 0.6], 0.04, P.d, 'chitin', { taper: 0.4, seg: 5 })); });
+    // patas-foice dobradas sob a cabeça
+    for (const s of S2) K.anim({ t: 'sway', p: [1.0, 1.05, s * 0.42], amp: 0.12, speed: 3, ph: s > 0 ? 0 : 0.8 }, () => { K.seg([1.0, 1.05, s * 0.42], [1.9, 1.3, s * 0.62], 0.11, P.b, 'chitin', { seg: 6 }); K.seg([1.9, 1.3, s * 0.62], [2.45, 0.65, s * 0.55], 0.09, P.bo, 'bone', { taper: 0.1, seg: 5 }); });
+    // abdômen comprido (um gomo na cor do time) e ferrão com veneno
+    K.anim({ t: 'sway', p: [-0.75, 1.4, 0], amp: 0.12, speed: 4.5 }, () => { K.seg([-0.6, 1.42, 0], [-1.25, 1.35, 0], 0.2, P.d, 'chitin', { seg: 7 });
+      const C = f => [-1.45 - f * 3.3, 1.32 - f * f * 0.85, 0], R = f => 0.56 - f * 0.3, cs = [0, 0.34, 0.67, 1].map(C);
+      for (let i = 0; i < 3; i++) { K.seg(cs[i], cs[i + 1], R(i / 3), P.b, 'chitin', { taper: R((i + 1) / 3) / R(i / 3), seg: 10 }); if (i) K.sph(cs[i][0], cs[i][1], 0, R(i / 3), P.b, 'chitin', { seg: 8 }); }
+      const n = K.q(5); for (let i = 0; i < n; i++) { const f = n > 1 ? i / (n - 1) * 0.92 : 0.4, c = C(f), r = R(f); V._placa(K, P, c[0], c[1] - 0.06, 0, 0.43 * 5 / n, r * 1.18, r * 1.15, i === 1 ? tc : (i % 2 ? P.b : P.a), Math.atan(0.53 * f) - 0.12, { seg: 10 }); }
+      K.sph(-4.65, 0.5, 0, 1, '#5E9A22', null, { e: 1, sx: 0.48, sy: 0.38, sz: 0.4, rz: 0.6, seg: 9 });
+      K.seg([-4.85, 0.4, 0], [-5.6, -0.05, 0], 0.24, P.bo, 'bone', { taper: 0.55, seg: 7 }); K.seg([-5.6, -0.05, 0], [-6.15, -0.2, 0], 0.13, P.bo, 'bone', { taper: 0.05, seg: 6 });
+      K.sph(-6.1, -0.18, 0, 0.17, P.ac, null, { e: 2.4, seg: 6 });
+      K.fine(() => { for (const s of S2) V._esp(K, P, [-5.3, 0.2, s * 0.12], [-5.55, 0.42, s * 0.36], 0.06); }); });
+    for (const s of S2) { V._asa(K, P, [0.35, 2.0, s * 0.5], 4.3, 1.1, s, { sw: 0.5, dh: 0.1, amp: 0.5, speed: 34 }); V._asa(K, P, [-0.35, 1.92, s * 0.45], 2.6, 0.8, s, { sw: 0.75, dh: 0.05, amp: 0.5, speed: 34, ph: 1.2 }); } },
   cria(K, P, tc) { K.sph(0, 1.6, 0, 1.2, P.a, 'chitin', { sx: 1.5, sy: 0.9, seg: 12 }); K.sph(1.8, 1.7, 0, 0.75, P.b, 'chitin', { seg: 10 }); for (const s of [-1, 1]) { K.cone(2.4, 1.3, s * 0.35, 0.18, 0.9, P.bo, 'bone', { rz: -2, seg: 6, anim: { t: 'sway', p: [2.4, 1.3, s * 0.35], amp: 0.18, speed: 7, ph: s > 0 ? 0 : PI } }); K.light(2.45, 2, s * 0.35, 0.18, P.l); }
     for (const x of [-0.8, 0.2, 1]) for (const s of [-1, 1]) leg(K, [x, 1.4, s * 0.8], [x + 0.4, 1.4, s * 1.8], [x + 0.2, 0, s * 2], 0.16, P.b, 'chitin'); K.sph(-0.8, 2.3, 0, 0.35, tc, 'wet', { seg: 8 }); },
   cuspidor(K, P, tc) { U.vorag.cria(K, P, tc); K.sph(-1.2, 2.8, 0, 1.3, P.ac, null, { e: 1.2, seg: 12 }); K.anim({ t: 'recoil', dist: 0.5 }, () => { K.seg([1.8, 2, 0], [3.6, 2.6, 0], 0.32, P.b, 'chitin', { taper: 0.6 }); K.sph(3.6, 2.6, 0, 0.28, P.ac, null, { e: 2.2, seg: 8 }); }); },
-  escaravelho(K, P, tc) { K.sph(0, 2.2, 0, 1, P.a, 'chitin', { sx: 5.4, sy: 2.6, sz: 3.6, seg: 18 }); K.sph(0, 2.6, 0, 1, P.b, 'chitin', { half: true, sx: 5, sy: 2.6, sz: 0.4, seg: 12 });
-    for (const x of [-3, 0, 3]) for (const s of [-1, 1]) leg(K, [x, 2, s * 3], [x + 0.8, 1.6, s * 4.4], [x + 0.4, 0, s * 4.6], 0.4, P.b, 'chitin');
-    K.sph(5.4, 2.2, 0, 1.4, P.b, 'chitin', { seg: 12 }); K.seg([6, 2.6, 0], [8.4, 5.2, 0], 0.5, P.bo, 'bone', { taper: 0.2 }); for (const s of [-1, 1]) K.light(6.6, 2.8, s * 0.6, 0.24, P.l); K.sph(-2.6, 4.4, 0, 0.6, tc, 'wet', { seg: 8 }); },
-  brutamonte(K, P, tc) { K.sph(0, 3.4, 0, 1, P.a, 'chitin', { sx: 8, sy: 4.4, sz: 5.6, seg: 20 }); for (let i = 0; i < 4; i++) K.sph(-4.8 + i * 3.2, 6.2, 0, 1, P.b, 'chitin', { sx: 2, sy: 1.3, sz: 5, seg: 12 });
-    ringOf(7, 1, (cx, cz) => { if (cx > -0.95) K.cone(cx * 5.4, 6.4, cz * 3.6, 0.5, 3.2, P.bo, 'bone', { seg: 8, rz: -cx * 0.5, rx: cz * 0.5 }); });
-    for (const x of [-5, -1.6, 1.8, 5]) for (const s of [-1, 1]) leg(K, [x, 3, s * 4.6], [x + 1, 2.6, s * 6.4], [x + 0.6, 0, s * 6.8], 0.8, P.b, 'chitin');
-    K.sph(8.2, 3.6, 0, 2.4, P.b, 'chitin', { sx: 1.1, seg: 14 }); for (const s of [-1, 1]) { K.seg([9.4, 3, s * 1.4], [12, 4.6, s * 2.2], 0.5, P.bo, 'bone', { taper: 0.25, anim: { t: 'sway', p: [9.4, 3, s * 1.4], amp: 0.1, speed: 3, ph: s > 0 ? 0 : PI } }); K.light(10.6, 4.6, s * 0.8, 0.32, P.l); }
-    K.sph(-4, 7.6, 0, 0.9, tc, 'wet', { seg: 10 }); K.sph(-6.6, 5.4, 0, 1.8, P.m, 'wet', { seg: 12 }); },
-  ferroada(K, P, tc) { U.vorag.drone(K, P, tc, { sting: 2.6, wings4: true }); },
   matriarca(K, P, tc) { // épica: rainha da Prole, abdômen enorme de ovos e coroa de espinhos
     K.anim({ t: 'sway', p: [-1.5, 4.6, 0], amp: 0.05, speed: 1.4 }, () => { K.sph(-7, 4.6, 0, 1, P.m, 'wet', { sx: 9, sy: 5, sz: 6.5, seg: 22 }); for (let i = 0; i < 4; i++) arch(K, -7, 0.4, 0, 9.1, 9.2, 6.6, i * PI / 4, 0.3, '#FF8A8A', null, { e: 1.4, ts: 16 }); ringOf(7, 1, (cx, cz) => K.sph(-7 + cx * 7, 4 + Math.abs(cz) * 2, cz * 5, 1.2, P.bo, 'bone', { sy: 1.4, seg: 10 }));
       for (const sd of [-1, 1]) { for (let i = 0; i < 4; i++) { const x = -10.5 + i * 2.1, y = 2.4 + (i % 2) * 0.9, z = sd * (6.15 - Math.abs(i - 1.5) * 0.35); K.sph(x, y, z, 1.05, '#F2C6A6', 'wet', { seg: 10 }); K.sph(x, y, z + sd * 0.45, 0.38, P.l, null, { e: 1.7, seg: 6 }); } // 4.2e: sacos de ovos com brilho
