@@ -20,7 +20,7 @@ function resGlyph(c, e, x, y, px) { // 4.2h: símbolo de recurso no radar, difer
   c.closePath(); c.fillStyle = NODE_COLOR[e.res]; c.strokeStyle = 'rgba(0,0,0,0.8)'; c.lineWidth = Math.max(1, px * 0.45); c.stroke(); c.fill();
 }
 const BIOME_RGB = { gelo: [0.66, 0.73, 0.8], rocha: [0.41, 0.42, 0.45], tundra: [0.36, 0.43, 0.36], basalto: [0.23, 0.21, 0.24] };
-const BIOME_MINI = { gelo: '#5C6B7A', rocha: '#4A4E56', tundra: '#3E5242', basalto: '#2A262C' };
+const BIOME_MINI = { gelo: '#73808E', rocha: '#6A533F', tundra: '#45533A', basalto: '#2A262C' }; /* 4.3c: radar com as cores do chão novo */
 function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
 function rgba(h, a) { const c = hexToRgb(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
 function create(canvas, overlay, mini) {
@@ -137,10 +137,11 @@ function create(canvas, overlay, mini) {
     else { q.shadows = !isTouch; q.shadowMap = 2048; q.post = !!ADD; q.ssao = !!ADD && !isTouch; q.aoHalf = true; q.msaa = false; q.pr = Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1); q.particles = 1; }
     if (over.ssao != null) q.ssao = over.ssao && !!ADD; if (over.msaa != null) q.msaa = over.msaa && !!ADD; if (over.shadowMap) q.shadowMap = over.shadowMap; if (over.post != null) q.post = over.post && !!ADD;
     q.detail = name === 'baixa' || isTouch ? 0 : name === 'media' ? 0.75 : 1; if (ME && ME.setDetail) ME.setDetail(q.detail); /* 4.3a: detalhe de superfície dos modelos */
-    renderer.setPixelRatio(q.pr); applyShadows(); buildComposer(); armWatchdog(); if (R.FX) R.FX.mult = q.particles; if (R.DR && R.sim && R.H) { try { R.DR.build(R.sim, R.H, dressDensity()); } catch (e) {} }
+    if (R._terrQ) R._terrQ(q); /* 4.3c: chão leve e sombra do relevo seguem a qualidade (definido junto do terreno) */
+    renderer.setPixelRatio(q.pr); applyShadows(); buildComposer(); armWatchdog(); if (R.FX) R.FX.mult = q.particles; if (R.DR && R.sim && R.H) { try { R.DR.build(R.sim, R.H, dressDensity(), terrT ? terrT.bioAt : null); } catch (e) {} }
   };
   const octx = overlay.getContext('2d'); const mctx = mini.getContext('2d'); const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
-  const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(38, 1, 30, 6000);
+  const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(38, 1, 30, 11000); /* 4.3c: mesas do horizonte até ~8 mil */
   const CAM = { pitch: 0.95, baseDist: 760, minPitch: 0.2, maxPitch: 1.12 }; R.CAM = CAM;
   // ---------- luzes ----------
   const hemi = new THREE.HemisphereLight(0x9fb8d6, 0x2a2a30, 0.55); scene.add(hemi);
@@ -156,14 +157,15 @@ function create(canvas, overlay, mini) {
     const pm = new THREE.PMREMGenerator(renderer); const rt = pm.fromScene(es, 0.025, 0.1, 400); pm.dispose(); sk.geometry.dispose(); sk.material.dispose(); gd.geometry.dispose(); gd.material.dispose();
     if (envRT) envRT.dispose(); envRT = rt; scene.environment = rt.texture; scene.environmentIntensity = R.envSkyK; R.envSky = true; } catch (err) { console.warn('[ARD] reflexo do céu indisponível: ' + err.message); } }
   R.sunDir = [-470, 640, 600]; /* 40° de elevação (antes 49°): sombras mais longas */ /* 4.3b: direção do sol (luz, céu, reflexo e bruma usam a mesma) */
-  R.lightK = { sun: 1.3, hemi: 0.68, amb: 0.5 }; R.atmoK = { haze: 1.2, hh: 70, air: 1.2, sun: 0.32, cloud: 0.2, warm: 0.28 }; R.gradeK = { gain: 1.12, sat: 1.2, con: 1.1, vig: 0.26 }; R.ppFx = () => ({ aoPass, atmoFx, gradeFx, bloomFx, toneFx, composer, PP: window.THREE_PP }); /* 4.3b: o céu agora ilumina pelo reflexo de ambiente; hemisfério e ambiente ficam menores */
+  R.lightK = { sun: 1.3, hemi: 0.68, amb: 0.5 }; R.atmoK = { haze: 0.6, hh: 220, air: 1.25, sun: 0.32, cloud: 0.2, warm: 0.36 }; /* 4.3c: camada de bruma mais alta e mais rala (o relevo novo tem vales e mesas) */ R.gradeK = { gain: 1.12, sat: 1.2, con: 1.1, vig: 0.26 }; R.ppFx = () => ({ aoPass, atmoFx, gradeFx, bloomFx, toneFx, composer, PP: window.THREE_PP }); /* 4.3b: o céu agora ilumina pelo reflexo de ambiente; hemisfério e ambiente ficam menores */
   R.skyEnv = skyEnv; R.cine = true; R.envSkyK = +(new URLSearchParams(location.search).get('envk') || 0.68);
   R.setQuality('auto');
   const lightPool = []; for (let i = 0; i < 10; i++) { const l = new THREE.PointLight(0xffc070, 0, 220, 2); scene.add(l); lightPool.push(l); }
   const flashLight = new THREE.PointLight(0xffc878, 0, 160, 2); scene.add(flashLight); let flashT = 0;
 
   // ---------- terreno ----------
-  let heights = null; const HN = 161; const HS = S.WORLD / (HN - 1);
+  let heights = null, HN = 161, HS = S.WORLD / (HN - 1); const TR = ARD.terrain3d || null; let terrTexs = null, terrU = null, riftWall = null, riftRing = null, terrT = null, SC = null, terrLeve = false; const terrLeveWanted = () => isTouch || (R.quality.resolved || R.quality.name) === 'baixa'; /* 4.3c: chão sem projeção triplanar no celular e na qualidade Baixa */
+  R._terrQ = q => { if (terrain && terrU && TR && terrLeve !== terrLeveWanted()) { terrLeve = terrLeveWanted(); const swap = (m, o) => { if (!m) return; const old = m.material; const nm = TR.material(THREE, terrU, o); nm.side = old.side; const ei = envMats.indexOf(old); if (ei >= 0) envMats[ei] = nm; else envMats.push(nm); m.material = nm; old.dispose(); }; swap(terrain, { leve: terrLeve }); swap(riftWall, { leve: terrLeve }); if (horizon) { const hm = horizon.children[0] && horizon.children[0].material; if (hm) { const nm = TR.material(THREE, terrU, { fora: true, leve: terrLeve }); const ei = envMats.indexOf(hm); if (ei >= 0) envMats[ei] = nm; horizon.children.forEach(c => { c.material = nm; }); hm.dispose(); } } } /* 4.3c */ if (terrain && TR && terrT) { terrain.castShadow = !isTouch && q.shadowMap >= 4096; if (riftWall) riftWall.castShadow = terrain.castShadow; } }; const trackSt = new Map(), flatDone = new Set(), flatQ = []; let trackPrune = 0; /* 4.3c: relevo esculpido (grade 321² no computador) */
   function H(x, y) { // altura bilinear
     if (!heights) return 0; const gx = Math.max(0, Math.min(HN - 1.001, x / HS)), gy = Math.max(0, Math.min(HN - 1.001, y / HS)); const ix = gx | 0, iy = gy | 0, fx = gx - ix, fy = gy - iy;
     const a = heights[iy * HN + ix], b = heights[iy * HN + ix + 1], c = heights[(iy + 1) * HN + ix], d = heights[(iy + 1) * HN + ix + 1];
@@ -177,6 +179,7 @@ function create(canvas, overlay, mini) {
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { let v = 0, a = 0.5, f = 4, s = 0; for (let o = 0; o < 4; o++) { v += a * vn(x / N * f, y / N * f, f); s += a; a *= 0.5; f *= 2; } v = v / s; v = Math.min(1, Math.max(0, (v - 0.35) * 2.2)); const i = (y * N + x) * 4; d[i] = d[i + 1] = d[i + 2] = 255 * v; d[i + 3] = 255; }
     c.putImageData(img, 0, 0); const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.NoColorSpace; return t; })();
   const fogData = new Uint8Array(FOGN * FOGN * 4); const fogTex = new THREE.DataTexture(fogData, FOGN, FOGN, THREE.RGBAFormat); fogTex.magFilter = THREE.LinearFilter; fogTex.minFilter = THREE.LinearFilter; fogTex.colorSpace = THREE.NoColorSpace;
+  const blackTex = new THREE.DataTexture(new Uint8Array(4), 1, 1); blackTex.needsUpdate = true; /* 4.3c */
   const terrData = new Uint8Array(TILES * TILES * 4); const terrTex = new THREE.DataTexture(terrData, TILES, TILES, THREE.RGBAFormat); terrTex.magFilter = THREE.LinearFilter; terrTex.minFilter = THREE.LinearFilter; terrTex.colorSpace = THREE.NoColorSpace;
   const microTex = W3 && W3.microTexture && !isTouch ? W3.microTexture(THREE) : null; /* 4.3a */
   const detailTex = W3 ? W3.detailTexture(THREE) : null; if (detailTex) { detailTex.repeat.set(44, 44); if (!/swiftshader|llvmpipe|software/i.test(R.gpu)) detailTex.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy()); } // anisotropia só em GPU de verdade (no SwiftShader custa 10×)
@@ -184,6 +187,25 @@ function create(canvas, overlay, mini) {
   const DR = ARD.dress3d ? ARD.dress3d.create(THREE, scene, { fogTex }) : null; R.DR = DR; let dressT = 0; // 4.2d
   const dressDensity = () => { const q = R.quality.resolved || R.quality.name; return q === 'ultra' ? 1.6 : q === 'alta' ? 1.25 : q === 'media' ? 0.8 : isTouch ? 0 : 0.35; };
   function buildTerrain(sim) {
+    const tb0 = performance.now(); let T = null; if (TR && !DBG_OFF.has('relevo43c')) { try { T = TR.build(sim, isTouch ? 161 : 321); } catch (err) { console.warn('[ARD] relevo esculpido indisponível: ' + err.message); T = null; } }
+    const tb1 = performance.now(); if (T) buildTerrain43c(sim, T); else buildTerrainOld(sim); if (R.debug) console.log('[ARD] relevo ' + Math.round(tb1 - tb0) + ' ms + malhas ' + Math.round(performance.now() - tb1) + ' ms');
+    finishTerrain(sim, T);
+  }
+  const _dc = [0, 0, 0];
+  function dustCol(x, y) { const T = terrT; if (!T) return [0.5, 0.45, 0.4]; const i = Math.max(0, Math.min(T.HN - 1, Math.round(y / T.HS))) * T.HN + Math.max(0, Math.min(T.HN - 1, Math.round(x / T.HS))); const B = TR.BIO_MEAN; let t = 0; _dc[0] = _dc[1] = _dc[2] = 0; for (let c = 0; c < 4; c++) { const w = T.bio[i * 4 + c]; t += w; _dc[0] += w * B[c][0]; _dc[1] += w * B[c][1]; _dc[2] += w * B[c][2]; } t = t || 1; return [_dc[0] / t * 1.05 + 0.05, _dc[1] / t * 1.05 + 0.05, _dc[2] / t * 1.05 + 0.05]; } /* 4.3c: cor da poeira pelo bioma */
+  function buildTerrain43c(sim, T) { /* 4.3c */
+    HN = T.HN; HS = T.HS; heights = T.heights; terrT = T; flatDone.clear(); flatQ.length = 0; trackSt.clear();
+    if (!terrTexs) { try { terrTexs = TR.detailTextures(THREE, renderer); } catch (err) { console.warn('[ARD] texturas do chão indisponíveis: ' + err.message); } }
+    if (!SC && !isTouch && !DBG_OFF.has('marcas')) { try { SC = TR.scars(THREE, renderer, S.WORLD, /alta|ultra/.test(R.quality.resolved || '') ? 2048 : 1024); } catch (err) { console.warn('[ARD] cicatrizes do chão indisponíveis: ' + err.message); SC = null; } }
+    if (!terrU) terrU = { scarMap: { value: SC ? SC.tex : blackTex }, uTexA: { value: terrTexs ? terrTexs.a : cloudTex }, uTexB: { value: terrTexs ? terrTexs.b : cloudTex }, fogMap: { value: fogTex }, terrMap: { value: terrTex }, cloudMap: { value: cloudTex }, microMap: { value: microTex || detailTex || cloudTex }, uNear: { value: 0 }, uCloudT: { value: 0 }, uCloudK: { value: 1 }, uTime: { value: 0 }, uRift: { value: new THREE.Vector2(S.CX, S.CY) }, worldSize: { value: S.WORLD } };
+    R.terrShader = { uniforms: terrU }; R.groundCol = new THREE.Color(T.mean[0], T.mean[1], T.mean[2]);
+    if (terrain) { scene.remove(terrain); terrain.geometry.dispose(); }
+    terrLeve = terrLeveWanted(); const mat = TR.material(THREE, terrU, { leve: terrLeve }); envMats.push(mat); terrain = new THREE.Mesh(TR.mapGeo(THREE, T), mat); terrain.receiveShadow = true; terrain.castShadow = !isTouch && R.quality.shadowMap >= 4096; scene.add(terrain);
+    if (riftWall) { scene.remove(riftWall); riftWall.geometry.dispose(); } if (!DBG_OFF.has('paredao')) { const wm = TR.material(THREE, terrU, { leve: terrLeve }); wm.side = THREE.DoubleSide; envMats.push(wm); riftWall = new THREE.Mesh(TR.riftWalls(THREE, sim, H), wm); riftWall.receiveShadow = true; riftWall.castShadow = !isTouch && R.quality.shadowMap >= 4096; scene.add(riftWall); }
+    if (horizon) { scene.remove(horizon); horizon.traverse(o => { if (o.geometry) o.geometry.dispose(); }); horizon = null; }
+    if (!DBG_OFF.has('horizonte')) { try { const fm = TR.material(THREE, terrU, { fora: true, leve: terrLeve }); envMats.push(fm); horizon = new THREE.Group(); for (const g of TR.backdrop(THREE, sim, T, H, isTouch)) { const m = new THREE.Mesh(g, fm); horizon.add(m); } scene.add(horizon); } catch (err) { console.warn('[ARD] mesas do horizonte indisponíveis: ' + err.message); horizon = null; } }
+  }
+  function buildTerrainOld(sim) {
     const seed = sim.seed; const hash = (ix, iy) => { let n = (ix * 374761393 + iy * 668265263 + seed * 1274126177) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); n ^= n >>> 16; return (n >>> 0) / 4294967296; };
     const sm = t => t * t * (3 - 2 * t); const val = (x, y) => { const ix = Math.floor(x), iy = Math.floor(y); const fx = sm(x - ix), fy = sm(y - iy); const a = hash(ix, iy), b = hash(ix + 1, iy), c = hash(ix, iy + 1), d = hash(ix + 1, iy + 1); return (a * (1 - fx) + b * fx) * (1 - fy) + (c * (1 - fx) + d * fx) * fy; };
     const noise = (x, y) => 0.6 * val(x, y) + 0.3 * val(x * 2.1 + 7.3, y * 2.1 + 3.1) + 0.1 * val(x * 4.3 + 1.7, y * 4.3 + 9.2);
@@ -218,21 +240,23 @@ function create(canvas, overlay, mini) {
     };
     if (terrain) scene.remove(terrain);
     terrain = new THREE.Mesh(geo, mat); terrain.position.set(S.WORLD / 2, 0, -S.WORLD / 2); terrain.receiveShadow = true; scene.add(terrain);
+    if (W3) { try { if (horizon) { scene.remove(horizon); horizon.traverse(o => { if (o.geometry) o.geometry.dispose(); }); horizon = null; } if (!DBG_OFF.has('horizonte')) horizon = W3.makeHorizon(THREE, S.WORLD, H, sim.seed % 97, 0x4c4e55); if (horizon) { horizon.material.userData.env = 0.15; envMats.push(horizon.material); scene.add(horizon); } } catch (err) { console.warn('[ARD] horizonte indisponível: ' + err.message); } }
+  }
+  function finishTerrain(sim, T) {
     if (W3) { try {
-      if (horizon) { scene.remove(horizon); horizon.geometry.dispose(); horizon = null; } if (!DBG_OFF.has('horizonte')) horizon = W3.makeHorizon(THREE, S.WORLD, H, sim.seed % 97, 0x4c4e55); if (horizon) { horizon.material.userData.env = 0.15; envMats.push(horizon.material); scene.add(horizon); }
       if (!sky && !DBG_OFF.has('ceu')) { sky = W3.makeSky(THREE); scene.add(sky); } skyEnv(R.climateCfg); /* 4.3b */
       if (home) scene.remove(home); const me = sim.players[R.humanId || 0] || sim.players[0]; home = W3.makeHomeWorld(THREE, me ? me.faction : 'vehnar', (sim.seed % 13) + 1); scene.add(home);
     } catch (err) { console.warn('[ARD] céu/horizonte indisponível: ' + err.message); } }
     // Fenda: anel emissivo e luz
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(S.RIFT_R * 0.9, 6, 8, 48), new THREE.MeshBasicMaterial({ color: new THREE.Color(2.6, 1.0, 0.5) })); ring.rotation.x = Math.PI / 2; ring.position.set(S.CX, H(S.CX, S.CY) + 4, -S.CY); scene.add(ring);
+    if (riftRing) { scene.remove(riftRing); riftRing = null; } if (!T) { const ring = new THREE.Mesh(new THREE.TorusGeometry(S.RIFT_R * 0.9, 6, 8, 48), new THREE.MeshBasicMaterial({ color: new THREE.Color(2.6, 1.0, 0.5) })); ring.rotation.x = Math.PI / 2; ring.position.set(S.CX, H(S.CX, S.CY) + 4, -S.CY); scene.add(ring); riftRing = ring; } /* 4.3c: no relevo novo a borda do abismo brilha no próprio chão */
     // 4.2h: os lagos de plasma decorativos saíram (pareciam nós de Plasma, brilhavam no breu e custavam 6 luzes)
     // névoa volumétrica barata: sprites aditivos na cratera da Fenda e na Tempestade
     const mistCv = document.createElement('canvas'); mistCv.width = 128; mistCv.height = 128; const mc = mistCv.getContext('2d'); const g = mc.createRadialGradient(64, 64, 4, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,0.55)'); g.addColorStop(0.5, 'rgba(255,255,255,0.18)'); g.addColorStop(1, 'rgba(255,255,255,0)'); mc.fillStyle = g; mc.fillRect(0, 0, 128, 128);
     const mistTex = new THREE.CanvasTexture(mistCv); mistTex.colorSpace = THREE.SRGBColorSpace;
-    for (let i = 0; i < 16; i++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: mistTex, color: i % 2 ? 0xff7a4a : 0xb23cff, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false })); const a = Math.random() * TAU, rr = Math.random() * 300; sp.userData = { x: S.CX + Math.cos(a) * rr, y: S.CY + Math.sin(a) * rr, z: 10 + Math.random() * 60, s: 120 + Math.random() * 160, ph: Math.random() * TAU, kind: 'rift' }; scene.add(sp); R.mist.push(sp); }
+    for (let i = 0; i < 16; i++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: mistTex, color: i % 2 ? 0xff7a4a : 0xb23cff, transparent: true, opacity: T ? 0.1 : 0.22, blending: THREE.AdditiveBlending, depthWrite: false })); const a = Math.random() * TAU, rr = Math.random() * 300; sp.userData = { x: S.CX + Math.cos(a) * rr, y: S.CY + Math.sin(a) * rr, z: 10 + Math.random() * 60, s: 120 + Math.random() * 160, ph: Math.random() * TAU, kind: 'rift' }; scene.add(sp); R.mist.push(sp); }
     for (let i = 0; i < 16; i++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: mistTex, color: 0x9a7cff, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, depthWrite: false })); sp.visible = false; sp.userData = { kind: 'storm', ph: Math.random() * TAU, ox: Math.random(), oy: Math.random(), z: 20 + Math.random() * 60, s: 160 + Math.random() * 160 }; scene.add(sp); R.mist.push(sp); }
-    const rl = new THREE.PointLight(0xff5e3a, 2500, 900, 2); rl.position.set(S.CX, H(S.CX, S.CY) + 60, -S.CY); scene.add(rl);
-    if (DR) { try { DR.build(sim, H, dressDensity()); } catch (err) { console.warn('[ARD] adereços indisponíveis: ' + err.message); } }
+    const rl = new THREE.PointLight(T ? 0xff4f9a : 0xff5e3a, T ? 3200 : 2500, 900, 2); rl.position.set(S.CX, T ? -60 : H(S.CX, S.CY) + 60, -S.CY); scene.add(rl); /* 4.3c: a luz sobe do abismo, na cor dos veios */
+    if (DR) { try { DR.build(sim, H, dressDensity(), T ? T.bioAt : null); } catch (err) { console.warn('[ARD] adereços indisponíveis: ' + err.message); } }
     // 4.2d: feixes de luz subindo da Fenda (cones abertos, aditivos, com faixas que sobem devagar)
     if (!R.riftRays) { const rayMat = new THREE.ShaderMaterial({ uniforms: { uTime: { value: 0 }, uNight: { value: 0 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false,
         vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
@@ -316,12 +340,12 @@ function create(canvas, overlay, mini) {
   }
   R.icon = function (def, pid) { const key = def + '|' + pid; let u = R.icons.get(key); if (u) return u; if (USE_MESH) { u = meshIcon(def, pid); if (u) { R.icons.set(key, u); return u; } } const sp = R.sprite(def, pid, 0, false, 0); const cv = document.createElement('canvas'); cv.width = 48; cv.height = 48; const c = cv.getContext('2d'); const sc = Math.min(44 / sp.w, 44 / sp.h); c.imageSmoothingEnabled = sc < 1; c.drawImage(sp.canvas, (48 - sp.w * sc) / 2, (48 - sp.h * sc) / 2, sp.w * sc, sp.h * sc); u = cv.toDataURL(); R.icons.set(key, u); return u; };
   R.prepare = function (sim, onProgress, onDone) {
-    R.sim = sim; buildTerrain(sim); const jobs = [];
+    R.sim = sim; if (onProgress) onProgress(0.02); const go = () => { buildTerrain(sim); const jobs = []; /* 4.3c: a tela de carregamento aparece antes de esculpir o terreno (~1 s) */
     for (const p of sim.players) { for (const def in S.BUILDINGS) jobs.push([def, p.id, 0]); for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'torre_base', 'torre_turret', 'drone', 'suporte', 'pirata', 'bastiao_base', 'bastiao_turret']) jobs.push([def, p.id, 0]); for (const def in S.UNITS) if (S.UNITS[def].faction === p.faction) jobs.push([def, p.id, 0]); }
     for (const res in NODE_MODEL) for (let s = 0; s < 4; s++) jobs.push([res, -1, s]);
     for (let s = 0; s < 6; s++) { jobs.push(['rocks', -1, s]); jobs.push(['ruin', -1, s]); } jobs.push(['crate', -1, 0]); jobs.push(['wreck', -1, 0]);
     for (const p of sim.players) if (MD.props[p.faction]) for (let s = 0; s < 4; s++) jobs.push(['prop_' + p.faction, -1, s]);
-    let i = 0; function chunk() { const t0 = performance.now(); while (i < jobs.length && performance.now() - t0 < 24) { const j = jobs[i++]; geoOf(j[0], j[1], j[2]); } if (onProgress) onProgress(i / jobs.length); if (i < jobs.length) requestAnimationFrame(chunk); else if (onDone) onDone(); } chunk();
+    let i = 0; function chunk() { const t0 = performance.now(); while (i < jobs.length && performance.now() - t0 < 24) { const j = jobs[i++]; geoOf(j[0], j[1], j[2]); } if (onProgress) onProgress(i / jobs.length); if (i < jobs.length) requestAnimationFrame(chunk); else if (onDone) onDone(); } chunk(); }; requestAnimationFrame(() => requestAnimationFrame(go));
   };
   // ---------- projeção ----------
   function updateCamera(cam) {
@@ -419,7 +443,7 @@ function create(canvas, overlay, mini) {
   const beamGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]); const beamMat = new THREE.LineBasicMaterial({ color: 0xd64cff, transparent: true, opacity: 0.9 }); const BEAMS = 16; const beams = []; for (let i = 0; i < BEAMS; i++) { const l = new THREE.Line(beamGeo.clone(), beamMat); l.visible = false; l.frustumCulled = false; scene.add(l); beams.push(l); }
   const stormDisc = new THREE.Mesh(new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0x7a5cff, transparent: true, opacity: 0.12, depthWrite: false })); stormDisc.visible = false; scene.add(stormDisc);
   let lightning = 0;
-  function addDecal(x, y, r) { decalList.push({ x, y, r, t: 0, life: 200 }); if (decalList.length > 160) decalList.shift(); }
+  function addDecal(x, y, r) { if (SC) { SC.burn(x, y, r * 1.6, 1, r > 14 ? 0.9 : 0.35); return; } decalList.push({ x, y, r, t: 0, life: 200 }); if (decalList.length > 160) decalList.shift(); } /* 4.3c: queimado e cratera gravados no chão */
 
   // 4.2c: efeitos só onde o jogador enxerga agora (grade da névoa do último quadro; O(1) por evento) — nada de revelar inimigos escondidos
   const seenAt = (x, y) => R.revealAll || (x >= 0 && y >= 0 && x < S.WORLD && y < S.WORLD && fogData[(((y / FOGC) | 0) * FOGN + ((x / FOGC) | 0)) * 4] >= 180);
@@ -484,7 +508,7 @@ function create(canvas, overlay, mini) {
 
   // ---------- quadro ----------
   R.draw = function (sim, view, alpha, dt) {
-    R.sim = sim; R.time += dt; R.revealAll = !!view.reveal; updateFx(dt); if (R.terrShader) R.terrShader.uniforms.uCloudT.value = R.time;
+    R.sim = sim; R.time += dt; R.revealAll = !!view.reveal; updateFx(dt); if (R.terrShader) R.terrShader.uniforms.uCloudT.value = R.time; if (terrU) terrU.uTime.value = R.time; /* 4.3c */
     const cam = view.cam, human = view.human, me = sim.players[human]; const vis = view.reveal ? { has: () => true } : sim.vis[human]; const explored = sim.explored[human];
     R.night = R.forceDay ? 0 : (1 - Math.cos(TAU * sim.time / 750)) / 2;
     R.shakeX = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0; R.shakeY = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0;
@@ -507,7 +531,7 @@ function create(canvas, overlay, mini) {
       let gx = acc[0], gy = acc[1], gz = acc[2]; if (cl && cl.tint) { gx *= 0.92 + cl.tint[0] * 0.2; gy *= 0.92 + cl.tint[1] * 0.2; gz *= 0.92 + cl.tint[2] * 0.2; } gx = gx * (1 - 0.1 * nt); gy = gy * (1 - 0.05 * nt); gz = gz * (1 + 0.08 * nt);
       const GK = R.gradeK; u.uGain.value.set(gx * GK.gain, gy * GK.gain, gz * GK.gain); u.uSat.value = GK.sat - 0.22 * nt; u.uCon.value = GK.con + 0.04 * nt; u.uVig.value = GK.vig + 0.12 * nt; }
     if (R.riftRays) { R.riftRayMat.uniforms.uTime.value = R.time; R.riftRayMat.uniforms.uNight.value = nt; for (let i = 0; i < R.riftRays.length; i++) R.riftRays[i].rotation.y += dt * (0.02 + i * 0.012); }
-    if (DR && (dressT -= dt) <= 0) { dressT = 1; try { DR.hideUnder(sim, H); DR.updateRoads(sim, H); } catch (e) {} } if (DR) DR.update(R.time);
+    if (DR && (dressT -= dt) <= 0) { dressT = 1; try { DR.hideUnder(sim, H); DR.updateRoads(sim, H); } catch (e) {} } if (DR) DR.update(R.time, camera); /* 4.3c: o dress3d recorta os blocos por esta câmera */
     const pitchNow = R.pitchEff != null ? R.pitchEff : cam.pitch == null ? CAM.pitch : cam.pitch; const tilt = Math.max(0, Math.min(1, (CAM.pitch - pitchNow) / (CAM.pitch - CAM.minPitch)));
     if (tilt > 0) { scene.fog.near = Math.max(scene.fog.near, 900 + 1400 * tilt); scene.fog.far = Math.max(scene.fog.far, 3200 + 3800 * tilt); }
     if (atmoFx) { const u = atmoFx.U; const gcol = R.groundCol || bg; const AK = R.atmoK; u.uAtFog.value.copy(bg).lerp(_cc.copy(gcol).multiplyScalar(1.5), AK.warm * (1 - 0.6 * nt)); if (cl && cl.tint) u.uAtFog.value.lerp(_cc.setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), 0.25); u.uAtFar.value.copy(bg).lerp(_cc.setRGB(0.5, 0.62, 0.8), 0.25 * (1 - nt)); /* longe a bruma azula (perspectiva aérea) */
@@ -542,6 +566,8 @@ function create(canvas, overlay, mini) {
       if (e.kind === 'proj') { if (!own && !vis.has(e.id)) continue; const w = S.WEAPONS[e.weapon]; const [wx, wy] = lerp(e, alpha); if (w.proj === 'shell') { if (FX && Math.random() < 0.45 * FX.mult) FX.trail(wx, H(wx, wy) + e.z, -wy); if (nShell < 256) { _p.set(wx, H(wx, wy) + e.z, -wy); _s.setScalar(1); _q.identity(); _m.compose(_p, _q, _s); shells.setMatrixAt(nShell++, _m); } } else if (nBul < BL) { const o = nBul * 6; blPos[o] = wx - e.vx * 0.03; blPos[o + 1] = H(wx, wy) + e.z; blPos[o + 2] = -(wy - e.vy * 0.03); blPos[o + 3] = wx; blPos[o + 4] = H(wx, wy) + e.z; blPos[o + 5] = -wy; nBul++; } continue; }
       if (!own && !vis.has(e.id)) continue;
       const isUnit = e.kind === 'unit'; const [wx, wy] = isUnit ? lerp(e, alpha) : [e.x, e.y]; const ud = isUnit ? S.UNITS[e.def] : S.BUILDINGS[e.def];
+      if (terrT) { if (isUnit) { if (SC && !ud.flying && ud.cls !== 'inf') { const ts = trackSt.get(e.id); if (!ts) trackSt.set(e.id, { x: wx, y: wy, t: R.time }); else { const dx = wx - ts.x, dy = wy - ts.y, dl = Math.hypot(dx, dy); if (dl > 150) { ts.x = wx; ts.y = wy; } else if (dl > 2.2) { const fac = (sim.players[e.owner] || {}).faction; if (fac !== 'erevane' && fac !== 'quorith') SC.track((wx + ts.x) / 2, (wy + ts.y) / 2, Math.atan2(dy, dx), e.r * 1.75, dl + 1.4, 0.9, fac === 'tessara' || fac === 'vorag'); if (FX && Math.random() < 0.3 * R.quality.particles && _frus.containsPoint(_p.set(wx, H(wx, wy), -wy))) { const dc = dustCol(wx, wy); const bx = wx - dx / dl * e.r * 0.8, by = wy - dy / dl * e.r * 0.8; FX.smoke(bx, H(bx, by) + 1.2, -by, dc, 1.3 + Math.random() * 0.8, 3 + Math.random() * 3, e.r * 0.45); } /* 4.3c: poeira do chão atrás de quem anda */ ts.x = wx; ts.y = wy; } ts.t = R.time; } } }
+        else if (!flatDone.has(e.id)) { flatDone.add(e.id); flatQ.push(e); } } /* 4.3c: rastros por Raça (Erevane e Quorith flutuam) e chão assentado sob construções */
       _sph.center.set(wx, H(wx, wy) + 6, -wy); _sph.radius = e.r * 1.6 + (isUnit ? 45 : 80); if (!_frus.intersectsSphere(_sph) && !view.sel.has(e.id)) continue;
       const parts = MD.PARTS[e.def]; const hullDef = parts ? parts.hull : e.def; const it = instOf(hullDef, e.owner, (e.def === 'nucleo' && R.skins && R.skins[e.owner]) || 0); /* 4.0e: Núcleo do Hangar */ const g = it.geo; let fit = fitOf(e, g); if (e.def === 'nucleo') { const op = sim.players[e.owner] || {}; fit *= 1 + 0.12 * ((op.era || 1) - 1) + (op.evolveT > 0 ? 0.025 * Math.sin(R.time * 6) : 0); } /* 4.1d: o Núcleo cresce a cada Era e pulsa enquanto evolui */
       const zz = isUnit && ud.flying ? 14 : 0; const moving = isUnit && (e.x !== e.px || e.y !== e.py); const bob = moving && (e.def === 'infantaria' || e.def === 'quimera' || e.def === 'soldador' || e.def === 'atirador' || e.def === 'agulha') ? Math.abs(Math.sin(R.time * 11 + e.id)) * 1.2 : moving && (e.def === 'cria' || e.def === 'cuspidor') ? Math.abs(Math.sin(R.time * 15 + e.id)) * 1.0 : moving && (e.def === 'prensa' || e.def === 'colosso' || e.def === 'brutamonte') ? Math.abs(Math.sin(R.time * 5 + e.id)) * 2.2 : (e.def === 'voz' || e.def === 'diapasao' || e.def === 'monolito' || e.def === 'prisma') ? 2 + Math.sin(R.time * 2.5 + e.id) * 1.2 : 0;
@@ -612,7 +638,9 @@ function create(canvas, overlay, mini) {
     // tempestade
     const st = sim.storm; if (st && st.phase === 'active') { stormDisc.visible = true; stormDisc.position.set(st.x, H(st.x, st.y) + 2, -st.y); stormDisc.scale.set(st.r, 1, st.r); for (let i = 0; i < 8 * R.quality.particles; i++) { const a = Math.random() * TAU, rr = Math.sqrt(Math.random()) * st.r; snow(st.x + Math.cos(a) * rr, st.y + Math.sin(a) * rr); } if (Math.random() < 0.012) lightning = 1; } else stormDisc.visible = false;
     if (R.poolMat) R.poolMat.uniforms.uTime.value = R.time; for (const pl of R.poolLights) pl.intensity = 120 * nt + 20;
-    for (const sp of R.mist) { const u = sp.userData; if (u.kind === 'rift') { const zz = u.z + Math.sin(R.time * 0.3 + u.ph) * 8; sp.position.set(u.x + Math.sin(R.time * 0.2 + u.ph) * 20, H(u.x, u.y) + zz, -u.y); sp.scale.set(u.s, u.s * 0.7, 1); sp.material.opacity = 0.16 + 0.1 * nt; } else { if (st && st.phase === 'active') { sp.visible = true; const a = u.ox * TAU + R.time * 0.05, rr = u.oy * st.r * 0.9; const px = st.x + Math.cos(a) * rr, py = st.y + Math.sin(a) * rr; sp.position.set(px, H(px, py) + u.z, -py); sp.scale.set(u.s, u.s * 0.6, 1); } else sp.visible = false; } }
+    for (const sp of R.mist) { const u = sp.userData; if (u.kind === 'rift') { const zz = u.z + Math.sin(R.time * 0.3 + u.ph) * 8; sp.position.set(u.x + Math.sin(R.time * 0.2 + u.ph) * 20, H(u.x, u.y) + zz, -u.y); sp.scale.set(u.s, u.s * 0.7, 1); sp.material.opacity = (terrT ? 0.07 : 0.16) + 0.1 * nt; } else { if (st && st.phase === 'active') { sp.visible = true; const a = u.ox * TAU + R.time * 0.05, rr = u.oy * st.r * 0.9; const px = st.x + Math.cos(a) * rr, py = st.y + Math.sin(a) * rr; sp.position.set(px, H(px, py) + u.z, -py); sp.scale.set(u.s, u.s * 0.6, 1); } else sp.visible = false; } }
+    if (terrT && terrain) { for (let k = 0; k < 6 && flatQ.length; k++) { const b = flatQ.shift(); if (b.alive) TR.flatten(terrT, terrain.geometry, b.x, b.y, b.r + 4); } if ((trackPrune -= dt) <= 0) { trackPrune = 20; for (const [id, ts] of trackSt) if (R.time - ts.t > 20) trackSt.delete(id); } }
+    if (SC) SC.flush(dt);
     if (FX) FX.update(R.time, camera);
     if (atmoFx) { atmoFx.U.uAtProjInv.value.copy(camera.projectionMatrixInverse); atmoFx.U.uAtCamWorld.value.copy(camera.matrixWorld); } /* 4.3b */
     if (composer) { composer.render(dt); } else renderer.render(scene, camera);

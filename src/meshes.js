@@ -12,6 +12,7 @@ const MAT = { // [rugosidade, metal]
   metal: [0.3, 0.78], steel: [0.42, 0.42], paint: [0.48, 0.18], dark: [0.58, 0.3], rubber: [0.9, 0], glass: [0.06, 0.3], gloss: [0.22, 0.45],
   bone: [0.62, 0], chitin: [0.2, 0.05], crystal: [0.12, 0.18], skin: [0.48, 0], stone: [0.9, 0], ice: [0.12, 0.02], wet: [0.14, 0.02], matte: [0.82, 0.04],
   rock: [0.88, 0.02], // 4.3b: rocha esculpida (padrão 6)
+  leaf: [0.78, 0], bark: [0.92, 0], petal: [0.66, 0], frost: [0.42, 0.05], snow: [0.93, 0], obsid: [0.07, 0.3], ash: [0.97, 0], // 4.3c: flora do mundo vestido (dress3d)
 };
 const PAL = {
   vehnar:  { a: '#7C8490', b: '#59606B', d: '#2B2E35', t: '#BCC2CA', r: '#8A5A3A', h: '#E8B23A', l: '#FFD27A', g: '#8FC9F0', ma: 'steel' },
@@ -34,9 +35,9 @@ class Kit {
     const q = o.q || new T.Quaternion().setFromEuler(new T.Euler(o.rx || 0, o.ry || 0, o.rz || 0, o.order || 'YXZ'));
     const m = new T.Matrix4().compose(new T.Vector3((o.x || 0) + this.ox, (o.y || 0) + this.oy, (o.z || 0) + this.oz), q, new T.Vector3(o.sx || 1, o.sy || 1, o.sz || 1));
     geo.applyMatrix4(m); if (o.flat || !geo.attributes.normal) geo.computeVertexNormals(); if (o.shade) shadeGeo(geo, o.shade); /* 4.3b: sombreado assado nas facetas */
-    const c = new T.Color(col); const an = animOf(o.anim || this._anim, this);
-    if (o.e) { c.multiplyScalar(o.e === true ? 2.4 : o.e); this.emi.push({ geo, c, an }); }
-    else this.main.push({ geo, c, rm: Array.isArray(mat) ? mat : (MAT[mat] || MAT.paint), an, pt: o.pat != null ? o.pat : (typeof mat === 'string' ? (PAT[mat] || 0) : 1) });
+    const c = new T.Color(col); const an = animOf(o.anim || this._anim, this); const wd = o.wind != null ? o.wind : (this._wind || 0); /* 4.3c: peso do vento da peça (só o dress3d lê) */
+    if (o.e) { c.multiplyScalar(o.e === true ? 2.4 : o.e); this.emi.push({ geo, c, an, wd }); }
+    else this.main.push({ geo, c, rm: Array.isArray(mat) ? mat : (MAT[mat] || MAT.paint), an, pt: o.pat != null ? o.pat : (typeof mat === 'string' ? (PAT[mat] || 0) : 1), wd });
     return this;
   }
   // caixa com base em y; o.b = chanfro (cantos arredondados na planta, bordas chanfradas em cima e embaixo)
@@ -61,7 +62,25 @@ class Kit {
   crag(x, y, z, w, h, d, col, mat, o) { o = Object.assign({ flat: true }, o, { x, y, z }); const g = cragGeo(w, h, d, col, o); const ry = o.ry || 0, c = Math.cos(ry), s = Math.sin(ry);
     const tr = (px, py, pz) => [x + this.ox + px * c + pz * s, y + this.oy + py, z + this.oz - px * s + pz * c]; this.fis = g.userData.fis.map(f => ({ a: tr(f[0], f[1], f[2]), b: tr(f[3], f[4], f[5]), n: [f[6] * c + f[7] * s, -f[6] * s + f[7] * c] })); return this._push(g, '#FFFFFF', mat, o); }
   // 4.3b: cristal (prisma de o.n faces com ponta piramidal torta, base enterrada); o.shade assa o sombreado das facetas (bom nos emissivos)
-  xtal(x, y, z, r, h, col, mat, o) { o = Object.assign({ flat: true }, o, { x, y, z }); return this._push(xtalGeo(r, h, o), col, mat, o); }
+  xtal(x, y, z, r, h, col, mat, o) { o = Object.assign({ flat: true }, o, { x, y, z }); if (this.lite) o.n = Math.max(3, (o.n || 6) - 2); /* 4.3c */ return this._push(xtalGeo(r, h, o), col, mat, o); }
+  // 4.3c: flora — geometria em coordenadas da receita, cor por vértice (o.c0 base → o.c1 ponta) e normais de copa (o.nc = centro da planta); o.wind = peso do vento
+  // lâmina curva (o.shape 'blade' afina até a ponta, 'leaf' fecha nas duas pontas; o.fold vinco central): nasce em (x, y, z), azimute az, inclinação t0 (0 = em pé), curva cv até a ponta
+  // 4.3c: versão leve (this.lite, para os blocos longe da câmera): q(n) reduz contagens das receitas e os construtores usam menos trechos e lados
+  q(n) { return this.lite ? Math.max(1, Math.round(n * 0.55)) : n; }
+  blade(x, y, z, az, t0, cv, L, w, col, mat, o) { o = Object.assign({}, o, { lite: this.lite }); const g = ribbonGeo([x, y, z], az, t0, cv, L, w, o); this.tip = g.userData.tip; this.leafy = true; return this._push(g, col, mat, { e: o.e, wind: o.wind }); }
+  // fronde de samambaia: ráquis curva com o.m pares de folíolos triangulares (o.lk = comprimento relativo, o.droop = caimento)
+  frond(x, y, z, az, t0, cv, L, col, mat, o) { o = Object.assign({}, o, { lite: this.lite }); const g = frondGeo([x, y, z], az, t0, cv, L, o); this.tip = g.userData.tip; this.leafy = true; return this._push(g, col, mat, { e: o.e, wind: o.wind }); }
+  // tronco ou galho afinado por pontos [x, y, z, raio] (raio 0 no fim fecha em ponta); o.n lados, o.bark listras de casca, o.cap fecha o topo
+  trunk(pts, col, mat, o) { o = Object.assign({}, o, { lite: this.lite }); return this._push(trunkGeo(pts, o), col, mat, { e: o.e, wind: o.wind }); }
+  // bulbo com gomos: perfil [[raio, y], ...] de baixo para cima (raio 0 no topo fecha); o.n lados, o.ribs gomos, o.rk fundura dos gomos; aceita rx/ry/rz
+  bulb(prof, x, y, z, col, mat, o) { o = Object.assign({}, o, { lite: this.lite }); return this._push(bulbGeo(prof, o), col, mat, { x, y, z, rx: o.rx, ry: o.ry, rz: o.rz, e: o.e, wind: o.wind }); }
+  // espinho: pirâmide fina de o.n lados (3) sem base, de a até b
+  spike(a, b, r, col, mat, o) { o = o || {}; return this._push(spikeGeo(a, b, r, o), col, mat, { e: o.e, wind: o.wind, flat: true }); }
+  // lascas de cascalho: lista [x, z, raio, altura]; tronco de pirâmide de o.n lados com tampa
+  chips(list, col, mat, o) { o = Object.assign({}, o, { lite: this.lite }); return this._push(chipsGeo(list, o), col, mat, { e: o.e, wind: o.wind, flat: true }); }
+  // pátina (líquen, geada, cinza) nas faces voltadas para cima da última peça: o.cols cores, k fração das faces, ny inclinação mínima
+  patina(cols, k, ny, seed) { const p = this.main[this.main.length - 1]; if (p) patinaGeo(p.geo, cols, k, ny, seed); return this; }
+  wind(k, fn) { const prev = this._wind; this._wind = k; try { fn(); } finally { this._wind = prev; } return this; }
   light(x, y, z, s, col, k) { return this.box(x, y, z, s, s, s, col, null, { e: k || 2.6 }); }
   finish(o) {
     o = o || {}; const all = this.main.concat(this.emi); const bb = new T.Box3(); const tmp = new T.Box3();
@@ -69,14 +88,15 @@ class Kit {
     const vb = this.base == null ? bb : visBox(all, this.base); /* 4.3b: com base, largura e centro só do que fica acima do chão */
     const cx = o.pivot ? o.pivot[0] : (vb.min.x + vb.max.x) / 2, cz = o.pivot ? o.pivot[1] : (vb.min.z + vb.max.z) / 2, y0 = this.base == null ? bb.min.y : this.base;
     const hasAnim = all.some(p => p.an); // 4.2b
+    const hasWind = all.some(p => p.wd); /* 4.3c */
     const mk = (list, withRM) => {
       if (!list.length) return null; let n = 0; for (const p of list) n += p.geo.attributes.position.count;
       const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), col = new Float32Array(n * 3), rm = withRM ? new Float32Array(n * 2) : null, pt = withRM ? new Float32Array(n) : null; let k = 0;
-      const aa = hasAnim ? new Float32Array(n * 4) : null, ab = hasAnim ? new Float32Array(n * 4) : null;
-      for (const p of list) { const c = p.geo.attributes.position.count, vc = p.geo.attributes.color; pos.set(p.geo.attributes.position.array, k * 3); nor.set(p.geo.attributes.normal.array, k * 3); for (let i = 0; i < c; i++) { const j = k + i; pos[j * 3] -= cx; pos[j * 3 + 1] -= y0; pos[j * 3 + 2] -= cz; if (vc) { col[j * 3] = p.c.r * vc.getX(i); col[j * 3 + 1] = p.c.g * vc.getY(i); col[j * 3 + 2] = p.c.b * vc.getZ(i); } else { col[j * 3] = p.c.r; col[j * 3 + 1] = p.c.g; col[j * 3 + 2] = p.c.b; } if (pt) pt[j] = p.pt || 0; if (rm) { rm[j * 2] = p.rm[0]; rm[j * 2 + 1] = p.rm[1]; } /* 4.3b: cor por vértice multiplica a cor da peça */
+      const aa = hasAnim ? new Float32Array(n * 4) : null, ab = hasAnim ? new Float32Array(n * 4) : null, wa = hasWind ? new Float32Array(n) : null;
+      for (const p of list) { const c = p.geo.attributes.position.count, vc = p.geo.attributes.color; pos.set(p.geo.attributes.position.array, k * 3); nor.set(p.geo.attributes.normal.array, k * 3); for (let i = 0; i < c; i++) { const j = k + i; pos[j * 3] -= cx; pos[j * 3 + 1] -= y0; pos[j * 3 + 2] -= cz; if (vc) { col[j * 3] = p.c.r * vc.getX(i); col[j * 3 + 1] = p.c.g * vc.getY(i); col[j * 3 + 2] = p.c.b * vc.getZ(i); } else { col[j * 3] = p.c.r; col[j * 3 + 1] = p.c.g; col[j * 3 + 2] = p.c.b; } if (pt) pt[j] = p.pt || 0; if (wa) wa[j] = p.wd || 0; if (rm) { rm[j * 2] = p.rm[0]; rm[j * 2 + 1] = p.rm[1]; } /* 4.3b: cor por vértice multiplica a cor da peça */
           if (aa && p.an) { aa[j * 4] = p.an.t; aa[j * 4 + 1] = p.an.p[0] - cx; aa[j * 4 + 2] = p.an.p[1] - y0; aa[j * 4 + 3] = p.an.p[2] - cz; ab[j * 4] = p.an.b[0]; ab[j * 4 + 1] = p.an.b[1]; ab[j * 4 + 2] = p.an.b[2]; ab[j * 4 + 3] = p.an.b[3]; } } k += c; p.geo.dispose(); }
       const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(pos, 3)); g.setAttribute('normal', new T.BufferAttribute(nor, 3)); g.setAttribute('color', new T.BufferAttribute(col, 3)); if (rm) g.setAttribute('rm', new T.BufferAttribute(rm, 2)); if (pt) g.setAttribute('pt', new T.BufferAttribute(pt, 1));
-      if (aa) { g.setAttribute('aAnim', new T.BufferAttribute(aa, 4)); g.setAttribute('aAnimB', new T.BufferAttribute(ab, 4)); } g.computeBoundingSphere(); return g;
+      if (aa) { g.setAttribute('aAnim', new T.BufferAttribute(aa, 4)); g.setAttribute('aAnimB', new T.BufferAttribute(ab, 4)); } if (wa) g.setAttribute('aWind', new T.BufferAttribute(wa, 1)); g.computeBoundingSphere(); return g;
     };
     const out = { main: mk(this.main, true), em: mk(this.emi, false), width: Math.max(vb.max.x - vb.min.x, vb.max.z - vb.min.z), height: bb.max.y - y0, mount: this.mount == null ? null : this.mount - y0, beam: this.beam ? [this.beam[0] - cx, this.beam[1] - y0, this.beam[2] - cz] : null, mesh: true, anim: hasAnim };
     if (!out.main) { const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(new Float32Array(9), 3)); g.setAttribute('normal', new T.BufferAttribute(new Float32Array(9), 3)); g.setAttribute('color', new T.BufferAttribute(new Float32Array(9), 3)); g.setAttribute('rm', new T.BufferAttribute(new Float32Array(6), 2)); out.main = g; }
@@ -224,6 +244,89 @@ function xtalGeo(rad, h, o) {
   for (let i = 0; i < N; i++) { const i2 = (i + 1) % N; V(A[i]); V(B[i]); V(A[i2]); V(B[i]); V(B[i2]); V(A[i2]); V(B[i]); V(C); V(B[i2]); }
   const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new T.Float32BufferAttribute(cl, 3)); return g;
 }
+
+// ---------- 4.3c: flora (lâminas, folhas, frondes, troncos afinados, bulbos com gomos, espinhos, cascalho) ----------
+// Geometria não indexada com cor por vértice e normais próprias. Lâminas, folhas e frondes usam normal "de copa": a face misturada com
+// "para cima" e "para fora do centro da planta" (o.nc), lida igual dos dois lados (o dress3d desfaz a inversão do verso). Assim a planta
+// sombreia como um volume e não como um monte de cartões soltos; o.kf/o.ku/o.ko = pesos de face, cima e fora.
+function fbuf(pos, nor, col) { const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('normal', new T.Float32BufferAttribute(nor, 3)); g.setAttribute('color', new T.Float32BufferAttribute(col, 3)); return g; }
+function cnorm(f, p, o) { const c = o.nc || [0, 0.4, 0]; let ox = p[0] - c[0], oy = (p[1] - c[1]) * 0.5, oz = p[2] - c[2]; const ol = Math.hypot(ox, oy, oz) || 1; ox /= ol; oy /= ol; oz /= ol;
+  const kf = o.kf == null ? 0.5 : o.kf, ku = o.ku == null ? 0.5 : o.ku, ko = o.ko == null ? 0.4 : o.ko; const sg = f[0] * ox * 0.4 + f[1] * 0.6 + f[2] * oz * 0.4 < 0 ? -kf : kf; /* a face que olha para cima e para fora */
+  const nx = f[0] * sg + ox * ko, ny = f[1] * sg + ku + oy * ko, nz = f[2] * sg + oz * ko, l = Math.hypot(nx, ny, nz) || 1; return [nx / l, ny / l, nz / l]; }
+function fcross(a, b, c) { const ux = b[0] - a[0], uy = b[1] - a[1], uz = b[2] - a[2], vx = c[0] - a[0], vy = c[1] - a[1], vz = c[2] - a[2]; const x = uy * vz - uz * vy, y = uz * vx - ux * vz, z = ux * vy - uy * vx, l = Math.hypot(x, y, z) || 1; return [x / l, y / l, z / l]; }
+// triângulo com normal de copa: a face é orientada pela referência ref (lado de cima da lâmina)
+function ftri(out, A, B, C, cA, cB, cC, ref, o) { let f = fcross(A, B, C); if (f[0] * ref[0] + f[1] * ref[1] + f[2] * ref[2] < 0) f = [-f[0], -f[1], -f[2]];
+  for (const [P, c] of [[A, cA], [B, cB], [C, cC]]) { out.pos.push(P[0], P[1], P[2]); const n = cnorm(f, P, o); out.nor.push(n[0], n[1], n[2]); out.col.push(c[0], c[1], c[2]); } }
+const fmix = (a, b, t, k) => [(a.r + (b.r - a.r) * t) * k, (a.g + (b.g - a.g) * t) * k, (a.b + (b.b - a.b) * t) * k];
+// caminho curvo no plano do azimute az: nasce em b, inclinação inicial t0 (0 = vertical), curva cv (rad somados até a ponta, quadrática), comprimento L, n trechos
+function curvePath(b, az, t0, cv, L, n) { const ca = Math.cos(az), sa = Math.sin(az), P = [], Tg = []; let r = 0, y = 0;
+  for (let i = 0; i <= n; i++) { if (i) { const sm = (i - 0.5) / n, th = t0 + cv * sm * sm; r += Math.sin(th) * L / n; y += Math.cos(th) * L / n; } const s = i / n, th = t0 + cv * s * s;
+    P.push([b[0] + r * ca, b[1] + y, b[2] + r * sa]); Tg.push([Math.sin(th) * ca, Math.cos(th), Math.sin(th) * sa]); }
+  return { P, Tg, side: [-sa, 0, ca] }; }
+const fupper = (side, t) => [-side[2] * t[1], side[2] * t[0] - side[0] * t[2], side[0] * t[1]]; // face de cima da lâmina (side × tangente)
+// lâmina ('blade': larga na base) ou folha ('leaf': fecha na base e na ponta); o.n trechos, o.fold vinco central, o.c0/o.c1 cores, o.dk escurece (folhas de dentro), o.ao sombra na base
+function ribbonGeo(b, az, t0, cv, L, w, o) {
+  const leaf = o.shape === 'leaf', n = o.lite ? Math.max(leaf ? 2 : 1, Math.ceil((o.n || 3) / 2)) : (o.n || 3), fold = o.lite ? 0 : (o.fold || 0), { P, Tg, side } = curvePath(b, az, t0, cv, L, n);
+  const c0 = new T.Color(o.c0 || '#FFFFFF'), c1 = new T.Color(o.c1 || o.c0 || '#FFFFFF'), dk = o.dk == null ? 1 : o.dk, ao = o.ao == null ? 0.3 : o.ao, out = { pos: [], nor: [], col: [] };
+  const R = P.map((C, i) => { const s = i / n, ww = (leaf ? Math.pow(Math.max(0, Math.sin(PI * s)), 0.75) : 1 - Math.pow(s, 1.4)) * w * 0.5, nf = fupper(side, Tg[i]);
+    return { C, nf, w: ww, L: [C[0] - side[0] * ww, C[1], C[2] - side[2] * ww], Rr: [C[0] + side[0] * ww, C[1], C[2] + side[2] * ww], M: [C[0] + nf[0] * fold * ww * 2, C[1] + nf[1] * fold * ww * 2, C[2] + nf[2] * fold * ww * 2],
+      c: fmix(c0, c1, Math.pow(s, 0.85), dk * (1 - ao * (1 - s) * (1 - s))) }; });
+  for (let i = 0; i < n; i++) { const a = R[i], q = R[i + 1], ref = a.nf, cE = a.c.map(v => v * 0.92), qE = q.c.map(v => v * 0.92); /* bordas um tom abaixo do vinco */
+    if (fold) { if (a.w < 1e-5) { ftri(out, a.C, q.L, q.M, a.c, qE, q.c, ref, o); ftri(out, a.C, q.M, q.Rr, a.c, q.c, qE, ref, o); }
+      else if (q.w < 1e-5) { ftri(out, a.L, a.M, q.C, cE, a.c, q.c, ref, o); ftri(out, a.M, a.Rr, q.C, a.c, cE, q.c, ref, o); }
+      else { ftri(out, a.L, q.L, a.M, cE, qE, a.c, ref, o); ftri(out, a.M, q.L, q.M, a.c, qE, q.c, ref, o); ftri(out, a.M, q.M, a.Rr, a.c, q.c, cE, ref, o); ftri(out, a.Rr, q.M, q.Rr, cE, q.c, qE, ref, o); } }
+    else { if (a.w < 1e-5) ftri(out, a.C, q.L, q.Rr, a.c, q.c, q.c, ref, o); else if (q.w < 1e-5) ftri(out, a.L, a.Rr, q.C, a.c, a.c, q.c, ref, o); else { ftri(out, a.L, a.Rr, q.L, a.c, a.c, q.c, ref, o); ftri(out, a.Rr, q.Rr, q.L, a.c, q.c, q.c, ref, o); } } }
+  const g = fbuf(out.pos, out.nor, out.col); g.userData.tip = P[n]; return g; }
+// fronde: ráquis curva com o.m pares de folíolos triangulares (maiores no meio), caídos (o.droop) e puxados para a ponta
+function frondGeo(b, az, t0, cv, L, o) {
+  const m = o.lite ? Math.max(3, Math.ceil((o.m || 9) / 2)) : (o.m || 9), { P, Tg, side } = curvePath(b, az, t0, cv, L, m), lk = o.lk || 0.3, dr = o.droop == null ? 0.3 : o.droop, c0 = new T.Color(o.c0 || '#FFFFFF'), c1 = new T.Color(o.c1 || o.c0 || '#FFFFFF'), dk = o.dk == null ? 1 : o.dk, out = { pos: [], nor: [], col: [] };
+  for (let i = 1; i <= m; i++) { const s = (i - 0.5) / m, ll = L * lk * Math.pow(Math.sin(PI * Math.min(1, 0.12 + s * 0.92)), 0.7) * (1 - 0.3 * s), A = P[i - 1], B = P[i], t = Tg[i], nf = fupper(side, t);
+    const M = [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2, (A[2] + B[2]) / 2], cA = fmix(c0, c1, (i - 1) / m, dk * 0.92), cB = fmix(c0, c1, i / m, dk * 0.92), cT = fmix(c0, c1, Math.min(1, s + 0.3), dk * 1.06);
+    for (const sg of [-1, 1]) { const tip = [M[0] + side[0] * sg * ll + t[0] * ll * 0.4 - nf[0] * ll * dr, M[1] + side[1] * sg * ll + t[1] * ll * 0.4 - nf[1] * ll * dr, M[2] + side[2] * sg * ll + t[2] * ll * 0.4 - nf[2] * ll * dr]; ftri(out, A, B, tip, cA, cB, cT, nf, o); } }
+  const g = fbuf(out.pos, out.nor, out.col); g.userData.tip = P[m]; return g; }
+// tronco/galho afinado por pontos [x, y, z, raio]; normal radial (liso); cor o.c0 → o.c1 ao longo, listras de casca o.bark e base mais escura; o.cap fecha o topo
+function trunkGeo(pts, o) {
+  const n = o.lite ? Math.max(3, (o.n || 6) - 2) : (o.n || 6), N = pts.length, c0 = new T.Color(o.c0 || '#FFFFFF'), c1 = new T.Color(o.c1 || o.c0 || '#FFFFFF'), bark = o.bark || 0, rot = o.rot || 0, sr = rng((o.seed | 0) * 31 + 7);
+  const V = p => new T.Vector3(p[0], p[1], p[2]), Ts = pts.map((p, i) => V(pts[Math.min(N - 1, i + 1)]).sub(V(pts[Math.max(0, i - 1)])).normalize());
+  let Nn = new T.Vector3().crossVectors(Ts[0], Math.abs(Ts[0].y) < 0.9 ? new T.Vector3(0, 1, 0) : new T.Vector3(1, 0, 0)).normalize(); const rings = [], stripe = [];
+  for (let k = 0; k < n; k++) stripe.push(1 - bark * sr());
+  for (let i = 0; i < N; i++) { const t = Ts[i]; Nn = Nn.sub(t.clone().multiplyScalar(Nn.dot(t))).normalize(); const B = new T.Vector3().crossVectors(t, Nn); const s = i / (N - 1), r = pts[i][3];
+    const base = fmix(c0, c1, s, 1), ring = []; for (let k = 0; k < n; k++) { const ph = rot + k / n * PI * 2, d = Nn.clone().multiplyScalar(Math.cos(ph)).add(B.clone().multiplyScalar(Math.sin(ph))); const ao = pts[i][1] < 0.12 ? 0.7 + 2.5 * Math.max(0, pts[i][1]) : 1;
+      ring.push({ p: [pts[i][0] + d.x * r, pts[i][1] + d.y * r, pts[i][2] + d.z * r], n: [d.x, d.y, d.z], c: base.map(v => v * stripe[k] * ao) }); } rings.push(ring); }
+  const pos = [], nor = [], col = []; const put = q => { pos.push(q.p[0], q.p[1], q.p[2]); nor.push(q.n[0], q.n[1], q.n[2]); col.push(q.c[0], q.c[1], q.c[2]); };
+  for (let i = 0; i < N - 1; i++) for (let k = 0; k < n; k++) { const k2 = (k + 1) % n, a = rings[i][k], b = rings[i][k2], c = rings[i + 1][k], d = rings[i + 1][k2];
+    if (pts[i][3] > 1e-5) { put(a); put(b); put(c); } if (pts[i + 1][3] > 1e-5) { put(b); put(d); put(c); } } /* anéis giram no sentido da tangente: frente para fora */
+  if (o.cap && pts[N - 1][3] > 1e-5) { const L = rings[N - 1], ct = pts[N - 1], tn = Ts[N - 1], cc = new T.Color(o.cap === true ? o.c1 || '#FFFFFF' : o.cap); for (let k = 0; k < n; k++) { const a = L[k], b = L[(k + 1) % n]; for (const q of [a, b]) { pos.push(q.p[0], q.p[1], q.p[2]); nor.push(tn.x, tn.y, tn.z); col.push(cc.r, cc.g, cc.b); } pos.push(ct[0], ct[1], ct[2]); nor.push(tn.x, tn.y, tn.z); col.push(cc.r * 0.85, cc.g * 0.85, cc.b * 0.85); } }
+  return fbuf(pos, nor, col); }
+// bulbo com gomos: perfil [[raio, y], ...] de baixo para cima; o.n lados (par = crista/vale alternados com o.ribs = n/2), o.rk fundura, o.jit irregularidade; normais lisas
+function bulbGeo(prof, o) {
+  const n = o.lite ? Math.max(4, Math.round((o.n || 8) * 0.6)) : (o.n || 8), ribs = o.ribs || n / 2, rk = o.lite ? 0 : (o.rk || 0), jit = o.jit || 0, r = rng((o.seed | 0) * 17 + 3), c0 = new T.Color(o.c0 || '#FFFFFF'), c1 = new T.Color(o.c1 || o.c0 || '#FFFFFF'), M = prof.length, y0 = prof[0][1], y1 = prof[M - 1][1];
+  const jt = []; for (let k = 0; k < n; k++) jt.push(1 + (r() - 0.5) * 2 * jit);
+  const pos = [], col = [], idx = [];
+  for (let j = 0; j < M; j++) { const [pr, py] = prof[j], s = (py - y0) / ((y1 - y0) || 1); for (let k = 0; k < n; k++) { const ph = k / n * PI * 2 + (o.rot || 0), rib = Math.cos(ribs * ph), rr = pr * (1 + rk * rib) * jt[k];
+    pos.push(Math.cos(ph) * rr, py, Math.sin(ph) * rr); const c = fmix(c0, c1, Math.max(0, Math.min(1, s)), (1 + rib * (o.ribC == null ? 0.1 : o.ribC)) * (py < 0.1 ? 0.75 + 2.5 * Math.max(0, py) : 1)); col.push(c[0], c[1], c[2]); } }
+  for (let j = 0; j < M - 1; j++) for (let k = 0; k < n; k++) { const k2 = (k + 1) % n, a = j * n + k, b = j * n + k2, c = (j + 1) * n + k, d = (j + 1) * n + k2;
+    if (prof[j][0] > 1e-5) idx.push(a, c, b); if (prof[j + 1][0] > 1e-5) idx.push(b, c, d); }
+  const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new T.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals(); return g; }
+// espinho: pirâmide fina sem base (o.n lados), cor o.c0 na base → o.c1 na ponta
+function spikeGeo(a, b, r, o) { const n = o.n || 3, A = new T.Vector3(a[0], a[1], a[2]), d = new T.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]).normalize(); const u = new T.Vector3().crossVectors(d, Math.abs(d.y) < 0.9 ? new T.Vector3(0, 1, 0) : new T.Vector3(1, 0, 0)).normalize(), v = new T.Vector3().crossVectors(d, u);
+  const c0 = new T.Color(o.c0 || '#FFFFFF'), c1 = new T.Color(o.c1 || o.c0 || '#FFFFFF'), ring = []; for (let k = 0; k < n; k++) { const ph = k / n * PI * 2 + (o.rot || 0); ring.push(A.clone().add(u.clone().multiplyScalar(Math.cos(ph) * r)).add(v.clone().multiplyScalar(Math.sin(ph) * r))); }
+  const pos = [], col = []; for (let k = 0; k < n; k++) { const p = ring[k], q = ring[(k + 1) % n]; pos.push(p.x, p.y, p.z, q.x, q.y, q.z, b[0], b[1], b[2]); col.push(c0.r, c0.g, c0.b, c0.r, c0.g, c0.b, c1.r, c1.g, c1.b); }
+  const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new T.Float32BufferAttribute(col, 3)); return g; }
+// cascalho: cada lasca [x, z, raio, altura] vira um tronco de pirâmide de o.n lados (4) meio enterrado, com tampa; topo empoeirado (o.c1) e pé escuro (o.c0)
+function chipsGeo(list, o) { const n = o.lite ? 3 : (o.n || 4), r = rng((o.seed | 0) * 7 + 5), c0 = new T.Color(o.c0 || '#FFFFFF'), c1 = new T.Color(o.c1 || o.c0 || '#FFFFFF'), pos = [], col = [];
+  for (const [x, z, rad, h] of list) { const tw = r() * PI, B = [], U = []; for (let k = 0; k < n; k++) { const ph = tw + k / n * PI * 2 + (r() - 0.5) * 0.5, rr = rad * (0.8 + r() * 0.4); B.push([x + Math.cos(ph) * rr, -0.06, z + Math.sin(ph) * rr * 0.8]); U.push([x + Math.cos(ph + 0.3) * rr * 0.55, h * (0.75 + r() * 0.3), z + Math.sin(ph + 0.3) * rr * 0.45]); }
+    const top = [x + (r() - 0.5) * rad * 0.3, h * 1.05, z + (r() - 0.5) * rad * 0.3], cb = [c0.r, c0.g, c0.b], cu = [c1.r * 0.92, c1.g * 0.92, c1.b * 0.92], ct = [c1.r, c1.g, c1.b];
+    const T3 = (p, q, s, cp, cq, cs) => { pos.push(p[0], p[1], p[2], q[0], q[1], q[2], s[0], s[1], s[2]); col.push(...cp, ...cq, ...cs); };
+    for (let k = 0; k < n; k++) { const k2 = (k + 1) % n; T3(B[k], U[k], B[k2], cb, cu, cb); T3(B[k2], U[k], U[k2], cb, cu, cu); T3(U[k], top, U[k2], cu, ct, cu); } }
+  const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new T.Float32BufferAttribute(col, 3)); return g; }
+// pátina: recolore faces voltadas para cima (normal.y > ny) por manchas de ruído (fração k) com as cores cols (líquen, geada, cinza)
+function patinaGeo(g, cols, k, ny, seed) { const p = g.attributes.position, c = g.attributes.color; if (!c) return; const C = cols.map(x => new T.Color(x)), h3 = (x, y, z) => { const v = Math.sin(x * 12.9898 + y * 78.233 + z * 37.719 + seed * 4.7) * 43758.5453; return v - Math.floor(v); };
+  const sm = (x, y, z) => { const f = 2.2; const a = h3(Math.floor(x * f), Math.floor(y * f), Math.floor(z * f)); return a; };
+  for (let i = 0; i < p.count; i += 3) { const A = [p.getX(i), p.getY(i), p.getZ(i)], B = [p.getX(i + 1), p.getY(i + 1), p.getZ(i + 1)], D = [p.getX(i + 2), p.getY(i + 2), p.getZ(i + 2)], f = fcross(A, B, D); if (f[1] < ny) continue;
+    const cx = (A[0] + B[0] + D[0]) / 3, cy = (A[1] + B[1] + D[1]) / 3, cz = (A[2] + B[2] + D[2]) / 3; const v = sm(cx, cy, cz) * 0.7 + h3(cx, cy, cz) * 0.3; if (v > k) continue; const cc = C[Math.floor(h3(cz, cx, cy) * C.length) % C.length], t = 0.75 + 0.25 * f[1];
+    for (let j = 0; j < 3; j++) c.setXYZ(i + j, c.getX(i + j) * (1 - t) + cc.r * t, c.getY(i + j) * (1 - t) + cc.g * t, c.getZ(i + j) * (1 - t) + cc.b * t); }
+  c.needsUpdate = true; }
 
 // ---------- utilitários de forma ----------
 const PI = Math.PI, H = Math.PI / 2;
@@ -1004,6 +1107,159 @@ const NEUTRAL = {
     else { wall(K, r, 0, -0.8, 9, 4, 1.1, 0.08, pal, { win: [-0.4, 1.6, 1.4, 3.2] }); pillar(K, r, -5.2, 1.4, 0.6, 2.6, pal, { seed, broken: 1 }); rubble(K, r, 0, 1.6, 4.8, 7, 0.9, pal, { seed }); lamp(0.6, 0.06, 0.4); } },
   // 4.3b: pedra solta barata (matacão com estratos ou pedra/seixo lascado) para o espalhamento do dress3d, no lugar do icosaedro; ver scatter()
   seixo(K, seed) { const big = !(seed & 1), r = rng(seed * 7 + 29); K.base = 0; K.crag(0, -0.12, 0, 2.1 + r() * 0.3, big ? 1.25 + r() * 0.2 : 0.9, 1.8, '#FFFFFF', 'rock', { seed, n: big ? 8 : 6, strata: big ? 2 : 0, sq: 2.6 + r(), rough: 0.14, chip: 0.12, jit: 0.06, tilt: 0.22, cuts: big ? 2 : 1, fis: big ? 1 : 0, flare: 0.04, dark: 0.35, dustK: 0.25, cols: ['#FFFFFF', '#E4E0D9'], dust: '#FFFFFF' }); },
+  // ---------- 4.3c: flora e adereços do mundo vestido (dress3d) ----------
+  // ~2 de largura, base em y = 0 (o que fica abaixo afunda no chão), altura até ~2,5 (o vento do dress3d pesa pela altura); o dress3d escala pela instância.
+  // Cor por vértice (sem cor de material), rugosidade pelo MAT de cada peça e peso do vento por peça; brilho só em peças emissivas fracas (brasa, fungo).
+  // tundra: tufo de capim — lâminas finas em dois tons, alturas e curvas diferentes
+  capim(K, seed) { const r = rng(seed * 7 + 41); K.base = 0; const nb = K.q(21 + (r() * 3 | 0)), G = ['#3A4620', '#445024', '#4E5626'], P = ['#A2A85C', '#B4B068', '#90A050', '#BEBA7A'], BR = ['#A08250', '#B4965E']; /* lâminas finas; um quarto com ponta bronze */
+    for (let i = 0; i < nb; i++) { const a = i / nb * PI * 2 + (r() - 0.5) * 0.7, d = 0.03 + r() * 0.18, tall = r() * r(), L = 0.7 + tall * 1.2, t0 = 0.12 + (1 - tall) * 0.45 + r() * 0.15, cv = 0.5 + r() * 0.9;
+      K.blade(Math.cos(a) * d, -0.06, Math.sin(a) * d, a, t0, cv, L, (0.075 + r() * 0.04) * (K.lite ? 1.4 : 1), '#FFFFFF', 'leaf', { n: 3, c0: G[i % 3], c1: i % 4 === 3 ? BR[i % 2] : P[(i * 3 + (r() * 2 | 0)) % 4], nc: [0, 0.2, 0], ku: 0.7, kf: 0.35, ko: 0.3, ao: 0.4, wind: 1 }); } },
+  // tundra: arbusto de folhagem — dezenas de folhas pequenas com vinco na casca de um domo e galhos curtos por dentro; variante 1 azul-esverdeada
+  folhagem(K, seed) { const r = rng(seed * 7 + 43); K.base = 0; const PAL = [['#323E26', '#6E7E4A'], ['#38482A', '#86985C'], ['#444628', '#9E9C62']]; /* um tom acima: na partida o arbusto ficava quase preto sobre o musgo claro */
+    for (let i = 0; i < 4; i++) { const a = i * PI / 2 + r() * 0.8; K.trunk([[0, -0.1, 0, 0.07], [Math.cos(a) * 0.22, 0.32, Math.sin(a) * 0.22, 0.045], [Math.cos(a) * 0.42, 0.62, Math.sin(a) * 0.42, 0.015]], '#FFFFFF', 'bark', { n: 3, c0: '#2A2018', c1: '#4A3C2C', wind: 0.2 }); }
+    const cy = 0.6, ls = K.lite ? 1.3 : 1; /* camadas: casca de fora (folhas maiores), casca de dentro (mais escura, aponta para cima) e tufo no topo: de cima não fica oca */
+    const shell = (N, RX, RY, L0, W0, dk0, cmin) => { for (let i = 0; i < N; i++) { const u = (i + 0.5) / N, cth = 1 - u * (1 - cmin), sth = Math.sqrt(Math.max(0, 1 - cth * cth)), ph = i * 2.39996 + r() * 0.5, dx = sth * Math.cos(ph), dz = sth * Math.sin(ph), dy = cth, rad = 0.85 + r() * 0.2;
+      const px = dx * RX * rad, py = cy + dy * RY * rad, pz = dz * RX * rad, pc = PAL[(r() * 3) | 0], up = Math.acos(Math.max(-1, Math.min(1, dy))) * 0.72 + 0.12;
+      K.blade(px - dx * 0.06, py - Math.max(0, dy) * 0.05, pz - dz * 0.06, Math.atan2(dz, dx), up, 0.25 + r() * 0.35, (L0 + r() * 0.12) * ls, (W0 + r() * 0.06) * ls, '#FFFFFF', 'leaf', { shape: 'leaf', n: 2, fold: 0.2, c0: pc[0], c1: pc[1], dk: dk0 * (0.78 + 0.22 * (cth - cmin) / (1 - cmin)), nc: [0, cy * 0.4, 0], ku: 0.8, kf: 0.22, ko: 0.42, ao: 0.1, wind: 0.6 }); } }; /* normal mais para o céu: a copa acende por igual (na partida a sombra própria e o AO já dão o volume) */
+    shell(K.q(46), 0.74, 0.5, 0.34, 0.22, 1, -0.3); shell(K.q(18), 0.42, 0.42, 0.3, 0.2, 0.9, 0.1); shell(K.q(7), 0.16, 0.5, 0.28, 0.2, 1.08, 0.6); },
+  // tundra: samambaia — frondes arqueadas com folíolos e dois brotos enrolados no centro; variante 1 azul-esverdeada
+  samambaia(K, seed) { const r = rng(seed * 7 + 47), v = seed % 2; K.base = 0; const c0 = v ? '#1E3430' : '#222C16', c1 = v ? '#6A9A88' : '#7A8646', nf = 8 + (r() * 3 | 0);
+    for (let i = 0; i < nf; i++) { const a = i / nf * PI * 2 + (r() - 0.5) * 0.5, L = 0.95 + r() * 0.35, t0 = 0.3 + r() * 0.35;
+      K.frond(Math.cos(a) * 0.05, -0.05, Math.sin(a) * 0.05, a, t0, 1.35 + r() * 0.6, L, '#FFFFFF', 'leaf', { m: 9, lk: 0.3, droop: 0.35, c0, c1, dk: 0.85 + r() * 0.2, nc: [0, 0.35, 0], ku: 0.5, kf: 0.4, ko: 0.4, wind: 0.8 }); }
+    for (let i = 0; i < K.q(2); i++) { const a = r() * PI * 2; K.blade(Math.cos(a) * 0.06, -0.03, Math.sin(a) * 0.06, a, 0.05, 4.2, 0.62, 0.09, '#FFFFFF', 'leaf', { n: 5, c0, c1: v ? '#9CC4B2' : '#A09C5C', nc: [0, 0.3, 0], wind: 0.5 }); } },
+  // tundra: flores alienígenas sem brilho — roseta de folhas, hastes finas e corolas em estrela (violeta, coral ou creme apagados)
+  flor(K, seed) { const r = rng(seed * 7 + 53); K.base = 0; const PP = [['#6E527E', '#B59BC9', '#3A2A44'], ['#9A5E52', '#D9A090', '#4A2E28'], ['#A89C70', '#E2D9B0', '#5A4A30']]; /* cada corola com uma das três cores */
+    for (let i = 0; i < K.q(6); i++) { const a = i / 6 * PI * 2 + r() * 0.6; K.blade(0, -0.03, 0, a, 1.05 + r() * 0.2, 0.5, 0.55 + r() * 0.15, 0.2, '#FFFFFF', 'leaf', { shape: 'leaf', n: 2, fold: 0.2, c0: '#24301A', c1: '#66763A', nc: [0, 0, 0], wind: 0.3 }); }
+    const ns = 4 + (r() * 3 | 0); for (let i = 0; i < ns; i++) { const a = r() * PI * 2, d = 0.05 + r() * 0.15, hh = 0.75 + r() * 0.85, t0 = 0.12 + r() * 0.3;
+      K.blade(Math.cos(a) * d, -0.03, Math.sin(a) * d, a, t0, 0.25, hh, 0.05, '#FFFFFF', 'leaf', { n: 2, c0: '#2E3A1C', c1: '#5A6A34', wind: 1 }); const tp = K.tip, ps = 0.2 + r() * 0.08, P = PP[(i + seed) % 3];
+      K.wind(1, () => { for (let k = 0; k < 5; k++) K.blade(tp[0], tp[1], tp[2], k / 5 * PI * 2 + a, 0.85, 0.5, ps, ps * 0.75, '#FFFFFF', 'petal', { shape: 'leaf', n: 2, c0: P[2], c1: k % 2 ? P[1] : P[0], nc: tp, ku: 0.6, kf: 0.4, ko: 0.2, ao: 0 });
+        if (!K.lite) K.oct(tp[0], tp[1] - 0.03, tp[2], 0.05, 0.11, P[2], 'petal'); }); } },
+  // tundra: pedra com líquen (manchas amarelo-esverdeadas e alaranjadas no topo) e almofadas de musgo no pé
+  liquen(K, seed) { const r = rng(seed * 7 + 59), big = !(seed & 1); K.base = 0;
+    K.crag(0, -0.12, 0, 2 + r() * 0.3, big ? 1.1 + r() * 0.2 : 0.8, 1.7, '#FFFFFF', 'rock', { seed: seed + 11, n: big ? 8 : 6, strata: big ? 2 : 0, sq: 2.6 + r(), rough: 0.14, chip: 0.12, jit: 0.06, tilt: 0.22, cuts: big ? 2 : 1, fis: big ? 1 : 0, flare: 0.04, dark: 0.35, dustK: 0.2, cols: ['#77736B', '#686460'], dust: '#8E8A80' });
+    K.patina(['#8C8A56', '#6E7A4E', '#A08A58', '#7E8656'], 0.32, 0.4, seed);
+    for (let i = 0; i < K.q(2); i++) { const a = r() * PI * 2, s = 0.8 + r() * 0.5; K.bulb([[0.26 * s, -0.04], [0.24 * s, 0.07 * s], [0.14 * s, 0.13 * s], [0, 0.15 * s]], Math.cos(a) * 0.95, 0, Math.sin(a) * 0.82, '#FFFFFF', 'leaf', { n: 6, rk: 0.12, c0: '#26301A', c1: '#5E6A30', seed: seed + i }); } },
+  // gelo: aglomerado de cristais de gelo fosco (prismas de alturas diferentes, branco-azulado sem brilho próprio) num monte de neve; variante 1 em leque
+  cristal(K, seed) { const r = rng(seed * 7 + 61), v = seed % 2; K.base = 0;
+    K.crag(0, -0.1, 0, 1.9, 0.34, 1.6, '#FFFFFF', 'snow', { seed: seed * 3 + 1, n: 9, strata: 0, top: 'dome', taper: 0.7, flare: 0.25, rough: 0.12, cuts: 0, fis: 0, tilt: 0.05, dark: 0.22, dustK: 0.55, cols: ['#93A4BE'], dust: '#D6DEEA' });
+    const n = 6 + (r() * 2 | 0), fan = r() * PI * 2;
+    for (let i = 0; i < n; i++) { const big = i === 0, a = v ? fan + (r() - 0.5) * 1.6 : r() * PI * 2, lean = big ? 0.06 + r() * 0.1 : (v ? 0.5 + r() * 0.3 : 0.32 + r() * 0.42), hh = big ? 1.85 + r() * 0.45 : 0.55 + r() * 0.95, rr = hh * (0.15 + r() * 0.04), off = big ? (v ? -0.3 : 0) : 0.18 + r() * 0.42;
+      const ox = big && v ? Math.cos(fan) * off : Math.cos(a) * off, oz = big && v ? Math.sin(fan) * off : Math.sin(a) * off;
+      K.xtal(ox, -0.12, oz, rr, hh, i % 3 ? '#B8D0E8' : '#D8E6F4', 'frost', { seed: seed * 13 + i, n: 5, rx: Math.sin(a) * lean, rz: -Math.cos(a) * lean, glow: 0.55 }); } },
+  // gelo: arbusto congelado espinhoso — galhos escuros que clareiam de geada, ramos laterais, ponta de gelo e colchão de neve
+  espinho(K, seed) { const r = rng(seed * 7 + 67); K.base = 0;
+    K.crag(0, -0.1, 0, 1.3, 0.22, 1.2, '#FFFFFF', 'snow', { seed: seed * 5 + 2, n: 8, strata: 0, top: 'dome', taper: 0.7, flare: 0.25, rough: 0.15, cuts: 0, fis: 0, dark: 0.2, dustK: 0.5, cols: ['#93A4BE'], dust: '#D6DEEA' });
+    const nb = K.q(9 + (r() * 3 | 0)); for (let i = 0; i < nb; i++) { const a = i / nb * PI * 2 + (r() - 0.5) * 0.5, el = 0.3 + r() * 0.55, L = 0.85 + r() * 0.5, sx = Math.sin(el) * Math.cos(a), sy = Math.cos(el), sz = Math.sin(el) * Math.sin(a);
+      const p0 = [Math.cos(a) * 0.06, -0.05, Math.sin(a) * 0.06], p1 = [p0[0] + sx * L, p0[1] + sy * L, p0[2] + sz * L];
+      K.spike(p0, p1, 0.13, '#FFFFFF', 'bark', { c0: '#262B36', c1: '#DCE7EE' });
+      for (let k = 0; k < K.q(2); k++) { const f = 0.35 + k * 0.25 + r() * 0.1, b = [p0[0] + sx * L * f, p0[1] + sy * L * f, p0[2] + sz * L * f], aa = a + (k ? 0.6 : -0.6) + (r() - 0.5) * 0.3, ee = el + 0.2 + r() * 0.3, ll = L * (0.4 + r() * 0.2);
+        K.spike(b, [b[0] + Math.sin(ee) * Math.cos(aa) * ll, b[1] + Math.cos(ee) * ll, b[2] + Math.sin(ee) * Math.sin(aa) * ll], 0.08, '#FFFFFF', 'frost', { c0: '#3E4856', c1: '#E8F0F5' }); }
+      if (!K.lite) K.xtal(p1[0], p1[1] - 0.14, p1[2], 0.08, 0.36, '#DCE8F4', 'frost', { seed: seed * 11 + i, n: 3, rx: Math.sin(a) * el, rz: -Math.cos(a) * el, glow: 0.2 }); } },
+  // gelo: montinhos de neve (dois ou três domos sobrepostos), às vezes com uma pedra escura aparecendo
+  neve(K, seed) { const r = rng(seed * 7 + 71); K.base = 0; const nm = 2 + (r() * 2 | 0);
+    for (let i = 0; i < nm; i++) { const a = r() * PI * 2, d = i ? 0.42 + r() * 0.3 : 0, s = i ? 0.55 + r() * 0.3 : 1;
+      K.crag(Math.cos(a) * d, -0.1, Math.sin(a) * d, 1.45 * s, 0.5 * s, 1.2 * s, '#FFFFFF', 'snow', { seed: seed * 5 + i, n: 7, strata: 0, top: 'dome', taper: 0.62, flare: 0.3, rough: 0.16, cuts: 0, fis: 0, tilt: 0.12, dark: 0.2, dustK: 0.6, cols: ['#8E9FBA'], dust: '#D4DCE8', ry: r() * PI }); }
+    for (let i = 0; i < 2; i++) { const a = r() * PI * 2, s = i ? 0.55 : 0.9; K.crag(Math.cos(a) * 0.45, -0.08, Math.sin(a) * 0.45, 0.7 * s, 0.5 * s, 0.56 * s, '#FFFFFF', 'rock', { seed: seed * 9 + 3 + i, n: 6, strata: 0, sq: 3, rough: 0.15, tilt: 0.3, cuts: 1, fis: 0, dark: 0.3, dustK: 0.35, cols: ['#3A3F4A'], dust: '#DCE4EE' }); }
+    for (let i = 0; i < K.q(2); i++) { const a = r() * PI * 2, d = 0.3 + r() * 0.5, hh = 0.3 + r() * 0.35; K.xtal(Math.cos(a) * d, -0.06, Math.sin(a) * d, hh * 0.22, hh, '#9EBCDC', 'frost', { seed: seed * 5 + 40 + i, n: 4, rx: Math.sin(a) * 0.7, rz: -Math.cos(a) * 0.7, glow: 0.45 }); } },
+  // gelo: pedra com geada (faces de cima brancas)
+  geada(K, seed) { const r = rng(seed * 7 + 73), big = !(seed & 1); K.base = 0;
+    K.crag(0, -0.12, 0, 2 + r() * 0.3, big ? 1.15 + r() * 0.2 : 0.85, 1.75, '#FFFFFF', 'rock', { seed: seed + 23, n: big ? 8 : 6, strata: big ? 2 : 0, sq: 2.6 + r(), rough: 0.14, chip: 0.12, jit: 0.06, tilt: 0.22, cuts: big ? 2 : 1, fis: big ? 1 : 0, flare: 0.04, dark: 0.35, dustK: 0.2, cols: ['#5E6470', '#525865'], dust: '#7A808A' });
+    K.patina(['#E9F0F4', '#D7E3EB', '#F5F8FA'], 0.8, 0.25, seed); },
+  // rocha (deserto de pedra): arbusto seco espinhoso — galhos marrons em leque com gravetos e tufos de folha seca nas pontas
+  seco(K, seed) { const r = rng(seed * 7 + 79); K.base = 0; const nb = 7 + (r() * 3 | 0);
+    for (let i = 0; i < nb; i++) { const a = i / nb * PI * 2 + (r() - 0.5) * 0.6, el = 0.45 + r() * 0.5, L = 0.75 + r() * 0.45, sx = Math.sin(el) * Math.cos(a), sy = Math.cos(el), sz = Math.sin(el) * Math.sin(a);
+      const p0 = [Math.cos(a) * 0.05, -0.08, Math.sin(a) * 0.05], pm = [p0[0] + sx * L * 0.5, p0[1] + sy * L * 0.5 + 0.05, p0[2] + sz * L * 0.5], p1 = [p0[0] + sx * L, p0[1] + sy * L * 0.85, p0[2] + sz * L];
+      K.trunk([[p0[0], p0[1], p0[2], 0.08], [pm[0], pm[1], pm[2], 0.055], [p1[0], p1[1], p1[2], 0]], '#FFFFFF', 'bark', { n: 3, c0: '#2E2018', c1: '#6A4E36', wind: 0.25 });
+      for (let k = 0; k < K.q(2); k++) { const aa = a + (k ? 0.7 : -0.7), ll = L * 0.45; K.spike(pm, [pm[0] + Math.cos(aa) * ll * 0.8, pm[1] + ll * 0.5, pm[2] + Math.sin(aa) * ll * 0.8], 0.04, '#FFFFFF', 'bark', { c0: '#3A2A1E', c1: '#7E6046', wind: 0.35 }); }
+      for (let k = 0; k < K.q(3); k++) K.blade(p1[0], p1[1] - 0.02, p1[2], a + (k - 1) * 0.9, 1.0, 0.6, 0.26, 0.15, '#FFFFFF', 'leaf', { shape: 'leaf', n: 2, c0: '#4A3420', c1: k ? '#7E6A3E' : '#7A3A22', nc: [0, 0.4, 0], wind: 0.5 }); } },
+  // rocha: suculentas alienígenas — bulbos com gomos, espinhos claros e botão rosado no maior; variante 1 = roseta de folhas grossas (agave) com haste de botões
+  suculenta(K, seed) { const r = rng(seed * 7 + 83), v = seed % 2; K.base = 0;
+    if (!v) { const nb = 3 + (r() * 2 | 0); for (let i = 0; i < nb; i++) { const big = i === 0, a = r() * PI * 2, d = big ? 0 : 0.42 + r() * 0.3, s = big ? 1 : 0.5 + r() * 0.25, tilt = big ? 0 : 0.25 + r() * 0.2;
+        const prof = [[0.4, -0.1], [0.5, 0.22], [0.42, 0.66], [0.18, 0.95], [0, 1.02]].map(q => [q[0] * s, q[1] * s * 1.1]);
+        K.bulb(prof, Math.cos(a) * d, 0, Math.sin(a) * d, '#FFFFFF', 'skin', { n: 8, ribs: 4, rk: 0.15, c0: '#2F4A3E', c1: '#7FA08A', ribC: 0.14, seed: seed * 3 + i, rx: Math.sin(a) * tilt, rz: -Math.cos(a) * tilt });
+        if (big) { if (!K.lite) for (let k = 0; k < 4; k++) for (const yy of [0.32, 0.62]) { const ph = k / 4 * PI * 2, rr = (yy > 0.5 ? 0.44 : 0.49) * 1.15; const b = [Math.cos(ph) * rr, yy * 1.1, Math.sin(ph) * rr]; K.spike(b, [b[0] + Math.cos(ph) * 0.2, b[1] + 0.1, b[2] + Math.sin(ph) * 0.2], 0.025, '#FFFFFF', 'bone', { c0: '#B8AE96', c1: '#EDE6D2' }); }
+          K.bulb([[0.12, 1.02], [0.14, 1.12], [0.08, 1.22], [0, 1.25]], 0, 0, 0, '#FFFFFF', 'petal', { n: 6, rk: 0.15, c0: '#9A6070', c1: '#D8A0A8', seed }); } } }
+    else { const nl = K.q(13 + (r() * 3 | 0)); for (let i = 0; i < nl; i++) { const a = i * 2.39996 + r() * 0.2, k = i / nl, el = 0.25 + k * 0.95, L = 0.65 + (1 - k) * 0.35 + r() * 0.1;
+        K.blade(0, 0.02, 0, a, el, 0.35 + r() * 0.3, L, 0.24, '#FFFFFF', 'skin', { n: 3, fold: 0.35, c0: '#2E4436', c1: k > 0.6 ? '#9AAE8A' : '#84A090', nc: [0, 0.3, 0], kf: 0.6, ku: 0.35, ko: 0.4 }); const tp = K.tip; if (!K.lite) K.spike([tp[0], tp[1], tp[2]], [tp[0] + Math.cos(a) * 0.08, tp[1] + 0.02, tp[2] + Math.sin(a) * 0.08], 0.02, '#5A2E28', 'bone'); }
+      K.trunk([[0, 0, 0, 0.05], [0.05, 0.8, 0.02, 0.035], [0.08, 1.55, 0.04, 0.02]], '#FFFFFF', 'skin', { n: 4, c0: '#4E5A40', c1: '#8E8E5E', wind: 0.4 });
+      for (let i = 0; i < 4; i++) K.oct(0.06 + (r() - 0.5) * 0.14, 1.1 + i * 0.13, 0.03 + (r() - 0.5) * 0.14, 0.05, 0.12, i % 2 ? '#C08890' : '#9A6070', 'petal', { wind: 0.4 }); } },
+  // rocha: toco de árvore morta (casca clareada, topo partido em lascas, raízes) ou tronco caído com galho quebrado
+  toco(K, seed) { const r = rng(seed * 7 + 89), v = seed % 2; K.base = 0; const C0 = '#463E34', C1 = '#968A76', CUT = '#C8B892';
+    if (!v) { const hh = 0.95 + r() * 0.3, lean = (r() - 0.5) * 0.2;
+      K.trunk([[0, -0.15, 0, 0.36], [0.02, 0.25, 0, 0.3], [lean * 0.5, 0.6, 0.02, 0.27], [lean, hh, 0.04, 0.24]], '#FFFFFF', 'bark', { n: 7, c0: C0, c1: C1, bark: 0.3, cap: CUT, seed });
+      for (let i = 0; i < K.q(4); i++) { const a = i / 4 * PI * 2 + r() * 0.8; K.trunk([[Math.cos(a) * 0.2, 0.18, Math.sin(a) * 0.2, 0.12], [Math.cos(a) * 0.5, 0.06, Math.sin(a) * 0.5, 0.08], [Math.cos(a) * 0.85, -0.08, Math.sin(a) * 0.85, 0.02]], '#FFFFFF', 'bark', { n: 4, c0: C0, c1: '#857A68', bark: 0.25, seed: seed + i }); }
+      for (let i = 0; i < K.q(5); i++) { const a = i / 5 * PI * 2 + r() * 0.6, y = hh - 0.04; K.spike([lean + Math.cos(a) * 0.15, y, 0.04 + Math.sin(a) * 0.15], [lean + Math.cos(a) * 0.2, y + 0.2 + r() * 0.32, 0.04 + Math.sin(a) * 0.2], 0.08, '#FFFFFF', 'bark', { c0: C1, c1: CUT }); }
+      K.trunk([[lean * 0.6, 0.6, 0.02, 0.11], [lean * 0.6 + 0.42, 0.9, 0.1, 0.065], [lean * 0.6 + 0.66, 1.0, 0.15, 0]], '#FFFFFF', 'bark', { n: 4, c0: C1, c1: '#8E8472', bark: 0.2, seed: seed + 9 }); }
+    else { const tw = (r() - 0.5) * 0.2; K.trunk([[0, 0.17, 0, 0.21], [-0.45, 0.19, 0.04, 0.2], [-0.98, 0.16, tw, 0.19]], '#FFFFFF', 'bark', { n: 7, c0: '#8A7E6C', c1: C1, bark: 0.3, cap: CUT, seed });
+      K.trunk([[0, 0.17, 0, 0.21], [0.42, 0.18, -0.03, 0.19], [0.9, 0.14, -tw, 0.17]], '#FFFFFF', 'bark', { n: 7, c0: '#8A7E6C', c1: C1, bark: 0.3, cap: CUT, seed: seed + 1 });
+      K.trunk([[0.25, 0.3, 0.05, 0.09], [0.4, 0.62, 0.12, 0.06], [0.48, 0.85, 0.2, 0]], '#FFFFFF', 'bark', { n: 4, c0: C1, c1: '#8E8472', seed: seed + 2 });
+      for (let i = 0; i < 4; i++) { const a = r() * PI * 2; K.spike([-0.92, 0.16 + Math.sin(a) * 0.12, tw + Math.cos(a) * 0.12], [-1.08 - r() * 0.15, 0.16 + Math.sin(a) * 0.2, tw + Math.cos(a) * 0.2], 0.06, '#FFFFFF', 'bark', { c0: C1, c1: CUT }); }
+      K.chips([[0.3, 0.45, 0.14, 0.08], [-0.5, -0.4, 0.12, 0.07], [0.7, -0.35, 0.1, 0.06]], '#FFFFFF', 'bark', { n: 4, seed, c0: '#6E6252', c1: '#B8AC94' }); } },
+  // cascalho: lascas pequenas meio enterradas, cor neutra (o dress3d tinge pelo bioma)
+  cascalho(K, seed) { const r = rng(seed * 7 + 97); K.base = 0; const L = [], n = 7 + (r() * 3 | 0);
+    for (let i = 0; i < K.q(n); i++) { const a = r() * PI * 2, d = Math.sqrt(r()) * 0.82, rad = (0.12 + r() * 0.2 * (1 - d * 0.5)) * (K.lite ? 1.25 : 1); L.push([Math.cos(a) * d, Math.sin(a) * d, rad, rad * (0.6 + r() * 0.5)]); }
+    K.chips(L, '#FFFFFF', 'rock', { n: 4, seed, c0: '#8E8A84', c1: '#F2EEE6' }); },
+  // basalto: respiro vulcânico — cone de rocha escura com boca, crosta de cinza na borda e brasa fraca lá dentro (o laranja aceso é do Plasma); variante 1 = dois cones
+  respiro(K, seed) { const r = rng(seed * 7 + 101), v = seed % 2; K.base = 0;
+    const cone = (x, z, s, sd) => { const hk = 1.1 + r() * 0.3; K.bulb([[1.0, -0.12], [0.84, 0.16], [0.6, 0.44], [0.42, 0.62], [0.34, 0.68], [0.27, 0.6], [0.22, 0.52]].map(q => [q[0] * s, q[1] * s * hk]), x, 0, z, '#FFFFFF', 'ash', { n: 10, ribs: 3, rk: 0.06, jit: 0.1, c0: '#1E1A1C', c1: '#5E5552', ribC: 0.25, seed: sd });
+      K.bulb([[0.25 * s, 0.53 * s * hk], [0.12 * s, 0.545 * s * hk], [0, 0.55 * s * hk]], x, 0, z, '#E8461A', null, { n: 8, e: 0.55 }); /* poça de brasa fraca na boca rasa: vista de cima (o laranja aceso é do Plasma) */
+      for (let i = 0; i < K.q(3); i++) { const a = r() * PI * 2, c = Math.cos(a), sn = Math.sin(a); K.blade(x + c * 0.36 * s, 0.6 * s * hk, z + sn * 0.36 * s, a, 1.95, 0.25, 0.42 * s, 0.035 * s, '#E0501E', null, { n: 2, e: 0.45, c0: '#FFFFFF', c1: '#A03818' }); } }; /* fendas acesas descendo a encosta */
+    if (!v) cone(0, 0, 1, seed); else { cone(-0.35, 0.1, 0.72, seed); cone(0.52, -0.28, 0.5, seed + 7); } },
+  // basalto: monte de cinza fofa (domos baixos escuros com topo mais claro)
+  cinza(K, seed) { const r = rng(seed * 7 + 103); K.base = 0; const nm = 2 + (r() * 2 | 0);
+    for (let i = 0; i < nm; i++) { const a = r() * PI * 2, d = i ? 0.4 + r() * 0.3 : 0, s = i ? 0.55 + r() * 0.3 : 1;
+      K.crag(Math.cos(a) * d, -0.1, Math.sin(a) * d, 1.5 * s, 0.42 * s, 1.25 * s, '#FFFFFF', 'ash', { seed: seed * 5 + i, n: 9, strata: 0, top: 'dome', taper: 0.62, flare: 0.3, rough: 0.2, cuts: 0, fis: 0, tilt: 0.12, dark: 0.25, dustK: 0.6, cols: ['#575254'], dust: '#A39C9E', ry: r() * PI }); } },
+  // basalto: lascas de obsidiana preta brilhante (especular, sem brilho próprio) sobre cascalho escuro
+  obsidiana(K, seed) { const r = rng(seed * 7 + 107); K.base = 0; const n = 4 + (r() * 3 | 0);
+    for (let i = 0; i < n; i++) { const big = i === 0, a = r() * PI * 2, d = big ? 0 : 0.3 + r() * 0.45, lean = big ? 0.15 + r() * 0.2 : 0.4 + r() * 0.5, hh = big ? 1.3 + r() * 0.5 : 0.45 + r() * 0.7;
+      K.xtal(Math.cos(a) * d, -0.12, Math.sin(a) * d, hh * 0.24, hh, i % 2 ? '#2A2436' : '#1E1A26', 'obsid', { seed: seed * 7 + i, n: 4, sh: 0.45 + r() * 0.2, rx: Math.sin(a) * lean, rz: -Math.cos(a) * lean, glow: 0.45 }); }
+    const L = []; for (let i = 0; i < K.q(5); i++) { const a = r() * PI * 2, d = 0.5 + r() * 0.4; L.push([Math.cos(a) * d, Math.sin(a) * d, 0.1 + r() * 0.1, 0.08 + r() * 0.06]); } K.chips(L, '#FFFFFF', 'ash', { n: 4, seed, c0: '#1A1719', c1: '#3E3A3C' }); },
+  // basalto (perto da Fenda): fungos de chapéu violeta escuro com lamelas e pintas de brilho roxo discreto (cor da bruma da Fenda)
+  fungo(K, seed) { const r = rng(seed * 7 + 109); K.base = 0; const n = 4 + (r() * 2 | 0), GL = '#B23CFF';
+    for (let i = 0; i < n; i++) { const big = i === 0, a = r() * PI * 2, d = big ? 0 : 0.38 + r() * 0.42, hh = big ? 1.25 + r() * 0.35 : 0.45 + r() * 0.55, cr = hh * 0.42 * (big ? 1 : 1.1), lean = (r() - 0.5) * 0.35, x = Math.cos(a) * d, z = Math.sin(a) * d, tx = x + lean * hh * Math.cos(a), tz = z + lean * hh * Math.sin(a);
+      K.trunk([[x, -0.05, z, cr * 0.3], [(x + tx) / 2, hh * 0.55, (z + tz) / 2, cr * 0.22], [tx, hh, tz, cr * 0.2]], '#FFFFFF', 'skin', { n: 4, c0: '#6E6070', c1: '#C9BCC6' });
+      K.bulb([[cr, hh - cr * 0.04], [cr * 0.96, hh + cr * 0.12], [cr * 0.66, hh + cr * 0.38], [0, hh + cr * 0.5]], tx, 0, tz, '#FFFFFF', 'skin', { n: 6, rk: 0.05, c0: '#2A1F34', c1: '#5E4A6E', seed: seed + i });
+      K.bulb([[cr * 1.005, hh - cr * 0.06], [cr * 0.975, hh + cr * 0.09]], tx, 0, tz, GL, null, { n: 6, e: 0.5 }); /* borda acesa do chapéu (as lamelas de baixo não aparecem nas câmeras do jogo): o brilho aparece de cima e de lado */
+      for (let k = 0; k < K.q(big ? 4 : 2); k++) { const pa = r() * PI * 2, pr = cr * (0.25 + r() * 0.45), py = hh + cr * 0.5 * (1 - (pr / cr) * (pr / cr) * 0.9) - 0.01; K.oct(tx + Math.cos(pa) * pr, py, tz + Math.sin(pa) * pr, cr * 0.13, cr * 0.08, GL, null, { e: 0.9 }); } } }, /* pintas acesas em todos os chapéus */
+  // marcos: árvores alienígenas grandes e raras (copa ~2 de largura, até ~2,4 de altura; o dress3d escala para 12–30 unidades) que projetam sombra
+  // tundra: palmeira alienígena — tronco curvo em gomos com raízes, coroa de frondes compridas caídas e cachos de frutos violeta; variante 1 = guarda-chuva de três galhos
+  marco_tundra(K, seed) { const r = rng(seed * 7 + 113), v = seed % 2; K.base = 0; const BK0 = '#3A2E24', BK1 = '#7A6450', F0 = '#1C2C16', F1 = '#7A8E44';
+    const crown = (cx, cy, cz, nfr, L) => { nfr = K.q(nfr) + (K.lite ? 2 : 0); for (let i = 0; i < nfr; i++) { const a = i / nfr * PI * 2 + (r() - 0.5) * 0.4; K.frond(cx, cy, cz, a, 0.8 + r() * 0.5, 1.1 + r() * 0.6, L * (0.85 + r() * 0.3), '#FFFFFF', 'leaf', { m: 12, lk: 0.24, droop: 0.4, c0: F0, c1: F1, dk: 0.85 + r() * 0.2, nc: [cx, cy - 0.25, cz], ku: 0.5, kf: 0.4, ko: 0.45, wind: 0.3 }); }
+      for (let i = 0; i < K.q(3); i++) K.frond(cx, cy, cz, r() * PI * 2, 0.15 + r() * 0.2, 0.7, L * 0.45, '#FFFFFF', 'leaf', { m: 7, lk: 0.22, c0: F0, c1: '#949E56', nc: [cx, cy - 0.25, cz], wind: 0.3 }); };
+    const roots = (n, rr) => { for (let i = 0; i < n; i++) { const a = i / n * PI * 2 + r() * 0.5; K.trunk([[Math.cos(a) * rr * 0.6, 0.28, Math.sin(a) * rr * 0.6, rr * 0.5], [Math.cos(a) * rr * 2, 0.06, Math.sin(a) * rr * 2, rr * 0.32], [Math.cos(a) * rr * 3.4, -0.1, Math.sin(a) * rr * 3.4, 0]], '#FFFFFF', 'bark', { n: 4, c0: BK0, c1: BK1, bark: 0.2, seed: seed + i }); } };
+    if (!v) { const H0 = 1.75 + r() * 0.35, bend = (r() - 0.5) * 0.7, pts = []; for (let i = 0; i <= 7; i++) { const s = i / 7; pts.push([bend * s * s * 0.5, -0.15 + s * (H0 + 0.15), bend * s * s * 0.15, (0.15 - 0.075 * s) * (i % 2 ? 1.12 : 1)]); }
+      K.trunk(pts, '#FFFFFF', 'bark', { n: 7, c0: BK0, c1: BK1, bark: 0.2, seed }); roots(4, 0.15); const t = pts[7]; crown(t[0], t[1], t[2], 11, 1.15);
+      for (let i = 0; i < K.q(5); i++) { const a = i / 5 * PI * 2 + r(); K.frond(t[0], t[1] - 0.06, t[2], a, 2.55 + r() * 0.3, 0.3, 0.55 + r() * 0.2, '#FFFFFF', 'leaf', { m: 6, lk: 0.2, droop: 0.1, c0: '#3A2E1E', c1: '#8A7448', nc: [t[0], t[1], t[2]], wind: 0.15 }); } /* folhas secas penduradas */
+      { const a = r() * PI * 2, bx = Math.cos(a) * 0.45, bz = Math.sin(a) * 0.45; K.trunk([[bx, -0.1, bz, 0.07], [bx * 1.1, 0.3, bz * 1.1, 0.05]], '#FFFFFF', 'bark', { n: 5, c0: BK0, c1: BK1, seed: seed + 3 }); for (let i = 0; i < K.q(6); i++) K.frond(bx * 1.1, 0.3, bz * 1.1, i / 6 * PI * 2 + r() * 0.4, 0.5 + r() * 0.3, 1.2, 0.42, '#FFFFFF', 'leaf', { m: 7, lk: 0.24, c0: F0, c1: '#8C9A50', nc: [bx, 0.25, bz], wind: 0.5 }); } /* broto ao pé */
+      for (let i = 0; i < K.q(3); i++) { const a = r() * PI * 2; K.bulb([[0, -0.1], [0.07, -0.04], [0.08, 0.04], [0, 0.08]], t[0] + Math.cos(a) * 0.12, t[1] - 0.12 - r() * 0.08, t[2] + Math.sin(a) * 0.12, '#FFFFFF', 'skin', { n: 6, rk: 0.1, c0: '#4A2E50', c1: '#8A6A92', seed: seed + i }); } }
+    else { const pts = [[0, -0.15, 0, 0.21], [0.02, 0.35, 0, 0.19], [0.03, 0.8, 0.02, 0.15], [0.02, 1.15, 0.02, 0.12]]; K.trunk(pts, '#FFFFFF', 'bark', { n: 7, c0: BK0, c1: BK1, bark: 0.25, seed }); roots(5, 0.19);
+      for (let i = 0; i < 3; i++) { const a = i / 3 * PI * 2 + r() * 0.5, R = 0.5 + r() * 0.2, top = [Math.cos(a) * R, 1.75 + r() * 0.35, Math.sin(a) * R]; K.trunk([[0.02, 1.08, 0.02, 0.1], [Math.cos(a) * R * 0.55, 1.45, Math.sin(a) * R * 0.55, 0.075], [top[0], top[1], top[2], 0.05]], '#FFFFFF', 'bark', { n: 5, c0: BK1, c1: '#8E7660', bark: 0.2, seed: seed + 5 + i }); crown(top[0], top[1], top[2], 7, 0.78); } } },
+  // rocha: árvore-espinheira (josué alienígena) — tronco fibroso que se ramifica em galhos tortos terminando em rosetas de folhas-espinho com saia de folhas secas; variante 1 = cacto-candelabro com gomos e espinhos
+  marco_rocha(K, seed) { const r = rng(seed * 7 + 127), v = seed % 2; K.base = 0;
+    if (!v) { const T0 = '#2E2924', T1 = '#665A4C'; K.trunk([[0, -0.15, 0, 0.19], [0.02, 0.4, 0, 0.16], [0.05, 0.85, 0.03, 0.135]], '#FFFFFF', 'bark', { n: 7, c0: T0, c1: T1, bark: 0.35, seed });
+      const rosette = (p, sz) => { const nr = K.q(15); for (let i = 0; i < nr; i++) { const a = i * 2.39996 + r() * 0.3, el = 0.2 + (i / nr) * 1.5; K.blade(p[0], p[1], p[2], a, el, 0.15, sz * (0.75 + r() * 0.3), 0.07 * sz / 0.32 * (K.lite ? 1.3 : 1), '#FFFFFF', 'leaf', { n: 2, fold: 0.3, c0: '#2E3C28', c1: i % 3 ? '#A8AE70' : '#C2B67E', nc: p, ku: 0.45, kf: 0.4, ko: 0.55, wind: 0.25 }); }
+        for (let i = 0; i < K.q(7); i++) { const a = i / 7 * PI * 2 + r() * 0.4; K.blade(p[0], p[1] - 0.05, p[2], a, 2.3 + r() * 0.3, 0.2, sz * 0.8, 0.07, '#FFFFFF', 'leaf', { n: 2, c0: '#3A2E20', c1: '#7A6446', nc: p, wind: 0.15 }); } };
+      const nbr = 3 + (r() * 2 | 0); for (let i = 0; i < nbr; i++) { const a = i / nbr * PI * 2 + (r() - 0.5) * 0.6, R = 0.55 + r() * 0.35, hy = 1.55 + r() * 0.6, mid = [Math.cos(a) * R * 0.45, 1.05 + r() * 0.2, Math.sin(a) * R * 0.45], tip = [Math.cos(a + 0.25) * R, hy, Math.sin(a + 0.25) * R];
+        K.trunk([[0.04, 0.8, 0.03, 0.11], [mid[0], mid[1], mid[2], 0.085], [tip[0], tip[1], tip[2], 0.06]], '#FFFFFF', 'bark', { n: 5, c0: T1, c1: '#7E705E', bark: 0.3, seed: seed + i });
+        rosette(tip, 0.32 + r() * 0.08); if (r() < 0.5) { const t2 = [mid[0] + Math.cos(a - 0.9) * 0.35, mid[1] + 0.35, mid[2] + Math.sin(a - 0.9) * 0.35]; K.trunk([[mid[0], mid[1], mid[2], 0.07], [t2[0], t2[1], t2[2], 0.045]], '#FFFFFF', 'bark', { n: 4, c0: T1, c1: '#7E705E', seed: seed + 20 + i }); rosette(t2, 0.24); } } }
+    else { const C0 = '#1E3634', C1 = '#5E8C84', SP = ['#C8B8A0', '#F2E8D4']; /* verde-azulado alienígena, não o saguaro da Terra */
+      K.bulb([[0.27, -0.12], [0.3, 0.2], [0.29, 1.2], [0.26, 1.75], [0.18, 2.1], [0, 2.2]], 0, 0, 0, '#FFFFFF', 'skin', { n: 12, ribs: 6, rk: 0.12, c0: C0, c1: C1, ribC: 0.16, seed });
+      const na = 3 + (r() * 2 | 0); for (let i = 0; i < na; i++) { const a = i / na * PI * 2 + (r() - 0.5) * 0.5, hy = 0.55 + r() * 0.55, R = 0.62 + r() * 0.12, top = 0.55 + r() * 0.45, ex = Math.cos(a), ez = Math.sin(a);
+        K.trunk([[ex * 0.2, hy, ez * 0.2, 0.15], [ex * R * 0.7, hy + 0.05, ez * R * 0.7, 0.15], [ex * R, hy + 0.3, ez * R, 0.15]], '#FFFFFF', 'skin', { n: 8, c0: C0, c1: '#46706A', seed: seed + i });
+        K.bulb([[0.155, hy + 0.25], [0.16, hy + 0.3 + top * 0.6], [0.12, hy + 0.3 + top * 0.92], [0, hy + 0.3 + top]], ex * R, 0, ez * R, '#FFFFFF', 'skin', { n: 10, ribs: 5, rk: 0.12, c0: '#2E4E4A', c1: C1, ribC: 0.16, seed: seed + 9 + i });
+        for (let k = 0; k < K.q(3); k++) { const ph = r() * PI * 2, yy = hy + 0.45 + k * top * 0.25, b = [ex * R + Math.cos(ph) * 0.17, yy, ez * R + Math.sin(ph) * 0.17]; K.spike(b, [b[0] + Math.cos(ph) * 0.12, yy + 0.05, b[2] + Math.sin(ph) * 0.12], 0.02, '#FFFFFF', 'bone', { c0: SP[0], c1: SP[1] }); } }
+      for (let k = 0; k < (K.lite ? 6 : 12); k++) { const ph = k / 6 * PI + (k > 5 ? 0.25 : 0), yy = k > 5 ? 1.3 : 0.75, b = [Math.cos(ph) * 0.34, yy, Math.sin(ph) * 0.34]; K.spike(b, [b[0] + Math.cos(ph) * 0.16, yy + 0.06, b[2] + Math.sin(ph) * 0.16], 0.025, '#FFFFFF', 'bone', { c0: SP[0], c1: SP[1] }); }
+      for (let i = 0; i < 3; i++) { const a = i / 3 * PI * 2 + r(); K.bulb([[0.07, 2.12], [0.1, 2.2], [0.05, 2.28], [0, 2.3]], Math.cos(a) * 0.1, 0, Math.sin(a) * 0.1, '#FFFFFF', 'petal', { n: 6, rk: 0.15, c0: '#8A5068', c1: '#D490A0', seed: seed + i }); } } },
+  // gelo: árvore congelada — tronco morto azul-acinzentado em forquilhas, geada nas faces de cima, pingentes e cristais de gelo nos galhos e neve na base
+  marco_gelo(K, seed) { const r = rng(seed * 7 + 131); K.base = 0; const T0 = '#262A33', T1 = '#4E5664', FR = ['#E8F0F5', '#D6E2EA', '#F4F8FA'];
+    K.crag(0, -0.1, 0, 1.5, 0.3, 1.3, '#FFFFFF', 'snow', { seed: seed * 3, n: 9, strata: 0, top: 'dome', taper: 0.7, flare: 0.3, rough: 0.14, cuts: 0, fis: 0, dark: 0.2, dustK: 0.55, cols: ['#93A4BE'], dust: '#D6DEEA' });
+    K.trunk([[0, -0.15, 0, 0.2], [0.04, 0.45, 0.02, 0.165], [-0.02, 0.95, 0.05, 0.13], [0.03, 1.3, 0.02, 0.1]], '#FFFFFF', 'bark', { n: 7, c0: T0, c1: T1, bark: 0.3, seed }); K.patina(FR, 0.7, 0.3, seed);
+    const nb = 4 + (r() * 2 | 0); for (let i = 0; i < nb; i++) { const a = i / nb * PI * 2 + (r() - 0.5) * 0.5, y0 = 0.75 + i * 0.12, R = 0.55 + r() * 0.3, mid = [Math.cos(a) * R * 0.5, y0 + 0.35, Math.sin(a) * R * 0.5], tip = [Math.cos(a) * R, y0 + 0.75 + r() * 0.4, Math.sin(a) * R];
+      K.trunk([[0, y0, 0.03, 0.08], [mid[0], mid[1], mid[2], 0.06], [tip[0], tip[1], tip[2], 0.02]], '#FFFFFF', 'bark', { n: 5, c0: T1, c1: '#6A7484', bark: 0.2, seed: seed + i }); K.patina(FR, 0.8, 0.2, seed + i);
+      for (const da of [-0.7, 0.6]) { const t2 = [mid[0] + Math.cos(a + da) * 0.4, mid[1] + 0.3 + r() * 0.25, mid[2] + Math.sin(a + da) * 0.4]; K.trunk([[mid[0], mid[1], mid[2], 0.04], [t2[0], t2[1], t2[2], 0.0]], '#FFFFFF', 'bark', { n: 3, c0: T1, c1: '#9AA6B4', seed: seed + 30 + i }); }
+      for (let k = 0; k < K.q(3); k++) { const f = 0.25 + k * 0.28, p = [mid[0] * (1 - f) + tip[0] * f, mid[1] * (1 - f) + tip[1] * f - 0.03, mid[2] * (1 - f) + tip[2] * f]; K.spike(p, [p[0], p[1] - 0.18 - r() * 0.24, p[2]], 0.04, '#FFFFFF', 'frost', { c0: '#D2E0EC', c1: '#F4F8FA' }); }
+      K.xtal(tip[0], tip[1] - 0.06, tip[2], 0.06, 0.32, '#E6EEF3', 'frost', { seed: seed * 11 + i, n: 4, rx: Math.sin(a) * 0.5, rz: -Math.cos(a) * 0.5, glow: 0.25 }); }
+    for (let i = 0; i < K.q(7); i++) { const a = r() * PI * 2, d = 0.35 + r() * 0.45, hh = 0.35 + r() * 0.6, lean = 0.25 + r() * 0.45; K.xtal(Math.cos(a) * d, -0.1, Math.sin(a) * d, hh * 0.17, hh, i % 2 ? '#B8D0E8' : '#D8E6F4', 'frost', { seed: seed * 17 + i, n: 5, rx: Math.sin(a) * lean, rz: -Math.cos(a) * lean, glow: 0.4 }); } },
   crate(K) { K.box(0, 0, 0, 6, 4.6, 5, '#B8862B', 'paint', { b: 0.35 }); for (const x of [-1.6, 1.6]) K.box(x, -0.05, 0, 0.5, 4.75, 5.12, '#4A3A20', 'dark'); K.box(0, 4.6, 0, 1.6, 0.3, 1.6, '#F2C230', null, { e: 1.6 }); },
   wreck(K) { K.box(0, 0, 0, 12, 2.4, 6, '#2A2624', 'dark', { b: 0.4, rz: 0.08, rx: 0.1 }); K.box(-1, 2.2, 0.4, 4.6, 1.6, 4, '#3A3430', 'dark', { b: 0.4, ry: 0.5, rz: -0.2 }); K.seg([1, 3, 0.2], [6.4, 1.2, 2.2], 0.36, '#1E1C1B', 'metal');
     for (let i = 0; i < 3; i++) K.light(-3 + i * 2.6, 2.4, (i - 1) * 1.6, 0.35, '#FF7A2E', 2); },
@@ -1037,7 +1293,18 @@ function build(def, race, color, seed) {
 }
 // 4.3b: geometria de pedra solta para o dress3d (kind 'boulder' = matacão com estratos; 'stone'/'pebble' = pedra lascada), base em y=0 e ~2 de largura;
 // a cor por vértice (sombra na base, topo claro) é quase branca: multiplica a cor do material se ele usar vertexColors
-function scatter(kind, seed) { T = T || globalThis.THREE; if (!T) return null; const K = new Kit(); try { NEUTRAL.seixo(K, ((seed | 0) << 1) | (kind === 'boulder' ? 0 : 1)); return K.finish().main; } catch (err) { console.warn('[ARD] pedra solta falhou: ' + err.message); return null; } }
+// 4.3c: a flora do dress3d (FLORA_DEFS, receitas do NEUTRAL com o mesmo nome) também passa por aqui; a parte emissiva (brasa, fungo) vem na mesma
+// geometria marcada no atributo aGlow (1 = emite a própria cor), com rugosidade/metal em rm e peso do vento em aWind; userData.leafy = tem folhas (dupla face)
+const FLORA_DEFS = ['capim', 'folhagem', 'samambaia', 'flor', 'liquen', 'cristal', 'espinho', 'neve', 'geada', 'seco', 'suculenta', 'toco', 'cascalho', 'respiro', 'cinza', 'obsidiana', 'fungo', 'marco_tundra', 'marco_rocha', 'marco_gelo'];
+function mergeEm(a, b) { const na = a.attributes.position.count, nb = b.attributes.position.count, g = new T.BufferGeometry();
+  for (const k of new Set([...Object.keys(a.attributes), ...Object.keys(b.attributes)])) { const A = a.attributes[k], B = b.attributes[k], sz = (A || B).itemSize, arr = new Float32Array((na + nb) * sz);
+    if (A) arr.set(A.array, 0); else if (k === 'rm') for (let i = 0; i < na; i++) arr[i * 2] = 1;
+    if (B) arr.set(B.array, na * sz); else if (k === 'rm') for (let i = 0; i < nb; i++) arr[(na + i) * 2] = 1;
+    g.setAttribute(k, new T.BufferAttribute(arr, sz)); }
+  const gl = new Float32Array(na + nb); gl.fill(1, na); g.setAttribute('aGlow', new T.BufferAttribute(gl, 1)); g.computeBoundingSphere(); a.dispose(); b.dispose(); return g; }
+function scatter(kind, seed, lite) { T = T || globalThis.THREE; if (!T) return null; const K = new Kit(), lod0 = LOD; K.lite = !!lite; if (lite) LOD = Math.min(LOD, 0.6); /* 4.3c: versão leve para longe */ try {
+    if (FLORA_DEFS.includes(kind)) NEUTRAL[kind](K, seed | 0); else NEUTRAL.seixo(K, ((seed | 0) << 1) | (kind === 'boulder' ? 0 : 1));
+    const f = K.finish(), g = f.em ? mergeEm(f.main, f.em) : f.main; g.userData.leafy = !!K.leafy; g.userData.width = f.width; g.userData.height = f.height; return g; } catch (err) { console.warn('[ARD] adereço ' + kind + ' falhou: ' + err.message); return null; } finally { LOD = lod0; } }
 // material padrão das malhas: rugosidade e metal vêm do atributo rm por vértice; rim opcional por Raça
 function material(o) { T = T || globalThis.THREE; o = o || {}; const m = new T.MeshStandardMaterial(Object.assign({ vertexColors: true, roughness: 1, metalness: 1, envMapIntensity: o.env == null ? 1 : o.env }, o.params || {}));
   m.onBeforeCompile = sh => {
@@ -1051,5 +1318,5 @@ function material(o) { T = T || globalThis.THREE; o = o || {}; const m = new T.M
 const BUILDING_DEFS = ['nucleo', 'reator', 'refinaria', 'quartel', 'fabrica', 'hangar', 'torre', 'nodulo', 'laboratorio', 'muro', 'portao', 'bastiao'];
 const GENERIC_UNITS = ['coletor', 'infantaria', 'veiculo', 'drone', 'suporte', 'pirata'];
 function unitsOf(race) { return GENERIC_UNITS.concat(Object.keys(U[race] || {}).filter(d => !GENERIC_UNITS.includes(d) && !d.startsWith('veiculo_'))); }
-ARD.meshes = { setLod(v) { LOD = Math.max(0.4, Math.min(1, v)); }, setDetail(v) { DET.value = Math.max(0, Math.min(1, v)); }, /* 4.3a: detalhe de superfície pela qualidade */ build, scatter, /* 4.3b */ material, animShader, ANIM_DEFAULTS, ANIM_T, PAL, MAT, BUILDING_DEFS, GENERIC_UNITS, unitsOf, NEUTRAL_DEFS: Object.keys(NEUTRAL), PROP_RACES: Object.keys(PROPS), FULL };
+ARD.meshes = { setLod(v) { LOD = Math.max(0.4, Math.min(1, v)); }, setDetail(v) { DET.value = Math.max(0, Math.min(1, v)); }, /* 4.3a: detalhe de superfície pela qualidade */ build, scatter, /* 4.3b */ FLORA_DEFS, /* 4.3c */ material, animShader, ANIM_DEFAULTS, ANIM_T, PAL, MAT, BUILDING_DEFS, GENERIC_UNITS, unitsOf, NEUTRAL_DEFS: Object.keys(NEUTRAL), PROP_RACES: Object.keys(PROPS), FULL };
 })(globalThis.ARD = globalThis.ARD || {});
