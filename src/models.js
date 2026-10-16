@@ -297,8 +297,8 @@ function crystals(seed) {
 }
 function ore(seed) { // minério de liga: rochas com veios metálicos
   const m = M(); let r = (seed | 0) + 7; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; };
-  for (let i = 0; i < 5; i++) m.sphere(3 + rnd() * 8, 3 + rnd() * 8, 0.5 + rnd(), 2 + rnd() * 2.2, ['#6E7682', '#5A616B', '#7E8794'][i % 3]);
-  for (let i = 0; i < 10; i++) m.set(Math.floor(2 + rnd() * 10), Math.floor(2 + rnd() * 10), Math.floor(1 + rnd() * 3), '#AFC2D6', i % 3 === 0);
+  for (let i = 0; i < 4; i++) m.sphere(3 + rnd() * 8, 3 + rnd() * 8, 0.5 + rnd(), 1.8 + rnd() * 1.8, ['#3A3F48', '#454B55', '#30353D'][i % 3]); // 4.2h: rocha escura
+  for (let i = 0; i < 5; i++) crystal(m, 3 + rnd() * 8, 3 + rnd() * 8, 1, 1 + rnd() * 0.5, 4 + Math.floor(rnd() * 4), '#4CC9FF', '#CFF3FF'); // cristais azuis de núcleo aceso
   return m;
 }
 function datashards(seed) { // fragmentos de dados: lâminas verdes flutuando sobre um pedestal
@@ -316,14 +316,14 @@ const props = {
   quorith(seed) { const m = M(); const rnd = propRnd(seed); const h = 6 + Math.floor(rnd() * 5); for (let z = 0; z < h; z++) { const r = z < h / 2 ? 1 + z * 3 / h : 2.5 - (z - h / 2) * 3 / h; m.box(3 - Math.round(r), 3 - Math.round(r), z, Math.round(r) * 2 + 1, Math.round(r) * 2 + 1, 1, z > h * 0.6 ? '#d4b8ff' : '#b388ff', (x, y, zz, w, d) => Math.abs(x - (w - 1) / 2) + Math.abs(y - (d - 1) / 2) <= r); } m.box(3, 3, Math.floor(h / 2), 1, 1, 1, '#ffffff', null, true); if (rnd() > 0.5) m.box(0, 0, 0, 2, 2, 3, '#b388ff'); return m; },
   vorag(seed) { const m = M(); const rnd = propRnd(seed); m.sphere(2.5, 2.5, 1.5, 2, '#e8dcc8'); m.sphere(5.5, 4, 1.2, 1.6, '#e8dcc8'); m.sphere(3.5, 5.5, 1, 1.3, '#d8ccb8'); m.box(6, 1, 0, 1, 1, 5, '#e8dcc8'); m.box(3, 3, 3, 1, 1, 1, '#e6455a', null, true); return m; },
 };
-function rocks(seed) { const m = M(); let r = (seed | 0) + 11; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; }; for (let i = 0; i < 4; i++) m.sphere(3 + rnd() * 8, 3 + rnd() * 8, 0.5 + rnd(), 2 + rnd() * 2.5, ['#6E7682', '#5A616B', '#7E8794'][i % 3]); return m; }
+function rocks(seed) { const m = M(); let r = (seed | 0) + 11; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; }; for (let i = 0; i < 4; i++) m.sphere(3 + rnd() * 8, 3 + rnd() * 8, 0.5 + rnd(), 2 + rnd() * 2.5, ['#6B655E', '#57524C', '#7A736A'][i % 3]); return m; } // 4.2h: cinza quente, não a paleta do Minério
 function ruin(seed) { // ruínas da civilização pré-Colapso: pilares quebrados e um arco
   const m = M(); let r = (seed | 0) + 19; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; };
   const stone = ['#9A9CA4', '#7E8088', '#B0B2BA'];
   m.box(0, 0, 0, 14, 10, 1, '#6B6E76', (x, y) => rnd() > 0.15);
   for (let i = 0; i < 3; i++) { const x = 1 + Math.floor(rnd() * 11), y = 1 + Math.floor(rnd() * 7), h = 3 + Math.floor(rnd() * 7); m.box(x, y, 1, 2, 2, h, stone[i % 3], (a, b2, z) => !(z === h - 1 && rnd() < 0.5)); }
   m.box(2, 8, 1, 2, 2, 7, stone[0]); m.box(10, 8, 1, 2, 2, 7, stone[0]); m.box(2, 8, 8, 10, 2, 1, stone[1], (x) => x !== 5);
-  if (rnd() < 0.6) m.box(6, 3, 1, 1, 1, 2, green, null, true);
+  if (rnd() < 0.6) m.box(6, 3, 1, 1, 1, 2, lamp, null, true); // 4.2h: verde aceso é só dos Dados
   return m;
 }
 function crate() { const m = M(); m.box(0, 0, 0, 6, 6, 5, '#B8862B'); m.box(0, 2, 0, 6, 2, 5, '#6E4F16'); m.box(2, 0, 0, 2, 6, 5, '#6E4F16'); m.box(2, 2, 5, 2, 2, 1, yellow, null, true); return m; }

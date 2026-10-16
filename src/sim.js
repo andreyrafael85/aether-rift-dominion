@@ -342,7 +342,7 @@ function generateMap(sim) {
     const ap = p.startAngle + Math.PI + (sim.rand() < 0.5 ? 1.5 : -1.5);
     addNode(sim, 'plasma', sx + DM.cos(ap) * 250, sy + DM.sin(ap) * 250, 1500);
     const ad = p.startAngle + (sim.rand() < 0.5 ? 1.1 : -1.1);
-    addNode(sim, 'dados', sx + DM.cos(ad) * 420, sy + DM.sin(ad) * 420, 350);
+    addNode(sim, 'dados', sx + DM.cos(ad) * 400, sy + DM.sin(ad) * 400, 350); // 4.2h: 400 (antes 420, bem na borda da Era II)
     // starting units
     for (let k = 0; k < 3; k++) {
       const u = addUnit(sim, p.id, 'coletor', sx + DM.cos(p.startAngle + Math.PI + k * 0.5) * 60, sy + DM.sin(p.startAngle + Math.PI + k * 0.5) * 60);
@@ -507,18 +507,21 @@ function rebuildNav(sim) {
     for (const w of sim.ents) { if (w === g || !w.alive || w.kind !== 'building' || w.owner !== g.owner || !BUILDINGS[w.def].wall) continue; const d = dist(w.x, w.y, g.x, g.y); if (d < d1) { d2 = d1; n2 = n1; d1 = d; n1 = w; } else if (d < d2) { d2 = d; n2 = w; } }
     let lx, ly; if (n1 && n2) { lx = n2.x - n1.x; ly = n2.y - n1.y; } else if (n1) { lx = g.x - n1.x; ly = g.y - n1.y; } else { lx = DM.cos(g.ang || 0); ly = DM.sin(g.ang || 0); }
     const ll = DM.hypot(lx, ly) || 1, L = 36; const nx = -ly / ll * L, ny = lx / ll * L;
-    cells4(g.x - nx, g.y - ny, g.x + nx, g.y + ny, i => { if (nav.blocked[i] && !hard[i] && wallOf[i] === g.owner && !nav.gates.has(i)) nav.gates.set(i, g.owner); });
+    const nnx = -ly / ll, nny = lx / ll; const mine = []; for (const w of sim.ents) if (w.alive && w.kind === 'building' && w.owner === g.owner && BUILDINGS[w.def].wall && dist(w.x, w.y, g.x, g.y) <= L + w.r + 7 + NAV * 1.5) mine.push(w);
+    cells4(g.x - nx, g.y - ny, g.x + nx, g.y + ny, i => { if (!nav.blocked[i] || hard[i] || wallOf[i] !== g.owner || nav.gates.has(i)) return; const cx = i % NW, cy = (i / NW) | 0;
+      for (const w of mine) { const qx = Math.max(cx * NAV, Math.min(w.x, (cx + 1) * NAV)), qy = Math.max(cy * NAV, Math.min(w.y, (cy + 1) * NAV)); if (dist(qx, qy, w.x, w.y) <= w.r + 7 && Math.abs((w.x - g.x) * nnx + (w.y - g.y) * nny) > 10) return; } // muro de outra linha cobre a célula
+      nav.gates.set(i, g.owner); });
   }
   for (const i of nav.gates.keys()) nav.blocked[i] = 0; // o portão vence os muros vizinhos
   sim.navDirty = false;
 }
 function cells4(x0, y0, x1, y1, fn) { // 4.2g: células cruzadas pelo segmento em sequência 4-conexa (DDA de Amanatides–Woo; só + − × ÷)
   let cx = clamp((x0 / NAV) | 0, 0, NW - 1), cy = clamp((y0 / NAV) | 0, 0, NW - 1); const ex = clamp((x1 / NAV) | 0, 0, NW - 1), ey = clamp((y1 / NAV) | 0, 0, NW - 1);
-  const dx = x1 - x0, dy = y1 - y0, sx = dx > 0 ? 1 : -1, sy = dy > 0 ? 1 : -1, ax = Math.abs(dx), ay = Math.abs(dy);
+  const dx = x1 - x0, dy = y1 - y0, sx = ex > cx ? 1 : -1, sy = ey > cy ? 1 : -1, ax = Math.abs(dx), ay = Math.abs(dy);
   const tdx = ax > 0 ? NAV / ax : Infinity, tdy = ay > 0 ? NAV / ay : Infinity;
   let tmx = ax > 0 ? (sx > 0 ? (cx + 1) * NAV - x0 : x0 - cx * NAV) / ax : Infinity, tmy = ay > 0 ? (sy > 0 ? (cy + 1) * NAV - y0 : y0 - cy * NAV) / ay : Infinity;
   fn(cy * NW + cx);
-  for (let k = 0; k < 4 * NW && (cx !== ex || cy !== ey); k++) { if (tmx < tmy) { cx += sx; tmx += tdx; } else { cy += sy; tmy += tdy; } if (cx < 0 || cy < 0 || cx >= NW || cy >= NW) break; fn(cy * NW + cx); }
+  for (let n = Math.abs(ex - cx) + Math.abs(ey - cy); n > 0; n--) { if (cx === ex) cy += sy; else if (cy === ey) cx += sx; else if (tmx < tmy) { cx += sx; tmx += tdx; } else { cy += sy; tmy += tdy; } fn(cy * NW + cx); }
 }
 function passArr(sim, owner) { // 4.2g: tabela de passagem do jogador (refeita a cada reconstrução da grade); um acesso por célula em vez de Map de portões
   const nav = sim.nav; if (!nav.pass) nav.pass = new Map(); let a = nav.pass.get(owner); if (a) return a;
@@ -577,6 +580,29 @@ function markExplored(sim) {
   }
 }
 function inStorm(sim, x, y) { const st = sim.storm; return !!(st && st.phase === 'active' && dist(x, y, st.x, st.y) <= st.r); }
+// 4.2h — veios de Minério: a partir dos 9 min, a cada 3,5 min um par de nós novos aparece no meio do mapa, longe dos Núcleos (o mapa secava antes dos 25 min)
+const VEIN = { first: 540, every: 210, amount: 1100 };
+function veinSpot(sim, x, y, nucs) {
+  if (x < 120 || y < 120 || x > WORLD - 120 || y > WORLD - 120 || dist(x, y, CX, CY) < RIFT_R + 120) return false;
+  for (const n of nucs) if (dist(x, y, n.x, n.y) < 520) return false;
+  for (const e of sim.ents) if (e.alive && (e.kind === 'building' || e.kind === 'rock' || e.kind === 'node') && dist(x, y, e.x, e.y) < e.r + 50) return false;
+  return !sim.nav.blocked[navIdx(x, y)];
+}
+function updateVeins(sim) {
+  if (sim.cfg && sim.cfg.noVeins) return;
+  if (sim.nextVein == null) sim.nextVein = Math.max(VEIN.first, sim.time + 60);
+  if (sim.time < sim.nextVein) return;
+  sim.nextVein = sim.time + VEIN.every;
+  const nucs = sim.ents.filter(e => e.alive && e.kind === 'building' && e.def === 'nucleo');
+  for (let k = 0; k < 24; k++) {
+    const a = sim.rand() * Math.PI * 2, rr = 520 + sim.rand() * 520; const x = CX + DM.cos(a) * rr, y = CY + DM.sin(a) * rr;
+    if (!veinSpot(sim, x, y, nucs)) continue;
+    const b = sim.rand() * Math.PI * 2; addNode(sim, 'minerio', x, y, VEIN.amount); const x2 = x + DM.cos(b) * 70, y2 = y + DM.sin(b) * 70; if (veinSpot(sim, x2, y2, nucs)) addNode(sim, 'minerio', x2, y2, VEIN.amount);
+    emit(sim, { t: 'vein', x, y });
+    for (const q of sim.players) if (q.alive) alertTo(sim, q.id, 'Veio de Minério exposto no meio do mapa', x, y, 'info');
+    return;
+  }
+}
 function updateStorm(sim, dt) {
   const st = sim.storm;
   if (!st) {
@@ -1222,8 +1248,9 @@ function updateUnit(sim, u, dt) {
       const n = sim.byId.get(u.node);
       if (!n || !n.alive || n.amount <= 0) { const m = pickNode(sim, u); if (m) u.node = m.id; else u.state = u.cargoTotal > 0 ? 'return' : 'idle'; break; }
       if (dist(u.x, u.y, n.x, n.y) <= u.r + n.r + 8) {
-        const take = Math.min(d.harvestRate * dt * (n.res === 'plasma' && inStorm(sim, n.x, n.y) ? 2 : 1), n.amount, d.capacity - u.cargoTotal);
-        n.amount -= take; u.cargo[n.res] += take; u.cargoTotal += take;
+        const k2 = n.res === 'plasma' && inStorm(sim, n.x, n.y) ? 2 : 1; // 4.2h: Tempestade rende 2× de verdade (o nó perde a metade do que entrega)
+        const take = Math.min(d.harvestRate * dt * k2, n.amount * k2, d.capacity - u.cargoTotal);
+        n.amount -= take / k2; u.cargo[n.res] += take; u.cargoTotal += take;
         if (u.cargoTotal >= d.capacity - 0.01 || n.amount <= 0) u.state = 'return';
       } else moveToward(sim, u, n.x, n.y, dt);
       break; }
@@ -1473,7 +1500,7 @@ function step(sim) {
   for (const e of sim.ents) if (e.kind !== 'node') { e.px = e.x; e.py = e.y; }
   if (sim.navDirty) rebuildNav(sim);
   rebuildGrid(sim);
-  updateStorm(sim, dt);
+  updateStorm(sim, dt); updateVeins(sim);
   const cmds = sim.cmdQueue; sim.cmdQueue = [];
   for (const c of cmds) processCommand(sim, c);
   for (const p of sim.players) {
@@ -1537,11 +1564,12 @@ function jsonBack(v) {
   if (typeof v.$n === 'string' && Object.keys(v).length === 1) return v.$n === '-0' ? -0 : Number(v.$n);
   const o = {}; for (const k of Object.keys(v)) o[k] = jsonBack(v[k]); return o;
 }
+function visDigest(sim) { let h = 0; for (let p = 0; p < sim.vis.length; p++) { h = (h * 31 + sim.vis[p].size) >>> 0; const ex = sim.explored[p]; if (ex) { let s = 0; for (let i = 0; i < ex.length; i++) s += ex[i]; h = (h * 31 + s) >>> 0; } } return h; } // 4.2h
 function snapshot(sim) {
   const nav = sim.nav;
   return { v: 1, hash: hash(sim), tick: sim.tick, time: sim.time, seed: sim.seed, nextId: sim.nextId, maxTime: sim.maxTime, rand: sim.rand.state(),
     ents: jsonSafe(sim.ents), players: jsonSafe(sim.players), cmdQueue: jsonSafe(sim.cmdQueue), pending: jsonSafe(sim.pending), result: jsonSafe(sim.result),
-    storm: jsonSafe(sim.storm), nextStorm: jsonSafe(sim.nextStorm), vis: sim.vis.map(st => [...st]), explored: sim.explored.map(b64),
+    storm: jsonSafe(sim.storm), nextStorm: jsonSafe(sim.nextStorm), nextVein: sim.nextVein == null ? null : sim.nextVein, digest: visDigest(sim), vis: sim.vis.map(st => [...st]), explored: sim.explored.map(b64),
     navDirty: !!sim.navDirty, nav: { blocked: b64(nav.blocked), gates: [...nav.gates], gatePos: [...nav.gatePos].map(([i, e]) => [i, e.id]), version: nav.version },
     auras: sim.auras ? sim.auras.map(a => ({ anchors: a.anchors.map(e => e.id), moldes: a.moldes.map(e => e.id), diapasoes: a.diapasoes.map(e => e.id) })) : null };
 }
@@ -1550,7 +1578,7 @@ function restore(sim, snap) {
   if (!snap || snap.v !== 1) throw new Error('salvamento em formato desconhecido');
   sim.tick = snap.tick; sim.time = snap.time; sim.seed = snap.seed; sim.nextId = snap.nextId; sim.maxTime = snap.maxTime; sim.rand.setState(snap.rand);
   sim.ents = jsonBack(snap.ents); sim.players = jsonBack(snap.players); sim.cmdQueue = jsonBack(snap.cmdQueue); sim.pending = jsonBack(snap.pending); sim.result = jsonBack(snap.result);
-  sim.storm = jsonBack(snap.storm); sim.nextStorm = jsonBack(snap.nextStorm); sim.vis = snap.vis.map(a => new Set(a)); sim.explored = snap.explored.map(unb64);
+  sim.storm = jsonBack(snap.storm); sim.nextStorm = jsonBack(snap.nextStorm); sim.nextVein = snap.nextVein == null ? undefined : snap.nextVein; /* 4.2h: salvamento antigo, o primeiro veio sai 60 s depois de retomar */ sim.vis = snap.vis.map(a => new Set(a)); sim.explored = snap.explored.map(unb64);
   sim.byId = new Map(); for (const e of sim.ents) sim.byId.set(e.id, e);
   const nav = sim.nav; nav.blocked = unb64(snap.nav.blocked); nav.gates = new Map(snap.nav.gates); nav.gatePos = new Map(snap.nav.gatePos.map(([i, id]) => [i, sim.byId.get(id)]).filter(x => x[1])); nav.fields = new Map(); nav.version = snap.nav.version; sim.navDirty = snap.navDirty;
   { const v0 = nav.version, nd = sim.navDirty; rebuildNav(sim); nav.version = v0; sim.navDirty = nd; } // 4.2g: refaz a grade (centros, donos de célula, corredores de portão) sem mudar versão nem o 'sujo'
@@ -1558,6 +1586,7 @@ function restore(sim, snap) {
   if (snap.auras) sim.auras = snap.auras.map(a => ({ anchors: a.anchors.map(id => sim.byId.get(id)).filter(Boolean), moldes: a.moldes.map(id => sim.byId.get(id)).filter(Boolean), diapasoes: a.diapasoes.map(id => sim.byId.get(id)).filter(Boolean) }));
   sim.events = []; sim._evRet = 0;
   const h = hash(sim); if (h !== snap.hash) console.warn('[ARD] retomada: hash ' + h + ' difere do salvo ' + snap.hash);
+  if (snap.digest != null && visDigest(sim) !== snap.digest) console.warn('[ARD] retomada: visão/exploração diferem do salvo'); // 4.2h
   return sim;
 }
 

@@ -12,7 +12,7 @@ Todo arquivo de arte ou biblioteca externa entra aqui com origem e licença. Sem
 | Efeitos 3D (src/fx3d.js, 4.2c) | partículas e formas procedurais em shader, sem texturas | equipe | todos os direitos reservados | jogo (modo 3D) |
 | Líderes vivos (src/leaders3d.js, 4.1e) | bustos procedurais em código, portados de tools/arte3d.html (arte de identidade aprovada) | equipe | todos os direitos reservados | tela inicial e retrato do HUD (desktop) (4.2f: Tessara redesenhada, retratos 2D assets/leader-tessara-*.jpg regerados) |
 | Ícones do app e favicons (assets/icon-*.png, favicon-*.png, apple-touch-icon.png) | recortes do render da Final 2 aprovada | equipe | todos os direitos reservados | manifesto PWA, aba do navegador, tela inicial do celular |
-| Ícones de recursos da barra (sprite SVG em src/index.tpl.html, 4.2f) | desenhados à mão em SVG (chama de Plasma, bloco de Minério, cristal de Dados, raio de Energia, relógio, escudo, espadas) | equipe | todos os direitos reservados | barra superior e custos dos botões |
+| Ícones de recursos da barra (sprite SVG em src/index.tpl.html, 4.2f; Minério redesenhado como cristais azuis na 4.2h) | desenhados à mão em SVG (chama de Plasma, bloco de Minério, cristal de Dados, raio de Energia, relógio, escudo, espadas) | equipe | todos os direitos reservados | barra superior e custos dos botões |
 | Texturas de terreno | procedurais (src/render.js) | equipe | todos os direitos reservados | jogo |
 | Efeitos sonoros | sintetizados em tempo real (src/audio.js) | equipe | todos os direitos reservados | jogo |
 | Voz de sistema | Web Speech API do navegador | navegador do jogador | n/a | jogo |

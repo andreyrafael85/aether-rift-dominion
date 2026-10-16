@@ -203,7 +203,7 @@ function prepare(id, o) {
     players.push({ name: e.name === 'auto' || swapped ? AI_NAMES[r][players.length % 3] : e.name, faction: r, difficulty: e.hard ? step[o.difficulty || 'normal'] : diff.ai, passive: !!e.passive, ally: !!e.ally }); }
   { const hostile = players.slice(1).filter(p => !p.passive).length; if (hostile >= 2) { const bonus = { facil: [700, 350], normal: [300, 150], dificil: [0, 0], fenda: [0, 0] }[o.difficulty || 'normal'] || [0, 0]; if (bonus[0]) { const m0 = players[0].mods = players[0].mods || {}; m0.startRes = Object.assign({}, m0.startRes); m0.startRes.minerio = (m0.startRes.minerio || 0) + bonus[0]; m0.startRes.plasma = (m0.startRes.plasma || 0) + bonus[1]; } } } // missões com vários inimigos ativos: reforço inicial no Fácil e no Normal
   const era = m.setup.era || (m.id === 'p1' || m.id === 'p2' ? 1 : 2); for (const pl of players) pl.era = era; // 4.1d: Era inicial da missão (todos começam iguais; a IA evolui sozinha)
-  return { mission: m, diff, difficulty: o.difficulty || 'normal', race, era, swap, cfg: { seed: m.setup.seed, players, minutes: (m.setup.minutes || 25) + (m.startTime ? Math.ceil(m.startTime / 60) : 0) } };
+  return { mission: m, diff, difficulty: o.difficulty || 'normal', race, era, swap, cfg: { seed: m.setup.seed, noVeins: m.act === 'prologo', players, minutes: (m.setup.minutes || 25) + (m.startTime ? Math.ceil(m.startTime / 60) : 0) } };
 }
 
 // ---------- executor ----------

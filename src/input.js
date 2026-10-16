@@ -59,9 +59,10 @@ function create(o) {
     return out;
   }
   function contextCommand(wx, wy, sx, sy) {
-    const units = ownSelectedUnits(); const t = pick(sx, sy, I.lastType === 'touch' ? 22 : 10, units.length > 0);
+    const units = ownSelectedUnits(); let t = pick(sx, sy, I.lastType === 'touch' ? 22 : 10, units.length > 0);
     if (!units.length) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice('Ponto de reunião definido'); } return; }
     const ids = units.map(u => u.id);
+    if (t && (t.kind === 'node' || t.kind === 'wreck') && t.amount <= 0) { if (units.some(u => u.def === 'coletor')) ui.notice('Nó esgotado: mande os coletores a outro campo'); t = null; } // 4.2h: nó seco vira ordem de mover
     if (t && (t.kind === 'node' || t.kind === 'wreck')) {
       const eaters = t.kind === 'wreck' && S.FACTIONS[sim.players[human].faction].devour ? units.filter(u => u.def === 'pirata') : []; // Carniceiro (Vorag) devora a carcaça
       if (eaters.length) { cmd({ t: 'devour', ids: eaters.map(u => u.id), target: t.id }); const rest = units.filter(u => u.def !== 'pirata').map(u => u.id); if (rest.length) cmd({ t: 'harvest', ids: rest, target: t.id }); }

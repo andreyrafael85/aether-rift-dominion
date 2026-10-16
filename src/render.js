@@ -8,7 +8,7 @@ const FINE = { veiculo_hull: 16, veiculo_turret: 16, torre_turret: 16, bastiao_t
 const facingsFor = def => FINE[def] || FACINGS;
 const BIOME_RGB = { gelo: [168, 186, 204], rocha: [104, 108, 116], tundra: [92, 110, 92], basalto: [58, 54, 60] };
 const BIOME_MINI = { gelo: '#5C6B7A', rocha: '#4A4E56', tundra: '#3E5242', basalto: '#2A262C' };
-const NODE_COLOR = { plasma: '#FF6A3D', minerio: '#8FA3B8', dados: '#7FE3A1' };
+const NODE_COLOR = { plasma: '#FF6A3D', minerio: '#4CC9FF', dados: '#7FE3A1' }; // 4.2h
 const NODE_MODEL = { plasma: 'crystals', minerio: 'ore', dados: 'datashards' };
 function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
 function rgba(h, a) { const c = hexToRgb(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
@@ -226,10 +226,11 @@ function create(canvas, mini) {
       const e = it.e; const own = e.owner === human;
       if (e.kind === 'node') {
         const sp = R.sprite(e.res, -1, 0, false, e.id % 4); const p = P(e.x, e.y, 0); const sc = fitOf(e, sp) * k / SV;
-        const g = c.createRadialGradient(p[0], p[1], 2, p[0], p[1], e.r * 1.6 * k); g.addColorStop(0, rgba(NODE_COLOR[e.res], 0.3)); g.addColorStop(1, rgba(NODE_COLOR[e.res], 0)); c.save(); c.translate(p[0], p[1]); c.scale(1, 0.5); c.fillStyle = g; c.beginPath(); c.arc(0, 0, e.r * 1.6 * k, 0, TAU); c.fill(); c.restore();
+        const f = e.max ? Math.max(0, e.amount) / e.max : 1, dry = e.amount <= 0; // 4.2h: halo pelo que resta, pulso lento, anel azul no gelo claro; seco não brilha
+        if (!dry) { const pul = f < 0.15 ? 0.55 + 0.45 * Math.sin(R.time * 6 + e.id) : 0.85 + 0.15 * Math.sin(R.time * 1.7 + e.id); const ga = (0.22 + 0.38 * Math.sqrt(f)) * pul; const rr = e.r * (1.8 + 0.8 * f) * k; const g = c.createRadialGradient(p[0], p[1], 2, p[0], p[1], rr); g.addColorStop(0, rgba(NODE_COLOR[e.res], ga)); g.addColorStop(1, rgba(NODE_COLOR[e.res], 0)); c.save(); c.translate(p[0], p[1]); c.scale(1, 0.5); c.fillStyle = g; c.beginPath(); c.arc(0, 0, rr, 0, TAU); c.fill(); c.restore(); c.strokeStyle = rgba(NODE_COLOR[e.res], 0.35 + 0.3 * pul * Math.sqrt(f)); c.lineWidth = 1.2; ellipse(c, p[0], p[1], e.r * 1.6 * k); c.stroke(); }
         if (view.sel.has(e.id)) { c.strokeStyle = 'rgba(255,255,255,0.8)'; c.lineWidth = 1.5; ellipse(c, p[0], p[1], (e.r + 6) * k); c.stroke(); }
-        drawSprite(c, sp, p[0], p[1], 0, sc, k, 1);
-        for (const l of sp.lights) lights.push({ x: p[0] - sp.ax * sc + l.x * sc, y: p[1] - sp.ay * sc + l.y * sc, r: 12 * z, c: l.c, a: 0.5 });
+        drawSprite(c, sp, p[0], p[1], 0, sc, k, dry ? 0.45 : 1);
+        if (!dry) for (const l of sp.lights) lights.push({ x: p[0] - sp.ax * sc + l.x * sc, y: p[1] - sp.ay * sc + l.y * sc, r: 12 * z, c: l.c, a: 0.5 });
         continue;
       }
       if (e.kind === 'rock') { const sp = R.sprite('rocks', -1, 0, false, e.seed % 6); const p = P(e.x, e.y, 0); c.fillStyle = 'rgba(0,0,0,0.3)'; ellipse(c, p[0] + 4, p[1] + 1, e.r * 1.4 * k); c.fill(); drawSprite(c, sp, p[0], p[1], 0, (2 * e.r * 1.9 / sp.fw) * k / SV, k, 1); continue; }
@@ -314,7 +315,7 @@ function create(canvas, mini) {
     } else if (lights.length) { c.save(); c.globalCompositeOperation = 'lighter'; for (const l of lights) { if (l.a < 0.6) continue; const g = c.createRadialGradient(l.x, l.y, 0, l.x, l.y, l.r); g.addColorStop(0, rgba(l.c, 0.5)); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.beginPath(); c.arc(l.x, l.y, l.r, 0, TAU); c.fill(); } c.restore(); }
     if (R.lightning > 0) { c.fillStyle = `rgba(200,190,255,${0.25 * R.lightning})`; c.fillRect(0, 0, W, H); }
     c.save(); c.translate(shx, shy);
-    for (const e of sim.ents) { if (!e.alive || e.kind !== 'node' || !inView(e.x, e.y, 40)) continue; let seen = false; for (const o of sim.ents) { if (o.alive && o.owner === human && (o.kind === 'unit' || o.kind === 'building') && S.dist(o.x, o.y, e.x, e.y) <= S.sensorRadius(sim, o)) { seen = true; break; } } if (seen) continue; const sp = R.sprite(e.res, -1, 0, false, e.id % 4); const p = P(e.x, e.y, 0); drawSprite(c, sp, p[0], p[1], 0, fitOf(e, sp) * k / SV, k, 0.3); }
+    for (const e of sim.ents) { if (!e.alive || e.kind !== 'node' || e.amount <= 0 || !inView(e.x, e.y, 40)) continue; let seen = false; for (const o of sim.ents) { if (o.alive && o.owner === human && (o.kind === 'unit' || o.kind === 'building') && S.dist(o.x, o.y, e.x, e.y) <= S.sensorRadius(sim, o)) { seen = true; break; } } if (seen) continue; const sp = R.sprite(e.res, -1, 0, false, e.id % 4); const p = P(e.x, e.y, 0); drawSprite(c, sp, p[0], p[1], 0, fitOf(e, sp) * k / SV, k, 0.3); }
     for (const f of R.fx.floats) { const kk = f.t / f.life; const p = P(f.x, f.y, 10); c.fillStyle = rgba(f.col, 1 - kk); c.font = 'bold 13px IBM Plex Mono, monospace'; c.textAlign = 'center'; c.fillText(f.text, p[0], p[1] - kk * 30); }
     for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || e.def !== 'reator' || !e.built || e.owner === human || !S.FACTIONS[sim.players[e.owner].faction].smoke || !inView(e.x, e.y, 60)) continue; const p = P(e.x, e.y, e.r * 1.2); c.fillStyle = 'rgba(190,190,200,0.45)'; for (let i = 0; i < 3; i++) { const ph = (R.time * 0.4 + i / 3 + e.id * 0.1) % 1; c.beginPath(); c.arc(p[0] + 6 + Math.sin(R.time + i) * 6, p[1] - 6 - ph * 40 * z, (4 + ph * 8) * z, 0, TAU); c.fill(); } }
     c.restore();
@@ -328,12 +329,12 @@ function create(canvas, mini) {
     const c = mctx; const size = mini.width; const human = view.human; const vis = view.reveal ? { has: () => true } : sim.vis[human]; const m = miniM(); const ex = sim.explored[human];
     const M = (x, y) => R.worldToMini(x, y);
     c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#0B0D11'; c.fillRect(0, 0, size, size);
-    if (!R.miniBase || R.miniBase.width !== size) { const mb = document.createElement('canvas'); mb.width = size; mb.height = size; const bc = mb.getContext('2d'); const tm = TILE * m; for (let ty = 0; ty < TILES; ty++) for (let tx = 0; tx < TILES; tx++) { const kind = tileKind(tx, ty); if (!kind) continue; const p = M((tx + 0.5) * TILE, (ty + 0.5) * TILE); bc.fillStyle = BIOME_MINI[kind] || '#15181F'; diamond(bc, p[0], p[1], tm + 0.6, tm * 0.5 + 0.6); bc.fill(); } for (const e of sim.ents) if (e.alive && e.kind === 'rock') { const p = M(e.x, e.y); bc.fillStyle = '#8A9098'; bc.fillRect(p[0] - 1, p[1] - 1, 2, 2); } R.miniBase = mb; }
+    if (!R.miniBase || R.miniBase.width !== size) { const mb = document.createElement('canvas'); mb.width = size; mb.height = size; const bc = mb.getContext('2d'); const tm = TILE * m; for (let ty = 0; ty < TILES; ty++) for (let tx = 0; tx < TILES; tx++) { const kind = tileKind(tx, ty); if (!kind) continue; const p = M((tx + 0.5) * TILE, (ty + 0.5) * TILE); bc.fillStyle = BIOME_MINI[kind] || '#15181F'; diamond(bc, p[0], p[1], tm + 0.6, tm * 0.5 + 0.6); bc.fill(); } for (const e of sim.ents) if (e.alive && e.kind === 'rock') { const p = M(e.x, e.y); bc.fillStyle = '#4E5156'; /* 4.2h: rocha escura, longe do azul do Minério */ bc.fillRect(p[0] - 1, p[1] - 1, 2, 2); } R.miniBase = mb; }
     c.drawImage(R.miniBase, 0, 0);
     { const p = M(S.CX, S.CY); c.fillStyle = 'rgba(255,94,58,0.35)'; c.beginPath(); c.ellipse(p[0], p[1], S.RIFT_R * 2 * m, S.RIFT_R * m, 0, 0, TAU); c.fill(); c.fillStyle = '#05040A'; c.beginPath(); c.ellipse(p[0], p[1], S.RIFT_R * m, S.RIFT_R * m * 0.5, 0, 0, TAU); c.fill(); }
     for (const e of sim.ents) {
       if (!e.alive) continue;
-      if (e.kind === 'node') { const p = M(e.x, e.y); c.fillStyle = NODE_COLOR[e.res]; c.fillRect(p[0] - 1.5, p[1] - 1.5, 3, 3); continue; }
+      if (e.kind === 'node') { const p = M(e.x, e.y); resGlyph(c, e, p[0], p[1], 1.9); continue; } // 4.2h
       if (e.kind !== 'unit' && e.kind !== 'building') continue;
       const own = e.owner === human; if (!(own || vis.has(e.id))) continue;
       const col = sim.players[e.owner].color; const p = M(e.x, e.y);
@@ -354,5 +355,13 @@ function create(canvas, mini) {
   }
   return R;
 }
-ARD.render = { create, NODE_COLOR, rgba, shade, K };
+function resGlyph(c, e, x, y, px) { // 4.2h: mesmo símbolo do radar 3D (losango Minério, hexágono Plasma, triângulo Dados; seco = anel cinza)
+  if (e.amount <= 0) { c.strokeStyle = 'rgba(150,150,150,0.55)'; c.lineWidth = 1; c.beginPath(); c.arc(x, y, px * 0.8, 0, TAU); c.stroke(); return; }
+  const s = px * (0.85 + 0.75 * Math.sqrt(e.max ? e.amount / e.max : 1)); c.beginPath();
+  if (e.res === 'minerio') { c.moveTo(x, y - s * 1.15); c.lineTo(x + s, y); c.lineTo(x, y + s * 1.15); c.lineTo(x - s, y); }
+  else if (e.res === 'plasma') { for (let i = 0; i < 6; i++) { const a = i / 6 * TAU + Math.PI / 6; if (i) c.lineTo(x + Math.cos(a) * s, y + Math.sin(a) * s); else c.moveTo(x + Math.cos(a) * s, y + Math.sin(a) * s); } }
+  else { c.moveTo(x, y - s); c.lineTo(x + s, y + s * 0.8); c.lineTo(x - s, y + s * 0.8); }
+  c.closePath(); c.fillStyle = NODE_COLOR[e.res]; c.strokeStyle = 'rgba(0,0,0,0.8)'; c.lineWidth = 1; c.stroke(); c.fill();
+}
+ARD.render = { create, NODE_COLOR, rgba, shade, K, resGlyph };
 })(globalThis.ARD = globalThis.ARD || {});

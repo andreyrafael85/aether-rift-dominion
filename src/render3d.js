@@ -9,7 +9,15 @@ const NODE_MODEL = { plasma: 'crystals', minerio: 'ore', dados: 'datashards' };
 const USE_MESH = !!ME && new URLSearchParams(location.search).get('malhas') !== '0';
 if (ME && matchMedia('(pointer: coarse)').matches) ME.setLod(0.6); // celular: menos segmentos por modelo
 const DBG_OFF = new Set((new URLSearchParams(location.search).get('sem') || '').split(',')); // diagnóstico: ?sem=ceu,horizonte,relevo,detalhe
-const NODE_COLOR = { plasma: '#FF6A3D', minerio: '#8FA3B8', dados: '#7FE3A1' };
+const NODE_COLOR = { plasma: '#FF6A3D', minerio: '#4CC9FF', dados: '#7FE3A1' }; // 4.2h: Minério azul-elétrico
+function resGlyph(c, e, x, y, px) { // 4.2h: símbolo de recurso no radar, diferente dos de unidade (círculo) e estrutura (quadrado)
+  if (e.amount <= 0) { c.strokeStyle = 'rgba(150,150,150,0.55)'; c.lineWidth = Math.max(1, px * 0.35); c.beginPath(); c.arc(x, y, px * 0.75, 0, Math.PI * 2); c.stroke(); return; }
+  const s = px * (0.85 + 0.75 * Math.sqrt(e.max ? e.amount / e.max : 1)); c.beginPath();
+  if (e.res === 'minerio') { c.moveTo(x, y - s * 1.15); c.lineTo(x + s, y); c.lineTo(x, y + s * 1.15); c.lineTo(x - s, y); }
+  else if (e.res === 'plasma') { for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + Math.PI / 6; if (i) c.lineTo(x + Math.cos(a) * s, y + Math.sin(a) * s); else c.moveTo(x + Math.cos(a) * s, y + Math.sin(a) * s); } }
+  else { c.moveTo(x, y - s); c.lineTo(x + s, y + s * 0.8); c.lineTo(x - s, y + s * 0.8); }
+  c.closePath(); c.fillStyle = NODE_COLOR[e.res]; c.strokeStyle = 'rgba(0,0,0,0.8)'; c.lineWidth = Math.max(1, px * 0.45); c.stroke(); c.fill();
+}
 const BIOME_RGB = { gelo: [0.66, 0.73, 0.8], rocha: [0.41, 0.42, 0.45], tundra: [0.36, 0.43, 0.36], basalto: [0.23, 0.21, 0.24] };
 const BIOME_MINI = { gelo: '#5C6B7A', rocha: '#4A4E56', tundra: '#3E5242', basalto: '#2A262C' };
 function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
@@ -169,12 +177,7 @@ function create(canvas, overlay, mini) {
     } catch (err) { console.warn('[ARD] céu/horizonte indisponível: ' + err.message); } }
     // Fenda: anel emissivo e luz
     const ring = new THREE.Mesh(new THREE.TorusGeometry(S.RIFT_R * 0.9, 6, 8, 48), new THREE.MeshBasicMaterial({ color: new THREE.Color(2.6, 1.0, 0.5) })); ring.rotation.x = Math.PI / 2; ring.position.set(S.CX, H(S.CX, S.CY) + 4, -S.CY); scene.add(ring);
-    // lagos de plasma no anel de basalto (só visuais)
-    const poolMat = new THREE.ShaderMaterial({ uniforms: { uTime: { value: 0 } }, transparent: true, depthWrite: false,
-      vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-      fragmentShader: 'uniform float uTime; varying vec2 vUv; float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); } float n(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f); return mix(mix(h(i), h(i+vec2(1,0)), f.x), mix(h(i+vec2(0,1)), h(i+vec2(1,1)), f.x), f.y); } void main(){ vec2 c = vUv - 0.5; float d = length(c) * 2.0; float v = n(vUv * 6.0 + uTime * 0.15) * 0.6 + n(vUv * 14.0 - uTime * 0.25) * 0.4; vec3 col = mix(vec3(2.4, 0.55, 0.25), vec3(1.6, 0.35, 2.2), smoothstep(0.35, 0.75, v)); float a = smoothstep(1.0, 0.72, d); gl_FragColor = vec4(col * (0.8 + 0.5 * v), a); }' });
-    R.poolMat = poolMat;
-    for (let i = 0; i < 6; i++) { const a = (i / 6) * TAU + 0.35, rr = 390 + (i % 2) * 110; const px = S.CX + Math.cos(a) * rr, py = S.CY + Math.sin(a) * rr; if (sim.ents.some(e => e.alive && e.kind === 'node' && S.dist(e.x, e.y, px, py) < 90)) continue; const pool = new THREE.Mesh(new THREE.CircleGeometry(28 + (i % 3) * 10, 32).rotateX(-Math.PI / 2), poolMat); pool.position.set(px, H(px, py) + 0.9, -py); scene.add(pool); const pl = new THREE.PointLight(0xff7a40, 0, 160, 2); pl.position.set(px, H(px, py) + 12, -py); scene.add(pl); R.poolLights.push(pl); }
+    // 4.2h: os lagos de plasma decorativos saíram (pareciam nós de Plasma, brilhavam no breu e custavam 6 luzes)
     // névoa volumétrica barata: sprites aditivos na cratera da Fenda e na Tempestade
     const mistCv = document.createElement('canvas'); mistCv.width = 128; mistCv.height = 128; const mc = mistCv.getContext('2d'); const g = mc.createRadialGradient(64, 64, 4, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,0.55)'); g.addColorStop(0.5, 'rgba(255,255,255,0.18)'); g.addColorStop(1, 'rgba(255,255,255,0)'); mc.fillStyle = g; mc.fillRect(0, 0, 128, 128);
     const mistTex = new THREE.CanvasTexture(mistCv); mistTex.colorSpace = THREE.SRGBColorSpace;
@@ -190,6 +193,7 @@ function create(canvas, overlay, mini) {
   }
   // ---------- geometrias e instancing ----------
   const envMats = []; // materiais que refletem o ambiente; a intensidade cai à noite
+  if (DR && DR.mats) for (const k in DR.mats) { DR.mats[k].userData.env = 1; envMats.push(DR.mats[k]); } // 4.2h: adereços escurecem à noite como o resto (antes ficavam mais claros que os nós)
   const mkMat = (o, base) => { const m = USE_MESH ? ME.material(o) : new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.82, metalness: 0.12 }); m.userData.env = base == null ? (o.env || 0.5) : base; envMats.push(m); return m; };
   const matMain = mkMat({ env: 0.45, key: 'neutro' });
   const depthAnim = ME && ME.animShader ? (() => { const d = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }); d.onBeforeCompile = sh => ME.animShader(sh); d.defaultAttributeValues = Object.assign({}, d.defaultAttributeValues, ME.ANIM_DEFAULTS); d.customProgramCacheKey = () => 'ard-depth-anim'; return d; })() : null; // 4.2b: sombras acompanham as peças animadas
@@ -238,12 +242,12 @@ function create(canvas, overlay, mini) {
   function animAttr(it, cap) { const old = it.ia, oldC = it.ic; const a = new THREE.InstancedBufferAttribute(new Float32Array(cap * 4), 4); a.setUsage(THREE.DynamicDrawUsage); if (old) a.array.set(old.array.subarray(0, Math.min(old.array.length, cap * 4))); const c = new THREE.InstancedBufferAttribute(new Float32Array(cap), 1); c.setUsage(THREE.DynamicDrawUsage); if (oldC) c.array.set(oldC.array.subarray(0, Math.min(oldC.array.length, cap))); it.ia = a; it.ic = c; for (const gg of [it.geo.main, it.geo.em]) if (gg) { gg.setAttribute('aInst', a); gg.setAttribute('aInstC', c); } } // 4.2b: distância, tempo, movimento e recuo por instância
   function grow(it) { const cap = it.cap * 2; if (it.anim) animAttr(it, cap); for (const k of ['main', 'em']) { const old = it[k]; if (!old) continue; const m = new THREE.InstancedMesh(old.geometry, old.material, cap); m.frustumCulled = false; m.castShadow = old.castShadow; m.receiveShadow = old.receiveShadow; if (old.customDepthMaterial) m.customDepthMaterial = old.customDepthMaterial; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.remove(old); old.dispose(); scene.add(m); it[k] = m; } it.cap = cap; }
   const ZERO4 = [0, 0, 0, 0];
-  function put(it, x, y, z, ang, scale, scaleY, tint, ia) {
+  function put(it, x, y, z, ang, scale, scaleY, tint, ia, emTint) { // 4.2h: emTint = brilho da parte emissiva (nó secando apaga)
     if (it.n >= it.cap) grow(it);
     if (it.anim) { const v = ia || ZERO4; const o = it.n * 4; it.ia.array[o] = v[0]; it.ia.array[o + 1] = v[1]; it.ia.array[o + 2] = v[2]; it.ia.array[o + 3] = v[3]; it.ic.array[it.n] = v[4] || 0; }
     _p.set(x, H(x, y) + (z || 0), -y); _q.setFromAxisAngle(UP, ang || 0); _s.set(scale, scale * (scaleY == null ? 1 : scaleY), scale); _m.compose(_p, _q, _s);
     it.main.setMatrixAt(it.n, _m); _c.setScalar(tint == null ? 1 : tint); it.main.setColorAt(it.n, _c);
-    if (it.em) { it.em.setMatrixAt(it.n, _m); it.em.setColorAt(it.n, _c); }
+    if (it.em) { it.em.setMatrixAt(it.n, _m); if (emTint != null) _c.setScalar(emTint); it.em.setColorAt(it.n, _c); }
     it.n++;
   }
   function fitOf(e, g) { const foot = e.kind === 'node' ? 2 * e.r * 1.2 * (0.55 + 0.45 * (e.max ? e.amount / e.max : 1)) : e.kind === 'wreck' ? 2 * e.r * 1.3 : e.kind === 'rock' ? 2 * e.r * 1.9 : 2 * e.r * 1.25; return foot / g.width; }
@@ -352,6 +356,11 @@ function create(canvas, overlay, mini) {
   const decalGeo = new THREE.CircleGeometry(1, 18); decalGeo.rotateX(-Math.PI / 2); const decals = new THREE.InstancedMesh(decalGeo, new THREE.MeshBasicMaterial({ color: 0x0b0908, transparent: true, opacity: 0.55, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }), 160); decals.count = 0; decals.frustumCulled = false; scene.add(decals); const decalList = [];
   const ringGeo = new THREE.RingGeometry(0.82, 1, 28); ringGeo.rotateX(-Math.PI / 2); const selRings = new THREE.InstancedMesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 }), 256); selRings.count = 0; selRings.frustumCulled = false; scene.add(selRings);
   const vetRings = new THREE.InstancedMesh(new THREE.RingGeometry(0.84, 1, 28).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.5, 1.12, 0.35), transparent: true, opacity: 0.7, depthWrite: false, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -3 }), 256); vetRings.count = 0; vetRings.frustumCulled = false; scene.add(vetRings); // 4.2e: veteranos
+  // 4.2h: halo de recurso no chão (cor do recurso, pulso lento, tamanho e brilho pelo que resta; deitado no relevo); um draw call para todos os nós
+  const glowTex = (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 64; const gc = cv.getContext('2d'); const gr = gc.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.3, 'rgba(255,255,255,0.6)'); gr.addColorStop(0.65, 'rgba(255,255,255,0.16)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); gc.fillStyle = gr; gc.fillRect(0, 0, 64, 64); const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+  const GLOW_CAP = 160; const nodeGlow = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 }), GLOW_CAP);
+  nodeGlow.setColorAt(0, new THREE.Color(0, 0, 0)); nodeGlow.count = 0; nodeGlow.frustumCulled = false; nodeGlow.renderOrder = 2; scene.add(nodeGlow);
+  const RES_GLOW = { plasma: new THREE.Color(NODE_COLOR.plasma).multiplyScalar(1.7), minerio: new THREE.Color(NODE_COLOR.minerio), dados: new THREE.Color(NODE_COLOR.dados).multiplyScalar(0.9) }; const _up = new THREE.Vector3(0, 1, 0), _nv = new THREE.Vector3();
   const rangeRings = new THREE.InstancedMesh(new THREE.RingGeometry(0.98, 1, 64).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.25, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 }), 32); rangeRings.count = 0; rangeRings.frustumCulled = false; scene.add(rangeRings);
   const shellGeo = new THREE.SphereGeometry(1.6, 6, 6); const shells = new THREE.InstancedMesh(shellGeo, new THREE.MeshBasicMaterial({ color: 0xffd9a0 }), 256); shells.count = 0; shells.frustumCulled = false; scene.add(shells);
   const BL = 512; const blPos = new Float32Array(BL * 6); const blGeo = new THREE.BufferGeometry(); blGeo.setAttribute('position', new THREE.BufferAttribute(blPos, 3)); const bullets = new THREE.LineSegments(blGeo, new THREE.LineBasicMaterial({ color: 0xffe6a8, transparent: true, opacity: 0.9 })); bullets.frustumCulled = false; scene.add(bullets);
@@ -369,6 +378,7 @@ function create(canvas, overlay, mini) {
         case 'shot': if (e.id != null) { const st = AN.get(e.id); if (st) st.rec = 1; } flashLight.position.set(e.x1, H(e.x1, e.y1) + 8, -e.y1); flashT = 0.06; if (e.beam) R.fx.rings.push({ x: e.x2, y: e.y2, r0: 4, r1: 18, col: '#9FE8FF', t: 0, life: 0.2 });
           if (FX && Math.random() < 0.85 * FX.mult && seenAt(e.x1, e.y1)) { const sh = e.id != null && sim.byId.get(e.id); const hz = sh ? (sh.kind === 'building' ? 14 : (S.UNITS[sh.def] && S.UNITS[sh.def].flying ? 16 : 5)) : 6; const dx = e.x2 - e.x1, dy = e.y2 - e.y1, L = Math.hypot(dx, dy) || 1; const mx = e.x1 + dx / L * (sh ? sh.r * 0.9 : 6), my = e.y1 + dy / L * (sh ? sh.r * 0.9 : 6); FX.muzzle(mx, H(mx, my) + hz, -my, e.beam ? [0.9, 1.3, 1.7] : [1.6, 1.15, 0.6], e.cls === 'vei' || e.cls === 'est' ? 5 : 3); }
           break;
+        case 'vein': if (R.fx && R.fx.rings) R.fx.rings.push({ x: e.x, y: e.y, r0: 10, r1: 110, col: '#4CC9FF', t: 0, life: 1.8 }); break; // 4.2h
         case 'impact': { const big = e.splash > 0; if (FX) { FX.impact(e.x, H(e.x, e.y), -e.y, e.splash || 0); if (big) { if (!e.hit) addDecal(e.x, e.y, e.splash * 0.7); if (e.splash >= 24) boomLight(e.x, H(e.x, e.y), -e.y, 0.5); } break; } for (let i = 0; i < (big ? 14 : 4); i++) spark(e.x, e.y, 3, [1, 0.75, 0.4], big ? 90 : 50, true); if (big) { boomList.push({ x: e.x, y: e.y, t: 0 }); smoke(e.x, e.y, 5, [0.35, 0.32, 0.3], 1.6, 20); if (!e.hit) addDecal(e.x, e.y, e.splash * 0.7); } break; }
         case 'death': if (FX && (e.kind === 'unit' || e.kind === 'building')) { const big = e.kind === 'building'; const fac = e.owner >= 0 && sim.players[e.owner] ? sim.players[e.owner].faction : 'vehnar'; const tint = RACE_TINT[fac] || [1, 1, 1]; const gx = e.x, gy = H(e.x, e.y), gz = -e.y; const r = e.r || 8;
             if (big) { FX.explosion(gx, gy, gz, r * 1.1, { tint, wave: true }); for (let i = 1; i <= 3; i++) { const a = Math.random() * Math.PI * 2, d = r * 0.6 * Math.random(); FX.explosion(gx + Math.cos(a) * d, gy + r * 0.3, gz + Math.sin(a) * d, r * (0.5 + Math.random() * 0.3), { tint, delay: i * 0.22 }); } for (let i = 0; i < Math.round(10 * FX.mult); i++) FX.smoke(gx + (Math.random() - .5) * r, gy + r * 0.5, gz + (Math.random() - .5) * r, [0.12, 0.11, 0.12], 4 + Math.random() * 3, 10 + Math.random() * 8, r * 0.9); boomLight(gx, gy, gz, 1.2); if (e.owner === human) R.shake = Math.min(1, R.shake + 0.5); }
@@ -459,10 +469,16 @@ function create(canvas, overlay, mini) {
     terrTex.needsUpdate = true;
     // instâncias
     for (const it of R.inst.values()) it.n = 0;
-    let nSel = 0, nRange = 0, nShell = 0, nBul = 0, nBeam = 0, nVet = 0; const hpList = []; const emitters = []; const flags = [];
+    let nSel = 0, nRange = 0, nShell = 0, nBul = 0, nBeam = 0, nVet = 0, nGlow = 0; const hpList = []; const emitters = []; const flags = [];
     for (const e of sim.ents) {
       if (!e.alive) continue; const own = e.owner === human;
-      if (e.kind === 'node') { const it = instOf(e.res, -1, e.id % 4); const g = it.geo; put(it, e.x, e.y, 0, 0, fitOf(e, g)); if (view.sel.has(e.id)) nSel = ring(nSel, e.x, e.y, e.r + 6); continue; }
+      if (e.kind === 'node') { const it = instOf(e.res, -1, e.id % 4); const g = it.geo; const f = e.max ? Math.max(0, e.amount) / e.max : 1; const dry = e.amount <= 0; // 4.2h
+        const fv = fogData[(Math.min(FOGN - 1, (e.y / FOGC) | 0) * FOGN + Math.min(FOGN - 1, (e.x / FOGC) | 0)) * 4] / 255; const seenK = 0.3 + 0.7 * fv; // nunca visto: apagado; à vista: aceso (antes brilhava no breu)
+        put(it, e.x, e.y, 0, 0, fitOf(e, g), 1, (dry ? 0.5 : 1) * (0.55 + 0.45 * fv), null, dry ? 0 : (0.3 + 0.7 * Math.sqrt(f)) * seenK);
+        if (!dry && nGlow < GLOW_CAP) { const low = f < 0.15; const pulse = low ? 0.55 + 0.45 * Math.sin(R.time * 6 + e.id) : 0.85 + 0.15 * Math.sin(R.time * 1.7 + e.id * 1.3); const k = (0.35 + 0.65 * Math.sqrt(f)) * pulse * seenK * (1 + 0.5 * R.night); const rad = e.r * (2 + 0.9 * f);
+          const hd = rad * 0.5, hx = (H(e.x + hd, e.y) - H(e.x - hd, e.y)) / (2 * hd), hy = (H(e.x, e.y + hd) - H(e.x, e.y - hd)) / (2 * hd); _nv.set(-hx, 1, hy).normalize(); _q.setFromUnitVectors(_up, _nv); // deitado no relevo (plano reto sumia na encosta da cratera)
+          _p.set(e.x, H(e.x, e.y) + 1.2, -e.y); _s.set(rad * 2, 1, rad * 2); _m.compose(_p, _q, _s); nodeGlow.setMatrixAt(nGlow, _m); _c.copy(RES_GLOW[e.res]).multiplyScalar(k); nodeGlow.setColorAt(nGlow++, _c); }
+        if (view.sel.has(e.id)) nSel = ring(nSel, e.x, e.y, e.r + 6); continue; }
       if (e.kind === 'rock') { const it = instOf('rocks', -1, e.seed % 6); put(it, e.x, e.y, 0, (e.seed % 8) * 0.8, fitOf(e, it.geo)); continue; }
       if (e.kind === 'crate') { if (!vis.has(e.id)) continue; const it = instOf('crate', -1, 0); put(it, e.x, e.y, 0, R.time, (2 * e.r * 1.6) / it.geo.width); continue; }
       if (e.kind === 'wreck') { if (!vis.has(e.id)) continue; const it = instOf('wreck', -1, 0); put(it, e.x, e.y, 0, e.ang || 0, fitOf(e, it.geo), 1, 0.6 + 0.4 * (e.max ? e.amount / e.max : 1)); if (sim.time - e.bornT < 25 && Math.random() < 0.25) { smoke(e.x, e.y, 6, [0.2, 0.2, 0.22], 1.6, 16); spark(e.x, e.y, 3, [1, 0.5, 0.2], 20, true); } if (view.sel.has(e.id)) nSel = ring(nSel, e.x, e.y, e.r + 6); continue; }
@@ -524,6 +540,7 @@ function create(canvas, overlay, mini) {
     if (view.ghost) { const gh = view.ghost; const d = S.BUILDINGS[gh.def]; const it = instOf(MD.PARTS[gh.def] ? MD.PARTS[gh.def].hull : gh.def, human, 0, true); put(it, gh.x, gh.y, 0, gh.ang || 0, 2 * d.r * 1.25 / it.geo.width, 1, gh.ok ? 1 : 0.5); nSel = ring(nSel, gh.x, gh.y, d.r + 4); if (d.territory && nRange < 32) { _p.set(gh.x, H(gh.x, gh.y) + 0.6, -gh.y); _s.set(d.territory, 1, d.territory); _q.identity(); _m.compose(_p, _q, _s); rangeRings.setMatrixAt(nRange++, _m); } }
     if (view.wallGhost && view.ghost) for (const g2 of view.wallGhost) { const it = instOf(view.ghost.def, human, 0, true); put(it, g2.x, g2.y, 0, g2.ang, 20 / it.geo.width, 1, g2.ok ? 1 : 0.5); }
     for (const it of R.inst.values()) { if (it.anim && it.n) { it.ia.needsUpdate = true; it.ic.needsUpdate = true; } it.main.count = it.n; it.main.instanceMatrix.needsUpdate = true; if (it.main.instanceColor) it.main.instanceColor.needsUpdate = true; if (it.em) { it.em.count = it.n; it.em.instanceMatrix.needsUpdate = true; if (it.em.instanceColor) it.em.instanceColor.needsUpdate = true; } }
+    nodeGlow.count = nGlow; nodeGlow.instanceMatrix.needsUpdate = true; if (nodeGlow.instanceColor) nodeGlow.instanceColor.needsUpdate = true; // 4.2h
     selRings.count = nSel; selRings.instanceMatrix.needsUpdate = true; vetRings.count = nVet; vetRings.instanceMatrix.needsUpdate = true; rangeRings.count = nRange; rangeRings.instanceMatrix.needsUpdate = true; shells.count = nShell; shells.instanceMatrix.needsUpdate = true;
     for (let i = nBul * 6; i < BL * 6; i++) blPos[i] = -9999; blGeo.attributes.position.needsUpdate = true; blGeo.setDrawRange(0, nBul * 2);
     // luzes pontuais: as mais próximas da câmera, à noite
@@ -575,7 +592,7 @@ function create(canvas, overlay, mini) {
     c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(mfog, 0, 0);
     // pontos: nós de recurso, construções (quadrados), unidades (pontos), memória de construções inimigas
     const px = Math.max(1, size / 92);
-    for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'node') { if (!view.reveal && !ex[Math.min(TILES - 1, (e.y / TILE) | 0) * TILES + Math.min(TILES - 1, (e.x / TILE) | 0)]) continue; const p = M(e.x, e.y); c.fillStyle = NODE_COLOR[e.res]; c.fillRect(p[0] - px * 0.8, p[1] - px * 0.8, px * 1.6, px * 1.6); continue; }
+    for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'node') { const seen = view.reveal || ex[Math.min(TILES - 1, (e.y / TILE) | 0) * TILES + Math.min(TILES - 1, (e.x / TILE) | 0)]; const p = M(e.x, e.y); c.globalAlpha = seen ? 1 : 0.4; resGlyph(c, e, p[0], p[1], px); c.globalAlpha = 1; continue; } // 4.2h
       if (e.kind !== 'unit' && e.kind !== 'building') continue; const own = e.owner === human; if (!(own || vis.has(e.id))) continue; const col = sim.players[e.owner].color; const p = M(e.x, e.y);
       if (e.kind === 'building') { const r = e.def === 'nucleo' ? px * 3.2 : px * 1.9; c.fillStyle = col; c.fillRect(p[0] - r, p[1] - r, r * 2, r * 2); c.strokeStyle = 'rgba(0,0,0,0.6)'; c.lineWidth = 1; c.strokeRect(p[0] - r, p[1] - r, r * 2, r * 2); }
       else { c.fillStyle = own ? col : rgba(col, 0.95); c.beginPath(); c.arc(p[0], p[1], own ? px * 1.05 : px * 1.2, 0, TAU); c.fill(); if (!own) { c.strokeStyle = 'rgba(0,0,0,0.7)'; c.lineWidth = 1; c.stroke(); } } }

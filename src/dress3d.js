@@ -32,15 +32,16 @@ function create(THREE, scene, opts) {
   };
   for (const k in g) g[k].computeVertexNormals();
   const mats = {
-    shard: mat({ color: 0xbfe6ff, roughness: 0.12, metalness: 0.1, emissive: 0x3f7fa0, emissiveIntensity: 0.25, flatShading: true }),
-    stone: mat({ color: 0xa3acb8, roughness: 0.85, flatShading: true }),
-    pebble: mat({ color: 0x77797e, roughness: 0.95, flatShading: true }),
-    boulder: mat({ color: 0x6d7077, roughness: 0.95, flatShading: true }),
+    shard: mat({ color: 0xdfe6ec, roughness: 0.3, metalness: 0.05, flatShading: true }), // 4.2h: gelo fosco sem brilho (azul aceso é só do Minério)
+    stone: mat({ color: 0xa8a29a, roughness: 0.85, flatShading: true }),
+    pebble: mat({ color: 0x7b756d, roughness: 0.95, flatShading: true }),
+    boulder: mat({ color: 0x6b645c, roughness: 0.95, flatShading: true }),
     tuft: mat({ color: 0x7d8f4f, roughness: 0.85, side: THREE.DoubleSide }, { wind: true }),
     shrub: mat({ color: 0x4f6a3d, roughness: 0.9, flatShading: true }, { wind: true }),
-    vent: mat({ color: 0x241f20, roughness: 0.9, emissive: 0x8a2a0c, emissiveIntensity: 0.35, flatShading: true }), // brasa discreta: rocha escura que mal brilha
+    vent: mat({ color: 0x241f20, roughness: 0.9, emissive: 0x3a0d06, emissiveIntensity: 0.2, flatShading: true }), // brasa discreta: rocha escura que mal brilha
     ash: mat({ color: 0x3a3537, roughness: 0.95, flatShading: true }),
   };
+  D.mats = mats; // 4.2h: o render3d põe estes materiais na curva da noite
   const SIZE = { shard: [3, 7], stone: [2.5, 5], pebble: [1.6, 3.8], boulder: [6, 11], tuft: [3, 6], shrub: [3, 6], vent: [4, 8], ash: [1.8, 3.4] };
   const COLJ = { shard: 0.12, stone: 0.08, pebble: 0.14, boulder: 0.1, tuft: 0.22, shrub: 0.18, vent: 0.1, ash: 0.1 };
   // posições determinísticas por tile
@@ -48,7 +49,7 @@ function create(THREE, scene, opts) {
   D.build = function (sim, H, density) {
     for (const m of D.meshes) { scene.remove(m.mesh); m.mesh.dispose(); } D.meshes = []; if (!density) return;
     const lists = {}; const TILE = 64, TILES = S.WORLD / TILE; const seed = sim.seed;
-    const blockers = sim.ents.filter(e => e.alive && (e.kind === 'node' || e.kind === 'rock')).map(e => ({ x: e.x, y: e.y, r: e.r + 10 }));
+    const blockers = sim.ents.filter(e => e.alive && (e.kind === 'node' || e.kind === 'rock')).map(e => ({ x: e.x, y: e.y, r: e.r + (e.kind === 'node' ? 30 : 10) })); // 4.2h: chão limpo em volta dos nós
     for (const p of sim.players) { const n = S.nucleoOf(sim, p.id); if (n) blockers.push({ x: n.x, y: n.y, r: 110 }); }
     for (let ty = 0; ty < TILES; ty++) for (let tx = 0; tx < TILES; tx++) {
       const ti = ty * TILES + tx; const b1 = S.BIOMES[sim.biome[ti]], b2 = S.BIOMES[sim.biome2[ti]]; const mix = sim.biomeMix[ti];

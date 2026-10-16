@@ -6,7 +6,7 @@
 :root{
   --bg:#0D0F13; --panel:rgba(20,23,29,.92); --panel2:#1C1F25; --line:#2E333B; --fg:#E8E2D6; --fg2:#A6A197;
   --rift1:#FF5E3A; --rift2:#B23CFF; --good:#7FE3A1; --warn:#F2C230; --bad:#FF6B6B;
-  --plasma:#FF8A5C; --minerio:#AFC2D6; --dados:#7FE3A1;
+  --plasma:#FF8A5C; --minerio:#7FD6FF; --dados:#7FE3A1;
   --fd:'Big Shoulders Display','Arial Narrow',Impact,sans-serif; --fb:'IBM Plex Sans',system-ui,sans-serif; --fm:'IBM Plex Mono',ui-monospace,monospace;
   color-scheme:dark;
 }
@@ -75,7 +75,8 @@ body.touch #chat{width:170px;bottom:calc(9.5rem + env(safe-area-inset-bottom,0))
 .rpill,.energy{display:flex;align-items:center;gap:.38rem;height:30px;padding:0 .6rem 0 .32rem;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 2px 6px rgba(0,0,0,.25)}
 .rpill b{font-weight:600;font-size:14px;color:#F1F4F8;letter-spacing:.01em;min-width:3.4ch;text-align:right;font-variant-numeric:tabular-nums}
 .rpill small{font-size:10px;min-width:4.2ch;color:var(--fg2);font-variant-numeric:tabular-nums}.rpill small.up{color:#7FE3A1}.rpill small.dn{color:#FF7A5C}
-.rpill.pl{border-color:rgba(255,120,60,.32);box-shadow:inset 0 0 14px rgba(255,106,61,.14),0 2px 6px rgba(0,0,0,.25)}.rpill.mi{border-color:rgba(160,185,210,.3);box-shadow:inset 0 0 14px rgba(143,163,184,.14),0 2px 6px rgba(0,0,0,.25)}.rpill.da{border-color:rgba(110,220,150,.3);box-shadow:inset 0 0 14px rgba(127,227,161,.13),0 2px 6px rgba(0,0,0,.25)}
+.rpill.pl{border-color:rgba(255,120,60,.32);box-shadow:inset 0 0 14px rgba(255,106,61,.14),0 2px 6px rgba(0,0,0,.25)}.rpill.mi{border-color:rgba(76,201,255,.34);box-shadow:inset 0 0 14px rgba(76,201,255,.15),0 2px 6px rgba(0,0,0,.25)}.rpill.mi .ri{filter:drop-shadow(0 0 4px rgba(76,201,255,.55))}
+.tchip.idle{border-color:rgba(242,194,48,.55);background:rgba(242,194,48,.12);color:#F7D774;cursor:pointer;font:inherit}.tchip.idle:hover{background:rgba(242,194,48,.2)}.tchip.idle[hidden]{display:none}.rpill.da{border-color:rgba(110,220,150,.3);box-shadow:inset 0 0 14px rgba(127,227,161,.13),0 2px 6px rgba(0,0,0,.25)}
 .ri{width:22px;height:22px;flex:none}.rpill.pl .ri{filter:drop-shadow(0 0 4px rgba(255,120,50,.55))}.rpill.da .ri{filter:drop-shadow(0 0 4px rgba(100,230,150,.45))}.energy .ri{filter:drop-shadow(0 0 4px rgba(242,194,48,.5))}
 .ri.sm{width:14px;height:14px;color:var(--fg2)}.ri.xs{width:13px;height:13px;vertical-align:-2px;margin-right:1px}
 .tchips{display:flex;gap:.35rem;align-items:center}.tchip{display:flex;align-items:center;gap:.3rem;height:26px;padding:0 .55rem;border-radius:7px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
@@ -309,7 +310,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
 <div id="start" class="screen">
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Versão 4.2g · build 2026-10-16 00:19Z · Engine gráfica 3 · caminhos livres · campanha destravada · multiplayer 2 a 4</div>
+    <div class="eyebrow">Versão 4.2h · build 2026-10-16 01:39Z · Engine gráfica 3 · minério à vista · caminhos livres · multiplayer 2 a 4</div>
     <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div><h1>Aether Rift<br><span>Dominion</span></h1></div></div>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -357,8 +358,9 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
     </div>
     <div class="notes">
       <div class="choose">Notas da versão</div>
+      <p class="start-notes"><b>4.2h — Minério à vista:</b> o <b>Minério virou cristal azul-elétrico com brilho próprio</b>, e azul aceso agora é só dele: pedras, gelo e ruínas do cenário perderam o brilho e as cores de recurso, e os lagos laranja decorativos saíram. Cada nó tem um <b>halo no chão</b> na cor do recurso, que encolhe conforme o nó esvazia e pisca quando está acabando; nó esgotado fica apagado. No radar cada recurso tem seu símbolo, do tamanho do que resta: <b>losango</b> para Minério, <b>hexágono</b> para Plasma e <b>triângulo</b> para Dados. Nós ainda não explorados aparecem apagados. Os recursos continuam finitos (cada nó tem uma quantidade fixa), mas agora o jogo <b>avisa quando o Minério ou o Plasma do seu território acaba</b> e aponta o campo livre mais perto. Um chip na barra mostra os <b>coletores parados</b> e seleciona todos com um clique. A partir dos 9 min surgem <b>veios de Minério</b> no meio do mapa a cada 3,5 min, longe das bases. A Tempestade de Éter passou a render 2× de verdade no Plasma, e o nó de Dados perto da base entra no território já na Era II.</p>
+      <details class="oldnotes"><summary>Histórico das versões anteriores (4.2g → 2.0)</summary>
       <p class="start-notes"><b>4.2g — Caminhos livres e campanha destravada:</b> correções pedidas pelos testes da campanha. As unidades <b>pararam de travar em muros e rochas</b>: veículos, coletores e infantaria contornam cristas de pedra e linhas de muro e passam pelos <b>Portões mesmo em muro na diagonal da tela</b>. Se o ponto clicado cai dentro de uma rocha, de um prédio ou da Fenda, elas param no ponto livre mais perto, e uma unidade que não consegue sair do lugar desiste em vez de empurrar para sempre. Coletores carregados acham o caminho até a Refinaria ou o Núcleo. Grupos grandes pesam menos: o grupo segue um caminho só até perto do destino. <b>Coletores mandados a outro lugar</b> (clique direito no chão ou num nó) colhem os nós em volta, mesmo fora do território, e entregam sozinhos; parado com carga, o coletor vai entregar. O clique direito num nó com coletores em cima vale como ordem de colher, e a seleção em caixa só deixa os coletores de fora quando o exército é maioria. Na <b>missão 6 (Roubo e contrarroubo)</b> o Pirata de qualquer Raça rouba. O Sifonador Erevane fica camuflado no caminho e só aparece quando começa a drenar, e o Pirata mandado de volta entrega ao chegar perto da Refinaria ou do Núcleo. Recuperar o próprio recurso numa caixa não conta como roubo, o inimigo sempre manda Piratas para o contrarroubo e as instruções dizem qual é o seu Pirata e onde atacar. <b>Salvar por cima</b> de um espaço ocupado voltou a funcionar (a confirmação ficava escondida atrás da janela), e <b>Sair</b> ou <b>Pausar e sair</b> levam ao início sem recomeçar a missão. Ctrl+S não manda as unidades pararem, e em telas de 1280 px a barra superior não fica embaixo do radar. O multiplayer pede esta mesma versão nos dois lados.</p>
-      <details class="oldnotes"><summary>Histórico das versões anteriores (4.2f → 2.0)</summary>
       <p class="start-notes"><b>4.2f — Barra nova, pausa clara e Tessara vilã:</b> rodada de ajustes pedida pelos testes. A <b>barra superior</b> foi refeita: Plasma, Minério e Fragmentos de Dados ganharam ícones desenhados (chama, bloco de minério e cristal de dados) em pílulas com a cor de cada recurso, e cada uma mostra quanto o recurso <b>subiu ou caiu por minuto</b> nos últimos 30 s. A Energia virou um medidor com raio e barra, e tempo, Era, reputação e inimigos viraram etiquetas com ícone. Os custos nos botões de construção usam os mesmos ícones. No celular a barra fica compacta. A <b>pausa ficou visível</b>: quando você troca de aba, o jogo continua pausando sozinho para nada se perder, mas agora mostra um painel <b>"Pausado"</b> explicando o motivo, com o botão <b>Continuar</b>. Um clique ou toque em qualquer lugar (ou P / ❚❚) volta a partida. Antes só aparecia um aviso rápido, e parecia que as unidades tinham travado. A <b>Tessara</b> (Sylva Oriel) ficou com cara de vilã: sobrancelhas em V, olhos semicerrados amarelo-tóxicos com pupila em fenda, órbitas escuras, espinhos no lugar das bochechas e um sorriso torto com presas. Vale para o busto 3D da tela inicial e da partida e para os retratos da campanha.</p>
       <p class="start-notes"><b>4.2e — Veteranos, avarias e épicos:</b> fecha a v4.2, a Engine gráfica 3. Unidades <b>Elite (★★)</b> ganham um anel dourado no chão, e as <b>Lendas (★★★)</b> fazem o anel pulsar e soltam faíscas douradas. Unidades muito feridas <b>soltam fumaça e faíscas</b>, e estruturas quase destruídas <b>pegam fogo</b>. Assim dá para ler a batalha sem abrir o painel. Os chefes da campanha ficaram mais imponentes. A <b>Catedral Errante</b> ganhou contrafortes de cristal, uma auréola de cristais que orbita o topo, estandartes de luz que balançam e uma faixa na cor do dono. A <b>Matriarca</b> ganhou sacos de ovos que brilham, veias acesas no abdômen e placas de carapaça no tórax. A luz curta das explosões ficou mais suave, para não estourar as unidades por perto.</p>
       <p class="start-notes"><b>4.2d — Mundo vestido e luz:</b> o chão ganhou vida por bioma. O gelo tem <b>cristais</b>, a rocha tem seixos e pedregulhos, a tundra tem <b>tufos de capim e arbustos que balançam ao vento</b> e o basalto tem cinza e brasas. Tudo some debaixo das estruturas e escurece na névoa de guerra, como o terreno. Cada base passa a ter <b>estradas de terra</b> ligando o Núcleo às suas estruturas, que crescem conforme você constrói. À noite, as luzes e janelas das estruturas <b>acendem</b>, os veículos ligam <b>faróis</b> que iluminam o chão à frente e <b>feixes de luz</b> sobem da Fenda. Uma <b>gradação de cor</b> suave acompanha o clima, a hora do dia e a sua Raça: mais quente no Vehnar, mais fria na Erevane, violeta no Coro. A quantidade de adereços segue a qualidade: Alta e Ultra têm mais, e no celular na qualidade Baixa eles ficam de fora.</p>
@@ -390,10 +392,11 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
 
 <svg id="ard-icons" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"><defs>
 <linearGradient id="g-pl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE59A"/><stop offset=".45" stop-color="#FF8A3D"/><stop offset="1" stop-color="#B8301A"/></linearGradient>
+<linearGradient id="g-mi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E2F8FF"/><stop offset=".45" stop-color="#4CC9FF"/><stop offset="1" stop-color="#1B6FA6"/></linearGradient>
 <linearGradient id="g-da" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#D2FFE0"/><stop offset=".5" stop-color="#5FD98A"/><stop offset="1" stop-color="#1A6E43"/></linearGradient>
 <linearGradient id="g-en" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF7B8"/><stop offset="1" stop-color="#F0AE2A"/></linearGradient>
 <symbol id="ic-plasma" viewBox="0 0 24 24"><path d="M12 1.6c3.3 4.1 6.6 7.5 6.6 12.1a6.6 6.6 0 0 1-13.2 0c0-2.6 1.3-4.7 3-6.5.2 1.8.9 3.1 2.1 3.7-.4-3.7.5-6.4 1.5-9.3z" fill="url(#g-pl)"/><path d="M12 11.4c1.5 1.8 2.6 3.2 2.6 4.9a2.6 2.6 0 0 1-5.2 0c0-1.7 1.2-3.1 2.6-4.9z" fill="#FFF4C8" opacity=".92"/></symbol>
-<symbol id="ic-minerio" viewBox="0 0 24 24"><path d="M12 2.4l8.6 5.1v9L12 21.6 3.4 16.5v-9z" fill="#4A5767"/><path d="M12 2.4l8.6 5.1L12 12 3.4 7.5z" fill="#C3D1DE"/><path d="M3.4 7.5L12 12v9.6l-8.6-5.1z" fill="#8396AA"/><path d="M12 12l8.6-4.5v9L12 21.6z" fill="#5C6E82"/><path d="M7.8 5.4l4.2 2.4 3.9-2.3" stroke="#F0F6FB" stroke-width=".9" fill="none" opacity=".75"/></symbol>
+<symbol id="ic-minerio" viewBox="0 0 24 24"><path d="M2.6 20.2l3.6-3.4 5.6 1 5.8-1.3 3.8 3.7-4.6 1.9H7.4z" fill="#3A404A"/><path d="M5.6 9.4l2.9 3.4-.3 5.2H5.1L4 13z" fill="url(#g-mi)"/><path d="M18.6 8.3l1.8 4.4-1.3 5.3h-3.2l.1-5.7z" fill="url(#g-mi)"/><path d="M12 1.8l3.4 5.7-1 10.6H9.6l-1-10.6z" fill="url(#g-mi)"/><path d="M12 1.8l-1.1 16.3h1.3z" fill="#EAFBFF" opacity=".6"/><path d="M6 10.6l-.6 7.4" stroke="#EAFBFF" stroke-width=".7" opacity=".5"/></symbol>
 <symbol id="ic-dados" viewBox="0 0 24 24"><path d="M12 1.6l7.3 10.4L12 22.4 4.7 12z" fill="url(#g-da)"/><path d="M12 1.6v20.8M4.7 12h14.6" stroke="#0E3A24" stroke-width=".7" opacity=".5"/><circle cx="12" cy="12" r="2.1" fill="#F0FFF5"/><path d="M8.3 8.6h2.2l1.5 1.5M15.7 15.4h-2.2L12 13.9" stroke="#F0FFF5" stroke-width=".9" fill="none"/></symbol>
 <symbol id="ic-energia" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.2" fill="none" stroke="#F2C230" stroke-width="1.4" opacity=".5"/><path d="M13.7 2.6L6.4 13.3h4.8l-1.5 8.1 7.9-11.4h-5z" fill="url(#g-en)" stroke="#7A4E08" stroke-width=".6" stroke-linejoin="round"/></symbol>
 <symbol id="ic-relogio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 6.8V12l3.6 2.2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></symbol>
@@ -407,7 +410,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
     <div id="top">
       <div class="res"><div class="rpill pl" title="Plasma · variação por minuto nos últimos 30 s"><svg class="ri"><use href="#ic-plasma"/></svg><b id="r-plasma">0</b><small id="rr-plasma"></small></div><div class="rpill mi" title="Minério · variação por minuto nos últimos 30 s"><svg class="ri"><use href="#ic-minerio"/></svg><b id="r-minerio">0</b><small id="rr-minerio"></small></div><div class="rpill da" title="Fragmentos de Dados · variação por minuto nos últimos 30 s"><svg class="ri"><use href="#ic-dados"/></svg><b id="r-dados">0</b><small id="rr-dados"></small></div></div>
       <div id="energy" class="energy pleno" title="Energia: produção / consumo"><svg class="ri"><use href="#ic-energia"/></svg><div class="egrid"><div class="row"><span id="e-text">0 / 0</span><span id="e-regime">Pleno</span></div><div class="bar"><i id="e-bar"></i></div></div></div>
-      <div class="tchips"><span class="tchip" title="Tempo de partida"><svg class="ri sm"><use href="#ic-relogio"/></svg><span id="clock">00:00</span></span><span id="era-badge" class="era e1">Era I</span><span class="tchip muted" title="Reputação"><svg class="ri sm"><use href="#ic-rep"/></svg><span id="rep">Neutro</span></span><span class="tchip muted" title="Inimigos ativos"><svg class="ri sm"><use href="#ic-inim"/></svg><b id="enemies">0</b></span></div>
+      <div class="tchips"><span class="tchip" title="Tempo de partida"><svg class="ri sm"><use href="#ic-relogio"/></svg><span id="clock">00:00</span></span><span id="era-badge" class="era e1">Era I</span><span class="tchip muted" title="Reputação"><svg class="ri sm"><use href="#ic-rep"/></svg><span id="rep">Neutro</span></span><span class="tchip muted" title="Inimigos ativos"><svg class="ri sm"><use href="#ic-inim"/></svg><b id="enemies">0</b></span><button class="tchip idle" id="idle-col" type="button" hidden title="Coletores parados: clique para selecionar"><svg class="ri sm"><use href="#ic-minerio"/></svg><b id="idle-n">0</b>&nbsp;parados</button></div>
       <div class="speed"><button data-speed="1" class="on">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button><button id="btn-pause" class="tb" title="Pausar (P)">❚❚</button><button id="btn-sound" class="tb" title="Som">♪</button><button id="btn-voice" class="tb" title="Voz do sistema">🗣</button><button id="btn-diplo" class="tb">Diplomacia</button><button id="btn-save" class="tb" title="Salvar partida (Ctrl+S)">💾</button><button id="btn-help" class="tb" title="Ajuda (H)">?</button><button id="btn-menu" class="tb" title="Sair">✕</button></div>
     </div>
     <div id="leader" hidden><div class="lframe"><img id="leader-img" class="lport" alt=""><div class="lscan"></div><img id="leader-badge" class="lbadge" alt="" hidden></div><div class="lname" id="leader-name"></div><div class="lsub" id="leader-sub">● em chamada</div></div>
@@ -503,6 +506,8 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
   <tr><td>Estruturas</td><td class="good">▲</td><td class="bad">▼</td><td class="good">▲</td><td>—</td><td class="bad">▼</td></tr>
   <tr><td>Suporte/Hack</td><td class="bad">▼</td><td class="good">▲</td><td class="bad">▼</td><td class="good">▲</td><td>—</td></tr></tbody></table>
   <p class="muted small">▲ Forte = 1,5× dano · ▼ Fraco = 0,65×. Vehnar: estruturas neutras contra veículos. Erevane: infantaria camuflada acerta 1,5× saindo da camuflagem.</p>
+  <h3>Recursos</h3>
+  <p class="small">Cada nó tem uma quantidade fixa e não volta. Minério é o cristal azul aceso, Plasma o laranja e Dados o verde; no radar aparecem como losango, hexágono e triângulo, e o halo no chão encolhe e pisca quando o nó está acabando. Nó esgotado fica apagado. Coletores colhem sozinhos no seu território; mandados com o botão direito, colhem em qualquer campo fora do território inimigo. A partir dos 9 min surgem <b>veios de Minério</b> no meio do mapa (aviso no canto). A Tempestade de Éter dobra o rendimento do Plasma dentro dela.</p>
   <h3>Roubo e diplomacia</h3>
   <p class="small">Piratas sifonam Refinarias e Reatores inimigos por até 40 s; a vítima recebe um Alerta com atraso de 3 a 5 s. Pirata morto com carga vira Caixa que qualquer um recolhe. Erevane rouba com +20% e sem deixar Rastro. Pactos de Não-agressão custam Caução de 150 Minério por lado; quebrar dá +20% de dano por 45 s, entrega sua Caução à vítima e derruba sua reputação.</p>
   <div class="row"><button class="btn" data-close>Fechar</button></div>
@@ -868,7 +873,7 @@ function generateMap(sim) {
     const ap = p.startAngle + Math.PI + (sim.rand() < 0.5 ? 1.5 : -1.5);
     addNode(sim, 'plasma', sx + DM.cos(ap) * 250, sy + DM.sin(ap) * 250, 1500);
     const ad = p.startAngle + (sim.rand() < 0.5 ? 1.1 : -1.1);
-    addNode(sim, 'dados', sx + DM.cos(ad) * 420, sy + DM.sin(ad) * 420, 350);
+    addNode(sim, 'dados', sx + DM.cos(ad) * 400, sy + DM.sin(ad) * 400, 350); // 4.2h: 400 (antes 420, bem na borda da Era II)
     // starting units
     for (let k = 0; k < 3; k++) {
       const u = addUnit(sim, p.id, 'coletor', sx + DM.cos(p.startAngle + Math.PI + k * 0.5) * 60, sy + DM.sin(p.startAngle + Math.PI + k * 0.5) * 60);
@@ -1033,18 +1038,21 @@ function rebuildNav(sim) {
     for (const w of sim.ents) { if (w === g || !w.alive || w.kind !== 'building' || w.owner !== g.owner || !BUILDINGS[w.def].wall) continue; const d = dist(w.x, w.y, g.x, g.y); if (d < d1) { d2 = d1; n2 = n1; d1 = d; n1 = w; } else if (d < d2) { d2 = d; n2 = w; } }
     let lx, ly; if (n1 && n2) { lx = n2.x - n1.x; ly = n2.y - n1.y; } else if (n1) { lx = g.x - n1.x; ly = g.y - n1.y; } else { lx = DM.cos(g.ang || 0); ly = DM.sin(g.ang || 0); }
     const ll = DM.hypot(lx, ly) || 1, L = 36; const nx = -ly / ll * L, ny = lx / ll * L;
-    cells4(g.x - nx, g.y - ny, g.x + nx, g.y + ny, i => { if (nav.blocked[i] && !hard[i] && wallOf[i] === g.owner && !nav.gates.has(i)) nav.gates.set(i, g.owner); });
+    const nnx = -ly / ll, nny = lx / ll; const mine = []; for (const w of sim.ents) if (w.alive && w.kind === 'building' && w.owner === g.owner && BUILDINGS[w.def].wall && dist(w.x, w.y, g.x, g.y) <= L + w.r + 7 + NAV * 1.5) mine.push(w);
+    cells4(g.x - nx, g.y - ny, g.x + nx, g.y + ny, i => { if (!nav.blocked[i] || hard[i] || wallOf[i] !== g.owner || nav.gates.has(i)) return; const cx = i % NW, cy = (i / NW) | 0;
+      for (const w of mine) { const qx = Math.max(cx * NAV, Math.min(w.x, (cx + 1) * NAV)), qy = Math.max(cy * NAV, Math.min(w.y, (cy + 1) * NAV)); if (dist(qx, qy, w.x, w.y) <= w.r + 7 && Math.abs((w.x - g.x) * nnx + (w.y - g.y) * nny) > 10) return; } // muro de outra linha cobre a célula
+      nav.gates.set(i, g.owner); });
   }
   for (const i of nav.gates.keys()) nav.blocked[i] = 0; // o portão vence os muros vizinhos
   sim.navDirty = false;
 }
 function cells4(x0, y0, x1, y1, fn) { // 4.2g: células cruzadas pelo segmento em sequência 4-conexa (DDA de Amanatides–Woo; só + − × ÷)
   let cx = clamp((x0 / NAV) | 0, 0, NW - 1), cy = clamp((y0 / NAV) | 0, 0, NW - 1); const ex = clamp((x1 / NAV) | 0, 0, NW - 1), ey = clamp((y1 / NAV) | 0, 0, NW - 1);
-  const dx = x1 - x0, dy = y1 - y0, sx = dx > 0 ? 1 : -1, sy = dy > 0 ? 1 : -1, ax = Math.abs(dx), ay = Math.abs(dy);
+  const dx = x1 - x0, dy = y1 - y0, sx = ex > cx ? 1 : -1, sy = ey > cy ? 1 : -1, ax = Math.abs(dx), ay = Math.abs(dy);
   const tdx = ax > 0 ? NAV / ax : Infinity, tdy = ay > 0 ? NAV / ay : Infinity;
   let tmx = ax > 0 ? (sx > 0 ? (cx + 1) * NAV - x0 : x0 - cx * NAV) / ax : Infinity, tmy = ay > 0 ? (sy > 0 ? (cy + 1) * NAV - y0 : y0 - cy * NAV) / ay : Infinity;
   fn(cy * NW + cx);
-  for (let k = 0; k < 4 * NW && (cx !== ex || cy !== ey); k++) { if (tmx < tmy) { cx += sx; tmx += tdx; } else { cy += sy; tmy += tdy; } if (cx < 0 || cy < 0 || cx >= NW || cy >= NW) break; fn(cy * NW + cx); }
+  for (let n = Math.abs(ex - cx) + Math.abs(ey - cy); n > 0; n--) { if (cx === ex) cy += sy; else if (cy === ey) cx += sx; else if (tmx < tmy) { cx += sx; tmx += tdx; } else { cy += sy; tmy += tdy; } fn(cy * NW + cx); }
 }
 function passArr(sim, owner) { // 4.2g: tabela de passagem do jogador (refeita a cada reconstrução da grade); um acesso por célula em vez de Map de portões
   const nav = sim.nav; if (!nav.pass) nav.pass = new Map(); let a = nav.pass.get(owner); if (a) return a;
@@ -1103,6 +1111,29 @@ function markExplored(sim) {
   }
 }
 function inStorm(sim, x, y) { const st = sim.storm; return !!(st && st.phase === 'active' && dist(x, y, st.x, st.y) <= st.r); }
+// 4.2h — veios de Minério: a partir dos 9 min, a cada 3,5 min um par de nós novos aparece no meio do mapa, longe dos Núcleos (o mapa secava antes dos 25 min)
+const VEIN = { first: 540, every: 210, amount: 1100 };
+function veinSpot(sim, x, y, nucs) {
+  if (x < 120 || y < 120 || x > WORLD - 120 || y > WORLD - 120 || dist(x, y, CX, CY) < RIFT_R + 120) return false;
+  for (const n of nucs) if (dist(x, y, n.x, n.y) < 520) return false;
+  for (const e of sim.ents) if (e.alive && (e.kind === 'building' || e.kind === 'rock' || e.kind === 'node') && dist(x, y, e.x, e.y) < e.r + 50) return false;
+  return !sim.nav.blocked[navIdx(x, y)];
+}
+function updateVeins(sim) {
+  if (sim.cfg && sim.cfg.noVeins) return;
+  if (sim.nextVein == null) sim.nextVein = Math.max(VEIN.first, sim.time + 60);
+  if (sim.time < sim.nextVein) return;
+  sim.nextVein = sim.time + VEIN.every;
+  const nucs = sim.ents.filter(e => e.alive && e.kind === 'building' && e.def === 'nucleo');
+  for (let k = 0; k < 24; k++) {
+    const a = sim.rand() * Math.PI * 2, rr = 520 + sim.rand() * 520; const x = CX + DM.cos(a) * rr, y = CY + DM.sin(a) * rr;
+    if (!veinSpot(sim, x, y, nucs)) continue;
+    const b = sim.rand() * Math.PI * 2; addNode(sim, 'minerio', x, y, VEIN.amount); const x2 = x + DM.cos(b) * 70, y2 = y + DM.sin(b) * 70; if (veinSpot(sim, x2, y2, nucs)) addNode(sim, 'minerio', x2, y2, VEIN.amount);
+    emit(sim, { t: 'vein', x, y });
+    for (const q of sim.players) if (q.alive) alertTo(sim, q.id, 'Veio de Minério exposto no meio do mapa', x, y, 'info');
+    return;
+  }
+}
 function updateStorm(sim, dt) {
   const st = sim.storm;
   if (!st) {
@@ -1748,8 +1779,9 @@ function updateUnit(sim, u, dt) {
       const n = sim.byId.get(u.node);
       if (!n || !n.alive || n.amount <= 0) { const m = pickNode(sim, u); if (m) u.node = m.id; else u.state = u.cargoTotal > 0 ? 'return' : 'idle'; break; }
       if (dist(u.x, u.y, n.x, n.y) <= u.r + n.r + 8) {
-        const take = Math.min(d.harvestRate * dt * (n.res === 'plasma' && inStorm(sim, n.x, n.y) ? 2 : 1), n.amount, d.capacity - u.cargoTotal);
-        n.amount -= take; u.cargo[n.res] += take; u.cargoTotal += take;
+        const k2 = n.res === 'plasma' && inStorm(sim, n.x, n.y) ? 2 : 1; // 4.2h: Tempestade rende 2× de verdade (o nó perde a metade do que entrega)
+        const take = Math.min(d.harvestRate * dt * k2, n.amount * k2, d.capacity - u.cargoTotal);
+        n.amount -= take / k2; u.cargo[n.res] += take; u.cargoTotal += take;
         if (u.cargoTotal >= d.capacity - 0.01 || n.amount <= 0) u.state = 'return';
       } else moveToward(sim, u, n.x, n.y, dt);
       break; }
@@ -1999,7 +2031,7 @@ function step(sim) {
   for (const e of sim.ents) if (e.kind !== 'node') { e.px = e.x; e.py = e.y; }
   if (sim.navDirty) rebuildNav(sim);
   rebuildGrid(sim);
-  updateStorm(sim, dt);
+  updateStorm(sim, dt); updateVeins(sim);
   const cmds = sim.cmdQueue; sim.cmdQueue = [];
   for (const c of cmds) processCommand(sim, c);
   for (const p of sim.players) {
@@ -2063,11 +2095,12 @@ function jsonBack(v) {
   if (typeof v.$n === 'string' && Object.keys(v).length === 1) return v.$n === '-0' ? -0 : Number(v.$n);
   const o = {}; for (const k of Object.keys(v)) o[k] = jsonBack(v[k]); return o;
 }
+function visDigest(sim) { let h = 0; for (let p = 0; p < sim.vis.length; p++) { h = (h * 31 + sim.vis[p].size) >>> 0; const ex = sim.explored[p]; if (ex) { let s = 0; for (let i = 0; i < ex.length; i++) s += ex[i]; h = (h * 31 + s) >>> 0; } } return h; } // 4.2h
 function snapshot(sim) {
   const nav = sim.nav;
   return { v: 1, hash: hash(sim), tick: sim.tick, time: sim.time, seed: sim.seed, nextId: sim.nextId, maxTime: sim.maxTime, rand: sim.rand.state(),
     ents: jsonSafe(sim.ents), players: jsonSafe(sim.players), cmdQueue: jsonSafe(sim.cmdQueue), pending: jsonSafe(sim.pending), result: jsonSafe(sim.result),
-    storm: jsonSafe(sim.storm), nextStorm: jsonSafe(sim.nextStorm), vis: sim.vis.map(st => [...st]), explored: sim.explored.map(b64),
+    storm: jsonSafe(sim.storm), nextStorm: jsonSafe(sim.nextStorm), nextVein: sim.nextVein == null ? null : sim.nextVein, digest: visDigest(sim), vis: sim.vis.map(st => [...st]), explored: sim.explored.map(b64),
     navDirty: !!sim.navDirty, nav: { blocked: b64(nav.blocked), gates: [...nav.gates], gatePos: [...nav.gatePos].map(([i, e]) => [i, e.id]), version: nav.version },
     auras: sim.auras ? sim.auras.map(a => ({ anchors: a.anchors.map(e => e.id), moldes: a.moldes.map(e => e.id), diapasoes: a.diapasoes.map(e => e.id) })) : null };
 }
@@ -2076,7 +2109,7 @@ function restore(sim, snap) {
   if (!snap || snap.v !== 1) throw new Error('salvamento em formato desconhecido');
   sim.tick = snap.tick; sim.time = snap.time; sim.seed = snap.seed; sim.nextId = snap.nextId; sim.maxTime = snap.maxTime; sim.rand.setState(snap.rand);
   sim.ents = jsonBack(snap.ents); sim.players = jsonBack(snap.players); sim.cmdQueue = jsonBack(snap.cmdQueue); sim.pending = jsonBack(snap.pending); sim.result = jsonBack(snap.result);
-  sim.storm = jsonBack(snap.storm); sim.nextStorm = jsonBack(snap.nextStorm); sim.vis = snap.vis.map(a => new Set(a)); sim.explored = snap.explored.map(unb64);
+  sim.storm = jsonBack(snap.storm); sim.nextStorm = jsonBack(snap.nextStorm); sim.nextVein = snap.nextVein == null ? undefined : snap.nextVein; /* 4.2h: salvamento antigo, o primeiro veio sai 60 s depois de retomar */ sim.vis = snap.vis.map(a => new Set(a)); sim.explored = snap.explored.map(unb64);
   sim.byId = new Map(); for (const e of sim.ents) sim.byId.set(e.id, e);
   const nav = sim.nav; nav.blocked = unb64(snap.nav.blocked); nav.gates = new Map(snap.nav.gates); nav.gatePos = new Map(snap.nav.gatePos.map(([i, id]) => [i, sim.byId.get(id)]).filter(x => x[1])); nav.fields = new Map(); nav.version = snap.nav.version; sim.navDirty = snap.navDirty;
   { const v0 = nav.version, nd = sim.navDirty; rebuildNav(sim); nav.version = v0; sim.navDirty = nd; } // 4.2g: refaz a grade (centros, donos de célula, corredores de portão) sem mudar versão nem o 'sujo'
@@ -2084,6 +2117,7 @@ function restore(sim, snap) {
   if (snap.auras) sim.auras = snap.auras.map(a => ({ anchors: a.anchors.map(id => sim.byId.get(id)).filter(Boolean), moldes: a.moldes.map(id => sim.byId.get(id)).filter(Boolean), diapasoes: a.diapasoes.map(id => sim.byId.get(id)).filter(Boolean) }));
   sim.events = []; sim._evRet = 0;
   const h = hash(sim); if (h !== snap.hash) console.warn('[ARD] retomada: hash ' + h + ' difere do salvo ' + snap.hash);
+  if (snap.digest != null && visDigest(sim) !== snap.digest) console.warn('[ARD] retomada: visão/exploração diferem do salvo'); // 4.2h
   return sim;
 }
 
@@ -2681,8 +2715,8 @@ function crystals(seed) {
 }
 function ore(seed) { // minério de liga: rochas com veios metálicos
   const m = M(); let r = (seed | 0) + 7; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; };
-  for (let i = 0; i < 5; i++) m.sphere(3 + rnd() * 8, 3 + rnd() * 8, 0.5 + rnd(), 2 + rnd() * 2.2, ['#6E7682', '#5A616B', '#7E8794'][i % 3]);
-  for (let i = 0; i < 10; i++) m.set(Math.floor(2 + rnd() * 10), Math.floor(2 + rnd() * 10), Math.floor(1 + rnd() * 3), '#AFC2D6', i % 3 === 0);
+  for (let i = 0; i < 4; i++) m.sphere(3 + rnd() * 8, 3 + rnd() * 8, 0.5 + rnd(), 1.8 + rnd() * 1.8, ['#3A3F48', '#454B55', '#30353D'][i % 3]); // 4.2h: rocha escura
+  for (let i = 0; i < 5; i++) crystal(m, 3 + rnd() * 8, 3 + rnd() * 8, 1, 1 + rnd() * 0.5, 4 + Math.floor(rnd() * 4), '#4CC9FF', '#CFF3FF'); // cristais azuis de núcleo aceso
   return m;
 }
 function datashards(seed) { // fragmentos de dados: lâminas verdes flutuando sobre um pedestal
@@ -2700,14 +2734,14 @@ const props = {
   quorith(seed) { const m = M(); const rnd = propRnd(seed); const h = 6 + Math.floor(rnd() * 5); for (let z = 0; z < h; z++) { const r = z < h / 2 ? 1 + z * 3 / h : 2.5 - (z - h / 2) * 3 / h; m.box(3 - Math.round(r), 3 - Math.round(r), z, Math.round(r) * 2 + 1, Math.round(r) * 2 + 1, 1, z > h * 0.6 ? '#d4b8ff' : '#b388ff', (x, y, zz, w, d) => Math.abs(x - (w - 1) / 2) + Math.abs(y - (d - 1) / 2) <= r); } m.box(3, 3, Math.floor(h / 2), 1, 1, 1, '#ffffff', null, true); if (rnd() > 0.5) m.box(0, 0, 0, 2, 2, 3, '#b388ff'); return m; },
   vorag(seed) { const m = M(); const rnd = propRnd(seed); m.sphere(2.5, 2.5, 1.5, 2, '#e8dcc8'); m.sphere(5.5, 4, 1.2, 1.6, '#e8dcc8'); m.sphere(3.5, 5.5, 1, 1.3, '#d8ccb8'); m.box(6, 1, 0, 1, 1, 5, '#e8dcc8'); m.box(3, 3, 3, 1, 1, 1, '#e6455a', null, true); return m; },
 };
-function rocks(seed) { const m = M(); let r = (seed | 0) + 11; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; }; for (let i = 0; i < 4; i++) m.sphere(3 + rnd() * 8, 3 + rnd() * 8, 0.5 + rnd(), 2 + rnd() * 2.5, ['#6E7682', '#5A616B', '#7E8794'][i % 3]); return m; }
+function rocks(seed) { const m = M(); let r = (seed | 0) + 11; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; }; for (let i = 0; i < 4; i++) m.sphere(3 + rnd() * 8, 3 + rnd() * 8, 0.5 + rnd(), 2 + rnd() * 2.5, ['#6B655E', '#57524C', '#7A736A'][i % 3]); return m; } // 4.2h: cinza quente, não a paleta do Minério
 function ruin(seed) { // ruínas da civilização pré-Colapso: pilares quebrados e um arco
   const m = M(); let r = (seed | 0) + 19; const rnd = () => { r = (r * 1103515245 + 12345) & 0x7fffffff; return r / 0x7fffffff; };
   const stone = ['#9A9CA4', '#7E8088', '#B0B2BA'];
   m.box(0, 0, 0, 14, 10, 1, '#6B6E76', (x, y) => rnd() > 0.15);
   for (let i = 0; i < 3; i++) { const x = 1 + Math.floor(rnd() * 11), y = 1 + Math.floor(rnd() * 7), h = 3 + Math.floor(rnd() * 7); m.box(x, y, 1, 2, 2, h, stone[i % 3], (a, b2, z) => !(z === h - 1 && rnd() < 0.5)); }
   m.box(2, 8, 1, 2, 2, 7, stone[0]); m.box(10, 8, 1, 2, 2, 7, stone[0]); m.box(2, 8, 8, 10, 2, 1, stone[1], (x) => x !== 5);
-  if (rnd() < 0.6) m.box(6, 3, 1, 1, 1, 2, green, null, true);
+  if (rnd() < 0.6) m.box(6, 3, 1, 1, 1, 2, lamp, null, true); // 4.2h: verde aceso é só dos Dados
   return m;
 }
 function crate() { const m = M(); m.box(0, 0, 0, 6, 6, 5, '#B8862B'); m.box(0, 2, 0, 6, 2, 5, '#6E4F16'); m.box(2, 0, 0, 2, 6, 5, '#6E4F16'); m.box(2, 2, 5, 2, 2, 1, yellow, null, true); return m; }
@@ -3201,13 +3235,16 @@ U.vorag = {
 const NEUTRAL = {
   plasma(K, seed) { const r = rng(seed + 3); K.rock(0, 0.3, 0, 3, '#3A2A2E', 'stone', { sy: 0.35, seed });
     for (let i = 0; i < 8; i++) { const a = r() * PI * 2, d = 0.6 + r() * 3, h = 3 + r() * 6, hot = r() < 0.55; K.prism(Math.cos(a) * d, 0.2, Math.sin(a) * d, 0.45 + r() * 0.5, h, 6, hot ? '#FF7A45' : '#C55CFF', 'crystal', { top: 0.12, rz: (r() - 0.5) * 0.6, rx: (r() - 0.5) * 0.6, e: hot ? 1.5 : 0 }); } },
-  minerio(K, seed) { const r = rng(seed + 7); for (let i = 0; i < 5; i++) K.rock((r() - 0.5) * 6, 0.6 + r(), (r() - 0.5) * 6, 1.6 + r() * 1.6, ['#6E7682', '#5A616B', '#7E8794'][i % 3], 'stone', { seed: seed + i, sy: 0.75 });
-    for (let i = 0; i < 9; i++) K.oct((r() - 0.5) * 6, 0.8 + r() * 1.6, (r() - 0.5) * 6, 0.35 + r() * 0.3, 1 + r() * 1.2, '#C9D8E8', 'metal', { rz: (r() - 0.5) * 1.4, rx: (r() - 0.5) * 1.4 }); },
+  // 4.2h: Minério de liga = rocha escura com cristais azul-elétrico de brilho próprio; azul aceso é exclusivo do Minério
+  minerio(K, seed) { const r = rng(seed + 7); for (let i = 0; i < 3; i++) K.rock((r() - 0.5) * 5, 0.4 + r() * 0.5, (r() - 0.5) * 5, 1.7 + r() * 1.2, ['#3A3F48', '#454B55', '#30353D'][i % 3], 'stone', { seed: seed + i, sy: 0.5 });
+    K.prism(0, 0.2, 0, 1.1, 7.5 + r() * 1.5, 6, '#4CC9FF', null, { top: 0.1, e: 1.7, rz: (r() - 0.5) * 0.25 });
+    for (let i = 0; i < 6; i++) { const a = i / 6 * PI * 2 + r() * 0.5, d = 1.5 + r() * 1.6; K.prism(Math.cos(a) * d, 0.2, Math.sin(a) * d, 0.45 + r() * 0.3, 2.4 + r() * 2.6, 6, i % 2 ? '#3FA9E0' : '#4CC9FF', i % 2 ? 'crystal' : null, i % 2 ? { top: 0.12, rz: -Math.cos(a) * 0.38, rx: Math.sin(a) * 0.38 } : { top: 0.12, e: 1.5 + r() * 0.4, rz: -Math.cos(a) * 0.38, rx: Math.sin(a) * 0.38 }); }
+    for (let i = 0; i < 3; i++) { const a = r() * PI * 2; K.seg([Math.cos(a) * 0.9, 0.5, Math.sin(a) * 0.9], [Math.cos(a) * 3, 0.9 + r() * 0.6, Math.sin(a) * 3], 0.09, '#4CC9FF', null, { e: 1.2 }); } },
   dados(K, seed) { const r = rng(seed + 11); K.rock(0, 0.2, 0, 2.6, '#33403A', 'stone', { sy: 0.3, seed }); K.tor(0, 1, 0, 2.6, 0.1, '#7FE3A1', null, { e: 2, ts: 24 });
     for (let i = 0; i < 5; i++) { const a = i / 5 * PI * 2 + r(); K.oct(Math.cos(a) * (0.8 + r() * 1.6), 1.6 + r() * 3, Math.sin(a) * (0.8 + r() * 1.6), 0.35 + r() * 0.25, 1.6 + r() * 1.6, '#7FE3A1', null, { e: 1.6 + r(), rz: (r() - 0.5) * 0.8 }); } },
   rocks(K, seed) { const r = rng(seed + 13); for (let i = 0; i < 4; i++) K.rock((r() - 0.5) * 7, 0.8 + i * 0.4, (r() - 0.5) * 7, 1.8 + r() * 2.2, ['#5D5A57', '#6B6560', '#4E4B49'][i % 3], 'stone', { seed: seed * 3 + i, sy: 0.7 + r() * 0.5, amp: 0.28 }); },
   ruin(K, seed) { const r = rng(seed + 17); for (let i = 0; i < 3; i++) K.box((r() - 0.5) * 7, 0, (r() - 0.5) * 7, 1.6, 3 + r() * 6, 1.6, '#8A8478', 'stone', { b: 0.15, rz: (r() - 0.5) * 0.35, rx: (r() - 0.5) * 0.35 });
-    K.box((r() - 0.5) * 4, 0, (r() - 0.5) * 4, 5, 0.9, 1.8, '#7A746A', 'stone', { b: 0.15, ry: r() * PI, rz: 0.12 }); for (let i = 0; i < 4; i++) K.rock((r() - 0.5) * 8, 0.3, (r() - 0.5) * 8, 0.5 + r() * 0.6, '#77716A', 'stone', { seed: seed + i }); K.light(0, 0.4, 0, 0.3, '#7FE3A1', 1.4); },
+    K.box((r() - 0.5) * 4, 0, (r() - 0.5) * 4, 5, 0.9, 1.8, '#7A746A', 'stone', { b: 0.15, ry: r() * PI, rz: 0.12 }); for (let i = 0; i < 4; i++) K.rock((r() - 0.5) * 8, 0.3, (r() - 0.5) * 8, 0.5 + r() * 0.6, '#77716A', 'stone', { seed: seed + i }); K.light(0, 0.4, 0, 0.3, '#FFE9C4', 0.9); }, // 4.2h: lâmpada morna; verde aceso é só dos Dados
   crate(K) { K.box(0, 0, 0, 6, 4.6, 5, '#B8862B', 'paint', { b: 0.35 }); for (const x of [-1.6, 1.6]) K.box(x, -0.05, 0, 0.5, 4.75, 5.12, '#4A3A20', 'dark'); K.box(0, 4.6, 0, 1.6, 0.3, 1.6, '#F2C230', null, { e: 1.6 }); },
   wreck(K) { K.box(0, 0, 0, 12, 2.4, 6, '#2A2624', 'dark', { b: 0.4, rz: 0.08, rx: 0.1 }); K.box(-1, 2.2, 0.4, 4.6, 1.6, 4, '#3A3430', 'dark', { b: 0.4, ry: 0.5, rz: -0.2 }); K.seg([1, 3, 0.2], [6.4, 1.2, 2.2], 0.36, '#1E1C1B', 'metal');
     for (let i = 0; i < 3; i++) K.light(-3 + i * 2.6, 2.4, (i - 1) * 1.6, 0.35, '#FF7A2E', 2); },
@@ -3880,7 +3917,7 @@ function prepare(id, o) {
     players.push({ name: e.name === 'auto' || swapped ? AI_NAMES[r][players.length % 3] : e.name, faction: r, difficulty: e.hard ? step[o.difficulty || 'normal'] : diff.ai, passive: !!e.passive, ally: !!e.ally }); }
   { const hostile = players.slice(1).filter(p => !p.passive).length; if (hostile >= 2) { const bonus = { facil: [700, 350], normal: [300, 150], dificil: [0, 0], fenda: [0, 0] }[o.difficulty || 'normal'] || [0, 0]; if (bonus[0]) { const m0 = players[0].mods = players[0].mods || {}; m0.startRes = Object.assign({}, m0.startRes); m0.startRes.minerio = (m0.startRes.minerio || 0) + bonus[0]; m0.startRes.plasma = (m0.startRes.plasma || 0) + bonus[1]; } } } // missões com vários inimigos ativos: reforço inicial no Fácil e no Normal
   const era = m.setup.era || (m.id === 'p1' || m.id === 'p2' ? 1 : 2); for (const pl of players) pl.era = era; // 4.1d: Era inicial da missão (todos começam iguais; a IA evolui sozinha)
-  return { mission: m, diff, difficulty: o.difficulty || 'normal', race, era, swap, cfg: { seed: m.setup.seed, players, minutes: (m.setup.minutes || 25) + (m.startTime ? Math.ceil(m.startTime / 60) : 0) } };
+  return { mission: m, diff, difficulty: o.difficulty || 'normal', race, era, swap, cfg: { seed: m.setup.seed, noVeins: m.act === 'prologo', players, minutes: (m.setup.minutes || 25) + (m.startTime ? Math.ceil(m.startTime / 60) : 0) } };
 }
 
 // ---------- executor ----------
@@ -4229,7 +4266,7 @@ const FINE = { veiculo_hull: 16, veiculo_turret: 16, torre_turret: 16, bastiao_t
 const facingsFor = def => FINE[def] || FACINGS;
 const BIOME_RGB = { gelo: [168, 186, 204], rocha: [104, 108, 116], tundra: [92, 110, 92], basalto: [58, 54, 60] };
 const BIOME_MINI = { gelo: '#5C6B7A', rocha: '#4A4E56', tundra: '#3E5242', basalto: '#2A262C' };
-const NODE_COLOR = { plasma: '#FF6A3D', minerio: '#8FA3B8', dados: '#7FE3A1' };
+const NODE_COLOR = { plasma: '#FF6A3D', minerio: '#4CC9FF', dados: '#7FE3A1' }; // 4.2h
 const NODE_MODEL = { plasma: 'crystals', minerio: 'ore', dados: 'datashards' };
 function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
 function rgba(h, a) { const c = hexToRgb(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
@@ -4447,10 +4484,11 @@ function create(canvas, mini) {
       const e = it.e; const own = e.owner === human;
       if (e.kind === 'node') {
         const sp = R.sprite(e.res, -1, 0, false, e.id % 4); const p = P(e.x, e.y, 0); const sc = fitOf(e, sp) * k / SV;
-        const g = c.createRadialGradient(p[0], p[1], 2, p[0], p[1], e.r * 1.6 * k); g.addColorStop(0, rgba(NODE_COLOR[e.res], 0.3)); g.addColorStop(1, rgba(NODE_COLOR[e.res], 0)); c.save(); c.translate(p[0], p[1]); c.scale(1, 0.5); c.fillStyle = g; c.beginPath(); c.arc(0, 0, e.r * 1.6 * k, 0, TAU); c.fill(); c.restore();
+        const f = e.max ? Math.max(0, e.amount) / e.max : 1, dry = e.amount <= 0; // 4.2h: halo pelo que resta, pulso lento, anel azul no gelo claro; seco não brilha
+        if (!dry) { const pul = f < 0.15 ? 0.55 + 0.45 * Math.sin(R.time * 6 + e.id) : 0.85 + 0.15 * Math.sin(R.time * 1.7 + e.id); const ga = (0.22 + 0.38 * Math.sqrt(f)) * pul; const rr = e.r * (1.8 + 0.8 * f) * k; const g = c.createRadialGradient(p[0], p[1], 2, p[0], p[1], rr); g.addColorStop(0, rgba(NODE_COLOR[e.res], ga)); g.addColorStop(1, rgba(NODE_COLOR[e.res], 0)); c.save(); c.translate(p[0], p[1]); c.scale(1, 0.5); c.fillStyle = g; c.beginPath(); c.arc(0, 0, rr, 0, TAU); c.fill(); c.restore(); c.strokeStyle = rgba(NODE_COLOR[e.res], 0.35 + 0.3 * pul * Math.sqrt(f)); c.lineWidth = 1.2; ellipse(c, p[0], p[1], e.r * 1.6 * k); c.stroke(); }
         if (view.sel.has(e.id)) { c.strokeStyle = 'rgba(255,255,255,0.8)'; c.lineWidth = 1.5; ellipse(c, p[0], p[1], (e.r + 6) * k); c.stroke(); }
-        drawSprite(c, sp, p[0], p[1], 0, sc, k, 1);
-        for (const l of sp.lights) lights.push({ x: p[0] - sp.ax * sc + l.x * sc, y: p[1] - sp.ay * sc + l.y * sc, r: 12 * z, c: l.c, a: 0.5 });
+        drawSprite(c, sp, p[0], p[1], 0, sc, k, dry ? 0.45 : 1);
+        if (!dry) for (const l of sp.lights) lights.push({ x: p[0] - sp.ax * sc + l.x * sc, y: p[1] - sp.ay * sc + l.y * sc, r: 12 * z, c: l.c, a: 0.5 });
         continue;
       }
       if (e.kind === 'rock') { const sp = R.sprite('rocks', -1, 0, false, e.seed % 6); const p = P(e.x, e.y, 0); c.fillStyle = 'rgba(0,0,0,0.3)'; ellipse(c, p[0] + 4, p[1] + 1, e.r * 1.4 * k); c.fill(); drawSprite(c, sp, p[0], p[1], 0, (2 * e.r * 1.9 / sp.fw) * k / SV, k, 1); continue; }
@@ -4535,7 +4573,7 @@ function create(canvas, mini) {
     } else if (lights.length) { c.save(); c.globalCompositeOperation = 'lighter'; for (const l of lights) { if (l.a < 0.6) continue; const g = c.createRadialGradient(l.x, l.y, 0, l.x, l.y, l.r); g.addColorStop(0, rgba(l.c, 0.5)); g.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = g; c.beginPath(); c.arc(l.x, l.y, l.r, 0, TAU); c.fill(); } c.restore(); }
     if (R.lightning > 0) { c.fillStyle = `rgba(200,190,255,${0.25 * R.lightning})`; c.fillRect(0, 0, W, H); }
     c.save(); c.translate(shx, shy);
-    for (const e of sim.ents) { if (!e.alive || e.kind !== 'node' || !inView(e.x, e.y, 40)) continue; let seen = false; for (const o of sim.ents) { if (o.alive && o.owner === human && (o.kind === 'unit' || o.kind === 'building') && S.dist(o.x, o.y, e.x, e.y) <= S.sensorRadius(sim, o)) { seen = true; break; } } if (seen) continue; const sp = R.sprite(e.res, -1, 0, false, e.id % 4); const p = P(e.x, e.y, 0); drawSprite(c, sp, p[0], p[1], 0, fitOf(e, sp) * k / SV, k, 0.3); }
+    for (const e of sim.ents) { if (!e.alive || e.kind !== 'node' || e.amount <= 0 || !inView(e.x, e.y, 40)) continue; let seen = false; for (const o of sim.ents) { if (o.alive && o.owner === human && (o.kind === 'unit' || o.kind === 'building') && S.dist(o.x, o.y, e.x, e.y) <= S.sensorRadius(sim, o)) { seen = true; break; } } if (seen) continue; const sp = R.sprite(e.res, -1, 0, false, e.id % 4); const p = P(e.x, e.y, 0); drawSprite(c, sp, p[0], p[1], 0, fitOf(e, sp) * k / SV, k, 0.3); }
     for (const f of R.fx.floats) { const kk = f.t / f.life; const p = P(f.x, f.y, 10); c.fillStyle = rgba(f.col, 1 - kk); c.font = 'bold 13px IBM Plex Mono, monospace'; c.textAlign = 'center'; c.fillText(f.text, p[0], p[1] - kk * 30); }
     for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || e.def !== 'reator' || !e.built || e.owner === human || !S.FACTIONS[sim.players[e.owner].faction].smoke || !inView(e.x, e.y, 60)) continue; const p = P(e.x, e.y, e.r * 1.2); c.fillStyle = 'rgba(190,190,200,0.45)'; for (let i = 0; i < 3; i++) { const ph = (R.time * 0.4 + i / 3 + e.id * 0.1) % 1; c.beginPath(); c.arc(p[0] + 6 + Math.sin(R.time + i) * 6, p[1] - 6 - ph * 40 * z, (4 + ph * 8) * z, 0, TAU); c.fill(); } }
     c.restore();
@@ -4549,12 +4587,12 @@ function create(canvas, mini) {
     const c = mctx; const size = mini.width; const human = view.human; const vis = view.reveal ? { has: () => true } : sim.vis[human]; const m = miniM(); const ex = sim.explored[human];
     const M = (x, y) => R.worldToMini(x, y);
     c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#0B0D11'; c.fillRect(0, 0, size, size);
-    if (!R.miniBase || R.miniBase.width !== size) { const mb = document.createElement('canvas'); mb.width = size; mb.height = size; const bc = mb.getContext('2d'); const tm = TILE * m; for (let ty = 0; ty < TILES; ty++) for (let tx = 0; tx < TILES; tx++) { const kind = tileKind(tx, ty); if (!kind) continue; const p = M((tx + 0.5) * TILE, (ty + 0.5) * TILE); bc.fillStyle = BIOME_MINI[kind] || '#15181F'; diamond(bc, p[0], p[1], tm + 0.6, tm * 0.5 + 0.6); bc.fill(); } for (const e of sim.ents) if (e.alive && e.kind === 'rock') { const p = M(e.x, e.y); bc.fillStyle = '#8A9098'; bc.fillRect(p[0] - 1, p[1] - 1, 2, 2); } R.miniBase = mb; }
+    if (!R.miniBase || R.miniBase.width !== size) { const mb = document.createElement('canvas'); mb.width = size; mb.height = size; const bc = mb.getContext('2d'); const tm = TILE * m; for (let ty = 0; ty < TILES; ty++) for (let tx = 0; tx < TILES; tx++) { const kind = tileKind(tx, ty); if (!kind) continue; const p = M((tx + 0.5) * TILE, (ty + 0.5) * TILE); bc.fillStyle = BIOME_MINI[kind] || '#15181F'; diamond(bc, p[0], p[1], tm + 0.6, tm * 0.5 + 0.6); bc.fill(); } for (const e of sim.ents) if (e.alive && e.kind === 'rock') { const p = M(e.x, e.y); bc.fillStyle = '#4E5156'; /* 4.2h: rocha escura, longe do azul do Minério */ bc.fillRect(p[0] - 1, p[1] - 1, 2, 2); } R.miniBase = mb; }
     c.drawImage(R.miniBase, 0, 0);
     { const p = M(S.CX, S.CY); c.fillStyle = 'rgba(255,94,58,0.35)'; c.beginPath(); c.ellipse(p[0], p[1], S.RIFT_R * 2 * m, S.RIFT_R * m, 0, 0, TAU); c.fill(); c.fillStyle = '#05040A'; c.beginPath(); c.ellipse(p[0], p[1], S.RIFT_R * m, S.RIFT_R * m * 0.5, 0, 0, TAU); c.fill(); }
     for (const e of sim.ents) {
       if (!e.alive) continue;
-      if (e.kind === 'node') { const p = M(e.x, e.y); c.fillStyle = NODE_COLOR[e.res]; c.fillRect(p[0] - 1.5, p[1] - 1.5, 3, 3); continue; }
+      if (e.kind === 'node') { const p = M(e.x, e.y); resGlyph(c, e, p[0], p[1], 1.9); continue; } // 4.2h
       if (e.kind !== 'unit' && e.kind !== 'building') continue;
       const own = e.owner === human; if (!(own || vis.has(e.id))) continue;
       const col = sim.players[e.owner].color; const p = M(e.x, e.y);
@@ -4575,7 +4613,15 @@ function create(canvas, mini) {
   }
   return R;
 }
-ARD.render = { create, NODE_COLOR, rgba, shade, K };
+function resGlyph(c, e, x, y, px) { // 4.2h: mesmo símbolo do radar 3D (losango Minério, hexágono Plasma, triângulo Dados; seco = anel cinza)
+  if (e.amount <= 0) { c.strokeStyle = 'rgba(150,150,150,0.55)'; c.lineWidth = 1; c.beginPath(); c.arc(x, y, px * 0.8, 0, TAU); c.stroke(); return; }
+  const s = px * (0.85 + 0.75 * Math.sqrt(e.max ? e.amount / e.max : 1)); c.beginPath();
+  if (e.res === 'minerio') { c.moveTo(x, y - s * 1.15); c.lineTo(x + s, y); c.lineTo(x, y + s * 1.15); c.lineTo(x - s, y); }
+  else if (e.res === 'plasma') { for (let i = 0; i < 6; i++) { const a = i / 6 * TAU + Math.PI / 6; if (i) c.lineTo(x + Math.cos(a) * s, y + Math.sin(a) * s); else c.moveTo(x + Math.cos(a) * s, y + Math.sin(a) * s); } }
+  else { c.moveTo(x, y - s); c.lineTo(x + s, y + s * 0.8); c.lineTo(x - s, y + s * 0.8); }
+  c.closePath(); c.fillStyle = NODE_COLOR[e.res]; c.strokeStyle = 'rgba(0,0,0,0.8)'; c.lineWidth = 1; c.stroke(); c.fill();
+}
+ARD.render = { create, NODE_COLOR, rgba, shade, K, resGlyph };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Aether Rift: Dominion — efeitos 3D na GPU (4.2c).
@@ -4730,15 +4776,16 @@ function create(THREE, scene, opts) {
   };
   for (const k in g) g[k].computeVertexNormals();
   const mats = {
-    shard: mat({ color: 0xbfe6ff, roughness: 0.12, metalness: 0.1, emissive: 0x3f7fa0, emissiveIntensity: 0.25, flatShading: true }),
-    stone: mat({ color: 0xa3acb8, roughness: 0.85, flatShading: true }),
-    pebble: mat({ color: 0x77797e, roughness: 0.95, flatShading: true }),
-    boulder: mat({ color: 0x6d7077, roughness: 0.95, flatShading: true }),
+    shard: mat({ color: 0xdfe6ec, roughness: 0.3, metalness: 0.05, flatShading: true }), // 4.2h: gelo fosco sem brilho (azul aceso é só do Minério)
+    stone: mat({ color: 0xa8a29a, roughness: 0.85, flatShading: true }),
+    pebble: mat({ color: 0x7b756d, roughness: 0.95, flatShading: true }),
+    boulder: mat({ color: 0x6b645c, roughness: 0.95, flatShading: true }),
     tuft: mat({ color: 0x7d8f4f, roughness: 0.85, side: THREE.DoubleSide }, { wind: true }),
     shrub: mat({ color: 0x4f6a3d, roughness: 0.9, flatShading: true }, { wind: true }),
-    vent: mat({ color: 0x241f20, roughness: 0.9, emissive: 0x8a2a0c, emissiveIntensity: 0.35, flatShading: true }), // brasa discreta: rocha escura que mal brilha
+    vent: mat({ color: 0x241f20, roughness: 0.9, emissive: 0x3a0d06, emissiveIntensity: 0.2, flatShading: true }), // brasa discreta: rocha escura que mal brilha
     ash: mat({ color: 0x3a3537, roughness: 0.95, flatShading: true }),
   };
+  D.mats = mats; // 4.2h: o render3d põe estes materiais na curva da noite
   const SIZE = { shard: [3, 7], stone: [2.5, 5], pebble: [1.6, 3.8], boulder: [6, 11], tuft: [3, 6], shrub: [3, 6], vent: [4, 8], ash: [1.8, 3.4] };
   const COLJ = { shard: 0.12, stone: 0.08, pebble: 0.14, boulder: 0.1, tuft: 0.22, shrub: 0.18, vent: 0.1, ash: 0.1 };
   // posições determinísticas por tile
@@ -4746,7 +4793,7 @@ function create(THREE, scene, opts) {
   D.build = function (sim, H, density) {
     for (const m of D.meshes) { scene.remove(m.mesh); m.mesh.dispose(); } D.meshes = []; if (!density) return;
     const lists = {}; const TILE = 64, TILES = S.WORLD / TILE; const seed = sim.seed;
-    const blockers = sim.ents.filter(e => e.alive && (e.kind === 'node' || e.kind === 'rock')).map(e => ({ x: e.x, y: e.y, r: e.r + 10 }));
+    const blockers = sim.ents.filter(e => e.alive && (e.kind === 'node' || e.kind === 'rock')).map(e => ({ x: e.x, y: e.y, r: e.r + (e.kind === 'node' ? 30 : 10) })); // 4.2h: chão limpo em volta dos nós
     for (const p of sim.players) { const n = S.nucleoOf(sim, p.id); if (n) blockers.push({ x: n.x, y: n.y, r: 110 }); }
     for (let ty = 0; ty < TILES; ty++) for (let tx = 0; tx < TILES; tx++) {
       const ti = ty * TILES + tx; const b1 = S.BIOMES[sim.biome[ti]], b2 = S.BIOMES[sim.biome2[ti]]; const mix = sim.biomeMix[ti];
@@ -4807,7 +4854,15 @@ const NODE_MODEL = { plasma: 'crystals', minerio: 'ore', dados: 'datashards' };
 const USE_MESH = !!ME && new URLSearchParams(location.search).get('malhas') !== '0';
 if (ME && matchMedia('(pointer: coarse)').matches) ME.setLod(0.6); // celular: menos segmentos por modelo
 const DBG_OFF = new Set((new URLSearchParams(location.search).get('sem') || '').split(',')); // diagnóstico: ?sem=ceu,horizonte,relevo,detalhe
-const NODE_COLOR = { plasma: '#FF6A3D', minerio: '#8FA3B8', dados: '#7FE3A1' };
+const NODE_COLOR = { plasma: '#FF6A3D', minerio: '#4CC9FF', dados: '#7FE3A1' }; // 4.2h: Minério azul-elétrico
+function resGlyph(c, e, x, y, px) { // 4.2h: símbolo de recurso no radar, diferente dos de unidade (círculo) e estrutura (quadrado)
+  if (e.amount <= 0) { c.strokeStyle = 'rgba(150,150,150,0.55)'; c.lineWidth = Math.max(1, px * 0.35); c.beginPath(); c.arc(x, y, px * 0.75, 0, Math.PI * 2); c.stroke(); return; }
+  const s = px * (0.85 + 0.75 * Math.sqrt(e.max ? e.amount / e.max : 1)); c.beginPath();
+  if (e.res === 'minerio') { c.moveTo(x, y - s * 1.15); c.lineTo(x + s, y); c.lineTo(x, y + s * 1.15); c.lineTo(x - s, y); }
+  else if (e.res === 'plasma') { for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + Math.PI / 6; if (i) c.lineTo(x + Math.cos(a) * s, y + Math.sin(a) * s); else c.moveTo(x + Math.cos(a) * s, y + Math.sin(a) * s); } }
+  else { c.moveTo(x, y - s); c.lineTo(x + s, y + s * 0.8); c.lineTo(x - s, y + s * 0.8); }
+  c.closePath(); c.fillStyle = NODE_COLOR[e.res]; c.strokeStyle = 'rgba(0,0,0,0.8)'; c.lineWidth = Math.max(1, px * 0.45); c.stroke(); c.fill();
+}
 const BIOME_RGB = { gelo: [0.66, 0.73, 0.8], rocha: [0.41, 0.42, 0.45], tundra: [0.36, 0.43, 0.36], basalto: [0.23, 0.21, 0.24] };
 const BIOME_MINI = { gelo: '#5C6B7A', rocha: '#4A4E56', tundra: '#3E5242', basalto: '#2A262C' };
 function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
@@ -4967,12 +5022,7 @@ function create(canvas, overlay, mini) {
     } catch (err) { console.warn('[ARD] céu/horizonte indisponível: ' + err.message); } }
     // Fenda: anel emissivo e luz
     const ring = new THREE.Mesh(new THREE.TorusGeometry(S.RIFT_R * 0.9, 6, 8, 48), new THREE.MeshBasicMaterial({ color: new THREE.Color(2.6, 1.0, 0.5) })); ring.rotation.x = Math.PI / 2; ring.position.set(S.CX, H(S.CX, S.CY) + 4, -S.CY); scene.add(ring);
-    // lagos de plasma no anel de basalto (só visuais)
-    const poolMat = new THREE.ShaderMaterial({ uniforms: { uTime: { value: 0 } }, transparent: true, depthWrite: false,
-      vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-      fragmentShader: 'uniform float uTime; varying vec2 vUv; float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); } float n(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f); return mix(mix(h(i), h(i+vec2(1,0)), f.x), mix(h(i+vec2(0,1)), h(i+vec2(1,1)), f.x), f.y); } void main(){ vec2 c = vUv - 0.5; float d = length(c) * 2.0; float v = n(vUv * 6.0 + uTime * 0.15) * 0.6 + n(vUv * 14.0 - uTime * 0.25) * 0.4; vec3 col = mix(vec3(2.4, 0.55, 0.25), vec3(1.6, 0.35, 2.2), smoothstep(0.35, 0.75, v)); float a = smoothstep(1.0, 0.72, d); gl_FragColor = vec4(col * (0.8 + 0.5 * v), a); }' });
-    R.poolMat = poolMat;
-    for (let i = 0; i < 6; i++) { const a = (i / 6) * TAU + 0.35, rr = 390 + (i % 2) * 110; const px = S.CX + Math.cos(a) * rr, py = S.CY + Math.sin(a) * rr; if (sim.ents.some(e => e.alive && e.kind === 'node' && S.dist(e.x, e.y, px, py) < 90)) continue; const pool = new THREE.Mesh(new THREE.CircleGeometry(28 + (i % 3) * 10, 32).rotateX(-Math.PI / 2), poolMat); pool.position.set(px, H(px, py) + 0.9, -py); scene.add(pool); const pl = new THREE.PointLight(0xff7a40, 0, 160, 2); pl.position.set(px, H(px, py) + 12, -py); scene.add(pl); R.poolLights.push(pl); }
+    // 4.2h: os lagos de plasma decorativos saíram (pareciam nós de Plasma, brilhavam no breu e custavam 6 luzes)
     // névoa volumétrica barata: sprites aditivos na cratera da Fenda e na Tempestade
     const mistCv = document.createElement('canvas'); mistCv.width = 128; mistCv.height = 128; const mc = mistCv.getContext('2d'); const g = mc.createRadialGradient(64, 64, 4, 64, 64, 64); g.addColorStop(0, 'rgba(255,255,255,0.55)'); g.addColorStop(0.5, 'rgba(255,255,255,0.18)'); g.addColorStop(1, 'rgba(255,255,255,0)'); mc.fillStyle = g; mc.fillRect(0, 0, 128, 128);
     const mistTex = new THREE.CanvasTexture(mistCv); mistTex.colorSpace = THREE.SRGBColorSpace;
@@ -4988,6 +5038,7 @@ function create(canvas, overlay, mini) {
   }
   // ---------- geometrias e instancing ----------
   const envMats = []; // materiais que refletem o ambiente; a intensidade cai à noite
+  if (DR && DR.mats) for (const k in DR.mats) { DR.mats[k].userData.env = 1; envMats.push(DR.mats[k]); } // 4.2h: adereços escurecem à noite como o resto (antes ficavam mais claros que os nós)
   const mkMat = (o, base) => { const m = USE_MESH ? ME.material(o) : new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.82, metalness: 0.12 }); m.userData.env = base == null ? (o.env || 0.5) : base; envMats.push(m); return m; };
   const matMain = mkMat({ env: 0.45, key: 'neutro' });
   const depthAnim = ME && ME.animShader ? (() => { const d = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }); d.onBeforeCompile = sh => ME.animShader(sh); d.defaultAttributeValues = Object.assign({}, d.defaultAttributeValues, ME.ANIM_DEFAULTS); d.customProgramCacheKey = () => 'ard-depth-anim'; return d; })() : null; // 4.2b: sombras acompanham as peças animadas
@@ -5036,12 +5087,12 @@ function create(canvas, overlay, mini) {
   function animAttr(it, cap) { const old = it.ia, oldC = it.ic; const a = new THREE.InstancedBufferAttribute(new Float32Array(cap * 4), 4); a.setUsage(THREE.DynamicDrawUsage); if (old) a.array.set(old.array.subarray(0, Math.min(old.array.length, cap * 4))); const c = new THREE.InstancedBufferAttribute(new Float32Array(cap), 1); c.setUsage(THREE.DynamicDrawUsage); if (oldC) c.array.set(oldC.array.subarray(0, Math.min(oldC.array.length, cap))); it.ia = a; it.ic = c; for (const gg of [it.geo.main, it.geo.em]) if (gg) { gg.setAttribute('aInst', a); gg.setAttribute('aInstC', c); } } // 4.2b: distância, tempo, movimento e recuo por instância
   function grow(it) { const cap = it.cap * 2; if (it.anim) animAttr(it, cap); for (const k of ['main', 'em']) { const old = it[k]; if (!old) continue; const m = new THREE.InstancedMesh(old.geometry, old.material, cap); m.frustumCulled = false; m.castShadow = old.castShadow; m.receiveShadow = old.receiveShadow; if (old.customDepthMaterial) m.customDepthMaterial = old.customDepthMaterial; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.remove(old); old.dispose(); scene.add(m); it[k] = m; } it.cap = cap; }
   const ZERO4 = [0, 0, 0, 0];
-  function put(it, x, y, z, ang, scale, scaleY, tint, ia) {
+  function put(it, x, y, z, ang, scale, scaleY, tint, ia, emTint) { // 4.2h: emTint = brilho da parte emissiva (nó secando apaga)
     if (it.n >= it.cap) grow(it);
     if (it.anim) { const v = ia || ZERO4; const o = it.n * 4; it.ia.array[o] = v[0]; it.ia.array[o + 1] = v[1]; it.ia.array[o + 2] = v[2]; it.ia.array[o + 3] = v[3]; it.ic.array[it.n] = v[4] || 0; }
     _p.set(x, H(x, y) + (z || 0), -y); _q.setFromAxisAngle(UP, ang || 0); _s.set(scale, scale * (scaleY == null ? 1 : scaleY), scale); _m.compose(_p, _q, _s);
     it.main.setMatrixAt(it.n, _m); _c.setScalar(tint == null ? 1 : tint); it.main.setColorAt(it.n, _c);
-    if (it.em) { it.em.setMatrixAt(it.n, _m); it.em.setColorAt(it.n, _c); }
+    if (it.em) { it.em.setMatrixAt(it.n, _m); if (emTint != null) _c.setScalar(emTint); it.em.setColorAt(it.n, _c); }
     it.n++;
   }
   function fitOf(e, g) { const foot = e.kind === 'node' ? 2 * e.r * 1.2 * (0.55 + 0.45 * (e.max ? e.amount / e.max : 1)) : e.kind === 'wreck' ? 2 * e.r * 1.3 : e.kind === 'rock' ? 2 * e.r * 1.9 : 2 * e.r * 1.25; return foot / g.width; }
@@ -5150,6 +5201,11 @@ function create(canvas, overlay, mini) {
   const decalGeo = new THREE.CircleGeometry(1, 18); decalGeo.rotateX(-Math.PI / 2); const decals = new THREE.InstancedMesh(decalGeo, new THREE.MeshBasicMaterial({ color: 0x0b0908, transparent: true, opacity: 0.55, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }), 160); decals.count = 0; decals.frustumCulled = false; scene.add(decals); const decalList = [];
   const ringGeo = new THREE.RingGeometry(0.82, 1, 28); ringGeo.rotateX(-Math.PI / 2); const selRings = new THREE.InstancedMesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 }), 256); selRings.count = 0; selRings.frustumCulled = false; scene.add(selRings);
   const vetRings = new THREE.InstancedMesh(new THREE.RingGeometry(0.84, 1, 28).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.5, 1.12, 0.35), transparent: true, opacity: 0.7, depthWrite: false, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -3 }), 256); vetRings.count = 0; vetRings.frustumCulled = false; scene.add(vetRings); // 4.2e: veteranos
+  // 4.2h: halo de recurso no chão (cor do recurso, pulso lento, tamanho e brilho pelo que resta; deitado no relevo); um draw call para todos os nós
+  const glowTex = (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 64; const gc = cv.getContext('2d'); const gr = gc.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.3, 'rgba(255,255,255,0.6)'); gr.addColorStop(0.65, 'rgba(255,255,255,0.16)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); gc.fillStyle = gr; gc.fillRect(0, 0, 64, 64); const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+  const GLOW_CAP = 160; const nodeGlow = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 }), GLOW_CAP);
+  nodeGlow.setColorAt(0, new THREE.Color(0, 0, 0)); nodeGlow.count = 0; nodeGlow.frustumCulled = false; nodeGlow.renderOrder = 2; scene.add(nodeGlow);
+  const RES_GLOW = { plasma: new THREE.Color(NODE_COLOR.plasma).multiplyScalar(1.7), minerio: new THREE.Color(NODE_COLOR.minerio), dados: new THREE.Color(NODE_COLOR.dados).multiplyScalar(0.9) }; const _up = new THREE.Vector3(0, 1, 0), _nv = new THREE.Vector3();
   const rangeRings = new THREE.InstancedMesh(new THREE.RingGeometry(0.98, 1, 64).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.25, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 }), 32); rangeRings.count = 0; rangeRings.frustumCulled = false; scene.add(rangeRings);
   const shellGeo = new THREE.SphereGeometry(1.6, 6, 6); const shells = new THREE.InstancedMesh(shellGeo, new THREE.MeshBasicMaterial({ color: 0xffd9a0 }), 256); shells.count = 0; shells.frustumCulled = false; scene.add(shells);
   const BL = 512; const blPos = new Float32Array(BL * 6); const blGeo = new THREE.BufferGeometry(); blGeo.setAttribute('position', new THREE.BufferAttribute(blPos, 3)); const bullets = new THREE.LineSegments(blGeo, new THREE.LineBasicMaterial({ color: 0xffe6a8, transparent: true, opacity: 0.9 })); bullets.frustumCulled = false; scene.add(bullets);
@@ -5167,6 +5223,7 @@ function create(canvas, overlay, mini) {
         case 'shot': if (e.id != null) { const st = AN.get(e.id); if (st) st.rec = 1; } flashLight.position.set(e.x1, H(e.x1, e.y1) + 8, -e.y1); flashT = 0.06; if (e.beam) R.fx.rings.push({ x: e.x2, y: e.y2, r0: 4, r1: 18, col: '#9FE8FF', t: 0, life: 0.2 });
           if (FX && Math.random() < 0.85 * FX.mult && seenAt(e.x1, e.y1)) { const sh = e.id != null && sim.byId.get(e.id); const hz = sh ? (sh.kind === 'building' ? 14 : (S.UNITS[sh.def] && S.UNITS[sh.def].flying ? 16 : 5)) : 6; const dx = e.x2 - e.x1, dy = e.y2 - e.y1, L = Math.hypot(dx, dy) || 1; const mx = e.x1 + dx / L * (sh ? sh.r * 0.9 : 6), my = e.y1 + dy / L * (sh ? sh.r * 0.9 : 6); FX.muzzle(mx, H(mx, my) + hz, -my, e.beam ? [0.9, 1.3, 1.7] : [1.6, 1.15, 0.6], e.cls === 'vei' || e.cls === 'est' ? 5 : 3); }
           break;
+        case 'vein': if (R.fx && R.fx.rings) R.fx.rings.push({ x: e.x, y: e.y, r0: 10, r1: 110, col: '#4CC9FF', t: 0, life: 1.8 }); break; // 4.2h
         case 'impact': { const big = e.splash > 0; if (FX) { FX.impact(e.x, H(e.x, e.y), -e.y, e.splash || 0); if (big) { if (!e.hit) addDecal(e.x, e.y, e.splash * 0.7); if (e.splash >= 24) boomLight(e.x, H(e.x, e.y), -e.y, 0.5); } break; } for (let i = 0; i < (big ? 14 : 4); i++) spark(e.x, e.y, 3, [1, 0.75, 0.4], big ? 90 : 50, true); if (big) { boomList.push({ x: e.x, y: e.y, t: 0 }); smoke(e.x, e.y, 5, [0.35, 0.32, 0.3], 1.6, 20); if (!e.hit) addDecal(e.x, e.y, e.splash * 0.7); } break; }
         case 'death': if (FX && (e.kind === 'unit' || e.kind === 'building')) { const big = e.kind === 'building'; const fac = e.owner >= 0 && sim.players[e.owner] ? sim.players[e.owner].faction : 'vehnar'; const tint = RACE_TINT[fac] || [1, 1, 1]; const gx = e.x, gy = H(e.x, e.y), gz = -e.y; const r = e.r || 8;
             if (big) { FX.explosion(gx, gy, gz, r * 1.1, { tint, wave: true }); for (let i = 1; i <= 3; i++) { const a = Math.random() * Math.PI * 2, d = r * 0.6 * Math.random(); FX.explosion(gx + Math.cos(a) * d, gy + r * 0.3, gz + Math.sin(a) * d, r * (0.5 + Math.random() * 0.3), { tint, delay: i * 0.22 }); } for (let i = 0; i < Math.round(10 * FX.mult); i++) FX.smoke(gx + (Math.random() - .5) * r, gy + r * 0.5, gz + (Math.random() - .5) * r, [0.12, 0.11, 0.12], 4 + Math.random() * 3, 10 + Math.random() * 8, r * 0.9); boomLight(gx, gy, gz, 1.2); if (e.owner === human) R.shake = Math.min(1, R.shake + 0.5); }
@@ -5257,10 +5314,16 @@ function create(canvas, overlay, mini) {
     terrTex.needsUpdate = true;
     // instâncias
     for (const it of R.inst.values()) it.n = 0;
-    let nSel = 0, nRange = 0, nShell = 0, nBul = 0, nBeam = 0, nVet = 0; const hpList = []; const emitters = []; const flags = [];
+    let nSel = 0, nRange = 0, nShell = 0, nBul = 0, nBeam = 0, nVet = 0, nGlow = 0; const hpList = []; const emitters = []; const flags = [];
     for (const e of sim.ents) {
       if (!e.alive) continue; const own = e.owner === human;
-      if (e.kind === 'node') { const it = instOf(e.res, -1, e.id % 4); const g = it.geo; put(it, e.x, e.y, 0, 0, fitOf(e, g)); if (view.sel.has(e.id)) nSel = ring(nSel, e.x, e.y, e.r + 6); continue; }
+      if (e.kind === 'node') { const it = instOf(e.res, -1, e.id % 4); const g = it.geo; const f = e.max ? Math.max(0, e.amount) / e.max : 1; const dry = e.amount <= 0; // 4.2h
+        const fv = fogData[(Math.min(FOGN - 1, (e.y / FOGC) | 0) * FOGN + Math.min(FOGN - 1, (e.x / FOGC) | 0)) * 4] / 255; const seenK = 0.3 + 0.7 * fv; // nunca visto: apagado; à vista: aceso (antes brilhava no breu)
+        put(it, e.x, e.y, 0, 0, fitOf(e, g), 1, (dry ? 0.5 : 1) * (0.55 + 0.45 * fv), null, dry ? 0 : (0.3 + 0.7 * Math.sqrt(f)) * seenK);
+        if (!dry && nGlow < GLOW_CAP) { const low = f < 0.15; const pulse = low ? 0.55 + 0.45 * Math.sin(R.time * 6 + e.id) : 0.85 + 0.15 * Math.sin(R.time * 1.7 + e.id * 1.3); const k = (0.35 + 0.65 * Math.sqrt(f)) * pulse * seenK * (1 + 0.5 * R.night); const rad = e.r * (2 + 0.9 * f);
+          const hd = rad * 0.5, hx = (H(e.x + hd, e.y) - H(e.x - hd, e.y)) / (2 * hd), hy = (H(e.x, e.y + hd) - H(e.x, e.y - hd)) / (2 * hd); _nv.set(-hx, 1, hy).normalize(); _q.setFromUnitVectors(_up, _nv); // deitado no relevo (plano reto sumia na encosta da cratera)
+          _p.set(e.x, H(e.x, e.y) + 1.2, -e.y); _s.set(rad * 2, 1, rad * 2); _m.compose(_p, _q, _s); nodeGlow.setMatrixAt(nGlow, _m); _c.copy(RES_GLOW[e.res]).multiplyScalar(k); nodeGlow.setColorAt(nGlow++, _c); }
+        if (view.sel.has(e.id)) nSel = ring(nSel, e.x, e.y, e.r + 6); continue; }
       if (e.kind === 'rock') { const it = instOf('rocks', -1, e.seed % 6); put(it, e.x, e.y, 0, (e.seed % 8) * 0.8, fitOf(e, it.geo)); continue; }
       if (e.kind === 'crate') { if (!vis.has(e.id)) continue; const it = instOf('crate', -1, 0); put(it, e.x, e.y, 0, R.time, (2 * e.r * 1.6) / it.geo.width); continue; }
       if (e.kind === 'wreck') { if (!vis.has(e.id)) continue; const it = instOf('wreck', -1, 0); put(it, e.x, e.y, 0, e.ang || 0, fitOf(e, it.geo), 1, 0.6 + 0.4 * (e.max ? e.amount / e.max : 1)); if (sim.time - e.bornT < 25 && Math.random() < 0.25) { smoke(e.x, e.y, 6, [0.2, 0.2, 0.22], 1.6, 16); spark(e.x, e.y, 3, [1, 0.5, 0.2], 20, true); } if (view.sel.has(e.id)) nSel = ring(nSel, e.x, e.y, e.r + 6); continue; }
@@ -5322,6 +5385,7 @@ function create(canvas, overlay, mini) {
     if (view.ghost) { const gh = view.ghost; const d = S.BUILDINGS[gh.def]; const it = instOf(MD.PARTS[gh.def] ? MD.PARTS[gh.def].hull : gh.def, human, 0, true); put(it, gh.x, gh.y, 0, gh.ang || 0, 2 * d.r * 1.25 / it.geo.width, 1, gh.ok ? 1 : 0.5); nSel = ring(nSel, gh.x, gh.y, d.r + 4); if (d.territory && nRange < 32) { _p.set(gh.x, H(gh.x, gh.y) + 0.6, -gh.y); _s.set(d.territory, 1, d.territory); _q.identity(); _m.compose(_p, _q, _s); rangeRings.setMatrixAt(nRange++, _m); } }
     if (view.wallGhost && view.ghost) for (const g2 of view.wallGhost) { const it = instOf(view.ghost.def, human, 0, true); put(it, g2.x, g2.y, 0, g2.ang, 20 / it.geo.width, 1, g2.ok ? 1 : 0.5); }
     for (const it of R.inst.values()) { if (it.anim && it.n) { it.ia.needsUpdate = true; it.ic.needsUpdate = true; } it.main.count = it.n; it.main.instanceMatrix.needsUpdate = true; if (it.main.instanceColor) it.main.instanceColor.needsUpdate = true; if (it.em) { it.em.count = it.n; it.em.instanceMatrix.needsUpdate = true; if (it.em.instanceColor) it.em.instanceColor.needsUpdate = true; } }
+    nodeGlow.count = nGlow; nodeGlow.instanceMatrix.needsUpdate = true; if (nodeGlow.instanceColor) nodeGlow.instanceColor.needsUpdate = true; // 4.2h
     selRings.count = nSel; selRings.instanceMatrix.needsUpdate = true; vetRings.count = nVet; vetRings.instanceMatrix.needsUpdate = true; rangeRings.count = nRange; rangeRings.instanceMatrix.needsUpdate = true; shells.count = nShell; shells.instanceMatrix.needsUpdate = true;
     for (let i = nBul * 6; i < BL * 6; i++) blPos[i] = -9999; blGeo.attributes.position.needsUpdate = true; blGeo.setDrawRange(0, nBul * 2);
     // luzes pontuais: as mais próximas da câmera, à noite
@@ -5373,7 +5437,7 @@ function create(canvas, overlay, mini) {
     c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(mfog, 0, 0);
     // pontos: nós de recurso, construções (quadrados), unidades (pontos), memória de construções inimigas
     const px = Math.max(1, size / 92);
-    for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'node') { if (!view.reveal && !ex[Math.min(TILES - 1, (e.y / TILE) | 0) * TILES + Math.min(TILES - 1, (e.x / TILE) | 0)]) continue; const p = M(e.x, e.y); c.fillStyle = NODE_COLOR[e.res]; c.fillRect(p[0] - px * 0.8, p[1] - px * 0.8, px * 1.6, px * 1.6); continue; }
+    for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'node') { const seen = view.reveal || ex[Math.min(TILES - 1, (e.y / TILE) | 0) * TILES + Math.min(TILES - 1, (e.x / TILE) | 0)]; const p = M(e.x, e.y); c.globalAlpha = seen ? 1 : 0.4; resGlyph(c, e, p[0], p[1], px); c.globalAlpha = 1; continue; } // 4.2h
       if (e.kind !== 'unit' && e.kind !== 'building') continue; const own = e.owner === human; if (!(own || vis.has(e.id))) continue; const col = sim.players[e.owner].color; const p = M(e.x, e.y);
       if (e.kind === 'building') { const r = e.def === 'nucleo' ? px * 3.2 : px * 1.9; c.fillStyle = col; c.fillRect(p[0] - r, p[1] - r, r * 2, r * 2); c.strokeStyle = 'rgba(0,0,0,0.6)'; c.lineWidth = 1; c.strokeRect(p[0] - r, p[1] - r, r * 2, r * 2); }
       else { c.fillStyle = own ? col : rgba(col, 0.95); c.beginPath(); c.arc(p[0], p[1], own ? px * 1.05 : px * 1.2, 0, TAU); c.fill(); if (!own) { c.strokeStyle = 'rgba(0,0,0,0.7)'; c.lineWidth = 1; c.stroke(); } } }
@@ -5460,7 +5524,7 @@ ARD.audio = A;
    tick T sem o pacote. Também: sala por código, lista de jogadores, checksums por tick, chat e aviso de desconexão. */
 (function (ARD) {
 'use strict';
-const PROTO = 4; // versão do protocolo: anfitrião e convidados precisam coincidir (3: volta à sala depois de queda, 4.1c; 4: navegação, coletores e Piratas novos mudam a simulação, 4.2g)
+const PROTO = 5; // versão do protocolo: anfitrião e convidados precisam coincidir (3: volta à sala depois de queda, 4.1c; 4: navegação, coletores e Piratas novos mudam a simulação, 4.2g; 5: veios, Tempestade 2× e Dados a 400, 4.2h)
 const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function makeCode() { let c = ''; for (let i = 0; i < 6; i++) c += ALPHA[Math.floor(Math.random() * ALPHA.length)]; return c; }
 const errText = t => ({ 'peer-unavailable': 'sala não encontrada (código errado ou anfitrião offline)', 'network': 'sem conexão com o servidor de sinalização', 'server-error': 'servidor de sinalização indisponível', 'browser-incompatible': 'navegador sem WebRTC', 'unavailable-id': 'código em uso' }[t] || t);
@@ -5685,9 +5749,10 @@ function create(o) {
     return out;
   }
   function contextCommand(wx, wy, sx, sy) {
-    const units = ownSelectedUnits(); const t = pick(sx, sy, I.lastType === 'touch' ? 22 : 10, units.length > 0);
+    const units = ownSelectedUnits(); let t = pick(sx, sy, I.lastType === 'touch' ? 22 : 10, units.length > 0);
     if (!units.length) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice('Ponto de reunião definido'); } return; }
     const ids = units.map(u => u.id);
+    if (t && (t.kind === 'node' || t.kind === 'wreck') && t.amount <= 0) { if (units.some(u => u.def === 'coletor')) ui.notice('Nó esgotado: mande os coletores a outro campo'); t = null; } // 4.2h: nó seco vira ordem de mover
     if (t && (t.kind === 'node' || t.kind === 'wreck')) {
       const eaters = t.kind === 'wreck' && S.FACTIONS[sim.players[human].faction].devour ? units.filter(u => u.def === 'pirata') : []; // Carniceiro (Vorag) devora a carcaça
       if (eaters.length) { cmd({ t: 'devour', ids: eaters.map(u => u.id), target: t.id }); const rest = units.filter(u => u.def !== 'pirata').map(u => u.id); if (rest.length) cmd({ t: 'harvest', ids: rest, target: t.id }); }
@@ -5887,12 +5952,12 @@ const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-16 00:19Z';
+const BUILD = '2026-10-16 01:39Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.2g';
+const VERSION = '4.2h';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -6148,7 +6213,7 @@ function startGame(cfg, netCtx) {
   const facsAll = Object.keys(S.FACTIONS).filter(f => f !== cfg.faction).concat([cfg.faction]);
   if (!cfg.players) for (let i = 0; i < parseInt(cfg.opp, 10); i++) { const f = facsAll[i % facsAll.length]; players.push({ name: aiNames[f][i % 3], faction: f, difficulty: cfg.diff }); }
   if (!netCtx && !cfg.campaign && ARD.campUI) ARD.campUI.applyColor(players); // tom da Raça escolhido no Hangar (solo)
-  const sim = S.createSim({ seed: cfg.seed, players, minutes: cfg.minutes || 25 });
+  const sim = S.createSim({ seed: cfg.seed, players, minutes: cfg.minutes || 25, noVeins: !!cfg.bench || !!(cfg.campaign && cfg.campaign.cfg && cfg.campaign.cfg.noVeins) }); // 4.2h: sem veios no prólogo e no teste de desempenho
   if (cfg.resume) S.restore(sim, cfg.resume.sim); // 4.1c: retomada a partir do salvamento (estado exato)
   const human = netCtx ? netCtx.myId : 0;
   const canvas = $('world'), mini = $('minimap'), overlay = $('overlay');
@@ -6415,11 +6480,21 @@ function startGame(cfg, netCtx) {
   function notice(text) { const n = $('notice'); n.textContent = text; n.classList.add('show'); clearTimeout(G.noticeT); G.noticeT = setTimeout(() => n.classList.remove('show'), 2200); }
 
   // ---------- HUD ----------
+  function resWatch() { // 4.2h: reserva do território no título das pílulas, alerta quando o Minério ou o Plasma do território acaba, chip de coletores parados (só interface)
+    const W = G.resW || (G.resW = { t: 0, warned: {} }); W.t = sim.time; const res = { minerio: 0, plasma: 0, dados: 0 }; const idle = [];
+    for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'unit' && e.owner === human && e.def === 'coletor' && e.state === 'idle') idle.push(e.id); else if (e.kind === 'node' && e.amount > 0 && S.inTerritory(sim, human, e.x, e.y)) res[e.res] += e.amount; }
+    for (const k of ['plasma', 'minerio', 'dados']) { const el = $('r-' + k); if (el && el.parentElement) el.parentElement.title = RES_NAME[k] + ' · variação por minuto nos últimos 30 s · no seu território restam ' + fmt(res[k]); }
+    for (const k of ['minerio', 'plasma']) { if (res[k] > 0) { W.warned[k] = false; continue; } if (W.warned[k] || sim.time < 60 || !S.nucleoOf(sim, human)) continue; W.warned[k] = true;
+      const n0 = S.nucleoOf(sim, human); let best = null, bd = 1e9; for (const e of sim.ents) if (e.alive && e.kind === 'node' && e.res === k && e.amount > 0 && S.territoryOwner(sim, e.x, e.y) === -1) { const d = S.dist(e.x, e.y, n0.x, n0.y); if (d < bd) { bd = d; best = e; } }
+      const text = RES_NAME[k] + ' do seu território acabou: mande coletores a outro campo (botão direito) ou expanda com um Nódulo.'; handleEvents([{ t: 'alert', p: human, text, x: best ? best.x : undefined, y: best ? best.y : undefined, kind: 'warn' }]); if (G.isTouch) notice(text); }
+    const chip = $('idle-col'); if (chip) { if (chip.hidden !== !idle.length) chip.hidden = !idle.length; if (idle.length) $('idle-n').textContent = idle.length; G.idleCol = idle; }
+  }
   function refreshTop() {
     const p = sim.players[human];
     $('r-plasma').textContent = fmt(p.res.plasma); $('r-minerio').textContent = fmt(p.res.minerio); $('r-dados').textContent = fmt(p.res.dados);
     { const H = G.resHist || (G.resHist = []); if (!H.length || sim.time - H[H.length - 1].t >= 1) { H.push({ t: sim.time, r: Object.assign({}, p.res) }); while (H.length > 32) H.shift(); } // 4.2f: variação por minuto (janela de 30 s)
       const old = H[0]; const span = sim.time - old.t; for (const k of ['plasma', 'minerio', 'dados']) { const el = $('rr-' + k); if (!el) continue; if (span < 8) { el.textContent = ''; continue; } const v = Math.round((p.res[k] - old.r[k]) * 60 / span); el.textContent = Math.abs(v) < 1 ? '' : (v > 0 ? '+' : '−') + fmt(Math.abs(v)); el.className = v > 0 ? 'up' : 'dn'; } }
+    if (!G.resW || sim.time - G.resW.t >= 2 || sim.time < G.resW.t) resWatch(); // 4.2h
     { const pb = $('pausebox'); if (pb) { const show = !!G.paused && !G.ended && !net && !G.bench && $('savebox').hidden; if (pb.hidden === show) pb.hidden = !show; if (show) $('pause-why').textContent = G.pauseWhy || 'Partida pausada.'; } }
     const en = p.energy; const reg = $('energy'); reg.className = 'energy ' + en.regime;
     $('e-text').textContent = `${Math.round(en.prod)} / ${Math.round(en.cons)}`; $('e-regime').textContent = S.REGIME[en.regime].name + (p.overchargeT > 0 ? ' · Sobrecarga' : '') + (p.blackoutT > 0 ? ' · BLECAUTE' : '');
@@ -6449,7 +6524,7 @@ function startGame(cfg, netCtx) {
     if (!ents.length || I.buildMenu) { panel.innerHTML = buildMenuHTML(p); bindBuildMenu(); return; }
     const e = ents[0];
     if (e.kind === 'wreck') { panel.innerHTML = `<div class="ph"><span class="dot" style="background:#8A5A3A"></span><b>Carcaça de ${esc(S.UNITS[e.def] ? S.UNITS[e.def].name : 'veículo')}</b></div><div class="muted">${fmt(e.amount)} de Minério recuperável</div><div class="muted small">Coletores podem saquear carcaças em qualquer lugar: clique direito com um coletor.</div>`; return; }
-    if (e.kind === 'node') { panel.innerHTML = `<div class="ph"><span class="dot" style="background:${ARD.render.NODE_COLOR[e.res]}"></span><b>Nó de ${RES_NAME[e.res]}</b></div><div class="muted">${fmt(e.amount)} / ${fmt(e.max)} restantes</div><div class="muted small">Coletores colhem automaticamente nós dentro do seu território. Clique direito com coletores para colher manualmente.</div>`; return; }
+    if (e.kind === 'node') { const dry = e.amount <= 0; panel.innerHTML = `<div class="ph"><span class="dot" style="background:${dry ? '#5A5F66' : ARD.render.NODE_COLOR[e.res]}"></span><b>Nó de ${RES_NAME[e.res]}${dry ? ' · esgotado' : ''}</b></div>` + (dry ? '<div class="muted">Nada mais a colher aqui. Os recursos não voltam: mande os coletores a outro campo ou expanda com um Nódulo.</div>' : `<div class="muted">${fmt(e.amount)} / ${fmt(e.max)} restantes</div><div class="muted small">Coletores colhem sozinhos no seu território. Mandados com o botão direito, colhem em qualquer campo fora do território inimigo.</div>`); return; } // 4.2h
     if (e.owner !== human) {
       const q = sim.players[e.owner]; const d = e.kind === 'unit' ? S.UNITS[e.def] : S.BUILDINGS[e.def];
       panel.innerHTML = `<div class="ph"><span class="dot" style="background:${q.color}"></span><b>${esc(d.name)}</b> <span class="muted">· ${esc(q.name)} (${S.FACTIONS[q.faction].short})</span></div><div class="hp"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="muted small">${fmt(e.hp)} / ${fmt(e.maxHp)} · ${e.kind === 'unit' ? S.CLASS_NAMES[e.cls] : 'Estrutura'} · ${S.hasPact(sim, human, e.owner) ? 'Em pacto de Não-agressão' : 'Inimigo'}</div>${e.kind === 'building' && (e.def === 'refinaria' || e.def === 'reator') ? '<div class="tip">Alvo de Sifão: selecione um Pirata e clique com o botão direito aqui.</div>' : ''}`;
@@ -6543,6 +6618,7 @@ function startGame(cfg, netCtx) {
     $('btn-help').addEventListener('click', () => toggleHelp(true));
     $('btn-menu').addEventListener('click', () => ui.confirm('Encerrar esta partida e voltar ao início?' + (G.autoSave ? ' Para continuar depois, use 💾 › Pausar e sair.' : ''), () => { G.leaving = true; const go = () => goStart(); if (net) mpSession.clear(); if (G.autoSave && ARD.saves) within(ARD.saves.del('auto'), 2500).then(go, go); else go(); })); // 4.2g: sem relançar a missão nem regravar o 'auto'
     if ($('btn-save')) $('btn-save').addEventListener('click', () => openSaveBox());
+    if ($('idle-col')) $('idle-col').addEventListener('click', () => { const ids = (G.idleCol || []).filter(id => { const u = sim.byId.get(id); return u && u.alive; }); if (!ids.length) return; I.select(ids); const u = sim.byId.get(ids[0]); if (u) I.center(u.x, u.y); notice(ids.length + (ids.length > 1 ? ' coletores parados selecionados' : ' coletor parado selecionado') + ': clique com o botão direito num campo de recursos para mandá-los colher.'); }); // 4.2h
     if ($('pausebox')) $('pausebox').addEventListener('click', () => { if (G.paused && !G.ended) { G.paused = false; G.autoPaused = false; G.pauseWhy = null; refreshTop(); notice('Continuando'); } }); // 4.2f: pausa visível; clique continua
     $('btn-build').addEventListener('click', () => { I.buildMenu = !I.buildMenu; view.sel = new Set(); ui.buildMenuChanged(I.buildMenu); });
     $('btn-attack').addEventListener('click', () => I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'));

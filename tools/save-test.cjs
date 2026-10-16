@@ -6,13 +6,13 @@ globalThis.ARD = {}; require(root + '/src/sim.js'); require(root + '/src/ai.js')
 const nSk = +(process.argv[2] || 4); const mArg = process.argv[3] || 'todas'; const before = +(process.argv[4] || 1800), after = +(process.argv[5] || 1800);
 const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag']; let fails = 0, oks = 0; const t00 = Date.now();
 const roundtrip = o => JSON.parse(JSON.stringify(o));
-function pair(label, mk) {
+function pair(label, mk, beforeN) {
   const t0 = Date.now(); let A = mk(null); // A: partida original
-  for (let i = 0; i < before && !A.done(); i++) A.tick();
+  for (let i = 0; i < (beforeN || before) && !A.done(); i++) A.tick();
   if (A.done()) { const half = Math.max(20, Math.floor(A.sim.tick / 2)); A = mk(null); for (let i = 0; i < half && !A.done(); i++) A.tick(); } // terminou antes: salva na metade
   const save = roundtrip(A.save()); const bytes = JSON.stringify(save).length; const B = mk(save); // B: retomada a partir do salvamento
   let diverged = null; const hA0 = S.hash(A.sim), hB0 = S.hash(B.sim); if (hA0 !== hB0) diverged = 'logo após restaurar: ' + hA0 + ' vs ' + hB0;
-  for (let i = 0; i < after && !diverged && !A.done(); i++) { A.tick(); B.tick(); if (i % 50 === 49 || A.done()) { const a = S.hash(A.sim), b = S.hash(B.sim); if (a !== b) diverged = 'tick ' + A.sim.tick + ': ' + a + ' vs ' + b; } }
+  for (let i = 0; i < after && !diverged && !A.done(); i++) { A.tick(); B.tick(); if (i < 10) { const sa = JSON.stringify(A.save()), sb = JSON.stringify(B.save()); if (sa !== sb) { diverged = 'fotografia difere no tick ' + A.sim.tick + ' (passo ' + (i + 1) + ' depois de retomar)'; break; } } if (i % 50 === 49 || A.done()) { const a = S.hash(A.sim), b = S.hash(B.sim); if (a !== b) diverged = 'tick ' + A.sim.tick + ': ' + a + ' vs ' + b; } }
   if (!diverged) { const sa = JSON.stringify(A.save()), sb = JSON.stringify(B.save()); if (sa !== sb) { let k = 0; while (k < sa.length && sa[k] === sb[k]) k++; diverged = 'fotografia final difere perto de: …' + sa.slice(Math.max(0, k - 80), k + 40) + '… vs …' + sb.slice(Math.max(0, k - 80), k + 40); } }
   if (diverged) fails++; else oks++;
   console.log(`${label.padEnd(34)} ${diverged ? 'FAIL ' + diverged : 'OK'} · salvo no tick ${save.sim.tick} · ${Math.round(bytes / 1024)} KB · fim no tick ${A.sim.tick} · ${Date.now() - t0} ms`);
@@ -26,6 +26,10 @@ for (let k = 0; k < nSk; k++) {
     return { sim, done: () => !!sim.result, tick() { if (sim.tick % 10 === 0) for (const a of ais) for (const c of AI.think(sim, a)) S.enqueue(sim, c); S.step(sim); }, save: () => ({ sim: S.snapshot(sim), ais: ais.map(AI.snapshot) }) };
   });
 }
+// 4.2h — um ponto salvo no meio do combate (3 jogadores, tick 5000): visão, alvos e filas cheias
+{ const seed = 7, players = [{ name: 'P0', faction: 'erevane', human: true, difficulty: 'dificil' }, { name: 'P1', faction: 'vehnar', difficulty: 'brutal' }, { name: 'P2', faction: 'vorag', difficulty: 'dificil' }];
+  if (nSk > 0) pair('combate 3p seed 7 (tick 5000)', save => { const sim = S.createSim({ seed, players, minutes: 25 }); if (save) S.restore(sim, save.sim); const ais = save ? save.ais.map(AI.restore) : sim.players.map(p => AI.create(p.id, p.difficulty));
+    return { sim, done: () => !!sim.result, tick() { if (sim.tick % 10 === 0) for (const a of ais) for (const c of AI.think(sim, a)) S.enqueue(sim, c); S.step(sim); }, save: () => ({ sim: S.snapshot(sim), ais: ais.map(AI.snapshot) }) }; }, 5000); }
 // missões: o roteiro também é salvo e retomado
 const ids = mArg === 'nenhuma' ? [] : mArg === 'todas' ? C.MISSIONS.map(m => m.id) : mArg.split(',');
 for (const id of ids) {
