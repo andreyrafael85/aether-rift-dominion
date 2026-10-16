@@ -17,7 +17,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.3c';
+const VERSION = '4.3c.1';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -57,7 +57,7 @@ function initStart() {
   setRace(raceColor);
   // 4.1e — líderes vivos nos cartões: cada busto olha para o ponteiro, pisca e respira; ao escolher a Raça, o líder acena
   const cardHeads = {};
-  const mountCardHeads = () => { if (!ARD.leaders3d || matchMedia('(pointer: coarse)').matches || params.get('logo') === 'estatico' || !ARD.leaders3d.canUse()) return;
+  const mountCardHeads = () => { if (!ARD.leaders3d || matchMedia('(pointer: coarse)').matches || params.get('logo') === 'estatico' || !ARD.leaders3d.canUse() || G || ($('start') && $('start').hidden)) return; /* 4.3d: partida já começou (início automático): os bustos dos cartões não sobem por baixo do HUD */
     for (const card of facWrap.querySelectorAll('.fac-card')) { const id = card.dataset.id; const img = card.querySelector('img.fac-lead'); if (!img || cardHeads[id]) continue;
       const cv = document.createElement('canvas'); cv.className = 'fac-lead fac-lead3d'; cv.width = 168; cv.height = 168; cv.setAttribute('aria-hidden', 'true');
       const sel = (document.querySelector('input[name=fac]:checked') || {}).value === id;

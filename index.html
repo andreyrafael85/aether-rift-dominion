@@ -310,7 +310,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
 <div id="start" class="screen">
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Versão 4.3c · build 2026-10-16 17:00Z · Remasterização · terreno esculpido · multiplayer 2 a 4</div>
+    <div class="eyebrow">Versão 4.3c.1 · build 2026-10-16 19:26Z · Remasterização · terreno esculpido · multiplayer 2 a 4</div>
     <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div><h1>Aether Rift<br><span>Dominion</span></h1></div></div>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -358,8 +358,9 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
     </div>
     <div class="notes">
       <div class="choose">Notas da versão</div>
+      <p class="start-notes"><b>4.3c.1 — Correção no Firefox:</b> no Firefox, o retrato do líder piscava e a tela escurecia por um instante de vez em quando. A causa: cada vez que o líder mudava de humor (furioso num ataque, triunfante numa vitória), o rosto 3D era montado de novo e os efeitos de luz dele eram recompilados. No Chrome isso é instantâneo, mas no Firefox travava a placa de vídeo por um momento. Agora os quatro humores ficam prontos desde o começo da partida e só trocam, sem recompilar. A cópia do retrato para o HUD também ficou à prova de quadro vazio.</p>
+      <details class="oldnotes"><summary>Histórico das versões anteriores (4.3c → 2.0)</summary>
       <p class="start-notes"><b>4.3c — Terreno esculpido:</b> o chão deixou de ser plano. A malha do terreno ficou <b>4× mais fina</b> e ganhou relevo: <b>dunas</b> de areia e de neve moldadas pelo vento, <b>crateras</b> de meteoro, <b>leitos secos</b> que serpenteiam pelo deserto e <b>degraus de estrato</b> que a luz rasante desenha. O material do chão foi refeito <b>em camadas por bioma</b>, que se misturam pela altura de cada uma. O deserto tem areia ondulada, cascalho e placas de rocha avermelhada, e a tundra tem musgo e capim baixo com manchas de terra rachada. No gelo há neve com sulcos de vento, lagos congelados nas baixadas e rocha escura aflorando, e o basalto tem cinza e rocha negra com veios em brasa perto da Fenda. As encostas mostram rocha em camadas, e a borda entre biomas ficou natural, não mais em quadrados. A <b>Fenda virou um abismo</b>: paredões em camadas descem até um fundo escuro cortado por veios de energia, com a cratera em volta em terraços. Além do mapa, as montanhas lisas e cinza deram lugar a uma <b>cordilheira de mesas</b> com topo plano e paredão em camadas, que some na bruma. O campo de batalha agora guarda <b>cicatrizes</b>: esteiras e rodas deixam rastro, Tessara e Vorag deixam marcas de passos, e Erevane e Quorith flutuam sem marcar o chão. Explosões deixam queimado e cratera com brasa que se apaga, e tudo some devagar. Veículos levantam <b>poeira na cor do chão</b>, e cada construção assenta o terreno onde é erguida. A <b>vegetação foi refeita do zero</b>, no fim dos blocos verdes. A tundra tem capim fino em dois tons, arbustos de dezenas de folhas, samambaias, flores alienígenas e pedras com líquen. O deserto tem arbustos secos e espinhosos, suculentas com gomos, agaves alienígenas, tocos e troncos caídos. O gelo tem aglomerados de cristal fosco, arbustos congelados e montes de neve. Perto da Fenda há respiros com brasa fraca, lascas de obsidiana e cogumelos com brilho roxo que aparece à noite. Árvores raras marcam a paisagem: palmeiras e árvores-guarda-chuva na tundra, árvores-espinheiras e cactos-candelabro no deserto e árvores congeladas no gelo. As plantas balançam ao vento, nascem em manchas com companheiras em volta e seguem a borda desenhada de cada bioma. Pedras e cascalho ganharam a cor do chão onde estão.</p>
-      <details class="oldnotes"><summary>Histórico das versões anteriores (4.3b → 2.0)</summary>
       <p class="start-notes"><b>4.3b — Luz e atmosfera:</b> começa a <b>remasterização total</b> do jogo, uma entrega por vez: luz, terreno, frota, soldados e líderes, bases, combate e mapas. O motor 3D foi atualizado do Three.js r160 para o <b>r186</b>, a versão atual, e ganhou um pós-processamento de cinema. Da qualidade Média para cima, tudo tem <b>sombra de contato</b>: unidades, prédios e pedras assentam no chão em vez de parecer colados por cima. O <b>bloom</b> acende só o que brilha de verdade (cristais, feixes, motores), a cor ficou mais quente e viva e as bordas mais lisas (SMAA na Média, MSAA na Alta). O sol baixou para 40°, com <b>sombras mais longas</b>, e os metais agora <b>refletem o céu e o chão do mapa</b>, não mais uma sala de estúdio. O mundo ganhou <b>atmosfera</b>: uma bruma baixa enche a Fenda e os vales, a poeira perto do chão azula ao longe e a luz do sol se espalha no ar quando você olha para ele. As <b>sombras das nuvens</b> passam por cima de tudo, não só do chão, e o céu ganhou <b>nuvens</b> que andam. A nova <b>câmera de cinema</b> desce quando você aproxima, para ver as unidades de lado; dá para desligar em Ajustes. As <b>rochas foram esculpidas</b> de novo: as cordilheiras viraram paredões contínuos com estratos, topos planos e blocos caídos, e as pedras soltas do chão deixaram de ser bolas. Os <b>nós de recurso</b> viraram afloramentos em escala com os coletores. O <b>Minério</b> é rocha escura estratificada com cristais azuis brotando das fendas, o <b>Plasma</b> são colunas de basalto com poças e fissuras incandescentes e os <b>Dados</b> um monólito antigo com glifos verdes. Nó esgotado fica com o cristal apagado, não preto.</p>
       <p class="start-notes"><b>4.3a — De perto: coletores e chão:</b> começa a v4.3, a Engine gráfica 4, que leva o jogo inteiro a um nível de detalhe de quem chega com a câmera colada. A câmera agora <b>aproxima até 6×</b> (4× no celular). Os <b>coletores das cinco Raças foram refeitos do zero</b>, cada um com dezenas de peças. O Vehnar virou um carregador pesado com rodas-tambor, caçamba de minério, motor com chaminés em brasa e cabeça de mineração. O Erevane é um esquife flutuante facetado com bico-sifão, e o Tessara uma colhedeira viva com flor-mandíbula e sacos de seiva. O Quorith é uma nave de cristal com diapasão e lente focal, e o Vorag um Semeador com saco digestivo aceso e mandíbulas de osso. Ao colher, o coletor se vira para o nó e solta um <b>feixe de mineração</b> na cor do recurso, com brilho, faíscas e poeira no contato. Todos os modelos ganharam <b>detalhe de superfície</b>: painéis com costuras, rebites e grades nos metais, sulcos na borracha, poros no osso e células na quitina. Esse detalhe aparece de perto e some sozinho de longe, sem cintilar. De perto, o chão ganha seixos, fendas e grão. Só o que a câmera vê é desenhado, então os modelos novos não pesam fora da tela.</p>
       <p class="start-notes"><b>4.2h — Minério à vista:</b> o <b>Minério virou cristal azul-elétrico com brilho próprio</b>, e azul aceso agora é só dele: pedras, gelo e ruínas do cenário perderam o brilho e as cores de recurso, e os lagos laranja decorativos saíram. Cada nó tem um <b>halo no chão</b> na cor do recurso, que encolhe conforme o nó esvazia e pisca quando está acabando; nó esgotado fica apagado. No radar cada recurso tem seu símbolo, do tamanho do que resta: <b>losango</b> para Minério, <b>hexágono</b> para Plasma e <b>triângulo</b> para Dados. Nós ainda não explorados aparecem apagados. Os recursos continuam finitos (cada nó tem uma quantidade fixa), mas agora o jogo <b>avisa quando o Minério ou o Plasma do seu território acaba</b> e aponta o campo livre mais perto. Um chip na barra mostra os <b>coletores parados</b> e seleciona todos com um clique. A partir dos 9 min surgem <b>veios de Minério</b> no meio do mapa a cada 3,5 min, longe das bases. A Tempestade de Éter passou a render 2× de verdade no Plasma, e o nó de Dados perto da base entra no território já na Era II.</p>
@@ -2867,6 +2868,7 @@ class Kit {
   // lâmina curva (o.shape 'blade' afina até a ponta, 'leaf' fecha nas duas pontas; o.fold vinco central): nasce em (x, y, z), azimute az, inclinação t0 (0 = em pé), curva cv até a ponta
   // 4.3c: versão leve (this.lite, para os blocos longe da câmera): q(n) reduz contagens das receitas e os construtores usam menos trechos e lados
   q(n) { return this.lite ? Math.max(1, Math.round(n * 0.55)) : n; }
+  fine(fn) { if (!this.lite) fn(); return this; } /* 4.3d: peças de detalhe fino (rebites, parafusos, antenas, grades miúdas) que somem na versão leve */
   blade(x, y, z, az, t0, cv, L, w, col, mat, o) { o = Object.assign({}, o, { lite: this.lite }); const g = ribbonGeo([x, y, z], az, t0, cv, L, w, o); this.tip = g.userData.tip; this.leafy = true; return this._push(g, col, mat, { e: o.e, wind: o.wind }); }
   // fronde de samambaia: ráquis curva com o.m pares de folíolos triangulares (o.lk = comprimento relativo, o.droop = caimento)
   frond(x, y, z, az, t0, cv, L, col, mat, o) { o = Object.assign({}, o, { lite: this.lite }); const g = frondGeo([x, y, z], az, t0, cv, L, o); this.tip = g.userData.tip; this.leafy = true; return this._push(g, col, mat, { e: o.e, wind: o.wind }); }
@@ -4080,16 +4082,16 @@ function recipe(race, def) {
   for (const r in U) if (U[r][def]) return (K, P, tc) => U[r][def](K, P, tc);
   return null;
 }
-function build(def, race, color, seed) {
+function build(def, race, color, seed, opts) { /* 4.3d: opts.lite = versão leve (nível de detalhe 1): menos lados e trechos (K.q, segmentos) e sem as peças de K.fine */
   T = T || globalThis.THREE; if (!T) return null;
-  const K = new Kit();
+  const K = new Kit(), lite = !!(opts && opts.lite), lod0 = LOD; if (lite) { K.lite = true; LOD = Math.min(LOD, 0.55); }
   try {
     if (NEUTRAL[def]) { NEUTRAL[def](K, seed | 0); return K.finish(); }
     if (def.startsWith('prop_')) { const f = PROPS[def.slice(5)]; if (!f) return null; f(K, seed | 0); return K.finish(); }
     race = PAL[race] ? race : 'vehnar'; const P = PAL[race]; const tc = color || '#FF8C1A';
     if (FULL[def]) { const a = recipe(race, FULL[def][0]), b = recipe(race, FULL[def][1]); if (!a || !b) return null; a(K, P, tc); const m = K.mount || 0; K.mount = null; K.oy = m; b(K, P, tc); K.oy = 0; return K.finish({ pivot: [0, 0] }); }
     const f = recipe(race, def); if (!f) return null; f(K, P, tc, seed | 0); return K.finish({ pivot: [0, 0] });
-  } catch (err) { console.warn('[ARD] malha ' + def + '/' + race + ' falhou: ' + err.message); return null; }
+  } catch (err) { console.warn('[ARD] malha ' + def + '/' + race + ' falhou: ' + err.message); return null; } finally { LOD = lod0; }
 }
 // 4.3b: geometria de pedra solta para o dress3d (kind 'boulder' = matacão com estratos; 'stone'/'pebble' = pedra lascada), base em y=0 e ~2 de largura;
 // a cor por vértice (sombra na base, topo claro) é quase branca: multiplica a cor do material se ele usar vertexColors
@@ -4117,7 +4119,7 @@ function material(o) { T = T || globalThis.THREE; o = o || {}; const m = new T.M
   m.defaultAttributeValues = Object.assign({}, m.defaultAttributeValues, ANIM_DEFAULTS, { pt: [0] }); m.customProgramCacheKey = () => 'ard-mesh-v43-' + (o.key || 'base') + (o.noAnim ? '-sem-anim' : ''); return m; }
 const BUILDING_DEFS = ['nucleo', 'reator', 'refinaria', 'quartel', 'fabrica', 'hangar', 'torre', 'nodulo', 'laboratorio', 'muro', 'portao', 'bastiao'];
 const GENERIC_UNITS = ['coletor', 'infantaria', 'veiculo', 'drone', 'suporte', 'pirata'];
-function unitsOf(race) { return GENERIC_UNITS.concat(Object.keys(U[race] || {}).filter(d => !GENERIC_UNITS.includes(d) && !d.startsWith('veiculo_'))); }
+function unitsOf(race) { return GENERIC_UNITS.concat(Object.keys(U[race] || {}).filter(d => !GENERIC_UNITS.includes(d) && !d.startsWith('veiculo_') && !d.startsWith('_'))); } /* 4.3d: '_nome' = ajudante interno da Raça, não é unidade */
 ARD.meshes = { setLod(v) { LOD = Math.max(0.4, Math.min(1, v)); }, setDetail(v) { DET.value = Math.max(0, Math.min(1, v)); }, /* 4.3a: detalhe de superfície pela qualidade */ build, scatter, /* 4.3b */ FLORA_DEFS, /* 4.3c */ material, animShader, ANIM_DEFAULTS, ANIM_T, PAL, MAT, BUILDING_DEFS, GENERIC_UNITS, unitsOf, NEUTRAL_DEFS: Object.keys(NEUTRAL), PROP_RACES: Object.keys(PROPS), FULL };
 })(globalThis.ARD = globalThis.ARD || {});
 
@@ -4596,7 +4598,7 @@ const RES = 256;
 function canUse() { if (failed) return false; try { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return false; } catch (e) {} return !!T(); }
 function ensure() {
   if (renderer || failed) return !!renderer; const THREE = T(); if (!THREE) return false;
-  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' }); renderer.setPixelRatio(1); renderer.setSize(RES, RES, false); renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; renderer.setClearColor(0x000000, 0);
+  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power', preserveDrawingBuffer: true }); /* 4.3d: o Firefox lia o quadro vazio de vez em quando (retrato piscando) */ renderer.setPixelRatio(1); renderer.setSize(RES, RES, false); renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; renderer.setClearColor(0x000000, 0);
     if (THREE.RoomEnvironment) { const pm = new THREE.PMREMGenerator(renderer); envTex = pm.fromScene(new THREE.RoomEnvironment(), 0.04).texture; pm.dispose(); }
     renderer.domElement.addEventListener('webglcontextlost', e => { e.preventDefault(); failed = true; for (const it of items.slice()) unmount(it); });
   } catch (e) { console.warn('[ARD] líderes 3D indisponíveis:', e.message); failed = true; renderer = null; }
@@ -4710,13 +4712,19 @@ function mount(canvas, race, opts) {
     st: { look: [0, 0], lookT: [0, 0], nextBlink: 1 + Math.random() * 3, blink: 0, nod: 0, shake: 0, talk: 0, jolt: 0, until: 0, gaze: null, gazeUntil: 0, nextGlance: 2 + Math.random() * 3 } };
   setHead(it, it.mood);
   if (it.framing === 'hud') { cam.position.set(1.0, 0.55, 5.1); cam.lookAt(0, -0.1, 0); } else { cam.position.set(1.1, 0.6, 5.0); cam.lookAt(0, -0.15, 0); }
+  if (it.framing === 'hud') prewarm(it); /* 4.3d: no HUD o líder troca de humor durante a partida */
   items.push(it); loop(); return it;
 }
-function setHead(it, mood) {
-  if (it.head) { it.sc.remove(it.head.g); it.head.g.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); }
-  it.head = buildHead(it.race, mood); it.sc.add(it.head.g); it.mood = mood;
+function setHead(it, mood) { /* 4.3d: as cabeças de cada humor ficam guardadas; antes cada troca recriava materiais e recompilava os shaders (no Firefox isso travava a tela e o retrato piscava) */
+  if (it.head) it.sc.remove(it.head.g);
+  it.heads = it.heads || {}; it.head = it.heads[mood] || (it.heads[mood] = buildHead(it.race, mood)); it.sc.add(it.head.g); it.mood = mood;
 }
-function unmount(it) { const i = items.indexOf(it); if (i >= 0) items.splice(i, 1); if (it.head) it.head.g.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); it.head = null; }
+function prewarm(it) { /* 4.3d: monta os quatro humores e compila os shaders de uma vez, fora do quadro (assíncrono quando o navegador permite) */
+  try { it.heads = it.heads || {}; const extra = []; for (const m of [1, 2, 3, 4]) { if (!it.heads[m]) it.heads[m] = buildHead(it.race, m); if (it.heads[m] !== it.head) { it.sc.add(it.heads[m].g); extra.push(it.heads[m].g); } }
+    const done = () => { for (const g of extra) if (!it.head || g !== it.head.g) it.sc.remove(g); };
+    const par = !!(renderer.extensions && renderer.extensions.has && renderer.extensions.has('KHR_parallel_shader_compile')); /* sem a extensão o three avisa no console (e a caixa de erros mostra): compila direto */
+    if (par && renderer.compileAsync) renderer.compileAsync(it.sc, it.cam).then(done, done); else { renderer.compile(it.sc, it.cam); done(); } } catch (e) { console.warn('[ARD] líder 3D (pré-compilação):', e.message); } }
+function unmount(it) { const i = items.indexOf(it); if (i >= 0) items.splice(i, 1); const all = new Set(Object.values(it.heads || {})); if (it.head) all.add(it.head); for (const h of all) { it.sc.remove(h.g); h.g.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); } it.heads = null; it.head = null; }
 function stopAll() { for (const it of items.slice()) unmount(it); }
 // ---------- reações ----------
 // mood(it, m, ms): troca o humor por ms (depois volta ao humor de base); react(it, kind): 'nod' | 'shake' | 'talk' | 'jolt'
@@ -4770,7 +4778,7 @@ function loop() {
     if (items.length) raf = requestAnimationFrame(step); };
   raf = requestAnimationFrame(step);
 }
-ARD.leaders3d = { canUse, mount, unmount, stopAll, mood, baseMood, react, gaze, EXPR };
+ARD.leaders3d = { canUse, mount, unmount, stopAll, mood, baseMood, react, gaze, EXPR, info: () => renderer ? { programs: renderer.info.programs ? renderer.info.programs.length : null, items: items.length } : null }; /* info: diagnóstico (4.3d) */
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Aether Rift: Dominion — ProgressStore v1 (4.0e): progresso local da campanha — Comandante (nível 1–30), missões e estrelas,
@@ -6103,10 +6111,11 @@ function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 2
 function rgba(h, a) { const c = hexToRgb(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
 function create(canvas, overlay, mini) {
   const _frus = new THREE.Frustum(), _pmF = new THREE.Matrix4(), _sph = new THREE.Sphere(); /* 4.3a: corte por câmera */
+  const _lp = new THREE.Vector3(), LOD_D2 = 560 * 560, LOD_ON = !!(ME && ME.build) && /[?&]lod=1/.test(location.search); /* 4.3d: nível de detalhe das unidades pela distância (ligado de vez quando a frota nova entrar; por ora só com ?lod=1) */
   const _v = new THREE.Vector3(), _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3(), _c = new THREE.Color(); const UP = new THREE.Vector3(0, 1, 0);
   const R = { canvas, w: 0, h: 0, dpr: 1, K: 1.7, zoomMin: matchMedia('(pointer: coarse)').matches ? 0.3 : 0.42, zoomMax: matchMedia('(pointer: coarse)').matches ? 4 : 6, /* 4.3a: chega perto para ver o detalhe */ supportsYaw: true, fx: { floats: [], rings: [] }, time: 0, shake: 0, icons: new Map(), geos: new Map(), inst: new Map(), sim: null, night: 0, spriteCache: new Map(), is3d: true };
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-  R.gpu = '?'; R.shaderErrors = []; R.degraded = [];
+  R.gpu = '?'; R.shaderErrors = []; R.degraded = []; R.glInfo = () => ({ programs: renderer.info.programs ? renderer.info.programs.length : null, calls: renderer.info.render.calls, tris: renderer.info.render.triangles, geos: renderer.info.memory.geometries, texs: renderer.info.memory.textures }); /* 4.3d: diagnóstico */
   try { const gl = renderer.getContext(); const ext = gl.getExtension('WEBGL_debug_renderer_info'); R.gpu = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); } catch (e) {}
   // Erros de shader viram mensagens legíveis (three cala o console.error próprio quando este hook existe).
   renderer.debug.onShaderError = (gl, program, vs, fs) => { let src = '', log = ''; try { src = gl.getShaderSource(fs) || ''; log = (gl.getProgramInfoLog(program) || gl.getShaderInfoLog(fs) || gl.getShaderInfoLog(vs) || '').trim(); } catch (e) {} const tag = src.includes('kernelRadius') ? 'SSAO' : src.includes('fogMap') ? 'terreno' : src.includes('luminosityThreshold') || src.includes('blurTexture') ? 'bloom' : 'material'; const msg = 'Shader (' + tag + '): ' + (log || 'falha de compilação').slice(0, 300); R.shaderErrors.push(msg); console.error('[ARD] ' + msg); };
@@ -6377,15 +6386,15 @@ function create(canvas, overlay, mini) {
     if (def.startsWith('prop_')) return MD.props[def.slice(5)](seed);
     const p = R.sim.players[pid]; const fn = (def === 'pirata' && MD.BY_DEF['pirata_' + p.faction]) || MD.BY_DEF[def]; return fn(p.color, p.faction);
   }
-  function meshFor(def, pid, seed) {
+  function meshFor(def, pid, seed, lo) {
     if (!USE_MESH) return null;
     if (pid == null || pid < 0) return ME.build(NODE_MODEL[def] ? def : def, null, null, seed); // nós de recurso, rochas, ruínas, caixas, carcaças e adereços
-    const p = R.sim && R.sim.players[pid]; if (!p) return null; return ME.build(def, p.faction, p.color, seed);
+    const p = R.sim && R.sim.players[pid]; if (!p) return null; return ME.build(def, p.faction, p.color, seed, lo ? { lite: true } : null);
   }
-  function geoOf(def, pid, seed) { const key = def + '|' + pid + '|' + (seed || 0); let g = R.geos.get(key); if (!g) { g = meshFor(def, pid, seed) || X.buildGeometry(modelFor(def, pid, seed), { emBoost: 1.8 }); R.geos.set(key, g); } return g; }
-  function instOf(def, pid, seed, ghost) {
-    const key = def + '|' + pid + '|' + (seed || 0) + (ghost ? '|g' : ''); let it = R.inst.get(key); if (it) return it;
-    const g = geoOf(def, pid, seed); const cap = 64;
+  function geoOf(def, pid, seed, lo) { const key = def + '|' + pid + '|' + (seed || 0) + (lo ? '|lo' : ''); let g = R.geos.get(key); if (!g) { g = meshFor(def, pid, seed, lo) || (lo ? geoOf(def, pid, seed) : X.buildGeometry(modelFor(def, pid, seed), { emBoost: 1.8 })); R.geos.set(key, g); } return g; } /* 4.3d: lo = nível de detalhe 1 */
+  function instOf(def, pid, seed, ghost, lo) {
+    const key = def + '|' + pid + '|' + (seed || 0) + (ghost ? '|g' : '') + (lo ? '|lo' : ''); let it = R.inst.get(key); if (it) return it;
+    const g = geoOf(def, pid, seed, lo); const cap = 64;
     const mk = (geo, mat) => { const m = new THREE.InstancedMesh(geo, mat, cap); m.count = 0; m.frustumCulled = false; m.castShadow = !ghost && !isTouch; m.receiveShadow = !ghost; if (!ghost && g.anim && depthAnim) m.customDepthMaterial = depthAnim; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(m); return m; };
     it = { geo: g, main: mk(g.main, ghost ? matGhost : matFor(pid)), em: g.em && !ghost ? mk(g.em, matEm) : null, n: 0, cap, anim: !ghost && !!g.anim }; if (it.anim) animAttr(it, cap); R.inst.set(key, it); return it;
   }
@@ -6419,11 +6428,11 @@ function create(canvas, overlay, mini) {
   R.icon = function (def, pid) { const key = def + '|' + pid; let u = R.icons.get(key); if (u) return u; if (USE_MESH) { u = meshIcon(def, pid); if (u) { R.icons.set(key, u); return u; } } const sp = R.sprite(def, pid, 0, false, 0); const cv = document.createElement('canvas'); cv.width = 48; cv.height = 48; const c = cv.getContext('2d'); const sc = Math.min(44 / sp.w, 44 / sp.h); c.imageSmoothingEnabled = sc < 1; c.drawImage(sp.canvas, (48 - sp.w * sc) / 2, (48 - sp.h * sc) / 2, sp.w * sc, sp.h * sc); u = cv.toDataURL(); R.icons.set(key, u); return u; };
   R.prepare = function (sim, onProgress, onDone) {
     R.sim = sim; if (onProgress) onProgress(0.02); const go = () => { buildTerrain(sim); const jobs = []; /* 4.3c: a tela de carregamento aparece antes de esculpir o terreno (~1 s) */
-    for (const p of sim.players) { for (const def in S.BUILDINGS) jobs.push([def, p.id, 0]); for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'torre_base', 'torre_turret', 'drone', 'suporte', 'pirata', 'bastiao_base', 'bastiao_turret']) jobs.push([def, p.id, 0]); for (const def in S.UNITS) if (S.UNITS[def].faction === p.faction) jobs.push([def, p.id, 0]); }
+    for (const p of sim.players) { for (const def in S.BUILDINGS) jobs.push([def, p.id, 0]); for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'torre_base', 'torre_turret', 'drone', 'suporte', 'pirata', 'bastiao_base', 'bastiao_turret']) jobs.push([def, p.id, 0]); for (const def in S.UNITS) if (S.UNITS[def].faction === p.faction) jobs.push([def, p.id, 0]); if (LOD_ON) { for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'drone', 'suporte', 'pirata']) jobs.push([def, p.id, 0, true]); for (const def in S.UNITS) if (S.UNITS[def].faction === p.faction) jobs.push([def, p.id, 0, true]); } } /* 4.3d: versões leves das unidades já na carga */
     for (const res in NODE_MODEL) for (let s = 0; s < 4; s++) jobs.push([res, -1, s]);
     for (let s = 0; s < 6; s++) { jobs.push(['rocks', -1, s]); jobs.push(['ruin', -1, s]); } jobs.push(['crate', -1, 0]); jobs.push(['wreck', -1, 0]);
     for (const p of sim.players) if (MD.props[p.faction]) for (let s = 0; s < 4; s++) jobs.push(['prop_' + p.faction, -1, s]);
-    let i = 0; function chunk() { const t0 = performance.now(); while (i < jobs.length && performance.now() - t0 < 24) { const j = jobs[i++]; geoOf(j[0], j[1], j[2]); } if (onProgress) onProgress(i / jobs.length); if (i < jobs.length) requestAnimationFrame(chunk); else if (onDone) onDone(); } chunk(); }; requestAnimationFrame(() => requestAnimationFrame(go));
+    let i = 0; function chunk() { const t0 = performance.now(); while (i < jobs.length && performance.now() - t0 < 24) { const j = jobs[i++]; geoOf(j[0], j[1], j[2], j[3]); } if (onProgress) onProgress(i / jobs.length); if (i < jobs.length) requestAnimationFrame(chunk); else if (onDone) onDone(); } chunk(); }; requestAnimationFrame(() => requestAnimationFrame(go));
   };
   // ---------- projeção ----------
   function updateCamera(cam) {
@@ -6647,7 +6656,7 @@ function create(canvas, overlay, mini) {
       if (terrT) { if (isUnit) { if (SC && !ud.flying && ud.cls !== 'inf') { const ts = trackSt.get(e.id); if (!ts) trackSt.set(e.id, { x: wx, y: wy, t: R.time }); else { const dx = wx - ts.x, dy = wy - ts.y, dl = Math.hypot(dx, dy); if (dl > 150) { ts.x = wx; ts.y = wy; } else if (dl > 2.2) { const fac = (sim.players[e.owner] || {}).faction; if (fac !== 'erevane' && fac !== 'quorith') SC.track((wx + ts.x) / 2, (wy + ts.y) / 2, Math.atan2(dy, dx), e.r * 1.75, dl + 1.4, 0.9, fac === 'tessara' || fac === 'vorag'); if (FX && Math.random() < 0.3 * R.quality.particles && _frus.containsPoint(_p.set(wx, H(wx, wy), -wy))) { const dc = dustCol(wx, wy); const bx = wx - dx / dl * e.r * 0.8, by = wy - dy / dl * e.r * 0.8; FX.smoke(bx, H(bx, by) + 1.2, -by, dc, 1.3 + Math.random() * 0.8, 3 + Math.random() * 3, e.r * 0.45); } /* 4.3c: poeira do chão atrás de quem anda */ ts.x = wx; ts.y = wy; } ts.t = R.time; } } }
         else if (!flatDone.has(e.id)) { flatDone.add(e.id); flatQ.push(e); } } /* 4.3c: rastros por Raça (Erevane e Quorith flutuam) e chão assentado sob construções */
       _sph.center.set(wx, H(wx, wy) + 6, -wy); _sph.radius = e.r * 1.6 + (isUnit ? 45 : 80); if (!_frus.intersectsSphere(_sph) && !view.sel.has(e.id)) continue;
-      const parts = MD.PARTS[e.def]; const hullDef = parts ? parts.hull : e.def; const it = instOf(hullDef, e.owner, (e.def === 'nucleo' && R.skins && R.skins[e.owner]) || 0); /* 4.0e: Núcleo do Hangar */ const g = it.geo; let fit = fitOf(e, g); if (e.def === 'nucleo') { const op = sim.players[e.owner] || {}; fit *= 1 + 0.12 * ((op.era || 1) - 1) + (op.evolveT > 0 ? 0.025 * Math.sin(R.time * 6) : 0); } /* 4.1d: o Núcleo cresce a cada Era e pulsa enquanto evolui */
+      const parts = MD.PARTS[e.def]; const hullDef = parts ? parts.hull : e.def; const lo = isUnit && LOD_ON && (isTouch || camera.position.distanceToSquared(_lp.set(wx, H(wx, wy), -wy)) > LOD_D2); /* 4.3d: unidade longe da câmera usa a versão leve */ const it = instOf(hullDef, e.owner, (e.def === 'nucleo' && R.skins && R.skins[e.owner]) || 0, false, lo); /* 4.0e: Núcleo do Hangar */ const g = lo ? geoOf(hullDef, e.owner, 0) : it.geo; let fit = fitOf(e, g); if (e.def === 'nucleo') { const op = sim.players[e.owner] || {}; fit *= 1 + 0.12 * ((op.era || 1) - 1) + (op.evolveT > 0 ? 0.025 * Math.sin(R.time * 6) : 0); } /* 4.1d: o Núcleo cresce a cada Era e pulsa enquanto evolui */
       const zz = isUnit && ud.flying ? 14 : 0; const moving = isUnit && (e.x !== e.px || e.y !== e.py); const bob = moving && (e.def === 'infantaria' || e.def === 'quimera' || e.def === 'soldador' || e.def === 'atirador' || e.def === 'agulha') ? Math.abs(Math.sin(R.time * 11 + e.id)) * 1.2 : moving && (e.def === 'cria' || e.def === 'cuspidor') ? Math.abs(Math.sin(R.time * 15 + e.id)) * 1.0 : moving && (e.def === 'prensa' || e.def === 'colosso' || e.def === 'brutamonte') ? Math.abs(Math.sin(R.time * 5 + e.id)) * 2.2 : (e.def === 'voz' || e.def === 'diapasao' || e.def === 'monolito' || e.def === 'prisma') ? 2 + Math.sin(R.time * 2.5 + e.id) * 1.2 : 0;
       const dmg = !isUnit && e.built && e.hp < e.maxHp * 0.5; const tint = e.cloaked ? 0.55 : dmg ? 0.6 : 1;
       let hvN = null; if (isUnit && e.def === 'coletor' && e.state === 'harvest') { const nd = sim.byId.get(e.node); if (nd && nd.alive && nd.amount > 0 && Math.hypot(nd.x - wx, nd.y - wy) <= e.r + nd.r + 12) hvN = nd; } /* 4.3a: colhendo, olha para o nó (só visual) */
@@ -6680,7 +6689,7 @@ function create(canvas, overlay, mini) {
         const bm = g.beam || [g.width * 0.48, g.height * 0.45, 0]; const a = Math.atan2(nd.y - wy, nd.x - wx), ca = Math.cos(a), sa = Math.sin(a); const gy = H(wx, wy) + zz; const tx = nd.x + Math.sin(R.time * 1.7 + e.id) * nd.r * 0.25, ty = nd.y + Math.cos(R.time * 1.3 + e.id) * nd.r * 0.25, th = H(nd.x, nd.y) + 3.2; const col = BEAM_COL[nd.res] || BEAM_COL.minerio; const fl = 0.8 + 0.2 * Math.sin(R.time * 37 + e.id * 3);
         for (const side of [-0.45, 0.45]) { const lx = bm[0], lz = bm[2] + side; const ex = wx + (lx * ca + lz * sa) * fit, ez = -wy + (-lx * sa + lz * ca) * fit, ey = gy + bm[1] * fit; nMine = beamTo(nMine, ex, ey, ez, tx, th, -ty, 0.22, col, 1.7 * fl); nMine = beamTo(nMine, ex, ey, ez, tx, th, -ty, 0.75, col, 0.34 * fl); }
         if (FX) { const pp = R.quality.particles; if (Math.random() < 0.35 * pp) FX.glow(tx, th, -ty, col, 3.4, 0.24); if (Math.random() < 0.09 * pp) FX.spark(tx, th, -ty, col, 22, 2); if (Math.random() < 0.05 * pp) FX.smoke(tx, H(tx, ty) + 1, -ty, [0.42, 0.36, 0.3], 1.4, 5, 3); } } }
-      if (parts && (isUnit || e.built)) { const tt = instOf(parts.turret, e.owner, 0); put(tt, wx, wy, zz + bob + (g.mount != null ? g.mount : parts.z) * fit, e.aimAng != null ? e.aimAng : (e.ang || 0), fit, 1, tint, tt.anim ? animFor(e, wx, wy, fit, 0, sim) : null); }
+      if (parts && (isUnit || e.built)) { const tt = instOf(parts.turret, e.owner, 0, false, lo); put(tt, wx, wy, zz + bob + (g.mount != null ? g.mount : parts.z) * fit, e.aimAng != null ? e.aimAng : (e.ang || 0), fit, 1, tint, tt.anim ? animFor(e, wx, wy, fit, 0, sim) : null); }
       if (view.sel.has(e.id)) { nSel = ring(nSel, wx, wy, e.r + 5); if (!isUnit && ud.attack && nRange < 32) { _p.set(wx, H(wx, wy) + 0.6, -wy); _s.set(ud.attack.range, 1, ud.attack.range); _q.identity(); _m.compose(_p, _q, _s); rangeRings.setMatrixAt(nRange++, _m); } }
       if (e.hp < e.maxHp - 0.5 || view.sel.has(e.id) || (isUnit && e.rank > 0)) hpList.push({ x: wx, y: wy, z: zz + g.height * fit + 4, w: Math.max(16, e.r * 1.4), frac: e.hp / e.maxHp, rank: isUnit ? e.rank : 0, cloak: e.cloaked && own, r: e.r });
       if (!isUnit && e.built && (e.def === 'nucleo' || e.def === 'nodulo')) flags.push(e);
@@ -7278,12 +7287,12 @@ const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-16 17:00Z';
+const BUILD = '2026-10-16 19:26Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.3c';
+const VERSION = '4.3c.1';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -7323,7 +7332,7 @@ function initStart() {
   setRace(raceColor);
   // 4.1e — líderes vivos nos cartões: cada busto olha para o ponteiro, pisca e respira; ao escolher a Raça, o líder acena
   const cardHeads = {};
-  const mountCardHeads = () => { if (!ARD.leaders3d || matchMedia('(pointer: coarse)').matches || params.get('logo') === 'estatico' || !ARD.leaders3d.canUse()) return;
+  const mountCardHeads = () => { if (!ARD.leaders3d || matchMedia('(pointer: coarse)').matches || params.get('logo') === 'estatico' || !ARD.leaders3d.canUse() || G || ($('start') && $('start').hidden)) return; /* 4.3d: partida já começou (início automático): os bustos dos cartões não sobem por baixo do HUD */
     for (const card of facWrap.querySelectorAll('.fac-card')) { const id = card.dataset.id; const img = card.querySelector('img.fac-lead'); if (!img || cardHeads[id]) continue;
       const cv = document.createElement('canvas'); cv.className = 'fac-lead fac-lead3d'; cv.width = 168; cv.height = 168; cv.setAttribute('aria-hidden', 'true');
       const sel = (document.querySelector('input[name=fac]:checked') || {}).value === id;

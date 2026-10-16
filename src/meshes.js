@@ -67,6 +67,7 @@ class Kit {
   // lâmina curva (o.shape 'blade' afina até a ponta, 'leaf' fecha nas duas pontas; o.fold vinco central): nasce em (x, y, z), azimute az, inclinação t0 (0 = em pé), curva cv até a ponta
   // 4.3c: versão leve (this.lite, para os blocos longe da câmera): q(n) reduz contagens das receitas e os construtores usam menos trechos e lados
   q(n) { return this.lite ? Math.max(1, Math.round(n * 0.55)) : n; }
+  fine(fn) { if (!this.lite) fn(); return this; } /* 4.3d: peças de detalhe fino (rebites, parafusos, antenas, grades miúdas) que somem na versão leve */
   blade(x, y, z, az, t0, cv, L, w, col, mat, o) { o = Object.assign({}, o, { lite: this.lite }); const g = ribbonGeo([x, y, z], az, t0, cv, L, w, o); this.tip = g.userData.tip; this.leafy = true; return this._push(g, col, mat, { e: o.e, wind: o.wind }); }
   // fronde de samambaia: ráquis curva com o.m pares de folíolos triangulares (o.lk = comprimento relativo, o.droop = caimento)
   frond(x, y, z, az, t0, cv, L, col, mat, o) { o = Object.assign({}, o, { lite: this.lite }); const g = frondGeo([x, y, z], az, t0, cv, L, o); this.tip = g.userData.tip; this.leafy = true; return this._push(g, col, mat, { e: o.e, wind: o.wind }); }
@@ -1280,16 +1281,16 @@ function recipe(race, def) {
   for (const r in U) if (U[r][def]) return (K, P, tc) => U[r][def](K, P, tc);
   return null;
 }
-function build(def, race, color, seed) {
+function build(def, race, color, seed, opts) { /* 4.3d: opts.lite = versão leve (nível de detalhe 1): menos lados e trechos (K.q, segmentos) e sem as peças de K.fine */
   T = T || globalThis.THREE; if (!T) return null;
-  const K = new Kit();
+  const K = new Kit(), lite = !!(opts && opts.lite), lod0 = LOD; if (lite) { K.lite = true; LOD = Math.min(LOD, 0.55); }
   try {
     if (NEUTRAL[def]) { NEUTRAL[def](K, seed | 0); return K.finish(); }
     if (def.startsWith('prop_')) { const f = PROPS[def.slice(5)]; if (!f) return null; f(K, seed | 0); return K.finish(); }
     race = PAL[race] ? race : 'vehnar'; const P = PAL[race]; const tc = color || '#FF8C1A';
     if (FULL[def]) { const a = recipe(race, FULL[def][0]), b = recipe(race, FULL[def][1]); if (!a || !b) return null; a(K, P, tc); const m = K.mount || 0; K.mount = null; K.oy = m; b(K, P, tc); K.oy = 0; return K.finish({ pivot: [0, 0] }); }
     const f = recipe(race, def); if (!f) return null; f(K, P, tc, seed | 0); return K.finish({ pivot: [0, 0] });
-  } catch (err) { console.warn('[ARD] malha ' + def + '/' + race + ' falhou: ' + err.message); return null; }
+  } catch (err) { console.warn('[ARD] malha ' + def + '/' + race + ' falhou: ' + err.message); return null; } finally { LOD = lod0; }
 }
 // 4.3b: geometria de pedra solta para o dress3d (kind 'boulder' = matacão com estratos; 'stone'/'pebble' = pedra lascada), base em y=0 e ~2 de largura;
 // a cor por vértice (sombra na base, topo claro) é quase branca: multiplica a cor do material se ele usar vertexColors
@@ -1317,6 +1318,6 @@ function material(o) { T = T || globalThis.THREE; o = o || {}; const m = new T.M
   m.defaultAttributeValues = Object.assign({}, m.defaultAttributeValues, ANIM_DEFAULTS, { pt: [0] }); m.customProgramCacheKey = () => 'ard-mesh-v43-' + (o.key || 'base') + (o.noAnim ? '-sem-anim' : ''); return m; }
 const BUILDING_DEFS = ['nucleo', 'reator', 'refinaria', 'quartel', 'fabrica', 'hangar', 'torre', 'nodulo', 'laboratorio', 'muro', 'portao', 'bastiao'];
 const GENERIC_UNITS = ['coletor', 'infantaria', 'veiculo', 'drone', 'suporte', 'pirata'];
-function unitsOf(race) { return GENERIC_UNITS.concat(Object.keys(U[race] || {}).filter(d => !GENERIC_UNITS.includes(d) && !d.startsWith('veiculo_'))); }
+function unitsOf(race) { return GENERIC_UNITS.concat(Object.keys(U[race] || {}).filter(d => !GENERIC_UNITS.includes(d) && !d.startsWith('veiculo_') && !d.startsWith('_'))); } /* 4.3d: '_nome' = ajudante interno da Raça, não é unidade */
 ARD.meshes = { setLod(v) { LOD = Math.max(0.4, Math.min(1, v)); }, setDetail(v) { DET.value = Math.max(0, Math.min(1, v)); }, /* 4.3a: detalhe de superfície pela qualidade */ build, scatter, /* 4.3b */ FLORA_DEFS, /* 4.3c */ material, animShader, ANIM_DEFAULTS, ANIM_T, PAL, MAT, BUILDING_DEFS, GENERIC_UNITS, unitsOf, NEUTRAL_DEFS: Object.keys(NEUTRAL), PROP_RACES: Object.keys(PROPS), FULL };
 })(globalThis.ARD = globalThis.ARD || {});

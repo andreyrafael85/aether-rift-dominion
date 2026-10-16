@@ -13,7 +13,7 @@ const RES = 256;
 function canUse() { if (failed) return false; try { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return false; } catch (e) {} return !!T(); }
 function ensure() {
   if (renderer || failed) return !!renderer; const THREE = T(); if (!THREE) return false;
-  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' }); renderer.setPixelRatio(1); renderer.setSize(RES, RES, false); renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; renderer.setClearColor(0x000000, 0);
+  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power', preserveDrawingBuffer: true }); /* 4.3d: o Firefox lia o quadro vazio de vez em quando (retrato piscando) */ renderer.setPixelRatio(1); renderer.setSize(RES, RES, false); renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; renderer.setClearColor(0x000000, 0);
     if (THREE.RoomEnvironment) { const pm = new THREE.PMREMGenerator(renderer); envTex = pm.fromScene(new THREE.RoomEnvironment(), 0.04).texture; pm.dispose(); }
     renderer.domElement.addEventListener('webglcontextlost', e => { e.preventDefault(); failed = true; for (const it of items.slice()) unmount(it); });
   } catch (e) { console.warn('[ARD] líderes 3D indisponíveis:', e.message); failed = true; renderer = null; }
@@ -127,13 +127,19 @@ function mount(canvas, race, opts) {
     st: { look: [0, 0], lookT: [0, 0], nextBlink: 1 + Math.random() * 3, blink: 0, nod: 0, shake: 0, talk: 0, jolt: 0, until: 0, gaze: null, gazeUntil: 0, nextGlance: 2 + Math.random() * 3 } };
   setHead(it, it.mood);
   if (it.framing === 'hud') { cam.position.set(1.0, 0.55, 5.1); cam.lookAt(0, -0.1, 0); } else { cam.position.set(1.1, 0.6, 5.0); cam.lookAt(0, -0.15, 0); }
+  if (it.framing === 'hud') prewarm(it); /* 4.3d: no HUD o líder troca de humor durante a partida */
   items.push(it); loop(); return it;
 }
-function setHead(it, mood) {
-  if (it.head) { it.sc.remove(it.head.g); it.head.g.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); }
-  it.head = buildHead(it.race, mood); it.sc.add(it.head.g); it.mood = mood;
+function setHead(it, mood) { /* 4.3d: as cabeças de cada humor ficam guardadas; antes cada troca recriava materiais e recompilava os shaders (no Firefox isso travava a tela e o retrato piscava) */
+  if (it.head) it.sc.remove(it.head.g);
+  it.heads = it.heads || {}; it.head = it.heads[mood] || (it.heads[mood] = buildHead(it.race, mood)); it.sc.add(it.head.g); it.mood = mood;
 }
-function unmount(it) { const i = items.indexOf(it); if (i >= 0) items.splice(i, 1); if (it.head) it.head.g.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); it.head = null; }
+function prewarm(it) { /* 4.3d: monta os quatro humores e compila os shaders de uma vez, fora do quadro (assíncrono quando o navegador permite) */
+  try { it.heads = it.heads || {}; const extra = []; for (const m of [1, 2, 3, 4]) { if (!it.heads[m]) it.heads[m] = buildHead(it.race, m); if (it.heads[m] !== it.head) { it.sc.add(it.heads[m].g); extra.push(it.heads[m].g); } }
+    const done = () => { for (const g of extra) if (!it.head || g !== it.head.g) it.sc.remove(g); };
+    const par = !!(renderer.extensions && renderer.extensions.has && renderer.extensions.has('KHR_parallel_shader_compile')); /* sem a extensão o three avisa no console (e a caixa de erros mostra): compila direto */
+    if (par && renderer.compileAsync) renderer.compileAsync(it.sc, it.cam).then(done, done); else { renderer.compile(it.sc, it.cam); done(); } } catch (e) { console.warn('[ARD] líder 3D (pré-compilação):', e.message); } }
+function unmount(it) { const i = items.indexOf(it); if (i >= 0) items.splice(i, 1); const all = new Set(Object.values(it.heads || {})); if (it.head) all.add(it.head); for (const h of all) { it.sc.remove(h.g); h.g.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); } it.heads = null; it.head = null; }
 function stopAll() { for (const it of items.slice()) unmount(it); }
 // ---------- reações ----------
 // mood(it, m, ms): troca o humor por ms (depois volta ao humor de base); react(it, kind): 'nod' | 'shake' | 'talk' | 'jolt'
@@ -187,5 +193,5 @@ function loop() {
     if (items.length) raf = requestAnimationFrame(step); };
   raf = requestAnimationFrame(step);
 }
-ARD.leaders3d = { canUse, mount, unmount, stopAll, mood, baseMood, react, gaze, EXPR };
+ARD.leaders3d = { canUse, mount, unmount, stopAll, mood, baseMood, react, gaze, EXPR, info: () => renderer ? { programs: renderer.info.programs ? renderer.info.programs.length : null, items: items.length } : null }; /* info: diagnóstico (4.3d) */
 })(globalThis.ARD = globalThis.ARD || {});

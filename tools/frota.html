@@ -1,0 +1,43 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Frota de uma Raça</title>
+<style>html,body{margin:0;background:#0e1116;overflow:hidden;font-family:system-ui,sans-serif}#lab{position:absolute;inset:0;pointer-events:none}.l{position:absolute;color:#dfe6ee;font:600 12px/1.25 system-ui;text-shadow:0 1px 3px #000;white-space:pre}</style>
+<script type="importmap">{"imports":{"three":"../dist/vendor/three/build/three.module.min.js","./vendor/three/build/three.core.js":"../dist/vendor/three/build/three.core.min.js","three/addons/":"../dist/vendor/three/examples/jsm/"}}</script>
+</head><body><div id="lab"></div>
+<script src="../src/sim.js"></script><script src="../src/meshes.js"></script>
+<script type="module">
+// 4.3d — a frota de uma Raça lado a lado, no tamanho do jogo (largura = 2,5 × raio da simulação, como o render3d), com a luz da partida.
+// Parâmetros: race, defs (lista; padrão = frota da Raça), view (partida | 34 | lado), lite (0 = completo, 1 = versão leve, 2 = os dois lado a lado),
+// color (cor do time), w, h, cols, anim (pose 0..1), zoom (1 = enquadra a maior; >1 aproxima).
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+window.THREE = THREE;
+const q = new URLSearchParams(location.search); const race = q.get('race') || 'vehnar'; const W = +(q.get('w') || 1600), Hh = +(q.get('h') || 1000); const tc = q.get('color') || '#FF8C1A';
+const S = ARD.sim, M = ARD.meshes; const UN = S.UNITS;
+const FLEET0 = ['veiculo', 'drone', 'suporte', 'pirata']; const extra = Object.keys(UN).filter(d => UN[d].faction === race && UN[d].cls !== 'inf' && d !== 'catedral' && d !== 'matriarca');
+const defs = (q.get('defs') ? q.get('defs').split(',') : FLEET0.concat(extra)); const liteMode = +(q.get('lite') || 0);
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); renderer.setSize(W, Hh); renderer.setPixelRatio(1); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap; document.body.appendChild(renderer.domElement);
+renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x8d8576); const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 0.3; /* igual ao jogo no r186 (ENV_K) */
+scene.add(new THREE.HemisphereLight(0x9fb8d6, 0x2a2622, 0.4)); const sun = new THREE.DirectionalLight(0xffe9c4, 2.1); sun.position.set(-47, 64, 60); sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096); sun.shadow.bias = -0.0005; const sc = sun.shadow.camera; sc.left = sc.bottom = -260; sc.right = sc.top = 260; sc.near = 1; sc.far = 400; scene.add(sun); scene.add(new THREE.AmbientLight(0x404860, 0.15));
+const gcv = document.createElement('canvas'); gcv.width = gcv.height = 256; const gc = gcv.getContext('2d'); const img = gc.createImageData(256, 256); for (let i = 0; i < 256 * 256; i++) { const v = 0.6 + 0.22 * Math.random() * Math.random(); img.data[i * 4] = 170 * v; img.data[i * 4 + 1] = 140 * v; img.data[i * 4 + 2] = 104 * v; img.data[i * 4 + 3] = 255; } gc.putImageData(img, 0, 0);
+const gt = new THREE.CanvasTexture(gcv); gt.wrapS = gt.wrapT = THREE.RepeatWrapping; gt.repeat.set(40, 40); gt.colorSpace = THREE.SRGBColorSpace;
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(1200, 1200).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ map: gt, roughness: 0.95 })); ground.receiveShadow = true; scene.add(ground);
+const mat = M.material({ env: 0.45, key: 'frota' }); const matEm = new THREE.MeshBasicMaterial({ vertexColors: true }); matEm.onBeforeCompile = sh => M.animShader(sh); matEm.defaultAttributeValues = Object.assign({}, matEm.defaultAttributeValues, M.ANIM_DEFAULTS); matEm.customProgramCacheKey = () => 'frota-em';
+const FULL = { veiculo: ['veiculo_hull', 'veiculo_turret'] };
+const list = []; for (const d of defs) for (const lite of liteMode === 2 ? [false, true] : [liteMode === 1]) list.push({ d, lite });
+const cols = +(q.get('cols') || Math.min(list.length, liteMode === 2 ? 4 : 4)); const rows = Math.ceil(list.length / cols); const SP = 46;
+const info = []; const lab = document.getElementById('lab');
+const addMesh = (grp, geo, m, y) => { if (!geo) return; const a = +(q.get('anim') || 0); const ia = new THREE.InstancedBufferAttribute(new Float32Array([0, a * 3, 0, 0]), 4); const ic = new THREE.InstancedBufferAttribute(new Float32Array([a * 2]), 1); geo.setAttribute('aInst', ia); geo.setAttribute('aInstC', ic); const im = new THREE.InstancedMesh(geo, m, 1); im.setMatrixAt(0, new THREE.Matrix4().makeTranslation(0, y || 0, 0)); im.castShadow = true; im.receiveShadow = true; im.frustumCulled = false; grp.add(im); };
+list.forEach((o, k) => { const cx = (k % cols - (cols - 1) / 2) * SP, cz = (Math.floor(k / cols) - (rows - 1) / 2) * SP; const def = o.d, u = UN[def];
+  const parts = FULL[def]; const gh = M.build(parts ? parts[0] : def, race, tc, 0, o.lite ? { lite: true } : null); if (!gh) { info.push({ def, lite: o.lite, erro: true }); return; }
+  const gt2 = parts ? M.build(parts[1], race, tc, 0, o.lite ? { lite: true } : null) : null; const gFull = parts ? M.build(parts[0], race, tc, 0) : gh;
+  const r = u ? u.r : 10; const fit = (2 * r * 1.25) / gFull.width; const grp = new THREE.Group(); grp.position.set(cx, (u && u.flying ? 14 : 0), cz); grp.scale.setScalar(fit); grp.rotation.y = -Math.PI * 0.12; scene.add(grp);
+  addMesh(grp, gh.main, mat); addMesh(grp, gh.em, matEm); if (gt2) { addMesh(grp, gt2.main, mat, gFull.mount || 0); addMesh(grp, gt2.em, matEm, gFull.mount || 0); }
+  const tris = (gh.main.attributes.position.count + (gh.em ? gh.em.attributes.position.count : 0) + (gt2 ? gt2.main.attributes.position.count + (gt2.em ? gt2.em.attributes.position.count : 0) : 0)) / 3;
+  info.push({ def, lite: o.lite, tris: Math.round(tris), width: +gFull.width.toFixed(1), height: +((gh.height + (gt2 ? gt2.height : 0))).toFixed(1), fit: +fit.toFixed(3), r, x: cx, z: cz, flying: !!(u && u.flying), anim: !!gh.anim }); });
+const view = q.get('view') || 'partida'; const zoom = +(q.get('zoom') || 1); const span = Math.max(cols, rows) * SP / zoom;
+const PV = { partida: [0.95, Math.PI / 4, 1.3], '34': [0.55, Math.PI * 0.62, 1.05], lado: [0.14, Math.PI / 2, 1.0] }[view] || [0.95, Math.PI / 4, 1.3];
+const cam = new THREE.PerspectiveCamera(32, W / Hh, 1, 3000); const dist = span * PV[2];
+cam.position.set(Math.cos(PV[0]) * Math.cos(PV[1]) * dist, Math.sin(PV[0]) * dist, Math.cos(PV[0]) * Math.sin(PV[1]) * dist); cam.lookAt(0, 4, 0); renderer.render(scene, cam);
+const v = new THREE.Vector3(); info.forEach(i => { if (i.erro) return; v.set(i.x, 0, i.z).project(cam); const el = document.createElement('div'); el.className = 'l'; el.style.left = ((v.x + 1) / 2 * W - 60) + 'px'; el.style.top = ((1 - v.y) / 2 * Hh + 22) + 'px'; el.textContent = i.def + (i.lite ? ' (leve)' : '') + '\n' + i.tris + ' tri'; lab.appendChild(el); });
+window.__info = info; window.__done = true;
+</script></body></html>
