@@ -17,7 +17,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.2f';
+const VERSION = '4.2g';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -256,6 +256,9 @@ const mpSession = {
   touch() { const o = this.load(); if (o) this.save(o); },
   clear() { try { localStorage.removeItem(this.KEY); } catch (e) {} },
 };
+// 4.2g — volta à tela inicial sem os parâmetros de lançamento (?missao&iniciar=1 dos botões do fim de missão, ?autostart, ?bench): um reload os relançaria
+function goStart() { const q = new URLSearchParams(location.search); for (const k of ['missao', 'dif', 'raca', 'iniciar', 'campanha', 'autostart', 'bench', 'retomar']) q.delete(k); const s = q.toString(); location.replace(location.pathname + (s ? '?' + s : '')); }
+const within = (p, ms) => Promise.race([p, new Promise(r => setTimeout(r, ms))]); // 4.2g: sair nunca fica preso esperando o armazenamento
 // ---------- game ----------
 function startGame(cfg, netCtx) {
   if (ARD.logo3d) ARD.logo3d.stop(); // libera o contexto WebGL do logo vivo antes da partida
@@ -319,6 +322,7 @@ function startGame(cfg, netCtx) {
   document.body.classList.toggle('touch', isTouch);
 
   bindHUD(); refreshTop(); refreshHints(); refreshQuick();
+  { const tb = $('top'); const fit = () => { const x = Math.max(0, tb.offsetHeight - 46); document.documentElement.style.setProperty('--tbx', document.body.classList.contains('touch') ? '0px' : x + 'px'); }; fit(); if (window.ResizeObserver) new ResizeObserver(fit).observe(tb); else addEventListener('resize', fit); } // 4.2g
   $('loading').hidden = false;
   R.humanId = human;
   R.prepare(sim, f => { $('load-bar').style.width = Math.round(f * 100) + '%'; }, () => {
@@ -497,7 +501,7 @@ function startGame(cfg, netCtx) {
   // ---------- 4.1c: salvamento ----------
   function setupSaves() {
     G.autoSave = !net && !!ARD.saves && !params.get('semsalvar') && !cfg.bench;
-    G.saveNow = (slot, extra) => { if (!G.autoSave || G.ended) return Promise.resolve(null);
+    G.saveNow = (slot, extra) => { if (!G.autoSave || G.ended || G.leaving) return Promise.resolve(null); // 4.2g: depois de Sair ou Pausar e sair nada regrava o 'auto' (ciclo de 10 s, aba escondida, pagehide)
       let data, meta; try { data = buildSave(); meta = saveMeta(extra); } catch (e) { console.warn('[ARD] salvamento: fotografia falhou', e); return Promise.resolve(null); }
       return ARD.saves.put(slot, meta, data).catch(e => { console.warn('[ARD] salvamento falhou:', e); return null; }); };
     if (!G.autoSave) return;
@@ -519,9 +523,9 @@ function startGame(cfg, netCtx) {
     return Object.assign({ kind: G.camp ? 'campanha' : 'solo', title, sub, gameTime: sim.time, faction: me.faction, version: VERSION, noPause: !!(G.camp && G.camp.noPause) }, extra || {});
   }
   function openSaveBox() {
-    const box = $('savebox'); if (!box) return; if (!G.autoSave) { notice('Sem salvamento no multiplayer'); return; }
+    const box = $('savebox'); if (!box) return; if (!G.autoSave) { notice('Sem salvamento no multiplayer'); return; } if (!box.hidden) return; // 4.2g: Ctrl+S de novo com a janela aberta não muda o estado da pausa
     const fenda = G.camp && G.camp.noPause; const wasPaused = G.paused; if (!fenda && !G.paused) { G.paused = true; refreshTop(); }
-    const close = () => { box.hidden = true; if (!fenda && !wasPaused) { G.paused = false; refreshTop(); } };
+    const close = () => { if (box.hidden) return; box.hidden = true; G.closeSave = null; if (!fenda && !wasPaused) { G.paused = false; refreshTop(); } }; G.closeSave = close;
     box.querySelectorAll('[data-close]').forEach(b => { b.onclick = close; });
     $('save-note').textContent = fenda ? 'Na dificuldade Fenda não há salvamento manual. O salvamento automático continua protegendo contra queda de internet ou energia.' : 'O jogo também salva sozinho a cada 10 segundos e ao sair da aba. Se a internet ou a energia cair, ele volta de onde parou.';
     const draw = () => ARD.saves.list().then(list => { const by = {}; for (const m of list) by[m.slot] = m;
@@ -529,7 +533,7 @@ function startGame(cfg, netCtx) {
       $('save-slots').querySelectorAll('[data-slot]').forEach(b => b.onclick = () => { const sl = b.dataset.slot; const go = () => G.saveNow(sl).then(m => { if (m) { notice('Partida salva no espaço ' + sl.slice(1)); draw(); } else notice('Não foi possível salvar neste aparelho'); });
         if (by[sl]) ui.confirm('Substituir o que está no espaço ' + sl.slice(1) + '?', go); else go(); }); });
     draw();
-    $('save-park').onclick = () => G.saveNow('auto', { parked: true }).then(m => { if (m) location.reload(); else notice('Não foi possível salvar neste aparelho'); });
+    $('save-park').onclick = () => { if (G.leaving) return; const p = G.saveNow('auto', { parked: true }); G.leaving = true; within(p, 6000).then(m => { if (m) goStart(); else { G.leaving = false; notice('Não foi possível salvar neste aparelho'); } }); }; // 4.2g: volta ao início de verdade (antes recarregava o link da missão e ela recomeçava)
     box.hidden = false;
   }
   function banner(title, sub, kind, ms) { const L = $('leader'); if (L && !L.hidden) { L.classList.remove('talk'); void L.offsetWidth; L.classList.add('talk'); } if (G.lead3d && ARD.leaders3d) ARD.leaders3d.react(G.lead3d, 'talk', Math.min(3.2, 1 + String(sub || '').length / 45)); if (kind === 'danger' || kind === 'warn') leaderMood(2); else if (kind === 'good') leaderMood(3); const b = $('banner'); $('banner-title').textContent = title; $('banner-sub').textContent = sub || ''; b.className = 'banner ' + (kind || 'info'); b.hidden = false; clearTimeout(G.bannerT); G.bannerT = setTimeout(() => { b.hidden = true; }, ms || 5000); }
@@ -630,8 +634,8 @@ function startGame(cfg, netCtx) {
     if (ents.length === 1) { const u = ents[0]; h += `<div class="hp" data-live="${u.id}"><i style="width:${(100 * u.hp / u.maxHp)}%"></i></div><div class="muted small"><span data-livetxt="${u.id}">${fmt(u.hp)} / ${fmt(u.maxHp)}</span> · ${S.CLASS_NAMES[u.cls]}${u.rank ? ' · ' + ['', '★ Veterano', '★★ Elite', '★★★ Lenda'][u.rank] : ''}${u.elo ? ' · Acorde ' + u.elo + (u.elo >= 3 ? ' ♪' : '') : ''} · ${esc(S.UNITS[u.def].desc)}</div>`; if (u.cargoTotal > 0) h += `<div class="muted small">Carga: ${fmt(u.cargoTotal)}${u.stolen ? ' (roubada)' : ''}</div>`; }
     const combat = ents.some(u => S.UNITS[u.def].attack);
     h += `<div class="row">${combat ? `<button class="act sm ${I.mode === 'attackmove' ? 'on' : ''}" data-u="attackmove"><span class="k">A</span> Atacar-mover</button>` : ''}<button class="act sm" data-u="stop"><span class="k">S</span> Parar</button></div>`;
-    if (counts.pirata) h += '<div class="tip">' + S.unitName(fac.id, 'pirata') + ': clique com o direito em uma Refinaria ou Reator inimigo para Sifonar (40 s). Volte à base para entregar. Se morrer carregado, a carga vira Caixa.' + (fac.devour ? ' Carniceiro: clique direito numa carcaça ou num Nódulo inimigo para devorar (biomassa direto no cofre).' : '') + (fac.silence ? ' Enquanto sifona, torres inimigas a até 110 ficam mudas.' : '') + '</div>';
-    if (counts.coletor) h += '<div class="tip">Coletor: colhe sozinho nós dentro do seu território. Clique direito em um nó para escolher manualmente.</div>';
+    if (counts.pirata) h += '<div class="tip">' + S.unitName(fac.id, 'pirata') + ': clique com o direito em uma Refinaria ou Reator inimigo para Sifonar (40 s). Entrega sozinho quando enche ou após 40 s; mandado de volta, entrega ao chegar perto da Refinaria ou do Núcleo. Se morrer carregado, a carga vira Caixa.' + (fac.cloak && fac.cloak.pirata ? ' Camuflado até começar a sifonar; Torres e Núcleo enxergam de perto.' : '') + (fac.devour ? ' Carniceiro: clique direito numa carcaça ou num Nódulo inimigo para devorar (biomassa direto no cofre).' : '') + (fac.silence ? ' Enquanto sifona, torres inimigas a até 110 ficam mudas.' : '') + '</div>';
+    if (counts.coletor) h += '<div class="tip">Coletor: colhe sozinho no seu território. Mandado a outro lugar (clique direito no chão ou num nó), colhe os nós em volta e entrega na Refinaria ou no Núcleo mais perto.</div>';
     panel.innerHTML = h;
     panel.querySelectorAll('[data-u]').forEach(b => b.addEventListener('click', () => { if (b.dataset.u === 'stop') I.cmd({ t: 'stop', ids: ents.map(u => u.id) }); else I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'); }));
   }
@@ -662,7 +666,7 @@ function startGame(cfg, netCtx) {
     $('btn-super').addEventListener('click', () => superClick(fac()));
     $('btn-diplo').addEventListener('click', () => openDiplo());
     $('btn-help').addEventListener('click', () => toggleHelp(true));
-    $('btn-menu').addEventListener('click', () => ui.confirm('Encerrar esta partida e voltar ao início?' + (G.autoSave ? ' Para continuar depois, use 💾 › Pausar e sair.' : ''), () => { const go = () => location.reload(); if (net) mpSession.clear(); if (G.autoSave && ARD.saves) ARD.saves.del('auto').then(go, go); else go(); }));
+    $('btn-menu').addEventListener('click', () => ui.confirm('Encerrar esta partida e voltar ao início?' + (G.autoSave ? ' Para continuar depois, use 💾 › Pausar e sair.' : ''), () => { G.leaving = true; const go = () => goStart(); if (net) mpSession.clear(); if (G.autoSave && ARD.saves) within(ARD.saves.del('auto'), 2500).then(go, go); else go(); })); // 4.2g: sem relançar a missão nem regravar o 'auto'
     if ($('btn-save')) $('btn-save').addEventListener('click', () => openSaveBox());
     if ($('pausebox')) $('pausebox').addEventListener('click', () => { if (G.paused && !G.ended) { G.paused = false; G.autoPaused = false; G.pauseWhy = null; refreshTop(); notice('Continuando'); } }); // 4.2f: pausa visível; clique continua
     $('btn-build').addEventListener('click', () => { I.buildMenu = !I.buildMenu; view.sel = new Set(); ui.buildMenuChanged(I.buildMenu); });
@@ -723,7 +727,7 @@ function startGame(cfg, netCtx) {
       { id: 'col', text: 'Selecione o Núcleo (F1) e produza Coletores (C) até ter 5.', done: () => S.entitiesOf(sim, human).filter(e => e.kind === 'unit' && e.def === 'coletor').length >= 5 },
       { id: 'reator', text: 'Construa um Reator (B → R). Energia abaixo de 100% deixa tudo mais lento.', done: () => S.hasBuilt(sim, human, 'reator') },
       { id: 'quartel', text: 'Construa um Quartel (B → Q) e treine Infantaria (I).', done: () => S.hasBuilt(sim, human, 'quartel') },
-      { id: 'nodulo', text: 'Expanda com um Nódulo (B → N) perto de cristais de Plasma. Coletores só colhem no seu território.', done: () => S.hasBuilt(sim, human, 'nodulo') },
+      { id: 'nodulo', text: 'Expanda com um Nódulo (B → N) perto de cristais de Plasma. Coletores colhem sozinhos no seu território; para outro campo, mande-os com o botão direito.', done: () => S.hasBuilt(sim, human, 'nodulo') },
       { id: 'refinaria', text: 'Uma Refinaria (B → F) perto dos nós encurta as viagens dos coletores.', done: () => S.hasBuilt(sim, human, 'refinaria') },
       { id: 'muro', text: 'Muros (B → M) se desenham arrastando o mouse. Deixe um Portão (G) para suas unidades passarem.', done: () => S.hasBuilt(sim, human, 'muro') || sim.time > 600 },
       { id: 'pirata', text: 'Treine um Pirata (P) no Quartel e clique com o direito em uma Refinaria inimiga para Sifonar.', done: () => sim.players[human].stats.stolen > 0 },
@@ -800,9 +804,9 @@ function startGame(cfg, netCtx) {
       placeChanged() { const pb = $('placebar'); if (!pb) return; const g = view.ghost; const on = G.isTouch && I.mode === 'build' && g && !S.BUILDINGS[g.def].wall; pb.hidden = !on; document.body.classList.toggle('placing', !!on); if (!on) return; const ok = S.canBuild(sim, human, g.def, g.x, g.y); const afford = S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost); $('pb-text').textContent = S.BUILDINGS[g.def].name + ' · ' + (!ok.ok ? ok.why : !afford ? 'recursos insuficientes' : 'local válido · arraste para ajustar'); $('pb-ok').disabled = !(ok.ok && afford); },
       buildMenuChanged() { refreshPanel(true); refreshQuick(); },
       touchBoxChanged() { refreshQuick(); },
-      notice, confirm: confirmModal, modalOpen() { return !$('diplo').hidden || !$('help').hidden || !$('confirm').hidden; },
+      notice, confirm: confirmModal, modalOpen() { return !$('diplo').hidden || !$('help').hidden || !$('confirm').hidden || !$('savebox').hidden; }, // 4.2g: com Salvar partida aberta as teclas não comandam o jogo
       enqueue(c) { if (net) G.pending.push(c); else S.enqueue(sim, c); },
-      closeModals() { $('diplo').hidden = true; $('help').hidden = true; $('confirm').hidden = true; },
+      closeModals() { $('diplo').hidden = true; $('help').hidden = true; $('confirm').hidden = true; if (G.closeSave) G.closeSave(); },
       toggleHelp() { toggleHelp(); }, togglePause() { if (net) { notice('Sem pausa no multiplayer'); return; } if (G.camp && G.camp.noPause) { notice('Sem pausa na dificuldade Fenda'); return; } G.paused = !G.paused; if (!G.paused) G.pauseWhy = null; else G.pauseWhy = 'Partida pausada.'; refreshTop(); if (!G.paused) notice('Continuando'); },
     };
   }

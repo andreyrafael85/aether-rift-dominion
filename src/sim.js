@@ -59,7 +59,7 @@ const FACTIONS = {
     id: 'erevane', name: 'Erevane', short: 'Erevane',
     tagline: 'Furtividade e roubo. Nódulos camuflados, Sifonadores e recursos roubados limpos.',
     pirateName: 'Sifonador', lineBonus: false, lotes: false, smoke: false, structNeutralVsVehicle: false,
-    stolenMult: 1.2, cloak: { nodulo: true, infantaria: true, pirata: true, atirador: true }, jumps: 2, jumpCostFrac: 0.2,
+    stolenMult: 1.2, cleanTheft: true, cloak: { nodulo: true, infantaria: true, pirata: true, atirador: true }, jumps: 2, jumpCostFrac: 0.2, // 4.2g: cleanTheft, o 'roubados limpos' do texto (sem Rastro)
     superKey: 'blecaute', superName: 'Blecaute',
     superDesc: 'Sensores e energia inimigos a zero por 20 s; suas unidades +30% de velocidade. Custa 300 Dados + 200 Plasma.',
   },
@@ -485,46 +485,85 @@ function queryGrid(sim, x, y, rad, fn) {
 // ---------- navegação: grade de obstáculos e campos de fluxo ----------
 function navIdx(x, y) { const cx = clamp((x / NAV) | 0, 0, NW - 1), cy = clamp((y / NAV) | 0, 0, NW - 1); return cy * NW + cx; }
 function rebuildNav(sim) {
-  const nav = sim.nav; nav.blocked.fill(0); nav.gates.clear(); nav.gatePos.clear(); nav.fields.clear(); nav.version++;
-  for (let cy = 0; cy < NW; cy++) for (let cx = 0; cx < NW; cx++) { const x = (cx + 0.5) * NAV, y = (cy + 0.5) * NAV; if (dist(x, y, CX, CY) < RIFT_R + 14) nav.blocked[cy * NW + cx] = 1; }
+  const nav = sim.nav; nav.blocked.fill(0); nav.gates.clear(); nav.gatePos.clear(); nav.fields.clear(); nav.version++; nav.pass = new Map();
+  const N = NW * NW; const hard = new Uint8Array(N); const wallOf = new Int8Array(N).fill(-1); const gateEnts = []; // 4.2g: o que bloqueia sem ser muro, e de quem é o muro de cada célula
+  const own = nav.own = new Int32Array(N); const centre = nav.centre = new Map(); // 4.2g: entidade que bloqueia cada célula sozinha (-1 = várias ou a Fenda) e centro de cada estrutura/rocha por célula
+  for (let cy = 0; cy < NW; cy++) for (let cx = 0; cx < NW; cx++) { const x = (cx + 0.5) * NAV, y = (cy + 0.5) * NAV; if (dist(x, y, CX, CY) < RIFT_R + 14) { nav.blocked[cy * NW + cx] = 1; hard[cy * NW + cx] = 1; own[cy * NW + cx] = -1; } }
   for (const e of sim.ents) {
     if (!e.alive || (e.kind !== 'building' && e.kind !== 'rock')) continue;
     const rr = e.r + 7; const x0 = Math.max(0, ((e.x - rr) / NAV) | 0), x1 = Math.min(NW - 1, ((e.x + rr) / NAV) | 0), y0 = Math.max(0, ((e.y - rr) / NAV) | 0), y1 = Math.min(NW - 1, ((e.y + rr) / NAV) | 0);
-    const gate = e.kind === 'building' && BUILDINGS[e.def].gate;
+    const gate = e.kind === 'building' && BUILDINGS[e.def].gate; const wall = e.kind === 'building' && BUILDINGS[e.def].wall; if (gate) gateEnts.push(e);
+    { const c0 = navIdx(e.x, e.y); if (!centre.has(c0)) centre.set(c0, [e.x, e.y, e.id, e.r]); }
     for (let cy = y0; cy <= y1; cy++) for (let cx = x0; cx <= x1; cx++) {
       // bloqueia se o círculo da estrutura toca o quadrado da célula
       const qx = Math.max(cx * NAV, Math.min(e.x, (cx + 1) * NAV)), qy = Math.max(cy * NAV, Math.min(e.y, (cy + 1) * NAV));
-      if (dist(qx, qy, e.x, e.y) <= rr) { const i = cy * NW + cx; if (gate) { nav.gates.set(i, e.owner); nav.gatePos.set(i, e); } else nav.blocked[i] = 1; }
+      if (dist(qx, qy, e.x, e.y) <= rr) { const i = cy * NW + cx; own[i] = own[i] === 0 || own[i] === e.id ? e.id : -1; if (gate) { nav.gates.set(i, e.owner); nav.gatePos.set(i, e); } else { nav.blocked[i] = 1; if (!wall) hard[i] = 1; else wallOf[i] = wallOf[i] === -1 || wallOf[i] === e.owner ? e.owner : -2; } }
     }
+  }
+  // 4.2g: em muro diagonal as 2×2 células do portão só encostam pela quina na faixa inflada (3 células de espessura) e o campo de fluxo,
+  // que não corta cantos, via o portão fechado. O corredor 4-conexo ao longo da normal da linha atravessa a faixa inteira (só muros do dono).
+  for (const g of gateEnts) {
+    let n1 = null, n2 = null, d1 = 40, d2 = 40;
+    for (const w of sim.ents) { if (w === g || !w.alive || w.kind !== 'building' || w.owner !== g.owner || !BUILDINGS[w.def].wall) continue; const d = dist(w.x, w.y, g.x, g.y); if (d < d1) { d2 = d1; n2 = n1; d1 = d; n1 = w; } else if (d < d2) { d2 = d; n2 = w; } }
+    let lx, ly; if (n1 && n2) { lx = n2.x - n1.x; ly = n2.y - n1.y; } else if (n1) { lx = g.x - n1.x; ly = g.y - n1.y; } else { lx = DM.cos(g.ang || 0); ly = DM.sin(g.ang || 0); }
+    const ll = DM.hypot(lx, ly) || 1, L = 36; const nx = -ly / ll * L, ny = lx / ll * L;
+    cells4(g.x - nx, g.y - ny, g.x + nx, g.y + ny, i => { if (nav.blocked[i] && !hard[i] && wallOf[i] === g.owner && !nav.gates.has(i)) nav.gates.set(i, g.owner); });
   }
   for (const i of nav.gates.keys()) nav.blocked[i] = 0; // o portão vence os muros vizinhos
   sim.navDirty = false;
 }
-function passable(sim, i, owner) { if (sim.nav.blocked[i]) return false; const g = sim.nav.gates.get(i); return g === undefined || g === owner; }
+function cells4(x0, y0, x1, y1, fn) { // 4.2g: células cruzadas pelo segmento em sequência 4-conexa (DDA de Amanatides–Woo; só + − × ÷)
+  let cx = clamp((x0 / NAV) | 0, 0, NW - 1), cy = clamp((y0 / NAV) | 0, 0, NW - 1); const ex = clamp((x1 / NAV) | 0, 0, NW - 1), ey = clamp((y1 / NAV) | 0, 0, NW - 1);
+  const dx = x1 - x0, dy = y1 - y0, sx = dx > 0 ? 1 : -1, sy = dy > 0 ? 1 : -1, ax = Math.abs(dx), ay = Math.abs(dy);
+  const tdx = ax > 0 ? NAV / ax : Infinity, tdy = ay > 0 ? NAV / ay : Infinity;
+  let tmx = ax > 0 ? (sx > 0 ? (cx + 1) * NAV - x0 : x0 - cx * NAV) / ax : Infinity, tmy = ay > 0 ? (sy > 0 ? (cy + 1) * NAV - y0 : y0 - cy * NAV) / ay : Infinity;
+  fn(cy * NW + cx);
+  for (let k = 0; k < 4 * NW && (cx !== ex || cy !== ey); k++) { if (tmx < tmy) { cx += sx; tmx += tdx; } else { cy += sy; tmy += tdy; } if (cx < 0 || cy < 0 || cx >= NW || cy >= NW) break; fn(cy * NW + cx); }
+}
+function passArr(sim, owner) { // 4.2g: tabela de passagem do jogador (refeita a cada reconstrução da grade); um acesso por célula em vez de Map de portões
+  const nav = sim.nav; if (!nav.pass) nav.pass = new Map(); let a = nav.pass.get(owner); if (a) return a;
+  const N = NW * NW; a = new Uint8Array(N); for (let i = 0; i < N; i++) a[i] = nav.blocked[i] ? 0 : 1; for (const [i, g] of nav.gates) if (g !== owner) a[i] = 0;
+  nav.pass.set(owner, a); return a;
+}
+function passable(sim, i, owner) { return passArr(sim, owner)[i] === 1; }
 function flowField(sim, destIdx, owner) {
-  const nav = sim.nav; const key = owner * 1000000 + destIdx; let f = nav.fields.get(key); if (f) return f;
-  if (nav.fields.size > 96) nav.fields.clear();
+  const nav = sim.nav; const key = owner * 1000000 + destIdx; let f = nav.fields.get(key); if (f) { nav.fields.delete(key); nav.fields.set(key, f); return f; }
+  if (nav.fields.size >= 96) nav.fields.delete(nav.fields.keys().next().value); // 4.2g: descarta o menos usado (antes limpava tudo de uma vez)
   const N = NW * NW; const cost = new Int32Array(N).fill(-1); const dir = new Int8Array(N).fill(-1);
-  // Dijkstra com heap binário; custo 10 reto, 14 diagonal; sem cortar cantos
-  const heap = []; const push = (c, i) => { heap.push(c * 1048576 + i); let k = heap.length - 1; while (k > 0) { const pk = (k - 1) >> 1; if (heap[pk] <= heap[k]) break; const tmp = heap[pk]; heap[pk] = heap[k]; heap[k] = tmp; k = pk; } };
-  const pop = () => { const top = heap[0]; const last = heap.pop(); if (heap.length) { heap[0] = last; let k = 0; for (;;) { const l = 2 * k + 1, r = l + 1; let m = k; if (l < heap.length && heap[l] < heap[m]) m = l; if (r < heap.length && heap[r] < heap[m]) m = r; if (m === k) break; const tmp = heap[m]; heap[m] = heap[k]; heap[k] = tmp; k = m; } } return top; };
-  cost[destIdx] = 0; push(0, destIdx);
-  while (heap.length) {
-    const v = pop(); const c = Math.floor(v / 1048576), i = v % 1048576; if (c > cost[i]) continue;
-    const cx = i % NW, cy = (i / NW) | 0;
-    for (let d = 0; d < 8; d++) {
-      const nx = cx + DX8[d], ny = cy + DY8[d]; if (nx < 0 || ny < 0 || nx >= NW || ny >= NW) continue;
-      const ni = ny * NW + nx; if (!passable(sim, ni, owner)) continue;
-      if (DX8[d] && DY8[d]) { if (!passable(sim, cy * NW + nx, owner) || !passable(sim, ny * NW + cx, owner)) continue; }
-      const nc = c + (DX8[d] && DY8[d] ? 14 : 10);
-      if (cost[ni] < 0 || nc < cost[ni]) { cost[ni] = nc; dir[ni] = (d + 4) % 8; push(nc, ni); }
-    }
+  const P = passArr(sim, owner); // Dijkstra; custo 10 reto, 14 diagonal; sem cortar cantos
+  const BK = 16, bk = []; for (let k = 0; k < BK; k++) bk.push([]); let pend = 0; // 4.2g: fila de baldes (Dial): custos inteiros e passo máximo 14 < 16, sem heap
+  const push = (c, i) => { bk[c % BK].push(i); pend++; };
+  if (passable(sim, destIdx, owner)) { cost[destIdx] = 0; push(0, destIdx); }
+  else { // 4.2g: destino dentro de obstáculo (centro de Núcleo/Refinaria/Quartel, ponto numa rocha): antes o campo saía vazio e a unidade ia reto.
+    // Semeia a primeira camada de células livres em volta (todos os lados), medindo do centro real da estrutura até o ponto mais próximo de cada célula
+    const dx0 = destIdx % NW, dy0 = (destIdx / NW) | 0, R = 8; const ce = nav.centre && nav.centre.get(destIdx); const ex = ce ? ce[0] : (dx0 + 0.5) * NAV, ey = ce ? ce[1] : (dy0 + 0.5) * NAV, eid = ce ? ce[2] : 0;
+    const cand = []; let anyOk = false;
+    for (let oy = -R; oy <= R; oy++) for (let ox = -R; ox <= R; ox++) { const x2 = dx0 + ox, y2 = dy0 + oy; if (x2 < 0 || y2 < 0 || x2 >= NW || y2 >= NW) continue; const i = y2 * NW + x2; if (!passable(sim, i, owner)) continue;
+      const dd = dist(clamp(ex, x2 * NAV, (x2 + 1) * NAV), clamp(ey, y2 * NAV, (y2 + 1) * NAV), ex, ey);
+      // semente boa: da célula até o centro só passa por células livres ou da própria estrutura (não do outro lado de um muro ou rocha)
+      let ok = 1; if (eid && nav.own) cells4((x2 + 0.5) * NAV, (y2 + 0.5) * NAV, ex, ey, j => { if (ok && j !== i && !passable(sim, j, owner) && nav.own[j] !== eid) ok = 0; });
+      cand.push(i, dd, ok); if (ok) anyOk = true; }
+    let dmin = Infinity; for (let k = 0; k < cand.length; k += 3) if ((cand[k + 2] || !anyOk) && cand[k + 1] < dmin) dmin = cand[k + 1];
+    for (let k = 0; k < cand.length; k += 3) if ((cand[k + 2] || !anyOk) && cand[k + 1] <= dmin + NAV) { const i = cand[k]; cost[i] = Math.round((cand[k + 1] - dmin) * 10 / NAV); push(cost[i], i); }
   }
+  for (let c = 0; pend > 0; c++) { const b = bk[c % BK];
+    for (let k = 0; k < b.length; k++) { const i = b[k]; pend--; if (cost[i] !== c) continue;
+      const cx = i % NW, cy = (i / NW) | 0;
+      for (let d = 0; d < 8; d++) {
+        const nx = cx + DX8[d], ny = cy + DY8[d]; if (nx < 0 || ny < 0 || nx >= NW || ny >= NW) continue;
+        const ni = ny * NW + nx; if (!P[ni]) continue;
+        if (DX8[d] && DY8[d]) { if (!P[cy * NW + nx] || !P[ny * NW + cx]) continue; }
+        const nc = c + (DX8[d] && DY8[d] ? 14 : 10);
+        if (cost[ni] < 0 || nc < cost[ni]) { cost[ni] = nc; dir[ni] = (d + 4) % 8; push(nc, ni); }
+      } }
+    b.length = 0; }
   f = { dir, cost, version: nav.version }; nav.fields.set(key, f); return f;
 }
-function lineFree(sim, x0, y0, x1, y1, owner) {
+function lineFree(sim, x0, y0, x1, y1, owner, rad) { // 4.2g: rad > 0 confere também duas linhas paralelas na largura do corpo
   const d = dist(x0, y0, x1, y1); const n = Math.max(1, Math.ceil(d / (NAV * 0.5)));
-  for (let i = 1; i <= n; i++) { const k = i / n; if (!passable(sim, navIdx(x0 + (x1 - x0) * k, y0 + (y1 - y0) * k), owner)) return false; }
+  const ox = rad > 0 && d > 0 ? -(y1 - y0) / d * rad : 0, oy = rad > 0 && d > 0 ? (x1 - x0) / d * rad : 0;
+  for (let i = 1; i <= n; i++) { const k = i / n; const px = x0 + (x1 - x0) * k, py = y0 + (y1 - y0) * k; if (!passable(sim, navIdx(px, py), owner)) return false;
+    if ((ox || oy) && (!passable(sim, navIdx(px + ox, py + oy), owner) || !passable(sim, navIdx(px - ox, py - oy), owner))) return false; }
   return true;
 }
 function markExplored(sim) {
@@ -657,32 +696,57 @@ function formation(units, x, y) {
   }
   return out;
 }
+function reachPoint(sim, u, x, y, maxR, comps) { // 4.2g: vaga dentro de rocha/muro/estrutura/Fenda ou num bolsão fechado pequeno: a célula livre alcançável mais próxima
+  if (UNITS[u.def].flying) return { x, y };
+  const di = navIdx(x, y); const pas = passable(sim, di, u.owner);
+  if (pas && lineFree(sim, u.x, u.y, x, y, u.owner, u.r)) return { x, y }; // reta livre: nada a corrigir (sem Dijkstra)
+  const ui = nearPassable(sim, u.x, u.y, u.owner); if (ui < 0) return { x, y };
+  // campo até a unidade = o que ela alcança (a grade é simétrica); comps reaproveita o campo de quem está no mesmo componente (1 Dijkstra por ordem de grupo)
+  let g = comps ? comps.find(h => h.owner === u.owner && h.f.cost[ui] >= 0) : null; if (!g) { g = { owner: u.owner, f: flowField(sim, ui, u.owner) }; if (comps) comps.push(g); } g = g.f;
+  if (pas && (g.cost[di] >= 0 || !smallPocket(sim, di, u.owner))) return { x, y }; // alcançável, ou do outro lado de um muro/vão estreito: mantém o pedido (como antes)
+  const dcx = di % NW, dcy = (di / NW) | 0;
+  for (let r = 0; r <= (maxR || 40); r++) { let best = -1, bd = Infinity;
+    for (let oy = -r; oy <= r; oy++) for (let ox = -r; ox <= r; ox++) { if (Math.max(Math.abs(ox), Math.abs(oy)) !== r) continue; const x2 = dcx + ox, y2 = dcy + oy; if (x2 < 0 || y2 < 0 || x2 >= NW || y2 >= NW) continue;
+      const i = y2 * NW + x2; if (g.cost[i] < 0 || !passable(sim, i, u.owner)) continue; const ex = (x2 + 0.5) * NAV - x, ey = (y2 + 0.5) * NAV - y; const s = ex * ex + ey * ey; if (s < bd) { bd = s; best = i; } }
+    if (best >= 0) return { x: (best % NW + 0.5) * NAV, y: (((best / NW) | 0) + 0.5) * NAV };
+  }
+  return { x, y };
+}
+function smallPocket(sim, i0, owner) { // 4.2g: a célula está num bolsão fechado pequeno (até 40 células livres, mesma conectividade do campo de fluxo)?
+  const seen = new Set([i0]); const q = [i0];
+  while (q.length) { const i = q.pop(); const cx = i % NW, cy = (i / NW) | 0;
+    for (let d = 0; d < 8; d++) { const nx = cx + DX8[d], ny = cy + DY8[d]; if (nx < 0 || ny < 0 || nx >= NW || ny >= NW) continue; const ni = ny * NW + nx; if (seen.has(ni) || !passable(sim, ni, owner)) continue;
+      if (DX8[d] && DY8[d] && (!passable(sim, cy * NW + nx, owner) || !passable(sim, ny * NW + cx, owner))) continue;
+      seen.add(ni); if (seen.size > 40) return false; q.push(ni); } }
+  return true;
+}
 function processCommand(sim, c) {
   const p = sim.players[c.p]; if (!p || !p.alive) return;
   switch (c.t) {
     case 'move': case 'attackmove': {
       const us = ownUnits(sim, c.p, c.ids); const f = formation(us, c.x, c.y);
-      us.forEach((u, i) => { u.state = c.t === 'move' ? 'move' : 'attackmove'; u.tx = clamp(f[i].x, 20, WORLD - 20); u.ty = clamp(f[i].y, 20, WORLD - 20); u.target = null; u.resume = null; u.node = null; });
+      const comps = []; us.forEach((u, i) => { u.state = c.t === 'move' ? 'move' : 'attackmove'; const q = reachPoint(sim, u, clamp(f[i].x, 20, WORLD - 20), clamp(f[i].y, 20, WORLD - 20), c.t === 'move' ? 40 : 3, comps); u.tx = q.x; u.ty = q.y; u.target = null; u.resume = null; u.node = null; u.stuck = 0; u.stk = 0; u.gx = clamp(c.x, 20, WORLD - 20); u.gy = clamp(c.y, 20, WORLD - 20); u.gn = 0;
+        if (u.def === 'coletor' && p.human) u.area = { x: clamp(c.x, 20, WORLD - 20), y: clamp(c.y, 20, WORLD - 20) }; }); // 4.2g: coletor mandado a um lugar colhe ali (área de trabalho)
       break; }
     case 'stop': ownUnits(sim, c.p, c.ids).forEach(u => { u.state = 'idle'; u.target = null; u.resume = null; }); break;
     case 'attack': {
       const t = sim.byId.get(c.target); if (!t || !t.alive || t.owner === c.p || t.kind === 'node' || !canSee(sim, c.p, t)) return;
       if (t.owner >= 0 && hasPact(sim, c.p, t.owner)) return; // UI must break the pact first
-      ownUnits(sim, c.p, c.ids).forEach(u => { if (UNITS[u.def].attack) { u.state = 'attack'; u.target = t.id; u.resume = null; } else { u.state = 'move'; u.tx = t.x; u.ty = t.y; } });
+      ownUnits(sim, c.p, c.ids).forEach(u => { if (UNITS[u.def].attack) { u.state = 'attack'; u.target = t.id; u.resume = null; } else { u.state = 'move'; const q = reachPoint(sim, u, t.x, t.y, 40); u.tx = q.x; u.ty = q.y; u.stuck = 0; u.stk = 0; u.gx = null; } });
       break; }
     case 'harvest': {
       const t = sim.byId.get(c.target); if (!t || !t.alive || (t.kind !== 'node' && t.kind !== 'wreck')) return;
-      ownUnits(sim, c.p, c.ids).forEach(u => { if (u.def === 'coletor') { u.state = 'harvest'; u.node = t.id; u.target = null; } else { u.state = 'move'; u.tx = t.x; u.ty = t.y; } });
+      ownUnits(sim, c.p, c.ids).forEach(u => { if (u.def === 'coletor') { u.state = 'harvest'; u.node = t.id; u.target = null; if (p.human && t.kind === 'node') u.area = { x: t.x, y: t.y }; } else { u.state = 'move'; const q = reachPoint(sim, u, t.x, t.y, 40); u.tx = q.x; u.ty = q.y; u.stuck = 0; u.stk = 0; u.gx = null; } });
       break; }
     case 'devour': { // Carniceiro (Vorag): carcaças e Nódulos inimigos
       const t = sim.byId.get(c.target); if (!t || !t.alive || !facOf(sim, c.p).devour) return;
       if (!(t.kind === 'wreck' || (t.kind === 'building' && t.def === 'nodulo' && t.owner >= 0 && t.owner !== c.p && !hasPact(sim, c.p, t.owner)))) return;
-      ownUnits(sim, c.p, c.ids).forEach(u => { if (u.def === 'pirata') { u.state = 'devour'; u.target = t.id; } else { u.state = 'move'; u.tx = t.x; u.ty = t.y; } });
+      ownUnits(sim, c.p, c.ids).forEach(u => { if (u.def === 'pirata') { u.state = 'devour'; u.target = t.id; } else { u.state = 'move'; const q = reachPoint(sim, u, t.x, t.y, 40); u.tx = q.x; u.ty = q.y; u.stuck = 0; u.stk = 0; u.gx = null; } });
       break; }
     case 'siphon': {
       const t = sim.byId.get(c.target); if (!t || !t.alive || t.kind !== 'building' || t.owner === c.p || !canSee(sim, c.p, t)) return;
       if (!(t.def === 'refinaria' || t.def === 'reator') || hasPact(sim, c.p, t.owner)) return;
-      ownUnits(sim, c.p, c.ids).forEach(u => { if (u.def === 'pirata') { u.state = 'siphon'; u.target = t.id; u.siphonT = 0; } else { u.state = 'move'; u.tx = t.x; u.ty = t.y; } });
+      ownUnits(sim, c.p, c.ids).forEach(u => { if (u.def === 'pirata') { if (u.state === 'siphon' && u.target === t.id) return; u.state = 'siphon'; u.target = t.id; u.siphonT = 0; } else { u.state = 'move'; const q = reachPoint(sim, u, t.x, t.y, 40); u.tx = q.x; u.ty = q.y; u.stuck = 0; u.stk = 0; u.gx = null; } });
       break; }
     case 'pickup': {
       const t = sim.byId.get(c.target); if (!t || !t.alive || t.kind !== 'crate') return;
@@ -961,7 +1025,7 @@ function kill(sim, e, killer) {
     if (p) p.stats.unitsLost++;
     if (killer >= 0 && killer !== e.owner) sim.players[killer].stats.unitsKilled++;
     if (e.cargoTotal > 0) {
-      const c = { id: sim.nextId++, kind: 'crate', x: e.x, y: e.y, r: 9, alive: true, owner: -1, cargo: Object.assign({}, e.cargo), stolen: e.stolen, bornT: sim.time };
+      const c = { id: sim.nextId++, kind: 'crate', x: e.x, y: e.y, r: 9, alive: true, owner: -1, cargo: Object.assign({}, e.cargo), stolen: e.stolen, victim: e.stolen ? e.victim : undefined, bornT: sim.time }; // 4.2g: guarda a vítima do roubo
       sim.ents.push(c); sim.byId.set(c.id, c);
       emit(sim, { t: 'crate', x: e.x, y: e.y });
       if (p && p.human) alertTo(sim, p.id, 'Caixa derrubada: ' + Math.round(e.cargoTotal) + ' em recursos', e.x, e.y, 'warn');
@@ -1001,18 +1065,37 @@ function acquire(sim, u, rad, unitsOnly) {
   });
   return best;
 }
-function moveToward(sim, u, tx, ty, dt) {
+function moveToward(sim, u, tx, ty, dt, gx, gy) { // gx, gy (4.2g): ponto da ordem do grupo; longe da vaga, todos seguem o mesmo campo
   const dx = tx - u.x, dy = ty - u.y; const d = DM.hypot(dx, dy);
-  const sp = speedOf(sim, u) * dt;
+  const sp = speedOf(sim, u) * dt; u.mvTick = sim.tick;
   if (d <= Math.max(sp, 4)) { u.x = tx; u.y = ty; return true; }
-  if (!UNITS[u.def].flying && d > NAV * 1.2 && !lineFree(sim, u.x, u.y, tx, ty, u.owner)) {
-    const f = flowField(sim, navIdx(tx, ty), u.owner); const ci = navIdx(u.x, u.y); let dir = f.dir[ci];
+  // 4.2g: sem o atalho "último trecho reto" (d <= 1,2 célula atravessava muro fino); a reta precisa estar livre na largura do corpo; travado há 2 s segue o campo
+  const di = navIdx(tx, ty), ci = navIdx(u.x, u.y), v = sim.nav.version; // destino em célula bloqueada (centro de estrutura): a reta nunca está livre, vai direto ao campo
+  // 4.2g: reta e mira são refeitas só quando a unidade muda de célula, de destino ou a grade muda (custo de CPU)
+  if (gx != null && !u.gn && d <= NAV * 8) u.gn = 1; // perto da vaga: daqui em diante só o campo dela (sem ir e voltar no limite)
+  const fdi = gx != null && !u.gn && dist(tx, ty, gx, gy) <= NAV * 6 ? navIdx(gx, gy) : di; // 4.2g: um Dijkstra por ordem de grupo, não um por vaga de formação
+  const fresh = u.pc !== ci || u.pd !== di || u.pv !== v || u.pg !== fdi; if (fresh) { u.pc = ci; u.pd = di; u.pv = v; u.pg = fdi; u.pl = UNITS[u.def].flying || (passable(sim, di, u.owner) ? lineFree(sim, u.x, u.y, tx, ty, u.owner, u.r) : approachClear(sim, u, di)) ? 1 : 0; u.pa = -1; }
+  if (!UNITS[u.def].flying && ((u.stuck || 0) >= 2 || !u.pl)) {
+    let f = flowField(sim, fdi, u.owner); if (fdi !== di && f.cost[ci] < 0) f = flowField(sim, di, u.owner); let dir = f.dir[ci];
     let nx = 0, ny = 0;
-    const cx = ci % NW, cy = (ci / NW) | 0;
-    if (dir >= 0) { const ni = (cy + DY8[dir]) * NW + (cx + DX8[dir]); const g = sim.nav.gatePos.get(ni); if (g && !sim.nav.gates.has(ci)) { nx = g.x; ny = g.y; } else { nx = (cx + DX8[dir] + 0.5) * NAV; ny = (cy + DY8[dir] + 0.5) * NAV; } }
-    else { // célula bloqueada ou sem rota: vai para o vizinho alcançável de menor custo
-      let best = -1, bc = Infinity;
-      for (let d = 0; d < 8; d++) { const x2 = cx + DX8[d], y2 = cy + DY8[d]; if (x2 < 0 || y2 < 0 || x2 >= NW || y2 >= NW) continue; const ni = y2 * NW + x2; if (f.cost[ni] >= 0 && f.cost[ni] < bc) { bc = f.cost[ni]; best = ni; } }
+    const cx = ci % NW, cy = (ci / NW) | 0; const here = passable(sim, ci, u.owner);
+    if (dir >= 0) { u.fa = -1; const ni = (cy + DY8[dir]) * NW + (cx + DX8[dir]); const g = sim.nav.gatePos.get(ni); if (g && !sim.nav.gates.has(ci)) { nx = g.x; ny = g.y; } else { nx = (cx + DX8[dir] + 0.5) * NAV; ny = (cy + DY8[dir] + 0.5) * NAV;
+      // 4.2g: olha até 6 células adiante no campo e mira a mais distante ainda livre em linha reta (sem zigue-zague entre centros; para antes de portões)
+      if (u.pa < 0) { u.pa = ni; const path = []; let c2 = ni; for (let k = 0; k < 6; k++) { const d2 = f.dir[c2]; if (d2 < 0) break; const c3 = (((c2 / NW) | 0) + DY8[d2]) * NW + c2 % NW + DX8[d2]; if (sim.nav.gates.has(c3)) break; path.push(c3); c2 = c3; }
+        for (let k = path.length - 1; k >= 0; k--) { const px = (path[k] % NW + 0.5) * NAV, py = (((path[k] / NW) | 0) + 0.5) * NAV; if (lineFree(sim, u.x, u.y, px, py, u.owner, u.r)) { u.pa = path[k]; break; } } }
+      nx = (u.pa % NW + 0.5) * NAV; ny = (((u.pa / NW) | 0) + 0.5) * NAV; } }
+    else if (here && f.cost[ci] >= 0) u.fa = di; // célula de destino ou semente ao redor do alvo: aproximação final em linha reta (trava a aproximação para este destino)
+    else if (!here && u.fa === di && (u.stuck || 0) < 2) { /* aproximação final já iniciada: segue reto para dentro da pegada do próprio alvo (entrega, sifão, ataque a estrutura); travada há 2 s solta a trava */ }
+    else { // célula bloqueada (corpo na faixa inflada) ou sem rota: célula LIVRE e alcançável de menor custo cujo trecho reto não entra em nenhuma estrutura/rocha (corpo físico);
+      // sem nenhuma assim, a livre mais perto do corpo; nada alcançável = reto, como antes (cerco a base murada)
+      const cand = [];
+      for (let r = 1; r <= 3 && !cand.length; r++) for (let oy = -r; oy <= r; oy++) for (let ox = -r; ox <= r; ox++) { if (Math.max(Math.abs(ox), Math.abs(oy)) !== r) continue; const x2 = cx + ox, y2 = cy + oy; if (x2 < 0 || y2 < 0 || x2 >= NW || y2 >= NW) continue; const ni = y2 * NW + x2;
+        if (f.cost[ni] < 0 || !passable(sim, ni, u.owner)) continue;
+        if (r === 1 && ox && oy && (!passable(sim, cy * NW + x2, u.owner) || !passable(sim, y2 * NW + cx, u.owner))) continue;
+        const dd = DM.hypot((x2 + 0.5) * NAV - u.x, (y2 + 0.5) * NAV - u.y); cand.push([Math.round(dd * 10 / NAV) + f.cost[ni], Math.round(dd), ni]); }
+      let best = -1;
+      if (cand.length) { cand.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2]); for (const c of cand) if (segClear(sim, u, (c[2] % NW + 0.5) * NAV, (((c[2] / NW) | 0) + 0.5) * NAV)) { best = c[2]; break; }
+        if (best < 0) { cand.sort((a, b) => a[1] - b[1] || a[0] - b[0] || a[2] - b[2]); best = cand[0][2]; } }
       if (best >= 0) { nx = (best % NW + 0.5) * NAV; ny = (((best / NW) | 0) + 0.5) * NAV; dir = 0; }
     }
     if (dir >= 0) {
@@ -1022,6 +1105,25 @@ function moveToward(sim, u, tx, ty, dt) {
   }
   u.x += dx / d * sp; u.y += dy / d * sp; u.ang = DM.atan2(dy, dx); return false;
 }
+function approachClear(sim, u, di) { // 4.2g: destino dentro de estrutura/rocha (entrega, sifão, ataque): a reta até encostar nela está livre? Livre = vai reto, sem o campo semeado (um Dijkstra do mapa todo)
+  const ce = sim.nav.centre && sim.nav.centre.get(di); if (!ce) return false;
+  const ex = ce[0], ey = ce[1], er = ce[3]; const d = dist(u.x, u.y, ex, ey); if (d < 1) return true;
+  const ux = (u.x - ex) / d, uy = (u.y - ey) / d, far = er + 7 + NAV * 1.5, cx = ex + ux * (er + u.r + 2), cy = ey + uy * (er + u.r + 2);
+  if (d > far) { const ax = ex + ux * far, ay = ey + uy * far; return lineFree(sim, u.x, u.y, ax, ay, u.owner, u.r) && segClear(sim, u, cx, cy, ax, ay); }
+  return segClear(sim, u, cx, cy);
+}
+function segClear(sim, u, x1, y1, x0, y0) { // 4.2g: o trecho reto até (x1,y1) não leva o corpo mais fundo em nenhuma estrutura/rocha (mesmos raios de separate(); portão próprio não conta)
+  if (x0 == null) { x0 = u.x; y0 = u.y; } const dx = x1 - x0, dy = y1 - y0, L2 = dx * dx + dy * dy; let ok = true;
+  queryGrid(sim, (x0 + x1) / 2, (y0 + y1) / 2, DM.hypot(dx, dy) / 2 + 60, e => {
+    if (!ok || (e.kind !== 'building' && e.kind !== 'rock') || (e.kind === 'building' && BUILDINGS[e.def].gate && e.owner === u.owner)) return;
+    const t = L2 > 0 ? clamp(((e.x - x0) * dx + (e.y - y0) * dy) / L2, 0, 1) : 0; const md = dist(x0 + dx * t, y0 + dy * t, e.x, e.y);
+    if (md < Math.min(e.r + u.r + 1, dist(x0, y0, e.x, e.y) - 0.5)) ok = false;
+  });
+  return ok;
+}
+function stuckDone(sim, u) { // 4.2g: chegou "o bastante" (vaga ocupada ou encostada num obstáculo) ou desiste depois de 12 s presa nesta ordem (somados: um desvio curto não zera a conta)
+  const st = u.stuck || 0; if (st < 2) return false; if ((u.stk || 0) >= 12 || dist(u.x, u.y, u.tx, u.ty) <= u.r + 26) { u.stuck = 0; u.stk = 0; return true; } return false;
+}
 function nearestDeposit(sim, u) {
   let best = null, bd = Infinity;
   for (const e of sim.ents) {
@@ -1030,21 +1132,27 @@ function nearestDeposit(sim, u) {
   }
   return best;
 }
+const WORK_R = 360; // 4.2g: raio da área de trabalho de um coletor mandado pelo jogador (mover, colher num nó, ponto de reunião)
 function pickNode(sim, u) {
   const p = sim.players[u.owner];
   // weight: prefer resource with lowest stock
   const stock = p.res; const w = { minerio: 1, plasma: 1, dados: 0.8 };
   const lowest = ['minerio', 'plasma', 'dados'].sort((a, b) => stock[a] - stock[b])[0];
   w[lowest] *= 0.6;
-  let best = null, bd = Infinity;
+  // 4.2g: círculos de território do dono calculados uma vez por chamada (antes, uma varredura de todas as entidades por nó: coletores parados pesavam no passo)
+  const terr = []; for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || e.owner !== u.owner || !e.built) continue; const t = territoryOf(sim, e); if (t) terr.push(e.x, e.y, t); }
+  const inT = (x, y) => { for (let k = 0; k < terr.length; k += 3) if (dist(x, y, terr[k], terr[k + 1]) <= terr[k + 2]) return true; return false; };
+  const ar = u.area || null; let best = null, bd = Infinity, bestA = null, bdA = Infinity;
   for (const e of sim.ents) {
     if (!e.alive || (e.kind !== 'node' && e.kind !== 'wreck') || e.amount <= 0) continue;
-    if (e.kind === 'node' && !inTerritory(sim, u.owner, e.x, e.y)) continue;
-    if (e.kind === 'wreck' && dist(u.x, u.y, e.x, e.y) > 520) continue;
     const d = dist(u.x, u.y, e.x, e.y) * w[e.res] * (e.kind === 'wreck' ? 0.7 : 1);
+    if (ar && dist(ar.x, ar.y, e.x, e.y) <= WORK_R) { const ow = territoryOwner(sim, e.x, e.y); if (ow === -1 || ow === u.owner || !isEnemy(sim, u.owner, ow)) { if (d < bdA) { bdA = d; bestA = e; } continue; } }
+    if (e.kind === 'node' && !inT(e.x, e.y)) continue;
+    if (e.kind === 'wreck' && dist(u.x, u.y, e.x, e.y) > 520) continue;
     if (d < bd) { bd = d; best = e; }
   }
-  return best;
+  if (ar && !bestA) u.area = null; // área esgotada: volta ao território
+  return bestA || best;
 }
 function deliver(sim, u) {
   const p = sim.players[u.owner];
@@ -1078,18 +1186,27 @@ function updateUnit(sim, u, dt) {
   if (u.tempUntil && sim.time >= u.tempUntil) { kill(sim, u, -1); return; } // Crias da Eclosão
   { const pm = sim.players[u.owner].mods; if (pm && pm.regen && u.hp < u.maxHp && sim.time - u.lastHitT > 5) u.hp = Math.min(u.maxHp, u.hp + pm.regen * dt); }
   if (fac.hunger && u.def === fac.hunger.def && !u.tempUntil && sim.tick % 10 === 0 && !inTerritory(sim, u.owner, u.x, u.y)) { const floor = u.maxHp * fac.hunger.floor; if (u.hp > floor) u.hp = Math.max(floor, u.hp - fac.hunger.rate); }
-  u.cloaked = !!fac.cloak[u.def] && u.state !== 'siphon' && (sim.time - u.lastAttack) > 3;
+  u.cloaked = !!fac.cloak[u.def] && !(u.state === 'siphon' && u.siphonT > 0) && (sim.time - u.lastAttack) > 3; // 4.2g: some só enquanto drena (antes sumia na marcha inteira até o alvo)
+  if (u.def === 'pirata' && u.stolen && u.cargoTotal > 0 && (u.state === 'idle' || u.state === 'move' || u.state === 'attackmove')) { // 4.2g: Pirata com carga roubada entrega ao chegar perto de uma Refinaria/Núcleo seu; parado, volta sozinho
+    let dep = null; queryGrid(sim, u.x, u.y, u.r + 70, e => { if (!dep && e.alive && e.kind === 'building' && e.owner === u.owner && e.built && BUILDINGS[e.def].deposit && dist(u.x, u.y, e.x, e.y) <= u.r + e.r + 10) dep = e; });
+    if (dep) deliver(sim, u); else if (u.state === 'idle' && sim.tick % 10 === u.id % 10 && nearestDeposit(sim, u)) u.state = 'return';
+  }
   if (!u.cloaked && u.def !== 'ancora' && sim.auras && sim.auras[u.owner].anchors.length && (sim.time - u.lastAttack) > 3) { for (const an of sim.auras[u.owner].anchors) if (dist(an.x, an.y, u.x, u.y) <= UNITS.ancora.aura.cloak) { u.cloaked = true; break; } }
   if (d.heal && sim.tick % 5 === 0) { queryGrid(sim, u.x, u.y, d.heal.range + 40, e => { if (!e.alive || e.owner !== u.owner || e === u || (e.kind !== 'unit' && e.kind !== 'building')) return; if (dist(u.x, u.y, e.x, e.y) > d.heal.range || e.hp >= e.maxHp) return; if (e.kind === 'building' && !e.built) return; e.hp = Math.min(e.maxHp, e.hp + (e.kind === 'unit' ? d.heal.unit : d.heal.building) * dt * 5); }); }
+  if (!d.flying && sim.tick % 10 === u.id % 10) { // 4.2g: detector de travamento (mesmo resultado em todo cliente: só estado da sim)
+    if (u.mvTick >= sim.tick - 1) { const m = DM.hypot(u.x - (u.sx == null ? u.x + 99 : u.sx), u.y - (u.sy == null ? u.y : u.sy)); u.stuck = m < speedOf(sim, u) * 0.2 ? (u.stuck || 0) + 1 : 0; if (u.stuck) u.stk = (u.stk || 0) + 1; }
+    else u.stuck = 0;
+    u.sx = u.x; u.sy = u.y;
+  }
   switch (u.state) {
     case 'idle': {
       if (d.attack) { const t = acquire(sim, u, d.attack.range + 70, false); if (t) { u.target = t.id; u.state = 'attack'; u.resume = null; } }
-      else if (u.def === 'coletor') { const n = pickNode(sim, u); if (n) { u.node = n.id; u.state = 'harvest'; } }
+      else if (u.def === 'coletor') { const n = pickNode(sim, u); if (n) { u.node = n.id; u.state = 'harvest'; } else if (u.cargoTotal > 0 && nearestDeposit(sim, u)) u.state = 'return'; } // 4.2g: parado com carga entrega
       break; }
-    case 'move': if (moveToward(sim, u, u.tx, u.ty, dt)) u.state = 'idle'; break;
+    case 'move': if (moveToward(sim, u, u.tx, u.ty, dt, u.gx, u.gy) || stuckDone(sim, u)) u.state = 'idle'; break;
     case 'attackmove': {
       if (d.attack) { const t = acquire(sim, u, d.attack.range + 90, false); if (t) { u.target = t.id; u.state = 'attack'; u.resume = { x: u.tx, y: u.ty }; break; } }
-      if (moveToward(sim, u, u.tx, u.ty, dt)) u.state = 'idle';
+      if (moveToward(sim, u, u.tx, u.ty, dt, u.gx, u.gy) || stuckDone(sim, u)) u.state = 'idle';
       break; }
     case 'attack': {
       const t = sim.byId.get(u.target);
@@ -1166,13 +1283,14 @@ function pickupCrates(sim) {
     if (taker) {
       const p = sim.players[taker.owner]; let total = 0;
       for (const k in c.cargo) { p.res[k] += c.cargo[k]; total += c.cargo[k]; }
-      p.stats.stolen += c.stolen ? total : 0; if (!c.stolen) p.stats.collected += total;
+      const steal = c.stolen && c.victim !== taker.owner; p.stats.stolen += steal ? total : 0; if (!steal) p.stats.collected += total; // 4.2g: recuperar o próprio recurso não é roubo
       c.alive = false;
       emit(sim, { t: 'float', x: c.x, y: c.y, text: 'CAIXA +' + Math.round(total), owner: taker.owner, kind: 'steal' });
       if (p.human) alertTo(sim, p.id, 'Caixa recolhida: +' + Math.round(total), c.x, c.y, 'good');
     } else if (sim.time - c.bornT > 120) c.alive = false;
   }
 }
+function rallyTo(sim, u, b) { const rx = b.rally.x + (sim.rand() - 0.5) * 30, ry = b.rally.y + (sim.rand() - 0.5) * 30; const q = reachPoint(sim, u, rx, ry, 40); u.tx = q.x; u.ty = q.y; u.stuck = 0; u.stk = 0; u.gx = b.rally.x; u.gy = b.rally.y; u.gn = 0; } // mesma ordem de sorteio de antes (x, depois y)
 function updateBuilding(sim, b, dt) {
   const d = BUILDINGS[b.def]; const p = sim.players[b.owner];
   if (b.cd > 0) b.cd -= dt;
@@ -1217,11 +1335,11 @@ function updateBuilding(sim, b, dt) {
       b.queue.shift();
       const ang = b.rally ? DM.atan2(b.rally.y - b.y, b.rally.x - b.x) : DM.atan2(CY - b.y, CX - b.x);
       const u = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang) * (b.r + 14), b.y + DM.sin(ang) * (b.r + 14));
-      if (b.rally) { u.state = 'move'; u.tx = b.rally.x + (sim.rand() - 0.5) * 30; u.ty = b.rally.y + (sim.rand() - 0.5) * 30; }
+      if (b.rally) { u.state = 'move'; rallyTo(sim, u, b); if (u.def === 'coletor' && p.human) u.area = { x: b.rally.x, y: b.rally.y }; } // 4.2g: vaga alcançável (reunião sobre um prédio, muro ou a Fenda travava a unidade)
       if (b.mod === 1 && b.def === 'quartel' && u.cls === 'inf') { u.rank = 1; u.xp = Math.max(50, unitCost(it.def)) * VET_RANKS[1]; } // Academia
       emit(sim, { t: 'spawn', p: b.owner, x: u.x, y: u.y, def: it.def });
-      if (UNITS[it.def].pair && p.mods && p.mods.brood >= 3) { const u3 = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang - 0.5) * (b.r + 14), b.y + DM.sin(ang - 0.5) * (b.r + 14)); if (b.rally) { u3.state = 'move'; u3.tx = b.rally.x + (sim.rand() - 0.5) * 30; u3.ty = b.rally.y + (sim.rand() - 0.5) * 30; } emit(sim, { t: 'spawn', p: b.owner, x: u3.x, y: u3.y, def: it.def }); } // Fome Sem Fim: trios
-      if (UNITS[it.def].pair) { const u2 = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang + 0.5) * (b.r + 14), b.y + DM.sin(ang + 0.5) * (b.r + 14)); if (b.rally) { u2.state = 'move'; u2.tx = b.rally.x + (sim.rand() - 0.5) * 30; u2.ty = b.rally.y + (sim.rand() - 0.5) * 30; } emit(sim, { t: 'spawn', p: b.owner, x: u2.x, y: u2.y, def: it.def }); }
+      if (UNITS[it.def].pair && p.mods && p.mods.brood >= 3) { const u3 = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang - 0.5) * (b.r + 14), b.y + DM.sin(ang - 0.5) * (b.r + 14)); if (b.rally) { u3.state = 'move'; rallyTo(sim, u3, b); } emit(sim, { t: 'spawn', p: b.owner, x: u3.x, y: u3.y, def: it.def }); } // Fome Sem Fim: trios
+      if (UNITS[it.def].pair) { const u2 = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang + 0.5) * (b.r + 14), b.y + DM.sin(ang + 0.5) * (b.r + 14)); if (b.rally) { u2.state = 'move'; rallyTo(sim, u2, b); } emit(sim, { t: 'spawn', p: b.owner, x: u2.x, y: u2.y, def: it.def }); }
     }
   }
   if (d.attack && b.cd <= 0) {
@@ -1233,7 +1351,7 @@ function separate(sim) {
   const units = [];
   for (const e of sim.ents) if (e.alive && e.kind === 'unit') units.push(e);
   for (const u of units) {
-    let fx = 0, fy = 0, bfx = 0, bfy = 0;
+    let fx = 0, fy = 0, bfx = 0, bfy = 0, ofx = 0, ofy = 0, om = 0; // o* (4.2g): empurrões das estruturas do próprio dono, somados à parte
     // Dentro do vão de um portão próprio (36 wu), os muros do próprio jogador não empurram: o portão é a passagem, mesmo para veículos largos.
     let inOwnGate = false; if (!UNITS[u.def].flying && sim.nav.gatePos.size) { for (const g of sim.nav.gatePos.values()) if (g.alive && g.owner === u.owner && dist(u.x, u.y, g.x, g.y) < 36) { inOwnGate = true; break; } }
     queryGrid(sim, u.x, u.y, 40, e => {
@@ -1247,9 +1365,12 @@ function separate(sim) {
         if (e.kind === 'building' && BUILDINGS[e.def].gate && e.owner === u.owner) return; // portão próprio: passa
         if (inOwnGate && e.kind === 'building' && BUILDINGS[e.def].wall && e.owner === u.owner) return; // muro ao lado do próprio portão: não trava a passagem
         const dx = u.x - e.x, dy = u.y - e.y; const dd = DM.hypot(dx, dy) || 0.01; const min = u.r + e.r + 2;
-        if (dd < min) { const push = (min - dd); fx += dx / dd * push; fy += dy / dd * push; bfx += dx / dd * push; bfy += dy / dd * push; }
+        if (dd < min) { const push = (min - dd); if (e.kind === 'building' && e.owner === u.owner) { ofx += dx / dd * push; ofy += dy / dd * push; om += push; } else { fx += dx / dd * push; fy += dy / dd * push; bfx += dx / dd * push; bfy += dy / dd * push; } }
       }
     });
+    // 4.2g: presa por estruturas da própria Raça (muro construído em cima dela, vão fechado entre prédios da IA): espremida há 3 s, ou só elas empurrando há 5 s,
+    // elas param de empurrar e a unidade sai andando. Estruturas inimigas e rochas continuam bloqueando.
+    if (om > 0) { const st = u.stuck || 0; const phase = (st >= 3 && DM.hypot(ofx, ofy) < 0.5 * om) || (st >= 5 && !bfx && !bfy); if (!phase) { fx += ofx; fy += ofy; bfx += ofx; bfy += ofy; } }
     // deslizar ao longo de obstáculos (muros e prédios) em direção ao destino
     if ((bfx || bfy) && (u.state === 'move' || u.state === 'attackmove' || u.state === 'attack' || u.state === 'harvest' || u.state === 'return' || u.state === 'siphon' || u.state === 'pickup')) {
       let gx = u.tx, gy = u.ty;
@@ -1432,6 +1553,7 @@ function restore(sim, snap) {
   sim.storm = jsonBack(snap.storm); sim.nextStorm = jsonBack(snap.nextStorm); sim.vis = snap.vis.map(a => new Set(a)); sim.explored = snap.explored.map(unb64);
   sim.byId = new Map(); for (const e of sim.ents) sim.byId.set(e.id, e);
   const nav = sim.nav; nav.blocked = unb64(snap.nav.blocked); nav.gates = new Map(snap.nav.gates); nav.gatePos = new Map(snap.nav.gatePos.map(([i, id]) => [i, sim.byId.get(id)]).filter(x => x[1])); nav.fields = new Map(); nav.version = snap.nav.version; sim.navDirty = snap.navDirty;
+  { const v0 = nav.version, nd = sim.navDirty; rebuildNav(sim); nav.version = v0; sim.navDirty = nd; } // 4.2g: refaz a grade (centros, donos de célula, corredores de portão) sem mudar versão nem o 'sujo'
   sim.grid = new Map(); rebuildGrid(sim);
   if (snap.auras) sim.auras = snap.auras.map(a => ({ anchors: a.anchors.map(id => sim.byId.get(id)).filter(Boolean), moldes: a.moldes.map(id => sim.byId.get(id)).filter(Boolean), diapasoes: a.diapasoes.map(id => sim.byId.get(id)).filter(Boolean) }));
   sim.events = []; sim._evRet = 0;

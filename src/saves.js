@@ -38,16 +38,22 @@ const ls = {
   get(slot) { const t = localStorage.getItem(LS_PREFIX + slot); return t ? JSON.parse(t) : null; },
   del(slot) { localStorage.removeItem(LS_PREFIX + slot); },
 };
-async function put(slot, meta, data) {
+// 4.2g — gravações e apagamentos em fila, na ordem em que foram pedidos (um salvamento ainda comprimindo não cai depois de um del('auto')); cada passo tem tempo-limite para a fila nunca travar
+let queue = Promise.resolve();
+function serial(fn) { const p = queue.then(() => Promise.race([fn(), new Promise((_, rej) => setTimeout(() => rej(new Error('armazenamento demorou')), 8000))])); queue = p.then(() => {}, () => {}); return p; }
+function put(slot, meta, data) {
   meta = Object.assign({}, meta, { slot, savedAt: Date.now() });
-  try { const p = await pack(data); meta.bytes = p.size; await tx('readwrite', st => st.put({ meta, enc: p.enc, body: p.body }, slot)); try { ls.del(slot); } catch (e) {} return meta; }
-  catch (e) { ls.put(slot, meta, data); meta.bytes = (localStorage.getItem(LS_PREFIX + slot) || '').length; return meta; }
+  const packed = pack(data); packed.catch(() => {}); // a fotografia vira texto já, na hora do pedido
+  return serial(async () => {
+    try { const p = await packed; meta.bytes = p.size; await tx('readwrite', st => st.put({ meta, enc: p.enc, body: p.body }, slot)); try { ls.del(slot); } catch (e) {} return meta; }
+    catch (e) { ls.put(slot, meta, data); meta.bytes = (localStorage.getItem(LS_PREFIX + slot) || '').length; return meta; }
+  });
 }
 async function getRec(slot) { try { const r = await tx('readonly', st => st.get(slot)); if (r) return r; } catch (e) {} try { return ls.get(slot); } catch (e) { return null; } }
 async function get(slot) { const r = await getRec(slot); if (!r) return null; return { meta: r.meta, data: await unpack(r) }; }
 async function meta(slot) { const r = await getRec(slot); return r ? r.meta : null; }
 async function list() { const out = []; for (const s of SLOTS) { try { const m = await meta(s); if (m) out.push(m); } catch (e) {} } return out; }
-async function del(slot) { try { await tx('readwrite', st => st.delete(slot)); } catch (e) {} try { ls.del(slot); } catch (e) {} }
+function del(slot) { return serial(async () => { try { await tx('readwrite', st => st.delete(slot)); } catch (e) {} try { ls.del(slot); } catch (e) {} }); }
 function ago(ts) { const s = Math.max(0, Math.round((Date.now() - ts) / 1000)); if (s < 60) return 'há ' + s + ' s'; const m = Math.round(s / 60); if (m < 60) return 'há ' + m + ' min'; const h = Math.round(m / 60); if (h < 48) return 'há ' + h + ' h'; return 'há ' + Math.round(h / 24) + ' dias'; }
 const mmss = t => Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0');
 ARD.saves = { SLOTS, put, get, meta, list, del, ago, mmss, gzip: canGzip };

@@ -22,10 +22,11 @@ function create(o) {
   };
   function updateGhost(sx, sy) { if (!view.ghost) return; const [wx, wy] = R.screenToWorld(cam, sx, sy); view.ghost.x = wx; view.ghost.y = wy; view.ghost.ok = S.canBuild(sim, human, view.ghost.def, wx, wy).ok && S.canAfford(sim.players[human], S.BUILDINGS[view.ghost.def].cost); }
 
-  function pick(sx, sy, radiusPx) {
+  function pick(sx, sy, radiusPx, skipOwn) { // skipOwn (4.2g): para ordens; unidade ou estrutura sua nunca é alvo, vale o nó, a caixa, a carcaça ou o inimigo embaixo
     const vis = sim.vis[human]; let best = null, bd = Infinity; const k = R.K * cam.zoom;
     for (const e of sim.ents) {
       if (!e.alive || e.kind === 'proj' || e.kind === 'rock') continue;
+      if (skipOwn && e.owner === human && (e.kind === 'unit' || e.kind === 'building')) continue;
       if (e.kind !== 'node' && e.owner !== human && !vis.has(e.id)) continue;
       const z = e.kind === 'unit' && S.UNITS[e.def].flying ? 14 : 0;
       const [ex, ey] = R.worldToScreen(cam, e.x, e.y, z);
@@ -58,7 +59,7 @@ function create(o) {
     return out;
   }
   function contextCommand(wx, wy, sx, sy) {
-    const units = ownSelectedUnits(); const t = pick(sx, sy, I.lastType === 'touch' ? 22 : 10);
+    const units = ownSelectedUnits(); const t = pick(sx, sy, I.lastType === 'touch' ? 22 : 10, units.length > 0);
     if (!units.length) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice('Ponto de reunião definido'); } return; }
     const ids = units.map(u => u.id);
     if (t && (t.kind === 'node' || t.kind === 'wreck')) {
@@ -110,6 +111,7 @@ function create(o) {
     const now = performance.now();
     if (I.lastType === 'touch') { // toque: com unidades selecionadas, tocar no chão move e tocar em alvo comanda
       const units = ownSelectedUnits();
+      if (units.length) { const tc = pick(sx, sy, 10, true); if (tc && (tc.owner !== human && tc.owner >= 0 || tc.kind === 'node' || tc.kind === 'crate' || tc.kind === 'wreck')) { contextCommand(wx, wy, sx, sy); return; } } // 4.2g: tocar num nó com coletores em cima colhe (antes selecionava um coletor e soltava o grupo)
       if (units.length && t && (t.owner !== human && t.owner >= 0 || t.kind === 'node' || t.kind === 'crate' || t.kind === 'wreck')) { contextCommand(wx, wy, sx, sy); return; }
       if (units.length && (!t || (t.owner === human && (t.kind === 'building' || view.sel.has(t.id))))) { cmd({ t: 'move', ids: units.map(u => u.id), x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#E8E2D6' }; return; } // tocar numa construção sua ou no próprio grupo também move
       if (!units.length && !t) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice('Ponto de reunião definido'); return; } }
@@ -138,8 +140,9 @@ function create(o) {
     }
     // prefer combat units over collectors when both present
     const ents = ids.map(id => sim.byId.get(id)).filter(Boolean);
-    const combat = ents.filter(e => e.kind === 'unit' && e.def !== 'coletor');
-    setSel((combat.length && ents.some(e => e.def === 'coletor') ? combat : ents).map(e => e.id));
+    const combat = ents.filter(e => e.kind === 'unit' && e.def !== 'coletor'); const nCol = ents.filter(e => e.def === 'coletor').length;
+    const dropCol = combat.length && nCol && combat.length >= nCol; // 4.2g: coletores só ficam de fora quando o exército é maioria (antes, 2 soldados no meio tiravam 10 coletores da seleção)
+    setSel((dropCol ? combat : ents).map(e => e.id)); if (dropCol) ui.notice(nCol + (nCol > 1 ? ' coletores ficaram' : ' coletor ficou') + ' de fora: o exército tem prioridade. Duplo clique num coletor seleciona todos na tela.');
   }
 
   // ---- pointer events
@@ -180,7 +183,7 @@ function create(o) {
     if (view.box) { const b = view.box; view.box = null; boxSelect(b, d.shift); return; }
     if (I.mode === 'build' && view.ghost && d.type === 'touch' && !S.BUILDINGS[view.ghost.def].wall) { if (!d.moved) updateGhost(sx, sy); ui.placeChanged && ui.placeChanged(); return; } // toque só reposiciona; o ✓ confirma
     if (d.moved) return;
-    if (d.button === 2) { if (I.mode !== 'normal') I.setMode('normal'); else contextCommand(wx, wy, sx, sy); return; }
+    if (d.button === 2) { if (I.mode === 'attackmove') { I.setMode('normal'); contextCommand(wx, wy, sx, sy); } else if (I.mode !== 'normal') I.setMode('normal'); else contextCommand(wx, wy, sx, sy); return; } // 4.2g: botão direito no modo Atacar-mover ainda dá a ordem
     if (d.button === 0) {
       if (d.type === 'touch' && I.touchBox) { I.touchBox = false; ui.touchBoxChanged(false); }
       primaryAction(wx, wy, sx, sy, d.shift);
@@ -197,6 +200,7 @@ function create(o) {
   window.addEventListener('keydown', e => {
     if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) return;
     if (ui.modalOpen()) { if (e.code === 'Escape') ui.closeModals(); return; }
+    if ((e.ctrlKey || e.metaKey) && !/^Digit[0-9]$/.test(e.code)) return; // 4.2g: Ctrl+S (salvar) não manda Parar nem produz; Ctrl+número continua definindo grupos
     I.keys.add(e.code);
     const k = e.key.toUpperCase();
     if (e.code === 'Escape') { if (I.mode !== 'normal') I.setMode('normal'); else if (I.buildMenu) { I.buildMenu = false; ui.buildMenuChanged(false); } else setSel([]); return; }
@@ -208,7 +212,7 @@ function create(o) {
     if (I.buildMenu && BUILD_KEYS[k]) { I.buildMenu = false; ui.buildMenuChanged(false); I.setMode('build', BUILD_KEYS[k]); return; }
     const b = ownSelectedBuilding(); const units = ownSelectedUnits();
     if (b && !units.length && S.BUILDINGS[b.def].produces && PROD_KEYS[k] && S.BUILDINGS[b.def].produces.includes(PROD_KEYS[k])) { cmd({ t: 'produce', id: b.id, def: PROD_KEYS[k], n: e.shiftKey ? 5 : 1 }); return; }
-    if (k === 'A' && units.length) { I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'); return; }
+    if (k === 'A' && units.length) { if (e.repeat) return; I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'); return; } // 4.2g: segurar A não fica ligando e desligando
     if (k === 'S' && units.length) { cmd({ t: 'stop', ids: units.map(u => u.id) }); return; }
     if (k === 'F' && view.sel.size) { const en = sim.byId.get([...view.sel][0]); if (en) I.center(en.x, en.y); return; }
     if (k === 'H' || e.key === '?') { ui.toggleHelp(); return; }

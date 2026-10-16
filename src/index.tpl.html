@@ -80,7 +80,8 @@ body.touch #chat{width:170px;bottom:calc(9.5rem + env(safe-area-inset-bottom,0))
 .ri.sm{width:14px;height:14px;color:var(--fg2)}.ri.xs{width:13px;height:13px;vertical-align:-2px;margin-right:1px}
 .tchips{display:flex;gap:.35rem;align-items:center}.tchip{display:flex;align-items:center;gap:.3rem;height:26px;padding:0 .55rem;border-radius:7px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
 .res b{font-weight:600}
-.energy{min-width:178px;padding-right:.7rem}.energy .egrid{display:grid;gap:3px;flex:1}
+.energy{min-width:178px;padding-right:.7rem}
+@media (max-width:1400px){body:not(.touch) .rpill small{display:none}body:not(.touch) #top{gap:.4rem .5rem}body:not(.touch) .tchip{padding:0 .42rem}body:not(.touch) .energy{min-width:150px}} /* 4.2g: cabe numa linha em 1280 px */.energy .egrid{display:grid;gap:3px;flex:1}
 .energy .row{display:flex;justify-content:space-between;gap:.5rem}
 .energy .bar{height:4px;background:#262A31;border-radius:2px;overflow:hidden}
 .energy .bar i{display:block;height:100%;background:var(--good);width:0}
@@ -115,7 +116,7 @@ body.touch #chat{width:170px;bottom:calc(9.5rem + env(safe-area-inset-bottom,0))
 .chips{display:flex;flex-wrap:wrap;gap:.3rem}
 .chip{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:.1rem .55rem;background:#15181D}
 .tip{font-size:12px;color:var(--fg2);border-left:2px solid var(--rift1);padding-left:.5rem}
-#right{position:absolute;right:.75rem;top:calc(3.2rem + env(safe-area-inset-top,0));width:184px;display:grid;gap:.5rem}
+#right{position:absolute;right:.75rem;top:calc(3.2rem + var(--tbx,0px) + env(safe-area-inset-top,0));width:184px;display:grid;gap:.5rem}
 #minimap{width:184px;height:184px;display:block;border:2px solid #2E333B;border-radius:50%;background:#05070a;touch-action:none;box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 18px rgba(127,227,161,.12),inset 0 0 22px rgba(0,0,0,.6)}
 #alerts{display:grid;gap:.25rem}
 .alert{display:grid;grid-template-columns:auto 1fr;gap:.4rem;text-align:left;font-size:12px;padding:.35rem .5rem;border-radius:6px;background:var(--panel);border:1px solid var(--line);border-left-width:3px;transition:opacity .8s}
@@ -152,7 +153,7 @@ body.touch .qb{padding:.25rem .4rem}
 body.touch .qb .sub{display:none}
 body.touch #right{top:calc(5.8rem + env(safe-area-inset-top,0))}
 #bar .tb{min-width:44px;min-height:40px;font-size:13px}
-#hints{position:absolute;left:50%;transform:translateX(-50%);top:calc(3.4rem + env(safe-area-inset-top,0));width:min(520px,calc(100vw - 420px));background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.5rem .75rem;display:grid;gap:.25rem;font-size:12.5px}
+#hints{position:absolute;left:50%;transform:translateX(-50%);top:calc(3.4rem + var(--tbx,0px) + env(safe-area-inset-top,0));width:min(520px,calc(100vw - 420px));background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.5rem .75rem;display:grid;gap:.25rem;font-size:12.5px}
 body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 #hints .hint{color:var(--fg2)} #hints .hint.now{color:var(--fg)} #hints .hint.now::before{content:"→ ";color:var(--rift1)}
 #hints-close{position:absolute;top:2px;right:6px;color:var(--fg2)}
@@ -165,6 +166,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 #notice.show{opacity:1}
 #proposal{position:absolute;left:50%;transform:translateX(-50%);top:calc(6rem + env(safe-area-inset-top,0));background:var(--panel);border:1px solid var(--warn);border-radius:8px;padding:.75rem 1rem;display:grid;gap:.5rem;max-width:min(420px,calc(100vw - 2rem))}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:1rem;z-index:5}
+#confirm{z-index:6} /* 4.2g: por cima de outro modal (Substituir espaço, dentro de Salvar partida) */
 .modal .box{background:#15181D;border:1px solid var(--line);border-radius:10px;padding:1.1rem;max-width:620px;width:100%;max-height:90vh;overflow:auto;display:grid;gap:.75rem}
 .modal .box{position:relative}
 .mclose{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:7px;border:1px solid var(--line);background:var(--panel2);color:var(--fg);font-size:16px;line-height:1;cursor:pointer;z-index:2}
@@ -200,7 +202,7 @@ body.touch #hints{width:calc(100vw - 150px);left:.5rem;transform:none}
 .sf-brand{font-family:var(--fd);font-weight:700;font-size:1.15rem;letter-spacing:.04em}
 .sf-brand b{color:var(--race,var(--rift1))}
 .sf-legal{font-family:var(--fm);font-size:11px;color:var(--fg2)}
-#leader{position:absolute;left:12px;top:52px;width:124px;z-index:3;--pc:var(--race,#FF5E3A)}
+#leader{position:absolute;left:12px;top:calc(52px + var(--tbx,0px));width:124px;z-index:3;--pc:var(--race,#FF5E3A)}
 #leader .lframe{position:relative;width:118px;height:118px;border:2px solid var(--pc);border-radius:6px;background:radial-gradient(70% 70% at 50% 65%,color-mix(in srgb,var(--pc) 28%,transparent),#060709 80%);overflow:hidden;box-shadow:0 0 16px color-mix(in srgb,var(--pc) 45%,transparent)}
 #leader img.lport{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:lbreath 5s ease-in-out infinite;transform-origin:50% 60%}
 #leader #leader-cv{position:absolute;inset:0;width:100%;height:100%;cursor:pointer}
@@ -281,10 +283,10 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
 .relic,.ach{border:1px solid var(--line);border-radius:8px;padding:.5rem .6rem;font-size:.85rem;display:grid;gap:.25rem;background:#12151A}.relic.on{border-color:var(--race);box-shadow:0 0 0 1px var(--race) inset}.relic.locked,.ach.locked{opacity:.45}.ach b,.relic b{font-size:.9rem}
 .brdlg{display:grid;gap:.5rem}.brl{display:flex;gap:.7rem;align-items:flex-start}.brl img{width:54px;height:54px;border-radius:9px;object-fit:cover;border:1px solid var(--line);flex:none}.brl .nm{font-weight:700;font-size:.82rem;color:var(--fg2)}
 .obj-list{margin:.2rem 0;padding-left:1.1rem}.obj-list li{margin:.15rem 0}.obj-list .bn{color:var(--fg2)}
-#objectives{position:absolute;left:12px;top:236px;width:min(290px,42vw);max-height:160px;overflow:auto;background:rgba(15,17,22,.88);border:1px solid var(--line);border-radius:9px;padding:.4rem .6rem;font-size:.76rem;line-height:1.3;z-index:3;backdrop-filter:blur(4px)}
+#objectives{position:absolute;left:12px;top:calc(236px + var(--tbx,0px));width:min(290px,42vw);max-height:160px;overflow:auto;background:rgba(15,17,22,.88);border:1px solid var(--line);border-radius:9px;padding:.4rem .6rem;font-size:.76rem;line-height:1.3;z-index:3;backdrop-filter:blur(4px)}
 #objectives .oh{font-family:var(--fd);text-transform:uppercase;letter-spacing:.04em;font-size:.95rem;margin-bottom:.2rem}
 #objectives ul{list-style:none;margin:0;padding:0;display:grid;gap:.18rem}#objectives li{display:flex;gap:.35rem}#objectives li.ok{color:#7FE3A1}#objectives li.bn{color:var(--fg2)}#objectives li.bn.ok{color:#c9f2d4}#objectives .pg{margin-left:auto;font-family:var(--fm);font-size:.72rem;color:var(--fg2);white-space:nowrap}
-#comms{position:absolute;left:50%;transform:translateX(-50%);top:118px;display:flex;gap:.7rem;align-items:center;max-width:min(560px,92vw);background:rgba(15,17,22,.92);border:1px solid var(--line);border-left:3px solid var(--cc,#FF5E3A);border-radius:9px;padding:.5rem .7rem;z-index:4;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+#comms{position:absolute;left:50%;transform:translateX(-50%);top:calc(118px + var(--tbx,0px));display:flex;gap:.7rem;align-items:center;max-width:min(560px,92vw);background:rgba(15,17,22,.92);border:1px solid var(--line);border-left:3px solid var(--cc,#FF5E3A);border-radius:9px;padding:.5rem .7rem;z-index:4;box-shadow:0 8px 24px rgba(0,0,0,.4)}
 #comms img{width:52px;height:52px;border-radius:8px;object-fit:cover;flex:none}#comms .nm{font-size:.75rem;color:var(--fg2);font-weight:700;letter-spacing:.04em;text-transform:uppercase}#comms .tx{font-size:.92rem}
 .stars{font-size:1.9rem;letter-spacing:.2em;color:#F2C230}.stars .off{color:#3a3f48}
 .unlock{border:1px dashed var(--race);border-radius:8px;padding:.45rem .6rem;font-size:.88rem}
@@ -307,7 +309,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
 <div id="start" class="screen">
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Versão 4.2f · build __BUILD__ · Engine gráfica 3 · barra nova · mundo vestido · efeitos na GPU · multiplayer 2 a 4</div>
+    <div class="eyebrow">Versão 4.2g · build __BUILD__ · Engine gráfica 3 · caminhos livres · campanha destravada · multiplayer 2 a 4</div>
     <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div><h1>Aether Rift<br><span>Dominion</span></h1></div></div>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -355,8 +357,9 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
     </div>
     <div class="notes">
       <div class="choose">Notas da versão</div>
+      <p class="start-notes"><b>4.2g — Caminhos livres e campanha destravada:</b> correções pedidas pelos testes da campanha. As unidades <b>pararam de travar em muros e rochas</b>: veículos, coletores e infantaria contornam cristas de pedra e linhas de muro e passam pelos <b>Portões mesmo em muro na diagonal da tela</b>. Se o ponto clicado cai dentro de uma rocha, de um prédio ou da Fenda, elas param no ponto livre mais perto, e uma unidade que não consegue sair do lugar desiste em vez de empurrar para sempre. Coletores carregados acham o caminho até a Refinaria ou o Núcleo. Grupos grandes pesam menos: o grupo segue um caminho só até perto do destino. <b>Coletores mandados a outro lugar</b> (clique direito no chão ou num nó) colhem os nós em volta, mesmo fora do território, e entregam sozinhos; parado com carga, o coletor vai entregar. O clique direito num nó com coletores em cima vale como ordem de colher, e a seleção em caixa só deixa os coletores de fora quando o exército é maioria. Na <b>missão 6 (Roubo e contrarroubo)</b> o Pirata de qualquer Raça rouba. O Sifonador Erevane fica camuflado no caminho e só aparece quando começa a drenar, e o Pirata mandado de volta entrega ao chegar perto da Refinaria ou do Núcleo. Recuperar o próprio recurso numa caixa não conta como roubo, o inimigo sempre manda Piratas para o contrarroubo e as instruções dizem qual é o seu Pirata e onde atacar. <b>Salvar por cima</b> de um espaço ocupado voltou a funcionar (a confirmação ficava escondida atrás da janela), e <b>Sair</b> ou <b>Pausar e sair</b> levam ao início sem recomeçar a missão. Ctrl+S não manda as unidades pararem, e em telas de 1280 px a barra superior não fica embaixo do radar. O multiplayer pede esta mesma versão nos dois lados.</p>
+      <details class="oldnotes"><summary>Histórico das versões anteriores (4.2f → 2.0)</summary>
       <p class="start-notes"><b>4.2f — Barra nova, pausa clara e Tessara vilã:</b> rodada de ajustes pedida pelos testes. A <b>barra superior</b> foi refeita: Plasma, Minério e Fragmentos de Dados ganharam ícones desenhados (chama, bloco de minério e cristal de dados) em pílulas com a cor de cada recurso, e cada uma mostra quanto o recurso <b>subiu ou caiu por minuto</b> nos últimos 30 s. A Energia virou um medidor com raio e barra, e tempo, Era, reputação e inimigos viraram etiquetas com ícone. Os custos nos botões de construção usam os mesmos ícones. No celular a barra fica compacta. A <b>pausa ficou visível</b>: quando você troca de aba, o jogo continua pausando sozinho para nada se perder, mas agora mostra um painel <b>"Pausado"</b> explicando o motivo, com o botão <b>Continuar</b>. Um clique ou toque em qualquer lugar (ou P / ❚❚) volta a partida. Antes só aparecia um aviso rápido, e parecia que as unidades tinham travado. A <b>Tessara</b> (Sylva Oriel) ficou com cara de vilã: sobrancelhas em V, olhos semicerrados amarelo-tóxicos com pupila em fenda, órbitas escuras, espinhos no lugar das bochechas e um sorriso torto com presas. Vale para o busto 3D da tela inicial e da partida e para os retratos da campanha.</p>
-      <details class="oldnotes"><summary>Histórico das versões anteriores (4.2e → 2.0)</summary>
       <p class="start-notes"><b>4.2e — Veteranos, avarias e épicos:</b> fecha a v4.2, a Engine gráfica 3. Unidades <b>Elite (★★)</b> ganham um anel dourado no chão, e as <b>Lendas (★★★)</b> fazem o anel pulsar e soltam faíscas douradas. Unidades muito feridas <b>soltam fumaça e faíscas</b>, e estruturas quase destruídas <b>pegam fogo</b>. Assim dá para ler a batalha sem abrir o painel. Os chefes da campanha ficaram mais imponentes. A <b>Catedral Errante</b> ganhou contrafortes de cristal, uma auréola de cristais que orbita o topo, estandartes de luz que balançam e uma faixa na cor do dono. A <b>Matriarca</b> ganhou sacos de ovos que brilham, veias acesas no abdômen e placas de carapaça no tórax. A luz curta das explosões ficou mais suave, para não estourar as unidades por perto.</p>
       <p class="start-notes"><b>4.2d — Mundo vestido e luz:</b> o chão ganhou vida por bioma. O gelo tem <b>cristais</b>, a rocha tem seixos e pedregulhos, a tundra tem <b>tufos de capim e arbustos que balançam ao vento</b> e o basalto tem cinza e brasas. Tudo some debaixo das estruturas e escurece na névoa de guerra, como o terreno. Cada base passa a ter <b>estradas de terra</b> ligando o Núcleo às suas estruturas, que crescem conforme você constrói. À noite, as luzes e janelas das estruturas <b>acendem</b>, os veículos ligam <b>faróis</b> que iluminam o chão à frente e <b>feixes de luz</b> sobem da Fenda. Uma <b>gradação de cor</b> suave acompanha o clima, a hora do dia e a sua Raça: mais quente no Vehnar, mais fria na Erevane, violeta no Coro. A quantidade de adereços segue a qualidade: Alta e Ultra têm mais, e no celular na qualidade Baixa eles ficam de fora.</p>
       <p class="start-notes"><b>4.2c — Efeitos:</b> as explosões foram refeitas em <b>camadas</b>: clarão, bolas de fogo que sobem e esfriam do branco ao vermelho, faíscas esticadas pela velocidade, destroços que caem e fumaça macia que fica no ar. As grandes ainda soltam uma <b>onda de choque</b> no chão, poeira e uma luz curta que ilumina o entorno. Cada disparo tem <b>clarão na boca do cano</b>, os obuses deixam <b>rastro de fumaça</b> e as estruturas destruídas explodem em sequência e queimam por alguns segundos. A cor das explosões puxa para a Raça de quem cai. A fumaça das chaminés, das carcaças e das estruturas avariadas deixou de ser feita de quadradinhos: agora é fumaça de verdade. As superarmas ganharam assinatura própria. A Fundição Orbital desce em coluna de luz, a Eclosão estoura em vermelho e o Salto Evolutivo acende as tropas em verde. O Uníssono solta anéis violeta e o Blecaute marca os Núcleos inimigos. A chegada de uma Era, a Ascensão e os módulos também têm efeito. Tudo roda na placa de vídeo: a CPU só escreve quando uma partícula nasce. Na qualidade Baixa saem metade das partículas.</p>
@@ -435,7 +438,6 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
 
   <div id="loading" class="modal" hidden><div class="box" style="max-width:360px"><img id="load-leader" alt="" hidden style="width:96px;height:96px;border-radius:12px;object-fit:cover;float:right;margin:0 0 .5rem .8rem;border:2px solid var(--line)"><div class="eyebrow"><img id="load-logo" class="load-logo" alt="" hidden>Preparando o campo</div><h2>Gerando sprites</h2><p class="muted small">Modelos voxel renderizados em 8 direções com iluminação, só nesta primeira vez.</p><div class="loadbar"><i id="load-bar"></i></div></div></div>
   <div id="diplo" class="modal" hidden><div class="box"><h2>Diplomacia</h2><div id="diplo-body"></div><div class="row"><button class="btn" data-close>Fechar</button></div></div></div>
-  <div id="confirm" class="modal" hidden><div class="box"><h2>Confirmar</h2><p id="confirm-text"></p><div class="row"><button id="confirm-yes" class="btn primary">Confirmar</button><button id="confirm-no" class="btn">Cancelar</button></div></div></div>
   <div id="end" class="modal" hidden><div class="box"><img id="end-leader" alt="" hidden style="width:110px;height:110px;border-radius:14px;object-fit:cover;float:right;margin:0 0 .5rem 1rem;border:2px solid var(--line)"><div class="eyebrow" id="end-eyebrow">Fim do Alinhamento</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-camp" hidden></div><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-next" class="btn primary" hidden>Próxima missão</button><button id="btn-again" class="btn primary">Jogar de novo</button><button id="btn-camp-menu" class="btn" hidden>Campanha</button><button id="btn-copy" class="btn">Copiar resultado (JSON)</button><a class="btn" id="end-feedback" href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener">Enviar feedback</a></div><textarea id="end-json" hidden rows="6" style="width:100%;font-family:var(--fm);font-size:11px;background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px"></textarea></div></div>
 </div>
 
@@ -459,6 +461,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
 </div></div>
 <div id="benchbox" class="modal" hidden><div class="box"><div class="eyebrow">Teste de desempenho</div><h2 id="bench-verdict" class="bv">—</h2><p class="muted small" id="bench-tip"></p><div class="stats" id="bench-table"></div><div class="row"><a class="btn primary" id="bench-feedback" target="_blank" rel="noopener">Enviar no Feedback</a><button class="btn" id="bench-back">Voltar ao início</button></div></div></div>
 <div id="savebox" class="modal" hidden><div class="box"><button class="mclose" data-close aria-label="Fechar">✕</button><div class="eyebrow">Partida</div><h2>Salvar partida</h2><p class="muted small" id="save-note"></p><div id="save-slots" class="slots"></div><div class="row"><button class="btn" id="save-park">Pausar e sair · continuar depois</button><button class="btn ghost" data-close>Voltar ao jogo</button></div></div></div>
+<div id="confirm" class="modal" hidden><div class="box"><h2>Confirmar</h2><p id="confirm-text"></p><div class="row"><button id="confirm-yes" class="btn primary">Confirmar</button><button id="confirm-no" class="btn">Cancelar</button></div></div></div>
 <div id="hangar" class="modal" hidden><div class="box wide"><button class="mclose" data-close aria-label="Fechar">✕</button>
   <div class="eyebrow">Personalização</div><h2>Hangar</h2>
   <div class="hg"><div class="hg-stage"><canvas id="hg-view" width="640" height="480"></canvas><div id="hg-loading" class="hg-loading" hidden>Carregando o 3D…</div></div><div class="hg-opts">
@@ -477,7 +480,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
   <p class="muted small">Objetivo: destruir os Núcleos inimigos ou ter mais Domínio (território, exército e recursos) ao fim de 25 minutos. Energia abaixo de 100% deixa produção, sensores e defesas piores: construa Reatores.</p>
   <h3>Mouse e teclado</h3>
   <table><tr><td>Clique / arrastar</td><td>Selecionar / caixa de seleção. Shift adiciona. Duplo clique seleciona todas do mesmo tipo na tela.</td></tr>
-  <tr><td>Botão direito</td><td>Mover. Em inimigo: atacar. Em nó com coletores: colher. Em Refinaria ou Reator inimigo com Pirata: Sifonar. Em Caixa: recolher. Com estrutura selecionada: ponto de reunião.</td></tr>
+  <tr><td>Botão direito</td><td>Mover. Em inimigo: atacar. Em nó com coletores: colher (eles continuam nos nós em volta e entregam sozinhos). Em Refinaria ou Reator inimigo com Pirata: Sifonar. Em Caixa: recolher. Com estrutura selecionada: ponto de reunião.</td></tr>
   <tr><td>A / S</td><td>Atacar-mover (clique no destino) / Parar</td></tr>
   <tr><td>B + letra</td><td>Construir: R Reator, F Refinaria, Q Quartel, V Fábrica, H Hangar, T Torre, N Nódulo, L Laboratório. Shift mantém o modo.</td></tr>
   <tr><td>Letras com estrutura selecionada</td><td>Produzir: a tecla aparece em cada botão (C Coletor, I Infantaria, S Suporte, P Pirata, V Veículo, D Drone; e as unidades da sua Raça, como O Soldador, U Guindaste, A Atirador, M Mosquito, N Âncora, L Lâmina, R Prensa, E Esporo, C Colosso na Fábrica)</td></tr>
