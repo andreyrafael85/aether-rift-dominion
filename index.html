@@ -310,7 +310,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
 <div id="start" class="screen">
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Versão 4.3c.1 · build 2026-10-16 19:26Z · Remasterização · terreno esculpido · multiplayer 2 a 4</div>
+    <div class="eyebrow">Versão 4.3c.2 · build 2026-10-16 20:56Z · Remasterização · terreno esculpido · multiplayer 2 a 4</div>
     <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div><h1>Aether Rift<br><span>Dominion</span></h1></div></div>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -358,8 +358,9 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
     </div>
     <div class="notes">
       <div class="choose">Notas da versão</div>
+      <p class="start-notes"><b>4.3c.2 — Líderes sem piscar no Firefox:</b> a 4.3c.1 não bastou. O vídeo do teste mostrou o retrato vazio em metade do tempo, na tela inicial e na partida. A causa estava na cópia do busto para o quadro: os líderes são desenhados por uma placa de vídeo só e copiados para cada retrato, e no Firefox do Windows essa cópia direta entre a imagem 3D e o quadro às vezes saía vazia. No Firefox a cópia agora lê os pixels de forma explícita e monta o retrato a partir deles, um pouco mais devagar (até 20 quadros por segundo no HUD e 12 nos cartões). Nos outros navegadores nada mudou.</p>
+      <details class="oldnotes"><summary>Histórico das versões anteriores (4.3c.1 → 2.0)</summary>
       <p class="start-notes"><b>4.3c.1 — Correção no Firefox:</b> no Firefox, o retrato do líder piscava e a tela escurecia por um instante de vez em quando. A causa: cada vez que o líder mudava de humor (furioso num ataque, triunfante numa vitória), o rosto 3D era montado de novo e os efeitos de luz dele eram recompilados. No Chrome isso é instantâneo, mas no Firefox travava a placa de vídeo por um momento. Agora os quatro humores ficam prontos desde o começo da partida e só trocam, sem recompilar. A cópia do retrato para o HUD também ficou à prova de quadro vazio.</p>
-      <details class="oldnotes"><summary>Histórico das versões anteriores (4.3c → 2.0)</summary>
       <p class="start-notes"><b>4.3c — Terreno esculpido:</b> o chão deixou de ser plano. A malha do terreno ficou <b>4× mais fina</b> e ganhou relevo: <b>dunas</b> de areia e de neve moldadas pelo vento, <b>crateras</b> de meteoro, <b>leitos secos</b> que serpenteiam pelo deserto e <b>degraus de estrato</b> que a luz rasante desenha. O material do chão foi refeito <b>em camadas por bioma</b>, que se misturam pela altura de cada uma. O deserto tem areia ondulada, cascalho e placas de rocha avermelhada, e a tundra tem musgo e capim baixo com manchas de terra rachada. No gelo há neve com sulcos de vento, lagos congelados nas baixadas e rocha escura aflorando, e o basalto tem cinza e rocha negra com veios em brasa perto da Fenda. As encostas mostram rocha em camadas, e a borda entre biomas ficou natural, não mais em quadrados. A <b>Fenda virou um abismo</b>: paredões em camadas descem até um fundo escuro cortado por veios de energia, com a cratera em volta em terraços. Além do mapa, as montanhas lisas e cinza deram lugar a uma <b>cordilheira de mesas</b> com topo plano e paredão em camadas, que some na bruma. O campo de batalha agora guarda <b>cicatrizes</b>: esteiras e rodas deixam rastro, Tessara e Vorag deixam marcas de passos, e Erevane e Quorith flutuam sem marcar o chão. Explosões deixam queimado e cratera com brasa que se apaga, e tudo some devagar. Veículos levantam <b>poeira na cor do chão</b>, e cada construção assenta o terreno onde é erguida. A <b>vegetação foi refeita do zero</b>, no fim dos blocos verdes. A tundra tem capim fino em dois tons, arbustos de dezenas de folhas, samambaias, flores alienígenas e pedras com líquen. O deserto tem arbustos secos e espinhosos, suculentas com gomos, agaves alienígenas, tocos e troncos caídos. O gelo tem aglomerados de cristal fosco, arbustos congelados e montes de neve. Perto da Fenda há respiros com brasa fraca, lascas de obsidiana e cogumelos com brilho roxo que aparece à noite. Árvores raras marcam a paisagem: palmeiras e árvores-guarda-chuva na tundra, árvores-espinheiras e cactos-candelabro no deserto e árvores congeladas no gelo. As plantas balançam ao vento, nascem em manchas com companheiras em volta e seguem a borda desenhada de cada bioma. Pedras e cascalho ganharam a cor do chão onde estão.</p>
       <p class="start-notes"><b>4.3b — Luz e atmosfera:</b> começa a <b>remasterização total</b> do jogo, uma entrega por vez: luz, terreno, frota, soldados e líderes, bases, combate e mapas. O motor 3D foi atualizado do Three.js r160 para o <b>r186</b>, a versão atual, e ganhou um pós-processamento de cinema. Da qualidade Média para cima, tudo tem <b>sombra de contato</b>: unidades, prédios e pedras assentam no chão em vez de parecer colados por cima. O <b>bloom</b> acende só o que brilha de verdade (cristais, feixes, motores), a cor ficou mais quente e viva e as bordas mais lisas (SMAA na Média, MSAA na Alta). O sol baixou para 40°, com <b>sombras mais longas</b>, e os metais agora <b>refletem o céu e o chão do mapa</b>, não mais uma sala de estúdio. O mundo ganhou <b>atmosfera</b>: uma bruma baixa enche a Fenda e os vales, a poeira perto do chão azula ao longe e a luz do sol se espalha no ar quando você olha para ele. As <b>sombras das nuvens</b> passam por cima de tudo, não só do chão, e o céu ganhou <b>nuvens</b> que andam. A nova <b>câmera de cinema</b> desce quando você aproxima, para ver as unidades de lado; dá para desligar em Ajustes. As <b>rochas foram esculpidas</b> de novo: as cordilheiras viraram paredões contínuos com estratos, topos planos e blocos caídos, e as pedras soltas do chão deixaram de ser bolas. Os <b>nós de recurso</b> viraram afloramentos em escala com os coletores. O <b>Minério</b> é rocha escura estratificada com cristais azuis brotando das fendas, o <b>Plasma</b> são colunas de basalto com poças e fissuras incandescentes e os <b>Dados</b> um monólito antigo com glifos verdes. Nó esgotado fica com o cristal apagado, não preto.</p>
       <p class="start-notes"><b>4.3a — De perto: coletores e chão:</b> começa a v4.3, a Engine gráfica 4, que leva o jogo inteiro a um nível de detalhe de quem chega com a câmera colada. A câmera agora <b>aproxima até 6×</b> (4× no celular). Os <b>coletores das cinco Raças foram refeitos do zero</b>, cada um com dezenas de peças. O Vehnar virou um carregador pesado com rodas-tambor, caçamba de minério, motor com chaminés em brasa e cabeça de mineração. O Erevane é um esquife flutuante facetado com bico-sifão, e o Tessara uma colhedeira viva com flor-mandíbula e sacos de seiva. O Quorith é uma nave de cristal com diapasão e lente focal, e o Vorag um Semeador com saco digestivo aceso e mandíbulas de osso. Ao colher, o coletor se vira para o nó e solta um <b>feixe de mineração</b> na cor do recurso, com brilho, faíscas e poeira no contato. Todos os modelos ganharam <b>detalhe de superfície</b>: painéis com costuras, rebites e grades nos metais, sulcos na borracha, poros no osso e células na quitina. Esse detalhe aparece de perto e some sozinho de longe, sem cintilar. De perto, o chão ganha seixos, fendas e grão. Só o que a câmera vê é desenhado, então os modelos novos não pesam fora da tela.</p>
@@ -4594,11 +4595,23 @@ const T = () => window.THREE;
 const COL = { vehnar: { c: 0xff7733, dk: 0x1a1210 }, erevane: { c: 0x33ffd0, dk: 0x0a1218 }, tessara: { c: 0x55e68a, dk: 0x0c1a10 }, quorith: { c: 0xb388ff, dk: 0x120e22 }, vorag: { c: 0xe6455a, dk: 0x1a0a0e } };
 const EXPR = { 1: { open: 0.95, brow: 0.0, mouth: 'smile', look: [0, 0], pupil: 1 }, 2: { open: 0.5, brow: 0.6, mouth: 'open', look: [0, -0.3], pupil: 0.7 }, 3: { open: 1.12, brow: -0.35, mouth: 'grin', look: [0.2, 0.3], pupil: 1.15 }, 4: { open: 0.8, brow: -0.3, mouth: 'frown', look: [0, -0.45], pupil: 0.9 } };
 let renderer = null, envTex = null, failed = false, raf = 0; const items = [];
+/* 4.3c.2: no Firefox a cópia do canvas WebGL para o canvas 2D (drawImage) falhava de vez em quando no Windows e o retrato piscava vazio; lá a cópia vira leitura explícita dos pixels (readPixels + putImageData), em ritmo menor. ?retrato=leitura força em qualquer navegador */
+const READ = (() => { try { return /firefox\//i.test(navigator.userAgent) || new URLSearchParams(location.search).get('retrato') === 'leitura'; } catch (e) { return false; } })(); let pbuf = null, tmpCv = null;
+function copyPixels(it, rw, rh, w, h) {
+  const gl = renderer.getContext(); const n = rw * rh * 4; if (!pbuf || pbuf.length < n) pbuf = new Uint8Array(n);
+  gl.readPixels(0, 0, rw, rh, gl.RGBA, gl.UNSIGNED_BYTE, pbuf);
+  if (!it.img || it.img.width !== rw || it.img.height !== rh) it.img = it.ctx.createImageData(rw, rh);
+  const d = it.img.data, row = rw * 4; /* o WebGL lê de baixo para cima e com alfa pré-multiplicado: inverte as linhas e desfaz o pré-multiplicado (brilho aditivo sobre o fundo vazio vira alfa) */
+  for (let y = 0; y < rh; y++) { let sI = (rh - 1 - y) * row, o = y * row; for (let x = 0; x < row; x += 4, sI += 4, o += 4) { const r = pbuf[sI], g = pbuf[sI + 1], b = pbuf[sI + 2]; let a = pbuf[sI + 3]; const mx = r > g ? (r > b ? r : b) : (g > b ? g : b); if (mx > a) a = mx;
+    if (a === 0) { d[o] = d[o + 1] = d[o + 2] = d[o + 3] = 0; } else if (a === 255) { d[o] = r; d[o + 1] = g; d[o + 2] = b; d[o + 3] = 255; } else { const k = 255 / a; d[o] = r * k; d[o + 1] = g * k; d[o + 2] = b * k; d[o + 3] = a; } } }
+  if (w === rw && h === rh) it.ctx.putImageData(it.img, 0, 0);
+  else { if (!tmpCv) tmpCv = document.createElement('canvas'); if (tmpCv.width !== rw || tmpCv.height !== rh) { tmpCv.width = rw; tmpCv.height = rh; } tmpCv.getContext('2d').putImageData(it.img, 0, 0); it.ctx.clearRect(0, 0, w, h); it.ctx.drawImage(tmpCv, 0, 0, rw, rh, 0, 0, w, h); }
+}
 const RES = 256;
 function canUse() { if (failed) return false; try { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return false; } catch (e) {} return !!T(); }
 function ensure() {
   if (renderer || failed) return !!renderer; const THREE = T(); if (!THREE) return false;
-  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power', preserveDrawingBuffer: true }); /* 4.3d: o Firefox lia o quadro vazio de vez em quando (retrato piscando) */ renderer.setPixelRatio(1); renderer.setSize(RES, RES, false); renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; renderer.setClearColor(0x000000, 0);
+  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' }); renderer.setPixelRatio(1); renderer.setSize(RES, RES, false); renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; renderer.setClearColor(0x000000, 0);
     if (THREE.RoomEnvironment) { const pm = new THREE.PMREMGenerator(renderer); envTex = pm.fromScene(new THREE.RoomEnvironment(), 0.04).texture; pm.dispose(); }
     renderer.domElement.addEventListener('webglcontextlost', e => { e.preventDefault(); failed = true; for (const it of items.slice()) unmount(it); });
   } catch (e) { console.warn('[ARD] líderes 3D indisponíveis:', e.message); failed = true; renderer = null; }
@@ -4768,11 +4781,11 @@ function loop() {
     for (const it of items.slice()) {
       if (!it.canvas.isConnected) { unmount(it); continue; }
       if (document.hidden || !it.canvas.offsetParent) continue;
-      any = true; if (now - it.last < 1000 / it.fps) continue; const dt = Math.min(0.1, it.last ? (now - it.last) / 1000 : 0.016); it.last = now;
+      any = true; const fps = READ ? Math.min(it.fps, it.framing === 'hud' ? 20 : 12) : it.fps; if (now - it.last < 1000 / fps) continue; const dt = Math.min(0.1, it.last ? (now - it.last) / 1000 : 0.016); it.last = now;
       try { animate(it, now, dt);
         const w = it.canvas.width, h = it.canvas.height; const rw = Math.min(RES, w), rh = Math.min(RES, h); it.cam.aspect = rw / rh; it.cam.updateProjectionMatrix();
         renderer.setViewport(0, 0, rw, rh); renderer.setScissor(0, 0, rw, rh); renderer.setScissorTest(true); renderer.clear(); renderer.render(it.sc, it.cam);
-        it.ctx.clearRect(0, 0, w, h); it.ctx.drawImage(renderer.domElement, 0, RES - rh, rw, rh, 0, 0, w, h);
+        if (READ) copyPixels(it, rw, rh, w, h); else { it.ctx.clearRect(0, 0, w, h); it.ctx.drawImage(renderer.domElement, 0, RES - rh, rw, rh, 0, 0, w, h); }
       } catch (e) { console.warn('[ARD] líder 3D:', e.message); unmount(it); }
     }
     if (items.length) raf = requestAnimationFrame(step); };
@@ -7287,12 +7300,12 @@ const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-16 19:26Z';
+const BUILD = '2026-10-16 20:56Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.3c.1';
+const VERSION = '4.3c.2';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }

@@ -9,11 +9,23 @@ const T = () => window.THREE;
 const COL = { vehnar: { c: 0xff7733, dk: 0x1a1210 }, erevane: { c: 0x33ffd0, dk: 0x0a1218 }, tessara: { c: 0x55e68a, dk: 0x0c1a10 }, quorith: { c: 0xb388ff, dk: 0x120e22 }, vorag: { c: 0xe6455a, dk: 0x1a0a0e } };
 const EXPR = { 1: { open: 0.95, brow: 0.0, mouth: 'smile', look: [0, 0], pupil: 1 }, 2: { open: 0.5, brow: 0.6, mouth: 'open', look: [0, -0.3], pupil: 0.7 }, 3: { open: 1.12, brow: -0.35, mouth: 'grin', look: [0.2, 0.3], pupil: 1.15 }, 4: { open: 0.8, brow: -0.3, mouth: 'frown', look: [0, -0.45], pupil: 0.9 } };
 let renderer = null, envTex = null, failed = false, raf = 0; const items = [];
+/* 4.3c.2: no Firefox a cópia do canvas WebGL para o canvas 2D (drawImage) falhava de vez em quando no Windows e o retrato piscava vazio; lá a cópia vira leitura explícita dos pixels (readPixels + putImageData), em ritmo menor. ?retrato=leitura força em qualquer navegador */
+const READ = (() => { try { return /firefox\//i.test(navigator.userAgent) || new URLSearchParams(location.search).get('retrato') === 'leitura'; } catch (e) { return false; } })(); let pbuf = null, tmpCv = null;
+function copyPixels(it, rw, rh, w, h) {
+  const gl = renderer.getContext(); const n = rw * rh * 4; if (!pbuf || pbuf.length < n) pbuf = new Uint8Array(n);
+  gl.readPixels(0, 0, rw, rh, gl.RGBA, gl.UNSIGNED_BYTE, pbuf);
+  if (!it.img || it.img.width !== rw || it.img.height !== rh) it.img = it.ctx.createImageData(rw, rh);
+  const d = it.img.data, row = rw * 4; /* o WebGL lê de baixo para cima e com alfa pré-multiplicado: inverte as linhas e desfaz o pré-multiplicado (brilho aditivo sobre o fundo vazio vira alfa) */
+  for (let y = 0; y < rh; y++) { let sI = (rh - 1 - y) * row, o = y * row; for (let x = 0; x < row; x += 4, sI += 4, o += 4) { const r = pbuf[sI], g = pbuf[sI + 1], b = pbuf[sI + 2]; let a = pbuf[sI + 3]; const mx = r > g ? (r > b ? r : b) : (g > b ? g : b); if (mx > a) a = mx;
+    if (a === 0) { d[o] = d[o + 1] = d[o + 2] = d[o + 3] = 0; } else if (a === 255) { d[o] = r; d[o + 1] = g; d[o + 2] = b; d[o + 3] = 255; } else { const k = 255 / a; d[o] = r * k; d[o + 1] = g * k; d[o + 2] = b * k; d[o + 3] = a; } } }
+  if (w === rw && h === rh) it.ctx.putImageData(it.img, 0, 0);
+  else { if (!tmpCv) tmpCv = document.createElement('canvas'); if (tmpCv.width !== rw || tmpCv.height !== rh) { tmpCv.width = rw; tmpCv.height = rh; } tmpCv.getContext('2d').putImageData(it.img, 0, 0); it.ctx.clearRect(0, 0, w, h); it.ctx.drawImage(tmpCv, 0, 0, rw, rh, 0, 0, w, h); }
+}
 const RES = 256;
 function canUse() { if (failed) return false; try { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return false; } catch (e) {} return !!T(); }
 function ensure() {
   if (renderer || failed) return !!renderer; const THREE = T(); if (!THREE) return false;
-  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power', preserveDrawingBuffer: true }); /* 4.3d: o Firefox lia o quadro vazio de vez em quando (retrato piscando) */ renderer.setPixelRatio(1); renderer.setSize(RES, RES, false); renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; renderer.setClearColor(0x000000, 0);
+  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' }); renderer.setPixelRatio(1); renderer.setSize(RES, RES, false); renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; renderer.setClearColor(0x000000, 0);
     if (THREE.RoomEnvironment) { const pm = new THREE.PMREMGenerator(renderer); envTex = pm.fromScene(new THREE.RoomEnvironment(), 0.04).texture; pm.dispose(); }
     renderer.domElement.addEventListener('webglcontextlost', e => { e.preventDefault(); failed = true; for (const it of items.slice()) unmount(it); });
   } catch (e) { console.warn('[ARD] líderes 3D indisponíveis:', e.message); failed = true; renderer = null; }
@@ -183,11 +195,11 @@ function loop() {
     for (const it of items.slice()) {
       if (!it.canvas.isConnected) { unmount(it); continue; }
       if (document.hidden || !it.canvas.offsetParent) continue;
-      any = true; if (now - it.last < 1000 / it.fps) continue; const dt = Math.min(0.1, it.last ? (now - it.last) / 1000 : 0.016); it.last = now;
+      any = true; const fps = READ ? Math.min(it.fps, it.framing === 'hud' ? 20 : 12) : it.fps; if (now - it.last < 1000 / fps) continue; const dt = Math.min(0.1, it.last ? (now - it.last) / 1000 : 0.016); it.last = now;
       try { animate(it, now, dt);
         const w = it.canvas.width, h = it.canvas.height; const rw = Math.min(RES, w), rh = Math.min(RES, h); it.cam.aspect = rw / rh; it.cam.updateProjectionMatrix();
         renderer.setViewport(0, 0, rw, rh); renderer.setScissor(0, 0, rw, rh); renderer.setScissorTest(true); renderer.clear(); renderer.render(it.sc, it.cam);
-        it.ctx.clearRect(0, 0, w, h); it.ctx.drawImage(renderer.domElement, 0, RES - rh, rw, rh, 0, 0, w, h);
+        if (READ) copyPixels(it, rw, rh, w, h); else { it.ctx.clearRect(0, 0, w, h); it.ctx.drawImage(renderer.domElement, 0, RES - rh, rw, rh, 0, 0, w, h); }
       } catch (e) { console.warn('[ARD] líder 3D:', e.message); unmount(it); }
     }
     if (items.length) raf = requestAnimationFrame(step); };
