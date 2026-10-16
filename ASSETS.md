@@ -5,8 +5,8 @@ Todo arquivo de arte ou biblioteca externa entra aqui com origem e licença. Sem
 | Item | Origem | Autor | Licença | Uso |
 |---|---|---|---|---|
 | Modelos voxel (src/models.js) | próprios, definidos em código | equipe | todos os direitos reservados | modo 2D, ícones de reserva, estilo 2D e 3D |
-| Malhas 3D por Raça (src/meshes.js, 4.0d) | próprias, geradas em código a partir de primitivas do Three.js (4.3a: coletores das 5 Raças remodelados; detalhe de superfície e microdetalhe do chão procedurais, sem texturas externas) | equipe | todos os direitos reservados | jogo (modo 3D), ícones do HUD, catálogo 3D |
-| Céu, planeta-mãe, horizonte e textura de detalhe do terreno (src/world3d.js) | procedurais (ruído fBm), paletas dos mundos aprovados | equipe | todos os direitos reservados | jogo (modo 3D) |
+| Malhas 3D por Raça (src/meshes.js, 4.0d) | próprias, geradas em código a partir de primitivas do Three.js (4.3a: coletores das 5 Raças remodelados; detalhe de superfície e microdetalhe do chão procedurais, sem texturas externas; 4.3b: rochas das cordilheiras, ruínas, pedras soltas e nós de recurso esculpidos com as primitivas crag e xtal e o padrão de superfície de rocha, sem texturas externas) | equipe | todos os direitos reservados | jogo (modo 3D), ícones do HUD, catálogo 3D |
+| Céu, planeta-mãe, horizonte e textura de detalhe do terreno (src/world3d.js) | procedurais (ruído fBm), paletas dos mundos aprovados; 4.3b: nuvens do céu em ruído de valor no shader | equipe | todos os direitos reservados | jogo (modo 3D) |
 | Logo vivo (src/logo3d.js) | cena procedural da Final 2 aprovada | equipe | todos os direitos reservados | tela inicial (desktop) |
 | Adereços do terreno e estradas (src/dress3d.js, 4.2d) | geometria procedural do Three.js e shader próprio, sem texturas | equipe | todos os direitos reservados | jogo (modo 3D) |
 | Efeitos 3D (src/fx3d.js, 4.2c) | partículas e formas procedurais em shader, sem texturas | equipe | todos os direitos reservados | jogo (modo 3D) |
@@ -17,5 +17,7 @@ Todo arquivo de arte ou biblioteca externa entra aqui com origem e licença. Sem
 | Efeitos sonoros | sintetizados em tempo real (src/audio.js) | equipe | todos os direitos reservados | jogo |
 | Voz de sistema | Web Speech API do navegador | navegador do jogador | n/a | jogo |
 | Fontes Big Shoulders Display, IBM Plex Sans, IBM Plex Mono | Google Fonts | Indestructible Type, IBM | SIL Open Font License 1.1 | interface |
-| Three.js 0.160.0 | jsDelivr (three.module.min.js + examples/jsm/postprocessing + examples/jsm/environments/RoomEnvironment.js) no jogo; cdnjs (three.min.js) em estilo3d.html | three.js authors | MIT | jogo (modo 3D) e estilo3d.html |
+| Three.js 0.186.1 (4.3b; antes 0.160.0) | jsDelivr (three.module.min.js e three.core.min.js minificados pelo próprio jsDelivr + examples/jsm/postprocessing + examples/jsm/environments/RoomEnvironment.js) no jogo; cdnjs (three.min.js 0.160.0) em estilo3d.html | three.js authors | MIT | jogo (modo 3D) e estilo3d.html |
+| postprocessing 6.39.5 (4.3b) | jsDelivr (build/index.min.js, minificado pelo jsDelivr), carregado depois do Three.js | Raoul van Rüschen (pmndrs) | Zlib | cadeia de pós-processamento: bloom HDR, tom ACES, SMAA, efeitos próprios de bruma e gradação |
+| N8AO 2.0.1 (4.3b) | jsDelivr (dist/N8AO.min.js, minificado pelo jsDelivr) | N8python (github.com/N8python/n8ao) | ISC | sombra de contato (oclusão ambiente em tela) nos presets Média, Alta e Ultra |
 | PeerJS 1.5.4 | cdnjs (peerjs.min.js); sinalização pelo PeerServer público | PeerJS contributors | MIT | multiplayer P2P |

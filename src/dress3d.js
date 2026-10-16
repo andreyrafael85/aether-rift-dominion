@@ -20,22 +20,25 @@ function create(THREE, scene, opts) {
     };
     m.customProgramCacheKey = () => 'ard-dress-' + (o.wind ? 'w' : 'n') + (params.emissive ? 'e' : ''); return m;
   }
+  /* 4.3b: pedras soltas esculpidas pelo kit do meshes.js (estratos e lascas, cor por vértice); sem ele, o icosaedro antigo */
+  const SG = (kind, seed) => { try { return (ARD.meshes && ARD.meshes.scatter && ARD.meshes.scatter(kind, seed)) || null; } catch (e) { return null; } };
   const g = {
     shard: new THREE.OctahedronGeometry(1, 0).scale(0.45, 1.6, 0.45).translate(0, 1.1, 0),
-    stone: new THREE.IcosahedronGeometry(1, 0).scale(1, 0.6, 0.9).translate(0, 0.3, 0),
-    pebble: new THREE.IcosahedronGeometry(1, 0).scale(1, 0.55, 0.85).translate(0, 0.25, 0),
-    boulder: new THREE.IcosahedronGeometry(1, 1).scale(1.1, 0.8, 1).translate(0, 0.45, 0),
+    stone: SG('stone', 1) || new THREE.IcosahedronGeometry(1, 0).scale(1, 0.6, 0.9).translate(0, 0.3, 0),
+    pebble: SG('pebble', 2) || new THREE.IcosahedronGeometry(1, 0).scale(1, 0.55, 0.85).translate(0, 0.25, 0),
+    boulder: SG('boulder', 1) || new THREE.IcosahedronGeometry(1, 1).scale(1.1, 0.8, 1).translate(0, 0.45, 0),
     tuft: (() => { const parts = []; for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; const c = new THREE.ConeGeometry(0.12, 1.4 + (i % 3) * 0.3, 4).translate(0, 0.7, 0); c.rotateZ(0.35 * Math.cos(a)); c.rotateX(0.35 * Math.sin(a)); c.translate(Math.cos(a) * 0.25, 0, Math.sin(a) * 0.25); parts.push(c.index ? c.toNonIndexed() : c); } return merge(THREE, parts); })(),
     shrub: (() => { const parts = []; for (let i = 0; i < 4; i++) { const s = new THREE.IcosahedronGeometry(0.55 + (i % 2) * 0.2, 0).translate(Math.cos(i * 1.7) * 0.5, 0.55 + (i % 2) * 0.25, Math.sin(i * 1.7) * 0.5); parts.push(s.index ? s.toNonIndexed() : s); } return merge(THREE, parts); })(),
     vent: new THREE.IcosahedronGeometry(1, 0).scale(1.3, 0.35, 1.1).translate(0, 0.15, 0),
     ash: new THREE.IcosahedronGeometry(1, 0).scale(0.9, 0.4, 0.8).translate(0, 0.18, 0),
   };
   for (const k in g) g[k].computeVertexNormals();
+  const VC = k => !!(g[k] && g[k].attributes && g[k].attributes.color); /* 4.3b: cor por vértice só quando a pedra nova veio */
   const mats = {
     shard: mat({ color: 0xdfe6ec, roughness: 0.3, metalness: 0.05, flatShading: true }), // 4.2h: gelo fosco sem brilho (azul aceso é só do Minério)
-    stone: mat({ color: 0xa8a29a, roughness: 0.85, flatShading: true }),
-    pebble: mat({ color: 0x7b756d, roughness: 0.95, flatShading: true }),
-    boulder: mat({ color: 0x6b645c, roughness: 0.95, flatShading: true }),
+    stone: mat({ color: 0xa8a29a, roughness: 0.85, flatShading: true, vertexColors: VC('stone') }),
+    pebble: mat({ color: 0x7b756d, roughness: 0.95, flatShading: true, vertexColors: VC('pebble') }),
+    boulder: mat({ color: 0x6b645c, roughness: 0.95, flatShading: true, vertexColors: VC('boulder') }),
     tuft: mat({ color: 0x7d8f4f, roughness: 0.85, side: THREE.DoubleSide }, { wind: true }),
     shrub: mat({ color: 0x4f6a3d, roughness: 0.9, flatShading: true }, { wind: true }),
     vent: mat({ color: 0x241f20, roughness: 0.9, emissive: 0x3a0d06, emissiveIntensity: 0.2, flatShading: true }), // brasa discreta: rocha escura que mal brilha

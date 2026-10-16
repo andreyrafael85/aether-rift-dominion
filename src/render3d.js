@@ -8,6 +8,7 @@ const NODE_MODEL = { plasma: 'crystals', minerio: 'ore', dados: 'datashards' };
 // 4.0d — Engine gráfica 2: malhas 3D suaves por Raça (src/meshes.js); voxel fica como reserva e no modo 2D. ?malhas=0 volta ao voxel.
 const USE_MESH = !!ME && new URLSearchParams(location.search).get('malhas') !== '0';
 if (ME && matchMedia('(pointer: coarse)').matches) ME.setLod(0.6); // celular: menos segmentos por modelo
+const ENV_K = 0.3; /* 4.3b: o r186 ilumina 2× a 3× mais pelo mapa de ambiente que o r160 (medido numa cena de teste); este fator devolve o equilíbrio calibrado na 4.3a */
 const DBG_OFF = new Set((new URLSearchParams(location.search).get('sem') || '').split(',')); // diagnóstico: ?sem=ceu,horizonte,relevo,detalhe
 const NODE_COLOR = { plasma: '#FF6A3D', minerio: '#4CC9FF', dados: '#7FE3A1' }; // 4.2h: Minério azul-elétrico
 function resGlyph(c, e, x, y, px) { // 4.2h: símbolo de recurso no radar, diferente dos de unidade (círculo) e estrutura (quadrado)
@@ -34,22 +35,53 @@ function create(canvas, overlay, mini) {
   console.log('[ARD] GPU: ' + R.gpu + ' · WebGL2: ' + !!renderer.capabilities.isWebGL2);
   const isTouch = matchMedia('(pointer: coarse)').matches;
   renderer.setPixelRatio(Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1));
-  renderer.shadowMap.enabled = !isTouch; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+  renderer.shadowMap.enabled = !isTouch; renderer.shadowMap.type = THREE.PCFShadowMap; /* 4.3b: r186 removeu o PCFSoft; o PCF novo é suave pelo raio */ renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
   const ADD = window.THREE_ADDONS || null; let composer = null, bloomPass = null, ssaoPass = null, gradePass = null;
+  let aoPass = null, atmoFx = null, gradeFx = null, bloomFx = null, toneFx = null; R.pp = false; /* 4.3b: cadeia de cinema (postprocessing + N8AO) */
   // 4.2d: gradação de cor (linear, antes do tone mapping): ganho por canal, saturação, contraste e vinheta; muda com o clima, a noite e a Raça
   const GRADE = { uniforms: { tDiffuse: { value: null }, uGain: { value: new THREE.Vector3(1.03, 1.0, 0.97) }, uLift: { value: new THREE.Vector3(0, 0, 0.004) }, uSat: { value: 1.08 }, uCon: { value: 1.06 }, uVig: { value: 0.28 } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
     fragmentShader: 'uniform sampler2D tDiffuse; uniform vec3 uGain; uniform vec3 uLift; uniform float uSat; uniform float uCon; uniform float uVig; varying vec2 vUv; void main(){ vec4 c = texture2D(tDiffuse, vUv); vec3 col = c.rgb * uGain + uLift; float l = dot(col, vec3(0.2126, 0.7152, 0.0722)); col = mix(vec3(l), col, uSat); col = 0.18 * pow(max(col / 0.18, vec3(0.0)), vec3(uCon)); float d = distance(vUv, vec2(0.5)); col *= 1.0 - uVig * smoothstep(0.35, 0.85, d); gl_FragColor = vec4(col, c.a); }' };
   R.quality = { name: 'media', shadows: !isTouch, shadowMap: 2048, post: !!ADD && !isTouch, ssao: false, pr: Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1), particles: 1 };
+  // 4.3b — efeitos da cadeia nova. Névoa de altura com perspectiva aérea (integral exata ao longo do raio), luz do sol espalhada na
+  // bruma e sombras de nuvem em tudo que está no chão, reconstruindo a posição no mundo pela profundidade; gradação igual à antiga.
+  const ATMO_FS = 'uniform mat4 uAtProjInv; uniform mat4 uAtCamWorld; uniform vec3 uAtFog; uniform vec3 uAtFar; uniform vec3 uAtSun; uniform vec3 uAtSunDir; uniform vec4 uAtP; uniform vec4 uAtQ; uniform sampler2D uAtCloud;\n' +
+    'void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth, out vec4 outputColor) {\n' +
+    '  if (depth >= 0.999999) { outputColor = inputColor; return; }\n' +
+    '  vec4 vp = uAtProjInv * vec4(uv * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0); vp.xyz /= vp.w; vec3 wp = (uAtCamWorld * vec4(vp.xyz, 1.0)).xyz; vec3 co = uAtCamWorld[3].xyz;\n' +
+    '  vec3 rd = wp - co; float dist = length(rd); rd /= max(dist, 0.001); float d = max(0.0, dist - uAtP.w);\n' +
+    '  float a = uAtP.x * exp(-uAtP.y * (co.y - uAtP.z)); float b = uAtP.y * rd.y; float od = abs(b) > 0.00001 ? a * (1.0 - exp(-b * d)) / b : a * d; od += uAtQ.x * d;\n' +
+    '  float fog = min(1.0 - exp(-max(od, 0.0)), 0.85); float sd = pow(max(dot(rd, uAtSunDir), 0.0), 7.0); vec3 fc = mix(uAtFog, uAtFar, smoothstep(700.0, 2600.0, dist)) + uAtSun * sd;\n' +
+    '  vec3 col = inputColor.rgb; if (uAtQ.w > 0.0 && dist < 2600.0) { float cl = texture2D(uAtCloud, vec2(wp.x, -wp.z) / uAtQ.y * 5.0 + vec2(uAtQ.z * 0.006, uAtQ.z * 0.0035)).r; col *= 1.0 - uAtQ.w * (1.0 - cl) * (1.0 - smoothstep(1800.0, 2600.0, dist)); }\n' +
+    '  outputColor = vec4(mix(col, fc, fog), inputColor.a);\n}';
+  const GRADE_FS = 'uniform vec3 uGain; uniform vec3 uLift; uniform float uSat; uniform float uCon; uniform float uVig;\n' +
+    'void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) { vec3 col = inputColor.rgb * uGain + uLift; float l = dot(col, vec3(0.2126, 0.7152, 0.0722)); col = mix(vec3(l), col, uSat); col = 0.18 * pow(max(col / 0.18, vec3(0.0)), vec3(uCon)); float dv = distance(uv, vec2(0.5)); col *= 1.0 - uVig * smoothstep(0.35, 0.85, dv); outputColor = vec4(col, inputColor.a); }';
+  function ppEffect(PP, name, fs, uniforms, depth) { const map = new Map(); const U = {}; for (const k in uniforms) { const u = new THREE.Uniform(uniforms[k]); map.set(k, u); U[k] = u; } const fx = new PP.Effect(name, fs, { blendFunction: PP.BlendFunction.SRC, attributes: depth ? PP.EffectAttribute.DEPTH : PP.EffectAttribute.NONE, uniforms: map }); fx.U = U; return fx; }
+  function buildPP(PP) {
+    const q = R.quality; const W = R.w || 800, Hh = R.h || 600;
+    composer = new PP.EffectComposer(renderer, { frameBufferType: THREE.HalfFloatType, multisampling: q.msaa ? 4 : 0 }); composer.setPixelRatio && composer.setPixelRatio(q.pr);
+    composer.addPass(new PP.RenderPass(scene, camera));
+    if (q.ssao && PP.N8AOPostPass) { aoPass = new PP.N8AOPostPass(scene, camera, W, Hh); const c = aoPass.configuration; c.transparencyAware = false; c.halfRes = !!q.aoHalf; c.depthAwareUpsampling = true; c.aoSamples = q.aoHalf ? 12 : q.resolved === 'ultra' ? 24 : 16; c.denoiseSamples = 8; c.denoiseRadius = 12; c.aoRadius = 12; c.distanceFalloff = 1.2; c.intensity = 2.8; c.color.setRGB(0.03, 0.025, 0.03); if (R.ssaoOut != null) c.renderMode = R.ssaoOut; composer.addPass(aoPass); }
+    atmoFx = DBG_OFF.has('bruma') ? null : ppEffect(PP, 'ArdAtmo', ATMO_FS, { uAtProjInv: new THREE.Matrix4(), uAtCamWorld: new THREE.Matrix4(), uAtFog: new THREE.Color(0.6, 0.66, 0.74), uAtFar: new THREE.Color(0.6, 0.66, 0.74), uAtSun: new THREE.Color(0.25, 0.2, 0.12), uAtSunDir: new THREE.Vector3(-0.4, 0.7, 0.5).normalize(), uAtP: new THREE.Vector4(1 / 2600, 1 / 70, 0, 120), uAtQ: new THREE.Vector4(1 / 14000, S.WORLD, 0, 0.2), uAtCloud: null }, true);
+    if (atmoFx) composer.addPass(new PP.EffectPass(camera, atmoFx));
+    bloomFx = new PP.BloomEffect({ mipmapBlur: true, luminanceThreshold: 1.0, luminanceSmoothing: 0.35, intensity: 0.75, radius: 0.72 });
+    gradeFx = ppEffect(PP, 'ArdGrade', GRADE_FS, { uGain: new THREE.Vector3(1.03, 1.0, 0.97), uLift: new THREE.Vector3(0, 0, 0.004), uSat: 1.08, uCon: 1.06, uVig: 0.28 }, false);
+    toneFx = new PP.ToneMappingEffect({ mode: PP.ToneMappingMode.ACES_FILMIC }); composer.addPass(new PP.EffectPass(camera, bloomFx, gradeFx, toneFx));
+    if (!q.msaa && PP.SMAAEffect) composer.addPass(new PP.EffectPass(camera, new PP.SMAAEffect({ preset: PP.SMAAPreset ? PP.SMAAPreset.HIGH : undefined })));
+    renderer.toneMapping = THREE.NoToneMapping; R.pp = true; const sz = renderer.getSize(new THREE.Vector2()); composer.setSize(sz.x || W, sz.y || Hh, false); /* false: o composer novo mexeria no estilo do canvas */
+  }
   function buildComposer() {
-    if (composer) { composer.dispose && composer.dispose(); composer = null; bloomPass = null; ssaoPass = null; } gradePass = null;
-    if (!ADD || !R.quality.post) return;
+    if (composer) { composer.dispose && composer.dispose(); composer = null; bloomPass = null; ssaoPass = null; } gradePass = null; aoPass = null; atmoFx = null; gradeFx = null; bloomFx = null; R.pp = false;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    if (!R.quality.post) return;
+    const PP = window.THREE_PP; if (PP && !DBG_OFF.has('pp')) { try { buildPP(PP); return; } catch (err) { console.warn('[ARD] pós de cinema falhou, voltando ao anterior: ' + err.message); try { composer && composer.dispose && composer.dispose(); } catch (e) {} composer = null; aoPass = null; atmoFx = null; gradeFx = null; bloomFx = null; R.pp = false; renderer.toneMapping = THREE.ACESFilmicToneMapping; } }
+    if (!ADD) return;
     // 4.0c: MSAA 4x no alvo do composer (mesma técnica do hero da galeria) nos presets Alta/Ultra; o watchdog desliga se a GPU não aguentar
     const rt = R.quality.msaa ? new THREE.WebGLRenderTarget(R.w || 800, R.h || 600, { type: THREE.HalfFloatType, samples: 4 }) : undefined;
     composer = new ADD.EffectComposer(renderer, rt); composer.setPixelRatio(R.quality.pr);
     // r160: SSAOPass nao renderiza a cena; ele le o buffer do passe anterior. O RenderPass precisa vir SEMPRE antes.
     composer.addPass(new ADD.RenderPass(scene, camera));
-    if (R.quality.ssao) { ssaoPass = new ADD.SSAOPass(scene, camera, R.w || 800, R.h || 600); ssaoPass.kernelRadius = 24; ssaoPass.minDistance = 0.0006; ssaoPass.maxDistance = 0.04; if (R.ssaoOut != null) ssaoPass.output = R.ssaoOut;
+    if (R.quality.ssao && R.quality.resolved === 'ultra') { ssaoPass = new ADD.SSAOPass(scene, camera, R.w || 800, R.h || 600); ssaoPass.kernelRadius = 24; ssaoPass.minDistance = 0.0006; ssaoPass.maxDistance = 0.04; if (R.ssaoOut != null) ssaoPass.output = R.ssaoOut;
       // Os passes de tela cheia do SSAO (oclusao e blur) nao precisam de depth; com depth test ligado o blur reprovava no proprio alvo e a saida ficava preta.
       [ssaoPass.ssaoMaterial, ssaoPass.blurMaterial].forEach(m => { m.depthTest = false; m.depthWrite = false; });
       composer.addPass(ssaoPass); }
@@ -96,12 +128,13 @@ function create(canvas, overlay, mini) {
     if (/nvidia|geforce|rtx|gtx|radeon rx|radeon pro|apple m\d|\barc\b/.test(g)) return 'alta';
     return 'media'; }
   R.autoTier = autoTier;
+  window.addEventListener('pp-ready', () => { if (R.quality.post && window.THREE_PP && !R.pp) { buildComposer(); armWatchdog(); } }); /* 4.3b */
   R.setQuality = function (name, over) {
     const q = R.quality; q.name = name; over = over || {};
     if (name === 'auto') name = autoTier(); q.resolved = name; // 4.0f: escolha pela GPU, memória e núcleos; o ajuste por FPS corrige depois
     if (name === 'baixa') { q.shadows = false; q.post = false; q.ssao = false; q.msaa = false; q.pr = 1; q.particles = 0.5; }
-    else if (name === 'alta' || name === 'ultra') { q.shadows = true; q.shadowMap = 4096; q.post = !!ADD; q.ssao = name === 'ultra' && !!ADD; q.msaa = !!ADD && !isTouch && !!(renderer.capabilities && renderer.capabilities.isWebGL2); q.pr = Math.min(2, window.devicePixelRatio || 1); q.particles = 1; }
-    else { q.shadows = !isTouch; q.shadowMap = 2048; q.post = !!ADD; q.ssao = false; q.msaa = false; q.pr = Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1); q.particles = 1; }
+    else if (name === 'alta' || name === 'ultra') { q.shadows = true; q.shadowMap = 4096; q.post = !!ADD; q.ssao = !!ADD; q.aoHalf = false; q.msaa = !!ADD && !isTouch && !!(renderer.capabilities && renderer.capabilities.isWebGL2); q.pr = Math.min(2, window.devicePixelRatio || 1); q.particles = 1; }
+    else { q.shadows = !isTouch; q.shadowMap = 2048; q.post = !!ADD; q.ssao = !!ADD && !isTouch; q.aoHalf = true; q.msaa = false; q.pr = Math.min(isTouch ? 1.5 : 2, window.devicePixelRatio || 1); q.particles = 1; }
     if (over.ssao != null) q.ssao = over.ssao && !!ADD; if (over.msaa != null) q.msaa = over.msaa && !!ADD; if (over.shadowMap) q.shadowMap = over.shadowMap; if (over.post != null) q.post = over.post && !!ADD;
     q.detail = name === 'baixa' || isTouch ? 0 : name === 'media' ? 0.75 : 1; if (ME && ME.setDetail) ME.setDetail(q.detail); /* 4.3a: detalhe de superfície dos modelos */
     renderer.setPixelRatio(q.pr); applyShadows(); buildComposer(); armWatchdog(); if (R.FX) R.FX.mult = q.particles; if (R.DR && R.sim && R.H) { try { R.DR.build(R.sim, R.H, dressDensity()); } catch (e) {} }
@@ -114,7 +147,17 @@ function create(canvas, overlay, mini) {
   const sun = new THREE.DirectionalLight(0xffe9c4, 1.6); sun.castShadow = !isTouch; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0006; scene.add(sun); scene.add(sun.target);
   const amb = new THREE.AmbientLight(0x404860, 0.3); scene.add(amb);
   scene.fog = new THREE.Fog(0x9fb0c4, 1500, 3200);
-  if (ADD && ADD.RoomEnvironment) { try { const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new ADD.RoomEnvironment(), 0.04).texture; pm.dispose(); } catch (err) { console.warn('[ARD] mapa de ambiente indisponível: ' + err.message); } }
+  if (ADD && ADD.RoomEnvironment) { try { const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new ADD.RoomEnvironment(), 0.04).texture; scene.environmentIntensity = ENV_K; pm.dispose(); } catch (err) { console.warn('[ARD] mapa de ambiente indisponível: ' + err.message); } }
+  let envRT = null; /* 4.3b: reflexo do céu do mapa */
+  function skyEnv(cl) { if (!W3 || !W3.makeSky || DBG_OFF.has('ceuenv')) return; try {
+    const bgD = new THREE.Color().setRGB(0.62, 0.69, 0.77); if (cl) bgD.lerp(new THREE.Color().setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), cl.mix); const gcol = R.groundCol || new THREE.Color(0.3, 0.28, 0.26);
+    const es = new THREE.Scene(); const sk = W3.makeSky(THREE); const u = sk.userData.mat.uniforms; u.uHor.value.copy(bgD).lerp(new THREE.Color().copy(gcol).multiplyScalar(1.5), 0.28); u.uTop.value.copy(bgD).multiplyScalar(0.55).lerp(new THREE.Color(0.12, 0.2, 0.36), 0.5); u.uBot.value.copy(gcol).multiplyScalar(0.7); u.uNight.value = 0; u.uSunDir.value.set(R.sunDir[0], R.sunDir[1], R.sunDir[2]).normalize(); u.uSunCol.value.setRGB(1.0, 0.91, 0.77).multiplyScalar(1.6); sk.scale.setScalar(0.02); es.add(sk);
+    const gd = new THREE.Mesh(new THREE.CircleGeometry(90, 40), new THREE.MeshBasicMaterial({ color: new THREE.Color().copy(gcol).multiplyScalar(0.8) })); gd.rotation.x = -Math.PI / 2; gd.position.y = -8; es.add(gd);
+    const pm = new THREE.PMREMGenerator(renderer); const rt = pm.fromScene(es, 0.025, 0.1, 400); pm.dispose(); sk.geometry.dispose(); sk.material.dispose(); gd.geometry.dispose(); gd.material.dispose();
+    if (envRT) envRT.dispose(); envRT = rt; scene.environment = rt.texture; scene.environmentIntensity = R.envSkyK; R.envSky = true; } catch (err) { console.warn('[ARD] reflexo do céu indisponível: ' + err.message); } }
+  R.sunDir = [-470, 640, 600]; /* 40° de elevação (antes 49°): sombras mais longas */ /* 4.3b: direção do sol (luz, céu, reflexo e bruma usam a mesma) */
+  R.lightK = { sun: 1.3, hemi: 0.68, amb: 0.5 }; R.atmoK = { haze: 1.2, hh: 70, air: 1.2, sun: 0.32, cloud: 0.2, warm: 0.28 }; R.gradeK = { gain: 1.12, sat: 1.2, con: 1.1, vig: 0.26 }; R.ppFx = () => ({ aoPass, atmoFx, gradeFx, bloomFx, toneFx, composer, PP: window.THREE_PP }); /* 4.3b: o céu agora ilumina pelo reflexo de ambiente; hemisfério e ambiente ficam menores */
+  R.skyEnv = skyEnv; R.cine = true; R.envSkyK = +(new URLSearchParams(location.search).get('envk') || 0.68);
   R.setQuality('auto');
   const lightPool = []; for (let i = 0; i < 10; i++) { const l = new THREE.PointLight(0xffc070, 0, 220, 2); scene.add(l); lightPool.push(l); }
   const flashLight = new THREE.PointLight(0xffc878, 0, 160, 2); scene.add(flashLight); let flashT = 0;
@@ -163,20 +206,21 @@ function create(canvas, overlay, mini) {
       cols[i * 3] = c[0] * g; cols[i * 3 + 1] = c[1] * g; cols[i * 3 + 2] = c[2] * g;
     }
     geo.setAttribute('color', new THREE.BufferAttribute(cols, 3)); geo.computeVertexNormals();
+    { let r = 0, g = 0, b = 0; const n = cols.length / 3; for (let i = 0; i < cols.length; i += 3) { r += cols[i]; g += cols[i + 1]; b += cols[i + 2]; } R.groundCol = new THREE.Color(r / n, g / n, b / n); } /* 4.3b: poeira da bruma e chão do reflexo */
     const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0.02, envMapIntensity: 0.22 }); mat.userData.env = 0.22; envMats.push(mat);
     if (detailTex && !DBG_OFF.has('relevo')) { mat.bumpMap = detailTex; mat.bumpScale = 1.4; }
     mat.onBeforeCompile = sh => {
-      sh.uniforms.fogMap = { value: fogTex }; sh.uniforms.terrMap = { value: terrTex }; sh.uniforms.worldSize = { value: S.WORLD }; sh.uniforms.cloudMap = { value: cloudTex }; sh.uniforms.uCloudT = { value: 0 }; sh.uniforms.detailMap = { value: detailTex || cloudTex }; sh.uniforms.microMap = { value: microTex || detailTex || cloudTex }; sh.uniforms.uNear = { value: 0 }; R.terrShader = sh; const useDet = !!detailTex && !DBG_OFF.has('detalhe');
+      sh.uniforms.fogMap = { value: fogTex }; sh.uniforms.terrMap = { value: terrTex }; sh.uniforms.worldSize = { value: S.WORLD }; sh.uniforms.cloudMap = { value: cloudTex }; sh.uniforms.uCloudT = { value: 0 }; sh.uniforms.detailMap = { value: detailTex || cloudTex }; sh.uniforms.microMap = { value: microTex || detailTex || cloudTex }; sh.uniforms.uNear = { value: 0 }; sh.uniforms.uCloudK = { value: 1 }; R.terrShader = sh; const useDet = !!detailTex && !DBG_OFF.has('detalhe');
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vWuv; varying float vNy;').replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n{ vec4 wp = modelMatrix * vec4(position, 1.0); vWuv = vec2(wp.x / worldSize, -wp.z / worldSize); vNy = normal.y; }');
       sh.fragmentShader = sh.fragmentShader.replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\nif (ardMh != 0.0) normal = ardTPerturb(-vViewPosition, normal, vec2(dFdx(ardMh), dFdy(ardMh)) * 1.4, faceDirection);'); /* 4.3a: relevo fino só perto */
       sh.vertexShader = sh.vertexShader.replace('uniform float worldSize', 'uniform float worldSize'); if (!sh.vertexShader.includes('uniform float worldSize')) sh.vertexShader = 'uniform float worldSize;\n' + sh.vertexShader;
-      sh.fragmentShader = ('uniform sampler2D fogMap; uniform sampler2D terrMap; uniform sampler2D cloudMap; uniform sampler2D detailMap; uniform sampler2D microMap; uniform float uNear; uniform float uCloudT; varying vec2 vWuv; varying float vNy;\n' + 'vec3 ardTPerturb(vec3 sp, vec3 sn, vec2 dh, float fd) { vec3 sx = normalize(dFdx(sp)), sy = normalize(dFdy(sp)); vec3 r1 = cross(sy, sn), r2 = cross(sn, sx); float det = dot(sx, r1) * fd; vec3 g = sign(det) * (dh.x * r1 + dh.y * r2); return normalize(abs(det) * sn - g); }\n' + sh.fragmentShader).replace('#include <color_fragment>', '#include <color_fragment>\n' + (useDet ? '' : '#define NO_DET\n') + '#ifndef NO_DET\n{ vec3 dn = texture2D(detailMap, vWuv * 44.0).rgb; vec3 dm = texture2D(detailMap, vWuv * 7.0 + 0.37).rgb; float det = dn.r * 0.5 + dm.g * 0.5; diffuseColor.rgb *= 0.8 + 0.4 * det; diffuseColor.rgb *= 1.0 - 0.2 * dn.b * smoothstep(0.35, 0.65, dm.r); float slope = 1.0 - clamp(vNy, 0.0, 1.0); diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.30, 0.29, 0.31) * (0.75 + 0.5 * dm.r), smoothstep(0.06, 0.2, slope)); }\n#endif\nfloat ardMh = 0.0; if (uNear > 0.0) { vec3 m1 = texture2D(microMap, vWuv * 260.0).rgb; vec3 m2 = texture2D(microMap, vWuv * 84.0 + 0.31).rgb; float pe = max(m1.r * 0.6, m2.r); diffuseColor.rgb *= mix(1.0, (0.82 + 0.36 * mix(m1.g, m2.g, step(0.25, m2.r))) * (1.0 - 0.45 * max(m1.b, m2.b * 0.8)) * (1.0 + 0.12 * pe), uNear); ardMh = (m1.r * 0.35 + m2.r * 0.9 - (m1.b + m2.b) * 0.3) * uNear; }\n{ vec4 tc = texture2D(terrMap, vWuv); diffuseColor.rgb = mix(diffuseColor.rgb, tc.rgb, tc.a * 0.2); float fl = texture2D(fogMap, vWuv).r; diffuseColor.rgb *= mix(0.06, 1.0, fl); float cl = texture2D(cloudMap, vWuv * 5.0 + vec2(uCloudT * 0.006, uCloudT * 0.0035)).r; diffuseColor.rgb *= 0.8 + 0.2 * cl; }');
+      sh.fragmentShader = ('uniform sampler2D fogMap; uniform sampler2D terrMap; uniform sampler2D cloudMap; uniform sampler2D detailMap; uniform sampler2D microMap; uniform float uNear; uniform float uCloudT; uniform float uCloudK; varying vec2 vWuv; varying float vNy;\n' + 'vec3 ardTPerturb(vec3 sp, vec3 sn, vec2 dh, float fd) { vec3 sx = normalize(dFdx(sp)), sy = normalize(dFdy(sp)); vec3 r1 = cross(sy, sn), r2 = cross(sn, sx); float det = dot(sx, r1) * fd; vec3 g = sign(det) * (dh.x * r1 + dh.y * r2); return normalize(abs(det) * sn - g); }\n' + sh.fragmentShader).replace('#include <color_fragment>', '#include <color_fragment>\n' + (useDet ? '' : '#define NO_DET\n') + '#ifndef NO_DET\n{ vec3 dn = texture2D(detailMap, vWuv * 44.0).rgb; vec3 dm = texture2D(detailMap, vWuv * 7.0 + 0.37).rgb; float det = dn.r * 0.5 + dm.g * 0.5; diffuseColor.rgb *= 0.8 + 0.4 * det; diffuseColor.rgb *= 1.0 - 0.2 * dn.b * smoothstep(0.35, 0.65, dm.r); float slope = 1.0 - clamp(vNy, 0.0, 1.0); diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.30, 0.29, 0.31) * (0.75 + 0.5 * dm.r), smoothstep(0.06, 0.2, slope)); }\n#endif\nfloat ardMh = 0.0; if (uNear > 0.0) { vec3 m1 = texture2D(microMap, vWuv * 260.0).rgb; vec3 m2 = texture2D(microMap, vWuv * 84.0 + 0.31).rgb; float pe = max(m1.r * 0.6, m2.r); diffuseColor.rgb *= mix(1.0, (0.82 + 0.36 * mix(m1.g, m2.g, step(0.25, m2.r))) * (1.0 - 0.45 * max(m1.b, m2.b * 0.8)) * (1.0 + 0.12 * pe), uNear); ardMh = (m1.r * 0.35 + m2.r * 0.9 - (m1.b + m2.b) * 0.3) * uNear; }\n{ vec4 tc = texture2D(terrMap, vWuv); diffuseColor.rgb = mix(diffuseColor.rgb, tc.rgb, tc.a * 0.2); float fl = texture2D(fogMap, vWuv).r; diffuseColor.rgb *= mix(0.06, 1.0, fl); float cl = texture2D(cloudMap, vWuv * 5.0 + vec2(uCloudT * 0.006, uCloudT * 0.0035)).r; diffuseColor.rgb *= 1.0 - uCloudK * 0.2 * (1.0 - cl); }');
     };
     if (terrain) scene.remove(terrain);
     terrain = new THREE.Mesh(geo, mat); terrain.position.set(S.WORLD / 2, 0, -S.WORLD / 2); terrain.receiveShadow = true; scene.add(terrain);
     if (W3) { try {
       if (horizon) { scene.remove(horizon); horizon.geometry.dispose(); horizon = null; } if (!DBG_OFF.has('horizonte')) horizon = W3.makeHorizon(THREE, S.WORLD, H, sim.seed % 97, 0x4c4e55); if (horizon) { horizon.material.userData.env = 0.15; envMats.push(horizon.material); scene.add(horizon); }
-      if (!sky && !DBG_OFF.has('ceu')) { sky = W3.makeSky(THREE); scene.add(sky); }
+      if (!sky && !DBG_OFF.has('ceu')) { sky = W3.makeSky(THREE); scene.add(sky); } skyEnv(R.climateCfg); /* 4.3b */
       if (home) scene.remove(home); const me = sim.players[R.humanId || 0] || sim.players[0]; home = W3.makeHomeWorld(THREE, me ? me.faction : 'vehnar', (sim.seed % 13) + 1); scene.add(home);
     } catch (err) { console.warn('[ARD] céu/horizonte indisponível: ' + err.message); } }
     // Fenda: anel emissivo e luz
@@ -254,7 +298,7 @@ function create(canvas, overlay, mini) {
     if (it.em) { it.em.setMatrixAt(it.n, _m); if (emTint != null) _c.setScalar(emTint); it.em.setColorAt(it.n, _c); }
     it.n++;
   }
-  function fitOf(e, g) { const foot = e.kind === 'node' ? 2 * e.r * 1.2 * (0.55 + 0.45 * (e.max ? e.amount / e.max : 1)) : e.kind === 'wreck' ? 2 * e.r * 1.3 : e.kind === 'rock' ? 2 * e.r * 1.9 : 2 * e.r * 1.25; return foot / g.width; }
+  function fitOf(e, g) { const foot = e.kind === 'node' ? 2 * e.r * 0.95 * (0.55 + 0.45 * (e.max ? e.amount / e.max : 1)) /* 4.3b: afloramento em escala com o coletor (antes 1,2) */ : e.kind === 'wreck' ? 2 * e.r * 1.3 : e.kind === 'rock' ? 2 * e.r * 1.9 : 2 * e.r * 1.25; return foot / g.width; }
   // sprites 2D só para ícones do HUD
   R.sprite = function (def, pid, facing, dmg, seed) { const key = def + '|' + pid + '|' + (seed || 0); let sp = R.spriteCache.get(key); if (!sp) { const m = modelFor(def, pid, seed); sp = V.renderSprite(m, 0, 4, {}); R.spriteCache.set(key, sp); } return sp; };
   let iconR = null, iconScene = null, iconCam = null, iconMat = null, iconMatEm = null;
@@ -263,7 +307,7 @@ function create(canvas, overlay, mini) {
     try {
       if (!iconR) { const cv = document.createElement('canvas'); cv.width = cv.height = 96; iconR = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true }); iconR.setPixelRatio(1); iconR.setSize(96, 96, false); iconR.outputColorSpace = THREE.SRGBColorSpace; iconR.toneMapping = THREE.ACESFilmicToneMapping; iconR.toneMappingExposure = 1.2;
         iconScene = new THREE.Scene(); iconScene.add(new THREE.HemisphereLight(0xd6e4f5, 0x34302c, 1.4)); const d = new THREE.DirectionalLight(0xfff1dc, 2.2); d.position.set(-3, 6, 4); iconScene.add(d); const rimL = new THREE.DirectionalLight(0xa9ccff, 1.6); rimL.position.set(4, 3, -5); iconScene.add(rimL);
-        if (ADD && ADD.RoomEnvironment) { const pm = new THREE.PMREMGenerator(iconR); iconScene.environment = pm.fromScene(new ADD.RoomEnvironment(), 0.04).texture; }
+        if (ADD && ADD.RoomEnvironment) { const pm = new THREE.PMREMGenerator(iconR); iconScene.environment = pm.fromScene(new ADD.RoomEnvironment(), 0.04).texture; iconScene.environmentIntensity = ENV_K; }
         iconCam = new THREE.PerspectiveCamera(28, 1, 0.1, 2000); iconMat = ME.material({ env: 0.8, key: 'icone' }); iconMatEm = new THREE.MeshBasicMaterial({ vertexColors: true }); }
       const grp = new THREE.Group(); grp.add(new THREE.Mesh(g.main, iconMat)); if (g.em) grp.add(new THREE.Mesh(g.em, iconMatEm)); grp.rotation.y = 0.55;
       const sz = Math.max(g.width, g.height * 1.15); const d = sz * 2.25; iconCam.position.set(d * 0.62, d * 0.52, d * 0.62); iconCam.lookAt(0, g.height * 0.42, 0);
@@ -282,12 +326,12 @@ function create(canvas, overlay, mini) {
   // ---------- projeção ----------
   function updateCamera(cam) {
     const portrait = R.h > R.w * 1.05; const frame = portrait ? 1 + Math.min(0.85, (R.h / R.w - 1) * 0.6) : 1; R.camDist = CAM.baseDist * frame / cam.zoom; // 4.1a: celular em pé enxerga mais
-    const d = R.camDist; const yaw = cam.yaw == null ? Math.PI / 4 : cam.yaw; if (R.terrShader && R.terrShader.uniforms.uNear) R.terrShader.uniforms.uNear.value = microTex ? Math.max(0, Math.min(1, (400 - d) / 240)) : 0; /* 4.3a */ const ty = H(cam.x, cam.y); const pitch = cam.pitch == null ? CAM.pitch : Math.max(CAM.minPitch, Math.min(CAM.maxPitch, cam.pitch));
+    const d = R.camDist; const yaw = cam.yaw == null ? Math.PI / 4 : cam.yaw; if (R.terrShader && R.terrShader.uniforms.uNear) R.terrShader.uniforms.uNear.value = microTex ? Math.max(0, Math.min(1, (400 - d) / 240)) : 0; /* 4.3a */ const ty = H(cam.x, cam.y); const pitch0 = cam.pitch == null ? CAM.pitch : Math.max(CAM.minPitch, Math.min(CAM.maxPitch, cam.pitch)); const zk = Math.max(0, Math.min(1, (cam.zoom - 2) / 4)); const pitch = R.cine === false ? pitch0 : pitch0 - zk * zk * (3 - 2 * zk) * Math.max(0, pitch0 - 0.5) * 0.75; R.pitchEff = pitch; /* 4.3b: câmera de cinema */
     camera.position.set(cam.x + Math.sin(yaw) * Math.cos(pitch) * d + R.shakeX, ty + Math.sin(pitch) * d, -cam.y + Math.cos(yaw) * Math.cos(pitch) * d + R.shakeY);
     camera.lookAt(cam.x, ty, -cam.y); camera.updateMatrixWorld(); camera.updateProjectionMatrix();
     if (sky) sky.position.copy(camera.position); if (home) { home.position.set(camera.position.x - 0.36 * 4200, camera.position.y * 0.15 + 4200 * 0.06, camera.position.z - 0.93 * 4200); }
-    sun.position.set(cam.x - 420, ty + 760, -cam.y + 520); sun.target.position.set(cam.x, ty, -cam.y); sun.target.updateMatrixWorld();
-    const sc = sun.shadow.camera; const ext = Math.min(900, d * 1.1); sc.left = -ext; sc.right = ext; sc.top = ext; sc.bottom = -ext; sc.near = 100; sc.far = 2200; sc.updateProjectionMatrix();
+    sun.position.set(cam.x + R.sunDir[0], ty + R.sunDir[1], -cam.y + R.sunDir[2]); sun.target.position.set(cam.x, ty, -cam.y); sun.target.updateMatrixWorld();
+    const sc = sun.shadow.camera; const ext = Math.min(900, d * (1.1 + 1.6 * (1 - Math.sin(pitch)))); sc.left = -ext; sc.right = ext; sc.top = ext; sc.bottom = -ext; sc.near = 100; sc.far = 2200; sc.updateProjectionMatrix();
   }
   R.shakeX = 0; R.shakeY = 0;
   R.setBeacon = function (pt) { R.beaconPt = pt || null; }; // 4.0e: farol do ponto de extração da missão
@@ -301,7 +345,7 @@ function create(canvas, overlay, mini) {
   function miniXf() { const size = mini.width || 184; const sc = size / (S.WORLD * Math.SQRT2) * 0.97; return { size, sc, co: Math.cos(miniYaw), si: Math.sin(miniYaw), cx: size / 2, cy: size / 2 }; }
   R.worldToMini = function (x, y) { const f = miniXf(); const vx = x - S.CX, vy = y - S.CY; return [f.cx + f.sc * (vx * f.co + vy * f.si), f.cy + f.sc * (vx * f.si - vy * f.co)]; };
   R.miniToWorld = function (nx, ny) { const f = miniXf(); const a = (nx * f.size - f.cx) / f.sc, b = (ny * f.size - f.cy) / f.sc; return [S.CX + a * f.co + b * f.si, S.CY + a * f.si - b * f.co]; }; // a matriz do giro é a própria inversa
-  R.resize = function () { const dpr = Math.min(2, window.devicePixelRatio || 1); const w = canvas.clientWidth, h = canvas.clientHeight; R.w = w; R.h = h; R.dpr = dpr; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = h > w * 1.05 ? 46 : 38; camera.updateProjectionMatrix(); if (composer) { composer.setSize(w, h); if (ssaoPass) ssaoPass.setSize(w, h); } if (overlay.width !== Math.round(w * dpr)) { overlay.width = Math.round(w * dpr); overlay.height = Math.round(h * dpr); } const ms = mini.clientWidth || 184; if (mini.width !== ms * dpr) { mini.width = ms * dpr; mini.height = ms * dpr; mfog.width = mini.width; mfog.height = mini.height; } };
+  R.resize = function () { const dpr = Math.min(2, window.devicePixelRatio || 1); const w = canvas.clientWidth, h = canvas.clientHeight; R.w = w; R.h = h; R.dpr = dpr; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = h > w * 1.05 ? 46 : 38; camera.updateProjectionMatrix(); if (composer) { composer.setSize(w, h, false); if (ssaoPass) ssaoPass.setSize(w, h); } if (overlay.width !== Math.round(w * dpr)) { overlay.width = Math.round(w * dpr); overlay.height = Math.round(h * dpr); } const ms = mini.clientWidth || 184; if (mini.width !== ms * dpr) { mini.width = ms * dpr; mini.height = ms * dpr; mfog.width = mini.width; mfog.height = mini.height; } };
 
   // ---------- 4.0d: bandeiras com a Insígnia da Raça no Núcleo e nos Nódulos ----------
   const FLAG = { poleGeo: new THREE.CylinderGeometry(0.06, 0.08, 1, 6).translate(0, 0.5, 0), clothGeo: new THREE.PlaneGeometry(1, 0.66, 10, 4).translate(0.5, 0, 0), poles: null, cloth: new Map(), uTime: { value: 0 } };
@@ -354,7 +398,7 @@ function create(canvas, overlay, mini) {
     acida: { tint: [0.44, 0.56, 0.28], mix: 0.62, fogN: 0.65, fogF: 2.4, hemi: 0xa8c878, sun: 0xd4e68a, drop: [0.6, 0.9, 0.3], vz: -175, vx: 6, rate: 1, burst: 5, life: 1.2 },
   };
   const _cc = new THREE.Color();
-  R.setClimate = function (name) { const c = CLIMATES[name] || null; R.climateCfg = c; if (!c) { scene.fog.near = 1500; scene.fog.far = 3200; } hemi.color.set(c ? c.hemi : 0x9fb8d6); };
+  R.setClimate = function (name) { const c = CLIMATES[name] || null; const changed = R.climateCfg !== c; R.climateCfg = c; if (changed && R.envSky) skyEnv(c); if (!c) { scene.fog.near = 1500; scene.fog.far = 3200; } hemi.color.set(c ? c.hemi : 0x9fb8d6); };
   function spark(x, y, z, col, sp, g) { if (FX) { FX.spark(x, H(x, y) + z, -y, [col[0] * 1.5, col[1] * 1.4, col[2] * 1.3], sp, 1); return; } const i = SP.i++ % SN; const a = Math.random() * TAU; SP.x[i] = x; SP.y[i] = y; SP.z[i] = z; SP.vx[i] = Math.cos(a) * sp * Math.random(); SP.vy[i] = Math.sin(a) * sp * Math.random(); SP.vz[i] = sp * (0.4 + Math.random() * 0.8); SP.t[i] = 0; SP.life[i] = 0.4 + Math.random() * 0.6; sCol[i * 3] = col[0]; sCol[i * 3 + 1] = col[1]; sCol[i * 3 + 2] = col[2]; }
   const boomGeo = new THREE.SphereGeometry(1, 10, 8); const boomMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 1.5, 0.8), transparent: true, opacity: 0.8, depthWrite: false }); const booms = new THREE.InstancedMesh(boomGeo, boomMat, 48); booms.count = 0; booms.frustumCulled = false; scene.add(booms); const boomList = [];
   const decalGeo = new THREE.CircleGeometry(1, 18); decalGeo.rotateX(-Math.PI / 2); const decals = new THREE.InstancedMesh(decalGeo, new THREE.MeshBasicMaterial({ color: 0x0b0908, transparent: true, opacity: 0.55, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }), 160); decals.count = 0; decals.frustumCulled = false; scene.add(decals); const decalList = [];
@@ -446,7 +490,7 @@ function create(canvas, overlay, mini) {
     R.shakeX = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0; R.shakeY = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0;
     updateCamera(cam);
     // dia e noite
-    const nt = R.night; for (const m of envMats) m.envMapIntensity = m.userData.env * (1 - 0.72 * nt); sun.intensity = 1.6 * (1 - nt) + 0.55 * nt; sun.color.setRGB(1 - 0.48 * nt, 0.91 - 0.24 * nt, 0.77 + 0.2 * nt); hemi.intensity = 0.55 * (1 - nt) + 0.42 * nt + lightning * 0.5; amb.intensity = 0.22 * (1 - nt) + 0.26 * nt + lightning * 0.6; // 4.1a: lua azulada; a noite fica escura mas jogável
+    const nt = R.night; for (const m of envMats) m.envMapIntensity = m.userData.env * (1 - 0.72 * nt); const LK = R.lightK; sun.intensity = (1.6 * (1 - nt) + 0.55 * nt) * LK.sun; sun.color.setRGB(1 - 0.48 * nt, 0.91 - 0.24 * nt, 0.77 + 0.2 * nt); hemi.intensity = (0.55 * (1 - nt) + 0.42 * nt) * LK.hemi + lightning * 0.5; amb.intensity = (0.22 * (1 - nt) + 0.26 * nt) * LK.amb + lightning * 0.6; // 4.1a: lua azulada; a noite fica escura mas jogável
     const bg = new THREE.Color().setRGB(0.62 * (1 - nt) + 0.07 * nt, 0.69 * (1 - nt) + 0.09 * nt, 0.77 * (1 - nt) + 0.16 * nt);
     const cl = R.climateCfg;
     if (cl) {
@@ -459,14 +503,18 @@ function create(canvas, overlay, mini) {
     }
     scene.background = bg; scene.fog.color.copy(bg);
     matEm.color.setScalar(1 + 0.9 * nt); // 4.2d: janelas e luzes das estruturas acendem à noite
-    if (gradePass) { const u = gradePass.uniforms; const fac = me ? me.faction : 'vehnar'; const acc = { vehnar: [1.04, 1.0, 0.95], erevane: [0.97, 1.01, 1.04], tessara: [1.0, 1.03, 0.96], quorith: [1.02, 0.98, 1.05], vorag: [1.05, 0.98, 0.97] }[fac] || [1, 1, 1];
+    const GU = gradePass ? gradePass.uniforms : gradeFx ? gradeFx.U : null; if (GU) { const u = GU; const fac = me ? me.faction : 'vehnar'; const acc = { vehnar: [1.04, 1.0, 0.95], erevane: [0.97, 1.01, 1.04], tessara: [1.0, 1.03, 0.96], quorith: [1.02, 0.98, 1.05], vorag: [1.05, 0.98, 0.97] }[fac] || [1, 1, 1];
       let gx = acc[0], gy = acc[1], gz = acc[2]; if (cl && cl.tint) { gx *= 0.92 + cl.tint[0] * 0.2; gy *= 0.92 + cl.tint[1] * 0.2; gz *= 0.92 + cl.tint[2] * 0.2; } gx = gx * (1 - 0.1 * nt); gy = gy * (1 - 0.05 * nt); gz = gz * (1 + 0.08 * nt);
-      u.uGain.value.set(gx, gy, gz); u.uSat.value = 1.08 - 0.22 * nt; u.uCon.value = 1.06 + 0.04 * nt; u.uVig.value = 0.26 + 0.12 * nt; }
+      const GK = R.gradeK; u.uGain.value.set(gx * GK.gain, gy * GK.gain, gz * GK.gain); u.uSat.value = GK.sat - 0.22 * nt; u.uCon.value = GK.con + 0.04 * nt; u.uVig.value = GK.vig + 0.12 * nt; }
     if (R.riftRays) { R.riftRayMat.uniforms.uTime.value = R.time; R.riftRayMat.uniforms.uNight.value = nt; for (let i = 0; i < R.riftRays.length; i++) R.riftRays[i].rotation.y += dt * (0.02 + i * 0.012); }
     if (DR && (dressT -= dt) <= 0) { dressT = 1; try { DR.hideUnder(sim, H); DR.updateRoads(sim, H); } catch (e) {} } if (DR) DR.update(R.time);
-    const pitchNow = cam.pitch == null ? CAM.pitch : cam.pitch; const tilt = Math.max(0, Math.min(1, (CAM.pitch - pitchNow) / (CAM.pitch - CAM.minPitch)));
+    const pitchNow = R.pitchEff != null ? R.pitchEff : cam.pitch == null ? CAM.pitch : cam.pitch; const tilt = Math.max(0, Math.min(1, (CAM.pitch - pitchNow) / (CAM.pitch - CAM.minPitch)));
     if (tilt > 0) { scene.fog.near = Math.max(scene.fog.near, 900 + 1400 * tilt); scene.fog.far = Math.max(scene.fog.far, 3200 + 3800 * tilt); }
-    if (sky) { const u = sky.userData.mat.uniforms; u.uHor.value.copy(bg); u.uTop.value.copy(bg).multiplyScalar(0.55).lerp(_cc.setRGB(0.12, 0.2, 0.36), 0.5 * (1 - nt)); u.uBot.value.copy(bg).multiplyScalar(0.4); u.uNight.value = nt; u.uTime.value = R.time; u.uSunDir.value.set(-420, 760, 520).normalize(); u.uSunCol.value.copy(sun.color); }
+    if (atmoFx) { const u = atmoFx.U; const gcol = R.groundCol || bg; const AK = R.atmoK; u.uAtFog.value.copy(bg).lerp(_cc.copy(gcol).multiplyScalar(1.5), AK.warm * (1 - 0.6 * nt)); if (cl && cl.tint) u.uAtFog.value.lerp(_cc.setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), 0.25); u.uAtFar.value.copy(bg).lerp(_cc.setRGB(0.5, 0.62, 0.8), 0.25 * (1 - nt)); /* longe a bruma azula (perspectiva aérea) */
+      const fk = cl ? Math.max(1, Math.min(2.6, 3.4 / cl.fogF)) : 1; const camD = R.camDist || CAM.baseDist; u.uAtSun.value.copy(sun.color).multiplyScalar(AK.sun * (1 - 0.85 * nt)); u.uAtSunDir.value.set(R.sunDir[0], R.sunDir[1], R.sunDir[2]).normalize();
+      u.uAtP.value.set(AK.haze * fk / 2600, 1 / AK.hh, 0, camD * (cl ? Math.min(1, cl.fogN) * 0.5 : 0.6)); u.uAtQ.value.set(AK.air * fk / 14000, S.WORLD, R.time, DBG_OFF.has('nuvem') ? 0 : AK.cloud); u.uAtCloud.value = cloudTex; scene.fog.near = 1e7; scene.fog.far = 2e7; }
+    if (R.terrShader && R.terrShader.uniforms.uCloudK) R.terrShader.uniforms.uCloudK.value = atmoFx ? 0 : 1;
+    if (sky) { const u = sky.userData.mat.uniforms; u.uHor.value.copy(atmoFx ? atmoFx.U.uAtFar.value : bg); u.uTop.value.copy(bg).multiplyScalar(0.55).lerp(_cc.setRGB(0.12, 0.2, 0.36), 0.5 * (1 - nt)); u.uBot.value.copy(bg).multiplyScalar(0.4); u.uNight.value = nt; u.uTime.value = R.time; u.uSunDir.value.set(R.sunDir[0], R.sunDir[1], R.sunDir[2]).normalize(); u.uSunCol.value.copy(sun.color); }
     // névoa de guerra e território → texturas do terreno
     for (let iy = 0; iy < FOGN; iy++) for (let ix = 0; ix < FOGN; ix++) { const i = (iy * FOGN + ix) * 4; const tx = (ix * FOGC / TILE) | 0, ty = (iy * FOGC / TILE) | 0; const ex = view.reveal || explored[ty * TILES + tx]; fogData[i] = ex ? 110 : 0; fogData[i + 3] = 255; }
     if (!view.reveal) for (const e of sim.ents) { if (!e.alive || e.owner !== human || (e.kind !== 'unit' && e.kind !== 'building')) continue; const r = S.sensorRadius(sim, e); const x0 = Math.max(0, ((e.x - r) / FOGC) | 0), x1 = Math.min(FOGN - 1, ((e.x + r) / FOGC) | 0), y0 = Math.max(0, ((e.y - r) / FOGC) | 0), y1 = Math.min(FOGN - 1, ((e.y + r) / FOGC) | 0); for (let iy = y0; iy <= y1; iy++) for (let ix = x0; ix <= x1; ix++) { const d = Math.hypot((ix + 0.5) * FOGC - e.x, (iy + 0.5) * FOGC - e.y); if (d <= r) { const i = (iy * FOGN + ix) * 4; const v = d > r * 0.75 ? 110 + 145 * (1 - (d - r * 0.75) / (r * 0.25)) : 255; if (v > fogData[i]) fogData[i] = v; } } }
@@ -483,12 +531,12 @@ function create(canvas, overlay, mini) {
       if (!e.alive) continue; const own = e.owner === human;
       if (e.kind === 'node') { const it = instOf(e.res, -1, e.id % 4); const g = it.geo; const f = e.max ? Math.max(0, e.amount) / e.max : 1; const dry = e.amount <= 0; // 4.2h
         const fv = fogData[(Math.min(FOGN - 1, (e.y / FOGC) | 0) * FOGN + Math.min(FOGN - 1, (e.x / FOGC) | 0)) * 4] / 255; const seenK = 0.3 + 0.7 * fv; // nunca visto: apagado; à vista: aceso (antes brilhava no breu)
-        put(it, e.x, e.y, 0, 0, fitOf(e, g), 1, (dry ? 0.5 : 1) * (0.55 + 0.45 * fv), null, dry ? 0 : (0.3 + 0.7 * Math.sqrt(f)) * seenK);
+        put(it, e.x, e.y, 0, 0, fitOf(e, g), 1, (dry ? 0.5 : 1) * (0.55 + 0.45 * fv), null, dry ? 0.12 * seenK : (0.3 + 0.7 * Math.sqrt(f)) * seenK); /* 4.3b: nó seco = cristal apagado, não preto */
         if (!dry && nGlow < GLOW_CAP) { const low = f < 0.15; const pulse = low ? 0.55 + 0.45 * Math.sin(R.time * 6 + e.id) : 0.85 + 0.15 * Math.sin(R.time * 1.7 + e.id * 1.3); const k = (0.35 + 0.65 * Math.sqrt(f)) * pulse * seenK * (1 + 0.5 * R.night); const rad = e.r * (2 + 0.9 * f);
           const hd = rad * 0.5, hx = (H(e.x + hd, e.y) - H(e.x - hd, e.y)) / (2 * hd), hy = (H(e.x, e.y + hd) - H(e.x, e.y - hd)) / (2 * hd); _nv.set(-hx, 1, hy).normalize(); _q.setFromUnitVectors(_up, _nv); // deitado no relevo (plano reto sumia na encosta da cratera)
           _p.set(e.x, H(e.x, e.y) + 1.2, -e.y); _s.set(rad * 2, 1, rad * 2); _m.compose(_p, _q, _s); nodeGlow.setMatrixAt(nGlow, _m); _c.copy(RES_GLOW[e.res]).multiplyScalar(k); nodeGlow.setColorAt(nGlow++, _c); }
         if (view.sel.has(e.id)) nSel = ring(nSel, e.x, e.y, e.r + 6); continue; }
-      if (e.kind === 'rock') { const it = instOf('rocks', -1, e.seed % 6); put(it, e.x, e.y, 0, (e.seed % 8) * 0.8, fitOf(e, it.geo)); continue; }
+      if (e.kind === 'rock') { _sph.center.set(e.x, H(e.x, e.y) + 10, -e.y); _sph.radius = e.r * 2 + 60; if (!_frus.intersectsSphere(_sph)) continue; /* 4.3b: rochas esculpidas pesam mais; só as visíveis */ const it = instOf('rocks', -1, e.seed % 6); put(it, e.x, e.y, 0, (e.seed % 8) * 0.8, fitOf(e, it.geo)); continue; }
       if (e.kind === 'crate') { if (!vis.has(e.id)) continue; const it = instOf('crate', -1, 0); put(it, e.x, e.y, 0, R.time, (2 * e.r * 1.6) / it.geo.width); continue; }
       if (e.kind === 'wreck') { if (!vis.has(e.id)) continue; const it = instOf('wreck', -1, 0); put(it, e.x, e.y, 0, e.ang || 0, fitOf(e, it.geo), 1, 0.6 + 0.4 * (e.max ? e.amount / e.max : 1)); if (sim.time - e.bornT < 25 && Math.random() < 0.25) { smoke(e.x, e.y, 6, [0.2, 0.2, 0.22], 1.6, 16); spark(e.x, e.y, 3, [1, 0.5, 0.2], 20, true); } if (view.sel.has(e.id)) nSel = ring(nSel, e.x, e.y, e.r + 6); continue; }
       if (e.kind === 'proj') { if (!own && !vis.has(e.id)) continue; const w = S.WEAPONS[e.weapon]; const [wx, wy] = lerp(e, alpha); if (w.proj === 'shell') { if (FX && Math.random() < 0.45 * FX.mult) FX.trail(wx, H(wx, wy) + e.z, -wy); if (nShell < 256) { _p.set(wx, H(wx, wy) + e.z, -wy); _s.setScalar(1); _q.identity(); _m.compose(_p, _q, _s); shells.setMatrixAt(nShell++, _m); } } else if (nBul < BL) { const o = nBul * 6; blPos[o] = wx - e.vx * 0.03; blPos[o + 1] = H(wx, wy) + e.z; blPos[o + 2] = -(wy - e.vy * 0.03); blPos[o + 3] = wx; blPos[o + 4] = H(wx, wy) + e.z; blPos[o + 5] = -wy; nBul++; } continue; }
@@ -551,7 +599,7 @@ function create(canvas, overlay, mini) {
     for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const bd = S.BUILDINGS[e.def]; const tr = bd && S.territoryOf(sim, e); if (!tr) continue; const fac = (sim.players[e.owner] || {}).faction; if (!MD.props[fac]) continue;
       if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue;
       const K = e.def === 'nucleo' ? 10 : 5; for (let i = 0; i < K; i++) { const hsh = ((e.id * 2654435761 + i * 40503) >>> 0) / 4294967296; const a = (i / K) * TAU + hsh * 0.9; const rr = tr * (0.52 + 0.4 * ((hsh * 7) % 1)); const px = e.x + Math.cos(a) * rr, py = e.y + Math.sin(a) * rr; if (px < 20 || py < 20 || px > S.WORLD - 20 || py > S.WORLD - 20) continue; if (!view.reveal && !explored[((py / TILE) | 0) * TILES + ((px / TILE) | 0)]) continue; const it = instOf('prop_' + fac, -1, (e.id + i) % 4); put(it, px, py, 0, hsh * TAU, 15 / it.geo.width); if (fac === 'vehnar' && Math.random() < 0.012 * R.quality.particles) smoke(px, py, 9, [0.5, 0.5, 0.52], 2, 11); } }
-    if (sim.props) for (const pr of sim.props) { if (!view.reveal && !explored[((pr.y / TILE) | 0) * TILES + ((pr.x / TILE) | 0)]) continue; const it = instOf(pr.kind, -1, pr.seed % 6); put(it, pr.x, pr.y, 0, (pr.seed % 7) * 0.9, 34 * pr.scale / it.geo.width); }
+    if (sim.props) for (const pr of sim.props) { if (!view.reveal && !explored[((pr.y / TILE) | 0) * TILES + ((pr.x / TILE) | 0)]) continue; _sph.center.set(pr.x, H(pr.x, pr.y) + 6, -pr.y); _sph.radius = 40 * pr.scale + 50; if (!_frus.intersectsSphere(_sph)) continue; const it = instOf(pr.kind, -1, pr.seed % 6); put(it, pr.x, pr.y, 0, (pr.seed % 7) * 0.9, 34 * pr.scale / it.geo.width); }
     if (view.ghost) { const gh = view.ghost; const d = S.BUILDINGS[gh.def]; const it = instOf(MD.PARTS[gh.def] ? MD.PARTS[gh.def].hull : gh.def, human, 0, true); put(it, gh.x, gh.y, 0, gh.ang || 0, 2 * d.r * 1.25 / it.geo.width, 1, gh.ok ? 1 : 0.5); nSel = ring(nSel, gh.x, gh.y, d.r + 4); if (d.territory && nRange < 32) { _p.set(gh.x, H(gh.x, gh.y) + 0.6, -gh.y); _s.set(d.territory, 1, d.territory); _q.identity(); _m.compose(_p, _q, _s); rangeRings.setMatrixAt(nRange++, _m); } }
     if (view.wallGhost && view.ghost) for (const g2 of view.wallGhost) { const it = instOf(view.ghost.def, human, 0, true); put(it, g2.x, g2.y, 0, g2.ang, 20 / it.geo.width, 1, g2.ok ? 1 : 0.5); }
     for (const it of R.inst.values()) { if (it.anim && it.n) { it.ia.needsUpdate = true; it.ic.needsUpdate = true; } it.main.count = it.n; it.main.instanceMatrix.needsUpdate = true; if (it.main.instanceColor) it.main.instanceColor.needsUpdate = true; if (it.em) { it.em.count = it.n; it.em.instanceMatrix.needsUpdate = true; if (it.em.instanceColor) it.em.instanceColor.needsUpdate = true; } }
@@ -566,7 +614,8 @@ function create(canvas, overlay, mini) {
     if (R.poolMat) R.poolMat.uniforms.uTime.value = R.time; for (const pl of R.poolLights) pl.intensity = 120 * nt + 20;
     for (const sp of R.mist) { const u = sp.userData; if (u.kind === 'rift') { const zz = u.z + Math.sin(R.time * 0.3 + u.ph) * 8; sp.position.set(u.x + Math.sin(R.time * 0.2 + u.ph) * 20, H(u.x, u.y) + zz, -u.y); sp.scale.set(u.s, u.s * 0.7, 1); sp.material.opacity = 0.16 + 0.1 * nt; } else { if (st && st.phase === 'active') { sp.visible = true; const a = u.ox * TAU + R.time * 0.05, rr = u.oy * st.r * 0.9; const px = st.x + Math.cos(a) * rr, py = st.y + Math.sin(a) * rr; sp.position.set(px, H(px, py) + u.z, -py); sp.scale.set(u.s, u.s * 0.6, 1); } else sp.visible = false; } }
     if (FX) FX.update(R.time, camera);
-    if (composer) { composer.render(); } else renderer.render(scene, camera);
+    if (atmoFx) { atmoFx.U.uAtProjInv.value.copy(camera.projectionMatrixInverse); atmoFx.U.uAtCamWorld.value.copy(camera.matrixWorld); } /* 4.3b */
+    if (composer) { composer.render(dt); } else renderer.render(scene, camera);
     if (R.testBlack && R.quality.ssao) { const pc = renderer.getClearColor(new THREE.Color()), pa = renderer.getClearAlpha(); renderer.setClearColor(0x000000, 1); renderer.clear(true, false, false); renderer.setClearColor(pc, pa); } // ?testblack=1: simula falha da GPU enquanto o SSAO está ligado
     checkFrame();
     drawOverlay(sim, view, hpList, me);

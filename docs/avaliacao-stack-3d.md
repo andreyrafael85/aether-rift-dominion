@@ -101,3 +101,47 @@ Nosso multiplayer é **lockstep de comandos sobre uma simulação determinístic
 | **3.0e Validação** | fps em três classes de aparelho, draw calls, tempo de carga, retenção e feedback dos testadores | Decisão sobre WebGPU como padrão e sobre o servidor autoritativo |
 
 Comece-se por 3.0a: é a fundação e é o que já foi validado.
+
+---
+
+## 6. Revisão de 16 de outubro de 2026: pesquisa de bibliotecas e remasterização total (v4.3)
+
+Pedido: remasterizar o jogo inteiro (unidades, soldados, líderes, bases, terreno, efeitos) no nível de um RTS estilizado moderno, de Supreme Commander 1 e 2 e de Starship Troopers: Terran Command, usando o potencial atual do Three.js. Versões e licenças conferidas no registro npm nesse dia.
+
+### 6.1 A pesquisa recebida, item a item
+
+| Item | No jogo em 16/10 | Veredito |
+|---|---|---|
+| Three.js (cena, câmera, WebGLRenderer) | r160 (dez/2023) | **Atualizado para o r186 (set/2026) na 4.3b.** O ecossistema atual exige versões novas: postprocessing pede three ≥ 0.168 e three.quarks ≥ 0.182 |
+| Física (Rapier.js, Cannon-es) | Movimento próprio, determinístico, conferido em 4 motores de navegador | **Não na simulação.** RTS não usa corpo rígido; o lockstep do multiplayer e o replay dependem de resultado idêntico. O Rapier tem build determinístico, mas trocaria código que já funciona por ~1,5 MB de WASM. Destroços que rolam ficam na GPU |
+| Blender → glTF/GLB + GLTFLoader | 193 malhas geradas em código (kit de primitivas) | **Híbrido.** O kit continua: 0 KB de download, cor por jogador, variações por semente, agentes modelando em paralelo. glTF entra como formato de saída (exportar para revisar no Blender) e de cache; o jogo passa a aceitar GLB por modelo quando houver um artista 3D. Blender por script Python, sem interface, fica como teste para os líderes |
+| KTX2 / WebP | Imagens da página inicial em WebP; texturas do chão geradas no navegador | KTX2 quando o terreno ganhar texturas pintadas (4.3c) |
+| InstancedMesh | Por modelo e jogador desde a 4.0d | Manter |
+| LOD | Não havia | 4.3d, gerado automaticamente (meshoptimizer) |
+| ECS | A simulação já separa dados (lista de entidades) e sistemas (funções por tick) | Não reescrever |
+| Loop rAF + delta time | Simulação fixa a 10 Hz + desenho interpolado a cada quadro | Já é o modelo certo; simulação em Web Worker na 4.3i |
+| HUD em HTML/CSS | Desde a 1.0 | Manter |
+| OrbitControls | Câmera RTS própria (giro, inclinação, zoom com regras de jogo) | Não na partida; sim no Modo Foto (4.3j) |
+| gltfjsx / React Three Fiber | — | Não se aplica: não usamos React |
+| lil-gui | — | Só no modo de desenvolvimento, para ajustar luz, bruma e cor ao vivo |
+| Vite | Build próprio em arquivo único (Pages + artefato) | Não agora: não muda nada para o jogador |
+| gltf-transform / gltf-pipeline | — | Nas ferramentas, junto com o glTF |
+
+### 6.2 Bibliotecas somadas ou previstas
+
+| Biblioteca | Licença | Versão | Uso | Entrada |
+|---|---|---|---|---|
+| postprocessing (pmndrs) | Zlib | 6.39.5 | Junta bloom, tom, gradação e efeitos próprios em poucos passes de tela; bloom HDR por mipmaps; SMAA | 4.3b |
+| N8AO | ISC | 2.0.1 | Sombra de contato (oclusão ambiente) de qualidade, em meia resolução no Média | 4.3b |
+| meshoptimizer | MIT | 1.3.0 | LOD automático e compressão de malhas | 4.3d |
+| three-mesh-bvh | MIT | 0.9.16 | Clique preciso no relevo alto; cálculo de sombra de cavidade nos modelos | 4.3c–4.3d |
+| three.quarks | MIT | 0.17.1 | Sistema de efeitos, a comparar com o fx3d.js da 4.2c | 4.3g |
+| stats-gl | MIT | 4.2.3 | Medidor de GPU no modo de desenvolvimento | 4.3i |
+
+### 6.3 O que já existia e é estendido (não é novo)
+
+Animação por peça na GPU (rodas, esteiras, pernas, rotores, recuo e torres que miram: 4.2b), partículas na GPU com explosões em camadas e marcas de queimado (4.2c), adereços por bioma com vento e gradação de cor por clima (4.2d), detalhe de superfície procedural e microdetalhe do chão (4.3a). A remasterização leva tudo isso aos modelos e ao terreno novos.
+
+### 6.4 WebGPU
+
+O r186 já tem WebGPURenderer com volta automática para WebGL2. Os nossos materiais são remendos de shader GLSL (onBeforeCompile), que só existem no WebGL; migrar exige reescrever cada material em TSL. Fica para depois da remasterização, quando os materiais estiverem estáveis.

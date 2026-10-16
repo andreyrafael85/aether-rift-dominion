@@ -11,6 +11,7 @@ const SG = n => Math.max(5, Math.round(n * LOD));
 const MAT = { // [rugosidade, metal]
   metal: [0.3, 0.78], steel: [0.42, 0.42], paint: [0.48, 0.18], dark: [0.58, 0.3], rubber: [0.9, 0], glass: [0.06, 0.3], gloss: [0.22, 0.45],
   bone: [0.62, 0], chitin: [0.2, 0.05], crystal: [0.12, 0.18], skin: [0.48, 0], stone: [0.9, 0], ice: [0.12, 0.02], wet: [0.14, 0.02], matte: [0.82, 0.04],
+  rock: [0.88, 0.02], // 4.3b: rocha esculpida (padrão 6)
 };
 const PAL = {
   vehnar:  { a: '#7C8490', b: '#59606B', d: '#2B2E35', t: '#BCC2CA', r: '#8A5A3A', h: '#E8B23A', l: '#FFD27A', g: '#8FC9F0', ma: 'steel' },
@@ -23,7 +24,7 @@ function rng(seed) { let r = ((seed | 0) * 7919 + 104729) >>> 0; return () => { 
 
 // ---------- construtor ----------
 class Kit {
-  constructor() { this.main = []; this.emi = []; this.mount = null; this.beam = null; this.ox = 0; this.oy = 0; this.oz = 0; this._anim = null; } // beam (4.3a): emissor do feixe de mineração, nas coordenadas da receita
+  constructor() { this.main = []; this.emi = []; this.mount = null; this.beam = null; this.base = null; this.fis = []; this.ox = 0; this.oy = 0; this.oz = 0; this._anim = null; } // beam (4.3a): emissor do feixe de mineração, nas coordenadas da receita; base (4.3b): altura do chão (o que fica abaixo afunda no relevo); fis (4.3b): fendas da última rocha esculpida
   // 4.2b: tudo o que for desenhado dentro de fn ganha a mesma animação (spec.t: wheel, spin, leg, recoil, bob, flap, sway, tread; spec.p = pivô)
   anim(spec, fn) { const prev = this._anim; this._anim = spec; try { fn(); } finally { this._anim = prev; } return this; }
   _push(geo, col, mat, o) {
@@ -32,7 +33,7 @@ class Kit {
     if (geo.attributes.uv) geo.deleteAttribute('uv'); if (geo.attributes.uv2) geo.deleteAttribute('uv2');
     const q = o.q || new T.Quaternion().setFromEuler(new T.Euler(o.rx || 0, o.ry || 0, o.rz || 0, o.order || 'YXZ'));
     const m = new T.Matrix4().compose(new T.Vector3((o.x || 0) + this.ox, (o.y || 0) + this.oy, (o.z || 0) + this.oz), q, new T.Vector3(o.sx || 1, o.sy || 1, o.sz || 1));
-    geo.applyMatrix4(m); if (o.flat) geo.computeVertexNormals();
+    geo.applyMatrix4(m); if (o.flat || !geo.attributes.normal) geo.computeVertexNormals(); if (o.shade) shadeGeo(geo, o.shade); /* 4.3b: sombreado assado nas facetas */
     const c = new T.Color(col); const an = animOf(o.anim || this._anim, this);
     if (o.e) { c.multiplyScalar(o.e === true ? 2.4 : o.e); this.emi.push({ geo, c, an }); }
     else this.main.push({ geo, c, rm: Array.isArray(mat) ? mat : (MAT[mat] || MAT.paint), an, pt: o.pat != null ? o.pat : (typeof mat === 'string' ? (PAT[mat] || 0) : 1) });
@@ -55,22 +56,29 @@ class Kit {
   poly(pts, depth, col, mat, o) { o = Object.assign({}, o); const s = new T.Shape(pts.map(p => new T.Vector2(p[0], p[1]))); const g = new T.ExtrudeGeometry(s, { depth, bevelEnabled: !!o.b, bevelThickness: o.b || 0, bevelSize: o.b || 0, bevelSegments: o.bs || 1, curveSegments: 4 }).translate(0, 0, -depth / 2); return this._push(g, col, mat, o); }
   // rocha/ovo facetado com relevo determinístico
   rock(x, y, z, r, col, mat, o) { o = Object.assign({ flat: true }, o, { x, y, z }); const g = new T.IcosahedronGeometry(r, o.detail == null ? 1 : o.detail); const p = g.attributes.position; const rnd = o.amp || 0.22; for (let i = 0; i < p.count; i++) { const vx = p.getX(i), vy = p.getY(i), vz = p.getZ(i); const hsh = Math.sin(vx * 12.9898 + vy * 78.233 + vz * 37.719 + (o.seed || 0) * 3.7) * 43758.5453; const k = 1 + (hsh - Math.floor(hsh) - 0.5) * 2 * rnd; p.setXYZ(i, vx * k, vy * k, vz * k); } return this._push(g, col, mat, o); }
+  // 4.3b: rocha esculpida (anéis empilhados: estratos com bancadas e recuos, fendas verticais, cortes planos de fratura, topo plano inclinado,
+  // saia que alarga e afunda abaixo de y) com cor por vértice; col = cor base ou o.cols = cores dos estratos. Guarda as fendas em K.fis (para cristais e veios)
+  crag(x, y, z, w, h, d, col, mat, o) { o = Object.assign({ flat: true }, o, { x, y, z }); const g = cragGeo(w, h, d, col, o); const ry = o.ry || 0, c = Math.cos(ry), s = Math.sin(ry);
+    const tr = (px, py, pz) => [x + this.ox + px * c + pz * s, y + this.oy + py, z + this.oz - px * s + pz * c]; this.fis = g.userData.fis.map(f => ({ a: tr(f[0], f[1], f[2]), b: tr(f[3], f[4], f[5]), n: [f[6] * c + f[7] * s, -f[6] * s + f[7] * c] })); return this._push(g, '#FFFFFF', mat, o); }
+  // 4.3b: cristal (prisma de o.n faces com ponta piramidal torta, base enterrada); o.shade assa o sombreado das facetas (bom nos emissivos)
+  xtal(x, y, z, r, h, col, mat, o) { o = Object.assign({ flat: true }, o, { x, y, z }); return this._push(xtalGeo(r, h, o), col, mat, o); }
   light(x, y, z, s, col, k) { return this.box(x, y, z, s, s, s, col, null, { e: k || 2.6 }); }
   finish(o) {
     o = o || {}; const all = this.main.concat(this.emi); const bb = new T.Box3(); const tmp = new T.Box3();
     for (const p of all) { p.geo.computeBoundingBox(); tmp.copy(p.geo.boundingBox); bb.union(tmp); }
-    const cx = o.pivot ? o.pivot[0] : (bb.min.x + bb.max.x) / 2, cz = o.pivot ? o.pivot[1] : (bb.min.z + bb.max.z) / 2, y0 = bb.min.y;
+    const vb = this.base == null ? bb : visBox(all, this.base); /* 4.3b: com base, largura e centro só do que fica acima do chão */
+    const cx = o.pivot ? o.pivot[0] : (vb.min.x + vb.max.x) / 2, cz = o.pivot ? o.pivot[1] : (vb.min.z + vb.max.z) / 2, y0 = this.base == null ? bb.min.y : this.base;
     const hasAnim = all.some(p => p.an); // 4.2b
     const mk = (list, withRM) => {
       if (!list.length) return null; let n = 0; for (const p of list) n += p.geo.attributes.position.count;
       const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), col = new Float32Array(n * 3), rm = withRM ? new Float32Array(n * 2) : null, pt = withRM ? new Float32Array(n) : null; let k = 0;
       const aa = hasAnim ? new Float32Array(n * 4) : null, ab = hasAnim ? new Float32Array(n * 4) : null;
-      for (const p of list) { const c = p.geo.attributes.position.count; pos.set(p.geo.attributes.position.array, k * 3); nor.set(p.geo.attributes.normal.array, k * 3); for (let i = 0; i < c; i++) { const j = k + i; pos[j * 3] -= cx; pos[j * 3 + 1] -= y0; pos[j * 3 + 2] -= cz; col[j * 3] = p.c.r; col[j * 3 + 1] = p.c.g; col[j * 3 + 2] = p.c.b; if (pt) pt[j] = p.pt || 0; if (rm) { rm[j * 2] = p.rm[0]; rm[j * 2 + 1] = p.rm[1]; }
+      for (const p of list) { const c = p.geo.attributes.position.count, vc = p.geo.attributes.color; pos.set(p.geo.attributes.position.array, k * 3); nor.set(p.geo.attributes.normal.array, k * 3); for (let i = 0; i < c; i++) { const j = k + i; pos[j * 3] -= cx; pos[j * 3 + 1] -= y0; pos[j * 3 + 2] -= cz; if (vc) { col[j * 3] = p.c.r * vc.getX(i); col[j * 3 + 1] = p.c.g * vc.getY(i); col[j * 3 + 2] = p.c.b * vc.getZ(i); } else { col[j * 3] = p.c.r; col[j * 3 + 1] = p.c.g; col[j * 3 + 2] = p.c.b; } if (pt) pt[j] = p.pt || 0; if (rm) { rm[j * 2] = p.rm[0]; rm[j * 2 + 1] = p.rm[1]; } /* 4.3b: cor por vértice multiplica a cor da peça */
           if (aa && p.an) { aa[j * 4] = p.an.t; aa[j * 4 + 1] = p.an.p[0] - cx; aa[j * 4 + 2] = p.an.p[1] - y0; aa[j * 4 + 3] = p.an.p[2] - cz; ab[j * 4] = p.an.b[0]; ab[j * 4 + 1] = p.an.b[1]; ab[j * 4 + 2] = p.an.b[2]; ab[j * 4 + 3] = p.an.b[3]; } } k += c; p.geo.dispose(); }
       const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(pos, 3)); g.setAttribute('normal', new T.BufferAttribute(nor, 3)); g.setAttribute('color', new T.BufferAttribute(col, 3)); if (rm) g.setAttribute('rm', new T.BufferAttribute(rm, 2)); if (pt) g.setAttribute('pt', new T.BufferAttribute(pt, 1));
       if (aa) { g.setAttribute('aAnim', new T.BufferAttribute(aa, 4)); g.setAttribute('aAnimB', new T.BufferAttribute(ab, 4)); } g.computeBoundingSphere(); return g;
     };
-    const out = { main: mk(this.main, true), em: mk(this.emi, false), width: Math.max(bb.max.x - bb.min.x, bb.max.z - bb.min.z), height: bb.max.y - bb.min.y, mount: this.mount == null ? null : this.mount - y0, beam: this.beam ? [this.beam[0] - cx, this.beam[1] - y0, this.beam[2] - cz] : null, mesh: true, anim: hasAnim };
+    const out = { main: mk(this.main, true), em: mk(this.emi, false), width: Math.max(vb.max.x - vb.min.x, vb.max.z - vb.min.z), height: bb.max.y - y0, mount: this.mount == null ? null : this.mount - y0, beam: this.beam ? [this.beam[0] - cx, this.beam[1] - y0, this.beam[2] - cz] : null, mesh: true, anim: hasAnim };
     if (!out.main) { const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(new Float32Array(9), 3)); g.setAttribute('normal', new T.BufferAttribute(new Float32Array(9), 3)); g.setAttribute('color', new T.BufferAttribute(new Float32Array(9), 3)); g.setAttribute('rm', new T.BufferAttribute(new Float32Array(6), 2)); out.main = g; }
     return out;
   }
@@ -121,7 +129,7 @@ function animShader(sh) {
 }
 const ANIM_DEFAULTS = { aAnim: [0, 0, 0, 0], aAnimB: [0, 0, 0, 0], aInst: [0, 0, 0, 0], aInstC: [0] };
 // 4.3a — detalhe de superfície (pt por peça: 1 painéis, 2 borracha, 3 poros, 4 quitina, 5 pedra; 0 liso). uDet é global (qualidade).
-const DET = { value: 1 }; const PAT = { steel: 1, metal: 1, paint: 1, dark: 1, gloss: 1, rubber: 2, bone: 3, skin: 3, chitin: 4, wet: 4, stone: 5, matte: 5 };
+const DET = { value: 1 }; const PAT = { steel: 1, metal: 1, paint: 1, dark: 1, gloss: 1, rubber: 2, bone: 3, skin: 3, chitin: 4, wet: 4, stone: 5, matte: 5, rock: 6 }; /* 4.3b: 6 rocha (estratos finos, grão, fissuras) */
 const SURF_GLSL = `uniform float uDet; varying float vPt; varying vec3 vLoc; varying vec3 vLocN;
 float ardH2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float ardVN(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(ardH2(i), ardH2(i + vec2(1.0, 0.0)), f.x), mix(ardH2(i + vec2(0.0, 1.0)), ardH2(i + vec2(1.0, 1.0)), f.x), f.y); }
@@ -144,6 +152,12 @@ void ardSurf(out float h, out float alb, out float rgh) {
     if (pt == 3) { float pore = 1.0 - smoothstep(0.0, 0.16, d1); h = -pore * 0.6 + ardVN(uv * 7.0) * 0.25; alb = 1.0 - 0.2 * pore; rgh = 0.1 * pore; }
     else { float edge = 1.0 - smoothstep(0.0, 0.09, d2 - d1); h = -edge * 0.7 + d1 * 0.3; alb = 0.92 + 0.14 * d1 - 0.22 * edge; rgh = -0.08 + 0.18 * edge; } }
   else if (pt == 5) { float n = ardVN(uv * 2.4) * 0.6 + ardVN(uv * 6.5) * 0.4; h = n * 0.8; alb = 0.84 + 0.32 * n; rgh = 0.05 * n; }
+  else if (pt == 6) { float sd = 1.0 - smoothstep(0.45, 0.8, an.y); /* 4.3b: rocha — paredes com estratos finos e grão alongado na horizontal, fissuras verticais esparsas; topo com grão e poeira */
+    float ly = vLoc.y * 1.25 + ardVN(uv * 0.35) * 0.9; float lt = ardH2(vec2(floor(ly), 5.3)); float tw = abs(fract(ly) - 0.5) * 2.0; float gro = smoothstep(0.55, 1.0, tw) * step(0.5, ardH2(vec2(floor(ly + 0.5), 9.1))); /* sulco escolhido pela junta mais próxima: contínuo dos dois lados (sem serrilhado da derivada) */
+    float gr = ardVN(uv * 4.6) * 0.65 + ardVN(uv * 11.0) * 0.35;
+    float crk = (1.0 - smoothstep(0.0, 0.05, abs(ardVN(vec2(uv.x * 2.4, uv.y * 0.45) + 7.1) - 0.5))) * smoothstep(0.5, 0.72, ardVN(uv * 0.6 + 2.3)) * sd; /* fissura só na cor: relevo fino serrilha na derivada de tela */
+    h = sd * (-gro * 0.6 + (0.5 - tw) * 0.25) + (gr - 0.5) * (0.7 - 0.35 * sd);
+    alb = 1.0 + sd * ((lt - 0.5) * 0.2 - gro * 0.2) + (gr - 0.5) * (0.2 - 0.06 * sd) - crk * 0.32; rgh = 0.04 * gr + 0.06 * crk; }
   h *= k; alb = mix(1.0, alb, k); rgh *= k;
 }
 `; // geometria sem as peças animadas lê zeros (sem animação)
@@ -153,6 +167,62 @@ function roundBox(w, h, d, b, segs) {
   s.moveTo(x0 + rc, y0); s.lineTo(x1 - rc, y0); s.quadraticCurveTo(x1, y0, x1, y0 + rc); s.lineTo(x1, y1 - rc); s.quadraticCurveTo(x1, y1, x1 - rc, y1); s.lineTo(x0 + rc, y1); s.quadraticCurveTo(x0, y1, x0, y1 - rc); s.lineTo(x0, y0 + rc); s.quadraticCurveTo(x0, y0, x0 + rc, y0);
   const g = new T.ExtrudeGeometry(s, { depth: Math.max(0.01, h - 2 * b), bevelEnabled: true, bevelThickness: b, bevelSize: b, bevelSegments: LOD < 1 ? 1 : (segs || 2), curveSegments: LOD < 1 ? 2 : 3 });
   g.rotateX(-Math.PI / 2); g.translate(0, b, 0); return g;
+}
+// ---------- 4.3b: rocha esculpida e cristal ----------
+const SUN_DIR = [-0.41, 0.74, 0.51]; // sol do jogo (render3d); os nós não giram, então o sombreado assado casa com a luz
+function smooth01(a, b, x) { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); }
+function visBox(parts, base) { const bb = new T.Box3(), v = new T.Vector3(); for (const p of parts) { const a = p.geo.attributes.position; for (let i = 0; i < a.count; i++) if (a.getY(i) >= base - 1e-4) bb.expandByPoint(v.fromBufferAttribute(a, i)); } if (bb.isEmpty()) bb.set(new T.Vector3(-1, base, -1), new T.Vector3(1, base + 1, 1)); return bb; }
+function shadeGeo(g, amt) { const n = g.attributes.normal, p = g.attributes.position; let c = g.attributes.color; if (!c) { c = new T.BufferAttribute(new Float32Array(p.count * 3).fill(1), 3); g.setAttribute('color', c); }
+  for (let i = 0; i < p.count; i++) { const l = n.getX(i) * SUN_DIR[0] + n.getY(i) * SUN_DIR[1] + n.getZ(i) * SUN_DIR[2]; const k = 1 - amt + amt * (0.3 + 0.95 * Math.max(0, l)); c.setXYZ(i, c.getX(i) * k, c.getY(i) * k, c.getZ(i) * k); } }
+function supR(c, s, sq) { return Math.pow(Math.pow(Math.abs(c), sq) + Math.pow(Math.abs(s), sq), -1 / sq); }
+// anéis do pé ao topo: saia (y < 0, enterrada), pé com tálus, estratos (paredão, bancada, recuo macio, camada dura saliente) e tampa;
+// o.n lados, o.sq superelipse (2 redondo, 6 quase caixa), o.rough ruído do contorno, o.fis fendas, o.strata camadas, o.ledge degrau, o.taper afinamento,
+// o.tilt inclinação do topo, o.cuts planos de fratura, o.sink saia (unidades da receita), o.flare alargamento do pé, o.top flat|dome|peak|jag, o.cols, o.dust, o.dark;
+// o.skirt anéis da saia, o.sinkFlare alargamento da saia, o.chip lascas do contorno, o.jit ruído por vértice, o.rim borda lascada do topo, o.dustK poeira, o.tiltDir
+function cragGeo(w, h, d, col, o) {
+  const r = rng((o.seed | 0) * 131 + 17), N = Math.max(5, Math.round((o.n || 16) * LOD)), sq = o.sq || 2.6, rough = o.rough == null ? 0.12 : o.rough, jit = o.jit == null ? 0.035 : o.jit, a = w / 2, b = d / 2;
+  const harm = []; for (let k = 2; k <= 5; k++) harm.push([k, (r() - 0.5) * 4 * rough / k, r() * PI * 2]);
+  const fis = new Set(); for (let i = 0; i < (o.fis == null ? 2 : o.fis); i++) fis.add(Math.floor(r() * N));
+  const th = [], rad = [], ck = [];
+  const chip = o.chip == null ? 0.07 : o.chip; for (let i = 0; i < N; i++) { const t = (i + (r() - 0.5) * 0.4) / N * PI * 2; let rr = supR(Math.cos(t), Math.sin(t), sq) * (1 + (r() - 0.5) * 2 * chip); for (const [k, am, ph] of harm) rr *= 1 + am * Math.cos(k * t + ph); const f = fis.has(i) ? 0.13 + r() * 0.15 : 0; th.push(t); rad.push(rr * (1 - f)); ck.push(f); }
+  const flare = o.flare == null ? 0.1 : o.flare, taper = o.taper == null ? 0.82 : o.taper, ledge = o.ledge == null ? 0.06 : o.ledge, top = o.top || 'flat', nb = o.strata == null ? 5 : o.strata, rim = o.rim == null ? 0.1 : o.rim;
+  const R = []; if (o.sink) { const ns = o.skirt || 1, sf = o.sinkFlare == null ? 0.22 : o.sinkFlare; for (let k = ns; k >= 1; k--) R.push({ y: -o.sink * (k - (k % 2 ? 0 : 0.35 + r() * 0.2)) / ns / h, s: 1 + flare + sf * Math.pow(k / ns, 0.8) + (ns > 1 ? (r() - 0.5) * 0.08 : 0), b: k, sk: 1 }); } // saia: parede irregular abaixo do chão (quase vertical: na encosta do monte não cobre quem passa ao lado)
+  R.push({ y: 0, s: 1 + flare, b: 0 }); let y = 0, s = 1, band = 0;
+  if (nb > 0) { y = 0.04 + r() * 0.05; R.push({ y, s, b: 0 }); const avg = (1 - y) / nb;
+    while (y < 0.999) { band++; let ny = y + avg * (0.55 + r() * 0.9); if (ny > 0.9) ny = 1; const tap = 1 - (1 - taper) * (ny - y), k = r();
+      if (k < 0.52) R.push({ y: ny, s: s *= tap, b: band });
+      else if (k < 0.76) { R.push({ y: y + 0.006, s: s *= 1 - ledge * (0.5 + r()), b: band, bench: 1 }); R.push({ y: ny, s: s *= tap, b: band }); }
+      else if (k < 0.9) { const s2 = s * (1 - ledge * (0.7 + r() * 0.6)); R.push({ y: y + (ny - y) * 0.45, s: s2, b: band }); R.push({ y: ny, s: s = s2 * (1 + ledge * 0.35) * tap, b: band }); }
+      else { R.push({ y: y + 0.006, s: s *= 1 + ledge * 0.45, b: band }); R.push({ y: ny, s: s *= tap, b: band }); }
+      y = ny; } }
+  else R.push({ y: 1, s: s *= taper, b: 1 });
+  const cy = top === 'dome' ? [0.08, 0.13] : top === 'peak' ? [0.16, 0.38] : top === 'jag' ? [-0.07, -0.03] : [0.006, 0.014];
+  R.push({ y: 1 + cy[0], s: s * (top === 'peak' ? 0.5 : top === 'flat' ? 0.72 : 0.6), b: band, cap: 1 }); R.push({ y: 1 + cy[1], s: 0, b: band, cap: 1 });
+  const tilt = o.tilt == null ? 0.1 : o.tilt, ta = o.tiltDir == null ? r() * PI * 2 : o.tiltDir, tx = Math.cos(ta) * tilt, tz = Math.sin(ta) * tilt;
+  const P = R.map(g => { if (g.s === 0) { const p = [0, g.y * h, 0]; return th.map(() => p); }
+    return th.map((t, i) => { const rr = g.s * rad[i] * (1 + (r() - 0.5) * 2 * jit); const p = [a * rr * Math.cos(t), g.y * h, b * rr * Math.sin(t)]; if (g.y >= 0.999 && !g.cap) { if (top === 'jag') p[1] -= r() * 0.24 * h; else if (top === 'flat' && r() < 0.4) p[1] -= (0.3 + r() * 0.7) * rim * h; } return p; }); }); // borda do topo lascada
+  const uniq = []; const seen = new Set(); for (const ring of P) for (const p of ring) if (!seen.has(p)) { seen.add(p); uniq.push(p); }
+  for (const p of uniq) if (p[1] > 0) p[1] += (p[1] / h) * (tx * p[0] / a + tz * p[2] / b) * h; // topo inclinado; os estratos mergulham junto
+  for (let c = 0; c < (o.cuts == null ? 2 : o.cuts); c++) { const an = r() * PI * 2, ny = -0.12 + r() * 0.42, L = Math.hypot(1, ny), n = [Math.cos(an) / L, ny / L, Math.sin(an) / L];
+    const rr = supR(Math.cos(an), Math.sin(an), sq), dist = Math.hypot(a * rr * Math.cos(an), b * rr * Math.sin(an)) * (0.68 + r() * 0.2);
+    const hx = Math.cos(an), hz = Math.sin(an), dh = L * dist + ny * h * 0.5 + 0.03 * (a + b) * 0.5; /* abaixo do chão a saia segue o corte na vertical (antes o pé ficava para fora como aba fina) */
+    for (const p of uniq) { if (p[1] < 0) { const v = p[0] * hx + p[2] * hz - dh; if (v > 0) { p[0] -= hx * v; p[2] -= hz * v; } continue; } const v = p[0] * n[0] + (p[1] - h * 0.5) * n[1] + p[2] * n[2] - dist; if (v > 0) { p[0] -= n[0] * v; p[1] = Math.max(0, p[1] - n[1] * v); p[2] -= n[2] * v; } } } // corte plano de fratura
+  const cols = (o.cols || [col]).map(c => new T.Color(c)), dust = new T.Color(o.dust || '#ADA08A'), dk = o.dark == null ? 0.42 : o.dark, dK = o.dustK == null ? 0.32 : o.dustK;
+  const CC = R.map(g => { const bc = cols[g.b % cols.length]; if (g.s === 0) { const c = bc.clone().multiplyScalar(1 - dk * 0.05).lerp(dust, dK); return th.map(() => c); } return th.map((t, i) => { const k = (1 - dk * (g.sk ? 0.75 : 1 - smooth01(-0.25, 0.5, g.y))) * (1 - 1.7 * ck[i]) * (0.9 + 0.2 * r()); const c = bc.clone().multiplyScalar(k); if (g.cap) c.lerp(dust, dK); else if (g.bench) c.lerp(dust, dK * 0.5); return c; }); });
+  const pos = [], cl = []; const V = (j, i) => { const p = P[j][i], c = CC[j][i]; pos.push(p[0], p[1], p[2]); cl.push(c.r, c.g, c.b); };
+  for (let j = 0; j < R.length - 1; j++) for (let i = 0; i < N; i++) { const i2 = (i + 1) % N; if (R[j].s > 0) { V(j, i); V(j + 1, i); V(j, i2); } if (R[j + 1].s > 0) { V(j + 1, i); V(j + 1, i2); V(j, i2); } }
+  const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new T.Float32BufferAttribute(cl, 3));
+  const j0 = R.findIndex(q => q.y >= 0), jt = R.length - 3; g.userData.fis = [...fis].map(i => { const p0 = P[j0][i], p1 = P[jt][i]; return [p0[0], p0[1], p0[2], p1[0], p1[1], p1[2], Math.cos(th[i]), Math.sin(th[i])]; }); // fendas: pé, topo e direção para fora
+  return g;
+}
+function xtalGeo(rad, h, o) {
+  const r = rng((o.seed | 0) * 53 + 11), N = o.n || 6, tw = r() * PI, sh = o.sh == null ? 0.66 + r() * 0.14 : o.sh;
+  const ring = (y, s) => { const a = []; for (let i = 0; i < N; i++) { const t = tw + i / N * PI * 2, k = s * (1 + (r() - 0.5) * 0.22); a.push([Math.cos(t) * rad * k, y, Math.sin(t) * rad * k]); } return a; };
+  const A = ring(-h * 0.25, 0.86), B = ring(h * sh, o.top == null ? 1.05 : o.top), C = [(r() - 0.5) * rad * 0.5, h, (r() - 0.5) * rad * 0.5];
+  const g0 = o.glow == null ? 0.45 : o.glow; const kk = y => 1 - g0 + g0 * Math.max(0, Math.min(1.25, (y + h * 0.1) / h)) * 1.05; // mais escuro na base, aceso na ponta
+  const pos = [], cl = []; const V = p => { pos.push(p[0], p[1], p[2]); const k = kk(p[1]); cl.push(k, k, k); };
+  for (let i = 0; i < N; i++) { const i2 = (i + 1) % N; V(A[i]); V(B[i]); V(A[i2]); V(B[i]); V(B[i2]); V(A[i2]); V(B[i]); V(C); V(B[i2]); }
+  const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new T.Float32BufferAttribute(cl, 3)); return g;
 }
 
 // ---------- utilitários de forma ----------
@@ -832,19 +902,108 @@ U.vorag = {
 };
 
 // ---------- cenário neutro: nós de recurso, rochas, ruínas, caixas, carcaças e adereços de território ----------
+// 4.3b: paletas das rochas por semente (cinza quente a marrom); cada peça embaralha as cores entre os estratos
+const ROCK_BASE = ['#7D746A', '#8C8276', '#6B635B', '#857A6D', '#5F5851', '#94897B'], ROCK_TINT = [[0, 0, 0], [0.006, 0.05, -0.01], [0.01, -0.06, 0.03], [-0.012, 0.06, -0.01], [0, -0.04, -0.035], [0.018, 0.07, 0.01]];
+function rockPal(v) { const t = ROCK_TINT[v % 6]; return ROCK_BASE.map(c => new T.Color(c).offsetHSL(t[0], t[1], t[2])); } // 4.3b: estratos variam dentro da peça; entre sementes só um leve matiz
+function shuf(a, r) { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); const t = b[i]; b[i] = b[j]; b[j] = t; } return b; }
+// 4.3b: blocos caídos encostados no pé de uma rocha, meio enterrados; o.depth = raiz (no monte das cordilheiras o pé desce a encosta e nada flutua)
+function talus(K, r, cx, cz, R, n, sz, pal, o) { o = o || {};
+  for (let i = 0; i < n; i++) { const a = r() * PI * 2, dd = R * ((o.near == null ? 0.84 : o.near) + r() * 0.16), s = sz * (0.6 + r() * 0.6);
+    K.crag(cx + Math.cos(a) * dd, (o.y || 0) - s * (0.12 + r() * 0.22), cz + Math.sin(a) * dd, s * (1 + r() * 0.5), s * (0.6 + r() * 0.45), s * (0.8 + r() * 0.4), pal[i % pal.length], o.mat || 'rock',
+      { seed: (o.seed | 0) * 17 + i, n: 5 + (r() * 3 | 0), strata: 0, sq: 2.6 + r() * 3, rough: 0.16, jit: 0.07, tilt: 0.25, cuts: 1, flare: 0.04, fis: 0, sink: o.depth || s * 0.9, sinkFlare: o.depth ? 0.06 : 0.1, cols: [pal[i % pal.length], pal[(i + 1) % pal.length]], dust: o.dust, dustK: 0.14, dark: 0.3, ry: r() * PI, rx: (r() - 0.5) * (o.depth ? 0.1 : 0.28), rz: (r() - 0.5) * (o.depth ? 0.1 : 0.28) }); } } /* raiz quase reta e pouco inclinada: a raiz torta e alargada furava o chão em lascas finas ao lado da rocha */
+// 4.3b: aglomerado de cristais: o maior no centro e menores tombando para fora (o.dir = cresce para fora de uma fenda); acesos e de vidro alternados
+function cluster(K, r, x, y, z, n, H, col, glass, o) { o = o || {};
+  for (let i = 0; i < n; i++) { const big = i === 0, a = o.dir ? Math.atan2(o.dir[1], o.dir[0]) + (r() - 0.5) * 2 : r() * PI * 2, lean = big ? (o.dir ? 0.42 : 0.06) + r() * 0.12 : (o.lean == null ? 0.42 : o.lean) + r() * 0.35;
+    const hh = H * (big ? 1 : 0.36 + r() * 0.5), rr = hh * (o.fat || 0.17) * (0.85 + r() * 0.3), off = big ? 0 : H * 0.13 * (0.4 + r()), px = x + Math.cos(a) * off, pz = z + Math.sin(a) * off, rx = Math.sin(a) * lean, rz = -Math.cos(a) * lean;
+    if ((big && o.emitK !== 0) || r() < (o.emitK == null ? 0.55 : o.emitK)) K.xtal(px, y, pz, rr, hh, col, null, { seed: (o.seed | 0) + i * 7, e: (o.e || 1.9) * (0.85 + r() * 0.3), shade: 0.5, rx, rz, glow: 0.5 });
+    else K.xtal(px, y, pz, rr * 1.05, hh * 0.9, glass, 'crystal', { seed: (o.seed | 0) + i * 7 + 3, rx, rz, glow: 0.35 }); } }
+// 4.3b: veio aceso ao longo de uma fenda (K.fis): do pé ao topo, um pouco para fora da parede
+function vein(K, f, col, e, rad, k) { k = k == null ? 1 : k; const out = (p, d) => [p[0] + f.n[0] * d, p[1], p[2] + f.n[1] * d]; const a = out(f.a, 0.04), b = out([f.a[0] + (f.b[0] - f.a[0]) * k, f.a[1] + (f.b[1] - f.a[1]) * k, f.a[2] + (f.b[2] - f.a[2]) * k], 0.06);
+  const m = [(a[0] + b[0]) / 2 + f.n[0] * 0.1, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2 + f.n[1] * 0.1]; a[1] += 0.15; K.seg(a, m, rad, col, null, { e, seg: 5 }); K.seg(m, b, rad * 0.75, col, null, { e: e * 0.9, seg: 5 }); }
+// 4.3b: ruínas — pilar em tambores (o.broken: topo partido), muro de blocos em fiadas com borda quebrada, entulho de pedra cortada
+function pillar(K, r, x, z, rad, h, pal, o) { o = o || {}; const dh = rad * 1.5; let y = -0.45;
+  K.box(x, y, z, rad * 2.7, 0.8, rad * 2.7, pal[3], 'stone', { ry: r() * 0.4 }); y += 0.8; const n = Math.max(1, Math.round(h / dh));
+  for (let i = 0; i < n; i++) { const ox = (r() - 0.5) * 0.1 * rad + (o.lean || 0) * y, oz = (r() - 0.5) * 0.1 * rad;
+    if (i === n - 1 && o.broken) K.crag(x + ox, y - 0.02, z + oz, rad * 2, dh * (0.8 + r() * 0.6), rad * 2, pal[i % pal.length], 'stone', { seed: (o.seed | 0) * 7 + i, n: 10, sq: 2, rough: 0.03, jit: 0.03, strata: 0, taper: 0.97, flare: 0, top: 'jag', tilt: 0.25, cuts: 1, fis: 1, cols: [pal[i % pal.length]], dust: '#B8B09E', dustK: 0.3, dark: 0.15 });
+    else K.cyl(x + ox, y, z + oz, rad * 0.96, rad, dh * 0.97, pal[(i % 2) * 2], 'stone', { seg: 10, facet: true, ry: r() }); y += dh; }
+  if (!o.broken) K.box(x + (o.lean || 0) * y, y, z, rad * 2.6, 0.5, rad * 2.6, pal[1], 'stone', { ry: r() * 0.2 }); return y; }
+function wall(K, r, x, z, len, h, th, ang, pal, o) { o = o || {}; const bh = 0.8, rows = Math.max(1, Math.round(h / bh)), ca = Math.cos(ang), sa = Math.sin(ang), y0 = o.y == null ? -0.35 : o.y, cut = 0.45 + r() * 0.4;
+  for (let k = 0; k < rows; k++) { const nb = Math.max(1, Math.round(len / (1.5 + r() * 0.3))), bl = len / nb, off = k % 2 ? bl * 0.5 : 0, keep = k < 2 ? len : len * (1 - (k - 1) / rows * cut * 1.6);
+    for (let i = 0; i <= nb; i++) { let s0 = -len / 2 + i * bl - off, s1 = s0 + bl; s0 = Math.max(s0, -len / 2); s1 = Math.min(s1, len / 2); const sc = (s0 + s1) / 2, yy = y0 + k * bh;
+      if (s1 - s0 < 0.3 || s1 > -len / 2 + keep + 0.01 || (k > 0 && r() < 0.07) || (o.win && sc > o.win[0] && sc < o.win[1] && yy > o.win[2] && yy < o.win[3])) continue;
+      K.box(x + ca * sc, yy, z - sa * sc, (s1 - s0) * 0.96, bh * 0.94, th * (0.9 + r() * 0.12), pal[(i + k * 2) % pal.length], 'stone', { ry: ang + (r() - 0.5) * 0.06, rz: (r() - 0.5) * 0.04 }); } } }
+function rubble(K, r, cx, cz, R, n, sz, pal, o) { o = o || {};
+  for (let i = 0; i < n; i++) { const a = r() * PI * 2, d = R * Math.sqrt(0.15 + r() * 0.85), s = sz * (0.5 + r() * 0.7);
+    K.crag(cx + Math.cos(a) * d, -s * 0.3, cz + Math.sin(a) * d, s * (1.1 + r() * 0.6), s * 0.75, s, pal[i % pal.length], 'stone', { seed: (o.seed | 0) * 13 + i, n: 4 + (r() * 2 | 0), sq: 2.5 + r() * 2, rough: 0.18, jit: 0.12, chip: 0.15, strata: 0, taper: 0.85, flare: 0.02, tilt: 0.3, cuts: 1, fis: 0, cols: [pal[i % pal.length]], dust: '#B8B09E', dustK: 0.25, dark: 0.25, ry: r() * PI, rx: (r() - 0.5) * 0.5, rz: (r() - 0.5) * 0.5 }); } }
 const NEUTRAL = {
-  plasma(K, seed) { const r = rng(seed + 3); K.rock(0, 0.3, 0, 3, '#3A2A2E', 'stone', { sy: 0.35, seed });
-    for (let i = 0; i < 8; i++) { const a = r() * PI * 2, d = 0.6 + r() * 3, h = 3 + r() * 6, hot = r() < 0.55; K.prism(Math.cos(a) * d, 0.2, Math.sin(a) * d, 0.45 + r() * 0.5, h, 6, hot ? '#FF7A45' : '#C55CFF', 'crystal', { top: 0.12, rz: (r() - 0.5) * 0.6, rx: (r() - 0.5) * 0.6, e: hot ? 1.5 : 0 }); } },
-  // 4.2h: Minério de liga = rocha escura com cristais azul-elétrico de brilho próprio; azul aceso é exclusivo do Minério
-  minerio(K, seed) { const r = rng(seed + 7); for (let i = 0; i < 3; i++) K.rock((r() - 0.5) * 5, 0.4 + r() * 0.5, (r() - 0.5) * 5, 1.7 + r() * 1.2, ['#3A3F48', '#454B55', '#30353D'][i % 3], 'stone', { seed: seed + i, sy: 0.5 });
-    K.prism(0, 0.2, 0, 1.1, 7.5 + r() * 1.5, 6, '#4CC9FF', null, { top: 0.1, e: 1.7, rz: (r() - 0.5) * 0.25 });
-    for (let i = 0; i < 6; i++) { const a = i / 6 * PI * 2 + r() * 0.5, d = 1.5 + r() * 1.6; K.prism(Math.cos(a) * d, 0.2, Math.sin(a) * d, 0.45 + r() * 0.3, 2.4 + r() * 2.6, 6, i % 2 ? '#3FA9E0' : '#4CC9FF', i % 2 ? 'crystal' : null, i % 2 ? { top: 0.12, rz: -Math.cos(a) * 0.38, rx: Math.sin(a) * 0.38 } : { top: 0.12, e: 1.5 + r() * 0.4, rz: -Math.cos(a) * 0.38, rx: Math.sin(a) * 0.38 }); }
-    for (let i = 0; i < 3; i++) { const a = r() * PI * 2; K.seg([Math.cos(a) * 0.9, 0.5, Math.sin(a) * 0.9], [Math.cos(a) * 3, 0.9 + r() * 0.6, Math.sin(a) * 3], 0.09, '#4CC9FF', null, { e: 1.2 }); } },
-  dados(K, seed) { const r = rng(seed + 11); K.rock(0, 0.2, 0, 2.6, '#33403A', 'stone', { sy: 0.3, seed }); K.tor(0, 1, 0, 2.6, 0.1, '#7FE3A1', null, { e: 2, ts: 24 });
-    for (let i = 0; i < 5; i++) { const a = i / 5 * PI * 2 + r(); K.oct(Math.cos(a) * (0.8 + r() * 1.6), 1.6 + r() * 3, Math.sin(a) * (0.8 + r() * 1.6), 0.35 + r() * 0.25, 1.6 + r() * 1.6, '#7FE3A1', null, { e: 1.6 + r(), rz: (r() - 0.5) * 0.8 }); } },
-  rocks(K, seed) { const r = rng(seed + 13); for (let i = 0; i < 4; i++) K.rock((r() - 0.5) * 7, 0.8 + i * 0.4, (r() - 0.5) * 7, 1.8 + r() * 2.2, ['#5D5A57', '#6B6560', '#4E4B49'][i % 3], 'stone', { seed: seed * 3 + i, sy: 0.7 + r() * 0.5, amp: 0.28 }); },
-  ruin(K, seed) { const r = rng(seed + 17); for (let i = 0; i < 3; i++) K.box((r() - 0.5) * 7, 0, (r() - 0.5) * 7, 1.6, 3 + r() * 6, 1.6, '#8A8478', 'stone', { b: 0.15, rz: (r() - 0.5) * 0.35, rx: (r() - 0.5) * 0.35 });
-    K.box((r() - 0.5) * 4, 0, (r() - 0.5) * 4, 5, 0.9, 1.8, '#7A746A', 'stone', { b: 0.15, ry: r() * PI, rz: 0.12 }); for (let i = 0; i < 4; i++) K.rock((r() - 0.5) * 8, 0.3, (r() - 0.5) * 8, 0.5 + r() * 0.6, '#77716A', 'stone', { seed: seed + i }); K.light(0, 0.4, 0, 0.3, '#FFE9C4', 0.9); }, // 4.2h: lâmpada morna; verde aceso é só dos Dados
+  // 4.3b: Plasma = colunas de basalto sobre plataforma vulcânica, poças e fissuras de plasma incandescente, alguns cristais violeta/laranja (leitura quente)
+  plasma(K, seed) { const r = rng(seed * 7 + 3), HOT = '#FF7A45', LAVA = '#FF5A1F', HOT2 = '#FF8A3D', VIO = '#C55CFF'; K.base = 0; const pal = ['#2F2A2B', '#3B3436', '#262123', '#433B3C', '#1F1B1C'], ash = '#6A6260';
+    const pw = 12 + r() * 1.2, pd = 10.4 + r() * 1.2, ph = 1.7 + r() * 0.5;
+    K.crag(0, 0, 0, pw, ph, pd, pal[0], 'rock', { seed: seed * 13, n: 18, strata: 2, cols: pal, dust: ash, dustK: 0.22, tilt: 0.05, sink: 1.6, fis: 4, cuts: 2, ledge: 0.14, dark: 0.5, rough: 0.16 }); const F = K.fis;
+    const cx = (r() - 0.5) * 1.6, cz = (r() - 0.5) * 1.6, nC = 10 + (r() * 3 | 0);
+    for (let i = 0; i < nC; i++) { const ring = i === 0 ? 0 : i < 7 ? 1 : 2, a = (i - 1) / 6 * PI * 2 + (ring === 2 ? 0.5 : 0) + (r() - 0.5) * 0.25, d = ring * 1.5 + (r() - 0.5) * 0.2;
+      const hh = (ring === 0 ? 5.4 : ring === 1 ? 3.1 + r() * 2.2 : 2 + r() * 1.4) * (r() < 0.22 ? 0.6 : 1);
+      K.crag(cx + Math.cos(a) * d, ph - 0.6, cz + Math.sin(a) * d, 1.58, hh, 1.58, pal[i % 5], 'rock', { seed: seed * 31 + i, n: 6, sq: 2, rough: 0.03, jit: 0.025, strata: 0, taper: 0.95, flare: 0, tilt: 0.14, cuts: r() < 0.3 ? 1 : 0, fis: 0, cols: [pal[i % 5]], dust: ash, dustK: 0.32, dark: 0.3, sink: 1, ry: (r() - 0.5) * 0.4 }); }
+    K.crag(cx, ph - 0.25, cz, 6.2, 0.32, 6.2, '#FFFFFF', null, { seed: seed * 7 + 1, n: 14, strata: 0, rough: 0.2, jit: 0.05, taper: 1, flare: 0, tilt: 0, cuts: 0, fis: 0, cols: [LAVA], dust: '#FF9A40', dustK: 0.45, dark: 0.3, e: 1.5 }); // poça entre as colunas: brilha nas frestas
+    for (let i = 0; i < 2; i++) { const a = r() * PI * 2, d = 3.4 + r() * 1.2, s = 1.4 + r() * 1.2; K.crag(cx * 0.3 + Math.cos(a) * d, ph - 0.16, cz * 0.3 + Math.sin(a) * d, s * 1.3, 0.24, s, '#FFFFFF', null, { seed: seed * 7 + 3 + i, n: 10, strata: 0, rough: 0.28, jit: 0.06, taper: 1, flare: 0, tilt: 0, cuts: 0, fis: 0, cols: [LAVA], dust: '#FFA850', dustK: 0.4, dark: 0.35, e: 1.45, ry: r() * PI }); }
+    F.forEach(f => vein(K, f, HOT, 1.8, 0.1)); // fissuras acesas nas paredes
+    for (let i = 0; i < 4; i++) { const a = r() * PI * 2, d0 = 2.2, rt = 0.84 / Math.hypot(Math.cos(a) / (pw / 2), Math.sin(a) / (pd / 2)) - Math.hypot(cx, cz), len = Math.max(0.6, Math.min(1.6 + r() * 1.6, rt - d0)); K.box(cx + Math.cos(a) * (d0 + len / 2), ph - 0.14, cz + Math.sin(a) * (d0 + len / 2), len, 0.22, 0.16, HOT, null, { e: 1.7, ry: -a }); } // rachaduras acesas no topo
+    cluster(K, r, cx + 2.3, ph - 0.1, cz - 1.5, 4, 3, HOT2, VIO, { seed: seed * 60, emitK: 0.45, e: 1.5, lean: 0.5 }); cluster(K, r, cx - 2.2, ph - 0.1, cz + 2, 4, 2.8, VIO, VIO, { seed: seed * 60 + 9, emitK: 0, fat: 0.2 }); // cristais laranja (acesos) e violeta (vidro)
+    talus(K, r, 0, 0, Math.min(pw, pd) * 0.5, 4, 0.9, pal, { seed: seed + 60, dust: ash }); },
+  // 4.3b: Minério de liga = afloramento baixo de rocha escura estratificada com aglomerados de cristal azul-elétrico brotando das fendas; azul aceso é exclusivo do Minério
+  minerio(K, seed) { const r = rng(seed * 7 + 7), C = '#34B2FF', C2 = '#4CC9FF', GL = '#8FDBFF'; K.base = 0; const pal = ['#3A3F48', '#454B55', '#30353D', '#4C525C', '#2A2E35'], dust = '#5F6E80';
+    const L = [[[-1.8, -0.6, 8.2, 3.1, 6.6], [2.7, 1.6, 6.4, 2.4, 5.6], [0.4, -3.2, 5.2, 1.7, 4.2]], [[-0.6, 0.4, 9.4, 2.7, 7.2], [3.4, -2.1, 4.8, 2, 4.4], [-3.7, 2.6, 4.6, 1.6, 4]],
+      [[-2.2, 0.8, 7, 3.3, 6], [2.4, -0.8, 7.2, 2.5, 6.2], [0.2, 3.5, 4.4, 1.5, 3.6]], [[0, 0, 8.8, 2.9, 8], [-3.9, -2.4, 4.6, 1.9, 4], [3.7, 2.8, 4.2, 1.6, 3.8]]][seed % 4];
+    const F = []; L.forEach(([x, z, w, h, d], i) => { K.crag(x, 0, z, w, h, d, pal[0], 'rock', { seed: seed * 13 + i, n: i ? 13 : 16, strata: i ? 2 : 3, cols: shuf(pal, r), dust, dustK: 0.3, tilt: 0.1 + r() * 0.1, sink: h * 0.8, fis: i ? 2 : 3, cuts: 2, ledge: 0.1, dark: 0.5 }); F.push(...K.fis); });
+    const [x0, z0, , h0] = L[0], [x1, z1, , h1] = L[1];
+    cluster(K, r, x0 + (r() - 0.5), h0 * 0.8, z0 + (r() - 0.5), 7, 5.2 + r(), C, GL, { seed: seed * 50, e: 1.75 }); // aglomerado principal no alto
+    cluster(K, r, (x0 + x1) / 2, Math.min(h0, h1) * 0.55, (z0 + z1) / 2, 5, 3.6 + r() * 0.8, C2, GL, { seed: seed * 50 + 9, e: 1.6 }); // na junta das camadas
+    const Fs = []; for (const f of F.slice().sort((a, b) => Math.atan2(a.a[2], a.a[0]) - Math.atan2(b.a[2], b.a[0]))) { const an = Math.atan2(f.a[2], f.a[0]); if (Fs.every(g => Math.abs(Math.atan2(Math.sin(an - g.an), Math.cos(an - g.an))) > 1.1)) Fs.push(Object.assign({ an }, f)); } /* fendas espalhadas em volta do nó */
+    cluster(K, r, x1 + (r() - 0.5) * 0.6, h1 * 0.75, z1 + (r() - 0.5) * 0.6, 4, 3 + r() * 0.6, C, GL, { seed: seed * 50 + 15, e: 1.6 }); // no alto da segunda camada
+    Fs.slice(0, 4).forEach((f, i) => { cluster(K, r, f.a[0] - f.n[0] * 0.2, f.a[1] + 0.2 + r() * 0.5, f.a[2] - f.n[1] * 0.2, 3 + (i % 2), 1.8 + r() * 1.3, i % 2 ? C2 : C, GL, { seed: seed * 50 + 20 + i * 5, dir: f.n, e: 1.55 }); vein(K, f, C, 1.5, 0.08, 0.85); });
+    for (let i = 0; i < 6; i++) { const a = r() * PI * 2, d = 5 + r() * 1.3, s = 0.6 + r() * 0.6, rx = Math.sin(a) * 1.2, rz = -Math.cos(a) * 1.2; K.xtal(Math.cos(a) * d, -0.15, Math.sin(a) * d, s * 0.3, s * 1.4, i % 2 ? GL : C, i % 2 ? 'crystal' : null, i % 2 ? { seed: seed * 50 + 40 + i, rx, rz } : { seed: seed * 50 + 40 + i, e: 1.4, shade: 0.5, rx, rz }); } // lascas na base
+    talus(K, r, 0, 0, 5.2, 4, 0.9, pal, { seed: seed + 40, dust }); },
+  // 4.3b: Dados = monólito antigo de pedra escura com glifos verdes acesos sobre plataforma em degraus, cristais octaédricos e o anel
+  dados(K, seed) { const r = rng(seed * 7 + 11), G = '#45D682', G2 = '#7FE3A1', v = seed % 4, DK = '#26302B'; K.base = 0; const pal = ['#33403A', '#3B4A42', '#2A3530', '#435249', '#25302B'], moss = '#71836F';
+    let ty = 0; [[11.4, 1, 10.2], [8.4, 0.9, 7.4], [5.6, 0.7, 5]].forEach(([w, h, d], i) => { K.crag(0, ty - (i ? 0.15 : 0), 0, w, h + (i ? 0.15 : 0), d, pal[i], 'rock', { seed: seed * 17 + i, n: 12, sq: 5.5, rough: 0.035, jit: 0.02, strata: 1, ledge: 0.04, taper: 0.97, flare: 0.02, tilt: 0.015, cuts: 1, fis: i ? 1 : 2, cols: [pal[i], pal[(i + 2) % 5]], dust: moss, dustK: 0.22, dark: 0.35, sink: i ? 0.2 : 1, ry: (r() - 0.5) * 0.1 }); ty += h; });
+    const mono = (x, z, w, h, d, ry, broken, sd) => { K.crag(x, ty - 0.3, z, w, h + 0.3, d, DK, 'rock', { seed: sd, n: 12, sq: 8, rough: 0.02, jit: 0.015, strata: 0, taper: 0.9, flare: 0.02, tilt: 0.05, cuts: broken ? 1 : 0, fis: 0, top: broken ? 'jag' : 'flat', cols: [DK], dust: '#3E4B44', dustK: 0.3, dark: 0.3, ry });
+      const c = Math.cos(ry), s = Math.sin(ry), at = (lx, ly, lz) => [x + lx * c + lz * s, ty + ly, z - lx * s + lz * c], hh = broken ? h * 0.66 : h * 0.92, face = (side, y) => side * (d / 2 * (1 - 0.1 * y / h) + 0.03);
+      for (const side of [-1, 1]) for (let y = 0.5; y < hh - 0.3; y += 0.42 + r() * 0.3) { const bw = 0.2 + r() * 0.7, bx = (r() - 0.5) * (w * 0.78 - bw) * (1 - 0.1 * y / h), p = at(bx, y, face(side, y)); K.box(p[0], p[1], p[2], bw, r() < 0.25 ? 0.2 : 0.08, 0.08, r() < 0.3 ? G2 : G, null, { e: 1.45, ry }); } // glifos
+      K.seg(at(w * 0.28, 0.35, face(1, 0.35)), at(w * 0.25, hh, face(1, hh)), 0.035, G, null, { e: 1.5, seg: 4 }); }; // canal vertical
+    if (v === 0) mono(0, 0, 2.5, 5.2, 1.35, (r() - 0.5) * 0.5, false, seed * 3);
+    else if (v === 1) { mono(-1.3, 0.3, 2.1, 4.8, 1.2, 0.25, false, seed * 3); mono(1.5, -0.4, 1.9, 3, 1.1, -0.35, true, seed * 3 + 1); }
+    else if (v === 2) { mono(-1.2, -1.2, 2.2, 3, 1.25, 0.2, true, seed * 3); K.crag(-0.9, ty + 0.15, 1, 1.9, 3.6, 1.1, DK, 'rock', { seed: seed * 3 + 2, n: 10, sq: 8, rough: 0.02, strata: 0, taper: 0.92, cuts: 1, fis: 0, top: 'jag', cols: [DK], dust: '#3E4B44', dark: 0.3, rz: -1.5, ry: -0.3 }); K.seg([-0.4, ty + 0.75, 1.15], [2.2, ty + 0.95, 1.95], 0.05, G, null, { e: 1.6, seg: 4 }); } // tombado
+    else { for (let i = 0; i < 3; i++) { const a = i / 3 * PI * 2 + 0.3; mono(Math.cos(a) * 2.1, Math.sin(a) * 2.1, 1.3, 3 + r() * 1, 0.8, -a + PI / 2, r() < 0.4, seed * 3 + i); } K.oct(0, ty + 2.2, 0, 0.75, 2.4, G, null, { e: 1.8, shade: 0.5 }); }
+    K.tor(0, ty + (v === 3 ? 2.3 : 2.8), 0, v === 1 ? 3.4 : 2.6, 0.09, G, null, { e: 1.6, ts: 28, rs: 5, rx: (r() - 0.5) * 0.32, rz: 0.12 });
+    for (let i = 0; i < 5; i++) { const a = i / 5 * PI * 2 + r(), d = 2.8 + r() * 1.2; K.oct(Math.cos(a) * d, ty + 1 + r() * 3, Math.sin(a) * d, 0.3 + r() * 0.22, 1.2 + r() * 1.1, i % 2 ? G2 : G, null, { e: 1.5 + r() * 0.4, shade: 0.5, rz: (r() - 0.5) * 0.6 }); } // cristais de dados flutuando
+    for (let i = 0; i < 3; i++) { const a = r() * PI * 2, d = 4.4 + r() * 0.6; K.oct(Math.cos(a) * d, 0.3 + r() * 0.3, Math.sin(a) * d, 0.35, 1.3, G, null, { e: 1.6, shade: 0.5, rz: (r() - 0.5) * 1.2, rx: (r() - 0.5) * 1.2 }); } // encravados nos degraus
+    talus(K, r, 0, 0, 5.4, 4, 0.8, pal, { seed: seed + 80, dust: moss }); },
+  // 4.3b: rocha das cordilheiras (e pedras soltas) = penhasco fraturado com estratos, topo plano inclinado, blocos caídos no pé e saia funda
+  // (no monte do relevo a peça fica no topo e a encosta cai ~45°: tudo desce até ~1,1× a distância do centro para nada flutuar). Variações: mesa larga,
+  // dois morros, mesa com agulha, laje inclinada, degraus, bloco fraturado
+  rocks(K, seed) { const r = rng(seed * 7 + 13), v = seed % 6, pal = rockPal(v), dust = '#B2A58F'; K.base = 0;
+    const PW = 13 + r() * 1.2, PD = 11.8 + r() * 1.2, PH = 2 + r() * 0.8; // pedestal: base contínua entre peças vizinhas e saia em degraus que desce a encosta
+    K.crag(0, 0, 0, PW, PH, PD, pal[0], 'rock', { seed: seed * 11, n: 16, strata: 2, taper: 0.88, flare: 0.08, ledge: 0.1, rim: 0.2, tilt: 0.06, sink: PW * 0.62, sinkFlare: 0.06, skirt: 4, cols: shuf(pal, r), dust, dustK: 0.2, fis: 4, cuts: 2, chip: 0.1, jit: 0.06, dark: 0.45 });
+    const M = (x, z, w, h, d, o) => K.crag(x, PH - 0.5, z, w, h + 0.5, d, pal[0], 'rock', Object.assign({ seed: seed * 11 + 1 + (o.k || 0), n: 14, strata: 4, taper: 0.7, ledge: 0.08, sink: PH * 0.6, cols: shuf(pal, r), dust, fis: 3, cuts: 3, chip: 0.09, jit: 0.05, ry: r() * PI * 2 }, o));
+    const T = (x, z, R, n, sz) => talus(K, r, x, z, R, n, sz, shuf(pal, r), { seed: seed * 5 + n + Math.round(x * 3), dust, near: 0.95, y: PH - 0.2, depth: PH });
+    if (v === 0) { M(-0.5, 0, 8.6, 5.8, 7.8, { tilt: 0.08 }); M(3.7, 2.3, 4.4, 2.8, 4, { k: 1, strata: 2, n: 11 }); T(-0.5, 0, 4.2, 4, 1.3); }
+    else if (v === 1) { M(-2.6, -0.6, 6.2, 5.6, 5.6, {}); M(2.8, 0.9, 5.6, 4.2, 5.2, { k: 1, strata: 3, tilt: 0.14 }); T(-2.6, -0.6, 3, 3, 1.2); T(2.8, 0.9, 2.8, 2, 1.1); }
+    else if (v === 2) { M(-1, 0, 7.6, 3.8, 7, {}); M(3.3, -2, 3.6, 6.2, 3.3, { k: 1, sq: 2.4, n: 10, strata: 4, taper: 0.72, cuts: 2, fis: 1, tilt: 0.16 }); T(-1, 0, 3.8, 4, 1.3); }
+    else if (v === 3) { M(0, 0, 9.2, 4.8, 7.6, { strata: 5, tilt: 0.32, taper: 0.78 }); T(0, 0, 4.4, 5, 1.3); }
+    else if (v === 4) { M(-2, 0, 6.8, 5.4, 6.4, {}); M(2.4, 1.6, 5.2, 3.2, 4.8, { k: 1, strata: 3, n: 12 }); T(-2, 0, 3.3, 3, 1.2); T(2.4, 1.6, 2.6, 2, 1); }
+    else { M(-0.6, 0, 8.2, 5, 7.6, { cuts: 4, fis: 4 }); M(3.9, 0.4, 2.4, 4.2, 5.2, { k: 1, sq: 4, n: 12, strata: 3, tilt: 0.2, rz: -0.14, cuts: 1 }); T(-0.6, 0, 4, 4, 1.3); }
+    talus(K, r, 0, 0, Math.min(PW, PD) * 0.5, 3, 1.5, shuf(pal, r), { seed: seed * 9 + 1, dust, near: 0.84, depth: PW * 0.6 }); }, // blocos na borda do pedestal com raiz funda
+  // 4.3b: ruína = pilares em tambores e trechos de muro de blocos de uma estrutura antiga, quebrados e meio enterrados, com entulho; lâmpada morna (verde aceso é só dos Dados)
+  ruin(K, seed) { const r = rng(seed * 7 + 17), v = seed % 6, pal = v % 2 ? ['#8E8676', '#7D766A', '#9A917F', '#706A60', '#A39A86'] : ['#8A8478', '#7A746A', '#958D7F', '#6F6A61', '#A0977F']; K.base = 0;
+    const lamp = (x, y, z) => { K.box(x, y - 0.1, z, 0.66, 0.16, 0.66, '#4A4540', 'dark'); K.light(x, y + 0.06, z, 0.3, '#FFE9C4', 0.9); };
+    if (v === 0) { pillar(K, r, -3.6, 0, 0.62, 5.4, pal, { seed }); pillar(K, r, 0, 0.2, 0.62, 3.4, pal, { seed: seed + 1, broken: 1 }); pillar(K, r, 3.6, -0.1, 0.62, 1.4, pal, { seed: seed + 2, broken: 1 }); K.box(1.2, -0.35, 2.4, 5.2, 0.9, 1.3, pal[1], 'stone', { ry: 0.25, rz: 0.08 }); rubble(K, r, 0, 0, 5.2, 7, 0.9, pal, { seed }); lamp(-2.3, 0.06, 1.3); }
+    else if (v === 1) { wall(K, r, -0.2, -1.6, 7.6, 3.4, 1, 0, pal); wall(K, r, 3.3, 0.9, 4.6, 2.4, 1, PI / 2, pal); rubble(K, r, 0.4, 1.2, 4.6, 7, 0.9, pal, { seed }); lamp(2.2, 0.06, -0.5); }
+    else if (v === 2) { pillar(K, r, -1.6, -0.6, 0.78, 5.6, pal, { seed, broken: 1 }); for (let i = 0; i < 3; i++) K.cyl(0.2 + i * 1.35 + r() * 0.3, 0.55, 0.6 + (r() - 0.5) * 0.6, 0.76, 0.78, 1.1, pal[i % 5], 'stone', { seg: 10, facet: true, rz: PI / 2 + (r() - 0.5) * 0.2, ry: (r() - 0.5) * 0.5 }); rubble(K, r, 0.6, 0.4, 4.6, 6, 0.9, pal, { seed }); lamp(-2.9, 0.06, 0.8); }
+    else if (v === 3) { const top = pillar(K, r, -2.3, 0, 0.6, 3.6, pal, { seed }); pillar(K, r, 2.3, 0, 0.6, 3.6, pal, { seed: seed + 1 }); for (let i = 0; i < 8; i++) { if (i === 4 || i === 5) continue; const a = PI - i * PI / 7, R = 2.3; K.box(Math.cos(a) * R, top + 0.45 + Math.sin(a) * R * 0.85, 0, 0.9, 0.7, 1.05, pal[i % 5], 'stone', { rz: a - PI / 2 }); } /* arco com a pedra-chave caída */ for (let i = 0; i < 3; i++) K.box(0.6 + i * 1.1, -0.2, 1.6 + (r() - 0.5), 0.95, 0.72, 1.05, pal[(i + 2) % 5], 'stone', { ry: r() * PI, rz: (r() - 0.5) * 0.6 }); rubble(K, r, 0, 0.6, 4.4, 6, 0.85, pal, { seed }); lamp(0, 0.06, 0.5); }
+    else if (v === 4) { wall(K, r, 0, -3, 7.2, 1.6, 0.8, 0, pal); wall(K, r, 0.4, 3, 6.4, 0.8, 0.8, 0, pal); wall(K, r, -3.6, 0, 6, 1.2, 0.8, PI / 2, pal); wall(K, r, 3.6, -0.6, 4.8, 1.6, 0.8, PI / 2, pal); for (let i = 0; i < 3; i++) K.cyl(-1.8 + i * 1.2, 0.4, 0.4 + i * 0.25, 0.55, 0.58, 1.05, pal[i % 5], 'stone', { seg: 10, facet: true, rz: PI / 2, ry: 0.35 }); rubble(K, r, 0, 0, 3.6, 8, 0.8, pal, { seed }); lamp(1.4, 0.06, 0.6); }
+    else { wall(K, r, 0, -0.8, 9, 4, 1.1, 0.08, pal, { win: [-0.4, 1.6, 1.4, 3.2] }); pillar(K, r, -5.2, 1.4, 0.6, 2.6, pal, { seed, broken: 1 }); rubble(K, r, 0, 1.6, 4.8, 7, 0.9, pal, { seed }); lamp(0.6, 0.06, 0.4); } },
+  // 4.3b: pedra solta barata (matacão com estratos ou pedra/seixo lascado) para o espalhamento do dress3d, no lugar do icosaedro; ver scatter()
+  seixo(K, seed) { const big = !(seed & 1), r = rng(seed * 7 + 29); K.base = 0; K.crag(0, -0.12, 0, 2.1 + r() * 0.3, big ? 1.25 + r() * 0.2 : 0.9, 1.8, '#FFFFFF', 'rock', { seed, n: big ? 8 : 6, strata: big ? 2 : 0, sq: 2.6 + r(), rough: 0.14, chip: 0.12, jit: 0.06, tilt: 0.22, cuts: big ? 2 : 1, fis: big ? 1 : 0, flare: 0.04, dark: 0.35, dustK: 0.25, cols: ['#FFFFFF', '#E4E0D9'], dust: '#FFFFFF' }); },
   crate(K) { K.box(0, 0, 0, 6, 4.6, 5, '#B8862B', 'paint', { b: 0.35 }); for (const x of [-1.6, 1.6]) K.box(x, -0.05, 0, 0.5, 4.75, 5.12, '#4A3A20', 'dark'); K.box(0, 4.6, 0, 1.6, 0.3, 1.6, '#F2C230', null, { e: 1.6 }); },
   wreck(K) { K.box(0, 0, 0, 12, 2.4, 6, '#2A2624', 'dark', { b: 0.4, rz: 0.08, rx: 0.1 }); K.box(-1, 2.2, 0.4, 4.6, 1.6, 4, '#3A3430', 'dark', { b: 0.4, ry: 0.5, rz: -0.2 }); K.seg([1, 3, 0.2], [6.4, 1.2, 2.2], 0.36, '#1E1C1B', 'metal');
     for (let i = 0; i < 3; i++) K.light(-3 + i * 2.6, 2.4, (i - 1) * 1.6, 0.35, '#FF7A2E', 2); },
@@ -876,6 +1035,9 @@ function build(def, race, color, seed) {
     const f = recipe(race, def); if (!f) return null; f(K, P, tc, seed | 0); return K.finish({ pivot: [0, 0] });
   } catch (err) { console.warn('[ARD] malha ' + def + '/' + race + ' falhou: ' + err.message); return null; }
 }
+// 4.3b: geometria de pedra solta para o dress3d (kind 'boulder' = matacão com estratos; 'stone'/'pebble' = pedra lascada), base em y=0 e ~2 de largura;
+// a cor por vértice (sombra na base, topo claro) é quase branca: multiplica a cor do material se ele usar vertexColors
+function scatter(kind, seed) { T = T || globalThis.THREE; if (!T) return null; const K = new Kit(); try { NEUTRAL.seixo(K, ((seed | 0) << 1) | (kind === 'boulder' ? 0 : 1)); return K.finish().main; } catch (err) { console.warn('[ARD] pedra solta falhou: ' + err.message); return null; } }
 // material padrão das malhas: rugosidade e metal vêm do atributo rm por vértice; rim opcional por Raça
 function material(o) { T = T || globalThis.THREE; o = o || {}; const m = new T.MeshStandardMaterial(Object.assign({ vertexColors: true, roughness: 1, metalness: 1, envMapIntensity: o.env == null ? 1 : o.env }, o.params || {}));
   m.onBeforeCompile = sh => {
@@ -889,5 +1051,5 @@ function material(o) { T = T || globalThis.THREE; o = o || {}; const m = new T.M
 const BUILDING_DEFS = ['nucleo', 'reator', 'refinaria', 'quartel', 'fabrica', 'hangar', 'torre', 'nodulo', 'laboratorio', 'muro', 'portao', 'bastiao'];
 const GENERIC_UNITS = ['coletor', 'infantaria', 'veiculo', 'drone', 'suporte', 'pirata'];
 function unitsOf(race) { return GENERIC_UNITS.concat(Object.keys(U[race] || {}).filter(d => !GENERIC_UNITS.includes(d) && !d.startsWith('veiculo_'))); }
-ARD.meshes = { setLod(v) { LOD = Math.max(0.4, Math.min(1, v)); }, setDetail(v) { DET.value = Math.max(0, Math.min(1, v)); }, /* 4.3a: detalhe de superfície pela qualidade */ build, material, animShader, ANIM_DEFAULTS, ANIM_T, PAL, MAT, BUILDING_DEFS, GENERIC_UNITS, unitsOf, NEUTRAL_DEFS: Object.keys(NEUTRAL), PROP_RACES: Object.keys(PROPS), FULL };
+ARD.meshes = { setLod(v) { LOD = Math.max(0.4, Math.min(1, v)); }, setDetail(v) { DET.value = Math.max(0, Math.min(1, v)); }, /* 4.3a: detalhe de superfície pela qualidade */ build, scatter, /* 4.3b */ material, animShader, ANIM_DEFAULTS, ANIM_T, PAL, MAT, BUILDING_DEFS, GENERIC_UNITS, unitsOf, NEUTRAL_DEFS: Object.keys(NEUTRAL), PROP_RACES: Object.keys(PROPS), FULL };
 })(globalThis.ARD = globalThis.ARD || {});

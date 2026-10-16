@@ -96,7 +96,7 @@ function startViewer(race, color, skin) { // 4.1a: um renderizador só, reaprove
   if (note) note.hidden = true;
   try {
     if (!hg) { const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); r.outputColorSpace = THREE.SRGBColorSpace; r.toneMapping = THREE.ACESFilmicToneMapping; r.shadowMap.enabled = true;
-      const sc = new THREE.Scene(); sc.background = new THREE.Color(0x0b0d11); if (ADD.RoomEnvironment) { const pm = new THREE.PMREMGenerator(r); sc.environment = pm.fromScene(new ADD.RoomEnvironment(), 0.04).texture; pm.dispose(); }
+      const sc = new THREE.Scene(); sc.background = new THREE.Color(0x0b0d11); if (ADD.RoomEnvironment) { const pm = new THREE.PMREMGenerator(r); sc.environmentIntensity = 0.3; /* 4.3b: r186 */ sc.environment = pm.fromScene(new ADD.RoomEnvironment(), 0.04).texture; pm.dispose(); }
       sc.add(new THREE.HemisphereLight(0x9fb8d6, 0x2a2a30, 0.75)); const sun = new THREE.DirectionalLight(0xffe9c4, 1.8); sun.position.set(-60, 90, 70); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024); Object.assign(sun.shadow.camera, { left: -70, right: 70, top: 70, bottom: -70 }); sc.add(sun);
       const ground = new THREE.Mesh(new THREE.CircleGeometry(80, 64).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x2c3038, roughness: 0.95 })); ground.receiveShadow = true; sc.add(ground);
       const cam = new THREE.PerspectiveCamera(32, 4 / 3, 1, 2000); cam.position.set(104, 74, 104); cam.lookAt(0, 6, 0);

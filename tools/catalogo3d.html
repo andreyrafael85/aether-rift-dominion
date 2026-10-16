@@ -15,7 +15,7 @@ window.THREE = THREE;
 const q = new URLSearchParams(location.search); const race = q.get('race') || 'vehnar', view = q.get('view') || 'b'; const W = +(q.get('w') || 1600), Hh = +(q.get('h') || 900);
 const S = ARD.sim, M = ARD.meshes; const tc = q.get('color') || '#FF8C1A';
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); renderer.setSize(W, Hh); renderer.setPixelRatio(1); document.body.appendChild(renderer.domElement);
-renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0; renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0; renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
 const scene = new THREE.Scene(); scene.background = new THREE.Color(0x1a2029); const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new RoomEnvironment(renderer), 0.04).texture;
 scene.add(new THREE.HemisphereLight(0x9fb8d6, 0x2a2a30, 0.55)); scene.add(new THREE.AmbientLight(0x404860, 0.25)); const sun = new THREE.DirectionalLight(0xffe9c4, 1.6); sun.position.set(-300, 520, 360); sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096); const sc = sun.shadow.camera; sc.left = -700; sc.right = 700; sc.top = 700; sc.bottom = -700; sc.near = 10; sc.far = 2000; sun.shadow.bias = -0.0004; scene.add(sun);
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: q.get('ground') || 0x5f6670, roughness: 0.95 })); ground.receiveShadow = true; scene.add(ground);

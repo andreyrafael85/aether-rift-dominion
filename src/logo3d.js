@@ -16,7 +16,7 @@ function mount(img) {
     renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, powerPreference: 'low-power' }); renderer.setPixelRatio(1); renderer.setSize(px, px, false);
     renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
     const scene = new THREE.Scene(); scene.background = new THREE.Color(0x06070c);
-    if (ADD.RoomEnvironment) { const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new ADD.RoomEnvironment(), 0.04).texture; pm.dispose(); }
+    if (ADD.RoomEnvironment) { const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new ADD.RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 0.25; /* 4.3b: r186 */ pm.dispose(); }
     { const n = 700, pos = new Float32Array(n * 3); for (let i = 0; i < n; i++) { const u = Math.random() * 2 - 1, th = Math.random() * Math.PI * 2, s = Math.sqrt(1 - u * u); pos[i * 3] = 60 * s * Math.cos(th); pos[i * 3 + 1] = 60 * s * Math.sin(th); pos[i * 3 + 2] = 60 * u; } const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xdfe6ff, size: 1.1, sizeAttenuation: false, transparent: true, opacity: 0.85, depthWrite: false }))); }
     const g = new THREE.Group(); scene.add(g);
     const steel = new THREE.MeshStandardMaterial({ color: 0xb4bcc9, metalness: 0.95, roughness: 0.3, envMapIntensity: 0.6 }), gun = new THREE.MeshStandardMaterial({ color: 0x242934, metalness: 0.85, roughness: 0.42, envMapIntensity: 0.5 });
