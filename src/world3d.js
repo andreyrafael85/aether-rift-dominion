@@ -35,7 +35,7 @@ function planetTexture(THREE, race, seed, W) {
 function atmo(THREE, r, color, power, intensity) {
   const mat = new THREE.ShaderMaterial({ uniforms: { col: { value: new THREE.Color(color) }, pw: { value: power }, it: { value: intensity } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.BackSide, fog: false,
     vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position,1.0); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }',
-    fragmentShader: 'uniform vec3 col; uniform float pw; uniform float it; varying vec3 vN; varying vec3 vV; void main(){ float d = abs(dot(normalize(vN), normalize(vV))); float f = pow(1.0 - d, pw); gl_FragColor = vec4(col * f * it, f * it); }' });
+    fragmentShader: 'uniform vec3 col; uniform float pw; uniform float it; varying vec3 vN; varying vec3 vV; void main(){ float d = abs(dot(normalize(vN), normalize(vV))); float f = pow(max(1.0 - d, 0.0), pw); /* 4.3f: sem NaN */ gl_FragColor = vec4(col * f * it, f * it); }' });
   return new THREE.Mesh(new THREE.SphereGeometry(r, 48, 32), mat);
 }
 // céu: cúpula em gradiente com brilho do sol e estrelas que aparecem à noite; acompanha a câmera (fica "no infinito")

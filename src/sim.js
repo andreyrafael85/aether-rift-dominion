@@ -1046,7 +1046,7 @@ function kill(sim, e, killer) {
   if (!e.alive) return;
   e.alive = false;
   const p = sim.players[e.owner];
-  emit(sim, { t: 'death', x: e.x, y: e.y, r: e.r, kind: e.kind, def: e.def, owner: e.owner, cls: e.cls });
+  emit(sim, { t: 'death', x: e.x, y: e.y, r: e.r, kind: e.kind, def: e.def, owner: e.owner, cls: e.cls, id: e.id }); /* 4.3f: id para a ruína no render */
   if (e.kind === 'unit') {
     if (p) p.stats.unitsLost++;
     if (killer >= 0 && killer !== e.owner) sim.players[killer].stats.unitsKilled++;
@@ -1070,7 +1070,7 @@ function kill(sim, e, killer) {
 function eliminate(sim, pid, killer) {
   const p = sim.players[pid]; if (!p.alive) return;
   p.alive = false; sim.navDirty = true;
-  for (const e of sim.ents) if (e.alive && e.owner === pid) { e.alive = false; emit(sim, { t: 'death', x: e.x, y: e.y, r: e.r, kind: e.kind, def: e.def, owner: pid, cls: e.cls }); }
+  for (const e of sim.ents) if (e.alive && e.owner === pid) { e.alive = false; emit(sim, { t: 'death', x: e.x, y: e.y, r: e.r, kind: e.kind, def: e.def, owner: pid, cls: e.cls, id: e.id }); }
   for (const k in p.pacts) { const q = sim.players[k]; delete q.pacts[pid]; } p.pacts = {};
   for (const q of sim.players) if (q.alive) alertTo(sim, q.id, p.name + ' foi eliminado' + (killer >= 0 && killer !== pid ? ' por ' + sim.players[killer].name : ''), null, null, q.id === killer ? 'good' : 'warn');
   emit(sim, { t: 'eliminated', p: pid });
@@ -1596,5 +1596,6 @@ ARD.sim = {
   NAV, NW, TILE, TILES, BIOMES, navIdx, passable, flowField, lineFree, inStorm,
   DM,
   createSim, step, enqueue, snapshot, restore, jsonSafe, jsonBack, ERAS, ASCENSION, eraOf, lockReason, eraBlock, territoryOf, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint, spawnUnit, forceStorm,
+  addBuilding, kill, /* 4.3f: ferramentas de teste (bases e ruínas na partida) */
 };
 })(globalThis.ARD = globalThis.ARD || {});

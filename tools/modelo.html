@@ -5,7 +5,8 @@
 <script src="../src/sim.js"></script><script src="../src/meshes.js"></script>
 <script type="module">
 // v4.3 — um modelo de perto, em quatro ângulos (de cima como na partida, 3/4, lado, frente), com a luz do jogo, sombra e reflexo de ambiente.
-// Parâmetros: race, def, color (cor do time), w, h, ground (1 = chão de regolito), anim (pose: 0..1 do ciclo), only=3q para um ângulo só.
+// Parâmetros: race, def, color (cor do time), w, h, ground (1 = chão de regolito), anim (pose: 0..1 do ciclo), only=3q para um ângulo só,
+// skin (estilo do Núcleo: 0, 1, 2), lite=1 (versão leve), ruina=0,0.6,1.4,4 (4.3f: a destruição nesses instantes, em segundos, vista em 3/4).
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 window.THREE = THREE;
@@ -20,18 +21,20 @@ const gcv = document.createElement('canvas'); gcv.width = gcv.height = 256; cons
 const gt = new THREE.CanvasTexture(gcv); gt.wrapS = gt.wrapT = THREE.RepeatWrapping; gt.repeat.set(6, 6); gt.colorSpace = THREE.SRGBColorSpace;
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ map: gt, roughness: 0.95 })); ground.receiveShadow = true; if (q.get('ground') !== '0') scene.add(ground);
 const mat = M.material({ env: 0.55, key: 'modelo' }); const matEm = new THREE.MeshBasicMaterial({ vertexColors: true }); matEm.onBeforeCompile = sh => M.animShader(sh); matEm.defaultAttributeValues = Object.assign({}, matEm.defaultAttributeValues, M.ANIM_DEFAULTS); matEm.customProgramCacheKey = () => 'modelo-em';
-const g = M.build(def, race, tc, 0); const info = { def, race, tris: 0, emTris: 0, width: g.width, height: g.height, beam: g.beam || null, parts: null };
+const g = M.build(def, race, tc, +(q.get('skin') || 0), q.get('lite') === '1' ? { lite: true } : null); const ruina = q.get('ruina') ? q.get('ruina').split(',').map(Number) : null; const info = { def, race, tris: 0, emTris: 0, width: g.width, height: g.height, beam: g.beam || null, parts: null };
 const fit = 14 / Math.max(g.width, g.height * 1.2); // o modelo ocupa ~14 unidades: tamanho de close
 const grp = new THREE.Group(); grp.scale.setScalar(fit); scene.add(grp);
 const addMesh = (geo, m) => { if (!geo) return null; const ia = new THREE.InstancedBufferAttribute(new Float32Array([0, +(q.get('anim') || 0) * 3, 0, 0]), 4); const ic = new THREE.InstancedBufferAttribute(new Float32Array([+(q.get('anim') || 0) * 2]), 1); geo.setAttribute('aInst', ia); geo.setAttribute('aInstC', ic); const im = new THREE.InstancedMesh(geo, m, 1); im.setMatrixAt(0, new THREE.Matrix4()); im.castShadow = true; im.receiveShadow = true; im.frustumCulled = false; grp.add(im); return im; };
-addMesh(g.main, mat); addMesh(g.em, matEm); info.tris = g.main.attributes.position.count / 3; info.emTris = g.em ? g.em.attributes.position.count / 3 : 0;
+let dieA = null; if (ruina) { const mr = M.material({ env: 0.55, key: 'modelo-ruina', noAnim: true, onShader: sh => M.ruinShader(sh, 'main') }); mr.defaultAttributeValues = Object.assign({}, mr.defaultAttributeValues, M.RUIN_DEFAULTS); const me = new THREE.MeshBasicMaterial({ vertexColors: true }); me.onBeforeCompile = sh => M.ruinShader(sh, 'em'); me.defaultAttributeValues = Object.assign({}, me.defaultAttributeValues, M.RUIN_DEFAULTS); me.customProgramCacheKey = () => 'modelo-ruina-em';
+  dieA = new THREE.InstancedBufferAttribute(new Float32Array([0, g.height, 1.7, 40]), 4); for (const gg of [g.main, g.em]) if (gg) gg.setAttribute('aDie', dieA); addMesh(g.main, mr); addMesh(g.em, me); info.pieces = g.pieces || 0; }
+else { addMesh(g.main, mat); addMesh(g.em, matEm); } info.tris = g.main.attributes.position.count / 3; info.emTris = g.em ? g.em.attributes.position.count / 3 : 0;
 if (g.beam) { const b = new THREE.Mesh(new THREE.SphereGeometry(0.25 / fit * 3, 10, 8), new THREE.MeshBasicMaterial({ color: 0xff40ff })); b.position.set(g.beam[0], g.beam[1], g.beam[2]); grp.add(b); }
-const H = g.height * fit; const views = [['de cima (partida)', 1.12, Math.PI / 4, 34], ['3/4', 0.62, Math.PI * 0.8, 26], ['lado', 0.12, Math.PI / 2, 24], ['frente', 0.3, 0.02, 24]].filter(v => !q.get('only') || q.get('only') === v[0].slice(0, 3));
+const H = g.height * fit; const views = ruina ? ruina.map(t => ['ruína t=' + t + ' s', 0.62, Math.PI * 0.8, 38, t]) : [['de cima (partida)', 1.12, Math.PI / 4, 34], ['3/4', 0.62, Math.PI * 0.8, 26], ['lado', 0.12, Math.PI / 2, 24], ['frente', 0.3, 0.02, 24]].filter(v => !q.get('only') || q.get('only') === v[0].slice(0, 3));
 const cols = views.length > 1 ? 2 : 1, rows = Math.ceil(views.length / cols); const vw = W / cols, vh = Hh / rows; const lab = document.getElementById('lab');
-views.forEach(([name, pitch, yaw, dist], k) => { const cx = (k % cols) * vw, cy = Math.floor(k / cols) * vh; const cam = new THREE.PerspectiveCamera(32, vw / vh, 0.5, 500);
+views.forEach(([name, pitch, yaw, dist, tr], k) => { if (dieA) { dieA.array[0] = tr; dieA.needsUpdate = true; } const cx = (k % cols) * vw, cy = Math.floor(k / cols) * vh; const cam = new THREE.PerspectiveCamera(32, vw / vh, 0.5, 500);
   cam.position.set(Math.cos(pitch) * Math.cos(yaw) * dist, H * 0.4 + Math.sin(pitch) * dist, Math.cos(pitch) * Math.sin(yaw) * dist); cam.lookAt(0, H * 0.4, 0);
   renderer.setViewport(cx, Hh - cy - vh, vw, vh); renderer.setScissor(cx, Hh - cy - vh, vw, vh); renderer.render(scene, cam);
   const el = document.createElement('div'); el.className = 'l'; el.style.left = (cx + 10) + 'px'; el.style.top = (cy + 8) + 'px'; el.textContent = race + ' · ' + def + ' · ' + name; lab.appendChild(el); });
-const t = document.createElement('div'); t.className = 'l'; t.style.right = '10px'; t.style.bottom = '8px'; t.textContent = Math.round(info.tris) + ' tri + ' + Math.round(info.emTris) + ' emissivos · largura ' + info.width.toFixed(1) + ' · altura ' + info.height.toFixed(1) + (info.beam ? ' · emissor do feixe ' + info.beam.map(v => v.toFixed(1)).join(',') : ''); lab.appendChild(t);
+const t = document.createElement('div'); t.className = 'l'; t.style.right = '10px'; t.style.bottom = '8px'; t.textContent = Math.round(info.tris) + ' tri + ' + Math.round(info.emTris) + ' emissivos · largura ' + info.width.toFixed(1) + ' · altura ' + info.height.toFixed(1) + (ruina ? ' · peças soltas ' + info.pieces : '') + (info.beam ? ' · emissor do feixe ' + info.beam.map(v => v.toFixed(1)).join(',') : ''); lab.appendChild(t);
 window.__info = info; window.__done = true;
 </script></body></html>
