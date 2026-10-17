@@ -17,7 +17,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.3d';
+const VERSION = '4.3e';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -385,6 +385,7 @@ function startGame(cfg, netCtx) {
     if (G.lead3d && ARD.leaders3d && G.frameN % 300 === 0) { const n = S.nucleoOf(sim, human); const mine = S.armyValue(sim, human); let foe = 0; for (const q of sim.players) if (q.alive && q.id !== human && !S.hasPact(sim, human, q.id)) foe = Math.max(foe, S.armyValue(sim, q.id)); ARD.leaders3d.baseMood(G.lead3d, !n || n.hp < n.maxHp * 0.5 || (foe > 600 && mine < foe * 0.45) ? 4 : (mine > 1500 && mine > foe * 1.8) ? 3 : 1); }
     if (G.camp && G.frameN % 10 === 0) { G.camp.frame(); if (R.setBeacon) R.setBeacon(G.camp.beacon(), G.camp.vip()); }
     R.draw(sim, view, G.paused ? 1 : Math.min(1, G.acc / S.TICK), dt);
+    if (G.lead3d && ARD.leaders3d && ARD.leaders3d.setLight && R.lightSt && (G.frameN % 15 === 0 || R.lightSt.flash > 0.2)) ARD.leaders3d.setLight(G.lead3d, R.lightSt); /* 4.3e: o retrato do líder recebe a luz do mapa (dia, noite, clima, relâmpago) */
     if (G.autoSave && !G.ended && sim.tick !== G.savedTick && now - (G.lastSave || 0) > 10000) { G.lastSave = now; G.savedTick = sim.tick; (window.requestIdleCallback || ((f) => setTimeout(f, 0)))(() => G.saveNow('auto'), { timeout: 2000 }); }
     requestAnimationFrame(frame);
   }

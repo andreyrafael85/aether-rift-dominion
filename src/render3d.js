@@ -158,7 +158,7 @@ function create(canvas, overlay, mini) {
     const pm = new THREE.PMREMGenerator(renderer); const rt = pm.fromScene(es, 0.025, 0.1, 400); pm.dispose(); sk.geometry.dispose(); sk.material.dispose(); gd.geometry.dispose(); gd.material.dispose();
     if (envRT) envRT.dispose(); envRT = rt; scene.environment = rt.texture; scene.environmentIntensity = R.envSkyK; R.envSky = true; } catch (err) { console.warn('[ARD] reflexo do céu indisponível: ' + err.message); } }
   R.sunDir = [-470, 640, 600]; /* 40° de elevação (antes 49°): sombras mais longas */ /* 4.3b: direção do sol (luz, céu, reflexo e bruma usam a mesma) */
-  R.lightK = { sun: 1.3, hemi: 0.68, amb: 0.5 }; R.atmoK = { haze: 0.6, hh: 220, air: 1.25, sun: 0.32, cloud: 0.2, warm: 0.36 }; /* 4.3c: camada de bruma mais alta e mais rala (o relevo novo tem vales e mesas) */ R.gradeK = { gain: 1.12, sat: 1.2, con: 1.1, vig: 0.26 }; R.ppFx = () => ({ aoPass, atmoFx, gradeFx, bloomFx, toneFx, composer, PP: window.THREE_PP }); /* 4.3b: o céu agora ilumina pelo reflexo de ambiente; hemisfério e ambiente ficam menores */
+  R.lightK = { sun: 1.3, hemi: 0.68, amb: 0.5 }; R.lightSt = { sun: [1, 0.91, 0.77], sunI: 1.6, sky: [0.62, 0.69, 0.77], ground: [0.3, 0.27, 0.24], night: 0, flash: 0 }; /* 4.3e */ R.atmoK = { haze: 0.6, hh: 220, air: 1.25, sun: 0.32, cloud: 0.2, warm: 0.36 }; /* 4.3c: camada de bruma mais alta e mais rala (o relevo novo tem vales e mesas) */ R.gradeK = { gain: 1.12, sat: 1.2, con: 1.1, vig: 0.26 }; R.ppFx = () => ({ aoPass, atmoFx, gradeFx, bloomFx, toneFx, composer, PP: window.THREE_PP }); /* 4.3b: o céu agora ilumina pelo reflexo de ambiente; hemisfério e ambiente ficam menores */
   R.skyEnv = skyEnv; R.cine = true; R.envSkyK = +(new URLSearchParams(location.search).get('envk') || 0.68);
   R.setQuality('auto');
   const lightPool = []; for (let i = 0; i < 10; i++) { const l = new THREE.PointLight(0xffc070, 0, 220, 2); scene.add(l); lightPool.push(l); }
@@ -281,6 +281,7 @@ function create(canvas, overlay, mini) {
     vorag: { roughness: 0.28, metalness: 0.04, rim: [0.95, 0.3, 0.38], pow: 2.6, amt: 0.32 }, // quitina úmida: specular forte, borda carmim
   };
   const SPIN = { voz: 1.6, harmonico: 2.2, diapasao: 0.8, monolito: 0.35 }; // Quorith gira para "olhar"
+  const SQUAD_ON = !/sem=[^&]*esquadrao/.test(location.search); /* 4.3e: ?sem=esquadrao volta à figura única */ const SQ_N = { cria: 3 }; const HOVER_INF = { voz: 1 }; const SQ_S = { 2: 0.7, 3: 0.62, 4: 0.55 }; const SQ_FORM = { 2: [[0.32, 0.5], [-0.32, -0.5]], 3: [[0.6, 0], [-0.46, 0.74], [-0.46, -0.74]], 4: [[0.52, 0.46], [0.52, -0.46], [-0.52, 0.46], [-0.52, -0.46]] }; const SQ_H = { _: 12.5, soldador: 13, voz: 13.5, quimera: 12 }; /* 4.3e: altura-alvo das figuras de perto (os modelos esguios ficavam mais altos que os tanques); criaturas baixas seguem limitadas pela largura */
 
   const raceMats = new Map();
   const RACE_ENV = { vehnar: 0.75, erevane: 0.9, tessara: 0.4, quorith: 0.85, vorag: 0.7 };
@@ -314,11 +315,11 @@ function create(canvas, overlay, mini) {
   }
   function animAttr(it, cap) { const old = it.ia, oldC = it.ic; const a = new THREE.InstancedBufferAttribute(new Float32Array(cap * 4), 4); a.setUsage(THREE.DynamicDrawUsage); if (old) a.array.set(old.array.subarray(0, Math.min(old.array.length, cap * 4))); const c = new THREE.InstancedBufferAttribute(new Float32Array(cap), 1); c.setUsage(THREE.DynamicDrawUsage); if (oldC) c.array.set(oldC.array.subarray(0, Math.min(oldC.array.length, cap))); it.ia = a; it.ic = c; for (const gg of [it.geo.main, it.geo.em]) if (gg) { gg.setAttribute('aInst', a); gg.setAttribute('aInstC', c); } } // 4.2b: distância, tempo, movimento e recuo por instância
   function grow(it) { const cap = it.cap * 2; if (it.anim) animAttr(it, cap); for (const k of ['main', 'em']) { const old = it[k]; if (!old) continue; const m = new THREE.InstancedMesh(old.geometry, old.material, cap); m.frustumCulled = false; m.castShadow = old.castShadow; m.receiveShadow = old.receiveShadow; if (old.customDepthMaterial) m.customDepthMaterial = old.customDepthMaterial; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.remove(old); old.dispose(); scene.add(m); it[k] = m; } it.cap = cap; }
-  const ZERO4 = [0, 0, 0, 0];
-  function put(it, x, y, z, ang, scale, scaleY, tint, ia, emTint) { // 4.2h: emTint = brilho da parte emissiva (nó secando apaga)
+  const ZERO4 = [0, 0, 0, 0]; const _qT = new THREE.Quaternion(), AXZ = new THREE.Vector3(0, 0, 1); /* 4.3e */
+  function put(it, x, y, z, ang, scale, scaleY, tint, ia, emTint, tilt) { // 4.2h: emTint = brilho da parte emissiva (nó secando apaga); 4.3e: tilt = tombo em torno do eixo lateral (figura caindo)
     if (it.n >= it.cap) grow(it);
     if (it.anim) { const v = ia || ZERO4; const o = it.n * 4; it.ia.array[o] = v[0]; it.ia.array[o + 1] = v[1]; it.ia.array[o + 2] = v[2]; it.ia.array[o + 3] = v[3]; it.ic.array[it.n] = v[4] || 0; }
-    _p.set(x, H(x, y) + (z || 0), -y); _q.setFromAxisAngle(UP, ang || 0); _s.set(scale, scale * (scaleY == null ? 1 : scaleY), scale); _m.compose(_p, _q, _s);
+    _p.set(x, H(x, y) + (z || 0), -y); _q.setFromAxisAngle(UP, ang || 0); if (tilt) _q.multiply(_qT.setFromAxisAngle(AXZ, tilt)); _s.set(scale, scale * (scaleY == null ? 1 : scaleY), scale); _m.compose(_p, _q, _s);
     it.main.setMatrixAt(it.n, _m); _c.setScalar(tint == null ? 1 : tint); it.main.setColorAt(it.n, _c);
     if (it.em) { it.em.setMatrixAt(it.n, _m); if (emTint != null) _c.setScalar(emTint); it.em.setColorAt(it.n, _c); }
     it.n++;
@@ -498,7 +499,7 @@ function create(canvas, overlay, mini) {
   }
   function lerp(e, a) { return [e.px + (e.x - e.px) * a, e.py + (e.y - e.py) * a]; }
   // 4.2b: estado visual por entidade para a animação procedural (distância rodada, movimento suavizado, recuo do disparo)
-  const AN = new Map(); let anSweep = 0; const ACT = { pleno: 1, racionado: 0.55, colapso: 0.2 };
+  const AN = new Map(), SQ = new Map(); let anSweep = 0; /* 4.3e: SQ = esquadrão (figura que acabou de cair) */ const ACT = { pleno: 1, racionado: 0.55, colapso: 0.2 };
   function animFor(e, wx, wy, fit, dt, sim) {
     let st = AN.get(e.id); if (!st) { st = { x: wx, y: wy, trav: 0, mov: 0, rec: 0, seen: 0, ph: (e.id % 97) * 0.37, clk: (e.id % 97) * 0.37 }; AN.set(e.id, st); }
     st.seen = R.time;
@@ -511,7 +512,7 @@ function create(canvas, overlay, mini) {
   R.draw = function (sim, view, alpha, dt) {
     if (R.measureGL) { renderer.info.autoReset = false; renderer.info.reset(); }
     R.sim = sim; R.time += dt; R.revealAll = !!view.reveal; updateFx(dt); if (R.terrShader) R.terrShader.uniforms.uCloudT.value = R.time; if (terrU) terrU.uTime.value = R.time; /* 4.3c */
-    const cam = view.cam, human = view.human, me = sim.players[human]; const vis = view.reveal ? { has: () => true } : sim.vis[human]; const explored = sim.explored[human];
+    const cam = view.cam, human = view.human, me = sim.players[human]; const sqB = Math.max(1, Math.min(1.4, 1 + (2.4 - (cam.zoom || 1)) * 0.22)); /* 4.3e: de longe as figuras da infantaria crescem até 1,3–1,4× para o esquadrão continuar legível; de perto ficam na escala real */ const vis = view.reveal ? { has: () => true } : sim.vis[human]; const explored = sim.explored[human];
     R.night = R.forceDay ? 0 : (1 - Math.cos(TAU * sim.time / 750)) / 2;
     R.shakeX = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0; R.shakeY = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0;
     updateCamera(cam);
@@ -529,6 +530,7 @@ function create(canvas, overlay, mini) {
     }
     scene.background = bg; scene.fog.color.copy(bg);
     matEm.color.setScalar(1 + 0.9 * nt); // 4.2d: janelas e luzes das estruturas acendem à noite
+    { const LS = R.lightSt; LS.sun[0] = sun.color.r; LS.sun[1] = sun.color.g; LS.sun[2] = sun.color.b; LS.sunI = 1.6 * (1 - nt) + 0.55 * nt; LS.sky[0] = bg.r; LS.sky[1] = bg.g; LS.sky[2] = bg.b; LS.ground[0] = hemi.groundColor.r; LS.ground[1] = hemi.groundColor.g; LS.ground[2] = hemi.groundColor.b; LS.night = nt; LS.flash = Math.min(1, (lightning || 0) * 1.5); } /* 4.3e: luz do mapa para o retrato do líder no HUD */
     const GU = gradePass ? gradePass.uniforms : gradeFx ? gradeFx.U : null; if (GU) { const u = GU; const fac = me ? me.faction : 'vehnar'; const acc = { vehnar: [1.04, 1.0, 0.95], erevane: [0.97, 1.01, 1.04], tessara: [1.0, 1.03, 0.96], quorith: [1.02, 0.98, 1.05], vorag: [1.05, 0.98, 0.97] }[fac] || [1, 1, 1];
       let gx = acc[0], gy = acc[1], gz = acc[2]; if (cl && cl.tint) { gx *= 0.92 + cl.tint[0] * 0.2; gy *= 0.92 + cl.tint[1] * 0.2; gz *= 0.92 + cl.tint[2] * 0.2; } gx = gx * (1 - 0.1 * nt); gy = gy * (1 - 0.05 * nt); gz = gz * (1 + 0.08 * nt);
       const GK = R.gradeK; u.uGain.value.set(gx * GK.gain, gy * GK.gain, gz * GK.gain); u.uSat.value = GK.sat - 0.22 * nt; u.uCon.value = GK.con + 0.04 * nt; u.uVig.value = GK.vig + 0.12 * nt; }
@@ -573,7 +575,7 @@ function create(canvas, overlay, mini) {
       _sph.center.set(wx, H(wx, wy) + 6, -wy); _sph.radius = e.r * 1.6 + (isUnit ? 45 : 80); if (!_frus.intersectsSphere(_sph) && !view.sel.has(e.id)) continue;
       const parts = MD.PARTS[e.def]; const hullDef = parts ? parts.hull : e.def; const lo = isUnit && LOD_ON && (isTouch || camera.position.distanceToSquared(_lp.set(wx, H(wx, wy), -wy)) > LOD_D2); /* 4.3d: unidade longe da câmera usa a versão leve */ const it = instOf(hullDef, e.owner, (e.def === 'nucleo' && R.skins && R.skins[e.owner]) || 0, false, lo); /* 4.0e: Núcleo do Hangar */ const g = lo ? geoOf(hullDef, e.owner, 0) : it.geo; let fit = fitOf(e, g); if (e.def === 'nucleo') { const op = sim.players[e.owner] || {}; fit *= 1 + 0.12 * ((op.era || 1) - 1) + (op.evolveT > 0 ? 0.025 * Math.sin(R.time * 6) : 0); } /* 4.1d: o Núcleo cresce a cada Era e pulsa enquanto evolui */
       const zz = isUnit && ud.flying ? 14 : 0; const moving = isUnit && (e.x !== e.px || e.y !== e.py); const bob = moving && (e.def === 'infantaria' || e.def === 'quimera' || e.def === 'soldador' || e.def === 'atirador' || e.def === 'agulha') ? Math.abs(Math.sin(R.time * 11 + e.id)) * 1.2 : moving && (e.def === 'cria' || e.def === 'cuspidor') ? Math.abs(Math.sin(R.time * 15 + e.id)) * 1.0 : moving && (e.def === 'prensa' || e.def === 'colosso' || e.def === 'brutamonte') ? Math.abs(Math.sin(R.time * 5 + e.id)) * 2.2 : (e.def === 'voz' || e.def === 'diapasao' || e.def === 'monolito' || e.def === 'prisma') ? 2 + Math.sin(R.time * 2.5 + e.id) * 1.2 : 0;
-      const dmg = !isUnit && e.built && e.hp < e.maxHp * 0.5; const tint = e.cloaked ? 0.55 : dmg ? 0.6 : 1;
+      const dmg = !isUnit && e.built && e.hp < e.maxHp * 0.5; const tint = e.cloaked ? 0.55 : dmg ? 0.6 : 1; let figFit = 0;
       let hvN = null; if (isUnit && e.def === 'coletor' && e.state === 'harvest') { const nd = sim.byId.get(e.node); if (nd && nd.alive && nd.amount > 0 && Math.hypot(nd.x - wx, nd.y - wy) <= e.r + nd.r + 12) hvN = nd; } /* 4.3a: colhendo, olha para o nó (só visual) */
       if (!isUnit && !e.built) { // 4.0a — nascimento de construção com assinatura por Raça
         const pr = Math.min(1, Math.max(0.04, e.progress || 0)); const fac2 = (sim.players[e.owner] || {}).faction; const pp = R.quality.particles;
@@ -599,14 +601,23 @@ function create(canvas, overlay, mini) {
           if (Math.random() < 0.2 * pp) spark(wx + (Math.random() - .5) * e.r * 1.3, wy + (Math.random() - .5) * e.r * 1.3, ((k + fr) / 5) * g.height * fit * 0.9 + 2, [1, 0.82, 0.45], 42, true);
           if (Math.random() < 0.07 * pp) smoke(wx, wy, 4, [0.5, 0.5, 0.52], 1.5, 14);
         }
-      } else put(it, wx, wy, zz + bob, (hvN ? Math.atan2(hvN.y - wy, hvN.x - wx) : (isUnit || ud.wall ? (e.ang || 0) : 0)) + (isUnit && SPIN[e.def] ? R.time * SPIN[e.def] : 0), fit, 1, tint, (it.anim || parts) ? animFor(e, wx, wy, fit, dt, sim) : null);
+      } else if (isUnit && SQUAD_ON && ud.cls === 'inf' && !ud.epic) { /* 4.3e: infantaria em esquadrão — três figuras menores em formação; caem conforme a vida (3 → 2 → 1) */
+        const nm = SQ_N[e.def] || 3, alive = Math.max(1, Math.min(nm, Math.ceil(nm * e.hp / Math.max(1, e.maxHp) - 0.001))), sk = SQ_S[nm] || 0.62, sf = Math.min(fit * sk, (SQ_H[e.def] || SQ_H._) / Math.max(0.1, g.height)) * sqB, spr = e.r * (0.5 + 0.5 * sqB); figFit = sf; const fire = sim.time - (e.lastAttack || -99) < 1.4; const a0 = (fire ? e.aimAng : e.ang) || 0, ca = Math.cos(a0), sa = Math.sin(a0); const base = it.anim ? animFor(e, wx, wy, fit, dt, sim) : null; const FO = SQ_FORM[nm] || SQ_FORM[3];
+        for (let m = 0; m < alive; m++) { const o = FO[m]; const ox = (o[0] * ca - o[1] * sa) * spr, oy = (o[0] * sa + o[1] * ca) * spr; const hm = ((e.id * 7 + m * 13) % 17) / 17; const bm = HOVER_INF[e.def] ? (2 + Math.sin(R.time * 2.5 + e.id + m * 2.1) * 1.2) * sk : moving ? Math.abs(Math.sin(R.time * 11 + e.id + m * 1.9)) * 1.2 * sk : 0; /* voz flutua; os outros sobem e descem no passo */
+          const ia = base ? [base[0] / sk + m * 2.3, base[1] + m * 0.83, base[2], fire ? base[3] * (m === ((e.id + Math.floor(R.time * 2.3)) % alive) ? 1 : 0.35) : base[3], base[4] + m * 0.61] : null;
+          put(it, wx + ox, wy + oy, zz + bm, a0 + (hm - 0.5) * 0.22 + (SPIN[e.def] ? R.time * SPIN[e.def] : 0), sf * (0.94 + 0.12 * hm), 1, tint, ia); }
+        let q = SQ.get(e.id); if (!q) { q = { n: alive, t: -9, x: 0, y: 0, a: 0, s: 0, m: 0, seen: 0 }; SQ.set(e.id, q); } q.seen = R.time; /* 4.3e: a figura que perde a vida tomba para trás e afunda no chão onde estava */
+        if (alive < q.n) { const m = Math.min(alive, FO.length - 1), o = FO[m]; q.x = wx + (o[0] * ca - o[1] * sa) * spr; q.y = wy + (o[0] * sa + o[1] * ca) * spr; q.a = a0 + (((e.id * 7 + m * 13) % 17) / 17 - 0.5) * 0.22; q.s = sf; q.m = m; q.t = R.time; } q.n = alive;
+        const kf = (R.time - q.t) / 1.3; if (kf >= 0 && kf < 1 && !HOVER_INF[e.def]) { const fall = Math.min(1, kf * 2.4); put(it, q.x, q.y, zz - Math.max(0, kf - 0.55) * 7 * q.s, q.a + (q.m % 2 ? 0.7 : -0.7), q.s, 1, tint * (1 - 0.45 * kf), null, 1 - kf, fall * fall * 1.45); }
+        else if (kf >= 0 && kf < 1) put(it, q.x, q.y, zz + (2 - kf * 6) * q.s, q.a + kf * 9, q.s * (1 - kf), 1, tint, null, 1 + 2 * (1 - kf)); }
+      else put(it, wx, wy, zz + bob, (hvN ? Math.atan2(hvN.y - wy, hvN.x - wx) : (isUnit || ud.wall ? (e.ang || 0) : 0)) + (isUnit && SPIN[e.def] ? R.time * SPIN[e.def] : 0), fit, 1, tint, (it.anim || parts) ? animFor(e, wx, wy, fit, dt, sim) : null);
       if (hvN && nMine < 252) { const nd = hvN; { /* 4.3a: colhendo */
         const bm = g.beam || [g.width * 0.48, g.height * 0.45, 0]; const a = Math.atan2(nd.y - wy, nd.x - wx), ca = Math.cos(a), sa = Math.sin(a); const gy = H(wx, wy) + zz; const tx = nd.x + Math.sin(R.time * 1.7 + e.id) * nd.r * 0.25, ty = nd.y + Math.cos(R.time * 1.3 + e.id) * nd.r * 0.25, th = H(nd.x, nd.y) + 3.2; const col = BEAM_COL[nd.res] || BEAM_COL.minerio; const fl = 0.8 + 0.2 * Math.sin(R.time * 37 + e.id * 3);
         for (const side of [-0.45, 0.45]) { const lx = bm[0], lz = bm[2] + side; const ex = wx + (lx * ca + lz * sa) * fit, ez = -wy + (-lx * sa + lz * ca) * fit, ey = gy + bm[1] * fit; nMine = beamTo(nMine, ex, ey, ez, tx, th, -ty, 0.22, col, 1.7 * fl); nMine = beamTo(nMine, ex, ey, ez, tx, th, -ty, 0.75, col, 0.34 * fl); }
         if (FX) { const pp = R.quality.particles; if (Math.random() < 0.35 * pp) FX.glow(tx, th, -ty, col, 3.4, 0.24); if (Math.random() < 0.09 * pp) FX.spark(tx, th, -ty, col, 22, 2); if (Math.random() < 0.05 * pp) FX.smoke(tx, H(tx, ty) + 1, -ty, [0.42, 0.36, 0.3], 1.4, 5, 3); } } }
       if (parts && (isUnit || e.built)) { const tt = instOf(parts.turret, e.owner, 0, false, lo); put(tt, wx, wy, zz + bob + (g.mount != null ? g.mount : parts.z) * fit, e.aimAng != null ? e.aimAng : (e.ang || 0), fit, 1, tint, tt.anim ? animFor(e, wx, wy, fit, 0, sim) : null); }
       if (view.sel.has(e.id)) { nSel = ring(nSel, wx, wy, e.r + 5); if (!isUnit && ud.attack && nRange < 32) { _p.set(wx, H(wx, wy) + 0.6, -wy); _s.set(ud.attack.range, 1, ud.attack.range); _q.identity(); _m.compose(_p, _q, _s); rangeRings.setMatrixAt(nRange++, _m); } }
-      if (e.hp < e.maxHp - 0.5 || view.sel.has(e.id) || (isUnit && e.rank > 0)) hpList.push({ x: wx, y: wy, z: zz + g.height * fit + 4, w: Math.max(16, e.r * 1.4), frac: e.hp / e.maxHp, rank: isUnit ? e.rank : 0, cloak: e.cloaked && own, r: e.r });
+      if (e.hp < e.maxHp - 0.5 || view.sel.has(e.id) || (isUnit && e.rank > 0)) hpList.push({ x: wx, y: wy, z: zz + g.height * (figFit || fit) + 4, w: Math.max(16, e.r * 1.4), frac: e.hp / e.maxHp, rank: isUnit ? e.rank : 0, cloak: e.cloaked && own, r: e.r });
       if (!isUnit && e.built && (e.def === 'nucleo' || e.def === 'nodulo')) flags.push(e);
       if (isUnit && e.vip) nSel = ring(nSel, wx, wy, e.r + 10); // 4.0e: Arca da escolta
       if (isUnit && e.rank >= 2 && nVet < 256) { const pul = e.rank >= 3 ? 1 + 0.08 * Math.sin(R.time * 4 + e.id) : 1; _p.set(wx, H(wx, wy) + 0.65, -wy); _s.set((e.r + 3) * pul, 1, (e.r + 3) * pul); _q.identity(); _m.compose(_p, _q, _s); vetRings.setMatrixAt(nVet++, _m); if (FX && e.rank >= 3 && Math.random() < 0.02 * FX.mult) FX.glow(wx + (Math.random() - 0.5) * e.r, H(wx, wy) + 4 + Math.random() * e.r, -wy + (Math.random() - 0.5) * e.r, [1.5, 1.15, 0.4], 2.2, 0.9, 14); } // 4.2e: anel dourado ★★ e brilho ★★★
@@ -619,7 +630,7 @@ function create(canvas, overlay, mini) {
     { let nh = 0; beamMat2.uniforms.uK.value = Math.max(0, (nt - 0.25) / 0.75) * 0.55; if (nt > 0.25) for (const e of sim.ents) { if (nh >= 160) break; if (!e.alive || e.kind !== 'unit') continue; const ud = S.UNITS[e.def]; if (!ud || ud.flying || (ud.cls !== 'vei' && e.def !== 'coletor' && e.def !== 'pirata')) continue; if (e.owner !== human && !vis.has(e.id)) continue;
         const a = e.ang || 0; const len = 46 + e.r * 2, wid = 26 + e.r; const x = e.x + Math.cos(a) * e.r * 0.8, y = e.y + Math.sin(a) * e.r * 0.8; _p.set(x, H(x, y) + 0.5, -y); _q.setFromAxisAngle(UP, a - Math.PI / 2); _s.set(wid, 1, len); _m.compose(_p, _q, _s); headlights.setMatrixAt(nh++, _m); }
       headlights.count = nh; headlights.instanceMatrix.needsUpdate = true; }
-    if ((anSweep += dt) > 5) { anSweep = 0; for (const [id, st] of AN) if (R.time - st.seen > 4) AN.delete(id); }
+    if ((anSweep += dt) > 5) { anSweep = 0; for (const [id, st] of AN) if (R.time - st.seen > 4) AN.delete(id); for (const [id, q] of SQ) if (R.time - q.seen > 4) SQ.delete(id); }
     drawFlags(flags, sim, cam.yaw);
     if (R.beaconPt) { nSel = ring(nSel, R.beaconPt.x, R.beaconPt.y, 70); nSel = ring(nSel, R.beaconPt.x, R.beaconPt.y, 52 + 10 * Math.sin(R.time * 3)); if (!R.beaconMesh) { R.beaconMesh = new THREE.Mesh(new THREE.CylinderGeometry(7, 12, 260, 16, 1, true).translate(0, 130, 0), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.6, 1.25, 0.5), transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); scene.add(R.beaconMesh); } R.beaconMesh.visible = true; R.beaconMesh.position.set(R.beaconPt.x, H(R.beaconPt.x, R.beaconPt.y), -R.beaconPt.y); } else if (R.beaconMesh) R.beaconMesh.visible = false;
     for (const [id, m] of view.memory) { if (vis.has(id)) continue; const it = instOf(MD.PARTS[m.def] ? MD.PARTS[m.def].hull : m.def, m.owner, 0); put(it, m.x, m.y, 0, 0, 2 * S.BUILDINGS[m.def].r * 1.25 / it.geo.width, 1, 0.45); }

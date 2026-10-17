@@ -9,7 +9,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-window.THREE = THREE;
+window.THREE = THREE; window.THREE_ADDONS = { RoomEnvironment }; /* 4.3e: igual ao jogo, para o ../src/leaders3d.js (fonte única dos bustos) */
 const RACES = {
   vehnar:  { c: 0xff7733, c2: 0xffc08a, dk: 0x1a1210, neb: ['#6a2c10', '#a0501a'], pl: ['#1a120c', '#5a3a22', '#a06a3a', '#e6b070'], ground: ['#2a2420', '#5a4a3a', '#8a7a62'], atmo: 0xff9a4a, bands: true, style: 'vehnar' },
   erevane: { c: 0x33ffd0, c2: 0xaef7e8, dk: 0x0a1218, neb: ['#0d3a4a', '#135a4a'], pl: ['#070c14', '#14283a', '#2f5a78', '#9fd8f0'], ground: ['#101a24', '#2a4a5e', '#6a93aa'], atmo: 0x33ffd0, bands: false, style: 'erevane' },
@@ -21,7 +21,7 @@ const RACE_IDS = Object.keys(RACES);
 let renderer, pmrem, envTex;
 function setup(w, h) {
   if (!renderer) { renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; document.body.appendChild(renderer.domElement); pmrem = new THREE.PMREMGenerator(renderer); envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture; }
-  renderer.setPixelRatio(1); renderer.setSize(w, h, false);
+  renderer.setPixelRatio(1); renderer.setSize(w, h, false); renderer.toneMappingExposure = 1.05; /* 4.3e: a cena 'head' usa a exposição do jogo; as outras voltam a 1,05 */
 }
 // ---------- ruído ----------
 function hash3(x, y, z) { let n = (x * 374761393 + y * 668265263 + z * 2147483647) | 0; n = (n ^ (n >> 13)) * 1274126177; n = n ^ (n >> 16); return (n & 0x7fffffff) / 0x7fffffff; }
@@ -217,96 +217,14 @@ function sceneLogo(S, v) {
   S.cam.fov = 30; S.cam.updateProjectionMatrix(); S.cam.position.set(6, 4, 52); S.cam.lookAt(0, -2.4, 0); S.bloom.strength = v === 1 ? 0.6 : v === 2 ? 0.9 : 0.7; S.bloom.threshold = v === 3 ? 0.95 : 0.82;
 }
 
-// ---------- cabeças cartoon dos líderes (3D, expressivas) ----------
-function matSkin(color, extra) { return new THREE.MeshPhysicalMaterial(Object.assign({ color, roughness: 0.42, metalness: 0, clearcoat: 0.7, clearcoatRoughness: 0.25, envMapIntensity: 0.6 }, extra || {})); }
-function eye(grp, x, y, z, r, iris, open, look, pupil, glow) {
-  const e = new THREE.Group(); e.position.set(x, y, z); open = Math.max(0.12, open);
-  const white = new THREE.Mesh(new THREE.SphereGeometry(r, 32, 24), new THREE.MeshPhysicalMaterial({ color: 0xf6f7ff, roughness: 0.18, clearcoat: 1 })); white.scale.y = open; e.add(white);
-  const ir = new THREE.Mesh(new THREE.SphereGeometry(r * 0.56, 24, 16), new THREE.MeshStandardMaterial({ color: iris, emissive: iris, emissiveIntensity: glow == null ? 0.6 : glow, roughness: 0.3 })); ir.position.set(look[0] * r * 0.3, look[1] * r * 0.3 * open, r * 0.7); ir.scale.set(1, open, 0.5); e.add(ir);
-  const pu = new THREE.Mesh(new THREE.SphereGeometry(r * 0.27 * pupil, 16, 12), new THREE.MeshStandardMaterial({ color: 0x050608, roughness: 0.2 })); pu.position.set(look[0] * r * 0.34, look[1] * r * 0.34 * open, r * 0.93); pu.scale.set(1, Math.min(1, open * 1.1), 0.4); e.add(pu);
-  const hl = new THREE.Mesh(new THREE.SphereGeometry(r * 0.13, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffffff })); hl.position.set(-r * 0.2, r * 0.26 * open, r * 1.0); e.add(hl);
-  grp.add(e); return e;
-}
-function brow(grp, x, y, z, angle, w, color, thick) { const b = new THREE.Mesh(new THREE.CapsuleGeometry(thick || 0.07, w, 4, 12), new THREE.MeshStandardMaterial({ color, roughness: 0.6 })); b.position.set(x, y, z); b.rotation.z = Math.PI / 2 + angle; grp.add(b); return b; }
-function mouth(grp, type, y, z, w, color) {
-  if (type === 'open' || type === 'grin') { const sh = new THREE.Shape(); sh.moveTo(-w, 0); sh.quadraticCurveTo(0, type === 'grin' ? -w * 0.55 : -w * 1.0, w, 0); sh.quadraticCurveTo(0, type === 'grin' ? w * 0.3 : w * 0.12, -w, 0); const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.22, bevelEnabled: true, bevelSize: 0.03, bevelThickness: 0.03 }), new THREE.MeshStandardMaterial({ color: 0x24060c, roughness: 0.55 })); m.position.set(0, y, z - 0.12); grp.add(m);
-    if (type === 'grin') { const t = new THREE.Mesh(new THREE.BoxGeometry(w * 1.5, w * 0.22, 0.08), new THREE.MeshStandardMaterial({ color: 0xf4f0e6, roughness: 0.3 })); t.position.set(0, y - w * 0.05, z + 0.1); grp.add(t); } return m; }
-  const pts = type === 'smirk' ? [[-w, -0.02 * w], [-w * 0.5, -0.08 * w], [0, -0.05 * w], [w * 0.5, 0.06 * w], [w, 0.32 * w]] : type === 'smile' ? [[-w, 0.18 * w], [-w * 0.5, -0.06 * w], [0, -0.16 * w], [w * 0.5, -0.06 * w], [w, 0.18 * w]] : [[-w, -0.16 * w], [-w * 0.5, 0.04 * w], [0, 0.1 * w], [w * 0.5, 0.04 * w], [w, -0.16 * w]];
-  const curve = new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(p[0], y + p[1], z))); const m = new THREE.Mesh(new THREE.TubeGeometry(curve, 24, w * 0.09, 10, false), new THREE.MeshStandardMaterial({ color, roughness: 0.6 })); grp.add(m); return m;
-}
-function tooth(grp, x, y, z, h, r, up, color) { const t = new THREE.Mesh(new THREE.ConeGeometry(r, h, 10), new THREE.MeshStandardMaterial({ color: color || 0xf0e6d2, roughness: 0.4 })); t.position.set(x, y, z); if (!up) t.rotation.x = Math.PI; grp.add(t); return t; }
-const EXPR = { 1: { open: 0.95, brow: 0.0, mouth: 'smile', look: [0, 0], pupil: 1, name: 'sereno' }, 2: { open: 0.5, brow: 0.6, mouth: 'open', look: [0, -0.3], pupil: 0.7, name: 'furioso' }, 3: { open: 1.12, brow: -0.35, mouth: 'grin', look: [0.2, 0.3], pupil: 1.15, name: 'triunfante' } };
-function sceneHead(S, race, v) {
-  const R = RACES[race], X = EXPR[v]; S.scene.background = new THREE.Color(R.dk); S.scene.environment = envTex; renderer.shadowMap.enabled = true;
-  const g = new THREE.Group(); S.scene.add(g); g.position.y = 0.1;
-  const dark = new THREE.MeshStandardMaterial({ color: 0x1b1e26, roughness: 0.5, metalness: 0.6 });
-  if (race === 'vehnar') {
-    const head = new THREE.Mesh(new THREE.SphereGeometry(1, 48, 32), matSkin(0xa88a70)); head.scale.set(1, 0.92, 0.95); g.add(head);
-    const helm = new THREE.Mesh(new THREE.SphereGeometry(1.1, 48, 32, 0, Math.PI * 2, 0, Math.PI * 0.55), new THREE.MeshStandardMaterial({ color: 0x59627a, roughness: 0.35, metalness: 0.85, envMapIntensity: 0.9 })); helm.position.y = 0.12; g.add(helm);
-    const brim = new THREE.Mesh(new THREE.TorusGeometry(1.06, 0.08, 12, 64), new THREE.MeshStandardMaterial({ color: 0x3a4150, metalness: 0.9, roughness: 0.3 })); brim.rotation.x = Math.PI / 2; brim.position.y = 0.2; g.add(brim);
-    for (let k = 0; k < 6; k++) { const a = -0.9 + k * 0.36; const rv = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 8), new THREE.MeshStandardMaterial({ color: 0xb0b8c6, metalness: 1, roughness: 0.3 })); rv.position.set(Math.sin(a) * 1.08, 0.22, Math.cos(a) * 1.08); g.add(rv); }
-    const plate = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.34, 0.1), new THREE.MeshStandardMaterial({ color: 0x7d8795, metalness: 0.9, roughness: 0.35 })); plate.position.set(0.62, -0.12, 0.72); plate.rotation.y = 0.6; g.add(plate);
-    eye(g, -0.36, 0.05, 0.86, 0.25, 0xff7733, X.open, X.look, X.pupil, 1.2); eye(g, 0.36, 0.05, 0.86, 0.25, 0xff7733, X.open, X.look, X.pupil, 1.2);
-    brow(g, -0.38, 0.42, 0.9, -X.brow, 0.3, 0x2a2f38, 0.06); brow(g, 0.38, 0.42, 0.9, X.brow, 0.3, 0x2a2f38, 0.06);
-    const vis = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.06, 0.08), new THREE.MeshStandardMaterial({ color: 0xff7733, emissive: 0xff7733, emissiveIntensity: 1.6 })); vis.position.set(0, 0.3, 0.98); g.add(vis);
-    if (X.mouth === 'open') mouth(g, 'open', -0.5, 0.95, 0.32); else { for (let k = -2; k <= 2; k++) { const bar = new THREE.Mesh(new THREE.BoxGeometry(0.07, X.mouth === 'grin' ? 0.22 : 0.16, 0.08), dark); bar.position.set(k * 0.13, -0.5 + (X.mouth === 'grin' ? -Math.abs(k) * 0.03 : 0), 0.93); g.add(bar); } }
-    const torso = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.25, 0.9, 32), new THREE.MeshStandardMaterial({ color: 0x4a5261, metalness: 0.7, roughness: 0.4 })); torso.position.y = -1.3; g.add(torso);
-    for (const sx of [-1, 1]) { const st = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.2, 0.9, 20), new THREE.MeshStandardMaterial({ color: 0x9a4a2a, roughness: 0.6 })); st.position.set(sx * 1.05, -0.75, 0.1); g.add(st); const em = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 10), new THREE.MeshStandardMaterial({ color: 0xffc08a, emissive: 0xffa040, emissiveIntensity: 2.2 })); em.position.set(sx * 1.05, -0.3, 0.1); g.add(em); }
-  } else if (race === 'erevane') {
-    const head = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 48), matSkin(0x1f3a52, { clearcoat: 1, clearcoatRoughness: 0.08, iridescence: 1, iridescenceIOR: 1.6, roughness: 0.3 })); head.scale.set(1, 1.38, 0.95); head.position.y = 0.25; g.add(head);
-    const lens = new THREE.Mesh(new THREE.SphereGeometry(0.46, 40, 28), new THREE.MeshPhysicalMaterial({ color: 0x08202c, roughness: 0.08, clearcoat: 1, clearcoatRoughness: 0.05 })); lens.scale.set(1.55, 0.62, 0.7); lens.position.set(0, 0.2, 0.86); g.add(lens);
-    const slit = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.05 + 0.2 * X.open, 0.08), new THREE.MeshBasicMaterial({ color: new THREE.Color(0x33ffd0).multiplyScalar(2.2), toneMapped: false })); slit.position.set(X.look[0] * 0.1, 0.2 + X.look[1] * 0.08, 1.15); slit.rotation.z = v === 2 ? 0.12 : v === 3 ? -0.06 : 0; g.add(slit);
-    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.09 * X.pupil, 16, 12), new THREE.MeshBasicMaterial({ color: 0x031016 })); pupil.position.set(X.look[0] * 0.2, 0.2 + X.look[1] * 0.06, 1.2); pupil.scale.y = 0.35 + 0.6 * X.open; g.add(pupil);
-    const hl = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffffff })); hl.position.set(-0.32, 0.36, 1.2); g.add(hl);
-    brow(g, -0.42, 0.62, 0.92, -X.brow * 0.8 + 0.1, 0.34, 0x0d1a24, 0.05); brow(g, 0.42, 0.62, 0.92, X.brow * 0.8 - 0.1, 0.34, 0x0d1a24, 0.05);
-    mouth(g, X.mouth === 'open' ? 'open' : X.mouth === 'grin' ? 'smile' : 'smile', -0.42, 0.92, X.mouth === 'open' ? 0.22 : 0.3, 0x0d1a24);
-    for (const sx of [-1, 1]) { const fin = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.8, 0.5), matSkin(0x2a4a5e, { clearcoat: 1 })); fin.position.set(sx * 1.05, 0.25, -0.1); fin.rotation.z = sx * -0.35; g.add(fin); }
-    const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.6, 0.8, 32), matSkin(0x13202b)); neck.position.y = -1.25; g.add(neck);
-    const collar = new THREE.Mesh(new THREE.TorusGeometry(0.95, 0.12, 16, 48), new THREE.MeshStandardMaterial({ color: 0x4a7a9e, metalness: 0.8, roughness: 0.3 })); collar.rotation.x = Math.PI / 2; collar.position.y = -1.0; g.add(collar);
-    for (let k = 0; k < 7; k++) { const sp = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), new THREE.MeshBasicMaterial({ color: new THREE.Color(0x9fe8ff).multiplyScalar(2), toneMapped: false })); const a = k * 0.9; sp.position.set(Math.sin(a) * 0.98, 0.5 + Math.cos(a * 1.3) * 0.6, Math.cos(a) * 0.9); g.add(sp); }
-  } else if (race === 'tessara') {
-    const head = new THREE.Mesh(new THREE.SphereGeometry(1, 48, 32), matSkin(0x3f9a5e)); head.scale.set(1.05, 1, 1); g.add(head);
-    for (const sx of [-1, 1]) { const so = new THREE.Mesh(new THREE.SphereGeometry(0.37, 24, 16), matSkin(0x0f2a18)); so.scale.set(1.1, 0.66, 0.34); so.position.set(sx * 0.38, 0.15, 0.86); so.rotation.z = sx * 0.28; g.add(so); for (const [dy, len] of [[0, 0.42], [-0.18, 0.3]]) { const th = new THREE.Mesh(new THREE.ConeGeometry(0.08, len, 6), matSkin(0x1d4a2c)); th.position.set(sx * 0.86, -0.18 + dy, 0.5); th.rotation.z = -sx * (Math.PI / 2 + 0.35); g.add(th); } } // 4.2f: órbitas escuras e espinhos no lugar das bochechas
-    const eL = eye(g, -0.38, 0.12, 0.84, 0.3, 0xd6e04a, X.open * 0.72, X.look, X.pupil * 0.85, 0.55), eR = eye(g, 0.38, 0.12, 0.84, 0.3, 0xd6e04a, X.open * 0.72, X.look, X.pupil * 0.85, 0.55);
-    for (const e of [eL, eR]) { e.children[0].material.color.setHex(0xb9c47e); e.children[1].material.color.setHex(0xd6e04a); e.children[1].material.emissive.setHex(0xd6e04a); e.children[2].scale.x *= 0.34; e.children[2].scale.y = Math.min(1.3, e.children[2].scale.y * 1.4); e.children[3].visible = false; } // 4.2f: íris amarelo-tóxica, pupila em fenda, sem brilho "fofo"
-    brow(g, -0.4, 0.46, 0.88, -Math.min(0.72, X.brow * 0.5 + 0.42), 0.32, 0x123522, 0.06); brow(g, 0.4, 0.46, 0.88, Math.min(0.72, X.brow * 0.5 + 0.42), 0.32, 0x123522, 0.06);
-    mouth(g, X.mouth === 'smile' ? 'smirk' : X.mouth, -0.5, 0.9, X.mouth === 'open' ? 0.26 : 0.36, 0x123522);
-    for (const sx of [-1, 1]) { const f = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.17, 6), new THREE.MeshStandardMaterial({ color: 0xede6c8, roughness: 0.4 })); f.rotation.x = Math.PI; f.position.set(sx * 0.15 + 0.04, -0.56, 0.93); g.add(f); } // 4.2f: presas e expressão mais vilã
-    for (const [fx, fz, h, tilt] of [[-0.45, 0.1, 1.0, -0.35], [-0.15, -0.2, 1.3, -0.1], [0.2, 0.1, 1.15, 0.15], [0.5, -0.1, 0.95, 0.4], [0, 0.35, 0.8, 0]]) { const fr = new THREE.Mesh(new THREE.CapsuleGeometry(0.07, h, 4, 12), matSkin(0x2f7a49)); fr.position.set(fx, 0.95 + h / 2, fz); fr.rotation.z = tilt; g.add(fr); const tip = new THREE.Mesh(new THREE.SphereGeometry(0.11, 14, 10), new THREE.MeshStandardMaterial({ color: 0xe6b85c, emissive: 0xe6b85c, emissiveIntensity: 1.8 })); tip.position.set(fx - Math.sin(tilt) * h, 0.95 + h + 0.05, fz); g.add(tip); }
-    const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.75, 0.9, 32), matSkin(0x2f7a49)); neck.position.y = -1.3; g.add(neck);
-    for (let k = 0; k < 6; k++) { const a = k * 1.05; const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.22, 14, 10), matSkin(0x55b86a)); leaf.scale.set(1, 0.4, 1.6); leaf.position.set(Math.sin(a) * 0.75, -0.95, Math.cos(a) * 0.75); leaf.rotation.y = a; g.add(leaf); }
-    const sap = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 12), new THREE.MeshStandardMaterial({ color: 0xe6b85c, emissive: 0xe6b85c, emissiveIntensity: 1.5 })); sap.position.set(0, -1.3, 0.7); g.add(sap);
-  } else if (race === 'quorith') {
-    const cry = new THREE.MeshPhysicalMaterial({ color: 0xb388ff, roughness: 0.06, metalness: 0.05, transmission: 0.45, thickness: 1.2, transparent: true, emissive: 0x6a40c0, emissiveIntensity: 0.35, envMapIntensity: 0.9 });
-    const head = new THREE.Mesh(new THREE.OctahedronGeometry(1.2, 0), cry); head.scale.set(0.85, 1.1, 0.85); head.position.y = 0.2; g.add(head);
-    const edges = new THREE.LineSegments(new THREE.EdgesGeometry(head.geometry), new THREE.LineBasicMaterial({ color: 0xefeaff, transparent: true, opacity: 0.5 })); edges.scale.copy(head.scale); edges.position.copy(head.position); g.add(edges);
-    for (const sx of [-1, 1]) { const sl = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.09 + 0.1 * X.open, 0.08), new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffffff).multiplyScalar(2.2), toneMapped: false })); sl.position.set(sx * 0.3, 0.32, 0.86 - Math.abs(sx) * 0.14); sl.rotation.z = sx * (X.brow * 0.6 + (v === 3 ? -0.2 : 0)); sl.rotation.y = sx * 0.6; g.add(sl); }
-    for (let k = -1; k <= 1; k++) { const bar = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.14 + Math.abs(k) * (X.mouth === 'open' ? 0.18 : 0.04) + (X.mouth === 'grin' ? 0.1 : 0), 0.06), new THREE.MeshBasicMaterial({ color: new THREE.Color(X.mouth === 'open' ? 0xff8a5c : 0xb388ff).multiplyScalar(2), toneMapped: false })); bar.position.set(k * 0.14, -0.22, 0.78); g.add(bar); }
-    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 1.05, 0.3, 6), new THREE.MeshStandardMaterial({ color: 0x3a2f5e, metalness: 0.7, roughness: 0.35 })); base.position.y = -1.35; g.add(base);
-    const core = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 12), new THREE.MeshBasicMaterial({ color: new THREE.Color(0xd4b8ff).multiplyScalar(2.2), toneMapped: false })); core.position.y = -1.05; g.add(core);
-    for (const [x, y, z, s] of [[-1.3, 0.6, 0.2, 0.22], [1.25, 0.1, -0.1, 0.28], [-0.9, -0.5, 0.6, 0.16], [1.0, 1.2, 0.3, 0.14]]) { const sh = new THREE.Mesh(new THREE.OctahedronGeometry(s, 0), cry); sh.position.set(x, y, z); sh.rotation.set(0.4, 0.3, 0.2); g.add(sh); }
-  } else {
-    const head = new THREE.Mesh(new THREE.SphereGeometry(1, 48, 32), matSkin(0xb8384a, { roughness: 0.5, clearcoat: 0.5 })); head.scale.set(1.3, 0.85, 1); g.add(head);
-    const cara = new THREE.Mesh(new THREE.SphereGeometry(1.08, 48, 32, 0, Math.PI * 2, 0, Math.PI * 0.42), new THREE.MeshStandardMaterial({ color: 0x7a2030, roughness: 0.55, metalness: 0.2 })); cara.scale.set(1.3, 0.85, 1); cara.position.y = 0.06; g.add(cara);
-    for (const [x, z] of [[-0.7, 0.1], [0, 0.2], [0.7, 0.1], [-0.35, -0.4], [0.35, -0.4]]) { const sp = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.42, 10), new THREE.MeshStandardMaterial({ color: 0xe8dcc8, roughness: 0.4 })); sp.position.set(x, 0.9, z); sp.rotation.z = -x * 0.3; g.add(sp); }
-    eye(g, -0.5, 0.12, 0.84, 0.25, 0xffb347, X.open, X.look, X.pupil, 1.4); eye(g, 0.5, 0.12, 0.84, 0.25, 0xffb347, X.open, X.look, X.pupil, 1.4);
-    eye(g, -0.85, 0.35, 0.6, 0.12, 0xffb347, X.open, X.look, X.pupil, 1.4); eye(g, 0.85, 0.35, 0.6, 0.12, 0xffb347, X.open, X.look, X.pupil, 1.4);
-    brow(g, -0.52, 0.45, 0.86, -X.brow - 0.15, 0.32, 0x4a0c16, 0.07); brow(g, 0.52, 0.45, 0.86, X.brow + 0.15, 0.32, 0x4a0c16, 0.07);
-    const openA = X.mouth === 'open' ? 0.75 : X.mouth === 'grin' ? 0.45 : 0.18;
-    const jaw = new THREE.Mesh(new THREE.SphereGeometry(0.95, 40, 28, 0, Math.PI * 2, Math.PI * 0.5, Math.PI * 0.5), matSkin(0x9a2a3c, { roughness: 0.5 })); jaw.scale.set(1.25, 0.75, 1); jaw.position.set(0, -0.3, 0.12); jaw.rotation.x = openA; g.add(jaw);
-    const gum = new THREE.Mesh(new THREE.SphereGeometry(0.9, 32, 24, 0, Math.PI * 2, Math.PI * 0.5, Math.PI * 0.5), new THREE.MeshStandardMaterial({ color: 0x2a070c, roughness: 0.8 })); gum.scale.set(1.2, 0.3, 0.95); gum.position.set(0, -0.3, 0.12); gum.rotation.x = openA; g.add(gum);
-    for (let k = -3; k <= 3; k++) { tooth(g, k * 0.26, -0.3, 0.95 + Math.abs(k) * -0.06, 0.22, 0.07, false); const lt = tooth(g, k * 0.26 + 0.13, -0.3 - Math.sin(openA) * 0.9, 0.95 + Math.cos(openA) * 0.1 + Math.abs(k) * -0.06, 0.2, 0.065, true); }
-    for (const sx of [-1, 1]) { const md = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.09, 12, 24, Math.PI * 0.8), new THREE.MeshStandardMaterial({ color: 0xff5e70, roughness: 0.5 })); md.position.set(sx * 1.25, -0.35, 0.55); md.rotation.set(0.4, sx * -1.2, sx * 0.6); g.add(md); const tp = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.3, 10), new THREE.MeshStandardMaterial({ color: 0xe8dcc8 })); tp.position.set(sx * 1.55, -0.65, 0.95); tp.rotation.z = sx * 0.8; g.add(tp); }
-    const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.9, 0.8, 32), matSkin(0x7a2030)); neck.position.y = -1.4; g.add(neck);
-  }
-  const floor = new THREE.Mesh(new THREE.CircleGeometry(4, 48), new THREE.MeshStandardMaterial({ color: R.dk, roughness: 1 })); floor.rotation.x = -Math.PI / 2; floor.position.y = -1.75; floor.receiveShadow = true; S.scene.add(floor);
-  g.traverse(o => { if (o.isMesh) { o.castShadow = true; } });
-  const back = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), new THREE.MeshStandardMaterial({ color: R.dk, roughness: 1 })); back.position.set(0, 2, -4); S.scene.add(back);
-  const glow = new THREE.Mesh(new THREE.CircleGeometry(2.6, 48), new THREE.MeshBasicMaterial({ color: R.c, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false })); glow.position.set(0, 0.4, -3.9); S.scene.add(glow);
-  const key = new THREE.DirectionalLight(0xfff1e0, 2.4); key.position.set(-2.5, 3.5, 4); key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.bias = -0.0005; S.scene.add(key);
-  const fill = new THREE.DirectionalLight(R.c, 0.9); fill.position.set(3, 0.5, 2.5); S.scene.add(fill); const rim = new THREE.DirectionalLight(0xffffff, 1.6); rim.position.set(0.5, 2.5, -3); S.scene.add(rim); S.scene.add(new THREE.HemisphereLight(0x9aa8c8, 0x1a1420, 0.5));
-  g.rotation.y = v === 2 ? -0.18 : 0.22;
-  S.cam.fov = 32; S.cam.updateProjectionMatrix(); S.cam.position.set(1.4, 0.9, 5.2); S.cam.lookAt(0, -0.05, 0); S.bloom.strength = 0.55; S.bloom.threshold = 0.9;
+// ---------- 4.3e: bustos dos líderes = os do jogo (src/leaders3d.js) ----------
+function sceneHead(S, race, v) { /* 4.3e: o MESMO busto do jogo (src/leaders3d.js, buildHead com mais segmentos), luz de estúdio dele e o cenário daqui */
+  const R = RACES[race], L3 = window.ARD.leaders3d; S.scene.background = new THREE.Color(R.dk); renderer.shadowMap.enabled = false;
+  if (!window.__envBusto) window.__envBusto = L3.envFor(renderer) || envTex; const b = L3.buildHead(race, v, { hi: true, env: window.__envBusto }); /* mesmo estúdio do jogo */ S.scene.add(b.g); L3.restPose(b, v === 2 ? -0.12 : 0.2); L3.studioRig(S.scene, race);
+  /* cenário: fundo escuro da Raça sem luz (não estoura) e um halo suave da cor da Raça atrás da cabeça */
+  const back = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), new THREE.MeshBasicMaterial({ color: new THREE.Color(R.dk).multiplyScalar(0.9) })); back.position.set(0, 0, -4.5); S.scene.add(back);
+  const halo = new THREE.Mesh(new THREE.PlaneGeometry(9, 9), new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: { c: { value: new THREE.Color(R.c) } }, vertexShader: 'varying vec2 vU; void main(){ vU = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }', fragmentShader: 'uniform vec3 c; varying vec2 vU; void main(){ float d = length(vU - 0.5) * 2.0; float k = pow(max(0.0, 1.0 - d), 2.2); gl_FragColor = vec4(c * k * 0.32, 1.0); }' })); halo.position.set(0.1, 0.35, -4.4); S.scene.add(halo);
+  const F = L3.frameFor(race, 'arte'); S.cam.fov = 30; S.cam.updateProjectionMatrix(); S.cam.position.set(F.pos[0], F.pos[1], F.pos[2]); S.cam.lookAt(F.look[0], F.look[1], F.look[2]); S.bloom.enabled = false; renderer.toneMappingExposure = 0.96; /* sem bloom: os realces molhados espalhavam um véu branco; o brilho vem das auras do próprio busto, como no jogo */
 }
 // ---------- emblemas do logo (3D) ----------
 function sceneEmblem(S, v) {
@@ -515,5 +433,6 @@ window.render3d = function (kind, race, variant, w, h) {
     composer.render(); const url = renderer.domElement.toDataURL('image/jpeg', 0.9); disposeScene(scene); composer.dispose(); return url;
   } catch (e) { return 'ERR:' + (e.stack || e.message); }
 };
+await new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = '../src/leaders3d.js'; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); }); /* 4.3e: bustos do jogo */
 window.__ready = true;
 </script></body>

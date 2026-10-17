@@ -468,13 +468,9 @@ const BLD = {
 // ---------- receitas de unidade por Raça ----------
 const U = {};
 U.vehnar = {
-  infantaria(K, P, tc, o) { o = o || {};
-    for (const s of [-1, 1]) K.anim(legSpec([0.15, 3.2, s * 0.75], { amp: 0.4, stride: 5 }), () => { K.seg([0, 0.4, s * 0.8], [0.15, 3.2, s * 0.75], 0.55, P.d, 'dark'); K.box(0.35, 0, s * 0.8, 1.7, 0.6, 1.1, P.d, 'rubber', { b: 0.2 }); });
-    K.box(0, 3, 0, 2.4, 3.2, 3, P.a, 'steel', { b: 0.45 }); K.box(0.95, 3.5, 0, 0.6, 2.2, 2.3, tc, 'paint', { b: 0.15 });
-    for (const s of [-1, 1]) K.sph(0, 5.9, s * 1.7, 0.85, tc, 'paint', { seg: 12 });
-    K.box(-1.55, 3.4, 0, 1.2, 2.6, 2.2, P.b, 'steel', { b: 0.3 }); K.sph(0.1, 6.9, 0, 1.15, P.b, 'steel', { seg: 14 }); K.box(1.15, 6.62, 0, 0.5, 0.5, 1.5, P.g, null, { e: 1.8 });
-    K.seg([0.1, 5.5, 1.5], [1.3, 4.6, 1.0], 0.38, P.a, 'steel'); K.seg([0.1, 5.5, -1.5], [1.7, 4.6, 0.3], 0.38, P.a, 'steel');
-    if (!o.noRifle) K.anim({ t: 'recoil', dist: 0.4 }, () => { K.box(2.2, 4.3, 0.95, 4, 0.55, 0.55, P.d, 'metal', { b: 0.12 }); K.box(3.7, 4.15, 0.95, 1.4, 0.85, 0.5, P.b, 'metal'); }); },
+  infantaria(K, P, tc, o) { o = o || {}; const V = U.vehnar, ra = o.noRifle ? null : { t: 'recoil', dist: 0.3 }; /* 4.3e: Infantaria Orbital — ciborgue de gravidade alta (corpo V._soldado): capacete-balde com visor aceso e respirador, mochila-fornalha com chaminés gêmeas em brasa, fuzil industrial de tambor no quadril direito (recua no tiro, com a mão) e braço esquerdo livre que balança na passada */
+    V._soldado(K, P, tc, { cD: [-0.34, 4.4, 1.56], mD: [0.46, 4.08, 1.42], cE: [-0.12, 4.2, -1.58], mE: [0.16, 3.22, -1.5], solto: true, ra, st: 21 });
+    V._capacete(K, P, tc); V._mochila(K, P, tc); if (!o.noRifle) K.anim(ra, () => V._fuzil(K, P, tc)); },
   coletor(K, P, tc) { // 4.3a: carregador de minério pesado — rodas-tambor duplas, chassi chanfrado, motor com chaminés em brasa, caçamba com minério, cabine blindada e cabeça de mineração com emissores gêmeos
     const FO = '#FF7A2E', PK = '#FF5FD2', RED = '#FF4040', ORE = '#3A3F48', CRY = '#3FA9E0', AY = 1.52, ZW = 2.68, AX = [-3.9, 2.45];
     // caixa chanfrada barata: perfil octogonal (cantos cortados em b) extrudado com chanfro nas pontas; base em y, centro em x/z
@@ -594,6 +590,67 @@ U.vehnar = {
       for (const a of [0.4, 0.4 + PI]) K.box(xa + Math.cos(a) * ir * 0.66, cy + Math.sin(a) * ir * 0.66 - 0.1, zo + s * 0.1, 0.2, 0.2, 0.06, P.d, 'dark'); });
     const ng = K.q(Math.round(2 * xa / 0.75)), sp = 2 * xa / ng;
     K.anim({ t: 'tread', spacing: sp }, () => { for (let i = 0; i < ng; i++) K.box(-xa + (i + 0.5) * sp, Ht - 0.06, z, 0.3, 0.15, w + 0.04, P.b, 'metal'); }); },
+  /* ---------- 4.3e: infantaria Vehnar (a receita é um soldado; o jogo desenha esquadrões de três a 62%). Frente +x, lado direito +z, origem no chão entre os pés ---------- */
+  _cbl(K, x, y, z, w, h, d, b, col, mat, o) { /* 4.3e: caixa chanfrada enxuta — o mesmo perfil octogonal do V._cb extrudado em z, sem o chanfro das pontas (28 triângulos em vez de 60); na versão leve, caixa reta */
+    if (K.lite) return K.poly([[-w / 2, -h / 2], [w / 2, -h / 2], [w / 2, h / 2], [-w / 2, h / 2]], d, col, mat, Object.assign({ x, y: y + h / 2, z }, o));
+    const hw = w / 2, hh = h / 2; return K.poly([[-hw + b, -hh], [hw - b, -hh], [hw, -hh + b], [hw, hh - b], [hw - b, hh], [-hw + b, hh], [-hw, hh - b], [-hw, -hh + b]], d, col, mat, Object.assign({ x, y: y + hh, z }, o)); },
+  _placa(K, a, b, t, d, bv, col, mat, o) { const dx = b[0] - a[0], dy = b[1] - a[1], dz = b[2] - a[2], L = Math.hypot(dx, dy, dz) || 0.001; /* 4.3e: viga chanfrada de a até b em qualquer direção (t = espessura, d = largura; perfil enxuto do V._cbl); o V._viga fica no plano z */
+    return U.vehnar._cbl(K, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2 - t / 2, (a[2] + b[2]) / 2, L, t, d, bv, col, mat, Object.assign({ rz: Math.asin(dy / L), ry: Math.atan2(-dz, dx) }, o)); },
+  _soldado(K, P, tc, o) { const V = U.vehnar, st = o.st || 19; /* 4.3e: corpo do soldado — pernas curtas e grossas (coxa de aço, joelheira clara, canela, bota larga com biqueira) que balançam do quadril com os lados alternados, pistão na panturrilha e fivelas de perto; quadril escuro com cinto e faldas; tronco-barril chanfrado com peitoral claro e grade; gola de aço; ombreiras grandes da cor do time sobre placa de aço (rebites de perto); braços blindados até as mãos. o.cD/o.mD = cotovelo e mão direitos, o.cE/o.mE = esquerdos; o.solto = braço esquerdo livre (balança na passada, fase oposta à da perna esquerda); o.ra = animação das mãos na arma (recuo); o.st = passada */
+    for (const s of [-1, 1]) { const z = s * 0.7, kn = [0.3, 1.75, s * 0.78], an = [0.04, 0.58, s * 0.82];
+      K.anim(legSpec([0, 3.05, z], { amp: 0.46, stride: st }), () => {
+        V._placa(K, [-0.02, 3.3, z], [kn[0], kn[1] - 0.12, kn[2]], 0.98, 0.9, 0.2, P.a, 'steel'); if (!K.lite) K.cyl(kn[0], kn[1], kn[2] - 0.4, 0.36, 0.36, 0.8, P.d, 'dark', { rx: H, seg: 6 });
+        V._placa(K, [kn[0], kn[1] + 0.1, kn[2]], an, 0.86, 0.84, 0.18, P.b, 'steel'); V._cbl(K, kn[0] + 0.36, kn[1] - 0.52, kn[2], 0.4, 1.0, 0.84, 0.14, P.t, 'steel', { rz: 0.2 });
+        V._cbl(K, 0.2, 0.04, an[2], 1.6, 0.6, 1.0, 0.2, P.d, 'dark'); V._cbl(K, 0.72, 0.1, an[2], 0.6, 0.44, 1.06, 0.14, P.b, 'steel'); K.box(0.2, 0, an[2], 1.66, 0.12, 1.06, '#1B1D21', 'rubber');
+        K.fine(() => { K.seg([-0.3, 1.62, an[2]], [-0.52, 0.74, an[2]], 0.08, P.t, 'gloss', { seg: 6 }); K.seg([-0.28, 1.74, an[2]], [-0.4, 1.2, an[2]], 0.14, P.b, 'metal', { seg: 6 }); for (const y of [0.22, 0.42]) K.box(0.0, y, an[2], 0.14, 0.08, 1.1, P.h, 'paint'); }); }); }
+    V._cbl(K, -0.06, 2.72, 0, 1.45, 0.86, 1.86, 0.22, P.d, 'dark'); K.box(0, 3.2, 0, 1.74, 0.32, 2.02, '#3B342C', 'rubber');
+    if (!K.lite) for (const s of [-1, 1]) V._cbl(K, 0.04, 2.48, s * 1.22, 1.3, 0.92, 0.2, 0.18, P.a, 'steel', { rx: s * 0.2 });
+    const nt = K.lite ? 6 : 8; K.prism(-0.1, 3.3, 0, 1.12, 2.45, nt, P.a, 'steel', { top: 1.2, sx: 0.8, ry: nt === 6 ? 0 : PI / 8 });
+    if (o.avental) { V._cbl(K, 0.84, 3.28, 0, 0.34, 2.36, 1.74, 0.12, '#4A3A2E', 'rubber', { rz: -0.07 }); V._cbl(K, 0.66, 2.3, 0, 0.18, 1.06, 0.42, 0.06, '#4A3A2E', 'rubber'); }
+    else { V._cb(K, 0.86, 4.2, 0, 0.42, 1.5, 1.86, 0.2, P.t, 'steel', { rz: -0.07 }); K.box(0.62, 3.36, 0, 0.5, 0.8, 1.3, P.d, 'dark'); }
+    K.cyl(0.02, 5.72, 0, 0.66, 0.84, 0.4, P.b, 'metal', { seg: 10 });
+    K.fine(() => { if (o.avental) for (const s of [-1, 1]) K.seg([1.0, 5.6, s * 0.7], [0.3, 6.0, s * 0.62], 0.05, P.h, 'paint', { seg: 4 }); else for (let i = 0; i < 3; i++) K.box(1.08, 4.62 + i * 0.22, 0, 0.06, 0.08, 1.1, P.d, 'dark', { rz: -0.07 }); for (const s of [-1, 1]) K.box(0.36, 3.08, s * 1.02, 0.42, 0.42, 0.3, '#5A4632', 'rubber'); if (!o.avental) for (let i = 0; i < 2; i++) K.box(0.9, 3.5 + i * 0.26, 0, 0.06, 0.08, 1.24, P.b, 'metal'); });
+    for (const s of [-1, 1]) V._ombreira(K, P, tc, -0.1, 5.46, s * 1.5, s);
+    for (const [s, el, hd] of [[1, o.cD, o.mD], [-1, o.cE, o.mE]]) { const sh = [-0.06, 5.32, s * 1.42], livre = s < 0 && o.solto;
+      if (!K.lite) K.cyl(sh[0], sh[1], sh[2] - 0.38, 0.4, 0.4, 0.76, P.d, 'dark', { rx: H, seg: 6 });
+      K.anim(livre ? legSpec(sh, { amp: 0.36, stride: st, ph: 0 }) : null, () => {
+        V._placa(K, sh, el, 0.74, 0.74, 0.18, P.a, 'steel'); if (!K.lite) K.cyl(el[0], el[1], el[2] - 0.3, 0.34, 0.34, 0.6, P.d, 'dark', { rx: H, seg: 6 }); V._placa(K, el, hd, 0.7, 0.68, 0.16, livre ? P.t : P.b, 'steel'); /* 4.3e: antebraço da arma mais escuro (separa do tambor claro); o livre, claro, mostra o balanço */
+        if (livre) { V._cbl(K, hd[0] + 0.04, hd[1] - 0.34, hd[2], 0.6, 0.6, 0.56, 0.12, P.d, 'dark'); K.box(hd[0] + 0.3, hd[1] - 0.3, hd[2], 0.14, 0.42, 0.5, P.h, 'paint'); K.fine(() => K.seg([el[0] + 0.05, el[1] - 0.2, el[2] - s * 0.38], [hd[0] - 0.05, hd[1] - 0.05, hd[2] - s * 0.34], 0.07, P.t, 'gloss', { seg: 5 })); }
+        else K.anim(o.ra, () => K.box(hd[0], hd[1] - 0.22, hd[2], 0.44, 0.44, 0.42, P.d, 'dark'));
+        if (s > 0) K.fine(() => K.seg([el[0] + 0.12, el[1] - 0.28, el[2] + 0.36], [hd[0] - 0.18, hd[1] - 0.1, hd[2] + 0.3], 0.07, P.t, 'gloss', { seg: 5 })); }); } },
+  _ombreira(K, P, tc, x, y, z, s) { const o = { rx: s * 0.36, sx: 0.94, sz: 0.74, flat: true }; /* 4.3e: ombreira grande facetada (lê de cima): cúpula baixa torneada em oito faces (seis na leve) da cor do time, inclinada para fora, lâmina de aço por baixo e rebites de perto */
+    const sg = K.lite ? 11 : 8; K.lathe([[0.92, -0.28], [0.98, 0.0]], x, y, z, P.b, 'steel', Object.assign({ seg: sg }, o)); K.lathe([[1.02, 0.0], [0.93, 0.19], [0.64, 0.34], [0, 0.4]], x, y, z, tc, 'paint', Object.assign({ seg: sg }, o));
+    K.fine(() => { for (const a of [-0.75, 0.75]) { const lx = Math.cos(a) * 0.76, lz = Math.sin(a) * 0.76 * s * 0.74, c = Math.cos(o.rx), n = Math.sin(o.rx), ly = 0.25; K.box(x + lx * 0.94, y + ly * c - lz * n, z + ly * n + lz * c, 0.1, 0.08, 0.1, P.d, 'metal', { rx: o.rx }); } }); },
+  _capacete(K, P, tc, solda) { const V = U.vehnar, VIS = '#FFE3A0', n = K.lite ? 6 : 8, ry = n === 6 ? 0 : PI / 8; /* 4.3e: capacete-balde octogonal grande (proporção heroica, lê de cima) com tampo da cor do time e crista de aço; o soldado tem viseira escura com fenda acesa e respirador com filtros; o soldador (solda), máscara de solda com vidro escuro e fenda acesa presa por dobradiças */
+    K.prism(0.1, 5.8, 0, 0.88, 1.32, n, P.a, 'steel', { top: 0.86, ry }); K.prism(0.1, 7.12, 0, 0.76, 0.24, n, tc, 'paint', { top: 0.68, ry }); K.box(-0.04, 7.18, 0, 1.46, 0.24, 0.22, P.b, 'steel');
+    if (!solda) { V._cbl(K, 0.86, 6.32, 0, 0.3, 0.46, 1.3, 0.08, P.d, 'dark'); K.box(1.01, 6.48, 0, 0.04, 0.13, 1.04, VIS, null, { e: 2.6 }); V._cbl(K, 0.78, 5.76, 0, 0.52, 0.54, 1.0, 0.12, P.b, 'steel');
+      K.fine(() => { for (const s of [-1, 1]) K.cyl(0.92, 5.94, s * 0.54 - 0.1, 0.16, 0.16, 0.2, P.d, 'dark', { rx: H, seg: 6 }); K.box(1.04, 5.88, 0, 0.04, 0.26, 0.4, P.d, 'metal'); }); }
+    else { V._cbl(K, 0.92, 5.72, 0, 0.26, 1.14, 1.44, 0.1, P.b, 'steel', { rz: 0.12 }); K.box(1.06, 6.24, 0, 0.05, 0.3, 0.9, '#1C2522', 'glass', { rz: 0.12 }); K.box(1.09, 6.33, 0, 0.03, 0.06, 0.76, VIS, null, { e: 2.2, rz: 0.12 }); K.box(0.66, 6.88, 0, 0.36, 0.14, 1.6, P.d, 'dark');
+      K.fine(() => { for (const s of [-1, 1]) K.cyl(0.7, 6.95, s * 0.8 - (s < 0 ? 0.12 : 0), 0.12, 0.12, 0.12, P.t, 'metal', { rx: H, seg: 6 }); for (let i = 0; i < 3; i++) K.box(1.05, 5.86 + i * 0.1, 0, 0.04, 0.04, 0.64, P.d, 'dark', { rz: 0.12 }); }); }
+    K.fine(() => { for (const s of [-1, 1]) K.cyl(0.02, 6.5, s * 0.82 - (s < 0 ? 0.14 : 0), 0.3, 0.3, 0.14, P.b, 'metal', { rx: H, seg: 6 }); }); },
+  _chamine(K, P, x, y, z, h, r) { /* 4.3e: chaminé curta da mochila (versão enxuta do V._escape): cano enferrujado, boca escura (só de perto) e brasa */
+    K.cyl(x, y, z, r, r * 1.12, h, P.r, 'metal', { seg: 8 }); if (!K.lite) K.cyl(x, y + h, z, r * 1.3, r * 1.06, r * 0.7, P.d, 'dark', { seg: 8 }); K.cyl(x, y + h + r * 0.4, z, r * 0.8, r * 0.8, r * 0.5, '#FF7A2E', null, { e: 2.5, seg: 6 }); },
+  _mochila(K, P, tc) { const V = U.vehnar; /* 4.3e: mochila-fornalha do soldado — caixa de aço chanfrada com tampa da cor do time (lê de cima), grade traseira em brasa, faixa de perigo e chaminés gêmeas com brasa na boca; de perto, fuligem na tampa, luz vermelha de status, venezianas e mangueira até o respirador */
+    V._cb(K, -1.38, 3.95, 0, 0.88, 1.95, 1.82, 0.2, P.b, 'steel'); V._cbl(K, -1.36, 5.82, 0, 0.94, 0.22, 1.66, 0.08, tc, 'paint'); K.box(-1.83, 4.36, 0, 0.04, 0.5, 1.12, '#FF7A2E', null, { e: 1.5 }); V._haz(K, P, -1.84, 5.6, 0, 1.5, 0.24, 3, 'fz');
+    for (const s of [-1, 1]) V._chamine(K, P, -1.6, 5.05, s * 0.6, 1.45, 0.16);
+    K.fine(() => { for (const s of [-1, 1]) K.box(-1.56, 6.04, s * 0.6, 0.62, 0.02, 0.5, '#2A2623', 'matte'); K.light(-1.1, 6.06, 0.0, 0.12, '#FF4040', 2.4); for (let i = 0; i < 3; i++) K.box(-1.86, 4.4 + i * 0.16, 0, 0.05, 0.06, 1.24, P.d, 'metal'); K.tube([[-1.1, 5.7, -0.55], [-0.5, 6.25, -0.82], [0.35, 6.0, -0.8], [0.72, 5.92, -0.55]], 0.07, P.d, 'rubber', { ts: 6, rs: 4 }); }); },
+  _fuzil(K, P, tc) { const V = U.vehnar, Z = 1.42, Y = 4.36; /* 4.3e: fuzil industrial no quadril direito (desenhar dentro do recuo) — culatra chanfrada escura com faixa da cor do time no topo, coronha curta, tambor de munição claro, camisa de refrigeração (aletas de perto), freio de boca e boca em brasa; mira com ponto vermelho e mangueira da mochila de perto */
+    K.box(-0.5, Y - 0.26, Z, 0.62, 0.42, 0.32, P.d, 'dark'); V._cbl(K, 0.62, Y - 0.32, Z, 1.66, 0.62, 0.44, 0.12, P.d, 'metal'); K.box(0.6, Y + 0.3, Z, 1.2, 0.1, 0.3, tc, 'paint');
+    K.cyl(0.8, Y - 0.56, Z - 0.21, 0.4, 0.4, 0.42, P.t, 'metal', { rx: H, seg: 12 }); K.cyl(0.8, Y - 0.56, Z - 0.23, 0.18, 0.18, 0.46, P.d, 'dark', { rx: H, seg: 6 }); K.box(0.42, Y - 0.62, Z, 0.24, 0.42, 0.22, P.d, 'rubber');
+    K.cyl(1.4, Y, Z, 0.22, 0.22, 1.5, P.b, 'steel', { rz: -H, seg: 8 }); K.cyl(2.9, Y, Z, 0.1, 0.1, 0.36, P.d, 'metal', { rz: -H, seg: 6 }); K.box(3.42, Y - 0.14, Z, 0.36, 0.28, 0.3, P.d, 'dark'); K.cyl(3.6, Y, Z, 0.08, 0.08, 0.04, '#FF6A3A', null, { e: 2.6, rz: -H, seg: 6 });
+    K.fine(() => { for (const x of [1.75, 2.1, 2.45]) K.cyl(x, Y, Z, 0.26, 0.26, 0.06, P.d, 'metal', { rz: -H, seg: 8 }); K.box(1.12, Y + 0.38, Z, 0.34, 0.16, 0.14, P.d, 'dark'); K.box(1.3, Y + 0.43, Z, 0.02, 0.05, 0.05, '#FF4040', null, { e: 2.4 }); K.tube([[-1.2, 4.3, 0.95], [-0.7, 3.9, 1.5], [0.1, 4.0, 1.62], [0.5, 4.2, 1.6]], 0.06, P.d, 'rubber', { ts: 6, rs: 4 }); }); },
+  _tanques(K, P, tc) { const V = U.vehnar, TX = -1.56; /* 4.3e: tanques gêmeos do soldador — cilindros amarelos de perigo com cúpula (um torno só) que passam dos ombros (lê de frente e de cima), cintas escuras e cinta da cor do time, berço escuro preso às costas, regulador e mangueira grossa até a lança (pelo quadril direito); válvulas com volante vermelho de perto */
+    V._cbl(K, -1.12, 3.75, 0, 0.32, 1.9, 1.6, 0.08, P.d, 'dark');
+    for (const s of [-1, 1]) { const z = s * 0.66; K.lathe(K.lite ? [[0.42, 0], [0.5, 0.12], [0.5, 2.9], [0.3, 3.32], [0, 3.4]] : [[0.36, 0], [0.5, 0.12], [0.5, 2.86], [0.42, 3.18], [0.24, 3.36], [0, 3.4]], TX, 3.5, z, P.h, 'paint', { seg: 10 });
+      K.cyl(TX, 5.0, z, 0.52, 0.52, 0.26, tc, 'paint', { seg: 10, open: true }); K.cyl(TX, 4.0, z, 0.52, 0.52, 0.16, P.d, 'dark', { seg: 10, open: true }); if (!K.lite) K.cyl(TX, 6.0, z, 0.52, 0.52, 0.16, P.d, 'dark', { seg: 10, open: true });
+      K.fine(() => { K.cyl(TX, 6.86, z, 0.06, 0.06, 0.14, P.d, 'metal', { seg: 5 }); K.cyl(TX, 6.98, z, 0.16, 0.16, 0.04, '#C0392B', 'paint', { seg: 8 }); }); }
+    K.box(TX, 6.2, 0, 0.36, 0.3, 0.7, P.d, 'metal'); K.tube([[-1.3, 3.6, 0.95], [-0.75, 3.15, 1.62], [-0.05, 3.5, 1.7], [0.0, 3.95, 1.32]], 0.11, P.d, 'rubber', { ts: 8, rs: 5 }); },
+  _lanca(K, P, tc) { const V = U.vehnar, Z = 1.34, Y = 4.2; /* 4.3e: lança-chamas do soldador no quadril direito (desenhar dentro do recuo) — corpo da válvula escuro com faixa da cor do time, tubo de aço longo, luva térmica escura (anéis de perto), bico claro alargado com a boca acesa por dentro e acendedor com chama-piloto que tremula (sway; fica fora do recuo) */
+    V._cbl(K, 0.3, Y - 0.28, Z, 1.36, 0.54, 0.44, 0.1, P.d, 'metal'); K.box(0.26, Y + 0.26, Z, 0.96, 0.08, 0.32, tc, 'paint'); K.fine(() => K.box(0.36, Y - 0.68, Z, 0.22, 0.42, 0.2, P.d, 'rubber'));
+    K.cyl(0.95, Y, Z, 0.13, 0.13, 1.9, P.b, 'steel', { rz: -H, seg: 8 }); K.cyl(2.2, Y, Z, 0.24, 0.24, 0.7, P.d, 'dark', { rz: -H, seg: 10 }); K.cyl(2.9, Y, Z, 0.23, 0.15, 0.5, P.t, 'metal', { rz: -H, seg: 10 }); K.cyl(3.39, Y, Z, 0.16, 0.16, 0.03, '#FF6A3A', null, { e: 1.8, rz: -H, seg: 8 });
+    K.box(3.12, Y - 0.36, Z, 0.28, 0.14, 0.14, P.d, 'dark');
+    K.anim({ t: 'sway', p: [3.27, Y - 0.29, Z], amp: 0.3, speed: 26 }, () => { K.cone(3.27, Y - 0.29, Z, 0.12, 0.56, '#FFC24A', null, { e: 2.6, rz: -H, seg: 6 }); if (!K.lite) K.sph(3.33, Y - 0.29, Z, 0.085, '#FFF1C4', null, { e: 3.2, seg: 6 }); });
+    K.fine(() => { for (const x of [2.32, 2.6]) K.cyl(x, Y, Z, 0.27, 0.27, 0.05, P.b, 'metal', { rz: -H, seg: 8 }); K.cyl(0.55, Y - 0.4, Z + 0.12, 0.12, 0.12, 0.7, P.h, 'paint', { rz: -H, seg: 8 }); }); },
   veiculo_hull(K, P, tc) { /* 4.3d: casco do tanque pesado — lagartas largas (rodas que giram, sapatas que rolam), casco chanfrado com glacis, convés do motor com ventoinha e grelhas em brasa, escapamentos gêmeos, para-lamas com faixa de perigo, faróis, faixas da cor do time no convés */
     const V = U.vehnar, FO = '#FF7A2E', RED = '#FF4040';
     for (const s of [-1, 1]) V._lagarta(K, P, tc, s * 3.6, s, { L: 13.4, Ht: 2.6, w: 2.3, R: 1.15, xb: 4.8, rw: 0.8 });
@@ -711,8 +768,9 @@ U.vehnar = {
     V._haz(K, P, -6.86, 1.1, 0, 2.6, 0.4, 4, 'fz');
     K.fine(() => { K.tube([[0.95, 5.95, 0.4], [1.9, 6.6, 0.42], [2.6, 6.75, 0.3]], 0.09, P.d, 'rubber', { ts: 8, rs: 4 }); for (const s of [-1, 1]) { K.seg([-3.6, TY + TR + 0.25, s * 0.55], [1.5, TY + TR + 0.25, s * 0.55], 0.04, P.h, 'paint', { seg: 4 }); for (const x of [-3.2, -1.2, 0.8]) K.seg([x, TY + TR - 0.1, s * 0.55], [x, TY + TR + 0.25, s * 0.55], 0.035, P.h, 'paint', { seg: 4 }); K.box(-5.0, 2.95, s * 0.3, 1.5, 0.05, 0.06, tc, 'paint'); }
       K.cyl(-4.38, TY - 0.5, 0, 0.18, 0.18, 0.3, P.d, 'dark', { rz: H, seg: 8 }); K.tor(-4.62, TY - 0.5, 0, 0.26, 0.04, RED, 'paint', { rz: H, ts: 10, rs: 3 }); for (let i = 0; i < 5; i++) K.box(6.6, 0.95, -1.6 + i * 0.8, 0.12, 0.95, 0.14, P.d, 'metal'); }); },
-  soldador(K, P, tc) { U.vehnar.infantaria(K, P, tc, { noRifle: true }); for (const s of [-1, 1]) K.cyl(-1.95, 3.1, s * 0.7, 0.62, 0.62, 3.4, P.h, 'paint', { seg: 12 });
-    K.anim({ t: 'recoil', dist: 0.3 }, () => { K.seg([1, 4.3, 1], [4.4, 4.1, 1], 0.32, P.d, 'metal'); K.cyl(4.4, 4.1, 1, 0.52, 0.34, 0.9, P.b, 'metal', { rz: -H }); K.light(5.45, 4.1, 1, 0.34, '#FF7A2E', 3); }); K.tube([[-1.9, 3.6, 0.6], [-0.6, 3, 1.4], [1, 4.1, 1.1]], 0.15, P.d, 'rubber'); },
+  soldador(K, P, tc) { const V = U.vehnar, ra = { t: 'recoil', dist: 0.14 }; /* 4.3e: Soldador — mesmo corpo da infantaria com máscara de solda e avental de couro (frente escura), tanques gêmeos de combustível amarelos acima dos ombros, mangueira grossa até a lança-chamas no quadril direito (recua pouco, com a mão), bico escurecido aceso por dentro e chama-piloto que tremula; braço esquerdo livre que balança na passada */
+    V._soldado(K, P, tc, { cD: [-0.3, 4.36, 1.56], mD: [0.36, 3.96, 1.34], cE: [-0.12, 4.2, -1.58], mE: [0.16, 3.22, -1.5], solto: true, avental: true, ra, st: 17 });
+    V._capacete(K, P, tc, true); V._tanques(K, P, tc); K.anim(ra, () => V._lanca(K, P, tc)); },
   guindaste(K, P, tc) { /* 4.3d: Guindaste Armado — chassi 8×8 com para-lamas, cabine clara deslocada à esquerda e gerador com ventoinha (gira), estabilizadores amarelos com macacos hidráulicos, superestrutura com cabine do operador, contrapeso com faixas de perigo e topo da cor do time, escapamentos gêmeos, lança telescópica amarela (cinta da cor do time) erguida por pistão hidráulico, moitão com cabeça de solda acesa que balança */
     const V = U.vehnar, RED = '#FF4040', WLD = '#FFF1C4', th = 0.62, c = Math.cos(th), sn = Math.sin(th), BP = [-3.4, 5.0];
     const at = (d, n) => [BP[0] + c * d - sn * n, BP[1] + sn * d + c * n]; /* ponto ao longo da lança (d) com desvio normal (n) */
@@ -806,12 +864,89 @@ U.vehnar = {
       for (let i = 0; i < 5; i++) K.box(-3.0, 8.2 + i * 0.42, 0, 0.06, 0.05, 2.2, P.h, 'paint'); }); },
 };
 U.erevane = {
-  infantaria(K, P, tc, o) { o = o || {};
-    for (const s of [-1, 1]) { K.anim(legSpec([0.1, 3.4, s * 0.6], { amp: 0.38, stride: 5 }), () => { K.seg([0, 0.3, s * 0.7], [0.1, 3.4, s * 0.6], 0.42, P.b, 'gloss'); K.box(0.3, 0, s * 0.7, 1.3, 0.45, 0.8, P.d, 'rubber', { b: 0.15 }); }); }
-    K.poly([[-1.1, 0], [1.1, 0], [0.8, 3], [-0.9, 3.2]], 2.4, P.a, 'gloss', { y: 3.2, b: 0.15 }); K.box(0.95, 4.3, 0, 0.12, 1.6, 1.8, tc, null, { e: 1.6 });
-    K.oct(0.1, 6.2, 0, 0.95, 1.9, P.b, 'gloss'); K.box(0.8, 7.05, 0, 0.3, 0.16, 1.1, P.l, null, { e: 3 }); K.poly([[0, 0], [-1.6, -2.6], [-0.4, -2.8]], 0.12, P.d, 'gloss', { x: -1, y: 6.2, anim: { t: 'sway', p: [-1, 6.2, 0], amp: 0.12, speed: 2.5 } });
-    K.seg([0.1, 6, 1.3], [1.3, 4.9, 0.95], 0.3, P.a, 'gloss'); K.seg([0.1, 6, -1.3], [1.6, 4.9, 0.3], 0.3, P.a, 'gloss');
-    if (!o.noRifle) K.anim({ t: 'recoil', dist: 0.35 }, () => { K.box(2.4, 4.6, 0.9, 4.6, 0.36, 0.36, P.d, 'metal'); K.box(4.8, 4.6, 0.9, 0.5, 0.2, 0.2, P.c, null, { e: 2.2 }); }); },
+  /* ---------- 4.3e — Infantaria Erevane (o jogo desenha cada unidade como um esquadrão de três figuras): soldado esguio de pernas digitígradas,
+     armadura facetada grafite em camadas (placas brilhantes sobre um núcleo escuro), traje de pele iridescente (cor por faceta: teal → índigo → violeta → magenta),
+     capacete varrido para trás em duas metades (largo na viseira, fecha em ponta atrás) com viseira fumê e fenda violeta, ombreiras em lâminas e coroa da cor
+     do time, fios teal. Frente em +x, chão em y = 0, direita em +z. Versão leve (K.lite): as mesmas massas e cores sem chanfros, camadas, juntas nem mãos
+     (o traje fica sob as placas); miúdos em K.fine ---------- */
+  _lp(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }, /* ponto entre a e b */
+  _qd(a, b, roll) { const Y = new T.Vector3(0, 1, 0), q = new T.Quaternion().setFromUnitVectors(Y, new T.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]).normalize()); if (roll) q.multiply(new T.Quaternion().setFromAxisAngle(Y, roll)); return q; }, /* leva +y para a direção a → b; roll gira as facetas em volta do eixo */
+  _pr(K, a, b, r, n, col, mat, o) { return K.prism(a[0], a[1], a[2], r, Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]), n, col, mat, Object.assign({ q: U.erevane._qd(a, b, o && o.roll) }, o)); }, /* prisma facetado de a até b (o.top afina a ponta, o.sx/o.sz achatam a seção) */
+  _iri(K, f, d, pal) { /* pele iridescente na última peça (difração estrutural, como besouro): a cor de cada faceta segue a direção dela (d = pesos x, y, z e |z|); f escurece; pal = quatro tons (padrão: teal, índigo, violeta, magenta) */
+    const p = K.main[K.main.length - 1]; if (!p) return; f = f || 1; d = d || [0.3, 0.8, 0, 0.2]; const n = p.geo.attributes.normal, N = n.count, c = new Float32Array(N * 3), S = (pal || ['#1C8C84', '#2A58B4', '#6844C2', '#A0408F']).map(h => new T.Color(h).multiplyScalar(f));
+    for (let i = 0; i < N; i++) { let t = 0.5 - 0.5 * (n.getX(i) * d[0] + n.getY(i) * d[1] + n.getZ(i) * d[2]) + d[3] * Math.abs(n.getZ(i)); t = Math.max(0, Math.min(0.999, t)) * 3; const j = Math.floor(t), w = t - j, A = S[j], B = S[j + 1]; c[i * 3] = A.r + (B.r - A.r) * w; c[i * 3 + 1] = A.g + (B.g - A.g) * w; c[i * 3 + 2] = A.b + (B.b - A.b) * w; }
+    p.geo.setAttribute('color', new T.BufferAttribute(c, 3)); p.c = new T.Color(1, 1, 1); },
+  _corpo(K, P, tc) { /* corpo sem braços: pernas digitígradas (coxa para a frente, joelho alto, canela para trás até o calcanhar suspenso, tarso e pé de lâmina; a perna toda balança no quadril), bacia, cintura de traje, couraça em V, flancos, gola, pescoço e ombreiras da cor do time */
+    const E = U.erevane, lp = E._lp, L = K.lite, SK = [0.32, 0.2], TP = (pts, y, th, col, mat, o) => E._tp(K, pts, y, th, col, mat, o);
+    for (const s of [-1, 1]) { const hip = [0, 4.3, s * 0.42], kn = [0.6, 2.62, s * 0.48], an = [-0.34, 1.06, s * 0.47], ft = [0.2, 0.22, s * 0.46];
+      K.anim(legSpec(hip, { amp: 0.46, stride: 10 }), () => {
+        if (!L) { K.seg(hip, kn, 0.25, '#FFFFFF', SK, { seg: 6, flat: true, pat: 0 }); E._iri(K); K.seg(kn, an, 0.18, '#FFFFFF', SK, { seg: 5, flat: true, pat: 0 }); E._iri(K); } /* coxa e canela de traje (na leve ficam sob as placas) */
+        E._pr(K, lp(hip, kn, L ? 0 : 0.08), lp(hip, kn, L ? 1 : 0.86), 0.41, 5, P.a, 'gloss', { top: 0.66, sz: 0.88 }); /* coxote */
+        E._pr(K, lp(kn, an, L ? 0 : 0.08), lp(kn, an, L ? 1 : 0.84), 0.31, 4, P.a, 'gloss', { top: 0.62, roll: PI / 4 }); /* caneleira */
+        E._pr(K, an, ft, 0.15, L ? 4 : 5, P.b, 'gloss', { top: 0.8 }); /* tarso */
+        K.poly([[-0.12, 0], [1.0, 0], [1.16, 0.07], [0.6, 0.3], [0.2, 0.42], [-0.06, 0.3]], 0.34, P.a, 'gloss', { x: ft[0] - 0.2, z: ft[2], b: L ? 0 : 0.05 }); /* pé de lâmina */
+        K.fine(() => { K.oct(kn[0] + 0.12, kn[1] - 0.32, kn[2], 0.24, 0.64, P.b, 'gloss'); K.oct(an[0], an[1] - 0.2, an[2], 0.16, 0.4, P.d, 'metal'); K.light(kn[0] + 0.33, kn[1] - 0.04, kn[2], 0.08, P.c, 2.2); K.cone(ft[0] + 1.02, 0.03, ft[2], 0.06, 0.26, P.t, 'metal', { rz: -H, seg: 5 });
+          K.seg([0.06, 3.95, s * 0.79], [0.5, 2.95, s * 0.72], 0.025, P.c, null, { e: 2, seg: 4 }); }); /* joelheira, tornozelo, luz do joelho, esporão de latão, fio teal na coxa */
+      });
+    }
+    K.prism(0, 3.98, 0, 0.62, 0.64, 6, P.b, 'gloss', { sx: 0.8, top: 1.12, ry: PI / 6 }); /* bacia */
+    K.prism(0, 4.5, 0, 0.47, 1.0, 6, '#FFFFFF', SK, { sx: 0.85, pat: 0 }); E._iri(K); /* cintura de traje */
+    K.prism(0, 5.25, 0, 0.76, 1.6, 6, L ? P.a : P.b, 'gloss', { top: 1.38, sx: 0.76, ry: PI / 6 }); /* tronco: núcleo escuro que alarga para os ombros (na leve, já na cor das placas) */
+    K.fine(() => { K.prism(0.04, 4.84, 0, 0.55, 0.26, 6, P.a, 'gloss', { sx: 0.78, top: 1.1, ry: PI / 6 }); K.prism(0.05, 5.12, 0, 0.62, 0.22, 6, P.a, 'gloss', { sx: 0.78, top: 1.1, ry: PI / 6 }); K.prism(0, 4.56, 0, 0.6, 0.08, 6, P.t, 'metal', { sx: 0.84, ry: PI / 6 }); /* gomos do abdome e cinto de latão */
+      for (const s of [-1, 1]) { K.poly([[-0.1, 5.52], [0.5, 5.47], [0.95, 5.98], [1.0, 6.55], [0.62, 6.96], [-0.1, 7.0]], 0.16, P.a, 'gloss', { z: s * 0.47, ry: s * 0.5, b: 0.05 }); /* couraça em V (duas placas que se encontram na quilha) */
+        K.poly([[-0.62, -0.72], [0.38, -0.72], [0.6, 0.1], [0.48, 0.66], [-0.66, 0.66], [-0.76, 0]], 0.1, P.a, 'gloss', { y: 6.15, z: s * 0.79, rx: s * 0.17, b: 0.04 }); /* flancos */
+        K.poly([[0.3, 4.62], [0.62, 4.5], [0.5, 3.75], [0.15, 3.6]], 0.1, P.a, 'gloss', { z: s * 0.5, ry: s * 0.6, b: 0.03 }); K.seg([0.62, 6.2, s * 0.24], [0.5, 6.85, s * 0.42], 0.025, P.c, null, { e: 2, seg: 4 }); } /* faldas nos quadris e fios teal na couraça */
+      K.prism(0.02, 6.8, 0, 0.27, 0.62, 6, '#FFFFFF', SK, { top: 0.85, pat: 0 }); E._iri(K); K.prism(0, 6.84, 0, 1.02, 0.18, 6, P.a, 'gloss', { top: 0.7, sx: 0.76, ry: PI / 6 }); K.light(0.93, 6.72, 0, 0.1, P.l, 2.2); }); /* pescoço, gola e joia violeta na quilha */
+    for (const s of [-1, 1]) { const M = pts => pts.map(p => [p[0], s * p[1]]); /* ombreiras em lâminas escalonadas: a de cima da cor do time, as de baixo grafite (caem para fora) */
+      TP(M([[0.56, -0.34], [0.46, 0.3], [0.02, 0.47], [-0.5, 0.4], [-0.64, 0], [-0.46, -0.34]]), 7.02, 0.12, tc, 'paint', { z: s * 1.0, rx: -H + s * 0.5, b: L ? 0 : 0.07 });
+      TP(M([[0.5, -0.26], [0.42, 0.26], [-0.44, 0.26], [-0.52, -0.26]]), 6.74, 0.11, P.a, 'gloss', { z: s * 1.33, rx: -H + s * 0.88, b: L ? 0 : 0.05 });
+      K.fine(() => TP(M([[0.42, -0.2], [0.35, 0.2], [-0.38, 0.2], [-0.44, -0.2]]), 6.44, 0.08, P.b, 'gloss', { z: s * 1.5, rx: -H + s * 1.18, b: 0.03 }));
+    }
+  },
+  _elmo(K, P, tc, o) { /* capacete em duas metades facetadas (largo na viseira, fecham em ponta atrás), viseira fumê com fenda violeta que contorna a frente, coroa da cor do time; o.capuz = perfil curto (sob o capuz do atirador), sem coroa */
+    o = o || {}; const E = U.erevane, L = K.lite, TP = (pts, y, th, col, mat, oo) => E._tp(K, pts, y, th, col, mat, oo);
+    const PF = (o.capuz ? [[0.6, 7.38], [0.76, 7.72], [0.7, 8.22], [0.36, 8.6], [-0.3, 8.7], [-0.8, 8.42], [-0.72, 7.9], [-0.42, 7.55], [0.02, 7.3]] : [[0.6, 7.38], [0.76, 7.72], [0.7, 8.22], [0.36, 8.58], [-0.3, 8.7], [-0.95, 8.54], [-1.18, 8.38], [-0.74, 8.04], [-0.46, 7.6], [0.02, 7.3]]).map(p => [p[0] - 0.5, p[1] - 8.5]);
+    if (L) K.poly(PF, 0.7, P.a, 'gloss', { x: 0.5, y: 8.5 }); else for (const s of [-1, 1]) K.poly(PF, 0.34, P.a, 'gloss', { x: 0.5, y: 8.5, z: s * 0.2, ry: -s * 0.15, rx: s * 0.14, b: 0.07 }); /* casco: as metades fecham atrás e no queixo (rosto em V) */
+    if (!L) TP([[0.9, 0], [0.74, 0.36], [0.34, 0.46], [0.02, 0.45], [0.02, -0.45], [0.34, -0.46], [0.74, -0.36]], 7.95, 0.26, P.g, 'glass'); /* viseira fumê */
+    TP([[0.93, 0], [0.77, 0.39], [0.36, 0.49], [0.12, 0.48], [0.12, -0.48], [0.36, -0.49], [0.77, -0.39]], 7.97, 0.05, P.l, null, { e: 2.4 }); /* fenda violeta */
+    if (!o.capuz) K.poly([[0.5, 8.34], [0.38, 8.62], [-0.3, 8.78], [-0.85, 8.62], [-1.04, 8.48], [-0.7, 8.44], [-0.3, 8.54], [0.2, 8.44]], 0.32, tc, 'paint', { b: L ? 0 : 0.06 }); /* coroa da cor do time */
+    K.fine(() => { for (const s of [-1, 1]) K.light(-0.22, 8.02, s * 0.44, 0.08, P.l, 2.2); /* sensores laterais */
+      if (!o.capuz) { K.seg([0.42, 8.66, 0], [-0.3, 8.86, 0], 0.025, P.t, 'metal', { seg: 4 }); K.seg([-0.3, 8.86, 0], [-1.04, 8.56, 0], 0.025, P.t, 'metal', { seg: 4 }); } }); /* friso de latão na crista */
+  },
+  _braco(K, P, S, Eb, M) { /* braço: traje iridescente, bíceps e antebraço facetados, cotovelo e mão (S ombro, Eb cotovelo, M mão); na leve, só as duas placas */
+    const E = U.erevane, lp = E._lp, L = K.lite;
+    if (!L) { K.seg(S, Eb, 0.17, '#FFFFFF', [0.32, 0.2], { seg: 6, flat: true, pat: 0 }); E._iri(K); }
+    E._pr(K, lp(S, Eb, L ? 0 : 0.2), lp(S, Eb, L ? 1 : 0.88), 0.25, L ? 4 : 5, P.a, 'gloss', { top: 0.78 });
+    E._pr(K, lp(Eb, M, L ? 0 : 0.06), lp(Eb, M, L ? 1 : 0.86), 0.26, L ? 4 : 5, P.a, 'gloss', { top: 0.68 });
+    K.fine(() => { K.oct(Eb[0], Eb[1] - 0.16, Eb[2], 0.19, 0.32, P.b, 'gloss'); K.box(M[0], M[1] - 0.13, M[2], 0.28, 0.26, 0.22, P.b, 'gloss'); });
+  },
+  _fuzil(K, P, B, th) { /* fuzil de fenda: coronha vazada, caixa facetada com trilho teal aceso, carregador, capa sextavada com anéis de latão, cano e boca violeta (B = coronha no ombro, th = inclinação); na leve, um contorno só */
+    const L = K.lite, c = Math.cos(th), s = Math.sin(th), W = (u, v) => [B[0] + u * c - v * s, B[1] + u * s + v * c, B[2]];
+    const PO = (pts, d, col, mat, o) => K.poly(pts, d, col, mat, Object.assign({ x: B[0], y: B[1], z: B[2], rz: th }, o));
+    const XA = (u, r, len, n, col, mat, o) => { const p = W(u, 0); K.prism(p[0], p[1], p[2], r, len, n, col, mat, Object.assign({ rz: th - H }, o)); };
+    if (L) { PO([[0, -0.22], [0, 0.1], [1.12, 0.23], [2.5, 0.12], [2.5, -0.12], [1.9, -0.58], [1.62, -0.58], [1.6, -0.17], [1.15, -0.5], [0.9, -0.48], [0.14, -0.22]], 0.2, P.a, 'gloss'); XA(2.45, 0.1, 1.55, 5, P.b, 'gloss'); }
+    else { PO([[0, -0.22], [0, 0.1], [0.3, 0.15], [0.98, 0.1], [0.98, -0.05], [0.36, -0.08], [0.14, -0.22]], 0.16, P.b, 'gloss'); /* coronha */
+      PO([[0.9, -0.13], [0.9, 0.15], [1.12, 0.23], [2.3, 0.21], [2.52, 0.1], [2.52, -0.1], [1.95, -0.17], [1.0, -0.17]], 0.24, P.a, 'gloss', { b: 0.035 }); /* caixa */
+      PO([[1.62, -0.1], [1.92, -0.1], [1.86, -0.58], [1.6, -0.54]], 0.16, P.d, 'dark'); PO([[0.98, -0.12], [1.22, -0.12], [1.1, -0.5], [0.9, -0.48]], 0.14, P.d, 'dark'); /* carregador e empunhadura */
+      XA(2.45, 0.11, 1.05, 6, P.b, 'gloss'); XA(3.45, 0.055, 0.55, 6, P.d, 'metal'); } /* capa e cano */
+    XA(3.98, 0.08, 0.12, 6, P.l, null, { e: 2.6 }); /* boca violeta */
+    const r0 = W(1.7, 0.22); K.box(r0[0], r0[1], r0[2], 1.1, 0.05, 0.07, P.c, null, { e: 2.2, rz: th }); /* trilho teal aceso */
+    K.fine(() => { const sg = W(1.3, 0.24); K.box(sg[0], sg[1], sg[2], 0.36, 0.14, 0.14, P.g, 'glass', { rz: th }); for (const u of [2.6, 3.3]) XA(u, 0.125, 0.05, 6, P.t, 'metal'); XA(3.42, 0.075, 0.05, 6, P.t, 'metal'); }); /* mira fumê e anéis de latão */
+  },
+  _mochila(K, P, tc) { /* gerador de véu nas costas: prisma sextavado escuro, tampa da cor do time, fenda teal acesa, aletas e antena com luz violeta (balança) */
+    K.prism(-0.88, 5.15, 0, 0.47, 1.6, 6, P.b, 'gloss', { sx: 0.6, top: 0.86, ry: PI / 6 });
+    K.prism(-0.88, 6.75, 0, 0.41, 0.16, 6, tc, 'paint', { sx: 0.6, top: 0.72, ry: PI / 6 });
+    K.box(-1.18, 5.35, 0, 0.05, 1.15, 0.16, P.c, null, { e: 2.2 });
+    K.fine(() => { for (const s of [-1, 1]) K.poly([[0, 0], [0.36, 0], [-0.22, 0.85], [-0.44, 0.78]], 0.05, P.a, 'gloss', { x: -0.92, y: 5.6, z: s * 0.32, rx: s * 0.3 }); /* aletas */
+      for (const y of [5.3, 5.58, 5.86, 6.14]) K.box(-1.12, y, 0, 0.06, 0.05, 0.34, P.d, 'metal', { pat: 0 }); K.prism(-0.88, 6.9, 0, 0.12, 0.1, 6, P.t, 'metal'); });
+    U.erevane._antena(K, P, [-1.0, 6.88, -0.2], [-1.28, 8.95, -0.28]);
+  },
+  infantaria(K, P, tc, o) { /* 4.3e: Infantaria Orbital — fuzil em pronto-baixo (coronha no ombro direito, cano um pouco abaixo da horizontal); braços e fuzil recuam juntos no tiro */
+    o = o || {}; const E = U.erevane; K.base = 0; /* pé chanfrado afunda 0,05 no chão: completa e leve na mesma altura */
+    E._corpo(K, P, tc); E._elmo(K, P, tc);
+    K.anim({ t: 'recoil', dist: 0.3 }, () => { E._braco(K, P, [0.02, 6.62, 0.98], [-0.22, 5.5, 1.04], [0.92, 5.81, 0.52]); E._braco(K, P, [0.02, 6.62, -0.98], [0.95, 5.95, -0.55], [2.03, 5.82, 0.4]); if (!o.noRifle) E._fuzil(K, P, [-0.08, 6.28, 0.46], -0.15); });
+    E._mochila(K, P, tc);
+  },
   coletor(K, P, tc) { // 4.3: esquife-sifão Erevane — casco facetado flutuante, bico sifão com mandíbulas, cabine de vidro fumê, carga em tanques laterais
     const TP = (pts, y, th, col, mat, o) => K.poly(pts.map(p => [p[0], -p[1]]), th, col, mat, Object.assign({ rx: -H, y }, o)); // placa vista de cima: contorno (x, z), centro em y, espessura th + 2b
     const SYM = h => h.concat(h.filter(p => p[1] !== 0).reverse().map(p => [p[0], -p[1]])); // meio contorno (z >= 0, da frente para trás) -> contorno simétrico
@@ -1286,15 +1421,106 @@ U.erevane = {
     K.anim({ t: 'spin', p: [0, 6.4, 0], speed: 0.6 }, () => { K.tor(0, 6.4, 0, 3.25, 0.14, P.b, 'gloss', { ts: 6, rs: 4 }); K.tor(0, 6.52, 0, 3.25, 0.05, P.c, null, { e: 2.2, ts: 6, rs: 4 }); ringOf(6, 3.25, (cx, cz) => { K.light(cx, 6.6, cz, 0.18, P.c, 2.4); K.fine(() => { K.prism(cx, 6.2, cz, 0.24, 0.4, 6, P.t, 'metal'); K.prism(cx, 6.1, cz, 0.12, 0.1, 6, P.c, null, { e: 2 }); }); }); });
     K.anim({ t: 'spin', p: [0, 6.9, 0], speed: -1.1 }, () => K.tor(0, 6.9, 0, 1.7, 0.06, tc, null, { e: 1.8, ts: 12, rs: 4, rz: 0.32 }));
   },
-  atirador(K, P, tc) { U.erevane.infantaria(K, P, tc, { noRifle: true }); K.anim({ t: 'recoil', dist: 0.5 }, () => { K.box(3.2, 4.7, 0.9, 7.4, 0.3, 0.3, P.d, 'metal'); K.cyl(1.6, 5.05, 0.9, 0.22, 0.22, 1.6, P.b, 'gloss', { rz: -H }); K.box(6.95, 4.7, 0.9, 0.5, 0.18, 0.18, P.c, null, { e: 2.4 }); K.box(-0.2, 4.5, 0.9, 1.2, 0.8, 0.4, P.b, 'gloss'); }); },
+  _pano() { return ['#1E2A36', '#25304C', '#3A2E62', '#4C2C5A']; }, /* 4.3e: tons do pano de refração (capa e capuz do atirador): ardósia, índigo, violeta e ameixa escuros */
+  _folha(K, G, col, mat, o) { /* 4.3e: folha facetada (dobras de origami) por uma grade de pontos G[linha][coluna] (linhas de cima para baixo, colunas de -z para +z): a frente olha para -x; o.back = cor do avesso; o.iri = brilho da pele iridescente; o.e = emissiva */
+    o = o || {}; const fr = [], bk = [];
+    for (let r = 0; r < G.length - 1; r++) for (let c = 0; c < G[r].length - 1; c++) { const a = G[r][c], b = G[r][c + 1], d = G[r + 1][c], e = G[r + 1][c + 1]; fr.push(...a, ...d, ...b, ...b, ...d, ...e); bk.push(...a, ...b, ...d, ...b, ...e, ...d); }
+    const mk = v => { const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(v, 3)); return g; };
+    K._push(mk(fr), col, mat, { flat: true, pat: 0, e: o.e }); if (o.iri && !o.e) U.erevane._iri(K, o.iri, o.dir, o.pal);
+    if (o.back) K._push(mk(bk), o.back, o.backMat || mat, { flat: true, pat: 0 });
+  },
+  _capa(K, P, tc) { /* 4.3e: capa de camuflagem que envolve o corpo (aberta na frente), em dobras de origami de pano de refração escuro com brilho iridescente, presa sob o capuz e as ombreiras, barra dentada com fio teal aceso; balança no ombro ao andar */
+    const E = U.erevane, n = K.lite ? 5 : 8, F = 1.95, R = [[7.05, 0.72], [5.7, 1.12], [4.2, 1.22], [2.75, 1.32]], G = R.map(() => []);
+    for (let c = 0; c <= n; c++) { const a = -F + c / n * 2 * F, odd = c % 2, ca = Math.cos(a), sa = Math.sin(a);
+      R.forEach(([y, r], k) => { const rr = r + (odd && k ? 0.08 * k / 3 + 0.04 : 0); G[k].push([0.1 - rr * ca, k === 3 ? y + (odd ? -0.18 : 0.18) : y, rr * sa]); }); }
+    K.anim({ t: 'sway', p: [-0.1, 7.0, 0], amp: 0.08, speed: 2.3 }, () => {
+      E._folha(K, G, '#FFFFFF', [0.3, 0.3], { iri: 1, pal: E._pano(), back: P.d });
+      E._folha(K, [G[3].map(p => [p[0] * 1.01, p[1] + 0.07, p[2] * 1.01]), G[3].map(p => [p[0] * 1.01, p[1], p[2] * 1.01])], P.c, null, { e: 2.0 });
+    });
+  },
+  _fuzilLongo(K, P, B, th) { /* 4.3e: fuzil longo do atirador — coronha com apoio de rosto, caixa facetada, luneta escura com lente teal, capa com bobinas teal acesas, cano longo, freio de boca com ponta violeta, bipé dobrado (B = coronha no ombro, th = inclinação) */
+    const L = K.lite, c = Math.cos(th), s = Math.sin(th), W = (u, v, w) => [B[0] + u * c - v * s, B[1] + u * s + v * c, B[2] + (w || 0)];
+    const PO = (pts, d, col, mat, o) => K.poly(pts, d, col, mat, Object.assign({ x: B[0], y: B[1], z: B[2], rz: th }, o));
+    const XA = (u, v, r, len, n, col, mat, o) => { const p = W(u, v); K.prism(p[0], p[1], p[2], r, len, n, col, mat, Object.assign({ rz: th - H }, o)); };
+    if (L) { PO([[0, -0.3], [0, 0.12], [1.3, 0.22], [2.85, 0.1], [2.85, -0.12], [1.4, -0.13], [1.28, -0.52], [1.08, -0.5], [1.1, -0.15], [0.22, -0.3]], 0.2, P.a, 'gloss'); XA(1.2, 0.42, 0.12, 1.25, 5, P.d, 'dark'); XA(2.8, 0, 0.085, 2.4, 5, P.b, 'gloss'); } /* leve: um contorno, luneta e cano */
+    else { PO([[0, -0.3], [0, 0.12], [0.35, 0.17], [1.15, 0.11], [1.15, -0.06], [0.5, -0.1], [0.22, -0.3]], 0.17, P.b, 'gloss'); /* coronha */
+      PO([[1.05, -0.14], [1.05, 0.15], [1.3, 0.22], [2.65, 0.2], [2.85, 0.1], [2.85, -0.12], [2.2, -0.18], [1.2, -0.18]], 0.24, P.a, 'gloss', { b: 0.035 }); /* caixa */
+      PO([[1.15, -0.13], [1.4, -0.13], [1.28, -0.52], [1.08, -0.5]], 0.14, P.d, 'dark'); /* empunhadura */
+      XA(1.2, 0.42, 0.12, 1.25, 8, P.d, 'dark'); XA(2.8, 0, 0.1, 1.0, 6, P.b, 'gloss'); XA(3.8, 0, 0.06, 1.15, 6, P.d, 'metal'); XA(4.95, 0, 0.11, 0.26, 6, P.b, 'gloss'); } /* luneta, capa do cano, cano longo e freio de boca */
+    XA(2.45, 0.42, 0.1, 0.04, 8, P.c, null, { e: 1.8 }); XA(5.21, 0, 0.075, 0.06, 6, P.l, null, { e: 2.6 }); /* lente teal e ponta violeta */
+    const nb = K.q(3); for (let i = 0; i < nb; i++) XA(2.95 + i * (L ? 0.45 : 0.3), 0, 0.125, 0.06, 6, P.c, null, { e: 2.2 }); /* bobinas teal */
+    K.fine(() => { PO([[0.45, 0.12], [1.0, 0.11], [0.95, 0.24], [0.5, 0.22]], 0.12, P.a, 'gloss'); PO([[1.95, -0.12], [2.25, -0.12], [2.2, -0.45], [1.98, -0.42]], 0.15, P.d, 'dark'); /* apoio de rosto e carregador */
+      for (const u of [1.5, 2.2]) { const m = W(u, 0.22); K.box(m[0], m[1], m[2], 0.1, 0.18, 0.1, P.t, 'metal', { rz: th }); } XA(1.15, 0.42, 0.135, 0.06, 8, P.t, 'metal'); XA(3.8, 0, 0.085, 0.06, 6, P.t, 'metal'); /* montagens e aros de latão */
+      for (const w of [-0.07, 0.07]) K.seg(W(3.9, -0.12, w), W(4.85, -0.16, w * 1.3), 0.025, P.d, 'metal', { seg: 4 }); }); /* bipé dobrado */
+  },
+  atirador(K, P, tc) { /* 4.3e: Atirador de Fenda — mesmo corpo da infantaria; capuz de duas abas em telhado (pano iridescente escuro) com crista larga da cor do time sobre o capacete curto, olho de luneta violeta, capa de camuflagem em dobras (balança), fuzil longo em pronto-baixo (braços e fuzil recuam mais no tiro) */
+    const E = U.erevane, L = K.lite; K.base = 0;
+    E._corpo(K, P, tc); E._elmo(K, P, tc, { capuz: true });
+    for (const s of [-1, 1]) { K.poly([[0.45, -0.35], [0.2, 0], [-0.5, 0.02], [-1.0, -0.25], [-1.18, -0.95], [-1.0, -1.85], [-0.4, -1.95], [-0.25, -1.1], [0.15, -0.7]], 0.1, '#FFFFFF', [0.3, 0.3], { y: 9.2, z: s * 0.32, rx: -s * 0.3, b: L ? 0 : 0.04 }); E._iri(K, 1, null, E._pano()); } /* abas do capuz */
+    K.poly([[-0.36, 9.05], [0.36, 9.05], [0.94, 7.25], [-0.94, 7.25]], 0.1, '#FFFFFF', [0.3, 0.3], { x: -1.1, ry: H }); E._iri(K, 1, null, E._pano()); /* fundo do capuz */
+    K.poly([[0.5, 9.0], [0.25, 9.24], [-0.5, 9.27], [-1.02, 9.0], [-1.16, 8.7], [-0.9, 8.8], [-0.45, 9.06], [0.25, 9.02]], 0.66, tc, 'paint', { b: L ? 0 : 0.04 }); /* crista da cor do time */
+    E._xc(K, 0.62, 8.06, 0.27, 0.13, 0.15, 0.3, P.d, 'dark', { seg: 8 }); E._xc(K, 0.92, 8.06, 0.27, 0.1, 0.1, 0.03, P.l, null, { e: 2.6, seg: 8 }); /* olho de luneta */
+    E._capa(K, P, tc);
+    K.anim({ t: 'recoil', dist: 0.45 }, () => { E._braco(K, P, [0.02, 6.62, 0.98], [-0.12, 5.42, 1.06], [1.02, 5.52, 0.47]); E._braco(K, P, [0.02, 6.62, -0.98], [0.78, 5.75, -0.62], [1.76, 5.34, 0.36]); E._fuzilLongo(K, P, [-0.05, 6.32, 0.42], -0.4); });
+  },
 };
 U.tessara = {
-  infantaria(K, P, tc, o) { o = o || {};
-    for (const s of [-1, 1]) K.anim(legSpec([0, 3.4, s * 0.8], { amp: 0.38, stride: 5 }), () => { K.seg([-0.4, 0, s * 0.8], [0.5, 1.6, s * 0.8], 0.42, P.b, 'bone'); K.seg([0.5, 1.6, s * 0.8], [0, 3.4, s * 0.75], 0.5, P.b, 'bone'); });
-    K.sph(0, 4.6, 0, 1, P.a, 'bone', { sx: 1.25, sy: 1.6, sz: 1.35, seg: 14 }); K.sph(-1.05, 5, 0, 0.75, '#A8EBB8', null, { e: 1.2, seg: 12 });
-    K.sph(0.4, 6.8, 0, 0.85, P.a, 'bone', { sx: 1.2, seg: 12 }); K.light(1.35, 6.95, 0.35, 0.22, P.l); K.light(1.35, 6.95, -0.35, 0.22, P.l); K.box(0.6, 5.7, 0, 0.5, 0.5, 2.5, tc, 'skin', { b: 0.2 });
-    K.seg([0.2, 5.6, 1.3], [1.3, 4.7, 1.1], 0.32, P.b, 'bone'); K.seg([0.2, 5.6, -1.3], [1.6, 4.7, 0.4], 0.32, P.b, 'bone');
-    if (!o.noRifle) { K.seg([0.6, 4.6, 1.1], [4.2, 4.8, 1.1], 0.3, P.t, 'bone', { taper: 0.7, anim: { t: 'recoil', dist: 0.35 } }); K.sph(1.2, 4.6, 1.1, 0.55, P.l, null, { e: 1.4, seg: 10 }); } },
+  infantaria(K, P, tc, o) { /* 4.3e: Infantaria Orbital — soldado de polímero vivo e osso (uma figura do esquadrão), tronco inclinado em postura de combate: carne escura com peitoral, coxotes e grevas de osso; capuz do capacete, ombreiras e bandoleira da cor do time (ombreira esquerda maior e com espinhos: assimétrico); crânio com nuca alongada, máscara escura, olhos verde-esmeralda enviesados e mandíbulas; fuzil vivo seguro pelos dois braços (recuam juntos no tiro); saco de seiva âmbar nas costas em costelas de osso, com duas folhas que balançam */
+    o = o && typeof o === 'object' ? o : {}; const X = U.tessara; /* 4.3e: o build passa a semente no 4º argumento */
+    for (const s of [-1, 1]) K.anim(legSpec([0, 3.42, s * 0.48], { amp: 0.5, stride: 8, ph: s > 0 ? 0 : PI }), () => X._pernaSold(K, P, s)); /* 4.3e: pernas balançam do quadril */
+    X._ovo(K, 0, 3.6, 0, 0.58, 0.44, 0.8, P.d, 'skin', { seg: 7 }); const m0 = [K.main.length, K.emi.length]; /* 4.3e: quadril; daqui até a mochila tudo inclina para a frente no fim */
+    X._ovo(K, -0.06, 4.3, 0, 0.62, 0.85, 0.8, P.d, 'skin', { seg: 7 }); X._ovo(K, 0.2, 4.98, 0, 0.64, 0.7, 0.9, P.b, 'bone', { seg: 10 }); /* 4.3e: tronco de carne e peitoral de osso */
+    X._cano(K, [[0.25, 5.62, -0.84], [0.72, 5.12, -0.36], [0.79, 4.6, 0.14], [0.3, 3.78, 0.55]], 0.085, tc, 'skin', { n: 4, k: 2 }); /* 4.3e: bandoleira da cor do time */
+    K.fine(() => { for (const s of [-1, 1]) X._ovo(K, 0.5, 5.02, s * 0.4, 0.38, 0.48, 0.42, P.a, 'bone', { seg: 7, rx: s * 0.25 }); }); /* 4.3e: peitorais */
+    K.seg([0.02, 5.4, 0], [0.16, 6.1, 0], 0.31, P.d, 'skin', { taper: 0.8, seg: 7 }); X._ovo(K, -0.02, 5.6, 0, 0.42, 0.26, 0.6, P.d, 'skin', { seg: 7 }); /* 4.3e: pescoço grosso e trapézio de carne entre as ombreiras */
+    X._ovo(K, 0.17, 6.62, 0, 0.6, 0.6, 0.55, P.a, 'bone', { seg: 11 }); X._ovo(K, -0.3, 6.84, 0, 0.62, 0.34, 0.36, P.b, 'bone', { seg: 9, rz: -0.42 }); /* 4.3e: crânio com a nuca alongada para trás */
+    X._ovo(K, -0.04, 6.7, 0, 0.76, 0.58, 0.6, tc, 'skin', { seg: 10, half: true, rz: 0.3 }); /* 4.3e: capuz da cor do time por cima do crânio (deixa a face de osso) */
+    K.fine(() => X._ovo(K, 0.55, 6.5, 0, 0.24, 0.3, 0.34, '#2C2620', 'wet', { seg: 8 })); /* 4.3e: máscara escura */
+    for (const s of [-1, 1]) { K.box(0.8, 6.54, s * 0.15, 0.12, 0.08, 0.17, '#55E68A', null, { e: 2.2, rx: -s * 0.4 }); X._espinho(K, P, [0.56, 6.28, s * 0.18], [0.84, 5.96, s * 0.09], 0.07); } /* 4.3e: olhos enviesados e mandíbulas */
+    K.fine(() => { for (const s of [-1, 1]) { K.box(0.66, 6.7, s * 0.17, 0.22, 0.08, 0.26, P.b, 'bone', { rx: -s * 0.42 }); K.box(0.74, 6.43, s * 0.27, 0.07, 0.05, 0.09, '#55E68A', null, { e: 2.0, rx: -s * 0.4 }); } }); /* 4.3e: sobrancelhas de osso e olhos menores */
+    for (let i = 0, n = K.lite ? 2 : 4; i < n; i++) X._espinho(K, P, [0.2 - i * 0.3, 7.22 - i * 0.12, 0], [-0.05 - i * 0.32, 7.62 - i * 0.16, 0], 0.07); /* 4.3e: crista de espinhos de osso no capuz */
+    for (const s of [-1, 1]) { const k = s < 0 ? 1.15 : 0.88, z = s * 1.0; X._ovo(K, 0, 5.16, z, 0.7 * k, 0.24 * k, 0.64 * k, P.b, 'bone', { seg: 10, half: true, rx: s * 0.55 }); X._ovo(K, 0, 5.2, z + s * 0.02, 0.62 * k, 0.38 * k, 0.53 * k, tc, 'skin', { seg: 10, half: true, rx: s * 0.55 });
+      K.fine(() => X._ovo(K, 0.02, 5.2 + 0.33 * k, z + s * 0.2 * k, 0.52 * k, 0.07, 0.08, P.a, 'bone', { seg: 6, rx: s * 0.55 })); } /* 4.3e: ombreiras — carapaça da cor do time sobre a aba de osso, com quilha de osso */
+    for (const [x, h] of [[0.18, 0.55], [-0.18, 0.78]]) X._espinho(K, P, [x, 5.48, -1.26], [x - 0.28, 5.48 + h, -1.62], 0.1); /* 4.3e: espinhos na ombreira esquerda */
+    K.fine(() => { for (const s of [-1, 1]) X._foto(K, P, 0.5, 5.36, s * 1.12, 0.07); });
+    X._ovo(K, -0.98, 5.0, 0, 0.42, 0.56, 0.5, P.am, 'glass', { seg: 9 }); X._ovo(K, -0.98, 5.07, 0, 0.32, 0.56, 0.38, P.am, null, { seg: 6, e: 1.3, anim: { t: 'bob', amp: 0.05, speed: 3.2 } }); /* 4.3e: saco de seiva âmbar nas costas; o miolo aceso sobe e desce e o brilho no topo pulsa */
+    K.fine(() => { for (const z of [-0.22, 0.22]) X._cano(K, [[-0.55, 5.6, z], [-1.12, 5.62, z * 1.25], [-1.46, 5.0, z * 1.3], [-1.12, 4.42, z * 1.25], [-0.55, 4.4, z]], 0.06, P.a, 'bone', { n: 4, k: 1.5 }); }); /* 4.3e: costelas de osso em volta do saco */
+    K.cyl(-0.98, 4.9, 0, 0.44, 0.45, 0.16, tc, 'skin', { seg: 10, open: true, sz: 1.17 }); /* 4.3e: cinta da cor do time na mochila (lê de costas) */
+    K.oct(-0.95, 5.5, 0, 0.17, 0.26, P.b, 'bone'); for (const [z, az, ph] of [[0.2, PI - 0.75, 0], [-0.2, PI + 0.8, 1.7]]) X._folha(K, -0.98, 5.66, z, az, 0.95, 0.48, 0.18, z > 0 ? '#5DA865' : '#7CC47F', { amp: 0.1, speed: 2.2, ph }); /* 4.3e: broto de osso com duas folhas que balançam */
+    X._inclina(K, m0, 0.14, [0, 3.7, 0]); /* 4.3e: tronco, cabeça, ombreiras e mochila inclinam ~8° para a frente */
+    if (!o.noRifle) K.anim({ t: 'recoil', dist: 0.32 }, () => X._fuzilSold(K, P)); }, /* 4.3e: braços e fuzil recuam juntos (fora da inclinação: o cano fica nivelado) */
+  /* ---------- 4.3e: ajudantes da infantaria (soldado e Quimera) ---------- */
+  /* 4.3e: elipsoide com contagem própria (o.seg lados; meia casca com o.half) e menos anéis que K.sph: a figura é pequena; segue o LOD e a versão leve */
+  _ovo(K, x, y, z, sx, sy, sz, col, mat, o) { o = o || {}; const w = SG(o.seg || 8), h = o.half ? Math.max(2, Math.round(w * 0.32)) : Math.max(3, Math.round(w * 0.6)); return K._push(new T.SphereGeometry(1, w, h, 0, PI * 2, 0, o.half ? H : PI), col, mat, Object.assign({}, o, { x, y, z, sx, sy, sz })); },
+  /* 4.3e: inclina para a frente (giro em z de a radianos em volta do pivô pv) as peças feitas desde a marca m = [main, emi], com os pivôs de animação delas: postura sem refazer as coordenadas */
+  _inclina(K, m, a, pv) { const R = new T.Matrix4().makeTranslation(pv[0], pv[1], pv[2]).multiply(new T.Matrix4().makeRotationZ(-a)).multiply(new T.Matrix4().makeTranslation(-pv[0], -pv[1], -pv[2])), v = new T.Vector3();
+    for (const p of K.main.slice(m[0]).concat(K.emi.slice(m[1]))) { p.geo.applyMatrix4(R); if (p.an) { v.set(p.an.p[0], p.an.p[1], p.an.p[2]).applyMatrix4(R); p.an.p = [v.x, v.y, v.z]; } } },
+  /* 4.3e: perna do soldado (dentro do K.anim da passada): coxa e canela de carne, coxote, joelho e greva de osso, pé de casco com garras */
+  _pernaSold(K, P, s) { const X = U.tessara, z = s * 0.5, FD = '#3E3329';
+    K.trunk([[0, 3.5, s * 0.47, 0.44], [0.34, 1.98, z, 0.31], [0.0, 0.42, z, 0.23]], '#FFFFFF', 'skin', { n: 7, c0: P.d, c1: '#4A3D31' });
+    K.fine(() => X._ovo(K, 0.28, 2.8, z + s * 0.05, 0.34, 0.62, 0.38, P.b, 'bone', { seg: 7, rz: -0.22 }));
+    K.oct(0.53, 1.8, z, 0.25, 0.4, P.a, 'bone'); X._ovo(K, 0.29, 1.2, z, 0.24, 0.64, 0.3, P.t, 'bone', { seg: 7, rz: 0.21 }); X._ovo(K, 0.2, 0.2, z, 0.56, 0.24, 0.34, FD, 'bone', { seg: 7 });
+    for (const t of (K.lite ? [-1, 1] : [-1, 0, 1])) X._espinho(K, P, [0.56, 0.18, z + t * 0.13], [0.98, 0.02, z + t * 0.22], 0.09, FD);
+    K.fine(() => { X._espinho(K, P, [0.62, 2.0, z], [0.95, 2.22, z], 0.07); X._espinho(K, P, [-0.12, 0.3, z], [-0.48, 0.1, z], 0.07, FD); X._veio(K, [[0.05, 3.2, z + s * 0.3], [0.24, 2.55, z + s * 0.32], [0.38, 2.05, z + s * 0.22]], 0.035); }); },
+  /* 4.3e: braços e fuzil vivo do soldado (dentro do K.anim do recuo): coronha de osso, câmara de carne, carregador de seiva âmbar, cano de chifre com anéis de osso, boca de dentes e miolo aceso */
+  _fuzilSold(K, P) { const X = U.tessara, y = 4.68, z = 0.6, FD = '#3E3329';
+    K.trunk([[0.22, 5.3, 1.04, 0.3], [-0.28, 4.8, 1.12, 0.23], [0.3, 4.62, 0.8, 0.18]], '#FFFFFF', 'skin', { n: 6, c0: P.d, c1: '#4A3D31' }); /* braço direito no gatilho */
+    K.trunk([[0.26, 5.3, -1.04, 0.3], [0.52, 4.76, -0.98, 0.23], [1.32, 4.6, z - 0.18, 0.18]], '#FFFFFF', 'skin', { n: 6, c0: P.d, c1: '#4A3D31' }); /* braço esquerdo cruza até o guarda-mão */
+    K.oct(0.34, 4.46, 0.78, 0.2, 0.34, FD, 'skin'); K.oct(1.36, 4.44, z - 0.15, 0.19, 0.32, FD, 'skin');
+    K.fine(() => { K.seg([-0.28, 4.82, 1.12], [0.14, 4.68, 0.88], 0.23, P.b, 'bone', { taper: 0.8, seg: 6 }); K.seg([0.58, 4.74, -0.86], [1.06, 4.65, -0.04], 0.23, P.b, 'bone', { taper: 0.8, seg: 6 }); X._espinho(K, P, [-0.34, 4.86, 1.14], [-0.7, 4.72, 1.24], 0.07); });
+    K.seg([-0.55, y + 0.1, z + 0.12], [0.3, y + 0.02, z], 0.14, P.b, 'bone', { taper: 0.75, seg: 5 }); X._ovo(K, 0.78, y, z, 0.62, 0.3, 0.27, P.d, 'skin', { seg: 8 }); X._ovo(K, 0.74, y - 0.32, z, 0.26, 0.22, 0.19, P.am, 'glass', { seg: 7 });
+    K.trunk([[1.22, y + 0.02, z, 0.17], [2.0, y + 0.05, z, 0.15], [2.68, y + 0.07, z, 0.14]], '#FFFFFF', 'bone', { n: 7, c0: P.t, c1: P.b });
+    for (const x of (K.lite ? [1.75] : [1.55, 2.15])) K.cyl(x, y + 0.04, z, 0.19, 0.19, 0.09, P.a, 'bone', { rz: -H, seg: 8, open: true });
+    K.cyl(2.64, y + 0.07, z, 0.24, 0.15, 0.2, P.b, 'bone', { rz: -H, seg: 8, open: true });
+    for (let i = 0, n = K.lite ? 2 : 4; i < n; i++) { const a = i / n * PI * 2 + 0.4; X._espinho(K, P, [2.82, y + 0.07 + Math.cos(a) * 0.17, z + Math.sin(a) * 0.17], [3.08, y + 0.07 + Math.cos(a) * 0.06, z + Math.sin(a) * 0.06], 0.05); }
+    if (K.lite) K.oct(2.84, y - 0.05, z, 0.12, 0.24, P.am, null, { e: 2.3 }); else X._ovo(K, 2.84, y + 0.07, z, 0.12, 0.12, 0.12, P.am, null, { seg: 6, e: 2.3 });
+    K.fine(() => { X._ovo(K, 0.72, y + 0.2, z, 0.46, 0.12, 0.18, P.b, 'bone', { seg: 6 }); X._veio(K, [[0.95, y + 0.17, z + 0.13], [1.6, y + 0.19, z + 0.11], [2.5, y + 0.2, z + 0.09]], 0.03); }); },
+  /* 4.3e: perna digitígrada da Quimera (dentro do K.anim da passada): coxa, canela e metatarso de carne, placas de osso, espinho no joelho, esporão e garras */
+  _pernaFera(K, P, s) { const X = U.tessara, FD = '#3E3329', z = s * 0.7, hip = [-0.2, 3.1, s * 0.6], kn = [0.4, 2.2, s * 0.72], hk = [-0.4, 1.08, z];
+    K.trunk([[hip[0], hip[1], hip[2], 0.46], [kn[0], kn[1], kn[2], 0.34], [hk[0], hk[1], hk[2], 0.22], [0.12, 0.22, z, 0.16]], '#FFFFFF', 'skin', { n: 7, c0: P.d, c1: '#4A3D31' });
+    X._ovo(K, 0.12, 2.72, s * 0.84, 0.36, 0.6, 0.3, P.b, 'bone', { seg: 7, rz: -0.6 }); X._espinho(K, P, kn, [kn[0] + 0.35, kn[1] + 0.35, kn[2] + s * 0.08], 0.09); X._espinho(K, P, hk, [hk[0] - 0.42, hk[1] - 0.3, hk[2]], 0.08, FD);
+    X._ovo(K, 0.2, 0.18, z, 0.32, 0.17, 0.28, FD, 'bone', { seg: 6 }); for (const t of (K.lite ? [-1, 1] : [-1, 0, 1])) X._espinho(K, P, [0.3, 0.18, z + t * 0.13], [0.78, 0.02, z + t * 0.24], 0.09, FD);
+    K.fine(() => { X._ovo(K, -0.06, 1.62, s * 0.74, 0.2, 0.48, 0.24, P.t, 'bone', { seg: 6, rz: 0.62 }); X._veio(K, [[hip[0] + 0.05, hip[1] - 0.2, hip[2] + s * 0.32], [0.15, 2.5, s * 0.98], [kn[0] - 0.05, kn[1] + 0.05, kn[2] + s * 0.2]], 0.035); }); },
   coletor(K, P, tc) { // 4.3: colhedeira viva — flor-mandíbula na frente, carapaça de osso sobre a membrana do time, roseta de folhas no dorso, sacos de seiva âmbar na garupa, seis pernas-raiz
     const LF = '#5DA865', LF2 = '#7CC47F', VN = '#5E7D44';
     const TH = [1.2, 2.45, 2.7, 1.95, 2.4], BR = [3.35, 2.95, 0.95, 0.9, 1.6]; // elipsoides [cx, cy, ax, ay, az] do tórax e da testa
@@ -1528,7 +1754,32 @@ U.tessara = {
     for (const s of [-1, 1]) [[2.0, 0.85, 1.9], [1.15, 0.3, 0.6], [0.25, -0.3, -0.7], [-0.65, -0.85, -1.9]].forEach(([hx, kdx, fdx], i) => X._perna(K, P, [hx, 1.95, s * 1.15], [hx + kdx, 3.05, s * 2.75], [hx + fdx, 0.15, s * 3.65], 0.19, { claws: 1, foto: i % 2 === 0, ph: (s > 0 ? 0 : PI) + (i % 2 ? PI : 0), amp: 0.32, stride: 4.5, col: P.d }));
     // 4.3d: raízes de enxerto arrastando atrás
     for (const [z, ph] of [[0, 0], [0.75, 1.3], [-0.75, 2.4]]) K.anim({ t: 'sway', p: [-3.2, 1.5, z], amp: 0.12, speed: 1.8, ph }, () => { K.trunk([[-3.2, 1.55, z, 0.13], [-3.85, 0.8, z * 1.3, 0.1], [-4.4, 0.25, z * 1.6, 0.07], [-4.85, 0.08, z * 1.85, 0.02]], VN, 'rubber', { n: 5 }); }); },
-  quimera(K, P, tc) { U.tessara.infantaria(K, P, tc); for (const s of [-1, 1]) K.cone(-0.7, 5.6, s * 1.1, 0.3, 1.8, P.t, 'bone', { rx: s * -0.6, rz: 0.5, seg: 8 }); K.cone(-0.2, 7.4, 0, 0.25, 1.4, P.t, 'bone', { rz: 0.4, seg: 8 }); },
+  quimera(K, P, tc) { /* 4.3e: Quimera — fera adaptativa e curvada: corcunda da membrana do time sob placas hexagonais de osso e fileira de espinhos (os Traços), pernas digitígradas com esporão e garras, cabeça baixa de crânio com chifres para trás, mandíbulas e olhos verde-esmeralda; braço-canhão vivo à direita (recua: anéis de osso, boca de dentes, miolo âmbar e glândula de seiva) e foice de osso à esquerda que balança no passo; cauda com ferrão que balança */
+    const X = U.tessara, HB = [-0.1, 4.6, 1.08, 0.92, 1.02]; /* 4.3e: corcunda = elipsoide [cx, cy, A, B, C] */
+    const on = (x, z, up) => { const u = (x - HB[0]) / HB[2], w = z / HB[4], y = HB[1] + (HB[3] + (up || 0)) * Math.sqrt(Math.max(0, 1 - u * u - w * w)); return [[x, y, z], [u / HB[2], (y - HB[1]) / (HB[3] * HB[3]), w / HB[4]]]; }; /* ponto e normal no topo da corcunda */
+    for (const s of [-1, 1]) K.anim(legSpec([-0.2, 3.1, s * 0.62], { amp: 0.45, stride: 7.5, ph: s > 0 ? 0 : PI }), () => X._pernaFera(K, P, s)); /* 4.3e: pernas digitígradas */
+    X._ovo(K, -0.22, 3.2, 0, 0.7, 0.52, 0.82, P.d, 'skin', { seg: 8 }); X._ovo(K, 0.1, 4.05, 0, 0.9, 1.0, 0.94, P.d, 'skin', { seg: 10, rz: -0.5 }); X._ovo(K, 0.7, 4.16, 0, 0.38, 0.54, 0.6, P.b, 'bone', { seg: 10, rz: -0.45 }); /* 4.3e: quadril, tronco inclinado e peito de osso */
+    X._ovo(K, HB[0], HB[1], 0, HB[2], HB[3], HB[4], tc, 'skin', { seg: 12, half: true }); /* 4.3e: corcunda da cor do time */
+    for (const [x, z, r] of [[0.46, 0, 0.34], [-0.12, 0, 0.36], [-0.7, 0, 0.32]].concat(K.lite ? [] : [[0.14, 0.56, 0.27], [0.14, -0.56, 0.27], [-0.44, 0.6, 0.26], [-0.44, -0.6, 0.26]])) { const [p, n] = on(x, z); X._escudo(K, P, p, n, r, 0.2, z ? P.b : P.a); } /* 4.3e: placas hexagonais de osso (Traços) */
+    for (const [x, h] of [[0.17, 0.9], [-0.41, 1.1], [-0.92, 0.8]]) { const [p, n] = on(x, 0, -0.05), L = Math.hypot(n[0], n[1]); X._espinho(K, P, p, [p[0] + (n[0] / L - 0.45) * h, p[1] + n[1] / L * h, 0], 0.12); } /* 4.3e: espinhos dorsais */
+    K.fine(() => { for (const s of [-1, 1]) for (const [x, h] of [[-0.15, 0.55], [-0.62, 0.45]]) { const [p, n] = on(x, s * 0.8, -0.04), L = Math.hypot(n[0], n[1], n[2]); X._espinho(K, P, p, [p[0] + (n[0] / L - 0.35) * h, p[1] + n[1] / L * h, p[2] + n[2] / L * h], 0.07); } }); /* 4.3e: espinhos laterais menores (Traços) */
+    K.trunk([[0.6, 4.8, 0, 0.36], [1.02, 5.02, 0, 0.3]], '#FFFFFF', 'skin', { n: 6, c0: P.d, c1: P.d }); X._ovo(K, 1.15, 5.08, 0, 0.62, 0.4, 0.45, P.a, 'bone', { seg: 10, rz: -0.12 }); X._ovo(K, 1.66, 4.88, 0, 0.38, 0.22, 0.3, P.b, 'bone', { seg: 8, rz: -0.25 }); /* 4.3e: pescoço, crânio e focinho */
+    for (const s of [-1, 1]) { X._espinho(K, P, [1.4, 4.78, s * 0.28], [2.08, 4.46, s * 0.13], 0.1); X._espinho(K, P, [1.02, 5.36, s * 0.24], [0.22, 6.05, s * 0.5], 0.13); K.box(1.68, 5.12, s * 0.24, 0.12, 0.08, 0.13, '#55E68A', null, { e: 2.2, rx: -s * 0.5, ry: s * 0.35 }); } /* 4.3e: mandíbulas, chifres para trás e olhos */
+    K.fine(() => { X._ovo(K, 1.55, 4.8, 0, 0.32, 0.1, 0.27, '#2C2620', 'wet', { seg: 7 }); for (const s of [-1, 1]) K.box(1.47, 5.24, s * 0.34, 0.08, 0.05, 0.09, '#55E68A', null, { e: 2.0, rx: -s * 0.5, ry: s * 0.45 }); for (let i = 0; i < 4; i++) X._espinho(K, P, [1.5 + i * 0.1, 4.8, (i - 1.5) * 0.1], [1.52 + i * 0.1, 4.6, (i - 1.5) * 0.09], 0.025); }); /* 4.3e: boca escura, olhos menores e dentes */
+    K.fine(() => X._ovo(K, 0.34, 4.74, 1.06, 0.56, 0.28, 0.56, P.b, 'bone', { seg: 10, half: true, rx: 0.55 })); X._ovo(K, 0.34, 4.78, 1.08, 0.47, 0.5, 0.46, tc, 'skin', { seg: 10, half: true, rx: 0.55 }); /* 4.3e: ombreira direita da cor do time */
+    X._ovo(K, 0.32, 4.8, -1.06, 0.64, 0.54, 0.62, P.a, 'bone', { seg: 10, half: true, rx: -0.55 }); for (const [x, h, a] of [[0.52, 0.75, 0.2], [0.17, 0.95, 0.45], [-0.13, 0.7, 0.75]]) X._espinho(K, P, [x, 5.15, -1.24], [x - Math.sin(a) * h, 5.15 + Math.cos(a) * h, -1.24 - h * 0.35], 0.1); /* 4.3e: placa de osso com espinhos no ombro esquerdo (Traço) */
+    K.anim({ t: 'recoil', dist: 0.26 }, () => { /* 4.3e: braço-canhão vivo (o topo do braço fica sob a ombreira mesmo recuado) */
+      K.trunk([[0.42, 4.72, 1.06, 0.29], [0.14, 4.0, 1.24, 0.25], [0.8, 3.92, 1.18, 0.34], [1.55, 3.98, 1.08, 0.3], [1.95, 4.02, 1.02, 0.25]], '#FFFFFF', 'skin', { n: 7, c0: P.d, c1: P.t });
+      for (const x of (K.lite ? [1.2] : [0.95, 1.45])) K.cyl(x, 3.96, 1.12, 0.36, 0.36, 0.11, P.a, 'bone', { rz: -H, seg: 9, open: true });
+      K.cyl(1.9, 4.02, 1.02, 0.35, 0.24, 0.24, P.b, 'bone', { rz: -H, seg: 9, open: true }); for (let i = 0, n = K.lite ? 3 : 5; i < n; i++) { const a = i / n * PI * 2 + 0.3; X._espinho(K, P, [2.12, 4.02 + Math.cos(a) * 0.27, 1.02 + Math.sin(a) * 0.27], [2.42, 4.02 + Math.cos(a) * 0.09, 1.02 + Math.sin(a) * 0.09], 0.07); }
+      if (K.lite) K.oct(2.13, 3.86, 1.02, 0.16, 0.32, P.am, null, { e: 2.3 }); else X._ovo(K, 2.13, 4.02, 1.02, 0.16, 0.16, 0.16, P.am, null, { seg: 6, e: 2.3 }); X._ovo(K, 0.8, 4.32, 1.26, 0.34, 0.24, 0.26, P.am, 'glass', { seg: 8 }); X._ovo(K, 0.8, 4.35, 1.26, 0.26, 0.24, 0.2, P.am, null, { seg: 6, e: 1.4 }); /* 4.3e: sem pulso aqui: a glândula recua com o canhão (uma animação por peça) */ X._veio(K, [[0.4, 4.6, 1.28], [0.85, 4.52, 1.44], [1.6, 4.28, 1.22]], 0.035); K.fine(() => { for (const x of [1.15, 1.55]) X._espinho(K, P, [x, 4.2, 1.08], [x - 0.3, 4.62, 1.12], 0.06); }); });
+    K.anim({ t: 'leg', p: [0.32, 4.85, -1.06], amp: 0.34, stride: 7.5, ph: 0 }, () => { /* 4.3e: foice de osso à esquerda (balança no passo, oposta à perna esquerda) */
+      K.trunk([[0.32, 4.85, -1.06, 0.3], [0.42, 3.95, -1.28, 0.22], [1.0, 3.6, -1.16, 0.19]], '#FFFFFF', 'skin', { n: 6, c0: P.d, c1: '#4A3D31' });
+      X._cano(K, [[0.95, 3.62, -1.16], [1.55, 4.12, -1.12], [2.08, 3.92, -1.06], [2.3, 3.3, -1.0]], 0.15, '#FFFFFF', 'bone', { n: 5, k: 2, r1: 0.015, c0: P.t, c1: '#EDE4CC' }); X._espinho(K, P, [1.0, 3.6, -1.16], [1.45, 3.2, -1.24], 0.08); X._espinho(K, P, [1.0, 3.6, -1.16], [1.35, 3.25, -1.0], 0.08);
+      K.fine(() => X._espinho(K, P, [0.4, 4.0, -1.3], [0.07, 3.7, -1.46], 0.08)); });
+    K.anim({ t: 'sway', p: [-0.75, 3.25, 0], amp: 0.2, speed: 2.4 }, () => { /* 4.3e: cauda com ferrão */
+      K.trunk([[-0.7, 3.3, 0, 0.32], [-1.3, 2.95, 0, 0.24], [-1.8, 2.3, 0, 0.16], [-2.0, 1.6, 0, 0.08]], '#FFFFFF', 'skin', { n: 6, c0: P.d, c1: P.t }); X._espinho(K, P, [-2.0, 1.65, 0], [-2.05, 1.05, 0], 0.09);
+      for (const [x, y] of (K.lite ? [[-1.3, 3.12]] : [[-1.05, 3.3], [-1.5, 2.88]])) X._espinho(K, P, [x, y, 0], [x - 0.35, y + 0.35, 0], 0.07); }); },
   esporo(K, P, tc) { /* 4.3d: esporo-sentinela — bexiga de gás em gaiola de costelas de osso, coroa de papilho que gira (de cima lê como estrela) com colar da cor do time, olho-sentinela de vidro com íris acesa, olhos em pedúnculo, ferrão e gavinhas pendurados, esporos-satélite que flutuam */
     const X = U.tessara, BX = '#CFEFD6', C = [0, 2.6, 0];
     K.sph(0, C[1], 0, 1, BX, 'wet', { sx: 1.35, sy: 1.5, sz: 1.35, seg: 16 }); K.sph(0, C[1] + 0.35, 0, 1, tc, 'skin', { half: true, sx: 1.33, sy: 1.18, sz: 1.33, seg: 14 });
@@ -1608,7 +1859,35 @@ U.tessara = {
     K.anim({ t: 'sway', p: [-5.0, 6.2, 0], amp: 0.1, speed: 1.6 }, () => { K.trunk([[-4.9, 6.3, 0, 0.6], [-5.8, 5.8, 0, 0.42], [-6.4, 4.95, 0, 0.18], [-6.55, 4.35, 0, 0]], '#FFFFFF', 'bone', { n: 8, c0: P.b, c1: P.a }); K.fine(() => { for (const [x, y] of [[-5.3, 6.55], [-5.95, 6.0], [-6.4, 5.25]]) X._espinho(K, P, [x, y, 0], [x - 0.45, y + 0.45, 0], 0.14); }); }); },
 };
 U.quorith = {
-  infantaria(K, P, tc) { K.prism(0, 0, 0, 1.4, 0.3, 6, P.c, null, { e: 1.6 }); K.oct(0, 1.2, 0, 1.3, 5.2, P.a, 'crystal'); K.tor(0, 3.8, 0, 1.12, 0.1, P.c, null, { e: 2.6, ts: 6 }); for (const s of [-1, 1]) K.oct(0.3, 3, s * 2, 0.45, 1.8, P.b, 'crystal', { rx: s * 0.3, anim: { t: 'bob', amp: 0.3, speed: 3, ph: s > 0 ? 0 : PI } }); K.oct(1.4, 3.4, 0, 0.3, 1.4, tc, null, { e: 1.8, rz: -H, anim: { t: 'recoil', dist: 0.4 } }); },
+  infantaria(K, P, tc) { /* 4.3e: Corista — soldado de cristal (_soldado) com fuzil de ressonância nas duas mãos: coronha escura, caixa violeta com célula acesa, cano de cristal e boca em diapasão (antebraços, mãos e fuzil recuam juntos); ressonador nas costas com tampa na cor do time e duas antenas que balançam */
+    const Q = U.quorith, yr = 2.94, zr = 0.33, X = [1, 0, 0];
+    const sh = Q._soldado(K, P, tc, { stride: 10 });
+    /* braços de cima (parados): o direito desce ao lado do corpo, o esquerdo cruza para a frente */
+    Q._bip(K, sh[1], [-0.12, 2.98, 0.74], 0.17, P.d, 'gloss', { n: 5, st: [[0, 0.85], [0.3, 1], [1, 0.62]] });
+    Q._bip(K, sh[0], [0.2, 3.02, -0.68], 0.17, P.d, 'gloss', { n: 5, st: [[0, 0.85], [0.3, 1], [1, 0.62]] });
+    K.fine(() => { K.oct(-0.12, 2.86, 0.74, 0.11, 0.26, P.t, 'crystal'); K.oct(0.2, 2.9, -0.68, 0.11, 0.26, P.t, 'crystal'); });
+    K.anim({ t: 'recoil', dist: 0.26 }, () => {
+      Q._bip(K, [-0.12, 2.98, 0.74], [0.22, yr - 0.08, zr + 0.1], 0.15, P.a, 'crystal', { n: 5, st: [[0, 0.75], [0.35, 1], [1, 0.62]] });
+      Q._bip(K, [0.2, 3.02, -0.68], [0.78, yr - 0.02, zr - 0.14], 0.15, P.a, 'crystal', { n: 5, st: [[0, 0.75], [0.35, 1], [1, 0.62]] });
+      for (const [x, z] of [[0.24, zr + 0.08], [0.8, zr - 0.15]]) K.oct(x, yr - 0.2, z, 0.13, 0.34, P.d, 'gloss');
+      Q._pr(K, -0.46, yr - 0.02, zr, 0.13, 0.6, P.d, 'gloss', { ax: X, top: 1.3 });
+      Q._pr(K, 0.12, yr, zr, 0.2, 0.56, P.t, 'crystal', { ax: X, top: 0.8 });
+      Q._pr(K, 0.16, yr + 0.15, zr, 0.095, 0.44, P.c, null, { ax: X, e: 2.2 });
+      Q._pr(K, 0.66, yr, zr, 0.1, 0.64, P.l, 'crystal', { ax: X });
+      Q._dot(K, 1.36, yr, zr, 0.08, P.c, 2.8);
+      for (const k of [-1, 1]) Q._bip(K, [1.12, yr + k * 0.07, zr], [1.56, yr + k * 0.15, zr], 0.075, P.a, 'crystal', { n: 4, f: 0.3 });
+      K.fine(() => { Q._pr(K, 1.0, yr, zr, 0.15, 0.12, P.c, null, { ax: X, e: 2 });
+        Q._bip(K, [0.34, yr - 0.12, zr], [0.5, yr - 0.56, zr], 0.1, P.b, 'crystal', { n: 4, f: 0.4, sq: 0.6 });
+        for (const x of [0.8, 0.92]) Q._pr(K, x, yr, zr, 0.12, 0.05, P.t, 'crystal', { ax: X }); Q._bip(K, [-0.4, yr + 0.08, zr], [-0.04, yr + 0.24, zr], 0.06, P.b, 'crystal', { n: 4, f: 0.5 }); for (const k of [-1, 1]) Q._dot(K, 0.4, yr + 0.02, zr + k * 0.2, 0.04, P.l, 2.4); Q._bip(K, [0.18, yr + 0.22, zr], [0.58, yr + 0.3, zr], 0.07, P.l, 'crystal', { n: 4, st: [[0, 0.6], [0.3, 1], [1, 0.5]] }); for (const k of [-1, 1]) Q._bip(K, [0.7, yr, zr + k * 0.08], [0.95, yr, zr + k * 0.2], 0.05, P.b, 'crystal', { n: 4, sq: 0.4, f: 0.3 }); });
+    });
+    /* ressonador nas costas: caixa escura, tampa na cor do time e antenas que balançam (células acesas e aletas na completa) */
+    Q._pr(K, -0.36, 2.66, 0, 0.32, 0.9, P.d, 'gloss', { top: 0.86, sx: 0.66 });
+    Q._pr(K, -0.36, 3.56, 0, 0.275, 0.18, tc, 'crystal', { top: 0.62, sx: 0.66 });
+    for (const s of [-1, 1]) K.anim({ t: 'sway', p: [-0.42, 3.66, s * 0.14], amp: 0.11, speed: 2.6, ph: s * 1.1 }, () => {
+      Q._bip(K, [-0.42, 3.6, s * 0.14], [-0.6, 4.62, s * 0.22], 0.07, P.l, 'crystal', { n: 4, st: [[0, 1], [0.2, 1], [1, 0.3]] });
+      Q._dot(K, -0.61, 4.68, s * 0.22, 0.08, P.c, 2.6); });
+    K.fine(() => { for (const s of [-1, 1]) { Q._bip(K, [-0.53, 2.78, s * 0.15], [-0.53, 3.46, s * 0.15], 0.085, P.c, null, { e: 2, n: 4, st: [[0, 0.6], [0.5, 1], [1, 0.6]] }); Q._bip(K, [-0.3, 2.72, s * 0.32], [-0.5, 3.5, s * 0.34], 0.08, P.t, 'crystal', { n: 4, f: 0.5 }); } Q._dot(K, -0.6, 3.05, 0, 0.06, P.l, 2.4); for (let i = 0; i < 3; i++) Q._bip(K, [-0.5, 2.78 + i * 0.26, 0], [-0.68, 2.9 + i * 0.26, 0], 0.08, P.b, 'crystal', { n: 4, sq: 0.35, up: [0, 0, 1], f: 0.3 }); });
+  },
   coletor(K, P, tc) { // 4.3: colhedor de cristal levitante — núcleo escuro entre placas facetadas, diapasão com lente focal (feixe), cápsulas de ressonância na cor do time, gaiola de carga acesa, aletas harmônicas e lascas em órbita
     const L6 = (x, y, z, L, W, h, top, col, mat, o) => K.prism(x, y, z, 1, h, 6, col, mat, Object.assign({ top, sz: L, sx: W / 0.866, ry: H }, o)); // losango hexagonal ao longo de x (pontas na frente e atrás)
     const X6 = (x, y, z, r, h, col, mat, o) => K.prism(x, y, z, r, h, 6, col, mat, Object.assign({ rz: -H }, o)); // prisma deitado, de x para a frente
@@ -1977,23 +2256,277 @@ U.quorith = {
     K.anim({ t: 'bob', amp: 0.2, speed: 3 }, () => { K.oct(0, 1.75, 0, 0.24, 0.9, P.l, 'crystal'); K.fine(() => { Q._dot(K, 0, 2.8, 0, 0.08, P.c, 2.6); ringOf(3, 0.3, (dx, dz) => K.oct(dx, 1.6, dz, 0.06, 0.4, P.a, 'crystal')); }); });
     K.fine(() => { Q._dot(K, 0, -0.2, 0, 0.12, P.c, 2.4); ringOf(6, 0.86, (dx, dz, a) => K.box(dx, 0.75, dz, 0.24, 0.36, 0.05, P.t, 'crystal', { ry: -a + H })); K.anim({ t: 'spin', p: [0, 1.3, 0], speed: -1.2 }, () => ringOf(6, 1.98, (dx, dz, a, i) => K.oct(dx, 1.05 + (i % 2) * 0.3, dz, 0.06, 0.34, i % 2 ? P.l : P.a, 'crystal'))); });
   },
-  voz(K, P, tc) { K.oct(0, 1.4, 0, 1.6, 6.2, P.a, 'crystal'); K.tor(0, 4.5, 0, 1.72, 0.12, P.c, null, { e: 2.6, ts: 6 }); ringOf(3, 2.6, (cx, cz, a) => K.oct(cx, 3.2 + (a > 3 ? 0.8 : 0), cz, 0.4, 1.4, P.b, 'crystal', { rz: 0.3, anim: { t: 'spin', p: [0, 3.2, 0], speed: 1.2 } })); K.tor(0, 0.4, 0, 1.4, 0.1, tc, null, { e: 2, ts: 6, anim: { t: 'spin', p: [0, 0.4, 0], speed: 1.4 } }); K.oct(0, 7.9, 0, 0.3, 0.8, P.c, null, { e: 2.6, anim: { t: 'bob', amp: 0.2, speed: 3 } }); },
-  agulha(K, P, tc) { K.prism(0, 0.4, 0, 1.6, 0.5, 6, P.d, 'gloss'); K.oct(0, 0.9, 0, 1.3, 3.8, P.a, 'crystal'); for (const [x, z, a] of [[0.8, 0.8, 0.3], [0.8, -0.8, 0.3], [-0.8, 0.8, -0.3], [-0.8, -0.8, -0.3]]) K.oct(x, 2, z, 0.28, 5.4, P.b, 'crystal', { rz: -a, rx: z * 0.3 }); K.oct(1.2, 2.4, 0, 0.3, 4, P.l, null, { e: 2.4, rz: -1.1, anim: { t: 'recoil', dist: 0.5 } }); K.tor(0, 2.6, 0, 1.5, 0.1, tc, null, { e: 2, ts: 6, anim: { t: 'spin', p: [0, 2.6, 0], speed: 1.2 } }); },
-  catedral(K, P, tc) { // épico: catedral de cristal que caminha sobre três pilares flutuantes, com sinos de cristal e coro aceso
-    K.prism(0, 0, 0, 1, 1.2, 6, P.d, 'gloss', { sx: 12, sz: 10 }); ringOf(3, 8, (cx, cz, a) => K.oct(cx, 0.6, cz, 2.2, 9, P.b, 'crystal', { anim: { t: 'bob', amp: 0.5, speed: 2.4, ph: a } }));
-    K.prism(0, 4, 0, 1, 7, 6, P.a, 'crystal', { sx: 9, sz: 7.5, top: 0.8 }); K.prism(0, 11, 0, 0.8, 5, 6, P.b, 'crystal', { sx: 9, sz: 7.5, top: 0.4 }); K.prism(0, 7.4, 0, 1.01, 0.4, 6, P.c, null, { e: 2.4, sx: 9, sz: 7.5, top: 1 });
-    K.oct(0, 15, 0, 3, 14, P.a, 'crystal', { ry: PI / 6 }); K.oct(0, 19, 0, 1.4, 6, P.c, null, { e: 2.8 }); for (const [x, z, h] of [[-5, -4, 10], [5, -4, 9], [-5, 4, 9], [5, 4, 10], [0, 6.5, 8]]) { K.oct(x, 10, z, 1.4, h, P.a, 'crystal'); K.oct(x, 10 + h * 0.55, z, 0.5, 2, P.l, null, { e: 2.6 }); }
-    K.tor(0, 22, 0, 6.5, 0.4, P.t, 'crystal', { rx: 0.3, ts: 6, anim: { t: 'spin', p: [0, 22, 0], speed: 0.6 } }); K.tor(0, 22, 0, 6, 0.25, P.l, null, { e: 2.4, rz: 0.4, ts: 6, anim: { t: 'spin', p: [0, 22, 0], speed: 0.6 } }); K.tor(0, 2.2, 0, 10, 0.3, tc, null, { e: 1.8, ts: 6, anim: { t: 'spin', p: [0, 2.2, 0], speed: 0.4 } });
-    ringOf(6, 7.4, (cx, cz) => K.oct(cx, 3.5, cz, 0.7, 10, P.b, 'crystal', { rz: cx / 7.4 * 0.32, rx: -cz / 7.4 * 0.32 })); // 4.2e: contrafortes de cristal inclinados para o corpo
-    K.prism(0, 10.7, 0, 1.03, 0.35, 6, tc, null, { e: 1.5, sx: 9, sz: 7.5, top: 1 }); // faixa na cor do dono
-    K.anim({ t: 'spin', p: [0, 25, 0], speed: 0.8 }, () => ringOf(6, 8.5, (cx, cz) => K.oct(cx, 24, cz, 0.6, 2.6, P.l, null, { e: 2.4 }))); // auréola de cristais orbitando
-    ringOf(3, 5.6, (cx, cz, a) => K.anim({ t: 'sway', p: [cx, 19.5, cz], amp: 0.06, speed: 1.2, ph: a }, () => K.box(cx, 13, cz, 0.14, 6.4, 1.7, P.c, null, { e: 1.5, ry: -a }))); }, // estandartes de luz
+  /* 4.3e — soldados do Coro e Catedral Errante: ajudantes internos (mesma convenção da 4.3d: frente em +x, chão em y = 0) */
+  _bip(K, a, b, r, col, mat, o) { /* 4.3e: lasca de cristal de a até b — estações o.st [fração, raio relativo] (padrão: ponta, cintura na fração o.f, ponta), o.n lados (a versão leve tira 2 de quem tem mais de 4), o.sq achata a seção na direção de o.up (padrão: cima; frente se a lasca for vertical), o.tw gira a seção */
+    o = o || {}; const n0 = o.n || 6, n = K.lite && n0 > 4 ? n0 - 2 : n0, st = o.st || [[0, 0], [o.f == null ? 0.5 : o.f, 1], [1, 0]], sq = o.sq || 1, tw = o.tw || 0;
+    const A = new T.Vector3(a[0], a[1], a[2]), d = new T.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]); const L = d.length() || 0.001; d.multiplyScalar(1 / L);
+    const ref = o.up ? new T.Vector3(o.up[0], o.up[1], o.up[2]) : Math.abs(d.y) < 0.9 ? new T.Vector3(0, 1, 0) : new T.Vector3(1, 0, 0);
+    const u = new T.Vector3().crossVectors(ref, d); if (u.lengthSq() < 1e-8) u.crossVectors(Math.abs(d.y) < 0.9 ? new T.Vector3(0, 1, 0) : new T.Vector3(1, 0, 0), d); u.normalize(); const v = new T.Vector3().crossVectors(d, u).normalize(); /* referência paralela à lasca: usa outra */
+    const R = st.map(([f, k]) => { const c = A.clone().addScaledVector(d, f * L), rr = k * r; if (rr <= 1e-5) return { c, p: null }; const p = []; for (let i = 0; i < n; i++) { const t = tw + i / n * PI * 2; p.push(c.clone().addScaledVector(u, Math.cos(t) * rr).addScaledVector(v, Math.sin(t) * rr * sq)); } return { c, p }; });
+    const pos = [], V = q => pos.push(q.x, q.y, q.z);
+    for (let j = 0; j < R.length - 1; j++) { const r0 = R[j], r1 = R[j + 1]; for (let i = 0; i < n; i++) { const i2 = (i + 1) % n;
+      if (r0.p && r1.p) { V(r0.p[i]); V(r0.p[i2]); V(r1.p[i2]); V(r0.p[i]); V(r1.p[i2]); V(r1.p[i]); } else if (r0.p) { V(r0.p[i]); V(r0.p[i2]); V(r1.c); } else if (r1.p) { V(r0.c); V(r1.p[i2]); V(r1.p[i]); } } }
+    const f0 = R[0].p, f1 = R[R.length - 1].p; if (f0) for (let i = 1; i < n - 1; i++) { V(f0[0]); V(f0[i + 1]); V(f0[i]); } if (f1) for (let i = 1; i < n - 1; i++) { V(f1[0]); V(f1[i]); V(f1[i + 1]); }
+    const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); return K._push(g, col, mat, { e: o.e, anim: o.anim, pat: o.pat, flat: true }); },
+  _pr(K, x, y, z, r, h, col, mat, o) { o = o || {}; const a = o.ax || [0, 1, 0]; return U.quorith._bip(K, [x, y, z], [x + a[0] * h, y + a[1] * h, z + a[2] * h], r, col, mat, { n: o.n || 6, st: [[0, 1], [1, o.top == null ? 1 : o.top]], sq: o.sx || 1, tw: o.tw || 0, up: o.up, e: o.e, anim: o.anim }); }, /* 4.3e: prisma de o.n lados (6; 4 na versão leve) de (x, y, z) ao longo do eixo o.ax (cima), base r e topo r·o.top; o.sx achata (na frente, se em pé), o.tw gira a seção */
+  _soldado(K, P, tc, o) { /* 4.3e: corpo do soldado de cristal (infantaria e agulha): pernas que andam (leg, do quadril) com coxa escura, joelho violeta e canela de gelo, quadril e cintura escuros, peito em V de gelo com núcleo aceso, gola violeta, ombreiras grandes na cor do time e cabeça de cristal flutuante sem rosto (bob) com faixa acesa e crista na cor do time; na completa (K.fine) dedos, joelheiras, caneleiras, tornozelos acesos, placas do quadril, costura acesa, peitorais, espinha, gola alta, juntas dos ombros e segundo degrau das ombreiras. Devolve os pontos dos ombros [esquerdo, direito] */
+    o = o || {}; const Q = U.quorith, b = o.bulk || 1, S = o.stride || 10, hy = 2.15, hz = 0.29 * b;
+    for (const s of [-1, 1]) K.anim(legSpec([0, hy, s * hz], { amp: 0.44, stride: S, ph: s > 0 ? 0 : PI }), () => {
+      const kn = [0.15, 1.15, s * (hz + 0.04)], ft = [0.0, 0.06, s * (hz + 0.07)];
+      Q._bip(K, [0.02, hy + 0.12, s * hz], kn, 0.24 * b, P.d, 'gloss', { n: 5, st: [[0, 0.7], [0.28, 1], [1, 0.5]], sq: 0.85 });
+      Q._bip(K, kn, ft, 0.21 * b, P.a, 'crystal', { n: 5, st: [[0, 0.62], [0.22, 1], [1, 0.16]], sq: 0.85 });
+      K.oct(kn[0] + 0.03, kn[1] - 0.15, kn[2], 0.15 * b, 0.32, P.t, 'crystal');
+      K.fine(() => { Q._bip(K, [-0.18, 0.12, ft[2]], [0.4, 0.04, ft[2]], 0.12 * b, P.l, 'crystal', { n: 4, sq: 0.5, f: 0.3 }); Q._bip(K, [kn[0] + 0.04, kn[1] - 0.2, kn[2]], [kn[0] + 0.3, kn[1] + 0.3, kn[2]], 0.1, P.t, 'crystal', { n: 4, f: 0.35, sq: 0.6 }); K.oct(kn[0] + 0.15, kn[1] - 0.08, kn[2], 0.05, 0.14, P.c, null, { e: 2.4 });
+        Q._bip(K, [0.02, hy - 0.2, s * (hz + 0.2 * b)], [0.1, hy - 0.75, s * (hz + 0.22 * b)], 0.1, P.a, 'crystal', { n: 4, sq: 0.45, up: [0, 0, 1], f: 0.3 });
+        Q._bip(K, [kn[0] + 0.12, kn[1] - 0.3, kn[2]], [ft[0] + 0.12, 0.4, ft[2]], 0.1, P.l, 'crystal', { n: 4, sq: 0.45, up: [1, 0, 0], f: 0.25 }); K.oct(ft[0] + 0.03, 0.3, ft[2], 0.06, 0.16, P.c, null, { e: 2.2 }); });
+    });
+    /* quadril e cintura escuros (costura acesa e placas de gelo do quadril só na completa) */
+    Q._pr(K, 0, 1.86, 0, 0.3 * b, 0.46, P.d, 'gloss', { top: 1.35, sx: 0.8 });
+    Q._pr(K, 0, 2.39, 0, 0.29 * b, 0.36, P.d, 'gloss', { top: 1.2, sx: 0.84 });
+    K.fine(() => { Q._pr(K, 0, 2.32, 0, 0.42 * b, 0.07, P.c, null, { sx: 0.8, e: 2 }); for (const s of [-1, 1]) { Q._bip(K, [0, 2.34, s * 0.36 * b], [0.02, 1.72, s * 0.5 * b], 0.2 * b, P.a, 'crystal', { n: 4, sq: 0.35, up: [0, 0, 1], st: [[0, 0.8], [0.35, 1], [1, 0]] }); Q._bip(K, [0.2 * b, 2.36, s * 0.12], [0.3 * b, 1.95, s * 0.16], 0.1, P.b, 'crystal', { n: 4, sq: 0.4, up: [1, 0, 0], st: [[0, 1], [0.4, 1], [1, 0]] }); } });
+    /* peito em V (gelo), achatado na frente, núcleo aceso no esterno, gola violeta e pescoço aceso */
+    Q._pr(K, 0, 2.68, 0, 0.34 * b, 0.98, P.a, 'crystal', { top: 1.95, sx: 0.66 });
+    K.oct(0.22 * b, 2.84, 0, 0.14 * b, 0.62, P.c, null, { e: 2.5 });
+    Q._pr(K, 0, 3.62, 0, 0.7 * b, 0.15, P.t, 'crystal', { top: 0.68, sx: 0.66 });
+    K.oct(0, 3.74, 0, 0.12, 0.34, P.c, null, { e: 2.6 });
+    K.fine(() => { for (const s of [-1, 1]) { Q._bip(K, [0.22 * b, 2.78, s * 0.13], [0.33 * b, 3.62, s * 0.44 * b], 0.09, P.l, 'crystal', { n: 4, f: 0.5, sq: 0.5 }); Q._glo(K, [0.03, 2.48, s * 0.33 * b], [0.03, 3.58, s * 0.6 * b], 0.03, P.c, 1.8); Q._bip(K, [-0.2 * b, 2.75, s * 0.1], [-0.3 * b, 3.6, s * 0.42 * b], 0.09, P.b, 'crystal', { n: 4, f: 0.5, sq: 0.5 });
+        Q._bip(K, [-0.1, 3.7, s * 0.22], [-0.16, 4.12, s * 0.3], 0.07, P.l, 'crystal', { n: 4, f: 0.3 }); K.oct(0, 3.4, s * 0.62 * b, 0.14, 0.32, P.d, 'gloss'); }
+      for (let i = 0; i < 3; i++) K.oct(-0.26 * b - i * 0.02, 2.5 + i * 0.36, 0, 0.06, 0.24, P.b, 'crystal', { rz: 0.5 }); });
+    /* ombreiras grandes na cor do time, inclinadas para fora (borda escura, segundo degrau, lasca de gelo e luz só na completa) */
+    const so = 0.82 * b, sy = 3.36, tl = 0.52;
+    for (const s of [-1, 1]) { const ax = [0, Math.cos(tl), s * Math.sin(tl)];
+      Q._pr(K, 0, sy, s * so, 0.43 * b, 0.46 * b, tc, 'crystal', { ax, up: [1, 0, 0], top: 0.5 });
+      K.fine(() => { Q._pr(K, 0, sy - 0.1, s * (so - 0.02), 0.45 * b, 0.12, P.d, 'gloss', { ax, up: [1, 0, 0] }); Q._pr(K, -0.02, sy + 0.32, s * (so + 0.07), 0.27 * b, 0.24 * b, tc, 'crystal', { ax, up: [1, 0, 0], top: 0.4, tw: PI / 6 });
+        Q._bip(K, [-0.08, sy + 0.22, s * (so + 0.12)], [-0.2, sy + 0.72, s * (so + 0.36)], 0.1, P.l, 'crystal', { n: 4, f: 0.3 }); Q._dot(K, 0.34 * b, sy + 0.05, s * (so + 0.1), 0.05, P.c, 2.4); }); }
+    /* cabeça flutuante: bipirâmide de cristal com faixa acesa no equador e crista na cor do time */
+    K.anim({ t: 'bob', amp: 0.045, speed: 2.4 }, () => {
+      Q._bip(K, [0, 3.9, 0], [0, 5.02, 0], 0.35, P.l, 'crystal', { n: 6, f: 0.4 });
+      Q._pr(K, 0, 4.32, 0, 0.365, 0.065, P.c, null, { e: 2.4 });
+      Q._bip(K, [-0.36, 4.55, 0], [0.16, 5.22, 0], 0.17, tc, 'crystal', { n: 4, sq: 0.32, f: 0.42, up: [0, 0, 1] });
+      K.fine(() => { for (const s of [-1, 1]) Q._bip(K, [-0.02, 4.36, s * 0.3], [-0.2, 4.7, s * 0.42], 0.05, P.l, 'crystal', { n: 4, f: 0.3 }); });
+    });
+    return [[0, sy + 0.1, -so + 0.04 * b], [0, sy + 0.1, so - 0.04 * b]];
+  },
+  voz(K, P, tc) { /* 4.3e: Voz — corista flutuante de simetria radial (o render gira a figura e a faz flutuar): fuso escuro com coração aceso, saia de três lâminas de gelo apontadas para baixo (mais três violeta e frestas acesas na completa), gola sextavada na cor do time (rufo de lascas na completa), cabeça de cristal sem rosto com faixa acesa e coroa na cor do time, auréola inclinada que gira, anel de canto aceso que sobe e desce pelo corpo, três mãos de cristal em órbita e pêndulo aceso que sobe e desce embaixo */
+    const Q = U.quorith;
+    K.anim({ t: 'bob', amp: 0.09, speed: 2.8 }, () => { Q._bip(K, [0, 0.04, 0], [0, 0.8, 0], 0.15, P.c, null, { e: 2.3, n: 6, f: 0.55 }); K.fine(() => ringOf(3, 0.24, (dx, dz) => K.oct(dx, 0.45, dz, 0.045, 0.26, P.l, null, { e: 2.2 }))); });
+    /* corpo: fuso escuro, coração aceso e saia de lâminas */
+    Q._bip(K, [0, 0.86, 0], [0, 3.15, 0], 0.32, P.d, 'gloss', { n: 6, st: [[0, 0], [0.72, 1], [1, 0.78]] });
+    K.oct(0, 2.0, 0, 0.2, 0.74, P.c, null, { e: 2.4 });
+    ringOf(3, 1, (dx, dz) => Q._bip(K, [dx * 0.1, 0.78, dz * 0.1], [dx * 0.44, 2.95, dz * 0.44], 0.3, P.a, 'crystal', { n: 4, sq: 0.3, up: [dx, 0, dz], st: [[0, 0], [0.76, 1], [1, 0.5]] }));
+    K.fine(() => { ringOf(3, 1, (dx, dz, a) => { const c = Math.cos(a + PI / 3), s = Math.sin(a + PI / 3);
+      Q._bip(K, [c * 0.08, 1.0, s * 0.08], [c * 0.4, 2.9, s * 0.4], 0.22, P.t, 'crystal', { n: 4, sq: 0.3, up: [c, 0, s], st: [[0, 0], [0.72, 1], [1, 0.5]] });
+      Q._bip(K, [c * 0.1, 1.25, s * 0.1], [c * 0.4, 2.75, s * 0.4], 0.055, P.c, null, { e: 2.3, n: 4, st: [[0, 0], [0.7, 1], [1, 0.4]] });
+      Q._glo(K, [dx * 0.17, 1.1, dz * 0.17], [dx * 0.52, 2.85, dz * 0.52], 0.022, P.l, 1.8); Q._dot(K, dx * 0.46, 2.92, dz * 0.46, 0.05, P.l, 2.4);
+      Q._bip(K, [dx * 0.16, 1.05, dz * 0.16], [dx * 0.3, 0.55, dz * 0.3], 0.07, P.b, 'crystal', { n: 4, f: 0.35 }); Q._bip(K, [dx * 0.2, 1.3, dz * 0.2], [dx * 0.54, 2.85, dz * 0.54], 0.05, P.l, 'crystal', { n: 4, st: [[0, 0], [0.15, 1], [0.9, 1], [1, 0]] }); }); });
+    /* anel de canto aceso que sobe e desce pelo corpo (o pulso da Voz) */
+    K.anim({ t: 'bob', p: [0, 2.2, 0], amp: 0.5, speed: 2.6 }, () => { K.tor(0, 2.2, 0, 0.52, 0.035, P.c, null, { e: 2.2, ts: 6, rs: 3 }); K.fine(() => ringOf(6, 0.52, (dx, dz, a, i) => K.oct(dx, 2.12 + (i % 2) * 0.06, dz, 0.035, 0.18, P.l, null, { e: 2.2 }))); });
+    /* gola na cor do time (borda escura, rufo de lascas e luzes na completa) e pescoço aceso */
+    Q._pr(K, 0, 3.0, 0, 0.64, 0.26, tc, 'crystal', { top: 0.56 });
+    K.oct(0, 3.22, 0, 0.11, 0.32, P.c, null, { e: 2.6 });
+    K.fine(() => { Q._pr(K, 0, 3.26, 0, 0.4, 0.12, tc, 'crystal', { top: 0.7, tw: PI / 6 }); for (const y of [1.55, 2.62]) Q._pr(K, 0, y, 0, y > 2 ? 0.33 : 0.27, 0.08, P.t, 'crystal'); ringOf(3, 0.5, (dx, dz) => Q._bip(K, [dx * 0.06, 0.95, dz * 0.06], [dx * 0.45, 0.5, dz * 0.45], 0.04, P.l, 'crystal', { n: 4, st: [[0, 1], [1, 1]] }));
+      ringOf(3, 1, (dx, dz) => { for (const f of [0.45, 0.7]) Q._bip(K, [dx * (0.1 + 0.34 * f), 0.78 + 2.17 * f, dz * (0.1 + 0.34 * f)], [dx * (0.3 + 0.34 * f), 0.98 + 2.17 * f, dz * (0.3 + 0.34 * f)], 0.06, P.l, 'crystal', { n: 4, f: 0.3 }); });
+      Q._pr(K, 0, 2.94, 0, 0.68, 0.07, P.d, 'gloss'); ringOf(6, 0.46, (dx, dz, a, i) => { Q._bip(K, [dx, 3.1, dz], [dx * 1.5, 3.42 + (i % 2) * 0.12, dz * 1.5], 0.07, i % 2 ? tc : P.l, 'crystal', { n: 4, f: 0.3, sq: 0.5 }); const b = a + PI / 6; Q._dot(K, Math.cos(b) * 0.5, 3.06, Math.sin(b) * 0.5, 0.04, P.c, 2.4); }); });
+    /* cabeça flutuante com faixa acesa e coroa de três lascas na cor do time */
+    K.anim({ t: 'bob', amp: 0.05, speed: 2.2, ph: 1 }, () => { Q._bip(K, [0, 3.42, 0], [0, 4.46, 0], 0.32, P.l, 'crystal', { n: 6, f: 0.4 }); Q._pr(K, 0, 3.81, 0, 0.335, 0.06, P.c, null, { e: 2.4 });
+      ringOf(3, 0.2, (dx, dz) => Q._bip(K, [dx, 4.2, dz], [dx * 2.1, 4.72, dz * 2.1], 0.07, tc, 'crystal', { n: 4, f: 0.3 }));
+      K.fine(() => { ringOf(3, 0.28, (dx, dz, a) => { const c = Math.cos(a + PI / 3), s = Math.sin(a + PI / 3); K.oct(c * 0.28, 3.98, s * 0.28, 0.04, 0.16, P.c, null, { e: 2.2 }); Q._bip(K, [c * 0.28, 3.9, s * 0.28], [c * 0.48, 4.25, s * 0.48], 0.045, P.l, 'crystal', { n: 4, f: 0.3 }); }); Q._pr(K, 0, 4.16, 0, 0.2, 0.06, P.t, 'crystal'); }); });
+    K.anim({ t: 'spin', p: [0, 4.6, 0], speed: 1.3 }, () => { K.tor(0, 4.6, 0, 0.5, 0.04, P.c, null, { e: 2.2, ts: 6, rs: 3, rx: 0.3 }); K.fine(() => { ringOf(3, 0.5, (dx, dz) => K.oct(dx, 4.51 - dz * Math.sin(0.3), dz * Math.cos(0.3), 0.055, 0.18, P.l, null, { e: 2.4 })); /* sobre o anel inclinado (rx: y = -z·sen) */ ringOf(3, 0.2, (dx, dz, a) => { const c = Math.cos(a + PI / 3), s = Math.sin(a + PI / 3); K.oct(c * 0.2, 4.5, s * 0.2, 0.05, 0.2, P.l, 'crystal'); }); ringOf(3, 0.62, (dx, dz) => K.oct(dx, 4.2 + dz * 0.3, dz, 0.04, 0.16, P.c, null, { e: 2.4 })); }); });
+    /* mãos de cristal em órbita (três, a 120°): lasca de gelo com ponta acesa (lascas violeta por dentro na completa) */
+    K.anim({ t: 'spin', p: [0, 2.5, 0], speed: -1.1 }, () => ringOf(3, 1.0, (dx, dz) => { const c = dx, s = dz;
+      Q._bip(K, [dx, 1.8, dz], [dx + c * 0.16, 3.05, dz + s * 0.16], 0.16, P.l, 'crystal', { n: 4, f: 0.3, sq: 0.6, up: [c, 0, s] });
+      Q._dot(K, dx - c * 0.02, 1.7, dz - s * 0.02, 0.08, P.c, 2.6);
+      K.fine(() => { for (const k of [-1, 1]) Q._bip(K, [c * 0.8 - s * k * 0.12, 2.05, s * 0.8 + c * k * 0.12], [c * 0.84 - s * k * 0.16, 2.75, s * 0.84 + c * k * 0.16], 0.06, P.t, 'crystal', { n: 4, f: 0.4 }); Q._dot(K, c * 1.12, 2.98, s * 1.12, 0.045, P.l, 2.4); Q._bip(K, [dx + c * 0.02, 2.15, dz + s * 0.02], [dx + c * 0.04, 2.3, dz + s * 0.04], 0.1, P.t, 'crystal', { n: 6, st: [[0, 1], [1, 1]] }); K.oct(dx + c * 0.06, 2.5, dz + s * 0.06, 0.05, 0.2, P.c, null, { e: 2.2 }); }); }));
+  },
+  agulha(K, P, tc) { /* 4.3e: Agulheiro — soldado de cristal mais robusto (_soldado) com lançador de agulhas apontado para o céu nas duas mãos (tubo escuro, anéis acesos, agulha de cristal; recua com os antebraços) e aljava de cinco agulhas em leque nas costas (pontas acesas, berço escuro com tampa na cor do time) */
+    const Q = U.quorith, b = 1.1, al = 0.62, ca = Math.cos(al), sa = Math.sin(al), zr = 0.36;
+    const sh = Q._soldado(K, P, tc, { stride: 10, bulk: b });
+    const L = (t, dz) => [0.0 + ca * t, 2.9 + sa * t, zr + (dz || 0)]; /* ponto ao longo do lançador (t a partir da culatra) */
+    Q._bip(K, sh[1], [-0.12, 2.98, 0.72], 0.17, P.t, 'crystal', { n: 5, st: [[0, 0.85], [0.3, 1], [1, 0.62]] });
+    Q._bip(K, sh[0], [0.12, 3.02, -0.66], 0.17, P.t, 'crystal', { n: 5, st: [[0, 0.85], [0.3, 1], [1, 0.62]] });
+    K.anim({ t: 'recoil', dist: 0.22 }, () => {
+      Q._bip(K, [-0.12, 2.98, 0.72], L(0.25, 0.12), 0.15, P.a, 'crystal', { n: 5, st: [[0, 0.75], [0.35, 1], [1, 0.62]] });
+      Q._bip(K, [0.12, 3.02, -0.66], L(0.72, -0.18), 0.15, P.a, 'crystal', { n: 5, st: [[0, 0.75], [0.35, 1], [1, 0.62]] });
+      for (const [t, dz] of [[0.25, 0.1], [0.72, -0.18]]) { const p = L(t, dz); K.oct(p[0], p[1] - 0.18, p[2], 0.13, 0.34, P.d, 'gloss'); }
+      Q._bip(K, L(-0.45), L(0.92), 0.2, P.d, 'gloss', { n: 6, st: [[0, 0.8], [0.12, 1], [0.9, 1], [1, 0.85]] });
+      Q._bip(K, L(0.62), L(0.72), 0.245, P.c, null, { e: 2, n: 6, st: [[0, 1], [1, 1]] });
+      Q._bip(K, L(0.92), L(1.66), 0.13, P.l, 'crystal', { n: 4, st: [[0, 1], [0.15, 1], [1, 0]] });
+      Q._dot(K, ...L(1.7), 0.08, P.c, 2.8);
+      K.fine(() => { Q._bip(K, L(0.05), L(0.15), 0.245, P.c, null, { e: 2, n: 6, st: [[0, 1], [1, 1]] }); Q._bip(K, L(0.3, 0), [L(0.3)[0] - 0.12, L(0.3)[1] - 0.42, zr], 0.08, tc, 'crystal', { n: 4, f: 0.4, sq: 0.6 });
+        for (const t of [0.35, 0.5]) Q._bip(K, L(t), L(t + 0.05), 0.225, P.t, 'crystal', { n: 6, st: [[0, 1], [1, 1]] }); for (const k of [-1, 1]) Q._bip(K, L(0.75, k * 0.13), L(1.15, k * 0.17), 0.04, P.a, 'crystal', { n: 4, f: 0.3 }); const m0 = L(0.2), m1 = L(0.62); Q._bip(K, [m0[0] - 0.1, m0[1] + 0.2, zr], [m1[0] - 0.12, m1[1] + 0.22, zr], 0.06, P.l, 'crystal', { n: 4, st: [[0, 0.6], [0.3, 1], [1, 0.5]] }); });
+    });
+    /* aljava: berço escuro com tampa na cor do time e cinco agulhas em leque (pontas acesas; as duas de fora só na completa) */
+    Q._pr(K, -0.4, 2.62, 0, 0.34, 0.92, P.d, 'gloss', { top: 0.92, sx: 0.66 });
+    Q._pr(K, -0.4, 3.5, 0, 0.32, 0.18, tc, 'crystal', { top: 0.72, sx: 0.66 });
+    const agu = k => { const ak = Math.abs(k), A = [-0.42 - ak * 0.02, 3.45, k * 0.12], B = [-0.66 - ak * 0.08, 5.4 - ak * 0.28, k * 0.29], M = A.map((v, j) => v + (B[j] - v) * 0.72);
+      Q._bip(K, A, M, 0.08, ak % 2 ? P.a : P.l, 'crystal', { n: 4, st: [[0, 1], [1, 1]] }); Q._bip(K, M, B, 0.08, P.c, null, { e: 2.3, n: 4, st: [[0, 1], [1, 0]] }); };
+    for (const k of [-1, 0, 1]) agu(k); K.fine(() => { agu(-2); agu(2); });
+    K.fine(() => { for (const s of [-1, 1]) { Q._glo(K, [-0.62, 2.75, s * 0.2], [-0.62, 3.4, s * 0.22], 0.03, P.c, 2); Q._bip(K, [-0.3, 2.7, s * 0.34], [-0.55, 3.45, s * 0.36], 0.09, P.t, 'crystal', { n: 4, f: 0.5, sq: 0.5 }); } Q._bip(K, [-0.68, 2.7, 0], [-0.7, 3.3, 0], 0.07, P.t, 'crystal', { n: 4, f: 0.5 }); });
+  },
+  catedral(K, P, tc) { /* 4.3e: Catedral Errante — catedral gótica de cristal sobre casco flutuante em cruz (proa em ponta na frente), andando em seis pilares de cristal que marcham em tripé (leg); telhados na cor do time, vitrais acesos entre contrafortes com arcobotantes, rosáceas no transepto e na fachada, duas torres com campanário aberto (sinos que balançam) e agulhas, torre do cruzeiro com a flecha mais alta, cristal flutuante e auréola de lascas que gira, abside com órgão de tubos acesos (o coro), estandartes de luz na cor do time e quilha de cristal pendurada sob o casco */
+    const Q = U.quorith, yb = 10.1, yw = 7.0, yt = yb + yw, xc = -1.6, xa = -9.2, xt = 6.0;
+    /* lanceta (janela gótica): painel aceso em arco quebrado com moldura violeta atrás; ry = direção da normal da parede */
+    const lanc = (x, y, z, w, h, ry, k, fr) => { const pts = [[-w / 2, 0], [w / 2, 0], [w / 2, h * 0.68], [0, h], [-w / 2, h * 0.68]];
+      if (fr !== false && !K.lite) K.poly(pts.map(([a, b]) => [a * 1.32, b * 1.08 - h * 0.04]), 0.12, P.t, 'crystal', { x, y, z, ry, flat: true });
+      K.poly(pts, 0.06, P.c, null, { x: x + Math.sin(ry) * 0.05, y, z: z + Math.cos(ry) * 0.05, ry, e: k || 1.7, flat: true }); };
+    const pin = (x, y, z, r, h, col) => { Q._pr(K, x, y, z, r, h * 0.35, P.t, 'crystal'); Q._bip(K, [x, y + h * 0.35, z], [x, y + h, z], r * 1.05, col || P.l, 'crystal', { n: 4, st: [[0, 1], [1, 0]] }); };
+    const qn = (nx, nz) => new T.Quaternion().setFromUnitVectors(new T.Vector3(0, 1, 0), new T.Vector3(nx, 0, nz));
+    /* rosácea: vidro aceso, aro violeta, raios de cristal e núcleo na cor do time; (nx, nz) = normal da parede */
+    const rosa = (x, y, z, R, nx, nz) => { const tx = nz, tz = -nx, n = K.lite ? 6 : 16, at = (c, s, k, o) => [x + nx * o + tx * c * R * k, y + s * R * k, z + nz * o + tz * c * R * k];
+      K.cyl(x, y, z, R, R, 0.1, P.c, null, { e: 1.5, q: qn(nx, nz), seg: K.lite ? 8 : 12, facet: true });
+      K.tor(x + nx * 0.08, y, z + nz * 0.08, R, 0.16, P.t, 'crystal', { ts: 12, rs: 4, q: qn(nx, nz) });
+      for (let i = 0; i < n; i++) { const a = i / n * PI * 2; Q._bip(K, at(Math.cos(a), Math.sin(a), 0.22, 0.12), at(Math.cos(a), Math.sin(a), 0.96, 0.12), 0.07, P.l, 'crystal', { n: 4, st: [[0, 1], [1, 1]] }); }
+      Q._bip(K, [x, y, z], [x + nx * 0.5, y, z + nz * 0.5], R * 0.24, tc, 'crystal', { n: 6, st: [[0, 1], [0.6, 1], [1, 0.4]] });
+      K.fine(() => { K.tor(x + nx * 0.1, y, z + nz * 0.1, R * 0.55, 0.06, P.l, 'crystal', { ts: 12, rs: 4, q: qn(nx, nz) }); for (let i = 0; i < 12; i++) { const a = (i + 0.5) / 12 * PI * 2; Q._dot(K, ...at(Math.cos(a), Math.sin(a), 0.78, 0.12), 0.09, P.l, 2.4); } }); };
+
+    /* 1. pilares que andam: seis colunas de cristal em tripé, encaixe escuro com anel de levitação aceso, faixas e pé em ponta; poça de luz fixa no chão */
+    for (const [x, s] of [[xt, 1], [xc, 1], [-8.9, 1], [xt, -1], [xc, -1], [-8.9, -1]]) { const z = s * 5.2, ph = ((x !== xc) === (s > 0)) ? 0 : PI;
+      K.anim(legSpec([x, 7.9, z], { amp: 0.2, stride: 14, ph }), () => {
+        Q._pr(K, x, 6.5, z, 1.42, 0.9, P.d, 'gloss', { top: 0.84 }); if (K.lite) Q._pr(K, x, 7.55, z, 1.3, 0.14, P.c, null, { e: 2.2, tw: PI / 6 }); else K.tor(x, 7.66, z, 1.22, 0.1, P.c, null, { e: 2.2, ts: 6, rs: 3 });
+        Q._pr(K, x, 1.9, z, 0.84, 4.6, P.a, 'crystal', { top: 1.36, tw: PI / 6 });
+        Q._pr(K, x, 4.9, z, 1.12, 0.34, P.t, 'crystal', { tw: PI / 6 }); Q._pr(K, x, 3.2, z, 1.0, 0.22, P.c, null, { e: 2, tw: PI / 6 });
+        Q._bip(K, [x, 1.95, z], [x, 0.0, z], 0.9, P.b, 'crystal', { n: 6, tw: PI / 6, st: [[0, 1], [0.25, 1.08], [1, 0]] });
+        K.fine(() => { ringOf(3, 0.8, (dx, dz) => { Q._bip(K, [x + dx, 1.4, z + dz], [x + dx * 2.0, 0.08, z + dz * 2.0], 0.24, P.t, 'crystal', { n: 4, f: 0.3 }); Q._glo(K, [x + dx * 1.16, 2.2, z + dz * 1.16], [x + dx * 1.42, 6.3, z + dz * 1.42], 0.06, P.c, 1.8); });
+          ringOf(6, 1.25, (dx, dz, a, i) => K.oct(x + dx, 7.05, z + dz, 0.18, 0.56, i % 2 ? P.l : P.b, 'crystal')); Q._pr(K, x, 5.95, z, 1.1, 0.12, P.t, 'crystal', { tw: PI / 6 }); });
+      });
+      Q._pr(K, x, 0, z, 2.0, 0.03, P.c, null, { e: 0.55 }); }
+
+    /* 2. casco flutuante em cruz com proa em ponta: dois degraus escuros, costura acesa e borda de gelo; quilha de cristal pendurada no cruzeiro (sobe e desce) */
+    const OUT = [[10.6, 0], [7.9, 6.1], [1.4, 6.1], [1.4, 8.2], [-1.6, 9.8], [-4.6, 8.2], [-4.6, 6.1], [-9.6, 6.1], [-12.5, 3.4], [-13.1, 0]]; const OL = OUT.concat(OUT.slice(1, -1).reverse().map(([x, z]) => [x, -z]));
+    const hull = (y, h, k, col, mat, o) => K.poly(OL.map(([x, z]) => [x * k, z * k]), h, col, mat, Object.assign({ x: -0.6 * (k - 1), y: y + h / 2, z: 0, rx: -H, flat: true }, o));
+    hull(8.0, 0.9, 0.9, P.d, 'gloss'); hull(8.9, 0.85, 1, P.d, 'gloss', { b: K.lite ? 0 : 0.12 }); hull(9.75, 0.1, 1.012, P.c, null, { e: 1.6 }); hull(9.85, 0.25, 1.006, P.a, 'crystal');
+    K.poly([[10.0, 0], [7.6, 1.0], [7.6, -1.0]], 0.05, P.c, null, { y: 10.13, rx: -H, e: 1.4, flat: true });
+    K.anim({ t: 'bob', amp: 0.25, speed: 1.1 }, () => { Q._bip(K, [xc, 8.4, 0], [xc, 3.4, 0], 1.7, P.t, 'crystal', { n: 6, st: [[0, 1], [0.3, 0.86], [1, 0]] }); Q._bip(K, [xc, 7.8, 0], [xc, 4.7, 0], 1.0, P.c, null, { e: 2, n: 6, tw: PI / 6, st: [[0, 1], [1, 0]] }); K.fine(() => ringOf(6, 1.55, (dx, dz) => Q._bip(K, [xc + dx, 7.6, dz], [xc + dx * 1.3, 5.6, dz * 1.3], 0.22, P.b, 'crystal', { n: 4, f: 0.3 }))); });
+    K.fine(() => { for (const [x, z, h] of [[3.0, 2.6, 2.6], [3.0, -2.6, 2.2], [-5.4, 2.4, 2.4], [-5.4, -2.4, 2.8], [8.6, 0, 2.0], [-11.4, 0, 2.2], [xc, 7.4, 2.0], [xc, -7.4, 2.0], [-11.0, 2.6, 1.6], [-11.0, -2.6, 1.6]]) Q._bip(K, [x, 8.05, z], [x, 8.05 - h, z], 0.5, P.b, 'crystal', { n: 4, st: [[0, 1], [1, 0]] });
+      for (let i = 0; i < 6; i++) for (const s of [-1, 1]) Q._pino(K, P, i < 3 ? -9.0 + i * 1.6 : 1.9 + (i - 3) * 1.6, 10.1, s * 5.75, 0.17, i % 2 ? P.t : P.b);
+      for (const s of [-1, 1]) pin(8.4, yb, s * 3.1, 0.3, 2.6); });
+
+    /* 3. nave: paredes altas de gelo com clerestório aceso, naves laterais baixas (meia-água na cor do time, vitrais), contrafortes violeta com pináculos e arcobotantes por cima das naves laterais */
+    K.box(-2.2, yb, 0, 14.4, yw, 8.0, P.a, 'crystal'); const ya = 3.3;
+    for (const s of [-1, 1]) {
+      for (const [x0, x1] of [[0.7, 4.5], [-9.4, -3.9]]) { K.box((x0 + x1) / 2, yb, s * 4.75, x1 - x0, ya, 1.5, P.a, 'crystal'); K.poly([[-s * 5.62, 0], [-s * 3.96, 0], [-s * 3.96, 1.15]], x1 - x0, tc, 'crystal', { x: (x0 + x1) / 2, y: yb + ya, z: 0, ry: H, flat: true }); }
+      for (const x of [1.8, 3.6, -5.3, -7.5]) { lanc(x, yb + ya + 1.25, s * 4.03, 1.05, 2.3, s > 0 ? 0 : PI, 1.9); lanc(x, yb + 0.45, s * 5.53, 0.95, 2.3, s > 0 ? 0 : PI, 1.6); K.fine(() => { for (const [y, h, zz] of [[yb + ya + 1.25, 2.2, 4.12], [yb + 0.45, 2.2, 5.62]]) Q._bip(K, [x, y, s * zz], [x, y + h * 0.8, s * zz], 0.06, P.t, 'crystal', { n: 4, st: [[0, 1], [1, 1]] }); }); }
+      for (const x of [2.7, -4.4, -6.4, -8.6]) { Q._pr(K, x, yb + ya, s * 4.22, 0.4, yw - ya + 0.5, P.t, 'crystal', { n: 4, tw: PI / 4 }); pin(x, yt + 0.5, s * 4.22, 0.3, 1.8);
+        Q._pr(K, x, yb, s * 5.62, 0.55, ya + 1.2, P.b, 'crystal', { n: 4, tw: PI / 4, top: 0.8 }); pin(x, yb + ya + 1.2, s * 5.62, 0.4, 2.2, P.l);
+        Q._bip(K, [x, yb + ya + 0.9, s * 5.45], [x, yt - 0.35, s * 4.4], 0.22, P.t, 'crystal', { n: 4, st: [[0, 1], [1, 1]] }); K.fine(() => Q._bip(K, [x, yb + ya + 0.2, s * 5.45], [x, yb + ya + 2.0, s * 4.4], 0.15, P.b, 'crystal', { n: 4, st: [[0, 1], [1, 1]] })); }
+      K.fine(() => { for (const [x0, x1] of [[-9.4, -3.9], [0.7, 4.5]]) { Q._glo(K, [x0, yt - 0.25, s * 4.06], [x1, yt - 0.25, s * 4.06], 0.06, P.c, 1.6); Q._glo(K, [x0, yb + ya - 0.2, s * 5.56], [x1, yb + ya - 0.2, s * 5.56], 0.05, P.c, 1.4); } });
+    }
+    /* telhado da nave na cor do time (losango ao longo de x), cumeeira com cristais e nervuras */
+    Q._bip(K, [-9.3, yt, 0], [5.9, yt, 0], 4.35, tc, 'crystal', { n: 4, sq: 0.88, st: [[0, 1], [1, 1]] });
+    K.fine(() => { for (const x of [-8.6, -7.0, -5.4, 1.6, 3.2, 4.6]) K.oct(x, yt + 3.65, 0, 0.18, 0.75, P.l, 'crystal'); for (let x = -8.9; x < 5.4; x += 0.55) if (Math.abs(x - xc) > 2.4) K.oct(x, yt + 3.72, 0, 0.07, 0.32, P.c, null, { e: 2 }); for (const z of [-6.6, -5.0, -3.4, 3.4, 5.0, 6.6]) K.oct(xc, yt + 3.65, z, 0.16, 0.65, P.l, 'crystal');
+      for (const x of [2.7, -4.4, -6.4, -8.6]) for (const s of [-1, 1]) Q._bip(K, [x, yt + 3.75, s * 0.1], [x, yt + 0.1, s * 4.2], 0.08, P.t, 'crystal', { n: 4, st: [[0, 1], [1, 1]] }); });
+
+    /* 4. transepto: braços com rosácea e portal aceso em cada ponta, contrafortes com pináculos, telhado na cor do time */
+    K.box(xc, yb, 0, 4.6, yw, 16.2, P.a, 'crystal');
+    Q._bip(K, [xc, yt, -8.02], [xc, yt, 8.02], 2.75, tc, 'crystal', { n: 4, sq: 1.38, st: [[0, 1], [1, 1]], up: [0, 1, 0] });
+    for (const s of [-1, 1]) { rosa(xc, yb + 4.2, s * 8.12, 1.75, 0, s); lanc(xc, yb + 0.2, s * 8.13, 1.2, 1.9, s > 0 ? 0 : PI, 2); for (const x of [xc - 2.3, xc + 2.3]) { Q._pr(K, x, yb, s * 8.2, 0.45, yw + 0.4, P.t, 'crystal', { n: 4, tw: PI / 4 }); pin(x, yt + 0.4, s * 8.2, 0.34, 2.2); } }
+
+    /* 5. fachada (frente, +x): duas torres com campanário aberto (sino que balança), agulhas e estandartes de luz; empena com rosácea e portal aceso */
+    for (const s of [-1, 1]) { const z = s * 3.9;
+      K.box(xt, yb, z, 3.0, 10.4, 3.0, P.a, 'crystal'); Q._pr(K, xt, yb + 10.4, z, 2.26, 0.35, tc, 'crystal', { n: 4, tw: PI / 4 }); Q._pr(K, xt, yb + 14.37, z, 1.9, 0.3, tc, 'crystal', { n: 4, tw: PI / 4, top: 0.85 });
+      for (const [dx, dz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) Q._pr(K, xt + dx * 1.05, yb + 10.75, z + dz * 1.05, 0.34, 3.0, P.b, 'crystal', { n: 4, tw: PI / 4 });
+      Q._pr(K, xt, yb + 13.75, z, 2.0, 0.32, P.t, 'crystal', { n: 4, tw: PI / 4 }); Q._pr(K, xt, yb + 10.75, z, 1.25, 0.14, P.c, null, { n: 4, tw: PI / 4, e: 1.8 });
+      K.anim({ t: 'sway', p: [xt, yb + 13.7, z], amp: 0.13, speed: 1.7, ph: s * 1.3 }, () => { Q._bip(K, [xt, yb + 13.65, z], [xt, yb + 11.6, z], 0.95, P.l, 'crystal', { n: K.lite ? 8 : 12, st: [[0, 0.32], [0.25, 0.55], [0.75, 0.82], [1, 1]] }); K.oct(xt, yb + 11.05, z, 0.24, 0.6, P.c, null, { e: 2.6 }); });
+      Q._bip(K, [xt, yb + 14.05, z], [xt, yb + 21.6, z], 1.75, P.a, 'crystal', { n: 4, tw: PI / 4, st: [[0, 1], [0.08, 1], [1, 0]] });
+      K.fine(() => { for (const [dx, dz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) pin(xt + dx * 1.3, yb + 14.37, z + dz * 1.3, 0.22, 2.2); Q._pr(K, xt, yb + 16.6, z, 0.8, 0.22, P.c, null, { n: 4, tw: PI / 4, e: 2 }); Q._dot(K, xt, yb + 21.8, z, 0.18, P.c, 2.6);
+        for (const y of [yb + 2.0, yb + 6.2]) { lanc(xt + 1.52, y, z, 0.9, 2.8, PI / 2, 1.5); lanc(xt, y, z + s * 1.52, 0.9, 2.8, s > 0 ? 0 : PI, 1.5); } });
+      K.anim({ t: 'sway', p: [xt + 1.62, yb + 9.8, z], amp: 0.06, speed: 1.2, ph: s }, () => { K.box(xt + 1.62, yb + 3.6, z, 0.1, 6.2, 1.15, tc, null, { e: 1.5 }); K.fine(() => K.cone(xt + 1.62, yb + 3.6, z, 0.58, 0.7, tc, null, { e: 1.5, seg: 4, rx: PI, sx: 0.17 })); });
+    }
+    K.box(xt + 0.5, yb, 0, 1.4, 9.6, 4.8, P.a, 'crystal'); K.poly([[-2.4, 0], [2.4, 0], [0, 3.3]], 1.4, P.b, 'crystal', { x: xt + 0.5, y: yb + 9.6, z: 0, ry: PI / 2, flat: true });
+    rosa(xt + 1.23, yb + 6.4, 0, 1.6, 1, 0); lanc(xt + 1.25, yb, 0, 1.9, 3.6, PI / 2, 2.2);
+    K.fine(() => { pin(xt + 0.5, yb + 12.9, 0, 0.3, 2.4); Q._dot(K, xt + 1.3, yb + 9.0, 0, 0.14, P.l, 2.4);
+      for (let i = 0; i < 6; i++) { const z = -1.9 + i * 0.76; if (Math.abs(z) < 0.5) continue; Q._bip(K, [xt + 1.28, yb + 3.9, z], [xt + 1.28, yb + 5.0, z], 0.16, P.l, 'crystal', { n: 4, f: 0.35 }); Q._pr(K, xt + 1.28, yb + 3.75, z, 0.2, 0.15, P.t, 'crystal', { n: 4 }); }
+      for (let k = 0; k < 3; k++) K.poly([[8.7 - k * 0.35, 0], [7.25, 1.9 - k * 0.3], [7.25, -1.9 + k * 0.3]], 0.15, k % 2 ? P.a : P.b, 'crystal', { y: 10.18 + k * 0.15, rx: -H, flat: true });
+      for (const [x, z] of [[7.95, 1.55], [7.95, -1.55], [8.65, 1.0], [8.65, -1.0]]) { Q._bip(K, [x, yb + 0.1, z], [x, yb + 0.95, z], 0.13, P.l, 'crystal', { n: 4, f: 0.45 }); K.oct(x, yb + 1.0, z, 0.08, 0.24, P.c, null, { e: 2.4 }); } });
+    /* anéis de lascas que giram em volta das agulhas das torres (o canto das torres) */
+    for (const s of [-1, 1]) K.anim({ t: 'spin', p: [xt, yb + 17.4, s * 3.9], speed: s * 0.9 }, () => { K.tor(xt, yb + 17.4, s * 3.9, 1.7, 0.05, P.c, null, { e: 2, ts: 8, rs: 3, rx: 0.12 * s }); ringOf(K.q(4), 1.7, (dx, dz, a, i) => K.oct(xt + dx, yb + 17.15 - dz * Math.sin(0.12 * s), s * 3.9 + dz * Math.cos(0.12), 0.12, 0.5, i % 2 ? P.l : tc, 'crystal')); });
+    /* detalhes finos da arquitetura: contrafortes das torres, gabletes sobre o clerestório, parapeitos, gárgulas, nervuras da flecha, lâmpadas sob o casco e vigias acesas no casco */
+    K.fine(() => { for (const s of [-1, 1]) { for (const [dx, dz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) { const x = xt + dx * 1.62, z = s * 3.9 + dz * 1.62; if (dx < 0 && dz === -s) continue; Q._pr(K, x, yb, z, 0.42, 6.2, P.t, 'crystal', { n: 4, tw: PI / 4, top: 0.8 }); Q._pr(K, x, yb + 6.2, z, 0.32, 2.6, P.b, 'crystal', { n: 4, tw: PI / 4, top: 0.7 }); pin(x, yb + 8.8, z, 0.24, 1.6); }
+        for (const x of [1.8, 3.6, -5.3, -7.5]) K.poly([[-0.72, 0], [0.72, 0], [0, 1.0]], 0.1, P.l, 'crystal', { x, y: yb + ya + 3.5, z: s * 4.1, ry: s > 0 ? 0 : PI, flat: true });
+        for (const [x0, x1] of [[-9.3, -3.9], [0.7, 4.5]]) { Q._bip(K, [x0, yt + 0.22, s * 3.92], [x1, yt + 0.22, s * 3.92], 0.08, P.l, 'crystal', { n: 4, st: [[0, 1], [1, 1]] }); for (let x = x0 + 0.5; x < x1; x += 0.9) Q._pr(K, x, yt, s * 3.92, 0.06, 0.24, P.t, 'crystal', { n: 4 }); }
+        for (const x of [-9.0, 0.9, 4.3]) Q._bip(K, [x, yt + 0.1, s * 4.3], [x + 0.2, yt - 0.3, s * 5.0], 0.12, P.t, 'crystal', { n: 4, f: 0.3 });
+        for (const x of [-8.8, -7.4, -6.0, 2.6, 4.0, 5.4, 6.8]) lanc(x, 9.0, s * 6.25, 0.36, 0.55, s > 0 ? 0 : PI, 1.8, false); }
+      ringOf(6, 1, (dx, dz, a) => { const b = a + PI / 6, ca = Math.cos(b), sa = Math.sin(b); Q._bip(K, [xc + ca * 2.2, yt + 7.7, sa * 2.2], [xc + ca * 0.9, yt + 12.6, sa * 0.9], 0.07, P.t, 'crystal', { n: 4, st: [[0, 1], [1, 1]] }); });
+      for (const [x, z] of [[3.6, 3.2], [3.6, -3.2], [-4.6, 3.0], [-4.6, -3.0], [-8.6, 0], [xc, 4.9], [xc, -4.9]]) { Q._bip(K, [x, 8.0, z], [x, 6.4, z], 0.06, P.t, 'crystal', { n: 4, st: [[0, 1], [1, 1]] }); Q._bip(K, [x, 6.5, z], [x, 5.7, z], 0.26, P.c, null, { e: 2.2, n: 6, f: 0.5 }); } });
+    /* arauto na proa: obelisco de cristal com núcleo aceso e coroa na cor do time (aponta a frente da Catedral) */
+    Q._pr(K, 9.3, yb, 0, 0.5, 0.35, P.t, 'crystal'); Q._bip(K, [9.3, yb + 0.3, 0], [9.3, yb + 3.6, 0], 0.42, P.l, 'crystal', { n: 6, st: [[0, 1], [0.7, 1.15], [1, 0]] }); K.oct(9.3, yb + 2.0, 0, 0.2, 0.8, P.c, null, { e: 2.4 });
+    ringOf(3, 0.38, (dx, dz) => Q._bip(K, [9.3 + dx, yb + 2.9, dz], [9.3 + dx * 2.2, yb + 3.9, dz * 2.2], 0.09, tc, 'crystal', { n: 4, f: 0.3 }));
+    K.fine(() => { for (const s of [-1, 1]) for (const z of [6.25, 7.4]) { const x0 = xc - 2.32, x1 = xc + 2.32; lanc(x0, yb + 1.0, s * z, 0.75, 3.4, -H, 1.7); lanc(x1, yb + 1.0, s * z, 0.75, 3.4, H, 1.7); }
+      for (const a of [PI * 0.83, PI * 1.17]) { const ca = Math.cos(a), sa = Math.sin(a), ox = xa + ca * 3.55, oz = sa * 3.55; Q._pr(K, ox, yb, oz, 0.42, 4.4, P.b, 'crystal', { n: 4, tw: a, top: 0.8 }); pin(ox, yb + 4.4, oz, 0.32, 1.8, P.l); Q._bip(K, [ox - ca * 0.2, yb + 4.1, oz - sa * 0.2], [xa + ca * 2.7, yt - 0.9, sa * 2.7], 0.16, P.t, 'crystal', { n: 4, st: [[0, 1], [1, 1]] }); }
+      ringOf(6, 2.3, (dx, dz) => Q._pr(K, xc + dx, yt + 2.7, dz, 0.16, 4.5, P.t, 'crystal', { n: 4 }));
+      for (const s of [-1, 1]) for (const dx of [-1, 1]) { const x = xt + dx * 0.8; K.poly([[-0.42, 0], [0.42, 0], [0.42, 1.2], [0, 1.8], [-0.42, 1.2]], 0.08, P.l, 'crystal', { x, y: yb + 11.1, z: s * 3.9 + s * 1.12, ry: s > 0 ? 0 : PI, flat: true }); }
+      for (let i = 0; i < 28; i++) { const t = i / 28, k = Math.floor(t * (OL.length - 1)), f = t * (OL.length - 1) - k, A = OL[k], B = OL[k + 1] || OL[0]; const x = A[0] + (B[0] - A[0]) * f, z = A[1] + (B[1] - A[1]) * f; K.oct(x * 1.0, 10.1, z * 1.0, 0.13, 0.5, i % 2 ? P.l : P.b, 'crystal'); } });
+    /* crochês: lascas de cristal subindo pelas arestas das agulhas (só na completa) */
+    K.fine(() => { for (const s of [-1, 1]) for (const [dx, dz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) for (const f of [0.3, 0.5, 0.7]) { const r = 1.75 * (1 - f) / 0.92 * 0.707, x = xt + dx * r, z = s * 3.9 + dz * r, y = yb + 14.05 + 7.55 * f; K.oct(x, y, z, 0.11, 0.42, P.l, 'crystal', { rz: -dx * 0.5, rx: dz * 0.5 }); }
+      for (let i = 0; i < 6; i++) { const a = PI / 6 + i * PI / 3, ca = Math.cos(a), sa = Math.sin(a); for (const f of [0.25, 0.45, 0.65]) { const r = 1.85 * (1 - f), x = xc + sa * r, z = ca * r, y = yt + 7.65 + 11.85 * f; K.oct(x, y, z, 0.12, 0.46, P.a, 'crystal', { rz: -sa * 0.5, rx: ca * 0.5 }); } } });
+
+    /* 6. torre do cruzeiro: lanterna sextavada com vitrais, coroa na cor do time, flecha mais alta, cristal flutuante e auréola de lascas que gira */
+    Q._pr(K, xc, yt + 2.6, 0, 2.15, 4.6, P.a, 'crystal', { tw: PI / 6 });
+    ringOf(6, 1, (dx, dz, a) => { const b = a + PI / 6, ap = 2.15 * 0.866 + 0.02; lanc(xc + Math.cos(b) * ap, yt + 3.2, Math.sin(b) * ap, 0.9, 3.2, Math.atan2(Math.cos(b), Math.sin(b)), 1.8, false); });
+    Q._pr(K, xc, yt + 7.2, 0, 2.3, 0.45, tc, 'crystal', { tw: PI / 6 }); Q._pr(K, xc, yt + 2.4, 0, 2.3, 0.3, P.t, 'crystal', { tw: PI / 6 });
+    Q._bip(K, [xc, yt + 7.65, 0], [xc, yt + 19.5, 0], 1.85, P.l, 'crystal', { n: 6, tw: PI / 6, st: [[0, 1], [1, 0]] });
+    Q._pr(K, xc, yt + 11.0, 0, 1.33, 0.3, P.c, null, { e: 2.2, tw: PI / 6 });
+    K.fine(() => { ringOf(6, 2.35, (dx, dz) => pin(xc + dx, yt + 7.65, dz, 0.24, 2.0)); Q._pr(K, xc, yt + 14.6, 0, 0.75, 0.2, P.t, 'crystal', { tw: PI / 6 }); ringOf(6, 1, (dx, dz, a) => { const b = a + PI / 6; Q._glo(K, [xc + Math.cos(b) * 1.72, yt + 7.8, Math.sin(b) * 1.72], [xc + Math.cos(b) * 0.25, yt + 18.2, Math.sin(b) * 0.25], 0.05, P.c, 1.8); }); });
+    K.anim({ t: 'bob', amp: 0.4, speed: 1.3 }, () => { Q._bip(K, [xc, yt + 20.4, 0], [xc, yt + 23.2, 0], 0.62, P.c, null, { e: 2.6, n: 6, f: 0.45 }); K.fine(() => ringOf(3, 0.75, (dx, dz) => K.oct(xc + dx, yt + 21.2, dz, 0.12, 0.7, P.l, null, { e: 2.2 }))); });
+    K.anim({ t: 'spin', p: [xc, yt + 12.5, 0], speed: 0.55 }, () => { K.tor(xc, yt + 12.5, 0, 4.6, 0.09, P.c, null, { e: 2, ts: K.lite ? 12 : 24, rs: 3, rx: 0.16 }); ringOf(K.q(8), 4.6, (dx, dz, a, i) => K.oct(xc + dx, yt + 11.9 - dz * Math.sin(0.16), dz * Math.cos(0.16), 0.3, 1.2, i % 2 ? P.l : tc, 'crystal')); /* sobre o anel inclinado */
+      K.fine(() => ringOf(8, 4.6, (dx, dz, a) => { const b = a + PI / 8; K.oct(xc + Math.cos(b) * 4.6, yt + 12.25 - Math.sin(b) * 4.6 * Math.sin(0.16), Math.sin(b) * 4.6 * Math.cos(0.16), 0.12, 0.5, P.c, null, { e: 2.4 }); })); });
+
+    /* 7. abside (trás, -x): meia coroa sextavada com vitrais altos, telhado na cor do time e o órgão de tubos de cristal acesos (o coro); capelas radiais na completa */
+    Q._pr(K, xa, yb, 0, 3.5, yw - 0.6, P.a, 'crystal');
+    for (const a of [PI * 2 / 3, PI, PI * 4 / 3]) { const ap = 3.5 * 0.866 + 0.03; lanc(xa + Math.cos(a) * ap, yb + 1.0, Math.sin(a) * ap, 1.1, 4.0, Math.atan2(Math.cos(a), Math.sin(a)), 1.8); }
+    Q._bip(K, [xa, yt - 0.6, 0], [xa, yt + 3.0, 0], 3.75, tc, 'crystal', { n: 6, st: [[0, 1], [1, 0.12]] });
+    const no = K.q(9); for (let i = 0; i < no; i++) { const a = PI * (0.62 + 0.76 * i / (no - 1)), r = 2.2, h = 3.2 + 2.6 * Math.sin(PI * i / (no - 1)); Q._bip(K, [xa + Math.cos(a) * r, yt + 1.0, Math.sin(a) * r], [xa + Math.cos(a) * r, yt + 1.0 + h, Math.sin(a) * r], 0.26, i % 2 ? P.l : P.c, i % 2 ? 'crystal' : null, { e: i % 2 ? 0 : 2.2, n: 6, st: [[0, 1], [0.86, 1], [1, 0]] }); }
+    K.fine(() => { for (const a of [PI * 0.72, PI * 1.28]) { const cx = xa + Math.cos(a) * 4.0, cz = Math.sin(a) * 4.0; Q._pr(K, cx, yb, cz, 1.2, 3.6, P.a, 'crystal'); Q._bip(K, [cx, yb + 3.6, cz], [cx, yb + 6.0, cz], 1.3, tc, 'crystal', { n: 6, st: [[0, 1], [1, 0]] }); lanc(cx + Math.cos(a) * 1.06, yb + 0.6, cz + Math.sin(a) * 1.06, 0.7, 2.2, Math.atan2(Math.cos(a), Math.sin(a)), 1.7, false); }
+      for (let i = 0; i < 9; i++) { const a = PI * (0.62 + 0.76 * i / 8); Q._dot(K, xa + Math.cos(a) * 2.2, yt + 0.95, Math.sin(a) * 2.2, 0.12, P.l, 2.4); } });
+  },
 };
 U.vorag = {
-  infantaria(K, P, tc) { for (const s of [-1, 1]) leg(K, [-0.4, 3.2, s * 0.9], [0.8, 1.8, s * 1.2], [-0.2, 0, s * 1.2], 0.42, P.b, 'chitin');
-    K.sph(-0.3, 4.4, 0, 1.5, P.a, 'chitin', { sx: 1.3, sy: 1.1, seg: 14, rz: 0.4 }); K.sph(1.4, 5.6, 0, 0.95, P.a, 'chitin', { sx: 1.3, seg: 12 });
-    for (const s of [-1, 1]) { K.cone(2.4, 5.2, s * 0.45, 0.22, 1.2, P.bo, 'bone', { rz: -2, seg: 6, anim: { t: 'sway', p: [2.4, 5.2, s * 0.45], amp: 0.16, speed: 6, ph: s > 0 ? 0 : PI } }); K.light(2.35, 6, s * 0.5, 0.22, P.l); K.anim({ t: 'sway', p: [0.6, 5, s * 1.3], amp: 0.14, speed: 3.5, ph: s > 0 ? 0 : PI }, () => { K.seg([0.6, 5, s * 1.3], [2.6, 3.6, s * 1.4], 0.26, P.b, 'chitin'); K.cone(2.6, 3.6, s * 1.4, 0.24, 1.4, P.bo, 'bone', { rz: -2.2, seg: 6 }); }); }
-    ringOf(3, 0.6, (cx, cz) => K.cone(-1 + cx, 5.4, cz, 0.22, 1.4, P.bo, 'bone', { rz: 0.6, seg: 6 })); K.sph(-1.25, 4.6, 0, 0.6, tc, 'wet', { seg: 10 }); },
+  infantaria(K, P, tc) { /* 4.3e — Guerreiro da Prole: soldado-inseto bípede de quitina — pernas digitígradas grossas com garras, tórax em pé e abdômen pendente que respira, élitros na cor do time como mochila, ombreiras com esporões e elmo com crista na cor do time, olhos compostos acesos, mandíbulas, quatro braços (o par de cima segura o lança-espinhos: cano de osso com anéis que recua e boca de ácido acesa) e saco de munição que pulsa nas costas */
+    const V = U.vorag, S2 = [-1, 1], GZ = 0.34, GY = 4.15, BN = '#A89478', AX = [-0.989, 0.149];
+    /* pernas digitígradas: coxa, canela, tarso e garras; balançam do quadril com lados alternados */
+    for (const s of S2) V._pernaB(K, P, s);
+    K.fine(() => K.sph(-0.12, 3.05, 0, 1, P.d, 'chitin', { sx: 0.52, sy: 0.42, sz: 0.8, seg: 8 }));
+    /* abdômen pendente em gomos (sway no pecíolo: respira e balança ao andar) */
+    K.anim({ t: 'sway', p: [-0.42, 3.2, 0], amp: 0.07, speed: 2.4 }, () => {
+      V._ov(K, [-0.42, 3.3, 0], [-1.38, 2.32, 0], 0.52, P.b, 'chitin', { seg: 9 }); V._pico(K, P, [-1.36, 2.36, 0], [-1.78, 1.78, 0], 0.15);
+      K.fine(() => { V._casca(K, -0.92, 2.88, 0, 0.44, 0.34, 0.52, P.a, 0.8, { seg: 8 }); for (const s of S2) K.light(-1.02, 2.48, s * 0.42, 0.09, P.l, 2.2); }); });
+    /* tórax em pé, inclinado para a frente, com plastrão de osso na frente e espiráculos acesos */
+    K.sph(0.08, 4.2, 0, 1, P.a, 'chitin', { sx: 0.88, sy: 1.12, sz: 0.9, rz: -0.18, seg: 9 });
+    K.sph(0.6, 3.98, 0, 1, BN, 'bone', { sx: 0.42, sy: 0.78, sz: 0.55, rz: -0.18, seg: 8 });
+    K.fine(() => { for (const s of S2) { K.light(-0.1, 3.87, s * 0.86, 0.09, P.l, 2.2); K.light(-0.16, 4.3, s * 0.87, 0.08, P.l, 2.2); } });
+    /* élitros na cor do time (a mochila): duas cascas coladas às costas, do ombro ao abdômen; no completo, borda escura e espinhos na costura */
+    for (const s of S2) { V._casca(K, -0.4, 4.36, s * 0.36, 1.12, 0.46, 0.5, tc, H - 0.15, { seg: 10, ry: s * 0.22 });
+      K.fine(() => V._casca(K, -0.4 - AX[0] * 0.07, 4.36 - AX[1] * 0.07, s * 0.36, 1.18, 0.44, 0.56, P.d, H - 0.15, { seg: 7, ry: s * 0.22 })); }
+    for (const s of S2) V._pico(K, P, [-0.62, 5.05, s * 0.3], [-1.25, 5.95, s * 0.42], 0.13); K.fine(() => { for (let i = 0; i < 3; i++) V._pico(K, P, [-0.84 + i * 0.02, 4.85 - i * 0.45, 0], [-1.22 + i * 0.02, 5.1 - i * 0.45, 0], 0.07); });
+    /* saco de munição sob os élitros: pele acesa e miolo de sangue que pulsa; no completo, duto de carne até a arma */
+    K.fine(() => K.sph(-0.92, 3.47, 0, 1, '#8E2234', null, { e: 1, sx: 0.42, sy: 0.45, sz: 0.5, seg: 8 }));
+    K.anim({ t: 'bob', amp: 0.05, speed: 3 }, () => K.sph(-0.94, 3.51, 0, 1, '#FF5A5A', null, { e: 1.12, sx: 0.37, sy: 0.4, sz: 0.44, seg: 7 }));
+    K.fine(() => K.tube([[-0.75, 3.6, 0.35], [-0.2, 3.47, 0.84], [0.35, 3.7, 0.72], [0.62, 3.97, GZ + 0.08]], 0.07, P.m, 'wet', { ts: 8, rs: 4 }));
+    /* ombreiras na cor do time com esporões de osso; no completo, borda escura */
+    for (const s of S2) { V._casca(K, -0.02, 5.08, s * 1.0, 0.66, 0.34, 0.74, tc, -0.12, { seg: 9, rx: s * 0.8 });
+      V._casca(K, 0.02, 4.78, s * 1.12, 0.5, 0.26, 0.5, P.b, -0.12, { seg: 7, rx: s * 1.15 });
+      K.fine(() => V._casca(K, -0.02, 5.03, s * 0.96, 0.7, 0.32, 0.8, P.d, -0.12, { seg: 7, rx: s * 0.8 }));
+      V._pico(K, P, [-0.2, 5.3, s * 1.22], [-0.78, 6.05, s * 1.62], 0.15); K.fine(() => V._pico(K, P, [0.2, 5.38, s * 1.25], [0.12, 5.95, s * 1.66], 0.1)); }
+    /* pescoço e cabeça: elmo na cor do time com crista de osso, olhos compostos acesos, mandíbulas que mastigam */
+    K.seg([0.32, 5.0, 0], [0.86, 5.66, 0], 0.33, P.d, 'chitin', { seg: 6 });
+    K.sph(1.08, 5.8, 0, 1, P.a, 'chitin', { sx: 0.8, sy: 0.52, sz: 0.58, rz: -0.22, seg: 9 });
+    V._casca(K, 1.02, 5.9, 0, 0.84, 0.44, 0.5, tc, -0.25, { seg: 9 });
+    V._pico(K, P, [0.74, 6.38, 0], [0.0, 7.05, 0], 0.19); K.fine(() => { for (const s of S2) V._pico(K, P, [0.64, 6.28, s * 0.3], [0.12, 6.72, s * 0.48], 0.1); });
+    for (const s of S2) { K.oct(1.5, 5.68, s * 0.48, 0.19, 0.36, P.l, null, { e: 1.9, ry: PI / 4 }); K.fine(() => K.oct(1.5, 6.14, s * 0.17, 0.07, 0.13, P.l, null, { e: 2 }));
+      K.anim({ t: 'sway', p: [1.38, 5.5, s * 0.24], amp: 0.16, speed: 5, ph: s > 0 ? 0 : PI }, () => { const m = [1.68, 5.43, s * 0.38]; if (K.lite) V._pico(K, P, [1.38, 5.5, s * 0.24], [1.92, 5.39, s * 0.1], 0.1, { n: 3 }); else { K.seg([1.38, 5.5, s * 0.24], m, 0.09, P.bo, 'bone', { seg: 5 }); V._pico(K, P, m, [1.98, 5.36, s * 0.08], 0.09, { n: 3 }); } }); }
+    K.fine(() => { for (const s of S2) K.anim({ t: 'sway', p: [1.28, 6.12, s * 0.17], amp: 0.18, speed: 3.5, ph: s > 0 ? 0 : 1.3 }, () => { V._pico(K, P, [1.28, 6.12, s * 0.17], [1.7, 6.82, s * 0.4], 0.05, { n: 3, col: P.d, c0: '#FFFFFF' }); V._pico(K, P, [1.68, 6.8, s * 0.39], [2.22, 6.95, s * 0.62], 0.04, { n: 3, col: P.d, c0: '#FFFFFF' }); }); });
+    /* lança-espinhos: corpo de órgão, cano de osso com anéis, boca de carne e brilho de ácido (o cano recua no disparo) */
+    if (K.lite) K.seg([0.22, GY - 0.02, GZ], [1.38, GY + 0.05, GZ], 0.28, P.a, 'chitin', { taper: 0.75, seg: 6 }); else V._ov(K, [0.22, GY - 0.02, GZ], [1.38, GY + 0.05, GZ], 0.31, P.a, 'chitin', { seg: 8 });
+    K.fine(() => { for (let i = 0; i < 3; i++) V._pico(K, P, [0.5 + i * 0.3, GY + 0.22, GZ], [0.32 + i * 0.3, GY + 0.56, GZ], 0.06); });
+    K.anim({ t: 'recoil', dist: 0.36 }, () => { K.seg([1.2, GY + 0.04, GZ], [2.68, GY + 0.1, GZ], 0.16, P.bo, 'bone', { taper: 0.85, seg: 7 });
+      for (const x of (K.lite ? [1.85] : [1.5, 1.95, 2.4])) K.cyl(x, GY + 0.06 + (x - 1.5) * 0.04, GZ, 0.21, 0.21, 0.12, P.b, 'chitin', { rz: -H, seg: 8 });
+      K.cyl(2.6, GY + 0.1, GZ, 0.26, 0.17, 0.22, P.m, 'wet', { rz: -H, seg: 8 }); if (K.lite) K.oct(2.86, GY - 0.02, GZ, 0.14, 0.24, P.ac, null, { e: 2.4 }); else K.sph(2.86, GY + 0.1, GZ, 0.14, P.ac, null, { e: 2.4, seg: 6 }); });
+    /* braços de cima: o direito na empunhadura, o esquerdo apoia o cano por baixo */
+    const arm = (sh, el, hd) => { if (K.lite) K.seg(sh, el, 0.21, P.b, 'chitin', { seg: 5 }); else V._ov(K, sh, el, 0.23, P.b, 'chitin', { seg: 6 }); K.seg(el, hd, 0.17, P.a, 'chitin', { taper: 0.8, seg: 5 });
+      K.fine(() => { K.sph(hd[0], hd[1], hd[2], 0.17, P.d, 'chitin', { seg: 5 }); const m = [(el[0] + hd[0]) / 2, (el[1] + hd[1]) / 2, (el[2] + hd[2]) / 2]; V._pico(K, P, m, [m[0] - 0.34, m[1] + 0.05, el[2] * 1.32], 0.07); }); };
+    arm([0.05, 4.8, 0.95], [-0.08, 3.93, 1.05], [0.6, 4.0, GZ + 0.22]); arm([0.05, 4.8, -0.95], [0.5, 3.95, -0.97], [1.5, GY - 0.14, GZ - 0.2]);
+    /* braços de baixo: foices de osso dobradas junto ao corpo (só no completo) */
+    K.fine(() => { for (const s of S2) { K.seg([0.38, 3.6, s * 0.66], [0.74, 3.2, s * 0.95], 0.1, P.b, 'chitin', { seg: 5 }); V._pico(K, P, [0.74, 3.2, s * 0.95], [1.34, 3.67, s * 0.86], 0.09); } }); },
   coletor(K, P, tc) { // 4.3 — Semeador: abdômen em placas de quitina sobrepostas, saco digestivo aceso nas costas preso por dedos de osso, sela de placas na cor do time, mandíbulas serrilhadas e goela de ácido (emissor do feixe)
     const SX = -2.2, SY = 3.6, AX = 2.55, AY = 1.75, AZ = 1.85, S2 = [-1, 1];
     const fr = x => Math.sqrt(Math.max(0, 1 - ((x - SX) / AX) ** 2)); // corte do saco em x
@@ -2053,30 +2586,6 @@ U.vorag = {
     [[2.9, 1.3, 1.3, 1.1], [1.6, 0.3, 1.35, 1], [0.3, -0.9, 1.5, 0.95], [-1.1, -2.1, 1.85, 0.9]].forEach(([hx, dx, hz, w], i) => { for (const s of S2) { const fx = hx + dx, hip = [hx, 2.1, s * hz], knee = [hx + dx * 0.6, 3.5, s * 2.85], ank = [fx + dx * 0.1, 1.2, s * 3.3], foot = [fx + dx * 0.15, 0, s * 3.45];
       K.anim(legSpec(hip, { ph: (s > 0 ? 0 : PI) + (i % 2 ? PI : 0) }), () => { K.seg(hip, knee, 0.3 * w, P.b, 'chitin', { seg: 7 }); K.sph(knee[0], knee[1], knee[2], 0.3 * w, P.a, 'chitin', { seg: 6 }); spike(knee, [knee[0] - 0.2, knee[1] + 0.75, knee[2] + s * 0.25], 0.12);
         K.seg(knee, ank, 0.24 * w, P.b, 'chitin', { taper: 0.7, seg: 7 }); K.seg(ank, foot, 0.16 * w, P.d, 'chitin', { taper: 0.3, seg: 6 }); }); } }); },
-  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
-  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
-  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
-  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
-  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
-  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
-  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
-  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
-  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
-  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
-  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
-  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
-  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
-  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
-  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
-  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
-  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
-  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
-  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
-  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
-  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
-  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
-  /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
-  // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
   /* 4.3d — Frota da Prole (tanque, voadores, suporte, Carniceiro, Escaravelho e Brutamonte) no nível do Semeador 4.3a. Ajudantes com prefixo _ (não são unidades; ficam dentro do bloco) */
   // ponto na pele de um elipsoide de centro c e semieixos a: u = azimute em torno de y (0 = frente, +x), v = ângulo a partir do topo, d = folga para fora
   _el(c, a, u, v, d) { d = d || 0; return [c[0] + (a[0] + d) * Math.sin(v) * Math.cos(u), c[1] + (a[1] + d) * Math.cos(v), c[2] + (a[2] + d) * Math.sin(v) * Math.sin(u)]; },
@@ -2330,17 +2839,121 @@ U.vorag = {
       K.sph(-6.1, -0.18, 0, 0.17, P.ac, null, { e: 2.4, seg: 6 });
       K.fine(() => { for (const s of S2) V._esp(K, P, [-5.3, 0.2, s * 0.12], [-5.55, 0.42, s * 0.36], 0.06); }); });
     for (const s of S2) { V._asa(K, P, [0.35, 2.0, s * 0.5], 4.3, 1.1, s, { sw: 0.5, dh: 0.1, amp: 0.5, speed: 34 }); V._asa(K, P, [-0.35, 1.92, s * 0.45], 2.6, 0.8, s, { sw: 0.75, dh: 0.05, amp: 0.5, speed: 34, ph: 1.2 }); } },
-  cria(K, P, tc) { K.sph(0, 1.6, 0, 1.2, P.a, 'chitin', { sx: 1.5, sy: 0.9, seg: 12 }); K.sph(1.8, 1.7, 0, 0.75, P.b, 'chitin', { seg: 10 }); for (const s of [-1, 1]) { K.cone(2.4, 1.3, s * 0.35, 0.18, 0.9, P.bo, 'bone', { rz: -2, seg: 6, anim: { t: 'sway', p: [2.4, 1.3, s * 0.35], amp: 0.18, speed: 7, ph: s > 0 ? 0 : PI } }); K.light(2.45, 2, s * 0.35, 0.18, P.l); }
-    for (const x of [-0.8, 0.2, 1]) for (const s of [-1, 1]) leg(K, [x, 1.4, s * 0.8], [x + 0.4, 1.4, s * 1.8], [x + 0.2, 0, s * 2], 0.16, P.b, 'chitin'); K.sph(-0.8, 2.3, 0, 0.35, tc, 'wet', { seg: 8 }); },
-  cuspidor(K, P, tc) { U.vorag.cria(K, P, tc); K.sph(-1.2, 2.8, 0, 1.3, P.ac, null, { e: 1.2, seg: 12 }); K.anim({ t: 'recoil', dist: 0.5 }, () => { K.seg([1.8, 2, 0], [3.6, 2.6, 0], 0.32, P.b, 'chitin', { taper: 0.6 }); K.sph(3.6, 2.6, 0, 0.28, P.ac, null, { e: 2.2, seg: 8 }); }); },
-  matriarca(K, P, tc) { // épica: rainha da Prole, abdômen enorme de ovos e coroa de espinhos
-    K.anim({ t: 'sway', p: [-1.5, 4.6, 0], amp: 0.05, speed: 1.4 }, () => { K.sph(-7, 4.6, 0, 1, P.m, 'wet', { sx: 9, sy: 5, sz: 6.5, seg: 22 }); for (let i = 0; i < 4; i++) arch(K, -7, 0.4, 0, 9.1, 9.2, 6.6, i * PI / 4, 0.3, '#FF8A8A', null, { e: 1.4, ts: 16 }); ringOf(7, 1, (cx, cz) => K.sph(-7 + cx * 7, 4 + Math.abs(cz) * 2, cz * 5, 1.2, P.bo, 'bone', { sy: 1.4, seg: 10 }));
-      for (const sd of [-1, 1]) { for (let i = 0; i < 4; i++) { const x = -10.5 + i * 2.1, y = 2.4 + (i % 2) * 0.9, z = sd * (6.15 - Math.abs(i - 1.5) * 0.35); K.sph(x, y, z, 1.05, '#F2C6A6', 'wet', { seg: 10 }); K.sph(x, y, z + sd * 0.45, 0.38, P.l, null, { e: 1.7, seg: 6 }); } // 4.2e: sacos de ovos com brilho
-        K.tube([[-14.5, 5.5, sd * 1.2], [-11, 8.4, sd * 2.8], [-6.5, 9.4, sd * 2.2], [-2.6, 8, sd * 0.8]], 0.14, '#FF5A6A', null, { e: 1.6, ts: 12 }); K.tube([[-13, 3.2, sd * 4.6], [-9, 5.6, sd * 5.8], [-4.5, 6, sd * 5.2]], 0.11, '#FF5A6A', null, { e: 1.4, ts: 10 }); } }); // veias acesas no abdômen
-    K.sph(2, 5, 0, 1, P.a, 'chitin', { sx: 5.5, sy: 4.4, sz: 5, seg: 20 }); for (let i = 0; i < 3; i++) K.sph(0 + i * 2.4, 8.4, 0, 1, P.b, 'chitin', { sx: 1.6, sy: 1, sz: 4.4, seg: 12 }); for (const sd of [-1, 1]) for (let i = 0; i < 3; i++) K.sph(-0.5 + i * 2.6, 6.2 - i * 0.3, sd * 4.1, 1, P.d, 'chitin', { half: true, sx: 1.5, sy: 0.8, sz: 1.4, rx: sd * 0.9, seg: 10 }); // 4.2e: placas laterais da carapaça
-    for (const x of [-1, 2, 5]) for (const s of [-1, 1]) leg(K, [x, 4, s * 4], [x + 1.6, 4.4, s * 8], [x + 1, 0, s * 9], 0.9, P.b, 'chitin');
-    K.sph(8.4, 6, 0, 2.6, P.b, 'chitin', { seg: 16 }); ringOf(6, 2.2, (cx, cz) => K.cone(8 + cx * 0.4, 8, cz, 0.45, 3.6, P.bo, 'bone', { seg: 8, rz: -cx * 0.25, rx: cz * 0.25 })); for (const s of [-1, 1]) { K.seg([10, 5.4, s * 1.4], [13.6, 3, s * 2.6], 0.6, P.bo, 'bone', { taper: 0.2, anim: { t: 'sway', p: [10, 5.4, s * 1.4], amp: 0.1, speed: 2.5, ph: s > 0 ? 0 : PI } }); K.light(10.8, 6.8, s * 1, 0.45, P.l); }
-    K.sph(-1, 9.6, 0, 1.1, tc, 'wet', { seg: 10 }); },
+  /* ---------- 4.3e: tropa da Prole (infantaria, Cria, Cuspidor) e a Matriarca. Ajudantes novos com prefixo _ (dentro do bloco) ---------- */
+  /* elipsoide esticado de a até b (coxas, braços, gomos): raio r, o.ext alonga as pontas para cobrir as juntas */
+  _ov(K, a, b, r, col, mat, o) { o = o || {}; const d = new T.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), L = d.length() || 0.001, q = new T.Quaternion().setFromUnitVectors(new T.Vector3(0, 1, 0), d.multiplyScalar(1 / L));
+    return K.sph((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2, 1, col, mat, Object.assign({}, o, { sx: r * (o.kx || 1), sy: L / 2 * (o.ext || 1.12), sz: r * (o.kz || 1), q })); },
+  /* espinho barato (pirâmide de 3 ou 4 lados, sem base) de a até b: osso com a base mais escura */
+  _pico(K, P, a, b, r, o) { o = o || {}; return K.spike(a, b, r, o.col || P.bo, o.mat || 'bone', { n: o.n || 4, c0: o.c0 || '#A8967E', c1: '#FFFFFF' }); },
+  /* casca de quitina (meia esfera) sem a borda escura: placas, élitros e ombreiras das figuras pequenas */
+  _casca(K, x, y, z, lx, h, wz, col, rz, o) { o = o || {}; return K.sph(x, y, z, 1, col, o.mat || 'chitin', { half: true, sx: lx, sy: h, sz: wz, rx: o.rx || 0, ry: o.ry || 0, rz, seg: o.seg || 9 }); },
+  /* perna digitígrada do soldado (lado s): coxa grossa, canela, tarso e garras de osso; balança do quadril (legSpec). No completo, esporões no joelho e no jarrete */
+  _pernaB(K, P, s, o) { o = o || {}; const V = U.vorag, z = s * 0.62, hip = [-0.15, 3.05, z], kn = [0.52, 2.0, z + s * 0.14], ak = [-0.36, 0.85, z + s * 0.2], ft = [0.08, 0.12, z + s * 0.24];
+    K.anim(legSpec(hip, { amp: o.amp || 0.42, stride: o.stride || 11, ph: s > 0 ? 0 : PI }), () => {
+      if (K.lite) K.seg(hip, kn, 0.33, P.b, 'chitin', { taper: 0.78, seg: 5 }); else V._ov(K, hip, kn, 0.36, P.b, 'chitin', { seg: 8 });
+      K.seg(kn, ak, 0.25, P.a, 'chitin', { taper: 0.62, seg: 6 }); K.seg(ak, ft, 0.16, P.d, 'chitin', { taper: 0.75, seg: 5 });
+      for (const dz of (K.lite ? [0] : [-0.17, 0.17])) V._pico(K, P, [ft[0] - 0.05, 0.1, ft[2] + dz * 0.4], [ft[0] + 0.72, 0, ft[2] + dz], 0.12, { n: 3 });
+      K.fine(() => { V._pico(K, P, [ft[0], 0.12, ft[2]], [ft[0] - 0.45, 0, ft[2]], 0.08, { n: 3 }); V._pico(K, P, [kn[0] + 0.05, kn[1] + 0.12, kn[2]], [kn[0] + 0.34, kn[1] + 0.66, kn[2] + s * 0.12], 0.1); V._pico(K, P, ak, [ak[0] - 0.44, ak[1] - 0.4, ak[2]], 0.09); }); }); },
+  /* pata leve de inseto pequeno (Cria, Cuspidor): fêmur bojudo, tíbia fina e tarso em ponta; balança do quadril. Na versão leve, tíbia e tarso viram um espinho só */
+  _patinha(K, P, hip, knee, ank, foot, w, o) { o = o || {}; const sp = { amp: o.amp || 0.36, stride: o.stride || 6 }; if (o.ph != null) sp.ph = o.ph; const s = hip[2] >= 0 ? 1 : -1, V = U.vorag;
+    K.anim(legSpec(hip, sp), () => { if (K.lite) { K.seg(hip, knee, 0.16 * w, P.b, 'chitin', { taper: 0.7, seg: 5 }); V._pico(K, P, knee, foot, 0.12 * w, { col: P.a, mat: 'chitin', c0: '#FFFFFF' }); return; }
+      V._ov(K, hip, knee, 0.19 * w, P.b, 'chitin', { seg: 7 }); K.seg(knee, ank, 0.12 * w, P.a, 'chitin', { taper: 0.6, seg: 5 }); V._pico(K, P, ank, foot, 0.075 * w, { col: P.d, mat: 'chitin', c0: '#FFFFFF' });
+      V._pico(K, P, knee, [knee[0] - 0.08 * w, knee[1] + 0.42 * w, knee[2] + s * 0.14 * w], 0.06 * w); }); },
+  cria(K, P, tc) { /* 4.3e — Cria: caçadora do enxame — seis patas altas e finas em arco (joelhos acima do corpo), duas foices de osso erguidas que golpeiam, mandíbulas grandes que mastigam, dorso em placas na cor do time e abdômen em gomos com ferrão */
+    const V = U.vorag, S2 = [-1, 1];
+    K.sph(-1.05, 1.85, 0, 1, P.a, 'chitin', { sx: 1.22, sy: 0.8, sz: 0.95, rz: 0.12, seg: 10 });
+    [[-0.45, 2.15, 0.55, 0.6, 0.94, tc, 0.15], [-1.15, 2.08, 0.52, 0.56, 0.9, tc, 0.25], [-1.82, 1.9, 0.42, 0.46, 0.66, P.b, 0.45]].forEach(([x, y, lx, h, wz, c, rz], i) => { if (i < 2 || !K.lite) V._casca(K, x, y, 0, lx, h, wz, c, rz, { seg: 8 }); });
+    V._pico(K, P, [-2.1, 1.8, 0], [-2.45, 2.12, 0], 0.14);
+    K.sph(0.5, 2.0, 0, 1, P.b, 'chitin', { sx: 0.8, sy: 0.62, sz: 0.68, seg: 8 }); V._casca(K, 0.5, 2.22, 0, 0.74, 0.45, 0.66, tc, -0.1, { seg: 8 });
+    K.sph(1.38, 1.85, 0, 1, P.a, 'chitin', { sx: 0.6, sy: 0.5, sz: 0.56, rz: -0.25, seg: 8 });
+    K.fine(() => { V._casca(K, 1.3, 1.98, 0, 0.55, 0.34, 0.5, P.b, -0.4, { seg: 7 }); for (const s of S2) V._pico(K, P, [1.15, 2.25, s * 0.2], [0.65, 2.75, s * 0.32], 0.08); });
+    for (const s of S2) { K.oct(1.72, 1.85, s * 0.3, 0.13, 0.24, P.l, null, { e: 2, ry: PI / 4 });
+      K.anim({ t: 'sway', p: [1.72, 1.6, s * 0.26], amp: 0.22, speed: 9, ph: s > 0 ? 0 : PI }, () => { const m = [2.18, 1.55, s * 0.6]; if (K.lite) V._pico(K, P, [1.72, 1.6, s * 0.26], [2.55, 1.5, s * 0.2], 0.12, { n: 3 }); else { K.seg([1.72, 1.6, s * 0.26], m, 0.1, P.bo, 'bone', { seg: 5 }); V._pico(K, P, m, [2.6, 1.48, s * 0.14], 0.1, { n: 3 }); } }); }
+    /* foices de osso erguidas (golpe: sway no ombro) */
+    for (const s of S2) K.anim({ t: 'sway', p: [0.95, 2.15, s * 0.42], amp: 0.22, speed: 7, ph: s > 0 ? 0 : 1.7 }, () => { const sh = [0.95, 2.15, s * 0.42], el = [1.35, 3.05, s * 0.82], tp = [2.3, 2.25, s * 0.72];
+      if (K.lite) K.seg(sh, el, 0.12, P.b, 'chitin', { seg: 5 }); else V._ov(K, sh, el, 0.13, P.b, 'chitin', { seg: 6 }); V._pico(K, P, el, tp, 0.12);
+      K.fine(() => { for (let i = 0; i < 2; i++) { const f = 0.3 + i * 0.3, b = [el[0] + (tp[0] - el[0]) * f, el[1] + (tp[1] - el[1]) * f, el[2] + (tp[2] - el[2]) * f]; V._pico(K, P, b, [b[0] - 0.12, b[1] - 0.25, b[2]], 0.04, { n: 3 }); } }); });
+    /* seis patas altas (tripé alternado) */
+    [[0.7, 0.85], [0.1, 0.1], [-0.55, -0.8]].forEach(([x, dx], i) => { for (const s of S2) V._patinha(K, P, [x, 1.75, s * 0.46], [x + dx * 0.4, 2.9, s * 1.38], [x + dx * 0.9, 1.0, s * 1.98], [x + dx * 1.05, 0, s * 2.14], 1.05, { ph: (s > 0 ? 0 : PI) + (i % 2 ? PI : 0), stride: 9, amp: 0.4 }); }); },
+  cuspidor(K, P, tc) { /* 4.3e — Cuspidor: artilheiro de ácido com forma própria — seis patas, saco de ácido enorme erguido sobre as costas (membrana lima acesa, miolo que pulsa, veias) preso por faixas de quitina na cor do time, dorso na cor do time, pescoço de carne e tromba de osso que recua no disparo, com a boca acesa */
+    const V = U.vorag, S2 = [-1, 1], SC = [-1.05, 3.4, 0], SA = [1.1, 1.2, 1.0];
+    K.sph(0.25, 1.75, 0, 1, P.a, 'chitin', { sx: 1.3, sy: 0.72, sz: 0.92, seg: 10 });
+    V._casca(K, 0.6, 2.05, 0, 0.75, 0.5, 0.82, tc, -0.12, { seg: 9 }); V._casca(K, -0.35, 2.05, 0, 0.6, 0.48, 0.8, tc, 0.1, { seg: 9 });
+    K.seg([-0.55, 1.9, 0], [-0.95, 2.45, 0], 0.4, P.d, 'chitin', { seg: 7 });
+    /* saco de ácido: membrana lima acesa, miolo que pulsa (bob), reflexo e, no completo, veias escuras */
+    K.sph(SC[0], SC[1], SC[2], 1, '#8CB02C', null, { e: 1.08, sx: SA[0], sy: SA[1], sz: SA[2], seg: 12, shade: 0.75 });
+    K.anim({ t: 'bob', amp: 0.1, speed: 2.4 }, () => { const ci = [SC[0] + 0.04, SC[1] + 0.2, 0], ai = [SA[0] * 0.86, SA[1] * 0.88, SA[2] * 0.84];
+      K.sph(ci[0], ci[1], ci[2], 1, '#D2F25A', null, { e: 1.15, sx: ai[0], sy: ai[1], sz: ai[2], seg: 10, shade: 0.35 });
+      K.fine(() => { K.sph(ci[0] + ai[0] * 0.18, ci[1] + ai[1] * 0.94, 0, 1, '#F6FFC4', null, { e: 1.16, sx: ai[0] * 0.32, sy: ai[1] * 0.1, sz: ai[2] * 0.3, seg: 8 });
+        for (let i = 0; i < 3; i++) { const u = i / 3 * PI * 2 + 0.4; K.tube([V._el(ci, ai, u, 0.2, 0.01), V._el(ci, ai, u + 0.2, 0.5, 0.02), V._el(ci, ai, u + 0.05, 0.8, 0.02)], 0.04, '#2E3A0C', 'wet', { ts: 6, rs: 4 }); } }); });
+    K.fine(() => { for (const [u, v, r] of [[0.6, 1.2, 0.16], [2.3, 1.0, 0.13], [-1.2, 1.35, 0.15], [-2.6, 0.9, 0.12], [PI * 0.8, 1.1, 0.14]]) { const p = V._el(SC, SA, u, v, -0.05); K.sph(p[0], p[1], p[2], r, '#F2FF9E', null, { e: 1.6, seg: 5 }); } });
+    for (const xb of [-0.55, -1.45]) { const g = Math.sqrt(1 - ((xb - SC[0]) / SA[0]) ** 2); arch(K, xb, SC[1] - 0.15, 0, 0, SA[1] * g + 0.1, SA[2] * g + 0.1, H, 0.13, tc, 'chitin', { ts: 12, rs: 5 }); }
+    K.fine(() => { for (let i = 0; i < 3; i++) { const x = SC[0] + 0.55 - i * 0.55, y = SC[1] + SA[1] * Math.sqrt(1 - ((x - SC[0]) / SA[0]) ** 2); V._pico(K, P, [x, y - 0.05, 0], [x - 0.35, y + 0.45, 0], 0.08); } });
+    /* pescoço, cabeça e tromba que recua */
+    K.seg([1.4, 1.9, 0], [1.95, 2.45, 0], 0.3, P.m, 'wet', { taper: 0.8, seg: 7 });
+    K.sph(2.1, 2.5, 0, 1, P.b, 'chitin', { sx: 0.52, sy: 0.44, sz: 0.48, seg: 8 }); K.fine(() => V._casca(K, 2.05, 2.62, 0, 0.5, 0.3, 0.46, P.a, -0.3, { seg: 7 }));
+    for (const s of S2) { K.oct(2.4, 2.5, s * 0.3, 0.12, 0.22, P.l, null, { e: 2, ry: PI / 4 });
+      K.anim({ t: 'sway', p: [2.35, 2.3, s * 0.2], amp: 0.2, speed: 6, ph: s > 0 ? 0 : PI }, () => V._pico(K, P, [2.35, 2.3, s * 0.2], [2.95, 2.18, s * 0.08], 0.07, { n: 3 })); }
+    K.anim({ t: 'recoil', dist: 0.45 }, () => { K.seg([2.3, 2.55, 0], [3.35, 2.78, 0], 0.19, P.bo, 'bone', { taper: 0.75, seg: 7 });
+      for (let i = 0; i < (K.lite ? 1 : 2); i++) K.cyl(2.6 + i * 0.38, 2.6 + i * 0.08, 0, 0.24, 0.24, 0.12, P.b, 'chitin', { rz: -H + 0.2, seg: 8 });
+      K.cyl(3.25, 2.78, 0, 0.26, 0.17, 0.2, P.m, 'wet', { rz: -H + 0.2, seg: 8 }); if (K.lite) K.oct(3.5, 2.7, 0, 0.15, 0.26, P.ac, null, { e: 2.4 }); else K.sph(3.5, 2.83, 0, 0.15, P.ac, null, { e: 2.4, seg: 6 }); });
+    [[0.9, 0.75], [0.2, 0.05], [-0.5, -0.7]].forEach(([x, dx], i) => { for (const s of S2) V._patinha(K, P, [x, 1.6, s * 0.55], [x + dx * 0.4, 2.7, s * 1.5], [x + dx * 0.9, 0.95, s * 2.05], [x + dx * 1.05, 0, s * 2.2], 1.15, { ph: (s > 0 ? 0 : PI) + (i % 2 ? PI : 0), stride: 9, amp: 0.34 }); }); },
+  matriarca(K, P, tc) { /* 4.3e — Matriarca: rainha da Prole — abdômen enorme de membrana com tergitos na cor do time, fileiras de ovos com embrião aceso, veias acesas, sacos que pulsam nos flancos e ovipositor que balança; tórax erguido com placas, crânio com máscara de osso e coroa de espinhos sobre faixa na cor do time, olhos acesos, mandíbulas em foice, antenas, duas foices enormes erguidas, bracinhos que chocam um ovo, asas vestigiais que batem devagar, oito patas e o morteiro de ovos nas costas que recua */
+    const V = U.vorag, S2 = [-1, 1], AC = [-9.5, 6.4, 0], AA = [8.6, 5.0, 6.2], TC = [2.5, 9.9, 0], HC = [6.7, 14.6, 0], MB = '#B86A74', OV = '#F6D2C8', BN = '#C9B89C';
+    const top = (x, z) => AC[1] + AA[1] * Math.sqrt(Math.max(0, 1 - ((x - AC[0]) / AA[0]) ** 2 - (z / AA[2]) ** 2)), lerp = (a, b, f) => [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+    /* abdômen: membrana, ventre escuro e seis tergitos (três na cor do time) com esporões nas bordas */
+    K.sph(AC[0], AC[1], AC[2], 1, MB, 'wet', { sx: AA[0], sy: AA[1], sz: AA[2], seg: 24 });
+    K.sph(AC[0] + 0.4, AC[1] - 1.9, 0, 1, P.a, 'chitin', { sx: AA[0] * 0.92, sy: AA[1] * 0.62, sz: AA[2] * 0.9, seg: 16 });
+    const TX = [-2.6, -5.15, -7.7, -10.25, -12.8, -15.35], TCOL = [P.b, tc, P.a, tc, P.b, tc];
+    TX.forEach((x, i) => { const g = Math.sqrt(1 - ((x - AC[0]) / AA[0]) ** 2); V._placa(K, P, x, AC[1] + AA[1] * g * 0.6, 0, 0.98, AA[1] * g * 0.5, AA[2] * g * 1.0, TCOL[i], 0.04 * (i - 2), { seg: 14 });
+      K.fine(() => { for (const s of S2) V._pico(K, P, [x - 0.1, AC[1] + AA[1] * g * 0.64, s * AA[2] * g * 0.94], [x - 0.8, AC[1] + AA[1] * g * 0.58, s * (AA[2] * g + 1.1)], 0.22, { n: 5 }); }); });
+    /* ovos acesos (pulsam): fileiras de ovos compridos nos vãos entre os tergitos (vista de cima) e um cacho saindo pelo ovipositor; veias acesas nos flancos */
+    const ovo = (p, k, ry) => { K.sph(p[0], p[1], p[2], 1, OV, null, { e: 1.05, shade: 0.55, sx: 0.5 * k, sy: 0.42 * k, sz: 0.82 * k, ry: ry || 0, seg: 8 }); K.fine(() => K.sph(p[0], p[1] + 0.3 * k, p[2], 0.15 * k, P.l, null, { e: 1.9, seg: 5 })); }; /* ovo comprido aceso (sombreado assado) e, no completo, o embrião vermelho */
+    K.anim({ t: 'bob', amp: 0.06, speed: 1.6 }, () => {
+      for (let j = 0; j < 5; j++) { const x = (TX[j] + TX[j + 1]) / 2, g = Math.sqrt(1 - ((x - AC[0]) / AA[0]) ** 2), nz = K.lite ? 2 : 4; for (let k = 0; k < nz; k++) { const zz = (k / (nz - 1) - 0.5) * AA[2] * 1.1 * g; ovo([x, top(x, zz) - 0.28, zz], 1.15 * (K.lite ? 1.3 : 1), zz * 0.05); } }
+      const nv = K.q(8); for (let i = 0; i < nv; i++) { const s = i % 2 ? 1 : -1, u = s * (0.6 + (i >> 1) * 0.55); K.tube([V._el(AC, AA, u, 0.55, 0.02), V._el(AC, AA, u + s * 0.12, 0.95, 0.04), V._el(AC, AA, u - s * 0.05, 1.45, 0.04), V._el(AC, AA, u + s * 0.1, 2.0, 0.02)], 0.09, '#FF4A5E', null, { e: 1.5, ts: 8, rs: 4 }); } });
+    for (const s of S2) for (const [u, k] of [[1.35, 1], [2.25, 0.85]]) V._saco(K, P, V._el(AC, AA, s * u, 2.0, 0.15), [1.15 * k, 0.95 * k, 0.8 * k], ['#8E2234', '#FF5A5A', '#FFD0D0'], { seg: 12, amp: 0.12, speed: 1.8 + u * 0.2, ph: s + u, up: 0.1, veins: 3 });
+    /* ovipositor na ponta do abdômen (balança) */
+    K.anim({ t: 'sway', p: [AC[0] - AA[0] + 0.8, AC[1] - 0.6, 0], amp: 0.08, speed: 1.3 }, () => { const a = [AC[0] - AA[0] + 0.8, AC[1] - 0.6, 0], b = [AC[0] - AA[0] - 0.9, AC[1] - 3.1, 0];
+      K.seg(a, b, 1.15, P.m, 'wet', { taper: 0.62, seg: 12 }); K.tor(b[0] - 0.05, b[1] + 0.02, 0, 0.72, 0.2, P.d, 'wet', { rz: -0.8, ts: 14, rs: 5 }); K.sph(b[0] - 0.12, b[1] - 0.06, 0, 0.55, P.l, null, { e: 1.8, seg: 8 }); for (const [dx, dy, dz] of (K.lite ? [[0.3, -1.05, 0]] : [[0.3, -1.05, 0], [0.75, -1.2, 0.62], [0.7, -1.15, -0.6]])) K.sph(b[0] + dx, b[1] + dy, dz, 1, OV, null, { e: 1.05, shade: 0.55, sx: 0.62, sy: 0.55, sz: 0.55, seg: 8 });
+      K.fine(() => { for (let i = 0; i < 4; i++) { const an = i / 4 * PI * 2 + 0.4; V._pico(K, P, [b[0] + 0.45, b[1] + 0.45 + 0.7 * Math.cos(an), 0.7 * Math.sin(an)], [b[0] - 0.3, b[1] + 0.2 + 1.3 * Math.cos(an), 1.3 * Math.sin(an)], 0.16); } }); });
+    /* pecíolo, tórax erguido, placas do dorso (a de cima na cor do time), plastrão de osso em faixas e espiráculos acesos */
+    K.seg([-1.4, 6.6, 0], [0.2, 7.9, 0], 1.3, P.d, 'chitin', { seg: 12 }); K.fine(() => K.tor(-0.6, 7.25, 0, 1.35, 0.22, BN, 'bone', { rz: -0.68, ts: 18, rs: 5 }));
+    K.sph(TC[0], TC[1], TC[2], 1, P.a, 'chitin', { sx: 3.1, sy: 4.4, sz: 3.6, rz: -0.32, seg: 18 });
+    V._placa(K, P, 0.9, 11.8, 0, 2.3, 1.4, 3.2, tc, 0.5, { seg: 14 }); V._placa(K, P, -0.4, 9.4, 0, 2.1, 1.25, 3.3, P.b, 0.9, { seg: 12 }); V._placa(K, P, 2.9, 13.4, 0, 1.6, 1.0, 2.5, P.b, 0.15, { seg: 12 });
+    K.sph(4.6, 8.9, 0, 1, '#9A5C62', 'chitin', { sx: 1.1, sy: 2.9, sz: 2.5, rz: -0.32, seg: 12 }); /* plastrão de carne escura em faixas: o osso fica para a máscara */
+    K.fine(() => { for (let i = 0; i < 4; i++) K.sph(5.35 - i * 0.36, 7.0 + i * 1.05, 0, 1, P.b, 'chitin', { sx: 0.42, sy: 0.16, sz: 2.05 - i * 0.12, rz: -0.32, seg: 8 });
+      for (const s of S2) for (let i = 0; i < 3; i++) { V._pico(K, P, [1.4 - i * 1.1, 10.6 - i * 0.65, s * 3.25], [0.6 - i * 1.1, 11.6 - i * 0.55, s * 4.4], 0.26, { n: 5 }); K.light(2.8 - i * 1.2, 8.0 + i * 0.45, s * 3.4, 0.28, P.l, 2.2); } });
+    /* asas vestigiais de membrana (batem devagar) */
+    for (const s of S2) V._asa(K, P, [0.2, 13.0, s * 1.8], 4.6, 1.7, s, { sw: 1.1, dh: 0.35, amp: 0.1, speed: 2.6, col: '#D88A98' });
+    /* morteiro de ovos nas costas: bulbo de carne e tubo de quitina que recua, boca de ácido acesa */
+    K.sph(-0.2, 12.9, 0, 1, P.m, 'wet', { sx: 1.35, sy: 1.1, sz: 1.35, seg: 12 });
+    K.anim({ t: 'recoil', dist: 0.9 }, () => { K.seg([-0.1, 13.4, 0], [1.3, 16.8, 0], 0.82, P.b, 'chitin', { taper: 0.82, seg: 12 });
+      for (let i = 0; i < K.q(3); i++) { const f = 0.3 + i * 0.25; K.tor(-0.1 + 1.4 * f, 13.4 + 3.4 * f, 0, 0.84 - f * 0.12, 0.17, P.d, 'chitin', { rz: -0.39, ts: 14, rs: 5 }); }
+      K.tor(1.32, 16.85, 0, 0.66, 0.24, P.m, 'wet', { rz: -0.39, ts: 14, rs: 6 }); K.sph(1.32, 16.8, 0, 0.5, P.ac, null, { e: 2.2, seg: 9 }); });
+    /* pescoço e cabeça: máscara de osso, olhos acesos, mandíbulas em foice, antenas que se curvam para a frente */
+    K.seg([3.9, 12.6, 0], [5.9, 14.0, 0], 1.4, P.d, 'chitin', { seg: 12 });
+    K.sph(HC[0], HC[1], HC[2], 1, P.a, 'chitin', { sx: 2.2, sy: 1.8, sz: 2.1, rz: -0.22, seg: 16 });
+    V._placa(K, P, HC[0] + 1.5, HC[1] - 0.35, 0, 1.55, 0.85, 1.65, '#BFAE92', -H + 0.35, { seg: 12, mat: 'bone' });
+    for (const s of S2) { K.sph(HC[0] + 1.45, HC[1] + 0.35, s * 1.45, 1, P.l, null, { e: 1.8, sx: 0.52, sy: 0.64, sz: 0.46, rz: -0.3, seg: 9 }); V._mand(K, P, HC[0] + 1.8, HC[1] - 1.15, s * 0.64, 1.3, s, { ry: 0.32, amp: 0.1, speed: 2.4 }); }
+    K.fine(() => { for (const [dx, dy, dz] of [[1.6, 1.05, 0], [1.35, 1.28, 0.44], [1.35, 1.28, -0.44]]) K.oct(HC[0] + dx, HC[1] + dy, dz, 0.16, 0.3, P.l, null, { e: 2 }); });
+    for (const s of S2) K.anim({ t: 'sway', p: [HC[0] + 1.2, HC[1] + 1.2, s * 0.55], amp: 0.12, speed: 1.8, ph: s > 0 ? 0 : 1.4 }, () => { const a = [HC[0] + 1.2, HC[1] + 1.2, s * 0.55], b = [HC[0] + 2.7, HC[1] + 2.7, s * 1.5], c = [HC[0] + 4.3, HC[1] + 3.1, s * 2.4];
+      K.seg(a, b, 0.18, P.d, 'chitin', { taper: 0.8, seg: 6 }); K.seg(b, c, 0.14, P.d, 'chitin', { taper: 0.35, seg: 6 }); });
+    /* coroa de espinhos sobre uma faixa na cor do time; pontas acesas no completo */
+    K.tor(HC[0] - 0.45, HC[1] + 1.15, 0, 1.75, 0.38, tc, 'chitin', { rz: -0.35, ts: 22, rs: 6 });
+    { const n = K.q(7); for (let i = 0; i < n; i++) { const a = PI * (0.32 + 1.36 * i / (n - 1)), ca = Math.cos(a), sa = Math.sin(a), b = [HC[0] - 0.45 + 1.66 * ca, HC[1] + 1.05 - 0.55 * ca + 0.1, 1.66 * sa], L = i % 2 ? 2.8 : 4.2, t = [b[0] + ca * 0.75 * L - 0.35 * L, b[1] + 0.92 * L, b[2] + sa * 0.55 * L];
+      V._esp(K, P, b, t, 0.44 * (i % 2 ? 0.8 : 1)); K.fine(() => K.sph(t[0], t[1], t[2], 0.14, P.l, null, { e: 2.2, seg: 5 })); } }
+    /* foices enormes erguidas (sway no ombro) com placa na cor do time no antebraço e serrilha de osso */
+    for (const s of S2) K.anim({ t: 'sway', p: [4.3, 11.3, s * 2.7], amp: 0.07, speed: 1.4, ph: s > 0 ? 0 : 1.9 }, () => { const sh = [4.3, 11.3, s * 2.7], el = [5.6, 16.1, s * 5.5], wr = [9.1, 14.5, s * 6.3], m = [10.7, 13.1, s * 6.2], tp = [11.7, 10.6, s * 5.7];
+      V._ov(K, sh, el, 0.8, P.b, 'chitin', { seg: 10 }); K.sph(el[0], el[1], el[2], 0.68, P.a, 'chitin', { seg: 9 }); V._ov(K, el, wr, 0.64, P.a, 'chitin', { seg: 10 });
+      V._placa(K, P, 7.35, 15.55, s * 5.95, 1.45, 0.45, 0.64, tc, -0.55, { seg: 9, rx: s * 0.35 });
+      K.seg(wr, m, 0.52, P.bo, 'bone', { taper: 0.72, seg: 8 }); K.seg(m, tp, 0.38, P.bo, 'bone', { taper: 0.04, seg: 8 }); K.sph(wr[0], wr[1], wr[2], 0.52, P.bo, 'bone', { seg: 8 });
+      K.fine(() => { for (let i = 0; i < 4; i++) { const f = 0.15 + i * 0.22, b = f < 0.5 ? lerp(wr, m, f * 2) : lerp(m, tp, f * 2 - 1); V._pico(K, P, b, [b[0] - 0.7, b[1] - 0.35, b[2] - s * 0.15], 0.12, { n: 3 }); } }); });
+    /* bracinhos que chocam um ovo aceso diante do peito (só no completo) */
+    K.fine(() => { for (const s of S2) { K.seg([4.7, 8.2, s * 1.5], [6.0, 7.3, s * 1.8], 0.28, P.b, 'chitin', { seg: 6 }); K.seg([6.0, 7.3, s * 1.8], [6.8, 7.9, s * 0.75], 0.22, P.a, 'chitin', { taper: 0.6, seg: 6 }); }
+      K.sph(7.05, 8.1, 0, 1, OV, 'wet', { sx: 0.95, sy: 1.15, sz: 0.85, seg: 10 }); K.sph(7.3, 8.5, 0, 0.42, P.l, null, { e: 1.6, seg: 6 }); });
+    /* oito patas longas em arco (tripé alternado, passada pesada) */
+    [[3.4, 7.8, 2.8], [1.4, 7.2, 0.9], [-0.8, 6.7, -1.0], [-3.2, 6.1, -2.8]].forEach(([x, y, dx], i) => { for (const s of S2) V._pata(K, P, [x, y, s * 2.5], [x + dx * 0.45, 11.4, s * 8.2], [x + dx, 4.3, s * 11.2], [x + dx * 1.08, 0, s * 12.0], 2.9, { ph: (s > 0 ? 0 : PI) + (i % 2 ? PI : 0), stride: 16, amp: 0.15 }); }); },
 };
 
 // ---------- cenário neutro: nós de recurso, rochas, ruínas, caixas, carcaças e adereços de território ----------
