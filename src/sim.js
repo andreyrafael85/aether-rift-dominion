@@ -987,7 +987,7 @@ function applyDamage(sim, attackerOwner, attacker, t, dmg, weapon) {
     }
   }
   if (weapon && weapon.stun && (t.cls === 'vei' || t.kind === 'building')) t.cd = Math.max(t.cd || 0, 1.0);
-  emit(sim, { t: 'hit', x: t.x, y: t.y, owner: t.owner, dmg });
+  emit(sim, { t: 'hit', x: t.x, y: t.y, owner: t.owner, dmg, id: t.id }); /* 4.3g: id para o escudo acender no golpe */
   if (t.kind === 'building' && q) {
     if (t.def === 'nucleo' && sim.time - q.lastNucleoAlert > 10) { q.lastNucleoAlert = sim.time; alertTo(sim, q.id, 'NÚCLEO SOB ATAQUE!', t.x, t.y, 'danger'); }
     else if (!BUILDINGS[t.def].wall && sim.time - q.lastBaseAlert > 12) { q.lastBaseAlert = sim.time; alertTo(sim, q.id, 'Base sob ataque', t.x, t.y, 'danger'); }
@@ -1001,9 +1001,9 @@ function fire(sim, a, t) {
   const base = w.dmg * damageMult(sim, a) * (ambush ? 1.5 : 1);
   a.cd = w.cd; a.lastAttack = sim.time; a.cloaked = false; a.aimAng = DM.atan2(t.y - a.y, t.x - a.x);
   const sx = a.x + DM.cos(a.aimAng) * a.r * 0.8, sy = a.y + DM.sin(a.aimAng) * a.r * 0.8;
-  emit(sim, { t: 'shot', id: a.id, x1: sx, y1: sy, x2: t.x, y2: t.y, cls: a.cls, owner: a.owner, ambush, weapon: a.kind === 'unit' ? UNITS[a.def].weapon : BUILDINGS[a.def].weapon, beam: w.proj === 'beam' });
+  emit(sim, { t: 'shot', id: a.id, tid: t.id, x1: sx, y1: sy, x2: t.x, y2: t.y, cls: a.cls, owner: a.owner, ambush, weapon: a.kind === 'unit' ? UNITS[a.def].weapon : BUILDINGS[a.def].weapon, beam: w.proj === 'beam' });
   if (w.proj === 'beam') {
-    if (w.splash > 0) { const hit = []; queryGrid(sim, t.x, t.y, w.splash + 40, e => { if (!e.alive || e.owner === a.owner || e.owner < 0 || e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck' || e.kind === 'rock' || !isEnemy(sim, a.owner, e.owner)) return; if (e.kind === 'unit' && UNITS[e.def].flying) return; if (dist(t.x, t.y, e.x, e.y) - e.r <= w.splash) hit.push(e); }); for (const e of hit) applyDamage(sim, a.owner, a, e, base * counterMult(sim, a, e) * (e === t ? 1 : 0.7), w); emit(sim, { t: 'impact', x: t.x, y: t.y, weapon: 'chama', splash: w.splash, hit: true, owner: a.owner }); }
+    if (w.splash > 0) { const hit = []; queryGrid(sim, t.x, t.y, w.splash + 40, e => { if (!e.alive || e.owner === a.owner || e.owner < 0 || e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck' || e.kind === 'rock' || !isEnemy(sim, a.owner, e.owner)) return; if (e.kind === 'unit' && UNITS[e.def].flying) return; if (dist(t.x, t.y, e.x, e.y) - e.r <= w.splash) hit.push(e); }); for (const e of hit) applyDamage(sim, a.owner, a, e, base * counterMult(sim, a, e) * (e === t ? 1 : 0.7), w); emit(sim, { t: 'impact', x: t.x, y: t.y, weapon: a.kind === 'unit' ? UNITS[a.def].weapon : BUILDINGS[a.def].weapon, splash: w.splash, hit: true, owner: a.owner }); }
     else applyDamage(sim, a.owner, a, t, base * counterMult(sim, a, t), w);
     return;
   }

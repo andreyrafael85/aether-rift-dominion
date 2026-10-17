@@ -135,7 +135,7 @@ Pedido: remasterizar o jogo inteiro (unidades, soldados, líderes, bases, terren
 | N8AO | ISC | 2.0.1 | Sombra de contato (oclusão ambiente) de qualidade, em meia resolução no Média | 4.3b |
 | meshoptimizer | MIT | 1.3.0 | LOD automático e compressão de malhas | 4.3d |
 | three-mesh-bvh | MIT | 0.9.16 | Clique preciso no relevo alto; cálculo de sombra de cavidade nos modelos | 4.3c–4.3d |
-| three.quarks | MIT | 0.17.1 | Sistema de efeitos, a comparar com o fx3d.js da 4.2c | 4.3g |
+| three.quarks | MIT | 0.17.1 | Sistema de efeitos, a comparar com o fx3d.js da 4.2c | **4.3g: avaliado e não adotado** (ver 6.5) |
 | stats-gl | MIT | 4.2.3 | Medidor de GPU no modo de desenvolvimento | 4.3i |
 
 ### 6.3 O que já existia e é estendido (não é novo)
@@ -145,3 +145,10 @@ Animação por peça na GPU (rodas, esteiras, pernas, rotores, recuo e torres qu
 ### 6.4 WebGPU
 
 O r186 já tem WebGPURenderer com volta automática para WebGL2. Os nossos materiais são remendos de shader GLSL (onBeforeCompile), que só existem no WebGL; migrar exige reescrever cada material em TSL. Fica para depois da remasterização, quando os materiais estiverem estáveis.
+
+### 6.5 Combate (4.3g): three.quarks × fx3d.js
+
+O three.quarks simula cada partícula na CPU a cada quadro. Numa batalha grande são 2 a 4 mil partículas vivas, na mesma CPU que roda a simulação, a IA e o render, e no celular isso pesa. O fx3d.js da 4.2c simula no shader: a CPU só escreve quando a partícula nasce. O que o three.quarks daria pronto (curvas ao longo da vida, subemissores, rastros em fita, turbulência, folhas de sprite) a 4.3g resolveu dentro do fx3d.js de forma analítica: arrasto, empuxo, balanço, pouso no chão, bola de fogo que vira fumaça, rastro marcado no arco conhecido, fumaça iluminada pela luz da cena e explosões em camadas por tamanho e por Raça. Trocar custaria ~150 KB, uma API nova, um programa de shader por sistema e a reintegração do tint por Raça, do mapa de clarões e da qualidade; as folhas de sprite pediriam texturas (a regra do projeto é tudo procedural). Decisão: manter o fx3d.js. Duas ideias do three.quarks ficam anotadas para depois: turbulência por ruído no vertex shader (fumaça que se enrola) e partículas suaves que desvanecem ao encostar na malha usando a profundidade da cena.
+
+A 4.3g também trouxe o mapa de clarões: cada disparo, impacto, explosão, fogo e farol é um disco (ou cone) de luz pintado num alvo de 512² em meia precisão, visto de cima e centrado na câmera; o terreno e as malhas leem o mapa e somam a luz ao albedo, com compressão suave para muitos clarões juntos não estourarem. São centenas de luzes por quadro pelo custo de um passe pequeno e uma leitura de textura, no lugar das luzes reais do three (cada luz real a mais encarece todos os shaders).
+

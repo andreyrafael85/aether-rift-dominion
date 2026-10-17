@@ -137,7 +137,7 @@ function detailTextures(THREE, renderer) {
 const TERR_PARS = `uniform sampler2D uTexA; uniform sampler2D uTexB; uniform sampler2D fogMap; uniform sampler2D terrMap; uniform sampler2D cloudMap; uniform sampler2D microMap;
 uniform sampler2D scarMap; uniform float uNear; uniform float uCloudT; uniform float uCloudK; uniform float uTime; uniform vec2 uRift; uniform float worldSize;
 varying vec4 vBio; varying vec2 vAoc; varying vec3 vWP; varying vec3 vWN; varying vec2 vWuv;
-vec3 ardTPerturb(vec3 sp, vec3 sn, vec2 dh, float fd) { vec3 sx = normalize(dFdx(sp)), sy = normalize(dFdy(sp)); vec3 r1 = cross(sy, sn), r2 = cross(sn, sx); float det = dot(sx, r1) * fd; vec3 g = sign(det) * (dh.x * r1 + dh.y * r2); return normalize(abs(det) * sn - g); }
+vec3 ardTPerturb(vec3 sp, vec3 sn, vec2 dh, float fd) { vec3 sx = dFdx(sp), sy = dFdy(sp); sx *= inversesqrt(max(dot(sx, sx), 1e-24)); sy *= inversesqrt(max(dot(sy, sy), 1e-24)); vec3 r1 = cross(sy, sn), r2 = cross(sn, sx); float det = dot(sx, r1) * fd; vec3 g = sign(det) * (dh.x * r1 + dh.y * r2); vec3 n = abs(det) * sn - g; float l = dot(n, n); return l > 1e-12 ? n * inversesqrt(l) : sn; } /* 4.3g: sem normalize de vetor nulo (NaN) — o terreno cobre a tela de perto */
 vec4 ardHB(vec4 h, vec4 w) { vec4 s = (h + w * 1.6) * step(0.001, w); float m = max(max(s.x, s.y), max(s.z, s.w)) - 0.22; vec4 k = max(s - m, 0.0); return k / max(0.0001, k.x + k.y + k.z + k.w); }
 `;
 const TERR_COLOR = `
@@ -194,7 +194,7 @@ float tRough = 0.9, tH = 0.0; vec3 tEmis = vec3(0.0);
   #ifndef ARD_FORA
   { float deep = smoothstep(-80.0, -225.0, vWP.y) * (1.0 - smoothstep(230.0, 300.0, length(gp - uRift))); float fl = 0.6 + 0.4 * sin(uTime * 0.9 + vWP.y * 0.05 + gp.x * 0.02); float vein = smoothstep(0.6, 0.9, Bk.b) + 0.3 * smoothstep(0.6, 0.9, As.b); tEmis += vec3(1.2, 0.3, 0.75) * deep * deep * deep * (0.12 + 0.9 * vein) * fl * 1.6; alb *= 1.0 - 0.6 * deep; }
   { vec4 sc = texture2D(scarMap, gp / worldSize); float tr = sc.r; alb *= 1.0 - tr * (0.34 + 0.16 * Bw.y + 0.12 * Bw.z); alb = mix(alb, alb * vec3(0.76, 0.85, 1.08), tr * Bw.x * 0.7); /* rastros: chão compactado (na neve, sombra azulada) */
-    float bu = smoothstep(0.0, 0.7, sc.g); alb = mix(alb, vec3(0.03, 0.026, 0.022) * (0.75 + 0.5 * soft), clamp(bu * 0.95, 0.0, 0.95)); rough = mix(rough, 0.6, bu * 0.4); hgt += -tr * 0.18 - sc.b * 1.6; /* queimado e cratera */
+    float bu = smoothstep(0.0, 0.85, sc.g); alb = mix(alb, vec3(0.06, 0.05, 0.042) * (0.75 + 0.5 * soft), clamp(bu * 0.85, 0.0, 0.85)); /* 4.3g: fuligem marrom-acinzentada, gradiente até a borda */ rough = mix(rough, 0.6, bu * 0.4); hgt += -tr * 0.18 - sc.b * 1.6; /* queimado e cratera */
     tEmis += vec3(1.4, 0.45, 0.12) * smoothstep(0.35, 1.0, sc.a) * (0.65 + 0.35 * sin(uTime * 9.0 + gp.x * 0.7)) * (0.5 + 0.5 * hCrk); } /* brasa recente */
   #endif
   alb *= 0.86 + 0.28 * macro; alb *= mix(vec3(1.0), vec3(1.06, 1.0, 0.92), smoothstep(0.4, 0.8, mid) * 0.6);
@@ -225,11 +225,11 @@ function material(THREE, U, o) {
     const dbg = +(new URLSearchParams(globalThis.location ? location.search : '').get('terrdbg') || 0); const defs = (o.fora ? '#define ARD_FORA\n' : '') + (o.leve ? '#define ARD_LEVE\n' : '') + (dbg ? '#define ARD_DBG ' + dbg + '\n' : '');
     sh.vertexShader = 'attribute vec4 bio; attribute vec2 aoc; uniform float worldSize; varying vec4 vBio; varying vec2 vAoc; varying vec3 vWP; varying vec3 vWN; varying vec2 vWuv;\n' + sh.vertexShader
       .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n{ vec4 ardW = modelMatrix * vec4(transformed, 1.0); vWP = ardW.xyz; vWN = normalize(mat3(modelMatrix) * objectNormal); vBio = bio; vAoc = aoc; vWuv = vec2(ardW.x / worldSize, -ardW.z / worldSize); }');
-    sh.fragmentShader = defs + TERR_PARS + sh.fragmentShader
+    sh.fragmentShader = defs + (U.uFlash ? 'uniform sampler2D uFlash; uniform vec4 uFlashR;\n' : '') + TERR_PARS + sh.fragmentShader
       .replace('#include <color_fragment>', '#include <color_fragment>\n' + TERR_COLOR)
       .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = tRough;')
       .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n{ vec2 dh = vec2(dFdx(tH), dFdy(tH)) + (ardMh != 0.0 ? vec2(dFdx(ardMh), dFdy(ardMh)) * 0.5 : vec2(0.0)); normal = ardTPerturb(-vViewPosition, normal, dh, faceDirection); } /* tH em unidades do mapa */')
-      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += tEmis;')
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += tEmis;' + (U.uFlash ? '\n{ vec2 fu = (vWP.xz - uFlashR.xy) / uFlashR.zw; if (fu.x > 0.0 && fu.y > 0.0 && fu.x < 1.0 && fu.y < 1.0) { vec3 fl = texture2D(uFlash, fu).rgb; totalEmissiveRadiance += diffuseColor.rgb * fl / (1.0 + 0.3 * fl) * (0.35 + 0.65 * max(vWN.y, 0.0)); } } /* 4.3g: clarões no chão (compressão suave) */' : ''))
       .replace('#include <aomap_fragment>', '#include <aomap_fragment>\nreflectedLight.indirectDiffuse *= vAoc.x; reflectedLight.indirectSpecular *= mix(0.4, 1.0, vAoc.x);');
     if (globalThis.__ardTerrDbg) globalThis.__ardTerrDbg.push({ vs: sh.vertexShader, fs: sh.fragmentShader });
   };
@@ -270,7 +270,8 @@ float hs(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 void main(){ float kind = vK.x, k = vK.y, len = vK.z; vec2 u = vUv; vec4 o = vec4(0.0);
   if (kind < 0.5) { float a = abs(u.x - 0.5); float band = smoothstep(0.13, 0.17, a) * (1.0 - smoothstep(0.38, 0.44, a)); float st = 0.62 + 0.38 * step(0.5, fract(u.y * len / 1.7)); o.r = band * st * k; }
   else if (kind < 1.5) { float a = abs(u.x - 0.5); float band = 1.0 - smoothstep(0.12, 0.5, a); float dots = 0.45 + 0.55 * step(0.45, fract(u.y * len / 3.2 + step(0.5, u.x) * 0.5)); o.r = band * dots * k * 0.75; }
-  else { vec2 q = u * 2.0 - 1.0; float r = length(q); float ang = atan(q.y, q.x); float jag = 0.82 + 0.18 * hs(vec2(floor(ang * 5.0), vK.w)); float rr = r / jag; o.g = (1.0 - smoothstep(0.25, 1.0, rr)) * k; o.b = (1.0 - smoothstep(0.0, 0.8, rr)) * k * vK.z; o.a = (1.0 - smoothstep(0.05, 0.5, rr)) * k; }
+  else { vec2 q = u * 2.0 - 1.0; float r = length(q); float ang = atan(q.y, q.x); float a7 = ang * 7.0 / 6.2831853 + 3.5, a17 = ang * 17.0 / 6.2831853 + 8.5; float n1 = mix(hs(vec2(floor(a7), vK.w)), hs(vec2(floor(a7) + 1.0, vK.w)), smoothstep(0.0, 1.0, fract(a7))), n2 = hs(vec2(floor(a17), vK.w + 3.1)); float jag = 0.66 + 0.24 * n1 + 0.1 * n2; float rr = r / jag; /* 4.3g: borda irregular em duas frequências e riscos de estilhaço */
+    float ray = smoothstep(0.55, 0.95, hs(vec2(floor(ang * 23.0 / 6.2831853 + 11.5), vK.w + 7.7))) * (1.0 - smoothstep(0.45, 1.0, r)) * smoothstep(0.2, 0.45, r); o.g = max(1.0 - smoothstep(0.1, 1.0, rr), ray * 0.55) * k; o.b = (1.0 - smoothstep(0.0, 0.8, rr)) * k * vK.z; o.a = (1.0 - smoothstep(0.05, 0.5, rr)) * k; }
   gl_FragColor = o; }`;
 function scars(THREE, renderer, W, N) {
   const FIXAS = /marcasfixas=1/.test(globalThis.location ? location.search : '');
