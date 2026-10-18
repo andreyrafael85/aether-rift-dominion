@@ -50,10 +50,10 @@ function planetTextures(R, seed, bands, lights, W) {
   const map = new THREE.CanvasTexture(cv); map.colorSpace = THREE.SRGBColorSpace; const bumpMap = new THREE.CanvasTexture(bc); const em = lights ? new THREE.CanvasTexture(ec) : null; if (em) em.colorSpace = THREE.SRGBColorSpace;
   return { map, bumpMap, em };
 }
-function nebulaPlane(R, seed, w, h, strength = 1, res) {
+function nebulaPlane(R, seed, w, h, strength = 1, res, norm) {
   const W = res || 512, H = W / 2; const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const c = cv.getContext('2d'); const img = c.createImageData(W, H); const d = img.data;
-  const a = pstr(R.neb[0]), b = pstr(R.neb[1]);
-  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const t1 = fbm(x / 90 + seed, y / 90, seed * 0.3, 4), t2 = fbm(x / 40 + seed * 2, y / 40, 3 + seed, 3); const i = (y * W + x) * 4; const k = Math.max(0, t1 - 0.42) * 2.4 * strength, k2 = Math.max(0, t2 - 0.5) * 2 * strength; d[i] = a[0] * k + b[0] * k2; d[i + 1] = a[1] * k + b[1] * k2; d[i + 2] = a[2] * k + b[2] * k2; d[i + 3] = 255; }
+  const a = pstr(R.neb[0]), b = pstr(R.neb[1]); const kq = norm ? 512 / W : 1; /* 4.3l: norm = o mesmo desenho da versão 512, só com mais pixels */
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const t1 = fbm(x * kq / 90 + seed, y * kq / 90, seed * 0.3, 4), t2 = fbm(x * kq / 40 + seed * 2, y * kq / 40, 3 + seed, 3); const i = (y * W + x) * 4; const k = Math.max(0, t1 - 0.42) * 2.4 * strength, k2 = Math.max(0, t2 - 0.5) * 2 * strength; d[i] = a[0] * k + b[0] * k2; d[i + 1] = a[1] * k + b[1] * k2; d[i + 2] = a[2] * k + b[2] * k2; d[i + 3] = 255; }
   c.putImageData(img, 0, 0); const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
   const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true })); return m;
 }
@@ -290,15 +290,16 @@ function sceneBelt(S, v) {
 }
 // ---------- Postal detalhado: três momentos do dia ----------
 function scenePostal(S, race, v) {
-  const R = RACES[race]; S.scene.background = new THREE.Color(0x04050a); S.scene.add(stars(1800, 90, 1.0)); renderer.shadowMap.enabled = true;
-  const nb = nebulaPlane(R, 5 + RACE_IDS.indexOf(race) * 2, 170, 85, v === 3 ? 1.3 : 0.9); nb.position.set(0, 0, -70); S.scene.add(nb);
-  const tex = planetTextures(R, RACE_IDS.indexOf(race) * 3.3 + 1, R.bands, v === 3);
+  const HI = S.hi; /* 4.3l: versão grande (tela de carregamento em 2560): planeta e nebulosa com mais resolução, estrelas e sombra na escala da imagem */
+  const R = RACES[race]; S.scene.background = new THREE.Color(0x04050a); S.scene.add(stars(1800, 90, HI ? Math.max(1, S.w / 1400) : 1.0)); renderer.shadowMap.enabled = true;
+  const nb = nebulaPlane(R, 5 + RACE_IDS.indexOf(race) * 2, 170, 85, v === 3 ? 1.3 : 0.9, HI ? 1536 : undefined, HI); nb.position.set(0, 0, -70); S.scene.add(nb);
+  const tex = planetTextures(R, RACE_IDS.indexOf(race) * 3.3 + 1, R.bands, v === 3, HI ? 2048 : undefined);
   const planet = new THREE.Mesh(new THREE.SphereGeometry(1.35, 96, 64), new THREE.MeshStandardMaterial({ map: tex.map, bumpMap: tex.bumpMap, bumpScale: 0.03, roughness: 0.9, emissiveMap: tex.em, emissive: tex.em ? new THREE.Color(R.c2) : new THREE.Color(0), emissiveIntensity: tex.em ? 1.4 : 0 })); planet.position.set(2.1, 0.95, -1); planet.rotation.y = 1.2; planet.rotation.z = 0.25; S.scene.add(planet);
   const a1 = atmo(1.37, R.atmo, true, 3.2, 1.0); a1.position.copy(planet.position); S.scene.add(a1); const a2 = atmo(1.57, R.atmo, false, 5.5, 0.8); a2.position.copy(planet.position); S.scene.add(a2);
   if (race === 'vehnar' || race === 'quorith') { const ring = ringMesh(1.95, 3.1, race === 'vehnar' ? 0xd9c8b0 : 0xd8c8ff); ring.position.copy(planet.position); S.scene.add(ring); }
   for (const [mx, my, mz, mr] of [[-2.9, 1.9, -6, 0.32], [3.6, 2.5, -3, 0.14]]) { const moon = new THREE.Mesh(new THREE.SphereGeometry(mr, 32, 24), new THREE.MeshStandardMaterial({ color: 0x9a9aa6, roughness: 1 })); moon.position.set(mx, my, mz); S.scene.add(moon); }
   const far = new THREE.Mesh(new THREE.SphereGeometry(0.55, 32, 24), new THREE.MeshStandardMaterial({ color: new THREE.Color(R.pl[2]), roughness: 1 })); far.position.set(-4.2, 0.6, -20); S.scene.add(far);
-  const t = terrain(R, 18, 9, 220, 0.75, RACE_IDS.indexOf(race) * 7 + 2, 0.7); t.position.set(0, -1.65, -1.5); t.receiveShadow = true; S.scene.add(t);
+  const t = terrain(R, 18, 9, HI ? 640 : 220, 0.75, RACE_IDS.indexOf(race) * 7 + 2, 0.7); /* 4.3l: facetas menores na versão grande (as de 220 viravam quadrados de 20 px) */ t.position.set(0, -1.65, -1.5); t.receiveShadow = true; S.scene.add(t);
   const defs = [['nucleo', -0.9, -1.2, 0.024], ['refinaria', 0.4, -1.5, 0.02], ['reator', -2.1, -1.7, 0.02], ['torre', 1.5, -0.9, 0.018], ['quartel', -0.2, -2.6, 0.022], ['laboratorio', 1.7, -2.2, 0.02], ['torre', -2.6, -0.8, 0.018]];
   for (const [def, bx, bz, s2] of defs) { const b = building(def, R, s2); b.position.set(bx, -1.45, bz); b.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } }); S.scene.add(b); }
   for (const [def, bx, bz] of [['veiculo_hull', -1.6, -0.3], ['veiculo_hull', 0.9, -0.2], ['infantaria', -0.3, 0.1], ['infantaria', 0.1, -0.05], ['coletor', 2.3, -1.4]]) { if (!ARD.models.BY_DEF[def]) continue; const u = building(def, R, 0.016); u.position.set(bx, -1.5, bz); u.rotation.y = bx; S.scene.add(u); }
@@ -310,7 +311,7 @@ function scenePostal(S, race, v) {
   if (race === 'erevane') for (let i = 0; i < 10; i++) { const sp = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.5 + Math.random() * 0.5, 6), new THREE.MeshPhysicalMaterial({ color: 0x9fd8f0, roughness: 0.1, transmission: 0.5, transparent: true, thickness: 0.4 })); sp.position.set((Math.random() - 0.5) * 12, -1.4, -Math.random() * 5 + 0.5); S.scene.add(sp); }
   if (race === 'vehnar') for (let i = 0; i < 4; i++) { const ch = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.6, 10), new THREE.MeshStandardMaterial({ color: 0x9a4a2a })); ch.position.set(-2.4 + i * 0.5, -1.2, -1.9); S.scene.add(ch); for (let k = 0; k < 4; k++) { const sm = new THREE.Mesh(new THREE.SphereGeometry(0.06 + k * 0.03, 8, 6), new THREE.MeshStandardMaterial({ color: 0x6b7686, transparent: true, opacity: 0.35 })); sm.position.set(ch.position.x + k * 0.08, -0.85 + k * 0.14, ch.position.z); S.scene.add(sm); } }
   const hc = document.createElement('canvas'); hc.width = 2; hc.height = 64; const hx = hc.getContext('2d'); const hg = hx.createLinearGradient(0, 0, 0, 64); hg.addColorStop(0, '#000'); hg.addColorStop(0.5, '#fff'); hg.addColorStop(1, '#000'); hx.fillStyle = hg; hx.fillRect(0, 0, 2, 64); const haze = new THREE.Mesh(new THREE.PlaneGeometry(40, 7), new THREE.MeshBasicMaterial({ color: R.atmo, alphaMap: new THREE.CanvasTexture(hc), transparent: true, opacity: v === 2 ? 0.14 : 0.08, blending: THREE.AdditiveBlending, depthWrite: false })); haze.position.set(0, -0.9, -9); S.scene.add(haze);
-  const pLight = new THREE.DirectionalLight(v === 3 ? 0xa0b0ff : 0xfff0dc, v === 3 ? 1.6 : 2.4); pLight.position.set(-4, 4, 2); pLight.target = planet; S.scene.add(pLight); S.scene.add(pLight.target); const sunCol = [null, 0xfff0dc, 0xffb070, 0x8090c0][v]; const sun = new THREE.DirectionalLight(sunCol, [null, 2.2, 2.0, 0.55][v]); sun.position.set(v === 2 ? 6 : -6, v === 2 ? 1.2 : 5, v === 2 ? -3 : 4); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); const sc2 = sun.shadow.camera; sc2.left = -9; sc2.right = 9; sc2.top = 6; sc2.bottom = -6; sc2.near = 1; sc2.far = 40; sun.shadow.bias = -0.0008; S.scene.add(sun);
+  const pLight = new THREE.DirectionalLight(v === 3 ? 0xa0b0ff : 0xfff0dc, v === 3 ? 1.6 : 2.4); pLight.position.set(-4, 4, 2); pLight.target = planet; S.scene.add(pLight); S.scene.add(pLight.target); const sunCol = [null, 0xfff0dc, 0xffb070, 0x8090c0][v]; const sun = new THREE.DirectionalLight(sunCol, [null, 2.2, 2.0, 0.55][v]); sun.position.set(v === 2 ? 6 : -6, v === 2 ? 1.2 : 5, v === 2 ? -3 : 4); sun.castShadow = true; sun.shadow.mapSize.set(HI ? 4096 : 2048, HI ? 4096 : 2048); const sc2 = sun.shadow.camera; sc2.left = -9; sc2.right = 9; sc2.top = 6; sc2.bottom = -6; sc2.near = 1; sc2.far = 40; sun.shadow.bias = -0.0008; S.scene.add(sun);
   const rim = new THREE.DirectionalLight(R.c, v === 3 ? 1.6 : 1.0); rim.position.set(6, 2, -5); S.scene.add(rim); S.scene.add(new THREE.HemisphereLight(v === 3 ? 0x3040a0 : v === 2 ? 0xd08060 : 0x8090c0, 0x202030, v === 3 ? 0.3 : 0.5));
   if (v === 2) { const flare = new THREE.Mesh(new THREE.CircleGeometry(0.9, 32), new THREE.MeshBasicMaterial({ color: 0xffb070, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false })); flare.position.set(5.2, 0.9, -9); S.scene.add(flare); }
   if (v === 3) { const lamp = new THREE.PointLight(R.c, 12, 8, 2); lamp.position.set(-0.9, -0.6, -1.2); S.scene.add(lamp); }
@@ -424,14 +425,15 @@ function sceneEmblem3(S, v) {
   S.cam.fov = 30; S.cam.updateProjectionMatrix(); S.cam.position.set(0, 0.1, 9.8); S.cam.lookAt(0, -0.05, 0); S.bloom.strength = 0.4; S.bloom.threshold = 0.9;
 }
 function disposeScene(scene) { scene.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) { const ms = Array.isArray(o.material) ? o.material : [o.material]; for (const m of ms) { for (const k of ['map', 'bumpMap', 'emissiveMap']) if (m[k]) m[k].dispose(); m.dispose(); } } }); }
-window.render3d = function (kind, race, variant, w, h) {
+window.render3d = function (kind, race, variant, w, h, opt) {
+  opt = opt || {}; const rnd0 = Math.random; if (opt.seed != null) { let a = opt.seed >>> 0; Math.random = () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; } /* 4.3l: semente opcional (a mesma imagem a cada render) */
   try {
     setup(w, h); renderer.shadowMap.enabled = false; const scene = new THREE.Scene(); const cam = new THREE.PerspectiveCamera(35, w / h, 0.1, 400);
     const rt = new THREE.WebGLRenderTarget(w, h, { type: THREE.HalfFloatType, samples: 4 }); const composer = new EffectComposer(renderer, rt); composer.setSize(w, h); composer.addPass(new RenderPass(scene, cam)); const bloom = new UnrealBloomPass(new THREE.Vector2(w, h), 0.8, 0.55, 0.8); composer.addPass(bloom); composer.addPass(new OutputPass());
-    const S = { scene, cam, bloom, hi: w >= 1600 }; scene.environment = null;
+    const S = { scene, cam, bloom, hi: w >= 1600, w, h }; scene.environment = null;
     if (kind === 'bust') sceneBust(S, race, variant); else if (kind === 'insignia') sceneInsignia(S, race, variant); else if (kind === 'world') sceneWorld(S, race, variant); else if (kind === 'layout') sceneLayout(S, variant); else if (kind === 'logo') sceneLogo(S, variant); else if (kind === 'head') sceneHead(S, race, variant); else if (kind === 'emblem') sceneEmblem(S, variant); else if (kind === 'belt') sceneBelt(S, variant); else if (kind === 'postal') scenePostal(S, race, variant); else if (kind === 'emblem2') sceneEmblem2(S, variant); else if (kind === 'emblem3') sceneEmblem3(S, variant); else if (kind === 'hero') sceneBelt(S, variant); else throw new Error('kind ' + kind);
-    composer.render(); const url = renderer.domElement.toDataURL('image/jpeg', 0.9); disposeScene(scene); composer.dispose(); return url;
-  } catch (e) { return 'ERR:' + (e.stack || e.message); }
+    composer.render(); const url = renderer.domElement.toDataURL(opt.type || 'image/jpeg', opt.q || 0.9); disposeScene(scene); composer.dispose(); return url; /* 4.3l: formato e qualidade opcionais (webp na tela de carregamento) */
+  } catch (e) { return 'ERR:' + (e.stack || e.message); } finally { Math.random = rnd0; }
 };
 await new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = '../src/leaders3d.js'; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); }); /* 4.3e: bustos do jogo */
 window.__ready = true;

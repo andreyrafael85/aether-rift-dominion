@@ -3,7 +3,11 @@
    frente. O mundo da Raça escolhida vem para a frente, atrás do líder; trocar de Raça desloca a fila. Cena WebGL leve:
    ~17 chamadas de desenho, sem pós-processamento, até 30 quadros por segundo e resolução limitada a 1920 de largura.
    Versão leve (celular, ?logo=estatico, prefers-reduced-motion, GPU por software): desenha um quadro e para; ao trocar
-   de Raça refaz a cena (com uma transição curta só quando há movimento). stop() libera tudo antes da partida. */
+   de Raça refaz a cena (com uma transição curta só quando há movimento). stop() libera tudo antes da partida.
+   4.3l — alta definição: antialias, densidade real da tela (até 2x, teto de ~8,3 milhões de pixels; a versão viva
+   cai um degrau sozinha se os quadros ficarem lentos), nebulosa assada em 1024 por face (768 na versão parada),
+   planetas com textura de 1024 px no mundo em destaque e 512 nos outros, com relevo, geradas em fatias no tempo
+   ocioso, e pontilhado no céu contra as faixas de cor do degradê escuro. */
 (function (ARD) {
 'use strict';
 const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'];
@@ -27,6 +31,7 @@ void main(){ vec3 d = normalize(vDir);
   gl_FragColor = vec4(col, 1.0);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
+  gl_FragColor.rgb += (h31(vec3(gl_FragCoord.xy, 7.0)) - 0.5) / 255.0; /* 4.3l: pontilhado contra faixas no degradê escuro */
 }`;
 /* a Fenda: rasgo vertical com núcleo branco, borda laranja e halo violeta, serrilhado por ruído que corre devagar */
 const RIFT_VS = 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }';
@@ -61,7 +66,7 @@ function mount(host, race) {
   let renderer = null;
   try {
     const cv = document.createElement('canvas'); cv.id = 'ui-bg'; cv.setAttribute('aria-hidden', 'true');
-    renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: false, alpha: false, powerPreference: 'low-power', stencil: false });
+    renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: false, powerPreference: 'low-power', stencil: false }); /* 4.3l: com antialias (bordas dos planetas e dos anéis) */
     renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
     const live = q.get('fundo') === 'vivo' || (!coarse() && !reduced() && q.get('logo') !== 'estatico' && !softwareGL(renderer));
     const scene = new THREE.Scene(); const cam = new THREE.PerspectiveCamera(36, 1, 0.1, 600);
@@ -81,13 +86,15 @@ function mount(host, race) {
     const rim = new THREE.DirectionalLight(0xff7733, 1.6); rim.position.set(3, -4, 2); scene.add(rim);
     /* os cinco mundos (as posições vêm das vagas calculadas em layout()) */
     const ring = new THREE.Group(); scene.add(ring);
+    const flatBump = new THREE.DataTexture(new Uint8Array([128, 128, 128, 255]), 1, 1); flatBump.needsUpdate = true; /* 4.3l: relevo neutro até a textura chegar */
+    const flatMap = new THREE.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1); flatMap.colorSpace = THREE.SRGBColorSpace; flatMap.needsUpdate = true; /* 4.3l: cor lisa até a textura chegar (o shader já nasce com mapa e não recompila) */
     const planets = RACES.map((rid, i) => { const P = W3.PLANETS[rid]; const g = new THREE.Group(); ring.add(g);
-      const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color(P.pl[2]), roughness: 0.92, metalness: 0, emissive: new THREE.Color(P.pl[1]), emissiveIntensity: 0.12 });
-      const sph = new THREE.Mesh(new THREE.SphereGeometry(1, 48, 32), mat); sph.rotation.z = 0.35 + i * 0.4; g.add(sph);
+      const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color(P.pl[2]), roughness: 0.92, metalness: 0, emissive: new THREE.Color(P.pl[1]), emissiveIntensity: 0.12, map: flatMap, emissiveMap: flatMap, bumpMap: flatBump, bumpScale: BUMP_K }); /* 4.3l: mapa e relevo desde o início (o shader compila uma vez só) */
+      const sph = new THREE.Mesh(new THREE.SphereGeometry(1, 96, 64), mat); sph.rotation.z = 0.35 + i * 0.4; g.add(sph);
       const atU = { col: { value: new THREE.Color(P.atmo) }, it: { value: 1.25 } };
       const at = new THREE.Mesh(new THREE.SphereGeometry(1.09, 48, 32), new THREE.ShaderMaterial({ uniforms: atU, vertexShader: ATMO_VS, fragmentShader: ATMO_FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.BackSide })); g.add(at);
       if (P.bands) { const rg = new THREE.Mesh(new THREE.RingGeometry(1.45, 2.05, 96, 1), new THREE.MeshBasicMaterial({ color: new THREE.Color(P.pl[3]), transparent: true, opacity: 0.32, side: THREE.DoubleSide, depthWrite: false })); rg.rotation.x = 1.25; rg.rotation.y = 0.2; g.add(rg); }
-      return { rid, g, sph, mat, atU, base: 1, idx: i }; });
+      return { rid, g, sph, mat, atU, base: 1, idx: i, texW: 0, busy: 0 }; });
     /* asteroides do Cinturão na frente (três formas, instanciadas) e poeira na cor da Raça */
     const rocks = []; const rmat = new THREE.MeshStandardMaterial({ color: 0x3d3833, roughness: 1, metalness: 0, flatShading: true });
     let seed = 7; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
@@ -99,22 +106,69 @@ function mount(host, race) {
     const dgeo = new THREE.BufferGeometry(); dgeo.setAttribute('position', new THREE.BufferAttribute(dpos, 3));
     const dust = new THREE.Points(dgeo, new THREE.PointsMaterial({ color: tint, size: 0.07, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending })); scene.add(dust);
     host.insertBefore(cv, host.children[1] || null);
-    st = { tmp: { M: new THREE.Matrix4(), Q: new THREE.Quaternion(), E: new THREE.Euler(), V: new THREE.Vector3(), SV: new THREE.Vector3() }, THREE, renderer, scene, cam, cv, host, live, planets, ring, rocks, dust, rift, sky, skyU, riftU, tint, rim, raf: 0, last: 0, t0: performance.now(), sel: RACES.indexOf(race) < 0 ? 0 : RACES.indexOf(race), ang: 0, angFrom: 0, angTo: 0, animT: 1, mouse: [0, 0], mt: [0, 0], dirty: true, frames: 0, disposables: [], ready: false };
+    st = { tmp: { M: new THREE.Matrix4(), Q: new THREE.Quaternion(), E: new THREE.Euler(), V: new THREE.Vector3(), SV: new THREE.Vector3() }, THREE, renderer, scene, cam, cv, host, live, planets, ring, rocks, dust, rift, sky, skyU, riftU, tint, rim, raf: 0, last: 0, t0: performance.now(), sel: RACES.indexOf(race) < 0 ? 0 : RACES.indexOf(race), ang: 0, angFrom: 0, angTo: 0, animT: 1, mouse: [0, 0], mt: [0, 0], dirty: true, frames: 0, disposables: [flatBump, flatMap], ready: false, prK: 1, slow: 0, forced: q.get('fundo') === 'vivo', aniso: Math.min(8, renderer.capabilities.getMaxAnisotropy ? renderer.capabilities.getMaxAnisotropy() : 1) };
     st.off = st.offFrom = st.offTo = st.sel; st.slots = []; st.RIFT = RIFT;
     setTint(race, true);
-    const resize = () => { if (!st) return; const w = innerWidth, h = innerHeight; const pr = Math.min(live ? 1 : 1.5, window.devicePixelRatio || 1) * Math.min(1, 1920 / Math.max(w, 1)); renderer.setPixelRatio(pr); renderer.setSize(w, h, false); cam.aspect = w / h; cam.fov = w < h ? 54 : 36; cam.updateProjectionMatrix(); layout(); st.dirty = true; if (!st.live) kick(); };
+    const resize = () => { if (!st) return; const w = innerWidth, h = innerHeight; const pr = Math.max(0.5, Math.min(2, window.devicePixelRatio || 1, Math.sqrt(8.3e6 / Math.max(1, w * h))) * st.prK); /* 4.3l: densidade real da tela até 2x, com teto de pixels (4K) e o degrau da versão viva */ renderer.setPixelRatio(pr); renderer.setSize(w, h, false); cam.aspect = w / h; cam.fov = w < h ? 54 : 36; cam.updateProjectionMatrix(); layout(); st.dirty = true; if (!st.live) kick(); };
     st.resize = resize; addEventListener('resize', resize); resize(); if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (st) resize(); }); /* as fontes mudam a posição do busto e do título */
     st.onMove = ev => { st.mt[0] = (ev.clientX / innerWidth) * 2 - 1; st.mt[1] = (ev.clientY / innerHeight) * 2 - 1; };
     if (live) addEventListener('pointermove', st.onMove, { passive: true });
     st.onVis = () => { if (st && !document.hidden && st.live) loop(); }; document.addEventListener('visibilitychange', st.onVis);
     /* nebulosa assada uma vez (GPU) e texturas dos planetas uma por vez, no tempo ocioso */
-    idle(() => { if (!st) return; try { const bd = W3.spaceBackdrop(THREE, renderer, { size: st.live ? 384 : 192, seed: 3.7, planetR: 0.0001, planetDir: [0.2, -0.9, -0.3] }); skyU.uNeb.value = bd.tex; skyU.uHasNeb.value = 1; st.disposables.push(bd.rt); } catch (e) { console.warn('[ARD] fundo: nebulosa indisponível: ' + e.message); } st.dirty = true; if (!st.live) kick(); }, 200);
-    let pi = 0; const nextTex = () => { if (!st) return; if (pi >= planets.length) { st.ready = true; st.dirty = true; if (!st.live) kick(); return; } const p = planets[pi++]; try { const tex = W3.planetTexture(THREE, p.rid, 3 + p.idx * 2.7, st.live ? 256 : 192); p.mat.map = tex; p.mat.emissiveMap = tex; p.mat.emissive.setRGB(1, 1, 1); p.mat.emissiveIntensity = 0.07; p.mat.color.setRGB(1, 1, 1); p.mat.needsUpdate = true; st.disposables.push(tex); } catch (e) {} st.dirty = true; idle(nextTex, 400); };
+    idle(() => { if (!st) return; try { const bd = W3.spaceBackdrop(THREE, renderer, { size: st.live ? 1024 : 768, seed: 3.7, planetR: 0.0001, planetDir: [0.2, -0.9, -0.3] }); /* 4.3l: 1024 por face (era 384) */ skyU.uNeb.value = bd.tex; skyU.uHasNeb.value = 1; st.disposables.push(bd.rt); } catch (e) { console.warn('[ARD] fundo: nebulosa indisponível: ' + e.message); } st.dirty = true; if (!st.live) kick(); }, 200);
+    /* 4.3l: o mundo em destaque primeiro; todos em 512 (256 nos pequenos da versão parada) e depois o destaque em 1024 */
+    const first = [planets[st.sel]].concat(planets.filter((p, i) => i !== st.sel)); let pi = 0;
+    const nextTex = () => { if (!st) return; if (pi >= first.length) { st.ready = true; st.dirty = true; if (!st.live) kick(); hdFeatured(); return; } const p = first[pi++]; planetTex(p, p === planets[st.sel] || st.live ? 512 : 256, nextTex); };
     idle(nextTex, 400);
     if (live) loop(); else { kick(); setTimeout(() => { if (st && !st.ready) { st.dirty = true; kick(); } }, 2500); }
     return true;
   } catch (err) { console.warn('[ARD] fundo vivo indisponível: ' + err.message); try { if (renderer) { renderer.dispose(); renderer.forceContextLoss(); } } catch (e) {} st = null; return false; }
 }
+/* 4.3l — texturas dos planetas: o mesmo desenho do world3d.planetTexture (mesmo ruído, paleta e semente), com uma oitava a mais
+   em 1024, e um mapa de relevo junto. Geradas num Web Worker (fora da linha principal: a página não trava e a vitrine segue
+   lisa); sem Worker, em fatias no tempo ocioso (no mínimo 10 ms a cada 60 ms, para andar mesmo com a página ocupada). */
+const BUMP_K = 3;
+/* cópia fiel do ruído do world3d (hash3, vnoise, fbm): o mesmo padrão sai no Worker (pelo texto destas funções) e na linha principal */
+function nzHash(x, y, z) { let n = (x * 374761393 + y * 668265263 + z * 2147483647) | 0; n = (n ^ (n >> 13)) * 1274126177; n = n ^ (n >> 16); return (n & 0x7fffffff) / 0x7fffffff; }
+function nzSm(t) { return t * t * (3 - 2 * t); }
+function nzValue(x, y, z) { const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z); const fx = nzSm(x - xi), fy = nzSm(y - yi), fz = nzSm(z - zi); const l = (a, b, t) => a + (b - a) * t;
+  return l(l(l(nzHash(xi, yi, zi), nzHash(xi + 1, yi, zi), fx), l(nzHash(xi, yi + 1, zi), nzHash(xi + 1, yi + 1, zi), fx), fy), l(l(nzHash(xi, yi, zi + 1), nzHash(xi + 1, yi, zi + 1), fx), l(nzHash(xi, yi + 1, zi + 1), nzHash(xi + 1, yi + 1, zi + 1), fx), fy), fz); }
+function nzFbm(x, y, z, oct) { let v = 0, a = 0.5, f = 1, s = 0; for (let i = 0; i < (oct || 5); i++) { v += a * nzValue(x * f, y * f, z * f); s += a; a *= 0.5; f *= 2.1; } return v / s; }
+/* linhas y0..y1 da textura (cor em d, relevo em bd) */
+function nzRows(o, d, bd, y0, y1) { const W = o.W, H = W / 2, n = o.stops.length - 1, hd = W >= 1024;
+  for (let y = y0; y < y1; y++) { const ny = y / H * 4.4; for (let x = 0; x < W; x++) { const u = x / W * Math.PI * 2; const nx = Math.cos(u) * 2.2 + o.seed, nz = Math.sin(u) * 2.2;
+    let t = o.bands ? nzFbm(nx * 0.25, ny * 2.6 + nzFbm(nx, ny, nz, hd ? 4 : 3) * 1.2, nz * 0.25, hd ? 5 : 4) : nzFbm(nx, ny, nz, hd ? 6 : 5); t = Math.min(1, Math.max(0, (t - 0.32) * 1.9));
+    const k = Math.min(n - 1, Math.max(0, Math.floor(t * n))), f = t * n - k, a = o.stops[k], b = o.stops[k + 1], i = (y * W + x) * 4;
+    d[i] = a[0] + (b[0] - a[0]) * f; d[i + 1] = a[1] + (b[1] - a[1]) * f; d[i + 2] = a[2] + (b[2] - a[2]) * f; d[i + 3] = 255; bd[i] = bd[i + 1] = bd[i + 2] = 60 + t * 190; bd[i + 3] = 255; } } }
+const WORKER_SRC = [nzHash, nzSm, nzValue, nzFbm, nzRows].map(f => f.toString()).join('\n') + '\nonmessage = e => { const o = e.data, W = o.W, H = W / 2; const d = new Uint8ClampedArray(W * H * 4), bd = new Uint8ClampedArray(W * H * 4); nzRows(o, d, bd, 0, H); postMessage({ id: o.id, d, bd }, [d.buffer, bd.buffer]); };';
+function texWorker(s0) { if (s0.worker !== undefined) return s0.worker; s0.worker = null;
+  try { if (!window.Worker || !window.Blob || !window.URL) return null; const url = URL.createObjectURL(new Blob([WORKER_SRC], { type: 'text/javascript' }));
+    const w = new Worker(url); URL.revokeObjectURL(url); s0.wjobs = {}; s0.wid = 0;
+    w.onmessage = e => { const j = s0.wjobs[e.data.id]; delete s0.wjobs[e.data.id]; if (j && st === s0) j(e.data.d, e.data.bd); };
+    w.onerror = ev => { /* Worker indisponível (política da página): os pedidos pendentes voltam para a linha principal */ if (ev && ev.preventDefault) ev.preventDefault(); const pend = s0.wjobs || {}; s0.wjobs = {}; try { w.terminate(); } catch (e) {} s0.worker = null; for (const id in pend) pend[id](null, null); };
+    s0.worker = w; } catch (e) { s0.worker = null; }
+  return s0.worker; }
+function planetTex(p, W, done) { const s0 = st; if (!s0) return; if (p.texW >= W || p.busy >= W) { if (done) idle(done, 200); return; } p.busy = W;
+  const W3 = ARD.world3d, P = W3.PLANETS[p.rid] || W3.PLANETS.vehnar, H = W / 2;
+  const o = { W, seed: 3 + p.idx * 2.7, bands: !!P.bands, stops: P.pl.map(c => [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)]) };
+  const apply = (dd, bb) => { if (st !== s0) return; const THREE = s0.THREE;
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H; cv.getContext('2d').putImageData(new ImageData(dd, W, H), 0, 0);
+    const bc = document.createElement('canvas'); bc.width = W; bc.height = H; bc.getContext('2d').putImageData(new ImageData(bb, W, H), 0, 0);
+    const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = s0.aniso; const bt = new THREE.CanvasTexture(bc); bt.anisotropy = s0.aniso;
+    const m = p.mat, keep = s0.disposables.slice(0, 2), old = [m.map, m.bumpMap].filter(x => x && !keep.includes(x));
+    m.map = tex; m.emissiveMap = tex; m.bumpMap = bt; if (!p.texW) { m.emissive.setRGB(1, 1, 1); m.emissiveIntensity = 0.07; m.color.setRGB(1, 1, 1); }
+    for (const x of old) { x.dispose(); const j = s0.disposables.indexOf(x); if (j >= 0) s0.disposables.splice(j, 1); }
+    s0.disposables.push(tex, bt); p.texW = W; p.busy = 0; s0.dirty = true; if (!s0.live) kick(); if (done) idle(done, 100); };
+  const local = () => { if (st !== s0) return;
+    const dd = new Uint8ClampedArray(W * H * 4), bb = new Uint8ClampedArray(W * H * 4); let y = 0;
+    const step = dl => { if (st !== s0) return; const t0 = performance.now(); const budget = dl && !dl.didTimeout && dl.timeRemaining ? Math.max(4, Math.min(14, dl.timeRemaining() - 1)) : 10;
+      while (y < H && performance.now() - t0 < budget) { nzRows(o, dd, bb, y, y + 1); y++; }
+      if (y < H) idle(step, 60); else apply(dd, bb); };
+    idle(step, 60); };
+  const w = texWorker(s0);
+  if (w) { const id = ++s0.wid; s0.wjobs[id] = (dd, bb) => (dd ? apply(dd, bb) : local()); try { w.postMessage(Object.assign({ id }, o)); } catch (e) { delete s0.wjobs[id]; local(); } }
+  else local(); }
+function hdFeatured() { if (st && st.ready) planetTex(st.planets[st.sel], 1024); }
 /* vagas na tela (NDC x, y, profundidade, raio em NDC de altura): a 0 é a do mundo escolhido, atrás do líder; as outras
    quatro sobem em fila pela faixa de cima (o Alinhamento), acima dos textos. A Fenda é um rasgo diagonal ao fundo. */
 const SLOTS = {
@@ -144,7 +198,7 @@ function setTint(race, now) { if (!st) return; const COL = { vehnar: 0xff7733, e
   st.tintTo = c; if (now) { st.tint.copy(c); st.rim.color.copy(c); st.dust.material.color.copy(c); } }
 function setRace(race) { if (!st) return; const i = RACES.indexOf(race); if (i < 0 || i === st.sel) return;
   /* o anel gira pelo caminho mais curto até o mundo escolhido ficar na frente */
-  let d = (i - st.sel) % 5; if (d > 2) d -= 5; if (d < -2) d += 5; st.sel = i; st.offFrom = st.off; st.offTo = st.off + d; st.animT = 0; setTint(race, false);
+  let d = (i - st.sel) % 5; if (d > 2) d -= 5; if (d < -2) d += 5; st.sel = i; st.offFrom = st.off; st.offTo = st.off + d; st.animT = 0; setTint(race, false); hdFeatured(); /* 4.3l */
   if (!st.live) { if (reduced() || softwareGL(st.renderer)) { st.off = st.offTo; st.animT = 1; setTint(race, true); st.dirty = true; kick(); } else loop(1200); } }
 let pending = 0;
 function kick() { if (!st || pending) return; pending = requestAnimationFrame(() => { pending = 0; if (!st) return; render(performance.now(), 0); }); }
@@ -163,10 +217,10 @@ function render(now, dt) { const s = st; const t = (now - s.t0) / 1000; const { 
   if (!s.cv.classList.contains('on') && ((s.ready && s.skyU.uHasNeb.value) || now - s.t0 > 3000)) s.cv.classList.add('on'); }
 function loop(ms) { if (!st || st.raf) return; const until = ms ? performance.now() + ms : 0;
   const step = now => { st.raf = 0; if (!st) return; if (document.hidden || st.host.hidden) return; const dt = st.last ? Math.min(0.1, (now - st.last) / 1000) : 0.016;
-    if (st.live || until) { if (now - st.last >= 32) { st.last = now; render(now, dt); } } if (st.live || (until && now < until)) st.raf = requestAnimationFrame(step); else { st.last = 0; st.animT = 1; st.off = st.offTo; if (st.tintTo) st.tint.copy(st.tintTo); render(now, 0); } };
+    if (st.live || until) { if (now - st.last >= 32) { if (st.live && st.last && !st.forced) { const ms = now - st.last; st.slow = ms > 52 && ms < 400 ? st.slow + 1 : Math.max(0, st.slow - 2); if (st.slow > 40 && st.prK > 0.55) { st.prK = st.prK > 0.9 ? 0.75 : 0.5; st.slow = 0; st.resize(); } } /* 4.3l: quadros lentos seguidos baixam a densidade um degrau */ st.last = now; render(now, dt); } } if (st.live || (until && now < until)) st.raf = requestAnimationFrame(step); else { st.last = 0; st.animT = 1; st.off = st.offTo; if (st.tintTo) st.tint.copy(st.tintTo); render(now, 0); } };
   st.raf = requestAnimationFrame(step); }
-function stop() { if (!st) return; const s = st; st = null; cancelAnimationFrame(s.raf); if (pending) { cancelAnimationFrame(pending); pending = 0; } removeEventListener('resize', s.resize); removeEventListener('pointermove', s.onMove); document.removeEventListener('visibilitychange', s.onVis);
+function stop() { if (!st) return; const s = st; st = null; cancelAnimationFrame(s.raf); if (s.worker) { try { s.worker.terminate(); } catch (e) {} } /* 4.3l */ if (pending) { cancelAnimationFrame(pending); pending = 0; } removeEventListener('resize', s.resize); removeEventListener('pointermove', s.onMove); document.removeEventListener('visibilitychange', s.onVis);
   try { s.scene.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); for (const d of s.disposables) if (d && d.dispose) d.dispose(); s.renderer.dispose(); s.renderer.forceContextLoss(); } catch (e) {}
   if (s.cv.parentNode) s.cv.parentNode.removeChild(s.cv); }
-ARD.uiFx = { mount, setRace, stop, active: () => !!st, info: () => st ? { live: st.live, frames: st.frames, ready: st.ready, neb: !!st.skyU.uHasNeb.value } : null };
+ARD.uiFx = { mount, setRace, stop, active: () => !!st, info: () => st ? { live: st.live, frames: st.frames, ready: st.ready, neb: !!st.skyU.uHasNeb.value, pr: st.renderer.getPixelRatio(), prK: st.prK, tex: st.planets.map(p => p.texW), sel: st.sel, worker: !!st.worker } : null }; /* 4.3l: densidade, texturas, mundo em destaque e se o Worker está gerando */
 })(globalThis.ARD = globalThis.ARD || {});

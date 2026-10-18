@@ -121,6 +121,7 @@ function select(id, first) { if (!st || !RACES.includes(id)) return; const chang
   if (first || reduced()) fillInfo(id); else if (changed) { info.classList.add('swap'); clearTimeout(st.swapT); st.swapT = setTimeout(() => { fillInfo(id); requestAnimationFrame(() => info.classList.remove('swap')); }, 190); }
   if (changed || first) showBust(id, first);
   if (ARD.uiFx) try { ARD.uiFx.setRace(id); } catch (e) {}
+  clearTimeout(st.preT); st.preT = setTimeout(() => { if (st && st.sel === id && ARD.preloadLoadArt) ARD.preloadLoadArt(id); }, first ? 4000 : 1500); /* 4.3l: a arte grande do carregamento da Raça escolhida já fica no cache */
   for (const m of st.maps) m.draw();
   if (st.cta) st.cta.dataset.race = id;
   queueThumbs(id); }

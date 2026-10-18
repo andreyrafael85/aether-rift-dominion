@@ -17,6 +17,9 @@ const setTi = (el, v) => { if (el && el.title !== v) el.title = v; };
 const setD = (el, v) => { v = !!v; if (el && el.disabled !== v) el.disabled = v; };
 const setH = (el, v) => { v = !!v; if (el && el.hidden !== v) el.hidden = v; };
 const setOn = (el, cls, v) => { v = !!v; if (el && el.classList.contains(cls) !== v) el.classList.toggle(cls, v); };
+const setV = (el, name, v) => { if (el && el['_' + name] !== v) { el['_' + name] = v; el.style.setProperty(name, v); } }; /* 4.3l: variável CSS só quando muda (sem ler o estilo) */
+const setA = (el, name, v) => { v = String(v); if (el && el.getAttribute(name) !== v) el.setAttribute(name, v); };
+const RES3 = ['plasma', 'minerio', 'dados'], RES_CLS = { plasma: 'pl', minerio: 'mi', dados: 'da' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
@@ -25,7 +28,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.3k';
+const VERSION = '4.3l';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -234,6 +237,12 @@ const within = (p, ms) => Promise.race([p, new Promise(r => setTimeout(r, ms))])
 const LOAD_TIPS = [['Energia abaixo de 100% deixa produção, sensores e defesas mais lentos: construa Reatores antes de precisar.'], ['Coletores colhem sozinhos no seu território; com o botão direito, mande-os a outro campo.'], ['Um Nódulo de Avanço amplia o território e libera novos nós para os coletores.'],
   ['Piratas sifonam Refinarias e Reatores inimigos por até 40 s; a vítima só recebe o alerta alguns segundos depois.'], ['Pactos de Não-agressão custam Caução. Quebrar um pacto dá +20% de dano por 45 s, mas derruba a sua reputação.'], ['Selecione o Núcleo e toque em Evoluir: a Era II libera Fábrica, Hangar e Laboratório.'],
   ['Ctrl + número guarda um grupo; o número seleciona, e duas vezes centraliza a câmera.', 1], ['Espaço leva a câmera ao último alerta.', 1], ['No Cinturão, quem anda só cruza pelas pontes; drones e naves voam por cima do abismo.'], ['Vença derrubando os Núcleos inimigos ou tendo mais Domínio aos 25 minutos.'], ['A Tempestade de Éter dobra o rendimento do Plasma dentro dela.']];
+/* 4.3l: arte da tela de carregamento em 2560x1440 (assets/load-<raça>.webp, arquivo à parte, fora do bundle); a de 560 px embutida fica
+   por baixo enquanto a grande chega (ou se faltar). A tela inicial já deixa a da Raça escolhida no cache do navegador. */
+const LOAD_SHADE = 'linear-gradient(90deg, rgba(5,7,11,.84), rgba(5,7,11,.4) 46%, rgba(5,7,11,.06) 80%), linear-gradient(0deg, rgba(5,7,11,.66), rgba(5,7,11,0) 36%)';
+const loadArtUrl = fac => 'assets/load-' + fac + '.webp';
+{ const asked = new Set(); ARD.preloadLoadArt = fac => { if (!fac || asked.has(fac) || !S.FACTIONS[fac]) return; asked.add(fac); try { const im = new Image(); im.decoding = 'async'; im.src = loadArtUrl(fac); } catch (e) {} }; }
+function loadBg(fac) { const el = $('loading'); if (!el) return; const lo = ART && ART.world && ART.world[fac]; el.style.backgroundImage = LOAD_SHADE + ', url(' + loadArtUrl(fac) + ')' + (lo ? ', url(' + lo + ')' : ''); }
 function loadingInfo(cfg, netCtx) { try {
   const fac = (netCtx && cfg.players && cfg.players[netCtx.myId] && cfg.players[netCtx.myId].faction) || cfg.faction || 'vehnar'; const f = S.FACTIONS[fac] || S.FACTIONS.vehnar;
   document.documentElement.dataset.race = S.FACTIONS[fac] ? fac : 'vehnar'; document.documentElement.style.removeProperty('--race');
@@ -241,13 +250,13 @@ function loadingInfo(cfg, netCtx) { try {
   if ($('load-title')) $('load-title').textContent = cfg.bench ? 'Teste de desempenho' : cfg.campaign && cfg.campaign.mission ? cfg.campaign.mission.title : ((S.MAPS || {})[cfg.map === 'cinturao' ? 'cinturao' : 'fenda'] || 'Planície da Fenda');
   const touch = matchMedia('(pointer: coarse)').matches; const tips = LOAD_TIPS.filter(t => !(touch && t[1])); if ($('load-tip')) $('load-tip').textContent = cfg.bench ? 'Batalha fixa de 30 s com a câmera passeando pelo mapa. Não mexa no jogo até terminar.' : tips[Math.floor(Math.random() * tips.length)][0];
   if (leaderArt(fac)) { $('load-leader').src = leaderArt(fac); $('load-leader').hidden = false; }
-  if (ART && ART.world && ART.world[fac]) { $('loading').style.backgroundImage = `linear-gradient(90deg, rgba(5,7,11,.92), rgba(5,7,11,.55) 60%, rgba(5,7,11,.3)), url(${ART.world[fac]})`; $('loading').style.backgroundSize = 'cover'; $('loading').style.backgroundPosition = 'center'; }
+  loadBg(fac); /* 4.3l */
 } catch (e) { console.warn('[ARD] carregamento:', e); } }
 // ---------- game ----------
 function startGame(cfg, netCtx) {
   if (ARD.logo3d) ARD.logo3d.stop(); // libera o contexto WebGL do logo vivo antes da partida
   if (ARD.leaders3d) ARD.leaders3d.stopAll(); // 4.1e: bustos dos cartões
-  if (ARD.uiFx) ARD.uiFx.stop(); if (ARD.uiStart) ARD.uiStart.stop(); loadingInfo(cfg, netCtx); /* 4.3k: fundo vivo e vitrine liberados antes da partida; carregamento com Raça, mapa e dica */
+  if (ARD.uiFx) ARD.uiFx.stop(); if (ARD.uiStart) ARD.uiStart.stop(); document.body.classList.add('ingame'); /* 4.3l: molduras da Raça na partida */ loadingInfo(cfg, netCtx); /* 4.3k: fundo vivo e vitrine liberados antes da partida; carregamento com Raça, mapa e dica */
   if (!cfg.bench) document.body.classList.remove('bench'); // 4.2a
   const want3dEarly = (cfg.gfx || '3d') === '3d' && params.get('r') !== '2d';
   if (want3dEarly && !window.THREE && !window.__threeFailed) { $('start').hidden = true; $('game').hidden = false; $('loading').hidden = false; $('load-bar').style.width = '5%'; whenThree(() => startGame(cfg, netCtx)); return; }
@@ -278,7 +287,7 @@ function startGame(cfg, netCtx) {
       if (ART && ART.insignia && ART.insignia[fac]) { $('leader-badge').src = ART.insignia[fac]; $('leader-badge').hidden = false; }
       L.hidden = false; G && (G.leaderFac = fac);
       if (ARD.leaders3d && R.is3d && !(R.quality && R.quality.resolved === 'baixa') && !(matchMedia('(pointer: coarse)').matches || params.get('touch')) && ARD.leaders3d.canUse()) { /* 4.1e: só com o 3D ligado e acima da qualidade Baixa */ const fr = L.querySelector('.lframe'); const cv = document.createElement('canvas'); cv.id = 'leader-cv'; cv.width = 236; cv.height = 236; const it = ARD.leaders3d.mount(cv, fac, { framing: 'hud', fps: 24, mood: 1, yaw: 0.2 }); if (it) { fr.insertBefore(cv, fr.firstChild); $('leader-img').hidden = true; window.__lead3d = it; } } }
-    if (ART && ART.world && ART.world[fac]) { $('loading').style.backgroundImage = `linear-gradient(90deg, rgba(5,7,11,.92), rgba(5,7,11,.55) 60%, rgba(5,7,11,.3)), url(${ART.world[fac]})`; $('loading').style.backgroundSize = 'cover'; $('loading').style.backgroundPosition = 'center'; } /* 4.3k */
+    loadBg(fac); /* 4.3l: arte grande por URL, a pequena embutida por baixo */
     if (leaderArt(fac)) { $('load-leader').src = leaderArt(fac); $('load-leader').hidden = false; }
   } catch (e) { console.warn('[ARD] retrato do líder indisponível:', e); }
   R.resize();
@@ -361,7 +370,7 @@ function startGame(cfg, netCtx) {
     else if (!document.hidden && !G.paused && !G.ended) { const pf = G.perf; pf.frames++; const el = now - pf.t0; if (el >= 4000) { const fps = pf.frames * 1000 / el; G.fps = fps; pf.t0 = now; pf.frames = 0; // 4.0f: ajuste automático da qualidade 3D pelo FPS medido
       if (pf.auto && R.setQuality) { const L = ['baixa', 'media', 'alta', 'ultra'], LBL = { baixa: 'Baixa', media: 'Média', alta: 'Alta', ultra: 'Ultra' }; const cur = L.indexOf(R.quality.resolved || 'media'); const cap = G.save30 ? 24 : 26;
         if (fps < cap) { pf.high = 0; if (++pf.low >= 2 && cur > 0) { R.setQuality(L[cur - 1]); R.quality.name = 'auto'; R.quality.resolved = L[cur - 1]; pf.low = 0; pf.down = true; notice('Qualidade 3D ajustada para ' + LBL[L[cur - 1]] + ' para manter a fluidez (' + Math.round(fps) + ' fps)'); } }
-        else if (fps > 57 && !G.save30) { pf.low = 0; if (++pf.high >= 4 && pf.down && !pf.up && cur < 3) { R.setQuality(L[cur + 1]); R.quality.name = 'auto'; R.quality.resolved = L[cur + 1]; pf.up = true; pf.high = 0; notice('Qualidade 3D voltou para ' + LBL[L[cur + 1]]); } }
+        else if (fps > 57 && !G.save30) { pf.low = 0; if (++pf.high >= 4 && !pf.up && cur < (isTouch ? 1 : 3)) { R.setQuality(L[cur + 1]); R.quality.name = 'auto'; R.quality.resolved = L[cur + 1]; pf.up = true; pf.high = 0; notice(pf.down ? 'Qualidade 3D voltou para ' + LBL[L[cur + 1]] : 'Qualidade 3D subiu para ' + LBL[L[cur + 1]] + ': o aparelho tem folga'); } } /* 4.3l: com folga de 16 s a 58+ fps a qualidade automática sobe uma vez (no celular, até a Média); se cair, desce e não sobe de novo */
         else { pf.low = 0; pf.high = 0; } } } }
     const iv = now - G.last; let dt = Math.min(0.25, iv / 1000); G.last = now;
     if (R.dynFrame && !G.paused && !G.ended && !document.hidden && now - G.perf.start > 6000) R.dynFrame(iv, now, G.save30 ? 33.4 : 16.7); /* 4.3i: resolução dinâmica (alvo ~60 fps; 30 na economia de bateria) */
@@ -549,14 +558,20 @@ function startGame(cfg, netCtx) {
   function refreshTop() { /* 4.3k: só escreve quando o valor muda (ver setT/setC/setW) */
     const p = sim.players[human];
     setT($('r-plasma'), fmt(p.res.plasma)); setT($('r-minerio'), fmt(p.res.minerio)); setT($('r-dados'), fmt(p.res.dados));
+    { /* 4.3l: brilho e "+N" quando o valor muda (a classe alterna entre 1 e 2 e reinicia a animação sem ler o layout); escrita só na mudança */
+      const T = G.topEls || (G.topEls = { pill: {}, dl: {}, last: {}, flip: {} });
+      for (const k of RES3) { if (!T.pill[k]) { const b = $('r-' + k); T.pill[k] = b ? b.closest('.rpill') : null; T.dl[k] = T.pill[k] ? T.pill[k].querySelector('.rdl') : null; }
+        const v = Math.floor(p.res[k]), lv = T.last[k]; T.last[k] = v; const pill = T.pill[k]; if (lv == null || !pill || v === lv) continue; const dv = v - lv; if (dv < 0 && dv > -10) continue; /* a queima lenta de Plasma dos Reatores não pisca */
+        T.flip[k] = !T.flip[k]; pill.className = 'rpill ' + RES_CLS[k] + (dv > 0 ? ' gu' : ' gd') + (T.flip[k] ? '1' : '2'); setT(T.dl[k], Math.abs(dv) >= 5 ? (dv > 0 ? '+' : '−') + fmt(Math.abs(dv)) : ''); } }
     { const H = G.resHist || (G.resHist = []); if (!H.length || sim.time - H[H.length - 1].t >= 1) { H.push({ t: sim.time, r: Object.assign({}, p.res) }); while (H.length > 32) H.shift(); } // 4.2f: variação por minuto (janela de 30 s)
       const old = H[0]; const span = sim.time - old.t; for (const k of ['plasma', 'minerio', 'dados']) { const el = $('rr-' + k); if (!el) continue; if (span < 8) { setT(el, ''); continue; } const v = Math.round((p.res[k] - old.r[k]) * 60 / span); setT(el, Math.abs(v) < 1 ? '' : (v > 0 ? '+' : '−') + fmt(Math.abs(v))); setC(el, v > 0 ? 'up' : 'dn'); } }
     if (!G.resW || sim.time - G.resW.t >= 2 || sim.time < G.resW.t) resWatch(); // 4.2h
     { const pb = $('pausebox'); if (pb) { const show = !!G.paused && !G.ended && !net && !G.bench && $('savebox').hidden; setH(pb, !show); if (show) setT($('pause-why'), G.pauseWhy || 'Partida pausada.'); } }
-    const en = p.energy; setC($('energy'), 'energy ' + en.regime);
+    const en = p.energy; setC($('energy'), 'tmod energy ' + en.regime); /* 4.3l: o medidor é um módulo da barra */
     setT($('e-text'), `${Math.round(en.prod)} / ${Math.round(en.cons)}`); setT($('e-regime'), S.REGIME[en.regime].name + (p.overchargeT > 0 ? ' · Sobrecarga' : '') + (p.blackoutT > 0 ? ' · BLECAUTE' : ''));
     setW($('e-bar'), Math.min(100, en.ratio * 100 / 1.5));
-    setT($('clock'), G.isTouch ? mmss(sim.time) : mmss(sim.time) + ' / ' + mmss(sim.maxTime)); /* 4.3k: no celular, só o tempo corrido */
+    setT($('clock'), mmss(sim.time)); /* 4.3l: o total fica embaixo (#clock-max) e o anel do mostrador mostra quanto da partida já passou */
+    { const T = G.topEls; if (!T.clk) { T.clk = $('clock-ring'); T.rep = $('rep-dial'); setT($('clock-max'), 'de ' + mmss(sim.maxTime)); } setV(T.clk, '--p', String(Math.min(100, Math.floor(100 * sim.time / Math.max(1, sim.maxTime))))); setA(T.rep, 'data-rep', p.rep); }
     { const eb = $('era-badge'); if (eb) { const er = p.era || 1; const nx = S.ERAS[er + 1]; setT(eb, 'Era ' + S.ERAS[er].roman + (p.evolveT > 0 && nx ? ' → ' + nx.roman + ' ' + Math.ceil(p.evolveT) + ' s' : '') + (p.ascended ? ' ✦' : '')); setTi(eb, S.ERAS[er].name + ': ' + S.ERAS[er].desc + (p.ascended ? ' · Ascensão: ' + S.ASCENSION[p.faction].name : '')); setC(eb, 'era e' + er + (p.evolveT > 0 ? ' evolving' : '') + (p.ascended ? ' asc' : '')); } }
     setT($('rep'), S.REP_NAMES[p.rep]);
     let enemies = 0; for (const x of sim.players) if (x.alive && x.id !== human && !S.hasPact(sim, human, x.id)) enemies++; setT($('enemies'), enemies);
@@ -571,14 +586,45 @@ function startGame(cfg, netCtx) {
   function liveUpdate(ents) { // atualiza barras de vida, texto de vida/construção e progresso da fila sem recriar o painel (4.3k: nós guardados a cada montagem e escrita só quando muda)
     const panel = $('panel'); const L = G.live || (G.live = { ref: new Map(), build: null }); const q1 = sel => L.ref.has(sel) ? L.ref.get(sel) : (L.ref.set(sel, panel.querySelector(sel)), L.ref.get(sel));
     if (L.build) { const p = sim.players[human]; for (const b of L.build) { const d = S.BUILDINGS[b.dataset.build]; if (d) setOn(b, 'poor', !S.canAfford(p, d.cost)); } }
+    if (L.det && L.det.el) { const n = needState(L.det.info); setC(L.det.el, 'bd-need ' + n[0]); setA(L.det.use, 'href', '#' + n[1]); setT(L.det.txt, n[2]); } /* 4.3l: "Faltam 30 de Minério" anda no lugar */
+    if (ents.length > 1) { const gb = q1('[data-grouphp] i'); if (gb) { let hp = 0, mx = 0; for (const u of ents) { hp += u.hp; mx += u.maxHp; } const pc = mx ? Math.round(100 * hp / mx) : 0; setW(gb, pc); setT(q1('[data-grouptxt]'), pc + '%'); } }
     for (const e of ents) { const bar = q1('[data-live="' + e.id + '"] i'); if (bar) setW(bar, 100 * e.hp / e.maxHp); const tx = q1('[data-livetxt="' + e.id + '"]'); if (tx) setT(tx, fmt(e.hp) + ' / ' + fmt(e.maxHp) + (e.kind === 'building' && !e.built ? ' · construção ' + Math.round(e.progress * 100) + '%' : ''));
       const qp = q1('[data-liveq="' + e.id + '"]'); if (qp && e.queue && e.queue[0]) setT(qp, Math.round(100 * e.queue[0].t / e.queue[0].total) + '%');
       if (e.def === 'nucleo') { const pl = sim.players[human]; const nx = S.ERAS[(pl.era || 1) + 1]; const eb = q1('[data-evobar] i'), et = q1('[data-evotxt]'); if (nx && pl.evolveT > 0) { if (eb) setW(eb, 100 * (1 - pl.evolveT / nx.time)); if (et) setT(et, Math.ceil(pl.evolveT) + ' s'); } }
       if (e.upT > 0) { const md = S.BUILDINGS[e.def].module; const ub = q1('[data-upbar] i'), ut = q1('[data-uptxt]'); if (md && ub) setW(ub, 100 * (1 - e.upT / md.time)); if (ut) setT(ut, Math.ceil(e.upT) + ' s'); } } } // 4.1d: evolução e módulo também andam no lugar
-  function refreshPanel(force) {
+  // ---------- 4.3l: painel de baixo com cabeçalho fixo e lista rolável; no toque, gaveta (alça, toque, deslizar; recolhe ao posicionar) ----------
+  function refreshPanel(force) { const g0 = G.pGen; refreshPanelRaw(force); if (G.pGen !== g0) drawerize(); }
+  function panelKind() { return !view.sel.size || I.buildMenu ? 'build' : 'sel'; }
+  function drawerClosed() { return !!(G.isTouch && (G.drawerAuto || (G.drawer && G.drawer[panelKind()]))); }
+  function drawerize() { /* só quando o painel é remontado (evento ou mudança de estrutura), nunca a cada quadro */
+    const panel = $('panel'); const kids = [...panel.children]; if (!kids.length) return;
+    const head = [kids[0]]; for (let i = 1; i < kids.length && i < 3; i++) { if (kids[i].classList.contains('btabs') || kids[i].classList.contains('gtot')) head.push(kids[i]); else break; }
+    const body = document.createElement('div'); body.className = 'pbody'; for (const k of kids) if (!head.includes(k)) body.appendChild(k); for (const h of head) h.setAttribute('data-dh', '');
+    if (body.childNodes.length) panel.appendChild(body);
+    const id = panelKind() + '|' + (panelKind() === 'build' ? G.btab || 'eco' : [...view.sel].join(','));
+    if (G.pScroll && G.pScroll.id === id && G.pScroll.top) body.scrollTop = G.pScroll.top; /* a lista volta onde estava quando o painel é remontado */
+    body.addEventListener('scroll', () => { G.pScroll = { id, top: body.scrollTop }; }, { passive: true });
+    if (G.isTouch) { const grip = document.createElement('div'); grip.className = 'dgrip'; grip.setAttribute('aria-hidden', 'true'); const tg = document.createElement('button'); tg.className = 'dtog'; tg.type = 'button'; panel.insertBefore(tg, panel.firstChild); panel.insertBefore(grip, panel.firstChild); bindDrawer(); syncDrawer(); } }
+  function syncDrawer() { const panel = $('panel'); const c = drawerClosed(); setOn(panel, 'collapsed', c); const tg = panel.querySelector('.dtog'); if (tg) { setA(tg, 'aria-label', c ? 'Abrir o painel' : 'Recolher o painel'); setA(tg, 'aria-expanded', !c); } }
+  function flipPanel(fn) { /* troca de estado com o painel deslizando até o lugar novo (só transform; medido só no evento) */
+    const panel = $('panel'); const r0 = panel.getBoundingClientRect(); fn(); panel.style.transition = 'none'; panel.style.transform = ''; const r1 = panel.getBoundingClientRect(); const dy = Math.round(r0.top - r1.top);
+    if (Math.abs(dy) < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return; panel.style.transform = 'translateY(' + dy + 'px)';
+    requestAnimationFrame(() => requestAnimationFrame(() => { panel.style.transition = 'transform .22s cubic-bezier(.2,.8,.2,1)'; panel.style.transform = ''; })); }
+  function setDrawer(closed) { G.drawer = G.drawer || {}; G.drawer[panelKind()] = !!closed; G.drawerAuto = false; flipPanel(syncDrawer); refreshQuick(); }
+  function autoDrawer() { if (!G.isTouch) return; const placing = I.mode === 'build'; if (placing === !!G.drawerAuto) return; G.drawerAuto = placing; flipPanel(syncDrawer); } /* ao posicionar, recolhe; depois volta ao estado lembrado */
+  function bindDrawer() { const panel = $('panel'); if (panel._drawer) return; panel._drawer = true; let d = null;
+    panel.addEventListener('pointerdown', ev => { if (!G.isTouch) return; const h = ev.target.closest && ev.target.closest('.dgrip,.dtog,#panel>[data-dh]'); if (!h || !panel.contains(h)) return; const b = ev.target.closest('button'); d = { id: ev.pointerId, y0: ev.clientY, dy: 0, moved: false, btn: b && !b.classList.contains('dtog') ? b : null, closed: panel.classList.contains('collapsed') }; });
+    panel.addEventListener('pointermove', ev => { if (!d || ev.pointerId !== d.id) return; const dy = ev.clientY - d.y0; if (!d.moved && Math.abs(dy) < 10) return;
+      if (!d.moved) { d.moved = true; try { panel.setPointerCapture(ev.pointerId); } catch (e) {} panel.style.transition = 'none'; } d.dy = dy; panel.style.transform = 'translateY(' + Math.round(d.closed ? Math.max(-90, Math.min(0, dy)) * 0.5 : Math.max(0, dy)) + 'px)'; });
+    panel.addEventListener('pointerup', ev => { if (!d || ev.pointerId !== d.id) return; const s = d; d = null;
+      if (s.moved) { panel._dragged = true; setTimeout(() => { panel._dragged = false; }, 0); setDrawer(s.closed ? s.dy > -24 : s.dy > 36); return; } /* deslizar: para baixo recolhe, para cima abre */
+      if (!s.btn) setDrawer(!s.closed); else if (s.closed) setDrawer(false); }); /* toque no cabeçalho alterna; um atalho da faixa recolhida abre a gaveta e faz o que faz */
+    panel.addEventListener('pointercancel', ev => { if (d && ev.pointerId === d.id) { d = null; flipPanel(() => {}); } });
+    panel.addEventListener('click', ev => { if (panel._dragged) { ev.stopPropagation(); ev.preventDefault(); return; } const tg = ev.target.closest && ev.target.closest('.dtog'); if (tg && ev.detail === 0) setDrawer(!panel.classList.contains('collapsed')); }, true); } /* teclado: Enter no botão também alterna */
+  function refreshPanelRaw(force) {
     const ents = selectionSummary();
-    const key = ents.map(e => e.id + ':' + (e.queue ? e.queue.length + ':' + (e.queue[0] ? (e.queue[0].waiting ? 'w' : 'p') : '') : '') + ':' + (e.built ? 1 : Math.floor(e.progress * 20)) + ':' + (e.amount != null ? Math.floor(e.amount) : '')).join('|') + '|' + I.buildMenu + '|' + I.mode + '|' + Object.keys(sim.players[human].research).length + '|' + (sim.players[human].era || 1) + (sim.players[human].evolveT > 0 ? 'e' : '') + (sim.players[human].ascended ? 'a' : '') + '|' + ents.map(e => (e.mod ? 'm' : '') + (e.upT > 0 ? 'u' : '')).join('');
-    if (!force && key === G.selKey) { liveUpdate(ents); return; } G.selKey = key; G.live = { ref: new Map(), build: null }; // 4.1a: vida e progresso mudam no lugar; redesenhar só quando a estrutura do painel muda (cliques não se perdem) · 4.3k: nós guardados valem só para esta montagem
+    const key = ents.map(e => e.id + ':' + (e.queue ? e.queue.length + ':' + (e.queue[0] ? (e.queue[0].waiting ? 'w' : 'p') : '') : '') + ':' + (e.built ? 1 : Math.floor(e.progress * 20)) + ':' + (e.amount != null ? Math.floor(e.amount) : '')).join('|') + '|' + I.buildMenu + '|' + I.mode + '|' + Object.keys(sim.players[human].research).length + '|' + (sim.players[human].era || 1) + (sim.players[human].evolveT > 0 ? 'e' : '') + (sim.players[human].ascended ? 'a' : '') + '|' + ents.map(e => (e.mod ? 'm' : '') + (e.upT > 0 ? 'u' : '')).join('') + '|' + (G.btab || '') + ((!ents.length || I.buildMenu) && G.btab === 'tec' ? S.eraBlock(sim, human) : ''); /* 4.3l: aba do Construir e o que falta para a próxima Era */
+    if (!force && key === G.selKey) { liveUpdate(ents); return; } G.selKey = key; G.live = { ref: new Map(), build: null }; G.pGen = (G.pGen || 0) + 1; /* 4.3l: remontou (o invólucro ajeita cabeçalho, lista e gaveta) */ // 4.1a: vida e progresso mudam no lugar; redesenhar só quando a estrutura do painel muda (cliques não se perdem) · 4.3k: nós guardados valem só para esta montagem
     const panel = $('panel'); const p = sim.players[human]; const fac = S.FACTIONS[p.faction];
     if (!ents.length || I.buildMenu) { panel.innerHTML = buildMenuHTML(p); bindBuildMenu(); return; }
     const e = ents[0];
@@ -586,17 +632,19 @@ function startGame(cfg, netCtx) {
     if (e.kind === 'node') { const dry = e.amount <= 0; panel.innerHTML = `<div class="ph"><span class="dot" style="background:${dry ? '#5A5F66' : ARD.render.NODE_COLOR[e.res]}"></span><b>Nó de ${RES_NAME[e.res]}${dry ? ' · esgotado' : ''}</b></div>` + (dry ? '<div class="muted">Nada mais a colher aqui. Os recursos não voltam: mande os coletores a outro campo ou expanda com um Nódulo.</div>' : `<div class="muted">${fmt(e.amount)} / ${fmt(e.max)} restantes</div><div class="muted small">Coletores colhem sozinhos no seu território. Mandados com o botão direito, colhem em qualquer campo fora do território inimigo.</div>`); return; } // 4.2h
     if (e.owner !== human) {
       const q = sim.players[e.owner]; const d = e.kind === 'unit' ? S.UNITS[e.def] : S.BUILDINGS[e.def];
-      panel.innerHTML = `<div class="sel-head"><img class="ph-ico" alt="" src="${R.icon(e.def, e.owner)}"><b>${esc(d.name)}</b><span class="muted small"><span class="dot" style="background:${q.color}"></span>${esc(q.name)} · ${S.FACTIONS[q.faction].short}</span><div class="hp foe"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div></div><div class="muted small">${fmt(e.hp)} / ${fmt(e.maxHp)} · ${e.kind === 'unit' ? S.CLASS_NAMES[e.cls] : 'Estrutura'} · ${S.hasPact(sim, human, e.owner) ? 'Em pacto de Não-agressão' : 'Inimigo'}</div>${e.kind === 'building' && (e.def === 'refinaria' || e.def === 'reator') ? '<div class="tip">Alvo de Sifão: selecione um Pirata e clique com o botão direito aqui.</div>' : ''}`;
+      panel.innerHTML = `<div class="sel-head"><img class="ph-ico foe" alt="" src="${R.icon(e.def, e.owner)}"><b>${esc(e.kind === 'unit' ? S.unitName(q.faction, e.def) : d.name)}</b><span class="sh-c"><span class="dot" style="background:${q.color}"></span>${esc(q.name)} · ${S.FACTIONS[q.faction].short} · ${S.hasPact(sim, human, e.owner) ? 'em pacto' : 'inimigo'}</span><div class="hp foe" data-live="${e.id}"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="sh-st"><span>${IC('ic-vida')}<span data-livetxt="${e.id}">${fmt(e.hp)} / ${fmt(e.maxHp)}</span></span><span>${e.kind === 'unit' ? S.CLASS_NAMES[e.cls] : 'Estrutura'}</span>${d.attack ? `<span>${IC('ic-dano')}${d.attack.dmg}</span><span>${IC('ic-alcance')}${d.attack.range}</span>` : ''}</div></div>${e.kind === 'building' && (e.def === 'refinaria' || e.def === 'reator') ? '<div class="tip">Alvo de Sifão: selecione um Pirata e clique com o botão direito aqui.</div>' : ''}`; /* 4.3l: retrato grande, vida e atributos */
       return;
     }
     if (e.kind === 'building' && ents.length === 1) {
-      const d = S.BUILDINGS[e.def]; let h = `<div class="sel-head"><img class="ph-ico" alt="" src="${R.icon(e.def, human)}"><b>${esc(d.name)}</b><div class="hp" data-live="${e.id}"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="muted small"><span data-livetxt="${e.id}">${fmt(e.hp)} / ${fmt(e.maxHp)}${e.built ? '' : ' · construção ' + Math.round(e.progress * 100) + '%'}</span>${d.energyProd ? ' · +' + (d.energyProd * (e.mod === 1 && e.def === 'reator' ? 1.6 : 1) + (e.def === 'nucleo' ? 15 * ((p.era || 1) - 1) : 0)) + ' energia' : ''}${d.energyUse ? ' · −' + d.energyUse + ' energia' : ''}</div></div><div class="muted small">${esc(d.desc)}</div>`; /* 4.3k: cabeçalho com o ícone da construção */
+      const d = S.BUILDINGS[e.def]; const enP = d.energyProd ? d.energyProd * (e.mod === 1 && e.def === 'reator' ? 1.6 : 1) + (e.def === 'nucleo' ? 15 * ((p.era || 1) - 1) : 0) : 0;
+      let h = `<div class="sel-head"><img class="ph-ico" alt="" src="${R.icon(e.def, human)}"><b>${esc(d.name)}</b><span class="sh-c">${e.def === 'nucleo' ? 'Centro da colônia · Era ' + S.ERAS[p.era || 1].roman : 'Estrutura'}${e.built ? '' : ' · em construção'}</span><div class="hp" data-live="${e.id}"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="sh-st"><span>${IC('ic-vida')}<span data-livetxt="${e.id}">${fmt(e.hp)} / ${fmt(e.maxHp)}${e.built ? '' : ' · construção ' + Math.round(e.progress * 100) + '%'}</span></span>${enP ? `<span>${IC('ic-energia')}+${enP}</span>` : ''}${d.energyUse ? `<span>${IC('ic-energia')}−${d.energyUse}</span>` : ''}${d.attack ? `<span>${IC('ic-dano')}${d.attack.dmg}</span><span>${IC('ic-alcance')}${d.attack.range}</span>` : `<span>${IC('ic-sensor')}${d.sensor}</span>`}</div></div><div class="muted small">${esc(d.desc)}</div>`; /* 4.3l: retrato grande, vida e atributos com ícones */
       const prodList = S.producesFor(e.def, p.faction);
       if (e.built && prodList.length) {
         h += '<div class="grid">';
-        for (const ud of prodList) { const u = S.UNITS[ud]; const name = S.unitName(fac.id, ud); const qn = e.queue.filter(q => q.def === ud).length; const lk = S.lockReason(sim, human, 'unit', ud); h += `<button class="act ${lk ? 'locked' : ''}" data-prod="${ud}" ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc((lk ? '🔒 ' + lk + ' · ' : '') + u.desc)} · clique +1, Shift +5, Ctrl +10${G.isTouch ? ', segurar +5' : ''}">${lk ? `<span class="lockb">${u.era && u.era > (p.era || 1) ? S.ERAS[u.era].roman : '🔒'}</span>` : ''}<img class="ico" alt="" src="${R.icon(ud, human)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span>${qn ? `<span class="qn">×${qn}</span>` : ''}</button>`; }
+        for (const ud of prodList) { const u = S.UNITS[ud]; const name = S.unitName(fac.id, ud); const qn = e.queue.filter(q => q.def === ud).length; const lk = S.lockReason(sim, human, 'unit', ud); h += `<button class="act ${lk ? 'locked' : ''}" data-prod="${ud}" ${lk ? `data-lock="${esc(lk)}"` : ''} aria-label="${esc(name)}">`; /* 4.3l: a descrição foi para o painel de detalhes */ h += `${lk ? `<span class="lockb">${u.era && u.era > (p.era || 1) ? S.ERAS[u.era].roman : '🔒'}</span>` : ''}<img class="ico" alt="" src="${R.icon(ud, human)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span>${qn ? `<span class="qn">×${qn}</span>` : ''}</button>`; }
         h += '</div>';
-        if (e.queue.length) { h += `<div class="queue"><span class="qtot">Fila ${e.queue.length}/50</span>`; for (let i = 0; i < e.queue.length;) { const q = e.queue[i]; let j = i; while (j < e.queue.length && e.queue[j].def === q.def) j++; const n = j - i; h += `<button class="q" data-cancel="${j - 1}" data-def="${q.def}" title="Clique cancela 1 · Shift cancela todas deste tipo">${esc(S.unitName(fac.id, q.def))}${n > 1 ? ` <b>×${n}</b>` : ''}${i === 0 ? (q.waiting ? ' <i class="wait">aguardando recursos</i>' : ` <i data-liveq="${e.id}">${Math.round(100 * q.t / q.total)}%</i>`) : ''} ✕</button>`; i = j; } h += '</div>'; }
+        { const cur = G.udet && prodList.includes(G.udet) ? G.udet : prodList[0]; h += `<div class="bdet" data-det data-def="${cur}"></div>`; } /* 4.3l: detalhes da unidade (passar o mouse; no toque, a última tocada) */
+        if (e.queue.length) { h += `<div class="queue"><span class="qtot">Fila ${e.queue.length}/50</span>`; for (let i = 0; i < e.queue.length;) { const q = e.queue[i]; let j = i; while (j < e.queue.length && e.queue[j].def === q.def) j++; const n = j - i; h += `<button class="q" data-cancel="${j - 1}" data-def="${q.def}" title="Clique cancela 1 · Shift cancela todas deste tipo"><img alt="" src="${R.icon(q.def, human)}">${esc(S.unitName(fac.id, q.def))}${n > 1 ? ` <b>×${n}</b>` : ''}${i === 0 ? (q.waiting ? ' <i class="wait">aguardando recursos</i>' : ` <i data-liveq="${e.id}">${Math.round(100 * q.t / q.total)}%</i>`) : ''} ✕</button>`; i = j; } h += '</div>'; }
         h += `<div class="row"><button class="act sm" data-mode="rally"><svg class="tbi" aria-hidden="true"><use href="#ic-reuniao"/></svg>Ponto de reunião</button>${e.def === 'nucleo' ? `<button class="act sm" data-mode="jump" ${p.jumpsLeft > 0 && e.jumpT <= 0 ? '' : 'disabled'}><svg class="tbi" aria-hidden="true"><use href="#ic-salto"/></svg>Salto de Núcleo (${p.jumpsLeft})</button>` : ''}</div>`;
       }
       if (e.built && e.def === 'nucleo') { // 4.1d: Eras
@@ -622,6 +670,7 @@ function startGame(cfg, netCtx) {
       }
       if (e.jumpT > 0) h += `<div class="tip">Salto em ${Math.ceil(e.jumpT)} s. O Núcleo está visível para todos.</div>`;
       panel.innerHTML = h;
+      { const ps = [...panel.querySelectorAll('[data-prod]')]; if (ps.length) { bindDetails('u', ps, 'prod'); const box = panel.querySelector('[data-det]'); if (box) showDet('u', box.dataset.def, ps, 'prod'); if (G.isTouch) ps.forEach(b => b.addEventListener('pointerdown', () => showDet('u', b.dataset.prod, ps, 'prod'))); } } /* 4.3l */
       panel.querySelectorAll('[data-prod]').forEach(b => { let lp = null, fired = false; // 4.1a: +1 clique, +5 Shift ou segurar no toque, +10 Ctrl
         b.addEventListener('pointerdown', ev => { if (ev.pointerType !== 'touch' || b.dataset.lock) return; fired = false; lp = setTimeout(() => { fired = true; I.cmd({ t: 'produce', id: e.id, def: b.dataset.prod, n: 5 }); if (navigator.vibrate) navigator.vibrate(15); notice('+5 na fila'); }, 480); });
         b.addEventListener('pointerup', () => clearTimeout(lp)); b.addEventListener('pointerleave', () => clearTimeout(lp));
@@ -638,8 +687,9 @@ function startGame(cfg, netCtx) {
     // units
     const counts = {}; for (const u of ents) if (u.kind === 'unit') counts[u.def] = (counts[u.def] || 0) + 1;
     let h = '';
-    if (ents.length === 1) { const u = ents[0]; h += `<div class="sel-head"><img class="ph-ico" alt="" src="${R.icon(u.def, human)}"><b>${esc(S.unitName(fac.id, u.def))}</b><span class="muted small">${S.CLASS_NAMES[u.cls]}${u.rank ? ' · ' + ['', '★ Veterano', '★★ Elite', '★★★ Lenda'][u.rank] : ''}${u.elo ? ' · Acorde ' + u.elo + (u.elo >= 3 ? ' ♪' : '') : ''}</span><div class="hp" data-live="${u.id}"><i style="width:${(100 * u.hp / u.maxHp)}%"></i></div></div><div class="muted small"><span data-livetxt="${u.id}">${fmt(u.hp)} / ${fmt(u.maxHp)}</span> · ${esc(S.UNITS[u.def].desc)}</div>`; if (u.cargoTotal > 0) h += `<div class="muted small">Carga: ${fmt(u.cargoTotal)}${u.stolen ? ' (roubada)' : ''}</div>`; }
-    else { h += `<div class="ph"><svg class="phi" aria-hidden="true"><use href="#ic-exercito"/></svg><b>${ents.length} unidades</b></div><div class="chips">`; for (const k in counts) h += `<span class="chip"><img alt="" src="${R.icon(k, human)}">${counts[k]}× ${esc(S.unitName(fac.id, k))}</span>`; h += '</div>'; } /* 4.3k: ícones 3D nas fichas e retrato da unidade */
+    if (ents.length === 1) { const u = ents[0]; const ud = S.UNITS[u.def]; const w = ud.attack; h += `<div class="sel-head"><img class="ph-ico" alt="" src="${R.icon(u.def, human)}"><b>${esc(S.unitName(fac.id, u.def))}</b><span class="sh-c">${S.CLASS_NAMES[u.cls]}${ud.flying ? ' · voa' : ''}${u.rank ? ' · ' + ['', '★ Veterano', '★★ Elite', '★★★ Lenda'][u.rank] : ''}${u.elo ? ' · Acorde ' + u.elo + (u.elo >= 3 ? ' ♪' : '') : ''}</span><div class="hp" data-live="${u.id}"><i style="width:${(100 * u.hp / u.maxHp)}%"></i></div><div class="sh-st"><span>${IC('ic-vida')}<span data-livetxt="${u.id}">${fmt(u.hp)} / ${fmt(u.maxHp)}</span></span>${w ? `<span title="Dano">${IC('ic-dano')}${w.dmg}</span><span title="Alcance">${IC('ic-alcance')}${w.range}</span>` : ''}<span title="Velocidade">${IC('ic-veloc')}${ud.speed}</span><span title="Visão">${IC('ic-sensor')}${ud.sensor}</span></div></div><div class="muted small">${esc(ud.desc)}</div>`; if (u.cargoTotal > 0) h += `<div class="muted small">Carga: ${fmt(u.cargoTotal)}${u.stolen ? ' (roubada)' : ''}</div>`; } /* 4.3l: retrato grande e atributos */
+    else { let hp = 0, mx = 0; for (const u of ents) { hp += u.hp; mx += u.maxHp; } const pc = mx ? Math.round(100 * hp / mx) : 0;
+      h += `<div class="ph">${IC('ic-exercito', 'phi')}<b>${ents.length} unidades</b><span class="ph-k">${Object.keys(counts).length} tipos</span></div><div class="gtot"><span>VIDA</span><div class="hp" data-grouphp><i style="width:${pc}%"></i></div><span data-grouptxt>${pc}%</span></div><div class="chips">`; for (const k in counts) h += `<span class="chip"><img alt="" src="${R.icon(k, human)}"><b>${counts[k]}</b><span>${esc(S.unitName(fac.id, k))}</span></span>`; h += '</div>'; } /* 4.3l: vida do grupo e fichas com retrato maior */
     const combat = ents.some(u => S.UNITS[u.def].attack);
     h += `<div class="row">${combat ? `<button class="act sm ${I.mode === 'attackmove' ? 'on' : ''}" data-u="attackmove"><svg class="tbi" aria-hidden="true"><use href="#ic-atacar"/></svg>Atacar-mover <span class="k">A</span></button>` : ''}<button class="act sm" data-u="stop"><svg class="tbi" aria-hidden="true"><use href="#ic-parar"/></svg>Parar <span class="k">S</span></button></div>`;
     if (counts.pirata) h += '<div class="tip">' + S.unitName(fac.id, 'pirata') + ': clique com o direito em uma Refinaria ou Reator inimigo para Sifonar (40 s). Entrega sozinho quando enche ou após 40 s; mandado de volta, entrega ao chegar perto da Refinaria ou do Núcleo. Se morrer carregado, a carga vira Caixa.' + (fac.cloak && fac.cloak.pirata ? ' Camuflado até começar a sifonar; Torres e Núcleo enxergam de perto.' : '') + (fac.devour ? ' Carniceiro: clique direito numa carcaça ou num Nódulo inimigo para devorar (biomassa direto no cofre).' : '') + (fac.silence ? ' Enquanto sifona, torres inimigas a até 110 ficam mudas.' : '') + '</div>';
@@ -647,14 +697,58 @@ function startGame(cfg, netCtx) {
     panel.innerHTML = h;
     panel.querySelectorAll('[data-u]').forEach(b => b.addEventListener('click', () => { if (b.dataset.u === 'stop') I.cmd({ t: 'stop', ids: ents.map(u => u.id) }); else I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'); }));
   }
+  // ---------- 4.3l: menu Construir com abas (Economia, Militar, Defesa, Tecnologia), cartões com retrato 3D grande e painel de detalhes ----------
+  const BTABS = [['eco', 'Economia', 'ic-eco', ['refinaria', 'reator', 'nodulo']], ['mil', 'Militar', 'ic-mil', ['quartel', 'fabrica', 'hangar']], ['def', 'Defesa', 'ic-def', ['torre', 'muro', 'portao']], ['tec', 'Tecnologia', 'ic-tec', ['laboratorio']]];
+  function tabDefs(id) { const t = BTABS.find(x => x[0] === id) || BTABS[0]; const known = new Set([].concat(...BTABS.map(x => x[3]))); const extra = t[0] === 'eco' ? Object.keys(S.BUILDINGS).filter(k => S.BUILDINGS[k].key && !known.has(k)) : []; return t[3].filter(k => S.BUILDINGS[k] && S.BUILDINGS[k].key).concat(extra); } /* construção nova sem aba cai em Economia */
+  const IC = (id, cls) => `<svg class="tbi${cls ? ' ' + cls : ''}" aria-hidden="true"><use href="#${id}"/></svg>`;
+  function detInfo(kind, def) { /* dados do painel de detalhes: construção ('b') ou unidade ('u') */
+    const p = sim.players[human]; const cd = w => String(w.cd).replace('.', ',') + ' s';
+    if (kind === 'b') { const d = S.BUILDINGS[def]; const w = d.attack; const st = [['ic-vida', fmt(d.hp), 'Vida'], ['ic-relogio', d.buildTime + ' s', 'Tempo de construção']];
+      if (d.energyProd) st.push(['ic-energia', '+' + d.energyProd, 'Energia produzida']); else if (d.energyUse) st.push(['ic-energia', '−' + d.energyUse, 'Energia consumida']);
+      if (w) st.push(['ic-dano', w.dmg + ' / ' + cd(w), 'Dano por disparo / intervalo'], ['ic-alcance', String(w.range), 'Alcance']);
+      if (d.territory) st.push(['ic-mundo', 'território ' + d.territory, 'Território']); else st.push(['ic-sensor', String(d.sensor), 'Visão']);
+      return { name: d.name, cls: d.wall ? 'Muralha' : 'Estrutura', era: d.era || 1, st, cost: d.cost, desc: d.desc, lock: S.lockReason(sim, human, 'building', def), key: d.key }; }
+    const u = S.UNITS[def]; const w = u.attack; const st = [['ic-vida', fmt(u.hp), 'Vida'], ['ic-relogio', u.time + ' s', 'Tempo de produção']];
+    if (w) st.push(['ic-dano', w.dmg + ' / ' + cd(w), 'Dano por disparo / intervalo'], ['ic-alcance', String(w.range), 'Alcance']);
+    st.push(['ic-veloc', String(u.speed), 'Velocidade']); if (u.energyUse) st.push(['ic-energia', '−' + u.energyUse, 'Energia consumida']);
+    return { name: S.unitName(p.faction, def), cls: (S.CLASS_NAMES[u.cls] || '') + (u.flying ? ' · voa' : ''), era: u.era || 1, st, cost: u.cost, desc: u.desc, lock: S.lockReason(sim, human, 'unit', def), key: u.key }; }
+  function needState(D) { /* o que falta: trava (Era ou construção), recursos ou pronto */
+    if (D.lock) return ['lk', 'ic-cadeado', D.lock]; const p = sim.players[human]; const m = [];
+    for (const k of RES3) { const c = (D.cost || {})[k] || 0, have = Math.floor(p.res[k] || 0); if (c > have) m.push(fmt(c - have) + ' de ' + RES_NAME[k]); }
+    if (m.length) return ['no', 'ic-limpar', 'Faltam ' + m.join(' e ')];
+    return ['ok', 'ic-rep', 'Pronto' + (D.key && !G.isTouch ? ' · tecla ' + D.key : '')]; }
+  function detHTML(kind, def) { const D = detInfo(kind, def), n = needState(D);
+    return `<div class="bd-h"><b class="bd-n">${esc(D.name)}</b><span class="bd-c">${esc(D.cls)}</span><span class="cost">${costStr(D.cost)}</span><span class="bd-era">ERA ${S.ERAS[D.era].roman}</span></div><div class="bd-st">${D.st.map(x => `<span title="${x[2]}">${IC(x[0])}${esc(x[1])}</span>`).join('')}</div><p class="bd-d">${esc(D.desc)}</p><div class="bd-need ${n[0]}" data-need><svg class="tbi" aria-hidden="true"><use href="#${n[1]}"/></svg><span>${esc(n[2])}</span></div>` + (G.isTouch && kind === 'b' ? `<button class="act sm bd-go" data-go="${def}"${D.lock ? ' disabled' : ''}>${IC('ic-construir')}Posicionar</button>` : ''); }
+  function showDet(kind, def, cards, attr) { /* no evento (passar o mouse, foco ou toque), nunca no laço */ const box = $('panel').querySelector('[data-det]'); if (!box || !def) return; if (kind === 'b') G.bdet = def; else G.udet = def;
+    box.innerHTML = detHTML(kind, def); for (const c of cards) setOn(c, 'cur', c.dataset[attr] === def);
+    const el = box.querySelector('[data-need]'); if (G.live) G.live.det = { info: detInfo(kind, def), el, use: el && el.querySelector('use'), txt: el && el.querySelector('span') };
+    const go = box.querySelector('[data-go]'); if (go) go.addEventListener('click', () => placeBuild(def)); }
+  function bindDetails(kind, cards, attr) { for (const c of cards) { const f = () => showDet(kind, c.dataset[attr], cards, attr); c.addEventListener('pointerenter', ev => { if (ev.pointerType !== 'touch') f(); }); c.addEventListener('focus', f); } }
+  function techHTML(p) { /* aba Tecnologia: trilha das Eras, o que falta para a próxima e as pesquisas */
+    const er = p.era || 1, nx = S.ERAS[er + 1];
+    let h = '<div class="etrack">' + [1, 2, 3].map(n => { const E = S.ERAS[n]; const evo = n === er + 1 && p.evolveT > 0; return `<div class="eg ${n < er ? 'done' : n === er ? 'cur' : evo ? 'evo' : ''}"><b>Era ${E.roman}</b><small>${esc(E.name)}${n === er ? ' · atual' : evo ? ' · evoluindo' : ''}</small></div>`; }).join('') + '</div>';
+    if (nx && !(p.evolveT > 0)) { const reqs = (nx.needs || []).map(n => [S.hasBuilt(sim, human, n), S.BUILDINGS[n].name]).concat(nx.needsAny ? [[nx.needsAny.some(n => S.hasBuilt(sim, human, n)), nx.needsAny.map(n => S.BUILDINGS[n].name).join(' ou ')]] : []);
+      h += `<div class="reqs"><span>Para a Era ${nx.roman}:</span>${reqs.map(r => `<span class="${r[0] ? 'ok' : 'no'}">${r[0] ? '✓' : '✗'} ${esc(r[1])}</span>`).join('')}<span>${costStr(nx.cost)} · ${nx.time} s</span></div>`; }
+    h += '<div class="rlist">' + Object.keys(S.RESEARCH).map(k => { const r = S.RESEARCH[k], done = !!p.research[k], lk = !done && S.lockReason(sim, human, 'research', k); return `<div class="rs ${done ? 'ok' : lk ? 'lk' : ''}" title="${esc(r.desc)}"><b>${esc(r.name)}${done ? ' ✓' : ''}</b><small>${done ? 'concluída' : lk ? 'Era ' + S.ERAS[r.era].roman : costStr(r.cost)}</small></div>`; }).join('') + '</div>';
+    if (nx && S.nucleoOf(sim, human)) h += `<div class="row"><button class="act sm" data-nucleo="1">${IC('ic-nucleo')}Abrir o Núcleo (F1) para evoluir</button></div>`;
+    return h; }
   function buildMenuHTML(p) {
-    let h = `<div class="ph"><svg class="phi" aria-hidden="true"><use href="#ic-construir"/></svg><b>Construir</b><span class="ph-k">${G.isTouch ? 'toque e posicione' : 'B + tecla'}</span></div><div class="grid">`; /* 4.3k */
-    for (const k in S.BUILDINGS) { const d = S.BUILDINGS[k]; if (!d.key) continue; const can = S.canAfford(p, d.cost); const lk = S.lockReason(sim, human, 'building', k); h += `<button class="act ${can ? '' : 'poor'} ${lk ? 'locked' : ''} ${view.ghost && view.ghost.def === k ? 'on' : ''}" data-build="${k}" ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc((lk ? '🔒 ' + lk + ' · ' : '') + d.desc)}">${lk ? `<span class="lockb">${S.ERAS[d.era || 1].roman}</span>` : ''}<img class="ico" alt="" src="${R.icon(k, human)}"><span class="k">${d.key}</span><span class="n">${esc(d.name)}</span><span class="cost">${costStr(d.cost)}</span></button>`; }
+    const tab = G.btab || 'eco', defs = tabDefs(tab);
+    let h = `<div class="ph">${IC('ic-construir', 'phi')}<b>Construir</b><span class="ph-k">${G.isTouch ? 'toque: detalhes · Posicionar' : 'B + tecla · passe o mouse para detalhes'}</span></div>`;
+    h += '<div class="btabs" role="tablist">' + BTABS.map(t => `<button class="btab${t[0] === tab ? ' on' : ''}" role="tab" aria-selected="${t[0] === tab}" data-btab="${t[0]}">${IC(t[2])}<span>${t[1]}</span><span class="bn">${tabDefs(t[0]).length}</span></button>`).join('') + '</div><div class="bgrid">';
+    if (tab === 'tec') h = h.replace(/<div class="bgrid">$/, '<div class="tecw"><div class="bgrid">'); /* 4.3l: na Tecnologia o cartão fica ao lado da trilha das Eras */
+    for (const k of defs) { const d = S.BUILDINGS[k]; const can = S.canAfford(p, d.cost); const lk = S.lockReason(sim, human, 'building', k); h += `<button class="act bcard ${can ? '' : 'poor'} ${lk ? 'locked' : ''} ${view.ghost && view.ghost.def === k ? 'on' : ''}" data-build="${k}" ${lk ? `data-lock="${esc(lk)}"` : ''} aria-label="${esc(d.name)}">${lk ? `<span class="lockb">ERA ${S.ERAS[d.era || 1].roman}</span>` : ''}<span class="bport"><img class="ico" alt="" src="${R.icon(k, human)}"></span><span class="k">${d.key}</span><span class="n">${esc(d.name)}</span><span class="cost">${costStr(d.cost)}</span></button>`; }
     h += '</div>';
-    if (!view.sel.size) h += '<div class="tip">Nada selecionado. Clique em unidades ou arraste uma caixa. F1 seleciona o Núcleo, F2 o exército.</div>';
-    return h;
-  }
-  function bindBuildMenu() { const bs = [...$('panel').querySelectorAll('[data-build]')]; if (G.live) G.live.build = bs; /* 4.3k: o "falta recurso" atualiza no lugar */ bs.forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.buildMenu = false; I.setMode('build', b.dataset.build); notice(G.isTouch ? 'Arraste para posicionar e toque em ✓ Construir aqui' : 'Posicione e clique para construir. Shift mantém o modo.'); })); }
+    if (tab === 'tec') h += '<div class="tecr">' + techHTML(p) + '</div></div>';
+    const cur = G.bdet && defs.includes(G.bdet) ? G.bdet : defs[0]; if (cur) h += `<div class="bdet" data-det data-def="${cur}"></div>`;
+    if (!view.sel.size && !G.isTouch) h += '<div class="tip">Nada selecionado. Clique em unidades ou arraste uma caixa. F1 seleciona o Núcleo, F2 o exército.</div>';
+    return h; }
+  function placeBuild(k) { const b = $('panel').querySelector('[data-build="' + k + '"]'); if (b && b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.buildMenu = false; I.setMode('build', k); notice(G.isTouch ? 'Arraste para posicionar e toque em ✓ Construir aqui' : 'Posicione e clique para construir. Shift mantém o modo.'); }
+  function bindBuildMenu() { const panel = $('panel'); const bs = [...panel.querySelectorAll('[data-build]')]; if (G.live) G.live.build = bs; /* 4.3k: o "falta recurso" atualiza no lugar */
+    panel.querySelectorAll('[data-btab]').forEach(t => t.addEventListener('click', () => { if (G.btab === t.dataset.btab) return; G.btab = t.dataset.btab; refreshPanel(true); }));
+    const nb = panel.querySelector('[data-nucleo]'); if (nb) nb.addEventListener('click', () => { const n = S.nucleoOf(sim, human); if (n) { I.select([n.id]); I.center(n.x, n.y); } });
+    bindDetails('b', bs, 'build'); const box = panel.querySelector('[data-det]'); if (box) showDet('b', box.dataset.def, bs, 'build');
+    bs.forEach(b => b.addEventListener('click', () => { const k = b.dataset.build; if (G.isTouch && !b.classList.contains('cur')) { showDet('b', k, bs, 'build'); return; } placeBuild(k); })); } /* 4.3l: no toque, o primeiro toque mostra os detalhes e o segundo (ou Posicionar) constrói */
   function refreshQuick() { /* 4.3k: escrita só quando muda */
     const p = sim.players[human]; const fac = S.FACTIONS[p.faction];
     const oc = $('btn-over'); const cd = Math.max(0, p.overchargeCd - sim.time); const Q = G.quickEls || (G.quickEls = { ocSub: oc.querySelector('.sub'), spN: $('btn-super').querySelector('.n'), spSub: $('btn-super').querySelector('.sub') });
@@ -663,7 +757,7 @@ function startGame(cfg, netCtx) {
     setT(Q.spN, fac.superName); const era3 = (p.era || 1) >= 3; setD(sp, !lab || !era3 || scd > 0 || !S.canAfford(p, S.SUPER_COST));
     setT(Q.spSub, !lab ? 'requer Laboratório' : !era3 ? 'requer Era III' : scd > 0 ? 'recarga ' + mmss(scd) : '300 Dados · 200 Plasma');
     setOn($('btn-diplo'), 'attn', !!G.pendingFor);
-    setOn($('btn-build'), 'on', I.buildMenu || I.mode === 'build');
+    setOn($('btn-build'), 'on', I.buildMenu || I.mode === 'build' || (G.isTouch && !view.sel.size && !(G.drawer && G.drawer.build))); /* 4.3l: no toque, aceso com a gaveta do Construir aberta */
     setOn($('btn-attack'), 'on', I.mode === 'attackmove');
     setOn($('btn-box'), 'on', I.touchBox);
   }
@@ -678,7 +772,8 @@ function startGame(cfg, netCtx) {
     if ($('btn-save')) $('btn-save').addEventListener('click', () => openSaveBox());
     if ($('idle-col')) $('idle-col').addEventListener('click', () => { const ids = (G.idleCol || []).filter(id => { const u = sim.byId.get(id); return u && u.alive; }); if (!ids.length) return; I.select(ids); const u = sim.byId.get(ids[0]); if (u) I.center(u.x, u.y); notice(ids.length + (ids.length > 1 ? ' coletores parados selecionados' : ' coletor parado selecionado') + ': clique com o botão direito num campo de recursos para mandá-los colher.'); }); // 4.2h
     if ($('pausebox')) $('pausebox').addEventListener('click', () => { if (G.paused && !G.ended) { G.paused = false; G.autoPaused = false; G.pauseWhy = null; refreshTop(); notice('Continuando'); } }); // 4.2f: pausa visível; clique continua
-    $('btn-build').addEventListener('click', () => { I.buildMenu = !I.buildMenu; view.sel = new Set(); ui.buildMenuChanged(I.buildMenu); });
+    $('btn-build').addEventListener('click', () => { if (G.isTouch && I.mode !== 'build') { G.drawer = G.drawer || {}; const showing = !view.sel.size || I.buildMenu; if (showing && !G.drawer.build) { setDrawer(true); return; } G.drawer.build = false; I.buildMenu = true; view.sel = new Set(); ui.buildMenuChanged(true); return; } /* 4.3l: no toque, o botão abre e recolhe a gaveta do Construir */
+      I.buildMenu = !I.buildMenu; view.sel = new Set(); ui.buildMenuChanged(I.buildMenu); });
     $('btn-attack').addEventListener('click', () => I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'));
     $('btn-box').addEventListener('click', () => { I.touchBox = !I.touchBox; refreshQuick(); notice(I.touchBox ? 'Arraste para selecionar em caixa' : 'Arraste para mover a câmera'); });
     $('btn-stop').addEventListener('click', () => { const ids = [...view.sel].filter(id => { const e = sim.byId.get(id); return e && e.alive && e.kind === 'unit' && e.owner === human; }); if (ids.length) I.cmd({ t: 'stop', ids }); });
@@ -696,6 +791,13 @@ function startGame(cfg, netCtx) {
     mini.addEventListener('contextmenu', e => e.preventDefault());
     $('hints-close').addEventListener('click', () => { $('hints').hidden = true; G.hintsOff = true; });
     document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => ui.closeModals()));
+    { /* 4.3l: dica única dos botões com data-tip (barra de cima e botões rápidos); a posição é medida só no evento, nunca no laço */
+      const tip = $('hud-tip'), hud = $('hud'); let cur = null;
+      if (tip && hud && !G.isTouch) { hud.addEventListener('pointerover', ev => { const el = ev.target && ev.target.closest ? ev.target.closest('[data-tip]') : null; if (!el || el === cur || ev.pointerType === 'touch') return; cur = el;
+          tip.innerHTML = esc(el.dataset.tip) + (el.dataset.k ? '<kbd>' + esc(el.dataset.k) + '</kbd>' : ''); const r = el.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight; const up = r.top > innerHeight * 0.55;
+          const x = Math.max(6, Math.min(innerWidth - tw - 6, r.left + r.width / 2 - tw / 2)), y = up ? r.top - th - 8 : r.bottom + 8; tip.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)'; tip.classList.add('on'); });
+        hud.addEventListener('pointerout', ev => { if (cur && !(ev.relatedTarget && cur.contains(ev.relatedTarget))) { cur = null; tip.classList.remove('on'); } });
+        hud.addEventListener('pointerdown', () => { if (cur) { cur = null; tip.classList.remove('on'); } }); } }
   }
   function fac() { return S.FACTIONS[sim.players[human].faction]; }
   const SUPER_TARGETED = { fundicao: 'Clique em território seu para derrubar o Bastião', eclosao: 'Clique num ponto visível para a Eclosão' };
@@ -809,7 +911,7 @@ function startGame(cfg, netCtx) {
   function makeUI() {
     return {
       selectionChanged() { I.buildMenu = false; refreshPanel(true); refreshQuick(); },
-      modeChanged() { refreshPanel(true); refreshQuick(); this.placeChanged(); },
+      modeChanged() { refreshPanel(true); refreshQuick(); this.placeChanged(); autoDrawer(); }, /* 4.3l */
       placeChanged() { const pb = $('placebar'); if (!pb) return; const g = view.ghost; const on = G.isTouch && I.mode === 'build' && g && !S.BUILDINGS[g.def].wall; pb.hidden = !on; document.body.classList.toggle('placing', !!on); if (!on) return; const ok = S.canBuild(sim, human, g.def, g.x, g.y); const afford = S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost); $('pb-text').textContent = S.BUILDINGS[g.def].name + ' · ' + (!ok.ok ? ok.why : !afford ? 'recursos insuficientes' : 'local válido · arraste para ajustar'); $('pb-ok').disabled = !(ok.ok && afford); },
       buildMenuChanged() { refreshPanel(true); refreshQuick(); },
       touchBoxChanged() { refreshQuick(); },
