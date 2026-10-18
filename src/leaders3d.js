@@ -29,7 +29,7 @@ function copyPixels(it, rw, rh, w, h) {
   if (w === rw && h === rh) it.ctx.putImageData(it.img, 0, 0);
   else { if (!tmpCv) tmpCv = document.createElement('canvas'); if (tmpCv.width !== rw || tmpCv.height !== rh) { tmpCv.width = rw; tmpCv.height = rh; } tmpCv.getContext('2d').putImageData(it.img, 0, 0); it.ctx.clearRect(0, 0, w, h); it.ctx.drawImage(tmpCv, 0, 0, rw, rh, 0, 0, w, h); }
 }
-const RES = 256;
+const RES = 512; /* 4.3k: a vitrine da tela inicial desenha o busto em até 512 px; HUD (236) e outros canvas seguem no tamanho do próprio canvas */
 function canUse() { if (failed) return false; try { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return false; } catch (e) {} return !!T(); }
 /* 4.3e: no jogo window.THREE é o namespace do módulo e não traz o RoomEnvironment (ele mora em THREE_ADDONS): antes os bustos do jogo saíam sem mapa de ambiente e os metais ficavam chapados */
 function roomEnv() { const a = T(), b = window.THREE_ADDONS; return (a && a.RoomEnvironment) || (b && b.RoomEnvironment) || null; }
