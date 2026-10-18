@@ -271,6 +271,53 @@ function mulberry32(seed) {
 function dist(ax, ay, bx, by) { return DM.hypot(ax - bx, ay - by); }
 function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
 
+// ---------- 4.3h: mapas e lagos ----------
+// 'fenda': a planície em volta da Fenda (o mapa de sempre). 'cinturao': plataformas de asteroide sobre o espaço — a de cada base, as de
+// expansão entre vizinhos e o anel do Plasma em volta do abismo central —, ligadas por pontes de rocha; o abismo é intransponível para
+// quem anda (voadores passam). Lagos nos dois mapas: plasma (derretido, intransponível) e gelo (congelado, dá para andar, não dá para construir).
+// sim.mapGrid (grade de navegação): 1 chão, 0 abismo, 2 lago de plasma, 3 lago de gelo.
+const MAPS = { fenda: 'Planície da Fenda', cinturao: 'Cinturão' };
+function edgeR(R, ang, sd) { return R * (1 + 0.075 * DM.sin(3 * ang + sd) + 0.045 * DM.sin(7 * ang + sd * 2.1) + 0.025 * DM.sin(13 * ang + sd * 3.7)); }
+function planCinturao(sim) {
+  const n = sim.players.length, R0 = 1180, RE = 740, plats = [], bridges = []; const sd = k => (sim.seed * 7.13 + k * 3.71) % 6.2831853;
+  for (let i = 0; i < n; i++) { const a = sim.players[i].startAngle; plats.push([CX + DM.cos(a) * R0, CY + DM.sin(a) * R0, 510, sd(i)]); }
+  for (let i = 0; i < n; i++) { const a = sim.players[i].startAngle + Math.PI / n; plats.push([CX + DM.cos(a) * RE, CY + DM.sin(a) * RE, 270, sd(i + 10)]); }
+  for (let i = 0; i < n; i++) { const a = sim.players[i].startAngle; for (const sg of [-1, 1]) { const b = a + sg * Math.PI / n; bridges.push([CX + DM.cos(a) * R0, CY + DM.sin(a) * R0, CX + DM.cos(b) * RE, CY + DM.sin(b) * RE, 92, sd(i * 2 + (sg > 0 ? 1 : 0) + 40)]); } }
+  for (let i = 0; i < n; i++) { const b = sim.players[i].startAngle + Math.PI / n; bridges.push([CX + DM.cos(b) * RE, CY + DM.sin(b) * RE, CX + DM.cos(b) * 430, CY + DM.sin(b) * 430, 84, sd(i + 60)]); }
+  return { type: 'cinturao', plats, ring: [CX, CY, 215, 475, sd(30)], bridges, lakes: [] };
+}
+function onPlat(m, x, y) { /* plataforma ou anel (sem as pontes) */
+  for (const p of m.plats) { const dx = x - p[0], dy = y - p[1], d2 = dx * dx + dy * dy; if (d2 > p[2] * p[2] * 1.3) continue; const r = edgeR(p[2], DM.atan2(dy, dx), p[3]); if (d2 <= r * r) return true; }
+  const g = m.ring; if (g) { const dx = x - g[0], dy = y - g[1], d = DM.hypot(dx, dy), a = DM.atan2(dy, dx); if (d >= edgeR(g[2], a, g[4]) && d <= edgeR(g[3], a, g[4] + 1.3)) return true; }
+  return false;
+}
+function onBridge(m, x, y) { for (const b of m.bridges) { const vx = b[2] - b[0], vy = b[3] - b[1], L2 = vx * vx + vy * vy; let t = ((x - b[0]) * vx + (y - b[1]) * vy) / (L2 || 1); t = t < 0 ? 0 : t > 1 ? 1 : t; const qx = b[0] + vx * t - x, qy = b[1] + vy * t - y; const w = b[4] * 0.5 * (1 + 0.14 * DM.sin(t * 11 + b[5]) + 0.06 * DM.sin(t * 29 + b[5] * 2)); if (qx * qx + qy * qy <= w * w) return true; } return false; }
+function lakeAt(m, x, y) { if (!m || !m.lakes) return null; for (const k of m.lakes) { const dx = x - k.x, dy = y - k.y, d2 = dx * dx + dy * dy; if (d2 > k.r * k.r * 1.4) continue; const r = edgeR(k.r, DM.atan2(dy, dx), k.seed); if (d2 <= r * r) return k; } return null; }
+function mapCell(sim, x, y) { /* 1 chão, 0 abismo, 2 lago de plasma, 3 lago de gelo — também usado pelo render (alta resolução) */
+  const m = sim.map; if (!m) return 1; if (m.type === 'cinturao' && !onPlat(m, x, y) && !onBridge(m, x, y)) return 0;
+  const k = lakeAt(m, x, y); return k ? (k.kind === 'plasma' ? 2 : 3) : 1; }
+function mapSd(sim, x, y) { /* distância com sinal até a borda do chão do Cinturão (positiva no chão); o render usa para os paredões */
+  const m = sim.map; if (!m || m.type !== 'cinturao') return 999; let best = -9999;
+  for (const p of m.plats) { const dx = x - p[0], dy = y - p[1]; const d = DM.hypot(dx, dy); if (d > p[2] * 1.6) { best = Math.max(best, p[2] * 1.15 - d); continue; } best = Math.max(best, edgeR(p[2], DM.atan2(dy, dx), p[3]) - d); }
+  const g = m.ring; if (g) { const dx = x - g[0], dy = y - g[1], d = DM.hypot(dx, dy), a = DM.atan2(dy, dx); best = Math.max(best, Math.min(d - edgeR(g[2], a, g[4]), edgeR(g[3], a, g[4] + 1.3) - d)); }
+  for (const b of m.bridges) { const vx = b[2] - b[0], vy = b[3] - b[1], L2 = vx * vx + vy * vy; let t = ((x - b[0]) * vx + (y - b[1]) * vy) / (L2 || 1); t = t < 0 ? 0 : t > 1 ? 1 : t; const w = b[4] * 0.5 * (1 + 0.14 * DM.sin(t * 11 + b[5]) + 0.06 * DM.sin(t * 29 + b[5] * 2)); best = Math.max(best, w - DM.hypot(b[0] + vx * t - x, b[1] + vy * t - y)); }
+  return best; }
+function groundAt(sim, x, y) { const g = sim.mapGrid; if (!g) return true; const v = g[navIdx(x, y)]; return v === 1 || v === 3; }
+function planLakes(sim) {
+  const m = sim.map, L = m.lakes, n = sim.players.length; const nodes = sim.ents.filter(e => e.kind === 'node');
+  const free = (x, y, r, gap) => nodes.every(e => dist(x, y, e.x, e.y) > r + e.r + (gap || 60)) && sim.ents.every(e => e.kind !== 'building' || dist(x, y, e.x, e.y) > r + e.r + 90) && L.every(k => dist(x, y, k.x, k.y) > r + k.r + 120);
+  const tryAdd = (x, y, r, kind, gap) => { if (x < r + 120 || y < r + 120 || x > WORLD - r - 120 || y > WORLD - r - 120) return false; if (!free(x, y, r, gap)) return false; if (m.type === 'cinturao') { for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4; if (!onPlat(m, x + DM.cos(a) * r * 1.25, y + DM.sin(a) * r * 1.25)) return false; } } L.push({ x, y, r, kind, seed: (sim.seed * 1.37 + L.length * 2.9) % 6.2831853 }); return true; };
+  if (m.type === 'cinturao') {
+    for (let i = 0; i < n; i++) { const a0 = sim.players[i].startAngle, r = 80 + sim.rand() * 20, bx = CX + DM.cos(a0) * 1180, by = CY + DM.sin(a0) * 1180; /* gelo atrás de cada base; perto da borda do mundo, gira para os lados */
+      for (const [off, d] of [[0, 260], [0.7, 250], [-0.7, 250], [1.3, 240], [-1.3, 240]]) if (tryAdd(bx + DM.cos(a0 + off) * d, by + DM.sin(a0 + off) * d, r, 'gelo')) break; }
+    for (let k = 0, got = 0; k < 8 && got < 2; k++) { const a = ((k * 3) % 8) * Math.PI / 4; /* entre os nós de Plasma do anel (que ficam em k·45° + 22,5°) */ if (tryAdd(CX + DM.cos(a) * 345, CY + DM.sin(a) * 345, 40 + sim.rand() * 8, 'plasma', 25)) got++; } /* poças de plasma no anel, entre os nós */
+  } else {
+    for (let k = 0, got = 0; k < 8 && got < 2; k++) { const a = sim.players[0].startAngle + k * Math.PI / 4 + sim.rand() * 0.2; if (tryAdd(CX + DM.cos(a) * 470, CY + DM.sin(a) * 470, 70 + sim.rand() * 22, 'plasma')) got++; } /* plasma no basalto perto da Fenda */
+    for (let i = 0, got = 0; i < n * 2 && got < Math.max(2, n); i++) { const a = sim.players[i % n].startAngle + Math.PI / n + (i < n ? 0.42 : -0.42); if (tryAdd(CX + DM.cos(a) * 1000, CY + DM.sin(a) * 1000, 110 + sim.rand() * 35, 'gelo')) got++; } /* gelo no anel de fora, entre os jogadores */
+    if (n >= 5) for (let i = 0, got = 0; i < n && got < 3; i++) { const a = sim.players[i].startAngle + Math.PI / n; if (tryAdd(CX + DM.cos(a) * 1000, CY + DM.sin(a) * 1000, 95 + sim.rand() * 20, 'gelo')) got++; } /* 4.3h: com 5 jogadores o anel de fora aperta: gelo bem no meio entre dois jogadores */
+  }
+}
+function buildMapGrid(sim) { const g = sim.mapGrid = new Uint8Array(NW * NW); for (let cy = 0; cy < NW; cy++) for (let cx = 0; cx < NW; cx++) g[cy * NW + cx] = mapCell(sim, (cx + 0.5) * NAV, (cy + 0.5) * NAV); }
 function createSim(cfg) {
   const sim = {
     cfg, tick: 0, time: 0, seed: cfg.seed || 1, ents: [], byId: new Map(), nextId: 1,
@@ -300,7 +347,9 @@ function createSim(cfg) {
     sim.explored.push(new Uint8Array(TILES * TILES));
   }
   sim.nextStorm = 300 + sim.rand() * 120;
+  sim.map = cfg.map === 'cinturao' ? planCinturao(sim) : { type: 'fenda', lakes: [] }; /* 4.3h */
   generateMap(sim);
+  if ((cfg.mapV || 0) >= 1) planLakes(sim); /* lagos só em partidas novas (salvamentos antigos e campanha ficam como eram) */ buildMapGrid(sim);
   generateTerrain(sim);
   rebuildNav(sim);
   computeVisibility(sim); markExplored(sim);
@@ -324,8 +373,8 @@ function generateMap(sim) {
   }
   if (n < 4) { // extra data for small games
     for (let k = 0; k < 4 - n; k++) {
-      const a = sim.rand() * Math.PI * 2;
-      addNode(sim, 'dados', CX + DM.cos(a) * 520, CY + DM.sin(a) * 520, 500);
+      let a = sim.rand() * Math.PI * 2, rr = 520; if (sim.map && sim.map.type === 'cinturao') { for (let t = 0; t < 24 && !onPlat(sim.map, CX + DM.cos(a) * rr, CY + DM.sin(a) * rr); t++) a += 0.27; if (!onPlat(sim.map, CX + DM.cos(a) * rr, CY + DM.sin(a) * rr)) rr = 340; } /* 4.3h: no Cinturão, só em plataforma (o anel do Plasma vai de 225 a 455) */
+      addNode(sim, 'dados', CX + DM.cos(a) * rr, CY + DM.sin(a) * rr, 500);
     }
   }
   for (let i = 0; i < n; i++) {
@@ -358,6 +407,7 @@ function generateMap(sim) {
     const a = sim.rand() * Math.PI * 2, d = 450 + sim.rand() * 550;
     const x = CX + DM.cos(a) * d, y = CY + DM.sin(a) * d;
     if (nearestEntity(sim, x, y, 150, e => e.kind !== 'unit')) continue;
+    if (sim.map && sim.map.type === 'cinturao' && !onPlat(sim.map, x, y)) continue; /* 4.3h: Minério solto só em plataforma */
     addNode(sim, 'minerio', x, y, 1200); k++;
   }
 }
@@ -384,16 +434,18 @@ function generateTerrain(sim) {
     // adereços decorativos (só visuais): ruínas no gelo, pedras na rocha, estilhaços na tundra, cristais no basalto
     const hh = (tx * 92821 + ty * 68917 + sim.seed * 3) % 1000 / 1000;
     if (d < RIFT_R + 60 || hh > 0.14) continue;
+    if (sim.mapGrid && sim.mapGrid[navIdx(cx, cy)] !== 1) continue; /* 4.3h: nada no abismo nem nos lagos */
     if (nucs.some(nc => dist(cx, cy, nc.x, nc.y) < 300)) continue;
     if (sim.ents.some(e => e.kind === 'node' && dist(cx, cy, e.x, e.y) < 70)) continue;
     const kind = (b === 0 || b === 2) && hh < 0.045 ? 'ruin' : 'rocks'; // só pedras e ruínas: nada que pareça um nó de recurso
     sim.props.push({ x: cx + (hh * 977 % 40) - 20, y: cy + (hh * 613 % 40) - 20, kind, seed: Math.floor(hh * 1000), scale: 0.35 + (hh * 331 % 1) * 0.35 });
   }
   // cordilheiras: segmentos de rochas intransponíveis no anel médio, mantendo o mapa conectado
-  const nR = 5 + sim.players.length; const placed = [];
+  const nR = sim.map && sim.map.type === 'cinturao' ? 0 : 5 + sim.players.length; const placed = []; /* 4.3h: o Cinturão já tem os abismos */
   for (let k = 0; k < nR * 3 && placed.length < nR; k++) {
     const a = sim.rand() * Math.PI * 2, rr = 620 + sim.rand() * 420; const cx = CX + DM.cos(a) * rr, cy = CY + DM.sin(a) * rr;
     if (nucs.some(nc => dist(cx, cy, nc.x, nc.y) < 460)) continue;
+    if (sim.map && sim.map.lakes.some(k => dist(cx, cy, k.x, k.y) < k.r + 260)) continue; /* 4.3h */
     const dir = a + Math.PI / 2 + (sim.rand() - 0.5) * 0.8; const len = 150 + sim.rand() * 220; const curve = (sim.rand() - 0.5) * 0.004;
     const rocks = [];
     for (let t = -len / 2; t <= len / 2; t += 26) {
@@ -488,7 +540,7 @@ function rebuildNav(sim) {
   const nav = sim.nav; nav.blocked.fill(0); nav.gates.clear(); nav.gatePos.clear(); nav.fields.clear(); nav.version++; nav.pass = new Map();
   const N = NW * NW; const hard = new Uint8Array(N); const wallOf = new Int8Array(N).fill(-1); const gateEnts = []; // 4.2g: o que bloqueia sem ser muro, e de quem é o muro de cada célula
   const own = nav.own = new Int32Array(N); const centre = nav.centre = new Map(); // 4.2g: entidade que bloqueia cada célula sozinha (-1 = várias ou a Fenda) e centro de cada estrutura/rocha por célula
-  for (let cy = 0; cy < NW; cy++) for (let cx = 0; cx < NW; cx++) { const x = (cx + 0.5) * NAV, y = (cy + 0.5) * NAV; if (dist(x, y, CX, CY) < RIFT_R + 14) { nav.blocked[cy * NW + cx] = 1; hard[cy * NW + cx] = 1; own[cy * NW + cx] = -1; } }
+  for (let cy = 0; cy < NW; cy++) for (let cx = 0; cx < NW; cx++) { const x = (cx + 0.5) * NAV, y = (cy + 0.5) * NAV; if (dist(x, y, CX, CY) < RIFT_R + 14 || (sim.mapGrid && (sim.mapGrid[cy * NW + cx] === 0 || sim.mapGrid[cy * NW + cx] === 2))) { nav.blocked[cy * NW + cx] = 1; hard[cy * NW + cx] = 1; own[cy * NW + cx] = -1; } } /* 4.3h: abismo e lago de plasma */
   for (const e of sim.ents) {
     if (!e.alive || (e.kind !== 'building' && e.kind !== 'rock')) continue;
     const rr = e.r + 7; const x0 = Math.max(0, ((e.x - rr) / NAV) | 0), x1 = Math.min(NW - 1, ((e.x + rr) / NAV) | 0), y0 = Math.max(0, ((e.y - rr) / NAV) | 0), y1 = Math.min(NW - 1, ((e.y + rr) / NAV) | 0);
@@ -584,6 +636,7 @@ function inStorm(sim, x, y) { const st = sim.storm; return !!(st && st.phase ===
 const VEIN = { first: 540, every: 210, amount: 1100 };
 function veinSpot(sim, x, y, nucs) {
   if (x < 120 || y < 120 || x > WORLD - 120 || y > WORLD - 120 || dist(x, y, CX, CY) < RIFT_R + 120) return false;
+  if (sim.map && (mapCell(sim, x, y) !== 1 || (sim.map.type === 'cinturao' && !onPlat(sim.map, x, y)))) return false; /* 4.3h: veio só em chão firme */
   for (const n of nucs) if (dist(x, y, n.x, n.y) < 520) return false;
   for (const e of sim.ents) if (e.alive && (e.kind === 'building' || e.kind === 'rock' || e.kind === 'node') && dist(x, y, e.x, e.y) < e.r + 50) return false;
   return !sim.nav.blocked[navIdx(x, y)];
@@ -685,6 +738,7 @@ function canBuild(sim, pid, def, x, y) {
   const d = BUILDINGS[def]; if (!d) return { ok: false, why: 'Desconhecido' };
   if (x < 60 || y < 60 || x > WORLD - 60 || y > WORLD - 60) return { ok: false, why: 'Fora do mapa' };
   if (dist(x, y, CX, CY) < RIFT_R + d.r + 12) return { ok: false, why: 'Dentro da Fenda' };
+  if (sim.map && (sim.map.type === 'cinturao' || sim.map.lakes.length)) { for (let k = -1; k < 8; k++) { const a = k * Math.PI / 4, rr = k < 0 ? 0 : d.r * 0.9; const c = mapCell(sim, x + DM.cos(a) * rr, y + DM.sin(a) * rr); if (c === 0) return { ok: false, why: 'Sobre o abismo' }; if (c !== 1) return { ok: false, why: 'Sobre o lago' }; } } /* 4.3h */
   for (const e of sim.ents) {
     if (!e.alive || e.kind === 'unit' || e.kind === 'crate' || e.kind === 'proj' || e.kind === 'wreck') continue;
     const bothWalls = d.wall && e.kind === 'building' && BUILDINGS[e.def].wall;
@@ -1360,7 +1414,8 @@ function updateBuilding(sim, b, dt) {
     it.t += dt * mult;
     if (it.t >= it.total) {
       b.queue.shift();
-      const ang = b.rally ? DM.atan2(b.rally.y - b.y, b.rally.x - b.x) : DM.atan2(CY - b.y, CX - b.x);
+      let ang = b.rally ? DM.atan2(b.rally.y - b.y, b.rally.x - b.x) : DM.atan2(CY - b.y, CX - b.x);
+      if (sim.mapGrid && !UNITS[it.def].flying) for (let k = 0; k < 18 && !groundAt(sim, b.x + DM.cos(ang) * (b.r + 14), b.y + DM.sin(ang) * (b.r + 14)); k++) ang += (k % 2 ? -1 : 1) * 0.35 * (k + 1); /* 4.3h: não nasce no abismo */
       const u = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang) * (b.r + 14), b.y + DM.sin(ang) * (b.r + 14));
       if (b.rally) { u.state = 'move'; rallyTo(sim, u, b); if (u.def === 'coletor' && p.human) u.area = { x: b.rally.x, y: b.rally.y }; } // 4.2g: vaga alcançável (reunião sobre um prédio, muro ou a Fenda travava a unidade)
       if (b.mod === 1 && b.def === 'quartel' && u.cls === 'inf') { u.rank = 1; u.xp = Math.max(50, unitCost(it.def)) * VET_RANKS[1]; } // Academia
@@ -1412,6 +1467,7 @@ function separate(sim) {
       const dx = u.x - CX, dy = u.y - CY; const dd = DM.hypot(dx, dy) || 0.01; const min = RIFT_R + u.r;
       if (dd < min) { fx += dx / dd * (min - dd); fy += dy / dd * (min - dd); }
     }
+    if ((fx || fy) && sim.mapGrid && !UNITS[u.def].flying && !groundAt(sim, u.x + fx, u.y + fy)) { if (groundAt(sim, u.x + fx, u.y)) fy = 0; else if (groundAt(sim, u.x, u.y + fy)) fx = 0; else { fx = 0; fy = 0; } } /* 4.3h: a borda do abismo e do plasma segura quem anda */
     if (fx || fy) { u.x = clamp(u.x + fx, 10, WORLD - 10); u.y = clamp(u.y + fy, 10, WORLD - 10); }
   }
 }
@@ -1597,5 +1653,6 @@ ARD.sim = {
   DM,
   createSim, step, enqueue, snapshot, restore, jsonSafe, jsonBack, ERAS, ASCENSION, eraOf, lockReason, eraBlock, territoryOf, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint, spawnUnit, forceStorm,
   addBuilding, kill, /* 4.3f: ferramentas de teste (bases e ruínas na partida) */
+  MAPS, mapCell, groundAt, onPlat, onBridge, edgeR, mapSd, /* 4.3h: mapas e lagos */
 };
 })(globalThis.ARD = globalThis.ARD || {});

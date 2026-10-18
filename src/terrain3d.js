@@ -40,6 +40,7 @@ function build(sim, HN) {
     for (let c = 0; c < 4; c++) { const a = tileW[(iy * TL + ix) * 4 + c], b = tileW[(iy * TL + ix + 1) * 4 + c], d = tileW[((iy + 1) * TL + ix) * 4 + c], e = tileW[((iy + 1) * TL + ix + 1) * 4 + c]; out[c] = (a * (1 - fx) + b * fx) * (1 - fy) + (d * (1 - fx) + e * fx) * fy; }
   };
   const heights = new Float32Array(HN * HN), bio = new Float32Array(HN * HN * 4), bw = [0, 0, 0, 0];
+  const CIN = !!(sim.map && sim.map.type === 'cinturao' && S.mapSd), VOID_H = -320; /* 4.3h: no Cinturão o chão acaba num paredão sobre o espaço */
   for (let iy = 0; iy < HN; iy++) for (let ix = 0; ix < HN; ix++) {
     const x = ix * HS, y = iy * HS, i = iy * HN + ix;
     let h = (base(x / 520, y / 520) - 0.5) * 36 + (base(x / 110, y / 110) - 0.5) * 7;
@@ -62,6 +63,7 @@ function build(sim, HN) {
       h = h + (ch - h * 0.6) * sstep(560, 470, dr); }
     // cordilheiras: monte sob as rochas (as rochas esculpidas da 4.3b assentam nele; até ~44 de altura)
     const kx = (x / RC) | 0, ky = (y / RC) | 0; for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) { const L = rgrid.get((kx + ox) + (ky + oy) * RN); if (L) for (const r of L) { const dd = Math.hypot(x - r.x, y - r.y); if (dd < 60) h += 26 * (1 - dd / 60) * (1 - dd / 60); } }
+    if (CIN) { const sd = S.mapSd(sim, x, y); if (sd < 6) { const k = sstep(6, -28, sd); h = h * (1 - k) + VOID_H * k; } else if (sd < 16) h -= (16 - sd) * 0.14; } /* borda chanfrada e paredão até o vazio */
     heights[i] = h;
   }
   const Hb = (x, y) => { const gx = Math.max(0, Math.min(HN - 1.001, x / HS)), gy = Math.max(0, Math.min(HN - 1.001, y / HS)); const ix = gx | 0, iy = gy | 0, fx = gx - ix, fy = gy - iy; return (heights[iy * HN + ix] * (1 - fx) + heights[iy * HN + ix + 1] * fx) * (1 - fy) + (heights[(iy + 1) * HN + ix] * (1 - fx) + heights[(iy + 1) * HN + ix + 1] * fx) * fy; };
@@ -70,6 +72,11 @@ function build(sim, HN) {
     for (let iy = j0; iy <= j1; iy++) for (let ix = g0; ix <= g1; ix++) { const d = Math.hypot(ix * HS - n.x, iy * HS - n.y); if (d < 400) { const k = d < 300 ? 1 : sm(1 - (d - 300) / 100); heights[iy * HN + ix] = heights[iy * HN + ix] * (1 - k) + hn * k; } } }
   for (const n of nodes) { const hn = Hb(n.x, n.y); const R0 = 46; const g0 = Math.max(0, ((n.x - R0) / HS) | 0), g1 = Math.min(HN - 1, Math.ceil((n.x + R0) / HS)), j0 = Math.max(0, ((n.y - R0) / HS) | 0), j1 = Math.min(HN - 1, Math.ceil((n.y + R0) / HS));
     for (let iy = j0; iy <= j1; iy++) for (let ix = g0; ix <= g1; ix++) { const d = Math.hypot(ix * HS - n.x, iy * HS - n.y); if (d < R0) { const k = 0.7 * sm(1 - d / R0); heights[iy * HN + ix] = heights[iy * HN + ix] * (1 - k) + hn * k; } } }
+  // 4.3h: lagos — o nível da água é o ponto mais baixo da margem (nunca transborda) e a bacia é escavada abaixo dele
+  const lakes = ((sim.map && sim.map.lakes) || []).map(k => Object.assign({}, k));
+  for (const k of lakes) { let lv = Infinity; for (let a = 0; a < 32; a++) { const ang = a / 32 * TAU, rr = S.edgeR(k.r, ang, k.seed); lv = Math.min(lv, Hb(k.x + Math.cos(ang) * rr, k.y + Math.sin(ang) * rr)); } k.level = lv - (k.kind === 'plasma' ? 1.6 : 0.5); const depth = k.kind === 'plasma' ? 9 : 2.5, R = k.r * 1.5;
+    const g0 = Math.max(0, ((k.x - R) / HS) | 0), g1 = Math.min(HN - 1, Math.ceil((k.x + R) / HS)), j0 = Math.max(0, ((k.y - R) / HS) | 0), j1 = Math.min(HN - 1, Math.ceil((k.y + R) / HS));
+    for (let iy = j0; iy <= j1; iy++) for (let ix = g0; ix <= g1; ix++) { const dx = ix * HS - k.x, dy = iy * HS - k.y, sd = S.edgeR(k.r, Math.atan2(dy, dx), k.seed) - Math.hypot(dx, dy); if (sd < -12) continue; const i = iy * HN + ix; if (sd < -1 && k.kind === 'plasma') heights[i] = Math.max(heights[i], k.level + 1.2 * sstep(-12, -5, sd)); /* dique de lava solidificada: a borda nunca fica abaixo do nível */ if (sd < -4) continue; heights[i] = Math.min(heights[i], k.level + 0.8 - (depth + 0.8) * sstep(-4, 16, sd)); } }
   // oclusão de cavidade (horizonte médio em 8 direções) e curvatura (+ bacia, − crista)
   const aoc = new Float32Array(HN * HN * 2); const HH = (gx, gy) => heights[Math.max(0, Math.min(HN - 1, gy)) * HN + Math.max(0, Math.min(HN - 1, gx))];
   const steps = [1, 2, 4, 7, 11]; const dirs = []; for (let k = 0; k < 8; k++) dirs.push([Math.cos(k / 8 * TAU), Math.sin(k / 8 * TAU)]);
@@ -78,7 +85,7 @@ function build(sim, HN) {
     aoc[i * 2] = Math.max(0.25, 1 - 0.85 * occ / 8);
     const lap = (HH(ix - 2, iy) + HH(ix + 2, iy) + HH(ix, iy - 2) + HH(ix, iy + 2) - 4 * h0) / (4 * HS * HS); aoc[i * 2 + 1] = Math.max(-1, Math.min(1, lap * 70)); }
   let mr = 0, mg = 0, mb = 0; for (let i = 0; i < HN * HN; i++) { const t = bio[i * 4] + bio[i * 4 + 1] + bio[i * 4 + 2] + bio[i * 4 + 3] || 1; for (let c = 0; c < 4; c++) { const w = bio[i * 4 + c] / t; mr += w * BIO_MEAN[c][0]; mg += w * BIO_MEAN[c][1]; mb += w * BIO_MEAN[c][2]; } }
-  const n2 = HN * HN; return { HN, HS, heights, bio, aoc, craters, bioAt, mean: [mr / n2, mg / n2, mb / n2] };
+  const n2 = HN * HN; return { HN, HS, heights, bio, aoc, craters, bioAt, mean: [mr / n2, mg / n2, mb / n2], lakes, voidH: CIN ? VOID_H : null };
 }
 function riftJag(ang, seed) { return (fbm(Math.cos(ang) * 2.6 + 11, Math.sin(ang) * 2.6 + 4, 3, seed + 41) - 0.5) * 30 + (fbm(Math.cos(ang) * 9 + 3, Math.sin(ang) * 9 + 7, 2, seed + 53) - 0.5) * 10; }
 
@@ -138,6 +145,9 @@ const TERR_PARS = `uniform sampler2D uTexA; uniform sampler2D uTexB; uniform sam
 uniform sampler2D scarMap; uniform float uNear; uniform float uCloudT; uniform float uCloudK; uniform float uTime; uniform vec2 uRift; uniform float worldSize;
 varying vec4 vBio; varying vec2 vAoc; varying vec3 vWP; varying vec3 vWN; varying vec2 vWuv;
 vec3 ardTPerturb(vec3 sp, vec3 sn, vec2 dh, float fd) { vec3 sx = dFdx(sp), sy = dFdy(sp); sx *= inversesqrt(max(dot(sx, sx), 1e-24)); sy *= inversesqrt(max(dot(sy, sy), 1e-24)); vec3 r1 = cross(sy, sn), r2 = cross(sn, sx); float det = dot(sx, r1) * fd; vec3 g = sign(det) * (dh.x * r1 + dh.y * r2); vec3 n = abs(det) * sn - g; float l = dot(n, n); return l > 1e-12 ? n * inversesqrt(l) : sn; } /* 4.3g: sem normalize de vetor nulo (NaN) — o terreno cobre a tela de perto */
+#ifdef ARD_VAZIO
+uniform sampler2D uVoidMap; /* 4.3h: R = distância com sinal até o vazio (±64), G = ponte */
+#endif
 vec4 ardHB(vec4 h, vec4 w) { vec4 s = (h + w * 1.6) * step(0.001, w); float m = max(max(s.x, s.y), max(s.z, s.w)) - 0.22; vec4 k = max(s - m, 0.0); return k / max(0.0001, k.x + k.y + k.z + k.w); }
 `;
 const TERR_COLOR = `
@@ -203,6 +213,13 @@ float tRough = 0.9, tH = 0.0; vec3 tEmis = vec3(0.0);
   #endif
   diffuseColor.rgb = alb; tRough = rough; tH = hgt * mix(0.25, 1.0, nearK);
   diffuseColor.rgb *= mix(0.72, 1.0, vAoc.x);
+  #ifdef ARD_VAZIO
+  { /* 4.3h: Cinturão — o chão vira rocha gasta perto do corte (encontra a beirada do space3d) e as pontes ganham cascalho */
+    vec4 vm = texture2D(uVoidMap, gp / worldSize); float esd = (vm.r - 0.5) * 128.0; float ponte = vm.g; float crumb = smoothstep(0.3, 0.75, Ap.g + (As.r - 0.5) * 0.7);
+    float lip = smoothstep(34.0, 19.0, esd + (crumb - 0.5) * 8.0); vec3 pale = mix(diffuseColor.rgb, vec3(dot(diffuseColor.rgb, vec3(0.3333))) * 1.12 + 0.04, 0.5) * (0.84 + 0.28 * crumb); diffuseColor.rgb = mix(diffuseColor.rgb, pale, lip * 0.65);
+    diffuseColor.rgb = mix(diffuseColor.rgb, mix(vec3(0.27, 0.245, 0.22), vec3(0.47, 0.43, 0.38), Ap.g) * (0.8 + 0.4 * macro), ponte * 0.5 * smoothstep(18.0, 26.0, esd));
+  }
+  #endif
   #if defined(ARD_DBG)
   diffuseColor.rgb = ARD_DBG == 1 ? Bw.xyz : ARD_DBG == 2 ? vec3(vAoc.x) : ARD_DBG == 3 ? vec3(0.5 + 0.5 * vAoc.y) : ARD_DBG == 4 ? vec3(Ar.r, Ap.g, Bt.r) : diffuseColor.rgb; tRough = ARD_DBG == 5 ? tRough : 1.0; if (ARD_DBG != 7) tH = 0.0;
   #endif
@@ -218,22 +235,24 @@ float ardMh = 0.0;
 { float cl = texture2D(cloudMap, vWuv * 5.0 + vec2(uCloudT * 0.006, uCloudT * 0.0035)).r; diffuseColor.rgb *= 1.0 - uCloudK * 0.2 * (1.0 - cl); }
 #endif
 `;
+let VOID0 = null; function voidNeutral(THREE) { if (!VOID0) { VOID0 = new THREE.DataTexture(new Uint8Array([255, 0, 0, 255]), 1, 1, THREE.RGBAFormat, THREE.UnsignedByteType); VOID0.needsUpdate = true; } return VOID0; } /* 4.3h */
 function material(THREE, U, o) {
   o = o || {}; const m = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, metalness: 0.02, envMapIntensity: 0.22 });
+  if (o.vazio) { m.userData.vazio = true; m.userData.voidMap = { value: voidNeutral(THREE) }; m.userData.terrU = U; } /* 4.3h: mapa da borda do Cinturão (o space3d põe o de verdade e lê a névoa de guerra) */
   m.onBeforeCompile = sh => {
-    Object.assign(sh.uniforms, U); if (o.onShader) o.onShader(sh);
-    const dbg = +(new URLSearchParams(globalThis.location ? location.search : '').get('terrdbg') || 0); const defs = (o.fora ? '#define ARD_FORA\n' : '') + (o.leve ? '#define ARD_LEVE\n' : '') + (dbg ? '#define ARD_DBG ' + dbg + '\n' : '');
+    Object.assign(sh.uniforms, U); if (o.vazio) sh.uniforms.uVoidMap = m.userData.voidMap; if (o.onShader) o.onShader(sh);
+    const dbg = +(new URLSearchParams(globalThis.location ? location.search : '').get('terrdbg') || 0); const defs = (o.fora ? '#define ARD_FORA\n' : '') + (o.leve ? '#define ARD_LEVE\n' : '') + (o.vazio ? '#define ARD_VAZIO\n' : '') + (dbg ? '#define ARD_DBG ' + dbg + '\n' : '');
     sh.vertexShader = 'attribute vec4 bio; attribute vec2 aoc; uniform float worldSize; varying vec4 vBio; varying vec2 vAoc; varying vec3 vWP; varying vec3 vWN; varying vec2 vWuv;\n' + sh.vertexShader
       .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n{ vec4 ardW = modelMatrix * vec4(transformed, 1.0); vWP = ardW.xyz; vWN = normalize(mat3(modelMatrix) * objectNormal); vBio = bio; vAoc = aoc; vWuv = vec2(ardW.x / worldSize, -ardW.z / worldSize); }');
     sh.fragmentShader = defs + (U.uFlash ? 'uniform sampler2D uFlash; uniform vec4 uFlashR;\n' : '') + TERR_PARS + sh.fragmentShader
-      .replace('#include <color_fragment>', '#include <color_fragment>\n' + TERR_COLOR)
+      .replace('#include <color_fragment>', '#include <color_fragment>\n' + (o.vazio ? 'if (vWP.y < -90.0) discard; /* 4.3h: abaixo do paredão é o espaço */\nif ((texture2D(uVoidMap, vec2(vWP.x, -vWP.z) / worldSize).r - 0.5) * 128.0 < 18.0) discard; /* 4.3h: corta a 18 da borda: dali para fora é a beirada de rocha e o paredão do space3d (contorno exato, sem os dentes da grade) */\n' : '') + TERR_COLOR)
       .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = tRough;')
       .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n{ vec2 dh = vec2(dFdx(tH), dFdy(tH)) + (ardMh != 0.0 ? vec2(dFdx(ardMh), dFdy(ardMh)) * 0.5 : vec2(0.0)); normal = ardTPerturb(-vViewPosition, normal, dh, faceDirection); } /* tH em unidades do mapa */')
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += tEmis;' + (U.uFlash ? '\n{ vec2 fu = (vWP.xz - uFlashR.xy) / uFlashR.zw; if (fu.x > 0.0 && fu.y > 0.0 && fu.x < 1.0 && fu.y < 1.0) { vec3 fl = texture2D(uFlash, fu).rgb; totalEmissiveRadiance += diffuseColor.rgb * fl / (1.0 + 0.3 * fl) * (0.35 + 0.65 * max(vWN.y, 0.0)); } } /* 4.3g: clarões no chão (compressão suave) */' : ''))
       .replace('#include <aomap_fragment>', '#include <aomap_fragment>\nreflectedLight.indirectDiffuse *= vAoc.x; reflectedLight.indirectSpecular *= mix(0.4, 1.0, vAoc.x);');
     if (globalThis.__ardTerrDbg) globalThis.__ardTerrDbg.push({ vs: sh.vertexShader, fs: sh.fragmentShader });
   };
-  m.customProgramCacheKey = () => 'ard-terreno-v43c' + (o.fora ? '-fora' : '') + (o.leve ? '-leve' : ''); m.userData.env = 0.22; return m;
+  m.customProgramCacheKey = () => 'ard-terreno-v43c' + (o.fora ? '-fora' : '') + (o.leve ? '-leve' : '') + (o.vazio ? '-vazio' : ''); m.userData.env = 0.22; return m;
 }
 
 // ---------- paredões do abismo da Fenda ----------

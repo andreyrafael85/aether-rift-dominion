@@ -86,3 +86,41 @@ console.log('events', JSON.stringify(r3.counts));
   const vozes = sim.ents.filter(e => e.alive && e.kind === 'unit' && e.owner === 1 && e.def === 'voz');
   console.log('Elo de Sincronia:', vozes.length === 3 && vozes.every(v => v.elo >= 2) ? 'OK (3 Vozes, acorde ' + vozes.map(v => v.elo).join('/') + ')' : 'FAIL vozes=' + vozes.length + ' elo=' + vozes.map(v => v.elo).join('/'));
 }
+// 4.3h — mapas e lagos: Cinturão (chão firme, Núcleos ligados, o abismo para quem anda e não para quem voa), lagos (o plasma bloqueia, o gelo se atravessa), obra fora do abismo e do lago, determinismo
+{
+  const facs = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'], NC = 32, NWc = S.WORLD / NC;
+  const mk = (map, n, seed) => { const players = []; for (let i = 0; i < n; i++) players.push({ name: 'P' + i, faction: facs[i], human: i === 0, difficulty: 'normal' }); return S.createSim({ seed, players, minutes: 25, map, mapV: 1 }); };
+  const reach = sim => { const b = sim.nav.blocked, idx = (x, y) => Math.floor(y / NC) * NWc + Math.floor(x / NC), seen = new Uint8Array(NWc * NWc), q = [];
+    const near = (x, y, ok) => { const c = idx(x, y); for (let r = 0; r < 6; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { const i = c + dy * NWc + dx; if (i >= 0 && i < NWc * NWc && ok(i)) return i; } return -1; };
+    const nucs = sim.players.map(p => S.nucleoOf(sim, p.id)); const s0 = near(nucs[0].x, nucs[0].y, i => !b[i]); if (s0 < 0) return false; q.push(s0); seen[s0] = 1;
+    while (q.length) { const i = q.pop(), x = i % NWc, y = (i / NWc) | 0; for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (nx < 0 || ny < 0 || nx >= NWc || ny >= NWc) continue; const j = ny * NWc + nx; if (!seen[j] && !b[j]) { seen[j] = 1; q.push(j); } } }
+    return nucs.every(nc => near(nc.x, nc.y, i => seen[i]) >= 0); };
+  let okPlat = true, okLink = true; const why = [];
+  for (const n of [2, 3, 4, 5]) { const sim = mk('cinturao', n, 42); S.step(sim);
+    const bad = sim.ents.filter(e => (e.kind === 'node' || e.kind === 'building' || e.kind === 'unit') && S.mapCell(sim, e.x, e.y) !== 1); if (bad.length) { okPlat = false; why.push(n + 'p: ' + bad.length + ' fora do chão'); }
+    const blk = sim.nav.blocked.reduce((a, v) => a + v, 0); if (!blk || !reach(sim)) { okLink = false; why.push(n + 'p: Núcleos sem caminho (bloqueadas ' + blk + ')'); } }
+  console.log('Cinturão: tudo em chão firme (2 a 5 jogadores):', okPlat ? 'OK' : 'FAIL ' + why.join('; '));
+  console.log('Cinturão: os Núcleos se alcançam a pé pelas pontes:', okLink ? 'OK' : 'FAIL ' + why.join('; '));
+  // o abismo segura quem anda e deixa passar quem voa
+  { const sim = mk('cinturao', 2, 42); S.step(sim); const n0 = S.nucleoOf(sim, 0); let vx = 0, vy = 0;
+    let best = 0; for (let a = 0; a < 6.28; a += 0.1) for (let d = 450; d <= 800; d += 25) { const x = n0.x + Math.cos(a) * d, y = n0.y + Math.sin(a) * d; if (x < 150 || y < 150 || x > S.WORLD - 150 || y > S.WORLD - 150) continue; const sd = S.mapSd(sim, x, y); if (S.mapCell(sim, x, y) === 0 && sd < best) { best = sd; vx = x; vy = y; } }
+    const ground = Object.keys(S.UNITS).find(k => !S.UNITS[k].flying && !S.UNITS[k].faction && k !== 'coletor'), air = 'drone';
+    const g = S.spawnUnit(sim, 0, ground, n0.x + 120, n0.y), f = S.spawnUnit(sim, 0, air, n0.x + 120, n0.y + 30); let fell = 0;
+    S.enqueue(sim, { t: 'move', p: 0, ids: [g.id], x: vx, y: vy }); S.enqueue(sim, { t: 'move', p: 0, ids: [f.id], x: vx, y: vy });
+    for (let i = 0; i < 400; i++) { S.step(sim); if (g.alive && S.mapCell(sim, g.x, g.y) === 0) fell++; }
+    const df = Math.hypot(f.x - vx, f.y - vy); console.log('Cinturão: abismo para quem anda e não para quem voa:', vx && !fell && df < 80 ? 'OK (' + ground + ' parou na borda; drone a ' + Math.round(df) + ' do alvo)' : 'FAIL vazio=' + Math.round(vx) + ' caiu=' + fell + ' drone=' + Math.round(df)); }
+  // lagos: o plasma bloqueia, o gelo se atravessa; nada se constrói no abismo nem no lago
+  { const sim = mk('fenda', 2, 42); S.step(sim); const L = sim.map.lakes, pl = L.find(k => k.kind === 'plasma'), ge = L.find(k => k.kind === 'gelo'); const ci = (x, y) => Math.floor(y / NC) * NWc + Math.floor(x / NC);
+    const okKinds = !!pl && !!ge && S.mapCell(sim, pl.x, pl.y) === 2 && S.mapCell(sim, ge.x, ge.y) === 3 && sim.nav.blocked[ci(pl.x, pl.y)] === 1 && sim.nav.blocked[ci(ge.x, ge.y)] === 0 && S.groundAt(sim, ge.x, ge.y) && !S.groundAt(sim, pl.x, pl.y);
+    const ground = Object.keys(S.UNITS).find(k => !S.UNITS[k].flying && !S.UNITS[k].faction && k !== 'coletor');
+    const sx = ge.x + Math.cos(0.4) * (ge.r + 90), sy = ge.y + Math.sin(0.4) * (ge.r + 90); const u = S.spawnUnit(sim, 0, ground, sx, sy); S.enqueue(sim, { t: 'move', p: 0, ids: [u.id], x: ge.x, y: ge.y });
+    const px = pl.x + (pl.r + 70), py = pl.y; const w = S.spawnUnit(sim, 0, ground, px, py); S.enqueue(sim, { t: 'move', p: 0, ids: [w.id], x: pl.x, y: pl.y }); let inLava = 0;
+    for (let i = 0; i < 500; i++) { S.step(sim); if (w.alive && S.mapCell(sim, w.x, w.y) === 2) inLava++; }
+    const du = Math.hypot(u.x - ge.x, u.y - ge.y);
+    console.log('Lagos: o plasma bloqueia e o gelo se atravessa:', okKinds && du < 60 && !inLava ? 'OK (a ' + Math.round(du) + ' do centro do gelo; ninguém entrou na lava)' : 'FAIL tipos=' + okKinds + ' gelo=' + Math.round(du) + ' lava=' + inLava);
+    const c1 = S.canBuild(sim, 0, 'quartel', pl.x, pl.y), c2 = S.canBuild(sim, 0, 'quartel', ge.x, ge.y); const sc = mk('cinturao', 2, 42); let vx = 0, vy = 0; for (let a = 0; a < 6.28 && !vx; a += 0.05) { const x = S.CX + Math.cos(a) * 820, y = S.CY + Math.sin(a) * 820; if (S.mapCell(sc, x, y) === 0) { vx = x; vy = y; } } const c3 = S.canBuild(sc, 0, 'quartel', vx, vy);
+    console.log('Obras fora do lago e do abismo:', !c1.ok && !c2.ok && !c3.ok && c3.why === 'Sobre o abismo' ? 'OK (' + c1.why + ' / ' + c2.why + ' / ' + c3.why + ')' : 'FAIL ' + JSON.stringify([c1, c2, c3])); }
+  // mesma semente, mesmo Cinturão
+  { const go = () => { const sim = mk('cinturao', 3, 9); const ais = sim.players.map(p => AI.create(p.id, 'normal')); for (let i = 0; i < 1800; i++) { if (i % 10 === 0) for (const a of ais) for (const c of AI.think(sim, a)) S.enqueue(sim, c); S.step(sim); } return S.hash(sim); };
+    const h1 = go(), h2 = go(); console.log('Cinturão determinístico (3 IAs, 3 min):', h1 === h2 ? 'OK' : 'FAIL ' + h1 + ' vs ' + h2); }
+}

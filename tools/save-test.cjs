@@ -30,6 +30,10 @@ for (let k = 0; k < nSk; k++) {
 { const seed = 7, players = [{ name: 'P0', faction: 'erevane', human: true, difficulty: 'dificil' }, { name: 'P1', faction: 'vehnar', difficulty: 'brutal' }, { name: 'P2', faction: 'vorag', difficulty: 'dificil' }];
   if (nSk > 0) pair('combate 3p seed 7 (tick 5000)', save => { const sim = S.createSim({ seed, players, minutes: 25 }); if (save) S.restore(sim, save.sim); const ais = save ? save.ais.map(AI.restore) : sim.players.map(p => AI.create(p.id, p.difficulty));
     return { sim, done: () => !!sim.result, tick() { if (sim.tick % 10 === 0) for (const a of ais) for (const c of AI.think(sim, a)) S.enqueue(sim, c); S.step(sim); }, save: () => ({ sim: S.snapshot(sim), ais: ais.map(AI.snapshot) }) }; }, 5000); }
+// 4.3h — mapas novos: Cinturão (plataformas sobre o abismo) e Fenda com lagos, salvos no meio da partida
+for (const [map, n, seed] of [['cinturao', 3, 19], ['fenda', 2, 23]]) { const players = []; for (let i = 0; i < n; i++) players.push({ name: 'P' + i, faction: RACES[(seed + i * 2) % 5], human: i === 0, difficulty: ['normal', 'dificil', 'brutal'][i % 3] });
+  if (nSk > 0) pair(map + ' ' + n + 'p seed ' + seed + ' (lagos)', save => { const sim = S.createSim({ seed, players, minutes: 25, map, mapV: 1 }); if (save) S.restore(sim, save.sim); const ais = save ? save.ais.map(AI.restore) : sim.players.map(p => AI.create(p.id, p.difficulty));
+    return { sim, done: () => !!sim.result, tick() { if (sim.tick % 10 === 0) for (const a of ais) for (const c of AI.think(sim, a)) S.enqueue(sim, c); S.step(sim); }, save: () => ({ sim: S.snapshot(sim), ais: ais.map(AI.snapshot) }) }; }); }
 // missões: o roteiro também é salvo e retomado
 const ids = mArg === 'nenhuma' ? [] : mArg === 'todas' ? C.MISSIONS.map(m => m.id) : mArg.split(',');
 for (const id of ids) {

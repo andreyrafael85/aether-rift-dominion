@@ -89,7 +89,7 @@ function create(canvas, mini) {
     return cv;
   }
   function tile(kind, v) { const k = kind + v; let t = R.tiles.get(k); if (!t) { t = makeTile(kind, v); R.tiles.set(k, t); } return t; }
-  function tileKind(tx, ty) { const cx = (tx + 0.5) * TILE, cy = (ty + 0.5) * TILE; const d = Math.hypot(cx - S.CX, cy - S.CY); if (d < S.RIFT_R + 24) return null; return S.BIOMES[R.sim.biome ? R.sim.biome[ty * TILES + tx] : 0]; }
+  function tileKind(tx, ty) { const cx = (tx + 0.5) * TILE, cy = (ty + 0.5) * TILE; const d = Math.hypot(cx - S.CX, cy - S.CY); if (d < S.RIFT_R + 24) return null; if (S.mapCell && R.sim && R.sim.map && R.sim.map.type === 'cinturao' && S.mapCell(R.sim, cx, cy) === 0) return null; /* 4.3h: abismo do Cinturão */ return S.BIOMES[R.sim.biome ? R.sim.biome[ty * TILES + tx] : 0]; }
   function diamond(c, px, py, hw, hh) { c.beginPath(); c.moveTo(px, py - hh); c.lineTo(px + hw, py); c.lineTo(px, py + hh); c.lineTo(px - hw, py); c.closePath(); }
   function ellipse(c, px, py, rx) { c.beginPath(); c.ellipse(px, py, rx, rx * 0.5, 0, 0, TAU); }
   function drawSprite(c, sp, gx, gy, z, scale, k, alpha, clipFrac) {
@@ -160,6 +160,8 @@ function create(canvas, mini) {
     R.night = (1 - Math.cos(TAU * sim.time / 750)) / 2;
     c.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
     c.fillStyle = '#07080B'; c.fillRect(0, 0, W, H);
+    if (sim.map && sim.map.type === 'cinturao') { const fr = v => v - Math.floor(v), ww = W + 200, hh = H + 200, ox = (cam.x - cam.y) * K * cam.zoom * 0.25, oy = (cam.x + cam.y) * K * cam.zoom * 0.125; c.fillStyle = '#CFD9FF'; /* 4.3h: estrelas no abismo do Cinturão, com paralaxe lenta */
+      for (let i = 0; i < 170; i++) { const hx = fr(Math.sin(i * 12.9898) * 43758.5453), hy = fr(Math.sin(i * 78.233) * 12543.123); const x = ((hx * ww - ox) % ww + ww) % ww - 100, y = ((hy * hh - oy) % hh + hh) % hh - 100; c.globalAlpha = 0.3 + 0.55 * fr(hx * 7.31); const sz = i % 9 === 0 ? 2 : 1; c.fillRect(x, y, sz, sz); } c.globalAlpha = 1; }
     let shx = 0, shy = 0; if (R.shake > 0) { shx = (Math.random() - 0.5) * 9 * R.shake; shy = (Math.random() - 0.5) * 9 * R.shake; }
     c.save(); c.translate(shx, shy);
     const P = (x, y, zz) => R.worldToScreen(cam, x, y, zz);
@@ -180,6 +182,11 @@ function create(canvas, mini) {
       { const i = ty * TILES + tx; const mix = sim.biomeMix ? sim.biomeMix[i] : 0; if (mix > 0.03) { c.globalAlpha = mix; c.drawImage(tile(S.BIOMES[sim.biome2[i]], (tx * 11 + ty * 5) % 3), p[0] - tw / 2, p[1] - th / 2, tw, th); c.globalAlpha = 1; } }
       for (const t of terr) if (Math.hypot(cx - t.x, cy - t.y) <= t.r) { c.fillStyle = rgba(t.col, 0.11); diamond(c, p[0], p[1], tw / 2, th / 2); c.fill(); c.strokeStyle = 'rgba(0,0,0,0.14)'; c.lineWidth = 1; c.stroke(); break; }
     }
+    if (sim.map && sim.map.lakes) for (const L of sim.map.lakes) { if (!inView(L.x, L.y, L.r * 1.3)) continue; const pl = L.kind === 'plasma', hs = i => { const v = Math.sin(L.seed * 12.9898 + i * 78.233) * 43758.5453; return v - Math.floor(v); }; /* 4.3h: lagos no 2D (o de plasma bloqueia quem anda; o gelo se atravessa) */
+      const ring = f => { c.beginPath(); for (let i = 0; i <= 36; i++) { const a = i / 36 * TAU, rr = S.edgeR(L.r * f, a, L.seed); const p = P(L.x + Math.cos(a) * rr, L.y + Math.sin(a) * rr, 0); if (i) c.lineTo(p[0], p[1]); else c.moveTo(p[0], p[1]); } c.closePath(); };
+      ring(1); c.fillStyle = pl ? '#2A120B' : '#8FC3E2'; c.fill(); c.strokeStyle = pl ? `rgba(255,122,42,${0.5 + 0.25 * Math.sin(R.time * 2 + L.seed)})` : 'rgba(238,248,255,0.9)'; c.lineWidth = pl ? 2.5 : 2.2; c.stroke();
+      ring(0.62); c.fillStyle = pl ? `rgba(200,70,26,${0.35 + 0.15 * Math.sin(R.time * 1.3 + L.seed * 2)})` : 'rgba(200,232,248,0.55)'; c.fill();
+      c.strokeStyle = pl ? 'rgba(255,160,70,0.75)' : 'rgba(255,255,255,0.5)'; c.lineWidth = pl ? 1.6 : 1; for (let j = 0; j < (pl ? 6 : 4); j++) { const a = hs(j) * TAU, r0 = L.r * (pl ? 0.1 : 0.2) * hs(j + 9), r1 = L.r * (0.45 + 0.35 * hs(j + 17)); const p0 = P(L.x + Math.cos(a) * r0, L.y + Math.sin(a) * r0, 0), p1 = P(L.x + Math.cos(a + 0.3 * (hs(j + 23) - 0.5)) * r1, L.y + Math.sin(a + 0.3 * (hs(j + 23) - 0.5)) * r1, 0); c.beginPath(); c.moveTo(p0[0], p0[1]); c.lineTo(p1[0], p1[1]); c.stroke(); } }
     c.lineWidth = 1.5; c.setLineDash([8, 6]);
     for (const t of terr) { const p = P(t.x, t.y, 0); c.strokeStyle = rgba(t.col, 0.35); ellipse(c, p[0], p[1], t.r * k); c.stroke(); }
     c.setLineDash([]);
