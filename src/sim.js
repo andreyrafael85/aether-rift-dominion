@@ -581,13 +581,15 @@ function passArr(sim, owner) { // 4.2g: tabela de passagem do jogador (refeita a
   nav.pass.set(owner, a); return a;
 }
 function passable(sim, i, owner) { return passArr(sim, owner)[i] === 1; }
+let FQB = null; const FQL = new Int32Array(16); /* 4.3i: filas do campo de fluxo */
 function flowField(sim, destIdx, owner) {
   const nav = sim.nav; const key = owner * 1000000 + destIdx; let f = nav.fields.get(key); if (f) { nav.fields.delete(key); nav.fields.set(key, f); return f; }
-  if (nav.fields.size >= 96) nav.fields.delete(nav.fields.keys().next().value); // 4.2g: descarta o menos usado (antes limpava tudo de uma vez)
+  if (nav.fields.size >= 256) nav.fields.delete(nav.fields.keys().next().value); // 4.2g: descarta o menos usado (antes limpava tudo de uma vez); 4.3i: 256 (com 96, um exército grande chegando às vagas refazia o mesmo campo a cada passo)
   const N = NW * NW; const cost = new Int32Array(N).fill(-1); const dir = new Int8Array(N).fill(-1);
   const P = passArr(sim, owner); // Dijkstra; custo 10 reto, 14 diagonal; sem cortar cantos
-  const BK = 16, bk = []; for (let k = 0; k < BK; k++) bk.push([]); let pend = 0; // 4.2g: fila de baldes (Dial): custos inteiros e passo máximo 14 < 16, sem heap
-  const push = (c, i) => { bk[c % BK].push(i); pend++; };
+  let pend = 0; /* 4.2g: fila de baldes (Dial): custos inteiros e passo máximo 14 < 16, sem heap; 4.3i: os 16 baldes são vetores fixos reaproveitados (cada balde segue FIFO, como antes) */
+  if (!FQB) { FQB = []; for (let k = 0; k < 16; k++) FQB.push(new Int32Array(N)); } FQL.fill(0);
+  const push = (c, i) => { const k = c & 15; let b = FQB[k]; if (FQL[k] >= b.length) { const nb = new Int32Array(b.length * 2); nb.set(b); FQB[k] = b = nb; } b[FQL[k]++] = i; pend++; };
   if (passable(sim, destIdx, owner)) { cost[destIdx] = 0; push(0, destIdx); }
   else { // 4.2g: destino dentro de obstáculo (centro de Núcleo/Refinaria/Quartel, ponto numa rocha): antes o campo saía vazio e a unidade ia reto.
     // Semeia a primeira camada de células livres em volta (todos os lados), medindo do centro real da estrutura até o ponto mais próximo de cada célula
@@ -601,17 +603,17 @@ function flowField(sim, destIdx, owner) {
     let dmin = Infinity; for (let k = 0; k < cand.length; k += 3) if ((cand[k + 2] || !anyOk) && cand[k + 1] < dmin) dmin = cand[k + 1];
     for (let k = 0; k < cand.length; k += 3) if ((cand[k + 2] || !anyOk) && cand[k + 1] <= dmin + NAV) { const i = cand[k]; cost[i] = Math.round((cand[k + 1] - dmin) * 10 / NAV); push(cost[i], i); }
   }
-  for (let c = 0; pend > 0; c++) { const b = bk[c % BK];
-    for (let k = 0; k < b.length; k++) { const i = b[k]; pend--; if (cost[i] !== c) continue;
+  for (let c = 0; pend > 0; c++) { const bq = c & 15, b = FQB[bq], bl = FQL[bq];
+    for (let k = 0; k < bl; k++) { const i = b[k]; pend--; if (cost[i] !== c) continue;
       const cx = i % NW, cy = (i / NW) | 0;
       for (let d = 0; d < 8; d++) {
         const nx = cx + DX8[d], ny = cy + DY8[d]; if (nx < 0 || ny < 0 || nx >= NW || ny >= NW) continue;
         const ni = ny * NW + nx; if (!P[ni]) continue;
         if (DX8[d] && DY8[d]) { if (!P[cy * NW + nx] || !P[ny * NW + cx]) continue; }
         const nc = c + (DX8[d] && DY8[d] ? 14 : 10);
-        if (cost[ni] < 0 || nc < cost[ni]) { cost[ni] = nc; dir[ni] = (d + 4) % 8; push(nc, ni); }
+        if (cost[ni] < 0 || nc < cost[ni]) { cost[ni] = nc; dir[ni] = (d + 4) % 8; const qk = nc & 15; let qb = FQB[qk]; if (FQL[qk] >= qb.length) { const nb = new Int32Array(qb.length * 2); nb.set(qb); FQB[qk] = qb = nb; } qb[FQL[qk]++] = ni; pend++; }
       } }
-    b.length = 0; }
+    FQL[bq] = 0; }
   f = { dir, cost, version: nav.version }; nav.fields.set(key, f); return f;
 }
 function lineFree(sim, x0, y0, x1, y1, owner, rad) { // 4.2g: rad > 0 confere também duas linhas paralelas na largura do corpo
@@ -1130,7 +1132,21 @@ function eliminate(sim, pid, killer) {
   emit(sim, { t: 'eliminated', p: pid });
 }
 
+/* 4.3i: quantos alvos possíveis cada jogador vê em cada célula da grade de busca (a mesma de queryGrid, montada no começo do passo); a busca de alvo pula quando o alcance está vazio — o que sobra é exatamente o que a busca acharia, então o resultado é idêntico */
+const AG = Math.ceil(WORLD / CELL) + 3, AGO = 1; let ACNT = [], ACQ = null;
+function buildAcq(sim) {
+  ACQ = null; const P = sim.players.length; while (ACNT.length < P) ACNT.push(new Int32Array(AG * AG)); for (let i = 0; i < P; i++) ACNT[i].fill(0);
+  for (const e of sim.ents) {
+    if (!e.alive || e.kind === 'node' || e.kind === 'proj' || e.kind === 'wreck' || e.owner < 0 || e.kind === 'crate') continue;
+    const cx = ((e.x / CELL) | 0) + AGO, cy = ((e.y / CELL) | 0) + AGO; if (!(cx >= 0 && cy >= 0 && cx < AG && cy < AG)) return; /* fora da grade: nesta rodada a busca roda sempre */
+    for (let p = 0; p < P; p++) if (p !== e.owner && sim.vis[p] && sim.vis[p].has(e.id)) ACNT[p][cy * AG + cx]++;
+  }
+  ACQ = sim;
+}
 function acquire(sim, u, rad, unitsOnly) {
+  if (ACQ === sim && u.owner >= 0 && u.owner < sim.players.length) { const R = rad + 40, x0 = ((u.x - R) / CELL) | 0, x1 = ((u.x + R) / CELL) | 0, y0 = ((u.y - R) / CELL) | 0, y1 = ((u.y + R) / CELL) | 0, C = ACNT[u.owner]; let any = false;
+    for (let cx = x0; cx <= x1 && !any; cx++) for (let cy = y0; cy <= y1; cy++) { const ix = cx + AGO, iy = cy + AGO; if (ix >= 0 && iy >= 0 && ix < AG && iy < AG && C[iy * AG + ix]) { any = true; break; } }
+    if (!any) return null; }
   let best = null, bd = Infinity;
   const vis = sim.vis[u.owner];
   queryGrid(sim, u.x, u.y, rad + 40, e => {
@@ -1471,15 +1487,23 @@ function separate(sim) {
     if (fx || fy) { u.x = clamp(u.x + fx, 10, WORLD - 10); u.y = clamp(u.y + fy, 10, WORLD - 10); }
   }
 }
+/* 4.3i: visão por baldes — cada círculo de sensor entra nos baldes que alcança (raio + maior raio de entidade + 1) e cada entidade só testa os círculos do próprio balde; o teste de distância é o mesmo de antes, então o resultado é idêntico */
+const VB = 200, VBN = Math.ceil(WORLD / VB) + 1; const VBH = new Int32Array(VBN * VBN); let VBX = new Int32Array(8192), VBI = new Int32Array(8192), VCX = new Float64Array(1024), VCY = new Float64Array(1024), VCR = new Float64Array(1024);
+function vbOf(v) { const b = Math.floor(v / VB); return b < 0 ? 0 : b >= VBN ? VBN - 1 : b; }
 function computeVisibility(sim) {
+  let rmax = 0; for (const e of sim.ents) if (e.alive && e.kind !== 'node' && e.kind !== 'rock' && e.r > rmax) rmax = e.r;
   for (const p of sim.players) {
     const vis = sim.vis[p.id]; vis.clear();
     if (!p.alive) continue;
-    const circles = [], detectors = [];
+    const detectors = []; let n = 0, m = 0; VBH.fill(-1);
     for (const e of sim.ents) {
       if (!e.alive || e.owner !== p.id) continue;
       if (e.kind !== 'unit' && e.kind !== 'building') continue;
-      circles.push([e.x, e.y, sensorRadius(sim, e)]);
+      if (n >= VCX.length) { const g = a => { const b = new Float64Array(a.length * 2); b.set(a); return b; }; VCX = g(VCX); VCY = g(VCY); VCR = g(VCR); }
+      const r = sensorRadius(sim, e); VCX[n] = e.x; VCY[n] = e.y; VCR[n] = r;
+      const R = r + rmax + 1, bx0 = vbOf(e.x - R), bx1 = vbOf(e.x + R), by0 = vbOf(e.y - R), by1 = vbOf(e.y + R);
+      for (let by = by0; by <= by1; by++) for (let bx = bx0; bx <= bx1; bx++) { if (m >= VBX.length) { const g = a => { const b = new Int32Array(a.length * 2); b.set(a); return b; }; VBX = g(VBX); VBI = g(VBI); } const b = by * VBN + bx; VBI[m] = n; VBX[m] = VBH[b]; VBH[b] = m; m++; }
+      n++;
       if (e.kind === 'building' && e.built && BUILDINGS[e.def].detect) detectors.push([e.x, e.y, BUILDINGS[e.def].detect]);
     }
     for (const e of sim.ents) {
@@ -1487,7 +1511,7 @@ function computeVisibility(sim) {
       if (e.kind === 'proj' && e.owner === p.id) { vis.add(e.id); continue; }
       let seen = false;
       if (e.kind === 'building' && e.built && e.def === 'reator' && facOf(sim, e.owner).smoke) seen = true;
-      if (!seen) for (const c of circles) { if (dist(e.x, e.y, c[0], c[1]) <= c[2] + e.r) { seen = true; break; } }
+      if (!seen) for (let k = VBH[vbOf(e.y) * VBN + vbOf(e.x)]; k >= 0; k = VBX[k]) { const i = VBI[k]; if (dist(e.x, e.y, VCX[i], VCY[i]) <= VCR[i] + e.r) { seen = true; break; } }
       if (seen && e.cloaked && !(e.revealT > 0)) {
         seen = false;
         for (const c of detectors) { if (dist(e.x, e.y, c[0], c[1]) <= c[2] + e.r) { seen = true; break; } }
@@ -1555,7 +1579,7 @@ function step(sim) {
   if (sim.result) { sim._evRet = sim.events.length; return sim.events; }
   for (const e of sim.ents) if (e.kind !== 'node') { e.px = e.x; e.py = e.y; }
   if (sim.navDirty) rebuildNav(sim);
-  rebuildGrid(sim);
+  rebuildGrid(sim); buildAcq(sim);
   updateStorm(sim, dt); updateVeins(sim);
   const cmds = sim.cmdQueue; sim.cmdQueue = [];
   for (const c of cmds) processCommand(sim, c);
@@ -1581,6 +1605,7 @@ function step(sim) {
     for (const e of sim.ents) { if (e.alive) keep.push(e); else sim.byId.delete(e.id); }
     sim.ents = keep;
   }
+  ACQ = null; /* 4.3i: a contagem vale só dentro do passo (a visão muda logo abaixo) */
   computeVisibility(sim);
   if (sim.tick % 3 === 0) markExplored(sim);
   sim.tick++; sim.time = sim.tick * TICK;

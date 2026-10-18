@@ -388,7 +388,7 @@ function create(THREE, scene, env) {
   /* ---------- quadro ---------- */
   const _fr = new THREE.Frustum(), _pm = new THREE.Matrix4(), _sp = new THREE.Sphere(), _sun = new THREE.Vector3(); let sunL = null, sunN = 0;
   ST.update = function (dt, time, camera, storm, sim) {
-    if (!noiseTex && !NG.done()) NG.step(storm ? 1e9 : 2.5); /* fatias do ruído nos primeiros quadros; com tempestade, termina já */
+    if (!noiseTex && !NG.done() && (storm || !sim || sim.time > 45)) NG.step(storm && storm.phase !== 'warn' ? 1e9 : 2.5); /* fatias do ruído (4.3i: só depois dos primeiros 45 s de partida, fora do começo e do teste de desempenho; no aviso, em fatias; tempestade já ativa, termina já) */
     if (!noiseReady()) return;
     /* fase e tempo contínuo (a simulação anda a 10 Hz) */
     if (storm) {

@@ -310,7 +310,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
 <div id="start" class="screen">
   <canvas id="bgfx"></canvas>
   <div class="start-wrap">
-    <div class="eyebrow">Versão 4.3h · build 2026-10-18 00:24Z · Remasterização · mapas e clima · multiplayer 2 a 4</div>
+    <div class="eyebrow">Versão 4.3i · build 2026-10-18 13:17Z · Remasterização · desempenho · multiplayer 2 a 4</div>
     <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div><h1>Aether Rift<br><span>Dominion</span></h1></div></div>
     <p class="tagline">Nada aqui é seu. Ainda.</p>
     <div class="start-grid">
@@ -349,7 +349,7 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
         </div>
         <div class="cpane" data-pane="ajustes" role="tabpanel" hidden>
           <div class="chead"><b>Aparelho</b><span>gráficos, qualidade e bateria</span></div>
-          <div class="opt"><label for="opt-gfx">Gráficos</label><select id="opt-gfx"><option value="3d">3D (Three.js, luz e relevo)</option><option value="2d">2D isométrico (leve, para celulares fracos)</option></select></div><div class="opt"><label for="opt-quality">Qualidade 3D</label><select id="opt-quality"><option value="auto">Automática</option><option value="baixa">Baixa (sem sombras e efeitos)</option><option value="media">Média (sombras, sombra de contato, bruma e bloom)</option><option value="alta">Alta (sombras 4K, sombra de contato, bruma, bloom e MSAA 4×)</option><option value="ultra">Ultra (Alta com sombra de contato mais fina)</option></select></div><div class="opt"><label class="chk"><input type="checkbox" id="opt-bateria"> Economia de bateria (30 fps)</label></div><div class="opt"><label class="chk"><input type="checkbox" id="opt-cine" checked> Câmera de cinema: inclina ao aproximar</label></div>
+          <div class="opt"><label for="opt-gfx">Gráficos</label><select id="opt-gfx"><option value="3d">3D (Three.js, luz e relevo)</option><option value="2d">2D isométrico (leve, para celulares fracos)</option></select></div><div class="opt"><label for="opt-quality">Qualidade 3D</label><select id="opt-quality"><option value="auto">Automática</option><option value="baixa">Baixa (sem sombras e efeitos)</option><option value="media">Média (sombras, sombra de contato, bruma e bloom)</option><option value="alta">Alta (sombras 4K, sombra de contato, bruma, bloom e MSAA 4×)</option><option value="ultra">Ultra (Alta com sombra de contato mais fina)</option></select></div><div class="opt"><label class="chk"><input type="checkbox" id="opt-bateria"> Economia de bateria (30 fps)</label></div><div class="opt"><label class="chk"><input type="checkbox" id="opt-cine" checked> Câmera de cinema: inclina ao aproximar</label><label class="chk"><input type="checkbox" id="opt-dynres" checked> Resolução dinâmica: baixa a resolução interna para manter ~60 fps</label></div>
           <div class="row"><button id="btn-install" class="btn" hidden>Instalar o jogo (app)</button><span id="net-state" class="small muted"></span></div>
           <div class="row"><button class="btn" id="btn-bench">Testar desempenho (30 s)</button></div><div class="small muted" id="bench-last"></div>
           <div class="row"><a class="btn ghost" id="cfg-feedback" target="_blank" rel="noopener" href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md">Enviar feedback</a></div>
@@ -358,8 +358,9 @@ details.adv{border:1px dashed var(--line);border-radius:8px;padding:.35rem .6rem
     </div>
     <div class="notes">
       <div class="choose">Notas da versão</div>
+      <p class="start-notes"><b>4.3i — Desempenho:</b> a partida ficou mais leve e mais estável. Os <b>shaders</b> agora são preparados na tela de carregamento: no Windows, cada efeito novo (a primeira explosão, a primeira ruína, a primeira obra) travava a tela por até meio segundo na primeira vez, e agora nenhum compila no meio da partida. A <b>resolução dinâmica</b> baixa a resolução interna em degraus quando o quadro passa do alvo de 60 fps e volta quando sobra folga (dá para desligar em Ajustes). Unidades e construções que não estão em cena deixaram de custar no desenho e na sombra, só a parte usada dos dados de cada modelo vai para a placa de vídeo, a névoa de guerra e o território são refeitos 10 vezes por segundo (antes, a cada quadro) e o radar redesenha a 30 por segundo. A <b>simulação</b> ficou cerca de 40% mais rápida nas partidas grandes, com o mesmo resultado de antes passo a passo: a visão dos jogadores e a procura de alvos olham só em volta, e os caminhos guardam mais rotas (um exército grande chegando ao destino refazia o mesmo cálculo a cada passo). O <b>Teste de desempenho</b> (Ajustes) agora mostra também o tempo de CPU e de GPU por quadro, quantos shaders compilaram durante o teste, a escala da resolução dinâmica e o tempo de carregamento por etapa.</p>
+      <details class="oldnotes"><summary>Histórico das versões anteriores (4.3h → 2.0)</summary>
       <p class="start-notes"><b>4.3h — Mapas e clima:</b> chegou um mapa novo, o <b>Cinturão</b>: o campo de batalha são plataformas de asteroide flutuando no espaço — a de cada base, as de expansão entre vizinhos e um anel de basalto em volta de um abismo —, ligadas por pontes de rocha. Quem anda só cruza pelas pontes; drones e naves voam por cima do abismo. Em volta e embaixo das plataformas está o espaço: nebulosa azul e violeta, estrelas, a faixa da galáxia, um planeta gigante no horizonte e asteroides facetados em camadas, alguns girando devagar. As plataformas mostram a parte de baixo, com raízes de rocha que somem no escuro, estalactites e cristais pendurados; as pontes têm quilha de rocha e pedras penduradas, e cai poeira e cascalho das bordas. Uma beirada de rocha clara mostra na hora onde o chão acaba, e no fundo do abismo do anel a Fenda gira como um redemoinho de luz, o ponto mais claro do mapa à noite. Escolha o mapa na Escaramuça ou na sala do multiplayer (lá vale o mapa do anfitrião). Os dois mapas ganharam <b>lagos</b>: o de plasma é rocha derretida, com crosta escura que racha, correntes incandescentes por baixo, bolhas que estouram em gotas de lava, vapor, brasas e margem de basalto queimado, ilumina o chão em volta e ninguém atravessa a pé; o de gelo dá para atravessar, com rachaduras, bolhas presas, neve na margem, profundidade azul e reflexo de verdade das unidades e construções em cima (na qualidade Baixa e no celular, reflexo do céu). A <b>Tempestade de Éter</b> virou uma tempestade de verdade: no aviso, as nuvens se juntam e baixam sobre o lugar, a borda da área aparece no chão e o vento começa a varrer a poeira; ativa, um vórtice de nuvens violeta gira devagar sobre a área com um funil de éter no meio, raios descem e estouram no chão iluminando tudo em volta, com trovão, chuva de éter, a área escurecida por dentro e uma borda elétrica que se vê de longe; no fim, ela sobe, se espalha e se desfaz. A <b>noite</b> ficou escura de verdade (antes o céu de dia seguia iluminando a cena) e as <b>bases se acendem</b> na cor da Raça: a luz derrama no chão em volta das construções, enfraquece quando a energia é racionada ou entra em colapso, falha na avaria, e as torres varrem o chão com holofotes. No modo 2D, o Cinturão mostra o abismo com estrelas e os lagos aparecem no chão. A campanha e as partidas salvas antes desta versão continuam na Planície da Fenda de sempre, sem lagos.</p>
-      <details class="oldnotes"><summary>Histórico das versões anteriores (4.3g → 2.0)</summary>
       <p class="start-notes"><b>4.3g — Combate:</b> cada Raça agora atira do seu jeito. O <b>Consórcio Vehnar</b> dispara traçantes laranja grossos com ponta incandescente, os canhões lançam lingotes em brasa com fumaça preta e o Soldador tem um lança-chamas de chama de verdade; a <b>Erevane</b> atira traçantes teal finos e quase sem clarão, o Atirador de Fenda deixa um risco de luz no ar e as Lâminas cortam em arco; a <b>Tessara</b> atira sementes âmbar que pulsam com rastro de esporos, e os impactos espirram seiva; o <b>Coro Quorith</b> dispara estilhaços e agulhas de cristal, a Voz manda anéis sonoros, o Prisma se divide em quatro feixes e o Harmônico atira em hélice; a <b>Prole Vorag</b> cospe ácido que pinga e deixa poça borbulhando, atira espinhos de osso, e mordidas e chifradas aparecem como golpes em arco. As balas agora voam na tela desde o disparo (antes apareciam por um instante) e o tiro sai do soldado que dispara e do cano da torreta. As <b>explosões</b> vêm em camadas, do impacto pequeno ao épico: clarão, bolas de fogo que viram fumaça, faíscas, destroços que voam e caem, onda de choque, poeira rasteira e fumaça que fica, na cor de cada Raça. Centenas de <b>clarões</b> de disparos, explosões, incêndios e faróis iluminam o chão e as unidades sem pesar como luzes de verdade: à noite, a batalha acende a cena. O veículo destruído vira <b>carcaça em chamas</b>: o próprio modelo achatado, escuro e em brasa, com a torreta arrancada caída ao lado, queimando por quase um minuto; construções avariadas pegam fogo de verdade e as ruínas ficam em brasa. O Uníssono do Coro agora cobre as unidades com <b>escudos</b> de cristal que brilham na borda e acendem com os golpes, e as marcas de queimado no chão ganharam borda irregular e fuligem. Firefox: mais um ponto que podia deixar a tela preta perto do chão (o relevo do terreno) foi protegido.</p>
       <p class="start-notes"><b>4.3f — Bases:</b> cada Raça ganhou a própria arquitetura: as 12 construções (Núcleo nos três estilos do Hangar, Reator, Refinaria, Quartel, Fábrica, Hangar, Laboratório, Torre, Bastião, Nódulo, Muro e Portão) foram refeitas do zero, com partes que se mexem, luzes que acendem à noite e versão leve longe da câmera. O <b>Consórcio Vehnar</b> virou uma colônia-fábrica de conveses octogonais com faixas de perigo, e o Núcleo é uma fundição com fornalha, chaminés e ponte rolante; a <b>Erevane</b> é grafite facetado com filetes teal e véus de camuflagem, com o Núcleo em forma de torre-farol; a <b>Tessara</b> brota do chão em flores, bulbos e casulos vivos presos por raízes, com o Núcleo como uma flor colossal; o <b>Coro Quorith</b> é cristal sobre plintos sextavados no estilo de Zayin Coral, com octaedros de arestas acesas e anéis de ressonância; a <b>Prole Vorag</b> é uma colônia de ninhos de carne, quitina e osso, com o Núcleo como uma colmeia-mãe coroada de espinhos. As obras têm a assinatura de cada Raça: andaime com grua (Vehnar), holograma da planta (Erevane), casulo com veias acesas (Tessara), coroa de cristais (Quorith) e casulo úmido que pulsa e rompe (Vorag), e cada uma termina com o próprio efeito. A <b>avaria</b> vem em estágios: abaixo de dois terços da vida a construção escurece e solta fumaça, abaixo de um terço pega fogo, solta faíscas e as luzes falham. E a <b>destruição é em pedaços</b>: torres, chaminés, tanques, cúpulas e telhados se soltam, voam e caem pelo chão, a torreta das torres é arrancada, e o miolo desaba e fica em brasa como carcaça antes de afundar. A <b>Catedral Errante</b> foi refeita no estilo de Zayin Coral: um octaedro de cristal escuro com arestas acesas e faixas de luz por dentro, anéis de ressonância e estilhaços em órbita, sobre uma plataforma de rocha facetada que caminha em seis pernas de cristal. Correção: no Firefox, a tela podia ficar toda preta em certos níveis de zoom perto do chão; um valor inválido nascido no brilho de borda das Raças se espalhava pelo bloom, e agora é filtrado antes dele.</p>
       <p class="start-notes"><b>4.3e — Soldados e líderes:</b> a infantaria agora luta em <b>esquadrões</b>: cada unidade são três soldados em formação, que andam com passos desencontrados, miram juntos e caem um a um conforme a unidade perde vida (a figura atingida tomba para trás; a Voz de cristal se estilhaça). Todos os soldados foram refeitos do zero, na família visual da frota: o <b>Consórcio Vehnar</b> virou ciborgues atarracados com mochila-fornalha e chaminés em brasa, e o Soldador tem máscara de solda, avental e tanques nas costas; a <b>Erevane</b> tem soldados esguios de armadura facetada, pernas invertidas e gerador de camuflagem, e o Atirador de Fenda ganhou capuz, capa de origami e rifle longo com luneta; a <b>Tessara</b> veste armadura de osso e chifre com fuzil vivo e saco de seiva, e a Quimera virou uma fera curvada com braço-canhão, foice de osso e cauda; o <b>Coro Quorith</b> tem coristas de cristal de cabeça flutuante, a Voz paira com auréola e mãos em órbita, e a Agulha carrega um leque de agulhas nas costas; a <b>Prole Vorag</b> tem guerreiros-inseto de quatro braços com lança de espinho, a Cria virou caçadora-aranha de foices erguidas e o Cuspidor ganhou um saco de ácido enorme. Os épicos estão no topo da escala: a <b>Catedral Errante</b> é uma catedral gótica de cristal que caminha sobre seis pilares, com sinos, rosáceas e torres na cor do time, e a <b>Matriarca</b> é uma rainha-aranha com abdômen de ovos acesos, coroa de espinhos e foices. Os soldados têm a mesma altura em todas as Raças e, com a câmera afastada, crescem um pouco para o esquadrão continuar legível. Os <b>líderes</b> foram refeitos como bustos de comandante, do peito para cima: rosto esculpido com órbitas de verdade, olhos com íris, córnea e pálpebras, ombros, gola e armadura, materiais com textura de poros, metal, quitina ou folha e as partículas de cada Raça. O <b>Barão-Forja</b> ganhou rosto curtido, bigode de morsa, monóculo e um respirador cuja "boca" é o fogo da fornalha atrás da grade; <b>Vesper Ísk</b> tem viseira com duas fendas de luz que mudam de ângulo e nadadeiras que abrem na fúria; <b>Sylva Oriel</b> mantém a cara de vilã e ganhou cabeleira de folhas com nervura acesa; <b>Zayin Coral</b> é um cristal transparente com núcleo e anel de ressonância girando; <b>Oru Voraz</b> tem carapaça em placas, quatro olhos com membrana e mandíbula que abre em duas fileiras de dentes. Os quatro humores (sereno, furioso, triunfante, preocupado) mudam sobrancelhas, pálpebras, boca e postura e leem no cartão e no HUD; na partida o retrato recebe a luz do mapa (dia, noite, clima e o clarão dos relâmpagos). Os retratos do carregamento, do fim de partida e da campanha foram regerados a partir dos mesmos bustos. Correção: no jogo o mapa de reflexo dos bustos não carregava e os metais ficavam chapados; agora refletem o ambiente.</p>
@@ -1124,13 +1125,15 @@ function passArr(sim, owner) { // 4.2g: tabela de passagem do jogador (refeita a
   nav.pass.set(owner, a); return a;
 }
 function passable(sim, i, owner) { return passArr(sim, owner)[i] === 1; }
+let FQB = null; const FQL = new Int32Array(16); /* 4.3i: filas do campo de fluxo */
 function flowField(sim, destIdx, owner) {
   const nav = sim.nav; const key = owner * 1000000 + destIdx; let f = nav.fields.get(key); if (f) { nav.fields.delete(key); nav.fields.set(key, f); return f; }
-  if (nav.fields.size >= 96) nav.fields.delete(nav.fields.keys().next().value); // 4.2g: descarta o menos usado (antes limpava tudo de uma vez)
+  if (nav.fields.size >= 256) nav.fields.delete(nav.fields.keys().next().value); // 4.2g: descarta o menos usado (antes limpava tudo de uma vez); 4.3i: 256 (com 96, um exército grande chegando às vagas refazia o mesmo campo a cada passo)
   const N = NW * NW; const cost = new Int32Array(N).fill(-1); const dir = new Int8Array(N).fill(-1);
   const P = passArr(sim, owner); // Dijkstra; custo 10 reto, 14 diagonal; sem cortar cantos
-  const BK = 16, bk = []; for (let k = 0; k < BK; k++) bk.push([]); let pend = 0; // 4.2g: fila de baldes (Dial): custos inteiros e passo máximo 14 < 16, sem heap
-  const push = (c, i) => { bk[c % BK].push(i); pend++; };
+  let pend = 0; /* 4.2g: fila de baldes (Dial): custos inteiros e passo máximo 14 < 16, sem heap; 4.3i: os 16 baldes são vetores fixos reaproveitados (cada balde segue FIFO, como antes) */
+  if (!FQB) { FQB = []; for (let k = 0; k < 16; k++) FQB.push(new Int32Array(N)); } FQL.fill(0);
+  const push = (c, i) => { const k = c & 15; let b = FQB[k]; if (FQL[k] >= b.length) { const nb = new Int32Array(b.length * 2); nb.set(b); FQB[k] = b = nb; } b[FQL[k]++] = i; pend++; };
   if (passable(sim, destIdx, owner)) { cost[destIdx] = 0; push(0, destIdx); }
   else { // 4.2g: destino dentro de obstáculo (centro de Núcleo/Refinaria/Quartel, ponto numa rocha): antes o campo saía vazio e a unidade ia reto.
     // Semeia a primeira camada de células livres em volta (todos os lados), medindo do centro real da estrutura até o ponto mais próximo de cada célula
@@ -1144,17 +1147,17 @@ function flowField(sim, destIdx, owner) {
     let dmin = Infinity; for (let k = 0; k < cand.length; k += 3) if ((cand[k + 2] || !anyOk) && cand[k + 1] < dmin) dmin = cand[k + 1];
     for (let k = 0; k < cand.length; k += 3) if ((cand[k + 2] || !anyOk) && cand[k + 1] <= dmin + NAV) { const i = cand[k]; cost[i] = Math.round((cand[k + 1] - dmin) * 10 / NAV); push(cost[i], i); }
   }
-  for (let c = 0; pend > 0; c++) { const b = bk[c % BK];
-    for (let k = 0; k < b.length; k++) { const i = b[k]; pend--; if (cost[i] !== c) continue;
+  for (let c = 0; pend > 0; c++) { const bq = c & 15, b = FQB[bq], bl = FQL[bq];
+    for (let k = 0; k < bl; k++) { const i = b[k]; pend--; if (cost[i] !== c) continue;
       const cx = i % NW, cy = (i / NW) | 0;
       for (let d = 0; d < 8; d++) {
         const nx = cx + DX8[d], ny = cy + DY8[d]; if (nx < 0 || ny < 0 || nx >= NW || ny >= NW) continue;
         const ni = ny * NW + nx; if (!P[ni]) continue;
         if (DX8[d] && DY8[d]) { if (!P[cy * NW + nx] || !P[ny * NW + cx]) continue; }
         const nc = c + (DX8[d] && DY8[d] ? 14 : 10);
-        if (cost[ni] < 0 || nc < cost[ni]) { cost[ni] = nc; dir[ni] = (d + 4) % 8; push(nc, ni); }
+        if (cost[ni] < 0 || nc < cost[ni]) { cost[ni] = nc; dir[ni] = (d + 4) % 8; const qk = nc & 15; let qb = FQB[qk]; if (FQL[qk] >= qb.length) { const nb = new Int32Array(qb.length * 2); nb.set(qb); FQB[qk] = qb = nb; } qb[FQL[qk]++] = ni; pend++; }
       } }
-    b.length = 0; }
+    FQL[bq] = 0; }
   f = { dir, cost, version: nav.version }; nav.fields.set(key, f); return f;
 }
 function lineFree(sim, x0, y0, x1, y1, owner, rad) { // 4.2g: rad > 0 confere também duas linhas paralelas na largura do corpo
@@ -1673,7 +1676,21 @@ function eliminate(sim, pid, killer) {
   emit(sim, { t: 'eliminated', p: pid });
 }
 
+/* 4.3i: quantos alvos possíveis cada jogador vê em cada célula da grade de busca (a mesma de queryGrid, montada no começo do passo); a busca de alvo pula quando o alcance está vazio — o que sobra é exatamente o que a busca acharia, então o resultado é idêntico */
+const AG = Math.ceil(WORLD / CELL) + 3, AGO = 1; let ACNT = [], ACQ = null;
+function buildAcq(sim) {
+  ACQ = null; const P = sim.players.length; while (ACNT.length < P) ACNT.push(new Int32Array(AG * AG)); for (let i = 0; i < P; i++) ACNT[i].fill(0);
+  for (const e of sim.ents) {
+    if (!e.alive || e.kind === 'node' || e.kind === 'proj' || e.kind === 'wreck' || e.owner < 0 || e.kind === 'crate') continue;
+    const cx = ((e.x / CELL) | 0) + AGO, cy = ((e.y / CELL) | 0) + AGO; if (!(cx >= 0 && cy >= 0 && cx < AG && cy < AG)) return; /* fora da grade: nesta rodada a busca roda sempre */
+    for (let p = 0; p < P; p++) if (p !== e.owner && sim.vis[p] && sim.vis[p].has(e.id)) ACNT[p][cy * AG + cx]++;
+  }
+  ACQ = sim;
+}
 function acquire(sim, u, rad, unitsOnly) {
+  if (ACQ === sim && u.owner >= 0 && u.owner < sim.players.length) { const R = rad + 40, x0 = ((u.x - R) / CELL) | 0, x1 = ((u.x + R) / CELL) | 0, y0 = ((u.y - R) / CELL) | 0, y1 = ((u.y + R) / CELL) | 0, C = ACNT[u.owner]; let any = false;
+    for (let cx = x0; cx <= x1 && !any; cx++) for (let cy = y0; cy <= y1; cy++) { const ix = cx + AGO, iy = cy + AGO; if (ix >= 0 && iy >= 0 && ix < AG && iy < AG && C[iy * AG + ix]) { any = true; break; } }
+    if (!any) return null; }
   let best = null, bd = Infinity;
   const vis = sim.vis[u.owner];
   queryGrid(sim, u.x, u.y, rad + 40, e => {
@@ -2014,15 +2031,23 @@ function separate(sim) {
     if (fx || fy) { u.x = clamp(u.x + fx, 10, WORLD - 10); u.y = clamp(u.y + fy, 10, WORLD - 10); }
   }
 }
+/* 4.3i: visão por baldes — cada círculo de sensor entra nos baldes que alcança (raio + maior raio de entidade + 1) e cada entidade só testa os círculos do próprio balde; o teste de distância é o mesmo de antes, então o resultado é idêntico */
+const VB = 200, VBN = Math.ceil(WORLD / VB) + 1; const VBH = new Int32Array(VBN * VBN); let VBX = new Int32Array(8192), VBI = new Int32Array(8192), VCX = new Float64Array(1024), VCY = new Float64Array(1024), VCR = new Float64Array(1024);
+function vbOf(v) { const b = Math.floor(v / VB); return b < 0 ? 0 : b >= VBN ? VBN - 1 : b; }
 function computeVisibility(sim) {
+  let rmax = 0; for (const e of sim.ents) if (e.alive && e.kind !== 'node' && e.kind !== 'rock' && e.r > rmax) rmax = e.r;
   for (const p of sim.players) {
     const vis = sim.vis[p.id]; vis.clear();
     if (!p.alive) continue;
-    const circles = [], detectors = [];
+    const detectors = []; let n = 0, m = 0; VBH.fill(-1);
     for (const e of sim.ents) {
       if (!e.alive || e.owner !== p.id) continue;
       if (e.kind !== 'unit' && e.kind !== 'building') continue;
-      circles.push([e.x, e.y, sensorRadius(sim, e)]);
+      if (n >= VCX.length) { const g = a => { const b = new Float64Array(a.length * 2); b.set(a); return b; }; VCX = g(VCX); VCY = g(VCY); VCR = g(VCR); }
+      const r = sensorRadius(sim, e); VCX[n] = e.x; VCY[n] = e.y; VCR[n] = r;
+      const R = r + rmax + 1, bx0 = vbOf(e.x - R), bx1 = vbOf(e.x + R), by0 = vbOf(e.y - R), by1 = vbOf(e.y + R);
+      for (let by = by0; by <= by1; by++) for (let bx = bx0; bx <= bx1; bx++) { if (m >= VBX.length) { const g = a => { const b = new Int32Array(a.length * 2); b.set(a); return b; }; VBX = g(VBX); VBI = g(VBI); } const b = by * VBN + bx; VBI[m] = n; VBX[m] = VBH[b]; VBH[b] = m; m++; }
+      n++;
       if (e.kind === 'building' && e.built && BUILDINGS[e.def].detect) detectors.push([e.x, e.y, BUILDINGS[e.def].detect]);
     }
     for (const e of sim.ents) {
@@ -2030,7 +2055,7 @@ function computeVisibility(sim) {
       if (e.kind === 'proj' && e.owner === p.id) { vis.add(e.id); continue; }
       let seen = false;
       if (e.kind === 'building' && e.built && e.def === 'reator' && facOf(sim, e.owner).smoke) seen = true;
-      if (!seen) for (const c of circles) { if (dist(e.x, e.y, c[0], c[1]) <= c[2] + e.r) { seen = true; break; } }
+      if (!seen) for (let k = VBH[vbOf(e.y) * VBN + vbOf(e.x)]; k >= 0; k = VBX[k]) { const i = VBI[k]; if (dist(e.x, e.y, VCX[i], VCY[i]) <= VCR[i] + e.r) { seen = true; break; } }
       if (seen && e.cloaked && !(e.revealT > 0)) {
         seen = false;
         for (const c of detectors) { if (dist(e.x, e.y, c[0], c[1]) <= c[2] + e.r) { seen = true; break; } }
@@ -2098,7 +2123,7 @@ function step(sim) {
   if (sim.result) { sim._evRet = sim.events.length; return sim.events; }
   for (const e of sim.ents) if (e.kind !== 'node') { e.px = e.x; e.py = e.y; }
   if (sim.navDirty) rebuildNav(sim);
-  rebuildGrid(sim);
+  rebuildGrid(sim); buildAcq(sim);
   updateStorm(sim, dt); updateVeins(sim);
   const cmds = sim.cmdQueue; sim.cmdQueue = [];
   for (const c of cmds) processCommand(sim, c);
@@ -2124,6 +2149,7 @@ function step(sim) {
     for (const e of sim.ents) { if (e.alive) keep.push(e); else sim.byId.delete(e.id); }
     sim.ents = keep;
   }
+  ACQ = null; /* 4.3i: a contagem vale só dentro do passo (a visão muda logo abaixo) */
   computeVisibility(sim);
   if (sim.tick % 3 === 0) markExplored(sim);
   sim.tick++; sim.time = sim.tick * TICK;
@@ -13394,7 +13420,7 @@ function create(THREE, scene, env) {
   /* ---------- quadro ---------- */
   const _fr = new THREE.Frustum(), _pm = new THREE.Matrix4(), _sp = new THREE.Sphere(), _sun = new THREE.Vector3(); let sunL = null, sunN = 0;
   ST.update = function (dt, time, camera, storm, sim) {
-    if (!noiseTex && !NG.done()) NG.step(storm ? 1e9 : 2.5); /* fatias do ruído nos primeiros quadros; com tempestade, termina já */
+    if (!noiseTex && !NG.done() && (storm || !sim || sim.time > 45)) NG.step(storm && storm.phase !== 'warn' ? 1e9 : 2.5); /* fatias do ruído (4.3i: só depois dos primeiros 45 s de partida, fora do começo e do teste de desempenho; no aviso, em fatias; tempestade já ativa, termina já) */
     if (!noiseReady()) return;
     /* fase e tempo contínuo (a simulação anda a 10 Hz) */
     if (storm) {
@@ -13797,7 +13823,7 @@ function create(canvas, overlay, mini) {
     if (over.ssao != null) q.ssao = over.ssao && !!ADD; if (over.msaa != null) q.msaa = over.msaa && !!ADD; if (over.shadowMap) q.shadowMap = over.shadowMap; if (over.post != null) q.post = over.post && !!ADD;
     q.detail = name === 'baixa' || isTouch ? 0 : name === 'media' ? 0.75 : 1; if (ME && ME.setDetail) ME.setDetail(q.detail); /* 4.3a: detalhe de superfície dos modelos */
     if (R._terrQ) R._terrQ(q); /* 4.3c: chão leve e sombra do relevo seguem a qualidade (definido junto do terreno) */
-    renderer.setPixelRatio(q.pr); applyShadows(); buildComposer(); armWatchdog(); if (R.FX) R.FX.mult = q.particles; if (R.DR && R.sim && R.H) { try { R.DR.build(R.sim, R.H, dressDensity(), terrT ? terrT.bioAt : null); } catch (e) {} }
+    renderer.setPixelRatio(q.pr * (R.dyn ? R.dyn.scale : 1)); applyShadows(); /* 4.3i: mantém a escala da resolução dinâmica */ buildComposer(); armWatchdog(); if (R.FX) R.FX.mult = q.particles; if (R.DR && R.sim && R.H) { try { R.DR.build(R.sim, R.H, dressDensity(), terrT ? terrT.bioAt : null); } catch (e) {} }
   };
   const octx = overlay.getContext('2d'); const mctx = mini.getContext('2d'); const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
   const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(38, 1, 30, 11000); /* 4.3c: mesas do horizonte até ~8 mil */
@@ -13837,6 +13863,7 @@ function create(canvas, overlay, mini) {
     const vn = (x, y, p) => { const xi = Math.floor(x), yi = Math.floor(y); const fx = sm(x - xi), fy = sm(y - yi); const w = (a, b) => ((a % p) + p) % p; const l = (a, b, t) => a + (b - a) * t; return l(l(h2(w(xi, p), w(yi, p)), h2(w(xi + 1, p), w(yi, p)), fx), l(h2(w(xi, p), w(yi + 1, p)), h2(w(xi + 1, p), w(yi + 1, p)), fx), fy); };
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { let v = 0, a = 0.5, f = 4, s = 0; for (let o = 0; o < 4; o++) { v += a * vn(x / N * f, y / N * f, f); s += a; a *= 0.5; f *= 2; } v = v / s; v = Math.min(1, Math.max(0, (v - 0.35) * 2.2)); const i = (y * N + x) * 4; d[i] = d[i + 1] = d[i + 2] = 255 * v; d[i + 3] = 255; }
     c.putImageData(img, 0, 0); const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.NoColorSpace; return t; })();
+  let fogTick = -1, fogRev = null, fogSim = null; /* 4.3i */
   const fogData = new Uint8Array(FOGN * FOGN * 4); const fogTex = new THREE.DataTexture(fogData, FOGN, FOGN, THREE.RGBAFormat); fogTex.magFilter = THREE.LinearFilter; fogTex.minFilter = THREE.LinearFilter; fogTex.colorSpace = THREE.NoColorSpace;
   const blackTex = new THREE.DataTexture(new Uint8Array(4), 1, 1); blackTex.needsUpdate = true; /* 4.3c */
   const terrData = new Uint8Array(TILES * TILES * 4); const terrTex = new THREE.DataTexture(terrData, TILES, TILES, THREE.RGBAFormat); terrTex.magFilter = THREE.LinearFilter; terrTex.minFilter = THREE.LinearFilter; terrTex.colorSpace = THREE.NoColorSpace;
@@ -13972,6 +13999,7 @@ function create(canvas, overlay, mini) {
     const mk = (geo, mat) => { const m = new THREE.InstancedMesh(geo, mat, cap); m.count = 0; m.frustumCulled = false; m.castShadow = !ghost && !isTouch; m.receiveShadow = !ghost; if (!ghost && g.anim && depthAnim) m.customDepthMaterial = depthAnim; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(m); return m; };
     it = { geo: g, main: mk(g.main, ghost ? matGhost : matFor(pid)), em: g.em && !ghost ? mk(g.em, matEm) : null, n: 0, cap, anim: !ghost && !!g.anim }; if (it.anim) animAttr(it, cap); R.inst.set(key, it); return it;
   }
+  function upl(a, c) { a.clearUpdateRanges(); a.addUpdateRange(0, c); a.needsUpdate = true; } /* 4.3i: envia só o trecho usado do buffer de instâncias */
   function animAttr(it, cap) { const old = it.ia, oldC = it.ic; const a = new THREE.InstancedBufferAttribute(new Float32Array(cap * 4), 4); a.setUsage(THREE.DynamicDrawUsage); if (old) a.array.set(old.array.subarray(0, Math.min(old.array.length, cap * 4))); const c = new THREE.InstancedBufferAttribute(new Float32Array(cap), 1); c.setUsage(THREE.DynamicDrawUsage); if (oldC) c.array.set(oldC.array.subarray(0, Math.min(oldC.array.length, cap))); it.ia = a; it.ic = c; for (const gg of [it.geo.main, it.geo.em]) if (gg) { gg.setAttribute('aInst', a); gg.setAttribute('aInstC', c); } } // 4.2b: distância, tempo, movimento e recuo por instância
   function grow(it) { const cap = it.cap * 2; if (it.anim) animAttr(it, cap); for (const k of ['main', 'em']) { const old = it[k]; if (!old) continue; const m = new THREE.InstancedMesh(old.geometry, old.material, cap); m.frustumCulled = false; m.castShadow = old.castShadow; m.receiveShadow = old.receiveShadow; if (old.customDepthMaterial) m.customDepthMaterial = old.customDepthMaterial; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.remove(old); old.dispose(); scene.add(m); it[k] = m; } it.cap = cap; }
   /* 4.3f: ruínas — a construção destruída vira peças que voam e assentam (K.piece) e um miolo que desaba, escurece e brilha em brasas; fica RUIN_LIFE s no chão e afunda. A torreta das torres sai voando inteira */
@@ -14038,7 +14066,7 @@ function create(canvas, overlay, mini) {
   function drawRuins() { let w = 0;
     for (const r of RUINS) { const t = R.ruinT != null ? R.ruinT : R.time - r.t0; /* R.ruinT: instante fixo (ferramentas de teste) */ if (t > RUIN_LIFE) continue; RUINS[w++] = r; ruinPut(r.def, r.pid, r.skin, r.x, r.y, r.z, r.ang, r.fit, r.h, r.sd, t, RUIN_LIFE);
       if (t < 10 && Math.random() < 0.35) R.flash(r.x, r.y, r.fit * r.h * 1.1, [1.4, 0.5, 0.14], 1.1 * (1 - t / 10), 0.18, 1); /* 4.3g: brasas acendem o chão */ if (t < 10 && FX && FX.fire && r.sd > 0 && Math.random() < 0.3 * R.quality.particles) FX.fire(r.x + (Math.random() - 0.5) * r.fit * r.h * 0.8, H(r.x, r.y) + 2, -r.y + (Math.random() - 0.5) * r.fit * r.h * 0.8, Math.max(3, r.fit * r.h * 0.1), 1 - t / 10, r.fit * r.h * 0.4); /* 4.3g: ruína em brasa */ if (t < 6 && FX && Math.random() < (t < 1.2 ? 0.5 : 0.12) * R.quality.particles) FX.smoke(r.x + (Math.random() - 0.5) * r.fit * r.h, H(r.x, r.y) + 2 + Math.random() * 4, -r.y + (Math.random() - 0.5) * r.fit * r.h, [0.1, 0.09, 0.09], 3 + Math.random() * 3, 7 + Math.random() * 6, 4); }
-    RUINS.length = w; for (const it of ruinInst.values()) { it.main.count = it.n; it.main.instanceMatrix.needsUpdate = true; if (it.em) { it.em.count = it.n; it.em.instanceMatrix.needsUpdate = true; } if (it.n) it.die.needsUpdate = true; } }
+    RUINS.length = w; for (const it of ruinInst.values()) { const n = it.n, on = n > 0 || !!R.warming; it.main.visible = on; it.main.count = n; if (it.em) { it.em.visible = on; it.em.count = n; } if (!n) continue; upl(it.main.instanceMatrix, n * 16); if (it.em) upl(it.em.instanceMatrix, n * 16); upl(it.die, n * it.die.itemSize); } } /* 4.3i: idem nas ruínas */
   const BASE_LIGHT = { vehnar: [1.45, 0.78, 0.32], erevane: [0.35, 1.25, 1.12], tessara: [0.78, 1.28, 0.45], quorith: [0.98, 0.72, 1.5], vorag: [1.4, 0.34, 0.4], _: [1.1, 0.95, 0.75] }; /* 4.3h */
   const ZERO4 = [0, 0, 0, 0]; const _qT = new THREE.Quaternion(), AXZ = new THREE.Vector3(0, 0, 1); /* 4.3e */
   function put(it, x, y, z, ang, scale, scaleY, tint, ia, emTint, tilt) { // 4.2h: emTint = brilho da parte emissiva (nó secando apaga); 4.3e: tilt = tombo em torno do eixo lateral (figura caindo)
@@ -14067,12 +14095,26 @@ function create(canvas, overlay, mini) {
   }
   R.icon = function (def, pid) { const key = def + '|' + pid; let u = R.icons.get(key); if (u) return u; if (USE_MESH) { u = meshIcon(def, pid); if (u) { R.icons.set(key, u); return u; } } const sp = R.sprite(def, pid, 0, false, 0); const cv = document.createElement('canvas'); cv.width = 48; cv.height = 48; const c = cv.getContext('2d'); const sc = Math.min(44 / sp.w, 44 / sp.h); c.imageSmoothingEnabled = sc < 1; c.drawImage(sp.canvas, (48 - sp.w * sc) / 2, (48 - sp.h * sc) / 2, sp.w * sc, sp.h * sc); u = cv.toDataURL(); R.icons.set(key, u); return u; };
   R.prepare = function (sim, onProgress, onDone) {
-    R.sim = sim; if (onProgress) onProgress(0.02); const go = () => { buildTerrain(sim); const jobs = []; /* 4.3c: a tela de carregamento aparece antes de esculpir o terreno (~1 s) */
+    R.sim = sim; if (onProgress) onProgress(0.02); const LT = R.loadT = { t0: performance.now() }; /* 4.3i: tempos do carregamento */ const go = () => { LT.inicio = Math.round(performance.now() - LT.t0); buildTerrain(sim); LT.terreno = Math.round(performance.now() - LT.t0 - LT.inicio); const jobs = []; /* 4.3c: a tela de carregamento aparece antes de esculpir o terreno (~1 s) */
     for (const p of sim.players) { for (const def in S.BUILDINGS) jobs.push([def, p.id, 0]); for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'torre_base', 'torre_turret', 'drone', 'suporte', 'pirata', 'bastiao_base', 'bastiao_turret']) jobs.push([def, p.id, 0]); for (const def in S.UNITS) if (S.UNITS[def].faction === p.faction) jobs.push([def, p.id, 0]); if (LOD_ON) { for (const def in S.BUILDINGS) jobs.push([MD.PARTS[def] ? MD.PARTS[def].hull : def, p.id, 0, true]); for (const def of ['torre_turret', 'bastiao_turret']) jobs.push([def, p.id, 0, true]); /* 4.3f */ for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'drone', 'suporte', 'pirata']) jobs.push([def, p.id, 0, true]); for (const def in S.UNITS) if (S.UNITS[def].faction === p.faction) jobs.push([def, p.id, 0, true]); } } /* 4.3d: versões leves das unidades já na carga */
     for (const res in NODE_MODEL) for (let s = 0; s < 4; s++) jobs.push([res, -1, s]);
     for (let s = 0; s < 6; s++) { jobs.push(['rocks', -1, s]); jobs.push(['ruin', -1, s]); } jobs.push(['crate', -1, 0]); jobs.push(['wreck', -1, 0]);
     for (const p of sim.players) if (MD.props[p.faction]) for (let s = 0; s < 4; s++) jobs.push(['prop_' + p.faction, -1, s]);
-    let i = 0; function chunk() { const t0 = performance.now(); while (i < jobs.length && performance.now() - t0 < 24) { const j = jobs[i++]; geoOf(j[0], j[1], j[2], j[3]); } if (onProgress) onProgress(i / jobs.length); if (i < jobs.length) requestAnimationFrame(chunk); else if (onDone) onDone(); } chunk(); }; requestAnimationFrame(() => requestAnimationFrame(go));
+    R.jobs = jobs; let i = 0; function chunk() { const t0 = performance.now(); while (i < jobs.length && performance.now() - t0 < 24) { const j = jobs[i++]; geoOf(j[0], j[1], j[2], j[3]); } if (onProgress) onProgress(i / jobs.length); if (i < jobs.length) requestAnimationFrame(chunk); else if (onDone) { LT.modelos = Math.round(performance.now() - LT.t0 - LT.inicio - LT.terreno); const tw = performance.now(); const fim = () => { LT.shaders = Math.round(performance.now() - tw); LT.total = Math.round(performance.now() - LT.t0); console.info('[ARD] carregamento: ' + JSON.stringify(LT)); onDone(); }; if (R.warm && !DBG_OFF.has('aquecer')) R.warm(sim).then(fim, fim); else fim(); } } chunk(); }; requestAnimationFrame(() => requestAnimationFrame(go)); /* 4.3i: aquece os shaders antes de liberar a partida (?sem=aquecer desliga) */
+  };
+  /* 4.3i: aquecimento dos shaders na tela de carregamento. Cria antes o que só nasceria no meio da partida (malhas de cada unidade e construção das Raças em jogo, com cor por instância como no desenho, fantasma de obra, ruínas, invólucros de obra, bandeiras) e desenha um quadro de verdade com todas essas malhas ligadas (sem instâncias, nada aparece): cada programa compila e é usado uma vez ainda no carregamento, também na sombra e no pós. No D3D11 (Windows) cada shader novo travava a tela por centenas de ms na primeira explosão, ruína ou obra. (Um renderer.compileAsync da cena inteira antes do primeiro quadro deixava a imagem toda branca: ficou de fora.) */
+  R.warm = function (sim) {
+    const t0 = performance.now(); const W1 = new THREE.Color(1, 1, 1);
+    try {
+      for (const j of R.jobs || []) { const it = instOf(j[0], j[1], j[2], false, j[3]); if (it && it.main && !it.main.instanceColor) it.main.setColorAt(0, W1); if (it && it.em && !it.em.instanceColor) it.em.setColorAt(0, W1); }
+      const hb = Object.keys(S.BUILDINGS)[0]; const g = instOf(hb, R.humanId != null ? R.humanId : 0, 0, true); if (g && g.main && !g.main.instanceColor) g.main.setColorAt(0, W1);
+      for (const p of sim.players) { ruinOf(hb, p.id, 0); clothFor(p.faction); }
+      for (const k of ['andaime', 'casulo', 'cristais', 'casulo_vorag']) { const s = obraOf(k); if (s && s.m && !s.m.instanceColor) s.m.setColorAt(0, W1); }
+    } catch (err) { console.warn('[ARD] aquecimento (malhas): ' + err.message); }
+    try { const wv = R.warmView && R.warmView.cam; const wx = wv ? wv.x : S.CX, wy = wv ? wv.y : S.CY; R.flash(wx, wy, 40, [1, 1, 1], 0, 0.05); R.flashCone(wx, wy, 0, 60, 20, [1, 1, 1], 0); if (SC) { SC.burn(wx, wy, 2, 0, 0); SC.flush(0.6); } } catch (err) { console.warn('[ARD] aquecimento (clarões e marcas): ' + err.message); } /* clarão, cone e marca no chão de intensidade zero: compila o mapa de clarões e as marcas sem deixar rastro */
+    return new Promise(res => requestAnimationFrame(() => { if (R.warmView) { R.warming = true; try { R.draw(sim, R.warmView, 1, 0); } catch (err) { console.warn('[ARD] aquecimento (quadro): ' + err.message); } R.warming = false; }
+      { const hid = [], fc = []; scene.traverse(o => { if (!(o.isMesh || o.isLine || o.isSprite || o.isPoints)) return; if (o.visible === false) { hid.push(o); o.visible = true; } if (o.frustumCulled) { fc.push(o); o.frustumCulled = false; } }); try { if (composer && R.pp) composer.render(0); else renderer.render(scene, camera); } catch (err) { console.warn('[ARD] aquecimento (escondidos): ' + err.message); } for (const o of hid) o.visible = false; for (const o of fc) o.frustumCulled = true; } /* mais um quadro com o que só aparece em combate (projéteis, feixes, efeitos): um quadro normal com mais objetos ligados, sem o compile da cena inteira */
+      R.warmMs = Math.round(performance.now() - t0); R.progs0 = R.progs ? R.progs() : 0; if (R.debug) console.info('[ARD] shaders aquecidos: ' + R.progs0 + ' em ' + R.warmMs + ' ms'); res(); }));
   };
   // ---------- projeção ----------
   function updateCamera(cam) {
@@ -14096,6 +14138,14 @@ function create(canvas, overlay, mini) {
   function miniXf() { const size = mini.width || 184; const sc = size / (S.WORLD * Math.SQRT2) * 0.97; return { size, sc, co: Math.cos(miniYaw), si: Math.sin(miniYaw), cx: size / 2, cy: size / 2 }; }
   R.worldToMini = function (x, y) { const f = miniXf(); const vx = x - S.CX, vy = y - S.CY; return [f.cx + f.sc * (vx * f.co + vy * f.si), f.cy + f.sc * (vx * f.si - vy * f.co)]; };
   R.miniToWorld = function (nx, ny) { const f = miniXf(); const a = (nx * f.size - f.cx) / f.sc, b = (ny * f.size - f.cy) / f.sc; return [S.CX + a * f.co + b * f.si, S.CY + a * f.si - b * f.co]; }; // a matriz do giro é a própria inversa
+  /* 4.3i: resolução dinâmica — escala da resolução interna (pixel ratio) em degraus de 10%, com folga e espera entre trocas (cada troca refaz os alvos do pós) */
+  R.dyn = { on: true, scale: 1, min: isTouch ? 0.55 : 0.67, ema: 0, t: 0, good: 0, minSeen: 1, maxSeen: 1 };
+  function dynApply(s) { const D = R.dyn; D.scale = s; D.minSeen = Math.min(D.minSeen, s); D.maxSeen = Math.max(D.maxSeen, s); renderer.setPixelRatio((R.quality ? R.quality.pr : 1) * s); R.resize(); }
+  R.setDyn = function (on) { R.dyn.on = !!on; if (!R.dyn.on && R.dyn.scale !== 1) dynApply(1); };
+  R.dynFrame = function (ms, now, target) { const D = R.dyn; if (!D.on || !(ms > 0) || ms > 250) return; D.ema = D.ema ? D.ema + (ms - D.ema) * 0.06 : ms; if (now - D.t < 1600) return;
+    if (D.ema > target * 1.22 && D.scale > D.min + 0.001) { dynApply(Math.max(D.min, Math.round((D.scale - 0.1) * 100) / 100)); D.t = now; D.ema = target * 1.1; D.good = 0; }
+    else if (D.ema < target * 1.06 && D.scale < 1) { if (!D.good) D.good = now; else if (now - D.good > 3000) { dynApply(Math.min(1, Math.round((D.scale + 0.05) * 100) / 100)); D.t = now; D.good = 0; D.ema = target; } }
+    else D.good = 0; };
   R.resize = function () { const dpr = Math.min(2, window.devicePixelRatio || 1); const w = canvas.clientWidth, h = canvas.clientHeight; R.w = w; R.h = h; R.dpr = dpr; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = h > w * 1.05 ? 46 : 38; camera.updateProjectionMatrix(); if (composer) { composer.setSize(w, h, false); if (ssaoPass) ssaoPass.setSize(w, h); } if (overlay.width !== Math.round(w * dpr)) { overlay.width = Math.round(w * dpr); overlay.height = Math.round(h * dpr); } const ms = mini.clientWidth || 184; if (mini.width !== ms * dpr) { mini.width = ms * dpr; mini.height = ms * dpr; mfog.width = mini.width; mfog.height = mini.height; } };
 
   // ---------- 4.0d: bandeiras com a Insígnia da Raça no Núcleo e nos Nódulos ----------
@@ -14183,7 +14233,7 @@ function create(canvas, overlay, mini) {
     aurora: { tint: [0.28, 0.54, 0.46], mix: 0.5, fogN: 1.8, fogF: 4.6, hemi: 0x7fe6c0, sun: 0x9effd4, aurora: [0.22, 0.85, 0.58] },
     acida: { tint: [0.44, 0.56, 0.28], mix: 0.62, fogN: 0.65, fogF: 2.4, hemi: 0xa8c878, sun: 0xd4e68a, drop: [0.6, 0.9, 0.3], vz: -175, vx: 6, rate: 1, burst: 5, life: 1.2 },
   };
-  const _cc = new THREE.Color();
+  const _cc = new THREE.Color(); const _bgC = new THREE.Color(); /* 4.3i: cor do fundo reaproveitada (antes um objeto novo por quadro) */
   R.setClimate = function (name) { const c = CLIMATES[name] || null; const changed = R.climateCfg !== c; R.climateCfg = c; if (changed && R.envSky) skyEnv(c); if (!c) { scene.fog.near = 1500; scene.fog.far = 3200; } hemi.color.set(c ? c.hemi : 0x9fb8d6); };
   function spark(x, y, z, col, sp, g) { if (FX) { FX.spark(x, H(x, y) + z, -y, [col[0] * 1.5, col[1] * 1.4, col[2] * 1.3], sp, 1); return; } const i = SP.i++ % SN; const a = Math.random() * TAU; SP.x[i] = x; SP.y[i] = y; SP.z[i] = z; SP.vx[i] = Math.cos(a) * sp * Math.random(); SP.vy[i] = Math.sin(a) * sp * Math.random(); SP.vz[i] = sp * (0.4 + Math.random() * 0.8); SP.t[i] = 0; SP.life[i] = 0.4 + Math.random() * 0.6; sCol[i * 3] = col[0]; sCol[i * 3 + 1] = col[1]; sCol[i * 3 + 2] = col[2]; }
   const boomGeo = new THREE.SphereGeometry(1, 10, 8); const boomMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 1.5, 0.8), transparent: true, opacity: 0.8, depthWrite: false }); const booms = new THREE.InstancedMesh(boomGeo, boomMat, 48); booms.count = 0; booms.frustumCulled = false; scene.add(booms); const boomList = [];
@@ -14276,7 +14326,15 @@ function create(canvas, overlay, mini) {
   }
 
   // ---------- quadro ----------
+  /* 4.3i: tempo de GPU por quadro (EXT_disjoint_timer_query_webgl2, quando o navegador oferece), ligado só pelo teste de desempenho; e a lista de shaders compilados */
+  const GT = { ext: null, on: false, q: [], free: [], ms: [] };
+  R.gpuTimer = function (on) { if (on && !GT.ext) { try { GT.ext = renderer.getContext().getExtension('EXT_disjoint_timer_query_webgl2'); } catch (err) { GT.ext = null; } } GT.on = !!(on && GT.ext); GT.ms.length = 0; return GT.on; };
+  R.gpuMs = () => GT.ms; R.progs = () => (renderer.info.programs ? renderer.info.programs.length : 0); R.progNames = () => (renderer.info.programs || []).map(p => (p.name || '') + ':' + String(p.cacheKey || '').slice(0, 90)); R.progMats = () => { const out = []; scene.traverse(o => { const ms = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : []; for (const m of ms) { const pp = renderer.properties.get(m); const pr = pp && pp.currentProgram; if (pr) out.push(pr.id + ' ' + m.type + (m.name ? '(' + m.name + ')' : '') + ' ' + o.type + (o.name ? '(' + o.name + ')' : '') + ' ro' + o.renderOrder + ' vis' + (o.visible ? 1 : 0) + ' key=' + (m.customProgramCacheKey ? String(m.customProgramCacheKey()).slice(0, 40) : '') + ' attrs=' + (o.geometry ? Object.keys(o.geometry.attributes).map(k => k + (o.geometry.attributes[k].itemSize)).join('.') : '') + ' fc' + (o.frustumCulled ? 1 : 0) + ' pai=' + (o.parent ? (o.parent.name || o.parent.type) : '')); } }); return out; }; R.progIdList = () => (renderer.info.programs || []).map(p => p.id); R.progKeys = () => (renderer.info.programs || []).map(p => [p.id, String(p.cacheKey || "")]); /* 4.3i: diagnóstico: que material usa cada programa */
+  function gtBegin() { if (!GT.on) return null; const gl = renderer.getContext(); const q = GT.free.pop() || gl.createQuery(); gl.beginQuery(GT.ext.TIME_ELAPSED_EXT, q); return q; }
+  function gtEnd(q) { if (!q) return; const gl = renderer.getContext(); gl.endQuery(GT.ext.TIME_ELAPSED_EXT); GT.q.push(q); const dj = gl.getParameter(GT.ext.GPU_DISJOINT_EXT);
+    while (GT.q.length) { const q0 = GT.q[0]; if (!gl.getQueryParameter(q0, gl.QUERY_RESULT_AVAILABLE)) break; GT.q.shift(); if (!dj && GT.ms.length < 20000) GT.ms.push(gl.getQueryParameter(q0, gl.QUERY_RESULT) / 1e6); GT.free.push(q0); } }
   R.draw = function (sim, view, alpha, dt) {
+    const gq = gtBegin(); /* 4.3i */
     if (R.fixedDt != null) dt = R.fixedDt; /* 4.3g: ferramentas de teste avançam o tempo do efeito em passos fixos */
     if (R.measureGL) { renderer.info.autoReset = false; renderer.info.reset(); }
     R.sim = sim; R.time += dt; R.revealAll = !!view.reveal; updateFx(dt); if (R.terrShader) R.terrShader.uniforms.uCloudT.value = R.time; if (terrU) terrU.uTime.value = R.time; /* 4.3c */
@@ -14286,7 +14344,7 @@ function create(canvas, overlay, mini) {
     updateCamera(cam);
     // dia e noite
     const nt = R.night; for (const m of envMats) m.envMapIntensity = m.userData.env * (1 - 0.72 * nt); if (R.envK0 == null) R.envK0 = scene.environmentIntensity; scene.environmentIntensity = R.envK0 * (1 - 0.72 * nt); /* 4.3h: no r186 o material sem mapa próprio usa a intensidade da cena; sem isto a noite seguia iluminada pelo céu de dia */ const LK = R.lightK; sun.intensity = (1.6 * (1 - nt) + 0.55 * nt) * LK.sun; sun.color.setRGB(1 - 0.48 * nt, 0.91 - 0.24 * nt, 0.77 + 0.2 * nt); hemi.intensity = (0.55 * (1 - nt) + 0.42 * nt) * LK.hemi + lightning * 0.5; amb.intensity = (0.22 * (1 - nt) + 0.26 * nt) * LK.amb + lightning * 0.6; // 4.1a: lua azulada; a noite fica escura mas jogável
-    const bg = new THREE.Color().setRGB(0.62 * (1 - nt) + 0.07 * nt, 0.69 * (1 - nt) + 0.09 * nt, 0.77 * (1 - nt) + 0.16 * nt);
+    const bg = _bgC.setRGB(0.62 * (1 - nt) + 0.07 * nt, 0.69 * (1 - nt) + 0.09 * nt, 0.77 * (1 - nt) + 0.16 * nt);
     const cl = R.climateCfg;
     if (cl) {
       const camD = (R.camDist || CAM.baseDist / Math.max(0.3, cam.zoom)); scene.fog.near = camD * cl.fogN; scene.fog.far = camD * cl.fogF;
@@ -14312,6 +14370,7 @@ function create(canvas, overlay, mini) {
     if (R.terrShader && R.terrShader.uniforms.uCloudK) R.terrShader.uniforms.uCloudK.value = atmoFx ? 0 : 1;
     if (sky) { const u = sky.userData.mat.uniforms; u.uHor.value.copy(atmoFx ? atmoFx.U.uAtFar.value : bg); u.uTop.value.copy(bg).multiplyScalar(0.55).lerp(_cc.setRGB(0.12, 0.2, 0.36), 0.5 * (1 - nt)); u.uBot.value.copy(bg).multiplyScalar(0.4); u.uNight.value = nt; u.uTime.value = R.time; u.uSunDir.value.set(R.sunDir[0], R.sunDir[1], R.sunDir[2]).normalize(); u.uSunCol.value.copy(sun.color); }
     // névoa de guerra e território → texturas do terreno
+    if (sim.tick !== fogTick || !!view.reveal !== fogRev || sim !== fogSim) { fogTick = sim.tick; fogRev = !!view.reveal; fogSim = sim; /* 4.3i: a névoa e o território mudam só no passo da simulação (10 por segundo): antes eram refeitos e enviados à GPU a cada quadro */
     for (let iy = 0; iy < FOGN; iy++) for (let ix = 0; ix < FOGN; ix++) { const i = (iy * FOGN + ix) * 4; const tx = (ix * FOGC / TILE) | 0, ty = (iy * FOGC / TILE) | 0; const ex = view.reveal || explored[ty * TILES + tx]; fogData[i] = ex ? 110 : 0; fogData[i + 3] = 255; }
     if (!view.reveal) for (const e of sim.ents) { if (!e.alive || e.owner !== human || (e.kind !== 'unit' && e.kind !== 'building')) continue; const r = S.sensorRadius(sim, e); const x0 = Math.max(0, ((e.x - r) / FOGC) | 0), x1 = Math.min(FOGN - 1, ((e.x + r) / FOGC) | 0), y0 = Math.max(0, ((e.y - r) / FOGC) | 0), y1 = Math.min(FOGN - 1, ((e.y + r) / FOGC) | 0); for (let iy = y0; iy <= y1; iy++) for (let ix = x0; ix <= x1; ix++) { const d = Math.hypot((ix + 0.5) * FOGC - e.x, (iy + 0.5) * FOGC - e.y); if (d <= r) { const i = (iy * FOGN + ix) * 4; const v = d > r * 0.75 ? 110 + 145 * (1 - (d - r * 0.75) / (r * 0.25)) : 255; if (v > fogData[i]) fogData[i] = v; } } }
     else fogData.fill(255);
@@ -14319,6 +14378,7 @@ function create(canvas, overlay, mini) {
     terrData.fill(0);
     for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const t = S.territoryOf(sim, e); if (!t) continue; if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue; const col = hexToRgb(sim.players[e.owner].color); const x0 = Math.max(0, ((e.x - t) / TILE) | 0), x1 = Math.min(TILES - 1, ((e.x + t) / TILE) | 0), y0 = Math.max(0, ((e.y - t) / TILE) | 0), y1 = Math.min(TILES - 1, ((e.y + t) / TILE) | 0); for (let iy = y0; iy <= y1; iy++) for (let ix = x0; ix <= x1; ix++) { if (Math.hypot((ix + 0.5) * TILE - e.x, (iy + 0.5) * TILE - e.y) <= t) { const i = (iy * TILES + ix) * 4; terrData[i] = col[0]; terrData[i + 1] = col[1]; terrData[i + 2] = col[2]; terrData[i + 3] = 255; } } }
     terrTex.needsUpdate = true;
+    }
     // instâncias
     for (const it of R.inst.values()) it.n = 0;
     _frus.setFromProjectionMatrix(_pmF.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)); /* 4.3a: só desenha unidades e estruturas que a câmera vê (com margem para as sombras); os modelos ficaram pesados */
@@ -14438,7 +14498,8 @@ function create(canvas, overlay, mini) {
     if (OBRA_ON) obraEnd();
     if (CB) CB.frame(dt, R.time, camera); /* 4.3g */
     shields.count = nShield; shields.instanceMatrix.needsUpdate = true; if (shields.instanceColor) shields.instanceColor.needsUpdate = true;
-    for (const it of R.inst.values()) { if (it.anim && it.n) { it.ia.needsUpdate = true; it.ic.needsUpdate = true; } it.main.count = it.n; it.main.instanceMatrix.needsUpdate = true; if (it.main.instanceColor) it.main.instanceColor.needsUpdate = true; if (it.em) { it.em.count = it.n; it.em.instanceMatrix.needsUpdate = true; if (it.em.instanceColor) it.em.instanceColor.needsUpdate = true; } }
+    for (const it of R.inst.values()) { const n = it.n, on = n > 0 || !!R.warming; it.main.visible = on; it.main.count = n; if (it.em) { it.em.visible = on; it.em.count = n; } if (!n) continue; /* 4.3i: malha sem instância fica fora do desenho (sem troca de programa nem envio de buffer, também na sombra) e só a parte usada dos buffers sobe para a GPU */
+      upl(it.main.instanceMatrix, n * 16); if (it.main.instanceColor) upl(it.main.instanceColor, n * 3); if (it.em) { upl(it.em.instanceMatrix, n * 16); if (it.em.instanceColor) upl(it.em.instanceColor, n * 3); } if (it.anim) { upl(it.ia, n * 4); upl(it.ic, n); } }
     mineBeams.count = nMine; mineBeams.instanceMatrix.needsUpdate = true; if (mineBeams.instanceColor) mineBeams.instanceColor.needsUpdate = true; /* 4.3a */
     nodeGlow.count = nGlow; nodeGlow.instanceMatrix.needsUpdate = true; if (nodeGlow.instanceColor) nodeGlow.instanceColor.needsUpdate = true; // 4.2h
     selRings.count = nSel; selRings.instanceMatrix.needsUpdate = true; vetRings.count = nVet; vetRings.instanceMatrix.needsUpdate = true; rangeRings.count = nRange; rangeRings.instanceMatrix.needsUpdate = true; shells.count = nShell; shells.instanceMatrix.needsUpdate = true;
@@ -14455,11 +14516,12 @@ function create(canvas, overlay, mini) {
     flashRender(cam); /* 4.3g */
     if (atmoFx) { atmoFx.U.uAtProjInv.value.copy(camera.projectionMatrixInverse); atmoFx.U.uAtCamWorld.value.copy(camera.matrixWorld); } /* 4.3b */
     if (composer) { composer.render(dt); } else renderer.render(scene, camera);
+    gtEnd(gq); /* 4.3i */
     if (R.measureGL) R.lastGL = { calls: renderer.info.render.calls, tris: renderer.info.render.triangles };
     if (R.testBlack && R.quality.ssao) { const pc = renderer.getClearColor(new THREE.Color()), pa = renderer.getClearAlpha(); renderer.setClearColor(0x000000, 1); renderer.clear(true, false, false); renderer.setClearColor(pc, pa); } // ?testblack=1: simula falha da GPU enquanto o SSAO está ligado
     checkFrame();
     drawOverlay(sim, view, hpList, me);
-    drawMinimap(sim, view);
+    if ((R.miniN = (R.miniN || 0) + 1) % 2 === 0 || R.warming) drawMinimap(sim, view); /* 4.3i: o radar redesenha a 30 por segundo (era a cada quadro) */
   };
   function ring(n, x, y, r) { if (n >= 256) return n; _p.set(x, H(x, y) + 0.7, -y); _s.set(r, 1, r); _q.identity(); _m.compose(_p, _q, _s); selRings.setMatrixAt(n, _m); return n + 1; }
   function drawOverlay(sim, view, hpList, me) {
@@ -15014,12 +15076,12 @@ const RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-18 00:24Z';
+const BUILD = '2026-10-18 13:17Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.3h';
+const VERSION = '4.3i';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -15113,6 +15175,7 @@ function initStart() {
   document.querySelectorAll('.ctab').forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab, true)));
   showTab(params.get('aba') || (params.get('campanha') ? 'campanha' : prefs.tab) || 'jogar', false);
   { const pb = loadPrefs(); $('opt-bateria').checked = !!pb.bateria; $('opt-bateria').addEventListener('change', () => savePrefs(Object.assign(loadPrefs() || {}, { bateria: $('opt-bateria').checked }))); }
+  { const pb = loadPrefs() || {}; const od = $('opt-dynres'); if (od) { od.checked = pb.dynres !== false; od.addEventListener('change', () => { savePrefs(Object.assign(loadPrefs() || {}, { dynres: od.checked })); if (G && G.R && G.R.setDyn) G.R.setDyn(od.checked); }); } } /* 4.3i: resolução dinâmica */
   { const pb = loadPrefs() || {}; const oc = $('opt-cine'); if (oc) { oc.checked = pb.cine !== false; oc.addEventListener('change', () => { savePrefs(Object.assign(loadPrefs() || {}, { cine: oc.checked })); if (G && G.R) G.R.cine = oc.checked; }); } } // 4.3b: câmera de cinema
   // 4.0e — campanha, Hangar e progresso do Comandante
   if (ARD.campUI && ARD.campaign && ARD.progress) { try { ARD.campUI.init({ $, leaderArt, LEADER_NAME, RACE_COLORS, LEADER_FACE, startGame: cfg => { savePrefs(Object.assign(loadPrefs() || {}, { gfx: cfg.gfx, quality: cfg.quality, clima: cfg.clima, name: cfg.name })); startGame(cfg); }, selectedRace: () => (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar' }); if (params.get('campanha')) ARD.campUI.openCampaign(); } catch (e) { console.warn('[ARD] campanha indisponível:', e); } }
@@ -15318,6 +15381,7 @@ function startGame(cfg, netCtx) {
   R.cine = (loadPrefs() || {}).cine !== false && !params.get('semcine'); /* 4.3b */
   G.save30 = !!(loadPrefs() || {}).bateria; G.lastDraw = 0; G.haptics = isTouch && !!navigator.vibrate; G.lastBuzz = 0;
   G.perf = { start: performance.now(), t0: performance.now(), frames: 0, low: 0, high: 0, down: false, up: false, auto: R.is3d && !params.get('q') && (cfg.quality || 'auto') === 'auto' };
+  if (R.setDyn) R.setDyn((loadPrefs() || {}).dynres !== false && (!params.get('debug') || params.get('dyn') === '1') && !params.get('benchpasso')); /* 4.3i: resolução dinâmica (fora das ferramentas de teste, que fotografam em resolução cheia) */
   if (isTouch && navigator.getBattery && !G.save30) navigator.getBattery().then(b => { if (b && !b.charging && b.level < 0.2) { G.save30 = true; notice('Bateria baixa: limitando a 30 fps para economizar'); } }).catch(() => {});
   document.addEventListener('visibilitychange', () => { if (!G || G.sim !== sim || G.ended) return; if (document.hidden) { if (!net && !G.paused) { G.paused = true; G.autoPaused = true; G.pauseWhy = 'O jogo pausou sozinho porque a aba ficou em segundo plano. Nada se perdeu.'; } } else { if (G.autoPaused) { G.autoPaused = false; refreshTop(); } else if (net) banner('Você voltou à partida', 'Com a aba em segundo plano o jogo não envia comandos; depois de 8 s a sala pode seguir sem você.', 'warn'); } });
   G.camp = cfg.campaign && ARD.campUI ? ARD.campUI.begin(sim, cfg.campaign, cfg.resume ? cfg.resume.run : null) : null; // 4.0e: missão da campanha (4.1c: ou a retomada dela)
@@ -15331,6 +15395,7 @@ function startGame(cfg, netCtx) {
   $('loading').hidden = false;
   R.humanId = human;
   if (R.STM) R.STM.onStrike = (x, y, big) => { const d = S.dist(x, y, view.cam.x, view.cam.y); AU.sfx('thunder', volAt(x, y) * (big ? 1 : 0.7), Math.min(2.2, d / 1500)); }; /* 4.3h: trovão de cada raio da tempestade */
+  R.warmView = view; /* 4.3i: o aquecimento dos shaders desenha um quadro com a câmera da partida */
   R.prepare(sim, f => { $('load-bar').style.width = Math.round(f * 100) + '%'; }, () => {
     $('loading').hidden = true;
     const ff = net || cfg.resume ? 0 : parseInt(params.get('ff') || '0', 10);
@@ -15370,7 +15435,7 @@ function startGame(cfg, netCtx) {
     if (sim.tick % 10 === 0) updateMemory();
   }
   function frame(now) {
-    if (!G || G.sim !== sim) return;
+    if (!G || G.sim !== sim) return; const fc0 = performance.now(); let simMs = 0, drawMs = 0; /* 4.3i: medidas do teste de desempenho */
     if (G.save30 && now - G.lastDraw < 31) { requestAnimationFrame(frame); return; } G.lastDraw = now; // economia de bateria: até 30 quadros por segundo
     if (!document.hidden && !G.paused && !G.ended && now - G.perf.start < 6000) { G.perf.t0 = now; G.perf.frames = 0; } // aquecimento: shaders compilando não contam
     else if (!document.hidden && !G.paused && !G.ended) { const pf = G.perf; pf.frames++; const el = now - pf.t0; if (el >= 4000) { const fps = pf.frames * 1000 / el; G.fps = fps; pf.t0 = now; pf.frames = 0; // 4.0f: ajuste automático da qualidade 3D pelo FPS medido
@@ -15378,8 +15443,9 @@ function startGame(cfg, netCtx) {
         if (fps < cap) { pf.high = 0; if (++pf.low >= 2 && cur > 0) { R.setQuality(L[cur - 1]); R.quality.name = 'auto'; R.quality.resolved = L[cur - 1]; pf.low = 0; pf.down = true; notice('Qualidade 3D ajustada para ' + LBL[L[cur - 1]] + ' para manter a fluidez (' + Math.round(fps) + ' fps)'); } }
         else if (fps > 57 && !G.save30) { pf.low = 0; if (++pf.high >= 4 && pf.down && !pf.up && cur < 3) { R.setQuality(L[cur + 1]); R.quality.name = 'auto'; R.quality.resolved = L[cur + 1]; pf.up = true; pf.high = 0; notice('Qualidade 3D voltou para ' + LBL[L[cur + 1]]); } }
         else { pf.low = 0; pf.high = 0; } } } }
-    let dt = Math.min(0.25, (now - G.last) / 1000); G.last = now;
-    if (!G.paused && !G.ended) { G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { if (tickOnce(false) === false) { G.acc = Math.min(G.acc, S.TICK); break; } G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; }
+    const iv = now - G.last; let dt = Math.min(0.25, iv / 1000); G.last = now;
+    if (R.dynFrame && !G.paused && !G.ended && !document.hidden && now - G.perf.start > 6000) R.dynFrame(iv, now, G.save30 ? 33.4 : 16.7); /* 4.3i: resolução dinâmica (alvo ~60 fps; 30 na economia de bateria) */
+    if (!G.paused && !G.ended) { const ts0 = performance.now(); G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { if (tickOnce(false) === false) { G.acc = Math.min(G.acc, S.TICK); break; } G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; simMs = performance.now() - ts0; }
     if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; $('mp-wait').hidden = G.waitT < 0.8; if (G.waitT >= 0.8) $('mp-wait').textContent = net.state === 'rejoining' || G.rejoin ? 'Reconectando à sala ' + net.code + '… (' + Math.round((performance.now() - (G.rejoin ? G.rejoin.since : performance.now())) / 1000) + ' s)' : net.state === 'lost' ? 'Conexão perdida.' : 'Aguardando os outros jogadores… (' + G.waitT.toFixed(0) + ' s)'; }
     I.update(dt);
     if (G.bench) benchFrame(now, dt);
@@ -15388,7 +15454,8 @@ function startGame(cfg, netCtx) {
     if (G.frameN % 30 === 0) refreshHints();
     if (G.lead3d && ARD.leaders3d && G.frameN % 300 === 0) { const n = S.nucleoOf(sim, human); const mine = S.armyValue(sim, human); let foe = 0; for (const q of sim.players) if (q.alive && q.id !== human && !S.hasPact(sim, human, q.id)) foe = Math.max(foe, S.armyValue(sim, q.id)); ARD.leaders3d.baseMood(G.lead3d, !n || n.hp < n.maxHp * 0.5 || (foe > 600 && mine < foe * 0.45) ? 4 : (mine > 1500 && mine > foe * 1.8) ? 3 : 1); }
     if (G.camp && G.frameN % 10 === 0) { G.camp.frame(); if (R.setBeacon) R.setBeacon(G.camp.beacon(), G.camp.vip()); }
-    R.draw(sim, view, G.paused ? 1 : Math.min(1, G.acc / S.TICK), dt);
+    { const td0 = performance.now(); R.draw(sim, view, G.paused ? 1 : Math.min(1, G.acc / S.TICK), dt); drawMs = performance.now() - td0; }
+    if (G.bench && G.bench.rec && !G.bench.done) { const B = G.bench; B.cpu.push(performance.now() - fc0); B.simT.push(simMs); B.drawT.push(drawMs); } /* 4.3i */
     if (G.lead3d && ARD.leaders3d && ARD.leaders3d.setLight && R.lightSt && (G.frameN % 15 === 0 || R.lightSt.flash > 0.2)) ARD.leaders3d.setLight(G.lead3d, R.lightSt); /* 4.3e: o retrato do líder recebe a luz do mapa (dia, noite, clima, relâmpago) */
     if (G.autoSave && !G.ended && sim.tick !== G.savedTick && now - (G.lastSave || 0) > 10000) { G.lastSave = now; G.savedTick = sim.tick; (window.requestIdleCallback || ((f) => setTimeout(f, 0)))(() => G.saveNow('auto'), { timeout: 2000 }); }
     requestAnimationFrame(frame);
@@ -15471,7 +15538,7 @@ function startGame(cfg, netCtx) {
         if (ids.length) S.enqueue(sim, { t: 'attackmove', p: p.id, ids, x: mx - ux * side * 120, y: my - uy * side * 120 }); } };
     G.benchWave = wave; // reforço a cada 4 s de jogo: a batalha dura a janela inteira
     view.reveal = true; R.forceDay = !params.get('noite'); G.perf.auto = false; G.speed = 1; document.body.classList.add('bench'); view.sel.clear(); I.buildMenu = false;
-    G.bench = { t0: performance.now(), mt: 0, warm: 3000, dur: 30000, frames: [], a, b, mx, my, yaw0: view.cam.yaw, done: false, nextWave: sim.time + 4 }; G.save30 = false; // 4.2a: economia de bateria não limita o teste
+    G.bench = { t0: performance.now(), mt: 0, warm: 3000, dur: 30000, frames: [], a, b, mx, my, yaw0: view.cam.yaw, done: false, nextWave: sim.time + 4, cpu: [], simT: [], drawT: [], rec: false, gpu: R.gpuTimer ? R.gpuTimer(true) : false, prog0: R.progs ? R.progs() : 0 }; /* 4.3i: CPU, GPU e shaders */ G.save30 = false; // 4.2a: economia de bateria não limita o teste
     try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(l => { G.benchLock = l; }).catch(() => {}); } catch (e) {} // tela acesa durante o teste
     banner('Teste de desempenho', 'Batalha fixa por 30 s com a câmera passeando pelo mapa. Não mexa no jogo até terminar.', 'info', 6000);
   }
@@ -15480,7 +15547,7 @@ function startGame(cfg, netCtx) {
     if (B.last) B.mt += Math.min(250, now - B.last); /* relógio do teste: só avança com o jogo rodando */
     const t = params.get('benchpasso') ? (B.vt = (B.vt || 0) + (+params.get('benchpasso') > 1 ? +params.get('benchpasso') : 1000 / 30)) : B.mt; /* ?benchpasso=1: tempo virtual por quadro (capturas iguais em qualquer máquina) */
     if (sim.time >= B.nextWave && G.benchWave) { B.nextWave = sim.time + 4; G.benchWave(); }
-    if (t > B.warm && B.last) B.frames.push(now - B.last); B.last = now; // intervalo real entre quadros (o dt do jogo é limitado a 250 ms)
+    if (t > B.warm && B.last) { B.frames.push(now - B.last); if (!B.rec) { B.rec = true; B.prog1 = R.progs ? R.progs() : 0; if (R.gpuMs) R.gpuMs().length = 0; } } B.last = now; // intervalo real entre quadros (o dt do jogo é limitado a 250 ms)
     const k = Math.max(0, Math.min(1, (t - B.warm) / B.dur)); const sm = x => x * x * (3 - 2 * x); const lerp = (p, q, f) => p + (q - p) * f;
     // trajeto: base A → batalha de perto → volta em órbita → panorama alto → base B
     const c = view.cam; let x, y, z, yaw, pitch;
@@ -15496,13 +15563,16 @@ function startGame(cfg, netCtx) {
     if (!fr.length || (!params.get('benchpasso') && (fr.length < 20 || total < B.dur * 0.6))) { G.paused = true; refreshTop(); window.__benchResult = { aborted: true, frames: fr.length }; showBench(null); return; } // pouco medido (aba escondida, tela bloqueada): não salva
     const pct = q => { const n = Math.max(1, Math.floor(sorted.length * q)); let s = 0; for (let i = 0; i < n; i++) s += sorted[i]; return Math.round(1000 / (s / n)); };
     const res = { fps: Math.round(fr.length * 1000 / Math.max(1, total)), p1: pct(0.01), p5: pct(0.05), worst: Math.round(sorted[0] || 0), stutters: fr.filter(v => v > 50).length, frames: fr.length, quality: (R.quality && R.quality.name === 'auto' ? 'auto → ' + R.quality.resolved : (R.quality && R.quality.name) || '2d'), res: Math.round(R.w * (R.quality ? R.quality.pr : 1)) + 'x' + Math.round(R.h * (R.quality ? R.quality.pr : 1)), gpu: R.gpu || '?', version: VERSION, at: Date.now() };
+    { const md = a => { if (!a || !a.length) return null; const s = a.slice().sort((p, q) => p - q); return s[Math.floor(s.length / 2)]; }, p95 = a => { if (!a || !a.length) return null; const s = a.slice().sort((p, q) => p - q); return s[Math.floor(s.length * 0.95)]; }, r1 = v => v == null ? null : Math.round(v * 10) / 10; /* 4.3i: onde vai o tempo do quadro */
+      res.cpu = r1(md(B.cpu)); res.cpu95 = r1(p95(B.cpu)); res.simMs = r1(md(B.simT)); res.drawMs = r1(md(B.drawT)); const gm = B.gpu && R.gpuMs ? R.gpuMs() : null; res.gpuMs = gm && gm.length > 20 ? r1(md(gm)) : null; res.gpu95 = gm && gm.length > 20 ? r1(p95(gm)) : null;
+      res.shaders = R.progs ? Math.max(0, R.progs() - (B.prog1 || B.prog0 || 0)) : null; if (R.loadT && R.loadT.total) res.carga = R.loadT; res.shaders0 = B.prog0 || null; if (R.dyn) res.escala = R.dyn.minSeen != null ? Math.round(R.dyn.minSeen * 100) + '–' + Math.round(R.dyn.maxSeen * 100) + '%' : null; if (R.gpuTimer) R.gpuTimer(false); }
     try { localStorage.setItem('ard-bench-last', JSON.stringify(res)); } catch (e) {}
     G.paused = true; refreshTop(); window.__benchResult = res; showBench(res);
   }
   function showBench(res) {
     const box = $('benchbox'); if (!box) return; if (!res) { $('bench-verdict').textContent = 'Teste interrompido'; $('bench-verdict').className = 'bv warn'; $('bench-tip').textContent = 'O jogo ficou pausado ou em segundo plano durante a medição. Rode de novo com a tela acesa e sem trocar de aba.'; $('bench-table').innerHTML = ''; $('bench-feedback').hidden = true; $('bench-back').onclick = () => location.href = location.pathname; box.hidden = false; return; } $('bench-feedback').hidden = false; const verdict = res.fps >= 55 && res.p1 >= 35 ? ['Ótimo', 'good', 'Pode subir a qualidade.'] : res.fps >= 40 ? ['Bom', 'good', 'Fluido para jogar.'] : res.fps >= 26 ? ['Jogável', 'warn', 'Se travar em batalhas grandes, desça um degrau de qualidade.'] : ['Pesado', 'danger', 'Use a qualidade Baixa ou o modo 2D neste aparelho.'];
     $('bench-verdict').textContent = verdict[0]; $('bench-verdict').className = 'bv ' + verdict[1]; $('bench-tip').textContent = verdict[2];
-    $('bench-table').innerHTML = [['FPS médio', res.fps], ['Piores 1% dos quadros', res.p1 + ' fps'], ['Piores 5% dos quadros', res.p5 + ' fps'], ['Pior quadro', res.worst + ' ms'], ['Travadas (> 50 ms)', res.stutters + ' de ' + res.frames], ['Qualidade', res.quality], ['Resolução interna', res.res], ['GPU', res.gpu]].map(([k, v]) => `<div class="stat"><span>${esc(k)}</span><b>${esc(String(v))}</b></div>`).join('');
+    $('bench-table').innerHTML = [['FPS médio', res.fps], ['Piores 1% dos quadros', res.p1 + ' fps'], ['Piores 5% dos quadros', res.p5 + ' fps'], ['Pior quadro', res.worst + ' ms'], ['Travadas (> 50 ms)', res.stutters + ' de ' + res.frames], ['Qualidade', res.quality], ['Resolução interna', res.res + (res.escala ? ' (escala ' + res.escala + ')' : '')], ['CPU por quadro', res.cpu != null ? res.cpu + ' ms (95%: ' + res.cpu95 + ' ms) · simulação ' + res.simMs + ' ms · desenho ' + res.drawMs + ' ms' : '—'], ['GPU por quadro', res.gpuMs != null ? res.gpuMs + ' ms (95%: ' + res.gpu95 + ' ms)' : 'não medido neste navegador'], ['Shaders compilados no teste', res.shaders != null ? res.shaders : '—'], ['Carregamento', res.carga ? (res.carga.total / 1000).toFixed(1) + ' s (terreno ' + (res.carga.terreno / 1000).toFixed(1) + ' s · modelos ' + (res.carga.modelos / 1000).toFixed(1) + ' s · shaders ' + (res.carga.shaders / 1000).toFixed(1) + ' s)' : '—'], ['GPU', res.gpu]].map(([k, v]) => `<div class="stat"><span>${esc(k)}</span><b>${esc(String(v))}</b></div>`).join('');
     $('bench-feedback').href = feedbackUrl({ teste_desempenho_detalhe: JSON.stringify(res) }); $('bench-back').onclick = () => location.href = location.pathname; box.hidden = false;
   }
   // ---------- 4.1c: salvamento ----------

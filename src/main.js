@@ -17,7 +17,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.3h';
+const VERSION = '4.3i';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -111,6 +111,7 @@ function initStart() {
   document.querySelectorAll('.ctab').forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab, true)));
   showTab(params.get('aba') || (params.get('campanha') ? 'campanha' : prefs.tab) || 'jogar', false);
   { const pb = loadPrefs(); $('opt-bateria').checked = !!pb.bateria; $('opt-bateria').addEventListener('change', () => savePrefs(Object.assign(loadPrefs() || {}, { bateria: $('opt-bateria').checked }))); }
+  { const pb = loadPrefs() || {}; const od = $('opt-dynres'); if (od) { od.checked = pb.dynres !== false; od.addEventListener('change', () => { savePrefs(Object.assign(loadPrefs() || {}, { dynres: od.checked })); if (G && G.R && G.R.setDyn) G.R.setDyn(od.checked); }); } } /* 4.3i: resolução dinâmica */
   { const pb = loadPrefs() || {}; const oc = $('opt-cine'); if (oc) { oc.checked = pb.cine !== false; oc.addEventListener('change', () => { savePrefs(Object.assign(loadPrefs() || {}, { cine: oc.checked })); if (G && G.R) G.R.cine = oc.checked; }); } } // 4.3b: câmera de cinema
   // 4.0e — campanha, Hangar e progresso do Comandante
   if (ARD.campUI && ARD.campaign && ARD.progress) { try { ARD.campUI.init({ $, leaderArt, LEADER_NAME, RACE_COLORS, LEADER_FACE, startGame: cfg => { savePrefs(Object.assign(loadPrefs() || {}, { gfx: cfg.gfx, quality: cfg.quality, clima: cfg.clima, name: cfg.name })); startGame(cfg); }, selectedRace: () => (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar' }); if (params.get('campanha')) ARD.campUI.openCampaign(); } catch (e) { console.warn('[ARD] campanha indisponível:', e); } }
@@ -316,6 +317,7 @@ function startGame(cfg, netCtx) {
   R.cine = (loadPrefs() || {}).cine !== false && !params.get('semcine'); /* 4.3b */
   G.save30 = !!(loadPrefs() || {}).bateria; G.lastDraw = 0; G.haptics = isTouch && !!navigator.vibrate; G.lastBuzz = 0;
   G.perf = { start: performance.now(), t0: performance.now(), frames: 0, low: 0, high: 0, down: false, up: false, auto: R.is3d && !params.get('q') && (cfg.quality || 'auto') === 'auto' };
+  if (R.setDyn) R.setDyn((loadPrefs() || {}).dynres !== false && (!params.get('debug') || params.get('dyn') === '1') && !params.get('benchpasso')); /* 4.3i: resolução dinâmica (fora das ferramentas de teste, que fotografam em resolução cheia) */
   if (isTouch && navigator.getBattery && !G.save30) navigator.getBattery().then(b => { if (b && !b.charging && b.level < 0.2) { G.save30 = true; notice('Bateria baixa: limitando a 30 fps para economizar'); } }).catch(() => {});
   document.addEventListener('visibilitychange', () => { if (!G || G.sim !== sim || G.ended) return; if (document.hidden) { if (!net && !G.paused) { G.paused = true; G.autoPaused = true; G.pauseWhy = 'O jogo pausou sozinho porque a aba ficou em segundo plano. Nada se perdeu.'; } } else { if (G.autoPaused) { G.autoPaused = false; refreshTop(); } else if (net) banner('Você voltou à partida', 'Com a aba em segundo plano o jogo não envia comandos; depois de 8 s a sala pode seguir sem você.', 'warn'); } });
   G.camp = cfg.campaign && ARD.campUI ? ARD.campUI.begin(sim, cfg.campaign, cfg.resume ? cfg.resume.run : null) : null; // 4.0e: missão da campanha (4.1c: ou a retomada dela)
@@ -329,6 +331,7 @@ function startGame(cfg, netCtx) {
   $('loading').hidden = false;
   R.humanId = human;
   if (R.STM) R.STM.onStrike = (x, y, big) => { const d = S.dist(x, y, view.cam.x, view.cam.y); AU.sfx('thunder', volAt(x, y) * (big ? 1 : 0.7), Math.min(2.2, d / 1500)); }; /* 4.3h: trovão de cada raio da tempestade */
+  R.warmView = view; /* 4.3i: o aquecimento dos shaders desenha um quadro com a câmera da partida */
   R.prepare(sim, f => { $('load-bar').style.width = Math.round(f * 100) + '%'; }, () => {
     $('loading').hidden = true;
     const ff = net || cfg.resume ? 0 : parseInt(params.get('ff') || '0', 10);
@@ -368,7 +371,7 @@ function startGame(cfg, netCtx) {
     if (sim.tick % 10 === 0) updateMemory();
   }
   function frame(now) {
-    if (!G || G.sim !== sim) return;
+    if (!G || G.sim !== sim) return; const fc0 = performance.now(); let simMs = 0, drawMs = 0; /* 4.3i: medidas do teste de desempenho */
     if (G.save30 && now - G.lastDraw < 31) { requestAnimationFrame(frame); return; } G.lastDraw = now; // economia de bateria: até 30 quadros por segundo
     if (!document.hidden && !G.paused && !G.ended && now - G.perf.start < 6000) { G.perf.t0 = now; G.perf.frames = 0; } // aquecimento: shaders compilando não contam
     else if (!document.hidden && !G.paused && !G.ended) { const pf = G.perf; pf.frames++; const el = now - pf.t0; if (el >= 4000) { const fps = pf.frames * 1000 / el; G.fps = fps; pf.t0 = now; pf.frames = 0; // 4.0f: ajuste automático da qualidade 3D pelo FPS medido
@@ -376,8 +379,9 @@ function startGame(cfg, netCtx) {
         if (fps < cap) { pf.high = 0; if (++pf.low >= 2 && cur > 0) { R.setQuality(L[cur - 1]); R.quality.name = 'auto'; R.quality.resolved = L[cur - 1]; pf.low = 0; pf.down = true; notice('Qualidade 3D ajustada para ' + LBL[L[cur - 1]] + ' para manter a fluidez (' + Math.round(fps) + ' fps)'); } }
         else if (fps > 57 && !G.save30) { pf.low = 0; if (++pf.high >= 4 && pf.down && !pf.up && cur < 3) { R.setQuality(L[cur + 1]); R.quality.name = 'auto'; R.quality.resolved = L[cur + 1]; pf.up = true; pf.high = 0; notice('Qualidade 3D voltou para ' + LBL[L[cur + 1]]); } }
         else { pf.low = 0; pf.high = 0; } } } }
-    let dt = Math.min(0.25, (now - G.last) / 1000); G.last = now;
-    if (!G.paused && !G.ended) { G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { if (tickOnce(false) === false) { G.acc = Math.min(G.acc, S.TICK); break; } G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; }
+    const iv = now - G.last; let dt = Math.min(0.25, iv / 1000); G.last = now;
+    if (R.dynFrame && !G.paused && !G.ended && !document.hidden && now - G.perf.start > 6000) R.dynFrame(iv, now, G.save30 ? 33.4 : 16.7); /* 4.3i: resolução dinâmica (alvo ~60 fps; 30 na economia de bateria) */
+    if (!G.paused && !G.ended) { const ts0 = performance.now(); G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { if (tickOnce(false) === false) { G.acc = Math.min(G.acc, S.TICK); break; } G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; simMs = performance.now() - ts0; }
     if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; $('mp-wait').hidden = G.waitT < 0.8; if (G.waitT >= 0.8) $('mp-wait').textContent = net.state === 'rejoining' || G.rejoin ? 'Reconectando à sala ' + net.code + '… (' + Math.round((performance.now() - (G.rejoin ? G.rejoin.since : performance.now())) / 1000) + ' s)' : net.state === 'lost' ? 'Conexão perdida.' : 'Aguardando os outros jogadores… (' + G.waitT.toFixed(0) + ' s)'; }
     I.update(dt);
     if (G.bench) benchFrame(now, dt);
@@ -386,7 +390,8 @@ function startGame(cfg, netCtx) {
     if (G.frameN % 30 === 0) refreshHints();
     if (G.lead3d && ARD.leaders3d && G.frameN % 300 === 0) { const n = S.nucleoOf(sim, human); const mine = S.armyValue(sim, human); let foe = 0; for (const q of sim.players) if (q.alive && q.id !== human && !S.hasPact(sim, human, q.id)) foe = Math.max(foe, S.armyValue(sim, q.id)); ARD.leaders3d.baseMood(G.lead3d, !n || n.hp < n.maxHp * 0.5 || (foe > 600 && mine < foe * 0.45) ? 4 : (mine > 1500 && mine > foe * 1.8) ? 3 : 1); }
     if (G.camp && G.frameN % 10 === 0) { G.camp.frame(); if (R.setBeacon) R.setBeacon(G.camp.beacon(), G.camp.vip()); }
-    R.draw(sim, view, G.paused ? 1 : Math.min(1, G.acc / S.TICK), dt);
+    { const td0 = performance.now(); R.draw(sim, view, G.paused ? 1 : Math.min(1, G.acc / S.TICK), dt); drawMs = performance.now() - td0; }
+    if (G.bench && G.bench.rec && !G.bench.done) { const B = G.bench; B.cpu.push(performance.now() - fc0); B.simT.push(simMs); B.drawT.push(drawMs); } /* 4.3i */
     if (G.lead3d && ARD.leaders3d && ARD.leaders3d.setLight && R.lightSt && (G.frameN % 15 === 0 || R.lightSt.flash > 0.2)) ARD.leaders3d.setLight(G.lead3d, R.lightSt); /* 4.3e: o retrato do líder recebe a luz do mapa (dia, noite, clima, relâmpago) */
     if (G.autoSave && !G.ended && sim.tick !== G.savedTick && now - (G.lastSave || 0) > 10000) { G.lastSave = now; G.savedTick = sim.tick; (window.requestIdleCallback || ((f) => setTimeout(f, 0)))(() => G.saveNow('auto'), { timeout: 2000 }); }
     requestAnimationFrame(frame);
@@ -469,7 +474,7 @@ function startGame(cfg, netCtx) {
         if (ids.length) S.enqueue(sim, { t: 'attackmove', p: p.id, ids, x: mx - ux * side * 120, y: my - uy * side * 120 }); } };
     G.benchWave = wave; // reforço a cada 4 s de jogo: a batalha dura a janela inteira
     view.reveal = true; R.forceDay = !params.get('noite'); G.perf.auto = false; G.speed = 1; document.body.classList.add('bench'); view.sel.clear(); I.buildMenu = false;
-    G.bench = { t0: performance.now(), mt: 0, warm: 3000, dur: 30000, frames: [], a, b, mx, my, yaw0: view.cam.yaw, done: false, nextWave: sim.time + 4 }; G.save30 = false; // 4.2a: economia de bateria não limita o teste
+    G.bench = { t0: performance.now(), mt: 0, warm: 3000, dur: 30000, frames: [], a, b, mx, my, yaw0: view.cam.yaw, done: false, nextWave: sim.time + 4, cpu: [], simT: [], drawT: [], rec: false, gpu: R.gpuTimer ? R.gpuTimer(true) : false, prog0: R.progs ? R.progs() : 0 }; /* 4.3i: CPU, GPU e shaders */ G.save30 = false; // 4.2a: economia de bateria não limita o teste
     try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(l => { G.benchLock = l; }).catch(() => {}); } catch (e) {} // tela acesa durante o teste
     banner('Teste de desempenho', 'Batalha fixa por 30 s com a câmera passeando pelo mapa. Não mexa no jogo até terminar.', 'info', 6000);
   }
@@ -478,7 +483,7 @@ function startGame(cfg, netCtx) {
     if (B.last) B.mt += Math.min(250, now - B.last); /* relógio do teste: só avança com o jogo rodando */
     const t = params.get('benchpasso') ? (B.vt = (B.vt || 0) + (+params.get('benchpasso') > 1 ? +params.get('benchpasso') : 1000 / 30)) : B.mt; /* ?benchpasso=1: tempo virtual por quadro (capturas iguais em qualquer máquina) */
     if (sim.time >= B.nextWave && G.benchWave) { B.nextWave = sim.time + 4; G.benchWave(); }
-    if (t > B.warm && B.last) B.frames.push(now - B.last); B.last = now; // intervalo real entre quadros (o dt do jogo é limitado a 250 ms)
+    if (t > B.warm && B.last) { B.frames.push(now - B.last); if (!B.rec) { B.rec = true; B.prog1 = R.progs ? R.progs() : 0; if (R.gpuMs) R.gpuMs().length = 0; } } B.last = now; // intervalo real entre quadros (o dt do jogo é limitado a 250 ms)
     const k = Math.max(0, Math.min(1, (t - B.warm) / B.dur)); const sm = x => x * x * (3 - 2 * x); const lerp = (p, q, f) => p + (q - p) * f;
     // trajeto: base A → batalha de perto → volta em órbita → panorama alto → base B
     const c = view.cam; let x, y, z, yaw, pitch;
@@ -494,13 +499,16 @@ function startGame(cfg, netCtx) {
     if (!fr.length || (!params.get('benchpasso') && (fr.length < 20 || total < B.dur * 0.6))) { G.paused = true; refreshTop(); window.__benchResult = { aborted: true, frames: fr.length }; showBench(null); return; } // pouco medido (aba escondida, tela bloqueada): não salva
     const pct = q => { const n = Math.max(1, Math.floor(sorted.length * q)); let s = 0; for (let i = 0; i < n; i++) s += sorted[i]; return Math.round(1000 / (s / n)); };
     const res = { fps: Math.round(fr.length * 1000 / Math.max(1, total)), p1: pct(0.01), p5: pct(0.05), worst: Math.round(sorted[0] || 0), stutters: fr.filter(v => v > 50).length, frames: fr.length, quality: (R.quality && R.quality.name === 'auto' ? 'auto → ' + R.quality.resolved : (R.quality && R.quality.name) || '2d'), res: Math.round(R.w * (R.quality ? R.quality.pr : 1)) + 'x' + Math.round(R.h * (R.quality ? R.quality.pr : 1)), gpu: R.gpu || '?', version: VERSION, at: Date.now() };
+    { const md = a => { if (!a || !a.length) return null; const s = a.slice().sort((p, q) => p - q); return s[Math.floor(s.length / 2)]; }, p95 = a => { if (!a || !a.length) return null; const s = a.slice().sort((p, q) => p - q); return s[Math.floor(s.length * 0.95)]; }, r1 = v => v == null ? null : Math.round(v * 10) / 10; /* 4.3i: onde vai o tempo do quadro */
+      res.cpu = r1(md(B.cpu)); res.cpu95 = r1(p95(B.cpu)); res.simMs = r1(md(B.simT)); res.drawMs = r1(md(B.drawT)); const gm = B.gpu && R.gpuMs ? R.gpuMs() : null; res.gpuMs = gm && gm.length > 20 ? r1(md(gm)) : null; res.gpu95 = gm && gm.length > 20 ? r1(p95(gm)) : null;
+      res.shaders = R.progs ? Math.max(0, R.progs() - (B.prog1 || B.prog0 || 0)) : null; if (R.loadT && R.loadT.total) res.carga = R.loadT; res.shaders0 = B.prog0 || null; if (R.dyn) res.escala = R.dyn.minSeen != null ? Math.round(R.dyn.minSeen * 100) + '–' + Math.round(R.dyn.maxSeen * 100) + '%' : null; if (R.gpuTimer) R.gpuTimer(false); }
     try { localStorage.setItem('ard-bench-last', JSON.stringify(res)); } catch (e) {}
     G.paused = true; refreshTop(); window.__benchResult = res; showBench(res);
   }
   function showBench(res) {
     const box = $('benchbox'); if (!box) return; if (!res) { $('bench-verdict').textContent = 'Teste interrompido'; $('bench-verdict').className = 'bv warn'; $('bench-tip').textContent = 'O jogo ficou pausado ou em segundo plano durante a medição. Rode de novo com a tela acesa e sem trocar de aba.'; $('bench-table').innerHTML = ''; $('bench-feedback').hidden = true; $('bench-back').onclick = () => location.href = location.pathname; box.hidden = false; return; } $('bench-feedback').hidden = false; const verdict = res.fps >= 55 && res.p1 >= 35 ? ['Ótimo', 'good', 'Pode subir a qualidade.'] : res.fps >= 40 ? ['Bom', 'good', 'Fluido para jogar.'] : res.fps >= 26 ? ['Jogável', 'warn', 'Se travar em batalhas grandes, desça um degrau de qualidade.'] : ['Pesado', 'danger', 'Use a qualidade Baixa ou o modo 2D neste aparelho.'];
     $('bench-verdict').textContent = verdict[0]; $('bench-verdict').className = 'bv ' + verdict[1]; $('bench-tip').textContent = verdict[2];
-    $('bench-table').innerHTML = [['FPS médio', res.fps], ['Piores 1% dos quadros', res.p1 + ' fps'], ['Piores 5% dos quadros', res.p5 + ' fps'], ['Pior quadro', res.worst + ' ms'], ['Travadas (> 50 ms)', res.stutters + ' de ' + res.frames], ['Qualidade', res.quality], ['Resolução interna', res.res], ['GPU', res.gpu]].map(([k, v]) => `<div class="stat"><span>${esc(k)}</span><b>${esc(String(v))}</b></div>`).join('');
+    $('bench-table').innerHTML = [['FPS médio', res.fps], ['Piores 1% dos quadros', res.p1 + ' fps'], ['Piores 5% dos quadros', res.p5 + ' fps'], ['Pior quadro', res.worst + ' ms'], ['Travadas (> 50 ms)', res.stutters + ' de ' + res.frames], ['Qualidade', res.quality], ['Resolução interna', res.res + (res.escala ? ' (escala ' + res.escala + ')' : '')], ['CPU por quadro', res.cpu != null ? res.cpu + ' ms (95%: ' + res.cpu95 + ' ms) · simulação ' + res.simMs + ' ms · desenho ' + res.drawMs + ' ms' : '—'], ['GPU por quadro', res.gpuMs != null ? res.gpuMs + ' ms (95%: ' + res.gpu95 + ' ms)' : 'não medido neste navegador'], ['Shaders compilados no teste', res.shaders != null ? res.shaders : '—'], ['Carregamento', res.carga ? (res.carga.total / 1000).toFixed(1) + ' s (terreno ' + (res.carga.terreno / 1000).toFixed(1) + ' s · modelos ' + (res.carga.modelos / 1000).toFixed(1) + ' s · shaders ' + (res.carga.shaders / 1000).toFixed(1) + ' s)' : '—'], ['GPU', res.gpu]].map(([k, v]) => `<div class="stat"><span>${esc(k)}</span><b>${esc(String(v))}</b></div>`).join('');
     $('bench-feedback').href = feedbackUrl({ teste_desempenho_detalhe: JSON.stringify(res) }); $('bench-back').onclick = () => location.href = location.pathname; box.hidden = false;
   }
   // ---------- 4.1c: salvamento ----------

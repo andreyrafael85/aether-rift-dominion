@@ -142,7 +142,7 @@ function create(canvas, overlay, mini) {
     if (over.ssao != null) q.ssao = over.ssao && !!ADD; if (over.msaa != null) q.msaa = over.msaa && !!ADD; if (over.shadowMap) q.shadowMap = over.shadowMap; if (over.post != null) q.post = over.post && !!ADD;
     q.detail = name === 'baixa' || isTouch ? 0 : name === 'media' ? 0.75 : 1; if (ME && ME.setDetail) ME.setDetail(q.detail); /* 4.3a: detalhe de superfície dos modelos */
     if (R._terrQ) R._terrQ(q); /* 4.3c: chão leve e sombra do relevo seguem a qualidade (definido junto do terreno) */
-    renderer.setPixelRatio(q.pr); applyShadows(); buildComposer(); armWatchdog(); if (R.FX) R.FX.mult = q.particles; if (R.DR && R.sim && R.H) { try { R.DR.build(R.sim, R.H, dressDensity(), terrT ? terrT.bioAt : null); } catch (e) {} }
+    renderer.setPixelRatio(q.pr * (R.dyn ? R.dyn.scale : 1)); applyShadows(); /* 4.3i: mantém a escala da resolução dinâmica */ buildComposer(); armWatchdog(); if (R.FX) R.FX.mult = q.particles; if (R.DR && R.sim && R.H) { try { R.DR.build(R.sim, R.H, dressDensity(), terrT ? terrT.bioAt : null); } catch (e) {} }
   };
   const octx = overlay.getContext('2d'); const mctx = mini.getContext('2d'); const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
   const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(38, 1, 30, 11000); /* 4.3c: mesas do horizonte até ~8 mil */
@@ -182,6 +182,7 @@ function create(canvas, overlay, mini) {
     const vn = (x, y, p) => { const xi = Math.floor(x), yi = Math.floor(y); const fx = sm(x - xi), fy = sm(y - yi); const w = (a, b) => ((a % p) + p) % p; const l = (a, b, t) => a + (b - a) * t; return l(l(h2(w(xi, p), w(yi, p)), h2(w(xi + 1, p), w(yi, p)), fx), l(h2(w(xi, p), w(yi + 1, p)), h2(w(xi + 1, p), w(yi + 1, p)), fx), fy); };
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { let v = 0, a = 0.5, f = 4, s = 0; for (let o = 0; o < 4; o++) { v += a * vn(x / N * f, y / N * f, f); s += a; a *= 0.5; f *= 2; } v = v / s; v = Math.min(1, Math.max(0, (v - 0.35) * 2.2)); const i = (y * N + x) * 4; d[i] = d[i + 1] = d[i + 2] = 255 * v; d[i + 3] = 255; }
     c.putImageData(img, 0, 0); const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.NoColorSpace; return t; })();
+  let fogTick = -1, fogRev = null, fogSim = null; /* 4.3i */
   const fogData = new Uint8Array(FOGN * FOGN * 4); const fogTex = new THREE.DataTexture(fogData, FOGN, FOGN, THREE.RGBAFormat); fogTex.magFilter = THREE.LinearFilter; fogTex.minFilter = THREE.LinearFilter; fogTex.colorSpace = THREE.NoColorSpace;
   const blackTex = new THREE.DataTexture(new Uint8Array(4), 1, 1); blackTex.needsUpdate = true; /* 4.3c */
   const terrData = new Uint8Array(TILES * TILES * 4); const terrTex = new THREE.DataTexture(terrData, TILES, TILES, THREE.RGBAFormat); terrTex.magFilter = THREE.LinearFilter; terrTex.minFilter = THREE.LinearFilter; terrTex.colorSpace = THREE.NoColorSpace;
@@ -317,6 +318,7 @@ function create(canvas, overlay, mini) {
     const mk = (geo, mat) => { const m = new THREE.InstancedMesh(geo, mat, cap); m.count = 0; m.frustumCulled = false; m.castShadow = !ghost && !isTouch; m.receiveShadow = !ghost; if (!ghost && g.anim && depthAnim) m.customDepthMaterial = depthAnim; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(m); return m; };
     it = { geo: g, main: mk(g.main, ghost ? matGhost : matFor(pid)), em: g.em && !ghost ? mk(g.em, matEm) : null, n: 0, cap, anim: !ghost && !!g.anim }; if (it.anim) animAttr(it, cap); R.inst.set(key, it); return it;
   }
+  function upl(a, c) { a.clearUpdateRanges(); a.addUpdateRange(0, c); a.needsUpdate = true; } /* 4.3i: envia só o trecho usado do buffer de instâncias */
   function animAttr(it, cap) { const old = it.ia, oldC = it.ic; const a = new THREE.InstancedBufferAttribute(new Float32Array(cap * 4), 4); a.setUsage(THREE.DynamicDrawUsage); if (old) a.array.set(old.array.subarray(0, Math.min(old.array.length, cap * 4))); const c = new THREE.InstancedBufferAttribute(new Float32Array(cap), 1); c.setUsage(THREE.DynamicDrawUsage); if (oldC) c.array.set(oldC.array.subarray(0, Math.min(oldC.array.length, cap))); it.ia = a; it.ic = c; for (const gg of [it.geo.main, it.geo.em]) if (gg) { gg.setAttribute('aInst', a); gg.setAttribute('aInstC', c); } } // 4.2b: distância, tempo, movimento e recuo por instância
   function grow(it) { const cap = it.cap * 2; if (it.anim) animAttr(it, cap); for (const k of ['main', 'em']) { const old = it[k]; if (!old) continue; const m = new THREE.InstancedMesh(old.geometry, old.material, cap); m.frustumCulled = false; m.castShadow = old.castShadow; m.receiveShadow = old.receiveShadow; if (old.customDepthMaterial) m.customDepthMaterial = old.customDepthMaterial; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.remove(old); old.dispose(); scene.add(m); it[k] = m; } it.cap = cap; }
   /* 4.3f: ruínas — a construção destruída vira peças que voam e assentam (K.piece) e um miolo que desaba, escurece e brilha em brasas; fica RUIN_LIFE s no chão e afunda. A torreta das torres sai voando inteira */
@@ -383,7 +385,7 @@ function create(canvas, overlay, mini) {
   function drawRuins() { let w = 0;
     for (const r of RUINS) { const t = R.ruinT != null ? R.ruinT : R.time - r.t0; /* R.ruinT: instante fixo (ferramentas de teste) */ if (t > RUIN_LIFE) continue; RUINS[w++] = r; ruinPut(r.def, r.pid, r.skin, r.x, r.y, r.z, r.ang, r.fit, r.h, r.sd, t, RUIN_LIFE);
       if (t < 10 && Math.random() < 0.35) R.flash(r.x, r.y, r.fit * r.h * 1.1, [1.4, 0.5, 0.14], 1.1 * (1 - t / 10), 0.18, 1); /* 4.3g: brasas acendem o chão */ if (t < 10 && FX && FX.fire && r.sd > 0 && Math.random() < 0.3 * R.quality.particles) FX.fire(r.x + (Math.random() - 0.5) * r.fit * r.h * 0.8, H(r.x, r.y) + 2, -r.y + (Math.random() - 0.5) * r.fit * r.h * 0.8, Math.max(3, r.fit * r.h * 0.1), 1 - t / 10, r.fit * r.h * 0.4); /* 4.3g: ruína em brasa */ if (t < 6 && FX && Math.random() < (t < 1.2 ? 0.5 : 0.12) * R.quality.particles) FX.smoke(r.x + (Math.random() - 0.5) * r.fit * r.h, H(r.x, r.y) + 2 + Math.random() * 4, -r.y + (Math.random() - 0.5) * r.fit * r.h, [0.1, 0.09, 0.09], 3 + Math.random() * 3, 7 + Math.random() * 6, 4); }
-    RUINS.length = w; for (const it of ruinInst.values()) { it.main.count = it.n; it.main.instanceMatrix.needsUpdate = true; if (it.em) { it.em.count = it.n; it.em.instanceMatrix.needsUpdate = true; } if (it.n) it.die.needsUpdate = true; } }
+    RUINS.length = w; for (const it of ruinInst.values()) { const n = it.n, on = n > 0 || !!R.warming; it.main.visible = on; it.main.count = n; if (it.em) { it.em.visible = on; it.em.count = n; } if (!n) continue; upl(it.main.instanceMatrix, n * 16); if (it.em) upl(it.em.instanceMatrix, n * 16); upl(it.die, n * it.die.itemSize); } } /* 4.3i: idem nas ruínas */
   const BASE_LIGHT = { vehnar: [1.45, 0.78, 0.32], erevane: [0.35, 1.25, 1.12], tessara: [0.78, 1.28, 0.45], quorith: [0.98, 0.72, 1.5], vorag: [1.4, 0.34, 0.4], _: [1.1, 0.95, 0.75] }; /* 4.3h */
   const ZERO4 = [0, 0, 0, 0]; const _qT = new THREE.Quaternion(), AXZ = new THREE.Vector3(0, 0, 1); /* 4.3e */
   function put(it, x, y, z, ang, scale, scaleY, tint, ia, emTint, tilt) { // 4.2h: emTint = brilho da parte emissiva (nó secando apaga); 4.3e: tilt = tombo em torno do eixo lateral (figura caindo)
@@ -412,12 +414,26 @@ function create(canvas, overlay, mini) {
   }
   R.icon = function (def, pid) { const key = def + '|' + pid; let u = R.icons.get(key); if (u) return u; if (USE_MESH) { u = meshIcon(def, pid); if (u) { R.icons.set(key, u); return u; } } const sp = R.sprite(def, pid, 0, false, 0); const cv = document.createElement('canvas'); cv.width = 48; cv.height = 48; const c = cv.getContext('2d'); const sc = Math.min(44 / sp.w, 44 / sp.h); c.imageSmoothingEnabled = sc < 1; c.drawImage(sp.canvas, (48 - sp.w * sc) / 2, (48 - sp.h * sc) / 2, sp.w * sc, sp.h * sc); u = cv.toDataURL(); R.icons.set(key, u); return u; };
   R.prepare = function (sim, onProgress, onDone) {
-    R.sim = sim; if (onProgress) onProgress(0.02); const go = () => { buildTerrain(sim); const jobs = []; /* 4.3c: a tela de carregamento aparece antes de esculpir o terreno (~1 s) */
+    R.sim = sim; if (onProgress) onProgress(0.02); const LT = R.loadT = { t0: performance.now() }; /* 4.3i: tempos do carregamento */ const go = () => { LT.inicio = Math.round(performance.now() - LT.t0); buildTerrain(sim); LT.terreno = Math.round(performance.now() - LT.t0 - LT.inicio); const jobs = []; /* 4.3c: a tela de carregamento aparece antes de esculpir o terreno (~1 s) */
     for (const p of sim.players) { for (const def in S.BUILDINGS) jobs.push([def, p.id, 0]); for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'torre_base', 'torre_turret', 'drone', 'suporte', 'pirata', 'bastiao_base', 'bastiao_turret']) jobs.push([def, p.id, 0]); for (const def in S.UNITS) if (S.UNITS[def].faction === p.faction) jobs.push([def, p.id, 0]); if (LOD_ON) { for (const def in S.BUILDINGS) jobs.push([MD.PARTS[def] ? MD.PARTS[def].hull : def, p.id, 0, true]); for (const def of ['torre_turret', 'bastiao_turret']) jobs.push([def, p.id, 0, true]); /* 4.3f */ for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'drone', 'suporte', 'pirata']) jobs.push([def, p.id, 0, true]); for (const def in S.UNITS) if (S.UNITS[def].faction === p.faction) jobs.push([def, p.id, 0, true]); } } /* 4.3d: versões leves das unidades já na carga */
     for (const res in NODE_MODEL) for (let s = 0; s < 4; s++) jobs.push([res, -1, s]);
     for (let s = 0; s < 6; s++) { jobs.push(['rocks', -1, s]); jobs.push(['ruin', -1, s]); } jobs.push(['crate', -1, 0]); jobs.push(['wreck', -1, 0]);
     for (const p of sim.players) if (MD.props[p.faction]) for (let s = 0; s < 4; s++) jobs.push(['prop_' + p.faction, -1, s]);
-    let i = 0; function chunk() { const t0 = performance.now(); while (i < jobs.length && performance.now() - t0 < 24) { const j = jobs[i++]; geoOf(j[0], j[1], j[2], j[3]); } if (onProgress) onProgress(i / jobs.length); if (i < jobs.length) requestAnimationFrame(chunk); else if (onDone) onDone(); } chunk(); }; requestAnimationFrame(() => requestAnimationFrame(go));
+    R.jobs = jobs; let i = 0; function chunk() { const t0 = performance.now(); while (i < jobs.length && performance.now() - t0 < 24) { const j = jobs[i++]; geoOf(j[0], j[1], j[2], j[3]); } if (onProgress) onProgress(i / jobs.length); if (i < jobs.length) requestAnimationFrame(chunk); else if (onDone) { LT.modelos = Math.round(performance.now() - LT.t0 - LT.inicio - LT.terreno); const tw = performance.now(); const fim = () => { LT.shaders = Math.round(performance.now() - tw); LT.total = Math.round(performance.now() - LT.t0); console.info('[ARD] carregamento: ' + JSON.stringify(LT)); onDone(); }; if (R.warm && !DBG_OFF.has('aquecer')) R.warm(sim).then(fim, fim); else fim(); } } chunk(); }; requestAnimationFrame(() => requestAnimationFrame(go)); /* 4.3i: aquece os shaders antes de liberar a partida (?sem=aquecer desliga) */
+  };
+  /* 4.3i: aquecimento dos shaders na tela de carregamento. Cria antes o que só nasceria no meio da partida (malhas de cada unidade e construção das Raças em jogo, com cor por instância como no desenho, fantasma de obra, ruínas, invólucros de obra, bandeiras) e desenha um quadro de verdade com todas essas malhas ligadas (sem instâncias, nada aparece): cada programa compila e é usado uma vez ainda no carregamento, também na sombra e no pós. No D3D11 (Windows) cada shader novo travava a tela por centenas de ms na primeira explosão, ruína ou obra. (Um renderer.compileAsync da cena inteira antes do primeiro quadro deixava a imagem toda branca: ficou de fora.) */
+  R.warm = function (sim) {
+    const t0 = performance.now(); const W1 = new THREE.Color(1, 1, 1);
+    try {
+      for (const j of R.jobs || []) { const it = instOf(j[0], j[1], j[2], false, j[3]); if (it && it.main && !it.main.instanceColor) it.main.setColorAt(0, W1); if (it && it.em && !it.em.instanceColor) it.em.setColorAt(0, W1); }
+      const hb = Object.keys(S.BUILDINGS)[0]; const g = instOf(hb, R.humanId != null ? R.humanId : 0, 0, true); if (g && g.main && !g.main.instanceColor) g.main.setColorAt(0, W1);
+      for (const p of sim.players) { ruinOf(hb, p.id, 0); clothFor(p.faction); }
+      for (const k of ['andaime', 'casulo', 'cristais', 'casulo_vorag']) { const s = obraOf(k); if (s && s.m && !s.m.instanceColor) s.m.setColorAt(0, W1); }
+    } catch (err) { console.warn('[ARD] aquecimento (malhas): ' + err.message); }
+    try { const wv = R.warmView && R.warmView.cam; const wx = wv ? wv.x : S.CX, wy = wv ? wv.y : S.CY; R.flash(wx, wy, 40, [1, 1, 1], 0, 0.05); R.flashCone(wx, wy, 0, 60, 20, [1, 1, 1], 0); if (SC) { SC.burn(wx, wy, 2, 0, 0); SC.flush(0.6); } } catch (err) { console.warn('[ARD] aquecimento (clarões e marcas): ' + err.message); } /* clarão, cone e marca no chão de intensidade zero: compila o mapa de clarões e as marcas sem deixar rastro */
+    return new Promise(res => requestAnimationFrame(() => { if (R.warmView) { R.warming = true; try { R.draw(sim, R.warmView, 1, 0); } catch (err) { console.warn('[ARD] aquecimento (quadro): ' + err.message); } R.warming = false; }
+      { const hid = [], fc = []; scene.traverse(o => { if (!(o.isMesh || o.isLine || o.isSprite || o.isPoints)) return; if (o.visible === false) { hid.push(o); o.visible = true; } if (o.frustumCulled) { fc.push(o); o.frustumCulled = false; } }); try { if (composer && R.pp) composer.render(0); else renderer.render(scene, camera); } catch (err) { console.warn('[ARD] aquecimento (escondidos): ' + err.message); } for (const o of hid) o.visible = false; for (const o of fc) o.frustumCulled = true; } /* mais um quadro com o que só aparece em combate (projéteis, feixes, efeitos): um quadro normal com mais objetos ligados, sem o compile da cena inteira */
+      R.warmMs = Math.round(performance.now() - t0); R.progs0 = R.progs ? R.progs() : 0; if (R.debug) console.info('[ARD] shaders aquecidos: ' + R.progs0 + ' em ' + R.warmMs + ' ms'); res(); }));
   };
   // ---------- projeção ----------
   function updateCamera(cam) {
@@ -441,6 +457,14 @@ function create(canvas, overlay, mini) {
   function miniXf() { const size = mini.width || 184; const sc = size / (S.WORLD * Math.SQRT2) * 0.97; return { size, sc, co: Math.cos(miniYaw), si: Math.sin(miniYaw), cx: size / 2, cy: size / 2 }; }
   R.worldToMini = function (x, y) { const f = miniXf(); const vx = x - S.CX, vy = y - S.CY; return [f.cx + f.sc * (vx * f.co + vy * f.si), f.cy + f.sc * (vx * f.si - vy * f.co)]; };
   R.miniToWorld = function (nx, ny) { const f = miniXf(); const a = (nx * f.size - f.cx) / f.sc, b = (ny * f.size - f.cy) / f.sc; return [S.CX + a * f.co + b * f.si, S.CY + a * f.si - b * f.co]; }; // a matriz do giro é a própria inversa
+  /* 4.3i: resolução dinâmica — escala da resolução interna (pixel ratio) em degraus de 10%, com folga e espera entre trocas (cada troca refaz os alvos do pós) */
+  R.dyn = { on: true, scale: 1, min: isTouch ? 0.55 : 0.67, ema: 0, t: 0, good: 0, minSeen: 1, maxSeen: 1 };
+  function dynApply(s) { const D = R.dyn; D.scale = s; D.minSeen = Math.min(D.minSeen, s); D.maxSeen = Math.max(D.maxSeen, s); renderer.setPixelRatio((R.quality ? R.quality.pr : 1) * s); R.resize(); }
+  R.setDyn = function (on) { R.dyn.on = !!on; if (!R.dyn.on && R.dyn.scale !== 1) dynApply(1); };
+  R.dynFrame = function (ms, now, target) { const D = R.dyn; if (!D.on || !(ms > 0) || ms > 250) return; D.ema = D.ema ? D.ema + (ms - D.ema) * 0.06 : ms; if (now - D.t < 1600) return;
+    if (D.ema > target * 1.22 && D.scale > D.min + 0.001) { dynApply(Math.max(D.min, Math.round((D.scale - 0.1) * 100) / 100)); D.t = now; D.ema = target * 1.1; D.good = 0; }
+    else if (D.ema < target * 1.06 && D.scale < 1) { if (!D.good) D.good = now; else if (now - D.good > 3000) { dynApply(Math.min(1, Math.round((D.scale + 0.05) * 100) / 100)); D.t = now; D.good = 0; D.ema = target; } }
+    else D.good = 0; };
   R.resize = function () { const dpr = Math.min(2, window.devicePixelRatio || 1); const w = canvas.clientWidth, h = canvas.clientHeight; R.w = w; R.h = h; R.dpr = dpr; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = h > w * 1.05 ? 46 : 38; camera.updateProjectionMatrix(); if (composer) { composer.setSize(w, h, false); if (ssaoPass) ssaoPass.setSize(w, h); } if (overlay.width !== Math.round(w * dpr)) { overlay.width = Math.round(w * dpr); overlay.height = Math.round(h * dpr); } const ms = mini.clientWidth || 184; if (mini.width !== ms * dpr) { mini.width = ms * dpr; mini.height = ms * dpr; mfog.width = mini.width; mfog.height = mini.height; } };
 
   // ---------- 4.0d: bandeiras com a Insígnia da Raça no Núcleo e nos Nódulos ----------
@@ -528,7 +552,7 @@ function create(canvas, overlay, mini) {
     aurora: { tint: [0.28, 0.54, 0.46], mix: 0.5, fogN: 1.8, fogF: 4.6, hemi: 0x7fe6c0, sun: 0x9effd4, aurora: [0.22, 0.85, 0.58] },
     acida: { tint: [0.44, 0.56, 0.28], mix: 0.62, fogN: 0.65, fogF: 2.4, hemi: 0xa8c878, sun: 0xd4e68a, drop: [0.6, 0.9, 0.3], vz: -175, vx: 6, rate: 1, burst: 5, life: 1.2 },
   };
-  const _cc = new THREE.Color();
+  const _cc = new THREE.Color(); const _bgC = new THREE.Color(); /* 4.3i: cor do fundo reaproveitada (antes um objeto novo por quadro) */
   R.setClimate = function (name) { const c = CLIMATES[name] || null; const changed = R.climateCfg !== c; R.climateCfg = c; if (changed && R.envSky) skyEnv(c); if (!c) { scene.fog.near = 1500; scene.fog.far = 3200; } hemi.color.set(c ? c.hemi : 0x9fb8d6); };
   function spark(x, y, z, col, sp, g) { if (FX) { FX.spark(x, H(x, y) + z, -y, [col[0] * 1.5, col[1] * 1.4, col[2] * 1.3], sp, 1); return; } const i = SP.i++ % SN; const a = Math.random() * TAU; SP.x[i] = x; SP.y[i] = y; SP.z[i] = z; SP.vx[i] = Math.cos(a) * sp * Math.random(); SP.vy[i] = Math.sin(a) * sp * Math.random(); SP.vz[i] = sp * (0.4 + Math.random() * 0.8); SP.t[i] = 0; SP.life[i] = 0.4 + Math.random() * 0.6; sCol[i * 3] = col[0]; sCol[i * 3 + 1] = col[1]; sCol[i * 3 + 2] = col[2]; }
   const boomGeo = new THREE.SphereGeometry(1, 10, 8); const boomMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 1.5, 0.8), transparent: true, opacity: 0.8, depthWrite: false }); const booms = new THREE.InstancedMesh(boomGeo, boomMat, 48); booms.count = 0; booms.frustumCulled = false; scene.add(booms); const boomList = [];
@@ -621,7 +645,15 @@ function create(canvas, overlay, mini) {
   }
 
   // ---------- quadro ----------
+  /* 4.3i: tempo de GPU por quadro (EXT_disjoint_timer_query_webgl2, quando o navegador oferece), ligado só pelo teste de desempenho; e a lista de shaders compilados */
+  const GT = { ext: null, on: false, q: [], free: [], ms: [] };
+  R.gpuTimer = function (on) { if (on && !GT.ext) { try { GT.ext = renderer.getContext().getExtension('EXT_disjoint_timer_query_webgl2'); } catch (err) { GT.ext = null; } } GT.on = !!(on && GT.ext); GT.ms.length = 0; return GT.on; };
+  R.gpuMs = () => GT.ms; R.progs = () => (renderer.info.programs ? renderer.info.programs.length : 0); R.progNames = () => (renderer.info.programs || []).map(p => (p.name || '') + ':' + String(p.cacheKey || '').slice(0, 90)); R.progMats = () => { const out = []; scene.traverse(o => { const ms = o.material ? (Array.isArray(o.material) ? o.material : [o.material]) : []; for (const m of ms) { const pp = renderer.properties.get(m); const pr = pp && pp.currentProgram; if (pr) out.push(pr.id + ' ' + m.type + (m.name ? '(' + m.name + ')' : '') + ' ' + o.type + (o.name ? '(' + o.name + ')' : '') + ' ro' + o.renderOrder + ' vis' + (o.visible ? 1 : 0) + ' key=' + (m.customProgramCacheKey ? String(m.customProgramCacheKey()).slice(0, 40) : '') + ' attrs=' + (o.geometry ? Object.keys(o.geometry.attributes).map(k => k + (o.geometry.attributes[k].itemSize)).join('.') : '') + ' fc' + (o.frustumCulled ? 1 : 0) + ' pai=' + (o.parent ? (o.parent.name || o.parent.type) : '')); } }); return out; }; R.progIdList = () => (renderer.info.programs || []).map(p => p.id); R.progKeys = () => (renderer.info.programs || []).map(p => [p.id, String(p.cacheKey || "")]); /* 4.3i: diagnóstico: que material usa cada programa */
+  function gtBegin() { if (!GT.on) return null; const gl = renderer.getContext(); const q = GT.free.pop() || gl.createQuery(); gl.beginQuery(GT.ext.TIME_ELAPSED_EXT, q); return q; }
+  function gtEnd(q) { if (!q) return; const gl = renderer.getContext(); gl.endQuery(GT.ext.TIME_ELAPSED_EXT); GT.q.push(q); const dj = gl.getParameter(GT.ext.GPU_DISJOINT_EXT);
+    while (GT.q.length) { const q0 = GT.q[0]; if (!gl.getQueryParameter(q0, gl.QUERY_RESULT_AVAILABLE)) break; GT.q.shift(); if (!dj && GT.ms.length < 20000) GT.ms.push(gl.getQueryParameter(q0, gl.QUERY_RESULT) / 1e6); GT.free.push(q0); } }
   R.draw = function (sim, view, alpha, dt) {
+    const gq = gtBegin(); /* 4.3i */
     if (R.fixedDt != null) dt = R.fixedDt; /* 4.3g: ferramentas de teste avançam o tempo do efeito em passos fixos */
     if (R.measureGL) { renderer.info.autoReset = false; renderer.info.reset(); }
     R.sim = sim; R.time += dt; R.revealAll = !!view.reveal; updateFx(dt); if (R.terrShader) R.terrShader.uniforms.uCloudT.value = R.time; if (terrU) terrU.uTime.value = R.time; /* 4.3c */
@@ -631,7 +663,7 @@ function create(canvas, overlay, mini) {
     updateCamera(cam);
     // dia e noite
     const nt = R.night; for (const m of envMats) m.envMapIntensity = m.userData.env * (1 - 0.72 * nt); if (R.envK0 == null) R.envK0 = scene.environmentIntensity; scene.environmentIntensity = R.envK0 * (1 - 0.72 * nt); /* 4.3h: no r186 o material sem mapa próprio usa a intensidade da cena; sem isto a noite seguia iluminada pelo céu de dia */ const LK = R.lightK; sun.intensity = (1.6 * (1 - nt) + 0.55 * nt) * LK.sun; sun.color.setRGB(1 - 0.48 * nt, 0.91 - 0.24 * nt, 0.77 + 0.2 * nt); hemi.intensity = (0.55 * (1 - nt) + 0.42 * nt) * LK.hemi + lightning * 0.5; amb.intensity = (0.22 * (1 - nt) + 0.26 * nt) * LK.amb + lightning * 0.6; // 4.1a: lua azulada; a noite fica escura mas jogável
-    const bg = new THREE.Color().setRGB(0.62 * (1 - nt) + 0.07 * nt, 0.69 * (1 - nt) + 0.09 * nt, 0.77 * (1 - nt) + 0.16 * nt);
+    const bg = _bgC.setRGB(0.62 * (1 - nt) + 0.07 * nt, 0.69 * (1 - nt) + 0.09 * nt, 0.77 * (1 - nt) + 0.16 * nt);
     const cl = R.climateCfg;
     if (cl) {
       const camD = (R.camDist || CAM.baseDist / Math.max(0.3, cam.zoom)); scene.fog.near = camD * cl.fogN; scene.fog.far = camD * cl.fogF;
@@ -657,6 +689,7 @@ function create(canvas, overlay, mini) {
     if (R.terrShader && R.terrShader.uniforms.uCloudK) R.terrShader.uniforms.uCloudK.value = atmoFx ? 0 : 1;
     if (sky) { const u = sky.userData.mat.uniforms; u.uHor.value.copy(atmoFx ? atmoFx.U.uAtFar.value : bg); u.uTop.value.copy(bg).multiplyScalar(0.55).lerp(_cc.setRGB(0.12, 0.2, 0.36), 0.5 * (1 - nt)); u.uBot.value.copy(bg).multiplyScalar(0.4); u.uNight.value = nt; u.uTime.value = R.time; u.uSunDir.value.set(R.sunDir[0], R.sunDir[1], R.sunDir[2]).normalize(); u.uSunCol.value.copy(sun.color); }
     // névoa de guerra e território → texturas do terreno
+    if (sim.tick !== fogTick || !!view.reveal !== fogRev || sim !== fogSim) { fogTick = sim.tick; fogRev = !!view.reveal; fogSim = sim; /* 4.3i: a névoa e o território mudam só no passo da simulação (10 por segundo): antes eram refeitos e enviados à GPU a cada quadro */
     for (let iy = 0; iy < FOGN; iy++) for (let ix = 0; ix < FOGN; ix++) { const i = (iy * FOGN + ix) * 4; const tx = (ix * FOGC / TILE) | 0, ty = (iy * FOGC / TILE) | 0; const ex = view.reveal || explored[ty * TILES + tx]; fogData[i] = ex ? 110 : 0; fogData[i + 3] = 255; }
     if (!view.reveal) for (const e of sim.ents) { if (!e.alive || e.owner !== human || (e.kind !== 'unit' && e.kind !== 'building')) continue; const r = S.sensorRadius(sim, e); const x0 = Math.max(0, ((e.x - r) / FOGC) | 0), x1 = Math.min(FOGN - 1, ((e.x + r) / FOGC) | 0), y0 = Math.max(0, ((e.y - r) / FOGC) | 0), y1 = Math.min(FOGN - 1, ((e.y + r) / FOGC) | 0); for (let iy = y0; iy <= y1; iy++) for (let ix = x0; ix <= x1; ix++) { const d = Math.hypot((ix + 0.5) * FOGC - e.x, (iy + 0.5) * FOGC - e.y); if (d <= r) { const i = (iy * FOGN + ix) * 4; const v = d > r * 0.75 ? 110 + 145 * (1 - (d - r * 0.75) / (r * 0.25)) : 255; if (v > fogData[i]) fogData[i] = v; } } }
     else fogData.fill(255);
@@ -664,6 +697,7 @@ function create(canvas, overlay, mini) {
     terrData.fill(0);
     for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || !e.built) continue; const t = S.territoryOf(sim, e); if (!t) continue; if (e.owner !== human && !vis.has(e.id) && !view.memory.has(e.id)) continue; const col = hexToRgb(sim.players[e.owner].color); const x0 = Math.max(0, ((e.x - t) / TILE) | 0), x1 = Math.min(TILES - 1, ((e.x + t) / TILE) | 0), y0 = Math.max(0, ((e.y - t) / TILE) | 0), y1 = Math.min(TILES - 1, ((e.y + t) / TILE) | 0); for (let iy = y0; iy <= y1; iy++) for (let ix = x0; ix <= x1; ix++) { if (Math.hypot((ix + 0.5) * TILE - e.x, (iy + 0.5) * TILE - e.y) <= t) { const i = (iy * TILES + ix) * 4; terrData[i] = col[0]; terrData[i + 1] = col[1]; terrData[i + 2] = col[2]; terrData[i + 3] = 255; } } }
     terrTex.needsUpdate = true;
+    }
     // instâncias
     for (const it of R.inst.values()) it.n = 0;
     _frus.setFromProjectionMatrix(_pmF.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse)); /* 4.3a: só desenha unidades e estruturas que a câmera vê (com margem para as sombras); os modelos ficaram pesados */
@@ -783,7 +817,8 @@ function create(canvas, overlay, mini) {
     if (OBRA_ON) obraEnd();
     if (CB) CB.frame(dt, R.time, camera); /* 4.3g */
     shields.count = nShield; shields.instanceMatrix.needsUpdate = true; if (shields.instanceColor) shields.instanceColor.needsUpdate = true;
-    for (const it of R.inst.values()) { if (it.anim && it.n) { it.ia.needsUpdate = true; it.ic.needsUpdate = true; } it.main.count = it.n; it.main.instanceMatrix.needsUpdate = true; if (it.main.instanceColor) it.main.instanceColor.needsUpdate = true; if (it.em) { it.em.count = it.n; it.em.instanceMatrix.needsUpdate = true; if (it.em.instanceColor) it.em.instanceColor.needsUpdate = true; } }
+    for (const it of R.inst.values()) { const n = it.n, on = n > 0 || !!R.warming; it.main.visible = on; it.main.count = n; if (it.em) { it.em.visible = on; it.em.count = n; } if (!n) continue; /* 4.3i: malha sem instância fica fora do desenho (sem troca de programa nem envio de buffer, também na sombra) e só a parte usada dos buffers sobe para a GPU */
+      upl(it.main.instanceMatrix, n * 16); if (it.main.instanceColor) upl(it.main.instanceColor, n * 3); if (it.em) { upl(it.em.instanceMatrix, n * 16); if (it.em.instanceColor) upl(it.em.instanceColor, n * 3); } if (it.anim) { upl(it.ia, n * 4); upl(it.ic, n); } }
     mineBeams.count = nMine; mineBeams.instanceMatrix.needsUpdate = true; if (mineBeams.instanceColor) mineBeams.instanceColor.needsUpdate = true; /* 4.3a */
     nodeGlow.count = nGlow; nodeGlow.instanceMatrix.needsUpdate = true; if (nodeGlow.instanceColor) nodeGlow.instanceColor.needsUpdate = true; // 4.2h
     selRings.count = nSel; selRings.instanceMatrix.needsUpdate = true; vetRings.count = nVet; vetRings.instanceMatrix.needsUpdate = true; rangeRings.count = nRange; rangeRings.instanceMatrix.needsUpdate = true; shells.count = nShell; shells.instanceMatrix.needsUpdate = true;
@@ -800,11 +835,12 @@ function create(canvas, overlay, mini) {
     flashRender(cam); /* 4.3g */
     if (atmoFx) { atmoFx.U.uAtProjInv.value.copy(camera.projectionMatrixInverse); atmoFx.U.uAtCamWorld.value.copy(camera.matrixWorld); } /* 4.3b */
     if (composer) { composer.render(dt); } else renderer.render(scene, camera);
+    gtEnd(gq); /* 4.3i */
     if (R.measureGL) R.lastGL = { calls: renderer.info.render.calls, tris: renderer.info.render.triangles };
     if (R.testBlack && R.quality.ssao) { const pc = renderer.getClearColor(new THREE.Color()), pa = renderer.getClearAlpha(); renderer.setClearColor(0x000000, 1); renderer.clear(true, false, false); renderer.setClearColor(pc, pa); } // ?testblack=1: simula falha da GPU enquanto o SSAO está ligado
     checkFrame();
     drawOverlay(sim, view, hpList, me);
-    drawMinimap(sim, view);
+    if ((R.miniN = (R.miniN || 0) + 1) % 2 === 0 || R.warming) drawMinimap(sim, view); /* 4.3i: o radar redesenha a 30 por segundo (era a cada quadro) */
   };
   function ring(n, x, y, r) { if (n >= 256) return n; _p.set(x, H(x, y) + 0.7, -y); _s.set(r, 1, r); _q.identity(); _m.compose(_p, _q, _s); selRings.setMatrixAt(n, _m); return n + 1; }
   function drawOverlay(sim, view, hpList, me) {
