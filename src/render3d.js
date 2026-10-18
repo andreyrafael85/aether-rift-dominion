@@ -444,6 +444,7 @@ function create(canvas, overlay, mini) {
     if (sky) sky.position.copy(camera.position); if (home) { home.position.set(camera.position.x - 0.36 * 4200, camera.position.y * 0.15 + 4200 * 0.06, camera.position.z - 0.93 * 4200); }
     sun.position.set(cam.x + R.sunDir[0], ty + R.sunDir[1], -cam.y + R.sunDir[2]); sun.target.position.set(cam.x, ty, -cam.y); sun.target.updateMatrixWorld();
     const sc = sun.shadow.camera; const ext = Math.min(900, d * (1.1 + 1.6 * (1 - Math.sin(pitch)))); sc.left = -ext; sc.right = ext; sc.top = ext; sc.bottom = -ext; sc.near = 100; sc.far = 2200; sc.updateProjectionMatrix();
+    if (R.photo && R.photo.on) R.photo.place(camera, sun, sky, home); /* 4.3j: Modo Foto — câmera livre, céu e sombra em volta do ponto da órbita */
   }
   R.shakeX = 0; R.shakeY = 0;
   R.setBeacon = function (pt) { R.beaconPt = pt || null; }; // 4.0e: farol do ponto de extração da missão
@@ -654,15 +655,17 @@ function create(canvas, overlay, mini) {
     while (GT.q.length) { const q0 = GT.q[0]; if (!gl.getQueryParameter(q0, gl.QUERY_RESULT_AVAILABLE)) break; GT.q.shift(); if (!dj && GT.ms.length < 20000) GT.ms.push(gl.getQueryParameter(q0, gl.QUERY_RESULT) / 1e6); GT.free.push(q0); } }
   R.draw = function (sim, view, alpha, dt) {
     const gq = gtBegin(); /* 4.3i */
+    const PH = R.photo && R.photo.on ? R.photo.frame(dt) : null; if (PH) { view = PH.view; dt = PH.dt; } /* 4.3j: Modo Foto — vista sem HUD com a câmera do foto; dt dos efeitos (0 congelado, ¼ lento) */
     if (R.fixedDt != null) dt = R.fixedDt; /* 4.3g: ferramentas de teste avançam o tempo do efeito em passos fixos */
     if (R.measureGL) { renderer.info.autoReset = false; renderer.info.reset(); }
     R.sim = sim; R.time += dt; R.revealAll = !!view.reveal; updateFx(dt); if (R.terrShader) R.terrShader.uniforms.uCloudT.value = R.time; if (terrU) terrU.uTime.value = R.time; /* 4.3c */
     const cam = view.cam, human = view.human, me = sim.players[human]; const sqB = Math.max(1, Math.min(1.4, 1 + (2.4 - (cam.zoom || 1)) * 0.22)); /* 4.3e: de longe as figuras da infantaria crescem até 1,3–1,4× para o esquadrão continuar legível; de perto ficam na escala real */ const vis = view.reveal ? { has: () => true } : sim.vis[human]; const explored = sim.explored[human];
-    R.night = R.forceDay ? 0 : (1 - Math.cos(TAU * sim.time / 750)) / 2;
+    R.night = PH && PH.night != null ? PH.night : R.forceDay ? 0 : (1 - Math.cos(TAU * sim.time / 750)) / 2; /* 4.3j: hora do dia do Modo Foto (só no visual) */
     R.shakeX = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0; R.shakeY = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0;
     updateCamera(cam);
     // dia e noite
     const nt = R.night; for (const m of envMats) m.envMapIntensity = m.userData.env * (1 - 0.72 * nt); if (R.envK0 == null) R.envK0 = scene.environmentIntensity; scene.environmentIntensity = R.envK0 * (1 - 0.72 * nt); /* 4.3h: no r186 o material sem mapa próprio usa a intensidade da cena; sem isto a noite seguia iluminada pelo céu de dia */ const LK = R.lightK; sun.intensity = (1.6 * (1 - nt) + 0.55 * nt) * LK.sun; sun.color.setRGB(1 - 0.48 * nt, 0.91 - 0.24 * nt, 0.77 + 0.2 * nt); hemi.intensity = (0.55 * (1 - nt) + 0.42 * nt) * LK.hemi + lightning * 0.5; amb.intensity = (0.22 * (1 - nt) + 0.26 * nt) * LK.amb + lightning * 0.6; // 4.1a: lua azulada; a noite fica escura mas jogável
+    if (PH && PH.light) PH.light(sun, hemi, amb); /* 4.3j: entardecer dourado do Modo Foto */
     const bg = _bgC.setRGB(0.62 * (1 - nt) + 0.07 * nt, 0.69 * (1 - nt) + 0.09 * nt, 0.77 * (1 - nt) + 0.16 * nt);
     const cl = R.climateCfg;
     if (cl) {
@@ -821,6 +824,7 @@ function create(canvas, overlay, mini) {
       upl(it.main.instanceMatrix, n * 16); if (it.main.instanceColor) upl(it.main.instanceColor, n * 3); if (it.em) { upl(it.em.instanceMatrix, n * 16); if (it.em.instanceColor) upl(it.em.instanceColor, n * 3); } if (it.anim) { upl(it.ia, n * 4); upl(it.ic, n); } }
     mineBeams.count = nMine; mineBeams.instanceMatrix.needsUpdate = true; if (mineBeams.instanceColor) mineBeams.instanceColor.needsUpdate = true; /* 4.3a */
     nodeGlow.count = nGlow; nodeGlow.instanceMatrix.needsUpdate = true; if (nodeGlow.instanceColor) nodeGlow.instanceColor.needsUpdate = true; // 4.2h
+    if (PH) { nSel = 0; nRange = 0; nVet = 0; if (R.beaconMesh) R.beaconMesh.visible = false; } /* 4.3j: fotos sem anéis de seleção, de alcance e de veterano nem farol da missão */
     selRings.count = nSel; selRings.instanceMatrix.needsUpdate = true; vetRings.count = nVet; vetRings.instanceMatrix.needsUpdate = true; rangeRings.count = nRange; rangeRings.instanceMatrix.needsUpdate = true; shells.count = nShell; shells.instanceMatrix.needsUpdate = true;
     for (let i = nBul * 6; i < BL * 6; i++) blPos[i] = -9999; blGeo.attributes.position.needsUpdate = true; blGeo.setDrawRange(0, nBul * 2);
     // luzes pontuais: as mais próximas da câmera, à noite
@@ -834,13 +838,12 @@ function create(canvas, overlay, mini) {
     if (FX) FX.update(R.time, camera);
     flashRender(cam); /* 4.3g */
     if (atmoFx) { atmoFx.U.uAtProjInv.value.copy(camera.projectionMatrixInverse); atmoFx.U.uAtCamWorld.value.copy(camera.matrixWorld); } /* 4.3b */
-    if (composer) { composer.render(dt); } else renderer.render(scene, camera);
+    if (PH) PH.render(composer, scene, camera, renderer, dt); /* 4.3j: Modo Foto — desfoque, filtro e captura */ else if (composer) { composer.render(dt); } else renderer.render(scene, camera);
     gtEnd(gq); /* 4.3i */
     if (R.measureGL) R.lastGL = { calls: renderer.info.render.calls, tris: renderer.info.render.triangles };
     if (R.testBlack && R.quality.ssao) { const pc = renderer.getClearColor(new THREE.Color()), pa = renderer.getClearAlpha(); renderer.setClearColor(0x000000, 1); renderer.clear(true, false, false); renderer.setClearColor(pc, pa); } // ?testblack=1: simula falha da GPU enquanto o SSAO está ligado
     checkFrame();
-    drawOverlay(sim, view, hpList, me);
-    if ((R.miniN = (R.miniN || 0) + 1) % 2 === 0 || R.warming) drawMinimap(sim, view); /* 4.3i: o radar redesenha a 30 por segundo (era a cada quadro) */
+    if (!PH) { drawOverlay(sim, view, hpList, me); if ((R.miniN = (R.miniN || 0) + 1) % 2 === 0 || R.warming) drawMinimap(sim, view); } /* 4.3i: o radar redesenha a 30 por segundo (era a cada quadro); 4.3j: sem barras de vida, avisos e radar no Modo Foto */
   };
   function ring(n, x, y, r) { if (n >= 256) return n; _p.set(x, H(x, y) + 0.7, -y); _s.set(r, 1, r); _q.identity(); _m.compose(_p, _q, _s); selRings.setMatrixAt(n, _m); return n + 1; }
   function drawOverlay(sim, view, hpList, me) {

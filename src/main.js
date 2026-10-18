@@ -17,7 +17,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.3i';
+const VERSION = '4.3j';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -309,6 +309,7 @@ function startGame(cfg, netCtx) {
   const ais = cfg.resume ? cfg.resume.ais.map(ARD.ai.restore) : sim.players.filter(p => (!p.human && !(players[p.id] && players[p.id].passive)) || (!netCtx && params.get('ia') === 'todos')).filter(() => !cfg.bench).map(p => ARD.ai.create(p.id, p.difficulty)); // 4.2a: no teste ninguém pensa por cima do roteiro da batalha // ?ia=todos: a IA joga também pelo humano (capturas e testes)
   G = { lead3d: window.__lead3d || null, sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null, net, pending: [], waiting: false, waitT: 0 };
   if (params.get('debug')) window.__ARDG = G; // testes automatizados
+  G.photo = ARD.photo3d && R.is3d ? ARD.photo3d.create({ G, R, view, I, ui, net, canvas, isTouch }) : null; /* 4.3j: Modo Foto (botão 📷 e tecla J; só no 3D) */
   G.track = ARD.campUI ? ARD.campUI.tracker(sim, human) : null; // conquistas valem em qualquer partida
   if (G.lead3d) { let lastG = 0; window.addEventListener('pointermove', ev => { const now = performance.now(); if (now - lastG < 120 || !G.lead3d || ev.pointerType === 'touch') return; lastG = now; ARD.leaders3d.gaze(G.lead3d, (ev.clientX - 80) / Math.max(400, innerWidth * 0.6), -(ev.clientY - 110) / Math.max(300, innerHeight * 0.6), 1200); }, { passive: true }); $('leader').addEventListener('click', () => { if (G.lead3d) { ARD.leaders3d.mood(G.lead3d, 3, 1600); ARD.leaders3d.react(G.lead3d, 'nod'); ARD.leaders3d.react(G.lead3d, 'talk', 0.9); } }); } // 4.1e: o líder olha para onde você aponta; clicar nele arranca um aceno
   if (cfg.resume && G.track && G.track.load) G.track.load(cfg.resume.track);
