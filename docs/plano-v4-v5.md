@@ -1,7 +1,9 @@
-# Aether Rift: Dominion — Plano Diretor v4.0 e v5.0
+# Aether Rift: Dominion — Plano Diretor v4.0 e v6.0
+
+> **Numeração nova (18/10/2026, decisão do dono):** a antiga v5.0 (contas, relé, ranking, temporadas, social e loja) passou a ser a **v6.0**, pensada para escalar com servidores. A **v5.0 "Além da Fenda"** é o salto visual e de jogo descrito em `docs/plano-v5.md`. Neste documento, toda menção à v5.0 antiga já está como v6.0.
 
 Data: 2026-10-10 · Base real: Beta 3.0d (commit 8847dec) · Autoria: direção técnica do projeto
-Público: arte, design, narrativa e engenharia. Este documento é a referência única das versões 4.0 e 5.0.
+Público: arte, design, narrativa e engenharia. Este documento é a referência das versões 4.x e 6.0; a v5.0 está em docs/plano-v5.md.
 
 ---
 
@@ -12,11 +14,11 @@ O briefing está correto na direção e foi adotado quase integralmente. Pontos 
 1. **"Raça" substitui "Facção" em toda a superfície do jogo** (UI, textos, páginas, docs). No código, a chave interna `faction` permanece até a 4.0b: ela participa do protocolo de rede versionado e do estado determinístico; renomear junto com a entrada das novas Raças evita duas quebras de compatibilidade.
 2. **Estilizado, não fotorrealista — e voxel continua sendo a identidade.** Subsurface scattering, refração e materiais complexos entram como aproximações baratas (wrap lighting, matcap, fresnel falso, bloom já existente), não como técnicas físicas. Em WebGL2 mobile, PBR completo custaria o frame budget inteiro.
 3. **WebGPU é aprimoramento progressivo, não base.** WebGL2 (Three.js atual) é o piso de compatibilidade; WebGPU entra como renderer opcional quando o Three.js estabilizar o backend para o nosso caso (instancing massivo).
-4. **Progressão que dá poder vale para Campanha e partidas contra IA. No PvP ranqueado, nível dá apenas cosméticos e títulos.** Decisão inegociável de fair play: lockstep determinístico com perks assimétricos por nível criaria pay-to-grind e quebraria o ranking da v5.0.
-5. **Marketplace fica para a v5.5+, somente cosméticos, com ledger imutável.** Antes de inventário com valor, é preciso conta, temporada e moderação funcionando.
-6. **A v4.0 não tem servidor**, então a progressão é local (ProgressStore v1 em localStorage + código de exportação), já no formato que a conta da v5.0 importa automaticamente.
+4. **Progressão que dá poder vale para Campanha e partidas contra IA. No PvP ranqueado, nível dá apenas cosméticos e títulos.** Decisão inegociável de fair play: lockstep determinístico com perks assimétricos por nível criaria pay-to-grind e quebraria o ranking da v6.0.
+5. **Marketplace fica para a v6.5+, somente cosméticos, com ledger imutável.** Antes de inventário com valor, é preciso conta, temporada e moderação funcionando.
+6. **A v4.0 não tem servidor**, então a progressão é local (ProgressStore v1 em localStorage + código de exportação), já no formato que a conta da v6.0 importa automaticamente.
 7. **As 2 Raças novas são o maior custo da v4.0**: entram no sim determinístico, na contra-tabela de armas, na IA e no teste de determinismo entre motores (`tools/det-test.cjs`). O balanceamento usa self-play automatizado (IA x IA headless), não achismo.
-8. **LGPD desde o design na v5.0**: dados mínimos, consentimento explícito, exclusão de conta, Argon2id para senhas, verificação de e-mail.
+8. **LGPD desde o design na v6.0**: dados mínimos, consentimento explícito, exclusão de conta, Argon2id para senhas, verificação de e-mail.
 
 ---
 
@@ -134,12 +136,12 @@ Regra de ouro: cada técnica nova no renderizador da galeria vira um módulo do 
 
 **Progressão**: XP por missão e por estrelas (até 3: objetivo principal + 2 bônus). Nível de Comandante 1–30. Recompensas: passivas por Raça (PvE, fichas acima), módulos de construção, variantes de unidade (sidegrades), cosméticos, **Relíquias** (modificadores de campanha equipáveis, 2 slots, ex.: "Âncora de Órbita: superarma recarrega 30% mais rápido, −10% de energia"). **Conquistas permanentes** (ex.: "Núcleo intacto", "Vitória só com infantaria", "Pacifista até o minuto 10").
 
-**Persistência**: ProgressStore v1 (localStorage + código de exportação/backup). A v5.0 importa esse formato na criação da conta.
+**Persistência**: ProgressStore v1 (localStorage + código de exportação/backup). A v6.0 importa esse formato na criação da conta.
 
 ## 5. Sistema de personalização 3D
 
 - **v4.0 (local)**: cor primária/secundária do jogador; skin de Núcleo (3 por Raça); emblema/decalque; retrato de líder (3 variantes voxel por Raça); bioma e clima da base (presets da seção 2); títulos de conquista. Tela **Hangar**: viewer 3D girável (renderer existente) com as escolhas aplicadas em tempo real.
-- **v5.0 (conta)**: inventário server-side, raridades, itens de temporada, presentes; nada que afete poder em PvP.
+- **v6.0 (conta)**: inventário server-side, raridades, itens de temporada, presentes; nada que afete poder em PvP.
 
 ## 6. Diretrizes mobile-first
 
@@ -149,7 +151,7 @@ Regra de ouro: cada técnica nova no renderizador da galeria vira um módulo do 
 - **PWA**: manifest + service worker (solo offline); aviso claro de que multiplayer exige rede; haptics leves em eventos-chave.
 - **Ciclo de vida**: aba em segundo plano pausa o solo e avisa a sala no multiplayer (limite atual documentado).
 
-## 7. v5.0 — contas, ranking e infraestrutura persistente
+## 7. v6.0 (antiga v5.0) — contas, ranking e infraestrutura persistente
 
 **Princípio: evoluir, não reescrever.** O cliente do jogo continua estático em CDN. O meta-portal (conta, ranking, loja) nasce separado (Next.js ou equivalente) consumindo APIs.
 
@@ -160,12 +162,12 @@ Regra de ouro: cada técnica nova no renderizador da galeria vira um módulo do 
 - **Dados**: PostgreSQL (contas, progresso, rating, temporadas, ledger), Redis (sessões, filas de matchmaking), objeto/S3 (replays).
 - **Infra**: Docker; começar em 1 provedor gerenciado (Fly/Render/VPS) com 3 containers (api, relé, portal); Kubernetes apenas quando a escala exigir; CDN Cloudflare; observabilidade com OneAgent/Grail desde o dia 1.
 - **Segurança/LGPD**: dados mínimos, consentimento, exclusão de conta self-service, rate limiting, logs de auditoria.
-- **Marketplace (v5.5+)**: somente cosméticos, ledger append-only, sem dinheiro real no lançamento.
-- **Roadmap**: 5.0a contas+perfil+importação · 5.0b relé+replays · 5.0c ranking+temporadas · 5.0d social (amigos, Discord, espectador) · 5.0e loja cosmética.
+- **Marketplace (v6.5+)**: somente cosméticos, ledger append-only, sem dinheiro real no lançamento.
+- **Roadmap**: 6.0a contas+perfil+importação · 6.0b relé+replays na nuvem (os replays locais chegam antes, na 5.0i) · 6.0c ranking+temporadas (com placar global do Desafio da Semana e do modo Caçada da v5.0) · 6.0d social (amigos, Discord, espectador) · 6.0e loja cosmética.
 
 ## 8. Comparativo de evolução
 
-| Dimensão | v3.0 (hoje) | v4.0 | v5.0 |
+| Dimensão | v3.0 | v4.0 | v6.0 |
 |---|---|---|---|
 | Identidade | 3 "facções" | **5 Raças**, termo "facção" eliminado | idem + títulos/temporadas |
 | Visual | voxel 3D, bloom, presets | materiais por Raça, nascimento de construção, clima local | idem + cosméticos de conta |
@@ -174,7 +176,7 @@ Regra de ouro: cada técnica nova no renderizador da galeria vira um módulo do 
 | Multiplayer | P2P 2–4, host-relé, determinístico | idem + polimento (reconexão básica) | relé autoritativo, replays, ranked |
 | Contas | — | — | e-mail/usuário, 2FA, LGPD |
 | Ranking | — | — | Glicko-2 global e por Raça |
-| Monetização | — | — | v5.5+: cosméticos |
+| Monetização | — | — | v6.5+: cosméticos |
 | Infra | GitHub Pages | Pages + PWA | CDN + api + relé + Postgres/Redis |
 
 ## 9. Prioridades de implementação
@@ -219,11 +221,13 @@ Regra de ouro: cada técnica nova no renderizador da galeria vira um módulo do 
   - **4.3l — Alta definição e menus** ✔ (pedida em 2026-10-18 depois dos testes do dono na RTX, no Firefox e no iPhone: fundo da tela inicial com antialias, densidade real até 2x, nebulosa de 1024 px e planetas de 1024/512 px gerados num Web Worker; carregamento com arte nova de 2560×1440 em WebP por URL (fora do bundle); molduras por Raça no HUD; barra de cima como painel de instrumentos; Construir com abas, retrato 3D grande e painel de detalhes; ícones 3D em 192 px; gaveta recolhível no celular (alta, toque e deslize; recolhe ao posicionar); shaders criados de uma vez com renderer.compileAsync num alvo de 1×1 (mesmos 77 programas; ver docs/avaliacao-stack-3d.md §6.8); qualidade automática sobe um degrau com folga.)
   - **4.3k — Tela inicial e interface** ✔ (pedida em 2026-10-18; 1 agente: linguagem "Comando da Fenda" com placas chanfradas, quinas acesas e trilho na cor da Raça por `<html data-race>`; src/ui-fx.js (fundo vivo do Grande Alinhamento em WebGL próprio, sem WebGL antes do load e estático na GPU por software) e src/ui-start.js (vitrine da Raça com busto 3D, insígnia vetorial, mundo natal, estilo e unidades-símbolo; teclas 1–5); controles segmentados e cartões de mapa desenhados sobre os `<select>` de sempre; HUD com ícones SVG próprios, radar com bisel, cartões de comando com ícone 3D, alertas por tipo, faixa de evento e carregamento com o mundo da Raça; toque com 44 px; sem backdrop-filter e o HUD só escreve no DOM quando um valor muda (7,3 → 0,67 mutações por quadro); 55 comparativos antes e depois.)
 
-**Preparação para a v5.0 dentro da v4.0**: interface ProgressStore (local hoje, conta amanhã); IDs estáveis de itens/conquistas; log de comandos por partida (replay local); protocolo de rede versionado (feito na 3.0d); separação meta/jogo na estrutura de páginas.
+- **v5.0 — "Além da Fenda"** (planejada em 18/10/2026 depois da 4.3l; detalhes, validação da pesquisa e chefões em docs/plano-v5.md): Onda 1 Primeiro impacto (5.0a Céu, clima e nuvens de guerra · 5.0b Sala de Comando), Onda 2 Vida e som (5.0c Bases e unidades vivas · 5.0d Som e cinema), Onda 3 Ameaças maiores (5.0e Chefões · 5.0f Inteligência e mundo), Onda 4 Além da Fenda (5.0g Campanha 2 · 5.0h Mundos novos · 5.0i Replays e relatório) e a trilha contínua de desempenho com o 5.0j Laboratório WebGPU.
+
+**Preparação para a v6.0 dentro da v4.0**: interface ProgressStore (local hoje, conta amanhã); IDs estáveis de itens/conquistas; log de comandos por partida (replay local); protocolo de rede versionado (feito na 3.0d); separação meta/jogo na estrutura de páginas.
 
 **Riscos**: (1) escopo das 2 Raças novas — mitigado por mapear para sistemas existentes; (2) arte voxel em volume — mitigado por geração procedural por código já praticada; (3) performance mobile com 5 paletas de materiais — mitigado pelo orçamento de draw calls e LOD; (4) balanceamento 5 Raças — mitigado por self-play headless automatizado.
 
 ---
 
 ### Mapa de entregáveis do briefing → seções
-1. Cinco Raças completas → §1 · 2. Modo História → §4 · 3. Homepage + rodapé → §3 · 4. Personalização 3D → §5 · 5. Mobile-first → §6 · 6. Arquitetura e roadmap v5.0 → §7 · 7. Comparativo → §8 · 8. Prioridades → §9 · Análise crítica → §0.
+1. Cinco Raças completas → §1 · 2. Modo História → §4 · 3. Homepage + rodapé → §3 · 4. Personalização 3D → §5 · 5. Mobile-first → §6 · 6. Arquitetura e roadmap v6.0 → §7 · 7. Comparativo → §8 · 8. Prioridades → §9 · Análise crítica → §0.
