@@ -3,13 +3,17 @@
    4.3b: as versões ficam aqui e em src/index.tpl.html (importmap); trocar a versão apaga a pasta antiga do pacote. */
 import { writeFileSync, mkdirSync, existsSync, readFileSync, rmSync } from 'node:fs';
 import { dirname } from 'node:path';
-export const VERSIONS = { three: '0.186.1', postprocessing: '6.39.5', n8ao: '2.0.1' };
+export const VERSIONS = { three: '0.186.1', postprocessing: '6.39.5', n8ao: '2.0.1', gsap: '3.15.0' };
 const PKGS = {
   three: ['build/three.module.min.js', 'build/three.core.min.js', /* o importmap troca three.core.js por este */ 'examples/jsm/postprocessing/EffectComposer.js', 'examples/jsm/postprocessing/RenderPass.js',
     'examples/jsm/postprocessing/UnrealBloomPass.js', 'examples/jsm/postprocessing/OutputPass.js', 'examples/jsm/postprocessing/SSAOPass.js',
-    'examples/jsm/postprocessing/ShaderPass.js', 'examples/jsm/postprocessing/Pass.js', 'examples/jsm/environments/RoomEnvironment.js'],
+    'examples/jsm/postprocessing/ShaderPass.js', 'examples/jsm/postprocessing/Pass.js', 'examples/jsm/environments/RoomEnvironment.js',
+    /* 5.0: Motor 5 (WebGPURenderer + TSL) e os nós de pós, sombras em cascata e céu físico */
+    'build/three.webgpu.js', 'build/three.tsl.js', 'examples/jsm/csm/CSMShadowNode.js', 'examples/jsm/objects/SkyMesh.js', 'examples/jsm/tsl/utils/Raymarching.js',
+    ...['BloomNode', 'DepthOfFieldNode', 'FXAANode', 'SMAANode', 'GTAONode', 'TRAANode', 'TAAUNode', 'FSR1Node', 'GodraysNode', 'OutlineNode', 'Lut3DNode', 'SSRNode', 'ChromaticAberrationNode', 'FilmNode', 'GaussianBlurNode'].map(n => 'examples/jsm/tsl/display/' + n + '.js')],
   postprocessing: ['build/index.min.js'], // minificado pelo jsDelivr, imports "three" intactos
   n8ao: ['dist/N8AO.min.js'],
+  gsap: ['dist/gsap.min.js'], /* 5.0: câmera e cinema da apresentação (UMD: window.gsap) */
 };
 const vroot = new URL('../', import.meta.url).pathname + 'dist/vendor/';
 let n = 0;

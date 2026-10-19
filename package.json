@@ -1,0 +1,13 @@
+{
+  "name": "aether-rift-dominion",
+  "private": true,
+  "description": "Ferramentas de teste do Aether Rift: Dominion (o jogo em si não tem dependências de npm; as bibliotecas vêm do CDN e de tools/vendor.mjs)",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "vendor": "node tools/vendor.mjs",
+    "qa": "node tools/qa.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}
