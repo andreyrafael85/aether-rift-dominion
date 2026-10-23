@@ -65,7 +65,7 @@ function create(THREE, scene, opts) {
     m.defaultAttributeValues = Object.assign({}, m.defaultAttributeValues, { rm: [0.9, 0], aWind: [0], aGlow: [0] }); /* geometria sem o atributo (recuo antigo) lê estes valores */
     m.customProgramCacheKey = () => 'ard-dress-43c-' + (o.leaf ? 'f' : 's'); return m;
   }
-  const mats = { solido: mat({}), folha: mat({ leaf: true }) };
+  const mats = opts.m5 ? { solido: opts.m5.adereco({}), folha: opts.m5.adereco({ leaf: true }) } : { solido: mat({}), folha: mat({ leaf: true }) }; /* 5.0a: no Motor 5, material TSL sem vento (o vento é da fase 2) */
   D.mats = mats; /* 4.2h: o render3d põe estes materiais na curva da noite */
   /* geometrias: uma por tipo e variante, do kit do meshes.js (4.3c); sem ele, formas simples de recuo */
   const SG = (kind, seed, lite) => { try { return (ARD.meshes && ARD.meshes.scatter && ARD.meshes.scatter(kind, seed, lite)) || null; } catch (e) { return null; } };
@@ -152,7 +152,7 @@ function create(THREE, scene, opts) {
   };
   /* estradas de terra: do Núcleo até cada estrutura pronta dentro do território (pedaços curtos que acompanham o relevo) */
   const roadGeo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
-  const roadMat = new THREE.ShaderMaterial({ uniforms: { fogMap: uni.fogMap, worldSize: uni.worldSize }, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2,
+  const roadMat = opts.m5 ? opts.m5.estrada() /* 5.0a: estrada em TSL */ : new THREE.ShaderMaterial({ uniforms: { fogMap: uni.fogMap, worldSize: uni.worldSize }, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2,
     vertexShader: 'uniform float worldSize; varying vec2 vUv; varying vec2 vW; void main(){ vUv = uv; vec4 wp = modelMatrix * instanceMatrix * vec4(position, 1.0); vW = vec2(wp.x / worldSize, -wp.z / worldSize); gl_Position = projectionMatrix * viewMatrix * wp; }',
     fragmentShader: 'uniform sampler2D fogMap; varying vec2 vUv; varying vec2 vW; float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); } float n(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f); return mix(mix(h(i), h(i+vec2(1,0)), f.x), mix(h(i+vec2(0,1)), h(i+vec2(1,1)), f.x), f.y); } void main(){ float side = abs(vUv.x - 0.5) * 2.0; float nz = n(vW * 900.0); float edge = 1.0 - smoothstep(0.55 + nz * 0.25, 1.0, side); float rut = smoothstep(0.08, 0.0, abs(side - 0.45)) * 0.18; vec3 col = mix(vec3(0.33, 0.29, 0.24), vec3(0.42, 0.37, 0.3), nz) * (1.0 - rut); float fl = texture2D(fogMap, vW).r; gl_FragColor = vec4(col * mix(0.06, 1.0, fl), edge * 0.62); }' });
   const roads = new THREE.InstancedMesh(roadGeo, roadMat, 2048); roads.count = 0; roads.frustumCulled = false; roads.renderOrder = 2; scene.add(roads); D.roads = roads;

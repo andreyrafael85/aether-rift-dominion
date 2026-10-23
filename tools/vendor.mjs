@@ -9,7 +9,7 @@ const PKGS = {
     'examples/jsm/postprocessing/UnrealBloomPass.js', 'examples/jsm/postprocessing/OutputPass.js', 'examples/jsm/postprocessing/SSAOPass.js',
     'examples/jsm/postprocessing/ShaderPass.js', 'examples/jsm/postprocessing/Pass.js', 'examples/jsm/environments/RoomEnvironment.js',
     /* 5.0: Motor 5 (WebGPURenderer + TSL) e os nós de pós, sombras em cascata e céu físico */
-    'build/three.webgpu.js', 'build/three.tsl.js', 'examples/jsm/csm/CSMShadowNode.js', 'examples/jsm/objects/SkyMesh.js', 'examples/jsm/tsl/utils/Raymarching.js',
+    'build/three.webgpu.js', 'build/three.tsl.js', 'build/three.webgpu.min.js', 'build/three.tsl.min.js', /* 5.0a: o importmap do jogo usa as versões minificadas do jsDelivr */ 'examples/jsm/csm/CSMShadowNode.js', 'examples/jsm/objects/SkyMesh.js', 'examples/jsm/tsl/utils/Raymarching.js',
     ...['BloomNode', 'DepthOfFieldNode', 'FXAANode', 'SMAANode', 'GTAONode', 'TRAANode', 'TAAUNode', 'FSR1Node', 'GodraysNode', 'OutlineNode', 'Lut3DNode', 'SSRNode', 'ChromaticAberrationNode', 'FilmNode', 'GaussianBlurNode'].map(n => 'examples/jsm/tsl/display/' + n + '.js')],
   postprocessing: ['build/index.min.js'], // minificado pelo jsDelivr, imports "three" intactos
   n8ao: ['dist/N8AO.min.js'],

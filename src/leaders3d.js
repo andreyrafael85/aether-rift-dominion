@@ -125,11 +125,11 @@ const CONE = (r, h, s) => new (T().ConeGeometry)(r, h, s || 8);
 function rbox(w, h, d, e, seg) { const g = SPH(1, seg || 16, seg || 12); const a = g.getAttribute('position').array; const ex = 2 / (e || 6);
   for (let i = 0; i < a.length; i += 3) { const x = a[i], y = a[i + 1], z = a[i + 2]; const f = v => Math.sign(v) * Math.pow(Math.abs(v), ex); a[i] = f(x) * w / 2; a[i + 1] = f(y) * h / 2; a[i + 2] = f(z) * d / 2; } g.computeVertexNormals(); weld(g); return g; }
 /* ---------- 4.3e: kit de materiais e texturas por busto (os quatro humores dividem tudo; nada é recriado ao trocar de humor) ---------- */
-function newKit(race, o) { o = o || {}; const kit = { race, hi: !!o.hi, env: o.env !== undefined ? o.env : envTex, mats: [], tex: [], geo: new Map(), glows: [], basics: [], q: o.hi ? 1.7 : 1 };
+function newKit(race, o) { o = o || {}; const kit = { race, hi: !!o.hi, env: o.env !== undefined ? o.env : envTex, mats: [], tex: [], geo: new Map(), glows: [], basics: [], q: o.hi ? 1.7 : 1, make: o.make || null /* 5.0b: fábrica de materiais da Sala de Comando (materiais de nós do Motor 5) */ };
   kit.g = (key, fn) => { let g = kit.geo.get(key); if (!g) { g = fn(); kit.geo.set(key, g); } return g; };
   kit.seg = n => Math.max(3, Math.round(n * kit.q)); return kit; }
 /* material registrado no kit; com mapa de ambiente próprio (no r186 o envMapIntensity do material só vale com material.envMap) */
-function MAT(kit, type, name, o, glow) { const THREE = T(); const m = new THREE[type](o); m.name = name; if (kit.env && m.isMeshStandardMaterial) m.envMap = kit.env;
+function MAT(kit, type, name, o, glow) { const THREE = T(); const m = kit.make ? kit.make(type, o, name) : new THREE[type](o); /* 5.0b: a Sala troca pelo material de nós equivalente */ m.name = name; if (kit.env && m.isMeshStandardMaterial) m.envMap = kit.env;
   m.userData.env0 = m.envMapIntensity == null ? 1 : m.envMapIntensity; m.userData.e0 = m.emissiveIntensity == null ? 0 : m.emissiveIntensity; if (m.isMeshBasicMaterial || m.isPointsMaterial) m.userData.c0 = m.color.clone(); kit.mats.push(m); if (glow) (m.isMeshBasicMaterial || m.isPointsMaterial ? kit.basics : kit.glows).push(m); return m; }
 function cnv(n, m) { const c = document.createElement('canvas'); c.width = n; c.height = m || n; return c; }
 /* 4.3e: os desenhos procedurais (olhos, mapas de normal, rampas) são feitos uma vez por página e guardados; cada kit só embrulha o canvas numa textura sua (descarte seguro) */
@@ -733,9 +733,10 @@ function animate(it, now, dt) {
     e.rotation.y = (u.by || 0) + s.look[0] * 0.45; e.rotation.x = (u.bx || 0) - s.look[1] * 0.35; }
   for (let i = 0; i < rig.lids.length; i++) { const l = rig.lids[i]; l.rotation.x = l.userData.up ? l.userData.k * bc : -l.userData.k * bc; }
   /* sobrancelhas acompanham a fala e um respiro */
-  const tk = s.talk > 0 ? Math.sin(t * 9) : 0; for (let i = 0; i < rig.brows.length; i++) { const b = rig.brows[i]; b.rotation.z = b.userData.base + Math.sin(t * 1.3 + b.userData.side) * 0.025 + tk * 0.045 * b.userData.side; b.position.y = b.userData.y0 + (s.talk > 0 ? Math.max(0, tk) * 0.012 : 0) + s.jolt * 0.03; }
+  const talking = s.talk > 0 || !!s.word; /* 5.0b: palavra da voz conta como fala */ const tk = talking ? Math.sin(t * 9) : 0; for (let i = 0; i < rig.brows.length; i++) { const b = rig.brows[i]; b.rotation.z = b.userData.base + Math.sin(t * 1.3 + b.userData.side) * 0.025 + tk * 0.045 * b.userData.side; b.position.y = b.userData.y0 + (s.talk > 0 ? Math.max(0, tk) * 0.012 : 0) + s.jolt * 0.03; }
   /* fala */
-  let open = 0; if (s.talk > 0) { s.talk -= dt; open = 0.5 + 0.5 * Math.abs(Math.sin(t * 17) * Math.sin(t * 7.3)); }
+  let open = 0; if (s.word) { /* 5.0b: boca pela palavra da voz do sistema (evento boundary): uma abertura por sílaba, mais aberta no meio da palavra */ s.word.t += dt; const ph = s.word.t / s.word.dur; if (ph >= 1) s.word = null; else open = Math.pow(Math.abs(Math.sin(Math.PI * s.word.syl * ph)), 0.7) * (0.6 + 0.4 * Math.sin(Math.PI * ph)); }
+  else if (s.talk > 0) { s.talk -= dt; open = 0.5 + 0.5 * Math.abs(Math.sin(t * 17) * Math.sin(t * 7.3)); }
   if (rig.jaw) rig.jaw.rotation.x = rig.jaw.userData.base + open * (rig.jawK || 0.22) + (still ? 0 : Math.sin(t * 1.7) * 0.01);
   if (rig.mouth) { const target = 1 + open * (rig.mouthK == null ? (rig.jaw ? 0.15 : 0.7) : rig.mouthK); rig.mouth.scale.y = still ? 1 : rig.mouth.scale.y + (target - rig.mouth.scale.y) * Math.min(1, dt * 14); }
   /* cabeça (pivô do pescoço): postura do humor + olhar + aceno, negação e susto; a raiz respira e balança */
@@ -790,6 +791,13 @@ function studioRig(scene, race) { const S = sceneFor(race); const it = { L: S.L,
 function bench(it, n) { if (!it || !renderer) return null; if (it.pending) build(it); const gl = renderer.getContext(), px = new Uint8Array(4); const t0 = performance.now(); n = n || 10;
   for (let i = 0; i < n; i++) { animate(it, performance.now(), 0.04); renderer.toneMappingExposure = it.exposure || 1; renderer.setViewport(0, 0, RES, RES); renderer.setScissor(0, 0, RES, RES); renderer.setScissorTest(true); renderer.clear(); renderer.render(it.sc, it.cam); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); }
   return { ms: (performance.now() - t0) / n, tris: renderer.info.render.triangles, calls: renderer.info.render.calls, programs: renderer.info.programs ? renderer.info.programs.length : null }; }
-ARD.leaders3d = { canUse, mount, unmount, stopAll, mood, baseMood, react, gaze, setLight, buildHead, newKit, studioRig, restPose, frameFor, envFor: rend => makeEnv(T(), rend), bench, EXPR, COL,
+/* 5.0b: busto num cenário de fora (Sala de Comando no Motor 5): attach monta no grupo dado, sem renderizador próprio; step anima (o laço é de quem chamou);
+   word marca uma palavra da voz (n letras) e a boca abre uma vez por sílaba; detach libera tudo */
+function attach(parent, race, o) { o = o || {}; race = COL[race] ? race : 'vehnar'; const it = { sc: parent, race, kit: newKit(race, { env: o.env === undefined ? null : o.env, hi: !!o.hi, make: o.make }), mood: o.mood || 1, baseMood: o.mood || 1, head: null, t0: performance.now(), last: 0, n: 0, yaw: o.yaw || 0, still: !!o.still, glowK: 1, envK: 1, external: true, stats: { tris: 0, calls: 0 },
+  st: { look: [0, 0], lookT: [0, 0], nextBlink: 1 + Math.random() * 3, blink: 0, nod: 0, shake: 0, talk: 0, jolt: 0, until: 0, gaze: null, gazeUntil: 0, nextGlance: 2 + Math.random() * 3, pose: [0, 0, 0], word: null } };
+  setHead(it, it.mood); return it; }
+function step(it, now, dt) { if (it && it.kit && it.head) animate(it, now, dt); }
+function word(it, n, w) { if (!it || !it.st) return; const v = String(w || '').match(/[aeiouáéíóúâêôãõày]+/gi); const syl = Math.max(1, Math.min(4, v ? v.length : Math.round((n || 3) / 3))); it.st.word = { t: 0, dur: Math.max(0.14, Math.min(0.8, (n || 3) * 0.065 + 0.06)), syl }; }
+ARD.leaders3d = { canUse, mount, unmount, stopAll, mood, baseMood, react, gaze, setLight, buildHead, newKit, studioRig, restPose, frameFor, envFor: rend => makeEnv(T(), rend), bench, EXPR, COL, attach, step, word, detach: unmount, /* 5.0b */
   info: () => renderer ? { programs: renderer.info.programs ? renderer.info.programs.length : null, items: items.length, stats: items.map(it => ({ race: it.race, mood: it.mood, tris: it.stats.tris, calls: it.stats.calls, ms: it.cost == null ? null : Math.round(it.cost * 10) / 10 })) } : null }; /* info: diagnóstico (4.3d; 4.3e: triângulos e chamadas por busto) */
 })(globalThis.ARD = globalThis.ARD || {});

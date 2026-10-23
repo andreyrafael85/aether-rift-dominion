@@ -21,7 +21,7 @@ A v5.0 ataca isso em quatro ondas, com uma trilha contínua de desempenho:
 
 | Onda | Versões | O que o jogador sente |
 |---|---|---|
-| 1. Motor 5 e primeiro impacto | 5.0a Motor 5 (WebGPU) · 5.0b Sala de Comando | O jogo inteiro no WebGPU, com reserva em WebGL2. A tela inicial vira uma sala de comando 3D, com a base da Raça, planetas em shader, partículas fluidas, câmera com GSAP e som 3D |
+| 1. Motor 5 e primeiro impacto | 5.0a Sala de Comando, Interface 3.0 e Motor 5 em teste ✔ · 5.0b Motor 5 completo | O jogo inteiro no WebGPU, com reserva em WebGL2. A tela inicial vira uma sala de comando 3D, com a base da Raça, planetas em shader, partículas fluidas, câmera com GSAP e som 3D |
 | 2. Mundo vivo | 5.0c Céu, clima e nuvens de guerra · 5.0d Bases e unidades vivas | Céu físico, clima simulado na GPU e uma névoa de guerra feita de nuvens. As construções sobem no estilo da Raça, os destroços quicam no chão e a batalha fica marcada |
 | 3. Som, cinema e ameaças | 5.0e Som 3D e cinema · 5.0f Chefões · 5.0g Inteligência e mundo | Som com posição no mapa, trilha que muda com a batalha e briefing de cinema. Chefões com fases, IA com a personalidade de cada líder e um mapa com vida própria |
 | 4. Além da Fenda | 5.0h Campanha 2 · 5.0i Mundos novos · 5.0j Replays e relatório | Campanha nova de 15 missões com 6 chefões, cinco mundos novos, um gerador de mapas, replays com câmera de cinema e clipes |
@@ -66,7 +66,7 @@ Legenda: **✔ já temos** (com a versão em que entrou) · **➕ adotar** na v5
 | Three.js para controle de baixo nível | r186 (o mais novo publicado é o r186.1), com importmap | ✔ 4.3b |
 | Física com Rapier.js ou Cannon-es | Movimento próprio e determinístico, conferido em 4 motores de navegador | ✗ O lockstep do multijogador e os salvamentos dependem de resultado idêntico. Os destroços já caem na GPU, pelo shader de ruína (4.3f) |
 | Interface em HTML/CSS ou Preact/Svelte | HTML/CSS próprio, sem framework, escrevendo no DOM só quando um valor muda | ✔ Framework não traria ganho |
-| Howler.js para áudio | Efeitos sintetizados em WebAudio e voz do sistema pela Web Speech API; **não há trilha sonora** | ✎ Sem Howler (não há arquivos de áudio para gerenciar). Som 3D com o próprio Web Audio na 5.0b (tela inicial) e na 5.0e (partida), com trilha adaptativa |
+| Howler.js para áudio | Efeitos sintetizados em WebAudio e voz do sistema pela Web Speech API; **não há trilha sonora** | ✎ Sem Howler (não há arquivos de áudio para gerenciar). Som 3D com o próprio Web Audio na 5.0a (tela inicial) e na 5.0e (partida), com trilha adaptativa |
 | Blender → GLB com Draco, gltfpack e glTF-Pipeline | Malhas geradas em código (277 no portão de qualidade), com LOD pelo meshoptimizer | ✎ O kit procedural continua (0 KB de download, cor por jogador, variação por semente). GLB entra só quando houver um artista 3D |
 | Texturas da Poliigon/AmbientCG; modelos do Sketchfab/CGTrader | Texturas geradas na GPU (4.3c) | ✗ Estilo e licença: fotorrealismo destoa do nosso visual estilizado, e cada modelo de terceiros traz risco de licença |
 | WebGPU com TSL | WebGL2; os 77 programas são remendos GLSL (onBeforeCompile); o pós (pmndrs postprocessing) e o N8AO só funcionam em WebGL | ➕ **Motor 5 na 5.0a** (revalidado em 19/10, §2.6): o jogo inteiro passa para o WebGPURenderer com TSL e volta sozinho para WebGL2. WebGPU hoje: Chrome e Edge (inclusive Android 12+), Safari 26, Firefox 141 no Windows e 145 no macOS ARM; no Firefox para Linux e Android ainda está em andamento |
@@ -126,7 +126,7 @@ Legenda: **✔ já temos** (com a versão em que entrou) · **➕ adotar** na v5
 | Tela de carregamento com briefing | Arte do mundo natal em 2560×1440 e dica da missão (4.3l) | ✔ |
 | Salvamento automático | A cada 10 s e ao sair da aba, no IndexedDB (4.1c) | ✔ |
 | Gatilhos de evento | Emboscadas, tempestade na rota, raides, chefe que surge | ✔. ➕ Gatilhos de área e eventos de cena (ponte que cai, reforço que desce) na 5.0h |
-| Retrato animado de rádio | Busto 3D com rig, quatro humores e fala (4.1e, 4.3e) | ✔. ➕ Transmissão em holograma e boca acompanhando a voz (5.0b) |
+| Retrato animado de rádio | Busto 3D com rig, quatro humores e fala (4.1e, 4.3e) | ✔. ➕ Transmissão em holograma e boca acompanhando a voz (5.0a) |
 | XState para estados da missão | Objetivos com testes por passo | ✗ Não precisa |
 | Tiled ou editor de fases | — | ➕ Gerador de mapas por semente na 5.0i. Editor e compartilhamento ficam para a v6.0, que terá onde guardar os mapas |
 | Briefing de cinema (varredura, texto digitado, mapa de satélite, câmera sincronizada) | Janela de briefing com os líderes | ➕ "Sala de Guerra" na 5.0e, na linguagem visual do Comando da Fenda (sem imitar o terminal verde de outro jogo) |
@@ -155,10 +155,10 @@ Em 18/10 o WebGPU tinha ficado como laboratório no fim da v5.0: os 77 programas
 |---|---|---|
 | Iluminação baseada em imagem (IBL) | ✔ já temos (PMREM do céu do mapa, 4.3b). No Motor 5, o PMREM vem do céu físico e é refeito quando a hora muda | 5.0a, 5.0c |
 | Sombras suaves | ✔ mapa de sombra com filtro. ➕ Sombras em cascata (CSMShadowNode) com filtro suave e sombra de contato fina | 5.0a, 5.0d |
-| Pós com bloom e profundidade de campo | ✔ bloom em toda partida (4.3b) e profundidade de campo no Modo Foto (4.3j). ➕ No Motor 5, os dois em TSL; a profundidade de campo entra na Sala de Comando, nas cenas de cinema e na câmera de perto, nunca na visão de jogo | 5.0a, 5.0b, 5.0e |
-| Shader próprio em WGSL ou GLSL: partículas fluidas ou distorção orgânica | ➕ Em TSL, que gera os dois: partículas fluidas da Fenda num compute shader e distorção orgânica (deslocamento por ruído e refração da cena), as duas provadas no laboratório | 5.0b, 5.0d |
-| Áudio espacial com Web Audio | ➕ Ouvinte preso à câmera e som com posição no mapa, provado no laboratório (HRTF, distância e reverberação gerada no navegador) | 5.0b, 5.0e |
-| GSAP para câmera com paralaxe e cliques | ➕ Revisto: entra na apresentação (Sala de Comando, cinema, chefões), andando no mesmo laço do render; nunca na simulação nem na câmera de jogo | 5.0b, 5.0e |
+| Pós com bloom e profundidade de campo | ✔ bloom em toda partida (4.3b) e profundidade de campo no Modo Foto (4.3j). ➕ No Motor 5, os dois em TSL; a profundidade de campo entra na Sala de Comando, nas cenas de cinema e na câmera de perto, nunca na visão de jogo | 5.0a, 5.0e |
+| Shader próprio em WGSL ou GLSL: partículas fluidas ou distorção orgânica | ➕ Em TSL, que gera os dois: partículas fluidas da Fenda num compute shader e distorção orgânica (deslocamento por ruído e refração da cena), as duas provadas no laboratório | 5.0a, 5.0d |
+| Áudio espacial com Web Audio | ➕ Ouvinte preso à câmera e som com posição no mapa, provado no laboratório (HRTF, distância e reverberação gerada no navegador) | 5.0a, 5.0e |
+| GSAP para câmera com paralaxe e cliques | ➕ Revisto: entra na apresentação (Sala de Comando, cinema, chefões), andando no mesmo laço do render; nunca na simulação nem na câmera de jogo | 5.0a, 5.0e |
 | Layout responsivo e laço eficiente | ✔ Um laço só, com simulação fixa e desenho interpolado; no Motor 5, o setAnimationLoop com o GSAP dentro | 5.0a |
 | Modelos glTF/GLB | ✎ Os modelos continuam gerados em código (0 KB de download, cor por jogador, variação por semente). glTF serve de saída para revisão e para um artista, se houver | — |
 | Shaders GLSL | ✎ Migram para TSL | 5.0a |
@@ -322,7 +322,9 @@ A v5.0 começa pelo Motor 5. Tudo o que vem depois nasce em TSL, então nada é 
 
 ### Onda 1 — Motor 5 e primeiro impacto
 
-#### 5.0a — Motor 5 (WebGPU) · tamanho GGG · 1 agente de fundação, depois 5 em paralelo
+**Entregas (23/10/2026):** a fundação do Motor 5 (a fase 1 abaixo), a Sala de Comando e a Interface 3.0 saíram juntas como **5.0a** ✔, com o Motor 5 como opção experimental em Ajustes. O porte dos módulos e a paridade (fases 2 e 3) saem como **5.0b**.
+
+#### Motor 5 (WebGPU): fase 1 na 5.0a ✔, fases 2 e 3 na 5.0b · tamanho GGG · 1 agente de fundação, depois 5 em paralelo
 - **Objetivo.** O jogo inteiro roda no WebGPURenderer do three, com materiais, efeitos e pós em TSL, e volta sozinho para WebGL2 onde não houver WebGPU. Em cada aparelho do dono, fica igual ou mais bonito e igual ou mais rápido que o motor de hoje.
 - **Fase 1, fundação (1 agente):**
   - escolha do motor: `?motor=5` e `?motor=classico`; o clássico continua padrão até a paridade;
@@ -350,7 +352,7 @@ A v5.0 começa pelo Motor 5. Tudo o que vem depois nasce em TSL, então nada é 
   - o Firefox no Windows carrega em até 5 s;
   - os piores 1% do iPhone passam de 40 fps.
 
-#### 5.0b — Sala de Comando · tamanho G · 2 agentes, junto com a fundação da 5.0a
+#### Sala de Comando e Interface 3.0: na 5.0a ✔ · tamanho G · 2 agentes, junto com a fundação do Motor 5
 - **Objetivo.** A primeira tela no nível de um lançamento, nascida no Motor 5 a partir do laboratório (`lab/motor5.html`).
 - **Entra:**
   - **Tela inicial em 3D:** diorama da base da Raça com os modelos do jogo, unidades trabalhando, luz pelo céu físico e o líder em holograma. Trocar de Raça leva a câmera ao próximo mundo do Grande Alinhamento.
@@ -522,7 +524,7 @@ Regras:
 
 ## 9. Decisões do dono (19/10/2026)
 
-- **Ondas aprovadas.** A ordem nova começa pelo Motor 5 (5.0a) e pela Sala de Comando (5.0b), em paralelo.
+- **Ondas aprovadas.** A ordem nova começa pelo Motor 5 e pela Sala de Comando, em paralelo (os dois saíram juntos na 5.0a, em 23/10).
 - **WebGPU no jogo:** sim, com volta automática para WebGL2 e o motor clássico como reserva até a paridade.
 - **GSAP:** sim, na apresentação.
 - **Chefões renomeados:**

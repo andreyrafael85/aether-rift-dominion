@@ -102,7 +102,7 @@ function fillInfo(id) { const S = ARD.sim, f = S.FACTIONS[id], L = LORE[id] || {
   $('sc-tag').textContent = f.tagline; $('sc-facts').innerHTML = factsHTML(id); $('sc-style').innerHTML = (L.style || []).map(t => '<span>' + esc(t) + '</span>').join(''); $('sc-units').innerHTML = unitsHTML(id);
   const em = $('sc-emblem-use'); if (em) em.setAttribute('href', '#em-' + id); }
 /* busto 3D grande (computador): um canvas por Raça, montado na primeira vez e guardado; o de fora fica escondido e não desenha */
-function bustFor(id) { if (!st.use3d) return null; if (st.busts[id]) return st.busts[id];
+function bustFor(id) { if (!st.use3d || st.holo) return null; /* 5.0b: com a Sala de Comando o líder é o holograma dela */ if (st.busts[id]) return st.busts[id];
   const cv = document.createElement('canvas'); cv.width = cv.height = 512; cv.className = 'out'; cv.setAttribute('aria-hidden', 'true'); cv.hidden = true; D.$('sc-bust').appendChild(cv);
   const it = ARD.leaders3d.mount(cv, id, { framing: 'arte', fps: 30, mood: 1, yaw: 0.16 }); if (!it) { cv.remove(); st.use3d = false; return null; }
   st.busts[id] = { cv, it }; return st.busts[id]; }
@@ -121,6 +121,7 @@ function select(id, first) { if (!st || !RACES.includes(id)) return; const chang
   if (first || reduced()) fillInfo(id); else if (changed) { info.classList.add('swap'); clearTimeout(st.swapT); st.swapT = setTimeout(() => { fillInfo(id); requestAnimationFrame(() => info.classList.remove('swap')); }, 190); }
   if (changed || first) showBust(id, first);
   if (ARD.uiFx) try { ARD.uiFx.setRace(id); } catch (e) {}
+  if (ARD.sala) try { ARD.sala.setRace(id, { voz: !first }); } catch (e) {} /* 5.0b: a câmera voa até o mundo da Raça */
   clearTimeout(st.preT); st.preT = setTimeout(() => { if (st && st.sel === id && ARD.preloadLoadArt) ARD.preloadLoadArt(id); }, first ? 4000 : 1500); /* 4.3l: a arte grande do carregamento da Raça escolhida já fica no cache */
   for (const m of st.maps) m.draw();
   if (st.cta) st.cta.dataset.race = id;
@@ -149,7 +150,7 @@ function mount(deps) {
   RACES.forEach((id, i) => { const f = ARD.sim.FACTIONS[id]; if (!f) return; const el = document.createElement('label'); el.className = 'fac-card'; el.dataset.id = id; el.style.setProperty('--rc', D.RACE_COLORS[id] || '#FF5E3A');
     const ins = ARD.ART && ARD.ART.insignia && ARD.ART.insignia[id];
     el.innerHTML = `<input type="radio" name="fac" value="${id}" ${pick === id ? 'checked' : ''} aria-label="${esc(f.name)}">${ins ? `<img class="fi" src="${ins}" alt="">` : `<svg class="fi" style="color:${D.RACE_COLORS[id]}" aria-hidden="true"><use href="#em-${id}"/></svg>`}<span class="fn"><b>${esc(f.short)}</b><small>${esc(D.LEADER_NAME[id] || '')}</small></span><span class="fk" aria-hidden="true">${i + 1}</span>`;
-    el.querySelector('input').addEventListener('change', () => { select(id); try { if (ARD.audio && ARD.audio.enabled) ARD.audio.sfx('click', 0.5); } catch (e) {} if (D.onRace) try { D.onRace(id); } catch (e) {} });
+    el.querySelector('input').addEventListener('change', () => { select(id); try { if (ARD.audio && ARD.audio.enabled && !(ARD.salaSom && ARD.salaSom.ativo())) ARD.audio.sfx('click', 0.5); /* 5.0b: com o som 3D da Sala o clique soa com posição */ } catch (e) {} if (D.onRace) try { D.onRace(id); } catch (e) {} });
     wrap.appendChild(el); });
   st.want3d = !!(ARD.leaders3d && !coarse() && params.get('logo') !== 'estatico'); st.use3d = false; /* 4.3k: o 3D liga só depois do load (abaixo): ?autostart, ?bench e missões não pagam nada */
   /* teclas 1–5 escolhem a Raça (fora dos campos de texto) */
@@ -160,7 +161,7 @@ function mount(deps) {
   select(pick, true);
   /* busto 3D e miniaturas: só depois do load da página e da sonda da GPU (o renderizador do leaders3d e o mapa de ambiente
      custam caro na GPU fraca e por software) e só se a tela inicial ainda estiver à vista; até lá fica o retrato 2D */
-  const up3d = () => setTimeout(() => { if (!st || G3() || !st.want3d) return; if (!window.THREE) { window.addEventListener('three-ready', up3d, { once: true }); return; } if (!ARD.leaders3d.canUse()) return; st.use3d = true; showBust(st.sel, true); queueThumbs(st.sel); }, 250);
+  const up3d = () => setTimeout(() => { if (!st || G3() || !st.want3d) return; if (!window.THREE) { window.addEventListener('three-ready', up3d, { once: true }); return; } if (!ARD.leaders3d.canUse()) return; st.holo = !!(ARD.sala && ARD.sala.want()); /* 5.0b */ st.use3d = true; showBust(st.sel, true); queueThumbs(st.sel); }, 250);
   if (ARD.gpuProbe) ARD.gpuProbe().then(() => { if (!ARD.gpuSoft) up3d(); }); else if (document.readyState === 'complete') up3d(); else window.addEventListener('load', up3d, { once: true }); /* depois da sonda da GPU (main.js); na GPU por software fica o retrato 2D */
   return { selected: () => st && st.sel };
 }
@@ -173,7 +174,17 @@ function enhance() { if (!st) return; const $ = D.$;
   const btn = $('btn-start'); if (btn && 'IntersectionObserver' in window) { const cta = document.createElement('button'); cta.id = 'st-cta'; cta.className = 'btn primary big'; cta.type = 'button'; cta.hidden = true; cta.textContent = 'Iniciar partida';
     cta.addEventListener('click', () => btn.click()); $('start').appendChild(cta); st.cta = cta; let vis = true;
     const upd = () => { const pane = document.querySelector('.cpane[data-pane=jogar]'); const show = !vis && pane && !pane.hidden && matchMedia('(max-width: 899px)').matches && !$('start').hidden; cta.hidden = !show; if (show) cta.textContent = btn.textContent; };
-    st.io = new IntersectionObserver(es => { vis = es[es.length - 1].isIntersecting; upd(); }); st.io.observe(btn); document.querySelectorAll('.ctab').forEach(t => t.addEventListener('click', () => setTimeout(upd, 30))); addEventListener('resize', upd); } }
-function stop() { if (!st) return; const s = st; st = null; if (s.onKey) document.removeEventListener('keydown', s.onKey); if (s.io) s.io.disconnect(); if (s.cta) s.cta.hidden = true; if (s.tr) { try { s.tr.r.dispose(); s.tr.r.forceContextLoss(); } catch (e) {} } }
-ARD.uiStart = { mount, enhance, stop, LORE, select: id => select(id), info: () => st ? { sel: st.sel, busts: Object.keys(st.busts), thumbs: Object.keys(st.thumbs), use3d: st.use3d } : null };
+    st.io = new IntersectionObserver(es => { vis = es[es.length - 1].isIntersecting; upd(); }); st.io.observe(btn); document.querySelectorAll('.ctab').forEach(t => t.addEventListener('click', () => setTimeout(upd, 30))); addEventListener('resize', upd); }
+  document.querySelectorAll('.ctab').forEach(t => t.addEventListener('click', () => { if (ARD.sala) try { ARD.sala.aba(t.dataset.tab); } catch (e) {} })); /* 5.0b: cada aba tem o seu enquadramento na Sala */
+  /* 5.0b: Academia de Comando, explorar a base, mesa tática e som da tela inicial */
+  { const ac = $('btn-academia'); if (ac) ac.addEventListener('click', () => { if (ARD.salaAcademia) ARD.salaAcademia.abrir(); });
+    const ex = $('btn-explorar'); if (ex) ex.addEventListener('click', () => { if (ARD.sala) ARD.sala.explorar(true); });
+    const bm = $('btn-mesa'); if (bm) bm.addEventListener('click', () => { const c = ARD.sala && ARD.sala.ctx(); if (c && ARD.salaMesa) ARD.salaMesa.aproximar(c); });
+    const AU = ARD.audio, os = $('opt-som'), ov = $('opt-voz'), bs = $('btn-som-inicio'); const sync = () => { if (!AU) return; if (os) os.checked = AU.enabled; if (ov) ov.checked = AU.voice; if (bs) bs.setAttribute('aria-pressed', AU.enabled ? 'true' : 'false'); };
+    const som = on => { if (!AU) return; AU.setEnabled(on); if (on) { AU.init(); AU.resume(); } if (ARD.salaSom) { if (ARD.salaSom.ativo()) ARD.salaSom.ligado(on); else if (on && ARD.sala) ARD.sala.som(); } sync(); };
+    if (os) os.addEventListener('change', () => som(os.checked)); if (bs) bs.addEventListener('click', () => som(!AU.enabled)); if (ov) ov.addEventListener('change', () => { AU.setVoice(ov.checked); sync(); }); sync(); } }
+function stop() { if (ARD.sala) try { ARD.sala.stop({ partida: true }); } catch (e) {} /* 5.0b: a Sala solta o laço e a GPU antes da partida (sem devolver o busto da vitrine) */ if (!st) return; const s = st; st = null; if (s.onKey) document.removeEventListener('keydown', s.onKey); if (s.io) s.io.disconnect(); if (s.cta) s.cta.hidden = true; if (s.tr) { try { s.tr.r.dispose(); s.tr.r.forceContextLoss(); } catch (e) {} } }
+/* 5.0b: a Sala avisa quando o holograma está à vista (o retrato some) ou quando saiu (o busto 3D de antes volta, se couber) */
+function salaPronta(on) { if (!st) return; if (on) { st.holo = true; for (const k in st.busts) st.busts[k].cv.classList.add('out'); } else if (st.holo) { st.holo = false; if (st.use3d && st.sel) showBust(st.sel, true); } }
+ARD.uiStart = { mount, enhance, stop, LORE, salaPronta, select: id => select(id), info: () => st ? { sel: st.sel, busts: Object.keys(st.busts), thumbs: Object.keys(st.thumbs), use3d: st.use3d } : null };
 })(globalThis.ARD = globalThis.ARD || {});

@@ -45,6 +45,7 @@ function create(o) {
   I.selectOnScreen = function () { const ids = []; for (const e of sim.ents) { if (!e.alive || e.owner !== human || e.kind !== 'unit' || !S.UNITS[e.def].attack) continue; const [sx, sy] = R.worldToScreen(cam, e.x, e.y); if (sx >= 0 && sy >= 0 && sx <= R.w && sy <= R.h) ids.push(e.id); } setSel(ids); return ids.length; };
   function cmd(c) { c.p = human; if (ui.enqueue) ui.enqueue(c); else S.enqueue(sim, c); }
   I.cmd = cmd;
+  I.pick = pick; I.ownSelectedUnits = ownSelectedUnits; I.ownSelectedBuilding = ownSelectedBuilding; I.contextCommand = contextCommand; /* 5.0b: a roda de comandos usa os mesmos critérios do clique */
 
   function wallSegments(x0, y0, x1, y1, def) {
     const len = Math.hypot(x1 - x0, y1 - y0); const n = Math.max(1, Math.round(len / 16)); const ang = Math.atan2(y1 - y0, x1 - x0);
@@ -148,6 +149,7 @@ function create(o) {
 
   // ---- pointer events
   canvas.addEventListener('contextmenu', e => e.preventDefault());
+  canvas.addEventListener('mousedown', e => { if (e.button === 1) e.preventDefault(); }); /* 5.0b: sem a rolagem automática do navegador no botão do meio */
   canvas.addEventListener('pointerdown', e => {
     canvas.setPointerCapture(e.pointerId);
     I.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, type: e.pointerType });
@@ -156,7 +158,8 @@ function create(o) {
     I.lastType = e.pointerType;
     I.down = { sx, sy, button: e.button, type: e.pointerType, moved: false, camx: cam.x, camy: cam.y, shift: e.shiftKey, t: performance.now() };
     if (e.button === 0 && I.mode === 'build' && view.ghost && S.BUILDINGS[view.ghost.def].wall) { const [wx0, wy0] = R.screenToWorld(cam, sx, sy); I.wallDrag = { x: wx0, y: wy0 }; }
-    if (e.pointerType === 'touch') { clearTimeout(I.longPress); I.longPress = setTimeout(() => { if (I.down && !I.down.moved) { const [wx, wy] = R.screenToWorld(cam, sx, sy); if (I.mode === 'normal') contextCommand(wx, wy, sx, sy); I.down = null; if (navigator.vibrate) navigator.vibrate(15); } }, 450); }
+    if (e.pointerType === 'touch') { clearTimeout(I.longPress); const dn = I.down; I.longPress = setTimeout(() => requestAnimationFrame(() => { if (I.down === dn && !dn.moved) { const [wx, wy] = R.screenToWorld(cam, sx, sy); if (I.mode === 'normal' && !(ui.wheel && ui.wheel({ sx, sy, wx, wy, touch: true, hold: true, id: e.pointerId, t0: e.timeStamp, tmin: 450 }))) contextCommand(wx, wy, sx, sy); I.down = null; if (navigator.vibrate) navigator.vibrate(15); } }), 450); } /* 5.0b: o toque longo abre a roda de comandos (sem ela, o comando de contexto de antes); decide no quadro seguinte, depois dos movimentos que um quadro lento atrasou */
+    if (e.button === 1 && e.pointerType === 'mouse') { clearTimeout(I.wheelT); const dn = I.down; I.wheelT = setTimeout(() => requestAnimationFrame(() => { if (I.down === dn && !dn.moved && ui.wheel) { const [wx, wy] = R.screenToWorld(cam, sx, sy); if (ui.wheel({ sx, sy, wx, wy, touch: false, hold: true, id: e.pointerId, t0: e.timeStamp, tmin: 240 })) I.down = null; } }), 240); } /* 5.0b: segurar o botão do meio abre a roda (decide no quadro seguinte, como o toque longo); arrastar com ele continua movendo o mapa */
   });
   canvas.addEventListener('pointermove', e => {
     const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top; I.lastSX = sx; I.lastSY = sy;
@@ -165,7 +168,7 @@ function create(o) {
     const touchPlace = I.mode === 'build' && view.ghost && I.lastType === 'touch' && !S.BUILDINGS[view.ghost.def].wall;
     if (view.ghost && !touchPlace) updateGhost(sx, sy);
     const d = I.down; if (!d) { const t = pick(sx, sy, 8); view.hover = t ? t.id : null; return; }
-    if (!d.moved && Math.hypot(sx - d.sx, sy - d.sy) > 7) { d.moved = true; clearTimeout(I.longPress); }
+    if (!d.moved && Math.hypot(sx - d.sx, sy - d.sy) > 7) { d.moved = true; clearTimeout(I.longPress); clearTimeout(I.wheelT); /* 5.0b: arrastou, não abre a roda */ }
     if (!d.moved) return;
     if (I.wallDrag) { const [wx1, wy1] = R.screenToWorld(cam, sx, sy); view.wallGhost = wallSegments(I.wallDrag.x, I.wallDrag.y, wx1, wy1, view.ghost.def); return; }
     if (touchPlace && d.type === 'touch') { updateGhost(sx, sy - 70); ui.placeChanged && ui.placeChanged(); return; } // 4.1a: arrastar leva o fantasma acima do dedo
@@ -184,6 +187,7 @@ function create(o) {
     if (view.box) { const b = view.box; view.box = null; boxSelect(b, d.shift); return; }
     if (I.mode === 'build' && view.ghost && d.type === 'touch' && !S.BUILDINGS[view.ghost.def].wall) { if (!d.moved) updateGhost(sx, sy); ui.placeChanged && ui.placeChanged(); return; } // toque só reposiciona; o ✓ confirma
     if (d.moved) return;
+    if (d.button === 1) { clearTimeout(I.wheelT); if (ui.wheel) ui.wheel({ sx, sy, wx, wy, touch: false, hold: false, id: e.pointerId }); return; } /* 5.0b: clique do meio: a roda fica aberta até escolher (ou clicar fora) */
     if (d.button === 2) { if (I.mode === 'attackmove') { I.setMode('normal'); contextCommand(wx, wy, sx, sy); } else if (I.mode !== 'normal') I.setMode('normal'); else contextCommand(wx, wy, sx, sy); return; } // 4.2g: botão direito no modo Atacar-mover ainda dá a ordem
     if (d.button === 0) {
       if (d.type === 'touch' && I.touchBox) { I.touchBox = false; ui.touchBoxChanged(false); }
@@ -200,15 +204,16 @@ function create(o) {
   I.buildMenu = false;
   window.addEventListener('keydown', e => {
     if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) return;
-    if (ui.modalOpen()) { if (e.code === 'Escape') ui.closeModals(); return; }
+    if (ui.modalOpen()) { if (e.code === 'Escape') ui.closeModals(); else if (e.code === 'F3') { e.preventDefault(); ui.closeModals(); } return; } /* 5.0b: F3 também fecha a tela de pesquisa */
     if ((e.ctrlKey || e.metaKey) && !/^Digit[0-9]$/.test(e.code)) return; // 4.2g: Ctrl+S (salvar) não manda Parar nem produz; Ctrl+número continua definindo grupos
     I.keys.add(e.code);
     const k = e.key.toUpperCase();
     if (e.code === 'Escape') { if (I.mode !== 'normal') I.setMode('normal'); else if (I.buildMenu) { I.buildMenu = false; ui.buildMenuChanged(false); } else setSel([]); return; }
-    if (e.code === 'Space') { e.preventDefault(); if (view.lastAlert) I.center(view.lastAlert.x, view.lastAlert.y); return; }
+    if (e.code === 'Space') { e.preventDefault(); const al = ui.nextAlert ? ui.nextAlert() : view.lastAlert; if (al) I.center(al.x, al.y); return; } /* 5.0b: de novo em até 3 s, o alerta anterior */
+    if (e.code === 'F3') { e.preventDefault(); if (ui.toggleTech) ui.toggleTech(); return; } /* 5.0b: tela de pesquisa */
     if (e.code === 'F1') { e.preventDefault(); const n = S.nucleoOf(sim, human); if (n) { setSel([n.id]); I.center(n.x, n.y); } return; }
     if (e.code === 'F2') { e.preventDefault(); const ids = []; for (const en of sim.ents) if (en.alive && en.owner === human && en.kind === 'unit' && S.UNITS[en.def].attack) ids.push(en.id); setSel(ids); return; }
-    if (/^Digit[0-9]$/.test(e.code)) { const n = e.code.slice(5); if (e.ctrlKey || e.metaKey) { e.preventDefault(); I.groups[n] = [...view.sel]; ui.notice('Grupo ' + n + ' definido'); } else { const g = (I.groups[n] || []).filter(id => { const en = sim.byId.get(id); return en && en.alive; }); if (g.length) { setSel(g); const now = performance.now(); if (I.lastGroupKey === n && now - I.lastGroupT < 400) { const en = sim.byId.get(g[0]); if (en) I.center(en.x, en.y); } I.lastGroupKey = n; I.lastGroupT = now; } } return; }
+    if (/^Digit[0-9]$/.test(e.code)) { const n = e.code.slice(5); if (e.ctrlKey || e.metaKey) { e.preventDefault(); I.groups[n] = [...view.sel]; ui.notice('Grupo ' + n + ' definido'); if (ui.groupsChanged) ui.groupsChanged(n); /* 5.0b: barra de grupos */ } else { const g = (I.groups[n] || []).filter(id => { const en = sim.byId.get(id); return en && en.alive; }); if (g.length) { setSel(g); const now = performance.now(); if (I.lastGroupKey === n && now - I.lastGroupT < 400) { const en = sim.byId.get(g[0]); if (en) I.center(en.x, en.y); } I.lastGroupKey = n; I.lastGroupT = now; } } return; }
     if (k === 'B' && !e.ctrlKey) { I.buildMenu = !I.buildMenu; ui.buildMenuChanged(I.buildMenu); return; }
     if (I.buildMenu && BUILD_KEYS[k]) { I.buildMenu = false; ui.buildMenuChanged(false); I.setMode('build', BUILD_KEYS[k]); return; }
     const b = ownSelectedBuilding(); const units = ownSelectedUnits();

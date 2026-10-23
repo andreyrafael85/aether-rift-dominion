@@ -51,11 +51,18 @@ function pickVoice() {
   if (!('speechSynthesis' in window)) return null; const vs = speechSynthesis.getVoices(); if (!vs.length) return null;
   return vs.find(v => /pt[-_]BR/i.test(v.lang)) || vs.find(v => /^pt/i.test(v.lang)) || vs[0];
 }
+/* 5.0b: gancho de palavras da voz: o evento 'ard-voz' no window traz { tipo: 'inicio' | 'palavra' | 'fim', texto, i, n } (posição e tamanho da palavra,
+   do evento boundary do speechSynthesis); a Sala de Comando mexe a boca do líder com ele */
+function voiceHook(u, text) { const ev = (tipo, i, n) => { try { window.dispatchEvent(new CustomEvent('ard-voz', { detail: { tipo, texto: text, i: i || 0, n: n || 0 } })); } catch (e) {} };
+  u.onstart = () => ev('inicio'); u.onboundary = e => { if (!e.name || e.name === 'word') ev('palavra', e.charIndex, e.charLength); }; u.onend = () => ev('fim'); u.onerror = () => ev('fim'); }
 A.say = function (text, key, cooldown) {
   if (!A.voice || !('speechSynthesis' in window)) return; const now = performance.now(); key = key || text; cooldown = cooldown == null ? 6 : cooldown;
   if (A.lastVoice[key] && now - A.lastVoice[key] < cooldown * 1000) return; A.lastVoice[key] = now;
-  try { if (speechSynthesis.pending && speechSynthesis.speaking) return; const u = new SpeechSynthesisUtterance(text); const v = pickVoice(); if (v) u.voice = v; u.lang = 'pt-BR'; u.rate = 1.05; u.pitch = 0.85; u.volume = 0.9; speechSynthesis.speak(u); } catch (e) {}
+  try { if (speechSynthesis.pending && speechSynthesis.speaking) return; const u = new SpeechSynthesisUtterance(text); const v = pickVoice(); if (v) u.voice = v; u.lang = 'pt-BR'; u.rate = 1.05; u.pitch = 0.85; u.volume = 0.9; voiceHook(u, text); /* 5.0b */ speechSynthesis.speak(u); } catch (e) {}
 };
 A.setEnabled = function (on) { A.enabled = on; save(); }; A.setVoice = function (on) { A.voice = on; save(); if (!on && 'speechSynthesis' in window) speechSynthesis.cancel(); };
+/* 5.0b: legendas — cada fala da voz do sistema também vai para A.onSay(texto), que a Interface 3.0 mostra em texto com o retrato do
+   líder (mesmo com a voz desligada); o mesmo intervalo por chave da fala evita repetir a legenda */
+{ const say0 = A.say, lastCap = {}; A.onSay = null; A.say = function (text, key, cooldown) { if (A.onSay) { const now = performance.now(), k = key || text, cd = cooldown == null ? 6 : cooldown; if (!(lastCap[k] && now - lastCap[k] < cd * 1000)) { lastCap[k] = now; try { A.onSay(text, k); } catch (e) {} } } return say0.call(A, text, key, cooldown); }; }
 ARD.audio = A;
 })(globalThis.ARD = globalThis.ARD || {});

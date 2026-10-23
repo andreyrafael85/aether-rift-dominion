@@ -6070,7 +6070,7 @@ function scatter(kind, seed, lite) { T = T || globalThis.THREE; if (!T) return n
     if (FLORA_DEFS.includes(kind)) NEUTRAL[kind](K, seed | 0); else NEUTRAL.seixo(K, ((seed | 0) << 1) | (kind === 'boulder' ? 0 : 1));
     const f = K.finish(), g = f.em ? mergeEm(f.main, f.em) : f.main; g.userData.leafy = !!K.leafy; g.userData.width = f.width; g.userData.height = f.height; return g; } catch (err) { console.warn('[ARD] adereço ' + kind + ' falhou: ' + err.message); return null; } finally { LOD = lod0; } }
 // material padrão das malhas: rugosidade e metal vêm do atributo rm por vértice; rim opcional por Raça
-function material(o) { T = T || globalThis.THREE; o = o || {}; flashDefaults(); const m = new T.MeshStandardMaterial(Object.assign({ vertexColors: true, roughness: 1, metalness: 1, envMapIntensity: o.env == null ? 1 : o.env }, o.params || {}));
+function material(o) { if (o && o.m5 && ARD.m5 && ARD.m5.modelo) return ARD.m5.modelo(o); /* 5.0a: Motor 5 — material TSL (src/m5/materiais.js) quando o render3d pede; ícones, vitrine e hangar seguem no WebGLRenderer */ T = T || globalThis.THREE; o = o || {}; flashDefaults(); const m = new T.MeshStandardMaterial(Object.assign({ vertexColors: true, roughness: 1, metalness: 1, envMapIntensity: o.env == null ? 1 : o.env }, o.params || {}));
   m.onBeforeCompile = sh => {
     sh.uniforms.uDet = DET; // 4.3a
     sh.uniforms.uFlash = FLASH.uFlash; sh.uniforms.uFlashR = FLASH.uFlashR; /* 4.3g */

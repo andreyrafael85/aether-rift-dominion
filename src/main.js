@@ -28,7 +28,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '4.3l';
+const VERSION = '5.0a';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -65,7 +65,8 @@ function initStart() {
   // com ?logo=estatico, com movimento reduzido e em GPU por software. Sem WebGL, fica a arte antiga (assets/hero-belt) atrás de um véu.
   { const bgfx = $('bgfx'); const stars = () => { if (!bgfx || $('start').hidden) return; const w = bgfx.clientWidth, h = bgfx.clientHeight; if (!w || !h) return; bgfx.width = w; bgfx.height = h; const c = bgfx.getContext('2d'); let sd = 5; const rnd = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; }; for (let i = 0; i < 260; i++) { c.globalAlpha = 0.15 + rnd() * 0.55; const r = rnd() < 0.1 ? 1.6 : 0.9; c.fillStyle = rnd() < 0.15 ? '#ffd9c4' : '#e6ecff'; c.fillRect(rnd() * w, rnd() * h, r, r); } }; stars(); addEventListener('resize', stars);
     const heroArt = () => { if (!ART || !ART.hero) return; const st = $('start'); const veil = 'linear-gradient(180deg, rgba(5,7,11,.45), rgba(5,7,11,.84) 55%, rgba(5,7,11,.97))'; st.style.backgroundImage = `${veil}, url(${ART.hero})`; st.style.backgroundSize = 'cover'; st.style.backgroundPosition = 'center top'; const hi = new Image(); hi.onload = () => { st.style.backgroundImage = `${veil}, url(${hi.src})`; }; hi.onerror = () => { hi.onerror = null; hi.src = 'assets/hero-belt.jpg'; }; hi.src = 'assets/hero-belt.webp'; };
-    ARD.gpuProbe().then(() => whenThree(ok => { if (!ok) { heroArt(); return; } if (ARD.gpuSoft) return; setTimeout(() => { if (G || $('start').hidden) return; if (!(ARD.uiFx && ARD.uiFx.mount($('start'), raceSel()))) heroArt(); }, 120); })); } /* a cena só sobe depois do load e da sonda; na GPU por software fica o fundo em CSS */
+    ARD.gpuProbe().then(() => whenThree(ok => { if (!ok) { heroArt(); return; } const sala = !!(ARD.sala && ARD.sala.want()); if (ARD.gpuSoft && !sala) return; setTimeout(() => { if (G || $('start').hidden) return; const fx = () => { if (!(ARD.uiFx && ARD.uiFx.mount($('start'), raceSel()))) heroArt(); };
+      /* 5.0b: a Sala de Comando (Motor 5) entra no lugar do ui-fx quando o aparelho aguenta; se ela não subir, o ui-fx assume */ if (sala) ARD.sala.mount($('start'), raceSel()).then(ok2 => { if (!ok2 && !G && !$('start').hidden) { if (ARD.uiStart && ARD.uiStart.salaPronta) ARD.uiStart.salaPronta(false); fx(); } }); else fx(); }, 120); })); } /* a cena só sobe depois do load e da sonda; na GPU por software fica o fundo em CSS */
   // rodapé: Termos, Privacidade e atalho do tutorial
   const wireModal = (btn, modal) => { const b = $(btn), m = $(modal); if (!b || !m) return; b.addEventListener('click', () => { m.hidden = false; }); m.querySelectorAll('[data-close]').forEach(x => x.addEventListener('click', () => { m.hidden = true; })); };
   wireModal('foot-termos', 'termos'); wireModal('foot-priv', 'priv');
@@ -82,6 +83,7 @@ function initStart() {
   showTab(params.get('aba') || (params.get('campanha') ? 'campanha' : prefs.tab) || 'jogar', false);
   { const pb = loadPrefs(); $('opt-bateria').checked = !!pb.bateria; $('opt-bateria').addEventListener('change', () => savePrefs(Object.assign(loadPrefs() || {}, { bateria: $('opt-bateria').checked }))); }
   { const pb = loadPrefs() || {}; const od = $('opt-dynres'); if (od) { od.checked = pb.dynres !== false; od.addEventListener('change', () => { savePrefs(Object.assign(loadPrefs() || {}, { dynres: od.checked })); if (G && G.R && G.R.setDyn) G.R.setDyn(od.checked); }); } } /* 4.3i: resolução dinâmica */
+  { const pb = loadPrefs() || {}; const om = $('opt-motor'); if (om) { om.value = ARD.motor === '5' ? '5' : 'classico'; om.addEventListener('change', () => { savePrefs(Object.assign(loadPrefs() || {}, { motor: om.value })); if (ARD.m5 && ARD.m5.setMotor) ARD.m5.setMotor(om.value); else ARD.motor = om.value; }); } } /* 5.0a: Motor gráfico (Clássico / Motor 5) lembrado no aparelho */
   { const pb = loadPrefs() || {}; const oc = $('opt-cine'); if (oc) { oc.checked = pb.cine !== false; oc.addEventListener('change', () => { savePrefs(Object.assign(loadPrefs() || {}, { cine: oc.checked })); if (G && G.R) G.R.cine = oc.checked; }); } } // 4.3b: câmera de cinema
   // 4.0e — campanha, Hangar e progresso do Comandante
   if (ARD.campUI && ARD.campaign && ARD.progress) { try { ARD.campUI.init({ $, leaderArt, LEADER_NAME, RACE_COLORS, LEADER_FACE, startGame: cfg => { savePrefs(Object.assign(loadPrefs() || {}, { gfx: cfg.gfx, quality: cfg.quality, clima: cfg.clima, name: cfg.name })); startGame(cfg); }, selectedRace: () => (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar' }); if (params.get('campanha')) ARD.campUI.openCampaign(); } catch (e) { console.warn('[ARD] campanha indisponível:', e); } }
@@ -252,6 +254,26 @@ function loadingInfo(cfg, netCtx) { try {
   if (leaderArt(fac)) { $('load-leader').src = leaderArt(fac); $('load-leader').hidden = false; }
   loadBg(fac); /* 4.3l */
 } catch (e) { console.warn('[ARD] carregamento:', e); } }
+// ---------- 5.0a: Detetive de travadas (vale para os dois motores) ----------
+/* fila fixa de quadros (sem alocar por quadro). Cada posição guarda o intervalo que terminou no começo do quadro e o trabalho do quadro
+   anterior, que rodou dentro desse intervalo: CPU, simulação, desenho, passos e eventos da simulação, shaders ou pipelines criados, troca de
+   resolução ou de qualidade, aba escondida e coleta de lixo provável (queda do performance.memory, amostrado a cada 6 quadros e atribuída ao
+   pior quadro da janela). O teste de desempenho mostra os 5 piores quadros; ARD.detetive() devolve os 5 piores dos últimos 4096 quadros. */
+const DET = { N: 4096, n: 0, ms: new Float32Array(4096), cpu: new Float32Array(4096), sim: new Float32Array(4096), draw: new Float32Array(4096), steps: new Uint8Array(4096), ev: new Uint16Array(4096), comp: new Uint16Array(4096), fl: new Uint8Array(4096), memD: new Float32Array(4096), p: { cpu: 0, sim: 0, draw: 0, steps: 0, ev: 0, comp: 0, fl: 0 }, prog: -1, scale: -1, qual: '', mem: 0, memN: 0, m5: false };
+const DF = { comp: 1, res: 2, qual: 4, gc: 8, passos: 16, oculto: 32 };
+function detPush(iv) { const D = DET, i = D.n % D.N, P = D.p; D.ms[i] = iv; D.cpu[i] = P.cpu; D.sim[i] = P.sim; D.draw[i] = P.draw; D.steps[i] = Math.min(255, P.steps); D.ev[i] = Math.min(65535, P.ev); D.comp[i] = Math.min(65535, P.comp); D.fl[i] = P.fl; D.memD[i] = 0; D.n++; }
+function detEnd(R, cpu, sim, draw, steps, ev) { const D = DET, P = D.p; P.cpu = cpu; P.sim = sim; P.draw = draw; P.steps = steps; P.ev = ev; let fl = 0; D.m5 = !!(R && R.m5);
+  const pg = R && R.progs ? R.progs() : 0; P.comp = D.prog >= 0 ? Math.max(0, pg - D.prog) : 0; D.prog = pg; if (P.comp) fl |= DF.comp;
+  const sc = R && R.dyn ? R.dyn.scale : 1; if (D.scale >= 0 && sc !== D.scale) fl |= DF.res; D.scale = sc;
+  const qn = R && R.quality ? R.quality.resolved || '' : ''; if (D.qual && qn !== D.qual) fl |= DF.qual; D.qual = qn;
+  if (steps > 1) fl |= DF.passos; if (document.hidden) fl |= DF.oculto; P.fl = fl;
+  if (++D.memN % 6 === 0 && performance.memory) { const m = performance.memory.usedJSHeapSize / 1048576; if (D.mem && m < D.mem - 2) { let w = -1, wv = -1; for (let k = 1; k <= 6 && k <= D.n; k++) { const i = (D.n - k) % D.N; if (D.ms[i] > wv) { wv = D.ms[i]; w = i; } } if (w >= 0) { D.fl[w] |= DF.gc; D.memD[w] = D.mem - m; } } D.mem = m; } }
+function detTop(from, to, k) { const D = DET; from = Math.max(from, to - D.N, 0); const best = []; for (let n = from; n < to; n++) { const i = n % D.N, v = D.ms[i]; if (best.length < k || v > D.ms[best[best.length - 1] % D.N]) { best.push(n); best.sort((a, b) => D.ms[b % D.N] - D.ms[a % D.N]); if (best.length > k) best.pop(); } }
+  const r1 = v => Math.round(v * 10) / 10; return best.map(n => { const i = n % D.N, f = D.fl[i], ms = D.ms[i], cpu = D.cpu[i]; const out = [Math.round(ms) + ' ms', 'CPU ' + r1(cpu) + ' ms (simulação ' + r1(D.sim[i]) + ' · desenho ' + r1(D.draw[i]) + ')', D.steps[i] + (D.steps[i] === 1 ? ' passo' : ' passos') + ' da simulação', D.ev[i] + ' eventos'];
+    if (f & DF.comp) out.push(D.comp[i] + (D.m5 ? ' pipelines criados' : ' shaders compilados')); if (f & DF.res) out.push('troca de resolução'); if (f & DF.qual) out.push('troca de qualidade'); if (f & DF.gc) out.push('coleta de lixo provável (−' + Math.round(D.memD[i]) + ' MB)'); if (f & DF.oculto) out.push('aba em segundo plano');
+    if (!(f & (DF.comp | DF.gc | DF.res | DF.qual)) && cpu < ms * 0.4) out.push('CPU folgada: espera da GPU, do compositor ou do navegador'); return out.join(' · '); }); }
+ARD.detetive = (k) => detTop(0, DET.n, k || 5);
+
 // ---------- game ----------
 function startGame(cfg, netCtx) {
   if (ARD.logo3d) ARD.logo3d.stop(); // libera o contexto WebGL do logo vivo antes da partida
@@ -260,6 +282,7 @@ function startGame(cfg, netCtx) {
   if (!cfg.bench) document.body.classList.remove('bench'); // 4.2a
   const want3dEarly = (cfg.gfx || '3d') === '3d' && params.get('r') !== '2d';
   if (want3dEarly && !window.THREE && !window.__threeFailed) { $('start').hidden = true; $('game').hidden = false; $('loading').hidden = false; $('load-bar').style.width = '5%'; whenThree(() => startGame(cfg, netCtx)); return; }
+  if (want3dEarly && window.THREE && ARD.motor === '5' && ARD.m5 && !ARD.m5.ready() && ARD.m5.ok !== false) { $('start').hidden = true; $('game').hidden = false; $('loading').hidden = false; $('load-bar').style.width = '5%'; ARD.m5.load().then(() => startGame(cfg, netCtx)); return; } /* 5.0a: Motor 5 — espera o three/webgpu e o TSL */
   const net = netCtx ? netCtx.net : null;
   const players = cfg.players ? cfg.players.map(p => Object.assign({}, p)) : [{ name: cfg.name, faction: cfg.faction, human: true }];
   const facs = ['vehnar', 'erevane'];
@@ -269,11 +292,14 @@ function startGame(cfg, netCtx) {
   if (!netCtx && !cfg.campaign && ARD.campUI) ARD.campUI.applyColor(players); // tom da Raça escolhido no Hangar (solo)
   const sim = S.createSim({ seed: cfg.seed, players, minutes: cfg.minutes || 25, map: cfg.campaign ? 'fenda' : (cfg.map === 'cinturao' ? 'cinturao' : 'fenda'), mapV: cfg.campaign ? 0 : (cfg.mapV == null ? 1 : cfg.mapV), /* 4.3h: mapa e lagos (salvamentos antigos sem lagos) */ noVeins: !!cfg.bench || !!(cfg.campaign && cfg.campaign.cfg && cfg.campaign.cfg.noVeins) }); // 4.2h: sem veios no prólogo e no teste de desempenho
   if (cfg.resume) S.restore(sim, cfg.resume.sim); // 4.1c: retomada a partir do salvamento (estado exato)
+  if (ARD.hud3) ARD.hud3.prepareSim(sim, !!cfg.resume); /* 5.0b: paleta para daltonismo nas cores dos jogadores, antes de o renderizador montar os modelos */
   const human = netCtx ? netCtx.myId : 0;
   const canvas = $('world'), mini = $('minimap'), overlay = $('overlay');
   $('start').hidden = true; $('game').hidden = false; $('end').hidden = true;
   let R = null; const want3d = (cfg.gfx || '3d') === '3d' && params.get('r') !== '2d';
   if (want3d && window.THREE) { try { R = ARD.render3d.create(canvas, overlay, mini); } catch (err) { console.warn('3D indisponível, usando 2D:', err); R = null; } }
+  if (!R && want3d && window.THREE && ARD.motor === '5') { console.warn('[ARD] Motor 5 falhou na criação; tentando o motor clássico'); ARD.motor = 'classico'; try { R = ARD.render3d.create(canvas, overlay, mini); } catch (err) { R = null; } } /* 5.0a */
+  if (want3d && ARD.motor === '5' && ARD.m5 && ARD.m5.ok === false) setTimeout(() => notice('Motor 5 indisponível neste navegador: usando o motor clássico'), 1500); /* 5.0a */
   if (!R) { R = ARD.render.create(canvas, mini); overlay.hidden = true; if (want3d) setTimeout(() => notice('3D indisponível neste navegador; usando o modo 2D'), 1200); }
   if (params.get('ssaoout')) R.ssaoOut = parseInt(params.get('ssaoout'), 10);
   if (params.get('testblack')) R.testBlack = true; R.debug = !!params.get('debug');
@@ -300,7 +326,7 @@ function startGame(cfg, netCtx) {
   const ais = cfg.resume ? cfg.resume.ais.map(ARD.ai.restore) : sim.players.filter(p => (!p.human && !(players[p.id] && players[p.id].passive)) || (!netCtx && params.get('ia') === 'todos')).filter(() => !cfg.bench).map(p => ARD.ai.create(p.id, p.difficulty)); // 4.2a: no teste ninguém pensa por cima do roteiro da batalha // ?ia=todos: a IA joga também pelo humano (capturas e testes)
   G = { lead3d: window.__lead3d || null, sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null, net, pending: [], waiting: false, waitT: 0 };
   if (params.get('debug')) window.__ARDG = G; // testes automatizados
-  G.photo = ARD.photo3d && R.is3d ? ARD.photo3d.create({ G, R, view, I, ui, net, canvas, isTouch }) : null; /* 4.3j: Modo Foto (botão 📷 e tecla J; só no 3D) */
+  G.photo = ARD.photo3d && R.is3d && !(R.m5 && !ARD.m5.portado('foto')) /* 5.0a: Modo Foto escondido no Motor 5 até a fase 2 */ ? ARD.photo3d.create({ G, R, view, I, ui, net, canvas, isTouch }) : null; /* 4.3j: Modo Foto (botão 📷 e tecla J; só no 3D) */
   G.track = ARD.campUI ? ARD.campUI.tracker(sim, human) : null; // conquistas valem em qualquer partida
   if (G.lead3d) { let lastG = 0; window.addEventListener('pointermove', ev => { const now = performance.now(); if (now - lastG < 120 || !G.lead3d || ev.pointerType === 'touch') return; lastG = now; ARD.leaders3d.gaze(G.lead3d, (ev.clientX - 80) / Math.max(400, innerWidth * 0.6), -(ev.clientY - 110) / Math.max(300, innerHeight * 0.6), 1200); }, { passive: true }); $('leader').addEventListener('click', () => { if (G.lead3d) { ARD.leaders3d.mood(G.lead3d, 3, 1600); ARD.leaders3d.react(G.lead3d, 'nod'); ARD.leaders3d.react(G.lead3d, 'talk', 0.9); } }); } // 4.1e: o líder olha para onde você aponta; clicar nele arranca um aceno
   if (cfg.resume && G.track && G.track.load) G.track.load(cfg.resume.track);
@@ -317,9 +343,10 @@ function startGame(cfg, netCtx) {
   if (R.is3d && ARD.campUI) R.skins = { [human]: ARD.campUI.skinOf(sim.players[human].faction) };
   window.addEventListener('resize', () => R.resize());
   document.body.classList.toggle('touch', isTouch);
-  if (isTouch) { const bar = $('bar'); for (const id of ['btn-diplo', 'btn-foto', 'btn-save', 'btn-sound', 'btn-voice', 'btn-help']) { const b = $(id); if (b && bar && b.parentElement !== bar) bar.appendChild(b); } } /* 4.3k: no toque, os botões de sistema vão para a barra de baixo (alvos de 44 px sem a barra de cima virar três linhas) */
+  if (isTouch) { const bar = $('bar'); for (const id of ['btn-diplo', 'btn-tech', 'btn-foto', 'btn-save', 'btn-sound', 'btn-voice', 'btn-a11y', 'btn-help']) /* 5.0b: Pesquisa e Ajustes também */ { const b = $(id); if (b && bar && b.parentElement !== bar) bar.appendChild(b); } } /* 4.3k: no toque, os botões de sistema vão para a barra de baixo (alvos de 44 px sem a barra de cima virar três linhas) */
 
   bindHUD(); refreshTop(); refreshHints(); refreshQuick();
+  try { G.h3 = ARD.hud3 ? ARD.hud3.mount({ G, sim, human, view, I, R, ui, notice, leaderArt, LEADER_NAME, RACE_COLORS }) : null; } catch (e) { G.h3 = null; console.warn('[ARD] Interface 3.0 indisponível:', e); } /* 5.0b: roda de comandos, grupos, central de alertas, visão do exército, pesquisa e acessibilidade (src/ui-hud3.js) */
   { const tb = $('top'); const fit = () => { const x = Math.max(0, tb.offsetHeight - 46); document.documentElement.style.setProperty('--tbx', document.body.classList.contains('touch') ? '0px' : x + 'px'); document.documentElement.style.setProperty('--tbh', tb.offsetHeight + 'px'); /* 4.3k: altura real da barra (no celular ela quebra em 2 ou 3 linhas) */ }; fit(); if (window.ResizeObserver) new ResizeObserver(fit).observe(tb); else addEventListener('resize', fit); } // 4.2g
   $('loading').hidden = false;
   R.humanId = human;
@@ -355,7 +382,7 @@ function startGame(cfg, netCtx) {
     }
     if (sim.tick % 10 === 0) for (const a of G.ais) for (const c of ARD.ai.think(sim, a)) S.enqueue(sim, c);
     if (net) for (const c of net.takeCmds(tick)) S.enqueue(sim, c);
-    const ev = S.step(sim);
+    const ev = S.step(sim); G.detEv = (G.detEv || 0) + ev.length; /* 5.0a: detetive */
     if (net && sim.tick % 10 === 0) { const h = S.hash(sim); net.sendHash(sim.tick, h); (G.hashLog = G.hashLog || {})[sim.tick] = h; const ks = Object.keys(G.hashLog); if (ks.length > 80) delete G.hashLog[ks[0]]; }
     if (!silent) G.R.onEvents(ev, sim, human);
     handleEvents(ev, silent);
@@ -372,19 +399,21 @@ function startGame(cfg, netCtx) {
         if (fps < cap) { pf.high = 0; if (++pf.low >= 2 && cur > 0) { R.setQuality(L[cur - 1]); R.quality.name = 'auto'; R.quality.resolved = L[cur - 1]; pf.low = 0; pf.down = true; notice('Qualidade 3D ajustada para ' + LBL[L[cur - 1]] + ' para manter a fluidez (' + Math.round(fps) + ' fps)'); } }
         else if (fps > 57 && !G.save30) { pf.low = 0; if (++pf.high >= 4 && !pf.up && cur < (isTouch ? 1 : 3)) { R.setQuality(L[cur + 1]); R.quality.name = 'auto'; R.quality.resolved = L[cur + 1]; pf.up = true; pf.high = 0; notice(pf.down ? 'Qualidade 3D voltou para ' + LBL[L[cur + 1]] : 'Qualidade 3D subiu para ' + LBL[L[cur + 1]] + ': o aparelho tem folga'); } } /* 4.3l: com folga de 16 s a 58+ fps a qualidade automática sobe uma vez (no celular, até a Média); se cair, desce e não sobe de novo */
         else { pf.low = 0; pf.high = 0; } } } }
-    const iv = now - G.last; let dt = Math.min(0.25, iv / 1000); G.last = now;
+    const iv = now - G.last; let dt = Math.min(0.25, iv / 1000); G.last = now; detPush(iv); /* 5.0a: detetive */
     if (R.dynFrame && !G.paused && !G.ended && !document.hidden && now - G.perf.start > 6000) R.dynFrame(iv, now, G.save30 ? 33.4 : 16.7); /* 4.3i: resolução dinâmica (alvo ~60 fps; 30 na economia de bateria) */
-    if (!G.paused && !G.ended) { const ts0 = performance.now(); G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { if (tickOnce(false) === false) { G.acc = Math.min(G.acc, S.TICK); break; } G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; simMs = performance.now() - ts0; }
+    if (!G.paused && !G.ended) { const ts0 = performance.now(); G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { if (tickOnce(false) === false) { G.acc = Math.min(G.acc, S.TICK); break; } G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; simMs = performance.now() - ts0; G.detSteps = n; }
     if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; setH($('mp-wait'), G.waitT < 0.8); if (G.waitT >= 0.8) setT($('mp-wait'), net.state === 'rejoining' || G.rejoin ? 'Reconectando à sala ' + net.code + '… (' + Math.round((performance.now() - (G.rejoin ? G.rejoin.since : performance.now())) / 1000) + ' s)' : net.state === 'lost' ? 'Conexão perdida.' : 'Aguardando os outros jogadores… (' + G.waitT.toFixed(0) + ' s)'); } /* 4.3k: escrita com guarda */
     I.update(dt);
     if (G.bench) benchFrame(now, dt);
     if (G.frameN % 3 === 0) refreshTop();
     if (G.frameN++ % 2 === 0) { refreshPanel(false); refreshQuick(); } // 4.1a: barato agora (vida e progresso atualizam no lugar)
     if (G.frameN % 30 === 0) refreshHints();
+    if (G.h3) G.h3.frame(G.frameN); /* 5.0b: cada parte da Interface 3.0 no seu ritmo, escrevendo só o que mudou */
     if (G.lead3d && ARD.leaders3d && G.frameN % 300 === 0) { const n = S.nucleoOf(sim, human); const mine = S.armyValue(sim, human); let foe = 0; for (const q of sim.players) if (q.alive && q.id !== human && !S.hasPact(sim, human, q.id)) foe = Math.max(foe, S.armyValue(sim, q.id)); ARD.leaders3d.baseMood(G.lead3d, !n || n.hp < n.maxHp * 0.5 || (foe > 600 && mine < foe * 0.45) ? 4 : (mine > 1500 && mine > foe * 1.8) ? 3 : 1); }
     if (G.camp && G.frameN % 10 === 0) { G.camp.frame(); if (R.setBeacon) R.setBeacon(G.camp.beacon(), G.camp.vip()); }
     { const td0 = performance.now(); R.draw(sim, view, G.paused ? 1 : Math.min(1, G.acc / S.TICK), dt); drawMs = performance.now() - td0; }
     if (G.bench && G.bench.rec && !G.bench.done) { const B = G.bench; B.cpu.push(performance.now() - fc0); B.simT.push(simMs); B.drawT.push(drawMs); } /* 4.3i */
+    detEnd(R, performance.now() - fc0, simMs, drawMs, G.detSteps || 0, G.detEv || 0); G.detSteps = 0; G.detEv = 0; /* 5.0a: detetive */
     if (G.lead3d && ARD.leaders3d && ARD.leaders3d.setLight && R.lightSt && (G.frameN % 15 === 0 || R.lightSt.flash > 0.2)) ARD.leaders3d.setLight(G.lead3d, R.lightSt); /* 4.3e: o retrato do líder recebe a luz do mapa (dia, noite, clima, relâmpago) */
     if (G.autoSave && !G.ended && sim.tick !== G.savedTick && now - (G.lastSave || 0) > 10000) { G.lastSave = now; G.savedTick = sim.tick; (window.requestIdleCallback || ((f) => setTimeout(f, 0)))(() => G.saveNow('auto'), { timeout: 2000 }); }
     requestAnimationFrame(frame);
@@ -429,6 +458,7 @@ function startGame(cfg, netCtx) {
   function handleEvents(ev, silent) {
     for (const e of ev) {
       if (!silent) audioFor(e);
+      if (!silent && G.h3 && e.p === human && (e.t === 'alert' || e.t === 'built' || e.t === 'spawn')) G.h3.ev(e); /* 5.0b: central de alertas */
       if (e.t === 'alert' && e.p === human && !silent && G.lead3d && ARD.leaders3d) { if (e.kind === 'danger') { ARD.leaders3d.react(G.lead3d, 'jolt'); ARD.leaders3d.mood(G.lead3d, 2, 3000); } else if (e.kind === 'good') ARD.leaders3d.react(G.lead3d, 'nod'); if (e.x != null && R.worldToScreen) { const sp = R.worldToScreen(view.cam, e.x, e.y); if (sp) ARD.leaders3d.gaze(G.lead3d, (sp[0] - 80) / 500, -(sp[1] - 110) / 400, 1600); } }
       if (e.t === 'alert' && e.p === human) { if (e.x != null) view.lastAlert = { x: e.x, y: e.y }; if (!silent) pushAlert(e); if (!silent && G.haptics && e.kind === 'danger' && performance.now() - G.lastBuzz > 2500) { G.lastBuzz = performance.now(); try { navigator.vibrate(30); } catch (er) {} } }
       if (!silent && G.haptics && e.t === 'super' && e.p === human) { try { navigator.vibrate([20, 40, 20]); } catch (er) {} }
@@ -476,7 +506,7 @@ function startGame(cfg, netCtx) {
     if (B.last) B.mt += Math.min(250, now - B.last); /* relógio do teste: só avança com o jogo rodando */
     const t = params.get('benchpasso') ? (B.vt = (B.vt || 0) + (+params.get('benchpasso') > 1 ? +params.get('benchpasso') : 1000 / 30)) : B.mt; /* ?benchpasso=1: tempo virtual por quadro (capturas iguais em qualquer máquina) */
     if (sim.time >= B.nextWave && G.benchWave) { B.nextWave = sim.time + 4; G.benchWave(); }
-    if (t > B.warm && B.last) { B.frames.push(now - B.last); if (!B.rec) { B.rec = true; B.prog1 = R.progs ? R.progs() : 0; if (R.gpuMs) R.gpuMs().length = 0; } } B.last = now; // intervalo real entre quadros (o dt do jogo é limitado a 250 ms)
+    if (t > B.warm && B.last) { B.frames.push(now - B.last); if (!B.rec) { B.rec = true; B.prog1 = R.progs ? R.progs() : 0; if (R.gpuMs) R.gpuMs().length = 0; B.det0 = DET.n; /* 5.0a */ } } B.last = now; // intervalo real entre quadros (o dt do jogo é limitado a 250 ms)
     const k = Math.max(0, Math.min(1, (t - B.warm) / B.dur)); const sm = x => x * x * (3 - 2 * x); const lerp = (p, q, f) => p + (q - p) * f;
     // trajeto: base A → batalha de perto → volta em órbita → panorama alto → base B
     const c = view.cam; let x, y, z, yaw, pitch;
@@ -493,15 +523,17 @@ function startGame(cfg, netCtx) {
     const pct = q => { const n = Math.max(1, Math.floor(sorted.length * q)); let s = 0; for (let i = 0; i < n; i++) s += sorted[i]; return Math.round(1000 / (s / n)); };
     const res = { fps: Math.round(fr.length * 1000 / Math.max(1, total)), p1: pct(0.01), p5: pct(0.05), worst: Math.round(sorted[0] || 0), stutters: fr.filter(v => v > 50).length, frames: fr.length, quality: (R.quality && R.quality.name === 'auto' ? 'auto → ' + R.quality.resolved : (R.quality && R.quality.name) || '2d'), res: Math.round(R.w * (R.quality ? R.quality.pr : 1)) + 'x' + Math.round(R.h * (R.quality ? R.quality.pr : 1)), gpu: R.gpu || '?', version: VERSION, at: Date.now() };
     { const md = a => { if (!a || !a.length) return null; const s = a.slice().sort((p, q) => p - q); return s[Math.floor(s.length / 2)]; }, p95 = a => { if (!a || !a.length) return null; const s = a.slice().sort((p, q) => p - q); return s[Math.floor(s.length * 0.95)]; }, r1 = v => v == null ? null : Math.round(v * 10) / 10; /* 4.3i: onde vai o tempo do quadro */
-      res.cpu = r1(md(B.cpu)); res.cpu95 = r1(p95(B.cpu)); res.simMs = r1(md(B.simT)); res.drawMs = r1(md(B.drawT)); const gm = B.gpu && R.gpuMs ? R.gpuMs() : null; res.gpuMs = gm && gm.length > 20 ? r1(md(gm)) : null; res.gpu95 = gm && gm.length > 20 ? r1(p95(gm)) : null;
+      res.cpu = r1(md(B.cpu)); res.cpu95 = r1(p95(B.cpu)); res.simMs = r1(md(B.simT)); res.drawMs = r1(md(B.drawT)); const gm = B.gpu && R.gpuMs ? R.gpuMs() : null; res.gpuMs = gm && gm.length > 20 ? r1(md(gm)) : null; res.gpu95 = gm && gm.length > 20 ? r1(p95(gm)) : null; res.gpuN = gm ? gm.length : 0; /* 5.0a: quantas medidas de GPU */
       res.shaders = R.progs ? Math.max(0, R.progs() - (B.prog1 || B.prog0 || 0)) : null; if (R.loadT && R.loadT.total) res.carga = R.loadT; res.shaders0 = B.prog0 || null; if (R.dyn) res.escala = R.dyn.minSeen != null ? Math.round(R.dyn.minSeen * 100) + '–' + Math.round(R.dyn.maxSeen * 100) + '%' : null; if (R.gpuTimer) R.gpuTimer(false); }
+    res.motor = R.m5 ? (R.m5.isWebGPU ? '5 (WebGPU)' : '5 (WebGL2)') : R.is3d ? 'Clássico' : '2D'; if (R.m5) { res.motorInicio = R.m5.initMs; res.pipelines0 = R.m5.pipes - (res.shaders || 0); if (R.m5.adapter) res.gpu = R.m5.adapter + ' · ' + res.gpu; } res.detetive = detTop(B.det0 != null ? B.det0 : Math.max(0, DET.n - fr.length), DET.n, 5); /* 5.0a: motor, pipelines e os 5 piores quadros */
     try { localStorage.setItem('ard-bench-last', JSON.stringify(res)); } catch (e) {}
     G.paused = true; refreshTop(); window.__benchResult = res; showBench(res);
   }
   function showBench(res) {
     const box = $('benchbox'); if (!box) return; if (!res) { $('bench-verdict').textContent = 'Teste interrompido'; $('bench-verdict').className = 'bv warn'; $('bench-tip').textContent = 'O jogo ficou pausado ou em segundo plano durante a medição. Rode de novo com a tela acesa e sem trocar de aba.'; $('bench-table').innerHTML = ''; $('bench-feedback').hidden = true; $('bench-back').onclick = () => location.href = location.pathname; box.hidden = false; return; } $('bench-feedback').hidden = false; const verdict = res.fps >= 55 && res.p1 >= 35 ? ['Ótimo', 'good', 'Pode subir a qualidade.'] : res.fps >= 40 ? ['Bom', 'good', 'Fluido para jogar.'] : res.fps >= 26 ? ['Jogável', 'warn', 'Se travar em batalhas grandes, desça um degrau de qualidade.'] : ['Pesado', 'danger', 'Use a qualidade Baixa ou o modo 2D neste aparelho.'];
     $('bench-verdict').textContent = verdict[0]; $('bench-verdict').className = 'bv ' + verdict[1]; $('bench-tip').textContent = verdict[2];
-    $('bench-table').innerHTML = [['FPS médio', res.fps], ['Piores 1% dos quadros', res.p1 + ' fps'], ['Piores 5% dos quadros', res.p5 + ' fps'], ['Pior quadro', res.worst + ' ms'], ['Travadas (> 50 ms)', res.stutters + ' de ' + res.frames], ['Qualidade', res.quality], ['Resolução interna', res.res + (res.escala ? ' (escala ' + res.escala + ')' : '')], ['CPU por quadro', res.cpu != null ? res.cpu + ' ms (95%: ' + res.cpu95 + ' ms) · simulação ' + res.simMs + ' ms · desenho ' + res.drawMs + ' ms' : '—'], ['GPU por quadro', res.gpuMs != null ? res.gpuMs + ' ms (95%: ' + res.gpu95 + ' ms)' : 'não medido neste navegador'], ['Shaders compilados no teste', res.shaders != null ? res.shaders : '—'], ['Carregamento', res.carga ? (res.carga.total / 1000).toFixed(1) + ' s (terreno ' + (res.carga.terreno / 1000).toFixed(1) + ' s · modelos ' + (res.carga.modelos / 1000).toFixed(1) + ' s · shaders ' + (res.carga.shaders / 1000).toFixed(1) + ' s)' : '—'], ['GPU', res.gpu]].map(([k, v]) => `<div class="stat"><span>${esc(k)}</span><b>${esc(String(v))}</b></div>`).join('');
+    $('bench-table').innerHTML = [['FPS médio', res.fps], ['Piores 1% dos quadros', res.p1 + ' fps'], ['Piores 5% dos quadros', res.p5 + ' fps'], ['Pior quadro', res.worst + ' ms'], ['Travadas (> 50 ms)', res.stutters + ' de ' + res.frames], ['Qualidade', res.quality], ['Resolução interna', res.res + (res.escala ? ' (escala ' + res.escala + ')' : '')], ['CPU por quadro', res.cpu != null ? res.cpu + ' ms (95%: ' + res.cpu95 + ' ms) · simulação ' + res.simMs + ' ms · desenho ' + res.drawMs + ' ms' : '—'], ['GPU por quadro', res.gpuMs != null ? res.gpuMs + ' ms (95%: ' + res.gpu95 + ' ms)' : res.gpuN ? 'poucos quadros medidos (' + res.gpuN + ')' : 'não medido neste navegador'] /* 5.0a */, ['Shaders compilados no teste', res.shaders != null ? res.shaders + (res.motor && res.motor[0] === '5' ? ' (pipelines criados no ' + res.motor.slice(3, -1) + ')' : '') : '—'], ['Carregamento', res.carga ? (res.carga.total / 1000).toFixed(1) + ' s (' + (res.carga.motor != null ? 'motor ' + (res.carga.motor / 1000).toFixed(2) + ' s · ' : '') + 'terreno ' + (res.carga.terreno / 1000).toFixed(1) + ' s · modelos ' + (res.carga.modelos / 1000).toFixed(1) + ' s · ' + (res.motor && res.motor[0] === '5' ? 'shaders e pipelines ' : 'shaders ') + (res.carga.shaders / 1000).toFixed(1) + ' s)' : '—'], ['Motor', res.motor || 'Clássico'], ['GPU', res.gpu]] /* 5.0a: linha do motor */.map(([k, v]) => `<div class="stat"><span>${esc(k)}</span><b>${esc(String(v))}</b></div>`).join('');
+    { const dd = $('bench-det'); if (dd) { const L = res.detetive || []; dd.hidden = !L.length; dd.innerHTML = L.length ? '<b>Detetive de travadas: os 5 piores quadros</b><ol>' + L.map(s => '<li>' + esc(s) + '</li>').join('') + '</ol>' : ''; } } /* 5.0a */
     $('bench-feedback').href = feedbackUrl({ teste_desempenho_detalhe: JSON.stringify(res) }); $('bench-back').onclick = () => location.href = location.pathname; box.hidden = false;
   }
   // ---------- 4.1c: salvamento ----------
@@ -654,7 +686,7 @@ function startGame(cfg, netCtx) {
         else if (nx) { const why = S.eraBlock(sim, human); const reqs = (nx.needs || []).map(n => (S.hasBuilt(sim, human, n) ? '✓ ' : '✗ ') + S.BUILDINGS[n].name).concat(nx.needsAny ? [(nx.needsAny.some(n => S.hasBuilt(sim, human, n)) ? '✓ ' : '✗ ') + nx.needsAny.map(n => S.BUILDINGS[n].name).join(' ou ')] : []);
           h += `<button class="act evolve" data-evolve="1" ${why ? `data-lock="${esc(why)}"` : ''} title="${esc(nx.desc)}"><span class="n">Evoluir para a Era ${nx.roman} · ${esc(nx.name)}</span><span class="cost">${costStr(nx.cost)} · ${nx.time} s</span></button><div class="small muted">${reqs.join(' · ')} — ${esc(nx.desc)}</div>`; }
         else h += '<div class="small muted">Era máxima. A Ascensão da Raça fica no Laboratório.</div>';
-        h += '</div>';
+        h += `<button class="act sm" data-techscr="1">${IC('ic-tec')}Pesquisa e Eras${G.isTouch ? '' : ' (F3)'}</button></div>`; /* 5.0b */
       }
       { const md = e.built && S.BUILDINGS[e.def].module; if (md) { // 4.1d: módulo da estrutura
         if (e.mod) h += `<div class="tip">✓ ${esc(md.name)}: ${esc(md.desc)}</div>`;
@@ -667,6 +699,7 @@ function startGame(cfg, netCtx) {
         { const a = S.ASCENSION[p.faction]; if (a) { const lk = p.ascended ? null : (p.era || 1) < 3 ? 'Requer Era III (Domínio)' : null; h += `<button class="act ascend ${lk ? 'locked' : ''}" data-ascend="1" ${p.ascended ? 'disabled' : ''} ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc(a.desc)}"><span class="n">✦ Ascensão: ${esc(a.name)}${p.ascended ? ' ✓' : ''}</span><span class="cost">${lk ? '🔒 Era III' : p.ascended ? esc(a.desc) : costStr(a.cost)}</span></button>`; } }
         const cd = Math.max(0, p.superCd - sim.time);
         h += `<button class="act super" data-super="1" ${cd > 0 ? 'disabled' : ''} title="${esc(fac.superDesc)}"><span class="n">${esc(fac.superName)}${cd > 0 ? ' · ' + mmss(cd) : ''}</span><span class="cost">${costStr(S.SUPER_COST)}</span></button>`;
+        h += `<div class="row"><button class="act sm" data-techscr="1">${IC('ic-tec')}Árvore de pesquisa e Eras${G.isTouch ? '' : ' (F3)'}</button></div>`; /* 5.0b */
       }
       if (e.jumpT > 0) h += `<div class="tip">Salto em ${Math.ceil(e.jumpT)} s. O Núcleo está visível para todos.</div>`;
       panel.innerHTML = h;
@@ -730,7 +763,7 @@ function startGame(cfg, netCtx) {
     if (nx && !(p.evolveT > 0)) { const reqs = (nx.needs || []).map(n => [S.hasBuilt(sim, human, n), S.BUILDINGS[n].name]).concat(nx.needsAny ? [[nx.needsAny.some(n => S.hasBuilt(sim, human, n)), nx.needsAny.map(n => S.BUILDINGS[n].name).join(' ou ')]] : []);
       h += `<div class="reqs"><span>Para a Era ${nx.roman}:</span>${reqs.map(r => `<span class="${r[0] ? 'ok' : 'no'}">${r[0] ? '✓' : '✗'} ${esc(r[1])}</span>`).join('')}<span>${costStr(nx.cost)} · ${nx.time} s</span></div>`; }
     h += '<div class="rlist">' + Object.keys(S.RESEARCH).map(k => { const r = S.RESEARCH[k], done = !!p.research[k], lk = !done && S.lockReason(sim, human, 'research', k); return `<div class="rs ${done ? 'ok' : lk ? 'lk' : ''}" title="${esc(r.desc)}"><b>${esc(r.name)}${done ? ' ✓' : ''}</b><small>${done ? 'concluída' : lk ? 'Era ' + S.ERAS[r.era].roman : costStr(r.cost)}</small></div>`; }).join('') + '</div>';
-    if (nx && S.nucleoOf(sim, human)) h += `<div class="row"><button class="act sm" data-nucleo="1">${IC('ic-nucleo')}Abrir o Núcleo (F1) para evoluir</button></div>`;
+    h += `<div class="row">${nx && S.nucleoOf(sim, human) ? `<button class="act sm" data-nucleo="1">${IC('ic-nucleo')}Abrir o Núcleo (F1) para evoluir</button>` : ''}<button class="act sm" data-techscr="1">${IC('ic-tec')}Pesquisa e Eras${G.isTouch ? '' : ' (F3)'}</button></div>`; /* 5.0b: tela de pesquisa */
     return h; }
   function buildMenuHTML(p) {
     const tab = G.btab || 'eco', defs = tabDefs(tab);
@@ -770,6 +803,7 @@ function startGame(cfg, netCtx) {
     $('btn-help').addEventListener('click', () => toggleHelp(true));
     $('btn-menu').addEventListener('click', () => ui.confirm('Encerrar esta partida e voltar ao início?' + (G.autoSave ? ' Para continuar depois, use 💾 › Pausar e sair.' : ''), () => { G.leaving = true; const go = () => goStart(); if (net) mpSession.clear(); if (G.autoSave && ARD.saves) within(ARD.saves.del('auto'), 2500).then(go, go); else go(); })); // 4.2g: sem relançar a missão nem regravar o 'auto'
     if ($('btn-save')) $('btn-save').addEventListener('click', () => openSaveBox());
+    $('panel').addEventListener('click', ev => { const b = ev.target.closest && ev.target.closest('[data-techscr]'); if (b && G.h3) G.h3.openTech(); }); /* 5.0b: botões da tela de pesquisa nos painéis (o painel é remontado; o ouvinte fica no contêiner) */
     if ($('idle-col')) $('idle-col').addEventListener('click', () => { const ids = (G.idleCol || []).filter(id => { const u = sim.byId.get(id); return u && u.alive; }); if (!ids.length) return; I.select(ids); const u = sim.byId.get(ids[0]); if (u) I.center(u.x, u.y); notice(ids.length + (ids.length > 1 ? ' coletores parados selecionados' : ' coletor parado selecionado') + ': clique com o botão direito num campo de recursos para mandá-los colher.'); }); // 4.2h
     if ($('pausebox')) $('pausebox').addEventListener('click', () => { if (G.paused && !G.ended) { G.paused = false; G.autoPaused = false; G.pauseWhy = null; refreshTop(); notice('Continuando'); } }); // 4.2f: pausa visível; clique continua
     $('btn-build').addEventListener('click', () => { if (G.isTouch && I.mode !== 'build') { G.drawer = G.drawer || {}; const showing = !view.sel.size || I.buildMenu; if (showing && !G.drawer.build) { setDrawer(true); return; } G.drawer.build = false; I.buildMenu = true; view.sel = new Set(); ui.buildMenuChanged(true); return; } /* 4.3l: no toque, o botão abre e recolhe a gaveta do Construir */
@@ -867,7 +901,7 @@ function startGame(cfg, netCtx) {
     net.on('close', () => { if (net.role !== 'guest' || G.ended) return; if (!G.rejoin) { G.rejoin = { since: performance.now(), tries: 0 }; banner('Conexão perdida', 'Tentando voltar à sala… a partida continua de onde parou.', 'warn', 8000); log('', 'Conexão perdida com o anfitrião; reconectando.'); setTimeout(tryRejoin, 1500); } });
     net.on('rejoin-fail', () => {});
     net.on('rejoin-no', d => { if (G.rejoin) clearTimeout(G.rejoin.t); G.rejoin = null; mpSession.clear(); banner('A sala recusou a volta', 'Motivo: ' + (d.why || '?') + '.', 'danger', 12000); log('', 'Volta recusada: ' + (d.why || '?')); });
-    net.on('state', st => { if (G.rejoin) clearTimeout(G.rejoin.t); G.rejoin = null; try { S.restore(sim, st.snap); } catch (e) { banner('Falha ao sincronizar', String(e.message || e), 'danger'); return; } net.sentFor = sim.tick - 1; G.pending = []; G.acc = 0; G.waiting = false; banner('De volta à sala', 'Partida sincronizada no tempo ' + ARD.saves.mmss(sim.time) + '.', 'good', 6000); log('', 'Reconectado à sala ' + net.code + '.'); });
+    net.on('state', st => { if (G.rejoin) clearTimeout(G.rejoin.t); G.rejoin = null; try { S.restore(sim, st.snap); if (G.h3) G.h3.reapply(sim); /* 5.0b: a fotografia do anfitrião traz as cores dele */ } catch (e) { banner('Falha ao sincronizar', String(e.message || e), 'danger'); return; } net.sentFor = sim.tick - 1; G.pending = []; G.acc = 0; G.waiting = false; banner('De volta à sala', 'Partida sincronizada no tempo ' + ARD.saves.mmss(sim.time) + '.', 'good', 6000); log('', 'Reconectado à sala ' + net.code + '.'); });
     net.on('rejoin-request', () => ({ tick: sim.tick, snap: S.snapshot(sim) }));
     net.on('back', d => { const nm = (sim.players[d.id] || {}).name || d.name || 'Um jogador'; banner('Jogador voltou', nm + ' voltou à partida.', 'good'); log('', nm + ' voltou.'); });
     if (net.role === 'guest') { mpSession.touch(); setInterval(() => { if (!G.ended && net.state === 'connected') mpSession.touch(); }, 5000); }
@@ -910,14 +944,15 @@ function startGame(cfg, netCtx) {
   // ---------- UI bridge for input ----------
   function makeUI() {
     return {
-      selectionChanged() { I.buildMenu = false; refreshPanel(true); refreshQuick(); },
+      selectionChanged() { I.buildMenu = false; refreshPanel(true); refreshQuick(); if (G.h3) G.h3.selChanged(); }, /* 5.0b: grupo aceso na barra */
       modeChanged() { refreshPanel(true); refreshQuick(); this.placeChanged(); autoDrawer(); }, /* 4.3l */
       placeChanged() { const pb = $('placebar'); if (!pb) return; const g = view.ghost; const on = G.isTouch && I.mode === 'build' && g && !S.BUILDINGS[g.def].wall; pb.hidden = !on; document.body.classList.toggle('placing', !!on); if (!on) return; const ok = S.canBuild(sim, human, g.def, g.x, g.y); const afford = S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost); $('pb-text').textContent = S.BUILDINGS[g.def].name + ' · ' + (!ok.ok ? ok.why : !afford ? 'recursos insuficientes' : 'local válido · arraste para ajustar'); $('pb-ok').disabled = !(ok.ok && afford); },
       buildMenuChanged() { refreshPanel(true); refreshQuick(); },
       touchBoxChanged() { refreshQuick(); },
-      notice, confirm: confirmModal, modalOpen() { return !$('diplo').hidden || !$('help').hidden || !$('confirm').hidden || !$('savebox').hidden; }, // 4.2g: com Salvar partida aberta as teclas não comandam o jogo
+      notice, confirm: confirmModal, modalOpen() { return !$('diplo').hidden || !$('help').hidden || !$('confirm').hidden || !$('savebox').hidden || !!(G.h3 && G.h3.modalOpen()); }, /* 5.0b: tela de pesquisa e Ajustes também */ // 4.2g: com Salvar partida aberta as teclas não comandam o jogo
       enqueue(c) { if (net) G.pending.push(c); else S.enqueue(sim, c); },
-      closeModals() { $('diplo').hidden = true; $('help').hidden = true; $('confirm').hidden = true; if (G.closeSave) G.closeSave(); },
+      closeModals() { $('diplo').hidden = true; $('help').hidden = true; $('confirm').hidden = true; if (G.closeSave) G.closeSave(); if (G.h3) G.h3.closeModals(); /* 5.0b: tela de pesquisa e Ajustes */ },
+      wheel(o) { return G.h3 ? G.h3.wheel(o) : false; }, groupsChanged() { if (G.h3) G.h3.groupsChanged(); }, nextAlert() { return G.h3 ? G.h3.nextAlert() : view.lastAlert; }, toggleTech() { if (G.h3) G.h3.toggleTech(); }, /* 5.0b: roda de comandos, grupos, Espaço nos alertas e F3 */
       toggleHelp() { toggleHelp(); }, togglePause() { if (net) { notice('Sem pausa no multiplayer'); return; } if (G.camp && G.camp.noPause) { notice('Sem pausa na dificuldade Fenda'); return; } G.paused = !G.paused; if (!G.paused) G.pauseWhy = null; else G.pauseWhy = 'Partida pausada.'; refreshTop(); if (!G.paused) notice('Continuando'); },
     };
   }
