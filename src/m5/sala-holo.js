@@ -16,10 +16,12 @@ function criar(C) { const { W, T } = C.L; const { float, vec3, color, uniform, m
   const U = H.U = { cor: uniform(new W.Color(COR.vehnar)), y0: uniform(0), h: uniform(30), revela: uniform(0), k: uniform(1), key: uniform(new W.Vector3(-0.6, 0.6, 0.5).normalize()) };
   /* luz de estúdio do busto (as posições do leaders3d, no espaço do busto); o alvo fica no centro do busto */
   const rig = new W.Group(); H.group.add(rig); const alvo = new W.Object3D(); rig.add(alvo);
-  const L = { key: new W.DirectionalLight(0xfff0dc, 3.0), fill: new W.DirectionalLight(0xffffff, 0.35), rimA: new W.DirectionalLight(0xd6e6ff, 2.6), rimB: new W.DirectionalLight(0xff7733, 3.4), cons: new W.DirectionalLight(0xff7733, 0.6), hemi: new W.HemisphereLight(0x9fb0cc, 0x1a1512, 0.45) };
-  L.key.position.set(-3.3, 3.4, 2.5); L.fill.position.set(3.4, 0.2, 2.0); L.rimA.position.set(-3.0, 2.6, -3.0); L.rimB.position.set(3.4, 1.2, -2.6); L.cons.position.set(0.3, -3.2, 2.4);
+  /* 5.0a.1: três luzes no busto (chave, contorno na cor da Raça e hemisfério; eram seis): o contorno frio e o preenchimento viram emissivo
+     na camada do holograma, e o bloom faz o resto. Shaders do busto bem menores (cada luz direcional repete o BRDF inteiro no programa) */
+  const L = { key: new W.DirectionalLight(0xfff0dc, 3.0), rimB: new W.DirectionalLight(0xff7733, 3.4), hemi: new W.HemisphereLight(0x9fb0cc, 0x1a1512, 0.62) };
+  L.key.position.set(-3.3, 3.4, 2.5); L.rimB.position.set(3.4, 1.2, -2.6);
   for (const k in L) { rig.add(L[k]); if (L[k].target) L[k].target = alvo; }
-  const luz = lights([L.key, L.fill, L.rimA, L.rimB, L.cons, L.hemi]);
+  const luz = lights([L.key, L.rimB, L.hemi]);
   /* camada de holograma: máscara de dissolução (de baixo para cima, borda serrilhada por ruído) e brilho */
   const yr = positionWorld.y.sub(U.y0).div(U.h), nz = mx_noise_float(positionWorld.mul(0.9)).mul(0.05), lim = U.revela.mul(1.3).sub(0.15);
   const vis = smoothstep(lim.add(0.012), lim.sub(0.012), yr.add(nz)).mul(smoothstep(0.035, 0.07, yr.add(nz)));
@@ -27,14 +29,15 @@ function criar(C) { const { W, T } = C.L; const { float, vec3, color, uniform, m
   const V = normalize(cameraPosition.sub(positionWorld)), rim = pow(float(1).sub(max(dot(normalize(normalWorld), V), 0)), 3.0);
   const scan = smoothstep(0.82, 1.0, sin(positionWorld.y.mul(2.6).sub(time.mul(5.0))).mul(0.5).add(0.5)), faixa = float(1).sub(smoothstep(0.0, 0.05, abs(yr.sub(fract(time.mul(0.16)).mul(1.4).sub(0.2)))));
   const cint = float(0.93).add(hash(floor(time.mul(24.0))).mul(0.07));
-  const brilho = U.cor.mul(rim.mul(1.0).add(scan.mul(0.1)).add(faixa.mul(0.32)).add(0.03)).mul(U.k).mul(cint).add(U.cor.mul(borda).mul(3.0));
+  const fria = vec3(0.84, 0.9, 1.0).mul(rim.mul(0.3)); /* 5.0a.1: o contorno frio que vinha de uma luz de trás */
+  const brilho = U.cor.mul(rim.mul(1.0).add(scan.mul(0.1)).add(faixa.mul(0.32)).add(0.03)).mul(U.k).mul(cint).add(fria).add(U.cor.mul(borda).mul(3.0));
   const tremida = step(0.985, hash(floor(time.mul(13.0)))).mul(sin(positionWorld.y.mul(1.7).add(time.mul(90.0)))).mul(0.06);
   /* brilho úmido do olho: reflexo afiado da luz principal (o olho é pequeno: um ponto vivo lê melhor que um reflexo largo) */
   const R = reflect(U.key.negate(), normalize(normalWorld)), glint = pow(max(dot(R, V), 0), 420.0).mul(9.0).add(pow(max(dot(R, V), 0), 40.0).mul(0.25));
   H.make = (type, o, name) => { o = Object.assign({}, o); let m;
     if (type === 'PointsMaterial') { m = new W.PointsNodeMaterial(o); m.visible = false; return m; } /* no WebGPU o ponto tem 1 pixel: faíscas e auras do retrato ficam de fora (aqui há bloom) */
-    if (PELE.test(name) && type === 'MeshPhysicalMaterial' && !o.transparent) { m = new W.MeshSSSNodeMaterial(o); m.thicknessColorNode = color(SSS[H.building] || SSS.vehnar).mul((SSSK[H.building] || 1) * (name === 'labio' ? 1.2 : 1.0));
-      m.thicknessDistortionNode = float(0.14); m.thicknessAmbientNode = float(0.0); m.thicknessAttenuationNode = float(0.8); m.thicknessPowerNode = float(3.0); m.thicknessScaleNode = float(name === 'pele-escura' ? 1.6 : 2.6); }
+    if (PELE.test(name) && type === 'MeshPhysicalMaterial' && !o.transparent) { m = new W.MeshSSSNodeMaterial(o); m.thicknessColorNode = uniform(new W.Color(SSS[H.building] || SSS.vehnar).multiplyScalar((SSSK[H.building] || 1) * (name === 'labio' ? 1.2 : 1.0))); /* 5.0a.1: cor e escala por uniform: a pele das cinco Raças usa o mesmo programa */
+      m.thicknessDistortionNode = float(0.14); m.thicknessAmbientNode = float(0.0); m.thicknessAttenuationNode = float(0.8); m.thicknessPowerNode = float(3.0); m.thicknessScaleNode = uniform(name === 'pele-escura' ? 1.6 : 2.6); }
     else if (name === 'olho') { m = new W.MeshPhysicalNodeMaterial(Object.assign(o, { clearcoat: 1, clearcoatRoughness: 0.03, roughness: Math.min(o.roughness == null ? 0.3 : o.roughness, 0.16) })); }
     else if (name === 'cornea') { m = new W.MeshPhysicalNodeMaterial(Object.assign(o, { roughness: 0.02, clearcoat: 1, clearcoatRoughness: 0.01, envMapIntensity: 2.6 })); m.emissiveNode = vec3(1.0, 0.98, 0.94).mul(glint); }
     else if (name === 'lente') { m = new W.MeshPhysicalNodeMaterial(o); m.emissiveNode = materialEmissive.add(vec3(1.0, 0.97, 0.9).mul(glint)); }
@@ -45,11 +48,11 @@ function criar(C) { const { W, T } = C.L; const { float, vec3, color, uniform, m
     if (m.transparent) m.opacityNode = materialOpacity.mul(vis); else { m.opacityNode = vis; m.alphaTest = 0.5; }
     return m; };
   /* projetor no topo do Núcleo: anel emissor e o feixe que sobe até o busto */
-  { const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending, side: W.DoubleSide }); m.fog = false; const p = positionLocal, ang = T.atan(p.z, p.x);
+  { const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending, side: W.DoubleSide, forceSinglePass: true }); m.fog = false; const p = positionLocal, ang = T.atan(p.z, p.x);
     const raios = mx_noise_float(vec3(ang.mul(5.0), p.y.mul(0.2).sub(time.mul(0.9)), 0)).mul(0.5).add(0.5), sobe = p.y.div(14).add(0.5);
     m.colorNode = U.cor.mul(raios.mul(0.6).add(0.4)).mul(float(1).sub(smoothstep(0.1, 1.0, sobe))).mul(U.revela.mul(0.7).add(0.3)).mul(1.4); m.opacityNode = float(0.55).mul(smoothstep(0.0, 0.08, sobe));
     const g = new W.CylinderGeometry(15, 4.5, 14, 48, 1, true); H.feixe = new W.Mesh(g, m); H.feixe.renderOrder = 7; H.disp.push(g, m); H.group.add(H.feixe); }
-  { const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending, side: W.DoubleSide }); m.fog = false; const r = T.length(positionLocal.xy);
+  { const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending, side: W.DoubleSide, forceSinglePass: true }); m.fog = false; const r = T.length(positionLocal.xy);
     const an = fract(T.atan(positionLocal.y, positionLocal.x).div(Math.PI * 2).add(time.mul(0.08))).mul(24.0); const tique = smoothstep(0.85, 1.0, fract(an));
     m.colorNode = U.cor.mul(smoothstep(4.5, 5.2, r).mul(smoothstep(6.6, 5.8, r)).mul(1.6).add(tique.mul(smoothstep(6.8, 7.0, r)).mul(smoothstep(7.6, 7.4, r)).mul(2.2)));
     const g = new W.RingGeometry(4.2, 7.8, 96, 1); H.anel = new W.Mesh(g, m); H.anel.rotation.x = -Math.PI / 2; H.anel.renderOrder = 7; H.disp.push(g, m); H.group.add(H.anel); }
@@ -62,7 +65,7 @@ function criar(C) { const { W, T } = C.L; const { float, vec3, color, uniform, m
   /* coloca o busto: escala s, base no topo do Núcleo (y), virado para a câmera (giro) */
   H.mostrar = (race, yTopo, s, giro) => { const p = H.preparar(race); for (const k in H.prep) H.prep[k].g.visible = k === race; H.it = p.it; H.race = race; const y = yTopo + 6;
     p.g.scale.setScalar(s); p.g.position.set(-p.cx * s, y - p.base * s, -p.cz * s); H.rig.position.set(0, y + p.h * s * 0.55, 0); H.rig.scale.setScalar(s); H.group.rotation.y = giro;
-    U.y0.value = y; U.h.value = p.h * s; U.cor.value.setHex(COR[race] || COR.vehnar); U.k.value = { tessara: 0.6, erevane: 0.7, quorith: 0.85 }[race] || 1; L.rimB.color.setHex(COR[race]); L.cons.color.setHex(COR[race]);
+    U.y0.value = y; U.h.value = p.h * s; U.cor.value.setHex(COR[race] || COR.vehnar); U.k.value = { tessara: 0.6, erevane: 0.7, quorith: 0.85 }[race] || 1; L.rimB.color.setHex(COR[race]);
     H.feixe.position.set(0, yTopo + 6.5, 0); H.anel.position.set(0, yTopo + 0.4, 0); H.topo = y + p.h * s; H.centro = y + p.h * s * 0.55; H.base = y;
     U.key.value.copy(L.key.position).normalize().applyQuaternion(H.group.quaternion); return p; };
   H.descartar = race => { const p = H.prep[race]; if (!p || p.race === H.race) return; ARD.leaders3d.detach(p.it); H.group.remove(p.g); delete H.prep[race]; };

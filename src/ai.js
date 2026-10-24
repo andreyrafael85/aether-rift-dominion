@@ -57,7 +57,7 @@ function strategic(sim, mem, p, army) {
   else if (hv > 0 && value > hv * 1.8) next = p.faction === 'erevane' ? 'roubo' : 'blindados';
   else if (sim.rand() < 0.3) next = prefs[Math.floor(sim.rand() * prefs.length)];
   if (next !== mem.strategy) { mem.strategy = next; emit(mem, sim, { t: 'aistrat', p: mem.pid, strategy: STRATS[next].name }); }
-  mem.towersWanted = 2 + (STRATS[mem.strategy].towers || 0) + Math.floor(t / 400);
+  mem.towersWanted = 2 + (STRATS[mem.strategy].towers || 0) + Math.floor(t / 400); if (mem.diff.maxTowers != null) mem.towersWanted = Math.min(mem.towersWanted, mem.diff.maxTowers); /* 5.0a.1: Fácil constrói menos defesa */
 }
 function emit(mem, sim, ev) { /* eventos informativos da IA aparecem só em depuração */ }
 function assessTargets(sim, mem, from) {
@@ -82,7 +82,7 @@ function think(sim, mem) {
   const t = sim.time; const D = mem.diff; const mine = own(sim, mem.pid);
   const nuc = mine.find(e => e.kind === 'building' && e.def === 'nucleo'); if (!nuc) return cmds;
   const builds = mine.filter(e => e.kind === 'building'); const units = mine.filter(e => e.kind === 'unit');
-  const era = p.era || 1; const ERA_AT = { facil: [0, 0, 300, 600], normal: [0, 0, 200, 420], dificil: [0, 0, 150, 330], brutal: [0, 0, 120, 280] }[mem.dn || 'normal'] || [0, 0, 200, 420];
+  const era = p.era || 1; const ERA_AT = { facil: [0, 0, 420, 840] /* 5.0a.1: antes 300 e 600 */, normal: [0, 0, 200, 420], dificil: [0, 0, 150, 330], brutal: [0, 0, 120, 280] }[mem.dn || 'normal'] || [0, 0, 200, 420];
   const collectors = units.filter(u => u.def === 'coletor'); const pirates = units.filter(u => u.def === 'pirata'); const army = units.filter(u => S.UNITS[u.def].attack && !u.scripted); // 4.0e: chefes de campanha obedecem só ao roteiro
   const nodulos = count(builds, b => b.def === 'nodulo'); const underConstruction = count(builds, b => !b.built);
   updateKnown(sim, mem);
@@ -118,6 +118,7 @@ function think(sim, mem) {
   else if (underConstruction < 2 && paced) { // 4.1a: Fácil/Normal constroem num ritmo humano
     const order = mem.order || (mem.order = (BUILD_ORDERS[p.faction] || BUILD_ORDERS.vehnar).slice()); let def = order[mem.bo];
     if (def && S.lockReason(sim, mem.pid, 'building', def)) { let j = mem.bo + 1; while (j < order.length && S.lockReason(sim, mem.pid, 'building', order[j])) j++; if (j < order.length) { const tmp = order[mem.bo]; order[mem.bo] = order[j]; order[j] = tmp; def = order[mem.bo]; } } // 4.1d: o trancado espera; adianta o próximo liberado
+    while (def === 'torre' && D.maxTowers != null && towers >= D.maxTowers && mem.bo < order.length) { mem.bo++; def = order[mem.bo]; } /* 5.0a.1: Fácil pula as Torres além do limite */
     if (lowNodes && nodulos < 7 && t > 60 && def !== 'nodulo' && t - (mem.lastExpand || -99) > 25) { def = 'nodulo'; mem.emergency = true; } // território secando: expandir antes de tudo
     if (!def || mem.bo >= order.length) {
       if (towers < mem.towersWanted && t - mem.lastExtra > 45) { def = 'torre'; mem.lastExtra = t; }
@@ -140,7 +141,7 @@ function think(sim, mem) {
     }
   }
   // muros na Fortaleza: arco voltado para o inimigo mais próximo, com portão no meio
-  if (strat.walls && !mem.wallsBuilt && t > 240 && p.res.minerio > 700) {
+  if (strat.walls && D.walls !== false && !mem.wallsBuilt && t > 240 && p.res.minerio > 700) { /* 5.0a.1: Fácil sem muros */
     const en = nearestEnemyNucleoPos(sim, mem.pid);
     if (en) { const a0 = S.DM.atan2(en.y - nuc.y, en.x - nuc.x); const R = 300; let n = 0;
       for (let a = a0 - 0.7; a <= a0 + 0.7; a += 16 / R) { const x = nuc.x + S.DM.cos(a) * R, y = nuc.y + S.DM.sin(a) * R; const gate = Math.abs(a - a0) < 0.06; if (S.canBuild(sim, mem.pid, gate ? 'portao' : 'muro', x, y).ok) { emitC({ t: 'build', def: gate ? 'portao' : 'muro', x, y, ang: a + Math.PI / 2 }); n++; } }
@@ -181,7 +182,7 @@ function think(sim, mem) {
     else if (best) { const k = mem.known.get(best); emitC({ t: 'move', ids: [pr.id], x: k.x + (sim.rand() - 0.5) * 80, y: k.y + (sim.rand() - 0.5) * 80 }); }
     else { const en = nearestEnemyNucleoPos(sim, mem.pid); if (en && sim.rand() < 0.5) emitC({ t: 'move', ids: [pr.id], x: en.x + (sim.rand() - 0.5) * 520, y: en.y + (sim.rand() - 0.5) * 520 }); }
   }
-  if (t - mem.lastScout > 90 && t > 120) { // batedor: uma unidade barata vai olhar a base inimiga
+  if (D.scout !== false && t - mem.lastScout > 90 && t > 120) { // batedor: uma unidade barata vai olhar a base inimiga (5.0a.1: o Fácil não manda batedor, que caçava coletores)
     const en = nearestEnemyNucleoPos(sim, mem.pid); const scout = army.find(u => u.state === 'idle' && (u.def === 'drone' || u.def === 'infantaria'));
     if (en && scout) { mem.lastScout = t; emitC({ t: 'move', ids: [scout.id], x: en.x + (sim.rand() - 0.5) * 300, y: en.y + (sim.rand() - 0.5) * 300 }); }
   }
@@ -199,7 +200,7 @@ function think(sim, mem) {
     if (value < mem.attackStart * 0.35 || ids.length === 0) { mem.mode = 'defend'; if (ids.length) emitC({ t: 'move', ids, x: rally.x, y: rally.y }); }
     else {
       if (!mem.target || (mem.target.def !== 'nucleo' && ![...mem.known.values()].some(k => k.x === mem.target.x && k.y === mem.target.y))) mem.target = assessTargets(sim, mem, nuc);
-      if (mem.target && t - mem.lastAttackOrder > 5) { mem.lastAttackOrder = t; const frac = D.attackFrac == null ? 1 : D.attackFrac; const sent = frac >= 1 ? ids : ids.filter((id, i) => (i % 10) < Math.round(frac * 10)); if (sent.length) emitC({ t: 'attackmove', ids: sent, x: mem.target.x, y: mem.target.y }); }
+      if (mem.target && t - mem.lastAttackOrder > 5) { mem.lastAttackOrder = t; const frac = D.attackFrac == null ? 1 : D.attackFrac; let sent = frac >= 1 ? ids : ids.filter((id, i) => (i % 10) < Math.round(frac * 10)); if (D.waveMax) sent = sent.slice(0, D.waveMax); /* 5.0a.1: ondas pequenas no Fácil */ if (sent.length) emitC({ t: 'attackmove', ids: sent, x: mem.target.x, y: mem.target.y }); }
       if (!mem.target) mem.mode = 'defend';
     }
   }

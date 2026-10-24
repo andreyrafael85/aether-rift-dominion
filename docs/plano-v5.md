@@ -324,6 +324,8 @@ A v5.0 começa pelo Motor 5. Tudo o que vem depois nasce em TSL, então nada é 
 
 **Entregas (23/10/2026):** a fundação do Motor 5 (a fase 1 abaixo), a Sala de Comando e a Interface 3.0 saíram juntas como **5.0a** ✔, com o Motor 5 como opção experimental em Ajustes. O porte dos módulos e a paridade (fases 2 e 3) saem como **5.0b**.
 
+**5.0a.1 ✔ (24/10/2026), correções dos testes do dono na 5.0a:** a carga do Motor 5 (no Chrome da RTX, 44,8 s dos 46,4 s eram pipelines; no iPhone, 63,9 dos 64,7 s) tinha três causas: as 15 luzes pontuais em todo shader (78 a 87 KB de WGSL por material), o grafo TSL remontado para cada InstancedMesh (732 a 1.088 montagens) e a criação dos pipelines em fila (no Safari, cada cedida esperava um quadro). Sem luzes pontuais (o mapa de clarões ilumina), com instâncias por atributo, criação em paralelo e outros cortes: WGSL 63 a 66% menor, e no SwiftShader os pipelines passaram de 5,3× para 0,3× o tempo dos shaders do clássico na Baixa e de 16,7× para 2,2 a 2,9× na Alta; na emulação do celular, de 68,6 para 6,0 s. A tela inicial ganhou um pôster por Raça com cruzamento para a Sala ao vivo, e a Sala para no clique em Iniciar (a partida clássica esperava até 30 s a fila da Sala). Na jogabilidade: produção 1 por toque, coletores que mudam de campo sozinhos (comando `gather`, protocolo do multiplayer 6), giro com dois dedos natural, inimigos em vermelho, conselheiro de recursos parados e o Fácil com o primeiro ataque aos 15 min (0/10 quedas). As 12 regras de carga para a fase 2 estão no relatório da carga (`.wip/v50/agents/a1-carga/work/RELATORIO.md` §8) e no `docs/avaliacao-stack-3d.md` §6.10.
+
 #### Motor 5 (WebGPU): fase 1 na 5.0a ✔, fases 2 e 3 na 5.0b · tamanho GGG · 1 agente de fundação, depois 5 em paralelo
 - **Objetivo.** O jogo inteiro roda no WebGPURenderer do three, com materiais, efeitos e pós em TSL, e volta sozinho para WebGL2 onde não houver WebGPU. Em cada aparelho do dono, fica igual ou mais bonito e igual ou mais rápido que o motor de hoje.
 - **Fase 1, fundação (1 agente):**
@@ -374,6 +376,25 @@ A v5.0 começa pelo Motor 5. Tudo o que vem depois nasce em TSL, então nada é 
     - layout deitado e de tablet.
   - **Acessibilidade:** paletas para daltonismo, escala da interface e legendas.
 - **Pronto quando:** a tela abre em até 2 s no computador sem atrasar a partida, com versão leve no celular e na GPU por software.
+
+#### 5.0a.1 — Ajustes de jogabilidade a partir dos testes do dono ✔ · tamanho M · 3 agentes (jogo, Sala de Comando, carga do Motor 5)
+O dono jogou a 5.0a no Fácil, no computador e no iPhone. A parte de jogo (agente a1-jogo, relatório em `.wip/v50/agents/a1-jogo/work/RELATORIO.md`):
+- **Produção, um por toque:** o "segurar = +5" escondido da 4.1a disparava pelo relógio da página e, com o quadro lento, cada toque virava +6 (6 toques = 36 unidades). Agora um toque ou clique = +1, medido no dedo e no botão debaixo dele (vale mesmo se o painel for remontado no meio); +5 e +10 viraram botões visíveis (no computador, nos detalhes da unidade; no toque, na linha "Pôr na fila" logo acima dos cartões; Shift e Ctrl + clique continuam, com aviso); as teclas C e I voltaram a produzir e segurar a tecla põe 1.
+- **Coletores inteligentes:** o nó acabou, o coletor vai sozinho ao nó do mesmo recurso mais perto (área, território, até 800 da base), espalhados pela lotação, a menos que esse recurso já sobre (aí vai ao que falta); sem nó, volta para a base. O chip "N parados" e o botão "Mandar coletores" do aviso de território seco mandam os parados aos nós livres com um toque (comando `gather` da simulação, determinístico; salvamentos antigos abrem).
+- **Dois dedos como num app de mapas:** o mapa gira no sentido dos dedos (antes era o contrário) e o ponto entre os dedos fica entre eles.
+- **Inimigos fáceis de ver:** anel fino vermelho com borda escura no chão, barra de vida vermelha e marca vermelha no radar, no clássico e no Motor 5; Ajustes "Destacar inimigos" (ligado) e "Cores relativas" (você verde, aliados azuis, inimigos vermelhos).
+- **Fácil de verdade** e **conselheiro de recursos parados** (Construir ou Evoluir com um toque); os recursos iniciais ficaram como estavam (500/300): começar com 350/200 tirava só ~3% do que o iniciante tinha parado aos 5 min (o que enche o cofre é a renda dos coletores sem nada em que gastar).
+
+**Tabela de dificuldade (5.0a.1).** `tools/difficulty-test.cjs`, defensor iniciante que constrói, defende e nunca ataca (agora com os coletores inteligentes), contra a IA de cada nível em 1v1, Raças espelhadas, 10 partidas de 18 min por nível:
+
+| Nível | Defensor cai (antes → depois) | Minuto da queda | 1º ataque da IA | Construções da IA aos 5 min | Exército da IA aos 5 min | Pico antes do 1º ataque | Era II · Era III da IA |
+|---|---|---|---|---|---|---|---|
+| Fácil | 0/10 → **0/10** | — → — | 12,0 min → **15,0 min** | 13,2 → 10,0 | 1326 → 1019 | 2892 → 3291 | 5,4 min · 12,6 min (7 de 10) → 7,6 min · não chega |
+| Normal | 2/10 → **3/10** | 9,5 min → 10,8 min | 8,0 min → **8,0 min** | 21,3 → 19,3 | 4513 → 4540 | 5620 → 5780 | 3,8 min · 9,3 min (8 de 10) → 3,8 min · 9,4 min |
+| Difícil | 4/10 → **5/10** | 9,3 min → 10,3 min | 7,0 min → **7,0 min** | 21,6 → 19,7 | 5601 → 5846 | 7008 → 6809 | 2,9 min · 7,5 min → 2,9 min · 7,5 min |
+| Brutal | 10/10 → **9/10** | 6,7 min → 6,4 min | 5,0 min → **5,0 min** | 20,6 → 20,4 | 8721 → 8923 | 8716 → 8895 | 2,5 min · 5,5 min (6 de 10) → 2,5 min · 6,2 min (8 de 10) |
+
+Leitura: o **Fácil** mudou (primeiro ataque aos 15 min, em todas as partidas; nenhuma queda; a IA chega à Era II aos 7,6 min e não chega à Era III em 18 min). **Normal, Difícil e Brutal não mudaram**: a IA desses níveis é a mesma (IA contra IA, 3 jogadores, 7 min, dá o mesmo hash do código da 5.0a — `work/ia-igual.json` da cópia a1-jogo); as diferenças de ±1 queda vêm do defensor de referência, que é marcado como humano e agora tem os coletores inteligentes (outra economia, outras partidas). Antes do ajuste "recurso que sobra não prende ninguém", o defensor ficava preso no Plasma e o Difícil ia a 8/10 quedas; com ele, 5/10.
 
 ### Onda 2 — Mundo vivo (tudo em TSL)
 

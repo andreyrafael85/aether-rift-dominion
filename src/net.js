@@ -3,7 +3,7 @@
    tick T sem o pacote. Também: sala por código, lista de jogadores, checksums por tick, chat e aviso de desconexão. */
 (function (ARD) {
 'use strict';
-const PROTO = 5; // versão do protocolo: anfitrião e convidados precisam coincidir (3: volta à sala depois de queda, 4.1c; 4: navegação, coletores e Piratas novos mudam a simulação, 4.2g; 5: veios, Tempestade 2× e Dados a 400, 4.2h)
+const PROTO = 6; // versão do protocolo: anfitrião e convidados precisam coincidir (3: volta à sala depois de queda, 4.1c; 4: navegação, coletores e Piratas novos mudam a simulação, 4.2g; 5: veios, Tempestade 2× e Dados a 400, 4.2h; 6: coletores inteligentes e o comando 'gather', 5.0a.1)
 const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function makeCode() { let c = ''; for (let i = 0; i < 6; i++) c += ALPHA[Math.floor(Math.random() * ALPHA.length)]; return c; }
 const errText = t => ({ 'peer-unavailable': 'sala não encontrada (código errado ou anfitrião offline)', 'network': 'sem conexão com o servidor de sinalização', 'server-error': 'servidor de sinalização indisponível', 'browser-incompatible': 'navegador sem WebRTC', 'unavailable-id': 'código em uso' }[t] || t);

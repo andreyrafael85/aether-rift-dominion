@@ -122,6 +122,7 @@ function select(id, first) { if (!st || !RACES.includes(id)) return; const chang
   if (changed || first) showBust(id, first);
   if (ARD.uiFx) try { ARD.uiFx.setRace(id); } catch (e) {}
   if (ARD.sala) try { ARD.sala.setRace(id, { voz: !first }); } catch (e) {} /* 5.0b: a câmera voa até o mundo da Raça */
+  if (ARD.salaPoster && !first) try { ARD.salaPoster.setRace(id); } catch (e) {} /* 5.0a.1: antes da Sala (ou sem ela), o pôster da Raça nova entra num esmaecer */
   clearTimeout(st.preT); st.preT = setTimeout(() => { if (st && st.sel === id && ARD.preloadLoadArt) ARD.preloadLoadArt(id); }, first ? 4000 : 1500); /* 4.3l: a arte grande do carregamento da Raça escolhida já fica no cache */
   for (const m of st.maps) m.draw();
   if (st.cta) st.cta.dataset.race = id;
@@ -161,8 +162,8 @@ function mount(deps) {
   select(pick, true);
   /* busto 3D e miniaturas: só depois do load da página e da sonda da GPU (o renderizador do leaders3d e o mapa de ambiente
      custam caro na GPU fraca e por software) e só se a tela inicial ainda estiver à vista; até lá fica o retrato 2D */
-  const up3d = () => setTimeout(() => { if (!st || G3() || !st.want3d) return; if (!window.THREE) { window.addEventListener('three-ready', up3d, { once: true }); return; } if (!ARD.leaders3d.canUse()) return; st.holo = !!(ARD.sala && ARD.sala.want()); /* 5.0b */ st.use3d = true; showBust(st.sel, true); queueThumbs(st.sel); }, 250);
-  if (ARD.gpuProbe) ARD.gpuProbe().then(() => { if (!ARD.gpuSoft) up3d(); }); else if (document.readyState === 'complete') up3d(); else window.addEventListener('load', up3d, { once: true }); /* depois da sonda da GPU (main.js); na GPU por software fica o retrato 2D */
+  const up3d = () => setTimeout(() => { if (!st || G3() || !st.want3d) return; if (!window.THREE) { window.addEventListener('three-ready', up3d, { once: true }); return; } if (!ARD.leaders3d.canUse()) return; st.holo = !!(ARD.sala && ARD.sala.want()) || !!(ARD.salaPoster && ARD.salaPoster.ativo()); /* 5.0b; 5.0a.1: com o pôster o líder já está no fundo */ st.use3d = true; showBust(st.sel, true); queueThumbs(st.sel); }, 250);
+  if (ARD.gpuProbe) ARD.gpuProbe().then(() => { if (!ARD.gpuSoft && !ARD.semWebGL) up3d(); }) /* 5.0a.1: sem WebGL, nada de busto 3D nem miniaturas */; else if (document.readyState === 'complete') up3d(); else window.addEventListener('load', up3d, { once: true }); /* depois da sonda da GPU (main.js); na GPU por software fica o retrato 2D */
   return { selected: () => st && st.sel };
 }
 /* depois que initStart preencheu os valores: segmentados, mapas e o botão fixo do celular */
@@ -183,8 +184,8 @@ function enhance() { if (!st) return; const $ = D.$;
     const AU = ARD.audio, os = $('opt-som'), ov = $('opt-voz'), bs = $('btn-som-inicio'); const sync = () => { if (!AU) return; if (os) os.checked = AU.enabled; if (ov) ov.checked = AU.voice; if (bs) bs.setAttribute('aria-pressed', AU.enabled ? 'true' : 'false'); };
     const som = on => { if (!AU) return; AU.setEnabled(on); if (on) { AU.init(); AU.resume(); } if (ARD.salaSom) { if (ARD.salaSom.ativo()) ARD.salaSom.ligado(on); else if (on && ARD.sala) ARD.sala.som(); } sync(); };
     if (os) os.addEventListener('change', () => som(os.checked)); if (bs) bs.addEventListener('click', () => som(!AU.enabled)); if (ov) ov.addEventListener('change', () => { AU.setVoice(ov.checked); sync(); }); sync(); } }
-function stop() { if (ARD.sala) try { ARD.sala.stop({ partida: true }); } catch (e) {} /* 5.0b: a Sala solta o laço e a GPU antes da partida (sem devolver o busto da vitrine) */ if (!st) return; const s = st; st = null; if (s.onKey) document.removeEventListener('keydown', s.onKey); if (s.io) s.io.disconnect(); if (s.cta) s.cta.hidden = true; if (s.tr) { try { s.tr.r.dispose(); s.tr.r.forceContextLoss(); } catch (e) {} } }
+function stop() { if (ARD.sala) try { ARD.sala.stop({ partida: true }); } catch (e) {} /* 5.0b: a Sala solta o laço e a GPU antes da partida (sem devolver o busto da vitrine) */ if (ARD.salaPoster) try { ARD.salaPoster.parar(); } catch (e) {} /* 5.0a.1: o pôster e o movimento 2D saem junto */ if (!st) return; const s = st; st = null; if (s.onKey) document.removeEventListener('keydown', s.onKey); if (s.io) s.io.disconnect(); if (s.cta) s.cta.hidden = true; if (s.tr) { try { s.tr.r.dispose(); s.tr.r.forceContextLoss(); } catch (e) {} } }
 /* 5.0b: a Sala avisa quando o holograma está à vista (o retrato some) ou quando saiu (o busto 3D de antes volta, se couber) */
-function salaPronta(on) { if (!st) return; if (on) { st.holo = true; for (const k in st.busts) st.busts[k].cv.classList.add('out'); } else if (st.holo) { st.holo = false; if (st.use3d && st.sel) showBust(st.sel, true); } }
+function salaPronta(on) { if (!st) return; if (on) { st.holo = true; for (const k in st.busts) st.busts[k].cv.classList.add('out'); } else if (st.holo) { st.holo = !!(ARD.salaPoster && ARD.salaPoster.ativo()); /* 5.0a.1: com o pôster no fundo, o líder segue nele */ if (!st.holo && st.use3d && st.sel) showBust(st.sel, true); } }
 ARD.uiStart = { mount, enhance, stop, LORE, salaPronta, select: id => select(id), info: () => st ? { sel: st.sel, busts: Object.keys(st.busts), thumbs: Object.keys(st.thumbs), use3d: st.use3d } : null };
 })(globalThis.ARD = globalThis.ARD || {});

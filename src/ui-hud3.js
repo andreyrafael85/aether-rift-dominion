@@ -26,9 +26,10 @@ const CVD = { normal: 'Normal', protan: 'Protanopia', deutan: 'Deuteranopia', tr
 const CVD_SUB = { normal: 'cores originais', protan: 'vermelho fraco', deutan: 'verde fraco', tritan: 'azul fraco' };
 const A11Y_KEY = 'ard-a11y';
 const clampScale = v => Math.max(90, Math.min(140, Math.round((+v || 100) / 5) * 5));
-const A = { cvd: 'normal', scale: 100, captions: false };
-try { const o = JSON.parse(localStorage.getItem(A11Y_KEY) || '{}') || {}; if (CVD[o.cvd]) A.cvd = o.cvd; if (o.scale) A.scale = clampScale(o.scale); A.captions = !!o.captions; } catch (e) {}
+const A = { cvd: 'normal', scale: 100, captions: false, foes: true, rel: false }; /* 5.0a.1: foes = "Destacar inimigos" (ligado por padrão), rel = "Cores relativas" (desligado) */
+try { const o = JSON.parse(localStorage.getItem(A11Y_KEY) || '{}') || {}; if (CVD[o.cvd]) A.cvd = o.cvd; if (o.scale) A.scale = clampScale(o.scale); A.captions = !!o.captions; if (o.foes === false) A.foes = false; A.rel = !!o.rel; } catch (e) {}
 if (CVD[params.get('cvd')]) A.cvd = params.get('cvd'); if (params.get('ui')) A.scale = clampScale(params.get('ui')); if (params.has('legendas')) A.captions = params.get('legendas') !== '0';
+if (params.has('inimigos')) A.foes = params.get('inimigos') !== '0'; if (params.has('relativas')) A.rel = params.get('relativas') !== '0'; /* 5.0a.1: só na sessão (fotos e testes) */
 const saveA = () => { try { localStorage.setItem(A11Y_KEY, JSON.stringify(A)); } catch (e) {} };
 
 /* Paletas por tipo de daltonismo (work/cvd-paleta.py): para cada Raça, a cor numa janela de matiz em volta da original (a
@@ -54,14 +55,21 @@ function applyPalette() { /* recursos na hora: variáveis do HUD, gradientes dos
   objs.forEach((o, i) => { for (const k of RES3) o[k] = P ? P.res[k] : nodeOrig[i][k]; });
 }
 function applyScale() { const r = document.documentElement; r.style.setProperty('--ui', String(A.scale / 100)); r.classList.toggle('h3big', A.scale >= 120); } /* h3big: no celular, grupos em 2 colunas e gaveta um pouco mais baixa */
-function applyAll() { applyPalette(); applyScale(); document.documentElement.classList.toggle('h3cap-on', !!A.captions); }
+/* 5.0a.1: cor do inimigo (anel, barra e radar) e as cores relativas (você, aliados, inimigos) por paleta: o vermelho vira o tom que cada tipo de daltonismo distingue */
+const FOE_COL = { normal: '#FF3030', protan: '#FF5500', deutan: '#FF6640', tritan: '#FF4D40' };
+const REL = { normal: { me: '#3DDC5A', ally: '#3D8BFF', foe: '#FF3B30' }, protan: { me: '#B2FFEB', ally: '#6685FF', foe: '#FF5500' }, deutan: { me: '#B2FFF5', ally: '#408CFF', foe: '#FF6640' }, tritan: { me: '#E8E1CF', ally: '#4796B2', foe: '#FF4D40' } };
+const VIEW = { foes: true, foeCol: FOE_COL.normal }; /* lido pelo render3d a cada quadro (sem alocar) */
+function applyView() { VIEW.foes = A.foes !== false; VIEW.foeCol = FOE_COL[A.cvd] || FOE_COL.normal; }
+function applyAll() { applyPalette(); applyScale(); applyView(); document.documentElement.classList.toggle('h3cap-on', !!A.captions); }
 applyAll();
 /* cores dos jogadores: valem para a partida inteira (modelos 3D, radar, território e HUD), aplicadas logo depois de criar (ou
    retomar) a simulação e antes do renderizador montar os modelos. A cor é só visual: o hash e o lockstep não a usam. */
-function playerColors(sim) { const P = PAL[A.cvd]; if (!P) return null; const used = new Set(); let r = 0;
+function playerColors(sim, me) {
+  if (A.rel && me != null && sim.players[me]) { const T = REL[A.cvd] || REL.normal; const cp = (sim.cfg && sim.cfg.players) || []; return sim.players.map((p, i) => i === me ? T.me : (cp[i] && cp[i].ally) || (S.hasPact && !S.isEnemy(sim, me, i)) ? T.ally : T.foe); } /* 5.0a.1: cores relativas — você, aliados (da missão ou em pacto ao começar) e inimigos */
+  const P = PAL[A.cvd]; if (!P) return null; const used = new Set(); let r = 0;
   return sim.players.map(p => { let c = P.racas[p.faction]; if (!c || used.has(c)) c = P.reserva[(r++) % P.reserva.length]; used.add(c); return c; }); }
-function prepareSim(sim, resume) {
-  const cols = playerColors(sim);
+function prepareSim(sim, resume, me) {
+  const cols = playerColors(sim, me);
   if (cols) { sim.players.forEach((p, i) => { p.color = cols[i]; }); return; }
   if (resume && S.assignColors && sim.cfg && sim.cfg.players) { try { const o = S.assignColors(sim.cfg.players); sim.players.forEach((p, i) => { if (o[i]) p.color = o[i]; }); } catch (e) {} } /* salvo com paleta e retomado sem ela: volta às cores originais */
 }
@@ -71,7 +79,9 @@ function a11yHTML(id) {
   const seg = (name, items, cur) => `<div class="seg h3seg" role="radiogroup" data-a11y="${name}">` + items.map(([v, t, s]) => `<button type="button" role="radio" aria-checked="${String(v) === String(cur)}" class="${String(v) === String(cur) ? 'on' : ''}" data-v="${v}">${t}${s ? `<small>${s}</small>` : ''}</button>`).join('') + '</div>';
   return `<div class="opt"><label>Paleta de cores · daltonismo</label>${seg('cvd', Object.keys(CVD).map(k => [k, CVD[k], CVD_SUB[k]]), A.cvd)}<div class="h3sw" data-swatch></div></div>` +
     `<div class="opt"><label for="${id}-scale">Escala da interface na partida · <b data-scale-v>${A.scale}%</b></label><input type="range" id="${id}-scale" class="h3range" min="90" max="140" step="5" value="${A.scale}" aria-describedby="${id}-scale-h"><div class="small muted" id="${id}-scale-h">90% a 140%. Botões de toque nunca ficam menores que 44 px.</div></div>` +
-    `<div class="opt"><label class="chk"><input type="checkbox" data-a11y="captions" ${A.captions ? 'checked' : ''}> Legendas das falas (o que a voz do sistema diz aparece em texto, com o retrato do líder)</label></div>`;
+    `<div class="opt"><label class="chk"><input type="checkbox" data-a11y="captions" ${A.captions ? 'checked' : ''}> Legendas das falas (o que a voz do sistema diz aparece em texto, com o retrato do líder)</label></div>` +
+    `<div class="opt"><label class="chk"><input type="checkbox" data-a11y="foes" ${A.foes !== false ? 'checked' : ''}> Destacar inimigos (anel vermelho no chão, barra de vida vermelha e marca no radar)</label></div>` +
+    `<div class="opt"><label class="chk"><input type="checkbox" data-a11y="rel" ${A.rel ? 'checked' : ''}> Cores relativas: você verde, aliados azuis e inimigos vermelhos (a partir da próxima partida)</label></div>`; /* 5.0a.1 */
 }
 function swatchHTML() { const P = PAL[A.cvd]; const races = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag']; const rc = r => P ? P.racas[r] : (S.RACE_SHADES[r] || ['#888'])[0];
   const res = k => P ? P.res[k] : ({ plasma: '#FF8A5C', minerio: '#62CDFF', dados: '#7FE3A1' })[k];
@@ -81,6 +91,7 @@ function bindA11y(box, onChange) {
   box.querySelectorAll('[data-a11y=cvd] button').forEach(b => b.addEventListener('click', () => { A.cvd = b.dataset.v; saveA(); applyPalette(); box.querySelectorAll('[data-a11y=cvd] button').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-checked', on); }); if (sw) sw.innerHTML = swatchHTML(); if (onChange) onChange('cvd'); }));
   const rg = box.querySelector('.h3range'); if (rg) rg.addEventListener('input', () => { A.scale = clampScale(rg.value); saveA(); applyScale(); const v = box.querySelector('[data-scale-v]'); if (v) v.textContent = A.scale + '%'; if (onChange) onChange('scale'); });
   const cb = box.querySelector('[data-a11y=captions]'); if (cb) cb.addEventListener('change', () => { A.captions = cb.checked; saveA(); applyAll(); if (onChange) onChange('captions'); });
+  for (const k of ['foes', 'rel']) { const x = box.querySelector('[data-a11y=' + k + ']'); if (x) x.addEventListener('change', () => { A[k] = x.checked; saveA(); applyAll(); if (onChange) onChange(k); }); } /* 5.0a.1: o destaque muda na hora; as cores relativas, na próxima partida */
 }
 function mountStartA11y() { const pane = document.querySelector('.cpane[data-pane="ajustes"]'); if (!pane || pane.querySelector('.h3a11y')) return;
   const box = document.createElement('div'); box.className = 'h3a11y'; box.innerHTML = '<div class="chead"><b>Acessibilidade</b><span>Cores, tamanho e legendas da partida</span></div>' + a11yHTML('st'); pane.appendChild(box); bindA11y(box); }
@@ -130,17 +141,18 @@ function mount(ctx) {
     const c = classify(e); const now = e.time != null ? e.time : sim.time; const top = AL.list[0]; /* a hora do evento (a simulação marca cada um) */
     if (top && c.agg && top.agg === c.agg && now - top.t0 < 8) { top.n++; top.t = now; if (e.x != null) { top.x = e.x; top.y = e.y; } if (top.el) { top.el.innerHTML = rowHTML(top); flash(top.el); } return; } /* unidades (e trechos de muro) prontos do mesmo tipo em seguida viram uma linha só (×3) */
     const a = Object.assign({ id: ++AL.seq, t: now, t0: now, n: 1, x: e.x, y: e.y }, c); AL.list.unshift(a);
-    if (AL.list.length > 40) { const old = AL.list.pop(); if (old.el) old.el.remove(); }
-    if (alist) { const b = document.createElement('button'); b.type = 'button'; b.className = 'arow k-' + a.kind + ' c-' + a.cat; b.dataset.id = a.id; b.innerHTML = rowHTML(a); if (a.x == null) b.classList.add('nox'); a.el = b; b.hidden = AL.filter !== 'todos' && AL.filter !== a.cat; alist.prepend(b); flash(b); }
+    if (AL.list.length > 40) { const old = AL.list.pop(); if (old.el) old.el.remove(); if (old.act) old.act.remove(); }
+    if (alist) { const b = document.createElement('button'); b.type = 'button'; b.className = 'arow k-' + a.kind + ' c-' + a.cat; b.dataset.id = a.id; b.innerHTML = rowHTML(a); if (a.x == null) b.classList.add('nox'); a.el = b; b.hidden = AL.filter !== 'todos' && AL.filter !== a.cat; alist.prepend(b); flash(b);
+      if (e.act === 'gather') { const ab = document.createElement('button'); ab.type = 'button'; ab.className = 'aact'; ab.dataset.res = e.res || ''; ab.innerHTML = IC('ic-' + (e.res || 'minerio')) + 'Mandar coletores'; ab.hidden = b.hidden; b.after(ab); a.act = ab; } } /* 5.0a.1: o aviso do território sem Minério ou Plasma ganha "Mandar coletores" */
     if (!(H.open === 'alc')) { AL.unread++; syncBadge(); }
     const em = box && box.querySelector('.aempty'); if (em) em.remove();
   }
   function flash(el) { el.classList.remove('nw1', 'nw2'); el.classList.add((AL.fl = !AL.fl) ? 'nw1' : 'nw2'); }
   function syncBadge() { if (abadge) { setT(abadge, AL.unread > 9 ? '9+' : AL.unread || ''); setH(abadge, !AL.unread); } setOn($('btn-alc'), 'attn', AL.unread > 0 && AL.list.some((a, i) => i < AL.unread && a.kind === 'danger')); const hn = $('alc-hn'); if (hn) setT(hn, AL.unread ? AL.unread + (AL.unread > 1 ? ' novos' : ' novo') : ''); }
   function goAlert(a) { if (!a || a.x == null) return false; I.center(a.x, a.y); view.lastAlert = { x: a.x, y: a.y }; for (const b of alist ? alist.children : []) setOn(b, 'cur', +b.dataset.id === a.id); return true; }
-  if (alist) alist.addEventListener('click', ev => { const b = ev.target.closest('.arow'); if (!b) return; const a = AL.list.find(x => x.id === +b.dataset.id); if (goAlert(a) && sheets()) closeSheet(); });
+  if (alist) alist.addEventListener('click', ev => { const ab = ev.target.closest('.aact'); if (ab) { if (G.sendIdleCollectors) G.sendIdleCollectors(ab.dataset.res || null); if (sheets()) closeSheet(); return; } const b = ev.target.closest('.arow'); if (!b) return; const a = AL.list.find(x => x.id === +b.dataset.id); if (goAlert(a) && sheets()) closeSheet(); });
   if (box) { const seen = ev => { if (AL.unread && (ev.type === 'pointerdown' || ev.pointerType === 'mouse')) { AL.unread = 0; syncBadge(); } }; box.addEventListener('pointerenter', seen); box.addEventListener('pointerdown', seen); } /* passou o mouse (ou tocou) na central: os novos foram vistos */
-  if (box) box.querySelectorAll('[data-af]').forEach(f => f.addEventListener('click', () => { AL.filter = f.dataset.af; box.querySelectorAll('[data-af]').forEach(x => { setOn(x, 'on', x === f); x.setAttribute('aria-pressed', x === f); }); for (const a of AL.list) if (a.el) a.el.hidden = AL.filter !== 'todos' && AL.filter !== a.cat; }));
+  if (box) box.querySelectorAll('[data-af]').forEach(f => f.addEventListener('click', () => { AL.filter = f.dataset.af; box.querySelectorAll('[data-af]').forEach(x => { setOn(x, 'on', x === f); x.setAttribute('aria-pressed', x === f); }); for (const a of AL.list) if (a.el) { a.el.hidden = AL.filter !== 'todos' && AL.filter !== a.cat; if (a.act) a.act.hidden = a.el.hidden; } }));
   H.nextAlert = () => { /* Espaço: o último alerta; de novo em até 3 s, o anterior (e assim por diante) */
     const now = performance.now(); const loc = AL.list.filter(a => a.x != null); if (!loc.length) return view.lastAlert;
     AL.cur = now - AL.curT < 3000 ? (AL.cur + 1) % loc.length : 0; AL.curT = now; const a = loc[AL.cur]; goAlert(a); if (loc.length > 1) notice('Alerta ' + (AL.cur + 1) + ' de ' + loc.length + ': ' + a.text + ' · Espaço de novo: o anterior'); return { x: a.x, y: a.y }; };
@@ -174,7 +186,7 @@ function mount(ctx) {
     let lastT = 0, lastDef = null;
     ARMY.addEventListener('click', ev => { const b = ev.target.closest('button'); if (!b || !AV.rows) return; const now = ev.timeStamp; /* duas vezes medidas pela hora dos eventos */
       if (b.dataset.def) { const r = AV.rows.find(x => x.def === b.dataset.def); if (!r) return; const dbl = lastDef === r.def && now - lastT < 350; lastT = now; lastDef = r.def; let ids = r.ids; if (ev.shiftKey) ids = [...new Set([...view.sel, ...ids])]; selectIds(ids, dbl, r.n + ' × ' + unitName(r.def) + (dbl ? '' : ' · duas vezes centraliza')); return; }
-      if (b.hasAttribute('data-idlecol')) { selectIds(AV.idleCol, true, AV.idleCol.length + ' coletores parados: mande-os a um campo de recursos (botão direito ou a roda de comandos).'); return; }
+      if (b.hasAttribute('data-idlecol')) { if (G.sendIdleCollectors) G.sendIdleCollectors(); else selectIds(AV.idleCol, true); if (sheets()) closeSheet(); return; } /* 5.0a.1: um toque manda os parados aos nós livres mais próximos */
       if (b.hasAttribute('data-idleu')) { const ids = []; for (const r of AV.rows) if (r.def !== 'coletor') ids.push(...r.idleIds); selectIds(ids, true, ids.length + ' unidades sem ordem'); return; }
       if (b.hasAttribute('data-idleprod')) { if (!AV.idleProd.length) { notice('Toda a produção está ocupada'); return; } AV.prodCur = (AV.prodCur + 1) % AV.idleProd.length; const bd = sim.byId.get(AV.idleProd[AV.prodCur]); if (bd) { I.select([bd.id]); I.center(bd.x, bd.y); notice(S.BUILDINGS[bd.def].name + ' sem fila (' + (AV.prodCur + 1) + ' de ' + AV.idleProd.length + ')'); if (sheets()) closeSheet(); } } });
   }
@@ -347,7 +359,7 @@ function mount(ctx) {
   if (TM) TM.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeTech));
 
   // ====== Ajustes da partida (acessibilidade) ======
-  const AM = $('a11y'); if (AM) { const body = $('a11y-body'); body.innerHTML = a11yHTML('pt') + '<p class="small muted h3note">As cores dos jogadores mudam na próxima partida (os modelos 3D já foram montados com as cores atuais); as dos recursos, a escala e as legendas mudam na hora.</p>'; bindA11y(body, () => { GV.key = ''; groupsRender(); }); AM.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => { AM.hidden = true; })); }
+  const AM = $('a11y'); if (AM) { const body = $('a11y-body'); body.innerHTML = a11yHTML('pt') + '<p class="small muted h3note">As cores dos jogadores (paleta e cores relativas) mudam na próxima partida (os modelos 3D já foram montados com as cores atuais); as dos recursos, a escala, as legendas e o destaque dos inimigos mudam na hora.</p>'; bindA11y(body, () => { GV.key = ''; groupsRender(); }); AM.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => { AM.hidden = true; })); }
   H.openA11y = () => { if (AM) { closeSheet(); AM.hidden = false; } };
   H.modalOpen = () => (TM && !TM.hidden) || (AM && !AM.hidden);
   H.closeModals = () => { closeTech(); if (AM) AM.hidden = true; closeSheet(); wheelClose(false); };
@@ -358,12 +370,12 @@ function mount(ctx) {
   H.frame = n => { if (n % 20 === 0) armyRender(false); if (n % 30 === 7) groupsRender(); if (n % 15 === 3) techRender(false); };
   H.selChanged = () => { groupsRender(); };
   H.groupsChanged = () => { groupsRender(); };
-  H.reapply = s => { const cols = playerColors(s); if (cols) s.players.forEach((p, i) => { p.color = cols[i]; }); }; /* volta à sala (multiplayer): a fotografia do anfitrião traz as cores dele */
+  H.reapply = s => { const cols = playerColors(s, human); if (cols) s.players.forEach((p, i) => { p.color = cols[i]; }); }; /* volta à sala (multiplayer): a fotografia do anfitrião traz as cores dele (5.0a.1: e as relativas são de cada um) */
   H._al = AL; H._w = W; /* testes (work/h3.cjs e work/toque.cjs): avisos e estado da roda */
   groupsRender(); syncBadge(); /* a visão do exército sobe no primeiro quadro da partida (os retratos 3D precisam do carregamento) */
   if (alist && !AL.list.length) alist.innerHTML = '<div class="aempty">Nenhum alerta ainda. Ataques, construções e unidades prontas, recursos esgotados e piratas aparecem aqui; toque ou clique para ir até lá.</div>';
   return H;
 }
 
-ARD.hud3 = { a11y: A, PAL, applyAll, prepareSim, mount, playerColors };
+ARD.hud3 = { a11y: A, PAL, applyAll, prepareSim, mount, playerColors, view: VIEW };
 })(globalThis.ARD = globalThis.ARD || {});

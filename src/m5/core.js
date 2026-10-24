@@ -12,7 +12,7 @@ function prefMotor() { try { return (JSON.parse(localStorage.getItem('ard-beta-p
 const pedido = Q.get('motor') || prefMotor();
 ARD.motor = pedido === '5' || pedido === 'm5' || pedido === 'webgpu' ? '5' : 'classico';
 const M5 = ARD.m5 = ARD.m5 || {};
-M5.versao = '5.0a';
+M5.versao = '5.0a.1';
 M5.gl = Q.get('m5gl') === '1'; /* força a reserva WebGL2 do WebGPURenderer (teste do caminho de quem não tem WebGPU) */
 M5.u = M5.u || {}; M5.tex = M5.tex || {}; M5.sample = M5.sample || {};
 M5.ready = () => !!(window.THREE_M5 && window.TSL && window.THREE_M5_ADDONS);
@@ -84,6 +84,8 @@ function shared() {
   U.detalhe = uniform(1);          /* detalhe de superfície pela qualidade (ME.setDetail) */
   U.raio = uniform(0);             /* relâmpago (0…1) */
   U.claraoRet = uniform(new T.Vector4(0, 0, 1, 1)); /* retângulo do mapa de clarões no mundo three: x0, z0, largura, altura */
+  U.fendaLuz = uniform(new T.Vector4(S ? S.CX : W / 2, -60, S ? -S.CY : -W / 2, 900)); /* 5.0a.1: luz da Fenda no chão (posição no mundo three e alcance; M5.luzFenda) */
+  U.fendaCor = uniform(new T.Color(0, 0, 0)); /* 5.0a.1: cor × intensidade da luz da Fenda (0 até o render3d passar a luz) */
   const X = M5.tex;
   X.clarao = texture(blank(0, 0, 0, 255));   /* mapa de clarões (alvo 512² meia precisão, visto de cima) */
   X.nevoa = texture(blank(255, 0, 0, 255));  /* névoa de guerra (R: 0 nunca visto, 110 explorado, 255 à vista) */
@@ -91,6 +93,7 @@ function shared() {
   X.cicatrizes = texture(blank(0, 0, 0, 0)); /* cicatrizes do chão (r rastros, g queimado, b cratera, a brasa) */
   X.nuvem = texture(blank(255, 255, 255, 255)); /* ruído de nuvem repetível 256² */
   X.micro = texture(blank(128, 128, 0, 255));  /* microdetalhe do chão (R seixos, G tom, B fendas) */
+  X.vazio = texture(blank(255, 0, 0, 255));   /* 5.0a.1: mapa do vazio do Cinturão (R = distância com sinal até o vazio, ±64; G = ponte); neutro fora dele */
   const mapUV = p => vec2(p.x.div(U.mundo), p.z.negate().div(U.mundo)); /* mundo three → uv do mapa (x, −z) */
   M5.mapUV = mapUV;
   M5.sample.nevoa = (p = positionWorld) => X.nevoa.sample(mapUV(p)).r; /* 0…1 */
@@ -102,6 +105,8 @@ function shared() {
   M5._shared = true;
 }
 M5.shared = shared;
+/* 5.0a.1: a PointLight da Fenda do clássico vira emissivo no material do chão (mesma posição, cor, intensidade e alcance); a luz não entra na cena */
+M5.luzFenda = function (l) { shared(); const U = M5.u; U.fendaLuz.value.set(l.position.x, l.position.y, l.position.z, l.distance || 900); U.fendaCor.value.copy(l.color).multiplyScalar(l.intensity); };
 
 /* ---------- renderizador ---------- */
 function gpuProbe() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return '?'; const e = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(e ? gl.getParameter(e.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -130,6 +135,7 @@ M5.create3d = function (canvas, R) {
   }, err => { X.failed = err; console.error('[ARD] Motor 5: renderer.init() falhou: ' + (err && err.message)); throw err; });
   /* tempo de GPU do quadro pelo timestamp do WebGPU (timestamp-query); na reserva WebGL2 fica desligado (consultas aninhadas do pós) */
   X.gpuTimer = on => { X.gpu.on = !!(on && X.timestamp); X.gpu.ms.length = 0; return X.gpu.on; };
+  X.marcas = []; X.marca = rot => { const t = performance.now(); X.marcas.push([rot, Math.round(t - (X.marcaT || t)), X.pipes]); X.marcaT = t; }; /* 5.0a.1: passos do aquecimento (ms desde o passo anterior, pipelines até ali) */
   X.frameNo = 0; X.debugPipes = /m5pipes=2/.test(location.search) ? 2 : /m5pipes=1/.test(location.search); /* 1: o que nasce depois do aquecimento; 2: todos */
   const tsOk = v => { const G = X.gpu; G.busy = false; if (typeof v === 'number' && v > 0) { G.last = v; if (G.on && G.ms.length < 20000) G.ms.push(v); } }, tsErr = () => { X.gpu.busy = false; }; /* funções criadas uma vez (sem fechar escopo novo por quadro) */
   X.afterFrame = () => { X.frameNo++; const G = X.gpu; G.n++; if (!X.timestamp || G.busy) return; if (G.on ? G.n % 2 !== 0 : G.n % 30 !== 0) return; G.busy = true; /* no teste, a cada 2 quadros (o three soma o último quadro resolvido); fora dele, a cada 30 */
@@ -140,7 +146,7 @@ M5.create3d = function (canvas, R) {
 /* ---------- sombras em cascata (CSMShadowNode): o WebGPURenderer não tem PCFSoftShadowMap; a suavidade vem do raio do PCF ----------
    Média: 2 cascatas de 1536²; Alta: 3 de 2048²; Ultra: 4 de 2048². As cascatas nascem na carga (shadowsBuild, depois do init) com a
    qualidade final; no meio da partida a troca de qualidade só liga/desliga e muda o tamanho do mapa. */
-const csmCfg = q => ({ casc: q.resolved === 'ultra' ? 4 : q.resolved === 'alta' ? 3 : 2, size: q.resolved === 'ultra' || q.resolved === 'alta' ? 2048 : 1536 });
+const csmCfg = q => ({ casc: +(Q.get('m5casc') || 0) || (q.resolved === 'ultra' ? 4 : q.resolved === 'alta' ? 3 : 2), size: q.resolved === 'ultra' || q.resolved === 'alta' ? 2048 : 1536 }); /* 5.0a.1: ?m5casc=N (medida) */
 M5.shadows = function (X, sun, q) {
   const r = X.renderer; r.shadowMap.enabled = !!q.shadows; r.shadowMap.type = X.T.PCFShadowMap; sun.castShadow = !!q.shadows; X.shadowQ = q; X.sun = sun;
   if (!q.shadows) return; if (X.csmOff) { const n = q.shadowMap || 2048; sun.shadow.mapSize.set(n, n); return; } if (!X.csm) { if (X.built) M5.shadowsBuild(X, sun); return; }
@@ -151,7 +157,7 @@ M5.shadowsBuild = function (X, sun) {
   X.built = true; const q = X.shadowQ; if (!q || !q.shadows || X.csm) return; const A = window.THREE_M5_ADDONS; const c = csmCfg(q);
   if (M5.csmModo === '0' || (M5.csmModo !== '1' && !X.isWebGPU)) { const n = q.shadowMap || 2048; sun.shadow.mapSize.set(n, n); sun.shadow.bias = -0.0006; sun.shadow.radius = 2; X.csmOff = true; return; } /* sombra única: o updateCamera do render3d ajusta a caixa como no clássico */
   sun.shadow.mapSize.set(c.size, c.size); sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.35; sun.shadow.radius = 2; sun.shadow.camera.near = 1; sun.shadow.camera.far = 6000;
-  const csm = new A.CSMShadowNode(sun, { cascades: c.casc, maxFar: 2400, mode: 'practical', lightMargin: 700 }); csm.fade = true; sun.shadow.shadowNode = csm; X.csm = csm; X.csmFar = 2400; X.csmCasc = c.casc;
+  const csm = new A.CSMShadowNode(sun, { cascades: c.casc, maxFar: 2400, mode: 'practical', lightMargin: 700 }); csm.fade = Q.get('m5fade') !== '0'; sun.shadow.shadowNode = csm; /* 5.0a.1: ?m5fade=0 (medida) */ X.csm = csm; X.csmFar = 2400; X.csmCasc = c.casc;
 };
 /* a cada quadro: alcance das cascatas pela distância da câmera; câmeras das cascatas com perto/longe do mundo do jogo */
 M5.csmFrame = function (X, camDist) {
@@ -165,7 +171,11 @@ M5.frame = function (X, R, nt, sun, bg, cl, lightning) {
   const U = M5.u; U.tempo.value = R.time; U.noite.value = nt; U.solDir.value.set(R.sunDir[0], R.sunDir[1], R.sunDir[2]).normalize(); U.solCor.value.copy(sun.color); U.ceuCor.value.copy(bg);
   if (cl && cl.tint) U.clima.value.set(cl.tint[0], cl.tint[1], cl.tint[2], cl.mix); else U.clima.value.set(0, 0, 0, 0); U.emissivo.value = 1 + 0.9 * nt; U.raio.value = Math.min(1, lightning || 0);
   X.pipesFrame = 0; /* o detetive lê quantos pipelines nasceram neste quadro (X.pipesFrame depois do desenho) */
+  /* 5.0a.1: cascatas de sombra longe redesenham em quadros alternados (cada cascata redesenha a cena inteira; a de perto segue a cada quadro).
+     O mapa e a matriz da cascata mudam juntos (o three só refaz os dois quando redesenha), então a sombra não escorrega; ?m5sombra=todas desliga */
+  const csm = X.csm; if (csm && csm.lights && csm.lights.length > 1 && M5.sombraAlterna) { const tudo = !X.warmDone || R.warming; for (let i = 1; i < csm.lights.length; i++) { const sh = csm.lights[i].shadow; if (!sh) continue; sh.autoUpdate = false; sh.needsUpdate = tudo || (X.frameNo + i) % 2 === 0; } }
 };
+M5.sombraAlterna = Q.get('m5sombra') !== 'todas';
 
 /* ---------- luz de ambiente pelo céu do mapa (PMREM do céu TSL com o chão do mapa), refeita quando o clima muda ----------
    um PMREMGenerator só e o mesmo alvo reaproveitado (sem pipelines novos a cada troca); fromScene depois do init (o fromSceneAsync está obsoleto) */
@@ -189,6 +199,48 @@ M5.registrar = function (nome, m, o) { o = o || {}; m.name = 'ard-' + nome; if (
 /* ganchos para a fase 2: funções (ctx) → nó, chamadas na montagem do material (null = sem efeito) */
 M5.ganchos = M5.ganchos || { modelo: { posicao: null, superficie: null, emissivo: null }, chao: { cor: null }, adereco: { posicao: null } };
 
+/* ---------- 5.0a.1: M5.Inst — instâncias por atributo da geometria: uma montagem de nós para todas as malhas do mesmo material ----------
+   No r186 cada InstancedMesh monta o grafo TSL do zero (a chave de cache dos nós leva o uuid do objeto: as matrizes de instância entram no
+   grafo como nós daquele objeto). A carga tinha ~650 InstancedMesh (blocos de adereços e modelos de cada Raça e jogador) = ~650 montagens
+   iguais, a maior parte do tempo de "shaders e pipelines". M5.Inst imita a API do InstancedMesh que o render3d e o dress3d usam (setMatrixAt,
+   setColorAt, instanceMatrix, count, computeBoundingSphere, troca de geometria) e guarda matriz e cor de instância numa InstancedBufferGeometry
+   própria (iM0..iM3 num buffer intercalado, iC): para o three é uma malha comum, e as que dividem material e formato de geometria dividem a
+   montagem. Os materiais do jogo leem os atributos quando o objeto é M5.Inst (M5.instMat e M5.instCor em src/m5/materiais.js). */
+let InstC = null;
+M5.Inst = function () {
+  if (InstC) return InstC; const T = window.THREE_M5; const _m = new T.Matrix4(), _s = new T.Sphere(), _b = new T.Box3();
+  InstC = class Inst extends T.Mesh {
+    constructor(geometry, material, count) {
+      super(geometry, material); const cap = Math.max(1, count | 0);
+      this.isM5Inst = true; this.type = 'M5Inst';
+      this.instanceMatrix = new T.InstancedInterleavedBuffer(new Float32Array(cap * 16), 16, 1); for (let i = 0; i < cap; i++) _m.identity().toArray(this.instanceMatrix.array, i * 16);
+      this._iC = new T.InstancedBufferAttribute(new Float32Array(cap * 3).fill(1), 3); this._cSujo = -1; this._wraps = new Map(); this._n = cap; this._base = null; this._g = null;
+      this.boundingSphere = null; this.boundingBox = null; this._ok = true; const g0 = this._pend; this._pend = null; this.geometry = g0; this.onBeforeRender = InstC.antes; }
+    get geometry() { return this._g || this._pend; }
+    set geometry(g) { if (!this._ok) { this._pend = g; return; } this._base = g || null; this._g = g ? this._wrap(g) : null; if (this._g) this._g.instanceCount = this._n; }
+    get count() { return 1; } /* o three lê count > 1 como "instâncias do objeto" e põe o uuid na chave dos nós; o número de verdade vai na geometria */
+    set count(v) { if (!this._ok) return; this._n = v; if (this._g) this._g.instanceCount = v; }
+    _wrap(g) { let w = this._wraps.get(g); if (w) return w; w = new T.InstancedBufferGeometry(); w.index = g.index;
+      for (const k in g.attributes) { const a = g.attributes[k]; if (!a.isInstancedBufferAttribute) w.setAttribute(k, a); } /* os atributos por instância da animação GLSL (aInst) ficam de fora: o formato é o mesmo antes e depois deles */
+      w.groups = g.groups; w.drawRange = g.drawRange; w.userData = g.userData; w.boundingSphere = g.boundingSphere; w.boundingBox = g.boundingBox; w.name = g.name;
+      for (let c = 0; c < 4; c++) w.setAttribute('iM' + c, new T.InterleavedBufferAttribute(this.instanceMatrix, 4, c * 4)); w.setAttribute('iC', this._iC); this._wraps.set(g, w); return w; }
+    setMatrixAt(i, m) { m.toArray(this.instanceMatrix.array, i * 16); }
+    getMatrixAt(i, m) { return m.fromArray(this.instanceMatrix.array, i * 16); }
+    setColorAt(i, c) { c.toArray(this._iC.array, i * 3); if (i > this._cSujo) this._cSujo = i; }
+    getColorAt(i, c) { return c.fromArray(this._iC.array, i * 3); }
+    computeBoundingSphere() { const g = this._base; if (!this.boundingSphere) this.boundingSphere = new T.Sphere(); if (!g) return; if (!g.boundingSphere) g.computeBoundingSphere(); this.boundingSphere.makeEmpty(); for (let i = 0; i < this._n; i++) { this.getMatrixAt(i, _m); _s.copy(g.boundingSphere).applyMatrix4(_m); this.boundingSphere.union(_s); } }
+    computeBoundingBox() { const g = this._base; if (!this.boundingBox) this.boundingBox = new T.Box3(); if (!g) return; if (!g.boundingBox) g.computeBoundingBox(); this.boundingBox.makeEmpty(); for (let i = 0; i < this._n; i++) { this.getMatrixAt(i, _m); _b.copy(g.boundingBox).applyMatrix4(_m); this.boundingBox.union(_b); } }
+    dispose() { this.dispatchEvent({ type: 'dispose' }); return this; } };
+  InstC.antes = function () { if (this._cSujo < 0) return; const a = this._iC; a.clearUpdateRanges(); a.addUpdateRange(0, (this._cSujo + 1) * 3); a.needsUpdate = true; this._cSujo = -1; }; /* a cor de instância sobe só na parte usada, antes do desenho */
+  return InstC;
+};
+/* fábrica com a assinatura do InstancedMesh: M5.Inst só para material que lê os atributos de instância (M5.instMat marca userData.m5Inst);
+   material que não lê (um de fora, ou um que a fase 2 trocar sem adaptar) segue num InstancedMesh de verdade: desenha certo, só monta por objeto */
+M5.instancia = function (THREE) { const I = M5.Inst(); return function InstancedMesh(g, mat, n) { return mat && mat.userData && mat.userData.m5Inst ? new I(g, mat, n) : new THREE.InstancedMesh(g, mat, n); }; };
+/* o dress3d recebe um THREE com o InstancedMesh trocado pela fábrica (sem mudar o dress3d) */
+M5.ns = function (THREE) { const ns = Object.create(THREE); Object.defineProperty(ns, 'InstancedMesh', { value: M5.instancia(THREE), writable: true, enumerable: true, configurable: true }); return ns; }; /* defineProperty: o THREE é um módulo (propriedades só de leitura na herança) */
+M5.instOff = Q.get('m5inst') === '0'; /* medida: ?m5inst=0 volta ao InstancedMesh (uma montagem de nós por malha) */
+
 /* ---------- mesma lista de atributos em todas as variantes de uma geometria (inteira e leve): o shader do TSL lê o atributo que existe,
    então geometrias com conjuntos diferentes viram programas diferentes; o dress3d troca a inteira pela leve no meio da partida ---------- */
 M5.normalizaAtributos = function (geos, defs) { const Tm = window.THREE_M5; let n = 0; for (const g of geos) { if (!g || !g.attributes || !g.attributes.position) continue; const cnt = g.attributes.position.count;
@@ -197,10 +249,27 @@ M5.normalizaAtributos = function (geos, defs) { const Tm = window.THREE_M5; let 
 /* ---------- aquecimento: todos os pipelines criados no carregamento (nenhum compila no meio da partida) ----------
    1) compileAsync da cena pelo passe da cena do pós (mesmo alvo e MRT: mesma chave de pipeline), com os escondidos ligados;
    2) o render3d desenha um quadro de verdade (R.warming) e mais um com tudo ligado: cria os pipelines das sombras e do pós. */
-M5.warmExtra = +(Q.get('m5aquecer') || 3); /* quadros a mais no aquecimento do Motor 5: o 1º desenha tudo ligado e sem recorte (cada um no seu requestAnimationFrame: os nós do pós atualizam uma vez por quadro) */
+M5.warmExtra = Q.get('m5aquecer') != null ? +Q.get('m5aquecer') : 3; /* quadros a mais no aquecimento do Motor 5: o 1º desenha tudo ligado e sem recorte (cada um no seu requestAnimationFrame: os nós do pós atualizam uma vez por quadro) */
+/* 5.0a.1: pipelines em paralelo. O compileAsync do r186 trata um objeto por vez: monta os nós, cria o pipeline, ESPERA ele ficar pronto
+   e só então passa ao próximo, cedendo a vez ao navegador entre um e outro (sem scheduler.yield, como no Safari, cada cedida espera um
+   quadro inteiro: ~6800 cedidas na carga). Aqui as promessas dos pipelines vão para uma lista só (o laço segue sem esperar e a GPU
+   compila todos ao mesmo tempo) e, sem scheduler.yield, a cedida vira uma mensagem (MessageChannel) com um quadro a cada 50 ms para a
+   tela de carregamento respirar. ?m5seq=1 volta ao jeito do r186 (medida). */
+M5.seq = Q.get('m5seq') === '1';
+M5.luzes = Q.get('m5luzes') === '1'; /* 5.0a.1: medida — ?m5luzes=1 põe de volta as 15 luzes pontuais na cena do Motor 5 */
+function cedidaCurta() { const mc = new MessageChannel(), fila = []; let ult = performance.now(); mc.port1.onmessage = () => { const f = fila.shift(); if (f) f(); };
+  return () => new Promise(res => { const t = performance.now(); if (t - ult > 50) { requestAnimationFrame(() => { ult = performance.now(); res(); }); return; } fila.push(res); mc.port2.postMessage(0); }); }
+/* 5.0a.1: quantos quadros extras o aquecimento desenha. Eles existem pelo pós (o RenderPipeline do r186 se refaz nos dois primeiros quadros) e
+   pelas cascatas de sombra; sem pós e sem sombra (Baixa) nenhum pipeline nasce neles, e cada um é um quadro inteiro com tudo ligado */
+M5.quadrosExtra = R => (Q.get('m5aquecer') != null ? M5.warmExtra : (R.pp || (R.quality && R.quality.shadows) ? M5.warmExtra : 0));
 M5.compile = async function (X, scene, camera) {
-  const t0 = performance.now(), p0 = X.pipes; /* o render3d liga tudo antes (tudoVisivel) */
-  try { const sp = X.post && X.post.scenePass; if (sp && sp.compileAsync) await sp.compileAsync(X.renderer); else await X.renderer.compileAsync(scene, camera); } catch (err) { console.warn('[ARD] Motor 5: compileAsync falhou: ' + err.message); }
-  X.compileMs = Math.round(performance.now() - t0); X.compilePipes = X.pipes - p0; return X.compileMs;
+  const t0 = performance.now(), p0 = X.pipes; X.marcaT = t0; X.scene = scene; X.camera = camera; /* o render3d liga tudo antes (tudoVisivel); cena e câmera ficam para o diagnóstico */
+  const r = X.renderer, PL = r._pipelines, todas = [], C = X.carga = { modo: M5.seq ? 'sequencial' : 'paralelo', cedida: 'nativa' };
+  let gfr = null, sch = null, schDono = false;
+  if (!M5.seq && PL && typeof PL.getForRender === 'function') { gfr = PL.getForRender; PL.getForRender = function (ro, promises) { return gfr.call(this, ro, promises ? todas : promises); }; } /* a lista local do laço fica vazia: nada de esperar objeto a objeto */
+  if (!M5.seq && !(window.scheduler && typeof window.scheduler.yield === 'function')) { C.cedida = 'MessageChannel'; if (window.scheduler) { sch = window.scheduler; sch.yield = cedidaCurta(); } else { window.scheduler = { yield: cedidaCurta() }; schDono = true; } }
+  try { const sp = X.post && X.post.scenePass; if (sp && sp.compileAsync) await sp.compileAsync(r); else await r.compileAsync(scene, camera); C.nosMs = Math.round(performance.now() - t0); C.emVoo = todas.length; await Promise.all(todas); } catch (err) { console.warn('[ARD] Motor 5: compileAsync falhou: ' + err.message); }
+  finally { if (gfr) PL.getForRender = gfr; if (schDono) { try { delete window.scheduler; } catch (e) { window.scheduler = undefined; } } else if (sch) delete sch.yield; }
+  X.compileMs = Math.round(performance.now() - t0); X.compilePipes = X.pipes - p0; C.ms = X.compileMs; C.pipes = X.compilePipes; return X.compileMs;
 };
 })(globalThis.ARD = globalThis.ARD || {});

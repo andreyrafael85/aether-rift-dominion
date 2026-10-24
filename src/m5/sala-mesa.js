@@ -24,13 +24,13 @@ function criar(C, st) { const { W, T } = C.L; const { float, vec3, color, unifor
   const ped = new W.Group(); M.group.add(ped); M.ped = ped;
   { const m = new W.MeshStandardNodeMaterial({ color: 0x23262c, roughness: 0.45, metalness: 0.8 }); m.lightsNode = C.luzMundo; const g = new W.CylinderGeometry(4.2, 6.5, 22, 32); M.disp.push(g, m); const c = new W.Mesh(g, m); c.position.y = 11; c.castShadow = true; c.receiveShadow = true; ped.add(c);
     const g2 = new W.CylinderGeometry(R + 1.6, R + 0.6, 1.4, 64); M.disp.push(g2); const tampo = new W.Mesh(g2, m); tampo.position.y = 22.4; tampo.castShadow = true; ped.add(tampo); }
-  { const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending, side: W.DoubleSide }); m.fog = false; const r = length(positionLocal.xy);
+  { const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending, side: W.DoubleSide, forceSinglePass: true }); m.fog = false; const r = length(positionLocal.xy);
     m.colorNode = U.cor.mul(smoothstep(R - 0.2, R + 0.6, r).mul(smoothstep(R + 1.6, R + 0.9, r)).mul(2.2).add(smoothstep(R * 0.2, R, r).mul(0.12))).mul(sin(time.mul(1.5)).mul(0.1).add(0.95));
     const g = new W.CircleGeometry(R + 1.7, 96); M.disp.push(g, m); const d = new W.Mesh(g, m); d.rotation.x = -Math.PI / 2; d.position.y = 23.15; d.renderOrder = 8; ped.add(d); M.disco = d; }
   /* holograma do mapa (o relevo entra quando a simulação de desenho fica pronta) */
   const incl = new W.Group(); incl.position.y = 24.4; incl.rotation.x = 0.3; ped.add(incl); M.incl = incl; /* o mapa inclina para quem olha (holograma de mesa de comando) */
   const holo = new W.Group(); holo.position.y = 2.2; incl.add(holo); M.holo = holo;
-  const mapMat = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: true, side: W.DoubleSide }); mapMat.fog = false; M.disp.push(mapMat);
+  const mapMat = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: true, side: W.DoubleSide, forceSinglePass: true }); mapMat.fog = false; M.disp.push(mapMat);
   { const bio = attribute('bio', 'vec4'), alt = attribute('alt', 'float'); const base = vec3(BIO[0][0], BIO[0][1], BIO[0][2]).mul(bio.x).add(vec3(BIO[1][0], BIO[1][1], BIO[1][2]).mul(bio.y)).add(vec3(BIO[2][0], BIO[2][1], BIO[2][2]).mul(bio.z)).add(vec3(BIO[3][0], BIO[3][1], BIO[3][2]).mul(bio.w));
     const ciano = color(0x6fe9ff); const lp = positionLocal;
     const curva = float(1).sub(smoothstep(0.0, 0.06, min(fract(alt.mul(0.11)), float(1).sub(fract(alt.mul(0.11))))));
@@ -44,13 +44,13 @@ function criar(C, st) { const { W, T } = C.L; const { float, vec3, color, unifor
   const pilMat = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending }); pilMat.fog = false; { const y = positionLocal.y; pilMat.colorNode = attribute('cor', 'vec3').mul(smoothstep(6.0, 0.0, y).mul(1.6)).mul(sin(time.mul(3.0)).mul(0.15).add(0.9)); } M.disp.push(pilMat);
   const losMat = new W.MeshBasicNodeMaterial(); losMat.fog = false; losMat.colorNode = attribute('cor', 'vec3').mul(1.8); M.disp.push(losMat);
   const noMat = new W.MeshBasicNodeMaterial(); noMat.fog = false; noMat.colorNode = color(0x62cdff).mul(2.2); M.disp.push(noMat);
-  const fendaMat = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending, side: W.DoubleSide }); fendaMat.fog = false;
+  const fendaMat = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending, side: W.DoubleSide, forceSinglePass: true }); fendaMat.fog = false;
   { const p = positionLocal.xy, r = length(p), a = T.atan(p.y, p.x); const gira = sin(a.mul(5.0).add(r.mul(2.2)).sub(time.mul(2.2))).mul(0.5).add(0.5);
     fendaMat.colorNode = mix(color(0xff3fb8), color(0x6fe9ff), gira).mul(smoothstep(2.6, 0.4, r)).mul(1.8).add(color(0xffd2b0).mul(smoothstep(0.5, 0.0, r)).mul(2.0)); fendaMat.opacityNode = smoothstep(2.6, 1.6, r); } M.disp.push(fendaMat);
   const lagoMat = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending }); lagoMat.fog = false; lagoMat.colorNode = attribute('cor', 'vec3').mul(0.9); M.disp.push(lagoMat);
   const modeloG = new W.Group(); modeloG.position.y = 23.4; ped.add(modeloG); M.modeloG = modeloG;
   /* anel de varredura que sobe pelo modelo da Academia */
-  { const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending, side: W.DoubleSide }); m.fog = false; const r = length(positionLocal.xy); m.colorNode = U.cor.mul(smoothstep(0.86, 0.98, r).mul(smoothstep(1.0, 0.98, r))).mul(2.4);
+  { const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending, side: W.DoubleSide, forceSinglePass: true }); m.fog = false; const r = length(positionLocal.xy); m.colorNode = U.cor.mul(smoothstep(0.86, 0.98, r).mul(smoothstep(1.0, 0.98, r))).mul(2.4);
     const g = new W.CircleGeometry(1, 64); M.disp.push(g, m); M.varredura = new W.Mesh(g, m); M.varredura.rotation.x = -Math.PI / 2; M.varredura.visible = false; M.varredura.renderOrder = 9; modeloG.add(M.varredura); }
   let gen = 0; M.mapa = (cfg, rapido) => { const my = ++gen; const run = () => { if (my !== gen || !S0()) return; let sim, Tt; try { sim = simDe(cfg); Tt = ARD.terrain3d.build(sim, HN); } catch (e) { console.warn('[ARD] mesa tática: ' + e.message); return; }
       if (my !== gen) return; montarMapa(sim, Tt, cfg); M.cfg = cfg; legenda(cfg, sim); if (rapido || reduced()) U.revela.value = 1; else { U.revela.value = 0; C.L.gsap.to(U.revela, { value: 1, duration: 1.6, ease: 'power2.out', onUpdate: () => ARD.sala.kick(60) }); } ARD.sala.kick(200); };
@@ -82,14 +82,15 @@ function criar(C, st) { const { W, T } = C.L; const { float, vec3, color, unifor
   /* lugar da mesa (na frente do Núcleo, sobre o canteiro) e cor da Raça */
   M.raca = (race, H) => { M.race = race; U.cor.value.setHex(COR[race] || COR.vehnar); const y = H(M.pos.x, M.pos.z); M.pos.y = y; ped.position.set(M.pos.x, y, M.pos.z); M.topo = y + 23.4; M.baixo = y + 19; M.centro = new W.Vector3(M.pos.x, y + 26, M.pos.z);
     const cfg = cfgAtual(race); if (!M.cfg || M.cfg.race !== race || M.cfg.map !== cfg.map || M.cfg.opp !== cfg.opp || M.cfg.seed !== cfg.seed) M.mapa(cfg, !st.ready); };
-  M.visivel = on => { M.alvoVis = on ? 1 : 0; const g = C.L.gsap; if (reduced()) { ped.scale.setScalar(on ? 1 : 0.001); ped.visible = on; ARD.sala.kick(100); return; } ped.visible = true; g.to(ped.scale, { x: on ? 1 : 0.001, y: on ? 1 : 0.001, z: on ? 1 : 0.001, duration: on ? 0.9 : 0.5, ease: on ? 'back.out(1.4)' : 'power2.in', onUpdate: () => ARD.sala.kick(60), onComplete: () => { if (!on) ped.visible = false; } }); };
+  const sombra = () => { if (ARD.sala && ARD.sala.sombra) ARD.sala.sombra(); }; /* 5.0a.1: a sombra é desenhada uma vez: a mesa que entra ou sai pede outra */
+  M.visivel = on => { M.alvoVis = on ? 1 : 0; const g = C.L.gsap; if (reduced()) { ped.scale.setScalar(on ? 1 : 0.001); ped.visible = on; sombra(); ARD.sala.kick(100); return; } ped.visible = true; g.to(ped.scale, { x: on ? 1 : 0.001, y: on ? 1 : 0.001, z: on ? 1 : 0.001, duration: on ? 0.9 : 0.5, ease: on ? 'back.out(1.4)' : 'power2.in', onUpdate: () => ARD.sala.kick(60), onComplete: () => { if (!on) ped.visible = false; sombra(); } }); };
   M.step = (dt, t) => { if (!ped.visible) return; if (st.vivo || st.anim) { holo.rotation.y += dt * 0.07; modeloG.rotation.y += dt * 0.45; } if (M.varrendo) { M.varredura.position.y = M.varrendo.y0 + (M.varrendo.y1 - M.varrendo.y0) * M.varrendo.k; } };
   M.acerto = ray => { if (!ped.visible) return null; const alvo = M.mapaMesh && M.modo === 'mapa' ? M.mapaMesh : null; const h = alvo ? ray.intersectObject(alvo, false)[0] : null; if (h) return h; const c = ray.ray.distanceToPoint(M.centro); return c < R ? { ponto: true } : null; };
   /* Academia: o modelo da unidade/construção girando sobre a mesa */
   M.modelo = (def, race) => { const ME = ARD.meshes; for (const o of modeloG.children.slice()) { if (o === M.varredura) continue; modeloG.remove(o); o.traverse(x => { if (x.geometry) x.geometry.dispose(); }); }
     if (!def) { M.modo = 'mapa'; holo.visible = true; M.varredura.visible = false; ARD.sala.kick(200); return null; }
     const cor = (ARD.campUI && ARD.campUI.colorFor && ARD.campUI.colorFor(race)) || ((ARD.sim.RACE_SHADES || {})[race] || [])[0] || '#ff7733'; const r = ME.build(def, race, cor, 3); if (!r || !r.main) return null;
-    const g = new W.Group(); const a = new W.Mesh(r.main, C.mats.main); a.castShadow = true; g.add(a); if (r.em && r.em.attributes.position.count) g.add(new W.Mesh(r.em, C.mats.em));
+    const g = new W.Group(); const a = new W.Mesh(r.main, C.mats.main); g.add(a); /* 5.0a.1: o modelo que gira não entra no mapa de sombra (desenhado uma vez) */ if (r.em && r.em.attributes.position.count) g.add(new W.Mesh(r.em, C.mats.em));
     const s = Math.min(20 / Math.max(r.width, 1), 15 / Math.max(r.height, 1)); g.scale.setScalar(s); modeloG.add(g); M.modo = 'modelo'; holo.visible = false; const hm = r.height * s;
     M.modeloH = hm; M.varredura.visible = true; M.varredura.scale.setScalar(Math.max(r.width * s * 0.62, 4)); M.varrendo = { y0: 0.2, y1: hm + 0.6, k: 0 };
     const gs = C.L.gsap; if (!reduced()) { g.scale.setScalar(s * 0.2); gs.to(g.scale, { x: s, y: s, z: s, duration: 0.7, ease: 'back.out(1.6)', onUpdate: () => ARD.sala.kick(60) }); gs.fromTo(M.varrendo, { k: 0 }, { k: 1, duration: 1.1, ease: 'power2.inOut', onComplete: () => { M.varredura.visible = false; M.varrendo = null; } }); }

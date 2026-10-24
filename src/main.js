@@ -28,13 +28,13 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylva Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' };
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.0a';
+const VERSION = '5.0a.1';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
 /* 4.3k: depois do load, uma sonda só da GPU (a linha "Build · GPU" do rodapé e o aviso de GPU por software). Na GPU por software (testes, VMs)
    a tela inicial fica estática e leve: sem logo vivo, fundo WebGL, busto 3D nem miniaturas (?vitrine=3d força tudo, para as fotos) */
-let gpuP = null; ARD.gpuProbe = () => gpuP || (gpuP = new Promise(res => { const run = () => setTimeout(() => { const st = $('start'); let n = '?'; if (st && !st.hidden) { try { n = gpuName(); } catch (e) {} } ARD.gpuSoft = /swiftshader|llvmpipe|softpipe|software/i.test(n) && params.get('vitrine') !== '3d'; res(n); }, 300); if (document.readyState === 'complete') run(); else window.addEventListener('load', run, { once: true }); }));
+let gpuP = null; ARD.gpuProbe = () => gpuP || (gpuP = new Promise(res => { const run = () => setTimeout(() => { const st = $('start'); let n = '?'; if (st && !st.hidden) { try { n = gpuName(); } catch (e) {} } ARD.gpuSoft = /swiftshader|llvmpipe|softpipe|software/i.test(n) && params.get('vitrine') !== '3d'; ARD.semWebGL = n === 'sem WebGL'; /* 5.0a.1: sem WebGL a tela inicial nem tenta o 3D (fica o pôster) */ res(n); }, 300); if (document.readyState === 'complete') run(); else window.addEventListener('load', run, { once: true }); }));
 let G = null; // game state
 ARD.inspect = () => { if (!G || !G.sim) return null; const sim = G.sim; return { tick: sim.tick, time: sim.time, hash: S.hash(sim), human: G.human, waiting: G.waiting, ended: G.ended, mpWait: $('mp-wait') ? $('mp-wait').hidden === false : null, net: G.net ? { state: G.net.state, role: G.net.role, code: G.net.code, desync: G.net.desync, rtt: Math.round(G.net.rtt) } : null, players: sim.players.map(p => ({ id: p.id, name: p.name, faction: p.faction, human: p.human, alive: p.alive, nucleo: !!S.nucleoOf(sim, p.id), units: sim.ents.filter(e => e.alive && e.kind === 'unit' && e.owner === p.id).length })), hashLog: G.hashLog ? Object.assign({}, G.hashLog) : null }; };
 
@@ -60,13 +60,17 @@ function initStart() {
   try { ARD.uiStart.mount({ $, prefs, params, LEADER_NAME, RACE_COLORS, LEADER_FACE, leaderArt, onRace: () => { if (ARD.campUI) try { ARD.campUI.refreshMini(); } catch (e) {} } }); } catch (e) { console.warn('[ARD] vitrine das Raças indisponível:', e); }
   if (ART && ART.logo) for (const id of ['logo-img', 'load-logo', 'foot-logo']) { const el = $(id); if (el) { el.src = ART.logo; el.hidden = false; } }
   // 4.0d — logo vivo: a mesma Final 2 em 3D com a órbita girando (desktop; celular e movimento reduzido ficam com a imagem)
-  if (ARD.logo3d && $('logo-img')) { const tryLogo = () => { const im = $('logo-img'); if (im && !im.hidden && !(document.getElementById('start') || {}).hidden) ARD.logo3d.mount(im); }; ARD.gpuProbe().then(() => { if (ARD.gpuSoft) return; if (window.THREE) setTimeout(tryLogo, 60); else window.addEventListener('three-ready', () => setTimeout(tryLogo, 60), { once: true }); }); } /* 4.3k: o logo vivo só sobe depois do load e da sonda da GPU */
+  if (ARD.logo3d && $('logo-img')) { const tryLogo = () => { const im = $('logo-img'); if (im && !im.hidden && !(document.getElementById('start') || {}).hidden) ARD.logo3d.mount(im); }; ARD.gpuProbe().then(() => { if (ARD.gpuSoft || ARD.semWebGL) return; if (window.THREE) setTimeout(tryLogo, 60); else window.addEventListener('three-ready', () => setTimeout(tryLogo, 60), { once: true }); }); } /* 4.3k: o logo vivo só sobe depois do load e da sonda da GPU */
   // 4.3k — fundo: estrelas paradas no canvas 2D na hora; depois do Three.js, a cena viva do Grande Alinhamento (src/ui-fx.js), com versão leve no celular,
   // com ?logo=estatico, com movimento reduzido e em GPU por software. Sem WebGL, fica a arte antiga (assets/hero-belt) atrás de um véu.
   { const bgfx = $('bgfx'); const stars = () => { if (!bgfx || $('start').hidden) return; const w = bgfx.clientWidth, h = bgfx.clientHeight; if (!w || !h) return; bgfx.width = w; bgfx.height = h; const c = bgfx.getContext('2d'); let sd = 5; const rnd = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; }; for (let i = 0; i < 260; i++) { c.globalAlpha = 0.15 + rnd() * 0.55; const r = rnd() < 0.1 ? 1.6 : 0.9; c.fillStyle = rnd() < 0.15 ? '#ffd9c4' : '#e6ecff'; c.fillRect(rnd() * w, rnd() * h, r, r); } }; stars(); addEventListener('resize', stars);
     const heroArt = () => { if (!ART || !ART.hero) return; const st = $('start'); const veil = 'linear-gradient(180deg, rgba(5,7,11,.45), rgba(5,7,11,.84) 55%, rgba(5,7,11,.97))'; st.style.backgroundImage = `${veil}, url(${ART.hero})`; st.style.backgroundSize = 'cover'; st.style.backgroundPosition = 'center top'; const hi = new Image(); hi.onload = () => { st.style.backgroundImage = `${veil}, url(${hi.src})`; }; hi.onerror = () => { hi.onerror = null; hi.src = 'assets/hero-belt.jpg'; }; hi.src = 'assets/hero-belt.webp'; };
-    ARD.gpuProbe().then(() => whenThree(ok => { if (!ok) { heroArt(); return; } const sala = !!(ARD.sala && ARD.sala.want()); if (ARD.gpuSoft && !sala) return; setTimeout(() => { if (G || $('start').hidden) return; const fx = () => { if (!(ARD.uiFx && ARD.uiFx.mount($('start'), raceSel()))) heroArt(); };
-      /* 5.0b: a Sala de Comando (Motor 5) entra no lugar do ui-fx quando o aparelho aguenta; se ela não subir, o ui-fx assume */ if (sala) ARD.sala.mount($('start'), raceSel()).then(ok2 => { if (!ok2 && !G && !$('start').hidden) { if (ARD.uiStart && ARD.uiStart.salaPronta) ARD.uiStart.salaPronta(false); fx(); } }); else fx(); }, 120); })); } /* a cena só sobe depois do load e da sonda; na GPU por software fica o fundo em CSS */
+    /* 5.0a.1: o pôster da Sala (render da própria Sala) aparece já com a vitrine montada; a Sala ao vivo entra por cima depois. Sem a Sala (celular, movimento reduzido,
+       GPU por software ou se ela não subir), o pôster fica como fundo, com o movimento leve; o ui-fx de antes só assume quando não há pôster */
+    const poster = !!(ARD.salaPoster && ARD.salaPoster.mount($('start'), raceSel())); const fica = () => !!(poster && ARD.salaPoster.ativo() && ARD.salaPoster.final());
+    if (poster && ARD.sala && ARD.sala.preparar) addEventListener('load', () => { if (!ARD.salaPoster.ativo() || ARD.salaPoster.visivel()) ARD.sala.preparar(); }, { once: true }); /* o three WebGPU baixa depois que o pôster aparece (o sala-poster.js pede ao mostrar; no load, só se ele já estiver na tela): a avaliação do módulo não atrasa o pôster; a Sala só monta depois do load e da sonda */
+    ARD.gpuProbe().then(() => whenThree(ok => { if (!ok) { if (!fica()) heroArt(); return; } const sala = !!(ARD.sala && ARD.sala.want()); if (ARD.gpuSoft && !sala) { fica(); return; } setTimeout(() => { if (G || $('start').hidden) return; const fx = () => { if (fica()) return; if (!(ARD.uiFx && ARD.uiFx.mount($('start'), raceSel()))) heroArt(); };
+      /* 5.0b: a Sala de Comando (Motor 5) entra no lugar do ui-fx quando o aparelho aguenta; se ela não subir, o pôster fica (ou o ui-fx assume) */ if (sala) ARD.sala.mount($('start'), raceSel()).then(ok2 => { if (!ok2 && !G && !$('start').hidden) { if (ARD.uiStart && ARD.uiStart.salaPronta) ARD.uiStart.salaPronta(false); fx(); } }); else fx(); }, 120); })); } /* a cena só sobe depois do load e da sonda; na GPU por software fica o pôster parado (ou o fundo em CSS) */
   // rodapé: Termos, Privacidade e atalho do tutorial
   const wireModal = (btn, modal) => { const b = $(btn), m = $(modal); if (!b || !m) return; b.addEventListener('click', () => { m.hidden = false; }); m.querySelectorAll('[data-close]').forEach(x => x.addEventListener('click', () => { m.hidden = true; })); };
   wireModal('foot-termos', 'termos'); wireModal('foot-priv', 'priv');
@@ -292,7 +296,7 @@ function startGame(cfg, netCtx) {
   if (!netCtx && !cfg.campaign && ARD.campUI) ARD.campUI.applyColor(players); // tom da Raça escolhido no Hangar (solo)
   const sim = S.createSim({ seed: cfg.seed, players, minutes: cfg.minutes || 25, map: cfg.campaign ? 'fenda' : (cfg.map === 'cinturao' ? 'cinturao' : 'fenda'), mapV: cfg.campaign ? 0 : (cfg.mapV == null ? 1 : cfg.mapV), /* 4.3h: mapa e lagos (salvamentos antigos sem lagos) */ noVeins: !!cfg.bench || !!(cfg.campaign && cfg.campaign.cfg && cfg.campaign.cfg.noVeins) }); // 4.2h: sem veios no prólogo e no teste de desempenho
   if (cfg.resume) S.restore(sim, cfg.resume.sim); // 4.1c: retomada a partir do salvamento (estado exato)
-  if (ARD.hud3) ARD.hud3.prepareSim(sim, !!cfg.resume); /* 5.0b: paleta para daltonismo nas cores dos jogadores, antes de o renderizador montar os modelos */
+  if (ARD.hud3) ARD.hud3.prepareSim(sim, !!cfg.resume, netCtx ? netCtx.myId : 0); /* 5.0b: paleta para daltonismo nas cores dos jogadores, antes de o renderizador montar os modelos · 5.0a.1: e as cores relativas (precisam saber quem é você) */
   const human = netCtx ? netCtx.myId : 0;
   const canvas = $('world'), mini = $('minimap'), overlay = $('overlay');
   $('start').hidden = true; $('game').hidden = false; $('end').hidden = true;
@@ -582,10 +586,15 @@ function startGame(cfg, netCtx) {
     const W = G.resW || (G.resW = { t: 0, warned: {} }); W.t = sim.time; const res = { minerio: 0, plasma: 0, dados: 0 }; const idle = [];
     for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'unit' && e.owner === human && e.def === 'coletor' && e.state === 'idle') idle.push(e.id); else if (e.kind === 'node' && e.amount > 0 && S.inTerritory(sim, human, e.x, e.y)) res[e.res] += e.amount; }
     for (const k of ['plasma', 'minerio', 'dados']) { const el = $('r-' + k); if (el && el.parentElement) setTi(el.parentElement, RES_NAME[k] + ' · variação por minuto nos últimos 30 s · no seu território restam ' + fmt(res[k])); }
-    for (const k of ['minerio', 'plasma']) { if (res[k] > 0) { W.warned[k] = false; continue; } if (W.warned[k] || sim.time < 60 || !S.nucleoOf(sim, human)) continue; W.warned[k] = true;
+    const dry = []; /* 5.0a.1: o que secou agora (os dois juntos viram um conselho só) */
+    for (const k of ['minerio', 'plasma']) { if (res[k] > 0) { W.warned[k] = false; continue; } if (W.warned[k] || sim.time < 60 || !S.nucleoOf(sim, human)) continue; W.warned[k] = true; dry.push(k);
       const n0 = S.nucleoOf(sim, human); let best = null, bd = 1e9; for (const e of sim.ents) if (e.alive && e.kind === 'node' && e.res === k && e.amount > 0 && S.territoryOwner(sim, e.x, e.y) === -1) { const d = S.dist(e.x, e.y, n0.x, n0.y); if (d < bd) { bd = d; best = e; } }
-      const text = RES_NAME[k] + ' do seu território acabou: mande coletores a outro campo (botão direito) ou expanda com um Nódulo.'; handleEvents([{ t: 'alert', p: human, text, x: best ? best.x : undefined, y: best ? best.y : undefined, kind: 'warn' }]); if (G.isTouch) notice(text); }
+      const text = RES_NAME[k] + ' do seu território acabou: mande os coletores a outro campo ou expanda com um Nódulo.'; handleEvents([{ t: 'alert', p: human, text, x: best ? best.x : undefined, y: best ? best.y : undefined, kind: 'warn', act: 'gather', res: k }]); /* 5.0a.1: a linha da central ganha "Mandar coletores" */
+    }
+    if (dry.length) { const k = dry[0], two = dry.length > 1; /* o Minério primeiro */
+      advise({ id: 'seco-' + k, icon: 'ic-' + k, title: two ? 'Minério e Plasma acabaram' : RES_NAME[k] + ' acabou', kind: 'warn', secs: 45, text: (two ? 'O Minério e o Plasma do seu território acabaram.' : 'O ' + RES_NAME[k] + ' do seu território acabou.') + ' Os coletores vão sozinhos ao campo mais perto; os que ficarem parados voltam para a base.', acts: [{ label: 'Mandar coletores', ic: 'ic-' + k, fn: () => sendIdleCollectors(k) }, { label: 'Construir Nódulo', ic: 'ic-construir', fn: () => openBuild('eco', 'nodulo') }] }); }
     const chip = $('idle-col'); if (chip) { setH(chip, !idle.length); if (idle.length) setT($('idle-n'), idle.length); G.idleCol = idle; }
+    advTick(); /* 5.0a.1: conselheiro dos recursos parados */
   }
   function refreshTop() { /* 4.3k: só escreve quando o valor muda (ver setT/setC/setW) */
     const p = sim.players[human];
@@ -656,7 +665,7 @@ function startGame(cfg, netCtx) {
   function refreshPanelRaw(force) {
     const ents = selectionSummary();
     const key = ents.map(e => e.id + ':' + (e.queue ? e.queue.length + ':' + (e.queue[0] ? (e.queue[0].waiting ? 'w' : 'p') : '') : '') + ':' + (e.built ? 1 : Math.floor(e.progress * 20)) + ':' + (e.amount != null ? Math.floor(e.amount) : '')).join('|') + '|' + I.buildMenu + '|' + I.mode + '|' + Object.keys(sim.players[human].research).length + '|' + (sim.players[human].era || 1) + (sim.players[human].evolveT > 0 ? 'e' : '') + (sim.players[human].ascended ? 'a' : '') + '|' + ents.map(e => (e.mod ? 'm' : '') + (e.upT > 0 ? 'u' : '')).join('') + '|' + (G.btab || '') + ((!ents.length || I.buildMenu) && G.btab === 'tec' ? S.eraBlock(sim, human) : ''); /* 4.3l: aba do Construir e o que falta para a próxima Era */
-    if (!force && key === G.selKey) { liveUpdate(ents); return; } G.selKey = key; G.live = { ref: new Map(), build: null }; G.pGen = (G.pGen || 0) + 1; /* 4.3l: remontou (o invólucro ajeita cabeçalho, lista e gaveta) */ // 4.1a: vida e progresso mudam no lugar; redesenhar só quando a estrutura do painel muda (cliques não se perdem) · 4.3k: nós guardados valem só para esta montagem
+    if (!force && key === G.selKey) { liveUpdate(ents); return; } if (!force && G.pPress && performance.now() - G.pPress < 1500) { liveUpdate(ents); return; } /* 5.0a.1: com um botão do painel apertado, a remontagem espera o dedo (ou o mouse) subir */ G.selKey = key; G.live = { ref: new Map(), build: null }; G.pGen = (G.pGen || 0) + 1; /* 4.3l: remontou (o invólucro ajeita cabeçalho, lista e gaveta) */ // 4.1a: vida e progresso mudam no lugar; redesenhar só quando a estrutura do painel muda (cliques não se perdem) · 4.3k: nós guardados valem só para esta montagem
     const panel = $('panel'); const p = sim.players[human]; const fac = S.FACTIONS[p.faction];
     if (!ents.length || I.buildMenu) { panel.innerHTML = buildMenuHTML(p); bindBuildMenu(); return; }
     const e = ents[0];
@@ -672,10 +681,11 @@ function startGame(cfg, netCtx) {
       let h = `<div class="sel-head"><img class="ph-ico" alt="" src="${R.icon(e.def, human)}"><b>${esc(d.name)}</b><span class="sh-c">${e.def === 'nucleo' ? 'Centro da colônia · Era ' + S.ERAS[p.era || 1].roman : 'Estrutura'}${e.built ? '' : ' · em construção'}</span><div class="hp" data-live="${e.id}"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="sh-st"><span>${IC('ic-vida')}<span data-livetxt="${e.id}">${fmt(e.hp)} / ${fmt(e.maxHp)}${e.built ? '' : ' · construção ' + Math.round(e.progress * 100) + '%'}</span></span>${enP ? `<span>${IC('ic-energia')}+${enP}</span>` : ''}${d.energyUse ? `<span>${IC('ic-energia')}−${d.energyUse}</span>` : ''}${d.attack ? `<span>${IC('ic-dano')}${d.attack.dmg}</span><span>${IC('ic-alcance')}${d.attack.range}</span>` : `<span>${IC('ic-sensor')}${d.sensor}</span>`}</div></div><div class="muted small">${esc(d.desc)}</div>`; /* 4.3l: retrato grande, vida e atributos com ícones */
       const prodList = S.producesFor(e.def, p.faction);
       if (e.built && prodList.length) {
+        if (G.isTouch) h += '<div class="pqty" data-qrow></div>'; /* 5.0a.1: no toque, +5 e +10 logo acima dos cartões (embaixo, nos detalhes, a lista cortava) */
         h += '<div class="grid">';
-        for (const ud of prodList) { const u = S.UNITS[ud]; const name = S.unitName(fac.id, ud); const qn = e.queue.filter(q => q.def === ud).length; const lk = S.lockReason(sim, human, 'unit', ud); h += `<button class="act ${lk ? 'locked' : ''}" data-prod="${ud}" ${lk ? `data-lock="${esc(lk)}"` : ''} aria-label="${esc(name)}">`; /* 4.3l: a descrição foi para o painel de detalhes */ h += `${lk ? `<span class="lockb">${u.era && u.era > (p.era || 1) ? S.ERAS[u.era].roman : '🔒'}</span>` : ''}<img class="ico" alt="" src="${R.icon(ud, human)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span>${qn ? `<span class="qn">×${qn}</span>` : ''}</button>`; }
+        for (const ud of prodList) { const u = S.UNITS[ud]; const name = S.unitName(fac.id, ud); const qn = e.queue.filter(q => q.def === ud).length; const lk = S.lockReason(sim, human, 'unit', ud); h += `<button class="act ${lk ? 'locked' : ''}" data-prod="${ud}" data-bid="${e.id}" ${lk ? `data-lock="${esc(lk)}"` : ''} aria-label="${esc(name)}: mais 1 na fila"${G.isTouch ? '' : ` title="${esc(name)}: clique põe 1 na fila · Shift+clique 5 · Ctrl+clique 10"`}>`; /* 4.3l: a descrição foi para o painel de detalhes · 5.0a.1: data-bid para o ouvinte único do painel */ h += `${lk ? `<span class="lockb">${u.era && u.era > (p.era || 1) ? S.ERAS[u.era].roman : '🔒'}</span>` : ''}<img class="ico" alt="" src="${R.icon(ud, human)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span>${qn ? `<span class="qn">×${qn}</span>` : ''}</button>`; }
         h += '</div>';
-        { const cur = G.udet && prodList.includes(G.udet) ? G.udet : prodList[0]; h += `<div class="bdet" data-det data-def="${cur}"></div>`; } /* 4.3l: detalhes da unidade (passar o mouse; no toque, a última tocada) */
+        { const cur = G.udet && prodList.includes(G.udet) ? G.udet : prodList[0]; G.prodBid = e.id; h += `<div class="bdet bdu" data-det data-def="${cur}"></div>`; } /* 4.3l: detalhes da unidade (passar o mouse; no toque, a última tocada) */
         if (e.queue.length) { h += `<div class="queue"><span class="qtot">Fila ${e.queue.length}/50</span>`; for (let i = 0; i < e.queue.length;) { const q = e.queue[i]; let j = i; while (j < e.queue.length && e.queue[j].def === q.def) j++; const n = j - i; h += `<button class="q" data-cancel="${j - 1}" data-def="${q.def}" title="Clique cancela 1 · Shift cancela todas deste tipo"><img alt="" src="${R.icon(q.def, human)}">${esc(S.unitName(fac.id, q.def))}${n > 1 ? ` <b>×${n}</b>` : ''}${i === 0 ? (q.waiting ? ' <i class="wait">aguardando recursos</i>' : ` <i data-liveq="${e.id}">${Math.round(100 * q.t / q.total)}%</i>`) : ''} ✕</button>`; i = j; } h += '</div>'; }
         h += `<div class="row"><button class="act sm" data-mode="rally"><svg class="tbi" aria-hidden="true"><use href="#ic-reuniao"/></svg>Ponto de reunião</button>${e.def === 'nucleo' ? `<button class="act sm" data-mode="jump" ${p.jumpsLeft > 0 && e.jumpT <= 0 ? '' : 'disabled'}><svg class="tbi" aria-hidden="true"><use href="#ic-salto"/></svg>Salto de Núcleo (${p.jumpsLeft})</button>` : ''}</div>`;
       }
@@ -704,10 +714,7 @@ function startGame(cfg, netCtx) {
       if (e.jumpT > 0) h += `<div class="tip">Salto em ${Math.ceil(e.jumpT)} s. O Núcleo está visível para todos.</div>`;
       panel.innerHTML = h;
       { const ps = [...panel.querySelectorAll('[data-prod]')]; if (ps.length) { bindDetails('u', ps, 'prod'); const box = panel.querySelector('[data-det]'); if (box) showDet('u', box.dataset.def, ps, 'prod'); if (G.isTouch) ps.forEach(b => b.addEventListener('pointerdown', () => showDet('u', b.dataset.prod, ps, 'prod'))); } } /* 4.3l */
-      panel.querySelectorAll('[data-prod]').forEach(b => { let lp = null, fired = false; // 4.1a: +1 clique, +5 Shift ou segurar no toque, +10 Ctrl
-        b.addEventListener('pointerdown', ev => { if (ev.pointerType !== 'touch' || b.dataset.lock) return; fired = false; lp = setTimeout(() => { fired = true; I.cmd({ t: 'produce', id: e.id, def: b.dataset.prod, n: 5 }); if (navigator.vibrate) navigator.vibrate(15); notice('+5 na fila'); }, 480); });
-        b.addEventListener('pointerup', () => clearTimeout(lp)); b.addEventListener('pointerleave', () => clearTimeout(lp));
-        b.addEventListener('click', ev => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } if (fired) { fired = false; return; } I.cmd({ t: 'produce', id: e.id, def: b.dataset.prod, n: ev.ctrlKey || ev.metaKey ? 10 : ev.shiftKey ? 5 : 1 }); }); });
+      /* 5.0a.1: a produção (cartões +1, botões +5 e +10 dos detalhes) é tratada por um ouvinte só no #panel (bindProd): sem o "segurar = +5" escondido da 4.1a, que com o quadro lento virava +6 a cada toque */
       panel.querySelectorAll('[data-cancel]').forEach(b => b.addEventListener('click', ev => I.cmd({ t: 'cancel', id: e.id, def: b.dataset.def, all: ev.shiftKey })));
       panel.querySelectorAll('[data-research]').forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.cmd({ t: 'research', key: b.dataset.research }); }));
       panel.querySelectorAll('[data-evolve]').forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.cmd({ t: 'evolve' }); }));
@@ -751,12 +758,19 @@ function startGame(cfg, netCtx) {
     if (m.length) return ['no', 'ic-limpar', 'Faltam ' + m.join(' e ')];
     return ['ok', 'ic-rep', 'Pronto' + (D.key && !G.isTouch ? ' · tecla ' + D.key : '')]; }
   function detHTML(kind, def) { const D = detInfo(kind, def), n = needState(D);
-    return `<div class="bd-h"><b class="bd-n">${esc(D.name)}</b><span class="bd-c">${esc(D.cls)}</span><span class="cost">${costStr(D.cost)}</span><span class="bd-era">ERA ${S.ERAS[D.era].roman}</span></div><div class="bd-st">${D.st.map(x => `<span title="${x[2]}">${IC(x[0])}${esc(x[1])}</span>`).join('')}</div><p class="bd-d">${esc(D.desc)}</p><div class="bd-need ${n[0]}" data-need><svg class="tbi" aria-hidden="true"><use href="#${n[1]}"/></svg><span>${esc(n[2])}</span></div>` + (G.isTouch && kind === 'b' ? `<button class="act sm bd-go" data-go="${def}"${D.lock ? ' disabled' : ''}>${IC('ic-construir')}Posicionar</button>` : ''); }
+    const need = `<div class="bd-need ${n[0]}" data-need><svg class="tbi" aria-hidden="true"><use href="#${n[1]}"/></svg><span>${esc(n[2])}</span></div>`;
+    const qn = kind === 'u' && !G.isTouch ? `<span class="bd-qn" role="group" aria-label="Pôr mais ${esc(D.name)} na fila">${[5, 10].map(k => `<button type="button" data-prodn="${k}" data-def="${def}" data-bid="${G.prodBid || ''}"${D.lock ? ` disabled data-lock="${esc(D.lock)}"` : ''} aria-label="Pôr ${k} ${esc(D.name)} na fila" title="Pôr ${k} na fila${G.isTouch ? '' : k === 5 ? ' · ou Shift+clique no cartão' : ' · ou Ctrl+clique no cartão'}">+${k}</button>`).join('')}</span>` : ''; /* 5.0a.1: +5 e +10 explícitos (um toque no cartão = +1) */
+    const head = `<div class="bd-h"><b class="bd-n">${esc(D.name)}</b><span class="bd-c">${esc(D.cls)}</span><span class="cost">${costStr(D.cost)}</span><span class="bd-era">ERA ${S.ERAS[D.era].roman}</span></div>`, row = qn ? `<div class="bd-row">${need}${qn}</div>` : need;
+    const body = `<div class="bd-st">${D.st.map(x => `<span title="${x[2]}">${IC(x[0])}${esc(x[1])}</span>`).join('')}</div><p class="bd-d">${esc(D.desc)}</p>`;
+    return head + body + row + (G.isTouch && kind === 'b' ? `<button class="act sm bd-go" data-go="${def}"${D.lock ? ' disabled' : ''}>${IC('ic-construir')}Posicionar</button>` : ''); }
+  function qrowHTML(def) { /* 5.0a.1: a linha do toque — a unidade escolhida e os botões +5 e +10 (um toque no cartão = +1) */ const D = detInfo('u', def);
+    return `<span class="pq-l">Pôr na fila<b>${esc(D.name)}</b></span><span class="bd-qn" role="group" aria-label="Pôr mais ${esc(D.name)} na fila">${[5, 10].map(k => `<button type="button" data-prodn="${k}" data-def="${def}" data-bid="${G.prodBid || ''}"${D.lock ? ` disabled data-lock="${esc(D.lock)}"` : ''} aria-label="Pôr ${k} ${esc(D.name)} na fila">+${k}</button>`).join('')}</span>`; }
   function showDet(kind, def, cards, attr) { /* no evento (passar o mouse, foco ou toque), nunca no laço */ const box = $('panel').querySelector('[data-det]'); if (!box || !def) return; if (kind === 'b') G.bdet = def; else G.udet = def;
     box.innerHTML = detHTML(kind, def); for (const c of cards) setOn(c, 'cur', c.dataset[attr] === def);
+    if (kind === 'u') { const qr = $('panel').querySelector('[data-qrow]'); if (qr) qr.innerHTML = qrowHTML(def); } /* 5.0a.1 */
     const el = box.querySelector('[data-need]'); if (G.live) G.live.det = { info: detInfo(kind, def), el, use: el && el.querySelector('use'), txt: el && el.querySelector('span') };
     const go = box.querySelector('[data-go]'); if (go) go.addEventListener('click', () => placeBuild(def)); }
-  function bindDetails(kind, cards, attr) { for (const c of cards) { const f = () => showDet(kind, c.dataset[attr], cards, attr); c.addEventListener('pointerenter', ev => { if (ev.pointerType !== 'touch') f(); }); c.addEventListener('focus', f); } }
+  function bindDetails(kind, cards, attr) { for (const c of cards) { const f = () => showDet(kind, c.dataset[attr], cards, attr); let ht = 0; c.addEventListener('pointerenter', ev => { if (ev.pointerType === 'touch') return; if (kind !== 'u') { f(); return; } clearTimeout(ht); ht = setTimeout(f, 160); }); c.addEventListener('pointerleave', () => clearTimeout(ht)); c.addEventListener('focus', f); } } /* 5.0a.1: unidades trocam os detalhes depois de 0,16 s sobre o cartão (a caminho do +5 o mouse cruza outros cartões) */
   function techHTML(p) { /* aba Tecnologia: trilha das Eras, o que falta para a próxima e as pesquisas */
     const er = p.era || 1, nx = S.ERAS[er + 1];
     let h = '<div class="etrack">' + [1, 2, 3].map(n => { const E = S.ERAS[n]; const evo = n === er + 1 && p.evolveT > 0; return `<div class="eg ${n < er ? 'done' : n === er ? 'cur' : evo ? 'evo' : ''}"><b>Era ${E.roman}</b><small>${esc(E.name)}${n === er ? ' · atual' : evo ? ' · evoluindo' : ''}</small></div>`; }).join('') + '</div>';
@@ -804,7 +818,8 @@ function startGame(cfg, netCtx) {
     $('btn-menu').addEventListener('click', () => ui.confirm('Encerrar esta partida e voltar ao início?' + (G.autoSave ? ' Para continuar depois, use 💾 › Pausar e sair.' : ''), () => { G.leaving = true; const go = () => goStart(); if (net) mpSession.clear(); if (G.autoSave && ARD.saves) within(ARD.saves.del('auto'), 2500).then(go, go); else go(); })); // 4.2g: sem relançar a missão nem regravar o 'auto'
     if ($('btn-save')) $('btn-save').addEventListener('click', () => openSaveBox());
     $('panel').addEventListener('click', ev => { const b = ev.target.closest && ev.target.closest('[data-techscr]'); if (b && G.h3) G.h3.openTech(); }); /* 5.0b: botões da tela de pesquisa nos painéis (o painel é remontado; o ouvinte fica no contêiner) */
-    if ($('idle-col')) $('idle-col').addEventListener('click', () => { const ids = (G.idleCol || []).filter(id => { const u = sim.byId.get(id); return u && u.alive; }); if (!ids.length) return; I.select(ids); const u = sim.byId.get(ids[0]); if (u) I.center(u.x, u.y); notice(ids.length + (ids.length > 1 ? ' coletores parados selecionados' : ' coletor parado selecionado') + ': clique com o botão direito num campo de recursos para mandá-los colher.'); }); // 4.2h
+    bindProd(); /* 5.0a.1 */
+    if ($('idle-col')) $('idle-col').addEventListener('click', () => sendIdleCollectors()); // 4.2h · 5.0a.1: um toque manda os parados aos nós livres mais próximos
     if ($('pausebox')) $('pausebox').addEventListener('click', () => { if (G.paused && !G.ended) { G.paused = false; G.autoPaused = false; G.pauseWhy = null; refreshTop(); notice('Continuando'); } }); // 4.2f: pausa visível; clique continua
     $('btn-build').addEventListener('click', () => { if (G.isTouch && I.mode !== 'build') { G.drawer = G.drawer || {}; const showing = !view.sel.size || I.buildMenu; if (showing && !G.drawer.build) { setDrawer(true); return; } G.drawer.build = false; I.buildMenu = true; view.sel = new Set(); ui.buildMenuChanged(true); return; } /* 4.3l: no toque, o botão abre e recolhe a gaveta do Construir */
       I.buildMenu = !I.buildMenu; view.sel = new Set(); ui.buildMenuChanged(I.buildMenu); });
@@ -823,7 +838,8 @@ function startGame(cfg, netCtx) {
     $('btn-army').addEventListener('click', () => { const ids = []; for (const en of sim.ents) if (en.alive && en.owner === human && en.kind === 'unit' && S.UNITS[en.def].attack) ids.push(en.id); I.select(ids); if (ids.length) { const e = sim.byId.get(ids[0]); I.center(e.x, e.y); } });
     mini.addEventListener('pointerdown', e => { e.preventDefault(); const r = mini.getBoundingClientRect(); const [x, y] = R.miniToWorld((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height); if (e.button === 2) { const ids = [...view.sel].filter(id => { const u = sim.byId.get(id); return u && u.alive && u.kind === 'unit' && u.owner === human; }); if (ids.length) I.cmd({ t: 'attackmove', ids, x, y }); } else I.center(x, y); });
     mini.addEventListener('contextmenu', e => e.preventDefault());
-    $('hints-close').addEventListener('click', () => { $('hints').hidden = true; G.hintsOff = true; });
+    $('hints-close').addEventListener('click', () => { if (G.adv) { advClose(240); return; } $('hints').hidden = true; G.hintsOff = true; }); /* 5.0a.1: com um conselho na caixa, o ✕ adia só o conselho */
+    $('hints-body').addEventListener('click', ev => { const b = ev.target.closest && ev.target.closest('[data-adv]'); if (!b || !G.adv) return; const a = G.adv.acts[+b.dataset.adv]; advClose(G.adv.id.startsWith('parado') ? 150 : 0); if (a) a.fn(); }); /* 5.0a.1: botões do conselheiro */
     document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => ui.closeModals()));
     { /* 4.3l: dica única dos botões com data-tip (barra de cima e botões rápidos); a posição é medida só no evento, nunca no laço */
       const tip = $('hud-tip'), hud = $('hud'); let cur = null;
@@ -833,6 +849,30 @@ function startGame(cfg, netCtx) {
         hud.addEventListener('pointerout', ev => { if (cur && !(ev.relatedTarget && cur.contains(ev.relatedTarget))) { cur = null; tip.classList.remove('on'); } });
         hud.addEventListener('pointerdown', () => { if (cur) { cur = null; tip.classList.remove('on'); } }); } }
   }
+  function bindProd() { /* 5.0a.1 — produção: um toque ou clique = +1. Um ouvinte só no #panel (o painel é remontado quando a fila muda):
+       a unidade entra quando o dedo (ou o botão do mouse) sobe sobre o mesmo botão — qualquer duração, mesmo que o painel tenha sido
+       remontado no meio —, sem ter arrastado no toque; o clique que o navegador manda depois é engolido. Teclado (Enter/Espaço no botão):
+       pelo clique. +5 e +10 só pelos botões dos detalhes ou Shift/Ctrl+clique no cartão. */
+    const panel = $('panel'); let pr = null, eat = -1;
+    const tgt = el => (el && el.closest ? el.closest('[data-prod],[data-prodn]') : null);
+    const keyOf = b => (b.dataset.prod || '') + '|' + (b.dataset.def || '') + '|' + (b.dataset.prodn || '');
+    const fire = (b, ev) => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } if (b.disabled) return;
+      const def = b.dataset.prod || b.dataset.def, bid = +(b.dataset.bid || G.prodBid || 0), bd = sim.byId.get(bid); if (!def || !bd || !bd.alive || bd.owner !== human) return;
+      const n = b.dataset.prodn ? +b.dataset.prodn : (ev && (ev.ctrlKey || ev.metaKey)) ? 10 : (ev && ev.shiftKey) ? 5 : 1;
+      I.cmd({ t: 'produce', id: bid, def, n }); if (n > 1) notice('+' + n + ' ' + S.unitName(sim.players[human].faction, def) + ' na fila');
+      if (b.dataset.prod) { const ps = [...panel.querySelectorAll('[data-prod]')]; if (G.udet !== def) showDet('u', def, ps, 'prod'); } };
+    panel.addEventListener('pointerdown', ev => { if (ev.target.closest && ev.target.closest('button')) G.pPress = performance.now(); const b = tgt(ev.target); pr = b && !(ev.pointerType === 'mouse' && ev.button !== 0) ? { id: ev.pointerId, key: keyOf(b), x: ev.clientX, y: ev.clientY, type: ev.pointerType, moved: false } : null; });
+    panel.addEventListener('pointermove', ev => { if (pr && ev.pointerId === pr.id && !pr.moved && Math.hypot(ev.clientX - pr.x, ev.clientY - pr.y) > 12) pr.moved = true; });
+    window.addEventListener('pointerup', ev => { G.pPress = 0; const d = pr; if (!d || ev.pointerId !== d.id) return; pr = null; if (d.moved && d.type !== 'mouse') return;
+      const b = tgt(document.elementFromPoint(ev.clientX, ev.clientY)); if (!b || !panel.contains(b) || keyOf(b) !== d.key) return; eat = ev.timeStamp; fire(b, ev); }, true); /* o botão embaixo do dedo (o painel pode ter sido remontado) */
+    window.addEventListener('pointercancel', ev => { G.pPress = 0; if (pr && ev.pointerId === pr.id) pr = null; }, true); /* a lista rolou: não era toque */
+    panel.addEventListener('click', ev => { const b = tgt(ev.target), eaten = eat >= 0 && ev.timeStamp - eat < 1000; eat = -1; if (!b || eaten) return; fire(b, ev); });
+    panel.addEventListener('contextmenu', ev => { if (tgt(ev.target)) ev.preventDefault(); }); /* segurar o botão não abre menu do sistema */
+  }
+  function sendIdleCollectors(res) { /* 5.0a.1: seleciona os coletores parados e manda cada um ao nó livre mais próximo, distribuídos (comando 'gather' da simulação; o aviso com o resultado vem dela); res: o recurso que acabou vem primeiro */
+    const ids = []; for (const e of sim.ents) if (e.alive && e.kind === 'unit' && e.owner === human && e.def === 'coletor' && (e.state === 'idle' || (e.state === 'move' && e.node == null && !e.area))) ids.push(e.id); /* parados e os que voltam para a base sem nó (os mandados pelo jogador têm área) */
+    if (!ids.length) { notice('Nenhum coletor parado: os coletores já estão trabalhando'); return 0; } I.select(ids); I.cmd(res ? { t: 'gather', ids, res } : { t: 'gather', ids }); return ids.length; }
+  G.sendIdleCollectors = sendIdleCollectors;
   function fac() { return S.FACTIONS[sim.players[human].faction]; }
   const SUPER_TARGETED = { fundicao: 'Clique em território seu para derrubar o Bastião', eclosao: 'Clique num ponto visível para a Eclosão' };
   function superClick(f) { if (SUPER_TARGETED[f.superKey]) { I.setMode('super'); notice(SUPER_TARGETED[f.superKey]); } else I.cmd({ t: 'super' }); }
@@ -881,10 +921,41 @@ function startGame(cfg, netCtx) {
     ];
   }
   function refreshHints() {
-    if (G.hintsOff) return;
+    const box = $('hints'), hb = $('hints-body');
+    if (G.adv && sim.time > G.adv.until) { (G.advS || (G.advS = { since: {}, next: {} })).quiet = sim.time + 25; G.adv = null; } /* 5.0a.1: o conselho some sozinho depois de um tempo de jogo */
+    if (G.adv) { const a = G.adv; const html = `<div class="hint adv k-${a.kind || 'info'}" role="status"><span class="adv-h">${IC(a.icon || 'ic-alerta')}<b>${esc(a.title || 'Conselho')}</b></span><span class="adv-t">${esc(a.text)}</span><span class="adv-b">${a.acts.map((x, i) => `<button type="button" class="act sm${i === 0 ? ' good' : ''}" data-adv="${i}">${x.ic ? IC(x.ic) : ''}${esc(x.label)}</button>`).join('')}</span></div>`;
+      setOn(box, 'advon', true); setH(box, false); if (G.hintsHtml !== html) { G.hintsHtml = html; hb.innerHTML = html; } return; }
+    setOn(box, 'advon', false);
+    if (G.hintsOff) { setH(box, true); return; }
     const todo = G.hints.filter(h => !h.done()).slice(0, 2);
-    const box = $('hints'); if (!todo.length) { setH(box, true); return; }
-    setH(box, false); const hb = $('hints-body'); const html = (G.isTouch ? todo.slice(0, 1) : todo).map((h, i) => `<div class="hint ${i === 0 ? 'now' : ''}">${esc(h.text)}</div>`).join(''); if (G.hintsHtml !== html) { G.hintsHtml = html; hb.innerHTML = html; } /* 4.3k: troca só quando a dica muda */
+    if (!todo.length) { setH(box, true); return; }
+    setH(box, false); const html = (G.isTouch ? todo.slice(0, 1) : todo).map((h, i) => `<div class="hint ${i === 0 ? 'now' : ''}">${esc(h.text)}</div>`).join(''); if (G.hintsHtml !== html) { G.hintsHtml = html; hb.innerHTML = html; } /* 4.3k: troca só quando a dica muda */
+  }
+  // ---------- 5.0a.1: conselheiro — recursos parados (com Construir ou Evoluir) e território sem Minério ou Plasma (com Mandar coletores) ----------
+  function advise(o) { G.adv = Object.assign({ until: sim.time + (o.secs || 30) }, o); G.hintsHtml = ''; refreshHints(); }
+  function advClose(snooze) { if (!G.adv) return; const A = G.advS || (G.advS = { since: {}, next: {} }); if (snooze) A.next[G.adv.id] = sim.time + snooze; A.quiet = sim.time + 25; G.adv = null; G.hintsHtml = ''; refreshHints(); } /* depois de um conselho, 25 s de jogo sem outro */
+  function openBuild(tab, def) { /* abre o Construir na aba certa, com os detalhes da construção sugerida (no toque, a gaveta aberta) */
+    if (I.mode !== 'normal') I.setMode('normal'); I.select([]); G.btab = tab; if (def) G.bdet = def; G.drawer = G.drawer || {}; G.drawer.build = false; G.drawerAuto = false; I.buildMenu = true; ui.buildMenuChanged(true); }
+  function advPick(k) { /* o conselho para o recurso parado k: o que destrava o jogo agora (Quartel, Era, Refinaria, Laboratório, Torres) */
+    const p = sim.players[human], er = p.era || 1, nx = S.ERAS[er + 1], amt = fmt(p.res[k]) + ' de ' + RES_NAME[k];
+    const has = d => sim.ents.some(e => e.alive && e.owner === human && e.kind === 'building' && e.def === d); /* pronta ou em obra */
+    const canEvo = !!nx && !(p.evolveT > 0) && !S.eraBlock(sim, human) && S.canAfford(p, nx.cost);
+    const evo = { label: 'Evoluir', ic: 'ic-era', fn: () => { if (G.h3) G.h3.openTech(); else { const n = S.nucleoOf(sim, human); if (n) { I.select([n.id]); I.center(n.x, n.y); } } } };
+    const build = (tab, def) => ({ label: 'Construir', ic: 'ic-construir', fn: () => openBuild(tab, def) });
+    const o = { id: 'parado-' + k, icon: 'ic-' + k, title: 'Recursos parados', kind: 'info' };
+    if (k === 'plasma') return Object.assign(o, canEvo ? { text: 'Você tem ' + amt + ' parado: evolua para a Era ' + nx.roman + ' ou construa Torres de Defesa.', acts: [evo, build('def', 'torre')] } : { text: 'Você tem ' + amt + ' parado: construa Torres de Defesa' + (er >= 2 ? ', uma Fábrica ou um Hangar.' : '.'), acts: [build(er >= 2 ? 'mil' : 'def', er >= 2 ? 'fabrica' : 'torre')] });
+    if (!has('quartel')) return Object.assign(o, { text: 'Você tem ' + amt + ' parado: construa um Quartel' + (canEvo ? ' ou evolua para a Era ' + nx.roman : '') + '.', acts: canEvo ? [build('mil', 'quartel'), evo] : [build('mil', 'quartel')] });
+    if (canEvo) return Object.assign(o, { text: 'Você tem ' + amt + ' parado: evolua para a Era ' + nx.roman + ' (' + nx.name + ') ou construa mais um Quartel.', acts: [evo, build('mil', 'quartel')] });
+    if (er === 1 && !has('refinaria')) return Object.assign(o, { text: 'Você tem ' + amt + ' parado: construa uma Refinaria perto dos nós; com ela e o Quartel você evolui para a Era II.', acts: [build('eco', 'refinaria')] });
+    if (er >= 2 && !has('laboratorio')) return Object.assign(o, { text: 'Você tem ' + amt + ' parado: construa um Laboratório (pesquisas e Era III) ou uma Fábrica.', acts: [build('tec', 'laboratorio')] });
+    return Object.assign(o, { text: 'Você tem ' + amt + ' parado: ponha tropas na fila do Quartel, construa Torres ou expanda com um Nódulo.', acts: [build('mil', 'quartel')] });
+  }
+  function advTick() { /* a cada 2 s de jogo (resWatch): Minério acima de 1.200 ou Plasma acima de 900 por 20 s seguidos; o mesmo conselho volta no máximo a cada 2,5 min */
+    if (G.bench || G.ended) return; const p = sim.players[human]; const A = G.advS || (G.advS = { since: {}, next: {} });
+    for (const [k, lim] of [['minerio', 1200], ['plasma', 900]]) { if (p.res[k] >= lim) { if (A.since[k] == null) A.since[k] = sim.time; } else A.since[k] = null; }
+    if (G.adv || sim.time < 75 || sim.time < (A.quiet || 0) || I.mode === 'build' || I.buildMenu || ui.modalOpen()) return;
+    const k = ['minerio', 'plasma'].find(r => A.since[r] != null && sim.time - A.since[r] >= 20 && sim.time >= (A.next['parado-' + r] || 0)); if (!k) return;
+    A.next['parado-' + k] = sim.time + 150; const o = advPick(k); if (o) advise(o);
   }
 
   function setupNet() {

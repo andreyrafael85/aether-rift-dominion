@@ -250,7 +250,9 @@ const REGIME = {
 
 const DIFFICULTY = {
   // 4.1a: Fácil de verdade (economia menor, constrói devagar, ataca tarde e com parte do exército, sem superarma); Brutal novo no topo
-  facil:   { name: 'Fácil',   income: 0.55, attackAt: 1600, minAttack: 720, acceptP: 0.95, breakP: 0.0,  pirateEvery: 260, reserve: 300, buildEvery: 30, attackFrac: 0.6, research: 1, superweapon: false, maxProd: 1, prodEvery: 9, maxCol: 8 },
+  // 5.0a.1: Fácil para quem está começando — primeiro ataque só depois dos 15 min, ondas de até 8 unidades, economia mais lenta (renda 0,45, 6 coletores),
+  // sem batedor e sem mirar coletores (noCiv), no máximo 1 Torre e sem muros; Normal, Difícil e Brutal não mudam
+  facil:   { name: 'Fácil',   income: 0.45, attackAt: 1600, minAttack: 900, acceptP: 0.95, breakP: 0.0,  pirateEvery: 260, reserve: 300, buildEvery: 36, attackFrac: 0.4, research: 1, superweapon: false, maxProd: 1, prodEvery: 12, maxCol: 6, waveMax: 8, scout: false, noCiv: true, maxTowers: 1, walls: false },
   normal:  { name: 'Normal',  income: 0.9,  attackAt: 1500, minAttack: 480, acceptP: 0.7,  breakP: 0.08, pirateEvery: 150, reserve: 180, buildEvery: 10, attackFrac: 0.85, research: 2, superweapon: true, maxProd: 2, prodEvery: 3, maxCol: 12 },
   dificil: { name: 'Difícil', income: 1.0,  attackAt: 1600, minAttack: 420, acceptP: 0.5,  breakP: 0.3,  pirateEvery: 100, reserve: 120, buildEvery: 4,  attackFrac: 0.95, research: 3, superweapon: true, maxProd: 4, prodEvery: 1 }, // 4.1d: suavizado depois da correção da economia da IA
   brutal:  { name: 'Brutal',  income: 1.4,  attackAt: 1800, minAttack: 300, acceptP: 0.35, breakP: 0.45, pirateEvery: 80,  reserve: 90,  buildEvery: 0,  attackFrac: 1,   research: 3, superweapon: true, maxProd: 9 },
@@ -808,7 +810,7 @@ function processCommand(sim, c) {
     case 'move': case 'attackmove': {
       const us = ownUnits(sim, c.p, c.ids); const f = formation(us, c.x, c.y);
       const comps = []; us.forEach((u, i) => { u.state = c.t === 'move' ? 'move' : 'attackmove'; const q = reachPoint(sim, u, clamp(f[i].x, 20, WORLD - 20), clamp(f[i].y, 20, WORLD - 20), c.t === 'move' ? 40 : 3, comps); u.tx = q.x; u.ty = q.y; u.target = null; u.resume = null; u.node = null; u.stuck = 0; u.stk = 0; u.gx = clamp(c.x, 20, WORLD - 20); u.gy = clamp(c.y, 20, WORLD - 20); u.gn = 0;
-        if (u.def === 'coletor' && p.human) u.area = { x: clamp(c.x, 20, WORLD - 20), y: clamp(c.y, 20, WORLD - 20) }; }); // 4.2g: coletor mandado a um lugar colhe ali (área de trabalho)
+        if (u.def === 'coletor' && p.human) { u.area = { x: clamp(c.x, 20, WORLD - 20), y: clamp(c.y, 20, WORLD - 20) }; u.auto = 0; } }); // 4.2g: coletor mandado a um lugar colhe ali (área de trabalho)
       break; }
     case 'stop': ownUnits(sim, c.p, c.ids).forEach(u => { u.state = 'idle'; u.target = null; u.resume = null; }); break;
     case 'attack': {
@@ -818,7 +820,7 @@ function processCommand(sim, c) {
       break; }
     case 'harvest': {
       const t = sim.byId.get(c.target); if (!t || !t.alive || (t.kind !== 'node' && t.kind !== 'wreck')) return;
-      ownUnits(sim, c.p, c.ids).forEach(u => { if (u.def === 'coletor') { u.state = 'harvest'; u.node = t.id; u.target = null; if (p.human && t.kind === 'node') u.area = { x: t.x, y: t.y }; } else { u.state = 'move'; const q = reachPoint(sim, u, t.x, t.y, 40); u.tx = q.x; u.ty = q.y; u.stuck = 0; u.stk = 0; u.gx = null; } });
+      ownUnits(sim, c.p, c.ids).forEach(u => { if (u.def === 'coletor') { u.state = 'harvest'; u.node = t.id; u.target = null; u.auto = 0; if (p.human && t.kind === 'node') u.area = { x: t.x, y: t.y }; } else { u.state = 'move'; const q = reachPoint(sim, u, t.x, t.y, 40); u.tx = q.x; u.ty = q.y; u.stuck = 0; u.stk = 0; u.gx = null; } });
       break; }
     case 'devour': { // Carniceiro (Vorag): carcaças e Nódulos inimigos
       const t = sim.byId.get(c.target); if (!t || !t.alive || !facOf(sim, c.p).devour) return;
@@ -829,6 +831,14 @@ function processCommand(sim, c) {
       const t = sim.byId.get(c.target); if (!t || !t.alive || t.kind !== 'building' || t.owner === c.p || !canSee(sim, c.p, t)) return;
       if (!(t.def === 'refinaria' || t.def === 'reator') || hasPact(sim, c.p, t.owner)) return;
       ownUnits(sim, c.p, c.ids).forEach(u => { if (u.def === 'pirata') { if (u.state === 'siphon' && u.target === t.id) return; u.state = 'siphon'; u.target = t.id; u.siphonT = 0; } else { u.state = 'move'; const q = reachPoint(sim, u, t.x, t.y, 40); u.tx = q.x; u.ty = q.y; u.stuck = 0; u.stk = 0; u.gx = null; } });
+      break; }
+    case 'gather': { /* 5.0a.1: chip "N parados" e "Mandar coletores": cada coletor ao nó mais próximo (território primeiro, depois até GATHER_R), distribuídos pela lotação; o recurso com menos estoque pesa menos */
+      const cols = ownUnits(sim, c.p, c.ids).filter(u => u.def === 'coletor'); if (!cols.length) return;
+      const load = colLoad(sim, c.p), terr = terrCircles(sim, c.p); const w = stockW(p);
+      let sent = 0; const used = new Set();
+      for (const u of cols) { u.area = null; const m = (RES_KEYS.includes(c.res) && freeNode(sim, u, c.res, load, GATHER_R, terr, w)) || freeNode(sim, u, null, load, GATHER_R, terr, w); if (!m) continue; /* c.res: o recurso que acabou vem primeiro */ load.set(m.id, (load.get(m.id) || 0) + 1); used.add(m.id);
+        u.state = 'harvest'; u.node = m.id; u.target = null; u.resume = null; u.stuck = 0; u.stk = 0; const fora = p.human && !inCircles(terr, m.x, m.y); if (fora) u.area = { x: m.x, y: m.y }; u.auto = fora ? 1 : 0; sent++; }
+      if (p.human) emit(sim, { t: 'notice', p: c.p, text: sent ? sent + (sent > 1 ? ' coletores a caminho de ' : ' coletor a caminho de ') + used.size + (used.size > 1 ? ' nós' : ' nó') + (sent < cols.length ? ' · ' + (cols.length - sent) + ' sem nó livre por perto' : '') : 'Nenhum nó livre por perto: expanda com um Nódulo perto de um campo' });
       break; }
     case 'pickup': {
       const t = sim.byId.get(c.target); if (!t || !t.alive || t.kind !== 'crate') return;
@@ -1148,12 +1158,13 @@ function acquire(sim, u, rad, unitsOnly) {
     for (let cx = x0; cx <= x1 && !any; cx++) for (let cy = y0; cy <= y1; cy++) { const ix = cx + AGO, iy = cy + AGO; if (ix >= 0 && iy >= 0 && ix < AG && iy < AG && C[iy * AG + ix]) { any = true; break; } }
     if (!any) return null; }
   let best = null, bd = Infinity;
-  const vis = sim.vis[u.owner];
+  const vis = sim.vis[u.owner]; const op = sim.players[u.owner]; const noCiv = u.kind === 'unit' && !!(op && !op.human && (DIFFICULTY[op.difficulty] || DIFFICULTY.normal).noCiv); /* Torres continuam defendendo */
   queryGrid(sim, u.x, u.y, rad + 40, e => {
     if (e.owner === u.owner || e.owner < 0 || e.kind === 'crate') return;
     if (!isEnemy(sim, u.owner, e.owner)) return;
     if (!vis.has(e.id)) return;
     if (unitsOnly && e.kind !== 'unit') return;
+    if (e.cls === 'civ' && noCiv) return; /* 5.0a.1: a IA do Fácil não caça coletores */
     const d = dist(u.x, u.y, e.x, e.y) - e.r;
     if (d > rad) return;
     const score = d + (e.kind === 'building' ? (BUILDINGS[e.def].wall ? 320 : 200) : 0) + (e.cls === 'civ' ? 60 : 0);
@@ -1250,6 +1261,46 @@ function pickNode(sim, u) {
   if (ar && !bestA) u.area = null; // área esgotada: volta ao território
   return bestA || best;
 }
+/* 5.0a.1 — coletores inteligentes (só os de jogador humano; a IA segue com a economia dela, que as dificuldades medem): quando o nó acaba,
+   o coletor vai sozinho ao nó do MESMO recurso mais próximo — na área para onde o jogador o mandou, depois no território, depois até
+   AUTO_R da Refinaria ou do Núcleo onde ele entrega (medido da base, para não ir se afastando de nó em nó), fora de território inimigo —,
+   e a lotação pesa no custo (ida até o nó + volta à base): os coletores se espalham. Recurso que já sobra (800 ou mais e mais que o dobro do
+   outro) não prende ninguém: aí vale o de sempre (o que tem menos), e quem foi sozinho para fora reavalia a cada entrega. Sem nó perto,
+   entrega a carga e volta para a base.
+   O comando 'gather' (chip "N parados" e "Mandar coletores") manda os parados aos nós mais próximos, distribuídos (até GATHER_R da base).
+   Determinístico: só estado da simulação, na ordem de sim.ents; nada de campo novo obrigatório (salvamentos antigos seguem iguais). */
+const AUTO_R = 800, GATHER_R = 1600, CROWD = 0.5, RES_KEYS = ['minerio', 'plasma', 'dados'];
+function colLoad(sim, owner) { const m = new Map(); for (const e of sim.ents) if (e.alive && e.kind === 'unit' && e.def === 'coletor' && e.owner === owner && (e.state === 'harvest' || e.state === 'return') && e.node != null) m.set(e.node, (m.get(e.node) || 0) + 1); return m; }
+function terrCircles(sim, owner) { const t = []; for (const e of sim.ents) { if (!e.alive || e.kind !== 'building' || e.owner !== owner || !e.built) continue; const r = territoryOf(sim, e); if (r) t.push(e.x, e.y, r); } return t; }
+function inCircles(t, x, y) { for (let k = 0; k < t.length; k += 3) if (dist(x, y, t[k], t[k + 1]) <= t[k + 2]) return true; return false; }
+const overStock = (p, r) => { const st = p.res, o = r === 'minerio' ? st.plasma : r === 'plasma' ? st.minerio : Math.min(st.minerio, st.plasma); return st[r] >= 800 && st[r] > 2 * o; };
+const stockW = p => { const w = { minerio: 1, plasma: 1, dados: 0.8 }; w[RES_KEYS.slice().sort((a, b) => p.res[a] - p.res[b])[0]] *= 0.6; return w; };
+function freeNode(sim, u, res, load, maxR, terr, w, okRes) {
+  const dep = nearestDeposit(sim, u), ox = dep ? dep.x : u.x, oy = dep ? dep.y : u.y; const ar = u.area || null; let b0 = null, d0 = Infinity, b1 = null, d1 = Infinity, b2 = null, d2 = Infinity;
+  for (const e of sim.ents) {
+    if (!e.alive || e.kind !== 'node' || e.amount <= 0 || (res && e.res !== res) || (okRes && !okRes(e.res))) continue;
+    const dd = dist(ox, oy, e.x, e.y), d = (dist(u.x, u.y, e.x, e.y) + dd) * (1 + CROWD * (load.get(e.id) || 0)) * (w ? w[e.res] : 1); const mine = inCircles(terr, e.x, e.y);
+    if (!mine) { const ow = territoryOwner(sim, e.x, e.y); if (ow !== -1 && ow !== u.owner && isEnemy(sim, u.owner, ow)) continue; }
+    if (ar && dist(ar.x, ar.y, e.x, e.y) <= WORK_R) { if (d < d0) { d0 = d; b0 = e; } continue; }
+    if (mine) { if (d < d1) { d1 = d; b1 = e; } continue; }
+    if (dd <= maxR && d < d2) { d2 = d; b2 = e; }
+  }
+  return b0 || b1 || b2;
+}
+function nextNode(sim, u, old) { // o nó seguinte de um coletor cujo nó acabou (IA: o pickNode de sempre)
+  const p = sim.players[u.owner]; if (!p.human || !old || old.kind !== 'node') return pickNode(sim, u);
+  const terr = terrCircles(sim, u.owner), load = colLoad(sim, u.owner), r = old.res;
+  let m = overStock(p, r) ? null : freeNode(sim, u, r, load, AUTO_R, terr, null), far = !!m; /* mesmo recurso (área, território, até 800 da base), se ele não sobra */
+  if (!m) { m = pickNode(sim, u); far = false; } /* o de sempre: qualquer recurso no território, pesando o que tem menos */
+  if (!m) { m = freeNode(sim, u, null, load, AUTO_R, terr, stockW(p), k => !overStock(p, k)); far = !!m; } /* território seco: o que falta, até 800 da base */
+  if (m && far) { const fora = !inCircles(terr, m.x, m.y); u.area = fora ? { x: m.x, y: m.y } : null; u.auto = fora ? 1 : 0; } else if (m) u.auto = 0;
+  return m;
+}
+function goHome(sim, u) { // sem nó perto: volta para perto da Refinaria ou do Núcleo e fica parado (o aviso e o chip "N parados" ficam com a interface)
+  const dep = nearestDeposit(sim, u); u.node = null; u.area = null; u.target = null;
+  if (!dep) { u.state = 'idle'; return; } const d = dist(u.x, u.y, dep.x, dep.y); if (d <= dep.r + 70) { u.state = 'idle'; return; }
+  const k = (dep.r + 40) / d; const q = reachPoint(sim, u, dep.x + (u.x - dep.x) * k, dep.y + (u.y - dep.y) * k, 40); u.state = 'move'; u.tx = q.x; u.ty = q.y; u.stuck = 0; u.stk = 0; u.gx = null; u.gn = 0;
+}
 function deliver(sim, u) {
   const p = sim.players[u.owner];
   const mult = p.human ? 1 : (DIFFICULTY[p.difficulty] || DIFFICULTY.normal).income;
@@ -1316,7 +1367,7 @@ function updateUnit(sim, u, dt) {
       break; }
     case 'harvest': {
       const n = sim.byId.get(u.node);
-      if (!n || !n.alive || n.amount <= 0) { const m = pickNode(sim, u); if (m) u.node = m.id; else u.state = u.cargoTotal > 0 ? 'return' : 'idle'; break; }
+      if (!n || !n.alive || n.amount <= 0) { const m = nextNode(sim, u, n); if (m) u.node = m.id; else if (u.cargoTotal > 0) u.state = 'return'; else if (sim.players[u.owner].human) goHome(sim, u); else u.state = 'idle'; break; } /* 5.0a.1: mesmo recurso mais perto; sem nó, volta para a base */
       if (dist(u.x, u.y, n.x, n.y) <= u.r + n.r + 8) {
         const k2 = n.res === 'plasma' && inStorm(sim, n.x, n.y) ? 2 : 1; // 4.2h: Tempestade rende 2× de verdade (o nó perde a metade do que entrega)
         const take = Math.min(d.harvestRate * dt * k2, n.amount * k2, d.capacity - u.cargoTotal);
@@ -1329,7 +1380,7 @@ function updateUnit(sim, u, dt) {
       if (!dep) { u.state = 'idle'; break; }
       if (dist(u.x, u.y, dep.x, dep.y) <= u.r + dep.r + 10) {
         deliver(sim, u);
-        if (u.def === 'coletor') { const n = sim.byId.get(u.node); if (n && n.alive && n.amount > 0) u.state = 'harvest'; else { const m = pickNode(sim, u); if (m) { u.node = m.id; u.state = 'harvest'; } else u.state = 'idle'; } }
+        if (u.def === 'coletor') { const n = sim.byId.get(u.node); if (n && n.alive && n.amount > 0 && !(u.auto && overStock(sim.players[u.owner], n.res))) u.state = 'harvest'; else { const m = nextNode(sim, u, n); if (m) { u.node = m.id; u.state = 'harvest'; } else u.state = 'idle'; } } /* 5.0a.1: quem foi sozinho para fora e colhe o que já sobra reavalia */
         else u.state = 'idle';
       } else moveToward(sim, u, dep.x, dep.y, dt);
       break; }

@@ -6,25 +6,39 @@
 'use strict';
 const M5 = ARD.m5 = ARD.m5 || {};
 const T = () => window.THREE_M5, L = () => window.TSL;
+const RIM_CONST = typeof location !== 'undefined' && /[?&]m5rim=const/.test(location.search); /* 5.0a.1: medida — rim em constantes (um WGSL por Raça, como na 5.0a) */
+const QS = new URLSearchParams(typeof location !== 'undefined' ? location.search : ''); const CORTE = +(QS.get('m5corte') || -6), PAR0 = +(QS.get('m5par0') || 50), PAR1 = +(QS.get('m5par1') || 150); /* 5.0a.1: Cinturão — corte do chão 6 além da borda (o paredão desce ~90, como o do clássico até −96, e o vazio entre as plataformas fica aberto) e onde o paredão escurece (50 a 150 de profundidade); ?m5corte, ?m5par0, ?m5par1 para ajuste */
 /* atributo da geometria com valor padrão quando a geometria não tem (sem aviso do three e sem shader quebrado) */
 M5.attr = function (name, def) { const { Fn, attribute } = L(); return Fn(b => (b.geometry && b.geometry.hasAttribute(name) ? attribute(name) : def))(); };
 /* ruído de valor barato (o mesmo hash dos shaders GLSL de hoje) */
 M5.hash2 = p => { const { fract, sin, dot, vec2 } = L(); return fract(sin(dot(p, vec2(127.1, 311.7))).mul(43758.5453)); };
 M5.vnoise2 = p => { const { floor, fract, mix, vec2 } = L(); const i = floor(p), f = fract(p), u = f.mul(f).mul(f.mul(-2).add(3)), h = M5.hash2; return mix(mix(h(i), h(i.add(vec2(1, 0))), u.x), mix(h(i.add(vec2(0, 1))), h(i.add(vec2(1, 1))), u.x), u.y); };
+/* 5.0a.1: instâncias por atributo (M5.Inst, src/m5/core.js): matriz em iM0..iM3 e cor em iC na geometria. Num InstancedMesh de verdade o three
+   já aplicou matriz e cor (vInstanceColor) e os nós abaixo não fazem nada. A matriz vai no positionNode (a sombra copia o positionNode do
+   material) e a normal no setupPosition do material; base = posição local da fase 2 (gancho de animação), antes da instância */
+M5.instMat = function (m, base) { const { Fn, attribute, mat4, vec4, positionLocal, normalLocal, transformNormal } = L();
+  const iM = mat4(attribute('iM0', 'vec4'), attribute('iM1', 'vec4'), attribute('iM2', 'vec4'), attribute('iM3', 'vec4'));
+  m.positionNode = Fn(b => { const p = base || positionLocal; return b.object && b.object.isM5Inst ? iM.mul(vec4(p, 1)).xyz : p; })();
+  const sp = m.setupPosition; m.setupPosition = function (b) { if (b.object && b.object.isM5Inst && b.hasGeometryAttribute('normal')) normalLocal.assign(transformNormal(normalLocal, iM)); return sp.call(this, b); };
+  m.userData.m5Inst = true; return m; }; /* a fábrica M5.instancia só cria M5.Inst para material marcado */
+M5.instCor = function (cor) { const { Fn, attribute } = L(); return Fn(b => (b.object && b.object.isM5Inst ? cor.mul(attribute('iC', 'vec3')) : cor))(); };
 
 /* ---------- unidades e construções: cor, rugosidade e metal por vértice (color, rm), cor do time e tinta por instância, rim por Raça, clarões ----------
    o: as mesmas opções do ARD.meshes.material ({ env, key, rim: { col, pow, amt }, noAnim, onShader }); onShader (GLSL) é ignorado aqui */
 M5.modelo = function (o) {
-  o = o || {}; const { attribute, clamp, float, vec3, pow, abs, dot, normalize, normalView, positionViewDirection, diffuseColor } = L();
-  const m = new (T().MeshStandardNodeMaterial)({ vertexColors: true, roughness: 1, metalness: 1 }); m.envMapIntensity = o.env == null ? 1 : o.env;
+  o = o || {}; const { uniform, clamp, float, pow, abs, dot, normalize, normalView, positionViewDirection, diffuseColor } = L(); const Tm = T();
+  const m = new Tm.MeshStandardNodeMaterial({ vertexColors: true, roughness: 1, metalness: 1 }); m.envMapIntensity = o.env == null ? 1 : o.env;
   const rm = M5.attr('rm', L().vec2(0.8, 0.1));
   m.roughnessNode = clamp(rm.x, 0.04, 1.0); m.metalnessNode = rm.y;
   let em = diffuseColor.rgb.mul(M5.sample.clarao()).mul(0.8); /* clarões: a luz do mapa de cima soma ao albedo (como o FLASH_ADD de hoje) */
-  if (o.rim) { const rim = pow(clamp(float(1).sub(abs(dot(normalize(normalView), positionViewDirection))), 0, 1), o.rim.pow); em = em.add(vec3(o.rim.col[0], o.rim.col[1], o.rim.col[2]).mul(rim.mul(o.rim.amt))); }
+  /* 5.0a.1: rim por Raça em uniforms (cor, expoente, força; o neutro tem força 0): o material neutro e os das Raças geram o mesmo WGSL e dividem módulo e pipeline */
+  const ri = o.rim || { col: [0, 0, 0], pow: 2, amt: 0 }; const K = RIM_CONST ? x => L().float(x) : x => uniform(x); const rU = m.userData.rim = { col: RIM_CONST ? L().vec3(ri.col[0], ri.col[1], ri.col[2]) : uniform(new Tm.Color(ri.col[0], ri.col[1], ri.col[2])), pow: K(ri.pow), amt: K(ri.amt) }; /* ?m5rim=const: constantes (medida) */
+  { const rim = pow(clamp(float(1).sub(abs(dot(normalize(normalView), positionViewDirection))), 0, 1), rU.pow); em = em.add(rU.col.mul(rim.mul(rU.amt))); }
   const G = M5.ganchos && M5.ganchos.modelo; const ctx = { m, o, em };
   if (G && G.superficie) G.superficie(ctx); /* fase 2: detalhe de superfície (colorNode/normalNode/roughnessNode) */
   if (G && G.emissivo) em = G.emissivo(ctx) || em;
-  if (G && G.posicao && !o.noAnim) { const p = G.posicao(ctx); if (p) m.positionNode = p; } /* fase 2: animação por peça (a sombra usa o mesmo positionNode) */
+  let pAnim = null; if (G && G.posicao && !o.noAnim) pAnim = G.posicao(ctx) || null; /* fase 2: animação por peça, na posição local do modelo (a sombra usa o mesmo positionNode) */
+  M5.instMat(m, pAnim); m.colorNode = M5.instCor(L().materialColor); /* 5.0a.1: M5.Inst */
   m.emissiveNode = em;
   return M5.registrar('modelo-' + (o.key || 'base'), m);
 };
@@ -33,9 +47,19 @@ M5.modelMaterial = function (o) { return M5.modelo(o); };
 /* parte emissiva dos modelos (janelas, luzes, cristais): cor por vértice × tinta por instância × material.color (o render3d acende à noite) */
 M5.emissivo = function (o) {
   o = o || {}; const m = new (T().MeshBasicNodeMaterial)({ vertexColors: true });
-  const G = M5.ganchos && M5.ganchos.modelo; if (G && G.posicao && !o.noAnim) { const p = G.posicao({ m, o, emissivo: true }); if (p) m.positionNode = p; }
+  const G = M5.ganchos && M5.ganchos.modelo; let pAnim = null; if (G && G.posicao && !o.noAnim) pAnim = G.posicao({ m, o, emissivo: true }) || null;
+  M5.instMat(m, pAnim); m.colorNode = M5.instCor(L().materialColor); /* 5.0a.1: M5.Inst */
   return M5.registrar('emissivo-' + (o.key || 'base'), m);
 };
+
+/* ---------- 5.0a.1: peças do chão que valem para qualquer material de chão do Motor 5 (o da fase 2 também deve chamar) ----------
+   luzFendaChao(normal no mundo, posição no mundo) → nó vec3 de luz para multiplicar pelo albedo e somar ao emissivo: a PointLight da Fenda do
+   clássico (M5.u.fendaLuz: posição e alcance; M5.u.fendaCor: cor × intensidade), difusa de Lambert com 1/d² e o corte suave do three. A luz
+   não fica na cena (cada luz pontual entraria em todo shader iluminado).
+   vazioMascara(posição no mundo) → nó bool do maskNode do Cinturão: some só onde o mapa do vazio (M5.tex.vazio) diz, nunca pela altura. */
+M5.luzFendaChao = function (wn, pw) { const { float, max, dot, length, clamp, pow } = L(); const FL = M5.u.fendaLuz, lv = FL.xyz.sub(pw), ld = length(lv); const corte = clamp(float(1).sub(pow(ld.div(FL.w), 4)), 0, 1);
+  return M5.u.fendaCor.mul(float(1 / Math.PI).mul(max(dot(wn, lv.div(max(ld, 0.001))), 0)).mul(corte.mul(corte)).div(max(ld.mul(ld), 0.01))); };
+M5.vazioMascara = function (pw) { return M5.tex.vazio.sample(M5.mapUV(pw)).r.sub(0.5).mul(128).greaterThanEqual(CORTE); };
 
 /* ---------- uniforms do chão no formato do terrU do render3d (cada um com .value) ---------- */
 M5.terrUniforms = function (tx) {
@@ -48,7 +72,7 @@ M5.terrUniforms = function (tx) {
    brasa nas fendas do basalto e luz do abismo perto da Fenda, cicatrizes, microdetalhe de perto, território, névoa de guerra, clarões.
    o: { fora (cordilheira além do mapa), leve, vazio (Cinturão: corta abaixo de −90) } */
 M5.chao = function (U, o) {
-  o = o || {}; const { float, vec2, vec3, mix, smoothstep, clamp, max, length, sin, positionWorld, normalWorld, pow, step } = L();
+  o = o || {}; const { float, vec2, vec3, mix, smoothstep, clamp, max, length, sin, positionWorld, normalWorld, pow, step, dot } = L();
   const m = new (T().MeshStandardNodeMaterial)({ roughness: 0.9, metalness: 0.02 }); m.envMapIntensity = 0.22;
   const pw = positionWorld, bio = M5.attr('bio', L().vec4(0, 1, 0, 0)), aoc = M5.attr('aoc', vec2(1, 0));
   const Bw = bio.div(max(bio.x.add(bio.y).add(bio.z).add(bio.w), 0.0001));
@@ -77,7 +101,7 @@ M5.chao = function (U, o) {
     const rd = length(gp.sub(U.uRift)); const rift = float(1).sub(smoothstep(260, 640, rd)); const ck = smoothstep(0.62, 0.92, fine).mul(smoothstep(0.52, 0.68, mid)).mul(rift).mul(float(1).sub(smoothstep(0.1, 0.28, slope)));
     const pulse = sin(U.uTime.mul(1.3).add(gp.x.mul(0.013)).add(gp.y.mul(0.017))).mul(0.35).add(0.65);
     tEmis = tEmis.add(vec3(1.15, 0.28, 0.7).mul(ck.mul(pulse).mul(1.15).mul(Bw.w))); alb = alb.mul(float(1).sub(Bw.w.mul(ck).mul(0.45)));
-    const deep = smoothstep(-80, -225, pw.y).mul(float(1).sub(smoothstep(230, 300, rd))); const fl = sin(U.uTime.mul(0.9).add(pw.y.mul(0.05)).add(gp.x.mul(0.02))).mul(0.4).add(0.6); const vein = smoothstep(0.6, 0.9, mid).add(smoothstep(0.6, 0.9, fine).mul(0.3));
+    const deep = float(1).sub(smoothstep(-225, -80, pw.y)).mul(float(1).sub(smoothstep(230, 300, rd))); /* 5.0a.1: bordas do smoothstep em ordem */ const fl = sin(U.uTime.mul(0.9).add(pw.y.mul(0.05)).add(gp.x.mul(0.02))).mul(0.4).add(0.6); const vein = smoothstep(0.6, 0.9, mid).add(smoothstep(0.6, 0.9, fine).mul(0.3));
     tEmis = tEmis.add(vec3(1.2, 0.3, 0.75).mul(pow(deep, 3)).mul(vein.mul(0.9).add(0.12)).mul(fl).mul(1.6)); alb = alb.mul(float(1).sub(deep.mul(0.6)));
     const sc = M5.sample.cicatrizes(); alb = alb.mul(float(1).sub(sc.r.mul(Bw.y.mul(0.16).add(Bw.z.mul(0.12)).add(0.34))));
     const bu = smoothstep(0.0, 0.85, sc.g); alb = mix(alb, vec3(0.06, 0.05, 0.042).mul(soft.mul(0.5).add(0.75)), clamp(bu.mul(0.85), 0, 0.85)); rough = mix(rough, 0.6, bu.mul(0.4));
@@ -86,7 +110,7 @@ M5.chao = function (U, o) {
   alb = alb.mul(macro.mul(0.28).add(0.86));
   if (o.fora) { const sl = smoothstep(250, 340, pw.y.add(macro.sub(0.5).mul(90))).mul(float(1).sub(smoothstep(0.35, 0.6, slope))); alb = mix(alb, vec3(0.78, 0.82, 0.88).mul(soft.mul(0.1).add(0.9)), sl); rough = mix(rough, 0.7, sl); }
   alb = alb.mul(mix(0.72, 1.0, aoc.x));
-  if (o.vazio) { const paredao = smoothstep(-8, -60, pw.y); alb = mix(alb, vec3(0.045, 0.04, 0.05).mul(mid.mul(0.5).add(0.75)), paredao.mul(0.9)); rough = mix(rough, 0.85, paredao); } /* Cinturão sem o space3d: o paredão da plataforma escurece para baixo (no clássico a beirada e o paredão são do space3d) */
+  if (o.vazio) { const paredao = smoothstep(PAR0, PAR1, pw.y.negate()); alb = alb.mul(float(1).sub(paredao)); rough = mix(rough, 0.85, paredao); tEmis = tEmis.add(vec3(0.006, 0.009, 0.022).mul(float(1).sub(M5.u.noite.mul(0.4))).mul(paredao)); } /* Cinturão sem o space3d: o paredão de rocha vai para a poeira escura do espaço perto do fundo (a mesma do clássico), sem luz (5.0a.1: o corte agora é no vazio, não na altura) */
   const CG = M5.ganchos && M5.ganchos.chao; if (CG && CG.cor) alb = CG.cor({ m, o, alb, Bw, gp }) || alb; /* fase 2: camadas e triplanar */
   if (!o.fora) {
     const wuv = vec2(gp.x.div(U.worldSize), gp.y.div(U.worldSize));
@@ -97,8 +121,10 @@ M5.chao = function (U, o) {
   }
   alb = alb.mul(float(1).sub(U.uCloudK.mul(0.2).mul(float(1).sub(M5.sample.nuvem()))));
   m.colorNode = alb; m.roughnessNode = rough; m.aoNode = aoc.x;
-  m.emissiveNode = tEmis.add(alb.mul(M5.sample.clarao()).mul(max(wn.y, 0).mul(0.65).add(0.35))); /* clarões no chão (encosta recebe menos) */
-  if (o.vazio) m.maskNode = pw.y.greaterThan(-90); /* Cinturão: abaixo do paredão é o espaço */
+  let luz = M5.sample.clarao().mul(max(wn.y, 0).mul(0.65).add(0.35)); /* clarões no chão (encosta recebe menos) */
+  if (!o.fora) luz = luz.add(M5.luzFendaChao(wn, pw)); /* 5.0a.1: a luz da Fenda (era uma PointLight) */
+  m.emissiveNode = tEmis.add(alb.mul(luz));
+  if (o.vazio) m.maskNode = M5.vazioMascara(pw); /* 5.0a.1: Cinturão — o chão some só onde o mapa do vazio diz (antes era abaixo de −90 de altura) */
   m.userData.env = 0.22;
   return M5.registrar('chao' + (o.fora ? '-fora' : '') + (o.leve ? '-leve' : '') + (o.vazio ? '-vazio' : ''), m);
 };
@@ -108,9 +134,9 @@ M5.adereco = function (o) {
   o = o || {}; const { float, mix, vertexColor } = L(); const Tm = T();
   const m = new Tm.MeshStandardNodeMaterial({ vertexColors: true, roughness: 1, metalness: 0, side: o.leaf ? Tm.DoubleSide : Tm.FrontSide });
   const rm = M5.attr('rm', L().vec2(0.9, 0)), glow = M5.attr('aGlow', float(0)); const fv = M5.sample.nevoa();
-  m.colorNode = L().vec3(mix(0.06, 1.0, fv).mul(float(1).sub(glow))); m.roughnessNode = rm.x; m.metalnessNode = rm.y;
+  m.colorNode = M5.instCor(L().vec3(mix(0.06, 1.0, fv).mul(float(1).sub(glow)))); m.roughnessNode = rm.x; m.metalnessNode = rm.y; /* 5.0a.1: cor de instância do M5.Inst */
   m.emissiveNode = vertexColor().rgb.mul(glow).mul(fv.mul(fv));
-  const G = M5.ganchos && M5.ganchos.adereco; if (G && G.posicao) { const p = G.posicao({ m, o }); if (p) m.positionNode = p; }
+  const G = M5.ganchos && M5.ganchos.adereco; let pVento = null; if (G && G.posicao) pVento = G.posicao({ m, o }) || null; M5.instMat(m, pVento); /* 5.0a.1: M5.Inst (o vento da fase 2 entra na posição local) */
   return M5.registrar('adereco-' + (o.leaf ? 'folha' : 'solido'), m, { env: 1 });
 };
 /* estradas de terra (dress3d): faixa com borda irregular, sulcos e névoa de guerra */
@@ -118,19 +144,22 @@ M5.estrada = function () {
   const { float, vec3, vec4, mix, smoothstep, abs, uv, positionWorld } = L(); const Tm = T();
   const m = new Tm.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }); m.fog = false;
   const side = abs(uv().x.sub(0.5)).mul(2); const wuv = L().vec2(positionWorld.x.div(M5.u.mundo), positionWorld.z.negate().div(M5.u.mundo)); const nz = M5.vnoise2(wuv.mul(900));
-  const edge = float(1).sub(smoothstep(nz.mul(0.25).add(0.55), 1.0, side)); const rut = smoothstep(0.08, 0.0, abs(side.sub(0.45))).mul(0.18);
+  const edge = float(1).sub(smoothstep(nz.mul(0.25).add(0.55), 1.0, side)); const rut = float(1).sub(smoothstep(0.0, 0.08, abs(side.sub(0.45)))).mul(0.18); /* 5.0a.1: bordas do smoothstep em ordem (invertidas são erro no WGSL com constantes) */
   const col = mix(vec3(0.33, 0.29, 0.24), vec3(0.42, 0.37, 0.3), nz).mul(float(1).sub(rut)).mul(mix(0.06, 1.0, M5.sample.nevoa()));
-  m.colorNode = col; m.opacityNode = edge.mul(0.62);
+  m.colorNode = col; m.opacityNode = edge.mul(0.62); M5.instMat(m); /* 5.0a.1: M5.Inst */
   return M5.registrar('estrada', m);
 };
 
 /* ---------- céu: gradiente de hoje (horizonte, topo, chão), nuvens que derivam, sol, estrelas à noite; modo espaço no Cinturão ----------
    devolve a malha com userData.mat.uniforms no formato do céu GLSL (uTop, uHor, uBot, uSunDir, uSunCol, uNight, uTime, uSpace) */
-M5.ceu = function () {
-  const Tm = T(); const { uniform, float, vec2, vec3, mix, pow, clamp, smoothstep, max, dot, normalize, positionLocal, floor, step, sin } = L();
-  const u = { uTop: uniform(new Tm.Color(0x3a5f8f)), uHor: uniform(new Tm.Color(0x9fb0c4)), uBot: uniform(new Tm.Color(0x30343a)), uSunDir: uniform(new Tm.Vector3(-0.4, 0.7, 0.5).normalize()), uSunCol: uniform(new Tm.Color(1, 0.9, 0.75)), uNight: uniform(0), uTime: uniform(0), uSpace: uniform(0) };
+M5.ceu = function (o) {
+  o = o || {}; const Tm = T(); const { uniform, float, vec2, vec3, mix, pow, clamp, smoothstep, max, dot, normalize, positionLocal, floor, step, sin } = L();
+  const u = { uTop: uniform(new Tm.Color(0x3a5f8f)), uHor: uniform(new Tm.Color(0x9fb0c4)), uBot: uniform(new Tm.Color(0x30343a)), uSunDir: uniform(new Tm.Vector3(-0.4, 0.7, 0.5).normalize()), uSunCol: uniform(new Tm.Color(1, 0.9, 0.75)), uNight: uniform(0), uTime: uniform(0), uSpace: uniform(o.espaco ? 1 : 0) };
   const m = new Tm.MeshBasicNodeMaterial({ side: Tm.BackSide, depthWrite: false }); m.fog = false;
   const d = normalize(positionLocal), y = d.y;
+  if (o.espaco && M5.espaco && M5.espaco.cor) { /* 5.0a.1: Cinturão — o céu de espaço do clássico (nebulosa assada, estrelas, faixa da galáxia, sol); só este mapa paga esse shader */
+    m.colorNode = M5.espaco.cor(d, u, o.nebulosa || null); m.uniforms = u;
+    const mesh = new Tm.Mesh(new Tm.SphereGeometry(4800, 32, 20), m); mesh.frustumCulled = false; mesh.renderOrder = -1000; mesh.userData.mat = m; M5.registrar('ceu-espaco', m); return mesh; }
   const grad = mix(mix(u.uHor, u.uBot, clamp(y.negate().mul(4), 0, 1)), mix(u.uHor, u.uTop, pow(clamp(y, 0, 1), 0.5)), step(0, y)); /* sem select (ramos do ConditionalNode) */
   let cp = d.xz.div(max(y, 0.0).add(0.16)).mul(1.4).add(vec2(u.uTime.mul(0.0035), u.uTime.mul(0.0018))); let cn = float(0), ca = 0.55;
   for (let i = 0; i < 4; i++) { cn = cn.add(M5.vnoise2(cp).mul(ca)); cp = cp.mul(2.07).add(vec2(1.7, 9.2)); ca *= 0.5; }
@@ -141,10 +170,7 @@ M5.ceu = function () {
   const star = (sc, dens) => { const q = d.mul(sc), c = floor(q); const h = L().fract(sin(dot(c, vec3(127.1, 311.7, 74.7))).mul(43758.5453)); return [step(dens, h), h]; };
   const [st, sh] = star(420, 0.9972); const tw = sin(u.uTime.mul(1.7).add(sh.mul(60))).mul(0.35).add(0.65);
   col = col.add(vec3(0.9, 0.95, 1.0).mul(st.mul(smoothstep(0.02, 0.2, y)).mul(tw).mul(u.uNight.mul(1.35).add(0.25))));
-  /* espaço (Cinturão sem o space3d portado): fundo escuro azulado, duas camadas de estrelas em toda a volta e o sol sem atmosfera */
-  const [s1] = star(280, 0.985), [s2, h2] = star(110, 0.993); const bandK = pow(max(float(1).sub(L().abs(dot(d, vec3(0.38, 0.33, 0.865)))), 0), 8);
-  const space = vec3(0.0016, 0.0022, 0.0048).add(vec3(0.012, 0.01, 0.022).mul(bandK)).add(vec3(0.75, 0.82, 1.0).mul(s1.mul(0.5).add(s2.mul(h2).mul(1.6)))).add(u.uSunCol.mul(pow(sd, 2400).mul(36).add(pow(sd, 160).mul(0.5))));
-  m.colorNode = mix(col, space, u.uSpace);
+  m.colorNode = col; /* 5.0a.1: o modo espaço saiu daqui (o Cinturão usa M5.ceu({ espaco })): os outros mapas não pagam o espaço no shader do céu */
   m.uniforms = u; /* formato do céu GLSL */
   const mesh = new Tm.Mesh(new Tm.SphereGeometry(4800, 32, 20), m); mesh.frustumCulled = false; mesh.renderOrder = -1000; mesh.userData.mat = m;
   M5.registrar('ceu', m); return mesh;

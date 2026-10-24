@@ -14,13 +14,13 @@ M5.flashInit = function (FL, FL_N, FLC_N, ME2) {
   const q = new Tm.PlaneGeometry(1, 1); const g = new Tm.InstancedBufferGeometry(); g.index = q.index; g.setAttribute('position', q.attributes.position); g.instanceCount = 0;
   FL.fa = new Tm.InstancedBufferAttribute(new Float32Array(FL_N * 4), 4); FL.fc = new Tm.InstancedBufferAttribute(new Float32Array(FL_N * 3), 3); FL.fa.setUsage(Tm.DynamicDrawUsage); FL.fc.setUsage(Tm.DynamicDrawUsage); g.setAttribute('fA', FL.fa); g.setAttribute('fC', FL.fc); FL.geo = g;
   const rect = M5.u.claraoRet;
-  const mat = new Tm.MeshBasicNodeMaterial({ transparent: true, depthTest: false, depthWrite: false, blending: Tm.AdditiveBlending }); mat.fog = false; mat.toneMapped = false;
+  const mat = new Tm.MeshBasicNodeMaterial({ transparent: true, depthTest: false, depthWrite: false, blending: Tm.AdditiveBlending, side: Tm.DoubleSide }); mat.fog = false; mat.toneMapped = false; mat.forceSinglePass = true; /* 5.0a.1: as duas faces — o y invertido na saída (convenção de uv do alvo) vira a ordem dos vértices, e com só a face da frente nenhum disco era pintado: no Motor 5 clarões, explosões, fogo e bases à noite não acendiam o chão */
   { const fA = attribute('fA', 'vec4'); const p2 = positionGeometry.xy.mul(2); const w = fA.xy.add(p2.mul(fA.z)); const n = w.sub(rect.xy).div(rect.zw).mul(2).sub(1);
     mat.vertexNode = vec4(n.x, n.y.negate(), 0, 1); const vQ = varying(p2); const d = dot(vQ, vQ); const f = float(1).sub(d);
     mat.maskNode = d.lessThanEqual(1); mat.colorNode = attribute('fC', 'vec3').mul(f.mul(f)); mat.opacityNode = float(1); }
   FL.mesh = new Tm.Mesh(g, mat); FL.mesh.frustumCulled = false; FL.scene = new Tm.Scene(); FL.scene.add(FL.mesh); FL.cam = new Tm.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   const gc = new Tm.InstancedBufferGeometry(); gc.index = q.index; gc.setAttribute('position', q.attributes.position); gc.instanceCount = 0; FL.ca = new Tm.InstancedBufferAttribute(new Float32Array(FLC_N * 4), 4); FL.cc = new Tm.InstancedBufferAttribute(new Float32Array(FLC_N * 4), 4); FL.ca.setUsage(Tm.DynamicDrawUsage); FL.cc.setUsage(Tm.DynamicDrawUsage); gc.setAttribute('cA', FL.ca); gc.setAttribute('cC', FL.cc); FL.cgeo = gc;
-  const matC = new Tm.MeshBasicNodeMaterial({ transparent: true, depthTest: false, depthWrite: false, blending: Tm.AdditiveBlending }); matC.fog = false; matC.toneMapped = false;
+  const matC = new Tm.MeshBasicNodeMaterial({ transparent: true, depthTest: false, depthWrite: false, blending: Tm.AdditiveBlending, side: Tm.DoubleSide }); matC.fog = false; matC.toneMapped = false; matC.forceSinglePass = true; /* 5.0a.1: idem nos cones (faróis, holofotes); forceSinglePass: transparente com as duas faces o three desenha duas vezes (costas e frente), com 2 pipelines e 2 desenhos — na soma, no máximo e na multiplicação a ordem não importa */
   { const cA = attribute('cA', 'vec4'), cC = attribute('cC', 'vec4'); const along = positionGeometry.y.add(0.5); const dd = vec2(cos(cA.z), sin(cA.z).negate()), pp = vec2(dd.y.negate(), dd.x);
     const w = cA.xy.add(dd.mul(along.mul(cA.w))).add(pp.mul(positionGeometry.x.mul(cC.w))); const n = w.sub(rect.xy).div(rect.zw).mul(2).sub(1); matC.vertexNode = vec4(n.x, n.y.negate(), 0, 1);
     const vL = varying(vec2(positionGeometry.x.mul(2), along)); const al = vL.y, ww = abs(vL.x); const cone = float(1).sub(smoothstep(al.mul(0.7).add(0.2), al.mul(0.65).add(0.35), ww)); const a = cone.mul(float(1).sub(al)).mul(float(1).sub(al)).mul(smoothstep(0.0, 0.12, al));
@@ -39,7 +39,7 @@ M5.scars = function (renderer, W, N) {
   const scene = new Tm.Scene(), cam = new Tm.OrthographicCamera(0, W, 0, W, -1, 1); /* alto = 0, baixo = W: y do mapa cresce para baixo na imagem (uv.y = y / W) */ const MAX = 1024;
   const kAttr = new Tm.InstancedBufferAttribute(new Float32Array(MAX * 4), 4); kAttr.setUsage(Tm.DynamicDrawUsage);
   const geo = new Tm.PlaneGeometry(1, 1); geo.setAttribute('aK', kAttr);
-  const mat = new Tm.MeshBasicNodeMaterial({ depthTest: false, depthWrite: false, transparent: true, side: Tm.DoubleSide, blending: Tm.CustomBlending, blendEquation: Tm.MaxEquation, blendSrc: Tm.OneFactor, blendDst: Tm.OneFactor, blendEquationAlpha: Tm.MaxEquation, blendSrcAlpha: Tm.OneFactor, blendDstAlpha: Tm.OneFactor }); mat.fog = false; mat.toneMapped = false;
+  const mat = new Tm.MeshBasicNodeMaterial({ depthTest: false, depthWrite: false, transparent: true, side: Tm.DoubleSide, blending: Tm.CustomBlending, blendEquation: Tm.MaxEquation, blendSrc: Tm.OneFactor, blendDst: Tm.OneFactor, blendEquationAlpha: Tm.MaxEquation, blendSrcAlpha: Tm.OneFactor, blendDstAlpha: Tm.OneFactor }); mat.fog = false; mat.toneMapped = false; mat.forceSinglePass = true; /* 5.0a.1: uma passada só */
   { const K = attribute('aK', 'vec4'); const kind = K.x, k = K.y, len = K.z, sd = K.w; const u = uv();
     const hs = p => fract(sin(dot(p, vec2(127.1, 311.7))).mul(43758.5453));
     const a = abs(u.x.sub(0.5));
@@ -53,7 +53,7 @@ M5.scars = function (renderer, W, N) {
     const o = vec4(trk.mul(isT).add(org.mul(isO)), burnG.mul(isB), burnB.mul(isB), burnA.mul(isB));
     mat.colorNode = o.rgb; mat.opacityNode = o.a; }
   const inst = new Tm.InstancedMesh(geo, mat, MAX); inst.frustumCulled = false; inst.count = 0; scene.add(inst);
-  const fadeScene = new Tm.Scene(); const fadeMat = new Tm.MeshBasicNodeMaterial({ color: 0xffffff, blending: Tm.CustomBlending, blendEquation: Tm.AddEquation, blendSrc: Tm.ZeroFactor, blendDst: Tm.SrcColorFactor, blendEquationAlpha: Tm.AddEquation, blendSrcAlpha: Tm.ZeroFactor, blendDstAlpha: Tm.SrcAlphaFactor, depthTest: false, depthWrite: false, transparent: true, side: Tm.DoubleSide }); fadeMat.fog = false; fadeMat.toneMapped = false;
+  const fadeScene = new Tm.Scene(); const fadeMat = new Tm.MeshBasicNodeMaterial({ color: 0xffffff, blending: Tm.CustomBlending, blendEquation: Tm.AddEquation, blendSrc: Tm.ZeroFactor, blendDst: Tm.SrcColorFactor, blendEquationAlpha: Tm.AddEquation, blendSrcAlpha: Tm.ZeroFactor, blendDstAlpha: Tm.SrcAlphaFactor, depthTest: false, depthWrite: false, transparent: true, side: Tm.DoubleSide }); fadeMat.fog = false; fadeMat.toneMapped = false; fadeMat.forceSinglePass = true; /* 5.0a.1: uma passada só */
   const fq = new Tm.Mesh(new Tm.PlaneGeometry(W, W), fadeMat); fq.position.set(W / 2, W / 2, 0); fq.frustumCulled = false; fadeScene.add(fq);
   const _m = new Tm.Matrix4(), _q = new Tm.Quaternion(), _p = new Tm.Vector3(), _s = new Tm.Vector3(), Z = new Tm.Vector3(0, 0, 1);
   let n = 0, fadeT = 0, cleared = false;

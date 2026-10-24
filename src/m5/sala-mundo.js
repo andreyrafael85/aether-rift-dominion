@@ -43,31 +43,40 @@ const FENDA = { x: 120, z: -560, r: 48 };
 const PADS = [['nucleo', 0, 0, 0.2], ['reator', -54, -46, 0.6], ['refinaria', 58, -40, -0.5], ['quartel', -108, -12, 1.15], ['fabrica', -92, -92, 0.75], ['hangar', 100, -6, -1.1], ['laboratorio', 16, -96, 0.1], ['torre', -96, 50, 0.35], ['torre', 74, 46, -0.4], ['reator', -18, -76, 0.9]];
 function relevo(race) { const k = (MUNDOS[race] || MUNDOS.vehnar).relevo, sx = RACES.indexOf(race) * 13.7 + 3.1;
   const base = (x, z) => { const rB = Math.hypot(x, z * 0.8); let h = (fbm(x * k.f + sx, z * k.f + 7.7) - 0.5) * k.amp * (0.25 + 0.75 * ss(70, 170, rB));
-    const dR = Math.hypot(x - FENDA.x, z - FENDA.z); h += ss(300, 520, Math.hypot(x - 40, z + 120)) * ss(FENDA.r + 50, FENDA.r + 170, dR) * k.crista * (0.55 + 0.9 * fbm(x * 0.006 + sx, z * 0.006 + 1.3)); /* cristas no horizonte (abertas em volta da Fenda) */ h -= 34 * ss(FENDA.r + 40, FENDA.r - 4, dR); h += 7 * Math.exp(-(((dR - FENDA.r - 20) / 11) ** 2)); /* cratera da Fenda com borda */
+    const dR = Math.hypot(x - FENDA.x, z - FENDA.z); h += ss(300, 520, Math.hypot(x - 40, z + 120)) * ss(FENDA.r + 50, FENDA.r + 170, dR) * ss(460, 320, z) * k.crista * (0.55 + 0.9 * fbm(x * 0.006 + sx, z * 0.006 + 1.3)); /* cristas no horizonte (abertas em volta da Fenda; nenhuma atrás da câmera, no chão que vai até z = 700) */ h -= 34 * ss(FENDA.r + 40, FENDA.r - 4, dR); h += 7 * Math.exp(-(((dR - FENDA.r - 20) / 11) ** 2)); /* cratera da Fenda com borda */
     return h; };
   const pads = PADS.map(p => [p[1], p[2], p[0] === 'nucleo' ? 34 : 18, base(p[1], p[2])]); pads.push([-50, 20, 22, base(-50, 20)]); /* pedestal da mesa tática */
   return (x, z) => { let h = base(x, z); for (const p of pads) { const k2 = ss(p[2] + 14, p[2] + 2, Math.hypot(x - p[0], z - p[1])); h += (p[3] - h) * k2; } return h; }; }
 /* ---------- terreno ---------- */
 function terreno(C, race, H) { const { W, T } = C.L; const M = MUNDOS[race] || MUNDOS.vehnar; const seg = C.leve ? 150 : 240;
-  const g = new W.PlaneGeometry(1200, 1100, seg, seg); g.rotateX(-Math.PI / 2); g.translate(60, 0, -250);
+  const g = new W.PlaneGeometry(1200, 1500, seg, Math.round(seg * 1.36)); g.rotateX(-Math.PI / 2); g.translate(60, 0, -50); /* 5.0a.1: o chão vai até z = 700 (antes 300): no celular em pé a câmera da Quorith (busto alto, câmera mais longe) ficava além da borda e o pôster mostrava o vazio embaixo */
   const a = g.attributes.position; for (let i = 0; i < a.count; i++) a.setY(i, H(a.getX(i), a.getZ(i))); g.computeVertexNormals();
-  const m = terrenoMat(C, race); const mesh = new W.Mesh(g, m); mesh.receiveShadow = true; mesh.name = 'terreno'; return mesh; }
-function terrenoMat(C, race) { const { W, T } = C.L; const M = MUNDOS[race] || MUNDOS.vehnar; const m = new W.MeshStandardNodeMaterial();
-  const { float, vec3, color, mix, smoothstep, abs, sin, length, max, positionWorld: pw, normalWorld: nw, time, mx_noise_float, mx_fractal_noise_float } = T;
+  const m = terrenoMat(C); const mesh = new W.Mesh(g, m); mesh.receiveShadow = true; mesh.name = 'terreno'; return mesh; }
+/* 5.0a.1: UM material de chão para os cinco mundos (cores, veios e pulso por uniform): o código do shader é o mesmo em todas as Raças,
+   então a troca de Raça não compila outro pipeline (antes eram cinco chãos, cada um com o seu programa) */
+const VEIO = { vehnar: [0.02, 0.012, 0, 1.5], erevane: [0.01, 0.012, 0, 0.45], tessara: [0.016, 0.012, 0, 0.7], quorith: [0.014, 0.02, 0, 1.1], vorag: [0.018, 0.012, 0.05, 1.1] }; /* largura, frequência, tempo e força dos veios */
+const PULSO = { vehnar: [0.9, 0, 0.04, 0.2, 0.9], vorag: [1.7, 0.05, 0, 0.35, 0.75] }; /* tempo, x, z, amplitude e base do pulso dos veios (os outros mundos: 0.85 fixo) */
+function terrenoMat(C) { if (C.chaoMat) return C.chaoMat; const { W, T } = C.L; const m = new W.MeshStandardNodeMaterial(); m.userData.compartilhado = true;
+  const { float, vec3, color, mix, smoothstep, abs, sin, length, uniform, positionWorld: pw, normalWorld: nw, time, mx_noise_float, mx_fractal_noise_float } = T;
+  const U = C.U.chao = { c0: uniform(new W.Color()), c1: uniform(new W.Color()), c2: uniform(new W.Color()), rocha: uniform(new W.Color()), brilho: uniform(new W.Color()), rug: uniform(0.9), rug2: uniform(1), larg: uniform(0.015), vf: uniform(0.012), vt: uniform(0), kv: uniform(1), pa: uniform(0), px: uniform(0), pz: uniform(0), pamp: uniform(0), poff: uniform(0.85) };
   const slope = float(1).sub(nw.y), det = mx_fractal_noise_float(pw.xz.mul(0.03), 4, 2.0, 0.5), grain = mx_noise_float(vec3(pw.xz.mul(0.9), 0));
-  let c = mix(color(M.chao[0]), color(M.chao[1]), smoothstep(-0.45, 0.55, det));
-  c = mix(c, color(M.rocha), smoothstep(0.2, 0.46, slope.add(det.mul(0.08))));
-  const fundo = smoothstep(-4.0, -26.0, pw.y); c = mix(c, color(M.chao[2]), fundo.mul(0.85)); /* a cratera escurece para o fundo */
+  let c = mix(U.c0, U.c1, smoothstep(-0.45, 0.55, det));
+  c = mix(c, U.rocha, smoothstep(0.2, 0.46, slope.add(det.mul(0.08))));
+  const fundo = smoothstep(-4.0, -26.0, pw.y); c = mix(c, U.c2, fundo.mul(0.85)); /* a cratera escurece para o fundo */
   m.colorNode = c.mul(det.mul(0.16).add(0.94)).mul(grain.mul(0.07).add(1));
-  m.roughnessNode = mix(float(M.rug), float(Math.min(1, M.rug + 0.1)), smoothstep(0.2, 0.5, slope));
+  m.roughnessNode = mix(U.rug, U.rug2, smoothstep(0.2, 0.5, slope));
   const longe = smoothstep(95.0, 150.0, length(pw.xz)); /* nada de brilho embaixo da base */
-  const zona = smoothstep(0.1, 0.42, mx_fractal_noise_float(vec3(pw.xz.mul(0.0045), 1.7), 2, 2.0, 0.5)); const larg = { vehnar: 0.02, erevane: 0.01, tessara: 0.016, quorith: 0.014, vorag: 0.018 }[race] || 0.015;
-  const veio = float(1).sub(smoothstep(0.0, larg, abs(mx_noise_float(vec3(pw.xz.mul(race === 'quorith' ? 0.02 : 0.012), race === 'vorag' ? time.mul(0.05) : 0))))).mul(longe).mul(zona).mul(float(1).sub(smoothstep(0.22, 0.45, slope)));
-  const pulso = race === 'vorag' ? sin(time.mul(1.7).add(pw.x.mul(0.05))).mul(0.35).add(0.75) : race === 'vehnar' ? sin(time.mul(0.9).add(pw.z.mul(0.04))).mul(0.2).add(0.9) : float(0.85);
-  const kv = { vehnar: 1.5, erevane: 0.45, tessara: 0.7, quorith: 1.1, vorag: 1.1 }[race] || 1;
+  const zona = smoothstep(0.1, 0.42, mx_fractal_noise_float(vec3(pw.xz.mul(0.0045), 1.7), 2, 2.0, 0.5));
+  const veio = float(1).sub(smoothstep(0.0, U.larg, abs(mx_noise_float(vec3(pw.xz.mul(U.vf), time.mul(U.vt)))))).mul(longe).mul(zona).mul(float(1).sub(smoothstep(0.22, 0.45, slope)));
+  const pulso = sin(time.mul(U.pa).add(pw.x.mul(U.px)).add(pw.z.mul(U.pz))).mul(U.pamp).add(U.poff);
   const fendaGlow = color(0xd94bd0).mul(smoothstep(-10.0, -30.0, pw.y)).mul(sin(time.mul(1.3)).mul(0.25).add(0.9)).mul(2.0);
-  m.emissiveNode = color(M.brilho).mul(veio).mul(pulso).mul(kv).add(fendaGlow);
-  if (C.luzMundo) m.lightsNode = C.luzMundo; return m; }
+  m.emissiveNode = U.brilho.mul(veio).mul(pulso).mul(U.kv).add(fendaGlow);
+  if (C.luzMundo) m.lightsNode = C.luzMundo; C.chaoMat = m; return m; }
+/* os valores do chão de um mundo (chamado na troca: o chão novo e o velho dividem o material) */
+function chaoDe(C, race) { terrenoMat(C); const U = C.U.chao, M = MUNDOS[race] || MUNDOS.vehnar, V = VEIO[race] || VEIO.vehnar, P = PULSO[race] || [0, 0, 0, 0, 0.85];
+  U.c0.value.setHex(M.chao[0]); U.c1.value.setHex(M.chao[1]); U.c2.value.setHex(M.chao[2]); U.rocha.value.setHex(M.rocha); U.brilho.value.setHex(M.brilho);
+  U.rug.value = M.rug; U.rug2.value = Math.min(1, M.rug + 0.1); U.larg.value = V[0]; U.vf.value = V[1]; U.vt.value = V[2]; U.kv.value = V[3];
+  U.pa.value = P[0]; U.px.value = P[1]; U.pz.value = P[2]; U.pamp.value = P[3]; U.poff.value = P[4]; }
 /* ---------- céu físico (SkyMesh em TSL, com nuvens) com ganho, tinta e estrelas por mundo; o mesmo céu, menor, assa a luz de ambiente ---------- */
 function ceu(C) { const { W, T, SkyMesh } = C.L; const { vec3, vec4, float, normalize, positionWorld, cameraPosition, floor, fract, dot, smoothstep, max, sin, time, hash, length } = T;
   const U = { ganho: T.uniform(0.12), tinta: T.uniform(new W.Color(1, 1, 1)), estrelas: T.uniform(0.0) };
@@ -112,15 +121,18 @@ function planetaMat(C, race, sol) { const { W, T } = C.L; const P = PLANETAS[rac
   cor = cor.add(noite.mul(float(1).sub(dia)).mul(float(1).sub(nuv.mul(0.7))));
   const fres = float(1).sub(max(dot(nw, V), 0)).pow(4.0); cor = cor.add(color(P.atmo).mul(fres).mul(dia.mul(0.9).add(0.03)).mul(1.0));
   m.colorNode = cor; return m; }
-function halo(C, race, sol) { const { W, T } = C.L; const P = PLANETAS[race] || PLANETAS.vehnar; const { color, abs, dot, normalize, smoothstep, max, cameraPosition, positionWorld, normalWorld } = T;
+/* 5.0a.1: halo e anel com a cor por uniform (o mesmo programa nos cinco planetas e nos dois anéis) */
+/* 5.0a.1: os vidros e brilhos de dois lados (anéis, rasgo, calor, feixe e anel do projetor, mesa) desenham numa passada só (forceSinglePass): no r186 o
+   compileAsync não prepara as duas passadas (costas e frente) dos transparentes de dois lados, e elas nasciam no primeiro quadro (travada) */
+function halo(C, race, sol) { const { W, T } = C.L; const P = PLANETAS[race] || PLANETAS.vehnar; const { uniform, abs, dot, normalize, smoothstep, max, cameraPosition, positionWorld, normalWorld } = T;
   const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: W.BackSide, blending: W.AdditiveBlending }); m.fog = false;
   const nw = normalize(normalWorld), V = normalize(cameraPosition.sub(positionWorld)), k = smoothstep(0.0, 0.48, abs(dot(nw, V))).pow(2.2), lit = smoothstep(-0.35, 0.4, dot(nw, sol));
-  m.colorNode = color(P.atmo).mul(k).mul(lit.mul(0.8).add(0.05)).mul(0.9); return m; }
-function anel(C, race, sol, centro, raio) { const { W, T } = C.L; const P = PLANETAS[race]; const { float, vec3, color, length, smoothstep, mx_fractal_noise_float, positionLocal, positionWorld, dot, max, sqrt } = T;
-  const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: W.DoubleSide }); m.fog = false;
+  m.colorNode = uniform(new W.Color(P.atmo)).mul(k).mul(lit.mul(0.8).add(0.05)).mul(0.9); return m; }
+function anel(C, race, sol, centro, raio) { const { W, T } = C.L; const P = PLANETAS[race]; const { float, vec3, uniform, length, smoothstep, mx_fractal_noise_float, positionLocal, positionWorld, dot, max, sqrt } = T;
+  const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: W.DoubleSide, forceSinglePass: true }); m.fog = false;
   const r = length(positionLocal.xy), bands = mx_fractal_noise_float(vec3(r.mul(26.0), 0.5, 0.5), 3, 2.0, 0.5).mul(0.5).add(0.5);
   const toC = centro.sub(positionWorld), t = max(dot(toC, sol), 0), d = length(toC.sub(sol.mul(t))), sombra = smoothstep(raio.mul(0.96), raio.mul(1.04), d).max(float(1).sub(smoothstep(0.0, 1.0, t)));
-  m.colorNode = color(P.anel).mul(bands.mul(0.8).add(0.35)).mul(sombra.mul(0.95).add(0.05)).mul(1.2);
+  m.colorNode = uniform(new W.Color(P.anel)).mul(bands.mul(0.8).add(0.35)).mul(sombra.mul(0.95).add(0.05)).mul(1.2);
   m.opacityNode = smoothstep(1.42, 1.5, r).mul(smoothstep(2.36, 2.2, r)).mul(bands.mul(0.7).add(0.15)).mul(smoothstep(1.86, 1.9, r).oneMinus().mul(0.55).add(0.45)); return m; }
 function planetas(C) { const { W, T } = C.L; C.U.solP = C.U.solP || T.uniform(new W.Vector3(0.5, 0.38, 0.78).normalize()); /* a luz dos planetas vem de fora do diorama: lado de dia para a câmera */ const geo = new W.SphereGeometry(1, C.leve ? 64 : 96, C.leve ? 44 : 64), geoH = new W.SphereGeometry(1.14, 48, 32); const out = { group: new W.Group(), por: {}, geos: [geo, geoH] };
   for (const race of RACES) { const g = new W.Group(); const centro = T.uniform(new W.Vector3()), raio = T.uniform(1);
@@ -132,21 +144,22 @@ function planetas(C) { const { W, T } = C.L; C.U.solP = C.U.solP || T.uniform(ne
   return out; }
 /* ---------- a Fenda: coração orgânico, calor que refrata, rasgo no céu e partículas fluidas em compute ---------- */
 function fenda(C, H) { const { W, T } = C.L; const { Fn, If, float, vec2, vec3, color, mix, smoothstep, abs, sin, cos, length, max, normalize, hash, time, instancedArray, instanceIndex, uniform, shapeCircle, positionLocal, normalLocal, positionWorld, mx_noise_vec3, mx_noise_float, mx_fractal_noise_float, viewportSharedTexture, screenUV, uv } = T;
-  const out = { group: new W.Group(), disp: [] }; const fy = H(FENDA.x, FENDA.z); out.centro = new W.Vector3(FENDA.x, fy - 26, FENDA.z);
+  /* 5.0a.1: a Fenda é UMA só na Sala (não muda com o mundo): só a altura acompanha o relevo de cada mundo (altura(H)), com o centro das partículas por uniform; a troca de Raça não refaz o compute nem os materiais */
+  const out = { group: new W.Group(), disp: [] }; const fy = H(FENDA.x, FENDA.z); out.centro = new W.Vector3(FENDA.x, fy - 26, FENDA.z); out.c0 = uniform(new W.Vector3(FENDA.x, fy - 18, FENDA.z));
   /* coração: deslocamento por ruído na GPU e veias que pulsam (o mesmo do laboratório) */
   const blobMat = new W.MeshStandardNodeMaterial({ roughness: 0.3, metalness: 0 }); { const p = positionLocal, n = normalLocal;
     const d = mx_fractal_noise_float(p.mul(0.28).add(vec3(0, time.mul(0.35), 0)), 3, 2.0, 0.5).mul(2.4).add(sin(time.mul(1.6)).mul(0.4)); blobMat.positionNode = p.add(n.mul(d));
     const vein = float(1).sub(smoothstep(0.0, 0.07, abs(mx_noise_float(p.mul(0.7).add(vec3(time.mul(0.12))))))); blobMat.colorNode = mix(color(0x2b1030), color(0x5a1d4f), d.mul(0.3).add(0.5));
     blobMat.emissiveNode = color(0xff4fc1).mul(vein).mul(sin(time.mul(2.1).add(p.y.mul(0.4))).mul(0.5).add(0.9)).mul(3.0); if (C.luzMundo) blobMat.lightsNode = C.luzMundo; }
-  const bg = new W.IcosahedronGeometry(9, C.leve ? 18 : 40); out.disp.push(bg); const blob = new W.Mesh(bg, blobMat); blob.position.copy(out.centro).y += 6; out.group.add(blob); out.disp.push(blobMat);
+  const bg = new W.IcosahedronGeometry(9, C.leve ? 18 : 40); out.disp.push(bg); const blob = new W.Mesh(bg, blobMat); blob.position.copy(out.centro).y += 6; out.group.add(blob); out.disp.push(blobMat); out.blob = blob;
   /* calor: a cena atrás é refratada por ruído (só na versão completa) */
-  if (!C.leve) { const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: W.DoubleSide }); m.fog = false;
+  if (!C.leve) { const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: W.DoubleSide, forceSinglePass: true }); m.fog = false;
     const hy = positionLocal.y.div(70).add(0.5), fade = smoothstep(0.0, 0.25, hy).mul(float(1).sub(smoothstep(0.55, 1.0, hy)));
     const off = vec2(mx_noise_float(vec3(positionWorld.xz.mul(0.05), time.mul(0.7))), mx_noise_float(vec3(positionWorld.zy.mul(0.05), time.mul(0.6).add(4)))).mul(0.012).mul(fade);
     m.colorNode = viewportSharedTexture(screenUV.add(off)).rgb; m.opacityNode = fade; const cg = new W.CylinderGeometry(34, 44, 70, 48, 1, true); out.disp.push(cg, m);
-    const haze = new W.Mesh(cg, m); haze.position.set(FENDA.x, fy + 10, FENDA.z); haze.renderOrder = 5; out.group.add(haze); }
+    const haze = new W.Mesh(cg, m); haze.position.set(FENDA.x, fy + 10, FENDA.z); haze.renderOrder = 5; out.group.add(haze); out.haze = haze; }
   /* rasgo no céu: núcleo branco, borda laranja e halo violeta, serrilhado por ruído que corre devagar (o desenho do fundo 4.3 em TSL) */
-  { const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending, side: W.DoubleSide }); m.fog = false; const u = uv(), y = u.y, t = time.mul(0.18);
+  { const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending, side: W.DoubleSide, forceSinglePass: true }); m.fog = false; const u = uv(), y = u.y, t = time.mul(0.18);
     const fb = x => mx_fractal_noise_float(vec3(x, 1.3, 0.7), 3, 2.1, 0.5).mul(0.5).add(0.5);
     const off = fb(y.mul(7.0).add(t)).sub(0.5).mul(0.16).add(fb(y.mul(23.0).sub(t.mul(2.0))).sub(0.5).mul(0.05)); const taper = smoothstep(0.0, 0.22, y).mul(smoothstep(1.0, 0.7, y));
     const w = float(0.012).add(taper.mul(0.03).mul(fb(y.mul(3.0).add(2.0)).mul(0.4).add(0.6))), x = abs(u.x.sub(0.5).sub(off));
@@ -155,7 +168,7 @@ function fenda(C, H) { const { W, T } = C.L; const { Fn, If, float, vec2, vec3, 
     const pg = new W.PlaneGeometry(1, 1); out.disp.push(pg, m); out.rasgo = new W.Mesh(pg, m); out.rasgo.renderOrder = -1; out.rasgo.frustumCulled = false; out.group.add(out.rasgo); }
   /* partículas fluidas: simuladas num compute shader (TSL → WGSL no WebGPU, GLSL na reserva WebGL2); o ponteiro mexe e o clique empurra */
   const N = C.nPart; out.N = N;
-  if (N > 0) { const P = instancedArray(N, 'vec3'), V = instancedArray(N, 'vec3'), L = instancedArray(N, 'float'); const c0 = vec3(FENDA.x, fy - 18, FENDA.z);
+  if (N > 0) { const P = instancedArray(N, 'vec3'), V = instancedArray(N, 'vec3'), L = instancedArray(N, 'float'); const c0 = out.c0;
     out.dt = uniform(1 / 60); out.pulseP = uniform(new W.Vector3()); out.pulseK = uniform(0); out.stirP = uniform(new W.Vector3()); out.stirK = uniform(0);
     const spawn = Fn(([s]) => { const a = hash(s).mul(Math.PI * 2), r = hash(s.add(17.0)).mul(16).add(4); return c0.add(vec3(cos(a).mul(r), hash(s.add(31.0)).mul(-8), sin(a).mul(r))); });
     out.cInit = Fn(() => { const i = instanceIndex, s = i.toFloat(); P.element(i).assign(spawn(s).add(vec3(0, hash(s.add(9.0)).mul(230), 0))); V.element(i).assign(vec3(0)); L.element(i).assign(hash(s.add(5.0))); })().compute(N);
@@ -174,22 +187,31 @@ function fenda(C, H) { const { W, T } = C.L; const { Fn, If, float, vec2, vec3, 
     m.positionNode = P.toAttribute(); m.colorNode = mix(color(0xff3fb8), color(0x6fe9ff), smoothstep(4.0, 22.0, sp)).mul(0.95);
     m.opacityNode = shapeCircle().mul(smoothstep(0.0, 0.25, lf)).mul(0.55); m.scaleNode = float(C.leve ? 1.3 : 0.9).mul(lf.mul(0.5).add(0.5));
     const s = new W.Sprite(m); s.count = N; s.frustumCulled = false; s.renderOrder = 6; out.group.add(s); out.disp.push(m); out.sprites = s; }
+  /* a cratera de cada mundo tem outra altura: o coração, o calor e o funil das partículas descem ou sobem junto */
+  out.altura = H2 => { const y = H2(FENDA.x, FENDA.z); out.centro.set(FENDA.x, y - 26, FENDA.z); out.c0.value.set(FENDA.x, y - 18, FENDA.z); blob.position.copy(out.centro).y += 6; if (out.haze) out.haze.position.set(FENDA.x, y + 10, FENDA.z); };
   return out; }
 /* ---------- partículas do ar por mundo (brasas, neve, esporos, pó de cristal): posição calculada na GPU pelo índice e pelo tempo, sem CPU por quadro ---------- */
-function ar(C, race) { const { W, T } = C.L; const { float, vec3, color, sin, cos, fract, hash, time, instanceIndex, shapeCircle, smoothstep, mix } = T; const M = MUNDOS[race] || MUNDOS.vehnar; const N = C.leve ? 140 : 380;
-  const m = new W.SpriteNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending }); m.fog = false; const i = instanceIndex.toFloat();
-  const sobe = M.ar === 'neve' ? -1 : 1, vel = M.ar === 'brasa' ? 0.07 : M.ar === 'neve' ? 0.05 : 0.025, age = fract(time.mul(vel).mul(hash(i.add(3.0)).mul(0.6).add(0.7)).add(hash(i)));
-  const x = hash(i.add(11.0)).sub(0.5).mul(460).add(10), z = hash(i.add(23.0)).sub(0.5).mul(380).sub(90), alt = M.ar === 'neve' ? float(140).mul(float(1).sub(age)) : age.mul(M.ar === 'brasa' ? 110 : 70).add(2);
-  const sw = sin(time.mul(0.6).add(i)).mul(M.ar === 'brasa' ? 3 : 6), sw2 = cos(time.mul(0.5).add(i.mul(1.7))).mul(5);
-  m.positionNode = vec3(x.add(sw), alt.add(sobe > 0 ? 0 : 0), z.add(sw2));
-  const cor = { brasa: 0xff7a2a, neve: 0xdff4ff, esporo: 0x9dff8a, cristal: 0xd2b4ff, 'esporo-vermelho': 0xff6a5a }[M.ar] || 0xffffff;
-  m.colorNode = color(cor).mul(M.ar === 'neve' ? 0.9 : 1.6).mul(sin(time.mul(3.0).add(i.mul(7.0))).mul(0.3).add(0.8));
-  m.opacityNode = shapeCircle().mul(smoothstep(0.0, 0.12, age)).mul(smoothstep(1.0, 0.75, age)).mul(M.ar === 'neve' ? 0.55 : 0.8);
-  m.scaleNode = float(M.ar === 'neve' ? 0.45 : M.ar === 'brasa' ? 0.3 : 0.36).mul(hash(i.add(5.0)).mul(0.8).add(0.6));
-  const s = new W.Sprite(m); s.count = N; s.frustumCulled = false; s.renderOrder = 4; return { obj: s, disp: [m] }; }
+/* 5.0a.1: UM céu de partículas para a Sala inteira, com o jeito de cada mundo por uniform (velocidade, subida ou queda, cor, tamanho):
+   o mesmo programa nas cinco Raças (antes, um material por mundo) */
+const AR = { brasa: { cor: 0xff7a2a, vel: 0.07, alt: 110, neve: 0, sw: 3, k: 1.6, op: 0.8, sc: 0.3 }, neve: { cor: 0xdff4ff, vel: 0.05, alt: 70, neve: 1, sw: 6, k: 0.9, op: 0.55, sc: 0.45 },
+  esporo: { cor: 0x9dff8a }, cristal: { cor: 0xd2b4ff }, 'esporo-vermelho': { cor: 0xff6a5a } };
+function ar(C) { if (C.arObj) return C.arObj; const { W, T } = C.L; const { float, vec3, uniform, sin, cos, fract, hash, time, instanceIndex, shapeCircle, smoothstep, mix } = T; const N = C.leve ? 140 : 380;
+  const U = C.U.ar = { cor: uniform(new W.Color(1, 1, 1)), vel: uniform(0.025), alt: uniform(70), neve: uniform(0), sw: uniform(6), op: uniform(0.8), sc: uniform(0.36) };
+  const m = new W.SpriteNodeMaterial({ transparent: true, depthWrite: false, blending: W.AdditiveBlending }); m.fog = false; m.userData.compartilhado = true; const i = instanceIndex.toFloat();
+  const age = fract(time.mul(U.vel).mul(hash(i.add(3.0)).mul(0.6).add(0.7)).add(hash(i)));
+  const x = hash(i.add(11.0)).sub(0.5).mul(460).add(10), z = hash(i.add(23.0)).sub(0.5).mul(380).sub(90), alt = mix(age.mul(U.alt).add(2), float(140).mul(float(1).sub(age)), U.neve);
+  const sw = sin(time.mul(0.6).add(i)).mul(U.sw), sw2 = cos(time.mul(0.5).add(i.mul(1.7))).mul(5);
+  m.positionNode = vec3(x.add(sw), alt, z.add(sw2));
+  m.colorNode = U.cor.mul(sin(time.mul(3.0).add(i.mul(7.0))).mul(0.3).add(0.8));
+  m.opacityNode = shapeCircle().mul(smoothstep(0.0, 0.12, age)).mul(smoothstep(1.0, 0.75, age)).mul(U.op);
+  m.scaleNode = U.sc.mul(hash(i.add(5.0)).mul(0.8).add(0.6));
+  const s = new W.Sprite(m); s.count = N; s.frustumCulled = false; s.renderOrder = 4; s.name = 'ar'; C.arObj = { obj: s, disp: [m], U }; return C.arObj; }
+function arDe(C, race) { const A = ar(C), M = MUNDOS[race] || MUNDOS.vehnar, K = Object.assign({ vel: 0.025, alt: 70, neve: 0, sw: 6, k: 1.6, op: 0.8, sc: 0.36 }, AR[M.ar] || {});
+  A.U.cor.value.setHex(K.cor || 0xffffff).multiplyScalar(K.k); A.U.vel.value = K.vel; A.U.alt.value = K.alt; A.U.neve.value = K.neve; A.U.sw.value = K.sw; A.U.op.value = K.op; A.U.sc.value = K.sc; }
 /* fumaça das chaminés (Vehnar e Reatores): bolhas que sobem, crescem e somem, calculadas na GPU */
 function fumaca(C, fontes) { const { W, T } = C.L; const { float, vec3, color, sin, fract, hash, time, instanceIndex, shapeCircle, smoothstep, uniformArray } = T; if (!fontes.length) return null;
-  const PER = C.leve ? 14 : 34, N = PER * fontes.length; const arr = uniformArray(fontes.map(p => new W.Vector3(p[0], p[1], p[2])), 'vec3');
+  /* 5.0a.1: a lista de chaminés tem sempre 2 lugares (o mesmo programa em todos os mundos; as que sobram ficam sem partícula) */ const fx = fontes.slice(0, 2); while (fx.length < 2) fx.push([0, -999, 0]);
+  const PER = C.leve ? 14 : 34, N = PER * Math.min(2, fontes.length); const arr = uniformArray(fx.map(p => new W.Vector3(p[0], p[1], p[2])), 'vec3');
   const m = new W.SpriteNodeMaterial({ transparent: true, depthWrite: false }); m.fog = false; const i = instanceIndex.toFloat(), k = i.div(PER).floor().toInt(), age = fract(time.mul(0.085).add(hash(i)));
   const o = arr.element(k); m.positionNode = o.add(vec3(sin(i.mul(3.1).add(time.mul(0.3))).mul(age.mul(5)).add(age.mul(age).mul(16)), age.mul(46), hash(i.add(9.0)).sub(0.5).mul(age).mul(10)));
   m.colorNode = color(0x2b2622).mul(float(1).add(smoothstep(0.25, 0.0, age).mul(5.0)));
@@ -207,7 +229,7 @@ function modelos(C) { const { W, T } = C.L; const { vertexColor, attribute, unif
 const UNID = r => ({ vehnar: ['prensa', 'soldador', 'tratorzao'], erevane: ['lamina', 'atirador', 'ancora'], tessara: ['colosso', 'quimera', 'molde'], quorith: ['monolito', 'prisma', 'voz'], vorag: ['brutamonte', 'escaravelho', 'cuspidor'] }[r] || []);
 async function base(C, race, H, cor, alive) { const { W } = C.L; const ME = ARD.meshes; const g = new W.Group(); g.name = 'base-' + race; const out = { group: g, pick: [], anim: [], fontes: [], disp: [] }; if (!ME) return out;
   let seed = 3; const place = (def, x, z, ang, o) => { const r = ME.build(def, race, cor, seed++); if (!r || !r.main) return null; const gg = new W.Group();
-    const a = new W.Mesh(r.main, C.mats.main); a.castShadow = true; a.receiveShadow = true; gg.add(a); out.disp.push(r.main);
+    const a = new W.Mesh(r.main, C.mats.main); a.castShadow = !(o && o.sombra === false); /* 5.0a.1: o que anda não faz sombra (o mapa de sombra é desenhado uma vez por mundo) */ a.receiveShadow = true; gg.add(a); out.disp.push(r.main);
     if (r.em && r.em.attributes.position.count) { const e = new W.Mesh(r.em, C.mats.em); gg.add(e); out.disp.push(r.em); } else if (r.em) r.em.dispose();
     gg.position.set(x, H(x, z) + ((o && o.y) || 0), z); gg.rotation.y = ang; if (o && o.s) gg.scale.setScalar(o.s); gg.userData = { def, w: r.width, h: r.height }; a.userData.root = gg; g.add(gg); out.pick.push(a); return gg; };
   const yieldF = () => C.tick ? C.tick() : null;
@@ -215,12 +237,12 @@ async function base(C, race, H, cor, alive) { const { W } = C.L; const ME = ARD.
     if (m && p[0] === 'reator' && (race === 'vehnar' || seed < 6)) out.fontes.push([p[1] - 3, m.position.y + m.userData.h * 0.95, p[2] + 2]); await yieldF(); }
   /* coletores indo e voltando entre a Refinaria e os cristais; drones em órbita; unidades da Raça paradas em formação */
   const cristal = [118, -118]; const ref = [58, -40];
-  for (let k = 0; k < 2; k++) { if (!alive()) return out; const m = place('coletor', ref[0], ref[1], 0); if (m) out.anim.push({ o: m, tipo: 'vaivem', a: [ref[0] + 14 + k * 8, ref[1] - 12 - k * 10], b: [cristal[0] - 6 + k * 10, cristal[1] + 8 - k * 6], per: 15 + k * 4, fase: k * 0.47 }); await yieldF(); }
+  for (let k = 0; k < 2; k++) { if (!alive()) return out; const m = place('coletor', ref[0], ref[1], 0, { sombra: false }); if (m) out.anim.push({ o: m, tipo: 'vaivem', a: [ref[0] + 14 + k * 8, ref[1] - 12 - k * 10], b: [cristal[0] - 6 + k * 10, cristal[1] + 8 - k * 6], per: 15 + k * 4, fase: k * 0.47 }); await yieldF(); }
   for (let k = 0; k < 5; k++) { if (!alive()) return out; const a = k / 5 * Math.PI * 2; const fl = ARD.meshes.scatter('cristal', 7 + k); if (fl) { fl.computeBoundingSphere(); if (!fl.getAttribute('aGlow')) fl.setAttribute('aGlow', new W.BufferAttribute(new Float32Array(fl.attributes.position.count), 1)); const mm = new W.Mesh(fl, C.mats.flora); const x = cristal[0] + Math.cos(a) * 10, z = cristal[1] + Math.sin(a) * 8; mm.position.set(x, H(x, z), z); mm.scale.setScalar(5 + (k % 2) * 2.5); mm.rotation.y = a * 2.3; g.add(mm); out.disp.push(fl); } }
   const dr = race === 'erevane' ? 'mosquito' : race === 'tessara' ? 'esporo' : race === 'quorith' ? 'harmonico' : race === 'vorag' ? 'ferroada' : 'drone';
-  for (let k = 0; k < 3; k++) { if (!alive()) return out; const m = place(dr, 0, 0, 0, { s: 1.15 }); if (m) out.anim.push({ o: m, tipo: 'orbita', c: [k === 2 ? 60 : -10, k === 2 ? -30 : -18], r: 70 + k * 24, h: 34 + k * 9, w: (k % 2 ? -1 : 1) * (0.16 + k * 0.03), fase: k * 2.1 }); await yieldF(); }
+  for (let k = 0; k < 3; k++) { if (!alive()) return out; const m = place(dr, 0, 0, 0, { s: 1.15, sombra: false }); if (m) out.anim.push({ o: m, tipo: 'orbita', c: [k === 2 ? 60 : -10, k === 2 ? -30 : -18], r: 70 + k * 24, h: 34 + k * 9, w: (k % 2 ? -1 : 1) * (0.16 + k * 0.03), fase: k * 2.1 }); await yieldF(); }
   const U3 = UNID(race); const pos = [[66, 36, -0.5], [44, 52, -0.2], [30, 30, 0.1], [-40, 70, 0.6], [100, 22, -0.3]];
-  for (let k = 0; k < pos.length; k++) { if (!alive()) return out; const def = k === 0 ? U3[0] : k < 3 ? U3[1] : (k === 3 ? 'veiculo' : U3[2]); const [x, z, ang] = pos[k]; const m = place(def, x, z, ang); if (m && k > 2) out.anim.push({ o: m, tipo: 'ronda', x0: x, z0: z, amp: 6 + k, per: 22 + k * 3, fase: k }); await yieldF(); }
+  for (let k = 0; k < pos.length; k++) { if (!alive()) return out; const def = k === 0 ? U3[0] : k < 3 ? U3[1] : (k === 3 ? 'veiculo' : U3[2]); const [x, z, ang] = pos[k]; const m = place(def, x, z, ang, k > 2 ? { sombra: false } : null); if (m && k > 2) out.anim.push({ o: m, tipo: 'ronda', x0: x, z0: z, amp: 6 + k, per: 22 + k * 3, fase: k }); await yieldF(); }
   /* flora do mundo em volta (sem tocar nos canteiros) */
   const F = (MUNDOS[race] || MUNDOS.vehnar).flora; let n = 0;
   for (let k = 0; k < (C.leve ? 26 : 60); k++) { const a = hh(k, 3.3) * Math.PI * 2, d = 120 + hh(k, 9.1) * 230; const x = Math.cos(a) * d * 1.15 + 20, z = Math.sin(a) * d - 90; if (Math.hypot(x - FENDA.x, z - FENDA.z) < FENDA.r + 30) continue;
@@ -233,8 +255,6 @@ function animar(b, H, t) { for (let i = 0; i < b.anim.length; i++) { const a = b
     o.position.set(x, H(x, z) + Math.abs(Math.sin(t * 9 + i)) * 0.15, z); o.rotation.y = Math.atan2(dx, dz); }
   else if (a.tipo === 'orbita') { const an = t * a.w + a.fase; const x = a.c[0] + Math.cos(an) * a.r, z = a.c[1] + Math.sin(an) * a.r * 0.7; o.position.set(x, a.h + Math.sin(t * 1.3 + i) * 2, z); o.rotation.y = Math.atan2(-Math.sin(an) * a.w, Math.cos(an) * a.w * 0.7) + Math.PI / 2 * Math.sign(a.w); o.rotation.z = -0.25 * Math.sign(a.w); }
   else if (a.tipo === 'ronda') { const u = Math.sin((t / a.per + a.fase) * Math.PI * 2); const x = a.x0 + u * a.amp, z = a.z0; o.position.set(x, H(x, z), z); o.rotation.y = Math.cos((t / a.per + a.fase) * Math.PI * 2) > 0 ? Math.PI / 2 : -Math.PI / 2; } } }
-/* aquecimento (versão completa): objetos mínimos com os materiais próprios de um mundo (chão e ar), para compilar os pipelines antes da troca */
-function aquecimento(C, race) { const { W } = C.L; const g = new W.PlaneGeometry(1, 1, 1, 1); g.rotateX(-Math.PI / 2); const t = new W.Mesh(g, terrenoMat(C, race)); t.receiveShadow = true; const a = ar(C, race); a.obj.count = 1;
-  const grupo = new W.Group(); grupo.add(t, a.obj); return { grupo, disp: [g, t.material].concat(a.disp) }; }
-ARD.salaMundo = { MUNDOS, PLANETAS, RACES, FENDA, PADS, relevo, terreno, ceu, solDir, planetas, fenda, ar, fumaca, modelos, base, animar, aquecimento };
+/* 5.0a.1: chão, ar, fumaça e Fenda dividem os programas entre os mundos; o que muda de uma Raça para outra é só o busto (sala-holo.js) */
+ARD.salaMundo = { MUNDOS, PLANETAS, RACES, FENDA, PADS, relevo, terreno, chaoDe, ceu, solDir, planetas, fenda, ar, arDe, fumaca, modelos, base, animar };
 })(globalThis.ARD = globalThis.ARD || {});

@@ -147,6 +147,27 @@ function create(o) {
     setSel((dropCol ? combat : ents).map(e => e.id)); if (dropCol) ui.notice(nCol + (nCol > 1 ? ' coletores ficaram' : ' coletor ficou') + ' de fora: o exército tem prioridade. Duplo clique num coletor seleciona todos na tela.');
   }
 
+  /* 5.0a.1 — dois dedos como num app de mapas: o mapa gira COM os dedos (dedos no sentido horário, cena no sentido horário; antes
+     era o contrário, cam.yaw - da), e o ponto do mapa que estava entre os dedos fica entre eles ao girar, aproximar e arrastar.
+     O chão em volta do alvo da câmera é o mesmo em qualquer giro (só roda em torno do alvo) e escala com 1/zoom: guardamos o ponto do mapa
+     sob o meio dos dedos e a sua posição nos eixos da câmera (direita, frente) no começo do gesto, e a cada movimento recolocamos o alvo
+     para ele cair sob o meio atual. O giro do computador (Q/E, botão Girar) não muda. */
+  const yawOf = () => (cam.yaw == null ? Math.PI / 4 : cam.yaw);
+  const toCam = (dx, dy, yaw) => { const c = Math.cos(yaw), s = Math.sin(yaw); return [dx * c + dy * s, -dx * s + dy * c]; };
+  function pinchStart(pts, r) {
+    const mx = (pts[0].x + pts[1].x) / 2 - r.left, my = (pts[0].y + pts[1].y) / 2 - r.top, yaw = yawOf(); const [wx, wy] = R.screenToWorld(cam, mx, my);
+    const [ax, ay] = R.screenToWorld(cam, mx + 24, my), [bx, by] = R.screenToWorld(cam, mx, my + 24); /* derivadas da tela para o chão (nos eixos da câmera), para o meio dos dedos que anda */
+    return { a: Math.atan2(pts[1].y - pts[0].y, pts[1].x - pts[0].x), yaw, rot: false, ra: 0, d: Math.max(1, Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y)), zoom: cam.zoom, mx, my, wx, wy,
+      L: toCam(wx - cam.x, wy - cam.y, yaw), jx: toCam((ax - wx) / 24, (ay - wy) / 24, yaw), jy: toCam((bx - wx) / 24, (by - wy) / 24, yaw) };
+  }
+  function pinchMove(pts, r) {
+    const P = I.pinch; const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y); const mx = (pts[0].x + pts[1].x) / 2 - r.left, my = (pts[0].y + pts[1].y) / 2 - r.top;
+    cam.zoom = P.zoom * (d / P.d); clampCam(); let yaw = P.yaw;
+    if (R.supportsYaw) { let da = Math.atan2(pts[1].y - pts[0].y, pts[1].x - pts[0].x) - P.a; da = Math.atan2(Math.sin(da), Math.cos(da)); if (!P.rot && Math.abs(da) > 0.14) { P.rot = true; P.ra = da; } /* 8° de folga para a pinça não girar sem querer; depois gira sem pulo e a folga some aos poucos (o mapa alcança os dedos em ~0,2 s) */
+      if (P.rot) { let g = da - P.ra; P.ra *= 0.8; g = Math.atan2(Math.sin(g), Math.cos(g)); yaw = P.yaw + g; cam.yaw = yaw; } } /* 4.0f: dois dedos giram · 5.0a.1: no mesmo sentido dos dedos */
+    const k = P.zoom / cam.zoom, ex = mx - P.mx, ey = my - P.my; const u = (P.L[0] + P.jx[0] * ex + P.jy[0] * ey) * k, v = (P.L[1] + P.jx[1] * ex + P.jy[1] * ey) * k; const c = Math.cos(yaw), s = Math.sin(yaw);
+    cam.x = P.wx - (u * c - v * s); cam.y = P.wy - (u * s + v * c); clampCam();
+  }
   // ---- pointer events
   canvas.addEventListener('contextmenu', e => e.preventDefault());
   canvas.addEventListener('mousedown', e => { if (e.button === 1) e.preventDefault(); }); /* 5.0b: sem a rolagem automática do navegador no botão do meio */
@@ -154,7 +175,7 @@ function create(o) {
     canvas.setPointerCapture(e.pointerId);
     I.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, type: e.pointerType });
     const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top;
-    if (I.pointers.size === 2) { const pts = [...I.pointers.values()]; I.pinch = { a: Math.atan2(pts[1].y - pts[0].y, pts[1].x - pts[0].x), yaw: cam.yaw || 0, rot: false, d: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y), zoom: cam.zoom, cx: (pts[0].x + pts[1].x) / 2, cy: (pts[0].y + pts[1].y) / 2, camx: cam.x, camy: cam.y }; I.down = null; view.box = null; clearTimeout(I.longPress); return; }
+    if (I.pointers.size === 2) { const pts = [...I.pointers.values()]; I.pinch = pinchStart(pts, r); I.down = null; view.box = null; clearTimeout(I.longPress); return; }
     I.lastType = e.pointerType;
     I.down = { sx, sy, button: e.button, type: e.pointerType, moved: false, camx: cam.x, camy: cam.y, shift: e.shiftKey, t: performance.now() };
     if (e.button === 0 && I.mode === 'build' && view.ghost && S.BUILDINGS[view.ghost.def].wall) { const [wx0, wy0] = R.screenToWorld(cam, sx, sy); I.wallDrag = { x: wx0, y: wy0 }; }
@@ -164,7 +185,7 @@ function create(o) {
   canvas.addEventListener('pointermove', e => {
     const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top; I.lastSX = sx; I.lastSY = sy;
     const p = I.pointers.get(e.pointerId); if (p) { p.x = e.clientX; p.y = e.clientY; }
-    if (I.pinch && I.pointers.size === 2) { const pts = [...I.pointers.values()]; const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y); const cx = (pts[0].x + pts[1].x) / 2, cy = (pts[0].y + pts[1].y) / 2; cam.zoom = I.pinch.zoom * (d / I.pinch.d); clampCam(); if (R.supportsYaw) { let da = Math.atan2(pts[1].y - pts[0].y, pts[1].x - pts[0].x) - I.pinch.a; da = Math.atan2(Math.sin(da), Math.cos(da)); if (!I.pinch.rot && Math.abs(da) > 0.14) I.pinch.rot = true; if (I.pinch.rot) cam.yaw = I.pinch.yaw - da; } /* 4.0f: dois dedos giram */ const [pwx, pwy] = R.screenDeltaToWorld(cam, cx - I.pinch.cx, cy - I.pinch.cy); cam.x = I.pinch.camx - pwx; cam.y = I.pinch.camy - pwy; clampCam(); return; }
+    if (I.pinch && I.pointers.size === 2) { pinchMove([...I.pointers.values()], r); return; }
     const touchPlace = I.mode === 'build' && view.ghost && I.lastType === 'touch' && !S.BUILDINGS[view.ghost.def].wall;
     if (view.ghost && !touchPlace) updateGhost(sx, sy);
     const d = I.down; if (!d) { const t = pick(sx, sy, 8); view.hover = t ? t.id : null; return; }
@@ -199,7 +220,6 @@ function create(o) {
   canvas.addEventListener('wheel', e => { e.preventDefault(); if (e.ctrlKey && R.CAM) { cam.pitchT = Math.max(R.CAM.minPitch, Math.min(R.CAM.maxPitch, (cam.pitchT == null ? R.CAM.pitch : cam.pitchT) + (e.deltaY > 0 ? 0.06 : -0.06))); return; } const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top; const [wx, wy] = R.screenToWorld(cam, sx, sy); const f = Math.exp(-e.deltaY * 0.0012); cam.zoom *= f; clampCam(); const [wx2, wy2] = R.screenToWorld(cam, sx, sy); cam.x += wx - wx2; cam.y += wy - wy2; clampCam(); if (view.ghost) updateGhost(sx, sy); }, { passive: false });
 
   // ---- keyboard
-  const PROD_KEYS = {}; for (const k in S.UNITS) PROD_KEYS[S.UNITS[k].key] = k;
   const BUILD_KEYS = {}; for (const k in S.BUILDINGS) if (S.BUILDINGS[k].key) BUILD_KEYS[S.BUILDINGS[k].key] = k;
   I.buildMenu = false;
   window.addEventListener('keydown', e => {
@@ -217,7 +237,7 @@ function create(o) {
     if (k === 'B' && !e.ctrlKey) { I.buildMenu = !I.buildMenu; ui.buildMenuChanged(I.buildMenu); return; }
     if (I.buildMenu && BUILD_KEYS[k]) { I.buildMenu = false; ui.buildMenuChanged(false); I.setMode('build', BUILD_KEYS[k]); return; }
     const b = ownSelectedBuilding(); const units = ownSelectedUnits();
-    if (b && !units.length && S.BUILDINGS[b.def].produces && PROD_KEYS[k] && S.BUILDINGS[b.def].produces.includes(PROD_KEYS[k])) { cmd({ t: 'produce', id: b.id, def: PROD_KEYS[k], n: e.shiftKey ? 5 : 1 }); return; }
+    if (b && !units.length && b.built) { const pd = S.producesFor(b.def, sim.players[human].faction).find(u => S.UNITS[u].key === k); if (pd) { if (!e.repeat) cmd({ t: 'produce', id: b.id, def: pd, n: e.shiftKey ? 5 : 1 }); return; } } /* 5.0a.1: a tecla de cada unidade vale pela lista da Raça (antes a última unidade com a mesma letra, de outra Raça, roubava a tecla: C e I não produziam) e segurar a tecla põe 1, não ~30 por segundo */
     if (k === 'A' && units.length) { if (e.repeat) return; I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'); return; } // 4.2g: segurar A não fica ligando e desligando
     if (k === 'S' && units.length) { cmd({ t: 'stop', ids: units.map(u => u.id) }); return; }
     if (k === 'F' && view.sel.size) { const en = sim.byId.get([...view.sel][0]); if (en) I.center(en.x, en.y); return; }
