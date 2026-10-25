@@ -6,7 +6,8 @@
 const S = ARD.sim, C = ARD.campaign, P = ARD.progress; const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'];
 const SHADES = r => (S.RACE_SHADES && S.RACE_SHADES[r]) || ['#FF8C1A']; // 4.1a: cores do Hangar ligadas à Raça
 const SKINS = [{ n: 'Padrão', lv: 1 }, { n: 'Fortaleza', lv: 10 }, { n: 'Santuário', lv: 20 }];
-let D = null; // dependências de main.js: { $, leaderArt, LEADER_NAME, RACE_COLORS, LEADER_FACE, startGame, loadPrefs, savePrefs, selectedRace }
+let D = null; // dependências de main.js: { $, leaderArt, LEADER_NAME, LEADER_GENDER, RACE_COLORS, LEADER_FACE, startGame, loadPrefs, savePrefs, selectedRace }
+const fem = r => !!(D && D.LEADER_GENDER && D.LEADER_GENDER[r] === 'f'); /* 5.0a.3: a líder da Tessara — os textos sobre ela vão para o feminino */
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const stars = n => '<span class="stars">' + [0, 1, 2].map(i => i < n ? '★' : '<span class="off">★</span>').join('') + '</span>';
 function raceName(r) { return (S.FACTIONS[r] || {}).name || r; }
@@ -77,7 +78,8 @@ function openHangar() {
   const cur = () => st.colors[st.race] || SHADES(st.race)[0];
   const draw = () => { $('hg-colors').innerHTML = SHADES(st.race).map(c => `<button class="swatch ${c === cur() ? 'on' : ''}" style="background:${c}" data-c="${c}" aria-label="tom ${c}"></button>`).join('');
     $('hg-skins').innerHTML = SKINS.map((k, i) => `<button class="chip2 ${(st.skin[st.race] || 0) === i ? 'on' : ''}" data-skin="${i}" ${li.level >= k.lv ? '' : 'disabled'}>${k.n}${li.level >= k.lv ? '' : ' · nível ' + k.lv}</button>`).join('');
-    $('hg-portraits').innerHTML = [1, 2, 3].map(i => `<button class="chip2 ${(st.portrait[st.race] || D.LEADER_FACE_DEFAULT[st.race]) === i ? 'on' : ''}" data-por="${i}">${['Sereno', 'Furioso', 'Triunfante'][i - 1]}</button>`).join('');
+    $('hg-portraits').innerHTML = [1, 2, 3].map(i => `<button class="chip2 ${(st.portrait[st.race] || D.LEADER_FACE_DEFAULT[st.race]) === i ? 'on' : ''}" data-por="${i}">${(fem(st.race) ? ['Serena', 'Furiosa', 'Triunfante'] : ['Sereno', 'Furioso', 'Triunfante'])[i - 1] /* 5.0a.3 */}</button>`).join('');
+    { const lb = $('hg-portraits').previousElementSibling; if (lb) lb.textContent = 'Retrato d' + (fem(st.race) ? 'a' : 'o') + ' líder no HUD'; } /* 5.0a.3: 'Retrato da líder no HUD' quando a Raça é a Tessara */
     $('hg-note').textContent = 'Os tons são da paleta da ' + raceName(st.race) + ' e valem no solo, na campanha e no multiplayer (se dois jogadores escolherem tons parecidos, o segundo recebe o próximo tom). O Núcleo e o retrato aparecem nas suas partidas.';
     $('hg-colors').querySelectorAll('[data-c]').forEach(b => b.onclick = () => { st.colors[st.race] = b.dataset.c; draw(); view(); });
     $('hg-skins').querySelectorAll('[data-skin]').forEach(b => b.onclick = () => { st.skin[st.race] = +b.dataset.skin; draw(); view(); });

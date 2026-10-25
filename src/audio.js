@@ -65,16 +65,29 @@ function nivel(v) { const n = v.name || '', u = v.voiceURI || '';
 const PREF = [/Francisca/i, /Antonio/i, /Thalita/i, /Luciana/i, /Felipe/i]; /* ordem pedida dentro do mesmo nível */
 const TAG = ['robótica', 'antiga do Windows', '', 'Apple', 'Apple aprimorada', '', 'neural do Edge'];
 function nomeCurto(n) { return String(n || '').replace(/^Microsoft\s+/i, '').replace(/\s*Online\s*\(Natural\)/i, '').replace(/\s+-\s+.*$/, '').replace(/\s+Desktop\b/i, '').replace(/\s*\((?:Portugu[eê]s|Portuguese)\s*\([^)]*\)\)\s*$/i, '').replace(/Multilingual$/i, ' multilíngue').trim(); }
+/* 5.0a.3: voz por líder. No modo Automática, as falas de líder (chave 'sala-<raça>', ou a raça no 4º argumento de A.say) preferem uma voz do gênero
+   de quem fala, mas só entre as vozes do mesmo nível da melhor voz do aparelho (mesmo nível de qualidade e mesmo português, do Brasil ou de Portugal):
+   nunca desce de nível para acertar o gênero; sem voz do gênero nesse nível, fala a melhor. Locutor e unidades seguem com a Automática, e a voz
+   escolhida em Ajustes vale para todas as falas. O gênero da voz sai destas listas de nomes (as vozes em português que os navegadores trazem): neurais
+   do Edge (Francisca, Thalita / Antonio; de Portugal, Raquel e Fernanda / Duarte; e as do Azure que o Edge às vezes lista), antigas do Windows (Maria,
+   Heloisa, Hélia / Daniel), Apple (Luciana, Fernanda, Joana, Catarina / Felipe; as "novidades" Flo, Sandy, Shelley, Vovó, Grandma / Eddy, Reed, Rocko,
+   Vovô, Grandpa) e a Google português do Brasil, que é feminina. Voz fora das listas (Android, Samsung, eSpeak) fica sem gênero e nunca é escolhida por ele. */
+const GENERO_LIDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* Barão-Forja, Vesper Ísk, Sylvia Oriel, Zayin Coral, Oru Voraz */
+const VOZ_F = /(^|[\s(])(Francisca|Thalita(?:Multilingual)?|Raquel|Fernanda|Maria|Heloisa|H[eé]lia|Luciana|Joana|Catarina|Brenda|Elza|Giovanna|Leila|Let[ií]cia|Manuela|Yara|Flo|Sandy|Shelley|Vov[óo]|Grandma)(?![a-z])|^Google portugu[eê]s/i;
+const VOZ_M = /(^|[\s(])(Ant[oô]nio(?:Multilingual)?|Duarte|Daniel|Felipe|Donato|F[aá]bio|Humberto|J[uú]lio|Nicolau|Val[eé]rio|Macerio(?:Multilingual)?|Ricardo|Cristiano|Eddy|Reed|Rocko|Vovô|Grandpa)(?![a-z])/i;
+function generoVoz(v) { const n = String((v && v.name) || '').replace(/^Microsoft\s+/i, ''); return VOZ_F.test(n) ? 'f' : VOZ_M.test(n) ? 'm' : null; }
 let RANK = null, RANK_T = 0; const RUIM = new Set(); /* vozes que falharam nesta sessão (voz online sem rede, por exemplo) */
 function ranking() {
   if (RANK && performance.now() - RANK_T < 5000) return RANK; if (!temFala()) return [];
   let vs = []; try { vs = speechSynthesis.getVoices() || []; } catch (e) {}
   const r = []; vs.forEach((v, i) => { const lang = String(v.lang || '').replace('_', '-'); const br = /^pt-BR$/i.test(lang); if (!br && !/^pt(-|$)/i.test(lang)) return;
     const nv = nivel(v), pi = PREF.findIndex(re => re.test(v.name || '')); const nota = (nv > 0 ? 2000 : 0) + (br ? 1000 : 0) + nv * 100 + (pi >= 0 ? 50 - pi * 5 : 0) + (/Premium/i.test((v.name || '') + ' ' + (v.voiceURI || '')) ? 2 : 0) + (v.default ? 1 : 0);
-    r.push({ v, id: vozId(v), nota, nivel: nv, br, i, rotulo: nomeCurto(v.name) + (TAG[nv] ? ' · ' + (nv === 4 && /Aprimorad|Enhanced|Premium|Melhorad/i.test(v.name || '') ? 'Apple' : TAG[nv]) : '') + (br ? '' : ' · Portugal') }); });
+    r.push({ v, id: vozId(v), nota, nivel: nv, br, i, genero: generoVoz(v) /* 5.0a.3 */, rotulo: nomeCurto(v.name) + (TAG[nv] ? ' · ' + (nv === 4 && /Aprimorad|Enhanced|Premium|Melhorad/i.test(v.name || '') ? 'Apple' : TAG[nv]) : '') + (br ? '' : ' · Portugal') }); });
   r.sort((a, b) => b.nota - a.nota || a.i - b.i); if (vs.length) { RANK = r; RANK_T = performance.now(); } return r;
 }
-function pickVoice(id) { const r = ranking(), want = id != null ? id : A.voz; if (want) { const f = r.find(x => x.id === want && !RUIM.has(x.id)); if (f) return f.v; } const b = r.find(x => !RUIM.has(x.id)); return b ? b.v : null; }
+function pickVoice(id, genero) { const r = ranking(), want = id != null ? id : A.voz; if (want) { const f = r.find(x => x.id === want && !RUIM.has(x.id)); if (f) return f.v; } const b = r.find(x => !RUIM.has(x.id));
+  if (b && genero && b.genero !== genero) { const g = r.find(x => !RUIM.has(x.id) && x.nivel === b.nivel && x.br === b.br && x.genero === genero); if (g) return g.v; } /* 5.0a.3: fala de líder: a voz do gênero, só no nível da melhor */
+  return b ? b.v : null; }
 /* 5.0a.2: falas por tipo — intervalo mínimo para repetir a mesma fala (s) e prioridade. A maior interrompe a menor (o perigo corta "Unidade pronta";
    uma fala de líder ou o "Ouvir" corta a anterior do mesmo tipo); avisos de rotina (unidade, obra, pesquisa) guardam 3 s entre si e não fazem fila: com a voz ocupada,
    ficam de fora; o resto espera numa fila de uma fala só, que é descartada se envelhecer 4 s. A legenda segue a mesma decisão. */
@@ -95,7 +108,7 @@ function voiceHook(u, text, c) { const ev = (tipo, i, n) => { try { window.dispa
   u.onstart = () => ev('inicio'); u.onboundary = e => { if (!e.name || e.name === 'word') ev('palavra', e.charIndex, e.charLength); }; u.onend = () => { ev('fim'); acabou(c); }; u.onerror = e => { ev('fim'); falhou(c, e); }; }
 function comecar(text, d, voz, tentativa) {
   let u; try { u = new SpeechSynthesisUtterance(text); } catch (e) { cur = null; return false; }
-  const v = voz || pickVoice(); if (v) { try { u.voice = v; } catch (e) {} } u.lang = (v && v.lang) || 'pt-BR'; u.pitch = 1; u.rate = d.p === 3 ? 1.05 : 1; u.volume = 0.9; /* 5.0a.2: tom natural (antes 0.85 e 1.05) */
+  const v = voz || pickVoice(null, d.genero) /* 5.0a.3: d.genero = gênero do líder que fala */; if (v) { try { u.voice = v; } catch (e) {} } u.lang = (v && v.lang) || 'pt-BR'; u.pitch = 1; u.rate = d.p === 3 ? 1.05 : 1; u.volume = 0.9; /* 5.0a.2: tom natural (antes 0.85 e 1.05) */
   const c = cur = { u, p: d.p, tipo: d.tipo, text, d, tentativa: tentativa || 0, fim: performance.now() + 3000 + text.length * 150 }; voiceHook(u, text, c); A.fala = u; /* referência viva: sem ela o Chrome pode perder o onend */
   try { if (speechSynthesis.paused) speechSynthesis.resume(); speechSynthesis.speak(u); } catch (e) { cur = null; return false; }
   return true;
@@ -117,8 +130,9 @@ function falar(text, d, voz) {
   return comecar(text, d, voz);
 }
 A.onSay = null; /* 5.0b: legendas — cada fala aceita também vai para A.onSay(texto, chave), que a Interface 3.0 mostra com o retrato do líder (mesmo com a voz desligada) */
-A.say = function (text, key, cooldown) {
+A.say = function (text, key, cooldown, quem) { /* 5.0a.3: quem = raça do líder que fala (a chave 'sala-<raça>' da Sala de Comando já diz quem é) */
   key = key || text; const now = performance.now(); const d = decide(key, cooldown, now); if (!d) return false;
+  { const lid = quem || (/^sala-([a-z]+)$/.exec(key) || [])[1]; if (lid && GENERO_LIDER[lid]) d.genero = GENERO_LIDER[lid]; } /* 5.0a.3 */
   if (A.voice && temFala() && !falar(text, d)) return false;
   ultima[key] = now; if (d.p === 1) ultimaRotina = now;
   if (A.onSay) { try { A.onSay(text, key); } catch (e) {} }
@@ -152,6 +166,8 @@ function preencher(box) {
 }
 A.vozes = () => ranking().map(x => ({ id: x.id, rotulo: x.rotulo, nivel: x.nivel, br: x.br }));
 A.vozAtual = () => { const v = temFala() ? pickVoice() : null; return v ? { id: vozId(v), nome: v.name } : null; };
+A.vozDoLider = raca => { const v = temFala() ? pickVoice(null, GENERO_LIDER[raca]) : null; return v ? { id: vozId(v), nome: v.name, genero: generoVoz(v) } : null; }; /* 5.0a.3: diagnóstico e testes */
+A.generoVoz = generoVoz; A.GENERO_LIDER = GENERO_LIDER; /* 5.0a.3 */
 A.setVoz = function (id) { A.voz = id || ''; const f = ranking().find(x => x.id === A.voz); A.vozNome = f ? nomeCurto(f.v.name) : ''; save(); UIS.forEach(preencher); };
 A.ouvir = function (id) { if (!temFala()) return false; const sid = id != null ? id : A.voz, f = sid ? ranking().find(x => x.id === sid) : null; return falar(AMOSTRA, { tipo: 'sistema', p: 4 }, f ? f.v : null); };
 A.vozUI = function (box) { if (!box || box.__voz) return; box.__voz = 1; UIS.push(box); const sel = box.querySelector('[data-voz-sel]'), bt = box.querySelector('[data-voz-ouvir]');

@@ -1,7 +1,7 @@
 # Galeria v5 (arte 3D): monta dist/identidade-visual.html com as imagens de dist/arte3d/*.jpg (tools/arte3d-render.cjs). Uso: python3 tools/galeria.py
 import base64, os
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RACES=[('vehnar','Consórcio Vehnar','Vehnar','Barão-Forja','#FF7733','indústria'),('erevane','Erevane','Erevane','Vesper Ísk','#33FFD0','furtividade'),('tessara','Tessara','Tessara','Sylva Oriel','#55E68A','adaptação'),('quorith','Coro Quorith','Quorith','Zayin Coral','#B388FF','sincronia'),('vorag','Prole Vorag','Vorag','Oru Voraz','#E6455A','enxame')]
+RACES=[('vehnar','Consórcio Vehnar','Vehnar','Barão-Forja','#FF7733','indústria'),('erevane','Erevane','Erevane','Vesper Ísk','#33FFD0','furtividade'),('tessara','Tessara','Tessara','Sylvia Oriel','#55E68A','adaptação'),('quorith','Coro Quorith','Quorith','Zayin Coral','#B388FF','sincronia'),('vorag','Prole Vorag','Vorag','Oru Voraz','#E6455A','enxame')]  # 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder)
 def img(name, cls='art'):
     with open(f'{ROOT}/dist/arte3d/{name}.jpg','rb') as f: return f'<img class="{cls}" src="data:image/jpeg;base64,{base64.b64encode(f.read()).decode()}" alt="">'
 css='''<title>Galeria Aether Rift</title>

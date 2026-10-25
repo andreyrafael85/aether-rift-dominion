@@ -1,6 +1,6 @@
 {
-  "nota": "5.0a.2: as 12 falas representativas da avaliação das vozes neurais (tools/vozes/gerar.py). Avisos do jogo, respostas de unidade e duas falas de dois líderes, com nomes e palavras do jogo.",
-  "vocabulario": "Fenda, Núcleo, Éter, Vehnar, Kessari, Barão-Forja, Sylva Oriel, Oriel, Tessara, superarma, comandante",
+  "nota": "5.0a.2: as 12 falas representativas da avaliação das vozes neurais (tools/vozes/gerar.py). Avisos do jogo, respostas de unidade e duas falas de dois líderes, com nomes e palavras do jogo. 2ª rodada (24/10/2026): a líder da Tessara passa a ser Sylvia Oriel.",
+  "vocabulario": "Fenda, Núcleo, Éter, Vehnar, Kessari, Barão-Forja, Sylvia Oriel, Oriel, Tessara, Vesper Ísk, Zayin Coral, Coro, Oru Voraz, Velk, superarma, comandante",
   "falas": [
     { "id": "01-unidade-pronta", "tipo": "aviso", "quem": "locutor", "texto": "Unidade pronta." },
     { "id": "02-construcao-concluida", "tipo": "aviso", "quem": "locutor", "texto": "Construção concluída." },
@@ -12,7 +12,7 @@
     { "id": "08-unidade-atacar", "tipo": "unidade", "quem": "ao receber ordem de ataque", "texto": "Alvo marcado. Atacando!" },
     { "id": "09-barao-forja-1", "tipo": "lider", "quem": "Barão-Forja (Vehnar)", "texto": "Barão-Forja na linha. As fornalhas de Kessari estão acesas, comandante." },
     { "id": "10-barao-forja-2", "tipo": "lider", "quem": "Barão-Forja (Vehnar)", "texto": "A Fenda se abriu. Ergam o Núcleo e não deixem um parafuso Vehnar para trás." },
-    { "id": "11-sylva-oriel-1", "tipo": "lider", "quem": "Sylva Oriel (Tessara)", "texto": "Sylva Oriel. Oriel cresce. E quem resiste vira adubo." },
-    { "id": "12-sylva-oriel-2", "tipo": "lider", "quem": "Sylva Oriel (Tessara)", "texto": "Sinto o Éter da Fenda nas raízes. O Núcleo deles vai murchar." }
+    { "id": "11-sylvia-oriel-1", "tipo": "lider", "quem": "Sylvia Oriel (Tessara)", "texto": "Sylvia Oriel. Oriel cresce. E quem resiste vira adubo." },
+    { "id": "12-sylvia-oriel-2", "tipo": "lider", "quem": "Sylvia Oriel (Tessara)", "texto": "Sinto o Éter da Fenda nas raízes. O Núcleo deles vai murchar." }
   ]
 }

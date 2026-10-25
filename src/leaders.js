@@ -29,13 +29,15 @@ B.erevane = () => { const m = M(); const bands = ['#2a4a66', '#33587a', '#3b6a8a
   m.box(5, 4, 14, 2, 10, 1, '#071017'); m.box(5, 4, 17, 2, 10, 1, '#071017');
   m.box(-1, 2, 20, 1, 1, 1, '#9fe8ff', null, true); m.box(2, 14, 21, 1, 1, 1, '#9fe8ff', null, true); // brilhos iridescentes
   return m; };
-// ---- Tessara: Sylva Oriel — cabeça bulbosa, frondes, seiva âmbar
+// ---- Tessara: Sylvia Oriel — cabeça bulbosa, frondes, seiva âmbar (5.0a.3: era Sylva; cílios, lábios cor de amora, brincos de semente e mechas)
 B.tessara = () => { const m = M(); const g = '#49a86a', gd = '#2f7a4a', amber = '#e6b85c', eye = '#7fffb0';
   m.cyl(0, 9, 0, 9, 4, gd); m.cyl(0, 9, 4, 5.5, 3, gd);         // ombros orgânicos e pescoço
   m.box(-2, 7, 5, 4, 4, 2, amber, null, true);                   // seiva no peito
   m.sphere(0, 9, 14, 6.5, g); m.sphere(0, 9, 11.5, 5.5, gd);     // cabeça com parte de baixo escura
   m.sphere(5.5, 6, 15, 1.6, eye, true); m.sphere(5.5, 12, 15, 1.6, eye, true); // olhos grandes
-  m.box(6, 8, 12, 1, 2, 1, amber, null, true);                   // boca-núcleo
+  m.box(6, 7, 12, 1, 4, 1, '#9a2a5e');                           /* 5.0a.3: lábios cor de amora (era a boca-núcleo âmbar, 2 de largura) */
+  m.box(6, 4, 17, 1, 4, 1, '#122016'); m.box(6, 11, 17, 1, 4, 1, '#122016'); m.box(5, 3, 18, 1, 1, 1, '#122016'); m.box(5, 15, 18, 1, 1, 1, '#122016'); /* 5.0a.3: cílios com a ponta para fora */
+  m.box(3, 2, 9, 1, 1, 2, amber, null, true); m.box(3, 15, 9, 1, 1, 2, amber, null, true); m.box(-1, 2, 6, 2, 1, 12, gd); m.box(-1, 15, 6, 2, 1, 12, gd); /* 5.0a.3: brincos de semente e mechas que caem dos lados */
   for (const [fx, fy, h] of [[-3, 4, 8], [0, 9, 10], [-2, 14, 7], [3, 6, 6], [2, 12, 6]]) { m.box(fx, fy, 20, 1, 1, h, g); m.box(fx, fy, 20 + h, 1, 1, 1, amber, null, true); } // frondes com ponta âmbar
   return m; };
 // ---- Quorith: Zayin Coral — octaedro de cristal sólido flutuando sobre um anel

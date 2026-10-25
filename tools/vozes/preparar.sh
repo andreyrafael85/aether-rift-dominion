@@ -9,11 +9,11 @@ mkdir -p "$T/cache/hf" "$T/cache/xdg" "$T/tmp" "$T/modelos/piper" "$T/modelos/ko
 export HF_HOME="$T/cache/hf" XDG_CACHE_HOME="$T/cache/xdg" TORCH_HOME="$T/cache/torch" TMPDIR="$T/tmp" PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
 [ -x "$T/venv/bin/python" ] || python3 -m venv "$T/venv"
 PY="$T/venv/bin/python"
-"$PY" -m pip install -q --upgrade pip wheel setuptools
+"$PY" -m pip install -q --upgrade pip wheel "setuptools<81"  # o pyworld ainda importa pkg_resources (saiu do setuptools 81)
 # torch só de CPU (o pacote padrão do PyPI traz as bibliotecas CUDA, ~2,5 GB a mais)
 "$PY" -m pip install -q torch --index-url https://download.pytorch.org/whl/cpu
 # Kokoro-82M (pesos Apache-2.0; G2P misaki + espeak-ng embutido no espeakng-loader), Piper (vozes ONNX), áudio e Whisper (conferência por transcrição)
-"$PY" -m pip install -q "kokoro>=0.9.4" soundfile numpy piper-tts imageio-ffmpeg faster-whisper
+"$PY" -m pip install -q "kokoro>=0.9.4" soundfile numpy piper-tts imageio-ffmpeg faster-whisper pyworld scipy praat-parselmouth  # caráter das Raças assado (2ª rodada): scipy (BSD), praat-parselmouth (GPL-3.0, PSOLA do Vorag), pyworld (MIT, medido e não usado)
 # modelos: Kokoro v1.0 (hexgrad/Kokoro-82M) e as vozes pt_BR do Piper (rhasspy/piper-voices), com o MODEL_CARD de cada uma
 HF=https://huggingface.co
 get() { if [ ! -s "$2" ]; then curl -sSfL "$1" -o "$2.part" && mv -f "$2.part" "$2"; fi; }

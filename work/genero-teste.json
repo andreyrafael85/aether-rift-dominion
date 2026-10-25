@@ -1,0 +1,832 @@
+{
+  "quando": "2026-10-25T01:53:48.491Z",
+  "aparelhos": [
+    {
+      "id": "edge",
+      "nome": "Edge no Windows 11",
+      "lideres": {
+        "Sylvia Oriel": {
+          "aceita": true,
+          "voz": "Microsoft Francisca Online (Natural) - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-tessara"
+          ],
+          "pitch": 1
+        },
+        "Barão-Forja": {
+          "aceita": true,
+          "voz": "Microsoft Antonio Online (Natural) - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vehnar"
+          ],
+          "pitch": 1
+        },
+        "Vesper Ísk": {
+          "aceita": true,
+          "voz": "Microsoft Antonio Online (Natural) - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-erevane"
+          ],
+          "pitch": 1
+        },
+        "Zayin Coral": {
+          "aceita": true,
+          "voz": "Microsoft Antonio Online (Natural) - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-quorith"
+          ],
+          "pitch": 1
+        },
+        "Oru Voraz": {
+          "aceita": true,
+          "voz": "Microsoft Antonio Online (Natural) - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vorag"
+          ],
+          "pitch": 1
+        }
+      },
+      "erros": [],
+      "locutor": {
+        "aceita": true,
+        "voz": "Microsoft Francisca Online (Natural) - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,fim",
+        "legendas": [
+          "built"
+        ],
+        "pitch": 1
+      },
+      "alerta": {
+        "aceita": true,
+        "voz": "Microsoft Francisca Online (Natural) - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "escolhida": {
+        "alvo": "Antonio · neural do Edge",
+        "sylvia": "Microsoft Antonio Online (Natural) - Portuguese (Brazil)",
+        "locutor": "Microsoft Antonio Online (Natural) - Portuguese (Brazil)"
+      },
+      "voltou": "Microsoft Francisca Online (Natural) - Portuguese (Brazil)",
+      "ok": true,
+      "falhas": []
+    },
+    {
+      "id": "edge-sem-rede",
+      "nome": "Edge no Windows 11, sem internet",
+      "lideres": {
+        "Sylvia Oriel": {
+          "aceita": true,
+          "voz": "Microsoft Maria - Portuguese (Brazil)",
+          "tentativas": 2,
+          "eventos": "fim,inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-tessara"
+          ],
+          "pitch": 1
+        },
+        "Barão-Forja": {
+          "aceita": true,
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vehnar"
+          ],
+          "pitch": 1
+        },
+        "Vesper Ísk": {
+          "aceita": true,
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-erevane"
+          ],
+          "pitch": 1
+        },
+        "Zayin Coral": {
+          "aceita": true,
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-quorith"
+          ],
+          "pitch": 1
+        },
+        "Oru Voraz": {
+          "aceita": true,
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vorag"
+          ],
+          "pitch": 1
+        }
+      },
+      "erros": [],
+      "locutor": {
+        "aceita": true,
+        "voz": "Microsoft Maria - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,fim",
+        "legendas": [
+          "built"
+        ],
+        "pitch": 1
+      },
+      "alerta": {
+        "aceita": true,
+        "voz": "Microsoft Maria - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "ok": true,
+      "falhas": []
+    },
+    {
+      "id": "chrome-win",
+      "nome": "Chrome no Windows 11",
+      "lideres": {
+        "Sylvia Oriel": {
+          "aceita": true,
+          "voz": "Google português do Brasil",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-tessara"
+          ],
+          "pitch": 1
+        },
+        "Barão-Forja": {
+          "aceita": true,
+          "voz": "Google português do Brasil",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vehnar"
+          ],
+          "pitch": 1
+        },
+        "Vesper Ísk": {
+          "aceita": true,
+          "voz": "Google português do Brasil",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-erevane"
+          ],
+          "pitch": 1
+        },
+        "Zayin Coral": {
+          "aceita": true,
+          "voz": "Google português do Brasil",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-quorith"
+          ],
+          "pitch": 1
+        },
+        "Oru Voraz": {
+          "aceita": true,
+          "voz": "Google português do Brasil",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vorag"
+          ],
+          "pitch": 1
+        }
+      },
+      "erros": [],
+      "locutor": {
+        "aceita": true,
+        "voz": "Google português do Brasil",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,fim",
+        "legendas": [
+          "built"
+        ],
+        "pitch": 1
+      },
+      "alerta": {
+        "aceita": true,
+        "voz": "Google português do Brasil",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "escolhida": {
+        "alvo": "Daniel · antiga do Windows",
+        "sylvia": "Microsoft Daniel - Portuguese (Brazil)",
+        "locutor": "Microsoft Daniel - Portuguese (Brazil)"
+      },
+      "voltou": "Google português do Brasil",
+      "ok": true,
+      "falhas": []
+    },
+    {
+      "id": "firefox-win",
+      "nome": "Firefox no Windows 11",
+      "lideres": {
+        "Sylvia Oriel": {
+          "aceita": true,
+          "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-tessara"
+          ],
+          "pitch": 1
+        },
+        "Barão-Forja": {
+          "aceita": true,
+          "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vehnar"
+          ],
+          "pitch": 1
+        },
+        "Vesper Ísk": {
+          "aceita": true,
+          "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-erevane"
+          ],
+          "pitch": 1
+        },
+        "Zayin Coral": {
+          "aceita": true,
+          "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-quorith"
+          ],
+          "pitch": 1
+        },
+        "Oru Voraz": {
+          "aceita": true,
+          "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vorag"
+          ],
+          "pitch": 1
+        }
+      },
+      "erros": [],
+      "locutor": {
+        "aceita": true,
+        "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,fim",
+        "legendas": [
+          "built"
+        ],
+        "pitch": 1
+      },
+      "alerta": {
+        "aceita": true,
+        "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "ok": true,
+      "falhas": []
+    },
+    {
+      "id": "iphone",
+      "nome": "iPhone (Safari, iOS 18)",
+      "lideres": {
+        "Sylvia Oriel": {
+          "aceita": true,
+          "voz": "Luciana",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-tessara"
+          ],
+          "pitch": 1
+        },
+        "Barão-Forja": {
+          "aceita": true,
+          "voz": "Felipe",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vehnar"
+          ],
+          "pitch": 1
+        },
+        "Vesper Ísk": {
+          "aceita": true,
+          "voz": "Felipe",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-erevane"
+          ],
+          "pitch": 1
+        },
+        "Zayin Coral": {
+          "aceita": true,
+          "voz": "Felipe",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-quorith"
+          ],
+          "pitch": 1
+        },
+        "Oru Voraz": {
+          "aceita": true,
+          "voz": "Felipe",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vorag"
+          ],
+          "pitch": 1
+        }
+      },
+      "erros": [],
+      "locutor": {
+        "aceita": true,
+        "voz": "Luciana",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,fim",
+        "legendas": [
+          "built"
+        ],
+        "pitch": 1
+      },
+      "alerta": {
+        "aceita": true,
+        "voz": "Luciana",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "escolhida": {
+        "alvo": "Felipe · Apple",
+        "sylvia": "Felipe",
+        "locutor": "Felipe"
+      },
+      "voltou": "Luciana",
+      "ok": true,
+      "falhas": []
+    },
+    {
+      "id": "iphone-aprimorada",
+      "nome": "iPhone com a Luciana Aprimorada baixada",
+      "lideres": {
+        "Sylvia Oriel": {
+          "aceita": true,
+          "voz": "Luciana (Aprimorada)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-tessara"
+          ],
+          "pitch": 1
+        },
+        "Barão-Forja": {
+          "aceita": true,
+          "voz": "Luciana (Aprimorada)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vehnar"
+          ],
+          "pitch": 1
+        },
+        "Vesper Ísk": {
+          "aceita": true,
+          "voz": "Luciana (Aprimorada)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-erevane"
+          ],
+          "pitch": 1
+        },
+        "Zayin Coral": {
+          "aceita": true,
+          "voz": "Luciana (Aprimorada)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-quorith"
+          ],
+          "pitch": 1
+        },
+        "Oru Voraz": {
+          "aceita": true,
+          "voz": "Luciana (Aprimorada)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vorag"
+          ],
+          "pitch": 1
+        }
+      },
+      "erros": [],
+      "locutor": {
+        "aceita": true,
+        "voz": "Luciana (Aprimorada)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,fim",
+        "legendas": [
+          "built"
+        ],
+        "pitch": 1
+      },
+      "alerta": {
+        "aceita": true,
+        "voz": "Luciana (Aprimorada)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "escolhida": {
+        "alvo": "Felipe · Apple",
+        "sylvia": "Felipe",
+        "locutor": "Felipe"
+      },
+      "voltou": "Luciana (Aprimorada)",
+      "ok": true,
+      "falhas": []
+    },
+    {
+      "id": "sem-voz",
+      "nome": "Navegador sem voz em português (Linux)",
+      "lideres": {
+        "Sylvia Oriel": {
+          "aceita": true,
+          "voz": null,
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-tessara"
+          ],
+          "pitch": 1
+        },
+        "Barão-Forja": {
+          "aceita": true,
+          "voz": null,
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vehnar"
+          ],
+          "pitch": 1
+        },
+        "Vesper Ísk": {
+          "aceita": true,
+          "voz": null,
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-erevane"
+          ],
+          "pitch": 1
+        },
+        "Zayin Coral": {
+          "aceita": true,
+          "voz": null,
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-quorith"
+          ],
+          "pitch": 1
+        },
+        "Oru Voraz": {
+          "aceita": true,
+          "voz": null,
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vorag"
+          ],
+          "pitch": 1
+        }
+      },
+      "erros": [],
+      "locutor": {
+        "aceita": true,
+        "voz": null,
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,fim",
+        "legendas": [
+          "built"
+        ],
+        "pitch": 1
+      },
+      "alerta": {
+        "aceita": true,
+        "voz": null,
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "ok": true,
+      "falhas": []
+    },
+    {
+      "id": "windows-antigo",
+      "nome": "Windows antigo (só as vozes locais)",
+      "lideres": {
+        "Sylvia Oriel": {
+          "aceita": true,
+          "voz": "Microsoft Maria - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-tessara"
+          ],
+          "pitch": 1
+        },
+        "Barão-Forja": {
+          "aceita": true,
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vehnar"
+          ],
+          "pitch": 1
+        },
+        "Vesper Ísk": {
+          "aceita": true,
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-erevane"
+          ],
+          "pitch": 1
+        },
+        "Zayin Coral": {
+          "aceita": true,
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-quorith"
+          ],
+          "pitch": 1
+        },
+        "Oru Voraz": {
+          "aceita": true,
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vorag"
+          ],
+          "pitch": 1
+        }
+      },
+      "erros": [],
+      "locutor": {
+        "aceita": true,
+        "voz": "Microsoft Maria - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,fim",
+        "legendas": [
+          "built"
+        ],
+        "pitch": 1
+      },
+      "alerta": {
+        "aceita": true,
+        "voz": "Microsoft Maria - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "escolhida": {
+        "alvo": "Daniel · antiga do Windows",
+        "sylvia": "Microsoft Daniel - Portuguese (Brazil)",
+        "locutor": "Microsoft Daniel - Portuguese (Brazil)"
+      },
+      "voltou": "Microsoft Maria - Portuguese (Brazil)",
+      "ok": true,
+      "falhas": []
+    },
+    {
+      "id": "iphone-dois-aprimorados",
+      "nome": "iPhone com Luciana e Felipe aprimorados",
+      "lideres": {
+        "Sylvia Oriel": {
+          "aceita": true,
+          "voz": "Luciana (Aprimorada)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-tessara"
+          ],
+          "pitch": 1
+        },
+        "Barão-Forja": {
+          "aceita": true,
+          "voz": "Felipe (Aprimorado)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vehnar"
+          ],
+          "pitch": 1
+        },
+        "Vesper Ísk": {
+          "aceita": true,
+          "voz": "Felipe (Aprimorado)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-erevane"
+          ],
+          "pitch": 1
+        },
+        "Zayin Coral": {
+          "aceita": true,
+          "voz": "Felipe (Aprimorado)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-quorith"
+          ],
+          "pitch": 1
+        },
+        "Oru Voraz": {
+          "aceita": true,
+          "voz": "Felipe (Aprimorado)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vorag"
+          ],
+          "pitch": 1
+        }
+      },
+      "erros": [],
+      "locutor": {
+        "aceita": true,
+        "voz": "Luciana (Aprimorada)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,fim",
+        "legendas": [
+          "built"
+        ],
+        "pitch": 1
+      },
+      "alerta": {
+        "aceita": true,
+        "voz": "Luciana (Aprimorada)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "escolhida": {
+        "alvo": "Felipe (Aprimorado) · Apple",
+        "sylvia": "Felipe (Aprimorado)",
+        "locutor": "Felipe (Aprimorado)"
+      },
+      "voltou": "Luciana (Aprimorada)",
+      "ok": true,
+      "falhas": []
+    },
+    {
+      "id": "chrome-sem-rede",
+      "nome": "Chrome no Windows 11, sem internet",
+      "lideres": {
+        "Sylvia Oriel": {
+          "aceita": true,
+          "voz": "Microsoft Maria - Portuguese (Brazil)",
+          "tentativas": 2,
+          "eventos": "fim,inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-tessara"
+          ],
+          "pitch": 1
+        },
+        "Barão-Forja": {
+          "aceita": true,
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vehnar"
+          ],
+          "pitch": 1
+        },
+        "Vesper Ísk": {
+          "aceita": true,
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-erevane"
+          ],
+          "pitch": 1
+        },
+        "Zayin Coral": {
+          "aceita": true,
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-quorith"
+          ],
+          "pitch": 1
+        },
+        "Oru Voraz": {
+          "aceita": true,
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vorag"
+          ],
+          "pitch": 1
+        }
+      },
+      "erros": [],
+      "locutor": {
+        "aceita": true,
+        "voz": "Microsoft Maria - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,fim",
+        "legendas": [
+          "built"
+        ],
+        "pitch": 1
+      },
+      "alerta": {
+        "aceita": true,
+        "voz": "Microsoft Maria - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "ok": true,
+      "falhas": []
+    }
+  ],
+  "navegador": null
+}
