@@ -275,12 +275,14 @@ function create(THREE, scene, env) {
   const ST = { on: false, owns: true, onStrike: null }; /* owns: o render3d desliga o disco, os flocos e os sprites antigos */
   const renderer = env.renderer; const FX = env.FX || null; const isTouch = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
   const H = (x, y) => env.H(x, y);
+  const M5 = !!(ARD.m5 && ARD.m5.active && ARD.m5.active() && ARD.m5.tempestadeVolume); /* 5.0b: Motor 5 — os quatro materiais em TSL (src/m5/tempestade.js); fases, raios, chuva e ruído iguais */
   /* estado da tempestade na tela */
   const S = { has: false, x: 0, y: 0, r: 420, G: 0, gMin: 0, gMax: 0, phase: '', t: 0, tSeen: -1, tAt: 0, warn: 30, dur: 90, endAt: 0, inEnd: false, ts: 0, tsEnd: 0,
     form: 0, lift: 0, glow: 1, nextStrike: 0, nextIC: 0, inView: false, pend: null, burst: false, forceStrike: null, endShift: null };
   /* ruído 3D: provisório até as fatias terminarem */
   const NG = noiseMaker(NN);
   const tmp3 = new THREE.Data3DTexture(new Uint8Array(8 * 2).fill(128), 2, 2, 2); tmp3.format = THREE.RGFormat; tmp3.needsUpdate = true;
+  if (M5) { tmp3.minFilter = tmp3.magFilter = THREE.LinearFilter; tmp3.wrapS = tmp3.wrapT = tmp3.wrapR = THREE.RepeatWrapping; tmp3.unpackAlignment = 1; tmp3.generateMipmaps = false; } /* 5.0b: no Motor 5 o amostrador nasce com o provisório: com o mesmo filtro e a mesma repetição do ruído de verdade (senão a troca fica com o grampo na borda e o volume risca) */
   let noiseTex = null;
   function noiseReady() { if (noiseTex) return true; if (!NG.done()) return false; const t = new THREE.Data3DTexture(NG.data, NN, NN, NN); t.format = THREE.RGFormat; t.type = THREE.UnsignedByteType; t.minFilter = t.magFilter = THREE.LinearFilter; t.wrapS = t.wrapT = t.wrapR = THREE.RepeatWrapping; t.unpackAlignment = 1; t.generateMipmaps = false; t.needsUpdate = true; noiseTex = t; for (const u of [UV, UR]) u.uN.value = t; return true; }
   /* mapa de alturas da área */
@@ -288,43 +290,45 @@ function create(THREE, scene, env) {
   const hmF = new Float32Array(HM * HM);
   const hm4 = new THREE.Vector4(1 / 1024, 0, 1, FLOOR);
   /* ---------- volume ---------- */
-  const UV = { uN: { value: tmp3 }, uHm: { value: hmTex }, uC: { value: new THREE.Vector4() }, uHm4: { value: hm4 }, uA: { value: new THREE.Vector4() }, uB: { value: new THREE.Vector4(0, 0, 0, 1) }, uD: { value: new THREE.Vector4(20, 0, 0, 0) }, uE: { value: new THREE.Vector4(0.6, 1, 0, TOP) }, uF: { value: new THREE.Vector4() }, uSunD: { value: new THREE.Vector3(-0.47, 0.64, 0.6).normalize() }, uSunC: { value: new THREE.Color(1.6, 1.45, 1.2) }, uSkyC: { value: new THREE.Color(0.6, 0.66, 0.74) }, uT: { value: 0 } };
+  const U5 = M5 ? ARD.m5.tempestadeUniforms(tmp3, hmTex, hm4) : null; /* 5.0b: as mesmas chaves em nós do TSL */
+  const UV = M5 ? U5.UV : { uN: { value: tmp3 }, uHm: { value: hmTex }, uC: { value: new THREE.Vector4() }, uHm4: { value: hm4 }, uA: { value: new THREE.Vector4() }, uB: { value: new THREE.Vector4(0, 0, 0, 1) }, uD: { value: new THREE.Vector4(20, 0, 0, 0) }, uE: { value: new THREE.Vector4(0.6, 1, 0, TOP) }, uF: { value: new THREE.Vector4() }, uSunD: { value: new THREE.Vector3(-0.47, 0.64, 0.6).normalize() }, uSunC: { value: new THREE.Color(1.6, 1.45, 1.2) }, uSkyC: { value: new THREE.Color(0.6, 0.66, 0.74) }, uT: { value: 0 } };
   const volMat = o => new THREE.RawShaderMaterial(Object.assign({ glslVersion: THREE.GLSL3, uniforms: UV, vertexShader: VOL_VS, fragmentShader: VOL_FS, transparent: true, depthWrite: false, depthTest: true, premultipliedAlpha: true, blending: THREE.CustomBlending, blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, blendEquationAlpha: THREE.AddEquation, blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneMinusSrcAlphaFactor }, o)); /* 4.3h: cor como antes (pré-multiplicada); no alfa do alvo do pós fica 1 − cobertura, que a bruma do render3d lê para não lavar a nuvem */
-  const matOut = volMat({ side: THREE.FrontSide }), matIn = volMat({ side: THREE.BackSide });
+  const matOut = M5 ? ARD.m5.tempestadeVolume(UV, THREE.FrontSide) : volMat({ side: THREE.FrontSide }), matIn = M5 ? ARD.m5.tempestadeVolume(UV, THREE.BackSide) : volMat({ side: THREE.BackSide });
   const volOut = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1, 40, 1, false).translate(0, 0.5, 0), matOut); volOut.renderOrder = 11; volOut.visible = false;
   const volIn = new THREE.Mesh(new THREE.SphereGeometry(60, 18, 12), matIn); volIn.renderOrder = 11; volIn.visible = false; volIn.frustumCulled = false;
   const setScr = function (r) { this.uniforms.uScr.value = r.getRenderTarget() === null ? 1 : 0; };
   const setScrV = r => { UV.uD.value.z = r.getRenderTarget() === null ? 1 : 0; };
-  volOut.onBeforeRender = setScrV; volIn.onBeforeRender = setScrV;
+  if (!M5) { volOut.onBeforeRender = setScrV; volIn.onBeforeRender = setScrV; } /* 5.0b: no Motor 5 a saída é linear e o renderer põe os tons */
   /* ---------- borda ---------- */
   const RS = 160, ROWS = [-46, -20, -8, -3, 0, 3, 12], RN = ROWS.length;
   const ringPos = new Float32Array((RS + 1) * RN * 3), ringU = new Float32Array((RS + 1) * RN * 3); const ringIdx = [];
   for (let i = 0; i < RS; i++) for (let j = 0; j < RN - 1; j++) { const a = i * RN + j, b = (i + 1) * RN + j; ringIdx.push(a, a + 1, b, a + 1, b + 1, b); } /* face para cima */
   const ringGeo = new THREE.BufferGeometry(); ringGeo.setAttribute('position', new THREE.BufferAttribute(ringPos, 3)); ringGeo.setAttribute('aU', new THREE.BufferAttribute(ringU, 3)); ringGeo.setIndex(ringIdx);
-  const UR = { uN: { value: tmp3 }, uK: { value: new THREE.Vector4() }, uScr: { value: 0 } };
-  const ringMat = new THREE.RawShaderMaterial({ glslVersion: THREE.GLSL3, uniforms: UR, vertexShader: RING_VS, fragmentShader: RING_FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 });
-  const ring = new THREE.Mesh(ringGeo, ringMat); ring.renderOrder = 11.5; ring.visible = false; ring.onBeforeRender = setScr.bind(ringMat);
+  const UR = M5 ? U5.UR : { uN: { value: tmp3 }, uK: { value: new THREE.Vector4() }, uScr: { value: 0 } };
+  const ringMat = M5 ? ARD.m5.tempestadeBorda(UR) : new THREE.RawShaderMaterial({ glslVersion: THREE.GLSL3, uniforms: UR, vertexShader: RING_VS, fragmentShader: RING_FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 });
+  const ring = new THREE.Mesh(ringGeo, ringMat); ring.renderOrder = 11.5; ring.visible = false; if (!M5) ring.onBeforeRender = setScr.bind(ringMat);
   /* ---------- chuva ---------- */
   const quad = new THREE.PlaneGeometry(1, 1);
   const rainGeo = new THREE.InstancedBufferGeometry(); rainGeo.index = quad.index; rainGeo.setAttribute('position', quad.attributes.position);
   { const a = new Float32Array(RAIN_N * 4); for (let i = 0; i < RAIN_N; i++) { a[i * 4] = (i + 0.5) / RAIN_N; a[i * 4 + 1] = Math.random(); a[i * 4 + 2] = Math.random(); a[i * 4 + 3] = Math.random(); } rainGeo.setAttribute('aR', new THREE.InstancedBufferAttribute(a, 4)); }
   rainGeo.instanceCount = RAIN_N;
-  const URn = { uHm: { value: hmTex }, uHm4: { value: hm4 }, uC: UV.uC, uR: { value: new THREE.Vector4() }, uT: { value: 0 }, uScr: { value: 0 } };
-  const rainMat = new THREE.RawShaderMaterial({ glslVersion: THREE.GLSL3, uniforms: URn, vertexShader: RAIN_VS, fragmentShader: RAIN_FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
-  const rain = new THREE.Mesh(rainGeo, rainMat); rain.frustumCulled = false; rain.renderOrder = 10.5; rain.visible = false; rain.onBeforeRender = setScr.bind(rainMat);
+  const URn = M5 ? U5.URn : { uHm: { value: hmTex }, uHm4: { value: hm4 }, uC: UV.uC, uR: { value: new THREE.Vector4() }, uT: { value: 0 }, uScr: { value: 0 } };
+  const rainMat = M5 ? ARD.m5.tempestadeChuva(URn) : new THREE.RawShaderMaterial({ glslVersion: THREE.GLSL3, uniforms: URn, vertexShader: RAIN_VS, fragmentShader: RAIN_FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+  const rain = new THREE.Mesh(rainGeo, rainMat); rain.frustumCulled = false; rain.renderOrder = 10.5; rain.visible = false; if (!M5) rain.onBeforeRender = setScr.bind(rainMat);
   /* ---------- raios ---------- */
   const BN = BOLT_SEG * BOLT_N; const boltGeo = new THREE.InstancedBufferGeometry(); boltGeo.index = quad.index; boltGeo.setAttribute('position', quad.attributes.position);
   const bA = new THREE.InstancedBufferAttribute(new Float32Array(BN * 4), 4), bB = new THREE.InstancedBufferAttribute(new Float32Array(BN * 4), 4), bC = new THREE.InstancedBufferAttribute(new Float32Array(BN * 4), 4);
-  const BATT = [bA, bB, bC]; for (const at of BATT) at.setUsage(THREE.DynamicDrawUsage);
+  const BATT = [bA, bB, bC]; if (!M5) for (const at of BATT) at.setUsage(THREE.DynamicDrawUsage); /* 5.0b: no Motor 5 o uso dinâmico sobe o atributo inteiro a cada desenho; com o padrão sobe só o trecho do golpe (addUpdateRange + needsUpdate) */
   boltGeo.setAttribute('aA', bA); boltGeo.setAttribute('aB', bB); boltGeo.setAttribute('aC', bC); boltGeo.instanceCount = BN;
-  const UBo = { uT: { value: 0 }, uScr: { value: 0 } };
-  const boltMat = new THREE.RawShaderMaterial({ glslVersion: THREE.GLSL3, uniforms: UBo, vertexShader: BOLT_VS, fragmentShader: BOLT_FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
-  const bolts = new THREE.Mesh(boltGeo, boltMat); bolts.frustumCulled = false; bolts.renderOrder = 12.5; bolts.visible = false; bolts.onBeforeRender = setScr.bind(boltMat);
+  const UBo = M5 ? U5.UBo : { uT: { value: 0 }, uScr: { value: 0 } };
+  const boltMat = M5 ? ARD.m5.tempestadeRaios(UBo) : new THREE.RawShaderMaterial({ glslVersion: THREE.GLSL3, uniforms: UBo, vertexShader: BOLT_VS, fragmentShader: BOLT_FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+  const bolts = new THREE.Mesh(boltGeo, boltMat); bolts.frustumCulled = false; bolts.renderOrder = 12.5; bolts.visible = false; if (!M5) bolts.onBeforeRender = setScr.bind(boltMat);
   const boltSt = []; for (let i = 0; i < BOLT_N; i++) boltSt.push({ t0: -9, life: 0, x: 0, y: 0, z: 0, gx: 0, gy: 0, k: 1, sd: 0, hits: 0, big: false });
   let boltI = 0;
-  const MESHES = [volOut, volIn, ring, rain, bolts]; const hideAll = () => { for (let i = 0; i < MESHES.length; i++) MESHES[i].visible = false; };
+  const selo = M5 ? ARD.m5.tempestadeSelo() : null; /* 5.0b: Motor 5 sem pós — devolve o alfa 1 depois da nuvem (src/m5/tempestade.js) */
+  const MESHES = M5 ? [volOut, volIn, ring, rain, bolts, selo] : [volOut, volIn, ring, rain, bolts]; const hideAll = () => { for (let i = 0; i < MESHES.length; i++) MESHES[i].visible = false; };
   /* 4.3h: compila os programas agora (RawShaderMaterial: a chave do programa não depende do pós, das luzes nem do lado), não no meio da partida */
-  try { const tmp = new THREE.Scene(); for (const m of MESHES) { m.visible = true; tmp.add(m); } renderer.compile(tmp, env.camera); } catch (err) { console.warn('[ST] compilação antecipada falhou: ' + err.message); }
+  if (!M5) try { const tmp = new THREE.Scene(); for (const m of MESHES) { m.visible = true; tmp.add(m); } renderer.compile(tmp, env.camera); } catch (err) { console.warn('[ST] compilação antecipada falhou: ' + err.message); } /* 5.0b: no Motor 5 o aquecimento da cena liga os escondidos e compila (a tempestade nasce no meio da partida sem pipeline novo) */
   for (const m of MESHES) { m.visible = false; scene.add(m); }
   const ss = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
   /* ---------- montagem por tempestade (sem alocar: só reescreve buffers) ---------- */
@@ -384,7 +388,7 @@ function create(THREE, scene, env) {
     if (!e || e.t !== 'storm') return;
     if (e.phase === 'warn' || e.phase === 'active') { if (!S.has || Math.abs(e.x - S.x) > 1 || Math.abs(e.y - S.y) > 1) { S.inEnd = false; S.has = false; } S.pend = e.phase; }
   };
-  ST.debug = { S, strike: (x, y) => { S.forceStrike = [x, y]; }, sinceEnd: t => { S.endShift = t; }, stats: () => ({ calls: MESHES.filter(m => m.visible).length, steps: UV.uD.value.x, rain: Math.round(URn.uR.value.x * RAIN_N), noise: !!noiseTex, inside: volIn.visible, form: +S.form.toFixed(2), phase: S.phase }) };
+  ST.debug = { S, UV /* 5.0b: uniforms do volume (ferramentas de teste) */, strike: (x, y) => { S.forceStrike = [x, y]; }, sinceEnd: t => { S.endShift = t; }, stats: () => ({ calls: MESHES.filter(m => m.visible).length, steps: UV.uD.value.x, rain: Math.round(URn.uR.value.x * RAIN_N), noise: !!noiseTex, inside: volIn.visible, form: +S.form.toFixed(2), phase: S.phase }) };
   /* ---------- quadro ---------- */
   const _fr = new THREE.Frustum(), _pm = new THREE.Matrix4(), _sp = new THREE.Sphere(), _sun = new THREE.Vector3(); let sunL = null, sunN = 0;
   ST.update = function (dt, time, camera, storm, sim) {
@@ -445,6 +449,7 @@ function create(THREE, scene, env) {
     const cx = camera.position.x - S.x, cz = camera.position.z + S.y, Rp = S.r * RP; const inside = cx * cx + cz * cz < (Rp + 90) * (Rp + 90) && camera.position.y < S.G + TOP + 60;
     U.uD.value.y = inside ? 1 : 0; volIn.position.copy(camera.position); volIn.updateMatrixWorld();
     volOut.visible = S.inView && !inside; volIn.visible = S.inView && inside;
+    if (selo) selo.visible = S.inView && !(ARD.m5.cur && ARD.m5.cur.post); /* 5.0b: sem o pós, o alfa da cobertura não pode chegar à tela */
     /* borda */
     ring.visible = S.inView && ringK > 0.01; UR.uK.value.set(ringK * (1 + 0.5 * night), ringW, time % 1000, -S.ts * 0.05 / TAU * 1.3);
     /* chuva */
@@ -470,5 +475,5 @@ function create(THREE, scene, env) {
   };
   return ST;
 }
-ARD.storm3d = { create };
+ARD.storm3d = { create, m5: true }; /* 5.0b: portado para o Motor 5 (src/m5/tempestade.js) */
 })(globalThis.ARD = globalThis.ARD || {});

@@ -5,7 +5,9 @@
    - cor(d, u, neb): o céu em modo espaço do world3d (nebulosa, estrelas em três camadas, faixa da galáxia e o sol sem ar), usado pelo
      M5.ceu({ espaco }) só no Cinturão (os outros mapas não pagam nada disso no shader do céu);
    - quadro(bg, fog, nt): fundo e névoa de poeira escura de espaço, os mesmos valores do SP.update do clássico.
-   O planeta gigante, os asteroides, as raízes de rocha e o redemoinho da Fenda ficam para a fase 2. Só visual: nada aqui toca a simulação. */
+   O planeta gigante, os asteroides, as raízes de rocha e o redemoinho da Fenda ficam para a fase 2. Só visual: nada aqui toca a simulação.
+   5.0b: com o space3d portado (src/space3d.js + src/m5/espaco.js) este arquivo é a base dos dois caminhos: o céu de espaço (agora com o planeta
+   gigante, que o space3d liga), a nebulosa assada, o mapa do vazio (o space3d do Motor 5 chama o mapaVazio) e o ruído (E.ruido); o quadro só vale sem o space3d. */
 (function (ARD) {
 'use strict';
 const M5 = ARD.m5 = ARD.m5 || {};
@@ -45,6 +47,7 @@ function ruido() {
   const fbm = n => Fn(([p0]) => { let p = vec3(p0), v = float(0), a = 0.5, t = 0; for (let i = 0; i < n; i++) { v = v.add(vn3(p).mul(a)); t += a; p = p.mul(2.03).add(vec3(1.7, 9.2, 4.1)); a *= 0.5; } return v.div(t); }).setLayout({ name: 'ardEspFbm' + n, type: 'float', inputs: [{ name: 'p0', type: 'vec3' }] });
   NZ = { h31, vn3, f4: fbm(4), f5: fbm(5), f6: fbm(6) }; return NZ;
 }
+E.ruido = ruido; /* 5.0b: o espaço completo (src/m5/espaco.js) usa as mesmas funções de ruído: um WGSL só para o hash e o ruído de valor */
 
 /* ---------- nebulosa assada (o BACKDROP_FS do world3d em TSL), uma vez, num cubemap ---------- */
 E.nebulosa = function (renderer, size, seed) {
@@ -66,7 +69,7 @@ E.nebulosa = function (renderer, size, seed) {
   E.nebulosaMs = Math.round(performance.now() - t0); return rt;
 };
 
-/* ---------- céu em modo espaço (o ardEspaco do world3d, sem o planeta gigante): d = direção normalizada, u = uniforms do céu ---------- */
+/* ---------- céu em modo espaço (o ardEspaco do world3d; 5.0b: com o planeta gigante do M5.espacoPlaneta): d = direção normalizada, u = uniforms do céu ---------- */
 E.cor = function (d, u, neb) {
   const L = window.TSL; const { vec3, float, floor, fract, dot, mix, smoothstep, step, pow, exp, max, min, length, fwidth, cubeTexture } = L;
   const hs3 = p => { const q = fract(p.mul(0.1031)); const q2 = q.add(dot(q, q.zyx.add(31.32))); return fract(q2.x.add(q2.y).mul(q2.z)); };
@@ -76,10 +79,11 @@ E.cor = function (d, u, neb) {
     const b = pow(h.y, 9).mul(5).add(0.22).mul(gain); const tc = mix(mix(vec3(0.7, 0.82, 1.0), vec3(1), h.z.div(0.62)), mix(vec3(1), vec3(1.0, 0.76, 0.5), h.z.sub(0.62).div(0.38)), step(0.62, h.z));
     return tc.mul(k.mul(b).mul(keep)); };
   let col = neb ? cubeTexture(neb, d).rgb.mul(u.uNight.mul(0.25).add(1)) : vec3(0.0012, 0.0018, 0.004); /* o clássico clareia a nebulosa 25% à noite (uSpaceK.x) */
+  let pm = float(1); const PLN = M5.espacoPlaneta ? M5.espacoPlaneta(d, u) : null; if (PLN) { col = mix(col.add(PLN.halo), PLN.cor.rgb, PLN.cor.a); pm = float(1).sub(PLN.cor.a); } /* 5.0b: o planeta gigante (src/m5/espaco.js; o space3d liga) tapa as estrelas e o sol */
   const bd = dot(d, vec3(0.38, 0.33, 0.865)), band = exp(bd.mul(bd).mul(-16));
   const st = star(d, 280, band.mul(0.22).add(0.05), 0.17, 0.5).add(star(d.zxy, 110, 0.035, 0.11, 1.5)).add(star(d.yzx, 560, band.mul(0.35).add(0.06), 0.2, 0.2));
-  col = col.add(st.mul(u.uNight.mul(0.5).add(0.8)));
-  const sd = max(dot(d, u.uSunDir), 0); col = col.add(u.uSunCol.mul(pow(sd, 2400).mul(36).add(pow(sd, 160).mul(0.5)).add(pow(sd, 12).mul(0.03))).mul(float(1).sub(u.uNight.mul(0.85))));
+  col = col.add(st.mul(u.uNight.mul(0.5).add(0.8)).mul(pm));
+  const sd = max(dot(d, u.uSunDir), 0); col = col.add(u.uSunCol.mul(pow(sd, 2400).mul(36).add(pow(sd, 160).mul(0.5)).add(pow(sd, 12).mul(0.03))).mul(float(1).sub(u.uNight.mul(0.85))).mul(pm));
   return col;
 };
 

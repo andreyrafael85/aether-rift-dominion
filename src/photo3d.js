@@ -23,7 +23,12 @@
    proporção muda) e lido do canvas no mesmo quadro (PNG aether-rift-AAAA-MM-DD-HHMMSS.png); no quadro seguinte tudo volta ao
    tamanho da tela e os alvos grandes são liberados.
    Custo: desligado, nada por quadro (só o atalho de teclado e o botão; o painel e os efeitos nascem na primeira entrada); ligado,
-   +2 passes (desfoque, ~7 subpasses em meia resolução; filtro, 1 passe) e nenhuma alocação por quadro. */
+   +2 passes (desfoque, ~7 subpasses em meia resolução; filtro, 1 passe) e nenhuma alocação por quadro.
+   5.0b — Motor 5 (R.m5): desfoque (dof do TSL), filtro e captura vêm de src/m5/foto.js (ARD.m5.foto), numa cadeia de pós própria com os
+   uniforms da partida, preparada na primeira entrada com aviso (depois disso nenhum pipeline nasce ao entrar, sair ou fotografar; com
+   ?m5foto=carga, na carga); a captura desenha num alvo do tamanho pedido e lê com
+   readRenderTargetPixelsAsync (o canvas não muda de tamanho); o foco por toque lê a profundidade de forma assíncrona; as sombras em
+   cascata seguem a câmera do foto (ARD.m5.foto.csm). Sem o Motor 5, tudo como na 4.3j. */
 (function (ARD) {
 'use strict';
 const DEG = Math.PI / 180;
@@ -132,6 +137,7 @@ body.touch .fo-toast{top:calc(.6rem + env(safe-area-inset-top,0px))}
 function create(ctx) {
   const THREE = window.THREE, S = ARD.sim;
   const G = ctx.G, R = ctx.R, view = ctx.view, ui = ctx.ui || null, canvas = ctx.canvas || R.canvas, net = ctx.net || null, isTouch = !!ctx.isTouch;
+  const M5R = R.m5 && ARD.m5 && ARD.m5.foto ? R.m5 : null; /* 5.0b: partida no Motor 5 (WebGPURenderer): desfoque, filtro e captura pelo src/m5/foto.js */
   const PH = { on: false, view: null, dt: 0, night: null };
   R.photo = PH;
   const btn = document.getElementById('btn-foto');
@@ -149,11 +155,13 @@ function create(ctx) {
     elev0: 0.7, az0: 0, len0: 985, warm: 0,
     cap: null, lastShot: null, keys: new Set(), ptr: new Map(), drag: null, pinch: null, lastTap: 0, lastTapX: 0, lastTapY: 0,
     occ: false, uiT: 0, uiDirty: true, saveT: 0, toastT: 0, ds: null,
+    f5: null, f5ok: false, tapN: 0, /* 5.0b: objeto do foto do Motor 5 (ARD.m5.foto.obter), aviso de pronto dado, toque em andamento */
   };
   const pcam = { x: 0, y: 0, zoom: 1, yaw: Math.PI / 4, pitch: 0.95, pitchT: 0.95 }; /* 4.3j: câmera que o R.draw usa no lugar da do jogo (alvo, distância e giro do foto) */
   const PV = { cam: pcam, sel: new Set(), hover: null, ghost: null, wallGhost: null, box: null, human: view.human, memory: view.memory, marker: null, mode: 'normal', lastAlert: null, reveal: false };
   PH.view = PV;
   const _v = new THREE.Vector3(), _w = new THREE.Vector3(), _w2 = new THREE.Vector3();
+  const _v2 = new THREE.Vector2(), _f1 = new THREE.Vector3(), _f2 = new THREE.Vector3(), _tp = new THREE.Vector3(); /* 5.0b: tamanho da tela, direção e distância do foco, origem da marcha do toque */
 
   /* ---------- relevo ---------- */
   const H = (x, y) => R.H(x, y);
@@ -197,9 +205,12 @@ function create(ctx) {
     PH.on = true; st.lookDirty = true; st.uiDirty = true;
     if (canPause()) setTime('congelado'); else st.time = 'livre';
     document.body.classList.add('foto'); st.root.hidden = false; if (btn) btn.classList.add('on');
+    if (M5R) { st.f5 = m5Obj(); st.f5ok = !!(st.f5 && st.f5.pronto); } /* 5.0b: o objeto do foto do pós atual; sem preparo (primeira entrada ou o pós mudou), prepara em alguns quadros, com aviso */
     refreshNotes(); syncUI(); guide();
-    toast(isTouch ? 'Modo Foto · um dedo orbita, dois arrastam e fazem pinça' : 'Modo Foto · arraste para orbitar · Espaço tira a foto · Esc sai', false, 2600);
+    if (M5R && !st.f5ok) toast('Preparando o Modo Foto…', false, 6000);
+    else toast(isTouch ? 'Modo Foto · um dedo orbita, dois arrastam e fazem pinça' : 'Modo Foto · arraste para orbitar · Espaço tira a foto · Esc sai', false, 2600);
   }
+  function m5Obj() { const fx = R.ppFx ? R.ppFx() : {}; return ARD.m5.foto.obter(M5R, R.pp ? fx.composer || null : null); } /* 5.0b: o objeto do foto do pós atual */
   function exit() {
     if (!PH.on) return; PH.on = false;
     const sv = st.saved;
@@ -211,6 +222,7 @@ function create(ctx) {
     R.sunDir[0] = sv.sunDir[0]; R.sunDir[1] = sv.sunDir[1]; R.sunDir[2] = sv.sunDir[2]; R.fixedDt = sv.fixedDt; PH.night = null; st.warm = 0;
     if (st.renderer && st.exp0 != null) st.renderer.toneMappingExposure = st.exp0; st.exp0 = null;
     detachPasses(true);
+    if (M5R) { if (st.f5) { st.f5.bloom(1); st.f5.encolher(); } ARD.m5.foto.csmSolta(M5R); ARD.m5.foto.exposicao(st.renderer ? st.renderer.toneMappingExposure : 1); } /* 5.0b: bloom e alvos do foto de volta, a exposição da partida em ARD.m5.u.exposicao; as cascatas voltam pela R.resize */
     if (st.camera) { st.camera.near = st.near0; st.camera.far = st.far0; }
     if (R.resize) R.resize(); /* lente e proporção da câmera do jogo */
     document.body.classList.remove('foto'); st.root.hidden = true; if (btn) btn.classList.remove('on');
@@ -324,6 +336,7 @@ function create(ctx) {
     if (home) home.position.set(camera.position.x - 0.36 * 4200, camera.position.y * 0.15 + 4200 * 0.06, camera.position.z - 0.93 * 4200);
     if (sun) { const sd = R.sunDir; sun.position.set(st.T.x + sd[0], st.T.y + sd[1], st.T.z + sd[2]); sun.target.position.copy(st.T); sun.target.updateMatrixWorld();
       const sc = sun.shadow.camera, ext = clamp(st.dist * (1.4 + 1.6 * (1 - Math.abs(Math.sin(st.pitch)))), 320, 900); sc.left = -ext; sc.right = ext; sc.top = ext; sc.bottom = -ext; sc.near = 100; sc.far = 2200; sc.updateProjectionMatrix(); } /* sombra em volta do ponto da órbita; mais larga nas vistas baixas */
+    if (M5R) ARD.m5.foto.csm(M5R, camera, st.dist); /* 5.0b: cascatas de sombra com a câmera livre (alcance pela distância; refeitas quando a lente, a proporção ou o plano próximo mudam) */
   };
 
   /* ---------- desfoque e filtro (no lugar do composer.render) ---------- */
@@ -331,6 +344,7 @@ function create(ctx) {
     st.renderer = renderer; if (!st.camera) st.camera = camera;
     if (st.exp0 == null) st.exp0 = renderer.toneMappingExposure;
     renderer.toneMappingExposure = st.exp0 * Math.pow(2, st.cfg.ev); /* exposição: a do tone mapping (pós de cinema e render direto) */
+    if (M5R) { ARD.m5.foto.exposicao(renderer.toneMappingExposure); renderM5(composer, scene, camera, renderer); return; } /* 5.0b: a exposição também em ARD.m5.u.exposicao (para os efeitos do Motor 5) */
     const pp = !!(R.pp && composer && composer.passes);
     if (pp) { if (composer !== st.comp) { detachPasses(false); st.fx = R.ppFx ? R.ppFx() : {}; attachPasses(composer, camera); } syncPasses(camera); } /* referências do pós lidas uma vez por composer (nada alocado por quadro) */
     else if (st.comp) detachPasses(false);
@@ -339,6 +353,51 @@ function create(ctx) {
     occEnd();
     if (st.cap && st.cap.phase === 'shoot') grab(renderer);
   };
+  /* 5.0b: quadro do foto no Motor 5. Pronto: a cadeia do foto (filtro e desfoque do src/m5/foto.js), ou o quadro da foto no alvo dela.
+     Sem preparo (primeira entrada, ou o pós mudou): o pós da partida na tela e um passo do preparo por quadro, até ficar pronto */
+  function renderM5(composer, scene, camera, rr) {
+    let F = st.f5; if (!F || F.P !== (R.pp ? composer || null : null)) { F = st.f5 = m5Obj(); st.f5ok = !!F.pronto; refreshNotes(); }
+    occStart();
+    if (F.pronto) { syncM5(F, camera); if (st.cap && st.cap.phase === 'shoot') shootM5(F, scene, camera); else F.render(scene, camera, !!st.cfg.dof); }
+    else {
+      if (composer) composer.render(); else rr.render(scene, camera);
+      syncM5(F, camera); F.passo(scene, camera);
+      if (F.pronto) { st.f5ok = true; st.lookDirty = true; refreshNotes(); toast(isTouch ? 'Modo Foto pronto · um dedo orbita, dois arrastam e fazem pinça' : 'Modo Foto pronto · arraste para orbitar · Espaço tira a foto · Esc sai', false, 2600); }
+    }
+    occEnd();
+  }
+  function syncM5(F, camera) { /* uniforms do foto no Motor 5 (nada alocado por quadro) */
+    const c = st.cfg;
+    if (F.dofN && c.dof) { const fd = focusPlanar(camera), f = fNum(c.abert); F.D.foco.value = fd; F.D.alcance.value = Math.max(2, fd * f / 14); F.D.bokeh.value = clamp(4.4 / Math.sqrt(f / 1.4), 0.8, 4.4); }
+    if (F.pipe && st.lookDirty) lookUniforms(F.U);
+    if (F.P) F.bloom(c.bloom);
+    F.res();
+  }
+  function focusPlanar(camera) { const p = st.focusMode === 'centro' ? st.T : st.focusP; camera.getWorldDirection(_f1); return Math.max(1, _f1.dot(_f2.subVectors(p, camera.position))); } /* 5.0b: o dof do TSL mede a distância ao longo do olhar da câmera */
+  function shootM5(F, scene, camera) { /* 5.0b: o quadro da foto no alvo do tamanho pedido (a tela fica com o quadro anterior) e a leitura assíncrona */
+    const c = st.cap; c.phase = 'read'; const name = fileName();
+    let pr; try { pr = F.capturar(c.W, c.H, scene, camera, !!st.cfg.dof, c.k); } catch (err) { pr = Promise.reject(err); }
+    pr.then(px => pngM5(px, name, c), err => capFail(c, err));
+  }
+  function pngM5(px, name, c) { /* pixels do alvo → PNG (linhas na ordem da imagem, sem o alinhamento do WebGPU, opaco) */
+    const W = px.W, Hh = px.H, data = px.data, row = W * 4; let c2 = null;
+    try {
+      c2 = document.createElement('canvas'); c2.width = W; c2.height = Hh; const x = c2.getContext('2d'); const img = x.createImageData(W, Hh), dst = img.data;
+      for (let y = 0; y < Hh; y++) { const s = (px.flip ? Hh - 1 - y : y) * px.stride; dst.set(data.subarray(s, s + row), y * row); }
+      for (let i = 3; i < dst.length; i += 4) dst[i] = 255;
+      x.putImageData(img, 0, 0);
+      if (st.cfg.faixas && !barsInShader()) { const bh = barH(W, Hh); if (bh > 0) { x.fillStyle = '#000'; x.fillRect(0, 0, W, bh); x.fillRect(0, Hh - bh, W, bh); } } /* sem o pós, as faixas entram aqui */
+      if (st.f5) st.f5.soltar();
+      c2.toBlob(b => { c2.width = 0; c2.height = 0; capDone(c, b, name, W, Hh); }, 'image/png');
+    } catch (err) { if (c2) { c2.width = 0; c2.height = 0; } capFail(c, err); }
+  }
+  function capDone(c, blob, name, W, Hh) {
+    if (st.cap === c) st.cap = null; if (st.el) st.el.shot.classList.remove('busy');
+    if (!blob) { toast('Não deu para gerar a foto ' + W + '×' + Hh + '; tente uma resolução menor', true); if (c.done) c.done(null); return; }
+    download(blob, name); st.lastShot = { name, w: W, h: Hh, bytes: blob.size }; toast('Foto salva · ' + W + '×' + Hh + ' · ' + name, false, 3200); if (c.done) c.done(st.lastShot);
+  }
+  function capFail(c, err) { if (st.f5) st.f5.soltar(); if (st.cap === c) st.cap = null; if (st.el) st.el.shot.classList.remove('busy'); toast('Falha na captura: ' + ((err && err.message) || err), true); if (c.done) c.done(null); }
+  function barsInShader() { return M5R ? !!(R.pp && st.f5 && st.f5.pipe && st.f5.pronto) : !!(R.pp && st.fotoPass); } /* faixas desenhadas pelo filtro (com o pós) */
   /* 4.3j: câmera no vazio do Cinturão, abaixo da borda: a rocha das plataformas é da camada do espaço, colada na profundidade do céu, e não
      esconde nada da cena do jogo. Aqui some o que a rocha esconderia: cada instância (unidade, construção, nó, rocha, adereço) cujo topo a
      câmera não enxerga por cima da borda (marcha da reta câmera → topo pelo relevo) e os blocos de vegetação na mesma situação */
@@ -384,8 +443,8 @@ function create(ctx) {
     if (st.fotoFx && st.lookDirty) lookUniforms();
     if (fx.bloomFx) { if (st.bloomFx !== fx.bloomFx) { st.bloomFx = fx.bloomFx; st.bloom0 = fx.bloomFx.intensity; } fx.bloomFx.intensity = st.bloom0 * c.bloom; }
   }
-  function lookUniforms() {
-    st.lookDirty = false; const u = st.fotoFx.U, c = st.cfg, L = st.look, t = clamp(c.temp + 0.38 * st.warm, -1, 1); /* no entardecer o balanço de branco esquenta junto (a bruma e o céu também ficam dourados) */
+  function lookUniforms(u0) { /* 5.0b: u0 = uniforms do filtro do Motor 5 (mesmas chaves) */
+    st.lookDirty = false; const u = u0 || st.fotoFx.U, c = st.cfg, L = st.look, t = clamp(c.temp + 0.38 * st.warm, -1, 1); /* no entardecer o balanço de branco esquenta junto (a bruma e o céu também ficam dourados) */
     const r = 1 + 0.16 * t, g = 1 + 0.015 * t, b = 1 - 0.2 * t, lw = 0.2126 * r + 0.7152 * g + 0.0722 * b; u.uWB.value.set(r / lw, g / lw, b / lw);
     u.uCon.value = c.con; u.uSat.value = c.sat; u.uMono.value = L.mono || 0; if (L.monoW) u.uMonoW.value.set(L.monoW[0], L.monoW[1], L.monoW[2]); else u.uMonoW.value.set(0.2126, 0.7152, 0.0722);
     if (L.sh) u.uSh.value.set(L.sh[0], L.sh[1], L.sh[2]); else u.uSh.value.set(1, 1, 1); if (L.hi) u.uHi.value.set(L.hi[0], L.hi[1], L.hi[2]); else u.uHi.value.set(1, 1, 1);
@@ -412,6 +471,18 @@ function create(ctx) {
     for (let i = 0; i < 900 && t < 9000; i++) { const x = o.x + _w.x * t, y = o.y + _w.y * t, z = o.z + _w.z * t; if (y < topAt(x, z)) { let a = prev, b = t; for (let k = 0; k < 10; k++) { const m = (a + b) / 2; if (o.y + _w.y * m < topAt(o.x + _w.x * m, o.z + _w.z * m)) b = m; else a = m; } out.set(o.x + _w.x * b, o.y + _w.y * b, o.z + _w.z * b); return true; } prev = t; t += Math.max(1.5, t * 0.015); }
     return false;
   }
+  /* 5.0b: no Motor 5 a profundidade do quadro chega depois (leitura assíncrona de 1 pixel): o ponto volta ao mundo com a câmera do momento
+     do toque; sem o pós (ou se a leitura falha), a mesma marcha do raio pelo relevo. Devolve a promessa de true/false (ponto em out) */
+  function pointAtM5(sx, sy, out) {
+    const cam = st.camera; if (!cam) return Promise.resolve(false); const u = sx / Math.max(1, R.w), v = 1 - sy / Math.max(1, R.h);
+    const pmi = new THREE.Matrix4().copy(cam.projectionMatrixInverse), cmw = new THREE.Matrix4().copy(cam.matrixWorld), near = Math.max(1, cam.near), zgpu = !!M5R.isWebGPU; /* um toque, não um quadro: a cópia da câmera é dele */
+    const F = st.f5, pr = F && F.pronto ? F.prof(u, 1 - v) : Promise.resolve(-1);
+    const march = () => { const o = _tp.setFromMatrixPosition(cmw); _w.set(u * 2 - 1, v * 2 - 1, 0.5).applyMatrix4(pmi).applyMatrix4(cmw).sub(o).normalize();
+      let t = near, prev = t;
+      for (let i = 0; i < 900 && t < 9000; i++) { const x = o.x + _w.x * t, y = o.y + _w.y * t, z = o.z + _w.z * t; if (y < topAt(x, z)) { let a = prev, b = t; for (let k = 0; k < 10; k++) { const m = (a + b) / 2; if (o.y + _w.y * m < topAt(o.x + _w.x * m, o.z + _w.z * m)) b = m; else a = m; } out.set(o.x + _w.x * b, o.y + _w.y * b, o.z + _w.z * b); return true; } prev = t; t += Math.max(1.5, t * 0.015); }
+      return false; };
+    return pr.then(d => { if (d >= 0) { if (d >= 0.99999) return false; out.set(u * 2 - 1, v * 2 - 1, zgpu ? d : d * 2 - 1).applyMatrix4(pmi).applyMatrix4(cmw); return true; } return march(); }, march); /* WebGPU: profundidade 0..1 = z do NDC; WebGL2: 2d − 1 */
+  }
   function pickEnt(sx, sy) { /* unidade ou construção sob o toque (as que o jogador vê) */
     const cam = st.camera; if (!cam) return null; const sim = G.sim, vis = sim.vis[view.human], fy = R.h / 2 / Math.tan(cam.fov * DEG / 2);
     let best = null, bd = 1e12;
@@ -426,9 +497,13 @@ function create(ctx) {
   function focusOn(e) { st.focusMode = 'ent'; st.focusEnt = e.id; st.focusName = entName(e); st.focusP.set(e.x, centerY(e), -e.y); st.uiDirty = true; }
   function tap(sx, sy, dbl) {
     const e = pickEnt(sx, sy); if (e) { centerOn(e); focusOn(e); ring(sx, sy); return; }
-    if (!pointAt(sx, sy, _v)) { if (dbl) toast('Nada para focar aí (céu ou espaço)', true); return; }
-    if (dbl) { st.follow = -1; st.txG = clamp(_v.x, -400, WORLD + 400); st.tyG = clamp(-_v.z, -400, WORLD + 400); st.hOffG = Math.max(isVoid(st.txG, st.tyG) ? -650 : 0, _v.y - groundRef(st.txG, st.tyG)); st.focusMode = 'centro'; st.focusEnt = -1; }
-    else { st.focusMode = 'ponto'; st.focusEnt = -1; st.focusP.copy(_v); }
+    if (M5R) { const n = ++st.tapN; pointAtM5(sx, sy, _v).then(ok => { if (n === st.tapN && PH.on) tapPoint(ok, _v, sx, sy, dbl); }); return; } /* 5.0b: vale o último toque */
+    tapPoint(pointAt(sx, sy, _v), _v, sx, sy, dbl);
+  }
+  function tapPoint(ok, p, sx, sy, dbl) {
+    if (!ok) { if (dbl) toast('Nada para focar aí (céu ou espaço)', true); return; }
+    if (dbl) { st.follow = -1; st.txG = clamp(p.x, -400, WORLD + 400); st.tyG = clamp(-p.z, -400, WORLD + 400); st.hOffG = Math.max(isVoid(st.txG, st.tyG) ? -650 : 0, p.y - groundRef(st.txG, st.tyG)); st.focusMode = 'centro'; st.focusEnt = -1; }
+    else { st.focusMode = 'ponto'; st.focusEnt = -1; st.focusP.copy(p); }
     st.uiDirty = true; ring(sx, sy);
   }
 
@@ -495,14 +570,16 @@ function create(ctx) {
   /* ---------- captura ---------- */
   function fileName() { const d = new Date(), p = n => String(n).padStart(2, '0'); return 'aether-rift-' + d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()) + '.png'; }
   function capSize(res) {
-    if (res === 'tela') { const rr = st.renderer; if (!rr) return null; const gl = rr.getContext(); return [gl.drawingBufferWidth, gl.drawingBufferHeight]; }
+    if (res === 'tela') { const rr = st.renderer; if (!rr) return null; if (M5R) { rr.getDrawingBufferSize(_v2); return [_v2.x, _v2.y]; } /* 5.0b */ const gl = rr.getContext(); return [gl.drawingBufferWidth, gl.drawingBufferHeight]; }
     const big = res === '4k', a = big ? 3840 : 2560, b = big ? 2160 : 1440, port = R.h > R.w * 1.05;
     return port ? [b, a] : [a, b];
   }
-  function maxDim() { const gl = st.renderer.getContext(); const vp = gl.getParameter(gl.MAX_VIEWPORT_DIMS); return Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), gl.getParameter(gl.MAX_TEXTURE_SIZE), vp ? Math.min(vp[0], vp[1]) : 4096); }
+  function maxDim() { if (M5R) return maxDimM5(st.renderer); /* 5.0b */ const gl = st.renderer.getContext(); const vp = gl.getParameter(gl.MAX_VIEWPORT_DIMS); return Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), gl.getParameter(gl.MAX_TEXTURE_SIZE), vp ? Math.min(vp[0], vp[1]) : 4096); }
+  function maxDimM5(rr) { /* 5.0b: limite de textura do WebGPU (ou do WebGL2 da reserva) */ try { const be = rr.backend; if (be.isWebGPUBackend && be.device) return be.device.limits.maxTextureDimension2D || 8192; const gl = be.gl; if (gl) { const vp = gl.getParameter(gl.MAX_VIEWPORT_DIMS); return Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), gl.getParameter(gl.MAX_TEXTURE_SIZE), vp ? Math.min(vp[0], vp[1]) : 4096); } } catch (e) {} return 4096; }
   function shoot() {
     if (!PH.on || st.cap) return;
     if (!st.renderer) { toast('Aguarde um instante e tente de novo', true); return; }
+    if (M5R && !(st.f5 && st.f5.pronto)) { toast('Preparando o Modo Foto…', true); return; } /* 5.0b */
     const res = st.cfg.res, sz = capSize(res); if (!sz) return;
     if (res !== 'tela' && Math.max(sz[0], sz[1]) > maxDim()) { toast('Este aparelho não desenha ' + sz[0] + '×' + sz[1] + '; use ' + (res === '4k' ? '2K ou ' : '') + 'Tela', true); return; }
     st.cap = { res, W: sz[0], H: sz[1], phase: 'pre', aspect: res === 'tela' ? 0 : sz[0] / sz[1], k: 1, pr: 1, lv: null, done: null };
@@ -511,6 +588,7 @@ function create(ctx) {
   }
   function capPre() { /* começo do quadro da foto: canvas e alvos do pós na resolução pedida (o tamanho na tela não muda) */
     const c = st.cap, rr = st.renderer; c.phase = 'shoot'; if (c.res === 'tela') return;
+    if (M5R) { rr.getDrawingBufferSize(_v2); c.k = c.H / Math.max(1, _v2.y); return; } /* 5.0b: no Motor 5 nada muda de tamanho (o alvo é da foto); só a escala do desfoque e do bloom */
     const fx = R.ppFx ? R.ppFx() : {}, comp = fx.composer; c.pr = rr.getPixelRatio(); c.k = c.H / Math.max(1, rr.getContext().drawingBufferHeight);
     if (fx.bloomFx && fx.bloomFx.mipmapBlurPass && R.pp) { c.lv = fx.bloomFx.mipmapBlurPass.levels; const add = Math.round(Math.log2(Math.max(1, c.k))); if (add > 0) fx.bloomFx.mipmapBlurPass.levels = Math.min(10, c.lv + add); } /* o bloom espalha do mesmo tamanho relativo */
     rr.setPixelRatio(1);
@@ -526,7 +604,7 @@ function create(ctx) {
     else if (comp) { rr.setSize(R.w, R.h, false); rr.setPixelRatio(c.pr); if (comp.setPixelRatio) comp.setPixelRatio(c.pr); comp.setSize(R.w, R.h); }
     else { rr.setSize(R.w, R.h, false); rr.setPixelRatio(c.pr); }
   }
-  function capAbort() { const c = st.cap; if (!c) return; if (c.phase === 'shoot' || c.phase === 'restore') { c.phase = 'restore'; capRestore(); } else st.cap = null; if (c.done) c.done(null); }
+  function capAbort() { const c = st.cap; if (!c) return; if (M5R) { if (c.phase !== 'read') { st.cap = null; if (st.el) st.el.shot.classList.remove('busy'); if (c.done) c.done(null); } return; } /* 5.0b: com a leitura em andamento a foto termina e é salva */ if (c.phase === 'shoot' || c.phase === 'restore') { c.phase = 'restore'; capRestore(); } else st.cap = null; if (c.done) c.done(null); }
   function grab(rr) { /* lê o canvas no mesmo quadro em que foi desenhado (sem preserveDrawingBuffer) */
     const c = st.cap; c.phase = 'restore'; const cv = rr.domElement, W = cv.width, Hh = cv.height, name = fileName();
     const done = blob => { if (!blob) { toast('Não deu para gerar a foto ' + W + '×' + Hh + '; tente uma resolução menor', true); if (c.done) c.done(null); return; }
@@ -608,16 +686,17 @@ function create(ctx) {
   }
   function syncChecks() { for (const k in st.el.ck) st.el.ck[k].inp.checked = !!st.cfg[k]; }
   function syncUI() {
-    if (!st.el) return; const c = st.cfg, pp = !!(R.pp && st.fotoPass) || (!!R.pp && !st.comp);
+    if (!st.el) return; const c = st.cfg, pp = ppOn(), dofOk = pp && !(M5R && st.f5 && st.f5.pipe && !st.f5.dofN); /* 5.0b: no Motor 5 o desfoque pode faltar sozinho */
     st.el.panel.classList.toggle('fold', !!c.fold); st.root.querySelector('[data-a="fold"]').textContent = c.fold ? '▴' : '▾';
     for (const b of st.root.querySelectorAll('[data-tab]')) { const on = b.dataset.tab === c.tab; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); }
     for (const p of st.root.querySelectorAll('[data-pane]')) p.hidden = p.dataset.pane !== c.tab;
     for (const b of st.root.querySelectorAll('[data-look]')) { b.classList.toggle('on', b.dataset.look === c.look); b.disabled = !pp; }
     for (const b of st.root.querySelectorAll('[data-r]')) b.classList.toggle('on', b.dataset.r === c.res);
-    for (const k in st.el.sl) { const s = st.el.sl[k], v = slGet(k); s.inp.value = v; s.out.textContent = s.d[7](+s.inp.value); const off = s.d[6] && !pp; s.inp.disabled = off; s.lab.classList.toggle('off', off); }
-    syncChecks(); st.el.ck.dof.inp.disabled = !pp; st.el.ck.dof.lab.classList.toggle('off', !pp);
+    for (const k in st.el.sl) { const s = st.el.sl[k], v = slGet(k); s.inp.value = v; s.out.textContent = s.d[7](+s.inp.value); const off = s.d[6] && !(k === 'abert' ? dofOk : pp); s.inp.disabled = off; s.lab.classList.toggle('off', off); }
+    syncChecks(); st.el.ck.dof.inp.disabled = !dofOk; st.el.ck.dof.lab.classList.toggle('off', !dofOk);
     syncTime(); syncLive(); bars();
   }
+  function ppOn() { if (M5R) { const F = st.f5; return !!R.pp && !(F && F.P && !F.pipe); } return !!(R.pp && st.fotoPass) || (!!R.pp && !st.comp); } /* 5.0b: filtros e desfoque disponíveis (antes de subir, conta como disponível) */
   function syncLive() { /* valores que mudam com o mouse e o teclado (no máximo ~7 vezes por segundo) */
     st.uiDirty = false; if (!st.el) return;
     for (let i = 0; i < LIVE.length; i++) { const k = LIVE[i], s = st.el.sl[k], v = slGet(k); if (Math.abs(+s.inp.value - v) > s.d[5] * 0.5) { s.inp.value = v; s.out.textContent = s.d[7](+s.inp.value); } }
@@ -628,6 +707,8 @@ function create(ctx) {
     if (net) n.push('Multiplayer: a partida continua rodando; o Modo Foto só solta a câmera.'); else if (G.camp && G.camp.noPause) n.push('Dificuldade Fenda: sem pausa; o Modo Foto só solta a câmera.');
     if (!R.pp) n.push('Sem o pós de cinema nesta qualidade (' + (isTouch ? 'celular' : 'Baixa') + '): profundidade de campo, filtros e brilho ficam desligados. Câmera, luz, exposição, faixas e captura funcionam.');
     else if (st.comp && !st.fotoPass) n.push('O desfoque e os filtros não subiram nesta placa; câmera, luz e captura funcionam.');
+    else if (M5R && st.f5 && st.f5.P && !st.f5.pipe) n.push('O desfoque e os filtros não subiram nesta placa; câmera, luz e captura funcionam.'); /* 5.0b */
+    else if (M5R && st.f5 && st.f5.pipe && !st.f5.dofN) n.push('A profundidade de campo não subiu nesta placa; filtros, luz e captura funcionam.');
     st.el.note.hidden = !n.length; st.el.note.textContent = n.join(' '); if (PH.on) syncUI();
   }
   function guide() { /* recorte da foto quando a proporção da resolução escolhida é outra que a da tela */
@@ -638,7 +719,7 @@ function create(ctx) {
     let w = R.w, h = R.h; if (a2 > a) h = R.w / a2; else w = R.h * a2; g.style.width = Math.round(w) + 'px'; g.style.height = Math.round(h) + 'px'; g.hidden = false;
   }
   function bars() { /* sem o pós, as faixas na tela são do painel (na foto, do 2D da captura) */
-    if (!st.el) return; const b = st.el.bars, on = st.cfg.faixas && !(R.pp && st.fotoPass); b.hidden = !on; if (!on) return;
+    if (!st.el) return; const b = st.el.bars, on = st.cfg.faixas && !barsInShader(); b.hidden = !on; if (!on) return; /* 5.0b: barsInShader vale nos dois motores */
     const h = barH(R.w, R.h); b.children[0].style.height = h + 'px'; b.children[1].style.height = h + 'px';
   }
   function flash() { const f = st.el.flash; f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); setTimeout(() => f.classList.remove('on'), 60); }
@@ -662,9 +743,9 @@ function create(ctx) {
     st.lookDirty = true; syncUI(); guide(); return PH.state();
   };
   PH.tap = (sx, sy, dbl) => tap(sx, sy, !!dbl);
-  PH.pick = (sx, sy) => { const e = pickEnt(sx, sy); return e ? e.id : null; }; PH.point = (sx, sy) => (pointAt(sx, sy, _w2) ? [_w2.x, _w2.y, _w2.z] : null); /* testes */
+  PH.pick = (sx, sy) => { const e = pickEnt(sx, sy); return e ? e.id : null; }; PH.point = (sx, sy) => (M5R ? pointAtM5(sx, sy, _w2).then(ok => (ok ? [_w2.x, _w2.y, _w2.z] : null)) : pointAt(sx, sy, _w2) ? [_w2.x, _w2.y, _w2.z] : null); /* testes (5.0b: no Motor 5, uma promessa) */
   PH.state = () => ({ on: PH.on, time: st.time, x: st.tx, y: st.ty, h: st.hOff, yaw: st.yaw, pitch: st.pitch, dist: st.dist, roll: st.roll / DEG, fov: st.fov, near: st.near, target: [st.T.x, st.T.y, st.T.z], cam: [st.C.x, st.C.y, st.C.z], ground: H(st.C.x, -st.C.z), focus: st.focusMode, focusName: st.focusName, follow: st.follow,
-    pp: !!R.pp, dof: !!(st.dofPass && st.dofPass.enabled), foto: !!st.fotoPass, night: PH.night, warm: st.warm, cfg: Object.assign({}, st.cfg), lastShot: st.lastShot, paused: G.paused, speed: G.speed, frozen: st.frozen, cap: st.cap ? st.cap.phase : null });
+    pp: !!R.pp, dof: M5R ? !!(st.f5 && st.f5.pronto && st.f5.dofN && st.cfg.dof) : !!(st.dofPass && st.dofPass.enabled), foto: M5R ? !!(st.f5 && st.f5.pronto && st.f5.pipe) : !!st.fotoPass, m5: !!M5R, pronto: M5R ? !!(st.f5 && st.f5.pronto) : true, /* 5.0b */ night: PH.night, warm: st.warm, cfg: Object.assign({}, st.cfg), lastShot: st.lastShot, paused: G.paused, speed: G.speed, frozen: st.frozen, cap: st.cap ? st.cap.phase : null });
   return PH;
 }
 ARD.photo3d = { create, LOOKS };

@@ -17,7 +17,8 @@
    nada é alocado por tiro nem por quadro. Fumaça, faíscas, brasas, gotas, esporos e explosões vão pelas partículas do env.FX.
    Balas (traçantes): o sim anda 10 vezes por segundo e uma bala vive 0 a 2 passos (o ferrão nasce e acerta no mesmo passo), então a
    bala na tela voa pela GPU desde o disparo, da boca da arma até o alvo, na velocidade da arma; o impacto espera ela chegar.
-   Projéteis em arco (obus) seguem a posição do sim a cada quadro (altura suavizada entre os passos, saída na boca da arma). */
+   Projéteis em arco (obus) seguem a posição do sim a cada quadro (altura suavizada entre os passos, saída na boca da arma).
+   5.0b: no Motor 5 as fitas e os sprites rodam em TSL (m5Arma, abaixo), com os mesmos lotes, atributos e receitas. */
 (function (ARD) {
 'use strict';
 /* 4.3g: paleta HDR por Raça. a = cor da arma, b = núcleo quente, g = brilho, s = faísca, l = luz no chão */
@@ -184,22 +185,163 @@ const FS_P = 'uniform float uClock;\nvarying vec4 vCol; varying vec4 vUv; varyin
   '  gl_FragColor = vec4((vCol.rgb * I + vec3(W)) * vS.y, A * vSol);\n' +
   '}';
 
+/* ---------- 5.0b: Motor 5 — fitas e sprites em TSL (WGSL no WebGPU, GLSL na reserva WebGL2) ----------
+   Mesmos atributos, mesmas contas e a mesma mistura pré-multiplicada (One/OneMinusSrcAlpha) dos dois programas GLSL; o vértice devolve a
+   posição de recorte (vertexNode). uRes vem do screenSize do TSL (o tamanho do alvo em que a cena desenha, como o onBeforeRender do
+   clássico); uTime é um uniform por lote (dinâmico = 0, envelhecido = relógio), então os 4 lotes usam 2 códigos de shader. */
+function m5Arma(sprite, uT, U) {
+  const T = window.THREE_M5, L = window.TSL;
+  const { Fn, If, Discard, attribute, positionGeometry, varyingProperty, float, vec2, vec3, vec4, max, min, abs, floor, fract, exp, pow, sqrt, sin, cos, atan, mix, smoothstep, clamp, step, length, normalize, cross, dot, select, modelViewMatrix, cameraProjectionMatrix, screenSize } = L;
+  const ent = (x, a, b) => x.greaterThan(a).and(x.lessThan(b));
+  const fl1 = n => [{ name: n, type: 'float' }];
+  const h1 = Fn(([n]) => fract(sin(n.mul(12.9898).add(4.1414)).mul(43758.5453))).setLayout({ name: 'ardCbH1', type: 'float', inputs: fl1('n') });
+  const n1 = Fn(([x]) => { const i = floor(x).toVar(), f = fract(x).toVar(); return mix(h1(i), h1(i.add(1)), f.mul(f).mul(float(3).sub(f.mul(2)))); }).setLayout({ name: 'ardCbN1', type: 'float', inputs: fl1('x') });
+  const n2 = Fn(([p]) => { const i = floor(p).toVar(), f = fract(p).toVar(); const u = f.mul(f).mul(vec2(3).sub(f.mul(2))).toVar(); const n = i.x.add(i.y.mul(57)).toVar(); return mix(mix(h1(n), h1(n.add(1)), u.x), mix(h1(n.add(57)), h1(n.add(58)), u.x), u.y); }).setLayout({ name: 'ardCbN2', type: 'float', inputs: [{ name: 'p', type: 'vec2' }] });
+  const inv = ARD.fx3d && ARD.fx3d.inversoSaida ? ARD.fx3d.inversoSaida() : (v => v); /* sem pós: a inversa da saída (src/fx3d.js) */
+  const m = new T.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, depthTest: true, side: T.DoubleSide, blending: T.CustomBlending, blendEquation: T.AddEquation, blendSrc: T.OneFactor, blendDst: T.OneMinusSrcAlphaFactor });
+  m.lights = false; m.fog = false; m.forceSinglePass = true; /* 5.0b: regra de carga 10 — transparente de duas faces numa passada só (o three desenharia costas e frente: 2 pipelines e 2 desenhos por lote); cada quadrado tem uma face só e a mistura é a mesma */
+  const pos = positionGeometry;
+  if (!sprite) { /* fita (VS_S/FS_S) */
+    const sA = attribute('sA', 'vec4'), sB = attribute('sB', 'vec4'), sC = attribute('sC', 'vec4'), sD = attribute('sD', 'vec4'), sE = attribute('sE', 'vec4');
+    const vCol = varyingProperty('vec4', 'vCbCol'), vP = varyingProperty('vec4', 'vCbP'), vQ = varyingProperty('vec4', 'vCbQ'), vRH = varyingProperty('vec4', 'vCbR'); /* vR (xy) e vH (z) num vec4 */
+    m.vertexNode = Fn(() => {
+      const tt = uT.sub(sD.x).toVar(), age = tt.div(max(sD.y, 0.0001)).toVar(), st = sD.z.toVar(), out = vec4(0, 0, 2, 1).toVar();
+      vCol.assign(vec4(0)); vP.assign(vec4(0)); vQ.assign(vec4(0)); vRH.assign(vec4(0, 0, 1, 0));
+      If(age.greaterThanEqual(0).and(age.lessThanEqual(1)), () => {
+        const A = sA.xyz.toVar(), B = sB.xyz.toVar(), wa = sA.w.toVar(), wb = sB.w.toVar();
+        If(ent(st, 0.5, 1.5), () => { const D = B.sub(A).toVar(), Ld = length(D).toVar(), kh = clamp(tt.div(max(sE.x, 0.001)), 0, 1).toVar(); const hd = A.add(D.mul(kh)).toVar(); B.assign(hd); A.assign(hd.sub(D.div(max(Ld, 0.001)).mul(min(sE.y, Ld.mul(kh).add(0.5))))); }) /* bala que voa na GPU */
+          .ElseIf(ent(st, 5.5, 6.5), () => { const g = age.mul(2).add(1).toVar(); wa.mulAssign(g); wb.mulAssign(g); A.y.addAssign(age.mul(2.5)); B.y.addAssign(age.mul(2.5)); });
+        const va = modelViewMatrix.mul(vec4(A, 1)).toVar(), vb = modelViewMatrix.mul(vec4(B, 1)).toVar(); const zn = U.near.mul(-1.02).toVar();
+        If(va.z.greaterThan(zn).and(vb.z.greaterThan(zn)).not(), () => {
+          If(va.z.greaterThan(zn), () => { va.assign(mix(vb, va, zn.sub(vb.z).div(va.z.sub(vb.z)))); }).ElseIf(vb.z.greaterThan(zn), () => { vb.assign(mix(va, vb, zn.sub(va.z).div(vb.z.sub(va.z)))); }); /* corta no plano perto */
+          const ca = cameraProjectionMatrix.mul(va).toVar(), cb = cameraProjectionMatrix.mul(vb).toVar(); const hr = screenSize.mul(0.5).toVar();
+          const d = cb.xy.div(cb.w).mul(hr).sub(ca.xy.div(ca.w).mul(hr)).toVar(), lp = length(d).toVar(); const dr = vec2(1, 0).toVar(); If(lp.greaterThan(0.001), () => { dr.assign(d.div(lp)); }); const nr = vec2(dr.y.negate(), dr.x).toVar();
+          const py = cameraProjectionMatrix.element(1).y.mul(hr.y).toVar(); const pa = wa.mul(py).div(ca.w).toVar(), pb = wb.mul(py).div(cb.w).toVar();
+          const t = pos.y.toVar(), hw = mix(pa, pb, t).toVar(), he = max(hw, U.minPx).toVar(); const cap = select(ent(st, 7.5, 8.5), float(0), max(max(pa, pb), U.minPx)).toVar();
+          const c = vec4(cb).toVar(); If(t.lessThan(0.5), () => { c.assign(ca); });
+          out.assign(vec4(c.xy.add(nr.mul(pos.x).mul(he).add(dr.mul(t.mul(2).sub(1)).mul(cap)).div(hr).mul(c.w)), c.z, c.w)); /* largura mínima em pixels, pontas arredondadas */
+          vCol.assign(vec4(sC.rgb, age));
+          vP.assign(vec4(t.add(t.mul(2).sub(1).mul(cap).div(max(lp, 0.001))), pos.x, lp.div(max(cap, 0.001)), st));
+          vQ.assign(vec4(sD.w, length(sB.xyz.sub(sA.xyz)), mix(sE.z, sE.w, t), sC.a.mul(pow(hw.div(he), 0.6))));
+          vRH.assign(vec4(sE.x, select(ent(st, 5.5, 6.5), clamp(tt.div(max(sE.x, 0.001)), 0, 1), sE.y), he, 0));
+        });
+      });
+      return out;
+    })();
+    m.colorNode = Fn(() => {
+      const t = vP.x.toVar(), x = vP.y.toVar(), st = vP.w.toVar(), age = vCol.a.toVar(), sd = vQ.x.toVar(), Ln = vQ.y.toVar(), vR = vRH.xy.toVar(), vH = vRH.z;
+      const tc = clamp(t, 0, 1).toVar(); const o = select(t.lessThan(0), t.negate(), max(t.sub(1), 0)).mul(vP.z).toVar(); const d2 = o.mul(o).add(x.mul(x)).toVar();
+      If(d2.greaterThanEqual(1), () => { Discard(); });
+      const col = vCol.rgb.toVar(), I = float(0).toVar(), W = float(0).toVar(), A = float(0).toVar(); const lw = clamp(float(0.9).div(max(vH, 0.5)), 0.07, 0.6).toVar(); const li = float(1).div(lw.mul(lw)).toVar();
+      const core = exp(d2.mul(-9)).toVar(), halo = exp(d2.mul(-2.4)).mul(float(1).sub(d2)).toVar();
+      If(st.lessThan(1.5), () => { const al = tc.mul(tc).toVar(); I.assign(halo.mul(0.55).add(core).mul(al.mul(0.94).add(0.06))); W.assign(core.mul(al).mul(al).mul(0.75)); }) /* traçante */
+        .ElseIf(st.lessThan(2.5), () => { const fl = n1(tc.mul(Ln).mul(0.11).sub(U.clock.mul(42)).add(sd.mul(17))).mul(0.56).add(0.72).toVar(); const k = float(1).sub(age.mul(age)).mul(smoothstep(0, 0.025, tc)).toVar(); I.assign(halo.mul(0.55).mul(fl).add(core.mul(1.1)).mul(k)); W.assign(core.mul(k).mul(0.75)); }) /* feixe */
+        .ElseIf(st.lessThan(3.5), () => { /* arco elétrico */
+          const fr = floor(U.clock.mul(26).add(sd.mul(7))).toVar(), en = sin(tc.mul(3.14159)).toVar(); const c1 = n1(tc.mul(Ln).mul(0.15).add(sd.mul(31)).add(fr.mul(7.31))).sub(0.5).mul(1.5).mul(en), c2 = n1(tc.mul(Ln).mul(0.33).add(sd.mul(13)).add(fr.mul(3.17))).sub(0.5).mul(1.1).mul(en);
+          const e1 = x.sub(c1).toVar(), e2 = x.sub(c2).toVar(); const ln = exp(e1.mul(e1).mul(li).negate()).add(exp(e2.mul(e2).mul(li).mul(2).negate()).mul(0.5)).toVar(); const k = float(1).sub(age).toVar(); I.assign(ln.add(exp(x.mul(x).mul(-2.5)).mul(0.18).mul(en)).mul(k)); W.assign(ln.mul(0.5).mul(k)); })
+        .ElseIf(st.lessThan(4.5), () => { /* onda (fios) */
+          const ph = tc.mul(Ln).div(max(vR.y, 1)).mul(6.2832).sub(U.clock.mul(16)).add(sd.mul(6.2832)); const en = smoothstep(0, 0.07, tc).mul(float(1).sub(smoothstep(0.93, 1, tc))); const a1 = sin(ph).mul(0.6).mul(en).toVar(); const e1 = x.sub(a1).toVar(); const ln = exp(e1.mul(e1).mul(li).mul(0.6).negate()).toVar();
+          If(vR.x.greaterThan(1.5), () => { const e2 = x.add(a1).toVar(); ln.addAssign(exp(e2.mul(e2).mul(li).mul(0.6).negate())); }); const k = float(1).sub(age).toVar(); I.assign(ln.add(exp(x.mul(x).mul(-4)).mul(0.22)).mul(k)); W.assign(ln.mul(0.35).mul(k)); })
+        .ElseIf(st.lessThan(5.5), () => { /* chama */
+          const q = vec2(tc.mul(Ln).mul(0.12).sub(U.clock.mul(9)), x.mul(2.1).add(sd.mul(9))).toVar(); const n = n2(q).mul(0.5).add(n2(q.mul(2.3).add(5.1)).mul(0.3)).add(n2(q.mul(5.1).add(2.3)).mul(0.2)).toVar();
+          const dens = float(1).sub(abs(x)).mul(n.add(0.5)).sub(tc.mul(0.3)).toVar(); const body = smoothstep(0.1, 0.38, dens).toVar(), hot = smoothstep(0.4, 0.85, dens).mul(float(1).sub(tc.mul(0.75))).toVar();
+          const k = smoothstep(0, 0.08, age).mul(float(1).sub(smoothstep(0.6, 1, age))).mul(smoothstep(0, 0.04, tc)).toVar();
+          const fc = mix(vec3(0.85, 0.13, 0.03), vec3(2.3, 0.78, 0.12), smoothstep(0.1, 0.5, dens.add(float(1).sub(tc).mul(0.25)))).toVar(); fc.assign(mix(fc, vec3(2.5, 1.65, 0.55), hot));
+          col.mulAssign(fc); I.assign(body.mul(k).mul(float(1).sub(tc.mul(0.35)))); W.assign(hot.mul(k).mul(0.12)); A.assign(body.mul(k).mul(0.3)); })
+        .ElseIf(st.lessThan(6.5), () => { /* risco que fica no ar */
+          If(tc.greaterThan(vR.y), () => { Discard(); }); const br = n1(tc.mul(Ln).mul(0.07).add(sd.mul(23)).add(age.mul(1.5))).mul(0.65).add(n1(tc.mul(Ln).mul(0.23).add(sd.mul(7)).sub(age)).mul(0.35)).toVar(); const th = age.sub(0.3).mul(1.5); const keep = float(1).sub(smoothstep(br.sub(0.12), br.add(0.12), th)).toVar();
+          const k = float(1).sub(age).mul(float(1).sub(age.mul(0.5))).toVar(); I.assign(core.add(halo.mul(0.4)).mul(k).mul(keep)); W.assign(core.mul(k).mul(keep).mul(0.6)); })
+        .ElseIf(st.lessThan(7.5), () => { const e = fract(tc.mul(Ln).div(13).sub(U.clock.mul(9)).add(sd)).sub(0.5).mul(4.5).toVar(); const band = exp(e.mul(e).negate()).toVar(); const k = float(1).sub(age).toVar(); I.assign(core.mul(0.3).add(halo.mul(1.1).add(core).mul(band)).mul(k)); W.assign(core.mul(band).mul(0.5).mul(k)); }) /* pulso sonoro */
+        .ElseIf(st.lessThan(8.5), () => { const c2 = exp(x.mul(x).mul(-8)).toVar(), h2 = exp(x.mul(x).mul(-2.2)).mul(float(1).sub(x.mul(x))).toVar(); const k = vQ.z.mul(float(1).sub(age)).toVar(); I.assign(h2.mul(0.55).add(c2).mul(k)); W.assign(c2.mul(k).mul(k).mul(0.4)); }) /* fita de rastro */
+        .Else(() => { const e = fract(tc.mul(Ln).div(9).add(U.clock.mul(3.2)).add(sd)).sub(0.5).mul(3.6).toVar(); const bead = exp(e.mul(e).negate()).toVar(); I.assign(core.mul(0.45).add(halo.mul(0.6).add(core).mul(bead))); W.assign(core.mul(bead).mul(0.35)); }); /* canal */
+      const saida = vec4(col.mul(I).add(vec3(W)).mul(vQ.w), A.mul(min(vQ.w, 1))).toVar();
+      If(U.semPos.greaterThan(0.5), () => { saida.assign(vec4(inv(saida.rgb).div(U.expo), float(1).sub(pow(float(1).sub(clamp(saida.a, 0, 1)), U.gama)))); }); /* sem pós: a imagem do clássico; 5.0b (junção): ÷ exposição (o Modo Foto muda; o clássico desenha os efeitos crus) */
+      return saida;
+    })();
+    return ARD.m5 && ARD.m5.registrar ? ARD.m5.registrar('armas-fita', m) : m;
+  }
+  /* sprite (VS_P/FS_P) */
+  const pA = attribute('pA', 'vec4'), pB = attribute('pB', 'vec4'), pC = attribute('pC', 'vec4'), pD = attribute('pD', 'vec4'), pE = attribute('pE', 'vec4');
+  const vCol = varyingProperty('vec4', 'vCbSCol'), vUv = varyingProperty('vec4', 'vCbSUv'), vS = varyingProperty('vec4', 'vCbSS'); /* vS (xy) e vSol (z) num vec4 */
+  m.vertexNode = Fn(() => {
+    const tt = uT.sub(pA.w).toVar(), age = tt.div(max(pB.w, 0.0001)).toVar(), st = pC.z.toVar(), out = vec4(0, 0, 2, 1).toVar();
+    vCol.assign(vec4(0)); vUv.assign(vec4(0)); vS.assign(vec4(0));
+    If(age.greaterThanEqual(0).and(age.lessThanEqual(1)), () => {
+      const v = pB.xyz.sub(vec3(0, pE.z.mul(tt), 0)).toVar(), p = pA.xyz.add(pB.xyz.mul(tt)).sub(vec3(0, pE.z.mul(0.5).mul(tt).mul(tt), 0)).toVar();
+      const sz = mix(pC.x, pC.y, float(1).sub(float(1).sub(age).mul(float(1).sub(age)))).toVar();
+      const q = pos.xy.toVar(); vUv.assign(vec4(q, age, st)); vCol.assign(vec4(pD.rgb, 1)); const sy = abs(pD.a).toVar(), sol = select(pD.a.lessThan(0), float(1), float(0)).toVar();
+      If(st.greaterThan(9.5), () => { /* anel deitado no plano perpendicular ao movimento */
+        const dn = normalize(v.add(vec3(0, 0.00001, 0))).toVar(); const u = normalize(cross(dn, select(abs(dn.y).lessThan(0.95), vec3(0, 1, 0), vec3(1, 0, 0)))).toVar(); const w = cross(dn, u).toVar();
+        vS.assign(vec4(pC.w, sy, 0, 0)); out.assign(cameraProjectionMatrix.mul(modelViewMatrix.mul(vec4(p.add(u.mul(q.x).add(w.mul(q.y)).mul(sz)), 1))));
+      }).Else(() => {
+        const vp = modelViewMatrix.mul(vec4(p, 1)).toVar(); vp.z.addAssign(min(sz, 14).mul(0.9)); /* vem para a frente pelo próprio tamanho */
+        const spx = sz.mul(cameraProjectionMatrix.element(1).y).mul(0.5).mul(screenSize.y).div(max(vp.z.negate(), 1)).toVar(), se = max(spx, U.minPx.mul(1.6)).toVar(), cmp = pow(spx.div(max(se, 0.0001)), 0.6).toVar();
+        vS.assign(vec4(pC.w, sy.mul(cmp), sol.mul(cmp), 0));
+        const an = pE.x.add(pE.y.mul(tt)).toVar(), dr = vec2(cos(an), sin(an)).toVar(), asp = float(1).toVar();
+        If(pE.w.greaterThan(0), () => { const vv = modelViewMatrix.mul(vec4(v, 0)).xyz.toVar(), lv = length(vv).toVar(), ls = length(vv.xy).toVar(); If(ls.greaterThan(0.0001), () => { dr.assign(vv.xy.div(ls)); asp.assign(pE.w.mul(ls).div(max(lv, 0.0001)).add(1)); }); }); /* alongado na direção do movimento */
+        const o0 = vec2(q.x.mul(asp), q.y).toVar(); const o = vec2(o0.x.mul(dr.x).sub(o0.y.mul(dr.y)), o0.x.mul(dr.y).add(o0.y.mul(dr.x)));
+        out.assign(cameraProjectionMatrix.mul(vec4(vp.xy.add(o.mul(sz).mul(se).div(max(spx, 0.0001))), vp.z, vp.w)));
+      });
+    });
+    return out;
+  })();
+  m.colorNode = Fn(() => {
+    const q = vUv.xy.toVar(), r2 = dot(q, q).toVar(); If(r2.greaterThanEqual(1), () => { Discard(); });
+    const r = sqrt(r2).toVar(), age = vUv.z.toVar(), st = vUv.w.toVar(), sx = vS.x.toVar(), sd = abs(sx).toVar(), vSol = vS.z.toVar();
+    const I = float(0).toVar(), W = float(0).toVar(), A = float(0).toVar(), k = float(1).sub(age).toVar(); const core = exp(r2.mul(-16)).toVar(), halo = exp(r2.mul(-3.2)).mul(float(1).sub(r2)).toVar();
+    const a = float(0).toVar(); If(r2.greaterThan(0.000001), () => { a.assign(atan(q.y, q.x)); });
+    If(st.lessThan(0.5), () => { I.assign(halo.mul(0.85).add(core)); W.assign(core.mul(0.6)); }) /* orbe */
+      .ElseIf(st.lessThan(2.5), () => { /* estrela de 4 pontas (1) e de cristal (2) */
+        const c = abs(cos(a.add(sd.mul(6.2832)).mul(select(st.lessThan(1.5), float(2), float(3))))).toVar(); const c2 = c.mul(c).toVar(), c4 = c2.mul(c2).toVar(), c8 = c4.mul(c4).toVar();
+        const sp = select(st.lessThan(1.5), c8.mul(c8).mul(c8), c8.mul(c8).mul(c8).mul(c8).mul(c8)).mul(float(1).sub(r)).mul(float(1).sub(r)).toVar();
+        I.assign(sp.mul(1.5).add(halo.mul(0.45)).add(core).mul(k)); W.assign(core.mul(1.1).add(sp.mul(0.4)).mul(k)); })
+      .ElseIf(st.lessThan(3.5), () => { /* agulha ou estilhaço */
+        const dm = abs(q.x).add(abs(q.y)).toVar(), body = float(1).sub(smoothstep(0.45, 1, dm)).toVar(), cr = exp(q.x.mul(q.x).mul(2.5).add(q.y.mul(q.y).mul(40)).negate()).toVar(), fc = select(q.y.greaterThan(0), float(1), float(0.55)).toVar();
+        I.assign(body.mul(0.6).mul(fc).add(cr)); W.assign(cr.mul(0.7));
+        If(vSol.greaterThan(0), () => { const bm = float(1).sub(smoothstep(0.55, 0.85, dm)).toVar(); I.assign(bm.mul(fc.mul(0.4).add(0.32)).add(cr.mul(0.35)).add(body.mul(0.25))); W.assign(cr.mul(0.15)); A.assign(bm.mul(0.75)); }); })
+      .ElseIf(st.lessThan(4.5), () => { /* glóbulo de ácido */
+        const wob = sin(a.mul(3).add(U.clock.mul(5)).add(sd.mul(9))).mul(0.15).add(sin(a.mul(5).sub(U.clock.mul(8)).add(sd.mul(3))).mul(0.08)); const body = float(1).sub(smoothstep(0.5, 0.8, r.add(wob))).toVar();
+        const bub = smoothstep(0.72, 0.9, n2(q.mul(3.5).add(vec2(sd.mul(7), U.clock.mul(1.6))))).toVar(), cg = exp(r2.mul(-6)).toVar(); I.assign(body.mul(bub.mul(0.4).add(0.6)).add(cg.mul(0.6)).add(halo.mul(0.3))); W.assign(cg.mul(0.12));
+        If(vSol.greaterThan(0), () => { I.assign(body.mul(bub.mul(0.5).add(0.22)).add(cg.mul(0.25)).add(halo.mul(0.25))); W.assign(0); A.assign(body.mul(0.75)); }); })
+      .ElseIf(st.lessThan(5.5).or(st.greaterThan(9.5)), () => { const e = r.sub(0.82).div(0.075).toVar(), ring = exp(e.mul(e).negate()).toVar(); I.assign(ring.mul(k.mul(0.4).add(1)).add(exp(e.mul(e).mul(-0.08)).mul(0.12)).mul(k)); W.assign(ring.mul(k).mul(k).mul(0.3)); }) /* anel */
+      .ElseIf(st.lessThan(6.5), () => { /* golpe: arco que varre */
+        const hd = smoothstep(0, 0.45, age).mul(2.5).sub(1.25).toVar(), tl = clamp(hd.sub(a).div(1.8), 0, 1).toVar(), on = step(a, hd.add(0.05)).mul(step(-1.35, a)).mul(float(1).sub(tl)).toVar();
+        const e = r.sub(0.78).div(float(1).sub(tl).mul(0.085).add(0.04)).toVar(), band = exp(e.mul(e).negate()).mul(on).toVar(), fd = float(1).sub(smoothstep(0.5, 1, age)).toVar();
+        I.assign(band.mul(1.5).add(exp(e.mul(e).mul(-0.12)).mul(on).mul(0.3)).mul(fd)); W.assign(band.mul(float(1).sub(tl)).mul(fd).mul(0.7)); })
+      .ElseIf(st.lessThan(7.5), () => { /* casulo pulsante */
+        const pul = sin(U.clock.mul(9).add(sd.mul(6.2832))).mul(0.3).add(0.8).toVar(), vein = float(1).sub(smoothstep(0, 0.08, abs(n2(q.mul(2.6).add(sd.mul(5))).sub(0.5)))).toVar(), body = float(1).sub(smoothstep(0.42, 0.72, r)).toVar();
+        I.assign(body.mul(vein.mul(0.75).add(0.55)).add(halo.mul(0.5)).mul(pul).add(core.mul(0.3))); W.assign(core.mul(0.12).mul(pul));
+        If(vSol.greaterThan(0), () => { I.assign(body.mul(vein.mul(1.5).add(0.16)).add(halo.mul(0.45)).mul(pul).add(core.mul(0.12))); W.assign(0); A.assign(body.mul(0.8)); }); })
+      .ElseIf(st.lessThan(8.5), () => { /* clarão de impacto com raios */
+        const c7 = cos(a.mul(7).add(sd.mul(6.2832))).mul(0.5).add(0.5).toVar(), c11 = cos(a.mul(11).sub(sd.mul(3))).mul(0.5).add(0.5).toVar(); c7.mulAssign(c7); c7.mulAssign(c7); c11.mulAssign(c11); c11.mulAssign(c11); c11.mulAssign(c11);
+        const rays = c7.mul(c7).mul(0.7).add(c11.mul(0.5)).mul(float(1).sub(r)).mul(1.5).toVar(); I.assign(rays.add(halo.mul(0.5)).add(core).mul(k)); W.assign(core.add(rays.mul(0.3)).mul(k).mul(k)); })
+      .Else(() => { I.assign(exp(r2.mul(-3.5)).mul(float(1).sub(r2)).mul(k)); }); /* sopro macio */
+    If(sx.greaterThanEqual(0).and(st.lessThan(0.5).or(ent(st, 2.5, 4.5)).or(ent(st, 6.5, 7.5))), () => { const f = float(1).sub(smoothstep(0.7, 1, age)).toVar(); I.mulAssign(f); W.mulAssign(f); A.mulAssign(f); });
+    const saida = vec4(vCol.rgb.mul(I).add(vec3(W)).mul(vS.y), A.mul(vSol)).toVar();
+    If(U.semPos.greaterThan(0.5), () => { saida.assign(vec4(inv(saida.rgb).div(U.expo), float(1).sub(pow(float(1).sub(clamp(saida.a, 0, 1)), U.gama)))); }); /* sem pós: a imagem do clássico; 5.0b (junção): ÷ exposição (o Modo Foto muda; o clássico desenha os efeitos crus) */
+    return saida;
+  })();
+  return ARD.m5 && ARD.m5.registrar ? ARD.m5.registrar('armas-sprite', m) : m;
+}
+
 function create(THREE, scene, env) {
   env = env || {}; const FX = env.FX || null, flashF = env.flash || null, HF = env.H || null, QL = () => (env.quality && env.quality()) || { particles: 1 };
   const R = Math.random, TAU = Math.PI * 2, TK = (ARD.sim && ARD.sim.TICK) || 0.1;
-  const U = { clock: { value: 0 }, res: { value: new THREE.Vector2(1280, 720) }, minPx: { value: 0.85 }, near: { value: 1 } }, uAged = { value: 0 }, uDyn = { value: 0 };
-  const mat = (vs, fs, ut) => new THREE.ShaderMaterial({ uniforms: { uTime: ut, uClock: U.clock, uRes: U.res, uMinPx: U.minPx, uNear: U.near }, vertexShader: vs, fragmentShader: fs, transparent: true, depthWrite: false, depthTest: true, blending: THREE.CustomBlending, blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, side: THREE.DoubleSide, fog: false }); /* dois lados: a fita é montada na tela e o anel deitado gira com o voo; mistura pré-multiplicada: alfa 0 soma luz (aditivo), alfa > 0 é corpo que cobre o fundo e segura a cor de dia */
+  const M5 = !!(ARD.m5 && ARD.m5.active && ARD.m5.active()); /* 5.0b: Motor 5 — fitas e sprites em TSL, mesma CPU */
+  const uni = v => (M5 ? window.TSL.uniform(v) : { value: v });
+  const U = { clock: uni(0), res: { value: new THREE.Vector2(1280, 720) }, minPx: uni(0.85), near: uni(1), semPos: uni(0), gama: uni(1.5) /* 5.0b: sem pós, a saída do clássico (ARD.fx3d.inversoSaida) */, expo: M5 && ARD.m5.foto && ARD.m5.foto.exposicao ? (ARD.m5.foto.exposicao() || uni(1)) : uni(1) /* 5.0b (junção): a exposição em uso (ARD.m5.u.exposicao do Modo Foto; 1 na partida) */ }, uAged = uni(0), uDyn = uni(0);
+  const mat = (vs, fs, ut) => M5 ? m5Arma(vs === VS_P, ut, U) /* 5.0b: TSL */ : new THREE.ShaderMaterial({ uniforms: { uTime: ut, uClock: U.clock, uRes: U.res, uMinPx: U.minPx, uNear: U.near }, vertexShader: vs, fragmentShader: fs, transparent: true, depthWrite: false, depthTest: true, blending: THREE.CustomBlending, blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, side: THREE.DoubleSide, fog: false }); /* dois lados: a fita é montada na tela e o anel deitado gira com o voo; mistura pré-multiplicada: alfa 0 soma luz (aditivo), alfa > 0 é corpo que cobre o fundo e segura a cor de dia */
   const mSd = mat(VS_S, FS_S, uDyn), mSa = mat(VS_S, FS_S, uAged), mPd = mat(VS_P, FS_P, uDyn), mPa = mat(VS_P, FS_P, uAged); /* mesmo código: 2 programas para os 4 lotes */
   const _rv = new THREE.Vector2(); function onBR(renderer) { const rt = renderer.getRenderTarget(); if (rt) U.res.value.set(rt.width, rt.height); else { renderer.getDrawingBufferSize(_rv); U.res.value.copy(_rv); } }
   function sys(sprite, cap, dyn) {
     const base = sprite ? new THREE.PlaneGeometry(2, 2) : new THREE.PlaneGeometry(2, 1).translate(0, 0.5, 0);
     const g = new THREE.InstancedBufferGeometry(); g.index = base.index; g.setAttribute('position', base.attributes.position);
     const names = sprite ? ['pA', 'pB', 'pC', 'pD', 'pE'] : ['sA', 'sB', 'sC', 'sD', 'sE']; const at = [], A = [];
-    for (let j = 0; j < 5; j++) { const a = new THREE.InstancedBufferAttribute(new Float32Array(cap * 4), 4); a.setUsage(THREE.DynamicDrawUsage); g.setAttribute(names[j], a); at.push(a); A.push(a.array); }
+    for (let j = 0; j < 5; j++) { const a = new THREE.InstancedBufferAttribute(new Float32Array(cap * 4), 4); if (!M5) a.setUsage(THREE.DynamicDrawUsage); /* 5.0b: StaticDrawUsage no Motor 5 (o r186 reenviaria o buffer inteiro a cada desenho) */ g.setAttribute(names[j], a); at.push(a); A.push(a.array); }
     if (!dyn) for (let i = 0; i < cap; i++) { if (sprite) { A[0][i * 4 + 3] = -1e6; A[1][i * 4 + 3] = 1; } else { A[3][i * 4] = -1e6; A[3][i * 4 + 1] = 1; } } /* nascidos "há muito tempo": invisíveis */
     g.instanceCount = dyn ? 0 : cap;
-    const m = new THREE.Mesh(g, sprite ? (dyn ? mPd : mPa) : (dyn ? mSd : mSa)); m.frustumCulled = false; m.renderOrder = 13; m.onBeforeRender = onBR; m.visible = !dyn; scene.add(m);
-    return { g, at, A0: A[0], A1: A[1], A2: A[2], A3: A[3], A4: A[4], m, n: 0, i: 0, cap, dyn, lo: cap, hi: -1, plo: 0, phi: -1, peak: 0, born: 0 };
+    const m = new THREE.Mesh(g, sprite ? (dyn ? mPd : mPa) : (dyn ? mSd : mSa)); m.frustumCulled = false; m.renderOrder = 13; if (!M5) m.onBeforeRender = onBR; /* 5.0b: no Motor 5 o tamanho do alvo vem do screenSize do TSL */ m.visible = !dyn; scene.add(m);
+    return { g, at, A0: A[0], A1: A[1], A2: A[2], A3: A[3], A4: A[4], m, n: 0, i: 0, cap, dyn, lo: cap, hi: -1, plo: 0, phi: -1, peak: 0, born: 0, fim: -1e9 };
   }
   const SD = sys(false, 3072, true), SA = sys(false, 3072, false), PD = sys(true, 1536, true), PA = sys(true, 4096, false);
   function slot(S) { let i; if (S.dyn) { if (S.n >= S.cap) return -1; i = S.n++; } else { i = S.i; S.i = i + 1 >= S.cap ? 0 : i + 1; if (i < S.lo) S.lo = i; if (i > S.hi) S.hi = i; S.born++; } return i * 4; }
@@ -207,12 +349,12 @@ function create(THREE, scene, env) {
   function seg(S, ax, ay, az, wa, bx, by, bz, wb, c, k, t0, life, st, sd, e0, e1, e2, e3) { const o = slot(S); if (o < 0) return;
     let A = S.A0; A[o] = ax; A[o + 1] = ay; A[o + 2] = az; A[o + 3] = wa; A = S.A1; A[o] = bx; A[o + 1] = by; A[o + 2] = bz; A[o + 3] = wb;
     A = S.A2; A[o] = c[0]; A[o + 1] = c[1]; A[o + 2] = c[2]; A[o + 3] = k; A = S.A3; A[o] = t0; A[o + 1] = life; A[o + 2] = st; A[o + 3] = sd;
-    A = S.A4; A[o] = e0; A[o + 1] = e1; A[o + 2] = e2; A[o + 3] = e3; }
+    A = S.A4; A[o] = e0; A[o + 1] = e1; A[o + 2] = e2; A[o + 3] = e3; if (M5 && !S.dyn && t0 + life > S.fim) S.fim = t0 + life; /* 5.0b */ }
   /* sprite */
   function spr(S, x, y, z, t0, vx, vy, vz, life, s0, s1, st, sd, c, k, rot, spin, grav, asp) { const o = slot(S); if (o < 0) return;
     let A = S.A0; A[o] = x; A[o + 1] = y; A[o + 2] = z; A[o + 3] = t0; A = S.A1; A[o] = vx; A[o + 1] = vy; A[o + 2] = vz; A[o + 3] = life;
     A = S.A2; A[o] = s0; A[o + 1] = s1; A[o + 2] = st; A[o + 3] = sd; A = S.A3; A[o] = c[0]; A[o + 1] = c[1]; A[o + 2] = c[2]; A[o + 3] = k;
-    A = S.A4; A[o] = rot; A[o + 1] = spin; A[o + 2] = grav; A[o + 3] = asp; }
+    A = S.A4; A[o] = rot; A[o + 1] = spin; A[o + 2] = grav; A[o + 3] = asp; if (M5 && !S.dyn && t0 + life > S.fim) S.fim = t0 + life; /* 5.0b */ }
   function flush(S) { const at = S.at;
     if (S.dyn) { const n = S.n; S.g.instanceCount = n; S.m.visible = n > 0; if (n > S.peak) S.peak = n; if (n) for (let j = 0; j < 5; j++) { const a = at[j]; a.clearUpdateRanges(); a.addUpdateRange(0, n * 4); a.needsUpdate = true; } S.n = 0; }
     else if (S.hi >= 0) { /* junta com a faixa que o three ainda não enviou (quadro escrito sem desenho no meio), para nada ficar velho na GPU */
@@ -515,12 +657,13 @@ function create(THREE, scene, env) {
       if (((frameNo * 7) % 3) === 0) light(t[0], t[2], 14, dev ? DEVL : p.l, 0.45, lead * 3.2, 1); },
     frame(dt, t, camera) { lead = Math.min(0.1, Math.max(0.001, dt || 1 / 60)); time = t;
       let w = 0; for (let j = 0; j < nAct; j++) { const s = act[j]; if (sSeen[s] === frameNo) { act[w++] = s; continue; } endShell(s, t); sIn[s] = 0; sId[s] = -1; sHas[s] = 0; } nAct = w;
-      U.clock.value = t; uAged.value = t; uDyn.value = 0; if (camera && camera.near) U.near.value = camera.near;
-      flush(SD); flush(SA); flush(PD); flush(PA); frameNo++; },
+      U.clock.value = t; uAged.value = t; uDyn.value = 0; if (camera && camera.near) U.near.value = camera.near; if (M5) U.semPos.value = env.semPos && env.semPos() ? 1 : 0; /* 5.0b */
+      flush(SD); flush(SA); flush(PD); flush(PA); frameNo++;
+      if (M5) { SA.m.visible = t <= SA.fim + 0.05; PA.m.visible = t <= PA.fim + 0.05; } /* 5.0b: lote envelhecido sem nada vivo fica fora do desenho (CPU do WebGPU por objeto); o pipeline já nasceu na carga */ },
     /* 4.3g: contagens para o relatório e a QA (pico de instâncias dinâmicas, nascimentos nos lotes envelhecidos) */
     stats() { return { emVoo: nAct, fitasDinPico: SD.peak, spritesDinPico: PD.peak, fitasNascidas: SA.born, spritesNascidos: PA.born, capFitas: SA.cap, capSprites: PA.cap, chamadas: 4, programas: 2 }; },
   };
   return CB;
 }
-ARD.combat3d = { create, STYLE, PAL, ARS };
+ARD.combat3d = { create, STYLE, PAL, ARS, m5: true /* 5.0b: portado para o Motor 5 (TSL) */ };
 })(globalThis.ARD = globalThis.ARD || {});

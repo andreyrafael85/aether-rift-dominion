@@ -18,8 +18,10 @@ M5.vnoise2 = p => { const { floor, fract, mix, vec2 } = L(); const i = floor(p),
    material) e a normal no setupPosition do material; base = posição local da fase 2 (gancho de animação), antes da instância */
 M5.instMat = function (m, base) { const { Fn, attribute, mat4, vec4, positionLocal, normalLocal, transformNormal } = L();
   const iM = mat4(attribute('iM0', 'vec4'), attribute('iM1', 'vec4'), attribute('iM2', 'vec4'), attribute('iM3', 'vec4'));
+  const pre = base && typeof base.ardPre === 'function' ? base.ardPre : null; if (pre) base = null; /* 5.0b: passo prévio da fase 2 (animação por peça e ruína, src/m5/modelos.js): mexe em positionLocal e normalLocal no espaço do modelo, antes da instância */
   m.positionNode = Fn(b => { const p = base || positionLocal; return b.object && b.object.isM5Inst ? iM.mul(vec4(p, 1)).xyz : p; })();
-  const sp = m.setupPosition; m.setupPosition = function (b) { if (b.object && b.object.isM5Inst && b.hasGeometryAttribute('normal')) normalLocal.assign(transformNormal(normalLocal, iM)); return sp.call(this, b); };
+  if (pre) m.positionNode.ardPre = pre; /* 5.0b: o material de sombra copia o positionNode e roda o mesmo passo */
+  const sp = m.setupPosition; m.setupPosition = function (b) { if (pre) pre(b); /* 5.0b */ if (b.object && b.object.isM5Inst && b.hasGeometryAttribute('normal')) normalLocal.assign(transformNormal(normalLocal, iM)); return sp.call(this, b); };
   m.userData.m5Inst = true; return m; }; /* a fábrica M5.instancia só cria M5.Inst para material marcado */
 M5.instCor = function (cor) { const { Fn, attribute } = L(); return Fn(b => (b.object && b.object.isM5Inst ? cor.mul(attribute('iC', 'vec3')) : cor))(); };
 
@@ -37,7 +39,7 @@ M5.modelo = function (o) {
   const G = M5.ganchos && M5.ganchos.modelo; const ctx = { m, o, em };
   if (G && G.superficie) G.superficie(ctx); /* fase 2: detalhe de superfície (colorNode/normalNode/roughnessNode) */
   if (G && G.emissivo) em = G.emissivo(ctx) || em;
-  let pAnim = null; if (G && G.posicao && !o.noAnim) pAnim = G.posicao(ctx) || null; /* fase 2: animação por peça, na posição local do modelo (a sombra usa o mesmo positionNode) */
+  let pAnim = null; if (G && G.posicao && (!o.noAnim || o.ruina /* 5.0b: a ruína (noAnim) também monta a posição no gancho */)) pAnim = G.posicao(ctx) || null; /* fase 2: animação por peça, na posição local do modelo (a sombra usa o mesmo positionNode) */
   M5.instMat(m, pAnim); m.colorNode = M5.instCor(L().materialColor); /* 5.0a.1: M5.Inst */
   m.emissiveNode = em;
   return M5.registrar('modelo-' + (o.key || 'base'), m);
@@ -47,7 +49,7 @@ M5.modelMaterial = function (o) { return M5.modelo(o); };
 /* parte emissiva dos modelos (janelas, luzes, cristais): cor por vértice × tinta por instância × material.color (o render3d acende à noite) */
 M5.emissivo = function (o) {
   o = o || {}; const m = new (T().MeshBasicNodeMaterial)({ vertexColors: true });
-  const G = M5.ganchos && M5.ganchos.modelo; let pAnim = null; if (G && G.posicao && !o.noAnim) pAnim = G.posicao({ m, o, emissivo: true }) || null;
+  const G = M5.ganchos && M5.ganchos.modelo; let pAnim = null; if (G && G.posicao && (!o.noAnim || o.ruina /* 5.0b: idem na parte emissiva da ruína */)) pAnim = G.posicao({ m, o, emissivo: true }) || null;
   M5.instMat(m, pAnim); m.colorNode = M5.instCor(L().materialColor); /* 5.0a.1: M5.Inst */
   return M5.registrar('emissivo-' + (o.key || 'base'), m);
 };
@@ -110,7 +112,8 @@ M5.chao = function (U, o) {
   alb = alb.mul(macro.mul(0.28).add(0.86));
   if (o.fora) { const sl = smoothstep(250, 340, pw.y.add(macro.sub(0.5).mul(90))).mul(float(1).sub(smoothstep(0.35, 0.6, slope))); alb = mix(alb, vec3(0.78, 0.82, 0.88).mul(soft.mul(0.1).add(0.9)), sl); rough = mix(rough, 0.7, sl); }
   alb = alb.mul(mix(0.72, 1.0, aoc.x));
-  if (o.vazio) { const paredao = smoothstep(PAR0, PAR1, pw.y.negate()); alb = alb.mul(float(1).sub(paredao)); rough = mix(rough, 0.85, paredao); tEmis = tEmis.add(vec3(0.006, 0.009, 0.022).mul(float(1).sub(M5.u.noite.mul(0.4))).mul(paredao)); } /* Cinturão sem o space3d: o paredão de rocha vai para a poeira escura do espaço perto do fundo (a mesma do clássico), sem luz (5.0a.1: o corte agora é no vazio, não na altura) */
+  let vzCorte = null; if (o.vazio && M5.espacoPleno && M5.espacoPleno()) { const vb = M5.espacoBorda({ m, U, gp, pw, alb, fine, soft, macro }); alb = vb.alb; vzCorte = vb.corte; } /* 5.0b: com o space3d portado, a borda do clássico (src/m5/espaco.js): corte a 18 da borda, beirada clara e cascalho nas pontes */
+  else if (o.vazio) { const paredao = smoothstep(PAR0, PAR1, pw.y.negate()); alb = alb.mul(float(1).sub(paredao)); rough = mix(rough, 0.85, paredao); tEmis = tEmis.add(vec3(0.006, 0.009, 0.022).mul(float(1).sub(M5.u.noite.mul(0.4))).mul(paredao)); } /* Cinturão sem o space3d: o paredão de rocha vai para a poeira escura do espaço perto do fundo (a mesma do clássico), sem luz (5.0a.1: o corte agora é no vazio, não na altura) */
   const CG = M5.ganchos && M5.ganchos.chao; if (CG && CG.cor) alb = CG.cor({ m, o, alb, Bw, gp }) || alb; /* fase 2: camadas e triplanar */
   if (!o.fora) {
     const wuv = vec2(gp.x.div(U.worldSize), gp.y.div(U.worldSize));
@@ -124,7 +127,7 @@ M5.chao = function (U, o) {
   let luz = M5.sample.clarao().mul(max(wn.y, 0).mul(0.65).add(0.35)); /* clarões no chão (encosta recebe menos) */
   if (!o.fora) luz = luz.add(M5.luzFendaChao(wn, pw)); /* 5.0a.1: a luz da Fenda (era uma PointLight) */
   m.emissiveNode = tEmis.add(alb.mul(luz));
-  if (o.vazio) m.maskNode = M5.vazioMascara(pw); /* 5.0a.1: Cinturão — o chão some só onde o mapa do vazio diz (antes era abaixo de −90 de altura) */
+  if (o.vazio) m.maskNode = vzCorte || M5.vazioMascara(pw); /* 5.0a.1: Cinturão — o chão some só onde o mapa do vazio diz (antes era abaixo de −90 de altura); 5.0b: com o space3d, o corte do clássico */
   m.userData.env = 0.22;
   return M5.registrar('chao' + (o.fora ? '-fora' : '') + (o.leve ? '-leve' : '') + (o.vazio ? '-vazio' : ''), m);
 };

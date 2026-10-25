@@ -190,6 +190,7 @@ vec3 lkEm = vec3(1.7, 1.8, 1.9) * lkGlit(P, normalize(cameraPosition - vLkW)) * 
 
 function create(THREE, scene, env) {
   const renderer = env.renderer, camera = env.camera, S = ARD.sim;
+  const M5 = !!(ARD.m5 && ARD.m5.active && ARD.m5.active() && ARD.m5.aguaMaterial); /* 5.0b: Motor 5 — materiais em TSL (src/m5/agua.js) e o passe do reflexo no WebGPURenderer; o resto é o mesmo */
   const qs = typeof location !== 'undefined' ? location.search : '';
   const OFF = new Set(((qs.match(/[?&]sem=([^&]*)/) || [])[1] || '').split(',')); /* ?sem=reflexo, ?sem=lagofx (partículas), ?sem=margem */
   const isTouch = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
@@ -199,7 +200,7 @@ function create(THREE, scene, env) {
   const white = new THREE.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1); white.needsUpdate = true;
   const black = new THREE.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1); black.needsUpdate = true;
   /* uniforms compartilhados (um objeto para todos os lagos) */
-  const G = { uTime: { value: 0 }, uDetail: { value: 1 }, uNight: { value: 0 }, uFog: { value: white }, uWorld: { value: S.WORLD }, uSunDir: { value: new THREE.Vector3(-0.47, 0.64, 0.6).normalize() }, uSky: { value: new THREE.Color(0.62, 0.69, 0.77) },
+  const G = M5 ? ARD.m5.aguaUniforms(S, qs) /* 5.0b: as mesmas chaves, como nós uniform do TSL */ : { uTime: { value: 0 }, uDetail: { value: 1 }, uNight: { value: 0 }, uFog: { value: white }, uWorld: { value: S.WORLD }, uSunDir: { value: new THREE.Vector3(-0.47, 0.64, 0.6).normalize() }, uSky: { value: new THREE.Color(0.62, 0.69, 0.77) },
     uFlash: FLASH ? FLASH.uFlash : { value: black }, uFlashR: FLASH ? FLASH.uFlashR : { value: new THREE.Vector4(0, 0, 1, 1) },
     uRefl: { value: black }, uReflDepth: { value: white }, uReflMat: { value: new THREE.Matrix4() }, uReflBox: { value: new THREE.Vector4(0, 0, 1, 1) }, uReflK: { value: +((qs.match(/[?&]reflexok=([0-9.]+)/) || [])[1] || 1) } };
 
@@ -222,7 +223,9 @@ function create(THREE, scene, env) {
     queimado(sh) { patch(sh, this, GL_BURN, { em: true, flash: true, bump: 0.8 }); },
     neve(sh) { patch(sh, this, GL_SNOW, { em: true, flash: true, bump: 0.6 }); },
   };
+  const M5MATS = {}; /* 5.0b: materiais do Motor 5, um por tipo, vivos enquanto o lakes3d existir */
   function mkMat(kind, U, decal) {
+    if (M5) return M5MATS[kind] || (M5MATS[kind] = ARD.m5.aguaMaterial(kind, G, decal, kind === 'gelo' ? 1 : 0.3, U.uLkData.value)); /* 5.0b: a mesma conta em TSL (src/m5/agua.js); um material por tipo para todos os lagos (os dados de cada lago vêm do userData.lkU da malha): um WGSL e um pipeline por tipo */
     const m = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8, metalness: 0, envMapIntensity: kind === 'gelo' ? 1 : 0.3, transparent: !!decal, depthWrite: !decal });
     if (decal) { m.polygonOffset = true; m.polygonOffsetFactor = 0; m.polygonOffsetUnits = -2; } /* só um empurrão mínimo: o decalque já fica 0,05 acima do chão e não pode passar na frente do gelo (0,12 acima) */
     m.userData.U = U; m.userData.env = m.envMapIntensity; m.onBeforeCompile = COMPILE[kind]; m.customProgramCacheKey = () => 'ard-lago-' + kind + '-v1'; return m;
@@ -284,7 +287,7 @@ function create(THREE, scene, env) {
   /* reflexo: chão simplificado em volta do gelo — a mesma grade e as mesmas alturas do terreno (a neve da margem assenta igual), cor do bioma por vértice.
      No passe do reflexo ele entra no lugar do terreno inteiro (321² vértices, ~205 mil triângulos): o reflexo da margem custa poucos milhares */
   const BIO = (ARD.terrain3d && ARD.terrain3d.BIO_MEAN) || [[0.78, 0.83, 0.9], [0.6, 0.46, 0.32], [0.27, 0.3, 0.18], [0.16, 0.15, 0.16]];
-  const proxyMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0.02, envMapIntensity: 0.22 }); proxyMat.userData.env = 0.22;
+  const proxyMat = M5 ? ARD.m5.aguaProxy() /* 5.0b */ : new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0.02, envMapIntensity: 0.22 }); proxyMat.userData.env = 0.22;
   LK.proxy = new THREE.Group(); LK.proxy.name = 'lagos3d-chao-do-reflexo'; LK.proxy.visible = false; LK.group.add(LK.proxy);
   function proxyGeo(D, T, pad) {
     const HN = T.HN, HS = T.HS, span = D.N * D.cell; const i0 = Math.max(0, Math.floor((D.x0 - pad) / HS)), i1 = Math.min(HN - 1, Math.ceil((D.x0 + span + pad) / HS)), j0 = Math.max(0, Math.floor((D.y0 - pad) / HS)), j1 = Math.min(HN - 1, Math.ceil((D.y0 + span + pad) / HS));
@@ -296,7 +299,7 @@ function create(THREE, scene, env) {
     const idx = []; for (let j = 0; j < Hh - 1; j++) for (let i = 0; i < W - 1; i++) { const a = j * W + i, b = a + 1, c = a + W, d = c + 1; idx.push(a, b, c, b, d, c); }
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.BufferAttribute(nrm, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.setIndex(idx); g.computeBoundingSphere(); return g;
   }
-  function clear() { for (const L of LK.lakes) { for (const m of [L.mesh, L.shore]) if (m) { LK.group.remove(m); m.geometry.dispose(); m.material.dispose(); } if (L.proxy) { LK.proxy.remove(L.proxy); L.proxy.geometry.dispose(); } if (L.D && L.D.tex) L.D.tex.dispose(); } LK.lakes.length = 0; }
+  function clear() { for (const L of LK.lakes) { for (const m of [L.mesh, L.shore]) if (m) { LK.group.remove(m); m.geometry.dispose(); if (!M5) m.material.dispose(); } /* 5.0b: no Motor 5 o material é do tipo (fica para o próximo build) */ if (L.proxy) { LK.proxy.remove(L.proxy); L.proxy.geometry.dispose(); } if (L.D && L.D.tex) L.D.tex.dispose(); } LK.lakes.length = 0; }
 
   LK.build = function (sim, T) {
     clear(); if (!T || !T.lakes || !T.heights) return; LK.T = T;
@@ -304,10 +307,10 @@ function create(THREE, scene, env) {
       /* o gelo fica no fundo da bacia (as unidades pisam no chão, que lá está ~2,5 abaixo do nível); o plasma no nível da água */
       let surf = k.level; if (!plasma) { const hs = []; for (let a = 0; a < 24; a++) for (const f of [0, 0.25, 0.45]) { const ang = a / 24 * TAU, rr = S.edgeR(k.r, ang, k.seed) * f; hs.push(terrH(T, k.x + Math.cos(ang) * rr, k.y + Math.sin(ang) * rr)); } hs.sort((p, q) => p - q); surf = Math.min(k.level - 0.05, hs[hs.length >> 1] + 0.12); }
       const D = lakeData(k, T, surf, plasma ? 34 : 30); if (D.area < 40) continue;
-      const U = { uLkData: { value: D.tex }, uLkRect: { value: new THREE.Vector4(D.x0, D.y0, D.N * D.cell, D.N * D.cell) }, uLkInfo: { value: new THREE.Vector4(k.x, k.y, k.r, (k.seed || 0) % 6.2831853) } };
+      const U = { uLkData: { value: D.tex }, uLkRect: { value: new THREE.Vector4(D.x0, D.y0, D.N * D.cell, D.N * D.cell) }, uLkInfo: { value: new THREE.Vector4(k.x, k.y, k.r, (k.seed || 0) % 6.2831853) } }; /* 5.0b: o mesmo U nos dois motores (no Motor 5 o material lê pelo userData.lkU da malha) */
       if (plasma) { U.uBub = { value: [] }; for (let i = 0; i < 6; i++) U.uBub.value.push(new THREE.Vector4(0, 0, -99, 0)); } else U.uReflOn = { value: 0 };
-      const mesh = new THREE.Mesh(surfGeo(D, surf), mkMat(plasma ? 'plasma' : 'gelo', U)); mesh.receiveShadow = true; mesh.castShadow = false; mesh.name = 'lago-' + k.kind; LK.group.add(mesh);
-      let shore = null; if (!OFF.has('margem')) { const g = shoreGeo(D, T, plasma ? -40 : -34, plasma ? 2 : 6); if (g) { shore = new THREE.Mesh(g, mkMat(plasma ? 'queimado' : 'neve', U, true)); shore.receiveShadow = true; shore.renderOrder = 1; shore.name = 'margem-' + k.kind; LK.group.add(shore); } }
+      const mesh = new THREE.Mesh(surfGeo(D, surf), mkMat(plasma ? 'plasma' : 'gelo', U)); mesh.receiveShadow = true; mesh.castShadow = false; mesh.name = 'lago-' + k.kind; mesh.userData.lkU = U; LK.group.add(mesh);
+      let shore = null; if (!OFF.has('margem')) { const g = shoreGeo(D, T, plasma ? -40 : -34, plasma ? 2 : 6); if (g) { shore = new THREE.Mesh(g, mkMat(plasma ? 'queimado' : 'neve', U, true)); shore.receiveShadow = true; shore.renderOrder = 1; shore.name = 'margem-' + k.kind; shore.userData.lkU = U; LK.group.add(shore); } }
       let proxy = null; if (!plasma && !OFF.has('chaoreflexo')) { proxy = new THREE.Mesh(proxyGeo(D, T, 110), proxyMat); proxy.receiveShadow = true; proxy.name = 'chao-reflexo'; LK.proxy.add(proxy); }
       const L = { k, plasma, x: k.x, y: k.y, r: k.r, surf, D, U, mesh, shore, proxy, vis: false, area: 0, fogK: 1, ft: Math.random() * 0.1, bt: 0.5 + Math.random(), bubs: [], ph: Math.random() * TAU, outline: [] };
       for (let a = 0; a < 20; a++) { const ang = a / 20 * TAU, rr = S.edgeR(k.r, ang, k.seed) * 0.98; L.outline.push(new THREE.Vector3(k.x + Math.cos(ang) * rr, surf, -(k.y + Math.sin(ang) * rr))); }
@@ -319,24 +322,25 @@ function create(THREE, scene, env) {
   };
 
   /* compila os materiais agora (no build), na variante que o jogo usa (pós → alvo de render; sem pós → tela) */
-  function prewarm() { if (!LK.lakes.length) return; try { const q = env.quality ? env.quality() : null; const prev = renderer.getRenderTarget(); let tmp = null; if (q && q.post) { tmp = new THREE.WebGLRenderTarget(4, 4, { type: rtType() }); renderer.setRenderTarget(tmp); } renderer.compile(LK.group, camera, scene); renderer.setRenderTarget(prev); if (tmp) tmp.dispose(); } catch (err) { console.warn('[ARD] lagos: pré-compilação falhou: ' + err.message); } }
+  function prewarm() { if (!LK.lakes.length) return; if (M5) return; /* 5.0b: no Motor 5 a superfície e as margens compilam no aquecimento da cena, e o chão do reflexo nos quadros de aquecimento (setupRefl com R.warming) */ try { const q = env.quality ? env.quality() : null; const prev = renderer.getRenderTarget(); let tmp = null; if (q && q.post) { tmp = new THREE.WebGLRenderTarget(4, 4, { type: rtType() }); renderer.setRenderTarget(tmp); } renderer.compile(LK.group, camera, scene); renderer.setRenderTarget(prev); if (tmp) tmp.dispose(); } catch (err) { console.warn('[ARD] lagos: pré-compilação falhou: ' + err.message); } }
   function rtType() { const c = renderer.capabilities, e = renderer.extensions; return c.isWebGL2 && (e.has('EXT_color_buffer_float') || e.has('EXT_color_buffer_half_float')) ? THREE.HalfFloatType : THREE.UnsignedByteType; }
 
   /* ---------- reflexo plano ---------- */
   const RF = { rt: null, cam: new THREE.PerspectiveCamera(), want: false, busy: false, plane: 0, vpW: 0, vpH: 0, hide: [], inst: [], save: [], hideT: 0, terrain: null, missed: 0, dead: false, probe: 0 };
   RF.cam.matrixAutoUpdate = true; RF.cam.name = 'reflexo-lagos';
+  if (M5) { RF.rt = ARD.m5.aguaAlvo(G); RF.frames = 0; } /* 5.0b: o alvo nasce na carga (a textura de profundidade entra no tipo do shader do gelo); o tamanho muda depois sem pipeline novo */
   const _pv = new THREE.Matrix4(), _pm = new THREE.Matrix4(), _v = new THREE.Vector3(), _v2 = new THREE.Vector3(), _up = new THREE.Vector3(), _fw = new THREE.Vector3(), _clip = new THREE.Vector4(), _qv = new THREE.Vector4(), _plane = new THREE.Plane(), _fr = new THREE.Frustum(), _sph = new THREE.Sphere(), _sz = new THREE.Vector2(), _cc = new THREE.Color(), _bg = new THREE.Color(0x101418), _box = new Float32Array(4), _bias = new THREE.Matrix4();
   const LAKE_SET = new Set(); let sunL = null;
   /* o que o passe não desenha: os lagos, partículas (FX, pontos, sprites) e transparentes sem profundidade (clarões, decalques, brilhos) */
   const addLake = o => LAKE_SET.add(o);
-  const visitHide = o => { if (o.isDirectionalLight && !sunL) sunL = o; if (o === scene || LAKE_SET.has(o)) return; const FX = env.FX; if (FX && ((FX.add && o === FX.add.mesh) || (FX.alp && o === FX.alp.mesh))) { RF.hide.push(o); return; } if (o.isPoints || o.isSprite || o.isLine) { RF.hide.push(o); return; }
-    const m = o.material; if (o.isMesh && m && !Array.isArray(m) && m.transparent && !m.depthWrite && o.renderOrder > -100) { RF.hide.push(o); return; } if (o.isInstancedMesh) { RF.inst.push(o); return; }
+  const visitHide = o => { if (o.isDirectionalLight && !sunL) sunL = o; if (o === scene || LAKE_SET.has(o)) return; if (M5 && o.userData && o.userData.ardSemReflexo) { RF.hide.push(o); return; } /* 5.0b: o quadro da camada do espaço é só da câmera do jogo */ const FX = env.FX; if (FX && ((FX.add && o === FX.add.mesh) || (FX.alp && o === FX.alp.mesh))) { RF.hide.push(o); return; } if (o.isPoints || o.isSprite || o.isLine) { RF.hide.push(o); return; }
+    const m = o.material; if (o.isMesh && m && !Array.isArray(m) && m.transparent && !m.depthWrite && o.renderOrder > -100) { RF.hide.push(o); return; } if (o.isInstancedMesh || o.isM5Inst) { RF.inst.push(o); return; } /* 5.0b: os ARD.m5.Inst (instâncias por atributo, 5.0a.1) entram no recorte como os InstancedMesh */
     const T = LK.T; if (!RF.terrain && T && o.isMesh && o.geometry && o.geometry.attributes && o.geometry.attributes.bio && o.geometry.attributes.position.count === T.HN * T.HN) RF.terrain = o; };
   function hideList(force) { if (!force && RF.hideT > 0) return; RF.hideT = 1.5; RF.hide.length = 0; RF.inst.length = 0; LAKE_SET.clear(); LK.group.traverse(addLake); sunL = null; RF.terrain = null; scene.traverse(visitHide);
     for (const L of LK.lakes) RF.hide.push(L.mesh); /* os decalques da margem ficam no reflexo (a neve aparece refletida); as superfícies saem */ if (!LK.proxy.children.length) RF.terrain = null; }
-  function instSeen(m) { const n = m.count; if (!n) return false; const a = m.instanceMatrix.array, g = m.geometry; if (!g.boundingSphere) g.computeBoundingSphere(); const bs = g.boundingSphere, r0 = bs.radius + bs.center.length(); const e = m.matrixWorld.elements; const ident = e[0] === 1 && e[5] === 1 && e[10] === 1 && e[12] === 0 && e[13] === 0 && e[14] === 0;
+  function instSeen(m) { const n = m.isM5Inst ? m.geometry.instanceCount : m.count; if (!n) return false; /* 5.0b: no ARD.m5.Inst o count é 1 de propósito (o número de verdade fica na geometria; a matriz tem o mesmo leiaute) */ const a = m.instanceMatrix.array, g = m.geometry; if (!g.boundingSphere) g.computeBoundingSphere(); const bs = g.boundingSphere, r0 = bs.radius + bs.center.length(); const e = m.matrixWorld.elements; const ident = e[0] === 1 && e[5] === 1 && e[10] === 1 && e[12] === 0 && e[13] === 0 && e[14] === 0;
     for (let i = 0; i < n; i++) { const o = i * 16; const sc = Math.sqrt(a[o] * a[o] + a[o + 1] * a[o + 1] + a[o + 2] * a[o + 2]); _sph.center.set(a[o + 12], a[o + 13], a[o + 14]); _sph.radius = r0 * sc; if (!ident) _sph.applyMatrix4(m.matrixWorld); if (_fr.intersectsSphere(_sph)) return true; } return false; }
-  function reflAllowed() { if (OFF.has('reflexo') || isTouch || !renderer.capabilities.isWebGL2) return false; const q = env.quality ? env.quality() : null; if (!q || !q.post) return false; return (q.resolved || q.name) !== 'baixa'; }
+  function reflAllowed() { if (OFF.has('reflexo') || isTouch || !(M5 || renderer.capabilities.isWebGL2)) return false; /* 5.0b: o Motor 5 reflete nos dois backends */ const q = env.quality ? env.quality() : null; if (!q || !q.post) return false; return (q.resolved || q.name) !== 'baixa'; }
   /* caixa (NDC) dos pontos do contorno numa câmera; devolve a área recortada na tela ou −1 se algum ponto está atrás */
   function ndcBox(pts, m, out) { let x0 = 9, y0 = 9, x1 = -9, y1 = -9, back = 0; const e = m.elements; for (const p of pts) { const w = e[3] * p.x + e[7] * p.y + e[11] * p.z + e[15]; if (w <= 1e-3) { back++; continue; } const x = (e[0] * p.x + e[4] * p.y + e[8] * p.z + e[12]) / w, y = (e[1] * p.x + e[5] * p.y + e[9] * p.z + e[13]) / w; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
     if (back === pts.length) { out[0] = out[1] = 9; out[2] = out[3] = -9; return 0; } if (back) { out[0] = -1; out[1] = -1; out[2] = 1; out[3] = 1; return -1; }
@@ -344,49 +348,62 @@ function create(THREE, scene, env) {
   function setupRefl(cam) {
     if (RF.want) { if (++RF.missed >= 3 && !RF.dead) { RF.dead = true; RF.probe = G.uTime.value; console.warn('[ARD] lagos: o passe de reflexo não rodou (scene.onBeforeRender substituído?) — gelo volta ao reflexo do céu'); } } else RF.missed = 0; /* o gancho não disparou: não amostra um alvo velho */
     let probing = false; if (RF.dead) { if (G.uTime.value - RF.probe < 5) { RF.want = false; for (const L of LK.lakes) if (L.U.uReflOn) L.U.uReflOn.value = 0; LK.stats.refl = 0; return; } RF.probe = G.uTime.value; probing = true; } /* a cada 5 s tenta de novo (sem usar o alvo neste quadro) */
-    let best = null; for (const L of LK.lakes) if (!L.plasma && L.vis && L.fogK > 0.05 && (!best || L.area > best.area)) best = L;
+    const aquece = M5 && !!(ARD.m5.cur && ARD.m5.cur.R && ARD.m5.cur.R.warming); RF.aquece = aquece; /* 5.0b: nos quadros de aquecimento o passe roda mesmo sem gelo à vista: o chão do reflexo é iluminado e recebe sombra, e o pipeline dele só fica certo depois que as sombras assentam (os primeiros quadros) */
+    let best = null; for (const L of LK.lakes) if (!L.plasma && L.vis && L.fogK > 0.05 && (!best || L.area > best.area)) best = L; if (!best && aquece) best = LK.lakes.find(L => !L.plasma) || null;
     for (const L of LK.lakes) if (L.U.uReflOn) L.U.uReflOn.value = 0;
     if (!best || !reflAllowed()) { RF.want = false; LK.stats.refl = 0; return; }
-    if (renderer.shadowMap.enabled && sunL && sunL.castShadow && !sunL.shadow.map) { RF.want = false; return; } /* sem o mapa de sombra ainda (primeiro quadro): o passe usaria uma textura vazia no amostrador de sombra */
+    if (M5 ? !aquece && RF.frames++ < 3 : renderer.shadowMap.enabled && sunL && sunL.castShadow && !sunL.shadow.map) { RF.want = false; return; } /* 5.0b: no Motor 5 as cascatas têm mapas próprios: espera os primeiros quadros */ /* sem o mapa de sombra ainda (primeiro quadro): o passe usaria uma textura vazia no amostrador de sombra */
     const Ly = best.surf; RF.plane = Ly;
     /* câmera espelhada: posição, frente e alto refletidos no plano y = Ly (câmera própria, sem inverter a face) */
     cam.updateMatrixWorld(); const ce = cam.matrixWorld.elements; _v.set(ce[12], ce[13], ce[14]); if (_v.y <= Ly + 1) { RF.want = false; return; }
     _fw.set(-ce[8], -ce[9], -ce[10]); _up.set(ce[4], ce[5], ce[6]);
     RF.cam.position.set(_v.x, 2 * Ly - _v.y, _v.z); _fw.y = -_fw.y; _up.y = -_up.y; RF.cam.up.copy(_up); _v2.copy(RF.cam.position).add(_fw); RF.cam.lookAt(_v2); RF.cam.updateMatrixWorld();
-    RF.cam.near = cam.near; RF.cam.far = cam.far; RF.cam.projectionMatrix.copy(cam.projectionMatrix);
+    if (M5) RF.cam.coordinateSystem = renderer.coordinateSystem; /* 5.0b: sem isto o WebGPURenderer refaz a projeção no primeiro desenho */ RF.cam.near = cam.near; RF.cam.far = cam.far; RF.cam.projectionMatrix.copy(cam.projectionMatrix);
     /* recorte: retângulo dos lagos do grupo (mesmo nível) vistos pela câmera espelhada */
     _pv.multiplyMatrices(RF.cam.projectionMatrix, RF.cam.matrixWorldInverse); let x0 = 9, y0 = 9, x1 = -9, y1 = -9, n = 0;
     for (const L of LK.lakes) { if (L.plasma || !L.vis || Math.abs(L.surf - Ly) > 0.75) continue; ndcBox(L.outline, _pv, _box); x0 = Math.min(x0, _box[0]); y0 = Math.min(y0, _box[1]); x1 = Math.max(x1, _box[2]); y1 = Math.max(y1, _box[3]); L.U.uReflOn.value = 1; n++; }
+    if (aquece && !n) { x0 = -1; y0 = -1; x1 = 1; y1 = 1; n = 1; } /* 5.0b: aquecimento sem lago à vista: alvo inteiro */
     x0 = Math.max(-1, x0 - 0.04); y0 = Math.max(-1, y0 - 0.04); x1 = Math.min(1, x1 + 0.04); y1 = Math.min(1, y1 + 0.04); if (!n || x1 - x0 < 0.01 || y1 - y0 < 0.01) { for (const L of LK.lakes) if (L.U.uReflOn) L.U.uReflOn.value = 0; RF.want = false; return; }
     const pe = RF.cam.projectionMatrix.elements; const sx = 2 / (x1 - x0), sy = 2 / (y1 - y0), tx = -(x1 + x0) / (x1 - x0), ty = -(y1 + y0) / (y1 - y0);
     for (let c = 0; c < 4; c++) { const r3 = pe[c * 4 + 3]; pe[c * 4] = sx * pe[c * 4] + tx * r3; pe[c * 4 + 1] = sy * pe[c * 4 + 1] + ty * r3; } /* linhas 0 e 1 da projeção: o recorte vira a tela inteira do alvo */
     /* plano de corte oblíquo (Lengyel): o plano próximo da câmera espelhada passa a ser o plano do gelo — some o que está abaixo dele */
     _plane.setFromNormalAndCoplanarPoint(_up.set(0, 1, 0), _v2.set(0, Ly - 0.04, 0)).applyMatrix4(RF.cam.matrixWorldInverse); _clip.set(_plane.normal.x, _plane.normal.y, _plane.normal.z, _plane.constant);
-    _qv.set((Math.sign(_clip.x) + pe[8]) / pe[0], (Math.sign(_clip.y) + pe[9]) / pe[5], -1, (1 + pe[10]) / pe[14]); _clip.multiplyScalar(2 / _clip.dot(_qv)); pe[2] = _clip.x; pe[6] = _clip.y; pe[10] = _clip.z + 1; pe[14] = _clip.w;
+    _qv.set((Math.sign(_clip.x) + pe[8]) / pe[0], (Math.sign(_clip.y) + pe[9]) / pe[5], -1, (1 + pe[10]) / pe[14]); const z01 = M5 && renderer.coordinateSystem === 2001; /* 5.0b: WebGPUCoordinateSystem, profundidade de 0 a 1 */ _clip.multiplyScalar((z01 ? 1 : 2) / _clip.dot(_qv)); pe[2] = _clip.x; pe[6] = _clip.y; pe[10] = _clip.z + (z01 ? 0 : 1); pe[14] = _clip.w;
     RF.cam.projectionMatrixInverse.copy(RF.cam.projectionMatrix).invert();
     /* alvo: metade da resolução por eixo, só do tamanho do recorte */
     const q = env.quality ? env.quality() : null; renderer.getDrawingBufferSize(_sz); const k = Math.min(LK.reflScale * ((q && (q.resolved || q.name)) === 'media' ? 0.8 : 1), 960 / Math.max(1, _sz.x)); const W = Math.max(64, Math.round(_sz.x * k)), Hh = Math.max(64, Math.round(_sz.y * k)); /* Média: 0,4 por eixo; no máximo 960 de largura (telas 2× e 4K) */
-    if (!RF.rt) { RF.rt = new THREE.WebGLRenderTarget(W, Hh, { type: rtType(), depthBuffer: true, stencilBuffer: false, generateMipmaps: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthTexture: new THREE.DepthTexture(W, Hh) }); RF.rt.texture.name = 'reflexo-lagos'; G.uRefl.value = RF.rt.texture; G.uReflDepth.value = RF.rt.depthTexture; } /* a profundidade separa céu (1) de objeto */
+    if (!RF.rt) { /* clássico: o alvo nasce aqui (no Motor 5 já nasceu na carga) */ RF.rt = new THREE.WebGLRenderTarget(W, Hh, { type: rtType(), depthBuffer: true, stencilBuffer: false, generateMipmaps: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthTexture: new THREE.DepthTexture(W, Hh) }); RF.rt.texture.name = 'reflexo-lagos'; G.uRefl.value = RF.rt.texture; G.uReflDepth.value = RF.rt.depthTexture; } /* a profundidade separa céu (1) de objeto */
     else if (RF.rt.width !== W || RF.rt.height !== Hh) RF.rt.setSize(W, Hh);
     RF.vpW = Math.max(16, Math.min(W, Math.round((x1 - x0) / 2 * _sz.x * k))); RF.vpH = Math.max(16, Math.min(Hh, Math.round((y1 - y0) / 2 * _sz.y * k))); RF.rt.viewport.set(0, 0, RF.vpW, RF.vpH); RF.rt.scissor.set(0, 0, RF.vpW, RF.vpH); RF.rt.scissorTest = true;
-    const su = RF.vpW / W, sv = RF.vpH / Hh; _bias.set(0.5 * su, 0, 0, 0.5 * su, 0, 0.5 * sv, 0, 0.5 * sv, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
+    const su = RF.vpW / W, sv = RF.vpH / Hh; if (M5) _bias.set(0.5 * su, 0, 0, 0.5 * su, 0, -0.5 * sv, 0, 0.5 * sv, 0, 0, 0.5, 0.5, 0, 0, 0, 1); /* 5.0b: no TSL o v do alvo cresce para baixo (o recorte fica no alto da imagem nos dois backends) */ else _bias.set(0.5 * su, 0, 0, 0.5 * su, 0, 0.5 * sv, 0, 0.5 * sv, 0, 0, 0.5, 0.5, 0, 0, 0, 1);
     G.uReflMat.value.multiplyMatrices(_bias, RF.cam.projectionMatrix).multiply(RF.cam.matrixWorldInverse); G.uReflBox.value.set(0.5 / W, 0.5 / Hh, su - 0.5 / W, sv - 0.5 / Hh);
-    _fr.setFromProjectionMatrix(_pm.multiplyMatrices(RF.cam.projectionMatrix, RF.cam.matrixWorldInverse));
+    _fr.setFromProjectionMatrix(_pm.multiplyMatrices(RF.cam.projectionMatrix, RF.cam.matrixWorldInverse), M5 ? renderer.coordinateSystem : undefined); /* 5.0b */
     RF.want = true; LK.stats.lakes = n; if (probing) for (const L of LK.lakes) if (L.U.uReflOn) L.U.uReflOn.value = 0;
   }
   /* o passe roda no começo do passe principal (scene.onBeforeRender): as unidades já estão no lugar deste quadro e a sombra é a do quadro anterior */
   function reflRender(r, cam) {
-    if (!RF.want || RF.busy || cam !== camera || !RF.rt) return; RF.want = false; RF.busy = true; RF.dead = false; RF.missed = 0; const t0 = performance.now();
+    if (!RF.want || RF.busy || cam !== camera || !RF.rt || (M5 && r._compilationPromises)) return; /* 5.0b: o compileAsync também chama scene.onBeforeRender */
+    if (M5) { const sg = sombraSig(r); if (sg !== RF.sombraSig) { RF.sombraSig = sg; RF.want = false; return; } } /* 5.0b: sombra nova (1º passe da cena depois da carga, troca de qualidade): o passe principal deste quadro ainda vai desenhar as cascatas pela 1ª vez e recriar as texturas delas; ligadas antes pelo reflexo, os grupos de ligação dele ficavam com as destruídas (erro no envio e o gelo preso na imagem do aquecimento). Espera um quadro */
+    RF.want = false; RF.busy = true; RF.dead = false; RF.missed = 0; const t0 = performance.now();
     const prevRT = r.getRenderTarget(), prevFace = r.getActiveCubeFace(), prevMip = r.getActiveMipmapLevel(), prevAuto = r.autoClear, prevSh = r.shadowMap.autoUpdate, prevXr = r.xr.enabled, prevA = r.getClearAlpha(); r.getClearColor(_cc);
-    let nh = 0; for (const o of RF.hide) { RF.save[nh++] = o.visible ? 1 : 0; o.visible = false; } let skip = 0; const tv = RF.terrain ? RF.terrain.visible : false; if (RF.terrain) { RF.terrain.visible = false; LK.proxy.visible = true; } for (const m of RF.inst) { RF.save[nh++] = m.visible ? 1 : 0; if (m.visible && m.parent && !instSeen(m)) { m.visible = false; skip++; } }
-    try { r.xr.enabled = false; r.shadowMap.autoUpdate = false; r.autoClear = false; r.setRenderTarget(RF.rt); r.setClearColor(scene.background && scene.background.isColor ? scene.background : _bg, 1); r.clear(true, true, false);
+    let nh = 0; for (const o of RF.hide) { RF.save[nh++] = o.visible ? 1 : 0; o.visible = false; } let skip = 0; const tv = RF.terrain ? RF.terrain.visible : false; if (RF.terrain) { RF.terrain.visible = false; LK.proxy.visible = true; } for (const m of RF.inst) { RF.save[nh++] = m.visible ? 1 : 0; if (m.visible && m.parent && !RF.aquece && !instSeen(m)) { m.visible = false; skip++; } } /* 5.0b: no aquecimento do Motor 5 todas entram (cria os pipelines do reflexo de cada material) */
+    if (M5) { const fc = RF.aquece ? LK.proxy.children.map(c => { const f = c.frustumCulled; c.frustumCulled = false; return f; }) : null; if (fc) LK.proxy.visible = true; /* aquecimento: todo o chão do reflexo entra (um pipeline por material) */
+      const mrt = r.getMRT(); try { r.xr.enabled = false; sombras(true); r.setMRT(null); r.autoClear = true; r.setRenderTarget(RF.rt); r.setClearColor(scene.background && scene.background.isColor ? scene.background : _bg, 1); /* 5.0b: limpa no próprio passe */
+      const inf = r.info.render, c0 = inf.drawCalls, tr0 = inf.triangles; r.render(scene, RF.cam); LK.stats.calls = inf.drawCalls - c0; LK.stats.tris = inf.triangles - tr0;
+    } finally { r.setMRT(mrt); r.setRenderTarget(prevRT, prevFace, prevMip); r.setClearColor(_cc, prevA); r.autoClear = prevAuto; r.xr.enabled = prevXr; sombras(false);
+      nh = 0; for (const o of RF.hide) o.visible = RF.save[nh++] === 1; for (const m of RF.inst) m.visible = RF.save[nh++] === 1; if (RF.terrain) RF.terrain.visible = tv; LK.proxy.visible = false; RF.busy = false; if (fc) LK.proxy.children.forEach((c, i) => { c.frustumCulled = fc[i]; }); } }
+    else try { r.xr.enabled = false; r.shadowMap.autoUpdate = false; r.autoClear = false; r.setRenderTarget(RF.rt); r.setClearColor(scene.background && scene.background.isColor ? scene.background : _bg, 1); r.clear(true, true, false);
       const inf = r.info.render, ar = r.info.autoReset, c0 = ar ? 0 : inf.calls, tr0 = ar ? 0 : inf.triangles; r.render(scene, RF.cam); LK.stats.calls = inf.calls - c0; LK.stats.tris = inf.triangles - tr0;
     } finally { r.setRenderTarget(prevRT, prevFace, prevMip); r.setClearColor(_cc, prevA); r.autoClear = prevAuto; r.shadowMap.autoUpdate = prevSh; r.xr.enabled = prevXr;
       nh = 0; for (const o of RF.hide) o.visible = RF.save[nh++] === 1; for (const m of RF.inst) m.visible = RF.save[nh++] === 1; if (RF.terrain) RF.terrain.visible = tv; LK.proxy.visible = false; RF.busy = false; }
     LK.stats.refl = 1; LK.stats.w = RF.vpW; LK.stats.h = RF.vpH; LK.stats.skipped = skip; LK.stats.ms = Math.round((performance.now() - t0) * 10) / 10;
   }
+  /* 5.0b: Motor 5 — o mapa de sombra atualiza uma vez por câmera e quadro: no passe do reflexo (outra câmera) as sombras ficam congeladas, como o
+     shadowMap.autoUpdate = false do clássico (o reflexo usa a sombra do quadro anterior). Sol (sombra única da reserva WebGL2) e cascatas do WebGPU. */
+  function sombraSig(r) { if (!r.shadowMap.enabled) return -1; const X = ARD.m5.cur, cs = X && X.csm ? X.csm.lights : null; if (cs && cs.length) return cs.length * 100000 + cs[0].shadow.mapSize.x; return sunL && sunL.shadow ? sunL.shadow.mapSize.x : 0; } /* 5.0b: assinatura numérica da sombra (cascatas × tamanho), sem alocar */
+  const SHS = []; function sombras(on) { if (on) { SHS.length = 0; if (sunL && sunL.shadow) SHS.push(sunL.shadow); const X = ARD.m5.cur, cs = X && X.csm ? X.csm.lights : null; if (cs) for (const l of cs) if (l.shadow) SHS.push(l.shadow); for (const sh of SHS) { sh.ardAU = sh.autoUpdate; sh.ardNU = sh.needsUpdate; sh.autoUpdate = false; sh.needsUpdate = false; } } else for (const sh of SHS) { sh.autoUpdate = sh.ardAU; sh.needsUpdate = sh.ardNU; } }
   const prevHook = scene.onBeforeRender; scene.onBeforeRender = function (r, s, cam, rt) { if (prevHook) prevHook.call(this, r, s, cam, rt); if (s === scene) reflRender(r, cam); };
-  LK.dispose = function () { clear(); proxyMat.dispose(); if (RF.rt) RF.rt.dispose(); scene.remove(LK.group); if (scene.onBeforeRender && prevHook !== undefined) scene.onBeforeRender = prevHook; };
+  LK.dispose = function () { clear(); for (const k in M5MATS) M5MATS[k].dispose(); proxyMat.dispose(); if (RF.rt) RF.rt.dispose(); scene.remove(LK.group); if (scene.onBeforeRender && prevHook !== undefined) scene.onBeforeRender = prevHook; };
 
   /* ---------- efeitos: clarões, bolhas, vapor, brasas e neve soprada (FX.emit com vetores reaproveitados) ---------- */
   const _P = [0, 0, 0], _V = [0, 0, 0], _C = [0, 0, 0]; const rnd = Math.random;
@@ -435,12 +452,12 @@ function create(THREE, scene, env) {
   /* névoa de guerra: o render3d passa env.fogTex (se não passar, acha a textura no material do terreno depois do primeiro quadro) */
   function findFog() { if (env.fogTex) return env.fogTex; let tex = null; scene.traverse(o => { if (tex || !o.isMesh || !o.geometry || !o.geometry.attributes || !o.geometry.attributes.bio || !o.material) return; const p = renderer.properties && renderer.properties.get(o.material); const u = p && p.uniforms; if (u && u.fogMap && u.fogMap.value) tex = u.fogMap.value; }); return tex; }
   LK.RF = RF; /* diagnóstico */
-  LK.progs = () => { const P = renderer.info.programs || []; let n = 0; for (const pr of P) if (String(pr.cacheKey).indexOf('ard-lago') >= 0) n++; return { lagos: n, total: P.length }; }; /* programas dos lagos (devem existir desde o build) */
+  LK.progs = () => { if (M5) { const X = ARD.m5.cur; return { lagos: (ARD.m5.lista || []).filter(n => /^lago-/.test(n)).length, total: X ? X.pipes : 0 }; } /* 5.0b: no Motor 5, os pipelines */ const P = renderer.info.programs || []; let n = 0; for (const pr of P) if (String(pr.cacheKey).indexOf('ard-lago') >= 0) n++; return { lagos: n, total: P.length }; }; /* programas dos lagos (devem existir desde o build) */
   /* diagnóstico: o que o último passe de reflexo desenharia (nome, triângulos × instâncias), do maior para o menor */
   LK.debugRefl = function () { const out = [], hid = new Set(RF.hide); if (RF.terrain) hid.add(RF.terrain); scene.traverseVisible(o => { if (!o.isMesh || hid.has(o)) return; let p = o; while (p) { if (hid.has(p)) return; p = p.parent; } if (o.isInstancedMesh && (!o.count || !instSeen(o))) return; if (o.frustumCulled !== false && !o.isInstancedMesh) { if (!o.geometry.boundingSphere) o.geometry.computeBoundingSphere(); _sph.copy(o.geometry.boundingSphere).applyMatrix4(o.matrixWorld); if (!_fr.intersectsSphere(_sph)) return; } const g = o.geometry, tri = (g.index ? g.index.count : g.attributes.position.count) / 3 * (o.isInstancedMesh ? o.count : g.isInstancedBufferGeometry ? g.instanceCount : 1); out.push([o.name || o.type + (o.material && o.material.type ? ':' + o.material.type : ''), Math.round(tri)]); });
     if (RF.terrain) for (const c of LK.proxy.children) { _sph.copy(c.geometry.boundingSphere); if (_fr.intersectsSphere(_sph)) out.push(['chao-reflexo', c.geometry.index.count / 3]); }
     return out.sort((a, b) => b[1] - a[1]).slice(0, 25); };
   return LK;
 }
-ARD.lakes3d = { create };
+ARD.lakes3d = { create, m5: true }; /* 5.0b: portado para o Motor 5 (src/m5/agua.js): o render3d cria os lagos também no WebGPURenderer */
 })(globalThis.ARD = globalThis.ARD || {});

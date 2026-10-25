@@ -1,5 +1,6 @@
 /* Aether Rift: Dominion — Engine gráfica 2 (4.0d): céu, planeta-mãe, horizonte além do mapa e detalhe do terreno.
    Reaproveita os geradores da galeria (tools/arte3d.html): ruído fBm, planetas com faixas e atmosfera por Fresnel.
+   5.0b: no Motor 5 o céu e o halo dos planetas (src/m5/terreno.js) e a nebulosa do Cinturão (src/m5/espaco-min.js) são TSL.
    Tudo aqui é só visual: nada lê ou altera a simulação. */
 (function (ARD) {
 'use strict';
@@ -106,6 +107,7 @@ void main(){ vec3 d = normalize(vDir);
   col += vec3(0.018, 0.019, 0.027) * band * (0.4 + 0.6 * n3) * (1.0 - 0.8 * lane);
   gl_FragColor = vec4(col, 1.0); }`;
 function spaceBackdrop(THREE, renderer, o) {
+  if (renderer && renderer.isWebGPURenderer && ARD.m5 && ARD.m5.espacoFundo && ARD.m5.espaco) return ARD.m5.espacoFundo(renderer, o); /* 5.0b: Motor 5 — a mesma nebulosa assada em TSL (ARD.m5.espaco.nebulosa), com o retorno de sempre */
   o = o || {}; const size = o.size || 384; const P = new THREE.Vector3().fromArray(o.planetDir || [-0.94, -0.3, -0.16]).normalize(); const cosR = Math.cos(o.planetR || 0.27);
   const L = new THREE.Vector3().fromArray(o.planetL || [-0.47, 0.64, 0.6]).normalize();
   const rt = new THREE.WebGLCubeRenderTarget(size, { type: THREE.HalfFloatType, generateMipmaps: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });

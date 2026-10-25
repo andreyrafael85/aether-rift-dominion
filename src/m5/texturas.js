@@ -26,6 +26,7 @@ M5.flashInit = function (FL, FL_N, FLC_N, ME2) {
     const vL = varying(vec2(positionGeometry.x.mul(2), along)); const al = vL.y, ww = abs(vL.x); const cone = float(1).sub(smoothstep(al.mul(0.7).add(0.2), al.mul(0.65).add(0.35), ww)); const a = cone.mul(float(1).sub(al)).mul(float(1).sub(al)).mul(smoothstep(0.0, 0.12, al));
     matC.colorNode = cC.rgb.mul(a); matC.opacityNode = float(1); }
   FL.cmesh = new Tm.Mesh(gc, matC); FL.cmesh.frustumCulled = false; FL.scene.add(FL.cmesh);
+  FL.cmesh.visible = false; /* 5.0b: paridade com o clássico — lá o cone dos faróis nunca chega ao mapa (o matC do flashInit clássico é FrontSide e a própria transformação do cone inverte o triângulo: descartado desde a 4.3g); com as duas faces da 5.0a.1, os faróis acendiam o chão só no Motor 5. Para acender nos dois motores: side DoubleSide no matC do flashInit clássico (render3d) e tirar esta linha */
   M5.tex.clarao.value = FL.rt.texture; if (ME2) { ME2.uFlash.value = FL.rt.texture; ME2.uFlashR.value = FL.rect; }
   M5.registrar('claroes-disco', mat); M5.registrar('claroes-cone', matC);
   return true;
@@ -37,7 +38,7 @@ M5.scars = function (renderer, W, N) {
   const FIXAS = /marcasfixas=1/.test(location.search);
   const rt = new Tm.RenderTarget(N, N, { type: Tm.HalfFloatType, depthBuffer: false, generateMipmaps: false, minFilter: Tm.LinearFilter, magFilter: Tm.LinearFilter }); rt.texture.name = 'ard-cicatrizes';
   const scene = new Tm.Scene(), cam = new Tm.OrthographicCamera(0, W, 0, W, -1, 1); /* alto = 0, baixo = W: y do mapa cresce para baixo na imagem (uv.y = y / W) */ const MAX = 1024;
-  const kAttr = new Tm.InstancedBufferAttribute(new Float32Array(MAX * 4), 4); kAttr.setUsage(Tm.DynamicDrawUsage);
+  const kAttr = new Tm.InstancedBufferAttribute(new Float32Array(MAX * 4), 4); /* 5.0b: uso padrão com updateRanges (o DynamicDrawUsage subia o buffer inteiro a cada desenho) */
   const geo = new Tm.PlaneGeometry(1, 1); geo.setAttribute('aK', kAttr);
   const mat = new Tm.MeshBasicNodeMaterial({ depthTest: false, depthWrite: false, transparent: true, side: Tm.DoubleSide, blending: Tm.CustomBlending, blendEquation: Tm.MaxEquation, blendSrc: Tm.OneFactor, blendDst: Tm.OneFactor, blendEquationAlpha: Tm.MaxEquation, blendSrcAlpha: Tm.OneFactor, blendDstAlpha: Tm.OneFactor }); mat.fog = false; mat.toneMapped = false; mat.forceSinglePass = true; /* 5.0a.1: uma passada só */
   { const K = attribute('aK', 'vec4'); const kind = K.x, k = K.y, len = K.z, sd = K.w; const u = uv();
@@ -66,7 +67,7 @@ M5.scars = function (renderer, W, N) {
       renderer.setRenderTarget(rt); renderer.autoClear = false;
       if (!cleared) { renderer.setClearColor(0x000000, 0); renderer.clear(true, false, false); cleared = true; }
       fadeT += dt; if (fadeT > 0.5) { const f = fadeT; fadeT = 0; if (!FIXAS) { fadeMat.color.setRGB(Math.pow(0.9962, f), Math.pow(0.9981, f), Math.pow(0.9989, f)); fadeMat.opacity = Math.pow(0.87, f); renderer.render(fadeScene, cam); } }
-      if (n) { inst.count = n; inst.instanceMatrix.needsUpdate = true; kAttr.needsUpdate = true; renderer.render(scene, cam); n = 0; }
+      if (n) { inst.count = n; inst.instanceMatrix.clearUpdateRanges(); inst.instanceMatrix.addUpdateRange(0, n * 16); inst.instanceMatrix.needsUpdate = true; kAttr.clearUpdateRanges(); kAttr.addUpdateRange(0, n * 4); kAttr.needsUpdate = true; renderer.render(scene, cam); n = 0; } /* 5.0b: sobe só as marcas novas */
       renderer.setRenderTarget(prev); renderer.autoClear = pa; },
     dispose() { rt.dispose(); geo.dispose(); mat.dispose(); fadeMat.dispose(); fq.geometry.dispose(); } };
 };

@@ -3,7 +3,8 @@
    e estradas de terra ligando cada Núcleo às próprias estruturas. Só visual: a simulação não muda.
    4.3c: geometrias do kit do meshes.js (capim, folhagem, samambaia, flores, cristais e arbustos de gelo, suculentas, tocos, respiros, fungos e
    árvores-marco), cor e rugosidade por vértice, brilho só nas peças emissivas fracas, composição em manchas com satélites (capim em volta da
-   samambaia, cinza em volta do respiro...) e instâncias em blocos de 400×400 com recorte pela câmera; miúdos somem de longe. */
+   samambaia, cinza em volta do respiro...) e instâncias em blocos de 400×400 com recorte pela câmera; miúdos somem de longe.
+   5.0b: no Motor 5 o material é o TSL de src/m5/terreno.js (ARD.m5.adereco, com o mesmo vento por peça, lido da matriz de instância do ARD.m5.Inst). */
 (function (ARD) {
 'use strict';
 const S = ARD.sim;
@@ -65,7 +66,7 @@ function create(THREE, scene, opts) {
     m.defaultAttributeValues = Object.assign({}, m.defaultAttributeValues, { rm: [0.9, 0], aWind: [0], aGlow: [0] }); /* geometria sem o atributo (recuo antigo) lê estes valores */
     m.customProgramCacheKey = () => 'ard-dress-43c-' + (o.leaf ? 'f' : 's'); return m;
   }
-  const mats = opts.m5 ? { solido: opts.m5.adereco({}), folha: opts.m5.adereco({ leaf: true }) } : { solido: mat({}), folha: mat({ leaf: true }) }; /* 5.0a: no Motor 5, material TSL sem vento (o vento é da fase 2) */
+  const mats = opts.m5 ? { solido: opts.m5.adereco({}), folha: opts.m5.adereco({ leaf: true }) } : { solido: mat({}), folha: mat({ leaf: true }) }; /* 5.0a: no Motor 5, material TSL (5.0b: com vento, src/m5/terreno.js) */
   D.mats = mats; /* 4.2h: o render3d põe estes materiais na curva da noite */
   /* geometrias: uma por tipo e variante, do kit do meshes.js (4.3c); sem ele, formas simples de recuo */
   const SG = (kind, seed, lite) => { try { return (ARD.meshes && ARD.meshes.scatter && ARD.meshes.scatter(kind, seed, lite)) || null; } catch (e) { return null; } };
@@ -81,6 +82,7 @@ function create(THREE, scene, opts) {
       if (!g) g = FCOL[k] ? (/capim|samambaia|flor|cristal|espinho|fungo/.test(k) ? FALL.cone(FCOL[k]) : FALL.ico(FCOL[k])) : FALL.ico([0.62, 0.6, 0.58], k === 'boulder' ? 0.8 : 0.55);
       g.computeBoundingSphere(); geo[key] = g; keys[k].push(key); const gl = SG(k, seedOf(k, v), true); geoLite[key] = gl && gl.attributes.position.count < g.attributes.position.count ? gl : g; } }
   D.geo = geo; D.geoLite = geoLite;
+  if (opts.m5 && opts.m5.normalizaAtributos) { const todas = Object.values(geo).concat(Object.values(geoLite)); opts.m5.normalizaAtributos(todas, { rm: [0.9, 0], aWind: [0], aGlow: [0], color: [1, 1, 1] }); if (opts.m5.intercala) opts.m5.intercala(todas, ['rm', 'aWind', 'aGlow']); } /* 5.0b: Motor 5 — inteira e leve com os mesmos atributos (um pipeline só) e rm, vento e brilho num buffer só (o WebGPU aceita 8 buffers de vértice; com a matriz e a cor do ARD.m5.Inst ficam 6) */
   /* posições determinísticas por tile */
   function hash(a, b, c) { let n = (a * 374761393 + b * 668265263 + c * 1274126177) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); n ^= n >>> 16; return (n >>> 0) / 4294967296; }
   function vnoise(x, y, s) { const ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy, sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy); const a = hash(ix, iy, s), b = hash(ix + 1, iy, s), c = hash(ix, iy + 1, s), d = hash(ix + 1, iy + 1, s); return (a * (1 - sx) + b * sx) * (1 - sy) + (c * (1 - sx) + d * sx) * sy; }
@@ -145,10 +147,10 @@ function create(THREE, scene, opts) {
   D.hideUnder = function (sim, H) {
     const bs = sim.ents.filter(e => e.alive && e.kind === 'building'); const sig = bs.length + ':' + (bs.length ? bs[bs.length - 1].id : 0); if (sig === D.sig) return; D.sig = sig;
     const cell = 128, grid = new Map(); for (const b of bs) { const k = ((b.x / cell) | 0) + ',' + ((b.y / cell) | 0); (grid.get(k) || grid.set(k, []).get(k)).push(b); }
-    for (const m of D.meshes) { const im = m.mesh; let changed = false;
+    for (const m of D.meshes) { const im = m.mesh; let changed = false, lo = 1e9, hi = -1;
       m.list.forEach((o, i) => { let hide = false; const cx = (o.x / cell) | 0, cy = (o.y / cell) | 0, pad = 6 + Math.min(30, o.rad * 0.45); for (let dy = -1; dy <= 1 && !hide; dy++) for (let dx = -1; dx <= 1 && !hide; dx++) { const L = grid.get((cx + dx) + ',' + (cy + dy)); if (L) for (const b of L) if (Math.hypot(o.x - b.x, o.y - b.y) < b.r + pad) { hide = true; break; } }
-        if (hide !== !!o.hid) { o.hid = hide; changed = true; im.setMatrixAt(i, compose(o, H, hide ? 0 : null)); } });
-      if (changed) im.instanceMatrix.needsUpdate = true; }
+        if (hide !== !!o.hid) { o.hid = hide; changed = true; if (i < lo) lo = i; if (i > hi) hi = i; im.setMatrixAt(i, compose(o, H, hide ? 0 : null)); } });
+      if (changed) { if (opts.m5) { im.instanceMatrix.clearUpdateRanges(); im.instanceMatrix.addUpdateRange(lo * 16, (hi - lo + 1) * 16); } im.instanceMatrix.needsUpdate = true; } } /* 5.0b: no Motor 5 sobe só o trecho das peças que mudaram */
   };
   /* estradas de terra: do Núcleo até cada estrutura pronta dentro do território (pedaços curtos que acompanham o relevo) */
   const roadGeo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
@@ -164,7 +166,7 @@ function create(THREE, scene, opts) {
       for (const b of bs) { if (b.owner !== p.id) continue; const d = Math.hypot(b.x - nu.x, b.y - nu.y); if (d > terr || d < nu.r + b.r + 8) continue;
         const ang = Math.atan2(b.y - nu.y, b.x - nu.x); const x0 = nu.x + Math.cos(ang) * (nu.r + 4), y0 = nu.y + Math.sin(ang) * (nu.r + 4), x1 = b.x - Math.cos(ang) * (b.r + 2), y1 = b.y - Math.sin(ang) * (b.r + 2); const L = Math.hypot(x1 - x0, y1 - y0); const pieces = Math.max(1, Math.ceil(L / 36));
         for (let i = 0; i < pieces && n < 2048; i++) { const f = (i + 0.5) / pieces; const px = x0 + (x1 - x0) * f, py = y0 + (y1 - y0) * f; _p.set(px, H(px, py) + 0.35, -py); _q.setFromAxisAngle(UP, ang + Math.PI / 2); _s.set(11, 1, L / pieces + 2); _m.compose(_p, _q, _s); roads.setMatrixAt(n++, _m); } } }
-    roads.count = n; roads.instanceMatrix.needsUpdate = true;
+    roads.count = n; if (opts.m5) { roads.instanceMatrix.clearUpdateRanges(); roads.instanceMatrix.addUpdateRange(0, Math.max(1, n) * 16); } roads.instanceMatrix.needsUpdate = true; /* 5.0b: no Motor 5 sobe só o trecho usado (2048 pedaços de capacidade) */
   };
   D.update = function (time, cam) { D.uTime.value = time; if (cam && cam.isPerspectiveCamera && D.meshes.length) D.cull(cam); }; /* 4.3c: o render3d pode passar a câmera (o gancho da cena continua valendo) */
   return D;

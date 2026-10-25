@@ -87,15 +87,18 @@ function create(THREE, scene, env) {
   const S = ARD.sim; const W3 = ARD.world3d;
   const SP = { THREE, scene, env, sim: null, T: null, built: false, stats: null };
   const isTouch = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+  const M5 = !!(ARD.m5 && ARD.m5.active && ARD.m5.active() && ARD.m5.espacoRocha); /* 5.0b: Motor 5 — materiais em TSL (src/m5/espaco.js), alvo e render no WebGPURenderer; a geometria e a lógica são as mesmas */
+  const T5 = M5 ? window.THREE_M5 : null; const vazio0 = M5 ? (ARD.m5.shared && ARD.m5.shared(), ARD.m5.tex.vazio.value) : null; /* 5.0b: mapa do vazio neutro (o chão inteiro) */
   /* uniforms compartilhados pelos materiais do espaço */
-  const U = { uTime: { value: 0 }, uSeed: { value: 0 }, uHaze: { value: new THREE.Color(0.006, 0.009, 0.022) }, uFade: { value: new THREE.Vector4(160, 1500, 9000, 0.93) },
+  const U = M5 ? ARD.m5.espacoUniforms() /* 5.0b: as mesmas chaves em nós do TSL (uFogMap = a névoa de guerra compartilhada) */ : { uTime: { value: 0 }, uSeed: { value: 0 }, uHaze: { value: new THREE.Color(0.006, 0.009, 0.022) }, uFade: { value: new THREE.Vector4(160, 1500, 9000, 0.93) },
     uCore: { value: new THREE.Vector4(1600, -1650, -1600, 650) }, uCoreC: { value: new THREE.Vector4(1.3, 0.32, 0.95, 0.9) }, uFogMap: { value: null } };
-  { const w = new THREE.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1, THREE.RGBAFormat, THREE.UnsignedByteType); w.needsUpdate = true; U.uFogMap.value = w; U._white = w; }
+  if (!M5) { const w = new THREE.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1, THREE.RGBAFormat, THREE.UnsignedByteType); w.needsUpdate = true; U.uFogMap.value = w; U._white = w; }
   let space = null, rt = null, comp = null, near = null, backdrop = null, voidTex = null, sky = null, edges = null, tier = null, mats = [], geos = [], frame = 0;
   let lights = null, mainL = null, spaceCam = null; const _c = new THREE.Color(), _v = new THREE.Vector2(), _v3 = new THREE.Vector3(); let vortex = [], shafts = null, emitT = { dust: 0, peb: 0, mote: 0 };
   const tierOf = () => { const q = (env.quality && env.quality()) || {}; return q.resolved === 'baixa' || isTouch ? 'leve' : q.resolved === 'media' ? 'media' : 'alta'; };
 
   function rockMat(o) { /* o: { inst, raiz, balanco, emissive, fadeK, env } */
+    if (M5) { const m5 = ARD.m5.espacoRocha(U, o); mats.push(m5); return m5; } /* 5.0b: a mesma conta em TSL */
     const m = new THREE.MeshStandardMaterial({ color: o.color || 0xffffff, roughness: o.rough || 0.9, metalness: 0.0, flatShading: true, vertexColors: !!o.vcol, envMapIntensity: o.env == null ? 0.35 : o.env, emissive: o.emissive || 0x000000, emissiveIntensity: o.emI || 1, fog: !!o.fog });
     m.userData.fadeK = { value: o.fadeK == null ? 1 : o.fadeK };
     m.onBeforeCompile = sh => {
@@ -148,7 +151,7 @@ function create(THREE, scene, env) {
         data[k] = Math.round(255 * (Math.max(-1, Math.min(1, sd / 64)) * 0.5 + 0.5)); data[k + 1] = br; data[k + 2] = 0; data[k + 3] = 255; } }
     const t = new THREE.DataTexture(data, N, N, THREE.RGBAFormat, THREE.UnsignedByteType); t.magFilter = THREE.LinearFilter; t.minFilter = THREE.LinearFilter; t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping; t.colorSpace = THREE.NoColorSpace; t.needsUpdate = true; return t;
   }
-  SP.refreshVoid = function () { if (!voidTex) return; scene.traverse(o => { const ud = o.isMesh && o.material && o.material.userData; if (!ud || !ud.voidMap) return; if (ud.voidMap.value !== voidTex) ud.voidMap.value = voidTex; if (!env.fogTex && ud.terrU && ud.terrU.fogMap && ud.terrU.fogMap.value) U.uFogMap.value = ud.terrU.fogMap.value; }); };
+  SP.refreshVoid = function () { if (!voidTex) return; if (M5) { ARD.m5.tex.vazio.value = voidTex; return; } /* 5.0b: no Motor 5 todo chão lê o mapa compartilhado */ scene.traverse(o => { const ud = o.isMesh && o.material && o.material.userData; if (!ud || !ud.voidMap) return; if (ud.voidMap.value !== voidTex) ud.voidMap.value = voidTex; if (!env.fogTex && ud.terrU && ud.terrU.fogMap && ud.terrU.fogMap.value) U.uFogMap.value = ud.terrU.fogMap.value; }); };
 
   // ---------- geometria: pilhas de anéis (raízes, quilhas e estalactites) ----------
   function Geo() { return { p: [], c: [], i: [] }; }
@@ -226,6 +229,7 @@ function create(THREE, scene, env) {
 
   // ---------- asteroides: camadas (perto das plataformas, fundo escuro lá embaixo, cinturão em volta do mapa); parte gira devagar na GPU ----------
   function rockInst(geo, list, mat) {
+    if (M5) return ARD.m5.espacoAsteroides(geo, list, mat); /* 5.0b: no Motor 5 a instância vem antes do positionNode: matriz por atributo e a forma no vértice */
     const n = list.length, im = new THREE.InstancedMesh(geo, mat, Math.max(1, n)); const spin = new Float32Array(Math.max(1, n) * 4); const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), P = new THREE.Vector3(), Sc = new THREE.Vector3(), E = new THREE.Euler(), C = new THREE.Color();
     for (let i = 0; i < n; i++) { const r = list[i]; P.set(r[0], r[1], r[2]); E.set(r[4], r[5], r[6]); Q.setFromEuler(E); Sc.set(r[3] * r[7], r[3] * r[8], r[3] * r[9]); M.compose(P, Q, Sc); im.setMatrixAt(i, M);
       C.setRGB(r[10], r[11], r[12]); im.setColorAt(i, C); const ax = _v3.set(r[13], r[14], r[15]).normalize(); spin[i * 4] = ax.x; spin[i * 4 + 1] = ax.y; spin[i * 4 + 2] = ax.z; spin[i * 4 + 3] = r[16]; }
@@ -263,12 +267,12 @@ void main(){ float streak = n(vUv.x * 46.0) * 0.6 + n(vUv.x * 15.0 + uTime * 0.1
   float a = streak * rise * fade * (0.35 + 0.65 * edge) * uK; gl_FragColor = vec4(uC * a, 0.0); }`;
   function buildVortex(sim) {
     const cx = sim.map.ring ? sim.map.ring[0] : S.CX, cy = sim.map.ring ? sim.map.ring[1] : S.CY; const Y = -380; U.uCore.value.set(cx, Y + 40, -cy, 640); vortex = [];
-    const mk = (y, rad, dir, k, c1, c2, c3) => { const mat = addBlend(new THREE.ShaderMaterial({ uniforms: { uTime: U.uTime, uDir: { value: dir }, uK: { value: k }, uC1: { value: new THREE.Color().fromArray(c1) }, uC2: { value: new THREE.Color().fromArray(c2) }, uC3: { value: new THREE.Color().fromArray(c3) } },
+    const mk = (y, rad, dir, k, c1, c2, c3) => { const mat = M5 ? ARD.m5.espacoVortice(U, dir, k, c1, c2, c3) /* 5.0b */ : addBlend(new THREE.ShaderMaterial({ uniforms: { uTime: U.uTime, uDir: { value: dir }, uK: { value: k }, uC1: { value: new THREE.Color().fromArray(c1) }, uC2: { value: new THREE.Color().fromArray(c2) }, uC3: { value: new THREE.Color().fromArray(c3) } },
         vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }', fragmentShader: VORTEX_FS, side: THREE.DoubleSide })); mats.push(mat);
       const g = new THREE.PlaneGeometry(rad * 2, rad * 2); g.rotateX(-Math.PI / 2); geos.push(g); const me = new THREE.Mesh(g, mat); me.position.set(cx, y, -cy); me.renderOrder = 2; me.frustumCulled = false; space.add(me); vortex.push(me); };
     mk(Y, 380, 1, 1, [2.3, 1.15, 1.95], [0.7, 0.17, 0.6], [0.2, 0.05, 0.38]);
     mk(Y + 70, 330, -0.8, 0.35, [0.0, 0.0, 0.0], [0.6, 0.18, 0.75], [0.12, 0.05, 0.36]);
-    const sm2 = addBlend(new THREE.ShaderMaterial({ uniforms: { uTime: U.uTime, uK: { value: 0.2 }, uC: { value: new THREE.Color(1.15, 0.38, 1.0) } }, side: THREE.DoubleSide,
+    const sm2 = M5 ? ARD.m5.espacoFeixes(U) /* 5.0b */ : addBlend(new THREE.ShaderMaterial({ uniforms: { uTime: U.uTime, uK: { value: 0.2 }, uC: { value: new THREE.Color(1.15, 0.38, 1.0) } }, side: THREE.DoubleSide,
       vertexShader: 'varying vec2 vUv; varying vec3 vN; varying vec3 vV; void main(){ vUv = uv; vN = normalMatrix * normal; vec4 mv = modelViewMatrix * vec4(position, 1.0); vV = -mv.xyz; gl_Position = projectionMatrix * mv; }', fragmentShader: SHAFT_FS })); mats.push(sm2);
     const sg = new THREE.CylinderGeometry(150, 250, 420, 40, 1, true); sg.translate(0, 210, 0); geos.push(sg); shafts = []; for (let i = 0; i < 3; i++) { const me = new THREE.Mesh(sg, sm2); me.position.set(cx, Y, -cy); me.scale.set(1 - i * 0.24, 1 + i * 0.12, 1 - i * 0.24); me.rotation.y = i * 1.7; me.renderOrder = 3; me.frustumCulled = false; space.add(me); shafts.push(me); }
   }
@@ -287,11 +291,11 @@ void main(){ float streak = n(vUv.x * 46.0) * 0.6 + n(vUv.x * 15.0 + uTime * 0.1
       const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.computeVertexNormals(); geos.push(g);
       const cm = rockMat({ color: 0xffffff, emissive: 0xffffff, emI: 1.1, rough: 0.3, env: 0.8, fadeK: 0.8, cristal: true, nevoa: true }); const list = []; const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), P = new THREE.Vector3(), Sc = new THREE.Vector3(), up = new THREE.Vector3(0, -1, 0), dir = new THREE.Vector3(), C = new THREE.Color();
       for (const c of R.crys) { const nn = 2 + Math.floor(rnd() * 3); for (let k = 0; k < nn; k++) list.push(c); }
-      const im = new THREE.InstancedMesh(g, cm, Math.max(1, list.length)); let i = 0;
+      const im = M5 ? new (ARD.m5.Inst())(g, cm, Math.max(1, list.length)) /* 5.0b: instâncias por atributo (M5.Inst) */ : new THREE.InstancedMesh(g, cm, Math.max(1, list.length)); let i = 0;
       for (const c of R.crys) { const nn = 2 + Math.floor(rnd() * 3); for (let k = 0; k < nn && i < list.length; k++, i++) { dir.set(c[3] * (0.35 + rnd() * 0.5), -1, -c[4] * (0.35 + rnd() * 0.5)).add(_v3.set(rnd() - 0.5, 0, rnd() - 0.5).multiplyScalar(0.6)).normalize(); Q.setFromUnitVectors(up, dir);
         const L = (c[5] ? 7 : 4.5) + rnd() * (c[5] ? 15 : 9); const wd = L * (0.17 + rnd() * 0.08); P.set(c[0] + (rnd() - 0.5) * 8, c[1] - rnd() * 4, -(c[2] + (rnd() - 0.5) * 8)); Sc.set(wd, L, wd); M.compose(P, Q, Sc); im.setMatrixAt(i, M);
         if (c[5]) C.setRGB(1.0, 0.26 + rnd() * 0.1, 0.72 + rnd() * 0.2); else C.setRGB(0.42 + rnd() * 0.18, 0.36 + rnd() * 0.16, 1.0); im.setColorAt(i, C); } }
-      im.count = i; im.instanceMatrix.needsUpdate = true; if (im.instanceColor) im.instanceColor.needsUpdate = true; im.frustumCulled = false; space.add(im); SP.crystals = im; }
+      im.count = i; im.instanceMatrix.needsUpdate = true; if (im.instanceColor) im.instanceColor.needsUpdate = true; im.frustumCulled = false; space.add(im); SP.crystals = im; SP.nCrys = i; }
     /* asteroides */
     const rec = { near: [], big: [] }; const m = sim.map, cx0 = m.ring ? m.ring[0] : S.CX, cy0 = m.ring ? m.ring[1] : S.CY;
     { const nMid = Math.round(170 * K); let tries = 0; while (rec.near.length < nMid && tries++ < nMid * 30) { const a = rnd() * TAU, d = Math.sqrt(rnd()) * 2050, x = cx0 + Math.cos(a) * d, y = cy0 + Math.sin(a) * d, h = -120 - Math.pow(rnd(), 0.8) * 860; const rad = 5 + Math.pow(rnd(), 2.6) * 52; if (d < (m.ring ? m.ring[2] + 70 : 0)) continue; /* a coluna do abismo fica livre */
@@ -310,22 +314,32 @@ void main(){ float streak = n(vUv.x * 46.0) * 0.6 + n(vUv.x * 15.0 + uTime * 0.1
         const rad = (2.2 + Math.pow(rnd(), 2.2) * 12) * (inAb ? 0.5 : 1), h = -14 - Math.pow(rnd(), 1.4) * 210; list.push(rockRec(rnd, x, h, -y, rad, [0.24, 0.22, 0.21])); }
       const nm = rockMat({ inst: true, balanco: true, nevoa: true, rough: 0.88, env: 0.4, fog: true, fadeK: 0.6 }); near = rockInst(new THREE.IcosahedronGeometry(1, 1), list, nm); geos.push(near.geometry); near.name = 'ard-espaco-pedras'; scene.add(near); }
     /* composição: quadro de tela cheia na profundidade do céu */
-    rt = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, depthBuffer: true, samples: 0 }); rt.texture.colorSpace = THREE.NoColorSpace;
-    const cmat = new THREE.ShaderMaterial({ uniforms: { tSpace: { value: rt.texture }, uOn: { value: 1 } }, transparent: true, depthTest: true, depthWrite: false, fog: false,
+    rt = M5 ? new T5.RenderTarget(4, 4, { type: THREE.HalfFloatType, depthBuffer: true, samples: 0 }) /* 5.0b */ : new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, depthBuffer: true, samples: 0 }); rt.texture.colorSpace = THREE.NoColorSpace; rt.texture.name = 'ard-espaco';
+    const cmat = M5 ? ARD.m5.espacoQuadro(rt.texture) /* 5.0b: cola na profundidade do céu; sem o onBeforeRender (o reflexo dos lagos esconde o quadro) */ : new THREE.ShaderMaterial({ uniforms: { tSpace: { value: rt.texture }, uOn: { value: 1 } }, transparent: true, depthTest: true, depthWrite: false, fog: false,
       blending: THREE.CustomBlending, blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneFactor,
       vertexShader: 'uniform float uOn; varying vec2 vUv; void main(){ vUv = position.xy * 0.5 + 0.5; gl_Position = uOn > 0.5 ? vec4(position.xy, 1.0, 1.0) : vec4(2.0, 2.0, 2.0, 1.0); }',
       fragmentShader: 'uniform sampler2D tSpace; varying vec2 vUv; void main(){ vec4 c = texture2D(tSpace, vUv); gl_FragColor = c;\n#include <tonemapping_fragment>\n#include <colorspace_fragment>\n}' }); mats.push(cmat);
     const cg = new THREE.PlaneGeometry(2, 2); geos.push(cg); comp = new THREE.Mesh(cg, cmat); comp.frustumCulled = false; comp.renderOrder = -999; comp.name = 'ard-espaco-quadro';
-    comp.onBeforeRender = (r, s, cam) => { const on = cam === env.camera ? 1 : 0; if (cmat.uniforms.uOn.value !== on) { cmat.uniforms.uOn.value = on; cmat.uniformsNeedUpdate = true; } }; scene.add(comp);
+    if (M5) comp.userData.ardSemReflexo = true; else comp.onBeforeRender = (r, s, cam) => { const on = cam === env.camera ? 1 : 0; if (cmat.uniforms.uOn.value !== on) { cmat.uniforms.uOn.value = on; cmat.uniformsNeedUpdate = true; } }; scene.add(comp);
     /* céu em modo espaço com o fundo assado */
     sky = scene.children.find(o => o.userData && o.userData.mat && o.userData.mat.uniforms && o.userData.mat.uniforms.uSpace) || null;
-    if (sky && W3 && W3.spaceBackdrop && env.renderer) { try { backdrop = W3.spaceBackdrop(THREE, env.renderer, { size: tier === 'leve' ? 256 : 384, seed: (sim.seed % 31) * 0.53 }); const u = sky.userData.mat.uniforms; u.uSpace.value = 1; u.uNebula.value = backdrop.tex; u.uPlanet.value.copy(backdrop.planet); if (u.uPlanetL) u.uPlanetL.value.copy(backdrop.planetL); u.uSpaceK.value.set(1, 1, 0, 0); } catch (err) { console.warn('[ARD] fundo do espaço indisponível: ' + err.message); } }
+    if (sky && M5) { const u = sky.userData.mat.uniforms; u.uSpace.value = 1; if (u.uPlanet) { _v3.set(-0.94, -0.3, -0.16).normalize(); u.uPlanet.value.set(_v3.x, _v3.y, _v3.z, Math.cos(0.27)); u.uPlanetL.value.set(-0.47, 0.64, 0.6).normalize(); } } /* 5.0b: céu de espaço do Motor 5 (M5.ceu com src/m5/espaco-min.js: nebulosa assada pelo render3d, estrelas, sol); aqui o planeta gigante liga, com os valores do spaceBackdrop */
+    if (sky && W3 && W3.spaceBackdrop && env.renderer && (!M5 || (sky.userData.mat.uniforms.uNebula && !(sky.userData.mat.uniforms.uNebula.value && sky.userData.mat.uniforms.uNebula.value.name === 'ard-nebulosa')))) /* 5.0b (junção): no Motor 5 o render3d já assa a nebulosa no céu do terreno (M5.ceu com uNebula): sem assar de novo pelo espacoFundo */ { try { backdrop = W3.spaceBackdrop(THREE, env.renderer, { size: tier === 'leve' ? 256 : 384, seed: (sim.seed % 31) * 0.53 }); const u = sky.userData.mat.uniforms; u.uSpace.value = 1; u.uNebula.value = backdrop.tex; u.uPlanet.value.copy(backdrop.planet); if (u.uPlanetL) u.uPlanetL.value.copy(backdrop.planetL); u.uSpaceK.value.set(1, 1, 0, 0); } catch (err) { console.warn('[ARD] fundo do espaço indisponível: ' + err.message); } }
     if (env.fogTex) U.uFogMap.value = env.fogTex; /* névoa de guerra do render3d (a mesma do terreno) */
     /* mapa da borda para o material do terreno */
-    tq.push(performance.now()); try { voidTex = voidMap(sim); SP.refreshVoid(); } catch (err) { console.warn('[ARD] mapa da borda indisponível: ' + err.message); } tq.push(performance.now());
-    SP.built = true; SP.stats = { ms: Math.round(performance.now() - t0), parts: tq.slice(1).map((v, i) => Math.round(v - tq[i])), tier, roots: R.geo.index.count / 3, crystals: SP.crystals.count, rocksS: SP.rocksS.count, rocksB: SP.rocksB.count, rocksTris: SP.rocksS.count * 80 + SP.rocksB.count * 320, near: near.count, edges: edges.n };
+    tq.push(performance.now()); try { voidTex = M5 && ARD.m5.espaco && ARD.m5.espaco.mapaVazio ? ARD.m5.espaco.mapaVazio(sim) /* 5.0b: a mesma conta, já com o nome que o QA confere */ : voidMap(sim); SP.refreshVoid(); } catch (err) { console.warn('[ARD] mapa da borda indisponível: ' + err.message); } tq.push(performance.now());
+    if (M5) compila5();
+    SP.built = true; SP.stats = { ms: Math.round(performance.now() - t0), parts: tq.slice(1).map((v, i) => Math.round(v - tq[i])), tier, roots: R.geo.index.count / 3, crystals: SP.nCrys, rocksS: SP.rocksS.count, rocksB: SP.rocksB.count, rocksTris: SP.rocksS.count * 80 + SP.rocksB.count * 320, near: near.count, edges: edges.n };
   };
 
+  /* 5.0b: Motor 5 — a camada do espaço desenha num alvo próprio: os pipelines nascem no formato desse alvo, com as luzes e o ambiente de
+     verdade (cópia do céu do mapa). Na carga a compilação entra no M5.compile (ARD.m5.pendentes: criação em paralelo, junto com a cena, e a
+     mesma espera); refeita no meio da partida (a qualidade mudou), compila na hora sem esperar (o three pula o objeto até o pipeline ficar
+     pronto). O quadro e as pedras soltas são da cena e compilam no aquecimento */
+  function compila5() {
+    const f = () => { try { const renderer = env.renderer, camera = env.camera; if (!space || !rt) return null; if (!spaceCam) spaceCam = new THREE.PerspectiveCamera(); spaceCam.position.copy(camera.position); spaceCam.quaternion.copy(camera.quaternion); spaceCam.fov = camera.fov; spaceCam.aspect = camera.aspect; spaceCam.near = camera.near; spaceCam.far = 24000; spaceCam.updateProjectionMatrix(); spaceCam.updateMatrixWorld();
+        space.environment = scene.environment; space.environmentIntensity = scene.environmentIntensity == null ? 0.6 : scene.environmentIntensity; const prev = renderer.getRenderTarget(), mrt = renderer.getMRT(); renderer.setRenderTarget(rt); renderer.setMRT(null); const pr = renderer.compileAsync(space, spaceCam); renderer.setRenderTarget(prev); renderer.setMRT(mrt); return pr; } catch (err) { console.warn('[ARD] espaço: pré-compilação falhou: ' + err.message); return null; } };
+    const X = ARD.m5.cur; if (X && X.warmDone) { const pr = f(); if (pr && pr.catch) pr.catch(err => console.warn('[ARD] espaço: pré-compilação falhou: ' + err.message)); } else ARD.m5.pendentes.push(f); }
   // ---------- quadro ----------
   function findMainLights() { mainL = { sun: null, hemi: null, amb: null }; for (const o of scene.children) { if (o.isDirectionalLight && !mainL.sun) mainL.sun = o; else if (o.isHemisphereLight && !mainL.hemi) mainL.hemi = o; else if (o.isAmbientLight && !mainL.amb) mainL.amb = o; } }
   SP.update = function (dt, time, camera) {
@@ -341,7 +355,7 @@ void main(){ float streak = n(vUv.x * 46.0) * 0.6 + n(vUv.x * 15.0 + uTime * 0.1
     space.environment = scene.environment; space.environmentIntensity = scene.environmentIntensity == null ? 0.6 : scene.environmentIntensity; /* o render3d já baixa a intensidade à noite */
     U.uHaze.value.setRGB(0.006 - 0.003 * nt, 0.009 - 0.004 * nt, 0.022 - 0.008 * nt); U.uCoreC.value.w = 1.3 + 0.6 * nt;
     for (const v of vortex) v.material.uniforms.uK.value = (v === vortex[0] ? 1 : 0.35) * (1 + 0.3 * nt);
-    if (sky) { const u = sky.userData.mat.uniforms; u.uSpace.value = backdrop ? 1 : 0; u.uSpaceK.value.x = 1 + 0.25 * nt; }
+    if (sky) { const u = sky.userData.mat.uniforms; u.uSpace.value = backdrop || M5 ? 1 : 0; if (u.uSpaceK) u.uSpaceK.value.x = 1 + 0.25 * nt; } /* 5.0b: o céu TSL fica no modo espaço mesmo sem a nebulosa */
     /* névoa de espaço: a cor de fundo vira a bruma (o render3d lê scene.background depois daqui); sem pós-processamento vale a névoa linear */
     const bg = scene.background; if (bg && bg.isColor) bg.setRGB(0.008 - 0.004 * nt, 0.012 - 0.005 * nt, 0.03 - 0.01 * nt);
     if (scene.fog) { scene.fog.color.setRGB(0.008 - 0.004 * nt, 0.012 - 0.005 * nt, 0.03 - 0.01 * nt); }
@@ -351,7 +365,8 @@ void main(){ float streak = n(vUv.x * 46.0) * 0.6 + n(vUv.x * 15.0 + uTime * 0.1
     const prevRT = renderer.getRenderTarget(), prevAuto = renderer.autoClear, prevA = renderer.getClearAlpha(); renderer.getClearColor(_c);
     if (!spaceCam) spaceCam = new THREE.PerspectiveCamera(); spaceCam.position.copy(camera.position); spaceCam.quaternion.copy(camera.quaternion);
     if (spaceCam.fov !== camera.fov || spaceCam.aspect !== camera.aspect || spaceCam.near !== camera.near || spaceCam.zoom !== camera.zoom) { spaceCam.fov = camera.fov; spaceCam.aspect = camera.aspect; spaceCam.near = camera.near; spaceCam.zoom = camera.zoom; spaceCam.far = 24000; spaceCam.updateProjectionMatrix(); } spaceCam.updateMatrixWorld();
-    renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 0); renderer.autoClear = false; renderer.clear(true, true, false); renderer.render(space, spaceCam);
+    if (M5) { const mrt = renderer.getMRT(); renderer.setRenderTarget(rt); renderer.setMRT(null); renderer.setClearColor(0x000000, 0); renderer.autoClear = true; renderer.render(space, spaceCam); renderer.setMRT(mrt); } /* 5.0b: limpa no próprio passe, sem o MRT do pós (mesma chave de pipeline da carga) */
+    else { renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 0); renderer.autoClear = false; renderer.clear(true, true, false); renderer.render(space, spaceCam); }
     renderer.setRenderTarget(prevRT); renderer.setClearColor(_c, prevA); renderer.autoClear = prevAuto;
     emit(dt, camera);
   };
@@ -374,11 +389,11 @@ void main(){ float streak = n(vUv.x * 46.0) * 0.6 + n(vUv.x * 15.0 + uTime * 0.1
   }
   SP.dbg = () => ({ U, space, rt, lights, mats, spaceCam }); /* 4.3h: ganchos para as ferramentas de teste */
   SP.dispose = function () {
-    if (near) { scene.remove(near); near = null; } if (comp) { scene.remove(comp); comp = null; } if (rt) { rt.dispose(); rt = null; } if (backdrop) { backdrop.rt.dispose(); backdrop = null; } if (voidTex) { voidTex.dispose(); voidTex = null; }
-    if (sky) { const u = sky.userData.mat.uniforms; u.uSpace.value = 0; u.uNebula.value = null; sky = null; }
-    for (const g of geos) g.dispose(); for (const m of mats) m.dispose(); geos = []; mats = []; space = null; vortex = []; shafts = null; lights = null; SP.built = false; U.uFogMap.value = U._white;
+    if (near) { scene.remove(near); near = null; } if (comp) { scene.remove(comp); comp = null; } if (rt) { rt.dispose(); rt = null; } if (backdrop) { backdrop.rt.dispose(); backdrop = null; } if (voidTex) { if (M5 && ARD.m5.tex.vazio.value === voidTex) ARD.m5.tex.vazio.value = vazio0; voidTex.dispose(); voidTex = null; } /* 5.0b: o chão volta ao mapa neutro */
+    if (sky) { const u = sky.userData.mat.uniforms; u.uSpace.value = 0; if (u.uNebula) u.uNebula.value = null; if (u.uPlanet) u.uPlanet.value.w = 2; sky = null; } /* 5.0b: planeta desligado */
+    for (const g of geos) g.dispose(); for (const m of mats) m.dispose(); geos = []; mats = []; space = null; vortex = []; shafts = null; lights = null; SP.built = false; if (!M5) U.uFogMap.value = U._white; /* 5.0b: no Motor 5 é a névoa de guerra compartilhada */
   };
   return SP;
 }
-ARD.space3d = { create };
+ARD.space3d = { create, m5: true }; /* 5.0b: portado para o Motor 5 (src/m5/espaco.js) */
 })(globalThis.ARD = globalThis.ARD || {});
