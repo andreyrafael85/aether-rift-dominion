@@ -16,6 +16,7 @@ const URLS = { webgpu: CDN + 'build/three.webgpu.js', tsl: CDN + 'build/three.ts
   bloom: CDN + 'examples/jsm/tsl/display/BloomNode.js', dof: CDN + 'examples/jsm/tsl/display/DepthOfFieldNode.js', fxaa: CDN + 'examples/jsm/tsl/display/FXAANode.js', gsap: 'https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js' };
 const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'];
 const FOV0 = 42; /* abertura da câmera em repouso (o voo entre Raças fecha e volta) */
+const BLOOM = { vivo: { forca: 0.5, raio: 0.15, limiar: 1.35, joelho: 0.35, teto: 6 }, leve: { forca: 0.36, raio: 0.15, limiar: 1.35, joelho: 0.35, teto: 6 } }; /* 5.0a.2: o bloom da Sala (ver mount); o limiar fica acima do teto do céu (sala-mundo.js, TETO_CEU) */
 /* fora do celular em pé, a abertura mantém a distância focal de 1920×1080 em px (42° em 1080 de altura, 54° em 1440, menos em telas baixas): a composição em volta do palco fica igual em qualquer tela, o horizonte não sobe por cima dos planetas e as telas baixas não deformam o céu */
 function celular() { return innerWidth < 700 || innerHeight < 560; } /* celular em pé ou deitado: palco pequeno, enquadramentos próprios */
 function fovBase() { const h = innerHeight; return innerWidth >= 700 ? Math.max(24, Math.min(60, 2 * Math.atan(h / 2 / 1407) * 180 / Math.PI)) : FOV0; }
@@ -49,8 +50,12 @@ function want() { const q = qs(), f = q.get('fundo'); if (falhou || f === 'off' 
    4) a Sala entra por cima do pôster num cruzamento suave (GSAP), no mesmo enquadramento do pôster, e depois desliza para o desta tela. */
 async function mount(host, race) {
   const modo = want(); if (!modo || S || !host || host.hidden) return false; const q = qs();
-  const st = S = { modo, vivo: modo === 'vivo', host, race: RACES.includes(race) ? race : 'vehnar', ready: false, frames: 0, t0: performance.now(), disp: [], tw: [], on: [], aba: 'jogar', modoCam: 'repouso', anim: false, prK: 1, slow: 0, forced: q.get('fundo') === 'vivo' || q.get('poster') === '1', posterTool: q.get('poster') === '1', med: {} };
+  const st = S = { modo, vivo: modo === 'vivo', host, race: RACES.includes(race) ? race : 'vehnar', ready: false, frames: 0, t0: performance.now(), disp: [], tw: [], on: [], aba: 'jogar', modoCam: 'repouso', anim: false, prK: 1, slow: 0, forced: q.get('fundo') === 'vivo' || q.get('poster') === '1', posterTool: q.get('poster') === '1', med: {},
+    rol: host.scrollTop || 0, ritmo: q.get('poster') === '1' ? 'contido' : 'livre', fora: false }; /* 5.0a.2: rolagem guardada (o laço só faz conta com ela), ritmo pela GPU e palco fora da tela */
   const alive = () => S === st; const marca = k => { st.med[k] = Math.round(performance.now() - st.t0); };
+  /* 5.0a.2: a rolagem num ouvinte passivo só, desde o começo da montagem (a rolagem feita enquanto a Sala monta já vale): o scrollTop é lido uma vez por evento e
+     guardado; o laço, a âncora e o ponteiro só fazem conta com ele. A versão leve desenha enquanto a rolagem anda (no máximo a 30 quadros por segundo) */
+  { const onRol = () => { st.rol = host.scrollTop; if (!st.vivo) kick(160); }; host.addEventListener('scroll', onRol, { passive: true }); st.on.push([host, 'scroll', onRol, { passive: true }]); }
   try {
     await libs(); if (!alive()) return false; marca('carga');
     const { W, T, gsap } = LIB; const M = ARD.salaMundo;
@@ -59,6 +64,7 @@ async function mount(host, race) {
     const renderer = new W.WebGPURenderer({ canvas: cv, antialias: false, alpha: false, forceWebGL: forceGL, powerPreference: st.vivo ? 'high-performance' : 'low-power' }); st.renderer = renderer;
     await renderer.init(); if (!alive()) { try { renderer.dispose(); } catch (e) {} return false; } marca('init');
     st.gpu = !!renderer.backend.isWebGPUBackend; st.fila = st.gpu && renderer.backend.device ? renderer.backend.device.queue : null; st.libera = () => { st.emVoo = false; }; /* ritmo pela GPU (ver frame) */
+    { const ai = st.gpu && renderer.backend.device && renderer.backend.device.adapterInfo; const soft = ARD.gpuSoft || (ai && (ai.isFallbackAdapter || /swiftshader|llvmpipe|lavapipe|softpipe|software|warp/i.test([ai.vendor, ai.architecture, ai.device, ai.description].join(' ')))); if (soft) { st.ritmo = 'contido'; st.soft = true; } st.adaptador = ai ? [ai.vendor, ai.architecture].filter(Boolean).join(' ') : null; } /* 5.0a.2: GPU por software: o laço já nasce contido (no máximo um quadro na fila) */
     renderer.toneMapping = W.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.95; renderer.shadowMap.enabled = true; renderer.shadowMap.type = W.PCFShadowMap;
     const scene = st.scene = new W.Scene(), camera = st.camera = new W.PerspectiveCamera(40, innerWidth / innerHeight, 1, 6000);
     st.rig = { az: 0, pol: 1.2, rad: 150, tx: 0, ty: 56, tz: 10, fov: fovBase() }; st.par = { x: 0, y: 0 }; st.anc = { x: innerWidth * 0.3, y: innerHeight * 0.45 }; st.tmp = { v: new W.Vector3(), v2: new W.Vector3(), cp: new W.Vector3(), ct: new W.Vector3() };
@@ -73,7 +79,13 @@ async function mount(host, race) {
     const pipe = st.pipe = new W.RenderPipeline(renderer); pipe.outputColorTransform = false;
     const sp = st.sp = T.pass(scene, camera), col = sp.getTextureNode('output'), viewZ = sp.getViewZNode();
     C.U.foco = T.uniform(130); C.U.focal = T.uniform(st.vivo ? 260 : 300); C.U.bokeh = T.uniform(0); /* em repouso quase nada de desfoque (planetas nítidos); o foco num modelo abre a profundidade de campo */
-    const src = st.vivo ? LIB.dof(col, viewZ, C.U.foco, C.U.focal, C.U.bokeh) : col; st.bloomK = st.vivo ? 0.62 : 0.4; st.bloom = LIB.bloom(src, st.bloomK, 0.42, st.vivo ? 0.8 : 0.86);
+    const src = st.vivo ? LIB.dof(col, viewZ, C.U.foco, C.U.focal, C.U.bokeh) : col;
+    /* 5.0a.2: bloom contido. Antes (força 0,62, raio 0,42 e limiar 0,8 sobre o HDR) ele somava 1,9 vez o brilho de toda área acima de 0,8, e o céu perto do sol
+       virava um clarão laranja sobre a metade esquerda da tela no alto da página (o líder quase sumia). Agora a entrada tem teto por pixel (o disco do sol e o
+       miolo da coluna da Fenda não espalham mais que BLOOM.teto), o limiar fica acima do céu (sala-mundo.js comprime o céu até 1,3) com joelho suave, o raio
+       baixo deixa o brilho perto da fonte e a força é menor. O desfoque do bloom anda com a densidade (resize): o halo tem o mesmo tamanho em qualquer tela */
+    const B = BLOOM[st.vivo ? 'vivo' : 'leve']; C.U.bTeto = T.uniform(B.teto); const lb = T.luminance(src.rgb); const bIn = T.vec4(src.rgb.mul(T.min(T.float(1), C.U.bTeto.div(T.max(lb, T.float(1e-4))))), 1);
+    st.bloomK = B.forca; st.bloom = LIB.bloom(bIn, B.forca, B.raio, B.limiar); st.bloom.smoothWidth.value = B.joelho;
     pipe.outputNode = LIB.fxaa(T.renderOutput(src.add(st.bloom))); /* um grafo só: trocar o outputNode no r186 recompila bloom e saída a cada troca (medido: 4 a 8 pipelines no quadro) */
     const ab = document.querySelector('.ctab.on'); st.aba = (ab && ab.dataset.tab) || 'jogar';
     /* ETAPA 1: céu, planetas, Fenda (partículas em compute) e ar */
@@ -103,7 +115,7 @@ async function mount(host, race) {
       const outra = await montarMundo(st, st.queroRaca, alive, true); if (!alive() || !outra) return false; await compilar(st, outra); if (!alive()) return false; trocarMundo(st, outra); st.casado = null; st.ancLivre = false; resize(); layout(true); casarPoster(st); aplicarCamera(0, 0); await aquecerQuadros(st); if (!alive()) return false; }
     marca('aquecido');
     eventos(st); st.montado = true;
-    if (st.vivo) { gsap.ticker.tick(); st.gOff = gsap.ticker.time - performance.now() / 1000; gsap.ticker.remove(gsap.updateRoot); gsap.ticker.lagSmoothing(0); st.gsapNoLaco = true; } /* o relógio do GSAP continua o mesmo (sem salto na troca nem na volta) */
+    gsapNoLaco(st, true); /* o relógio do GSAP continua o mesmo (sem salto na troca nem na volta) */
     revelar(st); marca('montagem');
     return true;
   } catch (err) { console.warn('[ARD] Sala de Comando indisponível: ' + (err && err.message)); if (S === st) stop(); falhou = true; return false; }
@@ -125,7 +137,10 @@ async function aquecerQuadros(st) { st.cv.style.transition = 'none'; st.cv.style
   /* dois quadros em ¼ da densidade (criam os pipelines de pós, sombra e compute com pouco trabalho de GPU; a profundidade de campo refaz os dela no segundo
      uso, medido: não é o tamanho), e a densidade de verdade volta para o primeiro quadro visível, que já não cria nada */
   const pr0 = st.pr || st.renderer.getPixelRatio(); st.renderer.setPixelRatio(Math.max(0.2, pr0 * 0.25)); st.sun.shadow.needsUpdate = true;
-  for (let i = 0; i < 2; i++) { if (S !== st) return; desenhar(st, performance.now()); await gpuOcioso(st); } st.renderer.setPixelRatio(pr0); }
+  for (let i = 0; i < 2; i++) { if (S !== st) return; const t0 = performance.now(); desenhar(st, t0); await gpuOcioso(st); st.med['aquecer' + i] = Math.round(performance.now() - t0); } st.renderer.setPixelRatio(pr0);
+  /* 5.0a.2: o segundo quadro do aquecimento (os pipelines já nasceram no primeiro) diz se a GPU acompanha: acima de 1,5 s em ¼ da densidade é GPU por
+     software ou fraca demais, e o laço fica contido (no máximo um quadro na fila, como na 5.0a.1); numa placa de verdade ele fica livre */
+  if (st.fila && (st.med.aquecer1 || 0) > 1500) { st.ritmo = 'contido'; st.soft = true; } }
 function gpuOcioso(st) { if (st.fila) return st.fila.onSubmittedWorkDone().catch(() => {}); return new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => r()))); }
 /* monta (ou troca) o mundo de uma Raça: chão, base, fumaça e o busto (céu, ar e Fenda são da Sala inteira) */
 async function montarMundo(st, race, alive, oculto) { const { W } = LIB; const M = ARD.salaMundo, C = st.C; const nova = {};
@@ -160,14 +175,25 @@ function luzDoMundo(st, race) { const { W } = LIB; const MU = ARD.salaMundo.MUND
   try { const rt = st.pmrem.fromScene(st.envScene, 0, 0.1, 1000); st.scene.environment = rt.texture; if (st.envRT) st.envRT.dispose(); st.envRT = rt; } catch (e) { console.warn('[ARD] Sala: luz de ambiente: ' + e.message); }
   if (st.ready && !st.casado) layout(true); }
 /* ---------- laço: GSAP, câmera, base, busto, som, compute e render ---------- */
-function frame(now) { const st = S; if (!st) return; if (st.emVoo || now < (st.descanso || 0)) return; /* GPU lenta: o quadro anterior ainda está na fila; não empilha outro (a fila curta deixa a partida começar na hora) */
+function frame(now) { const st = S; if (!st) return;
+  if (st.fora && now > (st.foraAte || 0)) { pausar(st); return; } /* 5.0a.2: palco fora da tela: a Sala para de desenhar (volta sozinha quando ele reaparece) */
+  if (st.emVoo || now < (st.descanso || 0)) return; /* GPU lenta: o quadro anterior ainda está na fila; não empilha outro (a fila curta deixa a partida começar na hora) */
   if (!st.vivo && st.frames > 2) { if (!st.anim && now > st.ate) { st.renderer.setAnimationLoop(null); st.loop = false; return; } /* versão leve: desenha só enquanto algo muda */ if (now - (st.desenho || 0) < 32) return; /* e no máximo a 30 quadros por segundo (bateria) */ }
   const raw = now - (st.last || now); desenhar(st, now); st.frames++;
-  /* 5.0a.1: no máximo um quadro na fila da GPU. O aviso de fim é pedido nos quadros lentos, a cada 15 quadros (amostra) e, enquanto a GPU estiver atrás,
-     em todos; até ele chegar nada é desenhado. Antes só o intervalo entre quadros acusava a lentidão, e com o ritmo dos quadros normal a fila da GPU crescia */
-  /* numa GPU que não passa de 10 quadros por segundo, a Sala descansa entre um quadro e outro (o tempo do próprio quadro; o triplo acima de 1 s): a GPU nunca fica
-     ocupada só com a Sala, e o resto da página (e o Iniciar) não espera atrás de uma fila cheia */
-  if (st.fila && (raw > 34 || st.gpuAtras || st.frames % 15 === 0)) { st.emVoo = true; const t0 = performance.now(); st.fila.onSubmittedWorkDone().then(() => { const ms = performance.now() - t0; st.gpuAtras = ms > 20; st.gpuMs = ms; st.descanso = ms > 100 && !st.posterTool && !st.cruzando && !st.casado ? performance.now() + ms * (ms > 1000 ? 3 : 1) : 0; /* sem descanso no cruzamento e no deslize */ st.emVoo = false; }, st.libera); }
+  /* 5.0a.2: ritmo pela GPU em dois modos.
+     - livre (placa de verdade): o laço nunca espera a GPU. Uma amostra de queue.onSubmittedWorkDone() por vez conta quantos quadros a Sala desenhou até a
+       resposta chegar (a fila): acima de 12 em duas amostras seguidas, ou 45 com a amostra ainda sem resposta, a GPU não acompanha e o laço passa a contido.
+       A demora da resposta em si não conta (o navegador pode levar dezenas de ms para avisar). Na 5.0a.1 a amostra a cada 15 quadros e todo quadro acima de
+       34 ms faziam o laço esperar a resposta, e acima de 20 ms ele esperava em todos: com a resposta chegando em 12 a 30 ms (o quadro na placa mais a espera
+       do navegador), de 14% a 66% dos quadros de tela ficavam sem desenho da Sala (medido com uma GPU simulada), e a cena andava aos degraus na rolagem;
+     - contido (GPU por software ou que não acompanha; o aquecimento decide): no máximo um quadro na fila, como na 5.0a.1; numa GPU que não passa de 10 quadros
+       por segundo a Sala descansa entre um quadro e outro (o tempo do próprio quadro; o triplo acima de 1 s), e o Iniciar não espera atrás de uma fila cheia.
+       Trinta respostas seguidas abaixo de 18 ms (a placa dá conta de 60 quadros) devolvem o laço ao livre */
+  if (st.fila && st.ritmo === 'contido') { st.emVoo = true; const t0 = performance.now(); st.fila.onSubmittedWorkDone().then(() => { const ms = performance.now() - t0; st.gpuMs = ms; st.descanso = ms > 100 && !st.posterTool && !st.cruzando && !st.casado ? performance.now() + ms * (ms > 1000 ? 3 : 1) : 0; /* sem descanso no cruzamento e no deslize */
+      st.rapidos = ms < 18 ? (st.rapidos || 0) + 1 : 0; if (st.rapidos >= 30 && !st.posterTool && !st.soft) { st.ritmo = 'livre'; st.rapidos = 0; } st.emVoo = false; }, st.libera); }
+  else if (st.fila) { const a0 = st.amostra; if (a0) { if (++a0.n > 45) { st.ritmo = 'contido'; st.lentos = 0; } }
+    else { const a = st.amostra = { n: 0, t0: performance.now() }; st.fila.onSubmittedWorkDone().then(() => { if (st.amostra !== a) return; st.amostra = null; st.gpuMs = performance.now() - a.t0; st.filaQ = a.n;
+        st.lentos = a.n > 12 ? (st.lentos || 0) + 1 : 0; if (st.lentos >= 2) { st.ritmo = 'contido'; st.lentos = 0; } }, () => { if (st.amostra === a) st.amostra = null; }); } }
   if (st.tag && st.foco) posTag(st);
   /* resolução dinâmica: quadros lentos seguidos baixam a densidade um degrau (fora do ?fundo=vivo, que mede a versão completa; nunca durante o cruzamento) */
   if (st.vivo && !st.forced && !st.cruzando && raw > 0 && raw < 400) { st.slow = raw > 40 ? st.slow + 1 : Math.max(0, st.slow - 2); if (st.slow > 45 && st.prK > 0.6) { st.prK = st.prK > 0.9 ? 0.78 : 0.62; st.slow = 0; resize(); } }
@@ -185,7 +211,15 @@ function naFrente(st) { const b = st.base; if (!b || !b.anim) return; const m = 
   for (let i = 0; i < b.anim.length; i++) { const o = b.anim[i].o; let vis = true;
     if (perto && o !== st.foco) { const px = o.position.x - c.x, py = o.position.y - c.y, pz = o.position.z - c.z, k = (px * dx + py * dy + pz * dz) / L2; if (k > 0 && k < 0.92) { const qx = px - dx * k, qy = py - dy * k, qz = pz - dz * k; vis = qx * qx + qy * qy + qz * qz > 324; } }
     if (o.visible !== vis) o.visible = vis; } }
-function kick(ms) { const st = S; if (!st) return; st.ate = Math.max(st.ate || 0, performance.now() + (ms || 120)); if (!st.montado) return; /* antes do fim da montagem nada desenha (os pipelines ainda estão compilando) */ if (!st.loop) { st.loop = true; st.last = performance.now(); st.renderer.setAnimationLoop(frame); } }
+function kick(ms) { const st = S; if (!st) return; st.ate = Math.max(st.ate || 0, performance.now() + (ms || 120)); if (!st.montado) return; /* antes do fim da montagem nada desenha (os pipelines ainda estão compilando) */ if (!st.loop && !st.fora) { st.loop = true; st.last = performance.now(); st.renderer.setAnimationLoop(frame); } } /* 5.0a.2: com o palco fora da tela, nada liga o laço */
+/* 5.0a.2: o GSAP anda no laço da Sala (mesmo relógio, sem salto) enquanto ela desenha; com a Sala parada (palco fora da tela) ou solta, ele volta ao relógio dele,
+   e os painéis e voos seguem andando */
+function gsapNoLaco(st, on) { if (!st.vivo || !LIB || !LIB.gsap || !!st.gsapNoLaco === on) return; const g = LIB.gsap, tk = g.ticker;
+  if (on) { tk.tick(); st.gOff = tk.time - performance.now() / 1000; tk.remove(g.updateRoot); tk.lagSmoothing(0); } else { tk.add(g.updateRoot); tk.tick(); tk.lagSmoothing(500, 33); } st.gsapNoLaco = on; }
+function pausar(st) { st.renderer.setAnimationLoop(null); st.loop = false; st.pausada = true; st.med.pausas = (st.med.pausas || 0) + 1; gsapNoLaco(st, false); }
+function retomar(st) { if (!st.fora) return; st.fora = false; if (st.pausada) { st.pausada = false; gsapNoLaco(st, true); kick(300); } }
+/* 5.0a.2: a roda só é da Sala no modo Explorar (ouvinte que pode cancelar a rolagem só enquanto ele está aberto; fora dele a rolagem da página nunca espera o JS) */
+function rodaExplorar(e) { const st = S; if (!st || !st.explorar) return; e.preventDefault(); st.rig.rad = Math.max(40, Math.min(520, st.rig.rad * (1 + Math.sign(e.deltaY) * 0.08))); kick(200); }
 /* 5.0a.1: a Sala aparece. Com o pôster na tela, ela entra por cima num cruzamento suave (GSAP) no mesmo enquadramento dele e depois desliza
    para o enquadramento desta tela; sem pôster, o esmaecer e a entrada de antes. Nada pesado roda no laço durante o cruzamento: o
    aquecimento das outras Raças só começa depois, com o jogador mostrando interesse nas Raças ou com a tela parada */
@@ -248,7 +282,7 @@ function aplicarCamera(dt, t) { const st = S, r = st.rig, cam = st.camera, T = s
   const sway = vivo && st.modoCam === 'repouso' && !st.posterTool ? Math.sin((t - (st.tRev || t)) * 0.045) * 0.035 : 0; /* 5.0a.1: o balanço começa em zero quando a Sala aparece (o pôster é desenhado sem balanço) */ const voo = st.modoCam === 'voo'; const pol = Math.max(voo ? 0.05 : 0.25, Math.min(voo ? Math.PI - 0.05 : 1.5, r.pol + st.par.y)), az = r.az + st.par.x + sway;
   T.ct.set(r.tx, r.ty, r.tz); T.cp.setFromSphericalCoords(r.rad, pol, az).add(T.ct); if (st.H) { const gy = st.H(T.cp.x, T.cp.z) + 6; if (T.cp.y < gy) T.cp.y = gy; }
   cam.position.copy(T.cp); cam.lookAt(T.ct); if (cam.fov !== r.fov) { cam.fov = r.fov; cam.updateProjectionMatrix(); }
-  const w = innerWidth, h = innerHeight, rol = st.host && (st.modoCam === 'repouso' || st.modoCam === 'voo') ? Math.min(h * 0.6, st.host.scrollTop || 0) : 0; /* o palco sobe com a rolagem da página; nos modos de tela cheia (foco, mesa, Academia, Explorar) não */ const ox = w / 2 - (st.ancLivre ? st.anc.x : Math.max(w * 0.15, Math.min(w * 0.85, st.anc.x))), oy = h / 2 - (st.ancLivre ? st.anc.y - rol : Math.max(h * 0.2, Math.min(h * 0.8, st.anc.y - rol))); /* a âncora fica dentro da tela: centro de projeção muito fora do meio deforma as esferas (5.0a.1: menos no começo casado com o pôster, onde o centro é o do pôster) */
+  const w = innerWidth, h = innerHeight, rol = st.modoCam === 'repouso' || st.modoCam === 'voo' ? Math.min(h * 0.6, st.rol) : 0; /* o palco sobe com a rolagem da página; nos modos de tela cheia (foco, mesa, Academia, Explorar) não. 5.0a.2: só conta com a rolagem guardada pelo ouvinte de scroll (nenhuma leitura de layout no quadro) */ const ox = w / 2 - (st.ancLivre ? st.anc.x : Math.max(w * 0.15, Math.min(w * 0.85, st.anc.x))), oy = h / 2 - (st.ancLivre ? st.anc.y - rol : Math.max(h * 0.2, Math.min(h * 0.8, st.anc.y - rol))); /* a âncora fica dentro da tela: centro de projeção muito fora do meio deforma as esferas (5.0a.1: menos no começo casado com o pôster, onde o centro é o do pôster) */
   if (Math.abs(ox) > 0.5 || Math.abs(oy) > 0.5) cam.setViewOffset(w, h, ox, oy, w, h); else cam.clearViewOffset();
   cam.updateMatrixWorld(); st.U.foco.value = st.focoD != null ? st.focoD : cam.position.distanceTo(T.ct); }
 /* 5.0a.1: um voo no meio do deslize (aba, foco, troca) solta o casamento com o pôster: céu e âncora voltam ao enquadramento desta tela */
@@ -260,7 +294,7 @@ function voar(alvo, dur, ease) { const st = S; if (!st) return; const g = LIB.gs
   kick(d * 1000 + 200); }
 /* ---------- layout: palco da vitrine (âncora do holograma), céu do Alinhamento (planetas e rasgo da Fenda) ---------- */
 function rect(sel) { const el = document.querySelector(sel); if (!el) return null; const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 ? r : null; }
-function ancoraPalco(st) { const rol = st.host.scrollTop || 0; const b = rect('#sc-bust'); if (b) { st.palcoH = Math.max(b.height, Math.min(innerHeight * 0.62, (rect('.sc-stage') || b).height)); return { x: b.left + b.width / 2, y: b.top + rol + b.height * 0.56 }; }
+function ancoraPalco(st) { const rol = st.rol; /* 5.0a.2: a rolagem guardada */ const b = rect('#sc-bust'); if (b) { st.palcoH = Math.max(b.height, Math.min(innerHeight * 0.62, (rect('.sc-stage') || b).height)); return { x: b.left + b.width / 2, y: b.top + rol + b.height * 0.56 }; }
   st.palcoH = innerHeight * 0.5; return { x: innerWidth * 0.32, y: innerHeight * 0.45 }; }
 function layout(snap) { const st = S; if (!st || !st.holo) return; const a = ancoraPalco(st); st.ancPalco = a; if (st.casado) return; /* 5.0a.1: casada com o pôster, a Sala só sai do enquadramento dele no deslize */
   if (st.modoCam === 'repouso') { const alvo = shot(st, st.aba); if (snap) { Object.assign(st.rig, alvo, { fov: fovBase() }); st.anc.x = a.x; st.anc.y = a.y; } else voar(Object.assign({ anc: a }, alvo), 0.8); }
@@ -287,7 +321,8 @@ function ceuAlvos(st) { const { W } = LIB; const w = innerWidth, h = innerHeight
     out.rasgo = { p: o.position.clone(), q: o.quaternion.clone(), s: o.scale.clone() }; }
   return out; }
 function resize() { const st = S; if (!st || !st.renderer) return; const w = innerWidth, h = innerHeight; const pr = st.posterTool ? Math.min(3, window.devicePixelRatio || 1) /* 5.0a.1: o pôster sai na densidade da tela */ : st.vivo ? Math.max(0.5, Math.min(2, window.devicePixelRatio || 1, Math.sqrt(8.3e6 / Math.max(1, w * h))) * st.prK) : Math.max(0.5, Math.min(1.5, window.devicePixelRatio || 1, Math.sqrt(2.6e6 / Math.max(1, w * h))));
-  st.renderer.setPixelRatio(pr); st.renderer.setSize(w, h, false); st.camera.aspect = w / h; st.camera.updateProjectionMatrix(); if (st.csm) try { st.csm.updateFrustums(); } catch (e) {} st.pr = pr; }
+  st.renderer.setPixelRatio(pr); st.renderer.setSize(w, h, false); st.camera.aspect = w / h; st.camera.updateProjectionMatrix(); if (st.csm) try { st.csm.updateFrustums(); } catch (e) {} st.pr = pr;
+  if (st.bloom && st.bloom.setResolutionScale) st.bloom.setResolutionScale(Math.min(1, Math.max(0.3, 0.5 / pr))); } /* 5.0a.2: o bloom sai sempre na metade da densidade 1 (o desfoque dele é em texels): o halo tem o mesmo tamanho na tela com densidade 1, 1,5 ou 2 e quando a resolução dinâmica baixa um degrau */
 /* ---------- troca de Raça: voo até o próximo mundo do Grande Alinhamento ---------- */
 async function setRace(race, o) { const st = S; o = o || {}; if (!st || !RACES.includes(race)) return; st.queroRaca = race; if (st.trocando || !st.ready) { if (!st.ready) st.race0 = race; return; } if (race === st.race) return;
   st.trocando = true; soltarCasado(st); const alive = () => S === st; const g = LIB.gsap; const de = st.race;
@@ -361,11 +396,12 @@ function voltar() { const st = S; if (!st) return; rotuloMesa(false); st.foco = 
 const UI = 'button,a,input,select,textarea,label,summary,details,.console,.sc-info,.fac-cards,.notes,.st-head,.modal,#academia,.site-foot,#sala-sair,#st-cta,.sc-pick';
 function eventos(st) { const on = (el, ev, f, o) => { el.addEventListener(ev, f, o); st.on.push([el, ev, f, o]); };
   on(window, 'resize', () => { resize(); layout(true); });
-  if (st.host) on(st.host, 'scroll', () => { if (!st.vivo) kick(160); }, { passive: true }); /* versão leve: o palco acompanha a rolagem (desenha só enquanto ela anda) */
+  /* 5.0a.2: com o palco fora da tela (as notas da versão à vista) a Sala para de desenhar e volta sozinha quando ele reaparece */
+  if (window.IntersectionObserver) { const pal = document.querySelector('.sc-stage') || document.getElementById('sc-bust'); if (pal) { st.io = new IntersectionObserver(es => { if (S !== st) return; if (es[es.length - 1].isIntersecting) retomar(st); else if (!st.fora) { st.fora = true; st.foraAte = performance.now() + 250; } }); st.io.observe(pal); } }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (S === st) layout(true); });
   if (window.ResizeObserver) { const b = document.querySelector('#sc-bust'); if (b) { let primeiro = true; st.ro = new ResizeObserver(() => { if (primeiro) { primeiro = false; return; } /* 5.0a.1: o aviso inicial do observador não é mudança de layout */ if (S === st && st.ready && !st.trocando) layout(false); }); st.ro.observe(b); } }
   on(window, 'pointermove', e => { if (!st.ready) return; if (e.pointerType === 'mouse' && !reduced() && st.vivo) { st.qx((e.clientX / innerWidth - 0.5) * 0.14); st.qy(Math.max(0, e.clientY / innerHeight - 0.5) * 0.05); } /* paralaxe curta; no alto ela só desce (os planetas da faixa de cima nunca saem da tela) */
-    if (st.holo.it && st.ancPalco) ARD.leaders3d.gaze(st.holo.it, (e.clientX - st.ancPalco.x) / 320, -(e.clientY - st.ancPalco.y + (st.host.scrollTop || 0)) / 260, 900);
+    if (st.holo.it && st.ancPalco) ARD.leaders3d.gaze(st.holo.it, (e.clientX - st.ancPalco.x) / 320, -(e.clientY - st.ancPalco.y + st.rol) / 260, 900); /* 5.0a.2: a rolagem guardada (nada de layout no ponteiro) */
     if (st.fenda && st.fenda.stirP) { const p = pick2(st, e.clientX, e.clientY); if (p) { st.fenda.stirP.value.copy(p); st.fenda.stirK.value = 1; } }
     if (st.explorar && st.drag) { const dx = e.clientX - st.drag.x, dy = e.clientY - st.drag.y; st.drag.x = e.clientX; st.drag.y = e.clientY; st.rig.az -= dx * 0.005; st.rig.pol = Math.max(0.35, Math.min(1.45, st.rig.pol - dy * 0.004)); st.drag.moveu = (st.drag.moveu || 0) + Math.abs(dx) + Math.abs(dy); kick(200); } }, { passive: true });
   on(st.host, 'click', e => { if (!st.ready || st.trocando) return; if (e.target.closest && e.target.closest(UI)) return; if (st.drag && st.drag.moveu > 6) return; const h = pick(st, e.clientX, e.clientY); if (!h) return;
@@ -373,7 +409,6 @@ function eventos(st) { const on = (el, ev, f, o) => { el.addEventListener(ev, f,
     else if (h.tipo === 'chao') { if (st.foco || st.modoCam === 'foco') voltar(); else if (st.modoCam === 'mesa') explorar(true); else if (st.fenda.pulseP) { pulso(st, h.p); } } });
   on(st.cv, 'pointerdown', e => { if (st.explorar) { st.drag = { x: e.clientX, y: e.clientY, moveu: 0 }; try { st.cv.setPointerCapture(e.pointerId); } catch (er) {} } });
   on(st.cv, 'pointerup', () => { setTimeout(() => { st.drag = null; }, 0); });
-  on(st.cv, 'wheel', e => { if (!st.explorar) return; e.preventDefault(); st.rig.rad = Math.max(40, Math.min(520, st.rig.rad * (1 + Math.sign(e.deltaY) * 0.08))); kick(200); }, { passive: false });
   on(document, 'keydown', e => { if (e.key === 'Escape' && !(ARD.salaAcademia && ARD.salaAcademia.aberta())) { if (st.explorar) explorar(false, { de: st.modoCam }); else if (st.foco) voltar(); } });
   /* som 3D: só depois de um gesto do jogador e se o som estiver ligado */
   const gesto = () => { if (S !== st) return; if (ARD.salaSom && ARD.audio && ARD.audio.enabled && !ARD.salaSom.ativo()) { const F = ARD.salaMundo.FENDA; ARD.salaSom.iniciar({ fenda: { x: F.x, y: st.H(F.x, F.z) + 30, z: F.z }, nucleo: nucleoPos(st), race: st.race }); } };
@@ -387,7 +422,7 @@ function pick2(st, x, y) { const { W } = LIB; const ray = st.ray || (st.ray = ne
 function pulso(st, p) { st.fenda.pulseP.value.copy(p); st.fenda.pulseK.value = 1; LIB.gsap.to(st.fenda.pulseK, { value: 0, duration: 1.6, ease: 'power2.out' }); if (ARD.salaSom) ARD.salaSom.pulso(p); kick(1700); }
 /* ---------- modo Explorar e mesa de perto: a interface sai, a câmera fica livre (arrastar gira, roda aproxima, clique foca) ---------- */
 function explorar(on, o) { const st = S; if (!st || !st.ready) return; o = o || {}; on = on == null ? !st.explorar : !!on; const naMesa = on && o.alvo === 'mesa' && !!st.mesa; const g = LIB.gsap; const wrap = st.host.querySelector('.start-wrap'); const abrir = on && !st.explorar;
-  st.explorar = on; st.host.classList.toggle('sala-explorar', on);
+  st.explorar = on; st.host.classList.toggle('sala-explorar', on); if (on) st.cv.addEventListener('wheel', rodaExplorar, { passive: false }); else st.cv.removeEventListener('wheel', rodaExplorar, { passive: false }); /* 5.0a.2 */
   if (abrir || !on) { if (wrap && !reduced()) g.to(wrap, { autoAlpha: on ? 0 : 1, duration: 0.5, ease: 'power2.out' }); else if (wrap) wrap.style.visibility = on ? 'hidden' : ''; }
   let bar = document.getElementById('sala-sair'); if (on && !bar) { bar = document.createElement('div'); bar.id = 'sala-sair'; bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Sala de Comando'); bar.innerHTML = '<span></span><button type="button" class="btn primary">Voltar ao menu</button>'; bar.querySelector('button').addEventListener('click', () => explorar(false)); st.host.appendChild(bar); }
   if (bar) { bar.hidden = !on; const leg = document.getElementById('mesa-txt'); bar.firstChild.textContent = naMesa ? 'Mesa tática · ' + (leg ? leg.textContent : '') + ' · arraste para girar' : 'Arraste para girar · roda para aproximar · clique numa construção ou na mesa'; }
@@ -405,8 +440,8 @@ function stop(o) { const st = S; if (!st) return; S = null; const partida = !!(o
      contexto WebGL dela (31 s no SwiftShader com a máquina carregada). Na GPU de verdade a fila esvazia em milissegundos */
   if (st.cv && st.cv.parentNode) st.cv.parentNode.removeChild(st.cv);
   for (const tw of st.tw) { try { tw.kill(); } catch (e) {} } if (LIB && LIB.gsap) { try { LIB.gsap.killTweensOf([st.rig, st.anc, st.par, st.cv]); if (st.holo) LIB.gsap.killTweensOf(st.holo.U.revela); if (st.U) LIB.gsap.killTweensOf([st.U.bokeh, st.U.focal]); if (st.bloom && st.bloom.strength) LIB.gsap.killTweensOf(st.bloom.strength); if (st.fenda && st.fenda.pulseK) LIB.gsap.killTweensOf(st.fenda.pulseK); } catch (e) {}
-    if (st.gsapNoLaco) { const tk = LIB.gsap.ticker; tk.add(LIB.gsap.updateRoot); tk.tick(); tk.lagSmoothing(500, 33); } } /* o GSAP volta ao relógio dele já sincronizado: as animações da partida começam na hora */
-  for (const [el, ev, f, o] of st.on) el.removeEventListener(ev, f, o); if (st.ro) st.ro.disconnect(); clearTimeout(st.aqT);
+    gsapNoLaco(st, false); } /* o GSAP volta ao relógio dele já sincronizado: as animações da partida começam na hora */
+  for (const [el, ev, f, o] of st.on) el.removeEventListener(ev, f, o); if (st.ro) st.ro.disconnect(); if (st.io) st.io.disconnect(); if (st.cv) st.cv.removeEventListener('wheel', rodaExplorar, { passive: false }); clearTimeout(st.aqT); /* 5.0a.2: o observador do palco e a roda do Explorar */
   if (ARD.salaSom) ARD.salaSom.parar();
   if (st.tag && st.tag.parentNode) st.tag.parentNode.removeChild(st.tag); if (st.flashEl && st.flashEl.parentNode) st.flashEl.remove(); const bar = document.getElementById('sala-sair'); if (bar) bar.remove();
   if (st.host) { st.host.classList.remove('sala-on', 'sala-explorar'); const wrap = st.host.querySelector('.start-wrap'); if (wrap) { wrap.style.opacity = ''; wrap.style.visibility = ''; } }
@@ -436,7 +471,8 @@ function posterInfo() { const st = S; if (!st || !st.ready) return null; const W
     cam: { p: arr(cam.position), t: arr(st.tmp.ct), fov: Math.round(cam.fov * 10000) / 10000, c: c.map(n => Math.round(n * 10) / 10) }, planetas,
     rasgo: rs ? { p: arr(rs.position), q: arr(rs.quaternion), s: arr(rs.scale) } : null, fx: { holo, fenda: st.fenda ? tela(st.fenda.centro.clone().setY(st.fenda.centro.y + 34)) : null, nucleo: tela(new W.Vector3(0, (st.holo.base || 40), 0)) } }; }
 function info() { const st = S; if (!st) return null; const r = st.renderer && st.renderer.info; return { modo: st.modo, motor: st.gpu ? 'WebGPU' : 'WebGL2', ready: st.ready, frames: st.frames, race: st.race, fps: st.fps || 0, pr: st.pr, particulas: st.C ? st.C.nPart : 0,
-  chamadas: r ? (r.render.drawCalls || r.render.calls || 0) : 0, triangulos: r ? r.render.triangles : 0, memoria: r && r.memory ? { geometrias: r.memory.geometries, texturas: r.memory.textures } : null, tempos: Object.assign({}, st.med), aba: st.aba, camera: st.modoCam, cruzando: !!st.cruzando, casado: !!st.casado, trocando: !!st.trocando, fase: st.fase || null, explorar: !!st.explorar, aquecidos: Object.assign({}, st.aquecidos || {}) }; }
+  chamadas: r ? (r.render.drawCalls || r.render.calls || 0) : 0, triangulos: r ? r.render.triangles : 0, memoria: r && r.memory ? { geometrias: r.memory.geometries, texturas: r.memory.textures } : null, tempos: Object.assign({}, st.med), aba: st.aba, camera: st.modoCam, cruzando: !!st.cruzando, casado: !!st.casado, trocando: !!st.trocando, fase: st.fase || null, explorar: !!st.explorar, aquecidos: Object.assign({}, st.aquecidos || {}),
+  ritmo: st.ritmo, adaptador: st.adaptador || null, gpuMs: st.gpuMs != null ? Math.round(st.gpuMs) : null, fila: st.filaQ != null ? st.filaQ : null, laco: !!st.loop, fora: !!st.fora, pausas: st.med.pausas || 0, rol: st.rol }; } /* 5.0a.2: ritmo pela GPU, quadros na fila da última amostra, laço ligado, palco fora da tela e a rolagem guardada */
 /* 5.0a.1: o three WebGPU, o TSL, os addons e o GSAP começam a baixar já com a vitrine na tela (no computador); a Sala monta depois do load e da sonda */
 function preparar() { const q = qs(), f = q.get('fundo'); if (LIB || f === 'off' || f === 'classico' || coarse() || reduced() || q.get('logo') === 'estatico') return; libs().catch(() => {}); }
 ARD.sala = { want, mount, preparar, sombra: () => { if (S && S.sun) { S.sun.shadow.needsUpdate = true; kick(120); } }, stop, setRace, aba, explorar, voltar, voar, kick, info, posterInfo, rotuloMesa, focarLider: () => { if (S) focarLider(S); }, som: () => { if (S && S.gesto) S.gesto(); }, active: () => !!S && S.ready, ctx: () => S, libs: () => LIB, pulso: (x, z) => { if (S && S.fenda && S.fenda.pulseP) pulso(S, new LIB.W.Vector3(x, S.fenda.centro.y + 30, z)); } };

@@ -1,4 +1,4 @@
-/* Aether Rift: Dominion — pôsteres da Sala de Comando (5.0a.1). Renderiza a própria Sala (Motor 5, WebGPU) num Chromium sem janela, uma foto
+/* Aether Rift: Dominion — pôsteres da Sala de Comando (5.0a.1; 5.0a.2: refeitos com a luz nova e com a luz de cada um no registro). Renderiza a própria Sala (Motor 5, WebGPU) num Chromium sem janela, uma foto
    por Raça e por tela, sem a interface por cima, e grava:
      assets/sala-<raça>-pc2560.webp   2560×1440 (computador grande)
      assets/sala-<raça>-pc1920.webp   1920×1080 (computador)
@@ -27,19 +27,30 @@ async function um(b, race, tela) { const t0 = Date.now(); const ctx = await b.ne
   /* as partículas da Fenda assentam (4 s de simulação em passos de 1/30 s) e a interface sai da frente (o layout fica: visibility) */
   await p.evaluate(async esc => { const c = ARD.sala.ctx(); if (c.fenda && c.fenda.cUpd) { for (let i = 0; i < 120; i++) { c.fenda.dt.value = 1 / 30; c.renderer.compute(c.fenda.cUpd); } }
     const s = document.createElement('style'); s.textContent = esc; document.head.appendChild(s); ARD.sala.kick(4000); if (c.fila) await c.fila.onSubmittedWorkDone(); }, ESCONDE);
-  const f0 = await p.evaluate(() => ARD.sala.info().frames); await p.waitForFunction(f => ARD.sala.info().frames >= f + 2, f0, { timeout: 1800000, polling: 500 }); await p.waitForTimeout(500);
+  /* 5.0a.2: um quadro novo (já com as partículas assentadas e a interface fora) terminado na GPU basta (antes, dois quadros inteiros: no SwiftShader, minutos a mais por pôster) */
+  const f0 = await p.evaluate(() => ARD.sala.info().frames); await p.waitForFunction(f => ARD.sala.info().frames >= f + 1, f0, { timeout: 1800000, polling: 500 });
+  await p.evaluate(async () => { const c = ARD.sala.ctx(); if (c.fila) await c.fila.onSubmittedWorkDone(); await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); }); await p.waitForTimeout(500);
   const meta = await p.evaluate(() => ARD.sala.posterInfo()); const png = await p.screenshot({ type: 'png' });
   /* WebP pelo próprio Chromium (canvas.toDataURL), na resolução da foto */
-  const webp = await p.evaluate(async ([b64, q]) => { const im = new Image(); im.src = 'data:image/png;base64,' + b64; await im.decode(); const cv = document.createElement('canvas'); cv.width = im.naturalWidth; cv.height = im.naturalHeight; cv.getContext('2d').drawImage(im, 0, 0); return cv.toDataURL('image/webp', q).split(',')[1]; }, [png.toString('base64'), QK || QUAL[tela]]);
+  /* 5.0a.2: a luz do pôster no registro: luma média (0 a 1), % da imagem estourada (algum canal >= 250) e, no holograma, a luma média e a estourada */
+  const [webp, luz] = await p.evaluate(async ([b64, q, holo, dpr]) => { const im = new Image(); im.src = 'data:image/png;base64,' + b64; await im.decode(); const cv = document.createElement('canvas'); cv.width = im.naturalWidth; cv.height = im.naturalHeight; const g = cv.getContext('2d'); g.drawImage(im, 0, 0);
+    const d = g.getImageData(0, 0, cv.width, cv.height).data; let s = 0, e = 0, sh = 0, eh = 0, nh = 0; const [hx, hy, hw, hh] = (holo || [0, 0, 0, 0]).map(v => Math.round(v * dpr));
+    for (let y = 0, i = 0; y < cv.height; y++) for (let x = 0; x < cv.width; x++, i += 4) { const L = (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) / 255, es = d[i] >= 250 || d[i + 1] >= 250 || d[i + 2] >= 250; s += L; if (es) e++;
+      if (x >= hx && x < hx + hw && y >= hy && y < hy + hh) { sh += L; nh++; if (es) eh++; } }
+    const n = cv.width * cv.height; return [cv.toDataURL('image/webp', q).split(',')[1], { luma: Math.round(s / n * 1000) / 1000, estourado: Math.round(e / n * 10000) / 100, holoLuma: nh ? Math.round(sh / nh * 1000) / 1000 : null, holoEstourado: nh ? Math.round(eh / nh * 10000) / 100 : null }]; },
+    [png.toString('base64'), QK || QUAL[tela], meta.fx && meta.fx.holo, meta.dpr || 1]); meta.luz = luz;
   const arq = 'sala-' + race + '-' + tela + '.webp'; const buf = Buffer.from(webp, 'base64'); fs.writeFileSync(path.join(ROOT, 'assets', arq), buf);
-  await ctx.close(); console.log('  ' + arq + ' · ' + Math.round(buf.length / 1024) + ' KB · ' + meta.w + '×' + meta.h + ' em ' + meta.dpr + 'x · ' + Math.round((Date.now() - t0) / 1000) + ' s' + (erros.length ? ' · erros: ' + erros.slice(0, 3).join(' | ') : ''));
+  await ctx.close(); console.log('  ' + arq + ' · ' + Math.round(buf.length / 1024) + ' KB · ' + meta.w + '×' + meta.h + ' em ' + meta.dpr + 'x · ' + Math.round((Date.now() - t0) / 1000) + ' s · luma ' + luz.luma + ' · estourado ' + luz.estourado + '% · holograma ' + luz.holoLuma + ' (estourado ' + luz.holoEstourado + '%)' + (erros.length ? ' · erros: ' + erros.slice(0, 3).join(' | ') : ''));
   if (erros.length) throw new Error(arq + ': ' + erros[0]); return { race, tela, meta, arq, bytes: buf.length }; }
 (async () => { if (ARGS.build !== '0') console.log(execFileSync(process.execPath, ['tools/build.mjs'], { cwd: ROOT, encoding: 'utf8' }).trim());
   const fila = []; for (const tela of (ARGS.telas || 'pc1920,pc2560,pe,deitado').split(',')) for (const race of RACAS) fila.push([race, tela]); const total = fila.length;
-  const D = fs.existsSync(JSONF) ? JSON.parse(fs.readFileSync(JSONF, 'utf8')) : { variantes: {} }; const feitos = [];
-  const trab = async () => { const b = await chromium.launch({ headless: true, args: FLAGS }); try { while (fila.length) { const [race, tela] = fila.shift(); let r = null; for (let k = 0; k < 2 && !r; k++) { try { r = await um(b, race, tela); } catch (e) { console.log('  falhou ' + race + '/' + tela + ' (' + e.message.slice(0, 160) + ')' + (k ? '' : ', de novo')); } } if (r) feitos.push(r); } } finally { await b.close(); } };
+  const feitos = [];
+  /* 5.0a.2: cada pôster pronto entra no JSON na hora (lido de novo e trocado de uma vez, por arquivo temporário): uma rodada interrompida não perde os dados
+     dos pôsteres que já fez, e duas rodadas com Raças ou telas diferentes podem andar juntas */
+  const grava = r => { const { race, tela, meta, arq, bytes } = r; const D = fs.existsSync(JSONF) ? JSON.parse(fs.readFileSync(JSONF, 'utf8')) : { variantes: {} }; const V = D.variantes[tela] = D.variantes[tela] || {}; V.w = meta.w; V.h = meta.h; V.dpr = meta.dpr; V.racas = V.racas || {};
+    V.racas[race] = { arquivo: arq, bytes, anc: meta.anc, palcoH: meta.palcoH, cam: meta.cam, planetas: meta.planetas, rasgo: meta.rasgo, fx: meta.fx, luz: meta.luz };
+    D.versao = '5.0a.2'; D.gerado = new Date().toISOString().slice(0, 16) + 'Z'; D.ferramenta = 'tools/sala-posteres.cjs'; const tmp = JSONF + '.' + process.pid + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(D, null, 1) + '\n'); fs.renameSync(tmp, JSONF); };
+  const trab = async () => { const b = await chromium.launch({ headless: true, args: FLAGS }); try { while (fila.length) { const [race, tela] = fila.shift(); let r = null; for (let k = 0; k < 2 && !r; k++) { try { r = await um(b, race, tela); } catch (e) { console.log('  falhou ' + race + '/' + tela + ' (' + e.message.slice(0, 160) + ')' + (k ? '' : ', de novo')); } } if (r) { feitos.push(r); grava(r); } } } finally { await b.close(); } };
   await Promise.all(Array.from({ length: Math.max(1, Math.min(2, +(ARGS.paralelo || 1))) }, trab)); /* no máximo 2 navegadores ao mesmo tempo (máquina dividida) */
-  for (const { race, tela, meta, arq, bytes } of feitos) { const V = D.variantes[tela] = D.variantes[tela] || {}; V.w = meta.w; V.h = meta.h; V.dpr = meta.dpr; V.racas = V.racas || {};
-    V.racas[race] = { arquivo: arq, bytes, anc: meta.anc, palcoH: meta.palcoH, cam: meta.cam, planetas: meta.planetas, rasgo: meta.rasgo, fx: meta.fx }; }
-  D.versao = '5.0a.1'; D.gerado = new Date().toISOString().slice(0, 16) + 'Z'; D.ferramenta = 'tools/sala-posteres.cjs'; fs.writeFileSync(JSONF, JSON.stringify(D, null, 1) + '\n');
+
   console.log('pôsteres: ' + feitos.length + ' de ' + total + ' · dados em assets/sala-posteres.json · rode node tools/build.mjs'); process.exit(feitos.length ? 0 : 1); })();

@@ -7,7 +7,7 @@
    "racas": {
     "vehnar": {
      "arquivo": "sala-vehnar-pc1920.webp",
-     "bytes": 115698,
+     "bytes": 119568,
      "anc": [
       388.5,
       558.5
@@ -80,10 +80,10 @@
      },
      "fx": {
       "holo": [
-       348,
-       319,
+       349,
+       325,
        263,
-       313
+       307
       ],
       "fenda": [
        743,
@@ -93,11 +93,17 @@
        476.3,
        600.3
       ]
+     },
+     "luz": {
+      "luma": 0.137,
+      "estourado": 0.57,
+      "holoLuma": 0.259,
+      "holoEstourado": 1.77
      }
     },
     "erevane": {
      "arquivo": "sala-erevane-pc1920.webp",
-     "bytes": 106866,
+     "bytes": 116714,
      "anc": [
       388.5,
       539.1
@@ -170,10 +176,10 @@
      },
      "fx": {
       "holo": [
-       383,
-       327,
-       129,
-       202
+       384,
+       326,
+       128,
+       203
       ],
       "fenda": [
        696.7,
@@ -183,11 +189,17 @@
        446.9,
        513.7
       ]
+     },
+     "luz": {
+      "luma": 0.171,
+      "estourado": 0.46,
+      "holoLuma": 0.369,
+      "holoEstourado": 0.03
      }
     },
     "tessara": {
      "arquivo": "sala-tessara-pc1920.webp",
-     "bytes": 118622,
+     "bytes": 119536,
      "anc": [
       388.5,
       546.3
@@ -263,7 +275,7 @@
        369,
        321,
        219,
-       285
+       283
       ],
       "fenda": [
        741.2,
@@ -273,11 +285,17 @@
        475.1,
        581.2
       ]
+     },
+     "luz": {
+      "luma": 0.216,
+      "estourado": 0.36,
+      "holoLuma": 0.363,
+      "holoEstourado": 0
      }
     },
     "quorith": {
      "arquivo": "sala-quorith-pc1920.webp",
-     "bytes": 106930,
+     "bytes": 120018,
      "anc": [
       388.5,
       570.5
@@ -350,10 +368,10 @@
      },
      "fx": {
       "holo": [
-       367,
-       303,
-       250,
-       380
+       375,
+       315,
+       241,
+       366
       ],
       "fenda": [
        757,
@@ -363,11 +381,17 @@
        489.1,
        657
       ]
+     },
+     "luz": {
+      "luma": 0.095,
+      "estourado": 0.48,
+      "holoLuma": 0.253,
+      "holoEstourado": 0.45
      }
     },
     "vorag": {
      "arquivo": "sala-vorag-pc1920.webp",
-     "bytes": 119702,
+     "bytes": 123950,
      "anc": [
       388.5,
       570.5
@@ -440,10 +464,10 @@
      },
      "fx": {
       "holo": [
-       348,
-       326,
-       303,
-       331
+       349,
+       322,
+       299,
+       334
       ],
       "fenda": [
        760,
@@ -453,6 +477,12 @@
        493,
        622.6
       ]
+     },
+     "luz": {
+      "luma": 0.111,
+      "estourado": 0.64,
+      "holoLuma": 0.258,
+      "holoEstourado": 1.9
      }
     }
    }
@@ -464,7 +494,7 @@
    "racas": {
     "vehnar": {
      "arquivo": "sala-vehnar-pe.webp",
-     "bytes": 102530,
+     "bytes": 110164,
      "anc": [
       76,
       191
@@ -550,11 +580,17 @@
        77.2,
        234.7
       ]
+     },
+     "luz": {
+      "luma": 0.162,
+      "estourado": 0.93,
+      "holoLuma": 0.234,
+      "holoEstourado": 1.78
      }
     },
     "erevane": {
      "arquivo": "sala-erevane-pe.webp",
-     "bytes": 106418,
+     "bytes": 119416,
      "anc": [
       76,
       191
@@ -628,9 +664,9 @@
      "fx": {
       "holo": [
        36,
-       120,
+       121,
        81,
-       120
+       119
       ],
       "fenda": [
        281.7,
@@ -640,11 +676,17 @@
        77.1,
        235.1
       ]
+     },
+     "luz": {
+      "luma": 0.208,
+      "estourado": 1.25,
+      "holoLuma": 0.381,
+      "holoEstourado": 0.47
      }
     },
     "tessara": {
      "arquivo": "sala-tessara-pe.webp",
-     "bytes": 98634,
+     "bytes": 105104,
      "anc": [
       76,
       191
@@ -718,7 +760,7 @@
      "fx": {
       "holo": [
        29,
-       120,
+       121,
        95,
        118
       ],
@@ -730,11 +772,17 @@
        77.2,
        233.7
       ]
+     },
+     "luz": {
+      "luma": 0.238,
+      "estourado": 0.8,
+      "holoLuma": 0.328,
+      "holoEstourado": 0
      }
     },
     "quorith": {
      "arquivo": "sala-quorith-pe.webp",
-     "bytes": 80358,
+     "bytes": 89392,
      "anc": [
       76,
       191
@@ -807,10 +855,10 @@
      },
      "fx": {
       "holo": [
-       33,
-       113,
-       85,
-       127
+       36,
+       122,
+       81,
+       117
       ],
       "fenda": [
        280.1,
@@ -820,11 +868,17 @@
        77.1,
        235.7
       ]
+     },
+     "luz": {
+      "luma": 0.087,
+      "estourado": 0.84,
+      "holoLuma": 0.212,
+      "holoEstourado": 0.02
      }
     },
     "vorag": {
      "arquivo": "sala-vorag-pe.webp",
-     "bytes": 103594,
+     "bytes": 109406,
      "anc": [
       76,
       191
@@ -899,7 +953,7 @@
       "holo": [
        21,
        121,
-       109,
+       110,
        117
       ],
       "fenda": [
@@ -910,6 +964,12 @@
        77.2,
        232.7
       ]
+     },
+     "luz": {
+      "luma": 0.153,
+      "estourado": 0.89,
+      "holoLuma": 0.25,
+      "holoEstourado": 0.97
      }
     }
    }
@@ -921,7 +981,7 @@
    "racas": {
     "vehnar": {
      "arquivo": "sala-vehnar-pc2560.webp",
-     "bytes": 136440,
+     "bytes": 152652,
      "anc": [
       708.5,
       558.5
@@ -995,9 +1055,9 @@
      "fx": {
       "holo": [
        669,
-       325,
+       322,
        261,
-       307
+       310
       ],
       "fenda": [
        1063,
@@ -1007,11 +1067,17 @@
        796.3,
        600.3
       ]
+     },
+     "luz": {
+      "luma": 0.12,
+      "estourado": 1.22,
+      "holoLuma": 0.264,
+      "holoEstourado": 1.68
      }
     },
     "erevane": {
      "arquivo": "sala-erevane-pc2560.webp",
-     "bytes": 147532,
+     "bytes": 140384,
      "anc": [
       708.5,
       539.1
@@ -1085,9 +1151,9 @@
      "fx": {
       "holo": [
        703,
-       326,
+       324,
        129,
-       203
+       205
       ],
       "fenda": [
        1016.7,
@@ -1097,11 +1163,17 @@
        766.9,
        513.7
       ]
+     },
+     "luz": {
+      "luma": 0.156,
+      "estourado": 0.24,
+      "holoLuma": 0.366,
+      "holoEstourado": 0.03
      }
     },
     "tessara": {
      "arquivo": "sala-tessara-pc2560.webp",
-     "bytes": 156438,
+     "bytes": 147560,
      "anc": [
       708.5,
       546.3
@@ -1174,10 +1246,10 @@
      },
      "fx": {
       "holo": [
-       691,
-       322,
+       689,
+       320,
        214,
-       282
+       285
       ],
       "fenda": [
        1061.2,
@@ -1187,11 +1259,17 @@
        795.1,
        581.2
       ]
+     },
+     "luz": {
+      "luma": 0.195,
+      "estourado": 0.2,
+      "holoLuma": 0.369,
+      "holoEstourado": 0
      }
     },
     "quorith": {
      "arquivo": "sala-quorith-pc2560.webp",
-     "bytes": 160124,
+     "bytes": 153558,
      "anc": [
       708.5,
       570.5
@@ -1265,9 +1343,9 @@
      "fx": {
       "holo": [
        695,
-       308,
+       312,
        242,
-       374
+       371
       ],
       "fenda": [
        1077,
@@ -1277,11 +1355,17 @@
        809.1,
        657
       ]
+     },
+     "luz": {
+      "luma": 0.086,
+      "estourado": 0.25,
+      "holoLuma": 0.253,
+      "holoEstourado": 0.45
      }
     },
     "vorag": {
      "arquivo": "sala-vorag-pc2560.webp",
-     "bytes": 176134,
+     "bytes": 162452,
      "anc": [
       708.5,
       570.5
@@ -1354,10 +1438,10 @@
      },
      "fx": {
       "holo": [
-       669,
-       321,
-       300,
-       335
+       668,
+       322,
+       302,
+       334
       ],
       "fenda": [
        1080,
@@ -1367,6 +1451,12 @@
        813,
        622.6
       ]
+     },
+     "luz": {
+      "luma": 0.113,
+      "estourado": 0.74,
+      "holoLuma": 0.258,
+      "holoEstourado": 1.9
      }
     }
    }
@@ -1378,7 +1468,7 @@
    "racas": {
     "vehnar": {
      "arquivo": "sala-vehnar-deitado.webp",
-     "bytes": 116094,
+     "bytes": 126058,
      "anc": [
       166,
       499.4
@@ -1452,9 +1542,9 @@
      "fx": {
       "holo": [
        72,
-       193,
+       194,
        181,
-       205
+       204
       ],
       "fenda": [
        384.3,
@@ -1464,11 +1554,17 @@
        167.9,
        385.4
       ]
+     },
+     "luz": {
+      "luma": 0.222,
+      "estourado": 1.23,
+      "holoLuma": 0.259,
+      "holoEstourado": 2.16
      }
     },
     "erevane": {
      "arquivo": "sala-erevane-deitado.webp",
-     "bytes": 98420,
+     "bytes": 105406,
      "anc": [
       166,
       488.9
@@ -1541,10 +1637,10 @@
      },
      "fx": {
       "holo": [
-       97,
-       194,
+       96,
+       193,
        137,
-       203
+       204
       ],
       "fenda": [
        382.6,
@@ -1554,11 +1650,17 @@
        167.9,
        386.1
       ]
+     },
+     "luz": {
+      "luma": 0.192,
+      "estourado": 1.1,
+      "holoLuma": 0.344,
+      "holoEstourado": 0.14
      }
     },
     "tessara": {
      "arquivo": "sala-tessara-deitado.webp",
-     "bytes": 108202,
+     "bytes": 114012,
      "anc": [
       166,
       500.9
@@ -1632,9 +1734,9 @@
      "fx": {
       "holo": [
        85,
-       191,
-       158,
-       203
+       192,
+       160,
+       202
       ],
       "fenda": [
        386.5,
@@ -1644,11 +1746,17 @@
        168,
        383.7
       ]
+     },
+     "luz": {
+      "luma": 0.35,
+      "estourado": 0.83,
+      "holoLuma": 0.357,
+      "holoEstourado": 0
      }
     },
     "quorith": {
      "arquivo": "sala-quorith-deitado.webp",
-     "bytes": 107372,
+     "bytes": 116672,
      "anc": [
       166,
       511.4
@@ -1722,9 +1830,9 @@
      "fx": {
       "holo": [
        97,
-       197,
+       187,
        137,
-       198
+       207
       ],
       "fenda": [
        382.1,
@@ -1734,11 +1842,17 @@
        167.8,
        387.2
       ]
+     },
+     "luz": {
+      "luma": 0.08,
+      "estourado": 0.99,
+      "holoLuma": 0.192,
+      "holoEstourado": 0.07
      }
     },
     "vorag": {
      "arquivo": "sala-vorag-deitado.webp",
-     "bytes": 119034,
+     "bytes": 124034,
      "anc": [
       166,
       490.6
@@ -1813,7 +1927,7 @@
       "holo": [
        70,
        193,
-       188,
+       187,
        201
       ],
       "fenda": [
@@ -1824,12 +1938,18 @@
        168,
        381.9
       ]
+     },
+     "luz": {
+      "luma": 0.147,
+      "estourado": 1.14,
+      "holoLuma": 0.253,
+      "holoEstourado": 1.21
      }
     }
    }
   }
  },
- "versao": "5.0a.1",
- "gerado": "2026-10-24T05:22Z",
+ "versao": "5.0a.2",
+ "gerado": "2026-10-24T23:20Z",
  "ferramenta": "tools/sala-posteres.cjs"
 }

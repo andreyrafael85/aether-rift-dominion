@@ -24,6 +24,7 @@ const MUNDOS = {
     fala: 'Oru Voraz. A fome de Velk não tem fim.' },
 };
 const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'];
+const TETO_CEU = { joelho: 0.6, teto: 1.3, sol: 4.0 }; /* 5.0a.2: o céu visível passa a comprimir acima do joelho e não passa do teto (abaixo do limiar do bloom em sala.js); sol = brilho do disco contido */
 /* cores dos planetas (as mesmas paletas do world3d.PLANETS: escuro → claro) e o que cada um tem */
 const PLANETAS = {
   vehnar: { pl: [0x1a120c, 0x5a3a22, 0xa06a3a, 0xe6b070], atmo: 0xff9a4a, noite: 0xff6a1a, anel: 0xc8a27a },
@@ -78,12 +79,22 @@ function chaoDe(C, race) { terrenoMat(C); const U = C.U.chao, M = MUNDOS[race] |
   U.rug.value = M.rug; U.rug2.value = Math.min(1, M.rug + 0.1); U.larg.value = V[0]; U.vf.value = V[1]; U.vt.value = V[2]; U.kv.value = V[3];
   U.pa.value = P[0]; U.px.value = P[1]; U.pz.value = P[2]; U.pamp.value = P[3]; U.poff.value = P[4]; }
 /* ---------- céu físico (SkyMesh em TSL, com nuvens) com ganho, tinta e estrelas por mundo; o mesmo céu, menor, assa a luz de ambiente ---------- */
-function ceu(C) { const { W, T, SkyMesh } = C.L; const { vec3, vec4, float, normalize, positionWorld, cameraPosition, floor, fract, dot, smoothstep, max, sin, time, hash, length } = T;
-  const U = { ganho: T.uniform(0.12), tinta: T.uniform(new W.Color(1, 1, 1)), estrelas: T.uniform(0.0) };
+function ceu(C) { const { W, T, SkyMesh } = C.L; const { vec3, vec4, float, normalize, positionWorld, cameraPosition, floor, fract, dot, smoothstep, max, min, sin, time, hash, length, luminance } = T;
+  const U = { ganho: T.uniform(0.12), tinta: T.uniform(new W.Color(1, 1, 1)), estrelas: T.uniform(0.0), teto: T.uniform(TETO_CEU.teto), sol: T.uniform(TETO_CEU.sol) };
   const stars = (dir, sc, th) => { const q = dir.mul(sc), c = floor(q), r = hash(c.x.add(c.y.mul(57.0)).add(c.z.mul(113.0))); const o = vec3(hash(c.x.add(7.1)), hash(c.y.add(3.3)), hash(c.z.add(9.9))).mul(0.6).add(0.2);
     const l = length(fract(q).sub(o)); return smoothstep(0.12, 0.0, l).mul(smoothstep(th, 1.0, r)).mul(sin(time.mul(r.mul(3.0).add(1.0)).add(r.mul(60.0))).mul(0.3).add(0.7)); };
+  /* 5.0a.2: as altas luzes do céu são comprimidas acima de TETO_CEU.joelho (curva suave até o teto, com o tom preservado). Perto do sol o céu do SkyMesh
+     passava de 6 numa área grande (o halo de Mie com turbidez alta: até 42 no canto da tela do Kessari em 2560×1440, medido) e o disco do sol, de 1.000;
+     com o bloom em 0,8 isso virava o clarão laranja sobre a metade esquerda da tela no alto da página. O céu visível fica abaixo do limiar do bloom (o halo do
+     próprio céu é o brilho do sol, com o degradê guardado) e o disco do SkyMesh dá lugar a um disco contido, que ainda acende um bloom pequeno.
+     O céu da luz de ambiente (PMREM) não é comprimido (o halo do sol é boa parte da luz de ambiente do mundo: comprimido, o chão escurecia 30%); só perde
+     o disco do sol (de 1.000), que virava reflexos estourados nas peças lisas: o brilho do sol nelas vem da luz direcional */
+  const comprime = (col, teto) => { const J = float(TETO_CEU.joelho), L = luminance(col), ex = max(L.sub(J), 0), Lc = min(L, J).add(ex.div(ex.div(teto.sub(J)).add(1))); return col.mul(Lc.div(max(L, 1e-4))); };
   const make = (scale, comEstrelas) => { const s = new SkyMesh(); s.scale.setScalar(scale); const base = s.material.colorNode; const dir = normalize(positionWorld.sub(cameraPosition));
-    let col = base.rgb.mul(U.ganho).mul(U.tinta); if (comEstrelas) col = col.add(vec3(0.85, 0.9, 1.0).mul(stars(dir, 170.0, 0.965).mul(1.4).add(stars(dir, 360.0, 0.982))).mul(U.estrelas).mul(smoothstep(-0.02, 0.2, dir.y)));
+    let col = base.rgb.mul(U.ganho).mul(U.tinta); s.showSunDisc.value = 0; if (comEstrelas) col = comprime(col, U.teto);
+    if (comEstrelas) { const sd = normalize(s.sunPosition), disco = smoothstep(0.99985, 0.99996, dot(dir, sd)).mul(smoothstep(-0.02, 0.03, sd.y)); /* raio de 0,5° a 1°; some com o sol abaixo do horizonte */
+      col = max(col, T.mix(vec3(1.0, 0.52, 0.24), vec3(1.0, 0.93, 0.84), smoothstep(0.0, 0.3, sd.y)).mul(disco).mul(U.sol)); }
+    if (comEstrelas) col = col.add(vec3(0.85, 0.9, 1.0).mul(stars(dir, 170.0, 0.965).mul(1.4).add(stars(dir, 360.0, 0.982))).mul(U.estrelas).mul(smoothstep(-0.02, 0.2, dir.y)));
     s.material.colorNode = vec4(col, 1); s.material.fog = false; s.frustumCulled = false; return s; };
   const sky = make(4000, true), envSky = make(400, false); envSky.cloudCoverage.value = 0.2;
   const set = race => { const K = (MUNDOS[race] || MUNDOS.vehnar).ceu; for (const s of [sky, envSky]) { s.turbidity.value = K.turb; s.rayleigh.value = K.ray; s.mieCoefficient.value = K.mie; s.mieDirectionalG.value = K.g; }

@@ -24,7 +24,7 @@ function url(race, v) { return 'assets/sala-' + race + '-' + v + '.webp'; }
 function dados(v) { const M = ARD.SALA_POSTERES; return (M && M.variantes && M.variantes[v]) || null; }
 function usar() { const q = qs(), f = q.get('fundo'); if (f === 'off' || f === 'classico' || q.get('poster') === '1' || q.get('autostart') || q.get('bench') || q.get('missao')) return false; return !!(ARD.SALA_POSTERES && ARD.SALA_POSTERES.variantes); }
 /* a âncora do palco na página (a mesma conta de ancoraPalco em sala.js): o centro do busto e a altura útil do palco */
-function palco() { const rol = P.host.scrollTop || 0; const b = document.getElementById('sc-bust'); const r = b && b.getBoundingClientRect();
+function palco() { const rol = P.rol; /* 5.0a.2: a rolagem guardada pelo ouvinte de scroll */ const b = document.getElementById('sc-bust'); const r = b && b.getBoundingClientRect();
   if (r && r.width > 0 && r.height > 0) { const sg = document.querySelector('.sc-stage'), rs = sg && sg.getBoundingClientRect(); const alto = rs && rs.width > 0 && rs.height > 0 ? rs.height : r.height;
     return { x: r.left + r.width / 2, y: r.top + rol + r.height * 0.56, ph: Math.max(r.height, Math.min(innerHeight * 0.62, alto)) }; }
   return { x: innerWidth * 0.32, y: innerHeight * 0.45, ph: innerHeight * 0.5 }; }
@@ -32,14 +32,15 @@ function palco() { const rol = P.host.scrollTop || 0; const b = document.getElem
 function conta(m) { const a = palco(), w = innerWidth, h = innerHeight; const R = (m.racas && m.racas[P.race]) || {}, anc = R.anc || m.anc || [m.w * 0.3, m.h * 0.45], ph = R.palcoH || m.palcoH;
   let s = ph && a.ph ? a.ph / ph : 1; s = Math.max(s, w / m.w, h / m.h);
   const tx = Math.min(0, Math.max(w - m.w * s, a.x - s * anc[0])), ty = Math.min(0, Math.max(h - m.h * s, a.y - s * anc[1])); return { s, tx, ty }; }
-function aplicar() { if (!P || !P.m) return; P.T = conta(P.m); for (const im of [P.img, P.img2]) if (im) { im.style.width = P.m.w + 'px'; im.style.height = P.m.h + 'px'; } rolar(); }
-/* rolagem: com a Sala por vir, o pôster sobe junto com o palco (como a Sala faz); como fundo final, sobe mais devagar que a página (paralaxe) */
-function rolar() { if (!P || !P.T) return; const rol = Math.min(innerHeight * 0.6, P.host.scrollTop || 0); P.desl = P.final && !P.parado ? rol * 0.45 : rol; const T = P.T;
-  const tf = 'translate3d(' + T.tx.toFixed(1) + 'px,' + (T.ty - P.desl).toFixed(1) + 'px,0) scale(' + T.s.toFixed(5) + ')'; for (const im of [P.img, P.img2]) if (im) im.style.transform = tf; }
+function aplicar() { if (!P || !P.m) return; P.T = conta(P.m); P.tf = null; /* 5.0a.2: escreve de novo (imagem nova ou tela nova) */ for (const im of [P.img, P.img2]) if (im) { im.style.width = P.m.w + 'px'; im.style.height = P.m.h + 'px'; } rolar(); }
+/* rolagem: com a Sala por vir, o pôster sobe junto com o palco (como a Sala faz); como fundo final, sobe mais devagar que a página (paralaxe).
+   5.0a.2: o scrollTop é lido uma vez por evento de scroll e guardado; o resto (e o movimento 2D) só faz conta com ele, e o transform só é escrito quando muda */
+function rolar(e) { if (!P) return; if (e) P.rol = P.host.scrollTop; if (!P.T) return; const rol = Math.min(innerHeight * 0.6, P.rol); P.desl = P.final && !P.parado ? rol * 0.45 : rol; const T = P.T;
+  const tf = 'translate3d(' + T.tx.toFixed(1) + 'px,' + (T.ty - P.desl).toFixed(1) + 'px,0) scale(' + T.s.toFixed(5) + ')'; if (tf === P.tf) return; P.tf = tf; for (const im of [P.img, P.img2]) if (im) im.style.transform = tf; }
 /* ---------- montagem: chamada pela tela inicial (main.js) assim que a vitrine tem o layout final ---------- */
 function mount(host, race) { if (P || !host || host.hidden || !usar()) return false; const el = document.getElementById('sala-poster'), img = document.getElementById('sala-poster-img'); if (!el || !img) return false;
   const v = variante(), m = dados(v); if (!m) return false; race = RACES.includes(race) ? race : 'vehnar';
-  P = { host, el, img, img2: null, race, v, m, T: null, desl: 0, vis: false, final: false, parado: reduced(), on: [], t0: performance.now(), med: {} };
+  P = { host, el, img, img2: null, race, v, m, T: null, desl: 0, rol: host.scrollTop || 0, vis: false, final: false, parado: reduced(), on: [], t0: performance.now(), med: {} }; /* 5.0a.2: rol = a rolagem guardada */
   const want = url(race, v); if (!img.getAttribute('src') || img.getAttribute('src') !== want) img.src = want; /* o script do topo já pediu esta mesma imagem (se a Raça ou a tela mudaram, pede a certa) */
   aplicar(); const st = P; const ok = () => { if (P !== st) return; st.med.decod = Math.round(performance.now()); mostrar(); }; const ruim = () => { if (P === st) falhar(); };
   if (img.complete && img.naturalWidth) (img.decode ? img.decode().then(ok, ok) : ok()); else { img.addEventListener('load', () => (img.decode ? img.decode().then(ok, ok) : ok()), { once: true }); img.addEventListener('error', ruim, { once: true }); }
@@ -61,7 +62,7 @@ function trocar(race, v) { const st = P; if (!st) return; const m = dados(v); if
   im.onload = () => (im.decode ? im.decode().then(pronto, pronto) : pronto()); im.src = nova; if (st.fx) st.fx.raca(race); }
 function setRace(race) { if (!P || !RACES.includes(race) || race === P.race) return; if (P.esc) { P.race = race; return; } trocar(race, P.v); }
 /* a Sala ao vivo cobriu o pôster (fim do cruzamento): ele sai e solta a imagem */
-function esconder() { if (!P) return; P.esc = true; pararFx(); P.el.classList.remove('on'); P.host.classList.remove('sala-poster'); const st = P; setTimeout(() => { if (P !== st || !st.esc) return; st.el.hidden = true; for (const im of [st.img, st.img2]) if (im) im.removeAttribute('src'); }, 400); }
+function esconder() { if (!P) return; P.esc = true; pararFx(); P.host.removeEventListener('scroll', rolar, { passive: true }); /* 5.0a.2: coberto pela Sala, o pôster não anda mais com a rolagem */ P.el.classList.remove('on'); P.host.classList.remove('sala-poster'); const st = P; setTimeout(() => { if (P !== st || !st.esc) return; st.el.hidden = true; for (const im of [st.img, st.img2]) if (im) im.removeAttribute('src'); }, 400); }
 /* sem a Sala (celular, movimento reduzido, GPU por software, ou ela não subiu): o pôster fica como fundo, com o movimento leve */
 function final() { if (!P || P.esc) return false; P.final = true; P.parado = reduced() || (!!ARD.gpuSoft && qs().get('fundo') !== 'fx'); P.host.classList.add('poster-final'); rolar(); if (P.vis) iniciarFx(); return true; }
 function parar() { const st = P; if (!st) return; P = null; pararFx(st); for (const [a, ev, f, o] of st.on) a.removeEventListener(ev, f, o); st.el.classList.remove('on'); st.el.hidden = true; st.host.classList.remove('sala-poster', 'poster-final'); for (const im of [st.img, st.img2]) if (im) im.removeAttribute('src'); }
