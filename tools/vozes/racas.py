@@ -26,8 +26,8 @@ VOZES_RACA = ['pf_dora', 'pm_alex', 'pm_santa']
 ELENCO = {
     'vehnar': dict(lider='Barão-Forja', lider_pesos={'pm_santa': 1.0}, lider_vel=0.95, locutor_pesos={'pm_alex': 1.0}, locutor_vel=1.0,
                    porque='Barão-Forja: a voz mais madura e grave (Santa), devagar, pelo rádio da fundição; o locutor é o Alex, a voz-base, mais jovem.'),
-    'erevane': dict(lider='Vesper Ísk', lider_pesos={'pm_alex': 0.7, 'pm_santa': 0.3}, lider_vel=1.05, locutor_pesos={'pf_dora': 1.0}, locutor_vel=1.0,
-                    porque='Vesper Ísk: Alex com um pouco do Santa, mais rápido e seco, com eco e ar; a locutora é a Dora, uma IA fria que contrasta com o líder.'),
+    'erevane': dict(lider='Vesper Ísk', lider_pesos={'pm_alex': 0.7, 'pm_santa': 0.3}, lider_vel=1.05, locutor_pesos={'pm_santa': 0.7, 'pm_alex': 0.3}, locutor_vel=1.0,
+                    porque='Vesper Ísk: Alex com um pouco do Santa, mais rápido e seco, com eco e ar; o locutor (5.0c.2, pedido do dono: voz feminina só na Tessara) é o Santa com um pouco do Alex, em ritmo normal, distinto do líder.'),
     'tessara': dict(lider='Sylvia Oriel', lider_pesos={'pf_dora': 1.0}, lider_vel=0.95, locutor_pesos={'pf_dora': 0.8, 'pm_santa': 0.2}, locutor_vel=1.05,
                     porque='Sylvia Oriel: a Dora, sem pressa, quente e orgânica; a locutora é a Dora com 20% do Santa e mais rápida, para não confundir com a líder.'),
     'quorith': dict(lider='Zayin Coral', lider_pesos={'pm_alex': 0.5, 'pm_santa': 0.5}, lider_vel=1.0, locutor_pesos={'pm_alex': 1.0}, locutor_vel=1.0,
@@ -232,8 +232,11 @@ def vorag_c(x24, sr24):  # C: −5 semitons e formantes 12% abaixo ("Change gend
 def erevane_loc(x24, sr24):
     """5.0c.1: o eco mais leve do locutor da Erevane (aprovado em 29/10/2026): realimentação 0,36 → 0,25 e sala 0,34 → 0,2. O eco de 165 ms da v1
     confundia os avisos curtos ("Base sob ataque" virava "Basis Sobataki"); o líder fica com o eco da v1. Vale também para as unidades da Erevane,
-    que são falas curtas como os avisos."""
-    x = para48(x24, sr24); a = eq(x, ('graves', 180, 0.7071, -4), ('agudos', 5500, 0.7071, 6), ('pico', 11000, 0.7, 4))
+    que são falas curtas como os avisos.
+    5.0c.2 (pedido do dono: as vozes da Erevane soavam femininas): sem afinar a voz masculina. Graves −4 → 0 dB, agudos em 5,5 kHz +6 → +3 dB e
+    ar em 11 kHz +4 → +2 dB; o eco leve e a sala ficam. O centroide espectral das unidades (Alex) caiu de 1.271 para 796 Hz em pt-BR (Alex seco
+    777 Hz; unidades do Vehnar 708 e do Quorith 756 Hz): ainda um pouco de ar acima da voz seca, a identidade fria de vidro."""
+    x = para48(x24, sr24); a = eq(x, ('graves', 180, 0.7071, 0), ('agudos', 5500, 0.7071, 3), ('pico', 11000, 0.7, 2))
     a = np.concatenate([a, np.zeros(int(2.0 * SR))])
     ir = sala(2.0, 2.4, semente=11); hp = eq(a, ('passa-alta', 500, 0.7071))
     rv = (fftconvolve(hp, ir[0])[:len(a)] + fftconvolve(hp, ir[1])[:len(a)]) / 2
@@ -252,6 +255,7 @@ VOZ_EN = {'pm_alex': 'am_michael', 'pm_santa': 'bm_george', 'pf_dora': 'af_bella
 UNIDADES = {'civil': ({'pm_alex': 1.0}, 1.0), 'infantaria': ({'pm_alex': 1.0}, 1.05), 'veiculo': ({'pm_alex': 0.6, 'pm_santa': 0.4}, 0.95),
             'drone': ({'pm_alex': 1.0}, 1.1), 'suporte': ({'pm_alex': 0.8, 'pm_santa': 0.2}, 1.0)}
 ASSADO_JOGO = {'vehnar': 'vehnar', 'erevane': 'erevane', 'tessara': 'tessara', 'quorith': 'quorith', 'vorag': 'vorag-c'}  # Vorag na variante C (29/10)
+VERSAO_ASSADO = {'erevane-loc': '5.0c.2'}  # muda a assinatura das falas: a etapa jogo refaz as que usam o caráter mudado
 
 
 def assado_do_papel(raca, quem):

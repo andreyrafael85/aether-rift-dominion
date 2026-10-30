@@ -171,8 +171,11 @@ V.tocar = function (g, cb, o) { o = o || {}; const h = { parado: false, fontes: 
    A Raça em destaque é a do html[data-race] (src/ui-start.js). A variante da próxima saudação é sorteada e baixada antes; ao trocar de Raça, a
    saudação da Raça nova é pedida na hora (a Sala espera até ESPERA_SALA ms por ela). */
 function preparaSaudacao(r) { if (!r || RACAS.indexOf(r) < 0) return; V.destaque = r; const st = document.getElementById('start'); if (st && st.hidden) return;
-  livre(() => manifesto().then(m => { if (!m || V.destaque !== r) return; const ch = 'sala-' + r, tab = m.chaves[r], ids = tab && tab[ch]; if (!ids || !ids.length) return;
-    const k = r + '|' + ch; let id = PROX[k]; if (!id || ids.indexOf(id) < 0) { const ult = ULT[k], op = ids.filter(x => x !== ult); id = PROX[k] = op[Math.floor(Math.random() * op.length)] || ids[0]; } enfileirar([id], true); })); }
+  const vai = () => manifesto().then(m => { if (!m || V.destaque !== r) return; const id = saudacaoDe(m, r); if (!id) return; enfileirar([id], true);
+    if (!V.todasSaudacoes) { V.todasSaudacoes = true; enfileirar(RACAS.filter(x => x !== r).map(x => saudacaoDe(m, x)).filter(Boolean)); } });
+  if (V.m) vai(); else livre(vai); } /* 5.0c.1 (testes do dono): com o manifesto já carregado, a saudação da Raça nova baixa na hora (antes, cada troca esperava um momento ocioso, até 2,5 s no Firefox com a Sala desenhando, e a voz chegava depois do voo); depois da primeira, as saudações das outras quatro Raças baixam em segundo plano (5 arquivos, cerca de 100 KB) */
+function saudacaoDe(m, r) { const ch = 'sala-' + r, tab = m.chaves[r], ids = tab && tab[ch]; if (!ids || !ids.length) return null;
+  const k = r + '|' + ch; let id = PROX[k]; if (!id || ids.indexOf(id) < 0) { const ult = ULT[k], op = ids.filter(x => x !== ult); id = PROX[k] = op[Math.floor(Math.random() * op.length)] || ids[0]; } return id; }
 V.preparaSaudacao = preparaSaudacao;
 if (typeof document !== 'undefined' && typeof MutationObserver !== 'undefined') {
   const liga = () => { const h = document.documentElement; V.destaque = h.dataset.race || V.destaque; new MutationObserver(() => { const r = h.dataset.race; if (r && r !== V.destaque) preparaSaudacao(r); }).observe(h, { attributes: true, attributeFilter: ['data-race'] });
@@ -182,9 +185,9 @@ if (typeof document !== 'undefined' && typeof MutationObserver !== 'undefined') 
 V.depoisDaSala = r => { if (!V.P) setTimeout(() => preparaSaudacao(r), 400); };
 
 /* troca de idioma: o manifesto e o pacote do idioma novo */
-try { addEventListener('ard-idioma', () => { mProm = null; mIdi = null; V.m = null; V.estado = 'parado'; filaIds.length = 0; const pacs = [...ATIVOS]; ATIVOS.clear(); if (V.P) pacs.forEach(carregarPacote); else preparaSaudacao(V.destaque); }); } catch (e) {}
+try { addEventListener('ard-idioma', () => { V.todasSaudacoes = false; /* 5.0c.1 */ mProm = null; mIdi = null; V.m = null; V.estado = 'parado'; filaIds.length = 0; const pacs = [...ATIVOS]; ATIVOS.clear(); if (V.P) pacs.forEach(carregarPacote); else preparaSaudacao(V.destaque); }); } catch (e) {}
 /* vozes gravadas ligadas/desligadas em Ajustes */
-V.mudou = () => { mProm = null; mIdi = null; V.m = null; V.estado = 'parado'; if (A() && A().gravadas !== false) { const pacs = [...ATIVOS]; ATIVOS.clear(); if (V.P) pacs.forEach(carregarPacote); else preparaSaudacao(V.destaque); } };
+V.mudou = () => { V.todasSaudacoes = false; /* 5.0c.1 */ mProm = null; mIdi = null; V.m = null; V.estado = 'parado'; if (A() && A().gravadas !== false) { const pacs = [...ATIVOS]; ATIVOS.clear(); if (V.P) pacs.forEach(carregarPacote); else preparaSaudacao(V.destaque); } };
 V.manifesto = manifesto;
 V.estadoMem = () => ({ estado: V.estado, motivo: V.motivo, idioma: V.idioma, formato: V.formato, bytes: [...BYTES.values()].reduce((s, b) => s + b.byteLength, 0), arquivos: BYTES.size, buffers: BUF.size, bufBytes, baixado: JSON.parse(JSON.stringify(V.baixado)), decodificado: V.decodificado, fila: filaIds.length, ativos: [...ATIVOS] });
 

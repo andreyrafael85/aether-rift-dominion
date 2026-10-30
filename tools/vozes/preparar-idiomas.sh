@@ -12,7 +12,7 @@ export HF_HOME="$T/cache/hf" XDG_CACHE_HOME="$T/cache/xdg" TORCH_HOME="$T/cache/
 HF=https://huggingface.co
 get() { if [ ! -s "$2" ]; then curl -sSfL "$1" -o "$2.part" && mv -f "$2.part" "$2"; fi; }
 # Kokoro: vozes escolhidas pelo papel no elenco (VOICES.md: af_heart A, af_bella A-, bf_emma B-, am_michael C+, am_fenrir C+, bm_george C; espanhol sem nota)
-for v in af_heart af_bella bf_emma am_michael am_fenrir bm_george ef_dora em_alex em_santa; do get "$HF/hexgrad/Kokoro-82M/resolve/main/voices/$v.pt" "$T/modelos/kokoro/voices/$v.pt"; done
+for v in af_heart af_bella bf_emma am_michael am_fenrir bm_george bm_daniel ef_dora em_alex em_santa; do get "$HF/hexgrad/Kokoro-82M/resolve/main/voices/$v.pt" "$T/modelos/kokoro/voices/$v.pt"; done  # 5.0c.2: bm_daniel, o locutor da Erevane em inglês
 "$T/venv/bin/python" -c "import spacy; spacy.load('en_core_web_sm')" 2>/dev/null || "$T/venv/bin/python" -m spacy download en_core_web_sm -q
 if [ "${1:-}" != "--chatterbox" ]; then echo 'vozes en/es do Kokoro e spaCy prontos (Chatterbox não instalado: use --chatterbox)'; exit 0; fi
 # Chatterbox Multilingual (chatterbox-tts 0.1.7), CPU

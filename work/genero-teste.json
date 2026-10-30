@@ -1,5 +1,5 @@
 {
-  "quando": "2026-10-30T12:34:57.623Z",
+  "quando": "2026-10-30T20:17:23.480Z",
   "aparelhos": [
     {
       "id": "edge",
@@ -89,11 +89,21 @@
       },
       "locErevane": {
         "aceita": true,
-        "voz": "Microsoft Francisca Online (Natural) - Portuguese (Brazil)",
+        "voz": "Microsoft Antonio Online (Natural) - Portuguese (Brazil)",
         "tentativas": 1,
         "eventos": "inicio,palavra,palavra,palavra,fim",
         "legendas": [
           "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
+      "locTessara": {
+        "aceita": true,
+        "voz": "Microsoft Francisca Online (Natural) - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,fim",
+        "legendas": [
+          "Blecaute"
         ],
         "pitch": 1
       },
@@ -194,11 +204,21 @@
       },
       "locErevane": {
         "aceita": true,
-        "voz": "Microsoft Maria - Portuguese (Brazil)",
+        "voz": "Microsoft Daniel - Portuguese (Brazil)",
         "tentativas": 1,
         "eventos": "inicio,palavra,palavra,palavra,fim",
         "legendas": [
           "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
+      "locTessara": {
+        "aceita": true,
+        "voz": "Microsoft Maria - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,fim",
+        "legendas": [
+          "Blecaute"
         ],
         "pitch": 1
       },
@@ -293,11 +313,21 @@
       },
       "locErevane": {
         "aceita": true,
-        "voz": "Google português do Brasil",
+        "voz": "Microsoft Daniel - Portuguese (Brazil)",
         "tentativas": 1,
         "eventos": "inicio,palavra,palavra,palavra,fim",
         "legendas": [
           "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
+      "locTessara": {
+        "aceita": true,
+        "voz": "Google português do Brasil",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,fim",
+        "legendas": [
+          "Blecaute"
         ],
         "pitch": 1
       },
@@ -406,6 +436,16 @@
         ],
         "pitch": 1
       },
+      "locTessara": {
+        "aceita": true,
+        "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,fim",
+        "legendas": [
+          "Blecaute"
+        ],
+        "pitch": 1
+      },
       "ok": true,
       "falhas": []
     },
@@ -497,11 +537,21 @@
       },
       "locErevane": {
         "aceita": true,
-        "voz": "Luciana",
+        "voz": "Felipe",
         "tentativas": 1,
         "eventos": "inicio,palavra,palavra,palavra,fim",
         "legendas": [
           "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
+      "locTessara": {
+        "aceita": true,
+        "voz": "Luciana",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,fim",
+        "legendas": [
+          "Blecaute"
         ],
         "pitch": 1
       },
@@ -602,11 +652,21 @@
       },
       "locErevane": {
         "aceita": true,
-        "voz": "Luciana (Aprimorada)",
+        "voz": "Felipe",
         "tentativas": 1,
         "eventos": "inicio,palavra,palavra,palavra,fim",
         "legendas": [
           "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
+      "locTessara": {
+        "aceita": true,
+        "voz": "Luciana (Aprimorada)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,fim",
+        "legendas": [
+          "Blecaute"
         ],
         "pitch": 1
       },
@@ -715,6 +775,16 @@
         ],
         "pitch": 1
       },
+      "locTessara": {
+        "aceita": true,
+        "voz": null,
+        "tentativas": 1,
+        "eventos": "inicio,palavra,fim",
+        "legendas": [
+          "Blecaute"
+        ],
+        "pitch": 1
+      },
       "ok": true,
       "falhas": []
     },
@@ -806,11 +876,21 @@
       },
       "locErevane": {
         "aceita": true,
-        "voz": "Microsoft Maria - Portuguese (Brazil)",
+        "voz": "Microsoft Daniel - Portuguese (Brazil)",
         "tentativas": 1,
         "eventos": "inicio,palavra,palavra,palavra,fim",
         "legendas": [
           "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
+      "locTessara": {
+        "aceita": true,
+        "voz": "Microsoft Maria - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,fim",
+        "legendas": [
+          "Blecaute"
         ],
         "pitch": 1
       },
@@ -911,11 +991,21 @@
       },
       "locErevane": {
         "aceita": true,
-        "voz": "Luciana (Aprimorada)",
+        "voz": "Felipe (Aprimorado)",
         "tentativas": 1,
         "eventos": "inicio,palavra,palavra,palavra,fim",
         "legendas": [
           "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
+      "locTessara": {
+        "aceita": true,
+        "voz": "Luciana (Aprimorada)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,fim",
+        "legendas": [
+          "Blecaute"
         ],
         "pitch": 1
       },
@@ -1016,11 +1106,21 @@
       },
       "locErevane": {
         "aceita": true,
-        "voz": "Microsoft Maria - Portuguese (Brazil)",
+        "voz": "Microsoft Daniel - Portuguese (Brazil)",
         "tentativas": 1,
         "eventos": "inicio,palavra,palavra,palavra,fim",
         "legendas": [
           "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
+      "locTessara": {
+        "aceita": true,
+        "voz": "Microsoft Maria - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,fim",
+        "legendas": [
+          "Blecaute"
         ],
         "pitch": 1
       },
@@ -1115,11 +1215,21 @@
       },
       "locErevane": {
         "aceita": true,
-        "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+        "voz": "Microsoft Daniel Desktop - Portuguese(Brazil)",
         "tentativas": 1,
         "eventos": "inicio,palavra,palavra,palavra,fim",
         "legendas": [
           "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
+      "locTessara": {
+        "aceita": true,
+        "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,fim",
+        "legendas": [
+          "Blecaute"
         ],
         "pitch": 1
       },
@@ -1228,6 +1338,16 @@
         ],
         "pitch": 1
       },
+      "locTessara": {
+        "aceita": true,
+        "voz": "Luciana",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,fim",
+        "legendas": [
+          "Blecaute"
+        ],
+        "pitch": 1
+      },
       "ok": true,
       "falhas": []
     },
@@ -1327,9 +1447,46 @@
         ],
         "pitch": 1
       },
+      "locTessara": {
+        "aceita": true,
+        "voz": "português Brasil",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,fim",
+        "legendas": [
+          "Blecaute"
+        ],
+        "pitch": 1
+      },
       "ok": true,
       "falhas": []
     }
   ],
-  "navegador": null
+  "navegador": null,
+  "gravadas": [
+    {
+      "id": "edge",
+      "falhas": [],
+      "ok": true
+    },
+    {
+      "id": "chrome-win",
+      "falhas": [],
+      "ok": true
+    },
+    {
+      "id": "iphone-aprimorada",
+      "falhas": [],
+      "ok": true
+    },
+    {
+      "id": "firefox-win-daniel",
+      "falhas": [],
+      "ok": true
+    },
+    {
+      "id": "sem-voz",
+      "falhas": [],
+      "ok": true
+    }
+  ]
 }

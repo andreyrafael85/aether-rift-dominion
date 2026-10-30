@@ -16,7 +16,8 @@ além dos áudios). Etapas (--etapa):
   manifesto  5.0c.1: assets/vozes/<idioma>/manifesto.json a partir do que a etapa jogo gravou (--idioma; sem ele, os três).
   formato    5.0c.1: --formato m4a|mp3 grava a mesma árvore no outro formato a partir dos mestres e acrescenta o formato no manifesto.
   reconferir 5.0c.1: recalcula o erro de cada fala pelo texto que o Whisper já ouviu (equivalências de grafia em jogo.EQUIV), sem gerar de novo.
-Uso: .tools/vozes/venv/bin/python tools/vozes/gerar.py [--etapa mesa|racas|elenco|antes|jogo|manifesto|formato|reconferir] [--falas id1,id2] [--so voz1,voz2] [--racas r1,r2] [--sem-whisper] [--threads N]"""
+  medir      5.0c.2: f0 e centroide espectral das falas selecionadas (--so) no Opus do jogo, em work/vozes-jogo/medidas-<tag>.json (--tag, --pasta).
+Uso: .tools/vozes/venv/bin/python tools/vozes/gerar.py [--etapa mesa|racas|elenco|antes|jogo|manifesto|formato|reconferir|medir] [--falas id1,id2] [--so voz1,voz2] [--racas r1,r2] [--sem-whisper] [--threads N]"""
 import os, sys, json, time, re, subprocess, unicodedata, platform
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 T = os.path.join(ROOT, '.tools', 'vozes')
@@ -286,7 +287,7 @@ def etapa_antes():
     man['racas_antes'] = A; gravar_manifesto(man, p)
 
 if __name__ == '__main__':
-    if ETAPA in ('jogo', 'manifesto', 'formato', 'reconferir'):  # 5.0c.1: as falas do jogo (tools/vozes/jogo.py)
+    if ETAPA in ('jogo', 'manifesto', 'formato', 'reconferir', 'medir'):  # 5.0c.1: as falas do jogo (tools/vozes/jogo.py)
         import jogo; jogo.main(sys.modules[__name__], ETAPA)
     else:
         {'mesa': etapa_mesa, 'racas': etapa_racas, 'elenco': etapa_elenco, 'antes': etapa_antes}[ETAPA]()

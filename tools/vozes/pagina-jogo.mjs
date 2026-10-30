@@ -12,6 +12,9 @@ const RACAS = R.racas, LIDER = R.lideres, NOME_RACA = { vehnar: 'Vehnar', erevan
 const MAN = Object.fromEntries(IDI.map(l => [l, ler(`assets/vozes/${l}/manifesto.json`, null)]));
 const EST = Object.fromEntries(IDI.map(l => [l, ler(`work/vozes-jogo/${l}/estado.json`, {})]));
 const NUM = ler('work/vozes-jogo/numeros.json', {}), TEMPOS = Object.fromEntries(IDI.map(l => [l, ler(`work/vozes-jogo/${l}/tempos.json`, [])]));
+/* 5.0c.2: a Erevane com voz masculina fora do líder — medidas antes e depois (gerar.py --etapa medir) e os Opus de antes guardados em work/vozes-jogo/antes/ */
+const MED = { antes: ler('work/vozes-jogo/medidas-antes.json', null), depois: ler('work/vozes-jogo/medidas-depois.json', null) };
+const ANTES_DEPOIS = [['Locutor', 'erevane-loc-base-sob-ataque'], ['Locutor', 'erevane-loc-spawn'], ['Locutor', 'erevane-loc-nucleo-sob-ataque'], ['Unidade · infantaria', 'erevane-unid-infantaria-sel-1'], ['Unidade · civil', 'erevane-unid-civil-mover-1']];
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const fala = id => R.falas.find(f => f.id === id);
 const nbr = (x, d = 0) => Number(x).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -49,10 +52,20 @@ const listaOuvir = ouvir.slice(0, 80).map(({ l, f, e }) => { const a = audio(l, 
   return `<div class="row" data-tipo="ouvir"><div class="tx"><small>${esc(NOME_IDI[l])} · ${esc(NOME_TIPO[f.tipo])} · ${esc(NOME_RACA[f.raca])} · erro ${nbr(100 * e.cer, 1)}%${e.seco ? ' · seca ' + nbr(100 * e.seco.cer, 1) + '%' : ''}</small><span><b>texto</b> ${esc(f.texto[l])}</span><span><b>ouviu</b> ${esc(e.asr || '(nada)')}</span></div><div class="vbtns">${a ? `<button type="button" class="vb" data-ogg="${a.ogg}" aria-label="Ouvir">▶</button>` : ''}</div></div>`; }).join('');
 
 /* ---------- a página ---------- */
-const cartoes = RACAS.map(r => `<article class="plate card" data-r="${r}"><header><span class="rn">${NOME_RACA[r]}</span><small>${esc(LIDER[r])} · locutor ${r === 'erevane' || r === 'tessara' ? 'feminino' : 'masculino'}${r === 'vorag' ? ' · variante C' : ''}${r === 'quorith' ? ' · estéreo' : ''}</small></header>
+const cartoes = RACAS.map(r => `<article class="plate card" data-r="${r}"><header><span class="rn">${NOME_RACA[r]}</span><small>${esc(LIDER[r])} · locutor ${r === 'tessara' ? 'feminino' : 'masculino'}${r === 'vorag' ? ' · variante C' : ''}${r === 'quorith' ? ' · estéreo' : ''}</small></header>
 ${linha('Locutor', AMOSTRA.locutor(r), 'aviso')}${linha('Unidade', AMOSTRA.unidade(r), 'unidade')}${linha('Líder · saudação nova da Sala', AMOSTRA.lider(r), 'lider')}</article>`).join('\n');
 const camp = CAMP.map(id => { const f = fala(id); return f ? linha(`Campanha · missão ${f.missao} · ${f.lider}`, id, 'lider') : ''; }).join('');
 const cont = R.contagem.por_tipo;
+const hz = x => x == null ? '—' : nbr(x) + ' Hz';
+const medF = (q, l, id) => (((MED[q] || {}).falas || {})[l] || {})[id] || {};
+const antesDepois = ANTES_DEPOIS.map(([rot, id]) => { const f = fala(id); if (!f) return ''; const a = `vozes-antes/pt-BR/${f.pacote}/${id}.ogg`, la = `work/vozes-jogo/antes/pt-BR/${f.pacote}/${id}.ogg`; const d = audio('pt-BR', id);
+  if (!existsSync(root + la) || !d) return ''; arquivos[a] = la; const ma = medF('antes', 'pt-BR', id), md = medF('depois', 'pt-BR', id);
+  return `<div class="row" data-tipo="${rot === 'Locutor' ? 'aviso' : 'unidade'}"><div class="tx"><small>${esc(rot)} · antes f0 ${hz(ma.f0)}, centroide ${hz(ma.centroide)} → depois f0 ${hz(md.f0)}, centroide ${hz(md.centroide)}</small><span>${esc(f.texto['pt-BR'])}</span></div><div class="vbtns"><button type="button" class="vb" data-ogg="${a}" aria-label="Ouvir antes">Antes</button><button type="button" class="vb" data-ogg="${d.ogg}" aria-label="Ouvir depois">Depois</button></div></div>`; }).join('');
+const resumoMed = (q, l, r, t) => ((((MED[q] || {}).resumo || {})[l] || {})[r] || {})[t] || {};
+const tabMed = MED.antes && MED.depois ? IDI.map(l => { const ref = ['vehnar', 'quorith', 'vorag'].map(r => resumoMed('depois', l, r, 'locutor')); const refU = ['vehnar', 'quorith', 'vorag', 'tessara'].map(r => resumoMed('depois', l, r, 'unidade'));
+  const m = (xs, k) => { const v = xs.map(x => x[k]).filter(x => x != null); return v.length ? v.reduce((s, x) => s + x, 0) / v.length : null; };
+  const la = resumoMed('antes', l, 'erevane', 'locutor'), ld = resumoMed('depois', l, 'erevane', 'locutor'), ua = resumoMed('antes', l, 'erevane', 'unidade'), ud = resumoMed('depois', l, 'erevane', 'unidade');
+  return `<tr><th scope="row">${NOME_IDI[l]}</th><td>${hz(la.f0)} → <b>${hz(ld.f0)}</b></td><td>${hz(la.centroide)} → <b>${hz(ld.centroide)}</b></td><td>${hz(m(ref, 'f0'))} · ${hz(m(ref, 'centroide'))}</td><td>${hz(ua.centroide)} → <b>${hz(ud.centroide)}</b></td><td>${hz(m(refU, 'centroide'))}</td></tr>`; }).join('') : '';
 const html = `<title>Vozes do Aether Rift</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -108,6 +121,9 @@ ul{margin:0;padding-left:1.2em;max-width:70ch}li{margin:.2em 0}
 </div></section>
 <section class="sec"><header><span class="eyebrow">Amostras</span><h2>As cinco Raças</h2><p>Locutor, unidade e líder de cada Raça. PT, EN e ES tocam a mesma fala nos três idiomas.</p></header>
 <div class="cards">${cartoes}</div></section>
+${antesDepois ? `<section class="sec"><header><span class="eyebrow">5.0c.2 · Erevane</span><h2>Antes e depois</h2><p>A voz feminina fica só na Tessara. O locutor da Erevane passou a ser masculino (pt-BR Santa 70% + Alex 30%; espanhol as mesmas vozes; inglês bm_daniel, britânico), e o caráter da Erevane fora do líder parou de afinar a voz: graves sem corte, agudos +3 dB e ar +2 dB (antes −4, +6 e +4 dB), com o mesmo eco leve. Medido no Opus do jogo.</p></header>
+<div class="cards"><div class="plate card" data-r="erevane">${antesDepois}</div></div>
+${tabMed ? `<div class="rolar"><table class="tab"><thead><tr><th>Idioma</th><th>Locutor f0</th><th>Locutor centroide</th><th>Outros locutores (f0 · centroide)</th><th>Unidades centroide</th><th>Unidades das outras Raças</th></tr></thead><tbody>${tabMed}</tbody></table></div>` : ''}</section>` : ''}
 <section class="sec"><header><span class="eyebrow">Amostras</span><h2>Campanha</h2></header><div class="cards"><div class="plate card">${camp}</div></div></section>
 <section class="sec"><header><span class="eyebrow">Números</span><h2>Tamanho e conferência</h2><p>Opus 24 kbps em Ogg, mono; o Quorith em estéreo a 32 kbps (em 24 kbps o Opus junta o estéreo e o coro fica quase mono). O erro é por caractere, no texto falado contra o que o Whisper ouviu, sem acento nem pontuação. Limite: 15% do texto ou 2 caracteres, o que for maior.</p></header>
 <div class="rolar"><table class="tab"><thead><tr><th>Idioma</th><th>Falas</th><th>Duração</th><th>Opus</th><th>Erro médio</th><th>Exatas</th><th>Acima do limite</th><th>Tempo para gerar</th></tr></thead><tbody>${tabIdi}</tbody></table></div>

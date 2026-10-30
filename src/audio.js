@@ -91,9 +91,9 @@ function nomeCurto(n) { return String(n || '').replace(/^Microsoft\s+/i, '').rep
    Vovô, Grandpa) e a Google português do Brasil, que é feminina. Voz fora das listas (Android, Samsung, eSpeak) fica sem gênero e nunca é escolhida por ele. */
 const GENERO_LIDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* Barão-Forja, Vesper Ísk, Sylvia Oriel, Zayin Coral, Oru Voraz */
 /* 5.0c: o locutor da partida (unidade pronta, obra, pesquisa, alertas, voz ativada) fala no gênero do locutor da Raça do jogador no elenco das vozes
-   gravadas (tools/vozes/racas.py: Vehnar, Quorith e Vorag com o Alex; Erevane e Tessara com a Dora). Antes ele usava a melhor voz do aparelho, de
+   gravadas (tools/vozes/racas.py: Vehnar, Quorith e Vorag com o Alex, a Erevane com o Santa e o Alex desde a 5.0c.2; a Tessara com a Dora). Antes ele usava a melhor voz do aparelho, de
    qualquer gênero: no Chrome a Google, feminina, para as cinco Raças. A.raca = Raça do jogador na partida (src/main.js); fora dela, a Automática */
-const GENERO_LOCUTOR = { vehnar: 'm', erevane: 'f', tessara: 'f', quorith: 'm', vorag: 'm' };
+const GENERO_LOCUTOR = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0c.2: o locutor da Erevane passa a masculino (pedido do dono em 30/10: voz feminina só na Tessara, da Sylvia Oriel) */
 const VOZ_F = /(^|[\s(])(Francisca|Thalita(?:Multilingual)?|Raquel|Fernanda|Maria|Heloisa|H[eé]lia|Luciana|Joana|Catarina|Brenda|Elza|Giovanna|Leila|Let[ií]cia|Manuela|Yara|Flo|Sandy|Shelley|Vov[óo]|Grandma)(?![a-z])|^Google portugu[eê]s/i;
 const VOZ_M = /(^|[\s(])(Ant[oô]nio(?:Multilingual)?|Duarte|Daniel|Felipe|Donato|F[aá]bio|Humberto|J[uú]lio|Nicolau|Val[eé]rio|Macerio(?:Multilingual)?|Ricardo|Cristiano|Eddy|Reed|Rocko|Vovô|Grandpa)(?![a-z])/i;
 function generoVoz(v) { const n = String((v && v.name) || '').replace(/^Microsoft\s+/i, ''); const I = IDI(), F = VOZES_F[I] || VOZ_F, M = VOZES_M[I] || VOZ_M; return F.test(n) ? 'f' : M.test(n) ? 'm' : null; } /* 5.0c */

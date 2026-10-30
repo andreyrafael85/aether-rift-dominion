@@ -27,10 +27,10 @@
   ],
   "referencia_extra": "Comandante, a Fenda está estável e o Núcleo aguarda as suas ordens.",
   "kokoro": {
-    "nota": "vozes do Kokoro por papel do elenco. Espanhol: as mesmas do português (ef_dora, em_alex, em_santa) com os mesmos pesos. Inglês: escolhidas pelo caráter e pela nota do VOICES.md (af_heart A, af_bella A-, bf_emma B-, am_michael C+, am_fenrir C+, bm_george C); a pronúncia segue a voz que pesa mais (a = americano, b = britânico).",
+    "nota": "5.0c.2: o locutor da Erevane passou a ser masculino nos três idiomas (pedido do dono: voz feminina só na Tessara); em inglês o bm_daniel (britânico; 2,8% de erro de transcrição em 14 avisos e eliminações, contra 25,3% do bm_lewis e 7,2% de bm_george 0,7 + am_michael 0,3, que ficaria entre as vozes do Barão-Forja e do Vesper Ísk). Antes: vozes do Kokoro por papel do elenco. Espanhol: as mesmas do português (ef_dora, em_alex, em_santa) com os mesmos pesos. Inglês: escolhidas pelo caráter e pela nota do VOICES.md (af_heart A, af_bella A-, bf_emma B-, am_michael C+, am_fenrir C+, bm_george C); a pronúncia segue a voz que pesa mais (a = americano, b = britânico).",
     "en": {
       "vehnar": { "lider": { "pesos": { "bm_george": 1.0 }, "vel": 0.95, "g2p": "b" }, "locutor": { "pesos": { "am_michael": 1.0 }, "vel": 1.0, "g2p": "a" } },
-      "erevane": { "lider": { "pesos": { "am_michael": 0.7, "bm_george": 0.3 }, "vel": 1.05, "g2p": "a" }, "locutor": { "pesos": { "bf_emma": 1.0 }, "vel": 1.0, "g2p": "b" } },
+      "erevane": { "lider": { "pesos": { "am_michael": 0.7, "bm_george": 0.3 }, "vel": 1.05, "g2p": "a" }, "locutor": { "pesos": { "bm_daniel": 1.0 }, "vel": 1.0, "g2p": "b" } },
       "tessara": { "lider": { "pesos": { "af_heart": 1.0 }, "vel": 0.95, "g2p": "a" }, "locutor": { "pesos": { "af_bella": 1.0 }, "vel": 1.05, "g2p": "a" } },
       "quorith": { "lider": { "pesos": { "am_michael": 0.5, "bm_george": 0.5 }, "vel": 1.0, "g2p": "a" }, "locutor": { "pesos": { "am_michael": 1.0 }, "vel": 1.0, "g2p": "a" } },
       "vorag": { "lider": { "pesos": { "am_fenrir": 0.6, "bm_george": 0.4 }, "vel": 0.9, "g2p": "a" }, "locutor": { "pesos": { "am_michael": 1.0 }, "vel": 1.0, "g2p": "a" } }

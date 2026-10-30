@@ -102,7 +102,7 @@ class Voz:
 
     def pack(self, c, pesos):
         k = (c, tuple(sorted(pesos.items())))
-        if k not in self.packs: self.packs[k] = sum(w * self.pipes[c].load_single_voice(os.path.join(self.d, 'voices', v + '.pt')) for v, w in pesos.items())
+        if k not in self.packs: self.packs[k] = sum(w * self.pipes[c].load_single_voice(arquivo_voz(self.d, v)) for v, w in pesos.items())
         return self.packs[k]
 
     def falar(self, txt, pesos, vel, c, semente):
@@ -224,8 +224,17 @@ def alinhar(texto, palavras, dur, regiao):
 
 
 # ---------- etapa jogo ----------
+def arquivo_voz(d, v):
+    """5.0c.2: a voz do Kokoro em modelos/kokoro/voices/ ou, se foi baixada depois (regra do ambiente: só acrescentar em tmp/ e mestres/),
+    em .tools/vozes/tmp/vozes-kokoro/ (o preparar-idiomas.sh baixa as mesmas no lugar normal num ambiente novo)"""
+    a = os.path.join(d, 'voices', v + '.pt'); b = os.path.join(G.T, 'tmp', 'vozes-kokoro', v + '.pt')
+    return a if os.path.exists(a) or not os.path.exists(b) else b
+
+
 def assinatura(txt, pesos, vel, g2p, assado, estereo):
     s = json.dumps([VERSAO, txt, sorted(pesos.items()), vel, g2p, assado, KBPS['estereo' if estereo else 'mono']], ensure_ascii=False)
+    v = getattr(RC, 'VERSAO_ASSADO', {}).get(assado)  # 5.0c.2: mudar os parâmetros de um caráter refaz as falas dele
+    if v: s += '|' + v
     return hashlib.sha1(s.encode('utf-8')).hexdigest()[:16]
 
 
@@ -370,6 +379,40 @@ def etapa_formato(idiomas):
     if not saida: etapa_manifesto(idiomas)
 
 
+# ---------- 5.0c.2: medidas da voz (f0 e centroide espectral) no arquivo final ----------
+def centroide(m, sr=48000):
+    """centroide espectral (Hz) da fala: média dos centroides dos quadros de 2.048 amostras a menos de 30 dB do mais forte, ponderada pela energia"""
+    n, h = 2048, 512; k = 1 + max(0, len(m) - n) // h
+    if len(m) < n: return None
+    Q = np.stack([m[i * h:i * h + n] for i in range(k)]) * np.hanning(n); P = np.abs(np.fft.rfft(Q, axis=1)) ** 2; f = np.fft.rfftfreq(n, 1 / sr)
+    e = P.sum(1); ok = e > e.max() * 1e-3; c = (P[ok] * f).sum(1) / (e[ok] + 1e-18)
+    return round(float((c * e[ok]).sum() / e[ok].sum()), 0)
+
+
+def medir_arquivo(arq, est):
+    y = decodificar(arq, 2 if est else 1); m = y.mean(1) if y.ndim == 2 else y; a, b = RC.regiao_fala(m, RC.SR); seg = m[int(a * RC.SR):int(b * RC.SR)]
+    return dict(f0=RC._f0(seg, RC.SR), centroide=centroide(seg))
+
+
+def etapa_medir(idiomas):
+    """mede o f0 (mediana, autocorrelação) e o centroide espectral de cada fala selecionada (--so) no Opus do jogo; grava
+    work/vozes-jogo/medidas-<tag>.json (--tag) com as falas e o resumo por idioma, Raça e tipo. --pasta <dir> mede uma cópia (o "antes")"""
+    tag = G.arg('--tag', 'agora'); pasta = G.arg('--pasta'); out = dict(tag=tag, falas={}, resumo={})
+    for idioma in idiomas:
+        P = caminhos(idioma); R = ler_json(P['rot'], None); base = os.path.join(pasta, idioma) if pasta else P['assets']; F = {}
+        for f in selecionar(R['falas'], G.arg('--so')):
+            arq = os.path.join(base, f['pacote'], f['id'] + '.ogg')
+            if os.path.exists(arq): F[f['id']] = dict(medir_arquivo(arq, f['raca'] in RC.ESTEREO), raca=f['raca'], tipo=f['tipo'])
+        out['falas'][idioma] = F; res = {}
+        for v in F.values():
+            q = res.setdefault(v['raca'], {}).setdefault(v['tipo'], dict(f0=[], centroide=[]))
+            for k in ('f0', 'centroide'):
+                if v[k]: q[k].append(v[k])
+        out['resumo'][idioma] = {r: {t: dict(n=len(q['centroide']), f0=round(float(np.median(q['f0'])), 1) if q['f0'] else None, centroide=round(float(np.mean(q['centroide'])), 0) if q['centroide'] else None) for t, q in ts.items()} for r, ts in res.items()}
+        print(f"medir {idioma} ({tag}): {len(F)} falas · " + ' · '.join(f"{r} " + ', '.join(f"{t} f0 {x['f0']} Hz, centroide {x['centroide']} Hz" for t, x in ts.items()) for r, ts in out['resumo'][idioma].items()), flush=True)
+    gravar_json(os.path.join(G.ROOT, 'work', 'vozes-jogo', f'medidas-{tag}.json'), out, 1)
+
+
 def main(gerar_mod, etapa):
     global G, RC
     G = gerar_mod; import racas; RC = racas
@@ -381,4 +424,5 @@ def main(gerar_mod, etapa):
         etapa_jogo(idi)
     elif etapa == 'manifesto': etapa_manifesto(idiomas)
     elif etapa == 'reconferir': etapa_reconferir(idiomas)
+    elif etapa == 'medir': etapa_medir(idiomas)
     else: etapa_formato(idiomas)
