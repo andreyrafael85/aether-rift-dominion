@@ -107,28 +107,38 @@ function ceu(C) { const { W, T, SkyMesh } = C.L; const { vec3, vec4, float, norm
 function solDir(race, out) { const K = (MUNDOS[race] || MUNDOS.vehnar).ceu; const phi = (90 - K.elev) * Math.PI / 180, th = K.az * Math.PI / 180; out.setFromSphericalCoords(1, phi, th); return out; }
 /* ---------- planetas só em shader ---------- */
 function planetaMat(C, race, sol) { const { W, T } = C.L; const P = PLANETAS[race] || PLANETAS.vehnar; const m = new W.MeshBasicNodeMaterial(); m.fog = false;
-  const { float, vec3, color, mix, smoothstep, abs, max, dot, pow, normalize, sin, reflect, time, positionLocal, normalWorld, positionWorld, cameraPosition, mx_noise_float, mx_fractal_noise_float, mx_worley_noise_vec2, mx_cell_noise_float, floor } = T;
+  const { float, vec3, color, mix, smoothstep, abs, max, dot, pow, normalize, sin, reflect, time, positionLocal, normalWorld, positionWorld, cameraPosition, mx_noise_float, mx_fractal_noise_float, mx_worley_noise_vec2, mx_cell_noise_float, floor, fwidth, length, fract, min } = T;
   const n = normalize(positionLocal), nw = normalize(normalWorld), V = normalize(cameraPosition.sub(positionWorld));
+  /* 5.0c: o detalhe filtrado pelo tamanho do pixel. Na Sala cada planeta tem de 25 a 70 px de raio, e perto da borda a superfície se comprime: costas
+     de borda dura, linhas de 1 px, células e a última oitava do ruído viravam degraus e pontos que piscam com o giro (o contorno "pixelado").
+     fp = quanto a superfície anda num pixel (na esfera de raio 1: cerca de 1/raio no meio do disco, bem mais na borda); nada muda no voo entre
+     Raças, quando o planeta enche a tela (fp pequeno). lim = limite alargado pelo pixel; linha = linha fina que alarga e esmaece com a mesma luz
+     no total; some(f) = detalhe de frequência f que some antes de serrilhar; filtra = padrão de pontos que vira a média dele */
+  const fp = length(fwidth(n)), some = (f, a, b) => float(1).sub(smoothstep(a || 0.25, b || 0.6, fp.mul(f)));
+  const lim = (a, b, x) => { const w = fwidth(x); return a < b ? smoothstep(float(a).sub(w), float(b).add(w), x) : float(1).sub(smoothstep(float(b).sub(w), float(a).add(w), x)); };
+  const linha = (k, x) => { const w = fwidth(x); return float(1).sub(smoothstep(0.0, w.add(k), abs(x))).mul(float(k).div(w.add(k))); };
+  const filtra = (pontos, media, f) => mix(float(media), pontos, some(f, 1.2, 2.6));
   const ndl = dot(nw, sol), dia = smoothstep(-0.16, 0.28, ndl), lam = max(ndl, 0).pow(0.8);
   const c0 = color(P.pl[0]), c1 = color(P.pl[1]), c2 = color(P.pl[2]), c3 = color(P.pl[3]); let alb, noite = vec3(0), spec = float(0), nuv = float(0);
-  const det = mx_fractal_noise_float(n.mul(9.0), 3, 2.0, 0.5).mul(0.12);
+  const det = mx_fractal_noise_float(n.mul(9.0), 3, 2.0, 0.5).mul(0.12).mul(some(36)); /* 5.0c */
   if (race === 'vehnar') { const reg = mx_fractal_noise_float(n.mul(1.6), 5, 2.0, 0.55), b = mx_fractal_noise_float(vec3(n.x.mul(0.9), n.y.mul(5.0), n.z.mul(0.9)), 3, 2.0, 0.5);
     alb = mix(mix(c0, c1, smoothstep(-0.5, 0.0, reg)), mix(c2, c3, smoothstep(0.1, 0.6, b.add(det))), smoothstep(-0.15, 0.25, reg.add(det)));
-    const lava = float(1).sub(smoothstep(0.0, 0.025, abs(mx_noise_float(n.mul(3.2))))).mul(smoothstep(0.0, -0.35, reg)); noite = color(P.noite).mul(lava).mul(1.6); }
-  else if (race === 'erevane') { const cont = mx_fractal_noise_float(n.mul(1.7), 5, 2.0, 0.55), land = smoothstep(0.08, 0.13, cont.add(det.mul(0.5)));
+    const lava = linha(0.025, mx_noise_float(n.mul(3.2))).mul(lim(0.0, -0.35, reg)); /* 5.0c */ noite = color(P.noite).mul(lava).mul(1.6); }
+  else if (race === 'erevane') { const cont = mx_fractal_noise_float(n.mul(1.7), 5, 2.0, 0.55), land = lim(0.08, 0.13, cont.add(det.mul(0.5))); /* 5.0c */
     alb = mix(mix(c0, c1, smoothstep(-0.7, 0.05, cont)), mix(c2, c3, smoothstep(0.12, 0.5, cont.add(det))), land); spec = float(1).sub(land);
     nuv = smoothstep(0.12, 0.55, mx_fractal_noise_float(vec3(n.x.mul(2.4), n.y.mul(4.0), n.z.mul(2.4)).add(vec3(time.mul(0.003), 0, 0)), 4, 2.0, 0.5)).mul(0.7);
-    noite = color(P.noite).mul(smoothstep(0.94, 0.97, mx_cell_noise_float(floor(n.mul(70.0))))).mul(land).mul(0.9); }
-  else if (race === 'tessara') { const cont = mx_fractal_noise_float(n.mul(1.5).add(vec3(3.1, 0, 1.7)), 5, 2.0, 0.55), land = smoothstep(-0.02, 0.04, cont.add(det.mul(0.5)));
+    noite = color(P.noite).mul(filtra(smoothstep(0.94, 0.97, mx_cell_noise_float(floor(n.mul(70.0)))), 0.045, 70)).mul(land).mul(0.9); } /* 5.0c: as luzes das cidades viram brilho médio onde não cabem no pixel */
+  else if (race === 'tessara') { const cont = mx_fractal_noise_float(n.mul(1.5).add(vec3(3.1, 0, 1.7)), 5, 2.0, 0.55), land = lim(-0.02, 0.04, cont.add(det.mul(0.5))); /* 5.0c */
     alb = mix(mix(c0, c1, 0.55), mix(c1, c2, smoothstep(-0.1, 0.45, mx_fractal_noise_float(n.mul(4.0), 3, 2.0, 0.5).add(cont))), land); spec = float(1).sub(land).mul(0.5);
     nuv = smoothstep(0.05, 0.5, mx_fractal_noise_float(vec3(n.x.mul(2.2), n.y.mul(3.6), n.z.mul(2.2)).add(vec3(0, time.mul(0.004), 0)), 4, 2.0, 0.5)).mul(0.8);
-    noite = color(P.noite).mul(float(1).sub(smoothstep(0.0, 0.02, abs(mx_noise_float(n.mul(5.0)))))).mul(land).mul(1.0); }
-  else if (race === 'quorith') { const w = mx_worley_noise_vec2(n.mul(2.6)), edge = w.y.sub(w.x), cell = mx_cell_noise_float(floor(n.mul(2.6)));
+    noite = color(P.noite).mul(linha(0.02, mx_noise_float(n.mul(5.0)))).mul(land).mul(1.0); } /* 5.0c */
+  else if (race === 'quorith') { const w = mx_worley_noise_vec2(n.mul(2.6)), edge = w.y.sub(w.x), q = n.mul(2.6), fq = fract(q), dq = min(fq, fq.oneMinus()), wq = max(fwidth(q), 1e-5);
+    const cell = mix(float(0.5), mx_cell_noise_float(floor(q)), smoothstep(0.0, 1.0, dq.x.div(wq.x)).mul(smoothstep(0.0, 1.0, dq.y.div(wq.y))).mul(smoothstep(0.0, 1.0, dq.z.div(wq.z)))); /* 5.0c: a borda de cada célula com 1 px de transição (antes, degraus) */
     alb = mix(mix(c1, c2, cell), c3, smoothstep(0.7, 1.0, cell).mul(0.5)).mul(smoothstep(0.0, 0.3, edge).mul(0.3).add(0.7)).add(det.mul(0.3));
-    noite = color(P.noite).mul(float(1).sub(smoothstep(0.0, 0.03, edge))).mul(1.2); spec = float(0.3); }
-  else { const r = float(1).sub(abs(mx_fractal_noise_float(n.mul(1.8), 4, 2.0, 0.5))), v = float(1).sub(smoothstep(0.0, 0.02, abs(mx_noise_float(n.mul(4.0).add(vec3(0, 0, time.mul(0.01)))))));
-    alb = mix(mix(c0, c1, smoothstep(0.3, 0.8, r)), mix(c2, c3, 0.2), smoothstep(0.75, 0.98, r.add(det))).mul(v.mul(-0.3).add(1)); noite = color(P.noite).mul(v).mul(sin(time.mul(1.4)).mul(0.25).add(0.9)).mul(1.0); }
-  const fino = mx_fractal_noise_float(n.mul(42.0), 3, 2.0, 0.5).mul(0.09); /* detalhe fino: só aparece quando a câmera mergulha no planeta (voo entre Raças) */
+    noite = color(P.noite).mul(linha(0.03, edge)).mul(1.2); spec = float(0.3); } /* 5.0c */
+  else { const r = float(1).sub(abs(mx_fractal_noise_float(n.mul(1.8), 4, 2.0, 0.5))), v = linha(0.02, mx_noise_float(n.mul(4.0).add(vec3(0, 0, time.mul(0.01))))); /* 5.0c */
+    alb = mix(mix(c0, c1, smoothstep(0.3, 0.8, r)), mix(c2, c3, 0.2), lim(0.75, 0.98, r.add(det))).mul(v.mul(-0.3).add(1)); /* 5.0c */ noite = color(P.noite).mul(v).mul(sin(time.mul(1.4)).mul(0.25).add(0.9)).mul(1.0); }
+  const fino = mx_fractal_noise_float(n.mul(42.0), 3, 2.0, 0.5).mul(0.09).mul(some(168)); /* 5.0c */ /* detalhe fino: só aparece quando a câmera mergulha no planeta (voo entre Raças) */
   let cor = alb.mul(fino.add(1)).mul(lam.mul(1.5).add(0.018));
   cor = mix(cor, vec3(0.92, 0.95, 1.0).mul(lam.mul(1.35).add(0.012)), nuv);
   const R = reflect(sol.negate(), nw); cor = cor.add(vec3(1.0, 0.95, 0.85).mul(pow(max(dot(R, V), 0), 60.0)).mul(spec).mul(float(1).sub(nuv)).mul(dia).mul(1.6));
@@ -142,12 +152,14 @@ function halo(C, race, sol) { const { W, T } = C.L; const P = PLANETAS[race] || 
   const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: W.BackSide, blending: W.AdditiveBlending }); m.fog = false;
   const nw = normalize(normalWorld), V = normalize(cameraPosition.sub(positionWorld)), k = smoothstep(0.0, 0.48, abs(dot(nw, V))).pow(2.2), lit = smoothstep(-0.35, 0.4, dot(nw, sol));
   m.colorNode = uniform(new W.Color(P.atmo)).mul(k).mul(lit.mul(0.8).add(0.05)).mul(0.9); return m; }
-function anel(C, race, sol, centro, raio) { const { W, T } = C.L; const P = PLANETAS[race]; const { float, vec3, uniform, length, smoothstep, mx_fractal_noise_float, positionLocal, positionWorld, dot, max, sqrt } = T;
+function anel(C, race, sol, centro, raio) { const { W, T } = C.L; const P = PLANETAS[race]; const { float, vec3, uniform, length, smoothstep, mx_fractal_noise_float, positionLocal, positionWorld, dot, max, sqrt, mix, fwidth } = T;
   const m = new W.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: W.DoubleSide, forceSinglePass: true }); m.fog = false;
-  const r = length(positionLocal.xy), bands = mx_fractal_noise_float(vec3(r.mul(26.0), 0.5, 0.5), 3, 2.0, 0.5).mul(0.5).add(0.5);
+  const r = length(positionLocal.xy), fr = fwidth(r), b1 = mx_fractal_noise_float(vec3(r.mul(26.0), 0.5, 0.5), 1, 2.0, 0.5), b3 = mx_fractal_noise_float(vec3(r.mul(26.0), 0.5, 0.5), 3, 2.0, 0.5);
+  const bands = mix(float(0), mix(b1, b3, float(1).sub(smoothstep(0.4, 0.9, fr.mul(52.0)))), float(1).sub(smoothstep(0.45, 0.9, fr.mul(26.0)))).mul(0.5).add(0.5); /* 5.0c: as oitavas altas das faixas saem antes de serrilhar; com o anel muito fino, a média */
+  const lim = (a, b) => { const w = fwidth(r); return a < b ? smoothstep(float(a).sub(w), float(b).add(w), r) : float(1).sub(smoothstep(float(b).sub(w), float(a).add(w), r)); };
   const toC = centro.sub(positionWorld), t = max(dot(toC, sol), 0), d = length(toC.sub(sol.mul(t))), sombra = smoothstep(raio.mul(0.96), raio.mul(1.04), d).max(float(1).sub(smoothstep(0.0, 1.0, t)));
   m.colorNode = uniform(new W.Color(P.anel)).mul(bands.mul(0.8).add(0.35)).mul(sombra.mul(0.95).add(0.05)).mul(1.2);
-  m.opacityNode = smoothstep(1.42, 1.5, r).mul(smoothstep(2.36, 2.2, r)).mul(bands.mul(0.7).add(0.15)).mul(smoothstep(1.86, 1.9, r).oneMinus().mul(0.55).add(0.45)); return m; }
+  m.opacityNode = lim(1.42, 1.5).mul(lim(2.36, 2.2)).mul(bands.mul(0.7).add(0.15)).mul(lim(1.86, 1.9).oneMinus().mul(0.55).add(0.45)); return m; } /* 5.0c: bordas do anel alargadas pelo pixel */
 function planetas(C) { const { W, T } = C.L; C.U.solP = C.U.solP || T.uniform(new W.Vector3(0.5, 0.38, 0.78).normalize()); /* a luz dos planetas vem de fora do diorama: lado de dia para a câmera */ const geo = new W.SphereGeometry(1, C.leve ? 64 : 96, C.leve ? 44 : 64), geoH = new W.SphereGeometry(1.14, 48, 32); const out = { group: new W.Group(), por: {}, geos: [geo, geoH] };
   for (const race of RACES) { const g = new W.Group(); const centro = T.uniform(new W.Vector3()), raio = T.uniform(1);
     const sph = new W.Mesh(geo, planetaMat(C, race, C.U.solP)); sph.rotation.z = 0.32 + RACES.indexOf(race) * 0.37; g.add(sph); const h = new W.Mesh(geoH, halo(C, race, C.U.solP)); g.add(h);

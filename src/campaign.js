@@ -5,6 +5,15 @@
 (function (ARD) {
 'use strict';
 const S = ARD.sim;
+/* 5.0c: idiomas — os textos das missões continuam aqui em pt-BR (reserva). A tradução sai por chaves estruturadas na hora de entregar
+   (camp.<missão>.titulo, .lugar, .brief.N, .obj.<id>, .fala.N do script, .ev.N dos eventos, .falha; camp.pg.* no progresso; camp.fim.* no motivo).
+   Sem o i18n.js (testes no Node) vale o pt-BR com os {x} preenchidos. Nada traduzido entra na simulação nem muda o formato do salvamento. */
+const enche = (s, v) => (!v || s.indexOf('{') < 0) ? s : s.replace(/\{(\w+)\}/g, (x, n) => Object.prototype.hasOwnProperty.call(v, n) ? (typeof v[n] === 'number' ? v[n].toLocaleString('pt-BR') : String(v[n])) : x);
+const T = (k, v, r) => (ARD.t ? ARD.t(k, v, r) : enche(r != null ? String(r) : k, v));
+const TG = (k, g, v, r) => (ARD.tg ? ARD.tg(k, g, v, r) : T(k, v, r));
+const TR = s => (ARD.tr ? ARD.tr(s) : s);
+const GEN = r => ((((ARD.audio && ARD.audio.GENERO_LIDER) || { tessara: 'f' })[r]) === 'f' ? 'f' : 'm'); /* 5.0a.3: a Sylvia Oriel (Tessara) é uma líder */
+const NUM = v => (ARD.i18n && ARD.i18n.num ? ARD.i18n.num(v) : v.toLocaleString('pt-BR'));
 const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'];
 const ACTS = [
   { id: 'prologo', name: 'Prólogo — Primeira Luz' }, { id: 'ato1', name: 'Ato 1 — Penumbra' }, { id: 'ato2', name: 'Ato 2 — Rotas de Éter' },
@@ -65,8 +74,8 @@ M.push({ id: 'p3', act: 'prologo', title: 'A primeira tempestade', place: 'Borda
 M.push({ id: 'a1m1', act: 'ato1', title: 'Cerco', place: 'Passo de Kessari', xp: 450,
   brief: [['self', 2, 'A Prole sentiu o cheiro do nosso Plasma. Ondas virão pelo passo leste.'], ['self', 1, 'Muros são baratos e um Portão deixa as nossas tropas passarem. Feche o passo antes da primeira onda.']],
   setup: { seed: 5107, enemies: [{ race: 'vorag', name: 'Horda de Velk', passive: true }] },
-  objectives: [{ id: 'muros', text: 'Construir 10 Muros e 1 Portão', test: c => c.built('muro') >= 10 && c.built('portao') >= 1, progress: c => c.built('muro') + '/10 muros, ' + c.built('portao') + '/1 portão' },
-    { id: 'ondas', text: 'Sobreviver às 5 ondas (até 9:00)', test: c => c.t >= 540 && c.st.waves >= 5 && c.waveAlive() === 0, progress: c => (c.st.waves || 0) + '/5 ondas' },
+  objectives: [{ id: 'muros', text: 'Construir 10 Muros e 1 Portão', test: c => c.built('muro') >= 10 && c.built('portao') >= 1, progress: c => c.pg('muros', { a: c.built('muro'), b: c.built('portao') }, '{a}/10 muros, {b}/1 portão') /* 5.0c */ },
+    { id: 'ondas', text: 'Sobreviver às 5 ondas (até 9:00)', test: c => c.t >= 540 && c.st.waves >= 5 && c.waveAlive() === 0, progress: c => c.pg('ondas', { n: c.st.waves || 0 }, '{n}/5 ondas') /* 5.0c */ },
     { id: 'b-nucleo', bonus: true, final: true, text: 'Núcleo acima de 80% no fim', test: c => c.nucleoFrac() >= 0.8 }, { id: 'b-abates', bonus: true, text: 'Abater 40 inimigos', test: c => c.killed() >= 40, progress: c => c.killed() + '/40' }],
   events: [120, 210, 300, 390, 480].map((at, i) => ({ at, do: c => { c.wave('w' + i, W({ cria: 6 + i * 3, cuspidor: 1 + i, escaravelho: i >= 2 ? i - 1 : 0, brutamonte: i === 4 ? 1 : 0 }, 0)); c.st.waves = (c.st.waves || 0) + 1; }, say: i === 0 ? ['vorag', 2, 'Fome! Fome! Abram!'] : i === 4 ? ['self', 2, 'A última onda trouxe um Brutamonte. Segure o Portão!'] : null })),
   script: [{ at: 6, say: ['self', 1, 'Arraste com o Muro selecionado (B, M) para desenhar uma linha inteira.'] }] });
@@ -80,7 +89,7 @@ M.push({ id: 'a1m2', act: 'ato1', title: 'Caça a comboios', place: 'Rota das Du
 M.push({ id: 'a1m3', act: 'ato1', title: 'Sobrevivência noturna', place: 'Pântano Negro', xp: 500, relic: 'semente-viva', startTime: 330,
   brief: [['self', 2, 'A noite cai e a Ninhada Cega caça no escuro. Não temos como ver longe.'], ['vorag', 2, 'Escuro. Quente. Comida.'], ['self', 1, 'Torres e luz. Aguente até o amanhecer.']],
   setup: { seed: 5319, enemies: [{ race: 'vorag', name: 'Ninhada Cega', passive: true }] },
-  objectives: [{ id: 'amanhecer', text: 'Sobreviver até o amanhecer (11:40)', test: c => c.sim.time >= 700, progress: c => 'faltam ' + c.mmss(Math.max(0, 700 - c.sim.time)) },
+  objectives: [{ id: 'amanhecer', text: 'Sobreviver até o amanhecer (11:40)', test: c => c.sim.time >= 700, progress: c => c.pg('faltam', { t: c.mmss(Math.max(0, 700 - c.sim.time)) }, 'faltam {t}') /* 5.0c */ },
     { id: 'b-predios', bonus: true, final: true, text: 'Não perder nenhuma construção', test: c => c.me.stats.buildingsLost === 0 }, { id: 'b-torres', bonus: true, text: 'Ter 3 Torres de Defesa', test: c => c.built('torre') >= 3 }],
   events: [380, 440, 500, 560, 620, 670].map((at, i) => ({ at, do: c => c.wave('n' + i, W({ cria: 8 + i * 2, cuspidor: 2 + i, ferroada: i >= 3 ? 3 : 0 }, 0)) })) });
 // Ato 2
@@ -90,7 +99,7 @@ M.push({ id: 'a2m1', act: 'ato2', title: 'Roubo e contrarroubo', place: 'Refinar
   objectives: [{ id: 'roubo', text: 'Roubar 800 em recursos com Piratas (Quartel, tecla P)', test: c => c.me.stats.stolen >= 800, progress: c => c.n(c.me.stats.stolen) + '/800' }, { id: 'piratas', text: 'Abater 3 Piratas inimigos', test: c => (c.kills.pirata || 0) >= 3, progress: c => (c.kills.pirata || 0) + '/3' },
     { id: 'b-perda', bonus: true, final: true, text: 'Perder menos de 300 para roubo', test: c => c.me.stats.lost < 300 }, { id: 'b-rapido', bonus: true, final: true, text: 'Concluir em menos de 12 min', test: c => c.t < 720 }],
   events: [150, 270, 390, 510].map(at => ({ at, do: c => { if (c.sim.players[c.en[0]].faction !== 'erevane') c.raid('rb' + at, 0); } })), // 4.2g: contrarroubo garantido quando o inimigo não é Erevane (a IA de outras Raças quase não faz Piratas)
-  script: [{ at: 5, say: c => ['self', 1, S.unitName(c.me.faction, 'pirata') + ' (Quartel, tecla P): leve-o pela lateral até um Reator nos fundos da base inimiga e só então clique com o direito para Sifonar. ' + (S.FACTIONS[c.me.faction].cloak.pirata ? 'Ele fica camuflado até começar a drenar; Torres e o Núcleo enxergam de perto. ' : '') + 'A Refinaria deles fica colada no exército. Ele volta sozinho e entrega ao encher ou após 40 s.'] }, { when: c => c.me.stats.stolen > 0, once: true, say: ['self', 3, 'O primeiro sifão é o mais doce.'] }] });
+  script: [{ at: 5, say: c => ['self', 1, '{pirata} (Quartel, tecla P): leve-o pela lateral até um Reator nos fundos da base inimiga e só então clique com o direito para Sifonar. {camuflagem}A Refinaria deles fica colada no exército. Ele volta sozinho e entrega ao encher ou após 40 s.', { pirata: ARD.i18n ? ARD.i18n.d.unidade(c.me.faction, 'pirata') : S.unitName(c.me.faction, 'pirata'), camuflagem: S.FACTIONS[c.me.faction].cloak.pirata ? T('camp.a2m1.fala.0.camuflagem', null, 'Ele fica camuflado até começar a drenar; Torres e o Núcleo enxergam de perto. ') : '' }] /* 5.0c: texto com marcadores (o 4º item são as variáveis da fala) */ }, { when: c => c.me.stats.stolen > 0, once: true, say: ['self', 3, 'O primeiro sifão é o mais doce.'] }] });
 M.push({ id: 'a2m2', act: 'ato2', title: 'Diplomacia forçada', place: 'Mesa de Kessari', xp: 600,
   brief: [['vehnar', 1, 'Pacto de Não-agressão, Comandante. Juntos esmagamos a Ordem do Molde.'], ['self', 2, 'Assine. E não confie. O Consórcio já quebrou pactos por menos.']],
   setup: { seed: 6211, enemies: [{ race: 'vehnar', name: 'Fundição Kessari' }, { race: 'tessara', name: 'Ordem do Molde' }] },
@@ -103,7 +112,7 @@ M.push({ id: 'a2m2', act: 'ato2', title: 'Diplomacia forçada', place: 'Mesa de 
 M.push({ id: 'a2m3', act: 'ato2', title: 'Escolta sob tempestade', place: 'Travessia do Éter', xp: 650, relic: 'ancora-de-mare',
   brief: [['self', 1, 'A Arca de Dados precisa cruzar a Travessia até o ponto de extração. Ela é lenta e não atira.'], ['erevane', 1, 'Que bela carga. Seria uma pena se a tempestade a escondesse de vocês.']],
   setup: { seed: 6317, enemies: [{ race: 'erevane', name: 'Corsários da Faixa', passive: true }] },
-  objectives: [{ id: 'chegar', text: 'Levar a Arca de Dados até o ponto de extração', test: c => c.st.vipArrived, progress: c => c.vip() ? Math.round(S.dist(c.vip().x, c.vip().y, c.st.ex, c.st.ey)) + ' de distância' : '—' },
+  objectives: [{ id: 'chegar', text: 'Levar a Arca de Dados até o ponto de extração', test: c => c.st.vipArrived, progress: c => c.vip() ? c.pg('distancia', { d: String(Math.round(S.dist(c.vip().x, c.vip().y, c.st.ex, c.st.ey))) }, '{d} de distância') /* 5.0c */ : '—' },
     { id: 'b-vida', bonus: true, final: true, text: 'Arca acima de 50% de vida', test: c => c.vip() && c.vip().hp >= c.vip().maxHp * 0.5 }, { id: 'b-rapido', bonus: true, final: true, text: 'Concluir em menos de 10 min', test: c => c.t < 600 }],
   fail: c => c.st.vipId && !c.vip() && !c.st.vipArrived ? 'A Arca de Dados foi destruída.' : null,
   events: [{ at: 1, do: c => c.spawnVip() }, { at: 90, do: c => c.stormOnRoute(0.35) }, { at: 120, do: c => c.ambush('e1', W({ lamina: 2, atirador: 3 }, 0), 0.4) }, { at: 230, do: c => c.stormOnRoute(0.65) }, { at: 260, do: c => c.ambush('e2', W({ lamina: 3, mosquito: 6 }, 0), 0.7) }, { at: 380, do: c => c.ambush('e3', W({ lamina: 3, atirador: 4, mosquito: 4 }, 0), 0.9) }],
@@ -113,13 +122,13 @@ M.push({ id: 'a2m3', act: 'ato2', title: 'Escolta sob tempestade', place: 'Trave
 M.push({ id: 'a3m1', act: 'ato3', title: 'Primeiro contato', place: 'Cavernas de Quor', xp: 700,
   brief: [['quorith', 1, 'Vocês fazem barulho. O Coro não suporta barulho.'], ['self', 2, 'Eles atacam em acorde: muitos juntos ficam fortes. Separe-os e derrube um de cada vez.']],
   setup: { seed: 7103, enemies: [{ race: 'quorith', name: 'Acorde Sétimo' }] },
-  objectives: [{ id: 'resistir', text: 'Resistir aos acordes até 9:00', test: c => c.t >= 540 && !!c.myNucleo(), progress: c => 'faltam ' + c.mmss(Math.max(0, 540 - c.t)) }, { id: 'abates', text: 'Silenciar 30 unidades do Coro', test: c => c.killed() >= 30, progress: c => c.killed() + '/30' },
+  objectives: [{ id: 'resistir', text: 'Resistir aos acordes até 9:00', test: c => c.t >= 540 && !!c.myNucleo(), progress: c => c.pg('faltam', { t: c.mmss(Math.max(0, 540 - c.t)) }, 'faltam {t}') /* 5.0c */ }, { id: 'abates', text: 'Silenciar 30 unidades do Coro', test: c => c.killed() >= 30, progress: c => c.killed() + '/30' },
     { id: 'b-nucleo', bonus: true, text: 'Destruir o Núcleo do Coro', test: c => c.enemyDead(0) }, { id: 'b-perdas', bonus: true, final: true, text: 'Perder menos de 15 unidades', test: c => c.me.stats.unitsLost < 15 }],
   events: [150, 270, 390, 480].map((at, i) => ({ at, do: c => c.wave('ac' + i, W({ voz: 6 + i * 2, diapasao: 1, prisma: i >= 2 ? 2 : 0 }, 0)), say: i === 0 ? ['quorith', 2, 'Uníssono.'] : null })) });
 M.push({ id: 'a3m2', act: 'ato3', title: 'A Prole devora um aliado', place: 'Jardins de Oriel', xp: 750,
   brief: [['tessara', 2, 'Os Carniceiros estão comendo nossos Nódulos vivos. Precisamos de vocês!'], ['self', 1, 'Pacto com a Linhagem Oriel. Mate os Carniceiros primeiro: são eles que devoram.']],
   setup: { seed: 7211, enemies: [{ race: 'tessara', name: 'Linhagem Oriel', ally: true }, { race: 'vorag', name: 'Prole Velk' }] },
-  objectives: [{ id: 'aliado', text: 'Manter o Núcleo da Linhagem Oriel de pé até 10:00', test: c => c.t >= 600 && !c.enemyDead(0), progress: c => 'faltam ' + c.mmss(Math.max(0, 600 - c.t)) }, { id: 'carniceiros', text: 'Abater 6 Carniceiros', test: c => (c.kills.pirata || 0) >= 6, progress: c => (c.kills.pirata || 0) + '/6' },
+  objectives: [{ id: 'aliado', text: 'Manter o Núcleo da Linhagem Oriel de pé até 10:00', test: c => c.t >= 600 && !c.enemyDead(0), progress: c => c.pg('faltam', { t: c.mmss(Math.max(0, 600 - c.t)) }, 'faltam {t}') /* 5.0c */ }, { id: 'carniceiros', text: 'Abater 6 Carniceiros', test: c => (c.kills.pirata || 0) >= 6, progress: c => (c.kills.pirata || 0) + '/6' },
     { id: 'b-prole', bonus: true, text: 'Destruir o Núcleo da Prole', test: c => c.enemyDead(1) }, { id: 'b-nodulos', bonus: true, final: true, text: 'O aliado perder no máximo 2 Nódulos', test: c => (c.st.allyNodLost || 0) <= 2 }],
   fail: c => c.enemyDead(0) && c.t < 600 ? 'A Linhagem Oriel foi devorada.' : null,
   events: [{ at: 2, do: c => S.enqueue(c.sim, { t: 'propose', p: c.en[0], to: 0 }) }, { at: 3, do: c => S.enqueue(c.sim, { t: 'respond', p: 0, to: c.en[0], accept: true }) },
@@ -137,14 +146,14 @@ M.push({ id: 'a3m3', act: 'ato3', title: 'Aliança tripla instável', place: 'Fe
 M.push({ id: 'a4m1', act: 'ato4', title: 'Assalto à Catedral Errante', place: 'Planície do Uníssono', xp: 900,
   brief: [['quorith', 3, 'A Catedral canta. Quem ouve, ajoelha.'], ['self', 2, 'Uma estrutura viva, armada e andando. Derrube a Catedral Errante e o Coro perde a voz.']],
   setup: { seed: 8101, minutes: 30, enemies: [{ race: 'quorith', name: 'Coro de Zayin', hard: true }] },
-  objectives: [{ id: 'catedral', text: 'Destruir a Catedral Errante', test: c => c.st.bossSpawned && !c.boss(), progress: c => c.boss() ? c.n(c.boss().hp) + ' de vida' : '—' },
+  objectives: [{ id: 'catedral', text: 'Destruir a Catedral Errante', test: c => c.st.bossSpawned && !c.boss(), progress: c => c.boss() ? c.pg('vida', { v: c.n(c.boss().hp) }, '{v} de vida') /* 5.0c */ : '—' },
     { id: 'b-rapido', bonus: true, final: true, text: 'Concluir em menos de 16 min', test: c => c.t < 960 }, { id: 'b-nucleo', bonus: true, final: true, text: 'Núcleo acima de 70% no fim', test: c => c.nucleoFrac() >= 0.7 }],
   events: [{ at: 2, do: c => c.spawnBoss('catedral', 0) }],
   tick: c => c.bossPatrol(0, 520) });
 M.push({ id: 'a4m2', act: 'ato4', title: 'Matriarca encurralada', place: 'Ninho de Velk', xp: 950,
   brief: [['vorag', 3, 'Mãe. Mãe. Mãe.'], ['self', 2, 'A Matriarca choca Crias sem parar. Mate a mãe e o enxame desmonta.']],
   setup: { seed: 8203, minutes: 30, enemies: [{ race: 'vorag', name: 'Prole Velk', hard: true }] },
-  objectives: [{ id: 'matriarca', text: 'Abater a Matriarca', test: c => c.st.bossSpawned && !c.boss(), progress: c => c.boss() ? c.n(c.boss().hp) + ' de vida' : '—' },
+  objectives: [{ id: 'matriarca', text: 'Abater a Matriarca', test: c => c.st.bossSpawned && !c.boss(), progress: c => c.boss() ? c.pg('vida', { v: c.n(c.boss().hp) }, '{v} de vida') /* 5.0c */ : '—' },
     { id: 'b-crias', bonus: true, text: 'Abater 60 Crias', test: c => (c.kills.cria || 0) >= 60, progress: c => (c.kills.cria || 0) + '/60' }, { id: 'b-predios', bonus: true, final: true, text: 'Não perder nenhuma construção', test: c => c.me.stats.buildingsLost === 0 }],
   events: [{ at: 2, do: c => c.spawnBoss('matriarca', 0) }],
   tick: c => { c.bossPatrol(0, 420); const b = c.boss(); if (b && c.t > 60 && c.every(25)) for (let i = 0; i < Math.round(3 * c.D.wave); i++) { const u = S.spawnUnit(c.sim, b.owner, 'cria', b.x + (c.sim.rand() - 0.5) * 60, b.y + (c.sim.rand() - 0.5) * 60); if (u) { u.state = 'attackmove'; const t = c.myNucleo(); if (t) { u.tx = t.x; u.ty = t.y; } } } } });
@@ -210,11 +219,11 @@ function prepare(id, o) {
 function start(sim, prep, saved) { // saved (4.1c): estado do roteiro gravado; o sim já vem restaurado
   const m = prep.mission, D = prep.diff; const me = sim.players[0]; const en = sim.players.slice(1).map(p => p.id);
   if (m.startTime && !saved) { sim.time = m.startTime; sim.tick = Math.round(m.startTime / S.TICK); sim.nextStorm += m.startTime; }
-  let t0 = sim.time; const said = []; const objectives = m.objectives.map(o => ({ id: o.id, text: o.text, bonus: !!o.bonus, final: !!o.final, done: false, progress: '' }));
+  let t0 = sim.time; const said = []; const objectives = m.objectives.map(o => ({ id: o.id, text: TXT.objetivo(m, o) /* 5.0c: já no idioma */, bonus: !!o.bonus, final: !!o.final, done: false, progress: '' }));
   const c = { sim, me, en, D, st: { waves: 0, crates: 0, produced: 0 }, kills: {}, lost: {}, t: 0, waveIds: {}, holds: {}, lastEvery: {} };
   const ob = id => objectives.find(o => o.id === id);
   Object.assign(c, {
-    n: v => Math.round(v).toLocaleString('pt-BR'), mmss: s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0'),
+    n: v => NUM(Math.round(v)) /* 5.0c: número no formato do idioma */, pg: (k, v, r) => T('camp.pg.' + k, v, r) /* 5.0c: texto de progresso com palavras */, mmss: s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0'),
     built: (def, pid) => { let k = 0; for (const e of sim.ents) if (e.alive && e.kind === 'building' && e.owner === (pid || 0) && e.def === def && e.built) k++; return k; },
     units: (def, pid) => { let k = 0; for (const e of sim.ents) if (e.alive && e.kind === 'unit' && e.owner === (pid || 0) && e.def === def) k++; return k; },
     done: id => !!(ob(id) && ob(id).done), myNucleo: () => S.nucleoOf(sim, 0), enemyDead: i => !sim.players[en[i]].alive || !S.nucleoOf(sim, en[i]),
@@ -222,7 +231,7 @@ function start(sim, prep, saved) { // saved (4.1c): estado do roteiro gravado; o
     killed: () => Object.values(c.kills).reduce((a, b) => a + b, 0), devoured: () => c.st.devoured || 0,
     hold: (key, cond, sec) => { c.holds[key] = cond ? (c.holds[key] || 0) + 0.5 : 0; return c.holds[key] >= sec; }, held: key => c.holds[key] || 0,
     every: sec => { const k = Math.floor(sim.time / sec); if (c.lastEvery[sec] === k) return false; c.lastEvery[sec] = k; return true; },
-    say: (who, mood, text) => { const race = who === 'self' ? me.faction : who === 'enemy' ? sim.players[en.find(i => !sim.players[i].ally) ?? en[0]].faction : who === 'ally' ? sim.players[en.find(i => sim.players[i].ally) ?? en[0]].faction : (prep.swap && prep.swap[who]) || who; said.push({ race, mood, text, t: sim.time }); },
+    say: (who, mood, text, k, v) => { const race = who === 'self' ? me.faction : who === 'enemy' ? sim.players[en.find(i => !sim.players[i].ally) ?? en[0]].faction : who === 'ally' ? sim.players[en.find(i => sim.players[i].ally) ?? en[0]].faction : (prep.swap && prep.swap[who]) || who; said.push({ race, mood, text: k ? TG(k, GEN(race), v, text) : text /* 5.0c: chave + gênero de quem fala */, t: sim.time }); },
     waveAlive: tag => { let k = 0; for (const [id, tg] of Object.entries(c.waveIds)) { if (tag && tg !== tag) continue; const e = sim.byId.get(+id); if (e && e.alive) k++; } return k; },
     targetFor: opt => { if (opt && opt.target === 'ally0') { const n = S.nucleoOf(sim, en[0]); if (n) return n; } return S.nucleoOf(sim, 0) || { x: S.CX, y: S.CY }; },
     spawnPoint: fromIdx => { const n = S.nucleoOf(sim, en[fromIdx]); const t = S.nucleoOf(sim, 0) || { x: S.CX, y: S.CY }; if (n) { const a = S.DM.atan2(t.y - n.y, t.x - n.x); return { x: n.x + S.DM.cos(a) * 160, y: n.y + S.DM.sin(a) * 160 }; } const a = sim.players[en[fromIdx]].startAngle; return { x: S.CX + S.DM.cos(a) * 1300, y: S.CY + S.DM.sin(a) * 1300 }; },
@@ -244,15 +253,16 @@ function start(sim, prep, saved) { // saved (4.1c): estado do roteiro gravado; o
     bossPatrol: (from, R) => { const b = c.boss(); if (!b || !c.every(12)) return; if (b.state === 'attack') return; const h = c.st.bossHome; const a = sim.rand() * Math.PI * 2; S.enqueue(sim, { t: 'attackmove', p: b.owner, ids: [b.id], x: h.x + S.DM.cos(a) * R, y: h.y + S.DM.sin(a) * R }); },
     scatterWrecks: n => { for (let i = 0; i < n; i++) { const a = sim.rand() * Math.PI * 2, r = 300 + sim.rand() * 900; const x = S.CX + S.DM.cos(a) * r, y = S.CY + S.DM.sin(a) * r; const wr = { id: sim.nextId++, kind: 'wreck', x, y, r: 12, ang: a, alive: true, owner: -1, res: 'minerio', amount: 160, max: 160, bornT: sim.time + 600, def: 'veiculo' }; sim.ents.push(wr); sim.byId.set(wr.id, wr); } },
   });
-  const fired = new Set(); let result = null; let lastEval = -1;
+  const fired = new Set(); let result = null; let lastEval = -1; let motivoPt = null; /* 5.0c: o motivo do fim em pt-BR (feedback para o dono); fora do salvamento */
   function evalObjectives(final) {
     let changed = false; for (const o of objectives) { const def = m.objectives.find(x => x.id === o.id); if (def.progress) { try { o.progress = def.progress(c); } catch (e) {} }
-      if (o.done || (def.final && !final)) continue; let ok = false; try { ok = !!def.test(c); } catch (e) { ok = false; } if (ok) { o.done = true; changed = true; if (!o.bonus && !final) c.say('self', 3, 'Objetivo concluído: ' + o.text + '.'); } }
+      if (o.done || (def.final && !final)) continue; let ok = false; try { ok = !!def.test(c); } catch (e) { ok = false; } if (ok) { o.done = true; changed = true; if (!o.bonus && !final) c.say('self', 3, 'Objetivo concluído: {obj}.', 'camp.obj-concluido', { obj: o.text }); } } /* 5.0c */
     return changed;
   }
   const runner = {
-    mission: m, objectives, said, ctx: c, get result() { return result; }, marker: () => c.marker || null, vipId: () => c.st.vipId || null,
-    brief() { const out = []; for (const [who, mood, text] of m.brief) { c.say(who, mood, text); } const s = said.splice(0); return s; },
+    mission: m, objectives, said, ctx: c, get result() { return result; }, get motivoPt() { return motivoPt; } /* 5.0c */, marker: () => c.marker || null, vipId: () => c.st.vipId || null,
+    brief() { m.brief.forEach(([who, mood, text], i) => { c.say(who, mood, text, 'camp.' + m.id + '.brief.' + i); }); const s = said.splice(0); return s; }, /* 5.0c: camp.<id>.brief.N */
+    retraduz() { for (const o of objectives) { const def = m.objectives.find(x => x.id === o.id); if (!def) continue; o.text = TXT.objetivo(m, def); if (def.progress) { try { o.progress = def.progress(c); } catch (e) {} } } }, /* 5.0c: troca de idioma no meio da missão — objetivos e progresso no idioma novo (só lê o estado) */
     tick(events) {
       if (result) return; c.t = sim.time - t0;
       for (const ev of events) {
@@ -267,18 +277,18 @@ function start(sim, prep, saved) { // saved (4.1c): estado do roteiro gravado; o
       for (const ev of events) if (ev.t === 'death' && ev.owner === 0 && ev.def === 'pirata') c.st.devouredBank = c.st.devoured; // carniceiro morto: guarda o que já tinha devorado
       if (m.tick) { try { m.tick(c); } catch (err) { console.warn('[ARD] roteiro ' + m.id + ': ' + err.message); } }
       if (D.storms && !sim.storm && c.every(240)) { const n = S.nucleoOf(sim, 0); if (n) S.forceStorm(sim, (n.x + S.CX) / 2, (n.y + S.CY) / 2, 25, 80); }
-      (m.events || []).forEach((ev, i) => { if (fired.has('e' + i) || c.t < ev.at) return; fired.add('e' + i); try { ev.do(c); } catch (err) { console.warn('[ARD] evento ' + m.id + '#' + i + ': ' + err.message); } if (ev.say) c.say(...(typeof ev.say === 'function' ? ev.say(c) : ev.say)); });
-      (m.script || []).forEach((sc, i) => { if (fired.has('s' + i)) return; let go = false; try { go = sc.at != null ? c.t >= sc.at : !!sc.when(c); } catch (e) {} if (go) { fired.add('s' + i); if (sc.say) c.say(...(typeof sc.say === 'function' ? sc.say(c) : sc.say)); } });
+      (m.events || []).forEach((ev, i) => { if (fired.has('e' + i) || c.t < ev.at) return; fired.add('e' + i); try { ev.do(c); } catch (err) { console.warn('[ARD] evento ' + m.id + '#' + i + ': ' + err.message); } if (ev.say) { const a = typeof ev.say === 'function' ? ev.say(c) : ev.say; c.say(a[0], a[1], a[2], 'camp.' + m.id + '.ev.' + i, a[3]); } }); /* 5.0c: camp.<id>.ev.N */
+      (m.script || []).forEach((sc, i) => { if (fired.has('s' + i)) return; let go = false; try { go = sc.at != null ? c.t >= sc.at : !!sc.when(c); } catch (e) {} if (go) { fired.add('s' + i); if (sc.say) { const a = typeof sc.say === 'function' ? sc.say(c) : sc.say; c.say(a[0], a[1], a[2], 'camp.' + m.id + '.fala.' + i, a[3]); } } }); /* 5.0c: camp.<id>.fala.N */
       if (sim.tick % 5 === 0 && sim.time !== lastEval) { lastEval = sim.time; evalObjectives(false); }
       // fim: vitória quando todos os principais estão feitos; derrota com o Núcleo perdido ou falha do roteiro
-      let fail = null; try { fail = m.fail ? m.fail(c) : null; } catch (e) {}
-      if (!S.nucleoOf(sim, 0) || !me.alive) fail = 'Seu Núcleo foi destruído.';
-      if (sim.result && sim.result.outcome !== 'victory' && m.id === 'a4m3') { const top = sim.result.scores ? sim.result.scores.slice().sort((a, b) => b.score - a.score)[0] : null; if (top && top.id === 0 && me.alive) c.st.matchWon = true; else fail = fail || 'Outra Raça ficou com o Domínio.'; }
+      let fail = null, failPt = null; try { fail = m.fail ? m.fail(c) : null; } catch (e) {} if (fail) { failPt = fail; fail = T('camp.' + m.id + '.falha', null, fail); } /* 5.0c: motivo no idioma; failPt guarda o pt-BR */
+      if (!S.nucleoOf(sim, 0) || !me.alive) { failPt = 'Seu Núcleo foi destruído.'; fail = T('camp.fim.nucleo', null, failPt); } /* 5.0c */
+      if (sim.result && sim.result.outcome !== 'victory' && m.id === 'a4m3') { const top = sim.result.scores ? sim.result.scores.slice().sort((a, b) => b.score - a.score)[0] : null; if (top && top.id === 0 && me.alive) c.st.matchWon = true; else if (!fail) { failPt = 'Outra Raça ficou com o Domínio.'; fail = T('camp.fim.dominio', null, failPt); } } /* 5.0c */
       if (sim.result && sim.result.outcome === 'victory') c.st.matchWon = true;
-      if (fail) { result = { won: false, reason: fail, stars: 0, time: c.t }; return; }
+      if (fail) { result = { won: false, reason: fail, stars: 0, time: c.t }; motivoPt = failPt; return; }
       const allEnemiesDown = sim.result && sim.result.outcome === 'victory'; // todos os inimigos caíram: a missão está ganha mesmo sem os objetivos de etapa
-      if (allEnemiesDown || objectives.filter(o => !o.bonus).every(o => o.done)) { evalObjectives(true); if (allEnemiesDown) for (const o of objectives) if (!o.bonus) o.done = true; const bonus = objectives.filter(o => o.bonus && o.done).length; result = { won: true, reason: 'Missão cumprida: ' + m.title + '.', stars: Math.min(3, 1 + bonus), time: c.t }; }
-      else if (sim.result && !result) result = { won: false, reason: sim.result.reason || 'O tempo acabou.', stars: 0, time: c.t };
+      if (allEnemiesDown || objectives.filter(o => !o.bonus).every(o => o.done)) { evalObjectives(true); if (allEnemiesDown) for (const o of objectives) if (!o.bonus) o.done = true; const bonus = objectives.filter(o => o.bonus && o.done).length; result = { won: true, reason: T('camp.fim.vitoria', { titulo: TXT.titulo(m) }, 'Missão cumprida: {titulo}.'), stars: Math.min(3, 1 + bonus), time: c.t }; motivoPt = 'Missão cumprida: ' + m.title + '.'; } /* 5.0c */
+      else if (sim.result && !result) { result = { won: false, reason: sim.result.reason ? TR(sim.result.reason) : T('camp.fim.tempo', null, 'O tempo acabou.'), stars: 0, time: c.t }; motivoPt = sim.result.reason || 'O tempo acabou.'; } /* 5.0c: motivo já no idioma (o da simulação passa pelo ARD.tr) */
     },
     takeSaid() { return said.splice(0); },
     // 4.1c: tudo o que o roteiro guarda entre os passos (objetivos, contadores, gatilhos já disparados)
@@ -289,8 +299,24 @@ function start(sim, prep, saved) { // saved (4.1c): estado do roteiro gravado; o
   if (saved) runner.load(saved);
   return runner;
 }
+/* 5.0c: textos das tabelas no idioma atual (reserva: a tabela em pt-BR). Aceitam a missão ou o id. Para o main.js e a campaign-ui. */
+const mi = m => (typeof m === 'string' ? BY_ID[m] : m) || {};
+const TXT = {
+  ato: id => { const a = ACTS.find(x => x.id === id); return a ? T('camp.ato.' + id, null, a.name) : ''; },
+  titulo: m => { m = mi(m); return m.id ? T('camp.' + m.id + '.titulo', null, m.title) : ''; },
+  lugar: m => { m = mi(m); return m.id ? T('camp.' + m.id + '.lugar', null, m.place) : ''; },
+  objetivo: (m, o) => { m = mi(m); const d = typeof o === 'string' ? (m.objectives || []).find(x => x.id === o) : o; return d ? T('camp.' + m.id + '.obj.' + d.id, null, d.text) : ''; },
+  brief: (m, i, race) => { m = mi(m); const b = (m.brief || [])[i]; return b ? TG('camp.' + m.id + '.brief.' + i, GEN(race), null, b[2]) : ''; },
+  dificuldade: k => T('dif.' + k, null, (DIFF[k] || {}).label || k),
+  reliquia: id => { const r = RELICS.find(x => x.id === id); return r ? T('camp.rel.' + id + '.nome', null, r.name) : ''; },
+  reliquiaDesc: id => { const r = RELICS.find(x => x.id === id); return r ? T('camp.rel.' + id + '.desc', null, r.desc) : ''; },
+  conquista: id => { const a = ACHIEVEMENTS.find(x => x.id === id); return a ? T('camp.conq.' + id + '.nome', null, a.name) : ''; },
+  conquistaDesc: id => { const a = ACHIEVEMENTS.find(x => x.id === id); return a ? T('camp.conq.' + id + '.desc', null, a.desc) : ''; },
+  tituloCmd: id => (TITLES[id] ? T('camp.titulo-cmd.' + id, null, TITLES[id]) : ''),
+  genero: GEN,
+};
 function missionsOfAct(act) { return M.filter(m => m.act === act); }
 function unlocked(id, prog) { const i = M.findIndex(m => m.id === id); if (i < 0) return false; const m = M[i]; if (m.act === 'identidade') return !!(prog.missions.p3 && prog.missions.p3.done); if (i === 0) return true; let k = i - 1; while (k >= 0 && M[k].act === 'identidade') k--; return k < 0 || !!(prog.missions[M[k].id] && prog.missions[M[k].id].done); }
 function xpFor(m, diffKey, stars, won) { const d = DIFF[diffKey] || DIFF.normal; return won ? Math.round((m.xp + 100 * stars) * d.xp) : Math.round(m.xp * 0.15); }
-ARD.campaign = { ACTS, DIFF, RELICS, RELIC_BY_LEVEL, ACHIEVEMENTS, TITLES, MISSIONS: M, BY_ID, prepare, start, missionsOfAct, unlocked, xpFor, rivalOf };
+ARD.campaign = Object.assign({ ACTS, DIFF, RELICS, RELIC_BY_LEVEL, ACHIEVEMENTS, TITLES, MISSIONS: M, BY_ID, prepare, start, missionsOfAct, unlocked, xpFor, rivalOf }, TXT); /* 5.0c: + textos no idioma (TXT) */
 })(globalThis.ARD = globalThis.ARD || {});

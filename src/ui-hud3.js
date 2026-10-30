@@ -8,7 +8,7 @@
 const S = ARD.sim;
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
-const fmt = n => Math.floor(n).toLocaleString('pt-BR');
+const fmt = n => (ARD.i18n ? ARD.i18n.num(Math.floor(n)) : String(Math.floor(n))); /* 5.0c: número no formato do idioma */
 const mmss = t => { t = Math.max(0, Math.floor(t)); return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
 const setT = (el, v) => { v = String(v); if (el && el.textContent !== v) el.textContent = v; };
 const setH = (el, v) => { v = !!v; if (el && el.hidden !== v) el.hidden = v; };
@@ -17,7 +17,14 @@ const setW = (el, pct) => { const v = (Math.round(pct * 10) / 10) + '%'; if (el 
 const IC = (id, cls) => `<svg class="tbi${cls ? ' ' + cls : ''}" aria-hidden="true"><use href="#${id}"/></svg>`;
 const RES3 = ['plasma', 'minerio', 'dados'], RES_NAME = { plasma: 'Plasma', minerio: 'Minério', dados: 'Dados' };
 const RES_IC = { plasma: 'ic-plasma', minerio: 'ic-minerio', dados: 'ic-dados' };
-const costStr = cost => Object.keys(cost || {}).filter(k => cost[k]).map(k => `<span class="c-${k}"><svg class="ri xs"><use href="#${RES_IC[k]}"/></svg> ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>';
+/* 5.0c: idiomas — textos pelo dicionário (ARD.t); o que vem da simulação em pt-BR é traduzido na hora de mostrar (ARD.tr); nomes pelo id (ARD.i18n.d) */
+const T = (k, v, r) => (ARD.t ? ARD.t(k, v, r) : (r != null ? r : k));
+const TR = s => (ARD.tr ? ARD.tr(s) : s);
+const DI = () => ARD.i18n.d;
+const nUni = (f, def) => (ARD.i18n ? ARD.i18n.d.unidade(f, def) : S.unitName(f, def));
+const nBld = def => (ARD.i18n ? ARD.i18n.d.construcao(def) : (S.BUILDINGS[def] || {}).name || def);
+const nRes = k => (ARD.i18n ? ARD.i18n.d.recurso(k) : RES_NAME[k]);
+const costStr = cost => Object.keys(cost || {}).filter(k => cost[k]).map(k => `<span class="c-${k}"><svg class="ri xs"><use href="#${RES_IC[k]}"/></svg> ${cost[k]}</span>`).join(' ') || '<span class="muted">' + T('hud3.gratis') + '</span>'; /* 5.0c */
 const params = new URLSearchParams(location.search);
 const coarse = () => matchMedia('(pointer: coarse)').matches || !!params.get('touch');
 
@@ -77,15 +84,15 @@ function prepareSim(sim, resume, me) {
 // ---------- Ajustes de acessibilidade na tela inicial (aba Ajustes): o bloco entra por script, sem mexer no HTML do #start ----------
 function a11yHTML(id) {
   const seg = (name, items, cur) => `<div class="seg h3seg" role="radiogroup" data-a11y="${name}">` + items.map(([v, t, s]) => `<button type="button" role="radio" aria-checked="${String(v) === String(cur)}" class="${String(v) === String(cur) ? 'on' : ''}" data-v="${v}">${t}${s ? `<small>${s}</small>` : ''}</button>`).join('') + '</div>';
-  return `<div class="opt"><label>Paleta de cores · daltonismo</label>${seg('cvd', Object.keys(CVD).map(k => [k, CVD[k], CVD_SUB[k]]), A.cvd)}<div class="h3sw" data-swatch></div></div>` +
-    `<div class="opt"><label for="${id}-scale">Escala da interface na partida · <b data-scale-v>${A.scale}%</b></label><input type="range" id="${id}-scale" class="h3range" min="90" max="140" step="5" value="${A.scale}" aria-describedby="${id}-scale-h"><div class="small muted" id="${id}-scale-h">90% a 140%. Botões de toque nunca ficam menores que 44 px.</div></div>` +
-    `<div class="opt"><label class="chk"><input type="checkbox" data-a11y="captions" ${A.captions ? 'checked' : ''}> Legendas das falas (o que a voz do sistema diz aparece em texto, com o retrato do líder)</label></div>` +
-    `<div class="opt"><label class="chk"><input type="checkbox" data-a11y="foes" ${A.foes !== false ? 'checked' : ''}> Destacar inimigos (anel vermelho no chão, barra de vida vermelha e marca no radar)</label></div>` +
-    `<div class="opt"><label class="chk"><input type="checkbox" data-a11y="rel" ${A.rel ? 'checked' : ''}> Cores relativas: você verde, aliados azuis e inimigos vermelhos (a partir da próxima partida)</label></div>`; /* 5.0a.1 */
+  return `<div class="opt"><label>${T('hud3.a11y.paleta')}</label>${seg('cvd', Object.keys(CVD).map(k => [k, T('hud3.cvd.' + k, null, CVD[k]), T('hud3.cvd.' + k + '.sub', null, CVD_SUB[k])]), A.cvd)}<div class="h3sw" data-swatch></div></div>` + /* 5.0c: textos pelo dicionário */
+    `<div class="opt"><label for="${id}-scale">${T('hud3.a11y.escala')} · <b data-scale-v>${A.scale}%</b></label><input type="range" id="${id}-scale" class="h3range" min="90" max="140" step="5" value="${A.scale}" aria-describedby="${id}-scale-h"><div class="small muted" id="${id}-scale-h">${T('hud3.a11y.escala-dica')}</div></div>` +
+    `<div class="opt"><label class="chk"><input type="checkbox" data-a11y="captions" ${A.captions ? 'checked' : ''}> ${T('hud3.a11y.legendas')}</label></div>` +
+    `<div class="opt"><label class="chk"><input type="checkbox" data-a11y="foes" ${A.foes !== false ? 'checked' : ''}> ${T('hud3.a11y.inimigos')}</label></div>` +
+    `<div class="opt"><label class="chk"><input type="checkbox" data-a11y="rel" ${A.rel ? 'checked' : ''}> ${T('hud3.a11y.relativas')}</label></div>`; /* 5.0a.1 */
 }
 function swatchHTML() { const P = PAL[A.cvd]; const races = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag']; const rc = r => P ? P.racas[r] : (S.RACE_SHADES[r] || ['#888'])[0];
   const res = k => P ? P.res[k] : ({ plasma: '#FF8A5C', minerio: '#62CDFF', dados: '#7FE3A1' })[k];
-  return '<span class="h3sw-l">Raças</span>' + races.map(r => `<i title="${esc((S.FACTIONS[r] || {}).short || r)}" style="background:${rc(r)}"></i>`).join('') + '<span class="h3sw-l">Recursos</span>' + RES3.map(k => `<i class="r" title="${RES_NAME[k]}" style="background:${res(k)}"></i>`).join(''); }
+  return '<span class="h3sw-l">' + T('hud3.a11y.racas') + '</span>' + races.map(r => `<i title="${esc(ARD.i18n ? DI().racaCurto(r) : (S.FACTIONS[r] || {}).short || r)}" style="background:${rc(r)}"></i>`).join('') + '<span class="h3sw-l">' + T('hud3.a11y.recursos') + '</span>' + RES3.map(k => `<i class="r" title="${esc(nRes(k))}" style="background:${res(k)}"></i>`).join(''); } /* 5.0c */
 function bindA11y(box, onChange) {
   const sw = box.querySelector('[data-swatch]'); if (sw) sw.innerHTML = swatchHTML();
   box.querySelectorAll('[data-a11y=cvd] button').forEach(b => b.addEventListener('click', () => { A.cvd = b.dataset.v; saveA(); applyPalette(); box.querySelectorAll('[data-a11y=cvd] button').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-checked', on); }); if (sw) sw.innerHTML = swatchHTML(); if (onChange) onChange('cvd'); }));
@@ -94,20 +101,36 @@ function bindA11y(box, onChange) {
   for (const k of ['foes', 'rel']) { const x = box.querySelector('[data-a11y=' + k + ']'); if (x) x.addEventListener('change', () => { A[k] = x.checked; saveA(); applyAll(); if (onChange) onChange(k); }); } /* 5.0a.1: o destaque muda na hora; as cores relativas, na próxima partida */
 }
 function mountStartA11y() { const pane = document.querySelector('.cpane[data-pane="ajustes"]'); if (!pane || pane.querySelector('.h3a11y')) return;
-  const box = document.createElement('div'); box.className = 'h3a11y'; box.innerHTML = '<div class="chead"><b>Acessibilidade</b><span>Cores, tamanho e legendas da partida</span></div>' + a11yHTML('st'); pane.appendChild(box); bindA11y(box); }
+  const box = document.createElement('div'); box.className = 'h3a11y'; box.dataset.h3st = '1'; startA11yHTML(box); pane.appendChild(box); bindA11y(box); }
+function startA11yHTML(box) { box.innerHTML = '<div class="chead"><b>' + T('hud3.a11y.titulo') + '</b><span>' + T('hud3.a11y.sub') + '</span></div>' + a11yHTML('st'); } /* 5.0c: refeito na troca de idioma */
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountStartA11y); else mountStartA11y();
+window.addEventListener('ard-idioma', () => { const box = document.querySelector('[data-h3st]'); if (box) { startA11yHTML(box); bindA11y(box); } }); /* 5.0c: o bloco da tela inicial no idioma novo, sem recarregar */
+/* 5.0c: textos fixos da Interface 3.0 no HTML (src/index.tpl.html, do coordenador): o mapa do i18n põe data-i18n neles na hora (não pisa em data-i18n que já exista) */
+const MAPA3 = {
+  '#btn-alc': { 'aria-label': 'hud3.html.central' }, '#btn-alc > span': 'hud3.html.alertas', '#btn-armyv': { 'aria-label': 'hud3.html.visao' }, '#btn-armyv > span': 'hud3.html.tropas',
+  '#army': { 'aria-label': 'hud3.html.visao' }, '#army .h3h b': 'hud3.html.exercito', '#army .h3x, #alertc .h3x, #tech .mclose, #a11y .mclose': { 'aria-label': 'hud3.html.fechar' },
+  '#army [data-idlecol]': { title: 'hud3.html.idlecol-d' }, '#army [data-idlecol] span': 'hud3.html.idlecol', '#army [data-idleu]': { title: 'hud3.html.idleu-d' }, '#army [data-idleu] span': 'hud3.html.idleu',
+  '#army [data-idleprod]': { title: 'hud3.html.idleprod-d' }, '#army [data-idleprod] span': 'hud3.html.idleprod',
+  '#alertc': { 'aria-label': 'hud3.html.central' }, '#alertc .h3h b': 'hud3.html.alertas', '#alertc .afl': { 'aria-label': 'hud3.html.filtrar' },
+  '#alertc [data-af="todos"]': 'hud3.html.f-todos', '#alertc [data-af="ataque"]': 'hud3.html.f-ataque', '#alertc [data-af="base"]': 'hud3.html.f-base', '#alertc [data-af="eco"]': 'hud3.html.f-eco',
+  '#groups': { 'aria-label': 'hud3.html.grupos' }, '#tech .box > .eyebrow': 'hud3.html.tech-eyebrow', '#tech .box > h2': 'hud3.html.tech-titulo', '#tech .box > .row .btn, #a11y .box > .row .btn': 'hud3.html.voltar',
+  '#a11y .box > .eyebrow': 'hud3.html.a11y-eyebrow', '#a11y .box > h2': 'hud3.html.a11y-titulo',
+};
+function marca3() { if (!ARD.i18n || !ARD.i18n.mapa) return; ARD.i18n.mapa(MAPA3); if (ARD.idioma !== 'pt-BR') ['.h3q', '#army', '#alertc', '#groups', '#tech', '#a11y'].forEach(s => { const el = document.querySelector(s); if (el) ARD.i18n.aplicar(el); }); } /* o i18n já começou: fora do pt-BR, aplica já */
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', marca3); else marca3();
 
 // ---------- legendas: a voz do sistema (src/audio.js chama A.onSay) aparece em texto com o retrato ----------
 let capCtx = null;
 function caption(text) {
   if (!A.captions || !capCtx) return; const el = $('caption'); if (!el) return; const c = capCtx;
-  if (!c.img) { c.img = el.querySelector('img'); c.who = el.querySelector('b'); c.tx = el.querySelector('span'); const art = c.leaderArt && c.leaderArt(c.fac); if (art) c.img.src = art; else c.img.hidden = true; setT(c.who, c.name); }
+  if (!c.img) { c.img = el.querySelector('img'); c.who = el.querySelector('b'); c.tx = el.querySelector('span'); const art = c.leaderArt && c.leaderArt(c.fac); if (art) c.img.src = art; else c.img.hidden = true; setT(c.who, c.name || T('hud3.cap.comando')); } /* 5.0c */
   setT(c.tx, text); el.hidden = false; el.classList.remove('in1', 'in2'); el.classList.add((c.flip = !c.flip) ? 'in1' : 'in2'); /* duas animações iguais alternadas: reinicia sem ler o layout */
   clearTimeout(c.t); if (!ARD.hud3.capHold) c.t = setTimeout(() => { el.hidden = true; }, Math.min(6500, 2200 + text.length * 70)); /* capHold: fotos na GPU por software */
 }
 if (ARD.audio) ARD.audio.onSay = text => caption(text);
 
 // ---------- partida ----------
+let langH = null; /* 5.0c: o ouvinte de 'ard-idioma' da partida atual (trocado a cada partida) */
 function mount(ctx) {
   const { G, sim, human, view, I, R, ui } = ctx; const notice = ctx.notice || (() => {});
   const me = () => sim.players[human]; const fac = () => S.FACTIONS[me().faction] || S.FACTIONS.vehnar;
@@ -115,47 +138,49 @@ function mount(ctx) {
   const tabMQ = matchMedia('(min-width:900px) and (min-height:600px)'); const sheets = () => isTouch() && !tabMQ.matches; /* no celular, exército e alertas abrem como folhas; no tablet ficam na coluna da direita, como no computador */
   const H = { open: null };
   document.body.classList.add('h3');
-  capCtx = { fac: me().faction, name: (ctx.LEADER_NAME && ctx.LEADER_NAME[me().faction]) || 'Comando', leaderArt: ctx.leaderArt };
+  capCtx = { fac: me().faction, name: (ctx.LEADER_NAME && ctx.LEADER_NAME[me().faction]) || null /* 5.0c: sem nome, "Comando" no idioma da hora */, leaderArt: ctx.leaderArt };
   const ICONS = {}; const icon = def => { if (ICONS[def]) return ICONS[def]; let u = ''; try { u = R.icon(def, human) || ''; } catch (e) {} if (u) ICONS[def] = u; return u; }; /* retratos 3D do render3d (ele já guarda; aqui só para saber na hora quais já existem) */
-  const unitName = def => S.unitName(me().faction, def);
+  const unitName = def => nUni(me().faction, def); /* 5.0c: nome no idioma */
   const ownUnits = () => sim.ents.filter(e => e.alive && e.kind === 'unit' && e.owner === human);
 
   // ====== central de alertas ======
   const AL = { list: [], seq: 0, unread: 0, cur: -1, curT: 0, filter: 'todos' };
   const box = $('alertc'), alist = box && box.querySelector('.alist'), abadge = $('alc-n');
-  function classify(e) {
-    if (e.t === 'built') return { cat: 'base', icon: 'ic-construir', kind: 'good', agg: 'b:' + e.def, text: 'Construção pronta: ' + ((S.BUILDINGS[e.def] || {}).name || e.def) };
-    if (e.t === 'spawn') return { cat: 'base', img: e.def, kind: 'info', agg: 'u:' + e.def, text: 'Unidade pronta: ' + unitName(e.def) };
-    const t = String(e.text || ''); const T = t.toUpperCase();
-    if (/SIF[ÃA]O|RASTRO|CARNICEIRO|CAIXA DERRUBADA|ROUBO/.test(T)) return { cat: 'ataque', icon: 'ic-pirata', kind: e.kind || 'danger', text: t };
-    if (/^VOCÊ QUEBROU|PACTO|NÃO-AGRESS|RECUSOU|CAUÇÃO/.test(T)) return { cat: 'outros', icon: 'ic-diplo', kind: e.kind || 'info', text: t };
-    if (/SOB ATAQUE|QUEBROU|ATIVOU|SALTOU|ELIMINADO|BLECAUTE!/.test(T)) return { cat: 'ataque', icon: e.kind === 'danger' ? 'ic-inim' : 'ic-alerta', kind: e.kind || 'danger', text: t };
-    if (/ACABOU|ESGOTAD|VEIO DE MIN|CAIXA RECOLHIDA/.test(T)) return { cat: 'eco', icon: /PLASMA/.test(T) ? 'ic-plasma' : 'ic-minerio', kind: e.kind || 'warn', text: t };
-    if (/TEMPESTADE/.test(T)) return { cat: 'eco', icon: 'ic-tempestade', kind: e.kind || 'warn', text: t };
-    if (/^ERA |EVOLUINDO|PESQUISA|PRONTA:|^ASCENSÃO:|TRAÇO|SOBRECARGA|SALTO DE NÚCLEO/.test(T)) return { cat: 'base', icon: /PESQUISA/.test(T) ? 'ic-tec' : 'ic-era', kind: e.kind || 'good', text: t };
+  function classify(e) { /* 5.0c: a classificação lê o texto em pt-BR (simulação); txt() dá o texto no idioma da hora, refeito na troca de idioma */
+    if (e.t === 'built') return { cat: 'base', icon: 'ic-construir', kind: 'good', agg: 'b:' + e.def, text: 'Construção pronta: ' + ((S.BUILDINGS[e.def] || {}).name || e.def), txt: () => T('hud3.alc.construcao-pronta', { x: nBld(e.def) }) };
+    if (e.t === 'spawn') return { cat: 'base', img: e.def, kind: 'info', agg: 'u:' + e.def, text: 'Unidade pronta: ' + S.unitName(me().faction, e.def), txt: () => T('hud3.alc.unidade-pronta', { x: unitName(e.def) }) };
+    const t = String(e.text || ''); const U = t.toUpperCase(); /* 5.0c: U (era T; T agora é o texto do dicionário) */
+    if (e.act === 'gather' && e.res) return { cat: 'eco', icon: e.res === 'plasma' ? 'ic-plasma' : 'ic-minerio', kind: e.kind || 'warn', text: t, txt: () => T('hud3.alc.territorio-acabou', { x: nRes(e.res) }) }; /* 5.0c: o aviso do território (main.js) pelo recurso, em qualquer idioma */
+    if (/SIF[ÃA]O|RASTRO|CARNICEIRO|CAIXA DERRUBADA|ROUBO/.test(U)) return { cat: 'ataque', icon: 'ic-pirata', kind: e.kind || 'danger', text: t };
+    if (/^VOCÊ QUEBROU|PACTO|NÃO-AGRESS|RECUSOU|CAUÇÃO/.test(U)) return { cat: 'outros', icon: 'ic-diplo', kind: e.kind || 'info', text: t };
+    if (/SOB ATAQUE|QUEBROU|ATIVOU|SALTOU|ELIMINADO|BLECAUTE!/.test(U)) return { cat: 'ataque', icon: e.kind === 'danger' ? 'ic-inim' : 'ic-alerta', kind: e.kind || 'danger', text: t };
+    if (/ACABOU|ESGOTAD|VEIO DE MIN|CAIXA RECOLHIDA/.test(U)) return { cat: 'eco', icon: /PLASMA/.test(U) ? 'ic-plasma' : 'ic-minerio', kind: e.kind || 'warn', text: t };
+    if (/TEMPESTADE/.test(U)) return { cat: 'eco', icon: 'ic-tempestade', kind: e.kind || 'warn', text: t };
+    if (/^ERA |EVOLUINDO|PESQUISA|PRONTA:|^ASCENSÃO:|TRAÇO|SOBRECARGA|SALTO DE NÚCLEO/.test(U)) return { cat: 'base', icon: /PESQUISA/.test(U) ? 'ic-tec' : 'ic-era', kind: e.kind || 'good', text: t };
     return { cat: 'outros', icon: 'ic-alerta', kind: e.kind || 'info', text: t };
   }
+  const atxt = a => (a.txt ? a.txt() : TR(a.text)); /* 5.0c: o texto do alerta no idioma da hora */
   function rowHTML(a) { const ico = a.img ? `<img alt="" src="${icon(a.img)}">` : `<svg aria-hidden="true"><use href="#${a.icon}"/></svg>`;
-    return `<span class="ai">${ico}</span><span class="at">${mmss(a.t)}</span><span class="am">${esc(a.text)}${a.n > 1 ? ` <b class="an">×${a.n}</b>` : ''}</span>${a.x != null ? '<span class="ago" aria-hidden="true">›</span>' : ''}`; }
+    return `<span class="ai">${ico}</span><span class="at">${mmss(a.t)}</span><span class="am">${esc(atxt(a))}${a.n > 1 ? ` <b class="an">×${a.n}</b>` : ''}</span>${a.x != null ? '<span class="ago" aria-hidden="true">›</span>' : ''}`; }
   function addAlert(e) {
     const c = classify(e); const now = e.time != null ? e.time : sim.time; const top = AL.list[0]; /* a hora do evento (a simulação marca cada um) */
     if (top && c.agg && top.agg === c.agg && now - top.t0 < 8) { top.n++; top.t = now; if (e.x != null) { top.x = e.x; top.y = e.y; } if (top.el) { top.el.innerHTML = rowHTML(top); flash(top.el); } return; } /* unidades (e trechos de muro) prontos do mesmo tipo em seguida viram uma linha só (×3) */
     const a = Object.assign({ id: ++AL.seq, t: now, t0: now, n: 1, x: e.x, y: e.y }, c); AL.list.unshift(a);
     if (AL.list.length > 40) { const old = AL.list.pop(); if (old.el) old.el.remove(); if (old.act) old.act.remove(); }
     if (alist) { const b = document.createElement('button'); b.type = 'button'; b.className = 'arow k-' + a.kind + ' c-' + a.cat; b.dataset.id = a.id; b.innerHTML = rowHTML(a); if (a.x == null) b.classList.add('nox'); a.el = b; b.hidden = AL.filter !== 'todos' && AL.filter !== a.cat; alist.prepend(b); flash(b);
-      if (e.act === 'gather') { const ab = document.createElement('button'); ab.type = 'button'; ab.className = 'aact'; ab.dataset.res = e.res || ''; ab.innerHTML = IC('ic-' + (e.res || 'minerio')) + 'Mandar coletores'; ab.hidden = b.hidden; b.after(ab); a.act = ab; } } /* 5.0a.1: o aviso do território sem Minério ou Plasma ganha "Mandar coletores" */
+      if (e.act === 'gather') { const ab = document.createElement('button'); ab.type = 'button'; ab.className = 'aact'; ab.dataset.res = e.res || ''; ab.innerHTML = IC('ic-' + (e.res || 'minerio')) + T('hud3.alc.mandar-coletores'); ab.hidden = b.hidden; b.after(ab); a.act = ab; } } /* 5.0a.1: o aviso do território sem Minério ou Plasma ganha "Mandar coletores" */
     if (!(H.open === 'alc')) { AL.unread++; syncBadge(); }
     const em = box && box.querySelector('.aempty'); if (em) em.remove();
   }
   function flash(el) { el.classList.remove('nw1', 'nw2'); el.classList.add((AL.fl = !AL.fl) ? 'nw1' : 'nw2'); }
-  function syncBadge() { if (abadge) { setT(abadge, AL.unread > 9 ? '9+' : AL.unread || ''); setH(abadge, !AL.unread); } setOn($('btn-alc'), 'attn', AL.unread > 0 && AL.list.some((a, i) => i < AL.unread && a.kind === 'danger')); const hn = $('alc-hn'); if (hn) setT(hn, AL.unread ? AL.unread + (AL.unread > 1 ? ' novos' : ' novo') : ''); }
+  function syncBadge() { if (abadge) { setT(abadge, AL.unread > 9 ? '9+' : AL.unread || ''); setH(abadge, !AL.unread); } setOn($('btn-alc'), 'attn', AL.unread > 0 && AL.list.some((a, i) => i < AL.unread && a.kind === 'danger')); const hn = $('alc-hn'); if (hn) setT(hn, AL.unread ? T('hud3.alc.novos', { n: AL.unread }) : ''); } /* 5.0c */
   function goAlert(a) { if (!a || a.x == null) return false; I.center(a.x, a.y); view.lastAlert = { x: a.x, y: a.y }; for (const b of alist ? alist.children : []) setOn(b, 'cur', +b.dataset.id === a.id); return true; }
   if (alist) alist.addEventListener('click', ev => { const ab = ev.target.closest('.aact'); if (ab) { if (G.sendIdleCollectors) G.sendIdleCollectors(ab.dataset.res || null); if (sheets()) closeSheet(); return; } const b = ev.target.closest('.arow'); if (!b) return; const a = AL.list.find(x => x.id === +b.dataset.id); if (goAlert(a) && sheets()) closeSheet(); });
   if (box) { const seen = ev => { if (AL.unread && (ev.type === 'pointerdown' || ev.pointerType === 'mouse')) { AL.unread = 0; syncBadge(); } }; box.addEventListener('pointerenter', seen); box.addEventListener('pointerdown', seen); } /* passou o mouse (ou tocou) na central: os novos foram vistos */
   if (box) box.querySelectorAll('[data-af]').forEach(f => f.addEventListener('click', () => { AL.filter = f.dataset.af; box.querySelectorAll('[data-af]').forEach(x => { setOn(x, 'on', x === f); x.setAttribute('aria-pressed', x === f); }); for (const a of AL.list) if (a.el) { a.el.hidden = AL.filter !== 'todos' && AL.filter !== a.cat; if (a.act) a.act.hidden = a.el.hidden; } }));
   H.nextAlert = () => { /* Espaço: o último alerta; de novo em até 3 s, o anterior (e assim por diante) */
     const now = performance.now(); const loc = AL.list.filter(a => a.x != null); if (!loc.length) return view.lastAlert;
-    AL.cur = now - AL.curT < 3000 ? (AL.cur + 1) % loc.length : 0; AL.curT = now; const a = loc[AL.cur]; goAlert(a); if (loc.length > 1) notice('Alerta ' + (AL.cur + 1) + ' de ' + loc.length + ': ' + a.text + ' · Espaço de novo: o anterior'); return { x: a.x, y: a.y }; };
+    AL.cur = now - AL.curT < 3000 ? (AL.cur + 1) % loc.length : 0; AL.curT = now; const a = loc[AL.cur]; goAlert(a); if (loc.length > 1) notice(T('hud3.alc.proximo', { i: AL.cur + 1, n: loc.length, x: atxt(a) })); return { x: a.x, y: a.y }; };
   H.ev = e => { if (e.p === human && (e.t === 'alert' || e.t === 'built' || e.t === 'spawn')) addAlert(e); };
 
   // ====== visão do exército ======
@@ -173,22 +198,22 @@ function mount(ctx) {
     if (!ARMY || (sheets() && H.open !== 'army' && !force)) return; const d = armyScan(); AV.idleCol = d.idleCol; AV.idleProd = d.idleProd; AV.rows = d.rows;
     const key = d.rows.map(r => r.def).join(',');
     if (key !== AV.key || !AV.nodes) { AV.key = key;
-      ARMY.querySelector('.avl').innerHTML = d.rows.length ? d.rows.map(r => `<button type="button" class="avc" data-def="${r.def}" title="${esc(unitName(r.def))}: clique seleciona todos · duas vezes centraliza · Shift soma"><img alt=""><b data-n></b><i data-i></i><span>${esc(unitName(r.def))}</span></button>`).join('') : '<div class="aempty">Nenhuma unidade ainda: produza no Núcleo (Coletores) e no Quartel.</div>';
+      ARMY.querySelector('.avl').innerHTML = d.rows.length ? d.rows.map(r => `<button type="button" class="avc" data-def="${r.def}" title="${esc(T('hud3.army.card-dica', { x: unitName(r.def) }))}"><img alt=""><b data-n></b><i data-i></i><span>${esc(unitName(r.def))}</span></button>`).join('') : '<div class="aempty">' + T('hud3.army.vazio') + '</div>';
       AV.nodes = {}; ARMY.querySelectorAll('.avc').forEach(b => { AV.nodes[b.dataset.def] = { n: b.querySelector('[data-n]'), i: b.querySelector('[data-i]'), img: b.querySelector('img'), el: b, src: '' }; }); }
     for (const r of d.rows) { const nd = AV.nodes[r.def]; if (!nd) continue; if (!nd.src) { nd.src = icon(r.def); if (nd.src) nd.img.src = nd.src; } /* o retrato 3D só existe depois do carregamento */
-      setT(nd.n, r.n); setT(nd.i, r.idle || ''); setOn(nd.el, 'idle', r.idle > 0); if (r.idle) { const tt = r.idle + (r.def === 'coletor' ? ' parados' : ' sem ordem'); if (nd.i.title !== tt) nd.i.title = tt; } } /* o título também só quando muda (escrever o mesmo valor ainda conta como mutação) */
+      setT(nd.n, r.n); setT(nd.i, r.idle || ''); setOn(nd.el, 'idle', r.idle > 0); if (r.idle) { const tt = T(r.def === 'coletor' ? 'hud3.army.parados' : 'hud3.army.sem-ordem', { n: r.idle }); if (nd.i.title !== tt) nd.i.title = tt; } } /* o título também só quando muda (escrever o mesmo valor ainda conta como mutação) */
     setT(AV.tot || (AV.tot = ARMY.querySelector('[data-tot]')), d.tot);
     const ic = AV.ic || (AV.ic = ARMY.querySelector('[data-idlecol]')), ip = AV.ip || (AV.ip = ARMY.querySelector('[data-idleprod]')), iu = AV.iu || (AV.iu = ARMY.querySelector('[data-idleu]'));
     setT(ic && ic.querySelector('b'), d.idleCol.length); setOn(ic, 'z', !d.idleCol.length); setT(ip && ip.querySelector('b'), d.idleProd.length); setOn(ip, 'z', !d.idleProd.length); setT(iu && iu.querySelector('b'), d.idleTot); setOn(iu, 'z', !d.idleTot);
   }
-  function selectIds(ids, center, label) { ids = ids.filter(id => { const u = sim.byId.get(id); return u && u.alive; }); if (!ids.length) { notice('Nada para selecionar'); return; } I.select(ids); if (center) { const u = sim.byId.get(ids[0]); if (u) I.center(u.x, u.y); } if (label) notice(label); if (sheets()) closeSheet(); }
+  function selectIds(ids, center, label) { ids = ids.filter(id => { const u = sim.byId.get(id); return u && u.alive; }); if (!ids.length) { notice(T('hud3.army.nada')); return; } I.select(ids); if (center) { const u = sim.byId.get(ids[0]); if (u) I.center(u.x, u.y); } if (label) notice(label); if (sheets()) closeSheet(); }
   if (ARMY) {
     let lastT = 0, lastDef = null;
     ARMY.addEventListener('click', ev => { const b = ev.target.closest('button'); if (!b || !AV.rows) return; const now = ev.timeStamp; /* duas vezes medidas pela hora dos eventos */
-      if (b.dataset.def) { const r = AV.rows.find(x => x.def === b.dataset.def); if (!r) return; const dbl = lastDef === r.def && now - lastT < 350; lastT = now; lastDef = r.def; let ids = r.ids; if (ev.shiftKey) ids = [...new Set([...view.sel, ...ids])]; selectIds(ids, dbl, r.n + ' × ' + unitName(r.def) + (dbl ? '' : ' · duas vezes centraliza')); return; }
+      if (b.dataset.def) { const r = AV.rows.find(x => x.def === b.dataset.def); if (!r) return; const dbl = lastDef === r.def && now - lastT < 350; lastT = now; lastDef = r.def; let ids = r.ids; if (ev.shiftKey) ids = [...new Set([...view.sel, ...ids])]; selectIds(ids, dbl, fmt(r.n) + ' × ' + unitName(r.def) + (dbl ? '' : ' · ' + T('hud3.army.duas-vezes'))); return; }
       if (b.hasAttribute('data-idlecol')) { if (G.sendIdleCollectors) G.sendIdleCollectors(); else selectIds(AV.idleCol, true); if (sheets()) closeSheet(); return; } /* 5.0a.1: um toque manda os parados aos nós livres mais próximos */
-      if (b.hasAttribute('data-idleu')) { const ids = []; for (const r of AV.rows) if (r.def !== 'coletor') ids.push(...r.idleIds); selectIds(ids, true, ids.length + ' unidades sem ordem'); return; }
-      if (b.hasAttribute('data-idleprod')) { if (!AV.idleProd.length) { notice('Toda a produção está ocupada'); return; } AV.prodCur = (AV.prodCur + 1) % AV.idleProd.length; const bd = sim.byId.get(AV.idleProd[AV.prodCur]); if (bd) { I.select([bd.id]); I.center(bd.x, bd.y); notice(S.BUILDINGS[bd.def].name + ' sem fila (' + (AV.prodCur + 1) + ' de ' + AV.idleProd.length + ')'); if (sheets()) closeSheet(); } } });
+      if (b.hasAttribute('data-idleu')) { const ids = []; for (const r of AV.rows) if (r.def !== 'coletor') ids.push(...r.idleIds); selectIds(ids, true, T('hud3.army.sel-sem-ordem', { n: ids.length })); return; }
+      if (b.hasAttribute('data-idleprod')) { if (!AV.idleProd.length) { notice(T('hud3.army.prod-ocupada')); return; } AV.prodCur = (AV.prodCur + 1) % AV.idleProd.length; const bd = sim.byId.get(AV.idleProd[AV.prodCur]); if (bd) { I.select([bd.id]); I.center(bd.x, bd.y); notice(T('hud3.army.sem-fila', { x: nBld(bd.def), i: AV.prodCur + 1, t: AV.idleProd.length })); if (sheets()) closeSheet(); } } });
   }
 
   // ====== grupos de controle (barra 1 a 5 no toque; no computador, os grupos gravados com Ctrl+número) ======
@@ -197,15 +222,15 @@ function mount(ctx) {
   function groupsRender() {
     if (!GR) return; const touch = isTouch(); const slots = touch ? ['1', '2', '3', '4', '5'] : Object.keys(I.groups).filter(n => groupIds(n).length).sort();
     const key = (touch ? 't' : 'd') + slots.join(''); setH(GR, !slots.length);
-    if (key !== GV.key) { GV.key = key; GR.innerHTML = slots.map(n => `<button type="button" class="gbtn" data-g="${n}" aria-label="Grupo ${n}" title="${touch ? 'Grupo ' + n + ': toque seleciona · dois toques centralizam · segure para gravar a seleção' : 'Grupo ' + n + ': tecla ' + n + ' ou clique seleciona · duas vezes centraliza · Ctrl+' + n + ' ou Ctrl+clique grava'}"><span class="gk">${n}</span><img alt="" hidden><b data-c></b><i class="ghold" aria-hidden="true"></i></button>`).join(''); GV.btn = {}; GR.querySelectorAll('.gbtn').forEach(b => { GV.btn[b.dataset.g] = { el: b, img: b.querySelector('img'), c: b.querySelector('[data-c]'), def: null }; }); }
+    if (key !== GV.key) { GV.key = key; GR.innerHTML = slots.map(n => `<button type="button" class="gbtn" data-g="${n}" aria-label="${esc(T('hud3.grp.grupo', { g: n }))}" title="${esc(T(touch ? 'hud3.grp.dica-toque' : 'hud3.grp.dica', { g: n }))}"><span class="gk">${n}</span><img alt="" hidden><b data-c></b><i class="ghold" aria-hidden="true"></i></button>`).join(''); GV.btn = {}; GR.querySelectorAll('.gbtn').forEach(b => { GV.btn[b.dataset.g] = { el: b, img: b.querySelector('img'), c: b.querySelector('[data-c]'), def: null }; }); }
     const sel = [...view.sel].sort().join(',');
     for (const n of slots) { const g = GV.btn[n]; if (!g) continue; const ids = groupIds(n); setT(g.c, ids.length || ''); setOn(g.el, 'empty', !ids.length);
       let top = null; if (ids.length) { const cnt = {}; for (const id of ids) { const u = sim.byId.get(id); cnt[u.def] = (cnt[u.def] || 0) + 1; } top = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0]; }
       if (top !== g.def) { g.def = top; if (top) g.img.src = icon(top); g.img.hidden = !top; }
       setOn(g.el, 'on', !!ids.length && ids.slice().sort().join(',') === sel); }
   }
-  function groupSelect(n, center) { const ids = groupIds(n); if (!ids.length) { notice(isTouch() ? 'Grupo ' + n + ' vazio: selecione unidades e segure o botão para gravar' : 'Grupo ' + n + ' vazio: Ctrl+' + n + ' grava a seleção'); return; } I.select(ids); if (center) { let x = 0, y = 0; for (const id of ids) { const u = sim.byId.get(id); x += u.x; y += u.y; } I.center(x / ids.length, y / ids.length); } }
-  function groupSave(n) { const ids = [...view.sel].filter(id => { const u = sim.byId.get(id); return u && u.alive && u.owner === human; }); I.groups[n] = ids; if (navigator.vibrate) try { navigator.vibrate([12, 40, 12]); } catch (e) {} notice(ids.length ? 'Grupo ' + n + ' gravado: ' + ids.length + (ids.length > 1 ? ' selecionados' : ' selecionado') : 'Grupo ' + n + ' limpo'); groupsRender(); }
+  function groupSelect(n, center) { const ids = groupIds(n); if (!ids.length) { notice(T(isTouch() ? 'hud3.grp.vazio-toque' : 'hud3.grp.vazio', { g: n })); return; } I.select(ids); if (center) { let x = 0, y = 0; for (const id of ids) { const u = sim.byId.get(id); x += u.x; y += u.y; } I.center(x / ids.length, y / ids.length); } }
+  function groupSave(n) { const ids = [...view.sel].filter(id => { const u = sim.byId.get(id); return u && u.alive && u.owner === human; }); I.groups[n] = ids; if (navigator.vibrate) try { navigator.vibrate([12, 40, 12]); } catch (e) {} notice(ids.length ? T('hud3.grp.gravado', { g: n, n: ids.length }) : T('hud3.grp.limpo', { g: n })); groupsRender(); }
   if (GR) {
     const tap = (n, t) => { const dbl = GV.lastN === n && t - GV.lastT < 380; GV.lastN = n; GV.lastT = t; groupSelect(n, dbl); }; /* t = hora do evento (dois toques medidos pelos eventos, não pelo laço) */
     const dropHold = () => { const g = GV.hold; if (!g) return null; clearTimeout(g.t); g.b.classList.remove('holding', 'armed'); GV.hold = null; return g; };
@@ -237,28 +262,28 @@ function mount(ctx) {
   function wheelItems(o) {
     const units = I.ownSelectedUnits(); const b = I.ownSelectedBuilding(); const t = I.pick(o.sx, o.sy, o.touch ? 22 : 12, units.length > 0); const f = fac(); const items = [];
     const foe = t && t.owner >= 0 && t.owner !== human && (t.kind === 'unit' || t.kind === 'building') ? t : null;
-    const tName = foe ? (foe.kind === 'unit' ? S.unitName(sim.players[foe.owner].faction, foe.def) : S.BUILDINGS[foe.def].name) : '';
+    const tName = foe ? (foe.kind === 'unit' ? nUni(sim.players[foe.owner].faction, foe.def) : nBld(foe.def)) : ''; /* 5.0c */
     if (units.length) {
       const armed = units.filter(u => S.UNITS[u.def].attack); const col = units.filter(u => u.def === 'coletor'); const pir = units.filter(u => u.def === 'pirata');
-      items.push({ id: 'move', ic: 'ic-mover', n: 'Mover', d: 'Mover ' + units.length + (units.length > 1 ? ' unidades' : ' unidade') + ' até aqui', go: () => { I.cmd({ t: 'move', ids: units.map(u => u.id), x: o.wx, y: o.wy }); view.marker = { x: o.wx, y: o.wy, t: R.time, col: '#E8E2D6' }; } });
-      items.push({ id: 'atk', ic: 'ic-atacar', n: 'Atacar', k: 'A', d: foe ? 'Atacar ' + tName : 'Atacar-mover: avança e luta com o que encontrar', off: !armed.length && 'Nenhuma unidade armada na seleção', go: () => { if (foe) I.contextCommand(o.wx, o.wy, o.sx, o.sy); else { I.cmd({ t: 'attackmove', ids: units.map(u => u.id), x: o.wx, y: o.wy }); view.marker = { x: o.wx, y: o.wy, t: R.time, col: '#FF5E3A' }; } } });
-      items.push({ id: 'stop', ic: 'ic-parar', n: 'Parar', k: 'S', d: 'Parar e ficar no lugar', go: () => I.cmd({ t: 'stop', ids: units.map(u => u.id) }) });
-      if (col.length) { const node = t && (t.kind === 'node' || t.kind === 'wreck') && t.amount > 0 ? t : null; items.push({ id: 'harv', ic: 'ic-minerio', n: 'Colher', d: node ? 'Colher ' + (t.kind === 'wreck' ? 'a carcaça' : 'este nó de ' + RES_NAME[t.res]) : 'Colher em volta deste ponto (os coletores entregam sozinhos)', go: () => { if (node) I.cmd({ t: 'harvest', ids: col.map(u => u.id), target: node.id }); else I.cmd({ t: 'move', ids: col.map(u => u.id), x: o.wx, y: o.wy }); view.marker = { x: o.wx, y: o.wy, t: R.time, col: '#7FE3A1' }; } }); }
-      if (pir.length) { const ok = foe && foe.kind === 'building' && (foe.def === 'refinaria' || foe.def === 'reator') && !S.hasPact(sim, human, foe.owner); items.push({ id: 'siph', ic: 'ic-pirata', n: 'Sifonar', d: ok ? 'Sifonar ' + tName + ' (até 40 s)' : 'Aponte para uma Refinaria ou Reator inimigo', off: !ok && 'Aponte para uma Refinaria ou Reator inimigo', go: () => I.cmd({ t: 'siphon', ids: pir.map(u => u.id), target: foe.id }) });
-        if (f.devour) { const dv = t && ((t.kind === 'wreck' && t.amount > 0) || (t.kind === 'building' && t.def === 'nodulo' && t.owner >= 0 && t.owner !== human && !S.hasPact(sim, human, t.owner))) ? t : null; items.push({ id: 'dev', ic: 'ic-devorar', n: 'Devorar', d: dv ? 'Devorar ' + (dv.kind === 'wreck' ? 'a carcaça' : 'o Nódulo inimigo') : 'Aponte para uma carcaça ou um Nódulo inimigo', off: !dv && 'Aponte para uma carcaça ou um Nódulo inimigo', go: () => I.cmd({ t: 'devour', ids: pir.map(u => u.id), target: dv.id }) }); } }
-      if (t && t.kind === 'crate') items.push({ id: 'crate', ic: 'ic-caixa', n: 'Recolher', d: 'Recolher a caixa de recursos', go: () => I.cmd({ t: 'pickup', ids: units.map(u => u.id), target: t.id }) });
+      items.push({ id: 'move', ic: 'ic-mover', n: T('hud3.roda.mover'), d: T('hud3.roda.mover-d', { n: units.length }), go: () => { I.cmd({ t: 'move', ids: units.map(u => u.id), x: o.wx, y: o.wy }); view.marker = { x: o.wx, y: o.wy, t: R.time, col: '#E8E2D6' }; } });
+      items.push({ id: 'atk', ic: 'ic-atacar', n: T('hud3.roda.atacar'), k: 'A', d: foe ? T('hud3.roda.atacar-alvo', { x: tName }) : T('hud3.roda.atacar-mover'), off: !armed.length && T('hud3.roda.sem-armadas'), go: () => { if (foe) I.contextCommand(o.wx, o.wy, o.sx, o.sy); else { I.cmd({ t: 'attackmove', ids: units.map(u => u.id), x: o.wx, y: o.wy }); view.marker = { x: o.wx, y: o.wy, t: R.time, col: '#FF5E3A' }; } } });
+      items.push({ id: 'stop', ic: 'ic-parar', n: T('hud3.roda.parar'), k: 'S', d: T('hud3.roda.parar-d'), go: () => I.cmd({ t: 'stop', ids: units.map(u => u.id) }) });
+      if (col.length) { const node = t && (t.kind === 'node' || t.kind === 'wreck') && t.amount > 0 ? t : null; items.push({ id: 'harv', ic: 'ic-minerio', n: T('hud3.roda.colher'), d: node ? (t.kind === 'wreck' ? T('hud3.roda.colher-carcaca') : T('hud3.roda.colher-no', { x: nRes(t.res) })) : T('hud3.roda.colher-aqui'), go: () => { if (node) I.cmd({ t: 'harvest', ids: col.map(u => u.id), target: node.id }); else I.cmd({ t: 'move', ids: col.map(u => u.id), x: o.wx, y: o.wy }); view.marker = { x: o.wx, y: o.wy, t: R.time, col: '#7FE3A1' }; } }); }
+      if (pir.length) { const ok = foe && foe.kind === 'building' && (foe.def === 'refinaria' || foe.def === 'reator') && !S.hasPact(sim, human, foe.owner); items.push({ id: 'siph', ic: 'ic-pirata', n: T('hud3.roda.sifonar'), d: ok ? T('hud3.roda.sifonar-d', { x: tName }) : T('hud3.roda.sifonar-alvo'), off: !ok && T('hud3.roda.sifonar-alvo'), go: () => I.cmd({ t: 'siphon', ids: pir.map(u => u.id), target: foe.id }) });
+        if (f.devour) { const dv = t && ((t.kind === 'wreck' && t.amount > 0) || (t.kind === 'building' && t.def === 'nodulo' && t.owner >= 0 && t.owner !== human && !S.hasPact(sim, human, t.owner))) ? t : null; items.push({ id: 'dev', ic: 'ic-devorar', n: T('hud3.roda.devorar'), d: dv ? T(dv.kind === 'wreck' ? 'hud3.roda.devorar-carcaca' : 'hud3.roda.devorar-nodulo') : T('hud3.roda.devorar-alvo'), off: !dv && T('hud3.roda.devorar-alvo'), go: () => I.cmd({ t: 'devour', ids: pir.map(u => u.id), target: dv.id }) }); } }
+      if (t && t.kind === 'crate') items.push({ id: 'crate', ic: 'ic-caixa', n: T('hud3.roda.recolher'), d: T('hud3.roda.recolher-d'), go: () => I.cmd({ t: 'pickup', ids: units.map(u => u.id), target: t.id }) });
     } else if (b) {
       const d = S.BUILDINGS[b.def];
-      if (S.producesFor(b.def, me().faction).length) items.push({ id: 'rally', ic: 'ic-reuniao', n: 'Reunião', d: 'Ponto de reunião de ' + d.name + ' aqui', go: () => { I.cmd({ t: 'rally', id: b.id, x: o.wx, y: o.wy }); view.marker = { x: o.wx, y: o.wy, t: R.time, col: '#F2C230' }; notice('Ponto de reunião definido'); } });
-      if (b.def === 'nucleo') { const p = me(); const can = p.jumpsLeft > 0 && !(b.jumpT > 0); items.push({ id: 'jump', ic: 'ic-salto', n: 'Saltar', d: 'Salto de Núcleo para este ponto (' + p.jumpsLeft + ' restante' + (p.jumpsLeft === 1 ? '' : 's') + ')', off: !can && (p.jumpsLeft > 0 ? 'Salto em andamento' : 'Sem Saltos restantes'), go: () => ui.confirm('Saltar o Núcleo para este ponto? Custa ' + Math.round(f.jumpCostFrac * 100) + '% de cada recurso e 60 s de canalização visível a todos.', () => I.cmd({ t: 'jump', x: o.wx, y: o.wy })) }); }
-      items.push({ id: 'tech', ic: 'ic-tec', n: 'Pesquisa', d: 'Abrir a tela de pesquisa e Eras (F3)', go: () => openTech() });
+      if (S.producesFor(b.def, me().faction).length) items.push({ id: 'rally', ic: 'ic-reuniao', n: T('hud3.roda.reuniao'), d: T('hud3.roda.reuniao-d', { x: nBld(b.def) }), go: () => { I.cmd({ t: 'rally', id: b.id, x: o.wx, y: o.wy }); view.marker = { x: o.wx, y: o.wy, t: R.time, col: '#F2C230' }; notice(T('hud3.roda.reuniao-ok')); } });
+      if (b.def === 'nucleo') { const p = me(); const can = p.jumpsLeft > 0 && !(b.jumpT > 0); items.push({ id: 'jump', ic: 'ic-salto', n: T('hud3.roda.saltar'), d: T('hud3.roda.saltar-d', { n: p.jumpsLeft }), off: !can && T(p.jumpsLeft > 0 ? 'hud3.roda.salto-andamento' : 'hud3.roda.sem-saltos'), go: () => ui.confirm(T('hud3.roda.saltar-confirma', { p: Math.round(f.jumpCostFrac * 100) }), () => I.cmd({ t: 'jump', x: o.wx, y: o.wy })) }); }
+      items.push({ id: 'tech', ic: 'ic-tec', n: T('hud3.roda.pesquisa'), d: T('hud3.roda.pesquisa-d'), go: () => openTech() });
     }
     if (!items.length) { /* nada seu selecionado: atalhos de seleção e câmera */
-      items.push({ id: 'army', ic: 'ic-exercito', n: 'Exército', d: 'Selecionar todas as unidades de combate', go: () => { const ids = ownUnits().filter(u => S.UNITS[u.def].attack).map(u => u.id); selectIds(ids, false, ids.length + ' unidades selecionadas'); } });
-      items.push({ id: 'idle', ic: 'ic-ocioso', n: 'Ociosos', d: 'Selecionar as unidades paradas (coletores e combate)', go: () => { const ids = ownUnits().filter(u => u.state === 'idle').map(u => u.id); selectIds(ids, true, ids.length + ' unidades paradas'); } });
-      items.push({ id: 'nuc', ic: 'ic-nucleo', n: 'Núcleo', d: 'Selecionar e centralizar o Núcleo', go: () => { const n = S.nucleoOf(sim, human); if (n) { I.select([n.id]); I.center(n.x, n.y); } } });
-      items.push({ id: 'build', ic: 'ic-construir', n: 'Construir', d: 'Abrir o menu Construir', go: () => { I.select([]); I.buildMenu = true; ui.buildMenuChanged(true); if (G.drawer) G.drawer.build = false; } });
-      items.push({ id: 'alert', ic: 'ic-alerta', n: 'Alerta', d: 'Ir ao último alerta', off: !AL.list.some(a => a.x != null) && 'Nenhum alerta com lugar ainda', go: () => { const a = H.nextAlert(); if (a) I.center(a.x, a.y); } });
+      items.push({ id: 'army', ic: 'ic-exercito', n: T('hud3.roda.exercito'), d: T('hud3.roda.exercito-d'), go: () => { const ids = ownUnits().filter(u => S.UNITS[u.def].attack).map(u => u.id); selectIds(ids, false, T('hud3.roda.selecionadas', { n: ids.length })); } });
+      items.push({ id: 'idle', ic: 'ic-ocioso', n: T('hud3.roda.ociosos'), d: T('hud3.roda.ociosos-d'), go: () => { const ids = ownUnits().filter(u => u.state === 'idle').map(u => u.id); selectIds(ids, true, T('hud3.roda.paradas', { n: ids.length })); } });
+      items.push({ id: 'nuc', ic: 'ic-nucleo', n: T('hud3.roda.nucleo'), d: T('hud3.roda.nucleo-d'), go: () => { const n = S.nucleoOf(sim, human); if (n) { I.select([n.id]); I.center(n.x, n.y); } } });
+      items.push({ id: 'build', ic: 'ic-construir', n: T('hud3.roda.construir'), d: T('hud3.roda.construir-d'), go: () => { I.select([]); I.buildMenu = true; ui.buildMenuChanged(true); if (G.drawer) G.drawer.build = false; } });
+      items.push({ id: 'alert', ic: 'ic-alerta', n: T('hud3.roda.alerta'), d: T('hud3.roda.alerta-d'), off: !AL.list.some(a => a.x != null) && T('hud3.roda.sem-alerta'), go: () => { const a = H.nextAlert(); if (a) I.center(a.x, a.y); } });
     }
     return items;
   }
@@ -281,10 +306,10 @@ function mount(ctx) {
       if (it.k && !isTouch()) svg += `<text class="wkey" x="${(x + 16).toFixed(1)}" y="${(y - 12).toFixed(1)}">${it.k}</text>`;
       svg += '</g>'; });
     svg += `<circle cx="${C}" cy="${C}" r="${R1 - 3}" class="whub"/></svg>`;
-    return `<i class="wring" aria-hidden="true"></i>${svg}<div class="wcen"><b>Comandos</b><span>${isTouch() ? 'deslize e solte' : 'escolha e solte'}</span></div><div class="wdesc"><span></span></div>`;
+    return `<i class="wring" aria-hidden="true"></i>${svg}<div class="wcen"><b>${T('hud3.roda.comandos')}</b><span>${T(isTouch() ? 'hud3.roda.deslize' : 'hud3.roda.escolha')}</span></div><div class="wdesc"><span></span></div>`;
   }
   function wheelPick(x, y) { const dx = x - W.cx, dy = y - W.cy; const d = Math.hypot(dx, dy); const k = W.scale; if (d < 46 * k || d > 150 * k) return -1; const n = W.items.length; let a = Math.atan2(dy, dx) + Math.PI / 2 + Math.PI / n; a = ((a % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI); return Math.floor(a / (2 * Math.PI / n)) % n; }
-  function wheelHi(i) { if (i === W.hi) return; W.hi = i; const it = W.items[i]; W.secs.forEach((g, j) => setOn(g, 'on', j === i)); const cen = W.cen; if (it) { setT(cen.b, it.n); setT(cen.s, it.off ? 'trancado' : (it.k && !isTouch() ? 'tecla ' + it.k : 'solte para dar a ordem')); setT(cen.d, it.off || it.d); setOn(WH, 'blocked', !!it.off); } else { setT(cen.b, W.hold && W.armed ? 'Cancelar' : 'Comandos'); setT(cen.s, W.hold ? (W.armed ? 'solte fora para cancelar' : (isTouch() ? 'deslize até uma ordem' : 'mova até uma ordem')) : 'clique fora para fechar'); setT(cen.d, ''); setOn(WH, 'blocked', false); } }
+  function wheelHi(i) { if (i === W.hi) return; W.hi = i; const it = W.items[i]; W.secs.forEach((g, j) => setOn(g, 'on', j === i)); const cen = W.cen; if (it) { setT(cen.b, it.n); setT(cen.s, it.off ? T('hud3.roda.trancado') : (it.k && !isTouch() ? T('hud3.roda.tecla', { k: it.k }) : T('hud3.roda.solte'))); setT(cen.d, it.off || it.d); setOn(WH, 'blocked', !!it.off); } else { setT(cen.b, T(W.hold && W.armed ? 'hud3.roda.cancelar' : 'hud3.roda.comandos')); setT(cen.s, T(W.hold ? (W.armed ? 'hud3.roda.solte-fora' : (isTouch() ? 'hud3.roda.deslize-ordem' : 'hud3.roda.mova-ordem')) : 'hud3.roda.clique-fora')); setT(cen.d, ''); setOn(WH, 'blocked', false); } }
   function wheelClose(run) { if (!W.open) return; const it = run && W.items[W.hi]; W.open = false; WH.classList.remove('on'); setTimeout(() => { if (!W.open) WH.hidden = true; }, 130); window.removeEventListener('pointermove', W.mv, true); window.removeEventListener('pointerup', W.up, true); window.removeEventListener('pointerdown', W.dn, true); window.removeEventListener('keydown', W.key, true); window.removeEventListener('pointercancel', W.cancel, true);
     if (it) { if (it.off) { notice('🔒 ' + it.off); return; } try { it.go(); } catch (e) { console.warn('[ARD] roda de comandos:', e); } if (navigator.vibrate && isTouch()) try { navigator.vibrate(10); } catch (e) {} } }
   H.wheel = o => { /* o = { sx, sy, wx, wy, touch, hold, id } (coordenadas do canvas e do mundo) */
@@ -310,56 +335,57 @@ function mount(ctx) {
   const TM = $('tech'), TB = TM && $('tech-body'); const TV = { key: '', iconQ: [] };
   const ERA_UNLOCK = er => { /* a Era em que cada coisa fica disponível: a da unidade ou a da construção que a produz (Veículo Pesado só com a Fábrica, Era II) */ const f = me().faction; const bs = Object.keys(S.BUILDINGS).filter(k => S.BUILDINGS[k].key && (S.BUILDINGS[k].era || 1) === er); const ue = {}; for (const b of ['nucleo', 'quartel', 'fabrica', 'hangar']) for (const u of S.producesFor(b, f)) { const e = Math.max(S.UNITS[u].era || 1, S.BUILDINGS[b].era || 1, ...(S.UNITS[u].needs || []).map(n => S.BUILDINGS[n].era || 1)); ue[u] = Math.min(ue[u] || 9, e); } return { bs, us: Object.keys(ue).filter(u => ue[u] === er) }; };
   const MODS = () => Object.keys(S.BUILDINGS).filter(k => S.BUILDINGS[k].module).map(k => ({ def: k, m: S.BUILDINGS[k].module }));
-  function missing(cost) { const p = me(); const m = []; for (const k of RES3) { const c = (cost || {})[k] || 0, have = Math.floor(p.res[k] || 0); if (c > have) m.push(fmt(c - have) + ' de ' + RES_NAME[k]); } return m.length ? 'Faltam ' + m.join(' e ') : null; }
+  function missing(cost) { const p = me(); const m = []; for (const k of RES3) { const c = (cost || {})[k] || 0, have = Math.floor(p.res[k] || 0); if (c > have) m.push(T('hud3.tk.falta-item', { q: fmt(c - have), x: nRes(k) })); } return m.length ? T('hud3.tk.faltam', { x: m.reduce((a, b) => T('hud3.tk.e', { a, b })) }) : null; } /* 5.0c */
   const lazyImg = def => ICONS[def] ? `<img class="tico" alt="" src="${ICONS[def]}">` : (TV.iconQ.push(def), `<img class="tico" alt="" data-ico="${def}">`); /* o que já foi desenhado entra na hora; o resto, aos poucos */
   function techState() { const p = me(); const n = S.nucleoOf(sim, human); const nx = S.ERAS[(p.era || 1) + 1]; const lab = S.hasBuilt(sim, human, 'laboratorio');
     const aff = c => S.canAfford(p, c || {}) ? 1 : 0;
     return [p.era || 1, p.evolveT > 0 ? 'e' : '', Object.keys(p.research).sort().join(''), p.ascended ? 'a' : '', lab ? 'L' : '', nx ? S.eraBlock(sim, human) || '' : '', nx ? aff(nx.cost) : '', Object.keys(S.RESEARCH).map(k => aff(S.RESEARCH[k].cost)).join(''), aff((S.ASCENSION[p.faction] || {}).cost), Math.max(0, p.superCd - sim.time) > 0 ? 'c' : '', aff(S.SUPER_COST), MODS().map(x => sim.ents.filter(e => e.alive && e.owner === human && e.def === x.def && e.built).map(e => (e.mod ? 1 : 0) + (e.upT > 0 ? 'u' : '')).join('')).join('|'), MODS().map(x => aff(x.m.cost)).join(''), n ? 1 : 0].join('/'); }
   function techHTML() {
     const p = me(), f = fac(), er = p.era || 1, nx = S.ERAS[er + 1]; const lab = S.hasBuilt(sim, human, 'laboratorio'); TV.iconQ = [];
-    let h = `<div class="tk-sum"><span>${IC('ic-era')}Era <b>${S.ERAS[er].roman} · ${esc(S.ERAS[er].name)}</b></span><span>${RES3.map(k => `<span class="c-${k}"><svg class="ri xs"><use href="#${RES_IC[k]}"/></svg> <b data-tr="${k}">${fmt(p.res[k])}</b></span>`).join(' ')}</span><span class="muted">${lab ? 'Laboratório pronto' : 'Sem Laboratório (Era II)'}</span></div>`;
-    h += '<h3>Eras do Núcleo</h3><div class="tk-eras">';
+    let h = `<div class="tk-sum"><span>${IC('ic-era')}${T('hud3.tk.era-atual', { r: S.ERAS[er].roman, x: esc(DI().era(er)) })}</span><span>${RES3.map(k => `<span class="c-${k}"><svg class="ri xs"><use href="#${RES_IC[k]}"/></svg> <b data-tr="${k}">${fmt(p.res[k])}</b></span>`).join(' ')}</span><span class="muted">${T(lab ? 'hud3.tk.lab-pronto' : 'hud3.tk.sem-lab')}</span></div>`; /* 5.0c: textos e nomes pelo dicionário */
+    h += '<h3>' + T('hud3.tk.eras') + '</h3><div class="tk-eras">';
     for (let n = 1; n <= 3; n++) { const E = S.ERAS[n]; const done = n < er, cur = n === er, nextE = n === er + 1, evo = nextE && p.evolveT > 0; const un = ERA_UNLOCK(n);
-      const st = done ? 'concluída' : cur ? 'atual' : evo ? 'evoluindo' : 'trancada';
-      h += `<div class="tk-era ${done ? 'done' : cur ? 'cur' : evo ? 'evo' : 'lk'}"><div class="te-h"><b>Era ${E.roman}</b><span>${esc(E.name)}</span><i>${st}</i></div><p>${esc(E.desc)}</p>`;
-      if (n > 1) { const reqs = (E.needs || []).map(r => [S.hasBuilt(sim, human, r), S.BUILDINGS[r].name]).concat(E.needsAny ? [[E.needsAny.some(r => S.hasBuilt(sim, human, r)), E.needsAny.map(r => S.BUILDINGS[r].name).join(' ou ')]] : []);
+      const st = T(done ? 'hud3.tk.era-concluida' : cur ? 'hud3.tk.era-atual-st' : evo ? 'hud3.tk.era-evoluindo' : 'hud3.tk.era-trancada');
+      h += `<div class="tk-era ${done ? 'done' : cur ? 'cur' : evo ? 'evo' : 'lk'}"><div class="te-h"><b>${T('hud3.tk.era-n', { r: E.roman })}</b><span>${esc(DI().era(n))}</span><i>${esc(st)}</i></div><p>${esc(DI().eraDesc(n))}</p>`;
+      if (n > 1) { const reqs = (E.needs || []).map(r => [S.hasBuilt(sim, human, r), nBld(r)]).concat(E.needsAny ? [[E.needsAny.some(r => S.hasBuilt(sim, human, r)), E.needsAny.map(r => nBld(r)).reduce((a, b) => T('hud3.tk.ou', { a, b }))]] : []);
         h += `<div class="te-req">${reqs.map(r => `<span class="${r[0] || done || cur ? 'ok' : 'no'}">${r[0] || done || cur ? '✓' : '✗'} ${esc(r[1])}</span>`).join('')}</div><div class="te-cost">${costStr(E.cost)} · ${IC('ic-relogio')}${E.time} s</div>`; }
-      h += `<div class="te-un">${un.bs.map(b => `<span title="${esc(S.BUILDINGS[b].name)}">${lazyImg(b)}<small>${esc(S.BUILDINGS[b].name)}</small></span>`).join('')}${un.us.map(u => `<span title="${esc(unitName(u))}">${lazyImg(u)}<small>${esc(unitName(u))}</small></span>`).join('')}</div>`;
-      if (nextE && !evo) { const why = S.eraBlock(sim, human), miss = missing(E.cost); h += `<div class="te-go">${why ? `<span class="tk-lock">${IC('ic-cadeado')}${esc(why)}</span>` : miss ? `<span class="tk-miss">${IC('ic-limpar')}${esc(miss)}</span>` : ''}<button class="act sm${why || miss ? '' : ' good'}" data-tk="evolve"${why || miss ? ' disabled' : ''}>${IC('ic-era')}Evoluir para a Era ${E.roman}</button></div>`; }
+      h += `<div class="te-un">${un.bs.map(b => `<span title="${esc(nBld(b))}">${lazyImg(b)}<small>${esc(nBld(b))}</small></span>`).join('')}${un.us.map(u => `<span title="${esc(unitName(u))}">${lazyImg(u)}<small>${esc(unitName(u))}</small></span>`).join('')}</div>`;
+      if (nextE && !evo) { const why = S.eraBlock(sim, human), miss = missing(E.cost); h += `<div class="te-go">${why ? `<span class="tk-lock">${IC('ic-cadeado')}${esc(TR(why))}</span>` : miss ? `<span class="tk-miss">${IC('ic-limpar')}${esc(miss)}</span>` : ''}<button class="act sm${why || miss ? '' : ' good'}" data-tk="evolve"${why || miss ? ' disabled' : ''}>${IC('ic-era')}${T('hud3.tk.evoluir', { r: E.roman })}</button></div>`; }
       if (evo) h += `<div class="te-go"><div class="hp evo" data-tk-evo><i style="width:${Math.round(100 * (1 - p.evolveT / E.time))}%"></i></div><span class="small" data-tk-evot>${Math.ceil(p.evolveT)} s</span></div>`;
       h += '</div>'; }
-    h += '</div><h3>Laboratório · pesquisas</h3><div class="tk-grid">';
+    h += '</div><h3>' + T('hud3.tk.pesquisas') + '</h3><div class="tk-grid">';
     const RIC = { armamento: 'ic-dano', blindagem: 'ic-def', sensores: 'ic-sensor' };
-    for (const k in S.RESEARCH) { const r = S.RESEARCH[k]; const done = !!p.research[k]; const lk = !done && (S.lockReason(sim, human, 'research', k) || (!lab ? 'Requer Laboratório' : null)); const miss = !done && !lk && missing(r.cost);
-      h += `<div class="tk-card ${done ? 'done' : lk ? 'lk' : ''}"><div class="tc-h">${IC(RIC[k] || 'ic-tec', 'tci')}<b>${esc(r.name)}</b><span class="tk-era-b">ERA ${S.ERAS[r.era].roman}</span></div><p>${esc(r.desc)}</p><div class="tc-f"><span>${costStr(r.cost)} · instantânea</span>${done ? '<span class="tk-ok">✓ concluída</span>' : lk ? `<span class="tk-lock">${IC('ic-cadeado')}${esc(lk)}</span>` : miss ? `<span class="tk-miss">${esc(miss)}</span>` : `<button class="act sm good" data-tk="research" data-k="${k}">${IC('ic-tec')}Pesquisar</button>`}</div></div>`; }
-    h += '</div><h3>Módulos das construções</h3><div class="tk-grid">';
-    for (const { def, m } of MODS()) { const mine = sim.ents.filter(e => e.alive && e.owner === human && e.def === def && e.built); const inst = mine.filter(e => e.mod).length, up = mine.filter(e => e.upT > 0).length; const lk = S.lockReason(sim, human, 'module', def);
-      h += `<div class="tk-card ${inst && inst === mine.length ? 'done' : lk ? 'lk' : ''}"><div class="tc-h">${lazyImg(def)}<b>${esc(m.name)}</b><span class="tk-era-b">ERA ${S.ERAS[m.era || 1].roman}</span></div><p>${esc(m.desc)} <span class="muted">· em ${esc(S.BUILDINGS[def].name)}</span></p><div class="tc-f"><span>${costStr(m.cost)} · ${IC('ic-relogio')}${m.time} s</span><span class="small">${mine.length ? inst + ' de ' + mine.length + ' com o módulo' + (up ? ' · ' + up + ' instalando' : '') : 'nenhum(a) ' + esc(S.BUILDINGS[def].name)}</span>${lk ? `<span class="tk-lock">${IC('ic-cadeado')}${esc(lk)}</span>` : mine.some(e => !e.mod && !(e.upT > 0)) ? `<button class="act sm" data-tk="pickmod" data-def="${def}">${IC('ic-construir')}Escolher ${esc(S.BUILDINGS[def].name)}</button>` : ''}</div></div>`; }
-    h += '</div><h3>Poder da Raça</h3><div class="tk-grid">';
-    { const a = S.ASCENSION[p.faction]; if (a) { const lk = p.ascended ? null : !lab ? 'Requer Laboratório' : er < 3 ? 'Requer Era III (Domínio)' : null; const miss = !p.ascended && !lk && missing(a.cost);
-      h += `<div class="tk-card asc ${p.ascended ? 'done' : lk ? 'lk' : ''}"><div class="tc-h">${IC('ic-super', 'tci')}<b>Ascensão: ${esc(a.name)}</b><span class="tk-era-b">ERA III</span></div><p>${esc(a.desc)}</p><div class="tc-f"><span>${costStr(a.cost)} · instantânea</span>${p.ascended ? '<span class="tk-ok">✓ alcançada</span>' : lk ? `<span class="tk-lock">${IC('ic-cadeado')}${esc(lk)}</span>` : miss ? `<span class="tk-miss">${esc(miss)}</span>` : `<button class="act sm good" data-tk="ascend">${IC('ic-super')}Ascender</button>`}</div></div>`; } }
-    { const cd = Math.max(0, p.superCd - sim.time); const lk = !lab ? 'Requer Laboratório' : er < 3 ? 'Requer Era III (Domínio)' : null; const miss = !lk && !cd && missing(S.SUPER_COST);
-      h += `<div class="tk-card sup ${lk ? 'lk' : ''}"><div class="tc-h">${IC('ic-super', 'tci')}<b>Superarma: ${esc(f.superName)}</b><span class="tk-era-b">ERA III</span></div><p>${esc(f.superDesc)}</p><div class="tc-f"><span>${costStr(S.SUPER_COST)} · recarga ${Math.round(S.SUPER_CD / 60)} min</span>${lk ? `<span class="tk-lock">${IC('ic-cadeado')}${esc(lk)}</span>` : cd ? `<span class="tk-miss" data-tk-cd>recarga ${mmss(cd)}</span>` : miss ? `<span class="tk-miss">${esc(miss)}</span>` : '<span class="tk-ok">pronta: botão Superarma ao lado do radar</span>'}</div></div>`; }
+    for (const k in S.RESEARCH) { const r = S.RESEARCH[k]; const done = !!p.research[k]; const lk = !done && (TR(S.lockReason(sim, human, 'research', k)) || (!lab ? T('hud3.tk.req-lab') : null)); const miss = !done && !lk && missing(r.cost);
+      h += `<div class="tk-card ${done ? 'done' : lk ? 'lk' : ''}"><div class="tc-h">${IC(RIC[k] || 'ic-tec', 'tci')}<b>${esc(DI().pesquisa(k))}</b><span class="tk-era-b">${T('hud3.tk.era-b', { r: S.ERAS[r.era].roman })}</span></div><p>${esc(DI().pesquisaDesc(k))}</p><div class="tc-f"><span>${costStr(r.cost)} · ${T('hud3.tk.instantanea')}</span>${done ? '<span class="tk-ok">' + T('hud3.tk.concluida') + '</span>' : lk ? `<span class="tk-lock">${IC('ic-cadeado')}${esc(lk)}</span>` : miss ? `<span class="tk-miss">${esc(miss)}</span>` : `<button class="act sm good" data-tk="research" data-k="${k}">${IC('ic-tec')}${T('hud3.tk.pesquisar')}</button>`}</div></div>`; }
+    h += '</div><h3>' + T('hud3.tk.modulos') + '</h3><div class="tk-grid">';
+    for (const { def, m } of MODS()) { const mine = sim.ents.filter(e => e.alive && e.owner === human && e.def === def && e.built); const inst = mine.filter(e => e.mod).length, up = mine.filter(e => e.upT > 0).length; const lk = TR(S.lockReason(sim, human, 'module', def));
+      h += `<div class="tk-card ${inst && inst === mine.length ? 'done' : lk ? 'lk' : ''}"><div class="tc-h">${lazyImg(def)}<b>${esc(DI().modulo(def))}</b><span class="tk-era-b">${T('hud3.tk.era-b', { r: S.ERAS[m.era || 1].roman })}</span></div><p>${esc(DI().moduloDesc(def))} <span class="muted">· ${esc(T('hud3.tk.mod-em', { x: nBld(def) }))}</span></p><div class="tc-f"><span>${costStr(m.cost)} · ${IC('ic-relogio')}${m.time} s</span><span class="small">${mine.length ? T('hud3.tk.mod-com', { i: inst, t: mine.length }) + (up ? ' · ' + T('hud3.tk.mod-instalando', { u: up }) : '') : esc(T('hud3.tk.mod-nenhum', { x: nBld(def) }))}</span>${lk ? `<span class="tk-lock">${IC('ic-cadeado')}${esc(lk)}</span>` : mine.some(e => !e.mod && !(e.upT > 0)) ? `<button class="act sm" data-tk="pickmod" data-def="${def}">${IC('ic-construir')}${esc(T('hud3.tk.escolher', { x: nBld(def) }))}</button>` : ''}</div></div>`; }
+    h += '</div><h3>' + T('hud3.tk.poder') + '</h3><div class="tk-grid">';
+    { const a = S.ASCENSION[p.faction]; if (a) { const lk = p.ascended ? null : !lab ? T('hud3.tk.req-lab') : er < 3 ? T('hud3.tk.req-era3') : null; const miss = !p.ascended && !lk && missing(a.cost);
+      h += `<div class="tk-card asc ${p.ascended ? 'done' : lk ? 'lk' : ''}"><div class="tc-h">${IC('ic-super', 'tci')}<b>${esc(T('hud3.tk.ascensao', { x: DI().ascensao(p.faction) }))}</b><span class="tk-era-b">${T('hud3.tk.era-b', { r: 'III' })}</span></div><p>${esc(DI().ascensaoDesc(p.faction))}</p><div class="tc-f"><span>${costStr(a.cost)} · ${T('hud3.tk.instantanea')}</span>${p.ascended ? '<span class="tk-ok">' + T('hud3.tk.alcancada') + '</span>' : lk ? `<span class="tk-lock">${IC('ic-cadeado')}${esc(lk)}</span>` : miss ? `<span class="tk-miss">${esc(miss)}</span>` : `<button class="act sm good" data-tk="ascend">${IC('ic-super')}${T('hud3.tk.ascender')}</button>`}</div></div>`; } }
+    { const cd = Math.max(0, p.superCd - sim.time); const lk = !lab ? T('hud3.tk.req-lab') : er < 3 ? T('hud3.tk.req-era3') : null; const miss = !lk && !cd && missing(S.SUPER_COST);
+      h += `<div class="tk-card sup ${lk ? 'lk' : ''}"><div class="tc-h">${IC('ic-super', 'tci')}<b>${esc(T('hud3.tk.superarma', { x: DI().superarma(p.faction) }))}</b><span class="tk-era-b">${T('hud3.tk.era-b', { r: 'III' })}</span></div><p>${esc(DI().superarmaDesc(p.faction))}</p><div class="tc-f"><span>${costStr(S.SUPER_COST)} · ${T('hud3.tk.recarga-min', { m: Math.round(S.SUPER_CD / 60) })}</span>${lk ? `<span class="tk-lock">${IC('ic-cadeado')}${esc(lk)}</span>` : cd ? `<span class="tk-miss" data-tk-cd>${T('hud3.tk.recarga', { t: mmss(cd) })}</span>` : miss ? `<span class="tk-miss">${esc(miss)}</span>` : '<span class="tk-ok">' + T('hud3.tk.super-pronta') + '</span>'}</div></div>`; }
     h += '</div>'; return h; }
   function techRender(force) { if (!TM || TM.hidden) return; const key = techState(); const p = me();
     if (force || key !== TV.key) { TV.key = key; const sb = TM.querySelector('.box'); const st = sb ? sb.scrollTop : 0; TB.innerHTML = techHTML(); if (sb) sb.scrollTop = st; /* a janela rola, não o corpo */ TV.evo = TB.querySelector('[data-tk-evo] i'); TV.evot = TB.querySelector('[data-tk-evot]'); TV.cd = TB.querySelector('[data-tk-cd]'); TV.tr = {}; TB.querySelectorAll('[data-tr]').forEach(b => { TV.tr[b.dataset.tr] = b; }); iconsLater(); return; }
     const nx = S.ERAS[(p.era || 1) + 1]; if (nx && p.evolveT > 0) { setW(TV.evo, 100 * (1 - p.evolveT / nx.time)); setT(TV.evot, Math.ceil(p.evolveT) + ' s'); }
-    if (TV.cd) setT(TV.cd, 'recarga ' + mmss(Math.max(0, p.superCd - sim.time)));
+    if (TV.cd) setT(TV.cd, T('hud3.tk.recarga', { t: mmss(Math.max(0, p.superCd - sim.time)) }));
     if (TV.tr) for (const k of RES3) setT(TV.tr[k], fmt(p.res[k])); } /* os recursos do alto andam no lugar */
   function iconsLater() { /* retratos 3D aos poucos (dois por quadro), para abrir a tela sem travar */ const imgs = [...TB.querySelectorAll('img[data-ico]')]; let i = 0; const step = () => { if (TM.hidden) return; for (let k = 0; k < 2 && i < imgs.length; k++, i++) { const im = imgs[i]; const u = icon(im.dataset.ico); if (u) im.src = u; im.removeAttribute('data-ico'); } if (i < imgs.length) requestAnimationFrame(step); }; requestAnimationFrame(step); }
   function openTech() { if (!TM) return; closeSheet(); TM.hidden = false; TV.key = ''; techRender(true); const c = TM.querySelector('.mclose'); if (c && !isTouch()) c.focus({ preventScroll: true }); }
   function closeTech() { if (TM) TM.hidden = true; }
   H.openTech = openTech; H.toggleTech = () => { if (TM && !TM.hidden) closeTech(); else openTech(); }; H.techOpen = () => !!TM && !TM.hidden;
   if (TB) TB.addEventListener('click', ev => { const b = ev.target.closest('[data-tk]'); if (!b || b.disabled) return; const k = b.dataset.tk;
-    if (k === 'evolve') { I.cmd({ t: 'evolve' }); notice('Evolução pedida ao Núcleo'); }
+    if (k === 'evolve') { I.cmd({ t: 'evolve' }); notice(T('hud3.tk.evolucao-pedida')); }
     else if (k === 'research') I.cmd({ t: 'research', key: b.dataset.k });
     else if (k === 'ascend') I.cmd({ t: 'ascend' });
-    else if (k === 'pickmod') { const e = sim.ents.find(x => x.alive && x.owner === human && x.def === b.dataset.def && x.built && !x.mod && !(x.upT > 0)); if (e) { closeTech(); I.select([e.id]); I.center(e.x, e.y); notice('Toque em Módulo no painel para instalar'); } }
+    else if (k === 'pickmod') { const e = sim.ents.find(x => x.alive && x.owner === human && x.def === b.dataset.def && x.built && !x.mod && !(x.upT > 0)); if (e) { closeTech(); I.select([e.id]); I.center(e.x, e.y); notice(T('hud3.tk.toque-modulo')); } }
     setTimeout(() => techRender(true), 120); });
   if (TM) TM.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeTech));
 
   // ====== Ajustes da partida (acessibilidade) ======
-  const AM = $('a11y'); if (AM) { const body = $('a11y-body'); body.innerHTML = a11yHTML('pt') + '<p class="small muted h3note">As cores dos jogadores (paleta e cores relativas) mudam na próxima partida (os modelos 3D já foram montados com as cores atuais); as dos recursos, a escala, as legendas e o destaque dos inimigos mudam na hora.</p>'; bindA11y(body, () => { GV.key = ''; groupsRender(); }); AM.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => { AM.hidden = true; })); }
+  const AM = $('a11y'); const a11yBody = () => { const body = $('a11y-body'); body.innerHTML = a11yHTML('pt') + '<p class="small muted h3note">' + T('hud3.a11y.nota') + '</p>'; bindA11y(body, () => { GV.key = ''; groupsRender(); }); }; /* 5.0c: refeito na troca de idioma */
+  if (AM) { a11yBody(); AM.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => { AM.hidden = true; })); }
   H.openA11y = () => { if (AM) { closeSheet(); AM.hidden = false; } };
   H.modalOpen = () => (TM && !TM.hidden) || (AM && !AM.hidden);
   H.closeModals = () => { closeTech(); if (AM) AM.hidden = true; closeSheet(); wheelClose(false); };
@@ -373,7 +399,17 @@ function mount(ctx) {
   H.reapply = s => { const cols = playerColors(s, human); if (cols) s.players.forEach((p, i) => { p.color = cols[i]; }); }; /* volta à sala (multiplayer): a fotografia do anfitrião traz as cores dele (5.0a.1: e as relativas são de cada um) */
   H._al = AL; H._w = W; /* testes (work/h3.cjs e work/toque.cjs): avisos e estado da roda */
   groupsRender(); syncBadge(); /* a visão do exército sobe no primeiro quadro da partida (os retratos 3D precisam do carregamento) */
-  if (alist && !AL.list.length) alist.innerHTML = '<div class="aempty">Nenhum alerta ainda. Ataques, construções e unidades prontas, recursos esgotados e piratas aparecem aqui; toque ou clique para ir até lá.</div>';
+  if (alist && !AL.list.length) alist.innerHTML = '<div class="aempty">' + T('hud3.alc.vazio') + '</div>';
+  /* 5.0c: troca de idioma sem recarregar: alertas (refeitos do texto original), exército, grupos, pesquisa aberta, Ajustes e o nome da legenda */
+  if (langH) window.removeEventListener('ard-idioma', langH);
+  langH = () => {
+    for (const a of AL.list) { if (a.el) a.el.innerHTML = rowHTML(a); if (a.act) a.act.innerHTML = IC('ic-' + (a.act.dataset.res || 'minerio')) + T('hud3.alc.mandar-coletores'); }
+    const em = alist && alist.querySelector('.aempty'); if (em) em.textContent = T('hud3.alc.vazio'); syncBadge();
+    AV.key = null; armyRender(true); GV.key = null; groupsRender(); if (TM && !TM.hidden) { TV.key = ''; techRender(true); }
+    if (AM) a11yBody(); if (W.open) wheelClose(false);
+    if (capCtx && capCtx.who) setT(capCtx.who, capCtx.name || T('hud3.cap.comando'));
+  };
+  window.addEventListener('ard-idioma', langH);
   return H;
 }
 

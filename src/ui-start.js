@@ -20,6 +20,12 @@ const SEG_LABELS = {
   'camp-diff': { fenda: ['Fenda', 'sem pausa'] },
 };
 const MAP_TXT = { fenda: 'Quatro biomas e o abismo da Fenda no centro.', cinturao: 'Plataformas sobre o espaço, ligadas por pontes.' };
+/* 5.0c: idiomas — LORE, SEG_LABELS e MAP_TXT ficam como o texto pt-BR de reserva; o que aparece sai de ARD.t (chaves vitrine.*) e os nomes da simulação de ARD.i18n.d */
+const I18 = () => ARD.i18n.d;
+const lore = (id, campo, pt) => ARD.t('vitrine.lore.' + id + '.' + campo, null, pt);
+function segLabel(id, o) { const v = o.value, lb = (SEG_LABELS[id] || {})[v];
+  if (lb) { if (id === 'opt-opp') return [lb[0], ARD.t('vitrine.seg.ias', { n: +v }, lb[1])]; if (id === 'opt-room') return [lb[0], ARD.t('vitrine.seg.jogadores', null, lb[1])]; if (id === 'camp-diff') return [I18().dificuldade(v), ARD.t('vitrine.seg.sem-pausa', null, lb[1])]; return lb; }
+  if (/-diff$/.test(id)) return [I18().dificuldade(v)]; return [ARD.tr(o.textContent.replace(/\s*\(.*\)$/, ''))]; }
 let D = null, st = null;
 const G3 = () => { const el = document.getElementById('start'); return !el || el.hidden; }; /* a partida já começou (ou não há tela inicial) */
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -34,14 +40,15 @@ function watchValue(sel, cb) { const desc = Object.getOwnPropertyDescriptor(HTML
 function segmented(sel) {
   if (!sel || sel.dataset.segDone) return; sel.dataset.segDone = '1';
   const wrap = document.createElement('div'); wrap.className = 'seg'; wrap.setAttribute('role', 'radiogroup');
-  const lab = document.querySelector('label[for="' + sel.id + '"]'); if (lab) wrap.setAttribute('aria-label', lab.textContent.trim());
-  const L = SEG_LABELS[sel.id] || {};
+  const lab = document.querySelector('label[for="' + sel.id + '"]');
   for (const o of sel.options) { const b = document.createElement('button'); b.type = 'button'; b.dataset.v = o.value; b.setAttribute('role', 'radio');
-    const lb = L[o.value]; b.innerHTML = lb ? esc(lb[0]) + '<small>' + esc(lb[1]) + '</small>' : esc(o.textContent.replace(/\s*\(.*\)$/, ''));
-    b.title = o.textContent; b.addEventListener('click', () => { if (sel.disabled) return; sel.value = o.value; sel.dispatchEvent(new Event('change', { bubbles: true })); sync(); }); wrap.appendChild(b); }
+    b.addEventListener('click', () => { if (sel.disabled) return; sel.value = o.value; sel.dispatchEvent(new Event('change', { bubbles: true })); sync(); }); wrap.appendChild(b); }
+  /* 5.0c: rótulos no idioma atual; refeitos na troca de idioma (o <label> e as <option> já vêm traduzidos pelo i18n) */
+  const rotulos = () => { if (lab) wrap.setAttribute('aria-label', lab.textContent.trim()); for (const b of wrap.children) { const o = [...sel.options].find(x => x.value === b.dataset.v); if (!o) continue; const lb = segLabel(sel.id, o); b.innerHTML = esc(lb[0]) + (lb[1] ? '<small>' + esc(lb[1]) + '</small>' : ''); b.title = ARD.tr(o.textContent); } };
   const sync = () => { for (const b of wrap.children) { const on = b.dataset.v === sel.value; b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false'); b.disabled = sel.disabled; } };
   sel.classList.add('seg-src'); sel.tabIndex = -1; sel.setAttribute('aria-hidden', 'true'); sel.after(wrap); sel.addEventListener('change', sync); watchValue(sel, sync);
-  new MutationObserver(sync).observe(sel, { attributes: true, attributeFilter: ['disabled'] }); sync();
+  new MutationObserver(sync).observe(sel, { attributes: true, attributeFilter: ['disabled'] }); rotulos(); sync();
+  return rotulos;
 }
 
 // ---------- cartões de mapa: miniatura tática desenhada no canvas ----------
@@ -79,27 +86,31 @@ function drawMap(cv, kind, nPlayers, color) {
 function base(c, x, y, col, me) { c.save(); c.translate(x, y); if (me) { c.shadowColor = col; c.shadowBlur = 10; } c.fillStyle = col; c.beginPath(); c.moveTo(0, -7); c.lineTo(7, 0); c.lineTo(0, 7); c.lineTo(-7, 0); c.closePath(); c.fill(); c.shadowBlur = 0; c.strokeStyle = 'rgba(0,0,0,.6)'; c.lineWidth = 1.5; c.stroke(); if (me) { c.strokeStyle = col; c.lineWidth = 1.2; c.beginPath(); c.arc(0, 0, 11, 0, Math.PI * 2); c.stroke(); } c.restore(); }
 function mapCards(sel) {
   if (!sel || sel.dataset.mapDone) return; sel.dataset.mapDone = '1';
-  const wrap = document.createElement('div'); wrap.className = 'mapcards'; wrap.setAttribute('role', 'radiogroup'); wrap.setAttribute('aria-label', 'Mapa');
+  const wrap = document.createElement('div'); wrap.className = 'mapcards'; wrap.setAttribute('role', 'radiogroup');
   const cards = [];
   for (const o of sel.options) { const b = document.createElement('button'); b.type = 'button'; b.className = 'mapc'; b.dataset.v = o.value; b.setAttribute('role', 'radio');
-    const name = o.textContent.replace(/\s*\(.*\)$/, ''); b.innerHTML = '<canvas aria-hidden="true"></canvas><b>' + esc(name) + '</b><span>' + esc(MAP_TXT[o.value] || o.textContent) + '</span>'; b.title = o.textContent;
+    b.innerHTML = '<canvas aria-hidden="true"></canvas><b></b><span></span>'; /* 5.0c: nome e descrição em rotulos() */
     b.addEventListener('click', () => { if (sel.disabled) return; sel.value = o.value; sel.dispatchEvent(new Event('change', { bubbles: true })); sync(); }); wrap.appendChild(b); cards.push(b); }
+  /* 5.0c: nome do mapa pela API (a miniatura no canvas não tem texto e não muda), descrição pelas chaves vitrine.mapa.*; refeitos na troca de idioma */
+  const rotulos = () => { wrap.setAttribute('aria-label', ARD.t('vitrine.mapa.aria')); for (const b of cards) { const o = [...sel.options].find(x => x.value === b.dataset.v); if (!o) continue; const name = o.textContent.replace(/\s*\(.*\)$/, '');
+    b.querySelector('b').textContent = (ARD.sim.MAPS || {})[o.value] ? I18().mapa(o.value) : ARD.tr(name); b.querySelector('span').textContent = ARD.t('vitrine.mapa.' + o.value, null, MAP_TXT[o.value] || o.textContent); b.title = ARD.tr(o.textContent); } };
   const sync = () => { for (const b of cards) { const on = b.dataset.v === sel.value; b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false'); } };
   const draw = () => { const n = sel.id === 'opt-map-mp' ? (parseInt((document.getElementById('opt-room') || {}).value, 10) || 2) : (parseInt((document.getElementById('opt-opp') || {}).value, 10) || 2) + 1; const col = getComputedStyle(document.documentElement).getPropertyValue('--race').trim() || '#FF7733'; for (const b of cards) drawMap(b.querySelector('canvas'), b.dataset.v, n, col); };
-  sel.classList.add('seg-src'); sel.tabIndex = -1; sel.setAttribute('aria-hidden', 'true'); sel.after(wrap); sel.addEventListener('change', sync); watchValue(sel, sync); sync(); draw();
-  return { draw, sync };
+  sel.classList.add('seg-src'); sel.tabIndex = -1; sel.setAttribute('aria-hidden', 'true'); sel.after(wrap); sel.addEventListener('change', sync); watchValue(sel, sync); rotulos(); sync(); draw();
+  return { draw, sync, rotulos };
 }
 
 // ---------- vitrine da Raça ----------
 function factsHTML(id) { const S = ARD.sim, f = S.FACTIONS[id], L = LORE[id] || {};
   const fact = (ic, k, v, tip) => `<div class="sc-fact"><svg aria-hidden="true"><use href="#${ic}"/></svg><span>${k}</span><b>${esc(v)}${tip ? '<i class="wt"> · ' + esc(tip) + '</i>' : ''}</b></div>`;
-  return fact('ic-lider', 'Líder', D.LEADER_NAME[id] || '—') + fact('ic-mundo', 'Mundo natal', L.world || '—', L.worldTip) + fact('ic-super', 'Superarma', f.superName) + fact('ic-pirata', 'Pirata', f.pirateName); }
+  return fact('ic-lider', ARD.t('vitrine.fato.lider'), D.LEADER_NAME[id] || '—') + fact('ic-mundo', ARD.t('vitrine.fato.mundo'), L.world || '—', L.worldTip ? lore(id, 'mundo-tip', L.worldTip) : '') + fact('ic-super', ARD.t('vitrine.fato.superarma'), I18().superarma(id)) + fact('ic-pirata', ARD.t('vitrine.fato.pirata'), I18().unidade(id, 'pirata')); } /* 5.0c: rótulos e nomes no idioma atual (líder e mundo são nomes próprios) */
 function unitsHTML(id) { const S = ARD.sim, L = LORE[id] || {}; return (L.units || []).filter(d => S.UNITS[d]).map(d => { const u = S.UNITS[d]; const where = ['quartel', 'fabrica', 'hangar'].find(b => S.producesFor(b, id).includes(d));
-  const th = st && st.thumbs[id + '|' + d]; return `<div class="sc-unit" data-def="${d}"><div class="ut">${th ? `<img alt="" src="${th}">` : `<svg aria-hidden="true"><use href="#${CLS_ICON[u.cls] || 'ic-inf'}"/></svg>`}</div><b>${esc(S.unitName(id, d))}</b><span>${esc(S.CLASS_NAMES[u.cls] || '')}${where ? ' · ' + esc(S.BUILDINGS[where].name) : ''}${u.era > 1 ? ' · Era ' + S.ERAS[u.era].roman : ''}</span></div>`; }).join(''); }
+  const th = st && st.thumbs[id + '|' + d]; return `<div class="sc-unit" data-def="${d}"><div class="ut">${th ? `<img alt="" src="${th}">` : `<svg aria-hidden="true"><use href="#${CLS_ICON[u.cls] || 'ic-inf'}"/></svg>`}</div><b>${esc(I18().unidade(id, d))}</b><span>${esc(I18().classe(u.cls))}${where ? ' · ' + esc(I18().construcao(where)) : ''}${u.era > 1 ? ' · Era ' + S.ERAS[u.era].roman : ''}</span></div>`; }).join(''); } /* 5.0c: nome, classe e construção pela API; "Era II" é igual nos três idiomas */
 function fillInfo(id) { const S = ARD.sim, f = S.FACTIONS[id], L = LORE[id] || {}; const $ = D.$;
-  $('sc-kicker').textContent = 'Raça ' + (RACES.indexOf(id) + 1) + ' de 5 · ' + (L.kicker || f.short);
-  const nm = f.name, sh = f.short || nm; $('sc-name').innerHTML = nm !== sh && nm.endsWith(sh) ? '<small>' + esc(nm.slice(0, nm.length - sh.length).trim()) + '</small>' + esc(sh) : esc(nm);
-  $('sc-tag').textContent = f.tagline; $('sc-facts').innerHTML = factsHTML(id); $('sc-style').innerHTML = (L.style || []).map(t => '<span>' + esc(t) + '</span>').join(''); $('sc-units').innerHTML = unitsHTML(id);
+  $('sc-kicker').textContent = ARD.t('vitrine.kicker', { i: RACES.indexOf(id) + 1, total: RACES.length, tipo: L.kicker ? lore(id, 'kicker', L.kicker) : I18().racaCurto(id) }); /* 5.0c */
+  /* 5.0c: o nome longo da Raça pela API; a parte descritiva vai pequena em cima (pt/es: "Consórcio" antes de Vehnar; en: "Consortium" depois) */
+  const nm = I18().raca(id), sh = I18().racaCurto(id) || nm; $('sc-name').innerHTML = nm !== sh && nm.endsWith(sh) ? '<small>' + esc(nm.slice(0, nm.length - sh.length).trim()) + '</small>' + esc(sh) : nm !== sh && nm.startsWith(sh) ? '<small>' + esc(nm.slice(sh.length).trim()) + '</small>' + esc(sh) : esc(nm);
+  $('sc-tag').textContent = I18().racaLema(id); $('sc-facts').innerHTML = factsHTML(id); $('sc-style').innerHTML = (L.style || []).map((t, i) => '<span>' + esc(lore(id, 'estilo.' + i, t)) + '</span>').join(''); $('sc-units').innerHTML = unitsHTML(id);
   const em = $('sc-emblem-use'); if (em) em.setAttribute('href', '#em-' + id); }
 /* busto 3D grande (computador): um canvas por Raça, montado na primeira vez e guardado; o de fora fica escondido e não desenha */
 function bustFor(id) { if (!st.use3d || st.holo) return null; /* 5.0b: com a Sala de Comando o líder é o holograma dela */ if (st.busts[id]) return st.busts[id];
@@ -145,18 +156,23 @@ function renderThumb(race, def) { const THREE = window.THREE, ME = ARD.meshes, A
 function mount(deps) {
   D = deps; const $ = D.$; const prefs = D.prefs || {}; const params = D.params;
   const pick = RACES.includes(prefs.faction) ? prefs.faction : 'vehnar';
-  st = { sel: null, busts: {}, thumbs: {}, tq: [], maps: [], use3d: false, cta: null };
+  st = { sel: null, busts: {}, thumbs: {}, tq: [], maps: [], segs: [], use3d: false, cta: null };
   /* fichas */
   const wrap = $('fac-cards'); wrap.innerHTML = '';
   RACES.forEach((id, i) => { const f = ARD.sim.FACTIONS[id]; if (!f) return; const el = document.createElement('label'); el.className = 'fac-card'; el.dataset.id = id; el.style.setProperty('--rc', D.RACE_COLORS[id] || '#FF5E3A');
     const ins = ARD.ART && ARD.ART.insignia && ARD.ART.insignia[id];
-    el.innerHTML = `<input type="radio" name="fac" value="${id}" ${pick === id ? 'checked' : ''} aria-label="${esc(f.name)}">${ins ? `<img class="fi" src="${ins}" alt="">` : `<svg class="fi" style="color:${D.RACE_COLORS[id]}" aria-hidden="true"><use href="#em-${id}"/></svg>`}<span class="fn"><b>${esc(f.short)}</b><small>${esc(D.LEADER_NAME[id] || '')}</small></span><span class="fk" aria-hidden="true">${i + 1}</span>`;
+    el.innerHTML = `<input type="radio" name="fac" value="${id}" ${pick === id ? 'checked' : ''} aria-label="${esc(I18().raca(id))}">${ins ? `<img class="fi" src="${ins}" alt="">` : `<svg class="fi" style="color:${D.RACE_COLORS[id]}" aria-hidden="true"><use href="#em-${id}"/></svg>`}<span class="fn"><b>${esc(I18().racaCurto(id))}</b><small>${esc(D.LEADER_NAME[id] || '')}</small></span><span class="fk" aria-hidden="true">${i + 1}</span>`; /* 5.0c: nome da Raça pela API */
     el.querySelector('input').addEventListener('change', () => { select(id); try { if (ARD.audio && ARD.audio.enabled && !(ARD.salaSom && ARD.salaSom.ativo())) ARD.audio.sfx('click', 0.5); /* 5.0b: com o som 3D da Sala o clique soa com posição */ } catch (e) {} if (D.onRace) try { D.onRace(id); } catch (e) {} });
     wrap.appendChild(el); });
   st.want3d = !!(ARD.leaders3d && !coarse() && params.get('logo') !== 'estatico'); st.use3d = false; /* 4.3k: o 3D liga só depois do load (abaixo): ?autostart, ?bench e missões não pagam nada */
   /* teclas 1–5 escolhem a Raça (fora dos campos de texto) */
   st.onKey = e => { if ($('start').hidden || e.ctrlKey || e.metaKey || e.altKey) return; const tg = e.target; if (tg && /^(INPUT|SELECT|TEXTAREA)$/.test(tg.tagName)) return; if (document.querySelector('.modal:not([hidden])')) return; const n = parseInt(e.key, 10); if (n >= 1 && n <= 5) { const r = wrap.querySelector('input[value="' + RACES[n - 1] + '"]'); if (r && !r.checked) { r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); } } };
   document.addEventListener('keydown', st.onKey);
+  /* 5.0c: troca de idioma sem recarregar — vitrine, fichas, segmentados e cartões de mapa se refazem (o i18n já traduziu o HTML antes do aviso) */
+  st.onIdioma = () => { if (!st) return; if (st.sel) fillInfo(st.sel);
+    wrap.querySelectorAll('.fac-card').forEach(el => { const id = el.dataset.id, inp = el.querySelector('input'), b = el.querySelector('.fn b'); if (inp) inp.setAttribute('aria-label', I18().raca(id)); if (b) b.textContent = I18().racaCurto(id); });
+    for (const r of st.segs) try { r(); } catch (e) {} for (const m of st.maps) try { m.rotulos(); } catch (e) {} if (st.ctaUpd) setTimeout(st.ctaUpd, 0); /* o botão fixo copia o "Iniciar partida" da aba Jogar depois que o main.js trocar o dele */ };
+  window.addEventListener('ard-idioma', st.onIdioma);
   /* o busto olha para o ponteiro */
   const stage = document.querySelector('.showcase'); if (stage) stage.addEventListener('pointermove', ev => { const b = st && st.busts[st.sel]; if (!b) return; const r = b.cv.getBoundingClientRect(); ARD.leaders3d.gaze(b.it, (ev.clientX - (r.left + r.width / 2)) / 260, -(ev.clientY - (r.top + r.height * 0.45)) / 200, 900); });
   select(pick, true);
@@ -168,14 +184,14 @@ function mount(deps) {
 }
 /* depois que initStart preencheu os valores: segmentados, mapas e o botão fixo do celular */
 function enhance() { if (!st) return; const $ = D.$;
-  document.querySelectorAll('select[data-seg]').forEach(segmented);
+  document.querySelectorAll('select[data-seg]').forEach(s => { const r = segmented(s); if (r) st.segs.push(r); }); /* 5.0c: guarda os rótulos para a troca de idioma */
   document.querySelectorAll('select[data-mapcards]').forEach(s => { const m = mapCards(s); if (m) st.maps.push(m); });
   for (const id of ['opt-opp', 'opt-room']) { const s = $(id); if (s) s.addEventListener('change', () => { for (const m of st.maps) m.draw(); }); }
   /* celular: "Iniciar partida" fixo embaixo enquanto o botão da aba Jogar está fora da tela */
-  const btn = $('btn-start'); if (btn && 'IntersectionObserver' in window) { const cta = document.createElement('button'); cta.id = 'st-cta'; cta.className = 'btn primary big'; cta.type = 'button'; cta.hidden = true; cta.textContent = 'Iniciar partida';
+  const btn = $('btn-start'); if (btn && 'IntersectionObserver' in window) { const cta = document.createElement('button'); cta.id = 'st-cta'; cta.className = 'btn primary big'; cta.type = 'button'; cta.hidden = true; cta.textContent = ARD.t('vitrine.iniciar'); cta.setAttribute('data-i18n', 'vitrine.iniciar') /* 5.0c: troca junto com o idioma */;
     cta.addEventListener('click', () => btn.click()); $('start').appendChild(cta); st.cta = cta; let vis = true;
     const upd = () => { const pane = document.querySelector('.cpane[data-pane=jogar]'); const show = !vis && pane && !pane.hidden && matchMedia('(max-width: 899px)').matches && !$('start').hidden; cta.hidden = !show; if (show) cta.textContent = btn.textContent; };
-    st.io = new IntersectionObserver(es => { vis = es[es.length - 1].isIntersecting; upd(); }); st.io.observe(btn); document.querySelectorAll('.ctab').forEach(t => t.addEventListener('click', () => setTimeout(upd, 30))); addEventListener('resize', upd); }
+    st.ctaUpd = upd; /* 5.0c */ st.io = new IntersectionObserver(es => { vis = es[es.length - 1].isIntersecting; upd(); }); st.io.observe(btn); document.querySelectorAll('.ctab').forEach(t => t.addEventListener('click', () => setTimeout(upd, 30))); addEventListener('resize', upd); }
   document.querySelectorAll('.ctab').forEach(t => t.addEventListener('click', () => { if (ARD.sala) try { ARD.sala.aba(t.dataset.tab); } catch (e) {} })); /* 5.0b: cada aba tem o seu enquadramento na Sala */
   /* 5.0b: Academia de Comando, explorar a base, mesa tática e som da tela inicial */
   { const ac = $('btn-academia'); if (ac) ac.addEventListener('click', () => { if (ARD.salaAcademia) ARD.salaAcademia.abrir(); });
@@ -184,7 +200,7 @@ function enhance() { if (!st) return; const $ = D.$;
     const AU = ARD.audio, os = $('opt-som'), ov = $('opt-voz'), bs = $('btn-som-inicio'); const sync = () => { if (!AU) return; if (os) os.checked = AU.enabled; if (ov) ov.checked = AU.voice; if (bs) bs.setAttribute('aria-pressed', AU.enabled ? 'true' : 'false'); };
     const som = on => { if (!AU) return; AU.setEnabled(on); if (on) { AU.init(); AU.resume(); } if (ARD.salaSom) { if (ARD.salaSom.ativo()) ARD.salaSom.ligado(on); else if (on && ARD.sala) ARD.sala.som(); } sync(); };
     if (os) os.addEventListener('change', () => som(os.checked)); if (bs) bs.addEventListener('click', () => som(!AU.enabled)); if (ov) ov.addEventListener('change', () => { AU.setVoice(ov.checked); sync(); }); sync(); } }
-function stop() { if (ARD.sala) try { ARD.sala.stop({ partida: true }); } catch (e) {} /* 5.0b: a Sala solta o laço e a GPU antes da partida (sem devolver o busto da vitrine) */ if (ARD.salaPoster) try { ARD.salaPoster.parar(); } catch (e) {} /* 5.0a.1: o pôster e o movimento 2D saem junto */ if (!st) return; const s = st; st = null; if (s.onKey) document.removeEventListener('keydown', s.onKey); if (s.io) s.io.disconnect(); if (s.cta) s.cta.hidden = true; if (s.tr) { try { s.tr.r.dispose(); s.tr.r.forceContextLoss(); } catch (e) {} } }
+function stop() { if (ARD.sala) try { ARD.sala.stop({ partida: true }); } catch (e) {} /* 5.0b: a Sala solta o laço e a GPU antes da partida (sem devolver o busto da vitrine) */ if (ARD.salaPoster) try { ARD.salaPoster.parar(); } catch (e) {} /* 5.0a.1: o pôster e o movimento 2D saem junto */ if (!st) return; const s = st; st = null; if (s.onKey) document.removeEventListener('keydown', s.onKey); if (s.onIdioma) window.removeEventListener('ard-idioma', s.onIdioma); /* 5.0c */ if (s.io) s.io.disconnect(); if (s.cta) s.cta.hidden = true; if (s.tr) { try { s.tr.r.dispose(); s.tr.r.forceContextLoss(); } catch (e) {} } }
 /* 5.0b: a Sala avisa quando o holograma está à vista (o retrato some) ou quando saiu (o busto 3D de antes volta, se couber) */
 function salaPronta(on) { if (!st) return; if (on) { st.holo = true; for (const k in st.busts) st.busts[k].cv.classList.add('out'); } else if (st.holo) { st.holo = !!(ARD.salaPoster && ARD.salaPoster.ativo()); /* 5.0a.1: com o pôster no fundo, o líder segue nele */ if (!st.holo && st.use3d && st.sel) showBust(st.sel, true); } }
 ARD.uiStart = { mount, enhance, stop, LORE, salaPronta, select: id => select(id), info: () => st ? { sel: st.sel, busts: Object.keys(st.busts), thumbs: Object.keys(st.thumbs), use3d: st.use3d } : null };

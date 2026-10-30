@@ -12,7 +12,7 @@ function create(o) {
   I.center = function (x, y) { cam.x = x; cam.y = y; clampCam(); };
   I.confirmPlace = function () { // 4.1a: ✓ da barra de posicionamento no toque
     const g = view.ghost; if (I.mode !== 'build' || !g) return; const ok = S.canBuild(sim, human, g.def, g.x, g.y);
-    if (!ok.ok) { ui.notice(ok.why); return; } if (!S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost)) { ui.notice('Recursos insuficientes'); return; }
+    if (!ok.ok) { ui.notice(ARD.tr(ok.why)); return; } if (!S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost)) { ui.notice(ARD.t('input.sem-recursos')); return; } /* 5.0c: o motivo vem da simulação em pt-BR; ARD.tr traduz na hora de mostrar */
     cmd({ t: 'build', def: g.def, x: g.x, y: g.y }); view.marker = { x: g.x, y: g.y, t: R.time, col: '#7FE3A1' }; I.setMode('normal'); };
   I.setMode = function (mode, data) {
     I.mode = mode; view.mode = mode; view.ghost = null;
@@ -61,9 +61,9 @@ function create(o) {
   }
   function contextCommand(wx, wy, sx, sy) {
     const units = ownSelectedUnits(); let t = pick(sx, sy, I.lastType === 'touch' ? 22 : 10, units.length > 0);
-    if (!units.length) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice('Ponto de reunião definido'); } return; }
+    if (!units.length) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice(ARD.t('input.reuniao')) /* 5.0c */; } return; }
     const ids = units.map(u => u.id);
-    if (t && (t.kind === 'node' || t.kind === 'wreck') && t.amount <= 0) { if (units.some(u => u.def === 'coletor')) ui.notice('Nó esgotado: mande os coletores a outro campo'); t = null; } // 4.2h: nó seco vira ordem de mover
+    if (t && (t.kind === 'node' || t.kind === 'wreck') && t.amount <= 0) { if (units.some(u => u.def === 'coletor')) ui.notice(ARD.t('input.no-esgotado')) /* 5.0c */; t = null; } // 4.2h: nó seco vira ordem de mover
     if (t && (t.kind === 'node' || t.kind === 'wreck')) {
       const eaters = t.kind === 'wreck' && S.FACTIONS[sim.players[human].faction].devour ? units.filter(u => u.def === 'pirata') : []; // Carniceiro (Vorag) devora a carcaça
       if (eaters.length) { cmd({ t: 'devour', ids: eaters.map(u => u.id), target: t.id }); const rest = units.filter(u => u.def !== 'pirata').map(u => u.id); if (rest.length) cmd({ t: 'harvest', ids: rest, target: t.id }); }
@@ -80,7 +80,7 @@ function create(o) {
         if (others.length) cmd({ t: 'attack', ids: others.map(u => u.id), target: t.id });
         view.marker = { x: t.x, y: t.y, t: R.time, col: '#FF5E3A' };
       };
-      if (S.hasPact(sim, human, t.owner)) ui.confirm('Atacar ' + sim.players[t.owner].name + ' quebra o pacto de Não-agressão: você perde a Caução, ganha +20% de dano por 45 s e sua Reputação cai. Quebrar?', () => { cmd({ t: 'break', with: t.owner }); doIt(); });
+      if (S.hasPact(sim, human, t.owner)) ui.confirm(ARD.t('input.quebrar-pacto', { nome: ARD.i18n.d.jogador(sim.players[t.owner].name) }) /* 5.0c: nome da IA pela API; o digitado fica igual */, () => { cmd({ t: 'break', with: t.owner }); doIt(); });
       else doIt();
       return;
     }
@@ -90,9 +90,9 @@ function create(o) {
     const mode = I.mode;
     if (mode === 'build' && view.ghost) {
       const g = view.ghost; const ok = S.canBuild(sim, human, g.def, g.x, g.y);
-      if (S.BUILDINGS[g.def].wall) { if (ok.ok && S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost)) { cmd({ t: 'build', def: g.def, x: g.x, y: g.y, ang: 0 }); if (!shift) I.setMode('normal'); } else ui.notice(ok.ok ? 'Recursos insuficientes' : ok.why); return; }
-      if (!ok.ok) { ui.notice(ok.why); return; }
-      if (!S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost)) { ui.notice('Recursos insuficientes'); return; }
+      if (S.BUILDINGS[g.def].wall) { if (ok.ok && S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost)) { cmd({ t: 'build', def: g.def, x: g.x, y: g.y, ang: 0 }); if (!shift) I.setMode('normal'); } else ui.notice(ok.ok ? ARD.t('input.sem-recursos') : ARD.tr(ok.why)) /* 5.0c */; return; }
+      if (!ok.ok) { ui.notice(ARD.tr(ok.why)) /* 5.0c */; return; }
+      if (!S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost)) { ui.notice(ARD.t('input.sem-recursos')) /* 5.0c */; return; }
       cmd({ t: 'build', def: g.def, x: g.x, y: g.y }); view.marker = { x: g.x, y: g.y, t: R.time, col: '#7FE3A1' };
       if (!shift) I.setMode('normal'); else updateGhost(sx, sy);
       return;
@@ -106,7 +106,7 @@ function create(o) {
       if (!shift && I.lastType !== 'touch') I.setMode('normal'); return;
     }
     if (mode === 'super') { cmd({ t: 'super', x: wx, y: wy }); I.setMode('normal'); return; }
-    if (mode === 'jump') { ui.confirm('Saltar o Núcleo para este ponto? Custa ' + Math.round(S.FACTIONS[sim.players[human].faction].jumpCostFrac * 100) + '% de cada recurso e 60 s de canalização visível a todos.', () => cmd({ t: 'jump', x: wx, y: wy })); I.setMode('normal'); return; }
+    if (mode === 'jump') { ui.confirm(ARD.t('input.salto', { p: Math.round(S.FACTIONS[sim.players[human].faction].jumpCostFrac * 100) }) /* 5.0c */, () => cmd({ t: 'jump', x: wx, y: wy })); I.setMode('normal'); return; }
     if (mode === 'rally') { const b = ownSelectedBuilding(); if (b) cmd({ t: 'rally', id: b.id, x: wx, y: wy }); I.setMode('normal'); return; }
     // normal: select (4.1a: no toque, com unidades selecionadas, a área das suas unidades encolhe para o toque no chão virar movimento)
     const selUnits = I.lastType === 'touch' ? ownSelectedUnits() : []; const t = pick(sx, sy, I.lastType === 'touch' ? (selUnits.length ? 10 : 26) : 8);
@@ -116,7 +116,7 @@ function create(o) {
       if (units.length) { const tc = pick(sx, sy, 10, true); if (tc && (tc.owner !== human && tc.owner >= 0 || tc.kind === 'node' || tc.kind === 'crate' || tc.kind === 'wreck')) { contextCommand(wx, wy, sx, sy); return; } } // 4.2g: tocar num nó com coletores em cima colhe (antes selecionava um coletor e soltava o grupo)
       if (units.length && t && (t.owner !== human && t.owner >= 0 || t.kind === 'node' || t.kind === 'crate' || t.kind === 'wreck')) { contextCommand(wx, wy, sx, sy); return; }
       if (units.length && (!t || (t.owner === human && (t.kind === 'building' || view.sel.has(t.id))))) { cmd({ t: 'move', ids: units.map(u => u.id), x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#E8E2D6' }; return; } // tocar numa construção sua ou no próprio grupo também move
-      if (!units.length && !t) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice('Ponto de reunião definido'); return; } }
+      if (!units.length && !t) { const b = ownSelectedBuilding(); if (b && S.BUILDINGS[b.def].produces) { cmd({ t: 'rally', id: b.id, x: wx, y: wy }); view.marker = { x: wx, y: wy, t: R.time, col: '#F2C230' }; ui.notice(ARD.t('input.reuniao')) /* 5.0c */; return; } }
     }
     if (t && t.kind !== 'node' && t.kind !== 'crate') {
       if (t.owner === human && t.kind === 'unit' && I.lastClickId === t.id && now - I.lastClickT < 350) {
@@ -144,7 +144,7 @@ function create(o) {
     const ents = ids.map(id => sim.byId.get(id)).filter(Boolean);
     const combat = ents.filter(e => e.kind === 'unit' && e.def !== 'coletor'); const nCol = ents.filter(e => e.def === 'coletor').length;
     const dropCol = combat.length && nCol && combat.length >= nCol; // 4.2g: coletores só ficam de fora quando o exército é maioria (antes, 2 soldados no meio tiravam 10 coletores da seleção)
-    setSel((dropCol ? combat : ents).map(e => e.id)); if (dropCol) ui.notice(nCol + (nCol > 1 ? ' coletores ficaram' : ' coletor ficou') + ' de fora: o exército tem prioridade. Duplo clique num coletor seleciona todos na tela.');
+    setSel((dropCol ? combat : ents).map(e => e.id)); if (dropCol) ui.notice(ARD.t('input.coletores-fora', { n: nCol })) /* 5.0c: plural pelo idioma */;
   }
 
   /* 5.0a.1 — dois dedos como num app de mapas: o mapa gira COM os dedos (dedos no sentido horário, cena no sentido horário; antes
@@ -233,7 +233,7 @@ function create(o) {
     if (e.code === 'F3') { e.preventDefault(); if (ui.toggleTech) ui.toggleTech(); return; } /* 5.0b: tela de pesquisa */
     if (e.code === 'F1') { e.preventDefault(); const n = S.nucleoOf(sim, human); if (n) { setSel([n.id]); I.center(n.x, n.y); } return; }
     if (e.code === 'F2') { e.preventDefault(); const ids = []; for (const en of sim.ents) if (en.alive && en.owner === human && en.kind === 'unit' && S.UNITS[en.def].attack) ids.push(en.id); setSel(ids); return; }
-    if (/^Digit[0-9]$/.test(e.code)) { const n = e.code.slice(5); if (e.ctrlKey || e.metaKey) { e.preventDefault(); I.groups[n] = [...view.sel]; ui.notice('Grupo ' + n + ' definido'); if (ui.groupsChanged) ui.groupsChanged(n); /* 5.0b: barra de grupos */ } else { const g = (I.groups[n] || []).filter(id => { const en = sim.byId.get(id); return en && en.alive; }); if (g.length) { setSel(g); const now = performance.now(); if (I.lastGroupKey === n && now - I.lastGroupT < 400) { const en = sim.byId.get(g[0]); if (en) I.center(en.x, en.y); } I.lastGroupKey = n; I.lastGroupT = now; } } return; }
+    if (/^Digit[0-9]$/.test(e.code)) { const n = e.code.slice(5); if (e.ctrlKey || e.metaKey) { e.preventDefault(); I.groups[n] = [...view.sel]; ui.notice(ARD.t('input.grupo', { n })) /* 5.0c */; if (ui.groupsChanged) ui.groupsChanged(n); /* 5.0b: barra de grupos */ } else { const g = (I.groups[n] || []).filter(id => { const en = sim.byId.get(id); return en && en.alive; }); if (g.length) { setSel(g); const now = performance.now(); if (I.lastGroupKey === n && now - I.lastGroupT < 400) { const en = sim.byId.get(g[0]); if (en) I.center(en.x, en.y); } I.lastGroupKey = n; I.lastGroupT = now; } } return; }
     if (k === 'B' && !e.ctrlKey) { I.buildMenu = !I.buildMenu; ui.buildMenuChanged(I.buildMenu); return; }
     if (I.buildMenu && BUILD_KEYS[k]) { I.buildMenu = false; ui.buildMenuChanged(false); I.setMode('build', BUILD_KEYS[k]); return; }
     const b = ownSelectedBuilding(); const units = ownSelectedUnits();

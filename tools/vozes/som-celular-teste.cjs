@@ -33,7 +33,7 @@ function portao(o) {
 }
 
 async function pagina(b, o) { const movel = o.movel !== false; const set = movel ? IPH : WIN;
-  const ctx = await b.newContext(Object.assign({ viewport: movel ? { width: 390, height: 844 } : { width: 1280, height: 800 }, userAgent: set.ua }, movel ? { hasTouch: true, isMobile: o.webkit ? false : true, deviceScaleFactor: o.webkit ? 1 : 2 } : {}));
+  const ctx = await b.newContext(Object.assign({ viewport: movel ? { width: 390, height: 844 } : { width: 1280, height: 800 }, userAgent: set.ua, locale: 'pt-BR' /* 5.0c: o jogo abre no idioma do navegador */ }, movel ? { hasTouch: true, isMobile: o.webkit ? false : true, deviceScaleFactor: o.webkit ? 1 : 2 } : {}));
   await ctx.addInitScript(`(${fake.toString()})(${JSON.stringify(set)})`); await ctx.addInitScript(`(${portao.toString()})(${JSON.stringify({ sessao: o.sessao, engolir: o.engolir || [] })})`);
   const p = await ctx.newPage(); p.setDefaultTimeout(240000); const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.goto(url(o.q || 'fundo=classico&aba=ajustes'), { waitUntil: 'load' }); await p.waitForFunction(() => window.ARD && ARD.audio); await espera(Math.max(700, (set.atraso || 0) + 500));

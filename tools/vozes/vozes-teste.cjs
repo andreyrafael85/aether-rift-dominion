@@ -14,7 +14,7 @@ const espera = ms => new Promise(r => setTimeout(r, ms));
   const out = { rotulo, navegador: ff ? 'firefox' : 'chromium', quando: new Date().toISOString(), conjuntos: {} };
   if (fotos) fs.mkdirSync(root + '/work/fotos', { recursive: true });
   for (const set of SETS) {
-    const movel = /iPhone/.test(set.ua); const ctx = await b.newContext(Object.assign({ viewport: movel ? { width: 390, height: 844 } : { width: 1280, height: 800 }, userAgent: set.ua }, movel && !ff ? { deviceScaleFactor: 2, isMobile: true, hasTouch: true } : {}));
+    const movel = /iPhone/.test(set.ua); const ctx = await b.newContext(Object.assign({ viewport: movel ? { width: 390, height: 844 } : { width: 1280, height: 800 }, userAgent: set.ua, locale: 'pt-BR' /* 5.0c: o jogo abre no idioma do navegador */ }, movel && !ff ? { deviceScaleFactor: 2, isMobile: true, hasTouch: true } : {}));
     await ctx.addInitScript(`(${fake.toString()})(${JSON.stringify(set)})`);
     const p = await ctx.newPage(); p.setDefaultTimeout(120000); const errs = []; p.on('pageerror', e => errs.push(e.message));
     await p.goto(url + '?aba=ajustes', { waitUntil: 'load' }); await p.waitForFunction(() => window.ARD && ARD.audio); await espera(Math.max(900, (set.atraso || 0) + 500));

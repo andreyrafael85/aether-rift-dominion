@@ -1,7 +1,7 @@
 /* Aether Rift: Dominion — service worker (4.0f): campanha e partidas solo funcionam offline depois da primeira visita.
    Build __BUILD__. Página: rede primeiro (atualiza quando online). Three.js, PeerJS e fontes: cache primeiro (URLs versionadas). */
 const CACHE = 'ard-__BUILD__';
-const CORE = ['./', './index.html', './manifest.webmanifest', './assets/hero-belt.webp', './assets/favicon-64.png', './assets/favicon-32.png', './assets/apple-touch-icon.png', './assets/icon-192.png', './assets/icon-512.png', './assets/icon-maskable-512.png'];
+const CORE = ['./', './index.html', './manifest.webmanifest', './assets/hero-belt.webp', './assets/favicon-64.png', './assets/favicon-32.png', './assets/apple-touch-icon.png', './assets/icon-192.png', './assets/icon-512.png', './assets/icon-maskable-512.png', './src/i18n/en.js?v=__BUILD__', './src/i18n/es.js?v=__BUILD__']; /* 5.0c: dicionários do inglês e do espanhol (a troca de idioma vale sem internet) */
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => Promise.all(CORE.map(u => c.add(u).catch(() => null)))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('ard-') && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 const IMMUTABLE = /^https:\/\/(cdn\.jsdelivr\.net\/npm\/(@[a-z0-9-]+\/)?[a-z0-9.-]+@\d[^/]*\/|cdnjs\.cloudflare\.com\/ajax\/libs\/|fonts\.gstatic\.com\/)/; // 4.3b: qualquer pacote do jsDelivr com versão fixa (three, postprocessing, N8AO)

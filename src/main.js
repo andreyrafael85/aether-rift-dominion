@@ -4,7 +4,7 @@
 const S = ARD.sim;
 const $ = id => document.getElementById(id);
 const AU = ARD.audio;
-const fmt = n => Math.floor(n).toLocaleString('pt-BR');
+const fmt = n => ARD.i18n.num(Math.floor(n)); /* 5.0c: número no formato do idioma */
 const mmss = t => { t = Math.max(0, Math.floor(t)); return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 const RES_ICON = { plasma: '<svg class="ri xs"><use href="#ic-plasma"/></svg>', minerio: '<svg class="ri xs"><use href="#ic-minerio"/></svg>', dados: '<svg class="ri xs"><use href="#ic-dados"/></svg>' }; // 4.2f: ícones desenhados (antes ◆ ▣ ◈)
@@ -19,8 +19,9 @@ const setH = (el, v) => { v = !!v; if (el && el.hidden !== v) el.hidden = v; };
 const setOn = (el, cls, v) => { v = !!v; if (el && el.classList.contains(cls) !== v) el.classList.toggle(cls, v); };
 const setV = (el, name, v) => { if (el && el['_' + name] !== v) { el['_' + name] = v; el.style.setProperty(name, v); } }; /* 4.3l: variável CSS só quando muda (sem ler o estilo) */
 const setA = (el, name, v) => { v = String(v); if (el && el.getAttribute(name) !== v) el.setAttribute(name, v); };
+const Tx = (k, v, r) => ARD.t(k, v, r), TRx = s => ARD.tr(s), DN = ARD.i18n.d; /* 5.0c: idiomas (src/i18n.js): texto por chave, texto da simulação traduzido na hora de mostrar e nomes pelo id */
 const RES3 = ['plasma', 'minerio', 'dados'], RES_CLS = { plasma: 'pl', minerio: 'mi', dados: 'da' };
-function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">grátis</span>'; }
+function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">' + Tx('geral.gratis') + '</span>'; } /* 5.0c */
 
 const params = new URLSearchParams(location.search);
 const BUILD = '__BUILD__';
@@ -29,7 +30,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.0b.1';
+const VERSION = '5.0c';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -78,7 +79,7 @@ function initStart() {
   // 4.0f — PWA: service worker (solo offline), botão Instalar, estado da rede e feedback com diagnóstico
   try { if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost') && !/claude\.ai|claudeusercontent|anthropic/.test(location.hostname)) navigator.serviceWorker.register('sw.js').catch(e => console.warn('[ARD] service worker:', e.message)); } catch (e) {}
   { let deferred = null; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; $('btn-install').hidden = false; }); $('btn-install').addEventListener('click', async () => { if (!deferred) return; deferred.prompt(); try { await deferred.userChoice; } catch (e) {} deferred = null; $('btn-install').hidden = true; }); }
-  const netState = () => { const el = $('net-state'); if (el) el.textContent = navigator.onLine ? '' : 'Sem internet: campanha e partidas solo funcionam; o multiplayer precisa de rede.'; }; window.addEventListener('online', netState); window.addEventListener('offline', netState); netState();
+  const netState = () => { const el = $('net-state'); if (el) el.textContent = navigator.onLine ? '' : Tx('inicio.sem-internet'); }; window.addEventListener('online', netState); /* 5.0c */ window.addEventListener('offline', netState); netState();
   { const fb = $('foot-feedback'); if (fb) fb.href = feedbackUrl(null); const cf = $('cfg-feedback'); if (cf) cf.href = feedbackUrl(null); }
   // 4.1b — painel de comando com abas por modo de jogo (a aba escolhida fica lembrada)
   const showTab = (tab, save) => { const tabs = document.querySelectorAll('.ctab'); if (!tabs.length) return; if (![...tabs].some(t => t.dataset.tab === tab)) tab = 'jogar';
@@ -99,31 +100,31 @@ function initStart() {
     if (!rec || !rec.data || !rec.data.sim) { refreshSaved(); return false; }
     const d = rec.data; const cfg = Object.assign({}, d.cfg, { players: d.simCfg.players, seed: d.simCfg.seed, minutes: d.simCfg.minutes || d.cfg.minutes, map: d.simCfg.map || 'fenda', mapV: d.simCfg.mapV || 0, /* 4.3h */ gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: d.cfg.clima || $('opt-clima').value, resume: d, resumeAt: rec.meta.savedAt, resumeAuto: auto ? Math.max(1, Math.round((Date.now() - rec.meta.savedAt) / 1000)) : 0 });
     if (d.camp && ARD.campaign) { try { cfg.campaign = ARD.campaign.prepare(d.camp.id, d.camp.opts); cfg.campArgs = d.camp; } catch (e) { console.warn('[ARD] retomada: missão indisponível', e); return false; } }
-    try { startGame(cfg); return true; } catch (e) { console.error('[ARD] retomada falhou:', e); alert('Não foi possível retomar esta partida (' + e.message + '). Ela continua salva; envie o feedback.'); location.reload(); return false; }
+    try { startGame(cfg); return true; } catch (e) { console.error('[ARD] retomada falhou:', e); alert(Tx('inicio.retomar-falhou', { erro: e.message })); /* 5.0c */ location.reload(); return false; }
   }
   function refreshSaved() {
     if (!ARD.saves) return;
     ARD.saves.list().then(list => {
       const auto = list.find(m => m.slot === 'auto'); const card = $('resume-card');
-      if (card) { if (auto) { $('resume-title').textContent = auto.title; $('resume-sub').textContent = auto.sub + ' · ' + (auto.parked ? 'pausada ' : 'interrompida ') + ARD.saves.ago(auto.savedAt) + (auto.version !== VERSION ? ' · salva na versão ' + auto.version : ''); card.hidden = false; } else card.hidden = true; }
+      if (card) { if (auto) { $('resume-title').textContent = TRx(auto.title); $('resume-sub').textContent = TRx(auto.sub) + ' · ' + Tx(auto.parked ? 'inicio.retomar.pausada' : 'inicio.retomar.interrompida', { quando: ARD.saves.ago(auto.savedAt) }) + (auto.version !== VERSION ? ' · ' + Tx('inicio.retomar.versao', { v: auto.version }) : ''); /* 5.0c: o salvamento guarda o texto em pt-BR; traduzido na hora de mostrar */ card.hidden = false; } else card.hidden = true; }
       for (const [id, kind] of [['saved-solo', 'solo'], ['saved-camp', 'campanha']]) { const el = $(id); if (!el) continue; const rows = list.filter(m => m.slot !== 'auto' && m.kind === kind); el.hidden = !rows.length;
-        el.innerHTML = rows.length ? '<div class="sh">Partidas salvas</div>' + rows.map(m => `<div class="svrow"><div class="sv-t">${esc(m.title)}<small>${esc(m.sub)} · espaço ${m.slot.slice(1)} · ${ARD.saves.ago(m.savedAt)}</small></div><button class="btn" data-load="${m.slot}">Carregar</button><button class="btn ghost" data-del="${m.slot}" aria-label="Apagar">🗑</button></div>`).join('') : '';
+        el.innerHTML = rows.length ? '<div class="sh">' + Tx('inicio.salvas') + '</div>' + rows.map(m => `<div class="svrow"><div class="sv-t">${esc(TRx(m.title))}<small>${esc(TRx(m.sub))} · ${Tx('inicio.espaco', { n: m.slot.slice(1) })} · ${ARD.saves.ago(m.savedAt)}</small></div><button class="btn" data-load="${m.slot}">${Tx('inicio.carregar')}</button><button class="btn ghost" data-del="${m.slot}" aria-label="${Tx('inicio.apagar')}">🗑</button></div>`).join('') : ''; /* 5.0c */
         el.querySelectorAll('[data-load]').forEach(b => b.onclick = () => resumeFrom(b.dataset.load, false));
-        el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (b.dataset.armed) ARD.saves.del(b.dataset.del).then(refreshSaved); else { b.dataset.armed = '1'; b.textContent = 'Apagar?'; setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = '🗑'; } }, 3000); } }); }
+        el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (b.dataset.armed) ARD.saves.del(b.dataset.del).then(refreshSaved); else { b.dataset.armed = '1'; b.textContent = Tx('inicio.apagar-q'); /* 5.0c */ setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = '🗑'; } }, 3000); } }); }
     }).catch(e => console.warn('[ARD] salvamentos indisponíveis:', e));
   }
-  if ($('btn-resume')) { $('btn-resume').addEventListener('click', () => resumeFrom('auto', false)); $('btn-resume-drop').addEventListener('click', e => { const b = e.currentTarget; if (b.dataset.armed) ARD.saves.del('auto').then(refreshSaved); else { b.dataset.armed = '1'; b.textContent = 'Descartar mesmo?'; setTimeout(() => { delete b.dataset.armed; b.textContent = 'Descartar'; }, 3000); } }); }
+  if ($('btn-resume')) { $('btn-resume').addEventListener('click', () => resumeFrom('auto', false)); $('btn-resume-drop').addEventListener('click', e => { const b = e.currentTarget; if (b.dataset.armed) ARD.saves.del('auto').then(refreshSaved); else { b.dataset.armed = '1'; b.textContent = Tx('inicio.descartar-q'); setTimeout(() => { delete b.dataset.armed; b.textContent = Tx('inicio.descartar'); }, 3000); /* 5.0c */ } }); }
   // 4.1c — convidado que recarregou a página (queda de energia, aba fechada) volta sozinho à sala em até 2 minutos
   function rejoinAfterReload(ms) {
     const card = $('resume-card'); const N = ARD.net.create(); let done = false; const t0 = Date.now(); window.__rejoining = true; // 4.2a: o teste de desempenho espera
-    const show = (t, sub, canCancel) => { if (!card) return; card.hidden = false; $('resume-title').textContent = t; $('resume-sub').textContent = sub; $('btn-resume').hidden = true; $('btn-resume-drop').textContent = canCancel ? 'Cancelar' : 'Fechar'; };
-    show('Voltando à sala ' + ms.code, 'Sua partida multiplayer caiu ' + ARD.saves.ago(ms.at) + '. Reconectando…', true);
-    $('btn-resume-drop').onclick = () => { done = true; window.__rejoining = false; mpSession.clear(); try { N.close(); } catch (e) {} card.hidden = true; $('btn-resume').hidden = false; $('btn-resume-drop').onclick = null; $('btn-resume-drop').textContent = 'Descartar'; refreshSaved(); };
+    const show = (t, sub, canCancel) => { if (!card) return; card.hidden = false; $('resume-title').textContent = t; $('resume-sub').textContent = sub; $('btn-resume').hidden = true; $('btn-resume-drop').textContent = Tx(canCancel ? 'geral.cancelar' : 'geral.fechar'); }; /* 5.0c */
+    show(Tx('multi.volta.titulo', { codigo: ms.code }), Tx('multi.volta.caiu', { quando: ARD.saves.ago(ms.at) }), true); /* 5.0c */
+    $('btn-resume-drop').onclick = () => { done = true; window.__rejoining = false; mpSession.clear(); try { N.close(); } catch (e) {} card.hidden = true; $('btn-resume').hidden = false; $('btn-resume-drop').onclick = null; $('btn-resume-drop').textContent = Tx('inicio.descartar'); /* 5.0c */ refreshSaved(); };
     N.on('state', st => { if (done) return; done = true; startGame(Object.assign({}, ms.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value, resume: { sim: st.snap, ais: [] } }), { net: N, myId: ms.id }); });
-    N.on('rejoin-no', d => { done = true; window.__rejoining = false; mpSession.clear(); show('Não deu para voltar à sala ' + ms.code, 'O anfitrião recusou: ' + (d.why || '?') + '.', false); });
+    N.on('rejoin-no', d => { done = true; window.__rejoining = false; mpSession.clear(); show(Tx('multi.volta.falhou', { codigo: ms.code }), Tx('multi.volta.recusou', { motivo: TRx(d.why || '?') }), false); }); /* 5.0c */
     N.on('error', () => {}); N.on('close', () => {}); N.on('rejoin-fail', () => {});
-    const attempt = first => { if (done) return; if (Date.now() - t0 > 120000) { done = true; window.__rejoining = false; mpSession.clear(); show('Não deu para voltar à sala ' + ms.code, 'A sala não respondeu em 2 minutos.', false); return; }
-      if (first || N.state !== 'connected') { N.rejoin(first ? { code: ms.code, id: ms.id, token: ms.token, me: Object.assign({}, ms.me, { build: BUILD }) } : null); $('resume-sub').textContent = 'Reconectando… tentativa ' + Math.ceil((Date.now() - t0 + 1) / 6000) + (navigator.onLine ? '' : ' (sem internet)'); }
+    const attempt = first => { if (done) return; if (Date.now() - t0 > 120000) { done = true; window.__rejoining = false; mpSession.clear(); show(Tx('multi.volta.falhou', { codigo: ms.code }), Tx('multi.volta.sem-resposta'), false); return; } /* 5.0c */
+      if (first || N.state !== 'connected') { N.rejoin(first ? { code: ms.code, id: ms.id, token: ms.token, me: Object.assign({}, ms.me, { build: BUILD }) } : null); $('resume-sub').textContent = Tx('multi.volta.tentativa', { n: Math.ceil((Date.now() - t0 + 1) / 6000) }) + (navigator.onLine ? '' : ' ' + Tx('multi.sem-internet-curto')); } /* 5.0c */
       setTimeout(() => attempt(false), 6000); };
     attempt(true);
   }
@@ -137,7 +138,7 @@ function initStart() {
   document.querySelectorAll('#help [data-close]').forEach(b => b.addEventListener('click', () => { $('help').hidden = true; }));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') for (const id of ['help', 'termos', 'priv', 'campaign', 'briefing', 'hangar']) { const m = $(id); if (m && !m.hidden) { m.hidden = true; e.stopPropagation(); } } }, true);
   if ($('foot-help')) $('foot-help').addEventListener('click', () => toggleHelp(true));
-  $('opt-name').value = prefs.name || 'Comandante';
+  $('opt-name').value = prefs.name || Tx('geral.comandante'); if (!prefs.name) $('opt-name').dataset.padrao = $('opt-name').value; /* 5.0c: o nome padrão no idioma (o digitado fica igual) */
   $('opt-opp').value = prefs.opp || '2';
   $('opt-diff').value = prefs.diff || 'normal';
   $('opt-seed').value = params.get('seed') || String(Math.floor(Math.random() * 90000) + 1000);
@@ -148,28 +149,28 @@ function initStart() {
   // multiplayer P2P por código de sala: 2 a 4 jogadores humanos, sem IAs; o anfitrião é o relé do lockstep
   let lobby = null;
   const mpStatus = t => { $('mp-status').textContent = t; };
-  const myInfo = () => { const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar'; return { name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction, color: ARD.campUI ? ARD.campUI.colorFor(faction) : null, build: BUILD }; };
-  const facName = f => (S.FACTIONS[f] && S.FACTIONS[f].short) || f;
+  const myInfo = () => { const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar'; return { name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante') /* 5.0c */, faction, color: ARD.campUI ? ARD.campUI.colorFor(faction) : null, build: BUILD }; };
+  const facName = f => (S.FACTIONS[f] ? DN.racaCurto(f) : f); /* 5.0c */
   function renderLobby(players, size) {
     const el = $('mp-players'); el.innerHTML = ''; const me = lobby ? lobby.me : null;
-    players.forEach(p => { const d = document.createElement('div'); d.textContent = (p.id === 0 ? '★ ' : '• ') + p.name + ' (' + facName(p.faction) + ')' + (p.id === 0 ? ' anfitrião' : '') + (me && p.name === me.name && (lobby.role === 'host' ? p.id === 0 : p.id !== 0) ? ' — você' : ''); el.appendChild(d); });
-    for (let i = players.length; i < size; i++) { const d = document.createElement('div'); d.className = 'muted'; d.textContent = '• vaga livre'; el.appendChild(d); }
-    if (lobby && lobby.warn) { const d = document.createElement('div'); d.className = 'warn'; d.textContent = '⚠ ' + lobby.warn; el.appendChild(d); }
+    players.forEach(p => { const d = document.createElement('div'); d.textContent = (p.id === 0 ? '★ ' : '• ') + p.name + ' (' + facName(p.faction) + ')' + (p.id === 0 ? ' ' + Tx('multi.anfitriao') : '') + (me && p.name === me.name && (lobby.role === 'host' ? p.id === 0 : p.id !== 0) ? ' — ' + Tx('multi.voce') : ''); /* 5.0c */ el.appendChild(d); });
+    for (let i = players.length; i < size; i++) { const d = document.createElement('div'); d.className = 'muted'; d.textContent = '• ' + Tx('multi.vaga'); /* 5.0c */ el.appendChild(d); }
+    if (lobby && lobby.warn) { const d = document.createElement('div'); d.className = 'warn'; d.textContent = '⚠ ' + TRx(lobby.warn); /* 5.0c */ el.appendChild(d); }
   }
   function setStartButton() { // 4.1b: Iniciar partida (aba Jogar) é só solo; a sala tem o próprio botão na aba Multiplayer
     const b = $('btn-start'), m = $('btn-mp-start');
     $('opt-opp').disabled = !!lobby; $('opt-diff').disabled = !!lobby;
-    b.disabled = false; b.textContent = lobby ? 'Você está numa sala · ver Multiplayer' : 'Iniciar partida';
-    if (!lobby) { const typed = $('opt-code').value.trim(); m.hidden = typed.length < 4; m.disabled = false; m.textContent = 'Entrar na sala ' + typed.toUpperCase(); return; }
+    b.disabled = false; b.textContent = Tx(lobby ? 'multi.numa-sala' : 'inicio.iniciar'); /* 5.0c */
+    if (!lobby) { const typed = $('opt-code').value.trim(); m.hidden = typed.length < 4; m.disabled = false; m.textContent = Tx('multi.entrar-sala', { codigo: typed.toUpperCase() }); return; } /* 5.0c */
     m.hidden = false;
-    if (lobby.role === 'host') { const n = lobby.N.roster().length; m.disabled = n < 2 || lobby.started; m.textContent = n < 2 ? 'Aguardando jogadores…' : 'Iniciar partida da sala (' + n + '/' + lobby.size + ')'; }
-    else { m.disabled = true; m.textContent = 'Aguardando o anfitrião…'; }
+    if (lobby.role === 'host') { const n = lobby.N.roster().length; m.disabled = n < 2 || lobby.started; m.textContent = n < 2 ? Tx('multi.aguardando-jogadores') : Tx('multi.iniciar-sala', { n, total: lobby.size }); } /* 5.0c */
+    else { m.disabled = true; m.textContent = Tx('multi.aguardando-anfitriao'); } /* 5.0c */
   }
   function leaveLobby() { if (lobby) { if (lobby.timer) clearInterval(lobby.timer); if (lobby.role === 'host') $('opt-code').value = ''; try { lobby.N.close(); } catch (e) {} lobby = null; } $('mp-players').innerHTML = ''; setStartButton(); }
   function startHosted() {
     if (!lobby || lobby.role !== 'host' || lobby.started) return;
     const N = lobby.N; N.me = myInfo(); const roster = N.roster();
-    if (roster.length < 2) { mpStatus('Aguarde pelo menos um jogador entrar na sala.'); return; }
+    if (roster.length < 2) { mpStatus(Tx('multi.aguarde-um')); return; } /* 5.0c */
     lobby.started = true; setStartButton();
     const players = roster.map(r => ({ name: r.name, faction: r.faction, human: true, color: r.color || undefined }));
     const cfg = { players, seed: parseInt($('opt-seed').value, 10) || 1, name: players[0].name, faction: players[0].faction, opp: '0', diff: 'normal', map: ($('opt-map-mp') && $('opt-map-mp').value) || ($('opt-map') && $('opt-map').value) || 'fenda', mapV: 1 }; /* 4.3h: o mapa do anfitrião vale para todos */
@@ -177,35 +178,35 @@ function initStart() {
     setTimeout(() => startGame(Object.assign({}, cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }), { net: N, myId: 0 }), 150);
   }
   $('btn-host').addEventListener('click', () => {
-    if (!navigator.onLine) { mpStatus('Sem internet: o multiplayer precisa de rede. A campanha e as partidas solo funcionam offline.'); return; }
-    if (!window.Peer) { mpStatus('PeerJS não carregou neste navegador.'); return; }
-    if (lobby) { mpStatus('Você já está na sala ' + (lobby.code || '…') + '. Recarregue a página para sair dela.'); return; }
+    if (!navigator.onLine) { mpStatus(Tx('multi.sem-internet-longo')); return; } /* 5.0c */
+    if (!window.Peer) { mpStatus(Tx('multi.sem-peerjs')); return; } /* 5.0c */
+    if (lobby) { mpStatus(Tx('multi.ja-na-sala', { codigo: lobby.code || '…' })); return; } /* 5.0c */
     const size = parseInt($('opt-room').value, 10) || 2; const me = myInfo();
     const N = ARD.net.create(); lobby = { N, role: 'host', size, code: null, started: false, me };
-    mpStatus('Criando sala…'); setStartButton();
-    N.on('error', e => mpStatus('Erro de rede: ' + e.message));
+    mpStatus(Tx('multi.criando')); setStartButton(); /* 5.0c */
+    N.on('error', e => mpStatus(Tx('multi.erro-rede', { msg: TRx(e.message) }))); /* 5.0c */
     N.on('warn', w => { if (lobby) { lobby.warn = w.message; renderLobby(N.roster(), lobby.size); } });
-    N.on('lobby', d => { renderLobby(d.players, d.size); setStartButton(); if (lobby && !lobby.started) { if (d.players.length >= d.size) { mpStatus('Sala completa. Iniciando…'); setTimeout(startHosted, 500); } else mpStatus('Sala ' + lobby.code + ': ' + d.players.length + '/' + d.size + ' jogadores. A partida começa quando a sala encher, ou toque em Iniciar partida da sala com 2 ou mais.'); } });
-    N.host({ size, me, code: (loadPrefs() || {}).room }, code => { lobby.code = code; $('opt-code').value = code; savePrefs(Object.assign(loadPrefs() || {}, { room: code })); renderLobby(N.roster(), size); mpStatus('Sala ' + code + ' criada para ' + size + ' jogadores. Envie o código aos amigos e aguarde a entrada deles.'); });
+    N.on('lobby', d => { renderLobby(d.players, d.size); setStartButton(); if (lobby && !lobby.started) { if (d.players.length >= d.size) { mpStatus(Tx('multi.completa')); setTimeout(startHosted, 500); } else mpStatus(Tx('multi.sala-host', { codigo: lobby.code, n: d.players.length, total: d.size })); } }); /* 5.0c */
+    N.host({ size, me, code: (loadPrefs() || {}).room }, code => { lobby.code = code; $('opt-code').value = code; savePrefs(Object.assign(loadPrefs() || {}, { room: code })); renderLobby(N.roster(), size); mpStatus(Tx('multi.criada', { codigo: code, total: size })); }); /* 5.0c */
   });
   function joinRoom(code, attempt) {
     attempt = attempt || 0;
-    if (!navigator.onLine) { mpStatus('Sem internet: o multiplayer precisa de rede.'); return; }
-    if (!window.Peer) { mpStatus('PeerJS não carregou neste navegador.'); return; }
-    if (lobby) { mpStatus('Você já está na sala ' + (lobby.code || '…') + '. Recarregue a página para sair dela.'); return; }
-    code = String(code || '').trim().toUpperCase(); if (code.length < 4) { mpStatus('Digite o código da sala.'); return; }
+    if (!navigator.onLine) { mpStatus(Tx('multi.sem-internet')); return; } /* 5.0c */
+    if (!window.Peer) { mpStatus(Tx('multi.sem-peerjs')); return; } /* 5.0c */
+    if (lobby) { mpStatus(Tx('multi.ja-na-sala', { codigo: lobby.code || '…' })); return; } /* 5.0c */
+    code = String(code || '').trim().toUpperCase(); if (code.length < 4) { mpStatus(Tx('multi.digite-codigo')); return; } /* 5.0c */
     const me = myInfo(); const N = ARD.net.create(); lobby = { N, role: 'guest', code, started: false, size: 2, me, t0: Date.now(), timer: null, warn: null };
-    mpStatus('Conectando à sala ' + code + '…'); setStartButton();
-    lobby.timer = setInterval(() => { if (!lobby || lobby.N !== N || N.state !== 'joining') return; const sec = Math.round((Date.now() - lobby.t0) / 1000); mpStatus(sec < 20 ? 'Conectando à sala ' + code + '… (' + sec + ' s)' : 'Sem resposta da sala ' + code + ' há ' + sec + ' s. Confira o código e se o anfitrião está com a sala aberta; continuamos tentando.'); }, 1000);
+    mpStatus(Tx('multi.conectando', { codigo: code })); setStartButton(); /* 5.0c */
+    lobby.timer = setInterval(() => { if (!lobby || lobby.N !== N || N.state !== 'joining') return; const sec = Math.round((Date.now() - lobby.t0) / 1000); mpStatus(sec < 20 ? Tx('multi.conectando-s', { codigo: code, s: sec }) : Tx('multi.sem-resposta', { codigo: code, s: sec })); }, 1000); /* 5.0c */
     N.on('error', e => {
-      if (lobby && lobby.N === N && !lobby.started && N.state !== 'connected' && /não encontrada/.test(e.message) && attempt < 20) { leaveLobby(); mpStatus('Sala ' + code + ' ainda não está aberta. Nova tentativa em 3 s… (' + (attempt + 1) + '/20)'); setTimeout(() => { if (!lobby) joinRoom(code, attempt + 1); }, 3000); return; }
-      mpStatus('Erro de rede: ' + e.message); if (lobby && lobby.N === N && !lobby.started && N.state !== 'connected') leaveLobby();
+      if (lobby && lobby.N === N && !lobby.started && N.state !== 'connected' && /não encontrada/.test(e.message) && attempt < 20) { leaveLobby(); mpStatus(Tx('multi.nao-aberta', { codigo: code, n: attempt + 1 })); /* 5.0c */ setTimeout(() => { if (!lobby) joinRoom(code, attempt + 1); }, 3000); return; }
+      mpStatus(Tx('multi.erro-rede', { msg: TRx(e.message) })); /* 5.0c */ if (lobby && lobby.N === N && !lobby.started && N.state !== 'connected') leaveLobby();
     });
     N.on('warn', w => { if (lobby && lobby.N === N) { lobby.warn = w.message; renderLobby(N.players || [], lobby.size); } });
-    N.on('open', () => mpStatus('Conectado à sala ' + code + '. Aguardando o anfitrião…'));
-    N.on('full', () => { mpStatus('A sala ' + code + ' está cheia ou a partida já começou.'); leaveLobby(); });
-    N.on('close', () => { if (!lobby || lobby.N !== N || lobby.started) return; mpStatus('O anfitrião saiu da sala ' + code + '.'); leaveLobby(); });
-    N.on('lobby', d => { if (!lobby || lobby.N !== N) return; lobby.size = d.size; renderLobby(d.players, d.size); mpStatus('Na sala ' + code + ' como ' + me.name + ' (' + d.players.length + '/' + d.size + '). A partida começa quando o anfitrião iniciar.'); });
+    N.on('open', () => mpStatus(Tx('multi.conectado', { codigo: code }))); /* 5.0c */
+    N.on('full', () => { mpStatus(Tx('multi.cheia', { codigo: code })); leaveLobby(); }); /* 5.0c */
+    N.on('close', () => { if (!lobby || lobby.N !== N || lobby.started) return; mpStatus(Tx('multi.anfitriao-saiu', { codigo: code })); leaveLobby(); }); /* 5.0c */
+    N.on('lobby', d => { if (!lobby || lobby.N !== N) return; lobby.size = d.size; renderLobby(d.players, d.size); mpStatus(Tx('multi.na-sala', { codigo: code, nome: me.name, n: d.players.length, total: d.size })); }); /* 5.0c */
     N.on('start', d => { if (!lobby || lobby.N !== N) return; lobby.started = true; if (lobby.timer) clearInterval(lobby.timer); mpSession.save({ code: N.code, id: d.you, token: d.token || null, cfg: d.cfg, me }); startGame(Object.assign({}, d.cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }), { net: N, myId: d.you }); });
     N.join(code, me);
   }
@@ -213,18 +214,19 @@ function initStart() {
   $('opt-code').addEventListener('input', () => { if (!lobby) setStartButton(); });
   $('opt-code').addEventListener('keydown', e => { if (e.key === 'Enter' && !lobby) { e.preventDefault(); joinRoom($('opt-code').value); } });
   $('btn-mp-start').addEventListener('click', () => {
-    if (lobby) { if (lobby.role === 'host') startHosted(); else mpStatus('Aguarde o anfitrião iniciar a partida.'); return; }
+    if (lobby) { if (lobby.role === 'host') startHosted(); else mpStatus(Tx('multi.aguarde-anfitriao')); return; } /* 5.0c */
     const typed = $('opt-code').value.trim(); if (typed.length >= 4) joinRoom(typed);
   });
   $('btn-start').addEventListener('click', () => {
     if (lobby) { showTab('multi', true); return; } // numa sala, o início é pela aba Multiplayer
     const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar';
-    const cfg = { name: $('opt-name').value.trim().slice(0, 18) || 'Comandante', faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value, map: $('opt-map') ? $('opt-map').value : 'fenda' };
+    const cfg = { name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante') /* 5.0c */, faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value, map: $('opt-map') ? $('opt-map').value : 'fenda' };
     savePrefs(Object.assign(loadPrefs() || {}, cfg)); startGame(cfg);
   });
   $('btn-help-start').addEventListener('click', () => toggleHelp(true));
-  { const bb = $('btn-bench'); if (bb) { const show = () => { const b = benchLoad(); $('bench-last').textContent = b ? 'Último teste: ' + b.fps + ' fps médio · 1% ' + b.p1 + ' fps · qualidade ' + b.quality + ' · ' + new Date(b.at).toLocaleDateString('pt-BR') : 'Ainda sem teste neste aparelho.'; }; show();
-    bb.addEventListener('click', () => { if (lobby || window.__rejoining) { showTab('multi', true); mpStatus(lobby ? 'Saia da sala multiplayer (recarregue a página) antes de testar o desempenho.' : 'Aguarde a volta à sala multiplayer terminar antes de testar o desempenho.'); return; } startGame({ name: 'Teste', faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar', opp: '1', diff: 'normal', seed: 4242, gfx: '3d', quality: $('opt-quality').value, clima: 'auto', bench: true }); }); } }
+  { const bb = $('btn-bench'); if (bb) { const show = () => { const b = benchLoad(); $('bench-last').textContent = b ? Tx('desempenho.ultimo', { fps: b.fps, p1: b.p1, q: TRx(b.quality), data: new Date(b.at).toLocaleDateString(ARD.i18n.locale()) }) : Tx('desempenho.nenhum'); }; show(); window.addEventListener('ard-idioma', show); /* 5.0c */
+    bb.addEventListener('click', () => { if (lobby || window.__rejoining) { showTab('multi', true); mpStatus(Tx(lobby ? 'desempenho.sair-sala' : 'desempenho.aguarde-volta')); return; } /* 5.0c */ startGame({ name: 'Teste', faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar', opp: '1', diff: 'normal', seed: 4242, gfx: '3d', quality: $('opt-quality').value, clima: 'auto', bench: true }); }); } }
+  window.addEventListener('ard-idioma', () => { if (G) return; try { refreshSaved(); netState(); setStartButton(); if (lobby) renderLobby(lobby.role === 'host' ? lobby.N.roster() : (lobby.N.players || []), lobby.size); const on = $('opt-name'); if (on && on.dataset.padrao && on.value === on.dataset.padrao) on.value = on.dataset.padrao = Tx('geral.comandante'); } catch (e) { console.warn('[ARD] idioma na tela inicial:', e); } }); /* 5.0c: a tela inicial se refaz no idioma novo, sem recarregar */
   if (params.get('bench')) { startGame({ name: 'Teste', faction: params.get('faction') || 'vehnar', opp: '1', diff: 'normal', seed: 4242, gfx: params.get('r') === '2d' ? '2d' : '3d', quality: params.get('q') || $('opt-quality').value, clima: params.get('clima') || 'auto', bench: true }); }
   else if (params.get('autostart')) { startGame({ name: 'Teste', faction: params.get('faction') || 'erevane', opp: params.get('opp') || '2', diff: params.get('diff') || 'normal', seed: parseInt(params.get('seed') || '5', 10), gfx: params.get('r') === '2d' ? '2d' : '3d', map: params.get('mapa') || 'fenda' }); }
 }
@@ -253,9 +255,9 @@ function loadBg(fac) { const el = $('loading'); if (!el) return; const lo = ART 
 function loadingInfo(cfg, netCtx) { try {
   const fac = (netCtx && cfg.players && cfg.players[netCtx.myId] && cfg.players[netCtx.myId].faction) || cfg.faction || 'vehnar'; const f = S.FACTIONS[fac] || S.FACTIONS.vehnar;
   document.documentElement.dataset.race = S.FACTIONS[fac] ? fac : 'vehnar'; document.documentElement.style.removeProperty('--race');
-  if ($('load-race')) $('load-race').textContent = f.name + ' · ' + (LEADER_NAME[fac] || '');
-  if ($('load-title')) $('load-title').textContent = cfg.bench ? 'Teste de desempenho' : cfg.campaign && cfg.campaign.mission ? cfg.campaign.mission.title : ((S.MAPS || {})[cfg.map === 'cinturao' ? 'cinturao' : 'fenda'] || 'Planície da Fenda');
-  const touch = matchMedia('(pointer: coarse)').matches; const tips = LOAD_TIPS.filter(t => !(touch && t[1])); if ($('load-tip')) $('load-tip').textContent = cfg.bench ? 'Batalha fixa de 30 s com a câmera passeando pelo mapa. Não mexa no jogo até terminar.' : tips[Math.floor(Math.random() * tips.length)][0];
+  if ($('load-race')) $('load-race').textContent = DN.raca(S.FACTIONS[fac] ? fac : 'vehnar') + ' · ' + (LEADER_NAME[fac] || ''); /* 5.0c */
+  if ($('load-title')) $('load-title').textContent = cfg.bench ? Tx('desempenho.titulo') : cfg.campaign && cfg.campaign.mission ? (ARD.campaign && ARD.campaign.titulo ? ARD.campaign.titulo(cfg.campaign.mission) : cfg.campaign.mission.title) : DN.mapa(cfg.map === 'cinturao' ? 'cinturao' : 'fenda'); /* 5.0c */
+  const touch = matchMedia('(pointer: coarse)').matches; const tips = LOAD_TIPS.filter(t => !(touch && t[1])); if ($('load-tip')) { const tp = tips[Math.floor(Math.random() * tips.length)]; $('load-tip').textContent = cfg.bench ? Tx('desempenho.dica-carga') : Tx('carga.dica.' + LOAD_TIPS.indexOf(tp), null, tp[0]); } /* 5.0c */
   if (leaderArt(fac)) { $('load-leader').src = leaderArt(fac); $('load-leader').hidden = false; }
   loadBg(fac); /* 4.3l */
 } catch (e) { console.warn('[ARD] carregamento:', e); } }
@@ -308,17 +310,17 @@ function startGame(cfg, netCtx) {
   let R = null; const want3d = (cfg.gfx || '3d') === '3d' && params.get('r') !== '2d';
   if (want3d && window.THREE) { try { R = ARD.render3d.create(canvas, overlay, mini); } catch (err) { console.warn('3D indisponível, usando 2D:', err); R = null; } }
   if (!R && want3d && window.THREE && ARD.motor === '5') { console.warn('[ARD] Motor 5 falhou na criação; tentando o motor clássico'); ARD.motor = 'classico'; try { R = ARD.render3d.create(canvas, overlay, mini); } catch (err) { R = null; } } /* 5.0a */
-  if (want3d && ARD.motor === '5' && ARD.m5 && ARD.m5.ok === false) setTimeout(() => notice('Motor 5 indisponível neste navegador: usando o motor clássico'), 1500); /* 5.0a */
-  if (!R) { R = ARD.render.create(canvas, mini); overlay.hidden = true; if (want3d) setTimeout(() => notice('3D indisponível neste navegador; usando o modo 2D'), 1200); }
+  if (want3d && ARD.motor === '5' && ARD.m5 && ARD.m5.ok === false) setTimeout(() => notice(Tx('jogo.m5-indisponivel')), 1500); /* 5.0c */ /* 5.0a */
+  if (!R) { R = ARD.render.create(canvas, mini); overlay.hidden = true; if (want3d) setTimeout(() => notice(Tx('jogo.3d-indisponivel')), 1200); } /* 5.0c */
   if (params.get('ssaoout')) R.ssaoOut = parseInt(params.get('ssaoout'), 10);
   if (params.get('testblack')) R.testBlack = true; R.debug = !!params.get('debug');
   if (R.setQuality) R.setQuality(params.get('q') || cfg.quality || 'auto', { msaa: params.has('msaa') ? params.get('msaa') === '1' : null, ssao: params.has('ssao') ? params.get('ssao') === '1' : null, shadowMap: params.get('sm') ? parseInt(params.get('sm'), 10) : null, post: params.has('post') ? params.get('post') === '1' : null });
   if (R.setClimate) R.setClimate(params.get('clima') || cfg.clima || 'auto');
-  if (R.is3d) R.onDegrade = (what, reason) => { if (what) banner('Qualidade 3D reduzida', what + ' desativada: ' + reason + '. Se continuar escuro, escolha outra qualidade na tela inicial e envie o feedback.', 'warn'); else banner('Renderização 3D falhou', 'Volte à tela inicial e escolha Gráficos: 2D. Exporte o resultado e envie o feedback.', 'danger'); };
+  if (R.is3d) R.onDegrade = (what, reason) => { if (what) banner(Tx('jogo.3d-reduzida'), Tx('jogo.3d-reduzida-txt', { o: TRx(what), motivo: TRx(reason) }), 'warn'); else banner(Tx('jogo.3d-falhou'), Tx('jogo.3d-falhou-txt'), 'danger'); }; /* 5.0c */
   // protótipo 4.0a: o líder da Raça em "chamada" no canto do HUD (retrato 2.5D renderizado na hora pelo motor voxel)
   try { const fac = sim.players[human].faction; const L = $('leader');
     if (L) { const art = leaderArt(fac); if (art) { $('leader-img').src = art; $('leader-img').className = 'lport'; } else if (ARD.leaders && ARD.leaders[fac]) { const sp = ARD.vox.renderSprite(ARD.leaders[fac](), 0.62, 3, {}); $('leader-img').src = sp.canvas.toDataURL(); $('leader-img').className = 'lvox'; }
-      $('leader-name').textContent = LEADER_NAME[fac] || ('Líder ' + (S.FACTIONS[fac].short || fac)); $('leader-sub').textContent = '● em chamada · ' + (S.FACTIONS[fac].short || fac); L.style.setProperty('--pc', RACE_COLORS[fac] || '#FF5E3A');
+      $('leader-name').textContent = LEADER_NAME[fac] || Tx('hud.lider', { raca: DN.racaCurto(fac) }); $('leader-sub').textContent = '● ' + Tx('hud.em-chamada', { raca: DN.racaCurto(fac) }); /* 5.0c */ L.style.setProperty('--pc', RACE_COLORS[fac] || '#FF5E3A');
       if (ART && ART.insignia && ART.insignia[fac]) { $('leader-badge').src = ART.insignia[fac]; $('leader-badge').hidden = false; }
       L.hidden = false; G && (G.leaderFac = fac);
       if (ARD.leaders3d && R.is3d && !(R.quality && R.quality.resolved === 'baixa') && !(matchMedia('(pointer: coarse)').matches || params.get('touch')) && ARD.leaders3d.canUse()) { /* 4.1e: só com o 3D ligado e acima da qualidade Baixa */ const fr = L.querySelector('.lframe'); const cv = document.createElement('canvas'); cv.id = 'leader-cv'; cv.width = 236; cv.height = 236; const it = ARD.leaders3d.mount(cv, fac, { framing: 'hud', fps: 24, mood: 1, yaw: 0.2 }); if (it) { fr.insertBefore(cv, fr.firstChild); $('leader-img').hidden = true; window.__lead3d = it; } } }
@@ -335,6 +337,7 @@ function startGame(cfg, netCtx) {
   const ais = cfg.resume ? cfg.resume.ais.map(ARD.ai.restore) : sim.players.filter(p => (!p.human && !(players[p.id] && players[p.id].passive)) || (!netCtx && params.get('ia') === 'todos')).filter(() => !cfg.bench).map(p => ARD.ai.create(p.id, p.difficulty)); // 4.2a: no teste ninguém pensa por cima do roteiro da batalha // ?ia=todos: a IA joga também pelo humano (capturas e testes)
   G = { lead3d: window.__lead3d || null, sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null, net, pending: [], waiting: false, waitT: 0 };
   if (params.get('debug')) window.__ARDG = G; // testes automatizados
+  if (AU) AU.raca = (sim.players[human] && sim.players[human].faction) || null; /* 5.0c: o locutor da partida fala no gênero do locutor desta Raça (src/audio.js, GENERO_LOCUTOR) */
   G.photo = ARD.photo3d && R.is3d && !(R.m5 && !ARD.m5.portado('foto')) /* 5.0a: Modo Foto escondido no Motor 5 até a fase 2 */ ? ARD.photo3d.create({ G, R, view, I, ui, net, canvas, isTouch }) : null; /* 4.3j: Modo Foto (botão 📷 e tecla J; só no 3D) */
   G.track = ARD.campUI ? ARD.campUI.tracker(sim, human) : null; // conquistas valem em qualquer partida
   if (G.lead3d) { let lastG = 0; window.addEventListener('pointermove', ev => { const now = performance.now(); if (now - lastG < 120 || !G.lead3d || ev.pointerType === 'touch') return; lastG = now; ARD.leaders3d.gaze(G.lead3d, (ev.clientX - 80) / Math.max(400, innerWidth * 0.6), -(ev.clientY - 110) / Math.max(300, innerHeight * 0.6), 1200); }, { passive: true }); $('leader').addEventListener('click', () => { if (G.lead3d) { ARD.leaders3d.mood(G.lead3d, 3, 1600); ARD.leaders3d.react(G.lead3d, 'nod'); ARD.leaders3d.react(G.lead3d, 'talk', 0.9); } }); } // 4.1e: o líder olha para onde você aponta; clicar nele arranca um aceno
@@ -345,8 +348,8 @@ function startGame(cfg, netCtx) {
   G.save30 = !!(loadPrefs() || {}).bateria; G.lastDraw = 0; G.haptics = isTouch && !!navigator.vibrate; G.lastBuzz = 0;
   G.perf = { start: performance.now(), t0: performance.now(), frames: 0, low: 0, high: 0, down: false, up: false, auto: R.is3d && !params.get('q') && (cfg.quality || 'auto') === 'auto' };
   if (R.setDyn) R.setDyn((loadPrefs() || {}).dynres !== false && (!params.get('debug') || params.get('dyn') === '1') && !params.get('benchpasso')); /* 4.3i: resolução dinâmica (fora das ferramentas de teste, que fotografam em resolução cheia) */
-  if (isTouch && navigator.getBattery && !G.save30) navigator.getBattery().then(b => { if (b && !b.charging && b.level < 0.2) { G.save30 = true; notice('Bateria baixa: limitando a 30 fps para economizar'); } }).catch(() => {});
-  document.addEventListener('visibilitychange', () => { if (!G || G.sim !== sim || G.ended) return; if (document.hidden) { if (!net && !G.paused) { G.paused = true; G.autoPaused = true; G.pauseWhy = 'O jogo pausou sozinho porque a aba ficou em segundo plano. Nada se perdeu.'; } } else { if (G.autoPaused) { G.autoPaused = false; refreshTop(); } else if (net) banner('Você voltou à partida', 'Com a aba em segundo plano o jogo não envia comandos; depois de 8 s a sala pode seguir sem você.', 'warn'); } });
+  if (isTouch && navigator.getBattery && !G.save30) navigator.getBattery().then(b => { if (b && !b.charging && b.level < 0.2) { G.save30 = true; notice(Tx('jogo.bateria-baixa')); } /* 5.0c */ }).catch(() => {});
+  document.addEventListener('visibilitychange', () => { if (!G || G.sim !== sim || G.ended) return; if (document.hidden) { if (!net && !G.paused) { G.paused = true; G.autoPaused = true; G.pauseWhy = 'O jogo pausou sozinho porque a aba ficou em segundo plano. Nada se perdeu.'; } } else { if (G.autoPaused) { G.autoPaused = false; refreshTop(); } else if (net) banner(Tx('multi.voltou'), Tx('multi.voltou-txt'), 'warn'); } }); /* 5.0c */
   G.camp = cfg.campaign && ARD.campUI ? ARD.campUI.begin(sim, cfg.campaign, cfg.resume ? cfg.resume.run : null) : null; // 4.0e: missão da campanha (4.1c: ou a retomada dela)
   G.cfg = cfg; setupSaves();
   if (R.is3d && ARD.campUI) R.skins = { [human]: ARD.campUI.skinOf(sim.players[human].faction) };
@@ -355,6 +358,7 @@ function startGame(cfg, netCtx) {
   if (isTouch) { const bar = $('bar'); for (const id of ['btn-diplo', 'btn-tech', 'btn-foto', 'btn-save', 'btn-sound', 'btn-voice', 'btn-a11y', 'btn-help']) /* 5.0b: Pesquisa e Ajustes também */ { const b = $(id); if (b && bar && b.parentElement !== bar) bar.appendChild(b); } } /* 4.3k: no toque, os botões de sistema vão para a barra de baixo (alvos de 44 px sem a barra de cima virar três linhas) */
 
   bindHUD(); refreshTop(); refreshHints(); refreshQuick();
+  window.addEventListener('ard-idioma', () => { if (!G || G.sim !== sim) return; try { G.selKey = ''; G.hintsHtml = ''; refreshPanel(true); refreshQuick(); refreshHints(); if (!$('diplo').hidden) openDiplo(); $('leader-sub').textContent = '● ' + Tx('hud.em-chamada', { raca: DN.racaCurto(sim.players[human].faction) }); } catch (e) { console.warn('[ARD] idioma na partida:', e); } }); /* 5.0c: o HUD se refaz no idioma novo (a barra de cima se reescreve sozinha no próximo quadro) */
   try { G.h3 = ARD.hud3 ? ARD.hud3.mount({ G, sim, human, view, I, R, ui, notice, leaderArt, LEADER_NAME, RACE_COLORS }) : null; } catch (e) { G.h3 = null; console.warn('[ARD] Interface 3.0 indisponível:', e); } /* 5.0b: roda de comandos, grupos, central de alertas, visão do exército, pesquisa e acessibilidade (src/ui-hud3.js) */
   { const tb = $('top'); const fit = () => { const x = Math.max(0, tb.offsetHeight - 46); document.documentElement.style.setProperty('--tbx', document.body.classList.contains('touch') ? '0px' : x + 'px'); document.documentElement.style.setProperty('--tbh', tb.offsetHeight + 'px'); /* 4.3k: altura real da barra (no celular ela quebra em 2 ou 3 linhas) */ }; fit(); if (window.ResizeObserver) new ResizeObserver(fit).observe(tb); else addEventListener('resize', fit); } // 4.2g
   $('loading').hidden = false;
@@ -366,8 +370,8 @@ function startGame(cfg, netCtx) {
     const ff = net || cfg.resume ? 0 : parseInt(params.get('ff') || '0', 10);
     if (cfg.resume && cfg.resume.view) { const v = cfg.resume.view; Object.assign(view.cam, v.cam || {}); view.cam.pitchT = view.cam.pitch; if (v.memory) view.memory = new Map(v.memory); }
     if (cfg.bench) setupBench();
-    if (cfg.resume && net) { net.sentFor = sim.tick - 1; G.pending = []; banner('De volta à sala', 'Partida sincronizada com o anfitrião no tempo ' + ARD.saves.mmss(sim.time) + '.', 'good', 7000); }
-    else if (cfg.resume) { const fenda = G.camp && G.camp.noPause; if (!fenda) { G.paused = true; G.pauseWhy = 'Partida retomada de onde parou.'; refreshTop(); } banner('Partida retomada', (cfg.resumeAuto ? 'Você voltou em ' + cfg.resumeAuto + ' s, ' : 'Salvamento de ' + ARD.saves.ago(cfg.resumeAt || Date.now()) + ', ') + 'no tempo ' + ARD.saves.mmss(sim.time) + ' de jogo.' + (fenda ? '' : ' Pausado: toque em ❚❚ ou P para continuar.'), 'info', 9000); }
+    if (cfg.resume && net) { net.sentFor = sim.tick - 1; G.pending = []; banner(Tx('multi.de-volta'), Tx('multi.sincronizada-host', { t: ARD.saves.mmss(sim.time) }), 'good', 7000); } /* 5.0c */
+    else if (cfg.resume) { const fenda = G.camp && G.camp.noPause; if (!fenda) { G.paused = true; G.pauseWhy = 'Partida retomada de onde parou.'; refreshTop(); } banner(Tx('jogo.retomada'), (cfg.resumeAuto ? Tx('jogo.retomada-auto', { s: cfg.resumeAuto, t: ARD.saves.mmss(sim.time) }) : Tx('jogo.retomada-salvo', { quando: ARD.saves.ago(cfg.resumeAt || Date.now()), t: ARD.saves.mmss(sim.time) })) + (fenda ? '' : ' ' + Tx('jogo.retomada-pausa')), 'info', 9000); } /* 5.0c */
     for (let i = 0; i < ff * 10; i++) tickOnce(true);
     if (net) setupNet();
     if (params.get('speed')) G.speed = parseFloat(params.get('speed')) || 1;
@@ -393,7 +397,7 @@ function startGame(cfg, netCtx) {
     if (net) for (const c of net.takeCmds(tick)) S.enqueue(sim, c);
     const ev = S.step(sim); G.detEv = (G.detEv || 0) + ev.length; /* 5.0a: detetive */
     if (net && sim.tick % 10 === 0) { const h = S.hash(sim); net.sendHash(sim.tick, h); (G.hashLog = G.hashLog || {})[sim.tick] = h; const ks = Object.keys(G.hashLog); if (ks.length > 80) delete G.hashLog[ks[0]]; }
-    if (!silent) G.R.onEvents(ev, sim, human);
+    if (!silent) G.R.onEvents(ARD.idioma === 'pt-BR' ? ev : ev.map(x => x.t === 'float' && typeof x.text === 'string' ? Object.assign({}, x, { text: TRx(x.text) }) : x), sim, human); /* 5.0c: textos flutuantes no idioma, numa cópia (a campanha lê o original em pt-BR) */
     handleEvents(ev, silent);
     if (G.track) G.track.tick(ev);
     if (G.camp) { const r = G.camp.tick(ev); if (r && !G.ended) endGame({ campaign: r }); }
@@ -406,14 +410,14 @@ function startGame(cfg, netCtx) {
     if (G.save30 && now - G.lastDraw < 31) { proximo(frame); return; } G.lastDraw = now; // economia de bateria: até 30 quadros por segundo · 5.0b.1: proximo(frame)
     if (!document.hidden && !G.paused && !G.ended && now - G.perf.start < 6000) { G.perf.t0 = now; G.perf.frames = 0; } // aquecimento: shaders compilando não contam
     else if (!document.hidden && !G.paused && !G.ended) { const pf = G.perf; pf.frames++; const el = now - pf.t0; if (el >= 4000) { const fps = pf.frames * 1000 / el; G.fps = fps; pf.t0 = now; pf.frames = 0; // 4.0f: ajuste automático da qualidade 3D pelo FPS medido
-      if (pf.auto && R.setQuality) { const L = ['baixa', 'media', 'alta', 'ultra'], LBL = { baixa: 'Baixa', media: 'Média', alta: 'Alta', ultra: 'Ultra' }; const cur = L.indexOf(R.quality.resolved || 'media'); const cap = G.save30 ? 24 : 26;
-        if (fps < cap) { pf.high = 0; if (++pf.low >= 2 && cur > 0) { R.setQuality(L[cur - 1]); R.quality.name = 'auto'; R.quality.resolved = L[cur - 1]; pf.low = 0; pf.down = true; notice('Qualidade 3D ajustada para ' + LBL[L[cur - 1]] + ' para manter a fluidez (' + Math.round(fps) + ' fps)'); } }
-        else if (fps > 57 && !G.save30) { pf.low = 0; if (++pf.high >= 4 && !pf.up && cur < (isTouch ? 1 : 3)) { R.setQuality(L[cur + 1]); R.quality.name = 'auto'; R.quality.resolved = L[cur + 1]; pf.up = true; pf.high = 0; notice(pf.down ? 'Qualidade 3D voltou para ' + LBL[L[cur + 1]] : 'Qualidade 3D subiu para ' + LBL[L[cur + 1]] + ': o aparelho tem folga'); } } /* 4.3l: com folga de 16 s a 58+ fps a qualidade automática sobe uma vez (no celular, até a Média); se cair, desce e não sobe de novo */
+      if (pf.auto && R.setQuality) { const L = ['baixa', 'media', 'alta', 'ultra'], LBL = { get baixa() { return Tx('ajustes.q.baixa'); }, get media() { return Tx('ajustes.q.media'); }, get alta() { return Tx('ajustes.q.alta'); }, get ultra() { return Tx('ajustes.q.ultra'); } }; /* 5.0c */ const cur = L.indexOf(R.quality.resolved || 'media'); const cap = G.save30 ? 24 : 26;
+        if (fps < cap) { pf.high = 0; if (++pf.low >= 2 && cur > 0) { R.setQuality(L[cur - 1]); R.quality.name = 'auto'; R.quality.resolved = L[cur - 1]; pf.low = 0; pf.down = true; notice(Tx('jogo.q-desceu', { q: LBL[L[cur - 1]], fps: Math.round(fps) })); } } /* 5.0c */
+        else if (fps > 57 && !G.save30) { pf.low = 0; if (++pf.high >= 4 && !pf.up && cur < (isTouch ? 1 : 3)) { R.setQuality(L[cur + 1]); R.quality.name = 'auto'; R.quality.resolved = L[cur + 1]; pf.up = true; pf.high = 0; notice(Tx(pf.down ? 'jogo.q-voltou' : 'jogo.q-subiu', { q: LBL[L[cur + 1]] })); } } /* 5.0c */ /* 4.3l: com folga de 16 s a 58+ fps a qualidade automática sobe uma vez (no celular, até a Média); se cair, desce e não sobe de novo */
         else { pf.low = 0; pf.high = 0; } } } }
     const iv = now - G.last; let dt = Math.min(0.25, iv / 1000); G.last = now; detPush(iv); /* 5.0a: detetive */
     if (R.dynFrame && !G.paused && !G.ended && !document.hidden && now - G.perf.start > 6000) R.dynFrame(iv, now, G.save30 ? 33.4 : 16.7); /* 4.3i: resolução dinâmica (alvo ~60 fps; 30 na economia de bateria) */
     if (!G.paused && !G.ended) { const ts0 = performance.now(); G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { if (tickOnce(false) === false) { G.acc = Math.min(G.acc, S.TICK); break; } G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; simMs = performance.now() - ts0; G.detSteps = n; }
-    if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; setH($('mp-wait'), G.waitT < 0.8); if (G.waitT >= 0.8) setT($('mp-wait'), net.state === 'rejoining' || G.rejoin ? 'Reconectando à sala ' + net.code + '… (' + Math.round((performance.now() - (G.rejoin ? G.rejoin.since : performance.now())) / 1000) + ' s)' : net.state === 'lost' ? 'Conexão perdida.' : 'Aguardando os outros jogadores… (' + G.waitT.toFixed(0) + ' s)'); } /* 4.3k: escrita com guarda */
+    if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; setH($('mp-wait'), G.waitT < 0.8); if (G.waitT >= 0.8) setT($('mp-wait'), net.state === 'rejoining' || G.rejoin ? Tx('multi.reconectando', { codigo: net.code, s: Math.round((performance.now() - (G.rejoin ? G.rejoin.since : performance.now())) / 1000) }) : net.state === 'lost' ? Tx('multi.conexao-perdida-curto') : Tx('multi.aguardando-outros', { s: Math.round(G.waitT) })); } /* 5.0c */ /* 4.3k: escrita com guarda */
     I.update(dt);
     if (G.bench) benchFrame(now, dt);
     if (G.frameN % 3 === 0) refreshTop();
@@ -456,10 +460,10 @@ function startGame(cfg, netCtx) {
       case 'shot': { const w = S.WEAPONS[e.weapon]; AU.sfx(e.beam ? 'beam' : (w && w.proj === 'shell') ? 'shot_heavy' : 'shot_light', volAt(e.x1, e.y1)); break; }
       case 'impact': AU.sfx(e.splash > 0 ? 'impact' : 'shot_light', volAt(e.x, e.y) * (e.splash > 0 ? 1 : 0.3)); break;
       case 'death': AU.sfx('explosion', volAt(e.x, e.y) * (e.kind === 'building' ? 1 : 0.6)); break;
-      case 'built': if (e.p === human) { AU.sfx('build'); AU.say('Construção concluída', 'built', 4); } break;
-      case 'spawn': if (e.p === human) { AU.sfx('spawn'); AU.say('Unidade pronta', 'spawn', 5); } break;
+      case 'built': if (e.p === human) { AU.sfx('build'); AU.say(Tx('voz.construcao'), 'built', 4); } break; /* 5.0c */
+      case 'spawn': if (e.p === human) { AU.sfx('spawn'); AU.say(Tx('voz.unidade'), 'spawn', 5); } break; /* 5.0c */
       case 'promote': if (e.owner === human) AU.sfx('promote'); break;
-      case 'alert': if (e.p === human) { AU.sfx(e.kind === 'danger' ? 'danger' : 'alert'); const v = voiceFor(e.text); if (v) AU.say(v, v, e.kind === 'danger' ? 8 : 15); } break;
+      case 'alert': if (e.p === human) { AU.sfx(e.kind === 'danger' ? 'danger' : 'alert'); const v = voiceFor(e.text); if (v) AU.say(TRx(v), v, e.kind === 'danger' ? 8 : 15); } break; /* 5.0c: fala no idioma; a chave segue a do audio.js */
       case 'storm': if (e.phase === 'active') AU.sfx('storm'); break;
       case 'pact': AU.sfx('pact'); break;
       case 'betrayal': AU.sfx('betrayal'); break;
@@ -473,24 +477,24 @@ function startGame(cfg, netCtx) {
       if (e.t === 'alert' && e.p === human && !silent && G.lead3d && ARD.leaders3d) { if (e.kind === 'danger') { ARD.leaders3d.react(G.lead3d, 'jolt'); ARD.leaders3d.mood(G.lead3d, 2, 3000); } else if (e.kind === 'good') ARD.leaders3d.react(G.lead3d, 'nod'); if (e.x != null && R.worldToScreen) { const sp = R.worldToScreen(view.cam, e.x, e.y); if (sp) ARD.leaders3d.gaze(G.lead3d, (sp[0] - 80) / 500, -(sp[1] - 110) / 400, 1600); } }
       if (e.t === 'alert' && e.p === human) { if (e.x != null) view.lastAlert = { x: e.x, y: e.y }; if (!silent) pushAlert(e); if (!silent && G.haptics && e.kind === 'danger' && performance.now() - G.lastBuzz > 2500) { G.lastBuzz = performance.now(); try { navigator.vibrate(30); } catch (er) {} } }
       if (!silent && G.haptics && e.t === 'super' && e.p === human) { try { navigator.vibrate([20, 40, 20]); } catch (er) {} }
-      else if (e.t === 'notice' && e.p === human && !silent) notice(e.text);
+      else if (e.t === 'notice' && e.p === human && !silent) notice(TRx(e.text)); /* 5.0c */
       else if (e.t === 'proposal' && e.p === human && !silent) { G.pendingFor = e.from; showProposal(e.from); }
-      else if (e.t === 'eliminated' && !silent) { const q = sim.players[e.p]; const left = sim.players.filter(x => x.alive && x.id !== human).length; if (e.p !== human) { banner(q.name + ' eliminado', left > 0 ? left + (left > 1 ? ' inimigos restantes' : ' inimigo restante') + ' · destrua todos os Núcleos ou vença por Domínio aos 25:00' : 'Todos os Núcleos inimigos caíram', 'good'); AU.sfx('promote'); AU.say(q.name + ' eliminado. ' + (left > 0 ? left + (left > 1 ? ' inimigos restantes' : ' inimigo restante') : ''), 'elim', 0); } }
+      else if (e.t === 'eliminated' && !silent) { const q = sim.players[e.p]; const left = sim.players.filter(x => x.alive && x.id !== human).length; if (e.p !== human) { const qn = DN.jogador(q.name); banner(Tx('hud.eliminado', { nome: qn }), left > 0 ? Tx('hud.restantes', { n: left }) + ' · ' + Tx('hud.restantes-dica') : Tx('hud.todos-cairam'), 'good'); AU.sfx('promote'); AU.say(Tx('hud.eliminado', { nome: qn }) + '. ' + (left > 0 ? Tx('hud.restantes', { n: left }) : ''), 'elim', 0); } } /* 5.0c */
       else if (e.t === 'trait' && e.owner === human && !silent) AU.sfx('promote');
       else if (e.t === 'end') { if (!G.camp) endGame(e.result); }
-      else if (e.t === 'regime' && e.p === human && !silent) notice('Energia: ' + S.REGIME[e.regime].name);
-      else if (e.t === 'era' && e.p === human && !silent) { const er = S.ERAS[e.era]; banner('Era ' + er.roman + ' — ' + er.name, er.desc, 'good', 7000); leaderMood(3); AU.sfx('promote'); G.selKey = ''; }
-      else if (e.t === 'ascend' && e.p === human && !silent) { const a = S.ASCENSION[sim.players[human].faction]; banner('Ascensão: ' + a.name, a.desc, 'good', 8000); leaderMood(3); AU.sfx('promote'); }
+      else if (e.t === 'regime' && e.p === human && !silent) notice(Tx('hud.energia-regime', { regime: DN.regime(e.regime) })); /* 5.0c */
+      else if (e.t === 'era' && e.p === human && !silent) { const er = S.ERAS[e.era]; banner('Era ' + er.roman + ' — ' + DN.era(e.era), DN.eraDesc(e.era), 'good', 7000); /* 5.0c */ leaderMood(3); AU.sfx('promote'); G.selKey = ''; }
+      else if (e.t === 'ascend' && e.p === human && !silent) { const af = sim.players[human].faction; banner(Tx('hud.ascensao', { nome: DN.ascensao(af) }), DN.ascensaoDesc(af), 'good', 8000); /* 5.0c */ leaderMood(3); AU.sfx('promote'); }
       else if (e.t === 'module' && e.p === human && !silent) { G.selKey = ''; AU.sfx('promote'); }
     }
   }
   function pushAlert(e) {
     const list = $('alerts'); const el = document.createElement('button'); el.className = 'alert ' + (e.kind || 'info'); el.type = 'button';
-    el.innerHTML = `<span class="t">${mmss(sim.time)}</span><span class="m">${esc(e.text)}</span>`;
+    el.innerHTML = `<span class="t">${mmss(sim.time)}</span><span class="m">${esc(TRx(e.text))}</span>`; /* 5.0c */
     if (e.x != null) el.addEventListener('click', () => I.center(e.x, e.y)); else el.disabled = true;
     list.prepend(el); while (list.children.length > 6) list.lastChild.remove();
     setTimeout(() => { el.classList.add('fade'); }, 9000); setTimeout(() => el.remove(), 14000);
-    const log = $('log'); const li = document.createElement('div'); li.textContent = mmss(sim.time) + ' · ' + e.text; log.prepend(li); while (log.children.length > 40) log.lastChild.remove();
+    const log = $('log'); const li = document.createElement('div'); li.textContent = mmss(sim.time) + ' · ' + TRx(e.text); /* 5.0c */ log.prepend(li); while (log.children.length > 40) log.lastChild.remove();
   }
   function leaderMood(mood, ms) { if (G.lead3d && ARD.leaders3d) { ARD.leaders3d.mood(G.lead3d, mood, ms || 4500); if (mood === 3) ARD.leaders3d.react(G.lead3d, 'nod'); else if (mood === 2) ARD.leaders3d.react(G.lead3d, 'shake'); } const fac = sim.players[human].faction; const art = leaderArt(fac, mood); const L = $('leader'); if (!art || !L || L.hidden) return; $('leader-img').src = art; L.classList.remove('mood'); void L.offsetWidth; L.classList.add('mood'); clearTimeout(G.moodT); G.moodT = setTimeout(() => { $('leader-img').src = leaderArt(fac); }, ms || 4500); }
   // ---------- 4.2a: teste de desempenho ----------
@@ -510,7 +514,7 @@ function startGame(cfg, netCtx) {
     view.reveal = true; R.forceDay = !params.get('noite'); G.perf.auto = false; G.speed = 1; document.body.classList.add('bench'); view.sel.clear(); I.buildMenu = false;
     G.bench = { t0: performance.now(), mt: 0, warm: 3000, dur: 30000, frames: [], a, b, mx, my, yaw0: view.cam.yaw, done: false, nextWave: sim.time + 4, cpu: [], simT: [], drawT: [], rec: false, gpu: R.gpuTimer ? R.gpuTimer(true) : false, prog0: R.progs ? R.progs() : 0 }; /* 4.3i: CPU, GPU e shaders */ G.save30 = false; // 4.2a: economia de bateria não limita o teste
     try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(l => { G.benchLock = l; }).catch(() => {}); } catch (e) {} // tela acesa durante o teste
-    banner('Teste de desempenho', 'Batalha fixa por 30 s com a câmera passeando pelo mapa. Não mexa no jogo até terminar.', 'info', 6000);
+    banner(Tx('desempenho.titulo'), Tx('desempenho.dica-carga'), 'info', 6000); /* 5.0c */
   }
   function benchFrame(now, dt) {
     const B = G.bench; if (B.done) return; if (G.paused || document.hidden) { B.last = 0; B.wasPaused = true; return; } /* pausado: câmera parada e sem contar quadros */
@@ -572,17 +576,17 @@ function startGame(cfg, netCtx) {
     return Object.assign({ kind: G.camp ? 'campanha' : 'solo', title, sub, gameTime: sim.time, faction: me.faction, version: VERSION, noPause: !!(G.camp && G.camp.noPause) }, extra || {});
   }
   function openSaveBox() {
-    const box = $('savebox'); if (!box) return; if (!G.autoSave) { notice('Sem salvamento no multiplayer'); return; } if (!box.hidden) return; // 4.2g: Ctrl+S de novo com a janela aberta não muda o estado da pausa
+    const box = $('savebox'); if (!box) return; if (!G.autoSave) { notice(Tx('jogo.sem-salvar-mp')); return; } /* 5.0c */ if (!box.hidden) return; // 4.2g: Ctrl+S de novo com a janela aberta não muda o estado da pausa
     const fenda = G.camp && G.camp.noPause; const wasPaused = G.paused; if (!fenda && !G.paused) { G.paused = true; refreshTop(); }
     const close = () => { if (box.hidden) return; box.hidden = true; G.closeSave = null; if (!fenda && !wasPaused) { G.paused = false; refreshTop(); } }; G.closeSave = close;
     box.querySelectorAll('[data-close]').forEach(b => { b.onclick = close; });
-    $('save-note').textContent = fenda ? 'Na dificuldade Fenda não há salvamento manual. O salvamento automático continua protegendo contra queda de internet ou energia.' : 'O jogo também salva sozinho a cada 10 segundos e ao sair da aba. Se a internet ou a energia cair, ele volta de onde parou.';
+    $('save-note').textContent = Tx(fenda ? 'jogo.salvar-fenda' : 'jogo.salvar-auto'); /* 5.0c */
     const draw = () => ARD.saves.list().then(list => { const by = {}; for (const m of list) by[m.slot] = m;
-      $('save-slots').innerHTML = ['m1', 'm2', 'm3'].map((sl, i) => { const m = by[sl]; return `<button class="slot" data-slot="${sl}" ${fenda ? 'disabled' : ''}><b>Espaço ${i + 1}</b><span>${m ? esc(m.title) + '<br><small>' + esc(m.sub) + ' · salvo ' + ARD.saves.ago(m.savedAt) + '</small>' : '<small>vazio</small>'}</span></button>`; }).join('');
-      $('save-slots').querySelectorAll('[data-slot]').forEach(b => b.onclick = () => { const sl = b.dataset.slot; const go = () => G.saveNow(sl).then(m => { if (m) { notice('Partida salva no espaço ' + sl.slice(1)); draw(); } else notice('Não foi possível salvar neste aparelho'); });
-        if (by[sl]) ui.confirm('Substituir o que está no espaço ' + sl.slice(1) + '?', go); else go(); }); });
+      $('save-slots').innerHTML = ['m1', 'm2', 'm3'].map((sl, i) => { const m = by[sl]; return `<button class="slot" data-slot="${sl}" ${fenda ? 'disabled' : ''}><b>${Tx('jogo.espaco', { n: i + 1 })}</b><span>${m ? esc(TRx(m.title)) + '<br><small>' + esc(TRx(m.sub)) + ' · ' + Tx('jogo.salvo', { quando: ARD.saves.ago(m.savedAt) }) + '</small>' : '<small>' + Tx('jogo.vazio') + '</small>'}</span></button>`; }).join(''); /* 5.0c */
+      $('save-slots').querySelectorAll('[data-slot]').forEach(b => b.onclick = () => { const sl = b.dataset.slot; const go = () => G.saveNow(sl).then(m => { if (m) { notice(Tx('jogo.salva-no', { n: sl.slice(1) })); draw(); } else notice(Tx('jogo.nao-salvou')); }); /* 5.0c */
+        if (by[sl]) ui.confirm(Tx('jogo.substituir', { n: sl.slice(1) }), go); else go(); }); }); /* 5.0c */
     draw();
-    $('save-park').onclick = () => { if (G.leaving) return; const p = G.saveNow('auto', { parked: true }); G.leaving = true; within(p, 6000).then(m => { if (m) goStart(); else { G.leaving = false; notice('Não foi possível salvar neste aparelho'); } }); }; // 4.2g: volta ao início de verdade (antes recarregava o link da missão e ela recomeçava)
+    $('save-park').onclick = () => { if (G.leaving) return; const p = G.saveNow('auto', { parked: true }); G.leaving = true; within(p, 6000).then(m => { if (m) goStart(); else { G.leaving = false; notice(Tx('jogo.nao-salvou')); } }); }; /* 5.0c */ // 4.2g: volta ao início de verdade (antes recarregava o link da missão e ela recomeçava)
     box.hidden = false;
   }
   function banner(title, sub, kind, ms) { const L = $('leader'); if (L && !L.hidden) { L.classList.remove('talk'); void L.offsetWidth; L.classList.add('talk'); } if (G.lead3d && ARD.leaders3d) ARD.leaders3d.react(G.lead3d, 'talk', Math.min(3.2, 1 + String(sub || '').length / 45)); if (kind === 'danger' || kind === 'warn') leaderMood(2); else if (kind === 'good') leaderMood(3); const b = $('banner'); $('banner-title').textContent = title; $('banner-sub').textContent = sub || ''; b.className = 'banner ' + (kind || 'info'); b.hidden = false; clearTimeout(G.bannerT); G.bannerT = setTimeout(() => { b.hidden = true; }, ms || 5000); }
@@ -592,14 +596,14 @@ function startGame(cfg, netCtx) {
   function resWatch() { // 4.2h: reserva do território no título das pílulas, alerta quando o Minério ou o Plasma do território acaba, chip de coletores parados (só interface)
     const W = G.resW || (G.resW = { t: 0, warned: {} }); W.t = sim.time; const res = { minerio: 0, plasma: 0, dados: 0 }; const idle = [];
     for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'unit' && e.owner === human && e.def === 'coletor' && e.state === 'idle') idle.push(e.id); else if (e.kind === 'node' && e.amount > 0 && S.inTerritory(sim, human, e.x, e.y)) res[e.res] += e.amount; }
-    for (const k of ['plasma', 'minerio', 'dados']) { const el = $('r-' + k); if (el && el.parentElement) setTi(el.parentElement, RES_NAME[k] + ' · variação por minuto nos últimos 30 s · no seu território restam ' + fmt(res[k])); }
+    for (const k of ['plasma', 'minerio', 'dados']) { const el = $('r-' + k); if (el && el.parentElement) setTi(el.parentElement, Tx('hud.pilula', { res: DN.recurso(k === 'dados' ? 'dados' : k, k === 'dados'), n: fmt(res[k]) })); } /* 5.0c */
     const dry = []; /* 5.0a.1: o que secou agora (os dois juntos viram um conselho só) */
     for (const k of ['minerio', 'plasma']) { if (res[k] > 0) { W.warned[k] = false; continue; } if (W.warned[k] || sim.time < 60 || !S.nucleoOf(sim, human)) continue; W.warned[k] = true; dry.push(k);
       const n0 = S.nucleoOf(sim, human); let best = null, bd = 1e9; for (const e of sim.ents) if (e.alive && e.kind === 'node' && e.res === k && e.amount > 0 && S.territoryOwner(sim, e.x, e.y) === -1) { const d = S.dist(e.x, e.y, n0.x, n0.y); if (d < bd) { bd = d; best = e; } }
       const text = RES_NAME[k] + ' do seu território acabou: mande os coletores a outro campo ou expanda com um Nódulo.'; handleEvents([{ t: 'alert', p: human, text, x: best ? best.x : undefined, y: best ? best.y : undefined, kind: 'warn', act: 'gather', res: k }]); /* 5.0a.1: a linha da central ganha "Mandar coletores" */
     }
     if (dry.length) { const k = dry[0], two = dry.length > 1; /* o Minério primeiro */
-      advise({ id: 'seco-' + k, icon: 'ic-' + k, title: two ? 'Minério e Plasma acabaram' : RES_NAME[k] + ' acabou', kind: 'warn', secs: 45, text: (two ? 'O Minério e o Plasma do seu território acabaram.' : 'O ' + RES_NAME[k] + ' do seu território acabou.') + ' Os coletores vão sozinhos ao campo mais perto; os que ficarem parados voltam para a base.', acts: [{ label: 'Mandar coletores', ic: 'ic-' + k, fn: () => sendIdleCollectors(k) }, { label: 'Construir Nódulo', ic: 'ic-construir', fn: () => openBuild('eco', 'nodulo') }] }); }
+      advise({ id: 'seco-' + k, icon: 'ic-' + k, title: two ? Tx('hud.seco.dois') : Tx('hud.seco.um', { res: DN.recurso(k) }), kind: 'warn', secs: 45, text: (two ? Tx('hud.seco.dois-txt') : Tx('hud.seco.um-txt.' + k)) + ' ' + Tx('hud.seco.dica'), acts: [{ label: Tx('hud.seco.mandar'), ic: 'ic-' + k, fn: () => sendIdleCollectors(k) }, { label: Tx('hud.seco.nodulo'), ic: 'ic-construir', fn: () => openBuild('eco', 'nodulo') }] }); } /* 5.0c */
     const chip = $('idle-col'); if (chip) { setH(chip, !idle.length); if (idle.length) setT($('idle-n'), idle.length); G.idleCol = idle; }
     advTick(); /* 5.0a.1: conselheiro dos recursos parados */
   }
@@ -614,14 +618,14 @@ function startGame(cfg, netCtx) {
     { const H = G.resHist || (G.resHist = []); if (!H.length || sim.time - H[H.length - 1].t >= 1) { H.push({ t: sim.time, r: Object.assign({}, p.res) }); while (H.length > 32) H.shift(); } // 4.2f: variação por minuto (janela de 30 s)
       const old = H[0]; const span = sim.time - old.t; for (const k of ['plasma', 'minerio', 'dados']) { const el = $('rr-' + k); if (!el) continue; if (span < 8) { setT(el, ''); continue; } const v = Math.round((p.res[k] - old.r[k]) * 60 / span); setT(el, Math.abs(v) < 1 ? '' : (v > 0 ? '+' : '−') + fmt(Math.abs(v))); setC(el, v > 0 ? 'up' : 'dn'); } }
     if (!G.resW || sim.time - G.resW.t >= 2 || sim.time < G.resW.t) resWatch(); // 4.2h
-    { const pb = $('pausebox'); if (pb) { const show = !!G.paused && !G.ended && !net && !G.bench && $('savebox').hidden; setH(pb, !show); if (show) setT($('pause-why'), G.pauseWhy || 'Partida pausada.'); } }
+    { const pb = $('pausebox'); if (pb) { const show = !!G.paused && !G.ended && !net && !G.bench && $('savebox').hidden; setH(pb, !show); if (show) setT($('pause-why'), TRx(G.pauseWhy || 'Partida pausada.')); } } /* 5.0c */
     const en = p.energy; setC($('energy'), 'tmod energy ' + en.regime); /* 4.3l: o medidor é um módulo da barra */
-    setT($('e-text'), `${Math.round(en.prod)} / ${Math.round(en.cons)}`); setT($('e-regime'), S.REGIME[en.regime].name + (p.overchargeT > 0 ? ' · Sobrecarga' : '') + (p.blackoutT > 0 ? ' · BLECAUTE' : ''));
+    setT($('e-text'), `${Math.round(en.prod)} / ${Math.round(en.cons)}`); setT($('e-regime'), DN.regime(en.regime) + (p.overchargeT > 0 ? ' · ' + Tx('hud.sobrecarga') : '') + (p.blackoutT > 0 ? ' · ' + Tx('hud.blecaute') : '')); /* 5.0c */
     setW($('e-bar'), Math.min(100, en.ratio * 100 / 1.5));
     setT($('clock'), mmss(sim.time)); /* 4.3l: o total fica embaixo (#clock-max) e o anel do mostrador mostra quanto da partida já passou */
-    { const T = G.topEls; if (!T.clk) { T.clk = $('clock-ring'); T.rep = $('rep-dial'); setT($('clock-max'), 'de ' + mmss(sim.maxTime)); } setV(T.clk, '--p', String(Math.min(100, Math.floor(100 * sim.time / Math.max(1, sim.maxTime))))); setA(T.rep, 'data-rep', p.rep); }
-    { const eb = $('era-badge'); if (eb) { const er = p.era || 1; const nx = S.ERAS[er + 1]; setT(eb, 'Era ' + S.ERAS[er].roman + (p.evolveT > 0 && nx ? ' → ' + nx.roman + ' ' + Math.ceil(p.evolveT) + ' s' : '') + (p.ascended ? ' ✦' : '')); setTi(eb, S.ERAS[er].name + ': ' + S.ERAS[er].desc + (p.ascended ? ' · Ascensão: ' + S.ASCENSION[p.faction].name : '')); setC(eb, 'era e' + er + (p.evolveT > 0 ? ' evolving' : '') + (p.ascended ? ' asc' : '')); } }
-    setT($('rep'), S.REP_NAMES[p.rep]);
+    { const T = G.topEls; if (!T.clk) { T.clk = $('clock-ring'); T.rep = $('rep-dial'); setT($('clock-max'), Tx('hud.relogio-de', { t: mmss(sim.maxTime) })); } /* 5.0c */ setV(T.clk, '--p', String(Math.min(100, Math.floor(100 * sim.time / Math.max(1, sim.maxTime))))); setA(T.rep, 'data-rep', p.rep); }
+    { const eb = $('era-badge'); if (eb) { const er = p.era || 1; const nx = S.ERAS[er + 1]; setT(eb, 'Era ' + S.ERAS[er].roman + (p.evolveT > 0 && nx ? ' → ' + nx.roman + ' ' + Math.ceil(p.evolveT) + ' s' : '') + (p.ascended ? ' ✦' : '')); setTi(eb, DN.era(er) + ': ' + DN.eraDesc(er) + (p.ascended ? ' · ' + Tx('hud.ascensao', { nome: DN.ascensao(p.faction) }) : '')); /* 5.0c */ setC(eb, 'era e' + er + (p.evolveT > 0 ? ' evolving' : '') + (p.ascended ? ' asc' : '')); } }
+    setT($('rep'), DN.reputacao(p.rep)); /* 5.0c */
     let enemies = 0; for (const x of sim.players) if (x.alive && x.id !== human && !S.hasPact(sim, human, x.id)) enemies++; setT($('enemies'), enemies);
     const sb = G.speedBtns || (G.speedBtns = [...document.querySelectorAll('[data-speed]')]); for (const b of sb) setOn(b, 'on', parseFloat(b.dataset.speed) === G.speed && !G.paused);
     setOn($('btn-pause'), 'on', G.paused);
@@ -636,7 +640,7 @@ function startGame(cfg, netCtx) {
     if (L.build) { const p = sim.players[human]; for (const b of L.build) { const d = S.BUILDINGS[b.dataset.build]; if (d) setOn(b, 'poor', !S.canAfford(p, d.cost)); } }
     if (L.det && L.det.el) { const n = needState(L.det.info); setC(L.det.el, 'bd-need ' + n[0]); setA(L.det.use, 'href', '#' + n[1]); setT(L.det.txt, n[2]); } /* 4.3l: "Faltam 30 de Minério" anda no lugar */
     if (ents.length > 1) { const gb = q1('[data-grouphp] i'); if (gb) { let hp = 0, mx = 0; for (const u of ents) { hp += u.hp; mx += u.maxHp; } const pc = mx ? Math.round(100 * hp / mx) : 0; setW(gb, pc); setT(q1('[data-grouptxt]'), pc + '%'); } }
-    for (const e of ents) { const bar = q1('[data-live="' + e.id + '"] i'); if (bar) setW(bar, 100 * e.hp / e.maxHp); const tx = q1('[data-livetxt="' + e.id + '"]'); if (tx) setT(tx, fmt(e.hp) + ' / ' + fmt(e.maxHp) + (e.kind === 'building' && !e.built ? ' · construção ' + Math.round(e.progress * 100) + '%' : ''));
+    for (const e of ents) { const bar = q1('[data-live="' + e.id + '"] i'); if (bar) setW(bar, 100 * e.hp / e.maxHp); const tx = q1('[data-livetxt="' + e.id + '"]'); if (tx) setT(tx, fmt(e.hp) + ' / ' + fmt(e.maxHp) + (e.kind === 'building' && !e.built ? ' · ' + Tx('hud.p.construcao', { p: Math.round(e.progress * 100) }) : '')); /* 5.0c */
       const qp = q1('[data-liveq="' + e.id + '"]'); if (qp && e.queue && e.queue[0]) setT(qp, Math.round(100 * e.queue[0].t / e.queue[0].total) + '%');
       if (e.def === 'nucleo') { const pl = sim.players[human]; const nx = S.ERAS[(pl.era || 1) + 1]; const eb = q1('[data-evobar] i'), et = q1('[data-evotxt]'); if (nx && pl.evolveT > 0) { if (eb) setW(eb, 100 * (1 - pl.evolveT / nx.time)); if (et) setT(et, Math.ceil(pl.evolveT) + ' s'); } }
       if (e.upT > 0) { const md = S.BUILDINGS[e.def].module; const ub = q1('[data-upbar] i'), ut = q1('[data-uptxt]'); if (md && ub) setW(ub, 100 * (1 - e.upT / md.time)); if (ut) setT(ut, Math.ceil(e.upT) + ' s'); } } } // 4.1d: evolução e módulo também andam no lugar
@@ -653,7 +657,7 @@ function startGame(cfg, netCtx) {
     if (G.pScroll && G.pScroll.id === id && G.pScroll.top) body.scrollTop = G.pScroll.top; /* a lista volta onde estava quando o painel é remontado */
     body.addEventListener('scroll', () => { G.pScroll = { id, top: body.scrollTop }; }, { passive: true });
     if (G.isTouch) { const grip = document.createElement('div'); grip.className = 'dgrip'; grip.setAttribute('aria-hidden', 'true'); const tg = document.createElement('button'); tg.className = 'dtog'; tg.type = 'button'; panel.insertBefore(tg, panel.firstChild); panel.insertBefore(grip, panel.firstChild); bindDrawer(); syncDrawer(); } }
-  function syncDrawer() { const panel = $('panel'); const c = drawerClosed(); setOn(panel, 'collapsed', c); const tg = panel.querySelector('.dtog'); if (tg) { setA(tg, 'aria-label', c ? 'Abrir o painel' : 'Recolher o painel'); setA(tg, 'aria-expanded', !c); } }
+  function syncDrawer() { const panel = $('panel'); const c = drawerClosed(); setOn(panel, 'collapsed', c); const tg = panel.querySelector('.dtog'); if (tg) { setA(tg, 'aria-label', Tx(c ? 'hud.p.abrir' : 'hud.p.recolher')); /* 5.0c */ setA(tg, 'aria-expanded', !c); } }
   function flipPanel(fn) { /* troca de estado com o painel deslizando até o lugar novo (só transform; medido só no evento) */
     const panel = $('panel'); const r0 = panel.getBoundingClientRect(); fn(); panel.style.transition = 'none'; panel.style.transform = ''; const r1 = panel.getBoundingClientRect(); const dy = Math.round(r0.top - r1.top);
     if (Math.abs(dy) < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return; panel.style.transform = 'translateY(' + dy + 'px)';
@@ -676,49 +680,49 @@ function startGame(cfg, netCtx) {
     const panel = $('panel'); const p = sim.players[human]; const fac = S.FACTIONS[p.faction];
     if (!ents.length || I.buildMenu) { panel.innerHTML = buildMenuHTML(p); bindBuildMenu(); return; }
     const e = ents[0];
-    if (e.kind === 'wreck') { panel.innerHTML = `<div class="ph"><span class="dot" style="background:#8A5A3A"></span><b>Carcaça de ${esc(S.UNITS[e.def] ? S.UNITS[e.def].name : 'veículo')}</b></div><div class="muted">${fmt(e.amount)} de Minério recuperável</div><div class="muted small">Coletores podem saquear carcaças em qualquer lugar: clique direito com um coletor.</div>`; return; }
-    if (e.kind === 'node') { const dry = e.amount <= 0; panel.innerHTML = `<div class="ph"><span class="dot" style="background:${dry ? '#5A5F66' : ARD.render.NODE_COLOR[e.res]}"></span><b>Nó de ${RES_NAME[e.res]}${dry ? ' · esgotado' : ''}</b></div>` + (dry ? '<div class="muted">Nada mais a colher aqui. Os recursos não voltam: mande os coletores a outro campo ou expanda com um Nódulo.</div>' : `<div class="muted">${fmt(e.amount)} / ${fmt(e.max)} restantes</div><div class="muted small">Coletores colhem sozinhos no seu território. Mandados com o botão direito, colhem em qualquer campo fora do território inimigo.</div>`); return; } // 4.2h
+    if (e.kind === 'wreck') { panel.innerHTML = `<div class="ph"><span class="dot" style="background:#8A5A3A"></span><b>${esc(Tx('hud.p.carcaca', { nome: S.UNITS[e.def] ? DN.unidade(null, e.def) : Tx('hud.p.veiculo') }))}</b></div><div class="muted">${Tx('hud.p.recuperavel', { n: fmt(e.amount) })}</div><div class="muted small">${Tx('hud.p.carcaca-dica')}</div>`; return; } /* 5.0c */
+    if (e.kind === 'node') { const dry = e.amount <= 0; panel.innerHTML = `<div class="ph"><span class="dot" style="background:${dry ? '#5A5F66' : ARD.render.NODE_COLOR[e.res]}"></span><b>${Tx('hud.p.no.' + e.res)}${dry ? ' · ' + Tx('hud.p.esgotado') : ''}</b></div>` + (dry ? '<div class="muted">' + Tx('hud.p.no-seco') + '</div>' : `<div class="muted">${Tx('hud.p.restantes', { n: fmt(e.amount), max: fmt(e.max) })}</div><div class="muted small">${Tx('hud.p.no-dica')}</div>`); return; } /* 5.0c */ // 4.2h
     if (e.owner !== human) {
       const q = sim.players[e.owner]; const d = e.kind === 'unit' ? S.UNITS[e.def] : S.BUILDINGS[e.def];
-      panel.innerHTML = `<div class="sel-head"><img class="ph-ico foe" alt="" src="${R.icon(e.def, e.owner)}"><b>${esc(e.kind === 'unit' ? S.unitName(q.faction, e.def) : d.name)}</b><span class="sh-c"><span class="dot" style="background:${q.color}"></span>${esc(q.name)} · ${S.FACTIONS[q.faction].short} · ${S.hasPact(sim, human, e.owner) ? 'em pacto' : 'inimigo'}</span><div class="hp foe" data-live="${e.id}"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="sh-st"><span>${IC('ic-vida')}<span data-livetxt="${e.id}">${fmt(e.hp)} / ${fmt(e.maxHp)}</span></span><span>${e.kind === 'unit' ? S.CLASS_NAMES[e.cls] : 'Estrutura'}</span>${d.attack ? `<span>${IC('ic-dano')}${d.attack.dmg}</span><span>${IC('ic-alcance')}${d.attack.range}</span>` : ''}</div></div>${e.kind === 'building' && (e.def === 'refinaria' || e.def === 'reator') ? '<div class="tip">Alvo de Sifão: selecione um Pirata e clique com o botão direito aqui.</div>' : ''}`; /* 4.3l: retrato grande, vida e atributos */
+      panel.innerHTML = `<div class="sel-head"><img class="ph-ico foe" alt="" src="${R.icon(e.def, e.owner)}"><b>${esc(DN.nome(e.kind, e.def, q.faction))}</b><span class="sh-c"><span class="dot" style="background:${q.color}"></span>${esc(DN.jogador(q.name))} · ${DN.racaCurto(q.faction)} · ${Tx(S.hasPact(sim, human, e.owner) ? 'hud.p.em-pacto' : 'hud.p.inimigo')}</span><div class="hp foe" data-live="${e.id}"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="sh-st"><span>${IC('ic-vida')}<span data-livetxt="${e.id}">${fmt(e.hp)} / ${fmt(e.maxHp)}</span></span><span>${e.kind === 'unit' ? DN.classe(e.cls) : Tx('hud.p.estrutura')}</span>${d.attack ? `<span>${IC('ic-dano')}${d.attack.dmg}</span><span>${IC('ic-alcance')}${d.attack.range}</span>` : ''}</div></div>${e.kind === 'building' && (e.def === 'refinaria' || e.def === 'reator') ? '<div class="tip">' + Tx('hud.p.alvo-sifao') + '</div>' : ''}`; /* 5.0c */ /* 4.3l: retrato grande, vida e atributos */
       return;
     }
     if (e.kind === 'building' && ents.length === 1) {
       const d = S.BUILDINGS[e.def]; const enP = d.energyProd ? d.energyProd * (e.mod === 1 && e.def === 'reator' ? 1.6 : 1) + (e.def === 'nucleo' ? 15 * ((p.era || 1) - 1) : 0) : 0;
-      let h = `<div class="sel-head"><img class="ph-ico" alt="" src="${R.icon(e.def, human)}"><b>${esc(d.name)}</b><span class="sh-c">${e.def === 'nucleo' ? 'Centro da colônia · Era ' + S.ERAS[p.era || 1].roman : 'Estrutura'}${e.built ? '' : ' · em construção'}</span><div class="hp" data-live="${e.id}"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="sh-st"><span>${IC('ic-vida')}<span data-livetxt="${e.id}">${fmt(e.hp)} / ${fmt(e.maxHp)}${e.built ? '' : ' · construção ' + Math.round(e.progress * 100) + '%'}</span></span>${enP ? `<span>${IC('ic-energia')}+${enP}</span>` : ''}${d.energyUse ? `<span>${IC('ic-energia')}−${d.energyUse}</span>` : ''}${d.attack ? `<span>${IC('ic-dano')}${d.attack.dmg}</span><span>${IC('ic-alcance')}${d.attack.range}</span>` : `<span>${IC('ic-sensor')}${d.sensor}</span>`}</div></div><div class="muted small">${esc(d.desc)}</div>`; /* 4.3l: retrato grande, vida e atributos com ícones */
+      let h = `<div class="sel-head"><img class="ph-ico" alt="" src="${R.icon(e.def, human)}"><b>${esc(DN.construcao(e.def))}</b><span class="sh-c">${e.def === 'nucleo' ? Tx('hud.p.centro', { era: S.ERAS[p.era || 1].roman }) : Tx('hud.p.estrutura')}${e.built ? '' : ' · ' + Tx('hud.p.em-construcao')}</span><div class="hp" data-live="${e.id}"><i style="width:${(100 * e.hp / e.maxHp)}%"></i></div><div class="sh-st"><span>${IC('ic-vida')}<span data-livetxt="${e.id}">${fmt(e.hp)} / ${fmt(e.maxHp)}${e.built ? '' : ' · ' + Tx('hud.p.construcao', { p: Math.round(e.progress * 100) })}</span></span>${enP ? `<span>${IC('ic-energia')}+${enP}</span>` : ''}${d.energyUse ? `<span>${IC('ic-energia')}−${d.energyUse}</span>` : ''}${d.attack ? `<span>${IC('ic-dano')}${d.attack.dmg}</span><span>${IC('ic-alcance')}${d.attack.range}</span>` : `<span>${IC('ic-sensor')}${d.sensor}</span>`}</div></div><div class="muted small">${esc(DN.construcaoDesc(e.def))}</div>`; /* 4.3l: retrato grande, vida e atributos com ícones · 5.0c */
       const prodList = S.producesFor(e.def, p.faction);
       if (e.built && prodList.length) {
         if (G.isTouch) h += '<div class="pqty" data-qrow></div>'; /* 5.0a.1: no toque, +5 e +10 logo acima dos cartões (embaixo, nos detalhes, a lista cortava) */
         h += '<div class="grid">';
-        for (const ud of prodList) { const u = S.UNITS[ud]; const name = S.unitName(fac.id, ud); const qn = e.queue.filter(q => q.def === ud).length; const lk = S.lockReason(sim, human, 'unit', ud); h += `<button class="act ${lk ? 'locked' : ''}" data-prod="${ud}" data-bid="${e.id}" ${lk ? `data-lock="${esc(lk)}"` : ''} aria-label="${esc(name)}: mais 1 na fila"${G.isTouch ? '' : ` title="${esc(name)}: clique põe 1 na fila · Shift+clique 5 · Ctrl+clique 10"`}>`; /* 4.3l: a descrição foi para o painel de detalhes · 5.0a.1: data-bid para o ouvinte único do painel */ h += `${lk ? `<span class="lockb">${u.era && u.era > (p.era || 1) ? S.ERAS[u.era].roman : '🔒'}</span>` : ''}<img class="ico" alt="" src="${R.icon(ud, human)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span>${qn ? `<span class="qn">×${qn}</span>` : ''}</button>`; }
+        for (const ud of prodList) { const u = S.UNITS[ud]; const name = DN.unidade(fac.id, ud); const qn = e.queue.filter(q => q.def === ud).length; const lk = TRx(S.lockReason(sim, human, 'unit', ud)); /* 5.0c */ h += `<button class="act ${lk ? 'locked' : ''}" data-prod="${ud}" data-bid="${e.id}" ${lk ? `data-lock="${esc(lk)}"` : ''} aria-label="${esc(Tx('hud.p.mais1', { nome: name }))}"${G.isTouch ? '' : ` title="${esc(Tx('hud.p.fila-dica', { nome: name }))}"`}>`; /* 5.0c */ /* 4.3l: a descrição foi para o painel de detalhes · 5.0a.1: data-bid para o ouvinte único do painel */ h += `${lk ? `<span class="lockb">${u.era && u.era > (p.era || 1) ? S.ERAS[u.era].roman : '🔒'}</span>` : ''}<img class="ico" alt="" src="${R.icon(ud, human)}"><span class="k">${u.key}</span><span class="n">${esc(name)}</span><span class="cost">${costStr(u.cost)}</span>${qn ? `<span class="qn">×${qn}</span>` : ''}</button>`; }
         h += '</div>';
         { const cur = G.udet && prodList.includes(G.udet) ? G.udet : prodList[0]; G.prodBid = e.id; h += `<div class="bdet bdu" data-det data-def="${cur}"></div>`; } /* 4.3l: detalhes da unidade (passar o mouse; no toque, a última tocada) */
-        if (e.queue.length) { h += `<div class="queue"><span class="qtot">Fila ${e.queue.length}/50</span>`; for (let i = 0; i < e.queue.length;) { const q = e.queue[i]; let j = i; while (j < e.queue.length && e.queue[j].def === q.def) j++; const n = j - i; h += `<button class="q" data-cancel="${j - 1}" data-def="${q.def}" title="Clique cancela 1 · Shift cancela todas deste tipo"><img alt="" src="${R.icon(q.def, human)}">${esc(S.unitName(fac.id, q.def))}${n > 1 ? ` <b>×${n}</b>` : ''}${i === 0 ? (q.waiting ? ' <i class="wait">aguardando recursos</i>' : ` <i data-liveq="${e.id}">${Math.round(100 * q.t / q.total)}%</i>`) : ''} ✕</button>`; i = j; } h += '</div>'; }
-        h += `<div class="row"><button class="act sm" data-mode="rally"><svg class="tbi" aria-hidden="true"><use href="#ic-reuniao"/></svg>Ponto de reunião</button>${e.def === 'nucleo' ? `<button class="act sm" data-mode="jump" ${p.jumpsLeft > 0 && e.jumpT <= 0 ? '' : 'disabled'}><svg class="tbi" aria-hidden="true"><use href="#ic-salto"/></svg>Salto de Núcleo (${p.jumpsLeft})</button>` : ''}</div>`;
+        if (e.queue.length) { h += `<div class="queue"><span class="qtot">${Tx('hud.p.fila', { n: e.queue.length })}</span>`; /* 5.0c */ for (let i = 0; i < e.queue.length;) { const q = e.queue[i]; let j = i; while (j < e.queue.length && e.queue[j].def === q.def) j++; const n = j - i; h += `<button class="q" data-cancel="${j - 1}" data-def="${q.def}" title="${Tx('hud.p.cancela')}"><img alt="" src="${R.icon(q.def, human)}">${esc(DN.unidade(fac.id, q.def))}${n > 1 ? ` <b>×${n}</b>` : ''}${i === 0 ? (q.waiting ? ' <i class="wait">' + Tx('hud.p.aguardando') + '</i>' : ` <i data-liveq="${e.id}">${Math.round(100 * q.t / q.total)}%</i>`) : ''} ✕</button>`; i = j; } h += '</div>'; }
+        h += `<div class="row"><button class="act sm" data-mode="rally"><svg class="tbi" aria-hidden="true"><use href="#ic-reuniao"/></svg>${Tx('hud.p.reuniao')}</button>${e.def === 'nucleo' ? `<button class="act sm" data-mode="jump" ${p.jumpsLeft > 0 && e.jumpT <= 0 ? '' : 'disabled'}><svg class="tbi" aria-hidden="true"><use href="#ic-salto"/></svg>${Tx('hud.p.salto', { n: p.jumpsLeft })}</button>` : ''}</div>`; /* 5.0c */
       }
       if (e.built && e.def === 'nucleo') { // 4.1d: Eras
         const er = p.era || 1; const nx = S.ERAS[er + 1];
-        h += `<div class="erabox"><div class="eb-h"><b>Era ${S.ERAS[er].roman} · ${esc(S.ERAS[er].name)}</b>${p.ascended ? ' <span class="asc">✦ ' + esc(S.ASCENSION[p.faction].name) + '</span>' : ''}</div>`;
-        if (nx && p.evolveT > 0) h += `<div class="small">Evoluindo para a Era ${nx.roman} · <span data-evotxt>${Math.ceil(p.evolveT)} s</span></div><div class="hp evo" data-evobar><i style="width:${Math.round(100 * (1 - p.evolveT / nx.time))}%"></i></div>`;
-        else if (nx) { const why = S.eraBlock(sim, human); const reqs = (nx.needs || []).map(n => (S.hasBuilt(sim, human, n) ? '✓ ' : '✗ ') + S.BUILDINGS[n].name).concat(nx.needsAny ? [(nx.needsAny.some(n => S.hasBuilt(sim, human, n)) ? '✓ ' : '✗ ') + nx.needsAny.map(n => S.BUILDINGS[n].name).join(' ou ')] : []);
-          h += `<button class="act evolve" data-evolve="1" ${why ? `data-lock="${esc(why)}"` : ''} title="${esc(nx.desc)}"><span class="n">Evoluir para a Era ${nx.roman} · ${esc(nx.name)}</span><span class="cost">${costStr(nx.cost)} · ${nx.time} s</span></button><div class="small muted">${reqs.join(' · ')} — ${esc(nx.desc)}</div>`; }
-        else h += '<div class="small muted">Era máxima. A Ascensão da Raça fica no Laboratório.</div>';
-        h += `<button class="act sm" data-techscr="1">${IC('ic-tec')}Pesquisa e Eras${G.isTouch ? '' : ' (F3)'}</button></div>`; /* 5.0b */
+        h += `<div class="erabox"><div class="eb-h"><b>Era ${S.ERAS[er].roman} · ${esc(DN.era(er))}</b>${p.ascended ? ' <span class="asc">✦ ' + esc(DN.ascensao(p.faction)) + '</span>' : ''}</div>`; /* 5.0c */
+        if (nx && p.evolveT > 0) h += `<div class="small">${Tx('hud.p.evoluindo', { era: nx.roman })} · <span data-evotxt>${Math.ceil(p.evolveT)} s</span></div><div class="hp evo" data-evobar><i style="width:${Math.round(100 * (1 - p.evolveT / nx.time))}%"></i></div>`;
+        else if (nx) { const why = TRx(S.eraBlock(sim, human)); const reqs = (nx.needs || []).map(n => (S.hasBuilt(sim, human, n) ? '✓ ' : '✗ ') + DN.construcao(n)).concat(nx.needsAny ? [(nx.needsAny.some(n => S.hasBuilt(sim, human, n)) ? '✓ ' : '✗ ') + nx.needsAny.map(n => DN.construcao(n)).join(' ' + Tx('geral.ou') + ' ')] : []); /* 5.0c */
+          h += `<button class="act evolve" data-evolve="1" ${why ? `data-lock="${esc(why)}"` : ''} title="${esc(DN.eraDesc(er + 1))}"><span class="n">${Tx('hud.p.evoluir', { era: nx.roman })} · ${esc(DN.era(er + 1))}</span><span class="cost">${costStr(nx.cost)} · ${nx.time} s</span></button><div class="small muted">${reqs.join(' · ')} — ${esc(DN.eraDesc(er + 1))}</div>`; } /* 5.0c */
+        else h += '<div class="small muted">' + Tx('hud.p.era-max') + '</div>'; /* 5.0c */
+        h += `<button class="act sm" data-techscr="1">${IC('ic-tec')}${Tx('hud.p.pesquisa-eras')}${G.isTouch ? '' : ' (F3)'}</button></div>`; /* 5.0b · 5.0c */
       }
       { const md = e.built && S.BUILDINGS[e.def].module; if (md) { // 4.1d: módulo da estrutura
-        if (e.mod) h += `<div class="tip">✓ ${esc(md.name)}: ${esc(md.desc)}</div>`;
-        else if (e.upT > 0) h += `<div class="small">Instalando ${esc(md.name)} · <span data-uptxt>${Math.ceil(e.upT)} s</span></div><div class="hp evo" data-upbar><i style="width:${Math.round(100 * (1 - e.upT / md.time))}%"></i></div>`;
-        else { const lk = S.lockReason(sim, human, 'module', e.def); h += `<button class="act module ${lk ? 'locked' : ''}" data-upgrade="1" ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc((lk ? '🔒 ' + lk + ' · ' : '') + md.desc)}"><span class="n">Módulo: ${esc(md.name)}</span><span class="cost">${lk ? '🔒 ' + esc(lk) : costStr(md.cost) + ' · ' + md.time + ' s'}</span></button>`; } } }
+        if (e.mod) h += `<div class="tip">✓ ${esc(DN.modulo(e.def))}: ${esc(DN.moduloDesc(e.def))}</div>`; /* 5.0c */
+        else if (e.upT > 0) h += `<div class="small">${esc(Tx('hud.p.instalando', { nome: DN.modulo(e.def) }))} · <span data-uptxt>${Math.ceil(e.upT)} s</span></div><div class="hp evo" data-upbar><i style="width:${Math.round(100 * (1 - e.upT / md.time))}%"></i></div>`;
+        else { const lk = TRx(S.lockReason(sim, human, 'module', e.def)); h += `<button class="act module ${lk ? 'locked' : ''}" data-upgrade="1" ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc((lk ? '🔒 ' + lk + ' · ' : '') + DN.moduloDesc(e.def))}"><span class="n">${esc(Tx('hud.p.modulo', { nome: DN.modulo(e.def) }))}</span><span class="cost">${lk ? '🔒 ' + esc(lk) : costStr(md.cost) + ' · ' + md.time + ' s'}</span></button>`; } } }
       if (e.built && e.def === 'laboratorio') {
         h += '<div class="grid">';
-        for (const k in S.RESEARCH) { const r = S.RESEARCH[k]; const lk = !p.research[k] && S.lockReason(sim, human, 'research', k); h += `<button class="act ${lk ? 'locked' : ''}" data-research="${k}" ${p.research[k] ? 'disabled' : ''} ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc((lk ? '🔒 ' + lk + ' · ' : '') + r.desc)}"><span class="n">${esc(r.name)}${p.research[k] ? ' ✓' : ''}</span><span class="cost">${lk ? '🔒 Era ' + S.ERAS[r.era].roman : costStr(r.cost)}</span></button>`; }
+        for (const k in S.RESEARCH) { const r = S.RESEARCH[k]; const lk = !p.research[k] && TRx(S.lockReason(sim, human, 'research', k)); h += `<button class="act ${lk ? 'locked' : ''}" data-research="${k}" ${p.research[k] ? 'disabled' : ''} ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc((lk ? '🔒 ' + lk + ' · ' : '') + DN.pesquisaDesc(k))}"><span class="n">${esc(DN.pesquisa(k))}${p.research[k] ? ' ✓' : ''}</span><span class="cost">${lk ? '🔒 Era ' + S.ERAS[r.era].roman : costStr(r.cost)}</span></button>`; }
         h += '</div>';
-        { const a = S.ASCENSION[p.faction]; if (a) { const lk = p.ascended ? null : (p.era || 1) < 3 ? 'Requer Era III (Domínio)' : null; h += `<button class="act ascend ${lk ? 'locked' : ''}" data-ascend="1" ${p.ascended ? 'disabled' : ''} ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc(a.desc)}"><span class="n">✦ Ascensão: ${esc(a.name)}${p.ascended ? ' ✓' : ''}</span><span class="cost">${lk ? '🔒 Era III' : p.ascended ? esc(a.desc) : costStr(a.cost)}</span></button>`; } }
+        { const a = S.ASCENSION[p.faction]; if (a) { const lk = p.ascended ? null : (p.era || 1) < 3 ? Tx('hud.p.requer-era3') : null; h += `<button class="act ascend ${lk ? 'locked' : ''}" data-ascend="1" ${p.ascended ? 'disabled' : ''} ${lk ? `data-lock="${esc(lk)}"` : ''} title="${esc(DN.ascensaoDesc(p.faction))}"><span class="n">✦ ${esc(Tx('hud.ascensao', { nome: DN.ascensao(p.faction) }))}${p.ascended ? ' ✓' : ''}</span><span class="cost">${lk ? '🔒 Era III' : p.ascended ? esc(DN.ascensaoDesc(p.faction)) : costStr(a.cost)}</span></button>`; } } /* 5.0c */
         const cd = Math.max(0, p.superCd - sim.time);
-        h += `<button class="act super" data-super="1" ${cd > 0 ? 'disabled' : ''} title="${esc(fac.superDesc)}"><span class="n">${esc(fac.superName)}${cd > 0 ? ' · ' + mmss(cd) : ''}</span><span class="cost">${costStr(S.SUPER_COST)}</span></button>`;
-        h += `<div class="row"><button class="act sm" data-techscr="1">${IC('ic-tec')}Árvore de pesquisa e Eras${G.isTouch ? '' : ' (F3)'}</button></div>`; /* 5.0b */
+        h += `<button class="act super" data-super="1" ${cd > 0 ? 'disabled' : ''} title="${esc(DN.superarmaDesc(fac.id))}"><span class="n">${esc(DN.superarma(fac.id))}${cd > 0 ? ' · ' + mmss(cd) : ''}</span><span class="cost">${costStr(S.SUPER_COST)}</span></button>`;
+        h += `<div class="row"><button class="act sm" data-techscr="1">${IC('ic-tec')}${Tx('hud.p.arvore')}${G.isTouch ? '' : ' (F3)'}</button></div>`; /* 5.0b · 5.0c */
       }
-      if (e.jumpT > 0) h += `<div class="tip">Salto em ${Math.ceil(e.jumpT)} s. O Núcleo está visível para todos.</div>`;
+      if (e.jumpT > 0) h += `<div class="tip">${Tx('hud.p.salto-em', { s: Math.ceil(e.jumpT) })}</div>`; /* 5.0c */
       panel.innerHTML = h;
       { const ps = [...panel.querySelectorAll('[data-prod]')]; if (ps.length) { bindDetails('u', ps, 'prod'); const box = panel.querySelector('[data-det]'); if (box) showDet('u', box.dataset.def, ps, 'prod'); if (G.isTouch) ps.forEach(b => b.addEventListener('pointerdown', () => showDet('u', b.dataset.prod, ps, 'prod'))); } } /* 4.3l */
       /* 5.0a.1: a produção (cartões +1, botões +5 e +10 dos detalhes) é tratada por um ouvinte só no #panel (bindProd): sem o "segurar = +5" escondido da 4.1a, que com o quadro lento virava +6 a cada toque */
@@ -727,20 +731,20 @@ function startGame(cfg, netCtx) {
       panel.querySelectorAll('[data-evolve]').forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.cmd({ t: 'evolve' }); }));
       panel.querySelectorAll('[data-upgrade]').forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.cmd({ t: 'upgrade', id: e.id }); }));
       panel.querySelectorAll('[data-ascend]').forEach(b => b.addEventListener('click', () => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.cmd({ t: 'ascend' }); }));
-      panel.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => { if (b.dataset.mode === 'jump') I.setMode('jump'); else I.setMode('rally'); notice(b.dataset.mode === 'jump' ? 'Clique no mapa para escolher o destino do Salto' : 'Clique no mapa para definir o ponto de reunião'); }));
+      panel.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => { if (b.dataset.mode === 'jump') I.setMode('jump'); else I.setMode('rally'); notice(Tx(b.dataset.mode === 'jump' ? 'hud.p.destino-salto' : 'hud.p.destino-reuniao')); })); /* 5.0c */
       const sb = panel.querySelector('[data-super]'); if (sb) sb.addEventListener('click', () => superClick(fac));
       return;
     }
     // units
     const counts = {}; for (const u of ents) if (u.kind === 'unit') counts[u.def] = (counts[u.def] || 0) + 1;
     let h = '';
-    if (ents.length === 1) { const u = ents[0]; const ud = S.UNITS[u.def]; const w = ud.attack; h += `<div class="sel-head"><img class="ph-ico" alt="" src="${R.icon(u.def, human)}"><b>${esc(S.unitName(fac.id, u.def))}</b><span class="sh-c">${S.CLASS_NAMES[u.cls]}${ud.flying ? ' · voa' : ''}${u.rank ? ' · ' + ['', '★ Veterano', '★★ Elite', '★★★ Lenda'][u.rank] : ''}${u.elo ? ' · Acorde ' + u.elo + (u.elo >= 3 ? ' ♪' : '') : ''}</span><div class="hp" data-live="${u.id}"><i style="width:${(100 * u.hp / u.maxHp)}%"></i></div><div class="sh-st"><span>${IC('ic-vida')}<span data-livetxt="${u.id}">${fmt(u.hp)} / ${fmt(u.maxHp)}</span></span>${w ? `<span title="Dano">${IC('ic-dano')}${w.dmg}</span><span title="Alcance">${IC('ic-alcance')}${w.range}</span>` : ''}<span title="Velocidade">${IC('ic-veloc')}${ud.speed}</span><span title="Visão">${IC('ic-sensor')}${ud.sensor}</span></div></div><div class="muted small">${esc(ud.desc)}</div>`; if (u.cargoTotal > 0) h += `<div class="muted small">Carga: ${fmt(u.cargoTotal)}${u.stolen ? ' (roubada)' : ''}</div>`; } /* 4.3l: retrato grande e atributos */
+    if (ents.length === 1) { const u = ents[0]; const ud = S.UNITS[u.def]; const w = ud.attack; h += `<div class="sel-head"><img class="ph-ico" alt="" src="${R.icon(u.def, human)}"><b>${esc(DN.unidade(fac.id, u.def))}</b><span class="sh-c">${DN.classe(u.cls)}${ud.flying ? ' · ' + Tx('hud.p.voa') : ''}${u.rank ? ' · ' + Tx('hud.p.rank.' + u.rank) : ''}${u.elo ? ' · ' + Tx('hud.p.acorde', { n: u.elo }) + (u.elo >= 3 ? ' ♪' : '') : ''}</span><div class="hp" data-live="${u.id}"><i style="width:${(100 * u.hp / u.maxHp)}%"></i></div><div class="sh-st"><span>${IC('ic-vida')}<span data-livetxt="${u.id}">${fmt(u.hp)} / ${fmt(u.maxHp)}</span></span>${w ? `<span title="${Tx('hud.st.dano')}">${IC('ic-dano')}${w.dmg}</span><span title="${Tx('hud.st.alcance')}">${IC('ic-alcance')}${w.range}</span>` : ''}<span title="${Tx('hud.st.velocidade')}">${IC('ic-veloc')}${ud.speed}</span><span title="${Tx('hud.st.visao')}">${IC('ic-sensor')}${ud.sensor}</span></div></div><div class="muted small">${esc(DN.unidadeDesc(u.def))}</div>`; if (u.cargoTotal > 0) h += `<div class="muted small">${Tx('hud.p.carga', { n: fmt(u.cargoTotal) })}${u.stolen ? ' ' + Tx('hud.p.roubada') : ''}</div>`; } /* 5.0c */ /* 4.3l: retrato grande e atributos */
     else { let hp = 0, mx = 0; for (const u of ents) { hp += u.hp; mx += u.maxHp; } const pc = mx ? Math.round(100 * hp / mx) : 0;
-      h += `<div class="ph">${IC('ic-exercito', 'phi')}<b>${ents.length} unidades</b><span class="ph-k">${Object.keys(counts).length} tipos</span></div><div class="gtot"><span>VIDA</span><div class="hp" data-grouphp><i style="width:${pc}%"></i></div><span data-grouptxt>${pc}%</span></div><div class="chips">`; for (const k in counts) h += `<span class="chip"><img alt="" src="${R.icon(k, human)}"><b>${counts[k]}</b><span>${esc(S.unitName(fac.id, k))}</span></span>`; h += '</div>'; } /* 4.3l: vida do grupo e fichas com retrato maior */
+      h += `<div class="ph">${IC('ic-exercito', 'phi')}<b>${Tx('hud.p.unidades', { n: ents.length })}</b><span class="ph-k">${Tx('hud.p.tipos', { n: Object.keys(counts).length })}</span></div><div class="gtot"><span>${Tx('hud.p.vida')}</span><div class="hp" data-grouphp><i style="width:${pc}%"></i></div><span data-grouptxt>${pc}%</span></div><div class="chips">`; for (const k in counts) h += `<span class="chip"><img alt="" src="${R.icon(k, human)}"><b>${counts[k]}</b><span>${esc(DN.unidade(fac.id, k))}</span></span>`; /* 5.0c */ h += '</div>'; } /* 4.3l: vida do grupo e fichas com retrato maior */
     const combat = ents.some(u => S.UNITS[u.def].attack);
-    h += `<div class="row">${combat ? `<button class="act sm ${I.mode === 'attackmove' ? 'on' : ''}" data-u="attackmove"><svg class="tbi" aria-hidden="true"><use href="#ic-atacar"/></svg>Atacar-mover <span class="k">A</span></button>` : ''}<button class="act sm" data-u="stop"><svg class="tbi" aria-hidden="true"><use href="#ic-parar"/></svg>Parar <span class="k">S</span></button></div>`;
-    if (counts.pirata) h += '<div class="tip">' + S.unitName(fac.id, 'pirata') + ': clique com o direito em uma Refinaria ou Reator inimigo para Sifonar (40 s). Entrega sozinho quando enche ou após 40 s; mandado de volta, entrega ao chegar perto da Refinaria ou do Núcleo. Se morrer carregado, a carga vira Caixa.' + (fac.cloak && fac.cloak.pirata ? ' Camuflado até começar a sifonar; Torres e Núcleo enxergam de perto.' : '') + (fac.devour ? ' Carniceiro: clique direito numa carcaça ou num Nódulo inimigo para devorar (biomassa direto no cofre).' : '') + (fac.silence ? ' Enquanto sifona, torres inimigas a até 110 ficam mudas.' : '') + '</div>';
-    if (counts.coletor) h += '<div class="tip">Coletor: colhe sozinho no seu território. Mandado a outro lugar (clique direito no chão ou num nó), colhe os nós em volta e entrega na Refinaria ou no Núcleo mais perto.</div>';
+    h += `<div class="row">${combat ? `<button class="act sm ${I.mode === 'attackmove' ? 'on' : ''}" data-u="attackmove"><svg class="tbi" aria-hidden="true"><use href="#ic-atacar"/></svg>${Tx('hud.p.atacar-mover')} <span class="k">A</span></button>` : ''}<button class="act sm" data-u="stop"><svg class="tbi" aria-hidden="true"><use href="#ic-parar"/></svg>${Tx('hud.p.parar')} <span class="k">S</span></button></div>`; /* 5.0c */
+    if (counts.pirata) h += '<div class="tip">' + Tx('hud.p.pirata-dica', { nome: DN.unidade(fac.id, 'pirata') }) + (fac.cloak && fac.cloak.pirata ? ' ' + Tx('hud.p.pirata-camuflado') : '') + (fac.devour ? ' ' + Tx('hud.p.pirata-devora') : '') + (fac.silence ? ' ' + Tx('hud.p.pirata-silencio') : '') + '</div>'; /* 5.0c */
+    if (counts.coletor) h += '<div class="tip">' + Tx('hud.p.coletor-dica', { nome: DN.unidade(fac.id, 'coletor') }) + '</div>'; /* 5.0c */
     panel.innerHTML = h;
     panel.querySelectorAll('[data-u]').forEach(b => b.addEventListener('click', () => { if (b.dataset.u === 'stop') I.cmd({ t: 'stop', ids: ents.map(u => u.id) }); else I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'); }));
   }
@@ -749,29 +753,29 @@ function startGame(cfg, netCtx) {
   function tabDefs(id) { const t = BTABS.find(x => x[0] === id) || BTABS[0]; const known = new Set([].concat(...BTABS.map(x => x[3]))); const extra = t[0] === 'eco' ? Object.keys(S.BUILDINGS).filter(k => S.BUILDINGS[k].key && !known.has(k)) : []; return t[3].filter(k => S.BUILDINGS[k] && S.BUILDINGS[k].key).concat(extra); } /* construção nova sem aba cai em Economia */
   const IC = (id, cls) => `<svg class="tbi${cls ? ' ' + cls : ''}" aria-hidden="true"><use href="#${id}"/></svg>`;
   function detInfo(kind, def) { /* dados do painel de detalhes: construção ('b') ou unidade ('u') */
-    const p = sim.players[human]; const cd = w => String(w.cd).replace('.', ',') + ' s';
-    if (kind === 'b') { const d = S.BUILDINGS[def]; const w = d.attack; const st = [['ic-vida', fmt(d.hp), 'Vida'], ['ic-relogio', d.buildTime + ' s', 'Tempo de construção']];
-      if (d.energyProd) st.push(['ic-energia', '+' + d.energyProd, 'Energia produzida']); else if (d.energyUse) st.push(['ic-energia', '−' + d.energyUse, 'Energia consumida']);
-      if (w) st.push(['ic-dano', w.dmg + ' / ' + cd(w), 'Dano por disparo / intervalo'], ['ic-alcance', String(w.range), 'Alcance']);
-      if (d.territory) st.push(['ic-mundo', 'território ' + d.territory, 'Território']); else st.push(['ic-sensor', String(d.sensor), 'Visão']);
-      return { name: d.name, cls: d.wall ? 'Muralha' : 'Estrutura', era: d.era || 1, st, cost: d.cost, desc: d.desc, lock: S.lockReason(sim, human, 'building', def), key: d.key }; }
-    const u = S.UNITS[def]; const w = u.attack; const st = [['ic-vida', fmt(u.hp), 'Vida'], ['ic-relogio', u.time + ' s', 'Tempo de produção']];
-    if (w) st.push(['ic-dano', w.dmg + ' / ' + cd(w), 'Dano por disparo / intervalo'], ['ic-alcance', String(w.range), 'Alcance']);
-    st.push(['ic-veloc', String(u.speed), 'Velocidade']); if (u.energyUse) st.push(['ic-energia', '−' + u.energyUse, 'Energia consumida']);
-    return { name: S.unitName(p.faction, def), cls: (S.CLASS_NAMES[u.cls] || '') + (u.flying ? ' · voa' : ''), era: u.era || 1, st, cost: u.cost, desc: u.desc, lock: S.lockReason(sim, human, 'unit', def), key: u.key }; }
+    const p = sim.players[human]; const cd = w => ARD.i18n.num(w.cd) + ' s'; /* 5.0c */
+    if (kind === 'b') { const d = S.BUILDINGS[def]; const w = d.attack; const st = [['ic-vida', fmt(d.hp), Tx('hud.st.vida')], ['ic-relogio', d.buildTime + ' s', Tx('hud.st.tempo-obra')]]; /* 5.0c */
+      if (d.energyProd) st.push(['ic-energia', '+' + d.energyProd, Tx('hud.st.energia-prod')]); else if (d.energyUse) st.push(['ic-energia', '−' + d.energyUse, Tx('hud.st.energia-cons')]); /* 5.0c */
+      if (w) st.push(['ic-dano', w.dmg + ' / ' + cd(w), Tx('hud.st.dano-int')], ['ic-alcance', String(w.range), Tx('hud.st.alcance')]); /* 5.0c */
+      if (d.territory) st.push(['ic-mundo', Tx('hud.st.territorio-n', { n: d.territory }), Tx('hud.st.territorio')]); else st.push(['ic-sensor', String(d.sensor), Tx('hud.st.visao')]);
+      return { name: DN.construcao(def), cls: Tx(d.wall ? 'hud.p.muralha' : 'hud.p.estrutura'), era: d.era || 1, st, cost: d.cost, desc: DN.construcaoDesc(def), lock: TRx(S.lockReason(sim, human, 'building', def)), key: d.key }; }
+    const u = S.UNITS[def]; const w = u.attack; const st = [['ic-vida', fmt(u.hp), Tx('hud.st.vida')], ['ic-relogio', u.time + ' s', Tx('hud.st.tempo-prod')]]; /* 5.0c */
+    if (w) st.push(['ic-dano', w.dmg + ' / ' + cd(w), Tx('hud.st.dano-int')], ['ic-alcance', String(w.range), Tx('hud.st.alcance')]);
+    st.push(['ic-veloc', String(u.speed), Tx('hud.st.velocidade')]); if (u.energyUse) st.push(['ic-energia', '−' + u.energyUse, Tx('hud.st.energia-cons')]);
+    return { name: DN.unidade(p.faction, def), cls: DN.classe(u.cls) + (u.flying ? ' · ' + Tx('hud.p.voa') : ''), era: u.era || 1, st, cost: u.cost, desc: DN.unidadeDesc(def), lock: TRx(S.lockReason(sim, human, 'unit', def)), key: u.key }; }
   function needState(D) { /* o que falta: trava (Era ou construção), recursos ou pronto */
     if (D.lock) return ['lk', 'ic-cadeado', D.lock]; const p = sim.players[human]; const m = [];
-    for (const k of RES3) { const c = (D.cost || {})[k] || 0, have = Math.floor(p.res[k] || 0); if (c > have) m.push(fmt(c - have) + ' de ' + RES_NAME[k]); }
-    if (m.length) return ['no', 'ic-limpar', 'Faltam ' + m.join(' e ')];
-    return ['ok', 'ic-rep', 'Pronto' + (D.key && !G.isTouch ? ' · tecla ' + D.key : '')]; }
+    for (const k of RES3) { const c = (D.cost || {})[k] || 0, have = Math.floor(p.res[k] || 0); if (c > have) m.push(Tx('hud.falta.' + k, { n: fmt(c - have) })); }
+    if (m.length) return ['no', 'ic-limpar', Tx('hud.faltam', { lista: m.join(' ' + Tx('geral.e') + ' ') })];
+    return ['ok', 'ic-rep', Tx('hud.pronto') + (D.key && !G.isTouch ? ' · ' + Tx('hud.tecla', { k: D.key }) : '')]; } /* 5.0c */
   function detHTML(kind, def) { const D = detInfo(kind, def), n = needState(D);
     const need = `<div class="bd-need ${n[0]}" data-need><svg class="tbi" aria-hidden="true"><use href="#${n[1]}"/></svg><span>${esc(n[2])}</span></div>`;
-    const qn = kind === 'u' && !G.isTouch ? `<span class="bd-qn" role="group" aria-label="Pôr mais ${esc(D.name)} na fila">${[5, 10].map(k => `<button type="button" data-prodn="${k}" data-def="${def}" data-bid="${G.prodBid || ''}"${D.lock ? ` disabled data-lock="${esc(D.lock)}"` : ''} aria-label="Pôr ${k} ${esc(D.name)} na fila" title="Pôr ${k} na fila${G.isTouch ? '' : k === 5 ? ' · ou Shift+clique no cartão' : ' · ou Ctrl+clique no cartão'}">+${k}</button>`).join('')}</span>` : ''; /* 5.0a.1: +5 e +10 explícitos (um toque no cartão = +1) */
+    const qn = kind === 'u' && !G.isTouch ? `<span class="bd-qn" role="group" aria-label="${esc(Tx('hud.q.mais', { nome: D.name }))}">${[5, 10].map(k => `<button type="button" data-prodn="${k}" data-def="${def}" data-bid="${G.prodBid || ''}"${D.lock ? ` disabled data-lock="${esc(D.lock)}"` : ''} aria-label="${esc(Tx('hud.q.por-n', { n: k, nome: D.name }))}" title="${esc(Tx('hud.q.por-dica', { n: k }) + (G.isTouch ? '' : ' · ' + Tx(k === 5 ? 'hud.q.shift' : 'hud.q.ctrl')))}">+${k}</button>`).join('')}</span>` : ''; /* 5.0c */ /* 5.0a.1: +5 e +10 explícitos (um toque no cartão = +1) */
     const head = `<div class="bd-h"><b class="bd-n">${esc(D.name)}</b><span class="bd-c">${esc(D.cls)}</span><span class="cost">${costStr(D.cost)}</span><span class="bd-era">ERA ${S.ERAS[D.era].roman}</span></div>`, row = qn ? `<div class="bd-row">${need}${qn}</div>` : need;
-    const body = `<div class="bd-st">${D.st.map(x => `<span title="${x[2]}">${IC(x[0])}${esc(x[1])}</span>`).join('')}</div><p class="bd-d">${esc(D.desc)}</p>`;
-    return head + body + row + (G.isTouch && kind === 'b' ? `<button class="act sm bd-go" data-go="${def}"${D.lock ? ' disabled' : ''}>${IC('ic-construir')}Posicionar</button>` : ''); }
+    const body = `<div class="bd-st">${D.st.map(x => `<span title="${esc(x[2])}">${IC(x[0])}${esc(x[1])}</span>`).join('')}</div><p class="bd-d">${esc(D.desc)}</p>`;
+    return head + body + row + (G.isTouch && kind === 'b' ? `<button class="act sm bd-go" data-go="${def}"${D.lock ? ' disabled' : ''}>${IC('ic-construir')}${Tx('hud.posicionar')}</button>` : ''); } /* 5.0c */
   function qrowHTML(def) { /* 5.0a.1: a linha do toque — a unidade escolhida e os botões +5 e +10 (um toque no cartão = +1) */ const D = detInfo('u', def);
-    return `<span class="pq-l">Pôr na fila<b>${esc(D.name)}</b></span><span class="bd-qn" role="group" aria-label="Pôr mais ${esc(D.name)} na fila">${[5, 10].map(k => `<button type="button" data-prodn="${k}" data-def="${def}" data-bid="${G.prodBid || ''}"${D.lock ? ` disabled data-lock="${esc(D.lock)}"` : ''} aria-label="Pôr ${k} ${esc(D.name)} na fila">+${k}</button>`).join('')}</span>`; }
+    return `<span class="pq-l">${Tx('hud.q.por')}<b>${esc(D.name)}</b></span><span class="bd-qn" role="group" aria-label="${esc(Tx('hud.q.mais', { nome: D.name }))}">${[5, 10].map(k => `<button type="button" data-prodn="${k}" data-def="${def}" data-bid="${G.prodBid || ''}"${D.lock ? ` disabled data-lock="${esc(D.lock)}"` : ''} aria-label="${esc(Tx('hud.q.por-n', { n: k, nome: D.name }))}">+${k}</button>`).join('')}</span>`; } /* 5.0c */
   function showDet(kind, def, cards, attr) { /* no evento (passar o mouse, foco ou toque), nunca no laço */ const box = $('panel').querySelector('[data-det]'); if (!box || !def) return; if (kind === 'b') G.bdet = def; else G.udet = def;
     box.innerHTML = detHTML(kind, def); for (const c of cards) setOn(c, 'cur', c.dataset[attr] === def);
     if (kind === 'u') { const qr = $('panel').querySelector('[data-qrow]'); if (qr) qr.innerHTML = qrowHTML(def); } /* 5.0a.1 */
@@ -780,24 +784,24 @@ function startGame(cfg, netCtx) {
   function bindDetails(kind, cards, attr) { for (const c of cards) { const f = () => showDet(kind, c.dataset[attr], cards, attr); let ht = 0; c.addEventListener('pointerenter', ev => { if (ev.pointerType === 'touch') return; if (kind !== 'u') { f(); return; } clearTimeout(ht); ht = setTimeout(f, 160); }); c.addEventListener('pointerleave', () => clearTimeout(ht)); c.addEventListener('focus', f); } } /* 5.0a.1: unidades trocam os detalhes depois de 0,16 s sobre o cartão (a caminho do +5 o mouse cruza outros cartões) */
   function techHTML(p) { /* aba Tecnologia: trilha das Eras, o que falta para a próxima e as pesquisas */
     const er = p.era || 1, nx = S.ERAS[er + 1];
-    let h = '<div class="etrack">' + [1, 2, 3].map(n => { const E = S.ERAS[n]; const evo = n === er + 1 && p.evolveT > 0; return `<div class="eg ${n < er ? 'done' : n === er ? 'cur' : evo ? 'evo' : ''}"><b>Era ${E.roman}</b><small>${esc(E.name)}${n === er ? ' · atual' : evo ? ' · evoluindo' : ''}</small></div>`; }).join('') + '</div>';
-    if (nx && !(p.evolveT > 0)) { const reqs = (nx.needs || []).map(n => [S.hasBuilt(sim, human, n), S.BUILDINGS[n].name]).concat(nx.needsAny ? [[nx.needsAny.some(n => S.hasBuilt(sim, human, n)), nx.needsAny.map(n => S.BUILDINGS[n].name).join(' ou ')]] : []);
-      h += `<div class="reqs"><span>Para a Era ${nx.roman}:</span>${reqs.map(r => `<span class="${r[0] ? 'ok' : 'no'}">${r[0] ? '✓' : '✗'} ${esc(r[1])}</span>`).join('')}<span>${costStr(nx.cost)} · ${nx.time} s</span></div>`; }
-    h += '<div class="rlist">' + Object.keys(S.RESEARCH).map(k => { const r = S.RESEARCH[k], done = !!p.research[k], lk = !done && S.lockReason(sim, human, 'research', k); return `<div class="rs ${done ? 'ok' : lk ? 'lk' : ''}" title="${esc(r.desc)}"><b>${esc(r.name)}${done ? ' ✓' : ''}</b><small>${done ? 'concluída' : lk ? 'Era ' + S.ERAS[r.era].roman : costStr(r.cost)}</small></div>`; }).join('') + '</div>';
-    h += `<div class="row">${nx && S.nucleoOf(sim, human) ? `<button class="act sm" data-nucleo="1">${IC('ic-nucleo')}Abrir o Núcleo (F1) para evoluir</button>` : ''}<button class="act sm" data-techscr="1">${IC('ic-tec')}Pesquisa e Eras${G.isTouch ? '' : ' (F3)'}</button></div>`; /* 5.0b: tela de pesquisa */
+    let h = '<div class="etrack">' + [1, 2, 3].map(n => { const E = S.ERAS[n]; const evo = n === er + 1 && p.evolveT > 0; return `<div class="eg ${n < er ? 'done' : n === er ? 'cur' : evo ? 'evo' : ''}"><b>Era ${E.roman}</b><small>${esc(DN.era(n))}${n === er ? ' · ' + Tx('hud.t.atual') : evo ? ' · ' + Tx('hud.t.evoluindo') : ''}</small></div>`; }).join('') + '</div>'; /* 5.0c */
+    if (nx && !(p.evolveT > 0)) { const reqs = (nx.needs || []).map(n => [S.hasBuilt(sim, human, n), DN.construcao(n)]).concat(nx.needsAny ? [[nx.needsAny.some(n => S.hasBuilt(sim, human, n)), nx.needsAny.map(n => DN.construcao(n)).join(' ' + Tx('geral.ou') + ' ')]] : []); /* 5.0c */
+      h += `<div class="reqs"><span>${Tx('hud.t.para-era', { era: nx.roman })}</span>${reqs.map(r => `<span class="${r[0] ? 'ok' : 'no'}">${r[0] ? '✓' : '✗'} ${esc(r[1])}</span>`).join('')}<span>${costStr(nx.cost)} · ${nx.time} s</span></div>`; }
+    h += '<div class="rlist">' + Object.keys(S.RESEARCH).map(k => { const r = S.RESEARCH[k], done = !!p.research[k], lk = !done && S.lockReason(sim, human, 'research', k); return `<div class="rs ${done ? 'ok' : lk ? 'lk' : ''}" title="${esc(DN.pesquisaDesc(k))}"><b>${esc(DN.pesquisa(k))}${done ? ' ✓' : ''}</b><small>${done ? Tx('hud.t.concluida') : lk ? 'Era ' + S.ERAS[r.era].roman : costStr(r.cost)}</small></div>`; }).join('') + '</div>'; /* 5.0c */
+    h += `<div class="row">${nx && S.nucleoOf(sim, human) ? `<button class="act sm" data-nucleo="1">${IC('ic-nucleo')}${Tx('hud.t.abrir-nucleo')}</button>` : ''}<button class="act sm" data-techscr="1">${IC('ic-tec')}${Tx('hud.p.pesquisa-eras')}${G.isTouch ? '' : ' (F3)'}</button></div>`; /* 5.0b: tela de pesquisa · 5.0c */
     return h; }
   function buildMenuHTML(p) {
     const tab = G.btab || 'eco', defs = tabDefs(tab);
-    let h = `<div class="ph">${IC('ic-construir', 'phi')}<b>Construir</b><span class="ph-k">${G.isTouch ? 'toque: detalhes · Posicionar' : 'B + tecla · passe o mouse para detalhes'}</span></div>`;
-    h += '<div class="btabs" role="tablist">' + BTABS.map(t => `<button class="btab${t[0] === tab ? ' on' : ''}" role="tab" aria-selected="${t[0] === tab}" data-btab="${t[0]}">${IC(t[2])}<span>${t[1]}</span><span class="bn">${tabDefs(t[0]).length}</span></button>`).join('') + '</div><div class="bgrid">';
+    let h = `<div class="ph">${IC('ic-construir', 'phi')}<b>${Tx('hud.construir')}</b><span class="ph-k">${Tx(G.isTouch ? 'hud.construir-toque' : 'hud.construir-mouse')}</span></div>`; /* 5.0c */
+    h += '<div class="btabs" role="tablist">' + BTABS.map(t => `<button class="btab${t[0] === tab ? ' on' : ''}" role="tab" aria-selected="${t[0] === tab}" data-btab="${t[0]}">${IC(t[2])}<span>${Tx('hud.btab.' + t[0], null, t[1])}</span><span class="bn">${tabDefs(t[0]).length}</span></button>`).join('') + '</div><div class="bgrid">';
     if (tab === 'tec') h = h.replace(/<div class="bgrid">$/, '<div class="tecw"><div class="bgrid">'); /* 4.3l: na Tecnologia o cartão fica ao lado da trilha das Eras */
-    for (const k of defs) { const d = S.BUILDINGS[k]; const can = S.canAfford(p, d.cost); const lk = S.lockReason(sim, human, 'building', k); h += `<button class="act bcard ${can ? '' : 'poor'} ${lk ? 'locked' : ''} ${view.ghost && view.ghost.def === k ? 'on' : ''}" data-build="${k}" ${lk ? `data-lock="${esc(lk)}"` : ''} aria-label="${esc(d.name)}">${lk ? `<span class="lockb">ERA ${S.ERAS[d.era || 1].roman}</span>` : ''}<span class="bport"><img class="ico" alt="" src="${R.icon(k, human)}"></span><span class="k">${d.key}</span><span class="n">${esc(d.name)}</span><span class="cost">${costStr(d.cost)}</span></button>`; }
+    for (const k of defs) { const d = S.BUILDINGS[k]; const can = S.canAfford(p, d.cost); const lk = TRx(S.lockReason(sim, human, 'building', k)); /* 5.0c */ h += `<button class="act bcard ${can ? '' : 'poor'} ${lk ? 'locked' : ''} ${view.ghost && view.ghost.def === k ? 'on' : ''}" data-build="${k}" ${lk ? `data-lock="${esc(lk)}"` : ''} aria-label="${esc(DN.construcao(k))}">${lk ? `<span class="lockb">ERA ${S.ERAS[d.era || 1].roman}</span>` : ''}<span class="bport"><img class="ico" alt="" src="${R.icon(k, human)}"></span><span class="k">${d.key}</span><span class="n">${esc(DN.construcao(k))}</span><span class="cost">${costStr(d.cost)}</span></button>`; }
     h += '</div>';
     if (tab === 'tec') h += '<div class="tecr">' + techHTML(p) + '</div></div>';
     const cur = G.bdet && defs.includes(G.bdet) ? G.bdet : defs[0]; if (cur) h += `<div class="bdet" data-det data-def="${cur}"></div>`;
-    if (!view.sel.size && !G.isTouch) h += '<div class="tip">Nada selecionado. Clique em unidades ou arraste uma caixa. F1 seleciona o Núcleo, F2 o exército.</div>';
+    if (!view.sel.size && !G.isTouch) h += '<div class="tip">' + Tx('hud.nada-sel') + '</div>'; /* 5.0c */
     return h; }
-  function placeBuild(k) { const b = $('panel').querySelector('[data-build="' + k + '"]'); if (b && b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.buildMenu = false; I.setMode('build', k); notice(G.isTouch ? 'Arraste para posicionar e toque em ✓ Construir aqui' : 'Posicione e clique para construir. Shift mantém o modo.'); }
+  function placeBuild(k) { const b = $('panel').querySelector('[data-build="' + k + '"]'); if (b && b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } I.buildMenu = false; I.setMode('build', k); notice(Tx(G.isTouch ? 'hud.posicionar-toque' : 'hud.posicionar-mouse')); } /* 5.0c */
   function bindBuildMenu() { const panel = $('panel'); const bs = [...panel.querySelectorAll('[data-build]')]; if (G.live) G.live.build = bs; /* 4.3k: o "falta recurso" atualiza no lugar */
     panel.querySelectorAll('[data-btab]').forEach(t => t.addEventListener('click', () => { if (G.btab === t.dataset.btab) return; G.btab = t.dataset.btab; refreshPanel(true); }));
     const nb = panel.querySelector('[data-nucleo]'); if (nb) nb.addEventListener('click', () => { const n = S.nucleoOf(sim, human); if (n) { I.select([n.id]); I.center(n.x, n.y); } });
@@ -806,41 +810,41 @@ function startGame(cfg, netCtx) {
   function refreshQuick() { /* 4.3k: escrita só quando muda */
     const p = sim.players[human]; const fac = S.FACTIONS[p.faction];
     const oc = $('btn-over'); const cd = Math.max(0, p.overchargeCd - sim.time); const Q = G.quickEls || (G.quickEls = { ocSub: oc.querySelector('.sub'), spN: $('btn-super').querySelector('.n'), spSub: $('btn-super').querySelector('.sub') });
-    setD(oc, cd > 0 || p.res.plasma < S.OVERCHARGE_COST); setT(Q.ocSub, cd > 0 ? 'recarga ' + mmss(cd) : '200 Plasma · +50% energia 60 s');
+    setD(oc, cd > 0 || p.res.plasma < S.OVERCHARGE_COST); setT(Q.ocSub, cd > 0 ? Tx('hud.recarga', { t: mmss(cd) }) : Tx('hud.sobrecarga-sub')); /* 5.0c */
     const sp = $('btn-super'); const lab = S.hasBuilt(sim, human, 'laboratorio'); const scd = Math.max(0, p.superCd - sim.time);
-    setT(Q.spN, fac.superName); const era3 = (p.era || 1) >= 3; setD(sp, !lab || !era3 || scd > 0 || !S.canAfford(p, S.SUPER_COST));
-    setT(Q.spSub, !lab ? 'requer Laboratório' : !era3 ? 'requer Era III' : scd > 0 ? 'recarga ' + mmss(scd) : '300 Dados · 200 Plasma');
+    setT(Q.spN, DN.superarma(p.faction)); /* 5.0c */ const era3 = (p.era || 1) >= 3; setD(sp, !lab || !era3 || scd > 0 || !S.canAfford(p, S.SUPER_COST));
+    setT(Q.spSub, !lab ? Tx('hud.requer-lab') : !era3 ? Tx('hud.requer-era3') : scd > 0 ? Tx('hud.recarga', { t: mmss(scd) }) : Tx('hud.super-sub')); /* 5.0c */
     setOn($('btn-diplo'), 'attn', !!G.pendingFor);
     setOn($('btn-build'), 'on', I.buildMenu || I.mode === 'build' || (G.isTouch && !view.sel.size && !(G.drawer && G.drawer.build))); /* 4.3l: no toque, aceso com a gaveta do Construir aberta */
     setOn($('btn-attack'), 'on', I.mode === 'attackmove');
     setOn($('btn-box'), 'on', I.touchBox);
   }
   function bindHUD() {
-    document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => { if (net) { notice('Velocidade fixa no multiplayer'); return; } G.speed = parseFloat(b.dataset.speed); G.paused = false; refreshTop(); }));
+    document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => { if (net) { notice(Tx('hud.vel-mp')); return; } /* 5.0c */ G.speed = parseFloat(b.dataset.speed); G.paused = false; refreshTop(); }));
     $('btn-pause').addEventListener('click', () => ui.togglePause());
     $('btn-over').addEventListener('click', () => I.cmd({ t: 'overcharge' }));
     $('btn-super').addEventListener('click', () => superClick(fac()));
     $('btn-diplo').addEventListener('click', () => openDiplo());
     $('btn-help').addEventListener('click', () => toggleHelp(true));
-    $('btn-menu').addEventListener('click', () => ui.confirm('Encerrar esta partida e voltar ao início?' + (G.autoSave ? ' Para continuar depois, use 💾 › Pausar e sair.' : ''), () => { G.leaving = true; const go = () => goStart(); if (net) mpSession.clear(); if (G.autoSave && ARD.saves) within(ARD.saves.del('auto'), 2500).then(go, go); else go(); })); // 4.2g: sem relançar a missão nem regravar o 'auto'
+    $('btn-menu').addEventListener('click', () => ui.confirm(Tx('hud.sair-q') + (G.autoSave ? ' ' + Tx('hud.sair-dica') : ''), () => { /* 5.0c */ G.leaving = true; const go = () => goStart(); if (net) mpSession.clear(); if (G.autoSave && ARD.saves) within(ARD.saves.del('auto'), 2500).then(go, go); else go(); })); // 4.2g: sem relançar a missão nem regravar o 'auto'
     if ($('btn-save')) $('btn-save').addEventListener('click', () => openSaveBox());
     $('panel').addEventListener('click', ev => { const b = ev.target.closest && ev.target.closest('[data-techscr]'); if (b && G.h3) G.h3.openTech(); }); /* 5.0b: botões da tela de pesquisa nos painéis (o painel é remontado; o ouvinte fica no contêiner) */
     bindProd(); /* 5.0a.1 */
     if ($('idle-col')) $('idle-col').addEventListener('click', () => sendIdleCollectors()); // 4.2h · 5.0a.1: um toque manda os parados aos nós livres mais próximos
-    if ($('pausebox')) $('pausebox').addEventListener('click', () => { if (G.paused && !G.ended) { G.paused = false; G.autoPaused = false; G.pauseWhy = null; refreshTop(); notice('Continuando'); } }); // 4.2f: pausa visível; clique continua
+    if ($('pausebox')) $('pausebox').addEventListener('click', () => { if (G.paused && !G.ended) { G.paused = false; G.autoPaused = false; G.pauseWhy = null; refreshTop(); notice(Tx('hud.continuando')); } }); /* 5.0c */ // 4.2f: pausa visível; clique continua
     $('btn-build').addEventListener('click', () => { if (G.isTouch && I.mode !== 'build') { G.drawer = G.drawer || {}; const showing = !view.sel.size || I.buildMenu; if (showing && !G.drawer.build) { setDrawer(true); return; } G.drawer.build = false; I.buildMenu = true; view.sel = new Set(); ui.buildMenuChanged(true); return; } /* 4.3l: no toque, o botão abre e recolhe a gaveta do Construir */
       I.buildMenu = !I.buildMenu; view.sel = new Set(); ui.buildMenuChanged(I.buildMenu); });
     $('btn-attack').addEventListener('click', () => I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'));
-    $('btn-box').addEventListener('click', () => { I.touchBox = !I.touchBox; refreshQuick(); notice(I.touchBox ? 'Arraste para selecionar em caixa' : 'Arraste para mover a câmera'); });
+    $('btn-box').addEventListener('click', () => { I.touchBox = !I.touchBox; refreshQuick(); notice(Tx(I.touchBox ? 'hud.caixa-on' : 'hud.caixa-off')); }); /* 5.0c */
     $('btn-stop').addEventListener('click', () => { const ids = [...view.sel].filter(id => { const e = sim.byId.get(id); return e && e.alive && e.kind === 'unit' && e.owner === human; }); if (ids.length) I.cmd({ t: 'stop', ids }); });
     $('btn-nucleo').addEventListener('click', () => { const n = S.nucleoOf(sim, human); if (n) { I.select([n.id]); I.center(n.x, n.y); } });
     $('btn-clear').addEventListener('click', () => { I.select([]); if (I.mode !== 'normal') I.setMode('normal'); });
-    $('btn-rot').addEventListener('click', () => { if (R.supportsYaw) view.cam.yaw = (view.cam.yaw || 0) + Math.PI / 2; else notice('Rotação só no modo 3D'); });
-    { const TILTS = [0.95, 0.62, 0.3], TN = ['Câmera tática', 'Câmera inclinada', 'Câmera de horizonte (planeta-mãe no céu)']; const tb = $('btn-tilt'); if (tb) tb.addEventListener('click', () => { if (!R.CAM) { notice('Inclinação só no modo 3D'); return; } const i = (TILTS.findIndex(t => Math.abs(t - view.cam.pitchT) < 0.05) + 1) % TILTS.length; view.cam.pitchT = TILTS[i]; notice(TN[i] + ' · PageUp/PageDown ou Ctrl + rolagem ajustam'); }); }
-    $('btn-all').addEventListener('click', () => { const n = I.selectOnScreen(); notice(n ? n + ' unidades selecionadas' : 'Nenhuma unidade de combate na tela'); });
+    $('btn-rot').addEventListener('click', () => { if (R.supportsYaw) view.cam.yaw = (view.cam.yaw || 0) + Math.PI / 2; else notice(Tx('hud.rot-3d')); }); /* 5.0c */
+    { const TILTS = [0.95, 0.62, 0.3]; const tb = $('btn-tilt'); if (tb) tb.addEventListener('click', () => { if (!R.CAM) { notice(Tx('hud.tilt-3d')); return; } const i = (TILTS.findIndex(t => Math.abs(t - view.cam.pitchT) < 0.05) + 1) % TILTS.length; view.cam.pitchT = TILTS[i]; notice(Tx('hud.tilt.' + i) + ' · ' + Tx('hud.tilt-dica')); }); } /* 5.0c */
+    $('btn-all').addEventListener('click', () => { const n = I.selectOnScreen(); notice(n ? Tx('hud.selecionadas', { n }) : Tx('hud.nenhuma-tela')); }); /* 5.0c */
     const syncAudioBtns = () => { $('btn-sound').classList.toggle('on', AU.enabled); $('btn-voice').classList.toggle('on', AU.voice); };
     $('btn-sound').addEventListener('click', () => { AU.setEnabled(!AU.enabled); AU.init(); syncAudioBtns(); if (AU.enabled) AU.sfx('click'); });
-    $('btn-voice').addEventListener('click', () => { AU.setVoice(!AU.voice); syncAudioBtns(); if (AU.voice) AU.say('Voz ativada', 'voz-on', 0); });
+    $('btn-voice').addEventListener('click', () => { AU.setVoice(!AU.voice); syncAudioBtns(); if (AU.voice) AU.say(Tx('voz.ativada'), 'voz-on', 0); }); /* 5.0c */
     syncAudioBtns();
     $('btn-army').addEventListener('click', () => { const ids = []; for (const en of sim.ents) if (en.alive && en.owner === human && en.kind === 'unit' && S.UNITS[en.def].attack) ids.push(en.id); I.select(ids); if (ids.length) { const e = sim.byId.get(ids[0]); I.center(e.x, e.y); } });
     mini.addEventListener('pointerdown', e => { e.preventDefault(); const r = mini.getBoundingClientRect(); const [x, y] = R.miniToWorld((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height); if (e.button === 2) { const ids = [...view.sel].filter(id => { const u = sim.byId.get(id); return u && u.alive && u.kind === 'unit' && u.owner === human; }); if (ids.length) I.cmd({ t: 'attackmove', ids, x, y }); } else I.center(x, y); });
@@ -866,7 +870,7 @@ function startGame(cfg, netCtx) {
     const fire = (b, ev) => { if (b.dataset.lock) { notice('🔒 ' + b.dataset.lock); return; } if (b.disabled) return;
       const def = b.dataset.prod || b.dataset.def, bid = +(b.dataset.bid || G.prodBid || 0), bd = sim.byId.get(bid); if (!def || !bd || !bd.alive || bd.owner !== human) return;
       const n = b.dataset.prodn ? +b.dataset.prodn : (ev && (ev.ctrlKey || ev.metaKey)) ? 10 : (ev && ev.shiftKey) ? 5 : 1;
-      I.cmd({ t: 'produce', id: bid, def, n }); if (n > 1) notice('+' + n + ' ' + S.unitName(sim.players[human].faction, def) + ' na fila');
+      I.cmd({ t: 'produce', id: bid, def, n }); if (n > 1) notice(Tx('hud.q.na-fila', { n, nome: DN.unidade(sim.players[human].faction, def) })); /* 5.0c */
       if (b.dataset.prod) { const ps = [...panel.querySelectorAll('[data-prod]')]; if (G.udet !== def) showDet('u', def, ps, 'prod'); } };
     panel.addEventListener('pointerdown', ev => { if (ev.target.closest && ev.target.closest('button')) G.pPress = performance.now(); const b = tgt(ev.target); pr = b && !(ev.pointerType === 'mouse' && ev.button !== 0) ? { id: ev.pointerId, key: keyOf(b), x: ev.clientX, y: ev.clientY, type: ev.pointerType, moved: false } : null; });
     panel.addEventListener('pointermove', ev => { if (pr && ev.pointerId === pr.id && !pr.moved && Math.hypot(ev.clientX - pr.x, ev.clientY - pr.y) > 12) pr.moved = true; });
@@ -878,11 +882,11 @@ function startGame(cfg, netCtx) {
   }
   function sendIdleCollectors(res) { /* 5.0a.1: seleciona os coletores parados e manda cada um ao nó livre mais próximo, distribuídos (comando 'gather' da simulação; o aviso com o resultado vem dela); res: o recurso que acabou vem primeiro */
     const ids = []; for (const e of sim.ents) if (e.alive && e.kind === 'unit' && e.owner === human && e.def === 'coletor' && (e.state === 'idle' || (e.state === 'move' && e.node == null && !e.area))) ids.push(e.id); /* parados e os que voltam para a base sem nó (os mandados pelo jogador têm área) */
-    if (!ids.length) { notice('Nenhum coletor parado: os coletores já estão trabalhando'); return 0; } I.select(ids); I.cmd(res ? { t: 'gather', ids, res } : { t: 'gather', ids }); return ids.length; }
+    if (!ids.length) { notice(Tx('hud.nenhum-parado')); return 0; } /* 5.0c */ I.select(ids); I.cmd(res ? { t: 'gather', ids, res } : { t: 'gather', ids }); return ids.length; }
   G.sendIdleCollectors = sendIdleCollectors;
   function fac() { return S.FACTIONS[sim.players[human].faction]; }
   const SUPER_TARGETED = { fundicao: 'Clique em território seu para derrubar o Bastião', eclosao: 'Clique num ponto visível para a Eclosão' };
-  function superClick(f) { if (SUPER_TARGETED[f.superKey]) { I.setMode('super'); notice(SUPER_TARGETED[f.superKey]); } else I.cmd({ t: 'super' }); }
+  function superClick(f) { if (SUPER_TARGETED[f.superKey]) { I.setMode('super'); notice(Tx('hud.super-alvo.' + f.superKey, null, SUPER_TARGETED[f.superKey])); } else I.cmd({ t: 'super' }); } /* 5.0c */
 
   // ---------- diplomacy ----------
   function openDiplo() {
@@ -890,18 +894,18 @@ function startGame(cfg, netCtx) {
     // 4.0c — cena frente a frente: seu líder à esquerda, o líder da sala em foco à direita (pacto = sereno, guerra = furioso); passe o mouse ou toque numa linha para trocar
     const others = sim.players.filter(q => q.id !== human); const focus = others.find(q => q.alive) || others[0];
     const scene = q => { const pact = q && p.pacts[q.id]; const me = leaderArt(p.faction, pact ? 1 : 2), them = q && leaderArt(q.faction, q.alive ? (pact ? 1 : 2) : 1);
-      return `<div class="dp-side me">${me ? `<img src="${me}" alt="">` : ''}<div><b>${LEADER_NAME[p.faction] || ''}</b><div class="muted small">${S.FACTIONS[p.faction].short} · você</div></div></div><div class="dp-vs ${pact ? 'pact' : 'war'}"><svg aria-hidden="true"><use href="#${pact ? 'ic-diplo' : 'ic-jogar'}"/></svg><span class="vh">${pact ? 'em pacto' : 'em guerra'}</span></div><div class="dp-side them${q && !q.alive ? ' dead' : ''}" style="--rc2:${q ? q.color : '#888'}"><div style="text-align:right"><b>${q ? (LEADER_NAME[q.faction] || '') : '—'}</b><div class="muted small">${q ? S.FACTIONS[q.faction].short + ' · ' + esc(q.name) + (q.alive ? '' : ' · eliminado') : ''}</div></div>${them ? `<img src="${them}" alt="">` : ''}</div>`; };
+      return `<div class="dp-side me">${me ? `<img src="${me}" alt="">` : ''}<div><b>${LEADER_NAME[p.faction] || ''}</b><div class="muted small">${DN.racaCurto(p.faction)} · ${Tx('multi.voce')}</div></div></div><div class="dp-vs ${pact ? 'pact' : 'war'}"><svg aria-hidden="true"><use href="#${pact ? 'ic-diplo' : 'ic-jogar'}"/></svg><span class="vh">${Tx(pact ? 'diplo.em-pacto' : 'diplo.em-guerra')}</span></div><div class="dp-side them${q && !q.alive ? ' dead' : ''}" style="--rc2:${q ? q.color : '#888'}"><div style="text-align:right"><b>${q ? (LEADER_NAME[q.faction] || '') : '—'}</b><div class="muted small">${q ? DN.racaCurto(q.faction) + ' · ' + esc(DN.jogador(q.name)) + (q.alive ? '' : ' · ' + Tx('diplo.eliminado')) : ''}</div></div>${them ? `<img src="${them}" alt="">` : ''}</div>`; }; /* 5.0c */
     if (focus) h += `<div class="dp-scene" id="dp-scene">${scene(focus)}</div>`;
-    h += `<div class="muted small">Sua reputação: <b>${S.REP_NAMES[p.rep]}</b>. Pactos cumpridos sobem a reputação; quebrar pactos derruba. Caução: 150 Minério por lado, devolvida ao fim do pacto; quem quebra perde a dele para a vítima.${fac().pactHalf ? ' Como Quorith, sua Caução é 75 e cada pacto cumprido rende o dobro de reputação.' : ''}</div>`;
+    h += `<div class="muted small">${Tx('diplo.reputacao', { rep: '<b>' + esc(DN.reputacao(p.rep)) + '</b>' })}${fac().pactHalf ? ' ' + Tx('diplo.quorith') : ''}</div>`; /* 5.0c */
     for (const q of sim.players) {
       if (q.id === human) continue;
       const pact = p.pacts[q.id]; const pending = sim.pending.find(pr => pr.from === q.id && pr.to === human); const mine = sim.pending.find(pr => pr.from === human && pr.to === q.id);
-      h += `<div class="dp ${q.alive ? '' : 'dead'}" data-pid="${q.id}"><div class="dp-h">${leaderArt(q.faction) ? `<img class="dp-lead" src="${leaderArt(q.faction)}" alt="">` : ''}<span class="dot" style="background:${q.color}"></span><b>${esc(q.name)}</b> <span class="muted">· ${LEADER_NAME[q.faction] || ''}</span> <span class="muted">· ${S.FACTIONS[q.faction].short} · ${q.alive ? S.REP_NAMES[q.rep] : 'eliminado'}</span></div>`;
+      h += `<div class="dp ${q.alive ? '' : 'dead'}" data-pid="${q.id}"><div class="dp-h">${leaderArt(q.faction) ? `<img class="dp-lead" src="${leaderArt(q.faction)}" alt="">` : ''}<span class="dot" style="background:${q.color}"></span><b>${esc(DN.jogador(q.name))}</b> <span class="muted">· ${LEADER_NAME[q.faction] || ''}</span> <span class="muted">· ${DN.racaCurto(q.faction)} · ${q.alive ? DN.reputacao(q.rep) : Tx('diplo.eliminado')}</span></div>`; /* 5.0c */
       if (!q.alive) { h += '</div>'; continue; }
-      if (pact) h += `<div class="small">Não-agressão ativa · restam ${mmss(pact.until - sim.time)}</div><button class="act sm danger" data-break="${q.id}">Quebrar pacto (Golpe de Traição)</button>`;
-      else if (pending) h += `<div class="small">Propõe Não-agressão (10 min, Caução 150)</div><div class="row"><button class="act sm good" data-accept="${q.id}">Aceitar</button><button class="act sm" data-decline="${q.id}">Recusar</button></div>`;
-      else if (mine) h += `<div class="small muted">Proposta enviada, aguardando resposta</div>`;
-      else h += `<button class="act sm" data-propose="${q.id}" ${p.res.minerio < S.pactCost(p) ? 'disabled' : ''}>Propor Não-agressão (Caução ${S.pactCost(p)})</button>`;
+      if (pact) h += `<div class="small">${Tx('diplo.ativa', { t: mmss(pact.until - sim.time) })}</div><button class="act sm danger" data-break="${q.id}">${Tx('diplo.quebrar')}</button>`; /* 5.0c */
+      else if (pending) h += `<div class="small">${Tx('diplo.propoe')}</div><div class="row"><button class="act sm good" data-accept="${q.id}">${Tx('diplo.aceitar')}</button><button class="act sm" data-decline="${q.id}">${Tx('diplo.recusar')}</button></div>`;
+      else if (mine) h += `<div class="small muted">${Tx('diplo.enviada')}</div>`;
+      else h += `<button class="act sm" data-propose="${q.id}" ${p.res.minerio < S.pactCost(p) ? 'disabled' : ''}>${Tx('diplo.propor', { n: S.pactCost(p) })}</button>`;
       h += '</div>';
     }
     $('diplo-body').innerHTML = h;
@@ -909,9 +913,9 @@ function startGame(cfg, netCtx) {
     m.querySelectorAll('[data-propose]').forEach(b => b.addEventListener('click', () => { I.cmd({ t: 'propose', to: parseInt(b.dataset.propose, 10) }); setTimeout(openDiplo, 150); }));
     m.querySelectorAll('[data-accept]').forEach(b => b.addEventListener('click', () => { I.cmd({ t: 'respond', to: parseInt(b.dataset.accept, 10), accept: true }); G.pendingFor = null; setTimeout(openDiplo, 150); }));
     m.querySelectorAll('[data-decline]').forEach(b => b.addEventListener('click', () => { I.cmd({ t: 'respond', to: parseInt(b.dataset.decline, 10), accept: false }); G.pendingFor = null; setTimeout(openDiplo, 150); }));
-    m.querySelectorAll('[data-break]').forEach(b => b.addEventListener('click', () => { const id = parseInt(b.dataset.break, 10); ui.confirm('Quebrar o pacto com ' + sim.players[id].name + '? Você perde a Caução, ganha +20% de dano por 45 s e sua Reputação cai.', () => { I.cmd({ t: 'break', with: id }); setTimeout(openDiplo, 150); }); }));
+    m.querySelectorAll('[data-break]').forEach(b => b.addEventListener('click', () => { const id = parseInt(b.dataset.break, 10); ui.confirm(Tx('diplo.quebrar-q', { nome: DN.jogador(sim.players[id].name) }), () => { /* 5.0c */ I.cmd({ t: 'break', with: id }); setTimeout(openDiplo, 150); }); }));
   }
-  function showProposal(from) { const q = sim.players[from]; const el = $('proposal'); el.hidden = false; $('proposal-text').textContent = q.name + ' propõe um pacto de Não-agressão por 10 min (Caução 150 Minério).'; $('prop-yes').onclick = () => { I.cmd({ t: 'respond', to: from, accept: true }); el.hidden = true; G.pendingFor = null; }; $('prop-no').onclick = () => { I.cmd({ t: 'respond', to: from, accept: false }); el.hidden = true; G.pendingFor = null; }; setTimeout(() => { el.hidden = true; }, 30000); }
+  function showProposal(from) { const q = sim.players[from]; const el = $('proposal'); el.hidden = false; $('proposal-text').textContent = Tx('diplo.proposta', { nome: DN.jogador(q.name) }); /* 5.0c */ $('prop-yes').onclick = () => { I.cmd({ t: 'respond', to: from, accept: true }); el.hidden = true; G.pendingFor = null; }; $('prop-no').onclick = () => { I.cmd({ t: 'respond', to: from, accept: false }); el.hidden = true; G.pendingFor = null; }; setTimeout(() => { el.hidden = true; }, 30000); }
 
   // ---------- hints ----------
   function makeHints() {
@@ -930,13 +934,13 @@ function startGame(cfg, netCtx) {
   function refreshHints() {
     const box = $('hints'), hb = $('hints-body');
     if (G.adv && sim.time > G.adv.until) { (G.advS || (G.advS = { since: {}, next: {} })).quiet = sim.time + 25; G.adv = null; } /* 5.0a.1: o conselho some sozinho depois de um tempo de jogo */
-    if (G.adv) { const a = G.adv; const html = `<div class="hint adv k-${a.kind || 'info'}" role="status"><span class="adv-h">${IC(a.icon || 'ic-alerta')}<b>${esc(a.title || 'Conselho')}</b></span><span class="adv-t">${esc(a.text)}</span><span class="adv-b">${a.acts.map((x, i) => `<button type="button" class="act sm${i === 0 ? ' good' : ''}" data-adv="${i}">${x.ic ? IC(x.ic) : ''}${esc(x.label)}</button>`).join('')}</span></div>`;
+    if (G.adv) { const a = G.adv; const html = `<div class="hint adv k-${a.kind || 'info'}" role="status"><span class="adv-h">${IC(a.icon || 'ic-alerta')}<b>${esc(a.title || Tx('hud.conselho'))}</b></span><span class="adv-t">${esc(a.text)}</span><span class="adv-b">${a.acts.map((x, i) => `<button type="button" class="act sm${i === 0 ? ' good' : ''}" data-adv="${i}">${x.ic ? IC(x.ic) : ''}${esc(x.label)}</button>`).join('')}</span></div>`;
       setOn(box, 'advon', true); setH(box, false); if (G.hintsHtml !== html) { G.hintsHtml = html; hb.innerHTML = html; } return; }
     setOn(box, 'advon', false);
     if (G.hintsOff) { setH(box, true); return; }
     const todo = G.hints.filter(h => !h.done()).slice(0, 2);
     if (!todo.length) { setH(box, true); return; }
-    setH(box, false); const html = (G.isTouch ? todo.slice(0, 1) : todo).map((h, i) => `<div class="hint ${i === 0 ? 'now' : ''}">${esc(h.text)}</div>`).join(''); if (G.hintsHtml !== html) { G.hintsHtml = html; hb.innerHTML = html; } /* 4.3k: troca só quando a dica muda */
+    setH(box, false); const html = (G.isTouch ? todo.slice(0, 1) : todo).map((h, i) => `<div class="hint ${i === 0 ? 'now' : ''}">${esc(Tx('hud.dica.' + h.id, null, h.text))}</div>`).join(''); /* 5.0c */ if (G.hintsHtml !== html) { G.hintsHtml = html; hb.innerHTML = html; } /* 4.3k: troca só quando a dica muda */
   }
   // ---------- 5.0a.1: conselheiro — recursos parados (com Construir ou Evoluir) e território sem Minério ou Plasma (com Mandar coletores) ----------
   function advise(o) { G.adv = Object.assign({ until: sim.time + (o.secs || 30) }, o); G.hintsHtml = ''; refreshHints(); }
@@ -944,18 +948,18 @@ function startGame(cfg, netCtx) {
   function openBuild(tab, def) { /* abre o Construir na aba certa, com os detalhes da construção sugerida (no toque, a gaveta aberta) */
     if (I.mode !== 'normal') I.setMode('normal'); I.select([]); G.btab = tab; if (def) G.bdet = def; G.drawer = G.drawer || {}; G.drawer.build = false; G.drawerAuto = false; I.buildMenu = true; ui.buildMenuChanged(true); }
   function advPick(k) { /* o conselho para o recurso parado k: o que destrava o jogo agora (Quartel, Era, Refinaria, Laboratório, Torres) */
-    const p = sim.players[human], er = p.era || 1, nx = S.ERAS[er + 1], amt = fmt(p.res[k]) + ' de ' + RES_NAME[k];
+    const p = sim.players[human], er = p.era || 1, nx = S.ERAS[er + 1], amt = Tx('hud.falta.' + k, { n: fmt(p.res[k]) }); /* 5.0c */
     const has = d => sim.ents.some(e => e.alive && e.owner === human && e.kind === 'building' && e.def === d); /* pronta ou em obra */
     const canEvo = !!nx && !(p.evolveT > 0) && !S.eraBlock(sim, human) && S.canAfford(p, nx.cost);
-    const evo = { label: 'Evoluir', ic: 'ic-era', fn: () => { if (G.h3) G.h3.openTech(); else { const n = S.nucleoOf(sim, human); if (n) { I.select([n.id]); I.center(n.x, n.y); } } } };
-    const build = (tab, def) => ({ label: 'Construir', ic: 'ic-construir', fn: () => openBuild(tab, def) });
-    const o = { id: 'parado-' + k, icon: 'ic-' + k, title: 'Recursos parados', kind: 'info' };
-    if (k === 'plasma') return Object.assign(o, canEvo ? { text: 'Você tem ' + amt + ' parado: evolua para a Era ' + nx.roman + ' ou construa Torres de Defesa.', acts: [evo, build('def', 'torre')] } : { text: 'Você tem ' + amt + ' parado: construa Torres de Defesa' + (er >= 2 ? ', uma Fábrica ou um Hangar.' : '.'), acts: [build(er >= 2 ? 'mil' : 'def', er >= 2 ? 'fabrica' : 'torre')] });
-    if (!has('quartel')) return Object.assign(o, { text: 'Você tem ' + amt + ' parado: construa um Quartel' + (canEvo ? ' ou evolua para a Era ' + nx.roman : '') + '.', acts: canEvo ? [build('mil', 'quartel'), evo] : [build('mil', 'quartel')] });
-    if (canEvo) return Object.assign(o, { text: 'Você tem ' + amt + ' parado: evolua para a Era ' + nx.roman + ' (' + nx.name + ') ou construa mais um Quartel.', acts: [evo, build('mil', 'quartel')] });
-    if (er === 1 && !has('refinaria')) return Object.assign(o, { text: 'Você tem ' + amt + ' parado: construa uma Refinaria perto dos nós; com ela e o Quartel você evolui para a Era II.', acts: [build('eco', 'refinaria')] });
-    if (er >= 2 && !has('laboratorio')) return Object.assign(o, { text: 'Você tem ' + amt + ' parado: construa um Laboratório (pesquisas e Era III) ou uma Fábrica.', acts: [build('tec', 'laboratorio')] });
-    return Object.assign(o, { text: 'Você tem ' + amt + ' parado: ponha tropas na fila do Quartel, construa Torres ou expanda com um Nódulo.', acts: [build('mil', 'quartel')] });
+    const evo = { label: Tx('hud.adv.evoluir'), ic: 'ic-era', /* 5.0c */ fn: () => { if (G.h3) G.h3.openTech(); else { const n = S.nucleoOf(sim, human); if (n) { I.select([n.id]); I.center(n.x, n.y); } } } };
+    const build = (tab, def) => ({ label: Tx('hud.construir'), ic: 'ic-construir', fn: () => openBuild(tab, def) }); /* 5.0c */
+    const o = { id: 'parado-' + k, icon: 'ic-' + k, title: Tx('hud.adv.titulo'), kind: 'info' }; const A = (c, v) => Tx('hud.adv.' + c, Object.assign({ amt }, v || {}));
+    if (k === 'plasma') return Object.assign(o, canEvo ? { text: A('plasma-evo', { era: nx.roman }), acts: [evo, build('def', 'torre')] } : { text: A(er >= 2 ? 'plasma-torres2' : 'plasma-torres'), acts: [build(er >= 2 ? 'mil' : 'def', er >= 2 ? 'fabrica' : 'torre')] });
+    if (!has('quartel')) return Object.assign(o, { text: A(canEvo ? 'quartel-evo' : 'quartel', canEvo ? { era: nx.roman } : null), acts: canEvo ? [build('mil', 'quartel'), evo] : [build('mil', 'quartel')] });
+    if (canEvo) return Object.assign(o, { text: A('evo', { era: nx.roman, nome: DN.era(er + 1) }), acts: [evo, build('mil', 'quartel')] });
+    if (er === 1 && !has('refinaria')) return Object.assign(o, { text: A('refinaria'), acts: [build('eco', 'refinaria')] });
+    if (er >= 2 && !has('laboratorio')) return Object.assign(o, { text: A('lab'), acts: [build('tec', 'laboratorio')] });
+    return Object.assign(o, { text: A('tropas'), acts: [build('mil', 'quartel')] });
   }
   function advTick() { /* a cada 2 s de jogo (resWatch): Minério acima de 1.200 ou Plasma acima de 900 por 20 s seguidos; o mesmo conselho volta no máximo a cada 2,5 min */
     if (G.bench || G.ended) return; const p = sim.players[human]; const A = G.advS || (G.advS = { since: {}, next: {} });
@@ -969,21 +973,21 @@ function startGame(cfg, netCtx) {
     $('chat').hidden = false; document.querySelectorAll('[data-speed]').forEach(b => { b.disabled = true; b.style.opacity = 0.4; });
     const log = (who, text) => { const d = document.createElement('div'); d.textContent = who ? who + ': ' + text : text; $('chat-log').appendChild(d); $('chat-log').scrollTop = 9999; while ($('chat-log').children.length > 30) $('chat-log').firstChild.remove(); };
     const myName = sim.players[human].name;
-    log('', 'Sala ' + net.code + ': ' + sim.players.map(p => p.name).join(', ') + '.');
+    log('', Tx('multi.chat.sala', { codigo: net.code, nomes: sim.players.map(p => p.name).join(', ') })); /* 5.0c */
     $('chat-in').addEventListener('keydown', e => { if (e.key === 'Enter') { const t = $('chat-in').value.trim(); if (t) { net.chat(t); log(myName, t); } $('chat-in').value = ''; e.stopPropagation(); } e.stopPropagation(); });
     net.on('chat', d => { const nm = d.name || (sim.players[d.id] || {}).name || '?'; const tx = String(d.text || '').slice(0, 120); log(nm, tx); notice(nm + ': ' + tx.slice(0, 60)); AU.sfx('click'); });
-    net.on('left', d => { const nm = (sim.players[d.id] || {}).name || d.name || 'Um jogador'; banner('Jogador desconectado', nm + ' caiu; as unidades dele ficam paradas. Se voltar em até 2 minutos, retoma o comando.', 'warn'); log('', nm + ' desconectou.'); });
+    net.on('left', d => { const nm = (sim.players[d.id] || {}).name || d.name || Tx('multi.um-jogador'); banner(Tx('multi.desconectado'), Tx('multi.desconectado-txt', { nome: nm }), 'warn'); log('', Tx('multi.desconectou', { nome: nm })); }); /* 5.0c */
     // 4.1c: queda curta não encerra a partida. O convidado tenta voltar à sala por até 2 min; o anfitrião guarda o lugar e manda o estado.
-    const tryRejoin = () => { if (!G.rejoin || G.ended || G.sim !== sim) return; if (performance.now() - G.rejoin.since > 120000) { G.rejoin = null; banner('Não foi possível voltar à sala', 'O anfitrião não respondeu em 2 minutos. A partida terminou para você.', 'danger', 12000); log('', 'Volta à sala esgotada.'); return; }
+    const tryRejoin = () => { if (!G.rejoin || G.ended || G.sim !== sim) return; if (performance.now() - G.rejoin.since > 120000) { G.rejoin = null; banner(Tx('multi.nao-voltou'), Tx('multi.nao-voltou-txt'), 'danger', 12000); log('', Tx('multi.volta-esgotada')); return; } /* 5.0c */
       G.rejoin.tries++; net.rejoin(); clearTimeout(G.rejoin.t); G.rejoin.t = setTimeout(() => { if (G.rejoin && net.state !== 'connected') tryRejoin(); }, 6000); };
-    net.on('close', () => { if (net.role !== 'guest' || G.ended) return; if (!G.rejoin) { G.rejoin = { since: performance.now(), tries: 0 }; banner('Conexão perdida', 'Tentando voltar à sala… a partida continua de onde parou.', 'warn', 8000); log('', 'Conexão perdida com o anfitrião; reconectando.'); setTimeout(tryRejoin, 1500); } });
+    net.on('close', () => { if (net.role !== 'guest' || G.ended) return; if (!G.rejoin) { G.rejoin = { since: performance.now(), tries: 0 }; banner(Tx('multi.conexao-perdida'), Tx('multi.conexao-perdida-txt'), 'warn', 8000); log('', Tx('multi.conexao-perdida-log')); /* 5.0c */ setTimeout(tryRejoin, 1500); } });
     net.on('rejoin-fail', () => {});
-    net.on('rejoin-no', d => { if (G.rejoin) clearTimeout(G.rejoin.t); G.rejoin = null; mpSession.clear(); banner('A sala recusou a volta', 'Motivo: ' + (d.why || '?') + '.', 'danger', 12000); log('', 'Volta recusada: ' + (d.why || '?')); });
-    net.on('state', st => { if (G.rejoin) clearTimeout(G.rejoin.t); G.rejoin = null; try { S.restore(sim, st.snap); if (G.h3) G.h3.reapply(sim); /* 5.0b: a fotografia do anfitrião traz as cores dele */ } catch (e) { banner('Falha ao sincronizar', String(e.message || e), 'danger'); return; } net.sentFor = sim.tick - 1; G.pending = []; G.acc = 0; G.waiting = false; banner('De volta à sala', 'Partida sincronizada no tempo ' + ARD.saves.mmss(sim.time) + '.', 'good', 6000); log('', 'Reconectado à sala ' + net.code + '.'); });
+    net.on('rejoin-no', d => { if (G.rejoin) clearTimeout(G.rejoin.t); G.rejoin = null; mpSession.clear(); banner(Tx('multi.recusou-volta'), Tx('multi.motivo', { motivo: TRx(d.why || '?') }), 'danger', 12000); log('', Tx('multi.volta-recusada', { motivo: TRx(d.why || '?') })); }); /* 5.0c */
+    net.on('state', st => { if (G.rejoin) clearTimeout(G.rejoin.t); G.rejoin = null; try { S.restore(sim, st.snap); if (G.h3) G.h3.reapply(sim); /* 5.0b: a fotografia do anfitrião traz as cores dele */ } catch (e) { banner(Tx('multi.falha-sinc'), String(e.message || e), 'danger'); return; } /* 5.0c */ net.sentFor = sim.tick - 1; G.pending = []; G.acc = 0; G.waiting = false; banner(Tx('multi.de-volta'), Tx('multi.sincronizada', { t: ARD.saves.mmss(sim.time) }), 'good', 6000); log('', Tx('multi.reconectado', { codigo: net.code })); }); /* 5.0c */
     net.on('rejoin-request', () => ({ tick: sim.tick, snap: S.snapshot(sim) }));
-    net.on('back', d => { const nm = (sim.players[d.id] || {}).name || d.name || 'Um jogador'; banner('Jogador voltou', nm + ' voltou à partida.', 'good'); log('', nm + ' voltou.'); });
+    net.on('back', d => { const nm = (sim.players[d.id] || {}).name || d.name || Tx('multi.um-jogador'); banner(Tx('multi.voltou-j'), Tx('multi.voltou-j-txt', { nome: nm }), 'good'); log('', Tx('multi.voltou-log', { nome: nm })); }); /* 5.0c */
     if (net.role === 'guest') { mpSession.touch(); setInterval(() => { if (!G.ended && net.state === 'connected') mpSession.touch(); }, 5000); }
-    net.on('desync', d => { banner('Dessincronização', 'Os mundos divergiram no tick ' + d.tick + '. Isto não deveria acontecer; exporte o resultado no fim e envie o feedback com os navegadores usados.', 'danger'); log('', 'Dessincronização no tick ' + d.tick + ' (jogador ' + ((sim.players[d.id] || {}).name || d.id) + ').'); });
+    net.on('desync', d => { banner(Tx('multi.dessinc'), Tx('multi.dessinc-txt', { tick: String(d.tick) }), 'danger'); log('', Tx('multi.dessinc-log', { tick: String(d.tick), nome: (sim.players[d.id] || {}).name || d.id })); }); /* 5.0c */
     if (net.role === 'host') setInterval(() => net.ping(), 5000);
   }
   // ---------- end ----------
@@ -993,30 +997,30 @@ function startGame(cfg, netCtx) {
       const r = result.campaign; const prep = G.camp.prep; const scores = sim.players.map(q => ({ id: q.id, name: q.name, score: q.alive ? S.score(sim, q) : 0, alive: q.alive }));
       result = { outcome: r.won ? 'victory' : 'defeat', reason: r.reason, scores };
       const fin = ARD.campUI.finish(G.camp, r.won, sim, human, G.track, 'campanha'); $('objectives').hidden = true; $('comms').hidden = true;
-      $('end-eyebrow').textContent = 'Campanha · ' + prep.mission.title + ' · ' + prep.diff.label; $('end-camp').innerHTML = fin.html; $('end-camp').hidden = false;
+      $('end-eyebrow').textContent = Tx('fim.campanha') + ' · ' + (ARD.campaign.titulo ? ARD.campaign.titulo(prep.mission) : prep.mission.title) + ' · ' + (ARD.campaign.dificuldade ? ARD.campaign.dificuldade(prep.difficulty) : prep.diff.label); /* 5.0c */ $('end-camp').innerHTML = fin.html; $('end-camp').hidden = false;
       const base = location.pathname; const keep = new URLSearchParams(location.search); for (const k of ['missao', 'dif', 'raca', 'campanha', 'autostart', 'iniciar']) keep.delete(k); const q = k => base + '?' + new URLSearchParams(Object.assign(Object.fromEntries(keep), k)).toString();
       $('btn-next').hidden = !fin.next; if (fin.next) $('btn-next').onclick = () => { location.href = q({ missao: fin.next, dif: prep.difficulty, raca: prep.race, iniciar: '1' }); };
       { const fb = $('end-feedback'); if (fb) fb.href = feedbackUrl({ resultado: r.won ? 'missão cumprida' : 'missão falhou', estrelas: r.stars }); }
       $('btn-camp-menu').hidden = false; $('btn-camp-menu').onclick = () => { location.href = q({ campanha: '1' }); };
       { const art = leaderArt(sim.players[human].faction, r.won ? 3 : 2); if (art) { $('end-leader').src = art; $('end-leader').hidden = false; } }
-      $('end').hidden = false; $('end-title').textContent = r.won ? 'MISSÃO CUMPRIDA' : 'MISSÃO FALHOU'; $('end-title').className = result.outcome; $('end').dataset.outcome = result.outcome; /* 4.3k */ $('end-reason').textContent = r.reason;
-      $('end-scores').innerHTML = ''; const st = sim.players[human].stats; $('end-stats').innerHTML = [['Tempo', mmss(r.time || sim.time)], ['Coletado', fmt(st.collected)], ['Roubado', fmt(st.stolen)], ['Unidades abatidas', st.unitsKilled], ['Unidades perdidas', st.unitsLost], ['Estruturas destruídas', st.buildingsDestroyed]].map(([k, v]) => `<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');
-      $('btn-again').textContent = 'Repetir missão'; $('btn-again').onclick = () => { location.href = q({ missao: prep.mission.id, dif: prep.difficulty, raca: prep.race, iniciar: '1' }); };
-      $('btn-copy').onclick = () => { const ta = $('end-json'); ta.hidden = false; ta.value = JSON.stringify({ versao: VERSION, missao: prep.mission.id, dificuldade: prep.difficulty, raca: prep.race, resultado: r, objetivos: G.camp.run.objectives.map(o => ({ id: o.id, feito: o.done })) }, null, 2); ta.select(); };
+      $('end').hidden = false; $('end-title').textContent = Tx(r.won ? 'fim.missao-cumprida' : 'fim.missao-falhou'); /* 5.0c */ $('end-title').className = result.outcome; $('end').dataset.outcome = result.outcome; /* 4.3k */ $('end-reason').textContent = r.reason;
+      $('end-scores').innerHTML = ''; const st = sim.players[human].stats; $('end-stats').innerHTML = [['tempo', mmss(r.time || sim.time)], ['coletado', fmt(st.collected)], ['roubado', fmt(st.stolen)], ['abatidas', st.unitsKilled], ['perdidas', st.unitsLost], ['estruturas', st.buildingsDestroyed]].map(([k, v]) => `<div class="stat"><span>${Tx('fim.st.' + k)}</span><b>${v}</b></div>`).join(''); /* 5.0c */
+      $('btn-again').textContent = Tx('fim.repetir'); /* 5.0c */ $('btn-again').onclick = () => { location.href = q({ missao: prep.mission.id, dif: prep.difficulty, raca: prep.race, iniciar: '1' }); };
+      $('btn-copy').onclick = () => { const ta = $('end-json'); ta.hidden = false; ta.value = JSON.stringify({ versao: VERSION, missao: prep.mission.id, dificuldade: prep.difficulty, raca: prep.race, resultado: Object.assign({}, r, { reason: (G.camp.run && G.camp.run.motivoPt) || r.reason }) /* 5.0c: o diagnóstico vai em pt-BR */, objetivos: G.camp.run.objectives.map(o => ({ id: o.id, feito: o.done })) }, null, 2); ta.select(); };
       return;
     }
-    if (result.outcome === 'over') { const me = sim.players[human]; result = Object.assign({}, result, { outcome: me.alive && result.winner === human ? 'victory' : 'defeat', reason: result.reason + (result.winner >= 0 ? ' Vencedor: ' + sim.players[result.winner].name + '.' : '') }); }
+    if (result.outcome === 'over') { const me = sim.players[human]; result = Object.assign({}, result, { outcome: me.alive && result.winner === human ? 'victory' : 'defeat', reason: result.reason + (result.winner >= 0 ? ' Vencedor: ' + sim.players[result.winner].name + '.' : ''), motivoPt: result.reason, vencedor: result.winner >= 0 ? sim.players[result.winner].name : null }); } /* 5.0c: motivo em pt-BR (JSON do feedback) e as partes para mostrar no idioma */
     const p = sim.players[human]; const st = p.stats;
     { const art = leaderArt(p.faction, result.outcome === 'victory' ? 3 : 2); if (art) { $('end-leader').src = art; $('end-leader').hidden = false; } }
-    $('end').hidden = false; $('end-title').textContent = result.outcome === 'victory' ? 'DOMÍNIO' : 'COLAPSO'; $('end-title').className = result.outcome; $('end').dataset.outcome = result.outcome; /* 4.3k */
-    $('end-reason').textContent = result.reason;
-    const rows = result.scores.slice().sort((a, b) => b.score - a.score).map((s, i) => `<tr><td>${i + 1}</td><td><span class="dot" style="background:${sim.players[s.id].color}"></span>${esc(s.name)}</td><td>${s.alive ? fmt(s.score) : 'eliminado'}</td></tr>`).join('');
-    $('end-scores').innerHTML = `<table><thead><tr><th>#</th><th>Jogador</th><th>Domínio</th></tr></thead><tbody>${rows}</tbody></table>`;
-    $('end-stats').innerHTML = [['Coletado', fmt(st.collected)], ['Roubado', fmt(st.stolen)], ['Perdido para roubo', fmt(st.lost)], ['Unidades abatidas', st.unitsKilled], ['Unidades perdidas', st.unitsLost], ['Estruturas destruídas', st.buildingsDestroyed], ['Tratados', st.treaties], ['Traições', st.betrayals], ['Reputação final', S.REP_NAMES[p.rep]]].map(([k, v]) => `<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');
+    $('end').hidden = false; $('end-title').textContent = Tx(result.outcome === 'victory' ? 'fim.dominio' : 'fim.colapso'); /* 5.0c */ $('end-title').className = result.outcome; $('end').dataset.outcome = result.outcome; /* 4.3k */
+    $('end-reason').textContent = result.motivoPt != null ? TRx(result.motivoPt) + (result.vencedor ? ' ' + Tx('fim.vencedor', { nome: DN.jogador(result.vencedor) }) : '') : TRx(result.reason); /* 5.0c */
+    const rows = result.scores.slice().sort((a, b) => b.score - a.score).map((s, i) => `<tr><td>${i + 1}</td><td><span class="dot" style="background:${sim.players[s.id].color}"></span>${esc(DN.jogador(s.name))}</td><td>${s.alive ? fmt(s.score) : Tx('diplo.eliminado')}</td></tr>`).join(''); /* 5.0c */
+    $('end-scores').innerHTML = `<table><thead><tr><th>#</th><th>${Tx('fim.jogador')}</th><th>${Tx('fim.dominio-col')}</th></tr></thead><tbody>${rows}</tbody></table>`;
+    $('end-stats').innerHTML = [['coletado', fmt(st.collected)], ['roubado', fmt(st.stolen)], ['perdido-roubo', fmt(st.lost)], ['abatidas', st.unitsKilled], ['perdidas', st.unitsLost], ['estruturas', st.buildingsDestroyed], ['tratados', st.treaties], ['traicoes', st.betrayals], ['reputacao', DN.reputacao(p.rep)]].map(([k, v]) => `<div class="stat"><span>${Tx('fim.st.' + k)}</span><b>${v}</b></div>`).join('');
     { const fb = $('end-feedback'); if (fb) fb.href = feedbackUrl({ resultado: result.outcome }); }
     if (ARD.campUI) { try { const fin = ARD.campUI.finish(null, result.outcome === 'victory', sim, human, G.track, net ? 'multiplayer' : 'escaramuca'); $('end-camp').innerHTML = fin.html; $('end-camp').hidden = false; } catch (e) { console.warn('[ARD] progresso indisponível:', e); } }
     $('btn-again').onclick = () => location.reload();
-    $('btn-copy').onclick = () => { const data = { versao: VERSION, data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, mapa: sim.map ? sim.map.type : 'fenda', lagos: !!(sim.map && sim.map.lakes && sim.map.lakes.length), duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = 'Copiado! Cole na Issue de feedback'; }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
+    $('btn-copy').onclick = () => { const data = { versao: VERSION, data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, mapa: sim.map ? sim.map.type : 'fenda', lagos: !!(sim.map && sim.map.lakes && sim.map.lakes.length), duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = Tx('fim.copiado'); }; /* 5.0c */ if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
   }
 
   // ---------- UI bridge for input ----------
@@ -1024,14 +1028,14 @@ function startGame(cfg, netCtx) {
     return {
       selectionChanged() { I.buildMenu = false; refreshPanel(true); refreshQuick(); if (G.h3) G.h3.selChanged(); }, /* 5.0b: grupo aceso na barra */
       modeChanged() { refreshPanel(true); refreshQuick(); this.placeChanged(); autoDrawer(); }, /* 4.3l */
-      placeChanged() { const pb = $('placebar'); if (!pb) return; const g = view.ghost; const on = G.isTouch && I.mode === 'build' && g && !S.BUILDINGS[g.def].wall; pb.hidden = !on; document.body.classList.toggle('placing', !!on); if (!on) return; const ok = S.canBuild(sim, human, g.def, g.x, g.y); const afford = S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost); $('pb-text').textContent = S.BUILDINGS[g.def].name + ' · ' + (!ok.ok ? ok.why : !afford ? 'recursos insuficientes' : 'local válido · arraste para ajustar'); $('pb-ok').disabled = !(ok.ok && afford); },
+      placeChanged() { const pb = $('placebar'); if (!pb) return; const g = view.ghost; const on = G.isTouch && I.mode === 'build' && g && !S.BUILDINGS[g.def].wall; pb.hidden = !on; document.body.classList.toggle('placing', !!on); if (!on) return; const ok = S.canBuild(sim, human, g.def, g.x, g.y); const afford = S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost); $('pb-text').textContent = DN.construcao(g.def) + ' · ' + (!ok.ok ? TRx(ok.why) : Tx(!afford ? 'hud.pb.sem-recursos' : 'hud.pb.valido')); /* 5.0c */ $('pb-ok').disabled = !(ok.ok && afford); },
       buildMenuChanged() { refreshPanel(true); refreshQuick(); },
       touchBoxChanged() { refreshQuick(); },
       notice, confirm: confirmModal, modalOpen() { return !$('diplo').hidden || !$('help').hidden || !$('confirm').hidden || !$('savebox').hidden || !!(G.h3 && G.h3.modalOpen()); }, /* 5.0b: tela de pesquisa e Ajustes também */ // 4.2g: com Salvar partida aberta as teclas não comandam o jogo
       enqueue(c) { if (net) G.pending.push(c); else S.enqueue(sim, c); },
       closeModals() { $('diplo').hidden = true; $('help').hidden = true; $('confirm').hidden = true; if (G.closeSave) G.closeSave(); if (G.h3) G.h3.closeModals(); /* 5.0b: tela de pesquisa e Ajustes */ },
       wheel(o) { return G.h3 ? G.h3.wheel(o) : false; }, groupsChanged() { if (G.h3) G.h3.groupsChanged(); }, nextAlert() { return G.h3 ? G.h3.nextAlert() : view.lastAlert; }, toggleTech() { if (G.h3) G.h3.toggleTech(); }, /* 5.0b: roda de comandos, grupos, Espaço nos alertas e F3 */
-      toggleHelp() { toggleHelp(); }, togglePause() { if (net) { notice('Sem pausa no multiplayer'); return; } if (G.camp && G.camp.noPause) { notice('Sem pausa na dificuldade Fenda'); return; } G.paused = !G.paused; if (!G.paused) G.pauseWhy = null; else G.pauseWhy = 'Partida pausada.'; refreshTop(); if (!G.paused) notice('Continuando'); },
+      toggleHelp() { toggleHelp(); }, togglePause() { if (net) { notice(Tx('hud.sem-pausa-mp')); return; } if (G.camp && G.camp.noPause) { notice(Tx('hud.sem-pausa-fenda')); return; } G.paused = !G.paused; if (!G.paused) G.pauseWhy = null; else G.pauseWhy = 'Partida pausada.'; refreshTop(); if (!G.paused) notice(Tx('hud.continuando')); }, /* 5.0c: pauseWhy fica em pt-BR (traduzido ao mostrar) */
     };
   }
   function confirmModal(text, onYes) { const m = $('confirm'); m.hidden = false; $('confirm-text').textContent = text; $('confirm-yes').onclick = () => { m.hidden = true; onYes(); }; $('confirm-no').onclick = () => { m.hidden = true; }; }

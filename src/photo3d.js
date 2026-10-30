@@ -36,11 +36,18 @@ const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const ease = (k, dt) => 1 - Math.exp(-k * dt);
 const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 const mix = (a, b, t) => a + (b - a) * t;
-const num = (v, d) => v.toFixed(d).replace('.', ',').replace(/^-/, '−'); /* 4.3j: números com vírgula e sinal de menos */
+const num = (v, d) => (ARD.i18n ? ARD.i18n.num(v, { minimumFractionDigits: d, maximumFractionDigits: d }) : v.toFixed(d).replace('.', ',')).replace(/^-/, '−'); /* 4.3j: números com vírgula e sinal de menos · 5.0c: o separador decimal do idioma */
 const fNum = a => 1.4 * Math.pow(22 / 1.4, a); /* 4.3j: abertura do painel (0..1) → número f */
 const STORE = 'ard-foto-1';
 const NOOP = function () {};
 const LIVE = ['fov', 'roll']; /* controles que o mouse e o teclado também mudam */
+/* 5.0c: idiomas — textos pelo dicionário (src/i18n.js). No painel, os textos fixos levam data-i18n / data-i18n-attr: a troca de idioma os refaz sozinha */
+const T = (k, v, r) => (ARD.t ? ARD.t(k, v, r) : (r != null ? r : k));
+const escA = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+const di = (k, r) => ` data-i18n="${k}">` + T(k, null, r); /* fecha a tag de abertura e põe o texto: '<b' + di(k) + '</b>' */
+const at = o => Object.keys(o).map(a => ` ${a}="${escA(T(o[a]))}"`).join('') + ` data-i18n-attr="${Object.keys(o).map(a => a + ':' + o[a]).join(';')}"`; /* atributos traduzidos e marcados */
+const slKey = k => 'foto.sl.' + k.replace(/[A-Z]/g, c => '-' + c.toLowerCase()); /* luzAz → foto.sl.luz-az */
+let langF = null; /* 5.0c: o ouvinte de 'ard-idioma' do Modo Foto da partida atual */
 
 /* 4.3j: filtros com nome — os ajustes do painel (ev … ab) e o caráter de cada um (preto e branco com filtro de canal, tom das sombras
    e das luzes, preto lavado e curva em S). Escolher um filtro põe os ajustes nos valores dele; o caráter fica até trocar de filtro */
@@ -207,8 +214,8 @@ function create(ctx) {
     document.body.classList.add('foto'); st.root.hidden = false; if (btn) btn.classList.add('on');
     if (M5R) { st.f5 = m5Obj(); st.f5ok = !!(st.f5 && st.f5.pronto); } /* 5.0b: o objeto do foto do pós atual; sem preparo (primeira entrada ou o pós mudou), prepara em alguns quadros, com aviso */
     refreshNotes(); syncUI(); guide();
-    if (M5R && !st.f5ok) toast('Preparando o Modo Foto…', false, 6000);
-    else toast(isTouch ? 'Modo Foto · um dedo orbita, dois arrastam e fazem pinça' : 'Modo Foto · arraste para orbitar · Espaço tira a foto · Esc sai', false, 2600);
+    if (M5R && !st.f5ok) toast(T('foto.preparando'), false, 6000);
+    else toast(T(isTouch ? 'foto.dica-toque' : 'foto.dica'), false, 2600); /* 5.0c */
   }
   function m5Obj() { const fx = R.ppFx ? R.ppFx() : {}; return ARD.m5.foto.obter(M5R, R.pp ? fx.composer || null : null); } /* 5.0b: o objeto do foto do pós atual */
   function exit() {
@@ -238,7 +245,7 @@ function create(ctx) {
   function setTime(t) {
     if (!canPause()) { st.time = 'livre'; syncTime(); return; }
     st.time = t; st.stepT = 0;
-    if (t === 'congelado') { G.paused = true; G.pauseWhy = 'Modo Foto: tempo congelado.'; freeze(true); }
+    if (t === 'congelado') { G.paused = true; G.pauseWhy = T('foto.pausa'); /* 5.0c */ freeze(true); }
     else { G.paused = false; G.speed = t === 'lento' ? 0.25 : (st.saved && st.saved.speed > 0 ? st.saved.speed : 1); freeze(false); }
     syncTime();
   }
@@ -362,7 +369,7 @@ function create(ctx) {
     else {
       if (composer) composer.render(); else rr.render(scene, camera);
       syncM5(F, camera); F.passo(scene, camera);
-      if (F.pronto) { st.f5ok = true; st.lookDirty = true; refreshNotes(); toast(isTouch ? 'Modo Foto pronto · um dedo orbita, dois arrastam e fazem pinça' : 'Modo Foto pronto · arraste para orbitar · Espaço tira a foto · Esc sai', false, 2600); }
+      if (F.pronto) { st.f5ok = true; st.lookDirty = true; refreshNotes(); toast(T(isTouch ? 'foto.pronto-toque' : 'foto.pronto'), false, 2600); }
     }
     occEnd();
   }
@@ -393,10 +400,10 @@ function create(ctx) {
   }
   function capDone(c, blob, name, W, Hh) {
     if (st.cap === c) st.cap = null; if (st.el) st.el.shot.classList.remove('busy');
-    if (!blob) { toast('Não deu para gerar a foto ' + W + '×' + Hh + '; tente uma resolução menor', true); if (c.done) c.done(null); return; }
-    download(blob, name); st.lastShot = { name, w: W, h: Hh, bytes: blob.size }; toast('Foto salva · ' + W + '×' + Hh + ' · ' + name, false, 3200); if (c.done) c.done(st.lastShot);
+    if (!blob) { toast(T('foto.erro-gerar', { w: String(W), h: String(Hh) }), true); if (c.done) c.done(null); return; } /* 5.0c: medidas como texto (sem separador de milhar) */
+    download(blob, name); st.lastShot = { name, w: W, h: Hh, bytes: blob.size }; toast(T('foto.salva', { w: String(W), h: String(Hh), f: name }), false, 3200); if (c.done) c.done(st.lastShot);
   }
-  function capFail(c, err) { if (st.f5) st.f5.soltar(); if (st.cap === c) st.cap = null; if (st.el) st.el.shot.classList.remove('busy'); toast('Falha na captura: ' + ((err && err.message) || err), true); if (c.done) c.done(null); }
+  function capFail(c, err) { if (st.f5) st.f5.soltar(); if (st.cap === c) st.cap = null; if (st.el) st.el.shot.classList.remove('busy'); toast(T('foto.falha', { x: String((err && err.message) || err) }), true); if (c.done) c.done(null); }
   function barsInShader() { return M5R ? !!(R.pp && st.f5 && st.f5.pipe && st.f5.pronto) : !!(R.pp && st.fotoPass); } /* faixas desenhadas pelo filtro (com o pós) */
   /* 4.3j: câmera no vazio do Cinturão, abaixo da borda: a rocha das plataformas é da camada do espaço, colada na profundidade do céu, e não
      esconde nada da cena do jogo. Aqui some o que a rocha esconderia: cada instância (unidade, construção, nó, rocha, adereço) cujo topo a
@@ -494,14 +501,15 @@ function create(ctx) {
   }
   function entName(e) { const d = e.kind === 'unit' ? S.UNITS[e.def] : S.BUILDINGS[e.def]; return d && d.name ? d.name : e.def; }
   function centerOn(e) { st.follow = e.id; st.txG = e.x; st.tyG = e.y; st.hOffG = centerY(e) - groundRef(e.x, e.y); }
-  function focusOn(e) { st.focusMode = 'ent'; st.focusEnt = e.id; st.focusName = entName(e); st.focusP.set(e.x, centerY(e), -e.y); st.uiDirty = true; }
+  function focoNome() { const k = st.focusKD; if (!k || !ARD.i18n) return st.focusName; return k[0] === 'unit' ? ARD.tn('unit', k[1], st.focusName) : ARD.i18n.d.construcao(k[1]); } /* 5.0c: o nome traduzido (st.focusName fica em pt-BR para os testes) */
+  function focusOn(e) { st.focusMode = 'ent'; st.focusEnt = e.id; st.focusName = entName(e); st.focusKD = [e.kind, e.def]; st.focusP.set(e.x, centerY(e), -e.y); st.uiDirty = true; }
   function tap(sx, sy, dbl) {
     const e = pickEnt(sx, sy); if (e) { centerOn(e); focusOn(e); ring(sx, sy); return; }
     if (M5R) { const n = ++st.tapN; pointAtM5(sx, sy, _v).then(ok => { if (n === st.tapN && PH.on) tapPoint(ok, _v, sx, sy, dbl); }); return; } /* 5.0b: vale o último toque */
     tapPoint(pointAt(sx, sy, _v), _v, sx, sy, dbl);
   }
   function tapPoint(ok, p, sx, sy, dbl) {
-    if (!ok) { if (dbl) toast('Nada para focar aí (céu ou espaço)', true); return; }
+    if (!ok) { if (dbl) toast(T('foto.nada-focar'), true); return; }
     if (dbl) { st.follow = -1; st.txG = clamp(p.x, -400, WORLD + 400); st.tyG = clamp(-p.z, -400, WORLD + 400); st.hOffG = Math.max(isVoid(st.txG, st.tyG) ? -650 : 0, p.y - groundRef(st.txG, st.tyG)); st.focusMode = 'centro'; st.focusEnt = -1; }
     else { st.focusMode = 'ponto'; st.focusEnt = -1; st.focusP.copy(p); }
     st.uiDirty = true; ring(sx, sy);
@@ -529,6 +537,9 @@ function create(ctx) {
   function onKeyUp(e) { if (st.keys.size) st.keys.delete(e.code); }
   window.addEventListener('keydown', onKeyDown, true);
   window.addEventListener('keyup', onKeyUp, true);
+  if (langF) window.removeEventListener('ard-idioma', langF); /* 5.0c: troca de idioma sem recarregar (um ouvinte por partida) */
+  langF = () => { if (!st.el) return; refreshNotes(); if (!PH.on) syncUI(); else if (st.time === 'congelado' && canPause()) G.pauseWhy = T('foto.pausa'); };
+  window.addEventListener('ard-idioma', langF);
   window.addEventListener('blur', () => { st.keys.clear(); });
 
   function orbitBy(dx, dy) { st.yawG -= dx / Math.max(320, R.w) * 2.8; st.pitchG = clamp(st.pitchG + dy / Math.max(240, R.h) * 2.1, -0.45, 1.52); st.uiDirty = true; }
@@ -578,10 +589,10 @@ function create(ctx) {
   function maxDimM5(rr) { /* 5.0b: limite de textura do WebGPU (ou do WebGL2 da reserva) */ try { const be = rr.backend; if (be.isWebGPUBackend && be.device) return be.device.limits.maxTextureDimension2D || 8192; const gl = be.gl; if (gl) { const vp = gl.getParameter(gl.MAX_VIEWPORT_DIMS); return Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), gl.getParameter(gl.MAX_TEXTURE_SIZE), vp ? Math.min(vp[0], vp[1]) : 4096); } } catch (e) {} return 4096; }
   function shoot() {
     if (!PH.on || st.cap) return;
-    if (!st.renderer) { toast('Aguarde um instante e tente de novo', true); return; }
-    if (M5R && !(st.f5 && st.f5.pronto)) { toast('Preparando o Modo Foto…', true); return; } /* 5.0b */
+    if (!st.renderer) { toast(T('foto.aguarde'), true); return; }
+    if (M5R && !(st.f5 && st.f5.pronto)) { toast(T('foto.preparando'), true); return; } /* 5.0b */
     const res = st.cfg.res, sz = capSize(res); if (!sz) return;
-    if (res !== 'tela' && Math.max(sz[0], sz[1]) > maxDim()) { toast('Este aparelho não desenha ' + sz[0] + '×' + sz[1] + '; use ' + (res === '4k' ? '2K ou ' : '') + 'Tela', true); return; }
+    if (res !== 'tela' && Math.max(sz[0], sz[1]) > maxDim()) { toast(T(res === '4k' ? 'foto.max-4k' : 'foto.max', { w: String(sz[0]), h: String(sz[1]) }), true); return; }
     st.cap = { res, W: sz[0], H: sz[1], phase: 'pre', aspect: res === 'tela' ? 0 : sz[0] / sz[1], k: 1, pr: 1, lv: null, done: null };
     st.el.shot.classList.add('busy'); flash();
     return new Promise(res2 => { st.cap.done = res2; });
@@ -607,12 +618,12 @@ function create(ctx) {
   function capAbort() { const c = st.cap; if (!c) return; if (M5R) { if (c.phase !== 'read') { st.cap = null; if (st.el) st.el.shot.classList.remove('busy'); if (c.done) c.done(null); } return; } /* 5.0b: com a leitura em andamento a foto termina e é salva */ if (c.phase === 'shoot' || c.phase === 'restore') { c.phase = 'restore'; capRestore(); } else st.cap = null; if (c.done) c.done(null); }
   function grab(rr) { /* lê o canvas no mesmo quadro em que foi desenhado (sem preserveDrawingBuffer) */
     const c = st.cap; c.phase = 'restore'; const cv = rr.domElement, W = cv.width, Hh = cv.height, name = fileName();
-    const done = blob => { if (!blob) { toast('Não deu para gerar a foto ' + W + '×' + Hh + '; tente uma resolução menor', true); if (c.done) c.done(null); return; }
-      download(blob, name); st.lastShot = { name, w: W, h: Hh, bytes: blob.size }; toast('Foto salva · ' + W + '×' + Hh + ' · ' + name, false, 3200); if (c.done) c.done(st.lastShot); };
+    const done = blob => { if (!blob) { toast(T('foto.erro-gerar', { w: String(W), h: String(Hh) }), true); if (c.done) c.done(null); return; }
+      download(blob, name); st.lastShot = { name, w: W, h: Hh, bytes: blob.size }; toast(T('foto.salva', { w: String(W), h: String(Hh), f: name }), false, 3200); if (c.done) c.done(st.lastShot); };
     try {
       if (st.cfg.faixas && !(R.pp && st.fotoPass)) { const c2 = document.createElement('canvas'); c2.width = W; c2.height = Hh; const x = c2.getContext('2d'); x.drawImage(cv, 0, 0); const bh = barH(W, Hh); if (bh > 0) { x.fillStyle = '#000'; x.fillRect(0, 0, W, bh); x.fillRect(0, Hh - bh, W, bh); } c2.toBlob(b => { done(b); c2.width = 0; c2.height = 0; }, 'image/png'); } /* sem o pós, as faixas entram aqui */
       else cv.toBlob(done, 'image/png');
-    } catch (err) { toast('Falha na captura: ' + err.message, true); if (c.done) c.done(null); }
+    } catch (err) { toast(T('foto.falha', { x: String(err.message) }), true); if (c.done) c.done(null); }
   }
   function download(blob, name) { const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = name; a.style.display = 'none'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 4000); }
   function barH(W, Hh) { const ar = W / Math.max(1, Hh); return ar < 2.39 ? Math.round(Hh * (1 - ar / 2.39) / 2) : 0; }
@@ -625,11 +636,11 @@ function create(ctx) {
     ['filtro', 'ev', 'Exposição', -2, 2, 0.05, false, v => (v > 0.001 ? '+' : '') + num(v, 2) + ' EV'],
     ['filtro', 'con', 'Contraste', 0.5, 1.6, 0.01, true, v => Math.round(v * 100) + '%'],
     ['filtro', 'sat', 'Saturação', 0, 2, 0.01, true, v => Math.round(v * 100) + '%'],
-    ['filtro', 'temp', 'Temperatura', -1, 1, 0.01, true, v => (v > 0.02 ? 'quente ' : v < -0.02 ? 'fria ' : 'neutra') + (Math.abs(v) > 0.02 ? Math.round(Math.abs(v) * 100) : '')],
+    ['filtro', 'temp', 'Temperatura', -1, 1, 0.01, true, v => v > 0.02 ? T('foto.temp.quente', { v: Math.round(v * 100) }) : v < -0.02 ? T('foto.temp.fria', { v: Math.round(-v * 100) }) : T('foto.temp.neutra')], /* 5.0c */
     ['filtro', 'vig', 'Vinheta', 0, 1, 0.01, true, v => Math.round(v * 100) + '%'],
     ['filtro', 'grao', 'Grão', 0, 1, 0.01, true, v => Math.round(v * 100) + '%'],
     ['filtro', 'ab', 'Aberração', 0, 1, 0.01, true, v => Math.round(v * 100) + '%'],
-    ['luz', 'hora', 'Hora', 0, 1, 0.01, false, v => v < 0.18 ? 'dia' : v < 0.36 ? 'tarde' : v < 0.58 ? 'entardecer' : v < 0.8 ? 'anoitecer' : 'noite'],
+    ['luz', 'hora', 'Hora', 0, 1, 0.01, false, v => T('foto.hora.' + (v < 0.18 ? 'dia' : v < 0.36 ? 'tarde' : v < 0.58 ? 'entardecer' : v < 0.8 ? 'anoitecer' : 'noite'))], /* 5.0c */
     ['luz', 'luzAz', 'Direção', -180, 180, 1, false, v => Math.round(v) + '°'],
     ['luz', 'bloom', 'Brilho', 0, 2.5, 0.01, true, v => Math.round(v * 100) + '%'],
   ];
@@ -641,22 +652,21 @@ function create(ctx) {
   function build() {
     st.cfg = loadCfg(); st.look = LOOKS.find(L => L.id === st.cfg.look) || LOOKS[0];
     if (!document.getElementById('foto-css')) { const s = document.createElement('style'); s.id = 'foto-css'; s.textContent = CSS; document.head.appendChild(s); }
-    const sl = pane => SL.filter(d => d[0] === pane).map(d => `<label class="fo-sl" data-sl="${d[1]}"><span>${d[2]}</span><input type="range" min="${d[3]}" max="${d[4]}" step="${d[5]}" aria-label="${d[2]}"><output></output></label>`).join('');
-    const helpCam = isTouch ? '<b>Um dedo</b> orbita · <b>dois dedos</b> arrastam o ponto e fazem pinça · <b>toque</b> numa unidade ou construção centraliza e foca · <b>toque duplo</b> leva a órbita ao ponto'
-      : '<b>Arrastar</b> orbita · <b>botão direito</b> (ou Shift) arrasta o ponto · <b>roda</b> aproxima (<b>Shift</b> + roda: lente) · <b>WASD</b>/setas movem · <b>Q</b>/<b>E</b> descem e sobem · <b>R</b>/<b>F</b> inclinam · <b>Z</b>/<b>C</b> giram em volta · <b>,</b> <b>.</b> horizonte · <b>−</b>/<b>+</b> lente · <b>Espaço</b> foto · <b>T</b> tempo · <b>H</b> painel · <b>Esc</b> sai';
+    const sl = pane => SL.filter(d => d[0] === pane).map(d => `<label class="fo-sl" data-sl="${d[1]}"><span${di(slKey(d[1]), d[2])}</span><input type="range" min="${d[3]}" max="${d[4]}" step="${d[5]}"${at({ 'aria-label': slKey(d[1]) })}><output></output></label>`).join(''); /* 5.0c: rótulos pelo dicionário */
+    const helpCam = isTouch ? 'foto.ajuda-toque' : 'foto.ajuda'; /* 5.0c: a chave da ajuda (o texto com <b> está no dicionário) */
     const root = document.createElement('div'); root.className = 'fo-root'; root.hidden = true;
-    root.innerHTML = '<div class="fo-layer" tabindex="-1" aria-label="Câmera do Modo Foto"></div><div class="fo-guide" hidden></div><div class="fo-bars" hidden><i></i><i></i></div><div class="fo-flash"></div><div class="fo-ring"></div><div class="fo-toast" role="status" aria-live="polite"></div>' +
-      '<section class="fo-panel" aria-label="Modo Foto"><header class="fo-head"><button class="fo-ib fo-cam" data-a="sair" title="Sair do Modo Foto (J ou Esc)" aria-label="Sair do Modo Foto">📷</button><b>Modo Foto</b><span class="fo-sp"></span>' +
-      '<button class="fo-ib" data-a="fold" title="Recolher ou abrir o painel (H)" aria-label="Recolher ou abrir o painel">▾</button><button class="fo-ib" data-a="sair" title="Sair (Esc)" aria-label="Sair do Modo Foto">✕</button></header>' +
-      '<div class="fo-body"><div class="fo-seg fo-time" role="group" aria-label="Tempo"><button data-t="congelado" title="Congela a cena (T)">❄ Congelado</button><button data-t="lento" title="Câmera lenta, ¼ da velocidade">◔ Lento</button><button data-t="normal" title="A partida anda (T)">▶ Normal</button><button data-a="passo" title="Avança um instante e congela de novo" aria-label="Avançar um instante">⏭</button></div>' +
+    root.innerHTML = '<div class="fo-layer" tabindex="-1"' + at({ 'aria-label': 'foto.camera-aria' }) + '></div><div class="fo-guide" hidden></div><div class="fo-bars" hidden><i></i><i></i></div><div class="fo-flash"></div><div class="fo-ring"></div><div class="fo-toast" role="status" aria-live="polite"></div>' +
+      '<section class="fo-panel"' + at({ 'aria-label': 'foto.titulo' }) + '><header class="fo-head"><button class="fo-ib fo-cam" data-a="sair"' + at({ title: 'foto.sair-jesc', 'aria-label': 'foto.sair' }) + '>📷</button><b' + di('foto.titulo') + '</b><span class="fo-sp"></span>' +
+      '<button class="fo-ib" data-a="fold"' + at({ title: 'foto.painel-h', 'aria-label': 'foto.painel' }) + '>▾</button><button class="fo-ib" data-a="sair"' + at({ title: 'foto.sair-esc', 'aria-label': 'foto.sair' }) + '>✕</button></header>' +
+      '<div class="fo-body"><div class="fo-seg fo-time" role="group"' + at({ 'aria-label': 'foto.tempo' }) + '><button data-t="congelado"' + at({ title: 'foto.t.congelado-d' }) + di('foto.t.congelado') + '</button><button data-t="lento"' + at({ title: 'foto.t.lento-d' }) + di('foto.t.lento') + '</button><button data-t="normal"' + at({ title: 'foto.t.normal-d' }) + di('foto.t.normal') + '</button><button data-a="passo"' + at({ title: 'foto.t.passo-d', 'aria-label': 'foto.t.passo' }) + '>⏭</button></div>' +
       '<p class="fo-note" hidden></p>' +
-      '<nav class="fo-tabs" role="tablist"><button data-tab="cam" role="tab">Câmera</button><button data-tab="foco" role="tab">Foco</button><button data-tab="filtro" role="tab">Filtros</button><button data-tab="luz" role="tab">Luz</button></nav>' +
-      '<div class="fo-pane" data-pane="cam">' + sl('cam') + '<div class="fo-btns"><button data-a="nivelar">Nivelar horizonte</button><button data-a="voltar">Câmera do jogo</button></div><p class="fo-help">' + helpCam + '</p></div>' +
-      '<div class="fo-pane" data-pane="foco"><label class="fo-chk" data-ck="dof"><input type="checkbox" data-k="dof"> Profundidade de campo</label>' + sl('foco') + '<div class="fo-focus">Foco: <b data-v="foco">no centro da órbita</b></div><div class="fo-btns"><button data-a="centro">Focar no centro</button></div><p class="fo-help">' + (isTouch ? 'Toque' : 'Clique') + ' num ponto para focar ali; numa unidade ou construção, a órbita vai até ela e o foco a acompanha. Abertura maior (f menor) desfoca mais.</p></div>' +
-      '<div class="fo-pane" data-pane="filtro"><div class="fo-looks">' + LOOKS.map(L => `<button class="fo-chip" data-look="${L.id}">${L.nome}</button>`).join('') + '</div>' + sl('filtro') + '<label class="fo-chk" data-ck="faixas"><input type="checkbox" data-k="faixas"> Faixas de cinema 2,39:1</label><div class="fo-btns"><button data-a="zerar">Voltar ao filtro</button></div></div>' +
-      '<div class="fo-pane" data-pane="luz"><label class="fo-chk" data-ck="horaJogo"><input type="checkbox" data-k="horaJogo"> Hora da partida</label>' + sl('luz') + '<p class="fo-help">A hora e a direção da luz mudam só a imagem; a partida não muda.</p></div></div>' +
-      '<footer class="fo-foot"><div class="fo-seg fo-res" role="radiogroup" aria-label="Resolução da foto"><button data-r="tela" title="Tamanho da tela">Tela</button><button data-r="2k" title="2560 × 1440">2K</button>' + (isTouch ? '' : '<button data-r="4k" title="3840 × 2160">4K</button>') + '</div>' +
-      '<button class="fo-shot" data-a="foto" title="Tirar a foto (Espaço)" aria-label="Tirar a foto"><i></i></button></footer></section>';
+      '<nav class="fo-tabs" role="tablist"><button data-tab="cam" role="tab"' + di('foto.aba.cam') + '</button><button data-tab="foco" role="tab"' + di('foto.aba.foco') + '</button><button data-tab="filtro" role="tab"' + di('foto.aba.filtro') + '</button><button data-tab="luz" role="tab"' + di('foto.aba.luz') + '</button></nav>' +
+      '<div class="fo-pane" data-pane="cam">' + sl('cam') + '<div class="fo-btns"><button data-a="nivelar"' + di('foto.nivelar') + '</button><button data-a="voltar"' + di('foto.voltar') + '</button></div><p class="fo-help"' + di(helpCam) + '</p></div>' +
+      '<div class="fo-pane" data-pane="foco"><label class="fo-chk" data-ck="dof" data-i18n="foto.dof"><input type="checkbox" data-k="dof"> ' + T('foto.dof') + '</label>' + sl('foco') + '<div class="fo-focus"><span' + di('foto.foco') + '</span> <b data-v="foco">' + T('foto.foco-centro') + '</b></div><div class="fo-btns"><button data-a="centro"' + di('foto.focar-centro') + '</button></div><p class="fo-help"' + di(isTouch ? 'foto.foco-dica-toque' : 'foto.foco-dica') + '</p></div>' +
+      '<div class="fo-pane" data-pane="filtro"><div class="fo-looks">' + LOOKS.map(L => `<button class="fo-chip" data-look="${L.id}"${di('foto.look.' + L.id, L.nome)}</button>`).join('') + '</div>' + sl('filtro') + '<label class="fo-chk" data-ck="faixas" data-i18n="foto.faixas"><input type="checkbox" data-k="faixas"> ' + T('foto.faixas') + '</label><div class="fo-btns"><button data-a="zerar"' + di('foto.zerar') + '</button></div></div>' +
+      '<div class="fo-pane" data-pane="luz"><label class="fo-chk" data-ck="horaJogo" data-i18n="foto.hora-jogo"><input type="checkbox" data-k="horaJogo"> ' + T('foto.hora-jogo') + '</label>' + sl('luz') + '<p class="fo-help"' + di('foto.luz-dica') + '</p></div></div>' +
+      '<footer class="fo-foot"><div class="fo-seg fo-res" role="radiogroup"' + at({ 'aria-label': 'foto.res' }) + '><button data-r="tela"' + at({ title: 'foto.res-tela-d' }) + di('foto.res-tela') + '</button><button data-r="2k" title="2560 × 1440">2K</button>' + (isTouch ? '' : '<button data-r="4k" title="3840 × 2160">4K</button>') + '</div>' +
+      '<button class="fo-shot" data-a="foto"' + at({ title: 'foto.tirar-espaco', 'aria-label': 'foto.tirar' }) + '><i></i></button></footer></section>'; /* 5.0c: textos fixos com data-i18n (o i18n os troca de idioma sem recarregar) */
     (canvas.parentElement || document.body).appendChild(root); st.root = root;
     const q = s => root.querySelector(s), qa = s => [...root.querySelectorAll(s)];
     st.el = { layer: q('.fo-layer'), guide: q('.fo-guide'), bars: q('.fo-bars'), flash: q('.fo-flash'), ring: q('.fo-ring'), toast: q('.fo-toast'), panel: q('.fo-panel'), note: q('.fo-note'), shot: q('.fo-shot'), foco: q('[data-v="foco"]'), sl: {}, ck: {} };
@@ -700,15 +710,15 @@ function create(ctx) {
   function syncLive() { /* valores que mudam com o mouse e o teclado (no máximo ~7 vezes por segundo) */
     st.uiDirty = false; if (!st.el) return;
     for (let i = 0; i < LIVE.length; i++) { const k = LIVE[i], s = st.el.sl[k], v = slGet(k); if (Math.abs(+s.inp.value - v) > s.d[5] * 0.5) { s.inp.value = v; s.out.textContent = s.d[7](+s.inp.value); } }
-    const t = st.focusMode === 'ent' ? 'em ' + st.focusName : st.focusMode === 'ponto' ? 'no ponto escolhido' : 'no centro da órbita'; if (st.el.foco.textContent !== t) st.el.foco.textContent = t;
+    const t = st.focusMode === 'ent' ? T('foto.foco-em', { x: focoNome() }) : T(st.focusMode === 'ponto' ? 'foto.foco-ponto' : 'foto.foco-centro'); if (st.el.foco.textContent !== t) st.el.foco.textContent = t;
   }
   function refreshNotes() {
     if (!st.el) return; const n = [];
-    if (net) n.push('Multiplayer: a partida continua rodando; o Modo Foto só solta a câmera.'); else if (G.camp && G.camp.noPause) n.push('Dificuldade Fenda: sem pausa; o Modo Foto só solta a câmera.');
-    if (!R.pp) n.push('Sem o pós de cinema nesta qualidade (' + (isTouch ? 'celular' : 'Baixa') + '): profundidade de campo, filtros e brilho ficam desligados. Câmera, luz, exposição, faixas e captura funcionam.');
-    else if (st.comp && !st.fotoPass) n.push('O desfoque e os filtros não subiram nesta placa; câmera, luz e captura funcionam.');
-    else if (M5R && st.f5 && st.f5.P && !st.f5.pipe) n.push('O desfoque e os filtros não subiram nesta placa; câmera, luz e captura funcionam.'); /* 5.0b */
-    else if (M5R && st.f5 && st.f5.pipe && !st.f5.dofN) n.push('A profundidade de campo não subiu nesta placa; filtros, luz e captura funcionam.');
+    if (net) n.push(T('foto.nota-multi')); else if (G.camp && G.camp.noPause) n.push(T('foto.nota-fenda')); /* 5.0c: avisos pelo dicionário */
+    if (!R.pp) n.push(T('foto.nota-sem-pos', { x: T(isTouch ? 'foto.nota-celular' : 'foto.nota-baixa') }));
+    else if (st.comp && !st.fotoPass) n.push(T('foto.nota-sem-filtros'));
+    else if (M5R && st.f5 && st.f5.P && !st.f5.pipe) n.push(T('foto.nota-sem-filtros')); /* 5.0b */
+    else if (M5R && st.f5 && st.f5.pipe && !st.f5.dofN) n.push(T('foto.nota-sem-dof'));
     st.el.note.hidden = !n.length; st.el.note.textContent = n.join(' '); if (PH.on) syncUI();
   }
   function guide() { /* recorte da foto quando a proporção da resolução escolhida é outra que a da tela */

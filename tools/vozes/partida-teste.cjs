@@ -7,7 +7,7 @@ const set = SETS.find(s => s.id === 'edge'); const foto = process.argv.includes(
 const espera = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
   const b = await pw.chromium.launch({ headless: true, args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--allow-file-access-from-files', '--disable-dev-shm-usage'] });
-  const ctx = await b.newContext({ viewport: { width: 1280, height: 800 }, userAgent: set.ua }); await ctx.addInitScript(`(${fake.toString()})(${JSON.stringify(set)})`);
+  const ctx = await b.newContext({ viewport: { width: 1280, height: 800 }, userAgent: set.ua, locale: 'pt-BR' /* 5.0c: o jogo abre no idioma do navegador */ }); await ctx.addInitScript(`(${fake.toString()})(${JSON.stringify(set)})`);
   const p = await ctx.newPage(); p.setDefaultTimeout(600000); const errs = []; p.on('pageerror', e => errs.push(e.message));
   const t0 = Date.now(); await p.goto('file://' + root + '/dist/local.html?autostart=1&faction=vehnar&opp=1&seed=5&q=baixa&semsalvar=1&legendas=1&debug=1', { waitUntil: 'load' });
   await p.waitForFunction(() => document.getElementById('loading') && document.getElementById('loading').hidden && window.__ARDG, null, { timeout: 600000 }); await espera(1500);

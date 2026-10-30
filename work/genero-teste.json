@@ -1,5 +1,5 @@
 {
-  "quando": "2026-10-25T01:53:48.491Z",
+  "quando": "2026-10-30T12:34:57.623Z",
   "aparelhos": [
     {
       "id": "edge",
@@ -74,6 +74,26 @@
         "eventos": "inicio,palavra,palavra,palavra,fim",
         "legendas": [
           "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locVorag": {
+        "aceita": true,
+        "voz": "Microsoft Antonio Online (Natural) - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locErevane": {
+        "aceita": true,
+        "voz": "Microsoft Francisca Online (Natural) - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Tempestade de Éter"
         ],
         "pitch": 1
       },
@@ -162,6 +182,26 @@
         ],
         "pitch": 1
       },
+      "locVorag": {
+        "aceita": true,
+        "voz": "Microsoft Daniel - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locErevane": {
+        "aceita": true,
+        "voz": "Microsoft Maria - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
       "ok": true,
       "falhas": []
     },
@@ -181,7 +221,7 @@
         },
         "Barão-Forja": {
           "aceita": true,
-          "voz": "Google português do Brasil",
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
           "tentativas": 1,
           "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,fim",
           "legendas": [
@@ -191,7 +231,7 @@
         },
         "Vesper Ísk": {
           "aceita": true,
-          "voz": "Google português do Brasil",
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
           "tentativas": 1,
           "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
           "legendas": [
@@ -201,7 +241,7 @@
         },
         "Zayin Coral": {
           "aceita": true,
-          "voz": "Google português do Brasil",
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
           "tentativas": 1,
           "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,fim",
           "legendas": [
@@ -211,7 +251,7 @@
         },
         "Oru Voraz": {
           "aceita": true,
-          "voz": "Google português do Brasil",
+          "voz": "Microsoft Daniel - Portuguese (Brazil)",
           "tentativas": 1,
           "eventos": "inicio,palavra,palavra,palavra,fim",
           "legendas": [
@@ -238,6 +278,26 @@
         "eventos": "inicio,palavra,palavra,palavra,fim",
         "legendas": [
           "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locVorag": {
+        "aceita": true,
+        "voz": "Microsoft Daniel - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locErevane": {
+        "aceita": true,
+        "voz": "Google português do Brasil",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Tempestade de Éter"
         ],
         "pitch": 1
       },
@@ -326,6 +386,26 @@
         ],
         "pitch": 1
       },
+      "locVorag": {
+        "aceita": true,
+        "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locErevane": {
+        "aceita": true,
+        "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
       "ok": true,
       "falhas": []
     },
@@ -405,6 +485,26 @@
         ],
         "pitch": 1
       },
+      "locVorag": {
+        "aceita": true,
+        "voz": "Felipe",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locErevane": {
+        "aceita": true,
+        "voz": "Luciana",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
       "escolhida": {
         "alvo": "Felipe · Apple",
         "sylvia": "Felipe",
@@ -430,7 +530,7 @@
         },
         "Barão-Forja": {
           "aceita": true,
-          "voz": "Luciana (Aprimorada)",
+          "voz": "Felipe",
           "tentativas": 1,
           "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,fim",
           "legendas": [
@@ -440,7 +540,7 @@
         },
         "Vesper Ísk": {
           "aceita": true,
-          "voz": "Luciana (Aprimorada)",
+          "voz": "Felipe",
           "tentativas": 1,
           "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
           "legendas": [
@@ -450,7 +550,7 @@
         },
         "Zayin Coral": {
           "aceita": true,
-          "voz": "Luciana (Aprimorada)",
+          "voz": "Felipe",
           "tentativas": 1,
           "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,fim",
           "legendas": [
@@ -460,7 +560,7 @@
         },
         "Oru Voraz": {
           "aceita": true,
-          "voz": "Luciana (Aprimorada)",
+          "voz": "Felipe",
           "tentativas": 1,
           "eventos": "inicio,palavra,palavra,palavra,fim",
           "legendas": [
@@ -487,6 +587,26 @@
         "eventos": "inicio,palavra,palavra,palavra,fim",
         "legendas": [
           "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locVorag": {
+        "aceita": true,
+        "voz": "Felipe",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locErevane": {
+        "aceita": true,
+        "voz": "Luciana (Aprimorada)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Tempestade de Éter"
         ],
         "pitch": 1
       },
@@ -575,6 +695,26 @@
         ],
         "pitch": 1
       },
+      "locVorag": {
+        "aceita": true,
+        "voz": null,
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locErevane": {
+        "aceita": true,
+        "voz": null,
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
       "ok": true,
       "falhas": []
     },
@@ -651,6 +791,26 @@
         "eventos": "inicio,palavra,palavra,palavra,fim",
         "legendas": [
           "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locVorag": {
+        "aceita": true,
+        "voz": "Microsoft Daniel - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locErevane": {
+        "aceita": true,
+        "voz": "Microsoft Maria - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Tempestade de Éter"
         ],
         "pitch": 1
       },
@@ -739,6 +899,26 @@
         ],
         "pitch": 1
       },
+      "locVorag": {
+        "aceita": true,
+        "voz": "Felipe (Aprimorado)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locErevane": {
+        "aceita": true,
+        "voz": "Luciana (Aprimorada)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
       "escolhida": {
         "alvo": "Felipe (Aprimorado) · Apple",
         "sylvia": "Felipe (Aprimorado)",
@@ -821,6 +1001,329 @@
         "eventos": "inicio,palavra,palavra,palavra,fim",
         "legendas": [
           "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locVorag": {
+        "aceita": true,
+        "voz": "Microsoft Daniel - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locErevane": {
+        "aceita": true,
+        "voz": "Microsoft Maria - Portuguese (Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
+      "ok": true,
+      "falhas": []
+    },
+    {
+      "id": "firefox-win-daniel",
+      "nome": "Firefox no Windows 11, com Maria e Daniel",
+      "lideres": {
+        "Sylvia Oriel": {
+          "aceita": true,
+          "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-tessara"
+          ],
+          "pitch": 1
+        },
+        "Barão-Forja": {
+          "aceita": true,
+          "voz": "Microsoft Daniel Desktop - Portuguese(Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vehnar"
+          ],
+          "pitch": 1
+        },
+        "Vesper Ísk": {
+          "aceita": true,
+          "voz": "Microsoft Daniel Desktop - Portuguese(Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-erevane"
+          ],
+          "pitch": 1
+        },
+        "Zayin Coral": {
+          "aceita": true,
+          "voz": "Microsoft Daniel Desktop - Portuguese(Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-quorith"
+          ],
+          "pitch": 1
+        },
+        "Oru Voraz": {
+          "aceita": true,
+          "voz": "Microsoft Daniel Desktop - Portuguese(Brazil)",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vorag"
+          ],
+          "pitch": 1
+        }
+      },
+      "erros": [],
+      "locutor": {
+        "aceita": true,
+        "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,fim",
+        "legendas": [
+          "built"
+        ],
+        "pitch": 1
+      },
+      "alerta": {
+        "aceita": true,
+        "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locVorag": {
+        "aceita": true,
+        "voz": "Microsoft Daniel Desktop - Portuguese(Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locErevane": {
+        "aceita": true,
+        "voz": "Microsoft Maria Desktop - Portuguese(Brazil)",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
+      "escolhida": {
+        "alvo": "Daniel · antiga do Windows",
+        "sylvia": "Microsoft Daniel Desktop - Portuguese(Brazil)",
+        "locutor": "Microsoft Daniel Desktop - Portuguese(Brazil)"
+      },
+      "voltou": "Microsoft Maria Desktop - Portuguese(Brazil)",
+      "ok": true,
+      "falhas": []
+    },
+    {
+      "id": "iphone-sem-felipe",
+      "nome": "iPhone sem o Felipe (homens só robóticos)",
+      "lideres": {
+        "Sylvia Oriel": {
+          "aceita": true,
+          "voz": "Luciana",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-tessara"
+          ],
+          "pitch": 1
+        },
+        "Barão-Forja": {
+          "aceita": true,
+          "voz": "Luciana",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vehnar"
+          ],
+          "pitch": 1
+        },
+        "Vesper Ísk": {
+          "aceita": true,
+          "voz": "Luciana",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-erevane"
+          ],
+          "pitch": 1
+        },
+        "Zayin Coral": {
+          "aceita": true,
+          "voz": "Luciana",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-quorith"
+          ],
+          "pitch": 1
+        },
+        "Oru Voraz": {
+          "aceita": true,
+          "voz": "Luciana",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vorag"
+          ],
+          "pitch": 1
+        }
+      },
+      "erros": [],
+      "locutor": {
+        "aceita": true,
+        "voz": "Luciana",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,fim",
+        "legendas": [
+          "built"
+        ],
+        "pitch": 1
+      },
+      "alerta": {
+        "aceita": true,
+        "voz": "Luciana",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locVorag": {
+        "aceita": true,
+        "voz": "Luciana",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locErevane": {
+        "aceita": true,
+        "voz": "Luciana",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Tempestade de Éter"
+        ],
+        "pitch": 1
+      },
+      "ok": true,
+      "falhas": []
+    },
+    {
+      "id": "android",
+      "nome": "Chrome no Android",
+      "lideres": {
+        "Sylvia Oriel": {
+          "aceita": true,
+          "voz": "português Brasil",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-tessara"
+          ],
+          "pitch": 1
+        },
+        "Barão-Forja": {
+          "aceita": true,
+          "voz": "português Brasil",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vehnar"
+          ],
+          "pitch": 1
+        },
+        "Vesper Ísk": {
+          "aceita": true,
+          "voz": "português Brasil",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-erevane"
+          ],
+          "pitch": 1
+        },
+        "Zayin Coral": {
+          "aceita": true,
+          "voz": "português Brasil",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-quorith"
+          ],
+          "pitch": 1
+        },
+        "Oru Voraz": {
+          "aceita": true,
+          "voz": "português Brasil",
+          "tentativas": 1,
+          "eventos": "inicio,palavra,palavra,palavra,fim",
+          "legendas": [
+            "sala-vorag"
+          ],
+          "pitch": 1
+        }
+      },
+      "erros": [],
+      "locutor": {
+        "aceita": true,
+        "voz": "português Brasil",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,fim",
+        "legendas": [
+          "built"
+        ],
+        "pitch": 1
+      },
+      "alerta": {
+        "aceita": true,
+        "voz": "português Brasil",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locVorag": {
+        "aceita": true,
+        "voz": "português Brasil",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Base sob ataque"
+        ],
+        "pitch": 1
+      },
+      "locErevane": {
+        "aceita": true,
+        "voz": "português Brasil",
+        "tentativas": 1,
+        "eventos": "inicio,palavra,palavra,palavra,fim",
+        "legendas": [
+          "Tempestade de Éter"
         ],
         "pitch": 1
       },

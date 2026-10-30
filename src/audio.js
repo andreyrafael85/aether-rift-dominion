@@ -60,10 +60,23 @@ function nivel(v) { const n = v.name || '', u = v.voiceURI || '';
   if (/espeak|eloquence/i.test(n + ' ' + u) || NOVIDADE.test(n)) return 0;
   if (/Microsoft/i.test(n) && /Natural|Online/i.test(n)) return 6;
   if (/^Google/i.test(n)) return 5;
-  if (/Aprimorad|Enhanced|Premium|Melhorad/i.test(n) || /\.(enhanced|premium)\./i.test(u)) return 4;
+  if (/Aprimorad|Enhanced|Premium|Melhorad|Mejorad/i.test(n) || /\.(enhanced|premium)\./i.test(u)) return 4; /* 5.0c: Mejorada */
   if (/^com\.apple\./i.test(u) || /^(Luciana|Felipe|Fernanda|Joana|Catarina)\b/i.test(n)) return 3;
   return /Microsoft/i.test(n) ? 1 : 2; }
 const PREF = [/Francisca/i, /Antonio/i, /Thalita/i, /Luciana/i, /Felipe/i]; /* ordem pedida dentro do mesmo nível */
+/* 5.0c: voz no idioma do jogo (ARD.idioma). Mesmo critério de qualidade; a região principal vem antes (Brasil; EUA e Reino Unido; América Latina),
+   e a voz escolhida em Ajustes só vale se for do idioma atual. Os nomes de cada idioma dizem o gênero, como nas listas do português. */
+const IDI = () => (globalThis.ARD && ARD.idioma) || 'pt-BR';
+const TX = (k, v, r) => (globalThis.ARD && ARD.t ? ARD.t(k, v, r) : (r != null ? r : k));
+const LINGUA = { 'pt-BR': /^pt(-|$)/i, en: /^en(-|$)/i, es: /^es(-|$)/i };
+const REGIAO = { 'pt-BR': /^pt-BR$/i, en: /^en-(US|GB)$/i, es: /^es-(419|MX|US|CO|AR|CL|PE|VE|UY|EC|BO|PY|CR|PA|DO|GT|HN|NI|SV|PR|CU)$/i };
+const LANG_FALA = { 'pt-BR': 'pt-BR', en: 'en-US', es: 'es-MX' };
+const PREFS = { en: [/Aria/i, /Jenny/i, /Guy/i, /Andrew/i, /Ava/i, /Samantha/i, /Daniel/i], es: [/Dalia/i, /Jorge/i, /Paloma/i, /Alonso/i, /Paulina/i, /Juan/i] };
+const VOZES_F = { en: /(^|[\s(])(Aria|Jenny|Michelle|Emma|Ana|Ava|Sonia|Libby|Maisie|Natasha|Clara|Samantha|Allison|Susan|Victoria|Karen|Moira|Tessa|Fiona|Serena|Zira|Hazel|Zoe|Nicky|Kate)(?![a-z])|^Google (US English|UK English Female)/i,
+  es: /(^|[\s(])(Dalia|Paloma|Salom[eé]|Elena|Elvira|Camila|Catalina|Paulina|M[oó]nica|Marisol|Ang[eé]lica|Isabela|Helena|Laura|Sabina|Ximena|Renata)(?![a-z])|^Google espa[nñ]ol/i };
+const VOZES_M = { en: /(^|[\s(])(Guy|Davis|Christopher|Eric|Roger|Steffan|Andrew|Brian|Ryan|Thomas|William|Liam|Alex|Daniel|Fred|Tom|Aaron|Arthur|Evan|Nathan|Rishi|David|Mark|George|Oliver)(?![a-z])|^Google UK English Male/i,
+  es: /(^|[\s(])(Jorge|Alonso|Gonzalo|Tom[aá]s|[AÁ]lvaro|Gerardo|Emilio|Juan|Diego|Carlos|Pablo|Ra[uú]l|Enrique|Mateo)(?![a-z])/i };
+const TAGK = ['voz.tag.robotica', 'voz.tag.antiga', '', 'voz.tag.apple', 'voz.tag.apple-apr', '', 'voz.tag.neural'];
 const TAG = ['robótica', 'antiga do Windows', '', 'Apple', 'Apple aprimorada', '', 'neural do Edge'];
 function nomeCurto(n) { return String(n || '').replace(/^Microsoft\s+/i, '').replace(/\s*Online\s*\(Natural\)/i, '').replace(/\s+-\s+.*$/, '').replace(/\s+Desktop\b/i, '').replace(/\s*\((?:Portugu[eê]s|Portuguese)\s*\([^)]*\)\)\s*$/i, '').replace(/Multilingual$/i, ' multilíngue').trim(); }
 /* 5.0a.3: voz por líder. No modo Automática, as falas de líder (chave 'sala-<raça>', ou a raça no 4º argumento de A.say) usam uma voz do gênero
@@ -76,17 +89,21 @@ function nomeCurto(n) { return String(n || '').replace(/^Microsoft\s+/i, '').rep
    Heloisa, Hélia / Daniel), Apple (Luciana, Fernanda, Joana, Catarina / Felipe; as "novidades" Flo, Sandy, Shelley, Vovó, Grandma / Eddy, Reed, Rocko,
    Vovô, Grandpa) e a Google português do Brasil, que é feminina. Voz fora das listas (Android, Samsung, eSpeak) fica sem gênero e nunca é escolhida por ele. */
 const GENERO_LIDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* Barão-Forja, Vesper Ísk, Sylvia Oriel, Zayin Coral, Oru Voraz */
+/* 5.0c: o locutor da partida (unidade pronta, obra, pesquisa, alertas, voz ativada) fala no gênero do locutor da Raça do jogador no elenco das vozes
+   gravadas (tools/vozes/racas.py: Vehnar, Quorith e Vorag com o Alex; Erevane e Tessara com a Dora). Antes ele usava a melhor voz do aparelho, de
+   qualquer gênero: no Chrome a Google, feminina, para as cinco Raças. A.raca = Raça do jogador na partida (src/main.js); fora dela, a Automática */
+const GENERO_LOCUTOR = { vehnar: 'm', erevane: 'f', tessara: 'f', quorith: 'm', vorag: 'm' };
 const VOZ_F = /(^|[\s(])(Francisca|Thalita(?:Multilingual)?|Raquel|Fernanda|Maria|Heloisa|H[eé]lia|Luciana|Joana|Catarina|Brenda|Elza|Giovanna|Leila|Let[ií]cia|Manuela|Yara|Flo|Sandy|Shelley|Vov[óo]|Grandma)(?![a-z])|^Google portugu[eê]s/i;
 const VOZ_M = /(^|[\s(])(Ant[oô]nio(?:Multilingual)?|Duarte|Daniel|Felipe|Donato|F[aá]bio|Humberto|J[uú]lio|Nicolau|Val[eé]rio|Macerio(?:Multilingual)?|Ricardo|Cristiano|Eddy|Reed|Rocko|Vovô|Grandpa)(?![a-z])/i;
-function generoVoz(v) { const n = String((v && v.name) || '').replace(/^Microsoft\s+/i, ''); return VOZ_F.test(n) ? 'f' : VOZ_M.test(n) ? 'm' : null; }
-let RANK = null, RANK_T = 0; const RUIM = new Set(); /* vozes que falharam nesta sessão (voz online sem rede, por exemplo) */
+function generoVoz(v) { const n = String((v && v.name) || '').replace(/^Microsoft\s+/i, ''); const I = IDI(), F = VOZES_F[I] || VOZ_F, M = VOZES_M[I] || VOZ_M; return F.test(n) ? 'f' : M.test(n) ? 'm' : null; } /* 5.0c */
+let RANK = null, RANK_T = 0, RANK_I = ''; const RUIM = new Set(); /* vozes que falharam nesta sessão (voz online sem rede, por exemplo) */
 function ranking() {
-  if (RANK && performance.now() - RANK_T < 5000) return RANK; if (!temFala()) return [];
+  if (RANK && RANK_I === IDI() && performance.now() - RANK_T < 5000) return RANK; if (!temFala()) return []; /* 5.0c: o cache lembra o idioma */
   let vs = []; try { vs = speechSynthesis.getVoices() || []; } catch (e) {}
-  const r = []; vs.forEach((v, i) => { const lang = String(v.lang || '').replace('_', '-'); const br = /^pt-BR$/i.test(lang); if (!br && !/^pt(-|$)/i.test(lang)) return;
-    const nv = nivel(v), pi = PREF.findIndex(re => re.test(v.name || '')); const nota = (nv > 0 ? 2000 : 0) + (br ? 1000 : 0) + nv * 100 + (pi >= 0 ? 50 - pi * 5 : 0) + (/Premium/i.test((v.name || '') + ' ' + (v.voiceURI || '')) ? 2 : 0) + (v.default ? 1 : 0);
-    r.push({ v, id: vozId(v), nota, nivel: nv, br, i, genero: generoVoz(v) /* 5.0a.3 */, rotulo: nomeCurto(v.name) + (TAG[nv] ? ' · ' + (nv === 4 && /Aprimorad|Enhanced|Premium|Melhorad/i.test(v.name || '') ? 'Apple' : TAG[nv]) : '') + (br ? '' : ' · Portugal') }); });
-  r.sort((a, b) => b.nota - a.nota || a.i - b.i); if (vs.length) { RANK = r; RANK_T = performance.now(); } return r;
+  const I = IDI(), PR = PREFS[I] || PREF; const r = []; vs.forEach((v, i) => { const lang = String(v.lang || '').replace('_', '-'); const br = (REGIAO[I] || REGIAO['pt-BR']).test(lang); if (!br && !(LINGUA[I] || LINGUA['pt-BR']).test(lang)) return; /* 5.0c: vozes do idioma do jogo */
+    const nv = nivel(v), pi = PR.findIndex(re => re.test(v.name || '')); const nota = (nv > 0 ? 2000 : 0) + (br ? 1000 : 0) + nv * 100 + (pi >= 0 ? 50 - pi * 5 : 0) + (/Premium/i.test((v.name || '') + ' ' + (v.voiceURI || '')) ? 2 : 0) + (v.default ? 1 : 0);
+    r.push({ v, id: vozId(v), nota, nivel: nv, br, i, genero: generoVoz(v) /* 5.0a.3 */, rotulo: nomeCurto(v.name) + (TAGK[nv] ? ' · ' + TX(nv === 4 && /Aprimorad|Enhanced|Premium|Melhorad|Mejorad/i.test(v.name || '') ? 'voz.tag.apple' : TAGK[nv], null, nv === 4 && /Aprimorad|Enhanced|Premium|Melhorad/i.test(v.name || '') ? 'Apple' : TAG[nv]) : '') + (br ? '' : ' · ' + (I === 'pt-BR' ? TX('voz.regiao.outra', null, 'Portugal') : lang)) }); });
+  r.sort((a, b) => b.nota - a.nota || a.i - b.i); if (vs.length) { RANK = r; RANK_T = performance.now(); RANK_I = I; } return r;
 }
 function pickVoice(id, genero) { const r = ranking(), want = id != null ? id : A.voz; if (want) { const f = r.find(x => x.id === want && !RUIM.has(x.id)); if (f) return f.v; } const b = r.find(x => !RUIM.has(x.id));
   if (b && genero && b.genero !== genero) { const g = r.find(x => !RUIM.has(x.id) && x.nivel >= 1 && x.genero === genero); if (g) return g.v; } /* 5.0b.1: fala de líder: a melhor voz do gênero, de qualquer nível a partir do 1 */
@@ -111,7 +128,7 @@ function voiceHook(u, text, c) { const ev = (tipo, i, n) => { try { window.dispa
   u.onstart = () => { c.ini = true; ev('inicio'); }; u.onboundary = e => { if (!e.name || e.name === 'word') ev('palavra', e.charIndex, e.charLength); }; u.onend = () => { ev('fim'); acabou(c); }; u.onerror = e => { ev('fim'); falhou(c, e); }; }
 function comecar(text, d, voz, tentativa) {
   let u; try { u = new SpeechSynthesisUtterance(text); } catch (e) { cur = null; return false; }
-  const v = voz || pickVoice(null, d.genero) /* 5.0a.3: d.genero = gênero do líder que fala */; if (v) { try { u.voice = v; } catch (e) {} } u.lang = (v && v.lang) || 'pt-BR'; u.pitch = 1; u.rate = d.p === 3 ? 1.05 : 1; u.volume = 0.9; /* 5.0a.2: tom natural (antes 0.85 e 1.05) */
+  const v = voz || pickVoice(null, d.genero) /* 5.0a.3: d.genero = gênero do líder que fala */; if (v) { try { u.voice = v; } catch (e) {} } u.lang = (v && v.lang) || LANG_FALA[IDI()] /* 5.0c */; u.pitch = 1; u.rate = d.p === 3 ? 1.05 : 1; u.volume = 0.9; /* 5.0a.2: tom natural (antes 0.85 e 1.05) */
   const c = cur = { u, p: d.p, tipo: d.tipo, text, d, tentativa: tentativa || 0, t0: performance.now(), fim: performance.now() + 3000 + text.length * 150 }; voiceHook(u, text, c); A.fala = u; /* referência viva: sem ela o Chrome pode perder o onend */
   try { if (speechSynthesis.paused) speechSynthesis.resume(); speechSynthesis.speak(u); } catch (e) { cur = null; return false; }
   return true;
@@ -135,7 +152,7 @@ function falar(text, d, voz) {
 A.onSay = null; /* 5.0b: legendas — cada fala aceita também vai para A.onSay(texto, chave), que a Interface 3.0 mostra com o retrato do líder (mesmo com a voz desligada) */
 A.say = function (text, key, cooldown, quem) { /* 5.0a.3: quem = raça do líder que fala (a chave 'sala-<raça>' da Sala de Comando já diz quem é) */
   key = key || text; const now = performance.now(); const d = decide(key, cooldown, now); if (!d) return false;
-  { const lid = quem || (/^sala-([a-z]+)$/.exec(key) || [])[1]; if (lid && GENERO_LIDER[lid]) d.genero = GENERO_LIDER[lid]; } /* 5.0a.3 */
+  { const lid = quem || (/^sala-([a-z]+)$/.exec(key) || [])[1]; if (lid && GENERO_LIDER[lid]) d.genero = GENERO_LIDER[lid]; else if (A.raca && GENERO_LOCUTOR[A.raca]) d.genero = GENERO_LOCUTOR[A.raca]; } /* 5.0a.3; 5.0c: o locutor da Raça */
   if (A.voice && temFala() && !falar(text, d)) return false;
   ultima[key] = now; if (d.p === 1) ultimaRotina = now;
   if (A.onSay) { try { A.onSay(text, key); } catch (e) {} }
@@ -148,34 +165,35 @@ A.setEnabled = function (on) { A.enabled = on; save(); sessao(); htmlMudo(); if 
 const AMOSTRA = 'Comandante, a Fenda está estável e o Núcleo aguarda as suas ordens.';
 const UIS = []; const esc = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 function dica(r, best) { const ua = (typeof navigator !== 'undefined' && navigator.userAgent) || '', ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1), mac = !ios && /Macintosh/.test(ua), win = /Windows/.test(ua), ffx = /Firefox\//.test(ua), android = /Android/.test(ua);
-  if (!temFala()) return 'Este navegador não tem voz do sistema: as falas aparecem só nas legendas.';
-  if (!r.length) return 'Nenhuma voz em português neste aparelho: as falas aparecem nas legendas.' + (win ? ' No Windows, o Edge traz vozes neurais (Francisca, Antonio, Thalita).' : '');
+  if (!temFala()) return TX('voz.d.sem'); /* 5.0c: as dicas pelo dicionário */
+  if (!r.length) return TX('voz.d.nenhuma') + (win ? ' ' + TX('voz.d.nenhuma-win') : '');
   const n = best ? best.nivel : 0;
-  if (n === 6) return 'Vozes neurais do Edge: soam naturais e precisam de internet; sem rede, o jogo passa para a melhor voz do aparelho.';
-  if (n === 5) return 'A voz do Google precisa de internet; sem rede, o jogo passa para a melhor voz do aparelho.';
-  if ((ios || mac) && n < 4) return (ios ? 'No iPhone e no iPad: Ajustes' : 'No Mac: Ajustes do Sistema') + ' › Acessibilidade › Conteúdo Falado › Vozes › Português (Brasil): baixe a Luciana ou o Felipe (Aprimorada) e recarregue o jogo.';
-  if (win && ffx) return 'O Firefox só enxerga as vozes antigas do Windows. Para uma voz natural, use o Edge (Francisca, Antonio, Thalita) ou o Chrome (Google português do Brasil).';
-  if (win && n <= 1) return 'Estas são as vozes antigas do Windows. O Edge traz vozes neurais (Francisca, Antonio, Thalita) e o Chrome, a Google português do Brasil.';
-  if (android && n <= 2) return 'No Android, a voz vem do mecanismo de texto para fala do aparelho (Ajustes › Acessibilidade › Saída de texto para fala).';
+  if (n === 6) return TX('voz.d.edge');
+  if (n === 5) return TX('voz.d.google');
+  if ((ios || mac) && n < 4) return TX('voz.d.apple', { onde: TX(ios ? 'voz.d.ios' : 'voz.d.mac') });
+  if (win && ffx) return TX('voz.d.firefox');
+  if (win && n <= 1) return TX('voz.d.win');
+  if (android && n <= 2) return TX('voz.d.android');
   return ''; }
 function preencher(box) {
   const sel = box.querySelector('[data-voz-sel]'), bt = box.querySelector('[data-voz-ouvir]'), dc = box.querySelector('[data-voz-dica]'); if (!sel) return;
-  const r = ranking(), best = r.find(x => !RUIM.has(x.id)), op = x => `<option value="${esc(x.id)}">${esc(x.rotulo)}${RUIM.has(x.id) ? ' (falhou agora)' : ''}</option>`;
-  let h = `<option value="">Automática${best ? ' · ' + esc(best.rotulo) : ''}</option>`; const br = r.filter(x => x.br), pt = r.filter(x => !x.br);
-  if (br.length) h += `<optgroup label="Português do Brasil">${br.map(op).join('')}</optgroup>`; if (pt.length) h += `<optgroup label="Outras vozes em português">${pt.map(op).join('')}</optgroup>`;
-  if (A.voz && !r.some(x => x.id === A.voz)) h += `<option value="${esc(A.voz)}">${esc(A.vozNome || nomeCurto(A.voz))} (indisponível agora)</option>`;
+  const r = ranking(), best = r.find(x => !RUIM.has(x.id)), op = x => `<option value="${esc(x.id)}">${esc(x.rotulo)}${RUIM.has(x.id) ? ' ' + esc(TX('voz.falhou')) : ''}</option>`; /* 5.0c */
+  let h = `<option value="">${esc(TX('voz.auto'))}${best ? ' · ' + esc(best.rotulo) : ''}</option>`; const br = r.filter(x => x.br), pt = r.filter(x => !x.br);
+  if (br.length) h += `<optgroup label="${esc(TX('voz.grupo.principal'))}">${br.map(op).join('')}</optgroup>`; if (pt.length) h += `<optgroup label="${esc(TX('voz.grupo.outras'))}">${pt.map(op).join('')}</optgroup>`;
+  if (A.voz && !r.some(x => x.id === A.voz)) h += `<option value="${esc(A.voz)}">${esc(A.vozNome || nomeCurto(A.voz))} ${esc(TX('voz.indisp'))}</option>`;
   if (sel.__h !== h) { sel.__h = h; sel.innerHTML = h; } sel.value = A.voz || ''; sel.disabled = !temFala(); if (bt) bt.disabled = !temFala();
   if (dc) { const t = dica(r, best); if (dc.textContent !== t) dc.textContent = t; dc.hidden = !t; }
 }
 A.vozes = () => ranking().map(x => ({ id: x.id, rotulo: x.rotulo, nivel: x.nivel, br: x.br }));
 A.vozAtual = () => { const v = temFala() ? pickVoice() : null; return v ? { id: vozId(v), nome: v.name } : null; };
 A.vozDoLider = raca => { const v = temFala() ? pickVoice(null, GENERO_LIDER[raca]) : null; return v ? { id: vozId(v), nome: v.name, genero: generoVoz(v) } : null; }; /* 5.0a.3: diagnóstico e testes */
-A.generoVoz = generoVoz; A.GENERO_LIDER = GENERO_LIDER; /* 5.0a.3 */
+A.generoVoz = generoVoz; A.GENERO_LIDER = GENERO_LIDER; A.GENERO_LOCUTOR = GENERO_LOCUTOR; A.raca = null; /* 5.0a.3; 5.0c */
 A.setVoz = function (id) { A.voz = id || ''; const f = ranking().find(x => x.id === A.voz); A.vozNome = f ? nomeCurto(f.v.name) : ''; save(); UIS.forEach(preencher); };
-A.ouvir = function (id) { if (!temFala()) return false; const sid = id != null ? id : A.voz, f = sid ? ranking().find(x => x.id === sid) : null; return falar(AMOSTRA, { tipo: 'sistema', p: 4 }, f ? f.v : null); };
+A.ouvir = function (id) { if (!temFala()) return false; const sid = id != null ? id : A.voz, f = sid ? ranking().find(x => x.id === sid) : null; return falar(TX('voz.amostra', null, AMOSTRA) /* 5.0c */, { tipo: 'sistema', p: 4 }, f ? f.v : null); };
 A.vozUI = function (box) { if (!box || box.__voz) return; box.__voz = 1; UIS.push(box); const sel = box.querySelector('[data-voz-sel]'), bt = box.querySelector('[data-voz-ouvir]'), ts = box.querySelector('[data-som-teste]');
   if (sel) sel.addEventListener('change', () => A.setVoz(sel.value)); if (bt) bt.addEventListener('click', () => A.ouvir(sel ? sel.value : A.voz)); if (ts) ts.addEventListener('click', () => A.testarSom(box)); /* 5.0b.1: Testar som */ preencher(box); };
 if (temFala()) { const mudou = () => { RANK = null; UIS.forEach(preencher); }; try { addEventListener('online', () => { RUIM.clear(); mudou(); }); } catch (e) {} try { if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', mudou); else speechSynthesis.onvoiceschanged = mudou; speechSynthesis.getVoices(); } catch (e) {} }
+try { addEventListener('ard-idioma', () => { RANK = null; RUIM.clear(); fila = null; cur = null; if (temFala()) try { speechSynthesis.cancel(); } catch (e) {} UIS.forEach(preencher); }); } catch (e) {} /* 5.0c: a lista e a voz mudam com o idioma, sem recarregar */
 if (typeof document !== 'undefined' && document.querySelectorAll) { const liga = () => document.querySelectorAll('[data-voz-ui]').forEach(b => A.vozUI(b)); if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', liga); else liga(); }
 /* 5.0b.1: som no celular. No iOS o Web Audio e a voz do sistema só começam dentro de um gesto de verdade: touchend, click, pointerup ou keydown
    (o touchstart e o pointerdown do toque não contam). Antes, o src/main.js só escutava pointerdown, keydown e touchstart: no iPhone o AudioContext
@@ -214,7 +232,7 @@ function destravarFala() { const c = cur; if (!c || !c.u || c.ini) return; try {
   cur = null; if (performance.now() - (c.t0 || 0) <= FILA_MAX) comecar(c.text, c.d, null, c.tentativa); else proxima(); }
 /* fala de preparo: volume 0, dentro do gesto (se o próprio gesto já falou, ele mesmo serve de preparo); não passa pela fila, pela legenda nem pelo 'ard-voz' */
 function prepararVoz(e) { if (D.voz || !temFala()) return; D.voz = true; D.vozEvento = e.type;
-  try { if (speechSynthesis.speaking || speechSynthesis.pending) return; const u = new SpeechSynthesisUtterance('Som'); u.lang = 'pt-BR'; u.volume = 0; u.rate = 1.3; D.prep = u; speechSynthesis.speak(u); } catch (er) { D.voz = false; } }
+  try { if (speechSynthesis.speaking || speechSynthesis.pending) return; const u = new SpeechSynthesisUtterance('Som'); u.lang = LANG_FALA[IDI()]; /* 5.0c */ u.volume = 0; u.rate = 1.3; D.prep = u; speechSynthesis.speak(u); } catch (er) { D.voz = false; } }
 /* <audio> mudo em laço (iOS sem navigator.audioSession): um WAV de silêncio de 0,5 s gerado aqui, na taxa do AudioContext (outra taxa faria o iOS
    trocar a do aparelho e chiar o Web Audio); nasce e toca pela primeira vez dentro de um gesto, depois pausa e volta com o som e a página */
 function wavMudo(taxa) { const n = Math.round(taxa / 2), b = new ArrayBuffer(44 + n * 2), d = new DataView(b), w = (o, t) => { for (let i = 0; i < t.length; i++) d.setUint8(o + i, t.charCodeAt(i)); };
@@ -231,23 +249,26 @@ A.gesto = function (e) { if (D.pronto || !gestoValido(e)) return; if (!D.evento)
 if (typeof document !== 'undefined' && document.addEventListener) { const volta = () => { D.pronto = false; if (visivel() && D.evento) retomar(); htmlMudo(); }; document.addEventListener('visibilitychange', volta); try { addEventListener('pageshow', volta); } catch (e) {} }
 /* diagnóstico (Testar som e testes): estado do áudio, sessão de reprodução, vozes em português e a voz usada */
 const ESTADO = { running: 'tocando', suspended: 'suspenso', interrupted: 'interrompido', closed: 'fechado' };
+const FALA_K = { esperando: 'esperando', falando: 'falando', tocou: 'tocou', falhou: 'falhou', 'não começou': 'nao-comecou', 'sem resposta (toque em Testar som de novo)': 'sem-resposta' }; /* 5.0c: o estado da fala fica em pt-BR no código; a linha sai no idioma */
 A.gestoValido = gestoValido; A.desbloqueio = () => ({ evento: D.evento, gestos: D.gestos, voz: D.voz, vozEvento: D.vozEvento, mudoCurto: D.mudoCurto, retomadas: D.retomadas, interrompido: D.interrompido, pronto: D.pronto, audioMudo: D.el ? (D.el.paused ? 'pausado' : 'tocando') : null, audioMudoEvento: D.elEvento });
 A.diagnostico = function () { const c = A.ctx, s = temSessao() ? navigator.audioSession.type : null, t = D.teste;
   return { audio: c ? c.state : null, sessao: s === 'playback' || !!(D.el && !D.el.paused), sessaoTipo: s, audioMudo: !!(D.el && !D.el.paused), precisaSessao: ehIOS(), vozesPt: ranking().length, voz: t ? t.voz : ((A.vozAtual() || {}).nome || null), fala: t ? t.fala : null, efeitos: A.enabled, vozJogo: A.voice }; };
-function diagTexto(g) { const ses = g.sessaoTipo === 'playback' ? 'sim' : g.audioMudo ? 'sim (áudio mudo em laço)' : !g.precisaSessao ? 'não precisa neste aparelho' : g.sessaoTipo ? 'não (' + g.sessaoTipo + ')' : 'não';
-  return 'Áudio: ' + (g.audio ? (ESTADO[g.audio] || g.audio) : 'sem Web Audio') + ' · Sessão de reprodução: ' + ses + ' · Vozes em português: ' + g.vozesPt + ' · Voz: ' + (g.voz ? nomeCurto(g.voz) : temFala() ? 'padrão do aparelho' : 'sem voz do sistema')
-    + (g.fala ? ' · Fala: ' + g.fala : '') + (g.efeitos ? '' : ' · efeitos desligados em Ajustes') + (g.vozJogo ? '' : ' · voz do jogo desligada'); }
+function diagTexto(g) { const DG = (k, r, v) => TX('voz.diag.' + k, v, r); /* 5.0c: os pedaços pelo dicionário (o pt-BR fica igual ao da 5.0b.1) */
+  const ses = g.sessaoTipo === 'playback' ? DG('sim', 'sim') : g.audioMudo ? DG('sim-mudo', 'sim (áudio mudo em laço)') : !g.precisaSessao ? DG('nao-precisa', 'não precisa neste aparelho') : g.sessaoTipo ? DG('nao', 'não') + ' (' + g.sessaoTipo + ')' : DG('nao', 'não');
+  return DG('audio', 'Áudio') + ': ' + (g.audio ? (ESTADO[g.audio] ? DG('e.' + g.audio, ESTADO[g.audio]) : g.audio) : DG('sem-webaudio', 'sem Web Audio')) + ' · ' + DG('sessao', 'Sessão de reprodução') + ': ' + ses + ' · ' + DG('vozes', 'Vozes em português') + ': ' + g.vozesPt + ' · ' + DG('voz', 'Voz') + ': ' + (g.voz ? nomeCurto(g.voz) : temFala() ? DG('padrao', 'padrão do aparelho') : DG('sem-voz', 'sem voz do sistema'))
+    + (g.fala ? ' · ' + DG('fala', 'Fala') + ': ' + (FALA_K[g.fala] ? DG('f.' + FALA_K[g.fala], g.fala) : g.fala) : '') + (g.efeitos ? '' : ' · ' + DG('efeitos-off', 'efeitos desligados em Ajustes')) + (g.vozJogo ? '' : ' · ' + DG('voz-off', 'voz do jogo desligada'))
+    + (g.precisaSessao && g.fala === 'tocou' ? ' · ' + DG('ios-silencio', 'Não ouviu a voz? No iPhone, confira a chave de silêncio: ela pode calar a voz do sistema sem calar os efeitos. Se ainda não sair, escolha em Voz das falas uma voz sem "Aprimorada".') : ''); } /* 5.0c: dica do iPhone (a voz do sistema e os efeitos saem por caminhos diferentes) */
 const FRASE_TESTE = 'Som testado, Comandante. Efeitos e voz no ar.';
 /* Testar som: toca um efeito curto e fala uma frase (mesmo com o som ou a voz do jogo desligados, como o Ouvir) e mostra o diagnóstico na linha [data-som-diag] */
 A.testarSom = function (box) { sessao(true); A.init(); const c = A.ctx; if (c) { retomar(c); if (c.state !== 'running') bufferMudo(c); try { [523, 659, 784].forEach((f, i) => tone(f, 0.12, { gain: 0.12, delay: i * 0.09 })); } catch (e) {} }
   const sel = box && box.querySelector ? box.querySelector('[data-voz-sel]') : null, sid = sel ? sel.value : A.voz, f = sid ? ranking().find(x => x.id === sid) : null, v = temFala() ? (f ? f.v : pickVoice()) : null;
-  const t = D.teste = { voz: v ? v.name : null, fala: temFala() ? 'esperando' : null, inicio: false };
+  const t = D.teste = { voz: v ? v.name : null, fala: temFala() ? 'esperando' : null, inicio: false }; const FRASE = TX('voz.teste', null, FRASE_TESTE); /* 5.0c: a frase no idioma */
   const linha = () => { const dg = box && box.querySelectorAll ? box.querySelectorAll('[data-som-diag]') : []; const txt = diagTexto(A.diagnostico()); dg.forEach(el => { el.hidden = false; if (el.textContent !== txt) el.textContent = txt; }); };
   if (temFala()) { const sai = () => { try { removeEventListener('ard-voz', ouve); } catch (er) {} };
-    const ouve = e => { const d = e && e.detail; if (!d || d.texto !== FRASE_TESTE) return; if (D.teste !== t) { sai(); return; }
+    const ouve = e => { const d = e && e.detail; if (!d || d.texto !== FRASE) return; if (D.teste !== t) { sai(); return; }
       if (d.tipo === 'inicio') { t.inicio = true; t.fala = 'falando'; if (A.fala && A.fala.voice) t.voz = A.fala.voice.name; } /* a voz de verdade (sem rede, a online cai para a local) */
       else if (d.tipo === 'fim') { if (t.inicio) { t.fala = 'tocou'; sai(); } else t.fala = 'falhou'; } linha(); }; /* sem 'inicio', a fala pode repetir na voz local: segue ouvindo */
-    try { addEventListener('ard-voz', ouve); } catch (e) {} if (!falar(FRASE_TESTE, { tipo: 'sistema', p: 4 }, v)) t.fala = 'não começou';
+    try { addEventListener('ard-voz', ouve); } catch (e) {} if (!falar(FRASE, { tipo: 'sistema', p: 4 }, v)) t.fala = 'não começou';
     setTimeout(() => { if (D.teste !== t || t.fala === 'tocou') return; sai(); if (!t.inicio) { t.fala = 'sem resposta (toque em Testar som de novo)'; linha(); } }, 8000); }
   linha(); setTimeout(linha, 450); return t; };
 ARD.audio = A;

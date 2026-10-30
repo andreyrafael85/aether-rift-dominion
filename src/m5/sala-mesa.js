@@ -78,7 +78,7 @@ function criar(C, st) { const { W, T } = C.L; const { float, vec3, color, unifor
     for (const g of list) { P.set(g.attributes.position.array, o * 3); if (g.attributes.cor) Cc.set(g.attributes.cor.array, o * 3); o += g.attributes.position.count; g.dispose(); }
     const g = new W.BufferGeometry(); g.setAttribute('position', new W.BufferAttribute(P, 3)); g.setAttribute('cor', new W.BufferAttribute(Cc, 3)); g.computeBoundingSphere(); return g; }
   /* legenda na aba Jogar */
-  function legenda(cfg, sim) { const el = $('mesa-txt'); if (!el) return; const S = ARD.sim; el.textContent = (S.MAPS[cfg.map] || cfg.map) + ' · ' + sim.players.length + ' bases · semente ' + cfg.seed; }
+  function legenda(cfg, sim) { const el = $('mesa-txt'); if (!el) return; el.textContent = ARD.t('sala.mesa.legenda', { mapa: ARD.i18n.d.mapa(cfg.map), n: sim ? sim.players.length : cfg.opp + 1, semente: String(cfg.seed) }); } M.legenda = () => { if (M.cfg) legenda(M.cfg); }; /* 5.0c: no idioma atual (a semente sem separador de milhar); M.legenda refaz na troca de idioma */
   /* lugar da mesa (na frente do Núcleo, sobre o canteiro) e cor da Raça */
   M.raca = (race, H) => { M.race = race; U.cor.value.setHex(COR[race] || COR.vehnar); const y = H(M.pos.x, M.pos.z); M.pos.y = y; ped.position.set(M.pos.x, y, M.pos.z); M.topo = y + 23.4; M.baixo = y + 19; M.centro = new W.Vector3(M.pos.x, y + 26, M.pos.z);
     const cfg = cfgAtual(race); if (!M.cfg || M.cfg.race !== race || M.cfg.map !== cfg.map || M.cfg.opp !== cfg.opp || M.cfg.seed !== cfg.seed) M.mapa(cfg, !st.ready); };
@@ -105,39 +105,39 @@ function criar(C, st) { const { W, T } = C.L; const { float, vec3, color, unifor
 /* ---------- câmera na mesa ("Ver na mesa" e clique) ---------- */
 function aproximar(st, on) { if (!st || !st.mesa) return; on = on == null ? st.modoCam !== 'mesa' : on; ARD.sala.explorar(on, { alvo: 'mesa', de: 'mesa' }); }
 /* ---------- Academia de Comando ---------- */
-const CL = { inf: 'Infantaria', vei: 'Veículos', dro: 'Drones', est: 'Estruturas', sup: 'Suporte', civ: 'Civis' };
-const PASSOS = [
-  { t: 'Colete', d: 'Os Coletores saem do Núcleo e trazem Minério e Plasma dos nós do seu território. Sem renda não há exército: comece com mais Coletores.', def: 'coletor', tipo: 'u' },
-  { t: 'Dê energia', d: 'Toda construção gasta energia. O Reator gera, a Refinaria encurta a viagem dos Coletores. Abaixo de 100% a base fica Racionada e lenta.', def: 'reator', tipo: 'b' },
-  { t: 'Treine', d: 'O Quartel treina infantaria; a Fábrica e o Hangar (Era II) trazem veículos e drones. Misture as classes: cada uma vence uma e perde para outra.', def: 'quartel', tipo: 'b' },
-  { t: 'Ataque', d: 'Selecione o exército e clique no inimigo. Veículos esmagam infantaria, drones caçam veículos, infantaria derruba drones. Derrube o Núcleo para vencer.', def: 'veiculo', tipo: 'u' },
+const CL = { get inf() { return ARD.t('sala.ac.cl.inf'); }, get vei() { return ARD.t('sala.ac.cl.vei'); }, get dro() { return ARD.t('sala.ac.cl.dro'); }, get est() { return ARD.t('sala.ac.cl.est'); }, get sup() { return ARD.t('sala.ac.cl.sup'); }, get civ() { return ARD.t('sala.ac.cl.civ'); } }; /* 5.0c: no idioma atual (o pt-BR é o de antes: "Suporte" e "Civis", não o CLASS_NAMES) */
+const PASSOS = [ /* 5.0c: t e d no idioma atual (chaves sala.ac.passo.N.*) */
+  { get t() { return ARD.t('sala.ac.passo.0.titulo'); }, get d() { return ARD.t('sala.ac.passo.0.texto'); }, def: 'coletor', tipo: 'u' },
+  { get t() { return ARD.t('sala.ac.passo.1.titulo'); }, get d() { return ARD.t('sala.ac.passo.1.texto'); }, def: 'reator', tipo: 'b' },
+  { get t() { return ARD.t('sala.ac.passo.2.titulo'); }, get d() { return ARD.t('sala.ac.passo.2.texto'); }, def: 'quartel', tipo: 'b' },
+  { get t() { return ARD.t('sala.ac.passo.3.titulo'); }, get d() { return ARD.t('sala.ac.passo.3.texto'); }, def: 'veiculo', tipo: 'u' },
 ];
 let A = null;
 function lista(race) { const S = ARD.sim; const us = []; const add = d => { if (S.UNITS[d] && !S.UNITS[d].epic && !us.includes(d)) us.push(d); }; for (const b of ['nucleo', 'quartel', 'fabrica', 'hangar']) S.producesFor(b, race).forEach(add);
   const bs = ['nucleo', 'reator', 'refinaria', 'quartel', 'fabrica', 'hangar', 'laboratorio', 'torre', 'nodulo'].filter(b => S.BUILDINGS[b]); return { u: us, b: bs }; }
 const RES = { minerio: 'Minério', plasma: 'Plasma', dados: 'Dados' };
-function custo(c) { const p = Object.keys(c || {}).filter(k => c[k]).map(k => '<span class="ac-c ac-' + k + '"><svg aria-hidden="true"><use href="#ic-' + k + '"/></svg>' + c[k] + ' <i>' + RES[k] + '</i></span>'); return p.length ? p.join('') : '<span class="ac-c">grátis</span>'; }
+function custo(c) { const p = Object.keys(c || {}).filter(k => c[k]).map(k => '<span class="ac-c ac-' + k + '"><svg aria-hidden="true"><use href="#ic-' + k + '"/></svg>' + c[k] + ' <i>' + (RES[k] ? ARD.i18n.d.recurso(k) : k) + '</i></span>'); return p.length ? p.join('') : '<span class="ac-c">' + ARD.t('sala.ac.gratis') + '</span>'; } /* 5.0c */
 function contra(w) { if (!w || !w.versus) return { forte: [], fraco: [] }; const f = [], r = []; for (const k of ['inf', 'vei', 'dro', 'est', 'sup']) { const v = w.versus[k]; if (v >= 1.3) f.push(CL[k]); else if (v <= 0.7) r.push(CL[k]); } return { forte: f, fraco: r }; }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 function ficha(race, tipo, def) { const S = ARD.sim; if (tipo === 'u') { const u = S.UNITS[def]; const w = u.attack; const ct = contra(w); const prod = ['nucleo', 'quartel', 'fabrica', 'hangar'].find(b => S.producesFor(b, race).includes(def));
-    const linhas = [['Vida', u.hp], ['Alcance', w ? w.range : (u.heal ? u.heal.range + ' (reparo)' : u.siphonRange ? u.siphonRange + ' (sifão)' : '—')], ['Dano', w ? Math.round(w.dmg / w.cd) + '/s' : '—'], ['Velocidade', u.speed], ['Sensor', u.sensor]];
-    return { nome: S.unitName(race, def), sub: (CL[u.cls] || '') + (u.flying ? ' · voa' : '') + (prod ? ' · ' + S.BUILDINGS[prod].name : '') + (u.era > 1 ? ' · Era ' + S.ERAS[u.era].roman : ''), desc: u.desc, custo: custo(u.cost), linhas, forte: ct.forte, fraco: ct.fraco }; }
-  const b = S.BUILDINGS[def]; const w = b.attack; const ct = contra(w); const prod = S.producesFor(def, race).filter(d => S.UNITS[d] && !S.UNITS[d].epic).map(d => S.unitName(race, d));
-  const linhas = [['Vida', b.hp], ['Energia', b.energyProd ? '+' + b.energyProd : b.energyUse ? '−' + b.energyUse : '0'], ['Alcance', w ? w.range : '—'], ['Sensor', b.sensor], ['Obra', b.buildTime ? b.buildTime + ' s' : '—']];
-  return { nome: b.name, sub: 'Construção' + (b.era > 1 ? ' · Era ' + S.ERAS[b.era].roman : '') + (prod.length ? ' · produz ' + prod.join(', ') : ''), desc: b.desc, custo: custo(b.cost), linhas, forte: ct.forte, fraco: ct.fraco }; }
+    const linhas = [[ARD.t('sala.ac.vida'), u.hp], [ARD.t('sala.ac.alcance'), w ? w.range : (u.heal ? ARD.t('sala.ac.reparo', { v: String(u.heal.range) }) : u.siphonRange ? ARD.t('sala.ac.sifao', { v: String(u.siphonRange) }) : '—')], [ARD.t('sala.ac.dano'), w ? Math.round(w.dmg / w.cd) + '/s' : '—'], [ARD.t('sala.ac.velocidade'), u.speed], [ARD.t('sala.ac.sensor'), u.sensor]]; /* 5.0c: rótulos no idioma atual; os números seguem como antes */
+    return { nome: ARD.i18n.d.unidade(race, def), sub: (CL[u.cls] || '') + (u.flying ? ' · ' + ARD.t('sala.ac.voa') : '') + (prod ? ' · ' + ARD.i18n.d.construcao(prod) : '') + (u.era > 1 ? ' · Era ' + S.ERAS[u.era].roman : ''), desc: ARD.i18n.d.unidadeDesc(def), custo: custo(u.cost), linhas, forte: ct.forte, fraco: ct.fraco }; } /* 5.0c: nome, construção e descrição pela API */
+  const b = S.BUILDINGS[def]; const w = b.attack; const ct = contra(w); const prod = S.producesFor(def, race).filter(d => S.UNITS[d] && !S.UNITS[d].epic).map(d => ARD.i18n.d.unidade(race, d)) /* 5.0c */;
+  const linhas = [[ARD.t('sala.ac.vida'), b.hp], [ARD.i18n.d.recurso('energia'), b.energyProd ? '+' + b.energyProd : b.energyUse ? '−' + b.energyUse : '0'], [ARD.t('sala.ac.alcance'), w ? w.range : '—'], [ARD.t('sala.ac.sensor'), b.sensor], [ARD.t('sala.ac.obra'), b.buildTime ? b.buildTime + ' s' : '—']]; /* 5.0c */
+  return { nome: ARD.i18n.d.construcao(def), sub: ARD.t('sala.ac.construcao') + (b.era > 1 ? ' · Era ' + S.ERAS[b.era].roman : '') + (prod.length ? ' · ' + ARD.t('sala.ac.produz', { lista: prod.join(', ') }) : ''), desc: ARD.i18n.d.construcaoDesc(def), custo: custo(b.cost), linhas, forte: ct.forte, fraco: ct.fraco }; } /* 5.0c */
 function montarDom() { const el = document.createElement('section'); el.id = 'academia'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'ac-titulo'); el.hidden = true;
-  el.innerHTML = '<div class="ac-head"><div><div class="eyebrow" id="ac-raca"></div><h2 id="ac-titulo">Academia de Comando</h2></div><button type="button" class="mclose" id="ac-close" aria-label="Fechar a Academia">✕</button></div>'
-    + '<div class="ac-passos" role="tablist" aria-label="O básico em 4 passos" id="ac-passos"></div>'
+  el.innerHTML = /* 5.0c: texto fixo no idioma atual; o data-i18n troca na hora do idioma */ '<div class="ac-head"><div><div class="eyebrow" id="ac-raca"></div><h2 id="ac-titulo" data-i18n="sala.ac.titulo">' + esc(ARD.t('sala.ac.titulo')) + '</h2></div><button type="button" class="mclose" id="ac-close" aria-label="' + esc(ARD.t('sala.ac.fechar')) + '" data-i18n-attr="aria-label:sala.ac.fechar">✕</button></div>'
+    + '<div class="ac-passos" role="tablist" aria-label="' + esc(ARD.t('sala.ac.passos-aria')) + '" data-i18n-attr="aria-label:sala.ac.passos-aria" id="ac-passos"></div>'
     + '<div class="ac-vista" id="ac-vista" aria-hidden="true"></div>'
     + '<div class="ac-ficha" id="ac-ficha" aria-live="polite"></div>'
-    + '<div class="ac-nav"><button type="button" class="btn" id="ac-prev" aria-label="Anterior">‹</button><div class="ac-tabs" role="tablist" aria-label="Catálogo"><button type="button" class="ac-tab on" data-t="u" role="tab" aria-selected="true">Unidades</button><button type="button" class="ac-tab" data-t="b" role="tab" aria-selected="false">Construções</button></div><button type="button" class="btn" id="ac-next" aria-label="Próxima">›</button></div>'
-    + '<div class="ac-lista" id="ac-lista" role="listbox" aria-label="Escolha uma unidade ou construção"></div>';
+    + '<div class="ac-nav"><button type="button" class="btn" id="ac-prev" aria-label="' + esc(ARD.t('sala.ac.anterior')) + '" data-i18n-attr="aria-label:sala.ac.anterior">‹</button><div class="ac-tabs" role="tablist" aria-label="' + esc(ARD.t('sala.ac.catalogo')) + '" data-i18n-attr="aria-label:sala.ac.catalogo"><button type="button" class="ac-tab on" data-t="u" role="tab" aria-selected="true" data-i18n="sala.ac.unidades">' + esc(ARD.t('sala.ac.unidades')) + '</button><button type="button" class="ac-tab" data-t="b" role="tab" aria-selected="false" data-i18n="sala.ac.construcoes">' + esc(ARD.t('sala.ac.construcoes')) + '</button></div><button type="button" class="btn" id="ac-next" aria-label="' + esc(ARD.t('sala.ac.proxima')) + '" data-i18n-attr="aria-label:sala.ac.proxima">›</button></div>'
+    + '<div class="ac-lista" id="ac-lista" role="listbox" aria-label="' + esc(ARD.t('sala.ac.lista-aria')) + '" data-i18n-attr="aria-label:sala.ac.lista-aria"></div>';
   document.getElementById('start').appendChild(el); return el; }
 function abrir() { const st = ARD.sala && ARD.sala.ctx(); const race = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar'; const el = $('academia') || montarDom();
   if (!A) { A = { el, tipo: 'u', i: 0, passo: -1 }; $('ac-close').addEventListener('click', fechar); $('ac-prev').addEventListener('click', () => mover(-1)); $('ac-next').addEventListener('click', () => mover(1));
     el.querySelectorAll('.ac-tab').forEach(b => b.addEventListener('click', () => { A.tipo = b.dataset.t; A.i = 0; A.passo = -1; abas(); listar(); mostrar(); }));
     el.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); fechar(); } else if (e.key === 'ArrowRight') mover(1); else if (e.key === 'ArrowLeft') mover(-1); }); }
-  A.race = race; A.L = lista(race); A.antes = document.activeElement; $('ac-raca').textContent = (ARD.sim.FACTIONS[race] || {}).name || race;
+  A.race = race; A.L = lista(race); A.antes = document.activeElement; $('ac-raca').textContent = ARD.i18n.d.raca(race) /* 5.0c */;
   $('ac-passos').innerHTML = PASSOS.map((p, k) => '<button type="button" class="ac-passo" role="tab" data-k="' + k + '"><b>' + (k + 1) + '</b>' + esc(p.t) + '</button>').join('');
   $('ac-passos').querySelectorAll('.ac-passo').forEach(b => b.addEventListener('click', () => passo(+b.dataset.k)));
   el.hidden = false; document.getElementById('start').classList.add('academia-on'); abas(); listar();
@@ -146,16 +146,16 @@ function abrir() { const st = ARD.sala && ARD.sala.ctx(); const race = (document
   else { const w = document.querySelector('#start .start-wrap'); if (w && st && st.ready) w.style.visibility = 'hidden'; }
   passo(0); setTimeout(() => { const b = $('ac-passos').querySelector('.ac-passo'); if (b) b.focus(); }, 60); }
 function abas() { A.el.querySelectorAll('.ac-tab').forEach(b => { const on = b.dataset.t === A.tipo; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); }); }
-function listar() { const S = ARD.sim; const L = A.L[A.tipo]; $('ac-lista').innerHTML = L.map((d, k) => '<button type="button" class="ac-item" role="option" data-k="' + k + '" aria-selected="false">' + esc(A.tipo === 'u' ? S.unitName(A.race, d) : S.BUILDINGS[d].name) + '</button>').join('');
+function listar() { const S = ARD.sim; const L = A.L[A.tipo]; $('ac-lista').innerHTML = L.map((d, k) => '<button type="button" class="ac-item" role="option" data-k="' + k + '" aria-selected="false">' + esc(A.tipo === 'u' ? ARD.i18n.d.unidade(A.race, d) : ARD.i18n.d.construcao(d)) /* 5.0c */ + '</button>').join('');
   $('ac-lista').querySelectorAll('.ac-item').forEach(b => b.addEventListener('click', () => { A.i = +b.dataset.k; A.passo = -1; mostrar(); })); }
 function passo(k) { const p = PASSOS[k]; A.passo = k; A.tipo = p.tipo; abas(); listar(); const L = A.L[A.tipo]; A.i = Math.max(0, L.indexOf(p.def)); mostrar(p); }
 function mover(d) { const L = A.L[A.tipo]; A.i = (A.i + d + L.length) % L.length; A.passo = -1; mostrar(); }
 function mostrar(p) { const L = A.L[A.tipo]; const def = L[A.i]; if (!def) return; const f = ficha(A.race, A.tipo, def); const el = $('ac-ficha');
   $('ac-passos').querySelectorAll('.ac-passo').forEach(b => { const on = +b.dataset.k === A.passo; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
   $('ac-lista').querySelectorAll('.ac-item').forEach(b => { const on = +b.dataset.k === A.i; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
-  const html = (p ? '<div class="ac-dica"><b>Passo ' + (PASSOS.indexOf(p) + 1) + ' · ' + esc(p.t) + '</b>' + esc(p.d) + '</div>' : '') + '<h3>' + esc(f.nome) + '</h3><div class="ac-sub">' + esc(f.sub) + '</div><p>' + esc(f.desc) + '</p><div class="ac-custo">' + f.custo + '</div>'
+  const html = (p ? '<div class="ac-dica"><b>' + esc(ARD.t('sala.ac.passo', { n: PASSOS.indexOf(p) + 1, titulo: p.t })) /* 5.0c */ + '</b>' + esc(p.d) + '</div>' : '') + '<h3>' + esc(f.nome) + '</h3><div class="ac-sub">' + esc(f.sub) + '</div><p>' + esc(f.desc) + '</p><div class="ac-custo">' + f.custo + '</div>'
     + '<dl class="ac-num">' + f.linhas.map(([k, v]) => '<div><dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd></div>').join('') + '</dl>'
-    + (f.forte.length || f.fraco.length ? '<div class="ac-vs">' + (f.forte.length ? '<div class="forte"><span>Forte contra</span>' + f.forte.map(x => '<b>' + esc(x) + '</b>').join('') + '</div>' : '') + (f.fraco.length ? '<div class="fraco"><span>Fraco contra</span>' + f.fraco.map(x => '<b>' + esc(x) + '</b>').join('') + '</div>' : '') + '</div>' : '');
+    + (f.forte.length || f.fraco.length ? '<div class="ac-vs">' + (f.forte.length ? '<div class="forte"><span>' + ARD.t('sala.ac.forte') /* 5.0c */ + '</span>' + f.forte.map(x => '<b>' + esc(x) + '</b>').join('') + '</div>' : '') + (f.fraco.length ? '<div class="fraco"><span>' + ARD.t('sala.ac.fraco') /* 5.0c */ + '</span>' + f.fraco.map(x => '<b>' + esc(x) + '</b>').join('') + '</div>' : '') + '</div>' : '');
   const g = window.gsap; if (g && !reduced()) { g.killTweensOf(el); g.to(el, { autoAlpha: 0, x: -10, duration: 0.14, onComplete: () => { el.innerHTML = html; g.fromTo(el, { autoAlpha: 0, x: 14 }, { autoAlpha: 1, x: 0, duration: 0.32, ease: 'power2.out', clearProps: 'transform' }); g.fromTo(el.querySelectorAll('.ac-num>div, .ac-vs b'), { y: 6, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.03, duration: 0.25, delay: 0.08 }); } }); } else el.innerHTML = html;
   /* o modelo 3D na mesa (com a Sala) ou a miniatura 2D */
   const st = ARD.sala && ARD.sala.ctx();
@@ -167,6 +167,8 @@ function fechar() { if (!A || A.el.hidden) return; const st = ARD.sala && ARD.sa
   const fim = () => { A.el.hidden = true; document.getElementById('start').classList.remove('academia-on'); if (A.antes && A.antes.focus) A.antes.focus(); };
   if (st && st.mesa) { st.mesa.modelo(null); st.mesa.visivel(st.aba === 'jogar'); st.anim = false; st.modoCam = 'repouso'; ARD.sala.voltar(); }
   if (g && !reduced()) { g.to(A.el, { x: 40, autoAlpha: 0, duration: 0.35, ease: 'power2.in', onComplete: fim }); if (w) g.to(w, { autoAlpha: 1, duration: 0.45 }); } else { fim(); if (w) w.style.visibility = ''; } }
+/* 5.0c: troca de idioma sem recarregar — a legenda da mesa e a Academia aberta se refazem (o texto fixo da Academia troca pelo data-i18n) */
+window.addEventListener('ard-idioma', () => { const st = ARD.sala && ARD.sala.ctx && ARD.sala.ctx(); if (st && st.mesa && st.mesa.legenda) st.mesa.legenda(); if (!A || A.el.hidden) return; $('ac-raca').textContent = ARD.i18n.d.raca(A.race); $('ac-passos').querySelectorAll('.ac-passo').forEach(b => { b.innerHTML = '<b>' + (+b.dataset.k + 1) + '</b>' + esc(PASSOS[+b.dataset.k].t); }); listar(); mostrar(A.passo >= 0 ? PASSOS[A.passo] : undefined); });
 ARD.salaMesa = { criar, aproximar, sairModelo: st => { if (st && st.mesa) st.mesa.modelo(null); } };
 ARD.salaAcademia = { abrir, fechar, aberta: () => !!(A && !A.el.hidden), ficha, lista };
 })(globalThis.ARD = globalThis.ARD || {});

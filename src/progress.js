@@ -4,6 +4,7 @@
 (function (ARD) {
 'use strict';
 const KEY = 'ard-progress-v1'; const MAX_LEVEL = 30;
+const T = (k, v, r) => (ARD.t ? ARD.t(k, v, r) : (r != null ? r : k)); /* 5.0c: mensagens no idioma (no Node, o pt-BR) */
 const LEVEL_XP = n => 260 * n + 30 * n * n; // XP acumulado para sair do nível n
 function blank() { return { v: 1, created: Date.now(), commander: { name: '', xp: 0, level: 1 }, missions: {}, achievements: {}, relics: { owned: [], equipped: [null, null] }, hangar: { color: null, skin: {}, portrait: {}, title: '' }, stats: { missions: 0, wins: 0, losses: 0, playSec: 0 } }; }
 function merge(base, src) { if (!src || typeof src !== 'object' || Array.isArray(src)) return src === undefined ? base : src; const out = Array.isArray(base) ? base.slice() : Object.assign({}, base); for (const k in src) out[k] = (base && typeof base[k] === 'object' && base[k] !== null && !Array.isArray(base[k])) ? merge(base[k], src[k]) : src[k]; return out; }
@@ -31,7 +32,7 @@ function checksum(str) { let h = 2166136261 >>> 0; for (let i = 0; i < str.lengt
 const b64e = s => typeof btoa !== 'undefined' ? btoa(unescape(encodeURIComponent(s))) : Buffer.from(s, 'utf8').toString('base64');
 const b64d = s => typeof atob !== 'undefined' ? decodeURIComponent(escape(atob(s))) : Buffer.from(s, 'base64').toString('utf8');
 function exportCode() { const json = JSON.stringify(load()); return 'ARD1-' + checksum(json) + '-' + b64e(json); }
-function importCode(code) { const m = /^ARD1-([0-9a-z]+)-([A-Za-z0-9+/=]+)$/.exec(String(code || '').trim()); if (!m) throw new Error('Código inválido'); const json = b64d(m[2]); if (checksum(json) !== m[1]) throw new Error('Código corrompido (soma não confere)'); state = migrate(JSON.parse(json)); save(); return state; }
+function importCode(code) { const m = /^ARD1-([0-9a-z]+)-([A-Za-z0-9+/=]+)$/.exec(String(code || '').trim()); if (!m) throw new Error(T('camp.backup.invalido', null, 'Código inválido')) /* 5.0c */; const json = b64d(m[2]); if (checksum(json) !== m[1]) throw new Error(T('camp.backup.corrompido', null, 'Código corrompido (soma não confere)')); state = migrate(JSON.parse(json)); save(); return state; }
 function reset() { state = blank(); save(); return state; }
 ARD.progress = { KEY, MAX_LEVEL, LEVEL_XP, load, save, levelOf, levelInfo, addXp, mission, completeMission, unlock, has, grantRelic, equipRelic, setHangar, setName, addPlayTime, exportCode, importCode, reset, _blank: blank };
 })(globalThis.ARD = globalThis.ARD || {});
