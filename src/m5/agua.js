@@ -11,9 +11,11 @@
 'use strict';
 const M5 = ARD.m5 = ARD.m5 || {};
 let F = null; /* funções comuns, criadas na primeira chamada (o TSL só existe depois do m5-ready) */
-function fns() {
-  if (F) return F; const L = window.TSL;
-  const { Fn, float, vec2, vec3, vec4, fract, floor, dot, mix, sin, sqrt, If, normalize, cross, sign, abs, dFdx, dFdy, length, step, smoothstep, pow, max, reflect } = L;
+/* 5.0b.1: novas = um conjunto próprio de funções (os materiais do par lago e margem): o r186 guarda nas funções com setLayout o que já montou, e o 2º
+   material que as usa sai com as definições em outra ordem (outro WGSL); com funções próprias os dois saem iguais */
+function fns(novas) {
+  if (F && !novas) return F; const L = window.TSL;
+  const { Fn, float, vec2, vec3, vec4, fract, floor, dot, mix, sin, sqrt, If, Loop, normalize, cross, sign, abs, dFdx, dFdy, length, step, smoothstep, pow, max, reflect } = L;
   const h1 = Fn(([p]) => { const q = fract(vec3(p.x, p.y, p.x).mul(0.1031)).toVar(); q.addAssign(dot(q, q.yzx.add(33.33))); return fract(q.x.add(q.y).mul(q.z)); }).setLayout({ name: 'lkH1', type: 'float', inputs: [{ name: 'p', type: 'vec2' }] });
   const h2 = Fn(([p]) => { const q = fract(vec3(p.x, p.y, p.x).mul(vec3(0.1031, 0.1030, 0.0973))).toVar(); q.addAssign(dot(q, q.yzx.add(33.33))); return fract(q.xx.add(q.yz).mul(q.zy)); }).setLayout({ name: 'lkH2', type: 'vec2', inputs: [{ name: 'p', type: 'vec2' }] });
   const n = Fn(([p]) => { const i = floor(p).toVar(), f0 = fract(p); const f = f0.mul(f0).mul(f0.mul(-2).add(3)).toVar(); return mix(mix(h1(i), h1(i.add(vec2(1, 0))), f.x), mix(h1(i.add(vec2(0, 1))), h1(i.add(vec2(1, 1))), f.x), f.y); }).setLayout({ name: 'lkN', type: 'float', inputs: [{ name: 'p', type: 'vec2' }] });
@@ -23,20 +25,29 @@ function fns() {
   /* Voronoi: x F1, y F2 − F1 (perto de 0 na aresta), z id da célula, w id da vizinha (a aresta é o par) */
   const vor = Fn(([p, t, jit]) => {
     const ip = floor(p).toVar(), fp = fract(p).toVar(); const d1 = float(9).toVar(), d2 = float(9).toVar(), id = float(0).toVar(), id2 = float(0).toVar();
-    for (let j = -1; j <= 1; j++) for (let i = -1; i <= 1; i++) { const g = vec2(i, j); const h = h2(ip.add(g)).toVar(); const o = vec2(0.5).add(h.sub(0.5).mul(jit)).add(sin(h.mul(6.2831).add(t)).mul(0.16)); const r = g.add(o).sub(fp); const d = dot(r, r).toVar();
-      If(d.lessThan(d1), () => { d2.assign(d1); id2.assign(id); d1.assign(d); id.assign(h.x); }).ElseIf(d.lessThan(d2), () => { d2.assign(d); id2.assign(h.x); }); }
+    Loop({ start: -1, end: 1, condition: '<=', name: 'vj' }, { start: -1, end: 1, condition: '<=', name: 'vi' }, ({ vj, vi }) => { const g = vec2(float(vi), float(vj)).toVar(); const h = h2(ip.add(g)).toVar(); const o = vec2(0.5).add(h.sub(0.5).mul(jit)).add(sin(h.mul(6.2831).add(t)).mul(0.16)); const r = g.add(o).sub(fp); const d = dot(r, r).toVar(); /* 5.0b.1: as 9 células num laço do WGSL (antes 9 cópias coladas: 6,5 KB por material de lago); a mesma ordem (linha de fora, coluna de dentro) */
+      If(d.lessThan(d1), () => { d2.assign(d1); id2.assign(id); d1.assign(d); id.assign(h.x); }).ElseIf(d.lessThan(d2), () => { d2.assign(d); id2.assign(h.x); }); });
     const s1 = sqrt(d1).toVar(); return vec4(s1, sqrt(d2).sub(s1), id, id2);
   }).setLayout({ name: 'lkV', type: 'vec4', inputs: [{ name: 'p', type: 'vec2' }, { name: 't', type: 'float' }, { name: 'jit', type: 'float' }] });
   const edge = v => h1(vec2(v.z.add(v.w), v.z.mul(v.w)).mul(97)); /* sorteio por aresta (o mesmo dos dois lados) */
   /* relevo por derivadas de tela (o lkBump do GLSL): sp posição na vista, sn normal na vista, dh derivadas da altura, fd lado da face */
   const bump = Fn(([sp, sn, dh, fd]) => { const sx = normalize(dFdx(sp)).toVar(), sy = normalize(dFdy(sp)).toVar(); const r1 = cross(sy, sn).toVar(), r2 = cross(sn, sx).toVar(); const det = dot(sx, r1).mul(fd).toVar(); const g = sign(det).mul(dh.x.mul(r1).add(dh.y.mul(r2))); return normalize(abs(det).mul(sn).sub(g)); })
     .setLayout({ name: 'lkBump', type: 'vec3', inputs: [{ name: 'sp', type: 'vec3' }, { name: 'sn', type: 'vec3' }, { name: 'dh', type: 'vec2' }, { name: 'fd', type: 'float' }] });
-  F = { h1, h2, n, fb, fb2, vor, edge, bump, rot, L, glit: null };
-  return F;
+  /* 5.0b.1: uma bolha do plasma (pele, aro e estouro) como função do WGSL: as seis saíam coladas no corpo do plasma. Devolve as três contribuições
+     (x pele, y aro, z estouro) e o corpo faz o máximo, como antes; o relógio entra como parâmetro (uniform dentro de função com setLayout não
+     entra no grupo do material) */
+  const bolha = Fn(([b, P, t]) => { const sk = float(0).toVar(), ri = float(0).toVar(), bu = float(0).toVar(); const age = t.sub(b.z).toVar(); const d = length(P.sub(b.xy)).toVar();
+    If(b.w.greaterThan(0).and(age.greaterThanEqual(0)).and(age.lessThanEqual(2.5)), () => {
+      If(age.lessThan(1.6), () => { const r = b.w.mul(smoothstep(0.0, 1.6, age).mul(0.75).add(0.25)); const inb = smoothstep(r.mul(0.8), r, d).oneMinus(); sk.assign(inb); ri.assign(inb.mul(smoothstep(r.mul(0.45), r.mul(0.9), d)).mul(smoothstep(0.8, 1.6, age).mul(0.5).add(0.5))); })
+        .Else(() => { const a2 = age.sub(1.6).div(0.9); const rr = b.w.mul(a2.mul(2.4).add(1)); bu.assign(smoothstep(0.0, b.w.mul(1.1), d).oneMinus().mul(a2.oneMinus()).mul(1.4)); ri.assign(smoothstep(0.0, a2.mul(1.2).add(0.5), abs(d.sub(rr))).oneMinus().mul(a2.oneMinus())); }); });
+    return vec3(sk, ri, bu); }).setLayout({ name: 'lkBolha', type: 'vec3', inputs: [{ name: 'b', type: 'vec4' }, { name: 'P', type: 'vec2' }, { name: 't', type: 'float' }] });
+  const FF = { h1, h2, n, fb, fb2, vor, edge, bump, rot, bolha, L, glit: null };
+  if (!novas) F = FF; return FF;
 }
 /* cristais de neve que piscam com o sol (lkGlit); o sol entra como parâmetro (uniform dentro de função com setLayout não entra no grupo do material) */
-function glitFn() {
-  const f = fns(); if (f.glit) return f.glit; const { Fn, vec2, vec3, floor, fract, length, normalize, pow, max, dot, reflect, step, smoothstep } = f.L;
+const FB = new WeakMap(); function fnsDe(b) { let x = FB.get(b); if (!x) { x = fns(true); FB.set(b, x); } return x; } /* 5.0b.1: funções por construtor (o par lago e margem) */
+function glitFn(f0) {
+  const f = f0 || fns(); if (f.glit) return f.glit; const { Fn, vec2, vec3, floor, fract, length, normalize, pow, max, dot, reflect, step, smoothstep } = f.L;
   f.glit = Fn(([P, V, Ls]) => { const gp = P.mul(0.8).toVar(); const gc = floor(gp).toVar(); const on = step(0.93, f.h1(gc.add(3.7))); const d = length(fract(gp).sub(0.25).sub(f.h2(gc.add(5.1)).mul(0.5)));
     const gn = normalize(vec3(f.h1(gc.add(1.1)).sub(0.5), 0.9, f.h1(gc.add(2.3)).sub(0.5))); return on.mul(pow(max(dot(reflect(Ls.negate(), gn), V), 0), 48)).mul(smoothstep(0.08, 0.3, d).oneMinus()); })
     .setLayout({ name: 'lkGlit', type: 'float', inputs: [{ name: 'P', type: 'vec2' }, { name: 'V', type: 'vec3' }, { name: 'Ls', type: 'vec3' }] });
@@ -65,14 +76,30 @@ function porObjeto(kind, tex0) {
 M5.aguaAlvo = function (G) {
   const T = window.THREE_M5, L = window.TSL;
   const rt = new T.RenderTarget(64, 64, { type: T.HalfFloatType, depthBuffer: true, stencilBuffer: false, generateMipmaps: false, minFilter: T.LinearFilter, magFilter: T.LinearFilter }); rt.depthTexture = new T.DepthTexture(64, 64); rt.texture.name = 'reflexo-lagos';
-  G.uRefl.value = rt.texture; G.uReflDepth = L.texture(rt.depthTexture); return rt;
+  G.uRefl.value = rt.texture; G.uReflDepth = L.texture(rt.depthTexture);
+  /* 5.0b.1: alvo vazio de 1×1 com os mesmos formatos (cor em meia precisão com filtro, profundidade): no par gelo e neve a neve da margem fica no
+     passe do reflexo e lê as texturas do reflexo pelo shader do gelo; durante o passe elas apontam para este alvo (M5.aguaTroca), nunca para o que
+     está sendo desenhado. O mesmo formato mantém o pipeline; a troca é só de grupo de ligação */
+  if (PARES) { const v = new T.RenderTarget(1, 1, { type: T.HalfFloatType, depthBuffer: true, stencilBuffer: false, generateMipmaps: false, minFilter: T.LinearFilter, magFilter: T.LinearFilter }); v.depthTexture = new T.DepthTexture(1, 1); v.texture.name = 'reflexo-vazio'; G._reflVazio = v; G._reflAlvo = rt; }
+  return rt;
 };
+M5.aguaTroca = function (G, noPasse) { const v = G && G._reflVazio, a = G && G._reflAlvo; if (!v || !a || !G.uReflDepth) return; const t = noPasse ? v : a; G.uRefl.value = t.texture; G.uReflDepth.value = t.depthTexture; }; /* 5.0b.1 */
 
 /* ---------- material de cada tipo ---------- */
+/* 5.0b.1: lago e margem no mesmo shader (plasma + margem queimada, gelo + neve da margem): o mesmo grafo com os dois corpos, escolhidos por um
+   uniform do material (uMg: 0 o lago, 1 a margem; um If de ramo uniforme, cada pixel roda um corpo só). O lago passa a transparente com
+   profundidade (alfa 1: a mesma imagem; o reflexo já não desenha os lagos) e a margem lê os mesmos uniforms por objeto do lago dela (o mesmo
+   userData.lkU). Dois materiais por par (estados de desenho diferentes: profundidade, deslocamento do decalque), um WGSL: um módulo de ~45 KB a
+   menos por par. ?m5lagos=4 volta aos quatro shaders (medida) */
+const PARES = !(typeof location !== 'undefined' && /[?&]m5lagos=4/.test(location.search));
 M5.aguaMaterial = function (kind, G, decal, envK, tex0) {
-  const T = window.THREE_M5, f = fns(), L = f.L; const U = porObjeto(kind, tex0);
+  const PAR = PARES ? (kind === 'plasma' || kind === 'queimado' ? ['plasma', 'queimado'] : ['gelo', 'neve']) : null;
+  const T = window.THREE_M5, f0 = fns(), L = f0.L; let f = f0; const U = porObjeto(PAR ? PAR[0] : kind, tex0);
+  /* 5.0b.1: no par, as funções nascem em cada montagem (fdo: um conjunto por construtor): o r186 guarda a função montada num cache global e só a 1ª
+     montagem percorre as dependências; com funções novas toda montagem é a 1ª e sai igual (o lago, a margem e a margem no passe do reflexo) */
+  const fdo = b => (PAR && b ? fnsDe(b) : f0);
   const { Fn, float, vec2, vec3, vec4, mix, smoothstep, clamp, max, min, sin, exp, length, abs, step, fract, floor, dot, If, fwidth, positionWorld, positionView, normalView, faceDirection, dFdx, dFdy, diffuseColor, cameraPosition, normalize, pow } = L;
-  const isGelo = kind === 'gelo';
+  const isGelo = PAR ? PAR[0] === 'gelo' : kind === 'gelo';
   let m;
   if (isGelo) { /* o reflexo entra no modelo de luz (depois do indireto, antes de somar): o mesmo lugar do remendo em lights_fragment_end */
     const A = M5._aguaClasses || (M5._aguaClasses = (() => {
@@ -80,8 +107,8 @@ M5.aguaMaterial = function (kind, G, decal, envK, tex0) {
       class MatGelo extends T.MeshStandardNodeMaterial { setupLightingModel() { return new LuzGelo(this.ardFx); } }
       return { MatGelo };
     })());
-    m = new A.MatGelo({ color: 0xffffff, roughness: 0.8, metalness: 0 });
-  } else m = new T.MeshStandardNodeMaterial({ color: 0xffffff, roughness: 0.8, metalness: 0, transparent: !!decal, depthWrite: !decal });
+    m = new A.MatGelo({ color: 0xffffff, roughness: 0.8, metalness: 0, transparent: !!(decal || PAR), depthWrite: !decal }); /* 5.0b.1: no par, transparente com profundidade */
+  } else m = new T.MeshStandardNodeMaterial({ color: 0xffffff, roughness: 0.8, metalness: 0, transparent: !!(decal || PAR), depthWrite: !decal });
   m.envMapIntensity = envK; m.userData.env = envK;
   if (decal) { m.polygonOffset = true; m.polygonOffsetFactor = 0; m.polygonOffsetUnits = -2; } /* o decalque já fica 0,05 acima do chão e não pode passar na frente do gelo (0,12 acima) */
   /* cabeça comum: posição no mapa, dados do lago, névoa de guerra e tamanho do pixel em unidades do mapa */
@@ -90,11 +117,13 @@ M5.aguaMaterial = function (kind, G, decal, envK, tex0) {
   const fogK = G.uFog.sample(P.div(G.uWorld)).r.toVar('lkFog'); const lkFw = length(fwidth(P)).toVar('lkFw');
   const t = G.uTime, sd = U.uLkInfo.w;
   const decalK = kind === 'queimado' || kind === 'neve'; const bumpK = { plasma: 1.3, gelo: 0.7, queimado: 0.8, neve: 0.6 }[kind]; const flash = kind !== 'plasma';
-  if (decalK) m.maskNode = s.lessThanEqual(0.4); /* dentro da lava ou do gelo o decalque fica por baixo dele */
+  const uMg = PAR ? L.uniform(decalK ? 1 : 0) : null, uBump = PAR ? L.uniform(bumpK) : null, uFlash = PAR ? L.uniform(flash ? 1 : 0) : null; /* 5.0b.1: o que distinguia os quatro, agora por uniform */
+  if (PAR) m.maskNode = s.lessThanEqual(0.4).or(uMg.lessThan(0.5)); /* 5.0b.1: o lago nunca descarta */
+  else if (decalK) m.maskNode = s.lessThanEqual(0.4); /* dentro da lava ou do gelo o decalque fica por baixo dele */
   /* saídas do corpo (variáveis do shader): a cor roda primeiro na montagem do material, o resto (rugosidade, relevo, emissivo, reflexo) lê daqui */
   const O = { col: vec3(0).toVar('lkCol'), rough: float(0.8).toVar('lkRough'), ht: float(0).toVar('lkHt'), em: vec3(0).toVar('lkEm'), alpha: float(1).toVar('lkAlpha'), refK: float(0).toVar('lkRefK') };
-  const corpo = () => { let col, rough, ht, em, alpha = null, refK = null;
-  if (kind === 'plasma') {
+  const corpoDe = kk => { let col, rough, ht, em, alpha = null, refK = null; /* 5.0b.1: o corpo de um tipo (kk); no par, os dois num If */
+  if (kk === 'plasma') {
     const q = P.mul(0.016).add(vec2(sd.mul(3.1), sd.mul(1.7))).toVar();
     const wv = vec2(f.fb2(q.add(vec2(t.mul(0.010), t.mul(-0.007)))), f.fb2(q.mul(1.3).add(vec2(5.2, 1.3)).sub(vec2(t.mul(0.008), t.mul(0.011))))).sub(0.5).toVar('lkWv');
     const heat = float(0).toVar('lkHeat'); heat.assign(f.fb(q.mul(1.35).add(wv.mul(1.8)).add(vec2(t.mul(0.005), t.mul(-0.003)))));
@@ -111,10 +140,7 @@ M5.aguaMaterial = function (kind, G, decal, envK, tex0) {
     const molten = clamp(max(max(crack, crackB), open), 0, 1).toVar('lkMolten');
     /* bolhas guiadas pela CPU: crescem (pele escura com aro aceso), estouram (clarão) e deixam um anel que se abre */
     const bub = float(0).toVar('lkBub'), bubRim = float(0).toVar('lkBubRim'), bubSkin = float(0).toVar('lkBubSkin'); const BA = U.uBub;
-    for (let i = 0; i < 6; i++) { const b = BA[i].toVar(); const age = t.sub(b.z).toVar(); const d = length(P.sub(b.xy)).toVar();
-      If(b.w.greaterThan(0).and(age.greaterThanEqual(0)).and(age.lessThanEqual(2.5)), () => {
-        If(age.lessThan(1.6), () => { const r = b.w.mul(smoothstep(0.0, 1.6, age).mul(0.75).add(0.25)); const inb = smoothstep(r.mul(0.8), r, d).oneMinus(); bubSkin.assign(max(bubSkin, inb)); bubRim.assign(max(bubRim, inb.mul(smoothstep(r.mul(0.45), r.mul(0.9), d)).mul(smoothstep(0.8, 1.6, age).mul(0.5).add(0.5)))); })
-          .Else(() => { const a2 = age.sub(1.6).div(0.9); const rr = b.w.mul(a2.mul(2.4).add(1)); bub.assign(max(bub, smoothstep(0.0, b.w.mul(1.1), d).oneMinus().mul(a2.oneMinus()).mul(1.4))); bubRim.assign(max(bubRim, smoothstep(0.0, a2.mul(1.2).add(0.5), abs(d.sub(rr))).oneMinus().mul(a2.oneMinus()))); }); }); }
+    for (let i = 0; i < 6; i++) { const c = f.bolha(BA[i], P, t).toVar(); bubSkin.assign(max(bubSkin, c.x)); bubRim.assign(max(bubRim, c.y)); bub.assign(max(bub, c.z)); } /* 5.0b.1: a mesma conta, numa função (lkBolha) */
     /* microbolhas: pontinhos que acendem e estouram nas partes quentes */
     const mb = float(0).toVar('lkMb');
     If(G.uDetail.greaterThan(0.3), () => { const mp = P.div(3.4); const mi = floor(mp).toVar(); const mh = f.h2(mi.add(41)).toVar(); const per = mh.x.mul(5).add(3); const ph = fract(t.add(mh.y.mul(17)).div(per)).toVar(); const mc = mi.add(0.25).add(f.h2(mi.add(7)).mul(0.5));
@@ -140,7 +166,7 @@ M5.aguaMaterial = function (kind, G, decal, envK, tex0) {
     col = mix(crustC, vec3(0.025, 0.012, 0.004), max(molten, skin.mul(0.6))).mul(mix(0.06, 1.0, fogK));
     rough = mix(cn2.mul(0.15).add(0.72), 0.45, max(molten, skin));
     ht = max(molten, open).oneMinus().mul(smoothstep(0.0, 0.3, vc.y).mul(0.9).add(cn.mul(0.25)).add(rope.mul(0.3).mul(fine))).add(skin.mul(0.9)).sub(shoreCrust.mul(0.15)); /* placas abauladas que descem para as fendas */
-  } else if (isGelo) {
+  } else if (kk === 'gelo') {
     const Vw = normalize(cameraPosition.sub(positionWorld)).toVar('lkVw'); const par = vec2(Vw.x, Vw.z.negate()).div(max(Vw.y, 0.28)).toVar('lkPar'); /* paralaxe das camadas de dentro */
     const fine = smoothstep(0.7, 1.8, lkFw).oneMinus().toVar('lkFine');
     const nN = f.fb(P.mul(0.05).add(sd.mul(7))).toVar('lkNN'); const nB = f.fb(P.mul(0.012).add(sd.mul(3)).add(11)).toVar('lkNB'); /* manchas grandes: gelo limpo (escuro) ou leitoso */
@@ -177,30 +203,34 @@ M5.aguaMaterial = function (kind, G, decal, envK, tex0) {
     const r0 = mix(mix(0.04, 0.3, max(frost, milky.mul(0.5))), 0.8, snow); rough = max(r0, crk0.mul(0.4));
     refK = snow.oneMinus().mul(frost.mul(0.6).oneMinus()).mul(crk0.mul(0.7).oneMinus()).mul(milky.mul(0.35).oneMinus()).mul(fogK);
     ht = crk0.mul(-0.5).add(snow.mul(nN.mul(0.6).add(0.5))).add(frost.mul(0.08).mul(sp));
-    em = vec3(1.7, 1.8, 1.9).mul(glitFn()(P, Vw, G.uSunDir)).mul(max(snow, frost.mul(0.5))).mul(smoothstep(0.6, 1.6, lkFw).oneMinus()).mul(G.uNight.mul(0.6).oneMinus()).mul(fogK);
-  } else if (kind === 'queimado') {
+    em = vec3(1.7, 1.8, 1.9).mul(glitFn(f)(P, Vw, G.uSunDir)).mul(max(snow, frost.mul(0.5))).mul(smoothstep(0.6, 1.6, lkFw).oneMinus()).mul(G.uNight.mul(0.6).oneMinus()).mul(fogK);
+  } else if (kk === 'queimado') {
     const o = s.negate(); /* distância para fora da margem */
-    const nN = f.fb(P.mul(0.045).add(sd.mul(5))).toVar('lkNN'); const cn = f.n(P.mul(0.6).add(1)).toVar('lkCn');
+    const nN = f.fb(P.mul(0.045).add(sd.mul(5))).toVar('lkNNm'); const cn = f.n(P.mul(0.6).add(1)).toVar('lkCnm'); /* 5.0b.1: nomes próprios da margem (no par os dois corpos ficam no mesmo shader) */
     const a = smoothstep(nN.mul(12).add(5), nN.mul(22).add(12), o).oneMinus();
-    const vc = f.vor(P.div(6.5).add(nN), float(0), float(0.9)).toVar('lkVc'); const cr = smoothstep(0.0, nN.mul(0.04).add(0.06), vc.y).oneMinus().mul(step(0.7, f.edge(vc))).toVar('lkCr'); /* só algumas arestas: fendas, não rede */
+    const vc = f.vor(P.div(6.5).add(nN), float(0), float(0.9)).toVar('lkVcm'); const cr = smoothstep(0.0, nN.mul(0.04).add(0.06), vc.y).oneMinus().mul(step(0.7, f.edge(vc))).toVar('lkCr'); /* só algumas arestas: fendas, não rede */
     const hot = smoothstep(0.0, nN.mul(4).add(2.5), o).oneMinus().toVar('lkHot'); const pulse = sin(t.mul(0.8).add(vc.z.mul(6.2831))).mul(0.3).add(0.7);
     const burnt = mix(vec3(0.032, 0.028, 0.027), vec3(0.075, 0.062, 0.055), cn).mul(cr.mul(0.25).oneMinus());
     col = burnt.mul(mix(0.06, 1.0, fogK)); alpha = clamp(a.mul(hot.mul(0.22).add(0.78)), 0, 1);
     em = vec3(2.0, 0.42, 0.05).mul(cr).mul(hot).mul(hot).mul(pulse).mul(smoothstep(0.9, 2.5, lkFw).oneMinus().mul(0.6).add(0.4)).add(vec3(1.4, 0.3, 0.03).mul(smoothstep(0.0, 2.2, o).oneMinus()).mul(0.8).mul(smoothstep(0.4, 0.75, f.n(P.mul(0.06).add(vec2(t.mul(0.02), sd)))))).mul(fogK); /* rocha em brasa colada na lava, em trechos */
     rough = hot.mul(-0.25).add(0.9); ht = cn.mul(0.5).sub(cr.mul(0.6));
   } else { /* neve da margem */
-    const o = s.negate(); const nN = f.fb(P.mul(0.04).add(sd.mul(5))).toVar('lkNN'); const sp = f.n(P.mul(0.5).add(4)).toVar();
+    const o = s.negate(); const nN = f.fb(P.mul(0.04).add(sd.mul(5))).toVar('lkNNm'); const sp = f.n(P.mul(0.5).add(4)).toVar();
     const thr = nN.mul(nN).mul(15).add(3).toVar(); const ny = normalize(L.normalWorldGeometry).y; /* borda irregular: de 1 a ~20 un da margem; pouca neve no paredão */
     const a = smoothstep(thr.sub(2.5), thr.add(2.0), o).oneMinus().mul(mix(0.3, 1.0, smoothstep(0.5, 0.85, ny))).toVar('lkA');
     col = vec3(0.76, 0.81, 0.88).mul(sp.mul(0.12).add(0.88)).mul(mix(0.06, 1.0, fogK)); alpha = clamp(a, 0, 1).mul(0.95);
-    em = vec3(1.7, 1.8, 1.9).mul(glitFn()(P, normalize(cameraPosition.sub(positionWorld)), G.uSunDir)).mul(a).mul(smoothstep(0.6, 1.6, lkFw).oneMinus()).mul(G.uNight.mul(0.6).oneMinus()).mul(fogK);
+    em = vec3(1.7, 1.8, 1.9).mul(glitFn(f)(P, normalize(cameraPosition.sub(positionWorld)), G.uSunDir)).mul(a).mul(smoothstep(0.6, 1.6, lkFw).oneMinus()).mul(G.uNight.mul(0.6).oneMinus()).mul(fogK);
     rough = float(0.8); ht = nN.mul(0.8).add(sp.mul(0.15));
   }
-  O.rough.assign(rough); O.ht.assign(ht); O.em.assign(em); if (alpha) O.alpha.assign(alpha); if (refK) O.refK.assign(refK); O.col.assign(col); return O.col; };
-  m.colorNode = Fn(corpo)(); if (decalK) m.opacityNode = O.alpha;
+  O.rough.assign(rough); O.ht.assign(ht); O.em.assign(em); if (alpha) O.alpha.assign(alpha); if (refK) O.refK.assign(refK); O.col.assign(col); };
+  const corpo = (b) => { f = fdo(b); if (!PAR) { corpoDe(kind); return O.col; }
+    fogK.toStack(); lkFw.toStack(); /* 5.0b.1: a névoa e o tamanho do pixel calculados antes do If (P, lkD e s já saem na máscara): a variável sai onde é usada pela 1ª vez e, dentro do 1º corpo, o 2º (a margem) lia 0 (neve escura, sem brasas na margem do plasma) */
+    O.col.assign(vec3(0)); O.rough.assign(float(0.8)); O.ht.assign(float(0)); O.em.assign(vec3(0)); O.alpha.assign(float(1)); O.refK.assign(float(0)); /* 5.0b.1: as saídas nascem fora do If (a inicialização não fica dentro de um ramo) */
+    If(uMg.lessThan(0.5), () => { corpoDe(PAR[0]); }).Else(() => { corpoDe(PAR[1]); }); return O.col; };
+  m.colorNode = Fn(corpo)(); if (decalK || PAR) m.opacityNode = O.alpha;
   m.roughnessNode = O.rough; m.metalnessNode = float(0);
-  m.normalNode = f.bump(positionView, normalView, vec2(dFdx(O.ht), dFdy(O.ht)).mul(bumpK), faceDirection);
-  m.emissiveNode = flash ? O.em.add(diffuseColor.rgb.mul(M5.sample.clarao()).mul(0.8)) : O.em; /* clarões: o mapa de cima acende o gelo e as margens (o plasma já brilha) */
+  m.normalNode = PAR ? Fn((b) => fdo(b).bump(positionView, normalView, vec2(dFdx(O.ht), dFdy(O.ht)).mul(uBump), faceDirection))() : f0.bump(positionView, normalView, vec2(dFdx(O.ht), dFdy(O.ht)).mul(bumpK), faceDirection); /* 5.0b.1: no par, a função da montagem */
+  m.emissiveNode = PAR ? O.em.add(diffuseColor.rgb.mul(M5.sample.clarao()).mul(0.8).mul(uFlash)) : flash ? O.em.add(diffuseColor.rgb.mul(M5.sample.clarao()).mul(0.8)) : O.em; /* 5.0b.1: no par, os clarões por uniform (o plasma já brilha) */ /* clarões: o mapa de cima acende o gelo e as margens (o plasma já brilha) */
   if (isGelo) { /* reflexo: plano (passe do reflexo) ou céu pelo mapa de ambiente; fresnel exagerado de propósito (gelo polido) */
     const { positionViewDirection, normalWorld } = L; const rk = O.refK, uOn = U.uReflOn;
     m.ardFx = ctx => {

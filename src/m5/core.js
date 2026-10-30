@@ -81,6 +81,10 @@ function shared() {
   U.claraoRet = uniform(new T.Vector4(0, 0, 1, 1)); /* retângulo do mapa de clarões no mundo three: x0, z0, largura, altura */
   U.fendaLuz = uniform(new T.Vector4(S ? S.CX : W / 2, -60, S ? -S.CY : -W / 2, 900)); /* 5.0a.1: luz da Fenda no chão (posição no mundo three e alcance; M5.luzFenda) */
   U.fendaCor = uniform(new T.Color(0, 0, 0)); /* 5.0a.1: cor × intensidade da luz da Fenda (0 até o render3d passar a luz) */
+  /* 5.0b.1: "sem pós" num só lugar (antes: o terreno pelo alvo do render, os modelos pelo M5.cur.post e os efeitos pelo !R.pp). A cada render: 1 quando
+     o r186 desenha no alvo interno de saída (isPostProcessingRenderTarget: a cena sem o RenderPipeline, que converte no fim), 0 no passe da cena do
+     pós e em qualquer outro alvo. Um shader só para os dois casos (trocar de qualidade não cria pipeline) */
+  U.semPos = uniform(0).onRenderUpdate(({ renderer }, u) => { if (u.fixo) return; /* 5.0b.1 (junção): fixo = o valor manual vale (o passe dos efeitos crus do Modo Foto, src/m5/foto.js F.semPos) */ const rt = renderer.getRenderTarget(); return rt !== null && rt.isPostProcessingRenderTarget === true ? 1 : 0; });
   const X = M5.tex;
   X.clarao = texture(blank(0, 0, 0, 255));   /* mapa de clarões (alvo 512² meia precisão, visto de cima) */
   X.nevoa = texture(blank(255, 0, 0, 255));  /* névoa de guerra (R: 0 nunca visto, 110 explorado, 255 à vista) */
@@ -219,9 +223,13 @@ M5.Inst = function () {
       for (const k in g.attributes) { const a = g.attributes[k]; if (!a.isInstancedBufferAttribute) w.setAttribute(k, a); } /* os atributos por instância da animação GLSL (aInst) ficam de fora: o formato é o mesmo antes e depois deles */
       w.groups = g.groups; w.drawRange = g.drawRange; w.userData = g.userData; w.boundingSphere = g.boundingSphere; w.boundingBox = g.boundingBox; w.name = g.name;
       for (let c = 0; c < 4; c++) w.setAttribute('iM' + c, new T.InterleavedBufferAttribute(this.instanceMatrix, 4, c * 4)); w.setAttribute('iC', this._iC); this._wraps.set(g, w); return w; }
-    setMatrixAt(i, m) { m.toArray(this.instanceMatrix.array, i * 16); }
+    setMatrixAt(i, m) { const a = this.instanceMatrix.array, e = m.elements, o = i * 16; for (let k = 0; k < 16; k++) { const v = Math.fround(e[k]); if (a[o + k] !== v) { a[o + k] = v; this._mMud = true; } } } /* 5.0b.1: escreve e marca só o que mudou (M5.Inst.sobe) */
+    /* 5.0b.1: sobe as n primeiras matrizes só quando alguma mudou ou o número mudou (quadro parado: nada sobe) e, com o recorte, refaz a esfera
+       das instâncias (o r186 recorta o objeto na câmera e em cada cascata da sombra); devolve se subiu */
+    sobe(n, recorte) { const mud = !!this._mMud || n !== this._mN; if (mud) { this._mMud = false; this._mN = n; this._esf = false; const a = this.instanceMatrix; a.clearUpdateRanges(); a.addUpdateRange(0, n * 16); a.needsUpdate = true; }
+      if (recorte && n > 0) { if (!this._esf) { this.computeBoundingSphere(); const s = this.boundingSphere; s.radius = s.radius * 1.25 + 4; this._esf = true; } this.frustumCulled = true; } else this.frustumCulled = false; return mud; }
     getMatrixAt(i, m) { return m.fromArray(this.instanceMatrix.array, i * 16); }
-    setColorAt(i, c) { c.toArray(this._iC.array, i * 3); if (i > this._cSujo) this._cSujo = i; }
+    setColorAt(i, c) { const a = this._iC.array, o = i * 3, r = Math.fround(c.r), g = Math.fround(c.g), b = Math.fround(c.b); if (a[o] === r && a[o + 1] === g && a[o + 2] === b) return; a[o] = r; a[o + 1] = g; a[o + 2] = b; if (i > this._cSujo) this._cSujo = i; } /* 5.0b.1: a cor só sobe quando muda */
     getColorAt(i, c) { return c.fromArray(this._iC.array, i * 3); }
     computeBoundingSphere() { const g = this._base; if (!this.boundingSphere) this.boundingSphere = new T.Sphere(); if (!g) return; if (!g.boundingSphere) g.computeBoundingSphere(); this.boundingSphere.makeEmpty(); for (let i = 0; i < this._n; i++) { this.getMatrixAt(i, _m); _s.copy(g.boundingSphere).applyMatrix4(_m); this.boundingSphere.union(_s); } }
     computeBoundingBox() { const g = this._base; if (!this.boundingBox) this.boundingBox = new T.Box3(); if (!g) return; if (!g.boundingBox) g.computeBoundingBox(); this.boundingBox.makeEmpty(); for (let i = 0; i < this._n; i++) { this.getMatrixAt(i, _m); _b.copy(g.boundingBox).applyMatrix4(_m); this.boundingBox.union(_b); } }
@@ -258,13 +266,37 @@ function cedidaCurta() { const mc = new MessageChannel(), fila = []; let ult = p
 /* 5.0a.1: quantos quadros extras o aquecimento desenha. Eles existem pelo pós (o RenderPipeline do r186 se refaz nos dois primeiros quadros) e
    pelas cascatas de sombra; sem pós e sem sombra (Baixa) nenhum pipeline nasce neles, e cada um é um quadro inteiro com tudo ligado */
 M5.quadrosExtra = R => (Q.get('m5aquecer') != null ? M5.warmExtra : (R.pp || (R.quality && R.quality.shadows) ? M5.warmExtra : 0));
+/* 5.0b.1: contexto de desenho fixo para o alvo do passe da cena. O r186 põe a profundidade da chamada de render na chave do contexto
+   (RenderContexts.get(alvo, mrt, profundidade)), e o passe da cena desenha aninhado na cadeia do pós (quad → SMAA → RTT → RTT → cena:
+   profundidade 4 na Média), enquanto o compileAsync usa sempre a profundidade 0. Os objetos montados no aquecimento não eram os do quadro:
+   o 1º quadro montava todos de novo, síncrono, e os lagos saíam com outra ordem de variáveis (outro WGSL e outro pipeline). Com o alvo do
+   passe da cena sempre na profundidade 0, a carga e o quadro dividem o contexto (o passe nunca desenha dentro de outro desenho no mesmo
+   formato e na profundidade 0). ?m5ctx=0 volta ao r186 (medida). */
+M5.ctxOff = Q.get('m5ctx') === '0';
+M5.ctxFixo = function (X, rt) { if (M5.ctxOff || !rt || !X || !X.renderer) return; const RC = X.renderer._renderContexts; if (!RC || typeof RC.get !== 'function') return;
+  if (!X.ctxAlvos) { const A = X.ctxAlvos = new Set(), g0 = RC.get; RC.get = function (alvo, mrt, prof) { return g0.call(this, alvo, mrt, alvo && A.has(alvo) ? 0 : prof); }; }
+  X.ctxAlvos.add(rt); };
+/* 5.0b.1: na carga (até X.warmDone), o r186 não solta programas nem pipelines que ficaram sem uso. Os passes do pós (GTAO, RTT, bloom)
+   refazem o material a cada setup e, nos primeiros quadros, a cadeia faz setup em cascata: o objeto de desenho antigo era descartado, o
+   programa e o pipeline soltos, e o novo, com o mesmo código, criava outro módulo e outro pipeline síncrono (o GTAO nascia três vezes).
+   Guardados, o mesmo código reaproveita os dois. Depois da carga volta ao do three. ?m5solta=1 desliga (medida). */
+M5.guardaCache = function (X) { const P = X && X.renderer && X.renderer._pipelines; if (!P || P.__ardGuarda || Q.get('m5solta') === '1' || typeof P._releasePipeline !== 'function' || typeof P._releaseProgram !== 'function') return; P.__ardGuarda = true;
+  const rp = P._releasePipeline, rg = P._releaseProgram; P._releasePipeline = function (pl) { if (!X.warmDone) return; return rp.call(this, pl); }; P._releaseProgram = function (pr) { if (!X.warmDone) return; return rg.call(this, pr); }; };
 M5.compile = async function (X, scene, camera) {
   const t0 = performance.now(), p0 = X.pipes; X.marcaT = t0; X.scene = scene; X.camera = camera; /* o render3d liga tudo antes (tudoVisivel); cena e câmera ficam para o diagnóstico */
-  const r = X.renderer, PL = r._pipelines, todas = [], C = X.carga = { modo: M5.seq ? 'sequencial' : 'paralelo', cedida: 'nativa' };
+  const r = X.renderer, PL = r._pipelines, todas = [], C = X.carga = { modo: M5.seq ? 'sequencial' : 'paralelo', cedida: 'nativa' }; M5.guardaCache(X); /* 5.0b.1 */
   let gfr = null, sch = null, schDono = false;
-  if (!M5.seq && PL && typeof PL.getForRender === 'function') { gfr = PL.getForRender; PL.getForRender = function (ro, promises) { return gfr.call(this, ro, promises ? todas : promises); }; } /* a lista local do laço fica vazia: nada de esperar objeto a objeto */
+  if (!M5.seq && PL && typeof PL.getForRender === 'function') { gfr = PL.getForRender; PL.getForRender = function (ro, promises) { if (ro && ro.object && ro.object.userData && ro.object.userData.ardSemPipeline) return null; /* 5.0b.1: a sonda da 1ª montagem não cria pipeline */ return gfr.call(this, ro, promises ? todas : promises); }; } /* a lista local do laço fica vazia: nada de esperar objeto a objeto */
   if (!M5.seq && !(window.scheduler && typeof window.scheduler.yield === 'function')) { C.cedida = 'MessageChannel'; if (window.scheduler) { sch = window.scheduler; sch.yield = cedidaCurta(); } else { window.scheduler = { yield: cedidaCurta() }; schDono = true; } }
-  try { const sp = X.post && X.post.scenePass; if (sp && sp.compileAsync) await sp.compileAsync(r); else await r.compileAsync(scene, camera); for (const f of M5.pendentes.splice(0)) { try { await (typeof f === 'function' ? f() : f); } catch (err) { console.warn('[ARD] Motor 5: pré-compilação de um módulo falhou: ' + err.message); } } /* 5.0b: alvos próprios dos módulos (camada do espaço): os pipelines entram na mesma lista */ C.nosMs = Math.round(performance.now() - t0); C.emVoo = todas.length; await Promise.all(todas); } catch (err) { console.warn('[ARD] Motor 5: compileAsync falhou: ' + err.message); }
+  try { const sp = X.post && X.post.scenePass; if (sp) M5.ctxFixo(X, sp.renderTarget); /* 5.0b.1: o mesmo contexto na carga e no quadro */
+    /* 5.0b.1: o 1º material que recebe sombra monta diferente dos outros (o ShadowNode do r186 guarda o grafo da sombra na 1ª montagem e as seguintes o
+       reaproveitam: outra ordem e outra numeração de uniforms). Materiais que dividem o módulo (o chão e o chão de fora, a ruína e os modelos, o gelo e
+       a neve) se separavam quando um deles era o 1º. Uma sonda descartável (um plano com o material padrão, recebendo sombra) monta primeiro, no
+       contexto do passe da cena, só até os nós: o pipeline dela não nasce (nenhum módulo a mais) e ela é descartada. ?m5primeiro=0 desliga (medida) */
+    if (sp && sp.compileAsync && !M5.seq && Q.get('m5primeiro') !== '0') { const Tm = X.T, son = new Tm.Mesh(new Tm.PlaneGeometry(1, 1), new Tm.MeshStandardNodeMaterial()); son.receiveShadow = true; son.castShadow = false; son.frustumCulled = false; son.userData.ardSemPipeline = true; son.name = 'ard-sonda-montagem';
+      const rt0 = r.getRenderTarget(), mrt0 = r.getMRT(); r.setRenderTarget(sp.renderTarget); r.setMRT(sp._mrt || null);
+      try { await r.compileAsync(son, camera, scene); } catch (err) { console.warn('[ARD] Motor 5: sonda da 1ª montagem: ' + err.message); } finally { r.setRenderTarget(rt0); r.setMRT(mrt0); son.geometry.dispose(); son.material.dispose(); } }
+    if (sp && sp.compileAsync) await sp.compileAsync(r); else await r.compileAsync(scene, camera); for (const f of M5.pendentes.splice(0)) { try { await (typeof f === 'function' ? f() : f); } catch (err) { console.warn('[ARD] Motor 5: pré-compilação de um módulo falhou: ' + err.message); } } /* 5.0b: alvos próprios dos módulos (camada do espaço): os pipelines entram na mesma lista */ C.nosMs = Math.round(performance.now() - t0); C.emVoo = todas.length; await Promise.all(todas); } catch (err) { console.warn('[ARD] Motor 5: compileAsync falhou: ' + err.message); }
   finally { if (gfr) PL.getForRender = gfr; if (schDono) { try { delete window.scheduler; } catch (e) { window.scheduler = undefined; } } else if (sch) delete sch.yield; }
   X.compileMs = Math.round(performance.now() - t0); X.compilePipes = X.pipes - p0; C.ms = X.compileMs; C.pipes = X.compilePipes; return X.compileMs;
 };

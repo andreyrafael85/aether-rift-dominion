@@ -108,6 +108,10 @@ M5.chao = function (U, o) {
   const vMap = o.vazio ? M5.tex.vazio : null; /* 5.0a.1: mapa do vazio compartilhado (o render3d põe o do espaço mínimo; o space3d portado pode trocar o .value) */
   const pleno = !!(o.vazio && M5.espacoPleno && M5.espacoPleno()); /* 5.0b (junção): com o space3d completo na partida (src/m5/espaco.js), o chão corta como o ARD_VAZIO do clássico: a 18 da borda e abaixo de −90, sem o paredão para a poeira (a beirada, o paredão e as raízes são do space3d) */
   const m2 = (a, b, c, d, v) => vec2(v.x.mul(a).add(v.y.mul(c)), v.x.mul(b).add(v.y.mul(d))); /* mat2(a, b, c, d) * v do GLSL (colunas) */
+  /* 5.0b.1: o chão e o chão de fora (as mesas além do mapa) num shader só: o que só um dos dois tem passa a pesar por um uniform do material (uFora:
+     0 no chão, 1 nas mesas) em vez de um if do JavaScript, com pesos exatos (×1 e ×0, mix com 0 ou 1): a mesma imagem e o mesmo WGSL (um módulo de
+     ~45 KB e um pipeline a menos). ?m5fora=1 volta aos dois shaders (medida) */
+  const UNI = !(QS.get('m5fora') === '1'), uFora = TL.uniform(o.fora ? 1 : 0), kf = float(1).sub(uFora); const dentro = UNI || !o.fora, fora = UNI || o.fora;
   const A = amostras(); const saida = b => b.__ardChao || (b.__ardChao = {}); /* saídas da cor para as outras partes do material (rugosidade, normal, emissivo), por montagem */
   const cor = Fn((b) => { const S = saida(b);
     const pw = positionWorld; const gp = vec2(pw.x, pw.z.negate()).toVar('tGp');
@@ -162,21 +166,21 @@ M5.chao = function (U, o) {
       const k = ardHB(vec4(hAsh, hRock, hGrav, 0.0), vec4(0.85, rk.mul(1.3).add(smoothstep(0.6, 0.7, mid).mul(0.5)), smoothstep(0.4, 0.7, Bk.g).mul(0.35), 0.0)).toVar();
       const ash = mix(vec3(0.028, 0.026, 0.03), vec3(0.075, 0.068, 0.074), hAsh); const rock = mix(vec3(0.022, 0.02, 0.026), vec3(0.07, 0.06, 0.068), bt).mul(gr.mul(0.5).add(0.7)); const obs = vec3(0.016, 0.016, 0.024);
       alb.addAssign(ash.mul(k.x).add(rock.mul(k.y)).add(obs.mul(k.z)).mul(Bw.w)); rough.addAssign(dot(k, vec4(0.96, 0.8, 0.22, 0.0)).mul(Bw.w)); hgt.addAssign(dot(k, vec4(hAsh.mul(0.15), hRock.mul(0.7), hGrav.mul(0.4), 0.0)).mul(Bw.w));
-      if (!o.fora) { const rd = length(gp.sub(rift)); const rf = float(1).sub(smoothstep(260.0, 640.0, rd)); const cw = As.b;
+      if (dentro) { const rd = length(gp.sub(rift)); const rf = float(1).sub(smoothstep(260.0, 640.0, rd)).mul(UNI ? kf : float(1)); const cw = As.b; /* 5.0b.1: ×(1 − uFora) */
         const ck = smoothstep(0.62, 0.92, cw).mul(smoothstep(0.52, 0.68, mid)).mul(rf).mul(float(1).sub(smoothstep(0.1, 0.28, slope))).mul(Bk.r.mul(0.4).add(0.6)); /* fendas largas (~25 de célula), só em manchas e no chão plano: brasa em veios */
         const pulse = sin(tempo.mul(1.3).add(gp.x.mul(0.013)).add(gp.y.mul(0.017))).mul(0.35).add(0.65);
         tEmis.addAssign(vec3(1.15, 0.28, 0.7).mul(ck.mul(pulse).mul(1.15).mul(Bw.w))); alb.mulAssign(float(1).sub(Bw.w.mul(ck).mul(0.45))); } });
-    if (!o.fora) {
+    if (dentro) {
       /* abismo da Fenda: as paredes fundas recebem a luz que sobe lá de baixo (veios); bordas do smoothstep em ordem (invertidas são erro no WGSL) */
-      { const deep = float(1).sub(smoothstep(-225.0, -80.0, pw.y)).mul(float(1).sub(smoothstep(230.0, 300.0, length(gp.sub(rift))))); const fl = sin(tempo.mul(0.9).add(pw.y.mul(0.05)).add(gp.x.mul(0.02))).mul(0.4).add(0.6); const vein = smoothstep(0.6, 0.9, Bk.b).add(smoothstep(0.6, 0.9, As.b).mul(0.3));
+      { const deep = float(1).sub(smoothstep(-225.0, -80.0, pw.y)).mul(float(1).sub(smoothstep(230.0, 300.0, length(gp.sub(rift))))).mul(UNI ? kf : float(1)); /* 5.0b.1: ×(1 − uFora) */ const fl = sin(tempo.mul(0.9).add(pw.y.mul(0.05)).add(gp.x.mul(0.02))).mul(0.4).add(0.6); const vein = smoothstep(0.6, 0.9, Bk.b).add(smoothstep(0.6, 0.9, As.b).mul(0.3));
         tEmis.addAssign(vec3(1.2, 0.3, 0.75).mul(deep.mul(deep).mul(deep)).mul(vein.mul(0.9).add(0.12)).mul(fl).mul(1.6)); alb.mulAssign(float(1).sub(deep.mul(0.6))); }
       /* cicatrizes: rastros (chão compactado; na neve, sombra azulada), queimado com fuligem, cratera e brasa recente */
-      { const sc = A.cicatrizes().toVar('tSc'); const tr = sc.r; alb.mulAssign(float(1).sub(tr.mul(Bw.y.mul(0.16).add(Bw.z.mul(0.12)).add(0.34)))); alb.assign(mix(alb, alb.mul(vec3(0.76, 0.85, 1.08)), tr.mul(Bw.x).mul(0.7)));
+      { const sc = (UNI ? A.cicatrizes().mul(kf) : A.cicatrizes()).toVar('tSc'); /* 5.0b.1: nas mesas, cicatriz 0 (nada muda) */ const tr = sc.r; alb.mulAssign(float(1).sub(tr.mul(Bw.y.mul(0.16).add(Bw.z.mul(0.12)).add(0.34)))); alb.assign(mix(alb, alb.mul(vec3(0.76, 0.85, 1.08)), tr.mul(Bw.x).mul(0.7)));
         const bu = smoothstep(0.0, 0.85, sc.g); alb.assign(mix(alb, vec3(0.06, 0.05, 0.042).mul(soft.mul(0.5).add(0.75)), clamp(bu.mul(0.85), 0.0, 0.85))); rough.assign(mix(rough, 0.6, bu.mul(0.4))); hgt.addAssign(tr.mul(-0.18).sub(sc.b.mul(1.6)));
         tEmis.addAssign(vec3(1.4, 0.45, 0.12).mul(smoothstep(0.35, 1.0, sc.a)).mul(sin(tempo.mul(9.0).add(gp.x.mul(0.7))).mul(0.35).add(0.65)).mul(hCrk.mul(0.5).add(0.5))); }
     }
     alb.mulAssign(macro.mul(0.28).add(0.86)); alb.mulAssign(mix(vec3(1.0), vec3(1.06, 1.0, 0.92), smoothstep(0.4, 0.8, mid).mul(0.6)));
-    if (o.fora) { const sl = smoothstep(250.0, 340.0, pw.y.add(macro.sub(0.5).mul(90.0))).mul(float(1).sub(smoothstep(0.35, 0.6, slope))); alb.assign(mix(alb, vec3(0.78, 0.82, 0.88).mul(soft.mul(0.1).add(0.9)), sl)); rough.assign(mix(rough, 0.7, sl)); } /* neve no alto das montanhas distantes */
+    if (fora) { const sl = smoothstep(250.0, 340.0, pw.y.add(macro.sub(0.5).mul(90.0))).mul(float(1).sub(smoothstep(0.35, 0.6, slope))).mul(UNI ? uFora : float(1)); /* 5.0b.1: ×uFora */ alb.assign(mix(alb, vec3(0.78, 0.82, 0.88).mul(soft.mul(0.1).add(0.9)), sl)); rough.assign(mix(rough, 0.7, sl)); } /* neve no alto das montanhas distantes */
     const CG = M5.ganchos && M5.ganchos.chao; if (CG && CG.cor) { const nc = CG.cor({ m, o, alb, Bw, gp }); if (nc) alb.assign(nc); } /* gancho da fase 2 (camadas extras) */
     const dif = alb.mul(mix(0.72, 1.0, aoc.x)).toVar('tDif');
     const DBG = +(QS.get('terrdbg') || 0); /* ?terrdbg=N: os mesmos modos de diagnóstico do clássico (1 bioma, 2 cavidade, 3 curvatura, 4 texturas, 5 rugosidade, 7 relevo fino) */
@@ -187,13 +191,13 @@ M5.chao = function (U, o) {
       dif.assign(mix(dif, mix(vec3(0.27, 0.245, 0.22), vec3(0.47, 0.43, 0.38), Ap.g).mul(macro.mul(0.4).add(0.8)), ponte.mul(0.5).mul(smoothstep(18.0, 26.0, esd))));
       if (!pleno) { const paredao = smoothstep(PAR0, PAR1, pw.y.negate()); dif.mulAssign(float(1).sub(paredao)); rough.assign(mix(rough, 0.85, paredao)); tEmis.addAssign(vec3(0.006, 0.009, 0.022).mul(float(1).sub(M5.u.noite.mul(0.4))).mul(paredao)); } } /* 5.0a.1: sem o space3d, o paredão de rocha vai para a poeira escura do espaço perto do fundo; 5.0b (junção): com o space3d, sem ele (como o clássico) */
     const mh = float(0).toVar('tMh');
-    if (!o.fora) {
-      const wuv = vec2(gp.x.div(W), gp.y.div(W)); /* microdetalhe de perto (seixos, tom, fendas) */
+    if (dentro) {
+      const wuv = vec2(gp.x.div(W), gp.y.div(W)); /* microdetalhe de perto (seixos, tom, fendas) */ const nk = UNI ? U.uNear.mul(kf) : U.uNear; /* 5.0b.1: nas mesas, sem microdetalhe */
       const mt = U.microMap || M5.tex.micro;
       If(U.uNear.greaterThan(0.0), () => { const m1 = amostra(mt, wuv.mul(260.0)).rgb.toVar(), m2v = amostra(mt, wuv.mul(84.0).add(0.31)).rgb.toVar(); const pe = max(m1.r.mul(0.6), m2v.r); /* ramo uniforme (a câmera inteira): de longe nem amostra */
-        dif.mulAssign(mix(float(1), mix(m1.g, m2v.g, step(0.25, m2v.r)).mul(0.28).add(0.86).mul(float(1).sub(max(m1.b, m2v.b.mul(0.8)).mul(0.35))).mul(pe.mul(0.1).add(1.0)), U.uNear.mul(0.7)));
-        mh.assign(m1.r.mul(0.3).add(m2v.r.mul(0.7)).sub(m1.b.add(m2v.b).mul(0.25)).mul(U.uNear)); });
-      const tc = A.territorio(); dif.assign(mix(dif, tc.rgb, tc.a.mul(0.14))); const fv = A.nevoa(); dif.mulAssign(mix(0.06, 1.0, fv)); tEmis.mulAssign(fv);
+        dif.mulAssign(mix(float(1), mix(m1.g, m2v.g, step(0.25, m2v.r)).mul(0.28).add(0.86).mul(float(1).sub(max(m1.b, m2v.b.mul(0.8)).mul(0.35))).mul(pe.mul(0.1).add(1.0)), nk.mul(0.7)));
+        mh.assign(m1.r.mul(0.3).add(m2v.r.mul(0.7)).sub(m1.b.add(m2v.b).mul(0.25)).mul(nk)); });
+      const tc = A.territorio(); dif.assign(mix(dif, tc.rgb, tc.a.mul(0.14).mul(UNI ? kf : float(1)))); const fv = A.nevoa(); dif.mulAssign(UNI ? mix(mix(0.06, 1.0, fv), 1.0, uFora) : mix(0.06, 1.0, fv)); tEmis.mulAssign(UNI ? mix(fv, 1.0, uFora) : fv); /* 5.0b.1: território e névoa de guerra só no chão (nas mesas, ×1) */
     }
     dif.mulAssign(float(1).sub(U.uCloudK.mul(0.2).mul(float(1).sub(A.nuvem())))); /* sombra de nuvem no material (0 quando a bruma do pós já faz) */
     S.rough = rough; S.tH = hgt.mul(mix(0.25, 1.0, nearK)).toVar('tH'); S.mh = mh; S.tEmis = tEmis; S.wn = wn;
@@ -211,11 +215,12 @@ M5.chao = function (U, o) {
     const n = sn.mul(abs(det)).sub(g); const l2 = dot(n, n); return select(l2.greaterThan(1e-12), n.mul(inverseSqrt(max(l2, 1e-30))), sn);
   })();
   /* clarões no chão (compressão suave; encosta recebe menos) e a luz da Fenda (5.0a.1: era uma PointLight; difusa de Lambert com 1/d² na normal final, como a luz do clássico) */
-  m.emissiveNode = Fn((b) => { const S = saida(b); let luz = A.clarao().mul(max(S.wn.y, 0.0).mul(0.65).add(0.35)); if (!o.fora && M5.luzFendaChao) luz = luz.add(M5.luzFendaChao(normalWorld, positionWorld)); return S.tEmis.add(dif.mul(luz)); })();
+  m.emissiveNode = Fn((b) => { const S = saida(b); let luz = A.clarao().mul(max(S.wn.y, 0.0).mul(0.65).add(0.35)); if (dentro && M5.luzFendaChao) luz = luz.add(UNI ? M5.luzFendaChao(normalWorld, positionWorld).mul(kf) : M5.luzFendaChao(normalWorld, positionWorld)); /* 5.0b.1: a luz da Fenda só no chão */ return S.tEmis.add(dif.mul(luz)); })();
   if (o.vazio) { m.maskNode = pleno ? positionWorld.y.greaterThan(-90.0).and(amostra(M5.tex.vazio, vec2(positionWorld.x, positionWorld.z.negate()).div(W)).r.sub(0.5).mul(128.0).greaterThanEqual(18.0)) /* 5.0b (junção): o corte do clássico (if (vWP.y < −90) discard; esd < 18 discard), que o M5.espacoBorda da água fazia no chão da fundação */
       : M5.vazioMascara ? M5.vazioMascara(positionWorld) : positionWorld.y.greaterThan(-90.0); /* 5.0a.1: some só onde o mapa do vazio diz (nunca pela altura) */
     m.userData.vazio = true; m.userData.voidMap = vMap; m.userData.terrU = U; } /* o space3d (refreshVoid) troca userData.voidMap.value: é o mesmo M5.tex.vazio */
-  m.userData.env = 0.22;
+  m.userData.env = 0.22; m.userData.ardFora = uFora;
+  if (UNI) m.receivedShadowNode = sh => sh.add(uFora.mul(float(1).sub(sh))); /* 5.0b.1: as mesas recebem sombra no Motor 5 (o mesmo shader do chão) com a sombra em 1, como sem receber */
   return M5.registrar('chao' + (o.fora ? '-fora' : '') + (o.leve ? '-leve' : '') + (o.vazio ? '-vazio' : ''), m);
 };
 
@@ -240,6 +245,7 @@ M5.adereco = function (o) {
   const corInst = Fn(b => (b.object && b.object.isM5Inst ? attribute('iC', 'vec3') : b.object && b.object.instanceColor ? varyingProperty('vec3', 'vInstanceColor') : vec3(1)))();
   m.emissiveNode = vertexColor().rgb.mul(corInst).mul(glow).mul(fv.mul(fv)); /* peça emissiva: a própria cor (com a tinta da instância), apagada na névoa */
   if (o.leaf) m.normalNode = normalViewGeometry; /* o clássico desfaz a inversão do verso: folhas e lâminas iluminadas igual dos dois lados */
+  if (o.leaf) { const semSombra = L().uniform(0).onObjectUpdate(({ object }) => (object.userData && object.userData.ardSemSombra ? 1 : 0)); m.receivedShadowNode = s => s.add(semSombra.mul(float(1).sub(s))); } /* 5.0b.1: um shader só para as folhas: todo bloco recebe sombra no Motor 5 e a folhagem pequena (ardSemSombra, do dress3d) fica com a sombra em 1, como sem receber (antes eram dois WGSL: com e sem sombra) */
   const vento = Fn(b => { if (!(b.object && b.object.isM5Inst)) return positionLocal; /* InstancedMesh de verdade (?m5inst=0): o three já aplicou a instância; sem vento */
     const iw = attribute('iM3', 'vec4'), t = M5.u.tempo, p = positionLocal; const k = wind.mul(max(p.y, 0.0));
     const gx = sin(t.mul(1.7).add(iw.x.mul(0.05)).add(iw.z.mul(0.03))).mul(0.09).add(sin(t.mul(4.6).add(p.x.mul(6.0)).add(iw.z.mul(0.21))).mul(0.022));

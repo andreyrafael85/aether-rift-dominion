@@ -5,10 +5,11 @@ const A = { ctx: null, master: null, enabled: true, voice: true, inited: false, 
 try { const p = JSON.parse(localStorage.getItem('ard-audio') || '{}'); if (p.enabled === false) A.enabled = false; if (p.voice === false) A.voice = false; if (typeof p.voz === 'string') A.voz = p.voz; if (typeof p.vozNome === 'string') A.vozNome = p.vozNome; /* 5.0a.2: voz escolhida em Ajustes ('' = Automática) */ } catch (e) {}
 function save() { try { localStorage.setItem('ard-audio', JSON.stringify({ enabled: A.enabled, voice: A.voice, voz: A.voz || '', vozNome: A.vozNome || '' })); } catch (e) {} }
 A.init = function () {
-  if (A.inited) return; A.inited = true;
+  if (A.inited) return; A.inited = true; sessao(); /* 5.0b.1: a sessão de reprodução do iOS vem antes de o contexto nascer */
   try { const C = window.AudioContext || window.webkitAudioContext; if (!C) return; A.ctx = new C(); A.master = A.ctx.createGain(); A.master.gain.value = 0.35; A.master.connect(A.ctx.destination); } catch (e) { A.ctx = null; }
+  if (A.ctx) vigiar(A.ctx); /* 5.0b.1: estado 'interrupted' do iOS e volta para a página */
 };
-A.resume = function () { if (A.ctx && A.ctx.state === 'suspended') A.ctx.resume(); };
+A.resume = function () { retomar(); }; /* 5.0b.1: retoma também do 'interrupted' do iOS e nunca deixa a promessa do resume() solta (antes: só 'suspended', sem catch) */
 let noiseBuf = null;
 function noise(dur, o) {
   const c = A.ctx; if (!noiseBuf) { noiseBuf = c.createBuffer(1, c.sampleRate, c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
@@ -65,10 +66,12 @@ function nivel(v) { const n = v.name || '', u = v.voiceURI || '';
 const PREF = [/Francisca/i, /Antonio/i, /Thalita/i, /Luciana/i, /Felipe/i]; /* ordem pedida dentro do mesmo nível */
 const TAG = ['robótica', 'antiga do Windows', '', 'Apple', 'Apple aprimorada', '', 'neural do Edge'];
 function nomeCurto(n) { return String(n || '').replace(/^Microsoft\s+/i, '').replace(/\s*Online\s*\(Natural\)/i, '').replace(/\s+-\s+.*$/, '').replace(/\s+Desktop\b/i, '').replace(/\s*\((?:Portugu[eê]s|Portuguese)\s*\([^)]*\)\)\s*$/i, '').replace(/Multilingual$/i, ' multilíngue').trim(); }
-/* 5.0a.3: voz por líder. No modo Automática, as falas de líder (chave 'sala-<raça>', ou a raça no 4º argumento de A.say) preferem uma voz do gênero
-   de quem fala, mas só entre as vozes do mesmo nível da melhor voz do aparelho (mesmo nível de qualidade e mesmo português, do Brasil ou de Portugal):
-   nunca desce de nível para acertar o gênero; sem voz do gênero nesse nível, fala a melhor. Locutor e unidades seguem com a Automática, e a voz
-   escolhida em Ajustes vale para todas as falas. O gênero da voz sai destas listas de nomes (as vozes em português que os navegadores trazem): neurais
+/* 5.0a.3: voz por líder. No modo Automática, as falas de líder (chave 'sala-<raça>', ou a raça no 4º argumento de A.say) usam uma voz do gênero
+   de quem fala. 5.0b.1: a melhor voz do gênero do líder entre as vozes boas do aparelho, de qualquer nível a partir do 1 (nunca uma robótica, nível 0),
+   na ordem do ranking (português do Brasil antes de Portugal); sem voz daquele gênero, fala a melhor de todas. Antes (5.0a.3) a troca de gênero só
+   valia no nível da melhor voz: no Chrome do Windows a melhor é a Google (feminina, nível 5) e o único homem é o Daniel antigo (nível 1), e todos os
+   líderes saíam com a Google. Locutor e unidades seguem com a Automática, e a voz escolhida em Ajustes vale para todas as falas.
+   O gênero da voz sai destas listas de nomes (as vozes em português que os navegadores trazem): neurais
    do Edge (Francisca, Thalita / Antonio; de Portugal, Raquel e Fernanda / Duarte; e as do Azure que o Edge às vezes lista), antigas do Windows (Maria,
    Heloisa, Hélia / Daniel), Apple (Luciana, Fernanda, Joana, Catarina / Felipe; as "novidades" Flo, Sandy, Shelley, Vovó, Grandma / Eddy, Reed, Rocko,
    Vovô, Grandpa) e a Google português do Brasil, que é feminina. Voz fora das listas (Android, Samsung, eSpeak) fica sem gênero e nunca é escolhida por ele. */
@@ -86,7 +89,7 @@ function ranking() {
   r.sort((a, b) => b.nota - a.nota || a.i - b.i); if (vs.length) { RANK = r; RANK_T = performance.now(); } return r;
 }
 function pickVoice(id, genero) { const r = ranking(), want = id != null ? id : A.voz; if (want) { const f = r.find(x => x.id === want && !RUIM.has(x.id)); if (f) return f.v; } const b = r.find(x => !RUIM.has(x.id));
-  if (b && genero && b.genero !== genero) { const g = r.find(x => !RUIM.has(x.id) && x.nivel === b.nivel && x.br === b.br && x.genero === genero); if (g) return g.v; } /* 5.0a.3: fala de líder: a voz do gênero, só no nível da melhor */
+  if (b && genero && b.genero !== genero) { const g = r.find(x => !RUIM.has(x.id) && x.nivel >= 1 && x.genero === genero); if (g) return g.v; } /* 5.0b.1: fala de líder: a melhor voz do gênero, de qualquer nível a partir do 1 */
   return b ? b.v : null; }
 /* 5.0a.2: falas por tipo — intervalo mínimo para repetir a mesma fala (s) e prioridade. A maior interrompe a menor (o perigo corta "Unidade pronta";
    uma fala de líder ou o "Ouvir" corta a anterior do mesmo tipo); avisos de rotina (unidade, obra, pesquisa) guardam 3 s entre si e não fazem fila: com a voz ocupada,
@@ -105,11 +108,11 @@ function decide(key, cooldown, now) {
 /* 5.0b: gancho de palavras da voz: o evento 'ard-voz' no window traz { tipo: 'inicio' | 'palavra' | 'fim', texto, i, n } (posição e tamanho da palavra,
    do evento boundary do speechSynthesis); a Sala de Comando mexe a boca do líder com ele */
 function voiceHook(u, text, c) { const ev = (tipo, i, n) => { try { window.dispatchEvent(new CustomEvent('ard-voz', { detail: { tipo, texto: text, i: i || 0, n: n || 0 } })); } catch (e) {} };
-  u.onstart = () => ev('inicio'); u.onboundary = e => { if (!e.name || e.name === 'word') ev('palavra', e.charIndex, e.charLength); }; u.onend = () => { ev('fim'); acabou(c); }; u.onerror = e => { ev('fim'); falhou(c, e); }; }
+  u.onstart = () => { c.ini = true; ev('inicio'); }; u.onboundary = e => { if (!e.name || e.name === 'word') ev('palavra', e.charIndex, e.charLength); }; u.onend = () => { ev('fim'); acabou(c); }; u.onerror = e => { ev('fim'); falhou(c, e); }; }
 function comecar(text, d, voz, tentativa) {
   let u; try { u = new SpeechSynthesisUtterance(text); } catch (e) { cur = null; return false; }
   const v = voz || pickVoice(null, d.genero) /* 5.0a.3: d.genero = gênero do líder que fala */; if (v) { try { u.voice = v; } catch (e) {} } u.lang = (v && v.lang) || 'pt-BR'; u.pitch = 1; u.rate = d.p === 3 ? 1.05 : 1; u.volume = 0.9; /* 5.0a.2: tom natural (antes 0.85 e 1.05) */
-  const c = cur = { u, p: d.p, tipo: d.tipo, text, d, tentativa: tentativa || 0, fim: performance.now() + 3000 + text.length * 150 }; voiceHook(u, text, c); A.fala = u; /* referência viva: sem ela o Chrome pode perder o onend */
+  const c = cur = { u, p: d.p, tipo: d.tipo, text, d, tentativa: tentativa || 0, t0: performance.now(), fim: performance.now() + 3000 + text.length * 150 }; voiceHook(u, text, c); A.fala = u; /* referência viva: sem ela o Chrome pode perder o onend */
   try { if (speechSynthesis.paused) speechSynthesis.resume(); speechSynthesis.speak(u); } catch (e) { cur = null; return false; }
   return true;
 }
@@ -138,7 +141,7 @@ A.say = function (text, key, cooldown, quem) { /* 5.0a.3: quem = raça do líder
   if (A.onSay) { try { A.onSay(text, key); } catch (e) {} }
   return true;
 };
-A.setEnabled = function (on) { A.enabled = on; save(); }; A.setVoice = function (on) { A.voice = on; save(); if (!on) { fila = null; cur = null; if (temFala()) try { speechSynthesis.cancel(); } catch (e) {} } };
+A.setEnabled = function (on) { A.enabled = on; save(); sessao(); htmlMudo(); if (on) retomar(); }; A.setVoice = function (on) { A.voice = on; save(); sessao(); if (!on) { fila = null; cur = null; if (temFala()) try { speechSynthesis.cancel(); } catch (e) {} } }; /* 5.0b.1: a sessão de reprodução e o áudio mudo do iOS seguem o som e a voz */
 /* 5.0a.2: escolha da voz em Ajustes (tela inicial e partida): cada bloco [data-voz-ui] tem um select[data-voz-sel], um botão [data-voz-ouvir] e um texto
    [data-voz-dica]. Os blocos ficam em sincronia e se refazem quando o aparelho carrega mais vozes (o Edge traz as neurais depois das locais);
    "Ouvir" fala a frase de exemplo com a voz do select, mesmo com a voz do jogo desligada. */
@@ -170,9 +173,82 @@ A.vozDoLider = raca => { const v = temFala() ? pickVoice(null, GENERO_LIDER[raca
 A.generoVoz = generoVoz; A.GENERO_LIDER = GENERO_LIDER; /* 5.0a.3 */
 A.setVoz = function (id) { A.voz = id || ''; const f = ranking().find(x => x.id === A.voz); A.vozNome = f ? nomeCurto(f.v.name) : ''; save(); UIS.forEach(preencher); };
 A.ouvir = function (id) { if (!temFala()) return false; const sid = id != null ? id : A.voz, f = sid ? ranking().find(x => x.id === sid) : null; return falar(AMOSTRA, { tipo: 'sistema', p: 4 }, f ? f.v : null); };
-A.vozUI = function (box) { if (!box || box.__voz) return; box.__voz = 1; UIS.push(box); const sel = box.querySelector('[data-voz-sel]'), bt = box.querySelector('[data-voz-ouvir]');
-  if (sel) sel.addEventListener('change', () => A.setVoz(sel.value)); if (bt) bt.addEventListener('click', () => A.ouvir(sel ? sel.value : A.voz)); preencher(box); };
+A.vozUI = function (box) { if (!box || box.__voz) return; box.__voz = 1; UIS.push(box); const sel = box.querySelector('[data-voz-sel]'), bt = box.querySelector('[data-voz-ouvir]'), ts = box.querySelector('[data-som-teste]');
+  if (sel) sel.addEventListener('change', () => A.setVoz(sel.value)); if (bt) bt.addEventListener('click', () => A.ouvir(sel ? sel.value : A.voz)); if (ts) ts.addEventListener('click', () => A.testarSom(box)); /* 5.0b.1: Testar som */ preencher(box); };
 if (temFala()) { const mudou = () => { RANK = null; UIS.forEach(preencher); }; try { addEventListener('online', () => { RUIM.clear(); mudou(); }); } catch (e) {} try { if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', mudou); else speechSynthesis.onvoiceschanged = mudou; speechSynthesis.getVoices(); } catch (e) {} }
 if (typeof document !== 'undefined' && document.querySelectorAll) { const liga = () => document.querySelectorAll('[data-voz-ui]').forEach(b => A.vozUI(b)); if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', liga); else liga(); }
+/* 5.0b.1: som no celular. No iOS o Web Audio e a voz do sistema só começam dentro de um gesto de verdade: touchend, click, pointerup ou keydown
+   (o touchstart e o pointerdown do toque não contam). Antes, o src/main.js só escutava pointerdown, keydown e touchstart: no iPhone o AudioContext
+   nascia suspenso e só saía disso se um clique de botão tocasse um efeito; na partida, onde os efeitos e as falas vêm do jogo e não de um toque,
+   ele ficava suspenso até o fim, e o iOS descartava toda fala da voz do sistema feita fora de um gesto. A.gesto(e) (o src/main.js liga em
+   pointerdown, pointerup, touchend, click e keydown) destrava tudo no primeiro gesto de verdade: cria e retoma o AudioContext e toca um buffer mudo
+   curto; liga a sessão de reprodução do iOS (navigator.audioSession.type = 'playback'), que não deixa a chave de silêncio do aparelho calar o jogo;
+   e fala uma vez a voz do sistema com volume 0, dentro do gesto, para o iOS liberar as falas de depois. No computador o pointerdown do mouse segue
+   valendo, como antes, e a fala de preparo e a sessão ficam de fora (só celular, tablet e Safari). Depois do desbloqueio, cada gesto custa uma
+   conferência: se o contexto voltar a 'suspended' ou 'interrupted' (ligação, outro app, tela bloqueada), ele é retomado no 'statechange', ao
+   voltar para a página (visibilitychange, pageshow) ou no próximo gesto. Sem a API de sessão (iOS mais antigo), um <audio> mudo em laço, com
+   playsinline, faz o papel dela: só no iPhone e no iPad sem a API, só com o som do jogo ligado e a página à vista (pausa ao esconder). */
+const D = { evento: null, gestos: 0, voz: false, vozEvento: null, mudoCurto: 0, retomadas: 0, interrompido: 0, pronto: false, el: null, elEvento: null, teste: null };
+const UA = () => (typeof navigator !== 'undefined' && navigator.userAgent) || '';
+const ehIOS = () => { const ua = UA(); return /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && typeof navigator !== 'undefined' && navigator.maxTouchPoints > 1); };
+const ehSafari = () => { const ua = UA(); return /AppleWebKit/.test(ua) && /Version\/[\d.]+.*Safari\//.test(ua) && !/Chrome|Chromium|CriOS|FxiOS|Edg|OPR|Android/.test(ua); };
+const grosso = () => { try { return typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches; } catch (e) { return false; } };
+const movel = () => ehIOS() || grosso(); /* celular e tablet */
+const temSessao = () => { try { return typeof navigator !== 'undefined' && !!navigator.audioSession && 'type' in navigator.audioSession; } catch (e) { return false; } };
+const visivel = () => typeof document === 'undefined' || !document.hidden;
+function gestoValido(e) { if (!e || e.isTrusted === false) return false; const t = e.type;
+  if (t === 'pointerdown') return e.pointerType === 'mouse'; /* no computador o clique do mouse já vale no pointerdown, como antes; o do toque não */
+  if (t === 'keydown') return e.key !== 'Escape';
+  return t === 'pointerup' || t === 'touchend' || t === 'click'; }
+/* sessão de reprodução (iOS com a API): 'playback' com o som ou a voz do jogo ligados (ou no Testar som), 'auto' com os dois desligados */
+function sessao(forcar) { if (!temSessao() || !movel()) return false; const s = navigator.audioSession, quer = forcar || A.enabled || A.voice ? 'playback' : 'auto';
+  try { if (s.type !== quer) s.type = quer; } catch (e) {} return s.type === 'playback'; }
+function retomar(c) { c = c || A.ctx; if (!c || !c.resume || c.state === 'running' || c.state === 'closed') return;
+  try { const p = c.resume(); if (p && p.then) p.then(() => { if (c.state === 'running') { D.retomadas++; htmlMudo(); } }, () => {}); } catch (e) {} }
+function vigiar(c) { const f = () => { if (c.state === 'running') { htmlMudo(); return; } D.pronto = false; if (c.state === 'interrupted') D.interrompido++; if (D.evento && visivel()) retomar(c); };
+  try { if (c.addEventListener) c.addEventListener('statechange', f); else c.onstatechange = f; } catch (e) {} }
+function bufferMudo(c) { try { const b = c.createBuffer(1, 1, 22050), s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); if (s.start) s.start(0); else s.noteOn(0); D.mudoCurto++; } catch (e) {} }
+/* fala presa: o iOS descarta sem aviso (sem start, end nem error) a fala feita fora de gesto antes do desbloqueio, e ela segurava a voz do jogo até o prazo
+   dela (3 s ou mais). No gesto, se a fala atual nunca começou e o aparelho não está falando nada, ela é refeita ali dentro (com menos de 4 s) ou solta a fila */
+function destravarFala() { const c = cur; if (!c || !c.u || c.ini) return; try { if (speechSynthesis.speaking || speechSynthesis.pending) return; } catch (e) { return; }
+  cur = null; if (performance.now() - (c.t0 || 0) <= FILA_MAX) comecar(c.text, c.d, null, c.tentativa); else proxima(); }
+/* fala de preparo: volume 0, dentro do gesto (se o próprio gesto já falou, ele mesmo serve de preparo); não passa pela fila, pela legenda nem pelo 'ard-voz' */
+function prepararVoz(e) { if (D.voz || !temFala()) return; D.voz = true; D.vozEvento = e.type;
+  try { if (speechSynthesis.speaking || speechSynthesis.pending) return; const u = new SpeechSynthesisUtterance('Som'); u.lang = 'pt-BR'; u.volume = 0; u.rate = 1.3; D.prep = u; speechSynthesis.speak(u); } catch (er) { D.voz = false; } }
+/* <audio> mudo em laço (iOS sem navigator.audioSession): um WAV de silêncio de 0,5 s gerado aqui, na taxa do AudioContext (outra taxa faria o iOS
+   trocar a do aparelho e chiar o Web Audio); nasce e toca pela primeira vez dentro de um gesto, depois pausa e volta com o som e a página */
+function wavMudo(taxa) { const n = Math.round(taxa / 2), b = new ArrayBuffer(44 + n * 2), d = new DataView(b), w = (o, t) => { for (let i = 0; i < t.length; i++) d.setUint8(o + i, t.charCodeAt(i)); };
+  w(0, 'RIFF'); d.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt '); d.setUint32(16, 16, true); d.setUint16(20, 1, true); d.setUint16(22, 1, true); d.setUint32(24, taxa, true); d.setUint32(28, taxa * 2, true); d.setUint16(32, 2, true); d.setUint16(34, 16, true); w(36, 'data'); d.setUint32(40, n * 2, true);
+  return new Blob([b], { type: 'audio/wav' }); }
+function htmlMudo(e) { if (!ehIOS() || temSessao() || typeof Audio === 'undefined') return; const quer = A.enabled && visivel() && !!D.evento;
+  if (!quer) { if (D.el && !D.el.paused) try { D.el.pause(); } catch (er) {} return; }
+  if (!D.el) { if (!e) return; try { const el = new Audio(); el.setAttribute('playsinline', ''); el.setAttribute('webkit-playsinline', ''); el.setAttribute('x-webkit-airplay', 'deny'); el.disableRemotePlayback = true; el.controls = false; el.loop = true; el.preload = 'auto';
+    el.src = URL.createObjectURL(wavMudo(Math.round((A.ctx && A.ctx.sampleRate) || 44100))); D.el = el; D.elEvento = e.type; } catch (er) { return; } }
+  if (D.el.paused) try { const p = D.el.play(); if (p && p.catch) p.catch(() => {}); } catch (er) {} }
+A.gesto = function (e) { if (D.pronto || !gestoValido(e)) return; if (!D.evento) D.evento = e.type; D.gestos++;
+  try { sessao(); A.init(); const c = A.ctx; if (c && c.state !== 'running') { bufferMudo(c); retomar(c); } if ((movel() || ehSafari()) && temFala()) { destravarFala(); prepararVoz(e); } htmlMudo(e); } catch (er) {}
+  D.pronto = !!(A.ctx && A.ctx.state === 'running') && (D.voz || !temFala() || !(movel() || ehSafari())) && (!D.el || !D.el.paused || !A.enabled); };
+if (typeof document !== 'undefined' && document.addEventListener) { const volta = () => { D.pronto = false; if (visivel() && D.evento) retomar(); htmlMudo(); }; document.addEventListener('visibilitychange', volta); try { addEventListener('pageshow', volta); } catch (e) {} }
+/* diagnóstico (Testar som e testes): estado do áudio, sessão de reprodução, vozes em português e a voz usada */
+const ESTADO = { running: 'tocando', suspended: 'suspenso', interrupted: 'interrompido', closed: 'fechado' };
+A.gestoValido = gestoValido; A.desbloqueio = () => ({ evento: D.evento, gestos: D.gestos, voz: D.voz, vozEvento: D.vozEvento, mudoCurto: D.mudoCurto, retomadas: D.retomadas, interrompido: D.interrompido, pronto: D.pronto, audioMudo: D.el ? (D.el.paused ? 'pausado' : 'tocando') : null, audioMudoEvento: D.elEvento });
+A.diagnostico = function () { const c = A.ctx, s = temSessao() ? navigator.audioSession.type : null, t = D.teste;
+  return { audio: c ? c.state : null, sessao: s === 'playback' || !!(D.el && !D.el.paused), sessaoTipo: s, audioMudo: !!(D.el && !D.el.paused), precisaSessao: ehIOS(), vozesPt: ranking().length, voz: t ? t.voz : ((A.vozAtual() || {}).nome || null), fala: t ? t.fala : null, efeitos: A.enabled, vozJogo: A.voice }; };
+function diagTexto(g) { const ses = g.sessaoTipo === 'playback' ? 'sim' : g.audioMudo ? 'sim (áudio mudo em laço)' : !g.precisaSessao ? 'não precisa neste aparelho' : g.sessaoTipo ? 'não (' + g.sessaoTipo + ')' : 'não';
+  return 'Áudio: ' + (g.audio ? (ESTADO[g.audio] || g.audio) : 'sem Web Audio') + ' · Sessão de reprodução: ' + ses + ' · Vozes em português: ' + g.vozesPt + ' · Voz: ' + (g.voz ? nomeCurto(g.voz) : temFala() ? 'padrão do aparelho' : 'sem voz do sistema')
+    + (g.fala ? ' · Fala: ' + g.fala : '') + (g.efeitos ? '' : ' · efeitos desligados em Ajustes') + (g.vozJogo ? '' : ' · voz do jogo desligada'); }
+const FRASE_TESTE = 'Som testado, Comandante. Efeitos e voz no ar.';
+/* Testar som: toca um efeito curto e fala uma frase (mesmo com o som ou a voz do jogo desligados, como o Ouvir) e mostra o diagnóstico na linha [data-som-diag] */
+A.testarSom = function (box) { sessao(true); A.init(); const c = A.ctx; if (c) { retomar(c); if (c.state !== 'running') bufferMudo(c); try { [523, 659, 784].forEach((f, i) => tone(f, 0.12, { gain: 0.12, delay: i * 0.09 })); } catch (e) {} }
+  const sel = box && box.querySelector ? box.querySelector('[data-voz-sel]') : null, sid = sel ? sel.value : A.voz, f = sid ? ranking().find(x => x.id === sid) : null, v = temFala() ? (f ? f.v : pickVoice()) : null;
+  const t = D.teste = { voz: v ? v.name : null, fala: temFala() ? 'esperando' : null, inicio: false };
+  const linha = () => { const dg = box && box.querySelectorAll ? box.querySelectorAll('[data-som-diag]') : []; const txt = diagTexto(A.diagnostico()); dg.forEach(el => { el.hidden = false; if (el.textContent !== txt) el.textContent = txt; }); };
+  if (temFala()) { const sai = () => { try { removeEventListener('ard-voz', ouve); } catch (er) {} };
+    const ouve = e => { const d = e && e.detail; if (!d || d.texto !== FRASE_TESTE) return; if (D.teste !== t) { sai(); return; }
+      if (d.tipo === 'inicio') { t.inicio = true; t.fala = 'falando'; if (A.fala && A.fala.voice) t.voz = A.fala.voice.name; } /* a voz de verdade (sem rede, a online cai para a local) */
+      else if (d.tipo === 'fim') { if (t.inicio) { t.fala = 'tocou'; sai(); } else t.fala = 'falhou'; } linha(); }; /* sem 'inicio', a fala pode repetir na voz local: segue ouvindo */
+    try { addEventListener('ard-voz', ouve); } catch (e) {} if (!falar(FRASE_TESTE, { tipo: 'sistema', p: 4 }, v)) t.fala = 'não começou';
+    setTimeout(() => { if (D.teste !== t || t.fala === 'tocou') return; sai(); if (!t.inicio) { t.fala = 'sem resposta (toque em Testar som de novo)'; linha(); } }, 8000); }
+  linha(); setTimeout(linha, 450); return t; };
 ARD.audio = A;
 })(globalThis.ARD = globalThis.ARD || {});

@@ -1,9 +1,12 @@
 // 5.0a.3: teste da voz por líder. No modo Automática, a fala de cada líder (chave 'sala-<raça>', a mesma da Sala de Comando) tem de sair numa voz do
-// gênero do líder (Sylvia Oriel feminina; Barão-Forja, Vesper Ísk, Zayin Coral e Oru Voraz masculinos), mas só no mesmo nível da melhor voz do aparelho;
-// locutor e unidades seguem com a Automática; a voz escolhida em Ajustes vale para todas as falas; legenda (A.onSay) e evento 'ard-voz' continuam iguais.
+// gênero do líder (Sylvia Oriel feminina; Barão-Forja, Vesper Ísk, Zayin Coral e Oru Voraz masculinos). 5.0b.1: a melhor voz do gênero entre as vozes
+// boas do aparelho, de qualquer nível a partir do 1 (nunca uma robótica); sem voz do gênero, a melhor de todas. O Chrome do Windows passa a dar o Daniel
+// aos líderes homens e a Google à Sylvia; o iPhone com a Luciana Aprimorada dá o Felipe comum aos homens (antes, a Luciana Aprimorada para todos).
+// Locutor e unidades seguem com a Automática; a voz escolhida em Ajustes vale para todas as falas; legenda (A.onSay) e evento 'ard-voz' continuam iguais.
 // Roda o src/audio.js de verdade no Node, com a imitação de fala (fala-falsa.cjs) e os conjuntos de vozes (conjuntos.cjs), os dois só em leitura;
-// três aparelhos a mais saem dos mesmos conjuntos: Windows antigo, iPhone com Luciana e Felipe aprimorados, Chrome sem rede.
-// Uso: node tools/vozes/genero-teste.cjs [--navegador]   (--navegador: também Edge e iPhone na página do jogo, dist/local.html; NODE_PATH com playwright)
+// aparelhos a mais saem dos mesmos conjuntos: Windows antigo, iPhone com Luciana e Felipe aprimorados, Chrome sem rede e (5.0b.1) Firefox com a Maria e
+// o Daniel, iPhone sem o Felipe (o único homem é robótico: Eddy, Reed, Rocko) e um Android (vozes sem gênero no nome).
+// Uso: node tools/vozes/genero-teste.cjs [--navegador]   (--navegador: também Edge, Chrome do Windows e iPhone na página do jogo, dist/local.html; NODE_PATH com playwright)
 const path = require('path'), fs = require('fs'), vm = require('vm'); const root = path.resolve(__dirname, '../..');
 const SETS = require('./conjuntos.cjs'); const fake = require('./fala-falsa.cjs');
 const espera = ms => new Promise(r => setTimeout(r, ms));
@@ -11,17 +14,23 @@ const LIDERES = [['tessara', 'Sylvia Oriel', 'Sylvia Oriel. Oriel cresce. E quem
   ['quorith', 'Zayin Coral', 'Zayin Coral. O Coro escuta.'], ['vorag', 'Oru Voraz', 'Oru Voraz. Fome.']];
 /* aparelhos derivados dos conjuntos (cópias; o conjuntos.cjs não muda) */
 const porId = id => SETS.find(s => s.id === id); const copia = (s, o) => Object.assign(JSON.parse(JSON.stringify(s)), o);
-const edge = porId('edge'), iph = porId('iphone-aprimorada'), chrome = porId('chrome-win');
+const edge = porId('edge'), iph = porId('iphone-aprimorada'), chrome = porId('chrome-win'), ffx = porId('firefox-win'), iphb = porId('iphone');
 const lu = iph.vozes.find(v => /^Luciana \(Aprimorada\)$/.test(v.name)); const fe = Object.assign({}, lu, { name: 'Felipe (Aprimorado)', voiceURI: lu.voiceURI.replace('Luciana', 'Felipe'), default: false });
 const EXTRA = [
   copia(edge, { id: 'windows-antigo', nome: 'Windows antigo (só as vozes locais)', atraso: 0, parcial: false, vozes: edge.vozes.filter(v => v.localService !== false) }),
   copia(iph, { id: 'iphone-dois-aprimorados', nome: 'iPhone com Luciana e Felipe aprimorados', vozes: iph.vozes.concat([fe]).sort((a, b) => a.name.localeCompare(b.name, 'pt')) }),
-  copia(chrome, { id: 'chrome-sem-rede', nome: 'Chrome no Windows 11, sem internet', atraso: 0, falha: 'Google' })];
+  copia(chrome, { id: 'chrome-sem-rede', nome: 'Chrome no Windows 11, sem internet', atraso: 0, falha: 'Google' }),
+  /* 5.0b.1 */
+  copia(ffx, { id: 'firefox-win-daniel', nome: 'Firefox no Windows 11, com Maria e Daniel', vozes: ffx.vozes.concat([Object.assign({}, ffx.vozes[0], { name: 'Microsoft Daniel Desktop - Portuguese(Brazil)', voiceURI: 'urn:moz-tts:sapi:Microsoft Daniel Desktop - Portuguese(Brazil)?pt-BR', default: false })]) }),
+  copia(iphb, { id: 'iphone-sem-felipe', nome: 'iPhone sem o Felipe (homens só robóticos)', vozes: iphb.vozes.filter(v => !/^Felipe$/.test(v.name)) }),
+  { id: 'android', nome: 'Chrome no Android', ua: 'Mozilla/5.0 (Linux; Android 15; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Mobile Safari/537.36', atraso: 200,
+    vozes: [['English United States', 'en-US', true], ['português Brasil', 'pt-BR'], ['português Portugal', 'pt-PT'], ['español España', 'es-ES']].map(([name, lang, d]) => ({ name, lang, voiceURI: name, localService: true, default: !!d })) }];
 /* o que cada aparelho tem de fazer: voz da Sylvia, voz dos outros quatro e do locutor (null = sem voz em português: só a legenda) */
-const ESPERA = { edge: [/Francisca/, /Antonio/, /Francisca/], 'edge-sem-rede': [/^Microsoft Maria\b/, /^Microsoft Daniel\b/, /^Microsoft Maria\b/], 'chrome-win': [/^Google português do Brasil$/, /^Google português do Brasil$/, /^Google português do Brasil$/],
-  'firefox-win': [/Maria Desktop/, /Maria Desktop/, /Maria Desktop/], iphone: [/^Luciana$/, /^Felipe$/, /^Luciana$/], 'iphone-aprimorada': [/^Luciana \(Aprimorada\)$/, /^Luciana \(Aprimorada\)$/, /^Luciana \(Aprimorada\)$/],
+const ESPERA = { edge: [/Francisca/, /Antonio/, /Francisca/], 'edge-sem-rede': [/^Microsoft Maria\b/, /^Microsoft Daniel\b/, /^Microsoft Maria\b/], 'chrome-win': [/^Google português do Brasil$/, /^Microsoft Daniel\b/, /^Google português do Brasil$/] /* 5.0b.1: antes, a Google para todos */,
+  'firefox-win': [/Maria Desktop/, /Maria Desktop/, /Maria Desktop/], iphone: [/^Luciana$/, /^Felipe$/, /^Luciana$/], 'iphone-aprimorada': [/^Luciana \(Aprimorada\)$/, /^Felipe$/, /^Luciana \(Aprimorada\)$/] /* 5.0b.1: antes, a Luciana Aprimorada para todos */,
   'sem-voz': [null, null, null], 'windows-antigo': [/^Microsoft Maria\b/, /^Microsoft Daniel\b/, /^Microsoft Maria\b/], 'iphone-dois-aprimorados': [/^Luciana \(Aprimorada\)$/, /^Felipe \(Aprimorado\)$/, /^Luciana \(Aprimorada\)$/],
-  'chrome-sem-rede': [/^Microsoft Maria\b/, /^Microsoft Daniel\b/, /^Microsoft Maria\b/] };
+  'chrome-sem-rede': [/^Microsoft Maria\b/, /^Microsoft Daniel\b/, /^Microsoft Maria\b/],
+  'firefox-win-daniel': [/Maria Desktop/, /Daniel Desktop/, /Maria Desktop/], 'iphone-sem-felipe': [/^Luciana$/, /^Luciana$/, /^Luciana$/], android: [/^português Brasil$/, /^português Brasil$/, /^português Brasil$/] }; /* 5.0b.1 */
 const curto = n => n == null ? '—' : String(n).replace(/^Microsoft\s+/, '').replace(/\s*Online \(Natural\) - Portuguese \(Brazil\)/, ' (neural)').replace(/ - Portuguese \(Brazil\)/, '').replace(/ - Portuguese\(Brazil\)/, '');
 
 /* um "navegador" no Node: window com eventos, localStorage em memória, a imitação de fala do conjunto e o src/audio.js */
@@ -52,7 +61,7 @@ function confere(r) { const e = ESPERA[r.id]; if (!e) return { ok: false, porque
 
 async function navegador(rs) { /* a mesma regra na página do jogo (Chromium), com as vozes do Edge e do iPhone imitadas */
   const pw = require('playwright'); const b = await pw.chromium.launch({ headless: true, args: ['--no-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--allow-file-access-from-files', '--disable-dev-shm-usage'] }); const out = {};
-  for (const id of ['edge', 'iphone-dois-aprimorados']) { const set = SETS.concat(EXTRA).find(s => s.id === id); const ctx = await b.newContext({ viewport: { width: 1280, height: 800 }, userAgent: set.ua }); await ctx.addInitScript(`(${fake.toString()})(${JSON.stringify(set)})`);
+  for (const id of ['edge', 'chrome-win', 'iphone-dois-aprimorados']) { /* 5.0b.1: + Chrome do Windows */ const set = SETS.concat(EXTRA).find(s => s.id === id); const ctx = await b.newContext({ viewport: { width: 1280, height: 800 }, userAgent: set.ua }); await ctx.addInitScript(`(${fake.toString()})(${JSON.stringify(set)})`);
     const p = await ctx.newPage(); p.setDefaultTimeout(180000); const errs = []; p.on('pageerror', e => errs.push(e.message)); await p.goto('file://' + root + '/dist/local.html?fundo=classico', { waitUntil: 'load' }); await p.waitForFunction(() => window.ARD && ARD.audio); await espera((set.atraso || 0) + 900);
     const r = await p.evaluate(async L => { const F = __fala, A = ARD.audio, res = {}; for (const [raca, nome, texto] of L) { F.log.length = 0; A.say(texto, 'sala-' + raca, 0); await new Promise(x => setTimeout(x, 120 + texto.length * 14)); res[nome] = (F.log[F.log.length - 1] || {}).voz || null; } F.log.length = 0; A.say('Construção concluída', 'built', 0); await new Promise(x => setTimeout(x, 400)); res.locutor = (F.log[0] || {}).voz || null; return res; }, LIDERES);
     out[id] = { vozes: r, erros: errs.slice(0, 3) }; await ctx.close(); }

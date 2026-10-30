@@ -9,6 +9,67 @@
 const M5 = ARD.m5 = ARD.m5 || {};
 const Q = new URLSearchParams(typeof location !== 'undefined' ? location.search : '');
 M5.up = Q.get('m5up') === 'fsr1' ? 'fsr1' : null; /* TAAU fica para quando houver o passe de velocidade (fase 3) */
+/* ---------- 5.0b.1: bloom igual ao do clássico ----------
+   O clássico usa o BloomEffect do pmndrs (postprocessing 6.39.5, mipmapBlur): limiar pela luminância em resolução cheia (a cor vezes
+   smoothstep(1, 1,35, luminância)), 8 níveis que reduzem à metade com o filtro de 13 amostras (sem as amostras de fora da imagem), a volta
+   com uma tenda de 9 amostras misturada ao nível do mesmo tamanho (mix(nível, ampliado, 0,72): pesos 0,28 · 0,20 · 0,15 · 0,10 · 0,08 · 0,05 ·
+   0,04 · 0,10, que somam 1) e a mistura "screen" do pmndrs (base + bloom − min(base × bloom, 1)) com intensidade 0,75. O BloomNode do r186
+   (o UnrealBloomPass) limiava em meia resolução, espalhava em 5 gaussianas com quase o mesmo peso (raio 0,62: 0,50 a 0,70) e somava
+   0,55 × 3 = 1,65 vez a luz que passa do limiar, 2,2 vezes a do clássico, com a maior parte em halos de 40 a 250 px. Aqui o mesmo
+   algoritmo do pmndrs em TSL, com 3 materiais (limiar, redução e ampliação: um pipeline cada) no lugar dos 7 do BloomNode.
+   Mesma interface do BloomNode para o Modo Foto (src/m5/foto.js): strength (o brilho do painel), set/getResolutionScale (fotos 2K e 4K
+   com o mesmo tamanho relativo), setSize e dispose. ?m5bloom=antigo volta ao BloomNode da 5.0b (comparação no aparelho). */
+M5.bloomAntigo = Q.get('m5bloom') === 'antigo';
+let BloomC = null;
+M5.bloomClassico = function (entrada, o) {
+  if (!BloomC) { const Tm = window.THREE_M5, L = window.TSL; const { Fn, vec2, uv, uniform, texture, luminance, smoothstep, mix, step, passTexture, context } = L;
+    const quad = new Tm.QuadMesh(); const tam = new Tm.Vector2(); let estado; /* undefined: o resetRendererState do r186 só cria o estado sem argumento */
+    const alvo = nome => { const t = new Tm.RenderTarget(1, 1, { depthBuffer: false, type: Tm.HalfFloatType }); t.texture.name = nome; t.texture.generateMipmaps = false; return t; };
+    BloomC = class ArdBloomNode extends Tm.TempNode {
+      static get type() { return 'ArdBloomNode'; }
+      constructor(inputNode, op) { super('vec4'); op = op || {};
+        this.inputNode = inputNode;
+        this.strength = uniform(op.intensidade != null ? op.intensidade : 0.75); /* intensity do pmndrs (o nome do BloomNode: o Modo Foto muda) */
+        this.radius = uniform(op.raio != null ? op.raio : 0.72); this.threshold = uniform(op.limiar != null ? op.limiar : 1); this.smoothWidth = uniform(op.suave != null ? op.suave : 0.35);
+        this.niveis = op.niveis || 8; this._escala = 1; /* o limiar em resolução cheia, como o LuminancePass do pmndrs */
+        this._lum = alvo('ard-bloom-limiar'); this._desce = []; this._sobe = [];
+        for (let i = 0; i < this.niveis; i++) this._desce.push(alvo('ard-bloom-desce' + i));
+        for (let i = 0; i < this.niveis - 1; i++) this._sobe.push(alvo('ard-bloom-sobe' + i)); /* o sobe0 (metade da tela) é a saída */
+        this._saida = passTexture(this, this._sobe[0].texture);
+        this._mLum = null; this._mDesce = null; this._mSobe = null;
+        this.updateBeforeType = Tm.NodeUpdateType.FRAME; }
+      getTextureNode() { return this._saida; }
+      setResolutionScale(s) { this._escala = s; return this; }
+      getResolutionScale() { return this._escala; }
+      setSize(w, h) { let x = Math.max(1, Math.round(w * this._escala)), y = Math.max(1, Math.round(h * this._escala)); this._lum.setSize(x, y);
+        for (let i = 0; i < this.niveis; i++) { x = Math.max(1, Math.round(x * 0.5)); y = Math.max(1, Math.round(y * 0.5)); this._desce[i].setSize(x, y); if (i < this._sobe.length) this._sobe[i].setSize(x, y); } } /* Math.round(0,5 × lado) por nível, como o MipmapBlurPass */
+      updateBefore(frame) { const r = frame.renderer; estado = Tm.RendererUtils.resetRendererState(r, estado);
+        const s = r.getDrawingBufferSize(tam); this.setSize(s.width, s.height);
+        r.setRenderTarget(this._lum); quad.material = this._mLum; quad.render(r);
+        let ent = this._lum; const D = this._mDesce, S = this._mSobe;
+        quad.material = D; for (let i = 0; i < this._desce.length; i++) { D.ardTex.value = ent.texture; D.ardTexel.value.set(1 / ent.width, 1 / ent.height); r.setRenderTarget(this._desce[i]); quad.render(r); ent = this._desce[i]; }
+        quad.material = S; for (let i = this._sobe.length - 1; i >= 0; i--) { S.ardTex.value = ent.texture; S.ardBase.value = this._desce[i].texture; S.ardTexel.value.set(1 / ent.width, 1 / ent.height); r.setRenderTarget(this._sobe[i]); quad.render(r); ent = this._sobe[i]; }
+        Tm.RendererUtils.restoreRendererState(r, estado); }
+      setup(builder) { const ctx = context(builder.getSharedContext()); const nm = (n, f) => { const m = new Tm.NodeMaterial(); m.contextNode = ctx; m.fragmentNode = f; if (M5.registrar) M5.registrar(n, m); else m.name = 'ard-' + n; return m; };
+        /* limiar: a cor vezes smoothstep(limiar, limiar + suave, luminância), como o LuminanceMaterial com colorOutput */
+        if (!this._mLum) this._mLum = nm('bloom-limiar', Fn(() => { const c = this.inputNode; return c.mul(smoothstep(this.threshold, this.threshold.add(this.smoothWidth), luminance(c.rgb))); })());
+        /* redução: o DownsamplingMaterial do pmndrs (4 amostras de dentro × 0,125, 8 de fora e o centro × 0,05556; fora da imagem pesa 0) */
+        if (!this._mDesce) { const tx = texture(this._lum.texture), tl = uniform(new Tm.Vector2(1, 1)); const W1 = 0.125, W2 = 0.05556;
+          this._mDesce = nm('bloom-desce', Fn(() => { const c = uv(); const borda = p => step(0, p.x).mul(step(p.x, 1)).mul(step(0, p.y)).mul(step(p.y, 1));
+            const a = (dx, dy, w) => { const p = c.add(tl.mul(vec2(dx, dy))); return tx.sample(p).mul(borda(p).mul(w)); };
+            return a(-1, 1, W1).add(a(1, 1, W1)).add(a(-1, -1, W1)).add(a(1, -1, W1)).add(a(-2, 2, W2)).add(a(0, 2, W2)).add(a(2, 2, W2)).add(a(-2, 0, W2)).add(a(2, 0, W2)).add(a(-2, -2, W2)).add(a(0, -2, W2)).add(a(2, -2, W2)).add(tx.sample(c).mul(W2)); })());
+          this._mDesce.ardTex = tx; this._mDesce.ardTexel = tl; }
+        /* ampliação: o UpsamplingMaterial do pmndrs (tenda 3×3 no nível de baixo) misturado ao nível do mesmo tamanho pelo raio */
+        if (!this._mSobe) { const tx = texture(this._lum.texture), bs = texture(this._lum.texture), tl = uniform(new Tm.Vector2(1, 1));
+          this._mSobe = nm('bloom-sobe', Fn(() => { const c = uv(); const t = (dx, dy, w) => tx.sample(c.add(tl.mul(vec2(dx, dy)))).mul(w);
+            const soma = t(-1, 1, 0.0625).add(t(0, 1, 0.125)).add(t(1, 1, 0.0625)).add(t(-1, 0, 0.125)).add(tx.sample(c).mul(0.25)).add(t(1, 0, 0.125)).add(t(-1, -1, 0.0625)).add(t(0, -1, 0.125)).add(t(1, -1, 0.0625));
+            return mix(bs.sample(c), soma, this.radius); })());
+          this._mSobe.ardTex = tx; this._mSobe.ardBase = bs; this._mSobe.ardTexel = tl; }
+        return this._saida; }
+      dispose() { super.dispose(); for (const t of [this._lum].concat(this._desce, this._sobe)) t.dispose(); for (const m of [this._mLum, this._mDesce, this._mSobe]) if (m) m.dispose(); }
+    }; }
+  return new BloomC(window.TSL.nodeObject(entrada), o);
+};
 M5.buildPost = function (X, scene, camera, q, opts) {
   opts = opts || {}; const Tm = window.THREE_M5, L = window.TSL, A = window.THREE_M5_ADDONS; const r = X.renderer;
   const { pass, uniform, texture, float, vec2, vec3, vec4, mix, smoothstep, clamp, max, min, exp, abs, pow, dot, length, distance, uv, getViewPosition, renderOutput, step, luminance, convertToTexture } = L;
@@ -34,7 +95,8 @@ M5.buildPost = function (X, scene, camera, q, opts) {
   const GU = { uGain: uniform(new Tm.Vector3(1.03, 1.0, 0.97)), uLift: uniform(new Tm.Vector3(0, 0, 0.004)), uSat: uniform(1.08), uCon: uniform(1.06), uVig: uniform(0.28) };
   const touch = matchMedia('(pointer: coarse)').matches;
   const cauda = src => { let c = src, bloomN = null; /* bloom → gradação → tons → AA */
-    if (!off.has('bloom') && A.bloom) { bloomN = A.bloom(c, 0.55, 0.62, 1.0); bloomN.smoothWidth.value = 0.35; c = vec4(c.rgb.add(bloomN.rgb), 1); }
+    if (!off.has('bloom') && M5.bloomAntigo && A.bloom) { bloomN = A.bloom(c, 0.55, 0.62, 1.0); bloomN.smoothWidth.value = 0.35; c = vec4(c.rgb.add(bloomN.rgb), 1); } /* ?m5bloom=antigo: o BloomNode da 5.0b */
+    else if (!off.has('bloom')) { bloomN = M5.bloomClassico(c); const b = bloomN.rgb.mul(bloomN.strength); c = vec4(c.rgb.add(b).sub(min(c.rgb.mul(b), 1)), 1); } /* 5.0b.1: o bloom do clássico (BloomEffect do pmndrs, mipmapBlur) e a mistura "screen" dele */
     { let col = c.rgb.mul(GU.uGain).add(GU.uLift); const l = luminance(col); col = mix(vec3(l), col, GU.uSat); col = pow(max(col.div(0.18), vec3(0)), vec3(GU.uCon)).mul(0.18); const dv = distance(uv(), vec2(0.5)); col = col.mul(float(1).sub(GU.uVig.mul(smoothstep(0.35, 0.85, dv)))); c = vec4(col, 1); }
     c = renderOutput(c); /* ACES do renderer (toneMapping) e sRGB (outputColorSpace) */
     if (!off.has('aa')) c = touch ? A.fxaa(c) : A.smaa(c);

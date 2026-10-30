@@ -329,7 +329,7 @@ function create(THREE, scene, env) {
   const R = Math.random, TAU = Math.PI * 2, TK = (ARD.sim && ARD.sim.TICK) || 0.1;
   const M5 = !!(ARD.m5 && ARD.m5.active && ARD.m5.active()); /* 5.0b: Motor 5 — fitas e sprites em TSL, mesma CPU */
   const uni = v => (M5 ? window.TSL.uniform(v) : { value: v });
-  const U = { clock: uni(0), res: { value: new THREE.Vector2(1280, 720) }, minPx: uni(0.85), near: uni(1), semPos: uni(0), gama: uni(1.5) /* 5.0b: sem pós, a saída do clássico (ARD.fx3d.inversoSaida) */, expo: M5 && ARD.m5.foto && ARD.m5.foto.exposicao ? (ARD.m5.foto.exposicao() || uni(1)) : uni(1) /* 5.0b (junção): a exposição em uso (ARD.m5.u.exposicao do Modo Foto; 1 na partida) */ }, uAged = uni(0), uDyn = uni(0);
+  const U = { clock: uni(0), res: { value: new THREE.Vector2(1280, 720) }, minPx: uni(0.85), near: uni(1), semPos: (M5 && ARD.m5.u && ARD.m5.u.semPos) || uni(0) /* 5.0b.1: o ARD.m5.u.semPos do núcleo */, gama: uni(1.5) /* 5.0b: sem pós, a saída do clássico (ARD.fx3d.inversoSaida) */, expo: M5 && ARD.m5.foto && ARD.m5.foto.exposicao ? (ARD.m5.foto.exposicao() || uni(1)) : uni(1) /* 5.0b (junção): a exposição em uso (ARD.m5.u.exposicao do Modo Foto; 1 na partida) */ }, uAged = uni(0), uDyn = uni(0);
   const mat = (vs, fs, ut) => M5 ? m5Arma(vs === VS_P, ut, U) /* 5.0b: TSL */ : new THREE.ShaderMaterial({ uniforms: { uTime: ut, uClock: U.clock, uRes: U.res, uMinPx: U.minPx, uNear: U.near }, vertexShader: vs, fragmentShader: fs, transparent: true, depthWrite: false, depthTest: true, blending: THREE.CustomBlending, blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, side: THREE.DoubleSide, fog: false }); /* dois lados: a fita é montada na tela e o anel deitado gira com o voo; mistura pré-multiplicada: alfa 0 soma luz (aditivo), alfa > 0 é corpo que cobre o fundo e segura a cor de dia */
   const mSd = mat(VS_S, FS_S, uDyn), mSa = mat(VS_S, FS_S, uAged), mPd = mat(VS_P, FS_P, uDyn), mPa = mat(VS_P, FS_P, uAged); /* mesmo código: 2 programas para os 4 lotes */
   const _rv = new THREE.Vector2(); function onBR(renderer) { const rt = renderer.getRenderTarget(); if (rt) U.res.value.set(rt.width, rt.height); else { renderer.getDrawingBufferSize(_rv); U.res.value.copy(_rv); } }
@@ -657,12 +657,13 @@ function create(THREE, scene, env) {
       if (((frameNo * 7) % 3) === 0) light(t[0], t[2], 14, dev ? DEVL : p.l, 0.45, lead * 3.2, 1); },
     frame(dt, t, camera) { lead = Math.min(0.1, Math.max(0.001, dt || 1 / 60)); time = t;
       let w = 0; for (let j = 0; j < nAct; j++) { const s = act[j]; if (sSeen[s] === frameNo) { act[w++] = s; continue; } endShell(s, t); sIn[s] = 0; sId[s] = -1; sHas[s] = 0; } nAct = w;
-      U.clock.value = t; uAged.value = t; uDyn.value = 0; if (camera && camera.near) U.near.value = camera.near; if (M5) U.semPos.value = env.semPos && env.semPos() ? 1 : 0; /* 5.0b */
+      U.clock.value = t; uAged.value = t; uDyn.value = 0; if (camera && camera.near) U.near.value = camera.near; if (M5 && U.semPos !== ARD.m5.u.semPos) U.semPos.value = env.semPos && env.semPos() ? 1 : 0; /* 5.0b; 5.0b.1: só sem o uniform do núcleo */
       flush(SD); flush(SA); flush(PD); flush(PA); frameNo++;
       if (M5) { SA.m.visible = t <= SA.fim + 0.05; PA.m.visible = t <= PA.fim + 0.05; } /* 5.0b: lote envelhecido sem nada vivo fica fora do desenho (CPU do WebGPU por objeto); o pipeline já nasceu na carga */ },
     /* 4.3g: contagens para o relatório e a QA (pico de instâncias dinâmicas, nascimentos nos lotes envelhecidos) */
     stats() { return { emVoo: nAct, fitasDinPico: SD.peak, spritesDinPico: PD.peak, fitasNascidas: SA.born, spritesNascidos: PA.born, capFitas: SA.cap, capSprites: PA.cap, chamadas: 4, programas: 2 }; },
   };
+  if (M5) { CB.m5SemPos = U.semPos; CB.m5Malhas = [SD.m, SA.m, PD.m, PA.m]; } /* 5.0b.1: o Modo Foto sem pós (src/m5/foto.js) desenha estas fitas e sprites depois da conversão de tons, crus, como o clássico */
   return CB;
 }
 ARD.combat3d = { create, STYLE, PAL, ARS, m5: true /* 5.0b: portado para o Motor 5 (TSL) */ };

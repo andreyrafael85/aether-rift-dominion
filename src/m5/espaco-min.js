@@ -69,7 +69,7 @@ E.nebulosa = function (renderer, size, seed) {
   E.nebulosaMs = Math.round(performance.now() - t0); return rt;
 };
 
-/* ---------- céu em modo espaço (o ardEspaco do world3d; 5.0b: com o planeta gigante do M5.espacoPlaneta): d = direção normalizada, u = uniforms do céu ---------- */
+/* ---------- céu em modo espaço (o ardEspaco do world3d; o do céu da fundação, M5.fase1.ceu): d = direção normalizada, u = uniforms do céu ---------- */
 E.cor = function (d, u, neb) {
   const L = window.TSL; const { vec3, float, floor, fract, dot, mix, smoothstep, step, pow, exp, max, min, length, fwidth, cubeTexture } = L;
   const hs3 = p => { const q = fract(p.mul(0.1031)); const q2 = q.add(dot(q, q.zyx.add(31.32))); return fract(q2.x.add(q2.y).mul(q2.z)); };
@@ -79,7 +79,7 @@ E.cor = function (d, u, neb) {
     const b = pow(h.y, 9).mul(5).add(0.22).mul(gain); const tc = mix(mix(vec3(0.7, 0.82, 1.0), vec3(1), h.z.div(0.62)), mix(vec3(1), vec3(1.0, 0.76, 0.5), h.z.sub(0.62).div(0.38)), step(0.62, h.z));
     return tc.mul(k.mul(b).mul(keep)); };
   let col = neb ? cubeTexture(neb, d).rgb.mul(u.uNight.mul(0.25).add(1)) : vec3(0.0012, 0.0018, 0.004); /* o clássico clareia a nebulosa 25% à noite (uSpaceK.x) */
-  let pm = float(1); const PLN = M5.espacoPlaneta ? M5.espacoPlaneta(d, u) : null; if (PLN) { col = mix(col.add(PLN.halo), PLN.cor.rgb, PLN.cor.a); pm = float(1).sub(PLN.cor.a); } /* 5.0b: o planeta gigante (src/m5/espaco.js; o space3d liga) tapa as estrelas e o sol */
+  const pm = float(1); /* 5.0b.1: sem o planeta gigante (o M5.espacoPlaneta saiu; o céu de espaço da partida é o do src/m5/terreno.js) */
   const bd = dot(d, vec3(0.38, 0.33, 0.865)), band = exp(bd.mul(bd).mul(-16));
   const st = star(d, 280, band.mul(0.22).add(0.05), 0.17, 0.5).add(star(d.zxy, 110, 0.035, 0.11, 1.5)).add(star(d.yzx, 560, band.mul(0.35).add(0.06), 0.2, 0.2));
   col = col.add(st.mul(u.uNight.mul(0.5).add(0.8)).mul(pm));

@@ -10,21 +10,24 @@ const MUNDOS = {
   vehnar: { lider: 'Barão-Forja', nome: 'Kessari', tip: 'mundo-forja das fundições', ceu: { elev: 6.5, az: 214, turb: 9.5, ray: 1.4, mie: 0.007, g: 0.86, nuv: 0.46, den: 0.6, ganho: 0.075, tinta: [1.0, 0.84, 0.7] }, hemi: [0xffb27a, 0x2a1a12, 0.3],
     chao: [0x3b2c24, 0x77553a, 0x1a1411], rocha: 0x4b403b, brilho: 0xff5a14, rug: 0.93, relevo: { amp: 13, f: 0.011, crista: 64 }, flora: ['obsidiana', 'respiro', 'cinza', 'boulder', 'respiro'], ar: 'brasa', nevoa: [0x3a2418, 260, 1500],
     fala: 'Barão-Forja na linha. As fornalhas de Kessari estão acesas, comandante.' },
-  erevane: { lider: 'Vesper Ísk', nome: 'Ísk', tip: 'arquipélago das refinarias', ceu: { elev: 1.2, az: 200, turb: 3.2, ray: 2.6, mie: 0.004, g: 0.8, nuv: 0.32, den: 0.42, ganho: 0.14, tinta: [0.78, 0.92, 1.0] }, hemi: [0x9fd0ff, 0x10202c, 0.34],
+  erevane: { lider: 'Vesper Ísk', nome: 'Ísk', tip: 'arquipélago das refinarias', ceu: { elev: 1.2, az: 200, turb: 3.2, ray: 2.6, mie: 0.004, g: 0.8, nuv: 0.32, den: 0.42, ganho: 0.14, tinta: [0.78, 0.92, 1.0], vis: 2.0 /* 5.0b.1 */ }, hemi: [0x9fd0ff, 0x10202c, 0.34],
     chao: [0x8a99a6, 0xd4e2ea, 0x3b4a56], rocha: 0x37434e, brilho: 0x33ffd0, rug: 0.32, relevo: { amp: 5, f: 0.009, crista: 52 }, flora: ['geada', 'cristal', 'boulder', 'geada'], ar: 'neve', nevoa: [0x1c2a38, 300, 1700],
     fala: 'Vesper Ísk. Ninguém nos vê chegar. Ninguém nos vê partir.' },
-  tessara: { lider: 'Sylvia Oriel' /* 5.0a.3: era Sylva */, nome: 'Oriel', tip: 'estufas e jardins vivos', ceu: { elev: 11, az: 228, turb: 6, ray: 2.0, mie: 0.006, g: 0.8, nuv: 0.5, den: 0.5, ganho: 0.12, tinta: [0.86, 1.0, 0.86] }, hemi: [0xbaffc8, 0x14260f, 0.32],
+  tessara: { lider: 'Sylvia Oriel' /* 5.0a.3: era Sylva */, nome: 'Oriel', tip: 'estufas e jardins vivos', ceu: { elev: 11, az: 228, turb: 6, ray: 2.0, mie: 0.006, g: 0.8, nuv: 0.5, den: 0.5, ganho: 0.12, tinta: [0.86, 1.0, 0.86], vis: 1.25 /* 5.0b.1 */ }, hemi: [0xbaffc8, 0x14260f, 0.32],
     chao: [0x2f4a26, 0x5c7a3a, 0x1c2a17], rocha: 0x4a5040, brilho: 0x7bff9a, rug: 0.88, relevo: { amp: 11, f: 0.013, crista: 58 }, flora: ['folhagem', 'samambaia', 'flor', 'fungo', 'folhagem'], ar: 'esporo', nevoa: [0x1f3324, 240, 1500],
     fala: 'Sylvia Oriel. Oriel cresce. E quem resiste vira adubo.' /* 5.0a.3: era Sylva */ },
   quorith: { lider: 'Zayin Coral', nome: 'Quor', tip: 'cavernas de cristal ressonante', ceu: { elev: -2.5, az: 208, turb: 2.4, ray: 3.2, mie: 0.003, g: 0.76, nuv: 0.26, den: 0.36, ganho: 0.2, tinta: [0.9, 0.8, 1.0] }, hemi: [0xb79cff, 0x140f24, 0.42],
     chao: [0x2a2340, 0x5a4a86, 0x15111f], rocha: 0x3b3456, brilho: 0xc08cff, rug: 0.55, relevo: { amp: 9, f: 0.012, crista: 70 }, flora: ['cristal', 'marco_rocha', 'cristal', 'boulder'], ar: 'cristal', nevoa: [0x1a1430, 260, 1600],
     fala: 'Zayin Coral. O Coro canta em uma só voz. Afine-se, comandante.' },
-  vorag: { lider: 'Oru Voraz', nome: 'Velk', tip: 'ninhos sob a crosta', ceu: { elev: 4, az: 222, turb: 11, ray: 1.1, mie: 0.009, g: 0.88, nuv: 0.52, den: 0.62, ganho: 0.11, tinta: [1.0, 0.74, 0.7] }, hemi: [0xff8a7a, 0x260c0e, 0.3],
+  vorag: { lider: 'Oru Voraz', nome: 'Velk', tip: 'ninhos sob a crosta', ceu: { elev: 4, az: 222, turb: 11, ray: 1.1, mie: 0.009, g: 0.88, nuv: 0.52, den: 0.62, ganho: 0.11, tinta: [1.0, 0.74, 0.7], vis: 2.0 /* 5.0b.1 */ }, hemi: [0xff8a7a, 0x260c0e, 0.3],
     chao: [0x3a1a1c, 0x6a2e2c, 0x1c0b0c], rocha: 0x4a2a2a, brilho: 0xff3a4a, rug: 0.62, relevo: { amp: 12, f: 0.014, crista: 60 }, flora: ['fungo', 'espinho', 'seco', 'fungo'], ar: 'esporo-vermelho', nevoa: [0x2a1012, 240, 1450],
     fala: 'Oru Voraz. A fome de Velk não tem fim.' },
 };
 const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'];
-const TETO_CEU = { joelho: 0.6, teto: 1.3, sol: 4.0 }; /* 5.0a.2: o céu visível passa a comprimir acima do joelho e não passa do teto (abaixo do limiar do bloom em sala.js); sol = brilho do disco contido */
+const TETO_CEU = { joelho: 0.6, teto: 1.3, sol: 4.0, vis: 1.5 }; /* 5.0a.2: o céu visível passa a comprimir acima do joelho e não passa do teto (abaixo do limiar do bloom em sala.js); sol = brilho do disco contido.
+  5.0b.1: vis = ganho a mais do céu VISÍVEL, antes da compressão (o céu da luz de ambiente fica como estava); cada mundo pode ter o seu (MUNDOS[...].ceu.vis:
+  Ísk e Velk 2,0, Oriel 1,25); fora do celular (ceu().set). O brilho do pôr do sol que o bloom antigo espalhava sobre a metade de cima da tela volta como céu, abaixo do limiar do bloom:
+  no Kessari em 1920×1080 a tela fica 6,8% mais clara só com ele, sem tocar no fundo em volta do líder (o céu fica acima dele) */
 /* cores dos planetas (as mesmas paletas do world3d.PLANETS: escuro → claro) e o que cada um tem */
 const PLANETAS = {
   vehnar: { pl: [0x1a120c, 0x5a3a22, 0xa06a3a, 0xe6b070], atmo: 0xff9a4a, noite: 0xff6a1a, anel: 0xc8a27a },
@@ -80,7 +83,7 @@ function chaoDe(C, race) { terrenoMat(C); const U = C.U.chao, M = MUNDOS[race] |
   U.pa.value = P[0]; U.px.value = P[1]; U.pz.value = P[2]; U.pamp.value = P[3]; U.poff.value = P[4]; }
 /* ---------- céu físico (SkyMesh em TSL, com nuvens) com ganho, tinta e estrelas por mundo; o mesmo céu, menor, assa a luz de ambiente ---------- */
 function ceu(C) { const { W, T, SkyMesh } = C.L; const { vec3, vec4, float, normalize, positionWorld, cameraPosition, floor, fract, dot, smoothstep, max, min, sin, time, hash, length, luminance } = T;
-  const U = { ganho: T.uniform(0.12), tinta: T.uniform(new W.Color(1, 1, 1)), estrelas: T.uniform(0.0), teto: T.uniform(TETO_CEU.teto), sol: T.uniform(TETO_CEU.sol) };
+  const U = { ganho: T.uniform(0.12), tinta: T.uniform(new W.Color(1, 1, 1)), estrelas: T.uniform(0.0), teto: T.uniform(TETO_CEU.teto), sol: T.uniform(TETO_CEU.sol), vis: T.uniform(TETO_CEU.vis) /* 5.0b.1 */ };
   const stars = (dir, sc, th) => { const q = dir.mul(sc), c = floor(q), r = hash(c.x.add(c.y.mul(57.0)).add(c.z.mul(113.0))); const o = vec3(hash(c.x.add(7.1)), hash(c.y.add(3.3)), hash(c.z.add(9.9))).mul(0.6).add(0.2);
     const l = length(fract(q).sub(o)); return smoothstep(0.12, 0.0, l).mul(smoothstep(th, 1.0, r)).mul(sin(time.mul(r.mul(3.0).add(1.0)).add(r.mul(60.0))).mul(0.3).add(0.7)); };
   /* 5.0a.2: as altas luzes do céu são comprimidas acima de TETO_CEU.joelho (curva suave até o teto, com o tom preservado). Perto do sol o céu do SkyMesh
@@ -91,14 +94,14 @@ function ceu(C) { const { W, T, SkyMesh } = C.L; const { vec3, vec4, float, norm
      o disco do sol (de 1.000), que virava reflexos estourados nas peças lisas: o brilho do sol nelas vem da luz direcional */
   const comprime = (col, teto) => { const J = float(TETO_CEU.joelho), L = luminance(col), ex = max(L.sub(J), 0), Lc = min(L, J).add(ex.div(ex.div(teto.sub(J)).add(1))); return col.mul(Lc.div(max(L, 1e-4))); };
   const make = (scale, comEstrelas) => { const s = new SkyMesh(); s.scale.setScalar(scale); const base = s.material.colorNode; const dir = normalize(positionWorld.sub(cameraPosition));
-    let col = base.rgb.mul(U.ganho).mul(U.tinta); s.showSunDisc.value = 0; if (comEstrelas) col = comprime(col, U.teto);
+    let col = base.rgb.mul(U.ganho).mul(U.tinta); s.showSunDisc.value = 0; if (comEstrelas) col = comprime(col.mul(U.vis), U.teto); /* 5.0b.1: o ganho a mais do céu visível entra antes da compressão (o teto continua 1,3) */
     if (comEstrelas) { const sd = normalize(s.sunPosition), disco = smoothstep(0.99985, 0.99996, dot(dir, sd)).mul(smoothstep(-0.02, 0.03, sd.y)); /* raio de 0,5° a 1°; some com o sol abaixo do horizonte */
       col = max(col, T.mix(vec3(1.0, 0.52, 0.24), vec3(1.0, 0.93, 0.84), smoothstep(0.0, 0.3, sd.y)).mul(disco).mul(U.sol)); }
     if (comEstrelas) col = col.add(vec3(0.85, 0.9, 1.0).mul(stars(dir, 170.0, 0.965).mul(1.4).add(stars(dir, 360.0, 0.982))).mul(U.estrelas).mul(smoothstep(-0.02, 0.2, dir.y)));
     s.material.colorNode = vec4(col, 1); s.material.fog = false; s.frustumCulled = false; return s; };
   const sky = make(4000, true), envSky = make(400, false); envSky.cloudCoverage.value = 0.2;
-  const set = race => { const K = (MUNDOS[race] || MUNDOS.vehnar).ceu; for (const s of [sky, envSky]) { s.turbidity.value = K.turb; s.rayleigh.value = K.ray; s.mieCoefficient.value = K.mie; s.mieDirectionalG.value = K.g; }
-    sky.cloudCoverage.value = K.nuv; sky.cloudDensity.value = K.den; U.ganho.value = K.ganho; U.tinta.value.setRGB(K.tinta[0], K.tinta[1], K.tinta[2]); U.estrelas.value = K.elev < 3 ? 1 : K.elev < 8 ? 0.45 : 0.15; };
+  const set = (race, cel) => { const K = (MUNDOS[race] || MUNDOS.vehnar).ceu; for (const s of [sky, envSky]) { s.turbidity.value = K.turb; s.rayleigh.value = K.ray; s.mieCoefficient.value = K.mie; s.mieDirectionalG.value = K.g; }
+    sky.cloudCoverage.value = K.nuv; sky.cloudDensity.value = K.den; U.ganho.value = K.ganho; U.tinta.value.setRGB(K.tinta[0], K.tinta[1], K.tinta[2]); U.estrelas.value = K.elev < 3 ? 1 : K.elev < 8 ? 0.45 : 0.15; U.vis.value = cel ? 1 : K.vis != null ? K.vis : TETO_CEU.vis; /* 5.0b.1: um mundo pode ter o seu; no celular (cel), nada a mais: lá o líder fica no alto da tela e o céu entra no fundo em volta dele (com o ganho a mais, o holograma perdia de 11% a 19% de contraste no celular em pé) */ };
   return { sky, envSky, U, set }; }
 /* direção do sol do mundo (para o céu, a luz e os planetas) */
 function solDir(race, out) { const K = (MUNDOS[race] || MUNDOS.vehnar).ceu; const phi = (90 - K.elev) * Math.PI / 180, th = K.az * Math.PI / 180; out.setFromSphericalCoords(1, phi, th); return out; }

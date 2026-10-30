@@ -21,8 +21,13 @@ M5.instMat = function (m, base) { const { Fn, attribute, mat4, vec4, positionLoc
   const pre = base && typeof base.ardPre === 'function' ? base.ardPre : null; if (pre) base = null; /* 5.0b: passo prévio da fase 2 (animação por peça e ruína, src/m5/modelos.js): mexe em positionLocal e normalLocal no espaço do modelo, antes da instância */
   m.positionNode = Fn(b => { const p = base || positionLocal; return b.object && b.object.isM5Inst ? iM.mul(vec4(p, 1)).xyz : p; })();
   if (pre) m.positionNode.ardPre = pre; /* 5.0b: o material de sombra copia o positionNode e roda o mesmo passo */
-  const sp = m.setupPosition; m.setupPosition = function (b) { if (pre) pre(b); /* 5.0b */ if (b.object && b.object.isM5Inst && b.hasGeometryAttribute('normal')) normalLocal.assign(transformNormal(normalLocal, iM)); return sp.call(this, b); };
+  const sp = m.setupPosition; m.setupPosition = function (b) { if (this.userData && this.userData.ardFragFixo) M5.fragFixo(b); /* 5.0b.1 */ if (pre) pre(b); /* 5.0b */ if (b.object && b.object.isM5Inst && b.hasGeometryAttribute('normal')) normalLocal.assign(transformNormal(normalLocal, iM)); return sp.call(this, b); };
   m.userData.m5Inst = true; return m; }; /* a fábrica M5.instancia só cria M5.Inst para material marcado */
+/* 5.0b.1: numeração fixa das variáveis do fragmento. O r186 numera as variáveis sem nome (nodeVarN) com um contador só para o vértice e o fragmento:
+   materiais com o mesmo fragmento e vértices diferentes (a ruína e os modelos: queda e animação) saíam com nomes deslocados no fragmento e não
+   dividiam o módulo. Ao começar a gerar o fragmento, o contador pula para 500 (o vértice usa bem menos): o fragmento sai igual nos dois */
+M5.fragFixo = function (b) { if (!b || b.__ardFragFixo || typeof b.setShaderStage !== 'function') return; b.__ardFragFixo = true; const ss = b.setShaderStage;
+  b.setShaderStage = function (st) { ss.call(this, st); if (st === 'fragment' && this.buildStage === 'generate') { if (this.vars) this.vars._var = Math.max(this.vars._var || 0, 500); if (this.uniforms && typeof this.uniforms.index === 'number') this.uniforms.index = Math.max(this.uniforms.index, 500); } }; }; /* as variáveis e os uniforms sem nome (nodeVarN, nodeUniformN) */
 M5.instCor = function (cor) { const { Fn, attribute } = L(); return Fn(b => (b.object && b.object.isM5Inst ? cor.mul(attribute('iC', 'vec3')) : cor))(); };
 
 /* ---------- unidades e construções: cor, rugosidade e metal por vértice (color, rm), cor do time e tinta por instância, rim por Raça, clarões ----------
@@ -40,7 +45,7 @@ M5.modelo = function (o) {
   if (G && G.superficie) G.superficie(ctx); /* fase 2: detalhe de superfície (colorNode/normalNode/roughnessNode) */
   if (G && G.emissivo) em = G.emissivo(ctx) || em;
   let pAnim = null; if (G && G.posicao && (!o.noAnim || o.ruina /* 5.0b: a ruína (noAnim) também monta a posição no gancho */)) pAnim = G.posicao(ctx) || null; /* fase 2: animação por peça, na posição local do modelo (a sombra usa o mesmo positionNode) */
-  M5.instMat(m, pAnim); m.colorNode = M5.instCor(L().materialColor); /* 5.0a.1: M5.Inst */
+  M5.instMat(m, pAnim); m.colorNode = M5.instCor(L().materialColor); /* 5.0a.1: M5.Inst */ m.userData.ardFragFixo = true; /* 5.0b.1: o fragmento dos modelos e da ruína com a mesma numeração */
   m.emissiveNode = em;
   return M5.registrar('modelo-' + (o.key || 'base'), m);
 };
@@ -51,6 +56,7 @@ M5.emissivo = function (o) {
   o = o || {}; const m = new (T().MeshBasicNodeMaterial)({ vertexColors: true });
   const G = M5.ganchos && M5.ganchos.modelo; let pAnim = null; if (G && G.posicao && (!o.noAnim || o.ruina /* 5.0b: idem na parte emissiva da ruína */)) pAnim = G.posicao({ m, o, emissivo: true }) || null;
   M5.instMat(m, pAnim); m.colorNode = M5.instCor(L().materialColor); /* 5.0a.1: M5.Inst */
+  if (M5.modelos && M5.modelos.ativo && M5.modelos.emRuina && !/[?&]m5ruina=1/.test(location.search)) { M5.modelos.emRuina(m); m.userData.ardFragFixo = true; } /* 5.0b.1: o apagar das luzes da ruína em toda parte emissiva (queda 0 nos modelos): um fragmento só para as duas */
   return M5.registrar('emissivo-' + (o.key || 'base'), m);
 };
 
@@ -62,6 +68,14 @@ M5.emissivo = function (o) {
 M5.luzFendaChao = function (wn, pw) { const { float, max, dot, length, clamp, pow } = L(); const FL = M5.u.fendaLuz, lv = FL.xyz.sub(pw), ld = length(lv); const corte = clamp(float(1).sub(pow(ld.div(FL.w), 4)), 0, 1);
   return M5.u.fendaCor.mul(float(1 / Math.PI).mul(max(dot(wn, lv.div(max(ld, 0.001))), 0)).mul(corte.mul(corte)).div(max(ld.mul(ld), 0.01))); };
 M5.vazioMascara = function (pw) { return M5.tex.vazio.sample(M5.mapUV(pw)).r.sub(0.5).mul(128).greaterThanEqual(CORTE); };
+/* 5.0b.1: geometria com as duas faces explícitas: o verso repete os vértices com a normal trocada e os triângulos na ordem inversa. Uma malha
+   que o clássico desenha com DoubleSide passa a usar o material FrontSide de outra (o paredão da Fenda usa o próprio material do chão: um
+   módulo de WGSL e um pipeline a menos). O verso sai como no DoubleSide do r186, que troca a normal pela faceDirection. */
+M5.duasFaces = function (g) { const Tm = T(); const n = g.attributes.position.count, out = new Tm.BufferGeometry();
+  for (const k in g.attributes) { const a = g.attributes[k], s = a.itemSize, src = a.array; const arr = new src.constructor(n * 2 * s); arr.set(src.subarray(0, n * s)); arr.set(src.subarray(0, n * s), n * s); if (k === 'normal') for (let i = n * s; i < 2 * n * s; i++) arr[i] = -arr[i]; out.setAttribute(k, new Tm.BufferAttribute(arr, s, a.normalized)); }
+  const idx = g.index ? g.index.array : null, m = idx ? idx.length : n, ni = new (n * 2 > 65535 ? Uint32Array : Uint16Array)(m * 2);
+  for (let i = 0; i < m; i += 3) { const a = idx ? idx[i] : i, b = idx ? idx[i + 1] : i + 1, c = idx ? idx[i + 2] : i + 2; ni[i] = a; ni[i + 1] = b; ni[i + 2] = c; ni[m + i] = a + n; ni[m + i + 1] = c + n; ni[m + i + 2] = b + n; }
+  out.setIndex(new Tm.BufferAttribute(ni, 1)); out.computeBoundingSphere(); return out; };
 
 /* ---------- uniforms do chão no formato do terrU do render3d (cada um com .value) ---------- */
 M5.terrUniforms = function (tx) {
@@ -112,8 +126,8 @@ M5.chao = function (U, o) {
   alb = alb.mul(macro.mul(0.28).add(0.86));
   if (o.fora) { const sl = smoothstep(250, 340, pw.y.add(macro.sub(0.5).mul(90))).mul(float(1).sub(smoothstep(0.35, 0.6, slope))); alb = mix(alb, vec3(0.78, 0.82, 0.88).mul(soft.mul(0.1).add(0.9)), sl); rough = mix(rough, 0.7, sl); }
   alb = alb.mul(mix(0.72, 1.0, aoc.x));
-  let vzCorte = null; if (o.vazio && M5.espacoPleno && M5.espacoPleno()) { const vb = M5.espacoBorda({ m, U, gp, pw, alb, fine, soft, macro }); alb = vb.alb; vzCorte = vb.corte; } /* 5.0b: com o space3d portado, a borda do clássico (src/m5/espaco.js): corte a 18 da borda, beirada clara e cascalho nas pontes */
-  else if (o.vazio) { const paredao = smoothstep(PAR0, PAR1, pw.y.negate()); alb = alb.mul(float(1).sub(paredao)); rough = mix(rough, 0.85, paredao); tEmis = tEmis.add(vec3(0.006, 0.009, 0.022).mul(float(1).sub(M5.u.noite.mul(0.4))).mul(paredao)); } /* Cinturão sem o space3d: o paredão de rocha vai para a poeira escura do espaço perto do fundo (a mesma do clássico), sem luz (5.0a.1: o corte agora é no vazio, não na altura) */
+  let vzCorte = null; /* 5.0b.1: sem o ramo do M5.espacoBorda: com o space3d na partida o chão é o do src/m5/terreno.js; este chão da fundação só serve à bancada (?chao=fase1), que não tem o espaço completo */
+  if (o.vazio) { const paredao = smoothstep(PAR0, PAR1, pw.y.negate()); alb = alb.mul(float(1).sub(paredao)); rough = mix(rough, 0.85, paredao); tEmis = tEmis.add(vec3(0.006, 0.009, 0.022).mul(float(1).sub(M5.u.noite.mul(0.4))).mul(paredao)); } /* Cinturão sem o space3d: o paredão de rocha vai para a poeira escura do espaço perto do fundo (a mesma do clássico), sem luz (5.0a.1: o corte agora é no vazio, não na altura) */
   const CG = M5.ganchos && M5.ganchos.chao; if (CG && CG.cor) alb = CG.cor({ m, o, alb, Bw, gp }) || alb; /* fase 2: camadas e triplanar */
   if (!o.fora) {
     const wuv = vec2(gp.x.div(U.worldSize), gp.y.div(U.worldSize));
@@ -186,7 +200,15 @@ M5.atmo = function (col, pw, it) {
   const c = uniform(new Tm.Color(col)); const f = pow(max(float(1).sub(abs(dot(normalize(normalView), positionViewDirection))), 0), pw);
   m.colorNode = c.mul(f).mul(it); m.opacityNode = f.mul(it); return M5.registrar('atmo', m);
 };
-M5.fixHalos = function (group) { if (!group) return; group.traverse(o => { const mm = o.material; if (!mm || !mm.isShaderMaterial) return; const U = mm.uniforms || {}; const col = U.col ? U.col.value : 0xffffff, pw = U.pw ? U.pw.value : 2, it = U.it ? U.it.value : 1; mm.dispose(); o.material = M5.atmo(col, pw, it); }); };
+M5.fixHalos = function (group) { if (!group) return; group.traverse(o => { const mm = o.material; if (!mm || !mm.isShaderMaterial) return; const U = mm.uniforms || {}; const col = U.col ? U.col.value : 0xffffff, pw = U.pw ? U.pw.value : 2, it = U.it ? U.it.value : 1; mm.dispose(); o.material = M5.atmo(col, pw, it); }); M5.luaComoPlaneta(group); };
+/* 5.0b.1: a lua e o planeta do mundo natal num shader só: a lua ganha mapa e mapa emissivo brancos de 1×1 com o filtro e o espaço de cor da
+   textura do planeta (com filtro Nearest o r186 leria por textureLoad e o código mudaria) e emissivo preto: cor × 1, emissivo 0, a mesma imagem;
+   os dois materiais geram o mesmo WGSL (um módulo e um pipeline a menos) */
+M5.luaComoPlaneta = function (group) { if (QS.get('m5lua') === '0') return; /* ?m5lua=0: medida */ const Tm = T(); let pl = null; const sem = [];
+  group.traverse(o => { const m = o.isMesh && o.material; if (!m || !m.isMeshStandardMaterial || m.isNodeMaterial) return; if (m.map && m.emissiveMap) pl = m; else if (!m.map && !m.emissiveMap) sem.push(m); });
+  if (!pl) return; const tx = pl.map; for (const m of sem) { if (m.fog !== pl.fog || m.vertexColors !== pl.vertexColors || m.transparent !== pl.transparent || m.side !== pl.side || m.flatShading !== pl.flatShading) continue;
+    const w = new Tm.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1); w.colorSpace = tx.colorSpace; w.magFilter = tx.magFilter; w.minFilter = tx.minFilter; w.generateMipmaps = tx.generateMipmaps; w.wrapS = tx.wrapS; w.wrapT = tx.wrapT; w.anisotropy = tx.anisotropy; w.needsUpdate = true;
+    m.map = w; m.emissiveMap = w; m.emissive.setRGB(0, 0, 0); m.emissiveIntensity = pl.emissiveIntensity; m.needsUpdate = true; } };
 
 /* ---------- feixes de luz subindo da Fenda (era ShaderMaterial): faixas que sobem devagar, mais fortes à noite ---------- */
 M5.feixeFenda = function () {
@@ -196,6 +218,7 @@ M5.feixeFenda = function () {
   const vu = uv(); const streak = n(vu.x.mul(40)).mul(0.6).add(n(vu.x.mul(13).add(u.uTime.mul(0.2))).mul(0.4)); const rise = sin(vu.y.mul(9).sub(u.uTime.mul(1.2)).add(vu.x.mul(20))).mul(0.4).add(0.6);
   const fade = smoothstep(0.0, 0.12, vu.y).mul(float(1).sub(smoothstep(0.35, 1.0, vu.y))); const a = streak.mul(rise).mul(fade).mul(u.uNight.mul(0.08).add(0.05));
   const m = new Tm.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, blending: Tm.AdditiveBlending, side: Tm.DoubleSide }); m.fog = false;
+  m.forceSinglePass = QS.get('m5feixe') !== '0'; /* 5.0b.1: regra 10 da carga — aditivo de duas faces numa passada (a soma não depende da ordem): um pipeline em vez de dois */
   m.colorNode = vec3(1.0, 0.45, 0.9).mul(a); m.opacityNode = a; m.uniforms = u; return M5.registrar('feixe-fenda', m);
 };
 

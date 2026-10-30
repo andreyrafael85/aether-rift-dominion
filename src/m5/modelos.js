@@ -51,7 +51,7 @@ function marcador(pre, nome) { const mk = L().positionLocal.toVar('ardPos'); mk.
 /* sem pós (Baixa, celular): o clássico soma o aditivo em sRGB depois dos tons e o Motor 5 em linear antes deles; com o alfa elevado a 2,2
    a pegada volta à do clássico (regra 11 da carga). Um uniform só, atualizado uma vez por quadro (M5.cur.post é o RenderPipeline do pós) */
 let semPos = null;
-function semPosU() { if (!semPos) semPos = L().uniform(0).onFrameUpdate(() => (M5.cur && M5.cur.post ? 0 : 1)); return semPos; }
+function semPosU() { if (!semPos) semPos = M5.u.semPos || L().uniform(0).onFrameUpdate(() => (M5.cur && M5.cur.post ? 0 : 1)); return semPos; } /* 5.0b.1: o ARD.m5.u.semPos do núcleo (o mesmo do terreno e dos efeitos) */
 let expo = null; function expoU() { return expo || (expo = (M5.foto && M5.foto.exposicao && M5.foto.exposicao()) || L().uniform(1)); } /* 5.0b (junção): a exposição em uso (ARD.m5.u.exposicao do Modo Foto; 1 na partida) */
 
 /* ---------- animação por peça (ANIM_GLSL, 4.2b): aAnim = [tipo, pivô xyz], aAnimB = parâmetros; aInst = [distância, tempo, movimento, recuo],
@@ -129,7 +129,7 @@ function prePano(builder) {
    pt por peça: 1 painéis, 2 borracha, 3 poros, 4 quitina, 5 pedra, 6 rocha; 0 liso. Tudo o que é usado em mais de um ramo é Var no escopo de fora
    (o TSL declara a variável onde ela é gerada primeiro: um valor criado dentro de um If e lido fora sairia sem valor) */
 function superficieNo() {
-  const { Fn, If, Var, float, vec2, vec3, abs, floor, fract, min, max, mix, step, smoothstep, length, dot, sqrt, fwidth, select, positionGeometry, normalGeometry } = L();
+  const { Fn, If, Loop, Var, float, vec2, vec3, abs, floor, fract, min, max, mix, step, smoothstep, length, dot, sqrt, fwidth, select, positionGeometry, normalGeometry } = L();
   return Fn(() => {
     const pl = positionGeometry, an = Var(abs(normalGeometry), 'ardSn');
     const pt = Var(floor(M5.attr('pt', float(0)).add(0.5)), 'ardSpt');
@@ -155,8 +155,8 @@ function superficieNo() {
         h.assign(gr.mul(-0.7)); alb.assign(float(1).sub(gr.mul(0.18))); rgh.assign(gr.mul(0.05));
       }).ElseIf(pt.lessThan(4.5), () => { /* 3 poros (osso, pele) e 4 células (quitina, úmido): Voronoi 3×3 */
         const p = uv.mul(select(pt.lessThan(3.5), float(2.6), float(1.5))); const i = Var(floor(p), 'ardVi'), f = Var(fract(p), 'ardVf');
-        let d1 = float(8), d2 = float(8);
-        for (let y = -1; y <= 1; y++) for (let x = -1; x <= 1; x++) { const o = vec2(x, y); const io = i.add(o); const r = o.add(vec2(H2(io), H2(io.add(17)))).sub(f); const d = Var(dot(r, r)); const n2 = Var(min(d2, max(d, d1))); d1 = Var(min(d1, d)); d2 = n2; }
+        const d1 = Var(float(8), 'ardVq1'), d2 = Var(float(8), 'ardVq2');
+        Loop({ start: -1, end: 1, condition: '<=', name: 'sy' }, { start: -1, end: 1, condition: '<=', name: 'sx' }, ({ sy, sx }) => { const o = vec2(float(sx), float(sy)); const io = i.add(o); const r = o.add(vec2(H2(io), H2(io.add(17)))).sub(f); const d = Var(dot(r, r)); d2.assign(min(d2, max(d, d1))); d1.assign(min(d1, d)); }); /* 5.0b.1: as 9 células num laço do WGSL (antes 9 cópias coladas), na mesma ordem */
         const D1 = Var(sqrt(d1), 'ardVd1'), D2 = sqrt(d2);
         const pore = Var(float(1).sub(smoothstep(0, 0.16, D1)), 'ardV3'), edge = Var(float(1).sub(smoothstep(0, 0.09, D2.sub(D1))), 'ardV4'); const p3 = Var(pt.lessThan(3.5), 'ardV34');
         h.assign(select(p3, pore.mul(-0.6).add(VN(uv.mul(7)).mul(0.25)), edge.mul(-0.7).add(D1.mul(0.3))));
@@ -188,6 +188,13 @@ function perturba(sx0, sy0, sn, dh, fd) {
   return select(l.greaterThan(1e-12), n.mul(inverseSqrt(max(l, 1e-30))), sn);
 }
 
+/* 5.0b.1: a ruína e os modelos com o mesmo fragmento (um módulo de WGSL a menos, ~50 KB, e outro na parte emissiva). A queda (aDie) e a peça
+   (aPiece.w) chegam ao fragmento por varyings com nome, que nos modelos valem 0 (o vértice escreve a constante): o escurecimento e as brasas da
+   ruína ficam no fragmento de todos e, com queda 0, não mudam nada (as brasas ficam num If, os modelos não pagam o ruído). Um varying por material
+   (o mesmo nó no escurecimento e nas brasas: dois nós com o mesmo nome declarariam a variável duas vezes). ?m5ruina=1 volta ao de antes (medida) */
+const RUINA_SEP = typeof location !== 'undefined' && /[?&]m5ruina=1/.test(location.search);
+function quedaV(ctx) { if (!ctx.ardQueda) ctx.ardQueda = L().varying(M5.attr('aDie', L().vec4(0, 0, 0, 0)), 'ardQueda'); return ctx.ardQueda; }
+function pecaV(ctx) { if (!ctx.ardPeca) ctx.ardPeca = L().varying(M5.attr('aPiece', L().vec4(0, 0, 0, 0)).w, 'ardPeca'); return ctx.ardPeca; }
 /* ---------- ganchos do material dos modelos (ARD.m5.modelo e ARD.m5.emissivo da fundação chamam na montagem) ---------- */
 const G = M5.ganchos = M5.ganchos || { modelo: { posicao: null, superficie: null, emissivo: null }, chao: { cor: null }, adereco: { posicao: null } };
 G.modelo = G.modelo || {};
@@ -210,7 +217,8 @@ G.modelo.superficie = function (ctx) {
   m.setupDiffuseColor = function (builder) {
     sup.call(this, builder);
     const s = Var(surf, 'ardSurf'); cur = s;
-    let k = s.y; if (ruina) k = k.mul(mix(float(1), float(0.24), smoothstep(0, 1.8, attribute('aDie', 'vec4').x))); /* ruína: escurece (4.3f) */
+    let k = s.y; if (ruina && RUINA_SEP) k = k.mul(mix(float(1), float(0.24), smoothstep(0, 1.8, attribute('aDie', 'vec4').x))); /* ruína: escurece (4.3f) */
+    else if (!RUINA_SEP) k = k.mul(mix(float(1), float(0.24), smoothstep(0, 1.8, quedaV(ctx).x))); /* 5.0b.1: o mesmo escurecimento em todo modelo (queda 0: ×1) */
     diffuseColor.rgb.mulAssign(k);
     const sx = Var(dFdx(positionView), 'ardSdx'), sy = Var(dFdy(positionView), 'ardSdy'), dh = Var(vec2(dFdx(s.x), dFdy(s.x)).mul(0.9), 'ardSdh');
     normalView.assign(select(s.x.notEqual(0), perturba(sx, sy, normalView, dh, faceDirection), normalView));
@@ -220,19 +228,23 @@ G.modelo.superficie = function (ctx) {
 };
 /* emissivo: clarões e rim (uniforms) da fundação; na ruína somam as brasas (4.3f) */
 G.modelo.emissivo = function (ctx) {
-  prepara(); const o = ctx.o || {}; if (o.ruina !== 'main') return ctx.em;
-  const { float, vec3, sin, smoothstep, attribute, positionGeometry } = L();
-  const die = attribute('aDie', 'vec4').x, pc = M5.attr('aPiece', L().vec4(0, 0, 0, 0)).w, pl = positionGeometry;
-  const emb = smoothstep(0.1, 0.6, die).mul(float(1).sub(smoothstep(4, 16, die)));
-  const nz = VN(pl.xz.mul(2.4).add(pl.y.mul(1.3)).add(pc.mul(3.1))).mul(0.6).add(VN(pl.zy.mul(6).add(pl.x.mul(2))).mul(0.4));
-  const fl = sin(die.mul(9).add(nz.mul(23))).mul(0.25).add(0.75);
-  return ctx.em.add(vec3(1, 0.3, 0.06).mul(emb.mul(fl).mul(smoothstep(0.7, 0.8, nz)).mul(1.3)));
+  prepara(); const o = ctx.o || {}; if (RUINA_SEP ? o.ruina !== 'main' : ctx.emissivo) return ctx.em; /* 5.0b.1: as brasas no fragmento de todo modelo (queda 0: nada) */
+  const { float, vec3, sin, smoothstep, attribute, positionGeometry, Var, If } = L();
+  const die = RUINA_SEP ? attribute('aDie', 'vec4').x : quedaV(ctx).x, pc = RUINA_SEP ? M5.attr('aPiece', L().vec4(0, 0, 0, 0)).w : pecaV(ctx), pl = positionGeometry;
+  const brasas = () => { const emb = smoothstep(0.1, 0.6, die).mul(float(1).sub(smoothstep(4, 16, die)));
+    const nz = VN(pl.xz.mul(2.4).add(pl.y.mul(1.3)).add(pc.mul(3.1))).mul(0.6).add(VN(pl.zy.mul(6).add(pl.x.mul(2))).mul(0.4));
+    const fl = sin(die.mul(9).add(nz.mul(23))).mul(0.25).add(0.75);
+    return vec3(1, 0.3, 0.06).mul(emb.mul(fl).mul(smoothstep(0.7, 0.8, nz)).mul(1.3)); };
+  if (RUINA_SEP) return ctx.em.add(brasas());
+  const br = L().Fn(() => { const b = Var(vec3(0, 0, 0), 'ardBrasa'); If(die.greaterThan(0.1), () => { b.assign(brasas()); }); return b; })(); /* 5.0b.1: abaixo de 0,1 s de queda as brasas valem 0 (smoothstep(0,1; 0,6)): o modelo não calcula o ruído */
+  return ctx.em.add(br);
 };
 }
 /* parte emissiva da ruína: as luzes apagam (4.3f) */
 M5.modelos.emRuina = function (m) {
-  const { float, smoothstep, attribute, diffuseColor } = L(); const sup = Object.getPrototypeOf(m).setupDiffuseColor;
-  m.setupDiffuseColor = function (builder) { sup.call(this, builder); diffuseColor.rgb.mulAssign(float(1).sub(smoothstep(0, 1.1, attribute('aDie', 'vec4').x))); };
+  if (m.userData.ardEmQueda) return m; m.userData.ardEmQueda = true; /* 5.0b.1: uma vez por material (o M5.emissivo já liga em todo modelo) */
+  const { float, smoothstep, attribute, diffuseColor } = L(); const sup = Object.getPrototypeOf(m).setupDiffuseColor; const ctx = {};
+  m.setupDiffuseColor = function (builder) { sup.call(this, builder); diffuseColor.rgb.mulAssign(float(1).sub(smoothstep(0, 1.1, RUINA_SEP ? attribute('aDie', 'vec4').x : quedaV(ctx).x))); }; /* 5.0b.1: pela queda em varying (0 nos modelos: ×1), o mesmo fragmento na parte emissiva da ruína e dos modelos */
   return m;
 };
 
@@ -330,7 +342,18 @@ M5.escudo = function () {
 M5.pano = function (tex) {
   prepara(); const Tm = T();
   const m = new Tm.MeshStandardNodeMaterial({ map: tex, side: Tm.DoubleSide, roughness: 0.75, metalness: 0, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.25 }); m.envMapIntensity = 0.3;
-  M5.instMat(m, marcador(prePano, 'pano')); /* sem cor por instância: o mapa da Insígnia já é a cor */
+  M5.instMat(m, marcador(prePano, 'pano')); /* sem cor por instância: o mapa da Insígnia já é a cor */ m.userData.ardFragFixo = true; /* 5.0b.1: o mesmo fragmento do mastro */
   return M5.registrar('bandeira', m);
+};
+/* 5.0b.1: o mastro das bandeiras com o fragmento do pano (um módulo de ~27 KB a menos; era um MeshStandardMaterial à parte): mapa e mapa emissivo
+   brancos de 1×1 com o filtro, a repetição e o espaço de cor da Insígnia (com filtro Nearest o r186 leria por textureLoad e o código mudaria),
+   emissivo preto (cor × 1, emissivo 0: a mesma imagem), as duas faces como o pano (o cilindro é fechado: o verso nunca aparece) e a sombra pelo
+   verso, como no material de uma face. Instâncias por atributo (ARD.m5.Inst), sem a onda do pano */
+function preMastro(builder) { const { Fn, vec3, positionLocal } = L(); Fn(() => { positionLocal.assign(positionLocal.add(vec3(0, M5.u.tempo.mul(0), 0))); }, 'void')(); } /* 5.0b.1: o relógio do pano no vértice, multiplicado por 0 (nada se move): o bloco de uniforms sai igual ao da bandeira */
+M5.mastro = function () {
+  prepara(); const Tm = T(); const w = new Tm.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1); w.colorSpace = Tm.SRGBColorSpace; w.magFilter = Tm.LinearFilter; w.minFilter = Tm.LinearMipmapLinearFilter; w.generateMipmaps = true; w.wrapS = w.wrapT = Tm.ClampToEdgeWrapping; w.needsUpdate = true;
+  const m = new Tm.MeshStandardNodeMaterial({ color: 0x8a919b, map: w, side: Tm.DoubleSide, roughness: 0.4, metalness: 0.6, emissive: 0x000000, emissiveMap: w, emissiveIntensity: 0.25 }); m.shadowSide = Tm.BackSide; m.envMapIntensity = 1;
+  M5.instMat(m, marcador(preMastro, 'mastro')); m.userData.ardFragFixo = true;
+  return M5.registrar('mastro', m);
 };
 })(globalThis.ARD = globalThis.ARD || {});

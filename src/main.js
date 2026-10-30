@@ -29,7 +29,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.0b';
+const VERSION = '5.0b.1';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -264,10 +264,13 @@ function loadingInfo(cfg, netCtx) { try {
    anterior, que rodou dentro desse intervalo: CPU, simulação, desenho, passos e eventos da simulação, shaders ou pipelines criados, troca de
    resolução ou de qualidade, aba escondida e coleta de lixo provável (queda do performance.memory, amostrado a cada 6 quadros e atribuída ao
    pior quadro da janela). O teste de desempenho mostra os 5 piores quadros; ARD.detetive() devolve os 5 piores dos últimos 4096 quadros. */
-const DET = { N: 4096, n: 0, ms: new Float32Array(4096), cpu: new Float32Array(4096), sim: new Float32Array(4096), draw: new Float32Array(4096), steps: new Uint8Array(4096), ev: new Uint16Array(4096), comp: new Uint16Array(4096), fl: new Uint8Array(4096), memD: new Float32Array(4096), p: { cpu: 0, sim: 0, draw: 0, steps: 0, ev: 0, comp: 0, fl: 0 }, prog: -1, scale: -1, qual: '', mem: 0, memN: 0, m5: false };
+const DET = { N: 4096, n: 0, ms: new Float32Array(4096), cpu: new Float32Array(4096), sim: new Float32Array(4096), draw: new Float32Array(4096), steps: new Uint8Array(4096), ev: new Uint16Array(4096), comp: new Uint16Array(4096), fl: new Uint8Array(4096), memD: new Float32Array(4096), pos: new Float32Array(4096) /* 5.0b.1 */, p: { cpu: 0, sim: 0, draw: 0, steps: 0, ev: 0, comp: 0, fl: 0, pos: 0 }, prog: -1, scale: -1, qual: '', mem: 0, memN: 0, m5: false };
 const DF = { comp: 1, res: 2, qual: 4, gc: 8, passos: 16, oculto: 32 };
-function detPush(iv) { const D = DET, i = D.n % D.N, P = D.p; D.ms[i] = iv; D.cpu[i] = P.cpu; D.sim[i] = P.sim; D.draw[i] = P.draw; D.steps[i] = Math.min(255, P.steps); D.ev[i] = Math.min(65535, P.ev); D.comp[i] = Math.min(65535, P.comp); D.fl[i] = P.fl; D.memD[i] = 0; D.n++; }
-function detEnd(R, cpu, sim, draw, steps, ev) { const D = DET, P = D.p; P.cpu = cpu; P.sim = sim; P.draw = draw; P.steps = steps; P.ev = ev; let fl = 0; D.m5 = !!(R && R.m5);
+/* 5.0b.1: o tempo da linha principal depois do quadro (estilo, layout e pintura do HUD, envio do canvas): uma mensagem postada no fim do quadro
+   roda depois da atualização da tela; até ela chegar, o navegador ainda trabalhava. Sem isto, esse trabalho aparecia como "CPU folgada" */
+const DETMC = typeof MessageChannel === 'function' ? new MessageChannel() : null; if (DETMC) DETMC.port1.onmessage = () => { DET.p.pos = performance.now() - DET.fimQ; };
+function detPush(iv) { const D = DET, i = D.n % D.N, P = D.p; D.ms[i] = iv; D.pos[i] = P.pos; P.pos = 0; /* 5.0b.1 */ D.cpu[i] = P.cpu; D.sim[i] = P.sim; D.draw[i] = P.draw; D.steps[i] = Math.min(255, P.steps); D.ev[i] = Math.min(65535, P.ev); D.comp[i] = Math.min(65535, P.comp); D.fl[i] = P.fl; D.memD[i] = 0; D.n++; }
+function detEnd(R, cpu, sim, draw, steps, ev) { const D = DET, P = D.p; if (DETMC) { D.fimQ = performance.now(); DETMC.port2.postMessage(0); } /* 5.0b.1 */ P.cpu = cpu; P.sim = sim; P.draw = draw; P.steps = steps; P.ev = ev; let fl = 0; D.m5 = !!(R && R.m5);
   const pg = R && R.progs ? R.progs() : 0; P.comp = D.prog >= 0 ? Math.max(0, pg - D.prog) : 0; D.prog = pg; if (P.comp) fl |= DF.comp;
   const sc = R && R.dyn ? R.dyn.scale : 1; if (D.scale >= 0 && sc !== D.scale) fl |= DF.res; D.scale = sc;
   const qn = R && R.quality ? R.quality.resolved || '' : ''; if (D.qual && qn !== D.qual) fl |= DF.qual; D.qual = qn;
@@ -276,7 +279,8 @@ function detEnd(R, cpu, sim, draw, steps, ev) { const D = DET, P = D.p; P.cpu = 
 function detTop(from, to, k) { const D = DET; from = Math.max(from, to - D.N, 0); const best = []; for (let n = from; n < to; n++) { const i = n % D.N, v = D.ms[i]; if (best.length < k || v > D.ms[best[best.length - 1] % D.N]) { best.push(n); best.sort((a, b) => D.ms[b % D.N] - D.ms[a % D.N]); if (best.length > k) best.pop(); } }
   const r1 = v => Math.round(v * 10) / 10; return best.map(n => { const i = n % D.N, f = D.fl[i], ms = D.ms[i], cpu = D.cpu[i]; const out = [Math.round(ms) + ' ms', 'CPU ' + r1(cpu) + ' ms (simulação ' + r1(D.sim[i]) + ' · desenho ' + r1(D.draw[i]) + ')', D.steps[i] + (D.steps[i] === 1 ? ' passo' : ' passos') + ' da simulação', D.ev[i] + ' eventos'];
     if (f & DF.comp) out.push(D.comp[i] + (D.m5 ? ' pipelines criados' : ' shaders compilados')); if (f & DF.res) out.push('troca de resolução'); if (f & DF.qual) out.push('troca de qualidade'); if (f & DF.gc) out.push('coleta de lixo provável (−' + Math.round(D.memD[i]) + ' MB)'); if (f & DF.oculto) out.push('aba em segundo plano');
-    if (!(f & (DF.comp | DF.gc | DF.res | DF.qual)) && cpu < ms * 0.4) out.push('CPU folgada: espera da GPU, do compositor ou do navegador'); return out.join(' · '); }); }
+    if (D.pos[i] >= 0.05) out.push('depois do quadro ' + r1(D.pos[i]) + ' ms (estilo, layout, pintura e envio do canvas)'); /* 5.0b.1 */
+    if (!(f & (DF.comp | DF.gc | DF.res | DF.qual)) && cpu + D.pos[i] < ms * 0.4) out.push('CPU folgada: espera da GPU, do compositor ou do navegador'); /* 5.0b.1: a CPU conta também o trabalho depois do quadro */ return out.join(' · '); }); }
 ARD.detetive = (k) => detTop(0, DET.n, k || 5);
 
 // ---------- game ----------
@@ -375,7 +379,7 @@ function startGame(cfg, netCtx) {
     if (params.get('pitch')) view.cam.pitch = view.cam.pitchT = parseFloat(params.get('pitch'));
     if (params.get('yaw')) view.cam.yaw = parseFloat(params.get('yaw'));
     refreshPanel(true); G.last = performance.now();
-    requestAnimationFrame(frame);
+    proximo(frame); /* 5.0b.1: era requestAnimationFrame(frame) */
   });
 
   function tickOnce(silent) {
@@ -395,9 +399,11 @@ function startGame(cfg, netCtx) {
     if (G.camp) { const r = G.camp.tick(ev); if (r && !G.ended) endGame({ campaign: r }); }
     if (sim.tick % 10 === 0) updateMemory();
   }
+  function proximo(f) { if (R.m5 && ARD.m5 && ARD.m5.agendar) ARD.m5.agendar(R, f); else requestAnimationFrame(f); } /* 5.0b.1: o próximo quadro; no Motor 5 com ?laco=animloop é o laço do three (renderer.setAnimationLoop) que chama (src/m5/ritmo.js) */
   function frame(now) {
-    if (!G || G.sim !== sim) return; const fc0 = performance.now(); let simMs = 0, drawMs = 0; /* 4.3i: medidas do teste de desempenho */
-    if (G.save30 && now - G.lastDraw < 31) { requestAnimationFrame(frame); return; } G.lastDraw = now; // economia de bateria: até 30 quadros por segundo
+    if (!G || G.sim !== sim) { if (R.m5 && ARD.m5.pararLaco) ARD.m5.pararLaco(R); return; } const fc0 = performance.now(); let simMs = 0, drawMs = 0; /* 4.3i: medidas do teste de desempenho · 5.0b.1: com ?laco=animloop, o laço do three para junto */
+    if (R.m5 && ARD.m5.ritmoEspera && ARD.m5.ritmoEspera(R)) { proximo(frame); return; } /* 5.0b.1: ritmo contido (GPU por software ou ?ritmo=contido): o quadro anterior ainda está na GPU, este quadro de tela passa sem desenhar (src/m5/ritmo.js) */
+    if (G.save30 && now - G.lastDraw < 31) { proximo(frame); return; } G.lastDraw = now; // economia de bateria: até 30 quadros por segundo · 5.0b.1: proximo(frame)
     if (!document.hidden && !G.paused && !G.ended && now - G.perf.start < 6000) { G.perf.t0 = now; G.perf.frames = 0; } // aquecimento: shaders compilando não contam
     else if (!document.hidden && !G.paused && !G.ended) { const pf = G.perf; pf.frames++; const el = now - pf.t0; if (el >= 4000) { const fps = pf.frames * 1000 / el; G.fps = fps; pf.t0 = now; pf.frames = 0; // 4.0f: ajuste automático da qualidade 3D pelo FPS medido
       if (pf.auto && R.setQuality) { const L = ['baixa', 'media', 'alta', 'ultra'], LBL = { baixa: 'Baixa', media: 'Média', alta: 'Alta', ultra: 'Ultra' }; const cur = L.indexOf(R.quality.resolved || 'media'); const cap = G.save30 ? 24 : 26;
@@ -421,7 +427,7 @@ function startGame(cfg, netCtx) {
     detEnd(R, performance.now() - fc0, simMs, drawMs, G.detSteps || 0, G.detEv || 0); G.detSteps = 0; G.detEv = 0; /* 5.0a: detetive */
     if (G.lead3d && ARD.leaders3d && ARD.leaders3d.setLight && R.lightSt && (G.frameN % 15 === 0 || R.lightSt.flash > 0.2)) ARD.leaders3d.setLight(G.lead3d, R.lightSt); /* 4.3e: o retrato do líder recebe a luz do mapa (dia, noite, clima, relâmpago) */
     if (G.autoSave && !G.ended && sim.tick !== G.savedTick && now - (G.lastSave || 0) > 10000) { G.lastSave = now; G.savedTick = sim.tick; (window.requestIdleCallback || ((f) => setTimeout(f, 0)))(() => G.saveNow('auto'), { timeout: 2000 }); }
-    requestAnimationFrame(frame);
+    proximo(frame); /* 5.0b.1: era requestAnimationFrame(frame) */
   }
   G.frameN = 0;
 
@@ -511,7 +517,7 @@ function startGame(cfg, netCtx) {
     if (B.last) B.mt += Math.min(250, now - B.last); /* relógio do teste: só avança com o jogo rodando */
     const t = params.get('benchpasso') ? (B.vt = (B.vt || 0) + (+params.get('benchpasso') > 1 ? +params.get('benchpasso') : 1000 / 30)) : B.mt; /* ?benchpasso=1: tempo virtual por quadro (capturas iguais em qualquer máquina) */
     if (sim.time >= B.nextWave && G.benchWave) { B.nextWave = sim.time + 4; G.benchWave(); }
-    if (t > B.warm && B.last) { B.frames.push(now - B.last); if (!B.rec) { B.rec = true; B.prog1 = R.progs ? R.progs() : 0; if (R.gpuMs) R.gpuMs().length = 0; B.det0 = DET.n; /* 5.0a */ } } B.last = now; // intervalo real entre quadros (o dt do jogo é limitado a 250 ms)
+    if (t > B.warm && B.last) { B.frames.push(now - B.last); if (!B.rec) { B.rec = true; B.prog1 = R.progs ? R.progs() : 0; if (R.gpuMs) R.gpuMs().length = 0; B.det0 = DET.n; /* 5.0a */ if (R.m5 && ARD.m5.ritmoMarca) ARD.m5.ritmoMarca(R); /* 5.0b.1: o ritmo conta desde aqui */ } } B.last = now; // intervalo real entre quadros (o dt do jogo é limitado a 250 ms)
     const k = Math.max(0, Math.min(1, (t - B.warm) / B.dur)); const sm = x => x * x * (3 - 2 * x); const lerp = (p, q, f) => p + (q - p) * f;
     // trajeto: base A → batalha de perto → volta em órbita → panorama alto → base B
     const c = view.cam; let x, y, z, yaw, pitch;
@@ -530,14 +536,14 @@ function startGame(cfg, netCtx) {
     { const md = a => { if (!a || !a.length) return null; const s = a.slice().sort((p, q) => p - q); return s[Math.floor(s.length / 2)]; }, p95 = a => { if (!a || !a.length) return null; const s = a.slice().sort((p, q) => p - q); return s[Math.floor(s.length * 0.95)]; }, r1 = v => v == null ? null : Math.round(v * 10) / 10; /* 4.3i: onde vai o tempo do quadro */
       res.cpu = r1(md(B.cpu)); res.cpu95 = r1(p95(B.cpu)); res.simMs = r1(md(B.simT)); res.drawMs = r1(md(B.drawT)); const gm = B.gpu && R.gpuMs ? R.gpuMs() : null; res.gpuMs = gm && gm.length > 20 ? r1(md(gm)) : null; res.gpu95 = gm && gm.length > 20 ? r1(p95(gm)) : null; res.gpuN = gm ? gm.length : 0; /* 5.0a: quantas medidas de GPU */
       res.shaders = R.progs ? Math.max(0, R.progs() - (B.prog1 || B.prog0 || 0)) : null; if (R.loadT && R.loadT.total) res.carga = R.loadT; res.shaders0 = B.prog0 || null; if (R.dyn) res.escala = R.dyn.minSeen != null ? Math.round(R.dyn.minSeen * 100) + '–' + Math.round(R.dyn.maxSeen * 100) + '%' : null; if (R.gpuTimer) R.gpuTimer(false); }
-    res.motor = R.m5 ? (R.m5.isWebGPU ? '5 (WebGPU)' : '5 (WebGL2)') : R.is3d ? 'Clássico' : '2D'; if (R.m5) { res.motorInicio = R.m5.initMs; res.pipelines0 = R.m5.pipes - (res.shaders || 0); if (R.m5.adapter) res.gpu = R.m5.adapter + ' · ' + res.gpu; } res.detetive = detTop(B.det0 != null ? B.det0 : Math.max(0, DET.n - fr.length), DET.n, 5); /* 5.0a: motor, pipelines e os 5 piores quadros */
+    res.motor = R.m5 ? (R.m5.isWebGPU ? '5 (WebGPU)' : '5 (WebGL2)') : R.is3d ? 'Clássico' : '2D'; if (R.m5) { res.motorInicio = R.m5.initMs; res.pipelines0 = R.m5.pipes - (res.shaders || 0); if (R.m5.adapter) res.gpu = R.m5.adapter + ' · ' + res.gpu; } if (R.m5 && ARD.m5.ritmoInfo) res.laco = ARD.m5.ritmoInfo(R); /* 5.0b.1: a combinação do laço (?ritmo, ?ts, ?laco) e o que o ritmo viu */ { const a0 = B.det0 != null ? B.det0 : Math.max(0, DET.n - fr.length), v = []; for (let n = Math.max(a0, DET.n - DET.N); n < DET.n; n++) v.push(DET.pos[n % DET.N]); v.sort((p, q) => p - q); if (v.length) { res.posMs = Math.round(v[v.length >> 1] * 10) / 10; res.pos95 = Math.round(v[Math.floor(v.length * 0.95)] * 10) / 10; } } /* 5.0b.1: o trabalho do navegador depois do quadro */ res.detetive = detTop(B.det0 != null ? B.det0 : Math.max(0, DET.n - fr.length), DET.n, 5); /* 5.0a: motor, pipelines e os 5 piores quadros */
     try { localStorage.setItem('ard-bench-last', JSON.stringify(res)); } catch (e) {}
     G.paused = true; refreshTop(); window.__benchResult = res; showBench(res);
   }
   function showBench(res) {
     const box = $('benchbox'); if (!box) return; if (!res) { $('bench-verdict').textContent = 'Teste interrompido'; $('bench-verdict').className = 'bv warn'; $('bench-tip').textContent = 'O jogo ficou pausado ou em segundo plano durante a medição. Rode de novo com a tela acesa e sem trocar de aba.'; $('bench-table').innerHTML = ''; $('bench-feedback').hidden = true; $('bench-back').onclick = () => location.href = location.pathname; box.hidden = false; return; } $('bench-feedback').hidden = false; const verdict = res.fps >= 55 && res.p1 >= 35 ? ['Ótimo', 'good', 'Pode subir a qualidade.'] : res.fps >= 40 ? ['Bom', 'good', 'Fluido para jogar.'] : res.fps >= 26 ? ['Jogável', 'warn', 'Se travar em batalhas grandes, desça um degrau de qualidade.'] : ['Pesado', 'danger', 'Use a qualidade Baixa ou o modo 2D neste aparelho.'];
     $('bench-verdict').textContent = verdict[0]; $('bench-verdict').className = 'bv ' + verdict[1]; $('bench-tip').textContent = verdict[2];
-    $('bench-table').innerHTML = [['FPS médio', res.fps], ['Piores 1% dos quadros', res.p1 + ' fps'], ['Piores 5% dos quadros', res.p5 + ' fps'], ['Pior quadro', res.worst + ' ms'], ['Travadas (> 50 ms)', res.stutters + ' de ' + res.frames], ['Qualidade', res.quality], ['Resolução interna', res.res + (res.escala ? ' (escala ' + res.escala + ')' : '')], ['CPU por quadro', res.cpu != null ? res.cpu + ' ms (95%: ' + res.cpu95 + ' ms) · simulação ' + res.simMs + ' ms · desenho ' + res.drawMs + ' ms' : '—'], ['GPU por quadro', res.gpuMs != null ? res.gpuMs + ' ms (95%: ' + res.gpu95 + ' ms)' : res.gpuN ? 'poucos quadros medidos (' + res.gpuN + ')' : 'não medido neste navegador'] /* 5.0a */, ['Shaders compilados no teste', res.shaders != null ? res.shaders + (res.motor && res.motor[0] === '5' ? ' (pipelines criados no ' + res.motor.slice(3, -1) + ')' : '') : '—'], ['Carregamento', res.carga ? (res.carga.total / 1000).toFixed(1) + ' s (' + (res.carga.motor != null ? 'motor ' + (res.carga.motor / 1000).toFixed(2) + ' s · ' : '') + 'terreno ' + (res.carga.terreno / 1000).toFixed(1) + ' s · modelos ' + (res.carga.modelos / 1000).toFixed(1) + ' s · ' + (res.motor && res.motor[0] === '5' ? 'shaders e pipelines ' : 'shaders ') + (res.carga.shaders / 1000).toFixed(1) + ' s)' : '—'], ['Motor', res.motor || 'Clássico'], ['GPU', res.gpu]] /* 5.0a: linha do motor */.map(([k, v]) => `<div class="stat"><span>${esc(k)}</span><b>${esc(String(v))}</b></div>`).join('');
+    $('bench-table').innerHTML = [['FPS médio', res.fps], ['Piores 1% dos quadros', res.p1 + ' fps'], ['Piores 5% dos quadros', res.p5 + ' fps'], ['Pior quadro', res.worst + ' ms'], ['Travadas (> 50 ms)', res.stutters + ' de ' + res.frames], ['Qualidade', res.quality], ['Resolução interna', res.res + (res.escala ? ' (escala ' + res.escala + ')' : '')], ['CPU por quadro', res.cpu != null ? res.cpu + ' ms (95%: ' + res.cpu95 + ' ms) · simulação ' + res.simMs + ' ms · desenho ' + res.drawMs + ' ms' : '—'], ['Depois do quadro (estilo, layout, pintura)', res.posMs != null ? res.posMs + ' ms (95%: ' + res.pos95 + ' ms)' : '—'] /* 5.0b.1 */, ['GPU por quadro', res.gpuMs != null ? res.gpuMs + ' ms (95%: ' + res.gpu95 + ' ms)' : res.gpuN ? 'poucos quadros medidos (' + res.gpuN + ')' : (res.laco && !res.laco.ts && ARD.m5 && ARD.m5.semTs ? 'desligado (?ts=0)' : 'não medido neste navegador')] /* 5.0b.1 */ /* 5.0a */, ['Shaders compilados no teste', res.shaders != null ? res.shaders + (res.motor && res.motor[0] === '5' ? ' (pipelines criados no ' + res.motor.slice(3, -1) + ')' : '') : '—'], ['Carregamento', res.carga ? (res.carga.total / 1000).toFixed(1) + ' s (' + (res.carga.motor != null ? 'motor ' + (res.carga.motor / 1000).toFixed(2) + ' s · ' : '') + 'terreno ' + (res.carga.terreno / 1000).toFixed(1) + ' s · modelos ' + (res.carga.modelos / 1000).toFixed(1) + ' s · ' + (res.motor && res.motor[0] === '5' ? 'shaders e pipelines ' : 'shaders ') + (res.carga.shaders / 1000).toFixed(1) + ' s)' : '—'], ['Motor', res.motor || 'Clássico'], ...(res.laco && ARD.m5 && ARD.m5.ritmoTexto ? [['Laço (Motor 5)', ARD.m5.ritmoTexto(res.laco)]] : []) /* 5.0b.1 */, ['GPU', res.gpu]] /* 5.0a: linha do motor */.map(([k, v]) => `<div class="stat"><span>${esc(k)}</span><b>${esc(String(v))}</b></div>`).join('');
     { const dd = $('bench-det'); if (dd) { const L = res.detetive || []; dd.hidden = !L.length; dd.innerHTML = L.length ? '<b>Detetive de travadas: os 5 piores quadros</b><ol>' + L.map(s => '<li>' + esc(s) + '</li>').join('') + '</ol>' : ''; } } /* 5.0a */
     $('bench-feedback').href = feedbackUrl({ teste_desempenho_detalhe: JSON.stringify(res) }); $('bench-back').onclick = () => location.href = location.pathname; box.hidden = false;
   }
@@ -1038,7 +1044,8 @@ window.addEventListener('error', e => { const el = $('errbox'); if (el) { el.hid
 window.addEventListener('unhandledrejection', e => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent = 'Erro (promise): ' + (e.reason && (e.reason.stack || e.reason.message) || e.reason); } });
 document.addEventListener('DOMContentLoaded', initStart);
 if (params.get('debug')) { const oe = console.error, ow = console.warn; const cap = (...a) => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent += ' || ' + a.map(x => String(x && x.message || x)).join(' ').slice(0, 400); } }; console.error = (...a) => { cap(...a); oe.apply(console, a); }; console.warn = (...a) => { cap(...a); ow.apply(console, a); }; }
-for (const ev of ['pointerdown', 'keydown', 'touchstart']) document.addEventListener(ev, () => { ARD.audio.init(); ARD.audio.resume(); }, { passive: true });
+/* 5.0b.1: desbloqueio do som no primeiro gesto de verdade (touchend, click, pointerup, keydown; o pointerdown só do mouse, como antes no computador). No iOS o touchstart e o pointerdown do toque não valem para o áudio: com só eles (antes), o AudioContext ficava suspenso e as falas eram descartadas. ARD.audio.gesto confere o evento e faz o resto (src/audio.js), na captura para vir antes dos botões */
+for (const ev of ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown']) window.addEventListener(ev, e => ARD.audio.gesto(e), { passive: true, capture: true });
 if (params.get('debug')) setTimeout(() => {
   const out = [];
   out.push('vw=' + innerWidth + ' sw=' + document.documentElement.scrollWidth);

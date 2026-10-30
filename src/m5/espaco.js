@@ -10,8 +10,8 @@
    - redemoinho da Fenda e feixes (aditivos de duas faces numa passada, só cor: o alfa da camada fica como está) e o quadro que cola a camada na
      profundidade do céu;
    - no céu e no chão (5.0a.1 absorvida, sem duplicar): o céu de espaço continua o M5.ceu({ espaco }) do src/m5/espaco-min.js (nebulosa assada,
-     estrelas, sol), agora com o planeta gigante (M5.espacoPlaneta, que o space3d liga); o mapa do vazio é o mapaVazio de lá no M5.tex.vazio
-     compartilhado; o chão corta como o ARD_VAZIO do clássico (M5.espacoBorda, chamado pelo M5.chao); o ruído 3D é o mesmo (M5.espaco.ruido).
+     estrelas, sol), agora com o planeta gigante (o do M5.ceu do src/m5/terreno.js; 5.0b.1: o M5.espacoPlaneta daqui saiu); o mapa do vazio é o mapaVazio de lá no M5.tex.vazio
+     compartilhado; o chão corta como o ARD_VAZIO do clássico (no M5.chao do src/m5/terreno.js; 5.0b.1: o M5.espacoBorda daqui saiu); o ruído 3D é o mesmo (M5.espaco.ruido).
    Contrato com o space3d: U = uniforms compartilhados no formato do GLSL (nós do TSL com .value). Só visual. */
 (function (ARD) {
 'use strict';
@@ -133,42 +133,8 @@ M5.espacoQuadro = function (tex) {
   return M5.registrar('espaco-quadro', m);
 };
 
-/* planeta gigante do Cinturão no céu de espaço (o ardPlaneta e o ardHalo do céu do world3d; o M5.ceu({ espaco }) chama pelo E.cor do src/m5/espaco-min.js):
-   disco analítico de borda nítida, faixas e tempestades, terminador e atmosfera do lado do sol. O space3d liga (u.uPlanet.w = cosseno do raio < 1),
-   como no clássico; sem ele fica desligado (w = 2). A derivada fica fora dos ramos (o WGSL exige fluxo uniforme para o fwidth); o fbm é o do céu */
-M5.espacoPlaneta = function (d, u) {
-  const Tm = window.THREE_M5, L = window.TSL; const { Fn, If, uniform, vec3, vec4, float, dot, sqrt, max, fwidth, normalize, mix, smoothstep, pow, acos, clamp, exp, select } = L; const N = M5.espaco.ruido();
-  if (!u.uPlanet) { u.uPlanet = uniform(new Tm.Vector4(0, -1, 0, 2)); u.uPlanetL = uniform(new Tm.Vector3(0, 1, 0)); }
-  const P = u.uPlanet, PL = u.uPlanetL, liga = P.w.lessThan(1);
-  const cp = dot(d, P.xyz).toVar('plCp'), pw = max(fwidth(cp), 1e-5).toVar('plPw'), sr = sqrt(max(float(1).sub(P.w.mul(P.w)), 0)).toVar('plSr'), disc = cp.mul(cp).sub(float(1).sub(sr.mul(sr))).toVar('plDisc');
-  const hz = acos(clamp(cp, -1, 1)).sub(acos(clamp(P.w, -1, 1))).toVar('plHz');
-  const cor = Fn(() => { const c = vec4(0).toVar('plCor');
-    If(liga.and(cp.greaterThan(0)).and(disc.greaterThan(pw.mul(-4))), () => {
-      const n = d.mul(cp.sub(sqrt(max(disc, 0)))).sub(P.xyz).div(max(sr, 1e-5)).toVar('plN'); const lat = dot(n, normalize(vec3(0.18, 1.0, -0.22))).toVar('plLat');
-      const tb = N.f5(n.mul(3).add(1.3)), bands = N.f5(vec3(lat.mul(7).add(tb.mul(0.9)), lat.mul(2), 4.2)), storms = smoothstep(0.64, 0.8, N.f5(n.mul(7).add(2)));
-      const pc = mix(mix(vec3(0.014, 0.032, 0.07), vec3(0.08, 0.14, 0.21), smoothstep(0.3, 0.75, bands)), vec3(0.15, 0.12, 0.19), storms.mul(0.5)).toVar('plPc');
-      const lit = dot(n, PL), rim = pow(float(1).sub(max(dot(n, d.negate()), 0)), 4);
-      c.assign(vec4(pc.mul(smoothstep(-0.08, 0.6, lit)).mul(1.5).add(vec3(0.05, 0.15, 0.4).mul(rim).mul(smoothstep(-0.25, 0.3, lit)).mul(1.3)).add(pc.mul(0.012)), smoothstep(pw.mul(-2), pw.mul(2), disc))); });
-    return c; })();
-  const halo = Fn(() => { const h = vec3(0).toVar('plHalo');
-    If(liga.and(hz.greaterThan(0)).and(hz.lessThanEqual(0.12)), () => { const dd = d.sub(P.xyz.mul(cp)).toVar('plDd'), q = dot(dd, dd);
-      const l2 = select(q.greaterThan(1e-8), dot(dd.div(sqrt(max(q, 1e-16))), PL), float(0)); h.assign(vec3(0.04, 0.11, 0.3).mul(exp(hz.mul(-50))).mul(smoothstep(-0.45, 0.5, l2)).mul(0.9)); });
-    return h; })();
-  return { cor, halo };
-};
-
+/* 5.0b.1: o M5.espacoPlaneta (o planeta gigante no E.cor do src/m5/espaco-min.js) saiu: o céu da partida e o da bancada são o M5.ceu do src/m5/terreno.js, que tem o planeta dele; o E.cor só servia ao céu da fundação, que ninguém monta */
 /* o Cinturão tem o space3d completo nesta partida (beirada, paredões e raízes no contorno exato): o chão corta como no clássico */
 M5.espacoPleno = () => !!(M5.cur && M5.cur.R && M5.cur.R.SPC);
-/* borda do chão no Cinturão (o ARD_VAZIO do terrain3d): perto do corte a rocha clareia e esfarela (encontra a beirada do space3d), as pontes
-   ganham cascalho e o chão some a 18 da borda e abaixo de −90 (dali para fora são a beirada e o paredão do space3d). Lê o mapa do vazio
-   compartilhado (M5.tex.vazio: R = distância com sinal até o vazio, ±64; G = ponte), que o space3d preenche. c: { m, U, gp, pw, alb, fine, soft, macro } */
-M5.espacoBorda = function (c) {
-  const L = window.TSL; const { vec3, mix, smoothstep, dot } = L; const vz = M5.tex.vazio;
-  c.m.userData.vazio = true; c.m.userData.voidMap = vz; c.m.userData.terrU = c.U;
-  const vm = vz.sample(c.gp.div(c.U.worldSize)); const esd = vm.r.sub(0.5).mul(128).toVar('chEsd'), ponte = vm.g; const crumb = smoothstep(0.3, 0.75, c.fine.add(c.soft.sub(0.5).mul(0.7)));
-  const lip = smoothstep(19, 34, esd.add(crumb.sub(0.5).mul(8))).oneMinus(); let alb = c.alb;
-  const pale = mix(alb, vec3(dot(alb, vec3(0.3333))).mul(1.12).add(0.04), 0.5).mul(crumb.mul(0.28).add(0.84)); alb = mix(alb, pale, lip.mul(0.65));
-  alb = mix(alb, mix(vec3(0.27, 0.245, 0.22), vec3(0.47, 0.43, 0.38), c.fine).mul(c.macro.mul(0.4).add(0.8)), ponte.mul(0.5).mul(smoothstep(18, 26, esd)));
-  return { alb, corte: c.pw.y.greaterThan(-90).and(esd.greaterThanEqual(18)) };
-};
+/* 5.0b.1: o M5.espacoBorda saiu (só o chão da fundação chamava, com o space3d na partida, e lá o chão é o do src/m5/terreno.js, que corta sozinho) */
 })(globalThis.ARD = globalThis.ARD || {});

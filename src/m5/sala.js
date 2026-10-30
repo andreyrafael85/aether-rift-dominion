@@ -16,7 +16,16 @@ const URLS = { webgpu: CDN + 'build/three.webgpu.js', tsl: CDN + 'build/three.ts
   bloom: CDN + 'examples/jsm/tsl/display/BloomNode.js', dof: CDN + 'examples/jsm/tsl/display/DepthOfFieldNode.js', fxaa: CDN + 'examples/jsm/tsl/display/FXAANode.js', gsap: 'https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js' };
 const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'];
 const FOV0 = 42; /* abertura da câmera em repouso (o voo entre Raças fecha e volta) */
-const BLOOM = { vivo: { forca: 0.5, raio: 0.15, limiar: 1.35, joelho: 0.35, teto: 6 }, leve: { forca: 0.36, raio: 0.15, limiar: 1.35, joelho: 0.35, teto: 6 } }; /* 5.0a.2: o bloom da Sala (ver mount); o limiar fica acima do teto do céu (sala-mundo.js, TETO_CEU) */
+const BLOOM = { vivo: { forca: 0.45, raio: 0.15, limiar: 1.35, joelho: 0.35, teto: 6 }, leve: { forca: 0.32, raio: 0.15, limiar: 1.35, joelho: 0.35, teto: 6 } }; /* 5.0a.2: o bloom da Sala (ver mount); o limiar fica acima do teto do céu (sala-mundo.js, TETO_CEU).
+  5.0b.1: força 0,45 e 0,32 (eram 0,5 e 0,36): a exposição subiu (EXPOSICAO) e o bloom entra antes da curva de tons, então o brilho em volta das luzes fica perto do
+  que era na tela. Em volta do líder o bloom vem do Núcleo e da coluna da Fenda (no Kessari ele soma mais no fundo em volta do holograma que no próprio holograma):
+  com 10% a menos, o líder ganha de 1,1% a 1,7% de contraste sobre o fundo (Kessari, Ísk, Oriel e Quor; em Velk, nada), o que a exposição maior tirava */
+/* 5.0b.1: a exposição da Sala, por mundo (era 0,95 em todos). Sobe para 1,0 nos mundos de dia; a noite de Quor abre mais (o sol está abaixo do horizonte, o céu
+  não ajuda, e a cena perdeu 21% a 27% quando o bloom antigo deixou de acender as luzes de cristal); Velk fica em 0,95 (lá a exposição maior tirava contraste do
+  líder sobre o fundo e o bloom menor não devolvia: a luz a mais de Velk vem só do céu, sala-mundo.js). O limiar do bloom vem antes da exposição: o céu (até 1,3)
+  continua fora dele e o clarão não volta. Na troca de Raça a exposição muda no quadro em que o mundo troca, sob o clarão do voo (flash).
+  Ela entra como um uniforme no pós (C.U.expo, multiplicando a cena e o bloom antes da curva de tons), com a do renderer fixa em 1 */
+const EXPOSICAO = { base: 1.0, quorith: 1.1, vorag: 0.95 };
 /* fora do celular em pé, a abertura mantém a distância focal de 1920×1080 em px (42° em 1080 de altura, 54° em 1440, menos em telas baixas): a composição em volta do palco fica igual em qualquer tela, o horizonte não sobe por cima dos planetas e as telas baixas não deformam o céu */
 function celular() { return innerWidth < 700 || innerHeight < 560; } /* celular em pé ou deitado: palco pequeno, enquadramentos próprios */
 function fovBase() { const h = innerHeight; return innerWidth >= 700 ? Math.max(24, Math.min(60, 2 * Math.atan(h / 2 / 1407) * 180 / Math.PI)) : FOV0; }
@@ -65,7 +74,7 @@ async function mount(host, race) {
     await renderer.init(); if (!alive()) { try { renderer.dispose(); } catch (e) {} return false; } marca('init');
     st.gpu = !!renderer.backend.isWebGPUBackend; st.fila = st.gpu && renderer.backend.device ? renderer.backend.device.queue : null; st.libera = () => { st.emVoo = false; }; /* ritmo pela GPU (ver frame) */
     { const ai = st.gpu && renderer.backend.device && renderer.backend.device.adapterInfo; const soft = ARD.gpuSoft || (ai && (ai.isFallbackAdapter || /swiftshader|llvmpipe|lavapipe|softpipe|software|warp/i.test([ai.vendor, ai.architecture, ai.device, ai.description].join(' ')))); if (soft) { st.ritmo = 'contido'; st.soft = true; } st.adaptador = ai ? [ai.vendor, ai.architecture].filter(Boolean).join(' ') : null; } /* 5.0a.2: GPU por software: o laço já nasce contido (no máximo um quadro na fila) */
-    renderer.toneMapping = W.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.95; renderer.shadowMap.enabled = true; renderer.shadowMap.type = W.PCFShadowMap;
+    renderer.toneMapping = W.ACESFilmicToneMapping; renderer.toneMappingExposure = 1; /* 5.0b.1: era 0,95; a exposição de cada mundo é o uniforme C.U.expo no pós (ver EXPOSICAO) */ renderer.shadowMap.enabled = true; renderer.shadowMap.type = W.PCFShadowMap;
     const scene = st.scene = new W.Scene(), camera = st.camera = new W.PerspectiveCamera(40, innerWidth / innerHeight, 1, 6000);
     st.rig = { az: 0, pol: 1.2, rad: 150, tx: 0, ty: 56, tz: 10, fov: fovBase() }; st.par = { x: 0, y: 0 }; st.anc = { x: innerWidth * 0.3, y: innerHeight * 0.45 }; st.tmp = { v: new W.Vector3(), v2: new W.Vector3(), cp: new W.Vector3(), ct: new W.Vector3() };
     const C = st.C = { L: LIB, leve: !st.vivo, nPart: st.vivo ? (st.gpu ? 65536 : 16384) : (st.gpu ? 8192 : 0), U: { sol: T.uniform(new W.Vector3(0, 1, 0)) }, tick: () => (window.scheduler && scheduler.yield ? scheduler.yield() : new Promise(r => setTimeout(r, 0))), st }; st.U = C.U; /* cede a vez entre um modelo e outro (sem depender do ritmo dos quadros) */
@@ -86,7 +95,8 @@ async function mount(host, race) {
        baixo deixa o brilho perto da fonte e a força é menor. O desfoque do bloom anda com a densidade (resize): o halo tem o mesmo tamanho em qualquer tela */
     const B = BLOOM[st.vivo ? 'vivo' : 'leve']; C.U.bTeto = T.uniform(B.teto); const lb = T.luminance(src.rgb); const bIn = T.vec4(src.rgb.mul(T.min(T.float(1), C.U.bTeto.div(T.max(lb, T.float(1e-4))))), 1);
     st.bloomK = B.forca; st.bloom = LIB.bloom(bIn, B.forca, B.raio, B.limiar); st.bloom.smoothWidth.value = B.joelho;
-    pipe.outputNode = LIB.fxaa(T.renderOutput(src.add(st.bloom))); /* um grafo só: trocar o outputNode no r186 recompila bloom e saída a cada troca (medido: 4 a 8 pipelines no quadro) */
+    C.U.expo = T.uniform(EXPOSICAO[st.race] || EXPOSICAO.base); const cenaBloom = src.add(st.bloom); /* 5.0b.1: a exposição do mundo, antes da curva de tons (luzDoMundo troca o valor) */
+    pipe.outputNode = LIB.fxaa(T.renderOutput(T.vec4(cenaBloom.rgb.mul(C.U.expo), cenaBloom.a))); /* um grafo só: trocar o outputNode no r186 recompila bloom e saída a cada troca (medido: 4 a 8 pipelines no quadro) */
     const ab = document.querySelector('.ctab.on'); st.aba = (ab && ab.dataset.tab) || 'jogar';
     /* ETAPA 1: céu, planetas, Fenda (partículas em compute) e ar */
     st.H = M.relevo(st.race); M.chaoDe(C, st.race); M.arDe(C, st.race);
@@ -163,14 +173,15 @@ function trocarMundo(st, nova) { const old = st.mundo; st.mundo = nova; st.race 
 function descartarMundo(w) { if (!w) return; const seen = new Set(); const add = d => { if (d && d.dispose && !seen.has(d) && !(d.userData && d.userData.compartilhado)) { seen.add(d); try { d.dispose(); } catch (e) {} } };
   if (w.terreno) { add(w.terreno.geometry); add(w.terreno.material); } if (w.fumaca) for (const d of w.fumaca.disp) add(d); if (w.base) for (const d of w.base.disp) add(d); }
 /* céu, sol, névoa e luz de ambiente do mundo (o PMREM é refeito a cada mundo) */
-function luzDoMundo(st, race) { const { W } = LIB; const MU = ARD.salaMundo.MUNDOS[race]; const K = MU.ceu; st.ceu.set(race); st.luzRaca = race;
+function luzDoMundo(st, race) { const { W } = LIB; const MU = ARD.salaMundo.MUNDOS[race]; const K = MU.ceu; st.ceu.set(race, celular()) /* 5.0b.1: no celular, sem o ganho a mais do céu */; st.luzRaca = race;
   const d = ARD.salaMundo.solDir(race, st.tmp.v); st.U.sol.value.copy(d); for (const s of [st.ceu.sky, st.ceu.envSky]) s.sunPosition.value.copy(d);
   const elev = K.elev; const day = Math.max(0, Math.min(1, (elev + 4) / 22)), warm = 1 - Math.max(0, Math.min(1, elev / 30));
   st.sun.color.setRGB(1, 0.9 - 0.32 * warm, 0.8 - 0.5 * warm); st.sun.intensity = 0.5 + 2.4 * day; st.sun.position.copy(d).multiplyScalar(600); st.sun.target.position.set(0, 0, -60);
   if (elev < 0) { st.sun.color.setRGB(0.62, 0.66, 1.0); st.sun.intensity = 0.95; st.sun.position.set(-260, 420, -180); }
   st.sun.position.add(st.sun.target.position); st.sun.target.updateMatrixWorld(); /* 5.0a.1: a caixa da sombra única fica centrada no diorama */
   st.hemi.color.setHex(MU.hemi[0]); st.hemi.groundColor.setHex(MU.hemi[1]); st.hemi.intensity = MU.hemi[2];
-  st.scene.fog = new W.Fog(MU.nevoa[0], MU.nevoa[1], MU.nevoa[2]);
+  if (st.U.expo) st.U.expo.value = EXPOSICAO[race] || EXPOSICAO.base; /* 5.0b.1: a exposição do mundo (só o valor do uniforme: nenhum pipeline novo) */
+  if (st.scene.fog && st.scene.fog.isFog) { st.scene.fog.color.setHex(MU.nevoa[0]); st.scene.fog.near = MU.nevoa[1]; st.scene.fog.far = MU.nevoa[2]; } else st.scene.fog = new W.Fog(MU.nevoa[0], MU.nevoa[1], MU.nevoa[2]); /* 5.0b.1: a mesma névoa, com os valores do mundo (antes, uma névoa nova por mundo fazia o r186 refazer os materiais que a usam na descida do voo, com a tela à vista) */
   st.U.aro.value.setHex(COR[race]); if (st.C.U.floraCor) st.C.U.floraCor.value.setRGB(1, 1, 1);
   try { const rt = st.pmrem.fromScene(st.envScene, 0, 0.1, 1000); st.scene.environment = rt.texture; if (st.envRT) st.envRT.dispose(); st.envRT = rt; } catch (e) { console.warn('[ARD] Sala: luz de ambiente: ' + e.message); }
   if (st.ready && !st.casado) layout(true); }
@@ -322,7 +333,8 @@ function ceuAlvos(st) { const { W } = LIB; const w = innerWidth, h = innerHeight
   return out; }
 function resize() { const st = S; if (!st || !st.renderer) return; const w = innerWidth, h = innerHeight; const pr = st.posterTool ? Math.min(3, window.devicePixelRatio || 1) /* 5.0a.1: o pôster sai na densidade da tela */ : st.vivo ? Math.max(0.5, Math.min(2, window.devicePixelRatio || 1, Math.sqrt(8.3e6 / Math.max(1, w * h))) * st.prK) : Math.max(0.5, Math.min(1.5, window.devicePixelRatio || 1, Math.sqrt(2.6e6 / Math.max(1, w * h))));
   st.renderer.setPixelRatio(pr); st.renderer.setSize(w, h, false); st.camera.aspect = w / h; st.camera.updateProjectionMatrix(); if (st.csm) try { st.csm.updateFrustums(); } catch (e) {} st.pr = pr;
-  if (st.bloom && st.bloom.setResolutionScale) st.bloom.setResolutionScale(Math.min(1, Math.max(0.3, 0.5 / pr))); } /* 5.0a.2: o bloom sai sempre na metade da densidade 1 (o desfoque dele é em texels): o halo tem o mesmo tamanho na tela com densidade 1, 1,5 ou 2 e quando a resolução dinâmica baixa um degrau */
+  if (st.bloom && st.bloom.setResolutionScale) st.bloom.setResolutionScale(Math.min(1, Math.max(0.3, 0.5 / pr))); /* 5.0a.2: o bloom sai sempre na metade da densidade 1 (o desfoque dele é em texels): o halo tem o mesmo tamanho na tela com densidade 1, 1,5 ou 2 e quando a resolução dinâmica baixa um degrau */
+  if (st.ceu && st.luzRaca) st.ceu.set(st.luzRaca, celular()); } /* 5.0b.1: a tela virou celular (ou deixou de ser): o céu visível acompanha (só uniformes) */
 /* ---------- troca de Raça: voo até o próximo mundo do Grande Alinhamento ---------- */
 async function setRace(race, o) { const st = S; o = o || {}; if (!st || !RACES.includes(race)) return; st.queroRaca = race; if (st.trocando || !st.ready) { if (!st.ready) st.race0 = race; return; } if (race === st.race) return;
   st.trocando = true; soltarCasado(st); const alive = () => S === st; const g = LIB.gsap; const de = st.race;

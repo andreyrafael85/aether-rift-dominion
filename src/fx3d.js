@@ -29,7 +29,7 @@ const m5Ativo = () => !!(ARD.m5 && ARD.m5.active && ARD.m5.active());
 function m5Uniforms(THREE) { const { uniform } = window.TSL;
   return { uTime: uniform(0), uCamR: uniform(new THREE.Vector3(1, 0, 0)), uCamU: uniform(new THREE.Vector3(0, 1, 0)), uCamF: uniform(new THREE.Vector3(0, 0, 1)),
     uSunDir: uniform(new THREE.Vector3(-0.47, 0.64, 0.6).normalize()), uSunC: uniform(new THREE.Color(0.85, 0.69, 0.47)), uAmbC: uniform(new THREE.Color(0.26, 0.37, 0.51)),
-    uSemPos: uniform(0), uGama: uniform(1.5) /* sem pós (Baixa): saída como a do clássico (abaixo, m5InversoSaida) */, uExpo: m5Exposicao() /* 5.0b (junção): a exposição em uso (ARD.m5.u.exposicao do Modo Foto) */ }; }
+    uSemPos: (ARD.m5 && ARD.m5.u && ARD.m5.u.semPos) || uniform(0) /* 5.0b.1: o ARD.m5.u.semPos do núcleo */, uGama: uniform(1.5) /* sem pós (Baixa): saída como a do clássico (abaixo, m5InversoSaida) */, uExpo: m5Exposicao() /* 5.0b (junção): a exposição em uso (ARD.m5.u.exposicao do Modo Foto) */ }; }
 /* 5.0b (junção): o uniform compartilhado da exposição do tone mapping (src/m5/foto.js: 1 na partida, 2^EV no Modo Foto). Sem pós a saída do three
    faz ACES(cor × exposição) e o clássico desenha os efeitos crus, sem exposição: a inversa divide por ela (fora da função com setLayout: o
    uniform fica no corpo do material). Sem o foto.js (bancadas), um uniform fixo em 1, como antes. */
@@ -354,6 +354,7 @@ void main() {
   }
   const add = batch(THREE.AdditiveBlending), alp = batch(THREE.NormalBlending);
   const FX = { time: 0, dt: 0, mult: 1, add, alp };
+  if (M5) { FX.m5SemPos = uniforms.uSemPos; FX.m5Malhas = [add.mesh, alp.mesh]; } /* 5.0b.1: o Modo Foto sem pós (src/m5/foto.js) desenha estes lotes depois da conversão de tons, crus (sem pós = 0 só nesse passe), como o clássico */
   /* 5.0b: o que a 5.0d precisa para simular na GPU sem mudar o vértice analítico (caminho por compute, no relatório da 5.0b): os uniforms,
      os lotes e, com opts.compute, os nós storage dos 5 atributos de cada lote (um compute shader lê e reescreve o nascimento: posição,
      instante, velocidade e vida; o quique de um destroço vira um nascimento novo). renderer.compute(nó) uma vez por quadro, antes do desenho. */
@@ -377,7 +378,7 @@ void main() {
   }
   FX.update = function (time, camera) {
     const dt = time - FX.time; FX.dt = dt > 0 ? (dt <= 0.25 ? dt : 1 / 60) : 0; FX.time = time; uniforms.uTime.value = time; /* dt do quadro: o fogo contínuo emite por segundo, não por quadro */
-    if (M5) { add.mesh.visible = time <= add.fim + 0.05; alp.mesh.visible = time <= alp.fim + 0.05; uniforms.uSemPos.value = opts.semPos && opts.semPos() ? 1 : 0; } /* 5.0b: lote sem partícula viva fica fora do desenho (no WebGPU cada objeto desenhado custa CPU); o pipeline já nasceu na carga */
+    if (M5) { add.mesh.visible = time <= add.fim + 0.05; alp.mesh.visible = time <= alp.fim + 0.05; if (uniforms.uSemPos !== (ARD.m5.u && ARD.m5.u.semPos)) uniforms.uSemPos.value = opts.semPos && opts.semPos() ? 1 : 0; /* 5.0b.1: só sem o uniform do núcleo */ } /* 5.0b: lote sem partícula viva fica fora do desenho (no WebGPU cada objeto desenhado custa CPU); o pipeline já nasceu na carga */
     const e = camera.matrixWorld.elements; uniforms.uCamR.value.set(e[0], e[1], e[2]).normalize(); uniforms.uCamU.value.set(e[4], e[5], e[6]).normalize(); uniforms.uCamF.value.set(e[8], e[9], e[10]).normalize();
     luzes();
     for (const b of [add, alp]) { let W = 0; for (const rg of b.r) W += rg.n; if (!W) continue; /* sobe só o trecho escrito neste quadro em cada anel (dois trechos quando o anel dá a volta); o three limpa os trechos depois de subir */

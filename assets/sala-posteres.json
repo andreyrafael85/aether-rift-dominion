@@ -7,7 +7,7 @@
    "racas": {
     "vehnar": {
      "arquivo": "sala-vehnar-pc1920.webp",
-     "bytes": 119568,
+     "bytes": 123842,
      "anc": [
       388.5,
       558.5
@@ -80,10 +80,10 @@
      },
      "fx": {
       "holo": [
-       349,
-       325,
+       348,
+       322,
        263,
-       307
+       310
       ],
       "fenda": [
        743,
@@ -95,15 +95,20 @@
       ]
      },
      "luz": {
-      "luma": 0.137,
-      "estourado": 0.57,
-      "holoLuma": 0.259,
-      "holoEstourado": 1.77
+      "luma": 0.15,
+      "lumaEsq": 0.201,
+      "estourado": 0.66,
+      "holoLuma": 0.262,
+      "holoEstourado": 2.04,
+      "holoFundo": 0.111,
+      "bloom": 0.005,
+      "bloomEsq": 0.01,
+      "exposicao": 1
      }
     },
     "erevane": {
      "arquivo": "sala-erevane-pc1920.webp",
-     "bytes": 116714,
+     "bytes": 118922,
      "anc": [
       388.5,
       539.1
@@ -191,15 +196,20 @@
       ]
      },
      "luz": {
-      "luma": 0.171,
-      "estourado": 0.46,
-      "holoLuma": 0.369,
-      "holoEstourado": 0.03
+      "luma": 0.187,
+      "lumaEsq": 0.251,
+      "estourado": 0.5,
+      "holoLuma": 0.382,
+      "holoEstourado": 0.01,
+      "holoFundo": 0.229,
+      "bloom": 0.015,
+      "bloomEsq": 0.03,
+      "exposicao": 1
      }
     },
     "tessara": {
      "arquivo": "sala-tessara-pc1920.webp",
-     "bytes": 119676,
+     "bytes": 125546,
      "anc": [
       388.5,
       546.3
@@ -273,9 +283,9 @@
      "fx": {
       "holo": [
        378,
-       320,
+       319,
        206,
-       281
+       282
       ],
       "fenda": [
        744.7,
@@ -287,15 +297,20 @@
       ]
      },
      "luz": {
-      "luma": 0.216,
-      "estourado": 0.33,
-      "holoLuma": 0.382,
-      "holoEstourado": 0.01
+      "luma": 0.232,
+      "lumaEsq": 0.262,
+      "estourado": 0.34,
+      "holoLuma": 0.385,
+      "holoEstourado": 0.01,
+      "holoFundo": 0.21,
+      "bloom": 0.005,
+      "bloomEsq": 0.009,
+      "exposicao": 1
      }
     },
     "quorith": {
      "arquivo": "sala-quorith-pc1920.webp",
-     "bytes": 120018,
+     "bytes": 125068,
      "anc": [
       388.5,
       570.5
@@ -368,10 +383,10 @@
      },
      "fx": {
       "holo": [
-       375,
-       315,
-       241,
-       366
+       362,
+       295,
+       264,
+       388
       ],
       "fenda": [
        757,
@@ -383,15 +398,20 @@
       ]
      },
      "luz": {
-      "luma": 0.095,
-      "estourado": 0.48,
+      "luma": 0.105,
+      "lumaEsq": 0.141,
+      "estourado": 0.64,
       "holoLuma": 0.253,
-      "holoEstourado": 0.45
+      "holoEstourado": 0.79,
+      "holoFundo": 0.13,
+      "bloom": 0.009,
+      "bloomEsq": 0.015,
+      "exposicao": 1.1
      }
     },
     "vorag": {
      "arquivo": "sala-vorag-pc1920.webp",
-     "bytes": 123950,
+     "bytes": 124404,
      "anc": [
       388.5,
       570.5
@@ -464,10 +484,10 @@
      },
      "fx": {
       "holo": [
-       349,
-       322,
-       299,
-       334
+       348,
+       320,
+       302,
+       337
       ],
       "fenda": [
        760,
@@ -479,10 +499,15 @@
       ]
      },
      "luz": {
-      "luma": 0.111,
+      "luma": 0.121,
+      "lumaEsq": 0.181,
       "estourado": 0.64,
-      "holoLuma": 0.258,
-      "holoEstourado": 1.9
+      "holoLuma": 0.251,
+      "holoEstourado": 1.88,
+      "holoFundo": 0.124,
+      "bloom": 0.004,
+      "bloomEsq": 0.007,
+      "exposicao": 0.95
      }
     }
    }
@@ -494,7 +519,7 @@
    "racas": {
     "vehnar": {
      "arquivo": "sala-vehnar-pe.webp",
-     "bytes": 110164,
+     "bytes": 110322,
      "anc": [
       76,
       191
@@ -567,10 +592,10 @@
      },
      "fx": {
       "holo": [
-       22,
-       120,
+       23,
+       122,
        107,
-       121
+       118
       ],
       "fenda": [
        283.6,
@@ -582,15 +607,20 @@
       ]
      },
      "luz": {
-      "luma": 0.162,
-      "estourado": 0.93,
-      "holoLuma": 0.234,
-      "holoEstourado": 1.78
+      "luma": 0.168,
+      "lumaEsq": 0.179,
+      "estourado": 0.97,
+      "holoLuma": 0.245,
+      "holoEstourado": 1.88,
+      "holoFundo": 0.178,
+      "bloom": 0.006,
+      "bloomEsq": 0.005,
+      "exposicao": 1
      }
     },
     "erevane": {
      "arquivo": "sala-erevane-pe.webp",
-     "bytes": 119416,
+     "bytes": 121042,
      "anc": [
       76,
       191
@@ -664,9 +694,9 @@
      "fx": {
       "holo": [
        36,
-       121,
+       120,
        81,
-       119
+       120
       ],
       "fenda": [
        281.7,
@@ -678,15 +708,20 @@
       ]
      },
      "luz": {
-      "luma": 0.208,
-      "estourado": 1.25,
-      "holoLuma": 0.381,
-      "holoEstourado": 0.47
+      "luma": 0.211,
+      "lumaEsq": 0.214,
+      "estourado": 1.34,
+      "holoLuma": 0.362,
+      "holoEstourado": 0.12,
+      "holoFundo": 0.188,
+      "bloom": 0.027,
+      "bloomEsq": 0.029,
+      "exposicao": 1
      }
     },
     "tessara": {
      "arquivo": "sala-tessara-pe.webp",
-     "bytes": 105952,
+     "bytes": 108584,
      "anc": [
       76,
       191
@@ -760,9 +795,9 @@
      "fx": {
       "holo": [
        31,
-       120,
+       119,
        91,
-       117
+       118
       ],
       "fenda": [
        290.8,
@@ -774,15 +809,20 @@
       ]
      },
      "luz": {
-      "luma": 0.232,
-      "estourado": 0.79,
-      "holoLuma": 0.328,
-      "holoEstourado": 0
+      "luma": 0.239,
+      "lumaEsq": 0.252,
+      "estourado": 0.81,
+      "holoLuma": 0.342,
+      "holoEstourado": 0,
+      "holoFundo": 0.271,
+      "bloom": 0.007,
+      "bloomEsq": 0.007,
+      "exposicao": 1
      }
     },
     "quorith": {
      "arquivo": "sala-quorith-pe.webp",
-     "bytes": 89392,
+     "bytes": 92704,
      "anc": [
       76,
       191
@@ -856,9 +896,9 @@
      "fx": {
       "holo": [
        36,
-       122,
+       117,
        81,
-       117
+       122
       ],
       "fenda": [
        280.1,
@@ -870,15 +910,20 @@
       ]
      },
      "luz": {
-      "luma": 0.087,
-      "estourado": 0.84,
-      "holoLuma": 0.212,
-      "holoEstourado": 0.02
+      "luma": 0.096,
+      "lumaEsq": 0.092,
+      "estourado": 1.1,
+      "holoLuma": 0.221,
+      "holoEstourado": 0.2,
+      "holoFundo": 0.164,
+      "bloom": 0.009,
+      "bloomEsq": 0.01,
+      "exposicao": 1.1
      }
     },
     "vorag": {
      "arquivo": "sala-vorag-pe.webp",
-     "bytes": 109406,
+     "bytes": 109826,
      "anc": [
       76,
       191
@@ -951,9 +996,9 @@
      },
      "fx": {
       "holo": [
-       21,
+       22,
        121,
-       110,
+       109,
        117
       ],
       "fenda": [
@@ -966,10 +1011,15 @@
       ]
      },
      "luz": {
-      "luma": 0.153,
-      "estourado": 0.89,
-      "holoLuma": 0.25,
-      "holoEstourado": 0.97
+      "luma": 0.152,
+      "lumaEsq": 0.168,
+      "estourado": 0.93,
+      "holoLuma": 0.242,
+      "holoEstourado": 0.92,
+      "holoFundo": 0.153,
+      "bloom": 0.005,
+      "bloomEsq": 0.004,
+      "exposicao": 0.95
      }
     }
    }
@@ -981,7 +1031,7 @@
    "racas": {
     "vehnar": {
      "arquivo": "sala-vehnar-pc2560.webp",
-     "bytes": 152652,
+     "bytes": 154240,
      "anc": [
       708.5,
       558.5
@@ -1054,10 +1104,10 @@
      },
      "fx": {
       "holo": [
-       669,
-       322,
-       261,
-       310
+       668,
+       320,
+       263,
+       311
       ],
       "fenda": [
        1063,
@@ -1069,15 +1119,20 @@
       ]
      },
      "luz": {
-      "luma": 0.12,
-      "estourado": 1.22,
-      "holoLuma": 0.264,
-      "holoEstourado": 1.68
+      "luma": 0.131,
+      "lumaEsq": 0.177,
+      "estourado": 1.48,
+      "holoLuma": 0.269,
+      "holoEstourado": 2.12,
+      "holoFundo": 0.111,
+      "bloom": 0.003,
+      "bloomEsq": 0.006,
+      "exposicao": 1
      }
     },
     "erevane": {
      "arquivo": "sala-erevane-pc2560.webp",
-     "bytes": 140384,
+     "bytes": 143848,
      "anc": [
       708.5,
       539.1
@@ -1150,10 +1205,10 @@
      },
      "fx": {
       "holo": [
-       703,
-       324,
-       129,
-       205
+       704,
+       326,
+       128,
+       203
       ],
       "fenda": [
        1016.7,
@@ -1165,15 +1220,20 @@
       ]
      },
      "luz": {
-      "luma": 0.156,
-      "estourado": 0.24,
-      "holoLuma": 0.366,
-      "holoEstourado": 0.03
+      "luma": 0.171,
+      "lumaEsq": 0.214,
+      "estourado": 0.3,
+      "holoLuma": 0.378,
+      "holoEstourado": 0.02,
+      "holoFundo": 0.228,
+      "bloom": 0.009,
+      "bloomEsq": 0.018,
+      "exposicao": 1
      }
     },
     "tessara": {
      "arquivo": "sala-tessara-pc2560.webp",
-     "bytes": 148066,
+     "bytes": 151510,
      "anc": [
       708.5,
       546.3
@@ -1247,9 +1307,9 @@
      "fx": {
       "holo": [
        698,
-       320,
+       319,
        206,
-       281
+       282
       ],
       "fenda": [
        1064.7,
@@ -1261,15 +1321,20 @@
       ]
      },
      "luz": {
-      "luma": 0.194,
-      "estourado": 0.17,
-      "holoLuma": 0.381,
-      "holoEstourado": 0.01
+      "luma": 0.208,
+      "lumaEsq": 0.238,
+      "estourado": 0.23,
+      "holoLuma": 0.384,
+      "holoEstourado": 0.02,
+      "holoFundo": 0.21,
+      "bloom": 0.003,
+      "bloomEsq": 0.006,
+      "exposicao": 1
      }
     },
     "quorith": {
      "arquivo": "sala-quorith-pc2560.webp",
-     "bytes": 153558,
+     "bytes": 160240,
      "anc": [
       708.5,
       570.5
@@ -1342,10 +1407,10 @@
      },
      "fx": {
       "holo": [
-       695,
-       312,
-       242,
-       371
+       696,
+       321,
+       240,
+       361
       ],
       "fenda": [
        1077,
@@ -1357,15 +1422,20 @@
       ]
      },
      "luz": {
-      "luma": 0.086,
-      "estourado": 0.25,
-      "holoLuma": 0.253,
-      "holoEstourado": 0.45
+      "luma": 0.096,
+      "lumaEsq": 0.121,
+      "estourado": 0.34,
+      "holoLuma": 0.283,
+      "holoEstourado": 0.89,
+      "holoFundo": 0.13,
+      "bloom": 0.005,
+      "bloomEsq": 0.009,
+      "exposicao": 1.1
      }
     },
     "vorag": {
      "arquivo": "sala-vorag-pc2560.webp",
-     "bytes": 162452,
+     "bytes": 164142,
      "anc": [
       708.5,
       570.5
@@ -1438,10 +1508,10 @@
      },
      "fx": {
       "holo": [
-       668,
-       322,
-       302,
-       334
+       669,
+       324,
+       300,
+       332
       ],
       "fenda": [
        1080,
@@ -1453,10 +1523,15 @@
       ]
      },
      "luz": {
-      "luma": 0.113,
-      "estourado": 0.74,
-      "holoLuma": 0.258,
-      "holoEstourado": 1.9
+      "luma": 0.12,
+      "lumaEsq": 0.189,
+      "estourado": 0.9,
+      "holoLuma": 0.255,
+      "holoEstourado": 1.89,
+      "holoFundo": 0.124,
+      "bloom": 0.003,
+      "bloomEsq": 0.004,
+      "exposicao": 0.95
      }
     }
    }
@@ -1468,7 +1543,7 @@
    "racas": {
     "vehnar": {
      "arquivo": "sala-vehnar-deitado.webp",
-     "bytes": 126058,
+     "bytes": 125904,
      "anc": [
       166,
       499.4
@@ -1541,10 +1616,10 @@
      },
      "fx": {
       "holo": [
-       72,
-       194,
-       181,
-       204
+       73,
+       192,
+       182,
+       206
       ],
       "fenda": [
        384.3,
@@ -1556,15 +1631,20 @@
       ]
      },
      "luz": {
-      "luma": 0.222,
-      "estourado": 1.23,
-      "holoLuma": 0.259,
-      "holoEstourado": 2.16
+      "luma": 0.229,
+      "lumaEsq": 0.321,
+      "estourado": 1.44,
+      "holoLuma": 0.272,
+      "holoEstourado": 2.59,
+      "holoFundo": 0.288,
+      "bloom": 0.007,
+      "bloomEsq": 0.007,
+      "exposicao": 1
      }
     },
     "erevane": {
      "arquivo": "sala-erevane-deitado.webp",
-     "bytes": 105406,
+     "bytes": 105262,
      "anc": [
       166,
       488.9
@@ -1638,9 +1718,9 @@
      "fx": {
       "holo": [
        96,
-       193,
+       194,
        137,
-       204
+       203
       ],
       "fenda": [
        382.6,
@@ -1652,15 +1732,20 @@
       ]
      },
      "luz": {
-      "luma": 0.192,
-      "estourado": 1.1,
-      "holoLuma": 0.344,
-      "holoEstourado": 0.14
+      "luma": 0.202,
+      "lumaEsq": 0.268,
+      "estourado": 1.26,
+      "holoLuma": 0.377,
+      "holoEstourado": 0.49,
+      "holoFundo": 0.184,
+      "bloom": 0.013,
+      "bloomEsq": 0.015,
+      "exposicao": 1
      }
     },
     "tessara": {
      "arquivo": "sala-tessara-deitado.webp",
-     "bytes": 111644,
+     "bytes": 116508,
      "anc": [
       166,
       500.9
@@ -1733,9 +1818,9 @@
      },
      "fx": {
       "holo": [
-       88,
-       192,
-       154,
+       87,
+       193,
+       155,
        200
       ],
       "fenda": [
@@ -1748,15 +1833,20 @@
       ]
      },
      "luz": {
-      "luma": 0.349,
-      "estourado": 0.9,
-      "holoLuma": 0.371,
-      "holoEstourado": 0
+      "luma": 0.36,
+      "lumaEsq": 0.422,
+      "estourado": 0.96,
+      "holoLuma": 0.381,
+      "holoEstourado": 0,
+      "holoFundo": 0.368,
+      "bloom": 0.007,
+      "bloomEsq": 0.006,
+      "exposicao": 1
      }
     },
     "quorith": {
      "arquivo": "sala-quorith-deitado.webp",
-     "bytes": 116672,
+     "bytes": 119802,
      "anc": [
       166,
       511.4
@@ -1829,10 +1919,10 @@
      },
      "fx": {
       "holo": [
-       97,
-       187,
-       137,
-       207
+       92,
+       177,
+       146,
+       218
       ],
       "fenda": [
        382.1,
@@ -1844,15 +1934,20 @@
       ]
      },
      "luz": {
-      "luma": 0.08,
-      "estourado": 0.99,
-      "holoLuma": 0.192,
-      "holoEstourado": 0.07
+      "luma": 0.085,
+      "lumaEsq": 0.098,
+      "estourado": 1.34,
+      "holoLuma": 0.173,
+      "holoEstourado": 0.16,
+      "holoFundo": 0.027,
+      "bloom": 0.007,
+      "bloomEsq": 0.008,
+      "exposicao": 1.1
      }
     },
     "vorag": {
      "arquivo": "sala-vorag-deitado.webp",
-     "bytes": 124034,
+     "bytes": 128618,
      "anc": [
       166,
       490.6
@@ -1925,10 +2020,10 @@
      },
      "fx": {
       "holo": [
-       70,
-       193,
+       69,
+       192,
        187,
-       201
+       202
       ],
       "fenda": [
        388.7,
@@ -1940,16 +2035,21 @@
       ]
      },
      "luz": {
-      "luma": 0.147,
-      "estourado": 1.14,
-      "holoLuma": 0.253,
-      "holoEstourado": 1.21
+      "luma": 0.148,
+      "lumaEsq": 0.204,
+      "estourado": 1.18,
+      "holoLuma": 0.245,
+      "holoEstourado": 1.17,
+      "holoFundo": 0.169,
+      "bloom": 0.008,
+      "bloomEsq": 0.01,
+      "exposicao": 0.95
      }
     }
    }
   }
  },
- "versao": "5.0a.2",
- "gerado": "2026-10-25T01:36Z",
+ "versao": "5.0b.1",
+ "gerado": "2026-10-29T21:08Z",
  "ferramenta": "tools/sala-posteres.cjs"
 }

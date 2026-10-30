@@ -120,10 +120,56 @@ function criar(X, P) {
      dele e a conversão de tons); cada foto usa um alvo novo do mesmo formato (mesmo pipeline) e o libera depois da leitura */
   F.capRT0 = new T.RenderTarget(16, 16, { depthBuffer: false }); F.capRT0.texture.name = 'ard-foto-aquece';
   const _v2 = new T.Vector2();
+  /* 5.0b.1: sem o pós (Baixa), os efeitos depois da conversão de tons, como o clássico. Lá os efeitos são ShaderMaterial crus somados na
+     imagem final do canvas (já em tons e sRGB), e a exposição do painel não passa por eles; aqui a 5.0b somava os efeitos em linear antes
+     do ACES (com a inversa da saída e ÷ exposição): exato sobre o preto, mas com o fundo empurrado para o ombro da curva (+EV) a soma
+     visível encolhia (a +1,5 EV, sobre fundo claro, 2,7 contra 12,4 do clássico). Agora, no quadro do foto sem pós:
+     1) a cena sem os efeitos desenha no alvo intermediário do próprio renderer (_getFrameBufferTarget: o mesmo formato, MSAA e
+        profundidade de sempre, então os mesmos pipelines), 2) a conversão de tons (renderOutput: ACES com a exposição e sRGB, a conta
+        da saída do r186) vai para um alvo RGBA8 (a foto, ou um alvo do tamanho da tela), 3) essa imagem volta para a cor do alvo
+        intermediário (a profundidade da cena fica), 4) só os efeitos desenham por cima, crus (o "sem pós" deles em 0 só nesse passe:
+        sem a inversa e sem a exposição) e com o teste de profundidade da cena, 5) o resultado vai sem conversão para a tela ou a foto.
+     Os efeitos usam os pipelines de sempre; nascem 4 (conversão, cópia para o alvo, cópia para a tela e para o RGBA8), no preparo da
+     primeira entrada. Memória: um alvo RGBA8 do tamanho da tela enquanto o modo está aberto (o alvo intermediário é o de sempre).
+     ?m5fotofx=antes volta ao jeito da 5.0b (comparação). */
+  const SP = { tons: null, q: null, conv: null, convTex: null, camada: 1 << 30, cena: null, antes: typeof location !== 'undefined' && new URLSearchParams(location.search).get('m5fotofx') === 'antes' };
+  const efeitosFx = () => { const R = X.R, Lm = [], Us = []; for (const m of [R && R.FX, R && R.CB]) if (m && m.m5Malhas && m.m5SemPos) { for (const o of m.m5Malhas) if (o) Lm.push(o); Us.push(m.m5SemPos); } return Lm.length ? { L: Lm, U: Us } : null; };
+  function spPrepara() {
+    if (SP.q) return; const { texture, vec4, renderOutput } = L;
+    const mq = (nome, no) => { const m = new T.NodeMaterial(); m.fragmentNode = no; m.depthTest = false; m.depthWrite = false; m.blending = T.NoBlending; reg(nome, m); return new T.QuadMesh(m); };
+    SP.tons = new T.RenderTarget(1, 1, { depthBuffer: false }); SP.tons.texture.name = 'ard-foto-tons'; /* RGBA8: a imagem em tons do tamanho da tela */
+    SP.convTex = texture(SP.tons.texture); SP.conv = mq('foto-tons', renderOutput(SP.convTex, T.ACESFilmicToneMapping, T.SRGBColorSpace)); /* a conta do quad de saída do r186 (exposição pelo toneMappingExposure) */
+    SP.cpTex = texture(SP.tons.texture); SP.q = mq('foto-copia', vec4(SP.cpTex.rgb, 1)); /* cópia crua (para o alvo intermediário, para a tela e para a foto) */
+  }
+  F.semPos = function (scene, camera, saida) { /* saida: o alvo RGBA8 da foto (null = a tela) */
+    const ef = SP.antes || !r._getFrameBufferTarget ? null : efeitosFx(); const o0 = r.getOutputRenderTarget(), rt0 = r.getRenderTarget();
+    if (!ef) { try { r.setRenderTarget(null); r.setOutputRenderTarget(saida || o0); r.render(scene, camera); } finally { r.setOutputRenderTarget(o0); r.setRenderTarget(rt0); } return; } /* como na 5.0b */
+    spPrepara(); const cam0 = camera.layers.mask, bg = scene.background, ac = r.autoClear, tm = r.toneMapping, cs = r.outputColorSpace;
+    const m0 = ef.L.map(o => o.layers.mask), v0 = ef.U.map(u => u.value);
+    try {
+      r.setRenderTarget(null); r.setOutputRenderTarget(saida || null); const fbt = r._getFrameBufferTarget(); /* o alvo intermediário da tela (ou o da foto) */
+      if (!fbt) { r.setOutputRenderTarget(saida || o0); r.render(scene, camera); return; } /* sem conversão de tons não há o que separar */
+      r.setOutputRenderTarget(null); const tons = saida || SP.tons; if (!saida && (tons.width !== fbt.width || tons.height !== fbt.height)) tons.setSize(fbt.width, fbt.height);
+      for (const o of ef.L) o.layers.mask = SP.camada; /* 1) a cena sem os efeitos (a câmera só vê a camada 0) */
+      r.setRenderTarget(fbt); r.render(scene, camera);
+      r.autoClear = false;
+      SP.convTex.value = fbt.texture; r.setRenderTarget(tons); SP.conv.render(r); /* 2) tons e sRGB */
+      SP.cpTex.value = tons.texture; r.setRenderTarget(fbt); SP.q.render(r); /* 3) a imagem em tons volta para o alvo; a profundidade fica */
+      if (SP.cena !== scene) { SP.cena = scene; scene.traverse(o => { if (o.isLight) o.layers.enable(30); }); } /* as luzes também na camada 30 (continuam na 0): a lista de luzes do passe dos efeitos fica a de sempre e o r186 não remonta os materiais deles (com o código em outra ordem nasciam módulo e pipeline novos) */
+      camera.layers.mask = SP.camada; scene.background = null; for (const u of ef.U) { u.value = 0; u.fixo = true; } /* 5.0b.1 (junção): fixo segura o 0 contra o onRenderUpdate do ARD.m5.u.semPos */ /* 4) só os efeitos, crus; sem a cor de fundo (forçaria limpar) */
+      r.render(scene, camera);
+      camera.layers.mask = cam0; scene.background = bg;
+      SP.cpTex.value = fbt.texture; /* 5) para a foto, ou para a tela sem conversão nenhuma */
+      if (saida) { r.setRenderTarget(saida); SP.q.render(r); } else { r.toneMapping = T.NoToneMapping; r.outputColorSpace = T.LinearSRGBColorSpace; r.setRenderTarget(null); SP.q.render(r); }
+    } finally {
+      for (let i = 0; i < ef.L.length; i++) ef.L[i].layers.mask = m0[i]; for (let i = 0; i < ef.U.length; i++) { ef.U[i].value = v0[i]; ef.U[i].fixo = false; }
+      camera.layers.mask = cam0; scene.background = bg; r.autoClear = ac; r.toneMapping = tm; r.outputColorSpace = cs; r.setOutputRenderTarget(o0); r.setRenderTarget(rt0);
+    }
+  };
   /* desenho de um quadro do foto na tela (ou no alvo atual) */
   F.render = function (scene, camera, comDof) {
     F.dofOn = !!(comDof && F.dofN); F.D.on.value = F.dofOn ? 1 : 0;
-    if (F.pipe) F.pipe.render(); else if (F.P) F.P.render(); else r.render(scene, camera);
+    if (F.pipe) F.pipe.render(); else if (F.P) F.P.render(); else F.semPos(scene, camera, null); /* 5.0b.1: sem o pós, os efeitos depois dos tons (era r.render) */
   };
   F.bloom = function (k) { if (F.ch && F.ch.bloomN) F.ch.bloomN.strength.value = F.s0 * k; }; /* brilho do painel: intensidade do bloom da cadeia do foto */
   F.res = function (w, h) { if (w == null) { r.getDrawingBufferSize(_v2); w = _v2.x; h = _v2.y; } F.U.uRes.value.set(w, h); };
@@ -146,7 +192,7 @@ function criar(X, P) {
       finally { F.D.bokeh.value = b0; if (bl && bl.setResolutionScale) bl.setResolutionScale(bk); F.res(); }
     } else {
       const o = r.getOutputRenderTarget(), prev = r.getRenderTarget();
-      cascatas(); try { r.setRenderTarget(null); r.setOutputRenderTarget(F.capRT); if (F.P) F.P.render(); else r.render(scene, camera); } finally { r.setOutputRenderTarget(o); r.setRenderTarget(prev); }
+      cascatas(); if (!F.P) F.semPos(scene, camera, F.capRT); /* 5.0b.1: sem o pós, os efeitos depois dos tons */ else try { r.setRenderTarget(null); r.setOutputRenderTarget(F.capRT); F.P.render(); } finally { r.setOutputRenderTarget(o); r.setRenderTarget(prev); }
     }
     const gpu = !!r.backend.isWebGPUBackend, stride = gpu ? Math.ceil(W * 4 / 256) * 256 : W * 4; /* WebGPU: linhas alinhadas em 256 bytes, de cima para baixo; WebGL2: juntas, de baixo para cima */
     return r.readRenderTargetPixelsAsync(F.capRT, 0, 0, W, H).then(data => ({ data, W, H, stride, flip: !gpu }));
@@ -180,7 +226,7 @@ function criar(X, P) {
         return false;
       }
       const o = r.getOutputRenderTarget(), prev = r.getRenderTarget(); /* sem o pós: a conversão de tons no alvo RGBA8 */
-      try { r.setRenderTarget(null); r.setOutputRenderTarget(F.capRT0); if (F.P) F.P.render(); else r.render(scene, camera); } finally { r.setOutputRenderTarget(o); r.setRenderTarget(prev); }
+      if (!F.P) { F.semPos(scene, camera, F.capRT0); F.semPos(scene, camera, null); } /* 5.0b.1: sem o pós, o caminho dos efeitos depois dos tons na foto (RGBA8) e na tela: os 4 pipelines dele nascem aqui */ else try { r.setRenderTarget(null); r.setOutputRenderTarget(F.capRT0); F.P.render(); } finally { r.setOutputRenderTarget(o); r.setRenderTarget(prev); }
     } catch (err) { F.erro = err; console.warn('[ARD] Modo Foto: aquecimento do Motor 5 falhou: ' + err.message); }
     return pronto();
   };
@@ -189,9 +235,10 @@ function criar(X, P) {
     const ch = F.ch; if (!ch) return; const sz = (n, w, h) => { try { if (n && n.setSize) n.setSize(w, h); } catch (e) {} };
     sz(ch.sp, 2, 2); sz(ch.aoN, 2, 2); sz(ch.hdr, 2, 2); sz(ch.bloomN, 64, 64); sz(ch.aa, 2, 2); if (ch.aa && ch.aa.textureNode) sz(ch.aa.textureNode, 2, 2);
     if (F.dofN) { sz(F.dofN, 2, 2); sz(F.dofN._CoCBlurNode, 2, 2); }
+    if (SP.tons) SP.tons.setSize(1, 1); /* 5.0b.1: o alvo dos tons sem o pós volta a 1×1 fora do modo (o próximo quadro do foto redimensiona) */
   };
   F.descartar = function () {
-    try { if (F.pipe) F.pipe.dispose(); const ch = F.ch; if (ch) { ch.sp.dispose(); if (ch.aoN) ch.aoN.dispose(); if (ch.bloomN) ch.bloomN.dispose(); if (ch.aa && ch.aa.dispose) ch.aa.dispose(); } if (F.dofN) F.dofN.dispose(); if (F.dq) F.dq.material.dispose(); if (F.dsRT) F.dsRT.dispose(); F.soltar(); F.capRT0.dispose(); } catch (e) {}
+    try { if (F.pipe) F.pipe.dispose(); const ch = F.ch; if (ch) { ch.sp.dispose(); if (ch.aoN) ch.aoN.dispose(); if (ch.bloomN) ch.bloomN.dispose(); if (ch.aa && ch.aa.dispose) ch.aa.dispose(); } if (F.dofN) F.dofN.dispose(); if (F.dq) F.dq.material.dispose(); if (F.dsRT) F.dsRT.dispose(); F.soltar(); F.capRT0.dispose(); if (SP.tons) { SP.tons.dispose(); SP.q.material.dispose(); SP.conv.material.dispose(); SP.tons = null; SP.q = null; } /* 5.0b.1 */ } catch (e) {}
     F.pipe = null; F.ch = null; F.pronto = false;
   };
   return F;
