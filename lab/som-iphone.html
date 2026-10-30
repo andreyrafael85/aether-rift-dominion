@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Teste de som no iPhone</title>
+<!-- 5.0c (30/10/2026): bancada do som no iPhone, fora do jogo. Cada teste é um toque (o iOS só libera áudio dentro de um gesto); a página
+     mostra ao vivo o AudioContext, a sessão de reprodução (navigator.audioSession) e a voz do sistema, pergunta se você ouviu e junta tudo
+     num texto para copiar. Responde três perguntas da 5.0c.1: a voz do sistema sai no iPhone (com e sem a chave de silêncio, com e sem a
+     sessão de reprodução)? a fala suspende o Web Audio? que formato de arquivo o Safari toca (Opus em Ogg ou WebM, AAC, MP3)?
+     O clipe é a saudação da Sylvia Oriel do elenco das vozes (Kokoro-82M, voz pf_dora; ASSETS.md). -->
+<style>
+:root{--bg:#0d1014;--fg:#e8edf2;--fg2:#9aa6b2;--card:#161b22;--line:#2a313a;--ok:#4fd68a;--no:#ff7a6b;--ac:#7bc4ff}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 -apple-system,system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:16px 16px 48px}
+h1{font-size:1.3rem;margin:.2rem 0 .4rem}p{margin:.4rem 0;color:var(--fg2)}
+.estado{position:sticky;top:0;z-index:2;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);font:13px/1.4 ui-monospace,Menlo,monospace}
+.estado b{color:var(--ac);font-weight:600}
+.chave{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.chave label{flex:1 1 140px;display:flex;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.t{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}
+.t h2{font-size:1rem;margin:0 0 4px}.t .d{font-size:.85rem;color:var(--fg2);margin:0 0 8px}
+button{font:inherit;border-radius:10px;border:1px solid var(--line);background:#222a34;color:var(--fg);padding:10px 14px;min-height:44px;cursor:pointer}
+button.ir{background:#1d5d9b;border-color:#2c76bf;font-weight:600}
+.resp{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.resp button.sel-sim{background:#1f5b3a;border-color:var(--ok)}.resp button.sel-nao{background:#5b2620;border-color:var(--no)}
+.log{font:12px/1.4 ui-monospace,Menlo,monospace;color:var(--fg2);white-space:pre-wrap;margin-top:6px;overflow-wrap:anywhere}
+textarea{width:100%;min-height:220px;font:12px/1.4 ui-monospace,Menlo,monospace;background:#0a0c10;color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px}
+</style>
+</head>
+<body>
+<main>
+<h1>Teste de som no iPhone</h1>
+<p>Toque nos testes de cima para baixo. Depois de cada um, responda se ouviu. No fim, toque em <b>Copiar resultado</b> e cole na conversa.</p>
+<div class="estado" id="estado">carregando…</div>
+<div class="chave">
+  <label><input type="radio" name="chave" value="desligada" checked> Chave de silêncio <b>desligada</b> (toca)</label>
+  <label><input type="radio" name="chave" value="ligada"> Chave de silêncio <b>ligada</b> (silencioso)</label>
+</div>
+<div id="testes"></div>
+<div class="t"><h2>Resultado</h2><p class="d">Se der tempo, repita os testes com a chave de silêncio na outra posição (marque acima antes).</p>
+<div class="resp"><button class="ir" id="copiar">Copiar resultado</button><button id="atualizar">Atualizar texto</button></div>
+<textarea id="saida" readonly></textarea></div>
+</main>
+<script>
+'use strict';
+const $ = s => document.querySelector(s), FRASE = 'Teste de voz do sistema. Comandante, a Fenda está estável.';
+let ctx = null, t0 = performance.now(); const R = [], buf = {};
+const ms = () => Math.round(performance.now() - t0);
+const sessao = () => { try { return navigator.audioSession ? navigator.audioSession.type : 'sem API'; } catch (e) { return 'erro'; } };
+const ctxEstado = () => ctx ? ctx.state : 'não criado';
+const chave = () => (document.querySelector('input[name=chave]:checked') || {}).value;
+function vozesPt() { let v = []; try { v = speechSynthesis.getVoices() || []; } catch (e) {} return v.filter(x => /^pt/i.test(x.lang)); }
+function vozLuciana() { return vozesPt().find(x => /Luciana/.test(x.name)) || null; }
+function estado() { const vs = vozesPt(); let fala = 'sem voz do sistema'; try { fala = (speechSynthesis.speaking ? 'falando' : 'parada') + (speechSynthesis.pending ? ' + na fila' : '') + (speechSynthesis.paused ? ' (pausada)' : ''); } catch (e) {}
+  $('#estado').innerHTML = 'Web Audio: <b>' + ctxEstado() + '</b> · sessão: <b>' + sessao() + '</b> · voz: <b>' + fala + '</b> · vozes pt: <b>' + vs.length + '</b>'; }
+setInterval(estado, 250); estado();
+function garanteCtx() { if (!ctx) { const C = window.AudioContext || window.webkitAudioContext; ctx = new C(); ctx.onstatechange = () => log(null, 'Web Audio virou ' + ctx.state); } const p = ctx.resume ? ctx.resume() : null; return p; }
+function bipe(f) { const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = f || 660; g.gain.value = 0.0001; g.gain.setValueAtTime(0.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.6); o.connect(g).connect(ctx.destination); o.start(); o.stop(ctx.currentTime + 0.65); }
+function falar(t, comVoz) { return new Promise(res => { let u; try { u = new SpeechSynthesisUtterance(FRASE); } catch (e) { log(t, 'sem SpeechSynthesisUtterance'); res(); return; }
+  u.lang = 'pt-BR'; u.volume = 1; u.rate = 1; if (comVoz) { const v = vozLuciana(); if (v) u.voice = v; log(t, 'voz pedida: ' + (v ? v.name + ' · ' + v.voiceURI : 'nenhuma Luciana')); }
+  const i0 = performance.now(); let fim = false; u.onstart = () => log(t, 'fala: start em ' + Math.round(performance.now() - i0) + ' ms · Web Audio ' + ctxEstado());
+  u.onend = () => { fim = true; log(t, 'fala: end em ' + Math.round(performance.now() - i0) + ' ms · Web Audio ' + ctxEstado()); res(); };
+  u.onerror = e => { fim = true; log(t, 'fala: error "' + (e && e.error) + '" em ' + Math.round(performance.now() - i0) + ' ms'); res(); };
+  try { speechSynthesis.cancel(); } catch (e) {} try { speechSynthesis.speak(u); } catch (e) { log(t, 'speak falhou: ' + e.message); res(); }
+  setTimeout(() => { if (!fim) { log(t, 'fala: sem end depois de 8 s · speaking=' + speechSynthesis.speaking + ' · Web Audio ' + ctxEstado()); res(); } }, 8000); }); }
+async function arquivo(t, ext, tipo) { const url = 'som/sylvia.' + ext; log(t, 'canPlayType("' + tipo + '") = "' + (new Audio().canPlayType(tipo) || 'não') + '"');
+  try { if (!buf[ext]) { const r = await fetch(url); const ab = await r.arrayBuffer(); buf[ext] = await new Promise((ok, no) => { const p = ctx.decodeAudioData(ab, ok, no); if (p && p.then) p.then(ok, no); }); }
+    const s = ctx.createBufferSource(); s.buffer = buf[ext]; s.connect(ctx.destination); s.start(); log(t, 'decodificou (' + buf[ext].duration.toFixed(2) + ' s) e tocou · Web Audio ' + ctxEstado()); }
+  catch (e) { log(t, 'decodeAudioData falhou: ' + (e && (e.message || e.name || e))); } }
+const TESTES = [
+  { id: 'bipe', nome: '1. Bipe (Web Audio)', d: 'Um tom curto pelo Web Audio, como os efeitos do jogo.', run: async t => { await garanteCtx(); bipe(660); log(t, 'bipe · Web Audio ' + ctxEstado()); } },
+  { id: 'fala-auto', nome: '2. Voz do sistema, sessão automática', d: 'A voz do iPhone com a sessão de áudio no padrão do Safari (auto).', run: async t => { try { if (navigator.audioSession) navigator.audioSession.type = 'auto'; } catch (e) {} log(t, 'sessão ' + sessao()); await falar(t, false); } },
+  { id: 'fala-playback', nome: '3. Voz do sistema, sessão de reprodução', d: 'A mesma voz com a sessão "playback", que o jogo usa para tocar com a chave de silêncio ligada.', run: async t => { try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {} log(t, 'sessão ' + sessao()); await falar(t, false); } },
+  { id: 'fala-luciana', nome: '4. Voz do sistema com a Luciana escolhida', d: 'Como o jogo faz: a Luciana pedida pelo nome.', run: async t => { await falar(t, true); } },
+  { id: 'bipe-depois', nome: '5. Bipe depois da voz', d: 'Confere se a voz deixou o Web Audio parado.', run: async t => { log(t, 'antes: Web Audio ' + ctxEstado()); await garanteCtx(); bipe(880); setTimeout(() => log(t, 'depois: Web Audio ' + ctxEstado()), 300); } },
+  { id: 'ogg', nome: '6. Voz gravada, Opus em Ogg', d: 'A saudação da Sylvia como arquivo, pelo Web Audio.', run: async t => { await garanteCtx(); await arquivo(t, 'ogg', 'audio/ogg; codecs=opus'); } },
+  { id: 'webm', nome: '7. Voz gravada, Opus em WebM', d: 'O mesmo áudio em outro formato.', run: async t => { await garanteCtx(); await arquivo(t, 'webm', 'audio/webm; codecs=opus'); } },
+  { id: 'm4a', nome: '8. Voz gravada, AAC (M4A)', d: 'O mesmo áudio em AAC.', run: async t => { await garanteCtx(); await arquivo(t, 'm4a', 'audio/mp4; codecs=mp4a.40.2'); } },
+  { id: 'mp3', nome: '9. Voz gravada, MP3', d: 'O mesmo áudio em MP3.', run: async t => { await garanteCtx(); await arquivo(t, 'mp3', 'audio/mpeg'); } },
+  { id: 'gravada-playback', nome: '10. Voz gravada com a sessão de reprodução', d: 'Opus ou AAC (o que tocou acima) com a sessão "playback". Faça com a chave de silêncio ligada também.', run: async t => { try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {} await garanteCtx(); const ext = buf.webm ? 'webm' : buf.ogg ? 'ogg' : buf.m4a ? 'm4a' : 'mp3'; log(t, 'sessão ' + sessao() + ' · formato ' + ext); await arquivo(t, ext, ''); } },
+];
+function log(t, s) { const linha = '[' + ms() + ' ms] ' + s; if (t) { t.log.push(linha); t.el.querySelector('.log').textContent = t.log.join('\n'); } else R.push(linha); }
+for (const d of TESTES) { const el = document.createElement('div'); el.className = 't'; el.innerHTML = '<h2></h2><p class="d"></p><div class="resp"><button class="ir">Tocar</button><button data-o="sim">Ouvi</button><button data-o="nao">Não ouvi</button></div><div class="log"></div>';
+  el.querySelector('h2').textContent = d.nome; el.querySelector('.d').textContent = d.d; const t = Object.assign({ log: [], el, ouviu: null, rodadas: [] }, d); d.t = t;
+  el.querySelector('.ir').addEventListener('click', () => { t.log.length = 0; t.ouviu = null; el.querySelectorAll('[data-o]').forEach(b => b.className = ''); log(t, 'toque · chave ' + chave() + ' · sessão ' + sessao() + ' · Web Audio ' + ctxEstado()); t.run(t); });
+  el.querySelectorAll('[data-o]').forEach(b => b.addEventListener('click', () => { t.ouviu = b.dataset.o; el.querySelectorAll('[data-o]').forEach(x => x.className = ''); b.className = 'sel-' + b.dataset.o; t.rodadas.push({ chave: chave(), ouviu: t.ouviu, log: t.log.slice() }); texto(); }));
+  $('#testes').appendChild(el); }
+function texto() { const vs = vozesPt().map(v => v.name + ' (' + v.lang + (v.localService === false ? ', online' : '') + (v.default ? ', padrão' : '') + ') ' + v.voiceURI);
+  const L = ['Teste de som no iPhone · ' + new Date().toISOString(), navigator.userAgent, 'audioSession: ' + (navigator.audioSession ? 'sim' : 'não') + ' · vozes pt: ' + vs.length, ...vs.map(x => '  ' + x), ''];
+  for (const d of TESTES) for (const r of d.t.rodadas) { L.push(d.nome + ' · chave ' + r.chave + ' · ' + (r.ouviu === 'sim' ? 'OUVIU' : 'NÃO OUVIU')); for (const l of r.log) L.push('   ' + l); }
+  if (R.length) { L.push('', 'Eventos:'); for (const l of R) L.push('  ' + l); } $('#saida').value = L.join('\n'); }
+$('#atualizar').addEventListener('click', texto);
+$('#copiar').addEventListener('click', async () => { texto(); try { await navigator.clipboard.writeText($('#saida').value); $('#copiar').textContent = 'Copiado'; } catch (e) { const a = $('#saida'); a.focus(); a.select(); try { document.execCommand('copy'); $('#copiar').textContent = 'Copiado'; } catch (er) { $('#copiar').textContent = 'Selecione o texto e copie'; } } setTimeout(() => { $('#copiar').textContent = 'Copiar resultado'; }, 2500); });
+try { speechSynthesis.onvoiceschanged = estado; speechSynthesis.getVoices(); } catch (e) {}
+texto();
+</script>
+</body>
+</html>
