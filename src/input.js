@@ -40,10 +40,10 @@ function create(o) {
   }
   function ownSelectedUnits() { const out = []; for (const id of view.sel) { const e = sim.byId.get(id); if (e && e.alive && e.kind === 'unit' && e.owner === human) out.push(e); } return out; }
   function ownSelectedBuilding() { for (const id of view.sel) { const e = sim.byId.get(id); if (e && e.alive && e.kind === 'building' && e.owner === human) return e; } return null; }
-  function setSel(ids) { view.sel = new Set(ids); ui.selectionChanged(); }
+  function setSel(ids) { view.sel = new Set(ids); ui.selectionChanged(); if (ARD.vozes) ARD.vozes.selecao(sim, human, ids); /* 5.0c.1: resposta da unidade (uma por seleção; a caixa chama uma vez) */ }
   I.select = setSel;
   I.selectOnScreen = function () { const ids = []; for (const e of sim.ents) { if (!e.alive || e.owner !== human || e.kind !== 'unit' || !S.UNITS[e.def].attack) continue; const [sx, sy] = R.worldToScreen(cam, e.x, e.y); if (sx >= 0 && sy >= 0 && sx <= R.w && sy <= R.h) ids.push(e.id); } setSel(ids); return ids.length; };
-  function cmd(c) { c.p = human; if (ui.enqueue) ui.enqueue(c); else S.enqueue(sim, c); }
+  function cmd(c) { c.p = human; if (ui.enqueue) ui.enqueue(c); else S.enqueue(sim, c); if (ARD.vozes) ARD.vozes.ordem(sim, human, c); /* 5.0c.1: resposta da unidade à ordem (mover, atacar) */ }
   I.cmd = cmd;
   I.pick = pick; I.ownSelectedUnits = ownSelectedUnits; I.ownSelectedBuilding = ownSelectedBuilding; I.contextCommand = contextCommand; /* 5.0b: a roda de comandos usa os mesmos critérios do clique */
 

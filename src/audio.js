@@ -1,9 +1,10 @@
-/* Áudio: efeitos sintetizados em WebAudio (sem arquivos) e voz de sistema pela Web Speech API. */
+/* Áudio: efeitos sintetizados em WebAudio (sem arquivos) e voz de sistema pela Web Speech API. 5.0c.1: e as vozes gravadas (src/vozes.js), pelo mesmo Web Audio. */
 (function (ARD) {
 'use strict';
-const A = { ctx: null, master: null, enabled: true, voice: true, inited: false, last: {}, recent: [], lastVoice: {}, voiceObj: null, voz: '', vozNome: '' };
-try { const p = JSON.parse(localStorage.getItem('ard-audio') || '{}'); if (p.enabled === false) A.enabled = false; if (p.voice === false) A.voice = false; if (typeof p.voz === 'string') A.voz = p.voz; if (typeof p.vozNome === 'string') A.vozNome = p.vozNome; /* 5.0a.2: voz escolhida em Ajustes ('' = Automática) */ } catch (e) {}
-function save() { try { localStorage.setItem('ard-audio', JSON.stringify({ enabled: A.enabled, voice: A.voice, voz: A.voz || '', vozNome: A.vozNome || '' })); } catch (e) {} }
+const A = { ctx: null, master: null, enabled: true, voice: true, gravadas: true /* 5.0c.1: vozes gravadas (false = voz do sistema) */, inited: false, last: {}, recent: [], lastVoice: {}, voiceObj: null, voz: '', vozNome: '' };
+try { const p = JSON.parse(localStorage.getItem('ard-audio') || '{}'); if (p.enabled === false) A.enabled = false; if (p.voice === false) A.voice = false; if (typeof p.voz === 'string') A.voz = p.voz; if (typeof p.vozNome === 'string') A.vozNome = p.vozNome; /* 5.0a.2: voz escolhida em Ajustes ('' = Automática) */ if (p.gravadas === false) A.gravadas = false; /* 5.0c.1 */ } catch (e) {}
+function save() { try { localStorage.setItem('ard-audio', JSON.stringify({ enabled: A.enabled, voice: A.voice, voz: A.voz || '', vozNome: A.vozNome || '', gravadas: A.gravadas !== false /* 5.0c.1 */ })); } catch (e) {} }
+const VZ = () => (globalThis.ARD && ARD.vozes) || null; /* 5.0c.1: o tocador das vozes gravadas (src/vozes.js); sem ele (testes no Node), tudo como antes */
 A.init = function () {
   if (A.inited) return; A.inited = true; sessao(); /* 5.0b.1: a sessão de reprodução do iOS vem antes de o contexto nascer */
   try { const C = window.AudioContext || window.webkitAudioContext; if (!C) return; A.ctx = new C(); A.master = A.ctx.createGain(); A.master.gain.value = 0.35; A.master.connect(A.ctx.destination); } catch (e) { A.ctx = null; }
@@ -111,21 +112,28 @@ function pickVoice(id, genero) { const r = ranking(), want = id != null ? id : A
 /* 5.0a.2: falas por tipo — intervalo mínimo para repetir a mesma fala (s) e prioridade. A maior interrompe a menor (o perigo corta "Unidade pronta";
    uma fala de líder ou o "Ouvir" corta a anterior do mesmo tipo); avisos de rotina (unidade, obra, pesquisa) guardam 3 s entre si e não fazem fila: com a voz ocupada,
    ficam de fora; o resto espera numa fila de uma fala só, que é descartada se envelhecer 4 s. A legenda segue a mesma decisão. */
-const TIPOS = { sistema: { gap: 0, p: 4 }, perigo: { gap: 12, p: 3 }, lider: { gap: 4, p: 2 }, evento: { gap: 15, p: 2 }, pesquisa: { gap: 6, p: 1 }, obra: { gap: 10, p: 1 }, unidade: { gap: 12, p: 1 } };
+const TIPOS = { sistema: { gap: 0, p: 4 }, perigo: { gap: 12, p: 3 }, lider: { gap: 4, p: 2 }, evento: { gap: 15, p: 2 }, pesquisa: { gap: 6, p: 1 }, obra: { gap: 10, p: 1 }, unidade: { gap: 12, p: 1 },
+  resposta: { gap: 2.5, p: 1.5 }, reacao: { gap: 30, p: 2 }, campanha: { gap: 0, p: 2.5 } }; /* 5.0c.1: resposta das unidades (corta aviso de rotina e a resposta anterior, nunca faz fila), reação do líder na partida e fala da campanha */
 const TIPO_DA_CHAVE = { built: 'obra', spawn: 'unidade', 'Pesquisa concluída': 'pesquisa', 'Base sob ataque': 'perigo', 'Núcleo sob ataque': 'perigo', 'Alerta de sifão': 'perigo', 'Pacto quebrado': 'perigo',
   'Tempestade de Éter': 'evento', Blecaute: 'evento', 'Fundição Orbital': 'evento', 'Salto de Núcleo': 'evento', 'Pacto assinado': 'evento', elim: 'evento', 'voz-on': 'sistema' };
 const ROTINA_GAP = 3000, FILA_MAX = 4000; const ultima = {}; let ultimaRotina = -1e9, cur = null, fila = null;
-function decide(key, cooldown, now) {
-  const conhecida = TIPO_DA_CHAVE[key] || (/^sala-/.test(key) ? 'lider' : null), tipo = conhecida || 'evento', T = TIPOS[tipo];
+/* 5.0c.1: chaves novas pelo prefixo (unid:<classe>:<ação>, lider:<evento>, camp:<missão>:<n>, loc:<aviso>, elim:<IA>); respostas guardam 0,25 s entre si
+   (os dois comandos de um clique com grupo misto viram uma resposta só; a ordem logo depois da seleção corta a resposta da seleção) e as reações do líder 12 s (com a fila, o líder fala depois do locutor) */
+const PREFIXO = [[/^sala-/, 'lider'], [/^unid:/, 'resposta'], [/^lider:/, 'reacao'], [/^camp:/, 'campanha'], [/^(loc|elim):/, 'evento']];
+function tipoDe(key, forc) { if (forc && TIPOS[forc]) return forc; if (TIPO_DA_CHAVE[key]) return TIPO_DA_CHAVE[key]; for (const [re, t] of PREFIXO) if (re.test(key)) return t; return null; }
+const RESPOSTA_GAP = 250, REACAO_GAP = 12000; let ultimaResposta = -1e9, ultimaReacao = -1e9;
+function decide(key, cooldown, now, forc) {
+  const conhecida = tipoDe(key, forc) /* 5.0c.1 */, tipo = conhecida || 'evento', T = TIPOS[tipo];
   const gap = cooldown === 0 ? 0 : conhecida ? Math.max(T.gap, cooldown || 0) : (cooldown == null ? 6 : cooldown); /* chave nova: o intervalo de quem chamou */
   if (gap && ultima[key] != null && now - ultima[key] < gap * 1000) return null;
   if (T.p === 1 && now - ultimaRotina < ROTINA_GAP) return null;
+  if ((tipo === 'resposta' && now - ultimaResposta < RESPOSTA_GAP) || (tipo === 'reacao' && now - ultimaReacao < REACAO_GAP)) return null; /* 5.0c.1 */
   return { tipo, p: T.p };
 }
 /* 5.0b: gancho de palavras da voz: o evento 'ard-voz' no window traz { tipo: 'inicio' | 'palavra' | 'fim', texto, i, n } (posição e tamanho da palavra,
    do evento boundary do speechSynthesis); a Sala de Comando mexe a boca do líder com ele */
 function voiceHook(u, text, c) { const ev = (tipo, i, n) => { try { window.dispatchEvent(new CustomEvent('ard-voz', { detail: { tipo, texto: text, i: i || 0, n: n || 0 } })); } catch (e) {} };
-  u.onstart = () => { c.ini = true; ev('inicio'); }; u.onboundary = e => { if (!e.name || e.name === 'word') ev('palavra', e.charIndex, e.charLength); }; u.onend = () => { ev('fim'); acabou(c); }; u.onerror = e => { ev('fim'); falhou(c, e); }; }
+  u.onstart = () => { c.ini = true; ev('inicio'); }; u.onboundary = e => { if (!e.name || e.name === 'word') ev('palavra', e.charIndex, e.charLength); }; u.onend = () => { ev('fim'); acabou(c); depoisDaFala(); }; u.onerror = e => { ev('fim'); falhou(c, e); depoisDaFala(); }; } /* 5.0c.1: o Web Audio do iOS volta no fim da fala */
 function comecar(text, d, voz, tentativa) {
   let u; try { u = new SpeechSynthesisUtterance(text); } catch (e) { cur = null; return false; }
   const v = voz || pickVoice(null, d.genero) /* 5.0a.3: d.genero = gênero do líder que fala */; if (v) { try { u.voice = v; } catch (e) {} } u.lang = (v && v.lang) || LANG_FALA[IDI()] /* 5.0c */; u.pitch = 1; u.rate = d.p === 3 ? 1.05 : 1; u.volume = 0.9; /* 5.0a.2: tom natural (antes 0.85 e 1.05) */
@@ -134,37 +142,63 @@ function comecar(text, d, voz, tentativa) {
   return true;
 }
 function acabou(c) { if (cur !== c) return; cur = null; proxima(); }
-function proxima() { while (fila) { const f = fila; fila = null; if (performance.now() - f.t <= FILA_MAX) { comecar(f.text, f.d); return; } } }
+function proxima() { while (fila) { const f = fila; fila = null; if (performance.now() - f.t <= FILA_MAX) { if (f.g) comecarGravada(f.text, f.d, f.g, f.o); else comecar(f.text, f.d); return; } } } /* 5.0c.1: a fila guarda também a fala gravada */
+/* 5.0c.1: voz do sistema permitida? No iPhone com vozes gravadas, não (src/vozes.js, IOS_FALA_SISTEMA): a fala sem arquivo fica só na legenda */
+const podeSistema = () => temFala() && !(VZ() && VZ().semFalaSistema());
+/* 5.0c.1: fala gravada pelo Web Audio, no mesmo lugar da fala do sistema (cur): a prioridade, o intervalo, a fila e o corte valem igual; o 'ard-voz'
+   sai com o tempo real de cada palavra do manifesto (i e n no texto, dur em s, gravada: true). Se o arquivo falhar, a voz do sistema assume (menos no iPhone). */
+function comecarGravada(text, d, g, o, marca) { o = o || {}; const now = performance.now(); const vz = VZ(); if (!vz) return false;
+  const c = cur = marca || {}; Object.assign(c, { p: d.p, tipo: d.tipo, text, d, g, o, t0: now, grav: true, fim: now + (o.espera || 0) + 4000 + (g.dur || 3) * 1000 });
+  const ev = (tipo, i, n, dur) => { try { window.dispatchEvent(new CustomEvent('ard-voz', { detail: { tipo, texto: g.texto, i: i || 0, n: n || 0, dur: dur || 0, gravada: true, chave: g.chave, raca: o.raca || null, lider: !!o.lider } })); } catch (e) {} };
+  c.h = vz.tocar(g, { inicio: () => { c.ini = true; ev('inicio'); }, palavra: (i, n, dur) => ev('palavra', i, n, dur), fim: () => { ev('fim'); if (/^sala-/.test(g.chave || '') && vz.depoisDaSala) vz.depoisDaSala(o.raca); acabou(c); },
+    falhou: mot => { if (cur !== c) return; cur = null; if (o.aoFalhar) try { o.aoFalhar(mot); } catch (e) {} if (o.sistema !== false && podeSistema() && comecar(o.textoSistema || text, d)) return; proxima(); } }, { espera: o.espera || 0 });
+  return true; }
 function falhou(c, e) { if (cur !== c) return; cur = null; const er = String((e && e.error) || '');
   if (!/interrupted|canceled/.test(er) && c.u.voice && c.tentativa < 2) { /* voz online sem rede: todas as online saem até a rede voltar e a fala repete na melhor local */
     if (c.u.voice.localService === false) { for (const x of ranking()) if (x.v.localService === false) RUIM.add(x.id); } else RUIM.add(vozId(c.u.voice));
     UIS.forEach(preencher); if (comecar(c.text, c.d, null, c.tentativa + 1)) return; }
   proxima(); }
-function falar(text, d, voz) {
-  const now = performance.now(); if (cur && now > cur.fim) cur = null; /* o onend não veio: libera a voz */
+function falar(text, d, voz, g, o) { /* 5.0c.1: g = fala gravada (src/vozes.js), o = opções do A.say */
+  const now = performance.now(); if (cur && now > cur.fim) { const vel = cur; cur = null; if (vel.h) try { vel.h.parar(0); } catch (e) {} } /* o onend não veio: libera a voz */
   if (cur) {
-    if (d.p > cur.p || (d.tipo === cur.tipo && (d.tipo === 'lider' || d.tipo === 'sistema'))) { const marca = cur = { p: d.p, tipo: d.tipo, fim: now + 2000 }; fila = null; try { speechSynthesis.cancel(); } catch (e) {} setTimeout(() => { if (cur === marca) comecar(text, d, voz); }, 60); return true; } /* falar logo depois do cancel perde a fala no Chrome */
-    if (d.p >= 2 && !fila) { fila = { text, d, t: now }; return true; }
+    if (d.p > cur.p || (d.tipo === cur.tipo && (d.tipo === 'lider' || d.tipo === 'sistema' || d.tipo === 'resposta'))) { const ant = cur, marca = cur = { p: d.p, tipo: d.tipo, fim: now + 2000, sis: !g }; fila = null;
+      if (ant.h) { try { ant.h.parar(); } catch (e) {} } /* 5.0c.1: a gravada sai com um fade curto */ else if ((ant.u || ant.sis) && temFala()) { try { speechSynthesis.cancel(); } catch (e) {} } /* 5.0c.1: o cancel só quando a voz do sistema falava (no iPhone com vozes gravadas ela nem é chamada) */
+      if (g) comecarGravada(text, d, g, o, marca); else setTimeout(() => { if (cur === marca) comecar(text, d, voz); }, 60); return true; } /* falar logo depois do cancel perde a fala no Chrome */
+    if (d.p >= 2 && !fila) { fila = { text, d, t: now, g, o }; return true; }
     return false;
   }
-  return comecar(text, d, voz);
+  return g ? comecarGravada(text, d, g, o) : comecar(text, d, voz);
 }
 A.onSay = null; /* 5.0b: legendas — cada fala aceita também vai para A.onSay(texto, chave), que a Interface 3.0 mostra com o retrato do líder (mesmo com a voz desligada) */
-A.say = function (text, key, cooldown, quem) { /* 5.0a.3: quem = raça do líder que fala (a chave 'sala-<raça>' da Sala de Comando já diz quem é) */
-  key = key || text; const now = performance.now(); const d = decide(key, cooldown, now); if (!d) return false;
-  { const lid = quem || (/^sala-([a-z]+)$/.exec(key) || [])[1]; if (lid && GENERO_LIDER[lid]) d.genero = GENERO_LIDER[lid]; else if (A.raca && GENERO_LOCUTOR[A.raca]) d.genero = GENERO_LOCUTOR[A.raca]; } /* 5.0a.3; 5.0c: o locutor da Raça */
-  if (A.voice && temFala() && !falar(text, d)) return false;
-  ultima[key] = now; if (d.p === 1) ultimaRotina = now;
-  if (A.onSay) { try { A.onSay(text, key); } catch (e) {} }
+/* 5.0c.1: o = { chaves (candidatas), pacote, partes (sequência: [{ chaves }]), tipo, legenda (false = sem A.onSay), soGravada (sem a fala gravada pronta, nada),
+   espera (ms para o arquivo chegar), campRaca, g (fala já escolhida), sistema (false = sem a voz do sistema se a gravada falhar), textoSistema, aoFalhar, lider }.
+   Com a fala gravada pronta (bytes na memória), ela toca pelo Web Audio e a legenda usa o texto do manifesto do idioma atual; sem ela, a voz do
+   sistema, como antes (no iPhone com vozes gravadas, só a legenda); a fala que ainda não chegou é pedida para a próxima vez. */
+A.say = function (text, key, cooldown, quem, o) { /* 5.0a.3: quem = raça do líder que fala (a chave 'sala-<raça>' da Sala de Comando já diz quem é) */
+  key = key || text; o = o || {}; const now = performance.now(); const d = decide(key, cooldown, now, o.tipo); if (!d) return false;
+  const lid = quem || (/^sala-([a-z]+)$/.exec(key) || [])[1]; { if (lid && GENERO_LIDER[lid]) d.genero = GENERO_LIDER[lid]; else if (A.raca && GENERO_LOCUTOR[A.raca]) d.genero = GENERO_LOCUTOR[A.raca]; } /* 5.0a.3; 5.0c: o locutor da Raça */
+  const vz = VZ(); if (vz && o.espera == null && /^sala-/.test(key)) o = Object.assign({}, o, { espera: vz.ESPERA_SALA }); /* 5.0c.1: a saudação da Sala espera o arquivo da Raça nova */
+  const g0 = A.voice && vz ? (o.g || vz.achar(o.chaves || key, lid || null, o)) : null, g = g0 && (g0.pronta || o.espera > 0) ? g0 : null; if (g0 && !g && vz.pedir) vz.pedir(g0); /* 5.0c.1 */
+  const txt = g ? g.texto : text != null ? text : g0 ? g0.texto : null; if (txt == null || (!g && o.soGravada)) return false;
+  const sis = !g && A.voice && podeSistema(); if (sis && !D.voz && movel()) D.pronto = false; /* 5.0c.1: a voz do sistema voltou a valer no celular: o próximo toque prepara */
+  if (A.voice && (g || sis) && !falar(txt, d, null, g, Object.assign({ raca: lid || A.raca || null }, o))) return false;
+  ultima[key] = now; if (d.p === 1) ultimaRotina = now; if (d.tipo === 'resposta') ultimaResposta = now; else if (d.tipo === 'reacao') ultimaReacao = now; /* 5.0c.1 */
+  if (A.onSay && o.legenda !== false) { try { A.onSay(txt, key); } catch (e) {} }
   return true;
 };
-A.setEnabled = function (on) { A.enabled = on; save(); sessao(); htmlMudo(); if (on) retomar(); }; A.setVoice = function (on) { A.voice = on; save(); sessao(); if (!on) { fila = null; cur = null; if (temFala()) try { speechSynthesis.cancel(); } catch (e) {} } }; /* 5.0b.1: a sessão de reprodução e o áudio mudo do iOS seguem o som e a voz */
+A.setEnabled = function (on) { A.enabled = on; save(); sessao(); htmlMudo(); if (on) retomar(); }; A.setVoice = function (on) { A.voice = on; save(); sessao(); htmlMudo(); if (!on) { calar(); } };
+/* 5.0c.1: cala a fala atual (gravada ou do sistema) e esvazia a fila */
+function calar() { const c = cur; fila = null; cur = null; if (c && c.h) try { c.h.parar(); } catch (e) {} if (temFala() && !(VZ() && VZ().semFalaSistema() && !(c && (c.u || c.sis)))) try { speechSynthesis.cancel(); } catch (e) {} }
+A.calar = calar; A.refazUI = () => UIS.forEach(preencher); /* 5.0c.1: a dica muda quando as vozes gravadas ficam prontas ou indisponíveis */
+/* 5.0c.1: Vozes gravadas (Ajustes): ligadas por padrão; desligadas, todas as falas usam a voz do sistema (como na 5.0c) */
+A.setGravadas = function (on) { A.gravadas = !!on; save(); calar(); const vz = VZ(); if (vz && vz.mudou) vz.mudou(); UIS.forEach(preencher); htmlMudo(); }; /* 5.0b.1: a sessão de reprodução e o áudio mudo do iOS seguem o som e a voz */
 /* 5.0a.2: escolha da voz em Ajustes (tela inicial e partida): cada bloco [data-voz-ui] tem um select[data-voz-sel], um botão [data-voz-ouvir] e um texto
    [data-voz-dica]. Os blocos ficam em sincronia e se refazem quando o aparelho carrega mais vozes (o Edge traz as neurais depois das locais);
    "Ouvir" fala a frase de exemplo com a voz do select, mesmo com a voz do jogo desligada. */
 const AMOSTRA = 'Comandante, a Fenda está estável e o Núcleo aguarda as suas ordens.';
 const UIS = []; const esc = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 function dica(r, best) { const ua = (typeof navigator !== 'undefined' && navigator.userAgent) || '', ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1), mac = !ios && /Macintosh/.test(ua), win = /Windows/.test(ua), ffx = /Firefox\//.test(ua), android = /Android/.test(ua);
+  if (ios && A.gravadas !== false && VZ() && VZ().disponivel()) return TX('voz.d.ios-gravadas'); /* 5.0c.1: o Safari do iPhone só expõe a Luciana e a Joana compactas (nem as aprimoradas baixadas, nem voz masculina): com as vozes gravadas, a dica diz que o jogo fala com elas */
   if (!temFala()) return TX('voz.d.sem'); /* 5.0c: as dicas pelo dicionário */
   if (!r.length) return TX('voz.d.nenhuma') + (win ? ' ' + TX('voz.d.nenhuma-win') : '');
   const n = best ? best.nivel : 0;
@@ -176,6 +210,7 @@ function dica(r, best) { const ua = (typeof navigator !== 'undefined' && navigat
   if (android && n <= 2) return TX('voz.d.android');
   return ''; }
 function preencher(box) {
+  { const cg = box.querySelector('[data-voz-gravada]'); if (cg && cg.checked !== (A.gravadas !== false)) cg.checked = A.gravadas !== false; } /* 5.0c.1 */
   const sel = box.querySelector('[data-voz-sel]'), bt = box.querySelector('[data-voz-ouvir]'), dc = box.querySelector('[data-voz-dica]'); if (!sel) return;
   const r = ranking(), best = r.find(x => !RUIM.has(x.id)), op = x => `<option value="${esc(x.id)}">${esc(x.rotulo)}${RUIM.has(x.id) ? ' ' + esc(TX('voz.falhou')) : ''}</option>`; /* 5.0c */
   let h = `<option value="">${esc(TX('voz.auto'))}${best ? ' · ' + esc(best.rotulo) : ''}</option>`; const br = r.filter(x => x.br), pt = r.filter(x => !x.br);
@@ -191,9 +226,10 @@ A.generoVoz = generoVoz; A.GENERO_LIDER = GENERO_LIDER; A.GENERO_LOCUTOR = GENER
 A.setVoz = function (id) { A.voz = id || ''; const f = ranking().find(x => x.id === A.voz); A.vozNome = f ? nomeCurto(f.v.name) : ''; save(); UIS.forEach(preencher); };
 A.ouvir = function (id) { if (!temFala()) return false; const sid = id != null ? id : A.voz, f = sid ? ranking().find(x => x.id === sid) : null; return falar(TX('voz.amostra', null, AMOSTRA) /* 5.0c */, { tipo: 'sistema', p: 4 }, f ? f.v : null); };
 A.vozUI = function (box) { if (!box || box.__voz) return; box.__voz = 1; UIS.push(box); const sel = box.querySelector('[data-voz-sel]'), bt = box.querySelector('[data-voz-ouvir]'), ts = box.querySelector('[data-som-teste]');
-  if (sel) sel.addEventListener('change', () => A.setVoz(sel.value)); if (bt) bt.addEventListener('click', () => A.ouvir(sel ? sel.value : A.voz)); if (ts) ts.addEventListener('click', () => A.testarSom(box)); /* 5.0b.1: Testar som */ preencher(box); };
+  if (sel) sel.addEventListener('change', () => A.setVoz(sel.value)); if (bt) bt.addEventListener('click', () => A.ouvir(sel ? sel.value : A.voz)); if (ts) ts.addEventListener('click', () => A.testarSom(box)); /* 5.0b.1: Testar som */
+  { const cg = box.querySelector('[data-voz-gravada]'); if (cg) cg.addEventListener('change', () => A.setGravadas(cg.checked)); } /* 5.0c.1: Vozes gravadas */ preencher(box); };
 if (temFala()) { const mudou = () => { RANK = null; UIS.forEach(preencher); }; try { addEventListener('online', () => { RUIM.clear(); mudou(); }); } catch (e) {} try { if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', mudou); else speechSynthesis.onvoiceschanged = mudou; speechSynthesis.getVoices(); } catch (e) {} }
-try { addEventListener('ard-idioma', () => { RANK = null; RUIM.clear(); fila = null; cur = null; if (temFala()) try { speechSynthesis.cancel(); } catch (e) {} UIS.forEach(preencher); }); } catch (e) {} /* 5.0c: a lista e a voz mudam com o idioma, sem recarregar */
+try { addEventListener('ard-idioma', () => { RANK = null; RUIM.clear(); calar() /* 5.0c.1: também a gravada */; UIS.forEach(preencher); }); } catch (e) {} /* 5.0c: a lista e a voz mudam com o idioma, sem recarregar */
 if (typeof document !== 'undefined' && document.querySelectorAll) { const liga = () => document.querySelectorAll('[data-voz-ui]').forEach(b => A.vozUI(b)); if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', liga); else liga(); }
 /* 5.0b.1: som no celular. No iOS o Web Audio e a voz do sistema só começam dentro de um gesto de verdade: touchend, click, pointerup ou keydown
    (o touchstart e o pointerdown do toque não contam). Antes, o src/main.js só escutava pointerdown, keydown e touchstart: no iPhone o AudioContext
@@ -206,7 +242,7 @@ if (typeof document !== 'undefined' && document.querySelectorAll) { const liga =
    conferência: se o contexto voltar a 'suspended' ou 'interrupted' (ligação, outro app, tela bloqueada), ele é retomado no 'statechange', ao
    voltar para a página (visibilitychange, pageshow) ou no próximo gesto. Sem a API de sessão (iOS mais antigo), um <audio> mudo em laço, com
    playsinline, faz o papel dela: só no iPhone e no iPad sem a API, só com o som do jogo ligado e a página à vista (pausa ao esconder). */
-const D = { evento: null, gestos: 0, voz: false, vozEvento: null, mudoCurto: 0, retomadas: 0, interrompido: 0, pronto: false, el: null, elEvento: null, teste: null };
+const D = { evento: null, gestos: 0, voz: false, vozEvento: null, mudoCurto: 0, retomadas: 0, interrompido: 0, pronto: false, el: null, elEvento: null, teste: null, porFala: 0, porFalaAgora: false, retomarDepois: false /* 5.0c.1 */ };
 const UA = () => (typeof navigator !== 'undefined' && navigator.userAgent) || '';
 const ehIOS = () => { const ua = UA(); return /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && typeof navigator !== 'undefined' && navigator.maxTouchPoints > 1); };
 const ehSafari = () => { const ua = UA(); return /AppleWebKit/.test(ua) && /Version\/[\d.]+.*Safari\//.test(ua) && !/Chrome|Chromium|CriOS|FxiOS|Edg|OPR|Android/.test(ua); };
@@ -221,9 +257,16 @@ function gestoValido(e) { if (!e || e.isTrusted === false) return false; const t
 /* sessão de reprodução (iOS com a API): 'playback' com o som ou a voz do jogo ligados (ou no Testar som), 'auto' com os dois desligados */
 function sessao(forcar) { if (!temSessao() || !movel()) return false; const s = navigator.audioSession, quer = forcar || A.enabled || A.voice ? 'playback' : 'auto';
   try { if (s.type !== quer) s.type = quer; } catch (e) {} return s.type === 'playback'; }
-function retomar(c) { c = c || A.ctx; if (!c || !c.resume || c.state === 'running' || c.state === 'closed') return;
+/* 5.0c.1: bancada do iPhone (iOS 18.7, 30/10/2026): a fala do sistema com a sessão 'playback' põe o AudioContext em 'interrupted' e o iOS o devolve
+   sozinho depois dela; um resume() no meio da fala devolve a sessão ao Web Audio e CALA a voz (o "Fala: falando" com "Áudio: suspenso" dos testes
+   do dono: o statechange daqui retomava na hora, e cada efeito pedia resume). No iOS, nada retoma o contexto enquanto a voz do sistema fala ou tem
+   fala na fila (statechange, efeitos, gesto, volta à página, voz gravada): a retomada fica para o fim da fala (onend/onerror) ou para o próprio iOS. */
+const falaAtiva = () => { try { return temFala() && !!(speechSynthesis.speaking || speechSynthesis.pending); } catch (e) { return false; } };
+const segurar = () => ehIOS() && falaAtiva();
+function depoisDaFala() { if (!D.retomarDepois) return; setTimeout(() => { if (segurar()) return; D.retomarDepois = false; D.porFalaAgora = false; if (D.evento && visivel()) retomar(); }, 60); }
+function retomar(c) { c = c || A.ctx; if (!c || !c.resume || c.state === 'running' || c.state === 'closed') return; if (segurar()) { D.retomarDepois = true; return; } /* 5.0c.1 */
   try { const p = c.resume(); if (p && p.then) p.then(() => { if (c.state === 'running') { D.retomadas++; htmlMudo(); } }, () => {}); } catch (e) {} }
-function vigiar(c) { const f = () => { if (c.state === 'running') { htmlMudo(); return; } D.pronto = false; if (c.state === 'interrupted') D.interrompido++; if (D.evento && visivel()) retomar(c); };
+function vigiar(c) { const f = () => { if (c.state === 'running') { htmlMudo(); return; } D.pronto = false; if (segurar()) { if (!D.porFalaAgora) { D.porFalaAgora = true; D.porFala++; } } else if (c.state === 'interrupted') D.interrompido++; if (D.evento && visivel()) retomar(c); }; /* 5.0c.1: a interrupção pela voz do sistema conta à parte (diagnóstico) */
   try { if (c.addEventListener) c.addEventListener('statechange', f); else c.onstatechange = f; } catch (e) {} }
 function bufferMudo(c) { try { const b = c.createBuffer(1, 1, 22050), s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); if (s.start) s.start(0); else s.noteOn(0); D.mudoCurto++; } catch (e) {} }
 /* fala presa: o iOS descarta sem aviso (sem start, end nem error) a fala feita fora de gesto antes do desbloqueio, e ela segurava a voz do jogo até o prazo
@@ -232,44 +275,62 @@ function destravarFala() { const c = cur; if (!c || !c.u || c.ini) return; try {
   cur = null; if (performance.now() - (c.t0 || 0) <= FILA_MAX) comecar(c.text, c.d, null, c.tentativa); else proxima(); }
 /* fala de preparo: volume 0, dentro do gesto (se o próprio gesto já falou, ele mesmo serve de preparo); não passa pela fila, pela legenda nem pelo 'ard-voz' */
 function prepararVoz(e) { if (D.voz || !temFala()) return; D.voz = true; D.vozEvento = e.type;
-  try { if (speechSynthesis.speaking || speechSynthesis.pending) return; const u = new SpeechSynthesisUtterance('Som'); u.lang = LANG_FALA[IDI()]; /* 5.0c */ u.volume = 0; u.rate = 1.3; D.prep = u; speechSynthesis.speak(u); } catch (er) { D.voz = false; } }
+  try { if (speechSynthesis.speaking || speechSynthesis.pending) return; const u = new SpeechSynthesisUtterance('Som'); u.lang = LANG_FALA[IDI()]; /* 5.0c */ u.volume = 0; u.rate = 1.3; u.onend = u.onerror = depoisDaFala; /* 5.0c.1 */ D.prep = u; speechSynthesis.speak(u); } catch (er) { D.voz = false; } }
 /* <audio> mudo em laço (iOS sem navigator.audioSession): um WAV de silêncio de 0,5 s gerado aqui, na taxa do AudioContext (outra taxa faria o iOS
    trocar a do aparelho e chiar o Web Audio); nasce e toca pela primeira vez dentro de um gesto, depois pausa e volta com o som e a página */
 function wavMudo(taxa) { const n = Math.round(taxa / 2), b = new ArrayBuffer(44 + n * 2), d = new DataView(b), w = (o, t) => { for (let i = 0; i < t.length; i++) d.setUint8(o + i, t.charCodeAt(i)); };
   w(0, 'RIFF'); d.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt '); d.setUint32(16, 16, true); d.setUint16(20, 1, true); d.setUint16(22, 1, true); d.setUint32(24, taxa, true); d.setUint32(28, taxa * 2, true); d.setUint16(32, 2, true); d.setUint16(34, 16, true); w(36, 'data'); d.setUint32(40, n * 2, true);
   return new Blob([b], { type: 'audio/wav' }); }
-function htmlMudo(e) { if (!ehIOS() || temSessao() || typeof Audio === 'undefined') return; const quer = A.enabled && visivel() && !!D.evento;
+const querMudo = () => A.enabled || (A.voice && A.gravadas !== false && !!(VZ() && VZ().disponivel())); /* 5.0c.1: a voz gravada também sai pelo Web Audio */
+function htmlMudo(e) { if (!ehIOS() || temSessao() || typeof Audio === 'undefined') return; const quer = querMudo() && visivel() && !!D.evento;
   if (!quer) { if (D.el && !D.el.paused) try { D.el.pause(); } catch (er) {} return; }
   if (!D.el) { if (!e) return; try { const el = new Audio(); el.setAttribute('playsinline', ''); el.setAttribute('webkit-playsinline', ''); el.setAttribute('x-webkit-airplay', 'deny'); el.disableRemotePlayback = true; el.controls = false; el.loop = true; el.preload = 'auto';
     el.src = URL.createObjectURL(wavMudo(Math.round((A.ctx && A.ctx.sampleRate) || 44100))); D.el = el; D.elEvento = e.type; } catch (er) { return; } }
   if (D.el.paused) try { const p = D.el.play(); if (p && p.catch) p.catch(() => {}); } catch (er) {} }
+/* 5.0c.1: no iPhone com vozes gravadas (src/vozes.js, IOS_PREPARO) o gesto não chama o speechSynthesis: sem fala de preparo e sem refazer fala presa */
+const semPreparo = () => !!(VZ() && VZ().semPreparo());
 A.gesto = function (e) { if (D.pronto || !gestoValido(e)) return; if (!D.evento) D.evento = e.type; D.gestos++;
-  try { sessao(); A.init(); const c = A.ctx; if (c && c.state !== 'running') { bufferMudo(c); retomar(c); } if ((movel() || ehSafari()) && temFala()) { destravarFala(); prepararVoz(e); } htmlMudo(e); } catch (er) {}
-  D.pronto = !!(A.ctx && A.ctx.state === 'running') && (D.voz || !temFala() || !(movel() || ehSafari())) && (!D.el || !D.el.paused || !A.enabled); };
+  try { sessao(); A.init(); const c = A.ctx; if (c && c.state !== 'running' && !segurar() /* 5.0c.1: não no meio da voz do sistema (iOS) */) { bufferMudo(c); retomar(c); } if ((movel() || ehSafari()) && temFala() && !semPreparo()) { destravarFala(); prepararVoz(e); } htmlMudo(e); } catch (er) {}
+  D.pronto = !!(A.ctx && A.ctx.state === 'running') && (D.voz || !temFala() || !(movel() || ehSafari()) || semPreparo()) && (!D.el || !D.el.paused || !querMudo()); };
 if (typeof document !== 'undefined' && document.addEventListener) { const volta = () => { D.pronto = false; if (visivel() && D.evento) retomar(); htmlMudo(); }; document.addEventListener('visibilitychange', volta); try { addEventListener('pageshow', volta); } catch (e) {} }
 /* diagnóstico (Testar som e testes): estado do áudio, sessão de reprodução, vozes em português e a voz usada */
 const ESTADO = { running: 'tocando', suspended: 'suspenso', interrupted: 'interrompido', closed: 'fechado' };
 const FALA_K = { esperando: 'esperando', falando: 'falando', tocou: 'tocou', falhou: 'falhou', 'não começou': 'nao-comecou', 'sem resposta (toque em Testar som de novo)': 'sem-resposta' }; /* 5.0c: o estado da fala fica em pt-BR no código; a linha sai no idioma */
-A.gestoValido = gestoValido; A.desbloqueio = () => ({ evento: D.evento, gestos: D.gestos, voz: D.voz, vozEvento: D.vozEvento, mudoCurto: D.mudoCurto, retomadas: D.retomadas, interrompido: D.interrompido, pronto: D.pronto, audioMudo: D.el ? (D.el.paused ? 'pausado' : 'tocando') : null, audioMudoEvento: D.elEvento });
+A.gestoValido = gestoValido; A.desbloqueio = () => ({ evento: D.evento, gestos: D.gestos, voz: D.voz, vozEvento: D.vozEvento, mudoCurto: D.mudoCurto, retomadas: D.retomadas, interrompido: D.interrompido, porFala: D.porFala /* 5.0c.1 */, retomarDepois: D.retomarDepois, pronto: D.pronto, audioMudo: D.el ? (D.el.paused ? 'pausado' : 'tocando') : null, audioMudoEvento: D.elEvento });
 A.diagnostico = function () { const c = A.ctx, s = temSessao() ? navigator.audioSession.type : null, t = D.teste;
-  return { audio: c ? c.state : null, sessao: s === 'playback' || !!(D.el && !D.el.paused), sessaoTipo: s, audioMudo: !!(D.el && !D.el.paused), precisaSessao: ehIOS(), vozesPt: ranking().length, voz: t ? t.voz : ((A.vozAtual() || {}).nome || null), fala: t ? t.fala : null, efeitos: A.enabled, vozJogo: A.voice }; };
+  const vz = VZ(); return { audio: c ? c.state : null, sessao: s === 'playback' || !!(D.el && !D.el.paused), sessaoTipo: s, audioMudo: !!(D.el && !D.el.paused), precisaSessao: ehIOS(), vozesPt: ranking().length, voz: t ? t.voz : ((A.vozAtual() || {}).nome || null), fala: t ? t.fala : null, efeitos: A.enabled, vozJogo: A.voice,
+    gravada: t ? t.gravada : null, gravadas: A.gravadas !== false, formato: vz ? vz.formato : null, manifesto: vz ? vz.estado : null, porFala: D.porFala }; }; /* 5.0c.1: a voz gravada no Testar som e o formato escolhido */
+const GRAV_PT = { tocou: 'tocou', 'sem-arquivo': 'sem arquivo', formato: 'formato não decodifica', tocando: 'tocando', esperando: 'carregando', desligada: 'desligada em Ajustes', suspenso: 'Web Audio suspenso' }; /* 5.0c.1 */
 function diagTexto(g) { const DG = (k, r, v) => TX('voz.diag.' + k, v, r); /* 5.0c: os pedaços pelo dicionário (o pt-BR fica igual ao da 5.0b.1) */
   const ses = g.sessaoTipo === 'playback' ? DG('sim', 'sim') : g.audioMudo ? DG('sim-mudo', 'sim (áudio mudo em laço)') : !g.precisaSessao ? DG('nao-precisa', 'não precisa neste aparelho') : g.sessaoTipo ? DG('nao', 'não') + ' (' + g.sessaoTipo + ')' : DG('nao', 'não');
   return DG('audio', 'Áudio') + ': ' + (g.audio ? (ESTADO[g.audio] ? DG('e.' + g.audio, ESTADO[g.audio]) : g.audio) : DG('sem-webaudio', 'sem Web Audio')) + ' · ' + DG('sessao', 'Sessão de reprodução') + ': ' + ses + ' · ' + DG('vozes', 'Vozes em português') + ': ' + g.vozesPt + ' · ' + DG('voz', 'Voz') + ': ' + (g.voz ? nomeCurto(g.voz) : temFala() ? DG('padrao', 'padrão do aparelho') : DG('sem-voz', 'sem voz do sistema'))
-    + (g.fala ? ' · ' + DG('fala', 'Fala') + ': ' + (FALA_K[g.fala] ? DG('f.' + FALA_K[g.fala], g.fala) : g.fala) : '') + (g.efeitos ? '' : ' · ' + DG('efeitos-off', 'efeitos desligados em Ajustes')) + (g.vozJogo ? '' : ' · ' + DG('voz-off', 'voz do jogo desligada'))
+    + (g.fala ? ' · ' + DG('fala', 'Fala') + ': ' + (FALA_K[g.fala] ? DG('f.' + FALA_K[g.fala], g.fala) : g.fala) : '') + (g.gravada ? ' · ' + DG('gravada', 'Voz gravada') + ': ' + DG('g.' + g.gravada, GRAV_PT[g.gravada] || g.gravada) : '') + (g.porFala ? ' · ' + DG('interrompido-fala', 'a voz do sistema interrompeu o áudio do jogo') + (g.audio === 'running' ? ' (' + DG('voltou', 'já voltou') + ')' : '') : '') /* 5.0c.1 */ + (g.efeitos ? '' : ' · ' + DG('efeitos-off', 'efeitos desligados em Ajustes')) + (g.vozJogo ? '' : ' · ' + DG('voz-off', 'voz do jogo desligada'))
     + (g.precisaSessao && g.fala === 'tocou' ? ' · ' + DG('ios-silencio', 'Não ouviu a voz? No iPhone, confira a chave de silêncio: ela pode calar a voz do sistema sem calar os efeitos. Se ainda não sair, escolha em Voz das falas uma voz sem "Aprimorada".') : ''); } /* 5.0c: dica do iPhone (a voz do sistema e os efeitos saem por caminhos diferentes) */
 const FRASE_TESTE = 'Som testado, Comandante. Efeitos e voz no ar.';
 /* Testar som: toca um efeito curto e fala uma frase (mesmo com o som ou a voz do jogo desligados, como o Ouvir) e mostra o diagnóstico na linha [data-som-diag] */
+/* 5.0c.1: com vozes gravadas, toca as três notas e uma fala gravada da Raça em destaque (a saudação do líder; na partida, a Raça do jogador) e diz
+   "Voz gravada: tocou | sem arquivo | formato não decodifica"; sem a fala gravada, a frase na voz do sistema, como antes (no iPhone com vozes gravadas, não) */
 A.testarSom = function (box) { sessao(true); A.init(); const c = A.ctx; if (c) { retomar(c); if (c.state !== 'running') bufferMudo(c); try { [523, 659, 784].forEach((f, i) => tone(f, 0.12, { gain: 0.12, delay: i * 0.09 })); } catch (e) {} }
   const sel = box && box.querySelector ? box.querySelector('[data-voz-sel]') : null, sid = sel ? sel.value : A.voz, f = sid ? ranking().find(x => x.id === sid) : null, v = temFala() ? (f ? f.v : pickVoice()) : null;
-  const t = D.teste = { voz: v ? v.name : null, fala: temFala() ? 'esperando' : null, inicio: false }; const FRASE = TX('voz.teste', null, FRASE_TESTE); /* 5.0c: a frase no idioma */
+  const t = D.teste = { voz: v ? v.name : null, fala: null, inicio: false, gravada: null }; const FRASE = TX('voz.teste', null, FRASE_TESTE); /* 5.0c: a frase no idioma */
   const linha = () => { const dg = box && box.querySelectorAll ? box.querySelectorAll('[data-som-diag]') : []; const txt = diagTexto(A.diagnostico()); dg.forEach(el => { el.hidden = false; if (el.textContent !== txt) el.textContent = txt; }); };
-  if (temFala()) { const sai = () => { try { removeEventListener('ard-voz', ouve); } catch (er) {} };
+  if (c && c.addEventListener) { const f = () => { if (D.teste !== t) { c.removeEventListener('statechange', f); return; } linha(); }; c.addEventListener('statechange', f); setTimeout(() => { try { c.removeEventListener('statechange', f); } catch (e) {} }, 15000); } /* 5.0c.1: a linha acompanha o áudio (no iPhone, interrompido pela voz do sistema e de volta) */
+  const sistema = () => { if (D.teste !== t || !temFala() || !podeSistema()) return; t.fala = 'esperando'; const sai = () => { try { removeEventListener('ard-voz', ouve); } catch (er) {} };
     const ouve = e => { const d = e && e.detail; if (!d || d.texto !== FRASE) return; if (D.teste !== t) { sai(); return; }
       if (d.tipo === 'inicio') { t.inicio = true; t.fala = 'falando'; if (A.fala && A.fala.voice) t.voz = A.fala.voice.name; } /* a voz de verdade (sem rede, a online cai para a local) */
       else if (d.tipo === 'fim') { if (t.inicio) { t.fala = 'tocou'; sai(); } else t.fala = 'falhou'; } linha(); }; /* sem 'inicio', a fala pode repetir na voz local: segue ouvindo */
     try { addEventListener('ard-voz', ouve); } catch (e) {} if (!falar(FRASE, { tipo: 'sistema', p: 4 }, v)) t.fala = 'não começou';
-    setTimeout(() => { if (D.teste !== t || t.fala === 'tocou') return; sai(); if (!t.inicio) { t.fala = 'sem resposta (toque em Testar som de novo)'; linha(); } }, 8000); }
+    setTimeout(() => { if (D.teste !== t || t.fala === 'tocou') return; sai(); if (!t.inicio) { t.fala = 'sem resposta (toque em Testar som de novo)'; linha(); } }, 8000); linha(); };
+  const vz = VZ();
+  if (vz && A.gravadas !== false && vz.disponivel()) { t.gravada = 'esperando';
+    vz.manifesto().then(m => { if (D.teste !== t) return; const raca = A.raca || vz.destaque || 'vehnar'; const g = m && vz.achar(['sala-' + raca, 'voz-on'], raca, { pacote: raca });
+      if (!g) { t.gravada = vz.motivo === 'formato' ? 'formato' : vz.estado === 'desligada' ? 'desligada' : 'sem-arquivo'; linha(); sistema(); return; }
+      const sai = () => { try { removeEventListener('ard-voz', ouve); } catch (er) {} };
+      const ouve = e => { const d = e && e.detail; if (!d || !d.gravada || d.texto !== g.texto) return; if (D.teste !== t) { sai(); return; } if (d.tipo === 'inicio') t.gravada = 'tocando'; else if (d.tipo === 'fim') { t.gravada = 'tocou'; sai(); } linha(); };
+      try { addEventListener('ard-voz', ouve); } catch (e) {}
+      const ok = falar(g.texto, { tipo: 'sistema', p: 4 }, null, g, { espera: vz.ESPERA_TESTE, raca, sistema: false, aoFalhar: mot => { sai(); if (D.teste !== t) return; t.gravada = mot === 'suspenso' ? 'suspenso' : mot === 'formato' ? 'formato' : 'sem-arquivo'; linha(); sistema(); } });
+      if (!ok) { sai(); t.gravada = 'sem-arquivo'; sistema(); } linha(); }); }
+  else { t.gravada = A.gravadas === false ? 'desligada' : 'sem-arquivo'; sistema(); }
   linha(); setTimeout(linha, 450); return t; };
 ARD.audio = A;
 })(globalThis.ARD = globalThis.ARD || {});

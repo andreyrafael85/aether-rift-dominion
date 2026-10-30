@@ -385,7 +385,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aqui é seu. Ainda.",
-  "inicio.versao": "Versão 5.0c · build __BUILD__ · Além da Fenda · Idiomas · multiplayer 2 a 4",
+  "inicio.versao": "Versão 5.0c.1 · build __BUILD__ · Além da Fenda · Vozes gravadas · multiplayer 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Escolha sua Raça",
   "inicio.vitrine.explorar-base": "Explorar a base",
   "inicio.vitrine.som-tela-inicial": "Som da tela inicial",
@@ -454,10 +454,11 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.btn-bench": "Testar desempenho (30 s)",
   "ajustes.cfg-feedback": "Enviar feedback",
   "notas.notas-versao": "Notas da versão",
+  "notas.5-0c-1": "<b>5.0c.1 — Vozes gravadas:</b> o jogo agora fala com vozes gravadas nos três idiomas: uma voz para cada líder e para o locutor de cada Raça, com o caráter de cada mundo. São 766 falas por idioma: os avisos do locutor, as respostas das unidades ao selecionar, mover e atacar, as eliminações pelo nome, as reações do líder durante a partida e a campanha inteira falada, com a legenda e a boca do líder acompanhando cada palavra. Cada partida baixa só as falas da sua Raça, depois da carga. No iPhone, as falas saem pelo mesmo caminho dos efeitos. Em Ajustes, <b>Vozes gravadas</b> liga e desliga; sem elas, o jogo volta à voz do aparelho. Com o Motor 5, a partida prepara 22% menos shaders na carga e cada quadro gasta cerca de 14% menos CPU.",
   "notas.5-0c": "<b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 mais leve, faróis e som no iPhone:</b> com o <b>Motor 5</b> ligado, os shaders que ele prepara na carga encolheram um terço (os lagos primeiro) e cada quadro manda muito menos dados para a placa de vídeo, o que alivia a CPU no Firefox e no celular. O brilho em volta das luzes agora é o mesmo do motor clássico, e no Modo Foto da qualidade Baixa os efeitos seguem a exposição como no clássico. À noite e dentro da Tempestade de Éter, os faróis dos veículos, coletores e piratas iluminam o chão à frente, nos dois motores. A Sala de Comando ficou um pouco mais clara, sem o clarão de antes. No iPhone, o som e a voz destravam no primeiro toque, tocam com a chave de silêncio ligada e voltam depois de uma ligação. Cada líder fala com uma voz do seu gênero em todo navegador. Em Ajustes, <b>Testar som</b> toca três notas e uma frase e mostra o estado do áudio do aparelho.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, em teste:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o jogo inteiro agora roda em WebGPU, com volta sozinha para WebGL2: unidades e construções com o detalhe de superfície e a animação de cada peça, ruínas, obras, o holograma da Erevane, os escudos do Uníssono e as bandeiras; o chão com todos os biomas, a vegetação ao vento, as estradas e o céu; explosões, fogo, fumaça e tiros; os lagos de plasma e de gelo com reflexo, o espaço do Cinturão e a Tempestade de Éter; e o <b>Modo Foto</b> (📷 ou tecla J) com desfoque, os 8 filtros e captura em 4K. Na primeira vez que o Modo Foto abre numa partida, ele leva alguns segundos para se preparar. Com tudo isso, a carga do Motor 5 ficou alguns segundos mais longa: a próxima versão mede nos aparelhos e enxuga. O motor clássico continua o padrão e não mudou.",
-  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0b.1 → 2.0)",
+  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0c → 2.0)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Termos de Uso",
   "inicio.rodape.foot-priv": "Privacidade",
@@ -487,7 +488,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "hud.html.modo-foto": "Modo Foto",
   "hud.html.foto": "Foto",
   "hud.html.som": "Som",
-  "hud.html.voz-sistema": "Voz do sistema",
+  "hud.html.voz-sistema": "Voz",
   "hud.html.voz": "Voz",
   "hud.html.diplomacia": "Diplomacia",
   "hud.html.diplomacia-pactos-reputacao": "Diplomacia: pactos e reputação",
@@ -630,7 +631,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.cine": "Câmera de cinema: inclina ao aproximar",
   "ajustes.dynres": "Resolução dinâmica: baixa a resolução interna para manter ~60 fps",
   "ajustes.som": "Som: efeitos e ambiente 3D da tela inicial",
-  "ajustes.voz": "Voz do sistema (líderes e avisos)",
+  "ajustes.voz": "Voz: líderes, avisos e unidades",
   "ajustes.motor": "Motor gráfico",
   "ajustes.motor-classico": "Clássico",
   "ajustes.motor-5": "Motor 5 (WebGPU, experimental)",
@@ -1734,5 +1735,18 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "voz.diag.f.nao-comecou": "não começou",
   "voz.diag.f.sem-resposta": "sem resposta (toque em Testar som de novo)",
   "voz.diag.ios-silencio": "Não ouviu a voz? No iPhone, confira a chave de silêncio: ela pode calar a voz do sistema sem calar os efeitos. Se ainda não sair, escolha em Voz das falas uma voz sem \"Aprimorada\".",
+  "ajustes.vozes-gravadas": "Vozes gravadas: cada Raça com a sua voz", /* 5.0c.1 */
+  "ajustes.vozes-gravadas-dica": "Desligadas, as falas usam a voz do sistema escolhida abaixo.", /* 5.0c.1 */
+  "voz.diag.gravada": "Voz gravada", /* 5.0c.1 */
+  "voz.diag.g.tocou": "tocou", /* 5.0c.1 */
+  "voz.diag.g.sem-arquivo": "sem arquivo", /* 5.0c.1 */
+  "voz.diag.g.formato": "formato não decodifica", /* 5.0c.1 */
+  "voz.diag.g.tocando": "tocando", /* 5.0c.1 */
+  "voz.diag.g.esperando": "carregando", /* 5.0c.1 */
+  "voz.diag.g.desligada": "desligada em Ajustes", /* 5.0c.1 */
+  "voz.diag.g.suspenso": "Web Audio suspenso", /* 5.0c.1 */
+  "voz.diag.interrompido-fala": "a voz do sistema interrompeu o áudio do jogo", /* 5.0c.1 */
+  "voz.diag.voltou": "já voltou", /* 5.0c.1 */
+  "voz.d.ios-gravadas": "No iPhone, o jogo fala com as vozes gravadas de cada Raça, pelo mesmo som dos efeitos. A voz do sistema escolhida aqui só vale para o Ouvir.", /* 5.0c.1 */
   "geral.idioma-offline": "Sem internet: este idioma ainda não foi baixado neste aparelho.",
 };

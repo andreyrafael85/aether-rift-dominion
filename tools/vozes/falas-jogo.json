@@ -1,0 +1,254 @@
+{
+  "nota": "5.0c.1: os textos das falas NOVAS gravadas (pt-BR escrito para o jogo; en e es traduzidos pelo docs/glossario.md). As falas que o jogo já tem (voz.*, sala.fala.*, camp.*, ia.*) não ficam aqui: o tools/vozes/roteiro.cjs lê o texto exato dos dicionários. Unidades sem adjetivo de gênero sobre quem fala (a voz pode trocar sem reescrever); a Sylvia Oriel no feminino.",
+  "pronuncia": {
+    "nota": "5.0c.1: troca de palavra só no texto que o Kokoro lê (a legenda não muda), por idioma e com a caixa exata. 'Sow' sozinho o G2P do inglês lia /saʊ/ (porca); 'Sew' tem o som de semear (/soʊ/).",
+    "en": { "Sow": "Sew" }
+  },
+  "locutor_novos": [
+    { "nome": "promovida", "pt-BR": "Unidade promovida.", "en": "Unit promoted.", "es": "Unidad promovida." },
+    { "nome": "modulo", "pt-BR": "Módulo instalado.", "en": "Module installed.", "es": "Módulo instalado." },
+    { "nome": "era2", "pt-BR": "Era dois alcançada.", "en": "Era Two reached.", "es": "Era dos alcanzada." },
+    { "nome": "era3", "pt-BR": "Era três alcançada.", "en": "Era Three reached.", "es": "Era tres alcanzada." },
+    { "nome": "ascensao", "pt-BR": "Ascensão alcançada.", "en": "Ascension achieved.", "es": "Ascensión alcanzada." },
+    { "nome": "superarma", "pt-BR": "Superarma pronta.", "en": "Superweapon ready.", "es": "Superarma lista." },
+    { "nome": "sobrecarga", "pt-BR": "Sobrecarga ativada.", "en": "Overcharge activated.", "es": "Sobrecarga activada." },
+    { "nome": "nodulo-ataque", "pt-BR": "Nódulo sob ataque!", "en": "Outpost under attack!", "es": "¡Nódulo bajo ataque!" },
+    { "nome": "recursos-roubados", "pt-BR": "Recursos roubados!", "en": "Resources stolen!", "es": "¡Recursos robados!" },
+    { "nome": "unissono", "pt-BR": "Uníssono!", "en": "Unison!", "es": "¡Unísono!" },
+    { "nome": "eclosao", "pt-BR": "Eclosão!", "en": "Hatching!", "es": "¡Eclosión!" },
+    { "nome": "salto-evolutivo", "pt-BR": "Salto Evolutivo!", "en": "Evolutionary Leap!", "es": "¡Salto Evolutivo!" },
+    { "nome": "pacto-recusado", "pt-BR": "Pacto recusado.", "en": "Pact declined.", "es": "Pacto rechazado." },
+    { "nome": "pacto-cumprido", "pt-BR": "Pacto cumprido.", "en": "Pact honored.", "es": "Pacto cumplido." },
+    { "nome": "tempestade-perto", "pt-BR": "Tempestade de Éter se aproximando.", "en": "Aether Storm approaching.", "es": "Tormenta de Éter acercándose." },
+    { "nome": "tempestade-ativa", "pt-BR": "Tempestade de Éter ativa.", "en": "Aether Storm active.", "es": "Tormenta de Éter activa." },
+    { "nome": "veio", "pt-BR": "Veio de Minério exposto.", "en": "Ore Vein exposed.", "es": "Veta de Mineral expuesta." },
+    { "nome": "caixa", "pt-BR": "Caixa recolhida.", "en": "Crate collected.", "es": "Caja recogida." },
+    { "nome": "vitoria", "pt-BR": "Vitória.", "en": "Victory.", "es": "Victoria." },
+    { "nome": "derrota", "pt-BR": "Derrota.", "en": "Defeat.", "es": "Derrota." },
+    { "nome": "inimigos-1", "pt-BR": "Um inimigo restante.", "en": "One enemy left.", "es": "Queda un enemigo." },
+    { "nome": "inimigos-2", "pt-BR": "Dois inimigos restantes.", "en": "Two enemies left.", "es": "Quedan dos enemigos." },
+    { "nome": "inimigos-3", "pt-BR": "Três inimigos restantes.", "en": "Three enemies left.", "es": "Quedan tres enemigos." }
+  ],
+  "elim_pt": {
+    "fundicao-kessari": "Fundição Kessari eliminada.", "consorcio-oryn": "Consórcio Oryn eliminado.", "estaleiro-vey": "Estaleiro Vey eliminado.",
+    "cla-sombrio": "Clã Sombrio eliminado.", "naufragos-de-isk": "Náufragos de Ísk eliminados.", "corsarios-da-faixa": "Corsários da Faixa eliminados.",
+    "linhagem-oriel": "Linhagem Oriel eliminada.", "ordem-do-molde": "Ordem do Molde eliminada.", "enxerto-vassi": "Enxerto Vassi eliminado.",
+    "coro-de-zayin": "Coro de Zayin eliminado.", "acorde-setimo": "Acorde Sétimo eliminado.", "silencio-de-quor": "Silêncio de Quor eliminado.",
+    "prole-velk": "Prole Velk eliminada.", "ninhada-cega": "Ninhada Cega eliminada.", "fome-de-oru": "Fome de Oru eliminada."
+  },
+  "elim_modelo": { "nota": "en e es: o nome da IA traduzido (ia.<id> do dicionário) mais o modelo de hoje (hud.eliminado). Em es o jogo diz 'fuera de combate', sem concordância de gênero (glossário).", "en": "{nome} eliminated.", "es": "{nome} fuera de combate." },
+  "unidades": {
+    "vehnar": {
+      "civil": {
+        "sel": [["Coletor pronto. Caçamba vazia.", "Harvester ready. Hopper's empty.", "Recolector listo. Tolva vacía."], ["Turno de coleta. Pode mandar.", "Harvest shift. Go ahead.", "Turno de recolección. Adelante."], ["Minério é lucro, comandante.", "Ore is profit, commander.", "El mineral es ganancia, comandante."]],
+        "mover": [["Indo para o veio.", "Heading for the vein.", "Rumbo a la veta."], ["Rota registrada.", "Route logged.", "Ruta registrada."], ["A caminho, sem atrasos.", "On my way, no delays.", "En camino, sin demoras."]],
+        "atacar": [["Isso não está no contrato!", "That's not in my contract!", "¡Eso no está en mi contrato!"], ["Vou tentar, comandante.", "I'll give it a shot, commander.", "Lo intentaré, comandante."]]
+      },
+      "infantaria": {
+        "sel": [["Infantaria Vehnar, às ordens.", "Vehnar infantry, standing by.", "Infantería Vehnar, a tus órdenes."], ["Botas no chão, comandante.", "Boots on the ground, commander.", "Botas en el suelo, comandante."], ["Linha de frente, pode falar.", "Front line, go ahead.", "Primera línea, adelante."]],
+        "mover": [["Marchando no compasso.", "Marching in step.", "Marchando al compás."], ["Entendido, avançando.", "Understood, advancing.", "Entendido, avanzando."], ["Deslocamento autorizado.", "Movement authorized.", "Desplazamiento autorizado."]],
+        "atacar": [["Abrir fogo, linha cheia!", "Open fire, full line!", "¡Fuego, línea completa!"], ["Derrubem a concorrência!", "Take down the competition!", "¡Derriben a la competencia!"]]
+      },
+      "veiculo": {
+        "sel": [["Motor quente, comandante.", "Engine's hot, commander.", "Motor caliente, comandante."], ["Blindagem em dia. Pode mandar.", "Armor's up to spec. Go ahead.", "Blindaje al día. Adelante."], ["Pistões prontos.", "Pistons ready.", "Pistones listos."]],
+        "mover": [["Engatando a marcha.", "Shifting into gear.", "Metiendo la marcha."], ["Esteiras rodando.", "Treads rolling.", "Orugas rodando."], ["Abram caminho!", "Clear the way!", "¡Abran paso!"]],
+        "atacar": [["Esmagando!", "Crushing!", "¡Aplastando!"], ["Hora de amassar metal!", "Time to dent some metal!", "¡Hora de abollar metal!"]]
+      },
+      "drone": {
+        "sel": [["Drone no ar.", "Drone airborne.", "Dron en el aire."], ["Hélices girando.", "Rotors spinning.", "Hélices girando."], ["Telemetria limpa.", "Telemetry clean.", "Telemetría limpia."]],
+        "mover": [["Rota de voo traçada.", "Flight path set.", "Ruta de vuelo trazada."], ["Subindo.", "Climbing.", "Subiendo."], ["Sobrevoando.", "Flying over.", "Sobrevolando."]],
+        "atacar": [["Mergulho de ataque!", "Attack dive!", "¡Picada de ataque!"], ["Alvo na mira.", "Target locked.", "Objetivo en la mira."]]
+      },
+      "suporte": {
+        "sel": [["Oficina móvel, na escuta.", "Mobile workshop, standing by.", "Taller móvil, a la escucha."], ["Chave inglesa na mão.", "Wrench in hand.", "Llave inglesa en mano."], ["Manutenção às ordens.", "Maintenance at your service.", "Mantenimiento a tus órdenes."]],
+        "mover": [["Levando as ferramentas.", "Bringing the tools.", "Llevando las herramientas."], ["Indo consertar.", "Off to fix things.", "Voy a reparar."], ["Guindaste em movimento.", "Crane on the move.", "Grúa en movimiento."]],
+        "atacar": [["Fritando os circuitos deles!", "Frying their circuits!", "¡Friendo sus circuitos!"], ["Curto-circuito neles!", "Short-circuit them!", "¡Cortocircuito para ellos!"]]
+      }
+    },
+    "erevane": {
+      "civil": {
+        "sel": [["Em silêncio.", "In silence.", "En silencio."], ["Mãos leves, comandante.", "Light hands, commander.", "Manos ligeras, comandante."], ["Ninguém nos vê colher.", "No one sees us harvest.", "Nadie nos ve recolectar."]],
+        "mover": [["Pelas sombras.", "Through the shadows.", "Por las sombras."], ["Sem deixar rastro.", "Leaving no trail.", "Sin dejar rastro."], ["Já fui.", "Already gone.", "Ya me fui."]],
+        "atacar": [["Isso vai fazer barulho.", "This will make noise.", "Esto va a hacer ruido."], ["Se precisa mesmo.", "If we really must.", "Si de verdad hace falta."]]
+      },
+      "infantaria": {
+        "sel": [["Na penumbra, comandante.", "In the half-light, commander.", "En la penumbra, comandante."], ["Sussurre a ordem.", "Whisper the order.", "Susurra la orden."], ["Ninguém nos ouviu chegar.", "No one heard us arrive.", "Nadie nos oyó llegar."]],
+        "mover": [["Sumindo.", "Vanishing.", "Desapareciendo."], ["Passo leve.", "Light steps.", "Paso ligero."], ["Contornando pelo escuro.", "Circling through the dark.", "Rodeando por la oscuridad."]],
+        "atacar": [["Golpe limpo.", "Clean strike.", "Golpe limpio."], ["Agora, sem aviso!", "Now, without warning!", "¡Ahora, sin aviso!"]]
+      },
+      "veiculo": {
+        "sel": [["Motor abafado.", "Engine muffled.", "Motor amortiguado."], ["Casco frio, sem brilho.", "Cold hull, no glint.", "Casco frío, sin brillo."], ["Rodando no escuro.", "Running dark.", "Rodando a oscuras."]],
+        "mover": [["Faróis apagados.", "Lights off.", "Luces apagadas."], ["Deslizando.", "Slipping away.", "Deslizándonos."], ["Rota discreta.", "Quiet route.", "Ruta discreta."]],
+        "atacar": [["Bater e sumir.", "Hit and vanish.", "Golpear y desaparecer."], ["Pelo flanco, agora!", "Through the flank, now!", "¡Por el flanco, ahora!"]]
+      },
+      "drone": {
+        "sel": [["Olhos no céu.", "Eyes in the sky.", "Ojos en el cielo."], ["Invisível e atento.", "Unseen and watching.", "Invisible y atento."], ["Sinal fraco, de propósito.", "Weak signal, on purpose.", "Señal débil, a propósito."]],
+        "mover": [["Voo rasante.", "Low flight.", "Vuelo rasante."], ["Sombra no ar.", "A shadow in the air.", "Una sombra en el aire."], ["Planando.", "Gliding.", "Planeando."]],
+        "atacar": [["Ferroada silenciosa.", "Silent sting.", "Picadura silenciosa."], ["Eles nem vão ver.", "They won't even see it.", "Ni lo van a ver."]]
+      },
+      "suporte": {
+        "sel": [["Véu pronto.", "Veil ready.", "Velo listo."], ["Escutando as frequências deles.", "Listening to their frequencies.", "Escuchando sus frecuencias."], ["Código frio, comandante.", "Cold code, commander.", "Código frío, comandante."]],
+        "mover": [["Estendendo o véu.", "Extending the veil.", "Extendiendo el velo."], ["Levando a estática.", "Bringing the static.", "Llevando la estática."], ["Entrando sem bater.", "Going in without knocking.", "Entrando sin llamar."]],
+        "atacar": [["Cegando os sensores.", "Blinding their sensors.", "Cegando sus sensores."], ["Sistemas deles, agora nossos.", "Their systems, ours now.", "Sus sistemas, ahora nuestros."]]
+      }
+    },
+    "tessara": {
+      "civil": {
+        "sel": [["A colheita espera.", "The harvest awaits.", "La cosecha espera."], ["Raízes prontas.", "Roots ready.", "Raíces listas."], ["Semente na mão.", "Seed in hand.", "Semilla en mano."]],
+        "mover": [["Seguindo a luz.", "Following the light.", "Siguiendo la luz."], ["Brotando por lá.", "Sprouting over there.", "Brotando por allá."], ["Vamos crescer ali.", "We'll grow there.", "Vamos a crecer allí."]],
+        "atacar": [["Até as flores mordem.", "Even flowers bite.", "Hasta las flores muerden."], ["Espinhos, então.", "Thorns, then.", "Espinas, entonces."]]
+      },
+      "infantaria": {
+        "sel": [["Adaptando.", "Adapting.", "Adaptándonos."], ["A pele aprende, comandante.", "The skin learns, commander.", "La piel aprende, comandante."], ["Cada luta nos ensina.", "Every fight teaches us.", "Cada lucha nos enseña."]],
+        "mover": [["Como raízes, avançamos.", "Like roots, we advance.", "Como raíces, avanzamos."], ["Espalhando.", "Spreading.", "Esparciéndonos."], ["Seguindo a seiva.", "Following the sap.", "Siguiendo la savia."]],
+        "atacar": [["Vamos aprender com eles.", "Let's learn from them.", "Aprendamos de ellos."], ["Que virem adubo!", "Let them become compost!", "¡Que se vuelvan abono!"]]
+      },
+      "veiculo": {
+        "sel": [["O casco respira.", "The hull breathes.", "El casco respira."], ["Carapaça viva, pronta.", "Living shell, ready.", "Caparazón vivo, listo."], ["Crescemos para isso.", "We grew for this.", "Crecimos para esto."]],
+        "mover": [["Avançando devagar e firme.", "Advancing slow and steady.", "Avanzando lento y firme."], ["Raízes soltas, em marcha.", "Roots loose, on the march.", "Raíces sueltas, en marcha."], ["Mudando de forma.", "Shifting shape.", "Cambiando de forma."]],
+        "atacar": [["Esmagar e semear.", "Crush and sow.", "Aplastar y sembrar."], ["O peso da floresta!", "The weight of the forest!", "¡El peso del bosque!"]]
+      },
+      "drone": {
+        "sel": [["Esporos no vento.", "Spores on the wind.", "Esporas al viento."], ["Pólen atento.", "Watchful pollen.", "Polen atento."], ["Vejo tudo daqui de cima.", "I see everything from up here.", "Veo todo desde aquí arriba."]],
+        "mover": [["Levado pela brisa.", "Carried by the breeze.", "Llevado por la brisa."], ["Flutuando.", "Floating.", "Flotando."], ["Semeando o céu.", "Seeding the sky.", "Sembrando el cielo."]],
+        "atacar": [["Esporos, agora!", "Spores, now!", "¡Esporas, ahora!"], ["Uma nuvem para eles.", "A cloud for them.", "Una nube para ellos."]]
+      },
+      "suporte": {
+        "sel": [["O Molde escuta.", "The Mold is listening.", "El Molde escucha."], ["Enxertos prontos.", "Grafts ready.", "Injertos listos."], ["Seiva e código.", "Sap and code.", "Savia y código."]],
+        "mover": [["Levando a seiva.", "Bringing the sap.", "Llevando la savia."], ["Onde algo murcha, eu vou.", "Where something withers, I go.", "Donde algo se marchita, voy."], ["Cultivando no caminho.", "Cultivating along the way.", "Cultivando en el camino."]],
+        "atacar": [["Infectando os sistemas deles.", "Infecting their systems.", "Infectando sus sistemas."], ["Raízes nos circuitos deles!", "Roots in their circuits!", "¡Raíces en sus circuitos!"]]
+      }
+    },
+    "quorith": {
+      "civil": {
+        "sel": [["O Afinador escuta.", "The Tuner listens.", "El Afinador escucha."], ["Uma nota, comandante.", "One note, commander.", "Una nota, comandante."], ["Afinados para colher.", "Tuned to harvest.", "Afinados para recolectar."]],
+        "mover": [["Seguindo o tom.", "Following the pitch.", "Siguiendo el tono."], ["Em compasso.", "In rhythm.", "A compás."], ["A canção nos leva.", "The song carries us.", "La canción nos lleva."]],
+        "atacar": [["Uma nota dissonante.", "A dissonant note.", "Una nota disonante."], ["Não fomos afinados para isso.", "We weren't tuned for this.", "No nos afinaron para esto."]]
+      },
+      "infantaria": {
+        "sel": [["Muitas vozes, uma ordem.", "Many voices, one order.", "Muchas voces, una orden."], ["O Coro escuta.", "The Choir listens.", "El Coro escucha."], ["Em acorde.", "In chord.", "En acorde."]],
+        "mover": [["Movemos juntos.", "We move together.", "Nos movemos juntos."], ["Afinando o passo.", "Tuning our step.", "Afinando el paso."], ["O acorde avança.", "The chord advances.", "El acorde avanza."]],
+        "atacar": [["Cantem!", "Sing!", "¡Canten!"], ["Estilhacem-nos!", "Shatter them!", "¡Háganlos añicos!"]]
+      },
+      "veiculo": {
+        "sel": [["O cristal ressoa.", "The crystal resonates.", "El cristal resuena."], ["Prisma alinhado.", "Prism aligned.", "Prisma alineado."], ["Um tom grave, comandante.", "A low tone, commander.", "Un tono grave, comandante."]],
+        "mover": [["Ressoando adiante.", "Resonating forward.", "Resonando hacia adelante."], ["Peso em harmonia.", "Weight in harmony.", "Peso en armonía."], ["Em marcha lenta.", "At a slow march.", "En marcha lenta."]],
+        "atacar": [["Concentrar a onda!", "Focus the wave!", "¡Concentren la onda!"], ["Rachem as muralhas!", "Crack their walls!", "¡Agrieten sus murallas!"]]
+      },
+      "drone": {
+        "sel": [["Uma nota no ar.", "A note in the air.", "Una nota en el aire."], ["Harmônico pronto.", "Harmonic ready.", "Armónico listo."], ["O céu também canta.", "The sky sings too.", "El cielo también canta."]],
+        "mover": [["Voando no tom.", "Flying on pitch.", "Volando en el tono."], ["Subindo uma oitava.", "Up an octave.", "Subiendo una octava."], ["Planando em acorde.", "Gliding in chord.", "Planeando en acorde."]],
+        "atacar": [["Acorde aéreo!", "Aerial chord!", "¡Acorde aéreo!"], ["Persigam a nota.", "Chase the note.", "Persigan la nota."]]
+      },
+      "suporte": {
+        "sel": [["O Diapasão vibra.", "The Tuning Fork hums.", "El Diapasón vibra."], ["Afinando o Elo.", "Tuning the Link.", "Afinando el Enlace."], ["Mais uma voz no acorde.", "One more voice in the chord.", "Una voz más en el acorde."]],
+        "mover": [["Levando o tom.", "Carrying the tone.", "Llevando el tono."], ["Ampliando o Elo.", "Widening the Link.", "Ampliando el Enlace."], ["Vibrando a caminho.", "Humming on the way.", "Vibrando en camino."]],
+        "atacar": [["Desafinando os sistemas deles.", "Detuning their systems.", "Desafinando sus sistemas."], ["Silêncio neles.", "Silence them.", "Silencio para ellos."]]
+      }
+    },
+    "vorag": {
+      "civil": {
+        "sel": [["Fome.", "Hunger.", "Hambre."], ["Semear. Comer.", "Sow. Eat.", "Sembrar. Comer."], ["Sim. Sim.", "Yes. Yes.", "Sí. Sí."]],
+        "mover": [["Rastejando.", "Crawling.", "Arrastrándome."], ["Cheiro bom lá.", "Smells good there.", "Huele bien allá."], ["Vou.", "Going.", "Voy."]],
+        "atacar": [["Morder!", "Bite!", "¡Morder!"], ["Fome dá coragem.", "Hunger makes us brave.", "El hambre da valor."]]
+      },
+      "infantaria": {
+        "sel": [["Com fome!", "Hungry!", "¡Con hambre!"], ["Ordem. Carne.", "Orders. Meat.", "Orden. Carne."], ["A Prole escuta.", "The Brood listens.", "La Prole escucha."]],
+        "mover": [["Enxame, vai!", "Swarm, go!", "¡Enjambre, ya!"], ["Correndo.", "Running.", "Corriendo."], ["Atrás do cheiro.", "After the scent.", "Tras el olor."]],
+        "atacar": [["Devorar!", "Devour!", "¡Devorar!"], ["Rasguem!", "Tear them apart!", "¡Desgárrenlos!"]]
+      },
+      "veiculo": {
+        "sel": [["Carapaça dura.", "Hard shell.", "Caparazón duro."], ["Grande. Faminto.", "Big. Starving.", "Grande. Hambriento."], ["Pisa. Esmaga.", "Stomp. Crush.", "Pisa. Aplasta."]],
+        "mover": [["Investida.", "Charging.", "Embestida."], ["Pisando forte.", "Stomping hard.", "Pisando fuerte."], ["Rolando.", "Rolling.", "Rodando."]],
+        "atacar": [["Atropelar!", "Trample!", "¡Arrollar!"], ["Esmagar e comer!", "Crush and eat!", "¡Aplastar y comer!"]]
+      },
+      "drone": {
+        "sel": [["Asas famintas.", "Hungry wings.", "Alas hambrientas."], ["Ferrão pronto.", "Stinger ready.", "Aguijón listo."], ["Voar. Picar.", "Fly. Sting.", "Volar. Picar."]],
+        "mover": [["Voando.", "Flying.", "Volando."], ["Enxame no ar.", "Swarm in the air.", "Enjambre en el aire."], ["Atrás da carne.", "After the meat.", "Tras la carne."]],
+        "atacar": [["Picar!", "Sting!", "¡Picar!"], ["Ferroada!", "Stinger strike!", "¡Aguijonazo!"]]
+      },
+      "suporte": {
+        "sel": [["Carcaça? Onde?", "Carcass? Where?", "¿Restos? ¿Dónde?"], ["Fome paciente.", "Patient hunger.", "Hambre paciente."], ["Farejando.", "Sniffing.", "Olfateando."]],
+        "mover": [["Atrás das sobras.", "After the scraps.", "Tras las sobras."], ["Vou roer.", "Going to gnaw.", "Voy a roer."], ["Seguindo o rastro.", "Following the trail.", "Siguiendo el rastro."]],
+        "atacar": [["Roer os fios deles!", "Gnaw their wires!", "¡Roer sus cables!"], ["Ácido nos sistemas!", "Acid in their systems!", "¡Ácido en sus sistemas!"]]
+      }
+    }
+  },
+  "lider_saudacoes": {
+    "nota": "as duas saudações novas da Sala de cada líder (a de hoje vem de sala.fala.<raça>)",
+    "vehnar": [["O Consórcio não dorme, comandante. As linhas de montagem também não.", "The Consortium never sleeps, commander. Neither do the assembly lines.", "El Consorcio no duerme, comandante. Las líneas de montaje tampoco."], ["Contrato fechado, turno aberto. Vamos lucrar com esta guerra.", "Contract signed, shift started. Let's turn a profit on this war.", "Contrato cerrado, turno abierto. Vamos a sacarle provecho a esta guerra."]],
+    "erevane": [["Vesper Ísk. O que é deles já é nosso. Eles só não sabem.", "Vesper Ísk. What is theirs is already ours. They just don't know it.", "Vesper Ísk. Lo que es de ellos ya es nuestro. Solo que no lo saben."], ["Fale baixo, comandante. As sombras estão ouvindo.", "Speak softly, commander. The shadows are listening.", "Habla bajo, comandante. Las sombras escuchan."]],
+    "tessara": [["Paciência, comandante. Todo jardim começa com uma semente.", "Patience, commander. Every garden starts with a seed.", "Paciencia, comandante. Todo jardín empieza con una semilla."], ["Sylvia Oriel. Cultivo o que serve. Arranco o que não serve.", "Sylvia Oriel. I cultivate what serves. I uproot what doesn't.", "Sylvia Oriel. Cultivo lo que sirve. Arranco lo que no."]],
+    "quorith": [["Nós somos muitos, comandante. E todos ouvimos você.", "We are many, commander. And all of us hear you.", "Somos muchos, comandante. Y todos te escuchamos."], ["Zayin Coral. Um acorde perfeito começa com uma nota firme.", "Zayin Coral. A perfect chord begins with a steady note.", "Zayin Coral. Un acorde perfecto empieza con una nota firme."]],
+    "vorag": [["Oru Voraz. Carne nova no mapa. Bom.", "Oru Voraz. Fresh meat on the map. Good.", "Oru Voraz. Carne fresca en el mapa. Bien."], ["Alimente a Prole, comandante. Ou ela come você.", "Feed the Brood, commander. Or it eats you.", "Alimenta a la Prole, comandante. O te come a ti."]]
+  },
+  "lider_eventos": ["era", "superarma", "base-atacada", "inimigo-eliminado", "vitoria", "derrota", "pacto", "traicao", "tempestade", "ascensao"],
+  "lider_eventos_nota": {
+    "era": "o jogador chega a uma Era nova (evento 'era')", "superarma": "a superarma da Raça do jogador fica pronta", "base-atacada": "Base ou Núcleo sob ataque (o líder reage junto do locutor)",
+    "inimigo-eliminado": "uma IA eliminada (evento 'eliminated')", "vitoria": "fim da partida com vitória", "derrota": "fim da partida com derrota",
+    "pacto": "Pacto de Não-agressão assinado", "traicao": "um pacto quebrado contra o jogador", "tempestade": "Tempestade de Éter ativa", "ascensao": "o jogador alcança a Ascensão (evento 'ascend')",
+    "retomada": "campanha: missão retomada de um salvamento (texto camp.retomada do dicionário)"
+  },
+  "lider_reacoes": {
+    "vehnar": [
+      ["Era nova, maquinário novo. A produção sobe.", "New era, new machinery. Production is rising.", "Nueva era, maquinaria nueva. La producción sube."],
+      ["A Fundição está pronta. Escolha onde entregar.", "The Foundry is ready. Pick the delivery point.", "La Fundición está lista. Elige dónde entregar."],
+      ["Estão na nossa fábrica! Defendam a linha!", "They're in our factory! Hold the line!", "¡Están en nuestra fábrica! ¡Defiendan la línea!"],
+      ["Um concorrente a menos no mercado.", "One less competitor on the market.", "Un competidor menos en el mercado."],
+      ["A Fenda é nossa. Bom negócio, comandante.", "The Rift is ours. Good business, commander.", "La Grieta es nuestra. Buen negocio, comandante."],
+      ["Fechem as fornalhas. Voltamos com mais aço.", "Bank the furnaces. We'll be back with more steel.", "Apaguen los hornos. Volveremos con más acero."],
+      ["Pacto assinado. Negócios são negócios.", "Pact signed. Business is business.", "Pacto firmado. Los negocios son negocios."],
+      ["Quebraram o contrato! Ninguém esquece uma dívida.", "They broke the contract! No one forgets a debt.", "¡Rompieron el contrato! Nadie olvida una deuda."],
+      ["O Éter ferve. Protejam os drones e os sensores.", "The Aether is boiling. Protect the drones and sensors.", "El Éter hierve. Protejan los drones y los sensores."],
+      ["Revolução Industrial! Agora o mundo trabalha para nós.", "Industrial Revolution! Now the world works for us.", "¡Revolución Industrial! Ahora el mundo trabaja para nosotros."]
+    ],
+    "erevane": [
+      ["Era nova. Mais sombras para nos esconder.", "A new era. More shadows to hide in.", "Una nueva era. Más sombras donde escondernos."],
+      ["O Blecaute está pronto. Diga quando apagar as luzes.", "The Blackout is ready. Say when to kill the lights.", "El Apagón está listo. Di cuándo apagar las luces."],
+      ["Nos acharam. Façam-nos se arrepender.", "They found us. Make them regret it.", "Nos encontraron. Que se arrepientan."],
+      ["Mais um que não viu de onde veio.", "Another one who never saw it coming.", "Otro que no vio de dónde vino."],
+      ["A Fenda é nossa. E ninguém viu como.", "The Rift is ours. And no one saw how.", "La Grieta es nuestra. Y nadie vio cómo."],
+      ["Recuem para as sombras. Voltaremos.", "Fall back into the shadows. We will return.", "Retírense a las sombras. Volveremos."],
+      ["Pacto selado. Por enquanto.", "Pact sealed. For now.", "Pacto sellado. Por ahora."],
+      ["Traição. Que elegante. Que imprudente.", "Betrayal. How elegant. How reckless.", "Traición. Qué elegante. Qué imprudente."],
+      ["Tempestade de Éter. Ótima cobertura.", "An Aether Storm. Perfect cover.", "Una Tormenta de Éter. Cobertura perfecta."],
+      ["Véu Total. Agora somos só um sussurro.", "Total Veil. Now we are only a whisper.", "Velo Total. Ahora solo somos un susurro."]
+    ],
+    "tessara": [
+      ["Era nova. O jardim cresce mais um anel.", "A new era. The garden grows another ring.", "Una nueva era. El jardín crece un anillo más."],
+      ["O Salto Evolutivo está maduro. Diga quando colher.", "The Evolutionary Leap is ripe. Say when to harvest.", "El Salto Evolutivo está maduro. Di cuándo cosechar."],
+      ["Pisam no meu jardim. Que virem adubo.", "They're trampling my garden. Let them become compost.", "Pisan mi jardín. Que se vuelvan abono."],
+      ["Mais um canteiro limpo.", "Another flowerbed cleared.", "Otra parcela limpia."],
+      ["A Fenda floresce para nós. Eu disse que cresceria.", "The Rift blooms for us. I said it would grow.", "La Grieta florece para nosotros. Dije que crecería."],
+      ["Recuem. Sementes esperam o inverno passar.", "Fall back. Seeds wait for winter to pass.", "Retírense. Las semillas esperan a que pase el invierno."],
+      ["Pacto selado. Até o enxerto pegar.", "Pact sealed. Until the graft takes.", "Pacto sellado. Hasta que prenda el injerto."],
+      ["Traição. Eu mesma arranco as raízes podres.", "Betrayal. I pull rotten roots myself.", "Traición. Yo misma arranco las raíces podridas."],
+      ["O Éter ferve. Fechem as folhas e esperem.", "The Aether is boiling. Close the leaves and wait.", "El Éter hierve. Cierren las hojas y esperen."],
+      ["Florescer! Agora eles vão entender o que é crescer.", "Bloom! Now they'll understand what growing means.", "¡Florecer! Ahora van a entender lo que es crecer."]
+    ],
+    "quorith": [
+      ["Era nova. O Coro ganha mais vozes.", "A new era. The Choir gains more voices.", "Una nueva era. El Coro gana más voces."],
+      ["O Uníssono está afinado. Diga o tom, comandante.", "The Unison is in tune. Name the key, commander.", "El Unísono está afinado. Di el tono, comandante."],
+      ["Dissonância na nossa base. Calem-nos!", "Dissonance in our base. Silence them!", "Disonancia en nuestra base. ¡Cállenlos!"],
+      ["Uma voz a menos no mundo. Mais silêncio.", "One voice fewer in the world. More silence.", "Una voz menos en el mundo. Más silencio."],
+      ["A Fenda canta conosco. Em uma só voz.", "The Rift sings with us. With a single voice.", "La Grieta canta con nosotros. Con una sola voz."],
+      ["Recuem. O Coro se afina de novo.", "Fall back. The Choir will tune itself again.", "Retírense. El Coro vuelve a afinarse."],
+      ["Pacto selado. Duas vozes, por ora.", "Pact sealed. Two voices, for now.", "Pacto sellado. Dos voces, por ahora."],
+      ["Traição! Uma nota falsa que não esqueceremos.", "Betrayal! A false note we will not forget.", "¡Traición! Una nota falsa que no olvidaremos."],
+      ["O Éter ferve. Até o cristal treme.", "The Aether is boiling. Even the crystal trembles.", "El Éter hierve. Hasta el cristal tiembla."],
+      ["Coro Pleno! Agora o mundo inteiro canta.", "Full Choir! Now the whole world sings.", "¡Coro Pleno! Ahora el mundo entero canta."]
+    ],
+    "vorag": [
+      ["Era nova. Mais dentes.", "A new era. More teeth.", "Una nueva era. Más dientes."],
+      ["Ovos prontos. Diga onde eclodir.", "Eggs ready. Say where to hatch.", "Huevos listos. Di dónde eclosionar."],
+      ["Comem o nosso ninho! Comam eles primeiro!", "They eat our nest! Eat them first!", "¡Se comen nuestro nido! ¡Cómanselos primero!"],
+      ["Um a menos. Mais carne para nós.", "One less. More meat for us.", "Uno menos. Más carne para nosotros."],
+      ["A Fenda é nossa. Banquete.", "The Rift is ours. Feast.", "La Grieta es nuestra. Festín."],
+      ["Recuar. Voltar com mais fome.", "Fall back. Come back hungrier.", "Retirada. Volver con más hambre."],
+      ["Pacto. Por enquanto não comemos vocês.", "Pact. For now, we don't eat you.", "Pacto. Por ahora no los comemos."],
+      ["Traição! Carne traidora tem gosto amargo.", "Betrayal! Traitor meat tastes bitter.", "¡Traición! La carne traidora sabe amarga."],
+      ["O Éter ferve. Escondam a ninhada.", "The Aether is boiling. Hide the clutch.", "El Éter hierve. Escondan la nidada."],
+      ["Fome Sem Fim! Agora tudo é comida.", "Endless Hunger! Now everything is food.", "¡Hambre sin Fin! Ahora todo es comida."]
+    ]
+  }
+}

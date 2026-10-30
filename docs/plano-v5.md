@@ -440,7 +440,20 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
 - **Glossário** em `docs/glossario.md` para o dono revisar. Nomes de Raças, líderes e mundos não mudam; Fenda → Rift / la Grieta, Núcleo → Core / Núcleo, Éter → Aether / Éter.
 - **Pronto quando:** o layout está conferido nos três idiomas, do celular ao computador, e o item "idiomas" do portão de qualidade passa (nenhuma chave faltando, nenhum marcador trocado, nenhum texto em português sobrando em inglês ou espanhol).
 
-#### 5.0c.1 — Vozes gravadas nos três idiomas · tamanho G · 1 a 2 agentes
+#### 5.0c.1 — Vozes gravadas nos três idiomas · tamanho G · 1 a 2 agentes · ✔ 30/10/2026
+**5.0c.1 ✔ (30/10/2026), três partes em paralelo sobre a 5.0c:**
+- **Vozes gravadas:** 766 falas por idioma (180 do locutor, 75 eliminações, 200 de unidades, 70 do líder e 241 da campanha), 2.298 arquivos Opus, de 7,1 a 7,4 MB por idioma, com erro de transcrição de 2,3% (pt-BR), 1,0% (en) e 1,3% (es). O Quorith ficou em estéreo a 32 kbps. As unidades falam com o Alex e o caráter da Raça, decisão a confirmar. Os 283 textos novos por idioma estão em `tools/vozes/falas-jogo.json`, para o dono revisar.
+- **No jogo (`src/vozes.js`):**
+  - toca pelo Web Audio, com as regras de prioridade do `A.say`, legenda e boca do líder no tempo de cada palavra;
+  - cada partida baixa só o pacote da Raça depois da carga, a Sala só a saudação e a campanha só a missão aberta;
+  - falas novas: respostas das unidades, avisos, eliminações, reações do líder e a campanha;
+  - o jogo segue inteiro sem nenhum arquivo, com a voz do sistema.
+- **iPhone:** a bancada `lab/som-iphone.html` mostrou que o Safari toca Opus e que a voz do sistema sai sozinha. Ela some no jogo porque o áudio dos efeitos era retomado no meio da fala. Agora, no iPhone, só as vozes gravadas falam; as falas sem arquivo saem na legenda, e o áudio nunca é retomado durante uma fala do sistema.
+- **Motor 5:**
+  - 74 → 58 pipelines no cenário do QA (celular: 56 → 42);
+  - CPU do desenho −14%: o `R.draw` foi dividido em quatro funções que o V8 otimiza, a árvore da cena é atualizada uma vez por quadro, há menos objetos nas cascatas e menos alocação por quadro;
+  - o `BundleGroup` ficou desligado (`?m5bundle=1` para medir), porque a vista alta perdia as mesas do horizonte;
+  - preparar a partida na tela inicial não ganhou no Chromium (30 a 32 s nos três modos) e custa cerca de 300 MB a mais; só um teste no iPhone decide.
 - **Vozes (decisões do dono em 24/10 e 29/10/2026, pela página de escuta):**
   - Kokoro-82M v1.0 (pesos Apache-2.0), com o Alex como voz-base, a Dora para a Sylvia Oriel e o Santa e misturas para os outros líderes; o Piper pt_BR ficou de fora (as vozes nasceram da en_US lessac, que só pode ser usada em pesquisa);
   - o caráter de cada Raça assado nos arquivos na geração (`tools/vozes/racas.py`), sem efeito ao vivo no jogo: a Vehnar com o rádio sem ruído por baixo da voz e o Vorag sem o ronco (ajustes pedidos pelo dono em 24/10; o grave do Vorag foi refeito depois na variante C, abaixo; nas pausas, o ruído do Vehnar caiu de +12,1 dB para −2,9 dB em relação à voz seca e o do Vorag de +16,8 dB para +1,5 dB);

@@ -843,7 +843,7 @@ function attach(parent, race, o) { o = o || {}; race = COL[race] ? race : 'vehna
   st: { look: [0, 0], lookT: [0, 0], nextBlink: 1 + Math.random() * 3, blink: 0, nod: 0, shake: 0, talk: 0, jolt: 0, until: 0, gaze: null, gazeUntil: 0, nextGlance: 2 + Math.random() * 3, pose: [0, 0, 0], word: null } };
   setHead(it, it.mood); return it; }
 function step(it, now, dt) { if (it && it.kit && it.head) animate(it, now, dt); }
-function word(it, n, w) { if (!it || !it.st) return; const v = String(w || '').match(/[aeiouáéíóúâêôãõày]+/gi); const syl = Math.max(1, Math.min(4, v ? v.length : Math.round((n || 3) / 3))); it.st.word = { t: 0, dur: Math.max(0.14, Math.min(0.8, (n || 3) * 0.065 + 0.06)), syl }; }
+function word(it, n, w, dur) { if (!it || !it.st) return; const v = String(w || '').match(/[aeiouáéíóúâêôãõày]+/gi); const syl = Math.max(1, Math.min(4, v ? v.length : Math.round((n || 3) / 3))); it.st.word = { t: 0, dur: dur > 0 ? Math.max(0.12, Math.min(1.2, dur)) /* 5.0c.1: a duração real da palavra na voz gravada */ : Math.max(0.14, Math.min(0.8, (n || 3) * 0.065 + 0.06)), syl }; }
 ARD.leaders3d = { canUse, mount, unmount, stopAll, mood, baseMood, react, gaze, setLight, buildHead, newKit, studioRig, restPose, frameFor, envFor: rend => makeEnv(T(), rend), bench, EXPR, COL, attach, step, word, detach: unmount, /* 5.0b */
   info: () => renderer ? { programs: renderer.info.programs ? renderer.info.programs.length : null, items: items.length, stats: items.map(it => ({ race: it.race, mood: it.mood, tris: it.stats.tris, calls: it.stats.calls, ms: it.cost == null ? null : Math.round(it.cost * 10) / 10 })) } : null }; /* info: diagnóstico (4.3d; 4.3e: triângulos e chamadas por busto) */
 })(globalThis.ARD = globalThis.ARD || {});

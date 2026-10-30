@@ -73,7 +73,7 @@ function criar(C) { const { W, T } = C.L; const { float, vec3, color, uniform, m
   /* voz: a boca abre por palavra; sem boundary (vozes de rede), as palavras saem por estimativa */
   let falso = null, ultimo = 0; const onVoz = e => { const d = e.detail || {}; const it = H.it; if (!it) return;
     if (d.tipo === 'inicio') { ultimo = 0; clearTimeout(falso); const txt = String(d.texto || ''); falso = setTimeout(() => { if (ultimo) return; let t = 0; for (const w of txt.split(/\s+/)) { if (!w) continue; const tt = t; setTimeout(() => { if (H.it === it && !ultimo) ARD.leaders3d.word(it, w.length, w); }, tt); t += (w.length * 0.065 + 0.12) * 1000 / 1.05; } }, 380); }
-    else if (d.tipo === 'palavra') { ultimo = performance.now(); const w = String(d.texto || '').substr(d.i || 0, d.n || 0) || 'aaa'; ARD.leaders3d.word(it, d.n || w.length, w); }
+    else if (d.tipo === 'palavra') { ultimo = performance.now(); const w = String(d.texto || '').substr(d.i || 0, d.n || 0) || 'aaa'; ARD.leaders3d.word(it, d.n || w.length, w, d.dur /* 5.0c.1: duração real da palavra na voz gravada */); }
     else if (d.tipo === 'fim') { clearTimeout(falso); } };
   addEventListener('ard-voz', onVoz); H.onVoz = onVoz;
   H.dispose = () => { removeEventListener('ard-voz', onVoz); clearTimeout(falso); for (const k in H.prep) { try { ARD.leaders3d.detach(H.prep[k].it); } catch (e) {} } H.prep = {}; H.it = null; for (const d of H.disp) if (d && d.dispose) d.dispose(); };

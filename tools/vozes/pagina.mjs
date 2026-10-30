@@ -2,11 +2,14 @@
    e calcula o plano da implantação: falas por tipo e por Raça, tamanho em Opus (ajuste bytes = cabeçalho + taxa × duração medido nos
    próprios arquivos, vezes o fator de cada Raça medido nos arquivos assados) e as falas da campanha contadas em src/campaign.js.
    2ª rodada (24/10/2026): decisão do dono no topo, elenco, caráter das Raças assado (a página toca os arquivos que o jogo vai tocar),
-   antes e depois do Vehnar e do Vorag, Sylvia Oriel. Os áudios ficam ao lado, em work/vozes/. Uso: node tools/vozes/pagina.mjs */
+   antes e depois do Vehnar e do Vorag, Sylvia Oriel. Os áudios ficam ao lado, em work/vozes/. Uso: node tools/vozes/pagina.mjs --escolha (5.0c.1: sem --escolha, a página das vozes do jogo) */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const root = new URL('../..', import.meta.url).pathname;
+/* 5.0c.1: sem --escolha, monta a página das vozes gravadas do jogo (tools/vozes/pagina-jogo.mjs: amostras por Raça e idioma, campanha, números e o
+   que precisa de ouvido). A página de escolha das rodadas 1 a 3 (abaixo) precisa do work/vozes/manifesto.json da avaliação (cópia do a2-vozes). */
+if (!process.argv.includes('--escolha')) { await import('./pagina-jogo.mjs'); process.exit(0); }
 const man = JSON.parse(readFileSync(root + 'work/vozes/manifesto.json', 'utf8'));
 { const F = JSON.parse(readFileSync(root + 'tools/vozes/falas.json', 'utf8')).falas; for (const f of man.falas) { const g = F.find(x => x.id === f.id); if (g) f.quem = g.quem; } } /* rótulos atuais de falas.json */
 const RACAS = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'];
@@ -65,6 +68,14 @@ const MED = ['nivel_db', 'pico_db', 'piso_rel_db', 'piso_pausas_rel_db', 'hnr_db
 const resumo = itens => Object.fromEntries(MED.map(k => { const v = itens.map(i => i && i[k]).filter(x => x != null); return [k, v.length ? media(v) : null]; }));
 const seco = resumo(RC.linhas.map(L => RC.seco.pm_alex[L])); const secoAntes = resumo(RC.linhas.map(L => RA.itens.seco[L]));
 const AD = Object.fromEntries(RACAS.map(r => [r, { antes: resumo(RC.linhas.map(L => RA.itens[r][L])), depois: resumo(RC.linhas.map(L => RC.itens[r].pm_alex[L])) }]));
+/* 3ª rodada: as três variantes mais graves do Vorag (racas.py: vorag-a, vorag-b, vorag-c) e as amostras de idiomas (idiomas.py, cb_gerar.py) */
+const VAR = ['vorag-a', 'vorag-b', 'vorag-c'], VREC = 'vorag-c';
+const VDESC = { 'vorag-a': 'A: −4 semitons, graves +5 dB', 'vorag-b': 'B: −5 semitons, graves +6 dB e mais aspereza', 'vorag-c': 'C: −5 semitons e formantes 12% abaixo, graves +4 dB' };
+for (const r of VAR) AD[r] = { depois: resumo(RC.linhas.map(L => RC.itens[r].pm_alex[L])) };
+const doze = r => { const q = []; for (const v of RC.vozes) for (const L of RC.linhas) { const it = RC.itens[r][v][L], sc = RC.seco[v][L]; q.push({ p: it.piso_pausas_rel_db - sc.piso_pausas_rel_db, h: it.hnr_db - sc.hnr_db, a: it.aspereza_db - sc.aspereza_db, f: it.f0_hz, fs: sc.f0_hz, n: it.nivel_db - sc.nivel_db, pk: it.pico_db, c: it.cer || 0, cs: sc.cer || 0 }); }
+  const mm = k => media(q.map(x => x[k])); return { pausas: mm('p'), pausasMax: Math.max(...q.map(x => x.p)), hnr: mm('h'), asp: mm('a'), f0: mm('f'), st: 12 * Math.log2(mm('f') / mm('fs')), nivel: mm('n'), picoMax: Math.max(...q.map(x => x.pk)), cer: mm('c'), cerSeco: mm('cs') }; };
+const V12 = Object.fromEntries(['vorag', ...VAR].map(r => [r, doze(r)])); const V12antes = (() => { const it = RC.linhas.map(L => RA.itens.vorag[L]), sc = RC.linhas.map(L => RA.itens.seco[L]); return { pausas: media(it.map(x => x.piso_pausas_rel_db)) - media(sc.map(x => x.piso_pausas_rel_db)) }; })();
+const IDI = man.idiomas || null; const LGN = { pt: 'pt-BR', en: 'inglês', es: 'espanhol' };
 writeFileSync(root + 'work/vozes/antes-depois.json', JSON.stringify({ voz: 'pm_alex', linhas: RC.linhas, seco, secoAntes, racas: AD, porVoz: Object.fromEntries(RACAS.map(r => [r, Object.fromEntries(RC.vozes.map(v => [v, resumo(RC.linhas.map(L => RC.itens[r][v][L]))]))])) }, null, 1));
 
 /* ---------- página ---------- */
@@ -103,10 +114,52 @@ const cartaElenco = r => { const e = EL.racas[r]; const lf = e.lider_fala, lc = 
     <button class="btn tk" type="button" data-arq="vozes/elenco/${r}-lider" data-r="${r}">Ouvir a saudação</button><small>tom da voz ${n0(lf.f0_seco_hz)} Hz antes do caráter · transcrição ${lf.cer === 0 ? 'sem erro' : 'erro por letra ' + n1(lf.cer * 100) + '%'}${lf.seco && lf.seco.cer != null ? ' (voz seca: ' + (lf.seco.cer === 0 ? 'sem erro' : n1(lf.seco.cer * 100) + '%') + ')' : ''}</small></div>
   <div class="papel"><div class="eyebrow">Locutor · ${esc(pesos(e.locutor_pesos))} · velocidade ${n1(e.locutor_vel, 2)}</div>
     <div class="row2">${lc.map(x => `<button class="btn tk" type="button" data-arq="vozes/elenco/${r}-locutor-${x.id}" data-r="${r}">${esc(x.texto.replace(/[.!]$/, ''))}</button>`).join('')}</div><small>tom ${n0(media(lc.map(x => x.f0_seco_hz)))} Hz antes do caráter · transcrição ${lc.every(x => x.cer === 0) ? 'sem erro' : 'erro por letra ' + n1(media(lc.map(x => x.cer)) * 100) + '%'} (voz seca: ${lc.every(x => x.seco && x.seco.cer === 0) ? 'sem erro' : n1(media(lc.map(x => (x.seco || {}).cer || 0)) * 100) + '%'})</small></div>
+  ${r === 'vorag' && EL.racas[VREC] ? `<div class="papel"><div class="eyebrow">Variantes mais graves (3ª rodada)</div><div class="row2">${VAR.filter(v => EL.racas[v]).map(v => `<button class="btn tk${v === VREC ? ' rec' : ''}" type="button" data-arq="vozes/elenco/${v}-lider" data-r="vorag">Saudação ${esc(VDESC[v].split(':')[0])}</button>`).join('')}${VAR.filter(v => EL.racas[v]).map(v => `<button class="btn tk" type="button" data-arq="vozes/elenco/${v}-locutor-03-base-sob-ataque" data-r="vorag">Locutor ${esc(VDESC[v].split(':')[0])}</button>`).join('')}</div><small>tom da saudação: ${VAR.filter(v => EL.racas[v]).map(v => esc(VDESC[v].split(':')[0]) + ' ' + n0(EL.racas[v].lider_fala.f0_hz) + ' Hz').join(' · ')} (2ª rodada ${n0(e.lider_fala.f0_hz)} Hz)</small></div>` : ''}
   <p class="muted">${esc(e.porque)}</p></article>`; };
 const assetsRows = `| Vozes gravadas (assets/vozes/&lt;raça&gt;/*.opus e assets/vozes/campanha/*.opus, 5.0x) | geradas na máquina de build com o Kokoro-82M v1.0 (hexgrad/Kokoro-82M), vozes pm_alex, pf_dora e pm_santa e misturas, com o caráter de cada Raça assado na geração (tools/vozes/racas.py) (\`bash tools/vozes/preparar.sh\` e \`.tools/vozes/venv/bin/python tools/vozes/gerar.py\`) | equipe (texto e direção); modelo de hexgrad | pesos Apache-2.0; áudio gerado pela equipe | locutor, unidades e líderes |
 | Dados CC BY usados no treino do Kokoro-82M (atribuição pedida no model card) | Koniwa (github.com/koniwa/koniwa), SIWIS (datashare.ed.ac.uk/handle/10283/2353) | Koniwa; University of Edinburgh / SIWIS | CC BY 3.0; CC BY 4.0 | crédito do modelo de voz |
 | Ferramentas de geração das vozes (tools/vozes/, só na máquina de build) | kokoro e misaki (pip), espeak-ng embutido no espeakng-loader, praat-parselmouth (Praat, PSOLA do Vorag), scipy | hexgrad; eSpeak NG; Yannick Jadoul (Parselmouth), Paul Boersma e David Weenink (Praat); SciPy | Apache-2.0; GPL-3.0 (espeak-ng e Praat, não vão no jogo); BSD-3 | geração das falas e do caráter das Raças |`;
+
+/* ---------- 3ª rodada: seção Idiomas ---------- */
+const IDID = JSON.parse(readFileSync(root + 'tools/vozes/idiomas.json', 'utf8'));
+const REC_IDIOMAS = (() => { try { return readFileSync(root + 'work/vozes/idiomas-recomendacao.html', 'utf8'); } catch (e) { return ''; } })();
+function idiomasHTML() {
+  if (!IDI) return '';
+  const it = (mod, lg, n) => ((IDI.itens[mod] || {})[lg] || {})[n];
+  const nomeF = (r, papel, fid) => r + '-' + (papel === 'lider' ? 'lider' : 'locutor-' + fid);
+  const sem = (mod, lg) => { const v = []; for (const r of RACAS) { const x = ((IDI.semelhanca || {})[r] || {}).lider; if (x && x[mod + '-' + lg] != null) v.push(x[mod + '-' + lg]); } return v.length ? media(v) : null; };
+  const est = (IDI.estimativa || {}); const falaS = plano.total.dur; const cal = ((IDI.chatterbox || {}).calibracao || {});
+  const kokPt = (cands.find(c => c.id === 'kokoro-pm_alex') || {}).rtf_cpu;
+  const linhas = [];
+  for (const [mod, nomeM] of [['kokoro', 'Kokoro-82M'], ['chatterbox', 'Chatterbox Multilingual']]) for (const lg of ['pt', 'en', 'es']) {
+    if (mod === 'chatterbox' && lg === 'pt') continue; /* o pt-BR fica com o Kokoro: é a própria referência da clonagem */
+    const e = (est[mod] || {})[lg]; const cpu = e ? e.cpu_por_s : (mod === 'kokoro' && lg === 'pt' ? kokPt : null);
+    const cerTxt = e ? n1(e.cer * 100) + '%<small>seca ' + n1(e.cer_seco * 100) + '%</small>' : (mod === 'kokoro' && lg === 'pt' ? 'ver a mesa' : '—');
+    const s1 = lg === 'pt' && mod === 'kokoro' ? 1 : sem(mod, lg);
+    linhas.push(`<tr><th scope="row">${nomeM}<small>${LGN[lg]}</small></th><td class="num">${cerTxt}</td><td class="num">${s1 == null ? '—' : (lg === 'pt' && mod === 'kokoro' ? 'é a referência' : n1(s1, 2))}</td><td class="num">${cpu == null ? '—' : n1(cpu, 1) + ' s'}</td><td class="num">${cpu == null ? '—' : n1(cpu * falaS / 3600, 1) + ' h'}<small>${cpu == null ? '' : n1(cpu * falaS / 3600 / 8, 1) + ' h com 8 núcleos livres'}</small></td></tr>`); }
+  const cb = IDI.chatterbox || {};
+  const glos = IDID.glossario.map(g => `<tr><th scope="row">${esc(g.pt)}</th><td>${esc(g.en)}</td><td>${esc(g.es)}</td><td class="muted">${esc(g.nota)}</td></tr>`).join('');
+  const celula = (r, papel, fid, lg, tx) => { const n = nomeF(r, papel, fid); const vr = r === 'vorag' ? VREC : r; const bt = [];
+    const kArq = lg === 'pt' ? 'vozes/elenco/' + (papel === 'lider' ? vr + '-lider' : vr + '-locutor-' + fid) : 'vozes/idiomas/kokoro/' + lg + '/' + n;
+    const k = lg === 'pt' ? null : it('kokoro', lg, n), c = it('chatterbox', lg, n);
+    bt.push(`<button class="btn tk" type="button" data-arq="${kArq}" data-r="${r}"${k ? ` title="a transcrição ouviu: ${esc(k.asr)}"` : ''}>Kokoro${k ? `<small>${k.cer === 0 ? 'sem erro' : n1(k.cer * 100) + '%'}</small>` : ''}</button>`);
+    if (c) bt.push(`<button class="btn tk" type="button" data-arq="vozes/idiomas/chatterbox/${lg}/${n}" data-r="${r}" title="a transcrição ouviu: ${esc(c.asr)}">Chatterbox<small>${c.cer === 0 ? 'sem erro' : n1(c.cer * 100) + '%'}</small></button>`);
+    return `<td><small>${esc(tx)}</small><div class="row2">${bt.join('')}</div></td>`; };
+  const cartas = RACAS.map(r => { const f = [['lider', 'lider', IDID.lideres[r]], ...IDID.locutor.map(x => ['locutor', x.id, x])]; const sl = ((IDI.semelhanca || {})[r] || {}).lider || {};
+    return `<article class="idc" data-r="${r}"><header><span class="rn" data-r="${r}">${NOME_RACA[r]}</span> <b>${esc(LIDER[r])}</b> <small>semelhança com a voz pt-BR do elenco: Chatterbox en ${n1(sl['chatterbox-en'], 2)}, es ${n1(sl['chatterbox-es'], 2)} · Kokoro en ${n1(sl['kokoro-en'], 2)}, es ${n1(sl['kokoro-es'], 2)}</small></header>
+      <div class="tbl"><table><thead><tr><th>Fala</th><th>pt-BR</th><th>inglês</th><th>espanhol</th></tr></thead><tbody>${f.map(([papel, fid, tx]) => `<tr><th scope="row">${papel === 'lider' ? 'Líder' : 'Locutor'}</th>${['pt', 'en', 'es'].map(lg => celula(r, papel, fid, lg, tx[lg])).join('')}</tr>`).join('')}</tbody></table></div></article>`; }).join('');
+  return `<section class="sec" aria-labelledby="t-idi">
+  <header><div class="eyebrow">Idiomas · 3ª rodada</div><h2 id="t-idi">Inglês e espanhol</h2>
+  <p class="muted">As 5 saudações e 2 avisos de locutor em pt-BR, inglês e espanhol, já com o caráter da Raça (o Vorag na variante C). <b>Kokoro</b>: espanhol com ef_dora, em_alex e em_santa nos mesmos pesos do elenco; inglês com as vozes americanas e britânicas mais parecidas com cada papel. <b>Chatterbox Multilingual</b>: a mesma voz de cada papel nos três idiomas, clonada da voz do elenco em pt-BR feita pelo Kokoro (uma voz nossa, nunca de uma pessoa real); toda saída leva a marca d'água PerTh, inaudível.</p></header>
+  ${REC_IDIOMAS ? `<div class="plate rec-box">${REC_IDIOMAS}</div>` : ''}
+  <div class="tbl"><table><thead><tr><th>Modelo</th><th class="num">Erro de transcrição</th><th class="num">Mesma voz do pt-BR</th><th class="num">CPU por s de fala</th><th class="num">742 falas num idioma</th></tr></thead><tbody>${linhas.join('')}</tbody></table></div>
+  <p class="muted">Erro: Whisper small no idioma da fala, no arquivo assado (embaixo, a mesma fala sem o caráter da Raça). Mesma voz: cosseno entre a voz da fala e a referência pt-BR do elenco no codificador de voz do Chatterbox (1 é a mesma voz; entre líderes diferentes do elenco dá em média ${n1(cal.entre_lideres_diferentes_media, 2)}, no máximo ${n1(cal.entre_lideres_diferentes_max, 2)}). CPU: segundos de CPU por segundo de fala nesta máquina sem GPU, dividida com outros agentes. As 742 falas somam ${n1(falaS / 60, 0)} min de fala por idioma (o plano em pt-BR); três idiomas = três vezes isso. Tamanho: Kokoro 328 MB (mais 0,5 MB por voz); Chatterbox ${n1(cb.modelo_gb, 1)} GB de pesos e um ambiente Python à parte (torch 2.6), ${esc(cb.versao || '')}.</p>
+  <h3 class="h3">Glossário inicial</h3>
+  <div class="tbl"><table><thead><tr><th>pt-BR</th><th>inglês</th><th>espanhol</th><th>Nota</th></tr></thead><tbody>${glos}</tbody></table></div>
+  <p class="muted">Os nomes próprios não mudam: ${esc(IDID.nomes.join(', '))}.</p>
+  <div class="idi">${cartas}</div>
+</section>`;
+}
 
 const html = `<title>Vozes do Aether Rift</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -166,7 +219,10 @@ select{font:500 .92rem/1.2 var(--fb);color:var(--fg);background:var(--ink1);bord
 .rb b{font:800 1.2rem/1 var(--fd);text-transform:uppercase;letter-spacing:.03em;color:var(--cor)}.rb small{color:var(--fg2)}
 .rb.tocando{background:var(--cor)}.rb.tocando b,.rb.tocando small{color:#0b0d10}
 .rb[data-r=vehnar]{--cor:var(--vehnar)}.rb[data-r=erevane]{--cor:var(--erevane)}.rb[data-r=tessara]{--cor:var(--tessara)}.rb[data-r=quorith]{--cor:var(--quorith)}.rb[data-r=vorag]{--cor:var(--vorag)}
-.ab{min-height:36px;font-size:.78rem;padding:6px 10px}
+.ab{min-height:36px;font-size:.78rem;padding:6px 10px}.ab.var{display:grid;justify-items:start;text-align:left;gap:2px}.btn.rec{box-shadow:inset 0 0 0 1px var(--rift)}.btn.rec.tocando{box-shadow:none}
+.h3{font:700 1.2rem/1.1 var(--fd);text-transform:uppercase;letter-spacing:.03em;margin:8px 0 0}tr.rec th{color:var(--rift)}
+.idi{display:grid;gap:10px}.idc{padding:12px 14px;background:linear-gradient(180deg,color-mix(in srgb,var(--cor) 9%,var(--ink2)),var(--ink1));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--cor) 30%,transparent);display:grid;gap:8px;min-width:0}
+.idc table td{min-width:190px}.idc td small{margin:4px 0}.idc .row2 .btn{min-height:34px;padding:6px 10px;font-size:.78rem}.idc .row2 .btn small{display:inline;margin-left:4px}
 canvas{width:100%;height:64px;display:block;background:var(--void);box-shadow:inset 0 0 0 1px var(--line)}
 .aviso{font-size:.84rem;color:var(--warn)}
 .tbl{overflow-x:auto;min-width:0}
@@ -188,16 +244,23 @@ footer{font:400 .76rem/1.5 var(--fm);color:var(--fg3);border-top:1px solid var(-
 </style>
 <div class="wrap">
 <header>
-  <div class="eyebrow">Aether Rift: Dominion · 5.0a.2 · vozes neurais · 2ª rodada</div>
+  <div class="eyebrow">Aether Rift: Dominion · 5.0a.2 · vozes neurais · 3ª rodada</div>
   <h1>Vozes do Aether Rift</h1>
-  <p class="lead">As vozes do Kokoro-82M aprovadas pelo dono, o elenco proposto para os cinco líderes e locutores, e o caráter de cada Raça agora assado nos arquivos: esta página toca exatamente o que o jogo vai tocar.</p>
+  <p class="lead">As vozes do Kokoro-82M aprovadas pelo dono, o elenco proposto para os cinco líderes e locutores, o caráter de cada Raça assado nos arquivos (esta página toca exatamente o que o jogo vai tocar) e as primeiras amostras em inglês e espanhol.</p>
 </header>
 
 <section class="sec" aria-labelledby="t-dec">
   <div class="plate rec-box">
-    <div class="eyebrow" id="t-dec">Decisão do dono · 24/10/2026</div>
+    <div class="eyebrow" id="t-dec">3ª rodada · 29/10/2026</div>
+    <p><b>Vehnar e Tessara aprovados. O Vorag ficou "muito normal": três variantes mais graves abaixo, todas sem ruído; recomendo a C. E a onda de idiomas: amostras em inglês e espanhol para escolher o caminho.</b></p>
+    <ul>
+      <li><b>Vorag:</b> A (−4 semitons, graves +5 dB), B (−5 semitons, graves +6 dB e mais aspereza) e C (−5 semitons com os formantes 12% abaixo, a voz de corpo grande). Na faixa das Raças e no cartão do Oru Voraz.</li>
+      <li><b>Idiomas:</b> as 5 saudações e 2 avisos de locutor em inglês e espanhol, no Kokoro e no Chatterbox Multilingual (a mesma voz do elenco clonada nos três idiomas), já com o caráter da Raça.</li>
+      <li><b>Elenco e eco do locutor da Erevane:</b> seguem como propostos, sem comentário do dono.</li>
+    </ul>
+    <div class="eyebrow">Decisão do dono · 24/10/2026</div>
     <p><b>Kokoro-82M, com Alex como voz-base; Dora e Santa, mais misturas, para os líderes; e o filtro de cada Raça.</b></p>
-    <div class="eyebrow">Ajustes desta rodada</div>
+    <div class="eyebrow">Ajustes da 2ª rodada</div>
     <ul>
       <li><b>Vehnar:</b> a mesma faixa de rádio, sem o chiado e os estalos por baixo da voz e com bem menos saturação; só um clique curto e baixo antes e depois da fala.</li>
       <li><b>Vorag:</b> sem o ruído e com menos grave: 3 semitons abaixo (antes 4) por PSOLA, que não passa por vocoder, graves +3 dB (antes +7), sem a modulação de 38 Hz; a aspereza vem de uma saturação leve, sem ruído.</li>
@@ -221,7 +284,8 @@ footer{font:400 .76rem/1.5 var(--fm);color:var(--fg3);border-top:1px solid var(-
   <div class="plate racas">
     <div class="ctrl"><label>Voz<select id="r-voz"><option value="padrao" selected>Padrão: Alex (Tessara com a Dora)</option>${RC.vozes.map(v => `<option value="kokoro-${v}">${VNOME[v]}</option>`).join('')}</select></label>
       <label>Fala<select id="r-fala">${RC.linhas.map(L => `<option value="${L}"${L === '10-barao-forja-2' ? ' selected' : ''}>${esc((man.falas.find(f => f.id === L) || {}).texto || L)}</option>`).join('')}</select></label></div>
-    <div class="rbtns">${RACA_INFO.map(([id, nome, desc]) => `<div class="rcol"><button class="rb" type="button" data-r="${id}"><b>${esc(nome)}</b><small>${esc(desc)}</small></button>${id === 'vehnar' || id === 'vorag' ? `<button class="btn ab" type="button" data-antes="${id}">Ouvir o antes (Alex)</button>` : ''}</div>`).join('')}</div>
+    <div class="rbtns">${RACA_INFO.map(([id, nome, desc]) => `<div class="rcol"><button class="rb" type="button" data-r="${id}"><b>${esc(nome)}</b><small>${esc(desc)}</small></button>${id === 'vehnar' || id === 'vorag' ? `<button class="btn ab" type="button" data-antes="${id}">Ouvir o antes (Alex)</button>` : ''}${id === 'vorag' ? VAR.map(v => `<button class="btn ab var${v === VREC ? ' rec' : ''}" type="button" data-rv="${v}" data-r="vorag">${esc(VDESC[v].split(':')[0])}${v === VREC ? ' · recomendada' : ''}<small>${esc(VDESC[v].split(': ')[1])}</small></button>`).join('') : ''}</div>`).join('')}</div>
+    <p class="muted">O botão Vorag toca a versão da 2ª rodada (−3 semitons); os botões A, B e C, as variantes mais graves desta rodada.</p>
     <canvas id="osc" width="1040" height="64" role="img" aria-label="Forma de onda do que está tocando"></canvas>
     <p class="aviso" id="r-aviso" hidden></p>
   </div>
@@ -232,9 +296,15 @@ footer{font:400 .76rem/1.5 var(--fm);color:var(--fg3);border-top:1px solid var(-
   <p class="muted">Voz Alex, média das ${RC.linhas.length} falas da faixa, medidas no arquivo final decodificado (o que o jogador ouve). Piso: média dos 10% de quadros de 20 ms mais baixos dentro da fala; piso nas pausas: os mesmos quadros onde a voz seca está calada. Os dois em dB abaixo do nível da própria fala (mais negativo é mais limpo) e, embaixo, a diferença para a voz seca. HNR: razão harmônico/ruído (mais alto é mais limpo). Aspereza: flutuações de 20 a 75 Hz do envelope sobre as das sílabas. Erro: transcrição pelo Whisper.</p></header>
   <div class="tbl"><table><thead><tr><th>Raça</th><th class="num">Nível vs seca</th><th class="num">Pico dBFS</th><th class="num">Piso</th><th class="num">Piso nas pausas</th><th class="num">HNR dB</th><th class="num">Aspereza dB</th><th class="num">Tom</th><th class="num">Erro</th></tr></thead>
   <tbody><tr class="ref"><th scope="row">Voz seca<small>referência (Alex, Opus 32 kbps)</small></th><td class="num">—</td><td class="num">${n1(seco.pico_db)}</td><td class="num">${n1(seco.piso_rel_db)}</td><td class="num">${n1(seco.piso_pausas_rel_db)}</td><td class="num">${n1(seco.hnr_db)}</td><td class="num">${n1(seco.aspereza_db)}</td><td class="num">${n0(seco.f0_hz)} Hz</td><td class="num">${n1(seco.cer * 100)}%</td></tr>
-  ${RACAS.map(r => linhaAD(r, 'antes', 'antes: ao vivo (v1)') + linhaAD(r, 'depois', 'depois: assado')).join('')}</tbody></table></div>
+  ${RACAS.map(r => linhaAD(r, 'antes', 'antes: ao vivo (v1)') + linhaAD(r, 'depois', r === 'vorag' ? 'depois: 2ª rodada, −3 semitons' : 'depois: assado') + (r === 'vorag' ? VAR.map(v => linhaAD(v, 'depois', 'variante ' + VDESC[v])).join('') : '')).join('')}</tbody></table></div>
+  <h3 class="h3">Vorag: as três variantes nas 12 falas da faixa (Dora, Alex e Santa)</h3>
+  <div class="tbl"><table><thead><tr><th>Versão</th><th class="num">Pausas vs seca</th><th class="num">Pior fala</th><th class="num">HNR vs seca</th><th class="num">Aspereza vs seca</th><th class="num">Tom</th><th class="num">Nível vs seca</th><th class="num">Pico máx.</th><th class="num">Erro</th></tr></thead>
+  <tbody><tr class="ref"><th scope="row">v1 ao vivo<small>a que o dono achou com ruído (voz Alex)</small></th><td class="num">${sinal(V12antes.pausas)} dB</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+  ${['vorag', ...VAR].map(v => { const x = V12[v]; return `<tr class="${v === VREC ? 'rec' : ''}"><th scope="row">${v === 'vorag' ? '2ª rodada' : esc(VDESC[v].split(':')[0])}${v === VREC ? ' · recomendada' : ''}<small>${v === 'vorag' ? '−3 semitons, graves +3 dB' : esc(VDESC[v].split(': ')[1])}</small></th><td class="num">${sinal(x.pausas)} dB</td><td class="num">${sinal(x.pausasMax)} dB</td><td class="num">${sinal(x.hnr)} dB</td><td class="num">${sinal(x.asp)} dB</td><td class="num">${n0(x.f0)} Hz<small>${sinal(x.st)} semitons</small></td><td class="num">${sinal(x.nivel)} dB</td><td class="num">${n1(x.picoMax)} dBFS</td><td class="num">${n1(x.cer * 100)}%<small>seca ${n1(x.cerSeco * 100)}%</small></td></tr>`; }).join('')}</tbody></table></div>
+  <p class="muted">Recomendação: a <b>C</b>. É a mais grave (5 semitons abaixo) e a única com corpo de voz grande (formantes mais baixos), com as pausas mais limpas das três e a mesma clareza da voz seca na transcrição. A B soa mais áspera, mas a saturação a mais levanta as partes baixas da fala. Nenhuma das três volta perto do ruído da v1.</p>
 </section>
 
+${idiomasHTML()}
 <section class="sec" aria-labelledby="t-mesa">
   <header><div class="eyebrow">Mesa de escuta</div><h2 id="t-mesa">12 falas, ${cands.length} vozes</h2>
   <p class="muted">As vozes secas, sem caráter de Raça. Cada botão toca a fala naquela voz; Kokoro à esquerda, Piper à direita. O ponto amarelo marca onde a transcrição ouviu algo diferente do texto.</p></header>
@@ -315,6 +385,7 @@ document.addEventListener('click', e => {
   if (b.classList.contains('tocando')) return parar();
   if (b.matches('.rb')) tocar(arqRaca(b.dataset.r), b);
   else if (b.hasAttribute('data-antes')) tocar('vozes/racas-antes/' + b.dataset.antes + '/' + document.getElementById('r-fala').value, b);
+  else if (b.hasAttribute('data-rv')) tocar(arqRaca(b.dataset.rv), b); /* 3ª rodada: variantes do Vorag */
   else if (b.hasAttribute('data-arq')) tocar(b.dataset.arq, b);
   else if (b.hasAttribute('data-todas')) todas(b.dataset.todas);
   else if (b.hasAttribute('data-parar')) parar();
@@ -332,11 +403,14 @@ for (const c of cands) for (const f of c.falas) add(c.id + '/' + f.id);
 for (const r of RACAS) for (const v of RC.vozes) for (const L of RC.linhas) add('racas/' + r + '/kokoro-' + v + '/' + L);
 for (const r of ['vehnar', 'vorag']) for (const L of RC.linhas) add('racas-antes/' + r + '/' + L);
 for (const r of RACAS) { add('elenco/' + r + '-lider'); for (const x of EL.racas[r].locutor_falas) add('elenco/' + r + '-locutor-' + x.id); }
-const novas = new Set(['11-sylvia-oriel-1', '12-sylvia-oriel-2']); const delta = {};
-for (const [k, v] of Object.entries(comp)) { const m = k.match(/^vozes\/(kokoro|piper)-[^/]+\/([^/]+)\.(ogg|mp3)$/); if (!m || novas.has(m[2])) delta[k] = v; }
-for (const c of cands) for (const old of ['11-sylva-oriel-1', '12-sylva-oriel-2']) for (const ext of ['ogg', 'mp3']) delta['vozes/' + c.id + '/' + old + '.' + ext] = null;
+for (const r of VAR) { for (const v of RC.vozes) for (const L of RC.linhas) add('racas/' + r + '/kokoro-' + v + '/' + L); if (EL.racas[r]) { add('elenco/' + r + '-lider'); for (const x of EL.racas[r].locutor_falas) add('elenco/' + r + '-locutor-' + x.id); } } /* 3ª rodada */
+if (IDI) for (const [mod, por] of Object.entries(IDI.itens)) for (const [lg, its] of Object.entries(por)) for (const n of Object.keys(its)) add('idiomas/' + mod + '/' + lg + '/' + n);
+/* diferença com o que a v2 publicou (work/antes/vozes-publicar-v2.json): caminhos novos, arquivos mexidos depois daquela publicação e null no que saiu */
+const { statSync } = await import('node:fs'); const v2p = root + 'work/antes/vozes-publicar-v2.json'; const v2 = JSON.parse(readFileSync(v2p, 'utf8')).files_completo; const t2 = statSync(v2p).mtimeMs; const delta = {};
+for (const [k, v] of Object.entries(comp)) if (!(k in v2) || statSync(v).mtimeMs > t2) delta[k] = v;
+for (const k of Object.keys(v2)) if (!(k in comp)) delta[k] = null;
 writeFileSync(root + 'work/vozes-publicar.json', JSON.stringify({ pagina: root + 'work/vozes-escolha.html', url: 'https://claude.ai/artifact/B3wjDoj33LSgJzeQ129dCb', titulo: 'Vozes do Aether Rift', icone: 'audio',
-  descricao: 'As vozes do Kokoro aprovadas pelo dono, o elenco dos cinco líderes e locutores e o caráter de cada Raça assado nos arquivos, com o antes e depois do Vehnar e do Vorag e o plano da implantação.',
-  nota: 'files = só o que mudou desde a v1 (novos e trocados; null remove as falas 11 e 12 com o nome antigo), cabe numa publicação na mesma url; files_completo = todos os arquivos, para uma publicação nova (passa de 255: em duas vezes).',
+  descricao: 'As vozes do Kokoro aprovadas pelo dono, o elenco, o caráter de cada Raça assado nos arquivos, três variantes mais graves do Vorag e as amostras em inglês e espanhol (Kokoro e Chatterbox) para a onda de idiomas.',
+  nota: 'files = só o que mudou desde a v2 publicada (caminhos novos e arquivos mexidos depois dela; null no que saiu), para atualizar a mesma url; files_completo = todos os arquivos, para uma publicação nova (passa de 255: em mais de uma vez).',
   arquivos: Object.values(delta).filter(Boolean).length, removidos: Object.values(delta).filter(x => x === null).length, files: delta, arquivos_completo: Object.keys(comp).length, files_completo: comp }, null, 1));
 console.log('publicação: ' + Object.values(delta).filter(Boolean).length + ' arquivos novos ou trocados + ' + Object.values(delta).filter(x => x === null).length + ' removidos (completo: ' + Object.keys(comp).length + ')');

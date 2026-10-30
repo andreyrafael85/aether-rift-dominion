@@ -10,13 +10,19 @@ além dos áudios). Etapas (--etapa):
           e com o caráter da Raça: work/vozes/elenco/<raça>-lider.ogg|mp3 e <raça>-locutor-<fala>.ogg|mp3.
   antes   mede as cadeias ao vivo da página v1 (renderizadas por tools/vozes/racas-antes.cjs em .tools/vozes/tmp/antes/) e grava o antes do
           Vehnar e do Vorag em work/vozes/racas-antes/<raça>/<fala>.ogg|mp3, para ouvir lado a lado.
-Uso: .tools/vozes/venv/bin/python tools/vozes/gerar.py [--etapa mesa|racas|elenco|antes] [--falas id1,id2] [--so voz1,voz2] [--racas r1,r2] [--sem-whisper]"""
+  jogo       5.0c.1: as falas do jogo (tools/vozes/roteiro.json) num idioma, no elenco e com o caráter da Raça assado: mestres sem perda em
+             .tools/vozes/mestres/, Opus 24 kbps em assets/vozes/<idioma>/<pacote>/<id>.ogg, conferência pelo Whisper e tempos de cada palavra
+             (tools/vozes/jogo.py). Retomável: pula o que já existe. --idioma pt-BR|en|es, --so <tipo|raça|pacote|id,...>, --refazer.
+  manifesto  5.0c.1: assets/vozes/<idioma>/manifesto.json a partir do que a etapa jogo gravou (--idioma; sem ele, os três).
+  formato    5.0c.1: --formato m4a|mp3 grava a mesma árvore no outro formato a partir dos mestres e acrescenta o formato no manifesto.
+  reconferir 5.0c.1: recalcula o erro de cada fala pelo texto que o Whisper já ouviu (equivalências de grafia em jogo.EQUIV), sem gerar de novo.
+Uso: .tools/vozes/venv/bin/python tools/vozes/gerar.py [--etapa mesa|racas|elenco|antes|jogo|manifesto|formato|reconferir] [--falas id1,id2] [--so voz1,voz2] [--racas r1,r2] [--sem-whisper] [--threads N]"""
 import os, sys, json, time, re, subprocess, unicodedata, platform
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 T = os.path.join(ROOT, '.tools', 'vozes')
 for k, v in {'HF_HOME': 'cache/hf', 'XDG_CACHE_HOME': 'cache/xdg', 'TORCH_HOME': 'cache/torch', 'TMPDIR': 'tmp'}.items():
     os.environ.setdefault(k, os.path.join(T, v))
-THREADS = 2  # máquina dividida com outros agentes: com carga alta, menos threads disputam menos
+THREADS = int(os.environ.get('ARD_THREADS') or (sys.argv[sys.argv.index('--threads') + 1] if '--threads' in sys.argv else 2))  # 5.0c.1: --threads N (a etapa jogo usa 1)
 for k in ('OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS'): os.environ.setdefault(k, str(THREADS))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np, soundfile as sf, imageio_ffmpeg
@@ -229,7 +235,7 @@ def etapa_racas():
     R['gerado'] = time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())
     for v in RC.VOZES_RACA:
         cid = 'kokoro-' + v; R['seco'][v] = {}
-        for r in alvo: R['itens'][r][v] = {}
+        for r in alvo: R['itens'].setdefault(r, {})[v] = {}
         for L in RC.LINHAS_RACA:
             x, sr = sf.read(os.path.join(TMP, cid + '-' + L + '.wav'), dtype='float64')
             d, dsr = decodificar(os.path.join(OUT, cid, L + '.ogg')); reg = RC.regiao_fala(d, dsr); pz = RC.pausas_da_seca(d, dsr, reg); seco = RC.medir(d, dsr, reg, pz)
@@ -257,8 +263,8 @@ def etapa_elenco():
         print(f"{raca:8} {os.path.basename(base):22} F0 seco {med['f0_seco_hz']} · F0 {med['f0_hz']} · CER {med.get('cer')} «{med.get('asr')}» · seco CER {med['seco'].get('cer')}", flush=True)
         return med
     for r in (RACAS_SO or RC.RACAS):
-        c = RC.ELENCO[r]; od = os.path.join(OUT, 'elenco')
-        E['racas'][r] = dict(c, lider_fala=uma(sala[r], c['lider_pesos'], c['lider_vel'], r, os.path.join(od, r + '-lider')),
+        c = RC.ELENCO.get(r) or RC.ELENCO[r.split('-')[0]]; od = os.path.join(OUT, 'elenco')  # 3ª rodada: vorag-a/b/c usam o elenco do Vorag
+        E['racas'][r] = dict(c, lider_fala=uma(sala[r.split('-')[0]], c['lider_pesos'], c['lider_vel'], r, os.path.join(od, r + '-lider')),
                              locutor_falas=[dict(id=L, **uma(texto, c['locutor_pesos'], c['locutor_vel'], r, os.path.join(od, r + '-locutor-' + L))) for L, texto in RC.LOCUTOR_FALAS])
     man['elenco'] = E; gravar_manifesto(man, p)
 
@@ -280,4 +286,7 @@ def etapa_antes():
     man['racas_antes'] = A; gravar_manifesto(man, p)
 
 if __name__ == '__main__':
-    {'mesa': etapa_mesa, 'racas': etapa_racas, 'elenco': etapa_elenco, 'antes': etapa_antes}[ETAPA]()
+    if ETAPA in ('jogo', 'manifesto', 'formato', 'reconferir'):  # 5.0c.1: as falas do jogo (tools/vozes/jogo.py)
+        import jogo; jogo.main(sys.modules[__name__], ETAPA)
+    else:
+        {'mesa': etapa_mesa, 'racas': etapa_racas, 'elenco': etapa_elenco, 'antes': etapa_antes}[ETAPA]()

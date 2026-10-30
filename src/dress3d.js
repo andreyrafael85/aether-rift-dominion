@@ -139,7 +139,7 @@ function create(THREE, scene, opts) {
      (com folga para sombra e vento) recorta de verdade. O three ainda testa a esfera em cada passe (inclusive o da sombra) */
   const _fr = new THREE.Frustum(), _pv = new THREE.Matrix4();
   D.cull = function (cam) { const p = cam.position; _fr.setFromProjectionMatrix(_pv.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse));
-    for (const b of D.meshes) { const d = b.box.distanceToPoint(p); /* distância até a caixa do bloco */
+    for (let bi = 0, bn = D.meshes.length; bi < bn; bi++) { const b = D.meshes[bi]; const mn = b.box.min, mx = b.box.max; const ex = Math.max(mn.x, Math.min(mx.x, p.x)) - p.x, ey = Math.max(mn.y, Math.min(mx.y, p.y)) - p.y, ez = Math.max(mn.z, Math.min(mx.z, p.z)) - p.z; const d = Math.sqrt(ex * ex + ey * ey + ez * ez); /* distância até a caixa do bloco */ /* 5.0c.1: laço por índice e a distância até a caixa escrita aqui (a mesma conta do Box3.distanceToPoint: clamp e distanceTo); a chamada devolvia um número alocado por bloco e por passe: ~29 KB por quadro */
       b.mesh.visible = d < b.far && _fr.intersectsBox(b.box); if (!b.mesh.visible) continue; const g = d > LITE_D ? b.gL : b.gF; if (b.mesh.geometry !== g) b.mesh.geometry = g;
       b.mesh.castShadow = b.cast && d < (b.big ? SHADOW_FAR * 2 : SHADOW_FAR); } }; /* longe: versão leve da geometria; sombra só perto (a de longe mal aparece e custa um desenho a mais por bloco) */
   const prevBR = scene.onBeforeRender; scene.onBeforeRender = function (r, sc, cam, rt) { if (prevBR) prevBR.call(this, r, sc, cam, rt); if (cam && cam.isPerspectiveCamera && D.meshes.length) D.cull(cam); };

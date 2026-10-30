@@ -199,7 +199,79 @@ def vorag(x24, sr24, semitons=-3.0):
     return portao(a, para48(x24, sr24)), 0.0
 
 
-ASSAR = {'vehnar': vehnar, 'erevane': erevane, 'tessara': tessara, 'quorith': quorith, 'vorag': vorag}
+def genero_praat(x, sr, semitons, formantes):
+    """tom e formantes juntos pelo "Change gender" do Praat (reamostra para mover os formantes e corrige o tom por PSOLA): a mediana do
+    tom vai para semitons abaixo e os formantes são multiplicados por formantes (< 1: trato vocal maior, voz de corpo grande)"""
+    import parselmouth
+    from parselmouth.praat import call
+    snd = parselmouth.Sound(np.asarray(x, float), sampling_frequency=sr); med = call(snd.to_pitch(pitch_floor=60.0, pitch_ceiling=400.0), 'Get quantile', 0, 0, 0.5, 'Hertz')
+    y = call(snd, 'Change gender', 60, 400, formantes, med * 2 ** (semitons / 12), 1.0, 1.0).values[0]
+    return np.pad(y, (0, max(0, len(x) - len(y))))[:len(x)]
+
+
+def _vorag_final(v48, x24, sr24, graves, sat_mix, sat_k):
+    a = eq(v48, ('passa-alta', 70, 0.7071), ('graves', 150, 0.7071, graves), ('pico', 2500, 1.0, 2), ('passa-baixa', 7000, 0.7071))
+    a = (1 - sat_mix) * a + sat_mix * satura(a, sat_k)
+    return portao(a, para48(x24, sr24)), 0.0
+
+
+# 3ª rodada (29/10/2026): o dono achou o Vorag da 2ª rodada "muito normal". Três variantes mais graves, todas pelo mesmo caminho limpo
+# (PSOLA, sem vocoder, sem modulação), para ele escolher de ouvido:
+def vorag_a(x24, sr24):  # A: −4 semitons, graves +5 dB, a mesma saturação leve
+    return _vorag_final(para48(tom_psola(x24, sr24, -4.0), sr24), x24, sr24, 5.0, 0.25, 2.0)
+
+
+def vorag_b(x24, sr24):  # B: −5 semitons, graves +6 dB e mais aspereza em paralelo
+    return _vorag_final(para48(tom_psola(x24, sr24, -5.0), sr24), x24, sr24, 6.0, 0.4, 2.8)
+
+
+def vorag_c(x24, sr24):  # C: −5 semitons e formantes 12% abaixo ("Change gender" do Praat): corpo de voz grande
+    return _vorag_final(para48(genero_praat(x24, sr24, -5.0, 0.88), sr24), x24, sr24, 4.0, 0.3, 2.2)
+
+
+def erevane_loc(x24, sr24):
+    """5.0c.1: o eco mais leve do locutor da Erevane (aprovado em 29/10/2026): realimentação 0,36 → 0,25 e sala 0,34 → 0,2. O eco de 165 ms da v1
+    confundia os avisos curtos ("Base sob ataque" virava "Basis Sobataki"); o líder fica com o eco da v1. Vale também para as unidades da Erevane,
+    que são falas curtas como os avisos."""
+    x = para48(x24, sr24); a = eq(x, ('graves', 180, 0.7071, -4), ('agudos', 5500, 0.7071, 6), ('pico', 11000, 0.7, 4))
+    a = np.concatenate([a, np.zeros(int(2.0 * SR))])
+    ir = sala(2.0, 2.4, semente=11); hp = eq(a, ('passa-alta', 500, 0.7071))
+    rv = (fftconvolve(hp, ir[0])[:len(a)] + fftconvolve(hp, ir[1])[:len(a)]) / 2
+    return 0.82 * a + eco(a, 0.165, 0.25, 4200, 0.36) + 0.2 * rv, 0.0
+
+
+ASSAR = {'vehnar': vehnar, 'erevane': erevane, 'erevane-loc': erevane_loc, 'tessara': tessara, 'quorith': quorith, 'vorag': vorag, 'vorag-a': vorag_a, 'vorag-b': vorag_b, 'vorag-c': vorag_c}
+VORAG_VARIANTES = {'vorag-a': 'A: −4 semitons, graves +5 dB', 'vorag-b': 'B: −5 semitons, graves +6 dB e mais aspereza', 'vorag-c': 'C: −5 semitons e formantes 12% abaixo (corpo grande), graves +4 dB'}
+
+# ---------- 5.0c.1: o elenco das falas do jogo, por idioma ----------
+# Líder e locutor: o elenco aprovado (ELENCO em pt-BR; em espanhol as mesmas vozes ef_/em_ com os mesmos pesos; em inglês as vozes da 3ª rodada,
+# tools/vozes/idiomas.json). Unidades: a voz-base (Alex) com o caráter da Raça, um pouco diferente por classe (velocidade e um pouco do Santa nos
+# veículos e no suporte), sempre dentro das três vozes aprovadas. Em inglês o papel do Alex é o am_michael e o do Santa, o bm_george (como no elenco).
+VOZ_ES = {'pf_dora': 'ef_dora', 'pm_alex': 'em_alex', 'pm_santa': 'em_santa'}
+VOZ_EN = {'pm_alex': 'am_michael', 'pm_santa': 'bm_george', 'pf_dora': 'af_bella'}
+UNIDADES = {'civil': ({'pm_alex': 1.0}, 1.0), 'infantaria': ({'pm_alex': 1.0}, 1.05), 'veiculo': ({'pm_alex': 0.6, 'pm_santa': 0.4}, 0.95),
+            'drone': ({'pm_alex': 1.0}, 1.1), 'suporte': ({'pm_alex': 0.8, 'pm_santa': 0.2}, 1.0)}
+ASSADO_JOGO = {'vehnar': 'vehnar', 'erevane': 'erevane', 'tessara': 'tessara', 'quorith': 'quorith', 'vorag': 'vorag-c'}  # Vorag na variante C (29/10)
+
+
+def assado_do_papel(raca, quem):
+    """o caráter assado de cada fala: o da Raça; a Erevane com o eco mais leve fora da voz do líder (locutor, eliminações e unidades)"""
+    return 'erevane-loc' if raca == 'erevane' and quem != 'lider' else ASSADO_JOGO[raca]
+
+
+def voz_do_papel(raca, quem, idioma, classe=None, en=None):
+    """(pesos do Kokoro, velocidade, g2p) de quem fala: quem = 'lider' | 'locutor' | 'unidade'; en = o bloco kokoro.en do idiomas.json"""
+    if quem == 'unidade':
+        pesos, vel = UNIDADES[classe]
+    else:
+        e = ELENCO[raca]; pesos, vel = (e['lider_pesos'], e['lider_vel']) if quem == 'lider' else (e['locutor_pesos'], e['locutor_vel'])
+    if idioma == 'pt-BR': return dict(pesos), vel, 'p'
+    if idioma == 'es': return {VOZ_ES[v]: w for v, w in pesos.items()}, vel, 'e'
+    if quem != 'unidade':
+        k = en[raca]['lider' if quem == 'lider' else 'locutor']; return dict(k['pesos']), k['vel'], k['g2p']
+    p = {}
+    for v, w in pesos.items(): p[VOZ_EN[v]] = p.get(VOZ_EN[v], 0) + w
+    am = sum(w for v, w in p.items() if v[0] == 'a'); return p, vel, ('a' if am >= 0.5 else 'b')
 
 
 def assar(raca, x24, sr24):

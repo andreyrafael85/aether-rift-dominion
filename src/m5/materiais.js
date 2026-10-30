@@ -77,6 +77,15 @@ M5.duasFaces = function (g) { const Tm = T(); const n = g.attributes.position.co
   for (let i = 0; i < m; i += 3) { const a = idx ? idx[i] : i, b = idx ? idx[i + 1] : i + 1, c = idx ? idx[i + 2] : i + 2; ni[i] = a; ni[i + 1] = b; ni[i + 2] = c; ni[m + i] = a + n; ni[m + i + 1] = c + n; ni[m + i + 2] = b + n; }
   out.setIndex(new Tm.BufferAttribute(ni, 1)); out.computeBoundingSphere(); return out; };
 
+/* 5.0c.1: o verso de uma geometria: os mesmos vértices, a normal trocada e os triângulos na ordem inversa. Desenhada com FrontSide, dá os mesmos
+   fragmentos que a original com BackSide (o r186 troca a normal pela faceDirection no verso): duas malhas do mesmo código que só diferiam no
+   lado (o volume da tempestade por fora e por dentro, o fundo e o chão do mapa de ambiente) passam a dividir o pipeline */
+M5.verso = function (g) { const Tm = T(); const out = new Tm.BufferGeometry();
+  for (const k in g.attributes) { const a = g.attributes[k], arr = a.array.slice(0, a.count * a.itemSize); if (k === 'normal') for (let i = 0; i < arr.length; i++) arr[i] = -arr[i]; out.setAttribute(k, new Tm.BufferAttribute(arr, a.itemSize, a.normalized)); }
+  const n = g.attributes.position.count, idx = g.index ? g.index.array : null, m = idx ? idx.length : n, ni = new (n > 65535 ? Uint32Array : Uint16Array)(m);
+  for (let i = 0; i < m; i += 3) { ni[i] = idx ? idx[i] : i; ni[i + 1] = idx ? idx[i + 2] : i + 2; ni[i + 2] = idx ? idx[i + 1] : i + 1; }
+  out.setIndex(new Tm.BufferAttribute(ni, 1)); out.groups = g.groups.slice(); out.computeBoundingSphere(); return out; };
+
 /* ---------- uniforms do chão no formato do terrU do render3d (cada um com .value) ---------- */
 M5.terrUniforms = function (tx) {
   const { texture } = L(); const U = M5.u, X = M5.tex;

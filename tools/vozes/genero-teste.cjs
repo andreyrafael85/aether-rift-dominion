@@ -6,6 +6,9 @@
 // Roda o src/audio.js de verdade no Node, com a imitação de fala (fala-falsa.cjs) e os conjuntos de vozes (conjuntos.cjs), os dois só em leitura;
 // aparelhos a mais saem dos mesmos conjuntos: Windows antigo, iPhone com Luciana e Felipe aprimorados, Chrome sem rede e (5.0b.1) Firefox com a Maria e
 // o Daniel, iPhone sem o Felipe (o único homem é robótico: Eddy, Reed, Rocko) e um Android (vozes sem gênero no nome).
+// 5.0c.1: e com as vozes gravadas (um tocador de imitação no lugar do src/vozes.js): com a fala gravada pronta, o líder fala pela gravada do pacote da
+// Raça dele e a voz do sistema não é chamada; sem ela pronta, a voz do sistema no gênero do líder, como antes, e o arquivo é pedido; no iPhone com
+// vozes gravadas, a fala sem arquivo fica só na legenda.
 // Uso: node tools/vozes/genero-teste.cjs [--navegador]   (--navegador: também Edge, Chrome do Windows e iPhone na página do jogo, dist/local.html; NODE_PATH com playwright)
 const path = require('path'), fs = require('fs'), vm = require('vm'); const root = path.resolve(__dirname, '../..');
 const SETS = require('./conjuntos.cjs'); const fake = require('./fala-falsa.cjs');
@@ -34,12 +37,12 @@ const ESPERA = { edge: [/Francisca/, /Antonio/, /Francisca/], 'edge-sem-rede': [
 const curto = n => n == null ? '—' : String(n).replace(/^Microsoft\s+/, '').replace(/\s*Online \(Natural\) - Portuguese \(Brazil\)/, ' (neural)').replace(/ - Portuguese \(Brazil\)/, '').replace(/ - Portuguese\(Brazil\)/, '');
 
 /* um "navegador" no Node: window com eventos, localStorage em memória, a imitação de fala do conjunto e o src/audio.js */
-function mundo(set) { const ev = {}, ls = new Map();
+function mundo(set, antes) { const ev = {}, ls = new Map();
   const ctx = { console, setTimeout, clearTimeout, setInterval, clearInterval, performance, navigator: { userAgent: set.ua, maxTouchPoints: /iPhone/.test(set.ua) ? 5 : 0 },
     localStorage: { getItem: k => (ls.has(k) ? ls.get(k) : null), setItem: (k, v) => ls.set(k, String(v)), removeItem: k => ls.delete(k) },
     addEventListener: (k, f) => (ev[k] = ev[k] || []).push(f), removeEventListener: (k, f) => { ev[k] = (ev[k] || []).filter(x => x !== f); }, dispatchEvent: e => { for (const f of (ev[e.type] || []).slice()) f(e); return true; },
     CustomEvent: class { constructor(type, o) { this.type = type; this.detail = o && o.detail; } } };
-  ctx.window = ctx; vm.createContext(ctx); vm.runInContext('(' + fake.toString() + ')(' + JSON.stringify(set) + ')', ctx);
+  ctx.window = ctx; vm.createContext(ctx); vm.runInContext('(' + fake.toString() + ')(' + JSON.stringify(set) + ')', ctx); if (antes) antes(ctx); /* 5.0c.1: o tocador de imitação */
   vm.runInContext(fs.readFileSync(path.join(root, 'src/audio.js'), 'utf8'), ctx, { filename: 'src/audio.js' }); return ctx; }
 /* uma fala até o fim (a voz online sem rede falha e repete na local): devolve a voz da última tentativa, os eventos e as legendas */
 async function falar(ctx, texto, chave) { const F = ctx.__fala, A = ctx.ARD.audio; F.log.length = 0; F.ev.length = 0; const caps = []; A.onSay = (t, k) => caps.push(k);
@@ -53,6 +56,19 @@ async function aparelho(set) { const ctx = mundo(set); await espera((set.atraso 
   const vs = A.vozes(); const outra = set.falha || set.pularEscolha ? null : vs.find(x => x.br && x.nivel > 0 && x.id !== (A.vozAtual() || {}).id && /Antonio|Daniel|Felipe/.test(x.rotulo)) || null; /* sem rede a voz online escolhida falha: lá só a Automática */
   if (outra) { A.setVoz(outra.id); r.escolhida = { alvo: outra.rotulo, sylvia: (await falar(ctx, LIDERES[0][2], 'sala-tessara')).voz, locutor: (await falar(ctx, 'Base sob ataque', 'Base sob ataque')).voz }; A.setVoz(''); r.voltou = (await falar(ctx, LIDERES[0][2], 'sala-tessara')).voz; }
   r.erros = ctx.__fala.erros.slice(0, 3); return r; }
+/* 5.0c.1: tocador de imitação (o contrato do src/vozes.js que o audio.js usa) */
+function tocadorFalso(ios, pronta) { const T = { achou: [], tocou: [], pediu: 0 }; return { T, V: { ESPERA_SALA: 0, disponivel: () => true, semFalaSistema: () => ios, semPreparo: () => ios, pedir: () => { T.pediu++; }, depoisDaSala() {},
+  achar: (ch, raca) => { T.achou.push([ch, raca]); return { itens: [{ id: raca + '-sala-1' }], texto: 'Fala gravada de ' + raca + '.', dur: 1, pronta, chave: ch, pacote: raca }; },
+  tocar: (g, cb) => { T.tocou.push(g.pacote); setTimeout(() => { cb.inicio(); cb.palavra(0, 4, 0.3); cb.palavra(5, 7, 0.3); setTimeout(() => cb.fim(), 30); }, 5); return { parar() {} }; } } }; }
+async function gravadas(set) { const e = ESPERA[set.id], ios = /iPhone/.test(set.ua), out = { id: set.id, falhas: [] };
+  for (const pronta of [true, false]) { const tf = tocadorFalso(ios, pronta); const ctx = mundo(set, c => { c.ARD = { vozes: tf.V }; }); await espera((set.atraso || 0) + 150);
+    for (const [raca, nome, texto] of LIDERES) { tf.T.tocou.length = 0; tf.T.achou.length = 0; const f = await falar(ctx, texto, 'sala-' + raca); const ach = tf.T.achou[0] || [];
+      if (ach[1] !== raca) out.falhas.push(nome + ': pacote ' + ach[1]); if (!f.aceita || f.legendas.length !== 1) out.falhas.push(nome + ': legenda');
+      if (pronta) { if (tf.T.tocou[0] !== raca || f.voz) out.falhas.push(nome + ': gravada (' + tf.T.tocou.join() + ') e voz do sistema ' + curto(f.voz)); if (!/inicio,palavra,palavra,fim/.test(f.eventos + '') && !/^$/.test(f.eventos)) out.falhas.push(nome + ': ard-voz ' + f.eventos); }
+      else if (ios) { if (f.voz || tf.T.tocou.length) out.falhas.push(nome + ': no iPhone, sem arquivo, só legenda (voz ' + curto(f.voz) + ')'); }
+      else { const re = nome === 'Sylvia Oriel' ? e[0] : e[1]; if (!(re === null ? f.voz === null : !!(f.voz && re.test(f.voz)))) out.falhas.push(nome + ': sem arquivo, voz do sistema ' + curto(f.voz)); } }
+    if (!pronta && !tf.T.pediu) out.falhas.push('arquivo não pedido'); }
+  out.ok = !out.falhas.length; return out; }
 function confere(r) { const e = ESPERA[r.id]; if (!e) return { ok: false, porque: 'sem expectativa' };
   const casa = (re, voz) => re === null ? voz === null : !!(voz && re.test(voz)); const falhas = [];
   for (const [nome, f] of Object.entries(r.lideres)) { const re = nome === 'Sylvia Oriel' ? e[0] : e[1]; if (!casa(re, f.voz)) falhas.push(nome + ': ' + curto(f.voz)); if (!f.aceita || f.legendas.length !== 1 || f.legendas[0] !== 'sala-' + LIDERES.find(l => l[1] === nome)[0]) falhas.push(nome + ': legenda'); if (re && !/^(fim,)?inicio(,palavra)+,fim$/.test(f.eventos.replace(/^(fim,)+/, 'fim,'))) falhas.push(nome + ': ard-voz ' + f.eventos); if (re && f.pitch !== 1) falhas.push(nome + ': tom'); }
@@ -74,7 +90,8 @@ async function navegador(rs) { /* a mesma regra na página do jogo (Chromium), c
     return `${(c.ok ? 'ok ' : 'FALHOU ')}${r.nome.padEnd(42)} Sylvia: ${curto(r.lideres['Sylvia Oriel'].voz).padEnd(30)} outros: ${mm.padEnd(30)} locutor: ${curto(r.locutor.voz).padEnd(28)}${r.escolhida ? ' Ajustes "' + r.escolhida.alvo.split(' · ')[0] + '": todas' : ''}${c.ok ? '' : '  ← ' + c.falhas.join('; ')}`; });
   console.log(linhas.join('\n'));
   let nav = null; if (process.argv.includes('--navegador')) { nav = await navegador(rs); for (const [id, v] of Object.entries(nav)) { const e = ESPERA[id]; v.ok = !v.erros.length && e[0].test(v.vozes['Sylvia Oriel'] || '') && LIDERES.slice(1).every(([, n]) => e[1].test(v.vozes[n] || '')) && e[2].test(v.vozes.locutor || ''); console.log(`${v.ok ? 'ok' : 'FALHOU'} página do jogo (${id}): Sylvia ${curto(v.vozes['Sylvia Oriel'])}, outros ${curto(v.vozes['Barão-Forja'])}, locutor ${curto(v.vozes.locutor)}${v.erros.length ? ' · erros: ' + v.erros.join(' | ') : ''}`); } }
-  const ok = rs.filter(r => r.ok).length, navOk = !nav || Object.values(nav).every(v => v.ok);
-  fs.mkdirSync(path.join(root, 'work'), { recursive: true }); fs.writeFileSync(path.join(root, 'work/genero-teste.json'), JSON.stringify({ quando: new Date().toISOString(), aparelhos: rs, navegador: nav }, null, 2));
-  console.log(`voz por gênero: ${ok}/${rs.length} aparelhos ok${nav ? ' · página do jogo ' + Object.values(nav).filter(v => v.ok).length + '/' + Object.keys(nav).length : ''} (${((Date.now() - t0) / 1000).toFixed(1)} s)`); process.exit(ok === rs.length && navOk ? 0 : 1);
+  const gv = []; for (const id of ['edge', 'chrome-win', 'iphone-aprimorada', 'firefox-win-daniel', 'sem-voz']) { const set = SETS.concat(EXTRA).find(s => s.id === id); if (!set) continue; const g = await gravadas(set); gv.push(g); console.log(`${g.ok ? 'ok ' : 'FALHOU '} vozes gravadas (${set.nome}): com a fala pronta, a gravada da Raça; sem ela, ${/iPhone/.test(set.ua) ? 'só a legenda' : 'a voz do sistema no gênero do líder'}${g.ok ? '' : '  ← ' + g.falhas.slice(0, 4).join('; ')}`); } /* 5.0c.1 */
+  const ok = rs.filter(r => r.ok).length, navOk = (!nav || Object.values(nav).every(v => v.ok)) && gv.every(g => g.ok);
+  fs.mkdirSync(path.join(root, 'work'), { recursive: true }); fs.writeFileSync(path.join(root, 'work/genero-teste.json'), JSON.stringify({ quando: new Date().toISOString(), aparelhos: rs, navegador: nav, gravadas: gv /* 5.0c.1 */ }, null, 2));
+  console.log(`voz por gênero: ${ok}/${rs.length} aparelhos ok${nav ? ' · página do jogo ' + Object.values(nav).filter(v => v.ok).length + '/' + Object.keys(nav).length : ''} · vozes gravadas ${gv.filter(g => g.ok).length}/${gv.length} (${((Date.now() - t0) / 1000).toFixed(1)} s)`); process.exit(ok === rs.length && navOk ? 0 : 1);
 })();

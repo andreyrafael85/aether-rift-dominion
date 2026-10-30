@@ -121,8 +121,9 @@ function preRuina(builder) {
    render3d escreve (o clássico tira da matriz da instância) ---------- */
 function prePano(builder) {
   const g = builder.geometry; if (!g) return; const { Fn, attribute, float, vec3, sin, positionLocal } = L(); const U = M5.u;
-  Fn(() => { const ph = g.hasAttribute('aFase') ? attribute('aFase', 'float') : float(0); const k = positionLocal.x;
-    positionLocal.assign(positionLocal.add(vec3(0, sin(k.mul(3).sub(U.tempo.mul(2.6)).add(ph)).mul(0.03).mul(k), sin(k.mul(5).sub(U.tempo.mul(4.2)).add(ph)).mul(0.09).mul(k)))); }, 'void')();
+  const amp = builder.material && builder.material.positionNode && builder.material.positionNode.ardOnda; /* 5.0c.1: a força da onda (1 no pano, 0 no mastro): o mastro roda o mesmo vértice e divide o pipeline do pano; vem no positionNode porque o material de sombra o copia */
+  Fn(() => { const ph = g.hasAttribute('aFase') ? attribute('aFase', 'float') : float(0); const k = positionLocal.x; const a = sin(k.mul(3).sub(U.tempo.mul(2.6)).add(ph)).mul(0.03).mul(k), b = sin(k.mul(5).sub(U.tempo.mul(4.2)).add(ph)).mul(0.09).mul(k);
+    positionLocal.assign(positionLocal.add(amp ? vec3(0, a.mul(amp), b.mul(amp)) : vec3(0, a, b))); }, 'void')(); /* × 1 no pano é exato; × 0 no mastro soma zero */
 }
 
 /* ---------- detalhe de superfície (SURF_GLSL, 4.3a/4.3b): devolve vec3(relevo, albedo, rugosidade) já com o apagamento k ----------
@@ -252,7 +253,7 @@ M5.modelos.emRuina = function (m) {
    O WebGPU aceita no máximo 8 buffers de vértice por pipeline (limite do Dawn), e cada BufferAttribute é um buffer: o modelo animado tem
    position, normal, color, rm, pt, aAnim, aAnimB + aInst, aInstC e a matriz e a cor da instância. Entrelaçados, os atributos por vértice
    viram 1 buffer. O render3d chama uma vez por geometria (geoOf); os ícones do HUD (WebGLRenderer) leem igual. */
-const FIXO = ['position', 'normal', 'color', 'rm', 'pt', 'aAnim', 'aAnimB'], FIXO_EM = ['position', 'normal', 'color', 'aAnim', 'aAnimB'];
+const FIXO = ['position', 'normal', 'color', 'rm', 'pt', 'aAnim', 'aAnimB'], FIXO_EM = ['position', 'normal', 'color', 'aAnim', 'aAnimB']; const EM_FIXO = !/[?&]m5emfixo=0/.test(typeof location !== 'undefined' ? location.search : ''); /* 5.0c.1 */
 M5.entrelaca = function (geo, em) {
   if (!geo || !geo.attributes || !geo.attributes.position || (geo.userData && geo.userData.ardEntrelacada)) return geo;
   const Tm = T() || window.THREE; const n0 = geo.attributes.position.count;
@@ -261,7 +262,8 @@ M5.entrelaca = function (geo, em) {
      unidades, construções, recursos e cenário dividem um pipeline e uma montagem de nós por material */
   for (const k of ['aPiece', 'aWind']) if (geo.attributes[k]) { geo.userData['ard_' + k] = geo.attributes[k]; geo.deleteAttribute(k); }
   for (const k of ['aAnim', 'aAnimB']) if (!geo.attributes[k]) geo.setAttribute(k, new Tm.BufferAttribute(new Float32Array(n0 * 4), 4));
-  const ord = em ? FIXO_EM : FIXO; const names = ord.filter(k => geo.attributes[k]).concat(Object.keys(geo.attributes).filter(k => !ord.includes(k))).filter(k => { const a = geo.attributes[k]; return !a.isInterleavedBufferAttribute && !a.isInstancedBufferAttribute && a.array instanceof Float32Array; });
+  const emFixo = em && EM_FIXO; if (emFixo) { if (!geo.attributes.rm) geo.setAttribute('rm', new Tm.BufferAttribute(new Float32Array(n0 * 2), 2)); if (!geo.attributes.pt) geo.setAttribute('pt', new Tm.BufferAttribute(new Float32Array(n0), 1)); } /* 5.0c.1: a parte emissiva no layout da principal (rm e pt zerados, que o emissivo não lê): na sombra as duas rodam o mesmo código e agora o mesmo layout, um pipeline de sombra a menos; ?m5emfixo=0 volta ao layout curto (medida) */
+  const ord = em && !emFixo ? FIXO_EM : FIXO; const names = ord.filter(k => geo.attributes[k]).concat(Object.keys(geo.attributes).filter(k => !ord.includes(k))).filter(k => { const a = geo.attributes[k]; return !a.isInterleavedBufferAttribute && !a.isInstancedBufferAttribute && a.array instanceof Float32Array; });
   if (names.length < 2) return geo;
   const n = geo.attributes.position.count; let stride = 0; const off = {}, sz = {}; for (const k of names) { off[k] = stride; sz[k] = geo.attributes[k].itemSize; stride += sz[k]; }
   const arr = new Float32Array(n * stride);
@@ -342,7 +344,7 @@ M5.escudo = function () {
 M5.pano = function (tex) {
   prepara(); const Tm = T();
   const m = new Tm.MeshStandardNodeMaterial({ map: tex, side: Tm.DoubleSide, roughness: 0.75, metalness: 0, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.25 }); m.envMapIntensity = 0.3;
-  M5.instMat(m, marcador(prePano, 'pano')); /* sem cor por instância: o mapa da Insígnia já é a cor */ m.userData.ardFragFixo = true; /* 5.0b.1: o mesmo fragmento do mastro */
+  M5.instMat(m, marcador(prePano, 'pano')); /* sem cor por instância: o mapa da Insígnia já é a cor */ m.userData.ardFragFixo = true; /* 5.0b.1: o mesmo fragmento do mastro */ if (M5.mastroUm) m.positionNode.ardOnda = L().uniform(1); /* 5.0c.1 */
   return M5.registrar('bandeira', m);
 };
 /* 5.0b.1: o mastro das bandeiras com o fragmento do pano (um módulo de ~27 KB a menos; era um MeshStandardMaterial à parte): mapa e mapa emissivo
@@ -350,10 +352,11 @@ M5.pano = function (tex) {
    emissivo preto (cor × 1, emissivo 0: a mesma imagem), as duas faces como o pano (o cilindro é fechado: o verso nunca aparece) e a sombra pelo
    verso, como no material de uma face. Instâncias por atributo (ARD.m5.Inst), sem a onda do pano */
 function preMastro(builder) { const { Fn, vec3, positionLocal } = L(); Fn(() => { positionLocal.assign(positionLocal.add(vec3(0, M5.u.tempo.mul(0), 0))); }, 'void')(); } /* 5.0b.1: o relógio do pano no vértice, multiplicado por 0 (nada se move): o bloco de uniforms sai igual ao da bandeira */
+M5.mastroUm = !/[?&]m5mastro=2/.test(typeof location !== 'undefined' ? location.search : ''); /* 5.0c.1 */
 M5.mastro = function () {
   prepara(); const Tm = T(); const w = new Tm.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1); w.colorSpace = Tm.SRGBColorSpace; w.magFilter = Tm.LinearFilter; w.minFilter = Tm.LinearMipmapLinearFilter; w.generateMipmaps = true; w.wrapS = w.wrapT = Tm.ClampToEdgeWrapping; w.needsUpdate = true;
   const m = new Tm.MeshStandardNodeMaterial({ color: 0x8a919b, map: w, side: Tm.DoubleSide, roughness: 0.4, metalness: 0.6, emissive: 0x000000, emissiveMap: w, emissiveIntensity: 0.25 }); m.shadowSide = Tm.BackSide; m.envMapIntensity = 1;
-  M5.instMat(m, marcador(preMastro, 'mastro')); m.userData.ardFragFixo = true;
+  if (M5.mastroUm) { M5.instMat(m, marcador(prePano, 'pano')); m.positionNode.ardOnda = L().uniform(0); } else M5.instMat(m, marcador(preMastro, 'mastro')); m.userData.ardFragFixo = true; /* 5.0c.1: o vértice do pano com a onda × 0 (a geometria do mastro ganha o aFase zerado no render3d): o mesmo pipeline do pano; ?m5mastro=2 volta ao vértice próprio (medida) */
   return M5.registrar('mastro', m);
 };
 })(globalThis.ARD = globalThis.ARD || {});

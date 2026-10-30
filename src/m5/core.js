@@ -129,6 +129,7 @@ M5.create3d = function (canvas, R) {
     X.timestamp = !!(be.trackTimestamp && renderer.hasFeature && renderer.hasFeature('timestamp-query')); /* sem rastreio ligado, o resolve só avisa no console */
     if (X.debugPipes && renderer._pipelines) { const P = renderer._pipelines, rel = P._releasePipeline; X.relLog = []; P._releasePipeline = function (pl) { if (X.warmDone && X.relLog.length < 30) X.relLog.push('libera ' + (pl && pl.cacheKey ? String(pl.cacheKey).slice(0, 40) : '') + ' @ ' + String(new Error().stack).split('\n').slice(2, 9).map(l => l.trim().replace(/^at /, '').replace(/\(.*\//, '(')).join(' < ')); return rel.apply(this, arguments); };
       const base = X.T.Material.prototype; const d0 = Object.getOwnPropertyDescriptor(base, 'needsUpdate'); if (d0 && d0.set) Object.defineProperty(base, 'needsUpdate', { configurable: true, get: d0.get, set(v) { if (v === true && X.warmDone && X.relLog.length < 60 && /GTAO|RTT|Bloom/.test(this.name || '')) X.relLog.push('needsUpdate ' + this.name + ' @ ' + String(new Error().stack).split('\n').slice(2, 10).map(l => l.trim().replace(/^at /, '').replace(/\(.*\//, '(')).join(' < ')); d0.set.call(this, v); } }); } /* diagnóstico ?m5pipes=1 */
+    M5.memoChave(X); M5.sombraFiltro(X); /* 5.0c.1 */
     console.log('[ARD] Motor 5: ' + X.backend + (forceGL && !M5.gl ? ' (sem navigator.gpu)' : '') + ' · início ' + X.initMs + ' ms · GPU ' + (X.adapter || X.gpuName) + ' · timestamp ' + (X.timestamp ? 'sim' : 'não'));
     return X;
   }, err => { X.failed = err; console.error('[ARD] Motor 5: renderer.init() falhou: ' + (err && err.message)); throw err; });
@@ -141,6 +142,27 @@ M5.create3d = function (canvas, R) {
     renderer.resolveTimestampsAsync('render').then(tsOk, tsErr); };
   return X;
 };
+
+/* 5.0c.1: a chave dinâmica de cada objeto de desenho, uma vez por mudança. O r186 recalcula RenderObject.getDynamicCacheKey em todo desenho de
+   todo objeto (o needsUpdate do RenderObjects.get): três hash(...) com um vetor novo cada, ~300 objetos por quadro. As entradas são as mesmas a
+   cada quadro (a chave do ambiente, que o r186 já guarda por chamada, a câmera em vetor, receiveShadow e o nó de contexto do renderer): com as
+   entradas iguais devolve a chave guardada, que é exatamente a que o r186 calcularia. ?m5chave=0 desliga (medida) */
+M5.memoChave = function (X) { const r = X && X.renderer, OB = r && r._objects; if (!OB || OB.__ardMemo || Q.get('m5chave') === '0' || typeof OB.get !== 'function') return; OB.__ardMemo = true; const g0 = OB.get;
+  OB.get = function () { const ro = g0.apply(this, arguments); const P = ro && Object.getPrototypeOf(ro); if (P && typeof P.getDynamicCacheKey === 'function' && !P.__ardMemo) { P.__ardMemo = true; const orig = P.getDynamicCacheKey;
+      P.getDynamicCacheKey = function () { const nk = this.material.isShadowPassMaterial === true ? 0 : this._nodes.getCacheKey(this.scene, this.lightsNode); const cam = this.camera, ca = cam.isArrayCamera ? cam.cameras.length : -1, rs = this.object.receiveShadow === true, cn = this.renderer.contextNode;
+        const m = this.__ardCk; if (m !== undefined && m.nk === nk && m.ca === ca && m.rs === rs && m.ci === cn.id && m.cv === cn.version) return m.v;
+        const v = orig.call(this); const o = m || (this.__ardCk = { nk: 0, ca: 0, rs: false, ci: 0, cv: 0, v: 0 }); o.nk = nk; o.ca = ca; o.rs = rs; o.ci = cn.id; o.cv = cn.version; o.v = v; return v; }; }
+    if (P && P.__ardMemo) OB.get = g0; return ro; }; };
+
+/* 5.0c.1: no passe de cada cascata da sombra, quem não projeta sombra sai da lista antes do recorte. O r186 projeta (recorta pela câmera da
+   cascata, põe na lista e ordena) todo objeto visível da cena em toda cascata e só no fim descarta quem tem castShadow falso (adereços miúdos, chão,
+   céu, lagos, estradas, anéis, efeitos: mais da metade dos objetos visíveis). Aqui a malha visível sem sombra numa câmera de sombra (marcada no
+   M5.csmFrame) é pulada e os filhos dela seguem; o resto vai ao _projectObject do r186. O mapa de sombra sai igual (o r186 descartaria a mesma
+   malha depois). ?m5sombrafiltro=0 desliga (medida) */
+M5.sombraFiltro = function (X) { const r = X && X.renderer; if (!r || r.__ardSF || Q.get('m5sombrafiltro') === '0' || typeof r._projectObject !== 'function') return; r.__ardSF = true; const po = r._projectObject;
+  r._projectObject = function (object, camera, groupOrder, renderList, clippingContext) {
+    if (camera.ardSombra === true && object.castShadow === false && object.visible !== false && (object.isMesh === true || object.isLine === true || object.isPoints === true || object.isSprite === true)) { const ch = object.children; for (let i = 0, l = ch.length; i < l; i++) this._projectObject(ch[i], camera, groupOrder, renderList, clippingContext); return; }
+    return po.call(this, object, camera, groupOrder, renderList, clippingContext); }; };
 
 /* ---------- sombras em cascata (CSMShadowNode): o WebGPURenderer não tem PCFSoftShadowMap; a suavidade vem do raio do PCF ----------
    Média: 2 cascatas de 1536²; Alta: 3 de 2048²; Ultra: 4 de 2048². As cascatas nascem na carga (shadowsBuild, depois do init) com a
@@ -160,7 +182,8 @@ M5.shadowsBuild = function (X, sun) {
 };
 /* a cada quadro: alcance das cascatas pela distância da câmera; câmeras das cascatas com perto/longe do mundo do jogo */
 M5.csmFrame = function (X, camDist) {
-  const csm = X.csm; if (!csm) return; if (csm.lights.length && !X.csmCam) { for (const l of csm.lights) { const c = l.shadow.camera; c.near = 1; c.far = 6000; c.updateProjectionMatrix(); } X.csmCam = true; }
+  if (X.sun && X.sun.shadow && X.sun.shadow.camera) X.sun.shadow.camera.ardSombra = true; /* 5.0c.1: câmeras de sombra marcadas (M5.sombraFiltro) */
+  const csm = X.csm; if (!csm) return; for (let i = 0; i < csm.lights.length; i++) { const sh = csm.lights[i].shadow; if (sh && sh.camera) sh.camera.ardSombra = true; } if (csm.lights.length && !X.csmCam) { for (const l of csm.lights) { const c = l.shadow.camera; c.near = 1; c.far = 6000; c.updateProjectionMatrix(); } X.csmCam = true; }
   const want = Math.max(700, Math.min(3200, camDist * 2.3)); if (csm.camera && Math.abs(want - X.csmFar) / X.csmFar > 0.12) { X.csmFar = want; csm.maxFar = want; csm.updateFrustums(); }
 };
 M5.csmResize = function (X) { if (X.csm && X.csm.camera) X.csm.updateFrustums(); };
@@ -178,9 +201,16 @@ M5.sombraAlterna = Q.get('m5sombra') !== 'todas';
 
 /* ---------- luz de ambiente pelo céu do mapa (PMREM do céu TSL com o chão do mapa), refeita quando o clima muda ----------
    um PMREMGenerator só e o mesmo alvo reaproveitado (sem pipelines novos a cada troca); fromScene depois do init (o fromSceneAsync está obsoleto) */
+M5.pmremUm = Q.get('m5pmrem') !== '0'; /* 5.0c.1 */
 M5.skyEnv = function (X, scene, cl, R) {
   const Tm = X.T; if (!X.renderer.hasInitialized || !X.renderer.hasInitialized()) return;
-  if (!X.envScene) { const es = new Tm.Scene(); const sk = M5.ceu(); sk.scale.setScalar(0.02); es.add(sk); const gm = new Tm.MeshBasicNodeMaterial({ color: 0x404040 }); gm.fog = false; const gd = new Tm.Mesh(new Tm.CircleGeometry(90, 40), gm); gd.rotation.x = -Math.PI / 2; gd.position.y = -8; es.add(gd); X.envScene = es; X.envSky = sk; X.envGround = gd; X.pmrem = new Tm.PMREMGenerator(X.renderer); }
+  if (!X.envScene) { const es = new Tm.Scene(); const sk = M5.ceu(); sk.scale.setScalar(0.02); es.add(sk); const um = M5.pmremUm && M5.verso; const gm = new Tm.MeshBasicNodeMaterial(um ? { color: 0x404040, side: Tm.BackSide, depthWrite: false, depthTest: false } : { color: 0x404040 }); gm.fog = false; const cg = new Tm.CircleGeometry(90, 40); const gd = new Tm.Mesh(um ? M5.verso(cg) : cg, gm); if (um) cg.dispose(); gd.rotation.x = -Math.PI / 2; gd.position.y = -8; es.add(gd); X.envScene = es; X.envSky = sk; X.envGround = gd; X.pmrem = new Tm.PMREMGenerator(X.renderer);
+    /* 5.0c.1: o mapa de ambiente sem profundidade. O r186 cria o alvo do fromScene com profundidade e o de ida e volta sem: o desfoque e o GGX nasciam
+       duas vezes (um pipeline por formato), e o fundo e o chão do mapa eram dois pipelines do mesmo código (só o lado e a profundidade mudavam). Na
+       cena do mapa nada depende da profundidade: o céu não a escreve e é desenhado primeiro (renderOrder −1000), o chão depois, por cima, como antes.
+       Com o alvo sem profundidade e o chão pelo verso (M5.verso, BackSide, sem profundidade, o estado do fundo do r186), são 3 pipelines a menos.
+       ?m5pmrem=0 volta ao jeito do r186 (medida) */
+    if (um && typeof X.pmrem._setSize === 'function' && typeof X.pmrem._allocateTarget === 'function') { try { X.pmrem._setSize(256); X.envRT = X.pmrem._allocateTarget(false); } catch (e) { X.envRT = null; } } }
   const bgD = new Tm.Color().setRGB(0.62, 0.69, 0.77); if (cl) bgD.lerp(new Tm.Color().setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), cl.mix); const gcol = R.groundCol || new Tm.Color(0.3, 0.28, 0.26);
   const u = X.envSky.userData.mat.uniforms; u.uHor.value.copy(bgD).lerp(new Tm.Color().copy(gcol).multiplyScalar(1.5), 0.28); u.uTop.value.copy(bgD).multiplyScalar(0.55).lerp(new Tm.Color(0.12, 0.2, 0.36), 0.5); u.uBot.value.copy(gcol).multiplyScalar(0.7); u.uNight.value = 0; u.uSunDir.value.set(R.sunDir[0], R.sunDir[1], R.sunDir[2]).normalize(); u.uSunCol.value.setRGB(1.0, 0.91, 0.77).multiplyScalar(1.6); u.uSpace.value = 0;
   X.envGround.material.color.copy(gcol).multiplyScalar(0.8);
@@ -211,7 +241,7 @@ M5.Inst = function () {
   InstC = class Inst extends T.Mesh {
     constructor(geometry, material, count) {
       super(geometry, material); const cap = Math.max(1, count | 0);
-      this.isM5Inst = true; this.type = 'M5Inst';
+      this.isM5Inst = true; this.type = 'M5Inst'; if (!M5.matrizOff) this.matrixAutoUpdate = false; /* 5.0c.1: o grupo de instâncias fica na origem (cada instância leva a própria matriz): sem recompor a matriz do objeto a cada passe (são ~900 na cena) */
       this.instanceMatrix = new T.InstancedInterleavedBuffer(new Float32Array(cap * 16), 16, 1); for (let i = 0; i < cap; i++) _m.identity().toArray(this.instanceMatrix.array, i * 16);
       this._iC = new T.InstancedBufferAttribute(new Float32Array(cap * 3).fill(1), 3); this._cSujo = -1; this._wraps = new Map(); this._n = cap; this._base = null; this._g = null;
       this.boundingSphere = null; this.boundingBox = null; this._ok = true; const g0 = this._pend; this._pend = null; this.geometry = g0; this.onBeforeRender = InstC.antes; }
@@ -243,6 +273,7 @@ M5.instancia = function (THREE) { const I = M5.Inst(); return function Instanced
 /* o dress3d recebe um THREE com o InstancedMesh trocado pela fábrica (sem mudar o dress3d) */
 M5.ns = function (THREE) { const ns = Object.create(THREE); Object.defineProperty(ns, 'InstancedMesh', { value: M5.instancia(THREE), writable: true, enumerable: true, configurable: true }); return ns; }; /* defineProperty: o THREE é um módulo (propriedades só de leitura na herança) */
 M5.instOff = Q.get('m5inst') === '0'; /* medida: ?m5inst=0 volta ao InstancedMesh (uma montagem de nós por malha) */
+M5.matrizOff = Q.get('m5matriz') === '0'; /* 5.0c.1: ?m5matriz=0 volta às matrizes do r186 (cada render() da cena refaz a árvore inteira e os grupos de instâncias recompõem a matriz) */
 
 /* ---------- mesma lista de atributos em todas as variantes de uma geometria (inteira e leve): o shader do TSL lê o atributo que existe,
    então geometrias com conjuntos diferentes viram programas diferentes; o dress3d troca a inteira pela leve no meio da partida ---------- */

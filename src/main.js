@@ -30,7 +30,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.0c';
+const VERSION = '5.0c.1';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -323,7 +323,7 @@ function startGame(cfg, netCtx) {
       $('leader-name').textContent = LEADER_NAME[fac] || Tx('hud.lider', { raca: DN.racaCurto(fac) }); $('leader-sub').textContent = '● ' + Tx('hud.em-chamada', { raca: DN.racaCurto(fac) }); /* 5.0c */ L.style.setProperty('--pc', RACE_COLORS[fac] || '#FF5E3A');
       if (ART && ART.insignia && ART.insignia[fac]) { $('leader-badge').src = ART.insignia[fac]; $('leader-badge').hidden = false; }
       L.hidden = false; G && (G.leaderFac = fac);
-      if (ARD.leaders3d && R.is3d && !(R.quality && R.quality.resolved === 'baixa') && !(matchMedia('(pointer: coarse)').matches || params.get('touch')) && ARD.leaders3d.canUse()) { /* 4.1e: só com o 3D ligado e acima da qualidade Baixa */ const fr = L.querySelector('.lframe'); const cv = document.createElement('canvas'); cv.id = 'leader-cv'; cv.width = 236; cv.height = 236; const it = ARD.leaders3d.mount(cv, fac, { framing: 'hud', fps: 24, mood: 1, yaw: 0.2 }); if (it) { fr.insertBefore(cv, fr.firstChild); $('leader-img').hidden = true; window.__lead3d = it; } } }
+      if (ARD.leaders3d && R.is3d && !(R.quality && R.quality.resolved === 'baixa') && !(matchMedia('(pointer: coarse)').matches || params.get('touch')) && params.get('busto') !== '0' /* 5.0c.1: ?busto=0 tira o busto 3D do líder do HUD (medida: o WebGL dele desenha a 20 quadros por segundo ao lado da partida) */ && ARD.leaders3d.canUse()) { /* 4.1e: só com o 3D ligado e acima da qualidade Baixa */ const fr = L.querySelector('.lframe'); const cv = document.createElement('canvas'); cv.id = 'leader-cv'; cv.width = 236; cv.height = 236; const it = ARD.leaders3d.mount(cv, fac, { framing: 'hud', fps: 24, mood: 1, yaw: 0.2 }); if (it) { fr.insertBefore(cv, fr.firstChild); $('leader-img').hidden = true; window.__lead3d = it; } } }
     loadBg(fac); /* 4.3l: arte grande por URL, a pequena embutida por baixo */
     if (leaderArt(fac)) { $('load-leader').src = leaderArt(fac); $('load-leader').hidden = false; }
   } catch (e) { console.warn('[ARD] retrato do líder indisponível:', e); }
@@ -351,6 +351,7 @@ function startGame(cfg, netCtx) {
   if (isTouch && navigator.getBattery && !G.save30) navigator.getBattery().then(b => { if (b && !b.charging && b.level < 0.2) { G.save30 = true; notice(Tx('jogo.bateria-baixa')); } /* 5.0c */ }).catch(() => {});
   document.addEventListener('visibilitychange', () => { if (!G || G.sim !== sim || G.ended) return; if (document.hidden) { if (!net && !G.paused) { G.paused = true; G.autoPaused = true; G.pauseWhy = 'O jogo pausou sozinho porque a aba ficou em segundo plano. Nada se perdeu.'; } } else { if (G.autoPaused) { G.autoPaused = false; refreshTop(); } else if (net) banner(Tx('multi.voltou'), Tx('multi.voltou-txt'), 'warn'); } }); /* 5.0c */
   G.camp = cfg.campaign && ARD.campUI ? ARD.campUI.begin(sim, cfg.campaign, cfg.resume ? cfg.resume.run : null) : null; // 4.0e: missão da campanha (4.1c: ou a retomada dela)
+  if (ARD.vozes) try { ARD.vozes.partida({ sim, human, lead3d: G.lead3d, missao: G.camp && G.camp.prep ? G.camp.prep.mission.id : null }); } catch (e) {} /* 5.0c.1: vozes gravadas — o pacote da Raça do jogador (e o da missão) baixa depois da tela de carregamento, em tempo ocioso (src/vozes.js) */
   G.cfg = cfg; setupSaves();
   if (R.is3d && ARD.campUI) R.skins = { [human]: ARD.campUI.skinOf(sim.players[human].faction) };
   window.addEventListener('resize', () => R.resize());
@@ -463,7 +464,7 @@ function startGame(cfg, netCtx) {
       case 'built': if (e.p === human) { AU.sfx('build'); AU.say(Tx('voz.construcao'), 'built', 4); } break; /* 5.0c */
       case 'spawn': if (e.p === human) { AU.sfx('spawn'); AU.say(Tx('voz.unidade'), 'spawn', 5); } break; /* 5.0c */
       case 'promote': if (e.owner === human) AU.sfx('promote'); break;
-      case 'alert': if (e.p === human) { AU.sfx(e.kind === 'danger' ? 'danger' : 'alert'); const v = voiceFor(e.text); if (v) AU.say(TRx(v), v, e.kind === 'danger' ? 8 : 15); } break; /* 5.0c: fala no idioma; a chave segue a do audio.js */
+      case 'alert': if (e.p === human) { AU.sfx(e.kind === 'danger' ? 'danger' : 'alert'); const v = voiceFor(e.text); if (v) AU.say(TRx(v), v, e.kind === 'danger' ? 8 : 15, null, ARD.vozes ? ARD.vozes.opcoesAlerta(e, v) : undefined); else if (ARD.vozes) ARD.vozes.alerta(e); /* 5.0c.1: avisos novos do locutor */ } break; /* 5.0c: fala no idioma; a chave segue a do audio.js */
       case 'storm': if (e.phase === 'active') AU.sfx('storm'); break;
       case 'pact': AU.sfx('pact'); break;
       case 'betrayal': AU.sfx('betrayal'); break;
@@ -479,13 +480,14 @@ function startGame(cfg, netCtx) {
       if (!silent && G.haptics && e.t === 'super' && e.p === human) { try { navigator.vibrate([20, 40, 20]); } catch (er) {} }
       else if (e.t === 'notice' && e.p === human && !silent) notice(TRx(e.text)); /* 5.0c */
       else if (e.t === 'proposal' && e.p === human && !silent) { G.pendingFor = e.from; showProposal(e.from); }
-      else if (e.t === 'eliminated' && !silent) { const q = sim.players[e.p]; const left = sim.players.filter(x => x.alive && x.id !== human).length; if (e.p !== human) { const qn = DN.jogador(q.name); banner(Tx('hud.eliminado', { nome: qn }), left > 0 ? Tx('hud.restantes', { n: left }) + ' · ' + Tx('hud.restantes-dica') : Tx('hud.todos-cairam'), 'good'); AU.sfx('promote'); AU.say(Tx('hud.eliminado', { nome: qn }) + '. ' + (left > 0 ? Tx('hud.restantes', { n: left }) : ''), 'elim', 0); } } /* 5.0c */
+      else if (e.t === 'eliminated' && !silent) { const q = sim.players[e.p]; const left = sim.players.filter(x => x.alive && x.id !== human).length; if (e.p !== human) { const qn = DN.jogador(q.name); banner(Tx('hud.eliminado', { nome: qn }), left > 0 ? Tx('hud.restantes', { n: left }) + ' · ' + Tx('hud.restantes-dica') : Tx('hud.todos-cairam'), 'good'); AU.sfx('promote'); AU.say(Tx('hud.eliminado', { nome: qn }) + '. ' + (left > 0 ? Tx('hud.restantes', { n: left }) : ''), 'elim', 0, null, ARD.vozes ? ARD.vozes.elim(q, left) : undefined /* 5.0c.1: nome da IA e inimigos restantes gravados */); } } /* 5.0c */
       else if (e.t === 'trait' && e.owner === human && !silent) AU.sfx('promote');
       else if (e.t === 'end') { if (!G.camp) endGame(e.result); }
       else if (e.t === 'regime' && e.p === human && !silent) notice(Tx('hud.energia-regime', { regime: DN.regime(e.regime) })); /* 5.0c */
       else if (e.t === 'era' && e.p === human && !silent) { const er = S.ERAS[e.era]; banner('Era ' + er.roman + ' — ' + DN.era(e.era), DN.eraDesc(e.era), 'good', 7000); /* 5.0c */ leaderMood(3); AU.sfx('promote'); G.selKey = ''; }
       else if (e.t === 'ascend' && e.p === human && !silent) { const af = sim.players[human].faction; banner(Tx('hud.ascensao', { nome: DN.ascensao(af) }), DN.ascensaoDesc(af), 'good', 8000); /* 5.0c */ leaderMood(3); AU.sfx('promote'); }
       else if (e.t === 'module' && e.p === human && !silent) { G.selKey = ''; AU.sfx('promote'); }
+      if (!silent && ARD.vozes) ARD.vozes.evento(e); /* 5.0c.1: avisos novos do locutor e reações do líder (src/vozes.js) */
     }
   }
   function pushAlert(e) {
@@ -992,7 +994,7 @@ function startGame(cfg, netCtx) {
   }
   // ---------- end ----------
   function endGame(result) {
-    if (G.ended) return; G.ended = true; if (G.autoSave && ARD.saves) ARD.saves.del('auto'); if (net) mpSession.clear(); // partida terminada não volta
+    if (G.ended) return; G.ended = true; if (ARD.vozes) try { ARD.vozes.fim(result.campaign ? !!result.campaign.won : result.outcome === 'victory' || (result.outcome === 'over' && result.winner === human)); } catch (e) {} /* 5.0c.1: Vitória/Derrota e a reação do líder */ if (G.autoSave && ARD.saves) ARD.saves.del('auto'); if (net) mpSession.clear(); // partida terminada não volta
     if (result.campaign) { // 4.0e: fim de missão
       const r = result.campaign; const prep = G.camp.prep; const scores = sim.players.map(q => ({ id: q.id, name: q.name, score: q.alive ? S.score(sim, q) : 0, alive: q.alive }));
       result = { outcome: r.won ? 'victory' : 'defeat', reason: r.reason, scores };

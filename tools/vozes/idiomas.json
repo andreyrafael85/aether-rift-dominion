@@ -1,0 +1,39 @@
+{
+  "nota": "5.0a.2 (3ª rodada, 29/10/2026): amostras de voz em inglês e espanhol para decidir o caminho da onda de idiomas. Nomes próprios não mudam. A tradução dos textos do jogo é outra etapa; aqui ficam só as falas das amostras e o glossário inicial.",
+  "glossario": [
+    { "pt": "Fenda", "en": "Rift", "es": "Grieta", "nota": "o rasgo no centro do mapa; em espanhol 'la Grieta' (feminino, como 'a Fenda')" },
+    { "pt": "Núcleo", "en": "Core", "es": "Núcleo", "nota": "a construção principal; 'the Core' / 'el Núcleo'" },
+    { "pt": "Éter", "en": "Aether", "es": "Éter", "nota": "a energia do mundo; 'Aether' acompanha o nome do jogo; 'Tempestade de Éter' = 'Aether Storm' / 'Tormenta de Éter'" },
+    { "pt": "Coro", "en": "Choir", "es": "Coro", "nota": "o coletivo do Quorith ('Coro Quorith')" },
+    { "pt": "comandante", "en": "commander", "es": "comandante", "nota": "tratamento do jogador" },
+    { "pt": "superarma", "en": "superweapon", "es": "superarma", "nota": "" }
+  ],
+  "nomes": ["Barão-Forja", "Vesper Ísk", "Sylvia Oriel", "Zayin Coral", "Oru Voraz", "Kessari", "Oriel", "Velk", "Vehnar", "Erevane", "Tessara", "Quorith", "Vorag"],
+  "vocabulario": {
+    "pt": "Fenda, Núcleo, Éter, Vehnar, Kessari, Barão-Forja, Sylvia Oriel, Oriel, Vesper Ísk, Zayin Coral, Coro, Oru Voraz, Velk, comandante",
+    "en": "Rift, Core, Aether, Vehnar, Kessari, Barão-Forja, Sylvia Oriel, Oriel, Vesper Ísk, Zayin Coral, Choir, Oru Voraz, Velk, commander",
+    "es": "Grieta, Núcleo, Éter, Vehnar, Kessari, Barão-Forja, Sylvia Oriel, Oriel, Vesper Ísk, Zayin Coral, Coro, Oru Voraz, Velk, comandante"
+  },
+  "lideres": {
+    "vehnar": { "pt": "Barão-Forja na linha. As fornalhas de Kessari estão acesas, comandante.", "en": "Barão-Forja on the line. The furnaces of Kessari are burning, commander.", "es": "Barão-Forja en línea. Los hornos de Kessari están encendidos, comandante." },
+    "erevane": { "pt": "Vesper Ísk. Ninguém nos vê chegar. Ninguém nos vê partir.", "en": "Vesper Ísk. No one sees us coming. No one sees us leave.", "es": "Vesper Ísk. Nadie nos ve llegar. Nadie nos ve partir." },
+    "tessara": { "pt": "Sylvia Oriel. Oriel cresce. E quem resiste vira adubo.", "en": "Sylvia Oriel. Oriel grows. And those who resist become compost.", "es": "Sylvia Oriel. Oriel crece. Y quien se resiste se vuelve abono." },
+    "quorith": { "pt": "Zayin Coral. O Coro canta em uma só voz. Afine-se, comandante.", "en": "Zayin Coral. The Choir sings with a single voice. Get in tune, commander.", "es": "Zayin Coral. El Coro canta con una sola voz. Afínese, comandante." },
+    "vorag": { "pt": "Oru Voraz. A fome de Velk não tem fim.", "en": "Oru Voraz. The hunger of Velk never ends.", "es": "Oru Voraz. El hambre de Velk no tiene fin." }
+  },
+  "locutor": [
+    { "id": "01-unidade-pronta", "pt": "Unidade pronta.", "en": "Unit ready.", "es": "Unidad lista." },
+    { "id": "03-base-sob-ataque", "pt": "Base sob ataque!", "en": "Base under attack!", "es": "¡Base bajo ataque!" }
+  ],
+  "referencia_extra": "Comandante, a Fenda está estável e o Núcleo aguarda as suas ordens.",
+  "kokoro": {
+    "nota": "vozes do Kokoro por papel do elenco. Espanhol: as mesmas do português (ef_dora, em_alex, em_santa) com os mesmos pesos. Inglês: escolhidas pelo caráter e pela nota do VOICES.md (af_heart A, af_bella A-, bf_emma B-, am_michael C+, am_fenrir C+, bm_george C); a pronúncia segue a voz que pesa mais (a = americano, b = britânico).",
+    "en": {
+      "vehnar": { "lider": { "pesos": { "bm_george": 1.0 }, "vel": 0.95, "g2p": "b" }, "locutor": { "pesos": { "am_michael": 1.0 }, "vel": 1.0, "g2p": "a" } },
+      "erevane": { "lider": { "pesos": { "am_michael": 0.7, "bm_george": 0.3 }, "vel": 1.05, "g2p": "a" }, "locutor": { "pesos": { "bf_emma": 1.0 }, "vel": 1.0, "g2p": "b" } },
+      "tessara": { "lider": { "pesos": { "af_heart": 1.0 }, "vel": 0.95, "g2p": "a" }, "locutor": { "pesos": { "af_bella": 1.0 }, "vel": 1.05, "g2p": "a" } },
+      "quorith": { "lider": { "pesos": { "am_michael": 0.5, "bm_george": 0.5 }, "vel": 1.0, "g2p": "a" }, "locutor": { "pesos": { "am_michael": 1.0 }, "vel": 1.0, "g2p": "a" } },
+      "vorag": { "lider": { "pesos": { "am_fenrir": 0.6, "bm_george": 0.4 }, "vel": 0.9, "g2p": "a" }, "locutor": { "pesos": { "am_michael": 1.0 }, "vel": 1.0, "g2p": "a" } }
+    }
+  }
+}
