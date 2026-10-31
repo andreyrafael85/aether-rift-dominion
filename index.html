@@ -1065,7 +1065,7 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
 
 
 <script>/* 5.0c: idioma antes da primeira pintura — fora do pt-BR, carrega aqui o dicionário do idioma (src/i18n/en.js ou es.js, 33 KB com gzip, enquanto o resto da página chega) e esconde o texto da tela inicial até o src/i18n.js (no fim da página) traduzir; a mesma regra de escolha do i18n.js */
-(function () { try { var q = (new URLSearchParams(location.search).get('lang') || '').toLowerCase(), s = ''; try { s = (localStorage.getItem('ard-idioma') || '').toLowerCase(); } catch (e) {} var l = /^(pt|en|es)/.test(q) ? q : /^(pt|en|es)/.test(s) ? s : ''; if (!l) { var ls = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']; for (var i = 0; i < ls.length && !l; i++) if (/^(pt|en|es)/i.test(ls[i])) l = ls[i].toLowerCase(); } if (!/^pt/.test(l)) { document.documentElement.classList.add('i18n-espera'); document.write('<script src="src/i18n/' + (/^es/.test(l) ? 'es' : 'en') + '.js?v=' + '2026-10-31 03:29Z'.replace(/[^0-9TZ]/g, '') + '"><\/script>'); } } catch (e) {} })();</script>
+(function () { try { var q = (new URLSearchParams(location.search).get('lang') || '').toLowerCase(), s = ''; try { s = (localStorage.getItem('ard-idioma') || '').toLowerCase(); } catch (e) {} var l = /^(pt|en|es)/.test(q) ? q : /^(pt|en|es)/.test(s) ? s : ''; if (!l) { var ls = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']; for (var i = 0; i < ls.length && !l; i++) if (/^(pt|en|es)/i.test(ls[i])) l = ls[i].toLowerCase(); } if (!/^pt/.test(l)) { document.documentElement.classList.add('i18n-espera'); document.write('<script src="src/i18n/' + (/^es/.test(l) ? 'es' : 'en') + '.js?v=' + '2026-10-31 18:08Z'.replace(/[^0-9TZ]/g, '') + '"><\/script>'); } } catch (e) {} })();</script>
 <div id="start" class="screen">
   <canvas id="bgfx" aria-hidden="true"></canvas>
   <!-- 5.0a.1: pôster da Sala de Comando (um render da própria Sala por Raça e por tela, em assets/sala-*.webp): entra na hora, antes da cena 3D -->
@@ -1079,7 +1079,7 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
   <div class="start-wrap">
     <header class="st-head">
       <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div class="brand-txt"><h1 data-i18n="inicio.aether-rift-dominion">Aether Rift<span>Dominion</span></h1><p class="tagline" data-i18n="inicio.nada-aqui-seu-ainda">Nada aqui é seu. Ainda.</p></div></div>
-      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.0d · build 2026-10-31 03:29Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4</div>
+      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.0d.1 · build 2026-10-31 18:08Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4</div>
       <div class="opt st-lang" data-idioma-sel="idioma-inicio"></div><!-- 5.0c: seletor de idioma, legível em qualquer idioma -->
     </header>
     <div class="start-grid">
@@ -1141,8 +1141,9 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
       </div>
       <div class="notes">
       <div class="choose" data-i18n="notas.notas-versao">Notas da versão</div>
+      <p class="start-notes" data-i18n="notas.5-0d-1"><b>5.0d.1 — Névoa leve e Firefox corrigido:</b> no Firefox, as nuvens de guerra da 5.0d deixavam a partida quase sem visibilidade na Alta, porque um shader que o Firefox recusava escurecia a tela. Está corrigido, e as nuvens viraram um véu claro e translúcido sobre o que nunca foi visto: o relevo continua legível, e o que está à vista nunca fica coberto. A névoa dos climas também ficou mais leve: unidades e construções continuam nítidas na névoa tóxica, na chuva e no celular. E o clima <b>Automático</b> agora acompanha o mapa, de leve: neve fina, chuva fina ou poeira na Planície da Fenda e cinza no Cinturão (da Média para cima).</p>
+      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.0d → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-0d"><b>5.0d — Céu, clima e nuvens de guerra:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o mundo ganhou vida. O sol anda no ciclo do dia, com nascer e pôr do sol, sombras que giram e, à noite, lua e estrelas; o reflexo do céu acompanha a hora. Na Alta e na Ultra, raios de sol atravessam a poeira e a Tempestade de Éter. O que nunca foi visto fica sob um banco de nuvens baixas, que se abre com a borda acesa quando as tropas chegam (da Média para cima). Os climas do campo (Jogar › Semente e clima) agora acontecem na placa de vídeo: neve de cristais que se acumula no chão e no alto das peças, neve fina e cortinas de luz na aurora, areia e cinza na tempestade de plasma, chuva com chão molhado e poças na chuva ácida, e bancos de névoa tóxica nos vales. E o chão guarda a batalha: crateras que afundam, mato queimado e pegadas na neve e na areia.</p>
-      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.0c.2 → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-0c-2"><b>5.0c.2 — Voz da Erevane e Sala mais rápida:</b> a Erevane ganhou um locutor masculino nos três idiomas. Os avisos, as eliminações e as respostas das unidades agora soam com corpo, sem perder o ar frio e o eco leve da Raça; a voz feminina fica só na Tessara, com a Sylvia Oriel. Na Sala de Comando, a saudação do líder sai logo depois da troca de Raça, sem esperar o navegador ficar livre: no Firefox, ela chegava a atrasar mais de dois segundos.</p>
       <p class="start-notes" data-i18n="notas.5-0c-1"><b>5.0c.1 — Vozes gravadas:</b> o jogo agora fala com vozes gravadas nos três idiomas: uma voz para cada líder e para o locutor de cada Raça, com o caráter de cada mundo. São 766 falas por idioma: os avisos do locutor, as respostas das unidades ao selecionar, mover e atacar, as eliminações pelo nome, as reações do líder durante a partida e a campanha inteira falada, com a legenda e a boca do líder acompanhando cada palavra. Cada partida baixa só as falas da sua Raça, depois da carga. No iPhone, as falas saem pelo mesmo caminho dos efeitos. Em Ajustes, <b>Vozes gravadas</b> liga e desliga; sem elas, o jogo volta à voz do aparelho. Com o Motor 5, a partida prepara 22% menos shaders na carga e cada quadro gasta cerca de 14% menos CPU.</p>
       <p class="start-notes" data-i18n="notas.5-0c"><b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.</p>
@@ -1787,7 +1788,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aqui é seu. Ainda.",
-  "inicio.versao": "Versão 5.0d · build 2026-10-31 03:29Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
+  "inicio.versao": "Versão 5.0d.1 · build 2026-10-31 18:08Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Escolha sua Raça",
   "inicio.vitrine.explorar-base": "Explorar a base",
   "inicio.vitrine.som-tela-inicial": "Som da tela inicial",
@@ -1856,13 +1857,14 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.btn-bench": "Testar desempenho (30 s)",
   "ajustes.cfg-feedback": "Enviar feedback",
   "notas.notas-versao": "Notas da versão",
+  "notas.5-0d-1": "<b>5.0d.1 — Névoa leve e Firefox corrigido:</b> no Firefox, as nuvens de guerra da 5.0d deixavam a partida quase sem visibilidade na Alta, porque um shader que o Firefox recusava escurecia a tela. Está corrigido, e as nuvens viraram um véu claro e translúcido sobre o que nunca foi visto: o relevo continua legível, e o que está à vista nunca fica coberto. A névoa dos climas também ficou mais leve: unidades e construções continuam nítidas na névoa tóxica, na chuva e no celular. E o clima <b>Automático</b> agora acompanha o mapa, de leve: neve fina, chuva fina ou poeira na Planície da Fenda e cinza no Cinturão (da Média para cima).",
   "notas.5-0d": "<b>5.0d — Céu, clima e nuvens de guerra:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o mundo ganhou vida. O sol anda no ciclo do dia, com nascer e pôr do sol, sombras que giram e, à noite, lua e estrelas; o reflexo do céu acompanha a hora. Na Alta e na Ultra, raios de sol atravessam a poeira e a Tempestade de Éter. O que nunca foi visto fica sob um banco de nuvens baixas, que se abre com a borda acesa quando as tropas chegam (da Média para cima). Os climas do campo (Jogar › Semente e clima) agora acontecem na placa de vídeo: neve de cristais que se acumula no chão e no alto das peças, neve fina e cortinas de luz na aurora, areia e cinza na tempestade de plasma, chuva com chão molhado e poças na chuva ácida, e bancos de névoa tóxica nos vales. E o chão guarda a batalha: crateras que afundam, mato queimado e pegadas na neve e na areia.",
   "notas.5-0c-2": "<b>5.0c.2 — Voz da Erevane e Sala mais rápida:</b> a Erevane ganhou um locutor masculino nos três idiomas. Os avisos, as eliminações e as respostas das unidades agora soam com corpo, sem perder o ar frio e o eco leve da Raça; a voz feminina fica só na Tessara, com a Sylvia Oriel. Na Sala de Comando, a saudação do líder sai logo depois da troca de Raça, sem esperar o navegador ficar livre: no Firefox, ela chegava a atrasar mais de dois segundos.",
   "notas.5-0c-1": "<b>5.0c.1 — Vozes gravadas:</b> o jogo agora fala com vozes gravadas nos três idiomas: uma voz para cada líder e para o locutor de cada Raça, com o caráter de cada mundo. São 766 falas por idioma: os avisos do locutor, as respostas das unidades ao selecionar, mover e atacar, as eliminações pelo nome, as reações do líder durante a partida e a campanha inteira falada, com a legenda e a boca do líder acompanhando cada palavra. Cada partida baixa só as falas da sua Raça, depois da carga. No iPhone, as falas saem pelo mesmo caminho dos efeitos. Em Ajustes, <b>Vozes gravadas</b> liga e desliga; sem elas, o jogo volta à voz do aparelho. Com o Motor 5, a partida prepara 22% menos shaders na carga e cada quadro gasta cerca de 14% menos CPU.",
   "notas.5-0c": "<b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 mais leve, faróis e som no iPhone:</b> com o <b>Motor 5</b> ligado, os shaders que ele prepara na carga encolheram um terço (os lagos primeiro) e cada quadro manda muito menos dados para a placa de vídeo, o que alivia a CPU no Firefox e no celular. O brilho em volta das luzes agora é o mesmo do motor clássico, e no Modo Foto da qualidade Baixa os efeitos seguem a exposição como no clássico. À noite e dentro da Tempestade de Éter, os faróis dos veículos, coletores e piratas iluminam o chão à frente, nos dois motores. A Sala de Comando ficou um pouco mais clara, sem o clarão de antes. No iPhone, o som e a voz destravam no primeiro toque, tocam com a chave de silêncio ligada e voltam depois de uma ligação. Cada líder fala com uma voz do seu gênero em todo navegador. Em Ajustes, <b>Testar som</b> toca três notas e uma frase e mostra o estado do áudio do aparelho.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, em teste:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o jogo inteiro agora roda em WebGPU, com volta sozinha para WebGL2: unidades e construções com o detalhe de superfície e a animação de cada peça, ruínas, obras, o holograma da Erevane, os escudos do Uníssono e as bandeiras; o chão com todos os biomas, a vegetação ao vento, as estradas e o céu; explosões, fogo, fumaça e tiros; os lagos de plasma e de gelo com reflexo, o espaço do Cinturão e a Tempestade de Éter; e o <b>Modo Foto</b> (📷 ou tecla J) com desfoque, os 8 filtros e captura em 4K. Na primeira vez que o Modo Foto abre numa partida, ele leva alguns segundos para se preparar. Com tudo isso, a carga do Motor 5 ficou alguns segundos mais longa: a próxima versão mede nos aparelhos e enxuga. O motor clássico continua o padrão e não mudou.",
-  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0c.2 → 2.0)",
+  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0d → 2.0)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Termos de Uso",
   "inicio.rodape.foot-priv": "Privacidade",
@@ -3181,7 +3183,7 @@ const pr = l => PR[l] || (PR[l] = new Intl.PluralRules(LOCALE[l] || l));
 function num(n, o) { if (typeof n !== 'number' || !isFinite(n)) return String(n); return nf(ARD.idioma, o || { maximumFractionDigits: 2 }).format(n); }
 function forma(v, n, l) { if (v == null || typeof v !== 'object') return v; const c = typeof n === 'number' ? (n === 0 && v.zero != null ? 'zero' : pr(l).select(n)) : 'other'; return v[c] != null ? v[c] : v.other != null ? v.other : v.one; }
 function busca(k, l) { const d = DIC[l]; return d && Object.prototype.hasOwnProperty.call(d, k) ? d[k] : undefined; }
-const MARCA_BUILD = '__' + 'BUILD__', CARIMBO = '2026-10-31 03:29Z'; /* o en e o es vêm em arquivo à parte, sem a troca do build: o carimbo entra aqui */
+const MARCA_BUILD = '__' + 'BUILD__', CARIMBO = '2026-10-31 18:08Z'; /* o en e o es vêm em arquivo à parte, sem a troca do build: o carimbo entra aqui */
 function preenche(s, vars) { if (s.indexOf(MARCA_BUILD) >= 0) s = s.split(MARCA_BUILD).join(CARIMBO); if (!vars || s.indexOf('{') < 0) return s; return s.replace(/\{(\w+)\}/g, (m, n) => Object.prototype.hasOwnProperty.call(vars, n) ? (typeof vars[n] === 'number' ? num(vars[n]) : String(vars[n])) : m); }
 function t(k, vars, reserva) { const l = ARD.idioma; let v = busca(k, l), ll = l; if (v === undefined) { v = busca(k, 'pt-BR'); ll = 'pt-BR'; } if (v === undefined) { if (reserva != null) return preenche(String(reserva), vars); falta(k); return k; }
   const s = forma(v, vars && vars.n, ll); return preenche(String(s == null ? '' : s), vars); }
@@ -3273,7 +3275,7 @@ function marcaHtml() { try { document.documentElement.lang = LANG_HTML[ARD.idiom
 /* carga dos dicionários: o pt-BR vem embutido no pacote (base e reserva); o en e o es são arquivos à parte (src/i18n/en.js e es.js, com o carimbo
    do build na URL), pedidos só por quem usa o idioma: o script do topo do <body> já carrega o do idioma escolhido antes do jogo; aqui, a troca
    na hora pede o outro. O service worker guarda os dois na instalação, então o jogo troca de idioma também sem internet. */
-const VER = '2026-10-31 03:29Z'.replace(/[^0-9TZ]/g, '');
+const VER = '2026-10-31 18:08Z'.replace(/[^0-9TZ]/g, '');
 const CARGAS = {};
 function carregar(l) { l = normaliza(l) || 'pt-BR'; if (DIC[l]) return Promise.resolve(l); if (CARGAS[l]) return CARGAS[l];
   return (CARGAS[l] = new Promise((ok, falha) => { const sc = document.createElement('script'); sc.src = 'src/i18n/' + l + '.js?v=' + VER; sc.onload = () => { if (DIC[l]) ok(l); else { CARGAS[l] = null; falha(new Error('dicionário vazio')); } }; sc.onerror = () => { CARGAS[l] = null; sc.remove(); falha(new Error('sem rede')); }; document.head.appendChild(sc); })); }
@@ -20805,25 +20807,36 @@ const ACUM = QS.get('acumulo'); /* '1': tudo coberto desde o início (fotos); '0
 const VISUAL = {
   cristais: { nome: 'neve de cristais', vento: [15, -5],
     tipos: [{ f: 0.82, K: [-24, 0.45, 7, 0], L: [3.0, 0.85, 0.8, 0], M: [0, 0, 0], cor: [0.92, 0.95, 1.0] }, { f: 0.18, K: [-20, 0.45, 8, 0], L: [3.0, 0.7, 0.95, 3], M: [0, 0, 1.6], cor: [0.78, 0.93, 1.0] }],
-    chao: [0.95, 0, 0, 0], peca: [0.8, 0, 0, 0] },
+    chao: [0.95, 0, 0, 0], peca: [0.55, 0, 0, 0] }, /* 5.0d.1: peças 0,8 → 0,55 (a cor do time aparece) */
   aurora: { nome: 'neve fina e neblina fria', vento: [8, 4],
     tipos: [{ f: 1, K: [-14, 0.55, 5, 0], L: [2.0, 0.6, 0.7, 0], M: [0, 0, 0], cor: [0.9, 0.95, 1.0] }],
-    chao: [0.4, 0, 0, 0], peca: [0.42, 0, 0, 0], neblina: { cor: [0.6, 0.78, 0.8], dens: 0.36, alturas: [10, 26, 46], deriva: 0.6, noite: 0.05 } },
+    chao: [0.4, 0, 0, 0], peca: [0.3, 0, 0, 0], neblina: { cor: [0.6, 0.78, 0.8], dens: 0.2, alturas: [3, 6, 9], deriva: 0.6, noite: 0.05 } }, /* 5.0d.1: véu baixo e ralo (antes 0,36 em 10/26/46: cobria as unidades) */
   acida: { nome: 'chuva', vento: [6, -2],
-    tipos: [{ f: 1, K: [-240, 0.12, 2, 0], L: [0.3, 0.24, 0.3, 1], M: [0, 0.038, 0], cor: [0.7, 0.8, 0.66] }],
+    tipos: [{ f: 1, K: [-240, 0.12, 2, 0], L: [0.3, 0.24, 0.22, 1], M: [0, 0.038, 0], cor: [0.7, 0.8, 0.66] }],
     chao: [0, 0, 0, 1], peca: [0, 0, 0, 1], reflexo: true },
   plasma: { nome: 'tempestade de areia e cinza', vento: [24, -8],
     tipos: [{ f: 0.42, K: [-10, 1.0, 6, 0], L: [1.2, 0.9, 0.75, 0], M: [0, 0, 0], cor: [0.32, 0.3, 0.29] }, { f: 0.2, K: [26, 0.65, 14, 0], L: [0, 0.45, 1.0, 2], M: [4.5, 0, 2.6], cor: [1.0, 0.42, 0.12] },
       { f: 0.38, K: [0, 2.6, 4, 7], L: [0, 0.45, 0.32, 1], M: [3.5, 0.1, 0], cor: [0.72, 0.56, 0.38] }],
-    chao: [0, 0.75, 0.65, 0], peca: [0, 0.55, 0.5, 0], neblina: { cor: [0.66, 0.5, 0.34], dens: 0.42, alturas: [6, 18, 34], deriva: 2.2, noite: 0, limiar: 0.18 } },
+    chao: [0, 0.75, 0.65, 0], peca: [0, 0.3, 0.4, 0], neblina: { cor: [0.66, 0.5, 0.34], dens: 0.24, alturas: [3, 6, 9], deriva: 2.2, noite: 0, limiar: 0.18 } }, /* 5.0d.1: antes 0,42 em 6/18/34 */
   toxica: { nome: 'névoa tóxica', vento: [9, -3],
     tipos: [{ f: 1, K: [-3, 0.55, 9, 0], L: [3.0, 0.7, 0.8, 2], M: [0, 0, 0.9], cor: [0.55, 0.95, 0.35] }],
-    chao: [0, 0, 0, 0.3], peca: [0, 0, 0, 0.2], neblina: { cor: [0.45, 0.62, 0.28], dens: 0.5, alturas: [8, 22, 40], deriva: 0.5, noite: 0.12 } },
+    chao: [0, 0, 0, 0.3], peca: [0, 0, 0, 0.2], neblina: { cor: [0.45, 0.62, 0.28], dens: 0.28, alturas: [3, 6, 9], deriva: 0.5, noite: 0.12 } }, /* 5.0d.1: antes 0,5 em 8/22/40 */
 };
+/* 5.0d.1: o "Automático (pelo bioma)" com clima leve, só visual: o mapa decide (Cinturão → cinza fina; na Fenda, gelo ≥ 30% → neve fina,
+   tundra ≥ 28% → chuva leve, senão poeira de areia: o deserto de rocha é o maior bioma de quase todo mapa). Poucas partículas finas, sem neblina,
+   cobertura discreta (leve: tinge, não cobre), sem poças nem reflexo; nada na Baixa e no celular. ?climaauto=0 desliga */
+const AUTO = {
+  neve: { nome: 'automático: neve fina (gelo)', leve: true, vento: [7, 3], tipos: [{ f: 1, K: [-12, 0.5, 4, 0], L: [1.5, 0.45, 0.5, 0], M: [0, 0, 0], cor: [0.92, 0.95, 1.0] }], chao: [0.12, 0, 0, 0], peca: [0.12, 0, 0, 0] }, /* geada: no fim do acúmulo clareia o chão em volta das unidades ~10% */
+  chuva: { nome: 'automático: chuva leve (tundra)', leve: true, poca: false, vento: [5, -2], tipos: [{ f: 1, K: [-220, 0.12, 2, 0], L: [0.25, 0.2, 0.16, 1], M: [0, 0.03, 0], cor: [0.75, 0.82, 0.9] }], chao: [0, 0, 0, 0.3], peca: [0, 0, 0, 0.3] },
+  areia: { nome: 'automático: poeira de areia (deserto de rocha)', leve: true, vento: [16, -6], tipos: [{ f: 1, K: [0, 2.2, 3, 5], L: [0, 0.35, 0.16, 1], M: [3, 0.08, 0], cor: [0.74, 0.6, 0.42] }], chao: [0, 0, 0.12, 0], peca: [0, 0, 0.1, 0] },
+  cinza: { nome: 'automático: cinza fina (Cinturão)', leve: true, vento: [6, 2], tipos: [{ f: 1, K: [-7, 0.8, 5, 0], L: [1.0, 0.5, 0.42, 0], M: [0, 0, 0], cor: [0.4, 0.38, 0.37] }], chao: [0, 0.12, 0, 0], peca: [0, 0.06, 0, 0] },
+};
+const AUTO_N = [0, 1024, 2048, 3072]; /* partículas do automático por nível (0 = Baixa e celular: nada) */
+const AUTO_LIGADO = QS.get('climaauto') !== '0';
 /* partículas e camadas por nível: 0 Baixa e celular (o mais barato), 1 Média, 2 Alta, 3 Ultra */
 const NIVEL = [{ n: 1536, camadas: 1 }, { n: 4096, camadas: 2 }, { n: 12288, camadas: 3 }, { n: 20480, camadas: 3 }];
 
-const C = M5.clima = { VISUAL, vis: null, nome: null, nivel: 1, ativo: false, montado: false, pipes: 0, N: 0, nAtivo: 0, U: null };
+const C = M5.clima = { VISUAL, AUTO, vis: null, nome: null, nivel: 1, ativo: false, montado: false, pipes: 0, N: 0, nAtivo: 0, U: null };
 
 /* ---------- uniforms do clima (criados uma vez, compartilhados por todos os materiais) ---------- */
 function init() {
@@ -20850,8 +20863,10 @@ C.init = init;
 /* ---------- escolha (R.setClimate, antes da carga): o visual, o nível e se o pós precisa do reflexo ---------- */
 C.escolher = function (nome, cfg, R, toque) {
   const v = LIGADO && cfg ? VISUAL[nome] || null : null; const antes = !!(C.vis && C.vis.reflexo && C.reflexoNivel());
+  C.autoPend = !!(LIGADO && AUTO_LIGADO && !cfg && !toque); /* 5.0d.1: o automático decide na montagem, pelo mapa */
   C.vis = v; C.nome = v ? nome : null; C.cfg = cfg || null; C.R = R; C.toque = !!toque;
   const q = R && R.quality ? (R.quality.resolved || R.quality.name) : 'media'; C.nivel = toque || q === 'baixa' ? 0 : q === 'ultra' ? 3 : q === 'alta' ? 2 : 1;
+  if (C.autoPend && C.nivel < 1) C.autoPend = false; /* 5.0d.1: Baixa: nada */
   C.ativo = !!v; const U = init(); U.nivel.value = C.nivel; U.cratera.value = C.nivel > 0 && !toque ? 1 : 0;
   return antes !== !!(C.vis && C.vis.reflexo && C.reflexoNivel()); /* true: o render3d refaz o pós (o reflexo entra ou sai) */
 };
@@ -20894,7 +20909,7 @@ G.chao.cor = function (ctx) {
   if (sc && (V.chao[0] > 0 || V.chao[2] > 0)) { const X = M5.tex.cicatrizes, uv0 = mapUV(pw), e = float(4.5).div(M5.u.mundo); const r = (du, dv) => X.sample(uv0.add(vec2(du, dv))).setUpdateMatrix(false).r;
     trS = r(e, e).add(r(e.negate(), e)).add(r(e, e.negate())).add(r(e.negate(), e.negate())).mul(0.25).mul(k); } /* na neve e na areia, a trilha borrada em ~1,5 texel: o desenho da esteira (1,7 unidade) é mais fino que o texel do mapa na Média e, com o contraste da neve, serrilhava em quadradinhos */
   const tr = trS ? trS : tr0;
-  const cobre = (q, lim, inv) => clamp(q.mul(1.35).sub(float(1).sub(plano).mul(lim)).sub((inv ? var0 : float(1).sub(var0)).mul(inv ? 0.9 : 0.42)).mul(2.2), 0.0, 1.0); /* sobe com o acúmulo, primeiro no plano e no macio (inv: nas manchas do outro lado da variação) */
+  const cobre = (q, lim, inv) => V.leve ? q.mul(plano).mul((inv ? float(1).sub(var0) : var0).mul(0.6).add(0.4)) /* 5.0d.1: automático leve: no máximo a fração do acúmulo, sem cobrir */ : clamp(q.mul(1.35).sub(float(1).sub(plano).mul(lim)).sub((inv ? var0 : float(1).sub(var0)).mul(inv ? 0.9 : 0.42)).mul(2.2), 0.0, 1.0); /* sobe com o acúmulo, primeiro no plano e no macio (inv: nas manchas do outro lado da variação) */
   if (V.chao[0] > 0) { /* neve: cobre o plano, derrete no queimado quente, as trilhas abrem até o chão e as pegadas afundam */
     const cr = sc ? sc.b : float(0); const c0 = cobre(CC.x, 1.1).mul(k).mul(float(1).sub(smoothstep(0.3, 0.9, quente))).mul(float(1).sub(smoothstep(0.3, 0.8, bu).mul(0.9))).mul(float(1).sub(smoothstep(0.08, 0.45, cr))); /* derrete no queimado e na cratera */
     const c = c0.mul(float(1).sub(tr.mul(0.82)));
@@ -20912,13 +20927,14 @@ G.chao.cor = function (ctx) {
     alb.assign(mix(alb, areia, c.mul(0.85))); rough.assign(mix(rough, 0.93, c)); hgt.assign(mix(hgt, rip.mul(0.22).add(soft.mul(0.08)), c));
     hgt.addAssign(tr.mul(c0).mul(-0.6)); alb.mulAssign(float(1).sub(tr.mul(c0).mul(0.22))); }
   if (V.chao[3] > 0) { /* molhado: solo escuro e mais liso; poças (planas, quase espelho) com o céu refletido e as ondas da chuva */
-    const w = CC.w.mul(k); const esc = mix(float(1), float(0.5), w.mul(soft.oneMinus().mul(0.35).add(0.65)).mul(float(1).sub(Bw.z.mul(0.5)))); /* o capim escurece menos que a terra e a areia */ alb.assign(alb.mul(esc).mul(mix(vec3(1), vec3(0.96, 0.98, 1.04), w))); rough.assign(mix(rough, rough.mul(0.5), w)); /* solo molhado: mais escuro, um pouco mais frio e liso */
+    const w = CC.w.mul(k); const esc = mix(float(1), float(0.72), w.mul(soft.oneMinus().mul(0.35).add(0.65)).mul(float(1).sub(Bw.z.mul(0.5)))); /* 5.0d.1: o chão molhado escurece no máximo 28% (antes 50%) */ /* o capim escurece menos que a terra e a areia */ alb.assign(alb.mul(esc).mul(mix(vec3(1), vec3(0.96, 0.98, 1.04), w))); rough.assign(mix(rough, rough.mul(0.5), w)); /* solo molhado: mais escuro, um pouco mais frio e liso */
+    if (V.poca !== false) { /* 5.0d.1: a chuva leve do automático não faz poça */
     const pd = poca(gp, false, chaoEm(pw.x, pw.z)).mul(smoothstep(0.55, 1.0, plano)).mul(w).toVar('ardPoca');
-    alb.mulAssign(mix(float(1), float(0.28), pd)); rough.assign(mix(rough, 0.04, pd));
+    alb.mulAssign(mix(float(1), float(0.5), pd)); /* 5.0d.1: antes 0,28 */ rough.assign(mix(rough, 0.04, pd));
     const rp = vec2(0).toVar('ardOnda'); If(U.nivel.greaterThan(0.5).and(U.dens.greaterThan(0.05)), () => { rp.assign(ondas(gp, MU.tempo).mul(U.dens)); });
     hgt.assign(mix(hgt, rp.x.add(rp.y).mul(0.07), pd));
     const fr = pow(float(1).sub(clamp(dot(ctx.wn || vec3(0, 1, 0), normalize(cameraPosition.sub(positionWorld))), 0.0, 1.0)), 5.0).mul(0.7).add(0.22); /* Fresnel da água (com o céu claro sobre o solo escuro, a poça brilha mais que a conta física) (normal da geometria: a normal final do chão monta depois da cor) */
-    tEmis.addAssign(MU.ceuCor.mul(pd).mul(fr).mul(0.75)); }
+    tEmis.addAssign(MU.ceuCor.mul(pd).mul(fr).mul(0.75)); } }
   return null;
 };
 /* crateras: o chão afunda pelo canal b do mapa de cicatrizes (tigela) e levanta a borda (5 amostras no vértice: o mapa é mais fino que a malha) */
@@ -20950,10 +20966,10 @@ let PK = null; /* as máscaras desta montagem (o setupDiffuseColor monta antes d
 function camadaPeca(dc, fv, k0) {
   PK = null; const V = C.vis; if (!V) return; const { float, vec3, mix, smoothstep, clamp, dot, normalWorld, positionWorld, Var } = L(); const U = init(); const P = U.cobrePeca;
   const n = normalWorld; const nz = M5.vnoise2(positionWorld.xz.mul(0.45)).sub(0.5); const fk = fv ? mix(float(0.06), float(1.0), fv) : float(1); const K = { neve: null, cinza: null, areia: null, molhado: null };
-  if (V.peca[0] > 0) { K.neve = Var(smoothstep(0.38, 0.8, n.y.add(nz.mul(0.4))).mul(P.x).mul(k0), 'ardNeveP'); dc.rgb.assign(mix(dc.rgb, vec3(0.84, 0.88, 0.94).mul(fk), K.neve.mul(0.9))); }
-  if (V.peca[1] > 0) { K.cinza = Var(smoothstep(0.32, 0.8, n.y.add(nz.mul(0.45))).mul(P.y).mul(k0), 'ardCinzaP'); dc.rgb.assign(mix(dc.rgb, vec3(0.13, 0.125, 0.12).mul(fk), K.cinza.mul(0.85))); }
+  if (V.peca[0] > 0) { K.neve = Var(smoothstep(0.38, 0.8, n.y.add(nz.mul(0.4))).mul(P.x).mul(k0), 'ardNeveP'); dc.rgb.assign(mix(dc.rgb, vec3(0.84, 0.88, 0.94).mul(fk), K.neve.mul(0.7))); /* 5.0d.1: 0,9 → 0,7 */ }
+  if (V.peca[1] > 0) { K.cinza = Var(smoothstep(0.32, 0.8, n.y.add(nz.mul(0.45))).mul(P.y).mul(k0), 'ardCinzaP'); dc.rgb.assign(mix(dc.rgb, vec3(0.26, 0.25, 0.24).mul(fk), K.cinza.mul(0.7))); /* 5.0d.1: cinza clara (antes 0,13 × 0,85: escurecia as unidades) */ }
   if (V.peca[2] > 0) { const bar = smoothstep(0.1, 0.7, dot(n.xz, vec3(U.vento.x, 0, U.vento.y).xz.negate())); K.areia = Var(clamp(bar.mul(0.55).add(smoothstep(0.5, 0.9, n.y).mul(0.45)).add(nz.mul(0.3)), 0.0, 1.0).mul(P.z).mul(k0), 'ardAreiaP'); dc.rgb.assign(mix(dc.rgb, vec3(0.62, 0.48, 0.32).mul(fk), K.areia.mul(0.75))); }
-  if (V.peca[3] > 0) { K.molhado = Var(P.w.mul(k0), 'ardMolhadoP'); dc.rgb.mulAssign(mix(float(1), float(0.62), K.molhado)); }
+  if (V.peca[3] > 0) { K.molhado = Var(P.w.mul(k0), 'ardMolhadoP'); dc.rgb.mulAssign(mix(float(1), float(0.86), K.molhado)); /* 5.0d.1: antes 0,62 */ }
   PK = K;
 }
 function rugPeca(m) {
@@ -20974,14 +20990,22 @@ C.pegadas = function (x, y) {
 C.montar = function (o) {
   const X = o.X, scene = o.scene; C.terr = o.terr || null; C.camera = o.camera; C.H = o.H; init();
   if (o.heights && o.HN) alturas(o.heights, o.HN, o.HS, o.W);
+  if (C.autoPend && !C.vis && !C.montado) { const t = autoTipo(o.sim || (C.R && C.R.sim)); if (t) { C.vis = AUTO[t]; C.nome = 'auto-' + t; C.ativo = true; } C.autoPend = false; } /* 5.0d.1 */
   if (!C.vis || C.montado || !X) return; C.montado = true; C.X = X; const V = C.vis, U = C.U;
   const vn = Math.hypot(V.vento[0], V.vento[1]) || 1; U.vento.value.set(V.vento[0] / vn, -V.vento[1] / vn, vn, 0); /* o vento do preset: x do mapa → x do three; y do mapa → −z */
-  const nq = NIVEL[C.nivel]; const N = Math.max(256, Math.min(32768, (+(QS.get('climaN') || 0) || nq.n))) & ~63; C.N = N; C.nAtivo = N;
+  const nq = NIVEL[C.nivel]; const N = Math.max(256, Math.min(32768, (+(QS.get('climaN') || 0) || (V.leve ? AUTO_N[C.nivel] : nq.n)))) & ~63; C.N = N; C.nAtivo = N; { const sm = o.sim || (C.R && C.R.sim); C.t0 = sm ? sm.time : 0; } /* 5.0d.1: o automático leve tem a sua conta; o acúmulo segue o relógio do jogo */
   particulas(N, o.H, o.cam); scene.add(C.malha);
   if (V.neblina) { neblina(nq.camadas); scene.add(C.nevoa); }
   const r = X.renderer; if (X.isWebGPU && r.compileComputeAsync && M5.pendentes) M5.pendentes.push(() => r.compileComputeAsync([C.kernel])); /* na reserva WebGL2 o compute nasce no 1º passo, ainda no aquecimento (R.warming) */ /* o compute nasce na carga, junto com os outros pipelines */
   acumulo(0, true);
 };
+/* 5.0d.1: o visual do automático pelo mapa (só leitura da simulação: a fração de cada bioma nos tiles de chão) */
+function autoTipo(sim) {
+  const S = ARD.sim; if (!sim || !sim.biome || !S) return null; if (sim.map && sim.map.type === 'cinturao') return 'cinza';
+  const w = [0, 0, 0, 0]; const n = sim.biome.length, TL = Math.round(Math.sqrt(n)), TI = S.WORLD / TL; let t = 0;
+  for (let i = 0; i < n; i++) { if (S.mapCell && sim.map) { const x = (i % TL + 0.5) * TI, y = (Math.floor(i / TL) + 0.5) * TI; if (S.mapCell(sim, x, y) !== 1) continue; } const m = sim.biomeMix[i] || 0; w[sim.biome[i]] += 1 - m; w[sim.biome2[i]] += m; t++; }
+  if (!t) return null; C.biomas = w.map(v => +(v / t).toFixed(3)); return w[0] / t >= 0.3 ? 'neve' : w[2] / t >= 0.28 ? 'chuva' : 'areia';
+}
 /* mapa de alturas do chão (R) e suavizado em ~150 unidades (G), meia precisão, para o compute, a neblina e o reflexo */
 function alturas(h, HN, HS, W) {
   const Tm = T(); const n = HN * HN, R = 8; const a = new Float32Array(n), b = new Float32Array(n);
@@ -21071,7 +21095,7 @@ function neblina(camadas) {
     return vec4(c.mul(a), a); })();
   M5.registrar('clima-neblina', m);
   const pg = new Tm.PlaneGeometry(1, 1, 40, 40); const g = new Tm.InstancedBufferGeometry(); g.index = pg.index; g.setAttribute('position', pg.attributes.position); g.setAttribute('uv', pg.attributes.uv); g.instanceCount = camadas; g.name = 'ard-clima-neblina';
-  const me = new Tm.Mesh(g, m); me.frustumCulled = false; me.castShadow = false; me.receiveShadow = false; me.renderOrder = 9; me.name = 'clima-neblina'; C.nevoa = me; C.nevoaGeo = g; C.camadas = camadas;
+  const me = new Tm.Mesh(g, m); me.frustumCulled = false; me.castShadow = false; me.receiveShadow = false; me.renderOrder = -1; me.name = 'clima-neblina'; /* 5.0d.1: antes dos anéis de seleção, do inimigo e dos efeitos (eles ficam por cima) */ C.nevoa = me; C.nevoaGeo = g; C.camadas = camadas;
 }
 
 /* ---------- reflexo de tela nas poças (Alta e Ultra, só com chuva): src/m5/pos.js chama na cadeia, depois da oclusão e antes da bruma ----------
@@ -21109,6 +21133,7 @@ C.reflexo = function (c, color, depth, camera, q) {
 let TACUM = 0;
 function acumulo(dt, zera) {
   const V = C.vis, U = C.U; if (!V || !U) return; if (zera) TACUM = 0; TACUM += dt; const f = ACUM === '1' ? 1 : ACUM === '0' ? 0 : null;
+  if (C.R && C.R.sim && C.t0 != null) TACUM = Math.max(0, C.R.sim.time - C.t0); /* 5.0d.1: o acúmulo segue o relógio da partida (pausa para, velocidade 2× acumula 2×) */
   if (C.forca) { U.cobreChao.value.fromArray(C.forca); U.cobrePeca.value.fromArray(C.forca); return; } /* ferramentas de teste: cobertura fixa (antes e depois na mesma carga) */
   const c = f != null ? f : Math.min(1, 0.4 + TACUM / 360), pm = f != null ? f : Math.min(1, TACUM / 150), pw = f != null ? f : Math.min(1, TACUM / 25);
   U.cobreChao.value.set(V.chao[0] * c, V.chao[1] * c, V.chao[2] * c, V.chao[3] * (f != null ? f : 1)); U.cobrePeca.value.set(V.peca[0] * pm, V.peca[1] * pm, V.peca[2] * pm, V.peca[3] * pw);
@@ -21121,7 +21146,7 @@ C.quadro = function (dt, cam, camera, R) {
   const g0 = C.H ? C.H(cam.x, cam.y) : 0; P.topo.value = Math.max(110, Math.min(420, (camera.position.y - g0) * 0.6)); P.dt.value = d; P.t.value = t;
   const V = C.vis; const rj = 1 + 0.35 * Math.sin(t * 0.13) + 0.15 * Math.sin(t * 0.37); const an = Math.atan2(-V.vento[1], V.vento[0]) + 0.3 * Math.sin(t * 0.021); U.vento.value.set(Math.cos(an), Math.sin(an), Math.hypot(V.vento[0], V.vento[1]) * rj, rj);
   U.dens.value = Math.max(0.35, Math.min(1, 0.8 + 0.2 * Math.sin(t * 0.045) + 0.1 * Math.sin(t * 0.17)));
-  const quer = +(QS.get('climaN') || 0) ? C.N : Math.min(C.N, NIVEL[C.nivel].n); C.nAtivo = Math.max(64, quer & ~63); P.n.value.w = C.nAtivo; C.geo.instanceCount = C.nAtivo; /* a qualidade pode baixar no meio da partida: menos partículas, o mesmo pipeline */
+  const quer = +(QS.get('climaN') || 0) ? C.N : Math.min(C.N, V.leve ? (AUTO_N[C.nivel] || 64) : NIVEL[C.nivel].n); C.nAtivo = Math.max(64, quer & ~63); P.n.value.w = C.nAtivo; C.geo.instanceCount = C.nAtivo; /* a qualidade pode baixar no meio da partida: menos partículas, o mesmo pipeline */
   acumulo(d, false); P.vento.value.copy(U.vento.value); P.altK.value.copy(U.altK.value); /* cópias para o compute (grupo próprio) */
   if (C.nevoa) { const B = C.B; const hb = 1100 / zf; const cel = hb * 2 / 40; B.centro.value.set(Math.round(cam.x / cel) * cel, Math.round(-cam.y / cel) * cel, hb * 2, 0); B.deriva.value.set(U.vento.value.x * t * U.vento.value.z * 0.0009 * V.neblina.deriva, -U.vento.value.y * t * U.vento.value.z * 0.0009 * V.neblina.deriva); C.nevoaGeo.instanceCount = Math.min(C.camadas, NIVEL[C.nivel].camadas); }
   if (C.S && C.cam) { const c = C.cam; C.S.proj.value.copy(c.projectionMatrix); C.S.projInv.value.copy(c.projectionMatrixInverse); C.S.vista.value.copy(c.matrixWorldInverse); C.S.mundo.value.copy(c.matrixWorld); }
@@ -21154,15 +21179,19 @@ const M5 = ARD.m5 = ARD.m5 || {};
 const Q = new URLSearchParams(typeof location !== 'undefined' ? location.search : '');
 const NV = M5.nuvens = M5.nuvens || {};
 NV.versao = '5.0d';
-const PED = Q.get('m5nuvens'); const RES = Math.max(1, Math.min(4, +(Q.get('m5nuvensres') || 2) | 0));
+const PED = Q.get('m5nuvens'); const DBGN = +(Q.get('m5nuvensdbg') || 0); const TESTE = Q.get('m5nuvensteste') || ''; /* 5.0d.1: simula a falha para provar as defesas: 'marcha' (a marcha não desenha, como no Firefox da 5.0d) ou 'memoria' (a memória presa em "nunca visto" em todo o mapa) */ const RES = Math.max(1, Math.min(4, +(Q.get('m5nuvensres') || 2) | 0));
 const toque = () => typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 /* versão pela qualidade: null (nada), 'camada' (Média), 'alta', 'ultra' */
+const FIREFOX = typeof navigator !== 'undefined' && /firefox/i.test(navigator.userAgent || ''); /* 5.0d.1 */
 NV.modo = function (q) {
   if (PED === '0' || !q) return null; const r = q.resolved || q.name;
   if (PED === 'camada') return 'camada'; if (PED === 'marcha') return r === 'ultra' ? 'ultra' : 'alta';
   if (toque()) return null; /* celular (em pé e deitado): a névoa pintada no chão, como hoje */
+  if (FIREFOX && (r === 'alta' || r === 'ultra')) return 'camada'; /* 5.0d.1: no Firefox (no limite da CPU) a camada também na Alta e na Ultra: um passe a menos; ?m5nuvens=marcha força a marcha */
   return r === 'ultra' ? 'ultra' : r === 'alta' ? 'alta' : r === 'media' ? 'camada' : null;
 };
+/* 5.0d.1: o véu leve — opacidade máxima no meio do nunca visto (de dia e de noite) e quanto a borda acesa soma */
+const VEU = { dia: +(Q.get('m5nuvensveu') || 0.5), noite: 0.32, borda: 0.5 };
 /* parâmetros da forma (unidades do mapa): topo, extinção, passos */
 const CFG = { camada: { topo: 58 }, alta: { topo: 92, passos: 26, passo: 15, sombra: false, detalhe: false }, ultra: { topo: 96, passos: 40, passo: 10, sombra: true, detalhe: true } };
 const MEM = 192; /* lado da memória (texels): ~17 unidades por texel no mapa de 3200 */
@@ -21200,7 +21229,7 @@ function divididos() {
   const NA = 128, altD = new Uint8Array(NA * NA * 4).fill(0); const alt = new Tm.DataTexture(altD, NA, NA, Tm.RGBAFormat); alt.magFilter = alt.minFilter = Tm.LinearFilter; alt.colorSpace = Tm.NoColorSpace; alt.name = 'ard-nuvens-alturas'; alt.needsUpdate = true;
   const mk = nome => { const rt = new Tm.RenderTarget(MEM, MEM, { type: Tm.HalfFloatType, depthBuffer: false, generateMipmaps: false, minFilter: Tm.LinearFilter, magFilter: Tm.LinearFilter }); rt.texture.name = nome; return rt; };
   const S = SH = { X, t3, alt, altD, NA, rts: [mk('ard-nuvens-mem-a'), mk('ard-nuvens-mem-b')], i: 0, quadro: -1, sim: null, tAnt: null, temNuvem: true, calma: 0, fogV: -1, geraMs: 0 };
-  S.U = { dt: uniform(0), reset: uniform(1), alt: uniform(new Tm.Vector2(0, 1)), fenda: uniform(new Tm.Vector4(0, 0, 1, 0)), vazio: uniform(0), celula: uniform(1 / 100), liga: uniform(1) };
+  S.U = { teste: uniform(TESTE === 'memoria' ? 1 : 0), dt: uniform(0), reset: uniform(1), alt: uniform(new Tm.Vector2(0, 1)), fenda: uniform(new Tm.Vector4(0, 0, 1, 0)), vazio: uniform(0), celula: uniform(1 / 100), liga: uniform(1) };
   S.ruido = texture3D(t3); S.memAnt = texture(S.rts[1].texture); S.mem = texture(S.rts[0].texture); /* a anterior (lida pelo passe) e a última escrita (lida pela marcha e pela composição): nós comuns do TSL; o .sample().level() de um nó de passe (PassTextureNode) perde o uv no r186 */
   /* memória: cobertura alvo pela névoa (borrada e recuada), abre devagar e fecha na hora; energia da abertura; altura do chão; alvo do quadro */
   const U = S.U, nev = M5.tex.nevoa, vaz = M5.tex.vazio, alT = texture(alt);
@@ -21218,7 +21247,7 @@ function divididos() {
     const c1 = select(alvo.greaterThanEqual(c0), alvo, max(alvo, c0.sub(desce))); /* fecha na hora (partida nova), abre em ~1 s */
     const g1 = clamp(g0.mul(exp(U.dt.mul(-1.3))).add(c0.sub(c1).mul(2.6).mul(step(U.dt, 1.0))), 0.0, 1.0); /* assentar (dt grande): sem borda acesa */
     const h = U.alt.x.add(alT.sample(u).level(0).r.mul(U.alt.y.sub(U.alt.x)));
-    return vec4(c1, g1, h, alvo); })();
+    return select(U.teste.greaterThan(0.5), vec4(1, 0, h, 1), vec4(c1, g1, h, alvo)); })(); /* 5.0d.1: ?m5nuvensteste=memoria */
   M5.registrar('nuvens-memoria', mat); S.mat = mat; S.quad = new Tm.QuadMesh(mat);
   S.geraMs = Math.round(performance.now() - t0);
   /* o ruído 3D em 8 fatias de 4 camadas, uma por tarefa (fora do caminho da carga: ~25 a 60 ms de CPU no total) e um envio só no fim */
@@ -21243,14 +21272,31 @@ function assaAlturas(S, R) {
 function temNevoa(S) { const tx = M5.tex.nevoa && M5.tex.nevoa.value; const d = tx && tx.image && tx.image.data; if (!d) return true; if (tx.version === S.fogV) return S.nevoaNunca; S.fogV = tx.version;
   let nunca = false; for (let i = 0; i < d.length; i += 4) if (d[i] < 100) { nunca = true; break; } S.nevoaNunca = nunca; return nunca; }
 /* uma vez por quadro (o primeiro nó de nuvens do quadro): alturas da partida, dt pelo relógio do visual e o passe da memória */
+/* 5.0d.1: à prova de falha — um passe das nuvens com erro do WebGPU, ou a memória que não abre onde o jogador já vê, desligam as nuvens sozinhas
+   (o chão volta a ser o de hoje); o motivo fica em ARD.m5.nuvens.estado().falha e no console */
+function falhou(S, motivo) { if (S.falha) return; S.falha = motivo; S.temNuvem = false; S.U.liga.value = 0; console.warn('[ARD] Motor 5: nuvens de guerra desligadas (' + motivo + ')'); }
+function escopo(S, r) { const dev = r.backend && r.backend.device; if (!dev || typeof dev.pushErrorScope !== 'function' || (S.escopos | 0) >= 6) return null; S.escopos = (S.escopos | 0) + 1; dev.pushErrorScope('validation'); return dev; } /* os primeiros quadros dos passes dentro de um escopo de erro */
+function fechaEscopo(S, dev) { if (dev) dev.popErrorScope().then(e => { if (e) falhou(S, 'erro do WebGPU: ' + String(e.message || e).slice(0, 200)); }, () => {}); }
+const meia = v => { const s = (v & 0x8000) ? -1 : 1, e = (v >> 10) & 0x1f, f = v & 0x3ff; return e === 0 ? s * f * Math.pow(2, -24) : e === 31 ? NaN : s * (1 + f / 1024) * Math.pow(2, e - 15); }; /* meia precisão → número */
+function autoteste(S, r, R) { /* aos 5 e aos 15 s da partida: a cobertura da memória no Núcleo (à vista desde o começo) tem de estar perto de 0 */
+  if (S.falha || (S.testes | 0) >= 2 || !S.temNuvem || typeof r.readRenderTargetPixelsAsync !== 'function' || S.testando) return;
+  if (R.time - (S.tReset || 0) < ((S.testes | 0) === 0 ? 5 : 15)) return; S.testes = (S.testes | 0) + 1;
+  const Sm = ARD.sim, sim = R.sim, n = Sm && Sm.nucleoOf && sim ? Sm.nucleoOf(sim, R.humanId || 0) : null; if (!n) return;
+  const W = Sm.WORLD, fog = M5.tex.nevoa.value && M5.tex.nevoa.value.image && M5.tex.nevoa.value.image.data; const fi = (Math.min(99, (n.y / W * 100) | 0) * 100 + Math.min(99, (n.x / W * 100) | 0)) * 4; if (!fog || fog[fi] < 110) return; /* o Núcleo não está à vista: sem prova */
+  const x = Math.min(MEM - 1, (n.x / W * MEM) | 0), y = Math.min(MEM - 1, (n.y / W * MEM) | 0), rt = S.rts[S.i]; S.testando = true;
+  const le = px => (px instanceof Uint16Array ? meia(px[0]) : px[0]); /* lê os dois texels (o y do WebGL2 é de baixo para cima): o menor é o do Núcleo */
+  Promise.all([r.readRenderTargetPixelsAsync(rt, x, y, 1, 1), r.readRenderTargetPixelsAsync(rt, x, MEM - 1 - y, 1, 1)]).then(([a, b]) => { S.testando = false; const c = Math.min(le(a), le(b)); S.prova = Math.round(c * 1000) / 1000; if (!(c < 0.5)) falhou(S, 'a memória não abre no Núcleo (cobertura ' + (isFinite(c) ? c.toFixed(2) : String(c)) + ')'); }, () => { S.testando = false; }); }
 function memoriaQuadro(S, r, frameId) {
   if (S.quadro === frameId) return; S.quadro = frameId; const R = S.X && S.X.R; if (!R) return;
-  if (R.sim && R.sim !== S.sim && R.H) { S.sim = R.sim; assaAlturas(S, R); S.U.reset.value = 1; S.calma = 0; S.tAnt = R.time; }
+  if (S.falha) return; /* 5.0d.1 */
+  { const E = S.X.errors; if (E && E.length !== (S.nErr | 0)) { for (let i = S.nErr | 0; i < E.length; i++) if (/nuvens/.test(E[i])) { falhou(S, String(E[i]).slice(0, 200)); break; } S.nErr = E.length; if (S.falha) return; } } /* 5.0d.1: erro do WebGPU num pipeline das nuvens */
+  if (R.sim && R.sim !== S.sim && R.H) { S.sim = R.sim; assaAlturas(S, R); S.U.reset.value = 1; S.calma = 0; S.tAnt = R.time; S.tReset = R.time; S.testes = 0; }
   const dt = S.tAnt == null ? 0 : Math.max(0, Math.min(0.25, R.time - S.tAnt)); S.tAnt = R.time; S.U.dt.value = S.assenta ? 30 : dt; S.assenta = false; /* assenta: a memória vai direto ao alvo (fotos e testes) */
   const nv = temNevoa(S); if (nv) S.calma = 0; else S.calma += dt;
   S.temNuvem = !!R.warming || S.U.reset.value > 0 || nv || S.calma < 2.5; S.U.liga.value = S.temNuvem ? 1 : 0;
   if (!S.temNuvem) return;
   const a = S.rts[S.i], b = S.rts[1 - S.i]; S.memAnt.value = a.texture; r.setRenderTarget(b); S.quad.render(r); S.U.reset.value = 0; S.i = 1 - S.i; S.mem.value = b.texture; /* a ida e volta: lê a (a última), escreve b; S.i aponta a última escrita */
+  autoteste(S, r, R); /* 5.0d.1 */
 }
 
 /* ---------- o nó do pós (um por cadeia: a partida e o Modo Foto) ---------- */
@@ -21261,20 +21307,20 @@ function classe() {
   NodeC = class ArdNuvensNode extends Tm.TempNode {
     static get type() { return 'ArdNuvensNode'; }
     constructor(cor, depth, sp, camera, modo) { /* nomes de campo fora das letras de componente (xyzw, rgba, stpq): o r186 lê "rt" e "sp" como troca de componentes */ super('vec4'); this.cor = cor; this.depth = depth; this.profT = texture(sp.getTexture('depth')); /* a profundidade da cena num nó comum (amostras com nível na composição) */ this.passe = sp; this.camera = camera; this.modo = modo; this.cfg = CFG[modo]; this.S = divididos();
-      this.U = { projInv: uniform(new Tm.Matrix4()), camMundo: uniform(new Tm.Matrix4()), camPos: uniform(new Tm.Vector3()), pertoLonge: uniform(new Tm.Vector2(30, 11000)), tamF: uniform(new Tm.Vector2(1, 1)), tamB: uniform(new Tm.Vector2(1, 1)), faixa: uniform(new Tm.Vector4(-50, 150, 0, 0)), vento: uniform(new Tm.Vector4(0, 0, 0, 0)) };
+      this.U = { projInv: uniform(new Tm.Matrix4()), camMundo: uniform(new Tm.Matrix4()), camPos: uniform(new Tm.Vector3()), pertoLonge: uniform(new Tm.Vector2(30, 11000)), tamF: uniform(new Tm.Vector2(1, 1)), tamB: uniform(new Tm.Vector2(1, 1)), faixa: uniform(new Tm.Vector4(-50, 150, 0, 0)), vento: uniform(new Tm.Vector4(0, 0, 0, 0)), alvoY: uniform(0) /* 5.0d.1: altura do chão no alvo da câmera (a proteção sem profundidade) */ };
       this.alvoB = this.cfg.passos ? new Tm.RenderTarget(1, 1, { type: Tm.HalfFloatType, depthBuffer: false, generateMipmaps: false, minFilter: Tm.LinearFilter, magFilter: Tm.LinearFilter }) : null; if (this.alvoB) this.alvoB.texture.name = 'ard-nuvens-marcha';
       this.saida = this.alvoB ? texture(this.alvoB.texture) : null; this._m = null;
       this.updateBeforeType = Tm.NodeUpdateType.FRAME; sp.addEventListener('dispose', () => this.dispose()); /* o pós refeito (troca de qualidade): o alvo da marcha vai junto com o passe da cena */ }
     updateBefore(frame) { const r = frame.renderer, S = this.S, U = this.U, cam = this.camera, R = S.X && S.X.R;
-      estado = Tm.RendererUtils.resetRendererState(r, estado);
-      memoriaQuadro(S, r, frame.frameId);
+      estado = Tm.RendererUtils.resetRendererState(r, estado); const dev = S.falha ? null : escopo(S, r); /* 5.0d.1 */
+      memoriaQuadro(S, r, frame.frameId); U.alvoY.value = R && R.camTy != null ? R.camTy : 0;
       U.projInv.value.copy(cam.projectionMatrixInverse); U.camMundo.value.copy(cam.matrixWorld); U.camPos.value.setFromMatrixPosition(cam.matrixWorld); U.pertoLonge.value.set(cam.near, cam.far);
       const rtF = this.passe && this.passe.renderTarget; if (rtF && rtF.width > 1) U.tamF.value.set(rtF.width, rtF.height); else { r.getDrawingBufferSize(tam); U.tamF.value.set(tam.x, tam.y); }
       const tq = R ? R.time : 0; U.vento.value.set(tq * 0.0021, tq * 0.0009, tq * 0.0015, tq);
       U.faixa.value.set((S.hLo != null ? S.hLo : -50) - 12, (S.hHi != null ? S.hHi : 100) + (this.cfg.topo || 90) + 8, 0, 0);
       if (this.alvoB && S.temNuvem) { const bw = Math.max(1, Math.ceil(U.tamF.value.x / RES)), bh = Math.max(1, Math.ceil(U.tamF.value.y / RES)); U.tamB.value.set(bw, bh); this.alvoB.setSize(bw, bh);
-        r.setRenderTarget(this.alvoB); quad.material = this._m; quad.render(r); }
-      Tm.RendererUtils.restoreRendererState(r, estado); }
+        r.setClearColor(0x000000, 0); r.setRenderTarget(this.alvoB); if (TESTE === 'marcha') r.clear(true, false, false); else { quad.material = this._m; quad.render(r); } } /* ?m5nuvensteste=marcha: só a limpeza */ /* 5.0d.1: limpa transparente (o resetRendererState limpa preto e opaco: um passe que não desenha cobria a tela de preto) */
+      fechaEscopo(S, dev); Tm.RendererUtils.restoreRendererState(r, estado); }
     setup(builder) { const ctx = context(builder.getSharedContext());
       if (this.cfg.passos && !this._m) { const m = new Tm.NodeMaterial(); m.contextNode = ctx; m.depthTest = false; m.depthWrite = false; m.blending = Tm.NoBlending; m.fragmentNode = marcha(this); M5.registrar('nuvens-marcha-' + this.modo, m); this._m = m; }
       return this.modo === 'camada' ? compoeCamada(this) : compoeMarcha(this); } /* a composição é a saída do nó (o nó entra no grafo do passe da bruma e o updateBefore roda) */
@@ -21291,13 +21337,17 @@ const dentro = uv => { const { min, smoothstep, float } = window.TSL; return smo
 const gira = p => { const { vec3, dot } = window.TSL; return vec3(dot(p, vec3(0.8, 0.36, -0.48)), dot(p, vec3(-0.6, 0.48, -0.64)), dot(p, vec3(0, 0.8, 0.6))); };
 /* cor de uma amostra da nuvem: sol com a profundidade até o topo (Beer), céu em cima, a tinta do clima e a borda acesa (cobertura no meio e energia da abertura) */
 function luz(o) { const L = window.TSL; const { float, vec3, mix, max, pow, exp, dot, smoothstep } = L; const U = M5.u;
+  /* 5.0d.1: as entradas viram variáveis f32: no Firefox (Naga) uma conta só de literais dentro de exp() ou mix() fica "abstrata" fora de
+     expressão constante e o shader inteiro é recusado (a marcha não desenhava e o alvo dela ficava preto e opaco) */
+  const hR = float(o.hR).toVar(), prof = float(o.prof).toVar(), vaga = float(o.vaga).toVar(), C = float(o.C).toVar(), G = float(o.G).toVar();
   const kN = U.noite; const solI = float(1.25).mul(kN.oneMinus()).add(kN.mul(0.3));
-  const sunT = exp(o.prof.negate()).mul(o.sombra || float(1)).mul(mix(0.6, 1.12, o.vaga)); const ph = pow(max(dot(o.rd, U.solDir), 0.0), 6.0).mul(0.55).add(0.8); /* vaga: o alto das vagas pega mais sol que o vale entre elas */
-  const alb = mix(vec3(0.74, 0.755, 0.79), U.clima.rgb, U.clima.a.mul(0.3));
-  const c = alb.mul(U.solCor.mul(solI).mul(sunT).mul(ph).add(U.ceuCor.mul(mix(0.22, 0.8, o.hR)).mul(0.75)));
-  const borda = smoothstep(0.02, 0.4, o.C).mul(float(1).sub(smoothstep(0.4, 0.95, o.C))); /* faixa larga e macia (sem riscos na parede do banco) */
+  const sunT = exp(prof.negate()).mul(o.sombra || float(1)).mul(mix(0.6, 1.12, vaga)); const ph = pow(max(dot(o.rd, U.solDir), 0.0), 6.0).mul(0.55).add(0.8); /* vaga: o alto das vagas pega mais sol que o vale entre elas */
+  const alb = mix(vec3(0.8, 0.815, 0.85), U.clima.rgb, U.clima.a.mul(0.3)); /* 5.0d.1: mais clara */
+  const c = alb.mul(U.solCor.mul(solI).mul(sunT).mul(ph).add(U.ceuCor.mul(mix(0.35, 0.9, hR)).mul(0.8)))
+    .add(vec3(0.1, 0.12, 0.17).mul(kN)); /* 5.0d.1: à noite um véu claro de luar (a composição nunca escurece o chão) */
+  const borda = smoothstep(0.02, 0.4, C).mul(float(1).sub(smoothstep(0.4, 0.95, C))); /* faixa larga e macia (sem riscos na parede do banco) */
   const corB = mix(vec3(1.0, 0.62, 0.26), vec3(0.62, 0.4, 1.3), kN); /* dourado de dia, éter à noite */
-  return c.add(corB.mul(borda.mul(kN.mul(0.55).add(0.28)).add(o.G.mul(2.2))).mul(float(1).sub(o.hR.mul(0.5)))); }
+  return c.add(corB.mul(borda.mul(kN.mul(0.55).add(0.28)).add(G.mul(2.2))).mul(float(1).sub(hR.mul(0.5))).mul(VEU.borda)); } /* 5.0d.1: borda acesa mais sutil */
 
 /* ---------- Alta e Ultra: a marcha de raio (passe em meia resolução) ---------- */
 function marcha(nd) {
@@ -21343,9 +21393,6 @@ function marcha(nd) {
             t.addAssign(jit.mul(PASSO * 0.4).add(PASSO * 0.8)); }); /* passo com o tremor do pixel: sem faixas na parede do banco */
       });
     });
-    const DBG = +(Q.get('m5nuvensdbg') || 0); /* diagnóstico: 1 posição do chão do pixel (grade de 100), 2 memória no chão do pixel (R cobertura, G alvo) */
-    if (DBG === 1) return vec4(L.fract(wp.x.div(100)), L.fract(wp.z.negate().div(100)), 0, 1);
-    if (DBG === 2) return vec4(mE.r, mE.a, 0, 1);
     /* os passos acabaram longe (vista baixa, raio rasante): o resto do raio vira a camada da Média (o plano do topo), sem buraco escuro no horizonte */
     If(t.lessThan(t1).and(T.greaterThan(0.05)), () => {
       const tL = max(t, mE.b.add(H * 0.62).sub(co.y).div(ry)); const q = co.add(rd.mul(min(tL, tEnd))).toVar(); const nq = R3.sample(q.mul(S1).add(U.vento.xyz)).level(0);
@@ -21358,26 +21405,48 @@ function marcha(nd) {
 /* ---------- composição na resolução cheia (no passe da bruma: depois da oclusão, antes da bruma) ----------
    Alta e Ultra: dos 4 texels da marcha em volta, se as profundidades batem com a do pixel, a bilinear; se não (borda de unidade, de construção,
    do relevo), o texel de profundidade mais próxima (sem halo). Média: a camada. */
+/* 5.0d.1: o fim comum das duas composições — à prova de falha e leve:
+   - "à vista nunca coberto" sem depender da memória: a névoa de guerra do próprio chão (ARD.m5.tex.nevoa) lida no ponto do chão do pixel (pela
+     profundidade) e no ponto em que o raio corta o plano do chão no alvo da câmera (sem a profundidade); onde qualquer um dos dois já foi visto, a
+     nuvem zera;
+   - opacidade no máximo VEU.dia (0,5) de dia e VEU.noite (0,32) à noite;
+   - a nuvem só clareia: o pixel nunca fica mais escuro que o chão debaixo dela (c + a × max(cor − c, 0));
+   - ?m5nuvensdbg=1|2|3 sai aqui, nas duas versões (1 posição do chão, 2 memória × névoa, 3 a opacidade final). */
+function fim(nd, c, aBruto, cor, dz) {
+  const L = window.TSL; const { float, vec2, vec3, vec4, max, min, mix, smoothstep, select, uv, getViewPosition, fract } = L; const U = nd.U, S = nd.S, nev = M5.tex.nevoa;
+  const vp = getViewPosition(uv(), dz, U.projInv); const wp = U.camMundo.mul(vec4(vp, 1)).xyz.toVar(); const co = U.camPos; const ceu = dz.greaterThanEqual(0.99999);
+  const rd = L.normalize(wp.sub(co)).toVar(); const desce = rd.y.lessThan(-0.004);
+  const visE = smoothstep(0.25, 0.42, nev.sample(mapUV(wp)).level(0).r).mul(select(ceu, float(0), float(1)));
+  const qP = co.add(rd.mul(max(U.alvoY.sub(co.y).div(min(rd.y, -0.004)), 0.0))); const visP = smoothstep(0.25, 0.42, nev.sample(mapUV(qP)).level(0).r).mul(select(desce, float(1), float(0)));
+  const prot = max(visE, visP).toVar();
+  const aMax = mix(float(VEU.dia), float(VEU.noite), M5.u.noite);
+  const a = L.clamp(aBruto, 0.0, 1.0).mul(aMax).mul(prot.oneMinus()).toVar();
+  const DBG = +(Q.get('m5nuvensdbg') || 0);
+  if (DBG === 1) return vec4(fract(wp.x.div(100)), fract(wp.z.negate().div(100)), select(ceu, float(1), float(0)), 1);
+  if (DBG === 2) { const m = S.mem.sample(mapUV(wp)).level(0); return vec4(m.r, m.a, nev.sample(mapUV(wp)).level(0).r, 1); }
+  if (DBG === 3) return vec4(vec3(a.div(max(aMax, 0.01))), 1);
+  return vec4(c.rgb.add(max(cor.sub(c.rgb), vec3(0)).mul(a)), c.a);
+}
 function compoeMarcha(nd) {
   const L = window.TSL; const { Fn, If, float, vec2, vec4, floor, fract, abs, max, min, select, uv, perspectiveDepthToViewZ } = L; const U = nd.U, S = nd.S, c = nd.cor, depth = nd.profT;
   return Fn(() => { const res = vec4(c).toVar();
-    If(S.U.liga.greaterThan(0.5), () => {
+    If(S.U.liga.greaterThan(DBGN ? -1 : 0.5), () => { /* 5.0d.1: com ?m5nuvensdbg a composição roda sempre (mesmo com as nuvens desligadas por falha) */
       const pF = uv().mul(U.tamF).sub(0.5); const jf = pF.div(RES); const j0 = floor(jf).toVar(); const f = fract(jf).toVar(); const jm = U.tamB.sub(1);
       const lin = d => perspectiveDepthToViewZ(d, U.pertoLonge.x, U.pertoLonge.y).negate();
-      const zF = lin(depth.sample(uv()).r).toVar(); /* profundidade sem .level(): na reserva WebGL2 o textureLod de profundidade do r186 sai sem o .x (não compila); o ramo é uniforme */
+      const dz = depth.sample(uv()).r.toVar(); const zF = lin(dz).toVar(); /* profundidade sem .level(): na reserva WebGL2 o textureLod de profundidade do r186 sai sem o .x (não compila); o ramo é uniforme */
       const uvD = j => j.mul(RES).add(0.5).div(U.tamF); const j00 = min(j0, jm), j10 = min(j0.add(vec2(1, 0)), jm), j01 = min(j0.add(vec2(0, 1)), jm), j11 = min(j0.add(vec2(1, 1)), jm);
       const e00 = abs(lin(depth.sample(uvD(j00)).r).sub(zF)).toVar(), e10 = abs(lin(depth.sample(uvD(j10)).r).sub(zF)).toVar(), e01 = abs(lin(depth.sample(uvD(j01)).r).sub(zF)).toVar(), e11 = abs(lin(depth.sample(uvD(j11)).r).sub(zF)).toVar();
       const tol = zF.mul(0.035).add(1.5); const ok = max(max(e00, e10), max(e01, e11)).lessThan(tol);
       const jA = select(e00.lessThanEqual(e10), j00, j10), eA = min(e00, e10), jB = select(e01.lessThanEqual(e11), j01, j11), eB = min(e01, e11); const jN = select(eA.lessThanEqual(eB), jA, jB);
       const uvB = select(ok, j0.add(f).add(0.5), jN.add(0.5)).div(U.tamB); /* bilinear entre os centros, ou o centro do mais próximo */
       const n = nd.saida.sample(uvB).level(0).toVar();
-      res.assign(vec4(c.rgb.mul(n.a.oneMinus()).add(n.rgb), c.a)); });
+      res.assign(fim(nd, c, n.a, n.rgb.div(max(n.a, 0.002)), dz)); }); /* 5.0d.1: a cor média da nuvem (o alvo guarda cor × cobertura) e o fim comum */
     return res; })();
 }
 function compoeCamada(nd) {
   const L = window.TSL; const { Fn, If, float, vec3, vec4, max, min, clamp, mix, smoothstep, length, select, uv, getViewPosition } = L; const U = nd.U, S = nd.S, mem = S.mem, R3 = S.ruido, H = CFG.camada.topo, c = nd.cor, depth = nd.profT;
   return Fn(() => { const res = vec4(c).toVar();
-    If(S.U.liga.greaterThan(0.5), () => {
+    If(S.U.liga.greaterThan(DBGN ? -1 : 0.5), () => { /* 5.0d.1: com ?m5nuvensdbg a composição roda sempre (mesmo com as nuvens desligadas por falha) */
       const dz = depth.sample(uv()).r.toVar(); /* sem .level() (idem) */ const vp = getViewPosition(uv(), dz, U.projInv); const wp = U.camMundo.mul(vec4(vp, 1)).xyz.toVar(); const co = U.camPos;
       const dv = wp.sub(co); const tE = length(dv).toVar(); const rd = dv.div(max(tE, 0.001)).toVar(); const ceu = dz.greaterThanEqual(0.99999);
       const uE = mapUV(wp).toVar(); const mE = mem.sample(uE).level(0).toVar(); const ry = min(rd.y, -0.004);
@@ -21389,7 +21458,7 @@ function compoeCamada(nd) {
       const vistoE = float(1).sub(smoothstep(0.08, 0.5, mE.a)).mul(select(ceu, float(0), float(1)));
       const a = a0.mul(vistoE.oneMinus()).mul(select(rd.y.lessThan(-0.004), float(1), float(0))).toVar(); /* chão do pixel já visto: nada de nuvem na frente */
       const col = luz({ rd, hR: nv.r.mul(0.35).add(0.65), C, G: max(mQ.g, mE.g), prof: float(0.12).add(nv.g.oneMinus().mul(0.5)), vaga: nv.g });
-      res.assign(vec4(mix(c.rgb, col, a), c.a)); });
+      res.assign(fim(nd, c, a, col, dz)); }); /* 5.0d.1: o fim comum (proteção pela névoa do chão, limite e só clarear) */
     return res; })();
 }
 
@@ -21403,12 +21472,12 @@ NV.compor = function (c, depth, sp, camera, q) {
    no quadro, no mínimo ×0,4 (a sombra da nuvem, sem o anel preto nas bordas finas). O explorado (×0,46) e o à vista não mudam. O uniform vale 0,4
    só nos quadros em que o nó das nuvens rodou (Baixa, celular ou qualidade trocada: 0, a imagem de hoje) */
 let PISO = null;
-NV.piso = () => PISO || (PISO = window.TSL.uniform(0).onFrameUpdate(({ frameId }) => (SH && SH.quadro >= 0 && frameId - SH.quadro <= 2 ? 0.4 : 0)));
+NV.piso = () => PISO || (PISO = window.TSL.uniform(0).onFrameUpdate(({ frameId }) => (SH && SH.quadro >= 0 && frameId - SH.quadro <= 2 && !SH.falha ? 0.4 : 0))); /* 5.0d.1: com as nuvens desligadas por falha, o chão de hoje */
 M5.nevoaChao = fv => { const L = window.TSL; return L.max(L.mix(0.06, 1.0, fv), NV.piso()); };
 /* testes e fotos: no próximo quadro a memória vai direto ao alvo (sem a abertura) */
 NV.assentar = () => { if (SH) SH.assenta = true; };
 /* diagnóstico: o estado da memória e a versão em uso */
-NV.estado = () => { const S = SH; return S ? { modo: NV.modoAtual || null, temNuvem: S.temNuvem, calma: +S.calma.toFixed(2), alturas: S.hLo != null ? [Math.round(S.hLo), Math.round(S.hHi)] : null, geraMs: S.geraMs, ruidoMs: S.ruidoMs, res: RES } : { modo: NV.modoAtual || null }; };
+NV.estado = () => { const S = SH; return S ? { modo: NV.modoAtual || null, temNuvem: S.temNuvem, calma: +S.calma.toFixed(2), alturas: S.hLo != null ? [Math.round(S.hLo), Math.round(S.hHi)] : null, geraMs: S.geraMs, ruidoMs: S.ruidoMs, res: RES, falha: S.falha || null, prova: S.prova != null ? S.prova : null, firefox: FIREFOX, veu: VEU } : { modo: NV.modoAtual || null }; };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Renderizador 3D do jogo (Three.js, v3.0a): mesma interface do renderizador 2D. Câmera RTS, instancing por modelo,
@@ -22307,7 +22376,7 @@ function create(canvas, overlay, mini) {
     const bg = _bgC.setRGB(0.62 * (1 - nt) + 0.07 * nt, 0.69 * (1 - nt) + 0.09 * nt, 0.77 * (1 - nt) + 0.16 * nt);
     const cl = R.climateCfg;
     if (cl) {
-      const camD = (R.camDist || CAM.baseDist / Math.max(0.3, cam.zoom)); scene.fog.near = camD * cl.fogN; scene.fog.far = camD * cl.fogF;
+      const camD = (R.camDist || CAM.baseDist / Math.max(0.3, cam.zoom)); scene.fog.near = camD * (M5X ? Math.max(cl.fogN, 1.4) : cl.fogN); scene.fog.far = camD * (M5X ? Math.max(cl.fogF, 4) : cl.fogF); /* 5.0d.1: no Motor 5 sem pós (Baixa e celular) a névoa do clima começa longe como sem clima (a tóxica cobria o chão todo no celular) */
       bg.lerp(_cc.setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), cl.mix * (1 - nt * 0.45));
       if (cl.sun) sun.color.lerp(_cc.set(cl.sun), 0.5);
       if (cl.aurora) { const ka = (Math.sin(R.time * 0.3) + 1) / 2; bg.lerp(_cc.setRGB(cl.aurora[0], cl.aurora[1], cl.aurora[2]), 0.14 + 0.2 * ka); hemi.intensity += 0.15 * ka; }
@@ -22325,9 +22394,9 @@ function create(canvas, overlay, mini) {
     if (DR && (dressT -= dt) <= 0) { dressT = 1; try { DR.hideUnder(sim, H); DR.updateRoads(sim, H); } catch (e) {} } if (DR) DR.update(R.time, camera); /* 4.3c: o dress3d recorta os blocos por esta câmera */ if (LKS) LKS.update(dt, R.time, camera); if (SPC && R.cinturao) SPC.update(dt, R.time, camera); else if (M5X && R.cinturao && ARD.m5.espaco) ARD.m5.espaco.quadro(bg, scene.fog, nt); /* 5.0a.1: fundo e névoa de espaço no Cinturão do Motor 5, como o space3d faz no clássico */ if (STM) STM.update(dt, R.time, camera, sim.storm, sim); /* 4.3h */
     const pitchNow = R.pitchEff != null ? R.pitchEff : cam.pitch == null ? CAM.pitch : cam.pitch; const tilt = Math.max(0, Math.min(1, (CAM.pitch - pitchNow) / (CAM.pitch - CAM.minPitch)));
     if (tilt > 0) { scene.fog.near = Math.max(scene.fog.near, 900 + 1400 * tilt); scene.fog.far = Math.max(scene.fog.far, 3200 + 3800 * tilt); }
-    if (atmoFx) { const u = atmoFx.U; u.uAtCov.value = STM && STM.on && !DBG_OFF.has('cobertura') ? 1 : 0; /* 4.3h: o alfa só vale como cobertura com a tempestade no ar (?sem=cobertura desliga) */ const gcol = R.groundCol || bg; const AK = R.atmoK; u.uAtFog.value.copy(bg).lerp(_cc.copy(gcol).multiplyScalar(1.5), AK.warm * (1 - 0.6 * nt)); if (cl && cl.tint) u.uAtFog.value.lerp(_cc.setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), 0.25); u.uAtFar.value.copy(bg).lerp(_cc.setRGB(0.5, 0.62, 0.8), 0.25 * (1 - nt)); /* longe a bruma azula (perspectiva aérea) */
-      const fk = cl ? Math.max(1, Math.min(2.6, 3.4 / cl.fogF)) : 1; const camD = R.camDist || CAM.baseDist; u.uAtSun.value.copy(sun.color).multiplyScalar(AK.sun * (1 - 0.85 * nt)); u.uAtSunDir.value.set(R.sunDir[0], R.sunDir[1], R.sunDir[2]).normalize();
-      u.uAtP.value.set(AK.haze * fk / 2600, 1 / AK.hh, 0, camD * (cl ? Math.min(1, cl.fogN) * 0.5 : 0.6)); u.uAtQ.value.set(AK.air * fk / 14000, S.WORLD, R.time, DBG_OFF.has('nuvem') ? 0 : AK.cloud); u.uAtCloud.value = cloudTex; scene.fog.near = 1e7; scene.fog.far = 2e7; }
+    if (atmoFx) { const u = atmoFx.U; u.uAtCov.value = STM && STM.on && !DBG_OFF.has('cobertura') ? 1 : 0; /* 4.3h: o alfa só vale como cobertura com a tempestade no ar (?sem=cobertura desliga) */ const gcol = R.groundCol || bg; const AK = R.atmoK; u.uAtFog.value.copy(bg).lerp(_cc.copy(gcol).multiplyScalar(1.5), AK.warm * (1 - 0.6 * nt)); if (cl && cl.tint) u.uAtFog.value.lerp(_cc.setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), M5X ? 0.12 : 0.25); /* 5.0d.1: no Motor 5 a bruma do clima tinge menos (leitura de jogo) */ u.uAtFar.value.copy(bg).lerp(_cc.setRGB(0.5, 0.62, 0.8), 0.25 * (1 - nt)); /* longe a bruma azula (perspectiva aérea) */
+      const fk = cl ? Math.max(1, Math.min(M5X ? 1.15 : 2.6, 3.4 / cl.fogF)) : 1; /* 5.0d.1: no Motor 5 o clima engrossa a bruma no máximo 15% (era até 2,6×: a névoa tóxica lavava as unidades) */ const camD = R.camDist || CAM.baseDist; u.uAtSun.value.copy(sun.color).multiplyScalar(AK.sun * (1 - 0.85 * nt)); u.uAtSunDir.value.set(R.sunDir[0], R.sunDir[1], R.sunDir[2]).normalize();
+      u.uAtP.value.set(AK.haze * fk / 2600, 1 / AK.hh, 0, camD * (cl ? (M5X ? Math.max(0.9, Math.min(1, cl.fogN)) : Math.min(1, cl.fogN)) * 0.5 : 0.6) /* 5.0d.1: no Motor 5 a bruma do clima começa quase onde começa sem clima (a tóxica começava a 0,22 da câmera) */); u.uAtQ.value.set(AK.air * fk / 14000, S.WORLD, R.time, DBG_OFF.has('nuvem') ? 0 : AK.cloud); u.uAtCloud.value = cloudTex; scene.fog.near = 1e7; scene.fog.far = 2e7; }
     if (R.terrShader && R.terrShader.uniforms.uCloudK) R.terrShader.uniforms.uCloudK.value = atmoFx ? 0 : 1;
     if (sky) { const u = sky.userData.mat.uniforms; u.uHor.value.copy(atmoFx ? atmoFx.U.uAtFar.value : bg); u.uTop.value.copy(bg).multiplyScalar(0.55).lerp(_cc.setRGB(0.12, 0.2, 0.36), 0.5 * (1 - nt)); u.uBot.value.copy(bg).multiplyScalar(0.4); u.uNight.value = nt; u.uTime.value = R.time; u.uSunDir.value.set(R.sunDir[0], R.sunDir[1], R.sunDir[2]).normalize(); u.uSunCol.value.copy(sun.color); }
     // névoa de guerra e território → texturas do terreno
@@ -25600,13 +25669,13 @@ const RES3 = ['plasma', 'minerio', 'dados'], RES_CLS = { plasma: 'pl', minerio: 
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">' + Tx('geral.gratis') + '</span>'; } /* 5.0c */
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-31 03:29Z';
+const BUILD = '2026-10-31 18:08Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.0d';
+const VERSION = '5.0d.1';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }

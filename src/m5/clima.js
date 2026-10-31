@@ -25,25 +25,36 @@ const ACUM = QS.get('acumulo'); /* '1': tudo coberto desde o início (fotos); '0
 const VISUAL = {
   cristais: { nome: 'neve de cristais', vento: [15, -5],
     tipos: [{ f: 0.82, K: [-24, 0.45, 7, 0], L: [3.0, 0.85, 0.8, 0], M: [0, 0, 0], cor: [0.92, 0.95, 1.0] }, { f: 0.18, K: [-20, 0.45, 8, 0], L: [3.0, 0.7, 0.95, 3], M: [0, 0, 1.6], cor: [0.78, 0.93, 1.0] }],
-    chao: [0.95, 0, 0, 0], peca: [0.8, 0, 0, 0] },
+    chao: [0.95, 0, 0, 0], peca: [0.55, 0, 0, 0] }, /* 5.0d.1: peças 0,8 → 0,55 (a cor do time aparece) */
   aurora: { nome: 'neve fina e neblina fria', vento: [8, 4],
     tipos: [{ f: 1, K: [-14, 0.55, 5, 0], L: [2.0, 0.6, 0.7, 0], M: [0, 0, 0], cor: [0.9, 0.95, 1.0] }],
-    chao: [0.4, 0, 0, 0], peca: [0.42, 0, 0, 0], neblina: { cor: [0.6, 0.78, 0.8], dens: 0.36, alturas: [10, 26, 46], deriva: 0.6, noite: 0.05 } },
+    chao: [0.4, 0, 0, 0], peca: [0.3, 0, 0, 0], neblina: { cor: [0.6, 0.78, 0.8], dens: 0.2, alturas: [3, 6, 9], deriva: 0.6, noite: 0.05 } }, /* 5.0d.1: véu baixo e ralo (antes 0,36 em 10/26/46: cobria as unidades) */
   acida: { nome: 'chuva', vento: [6, -2],
-    tipos: [{ f: 1, K: [-240, 0.12, 2, 0], L: [0.3, 0.24, 0.3, 1], M: [0, 0.038, 0], cor: [0.7, 0.8, 0.66] }],
+    tipos: [{ f: 1, K: [-240, 0.12, 2, 0], L: [0.3, 0.24, 0.22, 1], M: [0, 0.038, 0], cor: [0.7, 0.8, 0.66] }],
     chao: [0, 0, 0, 1], peca: [0, 0, 0, 1], reflexo: true },
   plasma: { nome: 'tempestade de areia e cinza', vento: [24, -8],
     tipos: [{ f: 0.42, K: [-10, 1.0, 6, 0], L: [1.2, 0.9, 0.75, 0], M: [0, 0, 0], cor: [0.32, 0.3, 0.29] }, { f: 0.2, K: [26, 0.65, 14, 0], L: [0, 0.45, 1.0, 2], M: [4.5, 0, 2.6], cor: [1.0, 0.42, 0.12] },
       { f: 0.38, K: [0, 2.6, 4, 7], L: [0, 0.45, 0.32, 1], M: [3.5, 0.1, 0], cor: [0.72, 0.56, 0.38] }],
-    chao: [0, 0.75, 0.65, 0], peca: [0, 0.55, 0.5, 0], neblina: { cor: [0.66, 0.5, 0.34], dens: 0.42, alturas: [6, 18, 34], deriva: 2.2, noite: 0, limiar: 0.18 } },
+    chao: [0, 0.75, 0.65, 0], peca: [0, 0.3, 0.4, 0], neblina: { cor: [0.66, 0.5, 0.34], dens: 0.24, alturas: [3, 6, 9], deriva: 2.2, noite: 0, limiar: 0.18 } }, /* 5.0d.1: antes 0,42 em 6/18/34 */
   toxica: { nome: 'névoa tóxica', vento: [9, -3],
     tipos: [{ f: 1, K: [-3, 0.55, 9, 0], L: [3.0, 0.7, 0.8, 2], M: [0, 0, 0.9], cor: [0.55, 0.95, 0.35] }],
-    chao: [0, 0, 0, 0.3], peca: [0, 0, 0, 0.2], neblina: { cor: [0.45, 0.62, 0.28], dens: 0.5, alturas: [8, 22, 40], deriva: 0.5, noite: 0.12 } },
+    chao: [0, 0, 0, 0.3], peca: [0, 0, 0, 0.2], neblina: { cor: [0.45, 0.62, 0.28], dens: 0.28, alturas: [3, 6, 9], deriva: 0.5, noite: 0.12 } }, /* 5.0d.1: antes 0,5 em 8/22/40 */
 };
+/* 5.0d.1: o "Automático (pelo bioma)" com clima leve, só visual: o mapa decide (Cinturão → cinza fina; na Fenda, gelo ≥ 30% → neve fina,
+   tundra ≥ 28% → chuva leve, senão poeira de areia: o deserto de rocha é o maior bioma de quase todo mapa). Poucas partículas finas, sem neblina,
+   cobertura discreta (leve: tinge, não cobre), sem poças nem reflexo; nada na Baixa e no celular. ?climaauto=0 desliga */
+const AUTO = {
+  neve: { nome: 'automático: neve fina (gelo)', leve: true, vento: [7, 3], tipos: [{ f: 1, K: [-12, 0.5, 4, 0], L: [1.5, 0.45, 0.5, 0], M: [0, 0, 0], cor: [0.92, 0.95, 1.0] }], chao: [0.12, 0, 0, 0], peca: [0.12, 0, 0, 0] }, /* geada: no fim do acúmulo clareia o chão em volta das unidades ~10% */
+  chuva: { nome: 'automático: chuva leve (tundra)', leve: true, poca: false, vento: [5, -2], tipos: [{ f: 1, K: [-220, 0.12, 2, 0], L: [0.25, 0.2, 0.16, 1], M: [0, 0.03, 0], cor: [0.75, 0.82, 0.9] }], chao: [0, 0, 0, 0.3], peca: [0, 0, 0, 0.3] },
+  areia: { nome: 'automático: poeira de areia (deserto de rocha)', leve: true, vento: [16, -6], tipos: [{ f: 1, K: [0, 2.2, 3, 5], L: [0, 0.35, 0.16, 1], M: [3, 0.08, 0], cor: [0.74, 0.6, 0.42] }], chao: [0, 0, 0.12, 0], peca: [0, 0, 0.1, 0] },
+  cinza: { nome: 'automático: cinza fina (Cinturão)', leve: true, vento: [6, 2], tipos: [{ f: 1, K: [-7, 0.8, 5, 0], L: [1.0, 0.5, 0.42, 0], M: [0, 0, 0], cor: [0.4, 0.38, 0.37] }], chao: [0, 0.12, 0, 0], peca: [0, 0.06, 0, 0] },
+};
+const AUTO_N = [0, 1024, 2048, 3072]; /* partículas do automático por nível (0 = Baixa e celular: nada) */
+const AUTO_LIGADO = QS.get('climaauto') !== '0';
 /* partículas e camadas por nível: 0 Baixa e celular (o mais barato), 1 Média, 2 Alta, 3 Ultra */
 const NIVEL = [{ n: 1536, camadas: 1 }, { n: 4096, camadas: 2 }, { n: 12288, camadas: 3 }, { n: 20480, camadas: 3 }];
 
-const C = M5.clima = { VISUAL, vis: null, nome: null, nivel: 1, ativo: false, montado: false, pipes: 0, N: 0, nAtivo: 0, U: null };
+const C = M5.clima = { VISUAL, AUTO, vis: null, nome: null, nivel: 1, ativo: false, montado: false, pipes: 0, N: 0, nAtivo: 0, U: null };
 
 /* ---------- uniforms do clima (criados uma vez, compartilhados por todos os materiais) ---------- */
 function init() {
@@ -70,8 +81,10 @@ C.init = init;
 /* ---------- escolha (R.setClimate, antes da carga): o visual, o nível e se o pós precisa do reflexo ---------- */
 C.escolher = function (nome, cfg, R, toque) {
   const v = LIGADO && cfg ? VISUAL[nome] || null : null; const antes = !!(C.vis && C.vis.reflexo && C.reflexoNivel());
+  C.autoPend = !!(LIGADO && AUTO_LIGADO && !cfg && !toque); /* 5.0d.1: o automático decide na montagem, pelo mapa */
   C.vis = v; C.nome = v ? nome : null; C.cfg = cfg || null; C.R = R; C.toque = !!toque;
   const q = R && R.quality ? (R.quality.resolved || R.quality.name) : 'media'; C.nivel = toque || q === 'baixa' ? 0 : q === 'ultra' ? 3 : q === 'alta' ? 2 : 1;
+  if (C.autoPend && C.nivel < 1) C.autoPend = false; /* 5.0d.1: Baixa: nada */
   C.ativo = !!v; const U = init(); U.nivel.value = C.nivel; U.cratera.value = C.nivel > 0 && !toque ? 1 : 0;
   return antes !== !!(C.vis && C.vis.reflexo && C.reflexoNivel()); /* true: o render3d refaz o pós (o reflexo entra ou sai) */
 };
@@ -114,7 +127,7 @@ G.chao.cor = function (ctx) {
   if (sc && (V.chao[0] > 0 || V.chao[2] > 0)) { const X = M5.tex.cicatrizes, uv0 = mapUV(pw), e = float(4.5).div(M5.u.mundo); const r = (du, dv) => X.sample(uv0.add(vec2(du, dv))).setUpdateMatrix(false).r;
     trS = r(e, e).add(r(e.negate(), e)).add(r(e, e.negate())).add(r(e.negate(), e.negate())).mul(0.25).mul(k); } /* na neve e na areia, a trilha borrada em ~1,5 texel: o desenho da esteira (1,7 unidade) é mais fino que o texel do mapa na Média e, com o contraste da neve, serrilhava em quadradinhos */
   const tr = trS ? trS : tr0;
-  const cobre = (q, lim, inv) => clamp(q.mul(1.35).sub(float(1).sub(plano).mul(lim)).sub((inv ? var0 : float(1).sub(var0)).mul(inv ? 0.9 : 0.42)).mul(2.2), 0.0, 1.0); /* sobe com o acúmulo, primeiro no plano e no macio (inv: nas manchas do outro lado da variação) */
+  const cobre = (q, lim, inv) => V.leve ? q.mul(plano).mul((inv ? float(1).sub(var0) : var0).mul(0.6).add(0.4)) /* 5.0d.1: automático leve: no máximo a fração do acúmulo, sem cobrir */ : clamp(q.mul(1.35).sub(float(1).sub(plano).mul(lim)).sub((inv ? var0 : float(1).sub(var0)).mul(inv ? 0.9 : 0.42)).mul(2.2), 0.0, 1.0); /* sobe com o acúmulo, primeiro no plano e no macio (inv: nas manchas do outro lado da variação) */
   if (V.chao[0] > 0) { /* neve: cobre o plano, derrete no queimado quente, as trilhas abrem até o chão e as pegadas afundam */
     const cr = sc ? sc.b : float(0); const c0 = cobre(CC.x, 1.1).mul(k).mul(float(1).sub(smoothstep(0.3, 0.9, quente))).mul(float(1).sub(smoothstep(0.3, 0.8, bu).mul(0.9))).mul(float(1).sub(smoothstep(0.08, 0.45, cr))); /* derrete no queimado e na cratera */
     const c = c0.mul(float(1).sub(tr.mul(0.82)));
@@ -132,13 +145,14 @@ G.chao.cor = function (ctx) {
     alb.assign(mix(alb, areia, c.mul(0.85))); rough.assign(mix(rough, 0.93, c)); hgt.assign(mix(hgt, rip.mul(0.22).add(soft.mul(0.08)), c));
     hgt.addAssign(tr.mul(c0).mul(-0.6)); alb.mulAssign(float(1).sub(tr.mul(c0).mul(0.22))); }
   if (V.chao[3] > 0) { /* molhado: solo escuro e mais liso; poças (planas, quase espelho) com o céu refletido e as ondas da chuva */
-    const w = CC.w.mul(k); const esc = mix(float(1), float(0.5), w.mul(soft.oneMinus().mul(0.35).add(0.65)).mul(float(1).sub(Bw.z.mul(0.5)))); /* o capim escurece menos que a terra e a areia */ alb.assign(alb.mul(esc).mul(mix(vec3(1), vec3(0.96, 0.98, 1.04), w))); rough.assign(mix(rough, rough.mul(0.5), w)); /* solo molhado: mais escuro, um pouco mais frio e liso */
+    const w = CC.w.mul(k); const esc = mix(float(1), float(0.72), w.mul(soft.oneMinus().mul(0.35).add(0.65)).mul(float(1).sub(Bw.z.mul(0.5)))); /* 5.0d.1: o chão molhado escurece no máximo 28% (antes 50%) */ /* o capim escurece menos que a terra e a areia */ alb.assign(alb.mul(esc).mul(mix(vec3(1), vec3(0.96, 0.98, 1.04), w))); rough.assign(mix(rough, rough.mul(0.5), w)); /* solo molhado: mais escuro, um pouco mais frio e liso */
+    if (V.poca !== false) { /* 5.0d.1: a chuva leve do automático não faz poça */
     const pd = poca(gp, false, chaoEm(pw.x, pw.z)).mul(smoothstep(0.55, 1.0, plano)).mul(w).toVar('ardPoca');
-    alb.mulAssign(mix(float(1), float(0.28), pd)); rough.assign(mix(rough, 0.04, pd));
+    alb.mulAssign(mix(float(1), float(0.5), pd)); /* 5.0d.1: antes 0,28 */ rough.assign(mix(rough, 0.04, pd));
     const rp = vec2(0).toVar('ardOnda'); If(U.nivel.greaterThan(0.5).and(U.dens.greaterThan(0.05)), () => { rp.assign(ondas(gp, MU.tempo).mul(U.dens)); });
     hgt.assign(mix(hgt, rp.x.add(rp.y).mul(0.07), pd));
     const fr = pow(float(1).sub(clamp(dot(ctx.wn || vec3(0, 1, 0), normalize(cameraPosition.sub(positionWorld))), 0.0, 1.0)), 5.0).mul(0.7).add(0.22); /* Fresnel da água (com o céu claro sobre o solo escuro, a poça brilha mais que a conta física) (normal da geometria: a normal final do chão monta depois da cor) */
-    tEmis.addAssign(MU.ceuCor.mul(pd).mul(fr).mul(0.75)); }
+    tEmis.addAssign(MU.ceuCor.mul(pd).mul(fr).mul(0.75)); } }
   return null;
 };
 /* crateras: o chão afunda pelo canal b do mapa de cicatrizes (tigela) e levanta a borda (5 amostras no vértice: o mapa é mais fino que a malha) */
@@ -170,10 +184,10 @@ let PK = null; /* as máscaras desta montagem (o setupDiffuseColor monta antes d
 function camadaPeca(dc, fv, k0) {
   PK = null; const V = C.vis; if (!V) return; const { float, vec3, mix, smoothstep, clamp, dot, normalWorld, positionWorld, Var } = L(); const U = init(); const P = U.cobrePeca;
   const n = normalWorld; const nz = M5.vnoise2(positionWorld.xz.mul(0.45)).sub(0.5); const fk = fv ? mix(float(0.06), float(1.0), fv) : float(1); const K = { neve: null, cinza: null, areia: null, molhado: null };
-  if (V.peca[0] > 0) { K.neve = Var(smoothstep(0.38, 0.8, n.y.add(nz.mul(0.4))).mul(P.x).mul(k0), 'ardNeveP'); dc.rgb.assign(mix(dc.rgb, vec3(0.84, 0.88, 0.94).mul(fk), K.neve.mul(0.9))); }
-  if (V.peca[1] > 0) { K.cinza = Var(smoothstep(0.32, 0.8, n.y.add(nz.mul(0.45))).mul(P.y).mul(k0), 'ardCinzaP'); dc.rgb.assign(mix(dc.rgb, vec3(0.13, 0.125, 0.12).mul(fk), K.cinza.mul(0.85))); }
+  if (V.peca[0] > 0) { K.neve = Var(smoothstep(0.38, 0.8, n.y.add(nz.mul(0.4))).mul(P.x).mul(k0), 'ardNeveP'); dc.rgb.assign(mix(dc.rgb, vec3(0.84, 0.88, 0.94).mul(fk), K.neve.mul(0.7))); /* 5.0d.1: 0,9 → 0,7 */ }
+  if (V.peca[1] > 0) { K.cinza = Var(smoothstep(0.32, 0.8, n.y.add(nz.mul(0.45))).mul(P.y).mul(k0), 'ardCinzaP'); dc.rgb.assign(mix(dc.rgb, vec3(0.26, 0.25, 0.24).mul(fk), K.cinza.mul(0.7))); /* 5.0d.1: cinza clara (antes 0,13 × 0,85: escurecia as unidades) */ }
   if (V.peca[2] > 0) { const bar = smoothstep(0.1, 0.7, dot(n.xz, vec3(U.vento.x, 0, U.vento.y).xz.negate())); K.areia = Var(clamp(bar.mul(0.55).add(smoothstep(0.5, 0.9, n.y).mul(0.45)).add(nz.mul(0.3)), 0.0, 1.0).mul(P.z).mul(k0), 'ardAreiaP'); dc.rgb.assign(mix(dc.rgb, vec3(0.62, 0.48, 0.32).mul(fk), K.areia.mul(0.75))); }
-  if (V.peca[3] > 0) { K.molhado = Var(P.w.mul(k0), 'ardMolhadoP'); dc.rgb.mulAssign(mix(float(1), float(0.62), K.molhado)); }
+  if (V.peca[3] > 0) { K.molhado = Var(P.w.mul(k0), 'ardMolhadoP'); dc.rgb.mulAssign(mix(float(1), float(0.86), K.molhado)); /* 5.0d.1: antes 0,62 */ }
   PK = K;
 }
 function rugPeca(m) {
@@ -194,14 +208,22 @@ C.pegadas = function (x, y) {
 C.montar = function (o) {
   const X = o.X, scene = o.scene; C.terr = o.terr || null; C.camera = o.camera; C.H = o.H; init();
   if (o.heights && o.HN) alturas(o.heights, o.HN, o.HS, o.W);
+  if (C.autoPend && !C.vis && !C.montado) { const t = autoTipo(o.sim || (C.R && C.R.sim)); if (t) { C.vis = AUTO[t]; C.nome = 'auto-' + t; C.ativo = true; } C.autoPend = false; } /* 5.0d.1 */
   if (!C.vis || C.montado || !X) return; C.montado = true; C.X = X; const V = C.vis, U = C.U;
   const vn = Math.hypot(V.vento[0], V.vento[1]) || 1; U.vento.value.set(V.vento[0] / vn, -V.vento[1] / vn, vn, 0); /* o vento do preset: x do mapa → x do three; y do mapa → −z */
-  const nq = NIVEL[C.nivel]; const N = Math.max(256, Math.min(32768, (+(QS.get('climaN') || 0) || nq.n))) & ~63; C.N = N; C.nAtivo = N;
+  const nq = NIVEL[C.nivel]; const N = Math.max(256, Math.min(32768, (+(QS.get('climaN') || 0) || (V.leve ? AUTO_N[C.nivel] : nq.n)))) & ~63; C.N = N; C.nAtivo = N; { const sm = o.sim || (C.R && C.R.sim); C.t0 = sm ? sm.time : 0; } /* 5.0d.1: o automático leve tem a sua conta; o acúmulo segue o relógio do jogo */
   particulas(N, o.H, o.cam); scene.add(C.malha);
   if (V.neblina) { neblina(nq.camadas); scene.add(C.nevoa); }
   const r = X.renderer; if (X.isWebGPU && r.compileComputeAsync && M5.pendentes) M5.pendentes.push(() => r.compileComputeAsync([C.kernel])); /* na reserva WebGL2 o compute nasce no 1º passo, ainda no aquecimento (R.warming) */ /* o compute nasce na carga, junto com os outros pipelines */
   acumulo(0, true);
 };
+/* 5.0d.1: o visual do automático pelo mapa (só leitura da simulação: a fração de cada bioma nos tiles de chão) */
+function autoTipo(sim) {
+  const S = ARD.sim; if (!sim || !sim.biome || !S) return null; if (sim.map && sim.map.type === 'cinturao') return 'cinza';
+  const w = [0, 0, 0, 0]; const n = sim.biome.length, TL = Math.round(Math.sqrt(n)), TI = S.WORLD / TL; let t = 0;
+  for (let i = 0; i < n; i++) { if (S.mapCell && sim.map) { const x = (i % TL + 0.5) * TI, y = (Math.floor(i / TL) + 0.5) * TI; if (S.mapCell(sim, x, y) !== 1) continue; } const m = sim.biomeMix[i] || 0; w[sim.biome[i]] += 1 - m; w[sim.biome2[i]] += m; t++; }
+  if (!t) return null; C.biomas = w.map(v => +(v / t).toFixed(3)); return w[0] / t >= 0.3 ? 'neve' : w[2] / t >= 0.28 ? 'chuva' : 'areia';
+}
 /* mapa de alturas do chão (R) e suavizado em ~150 unidades (G), meia precisão, para o compute, a neblina e o reflexo */
 function alturas(h, HN, HS, W) {
   const Tm = T(); const n = HN * HN, R = 8; const a = new Float32Array(n), b = new Float32Array(n);
@@ -291,7 +313,7 @@ function neblina(camadas) {
     return vec4(c.mul(a), a); })();
   M5.registrar('clima-neblina', m);
   const pg = new Tm.PlaneGeometry(1, 1, 40, 40); const g = new Tm.InstancedBufferGeometry(); g.index = pg.index; g.setAttribute('position', pg.attributes.position); g.setAttribute('uv', pg.attributes.uv); g.instanceCount = camadas; g.name = 'ard-clima-neblina';
-  const me = new Tm.Mesh(g, m); me.frustumCulled = false; me.castShadow = false; me.receiveShadow = false; me.renderOrder = 9; me.name = 'clima-neblina'; C.nevoa = me; C.nevoaGeo = g; C.camadas = camadas;
+  const me = new Tm.Mesh(g, m); me.frustumCulled = false; me.castShadow = false; me.receiveShadow = false; me.renderOrder = -1; me.name = 'clima-neblina'; /* 5.0d.1: antes dos anéis de seleção, do inimigo e dos efeitos (eles ficam por cima) */ C.nevoa = me; C.nevoaGeo = g; C.camadas = camadas;
 }
 
 /* ---------- reflexo de tela nas poças (Alta e Ultra, só com chuva): src/m5/pos.js chama na cadeia, depois da oclusão e antes da bruma ----------
@@ -329,6 +351,7 @@ C.reflexo = function (c, color, depth, camera, q) {
 let TACUM = 0;
 function acumulo(dt, zera) {
   const V = C.vis, U = C.U; if (!V || !U) return; if (zera) TACUM = 0; TACUM += dt; const f = ACUM === '1' ? 1 : ACUM === '0' ? 0 : null;
+  if (C.R && C.R.sim && C.t0 != null) TACUM = Math.max(0, C.R.sim.time - C.t0); /* 5.0d.1: o acúmulo segue o relógio da partida (pausa para, velocidade 2× acumula 2×) */
   if (C.forca) { U.cobreChao.value.fromArray(C.forca); U.cobrePeca.value.fromArray(C.forca); return; } /* ferramentas de teste: cobertura fixa (antes e depois na mesma carga) */
   const c = f != null ? f : Math.min(1, 0.4 + TACUM / 360), pm = f != null ? f : Math.min(1, TACUM / 150), pw = f != null ? f : Math.min(1, TACUM / 25);
   U.cobreChao.value.set(V.chao[0] * c, V.chao[1] * c, V.chao[2] * c, V.chao[3] * (f != null ? f : 1)); U.cobrePeca.value.set(V.peca[0] * pm, V.peca[1] * pm, V.peca[2] * pm, V.peca[3] * pw);
@@ -341,7 +364,7 @@ C.quadro = function (dt, cam, camera, R) {
   const g0 = C.H ? C.H(cam.x, cam.y) : 0; P.topo.value = Math.max(110, Math.min(420, (camera.position.y - g0) * 0.6)); P.dt.value = d; P.t.value = t;
   const V = C.vis; const rj = 1 + 0.35 * Math.sin(t * 0.13) + 0.15 * Math.sin(t * 0.37); const an = Math.atan2(-V.vento[1], V.vento[0]) + 0.3 * Math.sin(t * 0.021); U.vento.value.set(Math.cos(an), Math.sin(an), Math.hypot(V.vento[0], V.vento[1]) * rj, rj);
   U.dens.value = Math.max(0.35, Math.min(1, 0.8 + 0.2 * Math.sin(t * 0.045) + 0.1 * Math.sin(t * 0.17)));
-  const quer = +(QS.get('climaN') || 0) ? C.N : Math.min(C.N, NIVEL[C.nivel].n); C.nAtivo = Math.max(64, quer & ~63); P.n.value.w = C.nAtivo; C.geo.instanceCount = C.nAtivo; /* a qualidade pode baixar no meio da partida: menos partículas, o mesmo pipeline */
+  const quer = +(QS.get('climaN') || 0) ? C.N : Math.min(C.N, V.leve ? (AUTO_N[C.nivel] || 64) : NIVEL[C.nivel].n); C.nAtivo = Math.max(64, quer & ~63); P.n.value.w = C.nAtivo; C.geo.instanceCount = C.nAtivo; /* a qualidade pode baixar no meio da partida: menos partículas, o mesmo pipeline */
   acumulo(d, false); P.vento.value.copy(U.vento.value); P.altK.value.copy(U.altK.value); /* cópias para o compute (grupo próprio) */
   if (C.nevoa) { const B = C.B; const hb = 1100 / zf; const cel = hb * 2 / 40; B.centro.value.set(Math.round(cam.x / cel) * cel, Math.round(-cam.y / cel) * cel, hb * 2, 0); B.deriva.value.set(U.vento.value.x * t * U.vento.value.z * 0.0009 * V.neblina.deriva, -U.vento.value.y * t * U.vento.value.z * 0.0009 * V.neblina.deriva); C.nevoaGeo.instanceCount = Math.min(C.camadas, NIVEL[C.nivel].camadas); }
   if (C.S && C.cam) { const c = C.cam; C.S.proj.value.copy(c.projectionMatrix); C.S.projInv.value.copy(c.projectionMatrixInverse); C.S.vista.value.copy(c.matrixWorldInverse); C.S.mundo.value.copy(c.matrixWorld); }
