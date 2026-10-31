@@ -112,7 +112,10 @@ M5.buildPost = function (X, scene, camera, q, opts) {
     let c = base; let aoN = null;
     if (q.ssao && A.ao && !off.has('ao')) { aoN = A.ao(depth, null, camera); aoN.resolutionScale = q.aoHalf ? 0.5 : 1; aoN.radius.value = 14; aoN.thickness.value = 9; aoN.distanceExponent.value = 1.4; aoN.distanceFallOff.value = 1; aoN.scale.value = 1.25; aoN.samples.value = q.aoHalf ? 12 : q.resolved === 'ultra' ? 24 : 16;
       const ao = aoN.getTextureNode().r; c = vec4(c.rgb.mul(mix(vec3(0.03, 0.025, 0.03), vec3(1), ao)), c.a); } /* sombra de contato puxando para o tom do N8AO de hoje */
+    if (M5.clima && M5.clima.reflexo && !off.has('reflexo')) c = M5.clima.reflexo(c, color, depth, camera, q) || c; /* 5.0d: reflexo de tela nas poças da chuva (Alta e Ultra; src/m5/clima.js) */
+    if (M5.nuvens && M5.nuvens.compor && !off.has('nuvens')) c = M5.nuvens.compor(c, depth, sp, camera, q); /* 5.0d: nuvens de guerra (src/m5/nuvens.js) entre a oclusão e a bruma; sem efeito na Baixa e no celular */
     if (!off.has('bruma')) c = atmo(c, depth.r); else c = vec4(max(c.rgb, vec3(0)), 1);
+    if (M5.raiosSol && !off.has('raios')) { const rs = M5.raiosSol(c, depth, { camera, q, X }); if (rs) { c = rs.cor; sp.ardRaios = rs.no; } } /* 5.0d: raios de sol pela poeira e pela Tempestade (src/m5/ceu.js), só na Alta e na Ultra */
     c = convertToTexture(c); /* um alvo só para a cena com AO e bruma: o bloom e a gradação leem a mesma textura (a bruma não roda duas vezes) */
     const hdr = c, fim = cauda(meio ? meio(hdr, sp) : hdr);
     return { sp, aoN, hdr, bloomN: fim.bloomN, aa: fim.c };
@@ -125,7 +128,7 @@ M5.buildPost = function (X, scene, camera, q, opts) {
     setSize() { /* os nós do pós seguem o tamanho do renderer sozinhos */ },
     setPixelRatio() {},
     setScale(s) { P.scale = s; sp.setResolutionScale(s); }, /* só com ?m5up=fsr1 (resolução dinâmica no passe da cena) */
-    dispose() { try { pipe.dispose(); sp.dispose(); if (aoN) aoN.dispose(); if (bloomN) bloomN.dispose(); } catch (e) {} } };
+    dispose() { try { pipe.dispose(); sp.dispose(); if (aoN) aoN.dispose(); if (bloomN) bloomN.dispose(); if (sp.ardRaios) sp.ardRaios.dispose(); /* 5.0d */ } catch (e) {} } };
   return P;
 };
 })(globalThis.ARD = globalThis.ARD || {});

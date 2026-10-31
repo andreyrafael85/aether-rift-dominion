@@ -467,7 +467,12 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
 
 ### Onda 3 — Mundo vivo (tudo em TSL)
 
-#### 5.0d — Céu, clima e nuvens de guerra · tamanho G · 3 agentes
+#### 5.0d — Céu, clima e nuvens de guerra · tamanho G · 3 agentes · ✔ 31/10/2026
+**Entregue (31/10/2026), três agentes em paralelo (d-ceu, d-nuvens, d-clima), tudo só no Motor 5 e só visual:**
+- **Céu (`src/m5/ceu.js`):** o sol anda no ciclo de 12,5 min (meio-dia igual ao de antes, poente à frente da câmera padrão), a lua é a luz da noite, as estrelas giram em volta do polo e o céu é o Preetham do SkyMesh com nuvens e crepúsculo próprio, desenhado depois do opaco. As sombras giram em degraus de 0,25°, sem pipeline novo. A aurora vira cortinas em anel. O PMREM é refeito a cada 2° de hora (4° na Baixa), em 8 fases e com uma cópia de textura no fim. Os raios de sol (Alta e Ultra) são um nó próprio em ¼ da resolução, porque o `GodraysNode` do r186 não conhece o CSM.
+- **Nuvens de guerra (`src/m5/nuvens.js`):** um nó do pós entre a oclusão e a bruma. Na Alta e na Ultra é marcha de raio em meia resolução (26 e 40 passos); na Média, uma camada; na Baixa e no celular, como antes. A fonte é a névoa de guerra do chão.
+- **Clima (`src/m5/clima.js`):** partículas em compute que batem no relevo (1.536 na Baixa, 4.096 na Média, 12.288 na Alta e 20.480 na Ultra), neblina nos vales, acúmulo de neve, cinza, areia e molhado, poças com o reflexo de tela na Alta e na Ultra. Crateras que afundam, mato queimado e pegadas valem em toda partida. O "Automático (pelo bioma)" continua sem clima, até a decisão do dono.
+- **Carga no QA (Planície, Média):** 58 → 59 pipelines e 750 → ~770 KB de WGSL, sem pipeline tardio e sem erro.
 - **Céu:**
   - céu físico com nuvens (SkyMesh) e sol que anda: o ciclo de 12,5 min ganha nascer e pôr do sol, sombras que giram, lua e estrelas;
   - a aurora vira cortinas de luz no céu;

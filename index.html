@@ -1065,7 +1065,7 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
 
 
 <script>/* 5.0c: idioma antes da primeira pintura — fora do pt-BR, carrega aqui o dicionário do idioma (src/i18n/en.js ou es.js, 33 KB com gzip, enquanto o resto da página chega) e esconde o texto da tela inicial até o src/i18n.js (no fim da página) traduzir; a mesma regra de escolha do i18n.js */
-(function () { try { var q = (new URLSearchParams(location.search).get('lang') || '').toLowerCase(), s = ''; try { s = (localStorage.getItem('ard-idioma') || '').toLowerCase(); } catch (e) {} var l = /^(pt|en|es)/.test(q) ? q : /^(pt|en|es)/.test(s) ? s : ''; if (!l) { var ls = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']; for (var i = 0; i < ls.length && !l; i++) if (/^(pt|en|es)/i.test(ls[i])) l = ls[i].toLowerCase(); } if (!/^pt/.test(l)) { document.documentElement.classList.add('i18n-espera'); document.write('<script src="src/i18n/' + (/^es/.test(l) ? 'es' : 'en') + '.js?v=' + '2026-10-30 21:13Z'.replace(/[^0-9TZ]/g, '') + '"><\/script>'); } } catch (e) {} })();</script>
+(function () { try { var q = (new URLSearchParams(location.search).get('lang') || '').toLowerCase(), s = ''; try { s = (localStorage.getItem('ard-idioma') || '').toLowerCase(); } catch (e) {} var l = /^(pt|en|es)/.test(q) ? q : /^(pt|en|es)/.test(s) ? s : ''; if (!l) { var ls = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']; for (var i = 0; i < ls.length && !l; i++) if (/^(pt|en|es)/i.test(ls[i])) l = ls[i].toLowerCase(); } if (!/^pt/.test(l)) { document.documentElement.classList.add('i18n-espera'); document.write('<script src="src/i18n/' + (/^es/.test(l) ? 'es' : 'en') + '.js?v=' + '2026-10-31 03:29Z'.replace(/[^0-9TZ]/g, '') + '"><\/script>'); } } catch (e) {} })();</script>
 <div id="start" class="screen">
   <canvas id="bgfx" aria-hidden="true"></canvas>
   <!-- 5.0a.1: pôster da Sala de Comando (um render da própria Sala por Raça e por tela, em assets/sala-*.webp): entra na hora, antes da cena 3D -->
@@ -1079,7 +1079,7 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
   <div class="start-wrap">
     <header class="st-head">
       <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div class="brand-txt"><h1 data-i18n="inicio.aether-rift-dominion">Aether Rift<span>Dominion</span></h1><p class="tagline" data-i18n="inicio.nada-aqui-seu-ainda">Nada aqui é seu. Ainda.</p></div></div>
-      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.0c.2 · build 2026-10-30 21:13Z · Além da Fenda · Vozes gravadas · multiplayer 2 a 4</div>
+      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.0d · build 2026-10-31 03:29Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4</div>
       <div class="opt st-lang" data-idioma-sel="idioma-inicio"></div><!-- 5.0c: seletor de idioma, legível em qualquer idioma -->
     </header>
     <div class="start-grid">
@@ -1141,8 +1141,9 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
       </div>
       <div class="notes">
       <div class="choose" data-i18n="notas.notas-versao">Notas da versão</div>
+      <p class="start-notes" data-i18n="notas.5-0d"><b>5.0d — Céu, clima e nuvens de guerra:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o mundo ganhou vida. O sol anda no ciclo do dia, com nascer e pôr do sol, sombras que giram e, à noite, lua e estrelas; o reflexo do céu acompanha a hora. Na Alta e na Ultra, raios de sol atravessam a poeira e a Tempestade de Éter. O que nunca foi visto fica sob um banco de nuvens baixas, que se abre com a borda acesa quando as tropas chegam (da Média para cima). Os climas do campo (Jogar › Semente e clima) agora acontecem na placa de vídeo: neve de cristais que se acumula no chão e no alto das peças, neve fina e cortinas de luz na aurora, areia e cinza na tempestade de plasma, chuva com chão molhado e poças na chuva ácida, e bancos de névoa tóxica nos vales. E o chão guarda a batalha: crateras que afundam, mato queimado e pegadas na neve e na areia.</p>
+      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.0c.2 → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-0c-2"><b>5.0c.2 — Voz da Erevane e Sala mais rápida:</b> a Erevane ganhou um locutor masculino nos três idiomas. Os avisos, as eliminações e as respostas das unidades agora soam com corpo, sem perder o ar frio e o eco leve da Raça; a voz feminina fica só na Tessara, com a Sylvia Oriel. Na Sala de Comando, a saudação do líder sai logo depois da troca de Raça, sem esperar o navegador ficar livre: no Firefox, ela chegava a atrasar mais de dois segundos.</p>
-      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.0c.1 → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-0c-1"><b>5.0c.1 — Vozes gravadas:</b> o jogo agora fala com vozes gravadas nos três idiomas: uma voz para cada líder e para o locutor de cada Raça, com o caráter de cada mundo. São 766 falas por idioma: os avisos do locutor, as respostas das unidades ao selecionar, mover e atacar, as eliminações pelo nome, as reações do líder durante a partida e a campanha inteira falada, com a legenda e a boca do líder acompanhando cada palavra. Cada partida baixa só as falas da sua Raça, depois da carga. No iPhone, as falas saem pelo mesmo caminho dos efeitos. Em Ajustes, <b>Vozes gravadas</b> liga e desliga; sem elas, o jogo volta à voz do aparelho. Com o Motor 5, a partida prepara 22% menos shaders na carga e cada quadro gasta cerca de 14% menos CPU.</p>
       <p class="start-notes" data-i18n="notas.5-0c"><b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.</p>
       <p class="start-notes" data-i18n="notas.5-0b-1"><b>5.0b.1 — Motor 5 mais leve, faróis e som no iPhone:</b> com o <b>Motor 5</b> ligado, os shaders que ele prepara na carga encolheram um terço (os lagos primeiro) e cada quadro manda muito menos dados para a placa de vídeo, o que alivia a CPU no Firefox e no celular. O brilho em volta das luzes agora é o mesmo do motor clássico, e no Modo Foto da qualidade Baixa os efeitos seguem a exposição como no clássico. À noite e dentro da Tempestade de Éter, os faróis dos veículos, coletores e piratas iluminam o chão à frente, nos dois motores. A Sala de Comando ficou um pouco mais clara, sem o clarão de antes. No iPhone, o som e a voz destravam no primeiro toque, tocam com a chave de silêncio ligada e voltam depois de uma ligação. Cada líder fala com uma voz do seu gênero em todo navegador. Em Ajustes, <b>Testar som</b> toca três notas e uma frase e mostra o estado do áudio do aparelho.</p>
@@ -1786,7 +1787,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aqui é seu. Ainda.",
-  "inicio.versao": "Versão 5.0c.2 · build 2026-10-30 21:13Z · Além da Fenda · Vozes gravadas · multiplayer 2 a 4",
+  "inicio.versao": "Versão 5.0d · build 2026-10-31 03:29Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Escolha sua Raça",
   "inicio.vitrine.explorar-base": "Explorar a base",
   "inicio.vitrine.som-tela-inicial": "Som da tela inicial",
@@ -1855,12 +1856,13 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.btn-bench": "Testar desempenho (30 s)",
   "ajustes.cfg-feedback": "Enviar feedback",
   "notas.notas-versao": "Notas da versão",
+  "notas.5-0d": "<b>5.0d — Céu, clima e nuvens de guerra:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o mundo ganhou vida. O sol anda no ciclo do dia, com nascer e pôr do sol, sombras que giram e, à noite, lua e estrelas; o reflexo do céu acompanha a hora. Na Alta e na Ultra, raios de sol atravessam a poeira e a Tempestade de Éter. O que nunca foi visto fica sob um banco de nuvens baixas, que se abre com a borda acesa quando as tropas chegam (da Média para cima). Os climas do campo (Jogar › Semente e clima) agora acontecem na placa de vídeo: neve de cristais que se acumula no chão e no alto das peças, neve fina e cortinas de luz na aurora, areia e cinza na tempestade de plasma, chuva com chão molhado e poças na chuva ácida, e bancos de névoa tóxica nos vales. E o chão guarda a batalha: crateras que afundam, mato queimado e pegadas na neve e na areia.",
   "notas.5-0c-2": "<b>5.0c.2 — Voz da Erevane e Sala mais rápida:</b> a Erevane ganhou um locutor masculino nos três idiomas. Os avisos, as eliminações e as respostas das unidades agora soam com corpo, sem perder o ar frio e o eco leve da Raça; a voz feminina fica só na Tessara, com a Sylvia Oriel. Na Sala de Comando, a saudação do líder sai logo depois da troca de Raça, sem esperar o navegador ficar livre: no Firefox, ela chegava a atrasar mais de dois segundos.",
   "notas.5-0c-1": "<b>5.0c.1 — Vozes gravadas:</b> o jogo agora fala com vozes gravadas nos três idiomas: uma voz para cada líder e para o locutor de cada Raça, com o caráter de cada mundo. São 766 falas por idioma: os avisos do locutor, as respostas das unidades ao selecionar, mover e atacar, as eliminações pelo nome, as reações do líder durante a partida e a campanha inteira falada, com a legenda e a boca do líder acompanhando cada palavra. Cada partida baixa só as falas da sua Raça, depois da carga. No iPhone, as falas saem pelo mesmo caminho dos efeitos. Em Ajustes, <b>Vozes gravadas</b> liga e desliga; sem elas, o jogo volta à voz do aparelho. Com o Motor 5, a partida prepara 22% menos shaders na carga e cada quadro gasta cerca de 14% menos CPU.",
   "notas.5-0c": "<b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 mais leve, faróis e som no iPhone:</b> com o <b>Motor 5</b> ligado, os shaders que ele prepara na carga encolheram um terço (os lagos primeiro) e cada quadro manda muito menos dados para a placa de vídeo, o que alivia a CPU no Firefox e no celular. O brilho em volta das luzes agora é o mesmo do motor clássico, e no Modo Foto da qualidade Baixa os efeitos seguem a exposição como no clássico. À noite e dentro da Tempestade de Éter, os faróis dos veículos, coletores e piratas iluminam o chão à frente, nos dois motores. A Sala de Comando ficou um pouco mais clara, sem o clarão de antes. No iPhone, o som e a voz destravam no primeiro toque, tocam com a chave de silêncio ligada e voltam depois de uma ligação. Cada líder fala com uma voz do seu gênero em todo navegador. Em Ajustes, <b>Testar som</b> toca três notas e uma frase e mostra o estado do áudio do aparelho.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, em teste:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o jogo inteiro agora roda em WebGPU, com volta sozinha para WebGL2: unidades e construções com o detalhe de superfície e a animação de cada peça, ruínas, obras, o holograma da Erevane, os escudos do Uníssono e as bandeiras; o chão com todos os biomas, a vegetação ao vento, as estradas e o céu; explosões, fogo, fumaça e tiros; os lagos de plasma e de gelo com reflexo, o espaço do Cinturão e a Tempestade de Éter; e o <b>Modo Foto</b> (📷 ou tecla J) com desfoque, os 8 filtros e captura em 4K. Na primeira vez que o Modo Foto abre numa partida, ele leva alguns segundos para se preparar. Com tudo isso, a carga do Motor 5 ficou alguns segundos mais longa: a próxima versão mede nos aparelhos e enxuga. O motor clássico continua o padrão e não mudou.",
-  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0c.1 → 2.0)",
+  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0c.2 → 2.0)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Termos de Uso",
   "inicio.rodape.foot-priv": "Privacidade",
@@ -3179,7 +3181,7 @@ const pr = l => PR[l] || (PR[l] = new Intl.PluralRules(LOCALE[l] || l));
 function num(n, o) { if (typeof n !== 'number' || !isFinite(n)) return String(n); return nf(ARD.idioma, o || { maximumFractionDigits: 2 }).format(n); }
 function forma(v, n, l) { if (v == null || typeof v !== 'object') return v; const c = typeof n === 'number' ? (n === 0 && v.zero != null ? 'zero' : pr(l).select(n)) : 'other'; return v[c] != null ? v[c] : v.other != null ? v.other : v.one; }
 function busca(k, l) { const d = DIC[l]; return d && Object.prototype.hasOwnProperty.call(d, k) ? d[k] : undefined; }
-const MARCA_BUILD = '__' + 'BUILD__', CARIMBO = '2026-10-30 21:13Z'; /* o en e o es vêm em arquivo à parte, sem a troca do build: o carimbo entra aqui */
+const MARCA_BUILD = '__' + 'BUILD__', CARIMBO = '2026-10-31 03:29Z'; /* o en e o es vêm em arquivo à parte, sem a troca do build: o carimbo entra aqui */
 function preenche(s, vars) { if (s.indexOf(MARCA_BUILD) >= 0) s = s.split(MARCA_BUILD).join(CARIMBO); if (!vars || s.indexOf('{') < 0) return s; return s.replace(/\{(\w+)\}/g, (m, n) => Object.prototype.hasOwnProperty.call(vars, n) ? (typeof vars[n] === 'number' ? num(vars[n]) : String(vars[n])) : m); }
 function t(k, vars, reserva) { const l = ARD.idioma; let v = busca(k, l), ll = l; if (v === undefined) { v = busca(k, 'pt-BR'); ll = 'pt-BR'; } if (v === undefined) { if (reserva != null) return preenche(String(reserva), vars); falta(k); return k; }
   const s = forma(v, vars && vars.n, ll); return preenche(String(s == null ? '' : s), vars); }
@@ -3271,7 +3273,7 @@ function marcaHtml() { try { document.documentElement.lang = LANG_HTML[ARD.idiom
 /* carga dos dicionários: o pt-BR vem embutido no pacote (base e reserva); o en e o es são arquivos à parte (src/i18n/en.js e es.js, com o carimbo
    do build na URL), pedidos só por quem usa o idioma: o script do topo do <body> já carrega o do idioma escolhido antes do jogo; aqui, a troca
    na hora pede o outro. O service worker guarda os dois na instalação, então o jogo troca de idioma também sem internet. */
-const VER = '2026-10-30 21:13Z'.replace(/[^0-9TZ]/g, '');
+const VER = '2026-10-31 03:29Z'.replace(/[^0-9TZ]/g, '');
 const CARGAS = {};
 function carregar(l) { l = normaliza(l) || 'pt-BR'; if (DIC[l]) return Promise.resolve(l); if (CARGAS[l]) return CARGAS[l];
   return (CARGAS[l] = new Promise((ok, falha) => { const sc = document.createElement('script'); sc.src = 'src/i18n/' + l + '.js?v=' + VER; sc.onload = () => { if (DIC[l]) ok(l); else { CARGAS[l] = null; falha(new Error('dicionário vazio')); } }; sc.onerror = () => { CARGAS[l] = null; sc.remove(); falha(new Error('sem rede')); }; document.head.appendChild(sc); })); }
@@ -18553,7 +18555,10 @@ M5.buildPost = function (X, scene, camera, q, opts) {
     let c = base; let aoN = null;
     if (q.ssao && A.ao && !off.has('ao')) { aoN = A.ao(depth, null, camera); aoN.resolutionScale = q.aoHalf ? 0.5 : 1; aoN.radius.value = 14; aoN.thickness.value = 9; aoN.distanceExponent.value = 1.4; aoN.distanceFallOff.value = 1; aoN.scale.value = 1.25; aoN.samples.value = q.aoHalf ? 12 : q.resolved === 'ultra' ? 24 : 16;
       const ao = aoN.getTextureNode().r; c = vec4(c.rgb.mul(mix(vec3(0.03, 0.025, 0.03), vec3(1), ao)), c.a); } /* sombra de contato puxando para o tom do N8AO de hoje */
+    if (M5.clima && M5.clima.reflexo && !off.has('reflexo')) c = M5.clima.reflexo(c, color, depth, camera, q) || c; /* 5.0d: reflexo de tela nas poças da chuva (Alta e Ultra; src/m5/clima.js) */
+    if (M5.nuvens && M5.nuvens.compor && !off.has('nuvens')) c = M5.nuvens.compor(c, depth, sp, camera, q); /* 5.0d: nuvens de guerra (src/m5/nuvens.js) entre a oclusão e a bruma; sem efeito na Baixa e no celular */
     if (!off.has('bruma')) c = atmo(c, depth.r); else c = vec4(max(c.rgb, vec3(0)), 1);
+    if (M5.raiosSol && !off.has('raios')) { const rs = M5.raiosSol(c, depth, { camera, q, X }); if (rs) { c = rs.cor; sp.ardRaios = rs.no; } } /* 5.0d: raios de sol pela poeira e pela Tempestade (src/m5/ceu.js), só na Alta e na Ultra */
     c = convertToTexture(c); /* um alvo só para a cena com AO e bruma: o bloom e a gradação leem a mesma textura (a bruma não roda duas vezes) */
     const hdr = c, fim = cauda(meio ? meio(hdr, sp) : hdr);
     return { sp, aoN, hdr, bloomN: fim.bloomN, aa: fim.c };
@@ -18566,7 +18571,7 @@ M5.buildPost = function (X, scene, camera, q, opts) {
     setSize() { /* os nós do pós seguem o tamanho do renderer sozinhos */ },
     setPixelRatio() {},
     setScale(s) { P.scale = s; sp.setResolutionScale(s); }, /* só com ?m5up=fsr1 (resolução dinâmica no passe da cena) */
-    dispose() { try { pipe.dispose(); sp.dispose(); if (aoN) aoN.dispose(); if (bloomN) bloomN.dispose(); } catch (e) {} } };
+    dispose() { try { pipe.dispose(); sp.dispose(); if (aoN) aoN.dispose(); if (bloomN) bloomN.dispose(); if (sp.ardRaios) sp.ardRaios.dispose(); /* 5.0d */ } catch (e) {} } };
   return P;
 };
 })(globalThis.ARD = globalThis.ARD || {});
@@ -19282,11 +19287,11 @@ M5.chao = function (U, o) {
       /* cicatrizes: rastros (chão compactado; na neve, sombra azulada), queimado com fuligem, cratera e brasa recente */
       { const sc = (UNI ? A.cicatrizes().mul(kf) : A.cicatrizes()).toVar('tSc'); /* 5.0b.1: nas mesas, cicatriz 0 (nada muda) */ const tr = sc.r; alb.mulAssign(float(1).sub(tr.mul(Bw.y.mul(0.16).add(Bw.z.mul(0.12)).add(0.34)))); alb.assign(mix(alb, alb.mul(vec3(0.76, 0.85, 1.08)), tr.mul(Bw.x).mul(0.7)));
         const bu = smoothstep(0.0, 0.85, sc.g); alb.assign(mix(alb, vec3(0.06, 0.05, 0.042).mul(soft.mul(0.5).add(0.75)), clamp(bu.mul(0.85), 0.0, 0.85))); rough.assign(mix(rough, 0.6, bu.mul(0.4))); hgt.addAssign(tr.mul(-0.18).sub(sc.b.mul(1.6)));
-        tEmis.addAssign(vec3(1.4, 0.45, 0.12).mul(smoothstep(0.35, 1.0, sc.a)).mul(sin(tempo.mul(9.0).add(gp.x.mul(0.7))).mul(0.35).add(0.65)).mul(hCrk.mul(0.5).add(0.5))); }
+        tEmis.addAssign(vec3(1.4, 0.45, 0.12).mul(smoothstep(0.35, 1.0, sc.a)).mul(sin(tempo.mul(9.0).add(gp.x.mul(0.7))).mul(0.35).add(0.65)).mul(hCrk.mul(0.5).add(0.5))); S.sc = sc; /* 5.0d: as cicatrizes para as camadas do clima e da batalha (src/m5/clima.js) */ }
     }
     alb.mulAssign(macro.mul(0.28).add(0.86)); alb.mulAssign(mix(vec3(1.0), vec3(1.06, 1.0, 0.92), smoothstep(0.4, 0.8, mid).mul(0.6)));
     if (fora) { const sl = smoothstep(250.0, 340.0, pw.y.add(macro.sub(0.5).mul(90.0))).mul(float(1).sub(smoothstep(0.35, 0.6, slope))).mul(UNI ? uFora : float(1)); /* 5.0b.1: ×uFora */ alb.assign(mix(alb, vec3(0.78, 0.82, 0.88).mul(soft.mul(0.1).add(0.9)), sl)); rough.assign(mix(rough, 0.7, sl)); } /* neve no alto das montanhas distantes */
-    const CG = M5.ganchos && M5.ganchos.chao; if (CG && CG.cor) { const nc = CG.cor({ m, o, alb, Bw, gp }); if (nc) alb.assign(nc); } /* gancho da fase 2 (camadas extras) */
+    const CG = M5.ganchos && M5.ganchos.chao; if (CG && CG.cor) { const nc = CG.cor({ m, o, alb, Bw, gp, rough, hgt, tEmis, sc: S.sc || null, slope, cav, soft, mid, macro, Ap, As, nearK, pw, wn }); if (nc) alb.assign(nc); } /* gancho da fase 2 (camadas extras); 5.0d: com rugosidade, relevo, emissivo e cicatrizes (clima e batalha, src/m5/clima.js) */
     const dif = alb.mul(mix(0.72, 1.0, aoc.x)).toVar('tDif');
     const DBG = +(QS.get('terrdbg') || 0); /* ?terrdbg=N: os mesmos modos de diagnóstico do clássico (1 bioma, 2 cavidade, 3 curvatura, 4 texturas, 5 rugosidade, 7 relevo fino) */
     if (DBG) { if (DBG === 1) dif.assign(Bw.xyz); else if (DBG === 2) dif.assign(vec3(aoc.x)); else if (DBG === 3) dif.assign(vec3(aoc.y.mul(0.5).add(0.5))); else if (DBG === 4) dif.assign(vec3(Ar.r, Ap.g, Bt.r)); if (DBG !== 5) rough.assign(1.0); if (DBG !== 7) hgt.assign(0.0); }
@@ -19302,7 +19307,7 @@ M5.chao = function (U, o) {
       If(U.uNear.greaterThan(0.0), () => { const m1 = amostra(mt, wuv.mul(260.0)).rgb.toVar(), m2v = amostra(mt, wuv.mul(84.0).add(0.31)).rgb.toVar(); const pe = max(m1.r.mul(0.6), m2v.r); /* ramo uniforme (a câmera inteira): de longe nem amostra */
         dif.mulAssign(mix(float(1), mix(m1.g, m2v.g, step(0.25, m2v.r)).mul(0.28).add(0.86).mul(float(1).sub(max(m1.b, m2v.b.mul(0.8)).mul(0.35))).mul(pe.mul(0.1).add(1.0)), nk.mul(0.7)));
         mh.assign(m1.r.mul(0.3).add(m2v.r.mul(0.7)).sub(m1.b.add(m2v.b).mul(0.25)).mul(nk)); });
-      const tc = A.territorio(); dif.assign(mix(dif, tc.rgb, tc.a.mul(0.14).mul(UNI ? kf : float(1)))); const fv = A.nevoa(); dif.mulAssign(UNI ? mix(mix(0.06, 1.0, fv), 1.0, uFora) : mix(0.06, 1.0, fv)); tEmis.mulAssign(UNI ? mix(fv, 1.0, uFora) : fv); /* 5.0b.1: território e névoa de guerra só no chão (nas mesas, ×1) */
+      const tc = A.territorio(); dif.assign(mix(dif, tc.rgb, tc.a.mul(0.14).mul(UNI ? kf : float(1)))); const fv = A.nevoa(); const nvc = M5.nevoaChao ? M5.nevoaChao(fv) : mix(0.06, 1.0, fv); /* 5.0d: chão nunca visto sob as nuvens de guerra (src/m5/nuvens.js) */ dif.mulAssign(UNI ? mix(nvc, 1.0, uFora) : nvc); tEmis.mulAssign(UNI ? mix(fv, 1.0, uFora) : fv); /* 5.0b.1: território e névoa de guerra só no chão (nas mesas, ×1) */
     }
     dif.mulAssign(float(1).sub(U.uCloudK.mul(0.2).mul(float(1).sub(A.nuvem())))); /* sombra de nuvem no material (0 quando a bruma do pós já faz) */
     S.rough = rough; S.tH = hgt.mul(mix(0.25, 1.0, nearK)).toVar('tH'); S.mh = mh; S.tEmis = tEmis; S.wn = wn;
@@ -19310,6 +19315,7 @@ M5.chao = function (U, o) {
   });
   const dif = cor();
   m.colorNode = dif;
+  { const GP = M5.ganchos && M5.ganchos.chao && M5.ganchos.chao.posicao; const pp = GP ? GP({ m, o }) : null; if (pp) m.positionNode = pp; } /* 5.0d: crateras que afundam o chão (deslocamento pelo mapa de cicatrizes, src/m5/clima.js) */
   m.roughnessNode = Fn((b) => saida(b).rough)(); /* a cor monta antes (setupDiffuseColor) e deixa as variáveis prontas */
   m.aoNode = aoc.x;
   /* relevo fino por derivada (o ardTPerturb do clássico, sem normalize de vetor nulo): tH das camadas em unidades do mapa + microdetalhe */
@@ -19346,9 +19352,10 @@ M5.adereco = function (o) {
   o = o || {}; const Tm = T(); const { Fn, float, vec2, vec3, vec4, mat4, mix, max, sin, cos, attribute, vertexColor, varyingProperty, positionLocal, normalViewGeometry } = L();
   const m = new Tm.MeshStandardNodeMaterial({ vertexColors: true, roughness: 1, metalness: 0, side: o.leaf ? Tm.DoubleSide : Tm.FrontSide });
   const rm = M5.attr('rm', vec2(0.9, 0)), glow = M5.attr('aGlow', float(0)), wind = M5.attr('aWind', float(0)); const fv = amostras().nevoa();
-  m.colorNode = M5.instCor(vec3(mix(0.06, 1.0, fv).mul(float(1).sub(glow)))); m.roughnessNode = rm.x; m.metalnessNode = rm.y;
+  m.colorNode = M5.instCor(vec3((M5.nevoaChao ? M5.nevoaChao(fv) : mix(0.06, 1.0, fv)).mul(float(1).sub(glow)))); /* 5.0d: idem (nuvens.js) */ m.roughnessNode = rm.x; m.metalnessNode = rm.y;
   const corInst = Fn(b => (b.object && b.object.isM5Inst ? attribute('iC', 'vec3') : b.object && b.object.instanceColor ? varyingProperty('vec3', 'vInstanceColor') : vec3(1)))();
   m.emissiveNode = vertexColor().rgb.mul(corInst).mul(glow).mul(fv.mul(fv)); /* peça emissiva: a própria cor (com a tinta da instância), apagada na névoa */
+  { const GA = M5.ganchos && M5.ganchos.adereco && M5.ganchos.adereco.cor; if (GA) GA({ m, o, fv }); } /* 5.0d: mato queimado e neve, cinza ou molhado nos adereços (src/m5/clima.js) */
   if (o.leaf) m.normalNode = normalViewGeometry; /* o clássico desfaz a inversão do verso: folhas e lâminas iluminadas igual dos dois lados */
   if (o.leaf) { const semSombra = L().uniform(0).onObjectUpdate(({ object }) => (object.userData && object.userData.ardSemSombra ? 1 : 0)); m.receivedShadowNode = s => s.add(semSombra.mul(float(1).sub(s))); } /* 5.0b.1: um shader só para as folhas: todo bloco recebe sombra no Motor 5 e a folhagem pequena (ardSemSombra, do dress3d) fica com a sombra em 1, como sem receber (antes eram dois WGSL: com e sem sombra) */
   const vento = Fn(b => { if (!(b.object && b.object.isM5Inst)) return positionLocal; /* InstancedMesh de verdade (?m5inst=0): o three já aplicou a instância; sem vento */
@@ -19376,7 +19383,7 @@ M5.estrada = function () {
   const m = new Tm.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }); m.fog = false;
   const side = abs(uv().x.sub(0.5)).mul(2); const nz = M5.vnoise2(vec2(positionWorld.x.div(M5.u.mundo), positionWorld.z.negate().div(M5.u.mundo)).mul(900));
   const edge = float(1).sub(smoothstep(nz.mul(0.25).add(0.55), 1.0, side)); const rut = float(1).sub(smoothstep(0.0, 0.08, abs(side.sub(0.45)))).mul(0.18); /* bordas em ordem */
-  const col = mix(vec3(0.33, 0.29, 0.24), vec3(0.42, 0.37, 0.3), nz).mul(float(1).sub(rut)).mul(mix(0.06, 1.0, amostras().nevoa()));
+  const col = mix(vec3(0.33, 0.29, 0.24), vec3(0.42, 0.37, 0.3), nz).mul(float(1).sub(rut)).mul(M5.nevoaChao ? M5.nevoaChao(amostras().nevoa()) : mix(0.06, 1.0, amostras().nevoa())); /* 5.0d: idem (nuvens.js) */
   m.colorNode = mix(col, pow(col, vec3(2.2)).div(expo()), semPos()); /* 5.0b (junção): ÷ exposição sem pós */ m.opacityNode = edge.mul(0.62); M5.instMat(m);
   return M5.registrar('estrada', m);
 };
@@ -19464,6 +19471,415 @@ M5.ceu = function (o) {
 M5.espacoFundo = function (renderer, o) { o = o || {}; const Tm = T(); const rt = M5.espaco.nebulosa(renderer, o.size || 384, o.seed || 0);
   const P = new Tm.Vector3().fromArray(o.planetDir || PLANETA0.dir).normalize(), cosR = Math.cos(o.planetR || PLANETA0.r), PL = new Tm.Vector3().fromArray(o.planetL || PLANETA0.luz).normalize();
   return { tex: rt.texture, rt, planet: new Tm.Vector4(P.x, P.y, P.z, cosR), planetL: PL }; };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Aether Rift: Dominion — Motor 5 (5.0d): o céu da partida. Só no Motor 5 e só visual (nada aqui lê ou muda a simulação além do relógio sim.time).
+   - O sol anda no ciclo de 12,5 min do jogo (R.night = (1 − cos θ)/2, θ = 2π·t/750): meio-dia em θ = 0 com o sol de sempre (40° de elevação, o
+     R.sunDir da 4.3b), pôr do sol em θ = 90° (R.night = 0,5) à frente da câmera padrão, meia-noite em θ = 180°, nascer em θ = 270°. A lua fica do
+     outro lado do céu e é a luz da noite (a mesma luz azulada de antes, agora vinda dela). No Cinturão (espaço) o sol gira em volta do zênite a 40°,
+     sem pôr do sol e sem lua.
+   - A luz direcional anda em degraus de 0,25° (um a cada ~0,5 s) e não desce abaixo de 12°: entre um degrau e outro as cascatas não mudam (sem
+     tremor), e a sombra nunca vira uma faixa comprida demais. Na troca sol ↔ lua (horizonte) a luz apaga e acende de novo (crepúsculo).
+   - A cor da luz e do fundo segue a atmosfera: o sol passa pela mesma conta do céu (Preetham, a do SkyMesh do r186 e da Sala de Comando) e
+     avermelha perto do horizonte; o fundo e a bruma ganham a cor do horizonte no crepúsculo. Ao meio-dia tudo é exatamente o de antes.
+   - O céu visível é físico (o Preetham do SkyMesh com as nuvens dele, a compressão das altas luzes e as estrelas da Sala), com a lua, as estrelas
+     girando em volta do polo e, no clima aurora, cortinas de luz. Ele é desenhado DEPOIS do opaco, no fundo (z = w): só custa onde o céu aparece.
+   - O reflexo do céu (PMREM) é refeito quando a hora muda, em degraus (2°, ~4 s; 4° na Baixa), espalhado em quadros num alvo à parte e copiado
+     de uma vez no alvo de sempre (a cena não troca de textura: nenhum material se remonta e nenhum pipeline nasce).
+   - Raios de sol (Alta e Ultra): uma marcha curta na sombra das cascatas e do dossel da Tempestade de Éter, pela poeira do ar baixo, entrando no
+     pós (src/m5/pos.js) como contraste: o ar na sombra apaga parte da bruma e o ar iluminado ganha um pouco de sol.
+   Chaves de URL: ?m5ceu=0 (tudo como na 5.0c.1), ?hora=H (hora fixa, 0–24; 12 = meio-dia), ?m5ceuenv=0 (reflexo fixo, como antes),
+   ?m5aurora=0 (sem as cortinas), ?m5raios=0|1 (raios de sol; padrão: Alta e Ultra), ?m5luzdegrau=G (degrau da luz em graus). */
+(function (ARD) {
+'use strict';
+const M5 = ARD.m5 = ARD.m5 || {};
+const QS = new URLSearchParams(typeof location !== 'undefined' ? location.search : '');
+const DEG = Math.PI / 180, TAU = Math.PI * 2;
+const C = M5.ceuCfg = {
+  on: QS.get('m5ceu') !== '0',
+  hora: QS.get('hora') != null && QS.get('hora') !== '' ? +QS.get('hora') : null, /* null: segue o relógio da partida */
+  env: QS.get('m5ceuenv') !== '0',
+  aurora: QS.get('m5aurora') !== '0',
+  raios: QS.get('m5raios'), /* null: Alta e Ultra; '0' nunca; '1' sempre que houver sombra */
+  degrau: (+QS.get('m5luzdegrau') || 0.25) * DEG, /* degrau da luz direcional */
+  elevMin: 12 * DEG, /* a luz não desce abaixo disto (a sombra fica no máximo 4,7× a altura) */
+  apaga: Math.sin(3.5 * DEG), /* na troca sol ↔ lua a luz some entre 0 e 3,5° */
+  envPasso: 2 * DEG, envPassoBaixa: 4 * DEG, envIntervalo: 1.2, /* reflexo: degrau da hora e intervalo mínimo (s) */
+};
+/* ---------- o caminho do sol ---------- */
+const LEN = Math.hypot(-470, 640, 600); /* o R.sunDir de sempre: [-470, 640, 600], comprimento ~995 (a sombra única e a bruma usam esse tamanho) */
+const N0 = [-470 / LEN, 640 / LEN, 600 / LEN]; /* sol do meio-dia = o sol fixo da 4.3b */
+const NH = (() => { const l = Math.hypot(N0[0], N0[2]); return [N0[0] / l, 0, N0[2] / l]; })();
+const W0 = [-NH[2], 0, NH[0]]; /* poente: horizontal, perpendicular ao meio-dia, à frente da câmera padrão (yaw π/4) */
+const AX = [N0[1] * W0[2] - N0[2] * W0[1], N0[2] * W0[0] - N0[0] * W0[2], N0[0] * W0[1] - N0[1] * W0[0]]; /* eixo do giro (o sol vai do meio-dia ao poente) */
+/* estado do quadro (reaproveitado: nada é alocado por quadro) */
+const E = M5.ceuEstado = { th: 0, thL: 0, sol: [N0[0], N0[1], N0[2]], lua: [-N0[0], -N0[1], -N0[2]], luz: [N0[0], N0[1], N0[2]], deSol: true, k: 1, elev: 40 * DEG, noite: 0, espaco: false, pronto: false, cor: [1, 1, 1], foto: false };
+const solEm = (th, out, espaco) => { /* direção do sol no ângulo th do ciclo */
+  if (espaco) { const e = 40 * DEG, a = Math.atan2(N0[2], N0[0]) + th; out[0] = Math.cos(a) * Math.cos(e); out[1] = Math.sin(e); out[2] = Math.sin(a) * Math.cos(e); return out; } /* Cinturão: gira em volta do zênite */
+  const c = Math.cos(th), s = Math.sin(th); out[0] = c * N0[0] + s * W0[0]; out[1] = c * N0[1] + s * W0[1]; out[2] = c * N0[2] + s * W0[2]; return out; };
+const _q = [0, 0, 0];
+/* hora → θ e noite; chamado pelo render3d logo depois de calcular R.night e antes do updateCamera (a luz e as cascatas já saem no lugar) */
+M5.ceuHora = function (R, sim, PH) {
+  if (!C.on || !R) return; const X = M5.cur; E.espaco = !!R.cinturao; E.foto = !!(R.photo && R.photo.on);
+  let th;
+  if (C.hora != null && isFinite(C.hora)) { th = (C.hora - 12) / 24 * TAU; if (!(PH && PH.night != null)) R.night = (1 - Math.cos(th)) / 2; } /* hora fixa (fotos e testes) */
+  else if (PH && PH.night != null) th = Math.acos(Math.max(-1, Math.min(1, 1 - 2 * PH.night))); /* Modo Foto com hora própria: o lado da tarde */
+  else if (R.forceDay) th = 0; /* ?dia=1 e o Teste de desempenho: meio-dia (o sol de sempre) */
+  else th = TAU * ((sim && sim.time) || 0) / 750;
+  E.th = th; E.noite = R.night;
+  solEm(th, E.sol, E.espaco); E.lua[0] = -E.sol[0]; E.lua[1] = -E.sol[1]; E.lua[2] = -E.sol[2];
+  /* a luz: o mesmo caminho em degraus; o sol de dia, a lua de noite (no espaço, sempre o sol) */
+  const thq = Math.round(th / C.degrau) * C.degrau; E.thL = thq; solEm(thq, _q, E.espaco);
+  E.deSol = E.espaco || _q[1] >= 0; if (!E.deSol) { _q[0] = -_q[0]; _q[1] = -_q[1]; _q[2] = -_q[2]; }
+  E.elev = Math.asin(Math.max(-1, Math.min(1, _q[1]))); /* elevação de verdade de quem ilumina (antes do piso) */
+  E.k = E.espaco ? 1 : smooth(0, C.apaga, Math.abs(_q[1])); /* apaga perto do horizonte (troca sol ↔ lua) */
+  if (_q[1] < Math.sin(C.elevMin)) { const h = Math.hypot(_q[0], _q[2]) || 1, ce = Math.cos(C.elevMin); _q[0] = _q[0] / h * ce; _q[2] = _q[2] / h * ce; _q[1] = Math.sin(C.elevMin); }
+  E.luz[0] = _q[0]; E.luz[1] = _q[1]; E.luz[2] = _q[2];
+  if (!E.foto) { const sd = R.sunDir; sd[0] = _q[0] * LEN; sd[1] = _q[1] * LEN; sd[2] = _q[2] * LEN; } /* no Modo Foto a luz é dele (src/photo3d.js) */
+  E.pronto = true; if (X) X.ceuTh = th;
+};
+function smooth(a, b, x) { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); }
+
+/* ---------- a atmosfera na CPU: a mesma conta do céu (Preetham do SkyMesh do r186), para a cor da luz, do fundo, do reflexo e a exposição ---------- */
+const TR = [5.804542996261093E-6, 1.3562911419845635E-5, 3.0265902468824876E-5], MIE = [1.8399918514433978E14, 2.7798023919660528E14, 4.0790479543861094E14];
+const AT = M5.ceuAtmo = { turb: 2.4, ray: 1.25, mie: 0.0045, g: 0.82, bR: [0, 0, 0], bM: [0, 0, 0], sunE: 0 };
+const AT0 = { turb: AT.turb, ray: AT.ray };
+function atmoPrep(sol) { /* o que o vértice do SkyMesh calcula: extinção de Rayleigh e de Mie e a intensidade do sol. Com o sol baixo o ar engrossa (turbidez de
+   2,4 a 6 e Rayleigh de 1,25 a 2,25 entre 25° e o horizonte): o poente sai laranja e o céu em volta, azul fundo; acima de 25°, o céu do meio-dia */
+  const lo = 1 - smooth(0, Math.sin(25 * DEG), Math.max(sol[1], 0)); AT.turb = AT0.turb + 3.6 * lo; AT.ray = AT0.ray + 1.0 * lo;
+  for (let i = 0; i < 3; i++) { AT.bR[i] = TR[i] * AT.ray; AT.bM[i] = 0.434 * (0.2 * AT.turb * 10E-18) * MIE[i] * AT.mie; }
+  const za = Math.acos(Math.max(-1, Math.min(1, sol[1]))); AT.sunE = 1000 * Math.max(0, 1 - Math.exp(-(1.6110731556870734 - za) / 1.5)); }
+function fex(dy, out) { /* extinção ao longo de uma direção de elevação dy */
+  const za = Math.acos(Math.max(0, dy)), inv = 1 / (Math.cos(za) + 0.15 * Math.pow(93.885 - za / DEG, -1.253)); const sR = 8.4E3 * inv, sM = 1.25E3 * inv;
+  for (let i = 0; i < 3; i++) out[i] = Math.exp(-(AT.bR[i] * sR + AT.bM[i] * sM)); return out; }
+const _fx = [0, 0, 0], _ce = [0, 0, 0];
+function ceuEm(d, sol, out) { /* o céu (sem nuvens) numa direção, linear, na escala do SkyMesh (× 0,04) */
+  fex(d[1], _fx); const ct = d[0] * sol[0] + d[1] * sol[1] + d[2] * sol[2]; const c = ct * 0.5 + 0.5, rP = 0.05968310365946075 * (1 + c * c);
+  const g2 = AT.g * AT.g, mP = 0.07957747154594767 * (1 - g2) / Math.pow(1 - 2 * AT.g * ct + g2, 1.5); const k5 = Math.min(1, Math.max(0, Math.pow(1 - sol[1], 5)));
+  for (let i = 0; i < 3; i++) { const b = AT.bR[i] + AT.bM[i], bt = AT.bR[i] * rP + AT.bM[i] * mP, s = AT.sunE * bt / b; let L = Math.pow(s * (1 - _fx[i]), 1.5); L *= 1 + (Math.pow(s * _fx[i], 0.5) - 1) * k5; out[i] = (L + 0.1 * _fx[i]) * 0.04 + (i === 1 ? 0.0003 : i === 2 ? 0.00075 : 0); }
+  return out; }
+const lum = c => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+const _d = [0, 0, 0], _hor = [0, 0, 0], _top = [0, 0, 0];
+function medias(sol, hor, top) { /* médias do horizonte (elevação ~6°) e do alto (~45°) em 8 azimutes */
+  hor[0] = hor[1] = hor[2] = 0; top[0] = top[1] = top[2] = 0;
+  for (let k = 0; k < 16; k++) { const a = (k >> 1) / 8 * TAU, e = k & 1 ? 0.7 : 0.1, o = k & 1 ? top : hor, ch = Math.sqrt(1 - e * e); _d[0] = Math.cos(a) * ch; _d[1] = e; _d[2] = Math.sin(a) * ch; ceuEm(_d, sol, _ce); o[0] += _ce[0] / 8; o[1] += _ce[1] / 8; o[2] += _ce[2] / 8; } } /* sem alocar (roda a cada quadro) */
+/* referência do meio-dia (o céu e a luz de antes) */
+const REF = { hor: [0, 0, 0], top: [0, 0, 0], fx: [0, 0, 0], lumTop: 1, lumHor: 1 };
+function refPrep() { atmoPrep(N0); medias(N0, REF.hor, REF.top); fex(N0[1], REF.fx); REF.lumTop = Math.max(1e-6, lum(REF.top)); REF.lumHor = Math.max(1e-6, lum(REF.hor)); }
+refPrep();
+/* matiz (luminância 1) de uma cor relativa à do meio-dia */
+function matiz(c, ref, out) { for (let i = 0; i < 3; i++) out[i] = c[i] / Math.max(1e-7, ref[i]); const l = Math.max(1e-6, lum(out)); out[0] /= l; out[1] /= l; out[2] /= l; return out; }
+const _m1 = [0, 0, 0], _m2 = [0, 0, 0], _tr = [0, 0, 0], _mT = [0, 0, 0], _sl = [0, 0, 0];
+/* matiz do horizonte e do alto numa hora: o Preetham só vale com o sol acima do horizonte (abaixo dele a conta dá um cinza avermelhado sem sentido),
+   então ele é avaliado com o sol no máximo a +0,5° e, quando o sol desce de 0,5° a −8°, o matiz vai para o azul da noite de lua */
+const NOITE_H = [0.78, 0.93, 1.32], NOITE_T = [0.74, 0.92, 1.4];
+function matizHora(sol, oH, oT) { const s0 = Math.sin(0.5 * DEG); _sl[0] = sol[0]; _sl[1] = sol[1]; _sl[2] = sol[2];
+  if (_sl[1] < s0) { const h = Math.hypot(_sl[0], _sl[2]) || 1, ch = Math.cos(0.5 * DEG); _sl[0] = _sl[0] / h * ch; _sl[2] = _sl[2] / h * ch; _sl[1] = s0; }
+  atmoPrep(_sl); medias(_sl, _hor, _top); matiz(_hor, REF.hor, oH); matiz(_top, REF.top, oT);
+  const kn = smooth(s0, Math.sin(-8 * DEG), sol[1]); for (let i = 0; i < 3; i++) { oH[i] += (NOITE_H[i] - oH[i]) * kn; oT[i] += (NOITE_T[i] - oT[i]) * kn; } }
+
+/* ---------- o céu visível (TSL) ---------- */
+const ceu0 = M5.ceu; /* o céu da fase 2 (src/m5/terreno.js): fica para o Cinturão, para o reflexo e para ?m5ceu=0 */
+let RU = null; /* ruídos e hashes do céu, em funções de verdade no WGSL */
+function ruidos() {
+  if (RU) return RU; const L = window.TSL; const { Fn, float, vec2, vec3, floor, fract, dot, mix, Loop } = L;
+  const grad = Fn(([i]) => { const p = fract(vec3(i.x, i.y, i.x).mul(vec3(0.1031, 0.1030, 0.0973))).toVar(); p.addAssign(dot(p, p.yzx.add(33.33))); return fract(p.xx.add(p.yz).mul(p.zy)).mul(2.0).sub(1.0); }).setLayout({ name: 'ardSolGrad', type: 'vec2', inputs: [{ name: 'i', type: 'vec2' }] });
+  const ruido = Fn(([p]) => { const i = floor(p), f = fract(p); const u = f.mul(f).mul(f).mul(f.mul(f.mul(6.0).sub(15.0)).add(10.0));
+    const a = dot(grad(i), f), b = dot(grad(i.add(vec2(1, 0))), f.sub(vec2(1, 0))), c = dot(grad(i.add(vec2(0, 1))), f.sub(vec2(0, 1))), d = dot(grad(i.add(vec2(1, 1))), f.sub(vec2(1, 1)));
+    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y).mul(1.6); }).setLayout({ name: 'ardSolRuido', type: 'float', inputs: [{ name: 'p', type: 'vec2' }] }); /* ruído de gradiente do SkyMesh (~[−1, 1]) */
+  const fbm = Fn(([p0, drift]) => { const p = vec2(p0).toVar(), r = float(0).toVar(), a = float(1).toVar(); Loop(4, () => { r.addAssign(a.mul(ruido(p))); a.mulAssign(0.5); p.assign(p.mul(2.0).add(drift)); }); return r; })
+    .setLayout({ name: 'ardSolFbm', type: 'float', inputs: [{ name: 'p0', type: 'vec2' }, { name: 'drift', type: 'float' }] });
+  const h31 = Fn(([p0]) => { const p = fract(vec3(p0).mul(0.1031)).toVar(); p.addAssign(dot(p, p.zyx.add(31.32))); return fract(p.x.add(p.y).mul(p.z)); }).setLayout({ name: 'ardSolH31', type: 'float', inputs: [{ name: 'p0', type: 'vec3' }] });
+  const h33 = Fn(([p0]) => { const p = fract(vec3(p0).mul(vec3(0.1031, 0.1030, 0.0973))).toVar(); p.addAssign(dot(p, p.yxz.add(33.33))); return fract(p.xxy.add(p.yxx).mul(p.zyx)); }).setLayout({ name: 'ardSolH33', type: 'vec3', inputs: [{ name: 'p0', type: 'vec3' }] });
+  RU = { ruido, fbm, h31, h33 }; return RU; }
+/* uniforms do céu (um conjunto por céu; o quadro escreve neles) */
+function ceuUniforms(Tm, uniform) {
+  return { uSol: uniform(new Tm.Vector3().fromArray(N0)), uLua: uniform(new Tm.Vector3(-N0[0], -N0[1], -N0[2])), uLuz: uniform(new Tm.Vector3().fromArray(N0)),
+    uBR: uniform(new Tm.Vector3()), uBM: uniform(new Tm.Vector3()), uSE: uniform(0), uG: uniform(AT.g), uGanho: uniform(2.2), uNoiteK: uniform(0),
+    uNuv: uniform(new Tm.Vector4(0.42, 0.45, 0.0002, 0.00002)), /* cobertura, densidade, escala e velocidade das nuvens (os nomes do SkyMesh) */
+    uEstrelas: uniform(0), uLuaK: uniform(0), uLuaE1: uniform(new Tm.Vector3(1, 0, 0)), uLuaE2: uniform(new Tm.Vector3(0, 1, 0)), uRot: uniform(new Tm.Matrix3()),
+    uHalo: uniform(new Tm.Color(0, 0, 0)), uSolK: uniform(4.0), uTw: uniform(new Tm.Vector4(0, 0, 0, 0)), /* crepúsculo: força, bruma recolhida do lado do sol, direção horizontal do sol (x, z) */ uAurora: uniform(new Tm.Vector4(0.22, 0.85, 0.58, 0)), uPolo: uniform(new Tm.Vector2(1, 0)),
+    /* as chaves do céu GLSL que o render3d escreve a cada quadro: uHor e uBot (fundo da bruma), uNight, uTime; uTop, uSunDir e uSunCol ficam sem uso */
+    uTop: uniform(new Tm.Color(0x3a5f8f)), uHor: uniform(new Tm.Color(0x9fb0c4)), uBot: uniform(new Tm.Color(0x30343a)), uSunDir: uniform(new Tm.Vector3().fromArray(N0)), uSunCol: uniform(new Tm.Color(1, 0.9, 0.75)), uNight: uniform(0), uTime: uniform(0), uSpace: uniform(0) }; }
+const TETO = { joelho: 0.5, teto: 0.95 }; /* a compressão das altas luzes da Sala (src/m5/sala-mundo.js, 5.0a.2), com o teto abaixo do limiar do bloom da partida (1,0; na Sala, 1,35): o céu perto do sol
+  não vira um véu de bloom; só o disco do sol (contido) acende um bloom pequeno */
+function ceuFisico(o) {
+  const Tm = window.THREE_M5, L = window.TSL; const RN = ruidos();
+  const { Fn, If, Loop, uniform, float, vec2, vec3, vec4, mix, pow, clamp, smoothstep, max, min, dot, normalize, positionLocal, modelViewProjection, exp, acos, cos, sqrt, length, floor, fract, sin, luminance, select } = L;
+  const u = ceuUniforms(Tm, uniform); const comAurora = !!o.aurora; const T = u.uTime;
+  const m = new Tm.MeshBasicNodeMaterial({ side: Tm.BackSide, depthWrite: false, depthTest: true }); m.fog = false;
+  /* no fundo (z = w), desenhado depois do opaco: o teste de profundidade descarta o que está coberto, então o céu só custa onde ele aparece */
+  m.vertexNode = Fn(() => { const p = modelViewProjection; p.z.assign(p.w); return p; })();
+  const comprime = (col, teto) => { const J = float(TETO.joelho), Lm = luminance(col), ex = max(Lm.sub(J), 0), Lc = min(Lm, J).add(ex.div(ex.div(teto.sub(J)).add(1))); return col.mul(Lc.div(max(Lm, 1e-4))); };
+  m.colorNode = Fn(() => {
+    const d = normalize(positionLocal).toVar('sD'); const y = d.y;
+    /* Preetham (o fragmento do SkyMesh, com o que o vértice dele calcula vindo da CPU) */
+    const za = acos(max(0.0, y)); const inv = float(1.0).div(cos(za).add(float(0.15).mul(pow(float(93.885).sub(za.mul(57.29577951308232)), -1.253))));
+    const Fex = exp(u.uBR.mul(inv.mul(8.4E3)).add(u.uBM.mul(inv.mul(1.25E3))).negate()).toVar('sFex');
+    const ct = dot(d, u.uSol).toVar('sCt'); const c = ct.mul(0.5).add(0.5); const rP = float(0.05968310365946075).mul(c.mul(c).add(1.0));
+    const g2 = u.uG.mul(u.uG); const mP = float(0.07957747154594767).mul(float(1.0).sub(g2)).div(pow(float(1.0).sub(u.uG.mul(2.0).mul(ct)).add(g2), 1.5));
+    const bT = u.uBR.mul(rP).add(u.uBM.mul(mP)).div(u.uBR.add(u.uBM)).mul(u.uSE).toVar('sBt');
+    const Lin = pow(bT.mul(float(1.0).sub(Fex)), vec3(1.5)).toVar('sLin'); Lin.mulAssign(mix(vec3(1.0), pow(bT.mul(Fex), vec3(0.5)), clamp(pow(float(1.0).sub(u.uSol.y), 5.0), 0.0, 1.0)));
+    const col = Lin.add(Fex.mul(0.1)).mul(0.04).add(vec3(0.0, 0.0003, 0.00075)).toVar('sCol');
+    const nuvA = float(0).toVar('sNa');
+    /* nuvens do SkyMesh (o mesmo modelo, no relógio do visual), iluminadas pelo sol e, de noite, pela lua */
+    If(y.greaterThan(0.0).and(u.uNuv.x.greaterThan(0.0)), () => {
+      const cuv = d.xz.div(y.mul(0.55)).mul(u.uNuv.z).add(T.mul(u.uNuv.w)).toVar('sCuv'); const ev = T.mul(u.uNuv.w).mul(300.0);
+      const cn = RN.fbm(cuv.mul(1000.0), ev).mul(0.7).add(0.5).clamp(0.0, 1.0).toVar('sCn');
+      const reg = RN.ruido(cuv.mul(300.0)).mul(0.37).add(0.5); const cov = clamp(u.uNuv.x.add(reg.sub(0.5).mul(0.6)), 0.0, 1.0);
+      const th = float(1.0).sub(cov).toVar('sTh'); const mk = smoothstep(th, th.add(0.3), cn).toVar('sMk'); const hf = smoothstep(0.0, 0.06, y); mk.mulAssign(hf);
+      const dia = smoothstep(-0.08, 0.3, u.uSol.y); const sc = Fex.mul(u.uSE).mul(0.22 * 0.04).toVar('sSc'); const amb = Lin.mul(0.04).add(vec3(0.0, 0.0003, 0.00075));
+      const dp = max(0.0, cn.sub(th)).toVar('sDp'); const beer = exp(dp.mul(-4.0)).toVar('sBeer'); const pd = float(1.0).sub(beer.mul(beer)); const sh = mix(0.45, 1.0, beer.mul(pd).mul(2.6).clamp(0.0, 1.0));
+      const prata = float(0.51).div(pow(float(1.49).sub(ct.mul(1.4)), 1.5)).clamp(0.0, 3.0); const borda = mk.mul(float(1.0).sub(mk)).mul(4.0);
+      const cc = amb.add(sc.mul(sh)).toVar('sCc'); cc.addAssign(sc.mul(prata).mul(borda).mul(0.6)); cc.mulAssign(dia.max(0.03));
+      cc.addAssign(vec3(0.5, 0.58, 0.75).mul(sh).mul(u.uLuaK).mul(0.0035)); /* a lua acende a borda de baixo das nuvens */
+      const al = float(1.0).sub(exp(dp.mul(u.uNuv.y).mul(-12.0))).mul(hf).toVar('sAl');
+      col.assign(mix(col, mix(col, cc, Fex), al)); nuvA.assign(al); });
+    col.mulAssign(u.uGanho); /* exposição (a CPU segue o brilho do céu: de dia como antes, no crepúsculo um pouco mais escuro) */
+    /* noite: o fundo azul-escuro, o brilho da lua no ar e as estrelas que giram em volta do polo */
+    const nk = u.uNoiteK; const yp = max(y, 0.0);
+    const md = dot(d, u.uLua).toVar('sMd'); const mdp = max(md, 0.0);
+    const noite = mix(vec3(0.035, 0.045, 0.085), vec3(0.008, 0.013, 0.034), pow(yp, 0.5)).add(vec3(0.42, 0.5, 0.7).mul(pow(mdp, 24.0).mul(0.05).add(pow(mdp, 6.0).mul(0.012))).mul(u.uLuaK));
+    col.addAssign(noite.mul(nk).mul(float(1.0).sub(nuvA.mul(0.6))));
+    /* crepúsculo (o Preetham apaga com o sol abaixo de −2,3°): faixa laranja do lado do sol, rosa-violeta do outro (o cinturão de Vênus), zênite azul */
+    const dh = d.xz.div(max(length(d.xz), 1e-3)); const az = dot(dh, vec2(u.uTw.z, u.uTw.w)).toVar('sAz'); const faixa = exp(yp.mul(-10.0));
+    const twc = vec3(1.0, 0.4, 0.15).mul(pow(max(az, 0.0), 3.0)).add(vec3(0.5, 0.3, 0.52).mul(pow(max(az.negate(), 0.0), 2.0)).mul(0.35)).add(vec3(0.22, 0.16, 0.3).mul(0.3)).mul(faixa).add(vec3(0.03, 0.05, 0.15).mul(faixa.oneMinus()).mul(0.7));
+    col.addAssign(twc.mul(u.uTw.x).mul(0.4));
+    /* bruma no horizonte: o céu encontra a cor de longe da bruma do pós (uHor) com o brilho do sol dela; abaixo do horizonte, o fundo (uBot). No poente a bruma
+       recua do lado do sol (o brilho do sol no horizonte aparece por cima das mesas, que ficam em silhueta) */
+    const hz = exp(yp.mul(-9.0)).mul(0.85).mul(float(1.0).sub(pow(max(az, 0.0), 4.0).mul(u.uTw.y).mul(0.7))); const halo = u.uHor.add(u.uHalo.mul(pow(max(dot(d, u.uLuz), 0.0), 7.0)));
+    col.assign(mix(col, halo, hz)); col.assign(mix(col, mix(halo, u.uBot, clamp(y.negate().mul(4.0), 0.0, 1.0)), float(1.0).sub(smoothstep(-0.02, 0.0, y)))); /* bordas do smoothstep em ordem */
+    /* tinta do clima (a mesma do fundo: M5.u.clima) */
+    const CL = M5.u.clima; col.assign(mix(col, CL.rgb.mul(luminance(col)).mul(1.5), CL.a.mul(0.55).mul(nk.mul(0.45).oneMinus())));
+    col.assign(comprime(col, float(TETO.teto)));
+    const vis = smoothstep(-0.01, 0.06, y).mul(nuvA.oneMinus()).toVar('sVis'); /* o que fica atrás da nuvem e abaixo do horizonte some */
+    /* estrelas (as da Sala: duas camadas, cintilando), no céu que gira */
+    const ds = u.uRot.mul(d).toVar('sDs');
+    const estrela = (sc, lim) => { const q = ds.mul(sc), cc = floor(q); const r = RN.h31(cc); const of = RN.h33(cc).mul(0.6).add(0.2); const l = length(fract(q).sub(of));
+      return float(1.0).sub(smoothstep(0.0, 0.12, l)).mul(smoothstep(lim, 1.0, r)).mul(sin(T.mul(r.mul(3.0).add(1.0)).add(r.mul(60.0))).mul(0.3).add(0.7)); };
+    const st = estrela(170.0, 0.965).mul(1.4).add(estrela(360.0, 0.982));
+    col.addAssign(vec3(0.85, 0.9, 1.0).mul(st).mul(u.uEstrelas).mul(vis).mul(float(1.0).sub(smoothstep(0.9, 0.9995, md))));
+    /* a lua: disco com mares e o limbo mais escuro */
+    { const cosR = Math.cos(1.4 * DEG), sinR = Math.sin(1.4 * DEG); const lu = vec2(dot(d, u.uLuaE1), dot(d, u.uLuaE2)).div(sinR); const r2 = dot(lu, lu);
+      const disco = smoothstep(cosR - 0.00003, cosR + 0.00003, md); const mar = RN.ruido(lu.mul(2.3).add(3.1)).mul(0.5).add(0.5).add(RN.ruido(lu.mul(5.7).add(1.7)).mul(0.15));
+      const tom = mix(0.58, 1.0, smoothstep(0.38, 0.62, mar)).mul(pow(max(float(1.0).sub(r2), 0.0), 0.18));
+      col.assign(mix(col, vec3(0.93, 0.95, 1.0).mul(tom).mul(u.uLuaK).mul(1.35), disco.mul(vis).mul(min(u.uLuaK, 1.0)))); }
+    /* o disco do sol, contido (o da Sala: some abaixo do horizonte e atrás da nuvem) */
+    { const sd = smoothstep(0.99985, 0.99996, ct).mul(smoothstep(-0.02, 0.03, u.uSol.y)).mul(vis);
+      col.assign(max(col, mix(vec3(1.0, 0.52, 0.24), vec3(1.0, 0.93, 0.84), smoothstep(0.0, 0.3, u.uSol.y)).mul(sd).mul(u.uSolK))); }
+    if (comAurora) { /* aurora: duas paredes de luz em anel em volta do polo (o "oval"), vistas em 7 camadas de altura (1 a 3,1: cortinas altas). As estrias
+      dependem só do lugar no anel (as mesmas em todas as camadas), então sobem retas como cortinas; verde embaixo, violeta no alto. O anel passa perto do
+      horizonte em volta do céu todo (aparece na faixa de céu que a câmera do jogo vê) e sobe do lado de fora do polo; mais forte à noite */
+      const acc = vec3(0).toVar('sAu'); const pol = u.uPolo;
+      Loop(7, ({ i }) => { const fi = float(i); const h = fi.mul(0.35).add(1.0); const q = d.xz.mul(h.mul(0.5).div(max(y, 0.0).add(0.05)));
+        const v = q.sub(pol.mul(2.4)); const r = length(v); const cn = v.div(max(r, 1e-3)); /* direção no anel como ponto do círculo: ruído periódico, sem costura */
+        const w1 = RN.ruido(cn.mul(0.8).add(vec2(T.mul(0.015), 0.0))), w2 = RN.ruido(cn.mul(2.6).add(vec2(5.2, T.mul(0.04))));
+        const e1 = r.sub(w1.mul(1.1).add(w2.mul(0.35)).add(5.0)), e2 = r.sub(w1.mul(-0.8).add(w2.mul(0.3)).add(3.3));
+        const f = exp(e1.mul(e1).mul(-7.0)).add(exp(e2.mul(e2).mul(-9.0)).mul(0.55));
+        const est = RN.ruido(cn.mul(42.0).add(vec2(w1.mul(1.5).add(T.mul(0.06)), 0.0))).mul(0.5).add(0.5); const k = f.mul(est.mul(est).mul(est).mul(1.6).add(0.2));
+        const t = fi.div(6.0); const a = pow(float(1.0).sub(t), 1.6).add(select(i.equal(0), float(1.0), float(0.0))); /* a borda de baixo, mais viva */
+        acc.addAssign(mix(u.uAurora.rgb.mul(vec3(0.6, 1.15, 0.75)), vec3(0.55, 0.22, 0.9), t.mul(t)).mul(k).mul(a)); });
+      const au = acc.mul(u.uAurora.w).mul(smoothstep(-0.012, 0.03, y)).mul(nuvA.mul(0.85).oneMinus()).mul(0.22); col.addAssign(au.div(au.mul(0.6).add(1.0))); }
+    return vec4(col, 1.0); })();
+  m.uniforms = u;
+  const mesh = new Tm.Mesh(new Tm.SphereGeometry(4800, 32, 20), m); mesh.frustumCulled = false; mesh.renderOrder = 10000; mesh.userData.mat = m; mesh.name = 'ceu-fisico';
+  M5.registrar('ceu-fisico' + (comAurora ? '-aurora' : ''), m); S.ceu = mesh; S.u = u; return mesh; }
+const S = M5.ceuS = { ceu: null, u: null };
+M5.ceu = function (o) {
+  if (!C.on || (o && o.espaco) || !window.THREE_M5) return ceu0.apply(this, arguments); /* Cinturão: o céu de espaço de sempre */
+  const R = M5.cur && M5.cur.R; const cl = R && R.climateCfg; return ceuFisico({ aurora: !!(C.aurora && cl && cl.aurora) }); };
+
+/* ---------- por quadro: a luz, o fundo e o céu seguem a hora (antes do M5.frame da fundação) ---------- */
+const frame0 = M5.frame;
+const _rot = { m4: null, ax: null };
+M5.frame = function (X, R, nt, sun, bg, cl) {
+  if (C.on && E.pronto) { try { ceuQuadro(X, R, nt, sun, bg, cl); } catch (err) { if (!E.erro) { E.erro = true; console.warn('[ARD] Motor 5: céu (5.0d): ' + err.message); } } }
+  return frame0.apply(this, arguments); };
+function ceuQuadro(X, R, nt, sun, bg, cl) {
+  const Tm = X.T; const fonte = E.deSol ? E.sol : E.lua;
+  /* cor da luz: a de antes vezes o quanto a atmosfera avermelha (relativo ao meio-dia), com a troca sol ↔ lua apagando */
+  if (!E.espaco) { fex(Math.max(0.0, Math.sin(E.elev)), _tr); matiz(_tr, REF.fx, _m1); const mx = Math.max(_m1[0], _m1[1], _m1[2], 1e-6), kc = E.deSol ? 0.75 : 0.3; for (let i = 0; i < 3; i++) E.cor[i] = 1 + (_m1[i] / mx - 1) * kc; } /* a lua avermelha pouco */
+  else E.cor[0] = E.cor[1] = E.cor[2] = 1;
+  sun.color.r *= E.cor[0] * E.k; sun.color.g *= E.cor[1] * E.k; sun.color.b *= E.cor[2] * E.k; /* o apagar na troca sol ↔ lua vai na cor: a bruma do pós (que usa a cor da luz) e o halo do céu apagam junto e não pulam de lado */
+  /* fundo e bruma: no crepúsculo, metade do matiz do horizonte do céu (na luminância do fundo de antes); ao meio-dia e de noite, o de antes */
+  const es = Math.asin(Math.max(-1, Math.min(1, E.sol[1]))); const w = E.espaco ? 0 : 0.3 * Math.exp(-Math.pow((es - 1 * DEG) / (8 * DEG), 2));
+  if (w > 0.002) { matizHora(E.sol, _m2, _mT); const lb = 0.2126 * bg.r + 0.7152 * bg.g + 0.0722 * bg.b; for (let i = 0; i < 3; i++) _m2[i] = 1 + (_m2[i] - 1) * 0.5;
+    const lm = Math.max(1e-6, lum(_m2)); bg.r += (_m2[0] / lm * lb - bg.r) * w; bg.g += (_m2[1] / lm * lb - bg.g) * w; bg.b += (_m2[2] / lm * lb - bg.b) * w; if (X.scene && X.scene.fog) X.scene.fog.color.copy(bg); }
+  atmoPrep(E.sol); medias(E.sol, _hor, _top); /* o céu de agora (o visível usa o sol de verdade, também abaixo do horizonte) */
+  const LS = R.lightSt; if (LS) { LS.sun[0] = sun.color.r; LS.sun[1] = sun.color.g; LS.sun[2] = sun.color.b; LS.sky[0] = bg.r; LS.sky[1] = bg.g; LS.sky[2] = bg.b; } /* o retrato do líder recebe a mesma luz */
+  /* o céu visível */
+  const u = S.u; if (u && S.ceu && S.ceu.parent) {
+    u.uSol.value.fromArray(E.sol); u.uLua.value.fromArray(E.lua); u.uLuz.value.set(R.sunDir[0], R.sunDir[1], R.sunDir[2]).normalize();
+    u.uBR.value.fromArray(AT.bR); u.uBM.value.fromArray(AT.bM); u.uSE.value = AT.sunE; u.uG.value = AT.g;
+    /* exposição: a do meio-dia (alto do céu ~0,3, como o céu de antes) e meia adaptação quando o céu escurece (no crepúsculo não apaga de vez) */
+    const lt = Math.max(1e-6, lum(_top)); u.uGanho.value = (0.3 / REF.lumTop) * Math.min(3, Math.pow(REF.lumTop / lt, 0.35));
+    { const e = Math.asin(Math.max(-1, Math.min(1, E.sol[1]))), h = Math.hypot(E.sol[0], E.sol[2]) || 1; u.uTw.value.set(E.espaco ? 0 : Math.exp(-Math.pow((e + 2.5 * DEG) / (6 * DEG), 2)), E.espaco ? 0 : Math.exp(-Math.pow((e - 1 * DEG) / (8 * DEG), 2)), E.sol[0] / h, E.sol[2] / h); }
+    const sAlto = smooth(-0.035, 0.17, -E.sol[1]); u.uNoiteK.value = sAlto; u.uEstrelas.value = smooth(0.03, 0.2, -E.sol[1]) * (1 - 0.5 * (cl && cl.mix ? cl.mix : 0)); /* a noite entra do sol a +2° até −10°; as estrelas, de −2° a −12° */
+    u.uLuaK.value = E.espaco ? 0 : smooth(-0.04, 0.08, E.lua[1]) * (0.35 + 0.65 * sAlto);
+    { const a = E.lua, ux = Math.abs(a[1]) > 0.95 ? 1 : 0, uy = 1 - ux; let e1x = uy * a[2], e1y = -ux * a[2], e1z = ux * a[1] - uy * a[0]; /* eixo de cima × lua, sem alocar */ const l1 = Math.hypot(e1x, e1y, e1z) || 1; e1x /= l1; e1y /= l1; e1z /= l1;
+      u.uLuaE1.value.set(e1x, e1y, e1z); u.uLuaE2.value.set(a[1] * e1z - a[2] * e1y, a[2] * e1x - a[0] * e1z, a[0] * e1y - a[1] * e1x); }
+    if (!_rot.m4) { _rot.m4 = new Tm.Matrix4(); _rot.ax = new Tm.Vector3().fromArray(AX).normalize(); }
+    _rot.m4.makeRotationAxis(_rot.ax, -E.th); u.uRot.value.setFromMatrix4(_rot.m4);
+    const AK = R.atmoK || { sun: 0.32 }; u.uHalo.value.copy(sun.color).multiplyScalar(AK.sun * (1 - 0.85 * nt));
+    if (cl && cl.aurora) { const ka = (Math.sin(R.time * 0.3) + 1) / 2; u.uAurora.value.set(cl.aurora[0], cl.aurora[1], cl.aurora[2], (0.18 + 0.82 * smooth(0.25, 0.8, nt)) * (0.8 + 0.2 * ka)); } else u.uAurora.value.w = 0;
+    { const h = Math.hypot(AX[0], AX[2]) || 1; u.uPolo.value.set(-AX[0] / h, -AX[2] / h); } /* o polo que fica acima do horizonte */
+  }
+  if (S.raiosCor) { const kq = C.raiosK != null ? C.raiosK : 1, kr = (sun.intensity / 2.08) * kq; S.raiosCor.value.copy(sun.color).multiplyScalar(kr); if (S.raiosK) S.raiosK.value.x = Math.min(0.9, 0.7 * kq * Math.min(1, E.k + 0.2)); } /* raios de sol: a luz de agora (1 ao meio-dia), apagando com ela */
+  envQuadro(X, R, nt, cl);
+}
+
+/* ---------- reflexo do céu (PMREM) em degraus ----------
+   O mapa de ambiente da fundação (core.js, M5.skyEnv) é o céu da fase 2 em degradê com o sol e o chão do mapa. Aqui ele ganha a hora: as cores do
+   horizonte e do alto mudam de matiz como o céu físico muda (relativo ao meio-dia: ao meio-dia é exatamente o de antes), o "sol" do mapa é quem ilumina
+   (sol de dia, lua de noite), e a aurora tinge o alto. O brilho continua o da curva da noite do render3d (environmentIntensity), então nada escurece
+   duas vezes. Cada refeita vai para um alvo à parte em fases (o cubo, o desfoque e os níveis do GGX, alguns por quadro) e termina numa cópia de
+   textura para o alvo de sempre: a cena nunca troca de textura (nada se remonta) e nenhum pipeline nasce (os do PMREM nascem na primeira, na carga). */
+const skyEnv0 = M5.skyEnv;
+const ENV = M5.ceuEnv = { rtB: null, fase: -1, balde: null, t: -1e9, cl: null, sujo: false, n: 0, ms: [], quadros: 0, porQuadro: 2, alvoTh: 0 };
+const _bgD = { r: 0, g: 0, b: 0 };
+function envUniforms(X, R, cl, th) { /* os uniforms do céu do mapa de ambiente para a hora th (os mesmos de antes ao meio-dia) */
+  const Tm = X.T; const u = X.envSky.userData.mat.uniforms; const gcol = R.groundCol || new Tm.Color(0.3, 0.28, 0.26);
+  const bgD = new Tm.Color().setRGB(0.62, 0.69, 0.77); if (cl) bgD.lerp(new Tm.Color().setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), cl.mix);
+  u.uHor.value.copy(bgD).lerp(new Tm.Color().copy(gcol).multiplyScalar(1.5), 0.28); u.uTop.value.copy(bgD).multiplyScalar(0.55).lerp(new Tm.Color(0.12, 0.2, 0.36), 0.5); u.uBot.value.copy(gcol).multiplyScalar(0.7);
+  u.uNight.value = 0; u.uSpace.value = 0; X.envGround.material.color.copy(gcol).multiplyScalar(0.8);
+  const sol = [0, 0, 0]; solEm(th, sol, E.espaco); const deSol = E.espaco || sol[1] >= 0; const fonte = deSol ? sol : [-sol[0], -sol[1], -sol[2]];
+  u.uSunDir.value.set(fonte[0], fonte[1], fonte[2]).normalize(); u.uSunCol.value.setRGB(1.0, 0.91, 0.77).multiplyScalar(1.6);
+  if (!C.on || E.espaco) return;
+  const mH = [0, 0, 0], mT = [0, 0, 0]; matizHora(sol, mH, mT);
+  const kM = 0.65; const tinge = (c, m) => { c.r *= 1 + (m[0] - 1) * kM; c.g *= 1 + (m[1] - 1) * kM; c.b *= 1 + (m[2] - 1) * kM; };
+  tinge(u.uHor.value, mH); tinge(u.uTop.value, mT); tinge(X.envGround.material.color, mH);
+  /* a luz: a cor de agora (curva da noite e atmosfera), a mesma que o render3d dá ao sol, sem o clima */
+  const n = (1 - Math.cos(th)) / 2, el = Math.asin(Math.max(-1, Math.min(1, Math.abs(sol[1])))); const tr = matiz(fex(Math.sin(el), [0, 0, 0]), REF.fx, [0, 0, 0]); const mx = Math.max(tr[0], tr[1], tr[2], 1e-6);
+  const kz = smooth(0, C.apaga, Math.abs(sol[1])), kc = deSol ? 0.75 : 0.3; u.uSunCol.value.setRGB((1 - 0.48 * n) * (1 + (tr[0] / mx - 1) * kc), (0.91 - 0.24 * n) * (1 + (tr[1] / mx - 1) * kc), (0.77 + 0.2 * n) * (1 + (tr[2] / mx - 1) * kc)).multiplyScalar(1.6 * (0.25 + 0.75 * kz));
+  if (cl && cl.aurora && C.aurora) { const ka = 0.5 * smooth(0.25, 0.8, n); u.uTop.value.lerp(new Tm.Color(cl.aurora[0], cl.aurora[1], cl.aurora[2]).multiplyScalar(lumC(u.uTop.value) / 0.6), ka); u.uHor.value.lerp(new Tm.Color(cl.aurora[0], cl.aurora[1], cl.aurora[2]).multiplyScalar(lumC(u.uHor.value) / 0.6), ka * 0.4); }
+}
+const lumC = c => 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
+function envSetup(X, scene, R) { /* a cena do mapa de ambiente da fundação (core.js), montada uma vez */
+  if (X.envScene) return; const Tm = X.T; const es = new Tm.Scene(); const sk = ceu0(); sk.scale.setScalar(0.02); es.add(sk); const um = M5.pmremUm && M5.verso;
+  const gm = new Tm.MeshBasicNodeMaterial(um ? { color: 0x404040, side: Tm.BackSide, depthWrite: false, depthTest: false } : { color: 0x404040 }); gm.fog = false; const cg = new Tm.CircleGeometry(90, 40); const gd = new Tm.Mesh(um ? M5.verso(cg) : cg, gm); if (um) cg.dispose();
+  gd.rotation.x = -Math.PI / 2; gd.position.y = -8; es.add(gd); X.envScene = es; X.envSky = sk; X.envGround = gd; X.pmrem = new Tm.PMREMGenerator(X.renderer);
+  if (um && typeof X.pmrem._setSize === 'function' && typeof X.pmrem._allocateTarget === 'function') { try { X.pmrem._setSize(256); X.envRT = X.pmrem._allocateTarget(false); } catch (e) { X.envRT = null; } } }
+function envBakeTudo(X, scene, R) { /* refeita inteira, no quadro (a da carga e a reserva) */
+  const t0 = performance.now(); X.envRT = X.pmrem.fromScene(X.envScene, 0.025, 0.1, 400, X.envRT ? { renderTarget: X.envRT } : {}); X.envMs = Math.round(performance.now() - t0);
+  if (scene.environment !== X.envRT.texture) { scene.environment = X.envRT.texture; scene.environmentIntensity = R.envSkyK; R.envK0 = R.envSkyK; } R.envSky = true; }
+M5.skyEnv = function (X, scene, cl, R) {
+  if (!C.on || !C.env) return skyEnv0.apply(this, arguments);
+  const Tm = X.T; if (!X.renderer.hasInitialized || !X.renderer.hasInitialized()) return;
+  envSetup(X, scene, R); ENV.cl = cl; ENV.R = R; ENV.scene = scene; ENV.X = X;
+  if (!X.warmDone || ENV.balde == null) { const th = baldeTh(X, R); envUniforms(X, R, cl, th); envBakeTudo(X, scene, R); ENV.balde = baldeDe(th); ENV.t = performance.now() / 1000; ENV.fase = -1; ENV.n++;
+    /* com o ciclo andando, as fases rodam uma vez inteiras na carga: o alvo à parte e os objetos de desenho da câmera do cubo nascem aqui, não na 1ª refeita */
+    const diaFixo = R.forceDay || !!QS.get('dia') || (!!QS.get('bench') && !QS.get('noite')); /* o main.js liga o meio-dia fixo depois da carga (?dia=1, Teste de desempenho) */
+    if (!diaFixo && C.hora == null && envFasesOk(X) && !ENV.rtB) { try { ENV.fase = 0; let k = 0; while (ENV.fase >= 0 && k++ < 40) envFase(X); ENV.fim = false; } catch (err) { ENV.fase = -1; C.envFases = false; } } }
+  else ENV.sujo = true; /* troca de clima no meio da partida: refeita em fases no próximo quadro */
+};
+const passo = () => (M5.cur && M5.cur.R && M5.cur.R.quality && M5.cur.R.quality.resolved === 'baixa' ? C.envPassoBaixa : C.envPasso);
+const baldeDe = th => Math.round(th / passo());
+const baldeTh = (X, R) => { if (!E.pronto) { M5.ceuHora(R, R.sim || (window.__ARDG && window.__ARDG.sim), null); } return Math.round(E.th / passo()) * passo(); };
+function envQuadro(X, R, nt, cl) {
+  if (!C.env || !X.envScene || ENV.balde == null) return;
+  if (ENV.fase < 0) { const b = baldeDe(E.th); if (b === ENV.balde && !ENV.sujo) return; if (X.warmDone && performance.now() / 1000 - ENV.t < C.envIntervalo && !ENV.sujo) return;
+    ENV.balde = b; ENV.sujo = false; ENV.alvoTh = b * passo(); envUniforms(X, R, ENV.cl, ENV.alvoTh);
+    if (!X.warmDone || !envFasesOk(X)) { envBakeTudo(X, ENV.scene || X.scene, R); ENV.t = performance.now() / 1000; ENV.n++; return; } /* na carga e sem as partes do r186: inteira, no quadro */
+    ENV.fase = 0; ENV.t0 = performance.now(); ENV.t = ENV.t0 / 1000; ENV.cpu = 0; }
+  const t0 = performance.now(); ENV.nq = (ENV.nq || 0) + 1; try { envFase(X); } catch (err) { console.warn('[ARD] Motor 5: reflexo em fases (5.0d): ' + err.message); ENV.fase = -1; C.envFases = false; envBakeTudo(X, ENV.scene || X.scene, R); } const dtq = performance.now() - t0; ENV.cpu += dtq; ENV.maxq = Math.max(ENV.maxq || 0, dtq);
+  if (ENV.fim) { ENV.fim = false; if (ENV.ms.length < 40) ENV.ms.push([Math.round(performance.now() - ENV.t0), +ENV.cpu.toFixed(2), ENV.nq, +ENV.maxq.toFixed(2)]); ENV.nq = 0; ENV.maxq = 0; } /* [ms do começo ao fim, CPU somada, quadros, CPU do quadro mais caro] */
+}
+function envFasesOk(X) { const p = X.pmrem; if (C.envFases === false) return false; return !!(p && p._applyGGXFilter && p._blur && p._init && p._setViewport && p._lodMeshes && p._cubeSize && X.renderer.copyTextureToTexture); }
+/* uma fase por quadro: 0 e 1 = as faces do cubo (3 + 3, a mesma conta do _sceneToCubeUV do r186); 2 = o desfoque; 3… = níveis do GGX (ENV.porQuadro por
+   quadro); a última = a cópia para o alvo de sempre. Nenhum quadro desenha mais que ~4 passes pequenos */
+const UP_S = [1, 1, 1, 1, -1, 1], FW_S = [1, -1, 1, -1, 1, -1];
+function envFaces(X, B, i0, i1) { const r = X.renderer, pm = X.pmrem, Tm = X.T; const cam = ENV.cam || (ENV.cam = new Tm.PerspectiveCamera(90, 1, 0.1, 400)); const sz = pm._cubeSize;
+  r.setRenderTarget(B); if (i0 === 0) r.clear(); r.autoClear = false;
+  for (let i = i0; i < i1; i++) { const col = i % 3; cam.position.set(0, 0, 0);
+    if (col === 0) { cam.up.set(0, UP_S[i], 0); cam.lookAt(FW_S[i], 0, 0); } else if (col === 1) { cam.up.set(0, 0, UP_S[i]); cam.lookAt(0, FW_S[i], 0); } else { cam.up.set(0, UP_S[i], 0); cam.lookAt(0, 0, FW_S[i]); }
+    pm._setViewport(B, col * sz, i > 2 ? sz : 0, sz, sz); r.render(X.envScene, cam); } }
+function envFase(X) {
+  const r = X.renderer, pm = X.pmrem, A = X.envRT; if (!ENV.rtB) { ENV.rtB = pm._allocateTarget(false); ENV.rtB.texture.name = 'ard-ceu-ambiente-b'; }
+  const B = ENV.rtB, prev = r.getRenderTarget(), face = r.getActiveCubeFace(), mip = r.getActiveMipmapLevel(), ac = r.autoClear;
+  try {
+    if (ENV.fase === 0) { pm._init(B); envFaces(X, B, 0, 3); ENV.fase = 1; }
+    else if (ENV.fase === 1) { envFaces(X, B, 3, 6); ENV.fase = 2; }
+    else if (ENV.fase === 2) { r.autoClear = false; pm._blur(B, 0, 0, 0.025); ENV.fase = 3; }
+    else { const n = pm._lodMeshes.length; let i = ENV.fase - 2; r.autoClear = false; for (let k = 0; k < ENV.porQuadro && i < n; k++, i++) pm._applyGGXFilter(B, i - 1, i); ENV.fase = i + 2;
+      if (i >= n) { r.copyTextureToTexture(B.texture, A.texture); ENV.fase = -1; ENV.n++; ENV.quadros++; ENV.fim = true; } }
+  } finally { r.autoClear = ac; B.scissorTest = false; pm._setViewport(B, 0, 0, B.width, B.height); r.setRenderTarget(prev, face, mip); }
+}
+
+/* ---------- raios de sol (5.0d): a luz do sol espalhada pela poeira do ar baixo, com a sombra das cascatas e do dossel da Tempestade ----------
+   O GodraysNode do r186 marcha 60 passos por pixel na sombra de UMA luz e não conhece o CSMShadowNode (cada cascata é uma luz própria). Aqui, o
+   equivalente mais barato: ¼ da resolução, 20 passos com ruído, só no trecho do raio dentro da camada de poeira (até 300 acima do chão em volta da
+   câmera), a sombra lida da cascata que contém o ponto (até 3 das cascatas de longe; na reserva WebGL2, a sombra única) e, sob a Tempestade de Éter,
+   o dossel dela (a mesma textura 3D de ruído e o mesmo giro do volume) apaga o sol: sobram as falhas, que viram feixes. A soma sai com a fase de
+   Henyey-Greenstein (g 0,55): forte olhando para o sol (poente à frente), fraca de cima ao meio-dia. Só na Alta e na Ultra (com sombra). */
+let RaiosC = null;
+function raiosFontes(X) { const out = []; if (X.csm && X.csm.lights && X.csm.lights.length) { const L = X.csm.lights, n = L.length; for (let i = Math.max(0, n - 3); i < n; i++) { const sh = L[i].shadow; if (sh && sh.map && sh.map.depthTexture) out.push(sh); } }
+  else if (X.sun && X.sun.shadow && X.sun.shadow.map && X.sun.shadow.map.depthTexture) out.push(X.sun.shadow); return out; }
+M5.raiosSol = function (entrada, depth, o) {
+  o = o || {}; const X = o.X || M5.cur, q = o.q; if (!C.on || C.raios === '0' || !X || !q || !q.shadows) return null;
+  if (!(q.resolved === 'alta' || q.resolved === 'ultra' || C.raios === '1')) return null;
+  const Tm = window.THREE_M5, L = window.TSL; const { Fn, Loop, uniform, float, vec2, vec3, vec4, mix, max, min, exp, dot, length, clamp, select, getViewPosition, uv, texture, texture3D, interleavedGradientNoise, screenCoordinate, passTexture, context, cos, sin, smoothstep, pow } = L;
+  if (!RaiosC) RaiosC = class ArdRaiosNode extends Tm.TempNode {
+    static get type() { return 'ArdRaiosNode'; }
+    constructor(depthNode, camera, X) { super('vec4'); this.depthNode = depthNode; this.camera = camera; this.X = X; this.escala = 0.25; this.passos = 20;
+      this.rt = new Tm.RenderTarget(1, 1, { depthBuffer: false, type: Tm.HalfFloatType }); this.rt.texture.name = 'ard-raios-sol'; this.rt.texture.generateMipmaps = false;
+      this.quad = new Tm.QuadMesh(); this.mat = null; this.tam = new Tm.Vector2(); this.estado = undefined; this.fontes = null;
+      this.U = { projInv: uniform(new Tm.Matrix4()), camWorld: uniform(new Tm.Matrix4()), luz: uniform(new Tm.Vector3(0, 1, 0)), base: uniform(0), topo: uniform(300), hh: uniform(110), dmax: uniform(2600),
+        temp: uniform(0), tC: uniform(new Tm.Vector4()), tB: uniform(new Tm.Vector4()), tE: uniform(new Tm.Vector4()) };
+      this.saida = passTexture(this, this.rt.texture); this.updateBeforeType = Tm.NodeUpdateType.FRAME; }
+    getTextureNode() { return this.saida; }
+    updateBefore(frame) { const r = frame.renderer; if (!this.mat) return; this.estado = Tm.RendererUtils.resetRendererState(r, this.estado);
+      const s = r.getDrawingBufferSize(this.tam); this.rt.setSize(Math.max(1, Math.round(s.width * this.escala)), Math.max(1, Math.round(s.height * this.escala)));
+      const U = this.U, cam = this.camera; U.projInv.value.copy(cam.projectionMatrixInverse); U.camWorld.value.copy(cam.matrixWorld);
+      const R = this.X.R; if (R && R.sunDir) U.luz.value.set(R.sunDir[0], R.sunDir[1], R.sunDir[2]).normalize(); const ty = R && R.camTy != null ? R.camTy : 0; U.base.value = ty; U.topo.value = ty + 300;
+      const ST = R && R.STM, D = ST && ST.debug && ST.debug.UV; U.temp.value = ST && ST.on && D ? 1 : 0; if (D) { U.tC.value.copy(D.uC.value); U.tB.value.copy(D.uB.value); U.tE.value.set(D.uE.value.x, D.uA.value.x, 0, 0); }
+      if (this.texel) this.texel.value.set(1 / this.rt.width, 1 / this.rt.height);
+      r.setRenderTarget(this.rt); this.quad.material = this.mat; this.quad.render(r); Tm.RendererUtils.restoreRendererState(r, this.estado); }
+    setup(builder) {
+      if (!this.mat) { const U = this.U, X = this.X; const fontes = this.fontes = raiosFontes(X); const m = new Tm.NodeMaterial(); m.contextNode = context(builder.getSharedContext());
+        const R = X.R, ST = R && R.STM, D = ST && ST.debug && ST.debug.UV, nTex = D && D.uN && D.uN.value ? texture3D(D.uN.value) : null; const N = this.passos;
+        m.fragmentNode = Fn(() => {
+          const u0 = uv(); const dz = this.depthNode.sample(u0).r; const vp = getViewPosition(u0, dz, U.projInv); const wp = U.camWorld.mul(vec4(vp, 1)).xyz; const co = U.camWorld.element(3).xyz;
+          const rd0 = wp.sub(co), dist = min(length(rd0), U.dmax), rd = rd0.div(max(length(rd0), 1e-3)).toVar('rRd');
+          /* o trecho do raio dentro da camada de poeira (abaixo do topo) */
+          const tIn = clamp(U.topo.sub(co.y).div(min(rd.y, -1e-3)), 0.0, dist).toVar('rT0'); const tIn2 = select(co.y.greaterThan(U.topo), tIn, float(0)); const seg = max(dist.sub(tIn2), 0.0).toVar('rSeg');
+          const dt = seg.div(N).toVar('rDt'); const jit = interleavedGradientNoise(screenCoordinate); const acc = float(0).toVar('rAcc'), tot = float(0).toVar('rTot');
+          Loop(N, ({ i }) => { const t = tIn2.add(float(i).add(jit).mul(dt)); const p = co.add(rd.mul(t)).toVar('rP');
+            let lit = float(1);
+            for (let k = fontes.length - 1; k >= 0; k--) { const sh = fontes[k]; const sp = uniform(sh.matrix).mul(vec4(p, 1.0)); const sc = vec3(sp.x, sp.y.oneMinus(), sp.z);
+              const dentro = sc.x.greaterThanEqual(0.0).and(sc.x.lessThanEqual(1.0)).and(sc.y.greaterThanEqual(0.0)).and(sc.y.lessThanEqual(1.0)).and(sc.z.greaterThanEqual(0.0)).and(sc.z.lessThanEqual(1.0));
+              const v = texture(sh.map.depthTexture, clamp(sc.xy, 0.0, 1.0)).compare(sc.z); lit = select(dentro, v, lit); } /* a cascata mais perto que contém o ponto vence (a ordem do laço) */
+            if (nTex) { /* o dossel da Tempestade: o raio de sol que sai de p cruza a altura do meio do dossel; lá, o ruído do volume diz se há nuvem */
+              const yc = U.tC.y.add(U.tB.z).add(175.0); const Q = p.add(U.luz.mul(yc.sub(p.y).div(max(U.luz.y, 0.12)))); const lq = Q.xz.sub(vec2(U.tC.x, U.tC.z)); const Rr = U.tC.w.mul(U.tB.w); const rho = length(lq).div(max(Rr, 1.0));
+              const ang = U.tB.x.add(U.tB.y.div(rho.add(0.42))).add(yc.sub(U.tC.y).mul(0.0016)); const ca = cos(ang), sa = sin(ang); const qq = vec2(ca.mul(lq.x).sub(sa.mul(lq.y)), sa.mul(lq.x).add(ca.mul(lq.y)));
+              const n1 = nTex.sample(vec3(qq.x, yc.sub(U.tC.y).mul(1.5), qq.y).mul(0.0016)).level(0).r; const tw = exp(rho.sub(0.79).mul(rho.sub(0.79)).mul(-34.0));
+              const borda = float(1).sub(smoothstep(tw.mul(0.08).add(0.98), 1.16, rho)), olho = smoothstep(0.1, 0.36, rho.add(n1.sub(0.5).mul(0.2)));
+              const c1 = n1.mul(0.85).add(tw.mul(0.3)).sub(float(1).sub(borda.mul(olho)).mul(0.75)); const den = smoothstep(U.tE.x, U.tE.x.add(0.16), c1).mul(U.tE.y);
+              const sobe = select(p.y.lessThan(yc), float(1), float(0)); lit = lit.mul(exp(den.mul(sobe).mul(U.temp).mul(-2.6).div(max(U.luz.y, 0.25)))); }
+            let dens = exp(max(p.y.sub(U.base), 0.0).div(U.hh).negate());
+            if (nTex) { const rp = length(p.xz.sub(vec2(U.tC.x, U.tC.z))).div(max(U.tC.w.mul(U.tB.w), 1.0)); dens = dens.mul(float(1).sub(smoothstep(0.9, 1.15, rp)).mul(U.temp).mul(U.tE.y).mul(2.5).add(1.0)); } /* a Tempestade levanta poeira: mais ar para os feixes */
+            acc.addAssign(lit.mul(dens).mul(dt)); tot.addAssign(dens.mul(dt)); });
+          const ct = dot(rd, U.luz), g = 0.55; const hg = float(1 - g * g).div(pow(float(1 + g * g).sub(ct.mul(2 * g)), 1.5)); /* fase de Henyey-Greenstein (× 4π: 1 = isótropa): forte olhando para o sol */
+          return vec4(acc.div(800), tot.div(800), hg, 1); })(); /* poeira iluminada e poeira total no raio (em "opacidades" de 800 de caminho) e a fase */
+        if (M5.registrar) M5.registrar('raios-sol', m); else m.name = 'ard-raios-sol'; this.mat = m; }
+      return this.saida; }
+    dispose() { super.dispose(); this.rt.dispose(); if (this.mat) this.mat.dispose(); }
+  };
+  const no = new RaiosC(depth, o.camera, X);
+  const cor = S.raiosCor || (S.raiosCor = uniform(new Tm.Color(0, 0, 0))); /* cor × força, da CPU (ceuQuadro): o sol de agora, fraco de noite */
+  const tx = no.getTextureNode(), tl = no.texel = uniform(new Tm.Vector2(1, 1)), u0 = uv(); /* 4 amostras a ¾ de texel (com o filtro bilinear, uma média 4×4 da textura de ¼): o ruído da marcha some */
+  const r4 = tx.sample(u0.add(tl.mul(vec2(-0.75, -0.75)))).rgb.add(tx.sample(u0.add(tl.mul(vec2(0.75, -0.75)))).rgb).add(tx.sample(u0.add(tl.mul(vec2(-0.75, 0.75)))).rgb).add(tx.sample(u0.add(tl.mul(vec2(0.75, 0.75)))).rgb).mul(0.25);
+  /* contraste, não véu: o ar na sombra (das peças, do relevo e do dossel) apaga parte da bruma e o ar iluminado ganha um pouco de sol (mais olhando para ele),
+     na proporção da poeira que o raio atravessa (tau). Sem sombra no caminho, quase nada muda; ao meio-dia de cima, quase nada; no poente à frente, os feixes */
+  const tau = float(1).sub(exp(r4.y.negate())), f = r4.x.div(max(r4.y, 1e-4)).clamp(0.0, 1.0); const e = vec4(entrada);
+  const k = S.raiosK || (S.raiosK = uniform(new Tm.Vector2(0.7, 0.025))); /* escurecer a sombra, somar a luz */
+  const dbg = S.raiosDbg || (S.raiosDbg = uniform(0)); /* diagnóstico: 1 = fração iluminada, 2 = poeira do raio (tau), 3 = fase */
+  const out = max(e.rgb.mul(float(1).sub(tau.mul(f.oneMinus()).mul(k.x))).add(cor.mul(tau.mul(f).mul(r4.z).mul(k.y))), vec3(0));
+  return { no, cor: vec4(select(dbg.greaterThan(0.5), vec3(select(dbg.greaterThan(2.5), r4.z.mul(0.25), select(dbg.greaterThan(1.5), tau, f))), out), e.a) };
+};
+/* diagnóstico: ARD.m5.ceuInfo() e as contas da atmosfera (ARD.m5.ceuCPU) */
+M5.ceuCPU = { atmoPrep, medias, matiz, fex, ceuEm, solEm, REF, AT, lum };
+M5.ceuInfo = () => ({ on: C.on, hora: C.hora, th: +(E.th / DEG).toFixed(2), thLuz: +(E.thL / DEG).toFixed(2), sol: E.sol.map(v => +v.toFixed(3)), luz: E.luz.map(v => +v.toFixed(3)), deSol: E.deSol, k: +E.k.toFixed(3), cor: E.cor.map(v => +v.toFixed(3)), espaco: E.espaco,
+  env: { n: ENV.n, balde: ENV.balde, fase: ENV.fase, ms: ENV.ms.slice(-6) }, ceu: S.ceu ? S.ceu.material.name : null });
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Aether Rift: Dominion — Motor 5 (5.0b, fase 2): lagos de plasma e de gelo em TSL. O src/lakes3d.js escolhe este caminho no Motor 5
@@ -20362,6 +20778,639 @@ FOTO.csm = function (X, camera, dist) {
 FOTO.csmSolta = function (X) { if (X && X.fotoLente) { X.fotoLente.fov = 0; X.fotoLente.asp = 0; X.fotoLente.near = 0; } };
 })(globalThis.ARD = globalThis.ARD || {});
 
+/* Aether Rift: Dominion — Motor 5 (5.0d): clima simulado na GPU e o chão que guarda a batalha (TSL: WGSL no WebGPU, GLSL na reserva WebGL2).
+   Tudo visual: a simulação (src/sim.js) e o determinismo não mudam; os presets de clima continuam os mesmos (CLIMATES do src/render3d.js).
+   - Clima: partículas num compute shader (posição e velocidade em storage), que caem com vento e turbulência, batem no relevo (mapa de alturas
+     do chão numa textura) e pousam, respingam ou somem; um desenho só para todas (flocos, riscos de chuva e areia, respingos, brasas e esporos).
+     Bancos de neblina em camadas que seguem o relevo suavizado e engrossam nos vales. Neve, cinza, areia e molhado cobrem o chão, os adereços e
+     o alto das peças (máscara pela normal e um acúmulo que cresce na partida). Chuva: chão escuro, poças com o céu refletido (barato, no próprio
+     material do chão) e, na Alta e na Ultra, o reflexo de tela nas poças (um passe do pós, meia resolução).
+   - Batalha (toda partida): crateras que afundam o chão pelo mapa de cicatrizes (deslocamento no vértice, sem refazer a malha), borda de terra
+     levantada, mato queimado em volta do queimado, flocos de cinza no carvão, adereços queimados e pegadas da infantaria na neve e na areia.
+   Pipelines: o clima só existe na partida que tem clima (o compute, o desenho das partículas, a neblina quando há, o reflexo quando há); a
+   batalha só muda o código do chão e dos adereços (nenhum pipeline novo). Tudo nasce na carga (cena e M5.pendentes), nada por quadro.
+   Chaves de URL: ?clima5=0 (volta aos flocos antigos), ?marcas5=0 (sem as camadas da batalha), ?reflexo=0, ?acumulo=0|1, ?climaN=<partículas>. */
+(function (ARD) {
+'use strict';
+const M5 = ARD.m5 = ARD.m5 || {};
+const QS = new URLSearchParams(typeof location !== 'undefined' ? location.search : '');
+const T = () => window.THREE_M5, L = () => window.TSL;
+const LIGADO = QS.get('clima5') !== '0', BATALHA = QS.get('marcas5') !== '0', REFLEXO = QS.get('reflexo') !== '0';
+const ACUM = QS.get('acumulo'); /* '1': tudo coberto desde o início (fotos); '0': nada acumula */
+
+/* ---------- o visual novo de cada preset (os presets em si não mudam) ----------
+   tipos: até três tipos de partícula por clima, cada um com a fração do total (f), o movimento K = [vy, vento, turbulência, rente ao chão],
+   o jeito L = [tempo pousada (s), tamanho, alfa, forma (0 floco, 1 risco, 2 brilho, 3 floco que cintila)], M = [vida máxima (s), risco (s), brilho]
+   e a cor. cobre: quanto o chão e as peças ficam cobertos no fim (neve, cinza, areia, molhado). neblina: bancos em camadas. */
+const VISUAL = {
+  cristais: { nome: 'neve de cristais', vento: [15, -5],
+    tipos: [{ f: 0.82, K: [-24, 0.45, 7, 0], L: [3.0, 0.85, 0.8, 0], M: [0, 0, 0], cor: [0.92, 0.95, 1.0] }, { f: 0.18, K: [-20, 0.45, 8, 0], L: [3.0, 0.7, 0.95, 3], M: [0, 0, 1.6], cor: [0.78, 0.93, 1.0] }],
+    chao: [0.95, 0, 0, 0], peca: [0.8, 0, 0, 0] },
+  aurora: { nome: 'neve fina e neblina fria', vento: [8, 4],
+    tipos: [{ f: 1, K: [-14, 0.55, 5, 0], L: [2.0, 0.6, 0.7, 0], M: [0, 0, 0], cor: [0.9, 0.95, 1.0] }],
+    chao: [0.4, 0, 0, 0], peca: [0.42, 0, 0, 0], neblina: { cor: [0.6, 0.78, 0.8], dens: 0.36, alturas: [10, 26, 46], deriva: 0.6, noite: 0.05 } },
+  acida: { nome: 'chuva', vento: [6, -2],
+    tipos: [{ f: 1, K: [-240, 0.12, 2, 0], L: [0.3, 0.24, 0.3, 1], M: [0, 0.038, 0], cor: [0.7, 0.8, 0.66] }],
+    chao: [0, 0, 0, 1], peca: [0, 0, 0, 1], reflexo: true },
+  plasma: { nome: 'tempestade de areia e cinza', vento: [24, -8],
+    tipos: [{ f: 0.42, K: [-10, 1.0, 6, 0], L: [1.2, 0.9, 0.75, 0], M: [0, 0, 0], cor: [0.32, 0.3, 0.29] }, { f: 0.2, K: [26, 0.65, 14, 0], L: [0, 0.45, 1.0, 2], M: [4.5, 0, 2.6], cor: [1.0, 0.42, 0.12] },
+      { f: 0.38, K: [0, 2.6, 4, 7], L: [0, 0.45, 0.32, 1], M: [3.5, 0.1, 0], cor: [0.72, 0.56, 0.38] }],
+    chao: [0, 0.75, 0.65, 0], peca: [0, 0.55, 0.5, 0], neblina: { cor: [0.66, 0.5, 0.34], dens: 0.42, alturas: [6, 18, 34], deriva: 2.2, noite: 0, limiar: 0.18 } },
+  toxica: { nome: 'névoa tóxica', vento: [9, -3],
+    tipos: [{ f: 1, K: [-3, 0.55, 9, 0], L: [3.0, 0.7, 0.8, 2], M: [0, 0, 0.9], cor: [0.55, 0.95, 0.35] }],
+    chao: [0, 0, 0, 0.3], peca: [0, 0, 0, 0.2], neblina: { cor: [0.45, 0.62, 0.28], dens: 0.5, alturas: [8, 22, 40], deriva: 0.5, noite: 0.12 } },
+};
+/* partículas e camadas por nível: 0 Baixa e celular (o mais barato), 1 Média, 2 Alta, 3 Ultra */
+const NIVEL = [{ n: 1536, camadas: 1 }, { n: 4096, camadas: 2 }, { n: 12288, camadas: 3 }, { n: 20480, camadas: 3 }];
+
+const C = M5.clima = { VISUAL, vis: null, nome: null, nivel: 1, ativo: false, montado: false, pipes: 0, N: 0, nAtivo: 0, U: null };
+
+/* ---------- uniforms do clima (criados uma vez, compartilhados por todos os materiais) ---------- */
+function init() {
+  if (C.U) return C.U; const Tm = T(), { texture, renderGroup } = L(); M5.shared && M5.shared();
+  /* 5.0d: no grupo da chamada de render (um bloco só, igual para todos os objetos). No grupo por objeto (o padrão), os objetos que dividem o
+     material dividem também as cópias do bloco na CPU (o clone do r186 copia a referência): um valor igual para todos só subia para o primeiro
+     objeto desenhado depois da mudança (o chão divide o material com o paredão da Fenda e não recebia a cobertura) */
+  const uniform = v => L().uniform(v).setGroup(renderGroup);
+  const blank = M5.blank || ((r, g, b, a) => { const t = new Tm.DataTexture(new Uint8Array([r, g, b, a]), 1, 1); t.needsUpdate = true; return t; });
+  C.U = {
+    cobreChao: uniform(new Tm.Vector4(0, 0, 0, 0)),   /* neve, cinza, areia, molhado no chão (0…1) */
+    cobrePeca: uniform(new Tm.Vector4(0, 0, 0, 0)),   /* o mesmo no alto das peças e nos adereços */
+    vento: uniform(new Tm.Vector4(1, 0, 10, 0)),      /* direção (x, z do three), velocidade, rajada */
+    dens: uniform(1),                                 /* intensidade do clima no momento (as rajadas variam) */
+    nivel: uniform(1),                                /* 0 Baixa e celular … 3 Ultra (ramos uniformes: o mesmo código em toda qualidade) */
+    cratera: uniform(1),                              /* profundidade das crateras (0 na Baixa e no celular) */
+    alt: texture(blank(0, 0, 0, 255)),                /* mapa de alturas do chão (R altura, G altura suavizada), meia precisão */
+    altK: uniform(new Tm.Vector4(1 / 6000, 0, 6000, 0)), /* uv = (x·k + o, −z·k + o): k = 1/(HS·HN), o = 0,5/HN; z = tamanho do mapa */
+  };
+  return C.U;
+}
+C.init = init;
+
+/* ---------- escolha (R.setClimate, antes da carga): o visual, o nível e se o pós precisa do reflexo ---------- */
+C.escolher = function (nome, cfg, R, toque) {
+  const v = LIGADO && cfg ? VISUAL[nome] || null : null; const antes = !!(C.vis && C.vis.reflexo && C.reflexoNivel());
+  C.vis = v; C.nome = v ? nome : null; C.cfg = cfg || null; C.R = R; C.toque = !!toque;
+  const q = R && R.quality ? (R.quality.resolved || R.quality.name) : 'media'; C.nivel = toque || q === 'baixa' ? 0 : q === 'ultra' ? 3 : q === 'alta' ? 2 : 1;
+  C.ativo = !!v; const U = init(); U.nivel.value = C.nivel; U.cratera.value = C.nivel > 0 && !toque ? 1 : 0;
+  return antes !== !!(C.vis && C.vis.reflexo && C.reflexoNivel()); /* true: o render3d refaz o pós (o reflexo entra ou sai) */
+};
+C.reflexoNivel = () => REFLEXO && !C.toque && C.nivel >= 2;
+C.qualidade = function (R, toque) { const q = R.quality.resolved || R.quality.name; C.nivel = toque || q === 'baixa' ? 0 : q === 'ultra' ? 3 : q === 'alta' ? 2 : 1; if (C.U) { C.U.nivel.value = C.nivel; C.U.cratera.value = C.nivel > 0 && !toque ? 1 : 0; } };
+
+/* ---------- utilidades TSL ---------- */
+const mapUV = p => { const { vec2 } = L(); return vec2(p.x.div(M5.u.mundo), p.z.negate().div(M5.u.mundo)); };
+const altUV = (x, z, K) => { const k = K || C.U.altK, { vec2 } = L(); return vec2(x.mul(k.x).add(k.y), z.negate().mul(k.x).add(k.y)); };
+const chaoEm = (x, z, K) => C.U.alt.sample(altUV(x, z, K)).level(0);
+const dentroMapa = gp => { const { step } = L(); const W = C.U.altK.z; return step(-2.0, gp.x).mul(step(gp.x, W.add(2.0))).mul(step(-2.0, gp.y)).mul(step(gp.y, W.add(2.0))); }; /* 1 no mapa, 0 nas mesas de fora */ /* r: altura, g: suavizada (nível explícito: vale em compute, vértice e ramos) */
+let POCA = null; /* poças: o mesmo desenho no chão e no reflexo do pós (ruído de nuvem em duas escalas) */
+const poca = (gp, lvl, a1) => { const { vec2, smoothstep, clamp } = L(); const nz = M5.tex.nuvem; const vale = a1 ? clamp(a1.g.sub(a1.r).mul(0.025), -0.08, 0.12) : 0; const a = nz.sample(gp.div(330).add(vec2(0.37, 0.11))).setUpdateMatrix(false), b = nz.sample(gp.div(130).add(vec2(0.71, 0.29))).setUpdateMatrix(false);
+  const A = lvl ? a.level(0) : a, B = lvl ? b.level(0) : b; return smoothstep(0.52, 0.63, A.r.mul(0.62).add(B.r.mul(0.38)).add(vale)); };
+/* ondas da chuva nas poças: um anel por célula de 3,2 unidades, cada um na sua fase (hash), devolve a inclinação (x, z) */
+const ondas = (gp, t) => { const { floor, fract, vec2, length, sin, smoothstep, float, hash, max, uint } = L();
+  const s = gp.div(3.2); const c = floor(s), f = fract(s).sub(0.5); const id = max(c.x, 0.0).add(max(c.y, 0.0).mul(4096.0)).toUint(); const h = hash(id), h2 = hash(id.add(uint(16777259))); /* hash do TSL trunca para inteiro: a célula vira um id exato */
+  const ph = fract(t.mul(0.85).add(h)); const o = vec2(h.sub(0.5), h2.sub(0.5)).mul(0.5); const d = f.sub(o); const r = length(d); const rr = ph.mul(0.55);
+  const amp = float(1).sub(ph).mul(float(1).sub(ph)).mul(float(1).sub(smoothstep(0.0, 0.14, max(r.sub(rr), rr.sub(r))))); const w = sin(r.sub(rr).mul(36.0)).mul(amp);
+  return d.div(max(r, 0.001)).mul(w); };
+
+/* ---------- ganchos do chão (src/m5/terreno.js chama na montagem; o corpo decide na compilação, depois da escolha do clima) ---------- */
+const G = M5.ganchos = M5.ganchos || { modelo: { posicao: null, superficie: null, emissivo: null }, chao: { cor: null }, adereco: { posicao: null } };
+G.chao = G.chao || {}; G.adereco = G.adereco || {}; G.modelo = G.modelo || {};
+const corAntes = G.chao.cor;
+G.chao.cor = function (ctx) {
+  const nc = corAntes ? corAntes(ctx) : null; if (nc) ctx.alb.assign(nc);
+  const TL = L(); const { float, vec2, vec3, mix, smoothstep, clamp, max, dot, pow, If, normalize, cameraPosition, positionWorld, sin } = TL; const U = init(); const MU = M5.u;
+  const { alb, rough, hgt, tEmis, sc, Bw, gp, slope, soft, Ap, As, pw } = ctx; if (!alb || !rough || !hgt) return null; const k = dentroMapa(gp); /* dentro do mapa (as mesas do horizonte ficam de fora); o uFora do chão não entra: usado também no vértice, ele duplicava no bloco do objeto e o fragmento lia um valor parado */
+  /* batalha: mato queimado em volta do queimado (capim seco, marrom), flocos de cinza no carvão, borda levantada e terra revolvida na cratera */
+  if (BATALHA && sc) { const g = sc.g, b = sc.b;
+    const seco = smoothstep(0.02, 0.16, g).mul(float(1).sub(smoothstep(0.22, 0.6, g))).mul(k); const veg = clamp(Bw.z.add(Bw.y.mul(0.35)).add(Bw.x.mul(0.12)), 0.0, 1.0);
+    alb.assign(mix(alb, vec3(0.3, 0.215, 0.11).mul(soft.mul(0.4).add(0.75)), seco.mul(veg).mul(0.6)));
+    const car = smoothstep(0.25, 0.85, g).mul(k); alb.addAssign(vec3(0.2, 0.19, 0.18).mul(smoothstep(0.62, 0.86, Ap.g).mul(car).mul(0.4)));
+    const borda = smoothstep(0.0, 0.08, b).mul(float(1).sub(smoothstep(0.1, 0.32, b))).mul(k); hgt.addAssign(borda.mul(0.55));
+    alb.mulAssign(float(1).sub(smoothstep(0.15, 0.7, b).mul(0.32).mul(k))); rough.assign(mix(rough, 0.97, smoothstep(0.15, 0.7, b).mul(k))); }
+  const V = C.vis; if (!V) return null;
+  const CC = U.cobreChao; const plano = float(1).sub(smoothstep(0.04, 0.32, slope)); let trS = null; const tr0 = sc ? sc.r.mul(k) : float(0), bu = sc ? sc.g : float(0), quente = sc ? sc.a : float(0);
+  const var0 = soft.mul(0.55).add(As.r.mul(0.45)); /* variação larga (o macio e a ondulação grande do chão) */
+  if (sc && (V.chao[0] > 0 || V.chao[2] > 0)) { const X = M5.tex.cicatrizes, uv0 = mapUV(pw), e = float(4.5).div(M5.u.mundo); const r = (du, dv) => X.sample(uv0.add(vec2(du, dv))).setUpdateMatrix(false).r;
+    trS = r(e, e).add(r(e.negate(), e)).add(r(e, e.negate())).add(r(e.negate(), e.negate())).mul(0.25).mul(k); } /* na neve e na areia, a trilha borrada em ~1,5 texel: o desenho da esteira (1,7 unidade) é mais fino que o texel do mapa na Média e, com o contraste da neve, serrilhava em quadradinhos */
+  const tr = trS ? trS : tr0;
+  const cobre = (q, lim, inv) => clamp(q.mul(1.35).sub(float(1).sub(plano).mul(lim)).sub((inv ? var0 : float(1).sub(var0)).mul(inv ? 0.9 : 0.42)).mul(2.2), 0.0, 1.0); /* sobe com o acúmulo, primeiro no plano e no macio (inv: nas manchas do outro lado da variação) */
+  if (V.chao[0] > 0) { /* neve: cobre o plano, derrete no queimado quente, as trilhas abrem até o chão e as pegadas afundam */
+    const cr = sc ? sc.b : float(0); const c0 = cobre(CC.x, 1.1).mul(k).mul(float(1).sub(smoothstep(0.3, 0.9, quente))).mul(float(1).sub(smoothstep(0.3, 0.8, bu).mul(0.9))).mul(float(1).sub(smoothstep(0.08, 0.45, cr))); /* derrete no queimado e na cratera */
+    const c = c0.mul(float(1).sub(tr.mul(0.82)));
+    const neve = mix(vec3(0.6, 0.67, 0.8), vec3(0.86, 0.9, 0.96), soft.mul(0.5).add(Ap.a.mul(0.3)).add(0.2));
+    alb.assign(mix(alb, neve, c)); rough.assign(mix(rough, 0.78, c)); hgt.assign(mix(hgt, hgt.mul(0.15).add(soft.mul(0.1)), c)); /* a neve alisa o relevo fino (fica um pouco das dunas por baixo) */
+    hgt.addAssign(tr.mul(c0).mul(-0.95)); alb.assign(mix(alb, alb.mul(vec3(0.7, 0.8, 1.04)), tr.mul(c0).mul(0.55))); }
+  if (V.chao[1] > 0) { /* cinza vulcânica: camada fosca no plano, flocos claros, trilhas mostram o chão */
+    const c = cobre(CC.y, 1.0, true).mul(k).mul(float(1).sub(tr.mul(0.7))).mul(float(1).sub(smoothstep(0.3, 0.9, quente)));
+    const cinza = mix(vec3(0.1, 0.095, 0.092), vec3(0.2, 0.19, 0.18), Ap.g.mul(0.6).add(soft.mul(0.4)));
+    alb.assign(mix(alb, cinza, c.mul(0.9))); rough.assign(mix(rough, 0.96, c)); hgt.assign(mix(hgt, hgt.mul(0.55), c)); }
+  if (V.chao[2] > 0) { /* areia: dunas a favor do vento nas baixadas e no plano, ondulação perpendicular ao vento, pegadas e trilhas */
+    const vp = vec2(U.vento.y.negate(), U.vento.x); const rip = sin(dot(gp, vp).mul(2.4).add(soft.mul(9.0)).add(As.r.mul(5.0))).mul(0.5).add(0.5);
+    const c0 = cobre(CC.z.mul(0.85), 0.9).mul(k).mul(smoothstep(-6.0, 10.0, chaoEm(pw.x, pw.z).g.sub(pw.y)).mul(0.6).add(0.4)); const c = c0.mul(float(1).sub(tr.mul(0.35))); /* mais nas baixadas */
+    const areia = mix(vec3(0.5, 0.38, 0.24), vec3(0.72, 0.57, 0.38), rip.mul(0.35).add(soft.mul(0.45)).add(0.1));
+    alb.assign(mix(alb, areia, c.mul(0.85))); rough.assign(mix(rough, 0.93, c)); hgt.assign(mix(hgt, rip.mul(0.22).add(soft.mul(0.08)), c));
+    hgt.addAssign(tr.mul(c0).mul(-0.6)); alb.mulAssign(float(1).sub(tr.mul(c0).mul(0.22))); }
+  if (V.chao[3] > 0) { /* molhado: solo escuro e mais liso; poças (planas, quase espelho) com o céu refletido e as ondas da chuva */
+    const w = CC.w.mul(k); const esc = mix(float(1), float(0.5), w.mul(soft.oneMinus().mul(0.35).add(0.65)).mul(float(1).sub(Bw.z.mul(0.5)))); /* o capim escurece menos que a terra e a areia */ alb.assign(alb.mul(esc).mul(mix(vec3(1), vec3(0.96, 0.98, 1.04), w))); rough.assign(mix(rough, rough.mul(0.5), w)); /* solo molhado: mais escuro, um pouco mais frio e liso */
+    const pd = poca(gp, false, chaoEm(pw.x, pw.z)).mul(smoothstep(0.55, 1.0, plano)).mul(w).toVar('ardPoca');
+    alb.mulAssign(mix(float(1), float(0.28), pd)); rough.assign(mix(rough, 0.04, pd));
+    const rp = vec2(0).toVar('ardOnda'); If(U.nivel.greaterThan(0.5).and(U.dens.greaterThan(0.05)), () => { rp.assign(ondas(gp, MU.tempo).mul(U.dens)); });
+    hgt.assign(mix(hgt, rp.x.add(rp.y).mul(0.07), pd));
+    const fr = pow(float(1).sub(clamp(dot(ctx.wn || vec3(0, 1, 0), normalize(cameraPosition.sub(positionWorld))), 0.0, 1.0)), 5.0).mul(0.7).add(0.22); /* Fresnel da água (com o céu claro sobre o solo escuro, a poça brilha mais que a conta física) (normal da geometria: a normal final do chão monta depois da cor) */
+    tEmis.addAssign(MU.ceuCor.mul(pd).mul(fr).mul(0.75)); }
+  return null;
+};
+/* crateras: o chão afunda pelo canal b do mapa de cicatrizes (tigela) e levanta a borda (5 amostras no vértice: o mapa é mais fino que a malha) */
+G.chao.posicao = function (ctx) {
+  if (!BATALHA) return null; const { Fn, If, vec2, vec4, float, smoothstep, positionLocal, modelWorldMatrix } = L(); const U = init();
+  return Fn((b) => { if (!(b && b.renderer && b.renderer.backend && b.renderer.backend.isWebGPUBackend)) return positionLocal; /* na reserva WebGL2 a cratera fica só no relevo fino (a amostra no vértice gerava avisos de atributo uv na montagem) */ const p = positionLocal.toVar('ardCratP');
+    If(U.cratera.greaterThan(0.0), () => { const w = modelWorldMatrix.mul(vec4(p, 1)).xyz; const Wm = U.altK.z; const uv = vec2(w.x.div(Wm), w.z.negate().div(Wm)); const e = float(9.0).div(Wm); const X = M5.tex.cicatrizes; /* o tamanho do mapa pelo bloco do clima: um uniform do bloco por objeto usado também no vértice entra duas vezes no bloco e o fragmento lia uma cópia parada */
+      const s = (du, dv) => X.sample(uv.add(vec2(du, dv))).level(0).setUpdateMatrix(false).b;
+      const b = s(0, 0).mul(0.4).add(s(e, e).add(s(e.negate(), e)).add(s(e, e.negate())).add(s(e.negate(), e.negate())).mul(0.15));
+      const borda = smoothstep(0.0, 0.08, b).mul(float(1).sub(smoothstep(0.1, 0.32, b)));
+      const dy = b.mul(-6.0).add(borda.mul(1.6)).mul(U.cratera).mul(dentroMapa(vec2(w.x, w.z.negate()))); p.y.addAssign(dy); });
+    return p; })();
+};
+/* adereços: queimados no queimado (folhagem quase preta, rocha encardida) e a mesma cobertura do alto das peças */
+G.adereco.cor = function (ctx) {
+  const m = ctx.m, o = ctx.o || {}; const sdc = m.setupDiffuseColor;
+  m.setupDiffuseColor = function (b) { sdc.call(this, b); const { diffuseColor, positionWorld, smoothstep, mix, vec3, float } = L();
+    if (BATALHA) { const sc = M5.tex.cicatrizes.sample(mapUV(positionWorld)).setUpdateMatrix(false); const car = smoothstep(0.18, 0.62, sc.g).mul(o.leaf ? 0.92 : 0.62);
+      const fk = ctx.fv ? mix(float(0.06), float(1.0), ctx.fv) : float(1); diffuseColor.rgb.assign(mix(diffuseColor.rgb, vec3(0.032, 0.027, 0.024).mul(fk), car)); }
+    camadaPeca(diffuseColor, ctx.fv, o.leaf ? 0.75 : 1); };
+  rugPeca(m);
+};
+/* modelos (unidades e construções): depois do detalhe de superfície do src/m5/modelos.js */
+const supAntes = G.modelo.superficie;
+G.modelo.superficie = function (ctx) { if (supAntes) supAntes(ctx); if (ctx.emissivo) return; const m = ctx.m; const sdc = m.setupDiffuseColor;
+  m.setupDiffuseColor = function (b) { sdc.call(this, b); camadaPeca(L().diffuseColor, null, 1); }; rugPeca(m); };
+/* a cobertura das peças: neve e cinza no alto (normal para cima, com ruído), areia a barlavento e no alto, molhado escurece; a rugosidade segue (rugPeca) */
+let PK = null; /* as máscaras desta montagem (o setupDiffuseColor monta antes da rugosidade, como o detalhe de superfície dos modelos) */
+function camadaPeca(dc, fv, k0) {
+  PK = null; const V = C.vis; if (!V) return; const { float, vec3, mix, smoothstep, clamp, dot, normalWorld, positionWorld, Var } = L(); const U = init(); const P = U.cobrePeca;
+  const n = normalWorld; const nz = M5.vnoise2(positionWorld.xz.mul(0.45)).sub(0.5); const fk = fv ? mix(float(0.06), float(1.0), fv) : float(1); const K = { neve: null, cinza: null, areia: null, molhado: null };
+  if (V.peca[0] > 0) { K.neve = Var(smoothstep(0.38, 0.8, n.y.add(nz.mul(0.4))).mul(P.x).mul(k0), 'ardNeveP'); dc.rgb.assign(mix(dc.rgb, vec3(0.84, 0.88, 0.94).mul(fk), K.neve.mul(0.9))); }
+  if (V.peca[1] > 0) { K.cinza = Var(smoothstep(0.32, 0.8, n.y.add(nz.mul(0.45))).mul(P.y).mul(k0), 'ardCinzaP'); dc.rgb.assign(mix(dc.rgb, vec3(0.13, 0.125, 0.12).mul(fk), K.cinza.mul(0.85))); }
+  if (V.peca[2] > 0) { const bar = smoothstep(0.1, 0.7, dot(n.xz, vec3(U.vento.x, 0, U.vento.y).xz.negate())); K.areia = Var(clamp(bar.mul(0.55).add(smoothstep(0.5, 0.9, n.y).mul(0.45)).add(nz.mul(0.3)), 0.0, 1.0).mul(P.z).mul(k0), 'ardAreiaP'); dc.rgb.assign(mix(dc.rgb, vec3(0.62, 0.48, 0.32).mul(fk), K.areia.mul(0.75))); }
+  if (V.peca[3] > 0) { K.molhado = Var(P.w.mul(k0), 'ardMolhadoP'); dc.rgb.mulAssign(mix(float(1), float(0.62), K.molhado)); }
+  PK = K;
+}
+function rugPeca(m) {
+  const r0 = m.roughnessNode; if (!r0) return; const { Fn, mix, float } = L();
+  m.roughnessNode = Fn(() => { let r = r0; const K = PK; if (!K) return r; if (K.neve) r = mix(r, float(0.78), K.neve); if (K.cinza) r = mix(r, float(0.96), K.cinza); if (K.areia) r = mix(r, float(0.92), K.areia); if (K.molhado) r = r.mul(mix(float(1), float(0.35), K.molhado)); return r; })();
+}
+
+/* o mapa de cicatrizes da partida (src/m5/texturas.js) fica guardado para as ferramentas de teste marcarem o chão (C.marcas.burn / track) */
+const scarsAntes = M5.scars; if (scarsAntes) M5.scars = function () { const o = scarsAntes.apply(this, arguments); C.marcas = o; return o; };
+/* ---------- pegadas: a infantaria marca a neve e a areia (o clima cobre, ou o bioma é gelo ou deserto) ---------- */
+C.pegadas = function (x, y) {
+  const V = C.vis; if (V && (V.chao[0] > 0 || V.chao[1] > 0 || V.chao[2] > 0)) return true;
+  const T0 = C.terr; if (!T0 || !T0.bio) return false; const HN = T0.HN, HS = T0.HS; const ix = Math.max(0, Math.min(HN - 1, Math.round(x / HS))), iy = Math.max(0, Math.min(HN - 1, Math.round(y / HS))); const i = (iy * HN + ix) * 4; const b = T0.bio;
+  const t = b[i] + b[i + 1] + b[i + 2] + b[i + 3] || 1; return (b[i] + b[i + 1] * 0.8) / t > 0.45;
+};
+
+/* ---------- montagem na carga (finishTerrain): mapa de alturas, partículas e neblina na cena; o compute vai para M5.pendentes ---------- */
+C.montar = function (o) {
+  const X = o.X, scene = o.scene; C.terr = o.terr || null; C.camera = o.camera; C.H = o.H; init();
+  if (o.heights && o.HN) alturas(o.heights, o.HN, o.HS, o.W);
+  if (!C.vis || C.montado || !X) return; C.montado = true; C.X = X; const V = C.vis, U = C.U;
+  const vn = Math.hypot(V.vento[0], V.vento[1]) || 1; U.vento.value.set(V.vento[0] / vn, -V.vento[1] / vn, vn, 0); /* o vento do preset: x do mapa → x do three; y do mapa → −z */
+  const nq = NIVEL[C.nivel]; const N = Math.max(256, Math.min(32768, (+(QS.get('climaN') || 0) || nq.n))) & ~63; C.N = N; C.nAtivo = N;
+  particulas(N, o.H, o.cam); scene.add(C.malha);
+  if (V.neblina) { neblina(nq.camadas); scene.add(C.nevoa); }
+  const r = X.renderer; if (X.isWebGPU && r.compileComputeAsync && M5.pendentes) M5.pendentes.push(() => r.compileComputeAsync([C.kernel])); /* na reserva WebGL2 o compute nasce no 1º passo, ainda no aquecimento (R.warming) */ /* o compute nasce na carga, junto com os outros pipelines */
+  acumulo(0, true);
+};
+/* mapa de alturas do chão (R) e suavizado em ~150 unidades (G), meia precisão, para o compute, a neblina e o reflexo */
+function alturas(h, HN, HS, W) {
+  const Tm = T(); const n = HN * HN, R = 8; const a = new Float32Array(n), b = new Float32Array(n);
+  for (let y = 0; y < HN; y++) { let s = 0, c = 0; for (let x = -R; x <= R; x++) { const xx = Math.max(0, Math.min(HN - 1, x)); s += h[y * HN + xx]; c++; } for (let x = 0; x < HN; x++) { a[y * HN + x] = s / c; const xo = Math.max(0, Math.min(HN - 1, x - R)), xi = Math.max(0, Math.min(HN - 1, x + R + 1)); s += h[y * HN + xi] - h[y * HN + xo]; } }
+  for (let x = 0; x < HN; x++) { let s = 0, c = 0; for (let y = -R; y <= R; y++) { const yy = Math.max(0, Math.min(HN - 1, y)); s += a[yy * HN + x]; c++; } for (let y = 0; y < HN; y++) { b[y * HN + x] = s / c; const yo = Math.max(0, Math.min(HN - 1, y - R)), yi = Math.max(0, Math.min(HN - 1, y + R + 1)); s += a[yi * HN + x] - a[yo * HN + x]; } }
+  const d = new Uint16Array(n * 2); const toH = Tm.DataUtils.toHalfFloat; for (let i = 0; i < n; i++) { d[i * 2] = toH(h[i]); d[i * 2 + 1] = toH(b[i]); }
+  const t = new Tm.DataTexture(d, HN, HN, Tm.RGFormat, Tm.HalfFloatType); t.minFilter = t.magFilter = Tm.LinearFilter; t.wrapS = t.wrapT = Tm.ClampToEdgeWrapping; t.colorSpace = Tm.NoColorSpace; t.name = 'ard-clima-alturas'; t.needsUpdate = true;
+  if (C.altTex) C.altTex.dispose(); C.altTex = t; C.U.alt.value = t; C.U.altK.value.set(1 / (HS * HN), 0.5 / HN, W || HS * (HN - 1), 0);
+}
+
+/* ---------- partículas: compute (P = posição + relógio, V = velocidade + semente) e um desenho só ---------- */
+function particulas(N, H, cam) {
+  const Tm = T(), TL = L(); const { Fn, If, float, uint, vec2, vec3, vec4, uniform, instancedArray, instanceIndex, select, mix, smoothstep, clamp, max, min, abs, sin, cos, exp, floor, length, normalize, cross, hash, pow, varying, positionGeometry, cameraPosition, cameraProjectionMatrix, cameraViewMatrix, Discard } = TL;
+  const V = C.vis, U = C.U; const tp = V.tipos; const f0 = tp[0].f, f1 = tp[0].f + (tp[1] ? tp[1].f : 0);
+  const K = [0, 1, 2].map(i => uniform(new Tm.Vector4().fromArray((tp[i] || tp[0]).K))), Lk = [0, 1, 2].map(i => uniform(new Tm.Vector4().fromArray((tp[i] || tp[0]).L))), Mk = [0, 1, 2].map(i => { const m = (tp[i] || tp[0]).M; return uniform(new Tm.Vector4(m[0], m[1], m[2], 0)); }), Ck = [0, 1, 2].map(i => uniform(new Tm.Color().fromArray((tp[i] || tp[0]).cor)));
+  const P = { vento: uniform(new Tm.Vector4(1, 0, 10, 0)), altK: uniform(new Tm.Vector4(1 / 6000, 0, 6000, 0)), dt: uniform(0), t: uniform(0), caixa: uniform(new Tm.Vector4(3000, -3000, 900, 900)), topo: uniform(320), n: uniform(new Tm.Vector4(f0 * N, f1 * N, N, N)), K, Lk, Mk, Ck };
+  C.P = P;
+  /* estado inicial na CPU (sem um compute de início: um pipeline a menos): espalhadas na caixa da câmera, do chão até o topo */
+  const pa = new Float32Array(N * 4), va = new Float32Array(N * 4); const cx = cam ? cam.x : 3000, cy = cam ? cam.y : 3000;
+  for (let i = 0; i < N; i++) { const ti = i < f0 * N ? 0 : i < f1 * N ? 1 : 2; const t0 = tp[ti] || tp[0]; const x = cx + (Math.random() * 2 - 1) * 900, y = cy + (Math.random() * 2 - 1) * 900; const g = H ? H(x, y) : 0;
+    const alt = t0.K[3] > 0 ? g + t0.K[3] * (0.2 + Math.random()) : t0.K[0] > 0 ? g + 1 + Math.random() * 200 : g + 2 + Math.random() * 318;
+    pa[i * 4] = x; pa[i * 4 + 1] = alt; pa[i * 4 + 2] = -y; pa[i * 4 + 3] = Math.random() * 2; va[i * 4] = t0.K[1] * U.vento.value.x * U.vento.value.z; va[i * 4 + 1] = t0.K[0]; va[i * 4 + 2] = t0.K[1] * U.vento.value.y * U.vento.value.z; va[i * 4 + 3] = Math.floor(Math.random() * 16777216); } /* semente inteira (o hash do TSL trunca) */
+  const PB = instancedArray(N, 'vec4'), VB = instancedArray(N, 'vec4'); PB.value.array.set(pa); VB.value.array.set(va); PB.value.needsUpdate = true; VB.value.needsUpdate = true;
+  const sel = (fi, A) => select(fi.lessThan(P.n.x), A[0], select(fi.lessThan(P.n.y), A[1], A[2]));
+  /* compute: um passo por quadro */
+  C.kernel = Fn(() => { const i = instanceIndex; const fi = float(i); const p = PB.element(i).toVar('cp'), v = VB.element(i).toVar('cv');
+    const k = sel(fi, K).toVar('ck'), lk = sel(fi, Lk).toVar('cl'), mk = sel(fi, Mk).toVar('cm'); const s = v.w.toVar('cs'); const su = s.toUint().toVar('csu'); const qd = P.t.mul(13.0).floor().toUint().toVar('cqd'); const fa = vec3(hash(su.add(uint(19))), hash(su.add(uint(23))), hash(su.add(uint(29)))).mul(6.2831853).toVar('cfa'); /* fases da turbulência (a semente é grande demais para entrar no seno) */ /* semente inteira (exata até 2^24) e o número do passo */ const dt = P.dt; const cx0 = P.caixa.x, cz0 = P.caixa.y, hx = P.caixa.z, hz = P.caixa.w;
+    const nasce = Fn(([s2]) => { const h1 = hash(s2), h2 = hash(s2.add(uint(1))), h3 = hash(s2.add(uint(2))); const x = cx0.add(h1.mul(2).sub(1).mul(hx)), z = cz0.add(h2.mul(2).sub(1).mul(hz)); const g = chaoEm(x, z, P.altK).r;
+      const y = select(k.w.greaterThan(0), g.add(k.w.mul(h3.add(0.2))), select(k.x.greaterThan(0), g.add(1).add(h3.mul(12)), g.add(P.topo.mul(h3.mul(0.28).add(0.72)))));
+      return vec3(x, y, z); });
+    const alvo = vec3(P.vento.x.mul(P.vento.z).mul(k.y), k.x.mul(hash(su.add(uint(11))).mul(0.4).add(0.8)), P.vento.y.mul(P.vento.z).mul(k.y)).add(vec3(sin(P.t.mul(0.73).add(fa.x).add(p.z.mul(0.011))), sin(P.t.mul(0.51).add(fa.y)).mul(0.35), cos(P.t.mul(0.67).add(fa.z).add(p.x.mul(0.013)))).mul(k.z)).toVar('calvo'); /* variável no topo: os dois ramos do If usam */
+    If(p.w.greaterThanEqual(0), () => { /* no ar */
+      v.xyz.assign(mix(v.xyz, alvo, float(1).sub(exp(dt.mul(-2.2))))); p.xyz.addAssign(v.xyz.mul(dt)); p.w.addAssign(dt);
+      const g = chaoEm(p.x, p.z, P.altK).r.toVar('cg');
+      If(k.w.greaterThan(0), () => { p.y.assign(mix(p.y, g.add(k.w.mul(hash(su.add(uint(13))).add(0.2))), clamp(dt.mul(3.0), 0, 1))); }); /* rente ao chão (areia) */
+      /* volta para dentro da caixa da câmera (a câmera anda: a chuva anda junto, sem buraco) */
+      p.x.assign(cx0.add(p.x.sub(cx0).add(hx).sub(floor(p.x.sub(cx0).add(hx).div(hx.mul(2))).mul(hx.mul(2)))).sub(hx));
+      p.z.assign(cz0.add(p.z.sub(cz0).add(hz).sub(floor(p.z.sub(cz0).add(hz).div(hz.mul(2))).mul(hz.mul(2)))).sub(hz));
+      If(p.y.lessThan(g), () => { p.y.assign(g.add(0.15)); p.w.assign(lk.x.mul(hash(su.add(qd)).mul(0.8).add(0.6)).negate().sub(0.0001)); }); /* bateu no relevo: pousa ou respinga */
+      If(p.y.greaterThan(g.add(P.topo.mul(1.15))).or(mk.x.greaterThan(0).and(p.w.greaterThan(mk.x.mul(hash(su.add(uint(17))).mul(0.5).add(0.75))))), () => { p.w.assign(-0.0001); }); /* subiu demais ou viveu o bastante */
+    }).Else(() => { p.w.addAssign(dt); If(p.w.greaterThanEqual(0), () => { p.xyz.assign(nasce(su.add(qd.mul(uint(2654435761))))); p.w.assign(0); v.xyz.assign(alvo); }); }); /* pousada: fica um pouco e renasce */
+    PB.element(i).assign(p); VB.element(i).assign(v); })().compute(N, [64]);
+  C.kernel.name = 'ard-clima-compute';
+  /* desenho: quadrado instanciado, posição no vértice pelo estado do compute (atributo por instância nos dois motores) */
+  const ga = PB.toAttribute(), gv = VB.toAttribute(); const q = positionGeometry.xy; const fi = float(instanceIndex);
+  const k = sel(fi, K), lk = sel(fi, Lk), mk = sel(fi, Mk), ck = sel(fi, Ck); const s = gv.w; const forma = lk.w;
+  const su = s.toUint(); const vis = hash(su.add(uint(3))).lessThan(U.dens).and(fi.lessThan(P.n.w)); const pousada = ga.w.lessThan(0);
+  const c = ga.xyz; const tam = max(lk.y.mul(hash(su.add(uint(7))).mul(0.6).add(0.7)), length(cameraPosition.sub(c)).mul(0.0009)); /* pelo menos ~1 pixel */
+  const vC = cameraViewMatrix.mul(vec4(c, 1)); const bb = cameraProjectionMatrix.mul(vec4(vC.xyz.add(vec3(q.x.mul(tam).mul(2), q.y.mul(tam).mul(2), 0)), 1));
+  const dir = normalize(gv.xyz.add(vec3(0, -1e-4, 0))); const vel = length(gv.xyz); const comp = max(vel.mul(mk.y), tam.mul(2)); const tc = normalize(cameraPosition.sub(c)); const lado = normalize(cross(dir, tc)); const larg = max(tam, length(cameraPosition.sub(c)).mul(0.0007));
+  const pR = c.add(dir.mul(q.y.mul(comp))).add(lado.mul(q.x.mul(larg).mul(2))); const prog = clamp(float(1).add(ga.w.div(max(lk.x, 0.01))), 0, 1);
+  const rr = prog.mul(2.6).add(0.6); const pS = c.add(vec3(q.x.mul(rr).mul(2), 0.25, q.y.mul(rr).mul(2)));
+  const risco = abs(forma.sub(1)).lessThan(0.5); const fRisco = select(risco, float(1), float(0)), fPouso = select(pousada, float(1), float(0)), fVis = select(vis, float(1), float(0)); /* pesos escalares: na reserva WebGL2 o select aninhado de vetores (o respingo dentro do risco) quebrava a montagem do vértice */
+  const clip = mix(bb, cameraProjectionMatrix.mul(cameraViewMatrix).mul(vec4(mix(pR, pS, fPouso), 1)), fRisco);
+  const m = new Tm.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, depthTest: true, side: Tm.DoubleSide, blending: Tm.CustomBlending, blendEquation: Tm.AddEquation, blendSrc: Tm.OneFactor, blendDst: Tm.OneMinusSrcAlphaFactor, blendEquationAlpha: Tm.AddEquation, blendSrcAlpha: Tm.ZeroFactor, blendDstAlpha: Tm.OneFactor }); m.fog = false; m.forceSinglePass = true;
+  m.vertexNode = mix(vec4(2, 2, 2, 1), clip, fVis); /* fora da tela quando a partícula não aparece (rajada mais fraca ou acima da conta da qualidade) */
+  const aPouso = select(pousada, select(risco, float(1).sub(prog).mul(0.9), clamp(ga.w.negate().div(max(lk.x, 0.01)).mul(1.6), 0, 1)), float(1)); /* respingo apaga crescendo; floco pousado some devagar */
+  const vQ = varying(q.mul(2), 'vcQ'), vA = varying(lk.z.mul(aPouso), 'vcA'), vF = varying(select(pousada.and(risco), float(4), forma), 'vcF'), vC2 = varying(ck, 'vcC'), vG = varying(vec2(mk.z, hash(su.add(uint(31))).mul(6.2831853)), 'vcG');
+  const MU = M5.u;
+  m.fragmentNode = Fn(() => { const r = length(vQ); const luz = MU.ceuCor.mul(0.55).add(MU.solCor.mul(float(0.75).mul(float(1).sub(MU.noite.mul(0.7))))).add(MU.raio.mul(1.5));
+    const fl = exp(r.mul(r).mul(-3.2)).sub(0.04).max(0.0); /* floco macio */ const ri = float(1).sub(vQ.x.mul(vQ.x)).mul(vQ.y.mul(0.3).add(0.7)); const an = smoothstep(0.55, 0.8, r).mul(float(1).sub(smoothstep(0.85, 1.0, r))); const br = exp(r.mul(r).mul(-4.0));
+    const a = select(vF.lessThan(0.5), fl, select(vF.lessThan(1.5), ri, select(vF.lessThan(2.5), br, select(vF.lessThan(3.5), fl, an)))).mul(vA); /* sem Discard nem variável num bloco: na reserva WebGL2 o r186 não acha a pilha da variável dentro do If (erro de TSL e nenhuma partícula); com alfa 0 a mistura pré-multiplicada não soma nada */
+    const cint = pow(sin(MU.tempo.mul(9.0).add(vG.y.mul(9.0))).mul(0.5).add(0.5), 16.0).mul(vG.x).mul(select(vF.greaterThan(2.5).and(vF.lessThan(3.5)), float(1), float(0))); /* o floco de cristal cintila */
+    const brilho = select(vF.greaterThan(1.5).and(vF.lessThan(2.5)), float(1), float(0)); /* brasa e esporo: luz própria, somada */
+    const ab = mix(a, pow(a, 2.2), MU.semPos ? MU.semPos : float(0)); const corLuz = vC2.mul(luz).add(vec3(cint)); const corBr = vC2.mul(vG.x).mul(sin(MU.tempo.mul(11.0).add(vG.y.mul(17.0))).mul(0.25).add(0.75));
+    return select(brilho.greaterThan(0.5), vec4(corBr.mul(ab), 0), vec4(corLuz.mul(a), a)); })();
+  M5.registrar('clima-particulas', m);
+  const pg = new Tm.PlaneGeometry(1, 1); const g = new Tm.InstancedBufferGeometry(); g.index = pg.index; g.setAttribute('position', pg.attributes.position); g.setAttribute('uv', pg.attributes.uv); g.instanceCount = N; g.name = 'ard-clima';
+  const me = new Tm.Mesh(g, m); me.frustumCulled = false; me.castShadow = false; me.receiveShadow = false; me.renderOrder = 11; me.name = 'clima-particulas'; C.malha = me; C.geo = g;
+}
+
+/* ---------- bancos de neblina: camadas em grade que seguem o relevo suavizado, mais densas nos vales, com o ruído de nuvem à deriva ---------- */
+function neblina(camadas) {
+  const Tm = T(), TL = L(); const { Fn, float, vec2, vec3, vec4, uniform, instanceIndex, select, mix, smoothstep, max, abs, length, varying, positionGeometry, cameraPosition, cameraProjectionMatrix, cameraViewMatrix, Discard, If } = TL;
+  const V = C.vis, U = C.U, NB = V.neblina, MU = M5.u; const nz = M5.tex.nuvem;
+  const B = C.B = { centro: uniform(new Tm.Vector4(3000, -3000, 2200, 0)), cor: uniform(new Tm.Color().fromArray(NB.cor)), dens: uniform(NB.dens), alt: uniform(new Tm.Vector4(NB.alturas[0], NB.alturas[1], NB.alturas[2], 0)), deriva: uniform(new Tm.Vector2()), noite: uniform(NB.noite), lim: uniform(NB.limiar != null ? NB.limiar : 0.32) };
+  const li = float(instanceIndex); const hL = select(li.lessThan(0.5), B.alt.x, select(li.lessThan(1.5), B.alt.y, B.alt.z)); const gx = B.centro.x.add(positionGeometry.x.mul(B.centro.z)), gz = B.centro.y.add(positionGeometry.y.mul(B.centro.z));
+  const a0 = chaoEm(gx, gz); const y = max(a0.g.add(hL), a0.r.add(4)); const wp = vec3(gx, y, gz);
+  const m = new Tm.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, depthTest: true, side: Tm.DoubleSide, blending: Tm.CustomBlending, blendEquation: Tm.AddEquation, blendSrc: Tm.OneFactor, blendDst: Tm.OneMinusSrcAlphaFactor, blendEquationAlpha: Tm.AddEquation, blendSrcAlpha: Tm.ZeroFactor, blendDstAlpha: Tm.OneFactor }); m.fog = false; m.forceSinglePass = true;
+  m.vertexNode = cameraProjectionMatrix.mul(cameraViewMatrix).mul(vec4(wp, 1));
+  const vW = varying(wp, 'vnW'), vE = varying(vec3(positionGeometry.x, positionGeometry.y, li), 'vnE');
+  m.fragmentNode = Fn(() => { const xz = vec2(vW.x, vW.z.negate()); const n1 = nz.sample(xz.div(680).add(B.deriva.mul(0.6))).setUpdateMatrix(false).r; const n2 = nz.sample(xz.div(240).add(B.deriva).add(vec2(n1.mul(0.2), 0.37))).setUpdateMatrix(false).r;
+    const a1 = chaoEm(vW.x, vW.z); const d = smoothstep(B.lim, 0.82, n1.mul(0.6).add(n2.mul(0.4)).add(vE.z.mul(0.04)));
+    const vale = smoothstep(-15.0, 30.0, a1.g.sub(a1.r)).mul(0.6).add(0.4); const solo = smoothstep(0.0, 14.0, vW.y.sub(a1.r)); const borda = float(1).sub(smoothstep(0.3, 0.5, max(abs(vE.x), abs(vE.y))));
+    const perto = smoothstep(60.0, 260.0, length(cameraPosition.sub(vW))); const a = d.mul(vale).mul(solo).mul(borda).mul(perto).mul(B.dens).mul(U.dens.mul(0.4).add(0.6)); /* idem: sem Discard */
+    const luz = MU.ceuCor.mul(0.7).add(MU.solCor.mul(float(0.45).mul(float(1).sub(MU.noite.mul(0.75))))).add(MU.raio.mul(0.8)); const c = B.cor.mul(luz).add(B.cor.mul(B.noite).mul(MU.noite));
+    return vec4(c.mul(a), a); })();
+  M5.registrar('clima-neblina', m);
+  const pg = new Tm.PlaneGeometry(1, 1, 40, 40); const g = new Tm.InstancedBufferGeometry(); g.index = pg.index; g.setAttribute('position', pg.attributes.position); g.setAttribute('uv', pg.attributes.uv); g.instanceCount = camadas; g.name = 'ard-clima-neblina';
+  const me = new Tm.Mesh(g, m); me.frustumCulled = false; me.castShadow = false; me.receiveShadow = false; me.renderOrder = 9; me.name = 'clima-neblina'; C.nevoa = me; C.nevoaGeo = g; C.camadas = camadas;
+}
+
+/* ---------- reflexo de tela nas poças (Alta e Ultra, só com chuva): src/m5/pos.js chama na cadeia, depois da oclusão e antes da bruma ----------
+   As poças são planas: a normal é a do céu (para cima) com as ondas da chuva, então o raio refletido sai da profundidade e da câmera, sem um passe
+   de normais (o SSRNode do r186 pede a normal da cena num alvo à parte: todo material da cena passaria a escrever dois alvos). Um passe em meia
+   resolução (três quartos na Ultra): de 20 a 32 passos na tela, com espessura; acerto = a cor da cena naquele ponto, com Fresnel e borda da tela. */
+C.reflexo = function (c, color, depth, camera, q) {
+  if (!C.vis || !C.vis.reflexo || !C.reflexoNivel() || !C.U) return null;
+  const Tm = T(), TL = L(); const { Fn, If, Loop, Break, float, int, uint, uvec2, vec2, vec3, vec4, uniform, uv, mix, smoothstep, clamp, max, min, abs, dot, pow, normalize, reflect, hash, getViewPosition, getScreenPosition, rtt, screenCoordinate } = TL;
+  const U = C.U, MU = M5.u; const S = C.S || (C.S = { proj: uniform(new Tm.Matrix4()), projInv: uniform(new Tm.Matrix4()), vista: uniform(new Tm.Matrix4()), mundo: uniform(new Tm.Matrix4()), passos: uniform(24) });
+  C.cam = camera; S.passos.value = C.nivel >= 3 ? 32 : 20;
+  const f = Fn(() => { const u = uv(); const d = depth.sample(u).r.toVar('rd'); const out = vec4(0).toVar('ro');
+    If(d.lessThan(0.99999), () => { const vp = getViewPosition(u, d, S.projInv).toVar('rvp'); const wp = S.mundo.mul(vec4(vp, 1)).xyz.toVar('rwp'); const gp = vec2(wp.x, wp.z.negate());
+      const a0 = chaoEm(wp.x, wp.z); const e = float(18.0); const ax = chaoEm(wp.x.add(e), wp.z).r, az = chaoEm(wp.x, wp.z.sub(e)).r; const gr = vec2(ax.sub(a0.r), az.sub(a0.r)).div(e);
+      const plano = float(1).sub(smoothstep(0.04, 0.32, float(1).sub(float(1).div(dot(gr, gr).add(1).sqrt())))); const chao = float(1).sub(smoothstep(1.5, 5.0, abs(wp.y.sub(a0.r))));
+      const pd = poca(gp, true, a0).mul(smoothstep(0.55, 1.0, plano)).mul(chao).mul(U.cobreChao.w).toVar('rpd');
+      If(pd.greaterThan(0.02), () => { const on = ondas(gp, MU.tempo).mul(U.dens).mul(0.07); const nW = normalize(vec3(on.x.negate(), 1, on.y)); const nV = normalize(S.vista.mul(vec4(nW, 0)).xyz).toVar('rnv');
+        const vd = normalize(vp).toVar('rvd'); const r = normalize(reflect(vd, nV)).toVar('rr'); const ac = float(0).toVar('rac'), cor = vec3(0).toVar('rcor');
+        const j = hash(uvec2(screenCoordinate.xy).x.add(uvec2(screenCoordinate.xy).y.mul(uint(4096))).add(MU.tempo.mul(30.0).toUint().mul(uint(2654435761)))); const dist = vp.z.negate();
+        const passo = max(dist.mul(0.012), 3.0).toVar('rps');
+        Loop({ start: int(0), end: int(32), type: 'int', condition: '<' }, ({ i }) => { const fi = float(i); If(fi.greaterThanEqual(S.passos), () => { Break(); });
+          const t = fi.add(j).mul(passo).mul(fi.mul(0.12).add(1.0)); const p = vp.add(r.mul(t)).toVar('rp'); If(p.z.greaterThan(-1.0), () => { Break(); });
+          const su = getScreenPosition(p, S.proj).toVar('rsu'); If(su.x.lessThan(0).or(su.x.greaterThan(1)).or(su.y.lessThan(0)).or(su.y.greaterThan(1)), () => { Break(); });
+          const ds = depth.sample(su).level(0).r; const sz = getViewPosition(su, ds, S.projInv).z; const dz = sz.sub(p.z);
+          If(dz.greaterThan(0.0).and(dz.lessThan(passo.mul(2.2).add(t.mul(0.04)))).and(ds.lessThan(0.99999)), () => { cor.assign(color.sample(su).level(0).rgb);
+            const bd = smoothstep(0.0, 0.08, min(min(su.x, float(1).sub(su.x)), min(su.y, float(1).sub(su.y)))); ac.assign(bd.mul(float(1).sub(fi.div(S.passos)))); Break(); }); });
+        const fr = pow(float(1).sub(clamp(dot(vd.negate(), nV), 0.0, 1.0)), 5.0).mul(0.6).add(0.4);
+        out.assign(vec4(cor, pd.mul(ac).mul(fr).mul(0.85))); }); });
+    return out; })();
+  const rt = rtt(f, null, null, { resolutionScale: C.nivel >= 3 ? 0.75 : 0.5 }); rt.renderTarget.texture.name = 'ard-reflexo-tela'; C.rt = rt;
+  return vec4(mix(c.rgb, rt.rgb, clamp(rt.a, 0.0, 1.0)), c.a);
+};
+
+/* ---------- acúmulo: o chão já começa meio coberto (o clima vem de antes da partida) e cobre em ~3,5 min; as peças chegam limpas e cobrem em ~2,5 min ---------- */
+let TACUM = 0;
+function acumulo(dt, zera) {
+  const V = C.vis, U = C.U; if (!V || !U) return; if (zera) TACUM = 0; TACUM += dt; const f = ACUM === '1' ? 1 : ACUM === '0' ? 0 : null;
+  if (C.forca) { U.cobreChao.value.fromArray(C.forca); U.cobrePeca.value.fromArray(C.forca); return; } /* ferramentas de teste: cobertura fixa (antes e depois na mesma carga) */
+  const c = f != null ? f : Math.min(1, 0.4 + TACUM / 360), pm = f != null ? f : Math.min(1, TACUM / 150), pw = f != null ? f : Math.min(1, TACUM / 25);
+  U.cobreChao.value.set(V.chao[0] * c, V.chao[1] * c, V.chao[2] * c, V.chao[3] * (f != null ? f : 1)); U.cobrePeca.value.set(V.peca[0] * pm, V.peca[1] * pm, V.peca[2] * pm, V.peca[3] * pw);
+}
+
+/* ---------- por quadro (R.draw): caixa da câmera, vento e rajadas, acúmulo, um passo do compute e os uniforms do reflexo ---------- */
+C.quadro = function (dt, cam, camera, R) {
+  if (!C.ativo || !C.montado) return; const X = C.X, U = C.U, P = C.P; if (!X || !P) return; const d = Math.max(0, Math.min(0.1, dt || 0)); const t = R.time;
+  const zf = Math.max(0.6, cam.zoom || 1); const hx = 900 / zf; P.caixa.value.set(cam.x, -cam.y, hx, hx);
+  const g0 = C.H ? C.H(cam.x, cam.y) : 0; P.topo.value = Math.max(110, Math.min(420, (camera.position.y - g0) * 0.6)); P.dt.value = d; P.t.value = t;
+  const V = C.vis; const rj = 1 + 0.35 * Math.sin(t * 0.13) + 0.15 * Math.sin(t * 0.37); const an = Math.atan2(-V.vento[1], V.vento[0]) + 0.3 * Math.sin(t * 0.021); U.vento.value.set(Math.cos(an), Math.sin(an), Math.hypot(V.vento[0], V.vento[1]) * rj, rj);
+  U.dens.value = Math.max(0.35, Math.min(1, 0.8 + 0.2 * Math.sin(t * 0.045) + 0.1 * Math.sin(t * 0.17)));
+  const quer = +(QS.get('climaN') || 0) ? C.N : Math.min(C.N, NIVEL[C.nivel].n); C.nAtivo = Math.max(64, quer & ~63); P.n.value.w = C.nAtivo; C.geo.instanceCount = C.nAtivo; /* a qualidade pode baixar no meio da partida: menos partículas, o mesmo pipeline */
+  acumulo(d, false); P.vento.value.copy(U.vento.value); P.altK.value.copy(U.altK.value); /* cópias para o compute (grupo próprio) */
+  if (C.nevoa) { const B = C.B; const hb = 1100 / zf; const cel = hb * 2 / 40; B.centro.value.set(Math.round(cam.x / cel) * cel, Math.round(-cam.y / cel) * cel, hb * 2, 0); B.deriva.value.set(U.vento.value.x * t * U.vento.value.z * 0.0009 * V.neblina.deriva, -U.vento.value.y * t * U.vento.value.z * 0.0009 * V.neblina.deriva); C.nevoaGeo.instanceCount = Math.min(C.camadas, NIVEL[C.nivel].camadas); }
+  if (C.S && C.cam) { const c = C.cam; C.S.proj.value.copy(c.projectionMatrix); C.S.projInv.value.copy(c.projectionMatrixInverse); C.S.vista.value.copy(c.matrixWorldInverse); C.S.mundo.value.copy(c.matrixWorld); }
+  if (d > 0 || R.warming || !C.uma) { C.uma = true; X.renderer.compute(C.kernel, C.nAtivo); }
+};
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Aether Rift: Dominion — Motor 5 (5.0d): nuvens de guerra volumétricas em TSL (WebGPU e a reserva WebGL2 do WebGPURenderer).
+   O que nunca foi visto fica sob nuvens baixas e densas, que se abrem com uma borda acesa quando as tropas chegam; o que já foi visto e não está
+   à vista fica com o véu de hoje (o chão escurecido pela névoa de guerra, src/m5/terreno.js). A fonte é a textura da névoa de guerra que o render3d
+   já refaz no passo da simulação (ARD.m5.tex.nevoa, R: 0 nunca visto, 110 explorado, 255 à vista): nada novo na simulação, só visual.
+   - Memória (um passe de 192² por quadro, ida e volta entre dois alvos de meia precisão): R a cobertura (a névoa borrada e recuada da área vista;
+     abre em ~1 s e fecha na hora), G a energia da abertura (a borda acesa), B a altura do chão suavizada e A o alvo do quadro (o chão do pixel já
+     foi visto?). Buraco por cima do abismo da Fenda; no Cinturão, só sobre as plataformas.
+   - Alta e Ultra: marcha de raio em meia resolução, do olho até o chão do passe da cena (a profundidade), pulando o ar acima do topo das nuvens
+     (o topo é um campo de alturas), com saída cedo na nuvem densa e onde o chão do pixel já foi visto; reconstrução na resolução cheia pela
+     profundidade (nas bordas, a amostra mais próxima em profundidade: sem halo nas unidades). A Ultra tem mais passos, a sombra do sol no próprio
+     ruído e mais detalhe.
+   - Média: uma camada só, sem marcha (a nuvem no plano do topo, com a cobertura do chão do pixel), no passe da bruma.
+   - Baixa e celular: nada (a névoa pintada no chão, como hoje).
+   Leitura de jogo: a nuvem some no trecho final do raio quando o chão do pixel já foi visto (nada à vista fica coberto), e o recuo da cobertura
+   deixa a parede das nuvens um pouco além do limite da visão.
+   Carga: tudo nasce com o pós (no aquecimento); o ruído 3D (32³) sai da CPU em fatias fora da carga e a altura do chão (128²) uma vez por partida;
+   nenhuma alocação por quadro.
+   Chaves: ?m5nuvens=0 desliga; ?m5nuvens=camada (a versão da Média em qualquer qualidade); ?m5nuvens=marcha (a completa da Alta, também na
+   Média); ?m5nuvensres=1|2|4 (escala da marcha, medida). */
+(function (ARD) {
+'use strict';
+const M5 = ARD.m5 = ARD.m5 || {};
+const Q = new URLSearchParams(typeof location !== 'undefined' ? location.search : '');
+const NV = M5.nuvens = M5.nuvens || {};
+NV.versao = '5.0d';
+const PED = Q.get('m5nuvens'); const RES = Math.max(1, Math.min(4, +(Q.get('m5nuvensres') || 2) | 0));
+const toque = () => typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+/* versão pela qualidade: null (nada), 'camada' (Média), 'alta', 'ultra' */
+NV.modo = function (q) {
+  if (PED === '0' || !q) return null; const r = q.resolved || q.name;
+  if (PED === 'camada') return 'camada'; if (PED === 'marcha') return r === 'ultra' ? 'ultra' : 'alta';
+  if (toque()) return null; /* celular (em pé e deitado): a névoa pintada no chão, como hoje */
+  return r === 'ultra' ? 'ultra' : r === 'alta' ? 'alta' : r === 'media' ? 'camada' : null;
+};
+/* parâmetros da forma (unidades do mapa): topo, extinção, passos */
+const CFG = { camada: { topo: 58 }, alta: { topo: 92, passos: 26, passo: 15, sombra: false, detalhe: false }, ultra: { topo: 96, passos: 40, passo: 10, sombra: true, detalhe: true } };
+const MEM = 192; /* lado da memória (texels): ~17 unidades por texel no mapa de 3200 */
+
+/* ---------- ruído 3D repetível (32³, RGBA8), gerado na CPU uma vez: R grumos grandes (Perlin-Worley), G vagas (Worley em 3 oitavas), B detalhe ---------- */
+function ruido3D(N, d) { /* gerador em fatias: passo(z0, z1) calcula as camadas z0..z1−1; fim() normaliza em d (RGBA8) */
+  const hs = (x, y, z, s) => { let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(z, 1274126177) ^ Math.imul(s, 1442695041); h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
+  const md = (a, P) => ((a % P) + P) % P; const sm = t => t * t * (3 - 2 * t); const li = (a, b, t) => a + (b - a) * t;
+  /* tabelas por período (os mesmos valores do hash, calculados uma vez: ~5× mais rápido que o hash em cada amostra) */
+  const tab = (P, s, k) => { const t = new Float32Array(P * P * P * k); for (let z = 0, i = 0; z < P; z++) for (let y = 0; y < P; y++) for (let x = 0; x < P; x++, i++) for (let c = 0; c < k; c++) t[i * k + c] = hs(x, y, z, s + (c === 0 ? 0 : c === 1 ? 7 : 13)); return t; };
+  const V4 = tab(4, 1, 1), V8 = tab(8, 2, 1), V16 = tab(16, 3, 1), V16b = tab(16, 21, 1), W4 = tab(4, 11, 3), W8 = tab(8, 12, 3), W16 = tab(16, 13, 3);
+  const vn = (x, y, z, P, T) => { const I = (a, b, c) => T[(c * P + b) * P + a]; const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z), fx = sm(x - xi), fy = sm(y - yi), fz = sm(z - zi); const x0 = md(xi, P), x1 = md(xi + 1, P), y0 = md(yi, P), y1 = md(yi + 1, P), z0 = md(zi, P), z1 = md(zi + 1, P);
+    return li(li(li(I(x0, y0, z0), I(x1, y0, z0), fx), li(I(x0, y1, z0), I(x1, y1, z0), fx), fy), li(li(I(x0, y0, z1), I(x1, y0, z1), fx), li(I(x0, y1, z1), I(x1, y1, z1), fx), fy), fz); };
+  const wo = (x, y, z, P, T) => { const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z); let b = 9;
+    for (let dz = -1; dz <= 1; dz++) for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const cx = xi + dx, cy = yi + dy, cz = zi + dz, j = ((md(cz, P) * P + md(cy, P)) * P + md(cx, P)) * 3;
+      const px = cx + T[j] - x, py = cy + T[j + 1] - y, pz = cz + T[j + 2] - z; const d = px * px + py * py + pz * pz; if (d < b) b = d; }
+    return Math.min(1, Math.sqrt(b)); };
+  const n = N * N * N, A = new Float32Array(n * 3); const lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9]; const c = [0, 0, 0];
+  const passo = (z0, z1) => { for (let z = z0, i = z0 * N * N; z < z1; z++) for (let y = 0; y < N; y++) for (let x = 0; x < N; x++, i++) { const u = x / N, v = y / N, w = z / N;
+    const fb = vn(u * 4, v * 4, w * 4, 4, V4) * 0.5 + vn(u * 8, v * 8, w * 8, 8, V8) * 0.3 + vn(u * 16, v * 16, w * 16, 16, V16) * 0.2;
+    const w4 = 1 - wo(u * 4, v * 4, w * 4, 4, W4), w8 = 1 - wo(u * 8, v * 8, w * 8, 8, W8), w16 = 1 - wo(u * 16, v * 16, w * 16, 16, W16);
+    c[0] = fb * 0.55 + w4 * 0.6; c[1] = w4 * 0.55 + w8 * 0.3 + w16 * 0.15; c[2] = vn(u * 16, v * 16, w * 16, 16, V16b) * 0.6 + w16 * 0.4;
+    for (let k = 0; k < 3; k++) { A[i * 3 + k] = c[k]; if (c[k] < lo[k]) lo[k] = c[k]; if (c[k] > hi[k]) hi[k] = c[k]; } } };
+  const fim = () => { for (let i = 0; i < n; i++) { for (let k = 0; k < 3; k++) d[i * 4 + k] = Math.round(255 * (A[i * 3 + k] - lo[k]) / Math.max(1e-6, hi[k] - lo[k])); d[i * 4 + 3] = 255; } };
+  return { passo, fim };
+}
+
+/* ---------- recursos divididos (por renderizador): ruído, alturas, memória e o passe que a atualiza ---------- */
+let SH = null;
+function divididos() {
+  const X = M5.cur; if (SH && SH.X === X) return SH; const Tm = window.THREE_M5, L = window.TSL;
+  const { Fn, uniform, texture, texture3D, uv, vec2, vec4, float, smoothstep, mix, max, min, clamp, exp, length, select, step } = L;
+  const t0 = performance.now();
+  const N3 = 32, d3 = new Uint8Array(N3 * N3 * N3 * 4).fill(128), t3 = new Tm.Data3DTexture(d3, N3, N3, N3); /* nasce cinza (a forma sem grumos) e o ruído chega em fatias, fora da carga */ t3.format = Tm.RGBAFormat; t3.type = Tm.UnsignedByteType; t3.wrapS = t3.wrapT = t3.wrapR = Tm.RepeatWrapping; t3.minFilter = t3.magFilter = Tm.LinearFilter; t3.generateMipmaps = false; t3.unpackAlignment = 1; t3.colorSpace = Tm.NoColorSpace; t3.name = 'ard-nuvens-ruido'; t3.needsUpdate = true;
+  const NA = 128, altD = new Uint8Array(NA * NA * 4).fill(0); const alt = new Tm.DataTexture(altD, NA, NA, Tm.RGBAFormat); alt.magFilter = alt.minFilter = Tm.LinearFilter; alt.colorSpace = Tm.NoColorSpace; alt.name = 'ard-nuvens-alturas'; alt.needsUpdate = true;
+  const mk = nome => { const rt = new Tm.RenderTarget(MEM, MEM, { type: Tm.HalfFloatType, depthBuffer: false, generateMipmaps: false, minFilter: Tm.LinearFilter, magFilter: Tm.LinearFilter }); rt.texture.name = nome; return rt; };
+  const S = SH = { X, t3, alt, altD, NA, rts: [mk('ard-nuvens-mem-a'), mk('ard-nuvens-mem-b')], i: 0, quadro: -1, sim: null, tAnt: null, temNuvem: true, calma: 0, fogV: -1, geraMs: 0 };
+  S.U = { dt: uniform(0), reset: uniform(1), alt: uniform(new Tm.Vector2(0, 1)), fenda: uniform(new Tm.Vector4(0, 0, 1, 0)), vazio: uniform(0), celula: uniform(1 / 100), liga: uniform(1) };
+  S.ruido = texture3D(t3); S.memAnt = texture(S.rts[1].texture); S.mem = texture(S.rts[0].texture); /* a anterior (lida pelo passe) e a última escrita (lida pela marcha e pela composição): nós comuns do TSL; o .sample().level() de um nó de passe (PassTextureNode) perde o uv no r186 */
+  /* memória: cobertura alvo pela névoa (borrada e recuada), abre devagar e fecha na hora; energia da abertura; altura do chão; alvo do quadro */
+  const U = S.U, nev = M5.tex.nevoa, vaz = M5.tex.vazio, alT = texture(alt);
+  const mat = new Tm.NodeMaterial(); mat.name = 'ard-nuvens-memoria'; mat.depthTest = false; mat.depthWrite = false; mat.blending = Tm.NoBlending; /* o alfa é dado (o alvo), não mistura */
+  mat.fragmentNode = Fn(() => { const u = uv().toVar(); const r = U.celula;
+    const vi = (dx, dy) => smoothstep(0.16, 0.4, nev.sample(u.add(vec2(dx, dy).mul(r))).level(0).r); /* 1 = já visto (explorado ou à vista) */
+    /* média em dois anéis (raio 1,2 e 2,4 células de névoa): a borda da cobertura vira uma rampa de ~3 células, sem os degraus dos ladrilhos */
+    const anel = k => vi(k, 0).add(vi(-k, 0)).add(vi(0, k)).add(vi(0, -k)).add(vi(k * 0.71, k * 0.71)).add(vi(-k * 0.71, k * 0.71)).add(vi(k * 0.71, -k * 0.71)).add(vi(-k * 0.71, -k * 0.71));
+    const visto = vi(0, 0).mul(0.16).add(anel(1.2).mul(0.065)).add(anel(2.4).mul(0.04));
+    const p = u.mul(M5.u.mundo); const f = U.fenda;
+    const alvo = float(1).sub(smoothstep(0.05, 0.55, visto)).mul(mix(float(1), smoothstep(f.z.mul(0.95), f.z.mul(1.5), length(p.sub(f.xy))), f.w)) /* buraco por cima do abismo da Fenda */
+      .mul(mix(float(1), smoothstep(26.0, 62.0, vaz.sample(u).level(0).r.sub(0.5).mul(128.0)), U.vazio)).toVar(); /* Cinturão: só sobre as plataformas, afinando antes da beirada (R = distância até o vazio, ±64): nada pendurado sobre o espaço */
+    const ant = S.memAnt.sample(u).level(0); const c0 = mix(ant.r, float(1), U.reset), g0 = ant.g.mul(float(1).sub(U.reset));
+    const desce = max(c0.sub(alvo).mul(float(1).sub(exp(U.dt.mul(-2.6)))), U.dt.mul(0.4));
+    const c1 = select(alvo.greaterThanEqual(c0), alvo, max(alvo, c0.sub(desce))); /* fecha na hora (partida nova), abre em ~1 s */
+    const g1 = clamp(g0.mul(exp(U.dt.mul(-1.3))).add(c0.sub(c1).mul(2.6).mul(step(U.dt, 1.0))), 0.0, 1.0); /* assentar (dt grande): sem borda acesa */
+    const h = U.alt.x.add(alT.sample(u).level(0).r.mul(U.alt.y.sub(U.alt.x)));
+    return vec4(c1, g1, h, alvo); })();
+  M5.registrar('nuvens-memoria', mat); S.mat = mat; S.quad = new Tm.QuadMesh(mat);
+  S.geraMs = Math.round(performance.now() - t0);
+  /* o ruído 3D em 8 fatias de 4 camadas, uma por tarefa (fora do caminho da carga: ~25 a 60 ms de CPU no total) e um envio só no fim */
+  { const g = ruido3D(N3, d3); let z = 0, ms = 0; const fatia = () => { const t1 = performance.now(); g.passo(z, Math.min(N3, z + 4)); z += 4; ms += performance.now() - t1;
+      if (z < N3) setTimeout(fatia, 0); else { g.fim(); t3.needsUpdate = true; S.ruidoMs = Math.round(ms); } }; setTimeout(fatia, 0); }
+  return S;
+}
+/* altura do chão suavizada (128², a mesma do R.H do render3d), uma vez por partida; no Cinturão o vazio não puxa a base para baixo */
+function assaAlturas(S, R) {
+  const Sm = ARD.sim, W = Sm ? Sm.WORLD : 6000, n = S.NA, h = new Float32Array(n * n), h2 = new Float32Array(n * n);
+  for (let iy = 0; iy < n; iy++) for (let ix = 0; ix < n; ix++) { let v = R.H((ix + 0.5) * W / n, (iy + 0.5) * W / n); if (R.cinturao) v = Math.max(v, -40); h[iy * n + ix] = v; }
+  for (let k = 0; k < 2; k++) { /* duas caixas de raio 2 (separáveis): ~60 unidades de raio */
+    for (let iy = 0; iy < n; iy++) for (let ix = 0; ix < n; ix++) { let s = 0, c = 0; for (let d = -2; d <= 2; d++) { const x = ix + d; if (x < 0 || x >= n) continue; s += h[iy * n + x]; c++; } h2[iy * n + ix] = s / c; }
+    for (let iy = 0; iy < n; iy++) for (let ix = 0; ix < n; ix++) { let s = 0, c = 0; for (let d = -2; d <= 2; d++) { const y = iy + d; if (y < 0 || y >= n) continue; s += h2[y * n + ix]; c++; } h[iy * n + ix] = s / c; } }
+  let lo = 1e9, hi = -1e9; for (let i = 0; i < n * n; i++) { if (h[i] < lo) lo = h[i]; if (h[i] > hi) hi = h[i]; } hi = Math.max(hi, lo + 1);
+  for (let i = 0; i < n * n; i++) { const v = Math.round(255 * (h[i] - lo) / (hi - lo)); S.altD[i * 4] = v; S.altD[i * 4 + 3] = 255; }
+  S.alt.needsUpdate = true; S.U.alt.value.set(lo, hi); S.hLo = lo; S.hHi = hi;
+  S.U.fenda.value.set(Sm ? Sm.CX : W / 2, Sm ? Sm.CY : W / 2, Sm && Sm.RIFT_R ? Sm.RIFT_R : 170, R.cinturao ? 0 : 1); S.U.vazio.value = R.cinturao ? 1 : 0;
+  if (Sm && Sm.WORLD) S.U.celula.value = 1 / 100; /* FOGN do render3d: 100 células de névoa por lado */
+}
+/* há nuvem na partida? (alguma célula nunca vista na névoa, ou a memória ainda abrindo): sem nuvem, os passes param e a composição não lê nada */
+function temNevoa(S) { const tx = M5.tex.nevoa && M5.tex.nevoa.value; const d = tx && tx.image && tx.image.data; if (!d) return true; if (tx.version === S.fogV) return S.nevoaNunca; S.fogV = tx.version;
+  let nunca = false; for (let i = 0; i < d.length; i += 4) if (d[i] < 100) { nunca = true; break; } S.nevoaNunca = nunca; return nunca; }
+/* uma vez por quadro (o primeiro nó de nuvens do quadro): alturas da partida, dt pelo relógio do visual e o passe da memória */
+function memoriaQuadro(S, r, frameId) {
+  if (S.quadro === frameId) return; S.quadro = frameId; const R = S.X && S.X.R; if (!R) return;
+  if (R.sim && R.sim !== S.sim && R.H) { S.sim = R.sim; assaAlturas(S, R); S.U.reset.value = 1; S.calma = 0; S.tAnt = R.time; }
+  const dt = S.tAnt == null ? 0 : Math.max(0, Math.min(0.25, R.time - S.tAnt)); S.tAnt = R.time; S.U.dt.value = S.assenta ? 30 : dt; S.assenta = false; /* assenta: a memória vai direto ao alvo (fotos e testes) */
+  const nv = temNevoa(S); if (nv) S.calma = 0; else S.calma += dt;
+  S.temNuvem = !!R.warming || S.U.reset.value > 0 || nv || S.calma < 2.5; S.U.liga.value = S.temNuvem ? 1 : 0;
+  if (!S.temNuvem) return;
+  const a = S.rts[S.i], b = S.rts[1 - S.i]; S.memAnt.value = a.texture; r.setRenderTarget(b); S.quad.render(r); S.U.reset.value = 0; S.i = 1 - S.i; S.mem.value = b.texture; /* a ida e volta: lê a (a última), escreve b; S.i aponta a última escrita */
+}
+
+/* ---------- o nó do pós (um por cadeia: a partida e o Modo Foto) ---------- */
+let NodeC = null;
+function classe() {
+  if (NodeC) return NodeC; const Tm = window.THREE_M5, L = window.TSL;
+  const { uniform, texture, context } = L; const quad = new Tm.QuadMesh(); const tam = new Tm.Vector2(); let estado;
+  NodeC = class ArdNuvensNode extends Tm.TempNode {
+    static get type() { return 'ArdNuvensNode'; }
+    constructor(cor, depth, sp, camera, modo) { /* nomes de campo fora das letras de componente (xyzw, rgba, stpq): o r186 lê "rt" e "sp" como troca de componentes */ super('vec4'); this.cor = cor; this.depth = depth; this.profT = texture(sp.getTexture('depth')); /* a profundidade da cena num nó comum (amostras com nível na composição) */ this.passe = sp; this.camera = camera; this.modo = modo; this.cfg = CFG[modo]; this.S = divididos();
+      this.U = { projInv: uniform(new Tm.Matrix4()), camMundo: uniform(new Tm.Matrix4()), camPos: uniform(new Tm.Vector3()), pertoLonge: uniform(new Tm.Vector2(30, 11000)), tamF: uniform(new Tm.Vector2(1, 1)), tamB: uniform(new Tm.Vector2(1, 1)), faixa: uniform(new Tm.Vector4(-50, 150, 0, 0)), vento: uniform(new Tm.Vector4(0, 0, 0, 0)) };
+      this.alvoB = this.cfg.passos ? new Tm.RenderTarget(1, 1, { type: Tm.HalfFloatType, depthBuffer: false, generateMipmaps: false, minFilter: Tm.LinearFilter, magFilter: Tm.LinearFilter }) : null; if (this.alvoB) this.alvoB.texture.name = 'ard-nuvens-marcha';
+      this.saida = this.alvoB ? texture(this.alvoB.texture) : null; this._m = null;
+      this.updateBeforeType = Tm.NodeUpdateType.FRAME; sp.addEventListener('dispose', () => this.dispose()); /* o pós refeito (troca de qualidade): o alvo da marcha vai junto com o passe da cena */ }
+    updateBefore(frame) { const r = frame.renderer, S = this.S, U = this.U, cam = this.camera, R = S.X && S.X.R;
+      estado = Tm.RendererUtils.resetRendererState(r, estado);
+      memoriaQuadro(S, r, frame.frameId);
+      U.projInv.value.copy(cam.projectionMatrixInverse); U.camMundo.value.copy(cam.matrixWorld); U.camPos.value.setFromMatrixPosition(cam.matrixWorld); U.pertoLonge.value.set(cam.near, cam.far);
+      const rtF = this.passe && this.passe.renderTarget; if (rtF && rtF.width > 1) U.tamF.value.set(rtF.width, rtF.height); else { r.getDrawingBufferSize(tam); U.tamF.value.set(tam.x, tam.y); }
+      const tq = R ? R.time : 0; U.vento.value.set(tq * 0.0021, tq * 0.0009, tq * 0.0015, tq);
+      U.faixa.value.set((S.hLo != null ? S.hLo : -50) - 12, (S.hHi != null ? S.hHi : 100) + (this.cfg.topo || 90) + 8, 0, 0);
+      if (this.alvoB && S.temNuvem) { const bw = Math.max(1, Math.ceil(U.tamF.value.x / RES)), bh = Math.max(1, Math.ceil(U.tamF.value.y / RES)); U.tamB.value.set(bw, bh); this.alvoB.setSize(bw, bh);
+        r.setRenderTarget(this.alvoB); quad.material = this._m; quad.render(r); }
+      Tm.RendererUtils.restoreRendererState(r, estado); }
+    setup(builder) { const ctx = context(builder.getSharedContext());
+      if (this.cfg.passos && !this._m) { const m = new Tm.NodeMaterial(); m.contextNode = ctx; m.depthTest = false; m.depthWrite = false; m.blending = Tm.NoBlending; m.fragmentNode = marcha(this); M5.registrar('nuvens-marcha-' + this.modo, m); this._m = m; }
+      return this.modo === 'camada' ? compoeCamada(this) : compoeMarcha(this); } /* a composição é a saída do nó (o nó entra no grafo do passe da bruma e o updateBefore roda) */
+    dispose() { if (this._fim) return; this._fim = true; super.dispose(); if (this.alvoB) this.alvoB.dispose(); if (this._m) this._m.dispose(); }
+  };
+  return NodeC;
+}
+
+/* ---------- forma e luz (as mesmas contas na marcha e na camada) ---------- */
+const mapUV = p => { const { vec2 } = window.TSL; return vec2(p.x.div(M5.u.mundo), p.z.negate().div(M5.u.mundo)); };
+/* 1 dentro do mapa, 0 fora (as mesas do horizonte não têm névoa de guerra; a amostra fora do [0, 1] pegaria a borda da memória) */
+const dentro = uv => { const { min, smoothstep, float } = window.TSL; return smoothstep(-0.004, 0.0, min(min(uv.x, uv.y), min(float(1).sub(uv.x), float(1).sub(uv.y)))); };
+/* o ruído 3D girado (as fatias de 32³ não ficam na horizontal: sem faixas na parede do banco, que o limiar da densidade marcaria) */
+const gira = p => { const { vec3, dot } = window.TSL; return vec3(dot(p, vec3(0.8, 0.36, -0.48)), dot(p, vec3(-0.6, 0.48, -0.64)), dot(p, vec3(0, 0.8, 0.6))); };
+/* cor de uma amostra da nuvem: sol com a profundidade até o topo (Beer), céu em cima, a tinta do clima e a borda acesa (cobertura no meio e energia da abertura) */
+function luz(o) { const L = window.TSL; const { float, vec3, mix, max, pow, exp, dot, smoothstep } = L; const U = M5.u;
+  const kN = U.noite; const solI = float(1.25).mul(kN.oneMinus()).add(kN.mul(0.3));
+  const sunT = exp(o.prof.negate()).mul(o.sombra || float(1)).mul(mix(0.6, 1.12, o.vaga)); const ph = pow(max(dot(o.rd, U.solDir), 0.0), 6.0).mul(0.55).add(0.8); /* vaga: o alto das vagas pega mais sol que o vale entre elas */
+  const alb = mix(vec3(0.74, 0.755, 0.79), U.clima.rgb, U.clima.a.mul(0.3));
+  const c = alb.mul(U.solCor.mul(solI).mul(sunT).mul(ph).add(U.ceuCor.mul(mix(0.22, 0.8, o.hR)).mul(0.75)));
+  const borda = smoothstep(0.02, 0.4, o.C).mul(float(1).sub(smoothstep(0.4, 0.95, o.C))); /* faixa larga e macia (sem riscos na parede do banco) */
+  const corB = mix(vec3(1.0, 0.62, 0.26), vec3(0.62, 0.4, 1.3), kN); /* dourado de dia, éter à noite */
+  return c.add(corB.mul(borda.mul(kN.mul(0.55).add(0.28)).add(o.G.mul(2.2))).mul(float(1).sub(o.hR.mul(0.5)))); }
+
+/* ---------- Alta e Ultra: a marcha de raio (passe em meia resolução) ---------- */
+function marcha(nd) {
+  const L = window.TSL; const { Fn, If, Loop, Break, float, int, uint, uvec2, vec2, vec3, vec4, floor, max, min, clamp, mix, smoothstep, exp, sqrt, length, select, uv, getViewPosition, screenCoordinate } = L;
+  const U = nd.U, S = nd.S, cfg = nd.cfg, mem = S.mem, R3 = S.ruido, dep = nd.depth; /* dep: o nó do passe da cena (a marcha desenha dentro do updateBefore: amostrar o passe garante a cena do quadro antes) */
+  const S1 = 1 / 430, S2 = 1 / 140, S3 = 1 / 52, H = cfg.topo, PASSO = cfg.passo, SIG = 0.075, DEF = 80;
+  return Fn(() => {
+    const jL = floor(uv().mul(U.tamB)); const uvF = jL.mul(RES).add(0.5).div(U.tamF).toVar(); /* o pixel cheio cuja profundidade este texel usa (a composição relê o mesmo) */
+    const dz = dep.sample(uvF).r.toVar();
+    const vp = getViewPosition(uvF, dz, U.projInv); const wp = U.camMundo.mul(vec4(vp, 1)).xyz.toVar(); const co = U.camPos;
+    const dv = wp.sub(co); const tE0 = length(dv); const rd = dv.div(max(tE0, 0.001)).toVar(); const ceu = dz.greaterThanEqual(0.99999);
+    const tEnd = select(ceu, float(1e5), tE0).toVar();
+    const ry = min(rd.y, -0.004).toVar(); const hor = sqrt(max(float(1).sub(rd.y.mul(rd.y)), 0.0)).toVar();
+    const t0 = max(float(0), U.faixa.y.sub(co.y).div(ry)).toVar(); const t1 = min(tEnd, U.faixa.x.sub(co.y).div(ry)).toVar();
+    const mE = mem.sample(mapUV(wp)).level(0); const vistoE = float(1).sub(smoothstep(0.08, 0.5, mE.a)).mul(select(ceu, float(0), float(1))).toVar(); /* 1: o chão do pixel já foi visto */
+    t1.assign(select(vistoE.greaterThan(0.5), min(t1, tEnd.sub(100.0)), t1)); /* chão já visto: a nuvem some no trecho final do raio (nem marcha) */
+    const T = float(1).toVar(), cor = vec3(0).toVar();
+    const ui = uvec2(screenCoordinate.xy); const hs = ui.x.mul(uint(1973)).add(ui.y.mul(uint(9277))).toVar(); hs.assign(hs.shiftLeft(uint(13)).bitXor(hs)); hs.assign(hs.mul(hs.mul(hs).mul(uint(15731)).add(uint(789221))).add(uint(1376312589)));
+    const jit = float(hs.bitAnd(uint(0xffff))).div(65536).toVar(); const t = t0.add(jit.mul(PASSO * 0.6)).toVar(); /* tremor branco por pixel (o mesmo hash da tempestade): grão fino em vez de riscos */
+    If(rd.y.lessThan(-0.004).and(t1.greaterThan(t0)), () => {
+      Loop({ start: int(0), end: int(cfg.passos), type: 'int', condition: '<' }, () => {
+        If(t.greaterThanEqual(t1).or(T.lessThan(0.02)), () => { Break(); });
+        const p = co.add(rd.mul(t)).toVar(); const pg = gira(p).toVar(); const nw = R3.sample(pg.mul(S1).add(U.vento.xyz)).level(0).toVar(); const n1 = nw.r;
+        const um = mapUV(p.add(vec3(nw.b.sub(0.5), 0.0, nw.g.sub(0.5)).mul(DEF))).toVar(); const m = mem.sample(um).level(0).toVar(); /* contorno deformado pelo ruído: a borda vira bolhas, não o desenho dos ladrilhos */
+        const Cs = smoothstep(0.02, 0.85, m.r).mul(dentro(um)).toVar();
+        const base = m.b.sub(8.0).toVar(); const topo = base.add(Cs.mul(n1.mul(0.58).add(0.42)).mul(H)).toVar(); const dy = p.y.sub(topo).toVar();
+        If(dy.greaterThan(0.0), () => { t.addAssign(max(dy.div(ry.negate().add(hor.mul(mix(1.2, 0.45, Cs)))), max(t.mul(0.012), PASSO * 0.6))); }) /* acima do topo: pula o ar (o topo sobe no máximo ~1,2 por unidade na borda e ~0,45 no meio do banco); longe, passos maiores */
+          .Else(() => {
+            If(p.y.lessThan(base), () => { Break(); }); /* abaixo da base: acabou */
+            const hR = p.y.sub(base).div(max(topo.sub(base), 1.0)).toVar();
+            const nv = R3.sample(pg.mul(S2).add(U.vento.yzx.mul(1.7))).level(0).toVar(); let n2 = nv.g;
+            if (cfg.detalhe) n2 = n2.mul(0.78).add(R3.sample(pg.mul(S3).sub(U.vento.zxy.mul(2.3))).level(0).b.mul(0.22));
+            const n2v = n2.toVar();
+            /* núcleo denso embaixo e no meio do banco; as vagas comem mais na borda (cobertura baixa): a borda vira fiapos, não um corte */
+            const d = clamp(Cs.sub(hR.mul(hR).mul(0.8)).mul(1.25).sub(n2v.oneMinus().mul(hR.mul(0.35).add(0.45)).mul(Cs.mul(-0.6).add(1.25))), 0.0, 1.0).mul(Cs.mul(0.65).add(0.35)).mul(SIG)
+              .mul(mix(float(1), smoothstep(8.0, 130.0, tEnd.sub(t)), vistoE)).toVar(); /* chão do pixel já visto: some perto dele */
+            If(d.greaterThan(0.0004), () => {
+              let sombra = null; if (cfg.sombra) { const ns = R3.sample(gira(p.add(M5.u.solDir.mul(16.0))).mul(S2).add(U.vento.yzx.mul(1.7))).level(0).g; sombra = clamp(n2v.sub(ns).mul(3.0).add(1.05), 0.45, 1.25); }
+              const prof = topo.sub(p.y).div(max(M5.u.solDir.y, 0.25)).mul(SIG * 0.55);
+              const c = luz({ rd, hR, C: m.r, G: m.g, prof, sombra, vaga: n2v });
+              const a = float(1).sub(exp(d.mul(PASSO).negate()));
+              cor.addAssign(c.mul(a).mul(T)); T.mulAssign(a.oneMinus()); });
+            t.addAssign(jit.mul(PASSO * 0.4).add(PASSO * 0.8)); }); /* passo com o tremor do pixel: sem faixas na parede do banco */
+      });
+    });
+    const DBG = +(Q.get('m5nuvensdbg') || 0); /* diagnóstico: 1 posição do chão do pixel (grade de 100), 2 memória no chão do pixel (R cobertura, G alvo) */
+    if (DBG === 1) return vec4(L.fract(wp.x.div(100)), L.fract(wp.z.negate().div(100)), 0, 1);
+    if (DBG === 2) return vec4(mE.r, mE.a, 0, 1);
+    /* os passos acabaram longe (vista baixa, raio rasante): o resto do raio vira a camada da Média (o plano do topo), sem buraco escuro no horizonte */
+    If(t.lessThan(t1).and(T.greaterThan(0.05)), () => {
+      const tL = max(t, mE.b.add(H * 0.62).sub(co.y).div(ry)); const q = co.add(rd.mul(min(tL, tEnd))).toVar(); const nq = R3.sample(q.mul(S1).add(U.vento.xyz)).level(0);
+      const uq = mapUV(q); const mq = mem.sample(uq).level(0); const a = smoothstep(0.02, 0.85, mq.r).mul(dentro(uq)).mul(nq.r.mul(0.25).add(0.75)).mul(float(1).sub(vistoE)).toVar();
+      cor.addAssign(luz({ rd, hR: float(0.8), C: mq.r, G: mq.g, prof: float(0.3), vaga: nq.g }).mul(a).mul(T)); T.mulAssign(a.oneMinus()); });
+    return vec4(cor, T.oneMinus());
+  })();
+}
+
+/* ---------- composição na resolução cheia (no passe da bruma: depois da oclusão, antes da bruma) ----------
+   Alta e Ultra: dos 4 texels da marcha em volta, se as profundidades batem com a do pixel, a bilinear; se não (borda de unidade, de construção,
+   do relevo), o texel de profundidade mais próxima (sem halo). Média: a camada. */
+function compoeMarcha(nd) {
+  const L = window.TSL; const { Fn, If, float, vec2, vec4, floor, fract, abs, max, min, select, uv, perspectiveDepthToViewZ } = L; const U = nd.U, S = nd.S, c = nd.cor, depth = nd.profT;
+  return Fn(() => { const res = vec4(c).toVar();
+    If(S.U.liga.greaterThan(0.5), () => {
+      const pF = uv().mul(U.tamF).sub(0.5); const jf = pF.div(RES); const j0 = floor(jf).toVar(); const f = fract(jf).toVar(); const jm = U.tamB.sub(1);
+      const lin = d => perspectiveDepthToViewZ(d, U.pertoLonge.x, U.pertoLonge.y).negate();
+      const zF = lin(depth.sample(uv()).r).toVar(); /* profundidade sem .level(): na reserva WebGL2 o textureLod de profundidade do r186 sai sem o .x (não compila); o ramo é uniforme */
+      const uvD = j => j.mul(RES).add(0.5).div(U.tamF); const j00 = min(j0, jm), j10 = min(j0.add(vec2(1, 0)), jm), j01 = min(j0.add(vec2(0, 1)), jm), j11 = min(j0.add(vec2(1, 1)), jm);
+      const e00 = abs(lin(depth.sample(uvD(j00)).r).sub(zF)).toVar(), e10 = abs(lin(depth.sample(uvD(j10)).r).sub(zF)).toVar(), e01 = abs(lin(depth.sample(uvD(j01)).r).sub(zF)).toVar(), e11 = abs(lin(depth.sample(uvD(j11)).r).sub(zF)).toVar();
+      const tol = zF.mul(0.035).add(1.5); const ok = max(max(e00, e10), max(e01, e11)).lessThan(tol);
+      const jA = select(e00.lessThanEqual(e10), j00, j10), eA = min(e00, e10), jB = select(e01.lessThanEqual(e11), j01, j11), eB = min(e01, e11); const jN = select(eA.lessThanEqual(eB), jA, jB);
+      const uvB = select(ok, j0.add(f).add(0.5), jN.add(0.5)).div(U.tamB); /* bilinear entre os centros, ou o centro do mais próximo */
+      const n = nd.saida.sample(uvB).level(0).toVar();
+      res.assign(vec4(c.rgb.mul(n.a.oneMinus()).add(n.rgb), c.a)); });
+    return res; })();
+}
+function compoeCamada(nd) {
+  const L = window.TSL; const { Fn, If, float, vec3, vec4, max, min, clamp, mix, smoothstep, length, select, uv, getViewPosition } = L; const U = nd.U, S = nd.S, mem = S.mem, R3 = S.ruido, H = CFG.camada.topo, c = nd.cor, depth = nd.profT;
+  return Fn(() => { const res = vec4(c).toVar();
+    If(S.U.liga.greaterThan(0.5), () => {
+      const dz = depth.sample(uv()).r.toVar(); /* sem .level() (idem) */ const vp = getViewPosition(uv(), dz, U.projInv); const wp = U.camMundo.mul(vec4(vp, 1)).xyz.toVar(); const co = U.camPos;
+      const dv = wp.sub(co); const tE = length(dv).toVar(); const rd = dv.div(max(tE, 0.001)).toVar(); const ceu = dz.greaterThanEqual(0.99999);
+      const uE = mapUV(wp).toVar(); const mE = mem.sample(uE).level(0).toVar(); const ry = min(rd.y, -0.004);
+      const tL = clamp(mE.b.add(H).sub(co.y).div(ry), 0.0, select(ceu, float(1e5), tE)); /* o plano do topo sobre o chão do pixel (ou o próprio chão, se o topo ficar atrás) */
+      const q = co.add(rd.mul(tL)).toVar(); const nv = R3.sample(gira(q).mul(1 / 300).add(U.vento.xyz)).level(0).toVar();
+      const uQ = mapUV(q.add(vec3(nv.b.sub(0.5), 0.0, nv.g.sub(0.5)).mul(70.0))).toVar(); const mQ = mem.sample(uQ).level(0).toVar(); /* contorno deformado pelo ruído */
+      const C = max(mQ.r.mul(dentro(uQ)), mE.r.mul(0.92).mul(dentro(uE))).toVar(); const Cs = smoothstep(0.02, 0.85, C);
+      const a0 = clamp(Cs.mul(nv.r.mul(0.6).add(0.75)).sub(nv.g.oneMinus().mul(0.45)).sub(0.12).mul(2.4), 0.0, 1.0).mul(Cs);
+      const vistoE = float(1).sub(smoothstep(0.08, 0.5, mE.a)).mul(select(ceu, float(0), float(1)));
+      const a = a0.mul(vistoE.oneMinus()).mul(select(rd.y.lessThan(-0.004), float(1), float(0))).toVar(); /* chão do pixel já visto: nada de nuvem na frente */
+      const col = luz({ rd, hR: nv.r.mul(0.35).add(0.65), C, G: max(mQ.g, mE.g), prof: float(0.12).add(nv.g.oneMinus().mul(0.5)), vaga: nv.g });
+      res.assign(vec4(mix(c.rgb, col, a), c.a)); });
+    return res; })();
+}
+
+/* chamada pelo src/m5/pos.js (5.0d): c = cena (com a oclusão), depth = profundidade do passe da cena; devolve a cor com as nuvens (ou c, sem efeito) */
+NV.compor = function (c, depth, sp, camera, q) {
+  const modo = NV.modo(q); if (!modo || !M5.tex || !M5.tex.nevoa) return c;
+  try { const C = classe(); const nd = new C(c, depth, sp, camera, modo); NV.ultimo = nd; NV.modoAtual = modo; return window.TSL.nodeObject(nd); }
+  catch (err) { console.warn('[ARD] Motor 5: nuvens de guerra indisponíveis: ' + err.message); return c; }
+};
+/* o chão nunca visto sob as nuvens (src/m5/terreno.js chama no chão, nos adereços e nas estradas): hoje ×0,06 (quase preto); com as nuvens
+   no quadro, no mínimo ×0,4 (a sombra da nuvem, sem o anel preto nas bordas finas). O explorado (×0,46) e o à vista não mudam. O uniform vale 0,4
+   só nos quadros em que o nó das nuvens rodou (Baixa, celular ou qualidade trocada: 0, a imagem de hoje) */
+let PISO = null;
+NV.piso = () => PISO || (PISO = window.TSL.uniform(0).onFrameUpdate(({ frameId }) => (SH && SH.quadro >= 0 && frameId - SH.quadro <= 2 ? 0.4 : 0)));
+M5.nevoaChao = fv => { const L = window.TSL; return L.max(L.mix(0.06, 1.0, fv), NV.piso()); };
+/* testes e fotos: no próximo quadro a memória vai direto ao alvo (sem a abertura) */
+NV.assentar = () => { if (SH) SH.assenta = true; };
+/* diagnóstico: o estado da memória e a versão em uso */
+NV.estado = () => { const S = SH; return S ? { modo: NV.modoAtual || null, temNuvem: S.temNuvem, calma: +S.calma.toFixed(2), alturas: S.hLo != null ? [Math.round(S.hLo), Math.round(S.hHi)] : null, geraMs: S.geraMs, ruidoMs: S.ruidoMs, res: RES } : { modo: NV.modoAtual || null }; };
+})(globalThis.ARD = globalThis.ARD || {});
+
 /* Renderizador 3D do jogo (Three.js, v3.0a): mesma interface do renderizador 2D. Câmera RTS, instancing por modelo,
    relevo real (biomas, cordilheiras, Fenda), névoa projetada no terreno, sombras, dia e noite, efeitos. Só lê a simulação. */
 (function (ARD) {
@@ -20510,6 +21559,7 @@ function create(canvas, overlay, mini) {
     if (over.ssao != null) q.ssao = over.ssao && !!ADD; if (over.msaa != null) q.msaa = over.msaa && !!ADD; if (over.shadowMap) q.shadowMap = over.shadowMap; if (over.post != null) q.post = over.post && !!ADD;
     q.detail = name === 'baixa' || isTouch ? 0 : name === 'media' ? 0.75 : 1; if (ME && ME.setDetail) ME.setDetail(q.detail); /* 4.3a: detalhe de superfície dos modelos */
     if (R._terrQ) R._terrQ(q); /* 4.3c: chão leve e sombra do relevo seguem a qualidade (definido junto do terreno) */
+    if (M5X && ARD.m5.clima) ARD.m5.clima.qualidade(R, isTouch); /* 5.0d: partículas e crateras pela qualidade (o mesmo pipeline) */
     renderer.setPixelRatio(q.pr * (R.dyn && !(M5X && ARD.m5.up) ? R.dyn.scale : 1)); /* 5.0a: com ?m5up=fsr1 a escala fica no passe da cena */ applyShadows(); /* 4.3i: mantém a escala da resolução dinâmica */ buildComposer(); armWatchdog(); if (R.FX) R.FX.mult = q.particles; if (R.DR && R.sim && R.H) { try { R.DR.build(R.sim, R.H, dressDensity(), terrT ? terrT.bioAt : null); } catch (e) {} }
   };
   const octx = overlay.getContext('2d'); const mctx = mini.getContext('2d'); const mfog = document.createElement('canvas'); const mfctx = mfog.getContext('2d');
@@ -20641,6 +21691,7 @@ function create(canvas, overlay, mini) {
         vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
         fragmentShader: 'uniform float uTime; uniform float uNight; varying vec2 vUv; float h(float x){ return fract(sin(x * 127.1) * 43758.5453); } float n(float x){ float i = floor(x), f = fract(x); f = f*f*(3.0-2.0*f); return mix(h(i), h(i + 1.0), f); } void main(){ float streak = n(vUv.x * 40.0) * 0.6 + n(vUv.x * 13.0 + uTime * 0.2) * 0.4; float rise = 0.6 + 0.4 * sin(vUv.y * 9.0 - uTime * 1.2 + vUv.x * 20.0); float fade = smoothstep(0.0, 0.12, vUv.y) * (1.0 - smoothstep(0.35, 1.0, vUv.y)); float a = streak * rise * fade * (0.05 + 0.08 * uNight); gl_FragColor = vec4(vec3(1.0, 0.45, 0.9) * a, a); }' });
       R.riftRays = []; for (let i = 0; i < 3; i++) { const m = new THREE.Mesh(new THREE.CylinderGeometry(80 + i * 40, 150 + i * 30, 480 - i * 80, 32, 1, true).translate(0, (480 - i * 80) / 2, 0), rayMat); m.position.set(S.CX, H(S.CX, S.CY) - 10, -S.CY); m.rotation.y = i * 1.3; m.renderOrder = 5; scene.add(m); R.riftRays.push(m); } R.riftRayMat = rayMat; }
+    if (M5X && ARD.m5.clima) { try { const wv = R.warmView && R.warmView.cam; ARD.m5.clima.montar({ X: M5X, scene, camera, H, heights, HN, HS, W: S.WORLD, terr: T || null, cam: wv ? { x: wv.x, y: wv.y } : { x: S.CX, y: S.CY } }); } catch (err) { console.warn('[ARD] Motor 5: clima indisponível: ' + err.message); } } /* 5.0d: mapa de alturas, partículas e neblina do clima na cena antes do aquecimento (src/m5/clima.js) */
   }
   // ---------- geometrias e instancing ----------
   const envMats = []; // materiais que refletem o ambiente; a intensidade cai à noite
@@ -20812,7 +21863,7 @@ function create(canvas, overlay, mini) {
      com o Quorith na partida. O clássico não passa aqui. ?m5fora=0 deixa tudo na cena (medida) */
   function m5Fora(sim) { if (!M5X || /[?&]m5fora=0/.test(location.search)) return; const fora = R.m5Fora = []; const tira = (o, k) => { if (o && o.parent) { o.parent.remove(o); if (fora.indexOf(k) < 0) fora.push(k); } };
     if (CB) { tira(shells, 'cápsulas'); tira(bullets, 'balas'); for (const l of beams) tira(l, 'feixes'); }
-    if (FX) { tira(booms, 'explosões'); tira(sparkPts, 'faíscas'); if (!(R.climateCfg && R.climateCfg.drop)) tira(smokePts, 'flocos'); }
+    if (FX) { tira(booms, 'explosões'); tira(sparkPts, 'faíscas'); if (!(R.climateCfg && R.climateCfg.drop) || (ARD.m5.clima && ARD.m5.clima.ativo) /* 5.0d: o clima na GPU substitui os flocos */) tira(smokePts, 'flocos'); }
     if (SC) tira(decals, 'marcas');
     if (STM && STM.owns) tira(stormDisc, 'disco da tempestade');
     if (FL_ON && FL.ca) tira(headlights, 'cone dos faróis');
@@ -20985,7 +22036,7 @@ function create(canvas, overlay, mini) {
     acida: { tint: [0.44, 0.56, 0.28], mix: 0.62, fogN: 0.65, fogF: 2.4, hemi: 0xa8c878, sun: 0xd4e68a, drop: [0.6, 0.9, 0.3], vz: -175, vx: 6, rate: 1, burst: 5, life: 1.2 },
   };
   const _cc = new THREE.Color(); const _bgC = new THREE.Color(); /* 4.3i: cor do fundo reaproveitada (antes um objeto novo por quadro) */
-  R.setClimate = function (name) { const c = CLIMATES[name] || null; const changed = R.climateCfg !== c; R.climateCfg = c; if (M5X && c && c.drop && R.m5Fora && !smokePts.parent) scene.add(smokePts); /* 5.0c.1: o clima é escolhido antes da carga; se mudar depois para um com neve, os flocos voltam (o pipeline nasceria aqui) */ if (changed && R.envSky) skyEnv(c); if (!c) { scene.fog.near = 1500; scene.fog.far = 3200; } hemi.color.set(c ? c.hemi : 0x9fb8d6); };
+  R.setClimate = function (name) { const c = CLIMATES[name] || null; const changed = R.climateCfg !== c; R.climateCfg = c; if (M5X && ARD.m5.clima && ARD.m5.clima.escolher(name, c, R, isTouch) && R.pp) buildComposer(); /* 5.0d: clima na GPU (src/m5/clima.js); o pós é refeito quando o reflexo das poças entra ou sai */ if (M5X && c && c.drop && R.m5Fora && !smokePts.parent && !(ARD.m5.clima && ARD.m5.clima.ativo)) scene.add(smokePts); /* 5.0c.1: o clima é escolhido antes da carga; se mudar depois para um com neve, os flocos voltam (o pipeline nasceria aqui) */ if (changed && R.envSky) skyEnv(c); if (!c) { scene.fog.near = 1500; scene.fog.far = 3200; } hemi.color.set(c ? c.hemi : 0x9fb8d6); };
   function spark(x, y, z, col, sp, g) { if (FX) { FX.spark(x, H(x, y) + z, -y, [col[0] * 1.5, col[1] * 1.4, col[2] * 1.3], sp, 1); return; } const i = SP.i++ % SN; const a = Math.random() * TAU; SP.x[i] = x; SP.y[i] = y; SP.z[i] = z; SP.vx[i] = Math.cos(a) * sp * Math.random(); SP.vy[i] = Math.sin(a) * sp * Math.random(); SP.vz[i] = sp * (0.4 + Math.random() * 0.8); SP.t[i] = 0; SP.life[i] = 0.4 + Math.random() * 0.6; sCol[i * 3] = col[0]; sCol[i * 3 + 1] = col[1]; sCol[i * 3 + 2] = col[2]; }
   const boomGeo = new THREE.SphereGeometry(1, 10, 8); const boomMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.4, 1.5, 0.8), transparent: true, opacity: 0.8, depthWrite: false }); const booms = new THREE.InstancedMesh(boomGeo, boomMat, 48); booms.count = 0; booms.frustumCulled = false; scene.add(booms); const boomList = [];
   const decalGeo = new THREE.CircleGeometry(1, 18); decalGeo.rotateX(-Math.PI / 2); const decals = new THREE.InstancedMesh(decalGeo, new THREE.MeshBasicMaterial({ color: 0x0b0908, transparent: true, opacity: 0.55, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }), 160); decals.count = 0; decals.frustumCulled = false; scene.add(decals); const decalList = [];
@@ -21118,7 +22169,7 @@ function create(canvas, overlay, mini) {
         if (e.kind === 'proj') { if (!own && !vis.has(e.id)) continue; const w = S.WEAPONS[e.weapon]; const wx = e.px + (e.x - e.px) * alpha, wy = e.py + (e.y - e.py) * alpha; /* 5.0c.1: sem o vetor do lerp */ if (CB) { if (w.proj === 'shell') CB.proj({ id: e.id, weapon: e.weapon, faction: facOf(e.owner), at: [wx, H(wx, wy) + e.z, -wy], vel: [e.vx || 0, 0, -(e.vy || 0)], arc: true }); continue; } /* 4.3g: as balas voam no combat3d desde o disparo */ if (w.proj === 'shell') { if (FX && Math.random() < 0.45 * FX.mult) FX.trail(wx, H(wx, wy) + e.z, -wy); if (nShell < 256) { _p.set(wx, H(wx, wy) + e.z, -wy); _s.setScalar(1); _q.identity(); _m.compose(_p, _q, _s); shells.setMatrixAt(nShell++, _m); } } else if (nBul < BL) { const o = nBul * 6; blPos[o] = wx - e.vx * 0.03; blPos[o + 1] = H(wx, wy) + e.z; blPos[o + 2] = -(wy - e.vy * 0.03); blPos[o + 3] = wx; blPos[o + 4] = H(wx, wy) + e.z; blPos[o + 5] = -wy; nBul++; } continue; }
         if (!own && !vis.has(e.id)) continue;
         const isUnit = e.kind === 'unit'; let wx = e.x, wy = e.y; if (isUnit) { wx = e.px + (e.x - e.px) * alpha; wy = e.py + (e.y - e.py) * alpha; } /* 5.0c.1: a mesma conta do lerp, sem um vetor novo por entidade e por quadro */ const ud = isUnit ? S.UNITS[e.def] : S.BUILDINGS[e.def];
-        if (terrT) { if (isUnit) { if (SC && !ud.flying && ud.cls !== 'inf') { const ts = trackSt.get(e.id); if (!ts) trackSt.set(e.id, { x: wx, y: wy, t: R.time }); else { const dx = wx - ts.x, dy = wy - ts.y, dl = Math.hypot(dx, dy); if (dl > 150) { ts.x = wx; ts.y = wy; } else if (dl > 2.2) { const fac = (sim.players[e.owner] || {}).faction; if (fac !== 'erevane' && fac !== 'quorith') SC.track((wx + ts.x) / 2, (wy + ts.y) / 2, Math.atan2(dy, dx), e.r * 1.75, dl + 1.4, 0.9, fac === 'tessara' || fac === 'vorag'); if (FX && Math.random() < 0.3 * R.quality.particles && _frus.containsPoint(_p.set(wx, H(wx, wy), -wy))) { const dc = dustCol(wx, wy); const bx = wx - dx / dl * e.r * 0.8, by = wy - dy / dl * e.r * 0.8; FX.smoke(bx, H(bx, by) + 1.2, -by, dc, 1.3 + Math.random() * 0.8, 3 + Math.random() * 3, e.r * 0.45); } /* 4.3c: poeira do chão atrás de quem anda */ ts.x = wx; ts.y = wy; } ts.t = R.time; } } }
+        if (terrT) { if (isUnit) { if (SC && !ud.flying && (ud.cls !== 'inf' || (M5X && ARD.m5.clima && ARD.m5.clima.pegadas(wx, wy)) /* 5.0d: pegadas da infantaria na neve e na areia */)) { const ts = trackSt.get(e.id); if (!ts) trackSt.set(e.id, { x: wx, y: wy, t: R.time }); else { const dx = wx - ts.x, dy = wy - ts.y, dl = Math.hypot(dx, dy); if (dl > 150) { ts.x = wx; ts.y = wy; } else if (dl > 2.2) { const fac = (sim.players[e.owner] || {}).faction; if (fac !== 'erevane' && fac !== 'quorith') SC.track((wx + ts.x) / 2, (wy + ts.y) / 2, Math.atan2(dy, dx), e.r * (ud.cls === 'inf' ? 1.2 : 1.75) /* 5.0d */, dl + 1.4, 0.9, fac === 'tessara' || fac === 'vorag'); if (FX && Math.random() < 0.3 * R.quality.particles && _frus.containsPoint(_p.set(wx, H(wx, wy), -wy))) { const dc = dustCol(wx, wy); const bx = wx - dx / dl * e.r * 0.8, by = wy - dy / dl * e.r * 0.8; FX.smoke(bx, H(bx, by) + 1.2, -by, dc, 1.3 + Math.random() * 0.8, 3 + Math.random() * 3, e.r * 0.45); } /* 4.3c: poeira do chão atrás de quem anda */ ts.x = wx; ts.y = wy; } ts.t = R.time; } } }
           else if (!flatDone.has(e.id)) { flatDone.add(e.id); flatQ.push(e); } } /* 4.3c: rastros por Raça (Erevane e Quorith flutuam) e chão assentado sob construções */
         _sph.center.set(wx, H(wx, wy) + 6, -wy); _sph.radius = e.r * 1.6 + (isUnit ? 45 : 80); if (!_frus.intersectsSphere(_sph) && !view.sel.has(e.id)) continue;
         const parts = MD.PARTS[e.def]; const hullDef = parts ? parts.hull : e.def; const isB = e.kind === 'building'; const lo = LOD_ON && (isUnit || isB) && (isTouch || camera.position.distanceToSquared(_lp.set(wx, H(wx, wy), -wy)) > (isUnit ? LOD_D2 : LOD_DB2)); /* 4.3d: unidade longe da câmera usa a versão leve; 4.3f: construções também */ const skinV = (e.def === 'nucleo' && R.skins && R.skins[e.owner]) || 0; const it = instOf(hullDef, e.owner, skinV, false, lo); /* 4.0e: Núcleo do Hangar */ const g = lo ? geoOf(hullDef, e.owner, skinV) : it.geo; let fit = fitOf(e, g); if (e.def === 'nucleo') { const op = sim.players[e.owner] || {}; fit *= 1 + 0.12 * ((op.era || 1) - 1) + (op.evolveT > 0 ? 0.025 * Math.sin(R.time * 6) : 0); } /* 4.1d: o Núcleo cresce a cada Era e pulsa enquanto evolui */
@@ -21247,6 +22298,7 @@ function create(canvas, overlay, mini) {
     R.sim = sim; R.time += dt; R.revealAll = !!view.reveal; updateFx(dt); if (R.terrShader) R.terrShader.uniforms.uCloudT.value = R.time; if (terrU) terrU.uTime.value = R.time; /* 4.3c */
     const cam = view.cam, human = view.human, me = sim.players[human]; const sqB = Math.max(1, Math.min(1.4, 1 + (2.4 - (cam.zoom || 1)) * 0.22)); /* 4.3e: de longe as figuras da infantaria crescem até 1,3–1,4× para o esquadrão continuar legível; de perto ficam na escala real */ const vis = view.reveal ? { has: () => true } : sim.vis[human]; const explored = sim.explored[human];
     R.night = PH && PH.night != null ? PH.night : R.forceDay ? 0 : (1 - Math.cos(TAU * sim.time / 750)) / 2; /* 4.3j: hora do dia do Modo Foto (só no visual) */
+    if (M5X && ARD.m5.ceuHora) ARD.m5.ceuHora(R, sim, PH); /* 5.0d: no Motor 5 o sol anda com a hora (src/m5/ceu.js): R.sunDir em degraus antes do updateCamera */
     R.shakeX = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0; R.shakeY = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0;
     updateCamera(cam);
     // dia e noite
@@ -21259,7 +22311,7 @@ function create(canvas, overlay, mini) {
       bg.lerp(_cc.setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), cl.mix * (1 - nt * 0.45));
       if (cl.sun) sun.color.lerp(_cc.set(cl.sun), 0.5);
       if (cl.aurora) { const ka = (Math.sin(R.time * 0.3) + 1) / 2; bg.lerp(_cc.setRGB(cl.aurora[0], cl.aurora[1], cl.aurora[2]), 0.14 + 0.2 * ka); hemi.intensity += 0.15 * ka; }
-      if (cl.drop && Math.random() < cl.rate * R.quality.particles) for (let i = 0; i < cl.burst; i++) { const zf = Math.max(0.6, cam.zoom); snow(cam.x + (Math.random() - .5) * 1500 / zf, cam.y + (Math.random() - .5) * 1100 / zf, cl.drop, cl.vz, cl.vx, cl.life); }
+      if (cl.drop && !(M5X && ARD.m5.clima && ARD.m5.clima.ativo) /* 5.0d */ && Math.random() < cl.rate * R.quality.particles) for (let i = 0; i < cl.burst; i++) { const zf = Math.max(0.6, cam.zoom); snow(cam.x + (Math.random() - .5) * 1500 / zf, cam.y + (Math.random() - .5) * 1100 / zf, cl.drop, cl.vz, cl.vx, cl.life); }
       if (cl.sparkle && Math.random() < 0.35 * R.quality.particles) { const zf = Math.max(0.6, cam.zoom); spark(cam.x + (Math.random() - .5) * 1300 / zf, cam.y + (Math.random() - .5) * 950 / zf, 2, [0.75, 0.95, 1], 18, false); }
     }
     scene.background = bg; scene.fog.color.copy(bg);
@@ -21300,6 +22352,7 @@ function create(canvas, overlay, mini) {
     if (terrT && terrain) { for (let k = 0; k < 6 && flatQ.length; k++) { const b = flatQ.shift(); if (b.alive) TR.flatten(terrT, terrain.geometry, b.x, b.y, b.r + 4); } if ((trackPrune -= dt) <= 0) { trackPrune = 20; for (const [id, ts] of trackSt) if (R.time - ts.t > 20) trackSt.delete(id); } }
     if (SC) SC.flush(dt);
     if (FX) FX.update(R.time, camera);
+    if (M5X && ARD.m5.clima && ARD.m5.clima.ativo) ARD.m5.clima.quadro(dt, cam, camera, R); /* 5.0d: um passo do clima na GPU */
     flashRender(cam); /* 4.3g */
     if (atmoFx) { atmoFx.U.uAtProjInv.value.copy(camera.projectionMatrixInverse); atmoFx.U.uAtCamWorld.value.copy(camera.matrixWorld); } /* 4.3b */
     if (M5X) m5BundleConf(); /* 5.0c.1: o grupo estático regrava só quando algo dele muda */
@@ -24547,13 +25600,13 @@ const RES3 = ['plasma', 'minerio', 'dados'], RES_CLS = { plasma: 'pl', minerio: 
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">' + Tx('geral.gratis') + '</span>'; } /* 5.0c */
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-10-30 21:13Z';
+const BUILD = '2026-10-31 03:29Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.0c.2';
+const VERSION = '5.0d';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }

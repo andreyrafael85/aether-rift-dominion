@@ -177,11 +177,11 @@ M5.chao = function (U, o) {
       /* cicatrizes: rastros (chão compactado; na neve, sombra azulada), queimado com fuligem, cratera e brasa recente */
       { const sc = (UNI ? A.cicatrizes().mul(kf) : A.cicatrizes()).toVar('tSc'); /* 5.0b.1: nas mesas, cicatriz 0 (nada muda) */ const tr = sc.r; alb.mulAssign(float(1).sub(tr.mul(Bw.y.mul(0.16).add(Bw.z.mul(0.12)).add(0.34)))); alb.assign(mix(alb, alb.mul(vec3(0.76, 0.85, 1.08)), tr.mul(Bw.x).mul(0.7)));
         const bu = smoothstep(0.0, 0.85, sc.g); alb.assign(mix(alb, vec3(0.06, 0.05, 0.042).mul(soft.mul(0.5).add(0.75)), clamp(bu.mul(0.85), 0.0, 0.85))); rough.assign(mix(rough, 0.6, bu.mul(0.4))); hgt.addAssign(tr.mul(-0.18).sub(sc.b.mul(1.6)));
-        tEmis.addAssign(vec3(1.4, 0.45, 0.12).mul(smoothstep(0.35, 1.0, sc.a)).mul(sin(tempo.mul(9.0).add(gp.x.mul(0.7))).mul(0.35).add(0.65)).mul(hCrk.mul(0.5).add(0.5))); }
+        tEmis.addAssign(vec3(1.4, 0.45, 0.12).mul(smoothstep(0.35, 1.0, sc.a)).mul(sin(tempo.mul(9.0).add(gp.x.mul(0.7))).mul(0.35).add(0.65)).mul(hCrk.mul(0.5).add(0.5))); S.sc = sc; /* 5.0d: as cicatrizes para as camadas do clima e da batalha (src/m5/clima.js) */ }
     }
     alb.mulAssign(macro.mul(0.28).add(0.86)); alb.mulAssign(mix(vec3(1.0), vec3(1.06, 1.0, 0.92), smoothstep(0.4, 0.8, mid).mul(0.6)));
     if (fora) { const sl = smoothstep(250.0, 340.0, pw.y.add(macro.sub(0.5).mul(90.0))).mul(float(1).sub(smoothstep(0.35, 0.6, slope))).mul(UNI ? uFora : float(1)); /* 5.0b.1: ×uFora */ alb.assign(mix(alb, vec3(0.78, 0.82, 0.88).mul(soft.mul(0.1).add(0.9)), sl)); rough.assign(mix(rough, 0.7, sl)); } /* neve no alto das montanhas distantes */
-    const CG = M5.ganchos && M5.ganchos.chao; if (CG && CG.cor) { const nc = CG.cor({ m, o, alb, Bw, gp }); if (nc) alb.assign(nc); } /* gancho da fase 2 (camadas extras) */
+    const CG = M5.ganchos && M5.ganchos.chao; if (CG && CG.cor) { const nc = CG.cor({ m, o, alb, Bw, gp, rough, hgt, tEmis, sc: S.sc || null, slope, cav, soft, mid, macro, Ap, As, nearK, pw, wn }); if (nc) alb.assign(nc); } /* gancho da fase 2 (camadas extras); 5.0d: com rugosidade, relevo, emissivo e cicatrizes (clima e batalha, src/m5/clima.js) */
     const dif = alb.mul(mix(0.72, 1.0, aoc.x)).toVar('tDif');
     const DBG = +(QS.get('terrdbg') || 0); /* ?terrdbg=N: os mesmos modos de diagnóstico do clássico (1 bioma, 2 cavidade, 3 curvatura, 4 texturas, 5 rugosidade, 7 relevo fino) */
     if (DBG) { if (DBG === 1) dif.assign(Bw.xyz); else if (DBG === 2) dif.assign(vec3(aoc.x)); else if (DBG === 3) dif.assign(vec3(aoc.y.mul(0.5).add(0.5))); else if (DBG === 4) dif.assign(vec3(Ar.r, Ap.g, Bt.r)); if (DBG !== 5) rough.assign(1.0); if (DBG !== 7) hgt.assign(0.0); }
@@ -197,7 +197,7 @@ M5.chao = function (U, o) {
       If(U.uNear.greaterThan(0.0), () => { const m1 = amostra(mt, wuv.mul(260.0)).rgb.toVar(), m2v = amostra(mt, wuv.mul(84.0).add(0.31)).rgb.toVar(); const pe = max(m1.r.mul(0.6), m2v.r); /* ramo uniforme (a câmera inteira): de longe nem amostra */
         dif.mulAssign(mix(float(1), mix(m1.g, m2v.g, step(0.25, m2v.r)).mul(0.28).add(0.86).mul(float(1).sub(max(m1.b, m2v.b.mul(0.8)).mul(0.35))).mul(pe.mul(0.1).add(1.0)), nk.mul(0.7)));
         mh.assign(m1.r.mul(0.3).add(m2v.r.mul(0.7)).sub(m1.b.add(m2v.b).mul(0.25)).mul(nk)); });
-      const tc = A.territorio(); dif.assign(mix(dif, tc.rgb, tc.a.mul(0.14).mul(UNI ? kf : float(1)))); const fv = A.nevoa(); dif.mulAssign(UNI ? mix(mix(0.06, 1.0, fv), 1.0, uFora) : mix(0.06, 1.0, fv)); tEmis.mulAssign(UNI ? mix(fv, 1.0, uFora) : fv); /* 5.0b.1: território e névoa de guerra só no chão (nas mesas, ×1) */
+      const tc = A.territorio(); dif.assign(mix(dif, tc.rgb, tc.a.mul(0.14).mul(UNI ? kf : float(1)))); const fv = A.nevoa(); const nvc = M5.nevoaChao ? M5.nevoaChao(fv) : mix(0.06, 1.0, fv); /* 5.0d: chão nunca visto sob as nuvens de guerra (src/m5/nuvens.js) */ dif.mulAssign(UNI ? mix(nvc, 1.0, uFora) : nvc); tEmis.mulAssign(UNI ? mix(fv, 1.0, uFora) : fv); /* 5.0b.1: território e névoa de guerra só no chão (nas mesas, ×1) */
     }
     dif.mulAssign(float(1).sub(U.uCloudK.mul(0.2).mul(float(1).sub(A.nuvem())))); /* sombra de nuvem no material (0 quando a bruma do pós já faz) */
     S.rough = rough; S.tH = hgt.mul(mix(0.25, 1.0, nearK)).toVar('tH'); S.mh = mh; S.tEmis = tEmis; S.wn = wn;
@@ -205,6 +205,7 @@ M5.chao = function (U, o) {
   });
   const dif = cor();
   m.colorNode = dif;
+  { const GP = M5.ganchos && M5.ganchos.chao && M5.ganchos.chao.posicao; const pp = GP ? GP({ m, o }) : null; if (pp) m.positionNode = pp; } /* 5.0d: crateras que afundam o chão (deslocamento pelo mapa de cicatrizes, src/m5/clima.js) */
   m.roughnessNode = Fn((b) => saida(b).rough)(); /* a cor monta antes (setupDiffuseColor) e deixa as variáveis prontas */
   m.aoNode = aoc.x;
   /* relevo fino por derivada (o ardTPerturb do clássico, sem normalize de vetor nulo): tH das camadas em unidades do mapa + microdetalhe */
@@ -241,9 +242,10 @@ M5.adereco = function (o) {
   o = o || {}; const Tm = T(); const { Fn, float, vec2, vec3, vec4, mat4, mix, max, sin, cos, attribute, vertexColor, varyingProperty, positionLocal, normalViewGeometry } = L();
   const m = new Tm.MeshStandardNodeMaterial({ vertexColors: true, roughness: 1, metalness: 0, side: o.leaf ? Tm.DoubleSide : Tm.FrontSide });
   const rm = M5.attr('rm', vec2(0.9, 0)), glow = M5.attr('aGlow', float(0)), wind = M5.attr('aWind', float(0)); const fv = amostras().nevoa();
-  m.colorNode = M5.instCor(vec3(mix(0.06, 1.0, fv).mul(float(1).sub(glow)))); m.roughnessNode = rm.x; m.metalnessNode = rm.y;
+  m.colorNode = M5.instCor(vec3((M5.nevoaChao ? M5.nevoaChao(fv) : mix(0.06, 1.0, fv)).mul(float(1).sub(glow)))); /* 5.0d: idem (nuvens.js) */ m.roughnessNode = rm.x; m.metalnessNode = rm.y;
   const corInst = Fn(b => (b.object && b.object.isM5Inst ? attribute('iC', 'vec3') : b.object && b.object.instanceColor ? varyingProperty('vec3', 'vInstanceColor') : vec3(1)))();
   m.emissiveNode = vertexColor().rgb.mul(corInst).mul(glow).mul(fv.mul(fv)); /* peça emissiva: a própria cor (com a tinta da instância), apagada na névoa */
+  { const GA = M5.ganchos && M5.ganchos.adereco && M5.ganchos.adereco.cor; if (GA) GA({ m, o, fv }); } /* 5.0d: mato queimado e neve, cinza ou molhado nos adereços (src/m5/clima.js) */
   if (o.leaf) m.normalNode = normalViewGeometry; /* o clássico desfaz a inversão do verso: folhas e lâminas iluminadas igual dos dois lados */
   if (o.leaf) { const semSombra = L().uniform(0).onObjectUpdate(({ object }) => (object.userData && object.userData.ardSemSombra ? 1 : 0)); m.receivedShadowNode = s => s.add(semSombra.mul(float(1).sub(s))); } /* 5.0b.1: um shader só para as folhas: todo bloco recebe sombra no Motor 5 e a folhagem pequena (ardSemSombra, do dress3d) fica com a sombra em 1, como sem receber (antes eram dois WGSL: com e sem sombra) */
   const vento = Fn(b => { if (!(b.object && b.object.isM5Inst)) return positionLocal; /* InstancedMesh de verdade (?m5inst=0): o three já aplicou a instância; sem vento */
@@ -271,7 +273,7 @@ M5.estrada = function () {
   const m = new Tm.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }); m.fog = false;
   const side = abs(uv().x.sub(0.5)).mul(2); const nz = M5.vnoise2(vec2(positionWorld.x.div(M5.u.mundo), positionWorld.z.negate().div(M5.u.mundo)).mul(900));
   const edge = float(1).sub(smoothstep(nz.mul(0.25).add(0.55), 1.0, side)); const rut = float(1).sub(smoothstep(0.0, 0.08, abs(side.sub(0.45)))).mul(0.18); /* bordas em ordem */
-  const col = mix(vec3(0.33, 0.29, 0.24), vec3(0.42, 0.37, 0.3), nz).mul(float(1).sub(rut)).mul(mix(0.06, 1.0, amostras().nevoa()));
+  const col = mix(vec3(0.33, 0.29, 0.24), vec3(0.42, 0.37, 0.3), nz).mul(float(1).sub(rut)).mul(M5.nevoaChao ? M5.nevoaChao(amostras().nevoa()) : mix(0.06, 1.0, amostras().nevoa())); /* 5.0d: idem (nuvens.js) */
   m.colorNode = mix(col, pow(col, vec3(2.2)).div(expo()), semPos()); /* 5.0b (junção): ÷ exposição sem pós */ m.opacityNode = edge.mul(0.62); M5.instMat(m);
   return M5.registrar('estrada', m);
 };
