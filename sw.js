@@ -1,7 +1,7 @@
 /* Aether Rift: Dominion — service worker (4.0f): campanha e partidas solo funcionam offline depois da primeira visita.
-   Build 202610311808Z. Página: rede primeiro (atualiza quando online). Three.js, PeerJS e fontes: cache primeiro (URLs versionadas). */
-const CACHE = 'ard-202610311808Z';
-const CORE = ['./', './index.html', './manifest.webmanifest', './assets/hero-belt.webp', './assets/favicon-64.png', './assets/favicon-32.png', './assets/apple-touch-icon.png', './assets/icon-192.png', './assets/icon-512.png', './assets/icon-maskable-512.png', './src/i18n/en.js?v=202610311808Z', './src/i18n/es.js?v=202610311808Z']; /* 5.0c: dicionários do inglês e do espanhol (a troca de idioma vale sem internet) */
+   Build 202611010011Z. Página: rede primeiro (atualiza quando online). Three.js, PeerJS e fontes: cache primeiro (URLs versionadas). */
+const CACHE = 'ard-202611010011Z';
+const CORE = ['./', './index.html', './manifest.webmanifest', './assets/hero-belt.webp', './assets/favicon-64.png', './assets/favicon-32.png', './assets/apple-touch-icon.png', './assets/icon-192.png', './assets/icon-512.png', './assets/icon-maskable-512.png', './src/i18n/en.js?v=202611010011Z', './src/i18n/es.js?v=202611010011Z']; /* 5.0c: dicionários do inglês e do espanhol (a troca de idioma vale sem internet) */
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => Promise.all(CORE.map(u => c.add(u).catch(() => null)))).then(() => self.skipWaiting())); });
 /* 5.0c.1: vozes gravadas (assets/vozes/) numa cache à parte, que passa de uma versão para a outra: a página guarda nela cada fala que já tocou
    (src/vozes.js) e aqui ela é servida sem internet; o manifesto vem da rede primeiro (e fica guardado para a próxima vez sem rede) */

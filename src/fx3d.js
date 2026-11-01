@@ -442,7 +442,7 @@ void main() {
     for (let i = cnt((6 + S * 0.55) * m); i > 0; i--) { const a = R() * TAU, sp = S * (3 + R() * 6) + 20, up = 0.3 + R() * 1.1;
       FX.emit(add, [x, cy, z], [Math.cos(a) * sp, up * sp, Math.sin(a) * sp], (0.35 + R() * 0.55) * Math.min(1.4, L), 0.5 + R() * 0.7 + S * 0.02, 0.25, 2, P.spark, 120 + S * 3, 1, 0, 1, R() * 0.04, 1.6); }
     /* 5. destroços: giram, caem e ficam no chão; nas médias e grandes alguns soltam fumaça e fogo no caminho */
-    const nd = cnt(((imp ? 1.5 : 2) + S * (imp ? 0.12 : 0.2)) * m), nt = S >= 11 && !imp ? Math.round(1 + q * 2) : 0;
+    const nt = S >= 11 && !imp ? Math.round(1 + q * 2) : 0, nd = o.semDestrocos ? nt : cnt(((imp ? 1.5 : 2) + S * (imp ? 0.12 : 0.2)) * m); /* 5.0e: no Motor 5 os destroços da morte são em compute (src/m5/destrocos.js); ficam só os que soltam fogo */
     for (let i = 0; i < nd; i++) {
       const a = R() * TAU, hs = S * (1.2 + R() * 2.6), vy = S * (1.8 + R() * 2.8) + 15, gD = 75 + S * 1.5, ds = (0.9 + R() * 1.3) * (1 + S * 0.035);
       const p0 = [x + jit(0, S * 0.15), y + S * 0.2, z + jit(0, S * 0.15)], drop = Math.max(0.5, p0[1] - g0 - ds * 0.35), v = [Math.cos(a) * hs, vy, Math.sin(a) * hs];

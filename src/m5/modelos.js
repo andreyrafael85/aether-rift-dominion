@@ -45,6 +45,10 @@ function prepara() {
   pronto = true;
 }
 M5.modelos.prepara = prepara;
+M5.modelos.VN = p => VN(p); /* 5.0e: o mesmo ruído (a mesma função do WGSL) nos materiais 2.0 do src/m5/unidades.js: uma função própria lá mudava a ordem das funções de um material para o outro */
+M5.modelos.ruidos = () => { prepara(); return { H2: fH2, VN: fVN, HS: fHS }; }; /* 5.0e: os mesmos ruídos para a obra (src/m5/obra.js), sem cópia no WGSL */
+const OBRA = () => !!(M5.obra && M5.obra.ativo); /* 5.0e: Obra 2.0 (src/m5/obra.js; ?obra5=0 desliga) */
+const RUINA5 = typeof location === 'undefined' || !/[?&]ruina5=0/.test(location.search); /* 5.0e: as peças da ruína quicam uma vez no chão (?ruina5=0: como na 5.0d) */
 const H2 = p => fH2(p), VN = p => fVN(p), HS = n => fHS(n);
 /* marcador: um nó vec3 qualquer (nunca é gerado como posição) que leva o passo; um por material */
 function marcador(pre, nome) { const mk = L().positionLocal.toVar('ardPos'); mk.ardPre = pre; mk.ardNome = nome; return mk; }
@@ -65,7 +69,7 @@ function preAnim(builder) {
     const aI = g.hasAttribute('aInst') ? attribute('aInst', 'vec4') : vec4(0, 0, 0, 0), aC = g.hasAttribute('aInstC') ? attribute('aInstC', 'float') : float(0);
     const ty = Var(aA.x, 'ardTy');
     const ang = Var(float(0), 'ardAng'), eixo = Var(float(2), 'ardEixo'), tr = Var(vec3(0, 0, 0), 'ardTr'); /* eixo: 0 y, 1 x, 2 z */
-    If(ty.greaterThan(0.5), () => {
+    If(OBRA() ? ty.greaterThan(0.5).and(M5.obra.parada(aI)) : ty.greaterThan(0.5), () => { /* 5.0e: na obra as peças ficam paradas (o aInst leva o corte) */
       If(ty.lessThan(1.5), () => { ang.assign(aI.x.negate().div(max(aB.x, 0.05))); })
         .ElseIf(ty.lessThan(2.5), () => { ang.assign(aC.mul(aB.x).add(aB.z)); eixo.assign(select(aB.y.lessThan(0.5), float(0), select(aB.y.lessThan(1.5), float(1), float(2)))); })
         .ElseIf(ty.lessThan(3.5), () => { ang.assign(aB.x.mul(sin(aI.x.div(max(aB.y, 0.1)).mul(6.2831853).add(aB.z))).mul(aI.z)); })
@@ -81,6 +85,7 @@ function preAnim(builder) {
     const piv = aA.yzw; const d = Var(positionLocal.sub(piv), 'ardAd');
     positionLocal.assign(gira(d).add(piv).add(tr));
     normalLocal.assign(gira(normalLocal));
+    if (OBRA()) M5.obra.vertice(aI); /* 5.0e: o corte da obra (o que está acima desce até ele e vira a tampa) */
   }, 'void')();
 }
 
@@ -88,7 +93,7 @@ function preAnim(builder) {
    altura do modelo, semente, vida em s]. Semente negativa: a malha inteira é uma peça (torreta arrancada) com o chão em y = semente */
 function preRuina(builder) {
   const g = builder.geometry; if (!g || !g.hasAttribute('aDie')) return;
-  const { Fn, If, Var, attribute, float, vec2, vec3, vec4, sin, cos, max, min, sqrt, length, normalize, cross, dot, smoothstep, select, positionLocal, normalLocal } = L();
+  const { Fn, If, Var, attribute, float, vec2, vec3, vec4, sin, cos, max, min, abs, sqrt, length, normalize, cross, dot, smoothstep, select, positionLocal, normalLocal } = L();
   Fn(() => {
     const aP = g.hasAttribute('aPiece') ? attribute('aPiece', 'vec4') : vec4(0, 0, 0, 0), aD = attribute('aDie', 'vec4');
     const t = Var(aD.x, 'ardRt'), S = Var(max(aD.y, 0.5), 'ardRs'), sd = Var(aD.z, 'ardRd'), life = aD.w;
@@ -100,9 +105,11 @@ function preRuina(builder) {
       const rl = Var(length(c.xz), 'ardRl'), ra = h1.mul(6.2831853);
       const rd = Var(select(rl.greaterThan(S.mul(0.05)), c.xz.div(max(rl, 1e-6)), vec2(cos(ra), sin(ra))), 'ardRdir');
       const gg = Var(S.mul(2.6), 'ardRgg'); const vy = Var(sqrt(gg.mul(2).mul(S).mul(h2.mul(0.32).add(0.08))), 'ardRvy'); const vh = S.mul(h3.mul(0.34).add(0.12));
-      const dy = max(c.y.sub(gnd).sub(S.mul(0.04)), 0); const tl = vy.add(sqrt(vy.mul(vy).add(gg.mul(2).mul(dy)))).div(gg); const tt = Var(min(t, tl), 'ardRtt');
+      const dy = max(c.y.sub(gnd).sub(S.mul(0.04)), 0); const tl = Var(vy.add(sqrt(vy.mul(vy).add(gg.mul(2).mul(dy)))).div(gg), 'ardRtl'); const tt = Var(min(t, tl), 'ardRtt');
       tr.assign(vec3(rd.x.mul(vh).mul(tt), vy.mul(tt).sub(gg.mul(0.5).mul(tt).mul(tt)).sub(sink), rd.y.mul(vh).mul(tt)));
       ax.assign(normalize(vec3(h2.sub(0.5), h3.sub(0.5).mul(0.35), h1.sub(0.5)).add(0.0001))); ang.assign(h3.mul(3.5).add(1.2).mul(tt)); cen.assign(c);
+      if (RUINA5) { const vb = abs(vy.sub(gg.mul(tl))).mul(h1.mul(0.12).add(0.22)); const tb = Var(min(max(t.sub(tl), 0), vb.mul(2).div(gg)), 'ardRtb'); /* 5.0e: depois de cair, a peça quica uma vez (pula ~1/4 da velocidade da queda), escorrega e gira mais um pouco */
+        tr.addAssign(vec3(rd.x.mul(vh).mul(tb).mul(0.35), vb.mul(tb).sub(gg.mul(0.5).mul(tb).mul(tb)), rd.y.mul(vh).mul(tb).mul(0.35))); ang.addAssign(h3.mul(1.4).add(0.5).mul(tb)); }
     }).Else(() => {
       const c1 = Var(smoothstep(0.05, 1.5, t), 'ardRc1'); tz.assign(c1.mul(0.16).mul(HS(sd).sub(0.5)).mul(2)); sy.assign(float(1).sub(c1.mul(0.42)));
       tr.assign(vec3(0, S.mul(-0.05).mul(c1).sub(sink), 0));
@@ -194,8 +201,8 @@ function perturba(sx0, sy0, sn, dh, fd) {
    ruína ficam no fragmento de todos e, com queda 0, não mudam nada (as brasas ficam num If, os modelos não pagam o ruído). Um varying por material
    (o mesmo nó no escurecimento e nas brasas: dois nós com o mesmo nome declarariam a variável duas vezes). ?m5ruina=1 volta ao de antes (medida) */
 const RUINA_SEP = typeof location !== 'undefined' && /[?&]m5ruina=1/.test(location.search);
-function quedaV(ctx) { if (!ctx.ardQueda) ctx.ardQueda = L().varying(M5.attr('aDie', L().vec4(0, 0, 0, 0)), 'ardQueda'); return ctx.ardQueda; }
-function pecaV(ctx) { if (!ctx.ardPeca) ctx.ardPeca = L().varying(M5.attr('aPiece', L().vec4(0, 0, 0, 0)).w, 'ardPeca'); return ctx.ardPeca; }
+function quedaV(ctx) { if (!ctx.ardQueda) { const { varying, vec4 } = L(); ctx.ardQueda = varying(vec4(M5.attr('aDie', vec4(0, 0, 0, 0)).x, M5.attr('aPiece', vec4(0, 0, 0, 0)).w, 0, 0), 'ardQueda'); } return ctx.ardQueda; } /* 5.0e: a queda (x) e a peça (y) numa variável só: com a obra, a base e as unidades o fragmento passava do limite de 16 variáveis vindas do vértice */
+function pecaV(ctx) { return quedaV(ctx).y; }
 /* ---------- ganchos do material dos modelos (ARD.m5.modelo e ARD.m5.emissivo da fundação chamam na montagem) ---------- */
 const G = M5.ganchos = M5.ganchos || { modelo: { posicao: null, superficie: null, emissivo: null }, chao: { cor: null }, adereco: { posicao: null } };
 G.modelo = G.modelo || {};
@@ -221,11 +228,13 @@ G.modelo.superficie = function (ctx) {
     let k = s.y; if (ruina && RUINA_SEP) k = k.mul(mix(float(1), float(0.24), smoothstep(0, 1.8, attribute('aDie', 'vec4').x))); /* ruína: escurece (4.3f) */
     else if (!RUINA_SEP) k = k.mul(mix(float(1), float(0.24), smoothstep(0, 1.8, quedaV(ctx).x))); /* 5.0b.1: o mesmo escurecimento em todo modelo (queda 0: ×1) */
     diffuseColor.rgb.mulAssign(k);
-    const sx = Var(dFdx(positionView), 'ardSdx'), sy = Var(dFdy(positionView), 'ardSdy'), dh = Var(vec2(dFdx(s.x), dFdy(s.x)).mul(0.9), 'ardSdh');
+    if (OBRA()) { const ob = Var(M5.obra.cor(ctx), 'ardObC'); diffuseColor.rgb.mulAssign(ob.w); ctx.ardOb = ob; } /* 5.0e: a borda e a tampa da obra escurecem o albedo (o brilho vai no emissivo) */
+    const sx = Var(dFdx(positionView), 'ardSdx'), sy = Var(dFdy(positionView), 'ardSdy'), dh = Var(vec2(dFdx(s.x), dFdy(s.x)).mul(OBRA() ? ctx.ardOb.w.mul(0.9) : 0.9), 'ardSdh'); /* 5.0e: na tampa e na borda da obra sem o relevo do detalhe (a geometria achatada daria derivadas enormes: normais tortas, brilho branco) */
     normalView.assign(select(s.x.notEqual(0), perturba(sx, sy, normalView, dh, faceDirection), normalView));
   };
   const Fn = L().Fn;
-  m.roughnessNode = Fn(() => clamp(rm.x.add(cur ? cur.z : float(0)), 0.04, 1.0))();
+  m.roughnessNode = Fn(() => { const r = clamp(rm.x.add(cur ? cur.z : float(0)), 0.04, 1.0); return OBRA() && ctx.ardOb ? mix(r, float(1), float(1).sub(ctx.ardOb.w)) : r; })(); /* 5.0e: a tampa da obra fosca (sem o reflexo do sol e do céu por cima do brilho) */
+  if (OBRA() && m.metalnessNode) { const m0 = m.metalnessNode; m.metalnessNode = Fn(() => (ctx.ardOb ? m0.mul(ctx.ardOb.w) : m0))(); } /* 5.0e: e sem metal */
 };
 /* emissivo: clarões e rim (uniforms) da fundação; na ruína somam as brasas (4.3f) */
 G.modelo.emissivo = function (ctx) {
@@ -238,6 +247,7 @@ G.modelo.emissivo = function (ctx) {
     return vec3(1, 0.3, 0.06).mul(emb.mul(fl).mul(smoothstep(0.7, 0.8, nz)).mul(1.3)); };
   if (RUINA_SEP) return ctx.em.add(brasas());
   const br = L().Fn(() => { const b = Var(vec3(0, 0, 0), 'ardBrasa'); If(die.greaterThan(0.1), () => { b.assign(brasas()); }); return b; })(); /* 5.0b.1: abaixo de 0,1 s de queda as brasas valem 0 (smoothstep(0,1; 0,6)): o modelo não calcula o ruído */
+  if (OBRA()) return ctx.em.add(br).add(L().Fn(() => (ctx.ardOb ? ctx.ardOb.xyz : vec3(0, 0, 0)))()); /* 5.0e: o brilho da borda e da tampa da obra (calculado no albedo, src/m5/obra.js) */
   return ctx.em.add(br);
 };
 }
@@ -245,7 +255,8 @@ G.modelo.emissivo = function (ctx) {
 M5.modelos.emRuina = function (m) {
   if (m.userData.ardEmQueda) return m; m.userData.ardEmQueda = true; /* 5.0b.1: uma vez por material (o M5.emissivo já liga em todo modelo) */
   const { float, smoothstep, attribute, diffuseColor } = L(); const sup = Object.getPrototypeOf(m).setupDiffuseColor; const ctx = {};
-  m.setupDiffuseColor = function (builder) { sup.call(this, builder); diffuseColor.rgb.mulAssign(float(1).sub(smoothstep(0, 1.1, RUINA_SEP ? attribute('aDie', 'vec4').x : quedaV(ctx).x))); }; /* 5.0b.1: pela queda em varying (0 nos modelos: ×1), o mesmo fragmento na parte emissiva da ruína e dos modelos */
+  m.setupDiffuseColor = function (builder) { sup.call(this, builder); diffuseColor.rgb.mulAssign(float(1).sub(smoothstep(0, 1.1, RUINA_SEP ? attribute('aDie', 'vec4').x : quedaV(ctx).x)));
+    if (OBRA()) { const ob = L().Var(M5.obra.cor(ctx), 'ardObC'); diffuseColor.rgb.assign(L().mix(diffuseColor.rgb, ob.xyz, smoothstep(0.5, 1.0, M5.obra.varying(ctx).w))); } }; /* 5.0e: na tampa da obra a parte emissiva sai com a mesma cor do casco (as duas se cruzam no mesmo plano: sem pisca) */ /* 5.0b.1: pela queda em varying (0 nos modelos: ×1), o mesmo fragmento na parte emissiva da ruína e dos modelos */
   return m;
 };
 
@@ -256,6 +267,7 @@ M5.modelos.emRuina = function (m) {
 const FIXO = ['position', 'normal', 'color', 'rm', 'pt', 'aAnim', 'aAnimB'], FIXO_EM = ['position', 'normal', 'color', 'aAnim', 'aAnimB']; const EM_FIXO = !/[?&]m5emfixo=0/.test(typeof location !== 'undefined' ? location.search : ''); /* 5.0c.1 */
 M5.entrelaca = function (geo, em) {
   if (!geo || !geo.attributes || !geo.attributes.position || (geo.userData && geo.userData.ardEntrelacada)) return geo;
+  if (M5.desgAttr) M5.desgAttr(geo, em); /* 5.0e: arestas vivas dos materiais 2.0 (aDesg, src/m5/unidades.js) em todo modelo, antes de entrelaçar: o mesmo layout em todos */
   const Tm = T() || window.THREE; const n0 = geo.attributes.position.count;
   /* layout fixo de todo modelo (regra 4 da carga: o r186 põe nome, passo e deslocamento de TODOS os atributos na chave do pipeline): aAnim/aAnimB
      com zeros onde a peça não anima; aPiece e aWind saem da geometria (só a cópia da ruína lê o aPiece: fica guardado em userData). Assim
@@ -284,7 +296,7 @@ function copiaFixa(src, lay) {
    (um por material); a cópia é feita uma vez por modelo, na primeira queda ---------- */
 const LAY_RUINA = [['position', 3, [0, 0, 0]], ['normal', 3, [0, 1, 0]], ['color', 3, [1, 1, 1]], ['rm', 2, [0.8, 0.1]], ['pt', 1, [0]], ['aPiece', 4, [0, 0, 0, 0]]];
 const LAY_RUINA_EM = [['position', 3, [0, 0, 0]], ['normal', 3, [0, 1, 0]], ['color', 3, [1, 1, 1]], ['aPiece', 4, [0, 0, 0, 0]]];
-M5.ruinaGeo = function (src, main) { return src ? copiaFixa(src, main ? LAY_RUINA : LAY_RUINA_EM) : null; };
+M5.ruinaGeo = function (src, main) { const lay = main ? LAY_RUINA : LAY_RUINA_EM; return src ? copiaFixa(src, M5.desgAttr && M5.unidades ? lay.concat([M5.unidades.desgLayout]) /* 5.0e: a ruína com o aDesg dos modelos (o fragmento dividido continua um só) */ : lay) : null; };
 /* holograma: só a posição, sempre no mesmo formato (os modelos entrelaçados têm passos diferentes) */
 M5.holoGeo = function (src) { const Tm = T(); const p = src.attributes.position, n = p.count, arr = new Float32Array(n * 3); for (let i = 0; i < n; i++) { arr[i * 3] = p.getX(i); arr[i * 3 + 1] = p.getY(i); arr[i * 3 + 2] = p.getZ(i); }
   const gg = new Tm.BufferGeometry(); gg.setAttribute('position', new Tm.BufferAttribute(arr, 3)); gg.boundingSphere = src.boundingSphere; return gg; };
@@ -317,7 +329,11 @@ M5.holo = function () {
   const m = new Tm.MeshBasicNodeMaterial({ color: 0x33ffd0, transparent: true, opacity: 0.2, blending: Tm.AdditiveBlending, depthWrite: false });
   const hy = positionGeometry.y; const sl = smoothstep(0.32, 0.5, abs(fract(hy.mul(0.7).sub(t.mul(0.8))).sub(0.5))); const sw = smoothstep(0.92, 1.0, fract(hy.mul(0.06).sub(t.mul(0.25))));
   M5.instMat(m, null);
-  m.colorNode = vec4(M5.instCor(materialColor.rgb).mul(sl.mul(1.3).add(0.3).add(sw.mul(2.2))), 1);
+  if (OBRA()) { const { Fn, attribute, vec3, float, max, exp, step } = L(); const iC = Fn(b => (b.object && b.object.isM5Inst ? attribute('iC', 'vec3') : vec3(1, 1, 1)))(); /* 5.0e: a cor da instância leva [tinta, corte, altura]: a planta só acima do corte, com a trama de linhas logo acima dele */
+    const corta = step(1.5, iC.z), yc = iC.y, Hh = max(iC.z, 1); const mk = mix(float(1), smoothstep(yc.sub(Hh.mul(0.02)), yc.add(Hh.mul(0.03)), hy), corta);
+    const trama = exp(max(hy.sub(yc), 0).negate().div(Hh.mul(0.12))).mul(smoothstep(0.3, 0.5, abs(fract(hy.mul(1.6).sub(t.mul(2.2))).sub(0.5)))).mul(corta);
+    m.colorNode = vec4(materialColor.rgb.mul(iC.x).mul(sl.mul(1.3).add(0.3).add(sw.mul(2.2)).add(trama.mul(3))).mul(mk), 1); }
+  else m.colorNode = vec4(M5.instCor(materialColor.rgb).mul(sl.mul(1.3).add(0.3).add(sw.mul(2.2))), 1);
   m.opacityNode = mix(materialOpacity, pow(materialOpacity, 2.2), semPosU()); /* sem pós: alfa a 2,2 (regra 11) */
   return M5.registrar('holo', m);
 };

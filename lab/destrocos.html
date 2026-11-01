@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Laboratório de destroços</title>
+<meta name="description" content="Aether Rift: Dominion · 5.0e — destroços com a física do Rapier comparados aos destroços em compute do Motor 5: aparência, CPU por quadro e tamanho.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+/* 5.0e: laboratório dos destroços (Rapier × compute). O mesmo painel em placa chanfrada do lab/motor5.html; uma coluna no celular. */
+:root {
+  --bg: #07090e; --panel: rgba(12, 16, 24, .92); --line: #2a3446; --fg: #e8ecf3; --muted: #9aa6b8; --accent: #ff7a3d; --a2: #7fd7ff; --ok: #4cc38a; --warn: #e8b04b;
+  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif; --body: "IBM Plex Sans", "Segoe UI", Roboto, Arial, sans-serif; --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+:root[data-theme="light"] { --bg: #07090e; }
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.45 var(--body); overflow: hidden; }
+canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.hud { position: fixed; left: max(14px, env(safe-area-inset-left, 0px)); bottom: max(14px, env(safe-area-inset-bottom, 0px)); width: min(380px, calc(100vw - 28px)); max-height: min(56vh, calc(100% - 70px)); overflow: auto;
+  background: var(--panel); border: 1px solid var(--line); padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 10px; }
+.hud::before { content: ""; position: absolute; left: -1px; top: -1px; width: 22px; height: 22px; border-top: 2px solid var(--accent); border-left: 2px solid var(--accent); pointer-events: none; }
+.hud h1 { font: 800 26px/1 var(--display); text-transform: uppercase; letter-spacing: .02em; margin: 0; }
+.hud h1 span { color: var(--accent); }
+.eyebrow { font: 600 11px/1.3 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+button { font: 600 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--fg); background: rgba(255,255,255,.04); border: 1px solid var(--line); padding: 9px 10px; min-height: 36px; cursor: pointer; }
+button:hover { border-color: var(--accent); }
+button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+button:focus-visible { outline: 2px solid var(--a2); outline-offset: 2px; }
+table { border-collapse: collapse; width: 100%; font: 12px/1.35 var(--mono); }
+th, td { text-align: right; padding: 4px 6px; border-bottom: 1px solid rgba(255,255,255,.06); font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; color: var(--muted); font-weight: 400; }
+th { color: var(--fg); font-weight: 600; }
+th.r { color: var(--accent); } th.c { color: var(--a2); }
+.note { font-size: 12px; color: var(--muted); margin: 0; }
+.verdict { font-size: 13px; border-left: 2px solid var(--accent); padding: 6px 10px; background: rgba(255,122,61,.06); margin: 0; }
+.err { display: none; white-space: pre-wrap; font: 12px/1.4 var(--mono); color: #ff8f8f; }
+.lbl { position: fixed; top: max(12px, env(safe-area-inset-top, 0px)); font: 700 13px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; padding: 7px 10px; background: rgba(7,9,14,.72); border: 1px solid var(--line); pointer-events: none; }
+#lbl-r { left: 12px; color: var(--accent); } #lbl-c { right: 12px; color: var(--a2); }
+.load { position: fixed; inset: 0; display: grid; place-items: center; background: var(--bg); z-index: 5; font: 600 13px/1.4 var(--mono); color: var(--muted); text-align: center; }
+.load b { display: block; font: 800 30px/1 var(--display); color: var(--fg); text-transform: uppercase; margin-bottom: 8px; }
+.toggle { position: fixed; right: 12px; bottom: max(12px, env(safe-area-inset-bottom, 0px)); z-index: 3; }
+.hud.closed { display: none; }
+@media (max-width: 640px) { .hud { bottom: max(64px, calc(env(safe-area-inset-bottom, 0px) + 64px)); max-height: 58%; } .lbl { font-size: 11px; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.webgpu.js",
+  "three/tsl": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.tsl.js",
+  "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.webgpu.js"
+} }
+</script>
+</head>
+<body>
+<div class="load" id="load"><div><b>Destroços</b><span id="loadmsg">Iniciando o renderizador…</span></div></div>
+<div class="lbl" id="lbl-r">Rapier (física na CPU)</div>
+<div class="lbl" id="lbl-c">Compute (Motor 5)</div>
+<button class="toggle" id="toggle" aria-controls="hud" aria-expanded="false">Painel</button>
+<section class="hud closed" id="hud" aria-label="Painel do laboratório">
+  <div class="eyebrow">Aether Rift: Dominion · laboratório da 5.0e</div>
+  <h1>Destroços: <span>Rapier</span> × compute</h1>
+  <p class="note">À esquerda, pedaços como corpos rígidos do Rapier (@dimforge/rapier3d-compat 0.21.0, Apache-2.0) num campo de alturas; à direita, os destroços em compute do jogo (o mesmo passo do src/m5/destrocos.js: gravidade, arrasto, quique com a normal do relevo pelo mapa de alturas, assentamento). Mesmas explosões, mesmo número de pedaços, mesma vida (16 s).</p>
+  <div class="eyebrow">Ver</div>
+  <div class="row" id="modos" role="group" aria-label="Modo de exibição">
+    <button data-modo="lado" aria-pressed="true">Lado a lado</button>
+    <button data-modo="rapier" aria-pressed="false">Só Rapier</button>
+    <button data-modo="compute" aria-pressed="false">Só compute</button>
+  </div>
+  <div class="eyebrow">Pedaços por explosão</div>
+  <div class="row" id="qtds" role="group" aria-label="Pedaços por explosão">
+    <button data-n="24" aria-pressed="false">24 (unidade)</button>
+    <button data-n="64" aria-pressed="true">64 (construção)</button>
+    <button data-n="160" aria-pressed="false">160 (batalha)</button>
+  </div>
+  <div class="row">
+    <button id="b-boom">Explodir agora</button>
+    <button id="b-auto" aria-pressed="true">Explosões automáticas</button>
+    <button id="b-teste">Teste de 15 s</button>
+  </div>
+  <table aria-label="Comparação">
+    <thead><tr><th></th><th class="r">Rapier</th><th class="c">Compute</th></tr></thead>
+    <tbody>
+      <tr><td>Pedaços vivos</td><td id="r-n">—</td><td id="c-n">—</td></tr>
+      <tr><td>CPU por quadro (passo + envio)</td><td id="r-cpu">—</td><td id="c-cpu">—</td></tr>
+      <tr><td>CPU de uma explosão (criar)</td><td id="r-boom">—</td><td id="c-boom">—</td></tr>
+      <tr><td>GPU por quadro (em “Só …”)</td><td id="r-gpu">—</td><td id="c-gpu">—</td></tr>
+      <tr><td>Carga (iniciar)</td><td id="r-init">—</td><td id="c-init">—</td></tr>
+      <tr><td>Tamanho para baixar</td><td id="r-kb">—</td><td id="c-kb">—</td></tr>
+      <tr><td>Pedaços batem entre si</td><td>sim</td><td>não</td></tr>
+    </tbody>
+  </table>
+  <p class="note" id="fps">—</p>
+  <p class="verdict" id="veredito">O teste de 15 s mede os dois lados com a mesma batalha e escreve aqui a resposta.</p>
+  <div class="err" id="err"></div>
+</section>
+<script type="module">
+/* 5.0e: laboratório dos destroços. Só para comparar: o Rapier NÃO entra no jogo. */
+import * as THREE from 'three/webgpu';
+import { Fn, If, Loop, Break, float, int, uint, vec2, vec3, vec4, uniform, uniformArray, instancedArray, instanceIndex, texture, hash, floor, fract, sin, cos, sqrt, exp, min, max, dot, length, normalize, cross, select, positionGeometry, mix } from 'three/tsl';
+const RAPIER_URL = 'https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.21.0/dist/rapier.mjs';
+const $ = id => document.getElementById(id);
+const Q = new URLSearchParams(location.search);
+const err = m => { const e = $('err'); e.style.display = 'block'; e.textContent += m + '\n'; $('hud').classList.remove('closed'); };
+window.addEventListener('error', e => err(String(e.message || e)));
+window.addEventListener('unhandledrejection', e => err(String(e.reason && e.reason.message || e.reason)));
+const say = m => { $('loadmsg').textContent = m; };
+const coarse = matchMedia('(pointer: coarse)').matches;
+$('toggle').addEventListener('click', () => { const h = $('hud'); const c = h.classList.toggle('closed'); $('toggle').setAttribute('aria-expanded', String(!c)); });
+if (!coarse) { $('hud').classList.remove('closed'); $('toggle').setAttribute('aria-expanded', 'true'); }
+/* WGSL criado (tamanho do código do compute e do desenho) */
+let wgsl = 0, contaWgsl = false; if (typeof GPUDevice !== 'undefined') { const f = GPUDevice.prototype.createShaderModule; GPUDevice.prototype.createShaderModule = function (d) { if (contaWgsl && d && d.code) wgsl += d.code.length; return f.apply(this, arguments); }; }
+
+/* ---------- relevo: o mesmo campo de alturas para o Rapier (colisor) e para o compute (textura) ---------- */
+const NH = 129, TAM = 420, PASSO = TAM / (NH - 1);
+const hh = (x, y) => { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); };
+const vn = (x, y) => { const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf); const a = hh(xi, yi), b = hh(xi + 1, yi), c = hh(xi, yi + 1), d = hh(xi + 1, yi + 1); return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; };
+const alturaEm = (x, z) => { let h = 0, a = 1, f = 0.012; for (let i = 0; i < 4; i++) { h += (vn(x * f + 11, z * f + 3) - 0.5) * 22 * a; a *= 0.5; f *= 2.1; } return h + 6 * Math.sin(x * 0.02) * Math.cos(z * 0.017); };
+const alt = new Float32Array(NH * NH); for (let j = 0; j < NH; j++) for (let i = 0; i < NH; i++) alt[j * NH + i] = alturaEm(-TAM / 2 + i * PASSO, -TAM / 2 + j * PASSO);
+const hAt = (x, z) => { const fx = Math.max(0, Math.min(NH - 1.001, (x + TAM / 2) / PASSO)), fz = Math.max(0, Math.min(NH - 1.001, (z + TAM / 2) / PASSO)); const i = Math.floor(fx), j = Math.floor(fz), u = fx - i, v = fz - j; const a = alt[j * NH + i], b = alt[j * NH + i + 1], c = alt[(j + 1) * NH + i], d = alt[(j + 1) * NH + i + 1]; return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; };
+
+/* ---------- motor ---------- */
+const renderer = new THREE.WebGPURenderer({ antialias: true, trackTimestamp: true, powerPreference: 'high-performance', forceWebGL: Q.get('motor') === 'webgl2' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 2)); renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+document.body.prepend(renderer.domElement); renderer.autoClear = false; renderer.setClearColor(0x8fa3b8, 1); /* lado a lado: limpa uma vez e desenha as duas metades com recorte */
+const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 1, 3000);
+say('Iniciando o renderizador…'); await renderer.init(); const isGPU = !!renderer.backend.isWebGPUBackend; const temTS = isGPU && renderer.hasFeature && renderer.hasFeature('timestamp-query');
+function cena() { const s = new THREE.Scene(); s.fog = new THREE.Fog(0x8fa3b8, 700, 1600);
+  const sol = new THREE.DirectionalLight(0xfff0dd, 2.6); sol.position.set(-200, 320, 180); s.add(sol); s.add(new THREE.HemisphereLight(0xbcd2ff, 0x4a3d30, 1.1)); return s; }
+const cenaR = cena(), cenaC = cena();
+/* chão: a mesma malha nas duas cenas */
+const gChao = new THREE.PlaneGeometry(TAM, TAM, NH - 1, NH - 1); gChao.rotateX(-Math.PI / 2); { const p = gChao.attributes.position; for (let i = 0; i < p.count; i++) p.setY(i, hAt(p.getX(i), p.getZ(i))); gChao.computeVertexNormals(); }
+const mChao = new THREE.MeshStandardNodeMaterial({ color: 0x6f6448, roughness: 0.95, metalness: 0 });
+cenaR.add(new THREE.Mesh(gChao, mChao)); cenaC.add(new THREE.Mesh(gChao, mChao));
+/* a forma dos pedaços nos dois lados: uma caixa irregular (escala por pedaço) */
+const gPeca = new THREE.BoxGeometry(1, 1, 1);
+const PAL = [[0.15, 0.15, 0.17], [0.3, 0.19, 0.12], [0.62, 0.32, 0.2], [0.45, 0.45, 0.48]];
+const VIDA = 16, MAXP = 4096;
+
+/* ---------- lado do Rapier: corpos rígidos com colisor de caixa e um colisor de campo de alturas ---------- */
+say('Baixando o Rapier…');
+const tR0 = performance.now(); let RAPIER = null, kbRapier = 0;
+try { RAPIER = (await import(RAPIER_URL)).default; await RAPIER.init(); } catch (e) { err('Rapier indisponível: ' + e.message); }
+const initRapier = performance.now() - tR0;
+{ const ent = performance.getEntriesByType('resource').find(r => /rapier/.test(r.name)); kbRapier = ent ? (ent.transferSize || ent.encodedBodySize || ent.decodedBodySize) / 1024 : 0; if (ent && ent.decodedBodySize) kbRapier = { tr: (ent.transferSize || ent.encodedBodySize) / 1024, dec: ent.decodedBodySize / 1024 }; }
+let mundo = null; const corpos = [];
+const instR = new THREE.InstancedMesh(gPeca, new THREE.MeshStandardNodeMaterial({ roughness: 0.7, metalness: 0.35, flatShading: true }), MAXP); instR.count = 0; instR.frustumCulled = false; instR.instanceMatrix.setUsage(THREE.DynamicDrawUsage); cenaR.add(instR);
+{ const c = new THREE.Color(); for (let i = 0; i < MAXP; i++) { const p = PAL[i % 4]; c.setRGB(p[0], p[1], p[2]); instR.setColorAt(i, c); } }
+if (RAPIER) { mundo = new RAPIER.World({ x: 0, y: -165, z: 0 });
+  const hz = new Float32Array(NH * NH); for (let j = 0; j < NH; j++) for (let i = 0; i < NH; i++) hz[i * NH + j] = alt[j * NH + i]; /* o Rapier lê o campo por colunas */
+  mundo.createCollider(RAPIER.ColliderDesc.heightfield(NH - 1, NH - 1, hz, { x: TAM, y: 1, z: TAM }).setFriction(0.8).setRestitution(0.3)); }
+const _m = new THREE.Matrix4(), _p = new THREE.Vector3(), _q = new THREE.Quaternion(), _s = new THREE.Vector3();
+function explodeR(x, z, n, t) { if (!mundo) return 0; const t0 = performance.now(); const gy = hAt(x, z);
+  for (let i = 0; i < n; i++) { if (corpos.length >= MAXP) { const v = corpos.shift(); mundo.removeRigidBody(v.b); }
+    const a = Math.random() * 6.2832, rr = Math.sqrt(Math.random()) * 10, sz = 1.2 + Math.random() * 2.4, sx = sz * (1 + Math.random() * 0.7), sy = sz * (0.45 + Math.random() * 0.4), sw = sz * (0.75 + Math.random() * 0.5);
+    const hs = 50 * (0.3 + 0.7 * Math.random()), vy = 50 * (0.8 + 1.2 * Math.random());
+    const b = mundo.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(x + Math.cos(a) * rr, gy + 6 + Math.random() * 8, z + Math.sin(a) * rr).setLinvel(Math.cos(a) * hs, vy, Math.sin(a) * hs).setAngvel({ x: (Math.random() - 0.5) * 14, y: (Math.random() - 0.5) * 14, z: (Math.random() - 0.5) * 14 }).setLinearDamping(0.12).setAngularDamping(0.4).setCcdEnabled(false));
+    mundo.createCollider(RAPIER.ColliderDesc.cuboid(sx / 2, sy / 2, sw / 2).setRestitution(0.38).setFriction(0.62).setDensity(1), b); corpos.push({ b, t, s: [sx, sy, sw] }); }
+  return performance.now() - t0; }
+function passoR(dt, t) { if (!mundo) return [0, 0]; const t0 = performance.now(); mundo.timestep = Math.min(1 / 30, Math.max(1 / 240, dt)); mundo.step(); const t1 = performance.now();
+  while (corpos.length && t - corpos[0].t > VIDA) { const v = corpos.shift(); mundo.removeRigidBody(v.b); }
+  for (let i = 0; i < corpos.length; i++) { const c = corpos[i], tr = c.b.translation(), ro = c.b.rotation(); const fim = Math.max(0, (t - c.t) - (VIDA - 3)) / 3; _p.set(tr.x, tr.y - fim * c.s[1] * 1.8, tr.z); _q.set(ro.x, ro.y, ro.z, ro.w); _s.set(c.s[0], c.s[1], c.s[2]); _m.compose(_p, _q, _s); instR.setMatrixAt(i, _m); }
+  instR.count = corpos.length; instR.instanceMatrix.needsUpdate = true; return [t1 - t0, performance.now() - t1]; }
+
+/* ---------- lado do compute: o passo do src/m5/destrocos.js (só o tipo destroço), um anel fixo e um emissor por explosão ---------- */
+say('Montando o compute…');
+const tC0 = performance.now(); contaWgsl = true;
+const altD = new Uint16Array(NH * NH * 2); for (let i = 0; i < NH * NH; i++) { altD[i * 2] = THREE.DataUtils.toHalfFloat(alt[i]); altD[i * 2 + 1] = altD[i * 2]; }
+const altTex = new THREE.DataTexture(altD, NH, NH, THREE.RGFormat, THREE.HalfFloatType); altTex.minFilter = altTex.magFilter = THREE.LinearFilter; altTex.colorSpace = THREE.NoColorSpace; altTex.needsUpdate = true; /* como no jogo: meia precisão com filtro linear */
+const PB = instancedArray(MAXP, 'vec4'), VB = instancedArray(MAXP, 'vec4'), AB = instancedArray(MAXP, 'vec4');
+const E = 16; const EMV = []; for (let i = 0; i < E * 3; i++) EMV.push(new THREE.Vector4()); const EM = uniformArray(EMV, 'vec4');
+const K = { dt: uniform(0), nE: uniform(0), n: uniform(MAXP), quadro: uniform(0) };
+const AT = texture(altTex);
+const chao = (x, z) => AT.sample(vec2(x.add(TAM / 2).div(PASSO).add(0.5).div(NH), z.add(TAM / 2).div(PASSO).add(0.5).div(NH))).level(0).r;
+const kernel = Fn(() => { const i = instanceIndex; const fi = float(i).toVar();
+  const p = PB.element(i).toVar(), v = VB.element(i).toVar(), a = AB.element(i).toVar(); const dt = K.dt;
+  Loop({ start: int(0), end: int(E), type: 'int', condition: '<', name: 'k' }, ({ k }) => {
+    If(float(k).greaterThanEqual(K.nE), () => { Break(); });
+    const e0 = EM.element(k.mul(3)).toVar(), e1 = EM.element(k.mul(3).add(1)).toVar(), e2 = EM.element(k.mul(3).add(2)).toVar();
+    const rel = fi.sub(e0.w).toVar(); If(rel.lessThan(0), () => { rel.addAssign(K.n); });
+    If(rel.lessThan(e1.x), () => { const sb = uint(i).mul(uint(16)).add(K.quadro.toUint().mul(uint(2654435761))).toVar(); const h = j => hash(sb.add(uint(j)));
+      const an = h(1).mul(6.2831853).toVar(), rr = sqrt(h(2)).mul(e2.x); const hs = e1.w.mul(h(4).mul(0.7).add(0.3)), vy = e1.w.mul(h(5).mul(1.2).add(0.8));
+      p.assign(vec4(e0.x.add(cos(an).mul(rr)), e0.y.add(h(3).mul(e2.y)), e0.z.add(sin(an).mul(rr)), 0)); v.assign(vec4(cos(an).mul(hs), vy, sin(an).mul(hs), h(8).mul(6.2831853)));
+      a.assign(vec4(1, floor(e2.w.mul(10)).add(h(9).mul(0.999)), e1.z.mul(h(6).mul(0.9).add(0.55)), 0)); Break(); }); });
+  If(a.x.greaterThan(0.5), () => { const idade = p.w.add(dt).toVar(); p.w.assign(idade); const vida = floor(a.y).mul(0.1);
+    If(idade.greaterThan(vida), () => { a.x.assign(0); }).Else(() => { const sd = fract(a.y);
+      v.y.subAssign(dt.mul(165)); v.xyz.mulAssign(exp(dt.mul(-0.12))); const vel = length(v.xyz); v.w.addAssign(sd.mul(2).sub(1).mul(13).mul(min(vel.div(25), 1)).mul(dt));
+      p.xyz.addAssign(v.xyz.mul(dt)); const gy = chao(p.x, p.z).toVar(); const rz = a.z.mul(0.4);
+      If(p.y.lessThan(gy.add(rz)), () => { const e = float(3); const n = normalize(vec3(chao(p.x.sub(e), p.z).sub(chao(p.x.add(e), p.z)), e.mul(2), chao(p.x, p.z.sub(e)).sub(chao(p.x, p.z.add(e))))).toVar();
+        const vn = dot(v.xyz, n).toVar(); If(vn.lessThan(0), () => { v.xyz.subAssign(n.mul(vn.mul(1.38))); v.x.mulAssign(0.62); v.z.mulAssign(0.62); });
+        p.y.assign(gy.add(rz)); If(length(v.xyz).lessThan(9), () => { v.xyz.assign(vec3(0)); }); }); }); });
+  PB.element(i).assign(p); VB.element(i).assign(v); AB.element(i).assign(a); })().compute(MAXP, [64]);
+/* desenho: a caixa irregular girada pelo eixo da semente, como no jogo (lá é um octaedro com a cor da Raça) */
+const mC = new THREE.MeshStandardNodeMaterial({ roughness: 0.7, metalness: 0.35, flatShading: true });
+{ const ga = PB.toAttribute(), gv = VB.toAttribute(), gA = AB.toAttribute(); const sd = fract(gA.y), vida = max(floor(gA.y).mul(0.1), 0.05), h1 = fract(sd.mul(17.31)), h2 = fract(sd.mul(41.7)), h3 = fract(sd.mul(73.13));
+  const eixo = normalize(vec3(h1.sub(0.5), h2.sub(0.5).add(0.001), h3.sub(0.5))); const an = gv.w; const c = cos(an), s = sin(an);
+  const q = positionGeometry.mul(vec3(h1.mul(0.7).add(1), h2.mul(0.4).add(0.45), h3.mul(0.5).add(0.75))).mul(gA.z).mul(2.2);
+  const rq = q.mul(c).add(cross(eixo, q).mul(s)).add(eixo.mul(dot(eixo, q).mul(float(1).sub(c))));
+  const fim = ga.w.sub(vida.sub(3)).div(3).clamp(0, 1); const vivo = select(gA.x.greaterThan(0.5), float(1), float(0));
+  mC.positionNode = ga.xyz.add(rq).sub(vec3(0, fim.mul(gA.z).mul(2.2 * 0.45 * 1.8), 0)).mul(vivo).add(vec3(0, -9999, 0).mul(float(1).sub(vivo)));
+  const pal = floor(h3.mul(4)); mC.colorNode = mix(mix(vec3(0.15, 0.15, 0.17), vec3(0.3, 0.19, 0.12), select(pal.greaterThan(0.5), float(1), float(0))), mix(vec3(0.62, 0.32, 0.2), vec3(0.45, 0.45, 0.48), select(pal.greaterThan(2.5), float(1), float(0))), select(pal.greaterThan(1.5), float(1), float(0))); }
+const gC = new THREE.InstancedBufferGeometry(); gC.index = gPeca.index; for (const k of ['position', 'normal']) gC.setAttribute(k, gPeca.attributes[k]); gC.instanceCount = MAXP;
+const malhaC = new THREE.Mesh(gC, mC); malhaC.frustumCulled = false; cenaC.add(malhaC);
+await renderer.compileAsync(cenaC, camera); if (isGPU && renderer.compileComputeAsync) await renderer.compileComputeAsync([kernel]); else renderer.compute(kernel);
+const initCompute = performance.now() - tC0; contaWgsl = false; const kbCompute = wgsl / 1024;
+let cab = 0, nE = 0, aliveC = []; /* aliveC: [tempo, n] dos emissores, só para contar os vivos */
+function explodeC(x, z, n, t) { const t0 = performance.now(); if (nE >= E) return 0; const k = nE++; const gy = hAt(x, z);
+  EMV[k * 3].set(x, gy + 6, z, cab); EMV[k * 3 + 1].set(n, 1, 1.25, 50); EMV[k * 3 + 2].set(10, 8, 0, VIDA); cab = (cab + n) % MAXP; aliveC.push([t, n]); return performance.now() - t0; }
+function passoC(dt, t) { const t0 = performance.now(); K.dt.value = dt; K.nE.value = nE; K.quadro.value = (K.quadro.value + 1) % 16777216; renderer.compute(kernel); nE = 0; while (aliveC.length && t - aliveC[0][0] > VIDA * 1.25) aliveC.shift(); return performance.now() - t0; }
+
+/* ---------- laço: o mesmo relógio nos dois lados ---------- */
+let modo = 'lado', porBoom = 64, auto = true, tUlt = 0, tempo = 0, last = performance.now(); const am = { r: [], rs: [], c: [], br: [], bc: [], gr: [], gc: [], fps: [] };
+const vivosC = () => Math.min(MAXP, aliveC.reduce((s, x) => s + x[1], 0));
+function boom(n) { const x = (Math.random() - 0.5) * 160, z = (Math.random() - 0.5) * 120; const br = explodeR(x, z, n, tempo), bc = explodeC(x, z, n, tempo); am.br.push(br); am.bc.push(bc); }
+document.querySelectorAll('#modos button').forEach(b => b.addEventListener('click', () => { modo = b.dataset.modo; document.querySelectorAll('#modos button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); }));
+document.querySelectorAll('#qtds button').forEach(b => b.addEventListener('click', () => { porBoom = +b.dataset.n; document.querySelectorAll('#qtds button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); }));
+$('b-boom').addEventListener('click', () => boom(porBoom));
+$('b-auto').addEventListener('click', () => { auto = !auto; $('b-auto').setAttribute('aria-pressed', String(auto)); });
+const med = a => { if (!a.length) return null; const s = a.slice().sort((x, y) => x - y); return s[s.length >> 1]; };
+const p95 = a => { if (!a.length) return null; const s = a.slice().sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(s.length * 0.95))]; };
+const ms = v => v == null ? '—' : v.toFixed(v < 1 ? 3 : 2).replace('.', ',') + ' ms';
+$('r-init').textContent = RAPIER ? initRapier.toFixed(0) + ' ms' : '—'; $('c-init').textContent = initCompute.toFixed(0) + ' ms';
+$('r-kb').textContent = kbRapier && kbRapier.dec ? (kbRapier.dec / 1024).toFixed(2) + ' MB (' + (kbRapier.tr / 1024).toFixed(2) + ' MB na rede)' : '4,34 MB (1,66 MB com gzip)';
+$('c-kb').textContent = '≈ 6 KB de JS · ' + kbCompute.toFixed(0) + ' KB de WGSL';
+let gpuR = 0, gpuC = 0, tsBusy = false;
+function quadro() {
+  const now = performance.now(); const dt = Math.min(0.05, (now - last) / 1000); last = now; tempo += dt; am.fps.push(dt);
+  if (auto && tempo - tUlt > (porBoom >= 160 ? 0.35 : 0.9)) { tUlt = tempo; boom(porBoom); }
+  const [rs, rsync] = passoR(dt, tempo); const cs = passoC(dt, tempo); am.r.push(rs + rsync); am.rs.push(rs); am.c.push(cs);
+  const W = innerWidth, Hh = innerHeight; const lado = modo === 'lado';
+  camera.aspect = (lado ? W / 2 : W) / Hh; camera.updateProjectionMatrix(); const ang = tempo * 0.05; camera.position.set(Math.cos(ang) * 260, 190, Math.sin(ang) * 260); camera.lookAt(0, 0, 0);
+  renderer.setScissorTest(false); renderer.setViewport(0, 0, W, Hh); renderer.clear(); renderer.setScissorTest(lado);
+  if (modo !== 'compute') { if (lado) { renderer.setViewport(0, 0, W / 2, Hh); renderer.setScissor(0, 0, W / 2, Hh); } else renderer.setViewport(0, 0, W, Hh); renderer.render(cenaR, camera); }
+  if (modo !== 'rapier') { if (lado) { renderer.setViewport(W / 2, 0, W / 2, Hh); renderer.setScissor(W / 2, 0, W / 2, Hh); } else renderer.setViewport(0, 0, W, Hh); renderer.render(cenaC, camera); }
+  $('lbl-r').style.display = modo === 'compute' ? 'none' : ''; $('lbl-c').style.display = modo === 'rapier' ? 'none' : '';
+  if (temTS && !tsBusy && (am.fps.length % 20 === 0)) { tsBusy = true; renderer.resolveTimestampsAsync('render').then(v => { if (typeof v === 'number') { if (modo === 'rapier') gpuR = v; else if (modo === 'compute') gpuC = v; } }).finally(() => { tsBusy = false; }); }
+  if (am.fps.length % 15 === 0) { const L = a => a.slice(-120); $('r-n').textContent = String(corpos.length); $('c-n').textContent = String(vivosC()); $('r-cpu').textContent = ms(med(L(am.r))); $('c-cpu').textContent = ms(med(L(am.c)));
+    $('r-boom').textContent = ms(med(L(am.br))); $('c-boom').textContent = ms(med(L(am.bc))); $('r-gpu').textContent = !temTS ? 'sem consulta' : modo === 'lado' ? '—' : ms(gpuR); $('c-gpu').textContent = !temTS ? 'sem consulta' : modo === 'lado' ? '—' : ms(gpuC);
+    const f = med(L(am.fps)); $('fps').textContent = (f ? (1 / f).toFixed(0) : '—') + ' fps · ' + (isGPU ? 'WebGPU' : 'WebGL2 (reserva)'); }
+  requestAnimationFrame(quadro);
+}
+/* teste de 15 s: uma batalha fixa (explosões de 64 pedaços a cada 0,5 s), os dois lados ao mesmo tempo */
+$('b-teste').addEventListener('click', () => teste());
+async function teste() { $('veredito').textContent = 'Medindo por 15 s…'; const a0 = am.r.length, b0 = am.c.length, c0 = am.br.length; const auto0 = auto, n0 = porBoom; auto = true; porBoom = 64; const m0 = modo; modo = 'lado';
+  let maxR = 0, maxC = 0; const fim = tempo + 15; await new Promise(res => { const f = () => { maxR = Math.max(maxR, corpos.length); maxC = Math.max(maxC, vivosC()); if (tempo >= fim) res(); else requestAnimationFrame(f); }; requestAnimationFrame(f); });
+  auto = auto0; porBoom = n0; modo = m0;
+  const r = { rapier: { cpuMs: med(am.r.slice(a0)), cpuP95: p95(am.r.slice(a0)), passoMs: med(am.rs.slice(a0)), explosaoMs: med(am.br.slice(c0)), max: maxR, initMs: Math.round(initRapier), kb: kbRapier }, compute: { cpuMs: med(am.c.slice(b0)), cpuP95: p95(am.c.slice(b0)), explosaoMs: med(am.bc.slice(c0)), max: maxC, initMs: Math.round(initCompute), wgslKB: +kbCompute.toFixed(1) }, motor: isGPU ? 'WebGPU' : 'WebGL2' };
+  window.__labResult = r;
+  const x = r.rapier.cpuMs && r.compute.cpuMs ? r.rapier.cpuMs / Math.max(r.compute.cpuMs, 0.001) : null;
+  $('veredito').textContent = 'Com ' + maxR + ' pedaços vivos, o Rapier gastou ' + ms(r.rapier.cpuMs) + ' de CPU por quadro (95%: ' + ms(r.rapier.cpuP95) + ') e o compute ' + ms(r.compute.cpuMs) + (x ? ' (' + x.toFixed(0) + ' vezes menos)' : '') + '. No jogo a CPU do Firefox já está no limite (11 ms) e uma batalha tem centenas de mortes por minuto: os destroços ficam em compute. O Rapier só valeria para poucos objetos grandes e importantes (a queda de um chefão, uma cena de cinema), carregado sob demanda e só no computador.'; return r; }
+window.__labTeste = teste;
+$('load').remove(); window.__labPronto = true; requestAnimationFrame(quadro);
+addEventListener('resize', () => renderer.setSize(innerWidth, innerHeight));
+</script>
+</body>
+</html>

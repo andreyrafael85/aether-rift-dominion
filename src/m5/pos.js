@@ -109,6 +109,7 @@ M5.buildPost = function (X, scene, camera, q, opts) {
     const color = sp.getTextureNode('output'), depth = sp.getTextureNode('depth');
     let base = color;
     if (M5.up === 'fsr1' && A.fsr1) base = A.fsr1(color, 0.25, false); /* sobe a cena da escala do passe para a tela (antes da bruma e do bloom) */
+    if (M5.destrocos && M5.destrocos.refrata && !off.has('refracao')) base = M5.destrocos.refrata(base, color, depth, camera, q) || base; /* 5.0e: calor e onda de choque que refratam a cena (Alta e Ultra; src/m5/destrocos.js) */
     let c = base; let aoN = null;
     if (q.ssao && A.ao && !off.has('ao')) { aoN = A.ao(depth, null, camera); aoN.resolutionScale = q.aoHalf ? 0.5 : 1; aoN.radius.value = 14; aoN.thickness.value = 9; aoN.distanceExponent.value = 1.4; aoN.distanceFallOff.value = 1; aoN.scale.value = 1.25; aoN.samples.value = q.aoHalf ? 12 : q.resolved === 'ultra' ? 24 : 16;
       const ao = aoN.getTextureNode().r; c = vec4(c.rgb.mul(mix(vec3(0.03, 0.025, 0.03), vec3(1), ao)), c.a); } /* sombra de contato puxando para o tom do N8AO de hoje */

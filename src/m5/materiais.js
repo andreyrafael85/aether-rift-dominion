@@ -45,7 +45,7 @@ M5.modelo = function (o) {
   if (G && G.superficie) G.superficie(ctx); /* fase 2: detalhe de superfície (colorNode/normalNode/roughnessNode) */
   if (G && G.emissivo) em = G.emissivo(ctx) || em;
   let pAnim = null; if (G && G.posicao && (!o.noAnim || o.ruina /* 5.0b: a ruína (noAnim) também monta a posição no gancho */)) pAnim = G.posicao(ctx) || null; /* fase 2: animação por peça, na posição local do modelo (a sombra usa o mesmo positionNode) */
-  M5.instMat(m, pAnim); m.colorNode = M5.instCor(L().materialColor); /* 5.0a.1: M5.Inst */ m.userData.ardFragFixo = true; /* 5.0b.1: o fragmento dos modelos e da ruína com a mesma numeração */
+  M5.instMat(m, pAnim); m.colorNode = M5.unidades && M5.unidades.chaves && M5.unidades.chaves.contorno ? M5.unidades.corModelo(L().materialColor) /* 5.0e: só a tinta (iC.x); iC.y e iC.z levam a cor do time do contorno (src/m5/unidades.js) */ : M5.instCor(L().materialColor); /* 5.0a.1: M5.Inst */ m.userData.ardFragFixo = true; /* 5.0b.1: o fragmento dos modelos e da ruína com a mesma numeração */
   m.emissiveNode = em;
   return M5.registrar('modelo-' + (o.key || 'base'), m);
 };
@@ -55,7 +55,7 @@ M5.modelMaterial = function (o) { return M5.modelo(o); };
 M5.emissivo = function (o) {
   o = o || {}; const m = new (T().MeshBasicNodeMaterial)({ vertexColors: true });
   const G = M5.ganchos && M5.ganchos.modelo; let pAnim = null; if (G && G.posicao && (!o.noAnim || o.ruina /* 5.0b: idem na parte emissiva da ruína */)) pAnim = G.posicao({ m, o, emissivo: true }) || null;
-  M5.instMat(m, pAnim); m.colorNode = M5.instCor(L().materialColor); /* 5.0a.1: M5.Inst */
+  M5.instMat(m, pAnim); m.colorNode = M5.unidades && M5.unidades.chaves && M5.unidades.chaves.contorno ? M5.unidades.corModelo(L().materialColor) /* 5.0e: a parte emissiva lê só iC.x como a principal (as duas sombras seguem um pipeline só); aqui iC é sempre a tinta nos três canais */ : M5.instCor(L().materialColor); /* 5.0a.1: M5.Inst */
   if (M5.modelos && M5.modelos.ativo && M5.modelos.emRuina && !/[?&]m5ruina=1/.test(location.search)) { M5.modelos.emRuina(m); m.userData.ardFragFixo = true; } /* 5.0b.1: o apagar das luzes da ruína em toda parte emissiva (queda 0 nos modelos): um fragmento só para as duas */
   return M5.registrar('emissivo-' + (o.key || 'base'), m);
 };

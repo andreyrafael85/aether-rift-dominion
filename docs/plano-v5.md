@@ -486,7 +486,13 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
 - **Terreno que guarda a batalha:** crateras que afundam o chão, mato queimado e pegadas na neve e na areia.
 - **Pronto quando:** capturas de dia, entardecer, noite e cada clima, no computador e no celular, dentro do orçamento.
 
-#### 5.0e — Bases e unidades vivas · tamanho GG · 3 agentes
+#### 5.0e — Bases e unidades vivas · tamanho GG · 3 agentes · ✔ 31/10/2026
+**Entregue (31/10/2026), três agentes em paralelo (e-obra, e-base, e-unid), tudo só no Motor 5 e só visual:**
+- **Obra 2.0 (`src/m5/obra.js`):** a construção aparece inteira e sobe por um corte no vértice do material dos modelos (o mesmo pipeline, a sombra junto, sem `discard`), pelo `aInst` (`w < −0,5` marca a obra); borda e tampa por Raça; onda no chão ao concluir. O casulo e a coroa de cristais saíram; o andaime da Vehnar fica.
+- **Destroços (`src/m5/destrocos.js`):** um anel fixo de partículas num compute, um desenho só para as faíscas da obra, a onda e os destroços, que quicam com a normal do relevo e assentam (16 s unidade, 32 s construção). Calor e onda de choque no passe da bruma (Alta e Ultra). Laboratório do Rapier (`lab/destrocos.html`): 1.024 pedaços a 10,2 ms de CPU por quadro contra 0,2 ms no compute, e 4,34 MB de WASM; fica só para poucos objetos grandes, sob demanda.
+- **Base viva (`src/m5/base.js`):** 15 peças de módulo (Câmara de Fusão, Academia, Bateria Pesada por Raça), avaria pelo `aVida` no fragmento, condutos pela energia do dono, trabalhadores por Raça (3, 5 e 7 por base na Média, Alta e Ultra) e respiração Tessara e Vorag (~2,6%), antes do corte da obra.
+- **Unidades e materiais (`src/m5/unidades.js`):** aro em holograma (seleção, veteranos, promoção, fantasma, Arca e farol), barras de vida em segmentos desenhadas depois do pós, contorno do time no material (o `OutlineNode` custava +22 pipelines e +27% de CPU), veteranos com estrelas, e materiais 2.0 (desgaste de borda e cavidade pelo `aDesg` calculado num Worker, sujeira na cor do chão, sombra de contato fina).
+- **Carga no QA (Planície, Média):** 61 → 64 pipelines e 805 → 878 KB de WGSL, sem pipeline tardio e sem erro; todos os módulos passam no Naga (o compilador do Firefox).
 - **Obra 2.0:** a estrutura sobe por um corte com borda no estilo da Raça, com faíscas em compute e uma onda no chão ao concluir:
   - Vehnar: solda;
   - Erevane: trama de luz;
