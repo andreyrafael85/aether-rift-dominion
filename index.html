@@ -1065,7 +1065,7 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
 
 
 <script>/* 5.0c: idioma antes da primeira pintura — fora do pt-BR, carrega aqui o dicionário do idioma (src/i18n/en.js ou es.js, 33 KB com gzip, enquanto o resto da página chega) e esconde o texto da tela inicial até o src/i18n.js (no fim da página) traduzir; a mesma regra de escolha do i18n.js */
-(function () { try { var q = (new URLSearchParams(location.search).get('lang') || '').toLowerCase(), s = ''; try { s = (localStorage.getItem('ard-idioma') || '').toLowerCase(); } catch (e) {} var l = /^(pt|en|es)/.test(q) ? q : /^(pt|en|es)/.test(s) ? s : ''; if (!l) { var ls = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']; for (var i = 0; i < ls.length && !l; i++) if (/^(pt|en|es)/i.test(ls[i])) l = ls[i].toLowerCase(); } if (!/^pt/.test(l)) { document.documentElement.classList.add('i18n-espera'); document.write('<script src="src/i18n/' + (/^es/.test(l) ? 'es' : 'en') + '.js?v=' + '2026-11-01 00:11Z'.replace(/[^0-9TZ]/g, '') + '"><\/script>'); } } catch (e) {} })();</script>
+(function () { try { var q = (new URLSearchParams(location.search).get('lang') || '').toLowerCase(), s = ''; try { s = (localStorage.getItem('ard-idioma') || '').toLowerCase(); } catch (e) {} var l = /^(pt|en|es)/.test(q) ? q : /^(pt|en|es)/.test(s) ? s : ''; if (!l) { var ls = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']; for (var i = 0; i < ls.length && !l; i++) if (/^(pt|en|es)/i.test(ls[i])) l = ls[i].toLowerCase(); } if (!/^pt/.test(l)) { document.documentElement.classList.add('i18n-espera'); document.write('<script src="src/i18n/' + (/^es/.test(l) ? 'es' : 'en') + '.js?v=' + '2026-11-05 20:46Z'.replace(/[^0-9TZ]/g, '') + '"><\/script>'); } } catch (e) {} })();</script>
 <div id="start" class="screen">
   <canvas id="bgfx" aria-hidden="true"></canvas>
   <!-- 5.0a.1: pôster da Sala de Comando (um render da própria Sala por Raça e por tela, em assets/sala-*.webp): entra na hora, antes da cena 3D -->
@@ -1079,7 +1079,7 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
   <div class="start-wrap">
     <header class="st-head">
       <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div class="brand-txt"><h1 data-i18n="inicio.aether-rift-dominion">Aether Rift<span>Dominion</span></h1><p class="tagline" data-i18n="inicio.nada-aqui-seu-ainda">Nada aqui é seu. Ainda.</p></div></div>
-      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.0e · build 2026-11-01 00:11Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4</div>
+      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.0f · build 2026-11-05 20:46Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4</div>
       <div class="opt st-lang" data-idioma-sel="idioma-inicio"></div><!-- 5.0c: seletor de idioma, legível em qualquer idioma -->
     </header>
     <div class="start-grid">
@@ -1141,8 +1141,9 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
       </div>
       <div class="notes">
       <div class="choose" data-i18n="notas.notas-versao">Notas da versão</div>
+      <p class="start-notes" data-i18n="notas.5-0f"><b>5.0f — Som 3D e cinema:</b> cada som agora sai do seu lugar no mapa e acompanha a câmera, com som 3D para fone no computador; o que está longe perde o brilho, o que está sob a névoa de guerra soa abafado e cada bioma tem seu eco. Uma <b>trilha adaptativa</b>, gerada no próprio navegador, dá um tema a cada Raça e muda entre paz, tensão, batalha e chefão conforme a partida, e baixa quando alguém fala. Cliques e avisos têm o timbre da sua Raça. As 20 missões abrem com a <b>Sala de Guerra</b>: o mapa tático com as ameaças, a rota de ataque e os objetivos, e a câmera pousando na sua base. A superarma ganhou uma tomada curta do disparo, e os chefões, uma entrada de cinema. Tudo pode ser pulado (Esc, clique ou toque), e Ajustes tem volume de efeitos e de música, saída para fone ou caixas e as cenas de cinema.</p>
+      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.0e → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-0e"><b>5.0e — Bases e unidades vivas:</b> com o <b>Motor 5</b> ligado, cada construção sobe no estilo da sua Raça: solda na Vehnar, trama de luz na Erevane, veias na Tessara, cristais no Quorith e bolhas na Vorag, com uma onda no chão ao concluir. Os destroços quicam no relevo e o entulho fica um tempo no chão; na Alta e na Ultra, o calor e a onda de choque das explosões distorcem o ar. A base ganhou vida: módulos visíveis nas construções, paredes que racham conforme a vida cai, condutos que pulsam com a energia (e piscam quando ela falta), trabalhadores andando entre os prédios e construções Tessara e Vorag que respiram. As unidades ganharam aro de seleção em holograma, barras de vida em segmentos que nenhuma névoa escurece, contorno na cor do time e estrelas de veterano que brilham na promoção; os materiais mostram desgaste nas bordas e a poeira do mapa na base das peças.</p>
-      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.0d.1 → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-0d-1"><b>5.0d.1 — Névoa leve e Firefox corrigido:</b> no Firefox, as nuvens de guerra da 5.0d deixavam a partida quase sem visibilidade na Alta, porque um shader que o Firefox recusava escurecia a tela. Está corrigido, e as nuvens viraram um véu claro e translúcido sobre o que nunca foi visto: o relevo continua legível, e o que está à vista nunca fica coberto. A névoa dos climas também ficou mais leve: unidades e construções continuam nítidas na névoa tóxica, na chuva e no celular. E o clima <b>Automático</b> agora acompanha o mapa, de leve: neve fina, chuva fina ou poeira na Planície da Fenda e cinza no Cinturão (da Média para cima).</p>
       <p class="start-notes" data-i18n="notas.5-0d"><b>5.0d — Céu, clima e nuvens de guerra:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o mundo ganhou vida. O sol anda no ciclo do dia, com nascer e pôr do sol, sombras que giram e, à noite, lua e estrelas; o reflexo do céu acompanha a hora. Na Alta e na Ultra, raios de sol atravessam a poeira e a Tempestade de Éter. O que nunca foi visto fica sob um banco de nuvens baixas, que se abre com a borda acesa quando as tropas chegam (da Média para cima). Os climas do campo (Jogar › Semente e clima) agora acontecem na placa de vídeo: neve de cristais que se acumula no chão e no alto das peças, neve fina e cortinas de luz na aurora, areia e cinza na tempestade de plasma, chuva com chão molhado e poças na chuva ácida, e bancos de névoa tóxica nos vales. E o chão guarda a batalha: crateras que afundam, mato queimado e pegadas na neve e na areia.</p>
       <p class="start-notes" data-i18n="notas.5-0c-2"><b>5.0c.2 — Voz da Erevane e Sala mais rápida:</b> a Erevane ganhou um locutor masculino nos três idiomas. Os avisos, as eliminações e as respostas das unidades agora soam com corpo, sem perder o ar frio e o eco leve da Raça; a voz feminina fica só na Tessara, com a Sylvia Oriel. Na Sala de Comando, a saudação do líder sai logo depois da troca de Raça, sem esperar o navegador ficar livre: no Firefox, ela chegava a atrasar mais de dois segundos.</p>
@@ -1789,7 +1790,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aqui é seu. Ainda.",
-  "inicio.versao": "Versão 5.0e · build 2026-11-01 00:11Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
+  "inicio.versao": "Versão 5.0f · build 2026-11-05 20:46Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Escolha sua Raça",
   "inicio.vitrine.explorar-base": "Explorar a base",
   "inicio.vitrine.som-tela-inicial": "Som da tela inicial",
@@ -1858,6 +1859,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.btn-bench": "Testar desempenho (30 s)",
   "ajustes.cfg-feedback": "Enviar feedback",
   "notas.notas-versao": "Notas da versão",
+  "notas.5-0f": "<b>5.0f — Som 3D e cinema:</b> cada som agora sai do seu lugar no mapa e acompanha a câmera, com som 3D para fone no computador; o que está longe perde o brilho, o que está sob a névoa de guerra soa abafado e cada bioma tem seu eco. Uma <b>trilha adaptativa</b>, gerada no próprio navegador, dá um tema a cada Raça e muda entre paz, tensão, batalha e chefão conforme a partida, e baixa quando alguém fala. Cliques e avisos têm o timbre da sua Raça. As 20 missões abrem com a <b>Sala de Guerra</b>: o mapa tático com as ameaças, a rota de ataque e os objetivos, e a câmera pousando na sua base. A superarma ganhou uma tomada curta do disparo, e os chefões, uma entrada de cinema. Tudo pode ser pulado (Esc, clique ou toque), e Ajustes tem volume de efeitos e de música, saída para fone ou caixas e as cenas de cinema.",
   "notas.5-0e": "<b>5.0e — Bases e unidades vivas:</b> com o <b>Motor 5</b> ligado, cada construção sobe no estilo da sua Raça: solda na Vehnar, trama de luz na Erevane, veias na Tessara, cristais no Quorith e bolhas na Vorag, com uma onda no chão ao concluir. Os destroços quicam no relevo e o entulho fica um tempo no chão; na Alta e na Ultra, o calor e a onda de choque das explosões distorcem o ar. A base ganhou vida: módulos visíveis nas construções, paredes que racham conforme a vida cai, condutos que pulsam com a energia (e piscam quando ela falta), trabalhadores andando entre os prédios e construções Tessara e Vorag que respiram. As unidades ganharam aro de seleção em holograma, barras de vida em segmentos que nenhuma névoa escurece, contorno na cor do time e estrelas de veterano que brilham na promoção; os materiais mostram desgaste nas bordas e a poeira do mapa na base das peças.",
   "notas.5-0d-1": "<b>5.0d.1 — Névoa leve e Firefox corrigido:</b> no Firefox, as nuvens de guerra da 5.0d deixavam a partida quase sem visibilidade na Alta, porque um shader que o Firefox recusava escurecia a tela. Está corrigido, e as nuvens viraram um véu claro e translúcido sobre o que nunca foi visto: o relevo continua legível, e o que está à vista nunca fica coberto. A névoa dos climas também ficou mais leve: unidades e construções continuam nítidas na névoa tóxica, na chuva e no celular. E o clima <b>Automático</b> agora acompanha o mapa, de leve: neve fina, chuva fina ou poeira na Planície da Fenda e cinza no Cinturão (da Média para cima).",
   "notas.5-0d": "<b>5.0d — Céu, clima e nuvens de guerra:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o mundo ganhou vida. O sol anda no ciclo do dia, com nascer e pôr do sol, sombras que giram e, à noite, lua e estrelas; o reflexo do céu acompanha a hora. Na Alta e na Ultra, raios de sol atravessam a poeira e a Tempestade de Éter. O que nunca foi visto fica sob um banco de nuvens baixas, que se abre com a borda acesa quando as tropas chegam (da Média para cima). Os climas do campo (Jogar › Semente e clima) agora acontecem na placa de vídeo: neve de cristais que se acumula no chão e no alto das peças, neve fina e cortinas de luz na aurora, areia e cinza na tempestade de plasma, chuva com chão molhado e poças na chuva ácida, e bancos de névoa tóxica nos vales. E o chão guarda a batalha: crateras que afundam, mato queimado e pegadas na neve e na areia.",
@@ -1866,7 +1868,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "notas.5-0c": "<b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 mais leve, faróis e som no iPhone:</b> com o <b>Motor 5</b> ligado, os shaders que ele prepara na carga encolheram um terço (os lagos primeiro) e cada quadro manda muito menos dados para a placa de vídeo, o que alivia a CPU no Firefox e no celular. O brilho em volta das luzes agora é o mesmo do motor clássico, e no Modo Foto da qualidade Baixa os efeitos seguem a exposição como no clássico. À noite e dentro da Tempestade de Éter, os faróis dos veículos, coletores e piratas iluminam o chão à frente, nos dois motores. A Sala de Comando ficou um pouco mais clara, sem o clarão de antes. No iPhone, o som e a voz destravam no primeiro toque, tocam com a chave de silêncio ligada e voltam depois de uma ligação. Cada líder fala com uma voz do seu gênero em todo navegador. Em Ajustes, <b>Testar som</b> toca três notas e uma frase e mostra o estado do áudio do aparelho.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, em teste:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o jogo inteiro agora roda em WebGPU, com volta sozinha para WebGL2: unidades e construções com o detalhe de superfície e a animação de cada peça, ruínas, obras, o holograma da Erevane, os escudos do Uníssono e as bandeiras; o chão com todos os biomas, a vegetação ao vento, as estradas e o céu; explosões, fogo, fumaça e tiros; os lagos de plasma e de gelo com reflexo, o espaço do Cinturão e a Tempestade de Éter; e o <b>Modo Foto</b> (📷 ou tecla J) com desfoque, os 8 filtros e captura em 4K. Na primeira vez que o Modo Foto abre numa partida, ele leva alguns segundos para se preparar. Com tudo isso, a carga do Motor 5 ficou alguns segundos mais longa: a próxima versão mede nos aparelhos e enxuga. O motor clássico continua o padrão e não mudou.",
-  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0d.1 → 2.0)",
+  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0e → 2.0)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Termos de Uso",
   "inicio.rodape.foot-priv": "Privacidade",
@@ -2045,6 +2047,13 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.motor-5": "Motor 5 (WebGPU, experimental)",
   "ajustes.instalar": "Instalar o jogo (app)",
   "ajustes.testar-som": "Testar som",
+  "som.efeitos": "Efeitos",
+  "som.vol-efeitos": "Volume dos efeitos",
+  "som.musica": "Música",
+  "som.vol-musica": "Volume da música",
+  "som.saida": "Som 3D",
+  "som.saida.fone": "Fone de ouvido (HRTF)",
+  "som.saida.caixa": "Caixas de som",
   "geral.idioma": "Idioma",
   "inicio.multi.codigo": "CÓDIGO",
   /* inicio-jogo */
@@ -3157,6 +3166,19 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "voz.diag.voltou": "já voltou", /* 5.0c.1 */
   "voz.d.ios-gravadas": "No iPhone, o jogo fala com as vozes gravadas de cada Raça, pelo mesmo som dos efeitos. A voz do sistema escolhida aqui só vale para o Ouvir.", /* 5.0c.1 */
   "geral.idioma-offline": "Sem internet: este idioma ainda não foi baixado neste aparelho.",
+  "cine.pular": "Pular", /* 5.0f */
+  "cine.rever": "Rever a cena", /* 5.0f */
+  "cine.sala": "Sala de Guerra", /* 5.0f */
+  "cine.voce": "Você", /* 5.0f */
+  "cine.aliado": "Aliado", /* 5.0f */
+  "cine.ameaca": "Ameaça", /* 5.0f */
+  "cine.rota": "Rota de ataque", /* 5.0f */
+  "cine.superarma": "Superarma", /* 5.0f */
+  "cine.chefao": "Chefão", /* 5.0f */
+  "cine.chefe.catedral": "O relicário do Coro caminha cantando", /* 5.0f */
+  "cine.chefe.matriarca": "Rainha da Prole, mãe de todas as Crias", /* 5.0f */
+  "cine.op.cenas": "Cenas de cinema: Sala de Guerra, abertura das missões e entrada dos chefões", /* 5.0f */
+  "cine.op.super": "Câmera de ação da superarma", /* 5.0f */
 };
 
 /* Aether Rift: Dominion — idiomas (5.0c): português do Brasil (base), inglês e espanhol (neutro latino-americano).
@@ -3185,7 +3207,7 @@ const pr = l => PR[l] || (PR[l] = new Intl.PluralRules(LOCALE[l] || l));
 function num(n, o) { if (typeof n !== 'number' || !isFinite(n)) return String(n); return nf(ARD.idioma, o || { maximumFractionDigits: 2 }).format(n); }
 function forma(v, n, l) { if (v == null || typeof v !== 'object') return v; const c = typeof n === 'number' ? (n === 0 && v.zero != null ? 'zero' : pr(l).select(n)) : 'other'; return v[c] != null ? v[c] : v.other != null ? v.other : v.one; }
 function busca(k, l) { const d = DIC[l]; return d && Object.prototype.hasOwnProperty.call(d, k) ? d[k] : undefined; }
-const MARCA_BUILD = '__' + 'BUILD__', CARIMBO = '2026-11-01 00:11Z'; /* o en e o es vêm em arquivo à parte, sem a troca do build: o carimbo entra aqui */
+const MARCA_BUILD = '__' + 'BUILD__', CARIMBO = '2026-11-05 20:46Z'; /* o en e o es vêm em arquivo à parte, sem a troca do build: o carimbo entra aqui */
 function preenche(s, vars) { if (s.indexOf(MARCA_BUILD) >= 0) s = s.split(MARCA_BUILD).join(CARIMBO); if (!vars || s.indexOf('{') < 0) return s; return s.replace(/\{(\w+)\}/g, (m, n) => Object.prototype.hasOwnProperty.call(vars, n) ? (typeof vars[n] === 'number' ? num(vars[n]) : String(vars[n])) : m); }
 function t(k, vars, reserva) { const l = ARD.idioma; let v = busca(k, l), ll = l; if (v === undefined) { v = busca(k, 'pt-BR'); ll = 'pt-BR'; } if (v === undefined) { if (reserva != null) return preenche(String(reserva), vars); falta(k); return k; }
   const s = forma(v, vars && vars.n, ll); return preenche(String(s == null ? '' : s), vars); }
@@ -3277,7 +3299,7 @@ function marcaHtml() { try { document.documentElement.lang = LANG_HTML[ARD.idiom
 /* carga dos dicionários: o pt-BR vem embutido no pacote (base e reserva); o en e o es são arquivos à parte (src/i18n/en.js e es.js, com o carimbo
    do build na URL), pedidos só por quem usa o idioma: o script do topo do <body> já carrega o do idioma escolhido antes do jogo; aqui, a troca
    na hora pede o outro. O service worker guarda os dois na instalação, então o jogo troca de idioma também sem internet. */
-const VER = '2026-11-01 00:11Z'.replace(/[^0-9TZ]/g, '');
+const VER = '2026-11-05 20:46Z'.replace(/[^0-9TZ]/g, '');
 const CARGAS = {};
 function carregar(l) { l = normaliza(l) || 'pt-BR'; if (DIC[l]) return Promise.resolve(l); if (CARGAS[l]) return CARGAS[l];
   return (CARGAS[l] = new Promise((ok, falha) => { const sc = document.createElement('script'); sc.src = 'src/i18n/' + l + '.js?v=' + VER; sc.onload = () => { if (DIC[l]) ok(l); else { CARGAS[l] = null; falha(new Error('dicionário vazio')); } }; sc.onerror = () => { CARGAS[l] = null; sc.remove(); falha(new Error('sem rede')); }; document.head.appendChild(sc); })); }
@@ -13682,16 +13704,25 @@ function openBriefing(id, opts) {
   const $ = D.$; const m = C.BY_ID[id]; if (!m) return; brMission = id; const s = P.load(); opts = opts || {}; if (ARD.vozes) ARD.vozes.missao(id); /* 5.0c.1: as falas gravadas da missão baixam ao abri-la */
   const raceSel = $('br-race'); raceSel.innerHTML = RACES.map(r => `<option value="${r}">${esc(raceName(r))}</option>`).join(''); raceSel.value = m.race || opts.race || D.selectedRace(); raceSel.disabled = !!m.race;
   const pr = s.missions[id] || {}; $('br-diff').value = opts.diff || pr.lastDifficulty || 'normal';
+  if (ARD.cinema) ARD.cinema.pararSala(); /* 5.0f: cada abertura do briefing toca a Sala de Guerra do começo */
   const draw = () => { const race = raceSel.value; const prep = C.prepare(id, { race, difficulty: $('br-diff').value }); const who = w => w === 'self' ? race : w === 'enemy' ? prep.cfg.players.find((p, i) => i > 0 && !p.ally).faction : w === 'ally' ? (prep.cfg.players.find((p, i) => i > 0 && p.ally) || prep.cfg.players[1]).faction : (prep.swap && prep.swap[w]) || w; // 4.2g: fala da Raça trocada vai para a Raça real do inimigo
     $('br-act').textContent = C.ato(m.act); $('br-title').textContent = C.titulo(m); $('br-place').textContent = C.lugar(m) + ' · ' + T('camp.br.adversarios', { lista: prep.cfg.players.slice(1).map(p => jogador(p.name) + ' (' + raceName(p.faction) + (p.ally ? ', ' + T('camp.br.aliado', null, 'aliado') : '') + ')').join(', ') }, 'adversários: {lista}'); /* 5.0c */
     $('br-dialog').innerHTML = m.brief.map(([w, mood, text], i) => { const r = who(w); const art = D.leaderArt(r, mood); return `<div class="brl">${art ? `<img src="${art}" alt="">` : ''}<div><div class="nm">${esc(D.LEADER_NAME[r] || raceName(r))} · ${esc(raceName(r))}</div><div>${esc(C.brief(m, i, r)) /* 5.0c: camp.<id>.brief.N com o gênero de quem fala */}</div></div></div>`; }).join('');
     $('br-obj').innerHTML = m.objectives.map(o => `<li class="${o.bonus ? 'bn' : ''}">${o.bonus ? '★ ' + esc(T('camp.bonus', null, 'Bônus')) + ': ' : ''}${esc(C.objetivo(m, o).replace(/^Bônus: /, ''))}</li>`).join(''); /* 5.0c */
     const eq = P.load().relics.equipped.filter(Boolean).map(rid => C.reliquia(rid)); const rw = m.relic && !P.load().relics.owned.includes(m.relic); /* 5.0c */
+    salaGuerra(m, id, race, prep, who); /* 5.0f */
     $('br-relics').textContent = [eq.length ? T('camp.br.rel-equipadas', { lista: eq.join(', ') }, 'Relíquias equipadas: {lista}.') : T('camp.br.rel-nenhuma', null, 'Nenhuma relíquia equipada.'), rw ? T('camp.br.recompensa', { nome: C.reliquia(m.relic) }, 'Recompensa: relíquia {nome}.') : '', T('camp.br.melhor', { r: (pr.stars || 0) ? (pr.stars + ' ★') : T('camp.br.nao-concluida', null, 'ainda não concluída') }, 'Melhor resultado: {r}.')].filter(Boolean).join(' '); };
   raceSel.onchange = draw; $('br-diff').onchange = draw; draw(); brDraw = draw; /* 5.0c */
-  $('br-start').onclick = () => { $('briefing').hidden = true; launch(id, raceSel.value, $('br-diff').value); };
+  $('br-start').onclick = () => { if (ARD.cinema) ARD.cinema.pararSala(); /* 5.0f */ $('briefing').hidden = true; launch(id, raceSel.value, $('br-diff').value); };
   $('briefing').hidden = false;
 }
+
+/* 5.0f: Sala de Guerra — o mapa tático da missão no topo do briefing (src/cinema.js), com as falas digitadas e os objetivos; o texto de sempre fica embaixo */
+function salaGuerra(m, id, race, prep, who) { if (!ARD.cinema || !ARD.cinema.salaGuerra) return; const $ = D.$; const box = $('briefing').querySelector('.box');
+  let host = $('br-sala'); if (!host) { host = document.createElement('div'); host.id = 'br-sala'; $('br-dialog').parentNode.insertBefore(host, $('br-dialog')); }
+  try { ARD.cinema.salaGuerra({ host, box, missao: id, prep, raca: race, chave: [id, race, $('br-diff').value, ARD.idioma || ''].join('|'), ato: C.ato(m.act),
+    falas: m.brief.map(([w, mood], i) => { const r = who(w); return { race: r, mood, texto: C.brief(m, i, r), nome: (D.LEADER_NAME[r] || raceName(r)) + ' · ' + raceName(r), art: D.leaderArt(r, mood), k: 'camp.' + id + '.brief.' + i }; }),
+    objetivos: m.objectives.map(o => ({ texto: C.objetivo(m, o).replace(/^Bônus: /, ''), bonus: !!o.bonus })) }); } catch (e) { console.warn('[ARD] Sala de Guerra:', e); } }
 
 // 4.1b: início direto de uma missão (briefing, botão Continuar e links do fim de partida usam o mesmo caminho)
 function launch(id, race, diff) {
@@ -13778,9 +13809,9 @@ function grantXp(xp) { const lv = P.addXp(xp); const out = { xp, from: lv.from, 
 // ---------- sessão de missão (HUD) ----------
 function begin(sim, prep, saved) {
   const $ = D.$; const run = C.start(sim, prep, saved || null); if (saved && run.retraduz) run.retraduz(); /* 5.0c: salvamento de outro idioma — progresso já no idioma atual (só leitura) */ const queue = []; let showing = null, until = 0;
-  const comms = () => { const now = performance.now(); if (showing && now < until) return; if (!queue.length) { if (showing) { $('comms').hidden = true; showing = null; } return; } showing = queue.shift(); until = now + Math.max(4200, 1800 + showing.text.length * 55);
+  const comms = () => { if (ARD.cinema && ARD.cinema.ativa()) return; /* 5.0f: a central espera a cena acabar */ const now = performance.now(); if (showing && now < until) return; if (!queue.length) { if (showing) { $('comms').hidden = true; showing = null; } return; } showing = queue.shift(); until = now + Math.max(4200, 1800 + showing.text.length * 55);
     const art = D.leaderArt(showing.race, showing.mood); $('comms-img').src = art || ''; $('comms-img').hidden = !art; $('comms-name').textContent = (D.LEADER_NAME[showing.race] || raceName(showing.race)) + ' · ' + raceName(showing.race); $('comms-text').textContent = showing.text; $('comms').style.setProperty('--cc', D.RACE_COLORS[showing.race] || '#FF5E3A'); $('comms').hidden = false;
-    if (ARD.vozes) { const dv = ARD.vozes.campanha(showing, prep.mission.id); if (dv > 0) until = Math.max(until, now + dv * 1000 + 700); } /* 5.0c.1: a fala gravada de quem aparece na central (o painel fica até ela acabar) */ };
+    if (ARD.vozes && !(ARD.cinema && ARD.cinema.ouviu(showing.k)) /* 5.0f: a fala que já tocou na Sala de Guerra não repete a voz */) { const dv = ARD.vozes.campanha(showing, prep.mission.id); if (dv > 0) until = Math.max(until, now + dv * 1000 + 700); } /* 5.0c.1: a fala gravada de quem aparece na central (o painel fica até ela acabar) */ };
   let lastHud = null; const hud = () => { const ti = $('ob-title'); const tt = C.titulo(prep.mission); /* 5.0c */ if (ti.textContent !== tt) ti.textContent = tt; const html = run.objectives.map(o => `<li class="${o.done ? 'ok' : ''} ${o.bonus ? 'bn' : ''}"><span>${o.done ? '✓' : o.bonus ? '★' : '○'}</span><span>${esc(o.text.replace(/^Bônus: /, ''))}</span>${o.progress && !o.done ? `<span class="pg">${esc(o.progress)}</span>` : ''}</li>`).join(''); if (html !== lastHud) { lastHud = html; $('ob-list').innerHTML = html; } }; /* 4.3k: a lista de objetivos só é trocada quando muda (o HUD chama a cada 10 quadros) */
   if (!saved) for (const sd of run.brief()) queue.push(sd); else queue.push({ race: sim.players[0].faction, mood: 1, text: TG('camp.retomada', gen(sim.players[0].faction), null, 'De volta ao comando. A missão continua de onde parou.'), k: 'camp.retomada' /* 5.0c.1: a fala gravada do líder (lider:retomada) */ }); /* 5.0c */ $('objectives').hidden = false; hud();
   const sess = { prep, run, hud, noPause: !!prep.diff.noPause,
@@ -23274,6 +23305,7 @@ function create(canvas, overlay, mini) {
   // 4.2c: efeitos só onde o jogador enxerga agora (grade da névoa do último quadro; O(1) por evento) — nada de revelar inimigos escondidos
   const seenAt = (x, y) => R.revealAll || (x >= 0 && y >= 0 && x < S.WORLD && y < S.WORLD && fogData[(((y / FOGC) | 0) * FOGN + ((x / FOGC) | 0)) * 4] >= 180);
   R.onEvents = function (events, sim, human) {
+    if (ARD.musica) ARD.musica.eventos(events, sim, human); /* 5.0f: o estado da trilha (calor do combate, base atacada, fim) */
     for (const e of events) {
       if ((e.t === 'shot' && !seenAt(e.x1, e.y1) && !seenAt(e.x2, e.y2)) || ((e.t === 'impact' || e.t === 'death') && !seenAt(e.x, e.y))) continue;
       switch (e.t) {
@@ -23511,6 +23543,7 @@ function create(canvas, overlay, mini) {
     if (M5X && ARD.m5.ceuHora) ARD.m5.ceuHora(R, sim, PH); /* 5.0d: no Motor 5 o sol anda com a hora (src/m5/ceu.js): R.sunDir em degraus antes do updateCamera */
     R.shakeX = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0; R.shakeY = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0;
     updateCamera(cam);
+    if (ARD.som3d && !R.warming) ARD.som3d.quadro(camera, cam, sim, human, seenAt, H, R); /* 5.0f: som 3D (o ouvinte na câmera, a sala do bioma, a névoa) e a trilha adaptativa */
     // dia e noite
     const nt = R.night; for (const m of envMats) m.envMapIntensity = m.userData.env * (1 - 0.72 * nt); if (R.envK0 == null) R.envK0 = scene.environmentIntensity; scene.environmentIntensity = R.envK0 * (1 - 0.72 * nt); /* 4.3h: no r186 o material sem mapa próprio usa a intensidade da cena; sem isto a noite seguia iluminada pelo céu de dia */ const LK = R.lightK; sun.intensity = (1.6 * (1 - nt) + 0.55 * nt) * LK.sun; sun.color.setRGB(1 - 0.48 * nt, 0.91 - 0.24 * nt, 0.77 + 0.2 * nt); hemi.intensity = (0.55 * (1 - nt) + 0.42 * nt) * LK.hemi + lightning * 0.5; amb.intensity = (0.22 * (1 - nt) + 0.26 * nt) * LK.amb + lightning * 0.6; // 4.1a: lua azulada; a noite fica escura mas jogável
     if (PH && PH.light) PH.light(sun, hemi, amb); /* 4.3j: entardecer dourado do Modo Foto */
@@ -23787,7 +23820,7 @@ V.semPreparo = () => ehIOS() && V.disponivel() && !IOS_PREPARO;
    g = V.achar(...); cb = { inicio(), palavra(i, n, dur, w), fim(), falhou(motivo) }. Devolve { parar(fade) }. Bytes que faltam esperam até o.espera ms;
    decodifica na primeira vez; espera o Web Audio voltar a 'running' (interrupção do iOS) até ESPERA_RODANDO ms. */
 let ganho = null;
-function saida(c) { if (ganho && ganho.context === c) return ganho; ganho = c.createGain(); ganho.gain.value = VOZ_GANHO; ganho.connect(c.destination); return ganho; }
+function saida(c) { if (ganho && ganho.context === c) return ganho; ganho = c.createGain(); ganho.gain.value = VOZ_GANHO; ganho.connect((ARD.som3d && ARD.som3d.saidaFala(c)) || c.destination) /* 5.0f: as falas entram no limitador do fim, com a música e os efeitos abaixando sob elas */; return ganho; }
 function rodando(c, ms) { if (c.state === 'running') return Promise.resolve(true); const au = A(); if (au && au.resume) au.resume();
   return new Promise(ok => { let fim = false; const pronto = v => { if (fim) return; fim = true; try { c.removeEventListener('statechange', f); } catch (e) {} ok(v); }; const f = () => { if (c.state === 'running') pronto(true); };
     try { c.addEventListener('statechange', f); } catch (e) {} setTimeout(() => pronto(c.state === 'running'), ms); }); }
@@ -23940,38 +23973,452 @@ try { addEventListener('ard-voz', e => { const d = e.detail, P = V.P; if (!d || 
 ARD.vozes = V;
 })(globalThis.ARD = globalThis.ARD || {});
 
+/* Aether Rift: Dominion — 5.0f: som 3D da partida, só com Web Audio (nenhum arquivo de áudio). Vale para os dois motores (o src/render3d.js
+   chama ARD.som3d.quadro a cada quadro, depois da câmera).
+   - Ouvinte preso à câmera (posição e orientação a cada quadro; só escreve quando muda) e cada efeito com o lugar dele no mapa.
+   - HRTF no computador (Ajustes › Som 3D: fone de ouvido ou caixas de som) e panorâmica simples (equalpower) no celular e na Baixa.
+   - Distância pelo zoom (o volume pela distância do src/main.js e a câmera mais longe, mais baixo), ar que abafa o agudo de longe, abafamento do
+     que está sob a névoa de guerra e reverberação por bioma, com o impulso gerado no navegador (gelo, rocha, tundra, basalto e o vazio do Cinturão).
+   - Mixagem com limite de vozes e prioridade: um conjunto fixo de vozes (ganho → filtro → panorâmica, criadas uma vez); cada efeito é um
+     AudioBuffer pré-gravado tocado por um único AudioBufferSourceNode numa voz livre; sem voz livre, a de menor prioridade cede (explosões
+     grandes e alertas na frente) ou o efeito fica de fora. Nenhum nó novo por evento além do limite de vozes.
+   - Barramentos: efeitos (A.master, o volume de hoje × o volume dos efeitos) e música passam pelo "abaixa sob a fala" e por um limitador no fim,
+     junto com as vozes gravadas: nada estoura. A música (src/musica.js) entra no barramento de música daqui.
+   Chaves de URL (para comparar no aparelho): ?som3d=0 (efeitos como antes, sem posição, sem vozes do mixer), ?hrtf=0|1 (força a panorâmica),
+   ?reverb=0, ?abafar=0 (sem névoa e sem ar), ?somvozes=<n> (limite de vozes), ?limitador=0.
+   Nada aqui toca a simulação: só lê o que o renderizador já tem (câmera, névoa, bioma). */
+(function (ARD) {
+'use strict';
+const par = k => { try { return new URLSearchParams(location.search).get(k); } catch (e) { return null; } };
+const CH = { som3d: par('som3d') !== '0', hrtf: par('hrtf'), reverb: par('reverb') !== '0', abafar: par('abafar') !== '0', vozes: parseInt(par('somvozes') || '0', 10) || 0, limitador: par('limitador') !== '0' };
+const A = () => ARD.audio || null;
+const UA = () => (typeof navigator !== 'undefined' && navigator.userAgent) || '';
+const ehIOS = () => /iPhone|iPad|iPod/.test(UA()) || (/Macintosh/.test(UA()) && typeof navigator !== 'undefined' && navigator.maxTouchPoints > 1);
+const toque = () => { try { return ehIOS() || (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches); } catch (e) { return false; } };
+
+/* ---------- efeitos: prioridade e posição ---------- */
+const POS = { shot_light: 0, beam: 0, siphon: 0, shot_heavy: 1, impact: 1, explosion: 2, storm: 2 }; /* com lugar no mapa (prioridade) */
+const FRENTE = { click: 2, build: 3, spawn: 3, erro: 3, promote: 3, pact: 3, thunder: 2, storm: 2, alert: 4, danger: 4, betrayal: 4 }; /* na frente, sem lugar */
+const VARIA = { shot_light: 0.08, shot_heavy: 0.07, beam: 0.06, impact: 0.08, explosion: 0.1, siphon: 0.05 }; /* variação de altura (tom) por disparo */
+const UI_RACA = ['click', 'build', 'spawn', 'erro'];
+const DUR = { shot_light: 0.12, shot_heavy: 0.22, beam: 0.24, impact: 0.3, explosion: 0.8, build: 0.6, spawn: 0.5, alert: 0.62, danger: 0.72, promote: 0.36, click: 0.1, erro: 0.36, siphon: 0.58, storm: 1.5, thunder: 2.55, pact: 0.42, betrayal: 0.58 };
+
+/* ---------- reverberação por bioma (impulso sintético) ---------- */
+const IRS = { /* s = duração, dec = queda, brilho = agudo no começo (0–1), pre = pré-atraso, eco = reflexões [s, ganho], wet = mandada */
+  gelo: { s: 1.7, dec: 3.2, brilho: 0.8, pre: 0.012, eco: [[0.05, 0.3]], wet: 0.34 },
+  rocha: { s: 1.1, dec: 3.6, brilho: 0.5, pre: 0.02, eco: [[0.09, 0.55], [0.21, 0.35], [0.37, 0.2]], wet: 0.32 },
+  tundra: { s: 0.7, dec: 4.5, brilho: 0.3, pre: 0.008, eco: [], wet: 0.2 },
+  basalto: { s: 1.9, dec: 2.6, brilho: 0.26, pre: 0.03, eco: [[0.14, 0.4]], wet: 0.38 },
+  espaco: { s: 0.5, dec: 5, brilho: 0.7, pre: 0.004, eco: [[0.011, 0.5], [0.023, 0.4], [0.037, 0.3]], wet: 0.16 } };
+const BIOMAS = ['gelo', 'rocha', 'tundra', 'basalto'];
+function impulso(c, nome, leve) { const P = IRS[nome] || IRS.tundra, r = c.sampleRate, dur = leve ? Math.min(0.8, P.s * 0.5) : P.s /* 5.0f (bancada): o convolvedor é o mais caro do mixer; salas curtas */, n = Math.max(64, Math.floor(r * dur)), ch = leve ? 1 : 2, b = c.createBuffer(ch, n, r);
+  let sd = 1234567 + nome.length * 7919; const rnd = () => { sd = (sd * 1103515245 + 12345) >>> 0; return sd / 4294967296 * 2 - 1; }; /* sorteio próprio: o mesmo impulso sempre */
+  const pre = Math.floor(P.pre * r);
+  for (let k = 0; k < ch; k++) { const d = b.getChannelData(k); let y = 0;
+    const m = n - pre, r = Math.exp(-P.dec * 1.6 / m), fimF = Math.floor(m * 0.94); let env = 1; /* queda exponencial por multiplicação (sem Math.pow por amostra) e um fade no fim */
+    for (let i = pre, j = 0; i < n; i++, j++) { const a = Math.max(0.04, P.brilho * (1 - 0.8 * j / m)); y += a * (rnd() - y); env *= r; d[i] = y * env * (j > fimF ? (m - j) / (m - fimF) : 1); }
+    for (const [ts, g] of P.eco) { const i0 = pre + Math.floor(ts * r * (1 + k * 0.03)); for (let i = 0; i < 160 && i0 + i < n; i++) d[i0 + i] += g * (rnd()) * (1 - i / 160); } }
+  return b; }
+
+/* ---------- o mixer (um por contexto: o do jogo e, nas medidas, um OfflineAudioContext) ---------- */
+function criar(c, master, o) { o = o || {}; const M = { c, master, ok: true, leve: !!o.leve };
+  const nPos = o.vozes || CH.vozes || (o.leve ? 8 : 12), nFr = o.leve ? 3 : 4, lim = o.limitador != null ? o.limitador : CH.limitador;
+  /* fim da linha: fundo (efeitos + música) e vozes gravadas → limitador → compensação → saída */
+  M.fundo = c.createGain(); M.fala = c.createGain(); /* M.fala: as vozes gravadas (src/vozes.js) */
+  if (lim) { const L = M.lim = c.createDynamicsCompressor(); L.threshold.value = -2; L.knee.value = 1; L.ratio.value = 20; L.attack.value = 0.002; L.release.value = 0.12;
+    /* o compressor do Web Audio sobe o volume sozinho (ganho de compensação = 0,6 × o ganho que ele tira no máximo); aqui ele volta, para os
+       sons baixos ficarem no volume de hoje e só os picos serem segurados (teto ≈ −1,9 dBFS) */
+    const full = -2 + 2 / 20, comp = Math.pow(10, (full * 0.6) / 20); M.pos = c.createGain(); M.pos.gain.value = comp; M.fundo.connect(L); M.fala.connect(L); L.connect(M.pos); M.pos.connect(c.destination); }
+  else { M.fundo.connect(c.destination); M.fala.connect(c.destination); }
+  M.duckFx = c.createGain(); M.duckFx.connect(M.fundo); M.duckMus = c.createGain(); M.duckMus.connect(M.fundo); M.mus = c.createGain(); M.mus.gain.value = 0; M.mus.connect(M.duckMus);
+  try { master.disconnect(); } catch (e) {} master.connect(M.duckFx);
+  /* reverberação: duas salas (A/B) para trocar de bioma cruzando */
+  M.envio = c.createGain(); M.envio.channelCount = 1; M.envio.channelCountMode = 'explicit'; /* 5.0f (bancada): a mandada em mono (o convolvedor faz 2 convoluções, não 4) e só a sala ativa ligada nela */
+  M.salas = [0, 1].map(() => { const cv = c.createConvolver(), w = c.createGain(); w.gain.value = 0; cv.connect(w); w.connect(master); return { cv, w, nome: null, lig: false }; }); M.sala = 0; M.bioma = null;
+  /* vozes posicionais: ganho → panorâmica → um dos três barramentos de distância (perto: limpo; longe: o ar tira o agudo; sob a névoa: abafado),
+     cada um com a sua mandada para a sala. 5.0f (bancada): filtro e mandada por voz custavam ~2 ms por segundo de som cada voz, mesmo calada;
+     três filtros fixos custam o mesmo que um */
+  const modelo = o.modelo || 'equalpower', ENV = { perto: 0.3, longe: 0.65, nevoa: 0.85 };
+  M.bus = {}; for (const k of ['perto', 'longe', 'nevoa']) { let entrada; if (k === 'perto') entrada = c.createGain(); else { entrada = c.createBiquadFilter(); entrada.type = 'lowpass'; entrada.frequency.value = k === 'longe' ? 5200 : 650; entrada.Q.value = 0.5; }
+    const e = c.createGain(); e.gain.value = ENV[k]; entrada.connect(master); entrada.connect(e); e.connect(M.envio); M.bus[k] = entrada; }
+  M.vozes = []; for (let i = 0; i < nPos; i++) { const g = c.createGain(), p = c.createPanner(); g.gain.value = 0;
+    p.panningModel = modelo; p.distanceModel = 'linear'; p.rolloffFactor = 0; p.refDistance = 1; p.maxDistance = 1e6; /* a distância é do volume do jogo (src/main.js, volAt, e o zoom); a panorâmica só dá a direção */
+    g.connect(p); p.connect(M.bus.perto); M.vozes.push({ g, p, bus: 'perto', src: null, fim: 0, prio: -1, ini: 0 }); }
+  /* 5.0f (bancada): uma panorâmica que nunca recebeu som segue processando calada (no Chrome, ~1 ms por segundo de som cada, ~4 ms na HRTF); um
+     toque mudo de uma amostra em cada voz e na sala deixa o caminho desligado até o primeiro efeito de verdade */
+  { const mudo = c.createBuffer(1, 1, c.sampleRate); const toca = no => { const s0 = c.createBufferSource(); s0.buffer = mudo; s0.connect(no); s0.start(0); }; for (const v of M.vozes) toca(v.g); }
+  M.frente = []; for (let i = 0; i < nFr; i++) { const g = c.createGain(); g.gain.value = 0; g.connect(master); M.frente.push({ g, src: null, fim: 0, prio: -1, ini: 0 }); }
+  M.med = { roubos: 0, fora: 0, toques: 0, maxAtivas: 0 };
+  return M; }
+/* uma voz livre ou a que cede (a de menor prioridade, a mais antiga entre as iguais); null = o efeito fica de fora */
+function vozPara(M, lista, prio, t) { let livre = null, cede = null; for (const v of lista) { if (v.fim <= t) { livre = v; break; } if (v.prio < prio || (v.prio === prio && prio >= 2)) { if (!cede || v.prio < cede.prio || (v.prio === cede.prio && v.ini < cede.ini)) cede = v; } }
+  if (livre) return livre; if (cede) { M.med.roubos++; return cede; } M.med.fora++; return null; }
+/* toca um AudioBuffer numa voz: vol (0–1), prio, pos = [x, y, z] (null = na frente), visto (false = sob a névoa), rate, atraso (s), envio da sala */
+function tocarBuf(M, buf, vol, prio, pos, bus, rate, atraso, med) { const c = M.c, t = c.currentTime, lista = pos ? M.vozes : M.frente; const v = vozPara(M, lista, prio, t); if (!v) return false;
+  let t0 = t + (atraso || 0); if (v.src && v.fim > t) { const g = v.g.gain; g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(0, t + 0.012); try { v.src.stop(t + 0.014); } catch (e) {} t0 = Math.max(t0, t + 0.014); } /* cede com um corte curto, sem estalo */
+  const s = c.createBufferSource(); s.buffer = buf; if (rate !== 1) s.playbackRate.value = rate; s.connect(v.g); v.g.gain.setValueAtTime(vol, t0);
+  if (pos) { const p = v.p; if (p.positionX) { p.positionX.value = pos[0]; p.positionY.value = pos[1]; p.positionZ.value = pos[2]; } else p.setPosition(pos[0], pos[1], pos[2]); /* .value, não setValueAtTime: com automação o PannerNode do Chrome entra no caminho por amostra e fica caro mesmo calado (bancada) */
+    if (bus && v.bus !== bus && M.bus[bus]) { try { v.p.disconnect(); } catch (e) {} v.p.connect(M.bus[bus]); v.bus = bus; } }
+  s.start(t0); v.src = s; v.ini = t0; v.fim = t0 + buf.duration / rate + 0.02; v.prio = prio; if (med) { med.toques++; let n = 0; for (const x of lista) if (x.fim > t) n++; if (n > med.maxAtivas) med.maxAtivas = n; }
+  return true; }
+
+/* ---------- pré-gravação dos efeitos: todos num OfflineAudioContext só, cortados depois; as variantes de Raça com o volume médio do genérico ---------- */
+function preGravar(c) { const au = A(); const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext; if (!OC || !au || !au.sintetiza) return Promise.resolve(null);
+  const lista = []; for (const n of au.SONS) lista.push([n, null]); for (const r of au.UI_RACA) for (const n of UI_RACA) lista.push([n, r]);
+  const sr = c.sampleRate, gap = 0.05; let t = 0; const lug = lista.map(([n, r]) => { const d = (DUR[n] || 0.6) + (r ? 0.35 : 0); const o = { n, r, t, d }; t += d + gap; return o; });
+  const off = new OC(1, Math.ceil((t + 0.1) * sr), sr); for (const L of lug) au.sintetiza(off, off.destination, L.t, L.n, L.r, 1, 0);
+  const t0 = performance.now(); const pr = off.startRendering(); const fim = buf => { const d = buf.getChannelData(0), out = {}, rms = {};
+    for (const L of lug) { const i0 = Math.floor(L.t * sr); let n = Math.floor(L.d * sr); while (n > 64 && Math.abs(d[i0 + n - 1]) < 1e-4) n--; const b = c.createBuffer(1, n, sr), x = b.getChannelData(0); for (let i = 0; i < n; i++) x[i] = d[i0 + i];
+      let s = 0; for (let i = 0; i < n; i++) s += x[i] * x[i]; const k = L.r ? L.n + ':' + L.r : L.n; out[k] = b; rms[k] = Math.sqrt(s / Math.max(1, Math.min(n, Math.floor(0.25 * sr)))); }
+    for (const L of lug) if (L.r) { const k = L.n + ':' + L.r, g = rms[L.n] / Math.max(1e-6, rms[k]); if (isFinite(g) && g > 0.25 && g < 4) { const x = out[k].getChannelData(0); for (let i = 0; i < x.length; i++) x[i] *= g; } } /* volume médio igual ao genérico */
+    return { bufs: out, ms: Math.round(performance.now() - t0), seg: +t.toFixed(2) }; };
+  return pr && pr.then ? pr.then(fim) : new Promise(ok => { off.oncomplete = e => ok(fim(e.renderedBuffer)); }); }
+
+/* ---------- estado ao vivo ---------- */
+const S = { anel: new Float32Array(256), lento: 0, M: null, bufs: null, pronto: false, gravando: false, ouvT: -1e9, zoom: 1, visto: null, H: null, ty: 0, R: null, q: 0, falando: 0, falaT: 0, fala: false, med: { quadros: 0, ms: 0, sfx: 0, msSfx: 0, toques: 0, maxAtivas: 0, preMs: 0, preSeg: 0, irMs: 0, irMax: 0 }, partidaT: -1e9, bioma: null, biomaT: 0, biomaVisto: null, irs: {}, lp: { x: 0, y: 0, z: 0, fx: 0, fy: 0, fz: 0, ux: 0, uy: 0, uz: 0 } };
+const leve = () => toque() || (S.R && S.R.quality && S.R.quality.name === 'baixa'); /* celular e Baixa: menos vozes, panorâmica simples, sala curta e mono */
+function modelo() { if (CH.hrtf === '0') return 'equalpower'; if (CH.hrtf === '1') return 'HRTF'; if (toque()) return 'equalpower'; const au = A(); return au && au.saida === 'caixa' ? 'equalpower' : 'HRTF'; }
+function montar(c, master) { if (S.M || !CH.som3d || !c || !master) return; const ini = performance.now();
+  S.M = criar(c, master, { leve: toque(), modelo: modelo() }); volumes();
+  /* fala no ar (vozes gravadas e a voz do sistema): o 'ard-voz' de inicio e fim; o speechSynthesis.speaking é conferido no quadro */
+  try { addEventListener('ard-voz', e => { const d = e && e.detail; if (!d) return; if (d.tipo === 'inicio') { S.fala = true; S.falaT = performance.now(); abaixa(true); } else if (d.tipo === 'fim') { S.fala = false; abaixa(!!falaSistema()); } }); } catch (e) {} /* na hora do evento (não espera o quadro) */
+  S.med.montarMs = +(performance.now() - ini).toFixed(2);
+  /* a pré-gravação espera o contexto tocar e mais 0,8 s: no WebKit, um OfflineAudioContext gravando junto com o resume() do primeiro toque atrasava o desbloqueio */
+  const vai = () => { if (S.gravando || S.pronto) return; if (c.state !== 'running') { setTimeout(vai, 400); return; } setTimeout(gravar, 800); }; const gravar = () => {
+  S.gravando = true; preGravar(c).then(r => { S.gravando = false; if (!r) return; S.bufs = r.bufs; S.pronto = true; S.med.preMs = r.ms; S.med.preSeg = r.seg; }, e => { S.gravando = false; console.warn('[ARD] som 3D: pré-gravação falhou: ' + (e && e.message)); }); }; vai(); }
+function volumes() { const M = S.M, au = A(); if (!M || !au) return; const t = M.c.currentTime; try { M.mus.gain.setTargetAtTime(au.musica === false ? 0 : 0.9 * au.volMusica, t, 0.05); } catch (e) {} }
+function saida() { const M = S.M; if (!M) return; const m = modelo(); for (const v of M.vozes) if (v.p.panningModel !== m) v.p.panningModel = m; }
+/* a sala do bioma (troca cruzando em 1,2 s); o impulso de cada bioma nasce uma vez, na primeira vez que ele toca */
+function sala(nome) { const M = S.M; if (!M || !CH.reverb || nome === M.bioma) return; const lv = leve(); const k = nome + (lv ? ':l' : ''); const ir = S.irs[k];
+  if (!ir) { if (!S.irPedido) { S.irPedido = k; const f = () => { const t0 = performance.now(); S.irs[k] = impulso(M.c, nome, lv); const ms = performance.now() - t0; S.med.irMs += ms; if (ms > S.med.irMax) S.med.irMax = ms; S.irPedido = null; }; if (typeof requestIdleCallback === 'function') requestIdleCallback(f, { timeout: 1000 }); else setTimeout(f, 50); } return; } /* o impulso nasce em tempo ocioso; a troca vem na próxima conferência */
+  const t = M.c.currentTime, ant = M.salas[M.sala], nv = M.salas[1 - M.sala]; if (nv.nome !== k) { try { nv.cv.buffer = ir; } catch (e) { const cv = M.c.createConvolver(); cv.buffer = ir; try { nv.cv.disconnect(); } catch (er) {} M.envio.connect(cv); cv.connect(nv.w); nv.cv = cv; } nv.nome = k; }
+  if (!nv.lig) { M.envio.connect(nv.cv); nv.lig = true; } const P = IRS[nome] || IRS.tundra; ant.w.gain.setTargetAtTime(0, t, 0.35); nv.w.gain.setTargetAtTime(P.wet * (lv ? 0.7 : 1), t, 0.35); M.sala = 1 - M.sala; M.bioma = nome; M.wet = P.wet;
+  if (ant.lig) setTimeout(() => { if (M.salas[M.sala] !== ant && ant.lig) { try { M.envio.disconnect(ant.cv); } catch (e) {} ant.lig = false; } }, 2000); } /* a sala que saiu deixa de processar */
+
+/* ---------- toca um efeito (src/audio.js, A.sfx) ---------- */
+function tocar(name, vol, delay, ev, raca) { const M = S.M; if (!M || !S.pronto) return false; const t0 = performance.now();
+  try { const b = (raca && UI_RACA.indexOf(name) >= 0 && S.bufs[name + ':' + raca]) || S.bufs[name]; if (!b) return false;
+    const fresco = t0 - S.ouvT < 5000; /* o ouvinte foi posto há pouco (2D e telas sem câmera: na frente) */ let pos = null, prio = FRENTE[name] != null ? FRENTE[name] : 1, g = vol, bus = 'perto', rate = 1;
+    if (POS[name] != null && ev && fresco) { const x = ev.x != null ? ev.x : ev.x1 != null ? ev.x1 : ev.x2, y = ev.y != null ? ev.y : ev.y1 != null ? ev.y1 : ev.y2;
+      if (x != null && y != null) { prio = POS[name]; if (name === 'explosion' && (ev.kind === 'building' || vol > 0.7)) prio = 3; /* explosão grande na frente */
+        let h = S.ty; if (S.H) try { h = S.H(x, y) + 6; } catch (e) {} pos = [x, h, -y];
+        const vis = !CH.abafar || !S.visto || S.visto(x, y); const zf = Math.max(0.62, Math.min(1, 0.62 + 0.38 * (S.zoom || 1))); /* câmera mais longe, mais baixo */
+        g = vol * zf * (vis ? 1 : 0.55); bus = !CH.abafar ? 'perto' : !vis ? 'nevoa' : vol < 0.5 ? 'longe' : 'perto'; /* névoa: abafado; de longe, o ar tira o agudo (e a sala pesa mais) */ } }
+    if (VARIA[name]) rate = 1 + (Math.random() * 2 - 1) * VARIA[name];
+    const atraso = Math.max(0, Math.min(2.5, delay || 0)); /* o trovão longe chega depois (src/main.js) */
+    tocarBuf(M, b, g, prio, pos, bus, rate, atraso, S.med); S.med.sfx++; return true; /* sem voz livre, o efeito fica de fora (não volta para a síntese ao vivo) */ } finally { S.med.msSfx += performance.now() - t0; } }
+
+/* fala no ar: os efeitos descem 6 dB e a música 10 dB (ataque de ~50 ms, volta em ~0,4 s) */
+const falaSistema = () => { try { return typeof speechSynthesis !== 'undefined' && speechSynthesis.speaking; } catch (e) { return false; } };
+function abaixa(fala) { const M = S.M; fala = !!fala; if (!M || fala === S.falando) return; S.falando = fala; const t = M.c.currentTime; M.duckFx.gain.setTargetAtTime(fala ? 0.5 : 1, t, fala ? 0.04 : 0.25); M.duckMus.gain.setTargetAtTime(fala ? 0.32 : 1, t, fala ? 0.06 : 0.4); }
+/* ---------- quadro (src/render3d.js, R.draw, depois do updateCamera): ouvinte, sala, fala e a música ---------- */
+function quadro(camera, cam, sim, human, visto, H, R) { const t0 = performance.now();
+  try { S.R = R; S.visto = visto; S.H = H; S.zoom = cam && cam.zoom || 1; S.ty = R && R.camTy || 0; S.partidaT = t0;
+    const au = A(); if (!S.M && au && au.ctx) montar(au.ctx, au.master);
+    const M = S.M; if (M && camera) { const e = camera.matrixWorld.elements, p = camera.position, L = M.c.listener, o = S.lp;
+      const fx = -e[8], fy = -e[9], fz = -e[10], ux = e[4], uy = e[5], uz = e[6]; S.ouvT = t0;
+      if (Math.abs(p.x - o.x) + Math.abs(p.y - o.y) + Math.abs(p.z - o.z) > 0.05 || Math.abs(fx - o.fx) + Math.abs(fy - o.fy) + Math.abs(fz - o.fz) + Math.abs(ux - o.ux) + Math.abs(uy - o.uy) + Math.abs(uz - o.uz) > 1e-4) {
+        o.x = p.x; o.y = p.y; o.z = p.z; o.fx = fx; o.fy = fy; o.fz = fz; o.ux = ux; o.uy = uy; o.uz = uz;
+        if (L.positionX) { L.positionX.value = p.x; L.positionY.value = p.y; L.positionZ.value = p.z; L.forwardX.value = fx; L.forwardY.value = fy; L.forwardZ.value = fz; L.upX.value = ux; L.upY.value = uy; L.upZ.value = uz; }
+        else { L.setPosition(p.x, p.y, p.z); L.setOrientation(fx, fy, fz, ux, uy, uz); } } }
+    if (M && t0 - S.lento > 300) { S.lento = t0; /* a cada 0,3 s (pelo relógio, não por quadro: igual em 30 e em 144 fps): a sala do bioma sob a câmera, a fala no ar e o abaixar */
+      let nome = null; if (R && R.cinturao) nome = 'espaco'; else if (sim && sim.biome && ARD.sim && cam) { const SS = ARD.sim, tx = Math.floor(cam.x / SS.TILE), ty = Math.floor(cam.y / SS.TILE); if (tx >= 0 && ty >= 0 && tx < SS.TILES && ty < SS.TILES) nome = BIOMAS[sim.biome[ty * SS.TILES + tx]] || null; }
+      if (nome && nome !== M.bioma) { if (nome !== S.biomaVisto) { S.biomaVisto = nome; S.biomaT = t0; } else if (t0 - S.biomaT > 1200 || !M.bioma) sala(nome); } /* bioma novo firme por 1,2 s */
+      abaixa((S.fala && t0 - S.falaT < 20000) || falaSistema()); }
+    if (ARD.musica && ARD.musica.quadro) ARD.musica.quadro(sim, human, R); }
+  finally { const d = performance.now() - t0; S.med.quadros++; S.med.ms += d; S.anel[S.med.quadros & 255] = d; } } /* anel dos últimos 256 quadros (mediana e pior) */
+
+/* ---------- medidas (testes e relatório) ---------- */
+function medidas() { const m = S.med, M = S.M; const q = Math.max(1, m.quadros); const an = Array.from(S.anel.subarray(0, Math.min(256, m.quadros + 1))).filter((x, i) => i > 0 || m.quadros >= 256).sort((a, b) => a - b);
+  return { quadros: m.quadros, quadroMediana: an.length ? +an[an.length >> 1].toFixed(4) : 0, quadro95: an.length ? +an[Math.floor(an.length * 0.95)].toFixed(3) : 0, quadroPior: an.length ? +an[an.length - 1].toFixed(2) : 0, msPorQuadro: +((m.ms + m.msSfx) / q).toFixed(4), msQuadro: +(m.ms / q).toFixed(4), msSfxPorQuadro: +(m.msSfx / q).toFixed(4), sfx: m.sfx, toques: m.toques, maxAtivas: m.maxAtivas,
+    roubos: M ? M.med.roubos : 0, fora: M ? M.med.fora : 0, vozes: M ? M.vozes.length : 0, frente: M ? M.frente.length : 0, modelo: M ? M.vozes[0].p.panningModel : null, bioma: M ? M.bioma : null, falando: S.falando,
+    pronto: S.pronto, preMs: m.preMs, preSeg: m.preSeg, montarMs: m.montarMs, irMs: +m.irMs.toFixed(1), irMaxMs: +m.irMax.toFixed(1), buffers: S.bufs ? Object.keys(S.bufs).length : 0 }; }
+function zerar() { S.anel.fill(0); const m = S.med; m.quadros = 0; m.ms = 0; m.sfx = 0; m.msSfx = 0; m.toques = 0; m.maxAtivas = 0; if (S.M) { S.M.med.roubos = 0; S.M.med.fora = 0; } }
+/* bancada do áudio (custo no fio de áudio): toca uma linha de efeitos [t, nome, vol] num OfflineAudioContext com o mesmo mixer (ou, com
+   antes: true, pela síntese ao vivo de antes da 5.0f) e mede quanto tempo o render leva por segundo de som. o = { seg, linha, antes, leve, modelo, musica: [AudioBuffer] } */
+function bancada(o) { const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext, au = A(); const sr = (au && au.ctx && au.ctx.sampleRate) || 48000, seg = o.seg || 10;
+  const off = new OC(2, Math.ceil(seg * sr), sr), master = off.createGain(); master.gain.value = 0.35; master.connect(off.destination); let M = null;
+  if (!o.antes) { M = criar(off, master, { leve: !!o.leve, modelo: o.modelo || 'HRTF', vozes: o.vozes, limitador: o.limitador }); const L = off.listener; if (L.positionX) { L.positionY.value = 600; L.forwardY.value = -0.7; L.forwardZ.value = -0.7; } M.duckFx.gain.value = 1; M.mus.gain.value = 0.63;
+    if (o.sala !== false) { const ir = impulso(off, o.sala || 'rocha', !!o.leve); M.salas[0].cv.buffer = ir; M.envio.connect(M.salas[0].cv); M.salas[0].w.gain.value = 0.32; }
+    if (o.musica) for (const b of o.musica) { const s = off.createBufferSource(); s.buffer = b; s.loop = true; s.connect(M.mus); s.start(0); } }
+  let sd = 99; const rnd = () => { sd = (sd * 1103515245 + 12345) >>> 0; return sd / 4294967296; };
+  const linha = (o.linha || []).filter(x => x[0] < seg - 0.8); const ag = []; for (const [t, n, v] of linha) ag.push([t, n, v, rnd() * 900 - 450, rnd() * 900 - 450]);
+  /* os eventos entram pela linha do tempo do render (suspend/resume), como no jogo: cada um no seu momento, com o mesmo caminho do A.sfx */
+  const passo = 0.05; let i = 0; const agenda = []; for (let t = passo; t < seg - 0.5; t += passo) agenda.push(+t.toFixed(3));
+  const toca = (tA, tB) => { while (i < ag.length && ag[i][0] < tB) { const [, n, v, x, y] = ag[i++]; if (o.antes) au.sintetiza(off, master, off.currentTime, n, null, v, 0);
+      else { const b = S.bufs && S.bufs[n]; if (!b) continue; const pos = POS[n] != null ? [x, 0, -y] : null; tocarBuf(M, b, v, pos ? POS[n] : (FRENTE[n] || 1), pos, v < 0.5 ? 'longe' : 'perto', VARIA[n] ? 1 + (rnd() * 2 - 1) * VARIA[n] : 1, 0, null); } } };
+  for (const t of agenda) off.suspend(t).then(() => { toca(0, t); off.resume(); });
+  const t0 = performance.now(); return off.startRendering().then(b => { const ms = performance.now() - t0; let pk = 0, s = 0; for (let k = 0; k < b.numberOfChannels; k++) { const d = b.getChannelData(k); for (let j = 0; j < d.length; j++) { const a = Math.abs(d[j]); if (a > pk) pk = a; s += d[j] * d[j]; } }
+    return { ms: Math.round(ms), seg, msPorSeg: +(ms / seg).toFixed(1), eventos: i, picoDb: +(20 * Math.log10(pk || 1e-9)).toFixed(1), rmsDb: +(10 * Math.log10(s / (b.length * b.numberOfChannels) || 1e-12)).toFixed(1), roubos: M ? M.med.roubos : 0, fora: M ? M.med.fora : 0 }; }); }
+
+/* src/vozes.js: a saída das vozes gravadas (entra no limitador, junto com o resto) */
+function saidaFala(c) { return S.M && S.M.c === c ? S.M.fala : null; }
+/* src/musica.js: o barramento de música */
+function busMusica(c) { return S.M && S.M.c === c ? S.M.mus : null; }
+/* src/m5/sala-som.js: o ambiente da Sala também passa pelo limitador */
+function saidaSala(c) { return S.M && S.M.c === c ? S.M.fundo : null; }
+/* src/main.js: na partida, os botões da interface soam com o clique da Raça do jogador (um por toque, pela regra de intervalo do A.sfx) */
+if (typeof document !== 'undefined' && document.addEventListener) document.addEventListener('click', e => { if (!e.isTrusted || performance.now() - S.partidaT > 1500) return; const t = e.target, b = t && t.closest && t.closest('button, .act, .bcard'); const au = A();
+  if (!b || b.disabled || !au || b.id === 'btn-sound' || (b.closest && b.closest('[data-som-mix]'))) return; au.sfx('click', 0.55); }, true);
+ARD.som3d = { montar, tocar, quadro, medidas, zerar, volumes, saida, saidaFala, busMusica, saidaSala, bancada, falando: () => !!S.falando, ativo: () => !!S.M, pronto: () => S.pronto, CH, IRS, impulso, criar, _S: S };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Aether Rift: Dominion — 5.0f: trilha adaptativa gerada no navegador (Web Audio, nenhum arquivo de áudio).
+   Um tema por Raça (tom, modo, andamento, timbres e motivo próprios) e cinco camadas do mesmo laço de 4 compassos: paz, tensão, batalha, chefão
+   e cinema, mais dois finais (vitória e derrota). Cada camada é gravada uma vez num OfflineAudioContext (24 kHz; mono no celular e na Baixa),
+   com a cauda dobrada no começo (o laço emenda sem corte) e o volume médio nivelado; na partida as camadas tocam juntas, presas ao mesmo
+   relógio, e só os ganhos mudam: nenhum nó novo por nota nem por evento. A gravação começa depois da tela de carregamento, uma camada por vez.
+   O estado da partida escolhe a mistura (só leitura dos eventos que o renderizador já recebe):
+     calor = disparos e mortes que envolvem o jogador (cai pela metade em ~5 s); base = alerta de base ou Núcleo sob ataque, construção perdida;
+     era = a do jogador (a Era II e a III já trazem um pouco da tensão); chefão = muito calor com a Era III, o Núcleo atacado ou a superarma;
+     vitória e derrota = o fim da partida (o final da Raça e depois silêncio).
+   A música abaixa sob a fala (vozes gravadas e a do sistema: src/som3d.js) e tem liga/desliga e volume próprios (Ajustes).
+   Cenas (agente do cinema): ARD.musica.cena(nome, o) troca para a camada "cinema" da Raça (o.raca, ou a da partida, ou a da tela inicial):
+     nome = 'calma' | 'briefing' (cinema com um fundo de paz), 'tensa' (cinema com tensão), 'epica' (cinema com batalha), 'vitoria' | 'derrota'
+     (o final e o cinema baixo), 'abertura' (só o cinema), 'chefao' (+ chefão), 'superarma' (+ batalha), 'sala-guerra' (+ tensão);
+     nome desconhecido = nada muda; ARD.musica.cena(null) volta para a música do estado da partida. Devolve true.
+   Chaves de URL: ?musica=0 (sem música, nada é gravado), ?musica=<paz|tensao|batalha|chefao|cinema> (prende a camada, para comparar e gravar). */
+(function (ARD) {
+'use strict';
+const par = k => { try { return new URLSearchParams(location.search).get(k); } catch (e) { return null; } };
+const CHAVE = par('musica'); const LIGADA = CHAVE !== '0';
+const A = () => ARD.audio || null;
+const UA = () => (typeof navigator !== 'undefined' && navigator.userAgent) || '';
+const toque = () => { try { return /iPhone|iPad|iPod/.test(UA()) || (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches); } catch (e) { return false; } };
+const SR = 24000, CAUDA = 2.5;
+const CAMADAS = ['paz', 'tensao', 'batalha', 'chefao', 'cinema'], FINAIS = ['vitoria', 'derrota'];
+const MONO = ['tensao', 'chefao']; /* camadas quase sem imagem estéreo (baixo, tambores, zumbido): mono, metade da memória */
+const ALVO_DB = { paz: -27, tensao: -29, batalha: -24, chefao: -24, cinema: -25, vitoria: -22, derrota: -24 }; /* volume médio de cada camada sozinha (dBFS) */
+const hz = m => 440 * Math.pow(2, (m - 69) / 12);
+
+/* ---------- as Raças: tom, modo, andamento, progressão (graus por compasso), motivo (passo de 16 avos, grau, duração) e timbres ---------- */
+const RACAS = {
+  vehnar: { bpm: 96, tom: 38, escala: [0, 2, 3, 5, 7, 8, 10], prog: [0, 5, 3, 6], /* Ré menor eólio: i–VI–iv–VII, forja */
+    tema: [[0, 0, 3], [3, 2, 1], [4, 4, 4], [8, 3, 2], [10, 2, 2], [12, 0, 4], [16, 5, 6], [22, 4, 2], [24, 2, 8], [32, 3, 3], [35, 4, 1], [36, 5, 4], [40, 4, 2], [42, 3, 2], [44, 2, 4], [48, 6, 4], [52, 4, 4], [56, 1, 4], [60, 0, 4]],
+    pad: { tipo: 'sawtooth', det: 9, lp: 900, a: 0.5, v: 0.13 }, arp: { inst: 'pluck', tipo: 'square', lp: 1300, dec: 0.22 }, arpPadrao: [0, 3, 6, 8, 11, 14], baixo: { tipo: 'sawtooth', lp: 420 }, lead: { tipo: 'sawtooth', lp: 2000, v: 0.16 }, metal: 'bigorna', ost: [0, 0, 7, 0, 4, 0, 7, 4] },
+  erevane: { bpm: 84, tom: 40, escala: [0, 2, 3, 5, 7, 9, 10], prog: [0, 6, 3, 4], /* Mi dórico: i–VII–IV–v, gelo e vento */
+    tema: [[0, 4, 4], [4, 3, 2], [6, 2, 2], [8, 0, 8], [16, 1, 4], [20, 2, 4], [24, 4, 8], [32, 5, 4], [36, 4, 2], [38, 3, 2], [40, 2, 8], [48, 0, 4], [52, 1, 4], [56, -1, 8]],
+    pad: { tipo: 'triangle', det: 7, lp: 2600, a: 1.0, v: 0.16 }, arp: { inst: 'sino', dec: 1.2 }, arpPadrao: [0, 6, 10], baixo: { tipo: 'sine', lp: 600 }, lead: { tipo: 'sine', lp: 4000, v: 0.2, vib: 1 }, metal: 'vento', ost: [0, 7, 4, 7, 0, 7, 9, 7] },
+  tessara: { bpm: 90, tom: 45, escala: [0, 2, 3, 5, 7, 9, 10], prog: [0, 3, 5, 4], /* Lá dórico: madeira, bolhas, o que cresce */
+    tema: [[0, 0, 2], [2, 2, 2], [4, 4, 2], [6, 5, 2], [8, 4, 4], [12, 2, 4], [16, 3, 2], [18, 4, 2], [20, 5, 4], [24, 7, 4], [28, 5, 4], [32, 4, 2], [34, 2, 2], [36, 0, 4], [40, 2, 2], [42, 4, 2], [44, 3, 4], [48, 1, 2], [50, 2, 2], [52, 4, 4], [56, 0, 8]],
+    pad: { tipo: 'triangle', det: 12, lp: 1500, a: 0.7, v: 0.14 }, arp: { inst: 'marimba', dec: 0.5 }, arpPadrao: [0, 2, 4, 7, 9, 12, 14], baixo: { tipo: 'triangle', lp: 700 }, lead: { tipo: 'triangle', lp: 2600, v: 0.2 }, metal: 'bolha', ost: [0, 4, 0, 7, 0, 4, 9, 7] },
+  quorith: { bpm: 72, tom: 36, escala: [0, 2, 4, 6, 7, 9, 11], prog: [0, 1, 5, 4], /* Dó lídio: coro de cristal, sinos */
+    tema: [[0, 4, 6], [6, 5, 2], [8, 6, 8], [16, 7, 6], [22, 6, 2], [24, 4, 8], [32, 2, 6], [38, 3, 2], [40, 4, 8], [48, 5, 4], [52, 4, 4], [56, 0, 8]],
+    pad: { tipo: 'sine', det: 5, lp: 3500, a: 1.2, v: 0.22, coro: 1 }, arp: { inst: 'sino', dec: 1.6 }, arpPadrao: [0, 4, 8, 12], baixo: { tipo: 'sine', lp: 500 }, lead: { tipo: 'sine', lp: 5000, v: 0.2, vib: 1 }, metal: 'brilho', ost: [0, 4, 7, 11, 7, 4, 0, 4] },
+  vorag: { bpm: 110, tom: 37, escala: [0, 1, 3, 5, 7, 8, 10], prog: [0, 1, 0, 6], /* Dó# frígio: i–bII–i–bVII, enxame */
+    tema: [[0, 0, 2], [2, 0, 1], [3, 1, 3], [6, 0, 2], [8, 3, 4], [12, 1, 4], [16, 0, 2], [18, 0, 1], [19, 1, 3], [22, 4, 2], [24, 3, 8], [32, 0, 2], [34, 0, 1], [35, 1, 3], [38, 0, 2], [40, 6, 4], [44, 4, 4], [48, 3, 2], [50, 1, 2], [52, 0, 12]],
+    pad: { tipo: 'sawtooth', det: 18, lp: 520, a: 0.4, v: 0.13 }, arp: { inst: 'pluck', tipo: 'square', lp: 900, dec: 0.12 }, arpPadrao: [0, 2, 3, 6, 8, 10, 11, 14], baixo: { tipo: 'square', lp: 300 }, lead: { tipo: 'square', lp: 1300, v: 0.12 }, metal: 'enxame', ost: [0, 0, 1, 0, 0, 0, 7, 1] } };
+
+/* ---------- instrumentos (num contexto qualquer: aqui, sempre o OfflineAudioContext da gravação) ---------- */
+let RU = null; function ruido(c) { if (RU && RU.sampleRate === c.sampleRate) return RU; const n = c.sampleRate * 2, b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0); let s = 77; for (let i = 0; i < n; i++) { s = (s * 1103515245 + 12345) >>> 0; d[i] = s / 2147483648 - 1; } return (RU = b); }
+function painel(c, d, x) { if (!x || !c.createStereoPanner) return d; const p = c.createStereoPanner(); p.pan.value = x; p.connect(d); return p; }
+function ganho(c, d, t, a, pico, fim, rel) { const g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(0.0002, pico), t + a); g.gain.setValueAtTime(Math.max(0.0002, pico), Math.max(t + a, fim)); g.gain.exponentialRampToValueAtTime(0.0001, Math.max(t + a, fim) + rel); g.connect(d); return g; }
+function decai(c, d, t, pico, dec, a) { const g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(0.0002, pico), t + (a || 0.004)); g.gain.exponentialRampToValueAtTime(0.0001, t + (a || 0.004) + dec); g.connect(d); return g; }
+function osc(c, tipo, f, t, fim, d, det) { const o = c.createOscillator(); o.type = tipo; o.frequency.value = f; if (det) o.detune.value = det; o.connect(d); o.start(t); o.stop(fim); return o; }
+function fonteR(c, t, fim, d) { const s = c.createBufferSource(); s.buffer = ruido(c); s.loop = true; s.loopStart = (t * 7.3) % 1.5; s.connect(d); s.start(t, (t * 3.1) % 1.5); s.stop(fim); return s; }
+function filtro(c, tipo, f, q, d) { const b = c.createBiquadFilter(); b.type = tipo; b.frequency.value = f; b.Q.value = q || 0.7; b.connect(d); return b; }
+const INST = {
+  pad(c, d, t, dur, fs, o, v) { const rel = 1.2, ps = [-0.45, 0.45, -0.15, 0.15, 0];
+    fs.forEach((f, k) => { const g = ganho(c, painel(c, d, ps[k % ps.length]), t, o.a, (o.v * (v || 1)) / Math.sqrt(fs.length), t + dur, rel), lp = filtro(c, 'lowpass', o.lp * 0.55, 0.7, g); lp.frequency.setValueAtTime(o.lp * 0.55, t); lp.frequency.linearRampToValueAtTime(o.lp, t + Math.min(dur, o.a * 2 + 0.5));
+      const dst = o.coro ? (() => { const b1 = filtro(c, 'bandpass', 720, 3, lp), b2 = filtro(c, 'bandpass', 1180, 4, lp), m = c.createGain(); m.gain.value = 2.2; m.connect(b1); m.connect(b2); return m; })() : lp;
+      const tipo = o.coro ? 'sawtooth' : o.tipo; osc(c, tipo, f, t, t + dur + rel + 0.1, dst, -o.det); osc(c, tipo, f, t, t + dur + rel + 0.1, dst, o.det); if (o.coro) osc(c, 'sine', f, t, t + dur + rel + 0.1, lp, 0); }); },
+  pluck(c, d, t, f, v, o, x) { const g = decai(c, painel(c, d, x), t, v * 0.22, o.dec), lp = filtro(c, 'lowpass', o.lp * 4, 1.2, g); lp.frequency.setValueAtTime(o.lp * 4, t); lp.frequency.exponentialRampToValueAtTime(o.lp, t + 0.12); osc(c, o.tipo || 'square', f, t, t + o.dec + 0.1, lp); },
+  sino(c, d, t, f, v, o, x) { const p = painel(c, d, x); [[1, 1, 0.22], [2.76, 0.5, 0.09], [5.4, 0.3, 0.04]].forEach(([m, dk, a]) => { if (f * m < SR / 2 - 500) osc(c, 'sine', f * m, t, t + o.dec * dk + 0.1, decai(c, p, t, v * a, o.dec * dk)); }); },
+  marimba(c, d, t, f, v, o, x) { const p = painel(c, d, x); osc(c, 'sine', f, t, t + o.dec + 0.1, decai(c, p, t, v * 0.26, o.dec)); osc(c, 'sine', f * 4, t, t + 0.12, decai(c, p, t, v * 0.06, 0.06)); osc(c, 'triangle', f * 2, t, t + 0.3, decai(c, p, t, v * 0.05, 0.2)); },
+  baixo(c, d, t, f, dur, v, o) { const g = ganho(c, d, t, 0.006, v * 0.3, t + dur * 0.92, 0.08), lp = filtro(c, 'lowpass', o.lp * 2.4, 2, g); lp.frequency.setValueAtTime(o.lp * 2.4, t); lp.frequency.exponentialRampToValueAtTime(o.lp, t + 0.12); osc(c, o.tipo, f, t, t + dur + 0.2, lp); osc(c, 'sine', f, t, t + dur + 0.2, g); },
+  bumbo(c, d, t, v) { const g = decai(c, d, t, v * 0.9, 0.42, 0.002); const o = osc(c, 'sine', 150, t, t + 0.5, g); o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.16); fonteR(c, t, t + 0.02, decai(c, filtro(c, 'highpass', 3000, 0.7, d), t, v * 0.15, 0.012, 0.001)); },
+  caixa(c, d, t, v) { fonteR(c, t, t + 0.25, filtro(c, 'bandpass', 1900, 0.8, decai(c, d, t, v * 0.55, 0.17, 0.002))); osc(c, 'triangle', 185, t, t + 0.15, decai(c, d, t, v * 0.3, 0.09, 0.002)); },
+  chimbal(c, d, t, v, aberto, x) { fonteR(c, t, t + (aberto ? 0.3 : 0.06), filtro(c, 'highpass', 7200, 0.7, decai(c, painel(c, d, x), t, v * 0.16, aberto ? 0.22 : 0.035, 0.001))); },
+  tambor(c, d, t, f, v) { const g = decai(c, d, t, v * 0.85, 0.55, 0.003); const o = osc(c, 'sine', f * 1.6, t, t + 0.65, g); o.frequency.setValueAtTime(f * 1.6, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.08); fonteR(c, t, t + 0.12, filtro(c, 'lowpass', 700, 0.7, decai(c, d, t, v * 0.35, 0.07, 0.002))); },
+  bigorna(c, d, t, v, x) { const p = painel(c, d, x); fonteR(c, t, t + 0.3, filtro(c, 'bandpass', 2600, 10, decai(c, p, t, v * 0.9, 0.22, 0.001))); [[1250, 0.4, 0.07], [1960, 0.25, 0.05], [3110, 0.15, 0.03]].forEach(([f, dk, a]) => osc(c, 'sine', f, t, t + dk + 0.1, decai(c, p, t, v * a, dk, 0.001))); },
+  lead(c, d, t, f, dur, v, o) { const g = ganho(c, d, t, 0.03, v * o.v, t + dur * 0.95, 0.16), lp = filtro(c, 'lowpass', o.lp, 1, g); const s = osc(c, o.tipo, f, t, t + dur + 0.3, lp), s2 = osc(c, o.tipo, f, t, t + dur + 0.3, lp, 7);
+    if (o.vib || dur > 0.4) { const l = c.createOscillator(), lg = c.createGain(); l.frequency.value = 5.4; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(14, t + Math.min(0.5, dur)); l.connect(lg); lg.connect(s.detune); lg.connect(s2.detune); l.start(t); l.stop(t + dur + 0.3); } },
+  drone(c, d, t, dur, f, v, lp0) { const g = ganho(c, d, t, 1.2, v * 0.2, t + dur, 1.5), lp = filtro(c, 'lowpass', lp0, 1.5, g); lp.frequency.setValueAtTime(lp0, t); lp.frequency.linearRampToValueAtTime(lp0 * 2.2, t + dur * 0.5); lp.frequency.linearRampToValueAtTime(lp0, t + dur); osc(c, 'sawtooth', f, t, t + dur + 1.6, lp, -6); osc(c, 'sawtooth', f, t, t + dur + 1.6, lp, 6); },
+  enxame(c, d, t, dur, v) { const g = ganho(c, d, t, 0.8, v * 0.3, t + dur, 0.8), am = c.createGain(); am.gain.value = 0.5; am.connect(g); const l = c.createOscillator(), lg = c.createGain(); l.type = 'square'; l.frequency.value = 17; lg.gain.value = 0.45; l.connect(lg); lg.connect(am.gain); l.start(t); l.stop(t + dur + 1); fonteR(c, t, t + dur + 1, filtro(c, 'bandpass', 2600, 3, am)); },
+  bolha(c, d, t, f, v, x) { const o = osc(c, 'sine', f, t, t + 0.12, decai(c, painel(c, d, x), t, v * 0.16, 0.09)); o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * 2.2, t + 0.07); },
+  madeira(c, d, t, f, v, x) { const p = painel(c, d, x); osc(c, 'sine', f, t, t + 0.1, decai(c, p, t, v * 0.25, 0.05, 0.001)); osc(c, 'sine', f * 2.4, t, t + 0.06, decai(c, p, t, v * 0.1, 0.03, 0.001)); },
+  vento(c, d, t, dur, v) { const g = ganho(c, d, t, dur * 0.4, v * 0.5, t + dur * 0.6, dur * 0.4), bp = filtro(c, 'bandpass', 500, 1.2, g); bp.frequency.setValueAtTime(500, t); bp.frequency.linearRampToValueAtTime(1400, t + dur * 0.5); bp.frequency.linearRampToValueAtTime(600, t + dur); fonteR(c, t, t + dur + 0.1, bp); },
+  brilho(c, d, t, dur, v) { fonteR(c, t, t + dur + 0.2, filtro(c, 'highpass', 8000, 0.7, ganho(c, d, t, dur * 0.3, v * 0.06, t + dur * 0.5, dur * 0.5))); },
+  gongo(c, d, t, f, v) { [[1, 1, 0.2], [1.48, 0.7, 0.1], [2.11, 0.5, 0.07], [1.003, 1, 0.15]].forEach(([m, dk, a]) => osc(c, 'sine', f * m, t, t + 3.2 * dk + 0.1, decai(c, d, t, v * a, 3.2 * dk, 0.01))); },
+  timpano(c, d, t, f, v) { const g = decai(c, d, t, v * 0.6, 0.9, 0.004); const o = osc(c, 'sine', f * 1.15, t, t + 1, g); o.frequency.setValueAtTime(f * 1.15, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.1); fonteR(c, t, t + 0.1, filtro(c, 'lowpass', 300, 0.7, decai(c, d, t, v * 0.3, 0.08))); } };
+
+/* ---------- composição de cada camada ---------- */
+function rng(s) { return () => { s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function compor(c, d, nome, camada, R, I) { /* I = os instrumentos (aqui, o gravador de chamadas: os nós nascem depois, em fatias) */
+  const spb = 60 / R.bpm, st = spb / 4, bar = spb * 4, rnd = rng(nome.length * 131 + camada.length * 17 + R.bpm);
+  const mi = (g, o) => R.tom + 12 * o + R.escala[((g % 7) + 7) % 7] + 12 * Math.floor(g / 7), f = (g, o) => hz(mi(g, o));
+  const tri = (g, o) => [f(g, o), f(g + 2, o), f(g + 4, o)];
+  const ataque = (inst, t, fr, v, x) => { const o = R.arp; if (inst === 'sino') I.sino(c, d, t, fr, v, o, x); else if (inst === 'marimba') I.marimba(c, d, t, fr, v, o, x); else I.pluck(c, d, t, fr, v, o, x); };
+  const metal = (t, v, x) => { const m = R.metal; if (m === 'bigorna') I.bigorna(c, d, t, v, x); else if (m === 'bolha') I.bolha(c, d, t, 500 + rnd() * 700, v, x); else if (m === 'enxame') I.chimbal(c, d, t, v * 0.8, false, x); else if (m === 'brilho') I.sino(c, d, t, f(4, 4), v * 0.4, { dec: 0.8 }, x); else I.chimbal(c, d, t, v * 0.6, false, x); };
+  const tema = (oit, vel, timbre, esticar) => { for (const [s, g, n] of R.tema) { const t = s * st * (esticar || 1), dur = n * st * (esticar || 1); if (t >= 16 * spb) continue; if (timbre === 'lead') I.lead(c, d, t, f(g, oit), dur, vel, R.lead); else ataque(timbre, t, f(g, oit), vel, 0); } };
+  if (camada === 'paz') {
+    for (let b = 0; b < 4; b++) { const g = R.prog[b], t = b * bar; I.pad(c, d, t, bar, tri(g, 1), R.pad); I.baixo(c, d, t, f(g, 0), spb * 2, 0.45, R.baixo);
+      const ch = [g, g + 2, g + 4, g + 7, g + 9]; R.arpPadrao.forEach((s, k) => { if (rnd() < 0.18) return; ataque(R.arp.inst, t + s * st, f(ch[k % ch.length], 2 + (k % 3 === 2 ? 1 : 0)), 0.42 + rnd() * 0.18, (k % 2 ? 0.35 : -0.35)); }); }
+    if (R.metal === 'bigorna') { I.bigorna(c, d, bar + 2 * spb, 0.2, 0.5); I.bigorna(c, d, 3 * bar + 2 * spb, 0.16, -0.5); }
+    else if (R.metal === 'vento') { I.vento(c, d, 0, bar * 2, 0.5); I.vento(c, d, bar * 2, bar * 2, 0.45); }
+    else if (R.metal === 'bolha') { for (let k = 0; k < 7; k++) I.bolha(c, d, rnd() * 16 * spb, 400 + rnd() * 900, 0.5, rnd() * 1.4 - 0.7); }
+    else if (R.metal === 'brilho') { for (let b = 0; b < 4; b++) I.brilho(c, d, b * bar, bar, 1); }
+    else if (R.metal === 'enxame') I.enxame(c, d, 0, 16 * spb, 0.25);
+  } else if (camada === 'tensao') {
+    for (let b = 0; b < 4; b++) { const g = R.prog[b], t = b * bar; for (let k = 0; k < 8; k++) { const sm = R.ost[k]; const m = R.tom + R.escala[((g % 7) + 7) % 7] + sm + (k === 7 ? 12 : 0); I.baixo(c, d, t + k * 2 * st, hz(m), st * 1.7, k % 4 === 0 ? 0.55 : 0.4, R.baixo); }
+      for (let k = 0; k < 8; k++) metal(t + (k * 2 + 1) * st, k % 2 ? 0.35 : 0.22, k % 2 ? 0.4 : -0.4); I.tambor(c, d, t, hz(R.tom), 0.35);
+      I.lead(c, d, t, f(g + 4, 3), bar * 0.95, 0.35, Object.assign({}, R.lead, { lp: R.lead.lp * 0.6, vib: 1 })); }
+  } else if (camada === 'batalha') {
+    const bum = R.metal === 'enxame' ? [0, 4, 8, 12] : [0, 6, 8, 10];
+    for (let b = 0; b < 4; b++) { const g = R.prog[b], t = b * bar; for (const s of bum) I.bumbo(c, d, t + s * st, s ? 0.75 : 0.9); I.caixa(c, d, t + 4 * st, 0.7); I.caixa(c, d, t + 12 * st, 0.75); if (b === 3) { I.caixa(c, d, t + 14 * st, 0.4); I.caixa(c, d, t + 15 * st, 0.5); }
+      for (let k = 0; k < 16; k++) I.chimbal(c, d, t + k * st, k % 4 === 2 ? 0.75 : k % 2 ? 0.35 : 0.55, k === 14, (k % 2 ? 0.3 : -0.3));
+      for (let k = 0; k < 8; k++) I.baixo(c, d, t + k * 2 * st, f(g + (k === 3 || k === 6 ? 4 : 0), k % 2 ? 1 : 0), st * 1.6, 0.6, R.baixo);
+      I.pad(c, d, t, st * 1.5, tri(g, 2), Object.assign({}, R.pad, { a: 0.01, v: R.pad.v * 1.4 })); I.pad(c, d, t + 10 * st, st * 1.5, tri(g, 2), Object.assign({}, R.pad, { a: 0.01, v: R.pad.v * 1.2 }));
+      if (R.metal === 'bigorna' && b % 2) I.bigorna(c, d, t + 12 * st, 0.4, 0.3); }
+    tema(2, 1, 'lead');
+  } else if (camada === 'chefao') {
+    I.drone(c, d, 0, 16 * spb, hz(R.tom - 12), 1, 160); I.drone(c, d, 0, 16 * spb, hz(R.tom - 6), 0.6, 140);
+    for (let b = 0; b < 4; b++) { const g = R.prog[b], t = b * bar; for (const s of [0, 3, 8, 11, 14]) I.tambor(c, d, t + s * st, 52, s === 0 ? 1 : 0.7); for (const s of [6, 12]) I.tambor(c, d, t + s * st, 88, 0.55);
+      I.pad(c, d, t, bar, [f(g, 1), f(g + 1, 1), f(g + 4, 1)], Object.assign({}, R.pad, { coro: 1, lp: 2400, a: 0.4, v: 0.2 })); if (b % 2 === 0) I.gongo(c, d, t, hz(R.tom), 0.6);
+      for (let k = 0; k < 4; k++) I.baixo(c, d, t + k * 4 * st, f(g, 0), st * 3.5, 0.55, R.baixo); }
+    tema(1, 1, 'lead');
+  } else if (camada === 'cinema') {
+    I.gongo(c, d, 0, hz(R.tom + 12), 0.5); I.pad(c, d, 0, bar * 2, tri(R.prog[0], 1).concat([f(R.prog[0], 0)]), Object.assign({}, R.pad, { a: 1.6, v: R.pad.v * 1.3 })); I.pad(c, d, bar * 2, bar * 2, tri(R.prog[2], 1).concat([f(R.prog[2], 0)]), Object.assign({}, R.pad, { a: 1.6, v: R.pad.v * 1.3 }));
+    I.baixo(c, d, 0, f(R.prog[0], 0), bar * 2, 0.4, R.baixo); I.baixo(c, d, bar * 2, f(R.prog[2], 0), bar * 2, 0.4, R.baixo);
+    tema(2, 0.7, R.arp.inst === 'pluck' ? 'lead' : R.arp.inst);
+    for (let k = 0; k < 8; k++) I.timpano(c, d, 3 * bar + 2 * spb + k * st, hz(R.tom), 0.12 + k * 0.06);
+  } else if (camada === 'vitoria') {
+    const g6 = R.prog[1], g7 = R.prog[3]; I.pad(c, d, 0, spb, tri(g6, 1), Object.assign({}, R.pad, { a: 0.05 })); I.pad(c, d, spb, spb, tri(g7, 1), Object.assign({}, R.pad, { a: 0.05 }));
+    const raiz = R.tom + 12, maj = [raiz, raiz + 4, raiz + 7, raiz + 12].map(hz); I.pad(c, d, spb * 2, spb * 4, maj, Object.assign({}, R.pad, { a: 0.08, v: R.pad.v * 1.4 })); I.gongo(c, d, spb * 2, hz(R.tom + 12), 0.7);
+    maj.concat([hz(raiz + 16), hz(raiz + 19)]).forEach((fr, k) => ataque(R.arp.inst === 'pluck' ? 'sino' : R.arp.inst, spb * 2 + k * st, fr * 2, 0.6, (k % 2 ? 0.3 : -0.3))); I.baixo(c, d, spb * 2, hz(R.tom), spb * 4, 0.55, R.baixo); I.timpano(c, d, spb * 2, hz(R.tom), 0.6);
+  } else if (camada === 'derrota') {
+    I.pad(c, d, 0, spb * 2, tri(0, 1), Object.assign({}, R.pad, { a: 0.3 })); I.pad(c, d, spb * 2, spb * 4, [f(3, 0), f(5, 0), f(0, 1)], Object.assign({}, R.pad, { a: 0.6, lp: R.pad.lp * 0.6 }));
+    I.drone(c, d, 0, spb * 6, hz(R.tom - 12), 0.8, 120); [4, 3, 2, 0].forEach((g, k) => I.lead(c, d, k * spb, f(g, 2), spb * 0.95, 0.6, Object.assign({}, R.lead, { lp: R.lead.lp * 0.5 }))); I.tambor(c, d, 0, 50, 0.6); I.tambor(c, d, spb * 2, 46, 0.5); I.gongo(c, d, spb * 4, hz(R.tom - 12), 0.5);
+  } }
+const DUR_FINAL = { vitoria: 5.5, derrota: 6.5 };
+function tamanho(raca, camada) { const R = RACAS[raca]; return FINAIS.indexOf(camada) >= 0 ? DUR_FINAL[camada] : 16 * 60 / R.bpm; }
+/* grava uma camada: { buf: AudioBuffer, ms (relógio), montaMs (fio principal), pico, rms } */
+function renderizar(raca, camada, o) { o = o || {}; const R = RACAS[raca] || RACAS.vehnar, OC = window.OfflineAudioContext || window.webkitOfflineAudioContext; if (!OC) return Promise.reject(new Error('sem OfflineAudioContext'));
+  const laco = FINAIS.indexOf(camada) < 0, L = tamanho(raca, camada), ch = o.mono ? 1 : 2, n = Math.ceil((L + CAUDA) * SR);
+  const t0 = performance.now(); const c = new OC(ch, n, SR); const bus = c.createGain(); bus.connect(c.destination);
+  const lista = [], X = {}; for (const k in INST) X[k] = function () { lista.push([k, arguments]); }; compor(c, bus, raca, camada, R, X); let montaMs = performance.now() - t0, maxFatia = montaMs;
+  /* os nós de cada nota nascem em fatias de até ~4 ms (fora do jogo, tudo de uma vez): a gravação não trava o quadro */
+  const monta = () => new Promise(ok => { let i = 0; const passo = () => { const a = performance.now(); while (i < lista.length && (!o.fatias || performance.now() - a < 4)) { const [k, args] = lista[i++]; INST[k].apply(null, args); } const d = performance.now() - a; montaMs += d; if (d > maxFatia) maxFatia = d;
+      if (i < lista.length) { if (typeof requestIdleCallback === 'function') requestIdleCallback(passo, { timeout: 200 }); else setTimeout(passo, 16); } else ok(); }; passo(); });
+  const fim = b => { const nL = laco ? Math.round(L * SR) : n, nC = Math.min(n - nL, Math.round(CAUDA * SR)), out = c.createBuffer(ch, nL, SR); let pk = 0, s = 0;
+    for (let k = 0; k < ch; k++) { const src = b.getChannelData(k), dst = out.getChannelData(k); for (let i = 0; i < nL; i++) dst[i] = src[i]; if (laco) for (let i = 0; i < nC; i++) dst[i] += src[nL + i]; /* a cauda volta no começo: o laço emenda */
+      for (let i = 0; i < nL; i++) { const a = Math.abs(dst[i]); if (a > pk) pk = a; s += dst[i] * dst[i]; } }
+    const rms = Math.sqrt(s / (nL * ch)) || 1e-9; let g = Math.pow(10, (ALVO_DB[camada] || -26) / 20) / rms; if (pk * g > 0.708) g = 0.708 / pk; /* volume médio nivelado e pico no máximo em −3 dBFS */
+    for (let k = 0; k < ch; k++) { const dst = out.getChannelData(k); for (let i = 0; i < nL; i++) dst[i] *= g; }
+    return { buf: out, ms: Math.round(performance.now() - t0), montaMs: +montaMs.toFixed(1), maxFatiaMs: +maxFatia.toFixed(1), notas: lista.length, picoDb: +(20 * Math.log10(pk * g)).toFixed(1), rmsDb: +(20 * Math.log10(rms * g)).toFixed(1), seg: +(nL / SR).toFixed(2), bytes: nL * ch * 4 }; };
+  return monta().then(() => { const pr = c.startRendering(); return pr && pr.then ? pr.then(fim) : new Promise(ok => { c.oncomplete = e => ok(fim(e.renderedBuffer)); }); }); }
+
+/* ---------- o tocador: um "deck" por Raça (camadas presas ao mesmo relógio, um ganho por camada) ---------- */
+const P = { modo: null, deck: null, velhos: [], cache: {}, fila: [], gravando: false, med: { gravacoes: [], ms: 0 }, calor: 0, calorT: 0, baseT: -1e9, nucleoT: -1e9, superT: -1e9, nivel: 0, quer: 0, querT: 0, era: 1, fim: null, cena: null, ultimoQ: -1e9, raca: null, nq: 0, tela: false };
+const leve = () => toque() || (P.R && P.R.quality && P.R.quality.name === 'baixa');
+const agora = () => performance.now();
+function bus(c) { const s3 = ARD.som3d; const b = s3 && s3.busMusica && s3.busMusica(c); if (b) return b; if (!P.bus0 || P.bus0.context !== c) { P.bus0 = c.createGain(); P.bus0.connect(c.destination); } const au = A(); P.bus0.gain.value = au && au.musica !== false ? 0.9 * au.volMusica : 0; return P.bus0; }
+function novoDeck(raca, modo) { const au = A(), c = au.ctx; const d = { raca, modo, c, saida: c.createGain(), cam: {}, t0: null, L: tamanho(raca, 'paz') }; d.saida.gain.value = 0; d.saida.connect(bus(c)); d.saida.gain.setTargetAtTime(modo === 'menu' ? 0.6 : 1, c.currentTime, 0.6); return d; }
+function soltarDeck(d, tau) { if (!d) return; const t = d.c.currentTime; try { d.saida.gain.cancelScheduledValues(t); d.saida.gain.setTargetAtTime(0, t, tau || 0.5); } catch (e) {} P.velhos.push(d); setTimeout(() => { for (const k in d.cam) { const x = d.cam[k]; if (x.src) try { x.src.stop(); } catch (e) {} try { x.g.disconnect(); } catch (e) {} } try { d.saida.disconnect(); } catch (e) {} const i = P.velhos.indexOf(d); if (i >= 0) P.velhos.splice(i, 1); }, (tau || 0.5) * 5000 + 200); }
+/* põe a camada pronta para tocar no deck (presa ao relógio do deck: entra no ponto certo do laço) */
+function ligaCamada(d, camada, buf) { if (d.cam[camada] && d.cam[camada].src) return; const c = d.c, x = d.cam[camada] || (d.cam[camada] = { g: c.createGain(), alvo: 0 }); if (!x.g.__lig) { x.g.gain.value = 0; x.g.connect(d.saida); x.g.__lig = 1; }
+  const s = c.createBufferSource(); s.buffer = buf; s.loop = true; const t = c.currentTime + 0.06; if (d.t0 == null) d.t0 = t; const off = ((t - d.t0) % buf.duration + buf.duration) % buf.duration; s.connect(x.g); s.start(t, off); x.src = s; x.g.gain.setTargetAtTime(x.alvo, t, 0.4); }
+function tocaFinal(d, camada, buf) { const c = d.c, s = c.createBufferSource(), g = c.createGain(); g.gain.value = 1; s.buffer = buf; s.connect(g); g.connect(d.saida); s.start(c.currentTime + 0.05); s.onended = () => { try { g.disconnect(); } catch (e) {} }; }
+/* fila de gravação: uma camada por vez, em tempo livre e nunca na tela de carregamento */
+const carregando = () => { const el = typeof document !== 'undefined' && document.getElementById('loading'); return !!(el && !el.hidden); };
+function pede(raca, camada, cb) { const k = raca + '|' + camada + (leve() || MONO.indexOf(camada) >= 0 ? '|m' : ''); const ja = P.cache[k]; if (ja) { cb(ja.buf); return; } const f = P.fila.find(x => x.k === k) || (P.atual && P.atual.k === k ? P.atual : null); if (f) { f.cbs.push(cb); return; } /* também a que está gravando agora */ P.fila.push({ k, raca, camada, cbs: [cb] }); bomba(); }
+function bomba() { if (P.gravando || !P.fila.length) return; const au = A(), c = au && au.ctx; if (!c || c.state !== 'running') { P.rodandoT = 0; setTimeout(bomba, 500); return; } if (!P.rodandoT) P.rodandoT = agora(); if (carregando() || agora() - P.rodandoT < 1200) { setTimeout(bomba, 500); return; } /* nunca na carga; só com o contexto tocando há 1,2 s (o desbloqueio do toque vem antes) */ P.gravando = true; const ocioso = f => typeof requestIdleCallback === 'function' ? requestIdleCallback(f, { timeout: 800 }) : setTimeout(f, 30);
+  ocioso(() => { const it = P.atual = P.fila.shift(); if (!it) { P.gravando = false; return; } renderizar(it.raca, it.camada, { mono: leve() || MONO.indexOf(it.camada) >= 0, fatias: true }).then(r => { P.cache[it.k] = r; P.med.gravacoes.push({ raca: it.raca, camada: it.camada, ms: r.ms, montaMs: r.montaMs, maxFatiaMs: r.maxFatiaMs, notas: r.notas, seg: r.seg, kb: Math.round(r.bytes / 1024), picoDb: r.picoDb, rmsDb: r.rmsDb }); P.med.ms += r.montaMs; it.cbs.forEach(cb => { try { cb(r.buf); } catch (e) {} }); },
+    e => console.warn('[ARD] música: ' + (e && e.message))).then(() => { P.gravando = false; P.atual = null; setTimeout(bomba, 60); }); }); }
+function limpaCache(manter) { for (const k in P.cache) if (manter.indexOf(k.split('|')[0]) < 0) delete P.cache[k]; } /* memória: só as Raças em uso */
+
+/* ---------- mistura pelo estado ---------- */
+const MIX = [{ paz: 1, tensao: 0, batalha: 0, chefao: 0 }, { paz: 0.75, tensao: 1, batalha: 0, chefao: 0 }, { paz: 0.3, tensao: 0.8, batalha: 1, chefao: 0 }, { paz: 0, tensao: 0.5, batalha: 0.9, chefao: 1 }];
+const CENA = { abertura: { cinema: 1 }, chefao: { cinema: 1, chefao: 0.5 }, superarma: { cinema: 1, batalha: 0.4 }, 'sala-guerra': { cinema: 1, tensao: 0.4 } /* 5.0f: os nomes do f-cinema */, calma: { cinema: 1, paz: 0.3 }, briefing: { cinema: 1, paz: 0.3 }, tensa: { cinema: 1, tensao: 0.5 }, epica: { cinema: 1, batalha: 0.45 }, vitoria: { cinema: 0.6 }, derrota: { cinema: 0.6 } };
+function alvos() { const d = P.deck; if (!d) return null; let m; if (P.cena) m = CENA[P.cena] || { cinema: 1 }; else if (P.fim) m = {}; else if (CAMADAS.indexOf(CHAVE) >= 0) m = { [CHAVE]: 1 }; else if (d.modo === 'menu') m = { paz: 1 };
+  else { m = Object.assign({}, MIX[P.nivel]); if (P.nivel === 0 && P.era >= 2) m.tensao = P.era >= 3 ? 0.4 : 0.25; } return m; }
+function aplica(tau) { const d = P.deck; if (!d) return; const m = alvos() || {}, t = d.c.currentTime; for (const k of CAMADAS) { const v = m[k] || 0; const x = d.cam[k]; if (x) { if (x.alvo !== v) { x.alvo = v; x.g.gain.setTargetAtTime(v, t, tau || 0.8); } } else if (v > 0) garante(d, k); } }
+function garante(d, camada) { if (d.cam[camada] || (d.pedidas && d.pedidas[camada])) return; (d.pedidas = d.pedidas || {})[camada] = 1; pede(d.raca, camada, buf => { if (P.deck !== d && P.velhos.indexOf(d) < 0) return; const m = alvos() || {}; d.cam[camada] = d.cam[camada] || { g: d.c.createGain(), alvo: 0 }; d.cam[camada].alvo = (P.deck === d ? m[camada] : 0) || 0; ligaCamada(d, camada, buf); }); }
+/* calor e base: eventos da simulação (src/render3d.js, R.onEvents) */
+function eventos(evs, sim, human) { if (!P.deck || P.deck.modo !== 'partida' || !evs) return; const now = agora();
+  for (const e of evs) { switch (e.t) {
+    case 'shot': if (e.owner === human) P.calor += 0.35; else if (e.tid != null && sim && sim.byId) { const tg = sim.byId.get(e.tid); if (tg && tg.owner === human) P.calor += 0.5; } break;
+    case 'death': if (e.owner === human) { P.calor += e.kind === 'building' ? 4 : 1.2; if (e.kind === 'building') P.baseT = now; } else P.calor += 0.4; break;
+    case 'alert': if (e.p === human && e.kind === 'danger') { const tx = String(e.text || ''); if (/BASE SOB|NÚCLEO SOB|SIFÃO/i.test(tx)) { P.baseT = now; if (/NÚCLEO/i.test(tx)) P.nucleoT = now; } } break;
+    case 'super': P.superT = now; P.calor += 6; break;
+    case 'end': fimPartida(sim, human, e.result); break; } } }
+function estado(sim, human) { if (P.forcado) return; const now = agora(), dt = Math.min(2, (now - (P.calorT || now)) / 1000); P.calorT = now; P.calor *= Math.exp(-dt / 7); const p = sim && sim.players && sim.players[human]; P.era = (p && p.era) || 1;
+  let n = 0; const base = now - P.baseT < 25000; if (P.calor > 1.5 || base) n = 1; if (P.calor > 8 || (now - P.baseT < 15000 && P.calor > 3)) n = 2; if (P.calor > 22 && (P.era >= 3 || now - P.nucleoT < 20000 || now - P.superT < 30000)) n = 3;
+  if (n !== P.quer) { P.quer = n; P.querT = now; } const espera = n > P.nivel ? 700 : 9000; if (n !== P.nivel && now - P.querT > espera) { P.nivel = n; aplica(n > 0 ? 0.5 : 2.2); } }
+function fimPartida(sim, human, res) { if (P.fim) return; const o = res && res.outcome; const v = o === 'victory' || (o === 'over' && res.scores && res.scores[0] && res.scores.slice().sort((a, b) => b.score - a.score)[0].id === human); P.fim = v ? 'vitoria' : 'derrota'; const d = P.deck; aplica(1.2); if (d) pede(d.raca, P.fim, buf => { if (P.deck === d) tocaFinal(d, P.fim, buf); }); }
+
+/* ---------- partida, tela inicial e cenas ---------- */
+function partida(raca, sim) { const au = A(); if (!au || !au.ctx || !LIGADA) return; if (P.deck && P.deck.modo === 'partida' && P.deck.raca === raca && (!sim || P.sim === sim)) return; P.sim = sim || P.sim; const velho = P.deck; P.deck = novoDeck(raca, 'partida'); soltarDeck(velho, 0.6); P.modo = 'partida'; P.raca = raca;
+  P.calor = 0; P.calorT = agora(); P.baseT = P.nucleoT = P.superT = -1e9; P.nivel = 0; P.quer = 0; P.fim = null; limpaCache([raca]);
+  if (au.musica === false) return; aplica(1.5); for (const k of CAMADAS) garante(P.deck, k); }
+function menu(raca) { const au = A(); if (!au || !au.ctx || !LIGADA || au.musica === false) return; if (P.deck && P.deck.modo === 'menu' && P.deck.raca === raca) return; const velho = P.deck; P.deck = novoDeck(raca, 'menu'); soltarDeck(velho, 0.8); P.modo = 'menu'; P.raca = raca; P.fim = null;
+  const manter = [raca]; if (velho) manter.push(velho.raca); limpaCache(manter); aplica(1); garante(P.deck, 'paz'); }
+function parar(tau) { soltarDeck(P.deck, tau || 0.8); P.deck = null; P.modo = null; }
+function cena(nome, o) { o = o || {}; if (nome && !CENA[nome]) return true; /* nome desconhecido: nada muda */ P.cena = nome || null; const au = A(); if (!LIGADA || !au) return true;
+  if (nome && !P.deck && au.ctx && au.musica !== false) { const r = o.raca || P.raca || (document.documentElement.dataset.race) || 'vehnar'; P.deck = novoDeck(r, 'menu'); P.modo = 'menu'; P.raca = r; }
+  const d = P.deck; if (!d) return true; if (nome && (nome === 'vitoria' || nome === 'derrota')) pede(d.raca, nome, buf => { if (P.deck === d && P.cena === nome) tocaFinal(d, nome, buf); });
+  aplica(nome ? 1.2 : 1.6); if (nome) garante(d, 'cinema'); return true; }
+/* quadro (src/som3d.js): o estado a cada 0,25 s */
+function quadro(sim, human, R) { if (!LIGADA) return; P.R = R; P.ultimoQ = agora(); if (R && R.warming) return; const au = A(); if (!au || !au.ctx) return;
+  if (!P.deck || P.deck.modo !== 'partida' || P.sim !== sim) { const p = sim && sim.players && sim.players[human]; if (p && p.faction && au.musica !== false && !carregando()) partida(p.faction, sim); return; }
+  const t = agora(); if (t - (P.estT || 0) > 250) { P.estT = t; estado(sim, human); } } /* a cada 0,25 s pelo relógio */
+/* Ajustes: liga/desliga e volume (o volume já mudou no barramento do src/som3d.js) */
+function ajustes() { const au = A(); if (!au) return; if (P.bus0 && au.ctx) try { P.bus0.gain.setTargetAtTime(au.musica !== false ? 0.9 * au.volMusica : 0, au.ctx.currentTime, 0.05); } catch (e) {}
+  if (au.musica === false) { if (P.deck) parar(0.4); } else if (!P.deck) { if (agora() - P.ultimoQ < 2000 && P.R && P.R.sim) { const h = P.R.humanId != null ? P.R.humanId : 0, p = P.R.sim.players && P.R.sim.players[h]; if (p) partida(p.faction, P.R.sim); } else telaInicial(); } }
+const naTela = () => { const st = typeof document !== 'undefined' && document.getElementById('start'); return !!(st && !st.hidden); };
+function telaInicial() { const au = A(); if (!au || !au.ctx || !naTela()) return; menu(document.documentElement.dataset.race || 'vehnar'); }
+/* vigia (1 s): a partida acabou e voltou a tela inicial; a Raça em destaque mudou */
+let vigia = null; function vigiar() { if (vigia || typeof setInterval !== 'function') return; vigia = setInterval(() => { if (!LIGADA) return; const au = A(); if (!au || !au.ctx) return;
+  if (P.modo === 'partida' && (naTela() || agora() - P.ultimoQ > 20000)) { parar(0.8); } /* voltou para a tela inicial (ou a partida sumiu) */ if (!P.deck && naTela() && au.musica !== false && P.tela) telaInicial();
+  else if (P.deck && P.deck.modo === 'menu' && naTela() && !P.cena) { const r = document.documentElement.dataset.race; if (r && r !== P.deck.raca) menu(r); } }, 1000); }
+/* aba escondida: a música some (a partida pausa sozinha) e volta junto com a página */
+if (typeof document !== 'undefined' && document.addEventListener) document.addEventListener('visibilitychange', () => { const d = P.deck; if (!d) return; const t = d.c.currentTime; try { d.saida.gain.cancelScheduledValues(t); d.saida.gain.setTargetAtTime(document.hidden ? 0 : (d.modo === 'menu' ? 0.6 : 1), t, document.hidden ? 0.1 : 0.6); } catch (e) {} });
+/* tela inicial: começa no primeiro gesto (o AudioContext nasce nele, no src/audio.js) */
+if (typeof window !== 'undefined' && window.addEventListener) { const g = e => { if (!e.isTrusted) return; P.tela = true; vigiar(); setTimeout(() => { if (!P.deck && naTela()) telaInicial(); }, 0); }; ['pointerup', 'keydown', 'touchend'].forEach(ev => window.addEventListener(ev, g, { passive: true, capture: true })); }
+
+ARD.musica = { quadro, eventos, cena, renderizar, ajustes, partida, menu, parar, RACAS: Object.keys(RACAS), CAMADAS: CAMADAS.slice(), FINAIS: FINAIS.slice(),
+  forcar: n => { if (n == null) { P.forcado = false; return; } P.forcado = true; P.nivel = P.quer = Math.max(0, Math.min(3, n | 0)); aplica(0.3); }, /* testes e gravações: prende o nível (null solta) */
+  estado: () => ({ modo: P.modo, raca: P.raca, nivel: P.nivel, calor: +P.calor.toFixed(2), era: P.era, cena: P.cena, fim: P.fim, camadas: P.deck ? Object.keys(P.deck.cam).filter(k => P.deck.cam[k] && P.deck.cam[k].src).map(k => k + ':' + (+P.deck.cam[k].alvo.toFixed(2))) : [], gravacoes: P.med.gravacoes.slice(), montaMs: +P.med.ms.toFixed(1), fila: P.fila.length, cacheKB: Object.values(P.cache).reduce((s, r) => s + Math.round(r.bytes / 1024), 0) }) };
+})(globalThis.ARD = globalThis.ARD || {});
+
 /* Áudio: efeitos sintetizados em WebAudio (sem arquivos) e voz de sistema pela Web Speech API. 5.0c.1: e as vozes gravadas (src/vozes.js), pelo mesmo Web Audio. */
 (function (ARD) {
 'use strict';
-const A = { ctx: null, master: null, enabled: true, voice: true, gravadas: true /* 5.0c.1: vozes gravadas (false = voz do sistema) */, inited: false, last: {}, recent: [], lastVoice: {}, voiceObj: null, voz: '', vozNome: '' };
-try { const p = JSON.parse(localStorage.getItem('ard-audio') || '{}'); if (p.enabled === false) A.enabled = false; if (p.voice === false) A.voice = false; if (typeof p.voz === 'string') A.voz = p.voz; if (typeof p.vozNome === 'string') A.vozNome = p.vozNome; /* 5.0a.2: voz escolhida em Ajustes ('' = Automática) */ if (p.gravadas === false) A.gravadas = false; /* 5.0c.1 */ } catch (e) {}
-function save() { try { localStorage.setItem('ard-audio', JSON.stringify({ enabled: A.enabled, voice: A.voice, voz: A.voz || '', vozNome: A.vozNome || '', gravadas: A.gravadas !== false /* 5.0c.1 */ })); } catch (e) {} }
+const A = { ctx: null, master: null, enabled: true, voice: true, gravadas: true /* 5.0c.1: vozes gravadas (false = voz do sistema) */, inited: false, last: {}, recent: [], lastVoice: {}, voiceObj: null, voz: '', vozNome: '',
+  volSom: 1, musica: true, volMusica: 0.7, saida: 'fone' /* 5.0f: volume dos efeitos (1 = o de antes), música liga/desliga e volume, saída do som 3D ('fone' = HRTF, 'caixa' = panorâmica simples) */ };
+const GANHO_EFEITOS = 0.35; /* o volume dos efeitos de antes da 5.0f (A.master) */
+const vol01 = v => Math.max(0, Math.min(1, +v)); /* 5.0f */
+try { const p = JSON.parse(localStorage.getItem('ard-audio') || '{}'); if (p.enabled === false) A.enabled = false; if (p.voice === false) A.voice = false; if (typeof p.voz === 'string') A.voz = p.voz; if (typeof p.vozNome === 'string') A.vozNome = p.vozNome; /* 5.0a.2: voz escolhida em Ajustes ('' = Automática) */ if (p.gravadas === false) A.gravadas = false; /* 5.0c.1 */
+  if (p.volSom != null && isFinite(p.volSom)) A.volSom = vol01(p.volSom); if (p.musica === false) A.musica = false; if (p.volMusica != null && isFinite(p.volMusica)) A.volMusica = vol01(p.volMusica); if (p.saida === 'caixa' || p.saida === 'fone') A.saida = p.saida; /* 5.0f */ } catch (e) {}
+function save() { try { localStorage.setItem('ard-audio', JSON.stringify({ enabled: A.enabled, voice: A.voice, voz: A.voz || '', vozNome: A.vozNome || '', gravadas: A.gravadas !== false /* 5.0c.1 */, volSom: A.volSom, musica: A.musica !== false, volMusica: A.volMusica, saida: A.saida /* 5.0f */ })); } catch (e) {} }
 const VZ = () => (globalThis.ARD && ARD.vozes) || null; /* 5.0c.1: o tocador das vozes gravadas (src/vozes.js); sem ele (testes no Node), tudo como antes */
+const S3 = () => (globalThis.ARD && ARD.som3d) || null; /* 5.0f: o mixer do som 3D (src/som3d.js); sem ele, os efeitos como antes */
 A.init = function () {
   if (A.inited) return; A.inited = true; sessao(); /* 5.0b.1: a sessão de reprodução do iOS vem antes de o contexto nascer */
-  try { const C = window.AudioContext || window.webkitAudioContext; if (!C) return; A.ctx = new C(); A.master = A.ctx.createGain(); A.master.gain.value = 0.35; A.master.connect(A.ctx.destination); } catch (e) { A.ctx = null; }
+  try { const C = window.AudioContext || window.webkitAudioContext; if (!C) return; A.ctx = new C(); A.master = A.ctx.createGain(); A.master.gain.value = GANHO_EFEITOS * A.volSom; A.master.connect(A.ctx.destination); } catch (e) { A.ctx = null; }
   if (A.ctx) vigiar(A.ctx); /* 5.0b.1: estado 'interrupted' do iOS e volta para a página */
+  if (A.ctx && S3()) try { S3().montar(A.ctx, A.master); } catch (e) { console.warn('[ARD] som 3D indisponível: ' + e.message); } /* 5.0f: barramentos, limitador, vozes do mixer e os efeitos pré-gravados */
 };
 A.resume = function () { retomar(); }; /* 5.0b.1: retoma também do 'interrupted' do iOS e nunca deixa a promessa do resume() solta (antes: só 'suspended', sem catch) */
-let noiseBuf = null;
+/* 5.0f: a síntese escreve num alvo: o contexto ao vivo (A.ctx → A.master, agora) ou, na pré-gravação dos efeitos (src/som3d.js), um
+   OfflineAudioContext (TG = { c, d, t }). Os sons são os mesmos de antes; cada um vira um AudioBuffer uma vez e toca por uma voz do mixer. */
+let noiseBuf = null, TG = null;
+const sc = () => TG ? TG.c : A.ctx, sd = () => TG ? TG.d : A.master, st = () => TG ? TG.t : A.ctx.currentTime;
 function noise(dur, o) {
-  const c = A.ctx; if (!noiseBuf) { noiseBuf = c.createBuffer(1, c.sampleRate, c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
-  const t0 = c.currentTime + (o.delay || 0); /* 4.3h: atraso (trovão longe) */ const src = c.createBufferSource(); src.buffer = noiseBuf; const f = c.createBiquadFilter(); f.type = o.type || 'lowpass'; f.frequency.setValueAtTime(o.freq || 800, t0); if (o.sweep) f.frequency.exponentialRampToValueAtTime(o.sweep, t0 + dur); f.Q.value = o.q || 0.7;
+  const c = sc(); if (!noiseBuf || noiseBuf.sampleRate !== c.sampleRate) { noiseBuf = c.createBuffer(1, c.sampleRate, c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+  const t0 = st() + (o.delay || 0); /* 4.3h: atraso (trovão longe) */ const src = c.createBufferSource(); src.buffer = noiseBuf; const f = c.createBiquadFilter(); f.type = o.type || 'lowpass'; f.frequency.setValueAtTime(o.freq || 800, t0); if (o.sweep) f.frequency.exponentialRampToValueAtTime(o.sweep, t0 + dur); f.Q.value = o.q || 0.7;
   const g = c.createGain(); g.gain.setValueAtTime(o.gain || 0.3, t0); g.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
-  src.connect(f); f.connect(g); g.connect(A.master); src.start(t0); src.stop(t0 + dur + 0.05);
+  src.connect(f); f.connect(g); g.connect(sd()); src.start(t0); src.stop(t0 + dur + 0.05);
 }
 function tone(freq, dur, o) {
-  const c = A.ctx; o = o || {}; const osc = c.createOscillator(); osc.type = o.type || 'sine'; osc.frequency.setValueAtTime(freq, c.currentTime + (o.delay || 0));
-  if (o.slide) osc.frequency.exponentialRampToValueAtTime(o.slide, c.currentTime + (o.delay || 0) + dur);
-  const g = c.createGain(); g.gain.setValueAtTime(0.0001, c.currentTime + (o.delay || 0)); g.gain.exponentialRampToValueAtTime(o.gain || 0.2, c.currentTime + (o.delay || 0) + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + (o.delay || 0) + dur);
-  osc.connect(g); g.connect(A.master); osc.start(c.currentTime + (o.delay || 0)); osc.stop(c.currentTime + (o.delay || 0) + dur + 0.05);
+  const c = sc(); o = o || {}; const t0 = st() + (o.delay || 0), at = o.at || 0.01; const osc = c.createOscillator(); osc.type = o.type || 'sine'; osc.frequency.setValueAtTime(freq, t0); if (o.det) osc.detune.value = o.det;
+  if (o.slide) osc.frequency.exponentialRampToValueAtTime(o.slide, t0 + dur);
+  const g = c.createGain(); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(o.gain || 0.2, t0 + at); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(g); g.connect(sd()); osc.start(t0); osc.stop(t0 + dur + 0.05);
 }
-const MIN_GAP = { shot_light: 60, shot_heavy: 90, beam: 120, impact: 70, explosion: 120, build: 300, spawn: 300, alert: 800, danger: 1200, promote: 500, click: 40, siphon: 600, storm: 3000, thunder: 600, pact: 1000, betrayal: 1000 };
-A.sfx = function (name, vol, delay) {
-  if (!A.enabled || !A.ctx) return; A.resume(); vol = vol == null ? 1 : Math.max(0, Math.min(1, vol)); if (vol < 0.03) return;
-  const now = performance.now(); if (A.last[name] && now - A.last[name] < (MIN_GAP[name] || 50)) return;
-  A.recent = A.recent.filter(t => now - t < 100); if (A.recent.length > 10) return; A.recent.push(now); A.last[name] = now;
-  const v = vol;
+const MIN_GAP = { shot_light: 60, shot_heavy: 90, beam: 120, impact: 70, explosion: 120, build: 300, spawn: 300, alert: 800, danger: 1200, promote: 500, click: 40, siphon: 600, storm: 3000, thunder: 600, pact: 1000, betrayal: 1000, erro: 250 /* 5.0f */ };
+/* o desenho de cada efeito (v = volume; os de interface ignoram v, como antes) */
+function desenha(name, v, delay) {
   switch (name) {
     case 'shot_light': tone(900, 0.05, { type: 'square', gain: 0.08 * v, slide: 300 }); break;
     case 'shot_heavy': noise(0.14, { freq: 500, sweep: 120, gain: 0.35 * v }); tone(90, 0.12, { type: 'triangle', gain: 0.25 * v, slide: 45 }); break;
@@ -23984,13 +24431,59 @@ A.sfx = function (name, vol, delay) {
     case 'danger': for (let i = 0; i < 2; i++) tone(320, 0.3, { type: 'sawtooth', gain: 0.12, delay: i * 0.35, slide: 200 }); break;
     case 'promote': [523, 659, 784].forEach((f, i) => tone(f, 0.12, { gain: 0.12, delay: i * 0.09 })); break;
     case 'click': tone(1200, 0.03, { type: 'square', gain: 0.05 }); break;
+    case 'erro': tone(230, 0.11, { type: 'square', gain: 0.07, slide: 190 }); tone(180, 0.16, { type: 'square', gain: 0.07, delay: 0.12, slide: 150 }); break; /* 5.0f: comando recusado */
     case 'siphon': tone(180, 0.5, { type: 'triangle', gain: 0.1 * v, slide: 240 }); break;
     case 'storm': noise(1.4, { freq: 260, sweep: 90, gain: 0.35 }); break;
     case 'thunder': { const dl = Math.max(0, Math.min(2.5, delay || 0)); noise(0.22, { freq: 2600, sweep: 700, gain: 0.22 * v, delay: dl }); noise(2.4, { freq: 210, sweep: 45, gain: 0.5 * v, delay: dl + 0.04 }); tone(44, 1.6, { type: 'sine', gain: 0.16 * v, slide: 30, delay: dl }); break; } /* 4.3h: estalo e ronco do raio, atrasados pela distância */
     case 'pact': [440, 554, 659].forEach((f, i) => tone(f, 0.25, { gain: 0.1, delay: i * 0.05 })); break;
     case 'betrayal': tone(220, 0.5, { type: 'sawtooth', gain: 0.14, slide: 110 }); tone(233, 0.5, { type: 'sawtooth', gain: 0.1, slide: 116 }); break;
   }
+}
+/* 5.0f: identidade por Raça nos sons de interface (clique, construir, pronto, erro). Cada um com o timbre da Raça: a forja da Vehnar (metal e
+   bigorna), o gelo da Erevane (vidro e sino frio), o vivo da Tessara (madeira e bolha), o cristal do Quorith (acorde de sinos) e o enxame do Vorag
+   (estalo de quitina e rosnado). A pré-gravação iguala o volume médio de cada um ao do som genérico (o volume de hoje). */
+const UI_RACA = {
+  vehnar: {
+    click: () => { tone(640, 0.04, { type: 'square', gain: 0.045, slide: 470 }); noise(0.03, { type: 'highpass', freq: 3400, gain: 0.06 }); },
+    build: () => { [0, 0.15].forEach((d, i) => { noise(0.11, { type: 'bandpass', freq: 2100 - i * 400, q: 6, gain: 0.5, delay: d }); tone(1180 - i * 160, 0.16, { type: 'triangle', gain: 0.06, delay: d }); tone(1830 - i * 240, 0.12, { gain: 0.035, delay: d }); }); tone(98, 0.32, { type: 'sawtooth', gain: 0.07, delay: 0.15, slide: 82 }); },
+    spawn: () => { tone(330, 0.09, { type: 'square', gain: 0.07, slide: 320 }); tone(495, 0.14, { type: 'square', gain: 0.07, delay: 0.09 }); tone(82, 0.22, { type: 'sawtooth', gain: 0.06, delay: 0.09, slide: 75 }); noise(0.05, { type: 'bandpass', freq: 2400, q: 5, gain: 0.25, delay: 0.09 }); },
+    erro: () => { tone(140, 0.13, { type: 'square', gain: 0.075 }); tone(140, 0.16, { type: 'square', gain: 0.075, delay: 0.15, slide: 120 }); noise(0.06, { type: 'bandpass', freq: 900, q: 3, gain: 0.12 }); } },
+  erevane: {
+    click: () => { tone(1980, 0.05, { gain: 0.05, slide: 1700 }); tone(2970, 0.04, { gain: 0.02 }); },
+    build: () => { [659, 988, 1319].forEach((f, i) => { tone(f, 0.42, { gain: 0.07, delay: i * 0.07 }); tone(f * 2.76, 0.18, { gain: 0.015, delay: i * 0.07 }); }); noise(0.5, { type: 'highpass', freq: 5200, gain: 0.04, sweep: 9000 }); },
+    spawn: () => { tone(880, 0.18, { gain: 0.09, slide: 1175 }); tone(1760, 0.22, { gain: 0.025, delay: 0.06 }); noise(0.25, { type: 'bandpass', freq: 3600, q: 2, gain: 0.05 }); },
+    erro: () => { tone(660, 0.16, { gain: 0.09, slide: 520 }); tone(622, 0.2, { gain: 0.06, delay: 0.1, slide: 440 }); } },
+  tessara: {
+    click: () => { tone(880, 0.045, { type: 'triangle', gain: 0.08, slide: 1250 }); },
+    build: () => { tone(300, 0.14, { type: 'triangle', gain: 0.12, slide: 600 }); tone(450, 0.16, { type: 'triangle', gain: 0.1, delay: 0.12, slide: 900 }); tone(1046, 0.06, { gain: 0.05, delay: 0.24 }); noise(0.08, { type: 'bandpass', freq: 700, q: 4, gain: 0.2, delay: 0.02 }); },
+    spawn: () => { tone(523, 0.08, { type: 'triangle', gain: 0.1 }); tone(784, 0.12, { type: 'triangle', gain: 0.1, delay: 0.07 }); tone(1400, 0.05, { gain: 0.04, delay: 0.18, slide: 2400 }); },
+    erro: () => { tone(220, 0.1, { type: 'triangle', gain: 0.13, slide: 160 }); tone(196, 0.14, { type: 'triangle', gain: 0.12, delay: 0.12, slide: 140 }); } },
+  quorith: {
+    click: () => { tone(2093, 0.06, { gain: 0.035 }); tone(3136, 0.05, { gain: 0.02 }); },
+    build: () => { [523, 659, 784, 1046].forEach((f, i) => { tone(f, 0.55, { gain: 0.045, delay: i * 0.025, at: 0.004 }); tone(f * 3, 0.25, { gain: 0.008, delay: i * 0.025 }); }); },
+    spawn: () => { [784, 1047, 1319].forEach((f, i) => tone(f, 0.24, { gain: 0.06, delay: i * 0.06 })); },
+    erro: () => { tone(740, 0.25, { gain: 0.06 }); tone(784, 0.25, { gain: 0.06 }); tone(370, 0.2, { type: 'triangle', gain: 0.04, delay: 0.05 }); } },
+  vorag: {
+    click: () => { noise(0.025, { type: 'bandpass', freq: 3200, q: 5, gain: 0.3 }); noise(0.02, { type: 'bandpass', freq: 2600, q: 5, gain: 0.22, delay: 0.035 }); },
+    build: () => { noise(0.3, { freq: 900, sweep: 120, gain: 0.32 }); tone(110, 0.3, { type: 'sawtooth', gain: 0.07, slide: 70 }); for (let i = 0; i < 3; i++) noise(0.03, { type: 'bandpass', freq: 2900, q: 6, gain: 0.25, delay: 0.12 + i * 0.05 }); },
+    spawn: () => { tone(90, 0.28, { type: 'sawtooth', gain: 0.09, slide: 150 }); noise(0.26, { type: 'bandpass', freq: 1400, q: 3, gain: 0.16, sweep: 2600 }); for (let i = 0; i < 2; i++) noise(0.025, { type: 'bandpass', freq: 3400, q: 6, gain: 0.25, delay: 0.2 + i * 0.045 }); },
+    erro: () => { noise(0.22, { type: 'bandpass', freq: 1300, q: 2, gain: 0.2, sweep: 700 }); tone(72, 0.24, { type: 'sawtooth', gain: 0.08, slide: 60 }); } } };
+A.UI_RACA = Object.keys(UI_RACA); A.SONS = Object.keys(MIN_GAP); /* 5.0f: o que a pré-gravação grava */
+/* 5.0f: grava um efeito num contexto qualquer (o OfflineAudioContext da pré-gravação): c = contexto, d = destino, t = início */
+A.sintetiza = function (c, d, t, name, raca, v, delay) { const ant = TG; TG = { c, d, t }; try { const R = raca && UI_RACA[raca]; if (R && R[name]) R[name](); else desenha(name, v == null ? 1 : v, delay); } finally { TG = ant; } };
+/* 5.0f: posição do efeito: o src/main.js passa o evento (A.em(e)) antes do efeito dele; vale para o próximo A.sfx e só para ele */
+let EV = null; A.em = function (e) { EV = e || null; };
+A.sfx = function (name, vol, delay) {
+  const ev = EV; EV = null; /* 5.0f */
+  if (!A.enabled || !A.ctx) return; A.resume(); vol = vol == null ? 1 : Math.max(0, Math.min(1, vol)); if (vol < 0.03) return;
+  const now = performance.now(); if (A.last[name] && now - A.last[name] < (MIN_GAP[name] || 50)) return;
+  A.recent = A.recent.filter(t => now - t < 100); if (A.recent.length > 10) return; A.recent.push(now); A.last[name] = now;
+  const s3 = S3(); if (s3 && s3.tocar(name, vol, delay, ev, A.raca || racaDaTela())) return; /* 5.0f: pela voz do mixer (posição, abafamento, reverberação, prioridade) */
+  desenha(name, vol, delay); /* antes da 5.0f (e enquanto os efeitos pré-gravados não ficam prontos): a síntese ao vivo */
 };
+const racaDaTela = () => { try { return document.documentElement.dataset.race || null; } catch (e) { return null; } }; /* 5.0f: na tela inicial, a Raça em destaque */
+/* 5.0f: avisos da partida (src/main.js, ui.notice do src/input.js): o comando recusado ganha o som de erro da Raça; os avisos de confirmação, o clique */
+A.aviso = function (texto) { const t = String(texto || ''); const ok = ['input.reuniao', 'input.grupo'].some(k => { const r = TX(k, { n: 0 }); const raiz = String(r).split(/[0-9{]/)[0].trim(); return raiz && t.indexOf(raiz) === 0; }); A.sfx(ok ? 'click' : 'erro', 0.8); };
 /* 5.0a.2: voz do sistema escolhida pela qualidade. Cada voz do aparelho ganha um nível: 6 neurais do Edge ("Online (Natural)": Francisca, Antonio,
    Thalita) · 5 Google português do Brasil · 4 Apple aprimorada ou Premium (Luciana, Felipe) · 3 Apple comum · 2 outras (Android e afins) · 1 antigas
    do Windows (Maria, Daniel, Heloisa, "Desktop") · 0 robóticas (Eloquence da Apple: Eddy, Flo, Vovó…; eSpeak). Português do Brasil vem antes de
@@ -24128,10 +24621,36 @@ A.say = function (text, key, cooldown, quem, o) { /* 5.0a.3: quem = raça do lí
   if (A.onSay && o.legenda !== false) { try { A.onSay(txt, key); } catch (e) {} }
   return true;
 };
-A.setEnabled = function (on) { A.enabled = on; save(); sessao(); htmlMudo(); if (on) retomar(); }; A.setVoice = function (on) { A.voice = on; save(); sessao(); htmlMudo(); if (!on) { calar(); } };
+A.setEnabled = function (on) { A.enabled = on; save(); sessao(); htmlMudo(); if (on) retomar(); MIX.forEach(mixSync); /* 5.0f */ }; A.setVoice = function (on) { A.voice = on; save(); sessao(); htmlMudo(); if (!on) { calar(); } };
 /* 5.0c.1: cala a fala atual (gravada ou do sistema) e esvazia a fila */
 function calar() { const c = cur; fila = null; cur = null; if (c && c.h) try { c.h.parar(); } catch (e) {} if (temFala() && !(VZ() && VZ().semFalaSistema() && !(c && (c.u || c.sis)))) try { speechSynthesis.cancel(); } catch (e) {} }
 A.calar = calar; A.refazUI = () => UIS.forEach(preencher); /* 5.0c.1: a dica muda quando as vozes gravadas ficam prontas ou indisponíveis */
+/* 5.0f: volumes e liga/desliga em separado (Ajustes), salvos no 'ard-audio' como os de antes. Efeitos: A.enabled e A.volSom (1 = o volume de hoje);
+   música: A.musica e A.volMusica; saída do som 3D: 'fone' (HRTF) ou 'caixa' (panorâmica simples; o celular usa sempre a simples) */
+function aplicaVolumes() { if (A.master && A.ctx) try { A.master.gain.setTargetAtTime(GANHO_EFEITOS * A.volSom, A.ctx.currentTime, 0.03); } catch (e) {} const s3 = S3(); if (s3 && s3.volumes) s3.volumes(); if (globalThis.ARD && ARD.musica && ARD.musica.ajustes) ARD.musica.ajustes(); }
+A.setVolSom = function (v) { A.volSom = vol01(v); save(); aplicaVolumes(); MIX.forEach(mixSync); };
+A.setMusica = function (on) { A.musica = !!on; save(); if (on) { A.init(); retomar(); } aplicaVolumes(); MIX.forEach(mixSync); };
+A.setVolMusica = function (v) { A.volMusica = vol01(v); save(); aplicaVolumes(); MIX.forEach(mixSync); };
+A.setSaida = function (s) { A.saida = s === 'caixa' ? 'caixa' : 'fone'; save(); const s3 = S3(); if (s3 && s3.saida) s3.saida(); MIX.forEach(mixSync); };
+/* 5.0f: o bloco de mixagem em Ajustes (tela inicial e partida), montado aqui antes de cada [data-voz-ui]: efeitos (na partida, com o liga/desliga; na
+   tela inicial ele já existe ao lado), volume dos efeitos, música com liga/desliga e volume, e a saída do som 3D (só no computador) */
+const MIX = [];
+function mixMonta(box) { if (!box || box.__mix || typeof document === 'undefined' || !box.parentNode) return; box.__mix = 1; const d = document.createElement('div'); d.className = 'opt som-mix'; d.setAttribute('data-som-mix', '');
+  const n = MIX.length + 1, temEf = !document.getElementById('opt-som') || !!(box.closest && box.closest('#a11y')), toque = movel();
+  const lin = (k, extra) => '<div class="som-lin" style="display:flex;align-items:center;gap:.5em;flex-wrap:wrap">' + extra + '<input type="range" min="0" max="100" step="5" id="som-' + k + '-' + n + '" data-som-' + k + ' style="flex:1 1 8em;min-width:6em;max-width:16em"></div>';
+  d.innerHTML = lin('vol-efeitos', (temEf ? '<label class="chk"><input type="checkbox" data-som-efeitos> <span data-i18n="som.efeitos">' + esc(TX('som.efeitos', null, 'Efeitos')) + '</span></label>' : '') + '<label for="som-vol-efeitos-' + n + '" data-i18n="som.vol-efeitos">' + esc(TX('som.vol-efeitos', null, 'Volume dos efeitos')) + '</label>')
+    + lin('vol-musica', '<label class="chk"><input type="checkbox" data-som-musica> <span data-i18n="som.musica">' + esc(TX('som.musica', null, 'Música')) + '</span></label><label for="som-vol-musica-' + n + '" data-i18n="som.vol-musica">' + esc(TX('som.vol-musica', null, 'Volume da música')) + '</label>')
+    + (toque ? '' : '<div class="som-lin" style="display:flex;align-items:center;gap:.5em;flex-wrap:wrap"><label for="som-saida-' + n + '" data-i18n="som.saida">' + esc(TX('som.saida', null, 'Som 3D')) + '</label><select id="som-saida-' + n + '" data-som-saida><option value="fone" data-i18n="som.saida.fone">' + esc(TX('som.saida.fone', null, 'Fone de ouvido (HRTF)')) + '</option><option value="caixa" data-i18n="som.saida.caixa">' + esc(TX('som.saida.caixa', null, 'Caixas de som')) + '</option></select></div>');
+  box.parentNode.insertBefore(d, box); MIX.push(d);
+  const q = s => d.querySelector(s), ef = q('[data-som-efeitos]'), ve = q('[data-som-vol-efeitos]'), mu = q('[data-som-musica]'), vm = q('[data-som-vol-musica]'), sa = q('[data-som-saida]');
+  if (ef) ef.addEventListener('change', () => { A.setEnabled(ef.checked); if (ef.checked) { A.init(); A.resume(); A.sfx('click'); } try { const os = document.getElementById('opt-som'); if (os) os.checked = A.enabled; } catch (e) {} });
+  ve.addEventListener('input', () => A.setVolSom(+ve.value / 100)); ve.addEventListener('change', () => A.sfx('click'));
+  mu.addEventListener('change', () => A.setMusica(mu.checked)); vm.addEventListener('input', () => A.setVolMusica(+vm.value / 100)); if (sa) sa.addEventListener('change', () => A.setSaida(sa.value));
+  mixSync(d); }
+function mixSync(d) { const q = s => d.querySelector(s), ef = q('[data-som-efeitos]'), ve = q('[data-som-vol-efeitos]'), mu = q('[data-som-musica]'), vm = q('[data-som-vol-musica]'), sa = q('[data-som-saida]');
+  if (ef && ef.checked !== A.enabled) ef.checked = A.enabled; if (ve && +ve.value !== Math.round(A.volSom * 100)) ve.value = Math.round(A.volSom * 100); if (ve) ve.disabled = !A.enabled;
+  if (mu && mu.checked !== (A.musica !== false)) mu.checked = A.musica !== false; if (vm && +vm.value !== Math.round(A.volMusica * 100)) vm.value = Math.round(A.volMusica * 100); if (vm) vm.disabled = A.musica === false; if (sa && sa.value !== A.saida) sa.value = A.saida; }
+A.mixUI = () => MIX.forEach(mixSync); /* 5.0f */
 /* 5.0c.1: Vozes gravadas (Ajustes): ligadas por padrão; desligadas, todas as falas usam a voz do sistema (como na 5.0c) */
 A.setGravadas = function (on) { A.gravadas = !!on; save(); calar(); const vz = VZ(); if (vz && vz.mudou) vz.mudou(); UIS.forEach(preencher); htmlMudo(); }; /* 5.0b.1: a sessão de reprodução e o áudio mudo do iOS seguem o som e a voz */
 /* 5.0a.2: escolha da voz em Ajustes (tela inicial e partida): cada bloco [data-voz-ui] tem um select[data-voz-sel], um botão [data-voz-ouvir] e um texto
@@ -24169,7 +24688,7 @@ A.setVoz = function (id) { A.voz = id || ''; const f = ranking().find(x => x.id 
 A.ouvir = function (id) { if (!temFala()) return false; const sid = id != null ? id : A.voz, f = sid ? ranking().find(x => x.id === sid) : null; return falar(TX('voz.amostra', null, AMOSTRA) /* 5.0c */, { tipo: 'sistema', p: 4 }, f ? f.v : null); };
 A.vozUI = function (box) { if (!box || box.__voz) return; box.__voz = 1; UIS.push(box); const sel = box.querySelector('[data-voz-sel]'), bt = box.querySelector('[data-voz-ouvir]'), ts = box.querySelector('[data-som-teste]');
   if (sel) sel.addEventListener('change', () => A.setVoz(sel.value)); if (bt) bt.addEventListener('click', () => A.ouvir(sel ? sel.value : A.voz)); if (ts) ts.addEventListener('click', () => A.testarSom(box)); /* 5.0b.1: Testar som */
-  { const cg = box.querySelector('[data-voz-gravada]'); if (cg) cg.addEventListener('change', () => A.setGravadas(cg.checked)); } /* 5.0c.1: Vozes gravadas */ preencher(box); };
+  { const cg = box.querySelector('[data-voz-gravada]'); if (cg) cg.addEventListener('change', () => A.setGravadas(cg.checked)); } /* 5.0c.1: Vozes gravadas */ preencher(box); try { mixMonta(box); } catch (e) {} /* 5.0f */ };
 if (temFala()) { const mudou = () => { RANK = null; UIS.forEach(preencher); }; try { addEventListener('online', () => { RUIM.clear(); mudou(); }); } catch (e) {} try { if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', mudou); else speechSynthesis.onvoiceschanged = mudou; speechSynthesis.getVoices(); } catch (e) {} }
 try { addEventListener('ard-idioma', () => { RANK = null; RUIM.clear(); calar() /* 5.0c.1: também a gravada */; UIS.forEach(preencher); }); } catch (e) {} /* 5.0c: a lista e a voz mudam com o idioma, sem recarregar */
 if (typeof document !== 'undefined' && document.querySelectorAll) { const liga = () => document.querySelectorAll('[data-voz-ui]').forEach(b => A.vozUI(b)); if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', liga); else liga(); }
@@ -24762,7 +25281,7 @@ function soltar(b) { if (!b) return; const AC = S && S.AC; for (const t of b.tim
 /* começa (depois de um gesto): o = { fenda: {x,y,z}, nucleo: {x,y,z}, race } */
 function iniciar(o) { const A = ARD.audio; if (S || !A || !A.enabled) return false; if (!A.ctx) A.init(); const AC = A.ctx; if (!AC) return false; A.resume();
   S = { AC, src: [], nbuf: ruido(AC), on: true, race: o.race, pos: o };
-  const comp = AC.createDynamicsCompressor(); comp.connect(AC.destination); S.comp = comp; S.bus = AC.createGain(); S.bus.gain.value = 0; S.bus.connect(comp);
+  const comp = AC.createDynamicsCompressor(); comp.connect((ARD.som3d && ARD.som3d.saidaSala(AC)) || AC.destination); /* 5.0f: o ambiente da Sala entra no limitador do fim, junto com a música */ S.comp = comp; S.bus = AC.createGain(); S.bus.gain.value = 0; S.bus.connect(comp);
   const conv = AC.createConvolver(); conv.buffer = ir(AC, 2.6, 2.3); S.send = AC.createGain(); S.send.gain.value = 0.3; S.send.connect(conv); conv.connect(comp); S.conv = conv;
   fenda(AC, o.fenda); S.base = base(AC, o.race, o.nucleo); S.bus.gain.setValueAtTime(0.0001, AC.currentTime); S.bus.gain.linearRampToValueAtTime(0.7, AC.currentTime + 2.5); return true; }
 const fw = { x: 0, y: 0, z: -1 }, up = { x: 0, y: 1, z: 0 };
@@ -26787,6 +27306,302 @@ function mount(ctx) {
 ARD.hud3 = { a11y: A, PAL, applyAll, prepareSim, mount, playerColors, view: VIEW };
 })(globalThis.ARD = globalThis.ARD || {});
 
+/* Aether Rift: Dominion — 5.0f: cinema do jogo (nos dois motores).
+   - Tocador de cenas: linhas do tempo do GSAP (pausadas e levadas à mão pelo quadro da partida, no mesmo relógio do R.draw) com trilho de câmera
+     (escreve só no view.cam, o mesmo que o jogador move), faixas de cinema, cartão de título, legendas digitadas e botão Pular (Esc, Enter,
+     Espaço, toque). Fora da simulação: no solo a partida pausa (como a pausa do jogador); no multijogador e na dificuldade Fenda ela segue e a
+     cena só mexe na câmera, então o lockstep nunca espera por uma cena. Nenhum objeto 3D, material ou pipeline novo: só DOM e câmera.
+   - Abertura da missão (trilho da Fenda até a sua base com o título), câmera de ação da superarma e entrada dos chefões (moldura reaproveitável
+     pela 5.0g: ARD.cinema.chefe(G, unidade, { nome, epiteto })).
+   - Sala de Guerra do briefing: o mapa tático da missão num canvas 2D (gerado por um createSim de prévia, que não toca na partida), com varredura,
+     câmera de trilho, bases, ameaça, rota de ataque, objetivos com bipe e as falas do briefing digitadas (com as vozes gravadas quando existem).
+   - Música: chama ARD.musica.cena(nome) no começo e ARD.musica.cena(null) no fim, se a camada do f-som existir.
+   Chaves: ?cenas=0 desliga tudo; ?cenasala=0, ?cenaabertura=0, ?cenachefe=0 e ?cenasuper=0 (ou =1 para forçar) desligam cada uma. Ajustes:
+   "Cenas de cinema" (Sala de Guerra, abertura e chefões) e "Câmera de ação da superarma". */
+(function (ARD) {
+'use strict';
+const GSAP_URL = 'https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js'; /* a mesma da Sala (src/m5/sala.js); o build troca pela cópia em vendor/ no dist/local.html */
+const Q = new URLSearchParams(location.search);
+const T = (k, v, r) => (ARD.t ? ARD.t(k, v, r) : String(r != null ? r : k));
+const COR = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
+const raca = r => (ARD.i18n && ARD.i18n.d ? ARD.i18n.d.raca(r) : r);
+const jogador = n => (ARD.i18n && ARD.i18n.d ? ARD.i18n.d.jogador(n) : n);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const calmo = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
+
+/* ---------- GSAP (carregado uma vez; sem ele as cenas não tocam e o jogo segue igual) ---------- */
+let gsapP = null;
+function gsapCarrega() { if (window.gsap) return Promise.resolve(window.gsap); if (gsapP) return gsapP;
+  gsapP = new Promise(res => { const s = document.createElement('script'); s.src = GSAP_URL; s.async = true; s.onload = () => res(window.gsap || null); s.onerror = () => { gsapP = null; res(null); }; document.head.appendChild(s); }); return gsapP; }
+
+/* ---------- preferências e chaves de URL ---------- */
+function prefs() { try { return JSON.parse(localStorage.getItem('ard-beta-prefs') || '{}') || {}; } catch (e) { return {}; } }
+function ligada(tipo) { /* 'sala' | 'abertura' | 'chefe' | 'super' */
+  if (Q.get('cenas') === '0') return false; const k = Q.get('cena' + tipo); if (k === '0') return false; if (k === '1') return true;
+  const p = prefs(); return tipo === 'super' ? p.cineSuper !== false : p.cenas !== false; }
+function gravaPref(k, v) { try { const p = prefs(); p[k] = v; localStorage.setItem('ard-beta-prefs', JSON.stringify(p)); } catch (e) {} }
+function musica(nome) { try { if (ARD.musica && typeof ARD.musica.cena === 'function') ARD.musica.cena(nome); } catch (e) {} }
+function bipe(nome, v) { try { if (ARD.audio && ARD.audio.sfx) ARD.audio.sfx(nome, v); } catch (e) {} }
+
+/* ---------- estilo (injetado: nada no index.tpl.html) ---------- */
+const CSS = `
+#cine{position:fixed;inset:0;z-index:7;pointer-events:none;--cc:#FF5E3A;--fx:10vh}
+#cine[hidden]{display:none}
+#cine.on{pointer-events:auto}
+#cine .cb{position:absolute;left:0;right:0;height:var(--fx);background:#000;transform:scaleY(0)}
+#cine .cb.t{top:0;transform-origin:top}#cine .cb.b{bottom:0;transform-origin:bottom}
+#cine .ct{position:absolute;left:max(4vw,16px);bottom:calc(var(--fx) + 4vh);max-width:min(620px,86vw);opacity:0;text-shadow:0 2px 14px rgba(0,0,0,.85)}
+#cine .ct .k{font:600 .74rem/1.2 var(--fm);letter-spacing:.24em;text-transform:uppercase;color:var(--cc)}
+#cine .ct .n{font-family:var(--fd);font-weight:800;font-size:clamp(2rem,5.4vw,4.2rem);line-height:.95;text-transform:uppercase;color:#fff;letter-spacing:.02em;margin:.2rem 0 .3rem}
+#cine .ct{padding:.4rem .9rem .55rem;background:radial-gradient(ellipse at 30% 60%,rgba(4,6,10,.62),rgba(4,6,10,0) 72%)}
+#cine .ct .s{font:500 1rem/1.35 var(--fb);color:#E8E2D6;text-shadow:0 1px 3px #000,0 0 12px rgba(0,0,0,.9)}
+#cine .ct .ln{height:3px;width:120px;background:linear-gradient(90deg,var(--cc),transparent);margin-top:.5rem;transform-origin:left}
+#cine.chefe .ct{left:0;right:0;margin:0 auto;width:max-content;max-width:90vw;text-align:center;bottom:calc(var(--fx) + 2.5vh)}
+#cine.chefe .ct .ln{margin:.5rem auto 0;width:220px;background:linear-gradient(90deg,transparent,var(--cc),transparent)}
+#cine .cl{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(var(--fx) + 1.6vh);max-width:min(760px,90vw);font:500 1rem/1.4 var(--fb);color:#fff;text-align:center;text-shadow:0 1px 3px #000,0 0 18px rgba(0,0,0,.8)}
+#cine .cl b{color:var(--cc);font:600 .72rem/1 var(--fm);letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:.25rem}
+#cine .cp{position:absolute;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + max(8px,(var(--fx) - 44px) / 2));min-height:44px;min-width:44px;padding:0 1rem;border:1px solid rgba(255,255,255,.28);background:rgba(10,13,18,.72);color:#fff;font:600 .82rem/1 var(--fm);letter-spacing:.12em;text-transform:uppercase;cursor:pointer;opacity:.9}
+#cine .cp:hover,#cine .cp:focus-visible{border-color:var(--cc);opacity:1}
+#cine .cp kbd{font:inherit;opacity:.6;margin-left:.4rem}
+body.cine-on #hud{opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s .3s}
+body.cine-on #pausebox{display:none}
+@media (orientation:portrait){#cine{--fx:7vh}#cine .ct .n{font-size:clamp(1.7rem,9vw,2.6rem)}#cine .cl{font-size:.9rem}}
+body.touch #cine .cp kbd,#cine .cp.tq kbd{display:none}
+/* Sala de Guerra (briefing) */
+.sg{position:relative;--sc:var(--race,#FF5E3A);aspect-ratio:16/7.4;max-height:52vh;width:100%;background:#04070b;overflow:hidden;clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.sg canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.sg::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px);mix-blend-mode:screen}
+.sg .sg-top{position:absolute;left:14px;top:10px;font:600 .66rem/1.2 var(--fm);letter-spacing:.2em;text-transform:uppercase;color:var(--sc);text-shadow:0 0 10px rgba(0,0,0,.9)}
+.sg .sg-leg{position:absolute;left:12px;right:12px;bottom:12px;display:flex;gap:.6rem;align-items:flex-end;max-width:620px;opacity:0}
+.sg .sg-leg img{width:52px;height:52px;object-fit:cover;flex:none;clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);box-shadow:inset 0 0 0 2px var(--lc,var(--sc))}
+.sg .sg-leg>div{background:rgba(6,9,14,.82);padding:.4rem .65rem .45rem;border-left:2px solid var(--lc,var(--sc));min-height:2.8em;flex:1}
+.sg .sg-leg .nm{font:600 .62rem/1.3 var(--fm);letter-spacing:.12em;text-transform:uppercase;color:var(--lc,var(--sc))}
+.sg .sg-leg .tx{font-size:.9rem;line-height:1.4;color:#fff}
+.sg .sg-obj{position:absolute;right:12px;top:30px;margin:0;padding:.45rem .6rem .5rem 1.6rem;max-width:44%;background:rgba(6,9,14,.78);border-right:2px solid var(--sc);font-size:.78rem;line-height:1.35;color:#fff;opacity:0}
+.sg .sg-obj li{opacity:0;margin:.12rem 0}.sg .sg-obj li::marker{color:var(--sc)}.sg .sg-obj .bn{color:var(--fg2,#A9A598)}
+.sg .sg-bt{position:absolute;right:10px;bottom:10px;display:flex;gap:.4rem}
+.sg .sg-bt button{min-height:40px;min-width:44px;padding:0 .8rem;border:1px solid rgba(255,255,255,.28);background:rgba(10,13,18,.78);color:#fff;font:600 .72rem/1 var(--fm);letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.sg .sg-bt button:hover,.sg .sg-bt button:focus-visible{border-color:var(--sc)}
+.sg.fim .sg-leg{display:none}
+.sg-tocando #br-dialog{opacity:0;max-height:0;overflow:hidden}
+#br-dialog{transition:opacity .4s}
+@media (max-width:720px){.sg{aspect-ratio:4/3.3}.sg .sg-obj{left:12px;right:auto;top:28px;max-width:70%;font-size:.72rem}.sg .sg-leg .tx{font-size:.82rem}.sg .sg-leg img{width:40px;height:40px}.sg .sg-bt{top:8px;bottom:auto}.sg .sg-top{right:112px}}
+`;
+function estilo() { if (document.getElementById('cine-css')) return; const s = document.createElement('style'); s.id = 'cine-css'; s.textContent = CSS; document.head.appendChild(s); }
+
+/* ---------- DOM da cena na partida (criado uma vez) ---------- */
+let DOM = null;
+function dom() { if (DOM) return DOM; estilo(); const el = document.createElement('div'); el.id = 'cine'; el.hidden = true; el.setAttribute('aria-live', 'polite');
+  el.innerHTML = '<div class="cb t"></div><div class="cb b"></div><div class="ct"><div class="k"></div><div class="n"></div><div class="s"></div><div class="ln"></div></div><div class="cl"><b></b><span></span></div><button class="cp" type="button"><span data-i18n="cine.pular">Pular</span> ⏭<kbd>Esc</kbd></button>';
+  document.body.appendChild(el); if (ARD.i18n && ARD.i18n.aplicar) try { ARD.i18n.aplicar(el); } catch (e) {}
+  DOM = { el, bt: el.querySelector('.cb.t'), bb: el.querySelector('.cb.b'), ct: el.querySelector('.ct'), k: el.querySelector('.ct .k'), n: el.querySelector('.ct .n'), s: el.querySelector('.ct .s'), ln: el.querySelector('.ct .ln'), cl: el.querySelector('.cl'), clN: el.querySelector('.cl b'), clT: el.querySelector('.cl span'), cp: el.querySelector('.cp') };
+  DOM.cp.addEventListener('click', e => { e.stopPropagation(); pular(); });
+  el.addEventListener('pointerdown', e => { if (e.target === DOM.cp || !A) return; if (A.cena.tipo === 'super') pular(); }); /* na câmera da superarma, tocar em qualquer lugar devolve a câmera */
+  return DOM; }
+
+/* ---------- o tocador ---------- */
+let A = null; /* cena tocando: { cena, tl, P, t, salvo, G, pausou, revelou, legI, legN } */
+const fila = [];
+let ultimoG = null, superT = -1e9;
+function ativa() { return !!A; }
+function fimDe(G) { return !G || G.ended || G.bench || (G.R && G.R.photo && G.R.photo.on); }
+/* teclas: durante a cena o teclado não comanda a partida; Esc, Enter e Espaço pulam */
+function tecla(e) { if (!A) return; if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ' || e.code === 'Space') { e.preventDefault(); pular(); } e.stopImmediatePropagation(); e.stopPropagation(); }
+function enfileira(cena) { if (fila.length < 3) fila.push(cena); }
+/* yaw mais perto do atual (gira pelo caminho curto) */
+function perto(a, b) { const TAU = Math.PI * 2; let d = (b - a) % TAU; if (d > Math.PI) d -= TAU; if (d < -Math.PI) d += TAU; return a + d; }
+function comecar(cena, G) {
+  const gsap = window.gsap; if (!gsap) return false; const D = dom(); const cam = G.view.cam;
+  const salvo = { x: cam.x, y: cam.y, zoom: cam.zoom, yaw: cam.yaw == null ? Math.PI / 4 : cam.yaw, pitch: cam.pitch == null ? 0.95 : cam.pitch, pitchT: cam.pitchT };
+  const P = { x: salvo.x, y: salvo.y, zoom: salvo.zoom, yaw: salvo.yaw, pitch: salvo.pitch };
+  const tl = gsap.timeline({ paused: true }); const dur = cena.dur;
+  /* faixas e cartão */
+  D.el.className = 'on ' + (cena.classe || ''); D.el.style.setProperty('--cc', cena.cor || '#FF5E3A'); D.cp.classList.toggle('tq', !!(G.isTouch));
+  D.k.textContent = cena.kicker || ''; D.n.textContent = cena.nome || ''; D.s.textContent = cena.sub || ''; D.clN.textContent = ''; D.clT.textContent = ''; D.cl.style.opacity = '0';
+  tl.fromTo([D.bt, D.bb], { scaleY: 0 }, { scaleY: cena.faixa == null ? 1 : cena.faixa, duration: 0.45, ease: 'power2.out' }, 0);
+  tl.to([D.bt, D.bb], { scaleY: 0, duration: 0.4, ease: 'power2.in' }, dur - 0.4);
+  if (cena.nome) { const ti = cena.titulo || [0.5, dur - 0.9];
+    tl.fromTo(D.ct, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }, ti[0]);
+    tl.fromTo(D.n, { letterSpacing: '0.18em', clipPath: 'inset(0 100% 0 0)' }, { letterSpacing: '0.02em', clipPath: 'inset(0 0% 0 0)', duration: 0.8, ease: 'power3.out' }, ti[0]); tl.set(D.n, { clipPath: 'none' }, ti[0] + 0.85); /* o recorte só na entrada (o texto largo não fica cortado) */
+    tl.fromTo(D.ln, { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: 'power2.out' }, ti[0] + 0.25);
+    tl.to(D.ct, { opacity: 0, y: -10, duration: 0.4, ease: 'power2.in' }, ti[1]); }
+  /* trilho: cada ponto é um tween do proxy P (o quadro copia P para o view.cam) */
+  let yawAt = P.yaw;
+  for (const k of cena.trilho) { if (k.corte) { tl.set(P, { x: k.x, y: k.y, zoom: k.zoom, yaw: (yawAt = perto(yawAt, k.yaw)), pitch: k.pitch }, k.t); continue; }
+    const o = { duration: k.d, ease: k.ease || 'power2.inOut' }; if (k.x != null) o.x = k.x; if (k.y != null) o.y = k.y; if (k.zoom != null) o.zoom = k.zoom; if (k.pitch != null) o.pitch = k.pitch; if (k.yaw != null) o.yaw = yawAt = perto(yawAt, k.yaw); tl.to(P, o, k.t); }
+  if (cena.volta !== false) tl.to(P, { x: salvo.x, y: salvo.y, zoom: salvo.zoom, yaw: perto(yawAt, salvo.yaw), pitch: salvo.pitch, duration: cena.voltaD || 0.8, ease: 'power2.inOut' }, dur - (cena.voltaD || 0.8));
+  tl.time(0);
+  const net = !!G.net, semPausa = net || !!(G.camp && G.camp.noPause);
+  A = { cena, tl, P, t: 0, salvo, G, pausou: false, revelou: false, legI: -1, legN: -1, tipo: cena.tipo };
+  if (cena.pausa && !semPausa && !G.paused) { G.paused = true; A.pausou = true; }
+  if (cena.revela && !net && !G.view.reveal) { G.view.reveal = true; A.revelou = true; } /* só no solo: o multijogador nunca vê o que a névoa esconde */
+  document.body.classList.add('cine-on'); D.el.hidden = false; window.addEventListener('keydown', tecla, true);
+  musica(cena.musica || cena.tipo); return true;
+}
+function fim() { if (!A) return; const { G, salvo, tl } = A; const cam = G.view.cam;
+  try { tl.progress(1); tl.kill(); } catch (e) {}
+  cam.x = salvo.x; cam.y = salvo.y; cam.zoom = salvo.zoom; cam.yaw = salvo.yaw; cam.pitch = salvo.pitch; cam.pitchT = salvo.pitchT == null ? salvo.pitch : salvo.pitchT;
+  if (A.revelou) G.view.reveal = false; if (A.pausou && G.paused) { G.paused = false; G.last = performance.now(); }
+  const D = dom(); D.el.hidden = true; D.el.className = ''; document.body.classList.remove('cine-on'); window.removeEventListener('keydown', tecla, true);
+  musica(null); if (A.cena.aoFim) try { A.cena.aoFim(); } catch (e) {} A = null; }
+function pular() { if (A) fim(); }
+/* um quadro da partida (main.js, depois do I.update e antes do R.draw): começa a próxima cena da fila e leva a que está tocando */
+function quadro(now, dt, G) {
+  if (G !== ultimoG) { ultimoG = G; for (let i = fila.length - 1; i >= 0; i--) if (fila[i].G !== G) fila.splice(i, 1); /* só o que é desta partida */ if (A) fim(); superT = -1e9; if (G && !fimDe(G) && G.camp && !(G.cfg && G.cfg.resume) && !G.net && ligada('abertura')) { const c = abertura(G); if (c) fila.unshift(c); } }
+  if (!A) { if (!fila.length) return; if (fimDe(G) || !window.gsap) { fila.length = 0; return; } const c = fila.shift(); if (c.antes) try { c.antes(); } catch (e) {} if (!comecar(c, G)) return; }
+  if (fimDe(G)) { fim(); return; }
+  const a = A; a.t += dt; a.tl.time(Math.min(a.t, a.cena.dur));
+  const cam = G.view.cam, P = a.P; cam.x = P.x; cam.y = P.y; cam.zoom = P.zoom; cam.yaw = P.yaw; cam.pitch = P.pitch; cam.pitchT = P.pitch;
+  const L = a.cena.legendas; if (L) { let i = -1; for (let k = 0; k < L.length; k++) if (a.t >= L[k].t0 && a.t < L[k].t1) i = k; const D = DOM;
+    if (i !== a.legI) { a.legI = i; a.legN = -1; if (i < 0) D.cl.style.opacity = '0'; else { D.cl.style.opacity = '1'; D.clN.textContent = L[i].nome || ''; } }
+    if (i >= 0) { const n = Math.min(L[i].texto.length, Math.floor((a.t - L[i].t0) * 42)); if (n !== a.legN) { a.legN = n; D.clT.textContent = L[i].texto.slice(0, n); } } }
+  if (a.t >= a.cena.dur) fim();
+}
+
+/* ---------- cenas da partida ---------- */
+function nucleo(sim, p) { return ARD.sim.nucleoOf(sim, p); }
+/* abertura da missão: da Fenda (centro) até a sua base, com ato, título e lugar */
+function abertura(G) { const S = ARD.sim, C = ARD.campaign; const sim = G.sim, n = nucleo(sim, G.human); if (!n || !C || !G.camp.prep) return null;
+  const m = G.camp.prep.mission; const cam = G.view.cam; const y0 = cam.yaw == null ? Math.PI / 4 : cam.yaw; const fac = sim.players[G.human].faction;
+  const mx = (S.CX + n.x) / 2, my = (S.CY + n.y) / 2;
+  return { G, tipo: 'abertura', musica: 'abertura', dur: 6.2, pausa: true, cor: COR[fac], kicker: C.ato(m.act), nome: C.titulo(m), sub: C.lugar(m), titulo: [0.7, 5.0],
+    trilho: [{ corte: true, t: 0, x: S.CX, y: S.CY, zoom: 0.55, yaw: y0 - 1.1, pitch: 0.7 }, { t: 0, d: 3.0, x: mx, y: my, zoom: 0.7, yaw: y0 - 0.45, pitch: 0.62, ease: 'sine.inOut' }],
+    voltaD: 2.6 }; }
+/* câmera de ação da superarma: o alvo (ou o exército de quem disparou) e o impacto; a partida segue */
+function superarma(G, ev) { const S = ARD.sim, sim = G.sim; const p = sim.players[ev.p]; if (!p) return null; const meu = ev.p === G.human;
+  let x = ev.x, y = ev.y;
+  if (x == null) { if (!meu) return null; let sx = 0, sy = 0, k = 0; for (const e of sim.ents) if (e.alive && e.kind === 'unit' && e.owner === ev.p && S.UNITS[e.def] && S.UNITS[e.def].attack) { sx += e.x; sy += e.y; k++; } if (k >= 3) { x = sx / k; y = sy / k; } else { const n = nucleo(sim, ev.p); if (!n) return null; x = n.x; y = n.y; } }
+  else if (!meu && !G.view.reveal && !S.seesPoint(sim, G.human, x, y)) return null; /* do inimigo, só o que você já vê */
+  const cam = G.view.cam, y0 = cam.yaw == null ? Math.PI / 4 : cam.yaw;
+  return { G, tipo: 'super', musica: 'superarma', dur: 3.6, cor: COR[p.faction], classe: 'super', faixa: 0.75, kicker: T('cine.superarma', null, 'Superarma') + ' · ' + jogador(p.name), nome: T('fac.' + p.faction + '.super', null, (S.FACTIONS[p.faction] || {}).superName || ''), titulo: [0.35, 2.7],
+    trilho: [{ t: 0, d: 0.75, x, y, zoom: 1.9, pitch: 0.58, yaw: y0 + 0.25, ease: 'power3.inOut' }, { t: 0.75, d: 2.0, yaw: y0 + 0.55, zoom: 2.1, ease: 'none' }], voltaD: 0.8 }; }
+/* entrada de chefão: moldura reaproveitável (5.0g chama com { nome, epiteto }) */
+function chefe(G, u, o) { o = o || {}; const sim = G.sim; const p = sim.players[u.owner] || {}; const cam = G.view.cam, y0 = cam.yaw == null ? Math.PI / 4 : cam.yaw;
+  const c = { G, tipo: 'chefe', musica: 'chefao', dur: o.dur || 6.0, pausa: true, revela: true, cor: o.cor || COR[p.faction] || '#E6455A', classe: 'chefe', kicker: T('cine.chefao', null, 'Chefão') + ' · ' + raca(p.faction), nome: o.nome || T('unit.' + u.def + '.nome', null, u.def), sub: o.epiteto || T('cine.chefe.' + u.def, null, ''), titulo: [1.1, 4.8],
+    trilho: [{ t: 0, d: 1.1, x: u.x, y: u.y, zoom: 2.4, pitch: 0.42, yaw: y0 - 0.5, ease: 'power3.inOut' }, { t: 1.1, d: 3.9, yaw: y0 + 0.5, zoom: 2.0, pitch: 0.5, ease: 'sine.inOut' }], voltaD: 1.0 };
+  if (o.tocar !== false) enfileira(c); return c; }
+/* os eventos de um passo (main.js, depois do passo e da campanha; nunca no avanço silencioso) */
+function eventos(ev, G) { if (!ev || !ev.length || fimDe(G)) return; const S = ARD.sim;
+  for (let i = 0; i < ev.length; i++) { const e = ev[i];
+    if (e.t === 'super' && ligada('super')) { const agora = G.sim.time; if (agora - superT < 20 || A || fila.length) continue; const c = superarma(G, e); if (c) { superT = agora; enfileira(c); } }
+    else if (e.t === 'spawn' && S.UNITS[e.def] && S.UNITS[e.def].epic && e.p !== G.human && ligada('chefe')) { let u = null, bd = 80; for (const x of G.sim.ents) if (x.alive && x.kind === 'unit' && x.def === e.def && x.owner === e.p) { const d = Math.abs(x.x - e.x) + Math.abs(x.y - e.y); if (d < bd) { bd = d; u = x; } }
+      if (u && u.scripted && !G.net) chefe(G, u); } } }
+
+/* ---------- Ajustes: duas caixas ao lado da "Câmera de cinema" ---------- */
+function ajustes() { const oc = document.getElementById('opt-cine'); if (!oc || document.getElementById('opt-cenas')) return; const box = oc.closest('.opt') || oc.parentElement.parentElement; if (!box) return;
+  const mk = (id, k, txt, on, f) => { const l = document.createElement('label'); l.className = 'chk'; l.setAttribute('data-i18n', k); l.innerHTML = '<input type="checkbox" id="' + id + '"> ' + esc(txt); const i = l.firstChild; i.checked = on; i.addEventListener('change', () => f(i.checked)); box.appendChild(l); if (ARD.i18n && ARD.i18n.aplicar) try { ARD.i18n.aplicar(l); } catch (e) {} };
+  const p = prefs(); mk('opt-cenas', 'cine.op.cenas', 'Cenas de cinema: Sala de Guerra, abertura das missões e entrada dos chefões', p.cenas !== false, v => gravaPref('cenas', v));
+  mk('opt-cine-super', 'cine.op.super', 'Câmera de ação da superarma', p.cineSuper !== false, v => gravaPref('cineSuper', v)); }
+
+/* ---------- Sala de Guerra: mapa tático da missão no briefing ---------- */
+const RES = { plasma: '#FF8A5C', minerio: '#62CDFF', dados: '#7FE3A1' };
+const prev = new Map(); /* prévias por missão + Raça + dificuldade (o createSim é do mapa, não da partida) */
+function previa(prep, chave) { if (prev.has(chave)) return prev.get(chave); const S = ARD.sim; let d = null;
+  try { const cfg = prep.cfg; const sim = S.createSim({ seed: cfg.seed, players: cfg.players.map(p => Object.assign({}, p)), minutes: cfg.minutes || 25, map: 'fenda', mapV: 0, noVeins: !!cfg.noVeins });
+    const bases = sim.players.map((p, i) => { const n = S.nucleoOf(sim, i); return n ? { i, x: n.x, y: n.y, fac: p.faction, nome: p.name, ally: !!(cfg.players[i] && cfg.players[i].ally), cor: COR[p.faction] || p.color } : null; }).filter(Boolean);
+    const nodes = [], rocks = []; for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'node') nodes.push(e.x, e.y, e.res === 'plasma' ? 0 : e.res === 'dados' ? 2 : 1); else if (e.kind === 'rock') rocks.push(e.x, e.y, e.r || 10); }
+    d = { bases, nodes, rocks, W: S.WORLD, CX: S.CX, CY: S.CY, RR: S.RIFT_R }; } catch (e) { console.warn('[ARD] Sala de Guerra (prévia do mapa):', e); d = null; }
+  if (prev.size > 8) prev.clear(); prev.set(chave, d); return d; }
+let SG = null; /* a Sala que está aberta */
+const OUV = new Set(); /* falas do briefing que já tocaram gravadas na Sala: a central da missão mostra o texto sem repetir a voz (uma vez) */
+function ouviu(k) { if (!k || !OUV.has(k)) return false; OUV.delete(k); return true; }
+/* o = { host, missao, prep, chave, raca, falas: [{ race, mood, texto, nome, art, k }], objetivos: [{ texto, bonus }], ato, box } */
+function salaGuerra(o) {
+  if (SG && SG.host === o.host && SG.chave === o.chave) return SG; /* mesma missão aberta: a cena segue */
+  const tocar = !(SG && SG.missao === o.missao) && ligada('sala') && !calmo(); if (!(SG && SG.missao === o.missao)) OUV.clear(); /* troca de Raça ou dificuldade com a missão aberta: só redesenha */
+  if (tocar && !window.gsap) gsapCarrega().then(g => { if (g && SG && SG.host === o.host && SG.chave === o.chave && !SG.tl && !SG.tocando) { pararSala(); salaGuerra(o); } }); /* GSAP ainda chegando: mostra o mapa parado e toca quando ele chega */
+  pararSala(); estilo(); const map = previa(o.prep, o.chave); if (!map) return null;
+  let el = o.host.querySelector('.sg'); if (!el) { el = document.createElement('div'); el.className = 'sg'; el.setAttribute('role', 'img'); o.host.insertBefore(el, o.host.firstChild); }
+  el.style.setProperty('--sc', COR[o.raca] || '#FF5E3A'); el.setAttribute('aria-label', T('cine.sala', null, 'Sala de Guerra'));
+  el.innerHTML = '<canvas></canvas><div class="sg-top"></div><div class="sg-leg"><img alt=""><div><div class="nm"></div><div class="tx"></div></div></div><ol class="sg-obj"></ol><div class="sg-bt"><button type="button" class="sg-pular"></button><button type="button" class="sg-rever" hidden></button></div>';
+  const q = s => el.querySelector(s); const cv = q('canvas'), g = cv.getContext('2d');
+  q('.sg-top').textContent = T('cine.sala', null, 'Sala de Guerra') + ' · ' + (o.ato || '');
+  q('.sg-pular').innerHTML = esc(T('cine.pular', null, 'Pular')) + ' ⏭'; q('.sg-rever').textContent = '↻ ' + T('cine.rever', null, 'Rever a cena');
+  q('.sg-obj').innerHTML = o.objetivos.map(x => `<li class="${x.bonus ? 'bn' : ''}">${x.bonus ? '★ ' : ''}${esc(x.texto)}</li>`).join('');
+  const lis = [...q('.sg-obj').children];
+  /* quem fala → a base de quem fala; o inimigo principal → ameaça e rota */
+  const eu = map.bases[0], inim = map.bases.filter(b => b.i > 0 && !b.ally); const alvo = inim.length ? inim.reduce((a, b) => (Math.hypot(b.x - eu.x, b.y - eu.y) < Math.hypot(a.x - eu.x, a.y - eu.y) ? b : a)) : null;
+  const baseDe = r => r === o.raca ? eu : (map.bases.find(b => b.i > 0 && b.fac === r) || null);
+  const st = { el, host: o.host, missao: o.missao, chave: o.chave, cv, g, map, eu, alvo, cam: { x: map.CX, y: map.CY, z: 1, rot: 0 }, rota: { p: 0 }, varre: { a: -1 }, ameaca: { k: 0 }, t: 0, tl: null, raf: 0, vivo: true, tocando: false, holdAte: 0, holdEm: -1, legI: -1, legN: -1, dpr: 1, box: o.box };
+  SG = st;
+  /* linha do tempo: abertura (varredura), uma batida por fala, ameaça e rota, objetivos */
+  const falas = o.falas; const beats = []; let t = 1.4; for (const f of falas) { const d = Math.max(3.0, 1.3 + f.texto.length / 30); beats.push({ t0: t, t1: t + d, f }); t += d; }
+  const tRota = t, tObj = t + 2.6, dur = tObj + 0.5 + lis.length * 0.45 + 1.2; st.beats = beats; st.dur = dur; st.tObj = tObj;
+  const gsap = window.gsap; const C = st.cam;
+  if (gsap) { const tl = gsap.timeline({ paused: true }); st.tl = tl;
+    tl.fromTo(C, { z: 0.82, rot: -0.35 }, { z: 1, rot: 0, duration: 1.4, ease: 'power2.out' }, 0);
+    tl.fromTo(st.varre, { a: 0 }, { a: 1, duration: 1.6, ease: 'none' }, 0);
+    for (const b of beats) { const bs = baseDe(b.f.race) || eu; tl.to(C, { x: bs.x, y: bs.y, z: 1.9, rot: (bs === eu ? 0.12 : -0.12), duration: 1.0, ease: 'power2.inOut' }, b.t0); }
+    if (alvo) { tl.to(C, { x: (eu.x + alvo.x) / 2, y: (eu.y + alvo.y) / 2, z: 1.25, rot: 0, duration: 1.1, ease: 'power2.inOut' }, tRota); tl.fromTo(st.rota, { p: 0 }, { p: 1, duration: 1.8, ease: 'power1.inOut' }, tRota + 0.3); tl.fromTo(st.ameaca, { k: 0 }, { k: 1, duration: 0.5 }, tRota + 1.6); }
+    tl.to(C, { x: map.CX, y: map.CY, z: 1, rot: 0, duration: 1.0, ease: 'power2.inOut' }, tObj);
+    tl.fromTo(q('.sg-obj'), { opacity: 0, x: 14 }, { opacity: 1, x: 0, duration: 0.4 }, tObj + 0.2);
+    lis.forEach((li, i) => tl.fromTo(li, { opacity: 0, x: 10 }, { opacity: 1, x: 0, duration: 0.3 }, tObj + 0.5 + i * 0.45));
+    tl.to(q('.sg-leg'), { opacity: 0, duration: 0.3 }, tObj); tl.time(0); }
+  const tam = () => { const r = el.getBoundingClientRect(); const dpr = Math.min(2, window.devicePixelRatio || 1); const w = Math.max(2, Math.round(r.width * dpr)), h = Math.max(2, Math.round(r.height * dpr)); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; } st.dpr = dpr; };
+  st.tam = tam; tam(); st.onRes = () => { tam(); if (!st.tocando) desenha(st); }; window.addEventListener('resize', st.onRes); if (window.ResizeObserver) { st.ro = new ResizeObserver(() => { if (st.vivo) st.onRes(); }); st.ro.observe(el); } /* o briefing abre depois do desenho: o tamanho real chega aqui */
+  q('.sg-pular').addEventListener('click', () => pularSala(st)); q('.sg-rever').addEventListener('click', () => tocarSala(st));
+  st.tecla = e => { if (!st.tocando) return; if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation(); pularSala(st); } };
+  window.addEventListener('keydown', st.tecla, true); /* antes do Esc que fecha a janela (captura no document) */
+  if (tocar && gsap) tocarSala(st); else { if (!gsap) gsapCarrega(); fimSala(st, true); }
+  return st; }
+function tocarSala(st) { if (!st.vivo || !st.tl) return; st.t = 0; st.legI = -1; st.legN = -1; st.holdEm = -1; st.tocando = true; st.el.classList.remove('fim'); st.el.querySelector('.sg-rever').hidden = true; st.el.querySelector('.sg-pular').hidden = false; if (st.box) st.box.classList.add('sg-tocando');
+  st.tl.time(0); musica('sala-guerra'); let last = performance.now(); bipe('click', 0.35);
+  const loop = now => { if (!st.vivo) return; if (!st.el.isConnected || st.el.offsetParent === null) { pararSala(); return; } st.raf = requestAnimationFrame(loop); const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    if (!(st.holdEm >= 0 && st.t >= st.holdEm && now < st.holdAte)) st.t += dt; /* a fala gravada mais longa que a batida segura o relógio */
+    st.tam(); st.tl.time(Math.min(st.t, st.dur)); legenda(st, now); bipes(st); desenha(st); if (st.t >= st.dur) fimSala(st); };
+  st.raf = requestAnimationFrame(loop); }
+function legenda(st, now) { const leg = st.el.querySelector('.sg-leg'); let i = -1; for (let k = 0; k < st.beats.length; k++) if (st.t >= st.beats[k].t0 && st.t < st.beats[k].t1) i = k;
+  if (i !== st.legI) { st.legI = i; st.legN = -1; if (i < 0) { if (st.t < st.tObj) leg.style.opacity = '0'; return; } const f = st.beats[i].f; leg.style.opacity = '1'; leg.style.setProperty('--lc', COR[f.race] || '#FF5E3A'); const im = leg.querySelector('img'); im.src = f.art || ''; im.hidden = !f.art; leg.querySelector('.nm').textContent = f.nome;
+    let d = 0; try { if (ARD.vozes && ARD.vozes.campanha) d = ARD.vozes.campanha({ race: f.race, mood: f.mood, text: f.texto, k: f.k }, st.missao) || 0; } catch (e) {} /* a fala gravada desta linha (0 sem gravação: só a legenda) */
+    if (d > 0) { OUV.add(f.k); st.holdEm = st.beats[i].t1 - 0.25; st.holdAte = now + d * 1000 + 250; } else st.holdEm = -1; }
+  if (i >= 0) { const f = st.beats[i].f; const n = Math.min(f.texto.length, Math.floor((st.t - st.beats[i].t0 - 0.35) * 38)); if (n !== st.legN && n >= 0) { st.legN = n; st.el.querySelector('.sg-leg .tx').textContent = f.texto.slice(0, n); } } }
+function bipes(st) { const k = Math.floor((st.t - st.tObj - 0.5) / 0.45); if (st.t > st.tObj + 0.5 && k !== st.bip && k < st.el.querySelectorAll('.sg-obj li').length) { st.bip = k; bipe('click', 0.45); } }
+function pularSala(st) { if (!st.tocando) return; try { if (ARD.audio && ARD.audio.calar) ARD.audio.calar(); } catch (e) {} fimSala(st); }
+function fimSala(st, quieto) { if (st.raf) cancelAnimationFrame(st.raf); st.raf = 0; const era = st.tocando; st.tocando = false; if (st.tl) { st.tl.progress(1); st.t = st.dur; }
+  st.el.classList.add('fim'); const o = st.el.querySelector('.sg-obj'); o.style.opacity = '1'; o.style.transform = ''; for (const li of o.children) { li.style.opacity = '1'; li.style.transform = ''; }
+  st.cam.x = st.map.CX; st.cam.y = st.map.CY; st.cam.z = 1; st.cam.rot = 0; st.rota.p = 1; st.ameaca.k = 1; st.varre.a = 1;
+  st.el.querySelector('.sg-pular').hidden = true; st.el.querySelector('.sg-rever').hidden = !st.tl; if (st.box) st.box.classList.remove('sg-tocando');
+  if (era && !quieto) musica(null); st.tam(); desenha(st); }
+function pararSala() { const st = SG; if (!st) return; st.vivo = false; if (st.raf) cancelAnimationFrame(st.raf); if (st.tocando) musica(null); st.tocando = false; window.removeEventListener('resize', st.onRes); if (st.ro) st.ro.disconnect(); window.removeEventListener('keydown', st.tecla, true); if (st.tl) st.tl.kill(); if (st.box) st.box.classList.remove('sg-tocando'); SG = null; }
+/* desenho do mapa tático (canvas 2D) */
+function desenha(st) { const { g, cv, map, cam } = st; const W = cv.width, H = cv.height; const dpr = st.dpr; const sc = Math.min(W, H) / (map.W * 1.08) * cam.z; const tt = performance.now() / 1000;
+  const cs = Math.cos(cam.rot), sn = Math.sin(cam.rot); const px = (x, y) => { const dx = x - cam.x, dy = y - cam.y; return [W / 2 + (dx * cs - dy * sn) * sc, H / 2 + (dx * sn + dy * cs) * sc]; };
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; const bg = g.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.max(W, H) * 0.7); bg.addColorStop(0, '#0b1420'); bg.addColorStop(1, '#03060a'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  const acc = getComputedStyle(st.el).getPropertyValue('--sc').trim() || '#FF5E3A';
+  /* grade do mapa (a cada 200) e borda */
+  g.lineWidth = 1 * dpr; g.strokeStyle = 'rgba(120,170,220,0.07)'; g.beginPath(); for (let k = 0; k <= map.W; k += 200) { let a = px(k, 0), b = px(k, map.W); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); a = px(0, k); b = px(map.W, k); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); } g.stroke();
+  g.strokeStyle = 'rgba(160,200,240,0.28)'; g.lineWidth = 1.5 * dpr; g.beginPath(); { const c = [px(0, 0), px(map.W, 0), px(map.W, map.W), px(0, map.W)]; g.moveTo(c[0][0], c[0][1]); for (let i = 1; i < 4; i++) g.lineTo(c[i][0], c[i][1]); g.closePath(); } g.stroke();
+  /* rochas e nós */
+  g.fillStyle = 'rgba(150,160,175,0.22)'; for (let i = 0; i < map.rocks.length; i += 3) { const p = px(map.rocks[i], map.rocks[i + 1]); const r = Math.max(1.2 * dpr, map.rocks[i + 2] * sc); g.beginPath(); g.arc(p[0], p[1], r, 0, 6.2832); g.fill(); }
+  const RC = [RES.plasma, RES.minerio, RES.dados]; for (let i = 0; i < map.nodes.length; i += 3) { const p = px(map.nodes[i], map.nodes[i + 1]); g.fillStyle = RC[map.nodes[i + 2]]; g.globalAlpha = 0.75; g.fillRect(p[0] - 2 * dpr, p[1] - 2 * dpr, 4 * dpr, 4 * dpr); } g.globalAlpha = 1;
+  /* a Fenda no centro */
+  { const c = px(map.CX, map.CY); const r = map.RR * sc; const gr = g.createRadialGradient(c[0], c[1], r * 0.2, c[0], c[1], r * 1.9); gr.addColorStop(0, 'rgba(255,94,58,0.55)'); gr.addColorStop(0.5, 'rgba(178,60,255,0.22)'); gr.addColorStop(1, 'rgba(178,60,255,0)'); g.fillStyle = gr; g.beginPath(); g.arc(c[0], c[1], r * 1.9, 0, 6.2832); g.fill(); g.strokeStyle = 'rgba(255,140,90,' + (0.5 + 0.2 * Math.sin(tt * 2)) + ')'; g.lineWidth = 1.5 * dpr; g.beginPath(); g.arc(c[0], c[1], r, 0, 6.2832); g.stroke(); }
+  /* território de cada base (anel tênue na cor de quem é) */
+  for (const b of st.map.bases) { const p = px(b.x, b.y); const cor = b.i === 0 ? acc : b.ally ? '#7FE3A1' : '#FF4A4A'; g.globalAlpha = 0.08; g.fillStyle = cor; g.beginPath(); g.arc(p[0], p[1], 360 * sc, 0, 6.2832); g.fill(); g.globalAlpha = 0.3; g.strokeStyle = cor; g.lineWidth = 1 * dpr; g.setLineDash([4 * dpr, 5 * dpr]); g.stroke(); g.setLineDash([]); g.globalAlpha = 1; }
+  /* rota de ataque (contorna a Fenda) */
+  if (st.alvo && st.rota.p > 0) { const a = st.eu, b = st.alvo; const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2; let nx = mx - map.CX, ny = my - map.CY; const nl = Math.hypot(nx, ny); if (nl < 1) { nx = -(b.y - a.y); ny = b.x - a.x; } const L = Math.hypot(nx, ny) || 1; const off = Math.max(0, map.RR * 2.6 - nl); const cxp = mx + nx / L * off, cyp = my + ny / L * off;
+    g.strokeStyle = acc; g.lineWidth = 2.5 * dpr; g.setLineDash([9 * dpr, 7 * dpr]); g.lineDashOffset = -tt * 30 * dpr; g.beginPath(); const N = 40, M = Math.max(1, Math.round(N * st.rota.p)); for (let i = 0; i <= M; i++) { const u = i / N; const x = (1 - u) * (1 - u) * a.x + 2 * (1 - u) * u * cxp + u * u * b.x, y = (1 - u) * (1 - u) * a.y + 2 * (1 - u) * u * cyp + u * u * b.y; const p = px(x, y); if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); } g.stroke(); g.setLineDash([]);
+    if (st.rota.p > 0.5) { const p = px(cxp * 0.5 + mx * 0.5, cyp * 0.5 + my * 0.5); g.font = '600 ' + Math.round(10 * dpr) + 'px "IBM Plex Mono",monospace'; g.fillStyle = acc; g.globalAlpha = Math.min(1, (st.rota.p - 0.5) * 2); g.fillText(T('cine.rota', null, 'Rota de ataque').toUpperCase(), p[0] + 8 * dpr, p[1]); g.globalAlpha = 1; } }
+  /* bases: você, aliados e inimigos (ameaça pulsando) */
+  g.font = '600 ' + Math.round(10.5 * dpr) + 'px "IBM Plex Mono",monospace'; g.textAlign = 'center';
+  for (const b of st.map.bases) { const p = px(b.x, b.y); const eu = b.i === 0; const cor = eu ? acc : b.ally ? '#7FE3A1' : '#FF4A4A'; const r = 7 * dpr;
+    if (!eu && !b.ally) { const k = st.ameaca.k * (b === st.alvo ? 1 : 0.6); if (k > 0) for (let j = 0; j < 2; j++) { const f = ((tt * 0.7 + j * 0.5) % 1); g.strokeStyle = 'rgba(255,74,74,' + (0.6 * (1 - f) * k) + ')'; g.lineWidth = 1.5 * dpr; g.beginPath(); g.arc(p[0], p[1], r + f * 34 * dpr, 0, 6.2832); g.stroke(); } }
+    g.fillStyle = cor; g.beginPath(); g.moveTo(p[0], p[1] - r * 1.3); g.lineTo(p[0] + r, p[1]); g.lineTo(p[0], p[1] + r * 1.3); g.lineTo(p[0] - r, p[1]); g.closePath(); g.fill(); g.strokeStyle = 'rgba(0,0,0,.6)'; g.lineWidth = 1 * dpr; g.stroke();
+    g.fillStyle = '#fff'; g.shadowColor = '#000'; g.shadowBlur = 4 * dpr; const lb = eu ? T('cine.voce', null, 'Você') : (b.ally ? T('cine.aliado', null, 'Aliado') : T('cine.ameaca', null, 'Ameaça')) + ' · ' + raca(b.fac); g.fillText(lb.toUpperCase(), p[0], p[1] - r * 1.3 - 6 * dpr); g.shadowBlur = 0; }
+  g.textAlign = 'left';
+  /* varredura de radar a partir da sua base */
+  if (st.varre.a > 0 && st.varre.a < 1) { const p = px(st.eu.x, st.eu.y); const R = st.varre.a * Math.max(W, H) * 1.2; g.strokeStyle = acc; g.globalAlpha = 0.55 * (1 - st.varre.a); g.lineWidth = 2 * dpr; g.beginPath(); g.arc(p[0], p[1], R, 0, 6.2832); g.stroke(); g.globalAlpha = 1; }
+  /* cantos de mira */
+  g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = 1.5 * dpr; const m = 10 * dpr, l = 22 * dpr; g.beginPath(); for (const [x, y, sx, sy] of [[m, m, 1, 1], [W - m, m, -1, 1], [m, H - m, 1, -1], [W - m, H - m, -1, -1]]) { g.moveTo(x, y + sy * l); g.lineTo(x, y); g.lineTo(x + sx * l, y); } g.stroke(); }
+
+/* ---------- início ---------- */
+function init() { try { estilo(); ajustes(); } catch (e) { console.warn('[ARD] cinema:', e); } const go = () => gsapCarrega(); if (window.requestIdleCallback) requestIdleCallback(go, { timeout: 4000 }); else setTimeout(go, 1500); }
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+window.addEventListener('ard-idioma', () => { try { if (DOM && ARD.i18n && ARD.i18n.aplicar) ARD.i18n.aplicar(DOM.el); } catch (e) {} });
+
+ARD.cinema = { quadro, eventos, ativa, pular, ligada, chefe, superarma, abertura, enfileira, salaGuerra, pararSala, ouviu, gsap: gsapCarrega, estado: () => (A ? { tipo: A.tipo, t: A.t, dur: A.cena.dur, pausou: A.pausou } : SG && SG.tocando ? { tipo: 'sala', t: SG.t, dur: SG.dur } : null) };
+})(globalThis.ARD = globalThis.ARD || {});
+
 /* Bootstrap: tela inicial, laço de jogo, HUD, diplomacia, dicas e tela final. */
 (function (ARD) {
 'use strict';
@@ -26813,13 +27628,13 @@ const RES3 = ['plasma', 'minerio', 'dados'], RES_CLS = { plasma: 'pl', minerio: 
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">' + Tx('geral.gratis') + '</span>'; } /* 5.0c */
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-11-01 00:11Z';
+const BUILD = '2026-11-05 20:46Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.0e';
+const VERSION = '5.0f';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -27191,6 +28006,7 @@ function startGame(cfg, netCtx) {
     handleEvents(ev, silent);
     if (G.track) G.track.tick(ev);
     if (G.camp) { const r = G.camp.tick(ev); if (r && !G.ended) endGame({ campaign: r }); }
+    if (ARD.cinema && !silent) ARD.cinema.eventos(ev, G); /* 5.0f: superarma e chefão viram cena (só leem os eventos) */
     if (sim.tick % 10 === 0) updateMemory();
   }
   function proximo(f) { if (R.m5 && ARD.m5 && ARD.m5.agendar) ARD.m5.agendar(R, f); else requestAnimationFrame(f); } /* 5.0b.1: o próximo quadro; no Motor 5 com ?laco=animloop é o laço do three (renderer.setAnimationLoop) que chama (src/m5/ritmo.js) */
@@ -27209,6 +28025,7 @@ function startGame(cfg, netCtx) {
     if (!G.paused && !G.ended) { const ts0 = performance.now(); G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { if (tickOnce(false) === false) { G.acc = Math.min(G.acc, S.TICK); break; } G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; simMs = performance.now() - ts0; G.detSteps = n; }
     if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; setH($('mp-wait'), G.waitT < 0.8); if (G.waitT >= 0.8) setT($('mp-wait'), net.state === 'rejoining' || G.rejoin ? Tx('multi.reconectando', { codigo: net.code, s: Math.round((performance.now() - (G.rejoin ? G.rejoin.since : performance.now())) / 1000) }) : net.state === 'lost' ? Tx('multi.conexao-perdida-curto') : Tx('multi.aguardando-outros', { s: Math.round(G.waitT) })); } /* 5.0c */ /* 4.3k: escrita com guarda */
     I.update(dt);
+    if (ARD.cinema) ARD.cinema.quadro(now, dt, G); /* 5.0f: a cena que está tocando leva a câmera (view.cam) */
     if (G.bench) benchFrame(now, dt);
     if (G.frameN % 3 === 0) refreshTop();
     if (G.frameN++ % 2 === 0) { refreshPanel(false); refreshQuick(); } // 4.1a: barato agora (vida e progresso atualizam no lugar)
@@ -27246,6 +28063,7 @@ function startGame(cfg, netCtx) {
     if (t.includes('PACTO DE NÃO')) return 'Pacto assinado'; if (t.includes('BLECAUTE')) return 'Blecaute'; if (t.includes('FUNDIÇÃO')) return 'Fundição Orbital'; if (t.includes('SALTO')) return 'Salto de Núcleo'; return null;
   }
   function audioFor(e) {
+    AU.em(e); /* 5.0f: a posição do evento para o som 3D (src/som3d.js) */
     switch (e.t) {
       case 'shot': { const w = S.WEAPONS[e.weapon]; AU.sfx(e.beam ? 'beam' : (w && w.proj === 'shell') ? 'shot_heavy' : 'shot_light', volAt(e.x1, e.y1)); break; }
       case 'impact': AU.sfx(e.splash > 0 ? 'impact' : 'shot_light', volAt(e.x, e.y) * (e.splash > 0 ? 1 : 0.3)); break;
@@ -27822,7 +28640,7 @@ function startGame(cfg, netCtx) {
       placeChanged() { const pb = $('placebar'); if (!pb) return; const g = view.ghost; const on = G.isTouch && I.mode === 'build' && g && !S.BUILDINGS[g.def].wall; pb.hidden = !on; document.body.classList.toggle('placing', !!on); if (!on) return; const ok = S.canBuild(sim, human, g.def, g.x, g.y); const afford = S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost); $('pb-text').textContent = DN.construcao(g.def) + ' · ' + (!ok.ok ? TRx(ok.why) : Tx(!afford ? 'hud.pb.sem-recursos' : 'hud.pb.valido')); /* 5.0c */ $('pb-ok').disabled = !(ok.ok && afford); },
       buildMenuChanged() { refreshPanel(true); refreshQuick(); },
       touchBoxChanged() { refreshQuick(); },
-      notice, confirm: confirmModal, modalOpen() { return !$('diplo').hidden || !$('help').hidden || !$('confirm').hidden || !$('savebox').hidden || !!(G.h3 && G.h3.modalOpen()); }, /* 5.0b: tela de pesquisa e Ajustes também */ // 4.2g: com Salvar partida aberta as teclas não comandam o jogo
+      notice(t) { notice(t); if (AU.aviso) AU.aviso(t); } /* 5.0f: comando recusado com o som de erro da Raça */, confirm: confirmModal, modalOpen() { return !$('diplo').hidden || !$('help').hidden || !$('confirm').hidden || !$('savebox').hidden || !!(G.h3 && G.h3.modalOpen()); }, /* 5.0b: tela de pesquisa e Ajustes também */ // 4.2g: com Salvar partida aberta as teclas não comandam o jogo
       enqueue(c) { if (net) G.pending.push(c); else S.enqueue(sim, c); },
       closeModals() { $('diplo').hidden = true; $('help').hidden = true; $('confirm').hidden = true; if (G.closeSave) G.closeSave(); if (G.h3) G.h3.closeModals(); /* 5.0b: tela de pesquisa e Ajustes */ },
       wheel(o) { return G.h3 ? G.h3.wheel(o) : false; }, groupsChanged() { if (G.h3) G.h3.groupsChanged(); }, nextAlert() { return G.h3 ? G.h3.nextAlert() : view.lastAlert; }, toggleTech() { if (G.h3) G.h3.toggleTech(); }, /* 5.0b: roda de comandos, grupos, Espaço nos alertas e F3 */

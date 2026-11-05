@@ -508,7 +508,13 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
 
 ### Onda 4 — Som, cinema e ameaças
 
-#### 5.0f — Som 3D e cinema · tamanho G · 2 agentes
+#### 5.0f — Som 3D e cinema · tamanho G · 2 agentes · ✔ 05/11/2026
+**Entregue (05/11/2026), dois agentes em paralelo (f-som, f-cinema), nos dois motores e no 2D, sem arquivo de áudio novo e sem biblioteca nova:**
+- **Som 3D (`src/som3d.js`):** ouvinte na câmera a cada quadro e cada efeito na sua posição; HRTF no computador (Ajustes: fone ou caixas) e panorâmica simples no celular; distância pelo zoom em três barramentos (perto, longe com menos agudo, névoa abafada pela grade `seenAt`); reverberação por bioma com impulso gerado no navegador; 12 vozes fixas (8 no celular) com prioridade; limitador no fim (≈ −1,9 dBFS) e efeitos −6 dB e música −10 dB sob a fala. Chaves: `?reverb=0`, `?hrtf=0`, `?somvozes=N`.
+- **Trilha (`src/musica.js`):** feita no próprio Web Audio em vez do Tone.js (sem biblioteca nova): um tema por Raça com as camadas paz, tensão, batalha, chefão e cinema e os finais de vitória e derrota, gravadas num OfflineAudioContext depois da carga e tocadas presas ao mesmo relógio. `ARD.musica.cena(nome)` para o cinema. Memória: 7,5 a 10 MB no PC e 4,7 MB no celular.
+- **Cinema (`src/cinema.js`, GSAP):** tocador de cenas no laço do render (trilho de câmera, faixas, cartão, legenda digitada, Pular); pausa no solo e só câmera no multijogador e na Fenda. Sala de Guerra no briefing das 20 missões, abertura de missão (6,2 s), câmera da superarma (3,6 s, intervalo de 20 s) e entrada de chefão (`ARD.cinema.chefe`, para a 5.0g). Chaves: `?cenas=0`, `?cenasala=0`, `?cenaabertura=0`, `?cenachefe=0`, `?cenasuper=0`.
+- **Fica para depois:** as transições de shader (GL Transitions em TSL) e a profundidade de campo nas cenas.
+- **Carga no QA (Planície, Média):** 64 → 64 pipelines e 878 → 878 KB de WGSL: o som e o cinema não criam pipeline.
 - **Som 3D (Web Audio):**
   - o ouvinte fica preso à câmera (posição e orientação a cada quadro), e cada som tem posição no mapa;
   - HRTF no computador com fone e panorâmica simples no celular;

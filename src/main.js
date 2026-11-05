@@ -30,7 +30,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.0e';
+const VERSION = '5.0f';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -402,6 +402,7 @@ function startGame(cfg, netCtx) {
     handleEvents(ev, silent);
     if (G.track) G.track.tick(ev);
     if (G.camp) { const r = G.camp.tick(ev); if (r && !G.ended) endGame({ campaign: r }); }
+    if (ARD.cinema && !silent) ARD.cinema.eventos(ev, G); /* 5.0f: superarma e chefão viram cena (só leem os eventos) */
     if (sim.tick % 10 === 0) updateMemory();
   }
   function proximo(f) { if (R.m5 && ARD.m5 && ARD.m5.agendar) ARD.m5.agendar(R, f); else requestAnimationFrame(f); } /* 5.0b.1: o próximo quadro; no Motor 5 com ?laco=animloop é o laço do three (renderer.setAnimationLoop) que chama (src/m5/ritmo.js) */
@@ -420,6 +421,7 @@ function startGame(cfg, netCtx) {
     if (!G.paused && !G.ended) { const ts0 = performance.now(); G.acc += dt * G.speed; let n = 0; while (G.acc >= S.TICK && n < 12) { if (tickOnce(false) === false) { G.acc = Math.min(G.acc, S.TICK); break; } G.acc -= S.TICK; n++; } if (n >= 12) G.acc = 0; simMs = performance.now() - ts0; G.detSteps = n; }
     if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; setH($('mp-wait'), G.waitT < 0.8); if (G.waitT >= 0.8) setT($('mp-wait'), net.state === 'rejoining' || G.rejoin ? Tx('multi.reconectando', { codigo: net.code, s: Math.round((performance.now() - (G.rejoin ? G.rejoin.since : performance.now())) / 1000) }) : net.state === 'lost' ? Tx('multi.conexao-perdida-curto') : Tx('multi.aguardando-outros', { s: Math.round(G.waitT) })); } /* 5.0c */ /* 4.3k: escrita com guarda */
     I.update(dt);
+    if (ARD.cinema) ARD.cinema.quadro(now, dt, G); /* 5.0f: a cena que está tocando leva a câmera (view.cam) */
     if (G.bench) benchFrame(now, dt);
     if (G.frameN % 3 === 0) refreshTop();
     if (G.frameN++ % 2 === 0) { refreshPanel(false); refreshQuick(); } // 4.1a: barato agora (vida e progresso atualizam no lugar)
@@ -457,6 +459,7 @@ function startGame(cfg, netCtx) {
     if (t.includes('PACTO DE NÃO')) return 'Pacto assinado'; if (t.includes('BLECAUTE')) return 'Blecaute'; if (t.includes('FUNDIÇÃO')) return 'Fundição Orbital'; if (t.includes('SALTO')) return 'Salto de Núcleo'; return null;
   }
   function audioFor(e) {
+    AU.em(e); /* 5.0f: a posição do evento para o som 3D (src/som3d.js) */
     switch (e.t) {
       case 'shot': { const w = S.WEAPONS[e.weapon]; AU.sfx(e.beam ? 'beam' : (w && w.proj === 'shell') ? 'shot_heavy' : 'shot_light', volAt(e.x1, e.y1)); break; }
       case 'impact': AU.sfx(e.splash > 0 ? 'impact' : 'shot_light', volAt(e.x, e.y) * (e.splash > 0 ? 1 : 0.3)); break;
@@ -1033,7 +1036,7 @@ function startGame(cfg, netCtx) {
       placeChanged() { const pb = $('placebar'); if (!pb) return; const g = view.ghost; const on = G.isTouch && I.mode === 'build' && g && !S.BUILDINGS[g.def].wall; pb.hidden = !on; document.body.classList.toggle('placing', !!on); if (!on) return; const ok = S.canBuild(sim, human, g.def, g.x, g.y); const afford = S.canAfford(sim.players[human], S.BUILDINGS[g.def].cost); $('pb-text').textContent = DN.construcao(g.def) + ' · ' + (!ok.ok ? TRx(ok.why) : Tx(!afford ? 'hud.pb.sem-recursos' : 'hud.pb.valido')); /* 5.0c */ $('pb-ok').disabled = !(ok.ok && afford); },
       buildMenuChanged() { refreshPanel(true); refreshQuick(); },
       touchBoxChanged() { refreshQuick(); },
-      notice, confirm: confirmModal, modalOpen() { return !$('diplo').hidden || !$('help').hidden || !$('confirm').hidden || !$('savebox').hidden || !!(G.h3 && G.h3.modalOpen()); }, /* 5.0b: tela de pesquisa e Ajustes também */ // 4.2g: com Salvar partida aberta as teclas não comandam o jogo
+      notice(t) { notice(t); if (AU.aviso) AU.aviso(t); } /* 5.0f: comando recusado com o som de erro da Raça */, confirm: confirmModal, modalOpen() { return !$('diplo').hidden || !$('help').hidden || !$('confirm').hidden || !$('savebox').hidden || !!(G.h3 && G.h3.modalOpen()); }, /* 5.0b: tela de pesquisa e Ajustes também */ // 4.2g: com Salvar partida aberta as teclas não comandam o jogo
       enqueue(c) { if (net) G.pending.push(c); else S.enqueue(sim, c); },
       closeModals() { $('diplo').hidden = true; $('help').hidden = true; $('confirm').hidden = true; if (G.closeSave) G.closeSave(); if (G.h3) G.h3.closeModals(); /* 5.0b: tela de pesquisa e Ajustes */ },
       wheel(o) { return G.h3 ? G.h3.wheel(o) : false; }, groupsChanged() { if (G.h3) G.h3.groupsChanged(); }, nextAlert() { return G.h3 ? G.h3.nextAlert() : view.lastAlert; }, toggleTech() { if (G.h3) G.h3.toggleTech(); }, /* 5.0b: roda de comandos, grupos, Espaço nos alertas e F3 */

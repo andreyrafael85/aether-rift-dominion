@@ -385,7 +385,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aqui é seu. Ainda.",
-  "inicio.versao": "Versão 5.0e · build __BUILD__ · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
+  "inicio.versao": "Versão 5.0f · build __BUILD__ · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Escolha sua Raça",
   "inicio.vitrine.explorar-base": "Explorar a base",
   "inicio.vitrine.som-tela-inicial": "Som da tela inicial",
@@ -454,6 +454,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.btn-bench": "Testar desempenho (30 s)",
   "ajustes.cfg-feedback": "Enviar feedback",
   "notas.notas-versao": "Notas da versão",
+  "notas.5-0f": "<b>5.0f — Som 3D e cinema:</b> cada som agora sai do seu lugar no mapa e acompanha a câmera, com som 3D para fone no computador; o que está longe perde o brilho, o que está sob a névoa de guerra soa abafado e cada bioma tem seu eco. Uma <b>trilha adaptativa</b>, gerada no próprio navegador, dá um tema a cada Raça e muda entre paz, tensão, batalha e chefão conforme a partida, e baixa quando alguém fala. Cliques e avisos têm o timbre da sua Raça. As 20 missões abrem com a <b>Sala de Guerra</b>: o mapa tático com as ameaças, a rota de ataque e os objetivos, e a câmera pousando na sua base. A superarma ganhou uma tomada curta do disparo, e os chefões, uma entrada de cinema. Tudo pode ser pulado (Esc, clique ou toque), e Ajustes tem volume de efeitos e de música, saída para fone ou caixas e as cenas de cinema.",
   "notas.5-0e": "<b>5.0e — Bases e unidades vivas:</b> com o <b>Motor 5</b> ligado, cada construção sobe no estilo da sua Raça: solda na Vehnar, trama de luz na Erevane, veias na Tessara, cristais no Quorith e bolhas na Vorag, com uma onda no chão ao concluir. Os destroços quicam no relevo e o entulho fica um tempo no chão; na Alta e na Ultra, o calor e a onda de choque das explosões distorcem o ar. A base ganhou vida: módulos visíveis nas construções, paredes que racham conforme a vida cai, condutos que pulsam com a energia (e piscam quando ela falta), trabalhadores andando entre os prédios e construções Tessara e Vorag que respiram. As unidades ganharam aro de seleção em holograma, barras de vida em segmentos que nenhuma névoa escurece, contorno na cor do time e estrelas de veterano que brilham na promoção; os materiais mostram desgaste nas bordas e a poeira do mapa na base das peças.",
   "notas.5-0d-1": "<b>5.0d.1 — Névoa leve e Firefox corrigido:</b> no Firefox, as nuvens de guerra da 5.0d deixavam a partida quase sem visibilidade na Alta, porque um shader que o Firefox recusava escurecia a tela. Está corrigido, e as nuvens viraram um véu claro e translúcido sobre o que nunca foi visto: o relevo continua legível, e o que está à vista nunca fica coberto. A névoa dos climas também ficou mais leve: unidades e construções continuam nítidas na névoa tóxica, na chuva e no celular. E o clima <b>Automático</b> agora acompanha o mapa, de leve: neve fina, chuva fina ou poeira na Planície da Fenda e cinza no Cinturão (da Média para cima).",
   "notas.5-0d": "<b>5.0d — Céu, clima e nuvens de guerra:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o mundo ganhou vida. O sol anda no ciclo do dia, com nascer e pôr do sol, sombras que giram e, à noite, lua e estrelas; o reflexo do céu acompanha a hora. Na Alta e na Ultra, raios de sol atravessam a poeira e a Tempestade de Éter. O que nunca foi visto fica sob um banco de nuvens baixas, que se abre com a borda acesa quando as tropas chegam (da Média para cima). Os climas do campo (Jogar › Semente e clima) agora acontecem na placa de vídeo: neve de cristais que se acumula no chão e no alto das peças, neve fina e cortinas de luz na aurora, areia e cinza na tempestade de plasma, chuva com chão molhado e poças na chuva ácida, e bancos de névoa tóxica nos vales. E o chão guarda a batalha: crateras que afundam, mato queimado e pegadas na neve e na areia.",
@@ -462,7 +463,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "notas.5-0c": "<b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 mais leve, faróis e som no iPhone:</b> com o <b>Motor 5</b> ligado, os shaders que ele prepara na carga encolheram um terço (os lagos primeiro) e cada quadro manda muito menos dados para a placa de vídeo, o que alivia a CPU no Firefox e no celular. O brilho em volta das luzes agora é o mesmo do motor clássico, e no Modo Foto da qualidade Baixa os efeitos seguem a exposição como no clássico. À noite e dentro da Tempestade de Éter, os faróis dos veículos, coletores e piratas iluminam o chão à frente, nos dois motores. A Sala de Comando ficou um pouco mais clara, sem o clarão de antes. No iPhone, o som e a voz destravam no primeiro toque, tocam com a chave de silêncio ligada e voltam depois de uma ligação. Cada líder fala com uma voz do seu gênero em todo navegador. Em Ajustes, <b>Testar som</b> toca três notas e uma frase e mostra o estado do áudio do aparelho.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, em teste:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o jogo inteiro agora roda em WebGPU, com volta sozinha para WebGL2: unidades e construções com o detalhe de superfície e a animação de cada peça, ruínas, obras, o holograma da Erevane, os escudos do Uníssono e as bandeiras; o chão com todos os biomas, a vegetação ao vento, as estradas e o céu; explosões, fogo, fumaça e tiros; os lagos de plasma e de gelo com reflexo, o espaço do Cinturão e a Tempestade de Éter; e o <b>Modo Foto</b> (📷 ou tecla J) com desfoque, os 8 filtros e captura em 4K. Na primeira vez que o Modo Foto abre numa partida, ele leva alguns segundos para se preparar. Com tudo isso, a carga do Motor 5 ficou alguns segundos mais longa: a próxima versão mede nos aparelhos e enxuga. O motor clássico continua o padrão e não mudou.",
-  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0d.1 → 2.0)",
+  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0e → 2.0)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Termos de Uso",
   "inicio.rodape.foot-priv": "Privacidade",
@@ -641,6 +642,13 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.motor-5": "Motor 5 (WebGPU, experimental)",
   "ajustes.instalar": "Instalar o jogo (app)",
   "ajustes.testar-som": "Testar som",
+  "som.efeitos": "Efeitos",
+  "som.vol-efeitos": "Volume dos efeitos",
+  "som.musica": "Música",
+  "som.vol-musica": "Volume da música",
+  "som.saida": "Som 3D",
+  "som.saida.fone": "Fone de ouvido (HRTF)",
+  "som.saida.caixa": "Caixas de som",
   "geral.idioma": "Idioma",
   "inicio.multi.codigo": "CÓDIGO",
   /* inicio-jogo */
@@ -1753,4 +1761,17 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "voz.diag.voltou": "já voltou", /* 5.0c.1 */
   "voz.d.ios-gravadas": "No iPhone, o jogo fala com as vozes gravadas de cada Raça, pelo mesmo som dos efeitos. A voz do sistema escolhida aqui só vale para o Ouvir.", /* 5.0c.1 */
   "geral.idioma-offline": "Sem internet: este idioma ainda não foi baixado neste aparelho.",
+  "cine.pular": "Pular", /* 5.0f */
+  "cine.rever": "Rever a cena", /* 5.0f */
+  "cine.sala": "Sala de Guerra", /* 5.0f */
+  "cine.voce": "Você", /* 5.0f */
+  "cine.aliado": "Aliado", /* 5.0f */
+  "cine.ameaca": "Ameaça", /* 5.0f */
+  "cine.rota": "Rota de ataque", /* 5.0f */
+  "cine.superarma": "Superarma", /* 5.0f */
+  "cine.chefao": "Chefão", /* 5.0f */
+  "cine.chefe.catedral": "O relicário do Coro caminha cantando", /* 5.0f */
+  "cine.chefe.matriarca": "Rainha da Prole, mãe de todas as Crias", /* 5.0f */
+  "cine.op.cenas": "Cenas de cinema: Sala de Guerra, abertura das missões e entrada dos chefões", /* 5.0f */
+  "cine.op.super": "Câmera de ação da superarma", /* 5.0f */
 };

@@ -39,7 +39,7 @@ function soltar(b) { if (!b) return; const AC = S && S.AC; for (const t of b.tim
 /* começa (depois de um gesto): o = { fenda: {x,y,z}, nucleo: {x,y,z}, race } */
 function iniciar(o) { const A = ARD.audio; if (S || !A || !A.enabled) return false; if (!A.ctx) A.init(); const AC = A.ctx; if (!AC) return false; A.resume();
   S = { AC, src: [], nbuf: ruido(AC), on: true, race: o.race, pos: o };
-  const comp = AC.createDynamicsCompressor(); comp.connect(AC.destination); S.comp = comp; S.bus = AC.createGain(); S.bus.gain.value = 0; S.bus.connect(comp);
+  const comp = AC.createDynamicsCompressor(); comp.connect((ARD.som3d && ARD.som3d.saidaSala(AC)) || AC.destination); /* 5.0f: o ambiente da Sala entra no limitador do fim, junto com a música */ S.comp = comp; S.bus = AC.createGain(); S.bus.gain.value = 0; S.bus.connect(comp);
   const conv = AC.createConvolver(); conv.buffer = ir(AC, 2.6, 2.3); S.send = AC.createGain(); S.send.gain.value = 0.3; S.send.connect(conv); conv.connect(comp); S.conv = conv;
   fenda(AC, o.fenda); S.base = base(AC, o.race, o.nucleo); S.bus.gain.setValueAtTime(0.0001, AC.currentTime); S.bus.gain.linearRampToValueAtTime(0.7, AC.currentTime + 2.5); return true; }
 const fw = { x: 0, y: 0, z: -1 }, up = { x: 0, y: 1, z: 0 };

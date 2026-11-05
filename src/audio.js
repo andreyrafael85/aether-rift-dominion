@@ -1,35 +1,41 @@
 /* Áudio: efeitos sintetizados em WebAudio (sem arquivos) e voz de sistema pela Web Speech API. 5.0c.1: e as vozes gravadas (src/vozes.js), pelo mesmo Web Audio. */
 (function (ARD) {
 'use strict';
-const A = { ctx: null, master: null, enabled: true, voice: true, gravadas: true /* 5.0c.1: vozes gravadas (false = voz do sistema) */, inited: false, last: {}, recent: [], lastVoice: {}, voiceObj: null, voz: '', vozNome: '' };
-try { const p = JSON.parse(localStorage.getItem('ard-audio') || '{}'); if (p.enabled === false) A.enabled = false; if (p.voice === false) A.voice = false; if (typeof p.voz === 'string') A.voz = p.voz; if (typeof p.vozNome === 'string') A.vozNome = p.vozNome; /* 5.0a.2: voz escolhida em Ajustes ('' = Automática) */ if (p.gravadas === false) A.gravadas = false; /* 5.0c.1 */ } catch (e) {}
-function save() { try { localStorage.setItem('ard-audio', JSON.stringify({ enabled: A.enabled, voice: A.voice, voz: A.voz || '', vozNome: A.vozNome || '', gravadas: A.gravadas !== false /* 5.0c.1 */ })); } catch (e) {} }
+const A = { ctx: null, master: null, enabled: true, voice: true, gravadas: true /* 5.0c.1: vozes gravadas (false = voz do sistema) */, inited: false, last: {}, recent: [], lastVoice: {}, voiceObj: null, voz: '', vozNome: '',
+  volSom: 1, musica: true, volMusica: 0.7, saida: 'fone' /* 5.0f: volume dos efeitos (1 = o de antes), música liga/desliga e volume, saída do som 3D ('fone' = HRTF, 'caixa' = panorâmica simples) */ };
+const GANHO_EFEITOS = 0.35; /* o volume dos efeitos de antes da 5.0f (A.master) */
+const vol01 = v => Math.max(0, Math.min(1, +v)); /* 5.0f */
+try { const p = JSON.parse(localStorage.getItem('ard-audio') || '{}'); if (p.enabled === false) A.enabled = false; if (p.voice === false) A.voice = false; if (typeof p.voz === 'string') A.voz = p.voz; if (typeof p.vozNome === 'string') A.vozNome = p.vozNome; /* 5.0a.2: voz escolhida em Ajustes ('' = Automática) */ if (p.gravadas === false) A.gravadas = false; /* 5.0c.1 */
+  if (p.volSom != null && isFinite(p.volSom)) A.volSom = vol01(p.volSom); if (p.musica === false) A.musica = false; if (p.volMusica != null && isFinite(p.volMusica)) A.volMusica = vol01(p.volMusica); if (p.saida === 'caixa' || p.saida === 'fone') A.saida = p.saida; /* 5.0f */ } catch (e) {}
+function save() { try { localStorage.setItem('ard-audio', JSON.stringify({ enabled: A.enabled, voice: A.voice, voz: A.voz || '', vozNome: A.vozNome || '', gravadas: A.gravadas !== false /* 5.0c.1 */, volSom: A.volSom, musica: A.musica !== false, volMusica: A.volMusica, saida: A.saida /* 5.0f */ })); } catch (e) {} }
 const VZ = () => (globalThis.ARD && ARD.vozes) || null; /* 5.0c.1: o tocador das vozes gravadas (src/vozes.js); sem ele (testes no Node), tudo como antes */
+const S3 = () => (globalThis.ARD && ARD.som3d) || null; /* 5.0f: o mixer do som 3D (src/som3d.js); sem ele, os efeitos como antes */
 A.init = function () {
   if (A.inited) return; A.inited = true; sessao(); /* 5.0b.1: a sessão de reprodução do iOS vem antes de o contexto nascer */
-  try { const C = window.AudioContext || window.webkitAudioContext; if (!C) return; A.ctx = new C(); A.master = A.ctx.createGain(); A.master.gain.value = 0.35; A.master.connect(A.ctx.destination); } catch (e) { A.ctx = null; }
+  try { const C = window.AudioContext || window.webkitAudioContext; if (!C) return; A.ctx = new C(); A.master = A.ctx.createGain(); A.master.gain.value = GANHO_EFEITOS * A.volSom; A.master.connect(A.ctx.destination); } catch (e) { A.ctx = null; }
   if (A.ctx) vigiar(A.ctx); /* 5.0b.1: estado 'interrupted' do iOS e volta para a página */
+  if (A.ctx && S3()) try { S3().montar(A.ctx, A.master); } catch (e) { console.warn('[ARD] som 3D indisponível: ' + e.message); } /* 5.0f: barramentos, limitador, vozes do mixer e os efeitos pré-gravados */
 };
 A.resume = function () { retomar(); }; /* 5.0b.1: retoma também do 'interrupted' do iOS e nunca deixa a promessa do resume() solta (antes: só 'suspended', sem catch) */
-let noiseBuf = null;
+/* 5.0f: a síntese escreve num alvo: o contexto ao vivo (A.ctx → A.master, agora) ou, na pré-gravação dos efeitos (src/som3d.js), um
+   OfflineAudioContext (TG = { c, d, t }). Os sons são os mesmos de antes; cada um vira um AudioBuffer uma vez e toca por uma voz do mixer. */
+let noiseBuf = null, TG = null;
+const sc = () => TG ? TG.c : A.ctx, sd = () => TG ? TG.d : A.master, st = () => TG ? TG.t : A.ctx.currentTime;
 function noise(dur, o) {
-  const c = A.ctx; if (!noiseBuf) { noiseBuf = c.createBuffer(1, c.sampleRate, c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
-  const t0 = c.currentTime + (o.delay || 0); /* 4.3h: atraso (trovão longe) */ const src = c.createBufferSource(); src.buffer = noiseBuf; const f = c.createBiquadFilter(); f.type = o.type || 'lowpass'; f.frequency.setValueAtTime(o.freq || 800, t0); if (o.sweep) f.frequency.exponentialRampToValueAtTime(o.sweep, t0 + dur); f.Q.value = o.q || 0.7;
+  const c = sc(); if (!noiseBuf || noiseBuf.sampleRate !== c.sampleRate) { noiseBuf = c.createBuffer(1, c.sampleRate, c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+  const t0 = st() + (o.delay || 0); /* 4.3h: atraso (trovão longe) */ const src = c.createBufferSource(); src.buffer = noiseBuf; const f = c.createBiquadFilter(); f.type = o.type || 'lowpass'; f.frequency.setValueAtTime(o.freq || 800, t0); if (o.sweep) f.frequency.exponentialRampToValueAtTime(o.sweep, t0 + dur); f.Q.value = o.q || 0.7;
   const g = c.createGain(); g.gain.setValueAtTime(o.gain || 0.3, t0); g.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
-  src.connect(f); f.connect(g); g.connect(A.master); src.start(t0); src.stop(t0 + dur + 0.05);
+  src.connect(f); f.connect(g); g.connect(sd()); src.start(t0); src.stop(t0 + dur + 0.05);
 }
 function tone(freq, dur, o) {
-  const c = A.ctx; o = o || {}; const osc = c.createOscillator(); osc.type = o.type || 'sine'; osc.frequency.setValueAtTime(freq, c.currentTime + (o.delay || 0));
-  if (o.slide) osc.frequency.exponentialRampToValueAtTime(o.slide, c.currentTime + (o.delay || 0) + dur);
-  const g = c.createGain(); g.gain.setValueAtTime(0.0001, c.currentTime + (o.delay || 0)); g.gain.exponentialRampToValueAtTime(o.gain || 0.2, c.currentTime + (o.delay || 0) + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + (o.delay || 0) + dur);
-  osc.connect(g); g.connect(A.master); osc.start(c.currentTime + (o.delay || 0)); osc.stop(c.currentTime + (o.delay || 0) + dur + 0.05);
+  const c = sc(); o = o || {}; const t0 = st() + (o.delay || 0), at = o.at || 0.01; const osc = c.createOscillator(); osc.type = o.type || 'sine'; osc.frequency.setValueAtTime(freq, t0); if (o.det) osc.detune.value = o.det;
+  if (o.slide) osc.frequency.exponentialRampToValueAtTime(o.slide, t0 + dur);
+  const g = c.createGain(); g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(o.gain || 0.2, t0 + at); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(g); g.connect(sd()); osc.start(t0); osc.stop(t0 + dur + 0.05);
 }
-const MIN_GAP = { shot_light: 60, shot_heavy: 90, beam: 120, impact: 70, explosion: 120, build: 300, spawn: 300, alert: 800, danger: 1200, promote: 500, click: 40, siphon: 600, storm: 3000, thunder: 600, pact: 1000, betrayal: 1000 };
-A.sfx = function (name, vol, delay) {
-  if (!A.enabled || !A.ctx) return; A.resume(); vol = vol == null ? 1 : Math.max(0, Math.min(1, vol)); if (vol < 0.03) return;
-  const now = performance.now(); if (A.last[name] && now - A.last[name] < (MIN_GAP[name] || 50)) return;
-  A.recent = A.recent.filter(t => now - t < 100); if (A.recent.length > 10) return; A.recent.push(now); A.last[name] = now;
-  const v = vol;
+const MIN_GAP = { shot_light: 60, shot_heavy: 90, beam: 120, impact: 70, explosion: 120, build: 300, spawn: 300, alert: 800, danger: 1200, promote: 500, click: 40, siphon: 600, storm: 3000, thunder: 600, pact: 1000, betrayal: 1000, erro: 250 /* 5.0f */ };
+/* o desenho de cada efeito (v = volume; os de interface ignoram v, como antes) */
+function desenha(name, v, delay) {
   switch (name) {
     case 'shot_light': tone(900, 0.05, { type: 'square', gain: 0.08 * v, slide: 300 }); break;
     case 'shot_heavy': noise(0.14, { freq: 500, sweep: 120, gain: 0.35 * v }); tone(90, 0.12, { type: 'triangle', gain: 0.25 * v, slide: 45 }); break;
@@ -42,13 +48,59 @@ A.sfx = function (name, vol, delay) {
     case 'danger': for (let i = 0; i < 2; i++) tone(320, 0.3, { type: 'sawtooth', gain: 0.12, delay: i * 0.35, slide: 200 }); break;
     case 'promote': [523, 659, 784].forEach((f, i) => tone(f, 0.12, { gain: 0.12, delay: i * 0.09 })); break;
     case 'click': tone(1200, 0.03, { type: 'square', gain: 0.05 }); break;
+    case 'erro': tone(230, 0.11, { type: 'square', gain: 0.07, slide: 190 }); tone(180, 0.16, { type: 'square', gain: 0.07, delay: 0.12, slide: 150 }); break; /* 5.0f: comando recusado */
     case 'siphon': tone(180, 0.5, { type: 'triangle', gain: 0.1 * v, slide: 240 }); break;
     case 'storm': noise(1.4, { freq: 260, sweep: 90, gain: 0.35 }); break;
     case 'thunder': { const dl = Math.max(0, Math.min(2.5, delay || 0)); noise(0.22, { freq: 2600, sweep: 700, gain: 0.22 * v, delay: dl }); noise(2.4, { freq: 210, sweep: 45, gain: 0.5 * v, delay: dl + 0.04 }); tone(44, 1.6, { type: 'sine', gain: 0.16 * v, slide: 30, delay: dl }); break; } /* 4.3h: estalo e ronco do raio, atrasados pela distância */
     case 'pact': [440, 554, 659].forEach((f, i) => tone(f, 0.25, { gain: 0.1, delay: i * 0.05 })); break;
     case 'betrayal': tone(220, 0.5, { type: 'sawtooth', gain: 0.14, slide: 110 }); tone(233, 0.5, { type: 'sawtooth', gain: 0.1, slide: 116 }); break;
   }
+}
+/* 5.0f: identidade por Raça nos sons de interface (clique, construir, pronto, erro). Cada um com o timbre da Raça: a forja da Vehnar (metal e
+   bigorna), o gelo da Erevane (vidro e sino frio), o vivo da Tessara (madeira e bolha), o cristal do Quorith (acorde de sinos) e o enxame do Vorag
+   (estalo de quitina e rosnado). A pré-gravação iguala o volume médio de cada um ao do som genérico (o volume de hoje). */
+const UI_RACA = {
+  vehnar: {
+    click: () => { tone(640, 0.04, { type: 'square', gain: 0.045, slide: 470 }); noise(0.03, { type: 'highpass', freq: 3400, gain: 0.06 }); },
+    build: () => { [0, 0.15].forEach((d, i) => { noise(0.11, { type: 'bandpass', freq: 2100 - i * 400, q: 6, gain: 0.5, delay: d }); tone(1180 - i * 160, 0.16, { type: 'triangle', gain: 0.06, delay: d }); tone(1830 - i * 240, 0.12, { gain: 0.035, delay: d }); }); tone(98, 0.32, { type: 'sawtooth', gain: 0.07, delay: 0.15, slide: 82 }); },
+    spawn: () => { tone(330, 0.09, { type: 'square', gain: 0.07, slide: 320 }); tone(495, 0.14, { type: 'square', gain: 0.07, delay: 0.09 }); tone(82, 0.22, { type: 'sawtooth', gain: 0.06, delay: 0.09, slide: 75 }); noise(0.05, { type: 'bandpass', freq: 2400, q: 5, gain: 0.25, delay: 0.09 }); },
+    erro: () => { tone(140, 0.13, { type: 'square', gain: 0.075 }); tone(140, 0.16, { type: 'square', gain: 0.075, delay: 0.15, slide: 120 }); noise(0.06, { type: 'bandpass', freq: 900, q: 3, gain: 0.12 }); } },
+  erevane: {
+    click: () => { tone(1980, 0.05, { gain: 0.05, slide: 1700 }); tone(2970, 0.04, { gain: 0.02 }); },
+    build: () => { [659, 988, 1319].forEach((f, i) => { tone(f, 0.42, { gain: 0.07, delay: i * 0.07 }); tone(f * 2.76, 0.18, { gain: 0.015, delay: i * 0.07 }); }); noise(0.5, { type: 'highpass', freq: 5200, gain: 0.04, sweep: 9000 }); },
+    spawn: () => { tone(880, 0.18, { gain: 0.09, slide: 1175 }); tone(1760, 0.22, { gain: 0.025, delay: 0.06 }); noise(0.25, { type: 'bandpass', freq: 3600, q: 2, gain: 0.05 }); },
+    erro: () => { tone(660, 0.16, { gain: 0.09, slide: 520 }); tone(622, 0.2, { gain: 0.06, delay: 0.1, slide: 440 }); } },
+  tessara: {
+    click: () => { tone(880, 0.045, { type: 'triangle', gain: 0.08, slide: 1250 }); },
+    build: () => { tone(300, 0.14, { type: 'triangle', gain: 0.12, slide: 600 }); tone(450, 0.16, { type: 'triangle', gain: 0.1, delay: 0.12, slide: 900 }); tone(1046, 0.06, { gain: 0.05, delay: 0.24 }); noise(0.08, { type: 'bandpass', freq: 700, q: 4, gain: 0.2, delay: 0.02 }); },
+    spawn: () => { tone(523, 0.08, { type: 'triangle', gain: 0.1 }); tone(784, 0.12, { type: 'triangle', gain: 0.1, delay: 0.07 }); tone(1400, 0.05, { gain: 0.04, delay: 0.18, slide: 2400 }); },
+    erro: () => { tone(220, 0.1, { type: 'triangle', gain: 0.13, slide: 160 }); tone(196, 0.14, { type: 'triangle', gain: 0.12, delay: 0.12, slide: 140 }); } },
+  quorith: {
+    click: () => { tone(2093, 0.06, { gain: 0.035 }); tone(3136, 0.05, { gain: 0.02 }); },
+    build: () => { [523, 659, 784, 1046].forEach((f, i) => { tone(f, 0.55, { gain: 0.045, delay: i * 0.025, at: 0.004 }); tone(f * 3, 0.25, { gain: 0.008, delay: i * 0.025 }); }); },
+    spawn: () => { [784, 1047, 1319].forEach((f, i) => tone(f, 0.24, { gain: 0.06, delay: i * 0.06 })); },
+    erro: () => { tone(740, 0.25, { gain: 0.06 }); tone(784, 0.25, { gain: 0.06 }); tone(370, 0.2, { type: 'triangle', gain: 0.04, delay: 0.05 }); } },
+  vorag: {
+    click: () => { noise(0.025, { type: 'bandpass', freq: 3200, q: 5, gain: 0.3 }); noise(0.02, { type: 'bandpass', freq: 2600, q: 5, gain: 0.22, delay: 0.035 }); },
+    build: () => { noise(0.3, { freq: 900, sweep: 120, gain: 0.32 }); tone(110, 0.3, { type: 'sawtooth', gain: 0.07, slide: 70 }); for (let i = 0; i < 3; i++) noise(0.03, { type: 'bandpass', freq: 2900, q: 6, gain: 0.25, delay: 0.12 + i * 0.05 }); },
+    spawn: () => { tone(90, 0.28, { type: 'sawtooth', gain: 0.09, slide: 150 }); noise(0.26, { type: 'bandpass', freq: 1400, q: 3, gain: 0.16, sweep: 2600 }); for (let i = 0; i < 2; i++) noise(0.025, { type: 'bandpass', freq: 3400, q: 6, gain: 0.25, delay: 0.2 + i * 0.045 }); },
+    erro: () => { noise(0.22, { type: 'bandpass', freq: 1300, q: 2, gain: 0.2, sweep: 700 }); tone(72, 0.24, { type: 'sawtooth', gain: 0.08, slide: 60 }); } } };
+A.UI_RACA = Object.keys(UI_RACA); A.SONS = Object.keys(MIN_GAP); /* 5.0f: o que a pré-gravação grava */
+/* 5.0f: grava um efeito num contexto qualquer (o OfflineAudioContext da pré-gravação): c = contexto, d = destino, t = início */
+A.sintetiza = function (c, d, t, name, raca, v, delay) { const ant = TG; TG = { c, d, t }; try { const R = raca && UI_RACA[raca]; if (R && R[name]) R[name](); else desenha(name, v == null ? 1 : v, delay); } finally { TG = ant; } };
+/* 5.0f: posição do efeito: o src/main.js passa o evento (A.em(e)) antes do efeito dele; vale para o próximo A.sfx e só para ele */
+let EV = null; A.em = function (e) { EV = e || null; };
+A.sfx = function (name, vol, delay) {
+  const ev = EV; EV = null; /* 5.0f */
+  if (!A.enabled || !A.ctx) return; A.resume(); vol = vol == null ? 1 : Math.max(0, Math.min(1, vol)); if (vol < 0.03) return;
+  const now = performance.now(); if (A.last[name] && now - A.last[name] < (MIN_GAP[name] || 50)) return;
+  A.recent = A.recent.filter(t => now - t < 100); if (A.recent.length > 10) return; A.recent.push(now); A.last[name] = now;
+  const s3 = S3(); if (s3 && s3.tocar(name, vol, delay, ev, A.raca || racaDaTela())) return; /* 5.0f: pela voz do mixer (posição, abafamento, reverberação, prioridade) */
+  desenha(name, vol, delay); /* antes da 5.0f (e enquanto os efeitos pré-gravados não ficam prontos): a síntese ao vivo */
 };
+const racaDaTela = () => { try { return document.documentElement.dataset.race || null; } catch (e) { return null; } }; /* 5.0f: na tela inicial, a Raça em destaque */
+/* 5.0f: avisos da partida (src/main.js, ui.notice do src/input.js): o comando recusado ganha o som de erro da Raça; os avisos de confirmação, o clique */
+A.aviso = function (texto) { const t = String(texto || ''); const ok = ['input.reuniao', 'input.grupo'].some(k => { const r = TX(k, { n: 0 }); const raiz = String(r).split(/[0-9{]/)[0].trim(); return raiz && t.indexOf(raiz) === 0; }); A.sfx(ok ? 'click' : 'erro', 0.8); };
 /* 5.0a.2: voz do sistema escolhida pela qualidade. Cada voz do aparelho ganha um nível: 6 neurais do Edge ("Online (Natural)": Francisca, Antonio,
    Thalita) · 5 Google português do Brasil · 4 Apple aprimorada ou Premium (Luciana, Felipe) · 3 Apple comum · 2 outras (Android e afins) · 1 antigas
    do Windows (Maria, Daniel, Heloisa, "Desktop") · 0 robóticas (Eloquence da Apple: Eddy, Flo, Vovó…; eSpeak). Português do Brasil vem antes de
@@ -186,10 +238,36 @@ A.say = function (text, key, cooldown, quem, o) { /* 5.0a.3: quem = raça do lí
   if (A.onSay && o.legenda !== false) { try { A.onSay(txt, key); } catch (e) {} }
   return true;
 };
-A.setEnabled = function (on) { A.enabled = on; save(); sessao(); htmlMudo(); if (on) retomar(); }; A.setVoice = function (on) { A.voice = on; save(); sessao(); htmlMudo(); if (!on) { calar(); } };
+A.setEnabled = function (on) { A.enabled = on; save(); sessao(); htmlMudo(); if (on) retomar(); MIX.forEach(mixSync); /* 5.0f */ }; A.setVoice = function (on) { A.voice = on; save(); sessao(); htmlMudo(); if (!on) { calar(); } };
 /* 5.0c.1: cala a fala atual (gravada ou do sistema) e esvazia a fila */
 function calar() { const c = cur; fila = null; cur = null; if (c && c.h) try { c.h.parar(); } catch (e) {} if (temFala() && !(VZ() && VZ().semFalaSistema() && !(c && (c.u || c.sis)))) try { speechSynthesis.cancel(); } catch (e) {} }
 A.calar = calar; A.refazUI = () => UIS.forEach(preencher); /* 5.0c.1: a dica muda quando as vozes gravadas ficam prontas ou indisponíveis */
+/* 5.0f: volumes e liga/desliga em separado (Ajustes), salvos no 'ard-audio' como os de antes. Efeitos: A.enabled e A.volSom (1 = o volume de hoje);
+   música: A.musica e A.volMusica; saída do som 3D: 'fone' (HRTF) ou 'caixa' (panorâmica simples; o celular usa sempre a simples) */
+function aplicaVolumes() { if (A.master && A.ctx) try { A.master.gain.setTargetAtTime(GANHO_EFEITOS * A.volSom, A.ctx.currentTime, 0.03); } catch (e) {} const s3 = S3(); if (s3 && s3.volumes) s3.volumes(); if (globalThis.ARD && ARD.musica && ARD.musica.ajustes) ARD.musica.ajustes(); }
+A.setVolSom = function (v) { A.volSom = vol01(v); save(); aplicaVolumes(); MIX.forEach(mixSync); };
+A.setMusica = function (on) { A.musica = !!on; save(); if (on) { A.init(); retomar(); } aplicaVolumes(); MIX.forEach(mixSync); };
+A.setVolMusica = function (v) { A.volMusica = vol01(v); save(); aplicaVolumes(); MIX.forEach(mixSync); };
+A.setSaida = function (s) { A.saida = s === 'caixa' ? 'caixa' : 'fone'; save(); const s3 = S3(); if (s3 && s3.saida) s3.saida(); MIX.forEach(mixSync); };
+/* 5.0f: o bloco de mixagem em Ajustes (tela inicial e partida), montado aqui antes de cada [data-voz-ui]: efeitos (na partida, com o liga/desliga; na
+   tela inicial ele já existe ao lado), volume dos efeitos, música com liga/desliga e volume, e a saída do som 3D (só no computador) */
+const MIX = [];
+function mixMonta(box) { if (!box || box.__mix || typeof document === 'undefined' || !box.parentNode) return; box.__mix = 1; const d = document.createElement('div'); d.className = 'opt som-mix'; d.setAttribute('data-som-mix', '');
+  const n = MIX.length + 1, temEf = !document.getElementById('opt-som') || !!(box.closest && box.closest('#a11y')), toque = movel();
+  const lin = (k, extra) => '<div class="som-lin" style="display:flex;align-items:center;gap:.5em;flex-wrap:wrap">' + extra + '<input type="range" min="0" max="100" step="5" id="som-' + k + '-' + n + '" data-som-' + k + ' style="flex:1 1 8em;min-width:6em;max-width:16em"></div>';
+  d.innerHTML = lin('vol-efeitos', (temEf ? '<label class="chk"><input type="checkbox" data-som-efeitos> <span data-i18n="som.efeitos">' + esc(TX('som.efeitos', null, 'Efeitos')) + '</span></label>' : '') + '<label for="som-vol-efeitos-' + n + '" data-i18n="som.vol-efeitos">' + esc(TX('som.vol-efeitos', null, 'Volume dos efeitos')) + '</label>')
+    + lin('vol-musica', '<label class="chk"><input type="checkbox" data-som-musica> <span data-i18n="som.musica">' + esc(TX('som.musica', null, 'Música')) + '</span></label><label for="som-vol-musica-' + n + '" data-i18n="som.vol-musica">' + esc(TX('som.vol-musica', null, 'Volume da música')) + '</label>')
+    + (toque ? '' : '<div class="som-lin" style="display:flex;align-items:center;gap:.5em;flex-wrap:wrap"><label for="som-saida-' + n + '" data-i18n="som.saida">' + esc(TX('som.saida', null, 'Som 3D')) + '</label><select id="som-saida-' + n + '" data-som-saida><option value="fone" data-i18n="som.saida.fone">' + esc(TX('som.saida.fone', null, 'Fone de ouvido (HRTF)')) + '</option><option value="caixa" data-i18n="som.saida.caixa">' + esc(TX('som.saida.caixa', null, 'Caixas de som')) + '</option></select></div>');
+  box.parentNode.insertBefore(d, box); MIX.push(d);
+  const q = s => d.querySelector(s), ef = q('[data-som-efeitos]'), ve = q('[data-som-vol-efeitos]'), mu = q('[data-som-musica]'), vm = q('[data-som-vol-musica]'), sa = q('[data-som-saida]');
+  if (ef) ef.addEventListener('change', () => { A.setEnabled(ef.checked); if (ef.checked) { A.init(); A.resume(); A.sfx('click'); } try { const os = document.getElementById('opt-som'); if (os) os.checked = A.enabled; } catch (e) {} });
+  ve.addEventListener('input', () => A.setVolSom(+ve.value / 100)); ve.addEventListener('change', () => A.sfx('click'));
+  mu.addEventListener('change', () => A.setMusica(mu.checked)); vm.addEventListener('input', () => A.setVolMusica(+vm.value / 100)); if (sa) sa.addEventListener('change', () => A.setSaida(sa.value));
+  mixSync(d); }
+function mixSync(d) { const q = s => d.querySelector(s), ef = q('[data-som-efeitos]'), ve = q('[data-som-vol-efeitos]'), mu = q('[data-som-musica]'), vm = q('[data-som-vol-musica]'), sa = q('[data-som-saida]');
+  if (ef && ef.checked !== A.enabled) ef.checked = A.enabled; if (ve && +ve.value !== Math.round(A.volSom * 100)) ve.value = Math.round(A.volSom * 100); if (ve) ve.disabled = !A.enabled;
+  if (mu && mu.checked !== (A.musica !== false)) mu.checked = A.musica !== false; if (vm && +vm.value !== Math.round(A.volMusica * 100)) vm.value = Math.round(A.volMusica * 100); if (vm) vm.disabled = A.musica === false; if (sa && sa.value !== A.saida) sa.value = A.saida; }
+A.mixUI = () => MIX.forEach(mixSync); /* 5.0f */
 /* 5.0c.1: Vozes gravadas (Ajustes): ligadas por padrão; desligadas, todas as falas usam a voz do sistema (como na 5.0c) */
 A.setGravadas = function (on) { A.gravadas = !!on; save(); calar(); const vz = VZ(); if (vz && vz.mudou) vz.mudou(); UIS.forEach(preencher); htmlMudo(); }; /* 5.0b.1: a sessão de reprodução e o áudio mudo do iOS seguem o som e a voz */
 /* 5.0a.2: escolha da voz em Ajustes (tela inicial e partida): cada bloco [data-voz-ui] tem um select[data-voz-sel], um botão [data-voz-ouvir] e um texto
@@ -227,7 +305,7 @@ A.setVoz = function (id) { A.voz = id || ''; const f = ranking().find(x => x.id 
 A.ouvir = function (id) { if (!temFala()) return false; const sid = id != null ? id : A.voz, f = sid ? ranking().find(x => x.id === sid) : null; return falar(TX('voz.amostra', null, AMOSTRA) /* 5.0c */, { tipo: 'sistema', p: 4 }, f ? f.v : null); };
 A.vozUI = function (box) { if (!box || box.__voz) return; box.__voz = 1; UIS.push(box); const sel = box.querySelector('[data-voz-sel]'), bt = box.querySelector('[data-voz-ouvir]'), ts = box.querySelector('[data-som-teste]');
   if (sel) sel.addEventListener('change', () => A.setVoz(sel.value)); if (bt) bt.addEventListener('click', () => A.ouvir(sel ? sel.value : A.voz)); if (ts) ts.addEventListener('click', () => A.testarSom(box)); /* 5.0b.1: Testar som */
-  { const cg = box.querySelector('[data-voz-gravada]'); if (cg) cg.addEventListener('change', () => A.setGravadas(cg.checked)); } /* 5.0c.1: Vozes gravadas */ preencher(box); };
+  { const cg = box.querySelector('[data-voz-gravada]'); if (cg) cg.addEventListener('change', () => A.setGravadas(cg.checked)); } /* 5.0c.1: Vozes gravadas */ preencher(box); try { mixMonta(box); } catch (e) {} /* 5.0f */ };
 if (temFala()) { const mudou = () => { RANK = null; UIS.forEach(preencher); }; try { addEventListener('online', () => { RUIM.clear(); mudou(); }); } catch (e) {} try { if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', mudou); else speechSynthesis.onvoiceschanged = mudou; speechSynthesis.getVoices(); } catch (e) {} }
 try { addEventListener('ard-idioma', () => { RANK = null; RUIM.clear(); calar() /* 5.0c.1: também a gravada */; UIS.forEach(preencher); }); } catch (e) {} /* 5.0c: a lista e a voz mudam com o idioma, sem recarregar */
 if (typeof document !== 'undefined' && document.querySelectorAll) { const liga = () => document.querySelectorAll('[data-voz-ui]').forEach(b => A.vozUI(b)); if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', liga); else liga(); }

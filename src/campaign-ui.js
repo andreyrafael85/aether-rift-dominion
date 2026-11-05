@@ -48,16 +48,25 @@ function openBriefing(id, opts) {
   const $ = D.$; const m = C.BY_ID[id]; if (!m) return; brMission = id; const s = P.load(); opts = opts || {}; if (ARD.vozes) ARD.vozes.missao(id); /* 5.0c.1: as falas gravadas da missão baixam ao abri-la */
   const raceSel = $('br-race'); raceSel.innerHTML = RACES.map(r => `<option value="${r}">${esc(raceName(r))}</option>`).join(''); raceSel.value = m.race || opts.race || D.selectedRace(); raceSel.disabled = !!m.race;
   const pr = s.missions[id] || {}; $('br-diff').value = opts.diff || pr.lastDifficulty || 'normal';
+  if (ARD.cinema) ARD.cinema.pararSala(); /* 5.0f: cada abertura do briefing toca a Sala de Guerra do começo */
   const draw = () => { const race = raceSel.value; const prep = C.prepare(id, { race, difficulty: $('br-diff').value }); const who = w => w === 'self' ? race : w === 'enemy' ? prep.cfg.players.find((p, i) => i > 0 && !p.ally).faction : w === 'ally' ? (prep.cfg.players.find((p, i) => i > 0 && p.ally) || prep.cfg.players[1]).faction : (prep.swap && prep.swap[w]) || w; // 4.2g: fala da Raça trocada vai para a Raça real do inimigo
     $('br-act').textContent = C.ato(m.act); $('br-title').textContent = C.titulo(m); $('br-place').textContent = C.lugar(m) + ' · ' + T('camp.br.adversarios', { lista: prep.cfg.players.slice(1).map(p => jogador(p.name) + ' (' + raceName(p.faction) + (p.ally ? ', ' + T('camp.br.aliado', null, 'aliado') : '') + ')').join(', ') }, 'adversários: {lista}'); /* 5.0c */
     $('br-dialog').innerHTML = m.brief.map(([w, mood, text], i) => { const r = who(w); const art = D.leaderArt(r, mood); return `<div class="brl">${art ? `<img src="${art}" alt="">` : ''}<div><div class="nm">${esc(D.LEADER_NAME[r] || raceName(r))} · ${esc(raceName(r))}</div><div>${esc(C.brief(m, i, r)) /* 5.0c: camp.<id>.brief.N com o gênero de quem fala */}</div></div></div>`; }).join('');
     $('br-obj').innerHTML = m.objectives.map(o => `<li class="${o.bonus ? 'bn' : ''}">${o.bonus ? '★ ' + esc(T('camp.bonus', null, 'Bônus')) + ': ' : ''}${esc(C.objetivo(m, o).replace(/^Bônus: /, ''))}</li>`).join(''); /* 5.0c */
     const eq = P.load().relics.equipped.filter(Boolean).map(rid => C.reliquia(rid)); const rw = m.relic && !P.load().relics.owned.includes(m.relic); /* 5.0c */
+    salaGuerra(m, id, race, prep, who); /* 5.0f */
     $('br-relics').textContent = [eq.length ? T('camp.br.rel-equipadas', { lista: eq.join(', ') }, 'Relíquias equipadas: {lista}.') : T('camp.br.rel-nenhuma', null, 'Nenhuma relíquia equipada.'), rw ? T('camp.br.recompensa', { nome: C.reliquia(m.relic) }, 'Recompensa: relíquia {nome}.') : '', T('camp.br.melhor', { r: (pr.stars || 0) ? (pr.stars + ' ★') : T('camp.br.nao-concluida', null, 'ainda não concluída') }, 'Melhor resultado: {r}.')].filter(Boolean).join(' '); };
   raceSel.onchange = draw; $('br-diff').onchange = draw; draw(); brDraw = draw; /* 5.0c */
-  $('br-start').onclick = () => { $('briefing').hidden = true; launch(id, raceSel.value, $('br-diff').value); };
+  $('br-start').onclick = () => { if (ARD.cinema) ARD.cinema.pararSala(); /* 5.0f */ $('briefing').hidden = true; launch(id, raceSel.value, $('br-diff').value); };
   $('briefing').hidden = false;
 }
+
+/* 5.0f: Sala de Guerra — o mapa tático da missão no topo do briefing (src/cinema.js), com as falas digitadas e os objetivos; o texto de sempre fica embaixo */
+function salaGuerra(m, id, race, prep, who) { if (!ARD.cinema || !ARD.cinema.salaGuerra) return; const $ = D.$; const box = $('briefing').querySelector('.box');
+  let host = $('br-sala'); if (!host) { host = document.createElement('div'); host.id = 'br-sala'; $('br-dialog').parentNode.insertBefore(host, $('br-dialog')); }
+  try { ARD.cinema.salaGuerra({ host, box, missao: id, prep, raca: race, chave: [id, race, $('br-diff').value, ARD.idioma || ''].join('|'), ato: C.ato(m.act),
+    falas: m.brief.map(([w, mood], i) => { const r = who(w); return { race: r, mood, texto: C.brief(m, i, r), nome: (D.LEADER_NAME[r] || raceName(r)) + ' · ' + raceName(r), art: D.leaderArt(r, mood), k: 'camp.' + id + '.brief.' + i }; }),
+    objetivos: m.objectives.map(o => ({ texto: C.objetivo(m, o).replace(/^Bônus: /, ''), bonus: !!o.bonus })) }); } catch (e) { console.warn('[ARD] Sala de Guerra:', e); } }
 
 // 4.1b: início direto de uma missão (briefing, botão Continuar e links do fim de partida usam o mesmo caminho)
 function launch(id, race, diff) {
@@ -144,9 +153,9 @@ function grantXp(xp) { const lv = P.addXp(xp); const out = { xp, from: lv.from, 
 // ---------- sessão de missão (HUD) ----------
 function begin(sim, prep, saved) {
   const $ = D.$; const run = C.start(sim, prep, saved || null); if (saved && run.retraduz) run.retraduz(); /* 5.0c: salvamento de outro idioma — progresso já no idioma atual (só leitura) */ const queue = []; let showing = null, until = 0;
-  const comms = () => { const now = performance.now(); if (showing && now < until) return; if (!queue.length) { if (showing) { $('comms').hidden = true; showing = null; } return; } showing = queue.shift(); until = now + Math.max(4200, 1800 + showing.text.length * 55);
+  const comms = () => { if (ARD.cinema && ARD.cinema.ativa()) return; /* 5.0f: a central espera a cena acabar */ const now = performance.now(); if (showing && now < until) return; if (!queue.length) { if (showing) { $('comms').hidden = true; showing = null; } return; } showing = queue.shift(); until = now + Math.max(4200, 1800 + showing.text.length * 55);
     const art = D.leaderArt(showing.race, showing.mood); $('comms-img').src = art || ''; $('comms-img').hidden = !art; $('comms-name').textContent = (D.LEADER_NAME[showing.race] || raceName(showing.race)) + ' · ' + raceName(showing.race); $('comms-text').textContent = showing.text; $('comms').style.setProperty('--cc', D.RACE_COLORS[showing.race] || '#FF5E3A'); $('comms').hidden = false;
-    if (ARD.vozes) { const dv = ARD.vozes.campanha(showing, prep.mission.id); if (dv > 0) until = Math.max(until, now + dv * 1000 + 700); } /* 5.0c.1: a fala gravada de quem aparece na central (o painel fica até ela acabar) */ };
+    if (ARD.vozes && !(ARD.cinema && ARD.cinema.ouviu(showing.k)) /* 5.0f: a fala que já tocou na Sala de Guerra não repete a voz */) { const dv = ARD.vozes.campanha(showing, prep.mission.id); if (dv > 0) until = Math.max(until, now + dv * 1000 + 700); } /* 5.0c.1: a fala gravada de quem aparece na central (o painel fica até ela acabar) */ };
   let lastHud = null; const hud = () => { const ti = $('ob-title'); const tt = C.titulo(prep.mission); /* 5.0c */ if (ti.textContent !== tt) ti.textContent = tt; const html = run.objectives.map(o => `<li class="${o.done ? 'ok' : ''} ${o.bonus ? 'bn' : ''}"><span>${o.done ? '✓' : o.bonus ? '★' : '○'}</span><span>${esc(o.text.replace(/^Bônus: /, ''))}</span>${o.progress && !o.done ? `<span class="pg">${esc(o.progress)}</span>` : ''}</li>`).join(''); if (html !== lastHud) { lastHud = html; $('ob-list').innerHTML = html; } }; /* 4.3k: a lista de objetivos só é trocada quando muda (o HUD chama a cada 10 quadros) */
   if (!saved) for (const sd of run.brief()) queue.push(sd); else queue.push({ race: sim.players[0].faction, mood: 1, text: TG('camp.retomada', gen(sim.players[0].faction), null, 'De volta ao comando. A missão continua de onde parou.'), k: 'camp.retomada' /* 5.0c.1: a fala gravada do líder (lider:retomada) */ }); /* 5.0c */ $('objectives').hidden = false; hud();
   const sess = { prep, run, hud, noPause: !!prep.diff.noPause,

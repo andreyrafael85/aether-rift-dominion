@@ -385,7 +385,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nothing here is yours. Yet.",
-  "inicio.versao": "Version 5.0e · build __BUILD__ · Beyond the Rift · Living world · multiplayer 2 to 4",
+  "inicio.versao": "Version 5.0f · build __BUILD__ · Beyond the Rift · Living world · multiplayer 2 to 4",
   "inicio.vitrine.escolha-sua-raca": "Choose your Race",
   "inicio.vitrine.explorar-base": "Explore the base",
   "inicio.vitrine.som-tela-inicial": "Start screen sound",
@@ -454,6 +454,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "ajustes.btn-bench": "Run benchmark (30 s)",
   "ajustes.cfg-feedback": "Send feedback",
   "notas.notas-versao": "Release notes",
+  "notas.5-0f": "<b>5.0f — 3D sound and cinema:</b> every sound now comes from its place on the map and follows the camera, with 3D sound for headphones on desktop; distant sounds lose their sparkle, what lies under the fog of war sounds muffled and each biome has its own echo. An <b>adaptive soundtrack</b>, generated in the browser itself, gives each Race its own theme and shifts between peace, tension, battle and boss as the match unfolds, ducking whenever someone speaks. Clicks and alerts carry your Race's timbre. All 20 missions open in the <b>War Room</b>: the tactical map with threats, the attack route and the objectives, with the camera landing on your base. The superweapon gets a short shot of the launch, and bosses get a cinematic entrance. Everything can be skipped (Esc, click or tap), and Settings has effects and music volume, headphones or speakers output and the cinematic scenes.",
   "notas.5-0e": "<b>5.0e — Living bases and units:</b> with <b>Motor 5</b> on, each building rises in its Race's style: welding for the Vehnar, a weave of light for the Erevane, veins for the Tessara, crystals for the Quorith and bubbling biomass for the Vorag, with a wave across the ground when it is done. Debris bounces off the terrain and rubble stays on the ground for a while; on High and Ultra, the heat and shockwave of explosions warp the air. Bases come alive: visible modules on buildings, walls that crack as health drops, conduits that pulse with your energy (and flicker when it runs short), workers moving between buildings, and Tessara and Vorag buildings that breathe. Units get a holographic selection ring, segmented health bars that no fog can darken, a team-colored outline and veteran stars that flash on promotion; materials show worn edges and the map's dust at the base of each piece.",
   "notas.5-0d-1": "<b>5.0d.1 — Lighter fog and a Firefox fix:</b> on Firefox, the 5.0d war clouds left the match almost unreadable on High, because a shader Firefox rejected darkened the screen. That is fixed, and the clouds are now a light, translucent veil over what has never been seen: the terrain stays readable, and what is in sight is never covered. The weather fog is lighter too: units and buildings stay sharp in the toxic fog, in the rain and on phones. And the <b>Automatic</b> weather now follows the map, lightly: light snow, light rain or dust on the Rift Plains and ash on The Belt (Medium and up).",
   "notas.5-0d": "<b>5.0d — Sky, weather and war clouds:</b> with <b>Motor 5</b> on (Settings › Graphics engine), the world comes alive. The sun moves through the day cycle, with sunrise and sunset, turning shadows and, at night, the moon and stars; the sky reflection follows the hour. On High and Ultra, sunbeams cut through the dust and the Aether Storm. What has never been seen lies under a bank of low clouds that opens with a glowing edge when your troops arrive (Medium and up). The field weathers (Play › Seed and weather) now run on the graphics card: crystal snow that piles up on the ground and on top of units and buildings, light snow and curtains of light in the aurora, sand and ash in the plasma storm, rain with wet ground and puddles in the acid rain, and banks of toxic fog in the valleys. And the ground keeps the battle: craters that sink in, scorched grass and footprints in snow and sand.",
@@ -462,7 +463,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "notas.5-0c": "<b>5.0c — Languages:</b> the whole game is now in <b>English</b> and <b>Spanish</b> as well as Portuguese: start screen, War Room, matches, campaign, diplomacy, multiplayer, Photo Mode, help and the system-voice lines, which now use a voice in the chosen language. The game opens in your browser's language and switches instantly, without reloading, under <b>Idioma / Language / Idioma</b>: at the top of the start screen, in Settings and in the in-match Settings window. Also in this version: the planets and sky at the top of the War Room are crisp: at rest the background was drawn at half resolution and is now drawn in full, with the planets' detail following the pixel size, and the room no longer drops resolution when you switch Races; the match announcer speaks in the gender of your Race's announcer (a male voice for the Vehnar, Quorith and Vorag; a female one for the Erevane and Tessara); with Engine 5, dynamic resolution only drops when the graphics card is the limit, which avoids the hitches from resolution changes; and on iPhone, <b>Test sound</b> shows a tip when the effects play but the voice does not.",
   "notas.5-0b-1": "<b>5.0b.1 — Lighter Engine 5, headlights and sound on iPhone:</b> with <b>Engine 5</b> on, the shaders it prepares while loading shrank by a third (the lakes first) and each frame sends much less data to the graphics card, which eases the CPU on Firefox and on phones. The glow around lights is now the same as in the classic engine, and in Photo Mode on Low quality the effects follow the exposure as in the classic engine. At night and inside the Aether Storm, the headlights of vehicles, harvesters and pirates light the ground ahead, in both engines. The War Room got a little brighter, without the glare of before. On iPhone, sound and voice unlock on the first tap, play with the silent switch on and come back after a call. Each leader speaks with a voice of their own gender in every browser. In Settings, <b>Test sound</b> plays three notes and a line and shows the state of the device's audio.",
   "notas.5-0b-motor-5": "<b>5.0b — Engine 5 complete, in testing:</b> with <b>Engine 5</b> on (Settings › Graphics engine), the whole game now runs on WebGPU, falling back to WebGL2 on its own: units and buildings with surface detail and per-part animation, ruins, construction sites, the Erevane hologram, the Unison shields and the banners; the ground with every biome, vegetation in the wind, roads and the sky; explosions, fire, smoke and shots; the plasma and ice lakes with reflections, the Belt's space and the Aether Storm; and <b>Photo Mode</b> (📷 or the J key) with blur, the 8 filters and 4K capture. The first time Photo Mode opens in a match, it takes a few seconds to get ready. With all of this, Engine 5 takes a few seconds longer to load: the next version measures it on real devices and trims it down. The classic engine is still the default and has not changed.",
-  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.0d.1 → 2.0; from 5.0a.3 back, in Portuguese)",
+  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.0e → 2.0; from 5.0a.3 back, in Portuguese)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Terms of Use",
   "inicio.rodape.foot-priv": "Privacy",
@@ -641,6 +642,13 @@ globalThis.ARD.I18N_DIC['en'] = {
   "ajustes.motor-5": "Engine 5 (WebGPU, experimental)",
   "ajustes.instalar": "Install the game (app)",
   "ajustes.testar-som": "Test sound",
+  "som.efeitos": "Effects",
+  "som.vol-efeitos": "Effects volume",
+  "som.musica": "Music",
+  "som.vol-musica": "Music volume",
+  "som.saida": "3D sound",
+  "som.saida.fone": "Headphones (HRTF)",
+  "som.saida.caixa": "Speakers",
   "geral.idioma": "Language",
   "inicio.multi.codigo": "CODE",
   /* inicio-jogo */
@@ -1753,4 +1761,17 @@ globalThis.ARD.I18N_DIC['en'] = {
   "voz.diag.voltou": "back now", /* 5.0c.1 */
   "voz.d.ios-gravadas": "On iPhone, the game speaks with each Race's recorded voices, through the same audio as the effects. The system voice chosen here is only used for Listen.", /* 5.0c.1 */
   "geral.idioma-offline": "Offline: this language has not been downloaded on this device yet.",
+  "cine.pular": "Skip", /* 5.0f */
+  "cine.rever": "Replay scene", /* 5.0f */
+  "cine.sala": "War Room", /* 5.0f */
+  "cine.voce": "You", /* 5.0f */
+  "cine.aliado": "Ally", /* 5.0f */
+  "cine.ameaca": "Threat", /* 5.0f */
+  "cine.rota": "Attack route", /* 5.0f */
+  "cine.superarma": "Superweapon", /* 5.0f */
+  "cine.chefao": "Boss", /* 5.0f */
+  "cine.chefe.catedral": "The Choir's reliquary walks as it sings", /* 5.0f */
+  "cine.chefe.matriarca": "Queen of the Brood, mother of every Broodling", /* 5.0f */
+  "cine.op.cenas": "Cinematic scenes: War Room, mission openings and boss entrances", /* 5.0f */
+  "cine.op.super": "Superweapon action camera", /* 5.0f */
 };

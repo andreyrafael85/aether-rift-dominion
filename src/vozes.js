@@ -146,7 +146,7 @@ V.semPreparo = () => ehIOS() && V.disponivel() && !IOS_PREPARO;
    g = V.achar(...); cb = { inicio(), palavra(i, n, dur, w), fim(), falhou(motivo) }. Devolve { parar(fade) }. Bytes que faltam esperam até o.espera ms;
    decodifica na primeira vez; espera o Web Audio voltar a 'running' (interrupção do iOS) até ESPERA_RODANDO ms. */
 let ganho = null;
-function saida(c) { if (ganho && ganho.context === c) return ganho; ganho = c.createGain(); ganho.gain.value = VOZ_GANHO; ganho.connect(c.destination); return ganho; }
+function saida(c) { if (ganho && ganho.context === c) return ganho; ganho = c.createGain(); ganho.gain.value = VOZ_GANHO; ganho.connect((ARD.som3d && ARD.som3d.saidaFala(c)) || c.destination) /* 5.0f: as falas entram no limitador do fim, com a música e os efeitos abaixando sob elas */; return ganho; }
 function rodando(c, ms) { if (c.state === 'running') return Promise.resolve(true); const au = A(); if (au && au.resume) au.resume();
   return new Promise(ok => { let fim = false; const pronto = v => { if (fim) return; fim = true; try { c.removeEventListener('statechange', f); } catch (e) {} ok(v); }; const f = () => { if (c.state === 'running') pronto(true); };
     try { c.addEventListener('statechange', f); } catch (e) {} setTimeout(() => pronto(c.state === 'running'), ms); }); }

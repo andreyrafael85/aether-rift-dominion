@@ -664,6 +664,7 @@ function create(canvas, overlay, mini) {
   // 4.2c: efeitos só onde o jogador enxerga agora (grade da névoa do último quadro; O(1) por evento) — nada de revelar inimigos escondidos
   const seenAt = (x, y) => R.revealAll || (x >= 0 && y >= 0 && x < S.WORLD && y < S.WORLD && fogData[(((y / FOGC) | 0) * FOGN + ((x / FOGC) | 0)) * 4] >= 180);
   R.onEvents = function (events, sim, human) {
+    if (ARD.musica) ARD.musica.eventos(events, sim, human); /* 5.0f: o estado da trilha (calor do combate, base atacada, fim) */
     for (const e of events) {
       if ((e.t === 'shot' && !seenAt(e.x1, e.y1) && !seenAt(e.x2, e.y2)) || ((e.t === 'impact' || e.t === 'death') && !seenAt(e.x, e.y))) continue;
       switch (e.t) {
@@ -901,6 +902,7 @@ function create(canvas, overlay, mini) {
     if (M5X && ARD.m5.ceuHora) ARD.m5.ceuHora(R, sim, PH); /* 5.0d: no Motor 5 o sol anda com a hora (src/m5/ceu.js): R.sunDir em degraus antes do updateCamera */
     R.shakeX = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0; R.shakeY = R.shake > 0 ? (Math.random() - .5) * 10 * R.shake : 0;
     updateCamera(cam);
+    if (ARD.som3d && !R.warming) ARD.som3d.quadro(camera, cam, sim, human, seenAt, H, R); /* 5.0f: som 3D (o ouvinte na câmera, a sala do bioma, a névoa) e a trilha adaptativa */
     // dia e noite
     const nt = R.night; for (const m of envMats) m.envMapIntensity = m.userData.env * (1 - 0.72 * nt); if (R.envK0 == null) R.envK0 = scene.environmentIntensity; scene.environmentIntensity = R.envK0 * (1 - 0.72 * nt); /* 4.3h: no r186 o material sem mapa próprio usa a intensidade da cena; sem isto a noite seguia iluminada pelo céu de dia */ const LK = R.lightK; sun.intensity = (1.6 * (1 - nt) + 0.55 * nt) * LK.sun; sun.color.setRGB(1 - 0.48 * nt, 0.91 - 0.24 * nt, 0.77 + 0.2 * nt); hemi.intensity = (0.55 * (1 - nt) + 0.42 * nt) * LK.hemi + lightning * 0.5; amb.intensity = (0.22 * (1 - nt) + 0.26 * nt) * LK.amb + lightning * 0.6; // 4.1a: lua azulada; a noite fica escura mas jogável
     if (PH && PH.light) PH.light(sun, hemi, amb); /* 4.3j: entardecer dourado do Modo Foto */
