@@ -50,7 +50,7 @@ M5.ceuHora = function (R, sim, PH) {
   if (C.hora != null && isFinite(C.hora)) { th = (C.hora - 12) / 24 * TAU; if (!(PH && PH.night != null)) R.night = (1 - Math.cos(th)) / 2; } /* hora fixa (fotos e testes) */
   else if (PH && PH.night != null) th = Math.acos(Math.max(-1, Math.min(1, 1 - 2 * PH.night))); /* Modo Foto com hora própria: o lado da tarde */
   else if (R.forceDay) th = 0; /* ?dia=1 e o Teste de desempenho: meio-dia (o sol de sempre) */
-  else th = TAU * ((sim && sim.time) || 0) / 750;
+  else th = TAU * ((ARD.modos && ARD.modos.noite(sim) ? ARD.modos.HORA_NOITE /* 5.0g: Noite Eterna */ : sim && sim.time) || 0) / 750;
   E.th = th; E.noite = R.night;
   solEm(th, E.sol, E.espaco); E.lua[0] = -E.sol[0]; E.lua[1] = -E.sol[1]; E.lua[2] = -E.sol[2];
   /* a luz: o mesmo caminho em degraus; o sol de dia, a lua de noite (no espaço, sempre o sol) */

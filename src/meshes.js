@@ -5868,6 +5868,33 @@ const NEUTRAL = {
     else if (v === 3) { const top = pillar(K, r, -2.3, 0, 0.6, 3.6, pal, { seed }); pillar(K, r, 2.3, 0, 0.6, 3.6, pal, { seed: seed + 1 }); for (let i = 0; i < 8; i++) { if (i === 4 || i === 5) continue; const a = PI - i * PI / 7, R = 2.3; K.box(Math.cos(a) * R, top + 0.45 + Math.sin(a) * R * 0.85, 0, 0.9, 0.7, 1.05, pal[i % 5], 'stone', { rz: a - PI / 2 }); } /* arco com a pedra-chave caída */ for (let i = 0; i < 3; i++) K.box(0.6 + i * 1.1, -0.2, 1.6 + (r() - 0.5), 0.95, 0.72, 1.05, pal[(i + 2) % 5], 'stone', { ry: r() * PI, rz: (r() - 0.5) * 0.6 }); rubble(K, r, 0, 0.6, 4.4, 6, 0.85, pal, { seed }); lamp(0, 0.06, 0.5); }
     else if (v === 4) { wall(K, r, 0, -3, 7.2, 1.6, 0.8, 0, pal); wall(K, r, 0.4, 3, 6.4, 0.8, 0.8, 0, pal); wall(K, r, -3.6, 0, 6, 1.2, 0.8, PI / 2, pal); wall(K, r, 3.6, -0.6, 4.8, 1.6, 0.8, PI / 2, pal); for (let i = 0; i < 3; i++) K.cyl(-1.8 + i * 1.2, 0.4, 0.4 + i * 0.25, 0.55, 0.58, 1.05, pal[i % 5], 'stone', { seg: 10, facet: true, rz: PI / 2, ry: 0.35 }); rubble(K, r, 0, 0, 3.6, 8, 0.8, pal, { seed }); lamp(1.4, 0.06, 0.6); }
     else { wall(K, r, 0, -0.8, 9, 4, 1.1, 0.08, pal, { win: [-0.4, 1.6, 1.4, 3.2] }); pillar(K, r, -5.2, 1.4, 0.6, 2.6, pal, { seed, broken: 1 }); rubble(K, r, 0, 1.6, 4.8, 7, 0.9, pal, { seed }); lamp(0.6, 0.06, 0.4); } },
+  /* 5.0g: Destroço do Titã — peças da carcaça em tamanho de mundo (escala 1 no render): seed = (tipo − 1) × 4 + variação; 0–3 trecho de costela
+     (osso ao longo de X, ~36, com anéis de blindagem velha), 4–7 placa de blindagem, 8–11 vértebra, 12–15 lasca do crânio. Mesmo material das rochas: nenhum pipeline novo */
+  osso(K, seed) { const r = rng(seed * 7 + 41), tipo = (seed >> 2) & 3, v = seed & 3, BO = ['#D9CDB0', '#CFC2A3', '#E0D5BA', '#C8B996'][v], BD = '#A89878', MT = '#5C4E44', RU = '#7A5A42'; K.base = 0;
+    if (tipo === 0) { const R = 6.6 + v * 0.45, y0 = R * 0.62; /* trecho reto e grosso: os vizinhos (a cada 26) se sobrepõem e a costela sai contínua */
+      K.tube([[-21, y0, 0], [-7, y0 + 0.5, 0.3], [7, y0 + 0.5, -0.3], [21, y0, 0]], R, BO, 'bone', { ts: 8, rs: 10 });
+      for (const sx of [-21, 21]) K.sph(sx, y0, 0, R * 1.04, BD, 'bone', { seg: 10 }); /* juntas */
+      K.tube([[-19, y0 + R * 0.62, 0.8], [0, y0 + R * 0.72, 1.1], [19, y0 + R * 0.62, 0.8]], R * 0.3, BD, 'bone', { ts: 6, rs: 5 }); /* crista por cima */
+      if (v % 2) K.cyl(-4 + r() * 6, y0, 0, R + 0.9, R + 0.9, 3.2, v === 1 ? MT : RU, 'metal', { rz: Math.PI / 2, seg: 12 }); /* anel de blindagem velha */
+      K.fine(() => { for (let i = 0; i < 3; i++) K.rock(-14 + i * 13 + r() * 3, 0.4, (r() - 0.5) * 14, 1.8 + r() * 1.2, BD, 'stone', { seed: seed * 5 + i, detail: 0 }); }); }
+    else if (tipo === 1) { const w = 38 + v * 3, d = 26 + v * 2;
+      K.box(0, -1.2, 0, w, 4.2, d, MT, 'metal', { b: 1, rx: 0.14 * (v % 2 ? 1 : -1), rz: 0.1 });
+      K.box(0, 2.6, 0, w * 0.8, 1.2, d * 0.18, RU, 'metal', { rx: 0.14 * (v % 2 ? 1 : -1), rz: 0.1 });
+      K.fine(() => { for (let i = 0; i < 6; i++) K.cyl(-w * 0.35 + i * w * 0.14, 2.2, d * 0.32, 0.9, 0.9, 0.8, '#3E342E', 'dark', { seg: 6 }); });
+      K.crag(w * 0.32, -0.4, -d * 0.2, 8, 5, 7, BO, 'bone', { seed: seed * 3, n: 8, strata: 0, rough: 0.18, cols: [BO, BD], dust: BD, dustK: 0.2, dark: 0.3 }); }
+    else if (tipo === 2) { const s1 = 1 + v * 0.06;
+      K.cyl(0, -2, 0, 12 * s1, 14 * s1, 20, BO, 'bone', { seg: 12 }); K.cyl(0, 17, 0, 13 * s1, 12 * s1, 3, BD, 'bone', { seg: 12 });
+      K.seg([0, 18, -2], [0, 48 + v * 3, -9], 5.5, BO, 'bone', { taper: 0.35, seg: 8 });
+      for (const sg of [-1, 1]) K.seg([0, 12, 0], [sg * 24, 19, -3], 3.6, BD, 'bone', { taper: 0.5, seg: 8 });
+      K.cyl(0, 5, 0, 14.6 * s1, 14.6 * s1, 3, MT, 'metal', { seg: 12 }); }
+    else if (v === 0) { /* o crânio inteiro (~110 de comprimento, focinho para +X): calota, focinho, órbitas com brasa fraca, presas e a placa de metal da coroa */
+      K.sph(-12, -6, 0, 36, BO, 'bone', { half: true, sx: 1.25, sy: 0.9, sz: 1, seg: 22 }); K.sph(28, -6, 0, 24, BO, 'bone', { half: true, sx: 1.35, sy: 0.75, sz: 0.82, seg: 18 });
+      for (const sz of [-1, 1]) { K.sph(9, 14, sz * 14, 9.5, '#1E1714', 'dark', { seg: 12, sy: 0.8 }); K.sph(12, 15.5, sz * 14, 3.4, '#FF6A2A', null, { e: 0.9, seg: 8 }); K.tube([[-34, 18, sz * 18], [-6, 22, sz * 22], [12, 15, sz * 21]], 2.4, BD, 'bone', { ts: 8, rs: 6 }); }
+      for (let i = -3; i <= 3; i++) K.cone(54 - Math.abs(i) * 1.6, -5, i * 4.6, 2.3, 9 + (i % 2 ? 0 : 3), '#E8DEC6', 'bone', { rz: -Math.PI / 2, seg: 6 });
+      K.box(-36, 16, 0, 30, 4, 44, MT, 'metal', { b: 1.2, rz: 0.22 }); K.fine(() => { for (let i = 0; i < 5; i++) K.cyl(-46 + i * 5.5, 22.5, (i % 2 ? 1 : -1) * 14, 1.1, 1.1, 1, '#3E342E', 'dark', { seg: 6 }); });
+      K.tube([[-40, 20, -8], [-14, 27, 4], [4, 22, 10]], 1.4, '#6E6250', 'bone', { ts: 8, rs: 5 }); /* rachadura */ K.sph(36, 9, 0, 5, '#2A211C', 'dark', { seg: 10, sx: 1.4, sz: 0.7 }); /* cavidade do nariz */ }
+    else { const sx = 1 + v * 0.1; /* lascas do crânio */
+      K.sph(0, -5, 0, 17, BO, 'bone', { half: true, sx: 1.3 * sx, sy: 0.6, sz: 0.9, seg: 14 }); K.tube([[-16, 3, -4], [0, 6, 2], [14, 3, 5]], 1, BD, 'bone', { ts: 6, rs: 5 }); K.box(-8, -2, 0, 10, 5, 18, MT, 'metal', { b: 0.8, rz: 0.25 }); } },
   // 4.3b: pedra solta barata (matacão com estratos ou pedra/seixo lascado) para o espalhamento do dress3d, no lugar do icosaedro; ver scatter()
   seixo(K, seed) { const big = !(seed & 1), r = rng(seed * 7 + 29); K.base = 0; K.crag(0, -0.12, 0, 2.1 + r() * 0.3, big ? 1.25 + r() * 0.2 : 0.9, 1.8, '#FFFFFF', 'rock', { seed, n: big ? 8 : 6, strata: big ? 2 : 0, sq: 2.6 + r(), rough: 0.14, chip: 0.12, jit: 0.06, tilt: 0.22, cuts: big ? 2 : 1, fis: big ? 1 : 0, flare: 0.04, dark: 0.35, dustK: 0.25, cols: ['#FFFFFF', '#E4E0D9'], dust: '#FFFFFF' }); },
   // ---------- 4.3c: flora e adereços do mundo vestido (dress3d) ----------
@@ -6038,6 +6065,7 @@ const PROPS = {
 // ---------- API ----------
 const FULL = { veiculo: ['veiculo_hull', 'veiculo_turret'], torre: ['torre_base', 'torre_turret'], bastiao: ['bastiao_base', 'bastiao_turret'] };
 function recipe(race, def) {
+  { const RX = ARD.meshes && ARD.meshes.receitas; if (RX && RX[def]) return (K, P, tc, seed) => RX[def](K, P, tc, seed); } /* 5.0g: receitas de fora (os chefões, src/chefes-modelos.js) */
   const br = BR[race]; if (br && br[def] && !def.startsWith('_')) return (K, P, tc, seed) => br[def](K, P, tc, seed); /* 4.3f: construção própria da Raça (seed = estilo do Núcleo) */
   const u = U[race]; if (u && u[def]) return (K, P, tc) => u[def](K, P, tc);
   if (BLD[def]) return (K, P, tc, seed) => BLD[def](K, KITS[race] || KITS.vehnar, P, tc, seed);

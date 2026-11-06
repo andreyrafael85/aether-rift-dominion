@@ -385,7 +385,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nothing here is yours. Yet.",
-  "inicio.versao": "Version 5.0f.1 · build __BUILD__ · Beyond the Rift · Living world · multiplayer 2 to 4",
+  "inicio.versao": "Version 5.0g · build __BUILD__ · Beyond the Rift · Living world · multiplayer 2 to 4",
   "inicio.vitrine.escolha-sua-raca": "Choose your Race",
   "inicio.vitrine.explorar-base": "Explore the base",
   "inicio.vitrine.som-tela-inicial": "Start screen sound",
@@ -454,6 +454,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "ajustes.btn-bench": "Run benchmark (30 s)",
   "ajustes.cfg-feedback": "Send feedback",
   "notas.notas-versao": "Release notes",
+  "notas.5-0g": "<b>5.0g — Bosses:</b> The Herald and The Mother Forge have arrived, each with three phases, attacks warned on the ground ahead of time and windows when they are vulnerable, plus the new map Titan’s Wreck. In the Hunt tab you pick the boss, the difficulty and your allies, alone or with 2 to 4 friends in co-op, and earn a medal for time and losses. In skirmish, the Rift Events are optional: Rift Sentinel, Corsair Caravan, Wandering Swarm and meteor shower, with a reward for whoever lands the final blow. And the first mutators: Eternal Night, Frequent Storms and Scarce Resources.",
   "notas.5-0f-1": "<b>5.0f.1 — Cinematic sound:</b> the soundtrack is now real orchestral music: each Race has its own peace, tension and battle themes, plus boss, cinematic, superweapon, victory and defeat tracks, switching on the beat. Shots, impacts and explosions have real weight, layered from actual recordings. Unit voices when you select and give orders now sit at the same level for every Race, always clear above the ambience without startling. The files arrive after loading; without them, the previous generated sound still plays. Credits in Settings.",
   "notas.5-0f": "<b>5.0f — 3D sound and cinema:</b> every sound now comes from its place on the map and follows the camera, with 3D sound for headphones on desktop; distant sounds lose their sparkle, what lies under the fog of war sounds muffled and each biome has its own echo. An <b>adaptive soundtrack</b>, generated in the browser itself, gives each Race its own theme and shifts between peace, tension, battle and boss as the match unfolds, ducking whenever someone speaks. Clicks and alerts carry your Race's timbre. All 20 missions open in the <b>War Room</b>: the tactical map with threats, the attack route and the objectives, with the camera landing on your base. The superweapon gets a short shot of the launch, and bosses get a cinematic entrance. Everything can be skipped (Esc, click or tap), and Settings has effects and music volume, headphones or speakers output and the cinematic scenes.",
   "notas.5-0e": "<b>5.0e — Living bases and units:</b> with <b>Motor 5</b> on, each building rises in its Race's style: welding for the Vehnar, a weave of light for the Erevane, veins for the Tessara, crystals for the Quorith and bubbling biomass for the Vorag, with a wave across the ground when it is done. Debris bounces off the terrain and rubble stays on the ground for a while; on High and Ultra, the heat and shockwave of explosions warp the air. Bases come alive: visible modules on buildings, walls that crack as health drops, conduits that pulse with your energy (and flicker when it runs short), workers moving between buildings, and Tessara and Vorag buildings that breathe. Units get a holographic selection ring, segmented health bars that no fog can darken, a team-colored outline and veteran stars that flash on promotion; materials show worn edges and the map's dust at the base of each piece.",
@@ -464,7 +465,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "notas.5-0c": "<b>5.0c — Languages:</b> the whole game is now in <b>English</b> and <b>Spanish</b> as well as Portuguese: start screen, War Room, matches, campaign, diplomacy, multiplayer, Photo Mode, help and the system-voice lines, which now use a voice in the chosen language. The game opens in your browser's language and switches instantly, without reloading, under <b>Idioma / Language / Idioma</b>: at the top of the start screen, in Settings and in the in-match Settings window. Also in this version: the planets and sky at the top of the War Room are crisp: at rest the background was drawn at half resolution and is now drawn in full, with the planets' detail following the pixel size, and the room no longer drops resolution when you switch Races; the match announcer speaks in the gender of your Race's announcer (a male voice for the Vehnar, Quorith and Vorag; a female one for the Erevane and Tessara); with Engine 5, dynamic resolution only drops when the graphics card is the limit, which avoids the hitches from resolution changes; and on iPhone, <b>Test sound</b> shows a tip when the effects play but the voice does not.",
   "notas.5-0b-1": "<b>5.0b.1 — Lighter Engine 5, headlights and sound on iPhone:</b> with <b>Engine 5</b> on, the shaders it prepares while loading shrank by a third (the lakes first) and each frame sends much less data to the graphics card, which eases the CPU on Firefox and on phones. The glow around lights is now the same as in the classic engine, and in Photo Mode on Low quality the effects follow the exposure as in the classic engine. At night and inside the Aether Storm, the headlights of vehicles, harvesters and pirates light the ground ahead, in both engines. The War Room got a little brighter, without the glare of before. On iPhone, sound and voice unlock on the first tap, play with the silent switch on and come back after a call. Each leader speaks with a voice of their own gender in every browser. In Settings, <b>Test sound</b> plays three notes and a line and shows the state of the device's audio.",
   "notas.5-0b-motor-5": "<b>5.0b — Engine 5 complete, in testing:</b> with <b>Engine 5</b> on (Settings › Graphics engine), the whole game now runs on WebGPU, falling back to WebGL2 on its own: units and buildings with surface detail and per-part animation, ruins, construction sites, the Erevane hologram, the Unison shields and the banners; the ground with every biome, vegetation in the wind, roads and the sky; explosions, fire, smoke and shots; the plasma and ice lakes with reflections, the Belt's space and the Aether Storm; and <b>Photo Mode</b> (📷 or the J key) with blur, the 8 filters and 4K capture. The first time Photo Mode opens in a match, it takes a few seconds to get ready. With all of this, Engine 5 takes a few seconds longer to load: the next version measures it on real devices and trims it down. The classic engine is still the default and has not changed.",
-  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.0f → 2.0; from 5.0a.3 back, in Portuguese)",
+  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.0f.1 → 2.0; from 5.0a.3 back, in Portuguese)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Terms of Use",
   "inicio.rodape.foot-priv": "Privacy",
@@ -1778,4 +1779,121 @@ globalThis.ARD.I18N_DIC['en'] = {
   "cine.chefe.matriarca": "Queen of the Brood, mother of every Broodling", /* 5.0f */
   "cine.op.cenas": "Cinematic scenes: War Room, mission openings and boss entrances", /* 5.0f */
   "cine.op.super": "Superweapon action camera", /* 5.0f */
+  "mapa.tita": "Titan's Wreck", /* 5.0g */
+  "inicio.jogar.tita-carcaca": "Titan's Wreck (the carcass of a fallen titan)", /* 5.0g */
+  "vitrine.mapa.tita": "The carcass of a titan fallen across the Rift: ribs, plates and the skull.", /* 5.0g */
+  "unit.arauto.nome": "The Herald", /* 5.0g */
+  "unit.arauto.desc": "A lens-monolith of the Awakened, the first to cross the Rift.", /* 5.0g */
+  "unit.forja.nome": "The Mother Forge", /* 5.0g */
+  "unit.forja.desc": "An ancient factory of the Builders that walks on four legs.", /* 5.0g */
+  "unit.sentinela.nome": "Rift Sentinel", /* 5.0g */
+  "unit.sentinela.desc": "A lesser Herald that watches over the Rift.", /* 5.0g */
+  "unit.pilar_fenda.nome": "Rift Pillar", /* 5.0g */
+  "unit.pilar_fenda.desc": "Feeds the Herald's shield.", /* 5.0g */
+  "unit.perna_forja.nome": "Forge Leg", /* 5.0g */
+  "unit.perna_forja.desc": "Weak point of the Mother Forge: each leg destroyed makes her 25% slower.", /* 5.0g */
+  "chefe.arauto.nome": "The Herald", /* 5.0g */
+  "chefe.arauto.titulo": "The first to cross the Rift", /* 5.0g */
+  "chefe.arauto.fase.1": "Three Pillars", /* 5.0g */
+  "chefe.arauto.fase.2": "Echoes", /* 5.0g */
+  "chefe.arauto.fase.3": "Collapse", /* 5.0g */
+  "chefe.forja.nome": "The Mother Forge", /* 5.0g */
+  "chefe.forja.titulo": "The ancient factory that walks", /* 5.0g */
+  "chefe.forja.fase.1": "March", /* 5.0g */
+  "chefe.forja.fase.2": "Assembly Line", /* 5.0g */
+  "chefe.forja.fase.3": "Exposed Core", /* 5.0g */
+  "chefe.sentinela.nome": "Rift Sentinel", /* 5.0g */
+  "chefe.sentinela.titulo": "Warden of the Rift", /* 5.0g */
+  "chefe.sentinela.fase.1": "Watch", /* 5.0g */
+  "sim.chefe.classe": "Bosses", /* 5.0g */
+  "sim.chefe.sentinela": "The Rift Sentinel has awakened at the center of the map", /* 5.0g */
+  "sim.chefe.atravessou": "{nome} has crossed the Rift", /* 5.0g */
+  "sim.chefe.fase": "New phase for {nome}: {fase}", /* 5.0g */
+  "sim.chefe.escudo": "The Herald's shield is down!", /* 5.0g */
+  "sim.chefe.derrotado": "Boss defeated: {nome}", /* 5.0g */
+  "sim.chefe.capturado": "Boss captured: {nome}", /* 5.0g */
+  "sim.chefe.fim-caiu": "The boss has fallen.", /* 5.0g */
+  "sim.chefe.fim-resistiu": "The boss held out until the end of the Alignment.", /* 5.0g */
+  "modos.aba": "Hunt", /* 5.0g */
+  "modos.cac.titulo": "Hunt", /* 5.0g */
+  "modos.cac.sub": "bring down a Rift boss, alone or with friends", /* 5.0g */
+  "modos.cac.chefao": "Boss", /* 5.0g */
+  "modos.cac.arena": "Arena: {mapa}", /* 5.0g */
+  "modos.cac.recorde": "Record: {t}", /* 5.0g */
+  "modos.cac.sem-recorde": "No record yet", /* 5.0g */
+  "modos.cac.dificuldade": "Difficulty", /* 5.0g */
+  "modos.cac.aliados": "Allies", /* 5.0g */
+  "modos.cac.sozinho": "Alone", /* 5.0g */
+  "modos.cac.ia1": "1 AI ally", /* 5.0g */
+  "modos.cac.ia2": "2 AI allies", /* 5.0g */
+  "modos.cac.amigos": "Friends", /* 5.0g */
+  "modos.cac.regras": "Victory: bring the boss down. Defeat: lose your Core (in co-op, every Core). Medal by time and losses.", /* 5.0g */
+  "modos.cac.medalhas": "Gold: up to {t1} and {p1} losses · Silver: up to {t2} and {p2} losses · Bronze: any victory", /* 5.0g */
+  "modos.cac.iniciar": "Start Hunt", /* 5.0g */
+  "modos.cac.ir-sala": "Open the co-op room", /* 5.0g */
+  "modos.mut.titulo": "Mutators", /* 5.0g */
+  "modos.mut.noite": "Eternal Night", /* 5.0g */
+  "modos.mut.noite-d": "night never ends and vision drops 25%", /* 5.0g */
+  "modos.mut.tempestades": "Frequent Storms", /* 5.0g */
+  "modos.mut.tempestades-d": "Aether Storms twice as often; inside them, units are 10% slower", /* 5.0g */
+  "modos.mut.escassos": "Scarce Resources", /* 5.0g */
+  "modos.mut.escassos-d": "nodes and wrecks yield half", /* 5.0g */
+  "modos.ev.titulo": "Rift Events", /* 5.0g */
+  "modos.ev.desc": "Rift Sentinel, Corsair Caravan, Wandering Swarm and meteor showers during the match", /* 5.0g */
+  "modos.lente": "Herald's Lens", /* 5.0g */
+  "modos.lente-d": "+10% vision in this match", /* 5.0g */
+  "modos.sala.modo": "Room mode", /* 5.0g */
+  "modos.sala.escaramuca": "Skirmish", /* 5.0g */
+  "modos.sala.cacada": "Hunt", /* 5.0g */
+  "modos.sala.dica-cac": "Every human on the same side against the Rift; the host picks the boss.", /* 5.0g */
+  "modos.sala.dica-esc": "Free for all; the host picks the rules.", /* 5.0g */
+  "modos.sala.linha-cac": "Co-op Hunt: {chefe} ({dif}) · everyone against the Rift", /* 5.0g */
+  "modos.sala.linha-esc": "Skirmish: free for all", /* 5.0g */
+  "modos.cartao.cacada": "Hunt · {chefe} · {dif}", /* 5.0g */
+  "modos.medalha.ouro": "Gold", /* 5.0g */
+  "modos.medalha.prata": "Silver", /* 5.0g */
+  "modos.medalha.bronze": "Bronze", /* 5.0g */
+  "modos.fim.vitoria": "Hunt won", /* 5.0g */
+  "modos.fim.derrota": "The Rift won", /* 5.0g */
+  "modos.fim.eyebrow": "Hunt · {chefe} · {dif}", /* 5.0g */
+  "modos.fim.medalha": "Medal: {m}", /* 5.0g */
+  "modos.fim.tempo": "Time", /* 5.0g */
+  "modos.fim.perdas": "Losses", /* 5.0g */
+  "modos.fim.recorde": "Record", /* 5.0g */
+  "modos.fim.recorde-novo": "New local record!", /* 5.0g */
+  "modos.fim.trofeu": "Trophy in the Hangar: {chefe} ({m})", /* 5.0g */
+  "modos.fim.reliquia": "Relic: Herald's Lens (+10% vision in a match of your choice)", /* 5.0g */
+  "modos.fim.titulo": "Title: {t}", /* 5.0g */
+  "modos.fim.projeto": "Blueprint recovered from the Mother Forge: the new unit arrives in a future version", /* 5.0g */
+  "modos.titulo.cacador-arauto": "Herald Hunter", /* 5.0g */
+  "modos.titulo.quebra-forja": "Forgebreaker", /* 5.0g */
+  "modos.titulo.cacador-ouro": "Golden Hunter", /* 5.0g */
+  "modos.hg.trofeus": "Hunt trophies", /* 5.0g */
+  "modos.hg.nenhum": "No trophies yet: win a Hunt.", /* 5.0g */
+  "modos.hg.titulos": "Titles", /* 5.0g */
+  "modos.hg.projetos": "Blueprints", /* 5.0g */
+  "modos.hg.projeto-forja": "Mother Forge blueprint (the unit arrives in a future version)", /* 5.0g */
+  "modos.hg.sentinelas": "Sentinels brought down: {n}", /* 5.0g */
+  "sim.ev.sentinela-aviso": "The Rift Sentinel is awakening at the center of the map ({n} s)", /* 5.0g */
+  "sim.ev.sentinela-chega": "The Rift Sentinel has awakened at the center! Whoever lands the final blow takes the reward", /* 5.0g */
+  "sim.ev.sentinela-premio": "{nome} brought down the Rift Sentinel and took the reward", /* 5.0g */
+  "sim.ev.caravana-aviso": "Corsair Caravan sighted: it will cross the map ({n} s)", /* 5.0g */
+  "sim.ev.caravana-chega": "The Corsair Caravan is crossing the map. Whoever destroys it keeps the cargo", /* 5.0g */
+  "sim.ev.caravana-carga": "{nome} seized a Corsair Caravan cargo (+{n})", /* 5.0g */
+  "sim.ev.enxame-aviso": "Wandering Swarm approaching ({n} s)", /* 5.0g */
+  "sim.ev.enxame-chega": "The Wandering Swarm has arrived: it attacks whatever is closest", /* 5.0g */
+  "sim.ev.meteoros-aviso": "Meteor shower in {n} s: stay away from the rings on the ground", /* 5.0g */
+  "sim.ev.meteoros-chega": "Meteor shower! New crystals where they land", /* 5.0g */
+  "sim.cac.vitoria": "The boss has fallen: Hunt won.", /* 5.0g */
+  "sim.cac.captura": "The Mother Forge was captured: Hunt won.", /* 5.0g */
+  "sim.cac.time-caiu": "Every Core on the team has fallen.", /* 5.0g */
+  "sim.cac.tempo": "The Hunt ran out of time: the boss held on.", /* 5.0g */
+  "sim.fenda": "Rift", /* 5.0g */
+  "chefe.ui.fase": "Phase {n}", /* 5.0g */
+  "chefe.ui.escudo": "Shield", /* 5.0g */
+  "chefe.ui.pontos": "Weak points", /* 5.0g */
+  "chefe.ui.janela": "Damage window", /* 5.0g */
+  "chefe.ui.janela-k": "Now!", /* 5.0g */
+  "chefe.ui.derrotado": "Defeated", /* 5.0g */
+  "chefe.ui.fenda": "From the Rift", /* 5.0g */
 };

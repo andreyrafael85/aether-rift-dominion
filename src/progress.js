@@ -6,7 +6,8 @@
 const KEY = 'ard-progress-v1'; const MAX_LEVEL = 30;
 const T = (k, v, r) => (ARD.t ? ARD.t(k, v, r) : (r != null ? r : k)); /* 5.0c: mensagens no idioma (no Node, o pt-BR) */
 const LEVEL_XP = n => 260 * n + 30 * n * n; // XP acumulado para sair do nível n
-function blank() { return { v: 1, created: Date.now(), commander: { name: '', xp: 0, level: 1 }, missions: {}, achievements: {}, relics: { owned: [], equipped: [null, null] }, hangar: { color: null, skin: {}, portrait: {}, title: '' }, stats: { missions: 0, wins: 0, losses: 0, playSec: 0 } }; }
+function blank() { return { v: 1, created: Date.now(), commander: { name: '', xp: 0, level: 1 }, missions: {}, achievements: {}, relics: { owned: [], equipped: [null, null] }, hangar: { color: null, skin: {}, portrait: {}, title: '' }, stats: { missions: 0, wins: 0, losses: 0, playSec: 0 },
+  cacada: { recordes: {}, trofeus: {}, reliquias: [], titulos: [], projetos: [], sentinelas: 0 } /* 5.0g: Caçada (recordes por chefão e dificuldade, troféus, relíquia, títulos e projetos) */ }; }
 function merge(base, src) { if (!src || typeof src !== 'object' || Array.isArray(src)) return src === undefined ? base : src; const out = Array.isArray(base) ? base.slice() : Object.assign({}, base); for (const k in src) out[k] = (base && typeof base[k] === 'object' && base[k] !== null && !Array.isArray(base[k])) ? merge(base[k], src[k]) : src[k]; return out; }
 let state = null; let mem = null; // mem: armazenamento em memória quando localStorage não existe (Node, modo privado)
 const storage = () => { try { if (typeof localStorage !== 'undefined') { localStorage.getItem(KEY); return localStorage; } } catch (e) {} if (!mem) { const m = new Map(); mem = { getItem: k => m.has(k) ? m.get(k) : null, setItem: (k, v) => m.set(k, String(v)), removeItem: k => m.delete(k) }; } return mem; };
@@ -33,6 +34,19 @@ const b64e = s => typeof btoa !== 'undefined' ? btoa(unescape(encodeURIComponent
 const b64d = s => typeof atob !== 'undefined' ? decodeURIComponent(escape(atob(s))) : Buffer.from(s, 'base64').toString('utf8');
 function exportCode() { const json = JSON.stringify(load()); return 'ARD1-' + checksum(json) + '-' + b64e(json); }
 function importCode(code) { const m = /^ARD1-([0-9a-z]+)-([A-Za-z0-9+/=]+)$/.exec(String(code || '').trim()); if (!m) throw new Error(T('camp.backup.invalido', null, 'Código inválido')) /* 5.0c */; const json = b64d(m[2]); if (checksum(json) !== m[1]) throw new Error(T('camp.backup.corrompido', null, 'Código corrompido (soma não confere)')); state = migrate(JSON.parse(json)); save(); return state; }
+/* 5.0g — Caçada: recorde local por chefão e dificuldade (melhor tempo e melhor medalha), troféu no Hangar (a melhor medalha do chefão),
+   relíquia Lente do Arauto, títulos e o projeto da Forja-Mãe capturada. r: { chefe, dif, venceu, tempo, perdas, medalha, captura } */
+const MEDAL = { bronze: 1, prata: 2, ouro: 3 };
+function registrarCacada(r) { const s = load(); const C = s.cacada; const k = r.chefe + '|' + r.dif; const rec = Object.assign({ jogadas: 0, vitorias: 0, melhor: 0, medalha: null, perdas: null }, C.recordes[k] || {});
+  const out = { novoRecorde: false, trofeu: null, reliquia: false, titulos: [], projeto: false, rec }; rec.jogadas++;
+  if (r.venceu) { rec.vitorias++; if (!rec.melhor || r.tempo < rec.melhor) { out.novoRecorde = !!rec.melhor || rec.vitorias === 1; rec.melhor = Math.round(r.tempo); rec.perdas = r.perdas; }
+    if (r.medalha && (MEDAL[r.medalha] || 0) > (MEDAL[rec.medalha] || 0)) rec.medalha = r.medalha;
+    if (r.medalha && (MEDAL[r.medalha] || 0) > (MEDAL[C.trofeus[r.chefe]] || 0)) { C.trofeus[r.chefe] = r.medalha; out.trofeu = r.medalha; }
+    if (r.chefe === 'arauto' && !C.reliquias.includes('lente-arauto')) { C.reliquias.push('lente-arauto'); out.reliquia = true; }
+    const tit = { arauto: 'cacador-arauto', forja: 'quebra-forja' }[r.chefe]; for (const t of [tit, r.medalha === 'ouro' ? 'cacador-ouro' : null]) if (t && !C.titulos.includes(t)) { C.titulos.push(t); out.titulos.push(t); }
+    if (r.captura && !C.projetos.includes('forja-projeto')) { C.projetos.push('forja-projeto'); out.projeto = true; } }
+  C.recordes[k] = rec; save(); return out; }
+function registrarSentinela(n) { const s = load(); s.cacada.sentinelas = (s.cacada.sentinelas || 0) + Math.max(0, n | 0); save(); return s.cacada.sentinelas; }
 function reset() { state = blank(); save(); return state; }
-ARD.progress = { KEY, MAX_LEVEL, LEVEL_XP, load, save, levelOf, levelInfo, addXp, mission, completeMission, unlock, has, grantRelic, equipRelic, setHangar, setName, addPlayTime, exportCode, importCode, reset, _blank: blank };
+ARD.progress = { KEY, MAX_LEVEL, LEVEL_XP, load, save, levelOf, levelInfo, addXp, mission, completeMission, unlock, has, grantRelic, equipRelic, setHangar, setName, addPlayTime, exportCode, importCode, reset, _blank: blank, registrarCacada, registrarSentinela /* 5.0g */ };
 })(globalThis.ARD = globalThis.ARD || {});

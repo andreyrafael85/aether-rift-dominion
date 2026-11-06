@@ -36,6 +36,7 @@ function findSpot(sim, pid, def, cx, cy, rmin, rmax, tries) {
 function nearestEnemyNucleoPos(sim, pid) {
   const me = S.nucleoOf(sim, pid); if (!me) return null; let best = null, bd = Infinity;
   for (const q of sim.players) { if (q.id === pid || !q.alive || S.hasPact(sim, pid, q.id)) continue; const n = S.nucleoOf(sim, q.id); if (!n) continue; const d = S.dist(me.x, me.y, n.x, n.y); if (d < bd) { bd = d; best = { x: n.x, y: n.y, owner: q.id, def: 'nucleo' }; } }
+  if (!best && sim.modos && sim.modos.cac && S.bossOf) { const b = S.bossOf(sim); if (b && b.alive) { let t = b, td = Infinity; for (const id of (b.boss && b.boss.partes) || []) { const q = sim.byId.get(id); if (!q || !q.alive) continue; const d = S.dist(me.x, me.y, q.x, q.y); if (d < td) { td = d; t = q; } } best = { x: t.x, y: t.y, owner: b.owner, def: 'nucleo' }; } } /* 5.0g: na Caçada não há Núcleo inimigo: a IA aliada vai para o chefão (5.0g junção: primeiro para o ponto fraco vivo mais perto, os pilares e as pernas, que seguram o escudo) */
   return best;
 }
 function updateKnown(sim, mem) {

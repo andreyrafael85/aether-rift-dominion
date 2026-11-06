@@ -531,7 +531,7 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
   - entrada dos chefões.
 - **Pronto quando:** som e música desligáveis em separado, nenhum arquivo de áudio obrigatório, e cenas puláveis e fora da simulação.
 
-#### 5.0g — Chefões · tamanho GG · 3 agentes
+#### 5.0g — Chefões · tamanho GG · 3 agentes · ✔ 06/11/2026
 - **Entra:**
   - o sistema de chefões (§5.1);
   - **O Arauto** e **A Forja-Mãe**, com o mapa Destroço do Titã;
@@ -543,6 +543,7 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
   - toda a telegrafia é legível no celular;
   - o cooperativo funciona com 2 a 4 jogadores;
   - os testes novos estão no portão de qualidade.
+- **Entregue (06/11/2026):** três agentes em paralelo (simulação, modos e visual) e um quarto que juntou os três. Chefões determinísticos nos 4 motores (800 amostras iguais, também depois de salvar e voltar); partidas sem chefão nem modo dão o hash da 5.0f e as 20 missões ficam iguais. Carga no QA 64 → 64 pipelines; com chefão +1 (o chão do chefão, +11 KB de WGSL), com os 3 mutadores +2; nenhum pipeline tardio e o Naga sem erro. Custo por tique de 0,01 a 0,06 ms. Fica para a 5.0h: a IA desviar da telegrafia e o equilíbrio com jogadores de verdade.
 
 #### 5.0h — Inteligência e mundo · tamanho GG · 3 agentes
 - **IA 3.0:**

@@ -30,7 +30,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.0f.1';
+const VERSION = '5.0g';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -98,7 +98,7 @@ function initStart() {
   async function resumeFrom(slot, auto) {
     let rec = null; try { rec = await ARD.saves.get(slot); } catch (e) { console.warn('[ARD] retomada: leitura falhou', e); }
     if (!rec || !rec.data || !rec.data.sim) { refreshSaved(); return false; }
-    const d = rec.data; const cfg = Object.assign({}, d.cfg, { players: d.simCfg.players, seed: d.simCfg.seed, minutes: d.simCfg.minutes || d.cfg.minutes, map: d.simCfg.map || 'fenda', mapV: d.simCfg.mapV || 0, /* 4.3h */ gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: d.cfg.clima || $('opt-clima').value, resume: d, resumeAt: rec.meta.savedAt, resumeAuto: auto ? Math.max(1, Math.round((Date.now() - rec.meta.savedAt) / 1000)) : 0 });
+    const d = rec.data; const cfg = Object.assign({}, d.cfg, { players: d.simCfg.players, seed: d.simCfg.seed, minutes: d.simCfg.minutes || d.cfg.minutes, map: d.simCfg.map || 'fenda', mapV: d.simCfg.mapV || 0, /* 4.3h */ gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: d.cfg.clima || $('opt-clima').value, resume: d, resumeAt: rec.meta.savedAt, resumeAuto: auto ? Math.max(1, Math.round((Date.now() - rec.meta.savedAt) / 1000)) : 0 }, ARD.modos ? ARD.modos.cfgDe(d.simCfg) : {} /* 5.0g: a Caçada, os eventos e os mutadores voltam com o salvamento */);
     if (d.camp && ARD.campaign) { try { cfg.campaign = ARD.campaign.prepare(d.camp.id, d.camp.opts); cfg.campArgs = d.camp; } catch (e) { console.warn('[ARD] retomada: missão indisponível', e); return false; } }
     try { startGame(cfg); return true; } catch (e) { console.error('[ARD] retomada falhou:', e); alert(Tx('inicio.retomar-falhou', { erro: e.message })); /* 5.0c */ location.reload(); return false; }
   }
@@ -144,7 +144,7 @@ function initStart() {
   $('opt-seed').value = params.get('seed') || String(Math.floor(Math.random() * 90000) + 1000);
   $('opt-gfx').value = prefs.gfx || '3d'; $('opt-quality').value = prefs.quality || 'auto';
   if ($('opt-clima')) $('opt-clima').value = prefs.clima || 'auto';
-  { const mv = prefs.map === 'cinturao' ? 'cinturao' : 'fenda'; const ms = ['opt-map', 'opt-map-mp'].map(id => $(id)).filter(Boolean); for (const s of ms) { s.value = mv; s.addEventListener('change', () => { for (const o of ms) o.value = s.value; savePrefs(Object.assign(loadPrefs() || {}, { map: s.value })); }); } } /* 4.3h: o mapa aparece na Escaramuça e na sala, sempre o mesmo */
+  { const mv = prefs.map === 'cinturao' || prefs.map === 'tita' /* 5.0g */ ? prefs.map : 'fenda'; const ms = ['opt-map', 'opt-map-mp'].map(id => $(id)).filter(Boolean); for (const s of ms) { s.value = mv; s.addEventListener('change', () => { for (const o of ms) o.value = s.value; savePrefs(Object.assign(loadPrefs() || {}, { map: s.value })); }); } } /* 4.3h: o mapa aparece na Escaramuça e na sala, sempre o mesmo */
   try { ARD.uiStart.enhance(); } catch (e) { console.warn('[ARD] controles da tela inicial:', e); } /* 4.3k: segmentados e cartões de mapa por cima dos <select>, depois dos valores salvos */
   // multiplayer P2P por código de sala: 2 a 4 jogadores humanos, sem IAs; o anfitrião é o relé do lockstep
   let lobby = null;
@@ -155,6 +155,7 @@ function initStart() {
     const el = $('mp-players'); el.innerHTML = ''; const me = lobby ? lobby.me : null;
     players.forEach(p => { const d = document.createElement('div'); d.textContent = (p.id === 0 ? '★ ' : '• ') + p.name + ' (' + facName(p.faction) + ')' + (p.id === 0 ? ' ' + Tx('multi.anfitriao') : '') + (me && p.name === me.name && (lobby.role === 'host' ? p.id === 0 : p.id !== 0) ? ' — ' + Tx('multi.voce') : ''); /* 5.0c */ el.appendChild(d); });
     for (let i = players.length; i < size; i++) { const d = document.createElement('div'); d.className = 'muted'; d.textContent = '• ' + Tx('multi.vaga'); /* 5.0c */ el.appendChild(d); }
+    if (ARD.modosUI) ARD.modosUI.linhaSala(el, lobby); /* 5.0g: o modo da sala */
     if (lobby && lobby.warn) { const d = document.createElement('div'); d.className = 'warn'; d.textContent = '⚠ ' + TRx(lobby.warn); /* 5.0c */ el.appendChild(d); }
   }
   function setStartButton() { // 4.1b: Iniciar partida (aba Jogar) é só solo; a sala tem o próprio botão na aba Multiplayer
@@ -174,6 +175,7 @@ function initStart() {
     lobby.started = true; setStartButton();
     const players = roster.map(r => ({ name: r.name, faction: r.faction, human: true, color: r.color || undefined }));
     const cfg = { players, seed: parseInt($('opt-seed').value, 10) || 1, name: players[0].name, faction: players[0].faction, opp: '0', diff: 'normal', map: ($('opt-map-mp') && $('opt-map-mp').value) || ($('opt-map') && $('opt-map').value) || 'fenda', mapV: 1 }; /* 4.3h: o mapa do anfitrião vale para todos */
+    if (ARD.modosUI) Object.assign(cfg, ARD.modosUI.cfgSala()); /* 5.0g: Caçada cooperativa e mutadores (a cfg vai igual para todos) */
     N.start(cfg);
     setTimeout(() => startGame(Object.assign({}, cfg, { gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }), { net: N, myId: 0 }), 150);
   }
@@ -182,7 +184,7 @@ function initStart() {
     if (!window.Peer) { mpStatus(Tx('multi.sem-peerjs')); return; } /* 5.0c */
     if (lobby) { mpStatus(Tx('multi.ja-na-sala', { codigo: lobby.code || '…' })); return; } /* 5.0c */
     const size = parseInt($('opt-room').value, 10) || 2; const me = myInfo();
-    const N = ARD.net.create(); lobby = { N, role: 'host', size, code: null, started: false, me };
+    const N = ARD.net.create(); lobby = { N, role: 'host', size, code: null, started: false, me }; if (ARD.modosUI) N.modo = ARD.modosUI.modoSala(); /* 5.0g */
     mpStatus(Tx('multi.criando')); setStartButton(); /* 5.0c */
     N.on('error', e => mpStatus(Tx('multi.erro-rede', { msg: TRx(e.message) }))); /* 5.0c */
     N.on('warn', w => { if (lobby) { lobby.warn = w.message; renderLobby(N.roster(), lobby.size); } });
@@ -221,14 +223,15 @@ function initStart() {
     if (lobby) { showTab('multi', true); return; } // numa sala, o início é pela aba Multiplayer
     const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar';
     const cfg = { name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante') /* 5.0c */, faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value, map: $('opt-map') ? $('opt-map').value : 'fenda' };
-    savePrefs(Object.assign(loadPrefs() || {}, cfg)); startGame(cfg);
+    savePrefs(Object.assign(loadPrefs() || {}, cfg)); startGame(Object.assign(cfg, ARD.modosUI ? ARD.modosUI.cfgJogar() : {} /* 5.0g: Eventos da Fenda, mutadores e Lente */));
   });
   $('btn-help-start').addEventListener('click', () => toggleHelp(true));
+  if (ARD.modosUI) { try { ARD.modosUI.montar({ showTab, lobby: () => lobby, startGame: c => { if (lobby) { showTab('multi', true); return; } startGame(c); }, cfgBase: () => ({ name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante'), faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar', seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }) }); } catch (e) { console.warn('[ARD] modos:', e); } } /* 5.0g: aba Caçada, regras da Fenda e modo da sala */
   { const bb = $('btn-bench'); if (bb) { const show = () => { const b = benchLoad(); $('bench-last').textContent = b ? Tx('desempenho.ultimo', { fps: b.fps, p1: b.p1, q: TRx(b.quality), data: new Date(b.at).toLocaleDateString(ARD.i18n.locale()) }) : Tx('desempenho.nenhum'); }; show(); window.addEventListener('ard-idioma', show); /* 5.0c */
     bb.addEventListener('click', () => { if (lobby || window.__rejoining) { showTab('multi', true); mpStatus(Tx(lobby ? 'desempenho.sair-sala' : 'desempenho.aguarde-volta')); return; } /* 5.0c */ startGame({ name: 'Teste', faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar', opp: '1', diff: 'normal', seed: 4242, gfx: '3d', quality: $('opt-quality').value, clima: 'auto', bench: true }); }); } }
   window.addEventListener('ard-idioma', () => { if (G) return; try { refreshSaved(); netState(); setStartButton(); if (lobby) renderLobby(lobby.role === 'host' ? lobby.N.roster() : (lobby.N.players || []), lobby.size); const on = $('opt-name'); if (on && on.dataset.padrao && on.value === on.dataset.padrao) on.value = on.dataset.padrao = Tx('geral.comandante'); } catch (e) { console.warn('[ARD] idioma na tela inicial:', e); } }); /* 5.0c: a tela inicial se refaz no idioma novo, sem recarregar */
   if (params.get('bench')) { startGame({ name: 'Teste', faction: params.get('faction') || 'vehnar', opp: '1', diff: 'normal', seed: 4242, gfx: params.get('r') === '2d' ? '2d' : '3d', quality: params.get('q') || $('opt-quality').value, clima: params.get('clima') || 'auto', bench: true }); }
-  else if (params.get('autostart')) { startGame({ name: 'Teste', faction: params.get('faction') || 'erevane', opp: params.get('opp') || '2', diff: params.get('diff') || 'normal', seed: parseInt(params.get('seed') || '5', 10), gfx: params.get('r') === '2d' ? '2d' : '3d', map: params.get('mapa') || 'fenda' }); }
+  else if (params.get('autostart')) { startGame(Object.assign({ name: 'Teste', faction: params.get('faction') || 'erevane', opp: params.get('opp') || '2', diff: params.get('diff') || 'normal', seed: parseInt(params.get('seed') || '5', 10), gfx: params.get('r') === '2d' ? '2d' : '3d', map: params.get('mapa') || 'fenda', chefe: params.get('chefe') || undefined, chefeDif: params.get('chefedif') || undefined /* 5.0g: ?chefe=arauto|forja|sentinela (chefão perto da sua base) */ }, ARD.modosUI ? ARD.modosUI.cfgUrl(params) : {} /* 5.0g: ?cacada ?eventos ?evento ?mut ?lente */)); }
 }
 
 // 4.1c — sessão multiplayer do convidado: código, lugar e ficha para voltar à sala depois de recarregar a página
@@ -256,10 +259,11 @@ function loadingInfo(cfg, netCtx) { try {
   const fac = (netCtx && cfg.players && cfg.players[netCtx.myId] && cfg.players[netCtx.myId].faction) || cfg.faction || 'vehnar'; const f = S.FACTIONS[fac] || S.FACTIONS.vehnar;
   document.documentElement.dataset.race = S.FACTIONS[fac] ? fac : 'vehnar'; document.documentElement.style.removeProperty('--race');
   if ($('load-race')) $('load-race').textContent = DN.raca(S.FACTIONS[fac] ? fac : 'vehnar') + ' · ' + (LEADER_NAME[fac] || ''); /* 5.0c */
-  if ($('load-title')) $('load-title').textContent = cfg.bench ? Tx('desempenho.titulo') : cfg.campaign && cfg.campaign.mission ? (ARD.campaign && ARD.campaign.titulo ? ARD.campaign.titulo(cfg.campaign.mission) : cfg.campaign.mission.title) : DN.mapa(cfg.map === 'cinturao' ? 'cinturao' : 'fenda'); /* 5.0c */
+  if ($('load-title')) $('load-title').textContent = cfg.bench ? Tx('desempenho.titulo') : cfg.campaign && cfg.campaign.mission ? (ARD.campaign && ARD.campaign.titulo ? ARD.campaign.titulo(cfg.campaign.mission) : cfg.campaign.mission.title) : DN.mapa(cfg.map === 'cinturao' || cfg.map === 'tita' /* 5.0g */ ? cfg.map : 'fenda'); /* 5.0c */
   const touch = matchMedia('(pointer: coarse)').matches; const tips = LOAD_TIPS.filter(t => !(touch && t[1])); if ($('load-tip')) { const tp = tips[Math.floor(Math.random() * tips.length)]; $('load-tip').textContent = cfg.bench ? Tx('desempenho.dica-carga') : Tx('carga.dica.' + LOAD_TIPS.indexOf(tp), null, tp[0]); } /* 5.0c */
   if (leaderArt(fac)) { $('load-leader').src = leaderArt(fac); $('load-leader').hidden = false; }
   loadBg(fac); /* 4.3l */
+  if (ARD.modosUI) ARD.modosUI.cartao(cfg); /* 5.0g: Caçada, eventos e mutadores no cartão da partida */
 } catch (e) { console.warn('[ARD] carregamento:', e); } }
 // ---------- 5.0a: Detetive de travadas (vale para os dois motores) ----------
 /* fila fixa de quadros (sem alocar por quadro). Cada posição guarda o intervalo que terminou no começo do quadro e o trabalho do quadro
@@ -301,8 +305,10 @@ function startGame(cfg, netCtx) {
   const facsAll = Object.keys(S.FACTIONS).filter(f => f !== cfg.faction).concat([cfg.faction]);
   if (!cfg.players) for (let i = 0; i < parseInt(cfg.opp, 10); i++) { const f = facsAll[i % facsAll.length]; players.push({ name: aiNames[f][i % 3], faction: f, difficulty: cfg.diff }); }
   if (!netCtx && !cfg.campaign && ARD.campUI) ARD.campUI.applyColor(players); // tom da Raça escolhido no Hangar (solo)
-  const sim = S.createSim({ seed: cfg.seed, players, minutes: cfg.minutes || 25, map: cfg.campaign ? 'fenda' : (cfg.map === 'cinturao' ? 'cinturao' : 'fenda'), mapV: cfg.campaign ? 0 : (cfg.mapV == null ? 1 : cfg.mapV), /* 4.3h: mapa e lagos (salvamentos antigos sem lagos) */ noVeins: !!cfg.bench || !!(cfg.campaign && cfg.campaign.cfg && cfg.campaign.cfg.noVeins) }); // 4.2h: sem veios no prólogo e no teste de desempenho
+  if (ARD.modosUI && !cfg.campaign) ARD.modosUI.jogadores(players, cfg); /* 5.0g: a Lente do Arauto vai para o humano */
+  const sim = S.createSim(Object.assign(ARD.modos && !cfg.campaign && !cfg.bench ? ARD.modos.cfgDe(cfg) : {} /* 5.0g: Caçada, Eventos da Fenda e mutadores (g-modos) */, ARD.chefesSim && !cfg.campaign && !cfg.bench ? ARD.chefesSim.cfgDe(cfg) : {} /* 5.0g: a chave de teste ?chefe (também na retomada) */, { seed: cfg.seed, players, minutes: cfg.minutes || 25, map: cfg.campaign ? 'fenda' : (cfg.map === 'cinturao' || cfg.map === 'tita' /* 5.0g: Destroço do Titã */ ? cfg.map : 'fenda'), mapV: cfg.campaign ? 0 : (cfg.mapV == null ? 1 : cfg.mapV), /* 4.3h: mapa e lagos (salvamentos antigos sem lagos) */ noVeins: !!cfg.bench || !!(cfg.campaign && cfg.campaign.cfg && cfg.campaign.cfg.noVeins) })); // 4.2h: sem veios no prólogo e no teste de desempenho
   if (cfg.resume) S.restore(sim, cfg.resume.sim); // 4.1c: retomada a partir do salvamento (estado exato)
+  if (ARD.modosUI) ARD.modosUI.faixa(sim); /* 5.0g: mutadores à vista na partida */
   if (ARD.hud3) ARD.hud3.prepareSim(sim, !!cfg.resume, netCtx ? netCtx.myId : 0); /* 5.0b: paleta para daltonismo nas cores dos jogadores, antes de o renderizador montar os modelos · 5.0a.1: e as cores relativas (precisam saber quem é você) */
   const human = netCtx ? netCtx.myId : 0;
   const canvas = $('world'), mini = $('minimap'), overlay = $('overlay');
@@ -315,7 +321,7 @@ function startGame(cfg, netCtx) {
   if (params.get('ssaoout')) R.ssaoOut = parseInt(params.get('ssaoout'), 10);
   if (params.get('testblack')) R.testBlack = true; R.debug = !!params.get('debug');
   if (R.setQuality) R.setQuality(params.get('q') || cfg.quality || 'auto', { msaa: params.has('msaa') ? params.get('msaa') === '1' : null, ssao: params.has('ssao') ? params.get('ssao') === '1' : null, shadowMap: params.get('sm') ? parseInt(params.get('sm'), 10) : null, post: params.has('post') ? params.get('post') === '1' : null });
-  if (R.setClimate) R.setClimate(params.get('clima') || cfg.clima || 'auto');
+  if (R.setClimate) R.setClimate(ARD.modosUI ? ARD.modosUI.clima(cfg, params.get('clima') || cfg.clima || 'auto') /* 5.0g: Tempestades Frequentes */ : params.get('clima') || cfg.clima || 'auto');
   if (R.is3d) R.onDegrade = (what, reason) => { if (what) banner(Tx('jogo.3d-reduzida'), Tx('jogo.3d-reduzida-txt', { o: TRx(what), motivo: TRx(reason) }), 'warn'); else banner(Tx('jogo.3d-falhou'), Tx('jogo.3d-falhou-txt'), 'danger'); }; /* 5.0c */
   // protótipo 4.0a: o líder da Raça em "chamada" no canto do HUD (retrato 2.5D renderizado na hora pelo motor voxel)
   try { const fac = sim.players[human].faction; const L = $('leader');
@@ -334,7 +340,7 @@ function startGame(cfg, netCtx) {
   const view = { cam: { x: nuc.x, y: nuc.y, zoom: isTouch ? 0.7 : 1.0, yaw: Math.PI / 4, pitch: 0.95, pitchT: 0.95 }, sel: new Set(), hover: null, ghost: null, box: null, human, memory: new Map(), marker: null, mode: 'normal', lastAlert: null };
   const ui = makeUI(); // closures below
   const I = ARD.input.create({ canvas, sim, view, R, human, ui });
-  const ais = cfg.resume ? cfg.resume.ais.map(ARD.ai.restore) : sim.players.filter(p => (!p.human && !(players[p.id] && players[p.id].passive)) || (!netCtx && params.get('ia') === 'todos')).filter(() => !cfg.bench).map(p => ARD.ai.create(p.id, p.difficulty)); // 4.2a: no teste ninguém pensa por cima do roteiro da batalha // ?ia=todos: a IA joga também pelo humano (capturas e testes)
+  const ais = cfg.resume ? cfg.resume.ais.map(ARD.ai.restore) : sim.players.filter(p => !p.fenda /* 5.0g */ && ((!p.human && !(players[p.id] && players[p.id].passive)) || (!netCtx && params.get('ia') === 'todos'))).filter(() => !cfg.bench).map(p => ARD.ai.create(p.id, p.difficulty)); // 4.2a: no teste ninguém pensa por cima do roteiro da batalha // ?ia=todos: a IA joga também pelo humano (capturas e testes)
   G = { lead3d: window.__lead3d || null, sim, human, R, view, I, ais, speed: 1, paused: false, acc: 0, last: performance.now(), alerts: [], hints: makeHints(), selKey: '', isTouch, ended: false, pendingFor: null, net, pending: [], waiting: false, waitT: 0 };
   if (params.get('debug')) window.__ARDG = G; // testes automatizados
   if (AU) AU.raca = (sim.players[human] && sim.players[human].faction) || null; /* 5.0c: o locutor da partida fala no gênero do locutor desta Raça (src/audio.js, GENERO_LOCUTOR) */
@@ -403,6 +409,7 @@ function startGame(cfg, netCtx) {
     if (G.track) G.track.tick(ev);
     if (G.camp) { const r = G.camp.tick(ev); if (r && !G.ended) endGame({ campaign: r }); }
     if (ARD.cinema && !silent) ARD.cinema.eventos(ev, G); /* 5.0f: superarma e chefão viram cena (só leem os eventos) */
+    if (ARD.chefes && !silent) ARD.chefes.eventos(ev, G); /* 5.0g: entrada, fase, janela e morte do chefão (cinema, aviso e som) */
     if (sim.tick % 10 === 0) updateMemory();
   }
   function proximo(f) { if (R.m5 && ARD.m5 && ARD.m5.agendar) ARD.m5.agendar(R, f); else requestAnimationFrame(f); } /* 5.0b.1: o próximo quadro; no Motor 5 com ?laco=animloop é o laço do three (renderer.setAnimationLoop) que chama (src/m5/ritmo.js) */
@@ -422,6 +429,7 @@ function startGame(cfg, netCtx) {
     if (net) { G.waitT = G.waiting ? G.waitT + dt : 0; setH($('mp-wait'), G.waitT < 0.8); if (G.waitT >= 0.8) setT($('mp-wait'), net.state === 'rejoining' || G.rejoin ? Tx('multi.reconectando', { codigo: net.code, s: Math.round((performance.now() - (G.rejoin ? G.rejoin.since : performance.now())) / 1000) }) : net.state === 'lost' ? Tx('multi.conexao-perdida-curto') : Tx('multi.aguardando-outros', { s: Math.round(G.waitT) })); } /* 5.0c */ /* 4.3k: escrita com guarda */
     I.update(dt);
     if (ARD.cinema) ARD.cinema.quadro(now, dt, G); /* 5.0f: a cena que está tocando leva a câmera (view.cam) */
+    if (ARD.chefes) ARD.chefes.quadro(now, dt, G); /* 5.0g: barra do chefe, avisos de fase e a música do chefão */
     if (G.bench) benchFrame(now, dt);
     if (G.frameN % 3 === 0) refreshTop();
     if (G.frameN++ % 2 === 0) { refreshPanel(false); refreshQuick(); } // 4.1a: barato agora (vida e progresso atualizam no lugar)
@@ -483,7 +491,7 @@ function startGame(cfg, netCtx) {
       if (!silent && G.haptics && e.t === 'super' && e.p === human) { try { navigator.vibrate([20, 40, 20]); } catch (er) {} }
       else if (e.t === 'notice' && e.p === human && !silent) notice(TRx(e.text)); /* 5.0c */
       else if (e.t === 'proposal' && e.p === human && !silent) { G.pendingFor = e.from; showProposal(e.from); }
-      else if (e.t === 'eliminated' && !silent) { const q = sim.players[e.p]; const left = sim.players.filter(x => x.alive && x.id !== human).length; if (e.p !== human) { const qn = DN.jogador(q.name); banner(Tx('hud.eliminado', { nome: qn }), left > 0 ? Tx('hud.restantes', { n: left }) + ' · ' + Tx('hud.restantes-dica') : Tx('hud.todos-cairam'), 'good'); AU.sfx('promote'); AU.say(Tx('hud.eliminado', { nome: qn }) + '. ' + (left > 0 ? Tx('hud.restantes', { n: left }) : ''), 'elim', 0, null, ARD.vozes ? ARD.vozes.elim(q, left) : undefined /* 5.0c.1: nome da IA e inimigos restantes gravados */); } } /* 5.0c */
+      else if (e.t === 'eliminated' && !silent) { const q = sim.players[e.p]; const left = sim.players.filter(x => x.alive && x.id !== human && !x.fenda /* 5.0g */).length; if (e.p !== human) { const qn = DN.jogador(q.name); banner(Tx('hud.eliminado', { nome: qn }), left > 0 ? Tx('hud.restantes', { n: left }) + ' · ' + Tx('hud.restantes-dica') : Tx('hud.todos-cairam'), 'good'); AU.sfx('promote'); AU.say(Tx('hud.eliminado', { nome: qn }) + '. ' + (left > 0 ? Tx('hud.restantes', { n: left }) : ''), 'elim', 0, null, ARD.vozes ? ARD.vozes.elim(q, left) : undefined /* 5.0c.1: nome da IA e inimigos restantes gravados */); } } /* 5.0c */
       else if (e.t === 'trait' && e.owner === human && !silent) AU.sfx('promote');
       else if (e.t === 'end') { if (!G.camp) endGame(e.result); }
       else if (e.t === 'regime' && e.p === human && !silent) notice(Tx('hud.energia-regime', { regime: DN.regime(e.regime) })); /* 5.0c */
@@ -574,11 +582,12 @@ function startGame(cfg, netCtx) {
       view: { cam: { x: c.x, y: c.y, zoom: c.zoom, yaw: c.yaw, pitch: c.pitch }, memory: [...view.memory] } };
   }
   function saveMeta(extra) {
-    const me = sim.players[human]; const fac = (S.FACTIONS[me.faction] || {}).name || me.faction; const foes = sim.players.filter(q => q.id !== human);
+    const me = sim.players[human]; const fac = (S.FACTIONS[me.faction] || {}).name || me.faction; const foes = sim.players.filter(q => q.id !== human && !q.fenda /* 5.0g */);
     const dl = { facil: 'Fácil', normal: 'Normal', dificil: 'Difícil', brutal: 'Brutal', fenda: 'Fenda' };
-    const title = G.camp ? 'Campanha · ' + G.camp.prep.mission.title : 'Escaramuça · ' + fac + ' contra ' + foes.length + (foes.length > 1 ? ' IAs' : ' IA') + (sim.map && sim.map.type === 'cinturao' ? ' · Cinturão' : ''); /* 4.3h: o mapa aparece no cartão de retomar */
+    const title = G.camp ? 'Campanha · ' + G.camp.prep.mission.title : 'Escaramuça · ' + fac + ' contra ' + foes.length + (foes.length > 1 ? ' IAs' : ' IA') + (sim.map && sim.map.type === 'cinturao' ? ' · Cinturão' : sim.map && sim.map.type === 'tita' ? ' · Destroço do Titã' /* 5.0g */ : ''); /* 4.3h: o mapa aparece no cartão de retomar */
     const sub = (G.camp ? fac + ' · ' + G.camp.prep.diff.label : (dl[cfg.diff] || cfg.diff || '')) + ' · ' + ARD.saves.mmss(sim.time) + ' de jogo' + ' · ' + foes.filter(q => q.alive).length + ' adversário(s) de pé';
-    return Object.assign({ kind: G.camp ? 'campanha' : 'solo', title, sub, gameTime: sim.time, faction: me.faction, version: VERSION, noPause: !!(G.camp && G.camp.noPause) }, extra || {});
+    const mz = !G.camp && ARD.modosUI ? ARD.modosUI.salvo(sim) : null; /* 5.0g: Caçada e mutadores no cartão de retomar */
+    return Object.assign({ kind: G.camp ? 'campanha' : 'solo', title: mz && mz.titulo ? mz.titulo + ' · ' + fac + mz.extra : title + (mz ? mz.extra : ''), sub: mz && mz.titulo ? (dl[sim.modos.cac.dif] || '') + ' · ' + ARD.saves.mmss(sim.time) + ' de jogo' : sub, gameTime: sim.time, faction: me.faction, version: VERSION, noPause: !!(G.camp && G.camp.noPause) }, extra || {});
   }
   function openSaveBox() {
     const box = $('savebox'); if (!box) return; if (!G.autoSave) { notice(Tx('jogo.sem-salvar-mp')); return; } /* 5.0c */ if (!box.hidden) return; // 4.2g: Ctrl+S de novo com a janela aberta não muda o estado da pausa
@@ -631,7 +640,7 @@ function startGame(cfg, netCtx) {
     { const T = G.topEls; if (!T.clk) { T.clk = $('clock-ring'); T.rep = $('rep-dial'); setT($('clock-max'), Tx('hud.relogio-de', { t: mmss(sim.maxTime) })); } /* 5.0c */ setV(T.clk, '--p', String(Math.min(100, Math.floor(100 * sim.time / Math.max(1, sim.maxTime))))); setA(T.rep, 'data-rep', p.rep); }
     { const eb = $('era-badge'); if (eb) { const er = p.era || 1; const nx = S.ERAS[er + 1]; setT(eb, 'Era ' + S.ERAS[er].roman + (p.evolveT > 0 && nx ? ' → ' + nx.roman + ' ' + Math.ceil(p.evolveT) + ' s' : '') + (p.ascended ? ' ✦' : '')); setTi(eb, DN.era(er) + ': ' + DN.eraDesc(er) + (p.ascended ? ' · ' + Tx('hud.ascensao', { nome: DN.ascensao(p.faction) }) : '')); /* 5.0c */ setC(eb, 'era e' + er + (p.evolveT > 0 ? ' evolving' : '') + (p.ascended ? ' asc' : '')); } }
     setT($('rep'), DN.reputacao(p.rep)); /* 5.0c */
-    let enemies = 0; for (const x of sim.players) if (x.alive && x.id !== human && !S.hasPact(sim, human, x.id)) enemies++; setT($('enemies'), enemies);
+    let enemies = 0; for (const x of sim.players) if (x.alive && x.id !== human && !x.fenda /* 5.0g */ && !S.hasPact(sim, human, x.id)) enemies++; setT($('enemies'), enemies);
     const sb = G.speedBtns || (G.speedBtns = [...document.querySelectorAll('[data-speed]')]); for (const b of sb) setOn(b, 'on', parseFloat(b.dataset.speed) === G.speed && !G.paused);
     setOn($('btn-pause'), 'on', G.paused);
   }
@@ -897,12 +906,12 @@ function startGame(cfg, netCtx) {
   function openDiplo() {
     const m = $('diplo'); m.hidden = false; const p = sim.players[human]; let h = '';
     // 4.0c — cena frente a frente: seu líder à esquerda, o líder da sala em foco à direita (pacto = sereno, guerra = furioso); passe o mouse ou toque numa linha para trocar
-    const others = sim.players.filter(q => q.id !== human); const focus = others.find(q => q.alive) || others[0];
+    const others = sim.players.filter(q => q.id !== human && !q.fenda /* 5.0g: a Fenda fica fora da diplomacia */); const focus = others.find(q => q.alive) || others[0];
     const scene = q => { const pact = q && p.pacts[q.id]; const me = leaderArt(p.faction, pact ? 1 : 2), them = q && leaderArt(q.faction, q.alive ? (pact ? 1 : 2) : 1);
       return `<div class="dp-side me">${me ? `<img src="${me}" alt="">` : ''}<div><b>${LEADER_NAME[p.faction] || ''}</b><div class="muted small">${DN.racaCurto(p.faction)} · ${Tx('multi.voce')}</div></div></div><div class="dp-vs ${pact ? 'pact' : 'war'}"><svg aria-hidden="true"><use href="#${pact ? 'ic-diplo' : 'ic-jogar'}"/></svg><span class="vh">${Tx(pact ? 'diplo.em-pacto' : 'diplo.em-guerra')}</span></div><div class="dp-side them${q && !q.alive ? ' dead' : ''}" style="--rc2:${q ? q.color : '#888'}"><div style="text-align:right"><b>${q ? (LEADER_NAME[q.faction] || '') : '—'}</b><div class="muted small">${q ? DN.racaCurto(q.faction) + ' · ' + esc(DN.jogador(q.name)) + (q.alive ? '' : ' · ' + Tx('diplo.eliminado')) : ''}</div></div>${them ? `<img src="${them}" alt="">` : ''}</div>`; }; /* 5.0c */
     if (focus) h += `<div class="dp-scene" id="dp-scene">${scene(focus)}</div>`;
     h += `<div class="muted small">${Tx('diplo.reputacao', { rep: '<b>' + esc(DN.reputacao(p.rep)) + '</b>' })}${fac().pactHalf ? ' ' + Tx('diplo.quorith') : ''}</div>`; /* 5.0c */
-    for (const q of sim.players) {
+    for (const q of sim.players) { if (q.fenda) continue; /* 5.0g */
       if (q.id === human) continue;
       const pact = p.pacts[q.id]; const pending = sim.pending.find(pr => pr.from === q.id && pr.to === human); const mine = sim.pending.find(pr => pr.from === human && pr.to === q.id);
       h += `<div class="dp ${q.alive ? '' : 'dead'}" data-pid="${q.id}"><div class="dp-h">${leaderArt(q.faction) ? `<img class="dp-lead" src="${leaderArt(q.faction)}" alt="">` : ''}<span class="dot" style="background:${q.color}"></span><b>${esc(DN.jogador(q.name))}</b> <span class="muted">· ${LEADER_NAME[q.faction] || ''}</span> <span class="muted">· ${DN.racaCurto(q.faction)} · ${q.alive ? DN.reputacao(q.rep) : Tx('diplo.eliminado')}</span></div>`; /* 5.0c */
@@ -1024,6 +1033,8 @@ function startGame(cfg, netCtx) {
     $('end-stats').innerHTML = [['coletado', fmt(st.collected)], ['roubado', fmt(st.stolen)], ['perdido-roubo', fmt(st.lost)], ['abatidas', st.unitsKilled], ['perdidas', st.unitsLost], ['estruturas', st.buildingsDestroyed], ['tratados', st.treaties], ['traicoes', st.betrayals], ['reputacao', DN.reputacao(p.rep)]].map(([k, v]) => `<div class="stat"><span>${Tx('fim.st.' + k)}</span><b>${v}</b></div>`).join('');
     { const fb = $('end-feedback'); if (fb) fb.href = feedbackUrl({ resultado: result.outcome }); }
     if (ARD.campUI) { try { const fin = ARD.campUI.finish(null, result.outcome === 'victory', sim, human, G.track, net ? 'multiplayer' : 'escaramuca'); $('end-camp').innerHTML = fin.html; $('end-camp').hidden = false; } catch (e) { console.warn('[ARD] progresso indisponível:', e); } }
+    { const cz = result.cacada && ARD.modosUI ? ARD.modosUI.fim(result, sim, human) : null; /* 5.0g: medalha, recorde e recompensas da Caçada */
+      if (cz) { $('end-title').textContent = cz.titulo; $('end-eyebrow').textContent = cz.eyebrow; const ec = $('end-camp'); ec.innerHTML = cz.html + (ec.hidden ? '' : ec.innerHTML); ec.hidden = false; } else if (ARD.modosUI) ARD.modosUI.fimEscaramuca(sim, human); }
     $('btn-again').onclick = () => location.reload();
     $('btn-copy').onclick = () => { const data = { versao: VERSION, data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, mapa: sim.map ? sim.map.type : 'fenda', lagos: !!(sim.map && sim.map.lakes && sim.map.lakes.length), duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = Tx('fim.copiado'); }; /* 5.0c */ if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
   }

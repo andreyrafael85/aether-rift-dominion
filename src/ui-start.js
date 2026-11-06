@@ -19,7 +19,7 @@ const SEG_LABELS = {
   'opt-room': { 2: ['2', 'jogadores'], 3: ['3', 'jogadores'], 4: ['4', 'jogadores'] },
   'camp-diff': { fenda: ['Fenda', 'sem pausa'] },
 };
-const MAP_TXT = { fenda: 'Quatro biomas e o abismo da Fenda no centro.', cinturao: 'Plataformas sobre o espaço, ligadas por pontes.' };
+const MAP_TXT = { fenda: 'Quatro biomas e o abismo da Fenda no centro.', cinturao: 'Plataformas sobre o espaço, ligadas por pontes.', tita: 'A carcaça de um titã caído sobre a Fenda: costelas, placas e o crânio.' /* 5.0g */ };
 /* 5.0c: idiomas — LORE, SEG_LABELS e MAP_TXT ficam como o texto pt-BR de reserva; o que aparece sai de ARD.t (chaves vitrine.*) e os nomes da simulação de ARD.i18n.d */
 const I18 = () => ARD.i18n.d;
 const lore = (id, campo, pt) => ARD.t('vitrine.lore.' + id + '.' + campo, null, pt);
@@ -80,6 +80,11 @@ function drawMap(cv, kind, nPlayers, color) {
     c.strokeStyle = 'rgba(255,190,140,.9)'; c.lineWidth = 1.4; c.beginPath(); c.moveTo(cx - R * 0.26, cy + 2); for (let k = 1; k <= 8; k++) c.lineTo(cx - R * 0.26 + k * R * 0.065, cy + (k % 2 ? -3 : 3)); c.stroke();
     const n = Math.max(2, nPlayers); for (let i = 0; i < n; i++) { const a = -Math.PI / 2 + i * Math.PI * 2 / n + 0.3; base(c, cx + Math.cos(a) * R * 1.18, cy + Math.sin(a) * R * 0.74, i === 0 ? color : '#c9c4ba', i === 0); }
     for (let i = 0; i < 18; i++) { const a = rnd() * Math.PI * 2, d = 0.45 + rnd() * 0.5; const x = cx + Math.cos(a) * R * 1.4 * d, y = cy + Math.sin(a) * R * 0.88 * d; c.fillStyle = ['#62CDFF', '#FF8A5C', '#7FE3A1'][i % 3]; c.globalAlpha = 0.75; c.beginPath(); c.moveTo(x, y - 2.6); c.lineTo(x + 2.2, y); c.lineTo(x, y + 2.6); c.lineTo(x - 2.2, y); c.closePath(); c.fill(); c.globalAlpha = 1; }
+    if (kind === 'tita') { /* 5.0g: Destroço do Titã — a espinha atravessa o mapa, costelas em arco, o crânio numa ponta */
+      const a = -Math.PI / 2 + Math.PI / Math.max(2, nPlayers) + 0.3, ux = Math.cos(a), uy = Math.sin(a) * 0.63, nx = -uy, ny = ux; c.lineCap = 'round';
+      for (const t of [-0.85, -0.65, -0.45, 0.45, 0.65, 0.85]) for (const sg of [-1, 1]) { const bx = cx + ux * R * t * 1.4, by = cy + uy * R * t * 1.4; c.strokeStyle = 'rgba(70,60,48,.9)'; c.lineWidth = 5.5; c.beginPath(); c.moveTo(bx, by); c.quadraticCurveTo(bx + nx * sg * R * 0.32, by + ny * sg * R * 0.32, bx + nx * sg * R * 0.42 - ux * R * 0.14, by + ny * sg * R * 0.42 - uy * R * 0.14); c.stroke(); c.strokeStyle = '#E2D6BA'; c.lineWidth = 3; c.stroke(); }
+      c.strokeStyle = '#D6C9AA'; c.lineWidth = 4; c.setLineDash([5, 4]); c.beginPath(); c.moveTo(cx - ux * R * 1.3, cy - uy * R * 1.3); c.lineTo(cx + ux * R * 1.25, cy + uy * R * 1.25); c.stroke(); c.setLineDash([]);
+      c.fillStyle = '#D9CDB0'; c.beginPath(); c.ellipse(cx + ux * R * 1.36, cy + uy * R * 1.36, 13, 9, a, 0, Math.PI * 2); c.fill(); c.fillStyle = '#2A221E'; c.beginPath(); c.arc(cx + ux * R * 1.4 + nx * 4, cy + uy * R * 1.4 + ny * 4, 2.4, 0, Math.PI * 2); c.arc(cx + ux * R * 1.4 - nx * 4, cy + uy * R * 1.4 - ny * 4, 2.4, 0, Math.PI * 2); c.fill(); }
   }
   c.strokeStyle = 'rgba(255,255,255,.05)'; c.lineWidth = 1; for (let x = 0; x < W; x += 20) { c.beginPath(); c.moveTo(x + 0.5, 0); c.lineTo(x + 0.5, H); c.stroke(); } for (let y = 0; y < H; y += 20) { c.beginPath(); c.moveTo(0, y + 0.5); c.lineTo(W, y + 0.5); c.stroke(); }
 }
@@ -203,5 +208,5 @@ function enhance() { if (!st) return; const $ = D.$;
 function stop() { if (ARD.sala) try { ARD.sala.stop({ partida: true }); } catch (e) {} /* 5.0b: a Sala solta o laço e a GPU antes da partida (sem devolver o busto da vitrine) */ if (ARD.salaPoster) try { ARD.salaPoster.parar(); } catch (e) {} /* 5.0a.1: o pôster e o movimento 2D saem junto */ if (!st) return; const s = st; st = null; if (s.onKey) document.removeEventListener('keydown', s.onKey); if (s.onIdioma) window.removeEventListener('ard-idioma', s.onIdioma); /* 5.0c */ if (s.io) s.io.disconnect(); if (s.cta) s.cta.hidden = true; if (s.tr) { try { s.tr.r.dispose(); s.tr.r.forceContextLoss(); } catch (e) {} } }
 /* 5.0b: a Sala avisa quando o holograma está à vista (o retrato some) ou quando saiu (o busto 3D de antes volta, se couber) */
 function salaPronta(on) { if (!st) return; if (on) { st.holo = true; for (const k in st.busts) st.busts[k].cv.classList.add('out'); } else if (st.holo) { st.holo = !!(ARD.salaPoster && ARD.salaPoster.ativo()); /* 5.0a.1: com o pôster no fundo, o líder segue nele */ if (!st.holo && st.use3d && st.sel) showBust(st.sel, true); } }
-ARD.uiStart = { mount, enhance, stop, LORE, salaPronta, select: id => select(id), info: () => st ? { sel: st.sel, busts: Object.keys(st.busts), thumbs: Object.keys(st.thumbs), use3d: st.use3d } : null };
+ARD.uiStart = { mount, enhance, stop, LORE, salaPronta, segmented /* 5.0g: os seletores da aba Caçada e da sala */, select: id => select(id), info: () => st ? { sel: st.sel, busts: Object.keys(st.busts), thumbs: Object.keys(st.thumbs), use3d: st.use3d } : null };
 })(globalThis.ARD = globalThis.ARD || {});

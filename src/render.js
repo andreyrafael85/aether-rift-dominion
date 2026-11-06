@@ -39,7 +39,7 @@ function create(canvas, mini) {
     if (NODE_MODEL[def]) return MD[NODE_MODEL[def]](seed);
     if (def === 'crate') return MD.crate(); if (def === 'wreck') return MD.wreck(); if (def === 'rocks') return MD.rocks(seed); if (def === 'ruin') return MD.ruin(seed); if (def === 'crystals' || def === 'datashards') return MD[def](seed);
     const p = R.sim.players[pid]; const style = p.faction; const col = p.color;
-    const fn = (def === 'pirata' && MD.BY_DEF['pirata_' + style]) || MD.BY_DEF[def];
+    const fn = (def === 'pirata' && MD.BY_DEF['pirata_' + style]) || MD.BY_DEF[def] || MD.BY_DEF.drone; /* 5.0g: chefões e partes sem modelo voxel (ícone) */
     return fn(col, style);
   }
   R.sprite = function (def, pid, facing, dmg, seed) {
@@ -157,7 +157,7 @@ function create(canvas, mini) {
     const c = ctx, cam = view.cam, human = view.human, me = sim.players[human];
     const vis = view.reveal ? { has: () => true } : sim.vis[human]; const explored = sim.explored[human];
     const W = R.w, H = R.h, k = K * cam.zoom; const z = cam.zoom;
-    R.night = (1 - Math.cos(TAU * sim.time / 750)) / 2;
+    R.night = (1 - Math.cos(TAU * (ARD.modos && ARD.modos.noite(sim) ? ARD.modos.HORA_NOITE : sim.time) /* 5.0g: Noite Eterna */ / 750)) / 2;
     c.setTransform(R.dpr, 0, 0, R.dpr, 0, 0);
     c.fillStyle = '#07080B'; c.fillRect(0, 0, W, H);
     if (sim.map && sim.map.type === 'cinturao') { const fr = v => v - Math.floor(v), ww = W + 200, hh = H + 200, ox = (cam.x - cam.y) * K * cam.zoom * 0.25, oy = (cam.x + cam.y) * K * cam.zoom * 0.125; c.fillStyle = '#CFD9FF'; /* 4.3h: estrelas no abismo do Cinturão, com paralaxe lenta */
@@ -214,6 +214,7 @@ function create(canvas, mini) {
       if (d.type === 'crater') { const g = c.createRadialGradient(p[0], p[1], 1, p[0], p[1], d.r * k); g.addColorStop(0, `rgba(10,8,8,${0.85 * a})`); g.addColorStop(0.6, `rgba(40,36,34,${0.5 * a})`); g.addColorStop(1, 'rgba(0,0,0,0)'); c.save(); c.translate(p[0], p[1]); c.scale(1, 0.5); c.fillStyle = g; c.beginPath(); c.arc(0, 0, d.r * k, 0, TAU); c.fill(); c.restore(); }
       else { c.save(); c.translate(p[0], p[1]); c.scale(1, 0.5); c.fillStyle = `rgba(20,16,14,${0.5 * a})`; c.beginPath(); c.arc(0, 0, d.r * k, 0, TAU); c.fill(); c.restore(); }
     }
+    if (ARD.chefes) ARD.chefes.chao2d(c, sim, P, k, R, alpha); /* 5.0g: telegrafia dos chefões no chão */
     // objetos ordenados por profundidade
     const items = []; const lights = [];
     for (const e of sim.ents) {
@@ -240,6 +241,13 @@ function create(canvas, mini) {
         if (!dry) for (const l of sp.lights) lights.push({ x: p[0] - sp.ax * sc + l.x * sc, y: p[1] - sp.ay * sc + l.y * sc, r: 12 * z, c: l.c, a: 0.5 });
         continue;
       }
+      if (e.kind === 'rock' && e.osso) { /* 5.0g: Destroço do Titã no 2D — costela e vértebra em traço de osso, placa e crânio em polígono */
+        const ca = Math.cos(e.ang || 0), sa = Math.sin(e.ang || 0), hl = e.osso === 1 ? 17 : e.r, z0 = 4; const a = P(e.x - ca * hl, e.y - sa * hl, z0), b = P(e.x + ca * hl, e.y + sa * hl, z0), g = P(e.x, e.y, 0);
+        c.fillStyle = 'rgba(0,0,0,0.28)'; ellipse(c, g[0] + 3, g[1] + 1, e.r * 1.2 * k); c.fill(); c.lineCap = 'round';
+        if (e.osso === 2 || e.osso === 4) { const w = e.r * (e.osso === 4 ? 1.1 : 0.75), q1 = P(e.x - ca * hl - sa * w, e.y - sa * hl + ca * w, z0 + 3), q2 = P(e.x + ca * hl - sa * w, e.y + sa * hl + ca * w, z0 + 3), q3 = P(e.x + ca * hl + sa * w, e.y + sa * hl - ca * w, z0 + 3), q4 = P(e.x - ca * hl + sa * w, e.y - sa * hl - ca * w, z0 + 3);
+          c.fillStyle = e.osso === 4 ? '#CFC2A3' : '#5C4E44'; c.strokeStyle = e.osso === 4 ? '#8E8064' : '#3A302A'; c.lineWidth = 1.2; c.beginPath(); c.moveTo(q1[0], q1[1]); c.lineTo(q2[0], q2[1]); c.lineTo(q3[0], q3[1]); c.lineTo(q4[0], q4[1]); c.closePath(); c.fill(); c.stroke(); continue; }
+        const th = (e.osso === 3 ? 13 : 8.5) * k; c.strokeStyle = '#8A7C60'; c.lineWidth = th + 2.4; c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke(); c.strokeStyle = '#DCD0B4'; c.lineWidth = th; c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke();
+        if (e.osso === 3) { const t = P(e.x, e.y, 40); c.strokeStyle = '#D2C5A6'; c.lineWidth = 5 * k; c.beginPath(); c.moveTo(g[0], g[1]); c.lineTo(t[0], t[1]); c.stroke(); } continue; }
       if (e.kind === 'rock') { const sp = R.sprite('rocks', -1, 0, false, e.seed % 6); const p = P(e.x, e.y, 0); c.fillStyle = 'rgba(0,0,0,0.3)'; ellipse(c, p[0] + 4, p[1] + 1, e.r * 1.4 * k); c.fill(); drawSprite(c, sp, p[0], p[1], 0, (2 * e.r * 1.9 / sp.fw) * k / SV, k, 1); continue; }
       if (e.kind === 'crate') { const sp = R.sprite('crate', -1, 0, false, 0); const p = P(e.x, e.y, 0); drawSprite(c, sp, p[0], p[1], 0, (2 * e.r * 1.6 / sp.fw) * k / SV, k, 1); c.strokeStyle = `rgba(242,194,48,${0.4 + 0.3 * Math.sin(R.time * 4)})`; c.lineWidth = 1.5; ellipse(c, p[0], p[1], 16 * k); c.stroke(); continue; }
       if (e.kind === 'wreck') {
@@ -257,6 +265,7 @@ function create(canvas, mini) {
         else { const q = P(wx - e.vx * 0.03, wy - e.vy * 0.03, e.z); c.strokeStyle = 'rgba(255,230,160,0.95)'; c.lineWidth = 1.5 * Math.max(0.7, z); c.beginPath(); c.moveTo(q[0], q[1]); c.lineTo(p[0], p[1]); c.stroke(); }
         continue;
       }
+      if ((e.boss || e.parte) && ARD.chefes && ARD.chefes.ent2d(c, e, alpha, P, k, view, R, hpBar)) continue; /* 5.0g: chefões e partes */
       const p = sim.players[e.owner]; const isUnit = e.kind === 'unit';
       const [wx, wy] = isUnit ? lerp(e, alpha) : [e.x, e.y];
       const ud = isUnit ? S.UNITS[e.def] : S.BUILDINGS[e.def];
@@ -265,12 +274,12 @@ function create(canvas, mini) {
       const hullDef = parts ? parts.hull : e.def;
       let facing = 0; if (isUnit) facing = facingOf(e.ang || 0, facingsFor(hullDef)); else if (ud.wall) facing = facingOf(e.ang || 0);
       const dmg = !isUnit && e.built && e.hp < e.maxHp * 0.5;
-      const sp = R.sprite(hullDef, e.owner, parts && !isUnit ? 0 : facing, dmg, 0); const sc = fitOf(e, sp) * k / SV;
+      const eco2 = ARD.chefes && isUnit ? ARD.chefes.ecoDono(e) : -1; /* 5.0g: cópia espectral (cor do dono original, translúcida) */ const sp = R.sprite(hullDef, eco2 >= 0 ? eco2 : e.owner, parts && !isUnit ? 0 : facing, dmg, 0); const sc = fitOf(e, sp) * k / SV;
       const moving = isUnit && (e.x !== e.px || e.y !== e.py); const bob = moving && e.def === 'infantaria' ? Math.abs(Math.sin(R.time * 11 + e.id)) * 1.3 : 0;
       const g = P(wx, wy, 0);
       c.fillStyle = 'rgba(0,0,0,0.35)'; ellipse(c, g[0] + sp.fw * sc * 0.15, g[1] + 1, sp.fw * sc * 0.55); c.fill();
       if (view.sel.has(e.id)) { c.strokeStyle = 'rgba(255,255,255,0.9)'; c.lineWidth = 1.5; ellipse(c, g[0], g[1], (e.r + 5) * k); c.stroke(); if (!isUnit && ud.attack) { c.strokeStyle = 'rgba(255,255,255,0.18)'; c.setLineDash([4, 6]); ellipse(c, g[0], g[1], ud.attack.range * k); c.stroke(); c.setLineDash([]); } if (!isUnit && ud.detect) { c.strokeStyle = 'rgba(127,227,161,0.3)'; ellipse(c, g[0], g[1], ud.detect * k); c.stroke(); } }
-      const alphaS = e.cloaked ? (own ? 0.45 : 1) : 1;
+      const alphaS = (e.cloaked ? (own ? 0.45 : 1) : 1) * (eco2 >= 0 ? 0.5 : 1); /* 5.0g */
       const clip = isUnit ? 1 : (e.built ? 1 : 0.12 + 0.88 * e.progress);
       const box = drawSprite(c, sp, g[0], g[1], zz + bob, sc, k, alphaS, clip);
       if (parts && (isUnit || e.built)) { // torreta na direção da mira

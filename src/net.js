@@ -3,7 +3,7 @@
    tick T sem o pacote. Também: sala por código, lista de jogadores, checksums por tick, chat e aviso de desconexão. */
 (function (ARD) {
 'use strict';
-const PROTO = 6; // versão do protocolo: anfitrião e convidados precisam coincidir (3: volta à sala depois de queda, 4.1c; 4: navegação, coletores e Piratas novos mudam a simulação, 4.2g; 5: veios, Tempestade 2× e Dados a 400, 4.2h; 6: coletores inteligentes e o comando 'gather', 5.0a.1)
+const PROTO = 7; // versão do protocolo: anfitrião e convidados precisam coincidir (7: modos da partida — Caçada, Eventos da Fenda e mutadores —, 5.0g; 3: volta à sala depois de queda, 4.1c; 4: navegação, coletores e Piratas novos mudam a simulação, 4.2g; 5: veios, Tempestade 2× e Dados a 400, 4.2h; 6: coletores inteligentes e o comando 'gather', 5.0a.1)
 const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function makeCode() { let c = ''; for (let i = 0; i < 6; i++) c += ALPHA[Math.floor(Math.random() * ALPHA.length)]; return c; }
 const errText = t => ({ 'peer-unavailable': 'sala não encontrada (código errado ou anfitrião offline)', 'network': 'sem conexão com o servidor de sinalização', 'server-error': 'servidor de sinalização indisponível', 'browser-incompatible': 'navegador sem WebRTC', 'unavailable-id': 'código em uso' }[t] || t);
@@ -17,8 +17,9 @@ function create() {
   function broadcast(msg, except) { for (const g of N.guests) if (g.open && (g.ready || !N.started) && g.conn !== except) sendTo(g.conn, msg); }
   const readyGuests = () => N.guests.filter(g => g.ready);
   N.roster = () => N.role === 'host' ? [{ id: 0, name: N.me.name, faction: N.me.faction, color: N.me.color || null }].concat(readyGuests().map((g, i) => ({ id: i + 1, name: g.name, faction: g.faction, color: g.color || null }))) : N.players;
-  function lobbyMsg() { return { t: 'lobby', players: N.roster(), size: N.size }; }
+  function lobbyMsg() { return { t: 'lobby', players: N.roster(), size: N.size, modo: N.modo || null /* 5.0g: o modo da sala (Escaramuça ou Caçada) */ }; }
   function pushLobby() { const m = lobbyMsg(); broadcast(m); fire('lobby', m); }
+  N.relobby = () => { if (N.role === 'host' && !N.started) pushLobby(); }; /* 5.0g: o anfitrião trocou o modo da sala */
   // ---- anfitrião
   function bindGuest(conn) {
     const g = { conn, name: '', faction: 'vehnar', ready: false, open: false, id: -1, rtt: 0 };
@@ -93,7 +94,7 @@ function create() {
       if (!d || typeof d !== 'object' || N.hostConn !== conn) return;
       if (d.t === 'welcome') { if (d.v !== PROTO) { N.state = 'lost'; fire('error', { message: 'versão do jogo diferente da do anfitrião; atualizem a página (Ctrl+F5) nos dois lados' }); try { conn.close(); } catch (e) {} return; } N.size = d.size; if (d.build && N.me.build && d.build !== N.me.build) fire('warn', { message: 'build diferente do anfitrião (' + d.build + ' × ' + N.me.build + '); se algo falhar, Ctrl+F5 nos dois lados' }); }
       else if (d.t === 'bad-version') { N.state = 'lost'; fire('error', { message: 'versão do jogo diferente da do anfitrião; atualizem a página (Ctrl+F5) nos dois lados' }); }
-      else if (d.t === 'lobby') { N.players = d.players; N.size = d.size; fire('lobby', d); }
+      else if (d.t === 'lobby') { N.players = d.players; N.size = d.size; N.modo = d.modo || null; /* 5.0g */ fire('lobby', d); }
       else if (d.t === 'full') { N.state = 'full'; fire('full', {}); }
       else if (d.t === 'start') { N.started = true; N.id = d.you; N.players = d.players; N.token = d.token || null; fire('start', d); }
       else if (d.t === 'tick') N.bundles.set(d.tick, d.cmds || []);

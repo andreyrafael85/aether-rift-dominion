@@ -62,7 +62,7 @@ function build(sim, HN) {
       if (r < RIFT.rimR + 2) ch = -RIFT.bowlD + (RIFT.abyss + RIFT.bowlD) * sstep(RIFT.rimR + 2, RIFT.rimR - 30, r) + (fbm(x / 40, y / 40, 2, seed + 47) - 0.5) * 12 * sstep(RIFT.rimR - 10, RIFT.rimR - 60, r);
       h = h + (ch - h * 0.6) * sstep(560, 470, dr); }
     // cordilheiras: monte sob as rochas (as rochas esculpidas da 4.3b assentam nele; até ~44 de altura)
-    const kx = (x / RC) | 0, ky = (y / RC) | 0; for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) { const L = rgrid.get((kx + ox) + (ky + oy) * RN); if (L) for (const r of L) { const dd = Math.hypot(x - r.x, y - r.y); if (dd < 60) h += 26 * (1 - dd / 60) * (1 - dd / 60); } }
+    const kx = (x / RC) | 0, ky = (y / RC) | 0; for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) { const L = rgrid.get((kx + ox) + (ky + oy) * RN); if (L) for (const r of L) { const dd = Math.hypot(x - r.x, y - r.y); if (dd < 60) h += (r.osso ? 9 : 26) /* 5.0g: osso do titã quase rente ao chão */ * (1 - dd / 60) * (1 - dd / 60); } }
     if (CIN) { const sd = S.mapSd(sim, x, y); if (sd < 6) { const k = sstep(6, -28, sd); h = h * (1 - k) + VOID_H * k; } else if (sd < 16) h -= (16 - sd) * 0.14; } /* borda chanfrada e paredão até o vazio */
     heights[i] = h;
   }

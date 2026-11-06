@@ -349,11 +349,13 @@ function createSim(cfg) {
     sim.explored.push(new Uint8Array(TILES * TILES));
   }
   sim.nextStorm = 300 + sim.rand() * 120;
-  sim.map = cfg.map === 'cinturao' ? planCinturao(sim) : { type: 'fenda', lakes: [] }; /* 4.3h */
+  sim.map = cfg.map === 'cinturao' ? planCinturao(sim) : cfg.map === 'tita' && ARD.chefesSim ? ARD.chefesSim.planoTita(sim) /* 5.0g: Destroço do Titã */ : { type: 'fenda', lakes: [] }; /* 4.3h */
   generateMap(sim);
   if ((cfg.mapV || 0) >= 1) planLakes(sim); /* lagos só em partidas novas (salvamentos antigos e campanha ficam como eram) */ buildMapGrid(sim);
   generateTerrain(sim);
   rebuildNav(sim);
+  if (sim.fenda == null) sim.fenda = -1; if (!sim.avisos) sim.avisos = []; if (!sim.terreno) sim.terreno = []; if (ARD.chefesSim) ARD.chefesSim.inicio(sim, cfg); /* 5.0g: chefões, a Fenda e a telegrafia (src/chefes-sim.js) */
+  if (ARD.modos) ARD.modos.criar(sim); /* 5.0g: modos da partida (Caçada, Eventos da Fenda, mutadores); sem modo na cfg, não faz nada */
   computeVisibility(sim); markExplored(sim);
   return sim;
 }
@@ -443,7 +445,7 @@ function generateTerrain(sim) {
     sim.props.push({ x: cx + (hh * 977 % 40) - 20, y: cy + (hh * 613 % 40) - 20, kind, seed: Math.floor(hh * 1000), scale: 0.35 + (hh * 331 % 1) * 0.35 });
   }
   // cordilheiras: segmentos de rochas intransponíveis no anel médio, mantendo o mapa conectado
-  const nR = sim.map && sim.map.type === 'cinturao' ? 0 : 5 + sim.players.length; const placed = []; /* 4.3h: o Cinturão já tem os abismos */
+  const nR = sim.map && (sim.map.type === 'cinturao' || sim.map.type === 'tita') ? 0 : 5 + sim.players.length; /* 5.0g: no Titã a carcaça faz o papel das cordilheiras */ const placed = []; /* 4.3h: o Cinturão já tem os abismos */
   for (let k = 0; k < nR * 3 && placed.length < nR; k++) {
     const a = sim.rand() * Math.PI * 2, rr = 620 + sim.rand() * 420; const cx = CX + DM.cos(a) * rr, cy = CY + DM.sin(a) * rr;
     if (nucs.some(nc => dist(cx, cy, nc.x, nc.y) < 460)) continue;
@@ -462,6 +464,7 @@ function generateTerrain(sim) {
     if (!connected(sim, nucs)) { for (const r of rocks) { r.alive = false; sim.byId.delete(r.id); } continue; }
     placed.push(rocks);
   }
+  if (sim.map && sim.map.type === 'tita' && ARD.chefesSim) ARD.chefesSim.ossosTita(sim, nucs); /* 5.0g */
   sim.ents = sim.ents.filter(e => e.alive);
   rebuildNav(sim);
 }
@@ -673,7 +676,7 @@ function updateStorm(sim, dt) {
   }
   st.t += dt;
   if (st.phase === 'warn' && st.t >= st.warn) { st.phase = 'active'; st.t = 0; for (const q of sim.players) if (q.alive) alertTo(sim, q.id, 'Tempestade de Éter ativa: drones e sensores a 50%, Plasma 2× dentro dela', st.x, st.y, 'warn'); emit(sim, { t: 'storm', phase: 'active', x: st.x, y: st.y, r: st.r }); }
-  else if (st.phase === 'active' && st.t >= st.dur) { sim.storm = null; sim.nextStorm = sim.time + 360 + sim.rand() * 120; emit(sim, { t: 'storm', phase: 'end' }); }
+  else if (st.phase === 'active' && st.t >= st.dur) { sim.storm = null; sim.nextStorm = sim.modos && sim.modos.mut.tempestades ? sim.time + (360 + sim.rand() * 120) * ARD.modos.tormenta(sim) /* 5.0g: Tempestades Frequentes */ : sim.time + 360 + sim.rand() * 120; emit(sim, { t: 'storm', phase: 'end' }); }
 }
 
 // ---------- helpers ----------
@@ -712,6 +715,7 @@ function sensorRadius(sim, e) {
   if (p.mods && p.mods.sensorMul) r *= p.mods.sensorMul;
   if (p.blackoutT > 0) r *= 0.15;
   if (inStorm(sim, e.x, e.y)) r *= 0.5;
+  if (sim.modos) r *= ARD.modos.visao(sim, p); /* 5.0g: Noite Eterna e Lente do Arauto */
   return r;
 }
 function speedOf(sim, u) {
@@ -720,6 +724,7 @@ function speedOf(sim, u) {
   if (p.speedBuffT > 0) s *= 1.3;
   if (p.mods && p.mods.speedMul) s *= p.mods.speedMul;
   if (UNITS[u.def].flying && inStorm(sim, u.x, u.y)) s *= 0.5;
+  if (sim.modos && sim.modos.lento !== 1 && inStorm(sim, u.x, u.y)) s *= sim.modos.lento; /* 5.0g: Tempestades Frequentes */
   return s;
 }
 function inTerritory(sim, pid, x, y) {
@@ -950,7 +955,7 @@ function processCommand(sim, c) {
       for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Salto de Núcleo iniciado (60 s)' : p.name + ' iniciou um Salto de Núcleo!', nuc.x, nuc.y, q.id === c.p ? 'good' : 'warn');
       break; }
     case 'propose': {
-      const q = sim.players[c.to]; if (!q || !q.alive || c.to === c.p || hasPact(sim, c.p, c.to)) return;
+      const q = sim.players[c.to]; if (!q || !q.alive || q.fenda /* 5.0g */ || c.to === c.p || hasPact(sim, c.p, c.to)) return;
       if (sim.pending.some(pr => pr.from === c.p && pr.to === c.to)) return;
       const cc = pactCost(p); if (!canAfford(p, { minerio: cc })) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Caução: ' + cc + ' Minério' }); return; }
       sim.pending.push({ from: c.p, to: c.to, t: sim.time });
@@ -973,7 +978,7 @@ function processCommand(sim, c) {
       emit(sim, { t: 'pact', a: a.id, b: p.id });
       break; }
     case 'break': {
-      const pact = p.pacts[c.with]; if (!pact) return;
+      const pact = p.pacts[c.with]; if (!pact || pact.fixo /* 5.0g: o time da Caçada não se trai */) return;
       const v = sim.players[c.with];
       delete p.pacts[c.with]; delete v.pacts[c.p];
       v.res.minerio += (pact.caucaoA || pact.caucao) + (pact.caucaoB || pact.caucao); // a vítima fica com as duas cauções
@@ -998,7 +1003,7 @@ function computeEnergy(sim, p, dt) {
       if (!e.built) continue;
       if (d.energyProd) {
         if (d.plasmaBurn) { if (p.res.plasma > 0) { prod += d.energyProd * (e.mod === 1 && e.def === 'reator' ? 1.6 : 1); p.res.plasma = Math.max(0, p.res.plasma - d.plasmaBurn * dt * (p.mods && p.mods.burnMul || 1)); } }
-        else if (e.def === 'nucleo' && FACTIONS[p.faction].photosynthesis) { const nt = (1 - DM.cos(Math.PI * 2 * sim.time / 750)) / 2; prod += 95 - 50 * nt + ERA_NUCLEO.energy * ((p.era || 1) - 1); }
+        else if (e.def === 'nucleo' && FACTIONS[p.faction].photosynthesis) { const nt = sim.modos && sim.modos.mut.noite ? 1 /* 5.0g: Noite Eterna */ : (1 - DM.cos(Math.PI * 2 * sim.time / 750)) / 2; prod += 95 - 50 * nt + ERA_NUCLEO.energy * ((p.era || 1) - 1); }
         else prod += d.energyProd + (e.def === 'nucleo' ? ERA_NUCLEO.energy * ((p.era || 1) - 1) : 0);
       }
       cons += d.energyUse || 0;
@@ -1040,6 +1045,7 @@ function applyDamage(sim, attackerOwner, attacker, t, dmg, weapon) {
   if (q && t.kind === 'unit' && t.elo > 0) dmg *= 1 - FACTIONS[q.faction].elo.armor * t.elo;
   if (q && q.unissonoT > 0 && t.kind === 'unit') dmg *= 0.75;
   if (t.kind === 'unit') dmg *= 1 - 0.07 * (t.rank || 0);
+  if (t.boss) dmg = ARD.chefesSim.dano(sim, t, dmg, attacker); /* 5.0g: fases, escudo, pernas e janela */
   t.hp -= dmg; t.lastHitT = sim.time; t.lastHitBy = attackerOwner;
   const p = sim.players[attackerOwner]; if (p) p.stats.dmg += dmg;
   if (attacker && attacker.alive && attacker.kind === 'unit') {
@@ -1113,6 +1119,7 @@ function kill(sim, e, killer) {
   e.alive = false;
   const p = sim.players[e.owner];
   emit(sim, { t: 'death', x: e.x, y: e.y, r: e.r, kind: e.kind, def: e.def, owner: e.owner, cls: e.cls, id: e.id }); /* 4.3f: id para a ruína no render */
+  if ((e.boss || e.parte) && ARD.chefesSim) ARD.chefesSim.morte(sim, e, killer); /* 5.0g */
   if (e.kind === 'unit') {
     if (p) p.stats.unitsLost++;
     if (killer >= 0 && killer !== e.owner) sim.players[killer].stats.unitsKilled++;
@@ -1123,7 +1130,7 @@ function kill(sim, e, killer) {
       if (p && p.human) alertTo(sim, p.id, 'Caixa derrubada: ' + Math.round(e.cargoTotal) + ' em recursos', e.x, e.y, 'warn');
     }
     if (e.cls === 'vei' || e.def === 'coletor' || e.def === 'pirata') { // carcaça saqueável
-      const wr = { id: sim.nextId++, kind: 'wreck', x: e.x, y: e.y, r: e.r, ang: e.ang || 0, alive: true, owner: -1, res: 'minerio', amount: Math.round(unitCost(e.def) * 0.35), max: Math.round(unitCost(e.def) * 0.35), bornT: sim.time, def: e.def };
+      const wr = { id: sim.nextId++, kind: 'wreck', x: e.x, y: e.y, r: e.r, ang: e.ang || 0, alive: true, owner: -1, res: 'minerio', amount: Math.round(unitCost(e.def) * 0.35 * (sim.modos ? ARD.modos.destroco(sim) : 1)), max: Math.round(unitCost(e.def) * 0.35 * (sim.modos ? ARD.modos.destroco(sim) : 1)) /* 5.0g: Recursos Escassos */, bornT: sim.time, def: e.def };
       sim.ents.push(wr); sim.byId.set(wr.id, wr);
     }
   } else if (e.kind === 'building') {
@@ -1167,7 +1174,7 @@ function acquire(sim, u, rad, unitsOnly) {
     if (e.cls === 'civ' && noCiv) return; /* 5.0a.1: a IA do Fácil não caça coletores */
     const d = dist(u.x, u.y, e.x, e.y) - e.r;
     if (d > rad) return;
-    const score = d + (e.kind === 'building' ? (BUILDINGS[e.def].wall ? 320 : 200) : 0) + (e.cls === 'civ' ? 60 : 0);
+    const score = d + (e.kind === 'building' ? (BUILDINGS[e.def].wall ? 320 : 200) : 0) + (e.cls === 'civ' ? 60 : 0) + (e.boss && e.boss.pontos > 0 ? 160 : 0); /* 5.0g: com ponto fraco vivo, a mira automática prefere as partes */
     if (score < bd) { bd = score; best = e; }
   });
   return best;
@@ -1326,6 +1333,7 @@ function deliver(sim, u) {
 }
 
 function updateUnit(sim, u, dt) {
+  if (u.boss || u.parte) { ARD.chefesSim.unidade(sim, u, dt); return; } /* 5.0g */
   const d = UNITS[u.def];
   if (u.cd > 0) u.cd -= dt;
   if (u.revealT > 0) u.revealT -= dt;
@@ -1562,6 +1570,7 @@ function computeVisibility(sim) {
       if (e.kind === 'proj' && e.owner === p.id) { vis.add(e.id); continue; }
       let seen = false;
       if (e.kind === 'building' && e.built && e.def === 'reator' && facOf(sim, e.owner).smoke) seen = true;
+      if (e.boss || e.parte) seen = true; /* 5.0g: o chefão e as partes dele são vistos por todos (marco do mapa; a barra e a telegrafia dependem dele) */
       if (!seen) for (let k = VBH[vbOf(e.y) * VBN + vbOf(e.x)]; k >= 0; k = VBX[k]) { const i = VBI[k]; if (dist(e.x, e.y, VCX[i], VCY[i]) <= VCR[i] + e.r) { seen = true; break; } }
       if (seen && e.cloaked && !(e.revealT > 0)) {
         seen = false;
@@ -1599,16 +1608,18 @@ function score(sim, p) {
 }
 function checkEnd(sim) {
   if (sim.result) return;
-  const humans = sim.players.filter(p => p.human), ais = sim.players.filter(p => !p.human);
+  if (sim.chefes && sim.cfg && sim.cfg.cacada && ARD.chefesSim.fim(sim)) return; /* 5.0g: modo Caçada */
+  const pl = sim.fenda >= 0 ? sim.players.filter(p => !p.fenda) : sim.players; /* 5.0g: a Fenda fica fora de vitória, derrota e placar */
+  const humans = pl.filter(p => p.human), ais = pl.filter(p => !p.human);
   const humanAlive = humans.some(p => p.alive), aiAlive = ais.some(p => p.alive);
-  const scores = sim.players.map(p => ({ id: p.id, name: p.name, score: p.alive ? score(sim, p) : 0, alive: p.alive }));
+  const scores = pl.map(p => ({ id: p.id, name: p.name, score: p.alive ? score(sim, p) : 0, alive: p.alive }));
   if (humans.length >= 2) { // multiplayer: a partida acaba quando sobra um jogador ou o tempo termina; cada cliente decide o próprio resultado
-    const aliveN = sim.players.filter(p => p.alive).length;
+    const aliveN = pl.filter(p => p.alive).length; /* 5.0g */
     if (aliveN <= 1 || sim.time >= sim.maxTime) { const best = scores.filter(s2 => s2.alive).sort((a, b) => b.score - a.score)[0]; sim.result = { outcome: 'over', reason: aliveN <= 1 ? 'Último Núcleo de pé.' : 'Fim do Alinhamento: vitória por Domínio.', scores, winner: best ? best.id : -1 }; emit(sim, { t: 'end', result: sim.result }); }
     return;
   }
   if (humans.length === 0) { // headless mode: last one standing or time
-    const aliveN = sim.players.filter(p => p.alive).length;
+    const aliveN = pl.filter(p => p.alive).length; /* 5.0g */
     if (aliveN <= 1) sim.result = { outcome: 'headless', reason: 'Último sobrevivente', scores };
     else if (sim.time >= sim.maxTime) sim.result = { outcome: 'headless', reason: 'Tempo', scores };
     if (sim.result) emit(sim, { t: 'end', result: sim.result });
@@ -1634,13 +1645,14 @@ function step(sim) {
   updateStorm(sim, dt); updateVeins(sim);
   const cmds = sim.cmdQueue; sim.cmdQueue = [];
   for (const c of cmds) processCommand(sim, c);
+  if (sim.chefes) ARD.chefesSim.passo(sim, dt); /* 5.0g: golpes, avisos, fases e crias */
   for (const p of sim.players) {
     if (!p.alive) continue;
     if (p.overchargeT > 0) p.overchargeT -= dt;
     if (p.blackoutT > 0) p.blackoutT -= dt;
     if (p.speedBuffT > 0) p.speedBuffT -= dt;
     if (p.golpeT > 0) p.golpeT -= dt; if (p.saltoT > 0) p.saltoT -= dt; if (p.unissonoT > 0) p.unissonoT -= dt;
-    computeEnergy(sim, p, dt);
+    if (!p.fenda) computeEnergy(sim, p, dt); /* 5.0g: a Fenda não tem economia (energia sempre plena) */
   }
   updatePacts(sim);
   sim.auras = sim.players.map(() => ({ anchors: [], moldes: [], diapasoes: [] }));
@@ -1649,7 +1661,9 @@ function step(sim) {
   for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'building') updateBuilding(sim, e, dt); }
   for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'unit') updateUnit(sim, e, dt); else if (e.kind === 'proj') { e.px = e.x; e.py = e.y; updateProjectile(sim, e, dt); } else if (e.kind === 'wreck' && (e.amount <= 0 || sim.time - e.bornT > 150)) e.alive = false; }
   separate(sim);
+  if (sim.chefes) ARD.chefesSim.depois(sim); /* 5.0g: partes presas ao corpo e a lista dos Ecos */
   pickupCrates(sim);
+  if (sim.modos) ARD.modos.passo(sim, dt); /* 5.0g: Caçada e Eventos da Fenda (antes da poda: quem morreu neste passo ainda está em byId) */
   // prune
   if (sim.tick % 10 === 0) {
     const keep = [];
@@ -1676,6 +1690,8 @@ function hash(sim) { // cheap state hash for determinism tests
   const mix = v => { h ^= (v | 0); h = Math.imul(h, 16777619) >>> 0; };
   for (const e of sim.ents) { if (!e.alive) continue; mix(e.id); mix(Math.round(e.x * 10)); mix(Math.round(e.y * 10)); mix(Math.round((e.hp || 0) * 10)); mix(Math.round((e.amount || 0) * 10)); }
   for (const p of sim.players) { mix(Math.round(p.res.plasma * 10)); mix(Math.round(p.res.minerio * 10)); mix(Math.round(p.res.dados * 10)); mix(p.rep); }
+  if (sim.chefes && ARD.chefesSim) ARD.chefesSim.hash(sim, mix); /* 5.0g: só partidas com chefão ou evento */
+  if (sim.modos) ARD.modos.hash(sim, mix); /* 5.0g: estado dos modos (só nas partidas com modo) */
   return h >>> 0;
 }
 
@@ -1703,7 +1719,9 @@ function snapshot(sim) {
     ents: jsonSafe(sim.ents), players: jsonSafe(sim.players), cmdQueue: jsonSafe(sim.cmdQueue), pending: jsonSafe(sim.pending), result: jsonSafe(sim.result),
     storm: jsonSafe(sim.storm), nextStorm: jsonSafe(sim.nextStorm), nextVein: sim.nextVein == null ? null : sim.nextVein, digest: visDigest(sim), vis: sim.vis.map(st => [...st]), explored: sim.explored.map(b64),
     navDirty: !!sim.navDirty, nav: { blocked: b64(nav.blocked), gates: [...nav.gates], gatePos: [...nav.gatePos].map(([i, e]) => [i, e.id]), version: nav.version },
-    auras: sim.auras ? sim.auras.map(a => ({ anchors: a.anchors.map(e => e.id), moldes: a.moldes.map(e => e.id), diapasoes: a.diapasoes.map(e => e.id) })) : null };
+    auras: sim.auras ? sim.auras.map(a => ({ anchors: a.anchors.map(e => e.id), moldes: a.moldes.map(e => e.id), diapasoes: a.diapasoes.map(e => e.id) })) : null,
+    chefes: sim.chefes && ARD.chefesSim ? jsonSafe(ARD.chefesSim.foto(sim)) : null /* 5.0g */,
+    modos: sim.modos ? ARD.modos.snapshot(sim) : undefined /* 5.0g: só nas partidas com modo (a fotografia das outras fica igual) */ };
 }
 // aplica a fotografia num sim recém-criado com o mesmo cfg (createSim) e devolve o mesmo objeto
 function restore(sim, snap) {
@@ -1712,11 +1730,13 @@ function restore(sim, snap) {
   sim.ents = jsonBack(snap.ents); sim.players = jsonBack(snap.players); sim.cmdQueue = jsonBack(snap.cmdQueue); sim.pending = jsonBack(snap.pending); sim.result = jsonBack(snap.result);
   sim.storm = jsonBack(snap.storm); sim.nextStorm = jsonBack(snap.nextStorm); sim.nextVein = snap.nextVein == null ? undefined : snap.nextVein; /* 4.2h: salvamento antigo, o primeiro veio sai 60 s depois de retomar */ sim.vis = snap.vis.map(a => new Set(a)); sim.explored = snap.explored.map(unb64);
   sim.byId = new Map(); for (const e of sim.ents) sim.byId.set(e.id, e);
+  if (ARD.chefesSim) ARD.chefesSim.volta(sim, snap.chefes ? jsonBack(snap.chefes) : null); /* 5.0g: salvamento antigo = sem Fenda */
   const nav = sim.nav; nav.blocked = unb64(snap.nav.blocked); nav.gates = new Map(snap.nav.gates); nav.gatePos = new Map(snap.nav.gatePos.map(([i, id]) => [i, sim.byId.get(id)]).filter(x => x[1])); nav.fields = new Map(); nav.version = snap.nav.version; sim.navDirty = snap.navDirty;
   { const v0 = nav.version, nd = sim.navDirty; rebuildNav(sim); nav.version = v0; sim.navDirty = nd; } // 4.2g: refaz a grade (centros, donos de célula, corredores de portão) sem mudar versão nem o 'sujo'
   sim.grid = new Map(); rebuildGrid(sim);
   if (snap.auras) sim.auras = snap.auras.map(a => ({ anchors: a.anchors.map(id => sim.byId.get(id)).filter(Boolean), moldes: a.moldes.map(id => sim.byId.get(id)).filter(Boolean), diapasoes: a.diapasoes.map(id => sim.byId.get(id)).filter(Boolean) }));
   sim.events = []; sim._evRet = 0;
+  if (snap.modos && ARD.modos) ARD.modos.restore(sim, snap.modos); /* 5.0g */
   const h = hash(sim); if (h !== snap.hash) console.warn('[ARD] retomada: hash ' + h + ' difere do salvo ' + snap.hash);
   if (snap.digest != null && visDigest(sim) !== snap.digest) console.warn('[ARD] retomada: visão/exploração diferem do salvo'); // 4.2h
   return sim;
@@ -1729,6 +1749,10 @@ ARD.sim = {
   DM,
   createSim, step, enqueue, snapshot, restore, jsonSafe, jsonBack, ERAS, ASCENSION, eraOf, lockReason, eraBlock, territoryOf, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint, spawnUnit, forceStorm,
   addBuilding, kill, /* 4.3f: ferramentas de teste (bases e ruínas na partida) */
+  addNode, applyDamage, /* 5.0g: Eventos da Fenda (cristais dos meteoros e o dano em área) */
   MAPS, mapCell, groundAt, onPlat, onBridge, edgeR, mapSd, /* 4.3h: mapas e lagos */
 };
+/* 5.0g: funções internas para o src/chefes-sim.js (simulação dos chefões e do Destroço do Titã) */
+ARD.sim._int = { addUnit, addNode, applyDamage, fire, kill, moveToward, queryGrid, rebuildNav, connected, nucleoOf, lakeAt, emit, alertTo };
+if (ARD.chefesSim && ARD.chefesSim.instala) ARD.chefesSim.instala(ARD.sim);
 })(globalThis.ARD = globalThis.ARD || {});

@@ -169,14 +169,14 @@ function superarma(G, ev) { const S = ARD.sim, sim = G.sim; const p = sim.player
     trilho: [{ t: 0, d: 0.75, x, y, zoom: 1.9, pitch: 0.58, yaw: y0 + 0.25, ease: 'power3.inOut' }, { t: 0.75, d: 2.0, yaw: y0 + 0.55, zoom: 2.1, ease: 'none' }], voltaD: 0.8 }; }
 /* entrada de chefão: moldura reaproveitável (5.0g chama com { nome, epiteto }) */
 function chefe(G, u, o) { o = o || {}; const sim = G.sim; const p = sim.players[u.owner] || {}; const cam = G.view.cam, y0 = cam.yaw == null ? Math.PI / 4 : cam.yaw;
-  const c = { G, tipo: 'chefe', musica: 'chefao', dur: o.dur || 6.0, pausa: true, revela: true, cor: o.cor || COR[p.faction] || '#E6455A', classe: 'chefe', kicker: T('cine.chefao', null, 'Chefão') + ' · ' + raca(p.faction), nome: o.nome || T('unit.' + u.def + '.nome', null, u.def), sub: o.epiteto || T('cine.chefe.' + u.def, null, ''), titulo: [1.1, 4.8],
+  const c = { G, tipo: 'chefe', musica: 'chefao', dur: o.dur || 6.0, pausa: true, revela: true, cor: o.cor || COR[p.faction] || '#E6455A', classe: 'chefe', kicker: o.kicker || (T('cine.chefao', null, 'Chefão') + ' · ' + raca(p.faction)) /* 5.0g */, nome: o.nome || T('unit.' + u.def + '.nome', null, u.def), sub: o.epiteto || T('cine.chefe.' + u.def, null, ''), titulo: [1.1, 4.8],
     trilho: [{ t: 0, d: 1.1, x: u.x, y: u.y, zoom: 2.4, pitch: 0.42, yaw: y0 - 0.5, ease: 'power3.inOut' }, { t: 1.1, d: 3.9, yaw: y0 + 0.5, zoom: 2.0, pitch: 0.5, ease: 'sine.inOut' }], voltaD: 1.0 };
   if (o.tocar !== false) enfileira(c); return c; }
 /* os eventos de um passo (main.js, depois do passo e da campanha; nunca no avanço silencioso) */
 function eventos(ev, G) { if (!ev || !ev.length || fimDe(G)) return; const S = ARD.sim;
   for (let i = 0; i < ev.length; i++) { const e = ev[i];
     if (e.t === 'super' && ligada('super')) { const agora = G.sim.time; if (agora - superT < 20 || A || fila.length) continue; const c = superarma(G, e); if (c) { superT = agora; enfileira(c); } }
-    else if (e.t === 'spawn' && S.UNITS[e.def] && S.UNITS[e.def].epic && e.p !== G.human && ligada('chefe')) { let u = null, bd = 80; for (const x of G.sim.ents) if (x.alive && x.kind === 'unit' && x.def === e.def && x.owner === e.p) { const d = Math.abs(x.x - e.x) + Math.abs(x.y - e.y); if (d < bd) { bd = d; u = x; } }
+    else if (e.t === 'spawn' && S.UNITS[e.def] && S.UNITS[e.def].epic && !S.UNITS[e.def].boss /* 5.0g: os chefões entram pelo evento chefe/entra (src/chefes.js) */ && e.p !== G.human && ligada('chefe')) { let u = null, bd = 80; for (const x of G.sim.ents) if (x.alive && x.kind === 'unit' && x.def === e.def && x.owner === e.p) { const d = Math.abs(x.x - e.x) + Math.abs(x.y - e.y); if (d < bd) { bd = d; u = x; } }
       if (u && u.scripted && !G.net) chefe(G, u); } } }
 
 /* ---------- Ajustes: duas caixas ao lado da "Câmera de cinema" ---------- */

@@ -77,8 +77,8 @@ function playerColors(sim, me) {
   return sim.players.map(p => { let c = P.racas[p.faction]; if (!c || used.has(c)) c = P.reserva[(r++) % P.reserva.length]; used.add(c); return c; }); }
 function prepareSim(sim, resume, me) {
   const cols = playerColors(sim, me);
-  if (cols) { sim.players.forEach((p, i) => { p.color = cols[i]; }); return; }
-  if (resume && S.assignColors && sim.cfg && sim.cfg.players) { try { const o = S.assignColors(sim.cfg.players); sim.players.forEach((p, i) => { if (o[i]) p.color = o[i]; }); } catch (e) {} } /* salvo com paleta e retomado sem ela: volta às cores originais */
+  if (cols) { sim.players.forEach((p, i) => { if (!p.fenda) p.color = cols[i]; /* 5.0g: a Fenda guarda a cor dela */ }); return; }
+  if (resume && S.assignColors && sim.cfg && sim.cfg.players) { try { const o = S.assignColors(sim.cfg.players); sim.players.forEach((p, i) => { if (o[i] && !p.fenda) p.color = o[i]; }); } catch (e) {} } /* salvo com paleta e retomado sem ela: volta às cores originais */
 }
 
 // ---------- Ajustes de acessibilidade na tela inicial (aba Ajustes): o bloco entra por script, sem mexer no HTML do #start ----------
@@ -396,7 +396,7 @@ function mount(ctx) {
   H.frame = n => { if (n % 20 === 0) armyRender(false); if (n % 30 === 7) groupsRender(); if (n % 15 === 3) techRender(false); };
   H.selChanged = () => { groupsRender(); };
   H.groupsChanged = () => { groupsRender(); };
-  H.reapply = s => { const cols = playerColors(s, human); if (cols) s.players.forEach((p, i) => { p.color = cols[i]; }); }; /* volta à sala (multiplayer): a fotografia do anfitrião traz as cores dele (5.0a.1: e as relativas são de cada um) */
+  H.reapply = s => { const cols = playerColors(s, human); if (cols) s.players.forEach((p, i) => { if (!p.fenda) p.color = cols[i]; }); }; /* 5.0g */ /* volta à sala (multiplayer): a fotografia do anfitrião traz as cores dele (5.0a.1: e as relativas são de cada um) */
   H._al = AL; H._w = W; /* testes (work/h3.cjs e work/toque.cjs): avisos e estado da roda */
   groupsRender(); syncBadge(); /* a visão do exército sobe no primeiro quadro da partida (os retratos 3D precisam do carregamento) */
   if (alist && !AL.list.length) alist.innerHTML = '<div class="aempty">' + T('hud3.alc.vazio') + '</div>';

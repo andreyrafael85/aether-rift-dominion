@@ -385,7 +385,7 @@ globalThis.ARD.I18N_DIC['es'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aquí es tuyo. Todavía.",
-  "inicio.versao": "Versión 5.0f.1 · build __BUILD__ · Más allá de la Grieta · Mundo vivo · multijugador de 2 a 4",
+  "inicio.versao": "Versión 5.0g · build __BUILD__ · Más allá de la Grieta · Mundo vivo · multijugador de 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Elige tu Raza",
   "inicio.vitrine.explorar-base": "Explorar la base",
   "inicio.vitrine.som-tela-inicial": "Sonido de la pantalla de inicio",
@@ -454,6 +454,7 @@ globalThis.ARD.I18N_DIC['es'] = {
   "ajustes.btn-bench": "Probar rendimiento (30 s)",
   "ajustes.cfg-feedback": "Enviar comentarios",
   "notas.notas-versao": "Notas de la versión",
+  "notas.5-0g": "<b>5.0g — Jefes:</b> llegaron El Heraldo y La Forja Madre, cada uno con tres fases, ataques avisados en el suelo con antelación y ventanas en las que queda vulnerable, y el mapa nuevo Restos del Titán. En la pestaña Cacería eliges el jefe, la dificultad y los aliados, solo o con 2 a 4 amigos en cooperativo, y ganas una medalla por tiempo y bajas. En escaramuza, los Eventos de la Grieta son opcionales: Centinela de la Grieta, Caravana Corsaria, Enjambre Errante y lluvia de meteoros, con recompensa para quien da el golpe final. Y los primeros mutadores: Noche Eterna, Tormentas Frecuentes y Recursos Escasos.",
   "notas.5-0f-1": "<b>5.0f.1 — Sonido de cine:</b> la banda sonora ahora es orquestal y real: cada Raza tiene sus temas de paz, tensión y batalla, además de las pistas de jefe, de cine, de superarma, de victoria y de derrota, con cambios al compás. Disparos, impactos y explosiones ganaron peso, montados en capas a partir de grabaciones reales. La voz de las unidades al seleccionar y dar órdenes quedó al mismo nivel en todas las Razas, siempre clara sobre el ambiente y sin sobresaltar. Los archivos llegan después de la carga; sin ellos, sigue el sonido generado de antes. Créditos en Ajustes.",
   "notas.5-0f": "<b>5.0f — Sonido 3D y cine:</b> cada sonido ahora sale de su lugar en el mapa y sigue a la cámara, con sonido 3D para auriculares en el ordenador; lo lejano pierde brillo, lo que está bajo la niebla de guerra suena apagado y cada bioma tiene su eco. Una <b>banda sonora adaptativa</b>, generada en el propio navegador, da un tema a cada Raza y cambia entre paz, tensión, batalla y jefe según la partida, y baja cuando alguien habla. Clics y avisos tienen el timbre de tu Raza. Las 20 misiones se abren en la <b>Sala de Guerra</b>: el mapa táctico con las amenazas, la ruta de ataque y los objetivos, y la cámara aterrizando en tu base. La superarma ganó una toma corta del disparo, y los jefes, una entrada de cine. Todo se puede saltar (Esc, clic o toque), y Ajustes tiene volumen de efectos y de música, salida para auriculares o altavoces y las escenas de cine.",
   "notas.5-0e": "<b>5.0e — Bases y unidades vivas:</b> con el <b>Motor 5</b> activado, cada construcción se levanta al estilo de su Raza: soldadura en la Vehnar, una trama de luz en la Erevane, venas en la Tessara, cristales en el Quorith y burbujas en la Vorag, con una onda en el suelo al terminar. Los escombros rebotan en el relieve y quedan un tiempo en el suelo; en Alta y Ultra, el calor y la onda expansiva de las explosiones distorsionan el aire. La base cobra vida: módulos visibles en las construcciones, paredes que se agrietan a medida que baja la vida, conductos que laten con la energía (y parpadean cuando falta), trabajadores que van y vienen entre los edificios y construcciones Tessara y Vorag que respiran. Las unidades tienen un anillo de selección en holograma, barras de vida por segmentos que ninguna niebla oscurece, un contorno del color del equipo y estrellas de veterano que brillan al ascender; los materiales muestran desgaste en los bordes y el polvo del mapa en la base de las piezas.",
@@ -464,7 +465,7 @@ globalThis.ARD.I18N_DIC['es'] = {
   "notas.5-0c": "<b>5.0c — Idiomas:</b> todo el juego ahora está en <b>inglés</b> y <b>español</b>, además de portugués: pantalla de inicio, Sala de Mando, partida, campaña, diplomacia, multijugador, Modo Foto, ayuda y las líneas de la voz del sistema, que ahora usan una voz del idioma elegido. El juego abre en el idioma del navegador y cambia al instante, sin recargar, en <b>Idioma / Language / Idioma</b>: arriba en la pantalla de inicio, en Ajustes y en la ventana de Ajustes de la partida. También en esta versión: los planetas y el cielo de arriba de la Sala de Mando se ven nítidos: en reposo el fondo se dibujaba a media resolución y ahora sale completo, con el detalle de los planetas siguiendo el tamaño del píxel, y la Sala ya no pierde resolución al cambiar de Raza; el locutor de la partida habla en el género del locutor de tu Raza (voz masculina en Vehnar, Quorith y Vorag; femenina en Erevane y Tessara); con el Motor 5, la resolución dinámica solo baja cuando la tarjeta gráfica es el límite, lo que evita los tirones del cambio de resolución; y en el iPhone, <b>Probar sonido</b> muestra un consejo cuando los efectos suenan y la voz no.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 más ligero, faros y sonido en el iPhone:</b> con el <b>Motor 5</b> activado, los shaders que prepara en la carga se redujeron un tercio (los lagos primero) y cada cuadro envía muchos menos datos a la tarjeta gráfica, lo que alivia la CPU en Firefox y en el celular. El brillo alrededor de las luces ahora es el mismo del motor clásico, y en el Modo Foto de la calidad Baja los efectos siguen la exposición como en el clásico. De noche y dentro de la Tormenta de Éter, los faros de los vehículos, recolectores y piratas iluminan el suelo al frente, en los dos motores. La Sala de Mando quedó un poco más clara, sin el resplandor de antes. En el iPhone, el sonido y la voz se desbloquean con el primer toque, suenan con el interruptor de silencio activado y vuelven después de una llamada. Cada líder habla con una voz de su género en todos los navegadores. En Ajustes, <b>Probar sonido</b> toca tres notas y una frase y muestra el estado del audio del dispositivo.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, en prueba:</b> con el <b>Motor 5</b> activado (Ajustes › Motor gráfico), todo el juego ahora corre en WebGPU, con vuelta automática a WebGL2: unidades y construcciones con el detalle de superficie y la animación de cada pieza, ruinas, obras, el holograma de la Erevane, los escudos del Unísono y las banderas; el suelo con todos los biomas, la vegetación al viento, los caminos y el cielo; explosiones, fuego, humo y disparos; los lagos de plasma y de hielo con reflejo, el espacio del Cinturón y la Tormenta de Éter; y el <b>Modo Foto</b> (📷 o tecla J) con desenfoque, los 8 filtros y captura en 4K. La primera vez que el Modo Foto se abre en una partida, tarda unos segundos en prepararse. Con todo esto, la carga del Motor 5 se alargó unos segundos: la próxima versión la mide en los dispositivos y la reduce. El motor clásico sigue siendo el predeterminado y no cambió.",
-  "notas.historico-versoes-anteriores-5": "Notas de versiones anteriores (5.0f → 2.0; desde la 5.0a.3, en portugués)",
+  "notas.historico-versoes-anteriores-5": "Notas de versiones anteriores (5.0f.1 → 2.0; desde la 5.0a.3, en portugués)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Términos de uso",
   "inicio.rodape.foot-priv": "Privacidad",
@@ -1778,4 +1779,121 @@ globalThis.ARD.I18N_DIC['es'] = {
   "cine.chefe.matriarca": "Reina de la Prole, madre de todas las Crías", /* 5.0f */
   "cine.op.cenas": "Escenas de cine: Sala de Guerra, apertura de las misiones y entrada de los jefes", /* 5.0f */
   "cine.op.super": "Cámara de acción de la superarma", /* 5.0f */
+  "mapa.tita": "Restos del Titán", /* 5.0g */
+  "inicio.jogar.tita-carcaca": "Restos del Titán (el cadáver de un titán caído)", /* 5.0g */
+  "vitrine.mapa.tita": "El cadáver de un titán caído sobre la Grieta: costillas, placas y el cráneo.", /* 5.0g */
+  "unit.arauto.nome": "El Heraldo", /* 5.0g */
+  "unit.arauto.desc": "Monolito-lente de los Despertados, el primero en cruzar la Grieta.", /* 5.0g */
+  "unit.forja.nome": "La Forja Madre", /* 5.0g */
+  "unit.forja.desc": "Fábrica antigua de los Constructores que camina sobre cuatro patas.", /* 5.0g */
+  "unit.sentinela.nome": "Centinela de la Grieta", /* 5.0g */
+  "unit.sentinela.desc": "Un Heraldo menor que vigila la Grieta.", /* 5.0g */
+  "unit.pilar_fenda.nome": "Pilar de la Grieta", /* 5.0g */
+  "unit.pilar_fenda.desc": "Alimenta el escudo del Heraldo.", /* 5.0g */
+  "unit.perna_forja.nome": "Pata de la Forja", /* 5.0g */
+  "unit.perna_forja.desc": "Punto débil de la Forja Madre: cada pata destruida la vuelve un 25% más lenta.", /* 5.0g */
+  "chefe.arauto.nome": "El Heraldo", /* 5.0g */
+  "chefe.arauto.titulo": "El primero en cruzar la Grieta", /* 5.0g */
+  "chefe.arauto.fase.1": "Tres Pilares", /* 5.0g */
+  "chefe.arauto.fase.2": "Ecos", /* 5.0g */
+  "chefe.arauto.fase.3": "Colapso", /* 5.0g */
+  "chefe.forja.nome": "La Forja Madre", /* 5.0g */
+  "chefe.forja.titulo": "La fábrica antigua que camina", /* 5.0g */
+  "chefe.forja.fase.1": "Marcha", /* 5.0g */
+  "chefe.forja.fase.2": "Línea de montaje", /* 5.0g */
+  "chefe.forja.fase.3": "Núcleo expuesto", /* 5.0g */
+  "chefe.sentinela.nome": "Centinela de la Grieta", /* 5.0g */
+  "chefe.sentinela.titulo": "Vigía de la Grieta", /* 5.0g */
+  "chefe.sentinela.fase.1": "Vigilia", /* 5.0g */
+  "sim.chefe.classe": "Jefes", /* 5.0g */
+  "sim.chefe.sentinela": "La Centinela de la Grieta despertó en el centro del mapa", /* 5.0g */
+  "sim.chefe.atravessou": "{nome} cruzó la Grieta", /* 5.0g */
+  "sim.chefe.fase": "Nueva fase de {nome}: {fase}", /* 5.0g */
+  "sim.chefe.escudo": "¡El escudo del Heraldo cayó!", /* 5.0g */
+  "sim.chefe.derrotado": "Jefe derrotado: {nome}", /* 5.0g */
+  "sim.chefe.capturado": "Jefe capturado: {nome}", /* 5.0g */
+  "sim.chefe.fim-caiu": "El jefe cayó.", /* 5.0g */
+  "sim.chefe.fim-resistiu": "El jefe resistió hasta el fin de la Alineación.", /* 5.0g */
+  "modos.aba": "Cacería", /* 5.0g */
+  "modos.cac.titulo": "Cacería", /* 5.0g */
+  "modos.cac.sub": "derriba a un jefe de la Grieta, solo o con amigos", /* 5.0g */
+  "modos.cac.chefao": "Jefe", /* 5.0g */
+  "modos.cac.arena": "Arena: {mapa}", /* 5.0g */
+  "modos.cac.recorde": "Récord: {t}", /* 5.0g */
+  "modos.cac.sem-recorde": "Sin récord todavía", /* 5.0g */
+  "modos.cac.dificuldade": "Dificultad", /* 5.0g */
+  "modos.cac.aliados": "Aliados", /* 5.0g */
+  "modos.cac.sozinho": "Solo", /* 5.0g */
+  "modos.cac.ia1": "1 IA aliada", /* 5.0g */
+  "modos.cac.ia2": "2 IA aliadas", /* 5.0g */
+  "modos.cac.amigos": "Amigos", /* 5.0g */
+  "modos.cac.regras": "Victoria: derribar al jefe. Derrota: perder el Núcleo (en cooperativo, todos los Núcleos). Medalla por tiempo y bajas.", /* 5.0g */
+  "modos.cac.medalhas": "Oro: hasta {t1} y {p1} bajas · Plata: hasta {t2} y {p2} bajas · Bronce: cualquier victoria", /* 5.0g */
+  "modos.cac.iniciar": "Iniciar Cacería", /* 5.0g */
+  "modos.cac.ir-sala": "Abrir la sala cooperativa", /* 5.0g */
+  "modos.mut.titulo": "Mutadores", /* 5.0g */
+  "modos.mut.noite": "Noche Eterna", /* 5.0g */
+  "modos.mut.noite-d": "la noche no termina y la visión baja un 25%", /* 5.0g */
+  "modos.mut.tempestades": "Tormentas Frecuentes", /* 5.0g */
+  "modos.mut.tempestades-d": "Tormentas de Éter el doble de veces; dentro de ellas, las unidades van un 10% más lentas", /* 5.0g */
+  "modos.mut.escassos": "Recursos Escasos", /* 5.0g */
+  "modos.mut.escassos-d": "nodos y restos rinden la mitad", /* 5.0g */
+  "modos.ev.titulo": "Eventos de la Grieta", /* 5.0g */
+  "modos.ev.desc": "Centinela de la Grieta, Caravana Corsaria, Enjambre Errante y lluvia de meteoros durante la partida", /* 5.0g */
+  "modos.lente": "Lente del Heraldo", /* 5.0g */
+  "modos.lente-d": "+10% de visión en esta partida", /* 5.0g */
+  "modos.sala.modo": "Modo de la sala", /* 5.0g */
+  "modos.sala.escaramuca": "Escaramuza", /* 5.0g */
+  "modos.sala.cacada": "Cacería", /* 5.0g */
+  "modos.sala.dica-cac": "Todos los humanos del mismo lado contra la Grieta; el anfitrión elige al jefe.", /* 5.0g */
+  "modos.sala.dica-esc": "Todos contra todos; el anfitrión elige las reglas.", /* 5.0g */
+  "modos.sala.linha-cac": "Cacería cooperativa: {chefe} ({dif}) · todos contra la Grieta", /* 5.0g */
+  "modos.sala.linha-esc": "Escaramuza: todos contra todos", /* 5.0g */
+  "modos.cartao.cacada": "Cacería · {chefe} · {dif}", /* 5.0g */
+  "modos.medalha.ouro": "Oro", /* 5.0g */
+  "modos.medalha.prata": "Plata", /* 5.0g */
+  "modos.medalha.bronze": "Bronce", /* 5.0g */
+  "modos.fim.vitoria": "Cacería ganada", /* 5.0g */
+  "modos.fim.derrota": "La Grieta ganó", /* 5.0g */
+  "modos.fim.eyebrow": "Cacería · {chefe} · {dif}", /* 5.0g */
+  "modos.fim.medalha": "Medalla: {m}", /* 5.0g */
+  "modos.fim.tempo": "Tiempo", /* 5.0g */
+  "modos.fim.perdas": "Bajas", /* 5.0g */
+  "modos.fim.recorde": "Récord", /* 5.0g */
+  "modos.fim.recorde-novo": "¡Nuevo récord local!", /* 5.0g */
+  "modos.fim.trofeu": "Trofeo en el Hangar: {chefe} ({m})", /* 5.0g */
+  "modos.fim.reliquia": "Reliquia: Lente del Heraldo (+10% de visión en una partida que elijas)", /* 5.0g */
+  "modos.fim.titulo": "Título: {t}", /* 5.0g */
+  "modos.fim.projeto": "Plano recuperado de la Forja Madre: la unidad nueva llega en una próxima versión", /* 5.0g */
+  "modos.titulo.cacador-arauto": "Cazador del Heraldo", /* 5.0g */
+  "modos.titulo.quebra-forja": "Rompeforjas", /* 5.0g */
+  "modos.titulo.cacador-ouro": "Cazador de Oro", /* 5.0g */
+  "modos.hg.trofeus": "Trofeos de Cacería", /* 5.0g */
+  "modos.hg.nenhum": "Ningún trofeo todavía: gana una Cacería.", /* 5.0g */
+  "modos.hg.titulos": "Títulos", /* 5.0g */
+  "modos.hg.projetos": "Planos", /* 5.0g */
+  "modos.hg.projeto-forja": "plano de la Forja Madre (la unidad llega en una próxima versión)", /* 5.0g */
+  "modos.hg.sentinelas": "Centinelas derribadas: {n}", /* 5.0g */
+  "sim.ev.sentinela-aviso": "La Centinela de la Grieta está despertando en el centro del mapa ({n} s)", /* 5.0g */
+  "sim.ev.sentinela-chega": "¡La Centinela de la Grieta despertó en el centro! Quien dé el golpe final se lleva la recompensa", /* 5.0g */
+  "sim.ev.sentinela-premio": "{nome} derribó a la Centinela de la Grieta y se llevó la recompensa", /* 5.0g */
+  "sim.ev.caravana-aviso": "Caravana Corsaria a la vista: va a cruzar el mapa ({n} s)", /* 5.0g */
+  "sim.ev.caravana-chega": "La Caravana Corsaria está cruzando el mapa. Quien la destruya se queda con la carga", /* 5.0g */
+  "sim.ev.caravana-carga": "{nome} tomó una carga de la Caravana Corsaria (+{n})", /* 5.0g */
+  "sim.ev.enxame-aviso": "Enjambre Errante acercándose ({n} s)", /* 5.0g */
+  "sim.ev.enxame-chega": "Llegó el Enjambre Errante: ataca lo que esté más cerca", /* 5.0g */
+  "sim.ev.meteoros-aviso": "Lluvia de meteoros en {n} s: aléjate de los anillos en el suelo", /* 5.0g */
+  "sim.ev.meteoros-chega": "¡Lluvia de meteoros! Cristales nuevos donde caen", /* 5.0g */
+  "sim.cac.vitoria": "El jefe cayó: Cacería ganada.", /* 5.0g */
+  "sim.cac.captura": "La Forja Madre fue capturada: Cacería ganada.", /* 5.0g */
+  "sim.cac.time-caiu": "Cayeron todos los Núcleos del equipo.", /* 5.0g */
+  "sim.cac.tempo": "Se acabó el tiempo de la Cacería: el jefe resistió.", /* 5.0g */
+  "sim.fenda": "Grieta", /* 5.0g */
+  "chefe.ui.fase": "Fase {n}", /* 5.0g */
+  "chefe.ui.escudo": "Escudo", /* 5.0g */
+  "chefe.ui.pontos": "Puntos débiles", /* 5.0g */
+  "chefe.ui.janela": "Ventana de daño", /* 5.0g */
+  "chefe.ui.janela-k": "¡Ahora!", /* 5.0g */
+  "chefe.ui.derrotado": "Derrotado", /* 5.0g */
+  "chefe.ui.fenda": "De la Grieta", /* 5.0g */
 };
