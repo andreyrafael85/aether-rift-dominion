@@ -136,8 +136,8 @@ const UNITS = {
   monolito:   { name: 'Monólito', key: 'O', era: 3, cls: 'vei', hp: 780, r: 15, speed: 45, cost: { minerio: 330, plasma: 80, dados: 40 }, time: 19, energyUse: 5, weapon: 'ressonancia', sensor: 190, faction: 'quorith', desc: 'Cerco ressonante: onda lenta e longa que racha estruturas. Quase inútil contra drones.' },
   harmonico:  { name: 'Harmônico', key: 'H', cls: 'dro', hp: 120, r: 7, speed: 150, cost: { minerio: 110, plasma: 45, dados: 10 }, time: 9, energyUse: 2, flying: true, weapon: 'harmonico', sensor: 230, faction: 'quorith', desc: 'Voador do Coro: acorde aéreo que persegue veículos e suporte.' },
   // --- Vorag (4.0c)
-  cria:       { name: 'Cria', key: 'K', cls: 'inf', hp: 82, r: 6, speed: 122, cost: { minerio: 22, plasma: 12 }, time: 4.5, energyUse: 0.5, weapon: 'mordida', sensor: 150, faction: 'vorag', pair: true, desc: 'Enxame corpo a corpo; eclode em pares. Fome: fora do seu território perde vida devagar (até 40%).' },
-  cuspidor:   { name: 'Cuspidor', key: 'U', cls: 'inf', hp: 95, r: 7, speed: 90, cost: { minerio: 40, plasma: 30 }, time: 5, energyUse: 1, weapon: 'acido', sensor: 170, faction: 'vorag', desc: 'Cospe ácido a média distância; corrói veículos e estruturas.' },
+  cria:       { name: 'Cria', key: 'K', cls: 'inf', hp: 72 /* 5.0h: 82 → 72 */, r: 6, speed: 122, cost: { minerio: 26, plasma: 14 } /* 5.0h: 22/12 → 26/14 */, time: 6 /* 5.0h: 4,5 → 6 s (o par); equilíbrio do Vorag no self-play */, energyUse: 0.5, weapon: 'mordida', sensor: 150, faction: 'vorag', pair: true, desc: 'Enxame corpo a corpo; eclode em pares. Fome: fora do seu território perde vida devagar (até 40%).' },
+  cuspidor:   { name: 'Cuspidor', key: 'U', cls: 'inf', hp: 95, r: 7, speed: 90, cost: { minerio: 55, plasma: 35 } /* 5.0h: 40/30 → 55/35 */, time: 6 /* 5.0h: 5 → 6 s */, energyUse: 1, weapon: 'acido', sensor: 170, faction: 'vorag', desc: 'Cospe ácido a média distância; corrói veículos e estruturas.' },
   escaravelho: { name: 'Escaravelho', key: 'E', cls: 'vei', hp: 300, r: 11, speed: 120, cost: { minerio: 70, plasma: 60 }, time: 8, energyUse: 2, weapon: 'chifrada', sensor: 190, faction: 'vorag', desc: 'Besta de carga blindada: investida rápida que atropela infantaria.' },
   brutamonte: { name: 'Brutamonte', key: 'B', era: 3, cls: 'vei', hp: 1000, r: 16, speed: 52, cost: { minerio: 160, plasma: 130 }, time: 15, energyUse: 4, weapon: 'brutamonte', sensor: 170, faction: 'vorag', desc: 'Tanque biológico: carapaça grossa e golpe de área.' },
   // --- épicos de campanha (4.0e): não são produzidos; os roteiros do Ato 4 os criam
@@ -177,8 +177,8 @@ const WEAPONS = {
   ressonancia: { dmg: 75, range: 210, cd: 2.6, proj: 'shell', speed: 260, inacc: 10, splash: 30, cls: 'vei', versusOverride: { inf: 0.8, vei: 0.9, dro: 0.3, est: 1.8, sup: 0.9 } },
   harmonico: { dmg: 14, range: 120, cd: 0.9, proj: 'beam', speed: 0, inacc: 0, splash: 0, cls: 'dro' },
   // 4.0c — Vorag
-  mordida:   { dmg: 12, range: 26, cd: 0.5, proj: 'beam', speed: 0, inacc: 0, splash: 0, cls: 'inf', versusOverride: { inf: 1.3, vei: 0.8, dro: 0.4, est: 0.9, sup: 1.4 } },
-  acido:     { dmg: 18, range: 130, cd: 1.1, proj: 'shell', speed: 260, inacc: 8, splash: 14, cls: 'inf', versusOverride: { inf: 1.2, vei: 1.1, dro: 0.5, est: 1.1, sup: 1.2 } },
+  mordida:   { dmg: 10 /* 5.0h: 12 → 10 */, range: 26, cd: 0.5, proj: 'beam', speed: 0, inacc: 0, splash: 0, cls: 'inf', versusOverride: { inf: 1.3, vei: 0.8, dro: 0.4, est: 0.9, sup: 1.4 } },
+  acido:     { dmg: 16 /* 5.0h: 18 → 16 */, range: 130, cd: 1.1, proj: 'shell', speed: 260, inacc: 8, splash: 14, cls: 'inf', versusOverride: { inf: 1.2, vei: 1.1, dro: 0.5, est: 1.1, sup: 1.2 } },
   chifrada:  { dmg: 30, range: 30, cd: 0.9, proj: 'beam', speed: 0, inacc: 0, splash: 0, cls: 'vei' },
   catedral:  { dmg: 90, range: 240, cd: 2.2, proj: 'shell', speed: 280, inacc: 10, splash: 40, cls: 'vei' },
   matriarca: { dmg: 70, range: 160, cd: 1.6, proj: 'shell', speed: 300, inacc: 10, splash: 34, cls: 'vei' },
@@ -356,6 +356,8 @@ function createSim(cfg) {
   rebuildNav(sim);
   if (sim.fenda == null) sim.fenda = -1; if (!sim.avisos) sim.avisos = []; if (!sim.terreno) sim.terreno = []; if (ARD.chefesSim) ARD.chefesSim.inicio(sim, cfg); /* 5.0g: chefões, a Fenda e a telegrafia (src/chefes-sim.js) */
   if (ARD.modos) ARD.modos.criar(sim); /* 5.0g: modos da partida (Caçada, Eventos da Fenda, mutadores); sem modo na cfg, não faz nada */
+  sim.mundo = -1; if (ARD.mundo) ARD.mundo.criar(sim); /* 5.0h: mundo neutro (fauna, ruínas, Corsários e surto); sem cfg.mundo, não faz nada */
+  if (ARD.unicas) ARD.unicas.criar(sim, cfg); /* 5.0h: comandantes em campo (cfg.comandantes); sem a opção, não faz nada */
   computeVisibility(sim); markExplored(sim);
   return sim;
 }
@@ -630,9 +632,9 @@ function lineFree(sim, x0, y0, x1, y1, owner, rad) { // 4.2g: rad > 0 confere ta
 }
 function markExplored(sim) {
   for (const p of sim.players) {
-    if (!p.alive) continue; const ex = sim.explored[p.id];
+    if (!p.alive || p.mundo) continue; const ex = sim.explored[p.id]; /* 5.0h */
     for (const e of sim.ents) {
-      if (!e.alive || e.owner !== p.id || (e.kind !== 'unit' && e.kind !== 'building')) continue;
+      if (!e.alive || (e.owner !== p.id && !(e.ruina && e.ruina.dono === p.id)) || (e.kind !== 'unit' && e.kind !== 'building')) continue; /* 5.0h: a ruína capturada explora para o dono */
       const r = sensorRadius(sim, e); const x0 = Math.max(0, ((e.x - r) / TILE) | 0), x1 = Math.min(TILES - 1, ((e.x + r) / TILE) | 0), y0 = Math.max(0, ((e.y - r) / TILE) | 0), y1 = Math.min(TILES - 1, ((e.y + r) / TILE) | 0);
       for (let ty = y0; ty <= y1; ty++) for (let tx = x0; tx <= x1; tx++) { if (!ex[ty * TILES + tx] && dist((tx + 0.5) * TILE, (ty + 0.5) * TILE, e.x, e.y) <= r + TILE * 0.5) ex[ty * TILES + tx] = 1; }
     }
@@ -707,6 +709,7 @@ function updateElo(sim) {
 function isEnemy(sim, a, b) { return a !== b && !hasPact(sim, a, b); }
 function sensorRadius(sim, e) {
   if (e.kind !== 'unit' && e.kind !== 'building') return 0;
+  if (e.ruina) return ARD.mundo.visao(sim, e); /* 5.0h: a ruína vê para o dono (o Observatório, longe) */
   const p = sim.players[e.owner];
   const d = e.kind === 'unit' ? UNITS[e.def] : BUILDINGS[e.def];
   let r = e.kind === 'building' && !e.built ? 60 : d.sensor;
@@ -725,6 +728,7 @@ function speedOf(sim, u) {
   if (p.mods && p.mods.speedMul) s *= p.mods.speedMul;
   if (UNITS[u.def].flying && inStorm(sim, u.x, u.y)) s *= 0.5;
   if (sim.modos && sim.modos.lento !== 1 && inStorm(sim, u.x, u.y)) s *= sim.modos.lento; /* 5.0g: Tempestades Frequentes */
+  if (sim.unicas && (u.raizAte || u.lentoAte)) s *= ARD.unicas.vel(sim, u); /* 5.0h: Raízes, Rugido, Tumor e o pulso do Farol */
   return s;
 }
 function inTerritory(sim, pid, x, y) {
@@ -850,7 +854,7 @@ function processCommand(sim, c) {
       ownUnits(sim, c.p, c.ids).forEach(u => { u.state = 'pickup'; u.target = t.id; });
       break; }
     case 'build': {
-      const d = BUILDINGS[c.def]; if (!d || !d.key) return;
+      const d = BUILDINGS[c.def]; if (!d || !d.key) return; if (d.unica && !(ARD.unicas && ARD.unicas.podeConstruir(sim, c.p, c.def, p.human))) return; /* 5.0h: única da Raça, uma por jogador */
       { const lr = lockReason(sim, c.p, 'building', c.def); if (lr) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: lr }); return; } }
       const ok = canBuild(sim, c.p, c.def, c.x, c.y); if (!ok.ok) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: ok.why }); return; }
       if (!canAfford(p, d.cost)) { if (p.human) emit(sim, { t: 'notice', p: c.p, text: 'Recursos insuficientes' }); return; }
@@ -873,6 +877,7 @@ function processCommand(sim, c) {
       const n = Math.max(1, Math.min(50, c.n | 0 || 1)); const def0 = b.queue[c.index] && b.queue[c.index].def;
       for (let k = 0; k < n; k++) { const it = b.queue[c.index]; if (!it || it.def !== def0) break; if (it.paid) refund(p, UNITS[it.def].cost, it.mult); b.queue.splice(c.index, 1); }
       break; }
+    case 'modulo': case 'habilidade': if (ARD.unicas) ARD.unicas.comando(sim, c, p); break; /* 5.0h: módulo com escolha e habilidade do comandante */
     case 'rally': { const b = sim.byId.get(c.id); if (b && b.alive && b.owner === c.p && b.kind === 'building') b.rally = { x: c.x, y: c.y }; break; }
     case 'research': {
       const r = RESEARCH[c.key]; if (!r || p.research[c.key]) return;
@@ -954,6 +959,10 @@ function processCommand(sim, c) {
       p.jumpsLeft--; nuc.jumpT = JUMP_CHANNEL; nuc.jumpTo = { x: c.x, y: c.y };
       for (const q of sim.players) if (q.alive) alertTo(sim, q.id, q.id === c.p ? 'Salto de Núcleo iniciado (60 s)' : p.name + ' iniciou um Salto de Núcleo!', nuc.x, nuc.y, q.id === c.p ? 'good' : 'warn');
       break; }
+    case 'pedido': { /* 5.0h: pedido à IA aliada (atacar o alvo, defender a base, expandir); a IA dela lê p.pedido (src/ai.js) */
+      const q = sim.players[c.para]; if (!q || !q.alive || q.human || q.fenda || c.para === c.p || !hasPact(sim, c.p, c.para) || (c.tipo !== 'atacar' && c.tipo !== 'defender' && c.tipo !== 'expandir')) return;
+      q.pedido = { de: c.p, tipo: c.tipo, x: typeof c.x === 'number' && isFinite(c.x) ? clamp(c.x, 20, WORLD - 20) : null, y: typeof c.y === 'number' && isFinite(c.y) ? clamp(c.y, 20, WORLD - 20) : null, alvo: c.alvo | 0, t: sim.time };
+      emit(sim, { t: 'pedido', p: c.para, de: c.p, tipo: c.tipo }); break; }
     case 'propose': {
       const q = sim.players[c.to]; if (!q || !q.alive || q.fenda /* 5.0g */ || c.to === c.p || hasPact(sim, c.p, c.to)) return;
       if (sim.pending.some(pr => pr.from === c.p && pr.to === c.to)) return;
@@ -977,6 +986,7 @@ function processCommand(sim, c) {
       alertTo(sim, p.id, 'Pacto de Não-agressão com ' + a.name + ' (10 min)', null, null, 'good');
       emit(sim, { t: 'pact', a: a.id, b: p.id });
       break; }
+    case 'capturar': case 'portal': case 'contratar': if (ARD.mundo) ARD.mundo.comando(sim, c); break; /* 5.0h: mundo neutro */
     case 'break': {
       const pact = p.pacts[c.with]; if (!pact || pact.fixo /* 5.0g: o time da Caçada não se trai */) return;
       const v = sim.players[c.with];
@@ -1009,6 +1019,7 @@ function computeEnergy(sim, p, dt) {
       cons += d.energyUse || 0;
     } else if (e.kind === 'unit') cons += UNITS[e.def].energyUse || 0;
   }
+  if (sim.mundo >= 0) prod += ARD.mundo.energia(sim, p); /* 5.0h: Torres de Éter capturadas */
   if (p.overchargeT > 0) prod *= 1.5;
   if (p.mods && p.mods.energyMul) prod *= p.mods.energyMul;
   if (p.blackoutT > 0) prod = 0;
@@ -1035,10 +1046,12 @@ function damageMult(sim, a) { // multiplicadores do atacante (pesquisa, Golpe de
   if (a.kind === 'unit') m *= 1 + 0.1 * (a.rank || 0);
   if (p.saltoT > 0) m *= 1.35;
   if (a.kind === 'unit' && a.elo > 0) m *= 1 + FACTIONS[p.faction].elo.dmg * a.elo; // Elo de Sincronia (Quorith)
+  if (a.buffAte && sim.unicas) m *= ARD.unicas.buff(sim, a); /* 5.0h: Acorde e Rugido */
   if (a.kind === 'unit' && sim.auras && sim.auras[a.owner].moldes.length) { for (const mo of sim.auras[a.owner].moldes) if (mo !== a && dist(mo.x, mo.y, a.x, a.y) <= UNITS.molde.aura.buff) { m *= 1.15; break; } }
   return m;
 }
 function applyDamage(sim, attackerOwner, attacker, t, dmg, weapon) {
+  if (t.ruina || t.acampamento) return; /* 5.0h: ruínas e o Acampamento Corsário não levam dano */
   const q = sim.players[t.owner];
   if (attacker && attacker.kind === 'unit') { const p0 = sim.players[attacker.owner]; if (FACTIONS[p0.faction].traits) { const tc = armorOf(t); const tr = p0.traits[attacker.def]; if (tr && tr[tc]) dmg *= 1.25; } }
   if (q && q.research.blindagem) dmg *= 0.87;
@@ -1120,6 +1133,8 @@ function kill(sim, e, killer) {
   const p = sim.players[e.owner];
   emit(sim, { t: 'death', x: e.x, y: e.y, r: e.r, kind: e.kind, def: e.def, owner: e.owner, cls: e.cls, id: e.id }); /* 4.3f: id para a ruína no render */
   if ((e.boss || e.parte) && ARD.chefesSim) ARD.chefesSim.morte(sim, e, killer); /* 5.0g */
+  if (e.fauna && ARD.mundo) ARD.mundo.morte(sim, e, killer); /* 5.0h: o prêmio de quem caçou */
+  if (sim.unicas) ARD.unicas.morte(sim, e, killer); /* 5.0h: o comandante cai (e volta depois) e o pulso do Farol Falso */
   if (e.kind === 'unit') {
     if (p) p.stats.unitsLost++;
     if (killer >= 0 && killer !== e.owner) sim.players[killer].stats.unitsKilled++;
@@ -1155,6 +1170,7 @@ function buildAcq(sim) {
   ACQ = null; const P = sim.players.length; while (ACNT.length < P) ACNT.push(new Int32Array(AG * AG)); for (let i = 0; i < P; i++) ACNT[i].fill(0);
   for (const e of sim.ents) {
     if (!e.alive || e.kind === 'node' || e.kind === 'proj' || e.kind === 'wreck' || e.owner < 0 || e.kind === 'crate') continue;
+    if (e.owner === sim.mundo && !(e.fauna && e.fauna.hostil)) continue; /* 5.0h: a mesma regra do acquire */
     const cx = ((e.x / CELL) | 0) + AGO, cy = ((e.y / CELL) | 0) + AGO; if (!(cx >= 0 && cy >= 0 && cx < AG && cy < AG)) return; /* fora da grade: nesta rodada a busca roda sempre */
     for (let p = 0; p < P; p++) if (p !== e.owner && sim.vis[p] && sim.vis[p].has(e.id)) ACNT[p][cy * AG + cx]++;
   }
@@ -1166,15 +1182,17 @@ function acquire(sim, u, rad, unitsOnly) {
     if (!any) return null; }
   let best = null, bd = Infinity;
   const vis = sim.vis[u.owner]; const op = sim.players[u.owner]; const noCiv = u.kind === 'unit' && !!(op && !op.human && (DIFFICULTY[op.difficulty] || DIFFICULTY.normal).noCiv); /* Torres continuam defendendo */
+  const mu = sim.mundo >= 0 ? sim.mundo : -9; /* 5.0h */
   queryGrid(sim, u.x, u.y, rad + 40, e => {
     if (e.owner === u.owner || e.owner < 0 || e.kind === 'crate') return;
+    if (e.owner === mu && !(e.fauna && e.fauna.hostil)) return; /* 5.0h: do mundo neutro, só a fauna hostil vira alvo automático */
     if (!isEnemy(sim, u.owner, e.owner)) return;
     if (!vis.has(e.id)) return;
     if (unitsOnly && e.kind !== 'unit') return;
     if (e.cls === 'civ' && noCiv) return; /* 5.0a.1: a IA do Fácil não caça coletores */
     const d = dist(u.x, u.y, e.x, e.y) - e.r;
     if (d > rad) return;
-    const score = d + (e.kind === 'building' ? (BUILDINGS[e.def].wall ? 320 : 200) : 0) + (e.cls === 'civ' ? 60 : 0) + (e.boss && e.boss.pontos > 0 ? 160 : 0); /* 5.0g: com ponto fraco vivo, a mira automática prefere as partes */
+    const score = d + (e.kind === 'building' ? (BUILDINGS[e.def].wall ? 320 : 200) : 0) + (e.cls === 'civ' ? 60 : 0) + (e.boss && e.boss.pontos > 0 ? 160 : 0) + (e.def === 'farol' && e.built ? -400 : 0); /* 5.0h: o Farol Falso atrai a mira */ /* 5.0g: com ponto fraco vivo, a mira automática prefere as partes */
     if (score < bd) { bd = score; best = e; }
   });
   return best;
@@ -1259,6 +1277,7 @@ function pickNode(sim, u) {
   const ar = u.area || null; let best = null, bd = Infinity, bestA = null, bdA = Infinity;
   for (const e of sim.ents) {
     if (!e.alive || (e.kind !== 'node' && e.kind !== 'wreck') || e.amount <= 0) continue;
+    if (e.guarda && ARD.mundo.guardado(sim, e)) continue; /* 5.0h: nó rico com Guardião vivo fica fora da coleta automática */
     const d = dist(u.x, u.y, e.x, e.y) * w[e.res] * (e.kind === 'wreck' ? 0.7 : 1);
     if (ar && dist(ar.x, ar.y, e.x, e.y) <= WORK_R) { const ow = territoryOwner(sim, e.x, e.y); if (ow === -1 || ow === u.owner || !isEnemy(sim, u.owner, ow)) { if (d < bdA) { bdA = d; bestA = e; } continue; } }
     if (e.kind === 'node' && !inT(e.x, e.y)) continue;
@@ -1286,6 +1305,7 @@ function freeNode(sim, u, res, load, maxR, terr, w, okRes) {
   const dep = nearestDeposit(sim, u), ox = dep ? dep.x : u.x, oy = dep ? dep.y : u.y; const ar = u.area || null; let b0 = null, d0 = Infinity, b1 = null, d1 = Infinity, b2 = null, d2 = Infinity;
   for (const e of sim.ents) {
     if (!e.alive || e.kind !== 'node' || e.amount <= 0 || (res && e.res !== res) || (okRes && !okRes(e.res))) continue;
+    if (e.guarda && ARD.mundo.guardado(sim, e)) continue; /* 5.0h */
     const dd = dist(ox, oy, e.x, e.y), d = (dist(u.x, u.y, e.x, e.y) + dd) * (1 + CROWD * (load.get(e.id) || 0)) * (w ? w[e.res] : 1); const mine = inCircles(terr, e.x, e.y);
     if (!mine) { const ow = territoryOwner(sim, e.x, e.y); if (ow !== -1 && ow !== u.owner && isEnemy(sim, u.owner, ow)) continue; }
     if (ar && dist(ar.x, ar.y, e.x, e.y) <= WORK_R) { if (d < d0) { d0 = d; b0 = e; } continue; }
@@ -1334,6 +1354,7 @@ function deliver(sim, u) {
 
 function updateUnit(sim, u, dt) {
   if (u.boss || u.parte) { ARD.chefesSim.unidade(sim, u, dt); return; } /* 5.0g */
+  if (u.fauna) { ARD.mundo.unidade(sim, u, dt); return; } /* 5.0h: fauna da Fenda */
   const d = UNITS[u.def];
   if (u.cd > 0) u.cd -= dt;
   if (u.revealT > 0) u.revealT -= dt;
@@ -1377,7 +1398,7 @@ function updateUnit(sim, u, dt) {
       const n = sim.byId.get(u.node);
       if (!n || !n.alive || n.amount <= 0) { const m = nextNode(sim, u, n); if (m) u.node = m.id; else if (u.cargoTotal > 0) u.state = 'return'; else if (sim.players[u.owner].human) goHome(sim, u); else u.state = 'idle'; break; } /* 5.0a.1: mesmo recurso mais perto; sem nó, volta para a base */
       if (dist(u.x, u.y, n.x, n.y) <= u.r + n.r + 8) {
-        const k2 = n.res === 'plasma' && inStorm(sim, n.x, n.y) ? 2 : 1; // 4.2h: Tempestade rende 2× de verdade (o nó perde a metade do que entrega)
+        const k2 = (n.res === 'plasma' && inStorm(sim, n.x, n.y) ? 2 : 1) * (sim.surtos && sim.surtos.length && ARD.mundo.surto(sim, n.x, n.y) ? 2 : 1); // 4.2h: Tempestade rende 2× de verdade (o nó perde a metade do que entrega); 5.0h: o Surto de éter também
         const take = Math.min(d.harvestRate * dt * k2, n.amount * k2, d.capacity - u.cargoTotal);
         n.amount -= take / k2; u.cargo[n.res] += take; u.cargoTotal += take;
         if (u.cargoTotal >= d.capacity - 0.01 || n.amount <= 0) u.state = 'return';
@@ -1435,7 +1456,7 @@ function pickupCrates(sim) {
   for (const c of sim.ents) {
     if (!c.alive || c.kind !== 'crate') continue;
     let taker = null;
-    queryGrid(sim, c.x, c.y, 30, e => { if (!taker && e.kind === 'unit' && e.alive && dist(e.x, e.y, c.x, c.y) <= e.r + c.r + 6) taker = e; });
+    queryGrid(sim, c.x, c.y, 30, e => { if (!taker && e.kind === 'unit' && e.alive && !e.fauna /* 5.0h */ && dist(e.x, e.y, c.x, c.y) <= e.r + c.r + 6) taker = e; });
     if (taker) {
       const p = sim.players[taker.owner]; let total = 0;
       for (const k in c.cargo) { p.res[k] += c.cargo[k]; total += c.cargo[k]; }
@@ -1482,10 +1503,12 @@ function updateBuilding(sim, b, dt) {
       let n = 0; queryGrid(sim, b.x, b.y, 160, e => { if (e !== b && e.kind === 'building' && e.owner === b.owner && e.built && BUILDINGS[e.def].produces && e.def !== 'nucleo' && dist(e.x, e.y, b.x, b.y) <= 150) n++; });
       mult *= 1 + 0.12 * Math.min(4, n);
     }
+    if (sim.unicas) mult *= ARD.unicas.prod(sim, b); /* 5.0h: Esteira, Linha Rápida e Câmara de Incubação */
     const it = b.queue[0];
     if (!it.paid) { // 4.1a: paga ao começar; Lotes Vehnar (4+ iguais na fila) saem pela metade
       if (facOf(sim, b.owner).lotes) { let same = 0; for (const q of b.queue) if (q.def === it.def) same++; it.mult = same >= 4 ? 0.5 : 1; }
-      const cost = scaleCost(UNITS[it.def].cost, it.mult); if (!canAfford(p, cost)) { it.waiting = true; mult = 0; } else { pay(p, UNITS[it.def].cost, it.mult); it.paid = true; it.waiting = false; } }
+      const fm = sim.mundo >= 0 && UNITS[it.def].cls === 'vei' ? ARD.mundo.forja(sim, b.owner) : 1; /* 5.0h: Forja Antiga (o desconto entra no it.mult na hora de pagar: o cancelamento devolve o pago) */
+      const cost = scaleCost(UNITS[it.def].cost, it.mult * fm); if (!canAfford(p, cost)) { it.waiting = true; mult = 0; } else { it.mult *= fm; pay(p, UNITS[it.def].cost, it.mult); it.paid = true; it.waiting = false; } }
     it.t += dt * mult;
     if (it.t >= it.total) {
       b.queue.shift();
@@ -1494,6 +1517,7 @@ function updateBuilding(sim, b, dt) {
       const u = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang) * (b.r + 14), b.y + DM.sin(ang) * (b.r + 14));
       if (b.rally) { u.state = 'move'; rallyTo(sim, u, b); if (u.def === 'coletor' && p.human) u.area = { x: b.rally.x, y: b.rally.y }; } // 4.2g: vaga alcançável (reunião sobre um prédio, muro ou a Fenda travava a unidade)
       if (b.mod === 1 && b.def === 'quartel' && u.cls === 'inf') { u.rank = 1; u.xp = Math.max(50, unitCost(it.def)) * VET_RANKS[1]; } // Academia
+      if (sim.unicas) ARD.unicas.nasce(sim, b, u); /* 5.0h: Chassi Reforçado e Pós-combustão */
       emit(sim, { t: 'spawn', p: b.owner, x: u.x, y: u.y, def: it.def });
       if (UNITS[it.def].pair && p.mods && p.mods.brood >= 3) { const u3 = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang - 0.5) * (b.r + 14), b.y + DM.sin(ang - 0.5) * (b.r + 14)); if (b.rally) { u3.state = 'move'; rallyTo(sim, u3, b); } emit(sim, { t: 'spawn', p: b.owner, x: u3.x, y: u3.y, def: it.def }); } // Fome Sem Fim: trios
       if (UNITS[it.def].pair) { const u2 = addUnit(sim, b.owner, it.def, b.x + DM.cos(ang + 0.5) * (b.r + 14), b.y + DM.sin(ang + 0.5) * (b.r + 14)); if (b.rally) { u2.state = 'move'; rallyTo(sim, u2, b); } emit(sim, { t: 'spawn', p: b.owner, x: u2.x, y: u2.y, def: it.def }); }
@@ -1553,10 +1577,10 @@ function computeVisibility(sim) {
   let rmax = 0; for (const e of sim.ents) if (e.alive && e.kind !== 'node' && e.kind !== 'rock' && e.r > rmax) rmax = e.r;
   for (const p of sim.players) {
     const vis = sim.vis[p.id]; vis.clear();
-    if (!p.alive) continue;
+    if (!p.alive || p.mundo) continue; /* 5.0h: o mundo neutro não precisa de visão */
     const detectors = []; let n = 0, m = 0; VBH.fill(-1);
     for (const e of sim.ents) {
-      if (!e.alive || e.owner !== p.id) continue;
+      if (!e.alive || (e.owner !== p.id && !(e.ruina && e.ruina.dono === p.id))) continue; /* 5.0h: a ruína capturada vê para o dono */
       if (e.kind !== 'unit' && e.kind !== 'building') continue;
       if (n >= VCX.length) { const g = a => { const b = new Float64Array(a.length * 2); b.set(a); return b; }; VCX = g(VCX); VCY = g(VCY); VCR = g(VCR); }
       const r = sensorRadius(sim, e); VCX[n] = e.x; VCY[n] = e.y; VCR[n] = r;
@@ -1571,6 +1595,7 @@ function computeVisibility(sim) {
       let seen = false;
       if (e.kind === 'building' && e.built && e.def === 'reator' && facOf(sim, e.owner).smoke) seen = true;
       if (e.boss || e.parte) seen = true; /* 5.0g: o chefão e as partes dele são vistos por todos (marco do mapa; a barra e a telegrafia dependem dele) */
+      if (e.ruina || e.acampamento) seen = true; /* 5.0h: ruínas e o Acampamento Corsário são marcos do mapa */
       if (!seen) for (let k = VBH[vbOf(e.y) * VBN + vbOf(e.x)]; k >= 0; k = VBX[k]) { const i = VBI[k]; if (dist(e.x, e.y, VCX[i], VCY[i]) <= VCR[i] + e.r) { seen = true; break; } }
       if (seen && e.cloaked && !(e.revealT > 0)) {
         seen = false;
@@ -1609,7 +1634,7 @@ function score(sim, p) {
 function checkEnd(sim) {
   if (sim.result) return;
   if (sim.chefes && sim.cfg && sim.cfg.cacada && ARD.chefesSim.fim(sim)) return; /* 5.0g: modo Caçada */
-  const pl = sim.fenda >= 0 ? sim.players.filter(p => !p.fenda) : sim.players; /* 5.0g: a Fenda fica fora de vitória, derrota e placar */
+  const pl = sim.fenda >= 0 || sim.mundo >= 0 /* 5.0h: o mundo neutro também */ ? sim.players.filter(p => !p.fenda) : sim.players; /* 5.0g: a Fenda fica fora de vitória, derrota e placar */
   const humans = pl.filter(p => p.human), ais = pl.filter(p => !p.human);
   const humanAlive = humans.some(p => p.alive), aiAlive = ais.some(p => p.alive);
   const scores = pl.map(p => ({ id: p.id, name: p.name, score: p.alive ? score(sim, p) : 0, alive: p.alive }));
@@ -1660,10 +1685,12 @@ function step(sim) {
   if (sim.tick % 5 === 0) updateElo(sim);
   for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'building') updateBuilding(sim, e, dt); }
   for (const e of sim.ents) { if (!e.alive) continue; if (e.kind === 'unit') updateUnit(sim, e, dt); else if (e.kind === 'proj') { e.px = e.x; e.py = e.y; updateProjectile(sim, e, dt); } else if (e.kind === 'wreck' && (e.amount <= 0 || sim.time - e.bornT > 150)) e.alive = false; }
+  if (sim.unicas) ARD.unicas.passo(sim, dt); /* 5.0h: únicas, módulos e comandantes (depois das unidades: Véu e Espelho valem na visão deste tique) */
   separate(sim);
   if (sim.chefes) ARD.chefesSim.depois(sim); /* 5.0g: partes presas ao corpo e a lista dos Ecos */
   pickupCrates(sim);
   if (sim.modos) ARD.modos.passo(sim, dt); /* 5.0g: Caçada e Eventos da Fenda (antes da poda: quem morreu neste passo ainda está em byId) */
+  if (sim.mundoSt) ARD.mundo.passo(sim, dt); /* 5.0h: capturas, portais, fauna e a agenda do surto */
   // prune
   if (sim.tick % 10 === 0) {
     const keep = [];
@@ -1692,6 +1719,8 @@ function hash(sim) { // cheap state hash for determinism tests
   for (const p of sim.players) { mix(Math.round(p.res.plasma * 10)); mix(Math.round(p.res.minerio * 10)); mix(Math.round(p.res.dados * 10)); mix(p.rep); }
   if (sim.chefes && ARD.chefesSim) ARD.chefesSim.hash(sim, mix); /* 5.0g: só partidas com chefão ou evento */
   if (sim.modos) ARD.modos.hash(sim, mix); /* 5.0g: estado dos modos (só nas partidas com modo) */
+  if (sim.mundoSt) ARD.mundo.hash(sim, mix); /* 5.0h: mundo neutro (só com cfg.mundo) */
+  if (sim.unicas && ARD.unicas) ARD.unicas.hash(sim, mix); /* 5.0h: só partidas com única, módulo ou comandante */
   return h >>> 0;
 }
 
@@ -1721,7 +1750,9 @@ function snapshot(sim) {
     navDirty: !!sim.navDirty, nav: { blocked: b64(nav.blocked), gates: [...nav.gates], gatePos: [...nav.gatePos].map(([i, e]) => [i, e.id]), version: nav.version },
     auras: sim.auras ? sim.auras.map(a => ({ anchors: a.anchors.map(e => e.id), moldes: a.moldes.map(e => e.id), diapasoes: a.diapasoes.map(e => e.id) })) : null,
     chefes: sim.chefes && ARD.chefesSim ? jsonSafe(ARD.chefesSim.foto(sim)) : null /* 5.0g */,
-    modos: sim.modos ? ARD.modos.snapshot(sim) : undefined /* 5.0g: só nas partidas com modo (a fotografia das outras fica igual) */ };
+    modos: sim.modos ? ARD.modos.snapshot(sim) : undefined /* 5.0g: só nas partidas com modo (a fotografia das outras fica igual) */,
+    mundo: sim.mundoSt ? ARD.mundo.snapshot(sim) : undefined /* 5.0h: só com o mundo neutro */,
+    unicas: sim.unicas && ARD.unicas ? ARD.unicas.foto(sim) : undefined /* 5.0h */ };
 }
 // aplica a fotografia num sim recém-criado com o mesmo cfg (createSim) e devolve o mesmo objeto
 function restore(sim, snap) {
@@ -1737,6 +1768,8 @@ function restore(sim, snap) {
   if (snap.auras) sim.auras = snap.auras.map(a => ({ anchors: a.anchors.map(id => sim.byId.get(id)).filter(Boolean), moldes: a.moldes.map(id => sim.byId.get(id)).filter(Boolean), diapasoes: a.diapasoes.map(id => sim.byId.get(id)).filter(Boolean) }));
   sim.events = []; sim._evRet = 0;
   if (snap.modos && ARD.modos) ARD.modos.restore(sim, snap.modos); /* 5.0g */
+  if (ARD.mundo) ARD.mundo.restore(sim, snap.mundo || null); else sim.mundo = -1; /* 5.0h: salvamento antigo = sem mundo */
+  if (ARD.unicas) ARD.unicas.volta(sim, snap.unicas); /* 5.0h: salvamento antigo = sem únicas nem comandantes */
   const h = hash(sim); if (h !== snap.hash) console.warn('[ARD] retomada: hash ' + h + ' difere do salvo ' + snap.hash);
   if (snap.digest != null && visDigest(sim) !== snap.digest) console.warn('[ARD] retomada: visão/exploração diferem do salvo'); // 4.2h
   return sim;
@@ -1755,4 +1788,6 @@ ARD.sim = {
 /* 5.0g: funções internas para o src/chefes-sim.js (simulação dos chefões e do Destroço do Titã) */
 ARD.sim._int = { addUnit, addNode, applyDamage, fire, kill, moveToward, queryGrid, rebuildNav, connected, nucleoOf, lakeAt, emit, alertTo };
 if (ARD.chefesSim && ARD.chefesSim.instala) ARD.chefesSim.instala(ARD.sim);
+if (ARD.mundo && ARD.mundo.instala) ARD.mundo.instala(ARD.sim); /* 5.0h: mundo neutro (src/mundo.js) */
+if (ARD.unicas && ARD.unicas.instala) ARD.unicas.instala(ARD.sim); /* 5.0h */
 })(globalThis.ARD = globalThis.ARD || {});

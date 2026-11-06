@@ -545,7 +545,7 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
   - os testes novos estão no portão de qualidade.
 - **Entregue (06/11/2026):** três agentes em paralelo (simulação, modos e visual) e um quarto que juntou os três. Chefões determinísticos nos 4 motores (800 amostras iguais, também depois de salvar e voltar); partidas sem chefão nem modo dão o hash da 5.0f e as 20 missões ficam iguais. Carga no QA 64 → 64 pipelines; com chefão +1 (o chão do chefão, +11 KB de WGSL), com os 3 mutadores +2; nenhum pipeline tardio e o Naga sem erro. Custo por tique de 0,01 a 0,06 ms. Fica para a 5.0h: a IA desviar da telegrafia e o equilíbrio com jogadores de verdade.
 
-#### 5.0h — Inteligência e mundo · tamanho GG · 3 agentes
+#### 5.0h — Inteligência e mundo · tamanho GG · 3 agentes · ✔ 06/11/2026
 - **IA 3.0:**
   - **Personalidade por líder:**
     - Barão-Forja: fortaleza e depois empurrão blindado;
@@ -578,6 +578,7 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
   - Zayin Coral: Prisma Vivo (Acorde, Estilhaço, Silêncio);
   - Oru Voraz: Devorador (Devorar, Ninhada, Rugido).
 - **Pronto quando:** o self-play mantém as Raças na faixa de vitórias, o teste de dificuldade é refeito e o determinismo se mantém nos 4 motores.
+- **Entregue (06/11/2026):** três agentes em paralelo (IA, mundo neutro, únicas e comandantes) e um quarto que juntou os três em cima da 5.0g.1. A campanha segue com a IA de antes (as 20 missões passam; quatro mudam só na contagem de inimigos, pelo ajuste da Vorag). Determinismo nos 4 motores também com tudo ligado e depois de salvar e voltar. Carga: QA 64 → 64 pipelines; com mundo, únicas e comandantes ligados, 69 → 70 pipelines e +11 KB de WGSL (a camada do chão do surto), sem pipeline tardio, Naga sem erro. Ligar tudo não encareceu o tique. Rede: protocolo 7 → 8. Vorag: Cria em par a 6 s, 26/14, vida 72, Mordida 10; Cuspidor 55/35, 6 s, Ácido 16. **Self-play (100 partidas 1×1, 20 min, Normal):** desligado, Vehnar 62,5%, Erevane 35%, Tessara 48,8%, Quorith 38,8%, Vorag 65%; com tudo ligado, 56,3 / 52,5 / 27,5 / 60 / 53,8%. A faixa 40–60% ainda não foi atingida em todas as Raças: o equilíbrio continua na 5.0h.1, com os testes do dono. Nenhuma única, módulo ou habilidade decide sozinha a partida (Espelho do Véu 50%, Mina de Pulso 58%, Devorar 53,8%).
 
 #### 5.0g.1 — Ajustes dos testes do dono na 5.0g · ✔ 06/11/2026
 - Trilha nova para a Vehnar (máquinas, sem clima medieval) e a Vorag (enxame vivo, sem percussão tribal).

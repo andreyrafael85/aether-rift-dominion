@@ -59,7 +59,8 @@ function create(canvas, mini) {
   R.prepare = function (sim, onProgress, onDone) {
     R.sim = sim; const jobs = [];
     for (const p of sim.players) {
-      for (const def in S.BUILDINGS) jobs.push([def, p.id, 0, false]);
+      for (const def in S.BUILDINGS) if (!S.BUILDINGS[def].unica || S.BUILDINGS[def].fac === p.faction /* 5.0h: só as únicas da Raça */) jobs.push([def, p.id, 0, false]);
+      if (sim.cfg && sim.cfg.comandantes && S.COMANDANTES && S.COMANDANTES[p.faction]) jobs.push([S.COMANDANTES[p.faction].def, p.id, 0, false]); /* 5.0h: avatar */
       for (const def of ['infantaria', 'coletor', 'veiculo_hull', 'veiculo_turret', 'torre_turret']) for (let f = 0; f < facingsFor(def); f++) jobs.push([def, p.id, f, false]);
       for (const def of ['drone', 'suporte', 'pirata', 'veiculo', 'torre_base', 'bastiao_base', 'bastiao_turret']) jobs.push([def, p.id, 0, false]);
     }
@@ -266,12 +267,13 @@ function create(canvas, mini) {
         continue;
       }
       if ((e.boss || e.parte) && ARD.chefes && ARD.chefes.ent2d(c, e, alpha, P, k, view, R, hpBar)) continue; /* 5.0g: chefões e partes */
+      if (e.owner === sim.mundo && ARD.mundoUI && ARD.mundoUI.ent2d(c, e, alpha, P, k, view, R, hpBar, sim)) continue; /* 5.0h: ruínas, Acampamento e fauna */
       const p = sim.players[e.owner]; const isUnit = e.kind === 'unit';
       const [wx, wy] = isUnit ? lerp(e, alpha) : [e.x, e.y];
       const ud = isUnit ? S.UNITS[e.def] : S.BUILDINGS[e.def];
       const zz = isUnit && ud.flying ? 14 : 0;
       const parts = (!isUnit || e.built !== false) ? MD.PARTS[e.def] : null;
-      const hullDef = parts ? parts.hull : e.def;
+      const hullDef = parts ? parts.hull : e.merc ? 'pirata' : e.def; /* 5.0h: mercenário = Pirata */
       let facing = 0; if (isUnit) facing = facingOf(e.ang || 0, facingsFor(hullDef)); else if (ud.wall) facing = facingOf(e.ang || 0);
       const dmg = !isUnit && e.built && e.hp < e.maxHp * 0.5;
       const eco2 = ARD.chefes && isUnit ? ARD.chefes.ecoDono(e) : -1; /* 5.0g: cópia espectral (cor do dono original, translúcida) */ const sp = R.sprite(hullDef, eco2 >= 0 ? eco2 : e.owner, parts && !isUnit ? 0 : facing, dmg, 0); const sc = fitOf(e, sp) * k / SV;
@@ -318,7 +320,7 @@ function create(canvas, mini) {
     fctx.fillStyle = 'rgba(2,3,6,0.85)'; for (const p of unexplored) { diamond(fctx, p[0] + shx, p[1] + shy, tw / 2 + 1, th / 2 + 1); fctx.fill(); }
     fctx.globalCompositeOperation = 'destination-out';
     for (const e of sim.ents) {
-      if (!e.alive || e.owner !== human || (e.kind !== 'unit' && e.kind !== 'building')) continue; const rad = S.sensorRadius(sim, e); if (!inView(e.x, e.y, rad)) continue;
+      if (!e.alive || (e.owner !== human && !(e.ruina && e.ruina.dono === human) /* 5.0h junção: o Observatório abre a névoa no 2D */) || (e.kind !== 'unit' && e.kind !== 'building')) continue; const rad = S.sensorRadius(sim, e); if (!inView(e.x, e.y, rad)) continue;
       const p = R.worldToScreen(cam, e.x, e.y, 0); const rx = rad * k;
       fctx.save(); fctx.translate(p[0], p[1]); fctx.scale(1, 0.5); const g = fctx.createRadialGradient(0, 0, rx * 0.68, 0, 0, rx); g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)'); fctx.fillStyle = g; fctx.beginPath(); fctx.arc(0, 0, rx, 0, TAU); fctx.fill(); fctx.restore();
     }
@@ -351,19 +353,20 @@ function create(canvas, mini) {
     for (const e of sim.ents) {
       if (!e.alive) continue;
       if (e.kind === 'node') { const p = M(e.x, e.y); resGlyph(c, e, p[0], p[1], 1.9); continue; } // 4.2h
-      if (e.kind !== 'unit' && e.kind !== 'building') continue;
+      if ((e.kind !== 'unit' && e.kind !== 'building') || e.owner === sim.mundo /* 5.0h */) continue;
       const own = e.owner === human; if (!(own || vis.has(e.id))) continue;
       const col = sim.players[e.owner].color; const p = M(e.x, e.y);
       if (e.kind === 'building') { const t = S.territoryOf(sim, e); if (t && e.built) { c.fillStyle = rgba(col, 0.1); c.beginPath(); c.ellipse(p[0], p[1], t * m, t * m * 0.5, 0, 0, TAU); c.fill(); } c.fillStyle = col; const r = e.def === 'nucleo' ? 4 : S.BUILDINGS[e.def].wall ? 1.5 : 2.5; c.fillRect(p[0] - r, p[1] - r, r * 2, r * 2); }
       else { c.fillStyle = col; c.fillRect(p[0] - 1, p[1] - 1, 2, 2); }
     }
     for (const [id, mm] of view.memory) if (!vis.has(id)) { const p = M(mm.x, mm.y); c.fillStyle = rgba(sim.players[mm.owner].color, 0.5); c.fillRect(p[0] - 2, p[1] - 2, 4, 4); }
+    if (ARD.mundoUI && sim.mundoSt) ARD.mundoUI.mini(c, sim, view, M, 2, human); /* 5.0h */
     if (sim.storm) { const p = M(sim.storm.x, sim.storm.y); c.strokeStyle = sim.storm.phase === 'active' ? 'rgba(178,60,255,0.9)' : `rgba(178,60,255,${0.4 + 0.4 * Math.sin(R.time * 6)})`; c.lineWidth = 1.5; c.beginPath(); c.ellipse(p[0], p[1], sim.storm.r * m, sim.storm.r * m * 0.5, 0, 0, TAU); c.stroke(); }
     mfctx.setTransform(1, 0, 0, 1, 0, 0); mfctx.globalCompositeOperation = 'source-over'; mfctx.clearRect(0, 0, size, size);
     mfctx.fillStyle = 'rgba(6,8,12,0.72)'; diamond(mfctx, size / 2, size / 2, size / 2, size / 4); mfctx.fill();
     if (!view.reveal) { mfctx.fillStyle = 'rgba(2,3,6,0.8)'; const tm = TILE * m; for (let ty = 0; ty < TILES; ty++) for (let tx = 0; tx < TILES; tx++) { if (ex[ty * TILES + tx]) continue; const p = M((tx + 0.5) * TILE, (ty + 0.5) * TILE); diamond(mfctx, p[0], p[1], tm + 0.5, tm * 0.5 + 0.5); mfctx.fill(); } }
     mfctx.globalCompositeOperation = 'destination-out';
-    for (const e of sim.ents) { if (!e.alive || e.owner !== human || (e.kind !== 'unit' && e.kind !== 'building')) continue; const r = S.sensorRadius(sim, e) * m; const p = M(e.x, e.y); mfctx.beginPath(); mfctx.ellipse(p[0], p[1], r, r * 0.5, 0, 0, TAU); mfctx.fill(); }
+    for (const e of sim.ents) { if (!e.alive || (e.owner !== human && !(e.ruina && e.ruina.dono === human) /* 5.0h junção */) || (e.kind !== 'unit' && e.kind !== 'building')) continue; const r = S.sensorRadius(sim, e) * m; const p = M(e.x, e.y); mfctx.beginPath(); mfctx.ellipse(p[0], p[1], r, r * 0.5, 0, 0, TAU); mfctx.fill(); }
     c.drawImage(mfog, 0, 0);
     for (const r of R.fx.rings) if (r.ping) { const kk = r.t / r.life; const p = M(r.x, r.y); c.strokeStyle = rgba(r.col, 1 - kk); c.lineWidth = 1.5; c.beginPath(); c.arc(p[0], p[1], 3 + 10 * kk, 0, TAU); c.stroke(); }
     const cam = view.cam; const cs = [R.screenToWorld(cam, 0, 0), R.screenToWorld(cam, R.w, 0), R.screenToWorld(cam, R.w, R.h), R.screenToWorld(cam, 0, R.h)].map(p => M(p[0], p[1]));

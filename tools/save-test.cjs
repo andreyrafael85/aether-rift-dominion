@@ -2,7 +2,7 @@
 // e roda as duas cópias lado a lado; o estado completo tem de continuar idêntico (hash a cada 50 passos e fotografia inteira no fim).
 // Uso: node tools/save-test.cjs [escaramucas=4] [missoes=todas|ids] [passosAntes=1800] [passosDepois=1800]
 const path = require('path'); const root = path.resolve(__dirname, '..');
-globalThis.ARD = {}; require(root + '/src/sim.js'); require(root + '/src/ai.js'); require(root + '/src/campaign.js'); const S = ARD.sim, AI = ARD.ai, C = ARD.campaign;
+globalThis.ARD = {}; require(root + '/src/mundo.js'); require(root + '/src/unicas-sim.js'); /* 5.0h junção: carregado como no jogo (a IA 3.0 usa as únicas e os módulos) */ /* 5.0h */ require(root + '/src/sim.js'); require(root + '/src/ai.js'); require(root + '/src/campaign.js'); const S = ARD.sim, AI = ARD.ai, C = ARD.campaign;
 const nSk = +(process.argv[2] || 4); const mArg = process.argv[3] || 'todas'; const before = +(process.argv[4] || 1800), after = +(process.argv[5] || 1800);
 const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag']; let fails = 0, oks = 0; const t00 = Date.now();
 const roundtrip = o => JSON.parse(JSON.stringify(o));

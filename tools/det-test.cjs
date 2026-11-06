@@ -1,12 +1,12 @@
 // Determinismo entre motores JS: roda o mesmo jogo IA x IA no Node (V8) e em Chromium, Firefox e WebKit via Playwright.
 // Uso: NODE_PATH=<pasta com node_modules/playwright> node tools/det-test.cjs [seed=7] [ticks=3000]
 const path = require('path'); const fs = require('fs'); const root = path.resolve(__dirname, '..');
-require(root + '/src/modos.js') /* 5.0g */; require(root + '/src/chefes-sim.js'); /* 5.0g */ require(root + '/src/sim.js'); require(root + '/src/ai.js'); require(root + '/tools/det-run.js');
+require(root + '/src/modos.js') /* 5.0g */; require(root + '/src/chefes-sim.js'); /* 5.0g */ require(root + '/src/mundo.js'); require(root + '/src/unicas-sim.js'); /* 5.0h */ require(root + '/src/sim.js'); require(root + '/src/ai.js'); require(root + '/tools/det-run.js');
 const seed = +(process.argv[2] || 7), ticks = +(process.argv[3] || 3000);
 const t0 = Date.now(); const nodeHashes = globalThis.ARD_DET(seed, ticks);
 console.log('node (V8): ' + nodeHashes.length + ' amostras em ' + (Date.now() - t0) + ' ms · última ' + nodeHashes[nodeHashes.length - 1]);
 fs.mkdirSync(root + '/dist', { recursive: true });
-fs.writeFileSync(root + '/dist/det.html', '<!doctype html><meta charset="utf-8"><title>det</title><script src="../src/modos.js"></script><script src="../src/chefes-sim.js"></script><script src="../src/sim.js"></script><script src="../src/ai.js"></script><script src="../tools/det-run.js"></script>'); /* 5.0g: modos e chefões */
+fs.writeFileSync(root + '/dist/det.html', '<!doctype html><meta charset="utf-8"><title>det</title><script src="../src/modos.js"></script><script src="../src/chefes-sim.js"></script><script src="../src/mundo.js"></script><script src="../src/unicas-sim.js"></script><script src="../src/sim.js"></script><script src="../src/ai.js"></script><script src="../tools/det-run.js"></script>'); /* 5.0g: modos e chefões */
 const pw = require('playwright');
 (async () => {
   for (const name of ['chromium', 'firefox', 'webkit']) {

@@ -66,7 +66,7 @@ console.log('events', JSON.stringify(r3.counts));
   // quartel Vorag pronto, produz 1 Cria → 2 unidades
   const b = S.enqueue(sim, { t: 'build', p: 0, def: 'quartel', x: nucV.x + 90, y: nucV.y, }); S.step(sim);
   const qb = sim.ents.find(e => e.kind === 'building' && e.owner === 0 && e.def === 'quartel'); qb.built = true; qb.progress = 1; qb.hp = qb.maxHp;
-  S.enqueue(sim, { t: 'produce', p: 0, id: qb.id, def: 'cria' }); for (let i = 0; i < 60; i++) S.step(sim);
+  S.enqueue(sim, { t: 'produce', p: 0, id: qb.id, def: 'cria' }); for (let i = 0, n = Math.ceil(S.UNITS.cria.time / S.TICK) + 10 /* 5.0h: a Cria passou a 6 s */; i < n; i++) S.step(sim);
   const crias = sim.ents.filter(e => e.alive && e.kind === 'unit' && e.owner === 0 && e.def === 'cria');
   console.log('Crias em pares:', crias.length === 2 ? 'OK' : 'FAIL (' + crias.length + ')');
   // carcaça + Carniceiro

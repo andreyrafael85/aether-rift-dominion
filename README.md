@@ -20,7 +20,7 @@
   <img src="docs/imagens/partida/batalha.webp" alt="Batalha entre o Consórcio Vehnar e a Erevane, capturada no próprio jogo" width="800">
 </p>
 
-> Beta de testes, versão **5.0g.1**. O jogo abre no idioma do navegador e troca em **Idioma / Language / Idioma** (tela inicial, Ajustes e janela da partida) ou com `?lang=pt`, `?lang=en` e `?lang=es` no link.
+> Beta de testes, versão **5.0h**. O jogo abre no idioma do navegador e troca em **Idioma / Language / Idioma** (tela inicial, Ajustes e janela da partida) ou com `?lang=pt`, `?lang=en` e `?lang=es` no link.
 
 ## Destaques
 
@@ -115,9 +115,9 @@ Fases, golpes, vidas e recompensas: **[Chefões e modos](docs/chefoes-e-modos.md
 
 ## Roteiro
 
-A versão atual é a **5.0g.1** (chefões, Caçada, Eventos da Fenda e mutadores; na 5.0g.1, trilha nova da Vehnar e da Vorag e preparo antes do chefão). Os próximos passos da v5.0 "Além da Fenda":
+A versão atual é a **5.0h** (IA com a personalidade de cada líder, Mundo vivo, construções únicas, módulos e Comandantes em campo; antes, na 5.0g, os chefões, a Caçada, os Eventos da Fenda e os mutadores). Os próximos passos da v5.0 "Além da Fenda":
 
-- **5.0h — Inteligência e mundo:** IA com a personalidade de cada líder.
+- **5.0h — Inteligência e mundo** ✔: IA com a personalidade de cada líder, Mundo vivo, construções únicas e Comandantes em campo.
 - **5.0i — Campanha 2:** 15 missões e os chefões que faltam.
 - **5.0j — Mundos novos:** um mapa por mundo natal, com luz e clima próprios.
 - **5.0k — Replays, clipes e relatório de batalha.**

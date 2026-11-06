@@ -44,7 +44,7 @@ function create(o) {
   I.select = setSel;
   I.selectOnScreen = function () { const ids = []; for (const e of sim.ents) { if (!e.alive || e.owner !== human || e.kind !== 'unit' || !S.UNITS[e.def].attack) continue; const [sx, sy] = R.worldToScreen(cam, e.x, e.y); if (sx >= 0 && sy >= 0 && sx <= R.w && sy <= R.h) ids.push(e.id); } setSel(ids); return ids.length; };
   function cmd(c) { c.p = human; if (ui.enqueue) ui.enqueue(c); else S.enqueue(sim, c); if (ARD.vozes) ARD.vozes.ordem(sim, human, c); /* 5.0c.1: resposta da unidade à ordem (mover, atacar) */ }
-  I.cmd = cmd;
+  I.cmd = cmd; I.setSel = setSel; /* 5.0h: a barra do comandante seleciona o avatar */
   I.pick = pick; I.ownSelectedUnits = ownSelectedUnits; I.ownSelectedBuilding = ownSelectedBuilding; I.contextCommand = contextCommand; /* 5.0b: a roda de comandos usa os mesmos critérios do clique */
 
   function wallSegments(x0, y0, x1, y1, def) {
@@ -71,6 +71,7 @@ function create(o) {
       view.marker = { x: t.x, y: t.y, t: R.time, col: '#7FE3A1' }; return;
     }
     if (t && t.kind === 'crate') { cmd({ t: 'pickup', ids, target: t.id }); view.marker = { x: t.x, y: t.y, t: R.time, col: '#F2C230' }; return; }
+    if (t && ARD.mundoUI && ARD.mundoUI.ordem(t, units, cmd, view, R, sim, human)) return; /* 5.0h: ruína (capturar ou atravessar o Portal) e Acampamento */
     if (t && t.owner >= 0 && t.owner !== human) {
       const doIt = () => {
         const pirates = units.filter(u => u.def === 'pirata'); const others = units.filter(u => u.def !== 'pirata');
@@ -106,6 +107,7 @@ function create(o) {
       if (!shift && I.lastType !== 'touch') I.setMode('normal'); return;
     }
     if (mode === 'super') { cmd({ t: 'super', x: wx, y: wy }); I.setMode('normal'); return; }
+    if (mode === 'habilidade') { if (ARD.unicasUI) ARD.unicasUI.mira(wx, wy, pick(sx, sy, I.lastType === 'touch' ? 26 : 12)); I.setMode('normal'); return; } /* 5.0h: mira da habilidade do comandante */
     if (mode === 'jump') { ui.confirm(ARD.t('input.salto', { p: Math.round(S.FACTIONS[sim.players[human].faction].jumpCostFrac * 100) }) /* 5.0c */, () => cmd({ t: 'jump', x: wx, y: wy })); I.setMode('normal'); return; }
     if (mode === 'rally') { const b = ownSelectedBuilding(); if (b) cmd({ t: 'rally', id: b.id, x: wx, y: wy }); I.setMode('normal'); return; }
     // normal: select (4.1a: no toque, com unidades selecionadas, a área das suas unidades encolhe para o toque no chão virar movimento)
@@ -220,7 +222,7 @@ function create(o) {
   canvas.addEventListener('wheel', e => { e.preventDefault(); if (e.ctrlKey && R.CAM) { cam.pitchT = Math.max(R.CAM.minPitch, Math.min(R.CAM.maxPitch, (cam.pitchT == null ? R.CAM.pitch : cam.pitchT) + (e.deltaY > 0 ? 0.06 : -0.06))); return; } const r = canvas.getBoundingClientRect(); const sx = e.clientX - r.left, sy = e.clientY - r.top; const [wx, wy] = R.screenToWorld(cam, sx, sy); const f = Math.exp(-e.deltaY * 0.0012); cam.zoom *= f; clampCam(); const [wx2, wy2] = R.screenToWorld(cam, sx, sy); cam.x += wx - wx2; cam.y += wy - wy2; clampCam(); if (view.ghost) updateGhost(sx, sy); }, { passive: false });
 
   // ---- keyboard
-  const BUILD_KEYS = {}; for (const k in S.BUILDINGS) if (S.BUILDINGS[k].key) BUILD_KEYS[S.BUILDINGS[k].key] = k;
+  const BUILD_KEYS = {}; for (const k in S.BUILDINGS) if (S.BUILDINGS[k].key && (!S.BUILDINGS[k].unica || S.BUILDINGS[k].fac === sim.players[human].faction) /* 5.0h: J e K são as únicas da sua Raça */) BUILD_KEYS[S.BUILDINGS[k].key] = k;
   I.buildMenu = false;
   window.addEventListener('keydown', e => {
     if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) return;
@@ -236,6 +238,7 @@ function create(o) {
     if (/^Digit[0-9]$/.test(e.code)) { const n = e.code.slice(5); if (e.ctrlKey || e.metaKey) { e.preventDefault(); I.groups[n] = [...view.sel]; ui.notice(ARD.t('input.grupo', { n })) /* 5.0c */; if (ui.groupsChanged) ui.groupsChanged(n); /* 5.0b: barra de grupos */ } else { const g = (I.groups[n] || []).filter(id => { const en = sim.byId.get(id); return en && en.alive; }); if (g.length) { setSel(g); const now = performance.now(); if (I.lastGroupKey === n && now - I.lastGroupT < 400) { const en = sim.byId.get(g[0]); if (en) I.center(en.x, en.y); } I.lastGroupKey = n; I.lastGroupT = now; } } return; }
     if (k === 'B' && !e.ctrlKey) { I.buildMenu = !I.buildMenu; ui.buildMenuChanged(I.buildMenu); return; }
     if (I.buildMenu && BUILD_KEYS[k]) { I.buildMenu = false; ui.buildMenuChanged(false); I.setMode('build', BUILD_KEYS[k]); return; }
+    if (ARD.unicasUI && ARD.unicasUI.tecla(k, e)) return; /* 5.0h: Z, X e C são as habilidades do comandante */
     const b = ownSelectedBuilding(); const units = ownSelectedUnits();
     if (b && !units.length && b.built) { const pd = S.producesFor(b.def, sim.players[human].faction).find(u => S.UNITS[u].key === k); if (pd) { if (!e.repeat) cmd({ t: 'produce', id: b.id, def: pd, n: e.shiftKey ? 5 : 1 }); return; } } /* 5.0a.1: a tecla de cada unidade vale pela lista da Raça (antes a última unidade com a mesma letra, de outra Raça, roubava a tecla: C e I não produziam) e segurar a tecla põe 1, não ~30 por segundo */
     if (k === 'A' && units.length) { if (e.repeat) return; I.setMode(I.mode === 'attackmove' ? 'normal' : 'attackmove'); return; } // 4.2g: segurar A não fica ligando e desligando

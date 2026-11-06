@@ -121,9 +121,10 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 
 // ---------- legendas: a voz do sistema (src/audio.js chama A.onSay) aparece em texto com o retrato ----------
 let capCtx = null;
-function caption(text) {
-  if (!A.captions || !capCtx) return; const el = $('caption'); if (!el) return; const c = capCtx;
+function caption(text, quem) { /* 5.0h: quem = { fac, nome, cor }: fala de uma IA com o retrato dela (src/ia-ui.js), mesmo com as legendas desligadas */
+  if ((!A.captions && !quem) || !capCtx) return; const el = $('caption'); if (!el) return; const c = capCtx;
   if (!c.img) { c.img = el.querySelector('img'); c.who = el.querySelector('b'); c.tx = el.querySelector('span'); const art = c.leaderArt && c.leaderArt(c.fac); if (art) c.img.src = art; else c.img.hidden = true; setT(c.who, c.name || T('hud3.cap.comando')); } /* 5.0c */
+  if (quem || c.outro) { const f = quem ? quem.fac : c.fac, art = c.leaderArt && c.leaderArt(f); c.img.hidden = !art; if (art) c.img.src = art; setT(c.who, quem ? quem.nome : c.name || T('hud3.cap.comando')); if (quem && quem.cor) el.style.setProperty('--race', quem.cor); else el.style.removeProperty('--race'); c.outro = !!quem; } /* 5.0h */
   setT(c.tx, text); el.hidden = false; el.classList.remove('in1', 'in2'); el.classList.add((c.flip = !c.flip) ? 'in1' : 'in2'); /* duas animações iguais alternadas: reinicia sem ler o layout */
   clearTimeout(c.t); if (!ARD.hud3.capHold) c.t = setTimeout(() => { el.hidden = true; }, Math.min(6500, 2200 + text.length * 70)); /* capHold: fotos na GPU por software */
 }
@@ -333,7 +334,7 @@ function mount(ctx) {
 
   // ====== tela de pesquisa (Eras do Núcleo, Laboratório, módulos, Ascensão e superarma) ======
   const TM = $('tech'), TB = TM && $('tech-body'); const TV = { key: '', iconQ: [] };
-  const ERA_UNLOCK = er => { /* a Era em que cada coisa fica disponível: a da unidade ou a da construção que a produz (Veículo Pesado só com a Fábrica, Era II) */ const f = me().faction; const bs = Object.keys(S.BUILDINGS).filter(k => S.BUILDINGS[k].key && (S.BUILDINGS[k].era || 1) === er); const ue = {}; for (const b of ['nucleo', 'quartel', 'fabrica', 'hangar']) for (const u of S.producesFor(b, f)) { const e = Math.max(S.UNITS[u].era || 1, S.BUILDINGS[b].era || 1, ...(S.UNITS[u].needs || []).map(n => S.BUILDINGS[n].era || 1)); ue[u] = Math.min(ue[u] || 9, e); } return { bs, us: Object.keys(ue).filter(u => ue[u] === er) }; };
+  const ERA_UNLOCK = er => { /* a Era em que cada coisa fica disponível: a da unidade ou a da construção que a produz (Veículo Pesado só com a Fábrica, Era II) */ const f = me().faction; const bs = Object.keys(S.BUILDINGS).filter(k => S.BUILDINGS[k].key && (S.BUILDINGS[k].era || 1) === er && (!S.BUILDINGS[k].unica || S.BUILDINGS[k].fac === f) /* 5.0h: só as únicas da sua Raça */); const ue = {}; for (const b of ['nucleo', 'quartel', 'fabrica', 'hangar']) for (const u of S.producesFor(b, f)) { const e = Math.max(S.UNITS[u].era || 1, S.BUILDINGS[b].era || 1, ...(S.UNITS[u].needs || []).map(n => S.BUILDINGS[n].era || 1)); ue[u] = Math.min(ue[u] || 9, e); } return { bs, us: Object.keys(ue).filter(u => ue[u] === er) }; };
   const MODS = () => Object.keys(S.BUILDINGS).filter(k => S.BUILDINGS[k].module).map(k => ({ def: k, m: S.BUILDINGS[k].module }));
   function missing(cost) { const p = me(); const m = []; for (const k of RES3) { const c = (cost || {})[k] || 0, have = Math.floor(p.res[k] || 0); if (c > have) m.push(T('hud3.tk.falta-item', { q: fmt(c - have), x: nRes(k) })); } return m.length ? T('hud3.tk.faltam', { x: m.reduce((a, b) => T('hud3.tk.e', { a, b })) }) : null; } /* 5.0c */
   const lazyImg = def => ICONS[def] ? `<img class="tico" alt="" src="${ICONS[def]}">` : (TV.iconQ.push(def), `<img class="tico" alt="" data-ico="${def}">`); /* o que já foi desenhado entra na hora; o resto, aos poucos */
@@ -413,5 +414,5 @@ function mount(ctx) {
   return H;
 }
 
-ARD.hud3 = { a11y: A, PAL, applyAll, prepareSim, mount, playerColors, view: VIEW };
+ARD.hud3 = { a11y: A, PAL, applyAll, prepareSim, mount, playerColors, view: VIEW, falaIA: (text, quem) => caption(text, quem) /* 5.0h */ };
 })(globalThis.ARD = globalThis.ARD || {});

@@ -1,7 +1,7 @@
 // Roda cada missão da campanha no Node com a IA jogando também pelo humano: verifica roteiros (falas, ondas, eventos),
 // objetivos e fim sem exceções. Uso: node tools/missions-test.cjs [ids separados por vírgula] [minutos-máx=14] [dificuldade=normal]
 const path = require('path'); const root = path.resolve(__dirname, '..');
-globalThis.ARD = {}; require(root + '/src/sim.js'); require(root + '/src/ai.js'); require(root + '/src/campaign.js'); const S = ARD.sim, AI = ARD.ai, C = ARD.campaign;
+globalThis.ARD = {}; require(root + '/src/mundo.js'); require(root + '/src/unicas-sim.js'); /* 5.0h junção: carregado como no jogo (a IA 3.0 usa as únicas e os módulos) */ /* 5.0h: o mundo neutro carregado (e desligado) não muda as missões */ require(root + '/src/sim.js'); require(root + '/src/ai.js'); require(root + '/src/campaign.js'); const S = ARD.sim, AI = ARD.ai, C = ARD.campaign;
 const ids = (process.argv[2] && process.argv[2] !== 'todas') ? process.argv[2].split(',') : C.MISSIONS.map(m => m.id); const maxMin = +(process.argv[3] || 14), diff = process.argv[4] || 'normal';
 let bad = 0; const warn = console.warn; const warns = []; console.warn = (...a) => warns.push(a.join(' '));
 for (const id of ids) {

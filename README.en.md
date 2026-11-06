@@ -20,7 +20,7 @@
   <img src="docs/imagens/partida/batalha.webp" alt="A battle between the Vehnar Consortium and the Erevane, captured in the game itself" width="800">
 </p>
 
-> Playtest beta, version **5.0g.1**. The game opens in your browser's language and you can switch it in **Idioma / Language / Idioma** (start screen, Settings and the in-match window) or with `?lang=en`, `?lang=es` or `?lang=pt` in the link.
+> Playtest beta, version **5.0h**. The game opens in your browser's language and you can switch it in **Idioma / Language / Idioma** (start screen, Settings and the in-match window) or with `?lang=en`, `?lang=es` or `?lang=pt` in the link.
 
 ## Highlights
 
@@ -115,9 +115,9 @@ Phases, attacks, health and rewards: **[Bosses and modes](docs/chefoes-e-modos.e
 
 ## Roadmap
 
-The current version is **5.0g.1** (bosses, Hunt, Rift Events and mutators; 5.0g.1 adds new Vehnar and Vorag music and a wind-up before the boss). Next steps of v5.0 "Beyond the Rift":
+The current version is **5.0h** (AI with each leader’s personality, Living world, unique buildings, modules and Field Commanders; 5.0g brought the bosses, the Hunt, Rift Events and mutators). Next steps of v5.0 "Beyond the Rift":
 
-- **5.0h — Intelligence and world:** AI with each leader's personality.
+- **5.0h — Intelligence and world** ✔: AI with each leader's personality, Living world, unique buildings and Field Commanders.
 - **5.0i — Campaign 2:** 15 missions and the remaining bosses.
 - **5.0j — New worlds:** one map per homeworld, with its own light and weather.
 - **5.0k — Replays, clips and battle report.**

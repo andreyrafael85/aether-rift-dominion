@@ -39,9 +39,9 @@ function linhaLente(id, on, onChange) { const el = $(id); if (!el) return; el.hi
   el.innerHTML = `<label class="chk"><input type="checkbox" ${on ? 'checked' : ''}> <span><b>${esc(T('modos.lente', null, 'Lente do Arauto'))}</b> · ${esc(T('modos.lente-d', null, '+10% de visão nesta partida'))}</span></label>`;
   el.querySelector('input').addEventListener('change', e => onChange(e.target.checked)); }
 function desenhaJogar() { const p = prefs(); const el = $('regras-jogar'); if (!el) return;
-  el.innerHTML = `<label class="chk ev-chk"><input type="checkbox" id="opt-eventos" ${p.eventos ? 'checked' : ''}> <span><b>${esc(T('modos.ev.titulo', null, 'Eventos da Fenda'))}</b><small>${esc(T('modos.ev.desc', null, 'Sentinela da Fenda, Caravana Corsária, Enxame Errante e chuva de meteoros durante a partida'))}</small></span></label><div id="mut-jogar"></div><div id="lente-jogar" class="lente-l" hidden></div>`;
+  el.innerHTML = `<label class="chk ev-chk"><input type="checkbox" id="opt-eventos" ${p.eventos ? 'checked' : ''}> <span><b>${esc(T('modos.ev.titulo', null, 'Eventos da Fenda'))}</b><small>${esc(T('modos.ev.desc', null, 'Sentinela da Fenda, Caravana Corsária, Enxame Errante e chuva de meteoros durante a partida'))}</small></span></label><div id="mut-jogar"></div><div id="mundo-jogar"></div><div id="cmd-jogar"></div><div id="lente-jogar" class="lente-l" hidden></div>`; /* 5.0h: Mundo vivo */
   $('opt-eventos').addEventListener('change', e => guarda({ eventos: e.target.checked }));
-  chipsMut('mut-jogar', p.mutJogar.slice(), v => guarda({ mutJogar: v })); linhaLente('lente-jogar', p.lente, v => guarda({ lente: v })); }
+  chipsMut('mut-jogar', p.mutJogar.slice(), v => guarda({ mutJogar: v })); linhaLente('lente-jogar', p.lente, v => guarda({ lente: v })); if (ARD.mundoUI) ARD.mundoUI.bloco('mundo-jogar', 'jogar'); /* 5.0h */ if (ARD.unicasUI) ARD.unicasUI.bloco('cmd-jogar', 'jogar'); /* 5.0h junção: comandantes em campo */ }
 
 /* ---------- aba Caçada ---------- */
 function recordeDe(chefe, dif) { try { return (P().load().cacada.recordes || {})[chefe + '|' + dif] || null; } catch (e) { return null; } }
@@ -72,28 +72,28 @@ function iniciaCacada() { const p = prefs(); if (!D) return;
 function desenhaSala() { const el = $('regras-sala'); if (!el) return; const p = prefs();
   el.innerHTML = `<div class="opt"><label for="sala-modo">${esc(T('modos.sala.modo', null, 'Modo da sala'))}</label><select id="sala-modo" data-seg><option value="escaramuca">${esc(T('modos.sala.escaramuca', null, 'Escaramuça'))}</option><option value="cacada">${esc(T('modos.sala.cacada', null, 'Caçada'))}</option></select></div>
     <div class="cgrid" id="sala-cac" ${p.salaModo === 'cacada' ? '' : 'hidden'}><div class="opt"><label for="sala-chefe">${esc(T('modos.cac.chefao', null, 'Chefão'))}</label><select id="sala-chefe" data-seg>${CHEFES.map(c => `<option value="${c}">${esc(nomeChefe(c))}</option>`).join('')}</select></div><div class="opt"><label for="sala-dif">${esc(T('modos.cac.dificuldade', null, 'Dificuldade'))}</label><select id="sala-dif" data-seg>${DIFS.map(d => `<option value="${d}">${esc(nomeDif(d))}</option>`).join('')}</select></div></div>
-    <div id="mut-sala"></div><p class="small muted" id="sala-dica">${esc(T(p.salaModo === 'cacada' ? 'modos.sala.dica-cac' : 'modos.sala.dica-esc', null, p.salaModo === 'cacada' ? 'Todos os humanos do mesmo lado contra a Fenda; o anfitrião escolhe o chefão.' : 'Todos contra todos; o anfitrião escolhe as regras.'))}</p>`;
+    <div id="mut-sala"></div><div id="mundo-sala" ${p.salaModo === 'cacada' ? 'hidden' : ''}></div><div id="cmd-sala" ${p.salaModo === 'cacada' ? 'hidden' : ''}></div><p class="small muted" id="sala-dica">${esc(T(p.salaModo === 'cacada' ? 'modos.sala.dica-cac' : 'modos.sala.dica-esc', null, p.salaModo === 'cacada' ? 'Todos os humanos do mesmo lado contra a Fenda; o anfitrião escolhe o chefão.' : 'Todos contra todos; o anfitrião escolhe as regras.'))}</p>`;
   $('sala-modo').value = p.salaModo === 'cacada' ? 'cacada' : 'escaramuca'; $('sala-chefe').value = CHEFES.includes(p.salaChefe) ? p.salaChefe : 'arauto'; $('sala-dif').value = DIFS.includes(p.salaDif) ? p.salaDif : 'normal';
   if (ARD.uiStart && ARD.uiStart.segmented) for (const id of ['sala-modo', 'sala-chefe', 'sala-dif']) ARD.uiStart.segmented($(id));
-  const muda = () => { guarda({ salaModo: $('sala-modo').value, salaChefe: $('sala-chefe').value, salaDif: $('sala-dif').value }); $('sala-cac').hidden = $('sala-modo').value !== 'cacada';
+  const muda = () => { guarda({ salaModo: $('sala-modo').value, salaChefe: $('sala-chefe').value, salaDif: $('sala-dif').value }); $('sala-cac').hidden = $('sala-modo').value !== 'cacada'; for (const id of ['mundo-sala', 'cmd-sala']) if ($(id)) $(id).hidden = $('sala-modo').value === 'cacada'; /* 5.0h */
     $('sala-dica').textContent = T($('sala-modo').value === 'cacada' ? 'modos.sala.dica-cac' : 'modos.sala.dica-esc', null, $('sala-modo').value === 'cacada' ? 'Todos os humanos do mesmo lado contra a Fenda; o anfitrião escolhe o chefão.' : 'Todos contra todos; o anfitrião escolhe as regras.'); avisaSala(); };
   for (const id of ['sala-modo', 'sala-chefe', 'sala-dif']) $(id).addEventListener('change', muda);
-  chipsMut('mut-sala', p.salaMut.slice(), v => { guarda({ salaMut: v }); avisaSala(); }); }
-function modoSala() { const p = prefs(); return p.salaModo === 'cacada' ? { modo: 'cacada', chefe: p.salaChefe, dif: p.salaDif, mut: p.salaMut.slice() } : { modo: 'escaramuca', mut: p.salaMut.slice() }; }
+  chipsMut('mut-sala', p.salaMut.slice(), v => { guarda({ salaMut: v }); avisaSala(); }); if (ARD.mundoUI) ARD.mundoUI.bloco('mundo-sala', 'sala', avisaSala); /* 5.0h: Mundo vivo na sala (o anfitrião escolhe) */ if (ARD.unicasUI) ARD.unicasUI.bloco('cmd-sala', 'sala', avisaSala); /* 5.0h junção: comandantes em campo */ }
+function modoSala() { const p = prefs(); return p.salaModo === 'cacada' ? { modo: 'cacada', chefe: p.salaChefe, dif: p.salaDif, mut: p.salaMut.slice() } : { modo: 'escaramuca', mut: p.salaMut.slice(), mundo: ARD.mundoUI ? ARD.mundoUI.modoSala() : null /* 5.0h */, cmd: ARD.unicasUI ? ARD.unicasUI.modoSala() : false /* 5.0h junção */ }; }
 function avisaSala() { const L = D && D.lobby && D.lobby(); if (L && L.role === 'host' && L.N) { L.N.modo = modoSala(); if (L.N.relobby) L.N.relobby(); } } /* o anfitrião manda o modo na lista da sala */
 /* linha do modo na lista da sala (anfitrião e convidados) */
 function linhaSala(el, lobby) { if (!el || !lobby || !lobby.N) return; const m = lobby.role === 'host' ? modoSala() : lobby.N.modo; if (!m) return;
   const d = document.createElement('div'); d.className = 'sala-modo';
   d.textContent = m.modo === 'cacada' ? T('modos.sala.linha-cac', { chefe: nomeChefe(m.chefe), dif: nomeDif(m.dif) }, 'Caçada cooperativa: {chefe} ({dif}) · todos contra a Fenda') : T('modos.sala.linha-esc', null, 'Escaramuça: todos contra todos');
-  if (m.mut && m.mut.length) d.textContent += ' · ' + m.mut.map(nomeMut).join(', '); el.prepend(d); }
+  if (m.mut && m.mut.length) d.textContent += ' · ' + m.mut.map(nomeMut).join(', '); if (m.mundo && ARD.mundoUI) d.textContent += ' · ' + ARD.mundoUI.linha(m.mundo); /* 5.0h */ if (m.cmd && ARD.unicasUI) d.textContent += ' · ' + ARD.unicasUI.linha(); /* 5.0h junção */ el.prepend(d); }
 /* cfg da sala no início (o anfitrião manda para todos) */
-function cfgSala() { const m = modoSala(); const o = { mutadores: m.mut }; if (m.modo === 'cacada') { o.cacada = { chefe: m.chefe, dif: m.dif }; o.map = MO().CACADA[m.chefe].mapa; } return o; }
+function cfgSala() { const m = modoSala(); const o = { mutadores: m.mut }; if (m.modo === 'cacada') { o.cacada = { chefe: m.chefe, dif: m.dif }; o.map = MO().CACADA[m.chefe].mapa; } else { if (ARD.mundoUI) Object.assign(o, ARD.mundoUI.cfgSala()); if (ARD.unicasUI) Object.assign(o, ARD.unicasUI.cfgSala()); } /* 5.0h: Mundo vivo e comandantes em campo (a cfg vai igual para todos) */ return o; }
 
 /* ---------- partida ---------- */
-function cfgJogar() { const p = prefs(); return { eventos: !!p.eventos, mutadores: p.mutJogar.slice(), lente: !!(p.lente && temLente()) }; }
+function cfgJogar() { const p = prefs(); return Object.assign({ eventos: !!p.eventos, mutadores: p.mutJogar.slice(), lente: !!(p.lente && temLente()) }, ARD.mundoUI ? ARD.mundoUI.cfgJogar() : {} /* 5.0h: Mundo vivo */, ARD.unicasUI ? ARD.unicasUI.cfgJogar() : {} /* 5.0h junção: comandantes em campo */); }
 /* chaves de URL: ?cacada=arauto|forja &cdif= &aliados= &eventos=1 &evento=caravana|enxame|meteoros|sentinela &eventoem=<s> &mut=noite,tempestades,escassos &lente=1 */
 function cfgUrl(q) { const o = {}; const c = q.get('cacada'); if (c && MO().CACADA[c]) { o.cacada = { chefe: c, dif: DIFS.includes(q.get('cdif')) ? q.get('cdif') : 'normal' }; o.map = MO().CACADA[c].mapa; o.opp = q.get('aliados') || '0'; }
-  if (q.get('eventos') === '1') o.eventos = true; if (q.get('evento')) { o.eventosTeste = q.get('evento'); if (q.get('eventoem')) o.eventosEm = +q.get('eventoem'); } if (q.get('mut')) o.mutadores = q.get('mut').split(','); if (q.get('lente') === '1') o.lente = true; return o; }
+  if (q.get('eventos') === '1') o.eventos = true; if (q.get('evento')) { o.eventosTeste = q.get('evento'); if (q.get('eventoem')) o.eventosEm = +q.get('eventoem'); } if (q.get('mut')) o.mutadores = q.get('mut').split(','); if (q.get('lente') === '1') o.lente = true; if (ARD.mundoUI) Object.assign(o, ARD.mundoUI.cfgUrl(q)); /* 5.0h: ?mundo=1 ou ?mundo=fauna,ruinas,corsarios,surto */ return o; }
 /* os jogadores da partida solo: a Lente vai para o humano */
 function jogadores(players, cfg) { if (cfg && cfg.lente && players[0] && players[0].human && !cfg.players) players[0].lente = true; return players; }
 /* Tempestades Frequentes: com o clima automático, um clima forte que já existe (pela semente) */
@@ -102,13 +102,13 @@ function clima(cfg, nome) { if ((nome || 'auto') !== 'auto') return nome; const 
 function etiquetas(cfg) { const r = MO().resumo(cfg); const out = [];
   if (r.cacada) out.push({ k: 'cac', t: T('modos.cartao.cacada', { chefe: nomeChefe(r.cacada.chefe), dif: nomeDif(r.cacada.dif) }, 'Caçada · {chefe} · {dif}') });
   if (r.eventos) out.push({ k: 'ev', t: T('modos.ev.titulo', null, 'Eventos da Fenda') });
-  for (const m of r.mutadores) out.push({ k: 'mut', t: nomeMut(m) }); if (r.lente) out.push({ k: 'rel', t: T('modos.lente', null, 'Lente do Arauto') }); return out; }
+  for (const m of r.mutadores) out.push({ k: 'mut', t: nomeMut(m) }); if (r.lente) out.push({ k: 'rel', t: T('modos.lente', null, 'Lente do Arauto') }); { const mw = ARD.mundoUI && ARD.mundoUI.etiqueta(cfg); if (mw) out.push(mw); } /* 5.0h */ return out; }
 function cartao(cfg) { try { const box = document.querySelector('#loading .box'); if (!box) return; let el = $('load-modos'); if (!el) { el = document.createElement('div'); el.id = 'load-modos'; el.className = 'modos-tags'; const ref = $('load-tip'); if (ref) ref.before(el); else box.appendChild(el); }
   const tg = etiquetas(cfg); el.hidden = !tg.length; el.innerHTML = tg.map(x => `<span class="mtag t-${x.k}">${esc(x.t)}</span>`).join('');
   if (cfg && cfg.cacada && $('load-title')) $('load-title').textContent = nomeChefe(cfg.cacada.chefe) + ' · ' + nomeMapa(MO().CACADA[cfg.cacada.chefe].mapa); } catch (e) { console.warn('[ARD] modos (cartão):', e); } }
 /* título e linha do salvamento (o texto fica em pt-BR no salvamento, como o resto do cartão de retomar) */
 function salvo(sim) { const r = MO().resumo(sim); const pt = { arauto: 'O Arauto', forja: 'A Forja-Mãe' }; const mn = { noite: 'Noite Eterna', tempestades: 'Tempestades Frequentes', escassos: 'Recursos Escassos' };
-  return { titulo: r.cacada ? 'Caçada · ' + (pt[r.cacada.chefe] || r.cacada.chefe) : null, extra: (r.eventos ? ' · Eventos da Fenda' : '') + (r.mutadores.length ? ' · ' + r.mutadores.map(m => mn[m]).join(', ') : '') }; }
+  return { titulo: r.cacada ? 'Caçada · ' + (pt[r.cacada.chefe] || r.cacada.chefe) : null, extra: (r.eventos ? ' · Eventos da Fenda' : '') + (r.mutadores.length ? ' · ' + r.mutadores.map(m => mn[m]).join(', ') : '') + (ARD.mundoUI ? ARD.mundoUI.salvo(sim) : '') /* 5.0h */ }; }
 /* faixa do modo na partida (abaixo do topo): os mutadores e a Caçada à vista o tempo todo */
 function faixa(sim) { try { const tg = etiquetas(sim.cfg); let el = $('modos-faixa'); if (!tg.length) { if (el) el.hidden = true; return; } if (!el) { el = document.createElement('div'); el.id = 'modos-faixa'; el.className = 'modos-tags faixa'; const g = $('game'); if (g) g.appendChild(el); }
   el.hidden = false; el.innerHTML = tg.filter(x => x.k !== 'cac').map(x => `<span class="mtag t-${x.k}">${esc(x.t)}</span>`).join(''); el.hidden = !el.innerHTML; } catch (e) {} }

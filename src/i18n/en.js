@@ -385,7 +385,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nothing here is yours. Yet.",
-  "inicio.versao": "Version 5.0g.1 · build __BUILD__ · Beyond the Rift · Living world · multiplayer 2 to 4",
+  "inicio.versao": "Version 5.0h · build __BUILD__ · Beyond the Rift · Living world · multiplayer 2 to 4",
   "inicio.vitrine.escolha-sua-raca": "Choose your Race",
   "inicio.vitrine.explorar-base": "Explore the base",
   "inicio.vitrine.som-tela-inicial": "Start screen sound",
@@ -454,6 +454,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "ajustes.btn-bench": "Run benchmark (30 s)",
   "ajustes.cfg-feedback": "Send feedback",
   "notas.notas-versao": "Release notes",
+  "notas.5-0h": "<b>5.0h — Intelligence and world:</b> the AI now plays with each leader’s personality: the Forge Baron walls up and arrives heavy, Vesper Ísk raids your Harvesters and opens a second front, Sylvia Oriel expands and forms coalitions, Zayin Coral gathers the Choir before striking and Oru Voraz rushes. It dodges warned attacks, pulls back the wounded, talks to you through its portrait and, as an ally, answers your requests. In Skirmish and in the lobby, the <b>Living world</b> brings Rift fauna, Builders’ Ruins to capture with infantry, the Corsair Camp with mercenaries paid in Data and the Aether Surge; <b>Field Commanders</b> put your leader’s avatar on the battlefield, with three abilities. Each Race gained two unique buildings, and five buildings offer two modules to choose from. The Vorag Broodling and Spitter cost more and hit a little softer. Lobbies from earlier versions cannot connect to this one.",
   "notas.5-0g-1": "<b>5.0g.1 — Fixes:</b> new music for the Vehnar, with synths and a machine pulse instead of hammer beats, and for the Vorag, with a living-swarm texture instead of tribal drums. In the Hunt, the boss now sleeps until attacked or until the countdown on its bar ends (1:30 on Normal), and the arena sits farther from your base; the Herald only strikes inside the arena. Saving on the device no longer stalls when phone storage is slow, and the error footer shows the message before the location. On a phone in portrait, the tutorial tip no longer hides behind the boss bar.",
   "notas.5-0g": "<b>5.0g — Bosses:</b> The Herald and The Mother Forge have arrived, each with three phases, attacks warned on the ground ahead of time and windows when they are vulnerable, plus the new map Titan’s Wreck. In the Hunt tab you pick the boss, the difficulty and your allies, alone or with 2 to 4 friends in co-op, and earn a medal for time and losses. In skirmish, the Rift Events are optional: Rift Sentinel, Corsair Caravan, Wandering Swarm and meteor shower, with a reward for whoever lands the final blow. And the first mutators: Eternal Night, Frequent Storms and Scarce Resources.",
   "notas.5-0f-1": "<b>5.0f.1 — Cinematic sound:</b> the soundtrack is now real orchestral music: each Race has its own peace, tension and battle themes, plus boss, cinematic, superweapon, victory and defeat tracks, switching on the beat. Shots, impacts and explosions have real weight, layered from actual recordings. Unit voices when you select and give orders now sit at the same level for every Race, always clear above the ambience without startling. The files arrive after loading; without them, the previous generated sound still plays. Credits in Settings.",
@@ -466,7 +467,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "notas.5-0c": "<b>5.0c — Languages:</b> the whole game is now in <b>English</b> and <b>Spanish</b> as well as Portuguese: start screen, War Room, matches, campaign, diplomacy, multiplayer, Photo Mode, help and the system-voice lines, which now use a voice in the chosen language. The game opens in your browser's language and switches instantly, without reloading, under <b>Idioma / Language / Idioma</b>: at the top of the start screen, in Settings and in the in-match Settings window. Also in this version: the planets and sky at the top of the War Room are crisp: at rest the background was drawn at half resolution and is now drawn in full, with the planets' detail following the pixel size, and the room no longer drops resolution when you switch Races; the match announcer speaks in the gender of your Race's announcer (a male voice for the Vehnar, Quorith and Vorag; a female one for the Erevane and Tessara); with Engine 5, dynamic resolution only drops when the graphics card is the limit, which avoids the hitches from resolution changes; and on iPhone, <b>Test sound</b> shows a tip when the effects play but the voice does not.",
   "notas.5-0b-1": "<b>5.0b.1 — Lighter Engine 5, headlights and sound on iPhone:</b> with <b>Engine 5</b> on, the shaders it prepares while loading shrank by a third (the lakes first) and each frame sends much less data to the graphics card, which eases the CPU on Firefox and on phones. The glow around lights is now the same as in the classic engine, and in Photo Mode on Low quality the effects follow the exposure as in the classic engine. At night and inside the Aether Storm, the headlights of vehicles, harvesters and pirates light the ground ahead, in both engines. The War Room got a little brighter, without the glare of before. On iPhone, sound and voice unlock on the first tap, play with the silent switch on and come back after a call. Each leader speaks with a voice of their own gender in every browser. In Settings, <b>Test sound</b> plays three notes and a line and shows the state of the device's audio.",
   "notas.5-0b-motor-5": "<b>5.0b — Engine 5 complete, in testing:</b> with <b>Engine 5</b> on (Settings › Graphics engine), the whole game now runs on WebGPU, falling back to WebGL2 on its own: units and buildings with surface detail and per-part animation, ruins, construction sites, the Erevane hologram, the Unison shields and the banners; the ground with every biome, vegetation in the wind, roads and the sky; explosions, fire, smoke and shots; the plasma and ice lakes with reflections, the Belt's space and the Aether Storm; and <b>Photo Mode</b> (📷 or the J key) with blur, the 8 filters and 4K capture. The first time Photo Mode opens in a match, it takes a few seconds to get ready. With all of this, Engine 5 takes a few seconds longer to load: the next version measures it on real devices and trims it down. The classic engine is still the default and has not changed.",
-  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.0g → 2.0; from 5.0a.3 back, in Portuguese)",
+  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.0g.1 → 2.0; from 5.0a.3 back, in Portuguese)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Terms of Use",
   "inicio.rodape.foot-priv": "Privacy",
@@ -1909,4 +1910,322 @@ globalThis.ARD.I18N_DIC['en'] = {
   "erro.sem-msg": "error with no message", /* 5.0g.1 */
   "erro.fechar": "Tap to close", /* 5.0g.1 */
   "erro.pagina": "the page", /* 5.0g.1 */
+  "unit.fauna_pastador.nome": "Rift Grazer", /* 5.0h */
+  "unit.fauna_pastador.desc": "A docile herbivore of the Rift plains. It flees from anyone who gets close; when it falls, it leaves a small crate.", /* 5.0h */
+  "unit.fauna_guardiao.nome": "Vein Guardian", /* 5.0h */
+  "unit.fauna_guardiao.desc": "A crystal-armored beast that defends a rich node. It attacks anyone who comes near the node; when it falls, it drops a bonus.", /* 5.0h */
+  "unit.fauna_enxame.nome": "Night Swarm", /* 5.0h */
+  "unit.fauna_enxame.desc": "Aether moths that leave their nests near the Rift at night and attack anyone passing by.", /* 5.0h */
+  "unit.merc_saqueador.nome": "Corsair Raider", /* 5.0h */
+  "unit.merc_saqueador.desc": "A fast melee mercenary. Serves for 5 min.", /* 5.0h */
+  "unit.merc_artilheiro.nome": "Corsair Gunner", /* 5.0h */
+  "unit.merc_artilheiro.desc": "A siege mercenary: long-range splash fire. Serves for 5 min.", /* 5.0h */
+  "unit.merc_atirador.nome": "Corsair Marksman", /* 5.0h */
+  "unit.merc_atirador.desc": "A long-range mercenary; as infantry, it can also capture ruins. Serves for 5 min.", /* 5.0h */
+  "bld.ruina_observatorio.nome": "Observatory", /* 5.0h */
+  "bld.ruina_observatorio.desc": "A Builders’ ruin. Captured with infantry standing next to it, it grants wide vision around it.", /* 5.0h */
+  "bld.ruina_forja.nome": "Ancient Forge", /* 5.0h */
+  "bld.ruina_forja.desc": "A Builders’ ruin. Once captured, its owner’s vehicles cost 20% less.", /* 5.0h */
+  "bld.ruina_portal.nome": "Portal", /* 5.0h */
+  "bld.ruina_portal.desc": "A Builders’ ruin that comes in pairs. Once captured, it carries its owner’s units to the other end.", /* 5.0h */
+  "bld.ruina_torre.nome": "Aether Tower", /* 5.0h */
+  "bld.ruina_torre.desc": "A Builders’ ruin. Once captured, it gives its owner +40 energy.", /* 5.0h */
+  "bld.acampamento.nome": "Corsair Brotherhood Camp", /* 5.0h */
+  "bld.acampamento.desc": "A corsair ship anchored over the Rift. With one of your units within 600 of it, hire mercenaries paid in Data.", /* 5.0h */
+  "mundo.titulo": "Living world", /* 5.0h */
+  "mundo.sub": "neutrals on the map, for everyone", /* 5.0h */
+  "mundo.op.fauna": "Rift wildlife", /* 5.0h */
+  "mundo.op.fauna-d": "grazers that flee, Guardians of the rich nodes and swarms at night", /* 5.0h */
+  "mundo.op.ruinas": "Builders’ Ruins", /* 5.0h */
+  "mundo.op.ruinas-d": "capture with infantry: Observatory, Ancient Forge, Portal and Aether Tower", /* 5.0h */
+  "mundo.op.corsarios": "Corsair Brotherhood", /* 5.0h */
+  "mundo.op.corsarios-d": "a camp in the center with 3 mercenaries paid in Data", /* 5.0h */
+  "mundo.op.surto": "Aether surge", /* 5.0h */
+  "mundo.op.surto-d": "double income in a zone, announced in advance, and meteor showers", /* 5.0h */
+  "mundo.bonus.observatorio": "Wide vision around it", /* 5.0h */
+  "mundo.bonus.forja": "Vehicles 20% cheaper", /* 5.0h */
+  "mundo.bonus.portal": "Teleport to the other end of the pair", /* 5.0h */
+  "mundo.bonus.torre": "+40 energy", /* 5.0h */
+  "mundo.surto.ativo": "Surge ×2 · {s} s", /* 5.0h */
+  "mundo.surto.em": "Surge in {s} s", /* 5.0h */
+  "mundo.surto.ativo-l": "Aether surge: ×2 income in the zone · {s} s", /* 5.0h */
+  "mundo.surto.em-l": "Aether surge in {s} s", /* 5.0h */
+  "mundo.cap.disputa": "Contested", /* 5.0h */
+  "mundo.cap.tomando": "Taking over: {nome} {n}%", /* 5.0h */
+  "mundo.cap.capturando": "Capturing: {nome} {n}%", /* 5.0h */
+  "mundo.r.sua": "Yours", /* 5.0h */
+  "mundo.r.de": "Held by {nome}", /* 5.0h */
+  "mundo.r.livre": "Free", /* 5.0h */
+  "mundo.r.ruina": "Builders’ ruin", /* 5.0h */
+  "mundo.dica.portal": "Select units and right-click this Portal: they come out at the other end of the pair.", /* 5.0h */
+  "mundo.dica.manter": "Hold the ruin: enemy infantry standing next to it takes the bonus away from you.", /* 5.0h */
+  "mundo.dica.capturar": "Stop Infantry next to the ruin to capture it (20 s with one; faster with more). Right-click with units selected sends them all to it.", /* 5.0h */
+  "mundo.a.sub": "Mercenaries: {n}/{max}", /* 5.0h */
+  "mundo.a.longe": "Bring one of your units near the Camp (600) to hire.", /* 5.0h */
+  "mundo.a.recarga": "Next hire in {s} s", /* 5.0h */
+  "mundo.a.limite": "Limit of {max} mercenaries at a time", /* 5.0h */
+  "mundo.a.desc": "Each mercenary serves for {min} min. Paid in Data.", /* 5.0h */
+  "mundo.f.sub": "Rift wildlife", /* 5.0h */
+  "mundo.f.hostil": "hostile", /* 5.0h */
+  "mundo.f.mansa": "docile", /* 5.0h */
+  "mundo.dica.l-ruinas": "<b>Ruins</b>: stop Infantry next to one to capture it; the bonus lasts while you hold it.", /* 5.0h */
+  "mundo.dica.l-corsarios": "<b>Corsair Camp</b> (in the center): with a unit nearby, select the ship and hire mercenaries with Data.", /* 5.0h */
+  "mundo.dica.l-fauna": "<b>Wildlife</b>: Grazers flee; Guardians defend the rich nodes; at night, swarms leave their nests near the Rift.", /* 5.0h */
+  "mundo.dica.l-surto": "<b>Aether surge</b>: a circle on the ground warns 30 s ahead; harvesting there yields double.", /* 5.0h */
+  "mundo.dica.ok": "Got it", /* 5.0h */
+  "sim.mundo.cap.observatorio": "Observatory captured: wide vision around it", /* 5.0h */
+  "sim.mundo.cap.forja": "Ancient Forge captured: vehicles 20% cheaper", /* 5.0h */
+  "sim.mundo.cap.portal": "Portal captured: send units to the other end", /* 5.0h */
+  "sim.mundo.cap.torre": "Aether Tower captured: +40 energy", /* 5.0h */
+  "sim.mundo.cap-outro.observatorio": "{nome} captured the Observatory", /* 5.0h */
+  "sim.mundo.cap-outro.forja": "{nome} captured the Ancient Forge", /* 5.0h */
+  "sim.mundo.cap-outro.portal": "{nome} captured a Portal", /* 5.0h */
+  "sim.mundo.cap-outro.torre": "{nome} captured an Aether Tower", /* 5.0h */
+  "sim.mundo.tomada.observatorio": "Your Observatory is being taken", /* 5.0h */
+  "sim.mundo.tomada.forja": "Your Ancient Forge is being taken", /* 5.0h */
+  "sim.mundo.tomada.portal": "Your Portal is being taken", /* 5.0h */
+  "sim.mundo.tomada.torre": "Your Aether Tower is being taken", /* 5.0h */
+  "sim.mundo.perdeu.observatorio": "You lost the Observatory", /* 5.0h */
+  "sim.mundo.perdeu.forja": "You lost the Ancient Forge", /* 5.0h */
+  "sim.mundo.perdeu.portal": "You lost a Portal", /* 5.0h */
+  "sim.mundo.perdeu.torre": "You lost an Aether Tower", /* 5.0h */
+  "sim.mundo.enxame": "Night has fallen: night swarms left their nests near the Rift", /* 5.0h */
+  "sim.mundo.guardiao": "Vein Guardian down: its bonus is on the ground and the rich node is free", /* 5.0h */
+  "sim.mundo.portal-antes": "Capture this Portal first", /* 5.0h */
+  "sim.mundo.aguarde": "Corsair Brotherhood: wait {n} s to hire again", /* 5.0h */
+  "sim.mundo.longe": "Bring a unit near the Corsair Camp to hire", /* 5.0h */
+  "sim.mundo.limite": "Mercenary limit: {n} at a time", /* 5.0h */
+  "sim.mundo.requer": "Requires {n} Data", /* 5.0h */
+  "sim.mundo.merc.saqueador": "Corsair Raider hired for 5 min", /* 5.0h */
+  "sim.mundo.merc.artilheiro": "Corsair Gunner hired for 5 min", /* 5.0h */
+  "sim.mundo.merc.atirador": "Corsair Marksman hired for 5 min", /* 5.0h */
+  "sim.mundo.surto-aviso": "Aether surge in {n} s: income doubles inside the marked circle", /* 5.0h */
+  "sim.mundo.surto-comeca": "Aether surge! Income doubles inside the circle for {n} s", /* 5.0h */
+  "sim.mundo.nome": "World", /* 5.0h */
+  "bld.esteira.nome": "Assembly Belt", /* 5.0h */
+  "bld.esteira.desc": "Links the two nearest production buildings (up to 260): +20% production speed in them.", /* 5.0h */
+  "bld.silo.nome": "Scrap Silo", /* 5.0h */
+  "bld.silo.desc": "Wrecks within 240 turn into Ore on their own: 3 per second from each, up to 3 wrecks at once.", /* 5.0h */
+  "bld.espelho.nome": "Veil Mirror", /* 5.0h */
+  "bld.espelho.desc": "Cloaks your buildings within 200 (except the Core and itself). Enemy Towers and detectors still reveal them.", /* 5.0h */
+  "bld.farol.nome": "False Beacon", /* 5.0h */
+  "bld.farol.desc": "Decoy: nearby enemy units and towers prefer to shoot it. When it falls, it releases a pulse that stuns enemies within 120 for 2 s.", /* 5.0h */
+  "bld.arvore.nome": "Mother Tree", /* 5.0h */
+  "bld.arvore.desc": "Heals your units and buildings within 150 (+40 per Era): 3 health/s (+2 per Era). Grows and gains health every Era.", /* 5.0h */
+  "bld.viveiro.nome": "Nursery", /* 5.0h */
+  "bld.viveiro.desc": "Grows Sentinel Spores for free: one every 45 s, up to 3 alive at once.", /* 5.0h */
+  "bld.pilar.nome": "Resonance Pillar", /* 5.0h */
+  "bld.pilar.desc": "Extends the Link: your units within 200 count one more neighbor in the chord (up to one above the cap).", /* 5.0h */
+  "bld.eco.nome": "Echo Chamber", /* 5.0h */
+  "bld.eco.desc": "Resonance tower: a 200-range wave that deals area damage and slows vehicles and structures.", /* 5.0h */
+  "bld.incubadora.nome": "Incubation Chamber", /* 5.0h */
+  "bld.incubadora.desc": "Hatches Broodlings and Spitters 25% faster than the Barracks.", /* 5.0h */
+  "bld.tumor.nome": "Territory Tumor", /* 5.0h */
+  "bld.tumor.desc": "Claims territory within 240 and slows enemies inside it by 30%.", /* 5.0h */
+  "unit.exoforja.nome": "Exo-Forge", /* 5.0h */
+  "unit.exoforja.desc": "Avatar of Baron-Forge: a foundry exoskeleton with a seismic hammer.", /* 5.0h */
+  "unit.espectro.nome": "Specter", /* 5.0h */
+  "unit.espectro.desc": "Avatar of Vesper Ísk: a blade of light and a veil that hides those nearby.", /* 5.0h */
+  "unit.guardia.nome": "Warden", /* 5.0h */
+  "unit.guardia.desc": "Avatar of Sylvia Oriel: roots, healing blossoms and spores.", /* 5.0h */
+  "unit.prismavivo.nome": "Living Prism", /* 5.0h */
+  "unit.prismavivo.desc": "Avatar of Zayin Coral: a prism that sings the Choir's chord.", /* 5.0h */
+  "unit.devorador.nome": "Devourer", /* 5.0h */
+  "unit.devorador.desc": "Avatar of Oru Voraz: the beast that devours and calls the brood.", /* 5.0h */
+  "unit.espectro_eco.nome": "False Echo", /* 5.0h */
+  "unit.espectro_eco.desc": "A light copy of the Specter: it does no harm, it only deceives.", /* 5.0h */
+  "uni.mod.refinaria.prensa.nome": "Ore Press", /* 5.0h */
+  "uni.mod.refinaria.prensa.desc": "+0.5 Ore per second.", /* 5.0h */
+  "uni.mod.refinaria.cofre.nome": "Armored Vault", /* 5.0h */
+  "uni.mod.refinaria.cofre.desc": "+60% health and regenerates 4 health/s.", /* 5.0h */
+  "uni.mod.fabrica.linha.nome": "Fast Line", /* 5.0h */
+  "uni.mod.fabrica.linha.desc": "20% faster production in this Factory.", /* 5.0h */
+  "uni.mod.fabrica.chassi.nome": "Reinforced Chassis", /* 5.0h */
+  "uni.mod.fabrica.chassi.desc": "Vehicles from here come out with +15% health.", /* 5.0h */
+  "uni.mod.hangar.posq.nome": "Afterburner", /* 5.0h */
+  "uni.mod.hangar.posq.desc": "Drones from here come out 12% faster.", /* 5.0h */
+  "uni.mod.hangar.doca.nome": "Repair Dock", /* 5.0h */
+  "uni.mod.hangar.doca.desc": "Repairs your flying units within 160 (5 health/s).", /* 5.0h */
+  "uni.mod.laboratorio.antena.nome": "Data Antenna", /* 5.0h */
+  "uni.mod.laboratorio.antena.desc": "+0.3 Data per second.", /* 5.0h */
+  "uni.mod.laboratorio.contra.nome": "Counterintelligence", /* 5.0h */
+  "uni.mod.laboratorio.contra.desc": "Detects cloaked enemy units within 260, like a Tower.", /* 5.0h */
+  "uni.mod.nodulo.posto.nome": "Forward Post", /* 5.0h */
+  "uni.mod.nodulo.posto.desc": "+50% health and regenerates 3 health/s.", /* 5.0h */
+  "uni.mod.nodulo.mina.nome": "Pulse Mine", /* 5.0h */
+  "uni.mod.nodulo.mina.desc": "A 45-damage area pulse on enemies within 90, every 6 s.", /* 5.0h */
+  "cmd.hab.martelo.nome": "Seismic Hammer", /* 5.0h */
+  "cmd.hab.martelo.desc": "Ground slam: 110 area damage (r 90) and pins enemies for 1.2 s.", /* 5.0h */
+  "cmd.hab.reparo.nome": "Field Repair", /* 5.0h */
+  "cmd.hab.reparo.desc": "Repairs your units (140) and buildings (240) around.", /* 5.0h */
+  "cmd.hab.fundicao.nome": "Foundry Call", /* 5.0h */
+  "cmd.hab.fundicao.desc": "Two Welders drop in to fight for 30 s.", /* 5.0h */
+  "cmd.hab.veu.nome": "Veil", /* 5.0h */
+  "cmd.hab.veu.desc": "Cloaks the Specter and nearby units for 8 s.", /* 5.0h */
+  "cmd.hab.lamina.nome": "Light Blade", /* 5.0h */
+  "cmd.hab.lamina.desc": "A cut on one enemy: 180 damage.", /* 5.0h */
+  "cmd.hab.ecofalso.nome": "False Echo", /* 5.0h */
+  "cmd.hab.ecofalso.desc": "Three light copies run to the spot and draw fire for 15 s.", /* 5.0h */
+  "cmd.hab.raizes.nome": "Roots", /* 5.0h */
+  "cmd.hab.raizes.desc": "Roots enemies in an area for 3 s.", /* 5.0h */
+  "cmd.hab.florescer.nome": "Bloom", /* 5.0h */
+  "cmd.hab.florescer.desc": "Heals your units (160) and buildings (200) around.", /* 5.0h */
+  "cmd.hab.esporos.nome": "Spores", /* 5.0h */
+  "cmd.hab.esporos.desc": "A cloud that hurts enemies for 8 s (14 damage/s).", /* 5.0h */
+  "cmd.hab.acorde.nome": "Chord", /* 5.0h */
+  "cmd.hab.acorde.desc": "Your units around deal +20% damage for 8 s.", /* 5.0h */
+  "cmd.hab.estilhaco.nome": "Shatter", /* 5.0h */
+  "cmd.hab.estilhaco.desc": "Crystal burst: 140 area damage (r 70).", /* 5.0h */
+  "cmd.hab.silencio.nome": "Silence", /* 5.0h */
+  "cmd.hab.silencio.desc": "Enemies in an area cannot fire for 4 s.", /* 5.0h */
+  "cmd.hab.devorar.nome": "Devour", /* 5.0h */
+  "cmd.hab.devorar.desc": "Swallows a weak enemy (up to 220 health) and heals; on strong ones, 220 damage.", /* 5.0h */
+  "cmd.hab.ninhada.nome": "Brood", /* 5.0h */
+  "cmd.hab.ninhada.desc": "Four Broodlings hatch around for 25 s.", /* 5.0h */
+  "cmd.hab.rugido.nome": "Roar", /* 5.0h */
+  "cmd.hab.rugido.desc": "Enemies around 40% slower for 4 s; allies +15% damage for 6 s.", /* 5.0h */
+  "hud.btab.uni": "Unique", /* 5.0h */
+  "uni.unica": "Your Race's unique building", /* 5.0h */
+  "uni.instalando": "Installing {nome}", /* 5.0h */
+  "uni.modulo-tit": "Module: choose one", /* 5.0h */
+  "uni.para-sempre": "the choice is permanent", /* 5.0h */
+  "uni.requer-era2": "Era II", /* 5.0h */
+  "cmd.opcao": "Commanders in the field", /* 5.0h */
+  "cmd.opcao-d": "each leader brings an avatar with 3 abilities and levels; when it falls, it returns at the Core", /* 5.0h */
+  "cmd.barra": "Commander", /* 5.0h */
+  "cmd.fora": "Out of action", /* 5.0h */
+  "cmd.volta-em": "Back in {s} s", /* 5.0h */
+  "cmd.recarga": "Recharging: {s} s", /* 5.0h */
+  "cmd.mira-alvo": "{nome}: tap an enemy", /* 5.0h */
+  "cmd.mira-chao": "{nome}: tap the ground", /* 5.0h */
+  "cmd.escolha-inimigo": "Choose an enemy", /* 5.0h */
+  "sim.uni.uma": "Unique building: only one per player", /* 5.0h */
+  "sim.uni.recarga": "Ability recharging", /* 5.0h */
+  "sim.uni.longe": "Too far from the commander", /* 5.0h */
+  "sim.uni.inimigo": "Choose a visible enemy", /* 5.0h */
+  "sim.uni.caiu": "Your commander fell: back at the Core in {n} s", /* 5.0h */
+  "sim.uni.voltou": "Your commander is back in the field", /* 5.0h */
+  "sim.uni.nivel": "Commander reached level {n}", /* 5.0h */
+  "ia.ui.titulo": "Allied AI", /* 5.0h */
+  "ia.ui.atacar": "Attack my target", /* 5.0h */
+  "ia.ui.defender": "Defend my base", /* 5.0h */
+  "ia.ui.expandir": "Expand", /* 5.0h */
+  "ia.ui.atacar-d": "The allied AI attacks the selected enemy or the point at the center of the screen", /* 5.0h */
+  "ia.ui.defender-d": "The allied AI brings its army close to your Core", /* 5.0h */
+  "ia.ui.expandir-d": "The allied AI opens a Node near the center of the screen", /* 5.0h */
+  "ia.ui.enviado": "Request to the allied AI: {pedido}", /* 5.0h */
+  "ia.ui.grupo": "Requests to the allied AI", /* 5.0h */
+  "ia.ui.atacar-c": "Attack", /* 5.0h */
+  "ia.ui.defender-c": "Defend", /* 5.0h */
+  "ia.ui.expandir-c": "Expand", /* 5.0h */
+  "ia.fala.vehnar.inicio.0": "The furnace is lit. Anyone who wants to melt, step right up.", /* 5.0h */
+  "ia.fala.vehnar.inicio.1": "Steel, steam and patience. More steel than patience.", /* 5.0h */
+  "ia.fala.vehnar.chefe.0": "That thing is big. Good: more scrap for us.", /* 5.0h */
+  "ia.fala.vehnar.chefe.1": "New phase, same old hammer. Hit harder!", /* 5.0h */
+  "ia.fala.vehnar.ataque.0": "Make way: the Foundry is here for delivery.", /* 5.0h */
+  "ia.fala.vehnar.ataque.1": "My tanks are warmed up. Your base will be too.", /* 5.0h */
+  "ia.fala.vehnar.atacado.0": "You hit a fortress. The hammer sends its bill later.", /* 5.0h */
+  "ia.fala.vehnar.atacado.1": "That's it? My walls didn't even break a sweat.", /* 5.0h */
+  "ia.fala.vehnar.recua.0": "Back to the forge. I'll return with thicker plating.", /* 5.0h */
+  "ia.fala.vehnar.recua.1": "It's not a retreat, it's logistics. Resupply!", /* 5.0h */
+  "ia.fala.vehnar.pacto.0": "Pact accepted. A good contract beats a good cannon. Almost.", /* 5.0h */
+  "ia.fala.vehnar.pacto.1": "Deal. But I'm keeping the receipt.", /* 5.0h */
+  "ia.fala.vehnar.recusa.0": "I sign nothing until I see the steel in your offer.", /* 5.0h */
+  "ia.fala.vehnar.recusa.1": "Denied. Come back with a heavier offer.", /* 5.0h */
+  "ia.fala.vehnar.coalizao.0": "Someone on this map has grown too big. Shall we flatten them together?", /* 5.0h */
+  "ia.fala.vehnar.coalizao.1": "The leader is getting comfortable. I propose a joint pressing.", /* 5.0h */
+  "ia.fala.vehnar.trai.0": "Nothing personal: the contract expired and the furnace is hungry.", /* 5.0h */
+  "ia.fala.vehnar.trai.1": "Pact terminated. Read the fine print next time.", /* 5.0h */
+  "ia.fala.vehnar.super.0": "Orbital Foundry! Express delivery of hot steel.", /* 5.0h */
+  "ia.fala.vehnar.super.1": "A fortress falls from the sky. Don't stand under it.", /* 5.0h */
+  "ia.fala.vehnar.pedido.0": "Understood. The Foundry takes the order.", /* 5.0h */
+  "ia.fala.vehnar.pedido.1": "Order received. The hammer goes where you point.", /* 5.0h */
+  "ia.fala.erevane.inicio.0": "No one saw me arrive. No one will see me leave with your stuff.", /* 5.0h */
+  "ia.fala.erevane.inicio.1": "Nice base. Shame if it ran out of Plasma.", /* 5.0h */
+  "ia.fala.erevane.chefe.0": "Big thing, big pockets. Let's lighten this monster.", /* 5.0h */
+  "ia.fala.erevane.chefe.1": "It changed shape. I can do that too.", /* 5.0h */
+  "ia.fala.erevane.ataque.0": "I'm already in your base. You just didn't notice.", /* 5.0h */
+  "ia.fala.erevane.ataque.1": "Look left. Now look right. Too late.", /* 5.0h */
+  "ia.fala.erevane.atacado.0": "You hit a shadow. Congratulations, it was the only one.", /* 5.0h */
+  "ia.fala.erevane.atacado.1": "So much noise for so little.", /* 5.0h */
+  "ia.fala.erevane.recua.0": "Vanishing is a tactic too.", /* 5.0h */
+  "ia.fala.erevane.recua.1": "I'll be back when you get distracted. So, soon.", /* 5.0h */
+  "ia.fala.erevane.pacto.0": "Pact accepted. I promise to rob only the others.", /* 5.0h */
+  "ia.fala.erevane.pacto.1": "Deal. I swear on my camouflage cloak.", /* 5.0h */
+  "ia.fala.erevane.recusa.0": "Pacts are for those who have something to lose.", /* 5.0h */
+  "ia.fala.erevane.recusa.1": "No. But thanks for the distraction.", /* 5.0h */
+  "ia.fala.erevane.coalizao.0": "The leader is shining too bright. Shall we put out that light together?", /* 5.0h */
+  "ia.fala.erevane.coalizao.1": "Whoever leads becomes the target. Up for a two-person heist?", /* 5.0h */
+  "ia.fala.erevane.trai.0": "Oops. Was it a pact or a loan? I always mix them up.", /* 5.0h */
+  "ia.fala.erevane.trai.1": "You trusted an Erevane? How cute.", /* 5.0h */
+  "ia.fala.erevane.super.0": "Blackout! Now everyone plays my way: in the dark.", /* 5.0h */
+  "ia.fala.erevane.super.1": "Lights out. Pockets open.", /* 5.0h */
+  "ia.fala.erevane.pedido.0": "Request noted. No one will know where it came from.", /* 5.0h */
+  "ia.fala.erevane.pedido.1": "Consider it done. Quietly, just how I like it.", /* 5.0h */
+  "ia.fala.tessara.inicio.0": "Every seed starts small. Mine already has roots in your backyard.", /* 5.0h */
+  "ia.fala.tessara.inicio.1": "What fertile soil. I'll grow here, if you don't mind.", /* 5.0h */
+  "ia.fala.tessara.chefe.0": "An ancient creature. How lovely. What a pity.", /* 5.0h */
+  "ia.fala.tessara.chefe.1": "It adapts? So do we. It's our specialty.", /* 5.0h */
+  "ia.fala.tessara.ataque.0": "Pruning time. Don't worry, it grows back. Sometimes.", /* 5.0h */
+  "ia.fala.tessara.ataque.1": "My garden needs room. Yours, specifically.", /* 5.0h */
+  "ia.fala.tessara.atacado.0": "You stepped on my flowers. They remember faces.", /* 5.0h */
+  "ia.fala.tessara.atacado.1": "Cut one branch? Three grow back.", /* 5.0h */
+  "ia.fala.tessara.recua.0": "Pull back the roots. The season will return.", /* 5.0h */
+  "ia.fala.tessara.recua.1": "Tactical winter. Come spring, I collect.", /* 5.0h */
+  "ia.fala.tessara.pacto.0": "Wonderful! Neighboring gardens grow better together.", /* 5.0h */
+  "ia.fala.tessara.pacto.1": "Accepted. I'll water this friendship.", /* 5.0h */
+  "ia.fala.tessara.recusa.0": "Thank you, but that seedling won't take with me.", /* 5.0h */
+  "ia.fala.tessara.recusa.1": "No, thanks. I'd rather grow alone for now.", /* 5.0h */
+  "ia.fala.tessara.coalizao.0": "Someone is hogging everyone's sunlight. Shall we cast a shadow together?", /* 5.0h */
+  "ia.fala.tessara.coalizao.1": "A tree too big chokes the forest. I propose an alliance.", /* 5.0h */
+  "ia.fala.tessara.trai.0": "Sorry, dear. Harvest season has arrived.", /* 5.0h */
+  "ia.fala.tessara.trai.1": "Every plant seeks the light. Today the light is your base.", /* 5.0h */
+  "ia.fala.tessara.super.0": "Evolutionary Leap! My children are stronger, faster, hungrier.", /* 5.0h */
+  "ia.fala.tessara.super.1": "Evolution doesn't ask permission.", /* 5.0h */
+  "ia.fala.tessara.pedido.0": "Of course! Sending the seedlings right over.", /* 5.0h */
+  "ia.fala.tessara.pedido.1": "With pleasure. A united garden blooms.", /* 5.0h */
+  "ia.fala.quorith.inicio.0": "The Choir is tuning. You are off-key.", /* 5.0h */
+  "ia.fala.quorith.inicio.1": "Listen: that is the sound of many voices against one.", /* 5.0h */
+  "ia.fala.quorith.chefe.0": "A deep, enormous note. Let's answer in chords.", /* 5.0h */
+  "ia.fala.quorith.chefe.1": "The monster changed tempo. Keep up!", /* 5.0h */
+  "ia.fala.quorith.ataque.0": "Tutti! The whole Choir comes in now.", /* 5.0h */
+  "ia.fala.quorith.ataque.1": "The symphony starts at your base. Sold out.", /* 5.0h */
+  "ia.fala.quorith.atacado.0": "Off-key. And louder than necessary.", /* 5.0h */
+  "ia.fala.quorith.atacado.1": "You interrupted rehearsal. That will be answered.", /* 5.0h */
+  "ia.fala.quorith.recua.0": "One bar of rest. The chorus returns.", /* 5.0h */
+  "ia.fala.quorith.recua.1": "Gather the Choir. Every song has its silence.", /* 5.0h */
+  "ia.fala.quorith.pacto.0": "Accepted. Two voices, one harmony.", /* 5.0h */
+  "ia.fala.quorith.pacto.1": "In unison, then. For now.", /* 5.0h */
+  "ia.fala.quorith.recusa.0": "Your proposal is out of tune.", /* 5.0h */
+  "ia.fala.quorith.recusa.1": "No. The Choir sings this part alone.", /* 5.0h */
+  "ia.fala.quorith.coalizao.0": "There's a soloist far too loud. How about a duet against them?", /* 5.0h */
+  "ia.fala.quorith.coalizao.1": "Whoever dominates the music tires the audience. Shall we change conductors?", /* 5.0h */
+  "ia.fala.quorith.trai.0": "Key change. You weren't in the score.", /* 5.0h */
+  "ia.fala.quorith.trai.1": "End of the duet. Now it's a solo: mine.", /* 5.0h */
+  "ia.fala.quorith.super.0": "Unison! A thousand voices, a single blow.", /* 5.0h */
+  "ia.fala.quorith.super.1": "Hear the full chord. It won't be repeated.", /* 5.0h */
+  "ia.fala.quorith.pedido.0": "Understood. The Choir keeps time for you.", /* 5.0h */
+  "ia.fala.quorith.pedido.1": "Score received. We play at once.", /* 5.0h */
+  "ia.fala.vorag.inicio.0": "Hungry.", /* 5.0h */
+  "ia.fala.vorag.inicio.1": "Smell of a new base. Smell of dinner.", /* 5.0h */
+  "ia.fala.vorag.chefe.0": "Big. Very big. Lots of food.", /* 5.0h */
+  "ia.fala.vorag.chefe.1": "It changed? Still tastes like meat.", /* 5.0h */
+  "ia.fala.vorag.ataque.0": "Swarm, eat!", /* 5.0h */
+  "ia.fala.vorag.ataque.1": "Run, if you want. Broodlings love a chase.", /* 5.0h */
+  "ia.fala.vorag.atacado.0": "Bite Oru? Oru bites back.", /* 5.0h */
+  "ia.fala.vorag.atacado.1": "That hurt. Now Oru is hungrier.", /* 5.0h */
+  "ia.fala.vorag.recua.0": "Full belly for today. Tomorrow, more.", /* 5.0h */
+  "ia.fala.vorag.recua.1": "The brood pulls back. The brood comes back bigger.", /* 5.0h */
+  "ia.fala.vorag.pacto.0": "Pact. For now you are not food.", /* 5.0h */
+  "ia.fala.vorag.pacto.1": "Fine. Oru eats the others first.", /* 5.0h */
+  "ia.fala.vorag.recusa.0": "No. Oru does not share the table.", /* 5.0h */
+  "ia.fala.vorag.recusa.1": "A pact does not fill the belly.", /* 5.0h */
+  "ia.fala.vorag.coalizao.0": "The big one got too fat. Shall we eat it together?", /* 5.0h */
+  "ia.fala.vorag.coalizao.1": "There's a feast up ahead. Share it with me?", /* 5.0h */
+  "ia.fala.vorag.trai.0": "Sorry. Got hungry.", /* 5.0h */
+  "ia.fala.vorag.trai.1": "The pact is over. Dinner has begun.", /* 5.0h */
+  "ia.fala.vorag.super.0": "Hatching! Born, grow, eat!", /* 5.0h */
+  "ia.fala.vorag.super.1": "Eggs open. Good luck.", /* 5.0h */
+  "ia.fala.vorag.pedido.0": "Oru goes. Oru eats whatever you point at.", /* 5.0h */
+  "ia.fala.vorag.pedido.1": "Understood. The brood runs over there.", /* 5.0h */
 };

@@ -20,7 +20,7 @@
   <img src="docs/imagens/partida/batalha.webp" alt="Batalla entre el Consorcio Vehnar y los Erevane, capturada en el propio juego" width="800">
 </p>
 
-> Beta de pruebas, versión **5.0g.1**. El juego abre en el idioma del navegador y se cambia en **Idioma / Language / Idioma** (pantalla de inicio, Ajustes y ventana de la partida) o con `?lang=es`, `?lang=en` o `?lang=pt` en el enlace.
+> Beta de pruebas, versión **5.0h**. El juego abre en el idioma del navegador y se cambia en **Idioma / Language / Idioma** (pantalla de inicio, Ajustes y ventana de la partida) o con `?lang=es`, `?lang=en` o `?lang=pt` en el enlace.
 
 ## Lo más destacado
 
@@ -115,9 +115,9 @@ Fases, golpes, vida y recompensas: **[Jefes y modos](docs/chefoes-e-modos.es.md)
 
 ## Hoja de ruta
 
-La versión actual es la **5.0g.1** (jefes, Cacería, Eventos de la Grieta y mutadores; la 5.0g.1 trae música nueva para Vehnar y Vorag y preparación antes del jefe). Los próximos pasos de la v5.0 "Más allá de la Grieta":
+La versión actual es la **5.0h** (IA con la personalidad de cada líder, Mundo vivo, construcciones únicas, módulos y Comandantes en campo; la 5.0g trajo los jefes, la Cacería, los Eventos de la Grieta y los mutadores). Los próximos pasos de la v5.0 "Más allá de la Grieta":
 
-- **5.0h — Inteligencia y mundo:** IA con la personalidad de cada líder.
+- **5.0h — Inteligencia y mundo** ✔: IA con la personalidad de cada líder, Mundo vivo, construcciones únicas y Comandantes en campo.
 - **5.0i — Campaña 2:** 15 misiones y los jefes que faltan.
 - **5.0j — Mundos nuevos:** un mapa por mundo natal, con luz y clima propios.
 - **5.0k — Repeticiones, clips e informe de batalla.**

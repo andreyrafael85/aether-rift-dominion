@@ -167,7 +167,7 @@ function segue(sim, E, A, dt) {
     let vivos = 0, cx = 0, cy = 0; for (const id of A.ids) { const u = sim.byId.get(id); if (u && u.alive) { vivos++; cx += u.x; cy += u.y; } }
     if (!vivos) { anuncia(sim, 'enxame', 'fim', A.x, A.y); E.at = null; return; }
     if (sim.tick - (A.alvoK || 0) >= ENXAME.alvoCada) { A.alvoK = sim.tick; cx /= vivos; cy /= vivos; let best = null, bd = Infinity;
-      for (const e of sim.ents) { if (!e.alive || e.owner < 0 || e.owner === f || (e.kind !== 'unit' && e.kind !== 'building')) continue; if (e.kind === 'unit' && s.UNITS[e.def].flying) continue; const d = s.dist(cx, cy, e.x, e.y); if (d < bd) { bd = d; best = e; } }
+      for (const e of sim.ents) { if (!e.alive || e.owner < 0 || e.owner === f || (e.kind !== 'unit' && e.kind !== 'building') || e.owner === sim.mundo /* 5.0h: o mundo neutro não é alvo do Enxame */) continue; if (e.kind === 'unit' && s.UNITS[e.def].flying) continue; const d = s.dist(cx, cy, e.x, e.y); if (d < bd) { bd = d; best = e; } }
       if (best) for (const id of A.ids) { const u = sim.byId.get(id); if (u && u.alive && (u.state === 'idle' || u.state === 'attackmove' || u.state === 'move')) { u.state = 'attackmove'; u.tx = best.x; u.ty = best.y; u.gx = best.x; u.gy = best.y; u.stuck = 0; u.stk = 0; } } }
     return; }
   if (A.tipo === 'meteoros') {
@@ -185,7 +185,7 @@ function cai(sim, m) { /* o meteoro cai: dano em área para todos e um cristal n
   for (const [e, d] of hit) if (e.alive) s.applyDamage(sim, sim.fenda, null, e, METEOROS.dano * (d <= 0 ? 1 : 1 - d / R * 0.6), null);
   emit(sim, { t: 'impact', x: m.x, y: m.y, weapon: 'catedral', splash: R, hit: hit.length > 0, owner: sim.fenda, meteoro: true });
   let livre = !sim.nav.blocked[s.navIdx(m.x, m.y)] && s.mapCell(sim, m.x, m.y) === 1; if (livre) for (const e of sim.ents) if (e.alive && (e.kind === 'node' || e.kind === 'building' || e.kind === 'rock') && s.dist(m.x, m.y, e.x, e.y) < e.r + 40) { livre = false; break; }
-  if (livre) { const amt = Math.round(METEOROS.cristal * (sim.modos.mut.escassos ? MUTADORES.escassos.nos : 1)); const n = s.addNode(sim, sim.rand() < 0.5 ? 'dados' : 'plasma', m.x, m.y, amt); n.esc = 1; n.meteoro = 1; }
+  if (livre) { const amt = Math.round(METEOROS.cristal * (sim.modos && sim.modos.mut.escassos /* 5.0h: a chuva também vem do mundo neutro, sem sim.modos */ ? MUTADORES.escassos.nos : 1)); const n = s.addNode(sim, sim.rand() < 0.5 ? 'dados' : 'plasma', m.x, m.y, amt); n.esc = 1; n.meteoro = 1; }
 }
 function premiaCarga(sim, u) { /* a carga vai para quem destruiu o carro (o último a acertar) */
   const k = u.lastHitBy; const p = k != null && k >= 0 ? sim.players[k] : null; const c = u.carga; u.carga = null; if (!p || p.fenda || !c) return;
@@ -216,5 +216,6 @@ function restore(sim, snap) { const s = S(); if (!snap || !snap.modos) return; s
 function resumo(cfgOuSim) { const cfg = cfgOuSim && cfgOuSim.cfg ? cfgOuSim.cfg : cfgOuSim; const c = cfgDe(cfg); return { cacada: c.cacada || null, eventos: !!c.eventos, mutadores: c.mutadores || [], lente: !!(cfg && cfg.players && cfg.players.some(p => p && p.lente)) }; }
 
 ARD.modos = { MUTADORES, MUT_IDS, CACADA, CAC_DIF, CAC_LIMITE, MEDALHAS, EV, CARAVANA, ENXAME, METEOROS, SENTINELA_PREMIO, LENTE, HORA_NOITE,
-  cfgDe, ativo, criar, passo, fim, medalha, visao, lento, destroco, tormenta, noite, hash, snapshot, restore, resumo };
+  cfgDe, ativo, criar, passo, fim, medalha, visao, lento, destroco, tormenta, noite, hash, snapshot, restore, resumo,
+  chega, segue /* 5.0h: o mundo neutro (src/mundo.js) liga a chuva de meteoros ao Surto de éter com estas mesmas funções */ };
 })(globalThis.ARD = globalThis.ARD || {});

@@ -3,16 +3,18 @@
 // avisos com o mínimo de 1,5 s (2 s na Fácil); superarma tira no máximo 20%; a Fenda fica fora do placar; o Destroço do Titã fica conectado.
 // Uso: node tools/chefes-teste.cjs [--json] [--rapido]
 const path = require('path'); const root = path.resolve(__dirname, '..');
-globalThis.ARD = {}; require(root + '/src/modos.js'); /* 5.0g junção: a regra da Caçada (g-modos) também roda aqui */ require(root + '/src/chefes-sim.js'); require(root + '/src/sim.js'); require(root + '/src/ai.js'); require(root + '/tools/det-run.js');
+globalThis.ARD = {}; require(root + '/src/modos.js'); /* 5.0g junção: a regra da Caçada (g-modos) também roda aqui */ require(root + '/src/chefes-sim.js'); require(root + '/src/mundo.js'); require(root + '/src/unicas-sim.js'); /* 5.0h junção: carregado como no jogo (a IA 3.0 usa as únicas e os módulos) */ /* 5.0h */ require(root + '/src/sim.js'); require(root + '/src/ai.js'); require(root + '/tools/det-run.js');
 const S = ARD.sim, AI = ARD.ai, CH = ARD.chefesSim; const JSONOUT = process.argv.includes('--json'), RAPIDO = process.argv.includes('--rapido'); const SO = (process.argv.find(a => a.startsWith('--so=')) || '').slice(5); /* --so=forja/capturar: só essa luta (desenvolvimento) */
 const R = []; const log = (...a) => { if (!JSONOUT) console.log(...a); };
 const ok = (nome, cond, info) => { R.push({ nome, ok: !!cond, info: info || '' }); log((cond ? 'OK   ' : 'FAIL ') + nome + (info ? ' · ' + info : '')); };
 const ref = require(root + '/tools/chefes-ref.json'); const medidas = {};
 
 // ---------- 1) partidas sem chefão: o hash de antes ----------
-if (!SO) { const h = ARD_DET(7, 2000).slice(0, ref.casos['7/2000'].n); let d = -1; for (let i = 0; i < h.length; i++) if (h[i] !== ref.casos['7/2000'].todos[i]) { d = i; break; }
-  ok('sem chefão: hash igual ao da base 5.0f (7/2000, ' + h.length + ' amostras)', d < 0 && h.length === ref.casos['7/2000'].n, d < 0 ? h[h.length - 1] : 'diverge na amostra ' + d);
-  if (!RAPIDO) { const c = ref.casos['11/4000']; const h2 = ARD_DET(11, 4000); ok('sem chefão: hash igual ao da base 5.0f (11/4000)', h2[c.n - 1] === c.ultimo && h2[Math.floor(c.n / 3)] === c.meio, h2[c.n - 1]); } }
+if (!SO) { const h = ARD_DET(7, 2000, { iaPerfil: 'nulo', soBase: true } /* 5.0h: com a IA de antes (perfil nulo); a referência é a da 5.0f refeita com o Vorag novo (tools/ia-ref.cjs; a 5.0f fica em casos5f) */).slice(0, ref.casos['7/2000'].n); let d = -1; for (let i = 0; i < h.length; i++) if (h[i] !== ref.casos['7/2000'].todos[i]) { d = i; break; }
+  ok('sem chefão: hash igual à referência da IA de antes (7/2000, ' + h.length + ' amostras)', d < 0 && h.length === ref.casos['7/2000'].n, d < 0 ? h[h.length - 1] : 'diverge na amostra ' + d);
+  if (!RAPIDO) { const c = ref.casos['11/4000']; const h2 = ARD_DET(11, 4000, { iaPerfil: 'nulo', soBase: true }); ok('sem chefão: hash igual à referência da IA de antes (11/4000)', h2[c.n - 1] === c.ultimo && h2[Math.floor(c.n / 3)] === c.meio, h2[c.n - 1]); }
+  if (ref.ia3) { const c = ref.ia3['7/2000']; const h3 = ARD_DET(7, 2000, { soBase: true }); let d3 = -1; for (let i = 0; i < c.todos.length; i++) if (h3[i] !== c.todos[i]) { d3 = i; break; } /* 5.0h: a IA 3.0 (perfil do líder) muda o hash de propósito: a referência nova é a da 5.0h */
+    ok('IA 3.0: hash igual ao da referência 5.0h (7/2000, ' + c.todos.length + ' amostras)', d3 < 0 && h3.length === c.todos.length, d3 < 0 ? h3[h3.length - 1] : 'diverge na amostra ' + d3); } }
 
 // ---------- 2) a luta: exército de teste com roteiro sem estado (tudo derivado da simulação: serve para salvar e voltar) ----------
 const ARMY = { veiculo: 26, infantaria: 18, drone: 8 };

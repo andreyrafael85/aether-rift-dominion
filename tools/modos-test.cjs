@@ -3,17 +3,20 @@
 // curta com semente fixa termina com vitória (medalha e pacto fixo do time), e salvar e voltar no meio de cada modo segue idêntico.
 // Uso: node tools/modos-test.cjs [--json]   (cada linha com OK/FAIL conta; a última é o JSON com --json)
 const path = require('path'); const root = path.resolve(__dirname, '..');
-globalThis.ARD = {}; require(root + '/src/modos.js'); require(root + '/src/chefes-sim.js'); /* 5.0g junção: os chefões de verdade */ require(root + '/src/sim.js'); require(root + '/src/ai.js'); const S = ARD.sim, AI = ARD.ai, MO = ARD.modos;
+globalThis.ARD = {}; require(root + '/src/modos.js'); require(root + '/src/chefes-sim.js'); /* 5.0g junção: os chefões de verdade */ require(root + '/src/mundo.js'); require(root + '/src/unicas-sim.js'); /* 5.0h junção: carregado como no jogo (a IA 3.0 usa as únicas e os módulos) */ /* 5.0h */ require(root + '/src/sim.js'); require(root + '/src/ai.js'); const S = ARD.sim, AI = ARD.ai, MO = ARD.modos;
 const JSONOUT = process.argv.includes('--json'); const res = []; const t00 = Date.now();
 const ok = (nome, cond, info) => { res.push({ nome, ok: !!cond, info: info || '' }); if (!JSONOUT) console.log((cond ? 'OK   ' : 'FAIL ') + nome + (info ? ' · ' + info : '')); };
 const P3 = [{ name: 'A', faction: 'vehnar', difficulty: 'normal', human: true }, { name: 'B', faction: 'vorag', difficulty: 'dificil' }, { name: 'C', faction: 'tessara', difficulty: 'normal' }];
 function joga(cfg, n, cada) { const sim = S.createSim(Object.assign({ minutes: 25 }, cfg)); const ais = sim.players.filter(p => !p.fenda /* 5.0g junção */).map(p => AI.create(p.id, p.difficulty)); const evs = [];
   for (let t = 0; t < n; t++) { if (sim.tick % 10 === 0) for (const a of ais) for (const c of AI.think(sim, a)) S.enqueue(sim, c); const ev = S.step(sim); for (const e of ev) if (e.t === 'evento' || e.t === 'chefe' || e.t === 'aviso' || e.t === 'end' || (e.t === 'alert' && e.p === 0)) evs.push(e); if (cada) cada(sim, ev); if (sim.result) break; }
   return { sim, ais, evs }; }
-// 1) sem modo: o hash é o da 5.0f (medido em 3e6ffc2 com estas sementes) e nada de sim.modos
-{ const a = joga({ seed: 31, players: P3, mapV: 1 }, 4000), b = joga({ seed: 32, players: P3, map: 'cinturao', mapV: 1 }, 3000);
-  ok('sem modo: Planície da Fenda igual à 5.0f', S.hash(a.sim) === 1026467344 && !a.sim.modos, 'hash ' + S.hash(a.sim));
-  ok('sem modo: Cinturão igual à 5.0f', S.hash(b.sim) === 2701652613 && !b.sim.modos, 'hash ' + S.hash(b.sim));
+// 1) sem modo: o hash é o da 5.0f (medido em 3e6ffc2 com estas sementes) e nada de sim.modos; 5.0h: com a IA de antes (perfil nulo), e a IA 3.0 com a referência da 5.0h
+const IA3_PLANICIE = 1690377393; /* 5.0h: medido com a IA 3.0 congelada (tools/ia-ref.cjs) */
+const NULO_PLANICIE = 3444299792, NULO_CINTURAO = 2439875073; /* a IA de antes: 5.0f (3e6ffc2); 5.0h junção: refeitos pelo tools/ia-ref.cjs com o Vorag novo (Cria 6 s, Cuspidor 55/35/6 s) */
+{ const a = joga({ seed: 31, players: P3, mapV: 1, iaPerfil: 'nulo' /* 5.0h: com a IA de antes, o hash da 5.0f */ }, 4000), b = joga({ seed: 32, players: P3, map: 'cinturao', mapV: 1, iaPerfil: 'nulo' }, 3000);
+  ok('sem modo: Planície da Fenda igual à referência (IA de antes)', S.hash(a.sim) === NULO_PLANICIE && !a.sim.modos, 'hash ' + S.hash(a.sim));
+  ok('sem modo: Cinturão igual à referência (IA de antes)', S.hash(b.sim) === NULO_CINTURAO && !b.sim.modos, 'hash ' + S.hash(b.sim));
+  { const c = joga({ seed: 31, players: P3, mapV: 1 }, 4000); ok('sem modo, IA 3.0: Planície da Fenda igual à referência 5.0h', S.hash(c.sim) === IA3_PLANICIE && !c.sim.modos, 'hash ' + S.hash(c.sim)); } /* 5.0h: a IA 3.0 muda o hash de propósito */
   ok('sem modo: fotografia sem campo novo', !('modos' in JSON.parse(JSON.stringify(S.snapshot(a.sim)))) && a.sim.fenda < 0 && !a.sim.chefes); }
 // 2) mutadores
 { const base = S.createSim({ seed: 5, players: P3, minutes: 25, mapV: 1 }); const u0 = base.ents.find(e => e.kind === 'unit' && e.def === 'infantaria');
@@ -57,7 +60,7 @@ function desvia(sim) {
 // 5) Caçada curta com semente fixa: 2 IAs aliadas e um destacamento que vai direto ao chefão (e às partes dele) termina com vitória
 for (const chefe of ['arauto', 'forja']) {
   const players = [{ name: 'A', faction: 'vehnar', difficulty: 'normal', human: true }, { name: 'B', faction: 'tessara', difficulty: 'normal' }, { name: 'C', faction: 'quorith', difficulty: 'normal' }];
-  const cfg = { seed: 77, players, minutes: 25, mapV: 1, map: MO.CACADA[chefe].mapa, cacada: { chefe, dif: 'facil' } };
+  const cfg = { seed: 77, players, minutes: 25, mapV: 1, map: MO.CACADA[chefe].mapa, cacada: { chefe, dif: 'facil' } /* 5.0h junção: de volta à IA 3.0 (com o destacamento de 30 e o chefão que dorme, da 5.0g.1, as IAs aliadas 3.0 vencem: Forja aos 198 s, Arauto aos 144 s) */ };
   const r = joga(cfg, 16000, (sim) => {
     desvia(sim); /* 5.0g junção: com os chefões de verdade o destacamento lê a telegrafia (sem desviar, o pisão da Forja-Mãe derruba tudo) */
     if (sim.tick === 1) for (let k = 0; k < 30; k++) { /* 5.0g.1: 30 (antes 18): a arena ficou a 1026 das bases (antes 680) e o chefão dorme até ser atacado; com 18 o destacamento chega aos pedaços e a Forja vence */ const n = S.nucleoOf(sim, k % 3); if (n) S.spawnUnit(sim, k % 3, k % 3 === 0 ? 'veiculo' : k % 2 ? 'drone' : 'infantaria', n.x + (k % 5) * 18 - 36, n.y + 70); }

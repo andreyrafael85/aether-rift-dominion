@@ -3,7 +3,7 @@
 // próprio (fora do sim.rand, como um jogador de verdade) e os comandos só entram pelo pacote do tick. Compara o hash de todos a cada 10 ticks.
 // Uso: node tools/coop-test.cjs [jogadores=2,4] [ticks=3000] [--json]
 const path = require('path'); const root = path.resolve(__dirname, '..');
-globalThis.ARD = {}; require(root + '/src/modos.js'); require(root + '/src/chefes-sim.js'); /* 5.0g junção */ require(root + '/src/sim.js'); require(root + '/src/ai.js'); require(root + '/src/net.js');
+globalThis.ARD = {}; require(root + '/src/modos.js'); require(root + '/src/chefes-sim.js'); /* 5.0g junção */ require(root + '/src/mundo.js'); require(root + '/src/unicas-sim.js'); /* 5.0h junção: carregado como no jogo (a IA 3.0 usa as únicas e os módulos) */ /* 5.0h */ require(root + '/src/sim.js'); require(root + '/src/ai.js'); require(root + '/src/net.js');
 const S = ARD.sim, AI = ARD.ai; const JSONOUT = process.argv.includes('--json'); const args = process.argv.slice(2).filter(a => !a.startsWith('--'));
 const tamanhos = String(args[0] || '2,4').split(',').map(Number); const TICKS = +(args[1] || 3000);
 /* ---------- PeerJS de mentira: um corretor em memória, mensagens copiadas por JSON e entregues no próximo giro do laço ---------- */

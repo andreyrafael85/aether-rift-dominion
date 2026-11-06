@@ -385,7 +385,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aqui é seu. Ainda.",
-  "inicio.versao": "Versão 5.0g.1 · build __BUILD__ · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
+  "inicio.versao": "Versão 5.0h · build __BUILD__ · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Escolha sua Raça",
   "inicio.vitrine.explorar-base": "Explorar a base",
   "inicio.vitrine.som-tela-inicial": "Som da tela inicial",
@@ -454,6 +454,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.btn-bench": "Testar desempenho (30 s)",
   "ajustes.cfg-feedback": "Enviar feedback",
   "notas.notas-versao": "Notas da versão",
+  "notas.5-0h": "<b>5.0h — Inteligência e mundo:</b> a IA ganhou a personalidade de cada líder: o Barão-Forja se fecha e chega pesado, Vesper Ísk ataca seus Coletores e abre uma segunda frente, Sylvia Oriel cresce e faz coalizões, Zayin Coral reúne o Coro antes de atacar e Oru Voraz vem com pressa. Ela desvia dos golpes anunciados, recua os feridos, fala com você pelo retrato e, como aliada, atende aos seus pedidos. Na Escaramuça e na sala, o <b>Mundo vivo</b> traz fauna da Fenda, Ruínas dos Construtores para capturar com infantaria, o Acampamento Corsário com mercenários pagos em Dados e o Surto de éter; os <b>Comandantes em campo</b> põem o avatar do seu líder na batalha, com três habilidades. Cada Raça ganhou duas construções únicas, e cinco construções oferecem dois módulos para escolher. A Cria e o Cuspidor da Vorag ficaram mais caros e um pouco mais fracos. Salas de versões anteriores não se conectam a esta.",
   "notas.5-0g-1": "<b>5.0g.1 — Ajustes:</b> trilha nova para a Vehnar, com sintetizador e pulso de máquina no lugar das batidas de martelo, e para a Vorag, com textura de enxame vivo no lugar do batuque. Na Caçada, o chefão agora dorme até ser atacado ou até a contagem na barra acabar (1:30 no Normal), e a arena ficou mais longe da base; o Arauto só golpeia dentro da arena. O salvamento no aparelho não trava mais quando o armazenamento do celular demora, e o rodapé de erro mostra a mensagem antes do lugar. No celular em pé, a dica do tutorial não fica mais atrás da barra do chefão.",
   "notas.5-0g": "<b>5.0g — Chefões:</b> chegaram O Arauto e A Forja-Mãe, cada um com três fases, ataques avisados no chão com antecedência e janelas em que fica vulnerável, e o mapa novo Destroço do Titã. Na aba Caçada você escolhe o chefão, a dificuldade e os aliados, sozinho ou com 2 a 4 amigos no cooperativo, e ganha medalha por tempo e perdas. Na escaramuça, os Eventos da Fenda são opcionais: Sentinela da Fenda, Caravana Corsária, Enxame Errante e chuva de meteoros, com recompensa para quem dá o golpe final. E os primeiros mutadores: Noite Eterna, Tempestades Frequentes e Recursos Escassos.",
   "notas.5-0f-1": "<b>5.0f.1 — Som de cinema:</b> a trilha agora é orquestral e de verdade: cada Raça tem os seus temas de paz, tensão e batalha, mais as faixas de chefão, de cinema, de superarma, de vitória e de derrota, com trocas no compasso. Disparos, impactos e explosões ganharam peso, montados em camadas a partir de gravações reais. A voz das unidades ao selecionar e dar ordens ficou no mesmo plano em todas as Raças, sempre clara por cima do ambiente e sem sobressaltar. Os arquivos chegam depois da carga; sem eles, o som gerado de antes continua. Créditos em Ajustes.",
@@ -466,7 +467,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "notas.5-0c": "<b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 mais leve, faróis e som no iPhone:</b> com o <b>Motor 5</b> ligado, os shaders que ele prepara na carga encolheram um terço (os lagos primeiro) e cada quadro manda muito menos dados para a placa de vídeo, o que alivia a CPU no Firefox e no celular. O brilho em volta das luzes agora é o mesmo do motor clássico, e no Modo Foto da qualidade Baixa os efeitos seguem a exposição como no clássico. À noite e dentro da Tempestade de Éter, os faróis dos veículos, coletores e piratas iluminam o chão à frente, nos dois motores. A Sala de Comando ficou um pouco mais clara, sem o clarão de antes. No iPhone, o som e a voz destravam no primeiro toque, tocam com a chave de silêncio ligada e voltam depois de uma ligação. Cada líder fala com uma voz do seu gênero em todo navegador. Em Ajustes, <b>Testar som</b> toca três notas e uma frase e mostra o estado do áudio do aparelho.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, em teste:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o jogo inteiro agora roda em WebGPU, com volta sozinha para WebGL2: unidades e construções com o detalhe de superfície e a animação de cada peça, ruínas, obras, o holograma da Erevane, os escudos do Uníssono e as bandeiras; o chão com todos os biomas, a vegetação ao vento, as estradas e o céu; explosões, fogo, fumaça e tiros; os lagos de plasma e de gelo com reflexo, o espaço do Cinturão e a Tempestade de Éter; e o <b>Modo Foto</b> (📷 ou tecla J) com desfoque, os 8 filtros e captura em 4K. Na primeira vez que o Modo Foto abre numa partida, ele leva alguns segundos para se preparar. Com tudo isso, a carga do Motor 5 ficou alguns segundos mais longa: a próxima versão mede nos aparelhos e enxuga. O motor clássico continua o padrão e não mudou.",
-  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0g → 2.0)",
+  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0g.1 → 2.0)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Termos de Uso",
   "inicio.rodape.foot-priv": "Privacidade",
@@ -1909,4 +1910,322 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "erro.sem-msg": "erro sem mensagem", /* 5.0g.1 */
   "erro.fechar": "Toque para fechar", /* 5.0g.1 */
   "erro.pagina": "a página", /* 5.0g.1 */
+  "unit.fauna_pastador.nome": "Pastador da Fenda", /* 5.0h */
+  "unit.fauna_pastador.desc": "Herbívoro manso das planícies da Fenda. Foge de quem chega perto; caído, deixa uma caixa pequena.", /* 5.0h */
+  "unit.fauna_guardiao.nome": "Guardião do Veio", /* 5.0h */
+  "unit.fauna_guardiao.desc": "Fera blindada de cristal que defende um nó rico. Ataca quem chega perto do nó; caída, solta um bônus.", /* 5.0h */
+  "unit.fauna_enxame.nome": "Enxame Noturno", /* 5.0h */
+  "unit.fauna_enxame.desc": "Mariposas de éter que saem dos ninhos perto da Fenda à noite e atacam quem passa.", /* 5.0h */
+  "unit.merc_saqueador.nome": "Saqueador Corsário", /* 5.0h */
+  "unit.merc_saqueador.desc": "Mercenário rápido de ataque corpo a corpo. Serve por 5 min.", /* 5.0h */
+  "unit.merc_artilheiro.nome": "Artilheiro Corsário", /* 5.0h */
+  "unit.merc_artilheiro.desc": "Mercenário de cerco: tiro longo com área. Serve por 5 min.", /* 5.0h */
+  "unit.merc_atirador.nome": "Atirador Corsário", /* 5.0h */
+  "unit.merc_atirador.desc": "Mercenário de tiro longo; como infantaria, também captura ruínas. Serve por 5 min.", /* 5.0h */
+  "bld.ruina_observatorio.nome": "Observatório", /* 5.0h */
+  "bld.ruina_observatorio.desc": "Ruína dos Construtores. Capturada com infantaria parada ao lado, dá visão larga em volta dela.", /* 5.0h */
+  "bld.ruina_forja.nome": "Forja Antiga", /* 5.0h */
+  "bld.ruina_forja.desc": "Ruína dos Construtores. Capturada, deixa os veículos do dono 20% mais baratos.", /* 5.0h */
+  "bld.ruina_portal.nome": "Portal", /* 5.0h */
+  "bld.ruina_portal.desc": "Ruína dos Construtores, em par. Capturada, leva as unidades do dono até a outra ponta.", /* 5.0h */
+  "bld.ruina_torre.nome": "Torre de Éter", /* 5.0h */
+  "bld.ruina_torre.desc": "Ruína dos Construtores. Capturada, dá +40 de energia ao dono.", /* 5.0h */
+  "bld.acampamento.nome": "Acampamento da Irmandade Corsária", /* 5.0h */
+  "bld.acampamento.desc": "Nave corsária ancorada sobre a Fenda. Com uma unidade sua a até 600 dela, contrate mercenários pagos em Dados.", /* 5.0h */
+  "mundo.titulo": "Mundo vivo", /* 5.0h */
+  "mundo.sub": "neutros no mapa, para todos", /* 5.0h */
+  "mundo.op.fauna": "Fauna da Fenda", /* 5.0h */
+  "mundo.op.fauna-d": "herbívoros que fogem, Guardiões dos nós ricos e enxames à noite", /* 5.0h */
+  "mundo.op.ruinas": "Ruínas dos Construtores", /* 5.0h */
+  "mundo.op.ruinas-d": "capture com infantaria: Observatório, Forja Antiga, Portal e Torre de Éter", /* 5.0h */
+  "mundo.op.corsarios": "Irmandade Corsária", /* 5.0h */
+  "mundo.op.corsarios-d": "Acampamento no centro com 3 mercenários pagos em Dados", /* 5.0h */
+  "mundo.op.surto": "Surto de éter", /* 5.0h */
+  "mundo.op.surto-d": "renda dobrada numa zona, anunciada antes, e chuva de meteoros", /* 5.0h */
+  "mundo.bonus.observatorio": "Visão larga em volta dele", /* 5.0h */
+  "mundo.bonus.forja": "Veículos 20% mais baratos", /* 5.0h */
+  "mundo.bonus.portal": "Teleporte até a outra ponta do par", /* 5.0h */
+  "mundo.bonus.torre": "+40 de energia", /* 5.0h */
+  "mundo.surto.ativo": "Surto ×2 · {s} s", /* 5.0h */
+  "mundo.surto.em": "Surto em {s} s", /* 5.0h */
+  "mundo.surto.ativo-l": "Surto de éter: renda ×2 na zona · {s} s", /* 5.0h */
+  "mundo.surto.em-l": "Surto de éter em {s} s", /* 5.0h */
+  "mundo.cap.disputa": "Em disputa", /* 5.0h */
+  "mundo.cap.tomando": "Tomando: {nome} {n}%", /* 5.0h */
+  "mundo.cap.capturando": "Capturando: {nome} {n}%", /* 5.0h */
+  "mundo.r.sua": "Sua", /* 5.0h */
+  "mundo.r.de": "De {nome}", /* 5.0h */
+  "mundo.r.livre": "Livre", /* 5.0h */
+  "mundo.r.ruina": "Ruína dos Construtores", /* 5.0h */
+  "mundo.dica.portal": "Selecione unidades e clique com o botão direito neste Portal: elas saem na outra ponta do par.", /* 5.0h */
+  "mundo.dica.manter": "Mantenha a ruína: infantaria inimiga parada ao lado dela tira o bônus de você.", /* 5.0h */
+  "mundo.dica.capturar": "Pare Infantaria ao lado da ruína para capturá-la (20 s com uma; mais rápido com mais). Botão direito com unidades selecionadas leva todas até ela.", /* 5.0h */
+  "mundo.a.sub": "Mercenários: {n}/{max}", /* 5.0h */
+  "mundo.a.longe": "Leve uma unidade sua até perto do Acampamento (600) para contratar.", /* 5.0h */
+  "mundo.a.recarga": "Próxima contratação em {s} s", /* 5.0h */
+  "mundo.a.limite": "Limite de {max} mercenários ao mesmo tempo", /* 5.0h */
+  "mundo.a.desc": "Cada mercenário serve por {min} min. Pagos em Dados.", /* 5.0h */
+  "mundo.f.sub": "Fauna da Fenda", /* 5.0h */
+  "mundo.f.hostil": "hostil", /* 5.0h */
+  "mundo.f.mansa": "mansa", /* 5.0h */
+  "mundo.dica.l-ruinas": "<b>Ruínas</b>: pare Infantaria ao lado de uma para capturá-la; o bônus vale enquanto você a mantiver.", /* 5.0h */
+  "mundo.dica.l-corsarios": "<b>Acampamento Corsário</b> (no centro): com uma unidade perto, selecione a nave e contrate mercenários com Dados.", /* 5.0h */
+  "mundo.dica.l-fauna": "<b>Fauna</b>: os Pastadores fogem; os Guardiões defendem os nós ricos; à noite, enxames saem dos ninhos perto da Fenda.", /* 5.0h */
+  "mundo.dica.l-surto": "<b>Surto de éter</b>: um círculo no chão avisa 30 s antes; ali a coleta rende o dobro.", /* 5.0h */
+  "mundo.dica.ok": "Entendi", /* 5.0h */
+  "sim.mundo.cap.observatorio": "Observatório capturado: visão larga em volta dele", /* 5.0h */
+  "sim.mundo.cap.forja": "Forja Antiga capturada: veículos 20% mais baratos", /* 5.0h */
+  "sim.mundo.cap.portal": "Portal capturado: mande unidades para a outra ponta", /* 5.0h */
+  "sim.mundo.cap.torre": "Torre de Éter capturada: +40 de energia", /* 5.0h */
+  "sim.mundo.cap-outro.observatorio": "{nome} capturou o Observatório", /* 5.0h */
+  "sim.mundo.cap-outro.forja": "{nome} capturou a Forja Antiga", /* 5.0h */
+  "sim.mundo.cap-outro.portal": "{nome} capturou um Portal", /* 5.0h */
+  "sim.mundo.cap-outro.torre": "{nome} capturou uma Torre de Éter", /* 5.0h */
+  "sim.mundo.tomada.observatorio": "Seu Observatório está sendo tomado", /* 5.0h */
+  "sim.mundo.tomada.forja": "Sua Forja Antiga está sendo tomada", /* 5.0h */
+  "sim.mundo.tomada.portal": "Seu Portal está sendo tomado", /* 5.0h */
+  "sim.mundo.tomada.torre": "Sua Torre de Éter está sendo tomada", /* 5.0h */
+  "sim.mundo.perdeu.observatorio": "Você perdeu o Observatório", /* 5.0h */
+  "sim.mundo.perdeu.forja": "Você perdeu a Forja Antiga", /* 5.0h */
+  "sim.mundo.perdeu.portal": "Você perdeu um Portal", /* 5.0h */
+  "sim.mundo.perdeu.torre": "Você perdeu uma Torre de Éter", /* 5.0h */
+  "sim.mundo.enxame": "Anoiteceu: enxames noturnos saíram dos ninhos perto da Fenda", /* 5.0h */
+  "sim.mundo.guardiao": "Guardião do Veio derrubado: o bônus dele ficou no chão e o nó rico está livre", /* 5.0h */
+  "sim.mundo.portal-antes": "Capture este Portal primeiro", /* 5.0h */
+  "sim.mundo.aguarde": "Irmandade Corsária: aguarde {n} s para contratar de novo", /* 5.0h */
+  "sim.mundo.longe": "Leve uma unidade até perto do Acampamento Corsário para contratar", /* 5.0h */
+  "sim.mundo.limite": "Limite de mercenários: {n} ao mesmo tempo", /* 5.0h */
+  "sim.mundo.requer": "Requer {n} Dados", /* 5.0h */
+  "sim.mundo.merc.saqueador": "Saqueador Corsário contratado por 5 min", /* 5.0h */
+  "sim.mundo.merc.artilheiro": "Artilheiro Corsário contratado por 5 min", /* 5.0h */
+  "sim.mundo.merc.atirador": "Atirador Corsário contratado por 5 min", /* 5.0h */
+  "sim.mundo.surto-aviso": "Surto de éter em {n} s: a renda dobra dentro do círculo marcado", /* 5.0h */
+  "sim.mundo.surto-comeca": "Surto de éter! A renda dobra dentro do círculo por {n} s", /* 5.0h */
+  "sim.mundo.nome": "Mundo", /* 5.0h */
+  "bld.esteira.nome": "Esteira de Montagem", /* 5.0h */
+  "bld.esteira.desc": "Liga as duas construções de produção mais próximas (até 260): +20% de velocidade de produção nelas.", /* 5.0h */
+  "bld.silo.nome": "Silo de Sucata", /* 5.0h */
+  "bld.silo.desc": "Carcaças a até 240 viram Minério sozinhas: 3 por segundo de cada uma, até 3 carcaças ao mesmo tempo.", /* 5.0h */
+  "bld.espelho.nome": "Espelho do Véu", /* 5.0h */
+  "bld.espelho.desc": "Camufla as suas construções a até 200 (menos o Núcleo e ele mesmo). Torres e detectores inimigos ainda as revelam.", /* 5.0h */
+  "bld.farol.nome": "Farol Falso", /* 5.0h */
+  "bld.farol.desc": "Isca: unidades e torres inimigas por perto preferem atirar nele. Ao cair, solta um pulso que atordoa os inimigos a até 120 por 2 s.", /* 5.0h */
+  "bld.arvore.nome": "Árvore-Mãe", /* 5.0h */
+  "bld.arvore.desc": "Cura as suas unidades e construções a até 150 (+40 por Era): 3 de vida/s (+2 por Era). Cresce e ganha vida a cada Era.", /* 5.0h */
+  "bld.viveiro.nome": "Viveiro", /* 5.0h */
+  "bld.viveiro.desc": "Cultiva Esporos-sentinela de graça: um a cada 45 s, até 3 vivos ao mesmo tempo.", /* 5.0h */
+  "bld.pilar.nome": "Pilar de Ressonância", /* 5.0h */
+  "bld.pilar.desc": "Estende o Elo: as suas unidades a até 200 contam um vizinho a mais no acorde (até um acima do teto).", /* 5.0h */
+  "bld.eco.nome": "Câmara de Eco", /* 5.0h */
+  "bld.eco.desc": "Torre de ressonância: onda de 200 de alcance que fere em área e atrasa veículos e estruturas.", /* 5.0h */
+  "bld.incubadora.nome": "Câmara de Incubação", /* 5.0h */
+  "bld.incubadora.desc": "Choca Crias e Cuspidores 25% mais rápido que o Quartel.", /* 5.0h */
+  "bld.tumor.nome": "Tumor de Território", /* 5.0h */
+  "bld.tumor.desc": "Reclama território em 240 e desacelera em 30% os inimigos dentro dele.", /* 5.0h */
+  "unit.exoforja.nome": "Exo-Forja", /* 5.0h */
+  "unit.exoforja.desc": "Avatar do Barão-Forja: exoesqueleto de fundição com martelo sísmico.", /* 5.0h */
+  "unit.espectro.nome": "Espectro", /* 5.0h */
+  "unit.espectro.desc": "Avatar de Vesper Ísk: lâmina de luz e um véu que esconde quem está perto.", /* 5.0h */
+  "unit.guardia.nome": "Guardiã", /* 5.0h */
+  "unit.guardia.desc": "Avatar de Sylvia Oriel: raízes, flores que curam e esporos.", /* 5.0h */
+  "unit.prismavivo.nome": "Prisma Vivo", /* 5.0h */
+  "unit.prismavivo.desc": "Avatar de Zayin Coral: um prisma que canta o acorde do Coro.", /* 5.0h */
+  "unit.devorador.nome": "Devorador", /* 5.0h */
+  "unit.devorador.desc": "Avatar de Oru Voraz: a fera que devora e chama a ninhada.", /* 5.0h */
+  "unit.espectro_eco.nome": "Eco Falso", /* 5.0h */
+  "unit.espectro_eco.desc": "Cópia de luz do Espectro: não fere, só engana.", /* 5.0h */
+  "uni.mod.refinaria.prensa.nome": "Prensa de Minério", /* 5.0h */
+  "uni.mod.refinaria.prensa.desc": "+0,5 Minério por segundo.", /* 5.0h */
+  "uni.mod.refinaria.cofre.nome": "Cofre Blindado", /* 5.0h */
+  "uni.mod.refinaria.cofre.desc": "+60% de vida e regenera 4 de vida/s.", /* 5.0h */
+  "uni.mod.fabrica.linha.nome": "Linha Rápida", /* 5.0h */
+  "uni.mod.fabrica.linha.desc": "Produção 20% mais rápida nesta Fábrica.", /* 5.0h */
+  "uni.mod.fabrica.chassi.nome": "Chassi Reforçado", /* 5.0h */
+  "uni.mod.fabrica.chassi.desc": "Os veículos daqui saem com +15% de vida.", /* 5.0h */
+  "uni.mod.hangar.posq.nome": "Pós-combustão", /* 5.0h */
+  "uni.mod.hangar.posq.desc": "Os drones daqui saem 12% mais rápidos.", /* 5.0h */
+  "uni.mod.hangar.doca.nome": "Doca de Reparo", /* 5.0h */
+  "uni.mod.hangar.doca.desc": "Repara as suas unidades voadoras a até 160 (5 de vida/s).", /* 5.0h */
+  "uni.mod.laboratorio.antena.nome": "Antena de Dados", /* 5.0h */
+  "uni.mod.laboratorio.antena.desc": "+0,3 Dados por segundo.", /* 5.0h */
+  "uni.mod.laboratorio.contra.nome": "Contraespionagem", /* 5.0h */
+  "uni.mod.laboratorio.contra.desc": "Detecta as unidades camufladas inimigas a até 260, como uma Torre.", /* 5.0h */
+  "uni.mod.nodulo.posto.nome": "Posto Avançado", /* 5.0h */
+  "uni.mod.nodulo.posto.desc": "+50% de vida e regenera 3 de vida/s.", /* 5.0h */
+  "uni.mod.nodulo.mina.nome": "Mina de Pulso", /* 5.0h */
+  "uni.mod.nodulo.mina.desc": "Pulso de 45 de dano em área nos inimigos a até 90, a cada 6 s.", /* 5.0h */
+  "cmd.hab.martelo.nome": "Martelo Sísmico", /* 5.0h */
+  "cmd.hab.martelo.desc": "Golpe no chão: 110 de dano em área (r 90) e prende os inimigos por 1,2 s.", /* 5.0h */
+  "cmd.hab.reparo.nome": "Reparo de Campo", /* 5.0h */
+  "cmd.hab.reparo.desc": "Repara as suas unidades (140) e construções (240) em volta.", /* 5.0h */
+  "cmd.hab.fundicao.nome": "Chamado da Fundição", /* 5.0h */
+  "cmd.hab.fundicao.desc": "Dois Soldadores descem para lutar por 30 s.", /* 5.0h */
+  "cmd.hab.veu.nome": "Véu", /* 5.0h */
+  "cmd.hab.veu.desc": "Camufla o Espectro e as unidades por perto por 8 s.", /* 5.0h */
+  "cmd.hab.lamina.nome": "Lâmina de Luz", /* 5.0h */
+  "cmd.hab.lamina.desc": "Corte num inimigo: 180 de dano.", /* 5.0h */
+  "cmd.hab.ecofalso.nome": "Eco Falso", /* 5.0h */
+  "cmd.hab.ecofalso.desc": "Três cópias de luz correm para o ponto e atraem o fogo por 15 s.", /* 5.0h */
+  "cmd.hab.raizes.nome": "Raízes", /* 5.0h */
+  "cmd.hab.raizes.desc": "Prende os inimigos numa área por 3 s.", /* 5.0h */
+  "cmd.hab.florescer.nome": "Florescer", /* 5.0h */
+  "cmd.hab.florescer.desc": "Cura as suas unidades (160) e construções (200) em volta.", /* 5.0h */
+  "cmd.hab.esporos.nome": "Esporos", /* 5.0h */
+  "cmd.hab.esporos.desc": "Nuvem que fere os inimigos por 8 s (14 de dano/s).", /* 5.0h */
+  "cmd.hab.acorde.nome": "Acorde", /* 5.0h */
+  "cmd.hab.acorde.desc": "As suas unidades em volta causam +20% de dano por 8 s.", /* 5.0h */
+  "cmd.hab.estilhaco.nome": "Estilhaço", /* 5.0h */
+  "cmd.hab.estilhaco.desc": "Explosão de cristal: 140 de dano em área (r 70).", /* 5.0h */
+  "cmd.hab.silencio.nome": "Silêncio", /* 5.0h */
+  "cmd.hab.silencio.desc": "Inimigos numa área ficam sem atirar por 4 s.", /* 5.0h */
+  "cmd.hab.devorar.nome": "Devorar", /* 5.0h */
+  "cmd.hab.devorar.desc": "Engole um inimigo fraco (até 220 de vida) e se cura; nos fortes, 220 de dano.", /* 5.0h */
+  "cmd.hab.ninhada.nome": "Ninhada", /* 5.0h */
+  "cmd.hab.ninhada.desc": "Quatro Crias eclodem em volta por 25 s.", /* 5.0h */
+  "cmd.hab.rugido.nome": "Rugido", /* 5.0h */
+  "cmd.hab.rugido.desc": "Inimigos em volta 40% mais lentos por 4 s; aliados +15% de dano por 6 s.", /* 5.0h */
+  "hud.btab.uni": "Únicas", /* 5.0h */
+  "uni.unica": "Construção única da sua Raça", /* 5.0h */
+  "uni.instalando": "Instalando {nome}", /* 5.0h */
+  "uni.modulo-tit": "Módulo: escolha um", /* 5.0h */
+  "uni.para-sempre": "a escolha é para sempre", /* 5.0h */
+  "uni.requer-era2": "Era II", /* 5.0h */
+  "cmd.opcao": "Comandantes em campo", /* 5.0h */
+  "cmd.opcao-d": "cada líder leva um avatar com 3 habilidades e níveis; quando cai, volta no Núcleo", /* 5.0h */
+  "cmd.barra": "Comandante", /* 5.0h */
+  "cmd.fora": "Fora de combate", /* 5.0h */
+  "cmd.volta-em": "Volta em {s} s", /* 5.0h */
+  "cmd.recarga": "Em recarga: {s} s", /* 5.0h */
+  "cmd.mira-alvo": "{nome}: toque num inimigo", /* 5.0h */
+  "cmd.mira-chao": "{nome}: toque no chão", /* 5.0h */
+  "cmd.escolha-inimigo": "Escolha um inimigo", /* 5.0h */
+  "sim.uni.uma": "Construção única: só uma por jogador", /* 5.0h */
+  "sim.uni.recarga": "Habilidade em recarga", /* 5.0h */
+  "sim.uni.longe": "Longe demais do comandante", /* 5.0h */
+  "sim.uni.inimigo": "Escolha um inimigo visível", /* 5.0h */
+  "sim.uni.caiu": "Seu comandante caiu: volta no Núcleo em {n} s", /* 5.0h */
+  "sim.uni.voltou": "Seu comandante voltou ao campo", /* 5.0h */
+  "sim.uni.nivel": "Comandante no nível {n}", /* 5.0h */
+  "ia.ui.titulo": "IA aliada", /* 5.0h */
+  "ia.ui.atacar": "Atacar meu alvo", /* 5.0h */
+  "ia.ui.defender": "Defender minha base", /* 5.0h */
+  "ia.ui.expandir": "Expandir", /* 5.0h */
+  "ia.ui.atacar-d": "A IA aliada ataca o inimigo selecionado ou o ponto no centro da tela", /* 5.0h */
+  "ia.ui.defender-d": "A IA aliada traz o exército para perto do seu Núcleo", /* 5.0h */
+  "ia.ui.expandir-d": "A IA aliada abre um Nódulo perto do centro da tela", /* 5.0h */
+  "ia.ui.enviado": "Pedido à IA aliada: {pedido}", /* 5.0h */
+  "ia.ui.grupo": "Pedidos à IA aliada", /* 5.0h */
+  "ia.ui.atacar-c": "Atacar", /* 5.0h */
+  "ia.ui.defender-c": "Defesa", /* 5.0h */
+  "ia.ui.expandir-c": "Expandir", /* 5.0h */
+  "ia.fala.vehnar.inicio.0": "A fornalha está acesa. Quem quiser derreter, que venha.", /* 5.0h */
+  "ia.fala.vehnar.inicio.1": "Aço, vapor e paciência. Mais aço que paciência.", /* 5.0h */
+  "ia.fala.vehnar.chefe.0": "Isso aí é grande. Ótimo: rende mais sucata.", /* 5.0h */
+  "ia.fala.vehnar.chefe.1": "Fase nova, martelo velho. Batam mais forte!", /* 5.0h */
+  "ia.fala.vehnar.ataque.0": "Abram caminho: a Fundição chegou para a entrega.", /* 5.0h */
+  "ia.fala.vehnar.ataque.1": "Os blindados estão quentes. Sua base logo vai estar também.", /* 5.0h */
+  "ia.fala.vehnar.atacado.0": "Você bateu numa fortaleza. A conta do martelo vem depois.", /* 5.0h */
+  "ia.fala.vehnar.atacado.1": "Isso é tudo? Meus muros nem suaram.", /* 5.0h */
+  "ia.fala.vehnar.recua.0": "Volta para a forja. Retorno com mais chapa.", /* 5.0h */
+  "ia.fala.vehnar.recua.1": "Não é fuga, é logística. Reabastecer!", /* 5.0h */
+  "ia.fala.vehnar.pacto.0": "Pacto aceito. Um bom contrato vale mais que um bom canhão. Quase.", /* 5.0h */
+  "ia.fala.vehnar.pacto.1": "Fechado. Mas eu guardo a nota fiscal.", /* 5.0h */
+  "ia.fala.vehnar.recusa.0": "Não assino nada sem ver o aço da proposta.", /* 5.0h */
+  "ia.fala.vehnar.recusa.1": "Recusado. Volte com uma oferta mais pesada.", /* 5.0h */
+  "ia.fala.vehnar.coalizao.0": "Tem alguém grande demais neste mapa. Vamos amassar ele juntos?", /* 5.0h */
+  "ia.fala.vehnar.coalizao.1": "O líder está folgado. Proponho um ajuste de prensa em dupla.", /* 5.0h */
+  "ia.fala.vehnar.trai.0": "Nada pessoal: o contrato venceu e a fornalha está com fome.", /* 5.0h */
+  "ia.fala.vehnar.trai.1": "Pacto rescindido. Leia as letras miúdas da próxima vez.", /* 5.0h */
+  "ia.fala.vehnar.super.0": "Fundição Orbital! Entrega expressa de aço quente.", /* 5.0h */
+  "ia.fala.vehnar.super.1": "Do céu cai uma fortaleza. Não fiquem embaixo.", /* 5.0h */
+  "ia.fala.vehnar.pedido.0": "Entendido. A Fundição atende o pedido.", /* 5.0h */
+  "ia.fala.vehnar.pedido.1": "Ordem recebida. O martelo vai aonde você apontar.", /* 5.0h */
+  "ia.fala.erevane.inicio.0": "Ninguém me viu chegar. Ninguém vai me ver levar.", /* 5.0h */
+  "ia.fala.erevane.inicio.1": "Bela base. Seria uma pena faltar Plasma nela.", /* 5.0h */
+  "ia.fala.erevane.chefe.0": "Coisa grande, bolsos grandes. Vamos aliviar esse monstro.", /* 5.0h */
+  "ia.fala.erevane.chefe.1": "Ele mudou de forma. Eu também sei fazer isso.", /* 5.0h */
+  "ia.fala.erevane.ataque.0": "Já estou na sua base. Só não deu para você perceber.", /* 5.0h */
+  "ia.fala.erevane.ataque.1": "Olhe para a esquerda. Agora para a direita. Tarde demais.", /* 5.0h */
+  "ia.fala.erevane.atacado.0": "Você acertou uma sombra. Parabéns, foi a única.", /* 5.0h */
+  "ia.fala.erevane.atacado.1": "Tanto barulho por tão pouco.", /* 5.0h */
+  "ia.fala.erevane.recua.0": "Sumir também é tática.", /* 5.0h */
+  "ia.fala.erevane.recua.1": "Volto quando você se distrair. Ou seja, logo.", /* 5.0h */
+  "ia.fala.erevane.pacto.0": "Pacto aceito. Prometo roubar só dos outros.", /* 5.0h */
+  "ia.fala.erevane.pacto.1": "Fechado. Juro pela minha capa camuflada.", /* 5.0h */
+  "ia.fala.erevane.recusa.0": "Pactos são para quem tem algo a perder.", /* 5.0h */
+  "ia.fala.erevane.recusa.1": "Não. Mas obrigada pela distração.", /* 5.0h */
+  "ia.fala.erevane.coalizao.0": "O líder está brilhando demais. Vamos apagar essa luz juntos?", /* 5.0h */
+  "ia.fala.erevane.coalizao.1": "Quem está na frente vira alvo. Topa um assalto em dupla?", /* 5.0h */
+  "ia.fala.erevane.trai.0": "Ops. Era pacto ou empréstimo? Sempre confundo.", /* 5.0h */
+  "ia.fala.erevane.trai.1": "Confiou numa Erevane? Que fofo.", /* 5.0h */
+  "ia.fala.erevane.super.0": "Blecaute! Agora todo mundo joga do meu jeito: no escuro.", /* 5.0h */
+  "ia.fala.erevane.super.1": "Luzes apagadas. Bolsos abertos.", /* 5.0h */
+  "ia.fala.erevane.pedido.0": "Pedido anotado. Ninguém vai saber de onde veio.", /* 5.0h */
+  "ia.fala.erevane.pedido.1": "Considere feito. Quietinho, do jeito que eu gosto.", /* 5.0h */
+  "ia.fala.tessara.inicio.0": "Toda semente começa pequena. A minha já tem raízes no seu quintal.", /* 5.0h */
+  "ia.fala.tessara.inicio.1": "Que solo fértil. Vou crescer aqui, se não se importa.", /* 5.0h */
+  "ia.fala.tessara.chefe.0": "Uma criatura antiga. Que linda. Que pena.", /* 5.0h */
+  "ia.fala.tessara.chefe.1": "Ela se adapta? Nós também. É a nossa especialidade.", /* 5.0h */
+  "ia.fala.tessara.ataque.0": "Hora da poda. Não se preocupe, cresce de novo. Às vezes.", /* 5.0h */
+  "ia.fala.tessara.ataque.1": "Meu jardim precisa de espaço. O seu, no caso.", /* 5.0h */
+  "ia.fala.tessara.atacado.0": "Pisaram nas minhas flores. Elas lembram de rostos.", /* 5.0h */
+  "ia.fala.tessara.atacado.1": "Cortou um galho? Nascem três.", /* 5.0h */
+  "ia.fala.tessara.recua.0": "Recolher as raízes. A estação volta.", /* 5.0h */
+  "ia.fala.tessara.recua.1": "Inverno tático. Na primavera eu cobro.", /* 5.0h */
+  "ia.fala.tessara.pacto.0": "Que bom! Jardins vizinhos crescem melhor juntos.", /* 5.0h */
+  "ia.fala.tessara.pacto.1": "Aceito. Vou regar essa amizade.", /* 5.0h */
+  "ia.fala.tessara.recusa.0": "Agradeço, mas essa muda não pega comigo.", /* 5.0h */
+  "ia.fala.tessara.recusa.1": "Não, obrigada. Prefiro crescer sozinha por enquanto.", /* 5.0h */
+  "ia.fala.tessara.coalizao.0": "Alguém está tomando o sol de todos nós. Vamos fazer sombra juntos?", /* 5.0h */
+  "ia.fala.tessara.coalizao.1": "Árvore grande demais sufoca o bosque. Proponho uma aliança.", /* 5.0h */
+  "ia.fala.tessara.trai.0": "Desculpe, querido. Chegou a estação da colheita.", /* 5.0h */
+  "ia.fala.tessara.trai.1": "Toda planta procura a luz. Hoje a luz é a sua base.", /* 5.0h */
+  "ia.fala.tessara.super.0": "Salto Evolutivo! Meus filhos estão mais fortes, mais rápidos, mais famintos.", /* 5.0h */
+  "ia.fala.tessara.super.1": "A evolução não pede licença.", /* 5.0h */
+  "ia.fala.tessara.pedido.0": "Claro! Já mando as mudas para lá.", /* 5.0h */
+  "ia.fala.tessara.pedido.1": "Com prazer. Um jardim unido floresce.", /* 5.0h */
+  "ia.fala.quorith.inicio.0": "O Coro afina. Você está fora do tom.", /* 5.0h */
+  "ia.fala.quorith.inicio.1": "Escute: é o som de muitas vozes contra uma.", /* 5.0h */
+  "ia.fala.quorith.chefe.0": "Uma nota grave e enorme. Vamos responder em acorde.", /* 5.0h */
+  "ia.fala.quorith.chefe.1": "O monstro mudou de compasso. Acompanhem!", /* 5.0h */
+  "ia.fala.quorith.ataque.0": "Tutti! O Coro inteiro entra agora.", /* 5.0h */
+  "ia.fala.quorith.ataque.1": "A sinfonia começa na sua base. Ingressos esgotados.", /* 5.0h */
+  "ia.fala.quorith.atacado.0": "Desafinado. E mais alto do que precisava.", /* 5.0h */
+  "ia.fala.quorith.atacado.1": "Interromperam o ensaio. Isso não fica sem resposta.", /* 5.0h */
+  "ia.fala.quorith.recua.0": "Pausa de um compasso. O refrão volta.", /* 5.0h */
+  "ia.fala.quorith.recua.1": "Recolher o Coro. Toda música tem silêncio.", /* 5.0h */
+  "ia.fala.quorith.pacto.0": "Aceito. Duas vozes, uma harmonia.", /* 5.0h */
+  "ia.fala.quorith.pacto.1": "Em uníssono, então. Por enquanto.", /* 5.0h */
+  "ia.fala.quorith.recusa.0": "Sua proposta está fora do tom.", /* 5.0h */
+  "ia.fala.quorith.recusa.1": "Não. O Coro canta sozinho esta parte.", /* 5.0h */
+  "ia.fala.quorith.coalizao.0": "Tem um solista alto demais. Que tal um dueto contra ele?", /* 5.0h */
+  "ia.fala.quorith.coalizao.1": "Quem domina a música cansa a plateia. Vamos trocar o regente?", /* 5.0h */
+  "ia.fala.quorith.trai.0": "Mudança de tom. Você não estava na partitura.", /* 5.0h */
+  "ia.fala.quorith.trai.1": "Fim do dueto. Agora é solo: o meu.", /* 5.0h */
+  "ia.fala.quorith.super.0": "Uníssono! Mil vozes, um golpe só.", /* 5.0h */
+  "ia.fala.quorith.super.1": "Ouça o acorde completo. Ele não se repete.", /* 5.0h */
+  "ia.fala.quorith.pedido.0": "Entendido. O Coro marca o compasso para você.", /* 5.0h */
+  "ia.fala.quorith.pedido.1": "Partitura recebida. Tocamos já.", /* 5.0h */
+  "ia.fala.vorag.inicio.0": "Fome.", /* 5.0h */
+  "ia.fala.vorag.inicio.1": "Cheiro de base nova. Cheiro de jantar.", /* 5.0h */
+  "ia.fala.vorag.chefe.0": "Grande. Muito grande. Muita comida.", /* 5.0h */
+  "ia.fala.vorag.chefe.1": "Mudou? Ainda tem gosto de carne.", /* 5.0h */
+  "ia.fala.vorag.ataque.0": "Enxame, comer!", /* 5.0h */
+  "ia.fala.vorag.ataque.1": "Corram, se quiserem. As Crias gostam de correr atrás.", /* 5.0h */
+  "ia.fala.vorag.atacado.0": "Morde o Oru? O Oru morde de volta.", /* 5.0h */
+  "ia.fala.vorag.atacado.1": "Isso doeu. O Oru ficou com mais fome.", /* 5.0h */
+  "ia.fala.vorag.recua.0": "Barriga cheia por hoje. Amanhã, mais.", /* 5.0h */
+  "ia.fala.vorag.recua.1": "A ninhada recua. A ninhada volta maior.", /* 5.0h */
+  "ia.fala.vorag.pacto.0": "Pacto. Por enquanto você não é comida.", /* 5.0h */
+  "ia.fala.vorag.pacto.1": "Tá. O Oru come os outros primeiro.", /* 5.0h */
+  "ia.fala.vorag.recusa.0": "Não. O Oru não divide a mesa.", /* 5.0h */
+  "ia.fala.vorag.recusa.1": "Pacto não enche barriga.", /* 5.0h */
+  "ia.fala.vorag.coalizao.0": "O grandão engordou demais. Vamos comer ele juntos?", /* 5.0h */
+  "ia.fala.vorag.coalizao.1": "Tem um banquete lá na frente. Divide comigo?", /* 5.0h */
+  "ia.fala.vorag.trai.0": "Desculpa. Bateu a fome.", /* 5.0h */
+  "ia.fala.vorag.trai.1": "O pacto acabou. O jantar começou.", /* 5.0h */
+  "ia.fala.vorag.super.0": "Eclosão! Nasce, cresce, come!", /* 5.0h */
+  "ia.fala.vorag.super.1": "Ovos abertos. Boa sorte.", /* 5.0h */
+  "ia.fala.vorag.pedido.0": "O Oru vai. O Oru come o que você apontar.", /* 5.0h */
+  "ia.fala.vorag.pedido.1": "Entendido. A ninhada corre para lá.", /* 5.0h */
 };
