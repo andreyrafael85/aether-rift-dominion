@@ -145,6 +145,10 @@ V.semPreparo = () => ehIOS() && V.disponivel() && !IOS_PREPARO;
 /* ---------- tocar ----------
    g = V.achar(...); cb = { inicio(), palavra(i, n, dur, w), fim(), falhou(motivo) }. Devolve { parar(fade) }. Bytes que faltam esperam até o.espera ms;
    decodifica na primeira vez; espera o Web Audio voltar a 'running' (interrupção do iOS) até ESPERA_RODANDO ms. */
+/* 5.0f.1: as falas de cada Raça no mesmo plano. Medido nos arquivos (volume integrado, BS.1770, nos três idiomas): Vehnar −21,1, Erevane −20,8,
+   Tessara −21,4, Quorith −17,7 e Vorag −21,5 LUFS; o ganho leva todas a −21 (o Quorith estava 3,3 dB mais alto) */
+const RACA_DB = { vehnar: 0.1, erevane: -0.2, tessara: 0.4, quorith: -3.3, vorag: 0.5 };
+function ganhoRaca(g) { const it = g && g.itens && g.itens[0], r = (it && it.f && (it.f.raca || it.f.pacote)) || (it && it.pacote); return Math.pow(10, (RACA_DB[r] || 0) / 20); }
 let ganho = null;
 function saida(c) { if (ganho && ganho.context === c) return ganho; ganho = c.createGain(); ganho.gain.value = VOZ_GANHO; ganho.connect((ARD.som3d && ARD.som3d.saidaFala(c)) || c.destination) /* 5.0f: as falas entram no limitador do fim, com a música e os efeitos abaixando sob elas */; return ganho; }
 function rodando(c, ms) { if (c.state === 'running') return Promise.resolve(true); const au = A(); if (au && au.resume) au.resume();
@@ -157,7 +161,7 @@ V.tocar = function (g, cb, o) { o = o || {}; const h = { parado: false, fontes: 
     if (!h.iniciou) fim('cancelada'); else fim(); };
   const espera = o.espera || 0; const ps = g.itens.map(it => comTempo(decodificar(it.id), pronta(it.id) ? 0 : espera || 3000));
   Promise.all(ps).then(bufs => { if (h.parado) return null; const c = A().ctx; return rodando(c, ESPERA_RODANDO).then(ok => { if (h.parado) return null; if (!ok) throw Object.assign(new Error('suspenso'), { motivo: 'suspenso' }); return bufs; }); })
-    .then(bufs => { if (!bufs || h.parado) return; const c = A().ctx; const g1 = h.g1 = c.createGain(); g1.gain.value = 1; g1.connect(saida(c)); const t0 = c.currentTime + 0.03; let t = t0; const marcas = [];
+    .then(bufs => { if (!bufs || h.parado) return; const c = A().ctx; const g1 = h.g1 = c.createGain(); g1.gain.value = ganhoRaca(g); /* 5.0f.1 */ g1.connect(saida(c)); const t0 = c.currentTime + 0.03; let t = t0; const marcas = [];
       bufs.forEach((b, k) => { const s = c.createBufferSource(); s.buffer = b; s.connect(g1); s.start(t); h.fontes.push(s); const f = g.itens[k].f; for (const p of f.__pos || []) marcas.push([t - t0 + p[0], p[1] - p[0], p[2] + (k ? g.itens.slice(0, k).reduce((s2, x) => s2 + String(x.f.texto || '').length + 1, 0) : 0), p[3]]); t += b.duration + (k < bufs.length - 1 ? 0.12 : 0); });
       const ult = h.fontes[h.fontes.length - 1]; ult.onended = () => { if (!h.parado) fim(); };
       const ms = Math.max(0, (t0 - c.currentTime) * 1000); h.timers.push(setTimeout(() => { if (h.parado) return; h.iniciou = true; V.ultimo = { estado: 'tocou', chave: g.chave, quando: Date.now() }; for (const it of g.itens) { guardar(it.id); ULT[it.pacote + '|' + it.chave] = it.id; } if (cb.inicio) cb.inicio();

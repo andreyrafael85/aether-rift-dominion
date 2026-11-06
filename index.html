@@ -1065,7 +1065,7 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
 
 
 <script>/* 5.0c: idioma antes da primeira pintura — fora do pt-BR, carrega aqui o dicionário do idioma (src/i18n/en.js ou es.js, 33 KB com gzip, enquanto o resto da página chega) e esconde o texto da tela inicial até o src/i18n.js (no fim da página) traduzir; a mesma regra de escolha do i18n.js */
-(function () { try { var q = (new URLSearchParams(location.search).get('lang') || '').toLowerCase(), s = ''; try { s = (localStorage.getItem('ard-idioma') || '').toLowerCase(); } catch (e) {} var l = /^(pt|en|es)/.test(q) ? q : /^(pt|en|es)/.test(s) ? s : ''; if (!l) { var ls = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']; for (var i = 0; i < ls.length && !l; i++) if (/^(pt|en|es)/i.test(ls[i])) l = ls[i].toLowerCase(); } if (!/^pt/.test(l)) { document.documentElement.classList.add('i18n-espera'); document.write('<script src="src/i18n/' + (/^es/.test(l) ? 'es' : 'en') + '.js?v=' + '2026-11-05 20:46Z'.replace(/[^0-9TZ]/g, '') + '"><\/script>'); } } catch (e) {} })();</script>
+(function () { try { var q = (new URLSearchParams(location.search).get('lang') || '').toLowerCase(), s = ''; try { s = (localStorage.getItem('ard-idioma') || '').toLowerCase(); } catch (e) {} var l = /^(pt|en|es)/.test(q) ? q : /^(pt|en|es)/.test(s) ? s : ''; if (!l) { var ls = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']; for (var i = 0; i < ls.length && !l; i++) if (/^(pt|en|es)/i.test(ls[i])) l = ls[i].toLowerCase(); } if (!/^pt/.test(l)) { document.documentElement.classList.add('i18n-espera'); document.write('<script src="src/i18n/' + (/^es/.test(l) ? 'es' : 'en') + '.js?v=' + '2026-11-06 01:24Z'.replace(/[^0-9TZ]/g, '') + '"><\/script>'); } } catch (e) {} })();</script>
 <div id="start" class="screen">
   <canvas id="bgfx" aria-hidden="true"></canvas>
   <!-- 5.0a.1: pôster da Sala de Comando (um render da própria Sala por Raça e por tela, em assets/sala-*.webp): entra na hora, antes da cena 3D -->
@@ -1079,7 +1079,7 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
   <div class="start-wrap">
     <header class="st-head">
       <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div class="brand-txt"><h1 data-i18n="inicio.aether-rift-dominion">Aether Rift<span>Dominion</span></h1><p class="tagline" data-i18n="inicio.nada-aqui-seu-ainda">Nada aqui é seu. Ainda.</p></div></div>
-      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.0f · build 2026-11-05 20:46Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4</div>
+      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.0f.1 · build 2026-11-06 01:24Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4</div>
       <div class="opt st-lang" data-idioma-sel="idioma-inicio"></div><!-- 5.0c: seletor de idioma, legível em qualquer idioma -->
     </header>
     <div class="start-grid">
@@ -1141,8 +1141,9 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
       </div>
       <div class="notes">
       <div class="choose" data-i18n="notas.notas-versao">Notas da versão</div>
+      <p class="start-notes" data-i18n="notas.5-0f-1"><b>5.0f.1 — Som de cinema:</b> a trilha agora é orquestral e de verdade: cada Raça tem os seus temas de paz, tensão e batalha, mais as faixas de chefão, de cinema, de superarma, de vitória e de derrota, com trocas no compasso. Disparos, impactos e explosões ganharam peso, montados em camadas a partir de gravações reais. A voz das unidades ao selecionar e dar ordens ficou no mesmo plano em todas as Raças, sempre clara por cima do ambiente e sem sobressaltar. Os arquivos chegam depois da carga; sem eles, o som gerado de antes continua. Créditos em Ajustes.</p>
+      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.0f → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-0f"><b>5.0f — Som 3D e cinema:</b> cada som agora sai do seu lugar no mapa e acompanha a câmera, com som 3D para fone no computador; o que está longe perde o brilho, o que está sob a névoa de guerra soa abafado e cada bioma tem seu eco. Uma <b>trilha adaptativa</b>, gerada no próprio navegador, dá um tema a cada Raça e muda entre paz, tensão, batalha e chefão conforme a partida, e baixa quando alguém fala. Cliques e avisos têm o timbre da sua Raça. As 20 missões abrem com a <b>Sala de Guerra</b>: o mapa tático com as ameaças, a rota de ataque e os objetivos, e a câmera pousando na sua base. A superarma ganhou uma tomada curta do disparo, e os chefões, uma entrada de cinema. Tudo pode ser pulado (Esc, clique ou toque), e Ajustes tem volume de efeitos e de música, saída para fone ou caixas e as cenas de cinema.</p>
-      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.0e → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-0e"><b>5.0e — Bases e unidades vivas:</b> com o <b>Motor 5</b> ligado, cada construção sobe no estilo da sua Raça: solda na Vehnar, trama de luz na Erevane, veias na Tessara, cristais no Quorith e bolhas na Vorag, com uma onda no chão ao concluir. Os destroços quicam no relevo e o entulho fica um tempo no chão; na Alta e na Ultra, o calor e a onda de choque das explosões distorcem o ar. A base ganhou vida: módulos visíveis nas construções, paredes que racham conforme a vida cai, condutos que pulsam com a energia (e piscam quando ela falta), trabalhadores andando entre os prédios e construções Tessara e Vorag que respiram. As unidades ganharam aro de seleção em holograma, barras de vida em segmentos que nenhuma névoa escurece, contorno na cor do time e estrelas de veterano que brilham na promoção; os materiais mostram desgaste nas bordas e a poeira do mapa na base das peças.</p>
       <p class="start-notes" data-i18n="notas.5-0d-1"><b>5.0d.1 — Névoa leve e Firefox corrigido:</b> no Firefox, as nuvens de guerra da 5.0d deixavam a partida quase sem visibilidade na Alta, porque um shader que o Firefox recusava escurecia a tela. Está corrigido, e as nuvens viraram um véu claro e translúcido sobre o que nunca foi visto: o relevo continua legível, e o que está à vista nunca fica coberto. A névoa dos climas também ficou mais leve: unidades e construções continuam nítidas na névoa tóxica, na chuva e no celular. E o clima <b>Automático</b> agora acompanha o mapa, de leve: neve fina, chuva fina ou poeira na Planície da Fenda e cinza no Cinturão (da Média para cima).</p>
       <p class="start-notes" data-i18n="notas.5-0d"><b>5.0d — Céu, clima e nuvens de guerra:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o mundo ganhou vida. O sol anda no ciclo do dia, com nascer e pôr do sol, sombras que giram e, à noite, lua e estrelas; o reflexo do céu acompanha a hora. Na Alta e na Ultra, raios de sol atravessam a poeira e a Tempestade de Éter. O que nunca foi visto fica sob um banco de nuvens baixas, que se abre com a borda acesa quando as tropas chegam (da Média para cima). Os climas do campo (Jogar › Semente e clima) agora acontecem na placa de vídeo: neve de cristais que se acumula no chão e no alto das peças, neve fina e cortinas de luz na aurora, areia e cinza na tempestade de plasma, chuva com chão molhado e poças na chuva ácida, e bancos de névoa tóxica nos vales. E o chão guarda a batalha: crateras que afundam, mato queimado e pegadas na neve e na areia.</p>
@@ -1790,7 +1791,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aqui é seu. Ainda.",
-  "inicio.versao": "Versão 5.0f · build 2026-11-05 20:46Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
+  "inicio.versao": "Versão 5.0f.1 · build 2026-11-06 01:24Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Escolha sua Raça",
   "inicio.vitrine.explorar-base": "Explorar a base",
   "inicio.vitrine.som-tela-inicial": "Som da tela inicial",
@@ -1859,6 +1860,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.btn-bench": "Testar desempenho (30 s)",
   "ajustes.cfg-feedback": "Enviar feedback",
   "notas.notas-versao": "Notas da versão",
+  "notas.5-0f-1": "<b>5.0f.1 — Som de cinema:</b> a trilha agora é orquestral e de verdade: cada Raça tem os seus temas de paz, tensão e batalha, mais as faixas de chefão, de cinema, de superarma, de vitória e de derrota, com trocas no compasso. Disparos, impactos e explosões ganharam peso, montados em camadas a partir de gravações reais. A voz das unidades ao selecionar e dar ordens ficou no mesmo plano em todas as Raças, sempre clara por cima do ambiente e sem sobressaltar. Os arquivos chegam depois da carga; sem eles, o som gerado de antes continua. Créditos em Ajustes.",
   "notas.5-0f": "<b>5.0f — Som 3D e cinema:</b> cada som agora sai do seu lugar no mapa e acompanha a câmera, com som 3D para fone no computador; o que está longe perde o brilho, o que está sob a névoa de guerra soa abafado e cada bioma tem seu eco. Uma <b>trilha adaptativa</b>, gerada no próprio navegador, dá um tema a cada Raça e muda entre paz, tensão, batalha e chefão conforme a partida, e baixa quando alguém fala. Cliques e avisos têm o timbre da sua Raça. As 20 missões abrem com a <b>Sala de Guerra</b>: o mapa tático com as ameaças, a rota de ataque e os objetivos, e a câmera pousando na sua base. A superarma ganhou uma tomada curta do disparo, e os chefões, uma entrada de cinema. Tudo pode ser pulado (Esc, clique ou toque), e Ajustes tem volume de efeitos e de música, saída para fone ou caixas e as cenas de cinema.",
   "notas.5-0e": "<b>5.0e — Bases e unidades vivas:</b> com o <b>Motor 5</b> ligado, cada construção sobe no estilo da sua Raça: solda na Vehnar, trama de luz na Erevane, veias na Tessara, cristais no Quorith e bolhas na Vorag, com uma onda no chão ao concluir. Os destroços quicam no relevo e o entulho fica um tempo no chão; na Alta e na Ultra, o calor e a onda de choque das explosões distorcem o ar. A base ganhou vida: módulos visíveis nas construções, paredes que racham conforme a vida cai, condutos que pulsam com a energia (e piscam quando ela falta), trabalhadores andando entre os prédios e construções Tessara e Vorag que respiram. As unidades ganharam aro de seleção em holograma, barras de vida em segmentos que nenhuma névoa escurece, contorno na cor do time e estrelas de veterano que brilham na promoção; os materiais mostram desgaste nas bordas e a poeira do mapa na base das peças.",
   "notas.5-0d-1": "<b>5.0d.1 — Névoa leve e Firefox corrigido:</b> no Firefox, as nuvens de guerra da 5.0d deixavam a partida quase sem visibilidade na Alta, porque um shader que o Firefox recusava escurecia a tela. Está corrigido, e as nuvens viraram um véu claro e translúcido sobre o que nunca foi visto: o relevo continua legível, e o que está à vista nunca fica coberto. A névoa dos climas também ficou mais leve: unidades e construções continuam nítidas na névoa tóxica, na chuva e no celular. E o clima <b>Automático</b> agora acompanha o mapa, de leve: neve fina, chuva fina ou poeira na Planície da Fenda e cinza no Cinturão (da Média para cima).",
@@ -1868,7 +1870,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "notas.5-0c": "<b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 mais leve, faróis e som no iPhone:</b> com o <b>Motor 5</b> ligado, os shaders que ele prepara na carga encolheram um terço (os lagos primeiro) e cada quadro manda muito menos dados para a placa de vídeo, o que alivia a CPU no Firefox e no celular. O brilho em volta das luzes agora é o mesmo do motor clássico, e no Modo Foto da qualidade Baixa os efeitos seguem a exposição como no clássico. À noite e dentro da Tempestade de Éter, os faróis dos veículos, coletores e piratas iluminam o chão à frente, nos dois motores. A Sala de Comando ficou um pouco mais clara, sem o clarão de antes. No iPhone, o som e a voz destravam no primeiro toque, tocam com a chave de silêncio ligada e voltam depois de uma ligação. Cada líder fala com uma voz do seu gênero em todo navegador. Em Ajustes, <b>Testar som</b> toca três notas e uma frase e mostra o estado do áudio do aparelho.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, em teste:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o jogo inteiro agora roda em WebGPU, com volta sozinha para WebGL2: unidades e construções com o detalhe de superfície e a animação de cada peça, ruínas, obras, o holograma da Erevane, os escudos do Uníssono e as bandeiras; o chão com todos os biomas, a vegetação ao vento, as estradas e o céu; explosões, fogo, fumaça e tiros; os lagos de plasma e de gelo com reflexo, o espaço do Cinturão e a Tempestade de Éter; e o <b>Modo Foto</b> (📷 ou tecla J) com desfoque, os 8 filtros e captura em 4K. Na primeira vez que o Modo Foto abre numa partida, ele leva alguns segundos para se preparar. Com tudo isso, a carga do Motor 5 ficou alguns segundos mais longa: a próxima versão mede nos aparelhos e enxuga. O motor clássico continua o padrão e não mudou.",
-  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0e → 2.0)",
+  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0f → 2.0)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Termos de Uso",
   "inicio.rodape.foot-priv": "Privacidade",
@@ -2054,6 +2056,9 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "som.saida": "Som 3D",
   "som.saida.fone": "Fone de ouvido (HRTF)",
   "som.saida.caixa": "Caixas de som",
+  "som.creditos": "Créditos do som",
+  "som.creditos.musica": "Música",
+  "som.creditos.efeitos": "Efeitos",
   "geral.idioma": "Idioma",
   "inicio.multi.codigo": "CÓDIGO",
   /* inicio-jogo */
@@ -3207,7 +3212,7 @@ const pr = l => PR[l] || (PR[l] = new Intl.PluralRules(LOCALE[l] || l));
 function num(n, o) { if (typeof n !== 'number' || !isFinite(n)) return String(n); return nf(ARD.idioma, o || { maximumFractionDigits: 2 }).format(n); }
 function forma(v, n, l) { if (v == null || typeof v !== 'object') return v; const c = typeof n === 'number' ? (n === 0 && v.zero != null ? 'zero' : pr(l).select(n)) : 'other'; return v[c] != null ? v[c] : v.other != null ? v.other : v.one; }
 function busca(k, l) { const d = DIC[l]; return d && Object.prototype.hasOwnProperty.call(d, k) ? d[k] : undefined; }
-const MARCA_BUILD = '__' + 'BUILD__', CARIMBO = '2026-11-05 20:46Z'; /* o en e o es vêm em arquivo à parte, sem a troca do build: o carimbo entra aqui */
+const MARCA_BUILD = '__' + 'BUILD__', CARIMBO = '2026-11-06 01:24Z'; /* o en e o es vêm em arquivo à parte, sem a troca do build: o carimbo entra aqui */
 function preenche(s, vars) { if (s.indexOf(MARCA_BUILD) >= 0) s = s.split(MARCA_BUILD).join(CARIMBO); if (!vars || s.indexOf('{') < 0) return s; return s.replace(/\{(\w+)\}/g, (m, n) => Object.prototype.hasOwnProperty.call(vars, n) ? (typeof vars[n] === 'number' ? num(vars[n]) : String(vars[n])) : m); }
 function t(k, vars, reserva) { const l = ARD.idioma; let v = busca(k, l), ll = l; if (v === undefined) { v = busca(k, 'pt-BR'); ll = 'pt-BR'; } if (v === undefined) { if (reserva != null) return preenche(String(reserva), vars); falta(k); return k; }
   const s = forma(v, vars && vars.n, ll); return preenche(String(s == null ? '' : s), vars); }
@@ -3299,7 +3304,7 @@ function marcaHtml() { try { document.documentElement.lang = LANG_HTML[ARD.idiom
 /* carga dos dicionários: o pt-BR vem embutido no pacote (base e reserva); o en e o es são arquivos à parte (src/i18n/en.js e es.js, com o carimbo
    do build na URL), pedidos só por quem usa o idioma: o script do topo do <body> já carrega o do idioma escolhido antes do jogo; aqui, a troca
    na hora pede o outro. O service worker guarda os dois na instalação, então o jogo troca de idioma também sem internet. */
-const VER = '2026-11-05 20:46Z'.replace(/[^0-9TZ]/g, '');
+const VER = '2026-11-06 01:24Z'.replace(/[^0-9TZ]/g, '');
 const CARGAS = {};
 function carregar(l) { l = normaliza(l) || 'pt-BR'; if (DIC[l]) return Promise.resolve(l); if (CARGAS[l]) return CARGAS[l];
   return (CARGAS[l] = new Promise((ok, falha) => { const sc = document.createElement('script'); sc.src = 'src/i18n/' + l + '.js?v=' + VER; sc.onload = () => { if (DIC[l]) ok(l); else { CARGAS[l] = null; falha(new Error('dicionário vazio')); } }; sc.onerror = () => { CARGAS[l] = null; sc.remove(); falha(new Error('sem rede')); }; document.head.appendChild(sc); })); }
@@ -23819,6 +23824,10 @@ V.semPreparo = () => ehIOS() && V.disponivel() && !IOS_PREPARO;
 /* ---------- tocar ----------
    g = V.achar(...); cb = { inicio(), palavra(i, n, dur, w), fim(), falhou(motivo) }. Devolve { parar(fade) }. Bytes que faltam esperam até o.espera ms;
    decodifica na primeira vez; espera o Web Audio voltar a 'running' (interrupção do iOS) até ESPERA_RODANDO ms. */
+/* 5.0f.1: as falas de cada Raça no mesmo plano. Medido nos arquivos (volume integrado, BS.1770, nos três idiomas): Vehnar −21,1, Erevane −20,8,
+   Tessara −21,4, Quorith −17,7 e Vorag −21,5 LUFS; o ganho leva todas a −21 (o Quorith estava 3,3 dB mais alto) */
+const RACA_DB = { vehnar: 0.1, erevane: -0.2, tessara: 0.4, quorith: -3.3, vorag: 0.5 };
+function ganhoRaca(g) { const it = g && g.itens && g.itens[0], r = (it && it.f && (it.f.raca || it.f.pacote)) || (it && it.pacote); return Math.pow(10, (RACA_DB[r] || 0) / 20); }
 let ganho = null;
 function saida(c) { if (ganho && ganho.context === c) return ganho; ganho = c.createGain(); ganho.gain.value = VOZ_GANHO; ganho.connect((ARD.som3d && ARD.som3d.saidaFala(c)) || c.destination) /* 5.0f: as falas entram no limitador do fim, com a música e os efeitos abaixando sob elas */; return ganho; }
 function rodando(c, ms) { if (c.state === 'running') return Promise.resolve(true); const au = A(); if (au && au.resume) au.resume();
@@ -23831,7 +23840,7 @@ V.tocar = function (g, cb, o) { o = o || {}; const h = { parado: false, fontes: 
     if (!h.iniciou) fim('cancelada'); else fim(); };
   const espera = o.espera || 0; const ps = g.itens.map(it => comTempo(decodificar(it.id), pronta(it.id) ? 0 : espera || 3000));
   Promise.all(ps).then(bufs => { if (h.parado) return null; const c = A().ctx; return rodando(c, ESPERA_RODANDO).then(ok => { if (h.parado) return null; if (!ok) throw Object.assign(new Error('suspenso'), { motivo: 'suspenso' }); return bufs; }); })
-    .then(bufs => { if (!bufs || h.parado) return; const c = A().ctx; const g1 = h.g1 = c.createGain(); g1.gain.value = 1; g1.connect(saida(c)); const t0 = c.currentTime + 0.03; let t = t0; const marcas = [];
+    .then(bufs => { if (!bufs || h.parado) return; const c = A().ctx; const g1 = h.g1 = c.createGain(); g1.gain.value = ganhoRaca(g); /* 5.0f.1 */ g1.connect(saida(c)); const t0 = c.currentTime + 0.03; let t = t0; const marcas = [];
       bufs.forEach((b, k) => { const s = c.createBufferSource(); s.buffer = b; s.connect(g1); s.start(t); h.fontes.push(s); const f = g.itens[k].f; for (const p of f.__pos || []) marcas.push([t - t0 + p[0], p[1] - p[0], p[2] + (k ? g.itens.slice(0, k).reduce((s2, x) => s2 + String(x.f.texto || '').length + 1, 0) : 0), p[3]]); t += b.duration + (k < bufs.length - 1 ? 0.12 : 0); });
       const ult = h.fontes[h.fontes.length - 1]; ult.onended = () => { if (!h.parado) fim(); };
       const ms = Math.max(0, (t0 - c.currentTime) * 1000); h.timers.push(setTimeout(() => { if (h.parado) return; h.iniciou = true; V.ultimo = { estado: 'tocou', chave: g.chave, quando: Date.now() }; for (const it of g.itens) { guardar(it.id); ULT[it.pacote + '|' + it.chave] = it.id; } if (cb.inicio) cb.inicio();
@@ -23986,7 +23995,14 @@ ARD.vozes = V;
      junto com as vozes gravadas: nada estoura. A música (src/musica.js) entra no barramento de música daqui.
    Chaves de URL (para comparar no aparelho): ?som3d=0 (efeitos como antes, sem posição, sem vozes do mixer), ?hrtf=0|1 (força a panorâmica),
    ?reverb=0, ?abafar=0 (sem névoa e sem ar), ?somvozes=<n> (limite de vozes), ?limitador=0.
-   Nada aqui toca a simulação: só lê o que o renderizador já tem (câmera, névoa, bioma). */
+   Nada aqui toca a simulação: só lê o que o renderizador já tem (câmera, névoa, bioma).
+   5.0f.1 (som de cinema): os efeitos de combate e de mundo (disparos, feixe, impacto, explosões, trovão, tempestade, sifão) vêm de arquivos em
+   camadas (transiente, corpo, grave sub e cauda; assets/som/efeitos/, CC0), baixados depois da carga e nivelados pelo som gerado de antes; sem os
+   arquivos (o artefato, file://, ?somarq=0) fica o som gerado. Aqui também o carregador dos arquivos (assets/som/som.json, Opus no Ogg com AAC de
+   reserva) que o src/musica.js usa para a trilha. Metade das vozes posicionais com HRTF (as pesadas) e metade com a panorâmica simples (os
+   disparos leves), salas mais curtas: o fio de áudio custa menos. A voz das unidades (respostas) fica 4 a 6 dB acima do fundo: o fundo é medido
+   antes do abaixar e a voz e o abaixar seguem a medida. Chaves: ?somarq=0 (sem arquivos), ?efeitosarq=0 (efeitos gerados, trilha de arquivo),
+   ?vozauto=0 (sem o ajuste da voz pela medida do fundo). */
 (function (ARD) {
 'use strict';
 const par = k => { try { return new URLSearchParams(location.search).get(k); } catch (e) { return null; } };
@@ -24004,11 +24020,11 @@ const UI_RACA = ['click', 'build', 'spawn', 'erro'];
 const DUR = { shot_light: 0.12, shot_heavy: 0.22, beam: 0.24, impact: 0.3, explosion: 0.8, build: 0.6, spawn: 0.5, alert: 0.62, danger: 0.72, promote: 0.36, click: 0.1, erro: 0.36, siphon: 0.58, storm: 1.5, thunder: 2.55, pact: 0.42, betrayal: 0.58 };
 
 /* ---------- reverberação por bioma (impulso sintético) ---------- */
-const IRS = { /* s = duração, dec = queda, brilho = agudo no começo (0–1), pre = pré-atraso, eco = reflexões [s, ganho], wet = mandada */
-  gelo: { s: 1.7, dec: 3.2, brilho: 0.8, pre: 0.012, eco: [[0.05, 0.3]], wet: 0.34 },
-  rocha: { s: 1.1, dec: 3.6, brilho: 0.5, pre: 0.02, eco: [[0.09, 0.55], [0.21, 0.35], [0.37, 0.2]], wet: 0.32 },
-  tundra: { s: 0.7, dec: 4.5, brilho: 0.3, pre: 0.008, eco: [], wet: 0.2 },
-  basalto: { s: 1.9, dec: 2.6, brilho: 0.26, pre: 0.03, eco: [[0.14, 0.4]], wet: 0.38 },
+const IRS = { /* 5.0f.1: salas ~25% mais curtas (os efeitos de arquivo já trazem a cauda deles e o convolvedor é o mais caro do mixer). s = duração, dec = queda, brilho = agudo no começo (0–1), pre = pré-atraso, eco = reflexões [s, ganho], wet = mandada */
+  gelo: { s: 1.3, dec: 3.2, brilho: 0.8, pre: 0.012, eco: [[0.05, 0.3]], wet: 0.34 },
+  rocha: { s: 0.95, dec: 3.6, brilho: 0.5, pre: 0.02, eco: [[0.09, 0.55], [0.21, 0.35], [0.37, 0.2]], wet: 0.32 },
+  tundra: { s: 0.6, dec: 4.5, brilho: 0.3, pre: 0.008, eco: [], wet: 0.2 },
+  basalto: { s: 1.4, dec: 2.6, brilho: 0.26, pre: 0.03, eco: [[0.14, 0.4]], wet: 0.38 },
   espaco: { s: 0.5, dec: 5, brilho: 0.7, pre: 0.004, eco: [[0.011, 0.5], [0.023, 0.4], [0.037, 0.3]], wet: 0.16 } };
 const BIOMAS = ['gelo', 'rocha', 'tundra', 'basalto'];
 function impulso(c, nome, leve) { const P = IRS[nome] || IRS.tundra, r = c.sampleRate, dur = leve ? Math.min(0.8, P.s * 0.5) : P.s /* 5.0f (bancada): o convolvedor é o mais caro do mixer; salas curtas */, n = Math.max(64, Math.floor(r * dur)), ch = leve ? 1 : 2, b = c.createBuffer(ch, n, r);
@@ -24041,20 +24057,26 @@ function criar(c, master, o) { o = o || {}; const M = { c, master, ok: true, lev
   const modelo = o.modelo || 'equalpower', ENV = { perto: 0.3, longe: 0.65, nevoa: 0.85 };
   M.bus = {}; for (const k of ['perto', 'longe', 'nevoa']) { let entrada; if (k === 'perto') entrada = c.createGain(); else { entrada = c.createBiquadFilter(); entrada.type = 'lowpass'; entrada.frequency.value = k === 'longe' ? 5200 : 650; entrada.Q.value = 0.5; }
     const e = c.createGain(); e.gain.value = ENV[k]; entrada.connect(master); entrada.connect(e); e.connect(M.envio); M.bus[k] = entrada; }
+  /* 5.0f.1: só metade das vozes posicionais com o modelo escolhido (HRTF no computador); a outra metade, a panorâmica simples, fica com os
+     disparos leves e os feixes (prioridade 0), que são os mais numerosos: a HRTF processa menos da metade do tempo */
+  const nH = o.leve ? nPos : Math.ceil(nPos / 2);
   M.vozes = []; for (let i = 0; i < nPos; i++) { const g = c.createGain(), p = c.createPanner(); g.gain.value = 0;
-    p.panningModel = modelo; p.distanceModel = 'linear'; p.rolloffFactor = 0; p.refDistance = 1; p.maxDistance = 1e6; /* a distância é do volume do jogo (src/main.js, volAt, e o zoom); a panorâmica só dá a direção */
-    g.connect(p); p.connect(M.bus.perto); M.vozes.push({ g, p, bus: 'perto', src: null, fim: 0, prio: -1, ini: 0 }); }
+    p.panningModel = i < nH ? modelo : 'equalpower'; p.distanceModel = 'linear'; p.rolloffFactor = 0; p.refDistance = 1; p.maxDistance = 1e6; /* a distância é do volume do jogo (src/main.js, volAt, e o zoom); a panorâmica só dá a direção */
+    g.connect(p); p.connect(M.bus.perto); M.vozes.push({ g, p, bus: 'perto', src: null, fim: 0, prio: -1, ini: 0, h: i < nH }); }
+  M.ordemPesada = M.vozes.filter(v => v.h).concat(M.vozes.filter(v => !v.h)); M.ordemLeve = M.vozes.filter(v => !v.h).concat(M.vozes.filter(v => v.h)); /* 5.0f.1 */
   /* 5.0f (bancada): uma panorâmica que nunca recebeu som segue processando calada (no Chrome, ~1 ms por segundo de som cada, ~4 ms na HRTF); um
      toque mudo de uma amostra em cada voz e na sala deixa o caminho desligado até o primeiro efeito de verdade */
   { const mudo = c.createBuffer(1, 1, c.sampleRate); const toca = no => { const s0 = c.createBufferSource(); s0.buffer = mudo; s0.connect(no); s0.start(0); }; for (const v of M.vozes) toca(v.g); }
   M.frente = []; for (let i = 0; i < nFr; i++) { const g = c.createGain(); g.gain.value = 0; g.connect(master); M.frente.push({ g, src: null, fim: 0, prio: -1, ini: 0 }); }
+  /* 5.0f.1: medidor do fundo antes do abaixar (efeitos + música), para a voz das unidades ficar acima dele: um AnalyserNode só, lido a cada 0,3 s */
+  if (o.medidor !== false) { M.medF = c.createBiquadFilter(); M.medF.type = 'highpass'; M.medF.frequency.value = 60; M.medF.Q.value = 0.5; master.connect(M.medF); M.an = c.createAnalyser(); M.an.fftSize = 2048; M.medF.connect(M.an); /* só os efeitos, com passa-alta de 60 Hz (o grave sub das explosões não conta como "cobrir a voz"); a música vem do volume medido de cada faixa (src/musica.js, nivelDb): medir a música pelo analisador errava 2 a 4 dB conforme o timbre de cada faixa */ /* passa-alta de 60 Hz: o grave sub das explosões não conta como "cobrir a voz" */ const z = c.createGain(); z.gain.value = 0; M.an.connect(z); z.connect(c.destination); M.anBuf = new Float32Array(2048); }
   M.med = { roubos: 0, fora: 0, toques: 0, maxAtivas: 0 };
   return M; }
 /* uma voz livre ou a que cede (a de menor prioridade, a mais antiga entre as iguais); null = o efeito fica de fora */
 function vozPara(M, lista, prio, t) { let livre = null, cede = null; for (const v of lista) { if (v.fim <= t) { livre = v; break; } if (v.prio < prio || (v.prio === prio && prio >= 2)) { if (!cede || v.prio < cede.prio || (v.prio === cede.prio && v.ini < cede.ini)) cede = v; } }
   if (livre) return livre; if (cede) { M.med.roubos++; return cede; } M.med.fora++; return null; }
 /* toca um AudioBuffer numa voz: vol (0–1), prio, pos = [x, y, z] (null = na frente), visto (false = sob a névoa), rate, atraso (s), envio da sala */
-function tocarBuf(M, buf, vol, prio, pos, bus, rate, atraso, med) { const c = M.c, t = c.currentTime, lista = pos ? M.vozes : M.frente; const v = vozPara(M, lista, prio, t); if (!v) return false;
+function tocarBuf(M, buf, vol, prio, pos, bus, rate, atraso, med) { const c = M.c, t = c.currentTime, lista = pos ? (prio === 0 ? M.ordemLeve : M.ordemPesada) || M.vozes : M.frente; /* 5.0f.1: os leves preferem a panorâmica simples */ const v = vozPara(M, lista, prio, t); if (!v) return false;
   let t0 = t + (atraso || 0); if (v.src && v.fim > t) { const g = v.g.gain; g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(0, t + 0.012); try { v.src.stop(t + 0.014); } catch (e) {} t0 = Math.max(t0, t + 0.014); } /* cede com um corte curto, sem estalo */
   const s = c.createBufferSource(); s.buffer = buf; if (rate !== 1) s.playbackRate.value = rate; s.connect(v.g); v.g.gain.setValueAtTime(vol, t0);
   if (pos) { const p = v.p; if (p.positionX) { p.positionX.value = pos[0]; p.positionY.value = pos[1]; p.positionZ.value = pos[2]; } else p.setPosition(pos[0], pos[1], pos[2]); /* .value, não setValueAtTime: com automação o PannerNode do Chrome entra no caminho por amostra e fica caro mesmo calado (bancada) */
@@ -24074,6 +24096,41 @@ function preGravar(c) { const au = A(); const OC = window.OfflineAudioContext ||
     return { bufs: out, ms: Math.round(performance.now() - t0), seg: +t.toFixed(2) }; };
   return pr && pr.then ? pr.then(fim) : new Promise(ok => { off.oncomplete = e => ok(fim(e.renderedBuffer)); }); }
 
+/* ---------- 5.0f.1: arquivos de som (assets/som/): o manifesto, o formato que o aparelho decodifica e o carregador (efeitos aqui, trilha no src/musica.js) ----------
+   O tools/build.mjs troca o marcador: { base: 'assets/som/' } no index.html (GitHub Pages), '../assets/som/' no dist/local.html e null no arquivo único
+   (o artefato não pede nada à rede e fica com o som gerado). ?somarq=<pasta> aponta para outra pasta; ?somarq=0 desliga. */
+const SOM_TXT = '{"base":"assets/som/"}'; let SOMCFG = null; try { if (SOM_TXT.charAt(0) === '{') SOMCFG = JSON.parse(SOM_TXT); } catch (e) { SOMCFG = null; }
+function somBase() { const q = par('somarq'); if (q === '0' || q === 'off') return null; if (q && /^[\w./-]+$/.test(q) && !/^\/\//.test(q)) return /\/$/.test(q) ? q : q + '/';
+  if (typeof location === 'undefined' || location.protocol === 'file:' || typeof fetch !== 'function') return null; /* fetch não lê file:// */
+  return SOMCFG && SOMCFG.base ? SOMCFG.base : null; }
+const ARQ = { estado: 'parado', man: null, fmt: null, prom: null, motivo: null, med: { pedidos: 0, bytes: 0, falhas: 0, decodMs: 0, decodMax: 0 } };
+function manifesto() { if (ARQ.prom) return ARQ.prom; const b = somBase(); if (!b) { ARQ.estado = 'sem-arquivos'; return (ARQ.prom = Promise.resolve(null)); } ARQ.estado = 'carregando';
+  return (ARQ.prom = fetch(b + 'som.json', { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }).then(m => { if (!m || !m.musica) throw new Error('manifesto'); ARQ.man = m; ARQ.estado = 'pronto'; return m; })
+    .catch(e => { ARQ.estado = 'falhou'; ARQ.motivo = String((e && e.message) || e); return null; })); }
+function decodifica(ab, c) { return new Promise((ok, no) => { let fe = false; const f = (fn, v) => { if (!fe) { fe = true; fn(v); } };
+  try { const pr = c.decodeAudioData(ab, b => f(ok, b), e => f(no, e || new Error('decodificação'))); if (pr && pr.then) pr.then(b => f(ok, b), e => f(no, e || new Error('decodificação'))); } catch (e) { f(no, e); } }); }
+function paraMono(b, c) { if (b.numberOfChannels < 2) return b; const n = b.length, m = c.createBuffer(1, n, b.sampleRate), d = m.getChannelData(0), L = b.getChannelData(0), R = b.getChannelData(1); for (let i = 0; i < n; i++) d[i] = 0.5 * (L[i] + R[i]); return m; }
+/* busca e decodifica assets/som/<rel>.<formato>: o = { sr (decodifica já nessa taxa, menos memória), mono }. O primeiro formato que decodifica fica
+   (Opus no Ogg; se o aparelho não decodificar, o AAC). O decodeAudioData roda fora do fio principal; a página não trava. */
+function buscar(rel, o) { o = o || {}; const b = somBase(), au = A(); if (!b || !ARQ.man || !au || !au.ctx) return Promise.reject(new Error('sem arquivos'));
+  const ordem = ARQ.fmt ? [ARQ.fmt] : (Array.isArray(ARQ.man.formatos) && ARQ.man.formatos.length ? ARQ.man.formatos.slice() : ['ogg']);
+  const tenta = i => { const fmt = ordem[i]; if (!fmt) return Promise.reject(new Error('formato')); const url = b + rel + '.' + fmt + '?v=' + encodeURIComponent(ARQ.man.versao || '');
+    return fetch(url).then(r => { if (!r.ok) throw Object.assign(new Error('http ' + r.status), { rede: true }); return r.arrayBuffer(); }).then(ab => { ARQ.med.pedidos++; ARQ.med.bytes += ab.byteLength; const t0 = performance.now();
+      const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext; let c = au.ctx; if (o.sr && OC && o.sr !== au.ctx.sampleRate) { try { c = new OC(2, 1, o.sr); } catch (e) { c = au.ctx; } }
+      return decodifica(ab.slice(0), c).catch(e => c !== au.ctx ? decodifica(ab, au.ctx) : Promise.reject(e)).then(buf => { const ms = performance.now() - t0; ARQ.med.decodMs += ms; if (ms > ARQ.med.decodMax) ARQ.med.decodMax = ms; if (!ARQ.fmt) ARQ.fmt = fmt; return o.mono ? paraMono(buf, au.ctx) : buf; }); })
+      .catch(e => { if (!(e && e.rede) && !ARQ.fmt && i + 1 < ordem.length) return tenta(i + 1); throw e; }); };
+  return tenta(0).catch(e => { ARQ.med.falhas++; throw e; }); }
+/* nível "como se ouve" de um efeito: RMS dos primeiros 0,4 s depois de um passa-alta de ~120 Hz (o grave sub não engana a comparação) */
+function nivel(b) { const d = b.getChannelData(0), n = Math.min(d.length, Math.floor(0.4 * b.sampleRate)), k = Math.exp(-2 * Math.PI * 120 / b.sampleRate); let y = 0, x1 = 0, s = 0;
+  for (let i = 0; i < n; i++) { y = k * (y + d[i] - x1); x1 = d[i]; s += y * y; } return Math.sqrt(s / Math.max(1, n)); }
+/* volume de cada efeito de arquivo pelo som gerado de antes (o mesmo lugar na mixagem), com um pouco mais de peso nas explosões */
+const EF_REF = { explosion_big: 'explosion' }, EF_EXTRA = { shot_light: 0.9, beam: 0.9, shot_heavy: 1.1, impact: 1.05, explosion: 1.3, explosion_big: 1.7, thunder: 1.1, storm: 1.0, siphon: 1.0 };
+function carregaEfeitos() { if (S.arqPedido || par('efeitosarq') === '0') return; S.arqPedido = true;
+  manifesto().then(m => { if (!m || !m.efeitos) return; const lista = []; for (const nome in m.efeitos) for (const v of m.efeitos[nome]) lista.push([nome, v.arq]);
+    let i = 0; const out = {}; const prox = () => { if (i >= lista.length) { S.arq = out; S.med.efeitosArq = Object.keys(out).reduce((n, k) => n + out[k].length, 0); if (CH.reverb && leve() && par('reverb') !== '1') semSala(); return; } const [nome, arq] = lista[i++];
+      buscar('efeitos/' + arq, { mono: true }).then(buf => { const ref = S.bufs && S.bufs[EF_REF[nome] || nome]; let g = 1; if (ref) { const a = nivel(ref), b = nivel(buf); if (a > 0 && b > 0) g = Math.max(0.15, Math.min(6, a / b)); } g *= EF_EXTRA[nome] || 1;
+        (out[nome] = out[nome] || []).push({ buf, g }); }, e => { S.med.efeitosFalhas = (S.med.efeitosFalhas || 0) + 1; }).then(() => setTimeout(prox, 0)); }; prox(); }); }
+
 /* ---------- estado ao vivo ---------- */
 const S = { anel: new Float32Array(256), lento: 0, M: null, bufs: null, pronto: false, gravando: false, ouvT: -1e9, zoom: 1, visto: null, H: null, ty: 0, R: null, q: 0, falando: 0, falaT: 0, fala: false, med: { quadros: 0, ms: 0, sfx: 0, msSfx: 0, toques: 0, maxAtivas: 0, preMs: 0, preSeg: 0, irMs: 0, irMax: 0 }, partidaT: -1e9, bioma: null, biomaT: 0, biomaVisto: null, irs: {}, lp: { x: 0, y: 0, z: 0, fx: 0, fy: 0, fz: 0, ux: 0, uy: 0, uz: 0 } };
 const leve = () => toque() || (S.R && S.R.quality && S.R.quality.name === 'baixa'); /* celular e Baixa: menos vozes, panorâmica simples, sala curta e mono */
@@ -24081,15 +24138,17 @@ function modelo() { if (CH.hrtf === '0') return 'equalpower'; if (CH.hrtf === '1
 function montar(c, master) { if (S.M || !CH.som3d || !c || !master) return; const ini = performance.now();
   S.M = criar(c, master, { leve: toque(), modelo: modelo() }); volumes();
   /* fala no ar (vozes gravadas e a voz do sistema): o 'ard-voz' de inicio e fim; o speechSynthesis.speaking é conferido no quadro */
-  try { addEventListener('ard-voz', e => { const d = e && e.detail; if (!d) return; if (d.tipo === 'inicio') { S.fala = true; S.falaT = performance.now(); abaixa(true); } else if (d.tipo === 'fim') { S.fala = false; abaixa(!!falaSistema()); } }); } catch (e) {} /* na hora do evento (não espera o quadro) */
+  try { addEventListener('ard-voz', e => { const d = e && e.detail; if (!d) return; if (d.tipo === 'inicio') { S.fala = true; S.falaT = performance.now(); S.falaTipo = d.gravada ? (/^unid:/.test(d.chave || '') ? 'resposta' : 'gravada') : 'sistema'; S.falando = null; abaixa(true); if (d.gravada) vozNivel(true); } /* 5.0f.1: o tipo da fala escolhe o quanto o fundo abaixa; a voz gravada entra no plano do fundo medido agora */ else if (d.tipo === 'fim') { S.fala = false; if (falaSistema()) S.falaTipo = 'sistema'; abaixa(!!falaSistema()); } }); } catch (e) {} /* na hora do evento (não espera o quadro) */
   S.med.montarMs = +(performance.now() - ini).toFixed(2);
   /* a pré-gravação espera o contexto tocar e mais 0,8 s: no WebKit, um OfflineAudioContext gravando junto com o resume() do primeiro toque atrasava o desbloqueio */
   const vai = () => { if (S.gravando || S.pronto) return; if (c.state !== 'running') { setTimeout(vai, 400); return; } setTimeout(gravar, 800); }; const gravar = () => {
-  S.gravando = true; preGravar(c).then(r => { S.gravando = false; if (!r) return; S.bufs = r.bufs; S.pronto = true; S.med.preMs = r.ms; S.med.preSeg = r.seg; }, e => { S.gravando = false; console.warn('[ARD] som 3D: pré-gravação falhou: ' + (e && e.message)); }); }; vai(); }
+  S.gravando = true; preGravar(c).then(r => { S.gravando = false; if (!r) return; S.bufs = r.bufs; S.pronto = true; S.med.preMs = r.ms; S.med.preSeg = r.seg; setTimeout(carregaEfeitos, 1500); /* 5.0f.1 */ }, e => { S.gravando = false; console.warn('[ARD] som 3D: pré-gravação falhou: ' + (e && e.message)); }); }; vai(); }
 function volumes() { const M = S.M, au = A(); if (!M || !au) return; const t = M.c.currentTime; try { M.mus.gain.setTargetAtTime(au.musica === false ? 0 : 0.9 * au.volMusica, t, 0.05); } catch (e) {} }
-function saida() { const M = S.M; if (!M) return; const m = modelo(); for (const v of M.vozes) if (v.p.panningModel !== m) v.p.panningModel = m; }
+function saida() { const M = S.M; if (!M) return; const m = modelo(); for (const v of M.vozes) if (v.h !== false && v.p.panningModel !== m) v.p.panningModel = m; } /* 5.0f.1: a outra metade fica sempre na panorâmica simples */
 /* a sala do bioma (troca cruzando em 1,2 s); o impulso de cada bioma nasce uma vez, na primeira vez que ele toca */
-function sala(nome) { const M = S.M; if (!M || !CH.reverb || nome === M.bioma) return; const lv = leve(); const k = nome + (lv ? ':l' : ''); const ir = S.irs[k];
+/* 5.0f.1: no celular e na Baixa, com os efeitos de arquivo (que trazem a cauda deles), a sala do bioma sai: o convolvedor é o pedaço mais caro do fio de áudio */
+function semSala() { const M = S.M; if (!M || M.bioma === 'seco') return; const t = M.c.currentTime; for (const x of M.salas) x.w.gain.setTargetAtTime(0, t, 0.35); M.bioma = 'seco'; setTimeout(() => { if (M.bioma !== 'seco') return; for (const x of M.salas) if (x.lig) { try { M.envio.disconnect(x.cv); } catch (e) {} x.lig = false; } }, 2000); }
+function sala(nome) { const M = S.M; if (!M || !CH.reverb) return; if (S.arq && leve() && par('reverb') !== '1') { semSala(); return; } if (nome === M.bioma) return; const lv = leve(); const k = nome + (lv ? ':l' : ''); const ir = S.irs[k];
   if (!ir) { if (!S.irPedido) { S.irPedido = k; const f = () => { const t0 = performance.now(); S.irs[k] = impulso(M.c, nome, lv); const ms = performance.now() - t0; S.med.irMs += ms; if (ms > S.med.irMax) S.med.irMax = ms; S.irPedido = null; }; if (typeof requestIdleCallback === 'function') requestIdleCallback(f, { timeout: 1000 }); else setTimeout(f, 50); } return; } /* o impulso nasce em tempo ocioso; a troca vem na próxima conferência */
   const t = M.c.currentTime, ant = M.salas[M.sala], nv = M.salas[1 - M.sala]; if (nv.nome !== k) { try { nv.cv.buffer = ir; } catch (e) { const cv = M.c.createConvolver(); cv.buffer = ir; try { nv.cv.disconnect(); } catch (er) {} M.envio.connect(cv); cv.connect(nv.w); nv.cv = cv; } nv.nome = k; }
   if (!nv.lig) { M.envio.connect(nv.cv); nv.lig = true; } const P = IRS[nome] || IRS.tundra; ant.w.gain.setTargetAtTime(0, t, 0.35); nv.w.gain.setTargetAtTime(P.wet * (lv ? 0.7 : 1), t, 0.35); M.sala = 1 - M.sala; M.bioma = nome; M.wet = P.wet;
@@ -24097,20 +24156,39 @@ function sala(nome) { const M = S.M; if (!M || !CH.reverb || nome === M.bioma) r
 
 /* ---------- toca um efeito (src/audio.js, A.sfx) ---------- */
 function tocar(name, vol, delay, ev, raca) { const M = S.M; if (!M || !S.pronto) return false; const t0 = performance.now();
-  try { const b = (raca && UI_RACA.indexOf(name) >= 0 && S.bufs[name + ':' + raca]) || S.bufs[name]; if (!b) return false;
+  try { let b = (raca && UI_RACA.indexOf(name) >= 0 && S.bufs[name + ':' + raca]) || S.bufs[name]; if (!b) return false;
     const fresco = t0 - S.ouvT < 5000; /* o ouvinte foi posto há pouco (2D e telas sem câmera: na frente) */ let pos = null, prio = FRENTE[name] != null ? FRENTE[name] : 1, g = vol, bus = 'perto', rate = 1;
     if (POS[name] != null && ev && fresco) { const x = ev.x != null ? ev.x : ev.x1 != null ? ev.x1 : ev.x2, y = ev.y != null ? ev.y : ev.y1 != null ? ev.y1 : ev.y2;
       if (x != null && y != null) { prio = POS[name]; if (name === 'explosion' && (ev.kind === 'building' || vol > 0.7)) prio = 3; /* explosão grande na frente */
         let h = S.ty; if (S.H) try { h = S.H(x, y) + 6; } catch (e) {} pos = [x, h, -y];
         const vis = !CH.abafar || !S.visto || S.visto(x, y); const zf = Math.max(0.62, Math.min(1, 0.62 + 0.38 * (S.zoom || 1))); /* câmera mais longe, mais baixo */
         g = vol * zf * (vis ? 1 : 0.55); bus = !CH.abafar ? 'perto' : !vis ? 'nevoa' : vol < 0.5 ? 'longe' : 'perto'; /* névoa: abafado; de longe, o ar tira o agudo (e a sala pesa mais) */ } }
+    if (S.arq) { const vs = (name === 'explosion' && prio >= 3 && S.arq.explosion_big) || S.arq[name]; if (vs && vs.length) { const v = vs[(Math.random() * vs.length) | 0]; b = v.buf; g *= v.g; } } /* 5.0f.1: o efeito de arquivo (uma variação ao acaso; explosão grande = a de construção) */
     if (VARIA[name]) rate = 1 + (Math.random() * 2 - 1) * VARIA[name];
     const atraso = Math.max(0, Math.min(2.5, delay || 0)); /* o trovão longe chega depois (src/main.js) */
     tocarBuf(M, b, g, prio, pos, bus, rate, atraso, S.med); S.med.sfx++; return true; /* sem voz livre, o efeito fica de fora (não volta para a síntese ao vivo) */ } finally { S.med.msSfx += performance.now() - t0; } }
 
 /* fala no ar: os efeitos descem 6 dB e a música 10 dB (ataque de ~50 ms, volta em ~0,4 s) */
 const falaSistema = () => { try { return typeof speechSynthesis !== 'undefined' && speechSynthesis.speaking; } catch (e) { return false; } };
-function abaixa(fala) { const M = S.M; fala = !!fala; if (!M || fala === S.falando) return; S.falando = fala; const t = M.c.currentTime; M.duckFx.gain.setTargetAtTime(fala ? 0.5 : 1, t, fala ? 0.04 : 0.25); M.duckMus.gain.setTargetAtTime(fala ? 0.32 : 1, t, fala ? 0.06 : 0.4); }
+/* 5.0f.1: o quanto o fundo abaixa depende da fala. As gravadas sobem e descem com o fundo (vozNivel, abaixo), então o fundo só abaixa de leve: na
+   resposta das unidades a música −3 dB e os efeitos −2 dB; nas outras gravadas (locutor, líder, campanha) −5 e −3 dB. A voz do sistema não passa
+   pelo Web Audio (não dá para subir): o fundo abaixa como antes (−10 e −6 dB). */
+const ABAIXA = { resposta: [0.8, 0.71], gravada: [0.71, 0.56], sistema: [0.5, 0.32] };
+function abaixa(fala) { const M = S.M; fala = !!fala; if (!M || fala === S.falando) return; S.falando = fala; const t = M.c.currentTime; const a = ABAIXA[(fala && S.falaTipo) || 'sistema'] || ABAIXA.sistema;
+  M.duckFx.gain.setTargetAtTime(fala ? a[0] : 1, t, fala ? 0.04 : 0.25); M.duckMus.gain.setTargetAtTime(fala ? a[1] : 1, t, fala ? 0.06 : 0.4); }
+/* 5.0f.1: a voz gravada no plano do fundo. O fundo antes do abaixar = os efeitos medidos (analisador, sem o grave, a cada 0,3 s, alisado ~2 s) + a
+   música pelo volume conhecido da faixa que toca (src/musica.js, nivelDb) vezes o volume de Ajustes; entre
+   uma fala e outra o ganho das vozes vai para "fundo + MARGEM" (as falas saem niveladas em −21 LUFS: VOZ_REF), dentro de um piso (a voz nunca some
+   num momento calmo) e de um teto (nunca sobressalta). Com o abaixar leve da resposta, a voz fica 4 a 6 dB acima do fundo. ?vozauto=0 desliga. */
+const VOZ = { REF: -21, MARGEM: 5, PISO: -27, TETO: -15, auto: par('vozauto') !== '0' };
+function vozNivel(inicio) { const M = S.M; if (!M || !M.an) return;
+  if (!inicio) { M.an.getFloatTimeDomainData(M.anBuf); let s2 = 0; const b = M.anBuf; for (let i = 0; i < b.length; i++) s2 += b[i] * b[i]; const p = s2 / b.length;
+    S.fundoP = S.fundoP == null ? p : S.fundoP + (p - S.fundoP) * (p > S.fundoP ? 0.25 : 0.12);
+    let mus = null; try { mus = ARD.musica && ARD.musica.nivelDb ? ARD.musica.nivelDb() : null; } catch (e) {} const pm = mus == null ? 0 : Math.pow(10, (mus + 20 * Math.log10(Math.max(1e-6, M.mus.gain.value))) / 10);
+    S.fxDb = 10 * Math.log10(S.fundoP + 1e-10); S.musDb = mus == null ? null : 10 * Math.log10(pm + 1e-10); S.fundoDb = 10 * Math.log10(S.fundoP + pm + 1e-10); }
+  if (!VOZ.auto || S.fundoDb == null || (S.fala && !inicio)) return; /* nunca no meio de uma fala: entre as falas e no começo de cada uma */
+  const alvo = Math.max(VOZ.PISO, Math.min(VOZ.TETO, S.fundoDb + VOZ.MARGEM)), g = Math.pow(10, (alvo - VOZ.REF) / 20);
+  if (Math.abs(g - (S.vozG || 1)) > 0.02) { S.vozG = g; M.fala.gain.setTargetAtTime(g, M.c.currentTime, inicio ? 0.015 : 0.1); } }
 /* ---------- quadro (src/render3d.js, R.draw, depois do updateCamera): ouvinte, sala, fala e a música ---------- */
 function quadro(camera, cam, sim, human, visto, H, R) { const t0 = performance.now();
   try { S.R = R; S.visto = visto; S.H = H; S.zoom = cam && cam.zoom || 1; S.ty = R && R.camTy || 0; S.partidaT = t0;
@@ -24124,7 +24202,7 @@ function quadro(camera, cam, sim, human, visto, H, R) { const t0 = performance.n
     if (M && t0 - S.lento > 300) { S.lento = t0; /* a cada 0,3 s (pelo relógio, não por quadro: igual em 30 e em 144 fps): a sala do bioma sob a câmera, a fala no ar e o abaixar */
       let nome = null; if (R && R.cinturao) nome = 'espaco'; else if (sim && sim.biome && ARD.sim && cam) { const SS = ARD.sim, tx = Math.floor(cam.x / SS.TILE), ty = Math.floor(cam.y / SS.TILE); if (tx >= 0 && ty >= 0 && tx < SS.TILES && ty < SS.TILES) nome = BIOMAS[sim.biome[ty * SS.TILES + tx]] || null; }
       if (nome && nome !== M.bioma) { if (nome !== S.biomaVisto) { S.biomaVisto = nome; S.biomaT = t0; } else if (t0 - S.biomaT > 1200 || !M.bioma) sala(nome); } /* bioma novo firme por 1,2 s */
-      abaixa((S.fala && t0 - S.falaT < 20000) || falaSistema()); }
+      abaixa((S.fala && t0 - S.falaT < 20000) || falaSistema()); vozNivel(); /* 5.0f.1 */ }
     if (ARD.musica && ARD.musica.quadro) ARD.musica.quadro(sim, human, R); }
   finally { const d = performance.now() - t0; S.med.quadros++; S.med.ms += d; S.anel[S.med.quadros & 255] = d; } } /* anel dos últimos 256 quadros (mediana e pior) */
 
@@ -24139,14 +24217,14 @@ function zerar() { S.anel.fill(0); const m = S.med; m.quadros = 0; m.ms = 0; m.s
 function bancada(o) { const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext, au = A(); const sr = (au && au.ctx && au.ctx.sampleRate) || 48000, seg = o.seg || 10;
   const off = new OC(2, Math.ceil(seg * sr), sr), master = off.createGain(); master.gain.value = 0.35; master.connect(off.destination); let M = null;
   if (!o.antes) { M = criar(off, master, { leve: !!o.leve, modelo: o.modelo || 'HRTF', vozes: o.vozes, limitador: o.limitador }); const L = off.listener; if (L.positionX) { L.positionY.value = 600; L.forwardY.value = -0.7; L.forwardZ.value = -0.7; } M.duckFx.gain.value = 1; M.mus.gain.value = 0.63;
-    if (o.sala !== false) { const ir = impulso(off, o.sala || 'rocha', !!o.leve); M.salas[0].cv.buffer = ir; M.envio.connect(M.salas[0].cv); M.salas[0].w.gain.value = 0.32; }
+    if (o.sala !== false && !(o.leve && o.arquivos !== false && S.arq)) { const ir = impulso(off, o.sala || 'rocha', !!o.leve); /* 5.0f.1: no celular com os efeitos de arquivo, sem sala (como no jogo) */ M.salas[0].cv.buffer = ir; M.envio.connect(M.salas[0].cv); M.salas[0].w.gain.value = 0.32; }
     if (o.musica) for (const b of o.musica) { const s = off.createBufferSource(); s.buffer = b; s.loop = true; s.connect(M.mus); s.start(0); } }
   let sd = 99; const rnd = () => { sd = (sd * 1103515245 + 12345) >>> 0; return sd / 4294967296; };
   const linha = (o.linha || []).filter(x => x[0] < seg - 0.8); const ag = []; for (const [t, n, v] of linha) ag.push([t, n, v, rnd() * 900 - 450, rnd() * 900 - 450]);
   /* os eventos entram pela linha do tempo do render (suspend/resume), como no jogo: cada um no seu momento, com o mesmo caminho do A.sfx */
   const passo = 0.05; let i = 0; const agenda = []; for (let t = passo; t < seg - 0.5; t += passo) agenda.push(+t.toFixed(3));
   const toca = (tA, tB) => { while (i < ag.length && ag[i][0] < tB) { const [, n, v, x, y] = ag[i++]; if (o.antes) au.sintetiza(off, master, off.currentTime, n, null, v, 0);
-      else { const b = S.bufs && S.bufs[n]; if (!b) continue; const pos = POS[n] != null ? [x, 0, -y] : null; tocarBuf(M, b, v, pos ? POS[n] : (FRENTE[n] || 1), pos, v < 0.5 ? 'longe' : 'perto', VARIA[n] ? 1 + (rnd() * 2 - 1) * VARIA[n] : 1, 0, null); } } };
+      else { let b = S.bufs && S.bufs[n], gv = 1; if (!b) continue; const vs = o.arquivos !== false && S.arq && S.arq[n]; if (vs && vs.length) { const q = vs[(rnd() * vs.length) | 0]; b = q.buf; gv = q.g; } /* 5.0f.1: os efeitos de arquivo */ const pos = POS[n] != null ? [x, 0, -y] : null; tocarBuf(M, b, v * gv, pos ? POS[n] : (FRENTE[n] || 1), pos, v < 0.5 ? 'longe' : 'perto', VARIA[n] ? 1 + (rnd() * 2 - 1) * VARIA[n] : 1, 0, null); } } };
   for (const t of agenda) off.suspend(t).then(() => { toca(0, t); off.resume(); });
   const t0 = performance.now(); return off.startRendering().then(b => { const ms = performance.now() - t0; let pk = 0, s = 0; for (let k = 0; k < b.numberOfChannels; k++) { const d = b.getChannelData(k); for (let j = 0; j < d.length; j++) { const a = Math.abs(d[j]); if (a > pk) pk = a; s += d[j] * d[j]; } }
     return { ms: Math.round(ms), seg, msPorSeg: +(ms / seg).toFixed(1), eventos: i, picoDb: +(20 * Math.log10(pk || 1e-9)).toFixed(1), rmsDb: +(10 * Math.log10(s / (b.length * b.numberOfChannels) || 1e-12)).toFixed(1), roubos: M ? M.med.roubos : 0, fora: M ? M.med.fora : 0 }; }); }
@@ -24160,7 +24238,7 @@ function saidaSala(c) { return S.M && S.M.c === c ? S.M.fundo : null; }
 /* src/main.js: na partida, os botões da interface soam com o clique da Raça do jogador (um por toque, pela regra de intervalo do A.sfx) */
 if (typeof document !== 'undefined' && document.addEventListener) document.addEventListener('click', e => { if (!e.isTrusted || performance.now() - S.partidaT > 1500) return; const t = e.target, b = t && t.closest && t.closest('button, .act, .bcard'); const au = A();
   if (!b || b.disabled || !au || b.id === 'btn-sound' || (b.closest && b.closest('[data-som-mix]'))) return; au.sfx('click', 0.55); }, true);
-ARD.som3d = { montar, tocar, quadro, medidas, zerar, volumes, saida, saidaFala, busMusica, saidaSala, bancada, falando: () => !!S.falando, ativo: () => !!S.M, pronto: () => S.pronto, CH, IRS, impulso, criar, _S: S };
+ARD.som3d = { arquivos: { manifesto, buscar, estado: () => ({ estado: ARQ.estado, motivo: ARQ.motivo, formato: ARQ.fmt, base: somBase(), pedidos: ARQ.med.pedidos, kb: Math.round(ARQ.med.bytes / 1024), falhas: ARQ.med.falhas, decodMs: Math.round(ARQ.med.decodMs), decodMaxMs: Math.round(ARQ.med.decodMax), efeitos: S.med.efeitosArq || 0 }) } /* 5.0f.1 */, voz: () => ({ fundoDb: S.fundoDb != null ? +S.fundoDb.toFixed(1) : null, efeitosDb: S.fxDb != null ? +S.fxDb.toFixed(1) : null, musicaDb: S.musDb != null ? +S.musDb.toFixed(1) : null, ganhoDb: +(20 * Math.log10(S.vozG || 1)).toFixed(1), tipo: S.falaTipo || null }), montar, tocar, quadro, medidas, zerar, volumes, saida, saidaFala, busMusica, saidaSala, bancada, falando: () => !!S.falando, ativo: () => !!S.M, pronto: () => S.pronto, CH, IRS, impulso, criar, _S: S };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Aether Rift: Dominion — 5.0f: trilha adaptativa gerada no navegador (Web Audio, nenhum arquivo de áudio).
@@ -24177,11 +24255,19 @@ ARD.som3d = { montar, tocar, quadro, medidas, zerar, volumes, saida, saidaFala, 
      nome = 'calma' | 'briefing' (cinema com um fundo de paz), 'tensa' (cinema com tensão), 'epica' (cinema com batalha), 'vitoria' | 'derrota'
      (o final e o cinema baixo), 'abertura' (só o cinema), 'chefao' (+ chefão), 'superarma' (+ batalha), 'sala-guerra' (+ tensão);
      nome desconhecido = nada muda; ARD.musica.cena(null) volta para a música do estado da partida. Devolve true.
-   Chaves de URL: ?musica=0 (sem música, nada é gravado), ?musica=<paz|tensao|batalha|chefao|cinema> (prende a camada, para comparar e gravar). */
+   Chaves de URL: ?musica=0 (sem música, nada é gravado), ?musica=<paz|tensao|batalha|chefao|cinema> (prende a camada, para comparar e gravar).
+   5.0f.1 (som de cinema): com os arquivos (assets/som/musica/, temas orquestrais e híbridos de Kevin MacLeod, CC BY 4.0, ver ASSETS.md) a trilha é
+   de verdade: por Raça um tema de paz, um de tensão e um de batalha, um tema de chefão, um de cinema, um da superarma e os finais de vitória e
+   derrota. Cada faixa é um trecho que emenda em laço (número inteiro de compassos, cauda cruzada no começo). O estado da partida escolhe a faixa
+   e a troca é musical: subindo, no próximo compasso (a faixa nova entra no tempo forte dela, em 0,35 s); descendo, no fim da frase de 4
+   compassos, cruzando em ~3 s. Os arquivos chegam depois da carga, um por vez, decodificados já em 32 kHz (24 kHz mono no celular e na Baixa),
+   com no máximo 2 faixas na memória. Sem os arquivos (o artefato, file://, ?somarq=0) ou com ?musica=sintese, a trilha gerada de
+   antes, igual. */
 (function (ARD) {
 'use strict';
 const par = k => { try { return new URLSearchParams(location.search).get(k); } catch (e) { return null; } };
 const CHAVE = par('musica'); const LIGADA = CHAVE !== '0';
+const GANHO_ARQ = 1.25; /* 5.0f.1: a trilha de arquivo (−20 LUFS na paz, −18 na batalha) fica ~3 dB acima da gerada de antes (medido na partida), com a voz por cima (src/som3d.js) */
 const A = () => ARD.audio || null;
 const UA = () => (typeof navigator !== 'undefined' && navigator.userAgent) || '';
 const toque = () => { try { return /iPhone|iPad|iPod/.test(UA()) || (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches); } catch (e) { return false; } };
@@ -24314,7 +24400,7 @@ const leve = () => toque() || (P.R && P.R.quality && P.R.quality.name === 'baixa
 const agora = () => performance.now();
 function bus(c) { const s3 = ARD.som3d; const b = s3 && s3.busMusica && s3.busMusica(c); if (b) return b; if (!P.bus0 || P.bus0.context !== c) { P.bus0 = c.createGain(); P.bus0.connect(c.destination); } const au = A(); P.bus0.gain.value = au && au.musica !== false ? 0.9 * au.volMusica : 0; return P.bus0; }
 function novoDeck(raca, modo) { const au = A(), c = au.ctx; const d = { raca, modo, c, saida: c.createGain(), cam: {}, t0: null, L: tamanho(raca, 'paz') }; d.saida.gain.value = 0; d.saida.connect(bus(c)); d.saida.gain.setTargetAtTime(modo === 'menu' ? 0.6 : 1, c.currentTime, 0.6); return d; }
-function soltarDeck(d, tau) { if (!d) return; const t = d.c.currentTime; try { d.saida.gain.cancelScheduledValues(t); d.saida.gain.setTargetAtTime(0, t, tau || 0.5); } catch (e) {} P.velhos.push(d); setTimeout(() => { for (const k in d.cam) { const x = d.cam[k]; if (x.src) try { x.src.stop(); } catch (e) {} try { x.g.disconnect(); } catch (e) {} } try { d.saida.disconnect(); } catch (e) {} const i = P.velhos.indexOf(d); if (i >= 0) P.velhos.splice(i, 1); }, (tau || 0.5) * 5000 + 200); }
+function soltarDeck(d, tau) { if (!d) return; const t = d.c.currentTime; try { d.saida.gain.cancelScheduledValues(t); d.saida.gain.setTargetAtTime(0, t, tau || 0.5); } catch (e) {} P.velhos.push(d); setTimeout(() => { if (d.cur) try { d.cur.src.stop(); } catch (e) {} /* 5.0f.1 */ for (const k in d.cam) { const x = d.cam[k]; if (x.src) try { x.src.stop(); } catch (e) {} try { x.g.disconnect(); } catch (e) {} } try { d.saida.disconnect(); } catch (e) {} const i = P.velhos.indexOf(d); if (i >= 0) P.velhos.splice(i, 1); }, (tau || 0.5) * 5000 + 200); }
 /* põe a camada pronta para tocar no deck (presa ao relógio do deck: entra no ponto certo do laço) */
 function ligaCamada(d, camada, buf) { if (d.cam[camada] && d.cam[camada].src) return; const c = d.c, x = d.cam[camada] || (d.cam[camada] = { g: c.createGain(), alvo: 0 }); if (!x.g.__lig) { x.g.gain.value = 0; x.g.connect(d.saida); x.g.__lig = 1; }
   const s = c.createBufferSource(); s.buffer = buf; s.loop = true; const t = c.currentTime + 0.06; if (d.t0 == null) d.t0 = t; const off = ((t - d.t0) % buf.duration + buf.duration) % buf.duration; s.connect(x.g); s.start(t, off); x.src = s; x.g.gain.setTargetAtTime(x.alvo, t, 0.4); }
@@ -24332,7 +24418,7 @@ const MIX = [{ paz: 1, tensao: 0, batalha: 0, chefao: 0 }, { paz: 0.75, tensao: 
 const CENA = { abertura: { cinema: 1 }, chefao: { cinema: 1, chefao: 0.5 }, superarma: { cinema: 1, batalha: 0.4 }, 'sala-guerra': { cinema: 1, tensao: 0.4 } /* 5.0f: os nomes do f-cinema */, calma: { cinema: 1, paz: 0.3 }, briefing: { cinema: 1, paz: 0.3 }, tensa: { cinema: 1, tensao: 0.5 }, epica: { cinema: 1, batalha: 0.45 }, vitoria: { cinema: 0.6 }, derrota: { cinema: 0.6 } };
 function alvos() { const d = P.deck; if (!d) return null; let m; if (P.cena) m = CENA[P.cena] || { cinema: 1 }; else if (P.fim) m = {}; else if (CAMADAS.indexOf(CHAVE) >= 0) m = { [CHAVE]: 1 }; else if (d.modo === 'menu') m = { paz: 1 };
   else { m = Object.assign({}, MIX[P.nivel]); if (P.nivel === 0 && P.era >= 2) m.tensao = P.era >= 3 ? 0.4 : 0.25; } return m; }
-function aplica(tau) { const d = P.deck; if (!d) return; const m = alvos() || {}, t = d.c.currentTime; for (const k of CAMADAS) { const v = m[k] || 0; const x = d.cam[k]; if (x) { if (x.alvo !== v) { x.alvo = v; x.g.gain.setTargetAtTime(v, t, tau || 0.8); } } else if (v > 0) garante(d, k); } }
+function aplica(tau) { const d = P.deck; if (!d) return; if (d.arq) { aplicaArq(d, tau); return; } /* 5.0f.1 */ if (d.decidindo) return; const m = alvos() || {}, t = d.c.currentTime; for (const k of CAMADAS) { const v = m[k] || 0; const x = d.cam[k]; if (x) { if (x.alvo !== v) { x.alvo = v; x.g.gain.setTargetAtTime(v, t, tau || 0.8); } } else if (v > 0) garante(d, k); } }
 function garante(d, camada) { if (d.cam[camada] || (d.pedidas && d.pedidas[camada])) return; (d.pedidas = d.pedidas || {})[camada] = 1; pede(d.raca, camada, buf => { if (P.deck !== d && P.velhos.indexOf(d) < 0) return; const m = alvos() || {}; d.cam[camada] = d.cam[camada] || { g: d.c.createGain(), alvo: 0 }; d.cam[camada].alvo = (P.deck === d ? m[camada] : 0) || 0; ligaCamada(d, camada, buf); }); }
 /* calor e base: eventos da simulação (src/render3d.js, R.onEvents) */
 function eventos(evs, sim, human) { if (!P.deck || P.deck.modo !== 'partida' || !evs) return; const now = agora();
@@ -24345,18 +24431,57 @@ function eventos(evs, sim, human) { if (!P.deck || P.deck.modo !== 'partida' || 
 function estado(sim, human) { if (P.forcado) return; const now = agora(), dt = Math.min(2, (now - (P.calorT || now)) / 1000); P.calorT = now; P.calor *= Math.exp(-dt / 7); const p = sim && sim.players && sim.players[human]; P.era = (p && p.era) || 1;
   let n = 0; const base = now - P.baseT < 25000; if (P.calor > 1.5 || base) n = 1; if (P.calor > 8 || (now - P.baseT < 15000 && P.calor > 3)) n = 2; if (P.calor > 22 && (P.era >= 3 || now - P.nucleoT < 20000 || now - P.superT < 30000)) n = 3;
   if (n !== P.quer) { P.quer = n; P.querT = now; } const espera = n > P.nivel ? 700 : 9000; if (n !== P.nivel && now - P.querT > espera) { P.nivel = n; aplica(n > 0 ? 0.5 : 2.2); } }
-function fimPartida(sim, human, res) { if (P.fim) return; const o = res && res.outcome; const v = o === 'victory' || (o === 'over' && res.scores && res.scores[0] && res.scores.slice().sort((a, b) => b.score - a.score)[0].id === human); P.fim = v ? 'vitoria' : 'derrota'; const d = P.deck; aplica(1.2); if (d) pede(d.raca, P.fim, buf => { if (P.deck === d) tocaFinal(d, P.fim, buf); }); }
+function fimPartida(sim, human, res) { if (P.fim) return; const o = res && res.outcome; const v = o === 'victory' || (o === 'over' && res.scores && res.scores[0] && res.scores.slice().sort((a, b) => b.score - a.score)[0].id === human); P.fim = v ? 'vitoria' : 'derrota'; const d = P.deck; aplica(1.2); if (d && d.arq) { const nome = P.fim; setTimeout(() => { if (P.deck === d && P.fim === nome) tocaFinalArq(d, nome); }, 700); return; } /* 5.0f.1 */ if (d) pede(d.raca, P.fim, buf => { if (P.deck === d) tocaFinal(d, P.fim, buf); }); }
+
+/* ---------- 5.0f.1: a trilha de arquivo (assets/som/musica/) ---------- */
+const FA = { cache: new Map(), pend: new Map(), med: { trocas: 0, decod: [] } };
+const ARQS = () => { const s3 = ARD.som3d; return s3 && s3.arquivos ? s3.arquivos : null; };
+/* o deck decide uma vez: com o manifesto, arquivo; sem ele, a trilha gerada (sint) */
+function decide(d, sint) { const F = ARQS(); if (!F || CHAVE === 'sintese') { sint(); return; } d.decidindo = true;
+  F.manifesto().then(m => { d.decidindo = false; if (P.deck !== d) return; if (m && m.musica) { d.arq = m; aplicaArq(d, 1.5); } else sint(); }, () => { d.decidindo = false; if (P.deck === d) sint(); }); }
+const NIVEIS = ['paz', 'tensao', 'batalha'];
+const CENA_ARQ = { abertura: ['cinema', 1], calma: ['cinema', 0.8], briefing: ['cinema', 0.8], tensa: ['@tensao', 1], 'sala-guerra': ['@tensao', 1], epica: ['@batalha', 1], superarma: ['superarma', 1], chefao: ['chefao', 1], vitoria: ['cinema', 0.5], derrota: ['cinema', 0.5] };
+function faixaAlvo(d) { const r = d.raca; let id = null, v = 1;
+  if (P.cena) { const c = CENA_ARQ[P.cena] || ['cinema', 1]; id = c[0]; v = c[1]; } else if (P.fim) id = null;
+  else if (CAMADAS.indexOf(CHAVE) >= 0) id = CHAVE === 'cinema' || CHAVE === 'chefao' ? CHAVE : '@' + CHAVE;
+  else if (d.modo === 'menu') id = '@paz'; else id = P.nivel >= 3 ? 'chefao' : '@' + NIVEIS[P.nivel];
+  if (id && id.charAt(0) === '@') id = r + '-' + id.slice(1); if (id && d.arq && !d.arq.musica[id]) id = d.arq.musica[r + '-paz'] ? r + '-paz' : null; return [id, v]; }
+function carregaFaixa(id) { const ja = FA.cache.get(id); if (ja) { ja.t = agora(); return Promise.resolve(ja.buf); } if (FA.pend.has(id)) return FA.pend.get(id); const F = ARQS(); if (!F) return Promise.reject(new Error('sem arquivos'));
+  const lv = leve(), t0 = agora(); const pr = F.buscar('musica/' + id, { sr: lv ? 24000 : 32000, mono: lv }).then(buf => { FA.pend.delete(id); FA.cache.set(id, { buf, t: agora() }); FA.med.decod.push({ id, ms: Math.round(agora() - t0), kb: Math.round(buf.length * buf.numberOfChannels * 4 / 1024) }); poda(); return buf; }, e => { FA.pend.delete(id); throw e; });
+  FA.pend.set(id, pr); return pr; }
+/* memória: no máximo 2 faixas decodificadas (a que toca e a próxima; ~45 MB no computador em 32 kHz estéreo, ~16 MB no celular em 24 kHz mono); sai a mais antiga que não está tocando */
+function poda() { const max = 2; if (FA.cache.size <= max) return; const tocando = new Set(); for (const d of [P.deck].concat(P.velhos)) if (d && d.cur) tocando.add(d.cur.id);
+  const ks = Array.from(FA.cache.entries()).filter(([k]) => !tocando.has(k)).sort((a, b) => a[1].t - b[1].t); while (FA.cache.size > max && ks.length) FA.cache.delete(ks.shift()[0]); }
+function aplicaArq(d, tau) { const [id, v] = faixaAlvo(d); const c = d.c, t = c.currentTime;
+  if (!id) { if (d.cur) { const x = d.cur; d.cur = null; x.g.gain.cancelScheduledValues(t); x.g.gain.setTargetAtTime(0, t, Math.max(0.2, (tau || 1) / 2)); try { x.src.stop(t + 4 * (tau || 1) + 0.2); } catch (e) {} } d.querId = null; return; }
+  if (d.cur && d.cur.id === id) { if (d.cur.v !== v) { d.cur.v = v; d.cur.g.gain.cancelScheduledValues(t); d.cur.g.gain.setTargetAtTime(v * GANHO_ARQ, t, 0.6); } d.querId = id; return; }
+  if (d.querId === id) return; d.querId = id; const sobe = !d.cur || ordem(id) > ordem(d.cur.id);
+  carregaFaixa(id).then(buf => { if (P.deck !== d || d.querId !== id) return; troca(d, id, buf, v, sobe); if (d.modo === 'partida' && !leve()) prefetch(d); },
+    e => { if (P.deck !== d || d.querId !== id) return; d.querId = null; if (!d.cur) { d.arq = null; console.warn('[ARD] música: arquivo indisponível (' + ((e && e.message) || e) + '), trilha gerada'); aplica(1.5); if (d.modo === 'partida') for (const k of CAMADAS) garante(d, k); else garante(d, 'paz'); } }); }
+const ordem = id => /chefao|superarma/.test(id) ? 4 : /batalha/.test(id) ? 3 : /tensao/.test(id) ? 2 : /cinema/.test(id) ? 1.5 : 1;
+/* a troca no compasso: subindo, no próximo tempo forte; descendo, no fim da frase de 4 compassos (com teto de espera), cruzando */
+function troca(d, id, buf, v, sobe) { const c = d.c, now = c.currentTime, nv = d.arq.musica[id] || {}, at = d.cur; let tb = now + 0.08;
+  if (at && at.bpm) { const bar = 60 / at.bpm * (at.batidas || 4), frase = sobe ? bar : bar * 4, base = at.t0 + at.fase; const k = Math.ceil((now + 0.1 - base) / frase); tb = base + k * frase; if (tb - now > (sobe ? 3 : 12)) tb = now + 0.1; }
+  const semPulso = !at || !at.bpm || !nv.bpm; /* faixa de clima (sem andamento): cruza devagar */ const xIn = !at ? 1.2 : semPulso ? 2.5 : sobe ? 0.35 : 2.5, xOut = !at ? 0 : semPulso ? 3 : sobe ? 1.4 : 3.2, off = nv.bpm && at ? (nv.fase || 0) : 0;
+  const s = c.createBufferSource(); s.buffer = buf; s.loop = !!nv.laco; if (nv.laco && nv.dur && nv.dur < buf.duration - 0.001) { s.loopStart = 0; s.loopEnd = nv.dur; }
+  const g = c.createGain(); g.gain.value = 0; s.connect(g); g.connect(d.saida); s.start(tb, off); g.gain.setValueAtTime(0, tb); g.gain.linearRampToValueAtTime(v * GANHO_ARQ, tb + xIn);
+  if (at) { d.velhaArq = at; setTimeout(() => { if (d.velhaArq === at) d.velhaArq = null; }, (tb - now + xOut) * 1000 + 100); at.g.gain.cancelScheduledValues(tb); at.g.gain.setValueAtTime(at.v * GANHO_ARQ, tb); at.g.gain.linearRampToValueAtTime(0, tb + xOut); try { at.src.stop(tb + xOut + 0.05); } catch (e) {} setTimeout(() => { try { at.g.disconnect(); } catch (e) {} }, (tb - now + xOut + 0.5) * 1000); }
+  d.cur = { id, src: s, g, v, t0: tb - off, fase: nv.fase || 0, bpm: nv.bpm || null, batidas: nv.batidas || 4 }; FA.med.trocas++; }
+/* no computador, a batalha da Raça já fica pronta em tempo ocioso (a tensão decodifica na hora: a troca espera o compasso de qualquer jeito) */
+function prefetch(d) { if (d.prefetch) return; d.prefetch = true; const fila = ['batalha'].map(n => d.raca + '-' + n).filter(id => d.arq.musica[id]);
+  const vai = () => { const id = fila.shift(); if (!id || P.deck !== d) return; const f = () => carregaFaixa(id).then(() => setTimeout(vai, 1500), () => {}); if (typeof requestIdleCallback === 'function') requestIdleCallback(f, { timeout: 3000 }); else setTimeout(f, 500); }; setTimeout(vai, 4000); }
+function tocaFinalArq(d, nome) { carregaFaixa(nome).then(buf => { if (P.deck !== d) return; tocaFinal(d, nome, buf); }, () => { pede(d.raca, nome, buf => { if (P.deck === d) tocaFinal(d, nome, buf); }); }); }
 
 /* ---------- partida, tela inicial e cenas ---------- */
 function partida(raca, sim) { const au = A(); if (!au || !au.ctx || !LIGADA) return; if (P.deck && P.deck.modo === 'partida' && P.deck.raca === raca && (!sim || P.sim === sim)) return; P.sim = sim || P.sim; const velho = P.deck; P.deck = novoDeck(raca, 'partida'); soltarDeck(velho, 0.6); P.modo = 'partida'; P.raca = raca;
   P.calor = 0; P.calorT = agora(); P.baseT = P.nucleoT = P.superT = -1e9; P.nivel = 0; P.quer = 0; P.fim = null; limpaCache([raca]);
-  if (au.musica === false) return; aplica(1.5); for (const k of CAMADAS) garante(P.deck, k); }
+  if (au.musica === false) return; const d = P.deck; decide(d, () => { aplica(1.5); for (const k of CAMADAS) garante(d, k); }); /* 5.0f.1: arquivo ou gerada */ }
 function menu(raca) { const au = A(); if (!au || !au.ctx || !LIGADA || au.musica === false) return; if (P.deck && P.deck.modo === 'menu' && P.deck.raca === raca) return; const velho = P.deck; P.deck = novoDeck(raca, 'menu'); soltarDeck(velho, 0.8); P.modo = 'menu'; P.raca = raca; P.fim = null;
-  const manter = [raca]; if (velho) manter.push(velho.raca); limpaCache(manter); aplica(1); garante(P.deck, 'paz'); }
+  const manter = [raca]; if (velho) manter.push(velho.raca); limpaCache(manter); const d = P.deck; decide(d, () => { aplica(1); garante(d, 'paz'); }); /* 5.0f.1 */ }
 function parar(tau) { soltarDeck(P.deck, tau || 0.8); P.deck = null; P.modo = null; }
 function cena(nome, o) { o = o || {}; if (nome && !CENA[nome]) return true; /* nome desconhecido: nada muda */ P.cena = nome || null; const au = A(); if (!LIGADA || !au) return true;
-  if (nome && !P.deck && au.ctx && au.musica !== false) { const r = o.raca || P.raca || (document.documentElement.dataset.race) || 'vehnar'; P.deck = novoDeck(r, 'menu'); P.modo = 'menu'; P.raca = r; }
-  const d = P.deck; if (!d) return true; if (nome && (nome === 'vitoria' || nome === 'derrota')) pede(d.raca, nome, buf => { if (P.deck === d && P.cena === nome) tocaFinal(d, nome, buf); });
+  if (nome && !P.deck && au.ctx && au.musica !== false) { const r = o.raca || P.raca || (document.documentElement.dataset.race) || 'vehnar'; const nd = P.deck = novoDeck(r, 'menu'); P.modo = 'menu'; P.raca = r; decide(nd, () => { aplica(1.2); garante(nd, 'cinema'); }); return true; } /* 5.0f.1 */
+  const d = P.deck; if (!d) return true; if (d.arq || d.decidindo) { if (nome === 'vitoria' || nome === 'derrota') { if (d.arq) tocaFinalArq(d, nome); } aplica(nome ? 1.2 : 1.6); return true; } /* 5.0f.1: a trilha de arquivo */ if (nome && (nome === 'vitoria' || nome === 'derrota')) pede(d.raca, nome, buf => { if (P.deck === d && P.cena === nome) tocaFinal(d, nome, buf); });
   aplica(nome ? 1.2 : 1.6); if (nome) garante(d, 'cinema'); return true; }
 /* quadro (src/som3d.js): o estado a cada 0,25 s */
 function quadro(sim, human, R) { if (!LIGADA) return; P.R = R; P.ultimoQ = agora(); if (R && R.warming) return; const au = A(); if (!au || !au.ctx) return;
@@ -24376,9 +24501,18 @@ if (typeof document !== 'undefined' && document.addEventListener) document.addEv
 /* tela inicial: começa no primeiro gesto (o AudioContext nasce nele, no src/audio.js) */
 if (typeof window !== 'undefined' && window.addEventListener) { const g = e => { if (!e.isTrusted) return; P.tela = true; vigiar(); setTimeout(() => { if (!P.deck && naTela()) telaInicial(); }, 0); }; ['pointerup', 'keydown', 'touchend'].forEach(ev => window.addEventListener(ev, g, { passive: true, capture: true })); }
 
-ARD.musica = { quadro, eventos, cena, renderizar, ajustes, partida, menu, parar, RACAS: Object.keys(RACAS), CAMADAS: CAMADAS.slice(), FINAIS: FINAIS.slice(),
+/* 5.0f.1: o volume da música agora (dB, antes do volume de Ajustes), para a voz das unidades ficar no plano certo (src/som3d.js): pelo volume
+   medido de cada faixa (manifesto: o LUFS e o envelope em blocos de 2 s, no ponto do laço que toca agora) ou de cada camada gerada, vezes os ganhos do momento. Sai em "volume K de um canal" (o estéreo de música
+   descorrelacionado soma −5,3 dB em relação ao LUFS); null = sem música */
+function nivelDb() { const d = P.deck; if (!d || !d.saida) return null; const sg = d.saida.gain.value; if (!(sg > 1e-4)) return null; let pw = 0;
+  const t = d.c.currentTime; for (const x of [d.cur].concat(d.velhaArq ? [d.velhaArq] : [])) if (x && d.arq) { const m = d.arq.musica[x.id]; if (!m || m.lufs == null) continue; let env = 0;
+    if (m.env && m.env.length && m.dur) { let pos = t - x.t0; pos = m.laco ? ((pos % m.dur) + m.dur) % m.dur : Math.max(0, pos); const i = Math.min(m.env.length - 1, Math.floor(pos / (m.envBloco || 2))); env = Math.max(m.env[i], m.env[Math.min(m.env.length - 1, i + 1)]); } /* o trecho que toca agora e o próximo (a fala cobre os dois) */
+    pw += Math.pow(10, (m.lufs + env - 5.3 + 20 * Math.log10(Math.max(1e-6, x.g.gain.value * sg))) / 10); }
+  if (!d.arq) for (const k in d.cam) { const x = d.cam[k]; if (x && x.src && ALVO_DB[k] != null) pw += Math.pow(10, (ALVO_DB[k] + 20 * Math.log10(Math.max(1e-6, x.g.gain.value * sg))) / 10); }
+  return pw > 0 ? 10 * Math.log10(pw) : null; }
+ARD.musica = { nivelDb, quadro, eventos, cena, renderizar, ajustes, partida, menu, parar, RACAS: Object.keys(RACAS), CAMADAS: CAMADAS.slice(), FINAIS: FINAIS.slice(),
   forcar: n => { if (n == null) { P.forcado = false; return; } P.forcado = true; P.nivel = P.quer = Math.max(0, Math.min(3, n | 0)); aplica(0.3); }, /* testes e gravações: prende o nível (null solta) */
-  estado: () => ({ modo: P.modo, raca: P.raca, nivel: P.nivel, calor: +P.calor.toFixed(2), era: P.era, cena: P.cena, fim: P.fim, camadas: P.deck ? Object.keys(P.deck.cam).filter(k => P.deck.cam[k] && P.deck.cam[k].src).map(k => k + ':' + (+P.deck.cam[k].alvo.toFixed(2))) : [], gravacoes: P.med.gravacoes.slice(), montaMs: +P.med.ms.toFixed(1), fila: P.fila.length, cacheKB: Object.values(P.cache).reduce((s, r) => s + Math.round(r.bytes / 1024), 0) }) };
+  estado: () => ({ arquivo: !!(P.deck && P.deck.arq), faixa: P.deck && P.deck.cur ? P.deck.cur.id : null, trocas: FA.med.trocas, decodificadas: FA.med.decod.slice(-8), faixasNaMemoria: Array.from(FA.cache.keys()), faixasKB: Array.from(FA.cache.values()).reduce((s, x) => s + Math.round(x.buf.length * x.buf.numberOfChannels * 4 / 1024), 0) /* 5.0f.1 */, modo: P.modo, raca: P.raca, nivel: P.nivel, calor: +P.calor.toFixed(2), era: P.era, cena: P.cena, fim: P.fim, camadas: P.deck ? Object.keys(P.deck.cam).filter(k => P.deck.cam[k] && P.deck.cam[k].src).map(k => k + ':' + (+P.deck.cam[k].alvo.toFixed(2))) : [], gravacoes: P.med.gravacoes.slice(), montaMs: +P.med.ms.toFixed(1), fila: P.fila.length, cacheKB: Object.values(P.cache).reduce((s, r) => s + Math.round(r.bytes / 1024), 0) }) };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Áudio: efeitos sintetizados em WebAudio (sem arquivos) e voz de sistema pela Web Speech API. 5.0c.1: e as vozes gravadas (src/vozes.js), pelo mesmo Web Audio. */
@@ -24640,7 +24774,8 @@ function mixMonta(box) { if (!box || box.__mix || typeof document === 'undefined
   const lin = (k, extra) => '<div class="som-lin" style="display:flex;align-items:center;gap:.5em;flex-wrap:wrap">' + extra + '<input type="range" min="0" max="100" step="5" id="som-' + k + '-' + n + '" data-som-' + k + ' style="flex:1 1 8em;min-width:6em;max-width:16em"></div>';
   d.innerHTML = lin('vol-efeitos', (temEf ? '<label class="chk"><input type="checkbox" data-som-efeitos> <span data-i18n="som.efeitos">' + esc(TX('som.efeitos', null, 'Efeitos')) + '</span></label>' : '') + '<label for="som-vol-efeitos-' + n + '" data-i18n="som.vol-efeitos">' + esc(TX('som.vol-efeitos', null, 'Volume dos efeitos')) + '</label>')
     + lin('vol-musica', '<label class="chk"><input type="checkbox" data-som-musica> <span data-i18n="som.musica">' + esc(TX('som.musica', null, 'Música')) + '</span></label><label for="som-vol-musica-' + n + '" data-i18n="som.vol-musica">' + esc(TX('som.vol-musica', null, 'Volume da música')) + '</label>')
-    + (toque ? '' : '<div class="som-lin" style="display:flex;align-items:center;gap:.5em;flex-wrap:wrap"><label for="som-saida-' + n + '" data-i18n="som.saida">' + esc(TX('som.saida', null, 'Som 3D')) + '</label><select id="som-saida-' + n + '" data-som-saida><option value="fone" data-i18n="som.saida.fone">' + esc(TX('som.saida.fone', null, 'Fone de ouvido (HRTF)')) + '</option><option value="caixa" data-i18n="som.saida.caixa">' + esc(TX('som.saida.caixa', null, 'Caixas de som')) + '</option></select></div>');
+    + (toque ? '' : '<div class="som-lin" style="display:flex;align-items:center;gap:.5em;flex-wrap:wrap"><label for="som-saida-' + n + '" data-i18n="som.saida">' + esc(TX('som.saida', null, 'Som 3D')) + '</label><select id="som-saida-' + n + '" data-som-saida><option value="fone" data-i18n="som.saida.fone">' + esc(TX('som.saida.fone', null, 'Fone de ouvido (HRTF)')) + '</option><option value="caixa" data-i18n="som.saida.caixa">' + esc(TX('som.saida.caixa', null, 'Caixas de som')) + '</option></select></div>')
+    + creditosHTML() /* 5.0f.1 */;
   box.parentNode.insertBefore(d, box); MIX.push(d);
   const q = s => d.querySelector(s), ef = q('[data-som-efeitos]'), ve = q('[data-som-vol-efeitos]'), mu = q('[data-som-musica]'), vm = q('[data-som-vol-musica]'), sa = q('[data-som-saida]');
   if (ef) ef.addEventListener('change', () => { A.setEnabled(ef.checked); if (ef.checked) { A.init(); A.resume(); A.sfx('click'); } try { const os = document.getElementById('opt-som'); if (os) os.checked = A.enabled; } catch (e) {} });
@@ -24651,6 +24786,10 @@ function mixSync(d) { const q = s => d.querySelector(s), ef = q('[data-som-efeit
   if (ef && ef.checked !== A.enabled) ef.checked = A.enabled; if (ve && +ve.value !== Math.round(A.volSom * 100)) ve.value = Math.round(A.volSom * 100); if (ve) ve.disabled = !A.enabled;
   if (mu && mu.checked !== (A.musica !== false)) mu.checked = A.musica !== false; if (vm && +vm.value !== Math.round(A.volMusica * 100)) vm.value = Math.round(A.volMusica * 100); if (vm) vm.disabled = A.musica === false; if (sa && sa.value !== A.saida) sa.value = A.saida; }
 A.mixUI = () => MIX.forEach(mixSync); /* 5.0f */
+/* 5.0f.1: créditos da trilha e dos efeitos de arquivo (assets/som/; a licença CC BY 4.0 pede o crédito de cada faixa). Os títulos e os nomes ficam no original, marcados lang="en" */
+const FAIXAS = ['Crusade - Heavy Industry', 'Industrial Cinematic', 'Industrial Revolution', 'Lost Frontier', 'Oppressive Gloom', 'Rynos Theme', 'Mystic Force', 'Invariance', 'Constance', 'Tempting Secrets', 'Spellbound', 'Final Battle of the Dark Wizards', 'Drums of the Deep', 'Steel Rods', 'Corruption', 'Black Vortex', 'Our Story Begins', 'Mechanolith', 'Discovery Hit', 'Peaceful Desolation'];
+function creditosHTML() { return '<details class="som-creditos" style="margin-top:.4em;font-size:.85em"><summary data-i18n="som.creditos">' + esc(TX('som.creditos', null, 'Créditos do som')) + '</summary><p style="margin:.4em 0"><span data-i18n="som.creditos.musica">' + esc(TX('som.creditos.musica', null, 'Música')) + '</span>: <span lang="en">' + FAIXAS.map(t => '“' + esc(t) + '”').join(', ')
+  + ' — Kevin MacLeod (incompetech.com), Creative Commons: By Attribution 4.0 (creativecommons.org/licenses/by/4.0/).</span></p><p style="margin:.4em 0"><span data-i18n="som.creditos.efeitos">' + esc(TX('som.creditos.efeitos', null, 'Efeitos')) + '</span>: <span lang="en">Kenney (kenney.nl), rubberduck, qubodup, Joth, pauliuw, Nenad Simic (opengameart.org), CC0.</span></p></details>'; }
 /* 5.0c.1: Vozes gravadas (Ajustes): ligadas por padrão; desligadas, todas as falas usam a voz do sistema (como na 5.0c) */
 A.setGravadas = function (on) { A.gravadas = !!on; save(); calar(); const vz = VZ(); if (vz && vz.mudou) vz.mudou(); UIS.forEach(preencher); htmlMudo(); }; /* 5.0b.1: a sessão de reprodução e o áudio mudo do iOS seguem o som e a voz */
 /* 5.0a.2: escolha da voz em Ajustes (tela inicial e partida): cada bloco [data-voz-ui] tem um select[data-voz-sel], um botão [data-voz-ouvir] e um texto
@@ -27628,13 +27767,13 @@ const RES3 = ['plasma', 'minerio', 'dados'], RES_CLS = { plasma: 'pl', minerio: 
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">' + Tx('geral.gratis') + '</span>'; } /* 5.0c */
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-11-05 20:46Z';
+const BUILD = '2026-11-06 01:24Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.0f';
+const VERSION = '5.0f.1';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }

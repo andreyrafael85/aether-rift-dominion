@@ -12,11 +12,19 @@
      nome = 'calma' | 'briefing' (cinema com um fundo de paz), 'tensa' (cinema com tensão), 'epica' (cinema com batalha), 'vitoria' | 'derrota'
      (o final e o cinema baixo), 'abertura' (só o cinema), 'chefao' (+ chefão), 'superarma' (+ batalha), 'sala-guerra' (+ tensão);
      nome desconhecido = nada muda; ARD.musica.cena(null) volta para a música do estado da partida. Devolve true.
-   Chaves de URL: ?musica=0 (sem música, nada é gravado), ?musica=<paz|tensao|batalha|chefao|cinema> (prende a camada, para comparar e gravar). */
+   Chaves de URL: ?musica=0 (sem música, nada é gravado), ?musica=<paz|tensao|batalha|chefao|cinema> (prende a camada, para comparar e gravar).
+   5.0f.1 (som de cinema): com os arquivos (assets/som/musica/, temas orquestrais e híbridos de Kevin MacLeod, CC BY 4.0, ver ASSETS.md) a trilha é
+   de verdade: por Raça um tema de paz, um de tensão e um de batalha, um tema de chefão, um de cinema, um da superarma e os finais de vitória e
+   derrota. Cada faixa é um trecho que emenda em laço (número inteiro de compassos, cauda cruzada no começo). O estado da partida escolhe a faixa
+   e a troca é musical: subindo, no próximo compasso (a faixa nova entra no tempo forte dela, em 0,35 s); descendo, no fim da frase de 4
+   compassos, cruzando em ~3 s. Os arquivos chegam depois da carga, um por vez, decodificados já em 32 kHz (24 kHz mono no celular e na Baixa),
+   com no máximo 2 faixas na memória. Sem os arquivos (o artefato, file://, ?somarq=0) ou com ?musica=sintese, a trilha gerada de
+   antes, igual. */
 (function (ARD) {
 'use strict';
 const par = k => { try { return new URLSearchParams(location.search).get(k); } catch (e) { return null; } };
 const CHAVE = par('musica'); const LIGADA = CHAVE !== '0';
+const GANHO_ARQ = 1.25; /* 5.0f.1: a trilha de arquivo (−20 LUFS na paz, −18 na batalha) fica ~3 dB acima da gerada de antes (medido na partida), com a voz por cima (src/som3d.js) */
 const A = () => ARD.audio || null;
 const UA = () => (typeof navigator !== 'undefined' && navigator.userAgent) || '';
 const toque = () => { try { return /iPhone|iPad|iPod/.test(UA()) || (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches); } catch (e) { return false; } };
@@ -149,7 +157,7 @@ const leve = () => toque() || (P.R && P.R.quality && P.R.quality.name === 'baixa
 const agora = () => performance.now();
 function bus(c) { const s3 = ARD.som3d; const b = s3 && s3.busMusica && s3.busMusica(c); if (b) return b; if (!P.bus0 || P.bus0.context !== c) { P.bus0 = c.createGain(); P.bus0.connect(c.destination); } const au = A(); P.bus0.gain.value = au && au.musica !== false ? 0.9 * au.volMusica : 0; return P.bus0; }
 function novoDeck(raca, modo) { const au = A(), c = au.ctx; const d = { raca, modo, c, saida: c.createGain(), cam: {}, t0: null, L: tamanho(raca, 'paz') }; d.saida.gain.value = 0; d.saida.connect(bus(c)); d.saida.gain.setTargetAtTime(modo === 'menu' ? 0.6 : 1, c.currentTime, 0.6); return d; }
-function soltarDeck(d, tau) { if (!d) return; const t = d.c.currentTime; try { d.saida.gain.cancelScheduledValues(t); d.saida.gain.setTargetAtTime(0, t, tau || 0.5); } catch (e) {} P.velhos.push(d); setTimeout(() => { for (const k in d.cam) { const x = d.cam[k]; if (x.src) try { x.src.stop(); } catch (e) {} try { x.g.disconnect(); } catch (e) {} } try { d.saida.disconnect(); } catch (e) {} const i = P.velhos.indexOf(d); if (i >= 0) P.velhos.splice(i, 1); }, (tau || 0.5) * 5000 + 200); }
+function soltarDeck(d, tau) { if (!d) return; const t = d.c.currentTime; try { d.saida.gain.cancelScheduledValues(t); d.saida.gain.setTargetAtTime(0, t, tau || 0.5); } catch (e) {} P.velhos.push(d); setTimeout(() => { if (d.cur) try { d.cur.src.stop(); } catch (e) {} /* 5.0f.1 */ for (const k in d.cam) { const x = d.cam[k]; if (x.src) try { x.src.stop(); } catch (e) {} try { x.g.disconnect(); } catch (e) {} } try { d.saida.disconnect(); } catch (e) {} const i = P.velhos.indexOf(d); if (i >= 0) P.velhos.splice(i, 1); }, (tau || 0.5) * 5000 + 200); }
 /* põe a camada pronta para tocar no deck (presa ao relógio do deck: entra no ponto certo do laço) */
 function ligaCamada(d, camada, buf) { if (d.cam[camada] && d.cam[camada].src) return; const c = d.c, x = d.cam[camada] || (d.cam[camada] = { g: c.createGain(), alvo: 0 }); if (!x.g.__lig) { x.g.gain.value = 0; x.g.connect(d.saida); x.g.__lig = 1; }
   const s = c.createBufferSource(); s.buffer = buf; s.loop = true; const t = c.currentTime + 0.06; if (d.t0 == null) d.t0 = t; const off = ((t - d.t0) % buf.duration + buf.duration) % buf.duration; s.connect(x.g); s.start(t, off); x.src = s; x.g.gain.setTargetAtTime(x.alvo, t, 0.4); }
@@ -167,7 +175,7 @@ const MIX = [{ paz: 1, tensao: 0, batalha: 0, chefao: 0 }, { paz: 0.75, tensao: 
 const CENA = { abertura: { cinema: 1 }, chefao: { cinema: 1, chefao: 0.5 }, superarma: { cinema: 1, batalha: 0.4 }, 'sala-guerra': { cinema: 1, tensao: 0.4 } /* 5.0f: os nomes do f-cinema */, calma: { cinema: 1, paz: 0.3 }, briefing: { cinema: 1, paz: 0.3 }, tensa: { cinema: 1, tensao: 0.5 }, epica: { cinema: 1, batalha: 0.45 }, vitoria: { cinema: 0.6 }, derrota: { cinema: 0.6 } };
 function alvos() { const d = P.deck; if (!d) return null; let m; if (P.cena) m = CENA[P.cena] || { cinema: 1 }; else if (P.fim) m = {}; else if (CAMADAS.indexOf(CHAVE) >= 0) m = { [CHAVE]: 1 }; else if (d.modo === 'menu') m = { paz: 1 };
   else { m = Object.assign({}, MIX[P.nivel]); if (P.nivel === 0 && P.era >= 2) m.tensao = P.era >= 3 ? 0.4 : 0.25; } return m; }
-function aplica(tau) { const d = P.deck; if (!d) return; const m = alvos() || {}, t = d.c.currentTime; for (const k of CAMADAS) { const v = m[k] || 0; const x = d.cam[k]; if (x) { if (x.alvo !== v) { x.alvo = v; x.g.gain.setTargetAtTime(v, t, tau || 0.8); } } else if (v > 0) garante(d, k); } }
+function aplica(tau) { const d = P.deck; if (!d) return; if (d.arq) { aplicaArq(d, tau); return; } /* 5.0f.1 */ if (d.decidindo) return; const m = alvos() || {}, t = d.c.currentTime; for (const k of CAMADAS) { const v = m[k] || 0; const x = d.cam[k]; if (x) { if (x.alvo !== v) { x.alvo = v; x.g.gain.setTargetAtTime(v, t, tau || 0.8); } } else if (v > 0) garante(d, k); } }
 function garante(d, camada) { if (d.cam[camada] || (d.pedidas && d.pedidas[camada])) return; (d.pedidas = d.pedidas || {})[camada] = 1; pede(d.raca, camada, buf => { if (P.deck !== d && P.velhos.indexOf(d) < 0) return; const m = alvos() || {}; d.cam[camada] = d.cam[camada] || { g: d.c.createGain(), alvo: 0 }; d.cam[camada].alvo = (P.deck === d ? m[camada] : 0) || 0; ligaCamada(d, camada, buf); }); }
 /* calor e base: eventos da simulação (src/render3d.js, R.onEvents) */
 function eventos(evs, sim, human) { if (!P.deck || P.deck.modo !== 'partida' || !evs) return; const now = agora();
@@ -180,18 +188,57 @@ function eventos(evs, sim, human) { if (!P.deck || P.deck.modo !== 'partida' || 
 function estado(sim, human) { if (P.forcado) return; const now = agora(), dt = Math.min(2, (now - (P.calorT || now)) / 1000); P.calorT = now; P.calor *= Math.exp(-dt / 7); const p = sim && sim.players && sim.players[human]; P.era = (p && p.era) || 1;
   let n = 0; const base = now - P.baseT < 25000; if (P.calor > 1.5 || base) n = 1; if (P.calor > 8 || (now - P.baseT < 15000 && P.calor > 3)) n = 2; if (P.calor > 22 && (P.era >= 3 || now - P.nucleoT < 20000 || now - P.superT < 30000)) n = 3;
   if (n !== P.quer) { P.quer = n; P.querT = now; } const espera = n > P.nivel ? 700 : 9000; if (n !== P.nivel && now - P.querT > espera) { P.nivel = n; aplica(n > 0 ? 0.5 : 2.2); } }
-function fimPartida(sim, human, res) { if (P.fim) return; const o = res && res.outcome; const v = o === 'victory' || (o === 'over' && res.scores && res.scores[0] && res.scores.slice().sort((a, b) => b.score - a.score)[0].id === human); P.fim = v ? 'vitoria' : 'derrota'; const d = P.deck; aplica(1.2); if (d) pede(d.raca, P.fim, buf => { if (P.deck === d) tocaFinal(d, P.fim, buf); }); }
+function fimPartida(sim, human, res) { if (P.fim) return; const o = res && res.outcome; const v = o === 'victory' || (o === 'over' && res.scores && res.scores[0] && res.scores.slice().sort((a, b) => b.score - a.score)[0].id === human); P.fim = v ? 'vitoria' : 'derrota'; const d = P.deck; aplica(1.2); if (d && d.arq) { const nome = P.fim; setTimeout(() => { if (P.deck === d && P.fim === nome) tocaFinalArq(d, nome); }, 700); return; } /* 5.0f.1 */ if (d) pede(d.raca, P.fim, buf => { if (P.deck === d) tocaFinal(d, P.fim, buf); }); }
+
+/* ---------- 5.0f.1: a trilha de arquivo (assets/som/musica/) ---------- */
+const FA = { cache: new Map(), pend: new Map(), med: { trocas: 0, decod: [] } };
+const ARQS = () => { const s3 = ARD.som3d; return s3 && s3.arquivos ? s3.arquivos : null; };
+/* o deck decide uma vez: com o manifesto, arquivo; sem ele, a trilha gerada (sint) */
+function decide(d, sint) { const F = ARQS(); if (!F || CHAVE === 'sintese') { sint(); return; } d.decidindo = true;
+  F.manifesto().then(m => { d.decidindo = false; if (P.deck !== d) return; if (m && m.musica) { d.arq = m; aplicaArq(d, 1.5); } else sint(); }, () => { d.decidindo = false; if (P.deck === d) sint(); }); }
+const NIVEIS = ['paz', 'tensao', 'batalha'];
+const CENA_ARQ = { abertura: ['cinema', 1], calma: ['cinema', 0.8], briefing: ['cinema', 0.8], tensa: ['@tensao', 1], 'sala-guerra': ['@tensao', 1], epica: ['@batalha', 1], superarma: ['superarma', 1], chefao: ['chefao', 1], vitoria: ['cinema', 0.5], derrota: ['cinema', 0.5] };
+function faixaAlvo(d) { const r = d.raca; let id = null, v = 1;
+  if (P.cena) { const c = CENA_ARQ[P.cena] || ['cinema', 1]; id = c[0]; v = c[1]; } else if (P.fim) id = null;
+  else if (CAMADAS.indexOf(CHAVE) >= 0) id = CHAVE === 'cinema' || CHAVE === 'chefao' ? CHAVE : '@' + CHAVE;
+  else if (d.modo === 'menu') id = '@paz'; else id = P.nivel >= 3 ? 'chefao' : '@' + NIVEIS[P.nivel];
+  if (id && id.charAt(0) === '@') id = r + '-' + id.slice(1); if (id && d.arq && !d.arq.musica[id]) id = d.arq.musica[r + '-paz'] ? r + '-paz' : null; return [id, v]; }
+function carregaFaixa(id) { const ja = FA.cache.get(id); if (ja) { ja.t = agora(); return Promise.resolve(ja.buf); } if (FA.pend.has(id)) return FA.pend.get(id); const F = ARQS(); if (!F) return Promise.reject(new Error('sem arquivos'));
+  const lv = leve(), t0 = agora(); const pr = F.buscar('musica/' + id, { sr: lv ? 24000 : 32000, mono: lv }).then(buf => { FA.pend.delete(id); FA.cache.set(id, { buf, t: agora() }); FA.med.decod.push({ id, ms: Math.round(agora() - t0), kb: Math.round(buf.length * buf.numberOfChannels * 4 / 1024) }); poda(); return buf; }, e => { FA.pend.delete(id); throw e; });
+  FA.pend.set(id, pr); return pr; }
+/* memória: no máximo 2 faixas decodificadas (a que toca e a próxima; ~45 MB no computador em 32 kHz estéreo, ~16 MB no celular em 24 kHz mono); sai a mais antiga que não está tocando */
+function poda() { const max = 2; if (FA.cache.size <= max) return; const tocando = new Set(); for (const d of [P.deck].concat(P.velhos)) if (d && d.cur) tocando.add(d.cur.id);
+  const ks = Array.from(FA.cache.entries()).filter(([k]) => !tocando.has(k)).sort((a, b) => a[1].t - b[1].t); while (FA.cache.size > max && ks.length) FA.cache.delete(ks.shift()[0]); }
+function aplicaArq(d, tau) { const [id, v] = faixaAlvo(d); const c = d.c, t = c.currentTime;
+  if (!id) { if (d.cur) { const x = d.cur; d.cur = null; x.g.gain.cancelScheduledValues(t); x.g.gain.setTargetAtTime(0, t, Math.max(0.2, (tau || 1) / 2)); try { x.src.stop(t + 4 * (tau || 1) + 0.2); } catch (e) {} } d.querId = null; return; }
+  if (d.cur && d.cur.id === id) { if (d.cur.v !== v) { d.cur.v = v; d.cur.g.gain.cancelScheduledValues(t); d.cur.g.gain.setTargetAtTime(v * GANHO_ARQ, t, 0.6); } d.querId = id; return; }
+  if (d.querId === id) return; d.querId = id; const sobe = !d.cur || ordem(id) > ordem(d.cur.id);
+  carregaFaixa(id).then(buf => { if (P.deck !== d || d.querId !== id) return; troca(d, id, buf, v, sobe); if (d.modo === 'partida' && !leve()) prefetch(d); },
+    e => { if (P.deck !== d || d.querId !== id) return; d.querId = null; if (!d.cur) { d.arq = null; console.warn('[ARD] música: arquivo indisponível (' + ((e && e.message) || e) + '), trilha gerada'); aplica(1.5); if (d.modo === 'partida') for (const k of CAMADAS) garante(d, k); else garante(d, 'paz'); } }); }
+const ordem = id => /chefao|superarma/.test(id) ? 4 : /batalha/.test(id) ? 3 : /tensao/.test(id) ? 2 : /cinema/.test(id) ? 1.5 : 1;
+/* a troca no compasso: subindo, no próximo tempo forte; descendo, no fim da frase de 4 compassos (com teto de espera), cruzando */
+function troca(d, id, buf, v, sobe) { const c = d.c, now = c.currentTime, nv = d.arq.musica[id] || {}, at = d.cur; let tb = now + 0.08;
+  if (at && at.bpm) { const bar = 60 / at.bpm * (at.batidas || 4), frase = sobe ? bar : bar * 4, base = at.t0 + at.fase; const k = Math.ceil((now + 0.1 - base) / frase); tb = base + k * frase; if (tb - now > (sobe ? 3 : 12)) tb = now + 0.1; }
+  const semPulso = !at || !at.bpm || !nv.bpm; /* faixa de clima (sem andamento): cruza devagar */ const xIn = !at ? 1.2 : semPulso ? 2.5 : sobe ? 0.35 : 2.5, xOut = !at ? 0 : semPulso ? 3 : sobe ? 1.4 : 3.2, off = nv.bpm && at ? (nv.fase || 0) : 0;
+  const s = c.createBufferSource(); s.buffer = buf; s.loop = !!nv.laco; if (nv.laco && nv.dur && nv.dur < buf.duration - 0.001) { s.loopStart = 0; s.loopEnd = nv.dur; }
+  const g = c.createGain(); g.gain.value = 0; s.connect(g); g.connect(d.saida); s.start(tb, off); g.gain.setValueAtTime(0, tb); g.gain.linearRampToValueAtTime(v * GANHO_ARQ, tb + xIn);
+  if (at) { d.velhaArq = at; setTimeout(() => { if (d.velhaArq === at) d.velhaArq = null; }, (tb - now + xOut) * 1000 + 100); at.g.gain.cancelScheduledValues(tb); at.g.gain.setValueAtTime(at.v * GANHO_ARQ, tb); at.g.gain.linearRampToValueAtTime(0, tb + xOut); try { at.src.stop(tb + xOut + 0.05); } catch (e) {} setTimeout(() => { try { at.g.disconnect(); } catch (e) {} }, (tb - now + xOut + 0.5) * 1000); }
+  d.cur = { id, src: s, g, v, t0: tb - off, fase: nv.fase || 0, bpm: nv.bpm || null, batidas: nv.batidas || 4 }; FA.med.trocas++; }
+/* no computador, a batalha da Raça já fica pronta em tempo ocioso (a tensão decodifica na hora: a troca espera o compasso de qualquer jeito) */
+function prefetch(d) { if (d.prefetch) return; d.prefetch = true; const fila = ['batalha'].map(n => d.raca + '-' + n).filter(id => d.arq.musica[id]);
+  const vai = () => { const id = fila.shift(); if (!id || P.deck !== d) return; const f = () => carregaFaixa(id).then(() => setTimeout(vai, 1500), () => {}); if (typeof requestIdleCallback === 'function') requestIdleCallback(f, { timeout: 3000 }); else setTimeout(f, 500); }; setTimeout(vai, 4000); }
+function tocaFinalArq(d, nome) { carregaFaixa(nome).then(buf => { if (P.deck !== d) return; tocaFinal(d, nome, buf); }, () => { pede(d.raca, nome, buf => { if (P.deck === d) tocaFinal(d, nome, buf); }); }); }
 
 /* ---------- partida, tela inicial e cenas ---------- */
 function partida(raca, sim) { const au = A(); if (!au || !au.ctx || !LIGADA) return; if (P.deck && P.deck.modo === 'partida' && P.deck.raca === raca && (!sim || P.sim === sim)) return; P.sim = sim || P.sim; const velho = P.deck; P.deck = novoDeck(raca, 'partida'); soltarDeck(velho, 0.6); P.modo = 'partida'; P.raca = raca;
   P.calor = 0; P.calorT = agora(); P.baseT = P.nucleoT = P.superT = -1e9; P.nivel = 0; P.quer = 0; P.fim = null; limpaCache([raca]);
-  if (au.musica === false) return; aplica(1.5); for (const k of CAMADAS) garante(P.deck, k); }
+  if (au.musica === false) return; const d = P.deck; decide(d, () => { aplica(1.5); for (const k of CAMADAS) garante(d, k); }); /* 5.0f.1: arquivo ou gerada */ }
 function menu(raca) { const au = A(); if (!au || !au.ctx || !LIGADA || au.musica === false) return; if (P.deck && P.deck.modo === 'menu' && P.deck.raca === raca) return; const velho = P.deck; P.deck = novoDeck(raca, 'menu'); soltarDeck(velho, 0.8); P.modo = 'menu'; P.raca = raca; P.fim = null;
-  const manter = [raca]; if (velho) manter.push(velho.raca); limpaCache(manter); aplica(1); garante(P.deck, 'paz'); }
+  const manter = [raca]; if (velho) manter.push(velho.raca); limpaCache(manter); const d = P.deck; decide(d, () => { aplica(1); garante(d, 'paz'); }); /* 5.0f.1 */ }
 function parar(tau) { soltarDeck(P.deck, tau || 0.8); P.deck = null; P.modo = null; }
 function cena(nome, o) { o = o || {}; if (nome && !CENA[nome]) return true; /* nome desconhecido: nada muda */ P.cena = nome || null; const au = A(); if (!LIGADA || !au) return true;
-  if (nome && !P.deck && au.ctx && au.musica !== false) { const r = o.raca || P.raca || (document.documentElement.dataset.race) || 'vehnar'; P.deck = novoDeck(r, 'menu'); P.modo = 'menu'; P.raca = r; }
-  const d = P.deck; if (!d) return true; if (nome && (nome === 'vitoria' || nome === 'derrota')) pede(d.raca, nome, buf => { if (P.deck === d && P.cena === nome) tocaFinal(d, nome, buf); });
+  if (nome && !P.deck && au.ctx && au.musica !== false) { const r = o.raca || P.raca || (document.documentElement.dataset.race) || 'vehnar'; const nd = P.deck = novoDeck(r, 'menu'); P.modo = 'menu'; P.raca = r; decide(nd, () => { aplica(1.2); garante(nd, 'cinema'); }); return true; } /* 5.0f.1 */
+  const d = P.deck; if (!d) return true; if (d.arq || d.decidindo) { if (nome === 'vitoria' || nome === 'derrota') { if (d.arq) tocaFinalArq(d, nome); } aplica(nome ? 1.2 : 1.6); return true; } /* 5.0f.1: a trilha de arquivo */ if (nome && (nome === 'vitoria' || nome === 'derrota')) pede(d.raca, nome, buf => { if (P.deck === d && P.cena === nome) tocaFinal(d, nome, buf); });
   aplica(nome ? 1.2 : 1.6); if (nome) garante(d, 'cinema'); return true; }
 /* quadro (src/som3d.js): o estado a cada 0,25 s */
 function quadro(sim, human, R) { if (!LIGADA) return; P.R = R; P.ultimoQ = agora(); if (R && R.warming) return; const au = A(); if (!au || !au.ctx) return;
@@ -211,7 +258,16 @@ if (typeof document !== 'undefined' && document.addEventListener) document.addEv
 /* tela inicial: começa no primeiro gesto (o AudioContext nasce nele, no src/audio.js) */
 if (typeof window !== 'undefined' && window.addEventListener) { const g = e => { if (!e.isTrusted) return; P.tela = true; vigiar(); setTimeout(() => { if (!P.deck && naTela()) telaInicial(); }, 0); }; ['pointerup', 'keydown', 'touchend'].forEach(ev => window.addEventListener(ev, g, { passive: true, capture: true })); }
 
-ARD.musica = { quadro, eventos, cena, renderizar, ajustes, partida, menu, parar, RACAS: Object.keys(RACAS), CAMADAS: CAMADAS.slice(), FINAIS: FINAIS.slice(),
+/* 5.0f.1: o volume da música agora (dB, antes do volume de Ajustes), para a voz das unidades ficar no plano certo (src/som3d.js): pelo volume
+   medido de cada faixa (manifesto: o LUFS e o envelope em blocos de 2 s, no ponto do laço que toca agora) ou de cada camada gerada, vezes os ganhos do momento. Sai em "volume K de um canal" (o estéreo de música
+   descorrelacionado soma −5,3 dB em relação ao LUFS); null = sem música */
+function nivelDb() { const d = P.deck; if (!d || !d.saida) return null; const sg = d.saida.gain.value; if (!(sg > 1e-4)) return null; let pw = 0;
+  const t = d.c.currentTime; for (const x of [d.cur].concat(d.velhaArq ? [d.velhaArq] : [])) if (x && d.arq) { const m = d.arq.musica[x.id]; if (!m || m.lufs == null) continue; let env = 0;
+    if (m.env && m.env.length && m.dur) { let pos = t - x.t0; pos = m.laco ? ((pos % m.dur) + m.dur) % m.dur : Math.max(0, pos); const i = Math.min(m.env.length - 1, Math.floor(pos / (m.envBloco || 2))); env = Math.max(m.env[i], m.env[Math.min(m.env.length - 1, i + 1)]); } /* o trecho que toca agora e o próximo (a fala cobre os dois) */
+    pw += Math.pow(10, (m.lufs + env - 5.3 + 20 * Math.log10(Math.max(1e-6, x.g.gain.value * sg))) / 10); }
+  if (!d.arq) for (const k in d.cam) { const x = d.cam[k]; if (x && x.src && ALVO_DB[k] != null) pw += Math.pow(10, (ALVO_DB[k] + 20 * Math.log10(Math.max(1e-6, x.g.gain.value * sg))) / 10); }
+  return pw > 0 ? 10 * Math.log10(pw) : null; }
+ARD.musica = { nivelDb, quadro, eventos, cena, renderizar, ajustes, partida, menu, parar, RACAS: Object.keys(RACAS), CAMADAS: CAMADAS.slice(), FINAIS: FINAIS.slice(),
   forcar: n => { if (n == null) { P.forcado = false; return; } P.forcado = true; P.nivel = P.quer = Math.max(0, Math.min(3, n | 0)); aplica(0.3); }, /* testes e gravações: prende o nível (null solta) */
-  estado: () => ({ modo: P.modo, raca: P.raca, nivel: P.nivel, calor: +P.calor.toFixed(2), era: P.era, cena: P.cena, fim: P.fim, camadas: P.deck ? Object.keys(P.deck.cam).filter(k => P.deck.cam[k] && P.deck.cam[k].src).map(k => k + ':' + (+P.deck.cam[k].alvo.toFixed(2))) : [], gravacoes: P.med.gravacoes.slice(), montaMs: +P.med.ms.toFixed(1), fila: P.fila.length, cacheKB: Object.values(P.cache).reduce((s, r) => s + Math.round(r.bytes / 1024), 0) }) };
+  estado: () => ({ arquivo: !!(P.deck && P.deck.arq), faixa: P.deck && P.deck.cur ? P.deck.cur.id : null, trocas: FA.med.trocas, decodificadas: FA.med.decod.slice(-8), faixasNaMemoria: Array.from(FA.cache.keys()), faixasKB: Array.from(FA.cache.values()).reduce((s, x) => s + Math.round(x.buf.length * x.buf.numberOfChannels * 4 / 1024), 0) /* 5.0f.1 */, modo: P.modo, raca: P.raca, nivel: P.nivel, calor: +P.calor.toFixed(2), era: P.era, cena: P.cena, fim: P.fim, camadas: P.deck ? Object.keys(P.deck.cam).filter(k => P.deck.cam[k] && P.deck.cam[k].src).map(k => k + ':' + (+P.deck.cam[k].alvo.toFixed(2))) : [], gravacoes: P.med.gravacoes.slice(), montaMs: +P.med.ms.toFixed(1), fila: P.fila.length, cacheKB: Object.values(P.cache).reduce((s, r) => s + Math.round(r.bytes / 1024), 0) }) };
 })(globalThis.ARD = globalThis.ARD || {});

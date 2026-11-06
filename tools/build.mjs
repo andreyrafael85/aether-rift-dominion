@@ -23,7 +23,7 @@ const game = bundle('src/index.tpl.html', ['src/sim.js', 'src/ai.js', 'src/voxel
 /* 5.0c.1: vozes gravadas — o src/vozes.js recebe onde estão os arquivos: nenhum no artefato (um arquivo só, sem pedir nada à rede), assets/vozes/ no
    index.html (GitHub Pages) e ../assets/vozes/ no dist/local.html, só com os idiomas que têm assets/vozes/<idioma>/manifesto.json */
 const VOZ_IDI = ['pt-BR', 'en', 'es'].filter(l => exists(root + 'assets/vozes/' + l + '/manifesto.json'));
-const comVozes = (html, base) => html.replace("'__VOZES__'", "'" + (base && VOZ_IDI.length ? JSON.stringify({ base, idiomas: VOZ_IDI }) : 'null') + "'");
+const comVozes = (html, base) => html.replace("'__VOZES__'", "'" + (base && VOZ_IDI.length ? JSON.stringify({ base, idiomas: VOZ_IDI }) : 'null') + "'").replace("'__SOM__'", "'" + (base && exists(root + 'assets/som/som.json') ? JSON.stringify({ base: base.replace('vozes/', 'som/') }) : 'null') + "'"); /* 5.0f.1: arquivos de som (assets/som/) no mesmo lugar das vozes; nenhum no artefato */
 writeFileSync(root + 'dist/aether-rift-beta.html', comVozes(game, null)); writeFileSync(root + 'index.html', wrap(comVozes(game, 'assets/vozes/')));
 // Cópia para testes headless com three vendorizado (node tools/vendor.mjs); carrega sem rede.
 import { existsSync } from 'node:fs';
