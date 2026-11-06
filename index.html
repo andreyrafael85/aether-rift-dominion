@@ -1094,8 +1094,9 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
 
 
 
-<script>/* 5.0c: idioma antes da primeira pintura — fora do pt-BR, carrega aqui o dicionário do idioma (src/i18n/en.js ou es.js, 33 KB com gzip, enquanto o resto da página chega) e esconde o texto da tela inicial até o src/i18n.js (no fim da página) traduzir; a mesma regra de escolha do i18n.js */
-(function () { try { var q = (new URLSearchParams(location.search).get('lang') || '').toLowerCase(), s = ''; try { s = (localStorage.getItem('ard-idioma') || '').toLowerCase(); } catch (e) {} var l = /^(pt|en|es)/.test(q) ? q : /^(pt|en|es)/.test(s) ? s : ''; if (!l) { var ls = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']; for (var i = 0; i < ls.length && !l; i++) if (/^(pt|en|es)/i.test(ls[i])) l = ls[i].toLowerCase(); } if (!/^pt/.test(l)) { document.documentElement.classList.add('i18n-espera'); document.write('<script src="src/i18n/' + (/^es/.test(l) ? 'es' : 'en') + '.js?v=' + '2026-11-06 20:59Z'.replace(/[^0-9TZ]/g, '') + '"><\/script>'); } } catch (e) {} })();</script>
+<script>/* 5.0c: idioma antes da primeira pintura — fora do pt-BR, carrega aqui o dicionário do idioma (src/i18n/en.js ou es.js, 33 KB com gzip, enquanto o resto da página chega) e esconde o texto da tela inicial até o src/i18n.js (no fim da página) traduzir; a mesma regra de escolha do i18n.js.
+   5.0h.1: a escolha guardada manda antes do ?lang=; navigator.languages na ordem (o primeiro pt/en/es vale; nenhum → en); <html lang> e o manifesto do app já no idioma aqui */
+(function () { try { var re = /^(pt|en|es)/, q = (new URLSearchParams(location.search).get('lang') || '').toLowerCase(), s = ''; try { s = (localStorage.getItem('ard-idioma') || '').toLowerCase(); } catch (e) {} var l = re.test(s) ? s : re.test(q) ? q : ''; if (!l) { var ls = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']; for (var i = 0; i < ls.length && !l; i++) if (re.test(String(ls[i] || '').toLowerCase())) l = String(ls[i]).toLowerCase(); } if (!/^pt/.test(l)) { var k = /^es/.test(l) ? 'es' : 'en', de = document.documentElement; de.lang = k === 'es' ? 'es-419' : 'en'; de.classList.add('i18n-espera'); var mf = document.querySelector('link[rel=manifest]'); if (mf) mf.setAttribute('href', 'manifest.' + k + '.webmanifest'); document.write('<script src="src/i18n/' + k + '.js?v=' + '2026-11-06 22:56Z'.replace(/[^0-9TZ]/g, '') + '"><\/script>'); } } catch (e) {} })();</script>
 <div id="start" class="screen">
   <canvas id="bgfx" aria-hidden="true"></canvas>
   <!-- 5.0a.1: pôster da Sala de Comando (um render da própria Sala por Raça e por tela, em assets/sala-*.webp): entra na hora, antes da cena 3D -->
@@ -1109,7 +1110,7 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
   <div class="start-wrap">
     <header class="st-head">
       <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div class="brand-txt"><h1 data-i18n="inicio.aether-rift-dominion">Aether Rift<span>Dominion</span></h1><p class="tagline" data-i18n="inicio.nada-aqui-seu-ainda">Nada aqui é seu. Ainda.</p></div></div>
-      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.0h · build 2026-11-06 20:59Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4</div>
+      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.0h.1 · build 2026-11-06 22:56Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4</div>
       <div class="opt st-lang" data-idioma-sel="idioma-inicio"></div><!-- 5.0c: seletor de idioma, legível em qualquer idioma -->
     </header>
     <div class="start-grid">
@@ -1174,8 +1175,9 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
       </div>
       <div class="notes">
       <div class="choose" data-i18n="notas.notas-versao">Notas da versão</div>
+      <p class="start-notes" data-i18n="notas.5-0h-1"><b>5.0h.1 — Idioma e licença:</b> o jogo abre no idioma do seu navegador, em português, inglês ou espanhol, e qualquer outro idioma abre em inglês; o idioma que você escolher em Ajustes fica salvo e passa na frente. A tela não pisca mais em português antes de trocar, e o nome do app instalado segue o idioma. O jogo agora tem licença própria: todos os direitos reservados, e você pode jogar, compartilhar, fazer lives e vídeos, inclusive monetizados.</p>
+      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.0h → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-0h"><b>5.0h — Inteligência e mundo:</b> a IA ganhou a personalidade de cada líder: o Barão-Forja se fecha e chega pesado, Vesper Ísk ataca seus Coletores e abre uma segunda frente, Sylvia Oriel cresce e faz coalizões, Zayin Coral reúne o Coro antes de atacar e Oru Voraz vem com pressa. Ela desvia dos golpes anunciados, recua os feridos, fala com você pelo retrato e, como aliada, atende aos seus pedidos. Na Escaramuça e na sala, o <b>Mundo vivo</b> traz fauna da Fenda, Ruínas dos Construtores para capturar com infantaria, o Acampamento Corsário com mercenários pagos em Dados e o Surto de éter; os <b>Comandantes em campo</b> põem o avatar do seu líder na batalha, com três habilidades. Cada Raça ganhou duas construções únicas, e cinco construções oferecem dois módulos para escolher. A Cria e o Cuspidor da Vorag ficaram mais caros e um pouco mais fracos. Salas de versões anteriores não se conectam a esta.</p>
-      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.0g.1 → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-0g-1"><b>5.0g.1 — Ajustes:</b> trilha nova para a Vehnar, com sintetizador e pulso de máquina no lugar das batidas de martelo, e para a Vorag, com textura de enxame vivo no lugar do batuque. Na Caçada, o chefão agora dorme até ser atacado ou até a contagem na barra acabar (1:30 no Normal), e a arena ficou mais longe da base; o Arauto só golpeia dentro da arena. O salvamento no aparelho não trava mais quando o armazenamento do celular demora, e o rodapé de erro mostra a mensagem antes do lugar. No celular em pé, a dica do tutorial não fica mais atrás da barra do chefão.</p>
       <p class="start-notes" data-i18n="notas.5-0g"><b>5.0g — Chefões:</b> chegaram O Arauto e A Forja-Mãe, cada um com três fases, ataques avisados no chão com antecedência e janelas em que fica vulnerável, e o mapa novo Destroço do Titã. Na aba Caçada você escolhe o chefão, a dificuldade e os aliados, sozinho ou com 2 a 4 amigos no cooperativo, e ganha medalha por tempo e perdas. Na escaramuça, os Eventos da Fenda são opcionais: Sentinela da Fenda, Caravana Corsária, Enxame Errante e chuva de meteoros, com recompensa para quem dá o golpe final. E os primeiros mutadores: Noite Eterna, Tempestades Frequentes e Recursos Escassos.</p>
       <p class="start-notes" data-i18n="notas.5-0f-1"><b>5.0f.1 — Som de cinema:</b> a trilha agora é orquestral e de verdade: cada Raça tem os seus temas de paz, tensão e batalha, mais as faixas de chefão, de cinema, de superarma, de vitória e de derrota, com trocas no compasso. Disparos, impactos e explosões ganharam peso, montados em camadas a partir de gravações reais. A voz das unidades ao selecionar e dar ordens ficou no mesmo plano em todas as Raças, sempre clara por cima do ambiente e sem sobressaltar. Os arquivos chegam depois da carga; sem eles, o som gerado de antes continua. Créditos em Ajustes.</p>
@@ -1827,7 +1829,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aqui é seu. Ainda.",
-  "inicio.versao": "Versão 5.0h · build 2026-11-06 20:59Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
+  "inicio.versao": "Versão 5.0h.1 · build 2026-11-06 22:56Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Escolha sua Raça",
   "inicio.vitrine.explorar-base": "Explorar a base",
   "inicio.vitrine.som-tela-inicial": "Som da tela inicial",
@@ -1896,6 +1898,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.btn-bench": "Testar desempenho (30 s)",
   "ajustes.cfg-feedback": "Enviar feedback",
   "notas.notas-versao": "Notas da versão",
+  "notas.5-0h-1": "<b>5.0h.1 — Idioma e licença:</b> o jogo abre no idioma do seu navegador, em português, inglês ou espanhol, e qualquer outro idioma abre em inglês; o idioma que você escolher em Ajustes fica salvo e passa na frente. A tela não pisca mais em português antes de trocar, e o nome do app instalado segue o idioma. O jogo agora tem licença própria: todos os direitos reservados, e você pode jogar, compartilhar, fazer lives e vídeos, inclusive monetizados.",
   "notas.5-0h": "<b>5.0h — Inteligência e mundo:</b> a IA ganhou a personalidade de cada líder: o Barão-Forja se fecha e chega pesado, Vesper Ísk ataca seus Coletores e abre uma segunda frente, Sylvia Oriel cresce e faz coalizões, Zayin Coral reúne o Coro antes de atacar e Oru Voraz vem com pressa. Ela desvia dos golpes anunciados, recua os feridos, fala com você pelo retrato e, como aliada, atende aos seus pedidos. Na Escaramuça e na sala, o <b>Mundo vivo</b> traz fauna da Fenda, Ruínas dos Construtores para capturar com infantaria, o Acampamento Corsário com mercenários pagos em Dados e o Surto de éter; os <b>Comandantes em campo</b> põem o avatar do seu líder na batalha, com três habilidades. Cada Raça ganhou duas construções únicas, e cinco construções oferecem dois módulos para escolher. A Cria e o Cuspidor da Vorag ficaram mais caros e um pouco mais fracos. Salas de versões anteriores não se conectam a esta.",
   "notas.5-0g-1": "<b>5.0g.1 — Ajustes:</b> trilha nova para a Vehnar, com sintetizador e pulso de máquina no lugar das batidas de martelo, e para a Vorag, com textura de enxame vivo no lugar do batuque. Na Caçada, o chefão agora dorme até ser atacado ou até a contagem na barra acabar (1:30 no Normal), e a arena ficou mais longe da base; o Arauto só golpeia dentro da arena. O salvamento no aparelho não trava mais quando o armazenamento do celular demora, e o rodapé de erro mostra a mensagem antes do lugar. No celular em pé, a dica do tutorial não fica mais atrás da barra do chefão.",
   "notas.5-0g": "<b>5.0g — Chefões:</b> chegaram O Arauto e A Forja-Mãe, cada um com três fases, ataques avisados no chão com antecedência e janelas em que fica vulnerável, e o mapa novo Destroço do Titã. Na aba Caçada você escolhe o chefão, a dificuldade e os aliados, sozinho ou com 2 a 4 amigos no cooperativo, e ganha medalha por tempo e perdas. Na escaramuça, os Eventos da Fenda são opcionais: Sentinela da Fenda, Caravana Corsária, Enxame Errante e chuva de meteoros, com recompensa para quem dá o golpe final. E os primeiros mutadores: Noite Eterna, Tempestades Frequentes e Recursos Escassos.",
@@ -1909,7 +1912,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "notas.5-0c": "<b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 mais leve, faróis e som no iPhone:</b> com o <b>Motor 5</b> ligado, os shaders que ele prepara na carga encolheram um terço (os lagos primeiro) e cada quadro manda muito menos dados para a placa de vídeo, o que alivia a CPU no Firefox e no celular. O brilho em volta das luzes agora é o mesmo do motor clássico, e no Modo Foto da qualidade Baixa os efeitos seguem a exposição como no clássico. À noite e dentro da Tempestade de Éter, os faróis dos veículos, coletores e piratas iluminam o chão à frente, nos dois motores. A Sala de Comando ficou um pouco mais clara, sem o clarão de antes. No iPhone, o som e a voz destravam no primeiro toque, tocam com a chave de silêncio ligada e voltam depois de uma ligação. Cada líder fala com uma voz do seu gênero em todo navegador. Em Ajustes, <b>Testar som</b> toca três notas e uma frase e mostra o estado do áudio do aparelho.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, em teste:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o jogo inteiro agora roda em WebGPU, com volta sozinha para WebGL2: unidades e construções com o detalhe de superfície e a animação de cada peça, ruínas, obras, o holograma da Erevane, os escudos do Uníssono e as bandeiras; o chão com todos os biomas, a vegetação ao vento, as estradas e o céu; explosões, fogo, fumaça e tiros; os lagos de plasma e de gelo com reflexo, o espaço do Cinturão e a Tempestade de Éter; e o <b>Modo Foto</b> (📷 ou tecla J) com desfoque, os 8 filtros e captura em 4K. Na primeira vez que o Modo Foto abre numa partida, ele leva alguns segundos para se preparar. Com tudo isso, a carga do Motor 5 ficou alguns segundos mais longa: a próxima versão mede nos aparelhos e enxuga. O motor clássico continua o padrão e não mudou.",
-  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0g.1 → 2.0)",
+  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0h → 2.0)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Termos de Uso",
   "inicio.rodape.foot-priv": "Privacidade",
@@ -3673,7 +3676,8 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
 };
 
 /* Aether Rift: Dominion — idiomas (5.0c): português do Brasil (base), inglês e espanhol (neutro latino-americano).
-   Escolha: ?lang= na URL › a escolha guardada no aparelho ('ard-idioma') › navigator.languages (pt → pt-BR, es → es, o resto → en).
+   Escolha (5.0h.1): a escolha guardada no aparelho ('ard-idioma') › ?lang= na URL › navigator.languages na ordem, pelo prefixo (pt → pt-BR, en → en,
+   es → es; o primeiro suportado vale) › navigator.language; nenhum suportado (fr, de, ja…) → en.
    ARD.t(chave, vars, reserva): texto do idioma atual (cai no pt-BR e depois na reserva); {x} vira vars.x (número no formato do idioma);
    um valor { one, other, many… } escolhe a forma pelo Intl.PluralRules com vars.n. No HTML, data-i18n="chave" troca o texto do elemento
    e data-i18n-attr="title:chave;aria-label:chave" troca atributos. A troca vale sem recarregar: o evento 'ard-idioma' avisa os módulos.
@@ -3688,8 +3692,9 @@ const PREF = 'ard-idioma';
 function normaliza(l) { if (!l) return null; l = String(l).trim().toLowerCase(); if (/^pt/.test(l)) return 'pt-BR'; if (/^es/.test(l)) return 'es'; if (/^en/.test(l)) return 'en'; return null; }
 function guardado() { try { return normaliza(localStorage.getItem(PREF)); } catch (e) { return null; } }
 function doNavegador() { let ls = []; try { ls = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || '']; } catch (e) {} for (const l of ls) { const n = normaliza(l); if (n) return n; } return 'en'; }
-function escolhe() { let q = null; try { q = new URLSearchParams(location.search).get('lang'); } catch (e) {} const u = normaliza(q); if (u) return { idioma: u, origem: 'url' };
-  const g = guardado(); if (g) return { idioma: g, origem: 'aparelho' }; return { idioma: doNavegador(), origem: 'navegador' }; }
+function escolhe() { const g = guardado(); if (g) return { idioma: g, origem: 'aparelho' }; /* 5.0h.1: a escolha da pessoa manda primeiro */
+  let q = null; try { q = new URLSearchParams(location.search).get('lang'); } catch (e) {} const u = normaliza(q); if (u) return { idioma: u, origem: 'url' };
+  return { idioma: doNavegador(), origem: 'navegador' }; }
 const ini = escolhe(); ARD.idioma = ini.idioma;
 /* números e plural no formato do idioma (cache por idioma) */
 const NF = {}, PR = {};
@@ -3698,7 +3703,7 @@ const pr = l => PR[l] || (PR[l] = new Intl.PluralRules(LOCALE[l] || l));
 function num(n, o) { if (typeof n !== 'number' || !isFinite(n)) return String(n); return nf(ARD.idioma, o || { maximumFractionDigits: 2 }).format(n); }
 function forma(v, n, l) { if (v == null || typeof v !== 'object') return v; const c = typeof n === 'number' ? (n === 0 && v.zero != null ? 'zero' : pr(l).select(n)) : 'other'; return v[c] != null ? v[c] : v.other != null ? v.other : v.one; }
 function busca(k, l) { const d = DIC[l]; return d && Object.prototype.hasOwnProperty.call(d, k) ? d[k] : undefined; }
-const MARCA_BUILD = '__' + 'BUILD__', CARIMBO = '2026-11-06 20:59Z'; /* o en e o es vêm em arquivo à parte, sem a troca do build: o carimbo entra aqui */
+const MARCA_BUILD = '__' + 'BUILD__', CARIMBO = '2026-11-06 22:56Z'; /* o en e o es vêm em arquivo à parte, sem a troca do build: o carimbo entra aqui */
 function preenche(s, vars) { if (s.indexOf(MARCA_BUILD) >= 0) s = s.split(MARCA_BUILD).join(CARIMBO); if (!vars || s.indexOf('{') < 0) return s; return s.replace(/\{(\w+)\}/g, (m, n) => Object.prototype.hasOwnProperty.call(vars, n) ? (typeof vars[n] === 'number' ? num(vars[n]) : String(vars[n])) : m); }
 function t(k, vars, reserva) { const l = ARD.idioma; let v = busca(k, l), ll = l; if (v === undefined) { v = busca(k, 'pt-BR'); ll = 'pt-BR'; } if (v === undefined) { if (reserva != null) return preenche(String(reserva), vars); falta(k); return k; }
   const s = forma(v, vars && vars.n, ll); return preenche(String(s == null ? '' : s), vars); }
@@ -3790,7 +3795,7 @@ function marcaHtml() { try { document.documentElement.lang = LANG_HTML[ARD.idiom
 /* carga dos dicionários: o pt-BR vem embutido no pacote (base e reserva); o en e o es são arquivos à parte (src/i18n/en.js e es.js, com o carimbo
    do build na URL), pedidos só por quem usa o idioma: o script do topo do <body> já carrega o do idioma escolhido antes do jogo; aqui, a troca
    na hora pede o outro. O service worker guarda os dois na instalação, então o jogo troca de idioma também sem internet. */
-const VER = '2026-11-06 20:59Z'.replace(/[^0-9TZ]/g, '');
+const VER = '2026-11-06 22:56Z'.replace(/[^0-9TZ]/g, '');
 const CARGAS = {};
 function carregar(l) { l = normaliza(l) || 'pt-BR'; if (DIC[l]) return Promise.resolve(l); if (CARGAS[l]) return CARGAS[l];
   return (CARGAS[l] = new Promise((ok, falha) => { const sc = document.createElement('script'); sc.src = 'src/i18n/' + l + '.js?v=' + VER; sc.onload = () => { if (DIC[l]) ok(l); else { CARGAS[l] = null; falha(new Error('dicionário vazio')); } }; sc.onerror = () => { CARGAS[l] = null; sc.remove(); falha(new Error('sem rede')); }; document.head.appendChild(sc); })); }
@@ -31670,13 +31675,13 @@ const RES3 = ['plasma', 'minerio', 'dados'], RES_CLS = { plasma: 'pl', minerio: 
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">' + Tx('geral.gratis') + '</span>'; } /* 5.0c */
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-11-06 20:59Z';
+const BUILD = '2026-11-06 22:56Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.0h';
+const VERSION = '5.0h.1';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }

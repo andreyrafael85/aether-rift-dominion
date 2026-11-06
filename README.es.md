@@ -13,14 +13,14 @@
 </p>
 
 <p align="center">
-  <a href="README.md">Português (Brasil)</a> · <a href="README.en.md">English</a> · <b>Español</b>
+  <a href="README.md">English</a> · <a href="README.pt-BR.md">Português (Brasil)</a> · <b>Español</b>
 </p>
 
 <p align="center">
   <img src="docs/imagens/partida/batalha.webp" alt="Batalla entre el Consorcio Vehnar y los Erevane, capturada en el propio juego" width="800">
 </p>
 
-> Beta de pruebas, versión **5.0h**. El juego abre en el idioma del navegador y se cambia en **Idioma / Language / Idioma** (pantalla de inicio, Ajustes y ventana de la partida) o con `?lang=es`, `?lang=en` o `?lang=pt` en el enlace.
+> Beta de pruebas, versión **5.0h.1**. El juego abre en el idioma del navegador (español, inglés o portugués; cualquier otro idioma abre en inglés). Cámbialo en **Idioma / Language / Idioma** (pantalla de inicio, Ajustes y ventana de la partida) y el juego recuerda tu elección; `?lang=es`, `?lang=en` o `?lang=pt` en el enlace elige el idioma mientras no elijas uno.
 
 ## Lo más destacado
 
@@ -28,6 +28,7 @@
 - **Escaramuza** contra 1 a 3 IA (Fácil, Normal, Difícil y Brutal) en los mapas **Llanura de la Grieta**, **El Cinturón** y **Restos del Titán**.
 - **Campaña "La Gran Alineación":** 20 misiones, con estrellas, nivel de Comandante, reliquias, logros y el Hangar.
 - **Jefes de la Grieta:** El Heraldo y La Forja Madre, con fases, golpes avisados en el suelo y recompensas, en el modo **Cacería** (solo o con amigos), y la Centinela de la Grieta en los **Eventos de la Grieta**.
+- **Mundo vivo y Comandantes en el campo:** Ruinas de los Constructores para capturar, un campamento Corsario con mercenarios, la fauna de la Grieta y los surgimientos de éter; cada líder puede entrar al campo como un avatar con tres habilidades, y cada Raza tiene dos construcciones únicas y módulos a elegir.
 - **Multijugador de 2 a 4 amigos** con código de sala, directo entre los navegadores (sin servidor de juego).
 - **Robo y diplomacia:** los Piratas sifonan Refinerías y Reactores enemigos; los pactos de No Agresión se pueden romper en el momento justo.
 - **Tres idiomas con voz:** portugués, inglés y español, con 766 líneas grabadas por idioma (líderes, locutor y unidades).
@@ -84,7 +85,7 @@ La ayuda completa se abre en la partida con **H** o con el botón **?**.
 | <img src="assets/insignia-quorith.jpg" alt="" width="64"> | **[Coro Quorith](docs/racas/quorith.es.md)**<br>Líder: Zayin Coral | Sincronía: cada aliado cercano refuerza el Enlace; los pactos cuestan la mitad y las torres enemigas enmudecen.<br>Superarma: **Unísono**, todo el ejército en acorde pleno. |
 | <img src="assets/insignia-vorag.jpg" alt="" width="64"> | **[Prole Vorag](docs/racas/vorag.es.md)**<br>Líder: Oru Voraz | Enjambre barato y rápido: las Crías nacen en pares y el Carroñero devora restos y Nódulos.<br>Superarma: **Eclosión**, huevos que sueltan Crías en el campo. |
 
-Cada página muestra el líder y la historia, cada unidad y construcción con imagen, costo y números, las habilidades, la superarma y la Ascensión. Las reglas comunes (Eras, investigaciones y ventajas) están en **[Todas las Razas](docs/racas/README.es.md)**.
+Cada página muestra el líder y la historia, cada unidad y construcción con imagen, costo y números, las habilidades, la superarma, la Ascensión, el Comandante en el campo y las dos construcciones únicas. Las reglas comunes (Eras, investigaciones, módulos y ventajas) están en **[Todas las Razas](docs/racas/README.es.md)**.
 
 ## Jefes y modos
 
@@ -103,7 +104,7 @@ Cada página muestra el líder y la historia, cada unidad y construcción con im
 - **Eventos de la Grieta** en la escaramuza: Centinela de la Grieta, Caravana Corsaria, Enjambre Errante y lluvia de meteoros.
 - **Mutadores:** Noche Eterna, Tormentas Frecuentes y Recursos Escasos.
 
-Fases, golpes, vida y recompensas: **[Jefes y modos](docs/chefoes-e-modos.es.md)**.
+Fases, golpes, vida y recompensas, y el Mundo vivo: **[Jefes y modos](docs/bosses-and-modes.es.md)**.
 
 ## Motores y requisitos
 
@@ -115,7 +116,7 @@ Fases, golpes, vida y recompensas: **[Jefes y modos](docs/chefoes-e-modos.es.md)
 
 ## Hoja de ruta
 
-La versión actual es la **5.0h** (IA con la personalidad de cada líder, Mundo vivo, construcciones únicas, módulos y Comandantes en campo; la 5.0g trajo los jefes, la Cacería, los Eventos de la Grieta y los mutadores). Los próximos pasos de la v5.0 "Más allá de la Grieta":
+La versión actual es la **5.0h.1** (IA con la personalidad de cada líder, Mundo vivo, construcciones únicas, módulos y Comandantes en campo; la 5.0g trajo los jefes, la Cacería, los Eventos de la Grieta y los mutadores). Los próximos pasos de la v5.0 "Más allá de la Grieta":
 
 - **5.0h — Inteligencia y mundo** ✔: IA con la personalidad de cada líder, Mundo vivo, construcciones únicas y Comandantes en campo.
 - **5.0i — Campaña 2:** 15 misiones y los jefes que faltan.
@@ -155,7 +156,7 @@ aether-rift-dominion/
 ├─ tools/           build, pruebas, QA y generadores (documentación, galería, capturas)
 ├─ docs/            documentación: Razas, jefes y modos, planes, glosario y las imágenes (docs/imagens/)
 ├─ lab/             bancos de prueba activos (Motor 5, escombros, sonido en iPhone)
-├─ prototipos/      prototipos antiguos guardados: estilo 2D y 3D y capturas de las primeras versiones
+├─ prototipos/      prototipos antiguos guardados: las pruebas de estilo 2D y 3D
 ├─ estilo.html, estilo3d.html                pruebas visuales antiguas (generadas a partir de prototipos/)
 └─ ASSETS.md        origen y licencia de cada arte, sonido y biblioteca
 ```
@@ -164,15 +165,17 @@ El índice de la documentación está en [docs/README.md](docs/README.md).
 
 ## Créditos y licencias
 
-- Juego, código, modelos, arte y voces: el equipo de Aether Rift: Dominion (todos los derechos reservados, ver abajo).
+- Juego, código, modelos, arte y voces: el autor de Aether Rift: Dominion (todos los derechos reservados, ver [Licencia](#licencia)).
 - Música: pistas de Kevin MacLeod ([incompetech.com](https://incompetech.com)), licencia CC BY 4.0.
 - Bibliotecas: Three.js (MIT), postprocessing (Zlib), N8AO (ISC), GSAP (licencia Standard "No Charge"), PeerJS (MIT); fuentes Big Shoulders Display, IBM Plex Sans e IBM Plex Mono (SIL OFL 1.1).
 - La lista completa, con el origen, el autor y la licencia de cada elemento, está en [ASSETS.md](ASSETS.md).
 
-Contenido en fase de pruebas. Todos los derechos reservados; no se permite redistribuirlo fuera de este repositorio sin autorización.
+## Licencia
+
+Aether Rift: Dominion **no es código abierto**. El código, el arte, las voces, la música propia, el nombre y las Razas y personajes son del autor, con todos los derechos reservados: no se permite copiar, redistribuir, publicar versiones modificadas ni vender el juego. **Puedes jugarlo, compartir el enlace, transmitirlo y hacer videos y capturas, incluso monetizados, y escribir sobre él.** Las piezas de terceros siguen sus propias licencias, listadas en [ASSETS.md](ASSETS.md). El texto que vale es el [LICENSE](LICENSE), en inglés; la traducción de cortesía está en [LICENSE.es.md](LICENSE.es.md).
 
 ## Comentarios
 
 En la pantalla final, **Copiar resultado (JSON)** copia un resumen de la partida para pegarlo en un Issue, y **Enviar comentarios** abre la [plantilla de Issue](https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md) ya completa. Lo que más ayuda: dónde te perdiste, si el robo y las alertas quedaron claros, si la IA fue justa y qué faltó para que la partida fuera divertida. El diagnóstico automático que acompaña los comentarios queda en portugués, para el desarrollador.
 
-Problemas de seguridad: ver [SECURITY.md](SECURITY.md).
+Problemas de seguridad: ver [SECURITY.es.md](SECURITY.es.md).

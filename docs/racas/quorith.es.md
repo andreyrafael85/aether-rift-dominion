@@ -1,7 +1,7 @@
 <!-- Generado por node tools/docs-gerar.cjs a partir del código del juego (números de la simulación y textos de los diccionarios). Imágenes: tools/galeria.cjs, con los modelos del propio juego. -->
 # Coro Quorith
 
-**Idiomas:** [Português (Brasil)](quorith.md) · [English](quorith.en.md) · **Español** · [Todas las Razas](README.es.md) · [Volver al README](../../README.es.md)
+**Idiomas:** [English](quorith.md) · [Português (Brasil)](quorith.pt-BR.md) · **Español** · [Todas las Razas](README.es.md) · [Volver al README](../../README.es.md)
 
 <p align="center"><img src="../../assets/load-quorith.webp" alt="Coro Quorith" width="860"></p>
 
@@ -36,6 +36,22 @@ Durante 20 s, todo el ejército cuenta como acorde completo (Enlace máximo) y r
 
 El Enlace de Sincronía sube hasta 5 aliados (antes 3) y la energía rinde 15% más. Costo: 300 Mineral + 200 Plasma + 150 Datos.
 
+## Comandante en el campo: Prisma Vivo
+
+Opción de la partida (Comandantes en el campo): el líder entra al mapa con un avatar y tres habilidades.
+
+| | |
+|:-:|:--|
+| <img src="../imagens/quorith/prismavivo.webp" alt="Prisma Vivo" width="200"> | **Prisma Vivo** — Vehículos · Líder: Zayin Coral<br>Vida 850 · Velocidad 82 · Visión 250<br>Ataque 30 cada 1.3 s, alcance 160, área 14<br>*Avatar de Zayin Coral: un prisma que canta el acorde del Coro.* |
+
+| Habilidad | Objetivo | Recarga | Efecto |
+|:--|:--|:-:|:--|
+| **Acorde** | alrededor del avatar | 26 s | Tus unidades alrededor causan +20% de daño durante 8 s. |
+| **Esquirla** | punto en el suelo (alcance 220) | 14 s | Explosión de cristal: 140 de daño en área (r 70). |
+| **Silencio** | punto en el suelo (alcance 240) | 30 s | Los enemigos en un área no pueden disparar durante 4 s. |
+
+El nivel sube con la veteranía del avatar: cada nivel suma +15 % de daño y curación, −5 % de recarga y +10 % de vida. Cuando cae, vuelve al Núcleo después de 40 s + 10 s por nivel, con el nivel que tenía.
+
 ## Unidades
 
 | | |
@@ -59,15 +75,24 @@ El Enlace de Sincronía sube hasta 5 aliados (antes 3) y la energía rinde 15% m
 |:-:|:--|
 | <img src="../imagens/quorith/nucleo.webp" alt="Núcleo de Dominio" width="200"> | **Núcleo de Dominio** — Era I<br>Costo: — · Vida 8,000 · Energía +60 · Visión 420<br>Produce: Afinador<br>*Centro de la colonia. Produce recolectores. Si cae, quedas eliminado.* |
 | <img src="../imagens/quorith/reator.webp" alt="Reactor" width="200"> | **Reactor** (B + R) — Era I<br>Costo: 120 Mineral · Vida 700 · Energía +35 · Visión 120<br>*+35 de energía quemando 0.3 de Plasma/s. Vehnar: echa Humo visible para todos.*<br>Módulo **Cámara de Fusión** (Era II, 120 Mineral + 40 Plasma): +60% de energía en este Reactor, sin quemar más Plasma. |
-| <img src="../imagens/quorith/refinaria.webp" alt="Refinería" width="200"> | **Refinería** (B + F) — Era I<br>Costo: 150 Mineral · Vida 1,000 · Energía −6 · Visión 140<br>*Punto de entrega cerca de los nodos. Blanco de Sifón.* |
+| <img src="../imagens/quorith/refinaria.webp" alt="Refinería" width="200"> | **Refinería** (B + F) — Era I<br>Costo: 150 Mineral · Vida 1,000 · Energía −6 · Visión 140<br>*Punto de entrega cerca de los nodos. Blanco de Sifón.*<br>Módulos a elegir (Era II, 150 Mineral + 50 Plasma): **Prensa de Mineral** — +0,5 de Mineral por segundo. · **Cofre Blindado** — +60% de vida y regenera 4 de vida/s. |
 | <img src="../imagens/quorith/quartel.webp" alt="Cuartel Orbital" width="200"> | **Cuartel Orbital** (B + Q) — Era I<br>Costo: 200 Mineral · Vida 1,150 · Energía −8 · Visión 140<br>Produce: Infantería Orbital, Soporte / Hack, Resonador, Voz, Aguja, Diapasón<br>*Produce Infantería, Soporte/Hack y Piratas.*<br>Módulo **Academia** (Era II, 160 Mineral + 60 Plasma + 30 Datos): La infantería de este Cuartel ya sale Veterana (★): +10% de daño y −7% de daño recibido. |
-| <img src="../imagens/quorith/fabrica.webp" alt="Fábrica de Vehículos" width="200"> | **Fábrica de Vehículos** (B + V) — Era II<br>Costo: 300 Mineral + 60 Plasma · Vida 1,300 · Energía −12 · Visión 140<br>Produce: Vehículo Pesado, Prisma, Monolito<br>*Produce Vehículos Pesados.* |
-| <img src="../imagens/quorith/hangar.webp" alt="Hangar de Drones" width="200"> | **Hangar de Drones** (B + H) — Era II<br>Costo: 280 Mineral + 60 Plasma · Vida 1,150 · Energía −12 · Visión 160<br>Produce: Dron Aéreo, Armónico<br>*Produce Drones Aéreos.* |
+| <img src="../imagens/quorith/fabrica.webp" alt="Fábrica de Vehículos" width="200"> | **Fábrica de Vehículos** (B + V) — Era II<br>Costo: 300 Mineral + 60 Plasma · Vida 1,300 · Energía −12 · Visión 140<br>Produce: Vehículo Pesado, Prisma, Monolito<br>*Produce Vehículos Pesados.*<br>Módulos a elegir (Era II, 150 Mineral + 50 Plasma): **Línea Rápida** — Producción un 20% más rápida en esta Fábrica. · **Chasis Reforzado** — Los vehículos de aquí salen con +15% de vida. |
+| <img src="../imagens/quorith/hangar.webp" alt="Hangar de Drones" width="200"> | **Hangar de Drones** (B + H) — Era II<br>Costo: 280 Mineral + 60 Plasma · Vida 1,150 · Energía −12 · Visión 160<br>Produce: Dron Aéreo, Armónico<br>*Produce Drones Aéreos.*<br>Módulos a elegir (Era II, 150 Mineral + 50 Plasma): **Postcombustión** — Los drones de aquí salen un 12% más rápidos. · **Dique de Reparación** — Repara tus unidades voladoras a menos de 160 (5 de vida/s). |
 | <img src="../imagens/quorith/torre.webp" alt="Torre de Defensa" width="200"> | **Torre de Defensa** (B + T) — Era I<br>Costo: 180 Mineral + 40 Plasma · Vida 1,100 · Energía −10 · Visión 260<br>Ataque 30 cada 1 s, alcance 230, área 16<br>*Fuerte contra Infantería y Drones. Detecta camuflaje a 140.*<br>Módulo **Batería Pesada** (Era III, 150 Mineral + 60 Plasma): +40% de vida y +30% de daño en esta Torre. |
-| <img src="../imagens/quorith/nodulo.webp" alt="Nódulo de Avance" width="200"> | **Nódulo de Avance** (B + N) — Era I<br>Costo: 120 Mineral + 20 Plasma · Vida 650 · Energía −4 · Visión 260<br>*Reclama territorio en 320 y libera nodos para la recolección automática. Se puede colocar hasta a 650 de cualquier estructura tuya.* |
-| <img src="../imagens/quorith/laboratorio.webp" alt="Laboratorio" width="200"> | **Laboratorio** (B + L) — Era II<br>Costo: 220 Mineral + 60 Plasma + 40 Datos · Vida 900 · Energía −10 · Visión 140<br>*Investigaciones y superarma, pagadas con Fragmentos de Datos.* |
+| <img src="../imagens/quorith/nodulo.webp" alt="Nódulo de Avance" width="200"> | **Nódulo de Avance** (B + N) — Era I<br>Costo: 120 Mineral + 20 Plasma · Vida 650 · Energía −4 · Visión 260<br>*Reclama territorio en 320 y libera nodos para la recolección automática. Se puede colocar hasta a 650 de cualquier estructura tuya.*<br>Módulos a elegir (Era II, 150 Mineral + 50 Plasma): **Puesto Avanzado** — +50% de vida y regenera 3 de vida/s. · **Mina de Pulso** — Pulso de 45 de daño en área a los enemigos a menos de 90, cada 6 s. |
+| <img src="../imagens/quorith/laboratorio.webp" alt="Laboratorio" width="200"> | **Laboratorio** (B + L) — Era II<br>Costo: 220 Mineral + 60 Plasma + 40 Datos · Vida 900 · Energía −10 · Visión 140<br>*Investigaciones y superarma, pagadas con Fragmentos de Datos.*<br>Módulos a elegir (Era II, 150 Mineral + 50 Plasma): **Antena de Datos** — +0,3 de Datos por segundo. · **Contraespionaje** — Detecta las unidades camufladas enemigas a menos de 260, como una Torre. |
 | <img src="../imagens/quorith/muro.webp" alt="Muro" width="200"> | **Muro** (B + M) — Era I<br>Costo: 20 Mineral · Vida 450 · Visión 50<br>*Barrera barata. Arrastra para trazar una línea. Bloquea unidades y absorbe disparos.* |
 | <img src="../imagens/quorith/portao.webp" alt="Portón" width="200"> | **Portón** (B + G) — Era I<br>Costo: 40 Mineral · Vida 600 · Visión 60<br>*Tramo de muro que tus unidades atraviesan. Los enemigos tienen que derribarlo.* |
+
+## Construcciones únicas
+
+Cada Raza tiene dos, y cada jugador levanta como máximo una de cada (atajos B + J y B + K).
+
+| | |
+|:-:|:--|
+| <img src="../imagens/quorith/pilar.webp" alt="Pilar de Resonancia" width="200"> | **Pilar de Resonancia** (B + J) — Era II<br>Costo: 180 Mineral + 60 Plasma + 20 Datos · Vida 900 · Energía −8 · Visión 200<br>*Extiende el Vínculo: tus unidades a menos de 200 cuentan un vecino más en el acorde (hasta uno por encima del tope).* |
+| <img src="../imagens/quorith/eco.webp" alt="Cámara de Eco" width="200"> | **Cámara de Eco** (B + K) — Era II<br>Costo: 220 Mineral + 60 Plasma · Vida 1,000 · Energía −10 · Visión 240<br>Ataque 22 cada 1.6 s, alcance 200, área 40<br>*Torre de resonancia: onda de 200 de alcance que daña en área y retrasa vehículos y estructuras.* |
 
 ---
 

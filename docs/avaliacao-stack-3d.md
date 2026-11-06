@@ -13,7 +13,7 @@
 | geckos.io | **BSD-3-Clause** (permissiva) | 1,5 mil estrelas, último commit mar/2026 | UDP via WebRTC cliente-servidor em Node |
 | Colyseus | MIT | 7 mil estrelas, ativo | Salas, matchmaking e sincronização de estado em Node |
 | PeerJS | MIT | 13 mil estrelas, último commit fev/2026 | WebRTC P2P simples com servidor de sinalização público gratuito |
-| **VOIDSTRIKE** (braedonsaunders) | MIT | criado em jan/2026, 25 estrelas, 4 forks, 1.161 arquivos, 354 MB | Three.js r182 + TSL em WebGPU com fallback WebGL2, Next.js 16, React 19, Phaser 4 como overlay, recast-navigation (WASM), nostr-tools, zustand; 157 modelos .glb com LOD; docs de arquitetura de rede e render |
+| **RTS aberto de referência** (Three.js) | MIT | criado em jan/2026, 25 estrelas, 4 forks, 1.161 arquivos, 354 MB | Three.js r182 + TSL em WebGPU com fallback WebGL2, Next.js 16, React 19, Phaser 4 como overlay, recast-navigation (WASM), nostr-tools, zustand; 157 modelos .glb com LOD; docs de arquitetura de rede e render |
 
 **Correções ao briefing recebido:** Babylon.js é Apache-2.0; Rogue Engine não é MIT nem aberto; geckos.io é BSD-3. Nada disso impede o uso, mas o registro de licenças precisa estar certo.
 
@@ -34,7 +34,7 @@ O que faz o jogador dizer "visual incrível", em ordem de impacto por custo:
 7. **Água e plasma** com shader (lagos de plasma perto da Fenda, gelo refletindo).
 8. **LOD e instancing** para centenas de unidades a 60 fps, com presets de qualidade por dispositivo.
 
-Tudo isso está ao alcance do Three.js, e o VOIDSTRIKE prova em produção que dá para ir ainda além no navegador.
+Tudo isso está ao alcance do Three.js, e um RTS aberto em Three.js prova em produção que dá para ir ainda além no navegador.
 
 ---
 
@@ -46,7 +46,7 @@ Tudo isso está ao alcance do Three.js, e o VOIDSTRIKE prova em produção que d
 | Babylon.js | Motor completo, WebGPU maduro, editor de nós, áudio espacial, inspetor | Apache-2.0; port de tudo que validamos; física e colisão não servem (a simulação é nossa); menos mão de obra | Não trocar |
 | Rogue Engine | Editor visual sobre Three.js | Fechado; nossos mapas são procedurais, não montados à mão | Não |
 
-**Upgrade recomendado:** sair do `three.min.js` r160 (UMD, só WebGL) para a versão ESM atual via import map (r17x+), com **WebGPU quando disponível e WebGL2 como fallback**, exatamente a configuração do VOIDSTRIKE (r182). O custo é pequeno agora e evita um port depois.
+**Upgrade recomendado:** sair do `three.min.js` r160 (UMD, só WebGL) para a versão ESM atual via import map (r17x+), com **WebGPU quando disponível e WebGL2 como fallback**, exatamente a configuração do RTS aberto de referência (r182). O custo é pequeno agora e evita um port depois.
 
 **Camadas declarativas (Threlte/R3F):** ótimas para telas, menus e protótipos; inadequadas para 500 entidades atualizadas 10 vezes por segundo, porque cada mudança passa pela reconciliação do framework. Nosso HUD já é DOM e a cena é gerida por arrays. Opcional só para telas de lobby, se adotarmos React.
 
@@ -60,16 +60,16 @@ Nosso multiplayer é **lockstep de comandos sobre uma simulação determinístic
 |---|---|---|
 | geckos.io (UDP via WebRTC, cliente-servidor) | Jogos de ação com streaming de posições | Pouco: o ganho do UDP não aparece em lockstep; exige servidor Node com portas UDP e TURN |
 | Colyseus | Salas, matchmaking e sincronização de estado automática | Parcial: salas e matchmaking são úteis, mas o state sync é inútil para nós e viraria peso morto; um relay WebSocket próprio tem 200 linhas |
-| **P2P por WebRTC** (VOIDSTRIKE com Nostr, ou PeerJS) | Partidas entre amigos sem servidor de jogo | **Alto**: lockstep é o modelo natural do P2P; zero custo de servidor; código de sala; nossa simulação já está pronta |
+| **P2P por WebRTC** (com Nostr, como no RTS aberto de referência, ou PeerJS) | Partidas entre amigos sem servidor de jogo | **Alto**: lockstep é o modelo natural do P2P; zero custo de servidor; código de sala; nossa simulação já está pronta |
 | Servidor autoritativo (plano original, Rust) | Ranqueado, anti-cheat, replays oficiais | Continua sendo o destino para competição |
 
-**Sobre o VOIDSTRIKE sem servidor (WebRTC + Nostr):** é uma solução elegante e real. Prós: nenhum servidor para pagar ou manter; lobby por código; comandos assinados criptograficamente; adaptação de atraso por RTT e jitter; reconexão e ressincronização. Contras: sem autoridade central, trapaça é possível entre desconhecidos (maphack, pois todo cliente tem o estado inteiro); a sinalização depende de relays Nostr públicos que não controlamos; NAT simétrico falha sem servidor TURN; não há contas, ranking ou proteção contra desconexão tática além do que os pares combinam.
+**Sobre o P2P sem servidor do RTS aberto de referência (WebRTC + Nostr):** é uma solução elegante e real. Prós: nenhum servidor para pagar ou manter; lobby por código; comandos assinados criptograficamente; adaptação de atraso por RTT e jitter; reconexão e ressincronização. Contras: sem autoridade central, trapaça é possível entre desconhecidos (maphack, pois todo cliente tem o estado inteiro); a sinalização depende de relays Nostr públicos que não controlamos; NAT simétrico falha sem servidor TURN; não há contas, ranking ou proteção contra desconexão tática além do que os pares combinam.
 
-**Recomendação:** dois trilhos. **Agora (beta com amigos): P2P lockstep por código de sala**, com sinalização via PeerJS (MIT, servidor público gratuito, mais simples) ou via Nostr reaproveitando o módulo do VOIDSTRIKE; comandos assinados e checksums por tick com busca de divergência (ideias do VOIDSTRIKE). **Depois (ranqueado): o servidor autoritativo do plano.** O código de jogo não muda entre os dois, porque ambos falam a mesma linguagem de comandos.
+**Recomendação:** dois trilhos. **Agora (beta com amigos): P2P lockstep por código de sala**, com sinalização via PeerJS (MIT, servidor público gratuito, mais simples) ou via Nostr reaproveitando o módulo do RTS aberto de referência; comandos assinados e checksums por tick com busca de divergência (ideias do RTS aberto de referência). **Depois (ranqueado): o servidor autoritativo do plano.** O código de jogo não muda entre os dois, porque ambos falam a mesma linguagem de comandos.
 
 ---
 
-## 4. VOIDSTRIKE: o que aproveitar e o que evitar
+## 4. O RTS aberto de referência: o que aproveitar e o que evitar
 
 É o projeto mais próximo do que queremos ser tecnicamente, e é MIT: **podemos reutilizar código com atribuição**. Mas é jovem (janeiro de 2026), de autor único, com 25 estrelas e 354 MB; as APIs mudam.
 
@@ -106,7 +106,7 @@ Comece-se por 3.0a: é a fundação e é o que já foi validado.
 
 ## 6. Revisão de 16 de outubro de 2026: pesquisa de bibliotecas e remasterização total (v4.3)
 
-Pedido: remasterizar o jogo inteiro (unidades, soldados, líderes, bases, terreno, efeitos) no nível de um RTS estilizado moderno, de Supreme Commander 1 e 2 e de Starship Troopers: Terran Command, usando o potencial atual do Three.js. Versões e licenças conferidas no registro npm nesse dia.
+Pedido: remasterizar o jogo inteiro (unidades, soldados, líderes, bases, terreno, efeitos) no nível dos RTS 3D estilizados modernos, usando o potencial atual do Three.js. Versões e licenças conferidas no registro npm nesse dia.
 
 ### 6.1 A pesquisa recebida, item a item
 

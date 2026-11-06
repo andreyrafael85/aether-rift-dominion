@@ -76,8 +76,8 @@ Antes do plano, o que no briefing se sustenta e o que precisa de ajuste.
 │ de shard, logs WORM (Object Lock) para auditoria do ledger                    │
 └──────────────────────────────────────────────────────────────────────────────┘
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│ OBSERVABILIDADE: OpenTelemetry → Prometheus/Grafana/Loki/Tempo (ou Dynatrace │
-│ / Datadog) · Sentry (erros) · alertas → on-call                              │
+│ OBSERVABILIDADE: OpenTelemetry → Prometheus/Grafana/Loki/Tempo (ou APM       │
+│ comercial) · Sentry (erros) · alertas → on-call                              │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -150,7 +150,7 @@ No Shard, bases em Dormência são simuladas em taxa grosseira (só economia) pe
 | Nuvem | **GCP** (GKE, Cloud SQL, Memorystore) na fase inicial, infraestrutura como código para manter portabilidade | GKE é o Kubernetes mais maduro, Agones nasceu nele, região em São Paulo, descontos por uso comprometido | AWS (EKS, RDS, GameLift) |
 | Borda | **Cloudflare** (CDN, WAF, Bot Management, Turnstile, Spectrum para WSS) | Proteção L3–L7 e CDN em um só lugar, custo previsível | AWS Shield + CloudFront + WAF |
 | Pagamentos | **Stripe** (cartão, Apple Pay, Google Pay, Pix no Brasil) no lançamento; **Merchant of Record** (Xsolla ou Paddle) para expansão global | Stripe cobre o Brasil com Pix; MoR assume impostos e conformidade em dezenas de países | Mercado Pago para reforço local |
-| Observabilidade | **OpenTelemetry** em tudo; Prometheus, Grafana, Loki, Tempo; **Sentry** para erros | Padrão aberto, sem lock-in; Sentry tem source maps e release health | Dynatrace ou Datadog como plataforma unificada |
+| Observabilidade | **OpenTelemetry** em tudo; Prometheus, Grafana, Loki, Tempo; **Sentry** para erros | Padrão aberto, sem lock-in; Sentry tem source maps e release health | uma plataforma comercial de APM unificada |
 | Produto e analytics | **PostHog** (self-hosted ou cloud UE/BR) | Funis, retenção, feature flags, aderente à LGPD | Amplitude |
 | CI/CD | **GitHub Actions**, Turborepo (TS), Cargo workspace (Rust), **ArgoCD** (GitOps), **Terraform/OpenTofu** | Monorepo com cache de build, deploy declarativo, infra versionada | GitLab CI |
 | Segurança de código | Semgrep ou CodeQL (SAST), Trivy (imagens e SBOM), Renovate, gitleaks | Cobertura do SDLC sem custo alto | Snyk |
@@ -455,7 +455,7 @@ Não há anti-cheat de kernel no navegador, e isso é aceitável: a arquitetura 
 - **Logs** estruturados (JSON) com correlação por request e partida; **Loki** para operação; auditoria em R2 WORM.
 - **Sentry** com source maps e release health no app; alertas por release.
 - **Alertas** com SLOs: disponibilidade de matchmaking 99,9%, p95 de comando→efeito abaixo de 250 ms, zero divergência de ledger; on-call com escalonamento.
-- **Plataforma unificada** (Dynatrace ou Datadog) é uma opção válida quando o custo de operar a stack aberta superar a assinatura.
+- **Plataforma unificada** (APM comercial) é uma opção válida quando o custo de operar a stack aberta superar a assinatura.
 
 ### 6.6 CDN e otimização de assets
 
@@ -677,7 +677,7 @@ Ver tabela em 1.7. Em uma linha: **Rust para simular, TypeScript para servir, Re
 | Borda e proteção | Cloudflare (CDN, WAF, Bot Management, Turnstile, Spectrum, R2) | — |
 | Orquestração de game servers | Agones | Gerenciados: Hathora, Edgegap |
 | Erros | Sentry | Source maps, release health |
-| Observabilidade | OpenTelemetry, Prometheus, Grafana, Loki, Tempo | Unificado: Dynatrace ou Datadog |
+| Observabilidade | OpenTelemetry, Prometheus, Grafana, Loki, Tempo | Unificado: APM comercial |
 | Analytics de produto | PostHog | Funis, retenção, feature flags, aderente à LGPD |
 | Analítica de jogo | ClickHouse | Balanceamento e economia |
 | E-mail transacional | Resend ou Amazon SES | Verificação, recibos, alertas |

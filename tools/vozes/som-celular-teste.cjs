@@ -17,7 +17,7 @@ const raiz = (process.argv.find(a => a.startsWith('--raiz=')) || '').slice(7) ||
 const pw = require('playwright'); const fake = require('./fala-falsa.cjs'); const SETS = require('./conjuntos.cjs'); const { servir } = require('./servidor.cjs'); /* 5.0c.1 */
 const IPH = SETS.find(s => s.id === 'iphone-aprimorada'), WIN = SETS.find(s => s.id === 'chrome-win');
 const espera = ms => new Promise(r => setTimeout(r, ms));
-const url = q => 'file://' + raiz + '/dist/local.html?' + q; let HTTP = null; /* 5.0c.1: base http://127.0.0.1:<porta> nas páginas com vozes gravadas */
+const url = q => 'file://' + raiz + '/dist/local.html?lang=pt&' + q; /* 5.0h.1: o idioma pedido, não o do locale */ let HTTP = null; /* 5.0c.1: base http://127.0.0.1:<porta> nas páginas com vozes gravadas */
 
 /* o portão (roda na página antes do jogo, depois da imitação de fala). 5.0c.1 (bancada no iPhone do dono, iOS 18.7): com a sessão 'playback', a fala do
    sistema põe o AudioContext em 'interrupted' enquanto dura e o iOS o devolve sozinho depois dela; um resume() no meio da fala devolve a sessão ao
@@ -50,7 +50,7 @@ async function pagina(b, o) { const movel = o.movel !== false; const set = movel
   const ctx = await b.newContext(Object.assign({ viewport: movel ? { width: 390, height: 844 } : { width: 1280, height: 800 }, userAgent: set.ua, locale: 'pt-BR' /* 5.0c: o jogo abre no idioma do navegador */ }, movel ? { hasTouch: true, isMobile: o.webkit ? false : true, deviceScaleFactor: o.webkit ? 1 : 2 } : {}));
   await ctx.addInitScript(`(${fake.toString()})(${JSON.stringify(set)})`); await ctx.addInitScript(`(${portao.toString()})(${JSON.stringify({ sessao: o.sessao, engolir: o.engolir || [], iosFala: movel && o.iosFala !== false /* 5.0c.1 */ })})`);
   const p = await ctx.newPage(); p.setDefaultTimeout(240000); const errs = []; p.on('pageerror', e => errs.push(e.message));
-  await p.goto(o.http ? HTTP + '/dist/local.html?' + (o.q || 'fundo=classico&aba=ajustes') : url(o.q || 'fundo=classico&aba=ajustes'), { waitUntil: 'load' }); await p.waitForFunction(() => window.ARD && ARD.audio); await espera(Math.max(700, (set.atraso || 0) + 500));
+  await p.goto(o.http ? HTTP + '/dist/local.html?lang=pt&' + (o.q || 'fundo=classico&aba=ajustes') : url(o.q || 'fundo=classico&aba=ajustes'), { waitUntil: 'load' }); await p.waitForFunction(() => window.ARD && ARD.audio); await espera(Math.max(700, (set.atraso || 0) + 500));
   return { ctx, p, errs, close: () => ctx.close() }; }
 /* um ponto da tela que não é botão (o cabeçalho "Aparelho" do painel Ajustes) */
 async function vazio(p) { return p.evaluate(() => { const el = document.querySelector('.cpane[data-pane="ajustes"] .chead') || document.querySelector('.chead'); el.scrollIntoView({ block: 'center' }); const r = el.getBoundingClientRect(); return { x: Math.round(r.left + 12), y: Math.round(r.top + r.height / 2) }; }); }

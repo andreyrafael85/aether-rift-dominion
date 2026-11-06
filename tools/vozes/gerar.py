@@ -42,7 +42,7 @@ RACAS_SO = arg('--racas').split(',') if arg('--racas') else None  # refaz só es
 LIC_KOKORO = {'resumo': 'Apache-2.0 (pesos)', 'uso_comercial': 'sim',
               'detalhe': 'Pesos Apache-2.0 (hexgrad/Kokoro-82M, model card). Treino declarado só com áudio permissivo ou sem direitos autorais; entre os dados CC BY, Koniwa (CC BY 3.0) e SIWIS (CC BY 4.0), creditados no ASSETS.md. G2P misaki (Apache-2.0) com espeak-ng (GPL-3.0) só na máquina de build.'}
 LIC_PIPER = {'resumo': 'dados CC0, base lessac só para pesquisa', 'uso_comercial': 'risco',
-             'detalhe': 'MODEL_CARD: dados pt_BR CC0 (OHF-Voice/voice-datasets), mas "Finetuned from U.S. English lessac voice". O MODEL_CARD da lessac aponta a licença do Blizzard 2013 Lessac: "Research Purposes only", sem uso comercial nem produto de síntese de voz. Repositório rhasspy/piper-voices marcado MIT. Programa piper-tts 1.8 (GPL-3.0) só na máquina de build.'}
+             'detalhe': 'MODEL_CARD: dados pt_BR CC0 (OHF-Voice/voice-datasets), mas "Finetuned from U.S. English lessac voice". O MODEL_CARD da lessac aponta a licença do conjunto de fala Lessac (2013): "Research Purposes only", sem uso comercial nem produto de síntese de voz. Repositório rhasspy/piper-voices marcado MIT. Programa piper-tts 1.8 (GPL-3.0) só na máquina de build.'}
 CANDIDATAS = [
     dict(id='kokoro-pf_dora', modelo='Kokoro-82M v1.0', motor='kokoro', voz='pf_dora', licenca=LIC_KOKORO),
     dict(id='kokoro-pm_alex', modelo='Kokoro-82M v1.0', motor='kokoro', voz='pm_alex', licenca=LIC_KOKORO),

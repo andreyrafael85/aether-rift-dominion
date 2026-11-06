@@ -50,7 +50,7 @@ Barão-Forja fica com o til e o hífen nos três idiomas: é o nome de guerra de
 | pt-BR | Inglês | Espanhol | Motivo |
 |---|---|---|---|
 | Plasma | Plasma | Plasma | |
-| Minério | Ore | Mineral | *Ore* é o padrão de RTS; *Mineral* é o termo de jogo em es (StarCraft) |
+| Minério | Ore | Mineral | *Ore* é o padrão de RTS; *Mineral* é o termo comum de RTS em espanhol |
 | Dados / Fragmentos de Dados | Data / Data Shards | Datos / Fragmentos de Datos | *Shards* deixa claro que é recurso físico |
 | Energia | Energy | Energía | |
 | Pleno · Racionado · Colapso (regimes) | Full · Rationed · Collapse | Pleno · Racionado · Colapso | uma palavra cada, cabem no medidor |

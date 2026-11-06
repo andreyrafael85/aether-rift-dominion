@@ -1,7 +1,7 @@
 <!-- Generado por node tools/docs-gerar.cjs a partir del código del juego (números de la simulación y textos de los diccionarios). Imágenes: tools/galeria.cjs, con los modelos del propio juego. -->
 # Prole Vorag
 
-**Idiomas:** [Português (Brasil)](vorag.md) · [English](vorag.en.md) · **Español** · [Todas las Razas](README.es.md) · [Volver al README](../../README.es.md)
+**Idiomas:** [English](vorag.md) · [Português (Brasil)](vorag.pt-BR.md) · **Español** · [Todas las Razas](README.es.md) · [Volver al README](../../README.es.md)
 
 <p align="center"><img src="../../assets/load-vorag.webp" alt="Prole Vorag" width="860"></p>
 
@@ -36,6 +36,22 @@ Huevos brotan en un punto visible y liberan 8 Crías durante 30 s. Cuesta 300 Da
 
 Las Crías eclosionan de a tres y las unidades se regeneran fuera de combate (3 de vida/s). Costo: 300 Mineral + 200 Plasma + 150 Datos.
 
+## Comandante en el campo: Devorador
+
+Opción de la partida (Comandantes en el campo): el líder entra al mapa con un avatar y tres habilidades.
+
+| | |
+|:-:|:--|
+| <img src="../imagens/vorag/devorador.webp" alt="Devorador" width="200"> | **Devorador** — Vehículos · Líder: Oru Voraz<br>Vida 1,100 · Velocidad 98 · Visión 220<br>Ataque 40 cada 0.9 s, alcance 34<br>*Avatar de Oru Voraz: la fiera que devora y llama a la camada.* |
+
+| Habilidad | Objetivo | Recarga | Efecto |
+|:--|:--|:-:|:--|
+| **Devorar** | un enemigo (alcance 70) | 20 s | Engulle a un enemigo débil (hasta 220 de vida) y se cura; a los fuertes, 220 de daño. |
+| **Camada** | alrededor del avatar | 40 s | Cuatro Crías eclosionan alrededor durante 25 s. |
+| **Rugido** | alrededor del avatar | 30 s | Enemigos alrededor un 40% más lentos durante 4 s; aliados +15% de daño durante 6 s. |
+
+El nivel sube con la veteranía del avatar: cada nivel suma +15 % de daño y curación, −5 % de recarga y +10 % de vida. Cuando cae, vuelve al Núcleo después de 40 s + 10 s por nivel, con el nivel que tenía.
+
 ## Unidades
 
 | | |
@@ -58,15 +74,24 @@ Las Crías eclosionan de a tres y las unidades se regeneran fuera de combate (3 
 |:-:|:--|
 | <img src="../imagens/vorag/nucleo.webp" alt="Núcleo de Dominio" width="200"> | **Núcleo de Dominio** — Era I<br>Costo: — · Vida 8,000 · Energía +60 · Visión 420<br>Produce: Sembrador<br>*Centro de la colonia. Produce recolectores. Si cae, quedas eliminado.* |
 | <img src="../imagens/vorag/reator.webp" alt="Reactor" width="200"> | **Reactor** (B + R) — Era I<br>Costo: 120 Mineral · Vida 700 · Energía +35 · Visión 120<br>*+35 de energía quemando 0.3 de Plasma/s. Vehnar: echa Humo visible para todos.*<br>Módulo **Cámara de Fusión** (Era II, 120 Mineral + 40 Plasma): +60% de energía en este Reactor, sin quemar más Plasma. |
-| <img src="../imagens/vorag/refinaria.webp" alt="Refinería" width="200"> | **Refinería** (B + F) — Era I<br>Costo: 150 Mineral · Vida 1,000 · Energía −6 · Visión 140<br>*Punto de entrega cerca de los nodos. Blanco de Sifón.* |
+| <img src="../imagens/vorag/refinaria.webp" alt="Refinería" width="200"> | **Refinería** (B + F) — Era I<br>Costo: 150 Mineral · Vida 1,000 · Energía −6 · Visión 140<br>*Punto de entrega cerca de los nodos. Blanco de Sifón.*<br>Módulos a elegir (Era II, 150 Mineral + 50 Plasma): **Prensa de Mineral** — +0,5 de Mineral por segundo. · **Cofre Blindado** — +60% de vida y regenera 4 de vida/s. |
 | <img src="../imagens/vorag/quartel.webp" alt="Cuartel Orbital" width="200"> | **Cuartel Orbital** (B + Q) — Era I<br>Costo: 200 Mineral · Vida 1,150 · Energía −8 · Visión 140<br>Produce: Infantería Orbital, Soporte / Hack, Carroñero, Cría, Escupidor<br>*Produce Infantería, Soporte/Hack y Piratas.*<br>Módulo **Academia** (Era II, 160 Mineral + 60 Plasma + 30 Datos): La infantería de este Cuartel ya sale Veterana (★): +10% de daño y −7% de daño recibido. |
-| <img src="../imagens/vorag/fabrica.webp" alt="Fábrica de Vehículos" width="200"> | **Fábrica de Vehículos** (B + V) — Era II<br>Costo: 300 Mineral + 60 Plasma · Vida 1,300 · Energía −12 · Visión 140<br>Produce: Vehículo Pesado, Escarabajo, Brutamontes<br>*Produce Vehículos Pesados.* |
-| <img src="../imagens/vorag/hangar.webp" alt="Hangar de Drones" width="200"> | **Hangar de Drones** (B + H) — Era II<br>Costo: 280 Mineral + 60 Plasma · Vida 1,150 · Energía −12 · Visión 160<br>Produce: Dron Aéreo, Aguijón<br>*Produce Drones Aéreos.* |
+| <img src="../imagens/vorag/fabrica.webp" alt="Fábrica de Vehículos" width="200"> | **Fábrica de Vehículos** (B + V) — Era II<br>Costo: 300 Mineral + 60 Plasma · Vida 1,300 · Energía −12 · Visión 140<br>Produce: Vehículo Pesado, Escarabajo, Brutamontes<br>*Produce Vehículos Pesados.*<br>Módulos a elegir (Era II, 150 Mineral + 50 Plasma): **Línea Rápida** — Producción un 20% más rápida en esta Fábrica. · **Chasis Reforzado** — Los vehículos de aquí salen con +15% de vida. |
+| <img src="../imagens/vorag/hangar.webp" alt="Hangar de Drones" width="200"> | **Hangar de Drones** (B + H) — Era II<br>Costo: 280 Mineral + 60 Plasma · Vida 1,150 · Energía −12 · Visión 160<br>Produce: Dron Aéreo, Aguijón<br>*Produce Drones Aéreos.*<br>Módulos a elegir (Era II, 150 Mineral + 50 Plasma): **Postcombustión** — Los drones de aquí salen un 12% más rápidos. · **Dique de Reparación** — Repara tus unidades voladoras a menos de 160 (5 de vida/s). |
 | <img src="../imagens/vorag/torre.webp" alt="Torre de Defensa" width="200"> | **Torre de Defensa** (B + T) — Era I<br>Costo: 180 Mineral + 40 Plasma · Vida 1,100 · Energía −10 · Visión 260<br>Ataque 30 cada 1 s, alcance 230, área 16<br>*Fuerte contra Infantería y Drones. Detecta camuflaje a 140.*<br>Módulo **Batería Pesada** (Era III, 150 Mineral + 60 Plasma): +40% de vida y +30% de daño en esta Torre. |
-| <img src="../imagens/vorag/nodulo.webp" alt="Nódulo de Avance" width="200"> | **Nódulo de Avance** (B + N) — Era I<br>Costo: 120 Mineral + 20 Plasma · Vida 650 · Energía −4 · Visión 260<br>*Reclama territorio en 320 y libera nodos para la recolección automática. Se puede colocar hasta a 650 de cualquier estructura tuya.* |
-| <img src="../imagens/vorag/laboratorio.webp" alt="Laboratorio" width="200"> | **Laboratorio** (B + L) — Era II<br>Costo: 220 Mineral + 60 Plasma + 40 Datos · Vida 900 · Energía −10 · Visión 140<br>*Investigaciones y superarma, pagadas con Fragmentos de Datos.* |
+| <img src="../imagens/vorag/nodulo.webp" alt="Nódulo de Avance" width="200"> | **Nódulo de Avance** (B + N) — Era I<br>Costo: 120 Mineral + 20 Plasma · Vida 650 · Energía −4 · Visión 260<br>*Reclama territorio en 320 y libera nodos para la recolección automática. Se puede colocar hasta a 650 de cualquier estructura tuya.*<br>Módulos a elegir (Era II, 150 Mineral + 50 Plasma): **Puesto Avanzado** — +50% de vida y regenera 3 de vida/s. · **Mina de Pulso** — Pulso de 45 de daño en área a los enemigos a menos de 90, cada 6 s. |
+| <img src="../imagens/vorag/laboratorio.webp" alt="Laboratorio" width="200"> | **Laboratorio** (B + L) — Era II<br>Costo: 220 Mineral + 60 Plasma + 40 Datos · Vida 900 · Energía −10 · Visión 140<br>*Investigaciones y superarma, pagadas con Fragmentos de Datos.*<br>Módulos a elegir (Era II, 150 Mineral + 50 Plasma): **Antena de Datos** — +0,3 de Datos por segundo. · **Contraespionaje** — Detecta las unidades camufladas enemigas a menos de 260, como una Torre. |
 | <img src="../imagens/vorag/muro.webp" alt="Muro" width="200"> | **Muro** (B + M) — Era I<br>Costo: 20 Mineral · Vida 450 · Visión 50<br>*Barrera barata. Arrastra para trazar una línea. Bloquea unidades y absorbe disparos.* |
 | <img src="../imagens/vorag/portao.webp" alt="Portón" width="200"> | **Portón** (B + G) — Era I<br>Costo: 40 Mineral · Vida 600 · Visión 60<br>*Tramo de muro que tus unidades atraviesan. Los enemigos tienen que derribarlo.* |
+
+## Construcciones únicas
+
+Cada Raza tiene dos, y cada jugador levanta como máximo una de cada (atajos B + J y B + K).
+
+| | |
+|:-:|:--|
+| <img src="../imagens/vorag/incubadora.webp" alt="Cámara de Incubación" width="200"> | **Cámara de Incubación** (B + J) — Era II<br>Costo: 200 Mineral + 60 Plasma · Vida 1,000 · Energía −6 · Visión 150<br>Produce: Cría, Escupidor<br>*Incuba Crías y Escupidores un 25% más rápido que el Cuartel.* |
+| <img src="../imagens/vorag/tumor.webp" alt="Tumor de Territorio" width="200"> | **Tumor de Territorio** (B + K) — Era I<br>Costo: 140 Mineral + 30 Plasma · Vida 700 · Energía −2 · Visión 220<br>*Reclama territorio en 240 y ralentiza un 30% a los enemigos dentro de él.* |
 
 ---
 

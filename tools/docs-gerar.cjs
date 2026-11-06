@@ -1,20 +1,21 @@
-// Documentação gerada do próprio jogo: as páginas das Raças (docs/racas/<raça>.md, .en.md e .es.md), o índice das Raças com as Eras e as
-// pesquisas (docs/racas/README*.md) e a página dos chefões e modos (docs/chefoes-e-modos*.md). Os números saem da simulação (src/sim.js,
-// src/chefes-sim.js e src/modos.js: S.UNITS, S.BUILDINGS, S.FACTIONS, S.WEAPONS, chefões, Caçada, Eventos da Fenda e mutadores) e os nomes e
+// Documentação gerada do próprio jogo: as páginas das Raças (docs/racas/<raça>.md em inglês, .pt-BR.md e .es.md), o índice das Raças com as
+// Eras e as pesquisas (docs/racas/README*.md) e a página dos chefões e modos (docs/bosses-and-modes*.md). 5.0h.1: o inglês é o principal (sem
+// sufixo), como no GitHub. Os números saem da simulação (src/sim.js, src/chefes-sim.js, src/modos.js, src/unicas-sim.js e src/mundo.js: S.UNITS,
+// S.BUILDINGS, S.FACTIONS, S.WEAPONS, chefões, Caçada, Eventos da Fenda, mutadores, as únicas, S.MODULOS, S.COMANDANTES, S.MERCS e S.RUINAS) e os nomes e
 // descrições, dos dicionários (src/i18n/pt-BR.js, en.js e es.js) pela mesma API do jogo (ARD.i18n.d, ARD.t). O texto de ligação está aqui,
 // nos três idiomas. Rodar de novo dá o mesmo resultado (sem data nem sorteio). Imagens: docs/imagens/ (tools/galeria.cjs).
 // Uso: node tools/docs-gerar.cjs [--conferir]   (--conferir: não escreve; sai com erro se algum arquivo gerado estiver diferente)
 'use strict';
 const path = require('path'); const fs = require('fs'); const root = path.resolve(__dirname, '..');
 globalThis.ARD = {};
-for (const f of ['src/i18n/pt-BR.js', 'src/i18n/en.js', 'src/i18n/es.js', 'src/i18n.js', 'src/modos.js', 'src/chefes-sim.js', 'src/sim.js']) require(root + '/' + f);
-const S = ARD.sim, CH = ARD.chefesSim, MO = ARD.modos, D = ARD.i18n.d, t = ARD.t;
+for (const f of ['src/i18n/pt-BR.js', 'src/i18n/en.js', 'src/i18n/es.js', 'src/i18n.js', 'src/modos.js', 'src/chefes-sim.js', 'src/unicas-sim.js', 'src/mundo.js', 'src/sim.js']) require(root + '/' + f);
+const S = ARD.sim, CH = ARD.chefesSim, MO = ARD.modos, UN = ARD.unicas, MU = ARD.mundo, D = ARD.i18n.d, t = ARD.t;
 const SIMSRC = fs.readFileSync(root + '/src/sim.js', 'utf8');
 /* tabelas internas de outros arquivos (constantes sem exportação): lidas do código, para não copiar os valores */
 function constDe(arquivo, nome) { const src = fs.readFileSync(root + '/' + arquivo, 'utf8'); const i = src.indexOf('const ' + nome + ' = '); if (i < 0) throw new Error(nome + ' não achado em ' + arquivo); let k = src.indexOf('{', i), n = 0, j = k; for (; j < src.length; j++) { if (src[j] === '{') n++; else if (src[j] === '}' && --n === 0) break; } return Function('return ' + src.slice(k, j + 1))(); }
 const LORE = constDe('src/ui-start.js', 'LORE'); const LIDER = constDe('src/main.js', 'LEADER_NAME');
 /* números de regras que vivem no meio do código da simulação (sim.js): lidos por expressão; se o código mudar de forma, o gerador para */
-function num(re, nome) { const m = re.exec(SIMSRC); if (!m) throw new Error('regra não achada no src/sim.js: ' + nome); return m.slice(1).map(Number); }
+function num(re, nome, src) { const m = re.exec(src || SIMSRC); if (!m) throw new Error('regra não achada no código: ' + nome); return m.slice(1).map(Number); }
 const [LINHA_BONUS, LINHA_MAX] = num(/mult \*= 1 \+ ([\d.]+) \* Math\.min\((\d+), n\)/, 'Linhas de Montagem');
 const [LINHA_DIST] = num(/BUILDINGS\[e\.def\]\.produces && e\.def !== 'nucleo' && dist\(e\.x, e\.y, b\.x, b\.y\) <= (\d+)\) n\+\+/, 'Linhas de Montagem (distância)');
 const [LOTE_N, LOTE_MULT] = num(/it\.mult = same >= (\d+) \? ([\d.]+) : 1/, 'Lotes');
@@ -22,7 +23,9 @@ const [TRACO_XP] = num(/Object\.keys\(tr\)\.length < 2 && x\[tc\] >= (\d+)/, 'Tr
 const [TRACO_MULT] = num(/if \(tr && tr\[tc\]\) dmg \*= ([\d.]+)/, 'Traços (dano)');
 const [FOTO_DIA, FOTO_VAR] = num(/prod \+= (\d+) - (\d+) \* nt/, 'Fotossíntese');
 const [FOTO_CICLO] = num(/DM\.cos\(Math\.PI \* 2 \* sim\.time \/ (\d+)\)\) \/ 2; prod \+=/, 'Fotossíntese (ciclo)');
-const RACES = Object.keys(S.FACTIONS); const IDIOMAS = ['pt-BR', 'en', 'es']; const SUF = { 'pt-BR': '', en: '.en', es: '.es' };
+const RACES = Object.keys(S.FACTIONS); const IDIOMAS = ['en', 'pt-BR', 'es']; const SUF = { en: '', 'pt-BR': '.pt-BR', es: '.es' }; /* 5.0h.1: inglês principal */
+const MODOS = 'docs/bosses-and-modes'; /* 5.0h.1: o mesmo nome nos três idiomas */
+const [NIVEL_VIDA] = num(/NIVEL_VIDA = ([\d.]+)/, 'nível do comandante (vida)', fs.readFileSync(root + '/src/unicas-sim.js', 'utf8'));
 const PRODUTORAS = ['nucleo', 'quartel', 'fabrica', 'hangar'];
 const sim0 = r => S.createSim({ seed: 7, players: [{ name: 'A', faction: r, human: true }, { name: 'B', faction: r === 'vehnar' ? 'erevane' : 'vehnar', human: false }], minutes: 5 });
 /* vida, velocidade e carga como a unidade sai da fábrica (addUnit aplica os ajustes da Raça, como o Rebocador Vehnar) */
@@ -30,7 +33,18 @@ function stats(r, def) { const sim = sim0(r); const e = S._int.addUnit(sim, 0, d
 
 /* ---------- texto de ligação nos três idiomas ---------- */
 const L = {
-  'pt-BR': { idiomas: 'Idiomas', voltar: 'Voltar ao README', todas: 'Todas as Raças', lider: 'Líder', mundo: 'Mundo natal', estilo: 'Estilo de jogo', historia: 'O líder e a história',
+  'pt-BR': { idiomas: 'Idiomas', voltar: 'Voltar ao README',
+    unicas: 'Construções únicas', unicasTxt: 'Cada Raça tem duas, e cada jogador ergue no máximo uma de cada (atalhos B + J e B + K).',
+    modulos: 'Módulos com escolha', modulosTxt: (e, c, tm) => 'A partir da Era ' + e + ', cada uma destas construções aceita um módulo, escolhido entre dois (' + c + ', ' + tm + ' s para instalar). A escolha é para sempre.',
+    modCols: ['Construção', 'Opção A', 'Opção B'],
+    comandante: 'Comandante em campo', comandanteTxt: 'Opção da partida (Comandantes em campo): o líder entra no mapa com um avatar e três habilidades.',
+    nivelTxt: (k, cd, v, vb, vn) => 'O nível sobe com a veterania do avatar: a cada nível, +' + k + '% de dano e cura, −' + cd + '% de recarga e +' + v + '% de vida. Quando cai, volta no Núcleo depois de ' + vb + ' s + ' + vn + ' s por nível, com o nível que tinha.',
+    habCols: ['Habilidade', 'Alvo', 'Recarga', 'Efeito'], alvo: { chao: 'ponto no chão', unidade: 'um inimigo', proprio: 'em volta do avatar' }, alcance: 'alcance',
+    mundoVivo: 'Mundo vivo', mundoTxt: 'Opção da escaramuça, em quatro partes que se ligam à parte: neutros no mapa, para todos os jogadores.',
+    ruinasTxt: (tm, r, mx) => 'Infantaria parada a até ' + r + ' de uma ruína a captura em ' + tm + ' s (mais rápido com mais infantaria, até ' + mx + '). O bônus vale enquanto você a mantiver; infantaria inimiga ao lado toma a ruína de volta.',
+    mercTxt: (r, mx, min, cd) => 'O Acampamento fica no centro do mapa. Com uma unidade sua a até ' + r + ' dele, contrate mercenários pagos em Dados: até ' + mx + ' ao mesmo tempo, cada um serve por ' + min + ' min, e uma contratação a cada ' + cd + ' s.',
+    surtoTxt: (p, c, av, d, r) => 'O primeiro surto chega aos ' + p + ' min; depois, surto e chuva de meteoros se alternam a cada ' + c + ' s. Um círculo no chão (raio ' + r + ') avisa ' + av + ' s antes; dentro dele, a coleta rende o dobro por ' + d + ' s.',
+    bonus: 'Bônus', limite: n => 'até ' + n + ' por mapa', todas: 'Todas as Raças', lider: 'Líder', mundo: 'Mundo natal', estilo: 'Estilo de jogo', historia: 'O líder e a história',
     unidades: 'Unidades', construcoes: 'Construções', superarma: 'Superarma', ascensao: 'Ascensão da Raça', habilidades: 'Habilidades da Raça', tecla: 'tecla', era: 'Era', custo: 'Custo', vida: 'Vida', vel: 'Velocidade', visao: 'Visão',
     ataque: (d, a, c, s) => 'Ataque ' + d + ' a cada ' + c + ' s, alcance ' + a + (s ? ', área ' + s : ''), produzEm: 'Produzida em', produz: 'Produz', energia: 'Energia', modulo: 'Módulo', carga: 'Carga', semArma: 'Sem armas',
     cura: (r, u, b) => 'Repara ' + u + ' de vida/s em unidades e ' + b + '/s em estruturas a até ' + r, aura: { cloak: r => 'Campo de camuflagem a até ' + r, buff: r => 'Aura de dano a até ' + r, elo: r => 'Amplia o Elo a até ' + r },
@@ -64,7 +78,18 @@ const L = {
     enxame: (n, v, d) => n + ' ' + ARD.i18n.d.unidade('vorag', 'cria') + 's errantes (' + v + ' de vida cada) atacam o que estiver mais perto por ' + d + ' s.',
     meteoros: (n, c, r, d, cr) => n + ' meteoros, um a cada ' + c + ' s, com anel de aviso no chão (raio ' + r + ', ' + d + ' de dano). Onde caem, nascem cristais com ' + cr + ' de recurso.',
     sentPremio: c => 'Recompensa de quem derruba a Sentinela: ' + c + '.', evN: ['Caravana Corsária', 'Enxame Errante', 'Chuva de meteoros'], mutadores: 'Mutadores', mapas: 'Mapas', epicos: 'Épicos da campanha', epicosTxt: 'Na campanha O Grande Alinhamento, dois épicos aparecem como chefões das missões.' },
-  en: { idiomas: 'Languages', voltar: 'Back to the README', todas: 'All Races', lider: 'Leader', mundo: 'Homeworld', estilo: 'Play style', historia: 'The leader and the story',
+  en: { idiomas: 'Languages', voltar: 'Back to the README',
+    unicas: 'Unique buildings', unicasTxt: 'Each Race has two, and each player can raise at most one of each (shortcuts B + J and B + K).',
+    modulos: 'Modules with a choice', modulosTxt: (e, c, tm) => 'From Era ' + e + ' on, each of these buildings takes one module, chosen from two (' + c + ', ' + tm + ' s to install). The choice is permanent.',
+    modCols: ['Building', 'Option A', 'Option B'],
+    comandante: 'Commander in the field', comandanteTxt: 'A match option (Commanders in the field): the leader enters the map as an avatar with three abilities.',
+    nivelTxt: (k, cd, v, vb, vn) => 'The level rises with the avatar\'s veterancy: each level adds +' + k + '% damage and healing, −' + cd + '% cooldown and +' + v + '% health. When it falls, it returns at the Core after ' + vb + ' s + ' + vn + ' s per level, keeping its level.',
+    habCols: ['Ability', 'Target', 'Cooldown', 'Effect'], alvo: { chao: 'point on the ground', unidade: 'one enemy', proprio: 'around the avatar' }, alcance: 'range',
+    mundoVivo: 'Living world', mundoTxt: 'A skirmish option in four parts that can be turned on separately: neutrals on the map, for every player.',
+    ruinasTxt: (tm, r, mx) => 'Infantry standing within ' + r + ' of a ruin captures it in ' + tm + ' s (faster with more infantry, up to ' + mx + '). The bonus lasts while you hold it; enemy infantry standing next to it takes the ruin back.',
+    mercTxt: (r, mx, min, cd) => 'The Camp sits at the center of the map. With one of your units within ' + r + ' of it, hire mercenaries paid in Data: up to ' + mx + ' at a time, each serves for ' + min + ' min, and one hire every ' + cd + ' s.',
+    surtoTxt: (p, c, av, d, r) => 'The first surge comes at ' + p + ' min; after that, surges and meteor showers alternate every ' + c + ' s. A circle on the ground (radius ' + r + ') warns ' + av + ' s ahead; inside it, harvesting yields double for ' + d + ' s.',
+    bonus: 'Bonus', limite: n => 'up to ' + n + ' per map', todas: 'All Races', lider: 'Leader', mundo: 'Homeworld', estilo: 'Play style', historia: 'The leader and the story',
     unidades: 'Units', construcoes: 'Buildings', superarma: 'Superweapon', ascensao: 'Race Ascension', habilidades: 'Race abilities', tecla: 'key', era: 'Era', custo: 'Cost', vida: 'Health', vel: 'Speed', visao: 'Sight',
     ataque: (d, a, c, s) => 'Attack ' + d + ' every ' + c + ' s, range ' + a + (s ? ', splash ' + s : ''), produzEm: 'Built at', produz: 'Produces', energia: 'Energy', modulo: 'Module', carga: 'Cargo', semArma: 'Unarmed',
     cura: (r, u, b) => 'Repairs ' + u + ' health/s on units and ' + b + '/s on buildings within ' + r, aura: { cloak: r => 'Cloaking field within ' + r, buff: r => 'Damage aura within ' + r, elo: r => 'Extends the Link within ' + r },
@@ -98,7 +123,18 @@ const L = {
     enxame: (n, v, d) => n + ' wandering ' + ARD.i18n.d.unidade('vorag', 'cria') + 's (' + v + ' health each) attack whatever is closest for ' + d + ' s.',
     meteoros: (n, c, r, d, cr) => n + ' meteors, one every ' + c + ' s, with a warning ring on the ground (radius ' + r + ', ' + d + ' damage). Where they land, crystals with ' + cr + ' resources appear.',
     sentPremio: c => 'Reward for whoever takes down the Sentinel: ' + c + '.', evN: ['Corsair Caravan', 'Wandering Swarm', 'Meteor shower'], mutadores: 'Mutators', mapas: 'Maps', epicos: 'Campaign epics', epicosTxt: 'In the campaign The Great Alignment, two epics appear as mission bosses.' },
-  es: { idiomas: 'Idiomas', voltar: 'Volver al README', todas: 'Todas las Razas', lider: 'Líder', mundo: 'Mundo natal', estilo: 'Estilo de juego', historia: 'El líder y la historia',
+  es: { idiomas: 'Idiomas', voltar: 'Volver al README',
+    unicas: 'Construcciones únicas', unicasTxt: 'Cada Raza tiene dos, y cada jugador levanta como máximo una de cada (atajos B + J y B + K).',
+    modulos: 'Módulos a elegir', modulosTxt: (e, c, tm) => 'Desde la Era ' + e + ', cada una de estas construcciones acepta un módulo, elegido entre dos (' + c + ', ' + tm + ' s para instalar). La elección es para siempre.',
+    modCols: ['Construcción', 'Opción A', 'Opción B'],
+    comandante: 'Comandante en el campo', comandanteTxt: 'Opción de la partida (Comandantes en el campo): el líder entra al mapa con un avatar y tres habilidades.',
+    nivelTxt: (k, cd, v, vb, vn) => 'El nivel sube con la veteranía del avatar: cada nivel suma +' + k + ' % de daño y curación, −' + cd + ' % de recarga y +' + v + ' % de vida. Cuando cae, vuelve al Núcleo después de ' + vb + ' s + ' + vn + ' s por nivel, con el nivel que tenía.',
+    habCols: ['Habilidad', 'Objetivo', 'Recarga', 'Efecto'], alvo: { chao: 'punto en el suelo', unidade: 'un enemigo', proprio: 'alrededor del avatar' }, alcance: 'alcance',
+    mundoVivo: 'Mundo vivo', mundoTxt: 'Opción de la escaramuza en cuatro partes que se activan por separado: neutrales en el mapa, para todos los jugadores.',
+    ruinasTxt: (tm, r, mx) => 'Infantería quieta hasta ' + r + ' de una ruina la captura en ' + tm + ' s (más rápido con más infantería, hasta ' + mx + '). La bonificación dura mientras la mantengas; la infantería enemiga a su lado recupera la ruina.',
+    mercTxt: (r, mx, min, cd) => 'El Campamento está en el centro del mapa. Con una unidad tuya hasta ' + r + ' de él, contrata mercenarios pagados en Datos: hasta ' + mx + ' a la vez, cada uno sirve ' + min + ' min, y una contratación cada ' + cd + ' s.',
+    surtoTxt: (p, c, av, d, r) => 'El primer surgimiento llega a los ' + p + ' min; después, surgimiento y lluvia de meteoros se alternan cada ' + c + ' s. Un círculo en el suelo (radio ' + r + ') avisa ' + av + ' s antes; dentro de él, la recolección rinde el doble durante ' + d + ' s.',
+    bonus: 'Bonificación', limite: n => 'hasta ' + n + ' por mapa', todas: 'Todas las Razas', lider: 'Líder', mundo: 'Mundo natal', estilo: 'Estilo de juego', historia: 'El líder y la historia',
     unidades: 'Unidades', construcoes: 'Construcciones', superarma: 'Superarma', ascensao: 'Ascensión de la Raza', habilidades: 'Habilidades de la Raza', tecla: 'tecla', era: 'Era', custo: 'Costo', vida: 'Vida', vel: 'Velocidad', visao: 'Visión',
     ataque: (d, a, c, s) => 'Ataque ' + d + ' cada ' + c + ' s, alcance ' + a + (s ? ', área ' + s : ''), produzEm: 'Se produce en', produz: 'Produce', energia: 'Energía', modulo: 'Módulo', carga: 'Carga', semArma: 'Sin armas',
     cura: (r, u, b) => 'Repara ' + u + ' de vida/s en unidades y ' + b + '/s en estructuras hasta ' + r, aura: { cloak: r => 'Campo de camuflaje hasta ' + r, buff: r => 'Aura de daño hasta ' + r, elo: r => 'Amplía el Enlace hasta ' + r },
@@ -142,6 +178,13 @@ function seletor(base, l, nivel) { return '**' + L[l].idiomas + ':** ' + IDIOMAS
 const temImg = rel => fs.existsSync(path.join(root, 'docs', rel));
 const eraDe = o => o.era || 1;
 const celula = s => String(s).replace(/\|/g, '\\|').replace(/\n/g, ' ');
+const ERA = e => ['I', 'II', 'III'][(e || 1) - 1];
+const ataqueDe = (T, W) => T.ataque(n(W.dmg), n(W.range), n(W.cd), W.splash ? n(W.splash) : 0);
+/* 5.0h: módulos com escolha (S.MODULOS), nos dicionários como uni.mod.<construção>.<id> */
+const modNome = (b, m) => t('uni.mod.' + b + '.' + m.id + '.nome', null, m.name), modDesc = (b, m) => t('uni.mod.' + b + '.' + m.id + '.desc', null, m.desc);
+const habNome = h => t('cmd.hab.' + h.id + '.nome', null, h.id), habDesc = h => t('cmd.hab.' + h.id + '.desc', null, '');
+/* construções comuns a todas as Raças: sem as únicas (5.0h), as do mundo neutro (5.0h) e o Bastião (só da superarma Vehnar) */
+const comuns = () => Object.keys(S.BUILDINGS).filter(b => b !== 'bastiao' && !S.BUILDINGS[b].unica && !S.BUILDINGS[b].mundo);
 
 /* ---------- página de uma Raça ---------- */
 function paginaRaca(r, l) {
@@ -176,6 +219,14 @@ function paginaRaca(r, l) {
   o.push('## ' + T.superarma + ': ' + D.superarma(r), '', D.superarmaDesc(r), '');
   if (F.superKey === 'fundicao' && temImg('imagens/' + r + '/bastiao.webp')) o.push(img('../imagens/' + r + '/bastiao.webp', D.construcao('bastiao'), 280) + '  ', '**' + D.construcao('bastiao') + '** — ' + T.vida + ' ' + n(S.BUILDINGS.bastiao.hp) + ' · ' + D.construcaoDesc('bastiao'), '');
   const A = S.ASCENSION[r]; o.push('## ' + T.ascensao + ': ' + D.ascensao(r), '', D.ascensaoDesc(r) + ' ' + T.custo + ': ' + custo(A.cost) + '.', '');
+  /* 5.0h: comandante em campo (S.COMANDANTES): o avatar, os números e as três habilidades */
+  const C = S.COMANDANTES[r], AV = S.UNITS[C.def], WA = AV.weapon ? S.WEAPONS[AV.weapon] : null, imC = 'imagens/' + r + '/' + C.def + '.webp';
+  o.push('## ' + T.comandante + ': ' + D.unidade(r, C.def), '', T.comandanteTxt, '');
+  o.push('| | |', '|:-:|:--|', '| ' + (temImg(imC) ? img('../' + imC, D.unidade(r, C.def), 200) : '') + ' | ' + ['**' + D.unidade(r, C.def) + '** — ' + D.classe(AV.cls) + ' · ' + T.lider + ': ' + LIDER[r],
+    T.vida + ' ' + n(AV.hp) + ' · ' + T.vel + ' ' + n(AV.speed) + ' · ' + T.visao + ' ' + n(AV.sensor), WA ? ataqueDe(T, WA) : T.semArma, '*' + D.unidadeDesc(C.def) + '*'].map(celula).join('<br>') + ' |', '');
+  o.push('| ' + T.habCols.join(' | ') + ' |', '|:--|:--|:-:|:--|');
+  for (const h of C.habilidades) o.push('| **' + habNome(h) + '** | ' + T.alvo[h.alvo] + (h.alcance ? ' (' + T.alcance + ' ' + n(h.alcance) + ')' : '') + ' | ' + n(h.cd) + ' s | ' + celula(habDesc(h)) + ' |');
+  o.push('', T.nivelTxt(n(Math.round(UN.NIVEL_K * 100)), n(Math.round(UN.NIVEL_CD * 100)), n(Math.round(NIVEL_VIDA * 100)), n(UN.VOLTA_BASE), n(UN.VOLTA_NIVEL)), '');
   /* unidades */
   o.push('## ' + T.unidades, '', '| | |', '|:-:|:--|');
   const feitas = [];
@@ -190,7 +241,7 @@ function paginaRaca(r, l) {
   o.push('');
   /* construções */
   o.push('## ' + T.construcoes, '', '| | |', '|:-:|:--|');
-  for (const b of Object.keys(S.BUILDINGS)) { if (b === 'bastiao') continue; const B = S.BUILDINGS[b]; const linhas = [];
+  for (const b of comuns()) { const B = S.BUILDINGS[b]; const linhas = [];
     linhas.push('**' + D.construcao(b) + '**' + (B.key ? ' (B + ' + B.key + ')' : '') + ' — ' + T.era + ' ' + ['I', 'II', 'III'][eraDe(B) - 1]);
     const en = []; if (B.energyProd) en.push('+' + n(B.energyProd)); if (B.energyUse) en.push('−' + n(B.energyUse));
     linhas.push(T.custo + ': ' + custo(B.cost) + ' · ' + T.vida + ' ' + n(B.hp) + (en.length ? ' · ' + T.energia + ' ' + en.join(' / ') : '') + ' · ' + T.visao + ' ' + n(B.sensor));
@@ -198,6 +249,18 @@ function paginaRaca(r, l) {
     const pr = S.producesFor(b, r); if (pr.length) linhas.push(T.produz + ': ' + pr.map(u => D.unidade(r, u)).join(', '));
     linhas.push('*' + D.construcaoDesc(b) + '*');
     if (B.module) linhas.push(T.modulo + ' **' + D.modulo(b) + '** (' + T.era + ' ' + ['I', 'II', 'III'][B.module.era - 1] + ', ' + custo(B.module.cost) + '): ' + D.moduloDesc(b));
+    const MD = S.MODULOS[b]; if (MD) linhas.push(T.modulos + ' (' + T.era + ' ' + ERA(MD[0].era) + ', ' + custo(MD[0].cost) + '): ' + MD.map(m => '**' + modNome(b, m) + '** — ' + modDesc(b, m)).join(' · ')); /* 5.0h */
+    const im = 'imagens/' + r + '/' + b + '.webp'; o.push('| ' + (temImg(im) ? img('../' + im, D.construcao(b), 200) : '') + ' | ' + linhas.map(celula).join('<br>') + ' |'); }
+  o.push('');
+  /* 5.0h: as duas construções únicas da Raça (S.BUILDINGS com unica, S.UNICAS_DE) */
+  o.push('## ' + T.unicas, '', T.unicasTxt, '', '| | |', '|:-:|:--|');
+  for (const b of S.UNICAS_DE[r]) { const B = S.BUILDINGS[b]; const linhas = [];
+    linhas.push('**' + D.construcao(b) + '** (B + ' + B.key + ') — ' + T.era + ' ' + ERA(B.era));
+    const en = []; if (B.energyProd) en.push('+' + n(B.energyProd)); if (B.energyUse) en.push('−' + n(B.energyUse));
+    linhas.push(T.custo + ': ' + custo(B.cost) + ' · ' + T.vida + ' ' + n(B.hp) + (en.length ? ' · ' + T.energia + ' ' + en.join(' / ') : '') + ' · ' + T.visao + ' ' + n(B.sensor));
+    const W = B.weapon ? S.WEAPONS[B.weapon] : null; if (W) linhas.push(ataqueDe(T, W));
+    if (B.produces) linhas.push(T.produz + ': ' + B.produces.map(u => D.unidade(r, u)).join(', '));
+    linhas.push('*' + D.construcaoDesc(b) + '*');
     const im = 'imagens/' + r + '/' + b + '.webp'; o.push('| ' + (temImg(im) ? img('../' + im, D.construcao(b), 200) : '') + ' | ' + linhas.map(celula).join('<br>') + ' |'); }
   o.push('', '---', '', '<sub>' + T.nota + ' ' + T.gerado + '</sub>', '');
   return o.join('\n');
@@ -213,6 +276,8 @@ function indiceRacas(l) {
   for (const e of S.ERAS) if (e) o.push('- **' + T.era + ' ' + e.roman + ' — ' + D.era(e.n) + '**' + (e.cost ? ' (' + custo(e.cost) + ', ' + n(e.time) + ' s)' : '') + ': ' + D.eraDesc(e.n));
   o.push('', '### ' + T.pesquisas, '');
   for (const k of Object.keys(S.RESEARCH)) { const R = S.RESEARCH[k]; o.push('- **' + D.pesquisa(k) + '** (' + T.era + ' ' + ['I', 'II', 'III'][R.era - 1] + ', ' + custo(R.cost) + '): ' + D.pesquisaDesc(k)); }
+  { const ks = Object.keys(S.MODULOS), M0 = S.MODULOS[ks[0]][0]; o.push('', '### ' + T.modulos, '', T.modulosTxt(ERA(M0.era), custo(M0.cost), n(M0.time)), '', '| ' + T.modCols.join(' | ') + ' |', '|:--|:--|:--|');
+    for (const b of ks) o.push('| ' + D.construcao(b) + ' | ' + S.MODULOS[b].map(m => '**' + modNome(b, m) + '** — ' + celula(modDesc(b, m))).join(' | ') + ' |'); } /* 5.0h */
   const cls = ['inf', 'vei', 'dro', 'est', 'sup']; o.push('', '### ' + T.contras, '', '| ' + T.atacante + ' | ' + cls.map(c => D.classe(c)).join(' | ') + ' |', '|:--|' + cls.map(() => ':-:').join('|') + '|');
   for (const a of cls) o.push('| **' + D.classe(a) + '** | ' + cls.map(c => { const v = (S.COUNTER[a] || {})[c]; return v == null ? '1×' : (v > 1 ? '▲ ' : v < 1 ? '▼ ' : '') + n(v) + '×'; }).join(' | ') + ' |');
   o.push('', '<sub>' + T.gerado + '</sub>', '');
@@ -221,7 +286,7 @@ function indiceRacas(l) {
 
 /* ---------- chefões e modos ---------- */
 function paginaChefoes(l) {
-  ARD.idioma = l; const T = L[l]; const o = []; const base = 'docs/chefoes-e-modos'; const B = CH.BOSSES;
+  ARD.idioma = l; const T = L[l]; const o = []; const base = MODOS; const B = CH.BOSSES;
   const min = s => n(Math.round(s / 6) / 10);
   o.push('<!-- ' + T.gerado.replace(/`/g, '') + ' -->', '# ' + T.chefoes, '', seletor(base, l) + ' · [' + T.voltar + '](../' + ARQ('README', l) + ')', '', T.chefoesIntro, '');
   const golpes = (G) => ['| | ' + T.aviso + ' | ' + T.raio + ' | ' + T.dano + ' | ' + T.cada + ' |', '|:--|:-:|:-:|:-:|:-:|', ...Object.keys(G).map(k => { const g = G[k]; return '| ' + (T.golpe[k] || k) + ' | ' + n(g.aviso) + ' s | ' + (g.r != null ? n(g.r) : g.w != null ? n(g.w) + ' × ' + n(g.L) : g.dr != null ? '+' + n(g.dr) : '—') + ' | ' + (g.dano != null ? n(g.dano) : '—') + ' | ' + (g.cada != null ? n(g.cada) + ' s' : '—') + ' |'; })];
@@ -250,6 +315,16 @@ function paginaChefoes(l) {
   o.push('- **' + T.evN[2] + ':** ' + T.meteoros(n(Mt.n), n(Mt.cada), n(Mt.r), n(Mt.dano), n(Mt.cristal)), '');
   /* mutadores */
   o.push('## ' + T.mutadores, ''); for (const k of MO.MUT_IDS) o.push('- **' + t('modos.mut.' + k) + ':** ' + t('modos.mut.' + k + '-d'));
+  /* 5.0h: Mundo vivo (src/mundo.js): ruínas dos Construtores, Irmandade Corsária, fauna e surto de éter */
+  { const CAP = MU.CAP, CT = MU.CONTRATO, SU = MU.SURTO, FA = MU.FAUNA, LI = MU.LIMITE;
+    o.push('', '## ' + T.mundoVivo, '', T.mundoTxt, '');
+    o.push('### ' + t('mundo.op.ruinas'), '', T.ruinasTxt(n(CAP.t), n(CAP.raio), n(CAP.maxN)), '');
+    for (const k of MU.RUINA_TIPOS) o.push('- **' + D.construcao(MU.RUINAS[k].def) + ':** ' + t('mundo.bonus.' + k) + '. ' + D.construcaoDesc(MU.RUINAS[k].def));
+    o.push('', '### ' + t('mundo.op.corsarios'), '', T.mercTxt(n(CT.raio), n(CT.max), n(CT.dura / 60), n(CT.cd)), '', '| | ' + T.custo + ' | ' + T.vida + ' | ' + T.vel + ' | |', '|:--|:-:|:-:|:-:|:--|');
+    for (const k of MU.MERC_IDS) { const def = MU.MERCS[k].def, U = S.UNITS[def], W = U.weapon ? S.WEAPONS[U.weapon] : null; o.push('| **' + D.unidade('vehnar', def) + '** | ' + custo(MU.MERCS[k].custo) + ' | ' + n(U.hp) + ' | ' + n(U.speed) + ' | ' + (W ? ataqueDe(T, W) + '. ' : '') + celula(D.unidadeDesc(def)) + ' |'); }
+    o.push('', '### ' + t('mundo.op.fauna'), '');
+    for (const k of Object.keys(FA)) { const def = FA[k].def, U = S.UNITS[def], W = U.weapon ? S.WEAPONS[U.weapon] : null; o.push('- **' + D.unidade('vehnar', def) + '** (' + T.vida + ' ' + n(U.hp) + (W ? ' · ' + ataqueDe(T, W) : '') + ', ' + T.limite(n(LI[k])) + '): ' + D.unidadeDesc(def)); }
+    o.push('', '### ' + t('mundo.op.surto'), '', T.surtoTxt(n(SU.primeiro / 60), n(SU.cada), n(SU.aviso), n(SU.dura), n(SU.r))); }
   o.push('', '## ' + T.mapas, ''); for (const k of Object.keys(S.MAPS)) o.push('- **' + D.mapa(k) + ':** ' + t('vitrine.mapa.' + k));
   /* épicos da campanha */
   o.push('', '## ' + T.epicos, '', T.epicosTxt, '', '| | |', '|:-:|:--|');
@@ -260,7 +335,7 @@ function paginaChefoes(l) {
 
 /* ---------- escrever (ou conferir) ---------- */
 const saidas = {};
-for (const l of IDIOMAS) { for (const r of RACES) saidas[ARQ('docs/racas/' + r, l)] = paginaRaca(r, l); saidas[ARQ('docs/racas/README', l)] = indiceRacas(l); saidas[ARQ('docs/chefoes-e-modos', l)] = paginaChefoes(l); }
+for (const l of IDIOMAS) { for (const r of RACES) saidas[ARQ('docs/racas/' + r, l)] = paginaRaca(r, l); saidas[ARQ('docs/racas/README', l)] = indiceRacas(l); saidas[ARQ(MODOS, l)] = paginaChefoes(l); }
 ARD.idioma = 'pt-BR';
 const conferir = process.argv.includes('--conferir'); let dif = 0;
 for (const [f, txt] of Object.entries(saidas)) { const p = path.join(root, f); const atual = fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : null;

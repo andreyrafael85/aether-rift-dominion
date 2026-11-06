@@ -1,7 +1,7 @@
 <!-- Generado por node tools/docs-gerar.cjs a partir del código del juego (números de la simulación y textos de los diccionarios). Imágenes: tools/galeria.cjs, con los modelos del propio juego. -->
 # Todas las Razas
 
-**Idiomas:** [Português (Brasil)](README.md) · [English](README.en.md) · **Español** · [Volver al README](../../README.es.md)
+**Idiomas:** [English](README.md) · [Português (Brasil)](README.pt-BR.md) · **Español** · [Volver al README](../../README.es.md)
 
 | | Raza | Líder | Estilo | Superarma |
 |:-:|:--|:--|:--|:--|
@@ -28,6 +28,18 @@ Mineral (cristal azul), Plasma (naranja) y Fragmentos de Datos (verde) salen de 
 - **Armamento** (Era III, 150 Datos): +15% de daño para todas las unidades y torres.
 - **Blindaje** (Era III, 150 Datos): −13% de daño recibido por unidades y estructuras.
 - **Sensores** (Era II, 100 Datos): +25% de alcance de sensores.
+
+### Módulos a elegir
+
+Desde la Era II, cada una de estas construcciones acepta un módulo, elegido entre dos (150 Mineral + 50 Plasma, 15 s para instalar). La elección es para siempre.
+
+| Construcción | Opción A | Opción B |
+|:--|:--|:--|
+| Refinería | **Prensa de Mineral** — +0,5 de Mineral por segundo. | **Cofre Blindado** — +60% de vida y regenera 4 de vida/s. |
+| Fábrica de Vehículos | **Línea Rápida** — Producción un 20% más rápida en esta Fábrica. | **Chasis Reforzado** — Los vehículos de aquí salen con +15% de vida. |
+| Hangar de Drones | **Postcombustión** — Los drones de aquí salen un 12% más rápidos. | **Dique de Reparación** — Repara tus unidades voladoras a menos de 160 (5 de vida/s). |
+| Laboratorio | **Antena de Datos** — +0,3 de Datos por segundo. | **Contraespionaje** — Detecta las unidades camufladas enemigas a menos de 260, como una Torre. |
+| Nódulo de Avance | **Puesto Avanzado** — +50% de vida y regenera 3 de vida/s. | **Mina de Pulso** — Pulso de 45 de daño en área a los enemigos a menos de 90, cada 6 s. |
 
 ### Ventajas (daño de cada clase contra cada clase)
 

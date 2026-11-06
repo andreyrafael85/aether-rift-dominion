@@ -19,7 +19,7 @@ const espera = ms => new Promise(r => setTimeout(r, ms));
     const movel = /iPhone/.test(set.ua); const ctx = await b.newContext(Object.assign({ viewport: movel ? { width: 390, height: 844 } : { width: 1280, height: 800 }, userAgent: set.ua, locale: 'pt-BR' /* 5.0c: o jogo abre no idioma do navegador */ }, movel && !ff ? { deviceScaleFactor: 2, isMobile: true, hasTouch: true } : {}));
     await ctx.addInitScript(`(${fake.toString()})(${JSON.stringify(set)})`);
     const p = await ctx.newPage(); p.setDefaultTimeout(120000); const errs = []; p.on('pageerror', e => errs.push(e.message));
-    await p.goto(url + '?aba=ajustes', { waitUntil: 'load' }); await p.waitForFunction(() => window.ARD && ARD.audio); await espera(Math.max(900, (set.atraso || 0) + 500));
+    await p.goto(url + '?lang=pt&aba=ajustes', { waitUntil: 'load' }); await p.waitForFunction(() => window.ARD && ARD.audio); await espera(Math.max(900, (set.atraso || 0) + 500));
     await p.evaluate(() => { const A = ARD.audio; const o = A.onSay; A.onSay = (t, k) => { __fala.caps.push(t); if (o) o(t, k); }; });
     const fala = await p.evaluate(async () => { const F = __fala; F.log.length = 0; F.ev.length = 0; F.caps.length = 0; ARD.audio.say('Construção concluída', 'built', 4); await new Promise(r => setTimeout(r, 900)); return { log: F.log.slice(), ev: F.ev.slice(), caps: F.caps.slice() }; });
     const u = fala.log[fala.log.length - 1] || {}; /* a última: na voz online sem rede, a primeira tentativa falha e a fala repete na local */ const r = { nome: set.nome, voz: u.voz || null, uri: u.uri || null, pitch: u.pitch, rate: u.rate, lang: u.lang, evento: fala.ev.join(','), legendas: fala.caps.length, espera: set.espera ? String(set.espera) : null };
@@ -44,7 +44,7 @@ const espera = ms => new Promise(r => setTimeout(r, ms));
     console.log(`${set.nome.padEnd(42)} voz: ${String(r.voz).padEnd(62)} pitch ${r.pitch} rate ${r.rate} · boca ${r.bocaOk ? 'ok' : r.evento} · legendas ${r.legendas}${ui ? ` · Ajustes ${ui.opcoes.length} opções (padrão ${r.ajustes.padrao})${r.lembrada ? ' · lembrada ' + (r.lembrada.ok ? 'ok' : 'FALHOU') : ''}` : ' · sem escolha em Ajustes'}`);
   }
   { /* 5.0c.1: Vozes gravadas em Ajustes */ const set = SETS.find(s => s.id === 'edge'); const ctx = await b.newContext({ viewport: { width: 1280, height: 800 }, userAgent: set.ua, locale: 'pt-BR' }); await ctx.addInitScript(`(${fake.toString()})(${JSON.stringify(set)})`);
-    const p = await ctx.newPage(); p.setDefaultTimeout(120000); const errs = []; p.on('pageerror', e => errs.push(e.message)); await p.goto(url + '?aba=ajustes', { waitUntil: 'load' }); await p.waitForFunction(() => window.ARD && ARD.audio); await espera(900);
+    const p = await ctx.newPage(); p.setDefaultTimeout(120000); const errs = []; p.on('pageerror', e => errs.push(e.message)); await p.goto(url + '?lang=pt&aba=ajustes', { waitUntil: 'load' }); await p.waitForFunction(() => window.ARD && ARD.audio); await espera(900);
     const ver = () => p.evaluate(() => ({ inicio: document.getElementById('opt-voz-gravada').checked, partida: document.getElementById('pt-voz-gravada').checked, A: ARD.audio.gravadas, salvo: JSON.parse(localStorage.getItem('ard-audio') || '{}').gravadas }));
     const g = { padrao: await ver() }; await p.locator('#opt-voz-gravada').scrollIntoViewIfNeeded(); await p.click('#opt-voz-gravada'); await espera(150); g.desligada = await ver();
     await p.reload({ waitUntil: 'load' }); await p.waitForFunction(() => window.ARD && ARD.audio); await espera(700); g.recarregada = await ver();

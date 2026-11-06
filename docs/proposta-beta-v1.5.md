@@ -1,7 +1,7 @@
 # AETHER RIFT: DOMINION — Avaliação do beta 0.1 e proposta para o beta v1.5 / v2.0
 ### 10 de outubro de 2026
 
-> Prova de conceito visual publicada: https://claude.ai/artifact/Lb1VS9n78yLq8W5t9cPfrq (toggle Noite e Grade). Capturas em [`prototipos/capturas/`](../prototipos/capturas/).
+> Prova de conceito visual publicada: https://claude.ai/artifact/Lb1VS9n78yLq8W5t9cPfrq (toggle Noite e Grade).
 
 ---
 
@@ -21,18 +21,18 @@ O que vale a pena manter: a simulação determinística dirigida por comandos (b
 
 ---
 
-## 1. O que as referências de Command & Conquer ensinam (e o limite)
+## 1. O que as referências de RTS clássicos ensinam (e o limite)
 
 As cinco imagens têm em comum coisas que não dependem de orçamento de arte AAA:
 
-1. **Isometria 2.5D com volume.** Tiberian Sun e Red Alert 2 são sprites pré-renderizados de modelos 3D (e voxels, no caso dos veículos de RA2), vistos de cima em 2:1. O volume vem da luz fixa, não de poligonagem.
+1. **Isometria 2.5D com volume.** Os RTS isométricos clássicos usavam sprites pré-renderizados de modelos 3D (e voxels, em alguns veículos), vistos de cima em 2:1. O volume vem da luz fixa, não de poligonagem.
 2. **Base densa e legível.** Muros, portões, torres nos cantos, refinaria com tanques, usina com chaminé, tudo com silhueta própria e luzinhas. A base é um personagem.
 3. **Economia visível.** Campos de cristal que brilham e se esgotam, coletores indo e voltando com carga visível.
 4. **Combate com juice.** Flash de cano, traçantes, impactos, explosões com destroços, crateras e carcaças que ficam no mapa.
 5. **Vida ambiente.** Fumaça de chaminé, holofotes, neve, trilhas de esteira, voz de sistema ("unidade pronta").
 6. **Barra de construção lateral** com ícones de cada unidade: o jogador "vê" o catálogo o tempo todo.
 
-**O limite:** a EA abriu o código de alguns C&C clássicos, mas **a arte e a marca continuam propriedade da EA**. Nada de sprites, nomes, cutscenes ou interface do C&C entra no jogo. O briefing original também pede que nenhum título clássico apareça no nome, lore, interface ou marketing. Usamos C&C como professor de linguagem visual, não como fonte de assets.
+**O limite:** nada de arte, nomes, cutscenes, interface ou marca de outro jogo entra no nosso. O briefing original também pede que nenhum título clássico apareça no nome, lore, interface ou marketing. As referências ensinam linguagem visual; não são fonte de assets.
 
 ---
 
@@ -48,16 +48,13 @@ Para ter riqueza de detalhe em dias e sem artista contratado, a proposta é **sp
 
 Na prova de conceito, **tudo é gerado no navegador, sem nenhum asset externo**: 30 sprites em menos de 100 ms, 70 objetos, partículas, muros, raid com sifão, destroço em chamas e crateras.
 
-![Dia](../prototipos/capturas/estilo-voxel-dia.png)
-![Noite](../prototipos/capturas/estilo-voxel-noite.png)
-
 Por que não pular direto para 3D (Three.js) ou pixel art pintada à mão:
 
 | Caminho | Qualidade alcançável | Tempo até o v1.5 | Depende de |
 |---|---|---|---|
 | **Voxel pré-renderizado (proposto)** | Volume, luz, 16 direções, dano, animação por partes | Dias | Só código; artista opcional depois (MagicaVoxel é grátis) |
-| Pixel art / sprites pintados | O visual RA2 "de verdade" | Semanas a meses | Artista 2D sênior, 8 direções × dano × animação por unidade |
-| 3D em tempo real (Three.js) | O visual RA3 | Semanas | Modelos low-poly, technical artist, pipeline glTF/KTX2 (já no plano v2.0) |
+| Pixel art / sprites pintados | O acabamento pintado à mão dos RTS isométricos clássicos | Semanas a meses | Artista 2D sênior, 8 direções × dano × animação por unidade |
+| 3D em tempo real (Three.js) | 3D estilizado | Semanas | Modelos low-poly, technical artist, pipeline glTF/KTX2 (já no plano v2.0) |
 
 O voxel não exclui os outros: um artista pode substituir modelo por modelo sem tocar no jogo, e o renderizador 3D do plano v2.0 pode consumir os mesmos modelos voxel como malhas.
 
@@ -151,4 +148,4 @@ Cada entrega é publicada no mesmo link e commitada no repositório, para os tes
 - **Desempenho no celular** com milhares de sprites e luz noturna: mitigação com cache de sprites, culling por tela, cap de partículas e modo "luz simples" automático.
 - **Consistência de arte** entre modelos feitos em código: guia de estilo voxel (escala 1 voxel = 0,25 m, paleta por facção, 3 materiais) e revisão visual por captura automática a cada build.
 - **Escopo do elenco**: 12 unidades por facção é muito; cada uma entra só com modelo, contra e função claros. Sem função nova, não entra.
-- **Expectativa de "igual ao C&C"**: o voxel é uma estética própria. A meta do v1.5 é "parece um jogo", não "parece RA2". A meta de RA2 fica para artistas no v2.0.
+- **Expectativa de "igual aos clássicos"**: o voxel é uma estética própria. A meta do v1.5 é "parece um jogo", não "parece um clássico". O acabamento pintado à mão fica para artistas no v2.0.

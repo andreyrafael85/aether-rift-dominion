@@ -1,178 +1,181 @@
 <p align="center">
-  <img src="docs/imagens/compartilhar.jpg" alt="Aether Rift: Dominion — as cinco Raças em volta da Fenda" width="880">
+  <img src="docs/imagens/compartilhar.jpg" alt="Aether Rift: Dominion — the five Races around the Rift" width="880">
 </p>
 
 <h1 align="center">Aether Rift: Dominion</h1>
 
 <p align="center">
-  <b>Estratégia em tempo real no navegador.</b> Cinco Raças disputam a Fenda: construa a base, colha, roube, faça pactos e derrube chefões. No computador e no celular, sem instalar nada.
+  <b>Real-time strategy in the browser.</b> Five Races fight over the Rift: build your base, harvest, steal, make pacts and take down bosses. On PC and phone, with nothing to install.
 </p>
 
 <p align="center">
-  <a href="https://andreyrafael85.github.io/aether-rift-dominion/"><img src="https://img.shields.io/badge/%E2%96%B6%20JOGAR%20AGORA-no%20navegador-FF5E3A?style=for-the-badge" alt="Jogar agora no navegador"></a>
+  <a href="https://andreyrafael85.github.io/aether-rift-dominion/?lang=en"><img src="https://img.shields.io/badge/%E2%96%B6%20PLAY%20NOW-in%20your%20browser-FF5E3A?style=for-the-badge" alt="Play now in your browser"></a>
 </p>
 
 <p align="center">
-  <b>Português (Brasil)</b> · <a href="README.en.md">English</a> · <a href="README.es.md">Español</a>
+  <b>English</b> · <a href="README.pt-BR.md">Português (Brasil)</a> · <a href="README.es.md">Español</a>
 </p>
 
 <p align="center">
-  <img src="docs/imagens/partida/batalha.webp" alt="Batalha entre o Consórcio Vehnar e a Erevane, capturada no próprio jogo" width="800">
+  <img src="docs/imagens/partida/batalha.webp" alt="A battle between the Vehnar Consortium and the Erevane, captured in the game itself" width="800">
 </p>
 
-> Beta de testes, versão **5.0h**. O jogo abre no idioma do navegador e troca em **Idioma / Language / Idioma** (tela inicial, Ajustes e janela da partida) ou com `?lang=pt`, `?lang=en` e `?lang=es` no link.
+> Playtest beta, version **5.0h.1**. The game opens in your browser's language (Portuguese, English or Spanish; any other language opens in English). Switch it in **Idioma / Language / Idioma** (start screen, Settings and the in-match window) and the game remembers your choice; `?lang=en`, `?lang=es` or `?lang=pt` in the link picks the language until you choose one.
 
-## Destaques
+## Highlights
 
-- **Cinco Raças com estilo próprio:** cada uma tem líder, mundo natal, unidades exclusivas, Pirata, superarma e Ascensão. São 29 tipos de unidade e 11 construções por Raça.
-- **Escaramuça** contra 1 a 3 IAs (Fácil, Normal, Difícil e Brutal) nos mapas **Planície da Fenda**, **Cinturão** e **Destroço do Titã**.
-- **Campanha "O Grande Alinhamento":** 20 missões, com estrelas, nível de Comandante, relíquias, conquistas e o Hangar.
-- **Chefões da Fenda:** O Arauto e A Forja-Mãe, com fases, golpes avisados no chão e recompensas, no modo **Caçada** (sozinho ou com amigos), e a Sentinela da Fenda nos **Eventos da Fenda**.
-- **Multiplayer de 2 a 4 amigos** por código de sala, direto entre os navegadores (sem servidor de jogo).
-- **Roubo e diplomacia:** Piratas sifonam Refinarias e Reatores inimigos; pactos de Não-agressão podem ser quebrados na hora certa.
-- **Três idiomas com voz:** português, inglês e espanhol, com 766 falas gravadas por idioma (líderes, locutor e unidades).
-- **Funciona sem internet** depois da primeira visita (campanha e partidas solo) e pode ser instalado como app.
+- **Five Races with their own style:** each has a leader, a homeworld, exclusive units, a Pirate, a superweapon and an Ascension. 29 unit types and 11 buildings per Race.
+- **Skirmish** against 1 to 3 AIs (Easy, Normal, Hard and Brutal) on **Rift Plains**, **The Belt** and **Titan's Wreck**.
+- **Campaign "The Great Alignment":** 20 missions, with stars, a Commander level, relics, achievements and the Hangar.
+- **Rift bosses:** The Herald and The Mother Forge, with phases, attacks warned on the ground and rewards, in the **Hunt** mode (alone or with friends), plus the Rift Sentinel in the **Rift Events**.
+- **Living world and Field Commanders:** Builders' Ruins to capture, a Corsair camp with mercenaries, Rift wildlife and Aether surges; each leader can enter the field as an avatar with three abilities, and each Race has two unique buildings and modules with a choice.
+- **Multiplayer for 2 to 4 friends** by room code, straight between browsers (no game server).
+- **Theft and diplomacy:** Pirates siphon enemy Refineries and Reactors; Non-Aggression Pacts can be broken at the right moment.
+- **Three languages with voice:** Portuguese, English and Spanish, with 766 recorded lines per language (leaders, announcer and units).
+- **Works offline** after the first visit (campaign and solo matches) and can be installed as an app.
 
-## Como jogar
+## How to play
 
-O objetivo é destruir os Núcleos inimigos ou ter mais Domínio (território, exército e recursos) quando o tempo acabar. Os coletores colhem **Minério**, **Plasma** e **Dados** dentro do seu território; os **Reatores** dão energia; o **Núcleo** evolui de Era (I Fundação, II Expansão, III Domínio) e libera as unidades pesadas, a superarma e a Ascensão da Raça.
+Destroy the enemy Cores, or hold the most Dominion (territory, army and resources) when time runs out. Harvesters gather **Ore**, **Plasma** and **Data** inside your territory; **Reactors** give energy; the **Core** advances through the Eras (I Foundation, II Expansion, III Dominion) and unlocks heavy units, the superweapon and the Race Ascension.
 
 <table>
 <tr>
-<td width="50%"><img src="docs/imagens/partida/partida-pc.jpg" alt="Partida no computador, com o HUD"></td>
-<td width="50%"><img src="docs/imagens/partida/inicio-pc.jpg" alt="Tela inicial com a vitrine das Raças"></td>
+<td width="50%"><img src="docs/imagens/partida/partida-pc.jpg" alt="A match on PC, with the HUD"></td>
+<td width="50%"><img src="docs/imagens/partida/inicio-pc.jpg" alt="Start screen with the Race showcase"></td>
 </tr>
 </table>
 
-### No computador
+### On PC
 
-| Comando | O que faz |
+| Input | What it does |
 |:--|:--|
-| Clique / arrastar | Seleciona; arrastar faz a caixa de seleção (Shift adiciona; duplo clique pega todas do mesmo tipo) |
-| Botão direito | Move; em inimigo, ataca; em nó, colhe; com Pirata em Refinaria ou Reator inimigo, sifona |
-| A / S | Atacar-mover (clique no destino) / Parar |
-| B + letra | Construir: R Reator, F Refinaria, Q Quartel, V Fábrica, H Hangar, T Torre, N Nódulo, L Laboratório, M Muro, G Portão |
-| Letras com a construção selecionada | Produzir (a tecla aparece em cada botão) |
-| Ctrl+1–9 / 1–9 | Gravar / selecionar grupo |
-| Botão do meio | Roda de comandos onde o mouse está |
-| WASD, setas, roda | Câmera e zoom; segurar o botão direito e arrastar move o mapa |
-| Q / E · PageUp / PageDown | Girar / inclinar a câmera (Home volta à visão tática) |
-| F1 / F2 / F / Espaço | Núcleo / exército / centralizar a seleção / último alerta |
-| J ou 📷 | Modo Foto |
-| P / H / Esc | Pausar / ajuda / cancelar · Ctrl+S salva |
+| Click / drag | Select; drag for a selection box (Shift adds; double-click picks every unit of that type) |
+| Right click | Move; on an enemy, attack; on a node, harvest; with a Pirate on an enemy Refinery or Reactor, siphon |
+| A / S | Attack-move (click the destination) / Stop |
+| B + letter | Build: R Reactor, F Refinery, Q Barracks, V Factory, H Hangar, T Tower, N Outpost, L Laboratory, M Wall, G Gate |
+| Letters with a building selected | Produce (the key is shown on each button) |
+| Ctrl+1–9 / 1–9 | Set / select a group |
+| Middle button | Command wheel where the mouse is |
+| WASD, arrows, wheel | Camera and zoom; hold the right button and drag to move the map |
+| Q / E · PageUp / PageDown | Rotate / tilt the camera (Home goes back to the tactical view) |
+| F1 / F2 / F / Space | Core / army / center the selection / last alert |
+| J or 📷 | Photo Mode |
+| P / H / Esc | Pause / help / cancel · Ctrl+S saves |
 
-### No celular
+### On a phone
 
-<img src="docs/imagens/partida/partida-celular.jpg" alt="Partida no celular" width="230" align="right">
+<img src="docs/imagens/partida/partida-celular.jpg" alt="A match on a phone" width="230" align="right">
 
-- Toque numa unidade sua para selecionar (dois toques: todas do tipo); depois toque no chão para mover ou no inimigo para atacar.
-- A barra de baixo tem Núcleo, Exército, Construir, Atacar, Parar, Na tela, Caixa, Girar e Inclinar a câmera.
-- Toque longo no mapa abre a roda de comandos; arrastar com dois dedos move, aproxima e gira o mapa.
-- Os grupos 1–5 ficam à esquerda: segure para gravar, toque para selecionar.
+- Tap one of your units to select it (double tap: every unit of that type), then tap the ground to move or an enemy to attack.
+- The bottom bar has Core, Army, Build, Attack, Stop, On screen, Box, Rotate and Tilt.
+- A long press on the map opens the command wheel; dragging with two fingers moves, zooms and rotates the map.
+- Groups 1–5 sit on the left: hold to save, tap to select.
 
-A ajuda completa abre na partida com **H** ou pelo botão **?**.
+The full help opens in the match with **H** or the **?** button.
 
 <br clear="right">
 
-## As cinco Raças
+## The five Races
 
-| | Raça | Estilo de jogo |
+| | Race | Play style |
 |:-:|:--|:--|
-| <img src="assets/insignia-vehnar.jpg" alt="" width="64"> | **[Consórcio Vehnar](docs/racas/vehnar.md)**<br>Líder: Barão-Forja | Indústria pesada: Linhas de Montagem aceleram a produção, Lotes saem pela metade do preço e as construções são blindadas.<br>Superarma: **Fundição Orbital**, um Bastião que cai do céu. |
-| <img src="assets/insignia-erevane.jpg" alt="" width="64"> | **[Erevane](docs/racas/erevane.md)**<br>Líder: Vesper Ísk | Furtividade e roubo: infantaria, Piratas e Nódulos camuflados, roubo limpo e dois Saltos de Núcleo.<br>Superarma: **Blecaute**, que apaga sensores e energia do inimigo. |
-| <img src="assets/insignia-tessara.jpg" alt="" width="64"> | **[Tessara](docs/racas/tessara.md)**<br>Líder: Sylvia Oriel | Adaptação: as unidades ganham Traços contra o que combatem e o Núcleo faz Fotossíntese.<br>Superarma: **Salto Evolutivo**, +35% de dano para todo o exército. |
-| <img src="assets/insignia-quorith.jpg" alt="" width="64"> | **[Coro Quorith](docs/racas/quorith.md)**<br>Líder: Zayin Coral | Sincronia: cada aliado perto reforça o Elo; pactos custam metade e torres inimigas emudecem.<br>Superarma: **Uníssono**, o exército inteiro em acorde cheio. |
-| <img src="assets/insignia-vorag.jpg" alt="" width="64"> | **[Prole Vorag](docs/racas/vorag.md)**<br>Líder: Oru Voraz | Enxame barato e rápido: Crias nascem em pares e o Carniceiro devora carcaças e Nódulos.<br>Superarma: **Eclosão**, ovos que soltam Crias no campo. |
+| <img src="assets/insignia-vehnar.jpg" alt="" width="64"> | **[Vehnar Consortium](docs/racas/vehnar.md)**<br>Leader: Barão-Forja | Heavy industry: Assembly Lines speed up production, Batches cost half and the buildings are armored.<br>Superweapon: **Orbital Foundry**, a Bastion dropped from the sky. |
+| <img src="assets/insignia-erevane.jpg" alt="" width="64"> | **[Erevane](docs/racas/erevane.md)**<br>Leader: Vesper Ísk | Stealth and theft: cloaked infantry, Pirates and Outposts, clean theft and two Core Jumps.<br>Superweapon: **Blackout**, which shuts down enemy sensors and energy. |
+| <img src="assets/insignia-tessara.jpg" alt="" width="64"> | **[Tessara](docs/racas/tessara.md)**<br>Leader: Sylvia Oriel | Adaptation: units gain Traits against what they fight and the Core does Photosynthesis.<br>Superweapon: **Evolutionary Leap**, +35% damage for the whole army. |
+| <img src="assets/insignia-quorith.jpg" alt="" width="64"> | **[Quorith Choir](docs/racas/quorith.md)**<br>Leader: Zayin Coral | Sync: every nearby ally strengthens the Link; pacts cost half and enemy towers go silent.<br>Superweapon: **Unison**, the whole army in a full chord. |
+| <img src="assets/insignia-vorag.jpg" alt="" width="64"> | **[Vorag Brood](docs/racas/vorag.md)**<br>Leader: Oru Voraz | A cheap, fast swarm: Broodlings hatch in pairs and the Scavenger devours wrecks and Outposts.<br>Superweapon: **Hatching**, eggs that release Broodlings on the field. |
 
-Cada página mostra o líder e a história, cada unidade e construção com imagem, custo e números, as habilidades, a superarma e a Ascensão. As regras comuns (Eras, pesquisas e contras) estão em **[Todas as Raças](docs/racas/README.md)**.
+Each page shows the leader and the story, every unit and building with an image, cost and numbers, the abilities, the superweapon, the Ascension, the Commander in the field and the two unique buildings. The shared rules (Eras, research, modules and counters) are in **[All Races](docs/racas/README.md)**.
 
-## Chefões e modos
+## Bosses and modes
 
 <p>
-  <img src="docs/imagens/chefoes/arauto_1.webp" alt="O Arauto" width="200">
-  <img src="docs/imagens/chefoes/forja.webp" alt="A Forja-Mãe" width="200">
-  <img src="docs/imagens/chefoes/sentinela.webp" alt="Sentinela da Fenda" width="200">
+  <img src="docs/imagens/chefoes/arauto_1.webp" alt="The Herald" width="200">
+  <img src="docs/imagens/chefoes/forja.webp" alt="The Mother Forge" width="200">
+  <img src="docs/imagens/chefoes/sentinela.webp" alt="Rift Sentinel" width="200">
 </p>
 
 <p align="center">
-  <img src="docs/imagens/partida/chefao.webp" alt="O Arauto e A Forja-Mãe girando, com os modelos e a animação do próprio jogo" width="800">
+  <img src="docs/imagens/partida/chefao.webp" alt="The Herald and The Mother Forge turning, with the game's own models and animation" width="800">
 </p>
 
-- **O Arauto** (três fases: Três Pilares, Ecos e Colapso) e **A Forja-Mãe** (Marcha, Linha de montagem e Núcleo exposto, que também pode ser capturada).
-- **Caçada:** escolha o chefão, a dificuldade e os aliados; medalhas de ouro, prata e bronze por tempo e perdas.
-- **Eventos da Fenda** na escaramuça: Sentinela da Fenda, Caravana Corsária, Enxame Errante e chuva de meteoros.
-- **Mutadores:** Noite Eterna, Tempestades Frequentes e Recursos Escassos.
+- **The Herald** (three phases: Three Pillars, Echoes and Collapse) and **The Mother Forge** (March, Assembly Line and Exposed Core, which can also be captured).
+- **Hunt:** pick the boss, the difficulty and the allies; gold, silver and bronze medals by time and losses.
+- **Rift Events** in skirmish: Rift Sentinel, Corsair Caravan, Wandering Swarm and meteor showers.
+- **Mutators:** Eternal Night, Frequent Storms and Scarce Resources.
 
-Fases, golpes, vidas e recompensas: **[Chefões e modos](docs/chefoes-e-modos.md)**.
+Phases, attacks, health and rewards, plus the Living world: **[Bosses and modes](docs/bosses-and-modes.md)**.
 
-## Motores e requisitos
+## Engines and requirements
 
-- **Navegador atual** (Chrome, Edge, Firefox ou Safari) no computador ou no celular. O jogo é uma página só; as bibliotecas vêm de CDN e ficam guardadas para jogar sem internet.
-- **Motor clássico** (Three.js com WebGL2): o padrão, com qualidade automática pelo FPS.
-- **Motor 5** (WebGPU, com reserva em WebGL2), em teste: céu físico, clima, nuvens de guerra, água e efeitos na GPU. Liga em **Ajustes**.
-- **Modo 2D** leve, para aparelhos mais simples.
-- **Multiplayer:** PeerJS/WebRTC entre os navegadores; o anfitrião é o relé do lockstep e a simulação é determinística (o mesmo resultado no Chrome, no Firefox e no Safari).
+- **A current browser** (Chrome, Edge, Firefox or Safari) on PC or phone. The game is a single page; the libraries come from a CDN and are cached for offline play.
+- **Classic engine** (Three.js on WebGL2): the default, with automatic quality based on FPS.
+- **Engine 5** (WebGPU, falling back to WebGL2), in testing: physical sky, weather, war clouds, water and effects on the GPU. Turn it on in **Settings**.
+- **2D mode**, light, for simpler devices.
+- **Multiplayer:** PeerJS/WebRTC between browsers; the host relays the lockstep and the simulation is deterministic (the same result on Chrome, Firefox and Safari).
 
-## Roteiro
+## Roadmap
 
-A versão atual é a **5.0h** (IA com a personalidade de cada líder, Mundo vivo, construções únicas, módulos e Comandantes em campo; antes, na 5.0g, os chefões, a Caçada, os Eventos da Fenda e os mutadores). Os próximos passos da v5.0 "Além da Fenda":
+The current version is **5.0h.1** (AI with each leader’s personality, Living world, unique buildings, modules and Field Commanders; 5.0g brought the bosses, the Hunt, Rift Events and mutators). Next steps of v5.0 "Beyond the Rift":
 
-- **5.0h — Inteligência e mundo** ✔: IA com a personalidade de cada líder, Mundo vivo, construções únicas e Comandantes em campo.
-- **5.0i — Campanha 2:** 15 missões e os chefões que faltam.
-- **5.0j — Mundos novos:** um mapa por mundo natal, com luz e clima próprios.
-- **5.0k — Replays, clipes e relatório de batalha.**
+- **5.0h — Intelligence and world** ✔: AI with each leader's personality, Living world, unique buildings and Field Commanders.
+- **5.0i — Campaign 2:** 15 missions and the remaining bosses.
+- **5.0j — New worlds:** one map per homeworld, with its own light and weather.
+- **5.0k — Replays, clips and battle report.**
 
-O plano completo, com o que já foi feito e o porquê de cada escolha, está em [docs/plano-v5.md](docs/plano-v5.md); a história das versões 4 e o que fica para a v6.0 (servidores e escala), em [docs/plano-v4-v5.md](docs/plano-v4-v5.md).
+The full plan (in Portuguese), with what is done and why, is in [docs/plano-v5.md](docs/plano-v5.md); the v4 history and what is left for v6.0 (servers and scale), in [docs/plano-v4-v5.md](docs/plano-v4-v5.md).
 
-## Rodar e construir localmente
+## Run and build locally
 
-O jogo não tem dependências de npm: `index.html` é gerado a partir de `src/`.
-
-```sh
-node tools/build.mjs                     # gera index.html, sw.js, estilo.html e estilo3d.html
-python3 -m http.server 8000              # sirva a raiz por HTTP (o service worker e as vozes não funcionam em file://)
-# abra http://localhost:8000/
-```
-
-Para os testes (precisam do Playwright: `npm install`):
+The game has no npm dependencies: `index.html` is generated from `src/`.
 
 ```sh
-node tools/vendor.mjs                    # copia o Three.js para dist/vendor/ (testes sem rede)
-node tools/qa.cjs                        # portão de qualidade completo: sintaxe, testes, determinismo, smoke das 5 Raças, build
-node tools/docs-gerar.cjs                # refaz as páginas das Raças e dos chefões a partir do código
-node tools/galeria.cjs                   # refaz as imagens de docs/imagens/ com os modelos do jogo
+node tools/build.mjs                     # builds index.html, sw.js, estilo.html and estilo3d.html
+python3 -m http.server 8000              # serve the root over HTTP (the service worker and voices do not work on file://)
+# open http://localhost:8000/
 ```
 
-Mais ferramentas (multiplayer com vários navegadores, determinismo entre motores, dificuldade, campanha) estão descritas no topo de cada arquivo em `tools/`.
+For the tests (they need Playwright: `npm install`):
 
-## Estrutura do projeto
+```sh
+node tools/vendor.mjs                    # copies Three.js to dist/vendor/ (offline tests)
+node tools/qa.cjs                        # full quality gate: syntax, tests, determinism, smoke test of the 5 Races, build
+node tools/docs-gerar.cjs                # rebuilds the Race and boss pages from the code
+node tools/galeria.cjs                   # rebuilds the images in docs/imagens/ with the game's models
+```
+
+More tools (multiplayer with several browsers, cross-engine determinism, difficulty, campaign) are described at the top of each file in `tools/`.
+
+## Project layout
 
 ```
 aether-rift-dominion/
-├─ index.html, sw.js, manifest.webmanifest   o jogo publicado (gerados pelo build; é o que o GitHub Pages serve)
-├─ assets/          arte aprovada, ícones, telas de carregamento, pôsteres, trilha, efeitos e vozes gravadas
-├─ src/             código-fonte do jogo: simulação, IA, motores 3D (clássico e src/m5/ do Motor 5), interface e idiomas (src/i18n/)
-├─ tools/           build, testes, QA e geradores (documentação, galeria, capturas)
-├─ docs/            documentação: Raças, chefões e modos, planos, glossário e as imagens (docs/imagens/)
-├─ lab/             bancadas de teste ativas (Motor 5, destroços, som no iPhone)
-├─ prototipos/      protótipos antigos guardados: estilo 2D e 3D e capturas das primeiras versões
-├─ estilo.html, estilo3d.html                provas visuais antigas (geradas a partir de prototipos/)
-└─ ASSETS.md        origem e licença de cada arte, som e biblioteca
+├─ index.html, sw.js, manifest.webmanifest   the published game (built; this is what GitHub Pages serves)
+├─ assets/          approved art, icons, loading screens, posters, soundtrack, effects and recorded voices
+├─ src/             game source: simulation, AI, 3D engines (classic and src/m5/ for Engine 5), interface and languages (src/i18n/)
+├─ tools/           build, tests, QA and generators (docs, gallery, captures)
+├─ docs/            documentation: Races, bosses and modes, plans, glossary and the images (docs/imagens/)
+├─ lab/             active test benches (Engine 5, debris, sound on iPhone)
+├─ prototipos/      old prototypes kept in one place: the 2D and 3D style proofs
+├─ estilo.html, estilo3d.html                old visual proofs (built from prototipos/)
+└─ ASSETS.md        origin and license of every art, sound and library
 ```
 
-O índice da documentação está em [docs/README.md](docs/README.md).
+The documentation index is [docs/README.md](docs/README.md).
 
-## Créditos e licenças
+## Credits and licenses
 
-- Jogo, código, modelos, arte e vozes: equipe do Aether Rift: Dominion (todos os direitos reservados, veja abaixo).
-- Trilha: faixas de Kevin MacLeod ([incompetech.com](https://incompetech.com)), licença CC BY 4.0.
-- Bibliotecas: Three.js (MIT), postprocessing (Zlib), N8AO (ISC), GSAP (licença Standard "No Charge"), PeerJS (MIT); fontes Big Shoulders Display, IBM Plex Sans e IBM Plex Mono (SIL OFL 1.1).
-- A lista completa, com a origem, o autor e a licença de cada item, está em [ASSETS.md](ASSETS.md).
+- Game, code, models, art and voices: the author of Aether Rift: Dominion (all rights reserved, see [License](#license)).
+- Soundtrack: tracks by Kevin MacLeod ([incompetech.com](https://incompetech.com)), CC BY 4.0.
+- Libraries: Three.js (MIT), postprocessing (Zlib), N8AO (ISC), GSAP (Standard "No Charge" license), PeerJS (MIT); fonts Big Shoulders Display, IBM Plex Sans and IBM Plex Mono (SIL OFL 1.1).
+- The full list, with the origin, author and license of every item, is in [ASSETS.md](ASSETS.md).
 
-Conteúdo em fase de teste. Todos os direitos reservados; não é permitido redistribuir fora deste repositório sem autorização.
+## License
+
+Aether Rift: Dominion is **not open source**. The code, art, voices, original music, the name and the Races and characters belong to the author, with all rights reserved: copying, redistributing, publishing modified versions or selling the game is not allowed. **You are free to play it, share the link, stream it and make videos and screenshots, including monetized ones, and to write about it.** Third-party parts keep their own licenses, listed in [ASSETS.md](ASSETS.md). The full text is in [LICENSE](LICENSE) (courtesy translations: [Português](LICENSE.pt-BR.md), [Español](LICENSE.es.md)).
 
 ## Feedback
 
-Na tela final da partida, **Copiar resultado (JSON)** copia um resumo para colar numa Issue, e **Enviar feedback** abre o [modelo de Issue](https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md) já preenchido. O que mais ajuda: onde você se perdeu, se o roubo e os alertas ficaram claros, se a IA foi justa e o que faltou para a partida ser divertida.
+On the end screen, **Copy result (JSON)** copies a match summary to paste into an Issue, and **Send feedback** opens the [Issue template](https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md) already filled in. What helps the most: where you got lost, whether the theft and the alerts were clear, whether the AI was fair and what was missing for the match to be fun. The automatic diagnostics sent with the feedback stay in Portuguese, for the developer.
 
-Problemas de segurança: veja [SECURITY.md](SECURITY.md).
+Security issues: see [SECURITY.md](SECURITY.md).

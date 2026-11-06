@@ -1,5 +1,6 @@
 /* Aether Rift: Dominion — idiomas (5.0c): português do Brasil (base), inglês e espanhol (neutro latino-americano).
-   Escolha: ?lang= na URL › a escolha guardada no aparelho ('ard-idioma') › navigator.languages (pt → pt-BR, es → es, o resto → en).
+   Escolha (5.0h.1): a escolha guardada no aparelho ('ard-idioma') › ?lang= na URL › navigator.languages na ordem, pelo prefixo (pt → pt-BR, en → en,
+   es → es; o primeiro suportado vale) › navigator.language; nenhum suportado (fr, de, ja…) → en.
    ARD.t(chave, vars, reserva): texto do idioma atual (cai no pt-BR e depois na reserva); {x} vira vars.x (número no formato do idioma);
    um valor { one, other, many… } escolhe a forma pelo Intl.PluralRules com vars.n. No HTML, data-i18n="chave" troca o texto do elemento
    e data-i18n-attr="title:chave;aria-label:chave" troca atributos. A troca vale sem recarregar: o evento 'ard-idioma' avisa os módulos.
@@ -14,8 +15,9 @@ const PREF = 'ard-idioma';
 function normaliza(l) { if (!l) return null; l = String(l).trim().toLowerCase(); if (/^pt/.test(l)) return 'pt-BR'; if (/^es/.test(l)) return 'es'; if (/^en/.test(l)) return 'en'; return null; }
 function guardado() { try { return normaliza(localStorage.getItem(PREF)); } catch (e) { return null; } }
 function doNavegador() { let ls = []; try { ls = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || '']; } catch (e) {} for (const l of ls) { const n = normaliza(l); if (n) return n; } return 'en'; }
-function escolhe() { let q = null; try { q = new URLSearchParams(location.search).get('lang'); } catch (e) {} const u = normaliza(q); if (u) return { idioma: u, origem: 'url' };
-  const g = guardado(); if (g) return { idioma: g, origem: 'aparelho' }; return { idioma: doNavegador(), origem: 'navegador' }; }
+function escolhe() { const g = guardado(); if (g) return { idioma: g, origem: 'aparelho' }; /* 5.0h.1: a escolha da pessoa manda primeiro */
+  let q = null; try { q = new URLSearchParams(location.search).get('lang'); } catch (e) {} const u = normaliza(q); if (u) return { idioma: u, origem: 'url' };
+  return { idioma: doNavegador(), origem: 'navegador' }; }
 const ini = escolhe(); ARD.idioma = ini.idioma;
 /* números e plural no formato do idioma (cache por idioma) */
 const NF = {}, PR = {};

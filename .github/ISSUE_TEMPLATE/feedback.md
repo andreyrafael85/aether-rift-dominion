@@ -1,22 +1,24 @@
 ---
-name: Feedback de partida
-about: Conte como foi sua partida no beta
+name: Match feedback
+about: Tell us how your match went in the beta
 title: "[Feedback] "
 labels: feedback
 ---
 
-**Dispositivo e navegador:** (ex.: notebook Windows + Chrome; iPhone + Safari)
+<!-- You can write in English, Portuguese or Spanish. / Pode escrever em português. / Puedes escribir en español. -->
 
-**Facção, oponentes e dificuldade:**
+**Device and browser:** (e.g. Windows laptop + Chrome; iPhone + Safari)
 
-**Resultado e duração:** (a tela final mostra; uma captura ajuda)
+**Race, opponents and difficulty:**
 
-**O que funcionou bem:**
+**Result and length:** (the end screen shows it; a screenshot helps)
 
-**O que confundiu ou travou:**
+**What worked well:**
 
-**Roubo e alertas:** ficaram claros? deu vontade de contra-atacar?
+**What was confusing or got stuck:**
 
-**IA:** fácil, justa ou injusta? minuto do primeiro ataque?
+**Theft and alerts:** were they clear? Did you feel like striking back?
 
-**Uma coisa que faria você jogar de novo:**
+**AI:** easy, fair or unfair? At what minute was the first attack?
+
+**One thing that would make you play again:**

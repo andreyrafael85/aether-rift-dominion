@@ -1,0 +1,62 @@
+Aether Rift: Dominion — License
+
+Copyright (c) 2026 the author of Aether Rift: Dominion (GitHub: andreyrafael85).
+All rights reserved.
+
+This is the official text of the license. The Portuguese (LICENSE.pt-BR.md) and
+Spanish (LICENSE.es.md) versions are courtesy translations; if they differ, this
+English text prevails.
+
+1. What belongs to the author
+
+   The source code, the 3D models, the art, the voices, the original music and
+   sound, the texts and dialogue, the name "Aether Rift: Dominion", its logo, and
+   the Races, leaders, characters and worlds of the game (together, "the Game")
+   belong to the author. All rights not expressly granted below are reserved.
+
+2. What you may not do
+
+   Without written permission from the author, you may not:
+   a) copy the Game or any part of it, in whole or in substantial part, except
+      for the temporary copies your browser makes to run it;
+   b) redistribute, mirror, re-host or publish the Game or any part of it,
+      including on other websites, app stores or game portals;
+   c) publish modified versions, forks for distribution, ports, translations
+      or derivative works of the Game;
+   d) sell, rent, sublicense or otherwise commercially exploit the Game or any
+      part of it, including its art, voices, models and code;
+   e) use the name, logo, Races or characters to identify another product.
+
+   Forking this repository on GitHub only to view the code or to propose a
+   change to this repository (a pull request) is allowed by the GitHub Terms of
+   Service; it does not grant any of the rights above.
+
+3. What you may do
+
+   Anyone may, free of charge and without asking:
+   a) play the Game at its official address
+      (https://andreyrafael85.github.io/aether-rift-dominion/) or from this
+      repository;
+   b) share the link to the Game or to this repository;
+   c) stream the Game live, record videos and take screenshots of it, and
+      publish them, including on monetized channels and videos;
+   d) write, talk about and review the Game, quoting short excerpts and
+      showing images of it.
+
+   When you can, a mention of "Aether Rift: Dominion" and a link to the Game
+   is appreciated, but not required.
+
+4. Third-party components
+
+   Some parts of the Game are made by others (libraries, fonts, music tracks,
+   sound effects and other assets). Each of them stays under its own license,
+   as listed in ASSETS.md. Nothing in this license limits the rights those
+   licenses give you over those parts.
+
+5. No warranty
+
+   The Game is provided "as is", without warranty of any kind, express or
+   implied. In no event shall the author be liable for any claim, damages or
+   other liability arising from the use of the Game.
+
+For any use not covered here, ask the author through this repository.

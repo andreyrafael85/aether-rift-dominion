@@ -1,17 +1,17 @@
 // Galeria da documentação: renderiza cada unidade, construção e chefão com os modelos do próprio jogo (tools/galeria.html) em WebP,
 // em docs/imagens/<raça>/<def>.webp e docs/imagens/chefoes/<def>.webp. A lista sai da simulação (src/sim.js): o que cada construção
-// produz para cada Raça (producesFor), as construções e os modelos dos chefões (src/chefes-modelos.js).
-// Uso: NODE_PATH=<pasta com node_modules/playwright> node tools/galeria.cjs [filtro: vehnar|erevane|tessara|quorith|vorag|chefoes] [w=560] [h=420]
+// produz para cada Raça (producesFor), as construções (5.0h.1: com as duas únicas da Raça e o avatar do comandante, src/unicas-modelos.js) e os modelos dos chefões (src/chefes-modelos.js).
+// Uso: NODE_PATH=<pasta com node_modules/playwright> node tools/galeria.cjs [filtro: vehnar|erevane|tessara|quorith|vorag|chefoes] [w=560] [h=420] [--faltando]
 // Precisa do three vendorizado em dist/vendor/ (node tools/vendor.mjs). Um navegador só, uma página só (SwiftShader).
 'use strict';
 const path = require('path'); const fs = require('fs'); const root = path.resolve(__dirname, '..');
 const { chromium } = require('playwright');
-globalThis.ARD = {}; require(root + '/src/modos.js'); require(root + '/src/chefes-sim.js'); require(root + '/src/sim.js');
+globalThis.ARD = {}; require(root + '/src/modos.js'); require(root + '/src/chefes-sim.js'); require(root + '/src/unicas-sim.js'); require(root + '/src/mundo.js'); require(root + '/src/sim.js'); /* 5.0h.1: + as únicas e os avatares */
 const S = ARD.sim; const RACES = Object.keys(S.FACTIONS);
 const only = process.argv[2] && process.argv[2] !== 'todas' && !process.argv[2].startsWith('--') ? process.argv[2].split(',') : null; const W = +(process.argv[3] || 560), H = +(process.argv[4] || 420);
 const PRODUTORAS = ['nucleo', 'quartel', 'fabrica', 'hangar'];
 function unidadesDe(r) { const out = []; for (const b of PRODUTORAS) for (const u of S.producesFor(b, r)) if (!out.includes(u)) out.push(u); return out; }
-function construcoesDe(r) { return Object.keys(S.BUILDINGS).filter(b => b !== 'bastiao' || S.FACTIONS[r].superKey === 'fundicao'); }
+function construcoesDe(r) { return Object.keys(S.BUILDINGS).filter(b => !S.BUILDINGS[b].unica && !S.BUILDINGS[b].mundo && (b !== 'bastiao' || S.FACTIONS[r].superKey === 'fundicao')).concat(S.UNICAS_DE[r] || []); } /* 5.0h.1: as duas únicas da Raça (as do mundo neutro ficam fora) */
 /* chefões: o modelo de cada fase que a documentação mostra (o Arauto nas três fases e com o olho aberto; a Forja-Mãe, a perna e as baias abertas) */
 const CHEFOES = [['chefe_arauto_1', 'fenda'], ['chefe_arauto_2', 'fenda'], ['chefe_arauto_3', 'fenda'], ['chefe_arauto_j', 'fenda'], ['chefe_pilar', 'fenda'], ['chefe_forja', 'fenda'], ['chefe_forja_b', 'fenda'], ['chefe_forja_perna', 'fenda'], ['chefe_sentinela', 'fenda'], ['catedral', 'quorith'], ['matriarca', 'vorag']];
 /* a Forja-Mãe inteira: o corpo e as quatro pernas nos cantos do casco, como o src/chefes.js desenha (CANTOS e o ângulo de cada perna) */
@@ -22,8 +22,11 @@ const GIRO = (process.argv.find(a => a.startsWith('--giro=')) || '').slice(7);
 if (GIRO) { for (const d of GIRO.split(',')) for (let i = 0; i < 60; i++) jobs.push({ race: 'vehnar', def: d, color: '#FF5E3A', out: 'dist/capturas-docs/giro-' + d.replace(/^chefe_/, '') + '/' + String(i).padStart(4, '0') + '.jpg', pitch: 0.38, yaw: Math.PI * 0.78 + i * (Math.PI * 2 / 60), anim: i / 12, partes: /^chefe_forja(_b)?$/.test(d) ? PERNAS : undefined, largura: /^chefe_forja(_b)?$/.test(d) ? 70 : undefined, jpg: true }); }
 if (!GIRO) for (const r of RACES) { if (only && !only.includes(r)) continue; const cor = S.RACE_SHADES[r][0];
   for (const d of unidadesDe(r)) jobs.push({ race: r, def: d, color: cor, out: 'docs/imagens/' + r + '/' + d + '.webp' });
-  for (const d of construcoesDe(r)) jobs.push({ race: r, def: d, color: cor, out: 'docs/imagens/' + r + '/' + d + '.webp', pitch: 0.62 }); }
+  for (const d of construcoesDe(r)) jobs.push({ race: r, def: d, color: cor, out: 'docs/imagens/' + r + '/' + d + '.webp', pitch: 0.62 });
+  if (S.COMANDANTES && S.COMANDANTES[r]) jobs.push({ race: r, def: S.COMANDANTES[r].def, color: cor, out: 'docs/imagens/' + r + '/' + S.COMANDANTES[r].def + '.webp' }); } /* 5.0h.1: o avatar do comandante */
 if (!GIRO && (!only || only.includes('chefoes'))) for (const [d, r] of CHEFOES) jobs.push({ race: r === 'fenda' ? 'vehnar' : r, def: d, color: r === 'fenda' ? '#FF5E3A' : S.RACE_SHADES[r][0], out: 'docs/imagens/chefoes/' + d.replace(/^chefe_/, '') + '.webp', pitch: 0.42, partes: /^chefe_forja(_b)?$/.test(d) ? PERNAS : undefined, largura: /^chefe_forja(_b)?$/.test(d) ? 70 : undefined, yaw: d === 'chefe_forja_b' ? 0.35 : undefined });
+/* 5.0h.1: --faltando só desenha as imagens que ainda não existem (as outras ficam byte a byte como estão) */
+if (process.argv.includes('--faltando')) for (let i = jobs.length - 1; i >= 0; i--) if (fs.existsSync(root + '/' + jobs[i].out)) jobs.splice(i, 1);
 (async () => {
   const t0 = Date.now(); const b = await chromium.launch({ headless: true, args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--allow-file-access-from-files', '--disable-dev-shm-usage'] });
   const errs = []; let bytes = 0, n = 0;

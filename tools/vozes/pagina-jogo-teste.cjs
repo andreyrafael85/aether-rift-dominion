@@ -1,7 +1,7 @@
 /* 5.0c.1: confere a página das vozes gravadas (work/vozes-jogo.html) servida com o mesmo leiaute da publicação (work/vozes-jogo-publicar.json:
    caminho publicado → arquivo): todos os áudios citados respondem, um botão de cada tipo toca (o tempo do áudio anda), não há rolagem lateral
    a 390 px e não há erro no console, no tema claro e no escuro. Fotos em work/fotos/vozes-jogo-*.png. Resultado em work/vozes-jogo-teste.json.
-   Uso: NODE_PATH=/home/dynauser/aether-rift-dominion/node_modules node tools/vozes/pagina-jogo-teste.cjs */
+   Uso: NODE_PATH=<pasta com node_modules/playwright> node tools/vozes/pagina-jogo-teste.cjs */
 'use strict';
 const fs = require('fs'), path = require('path'), http = require('http');
 const { chromium } = require('playwright');

@@ -587,11 +587,12 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
 - Desempenho: a GPU no Chrome (11 → 15,6 ms) e o FPS no Firefox (55 → 49) desde a 5.0f, medidos versão contra versão.
 - **Entregue (06/11/2026):** quatro faixas trocadas (Vehnar paz e batalha, Vorag paz e tensão; CC BY 4.0, Kevin MacLeod), com o mesmo orçamento de som. O erro do iPhone era o `del` do salvamento automático no fim da partida, sem tratamento, preso atrás do IndexedDB lento: o `saves.js` agora tenta o IndexedDB duas vezes, cai no localStorage e nunca rejeita, e relê os salvamentos quando o IndexedDB abre atrasado (provado no WebKit com o IndexedDB travado e atrasado 15 s). Caçada, time parado: a Forja chegava no Núcleo aos 0:36 e vencia aos 1:48 no solo Normal; agora o chefão dorme até 2:00/1:30/1:15/1:00 conforme a dificuldade, a arena solo passou de 680 para 1680 do Núcleo, o primeiro golpe no Núcleo vem aos 3:56 e a derrota aos 4:56; o Arauto, que batia na base aos 0:40 com 3 e 4 jogadores, não toca a base em 12 min. Partidas sem Caçada idênticas. Naga: 69 pipelines e 938 KB, +0. **Desempenho:** a comparação versão contra versão não fechou nesta máquina (carga alta o dia todo); pela leitura do código nada novo roda por quadro no Teste de desempenho entre a 5.0f.1 e a 5.0g, e a medida segue para a próxima versão.
 
-#### Vitrine do repositório · junto da 5.0h (pedido do dono em 06/11/2026)
+#### Vitrine do repositório · ✔ 06/11/2026 (vitrine com a 5.0g.1; licença, inglês e limpeza na 5.0h.1)
 - **Segurança:** varredura de tokens e chaves na árvore e em todo o histórico, `.gitignore` de proteção, `SECURITY.md` e a lista do que ativar no GitHub (secret scanning com push protection, Dependabot, proteção do `main`).
 - **Organização:** inventário da raiz, protótipos antigos num lugar só, `docs/` com índice; nada apagado sem o OK do dono.
 - **Vitrine:** README nos três idiomas, com imagem, "Jogar agora", gameplay em GIF, como jogar, as cinco Raças, chefões, modos, roteiro e como construir localmente; uma página por Raça com cada unidade e construção, com imagem e os números gerados do próprio jogo (`tools/docs-gerar.cjs`, `tools/galeria.cjs`); a página dos chefões e modos; e a imagem de compartilhamento.
 - **No GitHub, pelo dono:** descrição, site, tópicos, imagem de compartilhamento, a licença do jogo (a escolher) e, se quiser, Releases.
+- **Entregue:** varredura sem nenhum segredo na árvore e no histórico; README, páginas das Raças e "Bosses and modes" geradas do jogo, com 136 imagens dos modelos; inglês como idioma principal no GitHub (português e espanhol secundários); licença proprietária (todos os direitos reservados, com permissão para jogar, compartilhar, fazer lives e vídeos); capturas antigas, saídas de teste e citações de outros jogos removidas; nenhuma referência ao servidor de build. No jogo, a abertura pelo idioma do navegador (pt/en/es, o resto em inglês) é testada em 45 casos nos 3 motores de navegador, sem piscar português.
 
 ### Onda 5 — Além da Fenda
 
@@ -755,7 +756,7 @@ Pergunta do dono em 19/10: para chegar ao 3D descrito aqui e às ondas, é preci
 
 **Recomendações:**
 
-1. **Um `package.json` do próprio jogo para as ferramentas de teste**, com o Playwright 1.63.0 fixo. Hoje o portão de qualidade usa o `node_modules` do conector Dynatrace (`NODE_PATH`): uma atualização naquele projeto pode quebrar os testes do jogo. Entra na fundação da 5.0a. Os navegadores já baixados são reaproveitados.
+1. **Um `package.json` do próprio jogo para as ferramentas de teste**, com o Playwright 1.63.0 fixo. Hoje o portão de qualidade usa um `node_modules` de fora do jogo (`NODE_PATH`): uma atualização nele pode quebrar os testes do jogo. Entra na fundação da 5.0a. Os navegadores já baixados são reaproveitados.
 2. **O portão de qualidade ganha a fumaça do Motor 5,** em WebGPU e na reserva WebGL2, com as opções do Chromium que ligam o adaptador por software.
 3. **Opcional:** apagar as cópias de agentes das versões já publicadas em `.wip/` (4.3c a 4.3h, cerca de 2,6 GB de 3,8 GB). Só com o seu OK.
 

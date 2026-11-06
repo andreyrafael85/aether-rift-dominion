@@ -5,7 +5,7 @@ dist/
 .tools/
 __pycache__/
 
-# Segredos e credenciais: nunca no repositório (veja SECURITY.md)
+# Secrets: never in the repository (see SECURITY.md)
 .env
 .env.*
 *.pem
@@ -16,9 +16,8 @@ id_rsa*
 id_ed25519*
 .npmrc
 .netrc
-credentials*.json
-*credenciais*
-tenants.yaml
 
-# Pastas locais de trabalho dos agentes
+# Local work folders
 .wip/
+# test and tool outputs written by tools/ (reports, photos, local voice pages)
+/work/

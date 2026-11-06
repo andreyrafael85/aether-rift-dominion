@@ -1,7 +1,7 @@
 <!-- Generado por node tools/docs-gerar.cjs a partir del código del juego (números de la simulación y textos de los diccionarios). Imágenes: tools/galeria.cjs, con los modelos del propio juego. -->
 # Jefes y modos
 
-**Idiomas:** [Português (Brasil)](chefoes-e-modos.md) · [English](chefoes-e-modos.en.md) · **Español** · [Volver al README](../README.es.md)
+**Idiomas:** [English](bosses-and-modes.md) · [Português (Brasil)](bosses-and-modes.pt-BR.md) · **Español** · [Volver al README](../README.es.md)
 
 Los jefes vienen de la Grieta: aparecen en la Cacería (el modo para derribar a un jefe, solo o con amigos), en los Eventos de la Grieta de la escaramuza y en la campaña.
 
@@ -106,6 +106,39 @@ Opción de la escaramuza. El primer evento llega entre los 6 y los 8 min; la Cen
 - **Noche Eterna:** la noche no termina y la visión baja un 25%
 - **Tormentas Frecuentes:** Tormentas de Éter el doble de veces; dentro de ellas, las unidades van un 10% más lentas
 - **Recursos Escasos:** nodos y restos rinden la mitad
+
+## Mundo vivo
+
+Opción de la escaramuza en cuatro partes que se activan por separado: neutrales en el mapa, para todos los jugadores.
+
+### Ruinas de los Constructores
+
+Infantería quieta hasta 70 de una ruina la captura en 20 s (más rápido con más infantería, hasta 5). La bonificación dura mientras la mantengas; la infantería enemiga a su lado recupera la ruina.
+
+- **Observatorio:** Visión amplia a su alrededor. Ruina de los Constructores. Capturada con infantería quieta a su lado, da visión amplia a su alrededor.
+- **Forja Antigua:** Vehículos un 20% más baratos. Ruina de los Constructores. Capturada, los vehículos de su dueño cuestan un 20% menos.
+- **Portal:** Teletransporte al otro extremo del par. Ruina de los Constructores, en pareja. Capturada, lleva las unidades de su dueño al otro extremo.
+- **Torre de Éter:** +40 de energía. Ruina de los Constructores. Capturada, da +40 de energía a su dueño.
+
+### Hermandad Corsaria
+
+El Campamento está en el centro del mapa. Con una unidad tuya hasta 600 de él, contrata mercenarios pagados en Datos: hasta 3 a la vez, cada uno sirve 5 min, y una contratación cada 60 s.
+
+| | Costo | Vida | Velocidad | |
+|:--|:-:|:-:|:-:|:--|
+| **Saqueador Corsario** | 80 Datos | 320 | 125 | Ataque 27 cada 0.6 s, alcance 80. Mercenario rápido de ataque cuerpo a cuerpo. Sirve por 5 min. |
+| **Artillero Corsario** | 140 Datos | 420 | 68 | Ataque 60 cada 0.9 s, alcance 260, área 30. Mercenario de asedio: disparo largo con área. Sirve por 5 min. |
+| **Tirador Corsario** | 100 Datos | 150 | 92 | Ataque 55 cada 2.6 s, alcance 260. Mercenario de tiro largo; como infantería, también captura ruinas. Sirve por 5 min. |
+
+### Fauna de la Grieta
+
+- **Pastador de la Grieta** (Vida 200, hasta 9 por mapa): Herbívoro manso de las llanuras de la Grieta. Huye de quien se acerca; al caer, deja una caja pequeña.
+- **Guardián de la Veta** (Vida 1,200 · Ataque 20 cada 1 s, alcance 36, hasta 4 por mapa): Bestia blindada de cristal que defiende un nodo rico. Ataca a quien se acerca al nodo; al caer, suelta un bono.
+- **Enjambre Nocturno** (Vida 70 · Ataque 5 cada 0.6 s, alcance 80, hasta 9 por mapa): Polillas de éter que salen de los nidos cerca de la Grieta por la noche y atacan a quien pasa.
+
+### Oleada de éter
+
+El primer surgimiento llega a los 5 min; después, surgimiento y lluvia de meteoros se alternan cada 150 s. Un círculo en el suelo (radio 230) avisa 30 s antes; dentro de él, la recolección rinde el doble durante 90 s.
 
 ## Mapas
 

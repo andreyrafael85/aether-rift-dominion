@@ -1,7 +1,7 @@
 <!-- Gerado por node tools/docs-gerar.cjs a partir do código do jogo (números da simulação e textos dos dicionários). Imagens: tools/galeria.cjs, com os modelos do próprio jogo. -->
 # Chefões e modos
 
-**Idiomas:** **Português (Brasil)** · [English](chefoes-e-modos.en.md) · [Español](chefoes-e-modos.es.md) · [Voltar ao README](../README.md)
+**Idiomas:** [English](bosses-and-modes.md) · **Português (Brasil)** · [Español](bosses-and-modes.es.md) · [Voltar ao README](../README.pt-BR.md)
 
 Os chefões vêm da Fenda: aparecem na Caçada (o modo de derrubar um chefão, sozinho ou com amigos), nos Eventos da Fenda da escaramuça e na campanha.
 
@@ -106,6 +106,39 @@ Opção da escaramuça. O primeiro evento chega entre 6 e 8 min; a Sentinela da 
 - **Noite Eterna:** a noite não acaba e a visão cai 25%
 - **Tempestades Frequentes:** Tempestades de Éter o dobro de vezes; dentro delas, unidades 10% mais lentas
 - **Recursos Escassos:** nós e destroços rendem a metade
+
+## Mundo vivo
+
+Opção da escaramuça, em quatro partes que se ligam à parte: neutros no mapa, para todos os jogadores.
+
+### Ruínas dos Construtores
+
+Infantaria parada a até 70 de uma ruína a captura em 20 s (mais rápido com mais infantaria, até 5). O bônus vale enquanto você a mantiver; infantaria inimiga ao lado toma a ruína de volta.
+
+- **Observatório:** Visão larga em volta dele. Ruína dos Construtores. Capturada com infantaria parada ao lado, dá visão larga em volta dela.
+- **Forja Antiga:** Veículos 20% mais baratos. Ruína dos Construtores. Capturada, deixa os veículos do dono 20% mais baratos.
+- **Portal:** Teleporte até a outra ponta do par. Ruína dos Construtores, em par. Capturada, leva as unidades do dono até a outra ponta.
+- **Torre de Éter:** +40 de energia. Ruína dos Construtores. Capturada, dá +40 de energia ao dono.
+
+### Irmandade Corsária
+
+O Acampamento fica no centro do mapa. Com uma unidade sua a até 600 dele, contrate mercenários pagos em Dados: até 3 ao mesmo tempo, cada um serve por 5 min, e uma contratação a cada 60 s.
+
+| | Custo | Vida | Velocidade | |
+|:--|:-:|:-:|:-:|:--|
+| **Saqueador Corsário** | 80 Dados | 320 | 125 | Ataque 27 a cada 0,6 s, alcance 80. Mercenário rápido de ataque corpo a corpo. Serve por 5 min. |
+| **Artilheiro Corsário** | 140 Dados | 420 | 68 | Ataque 60 a cada 0,9 s, alcance 260, área 30. Mercenário de cerco: tiro longo com área. Serve por 5 min. |
+| **Atirador Corsário** | 100 Dados | 150 | 92 | Ataque 55 a cada 2,6 s, alcance 260. Mercenário de tiro longo; como infantaria, também captura ruínas. Serve por 5 min. |
+
+### Fauna da Fenda
+
+- **Pastador da Fenda** (Vida 200, até 9 por mapa): Herbívoro manso das planícies da Fenda. Foge de quem chega perto; caído, deixa uma caixa pequena.
+- **Guardião do Veio** (Vida 1.200 · Ataque 20 a cada 1 s, alcance 36, até 4 por mapa): Fera blindada de cristal que defende um nó rico. Ataca quem chega perto do nó; caída, solta um bônus.
+- **Enxame Noturno** (Vida 70 · Ataque 5 a cada 0,6 s, alcance 80, até 9 por mapa): Mariposas de éter que saem dos ninhos perto da Fenda à noite e atacam quem passa.
+
+### Surto de éter
+
+O primeiro surto chega aos 5 min; depois, surto e chuva de meteoros se alternam a cada 150 s. Um círculo no chão (raio 230) avisa 30 s antes; dentro dele, a coleta rende o dobro por 90 s.
 
 ## Mapas
 
