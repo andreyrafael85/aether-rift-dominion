@@ -4,3 +4,21 @@ dist/
 .DS_Store
 .tools/
 __pycache__/
+
+# Segredos e credenciais: nunca no repositório (veja SECURITY.md)
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+.npmrc
+.netrc
+credentials*.json
+*credenciais*
+tenants.yaml
+
+# Pastas locais de trabalho dos agentes
+.wip/

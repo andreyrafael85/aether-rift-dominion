@@ -1,52 +1,178 @@
-# Aether Rift: Dominion — beta de testes
+<p align="center">
+  <img src="docs/imagens/compartilhar.jpg" alt="Aether Rift: Dominion — as cinco Raças em volta da Fenda" width="880">
+</p>
 
-**Idiomas:** **Português (Brasil)** · [English](README.en.md) · [Español](README.es.md) — o jogo abre no idioma do navegador e troca em **Idioma / Language / Idioma** (tela inicial, Ajustes e janela da partida) ou com `?lang=en`, `?lang=es` ou `?lang=pt` no link.
+<h1 align="center">Aether Rift: Dominion</h1>
 
-RTS multiplayer browser-first em desenvolvimento. Este repositório publica o **5.0g.1 jogável** (5.0g.1: trilha nova da Vehnar e da Vorag, o chefão da Caçada com contagem antes de despertar e arena mais longe da base, e o salvamento que não trava no celular; 5.0g: chefões com fases — O Arauto e A Forja-Mãe —, o mapa Destroço do Titã, o modo Caçada solo e cooperativo, os Eventos da Fenda na escaramuça e os primeiros mutadores; 5.0f.1: trilha orquestral por Raça e efeitos de combate em arquivo, com licença livre, e a voz das unidades equilibrada; 5.0f: som 3D com posição no mapa, trilha adaptativa por Raça gerada no navegador, cenas de cinema e a Sala de Guerra no briefing das missões; 5.0e: no Motor 5, a obra no estilo de cada Raça, destroços que quicam, a base viva e unidades com aro em holograma e barras em segmentos; 5.0d.1: nuvens de guerra leves e corrigidas no Firefox, névoa dos climas mais leve e o clima automático pelo bioma; 5.0d: no Motor 5, o sol que anda com o dia, o clima na GPU e as nuvens de guerra; 5.0c.2: locutor masculino na Erevane e a saudação da Sala de Comando sem atraso; 5.0c.1: vozes gravadas nos três idiomas, com 766 falas por idioma, legenda e boca do líder acompanhando cada palavra, e o Motor 5 com 22% menos shaders na carga e menos CPU por quadro; 5.0c: o jogo inteiro em inglês e espanhol, com a voz do sistema no idioma escolhido, planetas nítidos na Sala de Comando, o locutor no gênero da Raça e menos travadas de resolução no Motor 5; 5.0b.1: Motor 5 mais leve na carga e na CPU, bloom igual ao do clássico, faróis que iluminam o chão à noite, Sala mais clara e som no iPhone; 5.0b: Motor 5 completo em teste, com modelos, terreno, efeitos, água, espaço, tempestade e Modo Foto em WebGPU; 5.0a.3: a Tessara ganha uma líder, Sylvia Oriel, com busto e retratos novos e voz feminina; 5.0a.2: tela inicial sem clarão e com rolagem lisa, vozes naturais com a escolha da voz em Ajustes; 5.0a.1: pôster instantâneo da Sala de Comando, Motor 5 carregando muito mais rápido, um toque por unidade, coletores que mudam de campo sozinhos, giro natural, inimigos em vermelho e um Fácil de verdade; 5.0a: Sala de Comando em 3D no Motor 5 (WebGPU) com a Academia de Comando, Interface 3.0 da partida e o Motor 5 em teste na partida; 4.3l: fundos em alta definição, menus da partida com moldura de cada Raça, Construir com abas e detalhes, gaveta recolhível no celular e shaders compilados em paralelo; 4.3k: tela inicial com o Grande Alinhamento ao fundo e vitrine das Raças, cartões de mapa, e HUD e menus refeitos como placas de comando na cor da Raça; 4.3j: Modo Foto com câmera livre, profundidade de campo, 8 filtros, hora do dia e foto em Tela, 2K ou 4K; 4.3i: shaders preparados no carregamento (sem travadas na primeira explosão), resolução dinâmica para manter ~60 fps, simulação ~40% mais rápida nas partidas grandes com o mesmo resultado, e Teste de desempenho com CPU, GPU, shaders e carregamento; 4.3h: mapa Cinturão com plataformas de asteroide sobre o espaço, lagos de plasma e de gelo com reflexo, Tempestade de Éter volumétrica, noite escura de verdade e bases acesas na cor da Raça; 4.3g: armas com linguagem própria por Raça, explosões em camadas, clarões que iluminam o chão, carcaças em chamas com o modelo do veículo e escudos com fresnel; 4.3f: construções próprias das cinco Raças, obra com a assinatura da Raça, avaria em estágios, destruição em pedaços, Catedral Errante no estilo de Zayin Coral e correção da tela preta no Firefox; 4.3e: infantaria em esquadrões de três, soldados das cinco Raças e os épicos refeitos, bustos dos líderes remodelados com a luz da partida no retrato; 4.3d: frota das cinco Raças refeita do zero, 36 unidades com animação por peça, cor do time e versão leve longe da câmera; 4.3c.2: líderes sem piscar no Firefox, cópia do retrato por leitura de pixels; 4.3c.1: humores do líder sem recompilar; 4.3c terreno esculpido: malha 4× mais fina com dunas, crateras, leitos secos e degraus de estrato; chão em camadas por bioma com rocha estratificada nas encostas; Fenda como abismo com paredões e veios acesos; cordilheira de mesas além do mapa; rastros, queimados e crateras que ficam no chão; poeira na cor do chão; 4.3b: remasterização total começa: Three.js r186 com pós-processamento de cinema, sombra de contato, bloom HDR, bruma de altura com poeira, sombras de nuvem em tudo, céu com nuvens e reflexo do céu nos metais, câmera de cinema que desce ao aproximar; cordilheiras esculpidas com estratos e nós de recurso como afloramentos; 4.3a: Engine gráfica 4 começa: câmera aproxima até 6×, coletores das cinco Raças refeitos com dezenas de peças, feixe de mineração, detalhe de superfície nos modelos e microdetalhe do chão de perto; 4.2h: Minério em cristal azul aceso com halo no chão, símbolos de recurso no radar, aviso de território sem minério e coletores parados, veios de Minério a partir dos 9 min; 4.2g: unidades contornam muros e rochas e passam por Portões em qualquer ângulo, coletores colhem onde são mandados e entregam a carga, missão 6 jogável com qualquer Raça, salvar por cima e sair sem recomeçar a missão; 4.2f: barra superior nova e pausa clara; Engine gráfica 3 completa: veteranos com anel dourado, avarias com fumaça e fogo, épicos detalhados; chão vestido por bioma, estradas, faróis e janelas à noite, gradação de cor; explosões em camadas, fumaça macia e superarmas com assinatura, tudo na GPU; animação procedural de rodas, pernas, rotores, asas e recuo de canos; teste de desempenho de 30 s em Ajustes, resultado no Feedback; líderes vivos em 3D que reagem à partida; Eras do Núcleo com módulos e Ascensão por Raça; salvamento automático com volta direta depois de queda de internet ou energia, três espaços de salvamento, volta à sala multiplayer em até 2 min; painel de comando com abas por modo de jogo, campanha "O Grande Alinhamento" com Continuar de um clique, radar que gira com a câmera; jogabilidade de campo: toque e construção no celular, fila de produção até 50, dificuldades medidas com nível Brutal, cores por Raça; beta aberto: app instalável com campanha e solo offline, qualidade 3D automática que se ajusta pelo FPS; campanha com 20 missões, Comandante, conquistas, relíquias e Hangar; Engine gráfica 2: modelos 3D suaves por Raça, céu com o planeta-mãe, horizonte e câmera com inclinação livre; cinco Raças: Consórcio Vehnar, Erevane, Tessara, Coro Quorith e Prole Vorag, cada uma com elenco, superarma, pirata e nascimento de construção próprios; arte aprovada integrada: logo Escudo-Órbita, hero 4K, líderes com expressões, mundos e insígnias; plano completo em docs/plano-v4-v5.md; o próximo salto, a v5.0 "Além da Fenda", em docs/plano-v5.md; o laboratório do Motor 5 (WebGPU com TSL e reserva WebGL2, com teste de 20 s) em lab/motor5.html) ( contra IA ou **multiplayer P2P por código de sala**; em 3D com Three.js: relevo, sombras, bloom, oclusão ambiente, névoa volumétrica, lagos de plasma, presets de qualidade, câmera com rotação; modo 2D isométrico mantido como alternativa; terreno com biomas e cordilheiras, projéteis e torretas, muros com caminhos, veterância, carcaças, Tempestade de Éter, som e voz, controles de toque), a **prova de conceito visual 2D** (`estilo.html`) e a **validação do caminho 3D** (`estilo3d.html`, Three.js), para testes com amigos.
+<p align="center">
+  <b>Estratégia em tempo real no navegador.</b> Cinco Raças disputam a Fenda: construa a base, colha, roube, faça pactos e derrube chefões. No computador e no celular, sem instalar nada.
+</p>
 
-**Jogar agora:** abra `index.html` pelo GitHub Pages deste repositório (link na descrição) ou localmente, direto no navegador. Funciona em desktop e celular; nada para instalar.
+<p align="center">
+  <a href="https://andreyrafael85.github.io/aether-rift-dominion/"><img src="https://img.shields.io/badge/%E2%96%B6%20JOGAR%20AGORA-no%20navegador-FF5E3A?style=for-the-badge" alt="Jogar agora no navegador"></a>
+</p>
 
-**Provas de conceito visuais:** `estilo.html` (sprites voxel 2D) e `estilo3d.html` (os mesmos modelos em 3D com luz e sombras).
+<p align="center">
+  <b>Português (Brasil)</b> · <a href="README.en.md">English</a> · <a href="README.es.md">Español</a>
+</p>
 
-## O que testar
+<p align="center">
+  <img src="docs/imagens/partida/batalha.webp" alt="Batalha entre o Consórcio Vehnar e a Erevane, capturada no próprio jogo" width="800">
+</p>
 
-1. Uma partida 1v1 no Fácil para aprender os controles (tecla H abre a ajuda).
-2. Uma partida FFA com 2 IAs no Normal.
-3. Tente roubar: treine um Pirata no Quartel e clique com o botão direito em uma Refinaria inimiga.
-4. Tente um pacto pela Diplomacia e, se quiser, quebre-o na hora certa.
-5. Desenhe muros arrastando o mouse (B, depois M) e deixe um Portão (G) para suas unidades.
-7. Multiplayer: o anfitrião escolhe o tamanho da sala (2 a 4 jogadores), clica em "Criar sala" e envia o código de seis letras; cada amigo escolhe a facção, digita o código e clica em "Entrar" (ou em "Iniciar partida", que com um código digitado entra na sala em vez de abrir um jogo solo). A lista da sala mostra quem entrou; a partida começa quando a sala enche ou quando o anfitrião clica em "Iniciar partida" com 2 ou mais. Só os jogadores da sala entram no mapa, sem IAs. Quem digitar o código antes de o anfitrião abrir a sala fica tentando por um minuto; o anfitrião reaproveita o código da última sala ao recriá-la. Versões diferentes do jogo entre navegadores são recusadas com aviso (Ctrl+F5 nos dois lados). Sem servidor de jogo: o anfitrião é o relé do lockstep (PeerJS/WebRTC, só STUN); se um convidado cair, as unidades dele ficam paradas e a partida segue. A simulação usa matemática determinística (seno, cosseno, atan2 e hipotenusa só com aritmética), por isso Chrome, Firefox e Safari calculam o mesmo estado; `node tools/det-test.cjs` confere isso nos quatro motores.
-6. No celular: toque em uma unidade sua, depois toque no chão para mover ou no inimigo para atacar. A barra inferior tem Núcleo, Exército, Na tela, Construir, Atacar, Parar, Caixa e ✕.
-8. Mapa novo: em "Mapa e clima" escolha **Cinturão**. As tropas a pé só passam de uma plataforma a outra pelas pontes; drones voam por cima do abismo. Procure os lagos: no de plasma ninguém entra a pé, no de gelo dá para andar por cima (e as unidades se refletem).
+> Beta de testes, versão **5.0g.1**. O jogo abre no idioma do navegador e troca em **Idioma / Language / Idioma** (tela inicial, Ajustes e janela da partida) ou com `?lang=pt`, `?lang=en` e `?lang=es` no link.
 
-## Como dar feedback
+## Destaques
 
-Na tela final, o botão **Copiar resultado (JSON)** copia um resumo da partida (Raça, duração, placar, estatísticas, aparelho) para colar na Issue. O botão **Enviar feedback** abre o modelo de Issue já preenchido.
+- **Cinco Raças com estilo próprio:** cada uma tem líder, mundo natal, unidades exclusivas, Pirata, superarma e Ascensão. São 29 tipos de unidade e 11 construções por Raça.
+- **Escaramuça** contra 1 a 3 IAs (Fácil, Normal, Difícil e Brutal) nos mapas **Planície da Fenda**, **Cinturão** e **Destroço do Titã**.
+- **Campanha "O Grande Alinhamento":** 20 missões, com estrelas, nível de Comandante, relíquias, conquistas e o Hangar.
+- **Chefões da Fenda:** O Arauto e A Forja-Mãe, com fases, golpes avisados no chão e recompensas, no modo **Caçada** (sozinho ou com amigos), e a Sentinela da Fenda nos **Eventos da Fenda**.
+- **Multiplayer de 2 a 4 amigos** por código de sala, direto entre os navegadores (sem servidor de jogo).
+- **Roubo e diplomacia:** Piratas sifonam Refinarias e Reatores inimigos; pactos de Não-agressão podem ser quebrados na hora certa.
+- **Três idiomas com voz:** português, inglês e espanhol, com 766 falas gravadas por idioma (líderes, locutor e unidades).
+- **Funciona sem internet** depois da primeira visita (campanha e partidas solo) e pode ser instalado como app.
 
+## Como jogar
 
-Abra uma **Issue** usando o modelo "Feedback de partida" (ou mande a captura da tela final). Perguntas que mais ajudam:
+O objetivo é destruir os Núcleos inimigos ou ter mais Domínio (território, exército e recursos) quando o tempo acabar. Os coletores colhem **Minério**, **Plasma** e **Dados** dentro do seu território; os **Reatores** dão energia; o **Núcleo** evolui de Era (I Fundação, II Expansão, III Domínio) e libera as unidades pesadas, a superarma e a Ascensão da Raça.
 
-- Em que momento você se perdeu ou ficou sem saber o que fazer?
-- O roubo e os alertas ficaram claros? Deu vontade de contra-atacar?
-- A IA foi fácil, justa ou injusta? Em que minuto veio o primeiro ataque?
-- O que faltou para a partida ser divertida?
+<table>
+<tr>
+<td width="50%"><img src="docs/imagens/partida/partida-pc.jpg" alt="Partida no computador, com o HUD"></td>
+<td width="50%"><img src="docs/imagens/partida/inicio-pc.jpg" alt="Tela inicial com a vitrine das Raças"></td>
+</tr>
+</table>
 
-## Estrutura
+### No computador
+
+| Comando | O que faz |
+|:--|:--|
+| Clique / arrastar | Seleciona; arrastar faz a caixa de seleção (Shift adiciona; duplo clique pega todas do mesmo tipo) |
+| Botão direito | Move; em inimigo, ataca; em nó, colhe; com Pirata em Refinaria ou Reator inimigo, sifona |
+| A / S | Atacar-mover (clique no destino) / Parar |
+| B + letra | Construir: R Reator, F Refinaria, Q Quartel, V Fábrica, H Hangar, T Torre, N Nódulo, L Laboratório, M Muro, G Portão |
+| Letras com a construção selecionada | Produzir (a tecla aparece em cada botão) |
+| Ctrl+1–9 / 1–9 | Gravar / selecionar grupo |
+| Botão do meio | Roda de comandos onde o mouse está |
+| WASD, setas, roda | Câmera e zoom; segurar o botão direito e arrastar move o mapa |
+| Q / E · PageUp / PageDown | Girar / inclinar a câmera (Home volta à visão tática) |
+| F1 / F2 / F / Espaço | Núcleo / exército / centralizar a seleção / último alerta |
+| J ou 📷 | Modo Foto |
+| P / H / Esc | Pausar / ajuda / cancelar · Ctrl+S salva |
+
+### No celular
+
+<img src="docs/imagens/partida/partida-celular.jpg" alt="Partida no celular" width="230" align="right">
+
+- Toque numa unidade sua para selecionar (dois toques: todas do tipo); depois toque no chão para mover ou no inimigo para atacar.
+- A barra de baixo tem Núcleo, Exército, Construir, Atacar, Parar, Na tela, Caixa, Girar e Inclinar a câmera.
+- Toque longo no mapa abre a roda de comandos; arrastar com dois dedos move, aproxima e gira o mapa.
+- Os grupos 1–5 ficam à esquerda: segure para gravar, toque para selecionar.
+
+A ajuda completa abre na partida com **H** ou pelo botão **?**.
+
+<br clear="right">
+
+## As cinco Raças
+
+| | Raça | Estilo de jogo |
+|:-:|:--|:--|
+| <img src="assets/insignia-vehnar.jpg" alt="" width="64"> | **[Consórcio Vehnar](docs/racas/vehnar.md)**<br>Líder: Barão-Forja | Indústria pesada: Linhas de Montagem aceleram a produção, Lotes saem pela metade do preço e as construções são blindadas.<br>Superarma: **Fundição Orbital**, um Bastião que cai do céu. |
+| <img src="assets/insignia-erevane.jpg" alt="" width="64"> | **[Erevane](docs/racas/erevane.md)**<br>Líder: Vesper Ísk | Furtividade e roubo: infantaria, Piratas e Nódulos camuflados, roubo limpo e dois Saltos de Núcleo.<br>Superarma: **Blecaute**, que apaga sensores e energia do inimigo. |
+| <img src="assets/insignia-tessara.jpg" alt="" width="64"> | **[Tessara](docs/racas/tessara.md)**<br>Líder: Sylvia Oriel | Adaptação: as unidades ganham Traços contra o que combatem e o Núcleo faz Fotossíntese.<br>Superarma: **Salto Evolutivo**, +35% de dano para todo o exército. |
+| <img src="assets/insignia-quorith.jpg" alt="" width="64"> | **[Coro Quorith](docs/racas/quorith.md)**<br>Líder: Zayin Coral | Sincronia: cada aliado perto reforça o Elo; pactos custam metade e torres inimigas emudecem.<br>Superarma: **Uníssono**, o exército inteiro em acorde cheio. |
+| <img src="assets/insignia-vorag.jpg" alt="" width="64"> | **[Prole Vorag](docs/racas/vorag.md)**<br>Líder: Oru Voraz | Enxame barato e rápido: Crias nascem em pares e o Carniceiro devora carcaças e Nódulos.<br>Superarma: **Eclosão**, ovos que soltam Crias no campo. |
+
+Cada página mostra o líder e a história, cada unidade e construção com imagem, custo e números, as habilidades, a superarma e a Ascensão. As regras comuns (Eras, pesquisas e contras) estão em **[Todas as Raças](docs/racas/README.md)**.
+
+## Chefões e modos
+
+<p>
+  <img src="docs/imagens/chefoes/arauto_1.webp" alt="O Arauto" width="200">
+  <img src="docs/imagens/chefoes/forja.webp" alt="A Forja-Mãe" width="200">
+  <img src="docs/imagens/chefoes/sentinela.webp" alt="Sentinela da Fenda" width="200">
+</p>
+
+<p align="center">
+  <img src="docs/imagens/partida/chefao.webp" alt="O Arauto e A Forja-Mãe girando, com os modelos e a animação do próprio jogo" width="800">
+</p>
+
+- **O Arauto** (três fases: Três Pilares, Ecos e Colapso) e **A Forja-Mãe** (Marcha, Linha de montagem e Núcleo exposto, que também pode ser capturada).
+- **Caçada:** escolha o chefão, a dificuldade e os aliados; medalhas de ouro, prata e bronze por tempo e perdas.
+- **Eventos da Fenda** na escaramuça: Sentinela da Fenda, Caravana Corsária, Enxame Errante e chuva de meteoros.
+- **Mutadores:** Noite Eterna, Tempestades Frequentes e Recursos Escassos.
+
+Fases, golpes, vidas e recompensas: **[Chefões e modos](docs/chefoes-e-modos.md)**.
+
+## Motores e requisitos
+
+- **Navegador atual** (Chrome, Edge, Firefox ou Safari) no computador ou no celular. O jogo é uma página só; as bibliotecas vêm de CDN e ficam guardadas para jogar sem internet.
+- **Motor clássico** (Three.js com WebGL2): o padrão, com qualidade automática pelo FPS.
+- **Motor 5** (WebGPU, com reserva em WebGL2), em teste: céu físico, clima, nuvens de guerra, água e efeitos na GPU. Liga em **Ajustes**.
+- **Modo 2D** leve, para aparelhos mais simples.
+- **Multiplayer:** PeerJS/WebRTC entre os navegadores; o anfitrião é o relé do lockstep e a simulação é determinística (o mesmo resultado no Chrome, no Firefox e no Safari).
+
+## Roteiro
+
+A versão atual é a **5.0g.1** (chefões, Caçada, Eventos da Fenda e mutadores; na 5.0g.1, trilha nova da Vehnar e da Vorag e preparo antes do chefão). Os próximos passos da v5.0 "Além da Fenda":
+
+- **5.0h — Inteligência e mundo:** IA com a personalidade de cada líder.
+- **5.0i — Campanha 2:** 15 missões e os chefões que faltam.
+- **5.0j — Mundos novos:** um mapa por mundo natal, com luz e clima próprios.
+- **5.0k — Replays, clipes e relatório de batalha.**
+
+O plano completo, com o que já foi feito e o porquê de cada escolha, está em [docs/plano-v5.md](docs/plano-v5.md); a história das versões 4 e o que fica para a v6.0 (servidores e escala), em [docs/plano-v4-v5.md](docs/plano-v4-v5.md).
+
+## Rodar e construir localmente
+
+O jogo não tem dependências de npm: `index.html` é gerado a partir de `src/`.
+
+```sh
+node tools/build.mjs                     # gera index.html, sw.js, estilo.html e estilo3d.html
+python3 -m http.server 8000              # sirva a raiz por HTTP (o service worker e as vozes não funcionam em file://)
+# abra http://localhost:8000/
+```
+
+Para os testes (precisam do Playwright: `npm install`):
+
+```sh
+node tools/vendor.mjs                    # copia o Three.js para dist/vendor/ (testes sem rede)
+node tools/qa.cjs                        # portão de qualidade completo: sintaxe, testes, determinismo, smoke das 5 Raças, build
+node tools/docs-gerar.cjs                # refaz as páginas das Raças e dos chefões a partir do código
+node tools/galeria.cjs                   # refaz as imagens de docs/imagens/ com os modelos do jogo
+```
+
+Mais ferramentas (multiplayer com vários navegadores, determinismo entre motores, dificuldade, campanha) estão descritas no topo de cada arquivo em `tools/`.
+
+## Estrutura do projeto
 
 ```
 aether-rift-dominion/
-├─ index.html        jogo em arquivo único (gerado; é o que o GitHub Pages serve)
-├─ estilo.html       prova de conceito do visual voxel isométrico (gerado)
-├─ estilo3d.html     validação 3D em Three.js com os mesmos modelos (gerado)
-├─ src/              fontes do jogo: sim.js (simulação determinística), ai.js, voxel.js e models.js (modelos voxel),
-│                    vox3d.js (voxel → malha), render.js (2D isométrico), render3d.js (Three.js), audio.js, net.js (P2P lockstep), input.js, main.js, index.tpl.html
-├─ style/            cena da prova de conceito 2D (scene.js, boot.js, index.tpl.html)
-├─ style3d/          cena da validação 3D (scene3d.js, boot.js, index.tpl.html)
-├─ tools/            build.mjs (gera index.html, estilo.html e dist/) e test.cjs (IA contra IA, invariantes, determinismo)
-├─ docs/             conceito, plano de desenvolvimento e proposta do beta v1.5
-└─ capturas/         imagens de referência do estilo
+├─ index.html, sw.js, manifest.webmanifest   o jogo publicado (gerados pelo build; é o que o GitHub Pages serve)
+├─ assets/          arte aprovada, ícones, telas de carregamento, pôsteres, trilha, efeitos e vozes gravadas
+├─ src/             código-fonte do jogo: simulação, IA, motores 3D (clássico e src/m5/ do Motor 5), interface e idiomas (src/i18n/)
+├─ tools/           build, testes, QA e geradores (documentação, galeria, capturas)
+├─ docs/            documentação: Raças, chefões e modos, planos, glossário e as imagens (docs/imagens/)
+├─ lab/             bancadas de teste ativas (Motor 5, destroços, som no iPhone)
+├─ prototipos/      protótipos antigos guardados: estilo 2D e 3D e capturas das primeiras versões
+├─ estilo.html, estilo3d.html                provas visuais antigas (geradas a partir de prototipos/)
+└─ ASSETS.md        origem e licença de cada arte, som e biblioteca
 ```
 
-Dificuldades medidas (jogador defensivo de referência contra cada nível): `node tools/difficulty-test.cjs <facil|normal|dificil|brutal> [partidas] [minutos] > dist/difficulty.jsonl` e `python3 tools/difficulty-summary.py` · Campanha no Node (20 missões com a IA no lugar do humano): `node tools/missions-test.cjs [ids|todas] [minutos] [dificuldade]` · Portão de qualidade completo: `node tools/qa.cjs` (sintaxe, malhas 3D, testes, determinismo, smoke das 5 Raças, build e versão; imprime a linha "Qualidade e deploy") · Catálogo 3D por Raça: `node tools/catalogo-render.cjs` · Malhas no Node: `node tools/meshes-test.mjs` · Build: `node tools/build.mjs` · Teste headless: `node tools/test.cjs` · Self-play de balanceamento das cinco Raças: `tools/selfplay-all.sh [sementes] [minutos] [procs] > dist/selfplay.jsonl` (ou `node tools/selfplay.cjs raçaA raçaB`) · Determinismo entre motores: `node tools/det-test.cjs` · Multiplayer real com N navegadores: `node tools/mp-test.cjs <url> <saida> [n] [gfx] [espera] [early] [drop] [browsers] [joinvia] [prejoin]` · Captura: `node tools/shot.cjs` (os três com `NODE_PATH` apontando para um node_modules com playwright) · Captura headless sem rede: `node tools/vendor.mjs` (baixa three r160 para `dist/vendor/`) e o build passa a gerar `dist/local.html`, igual ao jogo mas carregando three local (use com Playwright/Chromium; `--virtual-time-budget` do Chromium congela a página em tick 0 de forma intermitente)
+O índice da documentação está em [docs/README.md](docs/README.md).
+
+## Créditos e licenças
+
+- Jogo, código, modelos, arte e vozes: equipe do Aether Rift: Dominion (todos os direitos reservados, veja abaixo).
+- Trilha: faixas de Kevin MacLeod ([incompetech.com](https://incompetech.com)), licença CC BY 4.0.
+- Bibliotecas: Three.js (MIT), postprocessing (Zlib), N8AO (ISC), GSAP (licença Standard "No Charge"), PeerJS (MIT); fontes Big Shoulders Display, IBM Plex Sans e IBM Plex Mono (SIL OFL 1.1).
+- A lista completa, com a origem, o autor e a licença de cada item, está em [ASSETS.md](ASSETS.md).
 
 Conteúdo em fase de teste. Todos os direitos reservados; não é permitido redistribuir fora deste repositório sem autorização.
+
+## Feedback
+
+Na tela final da partida, **Copiar resultado (JSON)** copia um resumo para colar numa Issue, e **Enviar feedback** abre o [modelo de Issue](https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md) já preenchido. O que mais ajuda: onde você se perdeu, se o roubo e os alertas ficaram claros, se a IA foi justa e o que faltou para a partida ser divertida.
+
+Problemas de segurança: veja [SECURITY.md](SECURITY.md).

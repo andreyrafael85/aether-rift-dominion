@@ -1,7 +1,7 @@
 # AETHER RIFT: DOMINION — Avaliação do beta 0.1 e proposta para o beta v1.5 / v2.0
 ### 10 de outubro de 2026
 
-> Prova de conceito visual publicada: https://claude.ai/artifact/Lb1VS9n78yLq8W5t9cPfrq (toggle Noite e Grade). Capturas em `aether-rift-capturas/`.
+> Prova de conceito visual publicada: https://claude.ai/artifact/Lb1VS9n78yLq8W5t9cPfrq (toggle Noite e Grade). Capturas em [`prototipos/capturas/`](../prototipos/capturas/).
 
 ---
 
@@ -48,8 +48,8 @@ Para ter riqueza de detalhe em dias e sem artista contratado, a proposta é **sp
 
 Na prova de conceito, **tudo é gerado no navegador, sem nenhum asset externo**: 30 sprites em menos de 100 ms, 70 objetos, partículas, muros, raid com sifão, destroço em chamas e crateras.
 
-![Dia](aether-rift-capturas/estilo-voxel-dia.png)
-![Noite](aether-rift-capturas/estilo-voxel-noite.png)
+![Dia](../prototipos/capturas/estilo-voxel-dia.png)
+![Noite](../prototipos/capturas/estilo-voxel-noite.png)
 
 Por que não pular direto para 3D (Three.js) ou pixel art pintada à mão:
 

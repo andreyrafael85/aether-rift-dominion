@@ -1,0 +1,48 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Galeria da documentação</title>
+<style>html,body{margin:0;background:#0e1116;overflow:hidden}</style>
+<script type="importmap">{"imports":{"three":"../dist/vendor/three/build/three.module.min.js","three/addons/":"../dist/vendor/three/examples/jsm/"}}</script>
+</head><body>
+<script src="../src/sim.js"></script><script src="../src/meshes.js"></script><script src="../src/chefes-modelos.js"></script>
+<script type="module">
+/* Galeria da documentação (docs/imagens/): um modelo do jogo por vez, em 3/4, com a luz da partida (sol quente, céu frio, reflexo de ambiente
+   e sombra), num fundo escuro limpo. As malhas são as do próprio jogo (src/meshes.js e src/chefes-modelos.js), na cor da Raça.
+   window.foto({ race, def, color, w, h, anim, skin }) devolve a imagem em WebP (data URL). Usada por tools/galeria.cjs. */
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+window.THREE = THREE;
+const M = ARD.meshes;
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: false });
+renderer.setPixelRatio(1); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+/* fundo: degradê radial escuro (neutro, combina com o tema claro e o escuro do GitHub) */
+const bg = document.createElement('canvas'); bg.width = bg.height = 512; { const c = bg.getContext('2d'); const g = c.createRadialGradient(256, 230, 30, 256, 256, 360); g.addColorStop(0, '#2a313c'); g.addColorStop(0.55, '#171b22'); g.addColorStop(1, '#0c0e12'); c.fillStyle = g; c.fillRect(0, 0, 512, 512); }
+const bgt = new THREE.CanvasTexture(bg); bgt.colorSpace = THREE.SRGBColorSpace; scene.background = bgt;
+const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+scene.add(new THREE.HemisphereLight(0x9fb8d6, 0x2a2622, 0.6));
+const sun = new THREE.DirectionalLight(0xffe9c4, 2.3); sun.position.set(-30, 60, 40); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0004; sun.shadow.radius = 4;
+{ const sc = sun.shadow.camera; sc.left = sc.bottom = -22; sc.right = sc.top = 22; sc.near = 1; sc.far = 200; } scene.add(sun);
+const rim = new THREE.DirectionalLight(0x9cc8ff, 0.7); rim.position.set(35, 25, -40); scene.add(rim);
+/* chão invisível que só recebe a sombra */
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80).rotateX(-Math.PI / 2), new THREE.ShadowMaterial({ opacity: 0.45 })); ground.receiveShadow = true; scene.add(ground);
+const mat = M.material({ env: 0.55, key: 'galeria' }); const matEm = new THREE.MeshBasicMaterial({ vertexColors: true }); matEm.onBeforeCompile = sh => M.animShader(sh); matEm.defaultAttributeValues = Object.assign({}, matEm.defaultAttributeValues, M.ANIM_DEFAULTS); matEm.customProgramCacheKey = () => 'galeria-em';
+let grp = null;
+window.foto = function (o) {
+  const W = o.w || 640, H = o.h || 480; renderer.setSize(W, H);
+  if (grp) { scene.remove(grp); grp.traverse(m => { if (m.geometry) m.geometry.dispose(); }); }
+  const g = M.build(o.def, o.race, o.color || '#FF8C1A', o.skin || 0, null);
+  const fit = 14 / Math.max(o.largura || g.width, g.height * 1.2); grp = new THREE.Group(); grp.scale.setScalar(fit); scene.add(grp);
+  const anim = +(o.anim || 0.3);
+  const add = (geo, m) => { if (!geo) return; geo.setAttribute('aInst', new THREE.InstancedBufferAttribute(new Float32Array([0, anim * 3, 0, 0]), 4)); geo.setAttribute('aInstC', new THREE.InstancedBufferAttribute(new Float32Array([anim * 2]), 1)); const im = new THREE.InstancedMesh(geo, m, 1); im.setMatrixAt(0, new THREE.Matrix4()); im.castShadow = true; im.receiveShadow = true; im.frustumCulled = false; grp.add(im); };
+  add(g.main, mat); add(g.em, matEm);
+  /* peças desenhadas à parte no jogo (as quatro pernas da Forja-Mãe, src/chefes.js): { def, x, z, rot } no espaço do modelo */
+  for (const pc of o.partes || []) { const gp = M.build(pc.def, o.race, o.color || '#FF8C1A', 0, null); const sub = new THREE.Group(); sub.position.set(pc.x, 0, pc.z); sub.rotation.y = pc.rot || 0; const g0 = grp; grp = sub; add(gp.main, mat); add(gp.em, matEm); grp = g0; grp.add(sub); }
+  const h = g.height * fit, pitch = o.pitch != null ? o.pitch : 0.55, yaw = o.yaw != null ? o.yaw : Math.PI * 0.78, dist = o.dist || 25;
+  const cam = new THREE.PerspectiveCamera(32, W / H, 0.5, 500);
+  cam.position.set(Math.cos(pitch) * Math.cos(yaw) * dist, h * 0.42 + Math.sin(pitch) * dist, Math.cos(pitch) * Math.sin(yaw) * dist); cam.lookAt(0, h * 0.42, 0);
+  renderer.render(scene, cam);
+  return { url: renderer.domElement.toDataURL(o.jpg ? 'image/jpeg' : 'image/webp', o.q || (o.jpg ? 0.92 : 0.86)), tris: Math.round(g.main.attributes.position.count / 3) };
+};
+window.__done = true;
+</script></body></html>
