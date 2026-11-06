@@ -23,7 +23,8 @@
       out.push.apply(out, run(players.slice(0, 3), { mapV: 1, chefe: 'arauto' }, Math.round(ticks / 2), 'arauto ').concat(run(duo, { map: 'tita', mapV: 1, chefe: 'forja' }, Math.round(ticks / 2), 'forja '))); }
     if (g.ARD.modos) { /* 5.0g: Eventos da Fenda (cada um começa aos 15 s com a chave de teste), os mutadores e a Caçada também entram no teste entre motores, depois das partidas de sempre */
       const M = ['noite', 'tempestades', 'escassos']; ['caravana', 'enxame', 'meteoros', 'sentinela'].forEach((ev, i) => { out.push.apply(out, run(players.slice(0, 3), { mapV: 1, eventosTeste: ev, mutadores: [M[i % 3]] }, 600, 'evento ' + ev + ' ')); });
-      out.push.apply(out, run(belt.slice(0, 2), { mapV: 1, cacada: { chefe: 'arauto', dif: 'facil' } }, 600, 'caçada ')); }
+      out.push.apply(out, run(belt.slice(0, 2), { mapV: 1, cacada: { chefe: 'arauto', dif: 'facil' } }, 600, 'caçada '));
+      out.push.apply(out, run(players.slice(0, 3), { map: 'tita', mapV: 1, cacada: { chefe: 'forja', dif: 'brutal' } }, 900, 'caçada forja ')); } /* 5.0g.1: Caçada com 3 jogadores (a espinha gira) e o despertar (60 s na Brutal) dentro dos 900 tiques */
     return out;
   };
 })(globalThis);

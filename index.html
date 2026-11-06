@@ -1095,7 +1095,7 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
 
 
 <script>/* 5.0c: idioma antes da primeira pintura — fora do pt-BR, carrega aqui o dicionário do idioma (src/i18n/en.js ou es.js, 33 KB com gzip, enquanto o resto da página chega) e esconde o texto da tela inicial até o src/i18n.js (no fim da página) traduzir; a mesma regra de escolha do i18n.js */
-(function () { try { var q = (new URLSearchParams(location.search).get('lang') || '').toLowerCase(), s = ''; try { s = (localStorage.getItem('ard-idioma') || '').toLowerCase(); } catch (e) {} var l = /^(pt|en|es)/.test(q) ? q : /^(pt|en|es)/.test(s) ? s : ''; if (!l) { var ls = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']; for (var i = 0; i < ls.length && !l; i++) if (/^(pt|en|es)/i.test(ls[i])) l = ls[i].toLowerCase(); } if (!/^pt/.test(l)) { document.documentElement.classList.add('i18n-espera'); document.write('<script src="src/i18n/' + (/^es/.test(l) ? 'es' : 'en') + '.js?v=' + '2026-11-06 03:38Z'.replace(/[^0-9TZ]/g, '') + '"><\/script>'); } } catch (e) {} })();</script>
+(function () { try { var q = (new URLSearchParams(location.search).get('lang') || '').toLowerCase(), s = ''; try { s = (localStorage.getItem('ard-idioma') || '').toLowerCase(); } catch (e) {} var l = /^(pt|en|es)/.test(q) ? q : /^(pt|en|es)/.test(s) ? s : ''; if (!l) { var ls = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']; for (var i = 0; i < ls.length && !l; i++) if (/^(pt|en|es)/i.test(ls[i])) l = ls[i].toLowerCase(); } if (!/^pt/.test(l)) { document.documentElement.classList.add('i18n-espera'); document.write('<script src="src/i18n/' + (/^es/.test(l) ? 'es' : 'en') + '.js?v=' + '2026-11-06 17:33Z'.replace(/[^0-9TZ]/g, '') + '"><\/script>'); } } catch (e) {} })();</script>
 <div id="start" class="screen">
   <canvas id="bgfx" aria-hidden="true"></canvas>
   <!-- 5.0a.1: pôster da Sala de Comando (um render da própria Sala por Raça e por tela, em assets/sala-*.webp): entra na hora, antes da cena 3D -->
@@ -1109,7 +1109,7 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
   <div class="start-wrap">
     <header class="st-head">
       <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div class="brand-txt"><h1 data-i18n="inicio.aether-rift-dominion">Aether Rift<span>Dominion</span></h1><p class="tagline" data-i18n="inicio.nada-aqui-seu-ainda">Nada aqui é seu. Ainda.</p></div></div>
-      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.0g · build 2026-11-06 03:38Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4</div>
+      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.0g.1 · build 2026-11-06 17:33Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4</div>
       <div class="opt st-lang" data-idioma-sel="idioma-inicio"></div><!-- 5.0c: seletor de idioma, legível em qualquer idioma -->
     </header>
     <div class="start-grid">
@@ -1174,8 +1174,9 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
       </div>
       <div class="notes">
       <div class="choose" data-i18n="notas.notas-versao">Notas da versão</div>
+      <p class="start-notes" data-i18n="notas.5-0g-1"><b>5.0g.1 — Ajustes:</b> trilha nova para a Vehnar, com sintetizador e pulso de máquina no lugar das batidas de martelo, e para a Vorag, com textura de enxame vivo no lugar do batuque. Na Caçada, o chefão agora dorme até ser atacado ou até a contagem na barra acabar (1:30 no Normal), e a arena ficou mais longe da base; o Arauto só golpeia dentro da arena. O salvamento no aparelho não trava mais quando o armazenamento do celular demora, e o rodapé de erro mostra a mensagem antes do lugar. No celular em pé, a dica do tutorial não fica mais atrás da barra do chefão.</p>
+      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.0g → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-0g"><b>5.0g — Chefões:</b> chegaram O Arauto e A Forja-Mãe, cada um com três fases, ataques avisados no chão com antecedência e janelas em que fica vulnerável, e o mapa novo Destroço do Titã. Na aba Caçada você escolhe o chefão, a dificuldade e os aliados, sozinho ou com 2 a 4 amigos no cooperativo, e ganha medalha por tempo e perdas. Na escaramuça, os Eventos da Fenda são opcionais: Sentinela da Fenda, Caravana Corsária, Enxame Errante e chuva de meteoros, com recompensa para quem dá o golpe final. E os primeiros mutadores: Noite Eterna, Tempestades Frequentes e Recursos Escassos.</p>
-      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.0f.1 → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-0f-1"><b>5.0f.1 — Som de cinema:</b> a trilha agora é orquestral e de verdade: cada Raça tem os seus temas de paz, tensão e batalha, mais as faixas de chefão, de cinema, de superarma, de vitória e de derrota, com trocas no compasso. Disparos, impactos e explosões ganharam peso, montados em camadas a partir de gravações reais. A voz das unidades ao selecionar e dar ordens ficou no mesmo plano em todas as Raças, sempre clara por cima do ambiente e sem sobressaltar. Os arquivos chegam depois da carga; sem eles, o som gerado de antes continua. Créditos em Ajustes.</p>
       <p class="start-notes" data-i18n="notas.5-0f"><b>5.0f — Som 3D e cinema:</b> cada som agora sai do seu lugar no mapa e acompanha a câmera, com som 3D para fone no computador; o que está longe perde o brilho, o que está sob a névoa de guerra soa abafado e cada bioma tem seu eco. Uma <b>trilha adaptativa</b>, gerada no próprio navegador, dá um tema a cada Raça e muda entre paz, tensão, batalha e chefão conforme a partida, e baixa quando alguém fala. Cliques e avisos têm o timbre da sua Raça. As 20 missões abrem com a <b>Sala de Guerra</b>: o mapa tático com as ameaças, a rota de ataque e os objetivos, e a câmera pousando na sua base. A superarma ganhou uma tomada curta do disparo, e os chefões, uma entrada de cinema. Tudo pode ser pulado (Esc, clique ou toque), e Ajustes tem volume de efeitos e de música, saída para fone ou caixas e as cenas de cinema.</p>
       <p class="start-notes" data-i18n="notas.5-0e"><b>5.0e — Bases e unidades vivas:</b> com o <b>Motor 5</b> ligado, cada construção sobe no estilo da sua Raça: solda na Vehnar, trama de luz na Erevane, veias na Tessara, cristais no Quorith e bolhas na Vorag, com uma onda no chão ao concluir. Os destroços quicam no relevo e o entulho fica um tempo no chão; na Alta e na Ultra, o calor e a onda de choque das explosões distorcem o ar. A base ganhou vida: módulos visíveis nas construções, paredes que racham conforme a vida cai, condutos que pulsam com a energia (e piscam quando ela falta), trabalhadores andando entre os prédios e construções Tessara e Vorag que respiram. As unidades ganharam aro de seleção em holograma, barras de vida em segmentos que nenhuma névoa escurece, contorno na cor do time e estrelas de veterano que brilham na promoção; os materiais mostram desgaste nas bordas e a poeira do mapa na base das peças.</p>
@@ -1825,7 +1826,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aqui é seu. Ainda.",
-  "inicio.versao": "Versão 5.0g · build 2026-11-06 03:38Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
+  "inicio.versao": "Versão 5.0g.1 · build 2026-11-06 17:33Z · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Escolha sua Raça",
   "inicio.vitrine.explorar-base": "Explorar a base",
   "inicio.vitrine.som-tela-inicial": "Som da tela inicial",
@@ -1894,6 +1895,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.btn-bench": "Testar desempenho (30 s)",
   "ajustes.cfg-feedback": "Enviar feedback",
   "notas.notas-versao": "Notas da versão",
+  "notas.5-0g-1": "<b>5.0g.1 — Ajustes:</b> trilha nova para a Vehnar, com sintetizador e pulso de máquina no lugar das batidas de martelo, e para a Vorag, com textura de enxame vivo no lugar do batuque. Na Caçada, o chefão agora dorme até ser atacado ou até a contagem na barra acabar (1:30 no Normal), e a arena ficou mais longe da base; o Arauto só golpeia dentro da arena. O salvamento no aparelho não trava mais quando o armazenamento do celular demora, e o rodapé de erro mostra a mensagem antes do lugar. No celular em pé, a dica do tutorial não fica mais atrás da barra do chefão.",
   "notas.5-0g": "<b>5.0g — Chefões:</b> chegaram O Arauto e A Forja-Mãe, cada um com três fases, ataques avisados no chão com antecedência e janelas em que fica vulnerável, e o mapa novo Destroço do Titã. Na aba Caçada você escolhe o chefão, a dificuldade e os aliados, sozinho ou com 2 a 4 amigos no cooperativo, e ganha medalha por tempo e perdas. Na escaramuça, os Eventos da Fenda são opcionais: Sentinela da Fenda, Caravana Corsária, Enxame Errante e chuva de meteoros, com recompensa para quem dá o golpe final. E os primeiros mutadores: Noite Eterna, Tempestades Frequentes e Recursos Escassos.",
   "notas.5-0f-1": "<b>5.0f.1 — Som de cinema:</b> a trilha agora é orquestral e de verdade: cada Raça tem os seus temas de paz, tensão e batalha, mais as faixas de chefão, de cinema, de superarma, de vitória e de derrota, com trocas no compasso. Disparos, impactos e explosões ganharam peso, montados em camadas a partir de gravações reais. A voz das unidades ao selecionar e dar ordens ficou no mesmo plano em todas as Raças, sempre clara por cima do ambiente e sem sobressaltar. Os arquivos chegam depois da carga; sem eles, o som gerado de antes continua. Créditos em Ajustes.",
   "notas.5-0f": "<b>5.0f — Som 3D e cinema:</b> cada som agora sai do seu lugar no mapa e acompanha a câmera, com som 3D para fone no computador; o que está longe perde o brilho, o que está sob a névoa de guerra soa abafado e cada bioma tem seu eco. Uma <b>trilha adaptativa</b>, gerada no próprio navegador, dá um tema a cada Raça e muda entre paz, tensão, batalha e chefão conforme a partida, e baixa quando alguém fala. Cliques e avisos têm o timbre da sua Raça. As 20 missões abrem com a <b>Sala de Guerra</b>: o mapa tático com as ameaças, a rota de ataque e os objetivos, e a câmera pousando na sua base. A superarma ganhou uma tomada curta do disparo, e os chefões, uma entrada de cinema. Tudo pode ser pulado (Esc, clique ou toque), e Ajustes tem volume de efeitos e de música, saída para fone ou caixas e as cenas de cinema.",
@@ -1905,7 +1907,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "notas.5-0c": "<b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 mais leve, faróis e som no iPhone:</b> com o <b>Motor 5</b> ligado, os shaders que ele prepara na carga encolheram um terço (os lagos primeiro) e cada quadro manda muito menos dados para a placa de vídeo, o que alivia a CPU no Firefox e no celular. O brilho em volta das luzes agora é o mesmo do motor clássico, e no Modo Foto da qualidade Baixa os efeitos seguem a exposição como no clássico. À noite e dentro da Tempestade de Éter, os faróis dos veículos, coletores e piratas iluminam o chão à frente, nos dois motores. A Sala de Comando ficou um pouco mais clara, sem o clarão de antes. No iPhone, o som e a voz destravam no primeiro toque, tocam com a chave de silêncio ligada e voltam depois de uma ligação. Cada líder fala com uma voz do seu gênero em todo navegador. Em Ajustes, <b>Testar som</b> toca três notas e uma frase e mostra o estado do áudio do aparelho.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, em teste:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o jogo inteiro agora roda em WebGPU, com volta sozinha para WebGL2: unidades e construções com o detalhe de superfície e a animação de cada peça, ruínas, obras, o holograma da Erevane, os escudos do Uníssono e as bandeiras; o chão com todos os biomas, a vegetação ao vento, as estradas e o céu; explosões, fogo, fumaça e tiros; os lagos de plasma e de gelo com reflexo, o espaço do Cinturão e a Tempestade de Éter; e o <b>Modo Foto</b> (📷 ou tecla J) com desfoque, os 8 filtros e captura em 4K. Na primeira vez que o Modo Foto abre numa partida, ele leva alguns segundos para se preparar. Com tudo isso, a carga do Motor 5 ficou alguns segundos mais longa: a próxima versão mede nos aparelhos e enxuga. O motor clássico continua o padrão e não mudou.",
-  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0f.1 → 2.0)",
+  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0g → 2.0)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Termos de Uso",
   "inicio.rodape.foot-priv": "Privacidade",
@@ -3336,6 +3338,18 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "chefe.ui.janela-k": "Agora!", /* 5.0g */
   "chefe.ui.derrotado": "Derrotado", /* 5.0g */
   "chefe.ui.fenda": "Da Fenda", /* 5.0g */
+  "sim.chefe.desperta-em": "{nome} desperta em {t}", /* 5.0g.1 */
+  "sim.chefe.despertou": "{nome} despertou!", /* 5.0g.1 */
+  "sim.chefe.despertou-atacado": "{nome} despertou com o ataque!", /* 5.0g.1 */
+  "chefe.ui.desperta": "Desperta em {t}", /* 5.0g.1 */
+  "chefe.ui.despertou": "Despertou!", /* 5.0g.1 */
+  "chefe.ui.despertou-atacado": "Despertou com o ataque!", /* 5.0g.1 */
+  "erro.titulo": "Erro", /* 5.0g.1 */
+  "erro.promessa": "Erro (tarefa em segundo plano)", /* 5.0g.1 */
+  "erro.lugar": "em {arq}, linha {lin}, coluna {col}", /* 5.0g.1 */
+  "erro.sem-msg": "erro sem mensagem", /* 5.0g.1 */
+  "erro.fechar": "Toque para fechar", /* 5.0g.1 */
+  "erro.pagina": "a página", /* 5.0g.1 */
 };
 
 /* Aether Rift: Dominion — idiomas (5.0c): português do Brasil (base), inglês e espanhol (neutro latino-americano).
@@ -3364,7 +3378,7 @@ const pr = l => PR[l] || (PR[l] = new Intl.PluralRules(LOCALE[l] || l));
 function num(n, o) { if (typeof n !== 'number' || !isFinite(n)) return String(n); return nf(ARD.idioma, o || { maximumFractionDigits: 2 }).format(n); }
 function forma(v, n, l) { if (v == null || typeof v !== 'object') return v; const c = typeof n === 'number' ? (n === 0 && v.zero != null ? 'zero' : pr(l).select(n)) : 'other'; return v[c] != null ? v[c] : v.other != null ? v.other : v.one; }
 function busca(k, l) { const d = DIC[l]; return d && Object.prototype.hasOwnProperty.call(d, k) ? d[k] : undefined; }
-const MARCA_BUILD = '__' + 'BUILD__', CARIMBO = '2026-11-06 03:38Z'; /* o en e o es vêm em arquivo à parte, sem a troca do build: o carimbo entra aqui */
+const MARCA_BUILD = '__' + 'BUILD__', CARIMBO = '2026-11-06 17:33Z'; /* o en e o es vêm em arquivo à parte, sem a troca do build: o carimbo entra aqui */
 function preenche(s, vars) { if (s.indexOf(MARCA_BUILD) >= 0) s = s.split(MARCA_BUILD).join(CARIMBO); if (!vars || s.indexOf('{') < 0) return s; return s.replace(/\{(\w+)\}/g, (m, n) => Object.prototype.hasOwnProperty.call(vars, n) ? (typeof vars[n] === 'number' ? num(vars[n]) : String(vars[n])) : m); }
 function t(k, vars, reserva) { const l = ARD.idioma; let v = busca(k, l), ll = l; if (v === undefined) { v = busca(k, 'pt-BR'); ll = 'pt-BR'; } if (v === undefined) { if (reserva != null) return preenche(String(reserva), vars); falta(k); return k; }
   const s = forma(v, vars && vars.n, ll); return preenche(String(s == null ? '' : s), vars); }
@@ -3456,7 +3470,7 @@ function marcaHtml() { try { document.documentElement.lang = LANG_HTML[ARD.idiom
 /* carga dos dicionários: o pt-BR vem embutido no pacote (base e reserva); o en e o es são arquivos à parte (src/i18n/en.js e es.js, com o carimbo
    do build na URL), pedidos só por quem usa o idioma: o script do topo do <body> já carrega o do idioma escolhido antes do jogo; aqui, a troca
    na hora pede o outro. O service worker guarda os dois na instalação, então o jogo troca de idioma também sem internet. */
-const VER = '2026-11-06 03:38Z'.replace(/[^0-9TZ]/g, '');
+const VER = '2026-11-06 17:33Z'.replace(/[^0-9TZ]/g, '');
 const CARGAS = {};
 function carregar(l) { l = normaliza(l) || 'pt-BR'; if (DIC[l]) return Promise.resolve(l); if (CARGAS[l]) return CARGAS[l];
   return (CARGAS[l] = new Promise((ok, falha) => { const sc = document.createElement('script'); sc.src = 'src/i18n/' + l + '.js?v=' + VER; sc.onload = () => { if (DIC[l]) ok(l); else { CARGAS[l] = null; falha(new Error('dicionário vazio')); } }; sc.onerror = () => { CARGAS[l] = null; sc.remove(); falha(new Error('sem rede')); }; document.head.appendChild(sc); })); }
@@ -3755,6 +3769,10 @@ const BOSSES = {
 /* dificuldade: vida, dano dos golpes, ritmo (multiplica o intervalo entre golpes) e aviso mínimo (2 s na Fácil, 1,5 s nas outras) */
 const DIF = { facil: { vida: 0.7, dano: 0.75, ritmo: 1.25, avisoMin: 2 }, normal: { vida: 1, dano: 1, ritmo: 1, avisoMin: 1.5 },
   dificil: { vida: 1.35, dano: 1.2, ritmo: 0.9, avisoMin: 1.5 }, brutal: { vida: 1.75, dano: 1.4, ritmo: 0.8, avisoMin: 1.5 } };
+/* 5.0g.1: Caçada — o chefão dorme na arena até o despertar (s, por dificuldade, contado do começo) ou até ser atacado; o Arauto só golpeia
+   dentro da arena dele (a cratera e o anel dos pilares, ARENA_ARAUTO do centro): a base só é alvo pela regra da fase (a Marcha da Forja, os Ecos) */
+const DESPERTA = { facil: 120, normal: 90, dificil: 75, brutal: 60 };
+const ARENA_ARAUTO = 820;
 const SUPER_MAX = 0.2; /* nenhuma superarma tira mais que 20% da vida de um chefão */
 const SUPER_DANO = { fundicao: { frac: 0.15, raio: 320 }, eclosao: { frac: 0.08, raio: 320 }, blecaute: { frac: 0.1, raio: 0, calma: 8 } };
 const FENDA_COR = '#C23BFF';
@@ -3782,6 +3800,7 @@ function instala(sim0) {
 }
 
 const cl = (v, a, b) => v < a ? a : v > b ? b : v;
+const mmss = t => { t = Math.max(0, Math.round(t)); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
 function tq(sim, s) { return (sim.tick + Math.max(1, Math.round(s / S.TICK))) * S.TICK; } /* tempo da simulação arredondado ao tique */
 function difDe(sim, o) { const c = sim.cfg || {}; const k = (o && o.dif) || (c.cacada && c.cacada.dif) || c.chefeDif || (sim.players.find(p => !p.human && !p.fenda) || {}).difficulty || 'normal'; return DIF[k] ? k : 'normal'; }
 function humanos(sim) { let n = 0; for (const p of sim.players) if (p.human && !p.fenda) n++; return Math.max(1, Math.min(4, n)); }
@@ -3838,11 +3857,13 @@ function spawnBoss(sim, tipo, x, y, o) {
     orb: S.DM.atan2(y - S.CY, x - S.CX), alvo: null, chegada: 0, lento: 1, torreT: 0, dronesT: 0, rastroT: 0, ecoT: 0, criasT: 0, capturaT: 0, capturaP: -1, capturaMax: 0, capturado: false, pocoId: 0 };
   sim.chefes.lista.push(u.id); if (o.cacada) sim.chefes.cacada = u.id;
   const b = u.boss;
+  if (o.cacada) { b.dorme = tq(sim, DESPERTA[dk] || DESPERTA.normal); b.aviso30 = false; } /* 5.0g.1: tempo de preparo da Caçada */
   if (tipo === 'arauto') { criaPilares(sim, u); b.criasT = sim.time + B.guardasCada; }
   if (tipo === 'sentinela') { b.criasT = sim.time + 6; }
   if (tipo === 'forja') { b.torreT = sim.time + B.torreCada; escolheAlvo(sim, u); b.capturaMax = B.captura.t; }
   I.emit(sim, { t: 'chefe', ev: 'entra', id: u.id, tipo, fase: 1, x: u.x, y: u.y });
   if (!o.evento) for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, B.def === 'sentinela' ? 'A Sentinela da Fenda despertou no centro do mapa' : (DEFS[B.def].name + ' atravessou a Fenda'), u.x, u.y, 'danger');
+  if (b.dorme) for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, DEFS[B.def].name + ' desperta em ' + mmss(b.dorme - sim.time), u.x, u.y, 'warn'); /* 5.0g.1 */
   return u;
 }
 /* S.bossOf(sim): o chefão vivo mais importante (maior ordem; empate = o mais antigo), ou null */
@@ -3862,9 +3883,9 @@ function livre(sim, x, y, r) { /* ponto livre para pilar ou torre: chão firme, 
 }
 function inimigoDeFenda(sim, e) { return e.alive && e.owner >= 0 && e.owner !== sim.fenda && (e.kind === 'unit' || e.kind === 'building') && !(sim.players[e.owner] && sim.players[e.owner].fenda); }
 /* alvo de golpe: um inimigo sorteado (RNG da partida) entre os que estão a até `raio`; unidades primeiro, depois estruturas */
-function sorteiaAlvo(sim, x, y, raio, soChao) {
+function sorteiaAlvo(sim, x, y, raio, soChao, arena) {
   const us = [], bs = [];
-  I.queryGrid(sim, x, y, raio + 40, e => { if (!inimigoDeFenda(sim, e) || S.dist(x, y, e.x, e.y) > raio) return; if (e.kind === 'unit') { if (soChao && S.UNITS[e.def].flying) return; us.push(e); } else bs.push(e); });
+  I.queryGrid(sim, x, y, raio + 40, e => { if (!inimigoDeFenda(sim, e) || S.dist(x, y, e.x, e.y) > raio) return; if (arena && S.dist(S.CX, S.CY, e.x, e.y) > arena) return; /* 5.0g.1 */ if (e.kind === 'unit') { if (soChao && S.UNITS[e.def].flying) return; us.push(e); } else bs.push(e); });
   const l = us.length ? us : bs; if (!l.length) return null; return l[Math.floor(sim.rand() * l.length) % l.length];
 }
 function maisPerto(sim, x, y, raio, pred) { let best = null, bd = raio; I.queryGrid(sim, x, y, raio + 40, e => { if (!inimigoDeFenda(sim, e) || (pred && !pred(e))) return; const d = S.dist(x, y, e.x, e.y) - (e.r || 0); if (d < bd) { bd = d; best = e; } }); return best; }
@@ -3943,7 +3964,7 @@ function golpeFaixa(sim, u, G, alvo, nome) { /* faixa que sai do chefão na dire
   return aviso(sim, u, 'faixa', nome || 'faixa', { aviso: G.aviso, x: u.x, y: u.y, x2, y2, w: G.w, dano: G.dano });
 }
 function logicaArauto(sim, u, dt) {
-  const b = u.boss, B = BOSSES[b.tipo], G = B.golpes; const sentinela = b.tipo === 'sentinela';
+  const b = u.boss, B = BOSSES[b.tipo], G = B.golpes; const sentinela = b.tipo === 'sentinela'; const ar = b.cacada ? ARENA_ARAUTO : 0; /* 5.0g.1: na Caçada só golpeia dentro da arena */
   if (!sentinela && b.fase === 1) { b.escudo = b.pilares > 0 ? Math.round(b.escudoMax * b.pilares / B.pilares) : 0;
     if (sim.time >= b.criasT) { b.criasT = sim.time + intervalo(sim, u, B.guardasCada); for (const pid of b.partes) { const p = vivo(sim, pid); if (!p || p.parte.tipo !== 'pilar') continue; let n = 0; for (const e of sim.ents) if (e.alive && e.cria === u.id && e.guarda && e.guarda.x === p.x && e.guarda.y === p.y) n++; for (let i = n; i < B.guardas; i++) guarda(sim, u, p, i, B.guardas); } } }
   if (sentinela && sim.time >= b.criasT) { b.criasT = sim.time + intervalo(sim, u, B.guardasCada); let n = 0; for (const e of sim.ents) if (e.alive && e.cria === u.id) n++;
@@ -3952,10 +3973,10 @@ function logicaArauto(sim, u, dt) {
   if (b.fase === 3) { /* Colapso: poço gravitacional e, entre um e outro, faixas */
     const poco = sim.avisos.find(a => a.id === b.pocoId);
     if (!poco && sim.time >= b.prox && !b.janela) { const a = aviso(sim, u, 'poco', 'poco', { aviso: G.poco.aviso, x: u.x, y: u.y, r: G.poco.r, w: G.poco.w, dano: G.poco.dano, puxa: G.poco.puxa }); b.pocoId = a.id; b.prox = a.t1 + G.poco.janela + intervalo(sim, u, G.poco.cada - G.poco.janela - G.poco.aviso); }
-    if (!poco && !b.janela && sim.time >= b.prox2) { const t = sorteiaAlvo(sim, u.x, u.y, 800); if (t) golpeFaixa(sim, u, G.faixa, t); b.prox2 = sim.time + intervalo(sim, u, 6); }
+    if (!poco && !b.janela && sim.time >= b.prox2) { const t = sorteiaAlvo(sim, u.x, u.y, 800, false, ar); if (t) golpeFaixa(sim, u, G.faixa, t); b.prox2 = sim.time + intervalo(sim, u, 6); }
     return;
   }
-  if (sim.time >= b.prox) { const t = sorteiaAlvo(sim, u.x, u.y, 900); if (t) { const useFaixa = (b.fase === 2 || sentinela) && sim.rand() < 0.5; if (useFaixa) golpeFaixa(sim, u, G.faixa, t); else golpeAnel(sim, u, G.anel, t.x, t.y); b.prox = sim.time + intervalo(sim, u, useFaixa ? G.faixa.cada : G.anel.cada); } else b.prox = sim.time + 2; }
+  if (sim.time >= b.prox) { const t = sorteiaAlvo(sim, u.x, u.y, 900, false, ar); if (t) { const useFaixa = (b.fase === 2 || sentinela) && sim.rand() < 0.5; if (useFaixa) golpeFaixa(sim, u, G.faixa, t); else golpeAnel(sim, u, G.anel, t.x, t.y); b.prox = sim.time + intervalo(sim, u, useFaixa ? G.faixa.cada : G.anel.cada); } else b.prox = sim.time + 2; }
   if (!sentinela && b.fase === 2 && sim.time >= b.ecoT) { b.ecoT = sim.time + intervalo(sim, u, B.ecoCada); ecoAbre(sim, u); }
 }
 /* Ecos: duas fendas pequenas perto do exército de um jogador (rodízio); em t1 saem cópias espectrais das últimas unidades que ele produziu, com metade da vida */
@@ -4018,6 +4039,7 @@ function passo(sim, dt) {
     for (let i = sim.terreno.length - 1; i >= 0; i--) { const z = sim.terreno[i]; if (sim.tick >= Math.round(z.t1 / S.TICK)) { sim.terreno.splice(i, 1); continue; }
       if (fz && z.dps) { const hit = []; I.queryGrid(sim, z.x, z.y, z.r + 40, e => { if (inimigoDeFenda(sim, e) && e.kind === 'unit' && !S.UNITS[e.def].flying && S.dist(z.x, z.y, e.x, e.y) <= z.r) hit.push(e); }); for (const e of hit) if (e.alive) I.applyDamage(sim, sim.fenda, null, e, z.dps * S.TICK * 5, null); } } }
   for (const id of st.lista) { const u = vivo(sim, id); if (!u || !u.boss) continue; const b = u.boss, B = BOSSES[b.tipo];
+    if (b.dorme && !acorda(sim, u)) continue; /* 5.0g.1: Caçada, preparo */
     b.faseT += dt; if (!b.furia && b.faseT > 150) { b.furia = true; I.emit(sim, { t: 'chefe', ev: 'furia', id: u.id, tipo: b.tipo, fase: b.fase }); }
     if (b.janela && b.janelaAte && sim.time >= b.janelaAte) fechaJanela(sim, u);
     const porVida = !(b.tipo === 'forja' && b.fase === 2); /* na Linha de montagem quem vira a fase são as pernas */
@@ -4025,6 +4047,19 @@ function passo(sim, dt) {
     if (b.tipo === 'forja') logicaForja(sim, u, dt); else logicaArauto(sim, u, dt);
   }
   if (sim.tick % 10 === 5) cerebro(sim);
+}
+/* 5.0g.1: o chefão da Caçada dorme até b.dorme (tempo da simulação) ou até ser atacado (ele ou uma parte); devolve true quando acorda neste tique */
+function acorda(sim, u) {
+  const b = u.boss, B = BOSSES[b.tipo]; let atacado = !!b.provoca || u.hp < u.maxHp;
+  if (!atacado) for (const pid of b.partes) { const p = vivo(sim, pid); if (p && p.hp < p.maxHp) { atacado = true; break; } }
+  if (!atacado && sim.time < b.dorme) {
+    if (!b.aviso30 && b.dorme - sim.time <= 30) { b.aviso30 = true; for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, DEFS[B.def].name + ' desperta em ' + mmss(b.dorme - sim.time), u.x, u.y, 'warn'); }
+    return false; }
+  b.dorme = 0; b.provoca = false; b.faseT = 0; b.prox = sim.time + 3; b.prox2 = sim.time + 6;
+  if (b.tipo === 'arauto') b.criasT = sim.time + B.guardasCada; if (b.tipo === 'forja') { b.torreT = sim.time + B.torreCada; escolheAlvo(sim, u); }
+  I.emit(sim, { t: 'chefe', ev: 'desperta', id: u.id, tipo: b.tipo, atacado, x: u.x, y: u.y });
+  for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, DEFS[B.def].name + (atacado ? ' despertou com o ataque!' : ' despertou!'), u.x, u.y, 'danger');
+  return true;
 }
 function puxa(sim, a, dt) { /* Colapso: o poço puxa pelo passo de movimento, sem física à parte (só posição, na ordem de sim.ents) */
   const k = a.puxa * dt;
@@ -4056,6 +4091,7 @@ function unidade(sim, u, dt) {
   if (u.cd > 0) u.cd -= dt;
   if (u.parte) return;
   const b = u.boss; if (!b) return; const B = BOSSES[b.tipo];
+  if (b.dorme) { b.fx = u.x; b.fy = u.y; return; } /* 5.0g.1: dormindo na arena */
   if (B.orbita) { /* o Arauto e a Sentinela flutuam sobre a cratera; no poço param */
     const parado = sim.avisos.some(a => a.dono === u.id && a.tipo === 'poco');
     if (!parado) b.orb += (u.speed / B.orbita) * dt * (b.fase === 3 ? 0.5 : 1);
@@ -4093,6 +4129,7 @@ function depois(sim) {
 /* dano que chega ao chefão (applyDamage): fases não se pulam, escudo dos pilares, pernas, janela do olho; superarma só limitada pelo piso da fase */
 function dano(sim, t, dmg, atk) {
   const b = t.boss; if (!b) return dmg; const B = BOSSES[b.tipo];
+  if (b.dorme && atk) b.provoca = true; /* 5.0g.1: atacado, desperta no próximo tique */
   if (!sim.chefes || !sim.chefes.superDano) {
     if (b.tipo === 'forja' && b.fase === 3 && atk && atk.kind === 'unit' && atk.cls === 'inf') return 0; /* núcleo exposto: a infantaria segura (captura), quem destrói são veículos, drones e torres */
     if (b.tipo === 'arauto' && b.fase === 1 && b.pilares > 0) dmg = 0;
@@ -4144,7 +4181,7 @@ function hash(sim, mix) {
   for (const a of sim.avisos) { mix(a.id); mix(Math.round(a.x * 10)); mix(Math.round(a.y * 10)); mix(Math.round(a.t1 * 10)); mix(a.dano); }
   for (const z of sim.terreno) { mix(z.id); mix(Math.round(z.x * 10)); mix(Math.round(z.y * 10)); mix(Math.round(z.t1 * 10)); }
   const st = sim.chefes; mix(st.lista.length); mix(st.ecoVez || 0); mix(st.cacada || 0);
-  for (const id of st.lista) { const e = sim.byId.get(id); if (!e || !e.alive || !e.boss) continue; const b = e.boss; mix(b.fase); mix(Math.round(b.escudo)); mix(b.janela ? 1 : 0); mix(Math.round(b.capturaT * 10)); mix(Math.round(b.prox * 10)); mix(Math.round(b.lento * 1000)); mix(b.pontos); }
+  for (const id of st.lista) { const e = sim.byId.get(id); if (!e || !e.alive || !e.boss) continue; const b = e.boss; mix(b.fase); mix(Math.round(b.escudo)); mix(b.janela ? 1 : 0); mix(Math.round(b.capturaT * 10)); mix(Math.round(b.prox * 10)); mix(Math.round(b.lento * 1000)); mix(b.pontos); if (b.cacada) mix(Math.round((b.dorme || 0) * 10)); }
   for (const l of st.ecos) { mix(l.length); for (const d of l) mix(d.length); }
 }
 function foto(sim) { return sim.chefes ? { fenda: sim.fenda, st: sim.chefes, avisos: sim.avisos, terreno: sim.terreno } : null; }
@@ -4158,7 +4195,8 @@ function volta(sim, d) { /* d = jsonBack(snap.chefes); salvamento antigo: tudo n
    com passagem entre elas e a espinha), placas de blindagem soltas, o crânio numa ponta e o "ventre" na outra (arena da Forja-Mãe).
    As peças são rochas (kind 'rock') com e.osso (1 costela, 2 placa, 3 vértebra, 4 crânio) e e.ang (direção); bloqueiam como as rochas das cordilheiras. */
 function planoTita(sim) {
-  const n = sim.players.length, a = sim.players[0].startAngle + PI / n; const ax = S.DM.cos(a), ay = S.DM.sin(a);
+  const n = sim.players.length, a = sim.players[0].startAngle + PI / n + (sim.cfg && sim.cfg.cacada && n % 2 ? PI : 0); const ax = S.DM.cos(a), ay = S.DM.sin(a);
+  /* 5.0g.1: na Caçada com 1 ou 3 jogadores a espinha gira meia volta: o ventre (a arena da Forja) fica entre as bases, não na frente de uma delas (era a 680 do Núcleo solo) */
   return { type: 'tita', lakes: [], ax, ay, ang: a, arena: { x: S.CX - ax * 500, y: S.CY - ay * 500, r: 170 }, costelas: [], cranio: { x: S.CX + ax * 820, y: S.CY + ay * 820 } };
 }
 function ossosTita(sim, nucs) {
@@ -14354,62 +14392,96 @@ ARD.progress = { KEY, MAX_LEVEL, LEVEL_XP, load, save, levelOf, levelInfo, addXp
 /* Aether Rift: Dominion — salvamentos (4.1c).
    Guarda partidas solo e de campanha no aparelho: um espaço automático ("auto", gravado a cada poucos segundos e ao sair
    da aba) e três espaços manuais. Cada registro tem um resumo (meta) para listar rápido e os dados da partida comprimidos
-   com gzip quando o navegador tem CompressionStream. Usa IndexedDB; sem ele, cai para o localStorage. */
+   com gzip quando o navegador tem CompressionStream. Usa IndexedDB; sem ele, cai para o localStorage.
+   5.0g.1: nenhuma chamada daqui devolve promise rejeitada por demora. No iPhone a primeira abertura do IndexedDB pode levar
+   vários segundos (ou nunca responder): cada abertura tem tempo-limite e uma segunda tentativa; sem resposta, o aparelho usa a
+   reserva do localStorage por um minuto e tenta de novo depois (uma abertura que chega atrasada é aproveitada). Leitura e
+   transação também têm tempo-limite; a leitura confere os dois lugares e fica com o registro mais novo. O gzip vai como
+   ArrayBuffer (o Safari guarda Blob no IndexedDB devagar e às vezes falha); os registros antigos, com Blob, continuam abrindo. */
 (function (ARD) {
 'use strict';
 const DB_NAME = 'ard-saves', STORE = 'saves', LS_PREFIX = 'ard-save-';
 const SLOTS = ['auto', 'm1', 'm2', 'm3'];
-let dbp = null;
-function openDb() {
+const ABRE_MS = [4000, 6000], TX_MS = 5000, PASSO_MS = 8000, PAUSA_MS = 60000; /* 5.0g.1: tempos-limite (abertura: 1ª e 2ª tentativa) e a pausa da reserva */
+let dbp = null, semIdbAte = 0;
+const espera = (p, ms, msg) => new Promise((res, rej) => { const t = setTimeout(() => rej(new Error(msg)), ms); p.then(v => { clearTimeout(t); res(v); }, e => { clearTimeout(t); rej(e); }); });
+function openDb() { /* 5.0g.1: 1ª tentativa; sem resposta em 4 s, uma 2ª (a 1ª continua valendo se chegar); sem nenhuma em 10 s, a reserva por um minuto */
   if (dbp) return dbp;
-  dbp = new Promise((res, rej) => {
-    try {
-      if (!('indexedDB' in globalThis) || !indexedDB) { rej(new Error('sem IndexedDB')); return; }
+  if (Date.now() < semIdbAte) return Promise.reject(new Error('IndexedDB em pausa'));
+  const p = new Promise((res, rej) => {
+    let feito = false;
+    const ok = db => { db.onversionchange = () => { try { db.close(); } catch (e) {} if (dbp && dbp.db === db) dbp = null; }; db.onclose = () => { if (dbp && dbp.db === db) dbp = null; };
+      if (!feito) { feito = true; p.db = db; res(db); return; }
+      if (!dbp) { const q = Promise.resolve(db); q.db = db; dbp = q; semIdbAte = 0; try { globalThis.dispatchEvent && globalThis.dispatchEvent(new Event('ard-saves-pronto')); } catch (e) {} return; } /* chegou atrasada: vale para a próxima vez (e a tela inicial relê os salvamentos) */
+      if (dbp.db !== db) try { db.close(); } catch (e) {} };
+    const falha = e => { if (feito) return; feito = true; rej(e); };
+    const tenta = () => { try {
+      if (!('indexedDB' in globalThis) || !indexedDB) { falha(new Error('sem IndexedDB')); return; }
       const rq = indexedDB.open(DB_NAME, 1);
       rq.onupgradeneeded = () => { const db = rq.result; if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE); };
-      rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error || new Error('IndexedDB falhou')); rq.onblocked = () => rej(new Error('IndexedDB bloqueado'));
-    } catch (e) { rej(e); }
+      rq.onsuccess = () => ok(rq.result); rq.onerror = () => falha(rq.error || new Error('IndexedDB falhou')); rq.onblocked = () => falha(new Error('IndexedDB bloqueado'));
+    } catch (e) { falha(e); } };
+    tenta(); setTimeout(() => { if (!feito) tenta(); }, ABRE_MS[0]); setTimeout(() => falha(new Error('IndexedDB demorou')), ABRE_MS[0] + ABRE_MS[1]);
   });
-  dbp.catch(() => { dbp = null; });
-  return dbp;
+  dbp = p; p.catch(() => { if (dbp === p) { dbp = null; semIdbAte = Date.now() + PAUSA_MS; } });
+  return p;
 }
-function tx(mode, fn) { return openDb().then(db => new Promise((res, rej) => { const t = db.transaction(STORE, mode); const st = t.objectStore(STORE); let out; const r = fn(st); if (r) r.onsuccess = () => { out = r.result; }; t.oncomplete = () => res(out); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error || new Error('transação abortada')); })); }
+function tx(mode, fn) {
+  return openDb().then(db => espera(new Promise((res, rej) => {
+    let t; try { t = db.transaction(STORE, mode); } catch (e) { if (dbp && dbp.db === db) dbp = null; rej(e); return; } /* conexão fechada pelo sistema: abre de novo na próxima */
+    const st = t.objectStore(STORE); let out; const r = fn(st); if (r) r.onsuccess = () => { out = r.result; };
+    t.oncomplete = () => res(out); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error || new Error('transação abortada')); }), TX_MS, 'IndexedDB demorou'));
+}
 const canGzip = typeof CompressionStream === 'function' && typeof DecompressionStream === 'function' && typeof Blob === 'function' && typeof Response === 'function';
-async function pack(obj) {
-  const json = JSON.stringify(obj);
-  if (!canGzip) return { enc: 'json', body: json, size: json.length };
-  try { const blob = await new Response(new Blob([json]).stream().pipeThrough(new CompressionStream('gzip'))).blob(); return { enc: 'gzip', body: blob, size: blob.size, raw: json.length }; }
-  catch (e) { return { enc: 'json', body: json, size: json.length }; }
+async function pack(json) {
+  if (!canGzip) return { enc: 'json', body: json, size: json.length, json };
+  try { const buf = await new Response(new Blob([json]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer(); return { enc: 'gzip', body: buf, size: buf.byteLength, raw: json.length, json }; } /* 5.0g.1: ArrayBuffer, não Blob */
+  catch (e) { return { enc: 'json', body: json, size: json.length, json }; }
 }
 async function unpack(rec) {
-  if (rec.enc === 'gzip') { const txt = await new Response(rec.body.stream().pipeThrough(new DecompressionStream('gzip'))).text(); return JSON.parse(txt); }
+  if (rec.enc === 'gzip') { const b = rec.body instanceof Blob ? rec.body : new Blob([rec.body]); const txt = await new Response(b.stream().pipeThrough(new DecompressionStream('gzip'))).text(); return JSON.parse(txt); }
   return JSON.parse(rec.body);
 }
 // localStorage: só texto; sem gzip (o tamanho cabe: 60–300 KB por partida)
 const ls = {
-  put(slot, meta, data) { localStorage.setItem(LS_PREFIX + slot, JSON.stringify({ meta, enc: 'json', body: JSON.stringify(data) })); },
+  put(slot, meta, json) { localStorage.setItem(LS_PREFIX + slot, JSON.stringify({ meta, enc: 'json', body: json })); },
   get(slot) { const t = localStorage.getItem(LS_PREFIX + slot); return t ? JSON.parse(t) : null; },
   del(slot) { localStorage.removeItem(LS_PREFIX + slot); },
 };
+function lsPut(slot, meta, json) { try { ls.put(slot, meta, json); meta.bytes = (localStorage.getItem(LS_PREFIX + slot) || '').length; meta.local = true; return meta; } catch (e) { console.warn('[ARD] salvamento: sem espaço no aparelho', e); return null; } }
 // 4.2g — gravações e apagamentos em fila, na ordem em que foram pedidos (um salvamento ainda comprimindo não cai depois de um del('auto')); cada passo tem tempo-limite para a fila nunca travar
+// 5.0g.1: o passo que passa do tempo-limite faz a reserva (localStorage) e responde; a fila nunca devolve promise rejeitada
 let queue = Promise.resolve();
-function serial(fn) { const p = queue.then(() => Promise.race([fn(), new Promise((_, rej) => setTimeout(() => rej(new Error('armazenamento demorou')), 8000))])); queue = p.then(() => {}, () => {}); return p; }
+function serial(fn, reserva) {
+  const p = queue.then(() => new Promise(res => { let feito = false; const ctx = { passou: false }; const fim = v => { if (feito) return; feito = true; clearTimeout(t); res(v); };
+    const t = setTimeout(() => { ctx.passou = true; let v = null; try { v = reserva(); } catch (e) {} fim(v); }, PASSO_MS);
+    Promise.resolve(ctx).then(fn).then(fim, () => { let v = null; try { v = reserva(); } catch (e) {} fim(v); }); }));
+  queue = p; return p;
+}
 function put(slot, meta, data) {
   meta = Object.assign({}, meta, { slot, savedAt: Date.now() });
-  const packed = pack(data); packed.catch(() => {}); // a fotografia vira texto já, na hora do pedido
-  return serial(async () => {
-    try { const p = await packed; meta.bytes = p.size; await tx('readwrite', st => st.put({ meta, enc: p.enc, body: p.body }, slot)); try { ls.del(slot); } catch (e) {} return meta; }
-    catch (e) { ls.put(slot, meta, data); meta.bytes = (localStorage.getItem(LS_PREFIX + slot) || '').length; return meta; }
-  });
+  let json = null; try { json = JSON.stringify(data); } catch (e) { return Promise.resolve(null); } /* a fotografia vira texto já, na hora do pedido */
+  const packed = pack(json); packed.catch(() => {});
+  return serial(async ctx => {
+    try { const p = await packed; if (ctx.passou) return null; /* 5.0g.1: o passo já fez a reserva; não grava atrasado */ meta.bytes = p.size; await tx('readwrite', st => st.put({ meta, enc: p.enc, body: p.body }, slot)); try { ls.del(slot); } catch (e) {} return meta; }
+    catch (e) { return lsPut(slot, meta, json); }
+  }, () => lsPut(slot, meta, json));
 }
-async function getRec(slot) { try { const r = await tx('readonly', st => st.get(slot)); if (r) return r; } catch (e) {} try { return ls.get(slot); } catch (e) { return null; } }
+async function getRec(slot) {
+  let a = null, b = null;
+  try { a = await tx('readonly', st => st.get(slot)) || null; } catch (e) {}
+  try { b = ls.get(slot); } catch (e) {}
+  if (a && b) return ((b.meta && b.meta.savedAt) || 0) > ((a.meta && a.meta.savedAt) || 0) ? b : a; /* 5.0g.1: o mais novo dos dois lugares */
+  return a || b;
+}
 async function get(slot) { const r = await getRec(slot); if (!r) return null; return { meta: r.meta, data: await unpack(r) }; }
-async function meta(slot) { const r = await getRec(slot); return r ? r.meta : null; }
-async function list() { const out = []; for (const s of SLOTS) { try { const m = await meta(s); if (m) out.push(m); } catch (e) {} } return out; }
-function del(slot) { return serial(async () => { try { await tx('readwrite', st => st.delete(slot)); } catch (e) {} try { ls.del(slot); } catch (e) {} }); }
+async function meta(slot) { try { const r = await getRec(slot); return r ? r.meta : null; } catch (e) { return null; } }
+async function list() { const out = []; for (const s of SLOTS) { const m = await meta(s); if (m) out.push(m); } return out; }
+function del(slot) { const lsDel = () => { try { ls.del(slot); } catch (e) {} return true; };
+  return serial(async () => { try { await tx('readwrite', st => st.delete(slot)); } catch (e) {} return lsDel(); }, lsDel); }
 function ago(ts) { const s = Math.max(0, Math.round((Date.now() - ts) / 1000)); if (s < 60) return 'há ' + s + ' s'; const m = Math.round(s / 60); if (m < 60) return 'há ' + m + ' min'; const h = Math.round(m / 60); if (h < 48) return 'há ' + h + ' h'; return 'há ' + Math.round(h / 24) + ' dias'; }
 const mmss = t => Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0');
-ARD.saves = { SLOTS, put, get, meta, list, del, ago, mmss, gzip: canGzip };
+ARD.saves = { SLOTS, put, get, meta, list, del, ago, mmss, gzip: canGzip, estado: () => ({ idb: !!dbp, pausa: Math.max(0, semIdbAte - Date.now()) }) };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Aether Rift: Dominion — Campanha "O Grande Alinhamento" (4.0e; renomeada na 4.1b): atos, missões com roteiro, conquistas, relíquias e o executor.
@@ -24065,6 +24137,8 @@ const CSS = `
 #chefe-hud .mk{position:absolute;top:-1px;bottom:-1px;width:2px;background:#0A0C10;box-shadow:0 0 0 1px rgba(255,210,63,.6)}
 #chefe-hud .rod{display:flex;justify-content:space-between;margin-top:3px;font:600 .66rem/1 var(--fm,monospace);letter-spacing:.1em;text-transform:uppercase;color:#E8E2D6}
 #chefe-hud .pf b{color:#FFD23F}#chefe-hud .esc b{color:#7FE8FF}
+#chefe-hud.dorme .fs{color:#7FE8FF;font-size:.8rem}#chefe-hud.dorme .hp{filter:saturate(.35) brightness(.8)}
+#hints.abaixo-chefe{top:calc(var(--chefe-fim,0px) + 6px)!important}
 #chefe-hud.jan .br{border-color:#E07CFF;box-shadow:0 0 12px rgba(224,124,255,.6)}
 #chefe-av{position:fixed;left:50%;top:32%;transform:translate(-50%,-50%);z-index:6;pointer-events:none;text-align:center;opacity:0;transition:opacity .25s}
 #chefe-av.on{opacity:1}
@@ -24076,7 +24150,7 @@ body.cine-on #chefe-hud,body.cine-on #chefe-av{visibility:hidden}
 @media (max-width:700px){#chefe-hud{top:calc(env(safe-area-inset-top,0px) + 90px);width:auto;left:58px;right:130px;transform:none;padding:4px 7px 5px}#chefe-hud .cab{flex-direction:column;align-items:flex-start;gap:1px}#chefe-hud .nm{font-size:.9rem}#chefe-hud .fs{font-size:.6rem;letter-spacing:.06em}#chefe-hud .ti{display:none}#chefe-hud .br{height:12px}#chefe-hud .rod{font-size:.6rem;letter-spacing:.04em}}
 @media (orientation:landscape) and (max-height:500px){#chefe-hud{top:calc(env(safe-area-inset-top,0px) + 110px);width:min(320px,38vw);left:auto;right:calc(env(safe-area-inset-right,0px) + 130px);transform:none;padding:4px 7px 5px}#chefe-hud .ti{display:none}#chefe-hud .nm{font-size:.9rem}#chefe-hud .fs{font-size:.6rem}#chefe-hud .br{height:11px}#chefe-av{top:40%}}
 `;
-let H = null; const HS = { id: -1, nome: '', hp: -1, es: -1, pf: -1, fase: -1, jan: null, lim: '' };
+let H = null; const HS = { id: -1, nome: '', hp: -1, es: -1, pf: -1, fase: -1, jan: null, lim: '', dorme: -1 };
 function monta() { if (H) return H; if (!document.getElementById('chefe-css')) { const st = document.createElement('style'); st.id = 'chefe-css'; st.textContent = CSS; document.head.appendChild(st); }
   const d = document.createElement('div'); d.id = 'chefe-hud'; d.hidden = true; d.setAttribute('role', 'status');
   d.innerHTML = '<div class="cab"><span class="nm"></span><span class="ti"></span><span class="fs"></span></div><div class="br"><div class="rc"></div><div class="hp"></div><div class="es"></div><div class="mks"></div></div><div class="rod"><span class="esc"></span><span class="pf"></span></div>';
@@ -24089,8 +24163,10 @@ function anuncia(k, n, jan, dur) { const h = monta(); setT(h.avK, k); setT(h.avN
 function barra(sim, human) {
   const h = monta(); const b = CH.chaves.barra ? CH.bossOf(sim) : null; if (!b || !b.boss) { if (!h.d.hidden) h.d.hidden = true; HS.id = -1; return null; }
   const bb = b.boss, tipo = bb.tipo; if (h.d.hidden) h.d.hidden = false;
-  if (HS.id !== b.id || HS.nome !== ARD.idioma) { HS.id = b.id; HS.nome = ARD.idioma; setT(h.nm, nomeDe(tipo)); setT(h.ti, tituloDe(tipo)); const lim = limiares(tipo); h.mks.innerHTML = lim.map(l => '<i class="mk" style="left:' + (l * 100).toFixed(1) + '%"></i>').join(''); HS.fase = -1; HS.pf = -1; HS.es = -1; HS.jan = null; }
-  const f = fase(b); if (f !== HS.fase) { HS.fase = f; setT(h.fs, T('chefe.ui.fase', { n: f }, 'Fase ' + f) + ' · ' + T('chefe.' + tipo + '.fase.' + f, null, '')); }
+  if (HS.id !== b.id || HS.nome !== ARD.idioma) { HS.id = b.id; HS.nome = ARD.idioma; setT(h.nm, nomeDe(tipo)); setT(h.ti, tituloDe(tipo)); const lim = limiares(tipo); h.mks.innerHTML = lim.map(l => '<i class="mk" style="left:' + (l * 100).toFixed(1) + '%"></i>').join(''); HS.fase = -1; HS.dorme = -1; /* 5.0g.1 */ HS.pf = -1; HS.es = -1; HS.jan = null; }
+  const dorme = bb.dorme > sim.time ? Math.ceil(bb.dorme - sim.time) : 0; /* 5.0g.1: Caçada, contagem do despertar no lugar da fase */
+  if (dorme !== HS.dorme) { HS.dorme = dorme; HS.fase = -1; h.d.classList.toggle('dorme', dorme > 0); if (dorme > 0) setT(h.fs, T('chefe.ui.desperta', { t: Math.floor(dorme / 60) + ':' + String(dorme % 60).padStart(2, '0') }, 'Desperta em ' + Math.floor(dorme / 60) + ':' + String(dorme % 60).padStart(2, '0'))); }
+  const f = fase(b); if (!dorme && f !== HS.fase) { HS.fase = f; setT(h.fs, T('chefe.ui.fase', { n: f }, 'Fase ' + f) + ' · ' + T('chefe.' + tipo + '.fase.' + f, null, '')); }
   const fr = b.hp / Math.max(1, b.maxHp); if (Math.abs(fr - HS.hp) > 0.0005) { HS.hp = fr; setX(h.hp, fr); setX(h.rc, fr); }
   const em = bb.escudoMax || 0, es = em > 0 ? Math.max(0, bb.escudo || 0) / em : 0; if (Math.abs(es - HS.es) > 0.002) { HS.es = es; setX(h.es, es); setT(h.esc, es > 0 ? '' : ''); if (es > 0) h.esc.innerHTML = T('chefe.ui.escudo', null, 'Escudo') + ' <b>' + Math.round(es * 100) + '%</b>'; else setT(h.esc, ''); }
   let pf = 0; for (const e of sim.ents) if (e.alive && e.parte && e.parte.chefe === b.id && e.parte.tipo !== 'nucleo') pf++;
@@ -24107,11 +24183,17 @@ CH.eventos = function (ev, G) { if (!ev || !ev.length || !G || !G.sim) return; c
         if (u && ARD.cinema && ARD.cinema.ligada && ARD.cinema.ligada('chefe')) ARD.cinema.chefe(G, u, { nome: nomeDe(tipo), epiteto: tituloDe(tipo), cor: tipo === 'forja' ? '#FF9A3A' : tipo === 'sentinela' ? '#FFC24A' : '#9FE8FF', kicker: T('cine.chefao', null, 'Chefão') + ' · ' + T('chefe.ui.fenda', null, 'Da Fenda') });
         else anuncia(T('cine.chefao', null, 'Chefão'), nomeDe(tipo), false, 3000); }
       else if (e.ev === 'fase') { const f = Math.max(1, e.fase | 0 || 1); if (ultFase.get(e.id) === f) continue; ultFase.set(e.id, f); if (f > 1) { anuncia(T('chefe.ui.fase', { n: f }, 'Fase ' + f), T('chefe.' + tipo + '.fase.' + f, null, ''), false, 2800); try { ARD.audio && ARD.audio.sfx && (ARD.audio.sfx('storm'), ARD.audio.sfx('danger')); } catch (er) {} if (G.R) G.R.shake = Math.max(G.R.shake || 0, 0.6); } }
+      else if (e.ev === 'desperta') { anuncia(nomeDe(tipo), T(e.atacado ? 'chefe.ui.despertou-atacado' : 'chefe.ui.despertou', null, 'Despertou!'), false, 2800); try { ARD.audio && ARD.audio.sfx && ARD.audio.sfx('danger'); } catch (er) {} if (G.R) G.R.shake = Math.max(G.R.shake || 0, 0.5); } /* 5.0g.1 */
       else if (e.ev === 'janela') { anuncia(T('chefe.ui.janela-k', null, 'Agora!'), T('chefe.ui.janela', null, 'Janela de dano'), true, 2000); try { ARD.audio && ARD.audio.sfx && ARD.audio.sfx('promote'); } catch (er) {} }
       else if (e.ev === 'morre') { anuncia(nomeDe(tipo), T('chefe.ui.derrotado', null, 'Derrotado'), false, 3600); try { ARD.audio && ARD.audio.sfx && ARD.audio.sfx('explosion'); } catch (er) {} if (G.R) G.R.shake = Math.max(G.R.shake || 0, 1); } }
     else if (e.t === 'aviso') { const now = performance.now(); if (now - (CH._somAv || 0) > 1200) { CH._somAv = now; try { ARD.audio && ARD.audio.sfx && ARD.audio.sfx('alert'); } catch (er) {} } } } };
+/* 5.0g.1: a dica do tutorial (#hints) desce para baixo da barra do chefe quando as duas dividem a mesma faixa da tela (celular em pé e o
+   computador); conferido a cada 0,4 s, sem mexer no layout a cada quadro */
+let dicaT = 0; function dicaAbaixo(b) { const hi = document.getElementById('hints'); if (!hi) return; const nt = performance.now(); if (nt - dicaT < 400) return; dicaT = nt;
+  let fim = 0; if (b && H && !H.d.hidden && !hi.hidden && hi.offsetParent) { const a = H.d.getBoundingClientRect(), d = hi.getBoundingClientRect(); if (a.height > 0 && d.left < a.right && d.right > a.left) fim = Math.ceil(a.bottom); }
+  if (fim) { hi.style.setProperty('--chefe-fim', fim + 'px'); hi.classList.add('abaixo-chefe'); } else if (hi.classList.contains('abaixo-chefe')) hi.classList.remove('abaixo-chefe'); }
 CH.quadro = function (now, dt, G) { if (!G || !G.sim) return; const sim = G.sim; if (!CH.temChefe(sim) && !H) return;
-  const b = barra(sim, G.human); if (H && H.avT && performance.now() > H.avT) { H.avT = 0; H.av.classList.remove('on'); }
+  const b = barra(sim, G.human); if (H && H.avT && performance.now() > H.avT) { H.avT = 0; H.av.classList.remove('on'); } dicaAbaixo(b); /* 5.0g.1 */
   /* música: o tema do chefão enquanto ele vive (fora das cenas, que trocam a música sozinhas) */
   const M = ARD.musica; if (!M || typeof M.cena !== 'function') return; const cine = ARD.cinema && ARD.cinema.ativa && ARD.cinema.ativa();
   if (b && !G.ended) { if (!cine) { const st = M.estado ? M.estado() : null; if (!st || st.cena !== 'chefao') { M.cena('chefao'); musicaMinha = true; } } }
@@ -26266,7 +26348,7 @@ function mixSync(d) { const q = s => d.querySelector(s), ef = q('[data-som-efeit
   if (mu && mu.checked !== (A.musica !== false)) mu.checked = A.musica !== false; if (vm && +vm.value !== Math.round(A.volMusica * 100)) vm.value = Math.round(A.volMusica * 100); if (vm) vm.disabled = A.musica === false; if (sa && sa.value !== A.saida) sa.value = A.saida; }
 A.mixUI = () => MIX.forEach(mixSync); /* 5.0f */
 /* 5.0f.1: créditos da trilha e dos efeitos de arquivo (assets/som/; a licença CC BY 4.0 pede o crédito de cada faixa). Os títulos e os nomes ficam no original, marcados lang="en" */
-const FAIXAS = ['Crusade - Heavy Industry', 'Industrial Cinematic', 'Industrial Revolution', 'Lost Frontier', 'Oppressive Gloom', 'Rynos Theme', 'Mystic Force', 'Invariance', 'Constance', 'Tempting Secrets', 'Spellbound', 'Final Battle of the Dark Wizards', 'Drums of the Deep', 'Steel Rods', 'Corruption', 'Black Vortex', 'Our Story Begins', 'Mechanolith', 'Discovery Hit', 'Peaceful Desolation'];
+const FAIXAS = ['Lightless Dawn', 'Industrial Cinematic', 'Hiding Your Reality', 'Lost Frontier', 'Oppressive Gloom', 'Rynos Theme', 'Mystic Force', 'Invariance', 'Constance', 'Tempting Secrets', 'Spellbound', 'Final Battle of the Dark Wizards', 'The Hive', 'Giant Wyrm', 'Corruption', 'Black Vortex', 'Our Story Begins', 'Mechanolith', 'Discovery Hit', 'Peaceful Desolation']; /* 5.0g.1: Vehnar paz e batalha, Vorag paz e tensão novas */
 function creditosHTML() { return '<details class="som-creditos" style="margin-top:.4em;font-size:.85em"><summary data-i18n="som.creditos">' + esc(TX('som.creditos', null, 'Créditos do som')) + '</summary><p style="margin:.4em 0"><span data-i18n="som.creditos.musica">' + esc(TX('som.creditos.musica', null, 'Música')) + '</span>: <span lang="en">' + FAIXAS.map(t => '“' + esc(t) + '”').join(', ')
   + ' — Kevin MacLeod (incompetech.com), Creative Commons: By Attribution 4.0 (creativecommons.org/licenses/by/4.0/).</span></p><p style="margin:.4em 0"><span data-i18n="som.creditos.efeitos">' + esc(TX('som.creditos.efeitos', null, 'Efeitos')) + '</span>: <span lang="en">Kenney (kenney.nl), rubberduck, qubodup, Joth, pauliuw, Nenad Simic (opengameart.org), CC0.</span></p></details>'; }
 /* 5.0c.1: Vozes gravadas (Ajustes): ligadas por padrão; desligadas, todas as falas usam a voz do sistema (como na 5.0c) */
@@ -29398,13 +29480,13 @@ const RES3 = ['plasma', 'minerio', 'dados'], RES_CLS = { plasma: 'pl', minerio: 
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">' + Tx('geral.gratis') + '</span>'; } /* 5.0c */
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-11-06 03:38Z';
+const BUILD = '2026-11-06 17:33Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.0g';
+const VERSION = '5.0g.1';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -29484,10 +29566,10 @@ function initStart() {
       for (const [id, kind] of [['saved-solo', 'solo'], ['saved-camp', 'campanha']]) { const el = $(id); if (!el) continue; const rows = list.filter(m => m.slot !== 'auto' && m.kind === kind); el.hidden = !rows.length;
         el.innerHTML = rows.length ? '<div class="sh">' + Tx('inicio.salvas') + '</div>' + rows.map(m => `<div class="svrow"><div class="sv-t">${esc(TRx(m.title))}<small>${esc(TRx(m.sub))} · ${Tx('inicio.espaco', { n: m.slot.slice(1) })} · ${ARD.saves.ago(m.savedAt)}</small></div><button class="btn" data-load="${m.slot}">${Tx('inicio.carregar')}</button><button class="btn ghost" data-del="${m.slot}" aria-label="${Tx('inicio.apagar')}">🗑</button></div>`).join('') : ''; /* 5.0c */
         el.querySelectorAll('[data-load]').forEach(b => b.onclick = () => resumeFrom(b.dataset.load, false));
-        el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (b.dataset.armed) ARD.saves.del(b.dataset.del).then(refreshSaved); else { b.dataset.armed = '1'; b.textContent = Tx('inicio.apagar-q'); /* 5.0c */ setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = '🗑'; } }, 3000); } }); }
+        el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (b.dataset.armed) ARD.saves.del(b.dataset.del).then(refreshSaved, refreshSaved); /* 5.0g.1 */ else { b.dataset.armed = '1'; b.textContent = Tx('inicio.apagar-q'); /* 5.0c */ setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = '🗑'; } }, 3000); } }); }
     }).catch(e => console.warn('[ARD] salvamentos indisponíveis:', e));
   }
-  if ($('btn-resume')) { $('btn-resume').addEventListener('click', () => resumeFrom('auto', false)); $('btn-resume-drop').addEventListener('click', e => { const b = e.currentTarget; if (b.dataset.armed) ARD.saves.del('auto').then(refreshSaved); else { b.dataset.armed = '1'; b.textContent = Tx('inicio.descartar-q'); setTimeout(() => { delete b.dataset.armed; b.textContent = Tx('inicio.descartar'); }, 3000); /* 5.0c */ } }); }
+  if ($('btn-resume')) { $('btn-resume').addEventListener('click', () => resumeFrom('auto', false)); $('btn-resume-drop').addEventListener('click', e => { const b = e.currentTarget; if (b.dataset.armed) ARD.saves.del('auto').then(refreshSaved, refreshSaved); /* 5.0g.1 */ else { b.dataset.armed = '1'; b.textContent = Tx('inicio.descartar-q'); setTimeout(() => { delete b.dataset.armed; b.textContent = Tx('inicio.descartar'); }, 3000); /* 5.0c */ } }); }
   // 4.1c — convidado que recarregou a página (queda de energia, aba fechada) volta sozinho à sala em até 2 minutos
   function rejoinAfterReload(ms) {
     const card = $('resume-card'); const N = ARD.net.create(); let done = false; const t0 = Date.now(); window.__rejoining = true; // 4.2a: o teste de desempenho espera
@@ -29504,8 +29586,9 @@ function initStart() {
   }
   const msess = mpSession.load();
   if (msess && msess.token && Date.now() - msess.at < 120000 && !params.get('autostart') && !params.get('novo') && !params.get('bench')) rejoinAfterReload(msess);
-  else if (ARD.saves && !params.get('autostart') && !params.get('missao') && !params.get('novo') && !params.get('campanha') && !params.get('bench'))
-    ARD.saves.meta('auto').then(m => { if (m && !m.parked && (params.get('retomar') || Date.now() - m.savedAt < RESUME_AUTO_S * 1000)) resumeFrom('auto', true).then(ok => { if (!ok) refreshSaved(); }); else refreshSaved(); }).catch(() => refreshSaved());
+  else if (ARD.saves && !params.get('autostart') && !params.get('missao') && !params.get('novo') && !params.get('campanha') && !params.get('bench')) {
+    const checaAuto = () => ARD.saves.meta('auto').then(m => { if (document.body.classList.contains('ingame')) return; if (m && !m.parked && (params.get('retomar') || Date.now() - m.savedAt < RESUME_AUTO_S * 1000)) resumeFrom('auto', true).then(ok => { if (!ok) refreshSaved(); }); else refreshSaved(); }).catch(() => refreshSaved());
+    checaAuto(); window.addEventListener('ard-saves-pronto', () => { if (!document.body.classList.contains('ingame')) checaAuto(); }); } /* 5.0g.1: o IndexedDB que abriu atrasado (iPhone) traz o salvamento que a primeira leitura não viu */
   else refreshSaved();
   if (msess && Date.now() - msess.at >= 120000) mpSession.clear();
   // a ajuda tambem precisa fechar na tela inicial (antes só era ligada dentro da partida); X e Esc fecham qualquer janela
@@ -29972,7 +30055,7 @@ function startGame(cfg, netCtx) {
     const draw = () => ARD.saves.list().then(list => { const by = {}; for (const m of list) by[m.slot] = m;
       $('save-slots').innerHTML = ['m1', 'm2', 'm3'].map((sl, i) => { const m = by[sl]; return `<button class="slot" data-slot="${sl}" ${fenda ? 'disabled' : ''}><b>${Tx('jogo.espaco', { n: i + 1 })}</b><span>${m ? esc(TRx(m.title)) + '<br><small>' + esc(TRx(m.sub)) + ' · ' + Tx('jogo.salvo', { quando: ARD.saves.ago(m.savedAt) }) + '</small>' : '<small>' + Tx('jogo.vazio') + '</small>'}</span></button>`; }).join(''); /* 5.0c */
       $('save-slots').querySelectorAll('[data-slot]').forEach(b => b.onclick = () => { const sl = b.dataset.slot; const go = () => G.saveNow(sl).then(m => { if (m) { notice(Tx('jogo.salva-no', { n: sl.slice(1) })); draw(); } else notice(Tx('jogo.nao-salvou')); }); /* 5.0c */
-        if (by[sl]) ui.confirm(Tx('jogo.substituir', { n: sl.slice(1) }), go); else go(); }); }); /* 5.0c */
+        if (by[sl]) ui.confirm(Tx('jogo.substituir', { n: sl.slice(1) }), go); else go(); }); }).catch(e => console.warn('[ARD] salvamentos indisponíveis:', e)); /* 5.0c; 5.0g.1: catch */
     draw();
     $('save-park').onclick = () => { if (G.leaving) return; const p = G.saveNow('auto', { parked: true }); G.leaving = true; within(p, 6000).then(m => { if (m) goStart(); else { G.leaving = false; notice(Tx('jogo.nao-salvou')); } }); }; /* 5.0c */ // 4.2g: volta ao início de verdade (antes recarregava o link da missão e ela recomeçava)
     box.hidden = false;
@@ -30380,7 +30463,7 @@ function startGame(cfg, netCtx) {
   }
   // ---------- end ----------
   function endGame(result) {
-    if (G.ended) return; G.ended = true; if (ARD.vozes) try { ARD.vozes.fim(result.campaign ? !!result.campaign.won : result.outcome === 'victory' || (result.outcome === 'over' && result.winner === human)); } catch (e) {} /* 5.0c.1: Vitória/Derrota e a reação do líder */ if (G.autoSave && ARD.saves) ARD.saves.del('auto'); if (net) mpSession.clear(); // partida terminada não volta
+    if (G.ended) return; G.ended = true; if (ARD.vozes) try { ARD.vozes.fim(result.campaign ? !!result.campaign.won : result.outcome === 'victory' || (result.outcome === 'over' && result.winner === human)); } catch (e) {} /* 5.0c.1: Vitória/Derrota e a reação do líder */ if (G.autoSave && ARD.saves) ARD.saves.del('auto').catch(() => {}); /* 5.0g.1: era esta, no fim da partida, a promise solta do iPhone ("armazenamento demorou") */ if (net) mpSession.clear(); // partida terminada não volta
     if (result.campaign) { // 4.0e: fim de missão
       const r = result.campaign; const prep = G.camp.prep; const scores = sim.players.map(q => ({ id: q.id, name: q.name, score: q.alive ? S.score(sim, q) : 0, alive: q.alive }));
       result = { outcome: r.won ? 'victory' : 'defeat', reason: r.reason, scores };
@@ -30433,9 +30516,14 @@ function startGame(cfg, netCtx) {
 
 function toggleHelp(force) { const h = $('help'); h.hidden = force === true ? false : !h.hidden; }
 
-window.addEventListener('error', e => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent = 'Erro: ' + (e.message || e.error); } });
+/* 5.0g.1: o rodapé de erro mostra a mensagem e, depois dela, o lugar (arquivo, linha e coluna), nos três motores: o Safari não põe a mensagem no stack */
+const lugarErro = (st, arq, lin, col) => { let m = null; if (st) for (const l of String(st).split('\n')) { m = /((?:https?|file|blob):[^\s()]*?|[\w./-]+\.(?:js|html)):(\d+):(\d+)\)?\s*$/.exec(l.trim()); if (m) break; } const a = m ? m[1] : (arq && arq !== 'undefined' ? arq : ''), li = m ? m[2] : lin, co = m ? m[3] : col; if (!a && !li) return '';
+  const nome = !a ? Tx('erro.pagina', null, 'a página') : String(a).split(/[?#]/)[0].replace(/\/+$/, '').split('/').pop() || 'index.html'; return Tx('erro.lugar', { arq: nome, lin: li || '?', col: co || '?' }, 'em ' + nome + ', linha ' + (li || '?') + ', coluna ' + (co || '?')); };
+const textoErro = (msg, lugar) => { msg = String(msg == null || msg === '' ? Tx('erro.sem-msg', null, 'erro sem mensagem') : msg).replace(/^(Uncaught )?(\w*Error: )?/, '').slice(0, 220); return msg + (lugar ? ' · ' + lugar : ''); };
+const mostraErro = (rot, t) => { const el = $('errbox'); if (!el) return; el.hidden = false; el.textContent = rot + ': ' + t; el.title = Tx('erro.fechar', null, 'Toque para fechar'); };
+window.addEventListener('error', e => { const er = e.error; mostraErro(Tx('erro.titulo', null, 'Erro'), textoErro(e.message || (er && er.message) || er, lugarErro(er && er.stack, e.filename, e.lineno, e.colno))); });
 { const setBuild = n => { const el = $('build-info'); if (el) el.textContent = 'Build ' + BUILD + ' · GPU: ' + n; }; document.addEventListener('DOMContentLoaded', () => ARD.gpuProbe().then(setBuild)); } /* 4.3k: o nome da GPU cria um contexto WebGL (segundos na GPU por software): vem da sonda única, depois do load */
-window.addEventListener('unhandledrejection', e => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent = 'Erro (promise): ' + (e.reason && (e.reason.stack || e.reason.message) || e.reason); } });
+window.addEventListener('unhandledrejection', e => { const r = e.reason; const msg = r && typeof r === 'object' ? (r.message || r.name || String(r)) : r; mostraErro(Tx('erro.promessa', null, 'Erro (tarefa em segundo plano)'), textoErro(msg, lugarErro(r && r.stack))); }); /* 5.0g.1: a mensagem antes do lugar */
 document.addEventListener('DOMContentLoaded', initStart);
 if (params.get('debug')) { const oe = console.error, ow = console.warn; const cap = (...a) => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent += ' || ' + a.map(x => String(x && x.message || x)).join(' ').slice(0, 400); } }; console.error = (...a) => { cap(...a); oe.apply(console, a); }; console.warn = (...a) => { cap(...a); ow.apply(console, a); }; }
 /* 5.0b.1: desbloqueio do som no primeiro gesto de verdade (touchend, click, pointerup, keydown; o pointerdown só do mouse, como antes no computador). No iOS o touchstart e o pointerdown do toque não valem para o áudio: com só eles (antes), o AudioContext ficava suspenso e as falas eram descartadas. ARD.audio.gesto confere o evento e faz o resto (src/audio.js), na captura para vir antes dos botões */

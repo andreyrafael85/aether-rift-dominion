@@ -334,6 +334,8 @@ const CSS = `
 #chefe-hud .mk{position:absolute;top:-1px;bottom:-1px;width:2px;background:#0A0C10;box-shadow:0 0 0 1px rgba(255,210,63,.6)}
 #chefe-hud .rod{display:flex;justify-content:space-between;margin-top:3px;font:600 .66rem/1 var(--fm,monospace);letter-spacing:.1em;text-transform:uppercase;color:#E8E2D6}
 #chefe-hud .pf b{color:#FFD23F}#chefe-hud .esc b{color:#7FE8FF}
+#chefe-hud.dorme .fs{color:#7FE8FF;font-size:.8rem}#chefe-hud.dorme .hp{filter:saturate(.35) brightness(.8)}
+#hints.abaixo-chefe{top:calc(var(--chefe-fim,0px) + 6px)!important}
 #chefe-hud.jan .br{border-color:#E07CFF;box-shadow:0 0 12px rgba(224,124,255,.6)}
 #chefe-av{position:fixed;left:50%;top:32%;transform:translate(-50%,-50%);z-index:6;pointer-events:none;text-align:center;opacity:0;transition:opacity .25s}
 #chefe-av.on{opacity:1}
@@ -345,7 +347,7 @@ body.cine-on #chefe-hud,body.cine-on #chefe-av{visibility:hidden}
 @media (max-width:700px){#chefe-hud{top:calc(env(safe-area-inset-top,0px) + 90px);width:auto;left:58px;right:130px;transform:none;padding:4px 7px 5px}#chefe-hud .cab{flex-direction:column;align-items:flex-start;gap:1px}#chefe-hud .nm{font-size:.9rem}#chefe-hud .fs{font-size:.6rem;letter-spacing:.06em}#chefe-hud .ti{display:none}#chefe-hud .br{height:12px}#chefe-hud .rod{font-size:.6rem;letter-spacing:.04em}}
 @media (orientation:landscape) and (max-height:500px){#chefe-hud{top:calc(env(safe-area-inset-top,0px) + 110px);width:min(320px,38vw);left:auto;right:calc(env(safe-area-inset-right,0px) + 130px);transform:none;padding:4px 7px 5px}#chefe-hud .ti{display:none}#chefe-hud .nm{font-size:.9rem}#chefe-hud .fs{font-size:.6rem}#chefe-hud .br{height:11px}#chefe-av{top:40%}}
 `;
-let H = null; const HS = { id: -1, nome: '', hp: -1, es: -1, pf: -1, fase: -1, jan: null, lim: '' };
+let H = null; const HS = { id: -1, nome: '', hp: -1, es: -1, pf: -1, fase: -1, jan: null, lim: '', dorme: -1 };
 function monta() { if (H) return H; if (!document.getElementById('chefe-css')) { const st = document.createElement('style'); st.id = 'chefe-css'; st.textContent = CSS; document.head.appendChild(st); }
   const d = document.createElement('div'); d.id = 'chefe-hud'; d.hidden = true; d.setAttribute('role', 'status');
   d.innerHTML = '<div class="cab"><span class="nm"></span><span class="ti"></span><span class="fs"></span></div><div class="br"><div class="rc"></div><div class="hp"></div><div class="es"></div><div class="mks"></div></div><div class="rod"><span class="esc"></span><span class="pf"></span></div>';
@@ -358,8 +360,10 @@ function anuncia(k, n, jan, dur) { const h = monta(); setT(h.avK, k); setT(h.avN
 function barra(sim, human) {
   const h = monta(); const b = CH.chaves.barra ? CH.bossOf(sim) : null; if (!b || !b.boss) { if (!h.d.hidden) h.d.hidden = true; HS.id = -1; return null; }
   const bb = b.boss, tipo = bb.tipo; if (h.d.hidden) h.d.hidden = false;
-  if (HS.id !== b.id || HS.nome !== ARD.idioma) { HS.id = b.id; HS.nome = ARD.idioma; setT(h.nm, nomeDe(tipo)); setT(h.ti, tituloDe(tipo)); const lim = limiares(tipo); h.mks.innerHTML = lim.map(l => '<i class="mk" style="left:' + (l * 100).toFixed(1) + '%"></i>').join(''); HS.fase = -1; HS.pf = -1; HS.es = -1; HS.jan = null; }
-  const f = fase(b); if (f !== HS.fase) { HS.fase = f; setT(h.fs, T('chefe.ui.fase', { n: f }, 'Fase ' + f) + ' · ' + T('chefe.' + tipo + '.fase.' + f, null, '')); }
+  if (HS.id !== b.id || HS.nome !== ARD.idioma) { HS.id = b.id; HS.nome = ARD.idioma; setT(h.nm, nomeDe(tipo)); setT(h.ti, tituloDe(tipo)); const lim = limiares(tipo); h.mks.innerHTML = lim.map(l => '<i class="mk" style="left:' + (l * 100).toFixed(1) + '%"></i>').join(''); HS.fase = -1; HS.dorme = -1; /* 5.0g.1 */ HS.pf = -1; HS.es = -1; HS.jan = null; }
+  const dorme = bb.dorme > sim.time ? Math.ceil(bb.dorme - sim.time) : 0; /* 5.0g.1: Caçada, contagem do despertar no lugar da fase */
+  if (dorme !== HS.dorme) { HS.dorme = dorme; HS.fase = -1; h.d.classList.toggle('dorme', dorme > 0); if (dorme > 0) setT(h.fs, T('chefe.ui.desperta', { t: Math.floor(dorme / 60) + ':' + String(dorme % 60).padStart(2, '0') }, 'Desperta em ' + Math.floor(dorme / 60) + ':' + String(dorme % 60).padStart(2, '0'))); }
+  const f = fase(b); if (!dorme && f !== HS.fase) { HS.fase = f; setT(h.fs, T('chefe.ui.fase', { n: f }, 'Fase ' + f) + ' · ' + T('chefe.' + tipo + '.fase.' + f, null, '')); }
   const fr = b.hp / Math.max(1, b.maxHp); if (Math.abs(fr - HS.hp) > 0.0005) { HS.hp = fr; setX(h.hp, fr); setX(h.rc, fr); }
   const em = bb.escudoMax || 0, es = em > 0 ? Math.max(0, bb.escudo || 0) / em : 0; if (Math.abs(es - HS.es) > 0.002) { HS.es = es; setX(h.es, es); setT(h.esc, es > 0 ? '' : ''); if (es > 0) h.esc.innerHTML = T('chefe.ui.escudo', null, 'Escudo') + ' <b>' + Math.round(es * 100) + '%</b>'; else setT(h.esc, ''); }
   let pf = 0; for (const e of sim.ents) if (e.alive && e.parte && e.parte.chefe === b.id && e.parte.tipo !== 'nucleo') pf++;
@@ -376,11 +380,17 @@ CH.eventos = function (ev, G) { if (!ev || !ev.length || !G || !G.sim) return; c
         if (u && ARD.cinema && ARD.cinema.ligada && ARD.cinema.ligada('chefe')) ARD.cinema.chefe(G, u, { nome: nomeDe(tipo), epiteto: tituloDe(tipo), cor: tipo === 'forja' ? '#FF9A3A' : tipo === 'sentinela' ? '#FFC24A' : '#9FE8FF', kicker: T('cine.chefao', null, 'Chefão') + ' · ' + T('chefe.ui.fenda', null, 'Da Fenda') });
         else anuncia(T('cine.chefao', null, 'Chefão'), nomeDe(tipo), false, 3000); }
       else if (e.ev === 'fase') { const f = Math.max(1, e.fase | 0 || 1); if (ultFase.get(e.id) === f) continue; ultFase.set(e.id, f); if (f > 1) { anuncia(T('chefe.ui.fase', { n: f }, 'Fase ' + f), T('chefe.' + tipo + '.fase.' + f, null, ''), false, 2800); try { ARD.audio && ARD.audio.sfx && (ARD.audio.sfx('storm'), ARD.audio.sfx('danger')); } catch (er) {} if (G.R) G.R.shake = Math.max(G.R.shake || 0, 0.6); } }
+      else if (e.ev === 'desperta') { anuncia(nomeDe(tipo), T(e.atacado ? 'chefe.ui.despertou-atacado' : 'chefe.ui.despertou', null, 'Despertou!'), false, 2800); try { ARD.audio && ARD.audio.sfx && ARD.audio.sfx('danger'); } catch (er) {} if (G.R) G.R.shake = Math.max(G.R.shake || 0, 0.5); } /* 5.0g.1 */
       else if (e.ev === 'janela') { anuncia(T('chefe.ui.janela-k', null, 'Agora!'), T('chefe.ui.janela', null, 'Janela de dano'), true, 2000); try { ARD.audio && ARD.audio.sfx && ARD.audio.sfx('promote'); } catch (er) {} }
       else if (e.ev === 'morre') { anuncia(nomeDe(tipo), T('chefe.ui.derrotado', null, 'Derrotado'), false, 3600); try { ARD.audio && ARD.audio.sfx && ARD.audio.sfx('explosion'); } catch (er) {} if (G.R) G.R.shake = Math.max(G.R.shake || 0, 1); } }
     else if (e.t === 'aviso') { const now = performance.now(); if (now - (CH._somAv || 0) > 1200) { CH._somAv = now; try { ARD.audio && ARD.audio.sfx && ARD.audio.sfx('alert'); } catch (er) {} } } } };
+/* 5.0g.1: a dica do tutorial (#hints) desce para baixo da barra do chefe quando as duas dividem a mesma faixa da tela (celular em pé e o
+   computador); conferido a cada 0,4 s, sem mexer no layout a cada quadro */
+let dicaT = 0; function dicaAbaixo(b) { const hi = document.getElementById('hints'); if (!hi) return; const nt = performance.now(); if (nt - dicaT < 400) return; dicaT = nt;
+  let fim = 0; if (b && H && !H.d.hidden && !hi.hidden && hi.offsetParent) { const a = H.d.getBoundingClientRect(), d = hi.getBoundingClientRect(); if (a.height > 0 && d.left < a.right && d.right > a.left) fim = Math.ceil(a.bottom); }
+  if (fim) { hi.style.setProperty('--chefe-fim', fim + 'px'); hi.classList.add('abaixo-chefe'); } else if (hi.classList.contains('abaixo-chefe')) hi.classList.remove('abaixo-chefe'); }
 CH.quadro = function (now, dt, G) { if (!G || !G.sim) return; const sim = G.sim; if (!CH.temChefe(sim) && !H) return;
-  const b = barra(sim, G.human); if (H && H.avT && performance.now() > H.avT) { H.avT = 0; H.av.classList.remove('on'); }
+  const b = barra(sim, G.human); if (H && H.avT && performance.now() > H.avT) { H.avT = 0; H.av.classList.remove('on'); } dicaAbaixo(b); /* 5.0g.1 */
   /* música: o tema do chefão enquanto ele vive (fora das cenas, que trocam a música sozinhas) */
   const M = ARD.musica; if (!M || typeof M.cena !== 'function') return; const cine = ARD.cinema && ARD.cinema.ativa && ARD.cinema.ativa();
   if (b && !G.ended) { if (!cine) { const st = M.estado ? M.estado() : null; if (!st || st.cena !== 'chefao') { M.cena('chefao'); musicaMinha = true; } } }

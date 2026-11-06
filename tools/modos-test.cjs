@@ -60,7 +60,7 @@ for (const chefe of ['arauto', 'forja']) {
   const cfg = { seed: 77, players, minutes: 25, mapV: 1, map: MO.CACADA[chefe].mapa, cacada: { chefe, dif: 'facil' } };
   const r = joga(cfg, 16000, (sim) => {
     desvia(sim); /* 5.0g junção: com os chefões de verdade o destacamento lê a telegrafia (sem desviar, o pisão da Forja-Mãe derruba tudo) */
-    if (sim.tick === 1) for (let k = 0; k < 18; k++) { const n = S.nucleoOf(sim, k % 3); if (n) S.spawnUnit(sim, k % 3, k % 3 === 0 ? 'veiculo' : k % 2 ? 'drone' : 'infantaria', n.x + (k % 5) * 18 - 36, n.y + 70); }
+    if (sim.tick === 1) for (let k = 0; k < 30; k++) { /* 5.0g.1: 30 (antes 18): a arena ficou a 1026 das bases (antes 680) e o chefão dorme até ser atacado; com 18 o destacamento chega aos pedaços e a Forja vence */ const n = S.nucleoOf(sim, k % 3); if (n) S.spawnUnit(sim, k % 3, k % 3 === 0 ? 'veiculo' : k % 2 ? 'drone' : 'infantaria', n.x + (k % 5) * 18 - 36, n.y + 70); }
     if (sim.tick % 100 === 2) { const f = sim.fenda; let alvo = null, bd = Infinity; const b = S.bossOf(sim); for (const e of sim.ents) if (e.alive && e.owner === f && (e.parte || e === b)) { const d = e.parte ? 0 : 1; if (d < bd) { bd = d; alvo = e; } } if (alvo) for (const p of [0, 1, 2]) { const ids = sim.ents.filter(e => e.alive && e.kind === 'unit' && e.owner === p && S.UNITS[e.def].attack && !(e.desvio > sim.tick)).map(e => e.id); if (ids.length) S.enqueue(sim, { t: 'attack', p, ids, target: alvo.id }); } } });
   const c = r.sim.result && r.sim.result.cacada; const time = r.sim.players.filter(p => !p.fenda && p.alive); /* 5.0g junção: um aliado eliminado pela Forja-Mãe sai do pacto (eliminate) */
   const fixo = time.every(a => time.every(b => a === b || (a.pacts[b.id] && a.pacts[b.id].fixo)));

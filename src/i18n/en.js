@@ -385,7 +385,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nothing here is yours. Yet.",
-  "inicio.versao": "Version 5.0g · build __BUILD__ · Beyond the Rift · Living world · multiplayer 2 to 4",
+  "inicio.versao": "Version 5.0g.1 · build __BUILD__ · Beyond the Rift · Living world · multiplayer 2 to 4",
   "inicio.vitrine.escolha-sua-raca": "Choose your Race",
   "inicio.vitrine.explorar-base": "Explore the base",
   "inicio.vitrine.som-tela-inicial": "Start screen sound",
@@ -454,6 +454,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "ajustes.btn-bench": "Run benchmark (30 s)",
   "ajustes.cfg-feedback": "Send feedback",
   "notas.notas-versao": "Release notes",
+  "notas.5-0g-1": "<b>5.0g.1 — Fixes:</b> new music for the Vehnar, with synths and a machine pulse instead of hammer beats, and for the Vorag, with a living-swarm texture instead of tribal drums. In the Hunt, the boss now sleeps until attacked or until the countdown on its bar ends (1:30 on Normal), and the arena sits farther from your base; the Herald only strikes inside the arena. Saving on the device no longer stalls when phone storage is slow, and the error footer shows the message before the location. On a phone in portrait, the tutorial tip no longer hides behind the boss bar.",
   "notas.5-0g": "<b>5.0g — Bosses:</b> The Herald and The Mother Forge have arrived, each with three phases, attacks warned on the ground ahead of time and windows when they are vulnerable, plus the new map Titan’s Wreck. In the Hunt tab you pick the boss, the difficulty and your allies, alone or with 2 to 4 friends in co-op, and earn a medal for time and losses. In skirmish, the Rift Events are optional: Rift Sentinel, Corsair Caravan, Wandering Swarm and meteor shower, with a reward for whoever lands the final blow. And the first mutators: Eternal Night, Frequent Storms and Scarce Resources.",
   "notas.5-0f-1": "<b>5.0f.1 — Cinematic sound:</b> the soundtrack is now real orchestral music: each Race has its own peace, tension and battle themes, plus boss, cinematic, superweapon, victory and defeat tracks, switching on the beat. Shots, impacts and explosions have real weight, layered from actual recordings. Unit voices when you select and give orders now sit at the same level for every Race, always clear above the ambience without startling. The files arrive after loading; without them, the previous generated sound still plays. Credits in Settings.",
   "notas.5-0f": "<b>5.0f — 3D sound and cinema:</b> every sound now comes from its place on the map and follows the camera, with 3D sound for headphones on desktop; distant sounds lose their sparkle, what lies under the fog of war sounds muffled and each biome has its own echo. An <b>adaptive soundtrack</b>, generated in the browser itself, gives each Race its own theme and shifts between peace, tension, battle and boss as the match unfolds, ducking whenever someone speaks. Clicks and alerts carry your Race's timbre. All 20 missions open in the <b>War Room</b>: the tactical map with threats, the attack route and the objectives, with the camera landing on your base. The superweapon gets a short shot of the launch, and bosses get a cinematic entrance. Everything can be skipped (Esc, click or tap), and Settings has effects and music volume, headphones or speakers output and the cinematic scenes.",
@@ -465,7 +466,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "notas.5-0c": "<b>5.0c — Languages:</b> the whole game is now in <b>English</b> and <b>Spanish</b> as well as Portuguese: start screen, War Room, matches, campaign, diplomacy, multiplayer, Photo Mode, help and the system-voice lines, which now use a voice in the chosen language. The game opens in your browser's language and switches instantly, without reloading, under <b>Idioma / Language / Idioma</b>: at the top of the start screen, in Settings and in the in-match Settings window. Also in this version: the planets and sky at the top of the War Room are crisp: at rest the background was drawn at half resolution and is now drawn in full, with the planets' detail following the pixel size, and the room no longer drops resolution when you switch Races; the match announcer speaks in the gender of your Race's announcer (a male voice for the Vehnar, Quorith and Vorag; a female one for the Erevane and Tessara); with Engine 5, dynamic resolution only drops when the graphics card is the limit, which avoids the hitches from resolution changes; and on iPhone, <b>Test sound</b> shows a tip when the effects play but the voice does not.",
   "notas.5-0b-1": "<b>5.0b.1 — Lighter Engine 5, headlights and sound on iPhone:</b> with <b>Engine 5</b> on, the shaders it prepares while loading shrank by a third (the lakes first) and each frame sends much less data to the graphics card, which eases the CPU on Firefox and on phones. The glow around lights is now the same as in the classic engine, and in Photo Mode on Low quality the effects follow the exposure as in the classic engine. At night and inside the Aether Storm, the headlights of vehicles, harvesters and pirates light the ground ahead, in both engines. The War Room got a little brighter, without the glare of before. On iPhone, sound and voice unlock on the first tap, play with the silent switch on and come back after a call. Each leader speaks with a voice of their own gender in every browser. In Settings, <b>Test sound</b> plays three notes and a line and shows the state of the device's audio.",
   "notas.5-0b-motor-5": "<b>5.0b — Engine 5 complete, in testing:</b> with <b>Engine 5</b> on (Settings › Graphics engine), the whole game now runs on WebGPU, falling back to WebGL2 on its own: units and buildings with surface detail and per-part animation, ruins, construction sites, the Erevane hologram, the Unison shields and the banners; the ground with every biome, vegetation in the wind, roads and the sky; explosions, fire, smoke and shots; the plasma and ice lakes with reflections, the Belt's space and the Aether Storm; and <b>Photo Mode</b> (📷 or the J key) with blur, the 8 filters and 4K capture. The first time Photo Mode opens in a match, it takes a few seconds to get ready. With all of this, Engine 5 takes a few seconds longer to load: the next version measures it on real devices and trims it down. The classic engine is still the default and has not changed.",
-  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.0f.1 → 2.0; from 5.0a.3 back, in Portuguese)",
+  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.0g → 2.0; from 5.0a.3 back, in Portuguese)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Terms of Use",
   "inicio.rodape.foot-priv": "Privacy",
@@ -1896,4 +1897,16 @@ globalThis.ARD.I18N_DIC['en'] = {
   "chefe.ui.janela-k": "Now!", /* 5.0g */
   "chefe.ui.derrotado": "Defeated", /* 5.0g */
   "chefe.ui.fenda": "From the Rift", /* 5.0g */
+  "sim.chefe.desperta-em": "{nome} awakens in {t}", /* 5.0g.1 */
+  "sim.chefe.despertou": "{nome} has awakened!", /* 5.0g.1 */
+  "sim.chefe.despertou-atacado": "{nome} awoke under attack!", /* 5.0g.1 */
+  "chefe.ui.desperta": "Awakens in {t}", /* 5.0g.1 */
+  "chefe.ui.despertou": "Awakened!", /* 5.0g.1 */
+  "chefe.ui.despertou-atacado": "Awoke under attack!", /* 5.0g.1 */
+  "erro.titulo": "Error", /* 5.0g.1 */
+  "erro.promessa": "Error (background task)", /* 5.0g.1 */
+  "erro.lugar": "in {arq}, line {lin}, column {col}", /* 5.0g.1 */
+  "erro.sem-msg": "error with no message", /* 5.0g.1 */
+  "erro.fechar": "Tap to close", /* 5.0g.1 */
+  "erro.pagina": "the page", /* 5.0g.1 */
 };

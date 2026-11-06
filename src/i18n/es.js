@@ -385,7 +385,7 @@ globalThis.ARD.I18N_DIC['es'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aquí es tuyo. Todavía.",
-  "inicio.versao": "Versión 5.0g · build __BUILD__ · Más allá de la Grieta · Mundo vivo · multijugador de 2 a 4",
+  "inicio.versao": "Versión 5.0g.1 · build __BUILD__ · Más allá de la Grieta · Mundo vivo · multijugador de 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Elige tu Raza",
   "inicio.vitrine.explorar-base": "Explorar la base",
   "inicio.vitrine.som-tela-inicial": "Sonido de la pantalla de inicio",
@@ -454,6 +454,7 @@ globalThis.ARD.I18N_DIC['es'] = {
   "ajustes.btn-bench": "Probar rendimiento (30 s)",
   "ajustes.cfg-feedback": "Enviar comentarios",
   "notas.notas-versao": "Notas de la versión",
+  "notas.5-0g-1": "<b>5.0g.1 — Ajustes:</b> música nueva para los Vehnar, con sintetizador y pulso de máquina en lugar de golpes de martillo, y para los Vorag, con textura de enjambre vivo en lugar de tambores tribales. En la Cacería, el jefe ahora duerme hasta ser atacado o hasta que termine la cuenta en su barra (1:30 en Normal), y la arena quedó más lejos de la base; el Heraldo solo golpea dentro de la arena. El guardado en el dispositivo ya no se traba cuando el almacenamiento del móvil tarda, y el pie de error muestra el mensaje antes del lugar. En el móvil en vertical, el consejo del tutorial ya no queda detrás de la barra del jefe.",
   "notas.5-0g": "<b>5.0g — Jefes:</b> llegaron El Heraldo y La Forja Madre, cada uno con tres fases, ataques avisados en el suelo con antelación y ventanas en las que queda vulnerable, y el mapa nuevo Restos del Titán. En la pestaña Cacería eliges el jefe, la dificultad y los aliados, solo o con 2 a 4 amigos en cooperativo, y ganas una medalla por tiempo y bajas. En escaramuza, los Eventos de la Grieta son opcionales: Centinela de la Grieta, Caravana Corsaria, Enjambre Errante y lluvia de meteoros, con recompensa para quien da el golpe final. Y los primeros mutadores: Noche Eterna, Tormentas Frecuentes y Recursos Escasos.",
   "notas.5-0f-1": "<b>5.0f.1 — Sonido de cine:</b> la banda sonora ahora es orquestal y real: cada Raza tiene sus temas de paz, tensión y batalla, además de las pistas de jefe, de cine, de superarma, de victoria y de derrota, con cambios al compás. Disparos, impactos y explosiones ganaron peso, montados en capas a partir de grabaciones reales. La voz de las unidades al seleccionar y dar órdenes quedó al mismo nivel en todas las Razas, siempre clara sobre el ambiente y sin sobresaltar. Los archivos llegan después de la carga; sin ellos, sigue el sonido generado de antes. Créditos en Ajustes.",
   "notas.5-0f": "<b>5.0f — Sonido 3D y cine:</b> cada sonido ahora sale de su lugar en el mapa y sigue a la cámara, con sonido 3D para auriculares en el ordenador; lo lejano pierde brillo, lo que está bajo la niebla de guerra suena apagado y cada bioma tiene su eco. Una <b>banda sonora adaptativa</b>, generada en el propio navegador, da un tema a cada Raza y cambia entre paz, tensión, batalla y jefe según la partida, y baja cuando alguien habla. Clics y avisos tienen el timbre de tu Raza. Las 20 misiones se abren en la <b>Sala de Guerra</b>: el mapa táctico con las amenazas, la ruta de ataque y los objetivos, y la cámara aterrizando en tu base. La superarma ganó una toma corta del disparo, y los jefes, una entrada de cine. Todo se puede saltar (Esc, clic o toque), y Ajustes tiene volumen de efectos y de música, salida para auriculares o altavoces y las escenas de cine.",
@@ -465,7 +466,7 @@ globalThis.ARD.I18N_DIC['es'] = {
   "notas.5-0c": "<b>5.0c — Idiomas:</b> todo el juego ahora está en <b>inglés</b> y <b>español</b>, además de portugués: pantalla de inicio, Sala de Mando, partida, campaña, diplomacia, multijugador, Modo Foto, ayuda y las líneas de la voz del sistema, que ahora usan una voz del idioma elegido. El juego abre en el idioma del navegador y cambia al instante, sin recargar, en <b>Idioma / Language / Idioma</b>: arriba en la pantalla de inicio, en Ajustes y en la ventana de Ajustes de la partida. También en esta versión: los planetas y el cielo de arriba de la Sala de Mando se ven nítidos: en reposo el fondo se dibujaba a media resolución y ahora sale completo, con el detalle de los planetas siguiendo el tamaño del píxel, y la Sala ya no pierde resolución al cambiar de Raza; el locutor de la partida habla en el género del locutor de tu Raza (voz masculina en Vehnar, Quorith y Vorag; femenina en Erevane y Tessara); con el Motor 5, la resolución dinámica solo baja cuando la tarjeta gráfica es el límite, lo que evita los tirones del cambio de resolución; y en el iPhone, <b>Probar sonido</b> muestra un consejo cuando los efectos suenan y la voz no.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 más ligero, faros y sonido en el iPhone:</b> con el <b>Motor 5</b> activado, los shaders que prepara en la carga se redujeron un tercio (los lagos primero) y cada cuadro envía muchos menos datos a la tarjeta gráfica, lo que alivia la CPU en Firefox y en el celular. El brillo alrededor de las luces ahora es el mismo del motor clásico, y en el Modo Foto de la calidad Baja los efectos siguen la exposición como en el clásico. De noche y dentro de la Tormenta de Éter, los faros de los vehículos, recolectores y piratas iluminan el suelo al frente, en los dos motores. La Sala de Mando quedó un poco más clara, sin el resplandor de antes. En el iPhone, el sonido y la voz se desbloquean con el primer toque, suenan con el interruptor de silencio activado y vuelven después de una llamada. Cada líder habla con una voz de su género en todos los navegadores. En Ajustes, <b>Probar sonido</b> toca tres notas y una frase y muestra el estado del audio del dispositivo.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, en prueba:</b> con el <b>Motor 5</b> activado (Ajustes › Motor gráfico), todo el juego ahora corre en WebGPU, con vuelta automática a WebGL2: unidades y construcciones con el detalle de superficie y la animación de cada pieza, ruinas, obras, el holograma de la Erevane, los escudos del Unísono y las banderas; el suelo con todos los biomas, la vegetación al viento, los caminos y el cielo; explosiones, fuego, humo y disparos; los lagos de plasma y de hielo con reflejo, el espacio del Cinturón y la Tormenta de Éter; y el <b>Modo Foto</b> (📷 o tecla J) con desenfoque, los 8 filtros y captura en 4K. La primera vez que el Modo Foto se abre en una partida, tarda unos segundos en prepararse. Con todo esto, la carga del Motor 5 se alargó unos segundos: la próxima versión la mide en los dispositivos y la reduce. El motor clásico sigue siendo el predeterminado y no cambió.",
-  "notas.historico-versoes-anteriores-5": "Notas de versiones anteriores (5.0f.1 → 2.0; desde la 5.0a.3, en portugués)",
+  "notas.historico-versoes-anteriores-5": "Notas de versiones anteriores (5.0g → 2.0; desde la 5.0a.3, en portugués)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Términos de uso",
   "inicio.rodape.foot-priv": "Privacidad",
@@ -1896,4 +1897,16 @@ globalThis.ARD.I18N_DIC['es'] = {
   "chefe.ui.janela-k": "¡Ahora!", /* 5.0g */
   "chefe.ui.derrotado": "Derrotado", /* 5.0g */
   "chefe.ui.fenda": "De la Grieta", /* 5.0g */
+  "sim.chefe.desperta-em": "{nome} despierta en {t}", /* 5.0g.1 */
+  "sim.chefe.despertou": "¡{nome} despertó!", /* 5.0g.1 */
+  "sim.chefe.despertou-atacado": "¡{nome} despertó con el ataque!", /* 5.0g.1 */
+  "chefe.ui.desperta": "Despierta en {t}", /* 5.0g.1 */
+  "chefe.ui.despertou": "¡Despertó!", /* 5.0g.1 */
+  "chefe.ui.despertou-atacado": "¡Despertó con el ataque!", /* 5.0g.1 */
+  "erro.titulo": "Error", /* 5.0g.1 */
+  "erro.promessa": "Error (tarea en segundo plano)", /* 5.0g.1 */
+  "erro.lugar": "en {arq}, línea {lin}, columna {col}", /* 5.0g.1 */
+  "erro.sem-msg": "error sin mensaje", /* 5.0g.1 */
+  "erro.fechar": "Toca para cerrar", /* 5.0g.1 */
+  "erro.pagina": "la página", /* 5.0g.1 */
 };

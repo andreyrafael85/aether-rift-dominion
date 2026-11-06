@@ -32,6 +32,10 @@ const BOSSES = {
 /* dificuldade: vida, dano dos golpes, ritmo (multiplica o intervalo entre golpes) e aviso mínimo (2 s na Fácil, 1,5 s nas outras) */
 const DIF = { facil: { vida: 0.7, dano: 0.75, ritmo: 1.25, avisoMin: 2 }, normal: { vida: 1, dano: 1, ritmo: 1, avisoMin: 1.5 },
   dificil: { vida: 1.35, dano: 1.2, ritmo: 0.9, avisoMin: 1.5 }, brutal: { vida: 1.75, dano: 1.4, ritmo: 0.8, avisoMin: 1.5 } };
+/* 5.0g.1: Caçada — o chefão dorme na arena até o despertar (s, por dificuldade, contado do começo) ou até ser atacado; o Arauto só golpeia
+   dentro da arena dele (a cratera e o anel dos pilares, ARENA_ARAUTO do centro): a base só é alvo pela regra da fase (a Marcha da Forja, os Ecos) */
+const DESPERTA = { facil: 120, normal: 90, dificil: 75, brutal: 60 };
+const ARENA_ARAUTO = 820;
 const SUPER_MAX = 0.2; /* nenhuma superarma tira mais que 20% da vida de um chefão */
 const SUPER_DANO = { fundicao: { frac: 0.15, raio: 320 }, eclosao: { frac: 0.08, raio: 320 }, blecaute: { frac: 0.1, raio: 0, calma: 8 } };
 const FENDA_COR = '#C23BFF';
@@ -59,6 +63,7 @@ function instala(sim0) {
 }
 
 const cl = (v, a, b) => v < a ? a : v > b ? b : v;
+const mmss = t => { t = Math.max(0, Math.round(t)); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
 function tq(sim, s) { return (sim.tick + Math.max(1, Math.round(s / S.TICK))) * S.TICK; } /* tempo da simulação arredondado ao tique */
 function difDe(sim, o) { const c = sim.cfg || {}; const k = (o && o.dif) || (c.cacada && c.cacada.dif) || c.chefeDif || (sim.players.find(p => !p.human && !p.fenda) || {}).difficulty || 'normal'; return DIF[k] ? k : 'normal'; }
 function humanos(sim) { let n = 0; for (const p of sim.players) if (p.human && !p.fenda) n++; return Math.max(1, Math.min(4, n)); }
@@ -115,11 +120,13 @@ function spawnBoss(sim, tipo, x, y, o) {
     orb: S.DM.atan2(y - S.CY, x - S.CX), alvo: null, chegada: 0, lento: 1, torreT: 0, dronesT: 0, rastroT: 0, ecoT: 0, criasT: 0, capturaT: 0, capturaP: -1, capturaMax: 0, capturado: false, pocoId: 0 };
   sim.chefes.lista.push(u.id); if (o.cacada) sim.chefes.cacada = u.id;
   const b = u.boss;
+  if (o.cacada) { b.dorme = tq(sim, DESPERTA[dk] || DESPERTA.normal); b.aviso30 = false; } /* 5.0g.1: tempo de preparo da Caçada */
   if (tipo === 'arauto') { criaPilares(sim, u); b.criasT = sim.time + B.guardasCada; }
   if (tipo === 'sentinela') { b.criasT = sim.time + 6; }
   if (tipo === 'forja') { b.torreT = sim.time + B.torreCada; escolheAlvo(sim, u); b.capturaMax = B.captura.t; }
   I.emit(sim, { t: 'chefe', ev: 'entra', id: u.id, tipo, fase: 1, x: u.x, y: u.y });
   if (!o.evento) for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, B.def === 'sentinela' ? 'A Sentinela da Fenda despertou no centro do mapa' : (DEFS[B.def].name + ' atravessou a Fenda'), u.x, u.y, 'danger');
+  if (b.dorme) for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, DEFS[B.def].name + ' desperta em ' + mmss(b.dorme - sim.time), u.x, u.y, 'warn'); /* 5.0g.1 */
   return u;
 }
 /* S.bossOf(sim): o chefão vivo mais importante (maior ordem; empate = o mais antigo), ou null */
@@ -139,9 +146,9 @@ function livre(sim, x, y, r) { /* ponto livre para pilar ou torre: chão firme, 
 }
 function inimigoDeFenda(sim, e) { return e.alive && e.owner >= 0 && e.owner !== sim.fenda && (e.kind === 'unit' || e.kind === 'building') && !(sim.players[e.owner] && sim.players[e.owner].fenda); }
 /* alvo de golpe: um inimigo sorteado (RNG da partida) entre os que estão a até `raio`; unidades primeiro, depois estruturas */
-function sorteiaAlvo(sim, x, y, raio, soChao) {
+function sorteiaAlvo(sim, x, y, raio, soChao, arena) {
   const us = [], bs = [];
-  I.queryGrid(sim, x, y, raio + 40, e => { if (!inimigoDeFenda(sim, e) || S.dist(x, y, e.x, e.y) > raio) return; if (e.kind === 'unit') { if (soChao && S.UNITS[e.def].flying) return; us.push(e); } else bs.push(e); });
+  I.queryGrid(sim, x, y, raio + 40, e => { if (!inimigoDeFenda(sim, e) || S.dist(x, y, e.x, e.y) > raio) return; if (arena && S.dist(S.CX, S.CY, e.x, e.y) > arena) return; /* 5.0g.1 */ if (e.kind === 'unit') { if (soChao && S.UNITS[e.def].flying) return; us.push(e); } else bs.push(e); });
   const l = us.length ? us : bs; if (!l.length) return null; return l[Math.floor(sim.rand() * l.length) % l.length];
 }
 function maisPerto(sim, x, y, raio, pred) { let best = null, bd = raio; I.queryGrid(sim, x, y, raio + 40, e => { if (!inimigoDeFenda(sim, e) || (pred && !pred(e))) return; const d = S.dist(x, y, e.x, e.y) - (e.r || 0); if (d < bd) { bd = d; best = e; } }); return best; }
@@ -220,7 +227,7 @@ function golpeFaixa(sim, u, G, alvo, nome) { /* faixa que sai do chefão na dire
   return aviso(sim, u, 'faixa', nome || 'faixa', { aviso: G.aviso, x: u.x, y: u.y, x2, y2, w: G.w, dano: G.dano });
 }
 function logicaArauto(sim, u, dt) {
-  const b = u.boss, B = BOSSES[b.tipo], G = B.golpes; const sentinela = b.tipo === 'sentinela';
+  const b = u.boss, B = BOSSES[b.tipo], G = B.golpes; const sentinela = b.tipo === 'sentinela'; const ar = b.cacada ? ARENA_ARAUTO : 0; /* 5.0g.1: na Caçada só golpeia dentro da arena */
   if (!sentinela && b.fase === 1) { b.escudo = b.pilares > 0 ? Math.round(b.escudoMax * b.pilares / B.pilares) : 0;
     if (sim.time >= b.criasT) { b.criasT = sim.time + intervalo(sim, u, B.guardasCada); for (const pid of b.partes) { const p = vivo(sim, pid); if (!p || p.parte.tipo !== 'pilar') continue; let n = 0; for (const e of sim.ents) if (e.alive && e.cria === u.id && e.guarda && e.guarda.x === p.x && e.guarda.y === p.y) n++; for (let i = n; i < B.guardas; i++) guarda(sim, u, p, i, B.guardas); } } }
   if (sentinela && sim.time >= b.criasT) { b.criasT = sim.time + intervalo(sim, u, B.guardasCada); let n = 0; for (const e of sim.ents) if (e.alive && e.cria === u.id) n++;
@@ -229,10 +236,10 @@ function logicaArauto(sim, u, dt) {
   if (b.fase === 3) { /* Colapso: poço gravitacional e, entre um e outro, faixas */
     const poco = sim.avisos.find(a => a.id === b.pocoId);
     if (!poco && sim.time >= b.prox && !b.janela) { const a = aviso(sim, u, 'poco', 'poco', { aviso: G.poco.aviso, x: u.x, y: u.y, r: G.poco.r, w: G.poco.w, dano: G.poco.dano, puxa: G.poco.puxa }); b.pocoId = a.id; b.prox = a.t1 + G.poco.janela + intervalo(sim, u, G.poco.cada - G.poco.janela - G.poco.aviso); }
-    if (!poco && !b.janela && sim.time >= b.prox2) { const t = sorteiaAlvo(sim, u.x, u.y, 800); if (t) golpeFaixa(sim, u, G.faixa, t); b.prox2 = sim.time + intervalo(sim, u, 6); }
+    if (!poco && !b.janela && sim.time >= b.prox2) { const t = sorteiaAlvo(sim, u.x, u.y, 800, false, ar); if (t) golpeFaixa(sim, u, G.faixa, t); b.prox2 = sim.time + intervalo(sim, u, 6); }
     return;
   }
-  if (sim.time >= b.prox) { const t = sorteiaAlvo(sim, u.x, u.y, 900); if (t) { const useFaixa = (b.fase === 2 || sentinela) && sim.rand() < 0.5; if (useFaixa) golpeFaixa(sim, u, G.faixa, t); else golpeAnel(sim, u, G.anel, t.x, t.y); b.prox = sim.time + intervalo(sim, u, useFaixa ? G.faixa.cada : G.anel.cada); } else b.prox = sim.time + 2; }
+  if (sim.time >= b.prox) { const t = sorteiaAlvo(sim, u.x, u.y, 900, false, ar); if (t) { const useFaixa = (b.fase === 2 || sentinela) && sim.rand() < 0.5; if (useFaixa) golpeFaixa(sim, u, G.faixa, t); else golpeAnel(sim, u, G.anel, t.x, t.y); b.prox = sim.time + intervalo(sim, u, useFaixa ? G.faixa.cada : G.anel.cada); } else b.prox = sim.time + 2; }
   if (!sentinela && b.fase === 2 && sim.time >= b.ecoT) { b.ecoT = sim.time + intervalo(sim, u, B.ecoCada); ecoAbre(sim, u); }
 }
 /* Ecos: duas fendas pequenas perto do exército de um jogador (rodízio); em t1 saem cópias espectrais das últimas unidades que ele produziu, com metade da vida */
@@ -295,6 +302,7 @@ function passo(sim, dt) {
     for (let i = sim.terreno.length - 1; i >= 0; i--) { const z = sim.terreno[i]; if (sim.tick >= Math.round(z.t1 / S.TICK)) { sim.terreno.splice(i, 1); continue; }
       if (fz && z.dps) { const hit = []; I.queryGrid(sim, z.x, z.y, z.r + 40, e => { if (inimigoDeFenda(sim, e) && e.kind === 'unit' && !S.UNITS[e.def].flying && S.dist(z.x, z.y, e.x, e.y) <= z.r) hit.push(e); }); for (const e of hit) if (e.alive) I.applyDamage(sim, sim.fenda, null, e, z.dps * S.TICK * 5, null); } } }
   for (const id of st.lista) { const u = vivo(sim, id); if (!u || !u.boss) continue; const b = u.boss, B = BOSSES[b.tipo];
+    if (b.dorme && !acorda(sim, u)) continue; /* 5.0g.1: Caçada, preparo */
     b.faseT += dt; if (!b.furia && b.faseT > 150) { b.furia = true; I.emit(sim, { t: 'chefe', ev: 'furia', id: u.id, tipo: b.tipo, fase: b.fase }); }
     if (b.janela && b.janelaAte && sim.time >= b.janelaAte) fechaJanela(sim, u);
     const porVida = !(b.tipo === 'forja' && b.fase === 2); /* na Linha de montagem quem vira a fase são as pernas */
@@ -302,6 +310,19 @@ function passo(sim, dt) {
     if (b.tipo === 'forja') logicaForja(sim, u, dt); else logicaArauto(sim, u, dt);
   }
   if (sim.tick % 10 === 5) cerebro(sim);
+}
+/* 5.0g.1: o chefão da Caçada dorme até b.dorme (tempo da simulação) ou até ser atacado (ele ou uma parte); devolve true quando acorda neste tique */
+function acorda(sim, u) {
+  const b = u.boss, B = BOSSES[b.tipo]; let atacado = !!b.provoca || u.hp < u.maxHp;
+  if (!atacado) for (const pid of b.partes) { const p = vivo(sim, pid); if (p && p.hp < p.maxHp) { atacado = true; break; } }
+  if (!atacado && sim.time < b.dorme) {
+    if (!b.aviso30 && b.dorme - sim.time <= 30) { b.aviso30 = true; for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, DEFS[B.def].name + ' desperta em ' + mmss(b.dorme - sim.time), u.x, u.y, 'warn'); }
+    return false; }
+  b.dorme = 0; b.provoca = false; b.faseT = 0; b.prox = sim.time + 3; b.prox2 = sim.time + 6;
+  if (b.tipo === 'arauto') b.criasT = sim.time + B.guardasCada; if (b.tipo === 'forja') { b.torreT = sim.time + B.torreCada; escolheAlvo(sim, u); }
+  I.emit(sim, { t: 'chefe', ev: 'desperta', id: u.id, tipo: b.tipo, atacado, x: u.x, y: u.y });
+  for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, DEFS[B.def].name + (atacado ? ' despertou com o ataque!' : ' despertou!'), u.x, u.y, 'danger');
+  return true;
 }
 function puxa(sim, a, dt) { /* Colapso: o poço puxa pelo passo de movimento, sem física à parte (só posição, na ordem de sim.ents) */
   const k = a.puxa * dt;
@@ -333,6 +354,7 @@ function unidade(sim, u, dt) {
   if (u.cd > 0) u.cd -= dt;
   if (u.parte) return;
   const b = u.boss; if (!b) return; const B = BOSSES[b.tipo];
+  if (b.dorme) { b.fx = u.x; b.fy = u.y; return; } /* 5.0g.1: dormindo na arena */
   if (B.orbita) { /* o Arauto e a Sentinela flutuam sobre a cratera; no poço param */
     const parado = sim.avisos.some(a => a.dono === u.id && a.tipo === 'poco');
     if (!parado) b.orb += (u.speed / B.orbita) * dt * (b.fase === 3 ? 0.5 : 1);
@@ -370,6 +392,7 @@ function depois(sim) {
 /* dano que chega ao chefão (applyDamage): fases não se pulam, escudo dos pilares, pernas, janela do olho; superarma só limitada pelo piso da fase */
 function dano(sim, t, dmg, atk) {
   const b = t.boss; if (!b) return dmg; const B = BOSSES[b.tipo];
+  if (b.dorme && atk) b.provoca = true; /* 5.0g.1: atacado, desperta no próximo tique */
   if (!sim.chefes || !sim.chefes.superDano) {
     if (b.tipo === 'forja' && b.fase === 3 && atk && atk.kind === 'unit' && atk.cls === 'inf') return 0; /* núcleo exposto: a infantaria segura (captura), quem destrói são veículos, drones e torres */
     if (b.tipo === 'arauto' && b.fase === 1 && b.pilares > 0) dmg = 0;
@@ -421,7 +444,7 @@ function hash(sim, mix) {
   for (const a of sim.avisos) { mix(a.id); mix(Math.round(a.x * 10)); mix(Math.round(a.y * 10)); mix(Math.round(a.t1 * 10)); mix(a.dano); }
   for (const z of sim.terreno) { mix(z.id); mix(Math.round(z.x * 10)); mix(Math.round(z.y * 10)); mix(Math.round(z.t1 * 10)); }
   const st = sim.chefes; mix(st.lista.length); mix(st.ecoVez || 0); mix(st.cacada || 0);
-  for (const id of st.lista) { const e = sim.byId.get(id); if (!e || !e.alive || !e.boss) continue; const b = e.boss; mix(b.fase); mix(Math.round(b.escudo)); mix(b.janela ? 1 : 0); mix(Math.round(b.capturaT * 10)); mix(Math.round(b.prox * 10)); mix(Math.round(b.lento * 1000)); mix(b.pontos); }
+  for (const id of st.lista) { const e = sim.byId.get(id); if (!e || !e.alive || !e.boss) continue; const b = e.boss; mix(b.fase); mix(Math.round(b.escudo)); mix(b.janela ? 1 : 0); mix(Math.round(b.capturaT * 10)); mix(Math.round(b.prox * 10)); mix(Math.round(b.lento * 1000)); mix(b.pontos); if (b.cacada) mix(Math.round((b.dorme || 0) * 10)); }
   for (const l of st.ecos) { mix(l.length); for (const d of l) mix(d.length); }
 }
 function foto(sim) { return sim.chefes ? { fenda: sim.fenda, st: sim.chefes, avisos: sim.avisos, terreno: sim.terreno } : null; }
@@ -435,7 +458,8 @@ function volta(sim, d) { /* d = jsonBack(snap.chefes); salvamento antigo: tudo n
    com passagem entre elas e a espinha), placas de blindagem soltas, o crânio numa ponta e o "ventre" na outra (arena da Forja-Mãe).
    As peças são rochas (kind 'rock') com e.osso (1 costela, 2 placa, 3 vértebra, 4 crânio) e e.ang (direção); bloqueiam como as rochas das cordilheiras. */
 function planoTita(sim) {
-  const n = sim.players.length, a = sim.players[0].startAngle + PI / n; const ax = S.DM.cos(a), ay = S.DM.sin(a);
+  const n = sim.players.length, a = sim.players[0].startAngle + PI / n + (sim.cfg && sim.cfg.cacada && n % 2 ? PI : 0); const ax = S.DM.cos(a), ay = S.DM.sin(a);
+  /* 5.0g.1: na Caçada com 1 ou 3 jogadores a espinha gira meia volta: o ventre (a arena da Forja) fica entre as bases, não na frente de uma delas (era a 680 do Núcleo solo) */
   return { type: 'tita', lakes: [], ax, ay, ang: a, arena: { x: S.CX - ax * 500, y: S.CY - ay * 500, r: 170 }, costelas: [], cranio: { x: S.CX + ax * 820, y: S.CY + ay * 820 } };
 }
 function ossosTita(sim, nucs) {

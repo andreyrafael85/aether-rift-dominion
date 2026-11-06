@@ -30,7 +30,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.0g';
+const VERSION = '5.0g.1';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -110,10 +110,10 @@ function initStart() {
       for (const [id, kind] of [['saved-solo', 'solo'], ['saved-camp', 'campanha']]) { const el = $(id); if (!el) continue; const rows = list.filter(m => m.slot !== 'auto' && m.kind === kind); el.hidden = !rows.length;
         el.innerHTML = rows.length ? '<div class="sh">' + Tx('inicio.salvas') + '</div>' + rows.map(m => `<div class="svrow"><div class="sv-t">${esc(TRx(m.title))}<small>${esc(TRx(m.sub))} · ${Tx('inicio.espaco', { n: m.slot.slice(1) })} · ${ARD.saves.ago(m.savedAt)}</small></div><button class="btn" data-load="${m.slot}">${Tx('inicio.carregar')}</button><button class="btn ghost" data-del="${m.slot}" aria-label="${Tx('inicio.apagar')}">🗑</button></div>`).join('') : ''; /* 5.0c */
         el.querySelectorAll('[data-load]').forEach(b => b.onclick = () => resumeFrom(b.dataset.load, false));
-        el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (b.dataset.armed) ARD.saves.del(b.dataset.del).then(refreshSaved); else { b.dataset.armed = '1'; b.textContent = Tx('inicio.apagar-q'); /* 5.0c */ setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = '🗑'; } }, 3000); } }); }
+        el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (b.dataset.armed) ARD.saves.del(b.dataset.del).then(refreshSaved, refreshSaved); /* 5.0g.1 */ else { b.dataset.armed = '1'; b.textContent = Tx('inicio.apagar-q'); /* 5.0c */ setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = '🗑'; } }, 3000); } }); }
     }).catch(e => console.warn('[ARD] salvamentos indisponíveis:', e));
   }
-  if ($('btn-resume')) { $('btn-resume').addEventListener('click', () => resumeFrom('auto', false)); $('btn-resume-drop').addEventListener('click', e => { const b = e.currentTarget; if (b.dataset.armed) ARD.saves.del('auto').then(refreshSaved); else { b.dataset.armed = '1'; b.textContent = Tx('inicio.descartar-q'); setTimeout(() => { delete b.dataset.armed; b.textContent = Tx('inicio.descartar'); }, 3000); /* 5.0c */ } }); }
+  if ($('btn-resume')) { $('btn-resume').addEventListener('click', () => resumeFrom('auto', false)); $('btn-resume-drop').addEventListener('click', e => { const b = e.currentTarget; if (b.dataset.armed) ARD.saves.del('auto').then(refreshSaved, refreshSaved); /* 5.0g.1 */ else { b.dataset.armed = '1'; b.textContent = Tx('inicio.descartar-q'); setTimeout(() => { delete b.dataset.armed; b.textContent = Tx('inicio.descartar'); }, 3000); /* 5.0c */ } }); }
   // 4.1c — convidado que recarregou a página (queda de energia, aba fechada) volta sozinho à sala em até 2 minutos
   function rejoinAfterReload(ms) {
     const card = $('resume-card'); const N = ARD.net.create(); let done = false; const t0 = Date.now(); window.__rejoining = true; // 4.2a: o teste de desempenho espera
@@ -130,8 +130,9 @@ function initStart() {
   }
   const msess = mpSession.load();
   if (msess && msess.token && Date.now() - msess.at < 120000 && !params.get('autostart') && !params.get('novo') && !params.get('bench')) rejoinAfterReload(msess);
-  else if (ARD.saves && !params.get('autostart') && !params.get('missao') && !params.get('novo') && !params.get('campanha') && !params.get('bench'))
-    ARD.saves.meta('auto').then(m => { if (m && !m.parked && (params.get('retomar') || Date.now() - m.savedAt < RESUME_AUTO_S * 1000)) resumeFrom('auto', true).then(ok => { if (!ok) refreshSaved(); }); else refreshSaved(); }).catch(() => refreshSaved());
+  else if (ARD.saves && !params.get('autostart') && !params.get('missao') && !params.get('novo') && !params.get('campanha') && !params.get('bench')) {
+    const checaAuto = () => ARD.saves.meta('auto').then(m => { if (document.body.classList.contains('ingame')) return; if (m && !m.parked && (params.get('retomar') || Date.now() - m.savedAt < RESUME_AUTO_S * 1000)) resumeFrom('auto', true).then(ok => { if (!ok) refreshSaved(); }); else refreshSaved(); }).catch(() => refreshSaved());
+    checaAuto(); window.addEventListener('ard-saves-pronto', () => { if (!document.body.classList.contains('ingame')) checaAuto(); }); } /* 5.0g.1: o IndexedDB que abriu atrasado (iPhone) traz o salvamento que a primeira leitura não viu */
   else refreshSaved();
   if (msess && Date.now() - msess.at >= 120000) mpSession.clear();
   // a ajuda tambem precisa fechar na tela inicial (antes só era ligada dentro da partida); X e Esc fecham qualquer janela
@@ -598,7 +599,7 @@ function startGame(cfg, netCtx) {
     const draw = () => ARD.saves.list().then(list => { const by = {}; for (const m of list) by[m.slot] = m;
       $('save-slots').innerHTML = ['m1', 'm2', 'm3'].map((sl, i) => { const m = by[sl]; return `<button class="slot" data-slot="${sl}" ${fenda ? 'disabled' : ''}><b>${Tx('jogo.espaco', { n: i + 1 })}</b><span>${m ? esc(TRx(m.title)) + '<br><small>' + esc(TRx(m.sub)) + ' · ' + Tx('jogo.salvo', { quando: ARD.saves.ago(m.savedAt) }) + '</small>' : '<small>' + Tx('jogo.vazio') + '</small>'}</span></button>`; }).join(''); /* 5.0c */
       $('save-slots').querySelectorAll('[data-slot]').forEach(b => b.onclick = () => { const sl = b.dataset.slot; const go = () => G.saveNow(sl).then(m => { if (m) { notice(Tx('jogo.salva-no', { n: sl.slice(1) })); draw(); } else notice(Tx('jogo.nao-salvou')); }); /* 5.0c */
-        if (by[sl]) ui.confirm(Tx('jogo.substituir', { n: sl.slice(1) }), go); else go(); }); }); /* 5.0c */
+        if (by[sl]) ui.confirm(Tx('jogo.substituir', { n: sl.slice(1) }), go); else go(); }); }).catch(e => console.warn('[ARD] salvamentos indisponíveis:', e)); /* 5.0c; 5.0g.1: catch */
     draw();
     $('save-park').onclick = () => { if (G.leaving) return; const p = G.saveNow('auto', { parked: true }); G.leaving = true; within(p, 6000).then(m => { if (m) goStart(); else { G.leaving = false; notice(Tx('jogo.nao-salvou')); } }); }; /* 5.0c */ // 4.2g: volta ao início de verdade (antes recarregava o link da missão e ela recomeçava)
     box.hidden = false;
@@ -1006,7 +1007,7 @@ function startGame(cfg, netCtx) {
   }
   // ---------- end ----------
   function endGame(result) {
-    if (G.ended) return; G.ended = true; if (ARD.vozes) try { ARD.vozes.fim(result.campaign ? !!result.campaign.won : result.outcome === 'victory' || (result.outcome === 'over' && result.winner === human)); } catch (e) {} /* 5.0c.1: Vitória/Derrota e a reação do líder */ if (G.autoSave && ARD.saves) ARD.saves.del('auto'); if (net) mpSession.clear(); // partida terminada não volta
+    if (G.ended) return; G.ended = true; if (ARD.vozes) try { ARD.vozes.fim(result.campaign ? !!result.campaign.won : result.outcome === 'victory' || (result.outcome === 'over' && result.winner === human)); } catch (e) {} /* 5.0c.1: Vitória/Derrota e a reação do líder */ if (G.autoSave && ARD.saves) ARD.saves.del('auto').catch(() => {}); /* 5.0g.1: era esta, no fim da partida, a promise solta do iPhone ("armazenamento demorou") */ if (net) mpSession.clear(); // partida terminada não volta
     if (result.campaign) { // 4.0e: fim de missão
       const r = result.campaign; const prep = G.camp.prep; const scores = sim.players.map(q => ({ id: q.id, name: q.name, score: q.alive ? S.score(sim, q) : 0, alive: q.alive }));
       result = { outcome: r.won ? 'victory' : 'defeat', reason: r.reason, scores };
@@ -1059,9 +1060,14 @@ function startGame(cfg, netCtx) {
 
 function toggleHelp(force) { const h = $('help'); h.hidden = force === true ? false : !h.hidden; }
 
-window.addEventListener('error', e => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent = 'Erro: ' + (e.message || e.error); } });
+/* 5.0g.1: o rodapé de erro mostra a mensagem e, depois dela, o lugar (arquivo, linha e coluna), nos três motores: o Safari não põe a mensagem no stack */
+const lugarErro = (st, arq, lin, col) => { let m = null; if (st) for (const l of String(st).split('\n')) { m = /((?:https?|file|blob):[^\s()]*?|[\w./-]+\.(?:js|html)):(\d+):(\d+)\)?\s*$/.exec(l.trim()); if (m) break; } const a = m ? m[1] : (arq && arq !== 'undefined' ? arq : ''), li = m ? m[2] : lin, co = m ? m[3] : col; if (!a && !li) return '';
+  const nome = !a ? Tx('erro.pagina', null, 'a página') : String(a).split(/[?#]/)[0].replace(/\/+$/, '').split('/').pop() || 'index.html'; return Tx('erro.lugar', { arq: nome, lin: li || '?', col: co || '?' }, 'em ' + nome + ', linha ' + (li || '?') + ', coluna ' + (co || '?')); };
+const textoErro = (msg, lugar) => { msg = String(msg == null || msg === '' ? Tx('erro.sem-msg', null, 'erro sem mensagem') : msg).replace(/^(Uncaught )?(\w*Error: )?/, '').slice(0, 220); return msg + (lugar ? ' · ' + lugar : ''); };
+const mostraErro = (rot, t) => { const el = $('errbox'); if (!el) return; el.hidden = false; el.textContent = rot + ': ' + t; el.title = Tx('erro.fechar', null, 'Toque para fechar'); };
+window.addEventListener('error', e => { const er = e.error; mostraErro(Tx('erro.titulo', null, 'Erro'), textoErro(e.message || (er && er.message) || er, lugarErro(er && er.stack, e.filename, e.lineno, e.colno))); });
 { const setBuild = n => { const el = $('build-info'); if (el) el.textContent = 'Build ' + BUILD + ' · GPU: ' + n; }; document.addEventListener('DOMContentLoaded', () => ARD.gpuProbe().then(setBuild)); } /* 4.3k: o nome da GPU cria um contexto WebGL (segundos na GPU por software): vem da sonda única, depois do load */
-window.addEventListener('unhandledrejection', e => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent = 'Erro (promise): ' + (e.reason && (e.reason.stack || e.reason.message) || e.reason); } });
+window.addEventListener('unhandledrejection', e => { const r = e.reason; const msg = r && typeof r === 'object' ? (r.message || r.name || String(r)) : r; mostraErro(Tx('erro.promessa', null, 'Erro (tarefa em segundo plano)'), textoErro(msg, lugarErro(r && r.stack))); }); /* 5.0g.1: a mensagem antes do lugar */
 document.addEventListener('DOMContentLoaded', initStart);
 if (params.get('debug')) { const oe = console.error, ow = console.warn; const cap = (...a) => { const el = $('errbox'); if (el) { el.hidden = false; el.textContent += ' || ' + a.map(x => String(x && x.message || x)).join(' ').slice(0, 400); } }; console.error = (...a) => { cap(...a); oe.apply(console, a); }; console.warn = (...a) => { cap(...a); ow.apply(console, a); }; }
 /* 5.0b.1: desbloqueio do som no primeiro gesto de verdade (touchend, click, pointerup, keydown; o pointerdown só do mouse, como antes no computador). No iOS o touchstart e o pointerdown do toque não valem para o áudio: com só eles (antes), o AudioContext ficava suspenso e as falas eram descartadas. ARD.audio.gesto confere o evento e faz o resto (src/audio.js), na captura para vir antes dos botões */
