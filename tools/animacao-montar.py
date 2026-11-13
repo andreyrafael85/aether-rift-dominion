@@ -1,3 +1,4 @@
+# 5.0h.2: a vitrine nova monta as animações com tools/vitrine-img.py (quadros PNG sem perda); este fica como referência.
 # Monta a animação da documentação (WebP animado) a partir dos quadros de tools/capturas-docs.cjs (dist/capturas-docs/<nome>/*.jpg).
 # Sem ffmpeg: só o Pillow. A duração de cada quadro (ms) vem do 5º argumento (padrão 166: 6 quadros por segundo, para quadros de 0,3 s de jogo).
 # Uso: python3 tools/animacao-montar.py <nome> [largura=800] [qualidade=70] [saída=docs/imagens/partida/<nome>.webp ou -] [ms por quadro=166]

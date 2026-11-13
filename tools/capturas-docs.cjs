@@ -1,3 +1,4 @@
+// 5.0h.2: substituída por tools/vitrine.cjs (qualidade Ultra, deviceScaleFactor 2 com Lanczos, relógio virtual quadro a quadro); fica como referência.
 // Capturas de partidas de verdade para a documentação (docs/imagens/partida/): o jogo servido por HTTP como no GitHub Pages
 // (python3 -m http.server na raiz, por exemplo), com a IA jogando pelos dois lados (?ia=todos) e o relógio da partida andando.
 //   fotos      telas do computador (1280x720) e do celular (390x844, toque): tela inicial, partida com o HUD e a batalha

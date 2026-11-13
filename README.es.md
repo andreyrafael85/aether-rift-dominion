@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/imagens/compartilhar.jpg" alt="Aether Rift: Dominion — las cinco Razas alrededor de la Grieta" width="880">
+  <img src="docs/imagens/compartilhar.es.jpg" alt="Aether Rift: Dominion — las cinco Razas alrededor de la Grieta" width="880">
 </p>
 
 <h1 align="center">Aether Rift: Dominion</h1>
@@ -17,10 +17,10 @@
 </p>
 
 <p align="center">
-  <img src="docs/imagens/partida/batalha.webp" alt="Batalla entre el Consorcio Vehnar y los Erevane, capturada en el propio juego" width="800">
+  <img src="docs/imagens/partida/batalha.webp" alt="Partida real capturada en el propio juego: Tessara contra los Erevane, el asalto Tessara a la base Erevane y la Fundición Orbital Vehnar dejando caer un Bastión del cielo" width="800">
 </p>
 
-> Beta de pruebas, versión **5.0h.1**. El juego abre en el idioma del navegador (español, inglés o portugués; cualquier otro idioma abre en inglés). Cámbialo en **Idioma / Language / Idioma** (pantalla de inicio, Ajustes y ventana de la partida) y el juego recuerda tu elección; `?lang=es`, `?lang=en` o `?lang=pt` en el enlace elige el idioma mientras no elijas uno.
+> Beta de pruebas, versión **5.0h.2**. El juego abre en el idioma del navegador (español, inglés o portugués; cualquier otro idioma abre en inglés). Cámbialo en **Idioma / Language / Idioma** (pantalla de inicio, Ajustes y ventana de la partida) y el juego recuerda tu elección; `?lang=es`, `?lang=en` o `?lang=pt` en el enlace elige el idioma mientras no elijas uno.
 
 ## Lo más destacado
 
@@ -40,8 +40,8 @@ El objetivo es destruir los Núcleos enemigos o tener más Dominio (territorio, 
 
 <table>
 <tr>
-<td width="50%"><img src="docs/imagens/partida/partida-pc.jpg" alt="Partida en la computadora, con el HUD"></td>
-<td width="50%"><img src="docs/imagens/partida/inicio-pc.jpg" alt="Pantalla de inicio con la vitrina de las Razas"></td>
+<td width="50%"><img src="docs/imagens/partida/partida-pc.es.jpg" alt="Partida en la computadora, con el HUD"></td>
+<td width="50%"><img src="docs/imagens/partida/inicio-pc.es.jpg" alt="Pantalla de inicio con la vitrina de las Razas"></td>
 </tr>
 </table>
 
@@ -64,7 +64,7 @@ El objetivo es destruir los Núcleos enemigos o tener más Dominio (territorio, 
 
 ### En el celular
 
-<img src="docs/imagens/partida/partida-celular.jpg" alt="Partida en el celular" width="230" align="right">
+<img src="docs/imagens/partida/partida-celular.es.jpg" alt="Partida en el celular" width="230" align="right">
 
 - Toca una de tus unidades para seleccionarla (doble toque: todas las de ese tipo); después toca el suelo para mover o al enemigo para atacar.
 - La barra inferior tiene Núcleo, Ejército, Construir, Atacar, Detener, En pantalla, Recuadro, Girar e Inclinar la cámara.
@@ -116,7 +116,7 @@ Fases, golpes, vida y recompensas, y el Mundo vivo: **[Jefes y modos](docs/bosse
 
 ## Hoja de ruta
 
-La versión actual es la **5.0h.1** (IA con la personalidad de cada líder, Mundo vivo, construcciones únicas, módulos y Comandantes en campo; la 5.0g trajo los jefes, la Cacería, los Eventos de la Grieta y los mutadores). Los próximos pasos de la v5.0 "Más allá de la Grieta":
+La versión actual es la **5.0h.2** (IA con la personalidad de cada líder, Mundo vivo, construcciones únicas, módulos y Comandantes en campo; la 5.0g trajo los jefes, la Cacería, los Eventos de la Grieta y los mutadores). Los próximos pasos de la v5.0 "Más allá de la Grieta":
 
 - **5.0h — Inteligencia y mundo** ✔: IA con la personalidad de cada líder, Mundo vivo, construcciones únicas y Comandantes en campo.
 - **5.0i — Campaña 2:** 15 misiones y los jefes que faltan.
@@ -142,6 +142,7 @@ node tools/vendor.mjs                    # copia Three.js a dist/vendor/ (prueba
 node tools/qa.cjs                        # control de calidad completo: sintaxis, pruebas, determinismo, prueba rápida de las 5 Razas, build
 node tools/docs-gerar.cjs                # rehace las páginas de las Razas y de los jefes a partir del código
 node tools/galeria.cjs                   # rehace las imágenes de docs/imagens/ con los modelos del juego
+node tools/vitrine.cjs                   # rehace todo el escaparate de GitHub en alta calidad (galería, capturas, animación de la batalla)
 ```
 
 Más herramientas (multijugador con varios navegadores, determinismo entre motores, dificultad, campaña) se describen al inicio de cada archivo en `tools/`.

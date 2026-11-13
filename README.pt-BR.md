@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/imagens/compartilhar.jpg" alt="Aether Rift: Dominion — as cinco Raças em volta da Fenda" width="880">
+  <img src="docs/imagens/compartilhar.pt-BR.jpg" alt="Aether Rift: Dominion — as cinco Raças em volta da Fenda" width="880">
 </p>
 
 <h1 align="center">Aether Rift: Dominion</h1>
@@ -17,10 +17,10 @@
 </p>
 
 <p align="center">
-  <img src="docs/imagens/partida/batalha.webp" alt="Batalha entre o Consórcio Vehnar e a Erevane, capturada no próprio jogo" width="800">
+  <img src="docs/imagens/partida/batalha.webp" alt="Partida de verdade capturada no próprio jogo: Tessara contra a Erevane, o ataque Tessara à base Erevane e a Fundição Orbital Vehnar derrubando um Bastião do céu" width="800">
 </p>
 
-> Beta de testes, versão **5.0h.1**. O jogo abre no idioma do navegador (português, inglês ou espanhol; qualquer outro idioma abre em inglês). Troque em **Idioma / Language / Idioma** (tela inicial, Ajustes e janela da partida) e o jogo guarda a escolha; `?lang=pt`, `?lang=en` ou `?lang=es` no link escolhe o idioma enquanto você não escolher um.
+> Beta de testes, versão **5.0h.2**. O jogo abre no idioma do navegador (português, inglês ou espanhol; qualquer outro idioma abre em inglês). Troque em **Idioma / Language / Idioma** (tela inicial, Ajustes e janela da partida) e o jogo guarda a escolha; `?lang=pt`, `?lang=en` ou `?lang=es` no link escolhe o idioma enquanto você não escolher um.
 
 ## Destaques
 
@@ -40,8 +40,8 @@ O objetivo é destruir os Núcleos inimigos ou ter mais Domínio (território, e
 
 <table>
 <tr>
-<td width="50%"><img src="docs/imagens/partida/partida-pc.jpg" alt="Partida no computador, com o HUD"></td>
-<td width="50%"><img src="docs/imagens/partida/inicio-pc.jpg" alt="Tela inicial com a vitrine das Raças"></td>
+<td width="50%"><img src="docs/imagens/partida/partida-pc.pt-BR.jpg" alt="Partida no computador, com o HUD"></td>
+<td width="50%"><img src="docs/imagens/partida/inicio-pc.pt-BR.jpg" alt="Tela inicial com a vitrine das Raças"></td>
 </tr>
 </table>
 
@@ -64,7 +64,7 @@ O objetivo é destruir os Núcleos inimigos ou ter mais Domínio (território, e
 
 ### No celular
 
-<img src="docs/imagens/partida/partida-celular.jpg" alt="Partida no celular" width="230" align="right">
+<img src="docs/imagens/partida/partida-celular.pt-BR.jpg" alt="Partida no celular" width="230" align="right">
 
 - Toque numa unidade sua para selecionar (dois toques: todas do tipo); depois toque no chão para mover ou no inimigo para atacar.
 - A barra de baixo tem Núcleo, Exército, Construir, Atacar, Parar, Na tela, Caixa, Girar e Inclinar a câmera.
@@ -116,7 +116,7 @@ Fases, golpes, vidas e recompensas, e o Mundo vivo: **[Chefões e modos](docs/bo
 
 ## Roteiro
 
-A versão atual é a **5.0h.1** (IA com a personalidade de cada líder, Mundo vivo, construções únicas, módulos e Comandantes em campo; antes, na 5.0g, os chefões, a Caçada, os Eventos da Fenda e os mutadores). Os próximos passos da v5.0 "Além da Fenda":
+A versão atual é a **5.0h.2** (IA com a personalidade de cada líder, Mundo vivo, construções únicas, módulos e Comandantes em campo; antes, na 5.0g, os chefões, a Caçada, os Eventos da Fenda e os mutadores). Os próximos passos da v5.0 "Além da Fenda":
 
 - **5.0h — Inteligência e mundo** ✔: IA com a personalidade de cada líder, Mundo vivo, construções únicas e Comandantes em campo.
 - **5.0i — Campanha 2:** 15 missões e os chefões que faltam.
@@ -142,6 +142,7 @@ node tools/vendor.mjs                    # copia o Three.js para dist/vendor/ (t
 node tools/qa.cjs                        # portão de qualidade completo: sintaxe, testes, determinismo, smoke das 5 Raças, build
 node tools/docs-gerar.cjs                # refaz as páginas das Raças e dos chefões a partir do código
 node tools/galeria.cjs                   # refaz as imagens de docs/imagens/ com os modelos do jogo
+node tools/vitrine.cjs                   # refaz toda a vitrine do GitHub em alta qualidade (galeria, fotos, animação da batalha)
 ```
 
 Mais ferramentas (multiplayer com vários navegadores, determinismo entre motores, dificuldade, campanha) estão descritas no topo de cada arquivo em `tools/`.

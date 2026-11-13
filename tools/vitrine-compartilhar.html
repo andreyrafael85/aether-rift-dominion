@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8">
+<!-- Imagem de compartilhamento do repositório (docs/imagens/compartilhar.jpg): hero, logo, título e os cinco líderes, com as artes do jogo (assets/).
+     O tools/vitrine.cjs --so=compartilhar fotografa esta página em 1280×640 CSS com deviceScaleFactor 2 (2560×1280), em ?lang=en, pt e es. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Sans:wght@500;600&display=swap">
+<style>
+html,body{margin:0;width:1280px;height:640px;overflow:hidden;background:#07090d}
+.bg{position:absolute;inset:0;background:url(../assets/hero-belt.jpg) center/cover}
+.sh{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,7,11,.92) 0%,rgba(5,7,11,.78) 38%,rgba(5,7,11,.15) 70%,rgba(5,7,11,0) 100%)}
+.logo{position:absolute;left:64px;top:70px;width:150px;height:150px;border-radius:14px;box-shadow:0 0 40px rgba(178,60,255,.45)}
+h1{position:absolute;left:62px;top:236px;margin:0;font:800 104px/0.9 'Big Shoulders Display',Impact,sans-serif;color:#F2ECE0;letter-spacing:1px;text-transform:uppercase}
+h1 span{display:block;font-size:150px;background:linear-gradient(90deg,#FF8C1A,#FF5E3A 45%,#B23CFF);-webkit-background-clip:text;color:transparent}
+p{position:absolute;left:66px;top:494px;margin:0;font:500 25px/1.35 'IBM Plex Sans',sans-serif;color:#cfc8bb;width:620px}
+.lid{position:absolute;right:56px;bottom:46px;display:flex;gap:12px}
+.lid img{width:92px;height:92px;object-fit:cover;border-radius:10px;border:2px solid var(--c);box-shadow:0 6px 18px rgba(0,0,0,.6)}
+</style></head><body><div class="bg"></div><div class="sh"></div>
+<img class="logo" src="../assets/logo.jpg">
+<h1>Aether Rift:<span>Dominion</span></h1>
+<p id="txt">Browser RTS · five Races · Rift bosses<br>PC and phone, nothing to install</p>
+<div class="lid"><img src="../assets/leader-vehnar-1.jpg" style="--c:#FF7733"><img src="../assets/leader-erevane-1.jpg" style="--c:#33FFD0"><img src="../assets/leader-tessara-1.jpg" style="--c:#55E68A"><img src="../assets/leader-quorith-1.jpg" style="--c:#B388FF"><img src="../assets/leader-vorag-1.jpg" style="--c:#E6455A"></div>
+<script>/* ?lang=en (padrão, compartilhar.jpg), pt (compartilhar.pt-BR.jpg) ou es (compartilhar.es.jpg): os mesmos termos dos READMEs */
+const T = { en: 'Browser RTS · five Races · Rift bosses<br>PC and phone, nothing to install', pt: 'RTS no navegador · cinco Raças · chefões da Fenda<br>PC e celular, sem instalar', es: 'RTS en el navegador · cinco Razas · jefes de la Grieta<br>Computadora y celular, sin instalar' };
+const l = new URLSearchParams(location.search).get('lang'); if (T[l]) document.getElementById('txt').innerHTML = T[l]; document.documentElement.lang = l === 'pt' ? 'pt-BR' : l || 'en';</script>
+</body></html>

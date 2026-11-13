@@ -68,6 +68,10 @@ for (const [tipo, modo, n] of [['arauto', null, 3], ['forja', 'destruir', 3], ['
     'fases ' + fs + ' · ' + (st.capturado ? 'capturada' : st.morreu ? 'caiu' : 'de pé') + ' aos ' + st.t + ' s · recompensa ' + st.recompensa + (st.result && st.result.outcome !== 'victory' ? ' · fim: ' + st.result.reason : '') + (st.sim.chefes && st.sim.byId.get(st.sim.chefes.lista[0]) ? ' · captura ' + st.sim.byId.get(st.sim.chefes.lista[0]).boss.capturaT.toFixed(1) : '') + ' · aviso mínimo ' + st.avisoMin.toFixed(1) + ' s · até ' + st.maxEnts + ' entidades · ' + (st.ms / st.ticks).toFixed(2) + ' ms/tique');
   ok(tipo + (modo ? ' (' + modo + ')' : '') + ': todo golpe forte avisado com 1,5 s ou mais', st.avisoMin >= 1.5 - 1e-9 && st.avisoMin < 99, st.avisoMin.toFixed(2) + ' s');
   if (tipo === 'arauto') { const st2 = luta(tipo, { modo }); ok('arauto: a mesma luta dá o mesmo hash', st2.hash === st.hash && st2.t === st.t, st.hash + ' / ' + st2.hash); }
+  if (tipo === 'arauto' || (tipo === 'forja' && modo === 'destruir')) { /* 5.0h.2: o desenho dos Chefões 2.0 (src/chefes-modelos.js e src/chefes.js) só lê a simulação: consultado a cada tique, o hash não muda */
+    require(root + '/src/chefes-modelos.js'); require(root + '/src/chefes.js'); const CHV = ARD.chefes; let nm = 0;
+    const st3 = luta(tipo, { modo, ate: sim => { for (const e of sim.ents) if (e.alive && (e.boss || e.parte)) { if (CHV.modelo(e)) nm++; CHV.fit(e, 1); } CHV.bossOf(sim); return false; } });
+    ok(tipo + (modo ? ' (' + modo + ')' : '') + ': o visual dos Chefões 2.0 só lê (o mesmo hash com o desenho consultado a cada tique)', st3.hash === st.hash && st3.t === st.t && nm > 0, st3.hash + ' · ' + nm + ' consultas'); }
 }
 if (SO) { console.log(JSON.stringify(medidas)); process.exit(0); }
 // ---------- 3) salvar no meio da fase 2 e voltar: o mesmo hash depois de N tiques; e uma Sentinela de evento numa escaramuça de IAs ----------

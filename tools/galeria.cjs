@@ -1,14 +1,18 @@
 // Galeria da documentação: renderiza cada unidade, construção e chefão com os modelos do próprio jogo (tools/galeria.html) em WebP,
 // em docs/imagens/<raça>/<def>.webp e docs/imagens/chefoes/<def>.webp. A lista sai da simulação (src/sim.js): o que cada construção
 // produz para cada Raça (producesFor), as construções (5.0h.1: com as duas únicas da Raça e o avatar do comandante, src/unicas-modelos.js) e os modelos dos chefões (src/chefes-modelos.js).
-// Uso: NODE_PATH=<pasta com node_modules/playwright> node tools/galeria.cjs [filtro: vehnar|erevane|tessara|quorith|vorag|chefoes] [w=560] [h=420] [--faltando]
+// Uso: NODE_PATH=<pasta com node_modules/playwright> node tools/galeria.cjs [filtro: vehnar|erevane|tessara|quorith|vorag|chefoes] [w=560] [h=420] [--faltando] [--ss=3] [--saida=<pasta>]
+// 5.0h.2: supersampling (--ss=3: desenha 3× maior, em PNG, e o tools/vitrine-img.py reduz com Lanczos para o tamanho final; --ss=1 é o desenho
+// direto de antes). --saida troca a pasta docs/imagens/ por outra (teste dos chefões sem mexer na documentação). Chamado pelo tools/vitrine.cjs.
 // Precisa do three vendorizado em dist/vendor/ (node tools/vendor.mjs). Um navegador só, uma página só (SwiftShader).
 'use strict';
 const path = require('path'); const fs = require('fs'); const root = path.resolve(__dirname, '..');
 const { chromium } = require('playwright');
 globalThis.ARD = {}; require(root + '/src/modos.js'); require(root + '/src/chefes-sim.js'); require(root + '/src/unicas-sim.js'); require(root + '/src/mundo.js'); require(root + '/src/sim.js'); /* 5.0h.1: + as únicas e os avatares */
 const S = ARD.sim; const RACES = Object.keys(S.FACTIONS);
-const only = process.argv[2] && process.argv[2] !== 'todas' && !process.argv[2].startsWith('--') ? process.argv[2].split(',') : null; const W = +(process.argv[3] || 560), H = +(process.argv[4] || 420);
+const only = process.argv[2] && process.argv[2] !== 'todas' && !process.argv[2].startsWith('--') ? process.argv[2].split(',') : null; const POS = process.argv.slice(2).filter(a => !a.startsWith('--')); const W = +(POS[1] || 560), H = +(POS[2] || 420);
+const OPT = k => { const a = process.argv.find(x => x.startsWith('--' + k + '=')); return a ? a.slice(k.length + 3) : null; }; const SS = Math.max(1, +(OPT('ss') || 3)); const SAIDA = OPT('saida') ? path.resolve(OPT('saida')) : null; /* 5.0h.2 */
+const TMPG = root + '/dist/vitrine/galeria-png'; const destino = out => (SAIDA ? SAIDA + '/' + out.replace(/^docs\/imagens\//, '') : root + '/' + out);
 const PRODUTORAS = ['nucleo', 'quartel', 'fabrica', 'hangar'];
 function unidadesDe(r) { const out = []; for (const b of PRODUTORAS) for (const u of S.producesFor(b, r)) if (!out.includes(u)) out.push(u); return out; }
 function construcoesDe(r) { return Object.keys(S.BUILDINGS).filter(b => !S.BUILDINGS[b].unica && !S.BUILDINGS[b].mundo && (b !== 'bastiao' || S.FACTIONS[r].superKey === 'fundicao')).concat(S.UNICAS_DE[r] || []); } /* 5.0h.1: as duas únicas da Raça (as do mundo neutro ficam fora) */
@@ -19,26 +23,29 @@ const CANTOS = [[15, 12], [15, -12], [-15, 12], [-15, -12]]; const PERNAS = CANT
 const jobs = [];
 /* --giro=<def>[,<def>…]: animação de vitrine (o modelo gira com a animação do jogo correndo), quadros em dist/capturas-docs/giro-<def>/ para tools/animacao-montar.py */
 const GIRO = (process.argv.find(a => a.startsWith('--giro=')) || '').slice(7);
-if (GIRO) { for (const d of GIRO.split(',')) for (let i = 0; i < 60; i++) jobs.push({ race: 'vehnar', def: d, color: '#FF5E3A', out: 'dist/capturas-docs/giro-' + d.replace(/^chefe_/, '') + '/' + String(i).padStart(4, '0') + '.jpg', pitch: 0.38, yaw: Math.PI * 0.78 + i * (Math.PI * 2 / 60), anim: i / 12, partes: /^chefe_forja(_b)?$/.test(d) ? PERNAS : undefined, largura: /^chefe_forja(_b)?$/.test(d) ? 70 : undefined, jpg: true }); }
+const NG = +(process.argv.find(a => a.startsWith('--giroq=')) || '--giroq=60').slice(8); /* 5.0h.2: quadros por volta (120 a 24 quadros/s = 5 s) */
+if (GIRO) { for (const d of GIRO.split(',')) for (let i = 0; i < NG; i++) jobs.push({ race: 'vehnar', def: d, color: '#FF5E3A', out: 'dist/capturas-docs/giro-' + d.replace(/^chefe_/, '') + '/' + String(i).padStart(4, '0') + '.jpg', pitch: 0.38, yaw: Math.PI * 0.78 + i * (Math.PI * 2 / NG), anim: i / NG * 5, partes: /^chefe_forja(_b)?$/.test(d) ? PERNAS : undefined, largura: /^chefe_forja(_b)?$/.test(d) ? 70 : undefined, jpg: true }); }
 if (!GIRO) for (const r of RACES) { if (only && !only.includes(r)) continue; const cor = S.RACE_SHADES[r][0];
   for (const d of unidadesDe(r)) jobs.push({ race: r, def: d, color: cor, out: 'docs/imagens/' + r + '/' + d + '.webp' });
   for (const d of construcoesDe(r)) jobs.push({ race: r, def: d, color: cor, out: 'docs/imagens/' + r + '/' + d + '.webp', pitch: 0.62 });
   if (S.COMANDANTES && S.COMANDANTES[r]) jobs.push({ race: r, def: S.COMANDANTES[r].def, color: cor, out: 'docs/imagens/' + r + '/' + S.COMANDANTES[r].def + '.webp' }); } /* 5.0h.1: o avatar do comandante */
 if (!GIRO && (!only || only.includes('chefoes'))) for (const [d, r] of CHEFOES) jobs.push({ race: r === 'fenda' ? 'vehnar' : r, def: d, color: r === 'fenda' ? '#FF5E3A' : S.RACE_SHADES[r][0], out: 'docs/imagens/chefoes/' + d.replace(/^chefe_/, '') + '.webp', pitch: 0.42, partes: /^chefe_forja(_b)?$/.test(d) ? PERNAS : undefined, largura: /^chefe_forja(_b)?$/.test(d) ? 70 : undefined, yaw: d === 'chefe_forja_b' ? 0.35 : undefined });
 /* 5.0h.1: --faltando só desenha as imagens que ainda não existem (as outras ficam byte a byte como estão) */
-if (process.argv.includes('--faltando')) for (let i = jobs.length - 1; i >= 0; i--) if (fs.existsSync(root + '/' + jobs[i].out)) jobs.splice(i, 1);
+if (process.argv.includes('--faltando')) for (let i = jobs.length - 1; i >= 0; i--) if (fs.existsSync(destino(jobs[i].out))) jobs.splice(i, 1);
 (async () => {
   const t0 = Date.now(); const b = await chromium.launch({ headless: true, args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--allow-file-access-from-files', '--disable-dev-shm-usage'] });
-  const errs = []; let bytes = 0, n = 0;
+  const errs = []; let bytes = 0, n = 0; const reduzir = []; /* 5.0h.2: [png, destino, w, h, qualidade] para o tools/vitrine-img.py */
   try {
     const p = await b.newPage({ viewport: { width: W, height: H } }); p.on('pageerror', e => errs.push(e.message.slice(0, 200))); p.on('console', m => { if (m.type() === 'error') errs.push(m.text().slice(0, 200)); });
     await p.goto('file://' + root + '/tools/galeria.html', { waitUntil: 'load' }); await p.waitForFunction(() => window.__done === true, null, { timeout: 120000 });
     for (const j of jobs) {
-      let r; try { r = await p.evaluate(o => window.foto(o), Object.assign({ w: W, h: H }, j)); } catch (e) { errs.push(j.out + ': ' + e.message.slice(0, 160)); continue; }
+      let r; try { r = await p.evaluate(o => window.foto(o), Object.assign({ w: W, h: H }, j, SS > 1 ? { ss: SS, png: true } : {})); } catch (e) { errs.push(j.out + ': ' + e.message.slice(0, 160)); continue; }
+      if (SS > 1) { const png = TMPG + '/' + j.out.replace(/^docs\/imagens\/|^dist\/capturas-docs\//, '').replace(/\.\w+$/, '.png'); fs.mkdirSync(path.dirname(png), { recursive: true }); fs.writeFileSync(png, Buffer.from(r.url.split(',')[1], 'base64')); reduzir.push([png, j.jpg ? png.replace(/(\/giro-[^/]+\/)/, '$1final/') : destino(j.out), W, H, j.jpg ? 100 : 90]); n++; if (n % 20 === 0) console.log('galeria: ' + n + '/' + jobs.length + ' desenhadas, ' + ((Date.now() - t0) / 1000).toFixed(0) + ' s'); continue; }
       const buf = Buffer.from(r.url.split(',')[1], 'base64'); if (!j.jpg && !/^RIFF....WEBP/s.test(buf.slice(0, 12).toString('latin1'))) { errs.push(j.out + ': não saiu WebP'); continue; }
-      fs.mkdirSync(path.dirname(root + '/' + j.out), { recursive: true }); fs.writeFileSync(root + '/' + j.out, buf); bytes += buf.length; n++;
+      const dst = j.jpg ? root + '/' + j.out : destino(j.out); fs.mkdirSync(path.dirname(dst), { recursive: true }); fs.writeFileSync(dst, buf); bytes += buf.length; n++;
     }
   } finally { await b.close(); }
+  if (reduzir.length) { const lj = TMPG + '/reduzir.json'; fs.writeFileSync(lj, JSON.stringify(reduzir)); const r = require('child_process').spawnSync('python3', ['-I', root + '/tools/vitrine-img.py', 'reduz', lj], { encoding: 'utf8' }); if (r.status !== 0) errs.push('redução: ' + (r.stderr || '').slice(-300)); else { console.log('galeria: Lanczos ' + SS + '× → ' + W + '×' + H + ': ' + r.stdout.trim()); for (const [, d] of reduzir) bytes += fs.statSync(d).size; } }
   console.log('galeria: ' + n + '/' + jobs.length + ' imagens, ' + (bytes / 1048576).toFixed(2) + ' MB, ' + ((Date.now() - t0) / 1000).toFixed(0) + ' s | erros: ' + (errs.join(' ; ') || 'nenhum'));
   if (errs.length) process.exitCode = 1;
 })().catch(e => { console.error('galeria falhou:', e.message); process.exit(1); });
