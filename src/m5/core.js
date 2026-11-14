@@ -129,7 +129,7 @@ M5.create3d = function (canvas, R) {
     X.timestamp = !!(be.trackTimestamp && renderer.hasFeature && renderer.hasFeature('timestamp-query')); /* sem rastreio ligado, o resolve só avisa no console */
     if (X.debugPipes && renderer._pipelines) { const P = renderer._pipelines, rel = P._releasePipeline; X.relLog = []; P._releasePipeline = function (pl) { if (X.warmDone && X.relLog.length < 30) X.relLog.push('libera ' + (pl && pl.cacheKey ? String(pl.cacheKey).slice(0, 40) : '') + ' @ ' + String(new Error().stack).split('\n').slice(2, 9).map(l => l.trim().replace(/^at /, '').replace(/\(.*\//, '(')).join(' < ')); return rel.apply(this, arguments); };
       const base = X.T.Material.prototype; const d0 = Object.getOwnPropertyDescriptor(base, 'needsUpdate'); if (d0 && d0.set) Object.defineProperty(base, 'needsUpdate', { configurable: true, get: d0.get, set(v) { if (v === true && X.warmDone && X.relLog.length < 60 && /GTAO|RTT|Bloom/.test(this.name || '')) X.relLog.push('needsUpdate ' + this.name + ' @ ' + String(new Error().stack).split('\n').slice(2, 10).map(l => l.trim().replace(/^at /, '').replace(/\(.*\//, '(')).join(' < ')); d0.set.call(this, v); } }); } /* diagnóstico ?m5pipes=1 */
-    M5.memoChave(X); M5.sombraFiltro(X); /* 5.0c.1 */
+    M5.memoChave(X); M5.sombraFiltro(X); /* 5.0c.1 */ M5.memoLuzes(X); M5.ligacoesSemTexto(X); /* 5.0h.4 */
     if (ARD.gpuConta && ARD.gpuConta.quer()) ARD.gpuConta.ligaM5(X); /* 5.0h.3: criações na GPU por quadro (Teste de desempenho e ?m5conta; src/gpuconta.js) */
     console.log('[ARD] Motor 5: ' + X.backend + (forceGL && !M5.gl ? ' (sem navigator.gpu)' : '') + ' · início ' + X.initMs + ' ms · GPU ' + (X.adapter || X.gpuName) + ' · timestamp ' + (X.timestamp ? 'sim' : 'não'));
     return X;
@@ -154,6 +154,41 @@ M5.memoChave = function (X) { const r = X && X.renderer, OB = r && r._objects; i
         const m = this.__ardCk; if (m !== undefined && m.nk === nk && m.ca === ca && m.rs === rs && m.ci === cn.id && m.cv === cn.version) return m.v;
         const v = orig.call(this); const o = m || (this.__ardCk = { nk: 0, ca: 0, rs: false, ci: 0, cv: 0, v: 0 }); o.nk = nk; o.ca = ca; o.rs = rs; o.ci = cn.id; o.cv = cn.version; o.v = v; return v; }; }
     if (P && P.__ardMemo) OB.get = g0; return ro; }; };
+
+/* 5.0h.4: a chave do nó de luzes, uma vez por mudança. Em cada render() (o passe da cena, o reflexo dos lagos e cada um dos ~27 quads do pós) o r186
+   pede lightsNode.getCacheKey(true): com o "true" ele percorre de novo o grafo inteiro das luzes (cada luz, a sombra de cada uma, as cascatas),
+   lista as propriedades de cada nó e monta vetores para o hash: ~60 KB de lixo por quadro no Teste de desempenho, para devolver sempre o mesmo
+   número (as luzes da partida não mudam). Depois da carga, com o mesmo nó, a mesma versão e a mesma lista de luzes (número de luzes, cada luz e
+   se projeta sombra: o que o próprio r186 põe na chave), devolve o número guardado; a cada meio segundo confere de novo pelo caminho do r186
+   (se algo de dentro do grafo mudasse sem mudar a lista, a chave nova apareceria em até meio segundo e o three refaria o objeto como hoje).
+   Com luz de foco (a chave dela tem mais coisas) ou na carga, sempre o caminho do r186. ?m5luzchave=0 desliga (medida) */
+M5.memoLuzes = function (X) { const T = window.THREE_M5, P = T && T.LightsNode && T.LightsNode.prototype; if (!P || P.__ardMemo || Q.get('m5luzchave') === '0' || typeof P.getCacheKey !== 'function') return; P.__ardMemo = true; const orig = P.getCacheKey;
+  P.getCacheKey = function (force, ignores) { const Xc = M5.cur; if (force !== true || ignores != null || !Xc || !Xc.warmDone) return orig.call(this, force, ignores);
+    const L = this._lights; if (!L) return orig.call(this, force, ignores); let sig = L.length; for (let i = 0; i < L.length; i++) { const l = L[i]; if (l.isSpotLight === true) return orig.call(this, force, ignores); sig = (Math.imul(sig, 31) + l.id * 2 + (l.castShadow ? 1 : 0)) | 0; }
+    const m = this.__ardLk, t = performance.now(); if (m !== undefined && m.sig === sig && m.n === L.length && m.ver === this.version && t - m.t < 500) return m.v;
+    const v = orig.call(this, true); const o = m || (this.__ardLk = { sig: 0, n: 0, ver: 0, t: 0, v: 0 }); o.sig = sig; o.n = L.length; o.ver = this.version; o.t = t; o.v = v; return v; }; };
+
+/* 5.0h.4: a conferência das ligações de cada objeto sem montar texto. Em todo desenho de todo objeto (cena, cascatas, reflexo, quads do pós) o
+   Bindings._update do r186 monta um texto com o número de cada textura ligada ("12,57,3,") e soma as versões delas, para o caso de precisar
+   de um grupo de ligação novo; quase nunca precisa (0 no Teste de desempenho depois da carga), e o texto vira lixo: ~37 KB por quadro. Aqui é
+   o mesmo laço do r186 0.186.1, linha por linha, só que o texto e a soma são montados depois, e só quando o grupo novo é de fato pedido (o
+   backend recebe os mesmos valores). Só entra no r186 e se o método do three tiver as peças esperadas; ?m5ligacoes=0 desliga (medida) */
+M5.ligacoesSemTexto = function (X) { const T = window.THREE_M5, r = X && X.renderer, BD = r && r._bindings; if (!BD || BD.__ardLig || Q.get('m5ligacoes') === '0' || !T || String(T.REVISION) !== '186' || typeof BD._update !== 'function') return;
+  const fonte = String(BD._update); for (const peca of ['updateGroup', 'isStorageBuffer', 'isIndirectStorageBufferAttribute', 'isUniformBuffer', 'updateBinding', 'isSampledTexture', 'updateTexture', 'generation', 'bindGroups', 'externalTexture', 'isDefaultTexture', 'isStorageTexture', 'mipmapsAutoUpdate', 'needsMipmap', 'generateMipmaps', 'isSampler', 'updateSampler', 'samplerKey', 'isBuffer', 'clearUpdateRanges', 'updateBindings']) if (fonte.indexOf(peca) < 0) return;
+  if (!BD.nodes || !BD.textures || !BD.attributes || !BD.backend || typeof BD.get !== 'function') return; BD.__ardLig = true; const PUL = []; /* quais ligações o laço pulou (grupo de uniforms já atualizado): a mesma ordem na segunda volta */
+  BD._update = function (bindGroup, bindings) { const backend = this.backend, bs = bindGroup.bindings, nb = bs.length; let needsBindingsUpdate = false, cacheBindings = true;
+    for (let i = 0; i < nb; i++) { const binding = bs[i]; if (this.nodes.updateGroup(binding) === false) { PUL[i] = 1; continue; } PUL[i] = 0;
+      if (binding.isStorageBuffer) { const attribute = binding.attribute, attributeType = attribute.isIndirectStorageBufferAttribute ? 4 : 3 /* AttributeType.INDIRECT : STORAGE */, bindingData = backend.get(binding); this.attributes.update(attribute, attributeType); if (bindingData.attribute !== attribute) { bindingData.attribute = attribute; needsBindingsUpdate = true; } }
+      if (binding.isUniformBuffer) { if (binding.update()) backend.updateBinding(binding); }
+      else if (binding.isSampledTexture) { const updated = binding.update(); const texture = binding.texture, texturesTextureData = this.textures.get(texture);
+        if (updated) { this.textures.updateTexture(texture); if (binding.generation !== texturesTextureData.generation) { binding.generation = texturesTextureData.generation; needsBindingsUpdate = true; } texturesTextureData.bindGroups.add(bindGroup); }
+        const textureData = backend.get(texture); if (textureData.externalTexture !== undefined || texturesTextureData.isDefaultTexture) cacheBindings = false;
+        if (texture.isStorageTexture === true && texture.mipmapsAutoUpdate === true) { const td = this.get(texture); if (binding.store === true) td.needsMipmap = true; else if (this.textures.needsMipmaps(texture) && td.needsMipmap === true) { this.backend.generateMipmaps(texture); td.needsMipmap = false; } } }
+      else if (binding.isSampler) { if (binding.update()) { const samplerKey = this.textures.updateSampler(binding); if (binding.samplerKey !== samplerKey) { binding.samplerKey = samplerKey; needsBindingsUpdate = true; } } }
+      if (binding.isBuffer && binding.updateRanges.length > 0) binding.clearUpdateRanges(); }
+    if (needsBindingsUpdate === true) { let cacheKey = '', version = 0; /* a segunda volta: o texto e a soma do r186, na mesma ordem */
+      if (cacheBindings) for (let i = 0; i < nb; i++) { if (PUL[i]) continue; const binding = bs[i]; if (binding.isStorageBuffer) cacheKey += binding.attribute.id + ','; if (!binding.isUniformBuffer && binding.isSampledTexture) { cacheKey += binding.texture.id + ','; version += binding.texture.version; } }
+      this.backend.updateBindings(bindGroup, bindings, cacheKey, version); } }; };
 
 /* 5.0c.1: no passe de cada cascata da sombra, quem não projeta sombra sai da lista antes do recorte. O r186 projeta (recorta pela câmera da
    cascata, põe na lista e ordena) todo objeto visível da cena em toda cascata e só no fim descarta quem tem castShadow falso (adereços miúdos, chão,

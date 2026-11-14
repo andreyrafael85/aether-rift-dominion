@@ -201,9 +201,10 @@ function mount(ctx) {
     if (key !== AV.key || !AV.nodes) { AV.key = key;
       ARMY.querySelector('.avl').innerHTML = d.rows.length ? d.rows.map(r => `<button type="button" class="avc" data-def="${r.def}" title="${esc(T('hud3.army.card-dica', { x: unitName(r.def) }))}"><img alt=""><b data-n></b><i data-i></i><span>${esc(unitName(r.def))}</span></button>`).join('') : '<div class="aempty">' + T('hud3.army.vazio') + '</div>';
       AV.nodes = {}; ARMY.querySelectorAll('.avc').forEach(b => { AV.nodes[b.dataset.def] = { n: b.querySelector('[data-n]'), i: b.querySelector('[data-i]'), img: b.querySelector('img'), el: b, src: '' }; }); }
-    for (const r of d.rows) { const nd = AV.nodes[r.def]; if (!nd) continue; if (!nd.src) { nd.src = icon(r.def); if (nd.src) nd.img.src = nd.src; } /* o retrato 3D só existe depois do carregamento */
+    let novo = 0, pend = false; /* 5.0h.4: no máximo um retrato 3D novo por chamada. Cada retrato novo é um desenho num WebGL à parte e um PNG gerado na hora (canvas.toDataURL): com vários tipos de unidade chegando juntos (o começo da partida, um reforço), eram todos no mesmo quadro. Os que faltam vêm nas chamadas seguintes (a cada 4 quadros enquanto faltar: H.frame) */
+    for (const r of d.rows) { const nd = AV.nodes[r.def]; if (!nd) continue; if (!nd.src) { if (ICONS[r.def] || !novo) { if (!ICONS[r.def]) novo = 1; nd.src = icon(r.def); if (nd.src) nd.img.src = nd.src; } else pend = true; } /* o retrato 3D só existe depois do carregamento */
       setT(nd.n, r.n); setT(nd.i, r.idle || ''); setOn(nd.el, 'idle', r.idle > 0); if (r.idle) { const tt = T(r.def === 'coletor' ? 'hud3.army.parados' : 'hud3.army.sem-ordem', { n: r.idle }); if (nd.i.title !== tt) nd.i.title = tt; } } /* o título também só quando muda (escrever o mesmo valor ainda conta como mutação) */
-    setT(AV.tot || (AV.tot = ARMY.querySelector('[data-tot]')), d.tot);
+    AV.pend = pend; /* 5.0h.4 */ setT(AV.tot || (AV.tot = ARMY.querySelector('[data-tot]')), d.tot);
     const ic = AV.ic || (AV.ic = ARMY.querySelector('[data-idlecol]')), ip = AV.ip || (AV.ip = ARMY.querySelector('[data-idleprod]')), iu = AV.iu || (AV.iu = ARMY.querySelector('[data-idleu]'));
     setT(ic && ic.querySelector('b'), d.idleCol.length); setOn(ic, 'z', !d.idleCol.length); setT(ip && ip.querySelector('b'), d.idleProd.length); setOn(ip, 'z', !d.idleProd.length); setT(iu && iu.querySelector('b'), d.idleTot); setOn(iu, 'z', !d.idleTot);
   }
@@ -394,7 +395,7 @@ function mount(ctx) {
   if ($('btn-a11y')) $('btn-a11y').addEventListener('click', () => H.openA11y());
 
   // ====== laço: tudo com guarda (escreve só o que mudou), em ritmos diferentes ======
-  H.frame = n => { if (n % 20 === 0) armyRender(false); if (n % 30 === 7) groupsRender(); if (n % 15 === 3) techRender(false); };
+  H.frame = n => { if (n % 20 === 0 || (AV.pend && n % 4 === 0) /* 5.0h.4: retratos que faltam, um por vez */) armyRender(false); if (n % 30 === 7) groupsRender(); if (n % 15 === 3) techRender(false); };
   H.selChanged = () => { groupsRender(); };
   H.groupsChanged = () => { groupsRender(); };
   H.reapply = s => { const cols = playerColors(s, human); if (cols) s.players.forEach((p, i) => { if (!p.fenda) p.color = cols[i]; }); }; /* 5.0g */ /* volta à sala (multiplayer): a fotografia do anfitrião traz as cores dele (5.0a.1: e as relativas são de cada um) */

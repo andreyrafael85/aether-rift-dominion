@@ -11,6 +11,15 @@ const MODO = +(Q.get('m5conta') || Q.get('gpuconta') || 0);
 const K = ['buf', 'tex', 'bg', 'pipe', 'prog', 'ro', 'nb', 'wb', 'wbKB', 'img'];
 const C = { modo: MODO, bench: false, ligados: [], tot: {}, q: {}, pilhas: MODO >= 2 ? new Map() : null };
 for (const k of K) { C.tot[k] = 0; C.q[k] = 0; }
+/* 5.0h.4: a CPU do desenho do Motor 5 por passe, em ms e sem contar o que roda dentro de outro passe (as sombras e o reflexo rodam dentro do
+   passe da cena): 0 sombras (cada cascata), 1 reflexo dos lagos, 2 cena, 3 pós e telas auxiliares (quads do pós, mapa de clarões, barras de vida).
+   O Detetive de travadas mostra qual passe pesou em cada um dos piores quadros; o que sobra do desenho é o preparo do quadro (o jogo). */
+C.passe = new Float64Array(4); C.passeQ = new Float64Array(4); const PT = new Float64Array(8), PK = new Int8Array(8); let pn = 0;
+function embRender(X) { const r = X.renderer, f = r.render; if (typeof f !== 'function' || f.__ardConta) return;
+  const w = function ardContaRender(cena, cam) { if (pn >= 8) return f.apply(this, arguments); const t = performance.now(), k = cam && cam.ardSombra ? 0 : cam && cam.name === 'reflexo-lagos' ? 1 : cena === X.scene && cam === X.camera ? 2 : 3;
+    if (pn) C.passe[PK[pn - 1]] += t - PT[pn - 1]; PK[pn] = k; PT[pn] = t; pn++;
+    try { return f.apply(this, arguments); } finally { const t2 = performance.now(); pn--; C.passe[k] += t2 - PT[pn]; if (pn) PT[pn - 1] = t2; } };
+  w.__ardConta = true; r.render = w; }
 C.quer = () => C.modo > 0 || C.bench;
 /* quem pediu: o primeiro quadro da pilha no código do jogo que não é este arquivo nem o three */
 function pilha(k) { const s = String(new Error().stack || '').split('\n'); let q = ''; for (let i = 2; i < s.length; i++) { const l = s[i]; if (/gpuconta|three\.|vendor\/|\b(pilha|inc|ardContaEmb)\b/.test(l)) continue; if (/local\.html|aether-rift|index\.html|\.html:/.test(l)) { q = l.trim().replace(/^at /, '').replace(/\(?(file|https?):\/\/[^)]*\/([^/)]+)\)?/, '@$2'); break; } }
@@ -29,7 +38,7 @@ function ligaM5(X) { const r = X && X.renderer, be = r && r.backend; if (!be || 
   if (be.isWebGPUBackend && be.device) { const d = be.device; emb(d, 'createBuffer', 'buf'); emb(d, 'createTexture', 'tex'); emb(d, 'createBindGroup', 'bg'); emb(d, 'createRenderPipeline', 'pipe'); emb(d, 'createRenderPipelineAsync', 'pipe'); emb(d, 'createComputePipeline', 'pipe'); emb(d, 'createComputePipelineAsync', 'pipe');
     const fq = d.queue; emb(fq, 'writeBuffer', 'wb', bytesWB); emb(fq, 'writeTexture', 'img'); emb(fq, 'copyExternalImageToTexture', 'img'); C.ligados.push('webgpu'); }
   else if (be.gl) ligaGL(be.gl);
-  if (r._objects) emb(r._objects, 'createRenderObject', 'ro'); if (r._nodes) emb(r._nodes, '_createNodeBuilder', 'nb');
+  if (r._objects) emb(r._objects, 'createRenderObject', 'ro'); if (r._nodes) emb(r._nodes, '_createNodeBuilder', 'nb'); embRender(X); /* 5.0h.4 */
   if (C.pilhas && r._objects) { const OB = r._objects, f = OB.createRenderObject; const vistos = new WeakSet(); /* ?m5conta=2: qual objeto ganhou objeto de desenho novo, em que passe, e se é a 1ª vez dele */
     OB.createRenderObject = function (nodes, geos, rr, obj, mat, scene, cam, ln, ctx) { try { const novo = !vistos.has(obj); vistos.add(obj); const rt = ctx && ctx.renderTarget; const passe = cam && cam.ardSombra ? 'sombra' : rt ? ((rt.texture && rt.texture.name) || 'alvo ' + rt.width + 'x' + rt.height) : 'tela';
       const k = 'ro: ' + (novo ? 'objeto novo' : 'objeto visto, passe novo') + ' · ' + (obj.isInstancedMesh || obj.isM5Inst ? 'instanciado' : obj.type) + (obj.name ? '(' + obj.name + ')' : '') + ' · ' + ((mat && (mat.name || mat.type)) || '?') + ' · ' + passe; C.pilhas.set(k, (C.pilhas.get(k) || 0) + 1); } catch (e) {} return f.apply(this, arguments); }; }
@@ -37,7 +46,7 @@ function ligaM5(X) { const r = X && X.renderer, be = r && r.backend; if (!be || 
   if (C.pilhas && be.isWebGPUBackend && be.device) { const d = be.device, f = d.createBuffer; d.createBuffer = function (desc) { try { const u = desc.usage | 0, t = u & 0x40 ? 'uniform' : u & 0x80 ? 'storage' : u & 0x20 ? 'vértice' : u & 0x10 ? 'índice' : u & 0x8 ? 'cópia' : 'outro'; const k = 'buf: ' + t + ' · ' + (desc.size >= 65536 ? '≥64 KB' : desc.size >= 4096 ? '4–64 KB' : '<4 KB'); C.pilhas.set(k, (C.pilhas.get(k) || 0) + 1); } catch (e) {} return f.apply(this, arguments); }; } }
 /* o quadro: devolve os contadores do quadro e zera (o objeto é sempre o mesmo: nada alocado) */
 const Z = {}; for (const k of K) Z[k] = 0;
-function quadro() { for (const k of K) { Z[k] = C.q[k]; C.q[k] = 0; } return Z; }
+function quadro() { for (const k of K) { Z[k] = C.q[k]; C.q[k] = 0; } for (let i = 0; i < 4; i++) { C.passeQ[i] = C.passe[i]; C.passe[i] = 0; } /* 5.0h.4 */ return Z; }
 C.ligaGL = ligaGL; C.ligaM5 = ligaM5; C.quadro = quadro; C.K = K;
 C.topo = n => C.pilhas ? [...C.pilhas.entries()].sort((a, b) => b[1] - a[1]).slice(0, n || 30) : [];
 ARD.gpuConta = C;

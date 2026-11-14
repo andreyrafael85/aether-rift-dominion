@@ -610,7 +610,95 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
 - **Detetive de travadas:** cada um dos 5 piores quadros diz agora os tipos de evento e o que nasceu na GPU (buffers, texturas, grupos de ligação, objetos de desenho, montagens de shader, KB enviados), nos três idiomas; `?m5conta=1` liga o contador fora do Teste (`src/gpuconta.js`).
 - **Fica para depois:** a primeira vez que um lago entra na tela no Motor 5 (uma montagem de nós do chão do reflexo, uma vez por partida); os alvos do pós recriados na troca de resolução dinâmica; a alocação que sobra no clássico (números passados ao `put` e aos setters de uniform do three) e na simulação (~200 KB por tique).
 
-### Onda 5 — Além da Fenda
+#### 5.0h.4 — Motor 5 sem criações na GPU depois da carga · ✔ 14/11/2026
+- **Teste do dono na 5.0h.3 (os três aparelhos no Motor 5):** Chrome ótimo (1% 56 fps, pior quadro 33 ms, nenhuma travada) e iPhone ótimo (1% 51); no Firefox, 1% de 24 fps e duas travadas (83 e 67 ms), as duas com "1 montagem de shader" e objetos de desenho novos no Detetive.
+- **Causas, todas do reflexo dos lagos de gelo:** o paredão da Fenda entrando no reflexo pela primeira vez (o three guarda o shader montado por alvo de desenho, e o reflexo é outro alvo); os grupos de ruína estreando no reflexo; e o gelo e a margem refazendo a ligação com o alvo do reflexo só quando apareciam na tela.
+- **Correções:** o reflexo do aquecimento desenha toda malha sem recorte, inclusive as escondidas; o grupo de ruína novo estreia também no reflexo no quadro em que nasce; os lagos entram sem recorte no aquecimento. No Teste (119 quadros, GPU por software): quadros com criação 4 → 0, objetos de desenho novos 19 → 0, montagens de shader 1 → 0; pipelines iguais (68 na carga, 0 tardios), Naga sem erro (varyings 14), aquecimento +0,7%.
+- **Também:** os retratos 3D do painel do exército são gerados um por vez (antes, todos no mesmo quadro); alocação do desenho no Motor 5 de 652 para 613 KB por quadro (chave do nó de luzes memorizada, texto das ligações do three adiado, listas do mapa de clarões); o Detetive mostra a CPU do desenho por passe (preparo, sombras, reflexo dos lagos, cena, pós).
+- **Presos ao three r186:** `M5.ligacoesSemTexto` (cópia de um método interno; `?m5ligacoes=0` desliga) e `M5.memoLuzes` (`?m5luzchave=0`). Quem subir o three refaz ou remove.
+- **Fica para depois:** o reflexo dos lagos custa de 25% a 55% mais CPU de desenho com lago de gelo na tela (mexer muda a imagem); o quadro de 40 ms sem evento e sem criação no Firefox segue sem causa provada (a aposta é coleta de lixo; o Firefox daqui não roda WebGPU).
+
+### v5.5 — Portas Abertas (aprovada pelo dono em 14/11/2026; revista no mesmo dia)
+
+**Decisão do dono:** o jogo só é publicado para o público geral quando estiver **completo** — campanhas, mundos, Raças, chefões, site próprio, domínio e a versão para baixar —, "sem ficar nada para depois". Enquanto isso, as redes sociais mostram o avanço do jogo para criar expectativa (o dono cria as contas; o material sai das nossas ferramentas a cada versão). O endereço de testes (GitHub Pages) continua como está até o lançamento.
+
+**Antes da 5.5a, fechando a 5.0h:**
+- **5.0h.4 — Desempenho no Motor 5 (✔ 14/11):** a travada da primeira vista de um lago no Firefox e a alocação por quadro.
+- **5.0h.5 — Chefões 3.0:** os três chefões deixam de ser máquinas e viram criaturas da Fenda, escolhidas pelo dono entre os conceitos: **A Medusa da Fenda** (era O Arauto), **O Titã-Fornalha** (era A Forja-Mãe) e **A Sentinela Devoradora** (era a Sentinela da Fenda, agora quase do tamanho dos outros). Regra da família: corpo violeta e azul profundo, o magenta da Fenda só deles, ponto fraco sempre âmbar, olho que segue o exército e boca que abre antes do golpe. Os lacaios (drones e Crias) entram na mesma família.
+
+**Ordem de arte dentro da 5.5a (reavaliação gráfica de 14/11, na ordem recomendada e aceita):**
+1. **Luz da Fenda:** sol baixo e quente e sombra violeta, as cores da marca como luz do mundo (só parâmetros que já existem; no celular, só as cores).
+2. **Leitura na câmera de jogo:** pedras no tom do chão, um arco fino na cor do dono no pé de cada unidade (no lugar do anel vermelho cheio) e o chão claro menos saturado.
+3. **Tela final com cartão de resultado:** a última cena ao fundo, a palavra grande, três números da partida, o gráfico com a virada, e o botão Compartilhar que gera a imagem.
+
+#### Fase 1 — Porta de entrada
+
+##### 5.5a — Porta de entrada · tamanho M/G · 3 agentes
+- **Entra:** a Luz da Fenda e a leitura (itens 1 e 2 acima) e o território na cor de cada Raça (primeiro passo de "o chão conta quem manda"); primeira partida guiada de 5 a 7 minutos, com um objetivo por vez e o HUD nascendo aos poucos; modo **Blitz** (1 contra 1, mapa pequeno, 8 a 10 minutos); tela final nova (item 3); **link de convite** que já abre a sala; primeira rodada de balanceamento (meta: 40% a 60% no jogo automático); polimentos baratos (barra do comandante por baixo da pausa e da tela final, barra de cima em 1600×900, rótulo da Raça sobre a Fenda, "Copiar resultado (JSON)" fora da tela final, promoção como estrela na barra de vida); o catálogo de cosméticos como dados, sem vender nada.
+- **Pronto quando:** um visitante novo termina a partida guiada sem ajuda no computador e no celular; o convite abre a sala em um toque; o jogo automático fica na faixa; fotos antes e depois da luz nos dois motores; desempenho dentro do orçamento da §8.
+
+##### 5.5b — Compartilhar · tamanho M · 2 agentes
+- **Entra:** **Desafio do Dia** (semente pela data, igual para todos, sem servidor); código de desafio por link; cartão de resultado e de conquista (1200×630 e 1080×1350, montados no navegador); degraus de descoberta (uma novidade por partida nas cinco primeiras); HUD de moldura fina (o de hoje cobre de 26% a 44% da tela); medição de uso só em contagens, sem cookies.
+- **Pronto quando:** o mesmo desafio dá o mesmo hash em Chrome, Firefox e Safari; o cartão sai nos três idiomas.
+
+#### Fase 2 — O jogo completo (as especificações estão na Onda 5, abaixo)
+
+##### 5.5c — Mundos novos · tamanho G/GG · 3 agentes (é a 5.0j)
+- **Entra:** os cinco mundos natais, o gerador por semente e o kit de marcos, já com a aposta **"o mundo é um estilhaço"**: todo mapa (os três de hoje também) com borda quebrada, rocha em camadas e espaço em volta, pelo menos três marcos altos por mapa e uma área inicial com caráter; a nave corsária da cratera e as costelas do Titã refeitas.
+- **Pronto quando:** cada mapa roda com 2 a 5 jogadores, no teste entre motores e no teste de desempenho; a área jogável dos três mapas antigos não muda (mesmos hashes).
+
+##### 5.5d — Campanha 2: Além da Fenda · tamanho GG · 3 agentes (é a 5.0i)
+- **Entra:** as 15 missões, os quatro chefões que faltam (Ouroboros, Almirante Sargaço, O Simulacro e Nadir) já na família visual dos Chefões 3.0, a campanha como mapa do Alinhamento, o passe de arte nas dez construções únicas e nos cinco avatares dos comandantes, e os líderes como transmissão da Raça.
+- **Pronto quando:** as 15 missões passam no teste de missões, os ramos ficam salvos e as cenas são puláveis, nos três idiomas com voz.
+
+##### 5.5e — O chão conta quem manda · tamanho G · 2 agentes
+- **Entra:** cada Raça transforma o terreno em volta da base na sua matéria (chapas de aço, tapete vivo, musgo e raízes, cristal, malha de luz), com versão simples no celular.
+- **Pronto quando:** +0 pipelines fora do orçamento, celular não pior, e uma foto do mapa de cima mostra quem domina o quê.
+
+#### Fase 3 — Online
+
+##### 5.5f — Placar e replays · tamanho G · 3 agentes (é a 5.0k, com o E3)
+- **Entra:** replays locais e por link, tocador com diretor de câmera, relatório de batalha, clipe de 15 s, Sobrevivência; placar do Desafio do Dia **sem contas** (apelido e chave no aparelho; o servidor refaz parte das partidas enviadas e descarta o que não bate); encontro das salas do multiplayer em serviço próprio; segunda rodada de balanceamento.
+- **Pronto quando:** o hash do fim do replay é igual ao da partida; uma partida adulterada é recusada pelo placar; o convite funciona sem o serviço público de hoje.
+
+#### Fase 4 — Versão para baixar e casa própria
+
+##### 5.5g — Versão para baixar (Windows, Linux e macOS) · tamanho M · 1 a 2 agentes
+- **O que é:** o mesmo jogo dentro de um aplicativo de computador, com instalador, que joga sozinho sem internet (campanha, escaramuça, vozes dos três idiomas) e online com quem está no navegador, porque é o mesmo código e a mesma simulação.
+- **Caminhos avaliados:**
+
+| Caminho | Como funciona | A favor | Contra |
+|---|---|---|---|
+| **Instalar pelo navegador (PWA)** | Já existe: o botão "Instalar" do Chrome e do Edge cria o atalho e o jogo abre em janela própria | Custo zero, atualiza sozinho | Não é um arquivo para baixar nem para vender; depende do navegador da pessoa |
+| **Aplicativo com navegador embutido (Electron)** | O instalador leva junto o mesmo motor do Chrome | O Motor 5 (WebGPU) roda igual nos três sistemas, os mesmos testes valem, atualização automática pronta | Instalador grande (na casa de 100 MB mais o jogo e as vozes) |
+| **Aplicativo com o navegador do sistema (Tauri)** | Usa o navegador que o sistema já tem | Instalador pequeno | No Linux e em macOS antigos o WebGPU falha e o jogo cairia para os motores de reserva; cada sistema vira um caso de teste diferente |
+
+- **Decisão do dono (14/11): Electron**, porque o jogo depende do WebGPU e de dar o mesmo resultado em todo aparelho; o PWA continua como a opção leve. Uma **prova rápida (tamanho P) entra já na Fase 1**: empacotar a versão atual nos três sistemas e conferir Motor 5, multiplayer com o navegador, salvamento e vozes sem internet. Se a prova falhar em algum sistema, a decisão é revista antes de investir.
+- **Entra:** instaladores dos três sistemas gerados por um comando a cada versão; salvamento em arquivo com importar e exportar para o navegador; tela cheia e resolução; atualização automática a partir das releases; a página de downloads do site com as notas de cada versão; o mesmo jogo publicado no itch.io.
+- **Custos e pendências do dono (conferir valores no dia):** assinatura de código no Windows (sem ela o sistema mostra um aviso de "aplicativo desconhecido") e conta de desenvolvedor da Apple com notarização no macOS (sem ela o macOS dificulta abrir). O Linux não pede.
+- **Venda:** a versão para baixar pode ser o corpo da Edição de Apoiador ou um pacote pago (jogo para baixar + cosméticos + trilha), com o jogo no navegador continuando grátis. Sem trava contra cópia: o código de apoiador libera os extras. A decisão de preço e de pessoa física ou empresa fica com o dono e o contador.
+- **Pronto quando:** os três instaladores abrem numa máquina limpa, jogam uma partida sem internet e uma partida online contra o navegador com o mesmo hash, e atualizam sozinhos de uma versão para a seguinte.
+
+##### 5.5h — Casa nova · tamanho M · 2 agentes
+- **Entra:** site próprio nos três idiomas (apresentação com Raças, mundos, campanhas e chefões, o jogo em `/jogar`, **downloads e releases**, novidades, imprensa, "Como é feito", privacidade e termos), capa e ícone novos, tela de carregamento com a Raça de verdade, bibliotecas e fontes servidas pelo próprio site, e o endereço antigo redirecionando.
+- **Hospedagem:** decidida na abertura da onda, com preços e termos conferidos no dia (a pesquisa de 14/11 aponta site estático com domínio próprio, sem depender de plano grátis que proíba uso comercial).
+- **Pronto quando:** o site abre o jogo em qualquer aparelho, o PWA e as vozes funcionam no endereço novo e nada é pedido a terceiros.
+
+##### 5.5i — Apoiadores e venda · tamanho M · depois das decisões legais do dono
+- **Entra:** página de apoio, Edição de Apoiador por código e o pacote para baixar. Regras públicas: nada comprado muda o resultado de uma partida; sem sorteio pago; preço em dinheiro de verdade, item por item; o jogo no navegador continua grátis.
+
+#### Em paralelo, desde já — Estúdio e redes (é o E1 do Estúdio da Fenda)
+- **A cada versão:** o kit de mídia sai por um comando (fotos, animação, vídeo com som, cartões dos líderes e dos chefões) e vira os posts do "diário de bordo" nas redes do dono: o que mudou, antes e depois, um momento "uau". Nada de link para jogar até o lançamento, só expectativa; o jogo é desenvolvido com um agente de IA e isso é dito desde o primeiro post.
+- **Antes do lançamento:** trailer de 30 a 45 s, clipes em pé, capa, pacote de imprensa e modo transmissão.
+
+#### Lançamento público — só com tudo acima pronto
+- Jogo completo, site, domínio, versão para baixar e loja no ar no mesmo dia; os canais grandes entram um por vez, com a primeira partida já medida nos testes fechados.
+
+#### Lembrete para o dono
+- **Agora:** criar as contas nas redes (o mesmo nome em todas) para o diário de bordo; conversar com o contador.
+- **No fim das ondas:** registrar o domínio e reservar o mesmo nome no itch.io, no YouTube e no Discord (conferir todos antes de registrar o primeiro), e verificar o registro da marca.
+
+### Onda 5 — Além da Fenda (as especificações do conteúdo; entra na v5.5 como 5.5c, 5.5d e 5.5f, antes do lançamento)
 
 #### 5.0i — Campanha 2 · tamanho GG · 3 agentes
 - **Entra:** as 15 missões, os quatro chefões que faltam (Ouroboros, Almirante Sargaço, O Simulacro e Nadir) e os sistemas da §6.
@@ -629,6 +717,7 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
 - **Pronto quando:** cada mapa roda com 2 a 5 jogadores, no teste entre motores e no teste de desempenho.
 
 #### 5.0k — Replays, clipes e relatório · tamanho M · 1 a 2 agentes · com o Estúdio E3
+- **Na v5.5:** o Desafio vira diário na 5.5b e o resto entra na 5.5f.
 - **Replays locais:** comandos mais fotografias periódicas do estado (o mesmo formato dos salvamentos), para pular no tempo.
 - **Tocador de replay:** linha do tempo, velocidades de 1× a 16× e visão por jogador.
 - **Diretor de câmera automático**, que segue a maior batalha, mais a câmera do Modo Foto.
