@@ -390,6 +390,13 @@ void main() {
   };
 
   // ---------- receitas ----------
+  /* 5.0h.3: vetores de passagem reaproveitados — o FX.emit copia posição, velocidade e cor na hora, então cada receita escreve num vetor do
+     módulo em vez de criar três listas por partícula (eram ~48 bytes de lixo por partícula, centenas por explosão). Regra: numa chamada,
+     p3 só na posição, v3 só na velocidade e c3 só na cor; quem guarda o vetor depois do emit (o destroço com rastro) usa um vetor próprio (d3). */
+  const _P3 = [0, 0, 0], _V3 = [0, 0, 0], _C3 = [0, 0, 0], _DP = [0, 0, 0], _DV = [0, 0, 0], Z3 = [0, 0, 0];
+  const p3 = (a, b, c) => { _P3[0] = a; _P3[1] = b; _P3[2] = c; return _P3; }, v3 = (a, b, c) => { _V3[0] = a; _V3[1] = b; _V3[2] = c; return _V3; }, c3 = (a, b, c) => { _C3[0] = a; _C3[1] = b; _C3[2] = c; return _C3; };
+  const d3 = (o, a, b, c) => { o[0] = a; o[1] = b; o[2] = c; return o; };
+  const K1 = [0.26, 0.05, 0.04], K2 = [0.045, 0.042, 0.04], K3 = [1.5, 1.0, 0.4], K4 = [0.45, 0.4, 0.34], K5 = [0.5, 0.48, 0.46], K6 = [1, 1, 1], K7 = [0.07, 0.065, 0.06], K8 = [1.9, 0.85, 0.3], K9 = [1.8, 0.85, 0.3], K10 = [1.6, 1.2, 0.7], K11 = [1.4, 0.9, 0.45]; /* cores fixas (o emit só lê) */
   const R = Math.random, TAU = Math.PI * 2;
   const jit = (v, k) => v + (R() - 0.5) * 2 * k;
   const cnt = n => { const f = Math.floor(n); return f + (R() < n - f ? 1 : 0); }; /* quantidade fracionária: sorteia o resto */
@@ -419,96 +426,96 @@ void main() {
     const q = Math.min(1, Math.max(0, (S - 5) / 30)), L = Math.min(1.9, Math.max(0.75, Math.sqrt(S / 10))), big = S >= 9, wave = !!o.wave || S >= 10;
     const g0 = o.ground != null ? o.ground : sec ? y - 1 - S * 0.5 : o.wave || imp ? y : y - 2, cy = y + S * 0.25; /* chão estimado: o render3d manda y = chão + 2 nas unidades, o chão nas construções e impactos */
     /* 1. clarão curto e forte: núcleo + halo (com raios nas grandes e no cristal) + casca de choque */
-    FX.emit(add, [x, cy, z], [0, 0, 0], 0.06 + S * 0.0025, S * 1.4, S * 2.2, 1, P.flash, 0, 1.5, 0, 1);
-    FX.emit(add, [x, cy, z], [0, 0, 0], 0.12 + S * 0.004, S * 2.2, S * 3.1, 1, P.halo, 0, 2, 0, 0.75, 0, big || P.id === 3 ? 0.55 : 0);
-    if ((o.wave || S >= 20) && !sec) FX.emit(add, [x, cy, z], [0, 0, 0], 0.16 + S * 0.002, S * 0.7, S * 3.2, 11, P.ring, 0, 3, 0, 0.2);
+    FX.emit(add, p3(x, cy, z), Z3, 0.06 + S * 0.0025, S * 1.4, S * 2.2, 1, P.flash, 0, 1.5, 0, 1);
+    FX.emit(add, p3(x, cy, z), Z3, 0.12 + S * 0.004, S * 2.2, S * 3.1, 1, P.halo, 0, 2, 0, 0.75, 0, big || P.id === 3 ? 0.55 : 0);
+    if ((o.wave || S >= 20) && !sec) FX.emit(add, p3(x, cy, z), Z3, 0.16 + S * 0.002, S * 0.7, S * 3.2, 11, P.ring, 0, 3, 0, 0.2);
     /* 2. bolas de fogo que viram fumaça (lote translúcido pré-multiplicado): núcleo grande e lento, borda menor e rápida; o arrasto
        abre rápido e segura; sobem, giram, esfriam do branco ao vermelho e escurecem em fumaça que cobre o chão claro */
     const nf = Math.max(2, cnt(((imp ? 2.5 : 3) + S * (imp ? 0.2 : 0.27)) * m)), sc = P.smoke;
     for (let i = 0; i < nf; i++) {
       const core = i < 2, a = R() * TAU, hz = core ? R() * 0.3 : 0.35 + R() * 0.65, up = core ? 0.3 + R() * 0.5 : 0.25 + R() * 0.9;
-      const sp = S * (core ? 1.2 + R() * 1.2 : 2.4 + R() * 3.2), kd = 3.2 + R() * 2.2, v = [Math.cos(a) * hz * sp, up * sp, Math.sin(a) * hz * sp];
-      const p0 = [x + jit(0, S * 0.12), y + S * 0.12, z + jit(0, S * 0.12)], life = (core ? 1.7 + R() * 0.6 : 1.3 + R() * 0.6) * L * (imp ? 0.75 : 1) * (1 + q * 0.4);
+      const sp = S * (core ? 1.2 + R() * 1.2 : 2.4 + R() * 3.2), kd = 3.2 + R() * 2.2, v = v3(Math.cos(a) * hz * sp, up * sp, Math.sin(a) * hz * sp);
+      const p0 = p3(x + jit(0, S * 0.12), y + S * 0.12, z + jit(0, S * 0.12)), life = (core ? 1.7 + R() * 0.6 : 1.3 + R() * 0.6) * L * (imp ? 0.75 : 1) * (1 + q * 0.4);
       const fz = (core ? 0.34 + R() * 0.08 : 0.28 + R() * 0.1) / (1 + q * 0.4), s0 = S * (core ? 0.5 + R() * 0.2 : 0.3 + R() * 0.2), s1 = S * (core ? 1.4 + R() * 0.35 : 0.95 + R() * 0.45);
       const gB = -S * (0.45 + R() * 0.45), d0 = R() * 0.05 * L, gg = 0.85 + R() * 0.3;
-      FX.emit(alp, p0, v, life, s0, s1, 14, [sc[0] * gg, sc[1] * gg, sc[2] * gg], gB, 2.4, jit(0, 1.2), 1, d0, Math.round(kd * 10) + fz);
+      FX.emit(alp, p0, v, life, s0, s1, 14, c3(sc[0] * gg, sc[1] * gg, sc[2] * gg), gB, 2.4, jit(0, 1.2), 1, d0, Math.round(kd * 10) + fz);
     }
     /* 3. núcleo aditivo: o ponto mais quente brilha por cima da fumaça e das faíscas */
-    for (let i = S >= 9 ? 3 : 2; i > 0; i--) FX.emit(add, [x + jit(0, S * 0.1), y + S * 0.2, z + jit(0, S * 0.1)], [jit(0, S * 0.8), S * (0.6 + R() * 0.8), jit(0, S * 0.8)], (0.26 + R() * 0.16) * L, S * 0.45, S * (0.9 + R() * 0.3), 0, P.fire, -S * 0.5, 2.2, jit(0, 1.5), 0.85, R() * 0.03, 4);
+    for (let i = S >= 9 ? 3 : 2; i > 0; i--) FX.emit(add, p3(x + jit(0, S * 0.1), y + S * 0.2, z + jit(0, S * 0.1)), v3(jit(0, S * 0.8), S * (0.6 + R() * 0.8), jit(0, S * 0.8)), (0.26 + R() * 0.16) * L, S * 0.45, S * (0.9 + R() * 0.3), 0, P.fire, -S * 0.5, 2.2, jit(0, 1.5), 0.85, R() * 0.03, 4);
     if (S >= 18 && !imp && !sec) for (let i = cnt((1.5 + q * 2) * m); i > 0; i--) { /* coluna: bolas que sobem alto e viram o tronco de fumaça */
-      const life = (2.6 + R() * 1.2) * L, s1 = S * (1.3 + R() * 0.4), v = [jit(0, S * 0.3), S * (2.6 + R() * 1.2), jit(0, S * 0.3)], kd = 1.8 + R() * 0.6, gg = 0.85 + R() * 0.3;
-      FX.emit(alp, [x, y + S * 0.3, z], v, life, S * 0.5, s1, 14, [sc[0] * gg, sc[1] * gg, sc[2] * gg], -S * 0.4, 2, jit(0, 0.8), 1, 0.03 + R() * 0.08, Math.round(kd * 10) + 0.26); }
+      const life = (2.6 + R() * 1.2) * L, s1 = S * (1.3 + R() * 0.4), v = v3(jit(0, S * 0.3), S * (2.6 + R() * 1.2), jit(0, S * 0.3)), kd = 1.8 + R() * 0.6, gg = 0.85 + R() * 0.3;
+      FX.emit(alp, p3(x, y + S * 0.3, z), v, life, S * 0.5, s1, 14, c3(sc[0] * gg, sc[1] * gg, sc[2] * gg), -S * 0.4, 2, jit(0, 0.8), 1, 0.03 + R() * 0.08, Math.round(kd * 10) + 0.26); }
     /* 4. faíscas */
     for (let i = cnt((6 + S * 0.55) * m); i > 0; i--) { const a = R() * TAU, sp = S * (3 + R() * 6) + 20, up = 0.3 + R() * 1.1;
-      FX.emit(add, [x, cy, z], [Math.cos(a) * sp, up * sp, Math.sin(a) * sp], (0.35 + R() * 0.55) * Math.min(1.4, L), 0.5 + R() * 0.7 + S * 0.02, 0.25, 2, P.spark, 120 + S * 3, 1, 0, 1, R() * 0.04, 1.6); }
+      FX.emit(add, p3(x, cy, z), v3(Math.cos(a) * sp, up * sp, Math.sin(a) * sp), (0.35 + R() * 0.55) * Math.min(1.4, L), 0.5 + R() * 0.7 + S * 0.02, 0.25, 2, P.spark, 120 + S * 3, 1, 0, 1, R() * 0.04, 1.6); }
     /* 5. destroços: giram, caem e ficam no chão; nas médias e grandes alguns soltam fumaça e fogo no caminho */
     const nt = S >= 11 && !imp ? Math.round(1 + q * 2) : 0, nd = o.semDestrocos ? nt : cnt(((imp ? 1.5 : 2) + S * (imp ? 0.12 : 0.2)) * m); /* 5.0e: no Motor 5 os destroços da morte são em compute (src/m5/destrocos.js); ficam só os que soltam fogo */
     for (let i = 0; i < nd; i++) {
       const a = R() * TAU, hs = S * (1.2 + R() * 2.6), vy = S * (1.8 + R() * 2.8) + 15, gD = 75 + S * 1.5, ds = (0.9 + R() * 1.3) * (1 + S * 0.035);
-      const p0 = [x + jit(0, S * 0.15), y + S * 0.2, z + jit(0, S * 0.15)], drop = Math.max(0.5, p0[1] - g0 - ds * 0.35), v = [Math.cos(a) * hs, vy, Math.sin(a) * hs];
+      const p0 = d3(_DP, x + jit(0, S * 0.15), y + S * 0.2, z + jit(0, S * 0.15)), drop = Math.max(0.5, p0[1] - g0 - ds * 0.35), v = d3(_DV, Math.cos(a) * hs, vy, Math.sin(a) * hs); /* 5.0h.3: vetores próprios (o rastro emite com p3/v3 e lê estes) */
       const mt = imp ? 3 : P.id === 3 && R() < 0.6 ? 1 : P.id === 4 && R() < 0.75 ? 2 : 0, cd = mt === 3 ? TERRA : P.debris;
       FX.emit(alp, p0, v, 1.8 + R() * 1.6, ds, ds * 0.85, 5, cd, gD, 1, jit(0, 9), 1, R() * 0.03, drop + mt * 1000);
       if (i < nt) rastro(p0, v, gD, drop, ds, P, m);
     }
     /* 6. chão: onda de luz, anel de poeira e poeira que corre rente */
-    if ((o.wave || S >= 14) && !sec) { if (o.wave) FX.emit(add, [x, g0 + 0.8, z], [0, 0, 0], 0.3 * L, S * 0.4, S * 3.4, 6, P.ring, 0, 2.6, 0, 0.4); FX.emit(alp, [x, g0 + 0.5, z], [0, 0, 0], 1.4 * L, S * 0.8, S * 3.2, 12, POEIRA, 0, 2.8, 0, 0.3, 0.03); }
+    if ((o.wave || S >= 14) && !sec) { if (o.wave) FX.emit(add, p3(x, g0 + 0.8, z), Z3, 0.3 * L, S * 0.4, S * 3.4, 6, P.ring, 0, 2.6, 0, 0.4); FX.emit(alp, p3(x, g0 + 0.5, z), Z3, 1.4 * L, S * 0.8, S * 3.2, 12, POEIRA, 0, 2.8, 0, 0.3, 0.03); }
     for (let i = cnt((big ? 3 + S * 0.15 : 2) * m * (sec ? 0.5 : 1)); i > 0; i--) { const a = R() * TAU, r0 = S * (0.15 + R() * 0.35), sp = S * (0.8 + R() * 3.4) + 6, gg = 0.85 + R() * 0.3;
-      FX.emit(alp, [x + Math.cos(a) * r0, g0 + 1, z + Math.sin(a) * r0], [Math.cos(a) * sp, S * 0.15, Math.sin(a) * sp], (1.1 + R() * 0.9) * L, S * (0.35 + R() * 0.25), S * (1.0 + R() * 0.7), 4, [POEIRA[0] * gg, POEIRA[1] * gg, POEIRA[2] * gg], 0, 2, jit(0, 0.3), 0.36, R() * 0.08, 2.4); }
+      FX.emit(alp, p3(x + Math.cos(a) * r0, g0 + 1, z + Math.sin(a) * r0), v3(Math.cos(a) * sp, S * 0.15, Math.sin(a) * sp), (1.1 + R() * 0.9) * L, S * (0.35 + R() * 0.25), S * (1.0 + R() * 0.7), 4, c3(POEIRA[0] * gg, POEIRA[1] * gg, POEIRA[2] * gg), 0, 2, jit(0, 0.3), 0.36, R() * 0.08, 2.4); }
     if (imp) for (let i = cnt((1.5 + S * 0.08) * m); i > 0; i--) /* impacto: chafariz de terra que sobe e assenta */
-      FX.emit(alp, [jit(x, S * 0.15), g0 + 1, jit(z, S * 0.15)], [jit(0, S * 0.5), S * (2.2 + R() * 1.6) + 10, jit(0, S * 0.5)], 1.2 + R() * 0.7, S * 0.35, S * (0.9 + R() * 0.4), 4, [TERRA[0] * 1.3, TERRA[1] * 1.3, TERRA[2] * 1.3], 0, 1.6, jit(0, 0.4), 0.7, R() * 0.04, 2.6);
+      FX.emit(alp, p3(jit(x, S * 0.15), g0 + 1, jit(z, S * 0.15)), v3(jit(0, S * 0.5), S * (2.2 + R() * 1.6) + 10, jit(0, S * 0.5)), 1.2 + R() * 0.7, S * 0.35, S * (0.9 + R() * 0.4), 4, c3(TERRA[0] * 1.3, TERRA[1] * 1.3, TERRA[2] * 1.3), 0, 1.6, jit(0, 0.4), 0.7, R() * 0.04, 2.6);
     /* 7. fumaça que fica: sobe devagar, abre e demora */
     if (big && !imp) for (let i = cnt(((sec ? 0.5 : 1) + S * 0.06) * m); i > 0; i--) { const gg = 0.8 + R() * 0.4, sc = P.smoke;
-      FX.emit(alp, [jit(x, S * 0.3), y + S * 0.5, jit(z, S * 0.3)], [jit(0, 3), S * (0.6 + R() * 0.5) + 6, jit(0, 3)], (5 + R() * 3) * (0.8 + q) * (o.wave ? 1.4 : 1), S * 0.7, S * (2.2 + R() * 0.8) * (o.wave ? 1.2 : 1), 3, [sc[0] * gg, sc[1] * gg, sc[2] * gg], -S * 0.04, 1.4, jit(0, 0.15), 0.6, 0.12 + R() * 0.3, 5.25); } /* nas construções a coluna fica mais (até ~18 s, no anel protegido) */
+      FX.emit(alp, p3(jit(x, S * 0.3), y + S * 0.5, jit(z, S * 0.3)), v3(jit(0, 3), S * (0.6 + R() * 0.5) + 6, jit(0, 3)), (5 + R() * 3) * (0.8 + q) * (o.wave ? 1.4 : 1), S * 0.7, S * (2.2 + R() * 0.8) * (o.wave ? 1.2 : 1), 3, c3(sc[0] * gg, sc[1] * gg, sc[2] * gg), -S * 0.04, 1.4, jit(0, 0.15), 0.6, 0.12 + R() * 0.3, 5.25); } /* nas construções a coluna fica mais (até ~18 s, no anel protegido) */
     /* 8. brasas */
-    for (let i = cnt((big ? 3 + S * 0.18 : 1.5) * m); i > 0; i--) FX.emit(add, [jit(x, S * 0.3), cy, jit(z, S * 0.3)], [jit(0, S * 1.2), S * (1 + R() * 1.6) + 8, jit(0, S * 1.2)], 1.1 + R() * 1.5, 0.5 + R() * 0.4 + S * 0.012, 0.3, 10, P.ember, -3, 1, 0, 1, 0.08 + R() * 0.3, 2 + S * 0.08);
+    for (let i = cnt((big ? 3 + S * 0.18 : 1.5) * m); i > 0; i--) FX.emit(add, p3(jit(x, S * 0.3), cy, jit(z, S * 0.3)), v3(jit(0, S * 1.2), S * (1 + R() * 1.6) + 8, jit(0, S * 1.2)), 1.1 + R() * 1.5, 0.5 + R() * 0.4 + S * 0.012, 0.3, 10, P.ember, -3, 1, 0, 1, 0.08 + R() * 0.3, 2 + S * 0.08);
     /* 9. a camada da Raça */
     raca(P, x, y, z, S, cy, g0, m, imp, big);
     /* 10. estouros atrasados nas unidades pesadas (munição cozinhando) */
     if (S >= 15 && !o.wave && !sec && !imp) for (let j = S >= 25 ? 2 : 1; j > 0; j--) { const a = R() * TAU, d = S * (0.2 + R() * 0.3), px = x + Math.cos(a) * d, pz = z + Math.sin(a) * d, d0 = 0.18 + R() * 0.35, s = S * 0.45;
-      FX.emit(add, [px, cy, pz], [0, 0, 0], 0.08, s * 1.4, s * 2.4, 1, P.flash, 0, 1.5, 0, 0.9, d0);
-      for (let i = 0; i < 3; i++) { const b = R() * TAU, sp = s * (2 + R() * 2); FX.emit(add, [px, cy, pz], [Math.cos(b) * sp, s * (1 + R() * 2), Math.sin(b) * sp], 0.45 + R() * 0.3, s * 0.4, s * 1.1, 0, P.fire, -s, 2.2, jit(0, 1.5), 1, d0 + R() * 0.03, 4); }
-      for (let i = 0; i < 4; i++) { const b = R() * TAU, sp = 40 + R() * 60; FX.emit(add, [px, cy, pz], [Math.cos(b) * sp, 30 + R() * 50, Math.sin(b) * sp], 0.4 + R() * 0.4, 0.7, 0.25, 2, P.spark, 150, 1, 0, 1, d0, 1.6); } }
+      FX.emit(add, p3(px, cy, pz), Z3, 0.08, s * 1.4, s * 2.4, 1, P.flash, 0, 1.5, 0, 0.9, d0);
+      for (let i = 0; i < 3; i++) { const b = R() * TAU, sp = s * (2 + R() * 2); FX.emit(add, p3(px, cy, pz), v3(Math.cos(b) * sp, s * (1 + R() * 2), Math.sin(b) * sp), 0.45 + R() * 0.3, s * 0.4, s * 1.1, 0, P.fire, -s, 2.2, jit(0, 1.5), 1, d0 + R() * 0.03, 4); }
+      for (let i = 0; i < 4; i++) { const b = R() * TAU, sp = 40 + R() * 60; FX.emit(add, p3(px, cy, pz), v3(Math.cos(b) * sp, 30 + R() * 50, Math.sin(b) * sp), 0.4 + R() * 0.4, 0.7, 0.25, 2, P.spark, 150, 1, 0, 1, d0, 1.6); } }
   }
   function rastro(p0, v, gD, drop, ds, P, m) { /* destroço em chamas: bolinhas de fogo que viram fumaça marcadas ao longo do arco (a CPU sabe o caminho) */
     const tl = (v[1] + Math.sqrt(v[1] * v[1] + 2 * gD * drop)) / gD; const n = Math.min(11, Math.floor(tl / 0.05)), sc = P.smoke;
     for (let i = 1; i <= n; i++) { if (R() > m) continue; const ti = i * 0.05, gg = 0.8 + R() * 0.4;
-      FX.emit(alp, [p0[0] + v[0] * ti, p0[1] + v[1] * ti - gD * 0.5 * ti * ti, p0[2] + v[2] * ti], [jit(0, 1.5), 3 + R() * 3, jit(0, 1.5)], 0.9 + R() * 0.7, ds * 1.5 + 1, ds * (3.4 + R() * 1.5) + 2, 14, [sc[0] * gg, sc[1] * gg, sc[2] * gg], -2, 1.6, jit(0, 0.6), 0.7, ti, 4 + (i < 3 ? 0.3 - i * 0.07 : 0.06)); }
+      FX.emit(alp, p3(p0[0] + v[0] * ti, p0[1] + v[1] * ti - gD * 0.5 * ti * ti, p0[2] + v[2] * ti), v3(jit(0, 1.5), 3 + R() * 3, jit(0, 1.5)), 0.9 + R() * 0.7, ds * 1.5 + 1, ds * (3.4 + R() * 1.5) + 2, 14, c3(sc[0] * gg, sc[1] * gg, sc[2] * gg), -2, 1.6, jit(0, 0.6), 0.7, ti, 4 + (i < 3 ? 0.3 - i * 0.07 : 0.06)); }
   }
   function raca(P, x, y, z, S, cy, g0, m, imp, big) {
     if (P.id === 1) { /* Erevane: plasma teal que se desfaz em centelhas */
-      FX.emit(add, [x, cy, z], [0, 0, 0], 0.3 * Math.min(1.4, Math.sqrt(S / 10) + 0.3), S * 1.2, S * 2.4, 1, P.halo, 0, 2.5, 0, 0.8);
-      if (!big) FX.emit(add, [x, cy, z], [0, 0, 0], 0.2, S * 0.5, S * 2.6, 11, P.ring, 0, 3, 0, 0.6);
-      for (let i = cnt((3 + S * 0.2) * m); i > 0; i--) FX.emit(add, [jit(x, S * 0.4), cy, jit(z, S * 0.4)], [jit(0, S * 1.5), S * (0.6 + R()) + 6, jit(0, S * 1.5)], 0.9 + R() * 1.0, 0.6 + R() * 0.5 + S * 0.015, 0.25, 10, P.ember, -4, 1, 0, 1, R() * 0.15, 1.5 + S * 0.06);
+      FX.emit(add, p3(x, cy, z), Z3, 0.3 * Math.min(1.4, Math.sqrt(S / 10) + 0.3), S * 1.2, S * 2.4, 1, P.halo, 0, 2.5, 0, 0.8);
+      if (!big) FX.emit(add, p3(x, cy, z), Z3, 0.2, S * 0.5, S * 2.6, 11, P.ring, 0, 3, 0, 0.6);
+      for (let i = cnt((3 + S * 0.2) * m); i > 0; i--) FX.emit(add, p3(jit(x, S * 0.4), cy, jit(z, S * 0.4)), v3(jit(0, S * 1.5), S * (0.6 + R()) + 6, jit(0, S * 1.5)), 0.9 + R() * 1.0, 0.6 + R() * 0.5 + S * 0.015, 0.25, 10, P.ember, -4, 1, 0, 1, R() * 0.15, 1.5 + S * 0.06);
     } else if (P.id === 2) { /* Tessara: seiva que espirra e esporos que flutuam */
-      for (let i = cnt((4 + S * 0.35) * m); i > 0; i--) { const a = R() * TAU, sp = S * (1.5 + R() * 3) + 10; FX.emit(alp, [x, cy, z], [Math.cos(a) * sp, S * (1.5 + R() * 2.5) + 12, Math.sin(a) * sp], 0.6 + R() * 0.5, 0.8 + R() * 0.8 + S * 0.035, 0.6, 13, R() < 0.6 ? P.gota : P.gota2, 160 + S * 2, 1, 0, 1, R() * 0.05, 0.6); }
-      for (let i = cnt((3 + S * 0.15) * m); i > 0; i--) FX.emit(add, [jit(x, S * 0.5), cy, jit(z, S * 0.5)], [jit(0, S * 0.6), S * (0.3 + R() * 0.5) + 3, jit(0, S * 0.6)], 1.6 + R() * 1.4, 0.8 + R() * 0.8 + S * 0.02, 1.4 + S * 0.03, 7, P.esporo, -1, 1.5, 0, 0.5, 0.1 + R() * 0.3);
+      for (let i = cnt((4 + S * 0.35) * m); i > 0; i--) { const a = R() * TAU, sp = S * (1.5 + R() * 3) + 10; FX.emit(alp, p3(x, cy, z), v3(Math.cos(a) * sp, S * (1.5 + R() * 2.5) + 12, Math.sin(a) * sp), 0.6 + R() * 0.5, 0.8 + R() * 0.8 + S * 0.035, 0.6, 13, R() < 0.6 ? P.gota : P.gota2, 160 + S * 2, 1, 0, 1, R() * 0.05, 0.6); }
+      for (let i = cnt((3 + S * 0.15) * m); i > 0; i--) FX.emit(add, p3(jit(x, S * 0.5), cy, jit(z, S * 0.5)), v3(jit(0, S * 0.6), S * (0.3 + R() * 0.5) + 3, jit(0, S * 0.6)), 1.6 + R() * 1.4, 0.8 + R() * 0.8 + S * 0.02, 1.4 + S * 0.03, 7, P.esporo, -1, 1.5, 0, 0.5, 0.1 + R() * 0.3);
     } else if (P.id === 3) { /* Quorith: estilhaços de cristal que cintilam e um anel harmônico */
-      for (let i = cnt((3 + S * 0.25) * m); i > 0; i--) { const a = R() * TAU, hs = S * (2 + R() * 3) + 10, ds = 0.6 + R() * 0.8 + S * 0.03, p0 = [x, y + S * 0.25, z], vy = S * (1.5 + R() * 2.5) + 12, gD = 90 + S * 1.5;
-        FX.emit(alp, p0, [Math.cos(a) * hs, vy, Math.sin(a) * hs], 1.2 + R() * 1.2, ds, ds * 0.7, 5, P.debris, gD, 1, jit(0, 14), 1, R() * 0.03, Math.max(0.5, p0[1] - g0 - ds * 0.35) + 1000); }
-      for (let j = 0; j < 2; j++) FX.emit(add, [x, y + S * (0.45 + j * 0.4), z], [0, S * 0.3, 0], 0.42 + j * 0.1, S * 0.4, S * (2.6 - j * 0.6), 6, P.ring, 0, 2.4, 0, 0.8, 0.02 + j * 0.07, 1); /* anéis harmônicos deitados no ar (só o aro) */
+      for (let i = cnt((3 + S * 0.25) * m); i > 0; i--) { const a = R() * TAU, hs = S * (2 + R() * 3) + 10, ds = 0.6 + R() * 0.8 + S * 0.03, p0 = p3(x, y + S * 0.25, z), vy = S * (1.5 + R() * 2.5) + 12, gD = 90 + S * 1.5;
+        FX.emit(alp, p0, v3(Math.cos(a) * hs, vy, Math.sin(a) * hs), 1.2 + R() * 1.2, ds, ds * 0.7, 5, P.debris, gD, 1, jit(0, 14), 1, R() * 0.03, Math.max(0.5, p0[1] - g0 - ds * 0.35) + 1000); }
+      for (let j = 0; j < 2; j++) FX.emit(add, p3(x, y + S * (0.45 + j * 0.4), z), v3(0, S * 0.3, 0), 0.42 + j * 0.1, S * 0.4, S * (2.6 - j * 0.6), 6, P.ring, 0, 2.4, 0, 0.8, 0.02 + j * 0.07, 1); /* anéis harmônicos deitados no ar (só o aro) */
     } else if (P.id === 4) { /* Vorag: ácido que espirra e fumaça amarelada */
-      for (let i = cnt((4 + S * 0.3) * m); i > 0; i--) { const a = R() * TAU, sp = S * (1.5 + R() * 3) + 10; FX.emit(alp, [x, cy, z], [Math.cos(a) * sp, S * (1.5 + R() * 2.5) + 12, Math.sin(a) * sp], 0.6 + R() * 0.5, 0.8 + R() * 0.8 + S * 0.035, 0.6, 13, P.gota, 160 + S * 2, 1, 0, 1, R() * 0.05, 0.6); }
-      if (!imp) { FX.emit(alp, [jit(x, S * 0.2), y + S * 0.3, jit(z, S * 0.2)], [jit(0, 3), S * 0.5 + 5, jit(0, 3)], (1.6 + R() * 1.0) * Math.sqrt(S / 10 + 0.3), S * 0.5, S * 1.5, 3, P.acido, -S * 0.05, 1.6, jit(0, 0.3), 0.5, 0.1 + R() * 0.2, 6.35); /* nuvem de ácido */
-        for (let i = cnt((1 + S * 0.05) * m); i > 0; i--) FX.emit(alp, [jit(x, S * 0.3), y + S * 0.15, jit(z, S * 0.3)], [jit(0, S * 1.2), S * 0.4 + 4, jit(0, S * 1.2)], 1.0 + R() * 0.6, S * 0.4, S * 1.3, 4, [0.26, 0.05, 0.04], 0, 2, jit(0, 0.4), 0.55, 0.02, 2.2); } /* névoa de carne */
+      for (let i = cnt((4 + S * 0.3) * m); i > 0; i--) { const a = R() * TAU, sp = S * (1.5 + R() * 3) + 10; FX.emit(alp, p3(x, cy, z), v3(Math.cos(a) * sp, S * (1.5 + R() * 2.5) + 12, Math.sin(a) * sp), 0.6 + R() * 0.5, 0.8 + R() * 0.8 + S * 0.035, 0.6, 13, P.gota, 160 + S * 2, 1, 0, 1, R() * 0.05, 0.6); }
+      if (!imp) { FX.emit(alp, p3(jit(x, S * 0.2), y + S * 0.3, jit(z, S * 0.2)), v3(jit(0, 3), S * 0.5 + 5, jit(0, 3)), (1.6 + R() * 1.0) * Math.sqrt(S / 10 + 0.3), S * 0.5, S * 1.5, 3, P.acido, -S * 0.05, 1.6, jit(0, 0.3), 0.5, 0.1 + R() * 0.2, 6.35); /* nuvem de ácido */
+        for (let i = cnt((1 + S * 0.05) * m); i > 0; i--) FX.emit(alp, p3(jit(x, S * 0.3), y + S * 0.15, jit(z, S * 0.3)), v3(jit(0, S * 1.2), S * 0.4 + 4, jit(0, S * 1.2)), 1.0 + R() * 0.6, S * 0.4, S * 1.3, 4, K1, 0, 2, jit(0, 0.4), 0.55, 0.02, 2.2); } /* névoa de carne */
     } else if (big && !imp) { /* Vehnar e neutras: fumaça preta de óleo */
-      for (let i = cnt((1 + S * 0.04) * m); i > 0; i--) FX.emit(alp, [jit(x, S * 0.25), y + S * 0.35, jit(z, S * 0.25)], [jit(0, 3), S * 0.7 + 6, jit(0, 3)], (2.6 + R() * 1.6) * Math.sqrt(S / 10 + 0.3), S * 0.6, S * 2.1, 3, [0.045, 0.042, 0.04], -S * 0.06, 1.6, jit(0, 0.3), 0.75, 0.15 + R() * 0.2, 8.45);
+      for (let i = cnt((1 + S * 0.04) * m); i > 0; i--) FX.emit(alp, p3(jit(x, S * 0.25), y + S * 0.35, jit(z, S * 0.25)), v3(jit(0, 3), S * 0.7 + 6, jit(0, 3)), (2.6 + R() * 1.6) * Math.sqrt(S / 10 + 0.3), S * 0.6, S * 2.1, 3, K2, -S * 0.06, 1.6, jit(0, 0.3), 0.75, 0.15 + R() * 0.2, 8.45);
     }
   }
   // clarão na boca do cano (curto, sem fumaça)
-  FX.muzzle = function (x, y, z, col, s) { s = s || 3; FX.emit(add, [x, y, z], [0, 0, 0], 0.07, s, s * 1.6, 1, col || [1.6, 1.2, 0.7], 0, 1, 0, 1); if (R() < 0.5 * FX.mult) FX.emit(add, [x, y, z], [jit(0, 30), 10 + R() * 25, jit(0, 30)], 0.18, 0.7, 0.2, 2, [1.5, 1.0, 0.4], 120, 1, 0, 1); };
+  FX.muzzle = function (x, y, z, col, s) { s = s || 3; FX.emit(add, p3(x, y, z), Z3, 0.07, s, s * 1.6, 1, col || K10, 0, 1, 0, 1); if (R() < 0.5 * FX.mult) FX.emit(add, p3(x, y, z), v3(jit(0, 30), 10 + R() * 25, jit(0, 30)), 0.18, 0.7, 0.2, 2, K3, 120, 1, 0, 1); };
   // impacto: sem área, clarão pequeno, faíscas e um sopro de poeira; com área, uma explosão de impacto (terra em vez de sucata)
   FX.impact = function (x, y, z, splash, col) {
     if (splash > 0) { FX.explosion(x, y, z, Math.min(16, 3 + splash * 0.3), { tint: col, impact: true }); return; }
-    const c = col || [1.4, 0.9, 0.45]; FX.emit(add, [x, y + 1.5, z], [0, 0, 0], 0.06, 2.2, 3.4, 1, [c[0] * 1.2, c[1] * 1.2, c[2] * 1.2], 0, 1.5, 0, 0.8);
-    const n = cnt(3.5 * FX.mult); for (let i = 0; i < n; i++) { const a = R() * TAU; FX.emit(add, [x, y + 2, z], [Math.cos(a) * 45 * R(), 20 + R() * 40, Math.sin(a) * 45 * R()], 0.2 + R() * 0.3, 0.6 + R() * 0.5, 0.2, 2, c, 180, 1, 0, 1, 0, 1.2); }
-    if (R() < 0.8 * FX.mult) FX.emit(alp, [x, y + 1.2, z], [jit(0, 3), 5 + R() * 4, jit(0, 3)], 0.7 + R() * 0.4, 1.6, 5.5, 4, [0.45, 0.4, 0.34], 0, 2, jit(0, 0.4), 0.5, 0, 2);
+    const c = col || K11; FX.emit(add, p3(x, y + 1.5, z), Z3, 0.06, 2.2, 3.4, 1, c3(c[0] * 1.2, c[1] * 1.2, c[2] * 1.2), 0, 1.5, 0, 0.8);
+    const n = cnt(3.5 * FX.mult); for (let i = 0; i < n; i++) { const a = R() * TAU; FX.emit(add, p3(x, y + 2, z), v3(Math.cos(a) * 45 * R(), 20 + R() * 40, Math.sin(a) * 45 * R()), 0.2 + R() * 0.3, 0.6 + R() * 0.5, 0.2, 2, c, 180, 1, 0, 1, 0, 1.2); }
+    if (R() < 0.8 * FX.mult) FX.emit(alp, p3(x, y + 1.2, z), v3(jit(0, 3), 5 + R() * 4, jit(0, 3)), 0.7 + R() * 0.4, 1.6, 5.5, 4, K4, 0, 2, jit(0, 0.4), 0.5, 0, 2);
   };
   // fumaça macia (chaminés, carcaças, estruturas avariadas) — 4.3g: com volume e luz da cena
-  FX.smoke = function (x, y, z, col, life, vz, size) { const s = size || 6; FX.emit(alp, [x, y, z], [jit(0, 3), vz == null ? 12 : vz, jit(0, 3)], life || 2.5, s * 0.6, s * 2, 3, col, -0.5, 1.5, jit(0, 0.5), 0.8); };
-  FX.trail = function (x, y, z) { FX.emit(alp, [x, y, z], [jit(0, 2), 3, jit(0, 2)], 0.7, 1.2, 4, 3, [0.5, 0.48, 0.46], 0, 1.5, 0, 0.45); };
-  FX.glow = function (x, y, z, col, size, life, vy) { FX.emit(add, [x, y, z], [0, vy || 0, 0], life || 0.6, size, size * 1.4, 7, col, 0, 2, 0, 1); };
-  FX.pulse = function (x, y, z, col, r, life) { FX.emit(add, [x, y + 0.8, z], [0, 0, 0], life || 1.2, r * 0.15, r, 6, col, 0, 2.2, 0, 1); };
-  FX.ring = function (x, y, z, col, r, life) { FX.emit(add, [x, y, z], [0, 0, 0], life || 0.9, r * 0.2, r, 8, col, 0, 2.2, 0, 1); };
+  FX.smoke = function (x, y, z, col, life, vz, size) { const s = size || 6; FX.emit(alp, p3(x, y, z), v3(jit(0, 3), vz == null ? 12 : vz, jit(0, 3)), life || 2.5, s * 0.6, s * 2, 3, col, -0.5, 1.5, jit(0, 0.5), 0.8); };
+  FX.trail = function (x, y, z) { FX.emit(alp, p3(x, y, z), v3(jit(0, 2), 3, jit(0, 2)), 0.7, 1.2, 4, 3, K5, 0, 1.5, 0, 0.45); };
+  FX.glow = function (x, y, z, col, size, life, vy) { FX.emit(add, p3(x, y, z), v3(0, vy || 0, 0), life || 0.6, size, size * 1.4, 7, col, 0, 2, 0, 1); };
+  FX.pulse = function (x, y, z, col, r, life) { FX.emit(add, p3(x, y + 0.8, z), Z3, life || 1.2, r * 0.15, r, 6, col, 0, 2.2, 0, 1); };
+  FX.ring = function (x, y, z, col, r, life) { FX.emit(add, p3(x, y, z), Z3, life || 0.9, r * 0.2, r, 8, col, 0, 2.2, 0, 1); };
   // 4.3g: fogo contínuo (carcaças em chamas, construções avariadas): o chamador chama a cada quadro com a chance que quiser; size = tamanho
   // da chama, k = força (0..1), pull (opcional) = puxão para a câmera em unidades (fogo de construção nasce dentro da malha: ~0,9 × raio). Línguas de chama que tremulam e sobem, núcleo quente, fumaça escura acesa por baixo, brasas e estalos.
   // A emissão é por segundo (usa o dt do quadro): o fogo tem a mesma cara a 20 ou a 60 quadros por segundo.
@@ -516,16 +523,16 @@ void main() {
     k = k == null ? 1 : Math.max(0, Math.min(1, k)); const m = FX.mult, dk = FX.dt > 0 ? Math.min(8, FX.dt * 60) : 0; if (!dk || !(size > 0)) return;
     const s = size, kk = 0.35 + 0.65 * k, pu = Math.max(0, Math.min(99, Math.floor(pull || 0))); /* pull (opcional): quanto o fogo vem para a frente, em unidades do mundo, quando o ponto fica dentro da malha */
     for (let i = cnt(0.65 * m * dk * (0.3 + 0.7 * k)); i > 0; i--) { const a = R() * TAU, rr = Math.sqrt(R()) * s * 0.45, h = s * (0.7 + R() * 0.5) * kk; /* línguas */
-      FX.emit(alp, [x + Math.cos(a) * rr, y + s * 0.1, z + Math.sin(a) * rr], [jit(0, s * 0.12), s * (0.8 + R() * 0.8) * kk, jit(0, s * 0.12)], 0.32 + R() * 0.3, h, h * 0.5, 9, [1, 1, 1], -s * 1.4 * kk, 1.3, 0, 0.75 + 0.25 * k, R() * 0.02, pu + (1.4 + R() * 0.7) / 10); }
+      FX.emit(alp, p3(x + Math.cos(a) * rr, y + s * 0.1, z + Math.sin(a) * rr), v3(jit(0, s * 0.12), s * (0.8 + R() * 0.8) * kk, jit(0, s * 0.12)), 0.32 + R() * 0.3, h, h * 0.5, 9, K6, -s * 1.4 * kk, 1.3, 0, 0.75 + 0.25 * k, R() * 0.02, pu + (1.4 + R() * 0.7) / 10); }
     for (let i = cnt(0.27 * m * dk * k); i > 0; i--) { const a = R() * TAU, rr = Math.sqrt(R()) * s * 0.35, b = s * (0.75 + R() * 0.45) * kk; /* corpo do fogo: bolas que queimam quase a vida toda e soltam fuligem */
-      FX.emit(alp, [x + Math.cos(a) * rr, y + s * 0.15, z + Math.sin(a) * rr], [jit(0, s * 0.15), s * (0.9 + R() * 0.7), jit(0, s * 0.15)], 0.55 + R() * 0.35, b, b * 1.5, 14, [0.07, 0.065, 0.06], -s * 0.6, 1.6, jit(0, 1.5), 0.9, R() * 0.02, Math.min(99, pu + Math.round(s * 0.6)) * 100 + 10 + 0.55 + R() * 0.15); }
-    if (R() < 0.18 * m * dk * k) FX.emit(add, [jit(x, s * 0.2), y + s * 0.2, jit(z, s * 0.2)], [0, s * 0.3, 0], 0.22 + R() * 0.12, s * 1.2, s * 1.6, 7, [1.2 * k, 0.42 * k, 0.09 * k], 0, 2, 0, 0.5, 0, pu + s * 1.1); /* núcleo quente */
+      FX.emit(alp, p3(x + Math.cos(a) * rr, y + s * 0.15, z + Math.sin(a) * rr), v3(jit(0, s * 0.15), s * (0.9 + R() * 0.7), jit(0, s * 0.15)), 0.55 + R() * 0.35, b, b * 1.5, 14, K7, -s * 0.6, 1.6, jit(0, 1.5), 0.9, R() * 0.02, Math.min(99, pu + Math.round(s * 0.6)) * 100 + 10 + 0.55 + R() * 0.15); }
+    if (R() < 0.18 * m * dk * k) FX.emit(add, p3(jit(x, s * 0.2), y + s * 0.2, jit(z, s * 0.2)), v3(0, s * 0.3, 0), 0.22 + R() * 0.12, s * 1.2, s * 1.6, 7, c3(1.2 * k, 0.42 * k, 0.09 * k), 0, 2, 0, 0.5, 0, pu + s * 1.1); /* núcleo quente */
     for (let i = cnt(0.22 * m * dk * (0.45 + 0.55 * k)); i > 0; i--) { const sc = 0.05 + R() * 0.03 + (1 - k) * 0.08; /* fumaça escura acesa por baixo */
-      FX.emit(alp, [jit(x, s * 0.25), y + s * (1.0 + 0.6 * k), jit(z, s * 0.25)], [jit(0, 2.5), s * (1.3 + R()) + 4, jit(0, 2.5)], 2.4 + R() * 1.4, s * (0.8 + R() * 0.3), s * (2.8 + R() * 1.2), 3, [sc, sc * 0.95, sc * 0.9], -s * 0.12, 1.6, jit(0, 0.35), 0.8 * (0.55 + 0.45 * k), R() * 0.03, 3.05 + 0.3 * k); }
-    if (R() < 0.14 * m * dk * k) FX.emit(add, [jit(x, s * 0.3), y + s * 0.3, jit(z, s * 0.3)], [jit(0, 4), s * (1.8 + R() * 2) + 6, jit(0, 4)], 1 + R() * 1.2, 0.45 + R() * 0.4 + s * 0.03, 0.3, 10, [1.9, 0.85, 0.3], -2, 1, 0, 1, 0, s * (0.15 + R() * 0.2)); /* brasas */
-    if (R() < 0.03 * m * dk * k) FX.emit(add, [x, y + s * 0.4, z], [jit(0, 14), 22 + R() * 26, jit(0, 14)], 0.6 + R() * 0.6, 0.6, 0.2, 2, [1.8, 0.85, 0.3], 40, 1, 0, 1, 0, 0.8); /* estalos */
+      FX.emit(alp, p3(jit(x, s * 0.25), y + s * (1.0 + 0.6 * k), jit(z, s * 0.25)), v3(jit(0, 2.5), s * (1.3 + R()) + 4, jit(0, 2.5)), 2.4 + R() * 1.4, s * (0.8 + R() * 0.3), s * (2.8 + R() * 1.2), 3, c3(sc, sc * 0.95, sc * 0.9), -s * 0.12, 1.6, jit(0, 0.35), 0.8 * (0.55 + 0.45 * k), R() * 0.03, 3.05 + 0.3 * k); }
+    if (R() < 0.14 * m * dk * k) FX.emit(add, p3(jit(x, s * 0.3), y + s * 0.3, jit(z, s * 0.3)), v3(jit(0, 4), s * (1.8 + R() * 2) + 6, jit(0, 4)), 1 + R() * 1.2, 0.45 + R() * 0.4 + s * 0.03, 0.3, 10, K8, -2, 1, 0, 1, 0, s * (0.15 + R() * 0.2)); /* brasas */
+    if (R() < 0.03 * m * dk * k) FX.emit(add, p3(x, y + s * 0.4, z), v3(jit(0, 14), 22 + R() * 26, jit(0, 14)), 0.6 + R() * 0.6, 0.6, 0.2, 2, K9, 40, 1, 0, 1, 0, 0.8); /* estalos */
   };
-  FX.spark = function (x, y, z, col, sp, n) { n = Math.max(1, Math.round((n || 1) * FX.mult)); for (let i = 0; i < n; i++) { const a = R() * TAU; FX.emit(add, [x, y, z], [Math.cos(a) * sp * R(), sp * (0.4 + R() * 0.8), Math.sin(a) * sp * R()], 0.35 + R() * 0.5, 0.6 + R() * 0.6, 0.2, 2, col, 200, 1, 0, 1); } };
+  FX.spark = function (x, y, z, col, sp, n) { n = Math.max(1, Math.round((n || 1) * FX.mult)); for (let i = 0; i < n; i++) { const a = R() * TAU; FX.emit(add, p3(x, y, z), v3(Math.cos(a) * sp * R(), sp * (0.4 + R() * 0.8), Math.sin(a) * sp * R()), 0.35 + R() * 0.5, 0.6 + R() * 0.6, 0.2, 2, col, 200, 1, 0, 1); } };
   return FX;
 }
 ARD.fx3d = { create, m5: true /* 5.0b: portado para o Motor 5 (TSL) */, farol: m5Farol, inversoSaida: m5InversoSaida };

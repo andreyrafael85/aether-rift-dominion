@@ -30,7 +30,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.0h.2';
+const VERSION = '5.0h.3';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -273,19 +273,35 @@ function loadingInfo(cfg, netCtx) { try {
    pior quadro da janela). O teste de desempenho mostra os 5 piores quadros; ARD.detetive() devolve os 5 piores dos últimos 4096 quadros. */
 const DET = { N: 4096, n: 0, ms: new Float32Array(4096), cpu: new Float32Array(4096), sim: new Float32Array(4096), draw: new Float32Array(4096), steps: new Uint8Array(4096), ev: new Uint16Array(4096), comp: new Uint16Array(4096), fl: new Uint8Array(4096), memD: new Float32Array(4096), pos: new Float32Array(4096) /* 5.0b.1 */, p: { cpu: 0, sim: 0, draw: 0, steps: 0, ev: 0, comp: 0, fl: 0, pos: 0 }, prog: -1, scale: -1, qual: '', mem: 0, memN: 0, m5: false };
 const DF = { comp: 1, res: 2, qual: 4, gc: 8, passos: 16, oculto: 32 };
+/* 5.0h.3: o que havia no quadro, além do tempo — as criações na GPU (src/gpuconta.js: buffers, texturas, grupos de ligação, pipelines ou
+   programas, objetos de desenho novos e montagens de nós do three, KB enviados) e os 3 tipos de evento da simulação mais comuns nos tiques do
+   quadro. Liga no Teste de desempenho e com ?m5conta; fora disso nada é contado. Filas fixas, como o DET (nada alocado por quadro). */
+const DG = { on: false, cria: new Uint16Array(4096), buf: new Uint16Array(4096), tex: new Uint16Array(4096), bg: new Uint16Array(4096), ro: new Uint16Array(4096), nb: new Uint16Array(4096), kb: new Float32Array(4096), eT: new Uint8Array(4096 * 3), eC: new Uint16Array(4096 * 3),
+  p: { cria: 0, buf: 0, tex: 0, bg: 0, ro: 0, nb: 0, kb: 0, t0: 0, t1: 0, t2: 0, c0: 0, c1: 0, c2: 0 }, tipos: [''], id: new Map(), evc: new Uint16Array(64) };
+function dgEventos(ev) { for (let i = 0; i < ev.length; i++) { const t = ev[i].t; let k = DG.id.get(t); if (k === undefined) { k = DG.tipos.length < 64 ? DG.tipos.length : 0; if (k) { DG.tipos.push(t); DG.id.set(t, k); } } if (k && DG.evc[k] < 65535) DG.evc[k]++; } }
+function dgFim() { const P = DG.p, C = ARD.gpuConta; const z = C ? C.quadro() : null; if (z) { P.buf = z.buf; P.tex = z.tex; P.bg = z.bg; P.ro = z.ro; P.nb = z.nb; P.kb = z.wbKB; P.cria = z.buf + z.tex + z.bg + z.pipe + z.prog; }
+  let a = 0, b = 0, c = 0, ca = 0, cb = 0, cc = 0; const E = DG.evc; for (let k = 1; k < 64; k++) { const v = E[k]; if (!v) continue; E[k] = 0; if (v > ca) { c = b; cc = cb; b = a; cb = ca; a = k; ca = v; } else if (v > cb) { c = b; cc = cb; b = k; cb = v; } else if (v > cc) { c = k; cc = v; } }
+  P.t0 = a; P.c0 = ca; P.t1 = b; P.c1 = cb; P.t2 = c; P.c2 = cc; }
+function dgPush(i) { const P = DG.p, m = (v, x) => v > x ? x : v; DG.cria[i] = m(P.cria, 65535); DG.buf[i] = m(P.buf, 65535); DG.tex[i] = m(P.tex, 65535); DG.bg[i] = m(P.bg, 65535); DG.ro[i] = m(P.ro, 65535); DG.nb[i] = m(P.nb, 65535); DG.kb[i] = P.kb; DG.eT[i * 3] = P.t0; DG.eC[i * 3] = P.c0; DG.eT[i * 3 + 1] = P.t1; DG.eC[i * 3 + 1] = P.c1; DG.eT[i * 3 + 2] = P.t2; DG.eC[i * 3 + 2] = P.c2;
+  P.cria = P.buf = P.tex = P.bg = P.ro = P.nb = P.kb = 0; P.t0 = P.t1 = P.t2 = P.c0 = P.c1 = P.c2 = 0; }
+const DG_ROT = { shot: 'tiro', impact: 'impacto', hit: 'golpe', death: 'morte', float: 'texto flutuante', spawn: 'nascimento', promote: 'promoção', built: 'obra pronta', place: 'obra começa', alert: 'alerta', notice: 'aviso', siphon: 'sifão', crate: 'caixa', super: 'superarma', storm: 'tempestade', chefe: 'chefão', mundo: 'mundo', cmd: 'comandante', unica: 'construção única', module: 'módulo', era: 'era' }; /* rótulos em pad.bench.ev.* */
+function dgTexto(i, out) { if (!DG.on) return; const r1 = v => Math.round(v * 10) / 10;
+  for (let j = 0; j < 3; j++) { const t = DG.eT[i * 3 + j], c = DG.eC[i * 3 + j]; if (!t || !c) break; const nm = DG.tipos[t]; out.push(c + ' × ' + (DG_ROT[nm] || nm)); }
+  if (DG.cria[i]) out.push(DG.cria[i] + (DG.cria[i] === 1 ? ' criação na GPU' : ' criações na GPU')); if (DG.bg[i]) out.push(DG.bg[i] + (DG.bg[i] === 1 ? ' grupo de ligação' : ' grupos de ligação')); if (DG.buf[i]) out.push(DG.buf[i] + (DG.buf[i] === 1 ? ' buffer novo' : ' buffers novos')); if (DG.tex[i]) out.push(DG.tex[i] + (DG.tex[i] === 1 ? ' textura nova' : ' texturas novas'));
+  if (DG.ro[i]) out.push(DG.ro[i] + (DG.ro[i] === 1 ? ' objeto de desenho novo' : ' objetos de desenho novos')); if (DG.nb[i]) out.push(DG.nb[i] + (DG.nb[i] === 1 ? ' montagem de shader' : ' montagens de shader')); if (DG.kb[i] >= 64) out.push(Math.round(DG.kb[i]) + ' KB enviados à GPU'); }
 /* 5.0b.1: o tempo da linha principal depois do quadro (estilo, layout e pintura do HUD, envio do canvas): uma mensagem postada no fim do quadro
    roda depois da atualização da tela; até ela chegar, o navegador ainda trabalhava. Sem isto, esse trabalho aparecia como "CPU folgada" */
 const DETMC = typeof MessageChannel === 'function' ? new MessageChannel() : null; if (DETMC) DETMC.port1.onmessage = () => { DET.p.pos = performance.now() - DET.fimQ; };
-function detPush(iv) { const D = DET, i = D.n % D.N, P = D.p; D.ms[i] = iv; D.pos[i] = P.pos; P.pos = 0; /* 5.0b.1 */ D.cpu[i] = P.cpu; D.sim[i] = P.sim; D.draw[i] = P.draw; D.steps[i] = Math.min(255, P.steps); D.ev[i] = Math.min(65535, P.ev); D.comp[i] = Math.min(65535, P.comp); D.fl[i] = P.fl; D.memD[i] = 0; D.n++; }
+function detPush(iv) { const D = DET, i = D.n % D.N, P = D.p; D.ms[i] = iv; D.pos[i] = P.pos; P.pos = 0; /* 5.0b.1 */ D.cpu[i] = P.cpu; D.sim[i] = P.sim; D.draw[i] = P.draw; D.steps[i] = Math.min(255, P.steps); D.ev[i] = Math.min(65535, P.ev); D.comp[i] = Math.min(65535, P.comp); D.fl[i] = P.fl; D.memD[i] = 0; if (DG.on) dgPush(i); /* 5.0h.3 */ D.n++; }
 function detEnd(R, cpu, sim, draw, steps, ev) { const D = DET, P = D.p; if (DETMC) { D.fimQ = performance.now(); DETMC.port2.postMessage(0); } /* 5.0b.1 */ P.cpu = cpu; P.sim = sim; P.draw = draw; P.steps = steps; P.ev = ev; let fl = 0; D.m5 = !!(R && R.m5);
   const pg = R && R.progs ? R.progs() : 0; P.comp = D.prog >= 0 ? Math.max(0, pg - D.prog) : 0; D.prog = pg; if (P.comp) fl |= DF.comp;
   const sc = R && R.dyn ? R.dyn.scale : 1; if (D.scale >= 0 && sc !== D.scale) fl |= DF.res; D.scale = sc;
   const qn = R && R.quality ? R.quality.resolved || '' : ''; if (D.qual && qn !== D.qual) fl |= DF.qual; D.qual = qn;
-  if (steps > 1) fl |= DF.passos; if (document.hidden) fl |= DF.oculto; P.fl = fl;
+  if (steps > 1) fl |= DF.passos; if (document.hidden) fl |= DF.oculto; P.fl = fl; if (DG.on) dgFim(); /* 5.0h.3 */
   if (++D.memN % 6 === 0 && performance.memory) { const m = performance.memory.usedJSHeapSize / 1048576; if (D.mem && m < D.mem - 2) { let w = -1, wv = -1; for (let k = 1; k <= 6 && k <= D.n; k++) { const i = (D.n - k) % D.N; if (D.ms[i] > wv) { wv = D.ms[i]; w = i; } } if (w >= 0) { D.fl[w] |= DF.gc; D.memD[w] = D.mem - m; } } D.mem = m; } }
 function detTop(from, to, k) { const D = DET; from = Math.max(from, to - D.N, 0); const best = []; for (let n = from; n < to; n++) { const i = n % D.N, v = D.ms[i]; if (best.length < k || v > D.ms[best[best.length - 1] % D.N]) { best.push(n); best.sort((a, b) => D.ms[b % D.N] - D.ms[a % D.N]); if (best.length > k) best.pop(); } }
   const r1 = v => Math.round(v * 10) / 10; return best.map(n => { const i = n % D.N, f = D.fl[i], ms = D.ms[i], cpu = D.cpu[i]; const out = [Math.round(ms) + ' ms', 'CPU ' + r1(cpu) + ' ms (simulação ' + r1(D.sim[i]) + ' · desenho ' + r1(D.draw[i]) + ')', D.steps[i] + (D.steps[i] === 1 ? ' passo' : ' passos') + ' da simulação', D.ev[i] + ' eventos'];
-    if (f & DF.comp) out.push(D.comp[i] + (D.m5 ? ' pipelines criados' : ' shaders compilados')); if (f & DF.res) out.push('troca de resolução'); if (f & DF.qual) out.push('troca de qualidade'); if (f & DF.gc) out.push('coleta de lixo provável (−' + Math.round(D.memD[i]) + ' MB)'); if (f & DF.oculto) out.push('aba em segundo plano');
+    if (f & DF.comp) out.push(D.comp[i] + (D.m5 ? ' pipelines criados' : ' shaders compilados')); if (f & DF.res) out.push('troca de resolução'); if (f & DF.qual) out.push('troca de qualidade'); if (f & DF.gc) out.push('coleta de lixo provável (−' + Math.round(D.memD[i]) + ' MB)'); if (f & DF.oculto) out.push('aba em segundo plano'); dgTexto(i, out); /* 5.0h.3: tipos de evento e criações na GPU */
     if (D.pos[i] >= 0.05) out.push('depois do quadro ' + r1(D.pos[i]) + ' ms (estilo, layout, pintura e envio do canvas)'); /* 5.0b.1 */
     if (!(f & (DF.comp | DF.gc | DF.res | DF.qual)) && cpu + D.pos[i] < ms * 0.4) out.push('CPU folgada: espera da GPU, do compositor ou do navegador'); /* 5.0b.1: a CPU conta também o trabalho depois do quadro */ return out.join(' · '); }); }
 ARD.detetive = (k) => detTop(0, DET.n, k || 5);
@@ -314,6 +330,7 @@ function startGame(cfg, netCtx) {
   const human = netCtx ? netCtx.myId : 0;
   const canvas = $('world'), mini = $('minimap'), overlay = $('overlay');
   $('start').hidden = true; $('game').hidden = false; $('end').hidden = true;
+  if (ARD.gpuConta) ARD.gpuConta.bench = !!cfg.bench; DG.on = !!(ARD.gpuConta && ARD.gpuConta.quer()); /* 5.0h.3: o contador da GPU liga antes do renderizador nascer */
   let R = null; const want3d = (cfg.gfx || '3d') === '3d' && params.get('r') !== '2d';
   if (want3d && window.THREE) { try { R = ARD.render3d.create(canvas, overlay, mini); } catch (err) { console.warn('3D indisponível, usando 2D:', err); R = null; } }
   if (!R && want3d && window.THREE && ARD.motor === '5') { console.warn('[ARD] Motor 5 falhou na criação; tentando o motor clássico'); ARD.motor = 'classico'; try { R = ARD.render3d.create(canvas, overlay, mini); } catch (err) { R = null; } } /* 5.0a */
@@ -404,7 +421,7 @@ function startGame(cfg, netCtx) {
     }
     if (sim.tick % 10 === 0) for (const a of G.ais) for (const c of ARD.ai.think(sim, a)) S.enqueue(sim, c);
     if (net) for (const c of net.takeCmds(tick)) S.enqueue(sim, c);
-    const ev = S.step(sim); G.detEv = (G.detEv || 0) + ev.length; /* 5.0a: detetive */
+    const ev = S.step(sim); G.detEv = (G.detEv || 0) + ev.length; /* 5.0a: detetive */ if (DG.on) dgEventos(ev); /* 5.0h.3 */
     if (net && sim.tick % 10 === 0) { const h = S.hash(sim); net.sendHash(sim.tick, h); (G.hashLog = G.hashLog || {})[sim.tick] = h; const ks = Object.keys(G.hashLog); if (ks.length > 80) delete G.hashLog[ks[0]]; }
     if (!silent) G.R.onEvents(ARD.idioma === 'pt-BR' ? ev : ev.map(x => x.t === 'float' && typeof x.text === 'string' ? Object.assign({}, x, { text: TRx(x.text) }) : x), sim, human); /* 5.0c: textos flutuantes no idioma, numa cópia (a campanha lê o original em pt-BR) */
     handleEvents(ev, silent);
