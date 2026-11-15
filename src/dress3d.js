@@ -39,7 +39,9 @@ const TINT = { capim: [0.14, [1.08, 1.0, 0.8], [0.88, 1.0, 0.95]], folhagem: [0.
   seco: [0.12, [1.05, 0.98, 0.9], [0.95, 0.95, 1.0]], suculenta: [0.1, [1.0, 0.98, 1.04], [0.96, 1.04, 0.96]], cristal: [0.06, [0.98, 1.0, 1.03], [1.0, 1.0, 1.0]], liquen: [0.1], geada: [0.08], neve: [0.04],
   espinho: [0.08], toco: [0.1], respiro: [0.08], cinza: [0.1], obsidiana: [0.12], fungo: [0.1, [1.05, 0.95, 1.05], [0.95, 1.0, 1.06]], boulder: [0.1], pebble: [0.14], cascalho: [0.12], marco_tundra: [0.08, [1.05, 1.0, 0.9], [0.92, 1.0, 1.02]], marco_rocha: [0.08], marco_gelo: [0.05] };
 /* albedo linear das pedras e do cascalho (geometria quase branca) por bioma */
-const ROCK_COL = { gelo: [0.093, 0.122, 0.195], rocha: [0.26, 0.155, 0.095], tundra: [0.156, 0.144, 0.112], basalto: [0.027, 0.024, 0.03] }; /* 4.3c: quentes no deserto, azuladas no gelo, negras no basalto */
+const ROCK_COL = { gelo: [0.36, 0.42, 0.52], rocha: [0.50, 0.37, 0.25], tundra: [0.33, 0.31, 0.25], basalto: [0.10, 0.09, 0.11] }; /* 5.5a: leitura — pedras e cascalho no tom do chão de cada bioma (antes bem mais escuras: gelo [0.093, 0.122, 0.195], rocha [0.26, 0.155, 0.095], tundra [0.156, 0.144, 0.112], basalto [0.027, 0.024, 0.03]); elas competiam com as unidades na câmera de jogo */
+/* 5.5a: adereços escuros do deserto e do gelo clareados para perto do chão (multiplica a cor da peça; 1 = como antes) */
+const CALMO = { seco: 1.45, toco: 1.4, suculenta: 1.2, espinho: 1.3, obsidiana: 1.6, cinza: 1.3 };
 const CELL = 400; /* blocos de instâncias: um InstancedMesh por tipo/variante e por bloco, recortado pela câmera */
 const MIN_BLOCK = 6; /* abaixo disto o grupo vai para o bloco maior */
 /* distâncias da câmera até a caixa do bloco: além de FAR_* o bloco não é desenhado (miúdos, médios, grandes = árvores e matacões); além de LITE_D usa a geometria leve */
@@ -101,7 +103,7 @@ function create(THREE, scene, opts) {
     const ground = (x, y, rad) => { const r = rad * 0.7; return Math.min(H(x, y), H(x + r, y), H(x - r, y), H(x, y + r), H(x, y - r)); }; /* encosta: assenta pelo ponto mais baixo do pé */
     const add = (k, x, y, h1, h2, h3, sm, biome) => { const [s0, s1] = SIZE[k], sc = (s0 + (s1 - s0) * h1) * (sm || 1), ks = keys[k]; const key = ks[(((h3 * 9.73) % 1) * ks.length) | 0] || ks[0], rad = sc * 1.05;
       if (blocked(x, y, rad * 0.35)) return null; if (bioAt && biome) { bioAt(x, y, _bw); const bi = S.BIOMES.indexOf(biome), bt = _bw[0] + _bw[1] + _bw[2] + _bw[3] || 1; if (bi >= 0 && _bw[bi] / bt < 0.34) return null; } /* 4.3c: peça só onde o chão desenhado é do bioma dela */ const tj = TINT[k] || [0.1], L = tj[0], ca = tj[1] || [1, 1, 1], cb = tj[2] || [1, 1, 1], u = Math.pow((h2 * 7.31) % 1, 2.2), val = 1 - L + 2 * L * h2; /* matiz puxado para A: o B (alienígena) é minoria */
-      const base = (k === 'cascalho' || k === 'pebble' || k === 'boulder') ? (ROCK_COL[biome] || ROCK_COL.rocha) : [1, 1, 1];
+      const ck = CALMO[k] || 1; const base = (k === 'cascalho' || k === 'pebble' || k === 'boulder') ? (ROCK_COL[biome] || ROCK_COL.rocha) : [ck, ck, ck]; /* 5.5a */
       const col = [0, 1, 2].map(i => (ca[i] + (cb[i] - ca[i]) * u) * val * base[i]); const o = { k: key, kind: k, x, y, a: h3 * 113.7 % (Math.PI * 2), sc, sy: SHADOW.has(k) ? 0.85 + 0.3 * h1 : 0.8 + 0.4 * ((h1 * 3.7) % 1), col, rad };
       o.gy = ground(x, y, Math.min(rad, 14)) - 0.04 * sc; items.push(o); return o; };
     for (let ty = 0; ty < TILES; ty++) for (let tx = 0; tx < TILES; tx++) {

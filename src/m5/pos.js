@@ -47,20 +47,20 @@ M5.bloomClassico = function (entrada, o) {
         const s = r.getDrawingBufferSize(tam); this.setSize(s.width, s.height);
         r.setRenderTarget(this._lum); quad.material = this._mLum; quad.render(r);
         let ent = this._lum; const D = this._mDesce, S = this._mSobe;
-        quad.material = D; for (let i = 0; i < this._desce.length; i++) { D.ardTex.value = ent.texture; D.ardTexel.value.set(1 / ent.width, 1 / ent.height); r.setRenderTarget(this._desce[i]); quad.render(r); ent = this._desce[i]; }
-        quad.material = S; for (let i = this._sobe.length - 1; i >= 0; i--) { S.ardTex.value = ent.texture; S.ardBase.value = this._desce[i].texture; S.ardTexel.value.set(1 / ent.width, 1 / ent.height); r.setRenderTarget(this._sobe[i]); quad.render(r); ent = this._sobe[i]; }
+        quad.material = D; for (let i = 0; i < this._desce.length; i++) { D.ardTex.value = ent.texture; if (D.ardTexel.value) D.ardTexel.value.set(1 / ent.width, 1 / ent.height); r.setRenderTarget(this._desce[i]); quad.render(r); ent = this._desce[i]; }
+        quad.material = S; for (let i = this._sobe.length - 1; i >= 0; i--) { S.ardTex.value = ent.texture; S.ardBase.value = this._desce[i].texture; if (S.ardTexel.value) S.ardTexel.value.set(1 / ent.width, 1 / ent.height); r.setRenderTarget(this._sobe[i]); quad.render(r); ent = this._sobe[i]; }
         Tm.RendererUtils.restoreRendererState(r, estado); }
-      setup(builder) { const ctx = context(builder.getSharedContext()); const nm = (n, f) => { const m = new Tm.NodeMaterial(); m.contextNode = ctx; m.fragmentNode = f; if (M5.registrar) M5.registrar(n, m); else m.name = 'ard-' + n; return m; };
+      setup(builder) { const ctx = context(builder.getSharedContext()); const texel = tx => (M5.bloomTexelU || !window.TSL.textureSize ? uniform(new Tm.Vector2(1, 1)) : vec2(1).div(vec2(window.TSL.textureSize(tx)))); /* 5.5a: o tamanho do pixel da entrada sai da própria textura, no shader. Antes era um uniform trocado a cada um dos 13 passes do brilho: 13 envios à GPU por quadro para um valor que a GPU já sabe */ const nm = (n, f) => { const m = new Tm.NodeMaterial(); m.contextNode = ctx; m.fragmentNode = f; if (M5.registrar) M5.registrar(n, m); else m.name = 'ard-' + n; return m; };
         /* limiar: a cor vezes smoothstep(limiar, limiar + suave, luminância), como o LuminanceMaterial com colorOutput */
         if (!this._mLum) this._mLum = nm('bloom-limiar', Fn(() => { const c = this.inputNode; return c.mul(smoothstep(this.threshold, this.threshold.add(this.smoothWidth), luminance(c.rgb))); })());
         /* redução: o DownsamplingMaterial do pmndrs (4 amostras de dentro × 0,125, 8 de fora e o centro × 0,05556; fora da imagem pesa 0) */
-        if (!this._mDesce) { const tx = texture(this._lum.texture), tl = uniform(new Tm.Vector2(1, 1)); const W1 = 0.125, W2 = 0.05556;
+        if (!this._mDesce) { const tx = texture(this._lum.texture), tl = texel(tx); const W1 = 0.125, W2 = 0.05556;
           this._mDesce = nm('bloom-desce', Fn(() => { const c = uv(); const borda = p => step(0, p.x).mul(step(p.x, 1)).mul(step(0, p.y)).mul(step(p.y, 1));
             const a = (dx, dy, w) => { const p = c.add(tl.mul(vec2(dx, dy))); return tx.sample(p).mul(borda(p).mul(w)); };
             return a(-1, 1, W1).add(a(1, 1, W1)).add(a(-1, -1, W1)).add(a(1, -1, W1)).add(a(-2, 2, W2)).add(a(0, 2, W2)).add(a(2, 2, W2)).add(a(-2, 0, W2)).add(a(2, 0, W2)).add(a(-2, -2, W2)).add(a(0, -2, W2)).add(a(2, -2, W2)).add(tx.sample(c).mul(W2)); })());
           this._mDesce.ardTex = tx; this._mDesce.ardTexel = tl; }
         /* ampliação: o UpsamplingMaterial do pmndrs (tenda 3×3 no nível de baixo) misturado ao nível do mesmo tamanho pelo raio */
-        if (!this._mSobe) { const tx = texture(this._lum.texture), bs = texture(this._lum.texture), tl = uniform(new Tm.Vector2(1, 1));
+        if (!this._mSobe) { const tx = texture(this._lum.texture), bs = texture(this._lum.texture), tl = texel(tx);
           this._mSobe = nm('bloom-sobe', Fn(() => { const c = uv(); const t = (dx, dy, w) => tx.sample(c.add(tl.mul(vec2(dx, dy)))).mul(w);
             const soma = t(-1, 1, 0.0625).add(t(0, 1, 0.125)).add(t(1, 1, 0.0625)).add(t(-1, 0, 0.125)).add(tx.sample(c).mul(0.25)).add(t(1, 0, 0.125)).add(t(-1, -1, 0.0625)).add(t(0, -1, 0.125)).add(t(1, -1, 0.0625));
             return mix(bs.sample(c), soma, this.radius); })());

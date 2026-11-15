@@ -62,7 +62,12 @@ M5.pendencias = [ /* 5.0b: fx3d, combat3d e o cone dos faróis portados para TSL
    ARD.m5.tex.*: nós texture do TSL (base); para amostrar use ARD.m5.sample.*(posição no mundo) ou ARD.m5.tex.X.sample(uv) */
 function shared() {
   if (M5._shared) return; const T = window.THREE_M5, L = window.TSL; const S = ARD.sim; const W = S ? S.WORLD : 6000;
-  const { uniform, texture, vec2, vec3, vec4, float, positionWorld, step, clamp } = L;
+  const { texture, vec2, vec3, vec4, float, positionWorld, step, clamp } = L;
+  /* 5.5a: os uniforms do jogo moram no grupo do render (um buffer por material, enviado uma vez por passe), não no grupo do objeto (o padrão do TSL:
+     uma cópia no buffer de CADA objeto). Com o relógio (U.tempo) e o retângulo dos clarões mudando a cada quadro, todo bloco de adereços e todo
+     grupo de modelos reenviava o próprio buffer por quadro (~150 writeBuffer no Teste de desempenho; no Firefox cada chamada custa caro).
+     ?m5ugrupo=0 volta ao grupo do objeto (para comparar) */
+  const uniform = M5.uObjeto || /[?&]m5ugrupo=0/.test(typeof location !== 'undefined' ? location.search : '') ? L.uniform : v => L.uniform(v).setGroup(L.renderGroup);
   const blank = (r, g, b, a) => { const t = new T.DataTexture(new Uint8Array([r, g, b, a]), 1, 1); t.needsUpdate = true; return t; };
   const U = M5.u;
   U.tempo = uniform(0);            /* segundos do visual (R.time: para na pausa, anda no Modo Foto) */
@@ -248,7 +253,7 @@ M5.skyEnv = function (X, scene, cl, R) {
        ?m5pmrem=0 volta ao jeito do r186 (medida) */
     if (um && typeof X.pmrem._setSize === 'function' && typeof X.pmrem._allocateTarget === 'function') { try { X.pmrem._setSize(256); X.envRT = X.pmrem._allocateTarget(false); } catch (e) { X.envRT = null; } } }
   const bgD = new Tm.Color().setRGB(0.62, 0.69, 0.77); if (cl) bgD.lerp(new Tm.Color().setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), cl.mix); const gcol = R.groundCol || new Tm.Color(0.3, 0.28, 0.26);
-  const u = X.envSky.userData.mat.uniforms; u.uHor.value.copy(bgD).lerp(new Tm.Color().copy(gcol).multiplyScalar(1.5), 0.28); u.uTop.value.copy(bgD).multiplyScalar(0.55).lerp(new Tm.Color(0.12, 0.2, 0.36), 0.5); u.uBot.value.copy(gcol).multiplyScalar(0.7); u.uNight.value = 0; u.uSunDir.value.set(R.sunDir[0], R.sunDir[1], R.sunDir[2]).normalize(); u.uSunCol.value.setRGB(1.0, 0.91, 0.77).multiplyScalar(1.6); u.uSpace.value = 0;
+  const u = X.envSky.userData.mat.uniforms; u.uHor.value.copy(bgD).lerp(new Tm.Color().copy(gcol).multiplyScalar(1.5), 0.28); const LZ = ARD.luzFenda; /* 5.5a: Luz da Fenda (src/world3d.js) */ u.uTop.value.copy(bgD).multiplyScalar(0.55).lerp(new Tm.Color(LZ.alto[0], LZ.alto[1], LZ.alto[2]), 0.5); u.uBot.value.copy(gcol).multiplyScalar(0.7); u.uNight.value = 0; u.uSunDir.value.set(R.sunDir[0], R.sunDir[1], R.sunDir[2]).normalize(); u.uSunCol.value.setRGB(LZ.sunCor[0], LZ.sunCor[1], LZ.sunCor[2]).multiplyScalar(LZ.sunI); u.uSpace.value = 0;
   X.envGround.material.color.copy(gcol).multiplyScalar(0.8);
   const t0 = performance.now(); X.envRT = X.pmrem.fromScene(X.envScene, 0.025, 0.1, 400, X.envRT ? { renderTarget: X.envRT } : {}); X.envMs = Math.round(performance.now() - t0);
   scene.environment = X.envRT.texture; scene.environmentIntensity = R.envSkyK; R.envK0 = R.envSkyK; R.envSky = true;
@@ -275,10 +280,10 @@ let InstC = null;
 M5.Inst = function () {
   if (InstC) return InstC; const T = window.THREE_M5; const _m = new T.Matrix4(), _s = new T.Sphere(), _b = new T.Box3();
   InstC = class Inst extends T.Mesh {
-    constructor(geometry, material, count) {
-      super(geometry, material); const cap = Math.max(1, count | 0);
+    constructor(geometry, material, count, extra) {
+      super(geometry, material); const cap = Math.max(1, count | 0); const st = this._st = 16 + (extra === 5 && !M5.animSeparada ? 5 : 0); /* 5.5a: com extra = 5, cada instância leva junto da matriz os 5 números da animação por peça (aInst e aInstC): matriz e animação sobem num envio só */
       this.isM5Inst = true; this.type = 'M5Inst'; if (!M5.matrizOff) this.matrixAutoUpdate = false; /* 5.0c.1: o grupo de instâncias fica na origem (cada instância leva a própria matriz): sem recompor a matriz do objeto a cada passe (são ~900 na cena) */
-      this.instanceMatrix = new T.InstancedInterleavedBuffer(new Float32Array(cap * 16), 16, 1); for (let i = 0; i < cap; i++) _m.identity().toArray(this.instanceMatrix.array, i * 16);
+      this.instanceMatrix = new T.InstancedInterleavedBuffer(new Float32Array(cap * st), st, 1); this.instanceMatrix.ardInst = this; /* 5.5a: quem recebe só o buffer acha a malha (upN do render3d) */ for (let i = 0; i < cap; i++) _m.identity().toArray(this.instanceMatrix.array, i * st);
       this._iC = new T.InstancedBufferAttribute(new Float32Array(cap * 3).fill(1), 3); this._cSujo = -1; this._wraps = new Map(); this._n = cap; this._base = null; this._g = null;
       this.boundingSphere = null; this.boundingBox = null; this._ok = true; const g0 = this._pend; this._pend = null; this.geometry = g0; this.onBeforeRender = InstC.antes; }
     get geometry() { return this._g || this._pend; }
@@ -288,13 +293,21 @@ M5.Inst = function () {
     _wrap(g) { let w = this._wraps.get(g); if (w) return w; w = new T.InstancedBufferGeometry(); w.index = g.index;
       for (const k in g.attributes) { const a = g.attributes[k]; if (!a.isInstancedBufferAttribute) w.setAttribute(k, a); } /* os atributos por instância da animação GLSL (aInst) ficam de fora: o formato é o mesmo antes e depois deles */
       w.groups = g.groups; w.drawRange = g.drawRange; w.userData = g.userData; w.boundingSphere = g.boundingSphere; w.boundingBox = g.boundingBox; w.name = g.name;
-      for (let c = 0; c < 4; c++) w.setAttribute('iM' + c, new T.InterleavedBufferAttribute(this.instanceMatrix, 4, c * 4)); w.setAttribute('iC', this._iC); this._wraps.set(g, w); return w; }
-    setMatrixAt(i, m) { const a = this.instanceMatrix.array, e = m.elements, o = i * 16; for (let k = 0; k < 16; k++) { const v = Math.fround(e[k]); if (a[o + k] !== v) { a[o + k] = v; this._mMud = true; } } } /* 5.0b.1: escreve e marca só o que mudou (M5.Inst.sobe) */
+      this._liga(w); w.setAttribute('iC', this._iC); this._wraps.set(g, w); return w; }
+    _liga(w) { const b = this.instanceMatrix; for (let c = 0; c < 4; c++) w.setAttribute('iM' + c, new T.InterleavedBufferAttribute(b, 4, c * 4)); if (this._st > 16) { w.setAttribute('aInst', new T.InterleavedBufferAttribute(b, 4, 16)); w.setAttribute('aInstC', new T.InterleavedBufferAttribute(b, 1, 20)); } } /* 5.5a */
+    setMatrixAt(i, m) { if (this._dono) return; /* 5.5a: o dono do buffer já escreveu esta matriz */ const a = this.instanceMatrix.array, e = m.elements, o = i * this._st; for (let k = 0; k < 16; k++) { const v = Math.fround(e[k]); if (a[o + k] !== v) { a[o + k] = v; this._mMud = true; } } } /* 5.0b.1: escreve e marca só o que mudou (M5.Inst.sobe) */
     /* 5.0b.1: sobe as n primeiras matrizes só quando alguma mudou ou o número mudou (quadro parado: nada sobe) e, com o recorte, refaz a esfera
        das instâncias (o r186 recorta o objeto na câmera e em cada cascata da sombra); devolve se subiu */
-    sobe(n, recorte) { const mud = !!this._mMud || n !== this._mN; if (mud) { this._mMud = false; this._mN = n; this._esf = false; const a = this.instanceMatrix; a.clearUpdateRanges(); a.addUpdateRange(0, n * 16); a.needsUpdate = true; }
+    /* 5.5a: duas malhas com as MESMAS matrizes (o corpo e a parte emissiva de um modelo) dividem um buffer de matrizes: um envio à GPU por quadro
+       no lugar de dois. Chamar logo depois de criar as duas (antes do primeiro desenho); o dono do buffer é a outra malha, e esta só acompanha */
+    usaMatriz(o) { if (!o || !o.isM5Inst || o === this || M5.matrizSeparada || o._st !== this._st || o.instanceMatrix.array.length !== this.instanceMatrix.array.length) return this; this.instanceMatrix = o.instanceMatrix; this._dono = o;
+      for (const w of this._wraps.values()) this._liga(w); return this; }
+    /* 5.5a: a animação por peça das n primeiras instâncias (ia: 4 números por instância; ic: 1) entra no buffer da matriz; chamar antes do sobe() e só quando mudou */
+    anima(ia, ic, n) { if (this._st <= 16 || this._dono) return false; const a = this.instanceMatrix.array, st = this._st; for (let i = 0, o = 16, k = 0; i < n; i++, o += st, k += 4) { a[o] = ia[k]; a[o + 1] = ia[k + 1]; a[o + 2] = ia[k + 2]; a[o + 3] = ia[k + 3]; a[o + 4] = ic[i]; } this._mMud = true; return true; }
+    sobe(n, recorte) { const d = this._dono; const mud = d ? d._mVer !== this._mVis || n !== this._mN : !!this._mMud || n !== this._mN; if (mud) { this._mMud = false; this._mN = n; this._esf = false; if (d) this._mVis = d._mVer; else { this._mVer = (this._mVer || 0) + 1; const a = this.instanceMatrix; a.clearUpdateRanges(); a.addUpdateRange(0, n * this._st); a.needsUpdate = true; } } /* 5.5a: com buffer dividido (usaMatriz), quem envia é o dono */
       if (recorte && n > 0) { if (!this._esf) { this.computeBoundingSphere(); const s = this.boundingSphere; s.radius = s.radius * 1.25 + 4; this._esf = true; } this.frustumCulled = true; } else this.frustumCulled = false; return mud; }
-    getMatrixAt(i, m) { return m.fromArray(this.instanceMatrix.array, i * 16); }
+    sobeSe(n) { if (this._dono) return false; const mud = !!this._mMud || n !== this._mN; if (mud) { this._mMud = false; this._mN = n; this._esf = false; this._mVer = (this._mVer || 0) + 1; const a = this.instanceMatrix; a.clearUpdateRanges(); a.addUpdateRange(0, n * this._st); a.needsUpdate = true; } return mud; } /* 5.5a: como o sobe(), sem mexer no recorte: as n primeiras matrizes sobem só se alguma mudou */
+    getMatrixAt(i, m) { return m.fromArray(this.instanceMatrix.array, i * this._st); }
     setColorAt(i, c) { const a = this._iC.array, o = i * 3, r = Math.fround(c.r), g = Math.fround(c.g), b = Math.fround(c.b); if (a[o] === r && a[o + 1] === g && a[o + 2] === b) return; a[o] = r; a[o + 1] = g; a[o + 2] = b; if (i > this._cSujo) this._cSujo = i; } /* 5.0b.1: a cor só sobe quando muda */
     getColorAt(i, c) { return c.fromArray(this._iC.array, i * 3); }
     computeBoundingSphere() { const g = this._base; if (!this.boundingSphere) this.boundingSphere = new T.Sphere(); if (!g) return; if (!g.boundingSphere) g.computeBoundingSphere(); this.boundingSphere.makeEmpty(); for (let i = 0; i < this._n; i++) { this.getMatrixAt(i, _m); _s.copy(g.boundingSphere).applyMatrix4(_m); this.boundingSphere.union(_s); } }
@@ -305,7 +318,7 @@ M5.Inst = function () {
 };
 /* fábrica com a assinatura do InstancedMesh: M5.Inst só para material que lê os atributos de instância (M5.instMat marca userData.m5Inst);
    material que não lê (um de fora, ou um que a fase 2 trocar sem adaptar) segue num InstancedMesh de verdade: desenha certo, só monta por objeto */
-M5.instancia = function (THREE) { const I = M5.Inst(); return function InstancedMesh(g, mat, n) { return mat && mat.userData && mat.userData.m5Inst ? new I(g, mat, n) : new THREE.InstancedMesh(g, mat, n); }; };
+M5.instancia = function (THREE) { const I = M5.Inst(); return function InstancedMesh(g, mat, n, extra) { return mat && mat.userData && mat.userData.m5Inst ? new I(g, mat, n, extra /* 5.5a */) : new THREE.InstancedMesh(g, mat, n); }; };
 /* o dress3d recebe um THREE com o InstancedMesh trocado pela fábrica (sem mudar o dress3d) */
 M5.ns = function (THREE) { const ns = Object.create(THREE); Object.defineProperty(ns, 'InstancedMesh', { value: M5.instancia(THREE), writable: true, enumerable: true, configurable: true }); return ns; }; /* defineProperty: o THREE é um módulo (propriedades só de leitura na herança) */
 M5.instOff = Q.get('m5inst') === '0'; /* medida: ?m5inst=0 volta ao InstancedMesh (uma montagem de nós por malha) */

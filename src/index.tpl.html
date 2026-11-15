@@ -125,6 +125,12 @@ a.btn{text-decoration:none;color:inherit}
 .medalha-g{flex:0 0 76px;width:76px;height:76px;border-radius:50%;display:grid;place-items:center;font:800 .8rem/1 var(--fd);text-transform:uppercase;color:#1a1206;box-shadow:inset 0 -6px 12px rgba(0,0,0,.35),0 0 18px rgba(255,220,120,.25);border:3px solid rgba(255,255,255,.55)}
 .medalha-g.m-ouro{background:radial-gradient(circle at 35% 30%,#fff6c4,#f2c94c 45%,#b8860b)}.medalha-g.m-prata{background:radial-gradient(circle at 35% 30%,#fff,#c9d3dd 45%,#7d8a96)}.medalha-g.m-bronze{background:radial-gradient(circle at 35% 30%,#ffd9b0,#cd8a52 45%,#7a4a22)}
 .hg-trofeus{display:grid;gap:.35rem;margin-top:.5rem}.trofeus{display:flex;flex-wrap:wrap;gap:6px}
+/* 5.5a: catálogo de cosméticos no Hangar (só aparência; sem preço) e as marcas de cada jogador na sala e na diplomacia */
+.hg-cosm{display:grid;gap:.45rem;margin-top:.6rem}.cz-grupo{display:grid;gap:.25rem}.cz-tipo{font:600 .72rem/1.2 var(--fm);letter-spacing:.08em;text-transform:uppercase;color:var(--fg2)}.cz-itens{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.35rem}
+.cz-item{display:grid;gap:.1rem;text-align:left;min-height:44px;padding:.35rem .6rem;cursor:pointer;color:var(--fg);background:linear-gradient(180deg,#1f2733,#151b24);border:1px solid rgba(255,255,255,.18);border-radius:6px;font-size:.85rem}.cz-item small{color:var(--fg2);font-size:.72rem;line-height:1.25}.cz-item.on{border-color:var(--race);box-shadow:inset 0 0 0 1px var(--race)}.cz-item.on small{color:var(--race)}.cz-item.trancado{opacity:.62;cursor:not-allowed}.cz-cad{margin-right:.3rem}.cz-nota{font:400 .78rem/1.4 var(--fb);letter-spacing:0;text-transform:none}
+.cz-cor{color:var(--cz-cor)}.cz-tit{margin-left:.45rem;padding:.05rem .4rem;font:600 .68rem/1.3 var(--fm);letter-spacing:.06em;text-transform:uppercase;color:var(--fg2);border:1px solid rgba(255,255,255,.22);border-radius:999px;vertical-align:middle}
+.cz-mol{padding:.15rem .45rem;border-radius:5px;border:1px solid rgba(255,255,255,.3)}b.cz-mol{display:inline-block}.cz-mol-alinhamento{border-color:#FFB13D;box-shadow:inset 0 0 0 1px rgba(255,177,61,.35)}.cz-mol-cinco-mundos{border-width:2px;border-style:solid;border-image:linear-gradient(90deg,#FF7733,#33FFD0,#55E68A,#B388FF,#E6455A) 1}.cz-mol-apoiador{border-color:#9FE8FF;box-shadow:0 0 8px rgba(159,232,255,.45)}
+#mp-players>div.cz-mol{margin:.15rem 0}.hg-stage{align-self:start}
 .trofeu{display:grid;justify-items:center;gap:1px;min-width:86px;padding:.4rem;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04)}.trofeu b{font:700 .72rem/1.1 var(--fb);color:#fff}.trofeu small{font:600 .6rem/1.2 var(--fm);text-transform:uppercase}
 .tro-gl{width:40px;height:40px}.tro-gl svg{width:100%;height:100%}.trofeu.m-ouro .tro-gl,.trofeu.m-ouro small{color:#f2c94c}.trofeu.m-prata .tro-gl,.trofeu.m-prata small{color:#c9d3dd}.trofeu.m-bronze .tro-gl,.trofeu.m-bronze small{color:#cd8a52}
 @media (max-width:480px){.mut-chips{grid-template-columns:1fr}.mut{min-height:0}.cac-chefes{grid-template-columns:1fr}.cac-card{min-height:76px}}
@@ -1090,6 +1096,113 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
 @media (min-width:900px){#st-cta{display:none!important}}
 /* movimento reduzido: sem animações contínuas */
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important}.btn.big.primary::after{display:none}}
+/* ===== 5.5a: porta de entrada (primeira partida guiada, Blitz, tela final nova, cartão de resultado, link de convite e polimentos) ===== */
+/* --- primeira partida guiada: a faixa do objetivo, a seta e o painel que nasce aos poucos (src/guia.js) --- */
+#guia{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + var(--tbh,60px) + 10px);width:min(760px,calc(100vw - 24px));z-index:3;pointer-events:auto;padding:.55rem .9rem .7rem;border-radius:10px;background:rgba(9,12,17,.92);border:1px solid rgba(255,255,255,.14);box-shadow:0 6px 24px rgba(0,0,0,.45),inset 0 3px 0 var(--race,#FF5E3A);display:grid;gap:.25rem}
+#guia[hidden]{display:none}
+#guia .g-top{display:flex;align-items:center;gap:.7rem;min-height:1.5rem}
+#guia .g-eye{font:500 .68rem/1.2 var(--fm);letter-spacing:.16em;text-transform:uppercase;color:var(--race,#FF5E3A)}
+#guia .g-tra{display:flex;gap:4px;margin-left:auto}
+#guia .g-tra i{width:22px;height:4px;border-radius:2px;background:rgba(255,255,255,.16)}
+#guia .g-tra i.ok{background:var(--race,#FF5E3A)}
+#guia .g-tra i.on{background:#fff}
+#guia .g-pular{background:none;border:0;color:var(--fg2);font:500 .74rem/1 var(--fb);cursor:pointer;padding:.55rem .15rem;margin:-.45rem 0;white-space:nowrap}
+#guia .g-pular:hover,#guia .g-pular:focus-visible{color:#fff;text-decoration:underline}
+#guia .g-txt{font:700 clamp(1.4rem,3.2vw,2.05rem)/1.05 var(--fd);letter-spacing:.02em;color:#fff}
+#guia .g-como{font:400 .88rem/1.35 var(--fb);color:#d9d4c8}
+#guia .g-acts{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.15rem}
+#guia .g-acts:empty{display:none}
+#guia .g-novo{font:500 .72rem/1.3 var(--fm);color:var(--good)}
+#guia .g-novo[hidden]{display:none}
+#guia.ok{box-shadow:0 6px 24px rgba(0,0,0,.45),inset 0 3px 0 var(--good),0 0 0 2px rgba(127,227,161,.45)}
+#guia.ok .g-txt{color:var(--good)}
+#guia-seta{position:fixed;left:0;top:0;z-index:6;pointer-events:none}
+#guia-seta[hidden]{display:none}
+#guia-seta b{display:block;transform:translateY(-100%);margin-top:-12px;background:var(--race,#FF5E3A);color:#0b0f15;font:800 .98rem/1 var(--fd);letter-spacing:.06em;text-transform:uppercase;padding:.42rem .65rem;border-radius:6px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.55);animation:gSeta 1s ease-in-out infinite}
+#guia-seta i{position:absolute;left:var(--sx,50%);top:-12px;margin-left:-8px;border:8px solid transparent;border-top-color:var(--race,#FF5E3A);border-bottom:0;animation:gSeta 1s ease-in-out infinite}
+#guia-seta.baixo b{transform:none;margin-top:12px}
+#guia-seta.baixo i{top:4px;border:8px solid transparent;border-bottom-color:var(--race,#FF5E3A);border-top:0}
+@keyframes gSeta{50%{translate:0 -5px}}
+.guia-alvo{outline:2px solid var(--race,#FF5E3A);outline-offset:2px;animation:gAlvo 1s ease-in-out infinite}
+@keyframes gAlvo{50%{outline-color:#fff;outline-offset:4px}}
+body.guia #panel:has(.guia-alvo) [data-prod]:not(.guia-alvo),body.guia #panel:has(.guia-alvo) [data-build]:not(.guia-alvo){opacity:.42} /* os outros cartões ficam apagados enquanto a seta aponta um */
+.g-nasce{animation:gNasce 2.4s ease-out}
+@keyframes gNasce{0%{opacity:0;scale:.8}18%{opacity:1;scale:1.06;filter:drop-shadow(0 0 14px var(--race,#FF5E3A)) brightness(1.5)}60%{scale:1;filter:drop-shadow(0 0 10px var(--race,#FF5E3A)) brightness(1.2)}100%{scale:1;filter:none}}
+body.guia #hints,body.guia #objectives,body.guia #modos-faixa,body.guia #groups,body.guia #leader,body.guia .quick,body.guia .h3q,body.guia #army,body.guia #alertc{display:none!important}
+body.guia:not(.g2) #energy{display:none!important}
+body.guia:not(.g5) #top .tchips,body.guia:not(.g5) #right .radar,body.guia:not(.g5) #alerts{display:none!important}
+body.guia:not(.g-fim) #top [data-speed],body.guia #btn-foto,body.guia #btn-voice,body.guia #btn-diplo,body.guia #btn-tech,body.guia #btn-save,body.guia #btn-a11y,body.guia #btn-help,body.guia #btn-rot,body.guia #btn-tilt,body.guia #btn-clear,body.guia #btn-box,body.guia #btn-stop{display:none!important}
+body.guia:not(.g2) #btn-build,body.guia:not(.g4) #btn-army,body.guia:not(.g4) #btn-all,body.guia:not(.g6) #btn-attack{display:none!important}
+body.guia.g-sem-painel #panel{display:none!important}
+body.guia #panel .erabox,body.guia #panel [data-mode=jump],body.guia #panel [data-mode=rally],body.guia #panel .bd-qn{display:none!important} /* na primeira partida a ficha da construção fica só com o que o passo usa */
+body.touch #guia{left:.5rem;right:.5rem;transform:none;width:auto;top:calc(env(safe-area-inset-top,0px) + var(--tbh,88px) + 6px);padding:.45rem .65rem .55rem}
+body.touch #guia .g-tra i{width:14px}
+body.touch.guia #right{top:calc(env(safe-area-inset-top,0px) + var(--tbh,88px) + var(--guiah,120px) + 12px)}
+body.touch.guia #comms{top:calc(env(safe-area-inset-top,0px) + var(--tbh,88px) + var(--guiah,120px) + 12px)}
+body.guia:not(.touch) #comms{top:calc(env(safe-area-inset-top,0px) + var(--tbh,60px) + var(--guiah,120px) + 18px)}
+/* --- cartão de boas-vindas (primeira visita) e modo Blitz na aba Jogar --- */
+#boas-vindas{z-index:60}
+#boas-vindas .box{max-width:520px;text-align:center;justify-items:center}
+#boas-vindas h2{font:800 clamp(2rem,6.4vw,3rem)/.95 var(--fd);margin:0;letter-spacing:.02em}
+#boas-vindas p{margin:0;color:#d9d4c8;font:400 1rem/1.45 var(--fb)}
+#boas-vindas #bv-menu{font:500 .92rem/1.2 var(--fb);text-transform:none;letter-spacing:0}
+#boas-vindas .btn{width:100%}
+.modo-jogar .small{margin-top:.35rem;line-height:1.35}
+.modo-jogar .small[hidden]{display:none}
+body.modo-blitz .cpane[data-pane=jogar] .cgrid .opt:nth-child(1),body.modo-blitz .cpane[data-pane=jogar] .cgrid .opt:nth-child(3),body.modo-blitz #mesa-info,body.modo-blitz #regras-jogar{display:none}
+/* --- link de convite na sala --- */
+.convite{display:grid;gap:.35rem;padding:.55rem .65rem;border:1px solid color-mix(in srgb,var(--race) 45%,transparent);border-radius:8px;background:color-mix(in srgb,var(--race) 9%,transparent)}
+.convite[hidden]{display:none}
+.convite label{font:500 .74rem/1.25 var(--fb);color:var(--fg)}
+.convite .row{flex-wrap:nowrap}
+.convite input{flex:1;min-width:0;font:500 .76rem var(--fm)}
+/* --- tela final nova: a última cena ao fundo, a palavra grande, três números, o gráfico e os botões (src/fim.js) --- */
+#end.fim{display:block;padding:0;overflow:auto;z-index:40;background:linear-gradient(180deg,rgba(5,7,11,.62),rgba(5,7,11,.34) 28%,rgba(5,7,11,.6) 62%,rgba(5,7,11,.92))}
+#end.fim[hidden]{display:none}
+.fim-in{box-sizing:border-box;min-height:100%;max-width:1160px;margin:0 auto;padding:calc(1.1rem + env(safe-area-inset-top,0px)) 1.1rem calc(1.4rem + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.65rem;text-align:center}
+#end.fim #end-eyebrow{font:500 clamp(.62rem,1.2vw,.82rem)/1.3 var(--fm);letter-spacing:.3em;text-transform:uppercase;color:#ece6da;text-shadow:0 1px 6px rgba(0,0,0,.95)}
+#end.fim #end-title{font:800 clamp(4rem,17.5vw,13.5rem)/.86 var(--fd);letter-spacing:.01em;margin:0;padding:.16em .06em 0;text-transform:uppercase;text-shadow:none} /* o espaço de cima é do acento (VITÓRIA): o degradê só pinta dentro da caixa */
+#end.fim #end-title.victory{background:linear-gradient(90deg,#FF5E3A,#E94FA0 55%,#C13CF5);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 6px 30px rgba(193,60,245,.4))}
+#end.fim #end-title.defeat{background:none;color:#d8d3c9;-webkit-text-fill-color:currentColor;filter:drop-shadow(0 6px 26px rgba(0,0,0,.7))}
+#end.fim #end-reason{font:400 clamp(1rem,2.1vw,1.45rem)/1.25 var(--fb);color:#f1ece2;margin:0;max-width:820px;text-shadow:0 1px 8px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.8)}
+.fim-meio{display:flex;gap:2.2rem;align-items:center;justify-content:center;width:100%;margin-top:.5rem}
+.fim-lider{margin:0;display:grid;justify-items:center;gap:.55rem;flex:none}
+#end.fim #end-leader{width:clamp(96px,13vw,190px);height:auto;aspect-ratio:1;border-radius:50%;object-fit:cover;border:3px solid var(--race);clip-path:none;box-shadow:0 0 0 6px rgba(0,0,0,.35);float:none!important;margin:0!important;grid-column:auto;grid-row:auto}
+.fim-lider figcaption{font:700 1.25rem/1 var(--fd);letter-spacing:.08em;text-transform:uppercase;color:#f1ece2;text-shadow:0 1px 6px rgba(0,0,0,.9)}
+.fim-dir{flex:1;min-width:0;max-width:720px;display:grid;gap:.85rem;text-align:left}
+.fim-nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.fn b{display:block;font:800 clamp(2.1rem,5.6vw,4.5rem)/.9 var(--fd);color:#f1ece2;text-shadow:0 2px 10px rgba(0,0,0,.7)}
+.fn span{display:block;margin-top:.3rem;font:500 clamp(.56rem,1vw,.7rem)/1.25 var(--fm);letter-spacing:.1em;text-transform:uppercase;color:var(--race);text-shadow:0 1px 5px rgba(0,0,0,.95)}
+.fim-graf{background:rgba(9,12,17,.74);border:1px solid rgba(255,255,255,.13);border-radius:8px;padding:.55rem .75rem .45rem}
+.fim-graf svg{display:block;width:100%;height:auto;overflow:visible}
+.fg-t{display:flex;justify-content:space-between;gap:.6rem;font:500 .64rem/1.2 var(--fm);letter-spacing:.16em;text-transform:uppercase;color:#cfc9bc;margin-bottom:.35rem}
+.fg-t span{color:var(--race);letter-spacing:.06em}
+.fg-v{font:500 13px var(--fm);fill:#fff}
+.fg-vazio{font:400 .82rem var(--fb);color:var(--fg2);padding:.5rem 0}
+.fim-prox{margin:0;font:400 .92rem/1.35 var(--fb);color:#e4dfd3;max-width:720px;text-shadow:0 1px 6px rgba(0,0,0,.95)}
+.fim-prox[hidden]{display:none}
+.fim-botoes{justify-content:center;flex-wrap:wrap;gap:.6rem;margin-top:.35rem}
+.fim-botoes .btn{min-width:160px;font-size:1.05rem;padding:.8rem 1.2rem}
+#end.fim #end-camp,.fim-det{box-sizing:border-box;max-width:720px;width:100%;text-align:left;background:rgba(9,12,17,.74);border:1px solid rgba(255,255,255,.11);border-radius:8px;padding:.55rem .8rem}
+#end.fim #end-camp[hidden]{display:none}
+.fim-det summary{cursor:pointer;font:500 .72rem/1.4 var(--fm);letter-spacing:.14em;text-transform:uppercase;color:#cfc9bc;padding:.3rem 0;min-height:1.6rem}
+.fim-det[open] summary{margin-bottom:.5rem}
+.fim-det>div{margin-bottom:.6rem}
+@media (max-width:720px){.fim-meio{flex-direction:column;gap:.7rem}.fim-lider{grid-auto-flow:column;align-items:center}#end.fim #end-leader{width:72px}.fim-nums{gap:.5rem}.fim-botoes .btn{flex:1 1 42%;min-width:0;font-size:.98rem}.fim-dir{width:100%}}
+@media (max-height:620px) and (orientation:landscape){#end.fim #end-title{font-size:clamp(3rem,22vh,7rem)}.fim-lider{display:none}}
+body.fim-on #hud,body.fim-on #cmd-bar,body.fim-on #modos-faixa,body.fim-on #ia-ped,body.fim-on #chefe-hud,body.fim-on #chefe-av,body.fim-on #mundo-surto,body.fim-on #mundo-dica{display:none!important}
+#cartao{z-index:50}
+#cartao .box{max-width:780px}
+#cartao-img{display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--line)}
+#cartao-nota:empty{display:none}
+/* --- polimentos: a barra do comandante por baixo da pausa (e fora da tela final, acima) --- */
+body #cmd-bar{z-index:3}
+body:has(#pausebox:not([hidden])) #cmd-bar{visibility:hidden} /* a camada sozinha não bastou (a barra mora fora do #game): com a pausa aberta ela sai da frente */
+/* --- polimentos: a barra de cima numa linha só em 1600×900 (o rótulo Diplomacia, o texto da reputação e o "de 25:00" saem; os ícones e as dicas ficam) --- */
+@media (max-width:1720px){body:not(.touch) #top #btn-diplo .tbl,body:not(.touch) #rep,body:not(.touch) #clock-max{display:none}body:not(.touch) .energy{min-width:calc(168px*var(--k))}}
+/* --- polimentos: o rótulo da Raça na tela inicial ganha uma placa escura (ficava ilegível sobre a coluna brilhante da Fenda) --- */
+#start .sc-kicker{justify-self:start;color:#ece6da;background:rgba(5,7,11,.8);padding:.3rem .62rem;border-radius:4px;box-shadow:0 0 0 1px rgba(255,255,255,.09)}
+#start .sc-name small{width:fit-content;background:rgba(5,7,11,.8);padding:.14em .5em .1em;border-radius:4px;box-shadow:0 0 0 1px rgba(255,255,255,.09)}
 </style>
 
 
@@ -1110,7 +1223,7 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
   <div class="start-wrap">
     <header class="st-head">
       <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div class="brand-txt"><h1 data-i18n="inicio.aether-rift-dominion">Aether Rift<span>Dominion</span></h1><p class="tagline" data-i18n="inicio.nada-aqui-seu-ainda">Nada aqui é seu. Ainda.</p></div></div>
-      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.0h.5 · build __BUILD__ · Além da Fenda · Mundo vivo · multiplayer 2 a 4</div>
+      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.5a · build __BUILD__ · Portas Abertas · Mundo vivo · multiplayer 2 a 4</div>
       <div class="opt st-lang" data-idioma-sel="idioma-inicio"></div><!-- 5.0c: seletor de idioma, legível em qualquer idioma -->
     </header>
     <div class="start-grid">
@@ -1136,12 +1249,13 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
         <div class="opt cname"><label for="opt-name" data-i18n="inicio.nome">Nome</label><input id="opt-name" maxlength="18" autocomplete="nickname"></div>
         <div class="cpane" data-pane="jogar" role="tabpanel">
           <div class="chead"><b data-i18n="inicio.jogar.escaramuca">Escaramuça</b><span data-i18n="inicio.jogar.contra-ia-raca-escolhida">contra a IA, com a Raça escolhida ao lado</span></div>
+          <div class="opt modo-jogar"><label for="opt-modo" data-i18n="modos.blitz.modo">Modo</label><select id="opt-modo" data-seg><option value="escaramuca" data-i18n="modos.blitz.escaramuca">Escaramuça</option><option value="blitz" data-i18n="modos.blitz.opcao">Blitz · 10 min</option></select><div class="small muted" id="modo-dica" hidden data-i18n="modos.blitz.dica">1 contra 1, bases perto uma da outra, coleta e produção mais rápidas e a IA ataca cedo. Acaba em até 10 minutos.</div></div><!-- 5.5a: modo Blitz -->
           <div class="cgrid"><div class="opt"><label for="opt-opp" data-i18n="inicio.jogar.oponentes-ia">Oponentes de IA</label><select id="opt-opp" data-seg><option value="1" data-i18n="inicio.jogar.1-ia-1v1">1 IA (1v1)</option><option value="2" data-i18n="inicio.jogar.2-ias-ffa-3">2 IAs (FFA 3)</option><option value="3" data-i18n="inicio.jogar.3-ias-ffa-4">3 IAs (FFA 4)</option></select></div><div class="opt"><label for="opt-diff" data-i18n="inicio.jogar.dificuldade">Dificuldade</label><select id="opt-diff" data-seg><option value="facil" data-i18n="inicio.jogar.facil">Fácil</option><option value="normal" data-i18n="inicio.jogar.normal">Normal</option><option value="dificil" data-i18n="inicio.jogar.dificil">Difícil</option><option value="brutal" data-i18n="inicio.jogar.brutal">Brutal</option></select></div><div class="opt"><label for="opt-map" data-i18n="inicio.jogar.mapa">Mapa</label><select id="opt-map" data-mapcards><option value="fenda" data-i18n="inicio.jogar.planicie-fenda">Planície da Fenda</option><option value="cinturao" data-i18n="inicio.jogar.cinturao-plataformas-sobre-espaco">Cinturão (plataformas sobre o espaço)</option><option value="tita" data-i18n="inicio.jogar.tita-carcaca">Destroço do Titã (carcaça de um titã caído)</option><!-- 5.0g --></select></div></div>
           <div class="mesa-info" id="mesa-info"><!-- 5.0b: mesa tática da Sala --><svg class="ci" aria-hidden="true"><use href="#ic-mundo"/></svg><span><b data-i18n="inicio.jogar.mesa-tatica">Mesa tática</b> <span id="mesa-txt" data-i18n="inicio.jogar.mesa-txt">o mapa em holograma</span></span><button type="button" class="btn ghost" id="btn-mesa" data-i18n="inicio.jogar.btn-mesa">Ver na mesa</button></div>
           <details class="adv"><summary data-i18n="inicio.jogar.semente-clima">Semente e clima</summary><div class="opt"><label for="opt-seed" data-i18n="inicio.jogar.semente-mapa">Semente do mapa</label><input id="opt-seed" inputmode="numeric"></div><div class="opt"><label for="opt-clima" data-i18n="inicio.jogar.clima-campo-efeito-dentro">Clima do campo (efeito dentro da partida)</label><select id="opt-clima"><option value="auto" data-i18n="inicio.jogar.automatico-pelo-bioma">Automático (pelo bioma)</option><option value="toxica" data-i18n="inicio.jogar.nevoa-toxica">Névoa tóxica</option><option value="plasma" data-i18n="inicio.jogar.tempestade-plasma">Tempestade de plasma</option><option value="cristais" data-i18n="inicio.jogar.chuva-cristais">Chuva de cristais</option><option value="aurora" data-i18n="inicio.jogar.aurora-fenda">Aurora da Fenda</option><option value="acida" data-i18n="inicio.jogar.chuva-acida">Chuva ácida</option></select></div></details>
           <div class="regras" id="regras-jogar"></div><!-- 5.0g: Eventos da Fenda, mutadores e relíquia (src/modos-ui.js) -->
           <button id="btn-start" class="btn primary big" data-i18n="inicio.jogar.btn-start">Iniciar partida</button>
-          <div class="row"><button id="btn-help-start" class="btn ghost" data-i18n="inicio.jogar.btn-help-start">Como jogar</button><button id="btn-academia" class="btn" type="button" data-i18n="inicio.jogar.btn-academia">Academia de Comando</button><!-- 5.0b --></div>
+          <div class="row"><button id="btn-help-start" class="btn ghost" data-i18n="inicio.jogar.btn-help-start">Como jogar</button><button id="btn-academia" class="btn" type="button" data-i18n="inicio.jogar.btn-academia">Academia de Comando</button><!-- 5.0b --><button id="btn-guia" class="btn" type="button" data-i18n="guia.botao">Primeira partida</button><!-- 5.5a: a partida guiada, repetível --></div>
           <div class="saved" id="saved-solo" hidden></div>
         </div>
         <div class="cpane" data-pane="campanha" role="tabpanel" hidden>
@@ -1159,6 +1273,7 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
             <div class="opt"><label for="opt-room" data-i18n="inicio.multi.tamanho-sala">Tamanho da sala</label><select id="opt-room" data-seg><option value="2" data-i18n="inicio.multi.2-jogadores-sala">2 jogadores na sala</option><option value="3" data-i18n="inicio.multi.3-jogadores-sala">3 jogadores na sala</option><option value="4" data-i18n="inicio.multi.4-jogadores-sala">4 jogadores na sala</option></select></div><div class="opt"><label for="opt-map-mp" data-i18n="inicio.multi.mapa-anfitriao-vale-sala">Mapa (o do anfitrião vale para a sala)</label><select id="opt-map-mp" data-mapcards><option value="fenda" data-i18n="inicio.jogar.planicie-fenda">Planície da Fenda</option><option value="cinturao" data-i18n="inicio.jogar.cinturao-plataformas-sobre-espaco">Cinturão (plataformas sobre o espaço)</option><option value="tita" data-i18n="inicio.jogar.tita-carcaca">Destroço do Titã (carcaça de um titã caído)</option><!-- 5.0g --></select></div>
             <div class="regras" id="regras-sala"></div><!-- 5.0g: modo da sala (Escaramuça ou Caçada cooperativa) e mutadores -->
             <div class="row"><button id="btn-host" class="btn" data-i18n="inicio.multi.btn-host">Criar sala</button><input id="opt-code" placeholder="CÓDIGO" maxlength="6" autocomplete="off" aria-label="Código da sala" data-i18n-attr="aria-label:inicio.multi.codigo-sala;placeholder:inicio.multi.codigo"><button id="btn-join" class="btn" data-i18n="inicio.multi.btn-join">Entrar</button></div>
+            <div id="convite" class="convite" hidden><label for="convite-link" data-i18n="multi.convite.rotulo">Link de convite: quem abrir já entra na sala</label><div class="row"><input id="convite-link" readonly aria-label="Link de convite" data-i18n-attr="aria-label:multi.convite.aria"><button id="btn-convite" class="btn primary" type="button" data-i18n="multi.convite.botao">Copiar link</button></div></div><!-- 5.5a -->
             <div id="mp-players" class="small"></div>
             <div id="mp-status" class="muted small"></div>
             <button id="btn-mp-start" class="btn primary big" hidden data-i18n="inicio.multi.btn-mp-start">Iniciar partida da sala</button>
@@ -1175,8 +1290,9 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
       </div>
       <div class="notes">
       <div class="choose" data-i18n="notas.notas-versao">Notas da versão</div>
+      <p class="start-notes" data-i18n="notas.5-5a"><b>5.5a — Porta de entrada:</b> quem chega agora tem uma <b>primeira partida guiada</b>, com um objetivo por vez e o painel aparecendo aos poucos. Chegou o modo <b>Blitz</b>: 1 contra 1, bases mais perto e relógio de 10 minutos. A <b>tela final</b> é nova, com o gráfico da virada e o botão Compartilhar, que gera um cartão com o resultado. A sala multiplayer ganhou um <b>link de convite</b> que já entra na sala. O mundo recebeu a <b>Luz da Fenda</b>: sol baixo e quente, sombras longas. Cada unidade tem um arco fino na cor do dono, o inimigo se reconhece também pela forma, o chão em volta da base ganha a cor da sua Raça e a promoção aparece como estrela na barra de vida. <b>Balanceamento:</b> Soldador com dano 16 (era 20), Cria e Cuspidor mais caros, Quimera com mais vida e o Atirador de Fenda da Erevane liberado na Era I. O Hangar lista os <b>cosméticos</b> e como ganhar cada um; nada está à venda. No Motor 5 o jogo envia metade dos dados por quadro à placa de vídeo.</p>
+      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.0h.5 → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-0h-5"><b>5.0h.5 — Chefões 3.0:</b> os três chefões deixaram de ser máquinas e viraram criaturas da Fenda, com nomes novos. O Arauto agora é <b>A Medusa da Fenda</b>, a Forja-Mãe é <b>O Titã-Fornalha</b> e a Sentinela da Fenda é <b>A Sentinela Devoradora</b>, que ficou bem maior na tela. Antes de cada golpe o corpo avisa: o Titã escancara a mandíbula, a Devoradora abre as presas e a Medusa contrai o sino. Na Linha de montagem o dorso do Titã se abre e os pontos fracos âmbar aparecem. Os pilares, os Ecos e os lacaios da Fenda ganharam o visual da mesma família. As regras das lutas, a vida e o dano dos chefões não mudaram.</p>
-      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.0h.4 → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-0h-4"><b>5.0h.4 — Desempenho no Motor 5:</b> a travada da primeira vez que um lago aparecia na tela acabou. Tudo o que o reflexo dos lagos precisa agora é preparado no carregamento, e no nosso teste nada mais é criado na placa de vídeo no meio da partida. Os retratos das unidades no painel do exército são gerados um por vez, e o jogo cria um pouco menos de lixo de memória por quadro. O Teste de desempenho agora mostra, em cada travada, quanto tempo foi para sombras, reflexo dos lagos, cena e efeitos. A imagem e a simulação continuam as mesmas.</p>
       <p class="start-notes" data-i18n="notas.5-0h-3"><b>5.0h.3 — Desempenho:</b> menos travadas no meio das batalhas. No Chrome, o jogo cria cerca de 20% menos lixo de memória por segundo, então o navegador para menos vezes para limpar. No <b>Motor 5</b>, a morte de um veículo e a câmera passando por um lago não criam mais recursos novos na placa de vídeo na hora: o jogo os prepara antes. O Teste de desempenho agora diz, em cada travada, o que havia naquele quadro (os eventos e o que nasceu na placa de vídeo). A imagem e a simulação continuam as mesmas.</p>
       <p class="start-notes" data-i18n="notas.5-0h-2"><b>5.0h.2 — Chefões 2.0:</b> os chefões foram redesenhados em 3D, no nível dos líderes. O Arauto é uma flor-catedral de vidro da Fenda que abre, racha e colapsa num buraco negro; a Forja-Mãe é uma fábrica-fera de bronze com fornalha na boca, chaminés no dorso e o núcleo em fusão quando desaba. Cada fase muda o corpo, os golpes nascem no próprio chefão, a entrada de cinema foi refeita e a barra mostra o retrato do modelo. O celular usa uma versão mais leve, e o jogo roda igual: nenhum shader novo e a mesma simulação. O texto de promoção das unidades agora sai no seu idioma.</p>
@@ -1308,6 +1424,7 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
 <symbol id="em-quorith" viewBox="0 0 48 48"><g fill="currentColor"><path d="M12 38 L12 20 L16 15 L20 20 L20 38Z"/><path d="M19.4 40 L19.4 13 L24 7 L28.6 13 L28.6 40Z"/><path d="M28 36 L28 24 L32 19 L36 24 L36 36Z"/><path d="M8 42.5h32l-2.4 2.5H10.4z"/></g><circle cx="24" cy="27" r="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 3.2" opacity=".75"/></symbol>
 <symbol id="em-vorag" viewBox="0 0 48 48"><g fill="currentColor"><path d="M4 9 L44 9 L44 16 L41.5 26 L39 17 L35.5 30 L32 17 L28 32.5 L24.6 17.5 L23.4 17.5 L20 32.5 L16 17 L12.5 30 L9 17 L6.5 26 L4 16Z"/><path d="M4 44 L44 44 L44 40 L41 31 L38.5 39 L35 28 L31.5 39 L28 29 L25 39 L23 39 L20 29 L16.5 39 L13 28 L9.5 39 L7 31 L4 40Z"/></g></symbol>
 </defs></svg>
+<div id="boas-vindas" class="modal bv" hidden><div class="box"><div class="eyebrow" data-i18n="guia.bv.eyebrow">Primeira vez aqui?</div><h2 data-i18n="guia.bv.titulo">Aprenda jogando, em 5 minutos</h2><p data-i18n="guia.bv.texto">Uma partida curta, com um objetivo por vez na tela: colher, construir, treinar tropas, defender a base e derrubar o Núcleo inimigo.</p><button id="bv-jogar" class="btn primary big" type="button" data-i18n="guia.bv.jogar">Jogar a primeira partida</button><button id="bv-menu" class="btn ghost" type="button" data-i18n="guia.bv.menu">Já conheço o jogo: ir para o menu</button></div></div><!-- 5.5a: só na primeira visita; a partida guiada fica no botão Primeira partida da aba Jogar -->
 <div id="game" hidden>
   <canvas id="world"></canvas>
   <canvas id="overlay"></canvas>
@@ -1352,7 +1469,8 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
 
   <div id="loading" class="modal" hidden><div class="box"><img id="load-leader" alt="" hidden><div class="eyebrow" data-i18n="carga.preparando-campo"><img id="load-logo" class="load-logo" alt="" hidden>Preparando o campo</div><div id="load-race"></div><h2 id="load-title" data-i18n="carga.load-title">Campo de batalha</h2><p id="load-tip"></p><div class="loadbar"><i id="load-bar"></i></div></div></div>
   <div id="diplo" class="modal" hidden><div class="box"><h2 data-i18n="hud.html.diplomacia">Diplomacia</h2><div id="diplo-body"></div><div class="row"><button class="btn" data-close data-i18n="diplo.fechar">Fechar</button></div></div></div>
-  <div id="end" class="modal" hidden><div class="box"><img id="end-leader" alt="" hidden style="width:120px;height:120px;object-fit:cover;float:right;margin:0 0 .5rem 1rem"><div class="eyebrow" id="end-eyebrow" data-i18n="fim.end-eyebrow">Fim do Alinhamento</div><h2 id="end-title"></h2><p id="end-reason"></p><div id="end-camp" hidden></div><div id="end-scores"></div><div id="end-stats"></div><div class="row"><button id="btn-next" class="btn primary" hidden data-i18n="fim.btn-next">Próxima missão</button><button id="btn-again" class="btn primary" data-i18n="fim.btn-again">Jogar de novo</button><button id="btn-camp-menu" class="btn" hidden data-i18n="inicio.campanha">Campanha</button><button id="btn-copy" class="btn" data-i18n="fim.btn-copy">Copiar resultado (JSON)</button><a class="btn" id="end-feedback" href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener" data-i18n="ajustes.cfg-feedback">Enviar feedback</a></div><textarea id="end-json" hidden rows="6" style="width:100%;font-family:var(--fm);font-size:11px;background:#12151A;color:var(--fg);border:1px solid var(--line);border-radius:6px"></textarea></div></div>
+  <div id="end" class="modal fim" hidden><!-- 5.5a: tela final nova (src/fim.js): a última cena ao fundo, a palavra grande, três números, o gráfico com a virada e o Compartilhar --><div class="fim-in"><div class="eyebrow" id="end-eyebrow" data-i18n="fim.end-eyebrow">Fim do Alinhamento</div><h2 id="end-title"></h2><p id="end-reason"></p><div class="fim-meio"><figure class="fim-lider"><img id="end-leader" alt="" hidden><figcaption id="fim-lider-nome"></figcaption></figure><div class="fim-dir"><div id="fim-nums" class="fim-nums"></div><div id="fim-graf" class="fim-graf"></div></div></div><p id="fim-prox" class="fim-prox" hidden></p><div class="row fim-botoes"><button id="btn-next" class="btn primary" hidden data-i18n="fim.btn-next">Próxima missão</button><button id="btn-again" class="btn primary" data-i18n="fim.btn-again">Jogar de novo</button><button id="btn-share" class="btn" data-i18n="fim.compartilhar">Compartilhar</button><button id="btn-camp-menu" class="btn" hidden data-i18n="inicio.campanha">Campanha</button><button id="btn-fim-menu" class="btn" data-i18n="fim.menu">Menu</button></div><div id="end-camp" hidden></div><details id="fim-det" class="fim-det"><summary data-i18n="fim.detalhes">Placar e detalhes</summary><div id="end-scores"></div><div id="end-stats"></div><div class="row"><a class="btn" id="end-feedback" href="https://github.com/andreyrafael85/aether-rift-dominion/issues/new?template=feedback.md" target="_blank" rel="noopener" data-i18n="ajustes.cfg-feedback">Enviar feedback</a></div></details></div></div>
+  <div id="cartao" class="modal" hidden><div class="box"><div class="eyebrow" data-i18n="fim.cartao.titulo">Cartão de resultado</div><img id="cartao-img" alt="" data-i18n-attr="alt:fim.cartao.titulo"><div class="row"><button id="cartao-enviar" class="btn primary" hidden data-i18n="fim.compartilhar">Compartilhar</button><a id="cartao-baixar" class="btn" data-i18n="fim.cartao.baixar">Baixar imagem</a><button id="cartao-copiar" class="btn" hidden data-i18n="fim.cartao.copiar">Copiar imagem</button><button id="cartao-fechar" class="btn" data-i18n="diplo.fechar">Fechar</button></div><div class="small muted" id="cartao-nota" role="status"></div></div></div><!-- 5.5a: a imagem 1200×630 montada no navegador -->
   <div id="tech" class="modal" hidden><div class="box wide"><button class="mclose" data-close aria-label="Fechar">✕</button><div class="eyebrow">Laboratório e Núcleo · F3</div><h2>Pesquisa e Eras</h2><div id="tech-body"></div><div class="row"><button class="btn" data-close>Voltar ao jogo</button></div></div></div><!-- 5.0b: tela de pesquisa -->
   <div id="a11y" class="modal" hidden><div class="box"><button class="mclose" data-close aria-label="Fechar" data-i18n-attr="aria-label:diplo.fechar">✕</button><div class="eyebrow" data-i18n="janela.ajustes.partida">Partida</div><h2 data-i18n="inicio.ajustes">Ajustes</h2><div class="opt" data-idioma-sel="idioma-partida"></div><!-- 5.0c --><div id="a11y-body" class="h3a11y"></div><div class="h3a11y voz-ui" data-voz-ui><!-- 5.0a.2: escolha da voz das falas --><div class="opt"><!-- 5.0c.1: vozes gravadas (ligadas por padrão; desligadas, a voz do sistema) --><label class="chk voz-grav"><input type="checkbox" id="pt-voz-gravada" data-voz-gravada checked> <span data-i18n="ajustes.vozes-gravadas">Vozes gravadas: cada Raça com a sua voz</span></label><div class="small muted voz-grav-dica" data-i18n="ajustes.vozes-gravadas-dica">Desligadas, as falas usam a voz do sistema escolhida abaixo.</div><label for="pt-voz-sel" data-i18n="janela.ajustes.voz-falas">Voz das falas</label><div class="voz-linha"><select id="pt-voz-sel" data-voz-sel><option value="" data-i18n="janela.ajustes.automatica">Automática</option></select><button type="button" class="btn" id="pt-voz-ouvir" data-voz-ouvir data-i18n="janela.ajustes.pt-voz-ouvir">Ouvir</button></div><div class="small muted voz-dica" data-voz-dica hidden></div><!-- 5.0b.1: Testar som — efeito curto, uma frase e o diagnóstico numa linha --><div class="som-teste"><button type="button" class="btn" id="pt-som-teste" data-som-teste data-i18n="ajustes.testar-som">Testar som</button><div class="small muted som-diag" id="pt-som-diag" data-som-diag role="status" aria-live="polite" hidden></div></div></div></div><div class="row"><button class="btn" data-close data-i18n="janela.ajustes.voltar-ao-jogo">Voltar ao jogo</button></div></div></div><!-- 5.0b: acessibilidade -->
 </div>
@@ -1375,7 +1493,7 @@ body.bench .h3grp,body.bench #army,body.bench #alertc,body.bench .h3q,body.bench
   <div class="small muted" id="br-relics"></div>
   <div class="row"><button id="br-start" class="btn primary">Iniciar missão</button><button class="btn" data-close>Voltar</button></div>
 </div></div>
-<div id="benchbox" class="modal" hidden><div class="box"><div class="eyebrow" data-i18n="desempenho.teste-desempenho">Teste de desempenho</div><h2 id="bench-verdict" class="bv">—</h2><p class="muted small" id="bench-tip"></p><div class="stats" id="bench-table"></div><div id="bench-det" class="bench-det" hidden></div><!-- 5.0a: Detetive de travadas --><div class="row"><a class="btn primary" id="bench-feedback" target="_blank" rel="noopener" data-i18n="desempenho.bench-feedback">Enviar no Feedback</a><button class="btn" id="bench-back" data-i18n="desempenho.bench-back">Voltar ao início</button></div></div></div>
+<div id="benchbox" class="modal" hidden><div class="box"><div class="eyebrow" data-i18n="desempenho.teste-desempenho">Teste de desempenho</div><h2 id="bench-verdict" class="bv">—</h2><p class="muted small" id="bench-tip"></p><div class="stats" id="bench-table"></div><div id="bench-det" class="bench-det" hidden></div><!-- 5.0a: Detetive de travadas --><div class="row"><a class="btn primary" id="bench-feedback" target="_blank" rel="noopener" data-i18n="desempenho.bench-feedback">Enviar no Feedback</a><button class="btn" id="bench-copy" hidden data-i18n="fim.btn-copy">Copiar resultado (JSON)</button><!-- 5.5a: veio da tela final --><button class="btn" id="bench-back" data-i18n="desempenho.bench-back">Voltar ao início</button></div></div></div>
 <div id="savebox" class="modal" hidden><div class="box"><button class="mclose" data-close aria-label="Fechar" data-i18n-attr="aria-label:diplo.fechar">✕</button><div class="eyebrow" data-i18n="janela.ajustes.partida">Partida</div><h2 data-i18n="hud.html.salvar-partida">Salvar partida</h2><p class="muted small" id="save-note"></p><div id="save-slots" class="slots"></div><div class="row"><button class="btn" id="save-park" data-i18n="jogo.salvar.save-park">Pausar e sair · continuar depois</button><button class="btn ghost" data-close data-i18n="janela.ajustes.voltar-ao-jogo">Voltar ao jogo</button></div></div></div>
 <div id="confirm" class="modal" hidden><div class="box"><h2 data-i18n="geral.confirmar.confirmar">Confirmar</h2><p id="confirm-text"></p><div class="row"><button id="confirm-yes" class="btn primary" data-i18n="geral.confirmar.confirmar">Confirmar</button><button id="confirm-no" class="btn" data-i18n="geral.confirmar.confirm-no">Cancelar</button></div></div></div>
 <div id="hangar" class="modal" hidden><div class="box wide"><button class="mclose" data-close aria-label="Fechar">✕</button>

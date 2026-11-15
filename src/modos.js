@@ -39,6 +39,11 @@ const SENTINELA_PREMIO = { minerio: 700, plasma: 450, dados: 180 };
 const CURTO = { arauto: ['a Medusa', 'A Medusa'], forja: ['o Titã', 'O Titã'], sentinela: ['a Devoradora', 'A Devoradora'] }; /* 5.0h.5: forma curta (chaves chefe.<id>.curto e .Curto do dicionário pt-BR); só texto de exibição */
 const nomeCurto = (id, ini) => { const dic = ARD.I18N_DIC && ARD.I18N_DIC['pt-BR']; const v = dic && dic['chefe.' + id + (ini ? '.Curto' : '.curto')]; return typeof v === 'string' && v && v.indexOf('{') < 0 ? v : CURTO[id][ini ? 1 : 0]; };
 const nomeChefe = id => { const U = ARD.sim && ARD.sim.UNITS; return (U && U[id] && U[id].name) || id; }; /* 5.0h.5: o nome exibido vem da tabela de unidades (chave chefe.<id>.nome do dicionário pt-BR) */
+/* 5.5a: modo Blitz — 1 contra 1 em 10 minutos. r0: distância de cada base até a Fenda (1180 no jogo normal), o que deixa as bases a 1.640 uma da outra em vez de 2.360;
+   res, coleta e producao viram bônus dos jogadores (os mesmos "mods" das relíquias: recursos iniciais, coleta e produção), e a IA ataca mais cedo e com menos tropa (iaAtaque, iaMinAtk).
+   Só vale com cfg.blitz; sem ela nada muda (os hashes das partidas de sempre ficam iguais). */
+const BLITZ = { r0: 820, minutos: 10, res: { minerio: 400, plasma: 200 }, coleta: 1.6, producao: 1.5, iaAtaque: 0.45, iaMinAtk: 0.3 };
+function blitzJogadores(players) { for (const p of players) if (p) p.mods = Object.assign({}, p.mods, { startRes: Object.assign({}, BLITZ.res), harvestMul: BLITZ.coleta, prodMul: BLITZ.producao }); return players; } /* idempotente: na retomada os jogadores já vêm com os bônus */
 const LENTE = 1.1;                             /* Lente do Arauto: +10% de visão para quem a leva */
 
 /* ---------- utilidades ---------- */
@@ -55,6 +60,7 @@ function cfgDe(c) {
   if (c.eventos && !o.cacada) o.eventos = true;
   if (c.eventosTeste && EV.menores.concat(['sentinela']).includes(c.eventosTeste)) { o.eventosTeste = c.eventosTeste; if (c.eventosEm > 0) o.eventosEm = Math.round(+c.eventosEm); } /* chaves de teste (?evento= e ?eventoem=) */
   const m = lista(c.mutadores).filter(k => MUTADORES[k]); if (m.length) o.mutadores = MUT_IDS.filter(k => m.includes(k));
+  if (c.blitz) o.blitz = true; /* 5.5a: modo Blitz (não cria sim.modos: é só a distância das bases, os bônus dos jogadores e o ritmo da IA) */
   return o;
 }
 function ativo(cfg) { const c = cfgDe(cfg); return !!(c.cacada || c.eventos || c.eventosTeste || c.mutadores) || !!(cfg && cfg.players && cfg.players.some(p => p && p.lente)); }
@@ -216,9 +222,9 @@ function hash(sim, mix) { const M = sim.modos; if (!M) return; const E = M.ev; m
 function snapshot(sim) { const s = S(); return sim.modos ? { modos: s.jsonSafe(sim.modos) } : null; } /* a Fenda, o sim.avisos e os chefões vão no snapshot do g-sim (snap.chefes) */
 function restore(sim, snap) { const s = S(); if (!snap || !snap.modos) return; sim.modos = s.jsonBack(snap.modos); }
 /* o resumo da partida para a interface (cartão da partida, salvamento e fim) */
-function resumo(cfgOuSim) { const cfg = cfgOuSim && cfgOuSim.cfg ? cfgOuSim.cfg : cfgOuSim; const c = cfgDe(cfg); return { cacada: c.cacada || null, eventos: !!c.eventos, mutadores: c.mutadores || [], lente: !!(cfg && cfg.players && cfg.players.some(p => p && p.lente)) }; }
+function resumo(cfgOuSim) { const cfg = cfgOuSim && cfgOuSim.cfg ? cfgOuSim.cfg : cfgOuSim; const c = cfgDe(cfg); return { cacada: c.cacada || null, eventos: !!c.eventos, mutadores: c.mutadores || [], blitz: !!c.blitz /* 5.5a */, lente: !!(cfg && cfg.players && cfg.players.some(p => p && p.lente)) }; }
 
-ARD.modos = { MUTADORES, MUT_IDS, CACADA, CAC_DIF, CAC_LIMITE, MEDALHAS, EV, CARAVANA, ENXAME, METEOROS, SENTINELA_PREMIO, LENTE, HORA_NOITE,
+ARD.modos = { BLITZ, blitzJogadores /* 5.5a */, MUTADORES, MUT_IDS, CACADA, CAC_DIF, CAC_LIMITE, MEDALHAS, EV, CARAVANA, ENXAME, METEOROS, SENTINELA_PREMIO, LENTE, HORA_NOITE,
   cfgDe, ativo, criar, passo, fim, medalha, visao, lento, destroco, tormenta, noite, hash, snapshot, restore, resumo,
   chega, segue /* 5.0h: o mundo neutro (src/mundo.js) liga a chuva de meteoros ao Surto de éter com estas mesmas funções */ };
 })(globalThis.ARD = globalThis.ARD || {});

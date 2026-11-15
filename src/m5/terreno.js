@@ -180,6 +180,7 @@ M5.chao = function (U, o) {
         tEmis.addAssign(vec3(1.4, 0.45, 0.12).mul(smoothstep(0.35, 1.0, sc.a)).mul(sin(tempo.mul(9.0).add(gp.x.mul(0.7))).mul(0.35).add(0.65)).mul(hCrk.mul(0.5).add(0.5))); S.sc = sc; /* 5.0d: as cicatrizes para as camadas do clima e da batalha (src/m5/clima.js) */ }
     }
     alb.mulAssign(macro.mul(0.28).add(0.86)); alb.mulAssign(mix(vec3(1.0), vec3(1.06, 1.0, 0.92), smoothstep(0.4, 0.8, mid).mul(0.6)));
+    { const lc = dot(alb, vec3(0.2126, 0.7152, 0.0722)).toVar('tLc'); alb.assign(mix(alb, mix(vec3(lc), alb, 0.74).mul(0.95), smoothstep(0.2, 0.5, lc))); } /* 5.5a: leitura — o chão claro (areia, neve) menos saturado e um fio mais escuro, como no clássico */
     if (fora) { const sl = smoothstep(250.0, 340.0, pw.y.add(macro.sub(0.5).mul(90.0))).mul(float(1).sub(smoothstep(0.35, 0.6, slope))).mul(UNI ? uFora : float(1)); /* 5.0b.1: ×uFora */ alb.assign(mix(alb, vec3(0.78, 0.82, 0.88).mul(soft.mul(0.1).add(0.9)), sl)); rough.assign(mix(rough, 0.7, sl)); } /* neve no alto das montanhas distantes */
     const CG = M5.ganchos && M5.ganchos.chao; if (CG && CG.cor) { const nc = CG.cor({ m, o, alb, Bw, gp, rough, hgt, tEmis, sc: S.sc || null, slope, cav, soft, mid, macro, Ap, As, nearK, pw, wn }); if (nc) alb.assign(nc); } /* gancho da fase 2 (camadas extras); 5.0d: com rugosidade, relevo, emissivo e cicatrizes (clima e batalha, src/m5/clima.js) */
     const dif = alb.mul(mix(0.72, 1.0, aoc.x)).toVar('tDif');
@@ -197,7 +198,7 @@ M5.chao = function (U, o) {
       If(U.uNear.greaterThan(0.0), () => { const m1 = amostra(mt, wuv.mul(260.0)).rgb.toVar(), m2v = amostra(mt, wuv.mul(84.0).add(0.31)).rgb.toVar(); const pe = max(m1.r.mul(0.6), m2v.r); /* ramo uniforme (a câmera inteira): de longe nem amostra */
         dif.mulAssign(mix(float(1), mix(m1.g, m2v.g, step(0.25, m2v.r)).mul(0.28).add(0.86).mul(float(1).sub(max(m1.b, m2v.b.mul(0.8)).mul(0.35))).mul(pe.mul(0.1).add(1.0)), nk.mul(0.7)));
         mh.assign(m1.r.mul(0.3).add(m2v.r.mul(0.7)).sub(m1.b.add(m2v.b).mul(0.25)).mul(nk)); });
-      const tc = A.territorio(); dif.assign(mix(dif, tc.rgb, tc.a.mul(0.14).mul(UNI ? kf : float(1)))); const fv = A.nevoa(); const nvc = M5.nevoaChao ? M5.nevoaChao(fv) : mix(0.06, 1.0, fv); /* 5.0d: chão nunca visto sob as nuvens de guerra (src/m5/nuvens.js) */ dif.mulAssign(UNI ? mix(nvc, 1.0, uFora) : nvc); tEmis.mulAssign(UNI ? mix(fv, 1.0, uFora) : fv); /* 5.0b.1: território e névoa de guerra só no chão (nas mesas, ×1) */
+      const tc = A.territorio(); dif.assign(mix(dif, tc.rgb.mul(dot(dif, vec3(0.2126, 0.7152, 0.0722)).mul(2.0).add(0.15)), tc.a.mul(0.36).mul(UNI ? kf : float(1)))); /* 5.5a: território na cor da Raça (antes a cor pura a 0.14): a cor entra no claro ou escuro do próprio chão, como no clássico */ const fv = A.nevoa(); const nvc = M5.nevoaChao ? M5.nevoaChao(fv) : mix(0.06, 1.0, fv); /* 5.0d: chão nunca visto sob as nuvens de guerra (src/m5/nuvens.js) */ dif.mulAssign(UNI ? mix(nvc, 1.0, uFora) : nvc); tEmis.mulAssign(UNI ? mix(fv, 1.0, uFora) : fv); /* 5.0b.1: território e névoa de guerra só no chão (nas mesas, ×1) */
     }
     dif.mulAssign(float(1).sub(U.uCloudK.mul(0.2).mul(float(1).sub(A.nuvem())))); /* sombra de nuvem no material (0 quando a bruma do pós já faz) */
     S.rough = rough; S.tH = hgt.mul(mix(0.25, 1.0, nearK)).toVar('tH'); S.mh = mh; S.tEmis = tEmis; S.wn = wn;

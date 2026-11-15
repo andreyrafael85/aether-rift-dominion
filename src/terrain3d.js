@@ -208,6 +208,7 @@ float tRough = 0.9, tH = 0.0; vec3 tEmis = vec3(0.0);
     tEmis += vec3(1.4, 0.45, 0.12) * smoothstep(0.35, 1.0, sc.a) * (0.65 + 0.35 * sin(uTime * 9.0 + gp.x * 0.7)) * (0.5 + 0.5 * hCrk); } /* brasa recente */
   #endif
   alb *= 0.86 + 0.28 * macro; alb *= mix(vec3(1.0), vec3(1.06, 1.0, 0.92), smoothstep(0.4, 0.8, mid) * 0.6);
+  { float lc = dot(alb, vec3(0.2126, 0.7152, 0.0722)); alb = mix(alb, mix(vec3(lc), alb, 0.74) * 0.95, smoothstep(0.2, 0.5, lc)); } /* 5.5a: leitura — o chão claro (areia, neve) menos saturado e um fio mais escuro; o chão escuro fica como está */
   #ifdef ARD_FORA
   { float sl = smoothstep(250.0, 340.0, vWP.y + (macro - 0.5) * 90.0) * (1.0 - smoothstep(0.35, 0.6, slope)); alb = mix(alb, vec3(0.78, 0.82, 0.88) * (0.9 + 0.1 * soft), sl); rough = mix(rough, 0.7, sl); } /* neve no alto das montanhas distantes */
   #endif
@@ -228,7 +229,7 @@ float tRough = 0.9, tH = 0.0; vec3 tEmis = vec3(0.0);
 float ardMh = 0.0;
 if (uNear > 0.0) { vec3 m1 = texture2D(microMap, vWuv * 260.0).rgb; vec3 m2 = texture2D(microMap, vWuv * 84.0 + 0.31).rgb; float pe = max(m1.r * 0.6, m2.r);
   diffuseColor.rgb *= mix(1.0, (0.86 + 0.28 * mix(m1.g, m2.g, step(0.25, m2.r))) * (1.0 - 0.35 * max(m1.b, m2.b * 0.8)) * (1.0 + 0.1 * pe), uNear * 0.7); ardMh = (m1.r * 0.3 + m2.r * 0.7 - (m1.b + m2.b) * 0.25) * uNear; }
-{ vec4 tc = texture2D(terrMap, vWuv); diffuseColor.rgb = mix(diffuseColor.rgb, tc.rgb, tc.a * 0.14); float fl = texture2D(fogMap, vWuv).r; diffuseColor.rgb *= mix(0.06, 1.0, fl); tEmis *= fl;
+{ vec4 tc = texture2D(terrMap, vWuv); diffuseColor.rgb = mix(diffuseColor.rgb, tc.rgb * (0.15 + 2.0 * dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722))), tc.a * 0.36); /* 5.5a: território na cor da Raça (antes a cor pura a 0.14, chapada): a cor entra no claro ou escuro do próprio chão (não clareia o musgo nem o basalto) e o alfa tem miolo suave e borda (render3d, fogUpdate) */ float fl = texture2D(fogMap, vWuv).r; diffuseColor.rgb *= mix(0.06, 1.0, fl); tEmis *= fl;
   float cl = texture2D(cloudMap, vWuv * 5.0 + vec2(uCloudT * 0.006, uCloudT * 0.0035)).r; diffuseColor.rgb *= 1.0 - uCloudK * 0.2 * (1.0 - cl); }
 #else
 float ardMh = 0.0;

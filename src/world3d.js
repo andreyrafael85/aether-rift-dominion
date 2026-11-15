@@ -4,6 +4,18 @@
    Tudo aqui é só visual: nada lê ou altera a simulação. */
 (function (ARD) {
 'use strict';
+/* 5.5a: Luz da Fenda — os números da luz do mundo num lugar só (o motor clássico e o Motor 5 leem daqui). Sol baixo e quente e sombra violeta:
+   as duas cores da marca viram a luz da partida. Só parâmetros que já existiam (direção, cor e força do sol; cores e força do hemisfério e do
+   ambiente; alto do céu e bruma de longe; contraste, vinheta e tom das sombras do pós): nenhuma luz, textura ou efeito novo.
+   sunDir tem o comprimento de sempre (~995: a sombra única e a bruma usam esse tamanho); elevação de 21° (antes 40°).
+   No celular e na qualidade Baixa entram só as cores (sunDirBaixa e sunIBaixa: o sol fica na altura e na força de antes; lá não há sombra projetada nem pós).
+   ?luz=0 volta à luz da 5.0h.5 (para comparar na mesma versão). */
+ARD.luzFenda = !(typeof location !== 'undefined' && /[?&]luz=0(&|$)/.test(location.search))
+  ? { on: true, sunDir: [-737.5, 357.9, 564.0], sunCor: [1.0, 0.80, 0.58], sunI: 2.0, ceu: [0.50, 0.52, 0.86], chao: [0.30, 0.16, 0.26], hemiK: 1.15, ambK: 0.8, amb: [0.075, 0.05, 0.13],
+      alto: [0.17, 0.16, 0.42], longe: [0.56, 0.54, 0.82], con: 0.04, vig: 0.08, lift: [0.006, 0.0, 0.016], sunDirBaixa: [-470, 640, 600], sunIBaixa: 1.6 }
+  : { on: false, sunDir: [-470, 640, 600], sunCor: [1.0, 0.91, 0.77], sunI: 1.6, ceu: [0.3467, 0.4793, 0.6724], chao: [0.0232, 0.0232, 0.0296], hemiK: 1, ambK: 1, amb: [0.0513, 0.0648, 0.117],
+      alto: [0.12, 0.2, 0.36], longe: [0.5, 0.62, 0.8], con: 0, vig: 0, lift: [0, 0, 0.004], sunDirBaixa: [-470, 640, 600], sunIBaixa: 1.6 };
+ARD.luzFenda.ceuN = [0.3467, 0.4793, 0.6724]; ARD.luzFenda.chaoN = [0.0232, 0.0232, 0.0296]; /* de noite o hemisfério volta às cores de sempre (a lua azulada) */
 const PLANETS = { // paletas dos mundos natais aprovados (Postal Dia)
   vehnar:  { pl: ['#1a120c', '#5a3a22', '#a06a3a', '#e6b070'], atmo: 0xff9a4a, bands: true, moon: '#b9a690' },
   erevane: { pl: ['#070c14', '#14283a', '#2f5a78', '#9fd8f0'], atmo: 0x33ffd0, bands: false, moon: '#9fb6c4' },

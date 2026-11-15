@@ -11,8 +11,8 @@ function joga(cfg, n, cada) { const sim = S.createSim(Object.assign({ minutes: 2
   for (let t = 0; t < n; t++) { if (sim.tick % 10 === 0) for (const a of ais) for (const c of AI.think(sim, a)) S.enqueue(sim, c); const ev = S.step(sim); for (const e of ev) if (e.t === 'evento' || e.t === 'chefe' || e.t === 'aviso' || e.t === 'end' || (e.t === 'alert' && e.p === 0)) evs.push(e); if (cada) cada(sim, ev); if (sim.result) break; }
   return { sim, ais, evs }; }
 // 1) sem modo: o hash é o da 5.0f (medido em 3e6ffc2 com estas sementes) e nada de sim.modos; 5.0h: com a IA de antes (perfil nulo), e a IA 3.0 com a referência da 5.0h
-const IA3_PLANICIE = 1690377393; /* 5.0h: medido com a IA 3.0 congelada (tools/ia-ref.cjs) */
-const NULO_PLANICIE = 3444299792, NULO_CINTURAO = 2439875073; /* a IA de antes: 5.0f (3e6ffc2); 5.0h junção: refeitos pelo tools/ia-ref.cjs com o Vorag novo (Cria 6 s, Cuspidor 55/35/6 s) */
+const IA3_PLANICIE = 315887030; /* 5.0h: medido com a IA 3.0 congelada (tools/ia-ref.cjs) */
+const NULO_PLANICIE = 3371634834, NULO_CINTURAO = 4051555666; /* a IA de antes: 5.0f (3e6ffc2); 5.0h junção: refeitos pelo tools/ia-ref.cjs com o Vorag novo (Cria 6 s, Cuspidor 55/35/6 s) */
 { const a = joga({ seed: 31, players: P3, mapV: 1, iaPerfil: 'nulo' /* 5.0h: com a IA de antes, o hash da 5.0f */ }, 4000), b = joga({ seed: 32, players: P3, map: 'cinturao', mapV: 1, iaPerfil: 'nulo' }, 3000);
   ok('sem modo: Planície da Fenda igual à referência (IA de antes)', S.hash(a.sim) === NULO_PLANICIE && !a.sim.modos, 'hash ' + S.hash(a.sim));
   ok('sem modo: Cinturão igual à referência (IA de antes)', S.hash(b.sim) === NULO_CINTURAO && !b.sim.modos, 'hash ' + S.hash(b.sim));

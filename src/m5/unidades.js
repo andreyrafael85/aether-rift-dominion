@@ -207,7 +207,7 @@ function aroGeo() {
   const g = new Tm.BufferGeometry(); g.setAttribute('position', new Tm.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeBoundingSphere(); return g;
 }
 function aroMat() {
-  const Tm = T(); const TL = L(); const { Fn, attribute, varying, float, vec2, vec3, vec4, abs, fract, atan, length, max, min, mix, pow, exp, smoothstep, step, sin, clamp, fwidth, positionGeometry, cameraPosition } = TL; const U = unif();
+  const Tm = T(); const TL = L(); const { Fn, attribute, varying, float, vec2, vec3, vec4, abs, fract, atan, length, max, min, mix, pow, exp, smoothstep, step, sin, cos, clamp, fwidth, positionGeometry, cameraPosition } = TL; const U = unif();
   const m = new Tm.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -2 }); m.fog = false;
   const c0 = attribute('iM0', 'vec4'), c2 = attribute('iM2', 'vec4'), c3 = attribute('iM3', 'vec4');
   m.positionNode = Fn(() => c3.xyz.add(c0.xyz.mul(positionGeometry.x)).add(c2.xyz.mul(positionGeometry.z)))();
@@ -215,7 +215,8 @@ function aroMat() {
   m.fragmentNode = Fn(() => {
     const p = positionGeometry.xz, rho = length(p), ang = atan(p.y.negate(), p.x); /* o z da geometria é −y do anel */
     const tipo = vK.y, t = U.tempo; const px = max(fwidth(rho), 0.0015); /* tamanho do pixel em unidades do anel */
-    const sel = step(tipo, 0.5).add(step(4.5, tipo)), vet = step(0.5, tipo).mul(step(tipo, 3.5)), fla = step(3.5, tipo).mul(step(tipo, 4.5));
+    const arco = step(7.5, tipo), ini = step(8.5, tipo), anel = float(1).sub(arco); /* 5.5a: tipos 8 e 9 = arco de time (9 com o dente do inimigo) */
+    const sel = step(tipo, 0.5).add(step(4.5, tipo).mul(anel)), vet = step(0.5, tipo).mul(step(tipo, 3.5)), fla = step(3.5, tipo).mul(step(tipo, 4.5));
     const cor = vC; const lw = max(px.mul(mix(float(0.85), float(0.6), vet)), float(0.011));
     const dC = abs(rho.sub(0.92)); const core = float(1).sub(smoothstep(lw, lw.add(px), dC));
     const halo = float(1).sub(smoothstep(lw.add(px), lw.add(px.mul(2.8)), dC)).mul(float(1).sub(core)); /* borda escura de ~1,5 px dos dois lados: lê na neve e no gelo */
@@ -231,12 +232,21 @@ function aroMat() {
       const dr = abs(rho.sub(1.0)); const dia = da.add(dr.mul(1.15)).div(tam); const on = step(float(i).add(0.5), pat); est = max(est, float(1).sub(smoothstep(0.82, 0.82 + 0.18, dia)).mul(on)); estB = max(estB, float(1).sub(smoothstep(1.05, 1.35, dia)).mul(on)); }
     const pul = mix(float(1), sin(t.mul(4)).mul(0.25).add(0.85), step(2.5, pat));
     /* camadas pré-multiplicadas: borda escura → brilho de dentro → marcas → linha → estrelas (com contorno escuro) */
-    let pc = vec3(0.004, 0.005, 0.007).mul(halo.mul(0.55)), al = halo.mul(0.55);
+    let pc = vec3(0.004, 0.005, 0.007).mul(halo.mul(0.55).mul(anel)), al = halo.mul(0.55).mul(anel);
     const sobre = (col, a) => { pc = col.mul(a).add(pc.mul(float(1).sub(a))); al = a.add(al.mul(float(1).sub(a))); };
-    sobre(cor.mul(0.8), brilho.mul(scan).mul(mix(float(0.16), float(0.07), vet)).mul(varre.mul(1.5).add(1)));
+    sobre(cor.mul(0.8), brilho.mul(scan).mul(mix(float(0.16), float(0.07), vet)).mul(varre.mul(1.5).add(1)).mul(anel));
     sobre(cor.mul(1.4), tick.mul(0.85));
-    sobre(cor.mul(float(1.5).add(varre.mul(2.2))).mul(pul), core.mul(mix(float(0.95), tr.mul(0.85).add(0.05), vet)));
+    sobre(cor.mul(float(1.5).add(varre.mul(2.2))).mul(pul), core.mul(mix(float(0.95), tr.mul(0.85).add(0.05), vet)).mul(anel));
     sobre(vec3(0.02, 0.012, 0.0), estB.mul(vet).mul(0.6)); sobre(cor.mul(2.0).mul(pul), est.mul(vet));
+    /* 5.5a: arco de time — o anel vem 1,25× maior (UN.arco) e a linha fica em rho 0,736 (o raio pedido); só a metade virada para a câmera; borda escura dos dois lados.
+       O inimigo (tipo 9) leva um dente para fora, na cor de inimigo guardada em vK.x, vK.z e vK.w (o arco não usa promoção, fase nem patente) */
+    { const dA = abs(fract(ang.sub(angC).div(6.2831853).add(0.5)).sub(0.5)).mul(6.2831853); const mA = float(1).sub(smoothstep(1.62, 1.78, dA)).mul(arco);
+      const lwA = max(px.mul(0.62), float(0.014)); /* linha fina: ~2 px na câmera de jogo */ const dR = abs(rho.sub(0.736)); const coreA = float(1).sub(smoothstep(lwA, lwA.add(px), dR)); const haloA = float(1).sub(smoothstep(lwA.add(px), lwA.add(px.mul(2.6)), dR)).mul(float(1).sub(coreA));
+      sobre(vec3(0.004, 0.005, 0.007), haloA.mul(mA).mul(0.75)); sobre(cor.mul(1.5), coreA.mul(mA));
+      const dR2 = abs(rho.sub(0.815)); const coreB = float(1).sub(smoothstep(lwA.mul(0.8), lwA.mul(0.8).add(px), dR2)); sobre(vec3(vK.x, vK.z, vK.w), coreB.mul(mA).mul(ini)); /* o inimigo leva um segundo fio, na cor de inimigo, por fora do arco */
+      const wT = clamp(px.mul(3.0), 0.27, 0.34); const lat = sin(min(dA, float(1.5))).mul(rho), fre = cos(min(dA, float(1.5))).mul(rho); const meia = wT.mul(float(1.2).sub(fre)).div(0.44); /* triângulo: base em 0,76 (meia largura 0,27; de longe cresce até 0,34 para não sumir), ponta em 1,2 */
+      const den = smoothstep(0, px, meia.sub(lat)).mul(smoothstep(0, px, fre.sub(0.76))).mul(ini); const denB = smoothstep(0, px, meia.add(px.mul(1.8)).sub(lat)).mul(smoothstep(0, px, fre.sub(0.76).add(px.mul(1.8)))).mul(step(dA, 1.5)).mul(ini);
+      sobre(vec3(0.004, 0.005, 0.007), denB.mul(0.85)); sobre(vec3(vK.x, vK.z, vK.w), den.mul(step(dA, 1.5))); }
     const F = vK.x; /* promoção: o anel claro que abre (o raio cresce no render3d), forte e sumindo */
     const out = vec4(pc.div(max(al, 0.0001)), clamp(al, 0, 1)); const fl = vec4(cor.mul(2.4), clamp(core.add(halo.mul(0.3)).add(brilho.mul(0.35)).mul(F), 0, 1));
     return mix(out, fl, fla);
@@ -246,7 +256,7 @@ function aroMat() {
 
 /* ---------- barras de vida em segmentos: quadrado por barra no espaço da tela, depois do pós ---------- */
 function barraMat() {
-  const Tm = T(); const TL = L(); const { Fn, attribute, varying, float, vec2, vec3, vec4, abs, fract, floor, max, min, mix, smoothstep, step, sin, clamp, select, positionGeometry, cameraProjectionMatrix, cameraViewMatrix } = TL; const U = unif();
+  const Tm = T(); const TL = L(); const { Fn, attribute, varying, float, vec2, vec3, vec4, abs, fract, floor, max, min, mix, smoothstep, step, sin, atan, length, clamp, select, positionGeometry, cameraProjectionMatrix, cameraViewMatrix } = TL; const U = unif();
   const m = new Tm.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, depthTest: false }); m.fog = false; m.toneMapped = false;
   const c0 = attribute('iM0', 'vec4'), c1 = attribute('iM1', 'vec4'), c3 = attribute('iM3', 'vec4');
   const Hc = c0.y.add(select(c1.y.greaterThan(0.5), float(9), float(0))); /* altura total: barra + divisas */
@@ -273,8 +283,10 @@ function barraMat() {
     rgb = mix(bordaCor, rgb, dentro); a = mix(float(0.88), a, dentro); a = a.mul(naBarra);
     /* divisas douradas (patente) acima da barra, em holograma: linha clara com contorno escuro; piscam claras na promoção */
     const yy = y.sub(Hb).sub(1.5); const cx0 = W.mul(0.5); let dv = float(0), db = float(0);
-    for (let i = 0; i < 3; i++) { const cx = cx0.add(float(i).sub(pat.sub(1).mul(0.5)).mul(8)); const dx = abs(x.sub(cx)); const d = abs(yy.sub(float(5.0).sub(dx.mul(1.05)))); const on = step(float(i).add(0.5), pat).mul(step(dx, 3.3)).mul(step(-0.5, yy)).mul(step(yy, 7));
-      dv = max(dv, float(1).sub(smoothstep(0.55, 1.05, d)).mul(on)); db = max(db, float(1).sub(smoothstep(1.3, 1.9, d)).mul(on)); }
+    /* 5.5a: a patente é uma estrela de cinco pontas (até três) em cima da barra, no lugar das divisas: a borda da estrela em coordenadas polares (ponta a 3,6 px, vale a 1,55 px) */
+    for (let i = 0; i < 3; i++) { const cx = cx0.add(float(i).sub(pat.sub(1).mul(0.5)).mul(6.5)); const dx = x.sub(cx), dy = yy.sub(3.6); const rr = length(vec2(dx, dy)); const th = abs(fract(atan(dx, dy).mul(5 / 6.2831853).add(0.5)).sub(0.5)).mul(1.2566371);
+      const borda = float(3.6 * 1.55 * 0.5877853).div(sin(th).mul(3.6).add(sin(float(0.6283185).sub(th)).mul(1.55))); const d = rr.sub(borda); const on = step(float(i).add(0.5), pat).mul(step(-1.4, yy));
+      dv = max(dv, float(1).sub(smoothstep(-0.45, 0.45, d)).mul(on)); db = max(db, float(1).sub(smoothstep(0.6, 1.4, d)).mul(on)); }
     const ouro = mix(vec3(0.95, 0.76, 0.19), vec3(1, 0.98, 0.85), clamp(fract(fl).mul(2), 0, 1)).mul(mix(float(1), sin(t.mul(4)).mul(0.12).add(0.95), step(2.5, pat)));
     const emCima = float(1).sub(naBarra); rgb = mix(rgb, mix(vec3(0.05, 0.035, 0), ouro, dv.div(max(db, 0.001))), emCima.mul(db)); a = mix(a, max(db.mul(0.85), dv), emCima);
     return vec4(rgb, a);
@@ -286,7 +298,7 @@ function barraMat() {
 U5.criar = function (o) {
   if (!ON || !T() || !L()) return null; const Tm = T(); const Inst = M5.Inst(); const U = unif(); const R = o.R, H = o.H;
   const UN = { aros: null, barras: null, cenaHud: null };
-  const CAP_ARO = 512, CAP_BAR = 768;
+  const CAP_ARO = 1536 /* 5.5a: era 512; agora cada unidade à vista leva um arco de time no mesmo desenho */, CAP_BAR = 768;
   const _e = { elements: new Float32Array(16) }, E = _e.elements; const _c = new Tm.Color(), _n = new Tm.Vector3(), _q = new Tm.Quaternion(), _a = new Tm.Vector3(), _b = new Tm.Vector3(), UPV = new Tm.Vector3(0, 1, 0);
   const corCache = new Map(); const corLin = hex => { let c = corCache.get(hex); if (!c) { c = new Tm.Color(hex); corCache.set(hex, c); } return c; }; /* Color(hex) = linear */
   const OURO = new Tm.Color(1.0, 0.55, 0.08), BRANCO = new Tm.Color(0.85, 0.9, 1.0), RUIM = new Tm.Color(1.0, 0.18, 0.12), FAROL = new Tm.Color(1.0, 0.78, 0.3);
@@ -303,6 +315,14 @@ U5.criar = function (o) {
     let c; if (tipo >= 1 && tipo <= 4) c = OURO; else if (tipo === 5) c = FAROL; else if (tipo === 7) c = RUIM; else if (dono == null || dono < 0 || !sim || !sim.players[dono]) c = BRANCO;
     else if (foeP && foeP[dono] === true && foeCor) c = foeCor; else c = corLin(sim.players[dono].color);
     UN.aros.setColorAt(n, c); return n + 1;
+  };
+  /* 5.5a: arco de time no pé da unidade (tipo 8), na cor do dono; o inimigo (tipo 9) leva o dente na cor de inimigo (ou na do dono, com o "Destacar inimigos" desligado) */
+  UN.arco = function (n, x, y, r, dono, inimigo) {
+    if (n >= CAP_ARO || !UN.aros) return n; const pq = sim && sim.players[dono]; if (!pq) return n; const rr = r * 1.25;
+    const hd = Math.max(4, r * 0.5); const hx = (H(x + hd, y) - H(x - hd, y)) / (2 * hd), hy = (H(x, y + hd) - H(x, y - hd)) / (2 * hd); _n.set(-hx, 1, hy).normalize(); _q.setFromUnitVectors(UPV, _n);
+    _a.set(rr, 0, 0).applyQuaternion(_q); _b.set(0, 0, rr).applyQuaternion(_q); const c = corLin(pq.color), d = inimigo ? (foeCor || c) : null;
+    E[0] = _a.x; E[1] = _a.y; E[2] = _a.z; E[3] = 0; E[4] = d ? d.r : 0; E[5] = inimigo ? 9 : 8; E[6] = d ? d.g : 0; E[7] = d ? d.b : 0;
+    E[8] = _b.x; E[9] = _b.y; E[10] = _b.z; E[11] = 0; E[12] = x; E[13] = H(x, y) + 0.7; E[14] = -y; E[15] = 1; UN.aros.setMatrixAt(n, _e); UN.aros.setColorAt(n, c); return n + 1;
   };
   /* veterano: aro dourado com as estrelas da patente; na promoção um anel claro abre por 1,2 s */
   const promo = new Map(); let podaT = 0;

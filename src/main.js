@@ -30,7 +30,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.0h.5';
+const VERSION = '5.5a';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -150,11 +150,11 @@ function initStart() {
   // multiplayer P2P por código de sala: 2 a 4 jogadores humanos, sem IAs; o anfitrião é o relé do lockstep
   let lobby = null;
   const mpStatus = t => { $('mp-status').textContent = t; };
-  const myInfo = () => { const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar'; return { name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante') /* 5.0c */, faction, color: ARD.campUI ? ARD.campUI.colorFor(faction) : null, build: BUILD }; };
+  const myInfo = () => { const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar'; return { name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante') /* 5.0c */, faction, color: ARD.campUI ? ARD.campUI.colorFor(faction) : null, cosm: ARD.cosmeticos ? ARD.cosmeticos.anuncia(faction) : [] /* 5.5a: os cosméticos em uso (só aparência; nunca vão para a cfg da partida) */, build: BUILD }; };
   const facName = f => (S.FACTIONS[f] ? DN.racaCurto(f) : f); /* 5.0c */
   function renderLobby(players, size) {
-    const el = $('mp-players'); el.innerHTML = ''; const me = lobby ? lobby.me : null;
-    players.forEach(p => { const d = document.createElement('div'); d.textContent = (p.id === 0 ? '★ ' : '• ') + p.name + ' (' + facName(p.faction) + ')' + (p.id === 0 ? ' ' + Tx('multi.anfitriao') : '') + (me && p.name === me.name && (lobby.role === 'host' ? p.id === 0 : p.id !== 0) ? ' — ' + Tx('multi.voce') : ''); /* 5.0c */ el.appendChild(d); });
+    const el = $('mp-players'); el.innerHTML = ''; const me = lobby ? lobby.me : null; syncConvite(); /* 5.5a: o link de convite aparece com o código da sala */
+    players.forEach(p => { const d = document.createElement('div'); d.textContent = (p.id === 0 ? '★ ' : '• ') + p.name + ' (' + facName(p.faction) + ')' + (p.id === 0 ? ' ' + Tx('multi.anfitriao') : '') + (me && p.name === me.name && (lobby.role === 'host' ? p.id === 0 : p.id !== 0) ? ' — ' + Tx('multi.voce') : ''); /* 5.0c */ if (ARD.cosmeticos) ARD.cosmeticos.enfeita(d, p.cosm, p.faction); /* 5.5a: moldura, cor do nome e título de cada jogador da sala */ el.appendChild(d); });
     for (let i = players.length; i < size; i++) { const d = document.createElement('div'); d.className = 'muted'; d.textContent = '• ' + Tx('multi.vaga'); /* 5.0c */ el.appendChild(d); }
     if (ARD.modosUI) ARD.modosUI.linhaSala(el, lobby); /* 5.0g: o modo da sala */
     if (lobby && lobby.warn) { const d = document.createElement('div'); d.className = 'warn'; d.textContent = '⚠ ' + TRx(lobby.warn); /* 5.0c */ el.appendChild(d); }
@@ -168,7 +168,7 @@ function initStart() {
     if (lobby.role === 'host') { const n = lobby.N.roster().length; m.disabled = n < 2 || lobby.started; m.textContent = n < 2 ? Tx('multi.aguardando-jogadores') : Tx('multi.iniciar-sala', { n, total: lobby.size }); } /* 5.0c */
     else { m.disabled = true; m.textContent = Tx('multi.aguardando-anfitriao'); } /* 5.0c */
   }
-  function leaveLobby() { if (lobby) { if (lobby.timer) clearInterval(lobby.timer); if (lobby.role === 'host') $('opt-code').value = ''; try { lobby.N.close(); } catch (e) {} lobby = null; } $('mp-players').innerHTML = ''; setStartButton(); }
+  function leaveLobby() { if (lobby) { if (lobby.timer) clearInterval(lobby.timer); if (lobby.role === 'host') $('opt-code').value = ''; try { lobby.N.close(); } catch (e) {} lobby = null; } $('mp-players').innerHTML = ''; setStartButton(); syncConvite(); /* 5.5a */ }
   function startHosted() {
     if (!lobby || lobby.role !== 'host' || lobby.started) return;
     const N = lobby.N; N.me = myInfo(); const roster = N.roster();
@@ -214,6 +214,14 @@ function initStart() {
     N.join(code, me);
   }
   $('btn-join').addEventListener('click', () => joinRoom($('opt-code').value));
+  /* 5.5a: link de convite — ?sala=CÓDIGO abre a aba Multiplayer e entra na sala sozinho (o nome padrão pode ser trocado depois, na própria sala); na sala, o botão copia ou compartilha o link */
+  const linkConvite = code => location.href.split(/[?#]/)[0] + '?sala=' + encodeURIComponent(code);
+  function syncConvite() { const box = $('convite'); if (!box) return; const on = !!(lobby && lobby.code && !lobby.started); box.hidden = !on; if (on) { const v = linkConvite(lobby.code); if ($('convite-link').value !== v) $('convite-link').value = v; } }
+  if ($('btn-convite')) $('btn-convite').addEventListener('click', () => { if (!lobby || !lobby.code) return; const url = linkConvite(lobby.code), b = $('btn-convite'); const ok = () => { b.textContent = Tx('multi.convite.copiado'); setTimeout(() => { b.textContent = Tx('multi.convite.botao'); }, 2500); }; const naMao = () => { $('convite-link').focus(); $('convite-link').select(); mpStatus(Tx('multi.convite.na-mao')); };
+    if (matchMedia('(pointer: coarse)').matches && navigator.share) navigator.share({ title: 'Aether Rift: Dominion', text: Tx('multi.convite.texto', { codigo: lobby.code }), url }).catch(() => {});
+    else if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(ok, naMao); else naMao(); });
+  if ($('convite-link')) $('convite-link').addEventListener('focus', e => e.target.select());
+  $('opt-name').addEventListener('change', () => { if (!lobby || lobby.started) return; if (lobby.role === 'guest') { const c = lobby.code; leaveLobby(); joinRoom(c); } else { lobby.me = lobby.N.me = myInfo(); if (lobby.N.relobby) lobby.N.relobby(); } }); /* 5.5a: trocar o nome dentro da sala (o convidado entra de novo com o nome novo; o anfitrião reenvia a lista) */
   $('opt-code').addEventListener('input', () => { if (!lobby) setStartButton(); });
   $('opt-code').addEventListener('keydown', e => { if (e.key === 'Enter' && !lobby) { e.preventDefault(); joinRoom($('opt-code').value); } });
   $('btn-mp-start').addEventListener('click', () => {
@@ -224,15 +232,19 @@ function initStart() {
     if (lobby) { showTab('multi', true); return; } // numa sala, o início é pela aba Multiplayer
     const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar';
     const cfg = { name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante') /* 5.0c */, faction, opp: $('opt-opp').value, diff: $('opt-diff').value, seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value, map: $('opt-map') ? $('opt-map').value : 'fenda' };
-    savePrefs(Object.assign(loadPrefs() || {}, cfg)); startGame(Object.assign(cfg, ARD.modosUI ? ARD.modosUI.cfgJogar() : {} /* 5.0g: Eventos da Fenda, mutadores e Lente */));
+    const blitz = !!(ARD.modosUI && ARD.modosUI.blitzLigado && ARD.modosUI.blitzLigado()); /* 5.5a: modo Blitz (1 contra 1, mapa pequeno, 10 minutos; sem eventos nem mutadores) */
+    savePrefs(Object.assign(loadPrefs() || {}, cfg)); startGame(Object.assign(cfg, blitz ? ARD.modosUI.cfgBlitz() : ARD.modosUI ? ARD.modosUI.cfgJogar() : {} /* 5.0g: Eventos da Fenda, mutadores e Lente */));
   });
   $('btn-help-start').addEventListener('click', () => toggleHelp(true));
   if (ARD.modosUI) { try { ARD.modosUI.montar({ showTab, lobby: () => lobby, startGame: c => { if (lobby) { showTab('multi', true); return; } startGame(c); }, cfgBase: () => ({ name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante'), faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar', seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }) }); } catch (e) { console.warn('[ARD] modos:', e); } } /* 5.0g: aba Caçada, regras da Fenda e modo da sala */
+  if (ARD.guia) { try { ARD.guia.inicio({ params, ocupado: () => !!lobby || !!window.__rejoining || document.body.classList.contains('ingame'), startGame: c => { if (lobby) { showTab('multi', true); return; } startGame(c); }, cfgBase: () => { const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar'; return { name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante'), faction, color: ARD.campUI ? ARD.campUI.colorFor(faction) || undefined : undefined, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: 'auto' }; } }); } catch (e) { console.warn('[ARD] primeira partida:', e); } } /* 5.5a: cartão de boas-vindas da primeira visita e o botão Primeira partida */
+  { const sala = (params.get('sala') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6); if (sala.length >= 4 && !params.get('autostart') && !params.get('bench') && !window.__rejoining) { showTab('multi', false); $('opt-code').value = sala; mpStatus(Tx('multi.convite.entrando', { codigo: sala })); setTimeout(() => { if (!lobby && !G) joinRoom(sala); }, 60); } } /* 5.5a: quem recebe o link cai direto na sala */
   { const bb = $('btn-bench'); if (bb) { const show = () => { const b = benchLoad(); $('bench-last').textContent = b ? Tx('desempenho.ultimo', { fps: b.fps, p1: b.p1, q: TRx(b.quality), data: new Date(b.at).toLocaleDateString(ARD.i18n.locale()) }) : Tx('desempenho.nenhum'); }; show(); window.addEventListener('ard-idioma', show); /* 5.0c */
     bb.addEventListener('click', () => { if (lobby || window.__rejoining) { showTab('multi', true); mpStatus(Tx(lobby ? 'desempenho.sair-sala' : 'desempenho.aguarde-volta')); return; } /* 5.0c */ startGame({ name: 'Teste', faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar', opp: '1', diff: 'normal', seed: 4242, gfx: '3d', quality: $('opt-quality').value, clima: 'auto', bench: true }); }); } }
   window.addEventListener('ard-idioma', () => { if (G) return; try { refreshSaved(); netState(); setStartButton(); if (lobby) renderLobby(lobby.role === 'host' ? lobby.N.roster() : (lobby.N.players || []), lobby.size); const on = $('opt-name'); if (on && on.dataset.padrao && on.value === on.dataset.padrao) on.value = on.dataset.padrao = Tx('geral.comandante'); } catch (e) { console.warn('[ARD] idioma na tela inicial:', e); } }); /* 5.0c: a tela inicial se refaz no idioma novo, sem recarregar */
   if (params.get('bench')) { startGame({ name: 'Teste', faction: params.get('faction') || 'vehnar', opp: '1', diff: 'normal', seed: 4242, gfx: params.get('r') === '2d' ? '2d' : '3d', quality: params.get('q') || $('opt-quality').value, clima: params.get('clima') || 'auto', bench: true }); }
-  else if (params.get('autostart')) { startGame(Object.assign({ name: 'Teste', faction: params.get('faction') || 'erevane', opp: params.get('opp') || '2', diff: params.get('diff') || 'normal', seed: parseInt(params.get('seed') || '5', 10), gfx: params.get('r') === '2d' ? '2d' : '3d', map: params.get('mapa') || 'fenda', chefe: params.get('chefe') || undefined, chefeDif: params.get('chefedif') || undefined /* 5.0g: ?chefe=arauto|forja|sentinela (chefão perto da sua base) */ }, ARD.modosUI ? ARD.modosUI.cfgUrl(params) : {} /* 5.0g: ?cacada ?eventos ?evento ?mut ?lente */, ARD.unicasUI ? ARD.unicasUI.cfgUrl(params) : {} /* 5.0h: ?cmd ?cmdnivel ?unicas */)); }
+  else if (params.get('autostart') && params.get('guia') === '1' && ARD.guia) { startGame(ARD.guia.cfgJogo({ name: 'Teste', faction: params.get('faction') || 'vehnar', gfx: params.get('r') === '2d' ? '2d' : '3d', quality: $('opt-quality').value, clima: 'auto' })); } /* 5.5a: ?autostart=1&guia=1 abre a primeira partida guiada (testes e capturas) */
+  else if (params.get('autostart')) { startGame(Object.assign({ name: 'Teste', faction: params.get('faction') || 'erevane', opp: params.get('opp') || '2', diff: params.get('diff') || 'normal', seed: parseInt(params.get('seed') || '5', 10), gfx: params.get('r') === '2d' ? '2d' : '3d', map: params.get('mapa') || 'fenda', chefe: params.get('chefe') || undefined, chefeDif: params.get('chefedif') || undefined /* 5.0g: ?chefe=arauto|forja|sentinela (chefão perto da sua base) */ }, ARD.modosUI ? ARD.modosUI.cfgUrl(params) : {} /* 5.0g: ?cacada ?eventos ?evento ?mut ?lente · 5.5a: ?blitz=1 */, ARD.unicasUI ? ARD.unicasUI.cfgUrl(params) : {} /* 5.0h: ?cmd ?cmdnivel ?unicas */)); }
 }
 
 // 4.1c — sessão multiplayer do convidado: código, lugar e ficha para voltar à sala depois de recarregar a página
@@ -244,7 +256,7 @@ const mpSession = {
   clear() { try { localStorage.removeItem(this.KEY); } catch (e) {} },
 };
 // 4.2g — volta à tela inicial sem os parâmetros de lançamento (?missao&iniciar=1 dos botões do fim de missão, ?autostart, ?bench): um reload os relançaria
-function goStart() { const q = new URLSearchParams(location.search); for (const k of ['missao', 'dif', 'raca', 'iniciar', 'campanha', 'autostart', 'bench', 'retomar']) q.delete(k); const s = q.toString(); location.replace(location.pathname + (s ? '?' + s : '')); }
+function goStart() { const q = new URLSearchParams(location.search); for (const k of ['missao', 'dif', 'raca', 'iniciar', 'campanha', 'autostart', 'bench', 'retomar', 'guia', 'blitz', 'sala' /* 5.5a: nem a partida guiada, nem o Blitz de teste, nem o convite já usado */]) q.delete(k); const s = q.toString(); location.replace(location.pathname + (s ? '?' + s : '')); }
 const within = (p, ms) => Promise.race([p, new Promise(r => setTimeout(r, ms))]); // 4.2g: sair nunca fica preso esperando o armazenamento
 // 4.3k — tela de carregamento: Raça e líder do jogador, mapa (ou missão) e uma dica; a interface passa a ter a cor da Raça de quem joga
 const LOAD_TIPS = [['Energia abaixo de 100% deixa produção, sensores e defesas mais lentos: construa Reatores antes de precisar.'], ['Coletores colhem sozinhos no seu território; com o botão direito, mande-os a outro campo.'], ['Um Nódulo de Avanço amplia o território e libera novos nós para os coletores.'],
@@ -260,7 +272,7 @@ function loadingInfo(cfg, netCtx) { try {
   const fac = (netCtx && cfg.players && cfg.players[netCtx.myId] && cfg.players[netCtx.myId].faction) || cfg.faction || 'vehnar'; const f = S.FACTIONS[fac] || S.FACTIONS.vehnar;
   document.documentElement.dataset.race = S.FACTIONS[fac] ? fac : 'vehnar'; document.documentElement.style.removeProperty('--race');
   if ($('load-race')) $('load-race').textContent = DN.raca(S.FACTIONS[fac] ? fac : 'vehnar') + ' · ' + (LEADER_NAME[fac] || ''); /* 5.0c */
-  if ($('load-title')) $('load-title').textContent = cfg.bench ? Tx('desempenho.titulo') : cfg.campaign && cfg.campaign.mission ? (ARD.campaign && ARD.campaign.titulo ? ARD.campaign.titulo(cfg.campaign.mission) : cfg.campaign.mission.title) : DN.mapa(cfg.map === 'cinturao' || cfg.map === 'tita' /* 5.0g */ ? cfg.map : 'fenda'); /* 5.0c */
+  if ($('load-title')) $('load-title').textContent = cfg.bench ? Tx('desempenho.titulo') : cfg.guia ? Tx('guia.titulo') /* 5.5a */ : cfg.campaign && cfg.campaign.mission ? (ARD.campaign && ARD.campaign.titulo ? ARD.campaign.titulo(cfg.campaign.mission) : cfg.campaign.mission.title) : DN.mapa(cfg.map === 'cinturao' || cfg.map === 'tita' /* 5.0g */ ? cfg.map : 'fenda'); /* 5.0c */
   const touch = matchMedia('(pointer: coarse)').matches; const tips = LOAD_TIPS.filter(t => !(touch && t[1])); if ($('load-tip')) { const tp = tips[Math.floor(Math.random() * tips.length)]; $('load-tip').textContent = cfg.bench ? Tx('desempenho.dica-carga') : Tx('carga.dica.' + LOAD_TIPS.indexOf(tp), null, tp[0]); } /* 5.0c */
   if (leaderArt(fac)) { $('load-leader').src = leaderArt(fac); $('load-leader').hidden = false; }
   loadBg(fac); /* 4.3l */
@@ -377,9 +389,13 @@ function startGame(cfg, netCtx) {
   if (isTouch && navigator.getBattery && !G.save30) navigator.getBattery().then(b => { if (b && !b.charging && b.level < 0.2) { G.save30 = true; notice(Tx('jogo.bateria-baixa')); } /* 5.0c */ }).catch(() => {});
   document.addEventListener('visibilitychange', () => { if (!G || G.sim !== sim || G.ended) return; if (document.hidden) { if (!net && !G.paused) { G.paused = true; G.autoPaused = true; G.pauseWhy = 'O jogo pausou sozinho porque a aba ficou em segundo plano. Nada se perdeu.'; } } else { if (G.autoPaused) { G.autoPaused = false; refreshTop(); } else if (net) banner(Tx('multi.voltou'), Tx('multi.voltou-txt'), 'warn'); } }); /* 5.0c */
   G.camp = cfg.campaign && ARD.campUI ? ARD.campUI.begin(sim, cfg.campaign, cfg.resume ? cfg.resume.run : null) : null; // 4.0e: missão da campanha (4.1c: ou a retomada dela)
-  if (ARD.vozes) try { ARD.vozes.partida({ sim, human, lead3d: G.lead3d, missao: G.camp && G.camp.prep ? G.camp.prep.mission.id : null }); } catch (e) {} /* 5.0c.1: vozes gravadas — o pacote da Raça do jogador (e o da missão) baixa depois da tela de carregamento, em tempo ocioso (src/vozes.js) */
+  G.guia = cfg.guia && ARD.guia && !cfg.resume && !netCtx ? ARD.guia.begin({ G, sim, human, view, I, R, cfg, openBuild, leaderArt, LEADER_NAME, RACE_COLORS, confirma: confirmModal, sair: () => { G.leaving = true; goStart(); } }) : null; if (!G.guia && ARD.guia) ARD.guia.sairDoModo(); /* 5.5a: primeira partida guiada (um objetivo por vez; o painel nasce aos poucos) */
+  if (ARD.vozes) try { ARD.vozes.partida({ sim, human, lead3d: G.lead3d, missao: G.camp && G.camp.prep ? G.camp.prep.mission.id : G.guia ? 'p1' /* 5.5a: a fala de abertura do guia é a do Prólogo */ : null }); } catch (e) {} /* 5.0c.1: vozes gravadas — o pacote da Raça do jogador (e o da missão) baixa depois da tela de carregamento, em tempo ocioso (src/vozes.js) */
   G.cfg = cfg; setupSaves();
   if (R.is3d && ARD.campUI) R.skins = { [human]: ARD.campUI.skinOf(sim.players[human].faction) };
+  G.cosm = {}; if (ARD.cosmeticos) { const CZ = ARD.cosmeticos; if (net && net.players) for (const q of net.players) { const sp = sim.players[q.id]; if (sp) G.cosm[q.id] = CZ.forma(q.cosm); } else G.cosm[human] = CZ.anuncia(sim.players[human].faction); /* 5.5a: cosméticos por jogador, fora da simulação (no multiplayer, o que cada um anunciou na sala) */
+    if (R.is3d && net) { R.skins = R.skins || {}; for (const id in G.cosm) R.skins[id] = CZ.skinDe(G.cosm[id], sim.players[id].faction); } } /* 5.5a: a pintura do Núcleo de cada jogador aparece para todos */
+  const czM = q => ARD.cosmeticos ? ARD.cosmeticos.marcas(G.cosm[q.id], q.faction) : { cls: '', estilo: '', titulo: '' }; /* 5.5a: moldura, cor do nome e título no painel de diplomacia */
   window.addEventListener('resize', () => R.resize());
   document.body.classList.toggle('touch', isTouch);
   if (isTouch) { const bar = $('bar'); for (const id of ['btn-diplo', 'btn-tech', 'btn-foto', 'btn-save', 'btn-sound', 'btn-voice', 'btn-a11y', 'btn-help']) /* 5.0b: Pesquisa e Ajustes também */ { const b = $(id); if (b && bar && b.parentElement !== bar) bar.appendChild(b); } } /* 4.3k: no toque, os botões de sistema vão para a barra de baixo (alvos de 44 px sem a barra de cima virar três linhas) */
@@ -430,6 +446,8 @@ function startGame(cfg, netCtx) {
     if (!silent && ARD.unicasUI) ARD.unicasUI.eventos(ev, G); /* 5.0h: efeitos das habilidades e dos módulos */
     if (G.track) G.track.tick(ev);
     if (G.camp) { const r = G.camp.tick(ev); if (r && !G.ended) endGame({ campaign: r }); }
+    if (G.guia) { const r = G.guia.tick(ev); if (r && !G.ended) endGame({ guia: r }); } /* 5.5a */
+    if (ARD.fim && sim.tick % ARD.fim.CADA === 0) ARD.fim.amostra(G); /* 5.5a: amostras da força dos exércitos para o gráfico da tela final (só leitura) */
     if (ARD.cinema && !silent) ARD.cinema.eventos(ev, G); /* 5.0f: superarma e chefão viram cena (só leem os eventos) */
     if (ARD.chefes && !silent) ARD.chefes.eventos(ev, G); /* 5.0g: entrada, fase, janela e morte do chefão (cinema, aviso e som) */
     if (ARD.mundoUI && !silent) ARD.mundoUI.eventos(ev, G); /* 5.0h: mundo neutro (luz, faíscas e som) */
@@ -462,7 +480,9 @@ function startGame(cfg, netCtx) {
     if (G.h3) G.h3.frame(G.frameN); /* 5.0b: cada parte da Interface 3.0 no seu ritmo, escrevendo só o que mudou */
     if (G.lead3d && ARD.leaders3d && G.frameN % 300 === 0) { const n = S.nucleoOf(sim, human); const mine = S.armyValue(sim, human); let foe = 0; for (const q of sim.players) if (q.alive && q.id !== human && !S.hasPact(sim, human, q.id)) foe = Math.max(foe, S.armyValue(sim, q.id)); ARD.leaders3d.baseMood(G.lead3d, !n || n.hp < n.maxHp * 0.5 || (foe > 600 && mine < foe * 0.45) ? 4 : (mine > 1500 && mine > foe * 1.8) ? 3 : 1); }
     if (G.camp && G.frameN % 10 === 0) { G.camp.frame(); if (R.setBeacon) R.setBeacon(G.camp.beacon(), G.camp.vip()); }
-    { const td0 = performance.now(); R.draw(sim, view, G.paused ? 1 : Math.min(1, G.acc / S.TICK), dt); drawMs = performance.now() - td0; }
+    if (G.guia && G.frameN % 2 === 0) G.guia.frame(); /* 5.5a: faixa do objetivo e seta */
+    if (G.ended && ARD.fim) ARD.fim.quadro(G, dt); /* 5.5a: a última cena gira devagar atrás da tela final */
+    { const td0 = performance.now(); R.draw(sim, view, G.paused ? 1 : Math.min(1, G.acc / S.TICK), dt); drawMs = performance.now() - td0; if (G.fimCap && ARD.fim) ARD.fim.captura(G, canvas); /* 5.5a: a foto da última cena para o cartão de resultado, no mesmo quadro do desenho */ }
     if (G.bench && G.bench.rec && !G.bench.done) { const B = G.bench; B.cpu.push(performance.now() - fc0); B.simT.push(simMs); B.drawT.push(drawMs); } /* 4.3i */
     detEnd(R, performance.now() - fc0, simMs, drawMs, G.detSteps || 0, G.detEv || 0); G.detSteps = 0; G.detEv = 0; /* 5.0a: detetive */
     if (G.lead3d && ARD.leaders3d && ARD.leaders3d.setLight && R.lightSt && (G.frameN % 15 === 0 || R.lightSt.flash > 0.2)) ARD.leaders3d.setLight(G.lead3d, R.lightSt); /* 4.3e: o retrato do líder recebe a luz do mapa (dia, noite, clima, relâmpago) */
@@ -518,7 +538,7 @@ function startGame(cfg, netCtx) {
       else if (e.t === 'proposal' && e.p === human && !silent) { G.pendingFor = e.from; showProposal(e.from); }
       else if (e.t === 'eliminated' && !silent) { const q = sim.players[e.p]; const left = sim.players.filter(x => x.alive && x.id !== human && !x.fenda /* 5.0g */).length; if (e.p !== human) { const qn = DN.jogador(q.name); banner(Tx('hud.eliminado', { nome: qn }), left > 0 ? Tx('hud.restantes', { n: left }) + ' · ' + Tx('hud.restantes-dica') : Tx('hud.todos-cairam'), 'good'); AU.sfx('promote'); AU.say(Tx('hud.eliminado', { nome: qn }) + '. ' + (left > 0 ? Tx('hud.restantes', { n: left }) : ''), 'elim', 0, null, ARD.vozes ? ARD.vozes.elim(q, left) : undefined /* 5.0c.1: nome da IA e inimigos restantes gravados */); } } /* 5.0c */
       else if (e.t === 'trait' && e.owner === human && !silent) AU.sfx('promote');
-      else if (e.t === 'end') { if (!G.camp) endGame(e.result); }
+      else if (e.t === 'end') { if (!G.camp && !G.guia /* 5.5a */) endGame(e.result); }
       else if (e.t === 'regime' && e.p === human && !silent) notice(Tx('hud.energia-regime', { regime: DN.regime(e.regime) })); /* 5.0c */
       else if (e.t === 'era' && e.p === human && !silent) { const er = S.ERAS[e.era]; banner('Era ' + er.roman + ' — ' + DN.era(e.era), DN.eraDesc(e.era), 'good', 7000); /* 5.0c */ leaderMood(3); AU.sfx('promote'); G.selKey = ''; }
       else if (e.t === 'ascend' && e.p === human && !silent) { const af = sim.players[human].faction; banner(Tx('hud.ascensao', { nome: DN.ascensao(af) }), DN.ascensaoDesc(af), 'good', 8000); /* 5.0c */ leaderMood(3); AU.sfx('promote'); }
@@ -588,11 +608,12 @@ function startGame(cfg, netCtx) {
     $('bench-verdict').textContent = verdict[0]; $('bench-verdict').className = 'bv ' + verdict[1]; $('bench-tip').textContent = verdict[2];
     $('bench-table').innerHTML = [['FPS médio', res.fps], ['Piores 1% dos quadros', res.p1 + ' fps'], ['Piores 5% dos quadros', res.p5 + ' fps'], ['Pior quadro', res.worst + ' ms'], ['Travadas (> 50 ms)', res.stutters + ' de ' + res.frames], ['Qualidade', res.quality], ['Resolução interna', res.res + (res.escala ? ' (escala ' + res.escala + ')' : '')], ['CPU por quadro', res.cpu != null ? res.cpu + ' ms (95%: ' + res.cpu95 + ' ms) · simulação ' + res.simMs + ' ms · desenho ' + res.drawMs + ' ms' : '—'], ['Depois do quadro (estilo, layout, pintura)', res.posMs != null ? res.posMs + ' ms (95%: ' + res.pos95 + ' ms)' : '—'] /* 5.0b.1 */, ['GPU por quadro', res.gpuMs != null ? res.gpuMs + ' ms (95%: ' + res.gpu95 + ' ms)' : res.gpuN ? 'poucos quadros medidos (' + res.gpuN + ')' : (res.laco && !res.laco.ts && ARD.m5 && ARD.m5.semTs ? 'desligado (?ts=0)' : 'não medido neste navegador')] /* 5.0b.1 */ /* 5.0a */, ['Shaders compilados no teste', res.shaders != null ? res.shaders + (res.motor && res.motor[0] === '5' ? ' (pipelines criados no ' + res.motor.slice(3, -1) + ')' : '') : '—'], ['Carregamento', res.carga ? (res.carga.total / 1000).toFixed(1) + ' s (' + (res.carga.motor != null ? 'motor ' + (res.carga.motor / 1000).toFixed(2) + ' s · ' : '') + 'terreno ' + (res.carga.terreno / 1000).toFixed(1) + ' s · modelos ' + (res.carga.modelos / 1000).toFixed(1) + ' s · ' + (res.motor && res.motor[0] === '5' ? 'shaders e pipelines ' : 'shaders ') + (res.carga.shaders / 1000).toFixed(1) + ' s)' : '—'], ['Motor', res.motor || 'Clássico'], ...(res.laco && ARD.m5 && ARD.m5.ritmoTexto ? [['Laço (Motor 5)', ARD.m5.ritmoTexto(res.laco)]] : []) /* 5.0b.1 */, ['GPU', res.gpu]] /* 5.0a: linha do motor */.map(([k, v]) => `<div class="stat"><span>${esc(k)}</span><b>${esc(String(v))}</b></div>`).join('');
     { const dd = $('bench-det'); if (dd) { const L = res.detetive || []; dd.hidden = !L.length; dd.innerHTML = L.length ? '<b>Detetive de travadas: os 5 piores quadros</b><ol>' + L.map(s => '<li>' + esc(s) + '</li>').join('') + '</ol>' : ''; } } /* 5.0a */
+    { const bc = $('bench-copy'); if (bc) { bc.hidden = false; bc.onclick = () => { const txt = JSON.stringify({ diagnostico: diagInfo(), teste: res }, null, 2); const done = () => { bc.textContent = Tx('fim.copiado'); }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => {}); }; } } /* 5.5a: Copiar resultado (JSON) saiu da tela final e ficou só aqui, no diagnóstico */
     $('bench-feedback').href = feedbackUrl({ teste_desempenho_detalhe: JSON.stringify(res) }); $('bench-back').onclick = () => location.href = location.pathname; box.hidden = false;
   }
   // ---------- 4.1c: salvamento ----------
   function setupSaves() {
-    G.autoSave = !net && !!ARD.saves && !params.get('semsalvar') && !cfg.bench;
+    G.autoSave = !net && !!ARD.saves && !params.get('semsalvar') && !cfg.bench && !cfg.guia; /* 5.5a: a partida guiada (5 a 7 minutos) não é salva */
     G.saveNow = (slot, extra) => { if (!G.autoSave || G.ended || G.leaving) return Promise.resolve(null); // 4.2g: depois de Sair ou Pausar e sair nada regrava o 'auto' (ciclo de 10 s, aba escondida, pagehide)
       let data, meta; try { data = buildSave(); meta = saveMeta(extra); } catch (e) { console.warn('[ARD] salvamento: fotografia falhou', e); return Promise.resolve(null); }
       return ARD.saves.put(slot, meta, data).catch(e => { console.warn('[ARD] salvamento falhou:', e); return null; }); };
@@ -942,7 +963,7 @@ function startGame(cfg, netCtx) {
     for (const q of sim.players) { if (q.fenda) continue; /* 5.0g */
       if (q.id === human) continue;
       const pact = p.pacts[q.id]; const pending = sim.pending.find(pr => pr.from === q.id && pr.to === human); const mine = sim.pending.find(pr => pr.from === human && pr.to === q.id);
-      h += `<div class="dp ${q.alive ? '' : 'dead'}" data-pid="${q.id}"><div class="dp-h">${leaderArt(q.faction) ? `<img class="dp-lead" src="${leaderArt(q.faction)}" alt="">` : ''}<span class="dot" style="background:${q.color}"></span><b>${esc(DN.jogador(q.name))}</b> <span class="muted">· ${LEADER_NAME[q.faction] || ''}</span> <span class="muted">· ${DN.racaCurto(q.faction)} · ${q.alive ? DN.reputacao(q.rep) : Tx('diplo.eliminado')}</span></div>`; /* 5.0c */
+      h += `<div class="dp ${q.alive ? '' : 'dead'}" data-pid="${q.id}"><div class="dp-h">${leaderArt(q.faction) ? `<img class="dp-lead" src="${leaderArt(q.faction)}" alt="">` : ''}<span class="dot" style="background:${q.color}"></span><b class="cz-nome${czM(q).cls}" style="${czM(q).estilo}">${esc(DN.jogador(q.name))}${czM(q).titulo}</b> <span class="muted">· ${LEADER_NAME[q.faction] || ''}</span> <span class="muted">· ${DN.racaCurto(q.faction)} · ${q.alive ? DN.reputacao(q.rep) : Tx('diplo.eliminado')}</span></div>`; /* 5.0c */
       if (!q.alive) { h += '</div>'; continue; }
       if (pact) h += `<div class="small">${Tx('diplo.ativa', { t: mmss(pact.until - sim.time) })}</div><button class="act sm danger" data-break="${q.id}">${Tx('diplo.quebrar')}</button>`; /* 5.0c */
       else if (pending) h += `<div class="small">${Tx('diplo.propoe')}</div><div class="row"><button class="act sm good" data-accept="${q.id}">${Tx('diplo.aceitar')}</button><button class="act sm" data-decline="${q.id}">${Tx('diplo.recusar')}</button></div>`;
@@ -1034,7 +1055,19 @@ function startGame(cfg, netCtx) {
   }
   // ---------- end ----------
   function endGame(result) {
-    if (G.ended) return; G.ended = true; if (ARD.vozes) try { ARD.vozes.fim(result.campaign ? !!result.campaign.won : result.outcome === 'victory' || (result.outcome === 'over' && result.winner === human)); } catch (e) {} /* 5.0c.1: Vitória/Derrota e a reação do líder */ if (G.autoSave && ARD.saves) ARD.saves.del('auto').catch(() => {}); /* 5.0g.1: era esta, no fim da partida, a promise solta do iPhone ("armazenamento demorou") */ if (net) mpSession.clear(); // partida terminada não volta
+    if (G.ended) return; G.ended = true; if (ARD.vozes) try { ARD.vozes.fim(result.campaign ? !!result.campaign.won : result.guia ? !!result.guia.won /* 5.5a */ : result.outcome === 'victory' || (result.outcome === 'over' && result.winner === human)); } catch (e) {} /* 5.0c.1: Vitória/Derrota e a reação do líder */ if (G.autoSave && ARD.saves) ARD.saves.del('auto').catch(() => {}); /* 5.0g.1: era esta, no fim da partida, a promise solta do iPhone ("armazenamento demorou") */ if (net) mpSession.clear(); // partida terminada não volta
+    const fimTela = o => { if (!ARD.fim) return; const pq = sim.players[human]; ARD.fim.mostrar(Object.assign({ G, sim, human, result, tempo: sim.time, lider: { nome: LEADER_NAME[pq.faction] || '', art: leaderArt(pq.faction, result.outcome === 'victory' ? 3 : 2) }, cores: RACE_COLORS, sair: () => { G.leaving = true; goStart(); } }, o)); }; /* 5.5a: a palavra grande, os três números, o gráfico com a virada e o Compartilhar (src/fim.js) */
+    if (result.guia) { /* 5.5a: fim da primeira partida guiada */
+      const r = result.guia; const scores = sim.players.map(q => ({ id: q.id, name: q.name, score: q.alive ? S.score(sim, q) : 0, alive: q.alive })); result = { outcome: r.won ? 'victory' : 'defeat', reason: r.reason, scores };
+      G.guia.fim(r.won); $('comms').hidden = true; $('end-camp').hidden = true; $('end-scores').innerHTML = ''; const st = sim.players[human].stats;
+      $('end-stats').innerHTML = [['tempo', mmss(r.time || sim.time)], ['coletado', fmt(st.collected)], ['abatidas', st.unitsKilled], ['perdidas', st.unitsLost], ['estruturas', st.buildingsDestroyed]].map(([k, v]) => `<div class="stat"><span>${Tx('fim.st.' + k)}</span><b>${v}</b></div>`).join('');
+      { const art = leaderArt(sim.players[human].faction, r.won ? 3 : 2); if (art) { $('end-leader').src = art; $('end-leader').hidden = false; } }
+      $('end-reason').textContent = r.won ? Tx('guia.fim.vitoria') : r.reason; const base = location.href.split(/[?#]/)[0];
+      $('btn-next').hidden = !r.won; $('btn-next').textContent = Tx('guia.fim.blitz'); $('btn-next').onclick = () => { location.href = base + '?aba=jogar&modo=blitz'; };
+      $('btn-again').textContent = Tx('guia.fim.repetir'); $('btn-again').classList.toggle('primary', !r.won); $('btn-again').onclick = () => { location.href = base + '?guia=1'; };
+      { const fb = $('end-feedback'); if (fb) fb.href = feedbackUrl({ resultado: r.won ? 'primeira partida concluída' : 'primeira partida perdida' }); }
+      fimTela({ tipo: 'guia', linha: Tx('guia.titulo') + ' · ' + mmss(r.time || sim.time), modo: Tx('guia.titulo'), tempo: r.time || sim.time, proximo: () => Tx(r.won ? 'guia.fim.prox' : 'fim.prox.perdeu') });
+      return; }
     if (result.campaign) { // 4.0e: fim de missão
       const r = result.campaign; const prep = G.camp.prep; const scores = sim.players.map(q => ({ id: q.id, name: q.name, score: q.alive ? S.score(sim, q) : 0, alive: q.alive }));
       result = { outcome: r.won ? 'victory' : 'defeat', reason: r.reason, scores };
@@ -1048,7 +1081,7 @@ function startGame(cfg, netCtx) {
       $('end').hidden = false; $('end-title').textContent = Tx(r.won ? 'fim.missao-cumprida' : 'fim.missao-falhou'); /* 5.0c */ $('end-title').className = result.outcome; $('end').dataset.outcome = result.outcome; /* 4.3k */ $('end-reason').textContent = r.reason;
       $('end-scores').innerHTML = ''; const st = sim.players[human].stats; $('end-stats').innerHTML = [['tempo', mmss(r.time || sim.time)], ['coletado', fmt(st.collected)], ['roubado', fmt(st.stolen)], ['abatidas', st.unitsKilled], ['perdidas', st.unitsLost], ['estruturas', st.buildingsDestroyed]].map(([k, v]) => `<div class="stat"><span>${Tx('fim.st.' + k)}</span><b>${v}</b></div>`).join(''); /* 5.0c */
       $('btn-again').textContent = Tx('fim.repetir'); /* 5.0c */ $('btn-again').onclick = () => { location.href = q({ missao: prep.mission.id, dif: prep.difficulty, raca: prep.race, iniciar: '1' }); };
-      $('btn-copy').onclick = () => { const ta = $('end-json'); ta.hidden = false; ta.value = JSON.stringify({ versao: VERSION, missao: prep.mission.id, dificuldade: prep.difficulty, raca: prep.race, resultado: Object.assign({}, r, { reason: (G.camp.run && G.camp.run.motivoPt) || r.reason }) /* 5.0c: o diagnóstico vai em pt-BR */, objetivos: G.camp.run.objectives.map(o => ({ id: o.id, feito: o.done })) }, null, 2); ta.select(); };
+      fimTela({ tipo: 'campanha', palavra: $('end-title').textContent, dif: ARD.campaign.dificuldade ? ARD.campaign.dificuldade(prep.difficulty) : prep.diff.label, modo: ARD.campaign.titulo ? ARD.campaign.titulo(prep.mission) : prep.mission.title, tempo: r.time || sim.time }); /* 5.5a: tela final nova (o Copiar resultado (JSON) saiu daqui) */
       return;
     }
     if (result.outcome === 'over') { const me = sim.players[human]; result = Object.assign({}, result, { outcome: me.alive && result.winner === human ? 'victory' : 'defeat', reason: result.reason + (result.winner >= 0 ? ' Vencedor: ' + sim.players[result.winner].name + '.' : ''), motivoPt: result.reason, vencedor: result.winner >= 0 ? sim.players[result.winner].name : null }); } /* 5.0c: motivo em pt-BR (JSON do feedback) e as partes para mostrar no idioma */
@@ -1064,7 +1097,8 @@ function startGame(cfg, netCtx) {
     { const cz = result.cacada && ARD.modosUI ? ARD.modosUI.fim(result, sim, human) : null; /* 5.0g: medalha, recorde e recompensas da Caçada */
       if (cz) { $('end-title').textContent = cz.titulo; $('end-eyebrow').textContent = cz.eyebrow; const ec = $('end-camp'); ec.innerHTML = cz.html + (ec.hidden ? '' : ec.innerHTML); ec.hidden = false; } else if (ARD.modosUI) ARD.modosUI.fimEscaramuca(sim, human); }
     $('btn-again').onclick = () => location.reload();
-    $('btn-copy').onclick = () => { const data = { versao: VERSION, data: new Date().toISOString(), seed: sim.seed, faccao: p.faction, dificuldade: p.difficulty, jogadores: sim.players.map(x => ({ nome: x.name, faccao: x.faction, humano: x.human, vivo: x.alive })), resultado: result.outcome, motivo: result.reason, mapa: sim.map ? sim.map.type : 'fenda', lagos: !!(sim.map && sim.map.lakes && sim.map.lakes.length), duracao_s: Math.round(sim.time), placar: result.scores, estatisticas: st, reputacao: S.REP_NAMES[p.rep], graficos: R.is3d ? '3d' : '2d', qualidade: R.quality ? R.quality.name : null, reduzido: R.degraded || [], shaders: R.shaderErrors || [], gpu: R.gpu || null, build: BUILD, multiplayer: !!net, aparelho: navigator.userAgent.slice(0, 80) }; const txt = JSON.stringify(data, null, 2); const done = () => { $('btn-copy').textContent = Tx('fim.copiado'); }; /* 5.0c */ if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(() => { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); }); else { $('end-json').hidden = false; $('end-json').value = txt; $('end-json').select(); } };
+    { const foes = sim.players.filter(q => q.id !== human && !q.fenda && q.id !== sim.mundo).length; const cz = !!result.cacada; const dif = net || cz ? null : DN.dificuldade(G.cfg.diff || 'normal'); const modo = G.cfg.blitz ? Tx('modos.blitz.nome') : null;
+      fimTela({ tipo: cz ? 'cacada' : net ? 'multi' : G.cfg.blitz ? 'blitz' : 'escaramuca', palavra: cz ? $('end-title').textContent : null, dif, modo: cz ? $('end-eyebrow').textContent : modo ? modo + ' · ' + DN.mapa(sim.map && sim.map.type ? sim.map.type : 'fenda') : null, linha: cz ? null : [DN.mapa(sim.map && sim.map.type ? sim.map.type : 'fenda'), modo || (foes > 1 ? 'FFA ' + (foes + 1) : '1v1'), dif, mmss(sim.time)].filter(Boolean).join(' · '), proximo: () => Tx(result.outcome === 'victory' ? 'fim.prox.venceu' : 'fim.prox.perdeu') }); } /* 5.5a: tela final nova (o Copiar resultado (JSON) saiu daqui; ficou no Teste de desempenho) */
   }
 
   // ---------- UI bridge for input ----------

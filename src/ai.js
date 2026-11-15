@@ -189,13 +189,14 @@ function think2(sim, mem) {
     if (en && scout) { mem.lastScout = t; emitC({ t: 'move', ids: [scout.id], x: en.x + (sim.rand() - 0.5) * 300, y: en.y + (sim.rand() - 0.5) * 300 }); }
   }
   // --- esquadrões: defesa, ataque por avaliação de alvo, recuo
-  const value = S.armyValue(sim, mem.pid); const threshold = (D.attackAt + Math.max(0, (t - 600) / 60) * 25) * strat.attackMul;
+  const BZ = sim.cfg && sim.cfg.blitz && ARD.modos && ARD.modos.BLITZ ? ARD.modos.BLITZ : null; /* 5.5a: no Blitz a IA ataca mais cedo e com menos tropa */
+  const value = S.armyValue(sim, mem.pid); const threshold = (D.attackAt + Math.max(0, (t - 600) / 60) * 25) * strat.attackMul * (BZ ? BZ.iaAtaque : 1);
   const attacked = builds.find(b => t - b.lastHitT < 6 && b.lastHitBy !== undefined && b.lastHitBy !== mem.pid);
   const rally = { x: nuc.x + (S.CX - nuc.x) * 0.12, y: nuc.y + (S.CY - nuc.y) * 0.12 };
   const ids = army.map(u => u.id);
   if (attacked && ids.length) { if (t - mem.lastAttackOrder > 4) { mem.lastAttackOrder = t; emitC({ t: 'attackmove', ids, x: attacked.x, y: attacked.y }); } if (mem.mode === 'attack' && value < mem.attackStart * 0.5) mem.mode = 'defend'; }
   else if (mem.mode === 'defend') {
-    if (value >= threshold && ids.length >= 4 && t >= D.minAttack) { mem.mode = 'attack'; mem.attackStart = value; mem.target = assessTargets(sim, mem, nuc); }
+    if (value >= threshold && ids.length >= 4 && t >= D.minAttack * (BZ ? BZ.iaMinAtk : 1)) { mem.mode = 'attack'; mem.attackStart = value; mem.target = assessTargets(sim, mem, nuc); }
     else if (t - mem.lastAttackOrder > 8) { const far = army.filter(u => u.state === 'idle' && S.dist(u.x, u.y, rally.x, rally.y) > 160).map(u => u.id); if (far.length) { mem.lastAttackOrder = t; emitC({ t: 'attackmove', ids: far, x: rally.x, y: rally.y }); } }
   }
   if (mem.mode === 'attack' && !attacked) {
@@ -383,7 +384,7 @@ function think3(sim, mem) {
   const paced = !D.buildEvery || t - (mem.lastBuild == null ? -999 : mem.lastBuild) >= D.buildEvery;
   if (needEnergy && paced && pode({ minerio: S.BUILDINGS.reator.cost.minerio + reserve })) { const s = findSpot(sim, mem.pid, 'reator', nuc.x, nuc.y, 70, 260, 30); if (s) { emitC({ t: 'build', def: 'reator', x: s.x, y: s.y }); mem.lastBuild = t; } }
   else if (underConstruction < 2 && paced) {
-    const order = mem.order || (mem.order = (cac ? BO_CAC[cac] || BO_CAC.arauto : BUILD_ORDERS[p.faction] || BUILD_ORDERS.vehnar).slice()); let def = order[mem.bo];
+    const order = mem.order || (mem.order = (cac ? BO_CAC[cac] || BO_CAC.arauto : P.ordem /* 5.5a: a ordem de construção do líder (só a IA 3.0; a campanha segue na BUILD_ORDERS) */ || BUILD_ORDERS[p.faction] || BUILD_ORDERS.vehnar).slice()); let def = order[mem.bo];
     if (def && S.lockReason(sim, mem.pid, 'building', def)) { let j = mem.bo + 1; while (j < order.length && S.lockReason(sim, mem.pid, 'building', order[j])) j++; if (j < order.length) { const tmp = order[mem.bo]; order[mem.bo] = order[j]; order[j] = tmp; def = order[mem.bo]; } }
     while (def === 'torre' && D.maxTowers != null && towers >= D.maxTowers && mem.bo < order.length) { mem.bo++; def = order[mem.bo]; }
     const nodMax = 7 + P.nod;
@@ -493,6 +494,7 @@ if (!ud.attack) sc *= 0.35; if (ud.cost.dados && p.res.dados < (ud.cost.dados + 
 
   // --- esquadrões: defesa, ataque (com reunião, duas frentes e o pedido do aliado), recuo
   const value = meuV; let threshold = (D.attackAt + Math.max(0, (t - 600) / 60) * 25) * strat.attackMul * P.ataque; let minAtk = D.minAttack * P.minAtk;
+  if (sim.cfg && sim.cfg.blitz && ARD.modos && ARD.modos.BLITZ) { threshold *= ARD.modos.BLITZ.iaAtaque; minAtk *= ARD.modos.BLITZ.iaMinAtk; } /* 5.5a: no Blitz a IA ataca mais cedo e com menos tropa */
   if (cac) { threshold = Math.min(threshold, D.attackAt * 0.55); minAtk = Math.min(minAtk, Math.max(240, D.minAttack * 0.6)); } /* contra a Forja-Mãe, só com o enxame de voadores pronto */
   let attacked = builds.find(b => t - b.lastHitT < 6 && b.lastHitBy !== undefined && b.lastHitBy !== mem.pid);
   if (!attacked && !cac) { const ca = collectors.find(u => t - u.lastHitT < 4 && u.lastHitBy != null && u.lastHitBy >= 0 && u.lastHitBy !== mem.pid && sim.players[u.lastHitBy] && S.isEnemy(sim, mem.pid, u.lastHitBy)); /* Coletores atacados: a defesa vai até eles e eles correm para o Núcleo */
@@ -618,5 +620,5 @@ function ganchos(sim, mem, v, P, D, p, nuc, builds, army, emitC, era) {
         else { if (h.cura && ferido < 2) continue; /* Reparo e Florescer só com feridos por perto */ x = av.x; y = av.y; }
         v.habT = t; emitC({ t: 'habilidade', id: av.id, n: k, x, y, alvo: al }); break; } } }
 }
-ARD.ai = { create, think, STRATS, snapshot, restore, PERFIS, perfilDe, FALAS: ['inicio', 'chefe', 'ataque', 'atacado', 'recua', 'pacto', 'recusa', 'coalizao', 'trai', 'super', 'pedido'], _contra: contra }; /* 5.0h: + PERFIS, perfilDe, as chaves das falas e a contra-composição (testes) */
+ARD.ai = { create, think, STRATS, snapshot, restore, PERFIS, perfilDe, _BO: BUILD_ORDERS /* 5.5a: as ordens de construção, para as ferramentas de balanceamento */, FALAS: ['inicio', 'chefe', 'ataque', 'atacado', 'recua', 'pacto', 'recusa', 'coalizao', 'trai', 'super', 'pedido'], _contra: contra }; /* 5.0h: + PERFIS, perfilDe, as chaves das falas e a contra-composição (testes) */
 })(globalThis.ARD = globalThis.ARD || {});

@@ -643,9 +643,17 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
 
 #### Fase 1 — Porta de entrada
 
-##### 5.5a — Porta de entrada · tamanho M/G · 3 agentes
+##### 5.5a — Porta de entrada · tamanho M/G · 3 agentes · ✔ 15/11/2026
 - **Entra:** a Luz da Fenda e a leitura (itens 1 e 2 acima) e o território na cor de cada Raça (primeiro passo de "o chão conta quem manda"); primeira partida guiada de 5 a 7 minutos, com um objetivo por vez e o HUD nascendo aos poucos; modo **Blitz** (1 contra 1, mapa pequeno, 8 a 10 minutos); tela final nova (item 3); **link de convite** que já abre a sala; primeira rodada de balanceamento (meta: 40% a 60% no jogo automático); polimentos baratos (barra do comandante por baixo da pausa e da tela final, barra de cima em 1600×900, rótulo da Raça sobre a Fenda, "Copiar resultado (JSON)" fora da tela final, promoção como estrela na barra de vida); o catálogo de cosméticos como dados, sem vender nada; **desempenho no Firefox (Motor 5):** menos chamadas à placa de vídeo por quadro, agrupando os envios de dados (teste do dono na 5.0h.4: sem criações na GPU, pior quadro 83 → 53 ms, mas 1% ainda em 25 fps, com quadros de 50 ms em que o desenho da cena custa 23 a 28 ms sem evento nenhum; Chrome e iPhone ótimos).
 - **Pronto quando:** um visitante novo termina a partida guiada sem ajuda no computador e no celular; o convite abre a sala em um toque; o jogo automático fica na faixa; fotos antes e depois da luz nos dois motores; desempenho dentro do orçamento da §8.
+
+- **Entregue em 15/11/2026 (agentes l-luz, l-entrada, l-equilibrio):**
+  - **Luz da Fenda e leitura:** sol de 40° para 21°, quente, sombra puxada para o violeta (`ARD.luzFenda`; `?luz=0` volta à luz antiga); pedras no tom do chão; arco fino na cor do dono em toda unidade, e no inimigo um segundo fio e um dente; território na cor da Raça; estrela de promoção na barra de vida. No Motor 5, 1 pipeline a menos.
+  - **Primeira partida guiada** (seis objetivos, painel nascendo aos poucos, pulável), **Blitz** (`cfg.blitz`: bases a 1.640, relógio de 10 minutos), **tela final nova** com cartão 1200×630 montado no navegador (`src/fim.js`), **link de convite** `?sala=CÓDIGO`, e os três polimentos de HUD.
+  - **Balanceamento (muda hashes):** Soldador dano 20 → 16; Cria Minério 26 → 31; Cuspidor 55 → 64; Atirador de Fenda Era II → Era I e Minério 100 → 130; Quimera vida 140 → 170. Em 160 partidas por Raça: Vehnar 68 → 56%, Erevane 36 → 47%, Tessara 43 → 56%, Quorith 42 → 44%, Vorag 62 → 48%. O portão de 20 partidas do QA é ruído (uma Raça de 50% aparece entre 22% e 78%) e segue dizendo "fora".
+  - **Catálogo de cosméticos** (`src/cosmeticos.js`, 18 itens, nada à venda), no Hangar e no multiplayer; hashes iguais com e sem cosméticos.
+  - **Motor 5:** envios de dados por quadro 435 → 221 no Teste de desempenho (49%); contado no Chromium, falta o teste do dono no Firefox.
+  - **Fica para depois:** mapa pequeno de verdade no Blitz e Blitz no multiplayer; arte de estandarte e rastro; a área de toque das construções no celular; a causa de fundo do balanceamento (o Minério acaba cedo e a partida entre IAs não sai da Era I); a prova da versão para baixar (vai com a 5.5g); `tools/cosmeticos-test.cjs` e `tools/entrada-test.cjs` ainda fora do `tools/qa.cjs`.
 
 ##### 5.5b — Compartilhar · tamanho M · 2 agentes
 - **Entra:** **Desafio do Dia** (semente pela data, igual para todos, sem servidor); código de desafio por link; cartão de resultado e de conquista (1200×630 e 1080×1350, montados no navegador); degraus de descoberta (uma novidade por partida nas cinco primeiras); HUD de moldura fina (o de hoje cobre de 26% a 44% da tela); medição de uso só em contagens, sem cookies.

@@ -419,7 +419,7 @@ globalThis.ARD.I18N_DIC['es'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aquí es tuyo. Todavía.",
-  "inicio.versao": "Versión 5.0h.5 · build __BUILD__ · Más allá de la Grieta · Mundo vivo · multijugador de 2 a 4",
+  "inicio.versao": "Versión 5.5a · build __BUILD__ · Puertas Abiertas · Mundo vivo · multijugador de 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Elige tu Raza",
   "inicio.vitrine.explorar-base": "Explorar la base",
   "inicio.vitrine.som-tela-inicial": "Sonido de la pantalla de inicio",
@@ -488,6 +488,7 @@ globalThis.ARD.I18N_DIC['es'] = {
   "ajustes.btn-bench": "Probar rendimiento (30 s)",
   "ajustes.cfg-feedback": "Enviar comentarios",
   "notas.notas-versao": "Notas de la versión",
+  "notas.5-5a": "<b>5.5a — Puerta de entrada:</b> quien llega ahora tiene una <b>primera partida guiada</b>, con un objetivo a la vez y el panel apareciendo poco a poco. Llegó el modo <b>Blitz</b>: 1 contra 1, bases más cerca y reloj de 10 minutos. La <b>pantalla final</b> es nueva, con el gráfico del vuelco y el botón Compartir, que genera una tarjeta con el resultado. La sala multijugador tiene un <b>enlace de invitación</b> que entra directo en la sala. El mundo recibió la <b>Luz de la Grieta</b>: sol bajo y cálido, sombras largas. Cada unidad tiene un arco fino del color de su dueño, el enemigo se reconoce también por la forma, el suelo alrededor de la base toma el color de tu Raza y el ascenso aparece como estrella en la barra de vida. <b>Balance:</b> Soldador con daño 16 (antes 20), Cría y Escupidor más caros, Quimera con más vida y el Tirador de Grieta de Erevane disponible en la Era I. El Hangar lista los <b>cosméticos</b> y cómo ganar cada uno; nada está a la venta. En el Motor 5 el juego envía la mitad de los datos por cuadro a la tarjeta gráfica.",
   "notas.5-0h-5": "<b>5.0h.5 — Jefes 3.0:</b> los tres jefes dejaron de ser máquinas y ahora son criaturas de la Grieta, con nombres nuevos. El Heraldo ahora es <b>La Medusa de la Grieta</b>, la Forja Madre es <b>El Titán-Fragua</b> y la Centinela de la Grieta es <b>La Centinela Devoradora</b>, que quedó mucho más grande en pantalla. Antes de cada golpe el cuerpo avisa: el Titán abre la mandíbula de par en par, la Devoradora abre los colmillos y la Medusa contrae la campana. En la Línea de montaje el lomo del Titán se abre y aparecen los puntos débiles ámbar. Los pilares, los Ecos y los esbirros de la Grieta recibieron el aspecto de la misma familia. Las reglas de los combates, la vida y el daño de los jefes no cambiaron.",
   "notas.5-0h-4": "<b>5.0h.4 — Rendimiento en el Motor 5:</b> se acabó el tirón de la primera vez que un lago aparecía en pantalla. Todo lo que necesita el reflejo de los lagos ahora se prepara durante la carga, y en nuestra prueba ya no se crea nada en la tarjeta gráfica en medio de la partida. Los retratos de las unidades en el panel del ejército se generan de uno en uno, y el juego crea un poco menos de basura de memoria por cuadro. La Prueba de rendimiento ahora muestra, en cada tirón, cuánto tiempo se fue en sombras, reflejo de los lagos, escena y efectos. La imagen y la simulación siguen iguales.",
   "notas.5-0h-3": "<b>5.0h.3 — Rendimiento:</b> menos tirones en medio de las batallas. En Chrome, el juego crea cerca de un 20% menos de basura de memoria por segundo, así que el navegador se detiene menos veces a limpiar. En el <b>Motor 5</b>, la muerte de un vehículo y la cámara pasando sobre un lago ya no crean recursos nuevos en la tarjeta gráfica en el momento: el juego los prepara antes. La Prueba de rendimiento ahora dice, en cada tirón, qué había en ese cuadro (los eventos y lo que se creó en la tarjeta gráfica). La imagen y la simulación siguen iguales.",
@@ -506,7 +507,7 @@ globalThis.ARD.I18N_DIC['es'] = {
   "notas.5-0c": "<b>5.0c — Idiomas:</b> todo el juego ahora está en <b>inglés</b> y <b>español</b>, además de portugués: pantalla de inicio, Sala de Mando, partida, campaña, diplomacia, multijugador, Modo Foto, ayuda y las líneas de la voz del sistema, que ahora usan una voz del idioma elegido. El juego abre en el idioma del navegador y cambia al instante, sin recargar, en <b>Idioma / Language / Idioma</b>: arriba en la pantalla de inicio, en Ajustes y en la ventana de Ajustes de la partida. También en esta versión: los planetas y el cielo de arriba de la Sala de Mando se ven nítidos: en reposo el fondo se dibujaba a media resolución y ahora sale completo, con el detalle de los planetas siguiendo el tamaño del píxel, y la Sala ya no pierde resolución al cambiar de Raza; el locutor de la partida habla en el género del locutor de tu Raza (voz masculina en Vehnar, Quorith y Vorag; femenina en Erevane y Tessara); con el Motor 5, la resolución dinámica solo baja cuando la tarjeta gráfica es el límite, lo que evita los tirones del cambio de resolución; y en el iPhone, <b>Probar sonido</b> muestra un consejo cuando los efectos suenan y la voz no.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 más ligero, faros y sonido en el iPhone:</b> con el <b>Motor 5</b> activado, los shaders que prepara en la carga se redujeron un tercio (los lagos primero) y cada cuadro envía muchos menos datos a la tarjeta gráfica, lo que alivia la CPU en Firefox y en el celular. El brillo alrededor de las luces ahora es el mismo del motor clásico, y en el Modo Foto de la calidad Baja los efectos siguen la exposición como en el clásico. De noche y dentro de la Tormenta de Éter, los faros de los vehículos, recolectores y piratas iluminan el suelo al frente, en los dos motores. La Sala de Mando quedó un poco más clara, sin el resplandor de antes. En el iPhone, el sonido y la voz se desbloquean con el primer toque, suenan con el interruptor de silencio activado y vuelven después de una llamada. Cada líder habla con una voz de su género en todos los navegadores. En Ajustes, <b>Probar sonido</b> toca tres notas y una frase y muestra el estado del audio del dispositivo.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, en prueba:</b> con el <b>Motor 5</b> activado (Ajustes › Motor gráfico), todo el juego ahora corre en WebGPU, con vuelta automática a WebGL2: unidades y construcciones con el detalle de superficie y la animación de cada pieza, ruinas, obras, el holograma de la Erevane, los escudos del Unísono y las banderas; el suelo con todos los biomas, la vegetación al viento, los caminos y el cielo; explosiones, fuego, humo y disparos; los lagos de plasma y de hielo con reflejo, el espacio del Cinturón y la Tormenta de Éter; y el <b>Modo Foto</b> (📷 o tecla J) con desenfoque, los 8 filtros y captura en 4K. La primera vez que el Modo Foto se abre en una partida, tarda unos segundos en prepararse. Con todo esto, la carga del Motor 5 se alargó unos segundos: la próxima versión la mide en los dispositivos y la reduce. El motor clásico sigue siendo el predeterminado y no cambió.",
-  "notas.historico-versoes-anteriores-5": "Notas de versiones anteriores (5.0h.4 → 2.0; desde la 5.0a.3, en portugués)",
+  "notas.historico-versoes-anteriores-5": "Notas de versiones anteriores (5.0h.5 → 2.0; desde la 5.0a.3, en portugués)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Términos de uso",
   "inicio.rodape.foot-priv": "Privacidad",
@@ -2273,4 +2274,141 @@ globalThis.ARD.I18N_DIC['es'] = {
   "ia.fala.vorag.super.1": "Huevos abiertos. Buena suerte.", /* 5.0h */
   "ia.fala.vorag.pedido.0": "Oru va. Oru se come lo que señales.", /* 5.0h */
   "ia.fala.vorag.pedido.1": "Entendido. La nidada corre para allá.", /* 5.0h */
+  "cosm.hg.titulo": "Cosméticos", /* 5.5a */
+  "cosm.hg.nota": "Solo apariencia: nada de esto cambia el resultado de una partida. La elección se aplica al instante y los demás jugadores la ven en las salas.", /* 5.5a */
+  "cosm.tipo.pintura": "Pintura del Núcleo", /* 5.5a */
+  "cosm.tipo.estandarte": "Estandarte", /* 5.5a */
+  "cosm.tipo.moldura": "Marco de la tarjeta", /* 5.5a */
+  "cosm.tipo.titulo": "Título", /* 5.5a */
+  "cosm.tipo.cor-nome": "Color del nombre", /* 5.5a */
+  "cosm.tipo.rastro": "Estela", /* 5.5a */
+  "cosm.gratis": "Gratis", /* 5.5a */
+  "cosm.em-uso": "En uso", /* 5.5a */
+  "cosm.trancado": "Bloqueado", /* 5.5a */
+  "cosm.em-producao": "En producción", /* 5.5a */
+  "cosm.apoiador": "Edición de Apoyo (todavía no disponible)", /* 5.5a */
+  "cosm.nivel": "Llega al nivel {n} de Comandante", /* 5.5a */
+  "cosm.conquista": "Logro: {nome}", /* 5.5a */
+  "cosm.item.pin-padrao": "Estándar", /* 5.5a */
+  "cosm.item.pin-fortaleza": "Fortaleza", /* 5.5a */
+  "cosm.item.pin-santuario": "Santuario", /* 5.5a */
+  "cosm.item.est-padrao": "Sin estandarte", /* 5.5a */
+  "cosm.item.est-apoiador": "Estandarte del Alineamiento", /* 5.5a */
+  "cosm.item.mol-padrao": "Marco simple", /* 5.5a */
+  "cosm.item.mol-alinhamento": "Marco del Alineamiento", /* 5.5a */
+  "cosm.item.mol-cinco-mundos": "Marco de los Cinco Mundos", /* 5.5a */
+  "cosm.item.mol-apoiador": "Marco de Apoyo", /* 5.5a */
+  "cosm.item.tit-nenhum": "Sin título", /* 5.5a */
+  "cosm.item.tit-recruta": "Recluta del Alineamiento", /* 5.5a */
+  "cosm.item.tit-palavra-dada": "Palabra Dada", /* 5.5a */
+  "cosm.item.tit-apoiador": "Aliado de la Grieta", /* 5.5a */
+  "cosm.item.cor-padrao": "Color estándar", /* 5.5a */
+  "cosm.item.cor-veterano": "Oro de veterano", /* 5.5a */
+  "cosm.item.cor-apoiador": "Azul de apoyo", /* 5.5a */
+  "cosm.item.ras-padrao": "Estela estándar", /* 5.5a */
+  "cosm.item.ras-apoiador": "Estela del Sifón en espiral", /* 5.5a */
+  "guia.titulo": "Primera partida", /* 5.5a */
+  "guia.botao": "Primera partida", /* 5.5a */
+  "guia.bv.eyebrow": "¿Primera vez aquí?", /* 5.5a */
+  "guia.bv.titulo": "Aprende jugando, en 5 minutos", /* 5.5a */
+  "guia.bv.texto": "Una partida corta, con un objetivo a la vez en pantalla: recolectar, construir, entrenar tropas, defender la base y derribar el Núcleo enemigo.", /* 5.5a */
+  "guia.bv.jogar": "Jugar la primera partida", /* 5.5a */
+  "guia.bv.menu": "Ya conozco el juego: ir al menú", /* 5.5a */
+  "guia.eyebrow": "Primera partida · paso {n} de {total}", /* 5.5a */
+  "guia.pular": "Saltar la guía", /* 5.5a */
+  "guia.pular-q": "¿Salir de la primera partida e ir al menú? Queda en el botón Primera partida, en la pestaña Jugar.", /* 5.5a */
+  "guia.feito": "¡Hecho!", /* 5.5a */
+  "guia.novo": "Nuevo en el panel: {o}", /* 5.5a */
+  "guia.novo.energia": "Energía", /* 5.5a */
+  "guia.novo.exercito": "botón Ejército", /* 5.5a */
+  "guia.novo.mapa": "mapa y alertas", /* 5.5a */
+  "guia.novo.atacar": "botón Atacar", /* 5.5a */
+  "guia.p.coletores.t": "Produce 2 × {coletor}", /* 5.5a */
+  "guia.p.reator.t": "Construye: {reator}", /* 5.5a */
+  "guia.p.quartel.t": "Construye: {quartel}", /* 5.5a */
+  "guia.p.tropa.t": "Entrena 4 × {infantaria}", /* 5.5a */
+  "guia.p.defesa.t": "Defiende la base del ataque", /* 5.5a */
+  "guia.p.nucleo.t": "Destruye el Núcleo enemigo", /* 5.5a */
+  "guia.p.coletores.pc": "Haz clic en el Núcleo, la construcción grande del centro, y luego en la tarjeta {coletor}. Recolectan el Mineral que paga todo.", /* 5.5a */
+  "guia.p.coletores.toque": "Toca Núcleo, en la barra de abajo, y luego la tarjeta {coletor}. Recolectan el Mineral que paga todo.", /* 5.5a */
+  "guia.p.reator.pc": "Haz clic en la tarjeta {reator} y luego en un lugar libre cerca del Núcleo. Da la energía de las demás construcciones.", /* 5.5a */
+  "guia.p.reator.toque": "Toca la tarjeta {reator}, elige un lugar cerca del Núcleo y confirma. Da la energía de las demás construcciones.", /* 5.5a */
+  "guia.p.quartel.pc": "Haz clic en la tarjeta {quartel} y luego en un lugar libre. Ahí se entrenan los soldados.", /* 5.5a */
+  "guia.p.quartel.toque": "Toca la tarjeta {quartel}, elige un lugar y confirma. Ahí se entrenan los soldados.", /* 5.5a */
+  "guia.p.obra": "La obra empezó. En unos segundos queda lista.", /* 5.5a */
+  "guia.p.tropa.pc": "Haz clic en la construcción {quartel} y luego, cuatro veces, en la tarjeta {infantaria}.", /* 5.5a */
+  "guia.p.tropa.toque": "Toca la construcción {quartel} y luego, cuatro veces, la tarjeta {infantaria}.", /* 5.5a */
+  "guia.p.defesa.como": "Viene una patrulla enemiga. Tus tropas disparan solas a quien se acerca: mantenlas junto a la base.", /* 5.5a */
+  "guia.p.nucleo.pc": "Llegaron refuerzos. Selecciona las tropas, ve al objetivo y haz clic derecho en el Núcleo enemigo.", /* 5.5a */
+  "guia.p.nucleo.toque": "Llegaron refuerzos. Selecciona las tropas, ve al objetivo y toca el Núcleo enemigo para atacar.", /* 5.5a */
+  "guia.s.clique": "Haz clic aquí", /* 5.5a */
+  "guia.s.toque": "Toca aquí", /* 5.5a */
+  "guia.s.nucleo": "Haz clic en el Núcleo", /* 5.5a */
+  "guia.s.quartel.pc": "Haz clic en esta construcción", /* 5.5a */
+  "guia.s.quartel.toque": "Toca esta construcción", /* 5.5a */
+  "guia.s.obra": "En obras", /* 5.5a */
+  "guia.s.construa": "Construye aquí", /* 5.5a */
+  "guia.s.inimigo": "Enemigo", /* 5.5a */
+  "guia.s.alvo": "Núcleo enemigo", /* 5.5a */
+  "guia.s.alvo.pc": "Clic derecho aquí", /* 5.5a */
+  "guia.s.alvo.toque": "Toca para atacar", /* 5.5a */
+  "guia.a.base": "Ver la base", /* 5.5a */
+  "guia.a.construir": "Abrir Construir", /* 5.5a */
+  "guia.a.tropas": "Seleccionar tropas", /* 5.5a */
+  "guia.a.alvo": "Ver el objetivo", /* 5.5a */
+  "guia.fim.vitoria": "El Núcleo enemigo cayó. Ya sabes recolectar, construir, entrenar y atacar.", /* 5.5a */
+  "guia.fim.blitz": "Jugar un Blitz (10 min)", /* 5.5a */
+  "guia.fim.repetir": "Repetir la primera partida", /* 5.5a */
+  "guia.fim.prox": "Siguiente paso: una partida Blitz, 1 contra 1, que termina en 10 minutos o menos.", /* 5.5a */
+  "fim.vitoria": "VICTORIA", /* 5.5a */
+  "fim.derrota": "DERROTA", /* 5.5a */
+  "fim.compartilhar": "Compartir", /* 5.5a */
+  "fim.menu": "Menú", /* 5.5a */
+  "fim.detalhes": "Marcador y detalles", /* 5.5a */
+  "fim.n.abatidas": "unidades derribadas", /* 5.5a */
+  "fim.n.dominio": "puntos de Dominio", /* 5.5a */
+  "fim.n.coletados": "recursos recolectados", /* 5.5a */
+  "fim.n.roubados": "recursos robados", /* 5.5a */
+  "fim.n.abatidas.curto": "derribadas", /* 5.5a */
+  "fim.n.dominio.curto": "Dominio", /* 5.5a */
+  "fim.n.coletados.curto": "recolectados", /* 5.5a */
+  "fim.n.roubados.curto": "robados", /* 5.5a */
+  "fim.graf.titulo": "Fuerza del ejército", /* 5.5a */
+  "fim.graf.legenda": "tú en destaque", /* 5.5a */
+  "fim.graf.virada": "la remontada · {t}", /* 5.5a */
+  "fim.graf.curto": "Partida demasiado corta para el gráfico.", /* 5.5a */
+  "fim.prox.venceu": "Siguiente paso: sube la dificultad o invita a un amigo desde la pestaña Multijugador.", /* 5.5a */
+  "fim.prox.perdeu": "Consejo: Reactor y Cuartel temprano, y las tropas cerca del Núcleo hasta que el grupo sea grande.", /* 5.5a */
+  "fim.cartao.titulo": "Tarjeta de resultado", /* 5.5a */
+  "fim.cartao.baixar": "Descargar imagen", /* 5.5a */
+  "fim.cartao.copiar": "Copiar imagen", /* 5.5a */
+  "fim.cartao.copiado": "Imagen copiada. Pégala donde quieras.", /* 5.5a */
+  "fim.cartao.nao-copiou": "Este navegador no dejó copiar la imagen. Usa Descargar imagen.", /* 5.5a */
+  "fim.cartao.nota-enviar": "La imagen se armó en este dispositivo; nada se envió a ningún servidor.", /* 5.5a */
+  "fim.cartao.nota-baixar": "La imagen se armó en este dispositivo. Descárgala y publícala donde quieras.", /* 5.5a */
+  "fim.cartao.lema": "estrategia en tiempo real, en el navegador", /* 5.5a */
+  "fim.cartao.primeira": "PRIMERA VICTORIA", /* 5.5a */
+  "fim.cartao.virei": "REMONTÉ A LOS {t}", /* 5.5a */
+  "fim.cartao.viraram": "ME REMONTARON A LOS {t}", /* 5.5a */
+  "fim.cartao.venci": "VICTORIA EN {t}", /* 5.5a */
+  "fim.cartao.cai": "DERROTA A LOS {t}", /* 5.5a */
+  "fim.cartao.contra": "contra {n}", /* 5.5a */
+  "fim.cartao.texto": "{m} en Aether Rift: Dominion", /* 5.5a */
+  "modos.blitz.nome": "Blitz", /* 5.5a */
+  "modos.blitz.modo": "Modo", /* 5.5a */
+  "modos.blitz.escaramuca": "Escaramuza", /* 5.5a */
+  "modos.blitz.opcao": "Blitz · 10 min", /* 5.5a */
+  "modos.blitz.dica": "1 contra 1, bases cerca una de la otra, recolección y producción más rápidas y la IA ataca temprano. Termina en 10 minutos o menos.", /* 5.5a */
+  "modos.blitz.etiqueta": "Blitz · {n} minutos", /* 5.5a */
+  "multi.convite.rotulo": "Enlace de invitación: quien lo abra entra en la sala", /* 5.5a */
+  "multi.convite.aria": "Enlace de invitación", /* 5.5a */
+  "multi.convite.botao": "Copiar enlace", /* 5.5a */
+  "multi.convite.copiado": "Enlace copiado", /* 5.5a */
+  "multi.convite.na-mao": "No se pudo copiar solo: el enlace está seleccionado, cópialo con Ctrl+C.", /* 5.5a */
+  "multi.convite.texto": "Entra en mi sala de Aether Rift: Dominion (código {codigo})", /* 5.5a */
+  "multi.convite.entrando": "Invitación recibida: entrando en la sala {codigo}…", /* 5.5a */
+  "fim.n.estruturas": "construcciones destruidas", /* 5.5a */
+  "fim.n.estruturas.curto": "construcciones", /* 5.5a */
+  "guia.p.nucleo.sem-tropa": "Te quedaste sin tropas. Entrena más {infantaria} en {quartel} y ataca de nuevo.", /* 5.5a */
+  "guia.a.quartel": "Abrir: {quartel}", /* 5.5a */
 };

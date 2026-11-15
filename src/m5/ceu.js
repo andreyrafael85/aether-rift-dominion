@@ -32,15 +32,20 @@ const C = M5.ceuCfg = {
   envPasso: 2 * DEG, envPassoBaixa: 4 * DEG, envIntervalo: 1.2, /* reflexo: degrau da hora e intervalo mínimo (s) */
 };
 /* ---------- o caminho do sol ---------- */
-const LEN = Math.hypot(-470, 640, 600); /* o R.sunDir de sempre: [-470, 640, 600], comprimento ~995 (a sombra única e a bruma usam esse tamanho) */
-const N0 = [-470 / LEN, 640 / LEN, 600 / LEN]; /* sol do meio-dia = o sol fixo da 4.3b */
-const NH = (() => { const l = Math.hypot(N0[0], N0[2]); return [N0[0] / l, 0, N0[2] / l]; })();
-const W0 = [-NH[2], 0, NH[0]]; /* poente: horizontal, perpendicular ao meio-dia, à frente da câmera padrão (yaw π/4) */
-const AX = [N0[1] * W0[2] - N0[2] * W0[1], N0[2] * W0[0] - N0[0] * W0[2], N0[0] * W0[1] - N0[1] * W0[0]]; /* eixo do giro (o sol vai do meio-dia ao poente) */
+const LZ = ARD.luzFenda, SD0 = LZ.sunDir; /* 5.5a: Luz da Fenda (src/world3d.js): o sol do meio-dia agora é baixo (21°); com ?luz=0, o de sempre [-470, 640, 600] (40°) */
+const LEN = Math.hypot(SD0[0], SD0[1], SD0[2]); /* comprimento ~995 (a sombra única e a bruma usam esse tamanho) */
+const N0 = [0, 1, 0]; /* sol do meio-dia = o sol fixo do render3d */
+let ELEV0 = 0;
+const NH = [0, 0, 0];
+const W0 = [0, 0, 0]; /* poente: horizontal, perpendicular ao meio-dia, à frente da câmera padrão (yaw π/4) */
+const AX = [0, 0, 0]; /* eixo do giro (o sol vai do meio-dia ao poente) */
+function meioDia(v) { const l0 = Math.hypot(v[0], v[1], v[2]) || 1; N0[0] = v[0] / l0; N0[1] = v[1] / l0; N0[2] = v[2] / l0; ELEV0 = Math.asin(N0[1]); const l = Math.hypot(N0[0], N0[2]) || 1; NH[0] = N0[0] / l; NH[1] = 0; NH[2] = N0[2] / l; W0[0] = -NH[2]; W0[1] = 0; W0[2] = NH[0];
+  AX[0] = N0[1] * W0[2] - N0[2] * W0[1]; AX[1] = N0[2] * W0[0] - N0[0] * W0[2]; AX[2] = N0[0] * W0[1] - N0[1] * W0[0]; }
+meioDia(SD0);
 /* estado do quadro (reaproveitado: nada é alocado por quadro) */
-const E = M5.ceuEstado = { th: 0, thL: 0, sol: [N0[0], N0[1], N0[2]], lua: [-N0[0], -N0[1], -N0[2]], luz: [N0[0], N0[1], N0[2]], deSol: true, k: 1, elev: 40 * DEG, noite: 0, espaco: false, pronto: false, cor: [1, 1, 1], foto: false };
+const E = M5.ceuEstado = { th: 0, thL: 0, sol: [N0[0], N0[1], N0[2]], lua: [-N0[0], -N0[1], -N0[2]], luz: [N0[0], N0[1], N0[2]], deSol: true, k: 1, elev: ELEV0, noite: 0, espaco: false, pronto: false, cor: [1, 1, 1], foto: false };
 const solEm = (th, out, espaco) => { /* direção do sol no ângulo th do ciclo */
-  if (espaco) { const e = 40 * DEG, a = Math.atan2(N0[2], N0[0]) + th; out[0] = Math.cos(a) * Math.cos(e); out[1] = Math.sin(e); out[2] = Math.sin(a) * Math.cos(e); return out; } /* Cinturão: gira em volta do zênite */
+  if (espaco) { const e = ELEV0, a = Math.atan2(N0[2], N0[0]) + th; out[0] = Math.cos(a) * Math.cos(e); out[1] = Math.sin(e); out[2] = Math.sin(a) * Math.cos(e); return out; } /* Cinturão: gira em volta do zênite */
   const c = Math.cos(th), s = Math.sin(th); out[0] = c * N0[0] + s * W0[0]; out[1] = c * N0[1] + s * W0[1]; out[2] = c * N0[2] + s * W0[2]; return out; };
 const _q = [0, 0, 0];
 /* hora → θ e noite; chamado pelo render3d logo depois de calcular R.night e antes do updateCamera (a luz e as cascatas já saem no lugar) */
@@ -92,6 +97,8 @@ function medias(sol, hor, top) { /* médias do horizonte (elevação ~6°) e do 
 const REF = { hor: [0, 0, 0], top: [0, 0, 0], fx: [0, 0, 0], lumTop: 1, lumHor: 1 };
 function refPrep() { atmoPrep(N0); medias(N0, REF.hor, REF.top); fex(N0[1], REF.fx); REF.lumTop = Math.max(1e-6, lum(REF.top)); REF.lumHor = Math.max(1e-6, lum(REF.hor)); }
 refPrep();
+/* 5.5a: o render3d troca o sol do meio-dia quando a qualidade pede (celular e Baixa ficam com o sol de antes, só as cores mudam) */
+M5.ceuMeioDia = function (v) { const l = Math.hypot(v[0], v[1], v[2]) || 1; if (Math.abs(N0[0] - v[0] / l) + Math.abs(N0[1] - v[1] / l) + Math.abs(N0[2] - v[2] / l) < 1e-6) return; meioDia(v); refPrep(); _rot.ax = null; _rot.m4 = null; };
 /* matiz (luminância 1) de uma cor relativa à do meio-dia */
 function matiz(c, ref, out) { for (let i = 0; i < 3; i++) out[i] = c[i] / Math.max(1e-7, ref[i]); const l = Math.max(1e-6, lum(out)); out[0] /= l; out[1] /= l; out[2] /= l; return out; }
 const _m1 = [0, 0, 0], _m2 = [0, 0, 0], _tr = [0, 0, 0], _mT = [0, 0, 0], _sl = [0, 0, 0];
@@ -265,17 +272,17 @@ const _bgD = { r: 0, g: 0, b: 0 };
 function envUniforms(X, R, cl, th) { /* os uniforms do céu do mapa de ambiente para a hora th (os mesmos de antes ao meio-dia) */
   const Tm = X.T; const u = X.envSky.userData.mat.uniforms; const gcol = R.groundCol || new Tm.Color(0.3, 0.28, 0.26);
   const bgD = new Tm.Color().setRGB(0.62, 0.69, 0.77); if (cl) bgD.lerp(new Tm.Color().setRGB(cl.tint[0], cl.tint[1], cl.tint[2]), cl.mix);
-  u.uHor.value.copy(bgD).lerp(new Tm.Color().copy(gcol).multiplyScalar(1.5), 0.28); u.uTop.value.copy(bgD).multiplyScalar(0.55).lerp(new Tm.Color(0.12, 0.2, 0.36), 0.5); u.uBot.value.copy(gcol).multiplyScalar(0.7);
+  u.uHor.value.copy(bgD).lerp(new Tm.Color().copy(gcol).multiplyScalar(1.5), 0.28); u.uTop.value.copy(bgD).multiplyScalar(0.55).lerp(new Tm.Color(LZ.alto[0], LZ.alto[1], LZ.alto[2]), 0.5); u.uBot.value.copy(gcol).multiplyScalar(0.7);
   u.uNight.value = 0; u.uSpace.value = 0; X.envGround.material.color.copy(gcol).multiplyScalar(0.8);
   const sol = [0, 0, 0]; solEm(th, sol, E.espaco); const deSol = E.espaco || sol[1] >= 0; const fonte = deSol ? sol : [-sol[0], -sol[1], -sol[2]];
-  u.uSunDir.value.set(fonte[0], fonte[1], fonte[2]).normalize(); u.uSunCol.value.setRGB(1.0, 0.91, 0.77).multiplyScalar(1.6);
+  u.uSunDir.value.set(fonte[0], fonte[1], fonte[2]).normalize(); u.uSunCol.value.setRGB(LZ.sunCor[0], LZ.sunCor[1], LZ.sunCor[2]).multiplyScalar(LZ.sunI);
   if (!C.on || E.espaco) return;
   const mH = [0, 0, 0], mT = [0, 0, 0]; matizHora(sol, mH, mT);
   const kM = 0.65; const tinge = (c, m) => { c.r *= 1 + (m[0] - 1) * kM; c.g *= 1 + (m[1] - 1) * kM; c.b *= 1 + (m[2] - 1) * kM; };
   tinge(u.uHor.value, mH); tinge(u.uTop.value, mT); tinge(X.envGround.material.color, mH);
   /* a luz: a cor de agora (curva da noite e atmosfera), a mesma que o render3d dá ao sol, sem o clima */
   const n = (1 - Math.cos(th)) / 2, el = Math.asin(Math.max(-1, Math.min(1, Math.abs(sol[1])))); const tr = matiz(fex(Math.sin(el), [0, 0, 0]), REF.fx, [0, 0, 0]); const mx = Math.max(tr[0], tr[1], tr[2], 1e-6);
-  const kz = smooth(0, C.apaga, Math.abs(sol[1])), kc = deSol ? 0.75 : 0.3; u.uSunCol.value.setRGB((1 - 0.48 * n) * (1 + (tr[0] / mx - 1) * kc), (0.91 - 0.24 * n) * (1 + (tr[1] / mx - 1) * kc), (0.77 + 0.2 * n) * (1 + (tr[2] / mx - 1) * kc)).multiplyScalar(1.6 * (0.25 + 0.75 * kz));
+  const kz = smooth(0, C.apaga, Math.abs(sol[1])), kc = deSol ? 0.75 : 0.3; u.uSunCol.value.setRGB((LZ.sunCor[0] + (0.52 - LZ.sunCor[0]) * n) * (1 + (tr[0] / mx - 1) * kc), (LZ.sunCor[1] + (0.67 - LZ.sunCor[1]) * n) * (1 + (tr[1] / mx - 1) * kc), (LZ.sunCor[2] + (0.97 - LZ.sunCor[2]) * n) * (1 + (tr[2] / mx - 1) * kc)).multiplyScalar(LZ.sunI * (0.25 + 0.75 * kz)); /* 5.5a */
   if (cl && cl.aurora && C.aurora) { const ka = 0.5 * smooth(0.25, 0.8, n); u.uTop.value.lerp(new Tm.Color(cl.aurora[0], cl.aurora[1], cl.aurora[2]).multiplyScalar(lumC(u.uTop.value) / 0.6), ka); u.uHor.value.lerp(new Tm.Color(cl.aurora[0], cl.aurora[1], cl.aurora[2]).multiplyScalar(lumC(u.uHor.value) / 0.6), ka * 0.4); }
 }
 const lumC = c => 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;

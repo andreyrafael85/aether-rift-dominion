@@ -419,7 +419,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nothing here is yours. Yet.",
-  "inicio.versao": "Version 5.0h.5 · build __BUILD__ · Beyond the Rift · Living world · multiplayer 2 to 4",
+  "inicio.versao": "Version 5.5a · build __BUILD__ · Open Gates · Living world · multiplayer 2 to 4",
   "inicio.vitrine.escolha-sua-raca": "Choose your Race",
   "inicio.vitrine.explorar-base": "Explore the base",
   "inicio.vitrine.som-tela-inicial": "Start screen sound",
@@ -488,6 +488,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "ajustes.btn-bench": "Run benchmark (30 s)",
   "ajustes.cfg-feedback": "Send feedback",
   "notas.notas-versao": "Release notes",
+  "notas.5-5a": "<b>5.5a — Front door:</b> newcomers now get a <b>guided first match</b>, one objective at a time, with the panel appearing little by little. New mode: <b>Blitz</b>, 1 versus 1, bases closer together and a 10-minute clock. The <b>end screen</b> is new, with the turning-point chart and a Share button that builds a result card. The multiplayer room has an <b>invite link</b> that joins the room right away. The world got the <b>Rift Light</b>: a low, warm sun and long shadows. Every unit has a thin arc in its owner's colour, enemies are also recognisable by shape, the ground around your base takes your Race's colour, and promotions show as stars on the health bar. <b>Balance:</b> Welder damage 16 (was 20), Spawn and Spitter cost more, Chimera has more health, and Erevane's Rift Marksman is available in Era I. The Hangar lists the <b>cosmetics</b> and how to earn each one; nothing is for sale. On Motor 5 the game sends half as much data per frame to the graphics card.",
   "notas.5-0h-5": "<b>5.0h.5 — Bosses 3.0:</b> the three bosses are no longer machines: they are creatures of the Rift, with new names. The Herald is now <b>The Rift Medusa</b>, the Mother Forge is <b>The Furnace Titan</b> and the Rift Sentinel is <b>The Devouring Sentinel</b>, which is much larger on screen. Before each strike the body warns you: the Titan throws its jaw open, the Devourer bares its fangs and the Medusa contracts its bell. In the Assembly line phase the Titan's back opens and the amber weak points show. The pillars, the Echoes and the Rift minions got the look of the same family. Fight rules, boss health and damage did not change.",
   "notas.5-0h-4": "<b>5.0h.4 — Motor 5 performance:</b> the stutter the first time a lake came into view is gone. Everything the lake reflection needs is now prepared during loading, and in our test nothing is created on the graphics card in the middle of a match anymore. Unit portraits in the army panel are generated one at a time, and the game creates a little less memory garbage per frame. The Benchmark now shows, for each stutter, how much time went to shadows, lake reflection, scene and effects. The picture and the simulation stay the same.",
   "notas.5-0h-3": "<b>5.0h.3 — Performance:</b> fewer stutters in the middle of battles. In Chrome, the game creates about 20% less memory garbage per second, so the browser pauses less often to clean up. In <b>Motor 5</b>, a vehicle dying or the camera passing over a lake no longer creates new graphics-card resources on the spot: the game prepares them ahead of time. The Benchmark now tells you, for each stutter, what was in that frame (the events and what was created on the graphics card). The picture and the simulation stay the same.",
@@ -506,7 +507,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "notas.5-0c": "<b>5.0c — Languages:</b> the whole game is now in <b>English</b> and <b>Spanish</b> as well as Portuguese: start screen, War Room, matches, campaign, diplomacy, multiplayer, Photo Mode, help and the system-voice lines, which now use a voice in the chosen language. The game opens in your browser's language and switches instantly, without reloading, under <b>Idioma / Language / Idioma</b>: at the top of the start screen, in Settings and in the in-match Settings window. Also in this version: the planets and sky at the top of the War Room are crisp: at rest the background was drawn at half resolution and is now drawn in full, with the planets' detail following the pixel size, and the room no longer drops resolution when you switch Races; the match announcer speaks in the gender of your Race's announcer (a male voice for the Vehnar, Quorith and Vorag; a female one for the Erevane and Tessara); with Engine 5, dynamic resolution only drops when the graphics card is the limit, which avoids the hitches from resolution changes; and on iPhone, <b>Test sound</b> shows a tip when the effects play but the voice does not.",
   "notas.5-0b-1": "<b>5.0b.1 — Lighter Engine 5, headlights and sound on iPhone:</b> with <b>Engine 5</b> on, the shaders it prepares while loading shrank by a third (the lakes first) and each frame sends much less data to the graphics card, which eases the CPU on Firefox and on phones. The glow around lights is now the same as in the classic engine, and in Photo Mode on Low quality the effects follow the exposure as in the classic engine. At night and inside the Aether Storm, the headlights of vehicles, harvesters and pirates light the ground ahead, in both engines. The War Room got a little brighter, without the glare of before. On iPhone, sound and voice unlock on the first tap, play with the silent switch on and come back after a call. Each leader speaks with a voice of their own gender in every browser. In Settings, <b>Test sound</b> plays three notes and a line and shows the state of the device's audio.",
   "notas.5-0b-motor-5": "<b>5.0b — Engine 5 complete, in testing:</b> with <b>Engine 5</b> on (Settings › Graphics engine), the whole game now runs on WebGPU, falling back to WebGL2 on its own: units and buildings with surface detail and per-part animation, ruins, construction sites, the Erevane hologram, the Unison shields and the banners; the ground with every biome, vegetation in the wind, roads and the sky; explosions, fire, smoke and shots; the plasma and ice lakes with reflections, the Belt's space and the Aether Storm; and <b>Photo Mode</b> (📷 or the J key) with blur, the 8 filters and 4K capture. The first time Photo Mode opens in a match, it takes a few seconds to get ready. With all of this, Engine 5 takes a few seconds longer to load: the next version measures it on real devices and trims it down. The classic engine is still the default and has not changed.",
-  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.0h.4 → 2.0; from 5.0a.3 back, in Portuguese)",
+  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.0h.5 → 2.0; from 5.0a.3 back, in Portuguese)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Terms of Use",
   "inicio.rodape.foot-priv": "Privacy",
@@ -2273,4 +2274,141 @@ globalThis.ARD.I18N_DIC['en'] = {
   "ia.fala.vorag.super.1": "Eggs open. Good luck.", /* 5.0h */
   "ia.fala.vorag.pedido.0": "Oru goes. Oru eats whatever you point at.", /* 5.0h */
   "ia.fala.vorag.pedido.1": "Understood. The brood runs over there.", /* 5.0h */
+  "cosm.hg.titulo": "Cosmetics", /* 5.5a */
+  "cosm.hg.nota": "Looks only: nothing here changes the result of a match. Your choice applies right away and other players see it in rooms.", /* 5.5a */
+  "cosm.tipo.pintura": "Core paint", /* 5.5a */
+  "cosm.tipo.estandarte": "Banner", /* 5.5a */
+  "cosm.tipo.moldura": "Card frame", /* 5.5a */
+  "cosm.tipo.titulo": "Title", /* 5.5a */
+  "cosm.tipo.cor-nome": "Name colour", /* 5.5a */
+  "cosm.tipo.rastro": "Trail", /* 5.5a */
+  "cosm.gratis": "Free", /* 5.5a */
+  "cosm.em-uso": "In use", /* 5.5a */
+  "cosm.trancado": "Locked", /* 5.5a */
+  "cosm.em-producao": "In production", /* 5.5a */
+  "cosm.apoiador": "Supporter Edition (not available yet)", /* 5.5a */
+  "cosm.nivel": "Reach Commander level {n}", /* 5.5a */
+  "cosm.conquista": "Achievement: {nome}", /* 5.5a */
+  "cosm.item.pin-padrao": "Standard", /* 5.5a */
+  "cosm.item.pin-fortaleza": "Fortress", /* 5.5a */
+  "cosm.item.pin-santuario": "Sanctuary", /* 5.5a */
+  "cosm.item.est-padrao": "No banner", /* 5.5a */
+  "cosm.item.est-apoiador": "Alignment Banner", /* 5.5a */
+  "cosm.item.mol-padrao": "Plain frame", /* 5.5a */
+  "cosm.item.mol-alinhamento": "Alignment Frame", /* 5.5a */
+  "cosm.item.mol-cinco-mundos": "Five Worlds Frame", /* 5.5a */
+  "cosm.item.mol-apoiador": "Supporter Frame", /* 5.5a */
+  "cosm.item.tit-nenhum": "No title", /* 5.5a */
+  "cosm.item.tit-recruta": "Alignment Recruit", /* 5.5a */
+  "cosm.item.tit-palavra-dada": "Word Kept", /* 5.5a */
+  "cosm.item.tit-apoiador": "Rift Supporter", /* 5.5a */
+  "cosm.item.cor-padrao": "Standard colour", /* 5.5a */
+  "cosm.item.cor-veterano": "Veteran gold", /* 5.5a */
+  "cosm.item.cor-apoiador": "Supporter blue", /* 5.5a */
+  "cosm.item.ras-padrao": "Standard trail", /* 5.5a */
+  "cosm.item.ras-apoiador": "Spiral Siphon trail", /* 5.5a */
+  "guia.titulo": "First match", /* 5.5a */
+  "guia.botao": "First match", /* 5.5a */
+  "guia.bv.eyebrow": "First time here?", /* 5.5a */
+  "guia.bv.titulo": "Learn by playing, in 5 minutes", /* 5.5a */
+  "guia.bv.texto": "A short match with one goal on screen at a time: gather, build, train troops, defend your base and bring down the enemy Core.", /* 5.5a */
+  "guia.bv.jogar": "Play the first match", /* 5.5a */
+  "guia.bv.menu": "I know the game: go to the menu", /* 5.5a */
+  "guia.eyebrow": "First match · step {n} of {total}", /* 5.5a */
+  "guia.pular": "Skip the guide", /* 5.5a */
+  "guia.pular-q": "Leave the first match and go to the menu? You can find it again under First match, on the Play tab.", /* 5.5a */
+  "guia.feito": "Done!", /* 5.5a */
+  "guia.novo": "New on your panel: {o}", /* 5.5a */
+  "guia.novo.energia": "Energy", /* 5.5a */
+  "guia.novo.exercito": "Army button", /* 5.5a */
+  "guia.novo.mapa": "map and alerts", /* 5.5a */
+  "guia.novo.atacar": "Attack button", /* 5.5a */
+  "guia.p.coletores.t": "Produce 2 × {coletor}", /* 5.5a */
+  "guia.p.reator.t": "Build: {reator}", /* 5.5a */
+  "guia.p.quartel.t": "Build: {quartel}", /* 5.5a */
+  "guia.p.tropa.t": "Train 4 × {infantaria}", /* 5.5a */
+  "guia.p.defesa.t": "Defend your base from the attack", /* 5.5a */
+  "guia.p.nucleo.t": "Destroy the enemy Core", /* 5.5a */
+  "guia.p.coletores.pc": "Click the Core, the large building in the middle, then the {coletor} card. They gather the Ore that pays for everything.", /* 5.5a */
+  "guia.p.coletores.toque": "Tap Core on the bottom bar, then the {coletor} card. They gather the Ore that pays for everything.", /* 5.5a */
+  "guia.p.reator.pc": "Click the {reator} card, then a free spot near the Core. It powers your other buildings.", /* 5.5a */
+  "guia.p.reator.toque": "Tap the {reator} card, pick a spot near the Core and confirm. It powers your other buildings.", /* 5.5a */
+  "guia.p.quartel.pc": "Click the {quartel} card, then a free spot. This is where soldiers are trained.", /* 5.5a */
+  "guia.p.quartel.toque": "Tap the {quartel} card, pick a spot and confirm. This is where soldiers are trained.", /* 5.5a */
+  "guia.p.obra": "Construction has started. It will be ready in a few seconds.", /* 5.5a */
+  "guia.p.tropa.pc": "Click the {quartel} building, then click the {infantaria} card four times.", /* 5.5a */
+  "guia.p.tropa.toque": "Tap the {quartel} building, then tap the {infantaria} card four times.", /* 5.5a */
+  "guia.p.defesa.como": "An enemy patrol is coming. Your troops fire on their own at anything that gets close: keep them by your base.", /* 5.5a */
+  "guia.p.nucleo.pc": "Reinforcements have arrived. Select your troops, go to the target and right-click the enemy Core.", /* 5.5a */
+  "guia.p.nucleo.toque": "Reinforcements have arrived. Select your troops, go to the target and tap the enemy Core to attack.", /* 5.5a */
+  "guia.s.clique": "Click here", /* 5.5a */
+  "guia.s.toque": "Tap here", /* 5.5a */
+  "guia.s.nucleo": "Click the Core", /* 5.5a */
+  "guia.s.quartel.pc": "Click this building", /* 5.5a */
+  "guia.s.quartel.toque": "Tap this building", /* 5.5a */
+  "guia.s.obra": "Under construction", /* 5.5a */
+  "guia.s.construa": "Build here", /* 5.5a */
+  "guia.s.inimigo": "Enemy", /* 5.5a */
+  "guia.s.alvo": "Enemy Core", /* 5.5a */
+  "guia.s.alvo.pc": "Right-click here", /* 5.5a */
+  "guia.s.alvo.toque": "Tap to attack", /* 5.5a */
+  "guia.a.base": "Show my base", /* 5.5a */
+  "guia.a.construir": "Open Build", /* 5.5a */
+  "guia.a.tropas": "Select troops", /* 5.5a */
+  "guia.a.alvo": "Show the target", /* 5.5a */
+  "guia.fim.vitoria": "The enemy Core has fallen. You now know how to gather, build, train and attack.", /* 5.5a */
+  "guia.fim.blitz": "Play a Blitz (10 min)", /* 5.5a */
+  "guia.fim.repetir": "Replay the first match", /* 5.5a */
+  "guia.fim.prox": "Next step: a Blitz match, 1 on 1, over in 10 minutes or less.", /* 5.5a */
+  "fim.vitoria": "VICTORY", /* 5.5a */
+  "fim.derrota": "DEFEAT", /* 5.5a */
+  "fim.compartilhar": "Share", /* 5.5a */
+  "fim.menu": "Menu", /* 5.5a */
+  "fim.detalhes": "Scoreboard and details", /* 5.5a */
+  "fim.n.abatidas": "units destroyed", /* 5.5a */
+  "fim.n.dominio": "Dominion points", /* 5.5a */
+  "fim.n.coletados": "resources gathered", /* 5.5a */
+  "fim.n.roubados": "resources stolen", /* 5.5a */
+  "fim.n.abatidas.curto": "destroyed", /* 5.5a */
+  "fim.n.dominio.curto": "Dominion", /* 5.5a */
+  "fim.n.coletados.curto": "gathered", /* 5.5a */
+  "fim.n.roubados.curto": "stolen", /* 5.5a */
+  "fim.graf.titulo": "Army strength", /* 5.5a */
+  "fim.graf.legenda": "you are highlighted", /* 5.5a */
+  "fim.graf.virada": "the turnaround · {t}", /* 5.5a */
+  "fim.graf.curto": "The match was too short for the chart.", /* 5.5a */
+  "fim.prox.venceu": "Next step: raise the difficulty or invite a friend from the Multiplayer tab.", /* 5.5a */
+  "fim.prox.perdeu": "Tip: build a Reactor and a Barracks early, and keep your troops near the Core until the group is large.", /* 5.5a */
+  "fim.cartao.titulo": "Result card", /* 5.5a */
+  "fim.cartao.baixar": "Download image", /* 5.5a */
+  "fim.cartao.copiar": "Copy image", /* 5.5a */
+  "fim.cartao.copiado": "Image copied. Paste it anywhere.", /* 5.5a */
+  "fim.cartao.nao-copiou": "This browser did not allow copying the image. Use Download image.", /* 5.5a */
+  "fim.cartao.nota-enviar": "The image was made on this device; nothing was sent to any server.", /* 5.5a */
+  "fim.cartao.nota-baixar": "The image was made on this device. Download it and post it anywhere.", /* 5.5a */
+  "fim.cartao.lema": "real-time strategy, in your browser", /* 5.5a */
+  "fim.cartao.primeira": "FIRST VICTORY", /* 5.5a */
+  "fim.cartao.virei": "TURNED IT AT {t}", /* 5.5a */
+  "fim.cartao.viraram": "THEY TURNED IT AT {t}", /* 5.5a */
+  "fim.cartao.venci": "VICTORY IN {t}", /* 5.5a */
+  "fim.cartao.cai": "DEFEATED AT {t}", /* 5.5a */
+  "fim.cartao.contra": "against {n}", /* 5.5a */
+  "fim.cartao.texto": "{m} in Aether Rift: Dominion", /* 5.5a */
+  "modos.blitz.nome": "Blitz", /* 5.5a */
+  "modos.blitz.modo": "Mode", /* 5.5a */
+  "modos.blitz.escaramuca": "Skirmish", /* 5.5a */
+  "modos.blitz.opcao": "Blitz · 10 min", /* 5.5a */
+  "modos.blitz.dica": "1 on 1, bases close to each other, faster gathering and production, and the AI attacks early. Over in 10 minutes or less.", /* 5.5a */
+  "modos.blitz.etiqueta": "Blitz · {n} minutes", /* 5.5a */
+  "multi.convite.rotulo": "Invite link: whoever opens it joins the lobby", /* 5.5a */
+  "multi.convite.aria": "Invite link", /* 5.5a */
+  "multi.convite.botao": "Copy link", /* 5.5a */
+  "multi.convite.copiado": "Link copied", /* 5.5a */
+  "multi.convite.na-mao": "Could not copy automatically: the link is selected, copy it with Ctrl+C.", /* 5.5a */
+  "multi.convite.texto": "Join my Aether Rift: Dominion lobby (code {codigo})", /* 5.5a */
+  "multi.convite.entrando": "Invite received: joining lobby {codigo}…", /* 5.5a */
+  "fim.n.estruturas": "buildings destroyed", /* 5.5a */
+  "fim.n.estruturas.curto": "buildings", /* 5.5a */
+  "guia.p.nucleo.sem-tropa": "You have no troops left. Train more {infantaria} at the {quartel} and attack again.", /* 5.5a */
+  "guia.a.quartel": "Open: {quartel}", /* 5.5a */
 };

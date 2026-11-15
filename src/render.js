@@ -130,7 +130,7 @@ function create(canvas, mini) {
           if (R.decals.length > 160) R.decals.splice(0, R.decals.length - 160);
           break; }
         case 'float': if (e.owner === human || e.kind === 'steal') R.fx.floats.push({ x: e.x, y: e.y, text: e.text, col: e.kind === 'steal' ? '#FF6A3D' : '#E8E2D6', t: 0, life: 1.3 }); break;
-        case 'promote': if (e.owner === human) R.fx.floats.push({ x: e.x, y: e.y, text: e.rank > 0 ? (ARD.t ? ARD.t('hud.p.rank.' + e.rank) : ['', '★ Veterano', '★★ Elite', '★★★ Lenda'][e.rank]) : '' /* 5.0h.2: no idioma do jogo (antes fixo em português) */, col: '#F2C230', t: 0, life: 1.8 }); break;
+        case 'promote': if (e.owner === human) R.fx.floats.push({ x: e.x, y: e.y, text: e.rank > 0 ? '★★★'.slice(0, Math.min(3, e.rank)) : '' /* 5.5a: a promoção é só a estrela que sobe e fica na barra de vida (antes o texto "★ Veterano", que se empilhava na luta) */, col: '#F2C230', t: 0, life: 1.4 }); break;
         case 'alert': if (e.p === human && e.x != null) R.fx.rings.push({ x: e.x, y: e.y, r0: 20, r1: 170, col: e.kind === 'danger' ? '#FF5E3A' : e.kind === 'good' ? '#7FE3A1' : '#F2C230', t: 0, life: 1.6, ping: true }); break;
         case 'super': if (e.kind === 'fundicao') R.fx.rings.push({ x: e.x, y: e.y, r0: 10, r1: 240, col: '#FF8C1A', t: 0, life: 3, ping: true }); else R.shake = 1; break;
         case 'jump': R.fx.rings.push({ x: e.from.x, y: e.from.y, r0: 40, r1: 300, col: '#B23CFF', t: 0, life: 1.2 }); R.fx.rings.push({ x: e.to.x, y: e.to.y, r0: 300, r1: 40, col: '#B23CFF', t: 0, life: 1.2 }); break;

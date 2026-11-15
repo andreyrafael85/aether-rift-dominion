@@ -328,7 +328,7 @@ function create(THREE, scene, env) {
   env = env || {}; const FX = env.FX || null, flashF = env.flash || null, HF = env.H || null, QL = () => (env.quality && env.quality()) || { particles: 1 };
   const R = Math.random, TAU = Math.PI * 2, TK = (ARD.sim && ARD.sim.TICK) || 0.1;
   const M5 = !!(ARD.m5 && ARD.m5.active && ARD.m5.active()); /* 5.0b: Motor 5 — fitas e sprites em TSL, mesma CPU */
-  const uni = v => (M5 ? window.TSL.uniform(v) : { value: v });
+  const uni = v => (M5 ? window.TSL.uniform(v).setGroup(window.TSL.renderGroup) /* 5.5a: relógio e parâmetros dos efeitos no grupo do render (não uma cópia no buffer de cada lote) */ : { value: v });
   const U = { clock: uni(0), res: { value: new THREE.Vector2(1280, 720) }, minPx: uni(0.85), near: uni(1), semPos: (M5 && ARD.m5.u && ARD.m5.u.semPos) || uni(0) /* 5.0b.1: o ARD.m5.u.semPos do núcleo */, gama: uni(1.5) /* 5.0b: sem pós, a saída do clássico (ARD.fx3d.inversoSaida) */, expo: M5 && ARD.m5.foto && ARD.m5.foto.exposicao ? (ARD.m5.foto.exposicao() || uni(1)) : uni(1) /* 5.0b (junção): a exposição em uso (ARD.m5.u.exposicao do Modo Foto; 1 na partida) */ }, uAged = uni(0), uDyn = uni(0);
   const mat = (vs, fs, ut) => M5 ? m5Arma(vs === VS_P, ut, U) /* 5.0b: TSL */ : new THREE.ShaderMaterial({ uniforms: { uTime: ut, uClock: U.clock, uRes: U.res, uMinPx: U.minPx, uNear: U.near }, vertexShader: vs, fragmentShader: fs, transparent: true, depthWrite: false, depthTest: true, blending: THREE.CustomBlending, blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, side: THREE.DoubleSide, fog: false }); /* dois lados: a fita é montada na tela e o anel deitado gira com o voo; mistura pré-multiplicada: alfa 0 soma luz (aditivo), alfa > 0 é corpo que cobre o fundo e segura a cor de dia */
   const mSd = mat(VS_S, FS_S, uDyn), mSa = mat(VS_S, FS_S, uAged), mPd = mat(VS_P, FS_P, uDyn), mPa = mat(VS_P, FS_P, uAged); /* mesmo código: 2 programas para os 4 lotes */
@@ -337,14 +337,16 @@ function create(THREE, scene, env) {
     const base = sprite ? new THREE.PlaneGeometry(2, 2) : new THREE.PlaneGeometry(2, 1).translate(0, 0.5, 0);
     const g = new THREE.InstancedBufferGeometry(); g.index = base.index; g.setAttribute('position', base.attributes.position);
     const names = sprite ? ['pA', 'pB', 'pC', 'pD', 'pE'] : ['sA', 'sB', 'sC', 'sD', 'sE']; const at = [], A = [];
-    for (let j = 0; j < 5; j++) { const a = new THREE.InstancedBufferAttribute(new Float32Array(cap * 4), 4); if (!M5) a.setUsage(THREE.DynamicDrawUsage); /* 5.0b: StaticDrawUsage no Motor 5 (o r186 reenviaria o buffer inteiro a cada desenho) */ g.setAttribute(names[j], a); at.push(a); A.push(a.array); }
-    if (!dyn) for (let i = 0; i < cap; i++) { if (sprite) { A[0][i * 4 + 3] = -1e6; A[1][i * 4 + 3] = 1; } else { A[3][i * 4] = -1e6; A[3][i * 4 + 1] = 1; } } /* nascidos "há muito tempo": invisíveis */
+    const UM = M5 && !(ARD.m5 && ARD.m5.fxSeparado); const K = UM ? 20 : 4; let ib = null; /* 5.5a: no Motor 5 os 5 atributos do lote moram num buffer só, intercalado (20 números por instância): um envio à GPU por lote e por quadro no lugar de cinco. A1 a A4 são janelas do mesmo vetor, deslocadas de 4 em 4: quem escreve (seg e spr) não muda */
+    if (UM) { ib = new THREE.InstancedInterleavedBuffer(new Float32Array(cap * 20), 20, 1); for (let j = 0; j < 5; j++) { g.setAttribute(names[j], new THREE.InterleavedBufferAttribute(ib, 4, j * 4)); A.push(j ? ib.array.subarray(j * 4) : ib.array); } }
+    else for (let j = 0; j < 5; j++) { const a = new THREE.InstancedBufferAttribute(new Float32Array(cap * 4), 4); if (!M5) a.setUsage(THREE.DynamicDrawUsage); /* 5.0b: StaticDrawUsage no Motor 5 (o r186 reenviaria o buffer inteiro a cada desenho) */ g.setAttribute(names[j], a); at.push(a); A.push(a.array); }
+    if (!dyn) for (let i = 0; i < cap; i++) { if (sprite) { A[0][i * K + 3] = -1e6; A[1][i * K + 3] = 1; } else { A[3][i * K] = -1e6; A[3][i * K + 1] = 1; } } /* nascidos "há muito tempo": invisíveis */
     g.instanceCount = dyn ? 0 : cap;
     const m = new THREE.Mesh(g, sprite ? (dyn ? mPd : mPa) : (dyn ? mSd : mSa)); m.frustumCulled = false; m.renderOrder = 13; if (!M5) m.onBeforeRender = onBR; /* 5.0b: no Motor 5 o tamanho do alvo vem do screenSize do TSL */ m.visible = !dyn; scene.add(m);
-    return { g, at, A0: A[0], A1: A[1], A2: A[2], A3: A[3], A4: A[4], m, n: 0, i: 0, cap, dyn, lo: cap, hi: -1, plo: 0, phi: -1, peak: 0, born: 0, fim: -1e9 };
+    return { g, at, ib, K, A0: A[0], A1: A[1], A2: A[2], A3: A[3], A4: A[4], m, n: 0, i: 0, cap, dyn, lo: cap, hi: -1, plo: 0, phi: -1, peak: 0, born: 0, fim: -1e9 };
   }
   const SD = sys(false, 3072, true), SA = sys(false, 3072, false), PD = sys(true, 1536, true), PA = sys(true, 4096, false);
-  function slot(S) { let i; if (S.dyn) { if (S.n >= S.cap) return -1; i = S.n++; } else { i = S.i; S.i = i + 1 >= S.cap ? 0 : i + 1; if (i < S.lo) S.lo = i; if (i > S.hi) S.hi = i; S.born++; } return i * 4; }
+  function slot(S) { let i; if (S.dyn) { if (S.n >= S.cap) return -1; i = S.n++; } else { i = S.i; S.i = i + 1 >= S.cap ? 0 : i + 1; if (i < S.lo) S.lo = i; if (i > S.hi) S.hi = i; S.born++; } return i * S.K; }
   /* fita de A a B */
   function seg(S, ax, ay, az, wa, bx, by, bz, wb, c, k, t0, life, st, sd, e0, e1, e2, e3) { const o = slot(S); if (o < 0) return;
     let A = S.A0; A[o] = ax; A[o + 1] = ay; A[o + 2] = az; A[o + 3] = wa; A = S.A1; A[o] = bx; A[o + 1] = by; A[o + 2] = bz; A[o + 3] = wb;
@@ -356,6 +358,10 @@ function create(THREE, scene, env) {
     A = S.A2; A[o] = s0; A[o + 1] = s1; A[o + 2] = st; A[o + 3] = sd; A = S.A3; A[o] = c[0]; A[o + 1] = c[1]; A[o + 2] = c[2]; A[o + 3] = k;
     A = S.A4; A[o] = rot; A[o + 1] = spin; A[o + 2] = grav; A[o + 3] = asp; if (M5 && !S.dyn && t0 + life > S.fim) S.fim = t0 + life; /* 5.0b */ }
   function flush(S) { const at = S.at;
+    if (S.ib) { const a = S.ib; /* 5.5a: Motor 5 — o lote inteiro num buffer intercalado, um trecho só */
+      if (S.dyn) { const n = S.n; S.g.instanceCount = n; S.m.visible = n > 0; if (n > S.peak) S.peak = n; if (n) { a.clearUpdateRanges(); a.addUpdateRange(0, n * 20); a.needsUpdate = true; } S.n = 0; }
+      else if (S.hi >= 0) { if (a.updateRanges.length) { S.lo = Math.min(S.lo, S.plo); S.hi = Math.max(S.hi, S.phi); } a.clearUpdateRanges(); a.addUpdateRange(S.lo * 20, (S.hi - S.lo + 1) * 20); a.needsUpdate = true; S.plo = S.lo; S.phi = S.hi; S.lo = S.cap; S.hi = -1; }
+      return; }
     if (S.dyn) { const n = S.n; S.g.instanceCount = n; S.m.visible = n > 0; if (n > S.peak) S.peak = n; if (n) for (let j = 0; j < 5; j++) { const a = at[j]; a.clearUpdateRanges(); a.addUpdateRange(0, n * 4); a.needsUpdate = true; } S.n = 0; }
     else if (S.hi >= 0) { /* junta com a faixa que o three ainda não enviou (quadro escrito sem desenho no meio), para nada ficar velho na GPU */
       if (at[0].updateRanges.length) { S.lo = Math.min(S.lo, S.plo); S.hi = Math.max(S.hi, S.phi); }

@@ -60,7 +60,7 @@ function preRespira(builder) {
     const vd = attribute('aVida', 'vec4'), ai = g.hasAttribute('aInst') ? attribute('aInst', 'vec4') : vec4(0, 0, 0, 0);
     const p = Var(vec3(0, 0, 0), 'ardRespP'); p.assign(positionLocal); const kx = Var(float(1), 'ardRespXZ'), ky = Var(float(1), 'ardRespY'); kx.assign(1); ky.assign(1); /* a posição e os fatores lidos aqui, antes do If: o TSL emite a inicialização de uma variável (positionLocal = position, inclusive) no primeiro uso, que seria dentro do If */
     If(vd.z.greaterThan(0.0005), () => {
-      const rap = step(1, vd.z), amp = vd.z.sub(rap), w = mix(float(0.7), float(1.55), rap), t = ai.y;
+      const rap = step(1, vd.z), amp = vd.z.sub(rap), w = mix(float(0.7), float(1.55), rap), t = M5.modelos && M5.modelos.relogio ? L().select(ai.y.lessThan(0), M5.u.tempo.sub(ai.y).sub(1), ai.y) /* 5.5a: aInst.y < 0 = -(fase + 1), o relógio é o da GPU (src/m5/modelos.js) */ : ai.y;
       const n = fN(p.xz.mul(0.21).add(vec2(t.mul(0.09), t.mul(0.06)))).sub(0.5);
       const s = sin(t.mul(w).add(p.y.mul(0.28))); const k = smoothstep(0.0, 1.4, p.y);
       kx.assign(amp.mul(s.mul(0.62).add(n.mul(0.9))).mul(k).add(1)); ky.assign(amp.mul(0.4).mul(s).mul(k).add(1));

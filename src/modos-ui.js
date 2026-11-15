@@ -93,14 +93,21 @@ function cfgSala() { const m = modoSala(); const o = { mutadores: m.mut }; if (m
 function cfgJogar() { const p = prefs(); return Object.assign({ eventos: !!p.eventos, mutadores: p.mutJogar.slice(), lente: !!(p.lente && temLente()) }, ARD.mundoUI ? ARD.mundoUI.cfgJogar() : {} /* 5.0h: Mundo vivo */, ARD.unicasUI ? ARD.unicasUI.cfgJogar() : {} /* 5.0h junção: comandantes em campo */); }
 /* chaves de URL: ?cacada=arauto|forja &cdif= &aliados= &eventos=1 &evento=caravana|enxame|meteoros|sentinela &eventoem=<s> &mut=noite,tempestades,escassos &lente=1 */
 function cfgUrl(q) { const o = {}; const c = q.get('cacada'); if (c && MO().CACADA[c]) { o.cacada = { chefe: c, dif: DIFS.includes(q.get('cdif')) ? q.get('cdif') : 'normal' }; o.map = MO().CACADA[c].mapa; o.opp = q.get('aliados') || '0'; }
+  if (q.get('blitz') === '1') Object.assign(o, cfgBlitz()); /* 5.5a: ?blitz=1 */
   if (q.get('eventos') === '1') o.eventos = true; if (q.get('evento')) { o.eventosTeste = q.get('evento'); if (q.get('eventoem')) o.eventosEm = +q.get('eventoem'); } if (q.get('mut')) o.mutadores = q.get('mut').split(','); if (q.get('lente') === '1') o.lente = true; if (ARD.mundoUI) Object.assign(o, ARD.mundoUI.cfgUrl(q)); /* 5.0h: ?mundo=1 ou ?mundo=fauna,ruinas,corsarios,surto */ return o; }
 /* os jogadores da partida solo: a Lente vai para o humano */
-function jogadores(players, cfg) { if (cfg && cfg.lente && players[0] && players[0].human && !cfg.players) players[0].lente = true; return players; }
+function jogadores(players, cfg) { if (cfg && cfg.lente && players[0] && players[0].human && !cfg.players) players[0].lente = true; if (cfg && cfg.blitz && !cfg.guia) MO().blitzJogadores(players); /* 5.5a: os bônus do Blitz valem para todos os jogadores */ return players; }
+/* 5.5a: modo Blitz na aba Jogar (1 contra 1, mapa pequeno, 10 minutos; sem eventos, mutadores, Mundo vivo nem comandantes) */
+function blitzLigado() { const s = $('opt-modo'); return !!(s && s.value === 'blitz'); }
+function cfgBlitz() { return { blitz: true, opp: '1', map: 'fenda', mapV: 1, minutes: MO().BLITZ.minutos }; }
+function ligaBlitz() { const s = $('opt-modo'); if (!s || s.dataset.blitzOk) return; s.dataset.blitzOk = '1'; const q = new URLSearchParams(location.search); s.value = q.get('modo') === 'blitz' || (q.get('modo') == null && prefs().modoJogar === 'blitz') ? 'blitz' : 'escaramuca';
+  const sync = () => { const b = s.value === 'blitz'; document.body.classList.toggle('modo-blitz', b); const d = $('modo-dica'); if (d) d.hidden = !b; }; s.addEventListener('change', () => { guarda({ modoJogar: s.value }); sync(); }); sync(); }
 /* Tempestades Frequentes: com o clima automático, um clima forte que já existe (pela semente) */
 function clima(cfg, nome) { if ((nome || 'auto') !== 'auto') return nome; const m = MO().cfgDe(cfg).mutadores || []; if (!m.includes('tempestades')) return nome; const fortes = ['plasma', 'toxica', 'cristais']; return fortes[(Math.abs(cfg.seed | 0)) % fortes.length]; }
 /* etiquetas do modo (cartão de carregamento, retomada e fim) */
 function etiquetas(cfg) { const r = MO().resumo(cfg); const out = [];
   if (r.cacada) out.push({ k: 'cac', t: T('modos.cartao.cacada', { chefe: nomeChefe(r.cacada.chefe), dif: nomeDif(r.cacada.dif) }, 'Caçada · {chefe} · {dif}') });
+  if (r.blitz && !(cfg && cfg.guia)) out.push({ k: 'mut', t: T('modos.blitz.etiqueta', { n: MO().BLITZ.minutos }, 'Blitz · {n} minutos') }); /* 5.5a */
   if (r.eventos) out.push({ k: 'ev', t: T('modos.ev.titulo', null, 'Eventos da Fenda') });
   for (const m of r.mutadores) out.push({ k: 'mut', t: nomeMut(m) }); if (r.lente) out.push({ k: 'rel', t: T('modos.lente', null, 'Lente da Medusa') }); { const mw = ARD.mundoUI && ARD.mundoUI.etiqueta(cfg); if (mw) out.push(mw); } /* 5.0h */ return out; }
 function cartao(cfg) { try { const box = document.querySelector('#loading .box'); if (!box) return; let el = $('load-modos'); if (!el) { el = document.createElement('div'); el.id = 'load-modos'; el.className = 'modos-tags'; const ref = $('load-tip'); if (ref) ref.before(el); else box.appendChild(el); }
@@ -108,7 +115,7 @@ function cartao(cfg) { try { const box = document.querySelector('#loading .box')
   if (cfg && cfg.cacada && $('load-title')) $('load-title').textContent = nomeChefe(cfg.cacada.chefe) + ' · ' + nomeMapa(MO().CACADA[cfg.cacada.chefe].mapa); } catch (e) { console.warn('[ARD] modos (cartão):', e); } }
 /* título e linha do salvamento (o texto fica em pt-BR no salvamento, como o resto do cartão de retomar) */
 function salvo(sim) { const r = MO().resumo(sim); const U = (ARD.sim && ARD.sim.UNITS) || {}; const pt = { arauto: (U.arauto || {}).name, forja: (U.forja || {}).name }; /* 5.0h.5: o nome em pt-BR da tabela (chave chefe.<id>.nome) */ const mn = { noite: 'Noite Eterna', tempestades: 'Tempestades Frequentes', escassos: 'Recursos Escassos' };
-  return { titulo: r.cacada ? 'Caçada · ' + (pt[r.cacada.chefe] || r.cacada.chefe) : null, extra: (r.eventos ? ' · Eventos da Fenda' : '') + (r.mutadores.length ? ' · ' + r.mutadores.map(m => mn[m]).join(', ') : '') + (ARD.mundoUI ? ARD.mundoUI.salvo(sim) : '') /* 5.0h */ }; }
+  return { titulo: r.cacada ? 'Caçada · ' + (pt[r.cacada.chefe] || r.cacada.chefe) : null, extra: (r.blitz ? ' · Blitz' : '') /* 5.5a */ + (r.eventos ? ' · Eventos da Fenda' : '') + (r.mutadores.length ? ' · ' + r.mutadores.map(m => mn[m]).join(', ') : '') + (ARD.mundoUI ? ARD.mundoUI.salvo(sim) : '') /* 5.0h */ }; }
 /* faixa do modo na partida (abaixo do topo): os mutadores e a Caçada à vista o tempo todo */
 function faixa(sim) { try { const tg = etiquetas(sim.cfg); let el = $('modos-faixa'); if (!tg.length) { if (el) el.hidden = true; return; } if (!el) { el = document.createElement('div'); el.id = 'modos-faixa'; el.className = 'modos-tags faixa'; const g = $('game'); if (g) g.appendChild(el); }
   el.hidden = false; el.innerHTML = tg.filter(x => x.k !== 'cac').map(x => `<span class="mtag t-${x.k}">${esc(x.t)}</span>`).join(''); el.hidden = !el.innerHTML; } catch (e) {} }
@@ -137,9 +144,9 @@ function hangar() { const box = document.querySelector('#hangar .hg-opts'); if (
     (s.sentinelas ? `<div class="small muted">${esc(T('modos.hg.sentinelas', { n: s.sentinelas }, 'Vitórias sobre a Devoradora: {n}'))}</div>` : ''); }
 
 /* ---------- montagem (tela inicial) ---------- */
-function montar(deps) { D = deps; if (!MO()) return;
+function montar(deps) { D = deps; if (!MO()) return; try { ligaBlitz(); } catch (e) { console.warn('[ARD] modos (Blitz):', e); } /* 5.5a */
   const tudo = () => { try { desenhaJogar(); desenhaCacada(); desenhaSala(); } catch (e) { console.warn('[ARD] modos (tela inicial):', e); } };
   tudo(); window.addEventListener('ard-idioma', () => { const st = $('start'); if (st && !st.hidden) tudo(); });
   const hg = $('hangar'); if (hg) new MutationObserver(() => { if (!hg.hidden) hangar(); }).observe(hg, { attributes: true, attributeFilter: ['hidden'] }); }
-ARD.modosUI = { montar, cfgJogar, cfgSala, cfgUrl, jogadores, clima, cartao, salvo, faixa, fim, fimEscaramuca, linhaSala, modoSala, etiquetas, nomeChefe, hangar, CHEFES, DIFS, MEDAL_RANK, _prefs: prefs, _guarda: guarda };
+ARD.modosUI = { blitzLigado, cfgBlitz /* 5.5a */, montar, cfgJogar, cfgSala, cfgUrl, jogadores, clima, cartao, salvo, faixa, fim, fimEscaramuca, linhaSala, modoSala, etiquetas, nomeChefe, hangar, CHEFES, DIFS, MEDAL_RANK, _prefs: prefs, _guarda: guarda };
 })(globalThis.ARD = globalThis.ARD || {});

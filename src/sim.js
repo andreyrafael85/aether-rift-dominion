@@ -119,12 +119,12 @@ const UNITS = {
   tratorzao:  { name: 'Tratorzão', key: 'T', cls: 'vei', hp: 220, r: 10, speed: 135, cost: { minerio: 110, plasma: 20 }, time: 8, energyUse: 2, weapon: 'metralha', sensor: 320, faction: 'vehnar', desc: 'Veículo leve e rápido de reconhecimento, com sensores longos e metralhadora.' },
   prensa:     { name: 'Prensa', key: 'R', era: 3, cls: 'vei', hp: 900, r: 15, speed: 50, cost: { minerio: 320, plasma: 80 }, time: 18, energyUse: 5, weapon: 'prensa', sensor: 170, faction: 'vehnar', desc: 'Mech bípede de cerco: canhões duplos com grande área. Lento e caro.' },
   // --- Erevane
-  atirador:   { name: 'Atirador de Fenda', key: 'A', era: 2, cls: 'inf', hp: 100, r: 7, speed: 85, cost: { minerio: 100, dados: 10 }, time: 9, energyUse: 1, weapon: 'fuzil_longo', sensor: 260, faction: 'erevane', desc: 'Camuflado quando parado. Tiro longo e letal contra infantaria e suporte; quase inútil contra estruturas.' },
+  atirador:   { name: 'Atirador de Fenda', key: 'A', cls: 'inf' /* 5.5a: era 2 → Era I (a Erevane era a única Raça sem tropa própria na Era I: 36% no jogo automático) */, hp: 100, r: 7, speed: 85, cost: { minerio: 130, dados: 10 } /* 5.5a: 100 → 130 de Minério (na Era I, a 100 passava de 60%) */, time: 9, energyUse: 1, weapon: 'fuzil_longo', sensor: 260, faction: 'erevane', desc: 'Camuflado quando parado. Tiro longo e letal contra infantaria e suporte; quase inútil contra estruturas.' },
   lamina:     { name: 'Lâmina Rodante', key: 'L', cls: 'vei', hp: 300, r: 11, speed: 145, cost: { minerio: 140, plasma: 30 }, time: 10, energyUse: 2, weapon: 'laminas', sensor: 180, faction: 'erevane', desc: 'Veículo baixo e rápido de ataque corpo a corpo. Bata e fuja.' },
   mosquito:   { name: 'Mosquito', key: 'M', cls: 'dro', hp: 65, r: 5, speed: 175, cost: { minerio: 45, plasma: 15 }, time: 4, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 200, faction: 'erevane', desc: 'Microdrone barato e frágil. Em enxame, pica veículos e suporte.' },
   ancora:     { name: 'Âncora', key: 'N', era: 2, needs: ['laboratorio'], cls: 'sup', hp: 160, r: 9, speed: 70, cost: { minerio: 140, plasma: 30, dados: 20 }, time: 11, energyUse: 3, sensor: 200, faction: 'erevane', aura: { cloak: 110 }, desc: 'Sem armas. Campo de Estática: suas unidades a até 110 dela ficam camufladas.' },
   // --- Tessara
-  quimera:    { name: 'Quimera', key: 'I', cls: 'inf', hp: 140, r: 7, speed: 88, cost: { minerio: 55 }, time: 6, energyUse: 1, weapon: 'fuzil', sensor: 170, faction: 'tessara', desc: 'Infantaria adaptativa. Ganha Traços contra as classes que mais combate.' },
+  quimera:    { name: 'Quimera', key: 'I', cls: 'inf', hp: 170 /* 5.5a: 140 → 170 (Tessara em 42% no jogo automático) */, r: 7, speed: 88, cost: { minerio: 55 }, time: 6, energyUse: 1, weapon: 'fuzil', sensor: 170, faction: 'tessara', desc: 'Infantaria adaptativa. Ganha Traços contra as classes que mais combate.' },
   esporo:     { name: 'Esporo-sentinela', key: 'E', cls: 'dro', hp: 90, r: 6, speed: 160, cost: { minerio: 70, plasma: 20 }, time: 6, energyUse: 1, flying: true, weapon: 'ferrao', sensor: 330, faction: 'tessara', desc: 'Drone de reconhecimento com sensores muito longos.' },
   molde:      { name: 'Molde', key: 'O', era: 2, needs: ['laboratorio'], cls: 'sup', hp: 150, r: 9, speed: 75, cost: { minerio: 130, plasma: 20, dados: 20 }, time: 10, energyUse: 2, sensor: 200, faction: 'tessara', aura: { buff: 100 }, desc: 'Sem armas. Suas unidades a até 100 dele causam +15% de dano.' },
   colosso:    { name: 'Colosso Cambiante', key: 'C', era: 3, cls: 'vei', hp: 1150, r: 16, speed: 50, cost: { minerio: 320, plasma: 80, dados: 25 }, time: 20, energyUse: 6, weapon: 'colosso', sensor: 180, faction: 'tessara', desc: 'Pesado de cerco com canhão de área. Ganha Traços como as outras unidades Tessara.' },
@@ -136,8 +136,8 @@ const UNITS = {
   monolito:   { name: 'Monólito', key: 'O', era: 3, cls: 'vei', hp: 780, r: 15, speed: 45, cost: { minerio: 330, plasma: 80, dados: 40 }, time: 19, energyUse: 5, weapon: 'ressonancia', sensor: 190, faction: 'quorith', desc: 'Cerco ressonante: onda lenta e longa que racha estruturas. Quase inútil contra drones.' },
   harmonico:  { name: 'Harmônico', key: 'H', cls: 'dro', hp: 120, r: 7, speed: 150, cost: { minerio: 110, plasma: 45, dados: 10 }, time: 9, energyUse: 2, flying: true, weapon: 'harmonico', sensor: 230, faction: 'quorith', desc: 'Voador do Coro: acorde aéreo que persegue veículos e suporte.' },
   // --- Vorag (4.0c)
-  cria:       { name: 'Cria', key: 'K', cls: 'inf', hp: 72 /* 5.0h: 82 → 72 */, r: 6, speed: 122, cost: { minerio: 26, plasma: 14 } /* 5.0h: 22/12 → 26/14 */, time: 6 /* 5.0h: 4,5 → 6 s (o par); equilíbrio do Vorag no self-play */, energyUse: 0.5, weapon: 'mordida', sensor: 150, faction: 'vorag', pair: true, desc: 'Enxame corpo a corpo; eclode em pares. Fome: fora do seu território perde vida devagar (até 40%).' },
-  cuspidor:   { name: 'Cuspidor', key: 'U', cls: 'inf', hp: 95, r: 7, speed: 90, cost: { minerio: 55, plasma: 35 } /* 5.0h: 40/30 → 55/35 */, time: 6 /* 5.0h: 5 → 6 s */, energyUse: 1, weapon: 'acido', sensor: 170, faction: 'vorag', desc: 'Cospe ácido a média distância; corrói veículos e estruturas.' },
+  cria:       { name: 'Cria', key: 'K', cls: 'inf', hp: 72 /* 5.0h: 82 → 72 */, r: 6, speed: 122, cost: { minerio: 31, plasma: 14 } /* 5.0h: 22/12 → 26/14; 5.5a: Minério 26 → 31 (o Minério é o que limita o exército; a Prole fazia 45% mais tropa com o Plasma que as outras deixam parado) */, time: 6 /* 5.0h: 4,5 → 6 s (o par); equilíbrio do Vorag no self-play */, energyUse: 0.5, weapon: 'mordida', sensor: 150, faction: 'vorag', pair: true, desc: 'Enxame corpo a corpo; eclode em pares. Fome: fora do seu território perde vida devagar (até 40%).' },
+  cuspidor:   { name: 'Cuspidor', key: 'U', cls: 'inf', hp: 95, r: 7, speed: 90, cost: { minerio: 64, plasma: 35 } /* 5.0h: 40/30 → 55/35; 5.5a: Minério 55 → 64 */, time: 6 /* 5.0h: 5 → 6 s */, energyUse: 1, weapon: 'acido', sensor: 170, faction: 'vorag', desc: 'Cospe ácido a média distância; corrói veículos e estruturas.' },
   escaravelho: { name: 'Escaravelho', key: 'E', cls: 'vei', hp: 300, r: 11, speed: 120, cost: { minerio: 70, plasma: 60 }, time: 8, energyUse: 2, weapon: 'chifrada', sensor: 190, faction: 'vorag', desc: 'Besta de carga blindada: investida rápida que atropela infantaria.' },
   brutamonte: { name: 'Brutamonte', key: 'B', era: 3, cls: 'vei', hp: 1000, r: 16, speed: 52, cost: { minerio: 160, plasma: 130 }, time: 15, energyUse: 4, weapon: 'brutamonte', sensor: 170, faction: 'vorag', desc: 'Tanque biológico: carapaça grossa e golpe de área.' },
   // --- épicos de campanha (4.0e): não são produzidos; os roteiros do Ato 4 os criam
@@ -164,7 +164,7 @@ const WEAPONS = {
   pulso:    { dmg: 10, range: 170, cd: 1.5, proj: 'beam',   speed: 0,   inacc: 0,  splash: 0,  cls: 'sup', stun: true },
   obus:     { dmg: 30, range: 230, cd: 1.0, proj: 'shell',  speed: 380, inacc: 8,  splash: 16, cls: 'est' },
   bombarda: { dmg: 60, range: 260, cd: 0.9, proj: 'shell',  speed: 400, inacc: 10, splash: 30, cls: 'est' },
-  chama:    { dmg: 20, range: 75,  cd: 0.5, proj: 'beam',   speed: 0,   inacc: 0,  splash: 22, cls: 'inf', versusOverride: { inf: 1.6, vei: 0.5, dro: 0.7, est: 0.9, sup: 1.3 } },
+  chama:    { dmg: 16 /* 5.5a: 20 → 16 (o Soldador decidia a briga de infantaria: Vehnar em 67% no jogo automático) */, range: 75,  cd: 0.5, proj: 'beam',   speed: 0,   inacc: 0,  splash: 22, cls: 'inf', versusOverride: { inf: 1.6, vei: 0.5, dro: 0.7, est: 0.9, sup: 1.3 } },
   fuzil_longo: { dmg: 55, range: 260, cd: 2.6, proj: 'bullet', speed: 900, inacc: 2, splash: 0, cls: 'inf', versusOverride: { inf: 1.6, vei: 0.6, dro: 1.1, est: 0.4, sup: 1.6 } },
   prensa:   { dmg: 70, range: 140, cd: 2.2, proj: 'shell',  speed: 280, inacc: 14, splash: 34, cls: 'vei' },
   laminas:  { dmg: 27, range: 80,  cd: 0.6, proj: 'beam',   speed: 0,   inacc: 0,  splash: 0,  cls: 'vei' },
@@ -363,7 +363,7 @@ function createSim(cfg) {
 }
 
 function generateMap(sim) {
-  const R0 = 1180;
+  const R0 = sim.cfg && sim.cfg.blitz && ARD.modos && ARD.modos.BLITZ ? ARD.modos.BLITZ.r0 : 1180; /* 5.5a: no Blitz (e na partida guiada) as bases nascem mais perto da Fenda; sem cfg.blitz, 1180 como sempre */
   // Plasma ring around the Rift
   for (let k = 0; k < 8; k++) {
     const a = (Math.PI * 2 * k) / 8 + Math.PI / 8;

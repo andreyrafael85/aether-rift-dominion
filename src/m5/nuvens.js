@@ -316,7 +316,7 @@ NV.compor = function (c, depth, sp, camera, q) {
    no quadro, no mínimo ×0,4 (a sombra da nuvem, sem o anel preto nas bordas finas). O explorado (×0,46) e o à vista não mudam. O uniform vale 0,4
    só nos quadros em que o nó das nuvens rodou (Baixa, celular ou qualidade trocada: 0, a imagem de hoje) */
 let PISO = null;
-NV.piso = () => PISO || (PISO = window.TSL.uniform(0).onFrameUpdate(({ frameId }) => (SH && SH.quadro >= 0 && frameId - SH.quadro <= 2 && !SH.falha ? 0.4 : 0))); /* 5.0d.1: com as nuvens desligadas por falha, o chão de hoje */
+NV.piso = () => PISO || (PISO = window.TSL.uniform(0).setGroup(window.TSL.renderGroup) /* 5.5a: um valor por quadro para a cena toda: grupo do render, não uma cópia no buffer de cada objeto */.onFrameUpdate(({ frameId }) => (SH && SH.quadro >= 0 && frameId - SH.quadro <= 2 && !SH.falha ? 0.4 : 0))); /* 5.0d.1: com as nuvens desligadas por falha, o chão de hoje */
 M5.nevoaChao = fv => { const L = window.TSL; return L.max(L.mix(0.06, 1.0, fv), NV.piso()); };
 /* testes e fotos: no próximo quadro a memória vai direto ao alvo (sem a abertura) */
 NV.assentar = () => { if (SH) SH.assenta = true; };

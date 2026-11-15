@@ -18,7 +18,7 @@
 const M5 = ARD.m5 = ARD.m5 || {};
 const T = () => window.THREE_M5, L = () => window.TSL;
 const DESLIGA = typeof location !== 'undefined' && /[?&]m5modelos=0/.test(location.search); /* medida: ?m5modelos=0 = o Motor 5 sem este porte (como a 5.0a.1) */
-M5.modelos = { versao: '5.0b', ativo: !DESLIGA };
+M5.modelos = { versao: '5.0b', ativo: !DESLIGA, relogio: !(typeof location !== 'undefined' && /[?&]m5relogio=0/.test(location.search)) /* 5.5a: o relógio da animação por peça na GPU; ?m5relogio=0 volta ao envio por quadro (para comparar) */ };
 const DUAS = typeof location !== 'undefined' && /[?&]m5casulo2=1/.test(location.search);
 
 /* ---------- portes ligados (o render3d consulta ARD.m5.portado(chave) na criação) e fora da lista de pendências ---------- */
@@ -66,7 +66,11 @@ function preAnim(builder) {
   const { Fn, If, Var, attribute, float, vec3, vec4, sin, cos, max, floor, select, positionLocal, normalLocal } = L();
   Fn(() => {
     const aA = attribute('aAnim', 'vec4'), aB = attribute('aAnimB', 'vec4');
-    const aI = g.hasAttribute('aInst') ? attribute('aInst', 'vec4') : vec4(0, 0, 0, 0), aC = g.hasAttribute('aInstC') ? attribute('aInstC', 'float') : float(0);
+    const aI = g.hasAttribute('aInst') ? attribute('aInst', 'vec4') : vec4(0, 0, 0, 0), aC0 = g.hasAttribute('aInstC') ? attribute('aInstC', 'float') : float(0);
+    /* 5.5a: o relógio na GPU. aInst.y < 0 = -(fase + 1): o tempo da peça é a fase mais o relógio do jogo, e o giro é a base (aInstC) mais (0,3 + 0,7 × movimento) × relógio.
+       aInst.y >= 0 = o tempo já pronto, como antes (chefões, vida de base, obra). Quem está parado deixa de reenviar o buffer a cada quadro */
+    const rel = M5.modelos.relogio && g.hasAttribute('aInst'); if (rel) M5.shared && M5.shared(); const noRel = rel ? aI.y.lessThan(0) : null;
+    const tI = rel ? Var(L().select(noRel, M5.u.tempo.sub(aI.y).sub(1), aI.y), 'ardTi') : aI.y, aC = rel ? Var(L().select(noRel, aC0.add(aI.z.mul(0.7).add(0.3).mul(M5.u.tempo)), aC0), 'ardTc') : aC0;
     const ty = Var(aA.x, 'ardTy');
     const ang = Var(float(0), 'ardAng'), eixo = Var(float(2), 'ardEixo'), tr = Var(vec3(0, 0, 0), 'ardTr'); /* eixo: 0 y, 1 x, 2 z */
     If(OBRA() ? ty.greaterThan(0.5).and(M5.obra.parada(aI)) : ty.greaterThan(0.5), () => { /* 5.0e: na obra as peças ficam paradas (o aInst leva o corte) */
@@ -74,9 +78,9 @@ function preAnim(builder) {
         .ElseIf(ty.lessThan(2.5), () => { ang.assign(aC.mul(aB.x).add(aB.z)); eixo.assign(select(aB.y.lessThan(0.5), float(0), select(aB.y.lessThan(1.5), float(1), float(2)))); })
         .ElseIf(ty.lessThan(3.5), () => { ang.assign(aB.x.mul(sin(aI.x.div(max(aB.y, 0.1)).mul(6.2831853).add(aB.z))).mul(aI.z)); })
         .ElseIf(ty.lessThan(4.5), () => { tr.assign(vec3(aB.x.negate().mul(aI.w), 0, 0)); })
-        .ElseIf(ty.lessThan(5.5), () => { tr.assign(vec3(0, aB.x.mul(sin(aI.y.mul(aB.y).add(aB.z))), 0)); })
-        .ElseIf(ty.lessThan(6.5), () => { ang.assign(aB.x.mul(sin(aI.y.mul(aB.y).add(aB.z))).mul(aB.w)); eixo.assign(1); })
-        .ElseIf(ty.lessThan(7.5), () => { ang.assign(aB.x.mul(sin(aI.y.mul(aB.y).add(aB.z))).mul(aI.z.mul(0.65).add(0.35))); })
+        .ElseIf(ty.lessThan(5.5), () => { tr.assign(vec3(0, aB.x.mul(sin(tI.mul(aB.y).add(aB.z))), 0)); })
+        .ElseIf(ty.lessThan(6.5), () => { ang.assign(aB.x.mul(sin(tI.mul(aB.y).add(aB.z))).mul(aB.w)); eixo.assign(1); })
+        .ElseIf(ty.lessThan(7.5), () => { ang.assign(aB.x.mul(sin(tI.mul(aB.y).add(aB.z))).mul(aI.z.mul(0.65).add(0.35))); })
         .Else(() => { const e = max(aB.x, 0.1); tr.assign(vec3(aI.x.sub(floor(aI.x.div(e)).mul(e)).sub(aB.x.mul(0.5)), 0, 0)); }); /* mod do GLSL sem a função polyfill */
     });
     const c = Var(cos(ang), 'ardAc'), s = Var(sin(ang), 'ardAs');
@@ -91,12 +95,16 @@ function preAnim(builder) {
 
 /* ---------- ruína (RUIN_GLSL, 4.3f): aPiece (por vértice) = pivô xyz da peça + id (0 = miolo); aDie (por instância) = [segundos desde a queda,
    altura do modelo, semente, vida em s]. Semente negativa: a malha inteira é uma peça (torreta arrancada) com o chão em y = semente */
+/* 5.5a: a idade da queda sai do relógio do jogo na GPU. aDie.x >= 0 é o INSTANTE da queda (a idade é ARD.m5.u.tempo menos ele); aDie.x < 0 é uma idade
+   fixa, guardada como -(idade + 1) (carcaças já assentadas e a ferramenta de foto). Antes o aDie.x era a própria idade: mudava a cada quadro e o buffer de
+   cada grupo de ruínas subia para a GPU a cada quadro, durante os 40 s da ruína */
+function idadeQueda(x) { const { select, max, float } = L(); M5.shared && M5.shared(); return select(x.lessThan(0), x.negate().sub(1), max(M5.u.tempo.sub(x), float(0))); }
 function preRuina(builder) {
   const g = builder.geometry; if (!g || !g.hasAttribute('aDie')) return;
   const { Fn, If, Var, attribute, float, vec2, vec3, vec4, sin, cos, max, min, abs, sqrt, length, normalize, cross, dot, smoothstep, select, positionLocal, normalLocal } = L();
   Fn(() => {
     const aP = g.hasAttribute('aPiece') ? attribute('aPiece', 'vec4') : vec4(0, 0, 0, 0), aD = attribute('aDie', 'vec4');
-    const t = Var(aD.x, 'ardRt'), S = Var(max(aD.y, 0.5), 'ardRs'), sd = Var(aD.z, 'ardRd'), life = aD.w;
+    const t = Var(idadeQueda(aD.x), 'ardRt') /* 5.5a */, S = Var(max(aD.y, 0.5), 'ardRs'), sd = Var(aD.z, 'ardRd'), life = aD.w;
     const neg = Var(sd.lessThan(0), 'ardRn'); const id = Var(select(neg, float(1), aP.w), 'ardRi'), gnd = Var(select(neg, sd, float(0)), 'ardRg');
     const sink = Var(smoothstep(life.sub(4), life, t).mul(S).mul(0.9), 'ardRk');
     const ax = Var(vec3(0, 1, 0), 'ardRax'), ang = Var(float(0), 'ardRa'), cen = Var(vec3(0, 0, 0), 'ardRc'), tr = Var(vec3(0, 0, 0), 'ardRtr'), sy = Var(float(1), 'ardRsy'), tz = Var(float(0), 'ardRtz');
@@ -201,7 +209,7 @@ function perturba(sx0, sy0, sn, dh, fd) {
    ruína ficam no fragmento de todos e, com queda 0, não mudam nada (as brasas ficam num If, os modelos não pagam o ruído). Um varying por material
    (o mesmo nó no escurecimento e nas brasas: dois nós com o mesmo nome declarariam a variável duas vezes). ?m5ruina=1 volta ao de antes (medida) */
 const RUINA_SEP = typeof location !== 'undefined' && /[?&]m5ruina=1/.test(location.search);
-function quedaV(ctx) { if (!ctx.ardQueda) { const { varying, vec4 } = L(); ctx.ardQueda = varying(vec4(M5.attr('aDie', vec4(0, 0, 0, 0)).x, M5.attr('aPiece', vec4(0, 0, 0, 0)).w, 0, 0), 'ardQueda'); } return ctx.ardQueda; } /* 5.0e: a queda (x) e a peça (y) numa variável só: com a obra, a base e as unidades o fragmento passava do limite de 16 variáveis vindas do vértice */
+function quedaV(ctx) { if (!ctx.ardQueda) { const { Fn, varying, vec4, float, attribute } = L(); const idade = Fn(b => (b.geometry && b.geometry.hasAttribute('aDie') ? idadeQueda(attribute('aDie', 'vec4').x) : float(0)))(); /* 5.5a: modelo sem queda = idade 0 */ ctx.ardQueda = varying(vec4(idade, M5.attr('aPiece', vec4(0, 0, 0, 0)).w, 0, 0), 'ardQueda'); } return ctx.ardQueda; } /* 5.0e: a queda (x) e a peça (y) numa variável só: com a obra, a base e as unidades o fragmento passava do limite de 16 variáveis vindas do vértice */
 function pecaV(ctx) { return quedaV(ctx).y; }
 /* ---------- ganchos do material dos modelos (ARD.m5.modelo e ARD.m5.emissivo da fundação chamam na montagem) ---------- */
 const G = M5.ganchos = M5.ganchos || { modelo: { posicao: null, superficie: null, emissivo: null }, chao: { cor: null }, adereco: { posicao: null } };
@@ -225,7 +233,7 @@ G.modelo.superficie = function (ctx) {
   m.setupDiffuseColor = function (builder) {
     sup.call(this, builder);
     const s = Var(surf, 'ardSurf'); cur = s;
-    let k = s.y; if (ruina && RUINA_SEP) k = k.mul(mix(float(1), float(0.24), smoothstep(0, 1.8, attribute('aDie', 'vec4').x))); /* ruína: escurece (4.3f) */
+    let k = s.y; if (ruina && RUINA_SEP) k = k.mul(mix(float(1), float(0.24), smoothstep(0, 1.8, idadeQueda(attribute('aDie', 'vec4').x)))); /* ruína: escurece (4.3f) */
     else if (!RUINA_SEP) k = k.mul(mix(float(1), float(0.24), smoothstep(0, 1.8, quedaV(ctx).x))); /* 5.0b.1: o mesmo escurecimento em todo modelo (queda 0: ×1) */
     diffuseColor.rgb.mulAssign(k);
     if (OBRA()) { const ob = Var(M5.obra.cor(ctx), 'ardObC'); diffuseColor.rgb.mulAssign(ob.w); ctx.ardOb = ob; } /* 5.0e: a borda e a tampa da obra escurecem o albedo (o brilho vai no emissivo) */
@@ -240,7 +248,7 @@ G.modelo.superficie = function (ctx) {
 G.modelo.emissivo = function (ctx) {
   prepara(); const o = ctx.o || {}; if (RUINA_SEP ? o.ruina !== 'main' : ctx.emissivo) return ctx.em; /* 5.0b.1: as brasas no fragmento de todo modelo (queda 0: nada) */
   const { float, vec3, sin, smoothstep, attribute, positionGeometry, Var, If } = L();
-  const die = RUINA_SEP ? attribute('aDie', 'vec4').x : quedaV(ctx).x, pc = RUINA_SEP ? M5.attr('aPiece', L().vec4(0, 0, 0, 0)).w : pecaV(ctx), pl = positionGeometry;
+  const die = RUINA_SEP ? idadeQueda(attribute('aDie', 'vec4').x) : quedaV(ctx).x, pc = RUINA_SEP ? M5.attr('aPiece', L().vec4(0, 0, 0, 0)).w : pecaV(ctx), pl = positionGeometry;
   const brasas = () => { const emb = smoothstep(0.1, 0.6, die).mul(float(1).sub(smoothstep(4, 16, die)));
     const nz = VN(pl.xz.mul(2.4).add(pl.y.mul(1.3)).add(pc.mul(3.1))).mul(0.6).add(VN(pl.zy.mul(6).add(pl.x.mul(2))).mul(0.4));
     const fl = sin(die.mul(9).add(nz.mul(23))).mul(0.25).add(0.75);
@@ -255,7 +263,7 @@ G.modelo.emissivo = function (ctx) {
 M5.modelos.emRuina = function (m) {
   if (m.userData.ardEmQueda) return m; m.userData.ardEmQueda = true; /* 5.0b.1: uma vez por material (o M5.emissivo já liga em todo modelo) */
   const { float, smoothstep, attribute, diffuseColor } = L(); const sup = Object.getPrototypeOf(m).setupDiffuseColor; const ctx = {};
-  m.setupDiffuseColor = function (builder) { sup.call(this, builder); diffuseColor.rgb.mulAssign(float(1).sub(smoothstep(0, 1.1, RUINA_SEP ? attribute('aDie', 'vec4').x : quedaV(ctx).x)));
+  m.setupDiffuseColor = function (builder) { sup.call(this, builder); diffuseColor.rgb.mulAssign(float(1).sub(smoothstep(0, 1.1, RUINA_SEP ? idadeQueda(attribute('aDie', 'vec4').x) : quedaV(ctx).x)));
     if (OBRA()) { const ob = L().Var(M5.obra.cor(ctx), 'ardObC'); diffuseColor.rgb.assign(L().mix(diffuseColor.rgb, ob.xyz, smoothstep(0.5, 1.0, M5.obra.varying(ctx).w))); } }; /* 5.0e: na tampa da obra a parte emissiva sai com a mesma cor do casco (as duas se cruzam no mesmo plano: sem pisca) */ /* 5.0b.1: pela queda em varying (0 nos modelos: ×1), o mesmo fragmento na parte emissiva da ruína e dos modelos */
   return m;
 };

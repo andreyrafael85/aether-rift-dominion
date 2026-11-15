@@ -26,7 +26,7 @@
    Os atributos ficam em StaticDrawUsage no Motor 5: no r186 o Renderer reenvia o buffer inteiro de todo atributo DynamicDrawUsage a cada
    desenho; assim só sobe o trecho escrito no quadro (updateRanges), como no clássico. */
 const m5Ativo = () => !!(ARD.m5 && ARD.m5.active && ARD.m5.active());
-function m5Uniforms(THREE) { const { uniform } = window.TSL;
+function m5Uniforms(THREE) { const uniform = v => window.TSL.uniform(v).setGroup(window.TSL.renderGroup); /* 5.5a: os uniforms das partículas no grupo do render (não uma cópia no buffer de cada lote) */
   return { uTime: uniform(0), uCamR: uniform(new THREE.Vector3(1, 0, 0)), uCamU: uniform(new THREE.Vector3(0, 1, 0)), uCamF: uniform(new THREE.Vector3(0, 0, 1)),
     uSunDir: uniform(new THREE.Vector3(-0.47, 0.64, 0.6).normalize()), uSunC: uniform(new THREE.Color(0.85, 0.69, 0.47)), uAmbC: uniform(new THREE.Color(0.26, 0.37, 0.51)),
     uSemPos: (ARD.m5 && ARD.m5.u && ARD.m5.u.semPos) || uniform(0) /* 5.0b.1: o ARD.m5.u.semPos do núcleo */, uGama: uniform(1.5) /* sem pós (Baixa): saída como a do clássico (abaixo, m5InversoSaida) */, uExpo: m5Exposicao() /* 5.0b (junção): a exposição em uso (ARD.m5.u.exposicao do Modo Foto) */ }; }
@@ -344,13 +344,15 @@ void main() {
 }`;
   function batch(blending) {
     const geo = new THREE.InstancedBufferGeometry(); geo.index = quad.index; geo.setAttribute('position', quad.attributes.position); geo.instanceCount = CAP;
-    const at = {}; for (const k of ['iA', 'iB', 'iC', 'iD', 'iE']) { const a = ARMZ ? new window.THREE_M5.StorageInstancedBufferAttribute(new Float32Array(CAP * 4), 4) : new THREE.InstancedBufferAttribute(new Float32Array(CAP * 4), 4); if (!M5) a.setUsage(THREE.DynamicDrawUsage); /* 5.0b: StaticDrawUsage no Motor 5 (só o trecho escrito sobe) */ geo.setAttribute(k, a); at[k] = a; }
-    for (let i = 0; i < CAP; i++) at.iA.array[i * 4 + 3] = -1e6; /* nascidas "há muito tempo": invisíveis */
+    const UM = M5 && !ARMZ && !(ARD.m5 && ARD.m5.fxSeparado); let ib = null; /* 5.5a: no Motor 5 os 5 atributos do lote moram num buffer só, intercalado (20 números por partícula): um envio à GPU por trecho no lugar de cinco. Cada .array abaixo é uma janela do mesmo vetor, deslocada de 4 em 4 (o emit só troca o passo de 4 para 20) */
+    const at = {}; if (UM) { ib = new THREE.InstancedInterleavedBuffer(new Float32Array(CAP * 20), 20, 1); ['iA', 'iB', 'iC', 'iD', 'iE'].forEach((k, j) => { geo.setAttribute(k, new THREE.InterleavedBufferAttribute(ib, 4, j * 4)); at[k] = { array: j ? ib.array.subarray(j * 4) : ib.array }; }); }
+    else for (const k of ['iA', 'iB', 'iC', 'iD', 'iE']) { const a = ARMZ ? new window.THREE_M5.StorageInstancedBufferAttribute(new Float32Array(CAP * 4), 4) : new THREE.InstancedBufferAttribute(new Float32Array(CAP * 4), 4); if (!M5) a.setUsage(THREE.DynamicDrawUsage); /* 5.0b: StaticDrawUsage no Motor 5 (só o trecho escrito sobe) */ geo.setAttribute(k, a); at[k] = a; }
+    const K = UM ? 20 : 4; for (let i = 0; i < CAP; i++) at.iA.array[i * K + 3] = -1e6; /* nascidas "há muito tempo": invisíveis */
     const mat = M5 ? m5Particulas(uniforms, blending === THREE.AdditiveBlending) /* 5.0b: TSL */ : new THREE.ShaderMaterial({ uniforms, vertexShader: vs, fragmentShader: fs, transparent: true, depthWrite: false, blending, fog: false, premultipliedAlpha: blending !== THREE.AdditiveBlending }); /* 4.3g: translúcido pré-multiplicado */
     const mesh = new THREE.Mesh(geo, mat); mesh.frustumCulled = false; mesh.renderOrder = blending === THREE.AdditiveBlending ? 12 : 10; scene.add(mesh);
-    if (blending === THREE.AdditiveBlending) return { geo, at, mesh, fim: -1e9, r: [{ a: 0, b: CAP, i: 0, s: 0, n: 0 }] };
+    if (blending === THREE.AdditiveBlending) return { geo, at, ib, K, mesh, fim: -1e9, r: [{ a: 0, b: CAP, i: 0, s: 0, n: 0 }] };
     const LG = Math.floor(CAP * 0.75); /* 4.3g: o translúcido tem dois anéis — o último quarto guarda só o que vive 4 s ou mais (fumaça que fica), para o fogo contínuo não o atropelar */
-    return { geo, at, mesh, fim: -1e9, r: [{ a: 0, b: LG, i: 0, s: 0, n: 0 }, { a: LG, b: CAP, i: LG, s: LG, n: 0 }] };
+    return { geo, at, ib, K, mesh, fim: -1e9, r: [{ a: 0, b: LG, i: 0, s: 0, n: 0 }, { a: LG, b: CAP, i: LG, s: LG, n: 0 }] };
   }
   const add = batch(THREE.AdditiveBlending), alp = batch(THREE.NormalBlending);
   const FX = { time: 0, dt: 0, mult: 1, add, alp };
@@ -361,7 +363,7 @@ void main() {
   if (M5) { const st = window.TSL.storage, nos = b => { const o = {}; for (const k in b.at) o[k] = st(b.at[k], 'vec4', CAP); return o; }; FX.m5 = { cap: CAP, uniforms, lotes: { add, alp }, armazenamento: ARMZ ? { add: nos(add), alp: nos(alp) } : null }; }
   // emite uma partícula: p=[x,y,z] (mundo three), v=[vx,vy,vz], life, s0, s1, type, col=[r,g,b], g=gravidade, ease, spin, alpha, delay, x=extra do tipo (4.3g)
   FX.emit = function (b, p, v, life, s0, s1, type, col, g, ease, spin, alpha, delay, x) {
-    const rg = life >= 4 && b.r.length > 1 ? b.r[1] : b.r[0], i = rg.i; rg.i = i + 1 >= rg.b ? rg.a : i + 1; if (rg.n === 0) rg.s = i; rg.n++; const o = i * 4; const A = b.at;
+    const rg = life >= 4 && b.r.length > 1 ? b.r[1] : b.r[0], i = rg.i; rg.i = i + 1 >= rg.b ? rg.a : i + 1; if (rg.n === 0) rg.s = i; rg.n++; const o = i * b.K; const A = b.at;
     A.iA.array[o] = p[0]; A.iA.array[o + 1] = p[1]; A.iA.array[o + 2] = p[2]; A.iA.array[o + 3] = FX.time + (delay || 0);
     A.iB.array[o] = v[0]; A.iB.array[o + 1] = v[1]; A.iB.array[o + 2] = v[2]; A.iB.array[o + 3] = life;
     A.iC.array[o] = s0; A.iC.array[o + 1] = s1; A.iC.array[o + 2] = x || 0; A.iC.array[o + 3] = type;
@@ -382,6 +384,10 @@ void main() {
     const e = camera.matrixWorld.elements; uniforms.uCamR.value.set(e[0], e[1], e[2]).normalize(); uniforms.uCamU.value.set(e[4], e[5], e[6]).normalize(); uniforms.uCamF.value.set(e[8], e[9], e[10]).normalize();
     luzes();
     for (const b of [add, alp]) { let W = 0; for (const rg of b.r) W += rg.n; if (!W) continue; /* sobe só o trecho escrito neste quadro em cada anel (dois trechos quando o anel dá a volta); o three limpa os trechos depois de subir */
+      if (b.ib) { const a = b.ib; /* 5.5a: Motor 5 — um buffer por lote */
+        if (a.updateRanges.length > 24) { a.clearUpdateRanges(); a.addUpdateRange(0, CAP * 20); }
+        else for (const rg of b.r) { if (!rg.n) continue; const sp = rg.b - rg.a; if (rg.n >= sp) a.addUpdateRange(rg.a * 20, sp * 20); else if (rg.s + rg.n <= rg.b) a.addUpdateRange(rg.s * 20, rg.n * 20); else { a.addUpdateRange(rg.s * 20, (rg.b - rg.s) * 20); a.addUpdateRange(rg.a * 20, (rg.s + rg.n - rg.b) * 20); } }
+        a.needsUpdate = true; for (const rg of b.r) rg.n = 0; continue; }
       for (const k in b.at) { const a = b.at[k]; if (!a.addUpdateRange) { a.needsUpdate = true; continue; }
         if (a.updateRanges && a.updateRanges.length > 24 && !ARMZ) { a.clearUpdateRanges(); a.addUpdateRange(0, CAP * 4); } /* 5.0b: com compute, nunca o buffer inteiro (desfaria o que a GPU reescreveu) */
         else for (const rg of b.r) { if (!rg.n) continue; const sp = rg.b - rg.a; if (rg.n >= sp) a.addUpdateRange(rg.a * 4, sp * 4); else if (rg.s + rg.n <= rg.b) a.addUpdateRange(rg.s * 4, rg.n * 4); else { a.addUpdateRange(rg.s * 4, (rg.b - rg.s) * 4); a.addUpdateRange(rg.a * 4, (rg.s + rg.n - rg.b) * 4); } }

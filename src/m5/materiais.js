@@ -142,7 +142,7 @@ M5.chao = function (U, o) {
     const wuv = vec2(gp.x.div(U.worldSize), gp.y.div(U.worldSize));
     if (!o.leve) { const m1 = U.microMap.sample(wuv.mul(260)).rgb, m2 = U.microMap.sample(wuv.mul(84).add(0.31)).rgb; const pe = max(m1.r.mul(0.6), m2.r);
       alb = alb.mul(mix(float(1), mix(m1.g, m2.g, step(0.25, m2.r)).mul(0.28).add(0.86).mul(float(1).sub(max(m1.b, m2.b.mul(0.8)).mul(0.35))).mul(pe.mul(0.1).add(1)), U.uNear.mul(0.7))); }
-    const tc = M5.sample.territorio(); alb = mix(alb, tc.rgb, tc.a.mul(0.14));
+    const tc = M5.sample.territorio(); alb = mix(alb, tc.rgb.mul(dot(alb, vec3(0.2126, 0.7152, 0.0722)).mul(2.0).add(0.15)), tc.a.mul(0.36)); /* 5.5a: território na cor da Raça (antes a cor pura a 0.14) */
     const fv = M5.sample.nevoa(); alb = alb.mul(mix(0.06, 1.0, fv)); tEmis = tEmis.mul(fv);
   }
   alb = alb.mul(float(1).sub(U.uCloudK.mul(0.2).mul(float(1).sub(M5.sample.nuvem()))));

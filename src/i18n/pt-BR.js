@@ -419,7 +419,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aqui é seu. Ainda.",
-  "inicio.versao": "Versão 5.0h.5 · build __BUILD__ · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
+  "inicio.versao": "Versão 5.5a · build __BUILD__ · Portas Abertas · Mundo vivo · multiplayer 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Escolha sua Raça",
   "inicio.vitrine.explorar-base": "Explorar a base",
   "inicio.vitrine.som-tela-inicial": "Som da tela inicial",
@@ -488,6 +488,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.btn-bench": "Testar desempenho (30 s)",
   "ajustes.cfg-feedback": "Enviar feedback",
   "notas.notas-versao": "Notas da versão",
+  "notas.5-5a": "<b>5.5a — Porta de entrada:</b> quem chega agora tem uma <b>primeira partida guiada</b>, com um objetivo por vez e o painel aparecendo aos poucos. Chegou o modo <b>Blitz</b>: 1 contra 1, bases mais perto e relógio de 10 minutos. A <b>tela final</b> é nova, com o gráfico da virada e o botão Compartilhar, que gera um cartão com o resultado. A sala multiplayer ganhou um <b>link de convite</b> que já entra na sala. O mundo recebeu a <b>Luz da Fenda</b>: sol baixo e quente, sombras longas. Cada unidade tem um arco fino na cor do dono, o inimigo se reconhece também pela forma, o chão em volta da base ganha a cor da sua Raça e a promoção aparece como estrela na barra de vida. <b>Balanceamento:</b> Soldador com dano 16 (era 20), Cria e Cuspidor mais caros, Quimera com mais vida e o Atirador de Fenda da Erevane liberado na Era I. O Hangar lista os <b>cosméticos</b> e como ganhar cada um; nada está à venda. No Motor 5 o jogo envia metade dos dados por quadro à placa de vídeo.",
   "notas.5-0h-5": "<b>5.0h.5 — Chefões 3.0:</b> os três chefões deixaram de ser máquinas e viraram criaturas da Fenda, com nomes novos. O Arauto agora é <b>A Medusa da Fenda</b>, a Forja-Mãe é <b>O Titã-Fornalha</b> e a Sentinela da Fenda é <b>A Sentinela Devoradora</b>, que ficou bem maior na tela. Antes de cada golpe o corpo avisa: o Titã escancara a mandíbula, a Devoradora abre as presas e a Medusa contrai o sino. Na Linha de montagem o dorso do Titã se abre e os pontos fracos âmbar aparecem. Os pilares, os Ecos e os lacaios da Fenda ganharam o visual da mesma família. As regras das lutas, a vida e o dano dos chefões não mudaram.",
   "notas.5-0h-4": "<b>5.0h.4 — Desempenho no Motor 5:</b> a travada da primeira vez que um lago aparecia na tela acabou. Tudo o que o reflexo dos lagos precisa agora é preparado no carregamento, e no nosso teste nada mais é criado na placa de vídeo no meio da partida. Os retratos das unidades no painel do exército são gerados um por vez, e o jogo cria um pouco menos de lixo de memória por quadro. O Teste de desempenho agora mostra, em cada travada, quanto tempo foi para sombras, reflexo dos lagos, cena e efeitos. A imagem e a simulação continuam as mesmas.",
   "notas.5-0h-3": "<b>5.0h.3 — Desempenho:</b> menos travadas no meio das batalhas. No Chrome, o jogo cria cerca de 20% menos lixo de memória por segundo, então o navegador para menos vezes para limpar. No <b>Motor 5</b>, a morte de um veículo e a câmera passando por um lago não criam mais recursos novos na placa de vídeo na hora: o jogo os prepara antes. O Teste de desempenho agora diz, em cada travada, o que havia naquele quadro (os eventos e o que nasceu na placa de vídeo). A imagem e a simulação continuam as mesmas.",
@@ -506,7 +507,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "notas.5-0c": "<b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 mais leve, faróis e som no iPhone:</b> com o <b>Motor 5</b> ligado, os shaders que ele prepara na carga encolheram um terço (os lagos primeiro) e cada quadro manda muito menos dados para a placa de vídeo, o que alivia a CPU no Firefox e no celular. O brilho em volta das luzes agora é o mesmo do motor clássico, e no Modo Foto da qualidade Baixa os efeitos seguem a exposição como no clássico. À noite e dentro da Tempestade de Éter, os faróis dos veículos, coletores e piratas iluminam o chão à frente, nos dois motores. A Sala de Comando ficou um pouco mais clara, sem o clarão de antes. No iPhone, o som e a voz destravam no primeiro toque, tocam com a chave de silêncio ligada e voltam depois de uma ligação. Cada líder fala com uma voz do seu gênero em todo navegador. Em Ajustes, <b>Testar som</b> toca três notas e uma frase e mostra o estado do áudio do aparelho.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, em teste:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o jogo inteiro agora roda em WebGPU, com volta sozinha para WebGL2: unidades e construções com o detalhe de superfície e a animação de cada peça, ruínas, obras, o holograma da Erevane, os escudos do Uníssono e as bandeiras; o chão com todos os biomas, a vegetação ao vento, as estradas e o céu; explosões, fogo, fumaça e tiros; os lagos de plasma e de gelo com reflexo, o espaço do Cinturão e a Tempestade de Éter; e o <b>Modo Foto</b> (📷 ou tecla J) com desfoque, os 8 filtros e captura em 4K. Na primeira vez que o Modo Foto abre numa partida, ele leva alguns segundos para se preparar. Com tudo isso, a carga do Motor 5 ficou alguns segundos mais longa: a próxima versão mede nos aparelhos e enxuga. O motor clássico continua o padrão e não mudou.",
-  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0h.4 → 2.0)",
+  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0h.5 → 2.0)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Termos de Uso",
   "inicio.rodape.foot-priv": "Privacidade",
@@ -2273,4 +2274,141 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ia.fala.vorag.super.1": "Ovos abertos. Boa sorte.", /* 5.0h */
   "ia.fala.vorag.pedido.0": "O Oru vai. O Oru come o que você apontar.", /* 5.0h */
   "ia.fala.vorag.pedido.1": "Entendido. A ninhada corre para lá.", /* 5.0h */
+  "cosm.hg.titulo": "Cosméticos", /* 5.5a */
+  "cosm.hg.nota": "Só aparência: nada aqui muda o resultado de uma partida. A escolha vale na hora e aparece para os outros jogadores nas salas.", /* 5.5a */
+  "cosm.tipo.pintura": "Pintura do Núcleo", /* 5.5a */
+  "cosm.tipo.estandarte": "Estandarte", /* 5.5a */
+  "cosm.tipo.moldura": "Moldura do cartão", /* 5.5a */
+  "cosm.tipo.titulo": "Título", /* 5.5a */
+  "cosm.tipo.cor-nome": "Cor do nome", /* 5.5a */
+  "cosm.tipo.rastro": "Rastro", /* 5.5a */
+  "cosm.gratis": "Grátis", /* 5.5a */
+  "cosm.em-uso": "Em uso", /* 5.5a */
+  "cosm.trancado": "Trancado", /* 5.5a */
+  "cosm.em-producao": "Em produção", /* 5.5a */
+  "cosm.apoiador": "Edição de Apoiador (ainda não disponível)", /* 5.5a */
+  "cosm.nivel": "Chegue ao nível {n} de Comandante", /* 5.5a */
+  "cosm.conquista": "Conquista: {nome}", /* 5.5a */
+  "cosm.item.pin-padrao": "Padrão", /* 5.5a */
+  "cosm.item.pin-fortaleza": "Fortaleza", /* 5.5a */
+  "cosm.item.pin-santuario": "Santuário", /* 5.5a */
+  "cosm.item.est-padrao": "Sem estandarte", /* 5.5a */
+  "cosm.item.est-apoiador": "Estandarte do Alinhamento", /* 5.5a */
+  "cosm.item.mol-padrao": "Moldura simples", /* 5.5a */
+  "cosm.item.mol-alinhamento": "Moldura do Alinhamento", /* 5.5a */
+  "cosm.item.mol-cinco-mundos": "Moldura dos Cinco Mundos", /* 5.5a */
+  "cosm.item.mol-apoiador": "Moldura de Apoiador", /* 5.5a */
+  "cosm.item.tit-nenhum": "Sem título", /* 5.5a */
+  "cosm.item.tit-recruta": "Recruta do Alinhamento", /* 5.5a */
+  "cosm.item.tit-palavra-dada": "Palavra Dada", /* 5.5a */
+  "cosm.item.tit-apoiador": "Apoiador da Fenda", /* 5.5a */
+  "cosm.item.cor-padrao": "Cor padrão", /* 5.5a */
+  "cosm.item.cor-veterano": "Ouro de veterano", /* 5.5a */
+  "cosm.item.cor-apoiador": "Azul de apoiador", /* 5.5a */
+  "cosm.item.ras-padrao": "Rastro padrão", /* 5.5a */
+  "cosm.item.ras-apoiador": "Rastro do Sifão em espiral", /* 5.5a */
+  "guia.titulo": "Primeira partida", /* 5.5a */
+  "guia.botao": "Primeira partida", /* 5.5a */
+  "guia.bv.eyebrow": "Primeira vez aqui?", /* 5.5a */
+  "guia.bv.titulo": "Aprenda jogando, em 5 minutos", /* 5.5a */
+  "guia.bv.texto": "Uma partida curta, com um objetivo por vez na tela: colher, construir, treinar tropas, defender a base e derrubar o Núcleo inimigo.", /* 5.5a */
+  "guia.bv.jogar": "Jogar a primeira partida", /* 5.5a */
+  "guia.bv.menu": "Já conheço o jogo: ir para o menu", /* 5.5a */
+  "guia.eyebrow": "Primeira partida · passo {n} de {total}", /* 5.5a */
+  "guia.pular": "Pular o guia", /* 5.5a */
+  "guia.pular-q": "Sair da primeira partida e ir para o menu? Ela fica no botão Primeira partida, na aba Jogar.", /* 5.5a */
+  "guia.feito": "Feito!", /* 5.5a */
+  "guia.novo": "Novo no painel: {o}", /* 5.5a */
+  "guia.novo.energia": "Energia", /* 5.5a */
+  "guia.novo.exercito": "botão Exército", /* 5.5a */
+  "guia.novo.mapa": "mapa e alertas", /* 5.5a */
+  "guia.novo.atacar": "botão Atacar", /* 5.5a */
+  "guia.p.coletores.t": "Produza 2 × {coletor}", /* 5.5a */
+  "guia.p.reator.t": "Construa: {reator}", /* 5.5a */
+  "guia.p.quartel.t": "Construa: {quartel}", /* 5.5a */
+  "guia.p.tropa.t": "Treine 4 × {infantaria}", /* 5.5a */
+  "guia.p.defesa.t": "Defenda a base do ataque", /* 5.5a */
+  "guia.p.nucleo.t": "Destrua o Núcleo inimigo", /* 5.5a */
+  "guia.p.coletores.pc": "Clique no Núcleo, a construção grande no centro, e depois no cartão {coletor}. Eles colhem o Minério que paga tudo.", /* 5.5a */
+  "guia.p.coletores.toque": "Toque em Núcleo, na barra de baixo, e depois no cartão {coletor}. Eles colhem o Minério que paga tudo.", /* 5.5a */
+  "guia.p.reator.pc": "Clique no cartão {reator} e depois num lugar livre perto do Núcleo. Ele dá a energia das outras construções.", /* 5.5a */
+  "guia.p.reator.toque": "Toque no cartão {reator}, escolha um lugar perto do Núcleo e confirme. Ele dá a energia das outras construções.", /* 5.5a */
+  "guia.p.quartel.pc": "Clique no cartão {quartel} e depois num lugar livre. É nele que os soldados são treinados.", /* 5.5a */
+  "guia.p.quartel.toque": "Toque no cartão {quartel}, escolha um lugar e confirme. É nele que os soldados são treinados.", /* 5.5a */
+  "guia.p.obra": "A obra começou. Em alguns segundos fica pronta.", /* 5.5a */
+  "guia.p.tropa.pc": "Clique na construção {quartel} e depois, quatro vezes, no cartão {infantaria}.", /* 5.5a */
+  "guia.p.tropa.toque": "Toque na construção {quartel} e depois, quatro vezes, no cartão {infantaria}.", /* 5.5a */
+  "guia.p.defesa.como": "Uma patrulha inimiga está vindo. Suas tropas atiram sozinhas em quem chega perto: mantenha-as junto da base.", /* 5.5a */
+  "guia.p.nucleo.pc": "Chegaram reforços. Selecione as tropas, vá até o alvo e clique com o botão direito no Núcleo inimigo.", /* 5.5a */
+  "guia.p.nucleo.toque": "Chegaram reforços. Selecione as tropas, vá até o alvo e toque no Núcleo inimigo para atacar.", /* 5.5a */
+  "guia.s.clique": "Clique aqui", /* 5.5a */
+  "guia.s.toque": "Toque aqui", /* 5.5a */
+  "guia.s.nucleo": "Clique no Núcleo", /* 5.5a */
+  "guia.s.quartel.pc": "Clique nesta construção", /* 5.5a */
+  "guia.s.quartel.toque": "Toque nesta construção", /* 5.5a */
+  "guia.s.obra": "Em obras", /* 5.5a */
+  "guia.s.construa": "Construa aqui", /* 5.5a */
+  "guia.s.inimigo": "Inimigo", /* 5.5a */
+  "guia.s.alvo": "Núcleo inimigo", /* 5.5a */
+  "guia.s.alvo.pc": "Botão direito aqui", /* 5.5a */
+  "guia.s.alvo.toque": "Toque para atacar", /* 5.5a */
+  "guia.a.base": "Ver a base", /* 5.5a */
+  "guia.a.construir": "Abrir Construir", /* 5.5a */
+  "guia.a.tropas": "Selecionar tropas", /* 5.5a */
+  "guia.a.alvo": "Ver o alvo", /* 5.5a */
+  "guia.fim.vitoria": "O Núcleo inimigo caiu. Você já sabe colher, construir, treinar e atacar.", /* 5.5a */
+  "guia.fim.blitz": "Jogar um Blitz (10 min)", /* 5.5a */
+  "guia.fim.repetir": "Repetir a primeira partida", /* 5.5a */
+  "guia.fim.prox": "Próximo passo: uma partida Blitz, 1 contra 1, que acaba em até 10 minutos.", /* 5.5a */
+  "fim.vitoria": "VITÓRIA", /* 5.5a */
+  "fim.derrota": "DERROTA", /* 5.5a */
+  "fim.compartilhar": "Compartilhar", /* 5.5a */
+  "fim.menu": "Menu", /* 5.5a */
+  "fim.detalhes": "Placar e detalhes", /* 5.5a */
+  "fim.n.abatidas": "unidades derrubadas", /* 5.5a */
+  "fim.n.dominio": "pontos de Domínio", /* 5.5a */
+  "fim.n.coletados": "recursos coletados", /* 5.5a */
+  "fim.n.roubados": "recursos roubados", /* 5.5a */
+  "fim.n.abatidas.curto": "derrubadas", /* 5.5a */
+  "fim.n.dominio.curto": "Domínio", /* 5.5a */
+  "fim.n.coletados.curto": "coletados", /* 5.5a */
+  "fim.n.roubados.curto": "roubados", /* 5.5a */
+  "fim.graf.titulo": "Força do exército", /* 5.5a */
+  "fim.graf.legenda": "você em destaque", /* 5.5a */
+  "fim.graf.virada": "a virada · {t}", /* 5.5a */
+  "fim.graf.curto": "Partida curta demais para o gráfico.", /* 5.5a */
+  "fim.prox.venceu": "Próximo passo: suba a dificuldade ou chame um amigo pela aba Multiplayer.", /* 5.5a */
+  "fim.prox.perdeu": "Dica: Reator e Quartel cedo, e as tropas perto do Núcleo até o grupo ficar grande.", /* 5.5a */
+  "fim.cartao.titulo": "Cartão de resultado", /* 5.5a */
+  "fim.cartao.baixar": "Baixar imagem", /* 5.5a */
+  "fim.cartao.copiar": "Copiar imagem", /* 5.5a */
+  "fim.cartao.copiado": "Imagem copiada. Cole onde quiser.", /* 5.5a */
+  "fim.cartao.nao-copiou": "Este navegador não deixou copiar a imagem. Use Baixar imagem.", /* 5.5a */
+  "fim.cartao.nota-enviar": "A imagem foi montada neste aparelho; nada foi enviado a servidor nenhum.", /* 5.5a */
+  "fim.cartao.nota-baixar": "A imagem foi montada neste aparelho. Baixe e poste onde quiser.", /* 5.5a */
+  "fim.cartao.lema": "estratégia em tempo real, no navegador", /* 5.5a */
+  "fim.cartao.primeira": "PRIMEIRA VITÓRIA", /* 5.5a */
+  "fim.cartao.virei": "VIREI AOS {t}", /* 5.5a */
+  "fim.cartao.viraram": "VIRARAM AOS {t}", /* 5.5a */
+  "fim.cartao.venci": "VITÓRIA EM {t}", /* 5.5a */
+  "fim.cartao.cai": "DERROTA AOS {t}", /* 5.5a */
+  "fim.cartao.contra": "contra {n}", /* 5.5a */
+  "fim.cartao.texto": "{m} em Aether Rift: Dominion", /* 5.5a */
+  "modos.blitz.nome": "Blitz", /* 5.5a */
+  "modos.blitz.modo": "Modo", /* 5.5a */
+  "modos.blitz.escaramuca": "Escaramuça", /* 5.5a */
+  "modos.blitz.opcao": "Blitz · 10 min", /* 5.5a */
+  "modos.blitz.dica": "1 contra 1, bases perto uma da outra, coleta e produção mais rápidas e a IA ataca cedo. Acaba em até 10 minutos.", /* 5.5a */
+  "modos.blitz.etiqueta": "Blitz · {n} minutos", /* 5.5a */
+  "multi.convite.rotulo": "Link de convite: quem abrir já entra na sala", /* 5.5a */
+  "multi.convite.aria": "Link de convite", /* 5.5a */
+  "multi.convite.botao": "Copiar link", /* 5.5a */
+  "multi.convite.copiado": "Link copiado", /* 5.5a */
+  "multi.convite.na-mao": "Não deu para copiar sozinho: o link está selecionado, copie com Ctrl+C.", /* 5.5a */
+  "multi.convite.texto": "Entre na minha sala de Aether Rift: Dominion (código {codigo})", /* 5.5a */
+  "multi.convite.entrando": "Convite recebido: entrando na sala {codigo}…", /* 5.5a */
+  "fim.n.estruturas": "construções destruídas", /* 5.5a */
+  "fim.n.estruturas.curto": "construções", /* 5.5a */
+  "guia.p.nucleo.sem-tropa": "Você ficou sem tropas. Treine mais {infantaria} no {quartel} e ataque de novo.", /* 5.5a */
+  "guia.a.quartel": "Abrir: {quartel}", /* 5.5a */
 };

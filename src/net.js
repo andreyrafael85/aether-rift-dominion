@@ -16,7 +16,8 @@ function create() {
   function sendTo(conn, msg) { try { conn.send(msg); } catch (e) {} }
   function broadcast(msg, except) { for (const g of N.guests) if (g.open && (g.ready || !N.started) && g.conn !== except) sendTo(g.conn, msg); }
   const readyGuests = () => N.guests.filter(g => g.ready);
-  N.roster = () => N.role === 'host' ? [{ id: 0, name: N.me.name, faction: N.me.faction, color: N.me.color || null }].concat(readyGuests().map((g, i) => ({ id: i + 1, name: g.name, faction: g.faction, color: g.color || null }))) : N.players;
+  const cosmDe = c => (ARD.cosmeticos ? ARD.cosmeticos.forma(c) : []); /* 5.5a: os ids de cosmético que cada jogador anuncia (só forma válida; quem recebe confere no próprio catálogo) */
+  N.roster = () => N.role === 'host' ? [{ id: 0, name: N.me.name, faction: N.me.faction, color: N.me.color || null, cosm: cosmDe(N.me.cosm) }].concat(readyGuests().map((g, i) => ({ id: i + 1, name: g.name, faction: g.faction, color: g.color || null, cosm: g.cosm || [] }))) : N.players;
   function lobbyMsg() { return { t: 'lobby', players: N.roster(), size: N.size, modo: N.modo || null /* 5.0g: o modo da sala (Escaramuça ou Caçada) */ }; }
   function pushLobby() { const m = lobbyMsg(); broadcast(m); fire('lobby', m); }
   N.relobby = () => { if (N.role === 'host' && !N.started) pushLobby(); }; /* 5.0g: o anfitrião trocou o modo da sala */
@@ -32,7 +33,7 @@ function create() {
         if (g.ready) return;
         if (d.v !== PROTO) { sendTo(conn, { t: 'bad-version', v: PROTO, build: N.me.build || '' }); fire('error', { message: 'o convidado ' + String(d.name || '?').slice(0, 18) + ' está com outra versão do jogo; peça para atualizar a página (Ctrl+F5)' }); setTimeout(() => { try { conn.close(); } catch (e) {} }, 500); return; }
         if (full()) { sendTo(conn, { t: 'full' }); return; }
-        g.name = String(d.name || 'Convidado').slice(0, 18); g.faction = String(d.faction || 'vehnar'); g.color = /^#[0-9a-fA-F]{6}$/.test(d.color || '') ? d.color : null; g.ready = true;
+        g.name = String(d.name || 'Convidado').slice(0, 18); g.faction = String(d.faction || 'vehnar'); g.color = /^#[0-9a-fA-F]{6}$/.test(d.color || '') ? d.color : null; g.cosm = cosmDe(d.cosm); /* 5.5a */ g.ready = true;
         if (d.build && N.me.build && d.build !== N.me.build) fire('warn', { message: 'build diferente em ' + g.name + ' (' + d.build + ' × ' + N.me.build + '); se algo falhar, Ctrl+F5 nos dois lados' });
         sendTo(conn, { t: 'welcome', size: N.size, v: PROTO, build: N.me.build || '' }); pushLobby();
       }
@@ -79,7 +80,7 @@ function create() {
     open();
   };
   N.start = function (cfg) { // só o anfitrião: fixa os ids finais e avisa todos
-    N.me = { name: cfg.players[0].name, faction: cfg.players[0].faction, color: cfg.players[0].color || null };
+    N.me = { name: cfg.players[0].name, faction: cfg.players[0].faction, color: cfg.players[0].color || null, cosm: N.me && N.me.cosm /* 5.5a */ };
     const rg = readyGuests(); rg.forEach((g, i) => { g.id = i + 1; });
     N.players = N.roster(); N.started = true;
     for (const g of rg) { N.tokens[g.id] = mkToken(); sendTo(g.conn, { t: 'start', cfg, you: g.id, players: N.players, token: N.tokens[g.id] }); }
@@ -89,7 +90,7 @@ function create() {
   function send(msg) { if (N.hostConn && N.state === 'connected') try { N.hostConn.send(msg); } catch (e) {} }
   function bindHost(conn, rejoin) {
     N.hostConn = conn; let parts = null;
-    conn.on('open', () => { N.state = 'connected'; if (rejoin) send({ t: 'rejoin', id: N.id, token: N.token, v: PROTO }); else send({ t: 'hello', name: N.me.name, faction: N.me.faction, color: N.me.color || null, v: PROTO, build: N.me.build || '' }); fire('open', { rejoin: !!rejoin }); });
+    conn.on('open', () => { N.state = 'connected'; if (rejoin) send({ t: 'rejoin', id: N.id, token: N.token, v: PROTO }); else send({ t: 'hello', name: N.me.name, faction: N.me.faction, color: N.me.color || null, cosm: cosmDe(N.me.cosm) /* 5.5a */, v: PROTO, build: N.me.build || '' }); fire('open', { rejoin: !!rejoin }); });
     conn.on('data', d => {
       if (!d || typeof d !== 'object' || N.hostConn !== conn) return;
       if (d.t === 'welcome') { if (d.v !== PROTO) { N.state = 'lost'; fire('error', { message: 'versão do jogo diferente da do anfitrião; atualizem a página (Ctrl+F5) nos dois lados' }); try { conn.close(); } catch (e) {} return; } N.size = d.size; if (d.build && N.me.build && d.build !== N.me.build) fire('warn', { message: 'build diferente do anfitrião (' + d.build + ' × ' + N.me.build + '); se algo falhar, Ctrl+F5 nos dois lados' }); }
