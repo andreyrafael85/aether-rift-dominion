@@ -1203,6 +1203,132 @@ body:has(#pausebox:not([hidden])) #cmd-bar{visibility:hidden} /* a camada sozinh
 /* --- polimentos: o rótulo da Raça na tela inicial ganha uma placa escura (ficava ilegível sobre a coluna brilhante da Fenda) --- */
 #start .sc-kicker{justify-self:start;color:#ece6da;background:rgba(5,7,11,.8);padding:.3rem .62rem;border-radius:4px;box-shadow:0 0 0 1px rgba(255,255,255,.09)}
 #start .sc-name small{width:fit-content;background:rgba(5,7,11,.8);padding:.14em .5em .1em;border-radius:4px;box-shadow:0 0 0 1px rgba(255,255,255,.09)}
+/* ===== 5.5b: Desafio do Dia, código de desafio por link e cartões (src/desafio-ui.js e src/cartoes.js) ===== */
+.dd-entrada{display:grid;gap:.12rem;width:100%;box-sizing:border-box;margin:0;padding:.7rem 1rem .65rem;border:0;border-left:3px solid var(--rift1);text-align:left;font:inherit;color:var(--fg);cursor:pointer;background:linear-gradient(100deg,rgba(255,94,58,.24),rgba(193,60,245,.2) 58%,rgba(20,25,34,.55));border-bottom:1px solid rgba(255,255,255,.09)}
+.dd-entrada:hover{filter:brightness(1.14)}.dd-entrada:focus-visible{outline:2px solid #fff;outline-offset:-3px}
+.dd-e-rot{display:flex;justify-content:space-between;gap:.6rem;font:600 .68rem/1.3 var(--fm);letter-spacing:.14em;text-transform:uppercase;color:#FFB088}.dd-e-rot i{font-style:normal;letter-spacing:.06em;color:var(--fg2)}
+.dd-e-tit{font:800 1.5rem/1.05 var(--fd);text-transform:uppercase;letter-spacing:.02em;color:#fff}
+.dd-e-sub{font:500 .82rem/1.3 var(--fb);color:var(--fg)}
+.dd-e-pe{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.2rem .8rem;margin-top:.2rem;font:500 .7rem/1.3 var(--fm);letter-spacing:.04em;color:var(--fg2)}.dd-e-seq.ok{color:var(--good)}.dd-e-falta b{color:#fff;font-weight:500}
+.dd-atalhos{margin:.1rem 0 .15rem}.dd-atalhos .btn{flex:1 1 46%;min-width:0}
+#desafio.dd{z-index:60}#desafio .box{max-width:640px}#desafio h2:focus{outline:none}#desafio .btn.big{height:auto;line-height:1.05;white-space:normal}
+.dd-p{margin:0;line-height:1.45;color:var(--fg)}.dd-seu span{color:var(--fg2)}
+.dd-itens{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:5px}
+.dd-itens li{display:grid;gap:1px;padding:.42rem .6rem;background:rgba(255,255,255,.045);border-left:2px solid var(--race)}
+.dd-itens span,.dd-stats span,.dd-cod span,.dd-racas-rot,.fd-linha label{font:600 .64rem/1.3 var(--fm);letter-spacing:.12em;text-transform:uppercase;color:var(--fg2)}
+.dd-itens b{font:600 .95rem/1.25 var(--fb);color:#fff}.dd-itens small{font:400 .74rem/1.3 var(--fb);color:var(--fg2)}
+.dd-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.dd-stats>div{display:grid;gap:2px;align-content:start;padding:.5rem .6rem;background:rgba(0,0,0,.28);border:1px solid var(--hair)}
+.dd-stats b{font:700 1.3rem/1.1 var(--fd);letter-spacing:.02em;color:#fff}.dd-stats b.dd-rec{font:600 .86rem/1.3 var(--fb)}.dd-stats small{font:400 .7rem/1.2 var(--fb);color:var(--fg2)}#dd-falta{font-family:var(--fm);font-weight:500;font-size:1.15rem}
+.dd-racas{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.dd-raca{--rc:var(--race);display:grid;gap:1px;align-content:center;justify-items:center;min-height:50px;padding:.3rem .2rem;border:1px solid var(--line2);background:rgba(255,255,255,.04);color:var(--fg);font:inherit;cursor:pointer}
+.dd-raca[data-race=vehnar]{--rc:#FF7733}.dd-raca[data-race=erevane]{--rc:#33FFD0}.dd-raca[data-race=tessara]{--rc:#55E68A}.dd-raca[data-race=quorith]{--rc:#B388FF}.dd-raca[data-race=vorag]{--rc:#E6455A}
+.dd-raca b{font:700 .84rem/1.15 var(--fb);border-bottom:2px solid var(--rc);padding-bottom:1px}.dd-raca small{font:500 .62rem/1.2 var(--fm);color:var(--fg2)}
+.dd-raca.on{border-color:var(--rc);background:color-mix(in srgb,var(--rc) 26%,#141a24);color:#fff}.dd-raca.on b::before{content:'✓ ';color:var(--rc)}.dd-raca:focus-visible{outline:2px solid #fff;outline-offset:1px}
+.dd-saida{display:grid;gap:.5rem}.dd-cod{display:grid;gap:2px}.dd-cod b{font:500 1.55rem/1.15 var(--fm);letter-spacing:.06em;color:#fff;user-select:all;-webkit-user-select:all;overflow-wrap:anywhere}
+.dd-cod-ruim{margin:0;padding:.4rem .6rem;font:500 .85rem/1.3 var(--fm);color:var(--fg2);background:rgba(0,0,0,.3);overflow-wrap:anywhere}
+.dd-form{display:grid;grid-template-columns:1fr 1fr;gap:.6rem .7rem}#desafio .opt select{width:100%}.dd-seed{flex-wrap:nowrap}.dd-seed input{flex:1 1 auto;min-width:0}
+.dd-regras{display:grid;gap:.35rem}.dd-chk{display:flex;gap:.5rem;align-items:flex-start;font:400 .9rem/1.3 var(--fb);color:var(--fg);cursor:pointer}.dd-chk input{margin-top:.2rem;accent-color:var(--race)}.dd-chk small{display:block;font-size:.74rem;color:var(--fg2)}
+.dd-pronto{display:grid;gap:.5rem;padding:.65rem .75rem;border:1px solid color-mix(in srgb,var(--race) 60%,var(--line));background:rgba(0,0,0,.25)}.dd-pronto-t{font:800 1.25rem/1.1 var(--fd);text-transform:uppercase;letter-spacing:.02em;color:#fff}
+.dd-tenho{padding-top:.2rem}
+.fim-desafio{box-sizing:border-box;display:grid;gap:.35rem;max-width:760px;width:100%;text-align:left;background:rgba(9,12,17,.78);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:.4rem .6rem .45rem}.fim-desafio[hidden],#fim-extras[hidden]{display:none}#fim-extras{justify-content:center;max-width:760px}
+.fd-topo{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem .5rem}.fd-st{padding:.1rem .45rem;font:500 .7rem/1.5 var(--fm);letter-spacing:.03em;color:#fff;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05)}
+.dd-vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}#end.fim-com-desafio #fim-prox{display:none}@media (max-height:820px){.fd-prox{display:none}}
+.fd-linha{display:grid;gap:.3rem}.fd-linha .row{flex-wrap:nowrap}.fd-linha .row .btn{white-space:nowrap;font-size:.95rem;min-height:38px;padding:.35rem .8rem}.fd-linha input{flex:1 1 auto;min-width:0;min-height:38px;box-sizing:border-box;padding:.45rem .6rem;font:500 .8rem/1.3 var(--fm);color:var(--fg);background:rgba(0,0,0,.4);border:1px solid var(--line2)}.fd-linha input:focus{outline:2px solid var(--race);outline-offset:-1px}
+#fd-nota:empty{display:none}#fd-nota{color:var(--good)}#fd-nota.falhou,#dd-nota.falhou{color:var(--warn)}.fd-botoes .btn{flex:0 1 auto}
+.cartao-fmt{display:flex;gap:4px}.cartao-fmt .btn{flex:1 1 50%;min-width:0;font-size:.85rem}.cartao-fmt .btn.on{color:#fff;box-shadow:inset 0 -3px 0 var(--race)}
+#cartao[data-fmt=pe] #cartao-img{width:auto;max-width:100%;max-height:58vh;margin:0 auto}#cartao.fazendo #cartao-img{opacity:.45}
+#camp-ach .ach[data-dd-conq]{cursor:pointer}#camp-ach .ach[data-dd-conq]:hover{filter:brightness(1.2)}#camp-ach .ach[data-dd-conq]:focus-visible{outline:2px solid var(--race);outline-offset:1px}
+@media (max-width:560px){.dd-form{grid-template-columns:1fr}.dd-stats{grid-template-columns:1fr}.dd-stats>div{padding:.35rem .6rem}.dd-itens{grid-template-columns:repeat(auto-fit,minmax(132px,1fr))}.dd-itens li{padding:.32rem .5rem}#desafio .btn.big{font-size:1.25rem;min-height:52px}.dd-racas{grid-template-columns:repeat(3,1fr)}.dd-e-tit{font-size:1.3rem}.fd-linha .row{flex-wrap:wrap}.fd-linha .row input{flex:1 1 100%}.fd-linha .row .btn{flex:1 1 40%}.dd-cod b{font-size:1.25rem}}
+/* ===== 5.5b: HUD de moldura fina (agente m-hud; src/hudfino.js). Vale com body.hudfino (padrão); a opção "Painel completo" tira a classe e nada abaixo se aplica.
+   A primeira partida guiada (body.guia) nunca leva a classe. Nenhuma regra antiga foi apagada nem reformatada. ===== */
+#btn-sis,#btn-mapa,#sis-menu[hidden]{display:none}
+/* --- barra de cima: sem a faixa escura de ponta a ponta; cada mostrador com o seu fundo --- */
+body.hudfino #top{background:none;box-shadow:none;pointer-events:none;padding-bottom:calc(4px*var(--k))}
+body.hudfino #top>*{pointer-events:auto}
+body.hudfino #top .tmod:not(.speed):not(.sys){background:linear-gradient(180deg,rgba(9,12,17,.9),rgba(9,12,17,.8)) 1px 1px/calc(100% - 2px) calc(100% - 2px) no-repeat,linear-gradient(180deg,rgba(255,255,255,.16),color-mix(in srgb,var(--race) 40%,transparent))}
+body.hudfino:not(.touch) #top .tmod{padding:calc(3px*var(--k)) calc(4px*var(--k))}
+body.hudfino:not(.touch) #top .tmod::before{display:none}
+body.hudfino:not(.touch) #top :is(.speed,.sys){background:none;clip-path:none;padding-left:0;padding-right:0}
+body.hudfino:not(.touch) .rpill{min-width:calc(98px*var(--k));height:calc(32px*var(--k))}
+body.hudfino:not(.touch) .rpill small{font-size:calc(9px*var(--k))}
+body.hudfino:not(.touch) .energy{min-width:calc(156px*var(--k))}
+body.hudfino:not(.touch) .tchip,body.hudfino:not(.touch) .speed button,body.hudfino:not(.touch) #top .tb{height:calc(32px*var(--k))}
+body.hudfino:not(.touch) #top #btn-diplo .tbl{display:none}
+/* --- os nove botões de sistema num só: #btn-sis abre o menu #sis-menu (os mesmos botões, mudados de lugar pelo hudfino.js) --- */
+body.hudfino #btn-sis:not([hidden]){display:inline-flex}
+#sis-menu{position:absolute;right:calc(10px*var(--k));top:calc(env(safe-area-inset-top,0px) + var(--tbh,46px) + 2px);z-index:4;display:grid;gap:calc(3px*var(--k));padding:calc(6px*var(--k));min-width:calc(200px*var(--k));background:linear-gradient(180deg,rgba(18,23,31,.98),rgba(10,13,18,.98));box-shadow:0 0 0 1px color-mix(in srgb,var(--race) 45%,rgba(255,255,255,.14)),0 10px 30px rgba(0,0,0,.5)}
+#sis-menu .tb{justify-content:flex-start;width:100%;height:auto;min-height:calc(38px*var(--k));gap:calc(9px*var(--k));padding:0 calc(10px*var(--k))}
+#sis-menu .tbl{display:inline;font:600 calc(12.5px*var(--k))/1 var(--fb)}
+#sis-menu .tb[data-k]:not(.attn)::after{content:attr(data-k);margin-left:auto;padding-left:calc(12px*var(--k));font:500 calc(10px*var(--k))/1 var(--fm);color:var(--fg3)}
+#sis-menu .tb.on[data-k]:not(.attn)::after{color:inherit;opacity:.7}
+/* --- caixa de conselhos (e a novidade da partida) mais baixa no computador: os botões ficam ao lado do texto --- */
+body.hudfino:not(.touch) #hints.advon{width:min(calc(680px*var(--k)),calc(100vw - 460px*var(--k)));padding-top:.4rem;padding-bottom:.42rem}
+body.hudfino:not(.touch) #hints .hint.adv{grid-template-columns:minmax(0,1fr) auto;column-gap:calc(14px*var(--k));row-gap:calc(3px*var(--k));align-items:center}
+body.hudfino:not(.touch) #hints .hint.adv>.adv-b{grid-column:2;grid-row:1 / span 2;flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:calc(4px*var(--k))}
+body.hudfino:not(.touch) #hints .adv-b .act.sm{min-height:calc(28px*var(--k));white-space:nowrap;justify-content:center}
+/* --- retrato do líder: aparece quando ele fala e some sozinho --- */
+body.hudfino #leader:not(.fino-fala){display:none} /* fora da tela de verdade: o busto 3D do líder para de desenhar enquanto não aparece */
+body.hudfino #leader.fino-fala{animation:finoLider .35s ease}
+@keyframes finoLider{0%{opacity:0}100%{opacity:1}}
+/* --- mapa pequeno: menor, com o botão de ampliar no canto --- */
+body.hudfino #btn-mapa{display:grid;place-items:center;position:absolute;left:calc(-7px*var(--k));bottom:calc(-7px*var(--k));width:calc(34px*var(--k));height:calc(34px*var(--k));z-index:2;color:var(--fg);pointer-events:auto}
+#btn-mapa svg{width:calc(26px*var(--k));height:calc(26px*var(--k));padding:calc(6px*var(--k));border-radius:50%;background:rgba(10,13,19,.94);box-shadow:0 0 0 1px color-mix(in srgb,var(--race) 60%,transparent)}
+#btn-mapa:hover svg{filter:brightness(1.3)}#btn-mapa:focus-visible{outline:0}#btn-mapa:focus-visible svg{box-shadow:0 0 0 2px #fff}
+body.hudfino.touch #btn-mapa{width:44px;height:44px;left:-12px;bottom:-12px}body.hudfino.touch #btn-mapa svg{width:28px;height:28px;padding:6px}
+body.hudfino:not(.touch):not(.fino-mapa) #right{width:calc(150px*var(--k))}
+body.hudfino:not(.touch):not(.fino-mapa) .radar{width:calc(150px*var(--k));height:calc(150px*var(--k))}
+body.hudfino:not(.touch):not(.fino-mapa) #minimap{width:calc(130px*var(--k));height:calc(130px*var(--k))}
+body.hudfino:not(.touch):not(.fino-mapa) .radar::after{inset:calc(9px*var(--k))}body.hudfino:not(.touch):not(.fino-mapa) .radar::before{inset:calc(4px*var(--k))}
+body.hudfino.touch.fino-mapa #hud{--rcw:calc(172px*var(--uim,1))}body.hudfino.touch.fino-mapa #minimap{width:calc(152px*var(--uim,1));height:calc(152px*var(--uim,1))}
+/* --- ao lado do mapa: Sobrecarga e Superarma compactos (custo e recarga na dica), e os botões Alertas e Tropas --- */
+body.hudfino:not(.touch) .quick{grid-template-columns:1fr 1fr;gap:calc(4px*var(--k));width:100%}
+body.hudfino:not(.touch) .qb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:calc(4px*var(--k)) 2px calc(3px*var(--k));text-align:center;min-height:calc(46px*var(--k))}
+body.hudfino:not(.touch) .qb::before{flex:none;width:calc(22px*var(--k));height:calc(22px*var(--k))}
+body.hudfino:not(.touch) .qb::after{left:50%;top:calc(7px*var(--k));margin:0 0 0 calc(-8px*var(--k));width:calc(16px*var(--k));height:calc(16px*var(--k))}
+body.hudfino:not(.touch) .qb .n{font-size:calc(9.5px*var(--k));line-height:1.05;font-weight:600}
+body.hudfino:not(.touch) .qb .sub{display:none}
+body.hudfino:not(.touch) .h3q{display:grid;grid-template-columns:1fr 1fr;gap:calc(4px*var(--k));width:100%}
+body.hudfino:not(.touch) .qb2{min-height:calc(44px*var(--k));cursor:pointer}body.hudfino:not(.touch) .qb2:hover{filter:brightness(1.2)}
+/* --- exército e central de alertas: abrem pelos botões; um alerta novo aparece sozinho, pequeno, por alguns segundos --- */
+body.hudfino:not(.touch) #army,body.hudfino:not(.touch) #alertc{display:none}
+body.hudfino.sh-army:not(.touch) #army,body.hudfino.sh-alc:not(.touch) #alertc{display:flex}
+body.hudfino:not(.touch) .h3x{display:block;cursor:pointer}
+body.hudfino.fino-alerta:not(.touch):not(.sh-alc) #alertc{display:flex;min-height:0;padding:calc(4px*var(--k)) calc(5px*var(--k))}
+body.hudfino.fino-alerta:not(.touch):not(.sh-alc) #alertc>:is(.h3h,.afl){display:none}
+body.hudfino.fino-alerta:not(.touch):not(.sh-alc) #alertc .alist>:nth-child(n+4){display:none}
+/* --- painel Construir recolhido numa plaqueta enquanto nada está selecionado (computador) --- */
+body.hudfino.fino-vazio #panel{width:auto;flex-direction:row;align-items:center;padding:calc(5px*var(--k)) calc(10px*var(--k));gap:calc(10px*var(--k));cursor:pointer}
+body.hudfino.fino-vazio #panel>:not(.ph):not(.btabs){display:none}
+body.hudfino.fino-vazio #panel>.btabs{display:flex;gap:calc(3px*var(--k))}
+body.hudfino.fino-vazio #panel>.btabs .btab{min-height:calc(30px*var(--k));padding:0 calc(7px*var(--k));white-space:nowrap}
+body.hudfino.fino-vazio #panel>.btabs .btab .bn{display:none}
+body.hudfino.fino-vazio #panel>.btabs .btab.on{color:var(--fg2);background:linear-gradient(180deg,#232b38,#161c25) 1px 1px/calc(100% - 2px) calc(100% - 2px) no-repeat,linear-gradient(165deg,rgba(255,255,255,.22),rgba(255,255,255,.06))}
+body.hudfino.fino-vazio #panel>.btabs .btab:hover,body.hudfino.fino-vazio #panel>.ph:hover{filter:brightness(1.3)}
+@media (max-width:1100px){body.hudfino.fino-vazio #panel>.btabs .btab span{display:none}}
+body.hudfino.fino-vazio #panel>.ph{border-bottom:0;padding:0;min-height:calc(30px*var(--k))}
+body.hudfino.fino-vazio #panel>.ph .ph-k{display:none}
+body.hudfino.fino-vazio #panel>.ph::after{content:"B";margin-left:calc(10px*var(--k));padding:calc(3px*var(--k)) calc(7px*var(--k));font:600 calc(11px*var(--k))/1 var(--fm);color:var(--fg2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+body.hudfino:not(.touch):not(.fino-vazio) #panel>.ph:first-child{cursor:pointer}
+/* --- celular: a gaveta fechada do Construir fica só com o título e a seta (as abas aparecem ao abrir); o aviso de coletores parados com 44 px de altura; e só um espaço vazio de grupo (os grupos gravados continuam todos) --- */
+body.hudfino.touch #panel.collapsed>.btabs{display:none}
+body.hudfino.touch #panel.collapsed>.ph{flex:1}
+body.hudfino.touch #top #idle-col{height:44px}
+body.hudfino.touch .gbtn.empty~.gbtn.empty{display:none}
+/* --- a opção nos Ajustes --- */
+.fino-cfg{margin-top:.5rem}.fino-cfg .small{margin-top:.2rem}
+/* --- 5.5b: a tela "O que este jogo conta" (src/medir.js) e o aviso de cosmético liberado na tela final (src/cosmeticos.js) --- */
+.medir-box{width:min(560px,94vw);max-height:92vh;overflow:auto;display:grid;gap:.6rem}
+.medir-lista{max-height:36vh;overflow:auto;box-shadow:inset 0 0 0 1px var(--hair)}
+.medir-lista table{width:100%;border-collapse:collapse;font-size:.85rem}
+.medir-lista th,.medir-lista td{padding:.3rem .6rem;text-align:left;border-bottom:1px solid var(--hair)}
+.medir-lista th{position:sticky;top:0;background:#141a23;font:600 .7rem/1 var(--fm);letter-spacing:.1em;text-transform:uppercase;color:var(--fg2)}
+.medir-lista td:last-child,.medir-lista th:last-child{text-align:right;font-family:var(--fm);font-variant-numeric:tabular-nums}
+.medir-lista tr.zero td{color:var(--fg3)}
+#medir-lote{margin:.4rem 0 0;padding:.5rem;max-height:9rem;overflow:auto;font:500 .75rem/1.3 var(--fm);background:rgba(0,0,0,.35);white-space:pre-wrap}
+.medir-envio{color:var(--good)}.medir-cfg{margin-top:.5rem}
+#end.tem-degrau #fim-prox{display:none} /* 5.5b: o botão "Próximo passo: …" do degrau toma o lugar da frase genérica */
+.fim-cosm{margin:.3rem 0 0;font:600 .9rem/1.3 var(--fb);color:#ffd27a;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+body.hudfino.touch #panel.collapsed .dtog{right:12px;top:5px}
 </style>
 
 
@@ -1223,7 +1349,7 @@ body:has(#pausebox:not([hidden])) #cmd-bar{visibility:hidden} /* a camada sozinh
   <div class="start-wrap">
     <header class="st-head">
       <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div class="brand-txt"><h1 data-i18n="inicio.aether-rift-dominion">Aether Rift<span>Dominion</span></h1><p class="tagline" data-i18n="inicio.nada-aqui-seu-ainda">Nada aqui é seu. Ainda.</p></div></div>
-      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.5a · build __BUILD__ · Portas Abertas · Mundo vivo · multiplayer 2 a 4</div>
+      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.5b · build __BUILD__ · Portas Abertas · Mundo vivo · multiplayer 2 a 4</div>
       <div class="opt st-lang" data-idioma-sel="idioma-inicio"></div><!-- 5.0c: seletor de idioma, legível em qualquer idioma -->
     </header>
     <div class="start-grid">
@@ -1290,8 +1416,9 @@ body:has(#pausebox:not([hidden])) #cmd-bar{visibility:hidden} /* a camada sozinh
       </div>
       <div class="notes">
       <div class="choose" data-i18n="notas.notas-versao">Notas da versão</div>
+      <p class="start-notes" data-i18n="notas.5-5b"><b>5.5b — Compartilhar:</b> chegou o <b>Desafio do Dia</b>: uma partida curta por dia, igual para todo mundo, com recorde e sequência de dias guardados no aparelho. Você também pode <b>montar um desafio</b> e mandar por link, ou desafiar um amigo a repetir a partida que acabou de jogar. Os <b>cartões</b> de resultado e de conquista saem em dois tamanhos, deitado e em pé. O <b>painel da partida ficou fino</b>: ele ocupa bem menos tela e cresce só quando há o que mostrar (em Ajustes, "Painel completo na partida" volta ao de antes). Nas cinco primeiras partidas o jogo apresenta <b>uma novidade por vez</b>. Os itens do Hangar com cadeado agora são <b>liberados pelas conquistas</b>. No celular, tocar numa construção não seleciona mais o Coletor que passa perto. Em Ajustes, "O que este jogo conta" mostra as contagens de uso guardadas só no seu aparelho; nada é enviado.</p>
+      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.5a → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-5a"><b>5.5a — Porta de entrada:</b> quem chega agora tem uma <b>primeira partida guiada</b>, com um objetivo por vez e o painel aparecendo aos poucos. Chegou o modo <b>Blitz</b>: 1 contra 1, bases mais perto e relógio de 10 minutos. A <b>tela final</b> é nova, com o gráfico da virada e o botão Compartilhar, que gera um cartão com o resultado. A sala multiplayer ganhou um <b>link de convite</b> que já entra na sala. O mundo recebeu a <b>Luz da Fenda</b>: sol baixo e quente, sombras longas. Cada unidade tem um arco fino na cor do dono, o inimigo se reconhece também pela forma, o chão em volta da base ganha a cor da sua Raça e a promoção aparece como estrela na barra de vida. <b>Balanceamento:</b> Soldador com dano 16 (era 20), Cria e Cuspidor mais caros, Quimera com mais vida e o Atirador de Fenda da Erevane liberado na Era I. O Hangar lista os <b>cosméticos</b> e como ganhar cada um; nada está à venda. No Motor 5 o jogo envia metade dos dados por quadro à placa de vídeo.</p>
-      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.0h.5 → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-0h-5"><b>5.0h.5 — Chefões 3.0:</b> os três chefões deixaram de ser máquinas e viraram criaturas da Fenda, com nomes novos. O Arauto agora é <b>A Medusa da Fenda</b>, a Forja-Mãe é <b>O Titã-Fornalha</b> e a Sentinela da Fenda é <b>A Sentinela Devoradora</b>, que ficou bem maior na tela. Antes de cada golpe o corpo avisa: o Titã escancara a mandíbula, a Devoradora abre as presas e a Medusa contrai o sino. Na Linha de montagem o dorso do Titã se abre e os pontos fracos âmbar aparecem. Os pilares, os Ecos e os lacaios da Fenda ganharam o visual da mesma família. As regras das lutas, a vida e o dano dos chefões não mudaram.</p>
       <p class="start-notes" data-i18n="notas.5-0h-4"><b>5.0h.4 — Desempenho no Motor 5:</b> a travada da primeira vez que um lago aparecia na tela acabou. Tudo o que o reflexo dos lagos precisa agora é preparado no carregamento, e no nosso teste nada mais é criado na placa de vídeo no meio da partida. Os retratos das unidades no painel do exército são gerados um por vez, e o jogo cria um pouco menos de lixo de memória por quadro. O Teste de desempenho agora mostra, em cada travada, quanto tempo foi para sombras, reflexo dos lagos, cena e efeitos. A imagem e a simulação continuam as mesmas.</p>
       <p class="start-notes" data-i18n="notas.5-0h-3"><b>5.0h.3 — Desempenho:</b> menos travadas no meio das batalhas. No Chrome, o jogo cria cerca de 20% menos lixo de memória por segundo, então o navegador para menos vezes para limpar. No <b>Motor 5</b>, a morte de um veículo e a câmera passando por um lago não criam mais recursos novos na placa de vídeo na hora: o jogo os prepara antes. O Teste de desempenho agora diz, em cada travada, o que havia naquele quadro (os eventos e o que nasceu na placa de vídeo). A imagem e a simulação continuam as mesmas.</p>

@@ -30,7 +30,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.5a';
+const VERSION = '5.5b';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -238,6 +238,8 @@ function initStart() {
   $('btn-help-start').addEventListener('click', () => toggleHelp(true));
   if (ARD.modosUI) { try { ARD.modosUI.montar({ showTab, lobby: () => lobby, startGame: c => { if (lobby) { showTab('multi', true); return; } startGame(c); }, cfgBase: () => ({ name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante'), faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar', seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }) }); } catch (e) { console.warn('[ARD] modos:', e); } } /* 5.0g: aba Caçada, regras da Fenda e modo da sala */
   if (ARD.guia) { try { ARD.guia.inicio({ params, ocupado: () => !!lobby || !!window.__rejoining || document.body.classList.contains('ingame'), startGame: c => { if (lobby) { showTab('multi', true); return; } startGame(c); }, cfgBase: () => { const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar'; return { name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante'), faction, color: ARD.campUI ? ARD.campUI.colorFor(faction) || undefined : undefined, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: 'auto' }; } }); } catch (e) { console.warn('[ARD] primeira partida:', e); } } /* 5.5a: cartão de boas-vindas da primeira visita e o botão Primeira partida */
+  if (ARD.desafioUI) { try { ARD.desafioUI.inicio({ params, ocupado: () => !!lobby || !!window.__rejoining || document.body.classList.contains('ingame'), startGame: c => { if (lobby) { showTab('multi', true); return; } startGame(c); }, cfgBase: () => ({ name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante'), faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar', gfx: params.get('r') === '2d' ? '2d' : $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }) }); } catch (e) { console.warn('[ARD] desafio:', e); } } /* 5.5b: Desafio do Dia, montar desafio e o link ?desafio=CÓDIGO (src/desafio-ui.js) */
+  if (ARD.degraus) { try { ARD.degraus.inicio({ params, ocupado: () => !!lobby || !!window.__rejoining || document.body.classList.contains('ingame'), startGame: c => { if (lobby) { showTab('multi', true); return; } startGame(c); }, cfgBase: () => ({ name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante'), faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar', seed: parseInt($('opt-seed').value, 10) || 1, gfx: $('opt-gfx').value, quality: $('opt-quality').value, clima: $('opt-clima').value }) }); } catch (e) { console.warn('[ARD] degraus:', e); } } /* 5.5b: degraus de descoberta — botão do próximo passo na aba Jogar e ?degrau=N */
   { const sala = (params.get('sala') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6); if (sala.length >= 4 && !params.get('autostart') && !params.get('bench') && !window.__rejoining) { showTab('multi', false); $('opt-code').value = sala; mpStatus(Tx('multi.convite.entrando', { codigo: sala })); setTimeout(() => { if (!lobby && !G) joinRoom(sala); }, 60); } } /* 5.5a: quem recebe o link cai direto na sala */
   { const bb = $('btn-bench'); if (bb) { const show = () => { const b = benchLoad(); $('bench-last').textContent = b ? Tx('desempenho.ultimo', { fps: b.fps, p1: b.p1, q: TRx(b.quality), data: new Date(b.at).toLocaleDateString(ARD.i18n.locale()) }) : Tx('desempenho.nenhum'); }; show(); window.addEventListener('ard-idioma', show); /* 5.0c */
     bb.addEventListener('click', () => { if (lobby || window.__rejoining) { showTab('multi', true); mpStatus(Tx(lobby ? 'desempenho.sair-sala' : 'desempenho.aguarde-volta')); return; } /* 5.0c */ startGame({ name: 'Teste', faction: (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar', opp: '1', diff: 'normal', seed: 4242, gfx: '3d', quality: $('opt-quality').value, clima: 'auto', bench: true }); }); } }
@@ -256,7 +258,7 @@ const mpSession = {
   clear() { try { localStorage.removeItem(this.KEY); } catch (e) {} },
 };
 // 4.2g — volta à tela inicial sem os parâmetros de lançamento (?missao&iniciar=1 dos botões do fim de missão, ?autostart, ?bench): um reload os relançaria
-function goStart() { const q = new URLSearchParams(location.search); for (const k of ['missao', 'dif', 'raca', 'iniciar', 'campanha', 'autostart', 'bench', 'retomar', 'guia', 'blitz', 'sala' /* 5.5a: nem a partida guiada, nem o Blitz de teste, nem o convite já usado */]) q.delete(k); const s = q.toString(); location.replace(location.pathname + (s ? '?' + s : '')); }
+function goStart() { const q = new URLSearchParams(location.search); for (const k of ['missao', 'dif', 'raca', 'iniciar', 'campanha', 'autostart', 'bench', 'retomar', 'guia', 'blitz', 'sala' /* 5.5a: nem a partida guiada, nem o Blitz de teste, nem o convite já usado */, 'desafio', 'jogar' /* 5.5b: nem o link de desafio já aberto */]) q.delete(k); const s = q.toString(); location.replace(location.pathname + (s ? '?' + s : '')); }
 const within = (p, ms) => Promise.race([p, new Promise(r => setTimeout(r, ms))]); // 4.2g: sair nunca fica preso esperando o armazenamento
 // 4.3k — tela de carregamento: Raça e líder do jogador, mapa (ou missão) e uma dica; a interface passa a ter a cor da Raça de quem joga
 const LOAD_TIPS = [['Energia abaixo de 100% deixa produção, sensores e defesas mais lentos: construa Reatores antes de precisar.'], ['Coletores colhem sozinhos no seu território; com o botão direito, mande-os a outro campo.'], ['Um Nódulo de Avanço amplia o território e libera novos nós para os coletores.'],
@@ -404,6 +406,8 @@ function startGame(cfg, netCtx) {
   window.addEventListener('ard-idioma', () => { if (!G || G.sim !== sim) return; try { G.selKey = ''; G.hintsHtml = ''; refreshPanel(true); refreshQuick(); refreshHints(); if (!$('diplo').hidden) openDiplo(); $('leader-sub').textContent = '● ' + Tx('hud.em-chamada', { raca: DN.racaCurto(sim.players[human].faction) }); } catch (e) { console.warn('[ARD] idioma na partida:', e); } }); /* 5.0c: o HUD se refaz no idioma novo (a barra de cima se reescreve sozinha no próximo quadro) */
   try { G.h3 = ARD.hud3 ? ARD.hud3.mount({ G, sim, human, view, I, R, ui, notice, leaderArt, LEADER_NAME, RACE_COLORS }) : null; } catch (e) { G.h3 = null; console.warn('[ARD] Interface 3.0 indisponível:', e); } /* 5.0b: roda de comandos, grupos, central de alertas, visão do exército, pesquisa e acessibilidade (src/ui-hud3.js) */
   try { if (ARD.iaUI) ARD.iaUI.mount({ G, sim, human, view, I, R, notice, LEADER_NAME }); } catch (e) { console.warn('[ARD] IA aliada indisponível:', e); } /* 5.0h */
+  try { if (ARD.hudFino) ARD.hudFino.partida({ G, sim, human, view, I, ui }); } catch (e) { console.warn('[ARD] HUD fino:', e); } /* 5.5b: HUD de moldura fina (src/hudfino.js): menu de sistema, Construir recolhido, mapa menor */
+  try { if (ARD.medir && !cfg.resume) ARD.medir.partida(cfg, !!netCtx, !R.is3d ? '2d' : R.m5 ? 'm5' : 'classico'); } catch (e) { console.warn('[ARD] medição:', e); } /* 5.5b: contagem de uso, só neste aparelho e sem identificar ninguém (src/medir.js; o envio está desligado) */
   { const tb = $('top'); const fit = () => { const x = Math.max(0, tb.offsetHeight - 46); document.documentElement.style.setProperty('--tbx', document.body.classList.contains('touch') ? '0px' : x + 'px'); document.documentElement.style.setProperty('--tbh', tb.offsetHeight + 'px'); /* 4.3k: altura real da barra (no celular ela quebra em 2 ou 3 linhas) */ }; fit(); if (window.ResizeObserver) new ResizeObserver(fit).observe(tb); else addEventListener('resize', fit); } // 4.2g
   $('loading').hidden = false;
   R.humanId = human;
@@ -426,6 +430,7 @@ function startGame(cfg, netCtx) {
     if (params.get('zoom')) view.cam.zoom = parseFloat(params.get('zoom'));
     if (params.get('pitch')) view.cam.pitch = view.cam.pitchT = parseFloat(params.get('pitch'));
     if (params.get('yaw')) view.cam.yaw = parseFloat(params.get('yaw'));
+    try { if (ARD.degraus) ARD.degraus.partida({ G, sim, human, cfg, rede: !!netCtx, advise, openDiplo, openBuild }); } catch (e) { console.warn('[ARD] degraus:', e); } /* 5.5b: a novidade da partida em uma frase, na caixa de conselhos (src/degraus.js) */
     refreshPanel(true); G.last = performance.now();
     proximo(frame); /* 5.0b.1: era requestAnimationFrame(frame) */
   });
@@ -707,7 +712,7 @@ function startGame(cfg, netCtx) {
       if (e.upT > 0) { const md = S.BUILDINGS[e.def].module; const ub = q1('[data-upbar] i'), ut = q1('[data-uptxt]'); if (md && ub) setW(ub, 100 * (1 - e.upT / md.time)); if (ut) setT(ut, Math.ceil(e.upT) + ' s'); } } } // 4.1d: evolução e módulo também andam no lugar
   // ---------- 4.3l: painel de baixo com cabeçalho fixo e lista rolável; no toque, gaveta (alça, toque, deslizar; recolhe ao posicionar) ----------
   function refreshPanel(force) { const g0 = G.pGen; refreshPanelRaw(force); if (G.pGen !== g0) drawerize(); }
-  function panelKind() { return !view.sel.size || I.buildMenu ? 'build' : 'sel'; }
+  function panelKind() { return !view.sel.size || I.buildMenu ? 'build' : ARD.hudFino && ARD.hudFino.soTropas(view, sim, human) ? 'tropas' /* 5.5b: no celular com o painel fino, a ficha de um grupo de tropas tem gaveta própria, que começa fechada */ : 'sel'; }
   function drawerClosed() { return !!(G.isTouch && (G.drawerAuto || (G.drawer && G.drawer[panelKind()]))); }
   function drawerize() { /* só quando o painel é remontado (evento ou mudança de estrutura), nunca a cada quadro */
     const panel = $('panel'); const kids = [...panel.children]; if (!kids.length) return;
@@ -881,6 +886,7 @@ function startGame(cfg, netCtx) {
     setOn($('btn-build'), 'on', I.buildMenu || I.mode === 'build' || (G.isTouch && !view.sel.size && !(G.drawer && G.drawer.build))); /* 4.3l: no toque, aceso com a gaveta do Construir aberta */
     setOn($('btn-attack'), 'on', I.mode === 'attackmove');
     setOn($('btn-box'), 'on', I.touchBox);
+    if (ARD.hudFino) ARD.hudFino.estado(); /* 5.5b: o Construir recolhido enquanto nada está selecionado */
   }
   function bindHUD() {
     document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => { if (net) { notice(Tx('hud.vel-mp')); return; } /* 5.0c */ G.speed = parseFloat(b.dataset.speed); G.paused = false; refreshTop(); }));
@@ -1056,6 +1062,7 @@ function startGame(cfg, netCtx) {
   // ---------- end ----------
   function endGame(result) {
     if (G.ended) return; G.ended = true; if (ARD.vozes) try { ARD.vozes.fim(result.campaign ? !!result.campaign.won : result.guia ? !!result.guia.won /* 5.5a */ : result.outcome === 'victory' || (result.outcome === 'over' && result.winner === human)); } catch (e) {} /* 5.0c.1: Vitória/Derrota e a reação do líder */ if (G.autoSave && ARD.saves) ARD.saves.del('auto').catch(() => {}); /* 5.0g.1: era esta, no fim da partida, a promise solta do iPhone ("armazenamento demorou") */ if (net) mpSession.clear(); // partida terminada não volta
+    { const guiaVenceu = !!(result.guia && result.guia.won); /* lido já: a variável result é trocada mais abaixo */ setTimeout(() => { try { if (ARD.medir) { ARD.medir.fim(G.cfg, !!net); if (guiaVenceu) ARD.medir.conta('guia.concluida'); } if (ARD.cosmeticos && ARD.cosmeticos.confere) ARD.cosmeticos.avisoFim(ARD.cosmeticos.confere()); if (ARD.degraus) ARD.degraus.fim({ cfg: G.cfg, rede: !!net, sim, human }); } catch (e) { console.warn('[ARD] 5.5b (fim):', e); } }, 0); } /* 5.5b: depois que a tela final está montada — contagem, aviso de cosmético liberado e o botão "Próximo passo" */
     const fimTela = o => { if (!ARD.fim) return; const pq = sim.players[human]; ARD.fim.mostrar(Object.assign({ G, sim, human, result, tempo: sim.time, lider: { nome: LEADER_NAME[pq.faction] || '', art: leaderArt(pq.faction, result.outcome === 'victory' ? 3 : 2) }, cores: RACE_COLORS, sair: () => { G.leaving = true; goStart(); } }, o)); }; /* 5.5a: a palavra grande, os três números, o gráfico com a virada e o Compartilhar (src/fim.js) */
     if (result.guia) { /* 5.5a: fim da primeira partida guiada */
       const r = result.guia; const scores = sim.players.map(q => ({ id: q.id, name: q.name, score: q.alive ? S.score(sim, q) : 0, alive: q.alive })); result = { outcome: r.won ? 'victory' : 'defeat', reason: r.reason, scores };

@@ -40,7 +40,21 @@ function serve(it, raca) { return !!it && (it.raca == null || raca == null || it
 /* o jogador tem o item? grátis: sempre; conquista: a conquista da campanha ou o nível do Comandante; apoiador: ninguém ainda (Etapa 0) */
 function tem(id, prog) { const it = porId(id); if (!it || it.pronto === false) return false; if (it.ganha === 'gratis') return true; if (it.ganha !== 'conquista') return false;
   let s = prog; if (!s) { try { s = P().load(); } catch (e) { s = null; } } if (!s) return false;
+  if (s.cosm && s.cosm[it.id]) return true; /* 5.5b: já liberado de verdade (registro no ProgressStore): fica do jogador */
+  return cumpre(it, s); }
+/* 5.5b: a condição do item de conquista vale agora? (a conquista da campanha ou o nível do Comandante) */
+function cumpre(it, s) { if (!it || it.ganha !== 'conquista' || it.pronto === false || !s) return false;
   if (it.conquista) return !!(s.achievements && s.achievements[it.conquista]); if (it.nivel) return ((s.commander && s.commander.level) || 1) >= it.nivel; return false; }
+/* 5.5b: libera de verdade o que a conquista já pagou: grava cada item novo no ProgressStore (cosm: { id: quando }) e devolve a lista dos que
+   entraram agora, para o aviso da tela final. Chamado ao abrir o jogo (em silêncio: o que o jogador já tinha não vira aviso) e no fim de cada partida.
+   Só progresso e interface: não toca na simulação. */
+function confere() { const out = []; let s = null; try { s = P().load(); } catch (e) { return out; } if (!s || !P().cosmLibera) return out;
+  for (const it of CATALOGO) if (it.ganha === 'conquista' && !(s.cosm && s.cosm[it.id]) && cumpre(it, s) && P().cosmLibera(it.id)) out.push(it); return out; }
+/* 5.5b: o aviso discreto da tela final: uma linha "Novo no Hangar: …" logo acima dos botões (elemento próprio, criado aqui; some se não há item novo) */
+function avisoFim(itens) { if (typeof document === 'undefined') return null; let el = document.getElementById('fim-cosm'); const linha = document.querySelector('#end .fim-botoes');
+  if (!itens || !itens.length) { if (el) el.hidden = true; return null; } if (!el) { el = document.createElement('p'); el.id = 'fim-cosm'; el.className = 'fim-cosm'; el.setAttribute('role', 'status'); if (linha && linha.parentElement) linha.parentElement.insertBefore(el, linha); else return null; }
+  el.__itens = itens; el.textContent = '✦ ' + T('cosm.fim.novo', { itens: itens.map(nome).join(' · ') }, 'Novo no Hangar: {itens}'); el.hidden = false; return el; }
+if (typeof window !== 'undefined') window.addEventListener('ard-idioma', () => { const el = document.getElementById('fim-cosm'); if (el && !el.hidden && el.__itens) avisoFim(el.__itens); });
 function nome(it) { return it ? T('cosm.item.' + it.id, null, it.nome) : ''; }
 function nomeTipo(t) { return T('cosm.tipo.' + t, null, t); }
 /* como se ganha, em texto (nunca um preço) */
@@ -87,5 +101,6 @@ function montar() { if (typeof document === 'undefined') return; const hg = docu
   hg.addEventListener('change', e => { if (e.target && e.target.id === 'hg-race') setTimeout(hangar, 0); }); hg.addEventListener('click', e => { if (e.target && e.target.closest && e.target.closest('#hg-skins')) setTimeout(hangar, 0); });
   if (typeof window !== 'undefined') window.addEventListener('ard-idioma', () => { if (!hg.hidden) hangar(); }); }
 if (typeof document !== 'undefined') { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montar); else montar(); }
-ARD.cosmeticos = { hangar, montar, TIPOS, GANHA, CATALOGO, PADRAO, MAX, porId, serve, tem, nome, nomeTipo, comoGanha, limpa, forma, usados, anuncia, equipa, skinDe, enfeita, marcas };
+try { confere(); } catch (e) {} /* 5.5b: ao abrir o jogo, o que o jogador já tinha ganho fica registrado sem aviso */
+ARD.cosmeticos = { confere, cumpre, avisoFim /* 5.5b */, hangar, montar, TIPOS, GANHA, CATALOGO, PADRAO, MAX, porId, serve, tem, nome, nomeTipo, comoGanha, limpa, forma, usados, anuncia, equipa, skinDe, enfeita, marcas };
 })(globalThis.ARD = globalThis.ARD || {});

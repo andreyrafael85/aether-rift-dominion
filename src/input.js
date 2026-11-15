@@ -34,7 +34,9 @@ function create(o) {
       if (Math.abs(dx) > rx) continue;
       if (dy > e.r * k * 0.7 + radiusPx || dy < -(e.r * k * 2.4 + radiusPx)) continue;
       const d = Math.hypot(dx, Math.max(0, dy)); const pri = e.kind === 'unit' ? 0 : e.kind === 'crate' ? 1 : e.kind === 'building' ? 2 : 3;
-      const sc = d + pri * 5; if (sc < bd) { bd = sc; best = e; }
+      let sc = d + pri * 5;
+      if (radiusPx > 12 && (Math.abs(dx) > e.r * k * 1.2 || dy > e.r * k * 0.7 || dy < -(e.r * k * 2.4))) sc += 1000; /* 5.5b: no toque (folga larga de 26 px), o que está de fato sob o dedo ganha do que só entrou pela folga — tocar numa construção não seleciona mais o Coletor que passa perto */
+      if (sc < bd) { bd = sc; best = e; }
     }
     return best;
   }

@@ -284,8 +284,8 @@ function dentroAviso(a, e) {
 }
 function fugaAviso(a, u) { /* ponto fora da forma avisada, pelo lado mais curto */
   const cl = z => Math.max(30, Math.min(S.WORLD - 30, z));
-  if (a.tipo === 'faixa') { const vx = a.x2 - a.x, vy = a.y2 - a.y, L = Math.hypot(vx, vy) || 1; let nx = -vy / L, ny = vx / L; const lado = (u.x - a.x) * nx + (u.y - a.y) * ny; if (lado < 0) { nx = -nx; ny = -ny; } const k = Math.abs(lado); const sai = a.w * 0.5 + u.r + 34 - k; return { x: cl(u.x + nx * sai), y: cl(u.y + ny * sai) }; }
-  const R = (a.tipo === 'poco' ? a.w : a.r) + u.r + 36; let dx = u.x - a.x, dy = u.y - a.y; let d = Math.hypot(dx, dy); if (d < 1) { dx = 1; dy = 0; d = 1; }
+  if (a.tipo === 'faixa') { const vx = a.x2 - a.x, vy = a.y2 - a.y, L = S.DM.hypot(vx, vy) || 1; let nx = -vy / L, ny = vx / L; const lado = (u.x - a.x) * nx + (u.y - a.y) * ny; if (lado < 0) { nx = -nx; ny = -ny; } const k = Math.abs(lado); const sai = a.w * 0.5 + u.r + 34 - k; return { x: cl(u.x + nx * sai), y: cl(u.y + ny * sai) }; }
+  const R = (a.tipo === 'poco' ? a.w : a.r) + u.r + 36; let dx = u.x - a.x, dy = u.y - a.y; let d = S.DM.hypot(dx, dy); if (d < 1) { dx = 1; dy = 0; d = 1; }
   return { x: cl(a.x + dx / d * R), y: cl(a.y + dy / d * R) };
 }
 /* fala pelo retrato: evento só de interface (fora do hash), com recarga por IA (35 s) e por fala (150 s) */
@@ -574,7 +574,7 @@ function micro(sim, mem, v, P, D, army, collectors, rally, emitC) {
       const cmd = !!m.cmd; if (recua && (m.hp < m.maxHp * P.recuo) && (S.unitCost(m.def) >= 120 || cmd) && m.state !== 'move') { emitC({ t: 'move', ids: [m.id], x: rally.x + ((m.id * 37) % 60) - 30, y: rally.y + ((m.id * 53) % 60) - 30 }); v.ferido[m.id] = t + 25; continue; }
       const wm = S.UNITS[m.def].weapon && S.WEAPONS[S.UNITS[m.def].weapon];
       if (wm && wm.range >= 140) { let near = null, nd = 75; for (const f of foes) { if (f.kind !== 'unit') continue; const wf = S.UNITS[f.def].weapon && S.WEAPONS[S.UNITS[f.def].weapon]; if (!wf || wf.range > 45) continue; const d = S.dist(m.x, m.y, f.x, f.y); if (d < nd) { nd = d; near = f; } }
-        if (near) { const dx = m.x - near.x, dy = m.y - near.y, d = Math.hypot(dx, dy) || 1; emitC({ t: 'move', ids: [m.id], x: Math.max(30, Math.min(S.WORLD - 30, m.x + dx / d * 90)), y: Math.max(30, Math.min(S.WORLD - 30, m.y + dy / d * 90)) }); v.desvio[m.id] = t + 1.5; continue; } }
+        if (near) { const dx = m.x - near.x, dy = m.y - near.y, d = S.DM.hypot(dx, dy) || 1; emitC({ t: 'move', ids: [m.id], x: Math.max(30, Math.min(S.WORLD - 30, m.x + dx / d * 90)), y: Math.max(30, Math.min(S.WORLD - 30, m.y + dy / d * 90)) }); v.desvio[m.id] = t + 1.5; continue; } }
       grp.push(m); }
     if (!grp.length) continue;
     let best = null, bs = 0; const temUn = foes.some(f => f.kind === 'unit' && S.UNITS[f.def].attack);

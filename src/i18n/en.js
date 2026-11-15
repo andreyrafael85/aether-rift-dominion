@@ -419,7 +419,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nothing here is yours. Yet.",
-  "inicio.versao": "Version 5.5a · build __BUILD__ · Open Gates · Living world · multiplayer 2 to 4",
+  "inicio.versao": "Version 5.5b · build __BUILD__ · Open Gates · Living world · multiplayer 2 to 4",
   "inicio.vitrine.escolha-sua-raca": "Choose your Race",
   "inicio.vitrine.explorar-base": "Explore the base",
   "inicio.vitrine.som-tela-inicial": "Start screen sound",
@@ -488,6 +488,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "ajustes.btn-bench": "Run benchmark (30 s)",
   "ajustes.cfg-feedback": "Send feedback",
   "notas.notas-versao": "Release notes",
+  "notas.5-5b": "<b>5.5b — Share:</b> the <b>Daily Challenge</b> is here: one short match a day, the same for everyone, with your record and day streak kept on your device. You can also <b>build a challenge</b> and send it as a link, or dare a friend to repeat the match you just played. Result and achievement <b>cards</b> now come in two sizes, landscape and portrait. The <b>match panel is now slim</b>: it takes much less of the screen and grows only when there is something to show (in Settings, \"Full panel in the match\" brings the old one back). In your first five matches the game introduces <b>one new thing at a time</b>. Locked Hangar items are now <b>unlocked by achievements</b>. On phones, tapping a building no longer selects a Collector passing by. In Settings, \"What this game counts\" shows the usage counts kept only on your device; nothing is sent.",
   "notas.5-5a": "<b>5.5a — Front door:</b> newcomers now get a <b>guided first match</b>, one objective at a time, with the panel appearing little by little. New mode: <b>Blitz</b>, 1 versus 1, bases closer together and a 10-minute clock. The <b>end screen</b> is new, with the turning-point chart and a Share button that builds a result card. The multiplayer room has an <b>invite link</b> that joins the room right away. The world got the <b>Rift Light</b>: a low, warm sun and long shadows. Every unit has a thin arc in its owner's colour, enemies are also recognisable by shape, the ground around your base takes your Race's colour, and promotions show as stars on the health bar. <b>Balance:</b> Welder damage 16 (was 20), Spawn and Spitter cost more, Chimera has more health, and Erevane's Rift Marksman is available in Era I. The Hangar lists the <b>cosmetics</b> and how to earn each one; nothing is for sale. On Motor 5 the game sends half as much data per frame to the graphics card.",
   "notas.5-0h-5": "<b>5.0h.5 — Bosses 3.0:</b> the three bosses are no longer machines: they are creatures of the Rift, with new names. The Herald is now <b>The Rift Medusa</b>, the Mother Forge is <b>The Furnace Titan</b> and the Rift Sentinel is <b>The Devouring Sentinel</b>, which is much larger on screen. Before each strike the body warns you: the Titan throws its jaw open, the Devourer bares its fangs and the Medusa contracts its bell. In the Assembly line phase the Titan's back opens and the amber weak points show. The pillars, the Echoes and the Rift minions got the look of the same family. Fight rules, boss health and damage did not change.",
   "notas.5-0h-4": "<b>5.0h.4 — Motor 5 performance:</b> the stutter the first time a lake came into view is gone. Everything the lake reflection needs is now prepared during loading, and in our test nothing is created on the graphics card in the middle of a match anymore. Unit portraits in the army panel are generated one at a time, and the game creates a little less memory garbage per frame. The Benchmark now shows, for each stutter, how much time went to shadows, lake reflection, scene and effects. The picture and the simulation stay the same.",
@@ -507,7 +508,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "notas.5-0c": "<b>5.0c — Languages:</b> the whole game is now in <b>English</b> and <b>Spanish</b> as well as Portuguese: start screen, War Room, matches, campaign, diplomacy, multiplayer, Photo Mode, help and the system-voice lines, which now use a voice in the chosen language. The game opens in your browser's language and switches instantly, without reloading, under <b>Idioma / Language / Idioma</b>: at the top of the start screen, in Settings and in the in-match Settings window. Also in this version: the planets and sky at the top of the War Room are crisp: at rest the background was drawn at half resolution and is now drawn in full, with the planets' detail following the pixel size, and the room no longer drops resolution when you switch Races; the match announcer speaks in the gender of your Race's announcer (a male voice for the Vehnar, Quorith and Vorag; a female one for the Erevane and Tessara); with Engine 5, dynamic resolution only drops when the graphics card is the limit, which avoids the hitches from resolution changes; and on iPhone, <b>Test sound</b> shows a tip when the effects play but the voice does not.",
   "notas.5-0b-1": "<b>5.0b.1 — Lighter Engine 5, headlights and sound on iPhone:</b> with <b>Engine 5</b> on, the shaders it prepares while loading shrank by a third (the lakes first) and each frame sends much less data to the graphics card, which eases the CPU on Firefox and on phones. The glow around lights is now the same as in the classic engine, and in Photo Mode on Low quality the effects follow the exposure as in the classic engine. At night and inside the Aether Storm, the headlights of vehicles, harvesters and pirates light the ground ahead, in both engines. The War Room got a little brighter, without the glare of before. On iPhone, sound and voice unlock on the first tap, play with the silent switch on and come back after a call. Each leader speaks with a voice of their own gender in every browser. In Settings, <b>Test sound</b> plays three notes and a line and shows the state of the device's audio.",
   "notas.5-0b-motor-5": "<b>5.0b — Engine 5 complete, in testing:</b> with <b>Engine 5</b> on (Settings › Graphics engine), the whole game now runs on WebGPU, falling back to WebGL2 on its own: units and buildings with surface detail and per-part animation, ruins, construction sites, the Erevane hologram, the Unison shields and the banners; the ground with every biome, vegetation in the wind, roads and the sky; explosions, fire, smoke and shots; the plasma and ice lakes with reflections, the Belt's space and the Aether Storm; and <b>Photo Mode</b> (📷 or the J key) with blur, the 8 filters and 4K capture. The first time Photo Mode opens in a match, it takes a few seconds to get ready. With all of this, Engine 5 takes a few seconds longer to load: the next version measures it on real devices and trims it down. The classic engine is still the default and has not changed.",
-  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.0h.5 → 2.0; from 5.0a.3 back, in Portuguese)",
+  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.5a → 2.0; from 5.0a.3 back, in Portuguese)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Terms of Use",
   "inicio.rodape.foot-priv": "Privacy",
@@ -2411,4 +2412,159 @@ globalThis.ARD.I18N_DIC['en'] = {
   "fim.n.estruturas.curto": "buildings", /* 5.5a */
   "guia.p.nucleo.sem-tropa": "You have no troops left. Train more {infantaria} at the {quartel} and attack again.", /* 5.5a */
   "guia.a.quartel": "Open: {quartel}", /* 5.5a */
+  "desafio.nome": "Daily Challenge", /* 5.5b desafio */
+  "desafio.conj": "and", /* 5.5b desafio */
+  "desafio.t.blitz": "Blitz against {raca}", /* 5.5b desafio */
+  "desafio.t.cacada": "Hunt: {chefe}", /* 5.5b desafio */
+  "desafio.t.escaramuca": "Skirmish against {racas}", /* 5.5b desafio */
+  "desafio.i.time": "Team", /* 5.5b desafio */
+  "desafio.i.sozinho": "you, no allies", /* 5.5b desafio */
+  "desafio.i.aliada": "you and one allied AI ({racas})", /* 5.5b desafio */
+  "desafio.i.aliadas": "you and two allied AIs ({racas})", /* 5.5b desafio */
+  "desafio.i.mapa": "Map", /* 5.5b desafio */
+  "desafio.i.dif": "Difficulty", /* 5.5b desafio */
+  "desafio.i.tempo": "Length", /* 5.5b desafio */
+  "desafio.i.minutos": "up to {n} minutes", /* 5.5b desafio */
+  "desafio.i.mutador": "Mutator", /* 5.5b desafio */
+  "desafio.i.regra": "Rule", /* 5.5b desafio */
+  "desafio.i.semente": "Seed", /* 5.5b desafio */
+  "desafio.n-mutadores": "{n} mutators", /* 5.5b desafio */
+  "desafio.raca.sua": "Your Race for this match", /* 5.5b desafio */
+  "desafio.raca.sugerida": "suggested", /* 5.5b desafio */
+  "desafio.raca.de-quem": "the challenger's", /* 5.5b desafio */
+  "desafio.raca.livre": "Today the Race is open: play any one you like.", /* 5.5b desafio */
+  "desafio.rec.nenhum": "not played yet", /* 5.5b desafio */
+  "desafio.res.vitoria": "Victory in {t}", /* 5.5b desafio */
+  "desafio.res.derrota": "Defeat at {t}", /* 5.5b desafio */
+  "desafio.res.dominio": "Dominion {n}", /* 5.5b desafio */
+  "desafio.res.medalha": "{m} medal", /* 5.5b desafio */
+  "desafio.res.perdas": "{n} losses", /* 5.5b desafio */
+  "desafio.seq.zero": "no days yet", /* 5.5b desafio */
+  "desafio.seq.um": "1 day in a row", /* 5.5b desafio */
+  "desafio.seq.n": "{n} days in a row", /* 5.5b desafio */
+  "desafio.seq.melhor": "best: {n}", /* 5.5b desafio */
+  "desafio.copiado": "Copied.", /* 5.5b desafio */
+  "desafio.link-copiado": "Link copied. Send it to whoever you want to challenge.", /* 5.5b desafio */
+  "desafio.copie-na-mao": "Could not copy automatically: the text is selected, copy it with Ctrl+C.", /* 5.5b desafio */
+  "desafio.copie-na-mao-toque": "Could not copy automatically: touch and hold the text to copy it.", /* 5.5b desafio */
+  "desafio.envio.texto": "I challenge you in Aether Rift: Dominion — {desafio}. The same match I played.", /* 5.5b desafio */
+  "desafio.ocupado": "Leave the multiplayer lobby to play the challenge.", /* 5.5b desafio */
+  "desafio.hoje.eyebrow": "Daily Challenge · {data}", /* 5.5b desafio */
+  "desafio.hoje.texto": "One match a day, the same for everyone: same map, same seed, same enemy. It changes every day at {hora}, your time.", /* 5.5b desafio */
+  "desafio.hoje.falta": "Next challenge in", /* 5.5b desafio */
+  "desafio.hoje.recorde": "Your best today", /* 5.5b desafio */
+  "desafio.hoje.seq": "Streak", /* 5.5b desafio */
+  "desafio.hoje.jogar": "Play the challenge", /* 5.5b desafio */
+  "desafio.hoje.de-novo": "Try again", /* 5.5b desafio */
+  "desafio.montar.botao": "Build a challenge", /* 5.5b desafio */
+  "desafio.montar.eyebrow": "Challenge code", /* 5.5b desafio */
+  "desafio.montar.titulo": "Build a challenge", /* 5.5b desafio */
+  "desafio.montar.texto": "Pick the match and send the link. Whoever opens it plays exactly the same one: same map, same seed and same enemies.", /* 5.5b desafio */
+  "desafio.montar.inimigos": "Enemies (AI)", /* 5.5b desafio */
+  "desafio.montar.rival": "Enemy {n} Race", /* 5.5b desafio */
+  "desafio.montar.aliada": "Ally {n} Race", /* 5.5b desafio */
+  "desafio.montar.raca": "Suggested Race for the player", /* 5.5b desafio */
+  "desafio.montar.livre": "Open", /* 5.5b desafio */
+  "desafio.montar.sortear": "Random", /* 5.5b desafio */
+  "desafio.montar.invalido": "This combination does not exist in the game. Change one of the options.", /* 5.5b desafio */
+  "desafio.montar.jogar": "Play now", /* 5.5b desafio */
+  "desafio.tenho.rotulo": "I have a challenge code or link", /* 5.5b desafio */
+  "desafio.tenho.abrir": "Open", /* 5.5b desafio */
+  "desafio.rec.eyebrow": "Challenge · code {codigo}", /* 5.5b desafio */
+  "desafio.rec.texto": "Someone challenged you. It is the same match they played: same map, same seed and same enemies. See what it is and accept when you are ready.", /* 5.5b desafio */
+  "desafio.rec.aceitar": "Accept and play", /* 5.5b desafio */
+  "desafio.rec.agora-nao": "Not now", /* 5.5b desafio */
+  "desafio.ver-hoje": "See the Daily Challenge", /* 5.5b desafio */
+  "desafio.erro.eyebrow": "Challenge link", /* 5.5b desafio */
+  "desafio.erro.titulo": "This challenge did not open", /* 5.5b desafio */
+  "desafio.erro.vazio": "The link came with no code at all.", /* 5.5b desafio */
+  "desafio.erro.formato": "This does not look like a challenge code. It may have been cut off when copied.", /* 5.5b desafio */
+  "desafio.erro.versao": "This challenge was made in a newer version of the game. Reload the page to update and open the link again.", /* 5.5b desafio */
+  "desafio.erro.soma": "The code is incomplete or has a wrong character. Ask the sender for the link again.", /* 5.5b desafio */
+  "desafio.erro.conteudo": "The code asks for a match this game does not have. Ask the sender for the link again.", /* 5.5b desafio */
+  "desafio.erro.dica": "Nothing was lost: you can play the Daily Challenge or build your own.", /* 5.5b desafio */
+  "desafio.amigo.botao": "Challenge a friend", /* 5.5b desafio */
+  "desafio.amigo.eyebrow": "Challenge a friend", /* 5.5b desafio */
+  "desafio.amigo.texto": "Send this link. Whoever opens it sees what the challenge is and plays the same match you just played.", /* 5.5b desafio */
+  "desafio.amigo.seu": "Your result:", /* 5.5b desafio */
+  "desafio.copiar-link": "Copy link", /* 5.5b desafio */
+  "desafio.codigo": "Code", /* 5.5b desafio */
+  "desafio.link": "Challenge link", /* 5.5b desafio */
+  "desafio.e.feito": "done today", /* 5.5b desafio */
+  "desafio.e.manter": "{seq}: play today to keep it", /* 5.5b desafio */
+  "desafio.e.comecar": "start a streak today", /* 5.5b desafio */
+  "desafio.e.novo-em": "new in", /* 5.5b desafio */
+  "desafio.e.aria": "Daily Challenge: {desafio}. Open.", /* 5.5b desafio */
+  "desafio.linha.diario": "Daily Challenge {data}", /* 5.5b desafio */
+  "desafio.linha.codigo": "code {codigo}", /* 5.5b desafio */
+  "desafio.selo.diario": "Daily Challenge · {data}", /* 5.5b desafio */
+  "desafio.selo.codigo": "Challenge · {codigo}", /* 5.5b desafio */
+  "desafio.fim.primeiro": "Today's record set", /* 5.5b desafio */
+  "desafio.fim.recorde-novo": "New record for today!", /* 5.5b desafio */
+  "desafio.fim.recorde-fica": "Your best today stands: {rec}", /* 5.5b desafio */
+  "desafio.fim.proximo": "next challenge in {t}", /* 5.5b desafio */
+  "desafio.fim.linha": "Result in one line, to paste anywhere", /* 5.5b desafio */
+  "desafio.fim.copiar": "Copy result", /* 5.5b desafio */
+  "desafio.fim.copiado": "Result copied. Paste it anywhere.", /* 5.5b desafio */
+  "cartao.tamanho": "Card size", /* 5.5b desafio */
+  "cartao.largo": "Wide · 1200×630", /* 5.5b desafio */
+  "cartao.pe": "Tall · 1080×1350", /* 5.5b desafio */
+  "cartao.conq.titulo": "Achievement card", /* 5.5b desafio */
+  "cartao.conq.rotulo": "Achievement unlocked", /* 5.5b desafio */
+  "cartao.conq.quem": "{nome} · level {n}", /* 5.5b desafio */
+  "cartao.conq.conta": "{n} of {total} achievements", /* 5.5b desafio */
+  "cartao.conq.texto": "Achievement \"{nome}\" in Aether Rift: Dominion", /* 5.5b desafio */
+  "cartao.conq.abrir": "Share the achievement {nome}", /* 5.5b desafio */
+  "cartao.conq.botao": "Achievement card: {nome}", /* 5.5b desafio */
+  "fino.sistema": "System: sound, voice, diplomacy, research, save, settings, help and quit", /* 5.5b */
+  "fino.mapa.ampliar": "Enlarge the map", /* 5.5b */
+  "fino.mapa.reduzir": "Shrink the map", /* 5.5b */
+  "fino.cfg.completo": "Full panel during matches", /* 5.5b */
+  "fino.cfg.dica": "Off (default), the panel stays thin and keeps the battlefield in view: Build, alerts and troops show up when there is something to show. On, everything stays open at all times, as before.", /* 5.5b */
+  "degrau.titulo": "New feature {n} of {total}", /* 5.5b */
+  "degrau.botao": "Next step: {nome}", /* 5.5b */
+  "degrau.entendi": "Got it", /* 5.5b */
+  "degrau.abrir-diplo": "Open Diplomacy", /* 5.5b */
+  "degrau.ver-unicas": "Show the Unique buildings", /* 5.5b */
+  "degrau.pirata.nome": "Pirate", /* 5.5b */
+  "degrau.pacto.nome": "Pact", /* 5.5b */
+  "degrau.comandante.nome": "Commander on the field", /* 5.5b */
+  "degrau.unica.nome": "Unique buildings", /* 5.5b */
+  "degrau.chefao.nome": "Rift boss", /* 5.5b */
+  "degrau.pirata.frase": "New in this match: the {pirata}, which you train at the {quartel} and send to an enemy {refinaria} to steal resources.", /* 5.5b */
+  "degrau.pacto.frase": "New in this match: open Diplomacy and offer a pact to one of your two rivals, so you face them one at a time.", /* 5.5b */
+  "degrau.comandante.frase": "New in this match: your leader takes the field as a Commander, with three abilities on the Z, X and C keys.", /* 5.5b */
+  "degrau.unica.frase": "New in this match: the Unique tab under Build holds two buildings that only your Race has.", /* 5.5b */
+  "degrau.chefao.frase": "New in this match: a Hunt, where the enemy is a Rift boss; bring it down before it reaches your Core.", /* 5.5b */
+  "medir.eyebrow": "Privacy", /* 5.5b */
+  "medir.titulo": "What this game counts", /* 5.5b */
+  "medir.explica": "The game counts, on this device, how many times a few things happen. They are just numbers: no cookies, nothing that identifies you or your device, no time and no place.", /* 5.5b */
+  "medir.envio.desligado": "None of this leaves your device: sending is turned off in this version.", /* 5.5b */
+  "medir.envio.ligado": "These counts are sent, added up and with nothing that identifies you, to the measurement service used by the game.", /* 5.5b */
+  "medir.ligado": "Count on this device", /* 5.5b */
+  "medir.col.oque": "What", /* 5.5b */
+  "medir.col.quantas": "Times", /* 5.5b */
+  "medir.lote": "What would be sent if sending were turned on", /* 5.5b */
+  "medir.zerar": "Reset counts", /* 5.5b */
+  "medir.n.partida.comecada": "Matches started", /* 5.5b */
+  "medir.n.partida.terminada": "Matches finished", /* 5.5b */
+  "medir.n.guia.concluida": "Guided first match completed", /* 5.5b */
+  "medir.n.guia.pulada": "Guided first match skipped", /* 5.5b */
+  "medir.n.convite.criado": "Invite links copied", /* 5.5b */
+  "medir.n.convite.aberto": "Invite links opened", /* 5.5b */
+  "medir.n.desafio.jogado": "Daily Challenges played", /* 5.5b */
+  "medir.n.cartao.compartilhado": "Result cards downloaded, copied or shared", /* 5.5b */
+  "medir.n.motor.classico": "Matches on the classic graphics engine", /* 5.5b */
+  "medir.n.motor.m5": "Matches on Engine 5", /* 5.5b */
+  "medir.n.motor.2d": "Matches in 2D mode", /* 5.5b */
+  "medir.n.degrau.apresentado": "New features introduced", /* 5.5b */
+  "medir.n.degrau.aceito": "Next steps accepted", /* 5.5b */
+  "medir.modo.escaramuca": "Skirmish", /* 5.5b */
+  "medir.modo.blitz": "Blitz", /* 5.5b */
+  "medir.modo.campanha": "Campaign", /* 5.5b */
+  "medir.modo.cacada": "Hunt", /* 5.5b */
+  "medir.modo.guiada": "First match", /* 5.5b */
+  "medir.modo.multi": "Multiplayer", /* 5.5b */
+  "medir.modo.desafio": "Daily Challenge", /* 5.5b */
+  "cosm.fim.novo": "New in the Hangar: {itens}", /* 5.5b */
 };

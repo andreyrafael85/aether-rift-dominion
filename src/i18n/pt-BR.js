@@ -419,7 +419,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aqui é seu. Ainda.",
-  "inicio.versao": "Versão 5.5a · build __BUILD__ · Portas Abertas · Mundo vivo · multiplayer 2 a 4",
+  "inicio.versao": "Versão 5.5b · build __BUILD__ · Portas Abertas · Mundo vivo · multiplayer 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Escolha sua Raça",
   "inicio.vitrine.explorar-base": "Explorar a base",
   "inicio.vitrine.som-tela-inicial": "Som da tela inicial",
@@ -488,6 +488,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.btn-bench": "Testar desempenho (30 s)",
   "ajustes.cfg-feedback": "Enviar feedback",
   "notas.notas-versao": "Notas da versão",
+  "notas.5-5b": "<b>5.5b — Compartilhar:</b> chegou o <b>Desafio do Dia</b>: uma partida curta por dia, igual para todo mundo, com recorde e sequência de dias guardados no aparelho. Você também pode <b>montar um desafio</b> e mandar por link, ou desafiar um amigo a repetir a partida que acabou de jogar. Os <b>cartões</b> de resultado e de conquista saem em dois tamanhos, deitado e em pé. O <b>painel da partida ficou fino</b>: ele ocupa bem menos tela e cresce só quando há o que mostrar (em Ajustes, \"Painel completo na partida\" volta ao de antes). Nas cinco primeiras partidas o jogo apresenta <b>uma novidade por vez</b>. Os itens do Hangar com cadeado agora são <b>liberados pelas conquistas</b>. No celular, tocar numa construção não seleciona mais o Coletor que passa perto. Em Ajustes, \"O que este jogo conta\" mostra as contagens de uso guardadas só no seu aparelho; nada é enviado.",
   "notas.5-5a": "<b>5.5a — Porta de entrada:</b> quem chega agora tem uma <b>primeira partida guiada</b>, com um objetivo por vez e o painel aparecendo aos poucos. Chegou o modo <b>Blitz</b>: 1 contra 1, bases mais perto e relógio de 10 minutos. A <b>tela final</b> é nova, com o gráfico da virada e o botão Compartilhar, que gera um cartão com o resultado. A sala multiplayer ganhou um <b>link de convite</b> que já entra na sala. O mundo recebeu a <b>Luz da Fenda</b>: sol baixo e quente, sombras longas. Cada unidade tem um arco fino na cor do dono, o inimigo se reconhece também pela forma, o chão em volta da base ganha a cor da sua Raça e a promoção aparece como estrela na barra de vida. <b>Balanceamento:</b> Soldador com dano 16 (era 20), Cria e Cuspidor mais caros, Quimera com mais vida e o Atirador de Fenda da Erevane liberado na Era I. O Hangar lista os <b>cosméticos</b> e como ganhar cada um; nada está à venda. No Motor 5 o jogo envia metade dos dados por quadro à placa de vídeo.",
   "notas.5-0h-5": "<b>5.0h.5 — Chefões 3.0:</b> os três chefões deixaram de ser máquinas e viraram criaturas da Fenda, com nomes novos. O Arauto agora é <b>A Medusa da Fenda</b>, a Forja-Mãe é <b>O Titã-Fornalha</b> e a Sentinela da Fenda é <b>A Sentinela Devoradora</b>, que ficou bem maior na tela. Antes de cada golpe o corpo avisa: o Titã escancara a mandíbula, a Devoradora abre as presas e a Medusa contrai o sino. Na Linha de montagem o dorso do Titã se abre e os pontos fracos âmbar aparecem. Os pilares, os Ecos e os lacaios da Fenda ganharam o visual da mesma família. As regras das lutas, a vida e o dano dos chefões não mudaram.",
   "notas.5-0h-4": "<b>5.0h.4 — Desempenho no Motor 5:</b> a travada da primeira vez que um lago aparecia na tela acabou. Tudo o que o reflexo dos lagos precisa agora é preparado no carregamento, e no nosso teste nada mais é criado na placa de vídeo no meio da partida. Os retratos das unidades no painel do exército são gerados um por vez, e o jogo cria um pouco menos de lixo de memória por quadro. O Teste de desempenho agora mostra, em cada travada, quanto tempo foi para sombras, reflexo dos lagos, cena e efeitos. A imagem e a simulação continuam as mesmas.",
@@ -507,7 +508,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "notas.5-0c": "<b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 mais leve, faróis e som no iPhone:</b> com o <b>Motor 5</b> ligado, os shaders que ele prepara na carga encolheram um terço (os lagos primeiro) e cada quadro manda muito menos dados para a placa de vídeo, o que alivia a CPU no Firefox e no celular. O brilho em volta das luzes agora é o mesmo do motor clássico, e no Modo Foto da qualidade Baixa os efeitos seguem a exposição como no clássico. À noite e dentro da Tempestade de Éter, os faróis dos veículos, coletores e piratas iluminam o chão à frente, nos dois motores. A Sala de Comando ficou um pouco mais clara, sem o clarão de antes. No iPhone, o som e a voz destravam no primeiro toque, tocam com a chave de silêncio ligada e voltam depois de uma ligação. Cada líder fala com uma voz do seu gênero em todo navegador. Em Ajustes, <b>Testar som</b> toca três notas e uma frase e mostra o estado do áudio do aparelho.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, em teste:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o jogo inteiro agora roda em WebGPU, com volta sozinha para WebGL2: unidades e construções com o detalhe de superfície e a animação de cada peça, ruínas, obras, o holograma da Erevane, os escudos do Uníssono e as bandeiras; o chão com todos os biomas, a vegetação ao vento, as estradas e o céu; explosões, fogo, fumaça e tiros; os lagos de plasma e de gelo com reflexo, o espaço do Cinturão e a Tempestade de Éter; e o <b>Modo Foto</b> (📷 ou tecla J) com desfoque, os 8 filtros e captura em 4K. Na primeira vez que o Modo Foto abre numa partida, ele leva alguns segundos para se preparar. Com tudo isso, a carga do Motor 5 ficou alguns segundos mais longa: a próxima versão mede nos aparelhos e enxuga. O motor clássico continua o padrão e não mudou.",
-  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0h.5 → 2.0)",
+  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.5a → 2.0)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Termos de Uso",
   "inicio.rodape.foot-priv": "Privacidade",
@@ -2411,4 +2412,159 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "fim.n.estruturas.curto": "construções", /* 5.5a */
   "guia.p.nucleo.sem-tropa": "Você ficou sem tropas. Treine mais {infantaria} no {quartel} e ataque de novo.", /* 5.5a */
   "guia.a.quartel": "Abrir: {quartel}", /* 5.5a */
+  "desafio.nome": "Desafio do Dia", /* 5.5b desafio */
+  "desafio.conj": "e", /* 5.5b desafio */
+  "desafio.t.blitz": "Blitz contra {raca}", /* 5.5b desafio */
+  "desafio.t.cacada": "Caçada: {chefe}", /* 5.5b desafio */
+  "desafio.t.escaramuca": "Escaramuça contra {racas}", /* 5.5b desafio */
+  "desafio.i.time": "Time", /* 5.5b desafio */
+  "desafio.i.sozinho": "você, sem aliados", /* 5.5b desafio */
+  "desafio.i.aliada": "você e uma IA aliada ({racas})", /* 5.5b desafio */
+  "desafio.i.aliadas": "você e duas IAs aliadas ({racas})", /* 5.5b desafio */
+  "desafio.i.mapa": "Mapa", /* 5.5b desafio */
+  "desafio.i.dif": "Dificuldade", /* 5.5b desafio */
+  "desafio.i.tempo": "Duração", /* 5.5b desafio */
+  "desafio.i.minutos": "até {n} minutos", /* 5.5b desafio */
+  "desafio.i.mutador": "Mutador", /* 5.5b desafio */
+  "desafio.i.regra": "Regra", /* 5.5b desafio */
+  "desafio.i.semente": "Semente", /* 5.5b desafio */
+  "desafio.n-mutadores": "{n} mutadores", /* 5.5b desafio */
+  "desafio.raca.sua": "Sua Raça nesta partida", /* 5.5b desafio */
+  "desafio.raca.sugerida": "sugerida", /* 5.5b desafio */
+  "desafio.raca.de-quem": "a de quem desafiou", /* 5.5b desafio */
+  "desafio.raca.livre": "Hoje a Raça é livre: jogue com a que quiser.", /* 5.5b desafio */
+  "desafio.rec.nenhum": "ainda não jogou", /* 5.5b desafio */
+  "desafio.res.vitoria": "Vitória em {t}", /* 5.5b desafio */
+  "desafio.res.derrota": "Derrota aos {t}", /* 5.5b desafio */
+  "desafio.res.dominio": "Domínio {n}", /* 5.5b desafio */
+  "desafio.res.medalha": "medalha de {m}", /* 5.5b desafio */
+  "desafio.res.perdas": "{n} perdas", /* 5.5b desafio */
+  "desafio.seq.zero": "nenhum dia ainda", /* 5.5b desafio */
+  "desafio.seq.um": "1 dia seguido", /* 5.5b desafio */
+  "desafio.seq.n": "{n} dias seguidos", /* 5.5b desafio */
+  "desafio.seq.melhor": "melhor: {n}", /* 5.5b desafio */
+  "desafio.copiado": "Copiado.", /* 5.5b desafio */
+  "desafio.link-copiado": "Link copiado. Mande para quem você quer desafiar.", /* 5.5b desafio */
+  "desafio.copie-na-mao": "Não deu para copiar sozinho: o texto está selecionado, copie com Ctrl+C.", /* 5.5b desafio */
+  "desafio.copie-na-mao-toque": "Não deu para copiar sozinho: toque e segure no texto para copiar.", /* 5.5b desafio */
+  "desafio.envio.texto": "Te desafio em Aether Rift: Dominion — {desafio}. A mesma partida que eu joguei.", /* 5.5b desafio */
+  "desafio.ocupado": "Saia da sala do multiplayer para jogar o desafio.", /* 5.5b desafio */
+  "desafio.hoje.eyebrow": "Desafio do Dia · {data}", /* 5.5b desafio */
+  "desafio.hoje.texto": "Uma partida por dia, igual para todo mundo: mesmo mapa, mesma semente, mesmo inimigo. Troca todo dia às {hora}, no seu horário.", /* 5.5b desafio */
+  "desafio.hoje.falta": "Próximo desafio em", /* 5.5b desafio */
+  "desafio.hoje.recorde": "Seu recorde de hoje", /* 5.5b desafio */
+  "desafio.hoje.seq": "Sequência", /* 5.5b desafio */
+  "desafio.hoje.jogar": "Jogar o desafio", /* 5.5b desafio */
+  "desafio.hoje.de-novo": "Tentar de novo", /* 5.5b desafio */
+  "desafio.montar.botao": "Montar um desafio", /* 5.5b desafio */
+  "desafio.montar.eyebrow": "Código de desafio", /* 5.5b desafio */
+  "desafio.montar.titulo": "Montar um desafio", /* 5.5b desafio */
+  "desafio.montar.texto": "Escolha a partida e mande o link. Quem abrir joga exatamente a mesma: mesmo mapa, mesma semente e mesmos inimigos.", /* 5.5b desafio */
+  "desafio.montar.inimigos": "Inimigos (IA)", /* 5.5b desafio */
+  "desafio.montar.rival": "Raça do inimigo {n}", /* 5.5b desafio */
+  "desafio.montar.aliada": "Raça da aliada {n}", /* 5.5b desafio */
+  "desafio.montar.raca": "Raça sugerida para quem joga", /* 5.5b desafio */
+  "desafio.montar.livre": "Livre", /* 5.5b desafio */
+  "desafio.montar.sortear": "Sortear", /* 5.5b desafio */
+  "desafio.montar.invalido": "Esta combinação não existe no jogo. Mude uma das opções.", /* 5.5b desafio */
+  "desafio.montar.jogar": "Jogar agora", /* 5.5b desafio */
+  "desafio.tenho.rotulo": "Tenho um código ou link de desafio", /* 5.5b desafio */
+  "desafio.tenho.abrir": "Abrir", /* 5.5b desafio */
+  "desafio.rec.eyebrow": "Desafio · código {codigo}", /* 5.5b desafio */
+  "desafio.rec.texto": "Alguém te desafiou. É a mesma partida que a pessoa jogou: mesmo mapa, mesma semente e mesmos inimigos. Veja o que é e aceite quando quiser.", /* 5.5b desafio */
+  "desafio.rec.aceitar": "Aceitar e jogar", /* 5.5b desafio */
+  "desafio.rec.agora-nao": "Agora não", /* 5.5b desafio */
+  "desafio.ver-hoje": "Ver o Desafio do Dia", /* 5.5b desafio */
+  "desafio.erro.eyebrow": "Link de desafio", /* 5.5b desafio */
+  "desafio.erro.titulo": "Este desafio não abriu", /* 5.5b desafio */
+  "desafio.erro.vazio": "O link veio sem código nenhum.", /* 5.5b desafio */
+  "desafio.erro.formato": "Isto não parece um código de desafio. Ele pode ter sido cortado ao copiar.", /* 5.5b desafio */
+  "desafio.erro.versao": "Este desafio foi feito numa versão mais nova do jogo. Recarregue a página para atualizar e abra o link de novo.", /* 5.5b desafio */
+  "desafio.erro.soma": "O código está incompleto ou tem uma letra trocada. Peça o link de novo a quem te mandou.", /* 5.5b desafio */
+  "desafio.erro.conteudo": "O código pede uma partida que este jogo não tem. Peça o link de novo a quem te mandou.", /* 5.5b desafio */
+  "desafio.erro.dica": "Nada se perdeu: você pode jogar o Desafio do Dia ou montar o seu.", /* 5.5b desafio */
+  "desafio.amigo.botao": "Desafiar um amigo", /* 5.5b desafio */
+  "desafio.amigo.eyebrow": "Desafiar um amigo", /* 5.5b desafio */
+  "desafio.amigo.texto": "Mande este link. Quem abrir vê o que é o desafio e joga a mesma partida que você acabou de jogar.", /* 5.5b desafio */
+  "desafio.amigo.seu": "Seu resultado:", /* 5.5b desafio */
+  "desafio.copiar-link": "Copiar link", /* 5.5b desafio */
+  "desafio.codigo": "Código", /* 5.5b desafio */
+  "desafio.link": "Link do desafio", /* 5.5b desafio */
+  "desafio.e.feito": "feito hoje", /* 5.5b desafio */
+  "desafio.e.manter": "{seq}: jogue hoje para manter", /* 5.5b desafio */
+  "desafio.e.comecar": "comece uma sequência hoje", /* 5.5b desafio */
+  "desafio.e.novo-em": "novo em", /* 5.5b desafio */
+  "desafio.e.aria": "Desafio do Dia: {desafio}. Abrir.", /* 5.5b desafio */
+  "desafio.linha.diario": "Desafio do Dia {data}", /* 5.5b desafio */
+  "desafio.linha.codigo": "código {codigo}", /* 5.5b desafio */
+  "desafio.selo.diario": "Desafio do Dia · {data}", /* 5.5b desafio */
+  "desafio.selo.codigo": "Desafio · {codigo}", /* 5.5b desafio */
+  "desafio.fim.primeiro": "Recorde do dia marcado", /* 5.5b desafio */
+  "desafio.fim.recorde-novo": "Novo recorde do dia!", /* 5.5b desafio */
+  "desafio.fim.recorde-fica": "Seu recorde de hoje continua: {rec}", /* 5.5b desafio */
+  "desafio.fim.proximo": "próximo desafio em {t}", /* 5.5b desafio */
+  "desafio.fim.linha": "Resultado em uma linha, para colar onde quiser", /* 5.5b desafio */
+  "desafio.fim.copiar": "Copiar resultado", /* 5.5b desafio */
+  "desafio.fim.copiado": "Resultado copiado. Cole onde quiser.", /* 5.5b desafio */
+  "cartao.tamanho": "Tamanho do cartão", /* 5.5b desafio */
+  "cartao.largo": "Deitado · 1200×630", /* 5.5b desafio */
+  "cartao.pe": "Em pé · 1080×1350", /* 5.5b desafio */
+  "cartao.conq.titulo": "Cartão de conquista", /* 5.5b desafio */
+  "cartao.conq.rotulo": "Conquista desbloqueada", /* 5.5b desafio */
+  "cartao.conq.quem": "{nome} · nível {n}", /* 5.5b desafio */
+  "cartao.conq.conta": "{n} de {total} conquistas", /* 5.5b desafio */
+  "cartao.conq.texto": "Conquista \"{nome}\" em Aether Rift: Dominion", /* 5.5b desafio */
+  "cartao.conq.abrir": "Compartilhar a conquista {nome}", /* 5.5b desafio */
+  "cartao.conq.botao": "Cartão da conquista: {nome}", /* 5.5b desafio */
+  "fino.sistema": "Sistema: som, voz, diplomacia, pesquisa, salvar, ajustes, ajuda e sair", /* 5.5b */
+  "fino.mapa.ampliar": "Ampliar o mapa", /* 5.5b */
+  "fino.mapa.reduzir": "Reduzir o mapa", /* 5.5b */
+  "fino.cfg.completo": "Painel completo na partida", /* 5.5b */
+  "fino.cfg.dica": "Desligado (padrão), o painel fica fino e deixa o campo à vista: o Construir, os alertas e as tropas aparecem quando há o que mostrar. Ligado, tudo fica sempre aberto, como antes.", /* 5.5b */
+  "degrau.titulo": "Novidade {n} de {total}", /* 5.5b */
+  "degrau.botao": "Próximo passo: {nome}", /* 5.5b */
+  "degrau.entendi": "Entendi", /* 5.5b */
+  "degrau.abrir-diplo": "Abrir a Diplomacia", /* 5.5b */
+  "degrau.ver-unicas": "Ver as Únicas", /* 5.5b */
+  "degrau.pirata.nome": "Pirata", /* 5.5b */
+  "degrau.pacto.nome": "Pacto", /* 5.5b */
+  "degrau.comandante.nome": "Comandante em campo", /* 5.5b */
+  "degrau.unica.nome": "Construções únicas", /* 5.5b */
+  "degrau.chefao.nome": "Chefão da Fenda", /* 5.5b */
+  "degrau.pirata.frase": "Novidade desta partida: {pirata}, que você treina em {quartel} e manda a uma {refinaria} inimiga para roubar recursos.", /* 5.5b */
+  "degrau.pacto.frase": "Novidade desta partida: abra a Diplomacia e proponha um pacto a um dos dois rivais, para enfrentar um de cada vez.", /* 5.5b */
+  "degrau.comandante.frase": "Novidade desta partida: o seu líder entra em campo como Comandante, com três habilidades nas teclas Z, X e C.", /* 5.5b */
+  "degrau.unica.frase": "Novidade desta partida: a aba Únicas do Construir tem duas construções que só a sua Raça tem.", /* 5.5b */
+  "degrau.chefao.frase": "Novidade desta partida: uma Caçada, em que o inimigo é um chefão da Fenda; derrube-o antes que ele chegue ao seu Núcleo.", /* 5.5b */
+  "medir.eyebrow": "Privacidade", /* 5.5b */
+  "medir.titulo": "O que este jogo conta", /* 5.5b */
+  "medir.explica": "O jogo conta, neste aparelho, quantas vezes algumas coisas acontecem. São só números: sem cookies, sem identificar você nem o aparelho, sem hora nem lugar.", /* 5.5b */
+  "medir.envio.desligado": "Nada disto sai do seu aparelho: nesta versão o envio está desligado.", /* 5.5b */
+  "medir.envio.ligado": "Estas contagens são enviadas, somadas e sem identificação, ao serviço de medição do jogo.", /* 5.5b */
+  "medir.ligado": "Contar neste aparelho", /* 5.5b */
+  "medir.col.oque": "O que", /* 5.5b */
+  "medir.col.quantas": "Vezes", /* 5.5b */
+  "medir.lote": "O que seria enviado, se o envio fosse ligado", /* 5.5b */
+  "medir.zerar": "Zerar contagens", /* 5.5b */
+  "medir.n.partida.comecada": "Partidas começadas", /* 5.5b */
+  "medir.n.partida.terminada": "Partidas terminadas", /* 5.5b */
+  "medir.n.guia.concluida": "Primeira partida guiada concluída", /* 5.5b */
+  "medir.n.guia.pulada": "Primeira partida guiada pulada", /* 5.5b */
+  "medir.n.convite.criado": "Links de convite copiados", /* 5.5b */
+  "medir.n.convite.aberto": "Links de convite abertos", /* 5.5b */
+  "medir.n.desafio.jogado": "Desafios do Dia jogados", /* 5.5b */
+  "medir.n.cartao.compartilhado": "Cartões de resultado baixados, copiados ou compartilhados", /* 5.5b */
+  "medir.n.motor.classico": "Partidas no motor gráfico clássico", /* 5.5b */
+  "medir.n.motor.m5": "Partidas no Motor 5", /* 5.5b */
+  "medir.n.motor.2d": "Partidas no modo 2D", /* 5.5b */
+  "medir.n.degrau.apresentado": "Novidades apresentadas", /* 5.5b */
+  "medir.n.degrau.aceito": "Próximos passos aceitos", /* 5.5b */
+  "medir.modo.escaramuca": "Escaramuça", /* 5.5b */
+  "medir.modo.blitz": "Blitz", /* 5.5b */
+  "medir.modo.campanha": "Campanha", /* 5.5b */
+  "medir.modo.cacada": "Caçada", /* 5.5b */
+  "medir.modo.guiada": "Primeira partida", /* 5.5b */
+  "medir.modo.multi": "Multiplayer", /* 5.5b */
+  "medir.modo.desafio": "Desafio do Dia", /* 5.5b */
+  "cosm.fim.novo": "Novo no Hangar: {itens}", /* 5.5b */
 };

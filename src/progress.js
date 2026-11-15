@@ -49,4 +49,16 @@ function registrarCacada(r) { const s = load(); const C = s.cacada; const k = r.
 function registrarSentinela(n) { const s = load(); s.cacada.sentinelas = (s.cacada.sentinelas || 0) + Math.max(0, n | 0); save(); return s.cacada.sentinelas; }
 function reset() { state = blank(); save(); return state; }
 ARD.progress = { KEY, MAX_LEVEL, LEVEL_XP, load, save, levelOf, levelInfo, addXp, mission, completeMission, unlock, has, grantRelic, equipRelic, setHangar, setName, addPlayTime, exportCode, importCode, reset, _blank: blank, registrarCacada, registrarSentinela /* 5.0g */ };
+/* 5.5b (agente m-hud): degraus de descoberta e cosméticos liberados. Campos novos, opcionais, criados só quando usados (o formato segue v: 1;
+   o merge() do migrate() conserva chaves que o blank() não conhece, então o código de backup leva e traz os dois).
+   degraus: { n: quantos degraus já foram apresentados (0 a 5), v: 1 quando o aparelho já foi avaliado, pulo: true se o jogador já tinha progresso }.
+   cosm: { id do item: quando foi liberado } — o registro do que o jogador ganhou por conquista (src/cosmeticos.js). */
+function degraus() { const s = load(); if (!s.degraus || typeof s.degraus !== 'object') s.degraus = { n: 0, v: 0 }; s.degraus.n = Math.max(0, Math.min(5, s.degraus.n | 0)); return s.degraus; }
+function jaJogou() { const s = load(); return s.commander.xp > 0 || s.stats.missions > 0 || s.stats.playSec > 0 || Object.keys(s.achievements).length > 0 || Object.keys(s.missions).length > 0; }
+function degrausInicia() { const d = degraus(); if (d.v) return d; d.v = 1; if (jaJogou()) { d.n = 5; d.pulo = true; } save(); return d; } /* quem já jogava não vê a apresentação (nada fica travado para ninguém) */
+function degrauAvanca(i) { const d = degrausInicia(); if (i === d.n && d.n < 5) { d.n++; save(); return true; } return false; }
+function degrausDefine(n) { const d = degrausInicia(); d.n = Math.max(0, Math.min(5, n | 0)); d.pulo = false; save(); return d; }
+function cosmLiberados() { const s = load(); if (!s.cosm || typeof s.cosm !== 'object') s.cosm = {}; return s.cosm; }
+function cosmLibera(id) { const c = cosmLiberados(); if (c[id]) return false; c[id] = Date.now(); save(); return true; }
+Object.assign(ARD.progress, { degraus, jaJogou, degrausInicia, degrauAvanca, degrausDefine, cosmLiberados, cosmLibera });
 })(globalThis.ARD = globalThis.ARD || {});

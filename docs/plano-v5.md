@@ -655,9 +655,22 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
   - **Motor 5:** envios de dados por quadro 435 → 221 no Teste de desempenho (49%); contado no Chromium, falta o teste do dono no Firefox.
   - **Fica para depois:** mapa pequeno de verdade no Blitz e Blitz no multiplayer; arte de estandarte e rastro; a área de toque das construções no celular; a causa de fundo do balanceamento (o Minério acaba cedo e a partida entre IAs não sai da Era I); a prova da versão para baixar (vai com a 5.5g); `tools/cosmeticos-test.cjs` e `tools/entrada-test.cjs` ainda fora do `tools/qa.cjs`.
 
-##### 5.5b — Compartilhar · tamanho M · 2 agentes
+##### 5.5b — Compartilhar · tamanho M · 2 agentes · ✔ 15/11/2026
 - **Entra:** **Desafio do Dia** (semente pela data, igual para todos, sem servidor); código de desafio por link; cartão de resultado e de conquista (1200×630 e 1080×1350, montados no navegador); degraus de descoberta (uma novidade por partida nas cinco primeiras); HUD de moldura fina (o de hoje cobre de 26% a 44% da tela); medição de uso só em contagens, sem cookies.
 - **Pronto quando:** o mesmo desafio dá o mesmo hash em Chrome, Firefox e Safari; o cartão sai nos três idiomas.
+
+- **Entregue em 15/11/2026 (agentes m-desafio, m-hud):**
+  - **Desafio do Dia** (`src/desafio.js`, regra pura só com inteiros a partir da data em UTC; `src/desafio-ui.js`): semana fixa (Blitz em cinco dias, Caçada na quarta e no domingo), 25 combinações diferentes em 30 dias, recorde e sequência no ProgressStore, linha para colar sem endereço (`LINK_NA_LINHA` desligada até o lançamento).
+  - **Código de desafio** `?desafio=CÓDIGO` (12 a 16 caracteres, versão do formato e 10 bits de verificação), tela de montar, tela de quem recebe e "Desafiar um amigo" na tela final.
+  - **Cartões** de resultado e de conquista em 1200×630 e 1080×1350 (`src/cartoes.js`), nos três idiomas, com a largura do texto medida.
+  - **Determinismo da IA (muda o resultado de partidas com IA):** três contas de `src/ai.js` usavam `Math.hypot`, que arredonda diferente entre navegadores; uma Caçada jogada pela IA divergia entre o Chrome e o Firefox (5 de 30 dias). Trocadas por `S.DM.hypot`: 30 de 30 iguais nos três navegadores. A Caçada curta de referência do teste de modos vence aos 141 s (antes 152 s). Resta um `Math.pow(x, 0.9)` na função `contra`, sem caso de divergência achado. A Caçada do dia segue sozinho e no Fácil.
+  - **HUD de moldura fina** (`src/hudfino.js`; "Painel completo na partida" ou `?hud=completo` volta ao de antes): cobertura no início da partida de 27,5% para 6,8% em 1920×1080, de 38,0% para 9,7% em 1600×900, de 42,9% para 11,3% em 1366×768 e de 72% para 35% no celular em pé (medido no modo 2D). A partida guiada não leva o painel fino.
+  - **Toque nas construções no celular** (`pick` em `src/input.js`): o que está sob o dedo ganha do que só entrou pela folga.
+  - **Degraus de descoberta** (`src/degraus.js`): Pirata, pacto, Comandante, únicas e chefão, uma frase no começo e "Próximo passo" na tela final; nada é bloqueado.
+  - **Medição só em contagens** (`src/medir.js`): 25 contadores no aparelho, **envio desligado** (`ENDERECO` vazio), tela "O que este jogo conta" nos Ajustes. O serviço fica para o dono escolher.
+  - **Cosméticos liberados por conquista**, com aviso na tela final.
+  - **QA:** `tools/cosmeticos-test.cjs`, `tools/entrada-test.cjs` e o novo `tools/hud-test.cjs` entraram no `tools/qa.cjs`; `tools/desafio-test.cjs` roda à parte.
+  - **Fica para depois:** fichas de seleção mais finas (seguram a cobertura no meio e no fim da partida); tablet; desafio no multiplayer e placar do dia (5.5f); Blitz do desafio só na Planície da Fenda; a manchete do cartão do Desafio do Dia repete o resultado; as fontes e o PeerJS ainda vêm de terceiros (resolve na 5.5h); painel fino e telas do desafio vistos só no Chromium.
 
 #### Fase 2 — O jogo completo (as especificações estão na Onda 5, abaixo)
 
