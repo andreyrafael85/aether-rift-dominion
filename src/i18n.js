@@ -25,7 +25,13 @@ const nf = (l, o) => { const k = l + JSON.stringify(o || 0); return NF[k] || (NF
 const pr = l => PR[l] || (PR[l] = new Intl.PluralRules(LOCALE[l] || l));
 function num(n, o) { if (typeof n !== 'number' || !isFinite(n)) return String(n); return nf(ARD.idioma, o || { maximumFractionDigits: 2 }).format(n); }
 function forma(v, n, l) { if (v == null || typeof v !== 'object') return v; const c = typeof n === 'number' ? (n === 0 && v.zero != null ? 'zero' : pr(l).select(n)) : 'other'; return v[c] != null ? v[c] : v.other != null ? v.other : v.one; }
-function busca(k, l) { const d = DIC[l]; return d && Object.prototype.hasOwnProperty.call(d, k) ? d[k] : undefined; }
+/* 5.0h.5: um texto pode citar outra chave do mesmo idioma com {@chave} (ex.: o nome de um chefão, em chefe.<id>.nome): o nome fica num lugar só por idioma.
+   A troca é feita uma vez por dicionário, na primeira consulta (o índice reverso e os padrões da simulação já veem o texto pronto) */
+const PRONTOS = new WeakSet(); const REF = /\{@([\w.\-]+)\}/g;
+function pronto(l) { const d = DIC[l]; if (!d || PRONTOS.has(d)) return d; PRONTOS.add(d); const base = DIC['pt-BR'] || {}; const acha = k => { const v = Object.prototype.hasOwnProperty.call(d, k) ? d[k] : base[k]; return typeof v === 'string' && v.indexOf('{@') < 0 ? v : null; };
+  const troca = s => s.replace(REF, (m, k) => { const v = acha(k); return v == null ? m : v; });
+  for (const k in d) { const v = d[k]; if (typeof v === 'string') { if (v.indexOf('{@') >= 0) d[k] = troca(v); } else if (v && typeof v === 'object') for (const f in v) if (typeof v[f] === 'string' && v[f].indexOf('{@') >= 0) v[f] = troca(v[f]); } return d; }
+function busca(k, l) { const d = pronto(l); return d && Object.prototype.hasOwnProperty.call(d, k) ? d[k] : undefined; }
 const MARCA_BUILD = '__' + 'BUILD__', CARIMBO = '__BUILD__'; /* o en e o es vêm em arquivo à parte, sem a troca do build: o carimbo entra aqui */
 function preenche(s, vars) { if (s.indexOf(MARCA_BUILD) >= 0) s = s.split(MARCA_BUILD).join(CARIMBO); if (!vars || s.indexOf('{') < 0) return s; return s.replace(/\{(\w+)\}/g, (m, n) => Object.prototype.hasOwnProperty.call(vars, n) ? (typeof vars[n] === 'number' ? num(vars[n]) : String(vars[n])) : m); }
 function t(k, vars, reserva) { const l = ARD.idioma; let v = busca(k, l), ll = l; if (v === undefined) { v = busca(k, 'pt-BR'); ll = 'pt-BR'; } if (v === undefined) { if (reserva != null) return preenche(String(reserva), vars); falta(k); return k; }
@@ -37,10 +43,10 @@ function tn(tipo, id, reserva, campo) { return t(tipo + '.' + id + '.' + (campo 
 function tg(k, genero, vars, reserva) { const kg = k + '.' + (genero === 'f' ? 'f' : 'm'); return (busca(kg, ARD.idioma) !== undefined || busca(kg, 'pt-BR') !== undefined) ? t(kg, vars) : t(k, vars, reserva); }
 /* índice reverso pt-BR → chave: traduz na hora de mostrar um texto que só existe em português (simulação, tabelas, módulos de outra frente) */
 let REV = null, REV_DIC = null; const PADROES = []; let PAD_DIC = null;
-function indice() { const d = DIC['pt-BR'] || {}; if (REV && REV_DIC === d) return REV; REV = new Map(); REV_DIC = d; for (const k in d) { const v = d[k]; if (typeof v === 'string') { if (!REV.has(v)) REV.set(v, k); } else if (v && typeof v === 'object') for (const f in v) if (typeof v[f] === 'string' && !REV.has(v[f])) REV.set(v[f], k + '#' + f); } return REV; }
+function indice() { const d = pronto('pt-BR') || {}; if (REV && REV_DIC === d) return REV; REV = new Map(); REV_DIC = d; for (const k in d) { const v = d[k]; if (typeof v === 'string') { if (!REV.has(v)) REV.set(v, k); } else if (v && typeof v === 'object') for (const f in v) if (typeof v[f] === 'string' && !REV.has(v[f])) REV.set(v[f], k + '#' + f); } return REV; }
 const NUM = /^(n\d?|total|s|ms|fps|p|pct|mb)$/; /* marcadores que só pegam número nos padrões; {t} pega mm:ss; os outros, qualquer texto */
 const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-function padroes() { const d = DIC['pt-BR'] || {}; if (PAD_DIC === d) return PADROES; PAD_DIC = d; PADROES.length = 0;
+function padroes() { const d = pronto('pt-BR') || {}; if (PAD_DIC === d) return PADROES; PAD_DIC = d; PADROES.length = 0;
   for (const k in d) { if (!/^(sim|pad)\./.test(k)) continue; const v = d[k]; const fs = typeof v === 'string' ? { _: v } : v; for (const f in fs) { const s = fs[f]; if (typeof s !== 'string' || s.indexOf('{') < 0) continue; const nomes = []; const re = '^' + reEsc(s).replace(/\\\{(\w+)\\\}/g, (m, n) => { nomes.push(n); return NUM.test(n) ? '([-+−]?\\d[\\d.,]*)' : n === 't' ? '(\\d+:\\d\\d)' : '(.+?)'; }) + '$'; try { PADROES.push({ k, f, re: new RegExp(re), nomes, fixo: s.replace(/\{\w+\}/g, '').length, sub: /^pad\.sub\./.test(k) }); } catch (e) {} } }
   PADROES.sort((a, b) => b.fixo - a.fixo); return PADROES; }
 const CACHE = new Map();

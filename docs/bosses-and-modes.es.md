@@ -5,15 +5,15 @@
 
 Los jefes vienen de la Grieta: aparecen en la Cacería (el modo para derribar a un jefe, solo o con amigos), en los Eventos de la Grieta de la escaramuza y en la campaña.
 
-## El Heraldo
+## La Medusa de la Grieta
 
-*El primero en cruzar la Grieta*
+*La primera en cruzar la Grieta*
 
-<p><img src="imagens/chefoes/arauto_1.webp" alt="El Heraldo" width="200"> <img src="imagens/chefoes/arauto_2.webp" alt="El Heraldo" width="200"> <img src="imagens/chefoes/arauto_3.webp" alt="El Heraldo" width="200"> <img src="imagens/chefoes/arauto_j.webp" alt="El Heraldo" width="200"> <img src="imagens/chefoes/pilar.webp" alt="El Heraldo" width="200"></p>
+<p><img src="imagens/chefoes/arauto_1.webp" alt="La Medusa de la Grieta" width="200"> <img src="imagens/chefoes/arauto_2.webp" alt="La Medusa de la Grieta" width="200"> <img src="imagens/chefoes/arauto_3.webp" alt="La Medusa de la Grieta" width="200"> <img src="imagens/chefoes/arauto_j.webp" alt="La Medusa de la Grieta" width="200"> <img src="imagens/chefoes/pilar.webp" alt="La Medusa de la Grieta" width="200"></p>
 
 **Vida:** 22,000 · **Fases:** 1. Tres Pilares (100%) → 2. Ecos (66%) → 3. Colapso (33%)
 
-3 Pilares (2,600 de vida cada uno) alimentan el escudo del Heraldo; con los Pilares en el suelo, el escudo cae. Llama a 5 guardias cada 45 s y, en las fases siguientes, crea copias espectrales (Ecos) de tus unidades. En el Colapso abre un Pozo que lo atrae todo al centro; después del Pozo llega la ventana de daño, con el ojo abierto.
+3 Pilares (2,600 de vida cada uno) alimentan el escudo del jefe; con los Pilares en el suelo, el escudo cae. El jefe llama a 5 guardias cada 45 s y, en las fases siguientes, crea copias espectrales (Ecos) de tus unidades. En el Colapso abre un Pozo que lo atrae todo al centro; después del Pozo llega la ventana de daño, con el ojo abierto.
 
 **Golpes (con aviso en el suelo antes de cada uno)**
 
@@ -24,19 +24,19 @@ Los jefes vienen de la Grieta: aparecen en la Cacería (el modo para derribar a 
 | Ecos | 1.6 s | 46 | — | — |
 | Pozo de gravedad | 5 s | 520 | 360 | 20 s |
 
-**Recompensa:** La reliquia Lente del Heraldo (+10 % de visión en una partida) y el título del Heraldo.
+**Recompensa:** La reliquia Lente de la Medusa (+10 % de visión en una partida) y el título Cazador de la Medusa.
 
-## La Forja Madre
+## El Titán-Fragua
 
-*La fábrica antigua que camina*
+*El fósil que volvió a caminar*
 
-<p><img src="imagens/chefoes/forja.webp" alt="La Forja Madre" width="200"> <img src="imagens/chefoes/forja_b.webp" alt="La Forja Madre" width="200"> <img src="imagens/chefoes/forja_perna.webp" alt="La Forja Madre" width="200"></p>
+<p><img src="imagens/chefoes/forja.webp" alt="El Titán-Fragua" width="200"> <img src="imagens/chefoes/forja_b.webp" alt="El Titán-Fragua" width="200"> <img src="imagens/chefoes/forja_perna.webp" alt="El Titán-Fragua" width="200"></p>
 
 **Vida:** 40,000 · **Fases:** 1. Marcha (100%) → 2. Línea de montaje (66%) → 3. Núcleo expuesto (34%)
 
-Camina sobre 4 patas (2,200 de vida cada una): cada pata destruida la vuelve un 25 % más lenta. En la Línea de montaje levanta una torre cada 30 s (hasta 8) y suelta 4 drones cada 20 s. En el Núcleo expuesto, el cuerpo queda abierto al ataque.
+Camina sobre 4 patas (2,200 de vida cada una): cada pata destruida le quita un 25 % de velocidad. En la Línea de montaje levanta una torre cada 30 s (hasta 8) y suelta 4 drones cada 20 s. En el Núcleo expuesto, el cuerpo queda abierto al ataque.
 
-Captura: con el Núcleo expuesto, 5 o más de tu infantería hasta 110 del casco durante 30 s capturan a la Forja Madre.
+Captura: con el Núcleo expuesto, 5 o más de tu infantería hasta 110 del casco durante 30 s capturan al jefe.
 
 **Golpes (con aviso en el suelo antes de cada uno)**
 
@@ -46,15 +46,15 @@ Captura: con el Núcleo expuesto, 5 o más de tu infantería hasta 110 del casco
 | Soldadura | 1.8 s | 56 × 640 | 200 | 9 s |
 | Ola de calor | 2 s | +150 | 140 | 9 s |
 
-**Recompensa:** Destruir: la reliquia Corazón de la Forja. Capturar: el proyecto del Dron constructor (la unidad llega en una próxima versión).
+**Recompensa:** Destruir: la reliquia Corazón de la Fragua. Capturar: el proyecto del Dron constructor (la unidad llega en una próxima versión).
 
-## Centinela de la Grieta
+## La Centinela Devoradora
 
-*Vigía de la Grieta*
+*Depredadora de la Grieta*
 
-<p><img src="imagens/chefoes/sentinela.webp" alt="Centinela de la Grieta" width="200"></p>
+<p><img src="imagens/chefoes/sentinela.webp" alt="La Centinela Devoradora" width="200"></p>
 
-**Vida:** 12,000 · Un Heraldo menor que vigila la Grieta. Aparece en el centro del mapa en los Eventos de la Grieta; quien dé el golpe final se lleva la recompensa.
+**Vida:** 12,000 · Raya depredadora del vacío, con un racimo de ojos y la boca de dientes. Aparece en el centro del mapa en los Eventos de la Grieta; quien dé el golpe final se lleva la recompensa.
 
 **Golpes (con aviso en el suelo antes de cada uno)**
 
@@ -63,7 +63,7 @@ Captura: con el Núcleo expuesto, 5 o más de tu infantería hasta 110 del casco
 | Anillo | 1.6 s | 80 | 140 | 9 s |
 | Franja | 1.8 s | 56 × 620 | 170 | 9 s |
 
-Recompensa de quien derriba a la Centinela: 700 Mineral + 450 Plasma + 180 Datos.
+Recompensa de quien dé el golpe final: 700 Mineral + 450 Plasma + 180 Datos.
 
 ### Dificultad
 
@@ -80,8 +80,8 @@ Elige el jefe, la dificultad y los aliados (solo, 1 o 2 IA aliadas, o amigos en 
 
 | Jefe | Arena |
 |:--|:--|
-| El Heraldo | Llanura de la Grieta |
-| La Forja Madre | Restos del Titán |
+| La Medusa de la Grieta | Llanura de la Grieta |
+| El Titán-Fragua | Restos del Titán |
 
 | Dificultad | Recursos iniciales | IA aliada |
 |:--|:--|:--|
@@ -94,9 +94,9 @@ Elige el jefe, la dificultad y los aliados (solo, 1 o 2 IA aliadas, o amigos en 
 
 ## Eventos de la Grieta
 
-Opción de la escaramuza. El primer evento llega entre los 6 y los 8 min; la Centinela de la Grieta, entre los 12 y los 15 min; después, un evento cada 3 min, siempre con 20 s de aviso.
+Opción de la escaramuza. El primer evento llega entre los 6 y los 8 min; la Devoradora, entre los 12 y los 15 min; después, un evento cada 3 min, siempre con 20 s de aviso.
 
-- **Centinela de la Grieta:** Recompensa de quien derriba a la Centinela: 700 Mineral + 450 Plasma + 180 Datos.
+- **La Centinela Devoradora:** Recompensa de quien dé el golpe final: 700 Mineral + 450 Plasma + 180 Datos.
 - **Caravana Corsaria:** 3 naves corsarias (520 de vida cada una) cruzan el mapa durante 170 s. Quien destruya una se queda con la carga: 260 Mineral + 120 Plasma.
 - **Enjambre Errante:** 10 Crías errantes (150 de vida cada una) atacan lo que tengan más cerca durante 150 s.
 - **Lluvia de meteoros:** 8 meteoros, uno cada 3 s, con un anillo de aviso en el suelo (radio 80, 160 de daño). Donde caen, nacen cristales con 240 de recurso.

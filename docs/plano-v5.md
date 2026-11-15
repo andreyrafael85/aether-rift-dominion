@@ -618,13 +618,23 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
 - **Presos ao three r186:** `M5.ligacoesSemTexto` (cópia de um método interno; `?m5ligacoes=0` desliga) e `M5.memoLuzes` (`?m5luzchave=0`). Quem subir o three refaz ou remove.
 - **Fica para depois:** o reflexo dos lagos custa de 25% a 55% mais CPU de desenho com lago de gelo na tela (mexer muda a imagem); o quadro de 40 ms sem evento e sem criação no Firefox segue sem causa provada (a aposta é coleta de lixo; o Firefox daqui não roda WebGPU).
 
+#### 5.0h.5 — Chefões 3.0 · ✔ 15/11/2026
+- **O que entrou:** os três chefões viraram criaturas da Fenda com os nomes escolhidos pelo dono: **A Medusa da Fenda** (id `arauto`), **O Titã-Fornalha** (id `forja`) e **A Sentinela Devoradora** (id `sentinela`). Os ids internos, as regras das lutas, a vida e o dano não mudaram; os hashes das três partidas de referência são os da base.
+- **Nome num lugar só por idioma:** `chefe.<id>.nome`, mais a forma curta `chefe.<id>.curto`/`.Curto`; um texto cita outra chave com `{@chave}`.
+- **Aviso de golpe no corpo:** durante o aviso o desenho troca para uma pose (mandíbula escancarada do Titã, presas abertas da Devoradora, sino contraído da Medusa). É troca de pose, não movimento contínuo. Cada Caçada aquece 10 modelos (antes 7 e 8).
+- **Titã:** na Linha de montagem o dorso abre e os pontos fracos âmbar aparecem; patas da frente maiores; queda perna a perna conferida com dano da simulação.
+- **Sentinela maior só no desenho:** o raio na simulação ficou em 32. Com 42 o teste de determinismo divergia no WebKit (cenário "tudo", tique 780); a causa da conta que arredonda diferente não foi investigada. O corpo desenhado é cerca de 30% maior que o círculo de colisão, e o anel de seleção acompanha o desenho.
+- **Família:** pilar, coroa dos Ecos, marca do ponto fraco e lacaios da Fenda no mesmo visual. Imagens da documentação refeitas.
+- **Modelos 2.0 retirados** com o OK do dono (cópia guardada fora do repositório): `src/chefes-modelos.js` tem 89 KB (148 KB com os dois conjuntos). O arquivo é gerado por um script que fica fora do repositório.
+- **Fica para depois:** olho que segue o exército e transição animada entre fases; o aviso de golpe em luta só foi fotografado na Sentinela (Medusa e Titã vistos no estúdio); na documentação as quatro pernas do Titã aparecem do mesmo tamanho.
+
 ### v5.5 — Portas Abertas (aprovada pelo dono em 14/11/2026; revista no mesmo dia)
 
 **Decisão do dono:** o jogo só é publicado para o público geral quando estiver **completo** — campanhas, mundos, Raças, chefões, site próprio, domínio e a versão para baixar —, "sem ficar nada para depois". Enquanto isso, as redes sociais mostram o avanço do jogo para criar expectativa (o dono cria as contas; o material sai das nossas ferramentas a cada versão). O endereço de testes (GitHub Pages) continua como está até o lançamento.
 
 **Antes da 5.5a, fechando a 5.0h:**
 - **5.0h.4 — Desempenho no Motor 5 (✔ 14/11):** a travada da primeira vista de um lago no Firefox e a alocação por quadro.
-- **5.0h.5 — Chefões 3.0:** os três chefões deixam de ser máquinas e viram criaturas da Fenda, escolhidas pelo dono entre os conceitos: **A Medusa da Fenda** (era O Arauto), **O Titã-Fornalha** (era A Forja-Mãe) e **A Sentinela Devoradora** (era a Sentinela da Fenda, agora quase do tamanho dos outros). Regra da família: corpo violeta e azul profundo, o magenta da Fenda só deles, ponto fraco sempre âmbar, olho que segue o exército e boca que abre antes do golpe. Os lacaios (drones e Crias) entram na mesma família.
+- **5.0h.5 — Chefões 3.0 (✔ 15/11):** os três chefões deixam de ser máquinas e viram criaturas da Fenda, escolhidas pelo dono entre os conceitos: **A Medusa da Fenda** (era O Arauto), **O Titã-Fornalha** (era A Forja-Mãe) e **A Sentinela Devoradora** (era a Sentinela da Fenda, agora quase do tamanho dos outros). Regra da família: corpo violeta e azul profundo, o magenta da Fenda só deles, ponto fraco sempre âmbar, olho que segue o exército e boca que abre antes do golpe. Os lacaios (drones e Crias) entram na mesma família.
 
 **Ordem de arte dentro da 5.5a (reavaliação gráfica de 14/11, na ordem recomendada e aceita):**
 1. **Luz da Fenda:** sol baixo e quente e sombra violeta, as cores da marca como luz do mundo (só parâmetros que já existem; no celular, só as cores).
@@ -634,7 +644,7 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
 #### Fase 1 — Porta de entrada
 
 ##### 5.5a — Porta de entrada · tamanho M/G · 3 agentes
-- **Entra:** a Luz da Fenda e a leitura (itens 1 e 2 acima) e o território na cor de cada Raça (primeiro passo de "o chão conta quem manda"); primeira partida guiada de 5 a 7 minutos, com um objetivo por vez e o HUD nascendo aos poucos; modo **Blitz** (1 contra 1, mapa pequeno, 8 a 10 minutos); tela final nova (item 3); **link de convite** que já abre a sala; primeira rodada de balanceamento (meta: 40% a 60% no jogo automático); polimentos baratos (barra do comandante por baixo da pausa e da tela final, barra de cima em 1600×900, rótulo da Raça sobre a Fenda, "Copiar resultado (JSON)" fora da tela final, promoção como estrela na barra de vida); o catálogo de cosméticos como dados, sem vender nada.
+- **Entra:** a Luz da Fenda e a leitura (itens 1 e 2 acima) e o território na cor de cada Raça (primeiro passo de "o chão conta quem manda"); primeira partida guiada de 5 a 7 minutos, com um objetivo por vez e o HUD nascendo aos poucos; modo **Blitz** (1 contra 1, mapa pequeno, 8 a 10 minutos); tela final nova (item 3); **link de convite** que já abre a sala; primeira rodada de balanceamento (meta: 40% a 60% no jogo automático); polimentos baratos (barra do comandante por baixo da pausa e da tela final, barra de cima em 1600×900, rótulo da Raça sobre a Fenda, "Copiar resultado (JSON)" fora da tela final, promoção como estrela na barra de vida); o catálogo de cosméticos como dados, sem vender nada; **desempenho no Firefox (Motor 5):** menos chamadas à placa de vídeo por quadro, agrupando os envios de dados (teste do dono na 5.0h.4: sem criações na GPU, pior quadro 83 → 53 ms, mas 1% ainda em 25 fps, com quadros de 50 ms em que o desenho da cena custa 23 a 28 ms sem evento nenhum; Chrome e iPhone ótimos).
 - **Pronto quando:** um visitante novo termina a partida guiada sem ajuda no computador e no celular; o convite abre a sala em um toque; o jogo automático fica na faixa; fotos antes e depois da luz nos dois motores; desempenho dentro do orçamento da §8.
 
 ##### 5.5b — Compartilhar · tamanho M · 2 agentes

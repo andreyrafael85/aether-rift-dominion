@@ -5,15 +5,15 @@
 
 Os chefões vêm da Fenda: aparecem na Caçada (o modo de derrubar um chefão, sozinho ou com amigos), nos Eventos da Fenda da escaramuça e na campanha.
 
-## O Arauto
+## A Medusa da Fenda
 
-*O primeiro a atravessar a Fenda*
+*A primeira a atravessar a Fenda*
 
-<p><img src="imagens/chefoes/arauto_1.webp" alt="O Arauto" width="200"> <img src="imagens/chefoes/arauto_2.webp" alt="O Arauto" width="200"> <img src="imagens/chefoes/arauto_3.webp" alt="O Arauto" width="200"> <img src="imagens/chefoes/arauto_j.webp" alt="O Arauto" width="200"> <img src="imagens/chefoes/pilar.webp" alt="O Arauto" width="200"></p>
+<p><img src="imagens/chefoes/arauto_1.webp" alt="A Medusa da Fenda" width="200"> <img src="imagens/chefoes/arauto_2.webp" alt="A Medusa da Fenda" width="200"> <img src="imagens/chefoes/arauto_3.webp" alt="A Medusa da Fenda" width="200"> <img src="imagens/chefoes/arauto_j.webp" alt="A Medusa da Fenda" width="200"> <img src="imagens/chefoes/pilar.webp" alt="A Medusa da Fenda" width="200"></p>
 
 **Vida:** 22.000 · **Fases:** 1. Três Pilares (100%) → 2. Ecos (66%) → 3. Colapso (33%)
 
-3 Pilares (2.600 de vida cada) alimentam o escudo do Arauto; com os Pilares no chão, o escudo cai. Ele chama 5 guardas a cada 45 s e, nas fases seguintes, cria cópias espectrais (Ecos) das suas unidades. No Colapso, abre um Poço que puxa tudo para o centro; depois do Poço vem a janela de dano, com o olho aberto.
+3 Pilares (2.600 de vida cada) alimentam o escudo do chefão; com os Pilares no chão, o escudo cai. O chefão chama 5 guardas a cada 45 s e, nas fases seguintes, cria cópias espectrais (Ecos) das suas unidades. No Colapso, abre um Poço que puxa tudo para o centro; depois do Poço vem a janela de dano, com o olho aberto.
 
 **Golpes (com aviso no chão antes de cada um)**
 
@@ -24,19 +24,19 @@ Os chefões vêm da Fenda: aparecem na Caçada (o modo de derrubar um chefão, s
 | Ecos | 1,6 s | 46 | — | — |
 | Poço de gravidade | 5 s | 520 | 360 | 20 s |
 
-**Recompensa:** Relíquia Lente do Arauto (+10% de visão numa partida) e o título do Arauto.
+**Recompensa:** Relíquia Lente da Medusa (+10% de visão numa partida) e o título Caçador da Medusa.
 
-## A Forja-Mãe
+## O Titã-Fornalha
 
-*A fábrica antiga que anda*
+*O fóssil que voltou a andar*
 
-<p><img src="imagens/chefoes/forja.webp" alt="A Forja-Mãe" width="200"> <img src="imagens/chefoes/forja_b.webp" alt="A Forja-Mãe" width="200"> <img src="imagens/chefoes/forja_perna.webp" alt="A Forja-Mãe" width="200"></p>
+<p><img src="imagens/chefoes/forja.webp" alt="O Titã-Fornalha" width="200"> <img src="imagens/chefoes/forja_b.webp" alt="O Titã-Fornalha" width="200"> <img src="imagens/chefoes/forja_perna.webp" alt="O Titã-Fornalha" width="200"></p>
 
 **Vida:** 40.000 · **Fases:** 1. Marcha (100%) → 2. Linha de montagem (66%) → 3. Núcleo exposto (34%)
 
-Anda sobre 4 pernas (2.200 de vida cada): cada perna destruída a deixa 25% mais lenta. Na Linha de montagem ergue uma torre a cada 30 s (até 8) e solta 4 drones a cada 20 s. No Núcleo exposto, o corpo fica aberto ao ataque.
+Anda sobre 4 pernas (2.200 de vida cada): cada perna destruída tira 25% da velocidade. Na Linha de montagem ergue uma torre a cada 30 s (até 8) e solta 4 drones a cada 20 s. No Núcleo exposto, o corpo fica aberto ao ataque.
 
-Captura: com o Núcleo exposto, 5 ou mais da sua infantaria a até 110 do casco por 30 s capturam a Forja-Mãe.
+Captura: com o Núcleo exposto, 5 ou mais da sua infantaria a até 110 do casco por 30 s capturam o chefão.
 
 **Golpes (com aviso no chão antes de cada um)**
 
@@ -46,15 +46,15 @@ Captura: com o Núcleo exposto, 5 ou mais da sua infantaria a até 110 do casco 
 | Solda | 1,8 s | 56 × 640 | 200 | 9 s |
 | Onda de calor | 2 s | +150 | 140 | 9 s |
 
-**Recompensa:** Destruir: a relíquia Coração da Forja. Capturar: o projeto do Drone-construtor (a unidade chega numa próxima versão).
+**Recompensa:** Destruir: a relíquia Coração da Fornalha. Capturar: o projeto do Drone-construtor (a unidade chega numa próxima versão).
 
-## Sentinela da Fenda
+## A Sentinela Devoradora
 
-*Vigia da Fenda*
+*Predadora da Fenda*
 
-<p><img src="imagens/chefoes/sentinela.webp" alt="Sentinela da Fenda" width="200"></p>
+<p><img src="imagens/chefoes/sentinela.webp" alt="A Sentinela Devoradora" width="200"></p>
 
-**Vida:** 12.000 · Um Arauto menor que vigia a Fenda. Aparece no centro do mapa nos Eventos da Fenda; quem der o golpe final leva a recompensa.
+**Vida:** 12.000 · Raia predadora do vazio, com um cacho de olhos e a boca de dentes. Aparece no centro do mapa nos Eventos da Fenda; quem der o golpe final leva a recompensa.
 
 **Golpes (com aviso no chão antes de cada um)**
 
@@ -63,7 +63,7 @@ Captura: com o Núcleo exposto, 5 ou mais da sua infantaria a até 110 do casco 
 | Anel | 1,6 s | 80 | 140 | 9 s |
 | Faixa | 1,8 s | 56 × 620 | 170 | 9 s |
 
-Recompensa de quem derruba a Sentinela: 700 Minério + 450 Plasma + 180 Dados.
+Recompensa de quem der o golpe final: 700 Minério + 450 Plasma + 180 Dados.
 
 ### Dificuldade
 
@@ -80,8 +80,8 @@ Escolha o chefão, a dificuldade e os aliados (sozinho, 1 ou 2 IAs aliadas, ou a
 
 | Chefão | Arena |
 |:--|:--|
-| O Arauto | Planície da Fenda |
-| A Forja-Mãe | Destroço do Titã |
+| A Medusa da Fenda | Planície da Fenda |
+| O Titã-Fornalha | Destroço do Titã |
 
 | Dificuldade | Recursos iniciais | IA aliada |
 |:--|:--|:--|
@@ -94,9 +94,9 @@ Escolha o chefão, a dificuldade e os aliados (sozinho, 1 ou 2 IAs aliadas, ou a
 
 ## Eventos da Fenda
 
-Opção da escaramuça. O primeiro evento chega entre 6 e 8 min; a Sentinela da Fenda, entre 12 e 15 min; depois, um evento a cada 3 min, sempre com 20 s de aviso.
+Opção da escaramuça. O primeiro evento chega entre 6 e 8 min; a Devoradora, entre 12 e 15 min; depois, um evento a cada 3 min, sempre com 20 s de aviso.
 
-- **Sentinela da Fenda:** Recompensa de quem derruba a Sentinela: 700 Minério + 450 Plasma + 180 Dados.
+- **A Sentinela Devoradora:** Recompensa de quem der o golpe final: 700 Minério + 450 Plasma + 180 Dados.
 - **Caravana Corsária:** 3 naves corsárias (520 de vida cada) cruzam o mapa por 170 s. Quem destruir uma fica com a carga: 260 Minério + 120 Plasma.
 - **Enxame Errante:** 10 Crias errantes (150 de vida cada) atacam o que estiver mais perto por 150 s.
 - **Chuva de meteoros:** 8 meteoros, um a cada 3 s, com anel de aviso no chão (raio 80, 160 de dano). Onde caem, nascem cristais com 240 de recurso.

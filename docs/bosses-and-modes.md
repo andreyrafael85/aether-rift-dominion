@@ -5,15 +5,15 @@
 
 The bosses come from the Rift: they show up in the Hunt (the mode for taking down a boss, alone or with friends), in the Rift Events of skirmish and in the campaign.
 
-## The Herald
+## The Rift Medusa
 
 *The first to cross the Rift*
 
-<p><img src="imagens/chefoes/arauto_1.webp" alt="The Herald" width="200"> <img src="imagens/chefoes/arauto_2.webp" alt="The Herald" width="200"> <img src="imagens/chefoes/arauto_3.webp" alt="The Herald" width="200"> <img src="imagens/chefoes/arauto_j.webp" alt="The Herald" width="200"> <img src="imagens/chefoes/pilar.webp" alt="The Herald" width="200"></p>
+<p><img src="imagens/chefoes/arauto_1.webp" alt="The Rift Medusa" width="200"> <img src="imagens/chefoes/arauto_2.webp" alt="The Rift Medusa" width="200"> <img src="imagens/chefoes/arauto_3.webp" alt="The Rift Medusa" width="200"> <img src="imagens/chefoes/arauto_j.webp" alt="The Rift Medusa" width="200"> <img src="imagens/chefoes/pilar.webp" alt="The Rift Medusa" width="200"></p>
 
 **Health:** 22,000 · **Phases:** 1. Three Pillars (100%) → 2. Echoes (66%) → 3. Collapse (33%)
 
-3 Pillars (2,600 health each) power the Herald's shield; with the Pillars down, the shield drops. It calls 5 guards every 45 s and, in later phases, makes spectral copies (Echoes) of your units. In Collapse it opens a Well that pulls everything to the center; after the Well comes the damage window, with the eye open.
+3 Pillars (2,600 health each) power the boss's shield; with the Pillars down, the shield drops. The boss calls 5 guards every 45 s and, in later phases, makes spectral copies (Echoes) of your units. In Collapse it opens a Well that pulls everything to the center; after the Well comes the damage window, with the eye open.
 
 **Attacks (with a warning on the ground before each one)**
 
@@ -24,19 +24,19 @@ The bosses come from the Rift: they show up in the Hunt (the mode for taking dow
 | Echoes | 1.6 s | 46 | — | — |
 | Gravity Well | 5 s | 520 | 360 | 20 s |
 
-**Reward:** The Herald's Lens relic (+10% sight for one match) and the Herald title.
+**Reward:** The Medusa Lens relic (+10% sight for one match) and the Medusa Hunter title.
 
-## The Mother Forge
+## The Furnace Titan
 
-*The ancient factory that walks*
+*The fossil that walks again*
 
-<p><img src="imagens/chefoes/forja.webp" alt="The Mother Forge" width="200"> <img src="imagens/chefoes/forja_b.webp" alt="The Mother Forge" width="200"> <img src="imagens/chefoes/forja_perna.webp" alt="The Mother Forge" width="200"></p>
+<p><img src="imagens/chefoes/forja.webp" alt="The Furnace Titan" width="200"> <img src="imagens/chefoes/forja_b.webp" alt="The Furnace Titan" width="200"> <img src="imagens/chefoes/forja_perna.webp" alt="The Furnace Titan" width="200"></p>
 
 **Health:** 40,000 · **Phases:** 1. March (100%) → 2. Assembly Line (66%) → 3. Exposed Core (34%)
 
 It walks on 4 legs (2,200 health each): every leg destroyed makes it 25% slower. In Assembly Line it raises a turret every 30 s (up to 8) and releases 4 drones every 20 s. In Exposed Core, the body is open to attack.
 
-Capture: with the Core exposed, 5 or more of your infantry within 110 of the hull for 30 s capture the Mother Forge.
+Capture: with the Core exposed, 5 or more of your infantry within 110 of the hull for 30 s capture the boss.
 
 **Attacks (with a warning on the ground before each one)**
 
@@ -46,15 +46,15 @@ Capture: with the Core exposed, 5 or more of your infantry within 110 of the hul
 | Weld | 1.8 s | 56 × 640 | 200 | 9 s |
 | Heat Wave | 2 s | +150 | 140 | 9 s |
 
-**Reward:** Destroy: the Forge Heart relic. Capture: the Builder Drone blueprint (the unit arrives in a future version).
+**Reward:** Destroy: the Furnace Heart relic. Capture: the Builder Drone blueprint (the unit arrives in a future version).
 
-## Rift Sentinel
+## The Devouring Sentinel
 
-*Warden of the Rift*
+*Predator of the Rift*
 
-<p><img src="imagens/chefoes/sentinela.webp" alt="Rift Sentinel" width="200"></p>
+<p><img src="imagens/chefoes/sentinela.webp" alt="The Devouring Sentinel" width="200"></p>
 
-**Health:** 12,000 · A smaller Herald that watches over the Rift. It appears at the center of the map in the Rift Events; whoever lands the final blow takes the reward.
+**Health:** 12,000 · A predatory ray of the void, with a cluster of eyes and a mouth of teeth. It appears at the center of the map in the Rift Events; whoever lands the final blow takes the reward.
 
 **Attacks (with a warning on the ground before each one)**
 
@@ -63,7 +63,7 @@ Capture: with the Core exposed, 5 or more of your infantry within 110 of the hul
 | Ring | 1.6 s | 80 | 140 | 9 s |
 | Beam | 1.8 s | 56 × 620 | 170 | 9 s |
 
-Reward for whoever takes down the Sentinel: 700 Ore + 450 Plasma + 180 Data.
+Reward for whoever lands the final blow: 700 Ore + 450 Plasma + 180 Data.
 
 ### Difficulty
 
@@ -80,8 +80,8 @@ Pick the boss, the difficulty and the allies (alone, 1 or 2 allied AIs, or frien
 
 | Boss | Arena |
 |:--|:--|
-| The Herald | Rift Plains |
-| The Mother Forge | Titan's Wreck |
+| The Rift Medusa | Rift Plains |
+| The Furnace Titan | Titan's Wreck |
 
 | Difficulty | Starting resources | Allied AI |
 |:--|:--|:--|
@@ -94,9 +94,9 @@ Pick the boss, the difficulty and the allies (alone, 1 or 2 allied AIs, or frien
 
 ## Rift Events
 
-A skirmish option. The first event comes between 6 and 8 min; the Rift Sentinel, between 12 and 15 min; after that, one event every 3 min, always with a 20 s warning.
+A skirmish option. The first event comes between 6 and 8 min; the Devourer, between 12 and 15 min; after that, one event every 3 min, always with a 20 s warning.
 
-- **Rift Sentinel:** Reward for whoever takes down the Sentinel: 700 Ore + 450 Plasma + 180 Data.
+- **The Devouring Sentinel:** Reward for whoever lands the final blow: 700 Ore + 450 Plasma + 180 Data.
 - **Corsair Caravan:** 3 corsair ships (520 health each) cross the map for 170 s. Whoever destroys one keeps its cargo: 260 Ore + 120 Plasma.
 - **Wandering Swarm:** 10 wandering Broodlings (150 health each) attack whatever is closest for 150 s.
 - **Meteor shower:** 8 meteors, one every 3 s, with a warning ring on the ground (radius 80, 160 damage). Where they land, crystals with 240 resources appear.

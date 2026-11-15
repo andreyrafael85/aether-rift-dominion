@@ -15,14 +15,14 @@ const KEY = 'ard-modos-v1';
 function prefs() { try { return Object.assign({ chefe: 'arauto', dif: 'normal', aliados: '0', mutJogar: [], mutCac: [], eventos: false, lente: false, salaModo: 'escaramuca', salaChefe: 'arauto', salaDif: 'normal', salaMut: [] }, JSON.parse(localStorage.getItem(KEY) || '{}') || {}); } catch (e) { return { chefe: 'arauto', dif: 'normal', aliados: '0', mutJogar: [], mutCac: [], eventos: false, lente: false, salaModo: 'escaramuca', salaChefe: 'arauto', salaDif: 'normal', salaMut: [] }; } }
 function guarda(patch) { const p = Object.assign(prefs(), patch); try { localStorage.setItem(KEY, JSON.stringify(p)); } catch (e) {} return p; }
 /* nomes */
-const nomeChefe = id => T('chefe.' + id + '.nome', null, { arauto: 'O Arauto', forja: 'A Forja-Mãe', sentinela: 'Sentinela da Fenda' }[id] || id);
+const nomeChefe = id => T('chefe.' + id + '.nome', null, { arauto: 'A Medusa da Fenda', forja: 'O Titã-Fornalha', sentinela: 'A Sentinela Devoradora' }[id] || id);
 const tituloChefe = id => T('chefe.' + id + '.titulo', null, { arauto: 'o primeiro a atravessar', forja: 'a fábrica antiga que anda', sentinela: 'a vigia desperta da Fenda' }[id] || '');
 const nomeDif = k => (ARD.i18n && ARD.i18n.d ? ARD.i18n.d.dificuldade(k) : k);
 const nomeMapa = k => ARD.i18n && ARD.i18n.d ? ARD.i18n.d.mapa(k) : (k === 'tita' ? 'Destroço do Titã' : k); /* 5.0g junção: o Titã usa a chave mapa.tita do g-sim */
 const nomeMut = k => T('modos.mut.' + k, null, { noite: 'Noite Eterna', tempestades: 'Tempestades Frequentes', escassos: 'Recursos Escassos' }[k]);
 const descMut = k => T('modos.mut.' + k + '-d', null, { noite: 'a noite não acaba e a visão cai 25%', tempestades: 'Tempestades de Éter o dobro de vezes; dentro delas, unidades 10% mais lentas', escassos: 'nós e destroços rendem a metade' }[k]);
 const nomeMedalha = m => T('modos.medalha.' + m, null, { ouro: 'Ouro', prata: 'Prata', bronze: 'Bronze' }[m]);
-const nomeTitulo = k => T('modos.titulo.' + k, null, { 'cacador-arauto': 'Caçador do Arauto', 'quebra-forja': 'Quebra-Forja', 'cacador-ouro': 'Caçador de Ouro' }[k] || k);
+const nomeTitulo = k => T('modos.titulo.' + k, null, { 'cacador-arauto': 'Caçador da Medusa', 'quebra-forja': 'Quebra-Fornalha', 'cacador-ouro': 'Caçador de Ouro' }[k] || k);
 /* glifos dos chefões (SVG próprio, feito aqui: o olho com três anéis do Arauto e a fábrica de quatro pernas da Forja-Mãe) */
 const GLIFO = {
   arauto: '<svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="32" rx="27" ry="10" fill="none" stroke="currentColor" stroke-width="2" opacity=".55" transform="rotate(-18 32 32)"/><ellipse cx="32" cy="32" rx="22" ry="22" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><ellipse cx="32" cy="32" rx="10" ry="26" fill="none" stroke="currentColor" stroke-width="2" opacity=".55" transform="rotate(24 32 32)"/><path d="M32 18 L42 32 L32 46 L22 32 Z" fill="currentColor" opacity=".25"/><circle cx="32" cy="32" r="6" fill="currentColor"/><circle cx="32" cy="32" r="2.4" fill="#fff"/></svg>',
@@ -36,10 +36,10 @@ function chipsMut(id, sel, onChange) { const el = $(id); if (!el) return;
   el.querySelectorAll('[data-mut]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.mut; const i = sel.indexOf(k); if (i >= 0) sel.splice(i, 1); else sel.push(k); b.classList.toggle('on', i < 0); b.setAttribute('aria-pressed', i < 0 ? 'true' : 'false'); onChange(sel.slice()); })); }
 function temLente() { try { return P().load().cacada.reliquias.includes('lente-arauto'); } catch (e) { return false; } }
 function linhaLente(id, on, onChange) { const el = $(id); if (!el) return; el.hidden = !temLente(); if (el.hidden) return;
-  el.innerHTML = `<label class="chk"><input type="checkbox" ${on ? 'checked' : ''}> <span><b>${esc(T('modos.lente', null, 'Lente do Arauto'))}</b> · ${esc(T('modos.lente-d', null, '+10% de visão nesta partida'))}</span></label>`;
+  el.innerHTML = `<label class="chk"><input type="checkbox" ${on ? 'checked' : ''}> <span><b>${esc(T('modos.lente', null, 'Lente da Medusa'))}</b> · ${esc(T('modos.lente-d', null, '+10% de visão nesta partida'))}</span></label>`;
   el.querySelector('input').addEventListener('change', e => onChange(e.target.checked)); }
 function desenhaJogar() { const p = prefs(); const el = $('regras-jogar'); if (!el) return;
-  el.innerHTML = `<label class="chk ev-chk"><input type="checkbox" id="opt-eventos" ${p.eventos ? 'checked' : ''}> <span><b>${esc(T('modos.ev.titulo', null, 'Eventos da Fenda'))}</b><small>${esc(T('modos.ev.desc', null, 'Sentinela da Fenda, Caravana Corsária, Enxame Errante e chuva de meteoros durante a partida'))}</small></span></label><div id="mut-jogar"></div><div id="mundo-jogar"></div><div id="cmd-jogar"></div><div id="lente-jogar" class="lente-l" hidden></div>`; /* 5.0h: Mundo vivo */
+  el.innerHTML = `<label class="chk ev-chk"><input type="checkbox" id="opt-eventos" ${p.eventos ? 'checked' : ''}> <span><b>${esc(T('modos.ev.titulo', null, 'Eventos da Fenda'))}</b><small>${esc(T('modos.ev.desc', null, 'A Sentinela Devoradora, Caravana Corsária, Enxame Errante e chuva de meteoros durante a partida'))}</small></span></label><div id="mut-jogar"></div><div id="mundo-jogar"></div><div id="cmd-jogar"></div><div id="lente-jogar" class="lente-l" hidden></div>`; /* 5.0h: Mundo vivo */
   $('opt-eventos').addEventListener('change', e => guarda({ eventos: e.target.checked }));
   chipsMut('mut-jogar', p.mutJogar.slice(), v => guarda({ mutJogar: v })); linhaLente('lente-jogar', p.lente, v => guarda({ lente: v })); if (ARD.mundoUI) ARD.mundoUI.bloco('mundo-jogar', 'jogar'); /* 5.0h */ if (ARD.unicasUI) ARD.unicasUI.bloco('cmd-jogar', 'jogar'); /* 5.0h junção: comandantes em campo */ }
 
@@ -102,12 +102,12 @@ function clima(cfg, nome) { if ((nome || 'auto') !== 'auto') return nome; const 
 function etiquetas(cfg) { const r = MO().resumo(cfg); const out = [];
   if (r.cacada) out.push({ k: 'cac', t: T('modos.cartao.cacada', { chefe: nomeChefe(r.cacada.chefe), dif: nomeDif(r.cacada.dif) }, 'Caçada · {chefe} · {dif}') });
   if (r.eventos) out.push({ k: 'ev', t: T('modos.ev.titulo', null, 'Eventos da Fenda') });
-  for (const m of r.mutadores) out.push({ k: 'mut', t: nomeMut(m) }); if (r.lente) out.push({ k: 'rel', t: T('modos.lente', null, 'Lente do Arauto') }); { const mw = ARD.mundoUI && ARD.mundoUI.etiqueta(cfg); if (mw) out.push(mw); } /* 5.0h */ return out; }
+  for (const m of r.mutadores) out.push({ k: 'mut', t: nomeMut(m) }); if (r.lente) out.push({ k: 'rel', t: T('modos.lente', null, 'Lente da Medusa') }); { const mw = ARD.mundoUI && ARD.mundoUI.etiqueta(cfg); if (mw) out.push(mw); } /* 5.0h */ return out; }
 function cartao(cfg) { try { const box = document.querySelector('#loading .box'); if (!box) return; let el = $('load-modos'); if (!el) { el = document.createElement('div'); el.id = 'load-modos'; el.className = 'modos-tags'; const ref = $('load-tip'); if (ref) ref.before(el); else box.appendChild(el); }
   const tg = etiquetas(cfg); el.hidden = !tg.length; el.innerHTML = tg.map(x => `<span class="mtag t-${x.k}">${esc(x.t)}</span>`).join('');
   if (cfg && cfg.cacada && $('load-title')) $('load-title').textContent = nomeChefe(cfg.cacada.chefe) + ' · ' + nomeMapa(MO().CACADA[cfg.cacada.chefe].mapa); } catch (e) { console.warn('[ARD] modos (cartão):', e); } }
 /* título e linha do salvamento (o texto fica em pt-BR no salvamento, como o resto do cartão de retomar) */
-function salvo(sim) { const r = MO().resumo(sim); const pt = { arauto: 'O Arauto', forja: 'A Forja-Mãe' }; const mn = { noite: 'Noite Eterna', tempestades: 'Tempestades Frequentes', escassos: 'Recursos Escassos' };
+function salvo(sim) { const r = MO().resumo(sim); const U = (ARD.sim && ARD.sim.UNITS) || {}; const pt = { arauto: (U.arauto || {}).name, forja: (U.forja || {}).name }; /* 5.0h.5: o nome em pt-BR da tabela (chave chefe.<id>.nome) */ const mn = { noite: 'Noite Eterna', tempestades: 'Tempestades Frequentes', escassos: 'Recursos Escassos' };
   return { titulo: r.cacada ? 'Caçada · ' + (pt[r.cacada.chefe] || r.cacada.chefe) : null, extra: (r.eventos ? ' · Eventos da Fenda' : '') + (r.mutadores.length ? ' · ' + r.mutadores.map(m => mn[m]).join(', ') : '') + (ARD.mundoUI ? ARD.mundoUI.salvo(sim) : '') /* 5.0h */ }; }
 /* faixa do modo na partida (abaixo do topo): os mutadores e a Caçada à vista o tempo todo */
 function faixa(sim) { try { const tg = etiquetas(sim.cfg); let el = $('modos-faixa'); if (!tg.length) { if (el) el.hidden = true; return; } if (!el) { el = document.createElement('div'); el.id = 'modos-faixa'; el.className = 'modos-tags faixa'; const g = $('game'); if (g) g.appendChild(el); }
@@ -120,9 +120,9 @@ function fim(result, sim, human) { const c = result && result.cacada; if (!c) re
   L.push(`<div class="cac-fim ${won ? 'won' : 'lost'}">${won && c.medalha ? `<div class="medalha-g m-${c.medalha}" role="img" aria-label="${esc(T('modos.fim.medalha', { m: nomeMedalha(c.medalha) }, 'Medalha: {m}'))}"><span>${esc(nomeMedalha(c.medalha))}</span></div>` : ''}<div class="cac-num"><div class="stat"><span>${esc(T('modos.fim.tempo', null, 'Tempo'))}</span><b>${mmss(c.tempo)}</b></div><div class="stat"><span>${esc(T('modos.fim.perdas', null, 'Perdas'))}</span><b>${c.perdas}</b></div>${reg && reg.rec && reg.rec.melhor ? `<div class="stat"><span>${esc(T('modos.fim.recorde', null, 'Recorde'))}</span><b>${mmss(reg.rec.melhor)}</b></div>` : ''}</div></div>`);
   if (reg && reg.novoRecorde) L.push(`<div class="unlock">${esc(T('modos.fim.recorde-novo', null, 'Novo recorde local!'))}</div>`);
   if (reg && reg.trofeu) L.push(`<div class="unlock">${esc(T('modos.fim.trofeu', { chefe: nomeChefe(c.chefe), m: nomeMedalha(reg.trofeu) }, 'Troféu no Hangar: {chefe} ({m})'))}</div>`);
-  if (reg && reg.reliquia) L.push(`<div class="unlock">${esc(T('modos.fim.reliquia', null, 'Relíquia: Lente do Arauto (+10% de visão numa partida que você escolher)'))}</div>`);
+  if (reg && reg.reliquia) L.push(`<div class="unlock">${esc(T('modos.fim.reliquia', null, 'Relíquia: Lente da Medusa (+10% de visão numa partida que você escolher)'))}</div>`);
   if (reg && reg.titulos) for (const t of reg.titulos) L.push(`<div class="unlock">${esc(T('modos.fim.titulo', { t: nomeTitulo(t) }, 'Título: {t}'))}</div>`);
-  if (reg && reg.projeto) L.push(`<div class="unlock">${esc(T('modos.fim.projeto', null, 'Projeto recuperado da Forja-Mãe: a unidade nova chega numa próxima versão'))}</div>`);
+  if (reg && reg.projeto) L.push(`<div class="unlock">${esc(T('modos.fim.projeto', null, 'Projeto recuperado na captura: a unidade nova chega numa próxima versão'))}</div>`);
   return { html: L.join(''), titulo: T(won ? 'modos.fim.vitoria' : 'modos.fim.derrota', null, won ? 'Caçada vencida' : 'A Fenda venceu'), eyebrow: T('modos.fim.eyebrow', { chefe: nomeChefe(c.chefe), dif: nomeDif(c.dif) }, 'Caçada · {chefe} · {dif}') }; }
 /* fim da escaramuça com eventos: a Sentinela derrubada conta no progresso */
 function fimEscaramuca(sim, human) { try { const p = sim.players[human]; if (p && p.sentinelas) P().registrarSentinela(p.sentinelas); } catch (e) {} }
@@ -133,8 +133,8 @@ function hangar() { const box = document.querySelector('#hangar .hg-opts'); if (
   const tro = CHEFES.filter(c => s.trofeus[c]).map(c => `<span class="trofeu m-${s.trofeus[c]}" title="${esc(nomeMedalha(s.trofeus[c]))}"><span class="tro-gl">${GLIFO[c]}</span><b>${esc(nomeChefe(c))}</b><small>${esc(nomeMedalha(s.trofeus[c]))}</small></span>`).join('');
   el.innerHTML = `<div class="small muted">${esc(T('modos.hg.trofeus', null, 'Troféus da Caçada'))}</div><div class="trofeus">${tro || `<span class="small muted">${esc(T('modos.hg.nenhum', null, 'Nenhum troféu ainda: vença uma Caçada.'))}</span>`}</div>` +
     (s.titulos.length ? `<div class="small muted">${esc(T('modos.hg.titulos', null, 'Títulos'))}: ${s.titulos.map(t => esc(nomeTitulo(t))).join(', ')}</div>` : '') +
-    (s.projetos.length ? `<div class="small muted">${esc(T('modos.hg.projetos', null, 'Projetos'))}: ${esc(T('modos.hg.projeto-forja', null, 'projeto da Forja-Mãe (a unidade chega numa próxima versão)'))}</div>` : '') +
-    (s.sentinelas ? `<div class="small muted">${esc(T('modos.hg.sentinelas', { n: s.sentinelas }, 'Sentinelas derrubadas: {n}'))}</div>` : ''); }
+    (s.projetos.length ? `<div class="small muted">${esc(T('modos.hg.projetos', null, 'Projetos'))}: ${esc(T('modos.hg.projeto-forja', null, 'projeto recuperado na captura (a unidade chega numa próxima versão)'))}</div>` : '') +
+    (s.sentinelas ? `<div class="small muted">${esc(T('modos.hg.sentinelas', { n: s.sentinelas }, 'Vitórias sobre a Devoradora: {n}'))}</div>` : ''); }
 
 /* ---------- montagem (tela inicial) ---------- */
 function montar(deps) { D = deps; if (!MO()) return;

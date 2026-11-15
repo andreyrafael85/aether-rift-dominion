@@ -36,17 +36,22 @@ CH.bossOf = function (sim) { const s = S(); if (s && typeof s.bossOf === 'functi
 const fase = e => Math.max(1, Math.min(3, (e.boss && e.boss.fase) | 0 || 1)); /* lido como 1, 2, 3 (0 conta como a 1) */
 CH.ecoDono = function (e) { const v = e.eco != null ? e.eco : e.espectro; if (v == null || v === false) return -1; if (typeof v === 'number') return v; if (typeof v === 'object' && v.dono != null) return v.dono | 0; return -1; };
 const PERNAS = new Map(); /* id do chefe → { vistas: já houve partes 'perna', vivas: máscara dos 4 cantos } (o 3D e o modelo leem) */
+/* 5.0h.5 (Chefões 3.0): o corpo reage antes do golpe. Enquanto há um aviso de golpe do chefão em sim.avisos (só leitura), o desenho troca para a
+   variante '_g' do modelo (mandíbula aberta, garganta e olhos acesos, sino contraído). As variantes nascem no aquecimento, como as das fases */
+const GOLPE = new Set(); CH.golpes = function (sim) { GOLPE.clear(); const av = sim && sim.avisos; if (!av) return; for (let k = 0; k < av.length; k++) { const q = av[k]; if (q && q.dono != null && q.golpe && sim.time < q.t1 + 0.2) GOLPE.add(q.dono); } };
+function comGolpe(e, m) { if (!GOLPE.has(e.id)) return m; const RX = ARD.meshes && ARD.meshes.receitas; return RX && RX[m + '_g'] ? m + '_g' : m; }
 CH.modelo = function (e) {
   const b = e.boss; if (b) { const f = fase(e);
-    if (b.tipo === 'arauto') return 'chefe_arauto_' + (b.janela ? 'j' : f);
-    if (b.tipo === 'sentinela') return b.janela ? 'chefe_sentinela_j' : 'chefe_sentinela';
-    if (b.tipo === 'forja') { const pg = PERNAS.get(e.id); return f >= 3 || (pg && pg.vistas && !pg.vivas) ? 'chefe_forja_caida' : f >= 2 ? 'chefe_forja_b' : 'chefe_forja'; }
+    if (b.tipo === 'arauto') return b.janela ? 'chefe_arauto_j' : comGolpe(e, 'chefe_arauto_' + f);
+    if (b.tipo === 'sentinela') return b.janela ? 'chefe_sentinela_j' : comGolpe(e, 'chefe_sentinela');
+    if (b.tipo === 'forja') { const pg = PERNAS.get(e.id); return f >= 3 || (pg && pg.vistas && !pg.vivas) ? 'chefe_forja_caida' : comGolpe(e, f >= 2 ? 'chefe_forja_b' : 'chefe_forja'); }
     return null; }
   const p = e.parte; if (p) return p.tipo === 'pilar' ? 'chefe_pilar' : p.tipo === 'nucleo' ? 'chefe_nucleo' : 'chefe_junta';
   return null; };
-const LARG = { arauto: 34, sentinela: 26, forja: 37 }; /* largura de referência por chefão: as variantes das fases ficam do mesmo tamanho (5.0h.2: o Arauto e a Sentinela novos, maiores que os de antes) */
+const LARG = { arauto: 34, sentinela: 22.9, forja: 37 }; /* 5.0h.5: a Sentinela Devoradora fica maior só no desenho (como se o raio fosse 42); o raio da simulação continua 32 */
+CH.raioVisual = e => (e && e.boss && e.boss.tipo === 'sentinela' ? e.r * 42 / 32 : e.r); /* o anel de seleção acompanha o corpo desenhado */ /* largura de referência por chefão: as variantes das fases ficam do mesmo tamanho (5.0h.2: o Arauto e a Sentinela novos, maiores que os de antes) */
 CH.fit = (e, fit) => (e.boss && LARG[e.boss.tipo] ? 2 * e.r * 1.25 / LARG[e.boss.tipo] : fit);
-CH.MODELOS = ['chefe_arauto_1', 'chefe_arauto_2', 'chefe_arauto_3', 'chefe_arauto_j', 'chefe_sentinela', 'chefe_sentinela_j', 'chefe_pilar', 'chefe_forja', 'chefe_forja_b', 'chefe_forja_caida', 'chefe_forja_perna', 'chefe_forja_perna_caida', 'chefe_junta', 'chefe_nucleo', 'chefe_eco' /* 5.0h.2: a coroa de cacos das cópias espectrais */];
+CH.MODELOS = ['chefe_arauto_1', 'chefe_arauto_2', 'chefe_arauto_3', 'chefe_arauto_j', 'chefe_arauto_1_g', 'chefe_arauto_2_g', 'chefe_arauto_3_g', 'chefe_sentinela', 'chefe_sentinela_g', 'chefe_sentinela_j', 'chefe_forja_g', 'chefe_forja_b_g', 'chefe_pilar', 'chefe_forja', 'chefe_forja_b', 'chefe_forja_caida', 'chefe_forja_perna', 'chefe_forja_perna_caida', 'chefe_junta', 'chefe_nucleo', 'chefe_eco' /* 5.0h.2: a coroa de cacos das cópias espectrais */];
 const PT = () => (ARD.chefesForma && ARD.chefesForma.pontos) || {}; /* 5.0h.2: pontos dos modelos (src/chefes-modelos.js) */
 const nomeDe = tipo => T('chefe.' + tipo + '.nome', null, tipo);
 const tituloDe = tipo => T('chefe.' + tipo + '.titulo', null, '');
@@ -257,10 +262,10 @@ function cria3d(api) {
     /* 5.0h.2: o pisão avisado — a perna do canto mais perto do alvo sobe durante a telegrafia e bate no chão no golpe */
     let pi = -1, pk = 0; const av = sim.avisos || []; for (let k = 0; k < av.length; k++) { const q = av[k]; if (!q || q.dono !== e.id || q.golpe !== 'pisao') continue; const dx = q.x - wx, dy = q.y - wy, lx = dx * ca + dy * sa, lz = dx * sa - dy * ca; let bd = -1e9; for (let i = 0; i < 4; i++) { const d = lx * CANTOS[i][0] + lz * CANTOS[i][1]; if (d > bd) { bd = d; pi = i; } } pk = Math.max(0, Math.min(1, (agora - q.t0) / Math.max(0.05, q.t1 - q.t0))); st.pisao = { i: pi, t1: q.t1 }; break; }
     for (let i = 0; i < 4; i++) { const lx = CANTOS[i][0], lz = CANTOS[i][1]; const cx = wx + (lx * ca + lz * sa) * fit, cy = wy + (lx * sa - lz * ca) * fit; const th = Math.atan2(-lz, lx);
-      const viva = (vivas >> i) & 1; if (!viva && f < 3 && ((st.cantos >> i) & 1)) QUEDAS.push({ x: cx, y: cy, ang: a + th, fit, t0: R.time, owner: e.owner, poeira: false });
+      const fi = fit * (lx > 0 ? 1.16 : 0.9); /* 5.0h.5: as patas da frente do Titã são maiores que as de trás */ const viva = (vivas >> i) & 1; if (!viva && f < 3 && ((st.cantos >> i) & 1)) QUEDAS.push({ x: cx, y: cy, ang: a + th, fit: fi, t0: R.time, owner: e.owner, poeira: false });
       if (!viva) continue; IA[0] = st.trav + (i === 0 || i === 3 ? 7 : 0); IA[1] = R.time; IA[2] = st.mov; IA[3] = 0; IA[4] = R.time;
       if (i === pi) { IA[0] = 3.5; IA[2] = pk * pk * (3 - 2 * pk); } else if (st.pisao && st.pisao.i === i && agora >= st.pisao.t1 && agora - st.pisao.t1 < 0.35) { IA[0] = 10.5; IA[2] = 0.5 * (1 - (agora - st.pisao.t1) / 0.35); } /* sin(3,5 / 14 · 2π) = 1: o pé no alto; 10,5: o pé no chão */
-      A.put(it, cx, cy, 0, a + th, fit, 1, 1, it.anim ? IA : null); }
+      A.put(it, cx, cy, 0, a + th, fi, 1, 1, it.anim ? IA : null); }
     st.cantos = vivas; }
   function quedas(dt) { const A = api; for (let i = QUEDAS.length - 1; i >= 0; i--) { const q = QUEDAS[i]; const k = R.time - q.t0; if (k > 22) { QUEDAS.splice(i, 1); continue; }
       const tomb = Math.min(1, k / 1.1), afunda = Math.max(0, k - 12) / 10; if (!q.poeira && k > 1.0) { q.poeira = true; R.shake = Math.max(R.shake || 0, 0.5); if (R.FX) { for (let j = 0; j < 6; j++) R.FX.smoke(q.x + Math.cos(q.ang) * 14 * q.fit + (Math.random() - 0.5) * 20, A.H(q.x, q.y) + 3, -(q.y + Math.sin(q.ang) * 14 * q.fit) + (Math.random() - 0.5) * 20, [0.32, 0.28, 0.25], 6 + Math.random() * 4, 18, 8); } if (R.flash) R.flash(q.x, q.y, 50, [1.5, 0.7, 0.3], 1, 0.3, 1); try { ARD.audio && ARD.audio.sfx && ARD.audio.sfx('explosion', 0.9); } catch (e) {} }
@@ -335,11 +340,11 @@ CH.ent2d = function (c, e, alpha, P, k, view, R, hpBar) { /* devolve true quando
   const isU = e.kind === 'unit'; const wx = isU ? e.px + (e.x - e.px) * alpha : e.x, wy = isU ? e.py + (e.y - e.py) * alpha : e.y; const g = P(wx, wy, 0), s = e.r * k, t = R.time;
   const ell = (x, y, rx, ry, rot) => { c.beginPath(); c.ellipse(x, y, Math.max(0.5, rx), Math.max(0.5, ry), rot || 0, 0, Math.PI * 2); };
   c.save(); c.fillStyle = 'rgba(0,0,0,0.35)'; ell(g[0], g[1], s * 1.1, s * 0.55); c.fill();
-  if (view.sel.has(e.id)) { c.strokeStyle = 'rgba(255,255,255,0.9)'; c.lineWidth = 1.5; ell(g[0], g[1], (e.r + 5) * k, (e.r + 5) * k * 0.5); c.stroke(); }
+  if (view.sel.has(e.id)) { c.strokeStyle = 'rgba(255,255,255,0.9)'; c.lineWidth = 1.5; ell(g[0], g[1], (CH.raioVisual(e) + 5) * k, (CH.raioVisual(e) + 5) * k * 0.5); c.stroke(); }
   let topo = g[1] - s * 2;
   if (e.boss && (e.boss.tipo === 'arauto' || e.boss.tipo === 'sentinela')) { const sen = e.boss.tipo === 'sentinela', f = fase(e), jan = !!e.boss.janela, cor = sen ? '#FFC24A' : '#BFF4FF';
     const gr = c.createRadialGradient(g[0], g[1], 1, g[0], g[1], s * 1.2); gr.addColorStop(0, sen ? 'rgba(255,190,80,0.35)' : 'rgba(120,220,255,0.35)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); c.save(); c.translate(g[0], g[1]); c.scale(1, 0.5); c.fillStyle = gr; c.beginPath(); c.arc(0, 0, s * 1.2, 0, Math.PI * 2); c.fill(); c.restore();
-    const spA = spr2d(CH.modelo(e)); if (spA) topo = desenhaSpr(c, spA, g[0], g[1] - s * 0.35 + Math.sin(t * 0.9) * s * 0.04, 1.9 * s / LARG[e.boss.tipo]); else { /* 5.0h.2: o modelo novo visto do ângulo do 2D; sem a foto, o desenho de antes */
+    const spA = spr2d(String(CH.modelo(e)).replace(/_g$/, '')); if (spA) topo = desenhaSpr(c, spA, g[0], g[1] - s * 0.35 + Math.sin(t * 0.9) * s * 0.04, 1.9 * s / LARG[e.boss.tipo]); else { /* 5.0h.2: o modelo novo visto do ângulo do 2D; sem a foto, o desenho de antes */
     const cy = g[1] - s * 1.6 + Math.sin(t * 0.9) * s * 0.04; topo = cy - s * 1.15;
     c.beginPath(); c.moveTo(g[0], cy - s * 1.1); c.lineTo(g[0] + s * 0.42, cy); c.lineTo(g[0], cy + s * 1.1); c.lineTo(g[0] - s * 0.42, cy); c.closePath(); c.fillStyle = '#16121F'; c.fill(); c.lineWidth = 2; c.strokeStyle = cor; c.stroke();
     const RS = f === 3 && !jan ? [0.75, 0.85] : jan ? [1.35, 1.6] : [1.0, 1.25]; const vel = jan ? 0.3 : f === 3 ? 2.6 : 1;
@@ -488,7 +493,7 @@ CH.eventos = function (ev, G) { if (!ev || !ev.length || !G || !G.sim) return; c
 let dicaT = 0; function dicaAbaixo(b) { const hi = document.getElementById('hints'); if (!hi) return; const nt = performance.now(); if (nt - dicaT < 400) return; dicaT = nt;
   let fim = 0; if (b && H && !H.d.hidden && !hi.hidden && hi.offsetParent) { const a = H.d.getBoundingClientRect(), d = hi.getBoundingClientRect(); if (a.height > 0 && d.left < a.right && d.right > a.left) fim = Math.ceil(a.bottom); }
   if (fim) { hi.style.setProperty('--chefe-fim', fim + 'px'); hi.classList.add('abaixo-chefe'); } else if (hi.classList.contains('abaixo-chefe')) hi.classList.remove('abaixo-chefe'); }
-CH.quadro = function (now, dt, G) { if (!G || !G.sim) return; const sim = G.sim; if (!CH.temChefe(sim) && !H) return;
+CH.quadro = function (now, dt, G) { if (!G || !G.sim) return; const sim = G.sim; CH.golpes(sim); if (!CH.temChefe(sim) && !H) return;
   const b = barra(sim, G.human); if (H && H.avT && performance.now() > H.avT) { H.avT = 0; H.av.classList.remove('on'); } dicaAbaixo(b); /* 5.0g.1 */
   if (CH._cine) { const ce = ARD.cinema && ARD.cinema.estado ? ARD.cinema.estado() : null; if (ce && ce.tipo === 'chefe') { if (!CH._cine.imp && ce.t >= 2.75) { CH._cine.imp = true; impacto(G, CH._cine); } } else if (!ce && CH._cine.imp) CH._cine = null; } /* 5.0h.2: o impacto da entrada */
   if (G.R && !G.R.is3d && CH.chaves.foto && CH.temChefe(sim)) { if (FOTO.fila2dSim !== sim) { FOTO.fila2dSim = sim; for (const q of fila2d(sim)) if (!FOTO.img.has(q.chave)) FOTO.fila.push(q); } if (FOTO.fila.length) { fotoUma(FOTO.fila.shift()); if (!FOTO.fila.length) fotoFim(); } } /* 5.0h.2: o desenho do 2D, uma foto por quadro */

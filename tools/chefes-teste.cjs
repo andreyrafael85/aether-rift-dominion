@@ -123,6 +123,8 @@ for (const tipo of ['arauto', 'forja']) {
     return { ms: ms / Math.max(1, n), maxE }; };
   const a = cus(false), b = cus(true); medidas.custo = { semChefe: +a.ms.toFixed(3), comSentinela: +b.ms.toFixed(3), maxEntSem: a.maxE, maxEntCom: b.maxE };
   ok('custo do passo medido', st.ticks > 0 && a.ms > 0 && b.ms > 0, 'luta do Arauto ' + (st.ms / st.ticks).toFixed(2) + ' ms/tique, dos quais ' + (acc / st.ticks).toFixed(3) + ' no src/chefes-sim.js · escaramuça de 3 IAs depois dos 4 min: sem evento ' + a.ms.toFixed(2) + ' ms/tique, com a Sentinela ' + b.ms.toFixed(2) + ' (até ' + b.maxE + ' entidades vivas)'); }
+  /* 5.0h.5 (Chefões 3.0): os raios da simulação não mudam (a Sentinela Devoradora cresce só no desenho: com raio 42 o WebKit divergia no tools/det-test.cjs) */
+  ok('raios dos chefões iguais aos da base', S.BOSSES.sentinela.raio === 32 && S.UNITS.sentinela.r === 32 && S.BOSSES.sentinela.vida === 12000 && S.BOSSES.arauto.raio === 46 && S.BOSSES.forja.raio === 64, 'sentinela ' + S.BOSSES.sentinela.raio + ' · arauto ' + S.BOSSES.arauto.raio + ' · forja ' + S.BOSSES.forja.raio);
 
 const nOk = R.filter(r => r.ok).length;
 if (JSONOUT) console.log(JSON.stringify({ ok: nOk, total: R.length, falhas: R.filter(r => !r.ok).map(r => r.nome + ' · ' + r.info), medidas }));

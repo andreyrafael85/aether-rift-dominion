@@ -36,6 +36,9 @@ const CARAVANA = { n: 3, def: 'pirata', vel: 42, vida: 520, carga: { minerio: 26
 const ENXAME = { n: 10, def: 'cria', vida: 150, dur: 150, alvoCada: 30 };
 const METEOROS = { n: 8, cada: 3, r: 80, dano: 160, aviso: 4, cristal: 240 };
 const SENTINELA_PREMIO = { minerio: 700, plasma: 450, dados: 180 };
+const CURTO = { arauto: ['a Medusa', 'A Medusa'], forja: ['o Titã', 'O Titã'], sentinela: ['a Devoradora', 'A Devoradora'] }; /* 5.0h.5: forma curta (chaves chefe.<id>.curto e .Curto do dicionário pt-BR); só texto de exibição */
+const nomeCurto = (id, ini) => { const dic = ARD.I18N_DIC && ARD.I18N_DIC['pt-BR']; const v = dic && dic['chefe.' + id + (ini ? '.Curto' : '.curto')]; return typeof v === 'string' && v && v.indexOf('{') < 0 ? v : CURTO[id][ini ? 1 : 0]; };
+const nomeChefe = id => { const U = ARD.sim && ARD.sim.UNITS; return (U && U[id] && U[id].name) || id; }; /* 5.0h.5: o nome exibido vem da tabela de unidades (chave chefe.<id>.nome do dicionário pt-BR) */
 const LENTE = 1.1;                             /* Lente do Arauto: +10% de visão para quem a leva */
 
 /* ---------- utilidades ---------- */
@@ -101,7 +104,7 @@ function fim(sim) {
   const time = sim.players.filter(p => !p.fenda); const humanos = time.filter(p => p.human); const quem = humanos.length ? humanos : time;
   const scores = time.map(p => ({ id: p.id, name: p.name, score: p.alive ? s.score(sim, p) : 0, alive: p.alive }));
   let outcome = null, reason = '';
-  if (C.fim === 'vitoria') { outcome = 'victory'; reason = C.captura ? 'A Forja-Mãe foi capturada: Caçada vencida.' : 'O chefão caiu: Caçada vencida.'; }
+  if (C.fim === 'vitoria') { outcome = 'victory'; reason = C.captura ? nomeCurto('forja', true) + ': captura concluída. Caçada vencida.' : 'O chefão caiu: Caçada vencida.'; }
   else if (!quem.some(p => p.alive)) { outcome = 'defeat'; reason = quem.length > 1 ? 'Todos os Núcleos do time caíram.' : 'Seu Núcleo foi destruído.'; }
   else if (sim.time >= sim.maxTime) { outcome = 'defeat'; reason = 'O tempo da Caçada acabou: o chefão resistiu.'; }
   if (!outcome) return true;
@@ -123,7 +126,7 @@ function anuncia(sim, tipo, fase, x, y, extra) { emit(sim, Object.assign({ t: 'e
 function passoEventos(sim, dt) {
   const s = S(); const E = sim.modos.ev; const t = sim.time;
   /* Sentinela: entre 12 e 15 min (o momento veio do RNG), respeitando o intervalo entre eventos */
-  if (!E.sentFeita && !E.at && t >= E.sentT && t - E.ultimo >= EV.intervalo) { E.at = { tipo: 'sentinela', fase: 'aviso', t0: t, x: s.CX, y: s.CY, ids: [] }; E.ultimo = t; E.seq++; anuncia(sim, 'sentinela', 'aviso', s.CX, s.CY); alertaTodos(sim, 'A Sentinela da Fenda está despertando no centro do mapa (' + EV.aviso + ' s)', s.CX, s.CY, 'warn'); }
+  if (!E.sentFeita && !E.at && t >= E.sentT && t - E.ultimo >= EV.intervalo) { E.at = { tipo: 'sentinela', fase: 'aviso', t0: t, x: s.CX, y: s.CY, ids: [] }; E.ultimo = t; E.seq++; anuncia(sim, 'sentinela', 'aviso', s.CX, s.CY); alertaTodos(sim, nomeChefe('sentinela') + ' está despertando no centro do mapa (' + EV.aviso + ' s)', s.CX, s.CY, 'warn'); }
   else if (!E.at && t >= E.prox && t - E.ultimo >= EV.intervalo && (E.sentFeita || E.sentT - t >= EV.intervalo)) iniciaMenor(sim, E); /* evento menor só se a Sentinela não vier nos próximos 3 min (ela sai sempre entre 12 e 15 min) */
   const A = E.at; if (!A) { vigiaSentinela(sim, E); return; }
   if (A.fase === 'aviso' && t - A.t0 >= EV.aviso) { A.fase = 'chega'; A.t1 = t; chega(sim, E, A); }
@@ -141,7 +144,7 @@ function iniciaMenor(sim, E) {
 }
 function chega(sim, E, A) {
   const s = S(); const f = fendaDe(sim);
-  if (A.tipo === 'sentinela') { const u = s.spawnBoss(sim, 'sentinela', s.CX, s.CY, { dif: 'normal', evento: true }); E.sentFeita = true; E.sentId = u ? u.id : 0; E.at = null; anuncia(sim, 'sentinela', 'chega', s.CX, s.CY, { id: E.sentId }); alertaTodos(sim, 'A Sentinela da Fenda despertou no centro! Quem der o golpe final leva a recompensa', s.CX, s.CY, 'danger'); return; }
+  if (A.tipo === 'sentinela') { const u = s.spawnBoss(sim, 'sentinela', s.CX, s.CY, { dif: 'normal', evento: true }); E.sentFeita = true; E.sentId = u ? u.id : 0; E.at = null; anuncia(sim, 'sentinela', 'chega', s.CX, s.CY, { id: E.sentId }); alertaTodos(sim, nomeCurto('sentinela', true) + ' despertou no centro! Quem der o golpe final leva a recompensa', s.CX, s.CY, 'danger'); return; }
   if (A.tipo === 'caravana') {
     const b = pontoChao(sim, A.a + Math.PI, [1450, 1350, 1200, 1000, 800, 740], 420) || pontoChao(sim, A.a + Math.PI * 0.75, [1450, 1200, 900, 740], 300) || { x: s.WORLD - A.x, y: s.WORLD - A.y };
     A.bx = b.x; A.by = b.y;
@@ -197,7 +200,7 @@ function vigiaSentinela(sim, E) {
   if (!E.sentId) return; const u = sim.byId.get(E.sentId); if (u && u.alive) return;
   const k = u ? u.lastHitBy : -1; const p = k != null && k >= 0 ? sim.players[k] : null; const x = u ? u.x : S().CX, y = u ? u.y : S().CY; E.sentId = 0;
   anuncia(sim, 'sentinela', 'fim', x, y, { por: p && !p.fenda ? p.id : -1 });
-  if (p && !p.fenda) { for (const r in SENTINELA_PREMIO) p.res[r] += SENTINELA_PREMIO[r]; p.stats.collected += SENTINELA_PREMIO.minerio + SENTINELA_PREMIO.plasma + SENTINELA_PREMIO.dados; p.sentinelas = (p.sentinelas || 0) + 1; emit(sim, { t: 'float', x, y, text: '+' + (SENTINELA_PREMIO.minerio + SENTINELA_PREMIO.plasma + SENTINELA_PREMIO.dados), owner: p.id, kind: 'gain' }); alertaTodos(sim, p.name + ' derrubou a Sentinela da Fenda e levou a recompensa', x, y, 'good'); }
+  if (p && !p.fenda) { for (const r in SENTINELA_PREMIO) p.res[r] += SENTINELA_PREMIO[r]; p.stats.collected += SENTINELA_PREMIO.minerio + SENTINELA_PREMIO.plasma + SENTINELA_PREMIO.dados; p.sentinelas = (p.sentinelas || 0) + 1; emit(sim, { t: 'float', x, y, text: '+' + (SENTINELA_PREMIO.minerio + SENTINELA_PREMIO.plasma + SENTINELA_PREMIO.dados), owner: p.id, kind: 'gain' }); alertaTodos(sim, p.name + ' derrubou ' + nomeCurto('sentinela') + ' e levou a recompensa', x, y, 'good'); }
 }
 
 /* ---------- ganchos chamados pelo src/sim.js ---------- */

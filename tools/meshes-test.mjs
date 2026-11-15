@@ -15,7 +15,7 @@ for (const r of M.PROP_RACES) for (let s = 0; s < 4; s++) { const g = M.build('p
 { /* 5.0h.2: Chefões 2.0 — cada modelo em cada nível (cheio, leve e o leve forçado da Baixa e do celular) sem erro, sem NaN e dentro do orçamento
      de triângulos; e o aquecimento (ARD.chefes.jobs) cobre todo modelo que o desenho pede, cada fase, janela, parte e as peças desenhadas à parte,
      todos no material do dono dos chefões (a Fenda): nenhum material novo no meio da partida */
-  const FO = globalThis.ARD.chefesForma || {}; const LIM = { cheio: 40000, leve: 16000, baixa: 16000 }; const tab = {};
+  const FO = globalThis.ARD.chefesForma || {}; const LIM = { cheio: 28000, leve: 5500, baixa: 6000 }; /* 5.0h.5 (Chefões 3.0): cheio até 28 mil; leve e Baixa perto de 5 mil */ const tab = {};
   for (const d of globalThis.ARD.chefesModelos || []) for (const [nv, lite, forc] of [['cheio', false, false], ['leve', true, false], ['baixa', false, true]]) { FO.leve = forc; const g = M.build(d, 'vehnar', '#C23BFF', 0, lite ? { lite: true } : null); FO.leve = false;
     const n = g ? tri(g.main) + tri(g.em) : 0; let nan = false; if (g) for (const gg of [g.main, g.em]) if (gg) { const a = gg.attributes.position.array; for (let i = 0; i < a.length; i++) if (!Number.isFinite(a[i])) { nan = true; break; } }
     if (g && g.main && g.width > 0 && g.height > 0 && !nan && n <= LIM[nv]) ok++; else { fail++; rows.push('FALHA chefão 2.0 ' + d + ' ' + nv + (nan ? ' (NaN)' : '') + ' · ' + n + ' tri'); } (tab[d] = tab[d] || []).push(n); }

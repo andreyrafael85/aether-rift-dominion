@@ -419,7 +419,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aqui é seu. Ainda.",
-  "inicio.versao": "Versão 5.0h.4 · build __BUILD__ · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
+  "inicio.versao": "Versão 5.0h.5 · build __BUILD__ · Além da Fenda · Mundo vivo · multiplayer 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Escolha sua Raça",
   "inicio.vitrine.explorar-base": "Explorar a base",
   "inicio.vitrine.som-tela-inicial": "Som da tela inicial",
@@ -488,6 +488,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.btn-bench": "Testar desempenho (30 s)",
   "ajustes.cfg-feedback": "Enviar feedback",
   "notas.notas-versao": "Notas da versão",
+  "notas.5-0h-5": "<b>5.0h.5 — Chefões 3.0:</b> os três chefões deixaram de ser máquinas e viraram criaturas da Fenda, com nomes novos. O Arauto agora é <b>A Medusa da Fenda</b>, a Forja-Mãe é <b>O Titã-Fornalha</b> e a Sentinela da Fenda é <b>A Sentinela Devoradora</b>, que ficou bem maior na tela. Antes de cada golpe o corpo avisa: o Titã escancara a mandíbula, a Devoradora abre as presas e a Medusa contrai o sino. Na Linha de montagem o dorso do Titã se abre e os pontos fracos âmbar aparecem. Os pilares, os Ecos e os lacaios da Fenda ganharam o visual da mesma família. As regras das lutas, a vida e o dano dos chefões não mudaram.",
   "notas.5-0h-4": "<b>5.0h.4 — Desempenho no Motor 5:</b> a travada da primeira vez que um lago aparecia na tela acabou. Tudo o que o reflexo dos lagos precisa agora é preparado no carregamento, e no nosso teste nada mais é criado na placa de vídeo no meio da partida. Os retratos das unidades no painel do exército são gerados um por vez, e o jogo cria um pouco menos de lixo de memória por quadro. O Teste de desempenho agora mostra, em cada travada, quanto tempo foi para sombras, reflexo dos lagos, cena e efeitos. A imagem e a simulação continuam as mesmas.",
   "notas.5-0h-3": "<b>5.0h.3 — Desempenho:</b> menos travadas no meio das batalhas. No Chrome, o jogo cria cerca de 20% menos lixo de memória por segundo, então o navegador para menos vezes para limpar. No <b>Motor 5</b>, a morte de um veículo e a câmera passando por um lago não criam mais recursos novos na placa de vídeo na hora: o jogo os prepara antes. O Teste de desempenho agora diz, em cada travada, o que havia naquele quadro (os eventos e o que nasceu na placa de vídeo). A imagem e a simulação continuam as mesmas.",
   "notas.5-0h-2": "<b>5.0h.2 — Chefões 2.0:</b> os chefões foram redesenhados em 3D, no nível dos líderes. O Arauto é uma flor-catedral de vidro da Fenda que abre, racha e colapsa num buraco negro; a Forja-Mãe é uma fábrica-fera de bronze com fornalha na boca, chaminés no dorso e o núcleo em fusão quando desaba. Cada fase muda o corpo, os golpes nascem no próprio chefão, a entrada de cinema foi refeita e a barra mostra o retrato do modelo. O celular usa uma versão mais leve, e o jogo roda igual: nenhum shader novo e a mesma simulação. O texto de promoção das unidades agora sai no seu idioma.",
@@ -505,7 +506,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "notas.5-0c": "<b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 mais leve, faróis e som no iPhone:</b> com o <b>Motor 5</b> ligado, os shaders que ele prepara na carga encolheram um terço (os lagos primeiro) e cada quadro manda muito menos dados para a placa de vídeo, o que alivia a CPU no Firefox e no celular. O brilho em volta das luzes agora é o mesmo do motor clássico, e no Modo Foto da qualidade Baixa os efeitos seguem a exposição como no clássico. À noite e dentro da Tempestade de Éter, os faróis dos veículos, coletores e piratas iluminam o chão à frente, nos dois motores. A Sala de Comando ficou um pouco mais clara, sem o clarão de antes. No iPhone, o som e a voz destravam no primeiro toque, tocam com a chave de silêncio ligada e voltam depois de uma ligação. Cada líder fala com uma voz do seu gênero em todo navegador. Em Ajustes, <b>Testar som</b> toca três notas e uma frase e mostra o estado do áudio do aparelho.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, em teste:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o jogo inteiro agora roda em WebGPU, com volta sozinha para WebGL2: unidades e construções com o detalhe de superfície e a animação de cada peça, ruínas, obras, o holograma da Erevane, os escudos do Uníssono e as bandeiras; o chão com todos os biomas, a vegetação ao vento, as estradas e o céu; explosões, fogo, fumaça e tiros; os lagos de plasma e de gelo com reflexo, o espaço do Cinturão e a Tempestade de Éter; e o <b>Modo Foto</b> (📷 ou tecla J) com desfoque, os 8 filtros e captura em 4K. Na primeira vez que o Modo Foto abre numa partida, ele leva alguns segundos para se preparar. Com tudo isso, a carga do Motor 5 ficou alguns segundos mais longa: a próxima versão mede nos aparelhos e enxuga. O motor clássico continua o padrão e não mudou.",
-  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0h.3 → 2.0)",
+  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.0h.4 → 2.0)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Termos de Uso",
   "inicio.rodape.foot-priv": "Privacidade",
@@ -1822,34 +1823,40 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "mapa.tita": "Destroço do Titã", /* 5.0g */
   "inicio.jogar.tita-carcaca": "Destroço do Titã (carcaça de um titã caído)", /* 5.0g */
   "vitrine.mapa.tita": "A carcaça de um titã caído sobre a Fenda: costelas, placas e o crânio.", /* 5.0g */
-  "unit.arauto.nome": "O Arauto", /* 5.0g */
-  "unit.arauto.desc": "Monólito-lente dos Despertos, o primeiro a atravessar a Fenda.", /* 5.0g */
-  "unit.forja.nome": "A Forja-Mãe", /* 5.0g */
-  "unit.forja.desc": "Fábrica antiga dos Construtores que anda sobre quatro pernas.", /* 5.0g */
-  "unit.sentinela.nome": "Sentinela da Fenda", /* 5.0g */
-  "unit.sentinela.desc": "Um Arauto menor que vigia a Fenda.", /* 5.0g */
+  "unit.arauto.nome": "{@chefe.arauto.nome}", /* 5.0g */
+  "unit.arauto.desc": "Água-viva colossal do vazio, com um único olho pendurado sob o sino. A primeira a atravessar a Fenda.", /* 5.0g */
+  "unit.forja.nome": "{@chefe.forja.nome}", /* 5.0g */
+  "unit.forja.desc": "Esqueleto titânico, meio fóssil e meio vivo: pele azul-noite, uma fornalha-estrela no peito e casulos onde cria drones.", /* 5.0g */
+  "unit.sentinela.nome": "{@chefe.sentinela.nome}", /* 5.0g */
+  "unit.sentinela.desc": "Raia predadora do vazio: manto com dedos de osso, um cacho de olhos e a boca de dentes.", /* 5.0g */
   "unit.pilar_fenda.nome": "Pilar da Fenda", /* 5.0g */
-  "unit.pilar_fenda.desc": "Alimenta o escudo do Arauto.", /* 5.0g */
-  "unit.perna_forja.nome": "Perna da Forja", /* 5.0g */
-  "unit.perna_forja.desc": "Ponto fraco da Forja-Mãe: cada perna destruída a deixa 25% mais lenta.", /* 5.0g */
-  "chefe.arauto.nome": "O Arauto", /* 5.0g */
-  "chefe.arauto.titulo": "O primeiro a atravessar a Fenda", /* 5.0g */
+  "unit.pilar_fenda.desc": "Alimenta o escudo do chefão.", /* 5.0g */
+  "unit.perna_forja.nome": "Perna do Titã", /* 5.0g */
+  "unit.perna_forja.desc": "Ponto fraco: cada perna destruída tira 25% da velocidade do chefão.", /* 5.0g */
+  "chefe.arauto.nome": "A Medusa da Fenda", /* 5.0g */
+  "chefe.arauto.curto": "a Medusa", /* 5.0h.5: forma curta, no meio da frase */
+  "chefe.arauto.Curto": "A Medusa", /* 5.0h.5: forma curta, no começo da frase */
+  "chefe.arauto.titulo": "A primeira a atravessar a Fenda", /* 5.0g */
   "chefe.arauto.fase.1": "Três Pilares", /* 5.0g */
   "chefe.arauto.fase.2": "Ecos", /* 5.0g */
   "chefe.arauto.fase.3": "Colapso", /* 5.0g */
-  "chefe.forja.nome": "A Forja-Mãe", /* 5.0g */
-  "chefe.forja.titulo": "A fábrica antiga que anda", /* 5.0g */
+  "chefe.forja.nome": "O Titã-Fornalha", /* 5.0g */
+  "chefe.forja.curto": "o Titã", /* 5.0h.5: forma curta, no meio da frase */
+  "chefe.forja.Curto": "O Titã", /* 5.0h.5: forma curta, no começo da frase */
+  "chefe.forja.titulo": "O fóssil que voltou a andar", /* 5.0g */
   "chefe.forja.fase.1": "Marcha", /* 5.0g */
   "chefe.forja.fase.2": "Linha de montagem", /* 5.0g */
   "chefe.forja.fase.3": "Núcleo exposto", /* 5.0g */
-  "chefe.sentinela.nome": "Sentinela da Fenda", /* 5.0g */
-  "chefe.sentinela.titulo": "Vigia da Fenda", /* 5.0g */
+  "chefe.sentinela.nome": "A Sentinela Devoradora", /* 5.0g */
+  "chefe.sentinela.curto": "a Devoradora", /* 5.0h.5: forma curta, no meio da frase */
+  "chefe.sentinela.Curto": "A Devoradora", /* 5.0h.5: forma curta, no começo da frase */
+  "chefe.sentinela.titulo": "Predadora da Fenda", /* 5.0g */
   "chefe.sentinela.fase.1": "Vigia", /* 5.0g */
   "sim.chefe.classe": "Chefões", /* 5.0g */
-  "sim.chefe.sentinela": "A Sentinela da Fenda despertou no centro do mapa", /* 5.0g */
+  "sim.chefe.sentinela": "{@chefe.sentinela.nome} despertou no centro do mapa", /* 5.0g */
   "sim.chefe.atravessou": "{nome} atravessou a Fenda", /* 5.0g */
-  "sim.chefe.fase": "Nova fase de {nome}: {fase}", /* 5.0g */
-  "sim.chefe.escudo": "O escudo do Arauto caiu!", /* 5.0g */
+  "sim.chefe.fase": "{nome}: nova fase, {fase}", /* 5.0g */
+  "sim.chefe.escudo": "{@chefe.arauto.Curto} perdeu o escudo!", /* 5.0g */
   "sim.chefe.derrotado": "Chefão derrotado: {nome}", /* 5.0g */
   "sim.chefe.capturado": "Chefão capturado: {nome}", /* 5.0g */
   "sim.chefe.fim-caiu": "O chefão caiu.", /* 5.0g */
@@ -1879,8 +1886,8 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "modos.mut.escassos": "Recursos Escassos", /* 5.0g */
   "modos.mut.escassos-d": "nós e destroços rendem a metade", /* 5.0g */
   "modos.ev.titulo": "Eventos da Fenda", /* 5.0g */
-  "modos.ev.desc": "Sentinela da Fenda, Caravana Corsária, Enxame Errante e chuva de meteoros durante a partida", /* 5.0g */
-  "modos.lente": "Lente do Arauto", /* 5.0g */
+  "modos.ev.desc": "{@chefe.sentinela.nome}, Caravana Corsária, Enxame Errante e chuva de meteoros durante a partida", /* 5.0g */
+  "modos.lente": "Lente da Medusa", /* 5.0g */
   "modos.lente-d": "+10% de visão nesta partida", /* 5.0g */
   "modos.sala.modo": "Modo da sala", /* 5.0g */
   "modos.sala.escaramuca": "Escaramuça", /* 5.0g */
@@ -1902,21 +1909,21 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "modos.fim.recorde": "Recorde", /* 5.0g */
   "modos.fim.recorde-novo": "Novo recorde local!", /* 5.0g */
   "modos.fim.trofeu": "Troféu no Hangar: {chefe} ({m})", /* 5.0g */
-  "modos.fim.reliquia": "Relíquia: Lente do Arauto (+10% de visão numa partida que você escolher)", /* 5.0g */
+  "modos.fim.reliquia": "Relíquia: Lente da Medusa (+10% de visão numa partida que você escolher)", /* 5.0g */
   "modos.fim.titulo": "Título: {t}", /* 5.0g */
-  "modos.fim.projeto": "Projeto recuperado da Forja-Mãe: a unidade nova chega numa próxima versão", /* 5.0g */
-  "modos.titulo.cacador-arauto": "Caçador do Arauto", /* 5.0g */
-  "modos.titulo.quebra-forja": "Quebra-Forja", /* 5.0g */
+  "modos.fim.projeto": "Projeto recuperado na captura: a unidade nova chega numa próxima versão", /* 5.0g */
+  "modos.titulo.cacador-arauto": "Caçador da Medusa", /* 5.0g */
+  "modos.titulo.quebra-forja": "Quebra-Fornalha", /* 5.0g */
   "modos.titulo.cacador-ouro": "Caçador de Ouro", /* 5.0g */
   "modos.hg.trofeus": "Troféus da Caçada", /* 5.0g */
   "modos.hg.nenhum": "Nenhum troféu ainda: vença uma Caçada.", /* 5.0g */
   "modos.hg.titulos": "Títulos", /* 5.0g */
   "modos.hg.projetos": "Projetos", /* 5.0g */
-  "modos.hg.projeto-forja": "projeto da Forja-Mãe (a unidade chega numa próxima versão)", /* 5.0g */
-  "modos.hg.sentinelas": "Sentinelas derrubadas: {n}", /* 5.0g */
-  "sim.ev.sentinela-aviso": "A Sentinela da Fenda está despertando no centro do mapa ({n} s)", /* 5.0g */
-  "sim.ev.sentinela-chega": "A Sentinela da Fenda despertou no centro! Quem der o golpe final leva a recompensa", /* 5.0g */
-  "sim.ev.sentinela-premio": "{nome} derrubou a Sentinela da Fenda e levou a recompensa", /* 5.0g */
+  "modos.hg.projeto-forja": "projeto recuperado na captura (a unidade chega numa próxima versão)", /* 5.0g */
+  "modos.hg.sentinelas": "Vitórias sobre {@chefe.sentinela.curto}: {n}", /* 5.0g */
+  "sim.ev.sentinela-aviso": "{@chefe.sentinela.nome} está despertando no centro do mapa ({n} s)", /* 5.0g */
+  "sim.ev.sentinela-chega": "{@chefe.sentinela.Curto} despertou no centro! Quem der o golpe final leva a recompensa", /* 5.0g */
+  "sim.ev.sentinela-premio": "{nome} derrubou {@chefe.sentinela.curto} e levou a recompensa", /* 5.0g */
   "sim.ev.caravana-aviso": "Caravana Corsária à vista: ela vai cruzar o mapa ({n} s)", /* 5.0g */
   "sim.ev.caravana-chega": "A Caravana Corsária está cruzando o mapa. Quem a destruir fica com a carga", /* 5.0g */
   "sim.ev.caravana-carga": "{nome} tomou uma carga da Caravana Corsária (+{n})", /* 5.0g */
@@ -1925,7 +1932,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "sim.ev.meteoros-aviso": "Chuva de meteoros em {n} s: fique longe dos anéis no chão", /* 5.0g */
   "sim.ev.meteoros-chega": "Chuva de meteoros! Cristais novos onde eles caem", /* 5.0g */
   "sim.cac.vitoria": "O chefão caiu: Caçada vencida.", /* 5.0g */
-  "sim.cac.captura": "A Forja-Mãe foi capturada: Caçada vencida.", /* 5.0g */
+  "sim.cac.captura": "{@chefe.forja.Curto}: captura concluída. Caçada vencida.", /* 5.0g */
   "sim.cac.time-caiu": "Todos os Núcleos do time caíram.", /* 5.0g */
   "sim.cac.tempo": "O tempo da Caçada acabou: o chefão resistiu.", /* 5.0g */
   "sim.fenda": "Fenda", /* 5.0g */

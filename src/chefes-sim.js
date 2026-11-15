@@ -42,12 +42,19 @@ const FENDA_COR = '#C23BFF';
 
 /* unidades novas (S.UNITS): os chefões e as partes; faction 'fenda' e epic tiram tudo das listas de produção, do teste de desempenho e do aquecimento por Raça */
 const DEFS = {
-  arauto:      { name: 'O Arauto', key: '', cls: 'chefe', hp: 22000, r: 46, speed: 26, cost: {}, time: 0, energyUse: 0, weapon: 'olho_arauto', sensor: 520, faction: 'fenda', flying: true, boss: true, epic: true, desc: 'Monólito-lente dos Despertos, o primeiro a atravessar a Fenda.' },
-  forja:       { name: 'A Forja-Mãe', key: '', cls: 'chefe', hp: 40000, r: 64, speed: 10, cost: {}, time: 0, energyUse: 0, weapon: 'forja_canhao', sensor: 480, faction: 'fenda', boss: true, epic: true, desc: 'Fábrica antiga dos Construtores que anda sobre quatro pernas.' },
-  sentinela:   { name: 'Sentinela da Fenda', key: '', cls: 'chefe', hp: 12000, r: 32, speed: 30, cost: {}, time: 0, energyUse: 0, weapon: 'olho_sentinela', sensor: 420, faction: 'fenda', flying: true, boss: true, epic: true, desc: 'Um Arauto menor que vigia a Fenda.' },
-  pilar_fenda: { name: 'Pilar da Fenda', key: '', cls: 'est', hp: 2600, r: 20, speed: 0, cost: {}, time: 0, energyUse: 0, sensor: 220, faction: 'fenda', parte: true, epic: true, desc: 'Alimenta o escudo do Arauto.' },
-  perna_forja: { name: 'Perna da Forja', key: '', cls: 'vei', hp: 2200, r: 16, speed: 0, cost: {}, time: 0, energyUse: 0, sensor: 160, faction: 'fenda', parte: true, epic: true, desc: 'Ponto fraco da Forja-Mãe: cada perna destruída a deixa 25% mais lenta.' },
+  arauto:      { name: 'A Medusa da Fenda', key: '', cls: 'chefe', hp: 22000, r: 46, speed: 26, cost: {}, time: 0, energyUse: 0, weapon: 'olho_arauto', sensor: 520, faction: 'fenda', flying: true, boss: true, epic: true, desc: 'Água-viva colossal do vazio, com um único olho pendurado sob o sino. A primeira a atravessar a Fenda.' },
+  forja:       { name: 'O Titã-Fornalha', key: '', cls: 'chefe', hp: 40000, r: 64, speed: 10, cost: {}, time: 0, energyUse: 0, weapon: 'forja_canhao', sensor: 480, faction: 'fenda', boss: true, epic: true, desc: 'Esqueleto titânico, meio fóssil e meio vivo: pele azul-noite, uma fornalha-estrela no peito e casulos onde cria drones.' },
+  sentinela:   { name: 'A Sentinela Devoradora', key: '', cls: 'chefe', hp: 12000, r: 32, speed: 30, cost: {}, time: 0, energyUse: 0, weapon: 'olho_sentinela', sensor: 420, faction: 'fenda', flying: true, boss: true, epic: true, desc: 'Raia predadora do vazio: manto com dedos de osso, um cacho de olhos e a boca de dentes.' },
+  pilar_fenda: { name: 'Pilar da Fenda', key: '', cls: 'est', hp: 2600, r: 20, speed: 0, cost: {}, time: 0, energyUse: 0, sensor: 220, faction: 'fenda', parte: true, epic: true, desc: 'Alimenta o escudo do chefão.' },
+  perna_forja: { name: 'Perna do Titã', key: '', cls: 'vei', hp: 2200, r: 16, speed: 0, cost: {}, time: 0, energyUse: 0, sensor: 160, faction: 'fenda', parte: true, epic: true, desc: 'Ponto fraco: cada perna destruída tira 25% da velocidade do chefão.' },
 };
+/* 5.0h.5: o nome exibido de cada chefão fica num lugar só por idioma: a chave chefe.<id>.nome dos dicionários (src/i18n/). A simulação fala em pt-BR;
+   com o dicionário pt-BR carregado (no jogo ele entra antes), o nome vem de lá, e os nomes da tabela acima são só a reserva (testes no Node sem dicionário).
+   É texto de exibição: não entra no hash da partida. */
+{ const dic = ARD.I18N_DIC && ARD.I18N_DIC['pt-BR']; for (const id of ['arauto', 'forja', 'sentinela']) { const v = dic && dic['chefe.' + id + '.nome']; if (typeof v === 'string' && v && v.indexOf('{') < 0) DEFS[id].name = v; } }
+/* 5.0h.5: a forma curta do nome (chave chefe.<id>.Curto do dicionário pt-BR) nos alertas que repetem o chefão; só texto de exibição */
+const CURTO = { arauto: 'A Medusa', forja: 'O Titã', sentinela: 'A Devoradora' }; { const dic = ARD.I18N_DIC && ARD.I18N_DIC['pt-BR']; for (const id in CURTO) { const v = dic && dic['chefe.' + id + '.Curto']; if (typeof v === 'string' && v && v.indexOf('{') < 0) CURTO[id] = v; } }
+const curto = def => CURTO[def] || DEFS[def].name;
 const ARMAS = {
   olho_arauto:    { dmg: 26, range: 280, cd: 1.0, proj: 'beam', speed: 0, inacc: 0, splash: 0, cls: 'chefe' },
   forja_canhao:   { dmg: 60, range: 230, cd: 1.6, proj: 'shell', speed: 300, inacc: 10, splash: 30, cls: 'chefe' },
@@ -125,8 +132,8 @@ function spawnBoss(sim, tipo, x, y, o) {
   if (tipo === 'sentinela') { b.criasT = sim.time + 6; }
   if (tipo === 'forja') { b.torreT = sim.time + B.torreCada; escolheAlvo(sim, u); b.capturaMax = B.captura.t; }
   I.emit(sim, { t: 'chefe', ev: 'entra', id: u.id, tipo, fase: 1, x: u.x, y: u.y });
-  if (!o.evento) for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, B.def === 'sentinela' ? 'A Sentinela da Fenda despertou no centro do mapa' : (DEFS[B.def].name + ' atravessou a Fenda'), u.x, u.y, 'danger');
-  if (b.dorme) for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, DEFS[B.def].name + ' desperta em ' + mmss(b.dorme - sim.time), u.x, u.y, 'warn'); /* 5.0g.1 */
+  if (!o.evento) for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, B.def === 'sentinela' ? (DEFS.sentinela.name + ' despertou no centro do mapa') : (DEFS[B.def].name + ' atravessou a Fenda'), u.x, u.y, 'danger');
+  if (b.dorme) for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, curto(B.def) + ' desperta em ' + mmss(b.dorme - sim.time), u.x, u.y, 'warn'); /* 5.0g.1 */
   return u;
 }
 /* S.bossOf(sim): o chefão vivo mais importante (maior ordem; empate = o mais antigo), ou null */
@@ -189,7 +196,7 @@ function setFase(sim, u, n) {
   const b = u.boss, B = BOSSES[b.tipo]; if (n <= b.fase || n > B.fases.length) return;
   b.fase = n; b.faseT = 0; b.furia = false; b.prox = sim.time + 3; b.prox2 = sim.time + 6;
   I.emit(sim, { t: 'chefe', ev: 'fase', id: u.id, tipo: b.tipo, fase: n, x: u.x, y: u.y });
-  for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, 'Nova fase de ' + DEFS[B.def].name + ': ' + B.fases[n - 1].nome, u.x, u.y, 'warn');
+  for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, curto(B.def) + ': nova fase, ' + B.fases[n - 1].nome, u.x, u.y, 'warn');
   if (b.tipo === 'arauto' && n === 2) { b.escudo = 0; b.ecoT = sim.time + 3; }
   if (b.tipo === 'arauto' && n === 3) { b.prox = sim.time + 2; b.prox2 = sim.time + 8; }
   if (b.tipo === 'forja' && n === 2) { criaPernas(sim, u); b.dronesT = sim.time + 4; }
@@ -316,12 +323,12 @@ function acorda(sim, u) {
   const b = u.boss, B = BOSSES[b.tipo]; let atacado = !!b.provoca || u.hp < u.maxHp;
   if (!atacado) for (const pid of b.partes) { const p = vivo(sim, pid); if (p && p.hp < p.maxHp) { atacado = true; break; } }
   if (!atacado && sim.time < b.dorme) {
-    if (!b.aviso30 && b.dorme - sim.time <= 30) { b.aviso30 = true; for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, DEFS[B.def].name + ' desperta em ' + mmss(b.dorme - sim.time), u.x, u.y, 'warn'); }
+    if (!b.aviso30 && b.dorme - sim.time <= 30) { b.aviso30 = true; for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, curto(B.def) + ' desperta em ' + mmss(b.dorme - sim.time), u.x, u.y, 'warn'); }
     return false; }
   b.dorme = 0; b.provoca = false; b.faseT = 0; b.prox = sim.time + 3; b.prox2 = sim.time + 6;
   if (b.tipo === 'arauto') b.criasT = sim.time + B.guardasCada; if (b.tipo === 'forja') { b.torreT = sim.time + B.torreCada; escolheAlvo(sim, u); }
   I.emit(sim, { t: 'chefe', ev: 'desperta', id: u.id, tipo: b.tipo, atacado, x: u.x, y: u.y });
-  for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, DEFS[B.def].name + (atacado ? ' despertou com o ataque!' : ' despertou!'), u.x, u.y, 'danger');
+  for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, curto(B.def) + (atacado ? ' despertou com o ataque!' : ' despertou!'), u.x, u.y, 'danger');
   return true;
 }
 function puxa(sim, a, dt) { /* Colapso: o poço puxa pelo passo de movimento, sem física à parte (só posição, na ordem de sim.ents) */
@@ -409,7 +416,7 @@ function dano(sim, t, dmg, atk) {
 function morte(sim, e, killer) {
   if (e.parte) { const u = vivo(sim, e.parte.chefe); if (!u || !u.boss) return; const b = u.boss; b.pontos = Math.max(0, b.pontos - 1);
     I.emit(sim, { t: 'chefe', ev: 'parte', id: u.id, tipo: b.tipo, parte: e.parte.tipo, pid: e.id, p: killer, x: e.x, y: e.y });
-    if (e.parte.tipo === 'pilar') { b.pilares = Math.max(0, (b.pilares || 0) - 1); if (!b.pilares) { b.escudo = 0; I.emit(sim, { t: 'chefe', ev: 'escudo', id: u.id, tipo: b.tipo, fase: b.fase, aberto: false }); for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, 'O escudo do Arauto caiu!', u.x, u.y, 'good'); } }
+    if (e.parte.tipo === 'pilar') { b.pilares = Math.max(0, (b.pilares || 0) - 1); if (!b.pilares) { b.escudo = 0; I.emit(sim, { t: 'chefe', ev: 'escudo', id: u.id, tipo: b.tipo, fase: b.fase, aberto: false }); for (const q of sim.players) if (q.alive && !q.fenda) I.alertTo(sim, q.id, curto('arauto') + ' perdeu o escudo!', u.x, u.y, 'good'); } }
     if (e.parte.tipo === 'perna') { const B = BOSSES.forja; b.pernas = Math.max(0, (b.pernas || 0) - 1); b.lento *= 1 - B.lentidao;
       u.hp = Math.max(u.maxHp * B.fases[2].limiar, u.hp - u.maxHp * B.pernaDano); u.lastHitT = sim.time; u.lastHitBy = killer;
       if (!b.pernas && b.fase === 2) setFase(sim, u, 3); }

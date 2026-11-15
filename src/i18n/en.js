@@ -419,7 +419,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nothing here is yours. Yet.",
-  "inicio.versao": "Version 5.0h.4 · build __BUILD__ · Beyond the Rift · Living world · multiplayer 2 to 4",
+  "inicio.versao": "Version 5.0h.5 · build __BUILD__ · Beyond the Rift · Living world · multiplayer 2 to 4",
   "inicio.vitrine.escolha-sua-raca": "Choose your Race",
   "inicio.vitrine.explorar-base": "Explore the base",
   "inicio.vitrine.som-tela-inicial": "Start screen sound",
@@ -488,6 +488,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "ajustes.btn-bench": "Run benchmark (30 s)",
   "ajustes.cfg-feedback": "Send feedback",
   "notas.notas-versao": "Release notes",
+  "notas.5-0h-5": "<b>5.0h.5 — Bosses 3.0:</b> the three bosses are no longer machines: they are creatures of the Rift, with new names. The Herald is now <b>The Rift Medusa</b>, the Mother Forge is <b>The Furnace Titan</b> and the Rift Sentinel is <b>The Devouring Sentinel</b>, which is much larger on screen. Before each strike the body warns you: the Titan throws its jaw open, the Devourer bares its fangs and the Medusa contracts its bell. In the Assembly line phase the Titan's back opens and the amber weak points show. The pillars, the Echoes and the Rift minions got the look of the same family. Fight rules, boss health and damage did not change.",
   "notas.5-0h-4": "<b>5.0h.4 — Motor 5 performance:</b> the stutter the first time a lake came into view is gone. Everything the lake reflection needs is now prepared during loading, and in our test nothing is created on the graphics card in the middle of a match anymore. Unit portraits in the army panel are generated one at a time, and the game creates a little less memory garbage per frame. The Benchmark now shows, for each stutter, how much time went to shadows, lake reflection, scene and effects. The picture and the simulation stay the same.",
   "notas.5-0h-3": "<b>5.0h.3 — Performance:</b> fewer stutters in the middle of battles. In Chrome, the game creates about 20% less memory garbage per second, so the browser pauses less often to clean up. In <b>Motor 5</b>, a vehicle dying or the camera passing over a lake no longer creates new graphics-card resources on the spot: the game prepares them ahead of time. The Benchmark now tells you, for each stutter, what was in that frame (the events and what was created on the graphics card). The picture and the simulation stay the same.",
   "notas.5-0h-2": "<b>5.0h.2 — Bosses 2.0:</b> the bosses were redesigned in 3D, at the level of the leaders. The Herald is a cathedral-flower of Rift glass that opens, cracks and collapses into a black hole; the Mother Forge is a bronze factory-beast with a furnace maw, smokestacks along its back and a molten core when it falls. Every phase changes the body, attacks charge up on the boss itself, the entrance cinematic was redone and the boss bar shows a portrait of the model. Phones get a lighter version, and the game runs the same: no new shaders and the same simulation. Unit promotion pop-ups now show in your language.",
@@ -505,7 +506,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "notas.5-0c": "<b>5.0c — Languages:</b> the whole game is now in <b>English</b> and <b>Spanish</b> as well as Portuguese: start screen, War Room, matches, campaign, diplomacy, multiplayer, Photo Mode, help and the system-voice lines, which now use a voice in the chosen language. The game opens in your browser's language and switches instantly, without reloading, under <b>Idioma / Language / Idioma</b>: at the top of the start screen, in Settings and in the in-match Settings window. Also in this version: the planets and sky at the top of the War Room are crisp: at rest the background was drawn at half resolution and is now drawn in full, with the planets' detail following the pixel size, and the room no longer drops resolution when you switch Races; the match announcer speaks in the gender of your Race's announcer (a male voice for the Vehnar, Quorith and Vorag; a female one for the Erevane and Tessara); with Engine 5, dynamic resolution only drops when the graphics card is the limit, which avoids the hitches from resolution changes; and on iPhone, <b>Test sound</b> shows a tip when the effects play but the voice does not.",
   "notas.5-0b-1": "<b>5.0b.1 — Lighter Engine 5, headlights and sound on iPhone:</b> with <b>Engine 5</b> on, the shaders it prepares while loading shrank by a third (the lakes first) and each frame sends much less data to the graphics card, which eases the CPU on Firefox and on phones. The glow around lights is now the same as in the classic engine, and in Photo Mode on Low quality the effects follow the exposure as in the classic engine. At night and inside the Aether Storm, the headlights of vehicles, harvesters and pirates light the ground ahead, in both engines. The War Room got a little brighter, without the glare of before. On iPhone, sound and voice unlock on the first tap, play with the silent switch on and come back after a call. Each leader speaks with a voice of their own gender in every browser. In Settings, <b>Test sound</b> plays three notes and a line and shows the state of the device's audio.",
   "notas.5-0b-motor-5": "<b>5.0b — Engine 5 complete, in testing:</b> with <b>Engine 5</b> on (Settings › Graphics engine), the whole game now runs on WebGPU, falling back to WebGL2 on its own: units and buildings with surface detail and per-part animation, ruins, construction sites, the Erevane hologram, the Unison shields and the banners; the ground with every biome, vegetation in the wind, roads and the sky; explosions, fire, smoke and shots; the plasma and ice lakes with reflections, the Belt's space and the Aether Storm; and <b>Photo Mode</b> (📷 or the J key) with blur, the 8 filters and 4K capture. The first time Photo Mode opens in a match, it takes a few seconds to get ready. With all of this, Engine 5 takes a few seconds longer to load: the next version measures it on real devices and trims it down. The classic engine is still the default and has not changed.",
-  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.0h.3 → 2.0; from 5.0a.3 back, in Portuguese)",
+  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.0h.4 → 2.0; from 5.0a.3 back, in Portuguese)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Terms of Use",
   "inicio.rodape.foot-priv": "Privacy",
@@ -1822,34 +1823,40 @@ globalThis.ARD.I18N_DIC['en'] = {
   "mapa.tita": "Titan's Wreck", /* 5.0g */
   "inicio.jogar.tita-carcaca": "Titan's Wreck (the carcass of a fallen titan)", /* 5.0g */
   "vitrine.mapa.tita": "The carcass of a titan fallen across the Rift: ribs, plates and the skull.", /* 5.0g */
-  "unit.arauto.nome": "The Herald", /* 5.0g */
-  "unit.arauto.desc": "A lens-monolith of the Awakened, the first to cross the Rift.", /* 5.0g */
-  "unit.forja.nome": "The Mother Forge", /* 5.0g */
-  "unit.forja.desc": "An ancient factory of the Builders that walks on four legs.", /* 5.0g */
-  "unit.sentinela.nome": "Rift Sentinel", /* 5.0g */
-  "unit.sentinela.desc": "A lesser Herald that watches over the Rift.", /* 5.0g */
+  "unit.arauto.nome": "{@chefe.arauto.nome}", /* 5.0g */
+  "unit.arauto.desc": "A colossal jellyfish of the void, with a single eye hanging beneath its bell. The first to cross the Rift.", /* 5.0g */
+  "unit.forja.nome": "{@chefe.forja.nome}", /* 5.0g */
+  "unit.forja.desc": "A titanic skeleton, half fossil and half alive: night-blue hide, a furnace-star in its chest and pods where it grows drones.", /* 5.0g */
+  "unit.sentinela.nome": "{@chefe.sentinela.nome}", /* 5.0g */
+  "unit.sentinela.desc": "A predatory ray of the void: a mantle with bone fingers, a cluster of eyes and a mouth of teeth.", /* 5.0g */
   "unit.pilar_fenda.nome": "Rift Pillar", /* 5.0g */
-  "unit.pilar_fenda.desc": "Feeds the Herald's shield.", /* 5.0g */
-  "unit.perna_forja.nome": "Forge Leg", /* 5.0g */
-  "unit.perna_forja.desc": "Weak point of the Mother Forge: each leg destroyed makes her 25% slower.", /* 5.0g */
-  "chefe.arauto.nome": "The Herald", /* 5.0g */
+  "unit.pilar_fenda.desc": "Feeds the boss's shield.", /* 5.0g */
+  "unit.perna_forja.nome": "Titan Leg", /* 5.0g */
+  "unit.perna_forja.desc": "Weak point: each leg destroyed takes 25% off the boss's speed.", /* 5.0g */
+  "chefe.arauto.nome": "The Rift Medusa", /* 5.0g */
+  "chefe.arauto.curto": "the Medusa", /* 5.0h.5: forma curta, no meio da frase */
+  "chefe.arauto.Curto": "The Medusa", /* 5.0h.5: forma curta, no começo da frase */
   "chefe.arauto.titulo": "The first to cross the Rift", /* 5.0g */
   "chefe.arauto.fase.1": "Three Pillars", /* 5.0g */
   "chefe.arauto.fase.2": "Echoes", /* 5.0g */
   "chefe.arauto.fase.3": "Collapse", /* 5.0g */
-  "chefe.forja.nome": "The Mother Forge", /* 5.0g */
-  "chefe.forja.titulo": "The ancient factory that walks", /* 5.0g */
+  "chefe.forja.nome": "The Furnace Titan", /* 5.0g */
+  "chefe.forja.curto": "the Titan", /* 5.0h.5: forma curta, no meio da frase */
+  "chefe.forja.Curto": "The Titan", /* 5.0h.5: forma curta, no começo da frase */
+  "chefe.forja.titulo": "The fossil that walks again", /* 5.0g */
   "chefe.forja.fase.1": "March", /* 5.0g */
   "chefe.forja.fase.2": "Assembly Line", /* 5.0g */
   "chefe.forja.fase.3": "Exposed Core", /* 5.0g */
-  "chefe.sentinela.nome": "Rift Sentinel", /* 5.0g */
-  "chefe.sentinela.titulo": "Warden of the Rift", /* 5.0g */
+  "chefe.sentinela.nome": "The Devouring Sentinel", /* 5.0g */
+  "chefe.sentinela.curto": "the Devourer", /* 5.0h.5: forma curta, no meio da frase */
+  "chefe.sentinela.Curto": "The Devourer", /* 5.0h.5: forma curta, no começo da frase */
+  "chefe.sentinela.titulo": "Predator of the Rift", /* 5.0g */
   "chefe.sentinela.fase.1": "Watch", /* 5.0g */
   "sim.chefe.classe": "Bosses", /* 5.0g */
-  "sim.chefe.sentinela": "The Rift Sentinel has awakened at the center of the map", /* 5.0g */
+  "sim.chefe.sentinela": "{@chefe.sentinela.nome} has awakened at the center of the map", /* 5.0g */
   "sim.chefe.atravessou": "{nome} has crossed the Rift", /* 5.0g */
-  "sim.chefe.fase": "New phase for {nome}: {fase}", /* 5.0g */
-  "sim.chefe.escudo": "The Herald's shield is down!", /* 5.0g */
+  "sim.chefe.fase": "{nome}: new phase, {fase}", /* 5.0g */
+  "sim.chefe.escudo": "{@chefe.arauto.Curto} has lost its shield!", /* 5.0g */
   "sim.chefe.derrotado": "Boss defeated: {nome}", /* 5.0g */
   "sim.chefe.capturado": "Boss captured: {nome}", /* 5.0g */
   "sim.chefe.fim-caiu": "The boss has fallen.", /* 5.0g */
@@ -1879,8 +1886,8 @@ globalThis.ARD.I18N_DIC['en'] = {
   "modos.mut.escassos": "Scarce Resources", /* 5.0g */
   "modos.mut.escassos-d": "nodes and wrecks yield half", /* 5.0g */
   "modos.ev.titulo": "Rift Events", /* 5.0g */
-  "modos.ev.desc": "Rift Sentinel, Corsair Caravan, Wandering Swarm and meteor showers during the match", /* 5.0g */
-  "modos.lente": "Herald's Lens", /* 5.0g */
+  "modos.ev.desc": "{@chefe.sentinela.nome}, Corsair Caravan, Wandering Swarm and meteor showers during the match", /* 5.0g */
+  "modos.lente": "Medusa Lens", /* 5.0g */
   "modos.lente-d": "+10% vision in this match", /* 5.0g */
   "modos.sala.modo": "Room mode", /* 5.0g */
   "modos.sala.escaramuca": "Skirmish", /* 5.0g */
@@ -1902,21 +1909,21 @@ globalThis.ARD.I18N_DIC['en'] = {
   "modos.fim.recorde": "Record", /* 5.0g */
   "modos.fim.recorde-novo": "New local record!", /* 5.0g */
   "modos.fim.trofeu": "Trophy in the Hangar: {chefe} ({m})", /* 5.0g */
-  "modos.fim.reliquia": "Relic: Herald's Lens (+10% vision in a match of your choice)", /* 5.0g */
+  "modos.fim.reliquia": "Relic: Medusa Lens (+10% vision in a match of your choice)", /* 5.0g */
   "modos.fim.titulo": "Title: {t}", /* 5.0g */
-  "modos.fim.projeto": "Blueprint recovered from the Mother Forge: the new unit arrives in a future version", /* 5.0g */
-  "modos.titulo.cacador-arauto": "Herald Hunter", /* 5.0g */
-  "modos.titulo.quebra-forja": "Forgebreaker", /* 5.0g */
+  "modos.fim.projeto": "Blueprint recovered in the capture: the new unit arrives in a future version", /* 5.0g */
+  "modos.titulo.cacador-arauto": "Medusa Hunter", /* 5.0g */
+  "modos.titulo.quebra-forja": "Furnacebreaker", /* 5.0g */
   "modos.titulo.cacador-ouro": "Golden Hunter", /* 5.0g */
   "modos.hg.trofeus": "Hunt trophies", /* 5.0g */
   "modos.hg.nenhum": "No trophies yet: win a Hunt.", /* 5.0g */
   "modos.hg.titulos": "Titles", /* 5.0g */
   "modos.hg.projetos": "Blueprints", /* 5.0g */
-  "modos.hg.projeto-forja": "Mother Forge blueprint (the unit arrives in a future version)", /* 5.0g */
-  "modos.hg.sentinelas": "Sentinels brought down: {n}", /* 5.0g */
-  "sim.ev.sentinela-aviso": "The Rift Sentinel is awakening at the center of the map ({n} s)", /* 5.0g */
-  "sim.ev.sentinela-chega": "The Rift Sentinel has awakened at the center! Whoever lands the final blow takes the reward", /* 5.0g */
-  "sim.ev.sentinela-premio": "{nome} brought down the Rift Sentinel and took the reward", /* 5.0g */
+  "modos.hg.projeto-forja": "blueprint recovered in the capture (the unit arrives in a future version)", /* 5.0g */
+  "modos.hg.sentinelas": "Victories over {@chefe.sentinela.curto}: {n}", /* 5.0g */
+  "sim.ev.sentinela-aviso": "{@chefe.sentinela.nome} is awakening at the center of the map ({n} s)", /* 5.0g */
+  "sim.ev.sentinela-chega": "{@chefe.sentinela.Curto} has awakened at the center! Whoever lands the final blow takes the reward", /* 5.0g */
+  "sim.ev.sentinela-premio": "{nome} brought down {@chefe.sentinela.curto} and took the reward", /* 5.0g */
   "sim.ev.caravana-aviso": "Corsair Caravan sighted: it will cross the map ({n} s)", /* 5.0g */
   "sim.ev.caravana-chega": "The Corsair Caravan is crossing the map. Whoever destroys it keeps the cargo", /* 5.0g */
   "sim.ev.caravana-carga": "{nome} seized a Corsair Caravan cargo (+{n})", /* 5.0g */
@@ -1925,7 +1932,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "sim.ev.meteoros-aviso": "Meteor shower in {n} s: stay away from the rings on the ground", /* 5.0g */
   "sim.ev.meteoros-chega": "Meteor shower! New crystals where they land", /* 5.0g */
   "sim.cac.vitoria": "The boss has fallen: Hunt won.", /* 5.0g */
-  "sim.cac.captura": "The Mother Forge was captured: Hunt won.", /* 5.0g */
+  "sim.cac.captura": "{@chefe.forja.Curto}: capture complete. Hunt won.", /* 5.0g */
   "sim.cac.time-caiu": "Every Core on the team has fallen.", /* 5.0g */
   "sim.cac.tempo": "The Hunt ran out of time: the boss held on.", /* 5.0g */
   "sim.fenda": "Rift", /* 5.0g */

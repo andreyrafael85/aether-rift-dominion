@@ -1,379 +1,473 @@
-/* Aether Rift: Dominion — 5.0g (agente g-visual), refeitos na 5.0h.2 (agente i-chefoes2, Chefões 2.0): os modelos dos chefões, no mesmo construtor
-   (Kit) e no mesmo formato das malhas de hoje (src/meshes.js): cor, rugosidade e metal por vértice, partes emissivas separadas e animação por peça
-   (spin, leg, bob, flap, sway) na GPU. Entram pelo gancho ARD.meshes.receitas (a função recipe do src/meshes.js procura aqui primeiro), então valem
-   nos dois motores com o material e as instâncias de sempre: nenhum material nem pipeline novo (no Motor 5 o formato da geometria é o mesmo de
-   qualquer modelo). Cada variante é um modelo à parte (o render3d escolhe pela fase, src/chefes.js), todos montados na carga só com chefão.
-   5.0h.2 — direção de arte: o que vem da Fenda não é de nenhuma das cinco Raças. Os Despertos (o Arauto e a Sentinela) são Éter que acordou:
-   vidro-da-Fenda (obsidiana violeta, quase preta, com relevo de células), ouro heráldico antigo, veias de Éter (ciano) e o plasma cru da Fenda
-   (magenta) no miolo; peças que flutuam soltas, presas por força e não por juntas (geometria impossível). Os Construtores (a Forja-Mãe) são um
-   colosso antigo de bronze escuro e ouro velho, uma fábrica-fera de quatro patas com costuras de metal derretido, bocarra de fornalha e chaminés
-   como espinhos do dorso. Formas próprias (casca varrida, esculpido com ruído, grupos com transformação) feitas aqui, no padrão procedural do jogo.
-   - O Arauto: botão de pétalas de vidro em volta do olho, coroa, dois anéis de runas, asas de lâminas soltas, véus pendentes e a quilha.
-       chefe_arauto_1 (Três Pilares: botão fechado, olho em fresta, escudo geodésico), _2 (Ecos: pétalas abrindo e rachando, anéis partidos, asas com
-       o eco atrás), _3 (Colapso: o miolo vira um buraco negro com disco de acreção e jatos; pétalas e lâminas arrancadas no redemoinho), _j (janela de
-       dano: o olho aberto e exausto, pétalas caídas, alvo âmbar no olho). A Sentinela (chefe_sentinela e _j): o Arauto menor, âmbar, sem escudo.
-   - Pilar do Arauto (chefe_pilar): coluna de blocos de vidro que levitam um sobre o outro, raízes de cristal no chão e o cristal da coroa girando.
-   - A Forja-Mãe: corpo sem as pernas (chefe_forja na Marcha; _b na Linha de montagem, com as placas do dorso abertas em grelha, a bocarra aberta e
-     as baias de trás acesas), a perna inteira (chefe_forja_perna, desenhada quatro vezes pelo src/chefes.js e que cai quando é destruída), a perna
-     caída, o corpo desabado (chefe_forja_caida: costelas abertas em volta do núcleo, placas no chão, metal escorrendo), a escora do ponto fraco
-     (chefe_junta: o pistão de cada perna com a bobina acesa à mostra) e o núcleo exposto (chefe_nucleo: crosta rachada sobre o metal em fusão).
-     Marca de ponto fraco: chefe_marca (losango âmbar que gira acima da parte). Ecos: chefe_eco (a coroa de cacos sobre as cópias espectrais).
-   Versão leve (K.lite, e toda montagem quando ARD.chefesForma.leve: qualidade Baixa e celular): menos pétalas, véus, lâminas, runas e segmentos. */
+/* Aether Rift: Dominion — os modelos dos chefões (Chefões 3.0, 5.0h.5, agente k-chefoes3), no construtor (Kit) e no formato das malhas do jogo
+   (src/meshes.js): cor, rugosidade e metal por vértice, partes acesas separadas e animação por peça na GPU. Entram pelo gancho ARD.meshes.receitas,
+   então valem nos dois motores com o material e as instâncias de sempre: nenhum material nem pipeline novo. Cada variante (fase, janela de dano,
+   aviso de golpe) é um modelo à parte; o src/chefes.js escolhe. Versão leve: K.lite e ARD.chefesForma.leve (qualidade Baixa e celular).
+   Este arquivo é gerado por work/vitrine/integra.py a partir de work/conceitos/ (não edite o bloco à mão). */
+(function (ARD) { 'use strict'; ARD.chefesForma = ARD.chefesForma || { leve: false }; /* o src/chefes.js liga o leve na Baixa e no celular, antes da carga */ if (ARD.meshes && !ARD.meshes.receitas) ARD.meshes.receitas = {}; })(globalThis.ARD = globalThis.ARD || {});
+/* ==== 5.0h.5 Chefões 3.0 (agente k-chefoes3): INÍCIO do bloco gerado por work/vitrine/integra.py ==== */
+/* Aether Rift: Dominion — conceitos dos chefões 3.0 (agente k-chefoes3, vitrine para escolha; não entra no jogo sem a escolha do dono).
+   Base comum dos nove conceitos: mesmas regras dos modelos de hoje (src/chefes-modelos.js): construtor Kit do src/meshes.js, cor, rugosidade
+   e metal por vértice, parte acesa separada (cor do vértice × brilho, sem sombreamento) e animação por peça na GPU (spin, bob, flap, sway).
+   Nenhum material novo, nenhuma textura, nenhum asset externo: tudo é geometria procedural. Cada conceito entra pelo gancho ARD.meshes.receitas
+   com o nome kch_<chefão>_<conceito> (pose normal) e kch_<chefão>_<conceito>_f (pose da fase final).
+   Convenções das receitas do jogo: frente em +x, y para cima, origem no chão; os que voam já trazem a altura no modelo. */
 (function (ARD) {
 'use strict';
 const PI = Math.PI, TAU = PI * 2;
 const TH = () => globalThis.THREE;
-const FORMA = ARD.chefesForma = ARD.chefesForma || { leve: false }; /* src/chefes.js liga o leve na qualidade Baixa e no celular, antes da carga */
-/* Despertos (Arauto e Sentinela) */
-const VID = '#120E1D', VID2 = '#2B2147', VID3 = '#4E3C80', OURO = '#C9A55A', OURO2 = '#7C5F2C', ETER = '#7FE8FF', ETER2 = '#D4FBFF', FEN = '#E07CFF', FEN2 = '#FFD9FF', FENV = '#B23BFF', AMB = '#FFC24A', AMB2 = '#FFE9B8';
-/* Construtores (Forja-Mãe) */
-const BRONZE = [0.42, 0.62], BRZ = '#4B3A2D', BRZ2 = '#6E563F', ACO = '#3F444D', ACO2 = '#626872', ESC = '#1B1D21', OV = '#A8874A', COB = '#8E5B3A', BRASA = '#FF6A1A', BRASA2 = '#FFC66A', BRANCO = '#FFF1D0', PER = '#FFD23F', SOLDA = '#CFF4FF';
-const VIDRO = [0.16, 0.06], VIDRO_F = [0.24, 0.05]; /* rugosidade e metal do vidro-da-Fenda (relevo de células: padrão 4) */
+/* paleta comum (a mesma família de cores dos chefões de hoje): vidro-da-Fenda, Éter, plasma da Fenda e o âmbar do ponto fraco */
+const C = { VID: '#120E1D', VID2: '#2B2147', VID3: '#4E3C80', ETER: '#7FE8FF', ETER2: '#D4FBFF', FEN: '#E07CFF', FEN2: '#FFD9FF', FENV: '#B23BFF', AMB: '#FFC24A', AMB2: '#FFE9B8', AMB0: '#7A3A06',
+  OSSO: '#D9CCB4', OSSO2: '#8C7B66', BRASA: '#FF6A1A', BRASA2: '#FFC66A', NOITE: '#07060D', ROCHA: '#1E1A26', ROCHA2: '#3A3444' };
+const VIDRO = [0.3, 0.06], PELE = [0.42, 0.04], UMIDO = [0.22, 0.02], PEDRA = [0.86, 0.02], OSSOM = [0.62, 0.0], CRIST = [0.1, 0.12];
 
-/* ---------- utilidades ---------- */
 function rng(seed) { let a = (seed | 0) >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 function h3(x, y, z) { let n = (Math.imul(x | 0, 374761393) + Math.imul(y | 0, 668265263) + Math.imul(z | 0, 1274126177)) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); n ^= n >>> 16; return (n & 0x7fffffff) / 0x7fffffff; }
 function vn(x, y, z) { const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z); let fx = x - xi, fy = y - yi, fz = z - zi; fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy); fz = fz * fz * (3 - 2 * fz);
   const L = (a, b, t) => a + (b - a) * t; const c = (i, j, k) => h3(xi + i, yi + j, zi + k);
   return L(L(L(c(0, 0, 0), c(1, 0, 0), fx), L(c(0, 1, 0), c(1, 1, 0), fx), fy), L(L(c(0, 0, 1), c(1, 0, 1), fx), L(c(0, 1, 1), c(1, 1, 1), fx), fy), fz); }
 function fbm(x, y, z, o) { let v = 0, a = 0.5, f = 1, s = 0; for (let i = 0; i < (o || 3); i++) { v += a * vn(x * f, y * f, z * f); s += a; a *= 0.5; f *= 2.03; } return v / s; }
-const cor = h => { const c = new (TH().Color)(h); return [c.r, c.g, c.b]; };
-const mixc = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+const cor = h => { if (Array.isArray(h)) return h; const c = new (TH().Color)(h); return [c.r, c.g, c.b]; };
+const mixc = (a, b, t) => { a = cor(a); b = cor(b); return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; };
+const mul = (a, k) => { a = cor(a); return [a[0] * k, a[1] * k, a[2] * k]; };
 const sst = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
-const leve = K => !!(K.lite || FORMA.leve);
+const leve = K => !!(K.lite || (ARD.chefesForma && ARD.chefesForma.leve));
 const nq = (K, n, k) => leve(K) ? Math.max(1, Math.round(n * (k || 0.55))) : n;
 const ns = (K, n) => leve(K) ? Math.max(4, Math.round(n * 0.5)) : n;
 const fino = (K, fn) => { if (!leve(K)) fn(); };
-function mat4(x, y, z, rx, ry, rz, s) { const T = TH(); return new T.Matrix4().compose(new T.Vector3(x || 0, y || 0, z || 0), new T.Quaternion().setFromEuler(new T.Euler(rx || 0, ry || 0, rz || 0, 'YXZ')), new T.Vector3(s || 1, s || 1, s || 1)); }
-function giro(px, py, pz, rx, ry, rz) { const T = TH(); return new T.Matrix4().makeTranslation(px, py, pz).multiply(mat4(0, 0, 0, rx, ry, rz)).multiply(new T.Matrix4().makeTranslation(-px, -py, -pz)); }
-/* grupo com transformação: tudo o que fn desenhar (peças e pivôs de animação) passa pela matriz M; os eixos da animação não giram */
-function grupo(K, M, fn, fixo) { const a = K.main.length, b = K.emi.length; fn(); const v = new (TH().Vector3)(); /* fixo: os pivôs ficam (peça que orbita em volta do pivô de fora) */
+function mat4(x, y, z, rx, ry, rz, s) { const T = TH(); const sc = Array.isArray(s) ? new T.Vector3(s[0], s[1], s[2]) : new T.Vector3(s || 1, s || 1, s || 1); return new T.Matrix4().compose(new T.Vector3(x || 0, y || 0, z || 0), new T.Quaternion().setFromEuler(new T.Euler(rx || 0, ry || 0, rz || 0, 'YXZ')), sc); }
+/* grupo com transformação: tudo o que fn desenhar (peças e pivôs de animação) passa pela matriz M */
+function grupo(K, M, fn, fixo) { const a = K.main.length, b = K.emi.length; fn(); const v = new (TH().Vector3)();
   for (const p of K.main.slice(a).concat(K.emi.slice(b))) { p.geo.applyMatrix4(M); if (p.an && !fixo) { v.set(p.an.p[0], p.an.p[1], p.an.p[2]).applyMatrix4(M); p.an.p = [v.x, v.y, v.z]; } } }
 function geo(pos, col, idx) { const T = TH(); const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new T.Float32BufferAttribute(col, 3)); if (idx) g.setIndex(idx); g.computeVertexNormals(); return g; }
-/* varredura: casca de perfil lenticular ao longo de pts = [[x, y, z, meia-largura, meia-espessura], ...]; o.lado = vetor da largura (ou função
-   do índice), o.conc = concavidade (bordas dobram para o lado de o.dentro), o.c0/o.c1 = cor da base e da ponta, o.borda = brilho das arestas,
-   o.c2 = cor da face de dentro; devolve a geometria e o quadro (centro, lado, normal) de cada ponto (para veias, rachaduras e bordas) */
+function poe(K, g, c, mat, o) { return K._push(g, c || '#FFFFFF', mat, Object.assign({}, o || {})); }
+function bez(P, n) { const out = []; for (let i = 0; i < n; i++) { const t = i / (n - 1), a = (1 - t) ** 3, b = 3 * t * (1 - t) ** 2, c = 3 * t * t * (1 - t), d = t ** 3; out.push(P[0].map((_, j) => a * P[0][j] + b * P[1][j] + c * P[2][j] + d * P[3][j])); } return out; }
+
+/* varredura: casca de perfil lenticular ao longo de pts = [[x, y, z, meia-largura, meia-espessura], ...] (pétalas, costelas, presas, barbatanas);
+   o.lado = vetor da largura, o.conc = concavidade, o.c0/o.c1 = cor da base e da ponta, o.c2 = cor da face de dentro, o.borda = brilho das arestas */
 function varre(pts, o) { o = o || {}; const T = TH(); const n = o.n || 10, N = pts.length; const V = p => new T.Vector3(p[0], p[1], p[2]);
   const c0 = cor(o.c0 || '#FFFFFF'), c1 = cor(o.c1 || o.c0 || '#FFFFFF'), c2 = o.c2 ? cor(o.c2) : null; const pos = [], col = [], idx = [], quad = [];
   for (let i = 0; i < N; i++) { const p = pts[i], t = V(pts[Math.min(N - 1, i + 1)]).sub(V(pts[Math.max(0, i - 1)])).normalize();
     const l0 = typeof o.lado === 'function' ? o.lado(i, p) : (o.lado || [0, 0, 1]); let S = V(l0); S.sub(t.clone().multiplyScalar(S.dot(t))); if (S.lengthSq() < 1e-6) S = new T.Vector3(1, 0, 0).cross(t); S.normalize();
     const Nn = new T.Vector3().crossVectors(t, S).normalize(); if (o.dentro) { const d = V(o.dentro).sub(V(p)); if (Nn.dot(d) > 0) { Nn.negate(); S.negate(); } }
-    quad.push({ c: V(p), s: S, n: Nn, w: p[3], h: p[4] }); const u = i / (N - 1), base = mixc(c0, c1, u);
+    quad.push({ c: V(p), s: S, n: Nn, w: p[3], h: p[4] }); const u = i / (N - 1), base = mixc(c0, c1, o.pot ? Math.pow(u, o.pot) : u);
     for (let k = 0; k < n; k++) { const ph = k / n * TAU, cs = Math.cos(ph), sn = Math.sin(ph); const lx = cs * p[3], ly = sn * p[4] - (o.conc || 0) * p[3] * (cs * cs - 0.35);
       const q = V(p).add(S.clone().multiplyScalar(lx)).add(Nn.clone().multiplyScalar(ly)); pos.push(q.x, q.y, q.z);
       let cc = sn < 0 && c2 ? mixc(base, c2, Math.min(1, -sn * 1.6)) : base; const ed = Math.pow(Math.abs(cs), 10) * (o.borda || 0); cc = [cc[0] * (1 + ed), cc[1] * (1 + ed), cc[2] * (1 + ed)];
       const ao = o.ao ? 1 - o.ao * (1 - u) : 1; col.push(cc[0] * ao, cc[1] * ao, cc[2] * ao); } }
   for (let i = 0; i < N - 1; i++) for (let k = 0; k < n; k++) { const k2 = (k + 1) % n, a = i * n + k, b = i * n + k2, c = (i + 1) * n + k, d = (i + 1) * n + k2; idx.push(a, c, b, b, c, d); }
-  if (o.tampa) { for (const [i, sg] of [[0, -1], [N - 1, 1]]) { const ci = pos.length / 3; const p = pts[i]; pos.push(p[0], p[1], p[2]); const b = mixc(c0, c1, i ? 1 : 0); col.push(b[0] * 0.8, b[1] * 0.8, b[2] * 0.8); for (let k = 0; k < n; k++) { const k2 = (k + 1) % n; if (sg > 0) idx.push(ci, i * n + k, i * n + k2); else idx.push(ci, i * n + k2, i * n + k); } } }
   const g = geo(pos, col, idx); g.userData.quad = quad; return g; }
-/* bezier cúbica amostrada (pontos 2D ou 3D) */
-function bez(P, n) { const out = []; for (let i = 0; i < n; i++) { const t = i / (n - 1), a = (1 - t) ** 3, b = 3 * t * (1 - t) ** 2, c = 3 * t * t * (1 - t), d = t ** 3; out.push(P[0].map((_, j) => a * P[0][j] + b * P[1][j] + c * P[2][j] + d * P[3][j])); } return out; }
+
 /* esculpido: esfera deformada por f(nx, ny, nz) (raio relativo) e colorida por fc(nx, ny, nz, r) */
-function esculpe(ws, hs, rx, ry, rz, f, fc) { const T = TH(); const g = new T.SphereGeometry(1, ws, hs); const p = g.attributes.position, col = new Float32Array(p.count * 3);
-  for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i); const r = f ? f(x, y, z) : 1; p.setXYZ(i, x * r * rx, y * r * ry, z * r * rz); const c = fc ? fc(x, y, z, r) : [1, 1, 1]; col[i * 3] = c[0]; col[i * 3 + 1] = c[1]; col[i * 3 + 2] = c[2]; }
-  g.setAttribute('color', new T.BufferAttribute(col, 3)); g.deleteAttribute('normal'); g.computeVertexNormals(); return g; }
-/* faixa de anel (seção retangular): face de fora, de dentro, topo e base; arco a0..a0 + al */
-function faixa(R, h, th, seg, a0, al) { const T = TH(); a0 = a0 || 0; al = al == null ? TAU : al; const pos = [], idx = [], col = [];
-  const anel = (rr, y) => { const o = pos.length / 3; for (let i = 0; i <= seg; i++) { const a = a0 + al * i / seg; pos.push(Math.cos(a) * rr, y, Math.sin(a) * rr); col.push(1, 1, 1); } return o; };
-  const q = (A, B, inv) => { for (let i = 0; i < seg; i++) { const a = A + i, b = A + i + 1, c = B + i, d = B + i + 1; if (inv) idx.push(a, b, c, b, d, c); else idx.push(a, c, b, b, c, d); } };
-  const Ro = R + th / 2, Ri = R - th / 2; const ob = anel(Ro, -h / 2), ot = anel(Ro, h / 2), ib = anel(Ri, -h / 2), it = anel(Ri, h / 2), tb = anel(Ri, h / 2), to = anel(Ro, h / 2), bb = anel(Ri, -h / 2), bo = anel(Ro, -h / 2);
-  q(ob, ot, false); q(ib, it, true); q(tb, to, true); q(bb, bo, false);
-  const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new T.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals(); return g; }
-function poe(K, g, c, mat, o) { return K._push(g, c, mat, Object.assign({}, o || {})); }
-/* 5.0h.2 (ajuste do miolo): emissivo com cara de energia. A parte acesa usa o material emissivo de sempre (cor do vértice × brilho), sem
-   sombreamento: uma esfera de cor única vira uma mancha chapada vista de cima. Aqui a cor de cada vértice vem de um ruído na direção do vértice:
-   veios escuros, corpo médio, pontos quentes e os filetes claros do meio do ruído; girando (spin), o desenho corre como plasma */
-function mancha(g, c0, c1, c2, f, sd) { const p = g.attributes.position, col = new Float32Array(p.count * 3), A = cor(c0), B = cor(c1), C = cor(c2);
+function esculpe(ws, hs, rx, ry, rz, f, fc, furo) { const T = TH(); const g = new T.SphereGeometry(1, ws, hs); const p = g.attributes.position, col = new Float32Array(p.count * 3);
+  if (furo) { const ix = g.index.array, keep = []; for (let i = 0; i < ix.length; i += 3) { const x = (p.getX(ix[i]) + p.getX(ix[i + 1]) + p.getX(ix[i + 2])) / 3, y = (p.getY(ix[i]) + p.getY(ix[i + 1]) + p.getY(ix[i + 2])) / 3, z = (p.getZ(ix[i]) + p.getZ(ix[i + 1]) + p.getZ(ix[i + 2])) / 3; if (!furo(x, y, z)) keep.push(ix[i], ix[i + 1], ix[i + 2]); } g.setIndex(keep); } /* furo(x, y, z): tira as faces (buracos, bocas, fissuras) */
+  for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i); const r = f ? f(x, y, z) : 1; p.setXYZ(i, x * r * rx, y * r * ry, z * r * rz); const c = fc ? cor(fc(x, y, z, r)) : [1, 1, 1]; col[i * 3] = c[0]; col[i * 3 + 1] = c[1]; col[i * 3 + 2] = c[2]; }
+  g.setAttribute('color', new T.BufferAttribute(col, 3)); g.deleteAttribute('normal'); g.deleteAttribute('uv'); const g2 = soldar(g); g2.computeVertexNormals(); return g2; }
+/* solda os vértices repetidos da costura e dos polos (normais lisas, sem risco) */
+function soldar(g) { const p = g.attributes.position, c = g.attributes.color, map = new Map(), pos = [], col = [], rem = new Int32Array(p.count);
+  for (let i = 0; i < p.count; i++) { const k = Math.round(p.getX(i) * 1e3) + '_' + Math.round(p.getY(i) * 1e3) + '_' + Math.round(p.getZ(i) * 1e3); let j = map.get(k); if (j == null) { j = pos.length / 3; map.set(k, j); pos.push(p.getX(i), p.getY(i), p.getZ(i)); col.push(c.getX(i), c.getY(i), c.getZ(i)); } rem[i] = j; }
+  const src = g.index ? g.index.array : null, n = src ? src.length : p.count, idx = []; for (let i = 0; i < n; i += 3) { const a = rem[src ? src[i] : i], b = rem[src ? src[i + 1] : i + 1], d = rem[src ? src[i + 2] : i + 2]; if (a !== b && b !== d && a !== d) idx.push(a, b, d); }
+  g.dispose(); return geo(pos, col, idx); }
+
+/* casca de revolução: perfil [[raio, y], ...]; o.n lados, o.a0/o.al arco (setor), o.f(a, v, r, y) → [r, y] deforma, o.cor(a, v, r, y) → cor,
+   o.inv inverte a face (perfil de cima para baixo), o.furo(a, v) abre buracos, o.esp espessura (gera a face de dentro, cor o.corIn) */
+function casca(prof, o) { o = o || {}; const n = o.n || 32, a0 = o.a0 || 0, al = o.al == null ? TAU : o.al, full = al >= TAU - 1e-6, cols = full ? n : n + 1, M = prof.length; const pos = [], col = [], idx = [];
+  const lado = (din, inv) => { const o0 = pos.length / 3; for (let j = 0; j < M; j++) { const v = j / (M - 1); for (let k = 0; k < cols; k++) { const a = a0 + al * k / n; let r = prof[j][0], y = prof[j][1]; if (o.f) { const d = o.f(a, v, r, y); r = d[0]; y = d[1]; }
+        if (din) { r = Math.max(0, r - o.esp * (o.espR == null ? 1 : o.espR)); y -= o.esp * (o.espY || 0); } pos.push(Math.cos(a) * r, y, Math.sin(a) * r); const c = din && o.corIn ? cor(o.corIn(a, v, r, y)) : (o.cor ? cor(o.cor(a, v, r, y)) : [1, 1, 1]); col.push(c[0], c[1], c[2]); } }
+    const at = (j, k) => o0 + j * cols + (full ? k % n : k); for (let j = 0; j < M - 1; j++) for (let k = 0; k < n; k++) { if (o.furo && o.furo(a0 + al * (k + 0.5) / n, (j + 0.5) / (M - 1))) continue; const a = at(j, k), b = at(j, k + 1), c = at(j + 1, k), d = at(j + 1, k + 1); if (inv) idx.push(a, b, c, b, d, c); else idx.push(a, c, b, b, c, d); } };
+  lado(false, !!o.inv); if (o.esp) lado(true, !o.inv); return geo(pos, col, idx); }
+
+/* folha com espessura: superfície fn(u, v) → [x, y, z] (u, v em 0..1), th(u, v) espessura; cor(u, v) em cima, cor2(u, v) embaixo.
+   A face de cima é a de du × dv; o.inv troca. Asas, mantos, véus largos, placas de carapaça */
+function folha(fn, nu, nv, o) { o = o || {}; const T = TH(); const pos = [], col = [], idx = []; const W = nu + 1;
+  for (let j = 0; j <= nv; j++) for (let i = 0; i <= nu; i++) { const u = i / nu, v = j / nv, p = fn(u, v); pos.push(p[0], p[1], p[2]); const c = o.cor ? cor(o.cor(u, v)) : [1, 1, 1]; col.push(c[0], c[1], c[2]); }
+  for (let j = 0; j < nv; j++) for (let i = 0; i < nu; i++) { const a = j * W + i, b = a + 1, c = a + W, d = c + 1; if (o.inv) idx.push(a, c, b, b, c, d); else idx.push(a, b, c, b, d, c); }
+  const top = geo(pos, col, idx); const nr = top.attributes.normal, N0 = pos.length / 3;
+  if (o.th) { for (let j = 0; j <= nv; j++) for (let i = 0; i <= nu; i++) { const k = j * W + i, u = i / nu, v = j / nv, t = typeof o.th === 'function' ? o.th(u, v) : o.th; pos.push(pos[k * 3] - nr.getX(k) * t, pos[k * 3 + 1] - nr.getY(k) * t, pos[k * 3 + 2] - nr.getZ(k) * t); const c = o.cor2 ? cor(o.cor2(u, v)) : [col[k * 3], col[k * 3 + 1], col[k * 3 + 2]]; col.push(c[0], c[1], c[2]); }
+    for (let j = 0; j < nv; j++) for (let i = 0; i < nu; i++) { const a = N0 + j * W + i, b = a + 1, c = a + W, d = c + 1; if (o.inv) idx.push(a, b, c, b, d, c); else idx.push(a, c, b, b, c, d); }
+    /* fecha as bordas */ const lig = (p, q) => { if (o.inv) idx.push(p, q, p + N0, q, q + N0, p + N0); else idx.push(p, p + N0, q, q, p + N0, q + N0); };
+    for (let i = 0; i < nu; i++) { lig(i + 1, i); lig(nv * W + i, nv * W + i + 1); } for (let j = 0; j < nv; j++) { lig(j * W, (j + 1) * W); lig((j + 1) * W + nu, j * W + nu); } }
+  top.dispose(); return geo(pos, col, idx); }
+
+/* disco plano com cor por vértice (acreção, nebulosa, véu de poeira): fc(u, a) → cor (u = 0 dentro, 1 fora), o.y(u, a) altura; duas faces */
+function disco(R0, R1, seg, an, fc, o) { o = o || {}; const pos = [], col = [], idx = []; const W = seg + 1, a0 = o.a0 || 0, al = o.al == null ? TAU : o.al;
+  for (let j = 0; j <= an; j++) for (let i = 0; i <= seg; i++) { const u = j / an, a = a0 + al * i / seg + (o.tw || 0) * u, r = R0 + (R1 - R0) * u; pos.push(Math.cos(a) * r, o.y ? o.y(u, a) : 0, Math.sin(a) * r); const c = cor(fc(u, a)); col.push(c[0], c[1], c[2]); }
+  const N0 = pos.length / 3; for (let k = 0; k < N0 * 3; k++) pos.push(pos[k]); for (let k = 0; k < N0 * 3; k++) col.push(col[k] * (o.verso == null ? 1 : o.verso));
+  for (let j = 0; j < an; j++) for (let i = 0; i < seg; i++) { const a = j * W + i, b = a + 1, c = a + W, d = c + 1; idx.push(a, c, b, b, c, d, N0 + a, N0 + b, N0 + c, N0 + b, N0 + d, N0 + c); }
+  return geo(pos, col, idx); }
+
+/* emissivo com cara de energia: a cor de cada vértice vem de um ruído (veios escuros, corpo, pontos quentes); girando, corre como plasma */
+function mancha(g, c0, c1, c2, f, sd) { const p = g.attributes.position, col = new Float32Array(p.count * 3), A = cor(c0), B = cor(c1), Cc = cor(c2);
   for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i), l = Math.hypot(x, y, z) || 1; const n = fbm(x / l * f + sd, y / l * f + sd * 0.7, z / l * f, 3);
-    const fil = Math.max(0, 1 - Math.abs(n - 0.52) * 11); let c = mixc(A, B, sst(0.28, 0.62, n)); c = mixc(c, C, Math.max(fil * 0.8, sst(0.7, 0.86, n))); col[i * 3] = c[0]; col[i * 3 + 1] = c[1]; col[i * 3 + 2] = c[2]; }
+    const fil = Math.max(0, 1 - Math.abs(n - 0.52) * 11); let c = mixc(A, B, sst(0.28, 0.62, n)); c = mixc(c, Cc, Math.max(fil * 0.8, sst(0.7, 0.86, n))); col[i * 3] = c[0]; col[i * 3 + 1] = c[1]; col[i * 3 + 2] = c[2]; }
   g.setAttribute('color', new (TH().BufferAttribute)(col, 3)); return g; }
-/* degradê na altura (jatos e gemas): claro numa ponta, escuro na outra, para a peça acesa ler a forma sem bloom */
-function degrade(g, c0, c1, k) { const p = g.attributes.position; g.computeBoundingBox(); const y0 = g.boundingBox.min.y, y1 = g.boundingBox.max.y, A = cor(c0), B = cor(c1), col = new Float32Array(p.count * 3);
-  for (let i = 0; i < p.count; i++) { const u = Math.pow((p.getY(i) - y0) / ((y1 - y0) || 1), k || 1); const c = mixc(A, B, u); col[i * 3] = c[0]; col[i * 3 + 1] = c[1]; col[i * 3 + 2] = c[2]; }
+function degrade(g, c0, c1, k, eixo) { const p = g.attributes.position; g.computeBoundingBox(); const ax = eixo || 'y', y0 = g.boundingBox.min[ax], y1 = g.boundingBox.max[ax], A = cor(c0), B = cor(c1), col = new Float32Array(p.count * 3); const get = ax === 'x' ? i => p.getX(i) : ax === 'z' ? i => p.getZ(i) : i => p.getY(i);
+  for (let i = 0; i < p.count; i++) { const u = Math.pow((get(i) - y0) / ((y1 - y0) || 1), k || 1); const c = mixc(A, B, u); col[i * 3] = c[0]; col[i * 3 + 1] = c[1]; col[i * 3 + 2] = c[2]; }
   g.setAttribute('color', new (TH().BufferAttribute)(col, 3)); return g; }
-function gema(K, x, y, z, r, h, cb, ct, e) { const g = new (TH().OctahedronGeometry)(1, 0).scale(r, h / 2, r).translate(0, h / 2, 0); poe(K, degrade(g, cb, ct, 0.8), '#FFFFFF', null, { e, x, y, z, flat: true }); }
 
-/* ---------- Despertos: o Arauto e a Sentinela ---------- */
-/* pétala de vidro: espinha bezier no plano (raio, altura) no azimute a; meia-largura máxima w; o = { conc, rach (rachaduras acesas), veia, borda } */
-function petala(K, a, B, w, t, o) { o = o || {}; const ca = Math.cos(a), sa = Math.sin(a); const n = ns(K, 16);
-  const sp = bez(B, n).map((q, i) => { const u = i / (n - 1); const ww = w * Math.pow(Math.sin(PI * (0.12 + 0.88 * u)), 0.75) + 0.02, tt = t * (1 - 0.65 * u) + 0.02; return [ca * q[0], q[1], sa * q[0], ww, tt]; });
-  const g = varre(sp, { n: ns(K, 10), lado: [-sa, 0, ca], dentro: [0, o.yc || 0, 0], conc: o.conc == null ? 0.18 : o.conc, c0: o.c0 || VID, c1: o.c1 || VID2, c2: o.c2 || VID3, borda: 0.9, ao: 0.35 });
-  const Q = g.userData.quad; poe(K, g, '#FFFFFF', VIDRO, { pat: 4 });
-  /* bordas acesas e a veia do meio (Éter) */
-  const lin = (f, r, cc, e, step) => { const pts = []; for (let i = 0; i < Q.length; i += step || 1) { const q = Q[i]; const v = f(q, i / (Q.length - 1)); pts.push([v.x, v.y, v.z, r]); } if (pts.length > 2) K.trunk(pts, '#FFFFFF', null, { n: leve(K) ? 3 : 4, c0: cc, c1: cc, e }); };
-  const ed = o.borda || ETER; if (!o.semBorda) for (const sg of [1, -1]) lin((q, u) => q.c.clone().addScaledVector(q.s, sg * q.w * 0.97).addScaledVector(q.n, q.h * 0.25 - (o.conc == null ? 0.18 : o.conc) * q.w * 0.63), 0.075, ed, o.ek || 1.7);
-  if (o.veia) fino(K, () => lin(q => q.c.clone().addScaledVector(q.n, q.h * 1.04), 0.06, o.veia, 1.4, 1));
-  fino(K, () => { const nr = []; for (let i = 1; i < Q.length - 1; i++) { const q = Q[i]; const v = q.c.clone().addScaledVector(q.n, q.h * 0.95); nr.push([v.x, v.y, v.z, q.h * 0.55]); } K.trunk(nr, '#FFFFFF', VIDRO, { n: 4, c0: VID3, c1: VID2 }); }); /* nervura de vidro (relevo, sem luz) */
-  if (o.rach) { const r = rng(o.seed || 1); for (let k = 0; k < o.rach; k++) { const i0 = 2 + Math.floor(r() * (Q.length - 6)), len = 3 + Math.floor(r() * 3); const pts = []; let v = (r() - 0.5) * 1.2;
-      for (let i = i0; i < Math.min(Q.length - 1, i0 + len); i++) { const q = Q[i]; v = Math.max(-0.8, Math.min(0.8, v + (r() - 0.5) * 0.9)); const p = q.c.clone().addScaledVector(q.s, v * q.w).addScaledVector(q.n, q.h * 1.08); pts.push([p.x, p.y, p.z, 0.09]); }
-      if (pts.length > 2) K.trunk(pts, '#FFFFFF', null, { n: 3, c0: o.rcor || FEN, c1: o.rcor || FEN2, e: 2.6 }); } }
-  return Q; }
-/* lâmina da asa: do ombro na direção d (unitária), comprimento L, largura w; face voltada para cima/fora; borda de ataque acesa */
-function lamina(K, sh, d, L, w, o) { o = o || {}; const n = ns(K, 10); const pts = []; const bx = o.recua || -0.18;
-  for (let i = 0; i < n; i++) { const u = i / (n - 1); const curv = Math.sin(u * PI * 0.5); pts.push([sh[0] + d[0] * L * u + bx * L * curv * 0.35, sh[1] + d[1] * L * u, sh[2] + d[2] * L * u, w * Math.pow(Math.sin(PI * (0.1 + 0.9 * u)), 0.6) + 0.02, 0.32 * (1 - 0.6 * u) + 0.02]); }
-  const g = varre(pts, { n: ns(K, 8), lado: [1, 0, 0], conc: 0.08, c0: o.c0 || VID2, c1: o.c1 || VID, c2: VID3, borda: 1.1 }); const Q = g.userData.quad; poe(K, g, '#FFFFFF', VIDRO, { pat: 4 });
-  if (!o.semBorda) { const pe = []; for (let i = 1; i < Q.length; i++) { const q = Q[i]; const v = q.c.clone().addScaledVector(q.s, q.w * 0.95); pe.push([v.x, v.y, v.z, 0.12 * (1 - 0.5 * i / Q.length)]); } K.trunk(pe, '#FFFFFF', null, { n: 3, c0: o.borda || ETER, c1: o.borda2 || ETER2, e: 2.4 }); }
-  return Q; }
-/* contorno de lâmina só em luz (o eco das asas na fase 2) */
-function laminaEco(K, sh, d, L, w, c) { const pts = [], pe = [], n = 6; for (let i = 0; i < n; i++) { const u = i / (n - 1), ww = w * Math.pow(Math.sin(PI * (0.1 + 0.9 * u)), 0.6); const x = sh[0] + d[0] * L * u - 0.06 * L * Math.sin(u * PI * 0.5), y = sh[1] + d[1] * L * u, z = sh[2] + d[2] * L * u; pts.push([x + ww, y, z, 0.07]); pe.push([x - ww, y, z, 0.07]); }
-  K.trunk(pts, '#FFFFFF', null, { n: 3, c0: c, c1: c, e: 1.7 }); K.trunk(pe, '#FFFFFF', null, { n: 3, c0: c, c1: c, e: 1.2 }); }
-/* anel de runas (faixa de ouro, runas acesas na face de fora), inclinado e girando em y; arcos = [[a0, al], ...] (partido nos Ecos) */
-function anelRunas(K, yc, R, tilt, rz, speed, o) { o = o || {}; const arcos = o.arcos || [[0, TAU]]; const seg = ns(K, 72);
-  K.anim({ t: 'spin', p: [0, 0, 0], speed, ph: o.ph || 0 }, () => grupo(K, new (TH().Matrix4)().makeTranslation(0, yc, 0).multiply(mat4(0, 0, 0, tilt, 0, rz)), () => {
-    for (const [a0, al] of arcos) { poe(K, faixa(R, o.h || 1.1, o.th || 0.55, Math.max(6, Math.round(seg * al / TAU)), a0, al), o.cor || OURO, 'metal');
-      if (!leve(K) || al > 1) { const ng = Math.max(1, Math.round((leve(K) ? 3 : 6) * al / TAU)), nr = ng * 3; for (let i = 0; i < nr; i++) { const a = a0 + (Math.floor(i / 3) + 0.5) / ng * al + ((i % 3) - 1) * 0.9 / R; const rr = R + (o.th || 0.55) / 2 + 0.04;
-          K.box(Math.cos(a) * rr, -(o.h || 1.1) * 0.3, Math.sin(a) * rr, 0.16, (o.h || 1.1) * 0.6, 0.42, o.runa || ETER, null, { e: 2.3, ry: -a }); } } }
-    fino(K, () => { poe(K, faixa(R - (o.th || 0.55) * 0.5 - 0.2, 0.3, 0.2, seg, 0, TAU), OURO2, 'metal'); }); })); }
-/* olho: esclera de vidro, íris e pupila acesas; abre de 0 (fresta) a 1 (escancarado); olha para +x e um pouco para baixo */
-function olho(K, c, r, abre, o) { o = o || {}; const T = TH(); grupo(K, new T.Matrix4().makeTranslation(c[0], c[1], c[2]).multiply(mat4(0, 0, 0, 0, 0, o.inclina == null ? -0.42 : o.inclina)), () => {
-  const ir = o.iris || FEN, ir2 = o.iris2 || FEN2;
-  K.sph(0, 0, 0, r, '#160C22', 'gloss', { seg: ns(K, 24) });
-  K.tor(r * 0.93, 0, 0, r * (0.42 + 0.22 * abre), r * 0.08, ir, null, { e: 3.0, rz: PI / 2, ts: ns(K, 28) });
-  K.cyl(r * 0.9, 0, 0, r * (0.4 + 0.2 * abre), r * (0.4 + 0.2 * abre), 0.12, '#2A0A3A', 'gloss', { rz: -PI / 2, seg: ns(K, 22) });
-  if (abre > 0.6) { K.cyl(r * 0.97, 0, 0, r * 0.2, r * 0.2, 0.1, ir2, null, { e: 3.4, rz: -PI / 2, seg: ns(K, 16) }); fino(K, () => { for (let i = 0; i < 12; i++) { const a = i / 12 * TAU; K.box(r * 0.98, Math.sin(a) * r * 0.33, Math.cos(a) * r * 0.33, 0.06, 0.1, r * 0.16, ir, null, { e: 2.2, rx: -a }); } }); }
-  else K.box(r * 0.98, -r * 0.34, 0, 0.08, r * 0.68, 0.24, ir2, null, { e: 3.4 }); /* pupila em fenda */
-  /* pálpebras: duas cascas que cobrem cima e baixo, deixando a fresta */
-  const ab = 0.18 + 1.05 * abre; for (const sg of [1, -1]) { const g = new T.SphereGeometry(r * 1.08, ns(K, 22), ns(K, 10), PI / 2, PI, 0, PI / 2 - ab * 0.5); if (sg < 0) g.rotateX(PI); poe(K, g, VID, VIDRO_F, { pat: 4 });
-    const e = new T.TorusGeometry(r * 1.08 * Math.sin(PI / 2 - ab * 0.5), 0.09, 4, ns(K, 24), PI); e.rotateX(PI / 2); e.rotateY(PI / 2); e.translate(0, sg * r * 1.08 * Math.cos(PI / 2 - ab * 0.5), 0); poe(K, e, o.palp || ETER, null, { e: 2.4 }); }
-  if (o.alvo) { K.tor(r * 1.02, 0, 0, r * 1.18, 0.14, PER, null, { e: 3.0, rz: PI / 2, ts: ns(K, 32) }); fino(K, () => { for (let i = 0; i < 4; i++) { const a = i * PI / 2 + PI / 4; K.box(r * 1.05, Math.sin(a) * r * 1.45 - 0.2, Math.cos(a) * r * 1.45 - 0.08, 0.1, 0.4, 0.16, PER, null, { e: 3.0, rx: -a }); } }); } }); }
-/* véu (tentáculo de vidro e luz) que pende da base; tipo: 'pende', 'puxado' (Colapso) ou 'murcho' (janela) */
-function veu(K, a, r0, y0, L, tipo, sd) { const r = rng(sd); const ca = Math.cos(a), sa = Math.sin(a); const j = 0.6 + r() * 0.8; const pts = [];
-  const P = tipo === 'puxado' ? [[r0, y0], [r0 + 3, y0 + 1.5], [r0 + 7 + j, y0 + 4], [r0 + 12 + j * 2, y0 + 6.5]] : tipo === 'murcho' ? [[r0, y0], [r0 + 0.8, y0 - L * 0.3], [r0 + 1.4 + j * 0.5, y0 - L * 0.7], [r0 + 1.2, y0 - L * 1.05]] : [[r0, y0], [r0 + 2.2, y0 - L * 0.25], [r0 + 3.6 + j, y0 - L * 0.62], [r0 + 3.2 + j, y0 - L]];
-  const n = ns(K, 9); const S = bez(P, n); for (let i = 0; i < n; i++) { const u = i / (n - 1); pts.push([ca * S[i][0], S[i][1], sa * S[i][0], 0.55 * (1 - u) + 0.08]); }
-  const anim = Math.abs(ca) > Math.abs(sa) ? { t: 'sway', p: [ca * r0, y0, sa * r0], amp: 0.1 + r() * 0.06, speed: 0.8 + r() * 0.5, ph: r() * TAU } : { t: 'flap', p: [ca * r0, y0, sa * r0], amp: 0.1 + r() * 0.06, speed: 0.8 + r() * 0.5, ph: r() * TAU, side: sa > 0 ? 1 : -1 };
-  K.anim(tipo === 'puxado' ? { t: 'bob', amp: 0.5, speed: 1.6, ph: r() * TAU } : anim, () => { K.trunk(pts, '#FFFFFF', 'wet', { n: leve(K) ? 4 : 6, c0: VID2, c1: '#3FA9C8' });
-    const tp = pts[n - 1]; K.sph(tp[0], tp[1], tp[2], 0.42, ETER2, null, { e: 3.0, seg: 8 });
-    fino(K, () => { for (const f of [0.35, 0.62]) { const q = pts[Math.round(f * (n - 1))]; K.sph(q[0], q[1], q[2], 0.26, ETER, null, { e: 2.4, seg: 6 }); } }); }); }
-/* corpo de um Desperto. v: '1' | '2' | '3' | 'j'; o.s escala; o.sent = Sentinela (âmbar, menor, sem escudo) */
-function desperto(K, v, o) { o = o || {}; const s = o.s || 1, sent = !!o.sent; const YC = 27 * s; const ED = sent ? AMB : ETER, ED2 = sent ? AMB2 : ETER2;
-  const NP = sent ? nq(K, 6, 0.67) : nq(K, 8, 0.75); const r = rng(sent ? 11 : 7);
-  /* brilho interno (aparece entre as pétalas) */
-  if (v === '1' || v === '2') { /* 5.0h.2 (ajuste): plasma atrás do olho (sem atravessar a frente dele), veios escuros e filetes claros girando, e os filamentos até as pétalas */
-    const rr = (v === '2' ? 3.9 : 4.3) * s, cx = -2.6 * s, cA = sent ? '#2A1004' : '#16051F', cB = sent ? '#E0701A' : '#9A2BE0', cC = sent ? '#FFE6B0' : '#FFE0FF';
-    K.anim({ t: 'spin', p: [cx, YC, 0], speed: 0.6 }, () => { poe(K, mancha(new (TH().SphereGeometry)(rr, ns(K, 30), ns(K, 20)), cA, cB, cC, 2.4, sent ? 7 : 3), '#FFFFFF', null, { e: v === '2' ? 1.7 : 1.3, x: cx, y: YC });
-      fino(K, () => { for (let i = 0; i < 6; i++) { const a = (i + 0.5) / 6 * TAU * 0.78 + TAU * 0.11, ca = Math.cos(a), sa = Math.sin(a); const pts = []; for (let k = 0; k <= 4; k++) { const f = k / 4, rad = rr * 0.9 + f * 5.5 * s, j = (k % 2 ? 1 : -1) * 0.6 * s * Math.sin(f * PI);
-          pts.push([cx + ca * rad - sa * j, YC + (f * (i % 2 ? 3 : -2.5) + Math.sin(i + k) * 0.6) * s, sa * rad + ca * j, 0.09 * s * (1 - 0.5 * f) + 0.03]); } K.trunk(pts, '#FFFFFF', null, { n: 3, c0: cC, c1: cB, e: 2.0 }); } }); }); }
-  /* núcleo: olho (fases 1, 2 e janela) ou buraco negro (Colapso) */
-  if (v === '3') {
-    K.sph(0, YC, 0, 4.4 * s, '#05030A', [0.04, 0.6], { seg: ns(K, 24) });
-    K.anim({ t: 'spin', p: [0, YC, 0], speed: 2.4 }, () => { K.tor(0, YC, 0, 5.0 * s, 0.32 * s, FEN2, null, { e: 3.6, ts: ns(K, 40), rx: 0.12 }); K.tor(0, YC, 0, 5.6 * s, 0.14 * s, '#FFFFFF', null, { e: 3.0, ts: ns(K, 40), rx: -0.2, rz: 0.15 }); });
-    /* disco de acreção: braços em espiral (branco quente → magenta → violeta), duas faces */
-    K.anim({ t: 'spin', p: [0, YC, 0], speed: 1.9 }, () => { const T = TH(); const NA = nq(K, 6, 0.67), NS = ns(K, 26); for (let k = 0; k < NA; k++) { const pos = [], col = [], idx = []; const a0 = k / NA * TAU;
-        for (let i = 0; i <= NS; i++) { const u = i / NS, rr = (6.0 + 15 * Math.pow(u, 1.25)) * s, th = a0 + u * 2.6, wd = (0.6 + 2.4 * Math.sin(PI * Math.min(1, u * 1.15))) * s * 0.55; const cA = mixc(cor('#FFFFFF'), cor(FEN), sst(0, 0.45, u)), cB = mixc(cA, cor('#3A0E66'), sst(0.5, 1, u));
-          for (const sg of [-1, 1]) { const rr2 = rr + sg * wd; pos.push(Math.cos(th) * rr2, YC + (sg * 0.05 - 0.04 * u) * s, Math.sin(th) * rr2); const f = 1 - 0.35 * Math.abs(sg); col.push(cB[0] * f, cB[1] * f, cB[2] * f); } }
-        for (let i = 0; i < NS; i++) { const a = i * 2, b = a + 1, c = a + 2, d = a + 3; idx.push(a, b, c, b, d, c, a, c, b, b, c, d); }
-        const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new T.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals(); poe(K, g, '#FFFFFF', null, { e: 2.6 }); } });
-    /* jatos para cima e para baixo */
-    { const T = TH(); poe(K, degrade(new T.ConeGeometry(0.9 * s, 26 * s, 10).translate(0, 13 * s, 0), '#FFFFFF', '#3A6E8C', 0.7), '#FFFFFF', null, { e: 2.5, y: YC + 4 * s }); poe(K, degrade(new T.ConeGeometry(0.8 * s, 20 * s, 10).translate(0, 10 * s, 0), '#FFFFFF', '#3A6E8C', 0.7), '#FFFFFF', null, { e: 2.3, y: YC - 4 * s, rx: PI });
-      fino(K, () => poe(K, degrade(new T.ConeGeometry(1.7 * s, 15 * s, 12, 1, true).translate(0, 7.5 * s, 0), '#C27BFF', '#1A0628', 0.6), '#FFFFFF', null, { e: 1.2, y: YC + 4 * s })); } /* 5.0h.2 (ajuste): jatos claros no pé e apagando na ponta */
-  } else { olho(K, [2.6 * s, YC + (v === 'j' ? 1.5 : 0) * s, 0], (v === 'j' ? 5.4 : 4.5) * s, v === 'j' ? 1 : v === '2' ? 0.35 : 0.08, { iris: sent ? AMB : FEN, iris2: sent ? AMB2 : FEN2, palp: ED, alvo: v === 'j', inclina: v === 'j' ? 0.75 : 0.2 }); /* olha para cima e para a frente: a câmera da partida vê o olho */ }
-  /* pétalas do manto */
-  const Bs = { '1': [[3.6, -7.5], [11.8, -5], [12.6, 10.5], [3.4, 18.5]], '2': [[3.6, -7.5], [13, -6], [17, 6], [16.5, 15.5]], 'j': [[3.6, -7.5], [14, -6.5], [20, -3], [23.5, 2]] };
-  const abre = v === '1' ? 0 : 1; const span = sent ? TAU * 0.78 : TAU * 0.78; const a0 = (TAU - span) / 2;
-  for (let i = 0; i < NP; i++) { const a = a0 + span * i / (NP - 1); const ph = i * 0.8;
-    if (v === '3') { /* Colapso: a pétala se parte; a base fica, a ponta gira no redemoinho */
-      const B = Bs['2'].map(q => [q[0] * s, q[1] * s + YC]); const Bb = [B[0], [B[0][0] + 3 * s, B[0][1] + 0.5 * s], [B[0][0] + 6 * s, B[0][1] + 3 * s], [B[0][0] + 7.5 * s, B[0][1] + 6 * s]];
-      petala(K, a, Bb, 2.4 * s, 0.5 * s, { yc: YC, rach: 2, seed: i + 3 });
-      K.anim({ t: 'spin', p: [0, YC, 0], speed: 1.25 + (i % 3) * 0.2 }, () => grupo(K, giro(0, YC, 0, 0.25 * Math.sin(i * 1.7), 0.5 + r() * 0.4, 0.18), () => grupo(K, new (TH().Matrix4)().makeTranslation(Math.cos(a) * (4 + r() * 3) * s, (r() - 0.4) * 5 * s, Math.sin(a) * (4 + r() * 3) * s), () =>
-        petala(K, a, [[B[2][0] - 2 * s, B[2][1] - 3 * s], [B[2][0], B[2][1]], [B[3][0], B[3][1] - 2 * s], [B[3][0] + 1 * s, B[3][1]]], 2.6 * s, 0.4 * s, { yc: YC, rach: 1, seed: i + 9, borda: FEN }), true))); continue; }
-    const B = Bs[v === 'j' ? 'j' : v].map(q => [q[0] * s, q[1] * s + YC]);
-    K.anim({ t: 'bob', amp: (v === 'j' ? 0.18 : 0.32) * s, speed: v === 'j' ? 0.7 : 1.05, ph }, () => petala(K, a, B, (abre ? 4.6 : 4.3) * s, 0.8 * s, { yc: YC, rach: v === '2' ? 2 : v === 'j' ? 3 : 0, seed: i + 1, borda: ED, rcor: v === 'j' ? FEN2 : FEN }));
-  }
-  /* cálice: sépalas grossas de vidro que dobram para baixo (a massa do corpo), com o friso de ouro */
-  if (v !== '3') { const NS = sent ? 5 : nq(K, 7, 0.72); for (let i = 0; i < NS; i++) { const a = (i + 0.5) / NS * TAU + 0.2; const B = (v === 'j' ? [[3.6, -8], [10, -9.5], [14.5, -14], [15, -19]] : [[3.6, -8], [9.5, -9], [13.5, -12], [14.5, -16.5]]).map(q => [q[0] * s, q[1] * s + YC]);
-      K.anim(Math.abs(Math.cos(a)) > Math.abs(Math.sin(a)) ? { t: 'sway', p: [Math.cos(a) * 3.6 * s, YC - 8 * s, Math.sin(a) * 3.6 * s], amp: 0.045, speed: 0.8, ph: i } : { t: 'flap', p: [Math.cos(a) * 3.6 * s, YC - 8 * s, Math.sin(a) * 3.6 * s], amp: 0.045, speed: 0.8, ph: i, side: Math.sin(a) > 0 ? 1 : -1 }, () => {
-        const Q = petala(K, a, B, 4.2 * s, 1.0 * s, { yc: YC - 14 * s, conc: -0.12, semBorda: true, c0: VID, c1: VID2, c2: VID });
-        const pe = []; for (let k = 1; k < Q.length; k++) { const q = Q[k]; const v2 = q.c.clone().addScaledVector(q.s, q.w * 0.6).addScaledVector(q.n, q.h * 0.9); pe.push([v2.x, v2.y, v2.z, 0.22 * s]); } K.trunk(pe, OURO, 'metal', { n: 5 });
-        const tp = Q[Q.length - 2].c; K.oct(tp.x, tp.y - 1.2 * s, tp.z, 0.5 * s, 2 * s, ED, null, { e: 2.4 }); }); } }
-  /* colar da base das pétalas e a quilha embaixo */
-  K.tor(0, YC - 8 * s, 0, 3.6 * s, 0.45 * s, OURO, 'metal', { ts: ns(K, 28) });
-  fino(K, () => { for (let i = 0; i < 10; i++) { const a = i / 10 * TAU; K.box(Math.cos(a) * 3.95 * s, YC - 8.35 * s, Math.sin(a) * 3.95 * s, 0.5 * s, 0.7 * s, 0.25 * s, ED, null, { e: 2.0, ry: -a }); } });
-  for (let i = 0; i < (sent ? 4 : nq(K, 6, 0.67)); i++) { const a = i / (sent ? 4 : nq(K, 6, 0.67)) * TAU + 0.3; K.spike([Math.cos(a) * 2.2 * s, YC - 7.5 * s, Math.sin(a) * 2.2 * s], [Math.cos(a) * 3.6 * s, YC - (13 + (i % 3) * 2) * s, Math.sin(a) * 3.6 * s], 0.75 * s, '#FFFFFF', VIDRO, { n: 4, c0: VID2, c1: VID3 }); }
-  K.spike([0, YC - 7 * s, 0], [0, YC - 19 * s, 0], 1.1 * s, '#FFFFFF', VIDRO, { n: 5, c0: VID2, c1: VID3 }); K.sph(0, YC - 19 * s, 0, 0.45 * s, ED2, null, { e: 3.0, seg: 8 });
-  /* véus */
-  const NV = sent ? nq(K, 7, 0.6) : nq(K, 12, 0.55); for (let i = 0; i < NV; i++) { const a = (i + 0.5) / NV * TAU; veu(K, a, (v === '3' ? 4.1 : 7.5 + (i % 2) * 2.5) * s, (v === '3' ? YC - 8 * s : YC - (11 + (i % 2) * 1.5) * s), (sent ? 13 : 17 + (i % 3) * 1.6) * s, v === '3' ? 'puxado' : v === 'j' ? 'murcho' : 'pende', i * 13 + (sent ? 5 : 1)); }
-  /* coroa */
-  const yk = YC + (v === 'j' ? 23 : v === '3' ? 20 : 21) * s;
-  if (v === '3') grupo(K, giro(0, yk, 0, 0.6, 0, 0.45), () => coroa(K, yk, s, ED, 2.6, sent));
-  else coroa(K, yk, s, ED, v === 'j' ? 0.25 : 0.45, sent);
-  /* anéis de runas */
-  const RS = v === '1' ? [17.5, 21] : v === '2' ? [19, 23] : v === '3' ? [8.5, 10.2] : [24, 28]; const SP = v === '3' ? [3.0, -3.6] : v === 'j' ? [0.22, -0.28] : v === '2' ? [0.9, -1.1] : [0.6, -0.75];
-  const arc = v === '2' ? k => [[0.2 + k, 1.7], [2.25 + k, 1.6], [4.2 + k, 1.75]] : () => null;
-  anelRunas(K, YC + 1 * s, RS[0] * s, 0.38, 0, SP[0], { arcos: arc(0), runa: ED, h: 1.2 * s, th: 0.6 * s }); if (!sent) anelRunas(K, YC + 1 * s, RS[1] * s, -0.3, 1.25, SP[1], { arcos: arc(0.8), runa: ED, h: 1.0 * s, th: 0.5 * s, ph: 1.3 });
-  /* asas de lâminas soltas (Arauto: 4 por lado; Sentinela: 2) */
-  const NL = sent ? 2 : nq(K, 4, 0.75); const LS = sent ? [10, 8] : [17, 21, 18.5, 13.5]; const ANG = v === '1' ? [-1.05, -1.3, -1.55, -1.8] : v === '2' ? [0.15, 0.45, 0.75, 1.05] : [-0.2, -0.02, 0.18, 0.38];
-  for (const sg of [1, -1]) { const SH = [-1.5 * s, YC + 4 * s, sg * 7.2 * s];
-    gema(K, SH[0], SH[1] - 1.2 * s, SH[2], 1.2 * s, 2.8 * s, sent ? '#5A2A06' : '#3A0A52', sent ? AMB2 : FEN2, 2.6); /* a gema do ombro, solta */
-    if (v === '3') { /* Colapso: as lâminas arrancadas giram longe, no anel de fora */
-      K.anim({ t: 'spin', p: [0, YC, 0], speed: -0.95 }, () => { for (let k = 0; k < NL; k++) { const a = (sg > 0 ? 0 : PI) + k * 0.7; grupo(K, giro(0, YC, 0, 0.35 * sg, a, 0.1), () => lamina(K, [0, YC + (k - 1.5) * 1.6 * s, 17 * s], [0.4, 0.05 * sg, 0.9 * sg].map((x, i, A) => x / Math.hypot(A[0], A[1], A[2])), LS[k] * 0.7 * s, 1.6 * s, { borda: FEN, borda2: FEN2 })); } }); continue; }
-    K.anim({ t: 'flap', p: SH, amp: v === 'j' ? 0.07 : 0.16, speed: v === 'j' ? 2.2 : 1.2, side: sg }, () => { for (let k = 0; k < NL; k++) { const th = ANG[sent ? k + 1 : k]; const d = [-0.22, Math.sin(th), sg * Math.cos(th)]; const m = Math.hypot(d[0], d[1], d[2]); d[0] /= m; d[1] /= m; d[2] /= m;
-        lamina(K, [SH[0] - k * 0.4 * s, SH[1] - k * 0.3 * s, SH[2]], d, LS[k] * s, (sent ? 1.8 : 2.7) * s, { borda: ED, borda2: ED2 }); } });
-    if (v === '2' && !leve(K)) K.anim({ t: 'flap', p: SH, amp: 0.16, speed: 1.2, side: sg, ph: -0.7 }, () => { for (let k = 0; k < NL; k++) { const th = ANG[k] + 0.12; const d = [-0.3, Math.sin(th), sg * Math.cos(th)]; const m = Math.hypot(d[0], d[1], d[2]); laminaEco(K, [SH[0] - 2.6 * s, SH[1] + 0.8 * s, SH[2]], [d[0] / m, d[1] / m, d[2] / m], LS[k] * 1.03 * s, 1.8 * s, FEN); } });
-  }
-  /* escudo geodésico dos Três Pilares */
-  if (v === '1' && !sent) K.anim({ t: 'spin', p: [0, YC + 2, 0], speed: 0.18 }, () => { const T = TH(); const ic = new T.IcosahedronGeometry(19.5, 0); const p = ic.attributes.position; const seen = new Set(), vs = new Map();
-      for (let i = 0; i < p.count; i += 3) for (let k = 0; k < 3; k++) { const A = [p.getX(i + k), p.getY(i + k) + YC + 2, p.getZ(i + k)], B = [p.getX(i + (k + 1) % 3), p.getY(i + (k + 1) % 3) + YC + 2, p.getZ(i + (k + 1) % 3)]; const ka = A.map(x => x.toFixed(2)).join(), kb = B.map(x => x.toFixed(2)).join(); vs.set(ka, A); const key = ka < kb ? ka + '|' + kb : kb + '|' + ka; if (seen.has(key)) continue; seen.add(key); K.seg(A, B, 0.13, ETER, null, { e: 1.25, seg: 5 }); }
-      ic.dispose(); for (const A of vs.values()) K.oct(A[0], A[1] - 0.4, A[2], 0.36, 0.8, ETER2, null, { e: 2.6 }); });
-}
-function coroa(K, y, s, ED, speed, sent) { K.anim({ t: 'spin', p: [0, y, 0], speed }, () => { poe(K, faixa(4.4 * s, 0.9 * s, 0.6 * s, ns(K, 40)).translate(0, y, 0), OURO, 'metal');
-  const n = sent ? 6 : nq(K, 10, 0.6); for (let i = 0; i < n; i++) { const a = i / n * TAU; const h = (i % 2 ? 3.2 : 4.8) * s; K.oct(Math.cos(a) * 4.4 * s, y + 0.2 * s, Math.sin(a) * 4.4 * s, 0.5 * s, h, i % 2 ? VID3 : ED, i % 2 ? VIDRO : null, i % 2 ? { rz: Math.cos(a) * 0.25, rx: -Math.sin(a) * 0.25 } : { e: 2.6, rz: Math.cos(a) * 0.25, rx: -Math.sin(a) * 0.25 }); }
-  gema(K, 0, y + 3.2 * s, 0, 1.2 * s, 4.2 * s, sent ? '#6A3408' : '#4A1066', sent ? AMB2 : FEN2, 3.0); }); }
-function arauto(v) { return K => { K.base = 0; desperto(K, v, { s: 1 }); }; }
-function sentinela(v) { return K => { K.base = 0; desperto(K, v === 'j' ? 'j' : '1', { s: 0.72, sent: true }); }; }
+/* fio/tentáculo por pontos [x, y, z]: raio r0 → r1 (o.pot curva do afinamento); o.e = aceso */
+function fio(K, pts, r0, r1, o) { o = o || {}; const N = pts.length; const p4 = pts.map((p, i) => { const u = i / (N - 1); return [p[0], p[1], p[2], (r0 + (r1 - r0) * Math.pow(u, o.pot || 1)) * (o.rf ? o.rf(u) : 1)]; });
+  return K.trunk(p4, '#FFFFFF', o.mat === undefined ? UMIDO : o.mat, { n: leve(K) ? Math.max(3, (o.n || 6) - 2) : (o.n || 6), c0: o.c0 || C.VID2, c1: o.c1 || o.c0 || C.VID2, e: o.e, cap: o.cap }); }
+/* curva ondulada entre a e b (com flecha e ondas): devolve n pontos */
+function onda(a, b, n, o) { o = o || {}; const T = TH(); const A = new T.Vector3(a[0], a[1], a[2]), Bv = new T.Vector3(b[0], b[1], b[2]), d = Bv.clone().sub(A), L = d.length(); d.normalize();
+  const up = Math.abs(d.y) < 0.95 ? new T.Vector3(0, 1, 0) : new T.Vector3(1, 0, 0), s1 = new T.Vector3().crossVectors(d, up).normalize(), s2 = new T.Vector3().crossVectors(d, s1); const out = [], ph = o.ph || 0, fr = o.fr || 1.5, amp = (o.amp == null ? 0.08 : o.amp) * L;
+  for (let i = 0; i < n; i++) { const u = i / (n - 1), w = Math.sin(u * PI) * (o.flecha || 0) * L, env = Math.pow(u, o.env == null ? 0.8 : o.env); const p = A.clone().addScaledVector(d, L * u).addScaledVector(s1, Math.sin(u * fr * TAU + ph) * amp * env).addScaledVector(s2, Math.cos(u * fr * TAU * 0.8 + ph * 1.7) * amp * env * (o.esp == null ? 1 : o.esp)); if (o.fd) p.add(new T.Vector3(o.fd[0], o.fd[1], o.fd[2]).multiplyScalar(w)); out.push([p.x, p.y, p.z]); }
+  return out; }
+/* cristal: prisma de n lados com ponta, de a até b; cor da base e da ponta por vértice, facetado */
+function cristal(K, a, b, r, o) { o = o || {}; const T = TH(); const A = new T.Vector3(a[0], a[1], a[2]), d = new T.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]); const L = d.length() || 0.001; d.normalize();
+  const pf = o.duplo ? [[0, 0], [r * 0.8, L * 0.16], [r, L * 0.5], [r * 0.7, L * 0.82], [0, L]] : [[r * 0.75, 0], [r, L * 0.3], [r * (o.topo == null ? 0.62 : o.topo), L * (o.om || 0.78)], [0, L]];
+  const g = new T.LatheGeometry(pf.map(p => new T.Vector2(p[0], p[1])), o.n || 5, o.rot || 0); g.deleteAttribute('uv'); degrade(g, o.c0 || C.VID2, o.c1 || C.VID3, o.k || 1);
+  const q = new T.Quaternion().setFromUnitVectors(new T.Vector3(0, 1, 0), d); return K._push(g, '#FFFFFF', o.e ? null : (o.mat || CRIST), { x: a[0], y: a[1], z: a[2], q, flat: true, e: o.e, pat: o.pat == null ? 0 : o.pat }); }
+/* olho: esclera escura e a íris acesa (calota com estrias); abre 0..1 = tamanho da pupila em fenda; olha para +x; o.ry/o.rz giram o olhar */
+function olho(K, c, r, o) { o = o || {}; const T = TH(); const i1 = cor(o.iris || C.FEN), i2 = cor(o.iris2 || C.FEN2), i0 = cor(o.iris0 || '#2A0A3A'), ab = o.abre == null ? 0.5 : o.abre;
+  grupo(K, mat4(c[0], c[1], c[2], 0, o.ry || 0, o.rz == null ? -0.3 : o.rz), () => {
+    K.sph(0, 0, 0, r, o.esclera || '#0E0816', 'gloss', { seg: ns(K, 24) });
+    const th = o.tam || 0.95, g = new T.SphereGeometry(r * 1.02, ns(K, 40), ns(K, 12), 0, TAU, 0, th); const p = g.attributes.position, col = new Float32Array(p.count * 3);
+    for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i); const rho = Math.acos(Math.max(-1, Math.min(1, y / (r * 1.02)))) / th, ph = Math.atan2(z, -x); const px = rho * Math.sin(ph), py = rho * Math.cos(ph);
+      const pw = 0.07 + 0.3 * ab, phh = 0.5 + 0.12 * ab; const d = Math.hypot(px / pw, py / phh); const st = fbm(Math.cos(ph) * 5 + 3, Math.sin(ph) * 5, rho * 1.2, 2);
+      let cc = mixc(i0, i1, sst(0.1, 0.75, st) * (1 - 0.35 * rho)); cc = mixc(cc, i2, Math.max(0, 1 - Math.abs(d - 1.12) * 3.2) * 0.9 + sst(0.72, 0.9, st) * 0.5); cc = mul(cc, 1 - 0.75 * sst(0.8, 1, rho)); if (d < 1) cc = [0.004, 0.002, 0.008];
+      col[i * 3] = cc[0]; col[i * 3 + 1] = cc[1]; col[i * 3 + 2] = cc[2]; }
+    g.setAttribute('color', new T.BufferAttribute(col, 3)); g.rotateZ(-PI / 2); poe(K, g, '#FFFFFF', null, { e: o.e || 2.6 });
+    if (o.alvo) { K.tor(r * 0.62, 0, 0, r * 1.05, r * 0.035, C.AMB, null, { e: 3.0, rz: PI / 2, ts: ns(K, 36), rs: 5 }); } }); }
+/* gema acesa (octaedro com degradê) */
+function gema(K, x, y, z, r, h, cb, ct, e, o) { const g = new (TH().OctahedronGeometry)(1, 0).scale(r, h / 2, r); poe(K, degrade(g, cb, ct, 0.8), '#FFFFFF', null, Object.assign({ e, x, y, z, flat: true }, o || {})); }
+/* poeira presa: n grãos acesos (tetraedros) nas posições de fn(i, r) → [x, y, z, tamanho, cor] */
+function poeira(K, n, sd, fn, e) { const T = TH(), r = rng(sd); const pos = [], col = []; const base = new T.TetrahedronGeometry(1, 0), bp = base.attributes.position; const m = new T.Matrix4(), v = new T.Vector3();
+  for (let i = 0; i < n; i++) { const q = fn(i, r); if (!q) continue; const c = cor(q[4] || C.ETER2); m.compose(new T.Vector3(q[0], q[1], q[2]), new T.Quaternion().setFromEuler(new T.Euler(r() * TAU, r() * TAU, 0)), new T.Vector3(q[3], q[3], q[3])); for (let k = 0; k < bp.count; k++) { v.set(bp.getX(k), bp.getY(k), bp.getZ(k)).applyMatrix4(m); pos.push(v.x, v.y, v.z); col.push(c[0], c[1], c[2]); } }
+  if (pos.length) poe(K, geo(pos, col, null), '#FFFFFF', null, { e: e || 2.4, flat: true }); }
+/* pedra/caco facetado: icosaedro amassado por ruído, cor por vértice clara em cima */
+function pedra(K, x, y, z, r, o) { o = o || {}; const T = TH(); const g0 = new T.IcosahedronGeometry(1, o.det == null ? 1 : o.det); g0.deleteAttribute('uv'); g0.deleteAttribute('normal'); const c0 = cor(o.c0 || C.ROCHA), c1 = cor(o.c1 || C.ROCHA2), sd = o.seed || 1; const p = g0.attributes.position, col = new Float32Array(p.count * 3), s = o.s || [1, 1, 1];
+  for (let i = 0; i < p.count; i++) { const px = p.getX(i), py = p.getY(i), pz = p.getZ(i); const k = 0.62 + 0.75 * fbm(px * 1.3 + sd, py * 1.3 + sd * 0.3, pz * 1.3, 2); p.setXYZ(i, px * k * r * s[0], py * k * r * s[1], pz * k * r * s[2]); const cc = mixc(c0, c1, 0.5 + 0.5 * py); col[i * 3] = cc[0]; col[i * 3 + 1] = cc[1]; col[i * 3 + 2] = cc[2]; }
+  g0.setAttribute('color', new T.BufferAttribute(col, 3)); return poe(K, g0, '#FFFFFF', o.e ? null : (o.mat || PEDRA), { x, y, z, rx: o.rx, ry: o.ry, rz: o.rz, flat: true, e: o.e, pat: o.pat == null ? 6 : o.pat }); }
+/* animação de tentáculo conforme o lado (as rotações da GPU são nos eixos x e z do modelo) */
+function balanca(a, p, amp, speed, ph) { const ca = Math.cos(a), sa = Math.sin(a); return Math.abs(ca) > Math.abs(sa) ? { t: 'sway', p, amp, speed, ph } : { t: 'flap', p, amp, speed, ph, side: sa > 0 ? 1 : -1 }; }
+/* registra as receitas de um conceito e a ficha (nome, frase, o que muda) que a página de escolha lê */
+const RX = ARD.meshes && ARD.meshes.receitas ? ARD.meshes.receitas : {}; if (ARD.meshes) ARD.meshes.receitas = RX;
+const FICHAS = {};
+function registra(id, ficha, receitas) { FICHAS[id] = ficha; Object.assign(RX, receitas); }
 
-/* pilar dos Três Pilares: blocos de vidro que levitam um sobre o outro (cada um respira no seu ritmo), raízes de cristal e a coroa girando */
-function pilar(K) { K.base = 0; const r = rng(23);
-  for (let i = 0; i < nq(K, 7, 0.6); i++) { const a = i / nq(K, 7, 0.6) * TAU + 0.3, L = 6 + r() * 3.5; K.spike([Math.cos(a) * 1.8, 0.2, Math.sin(a) * 1.8], [Math.cos(a) * L, -0.6, Math.sin(a) * L], 1.4, '#FFFFFF', VIDRO, { n: 4, c0: VID, c1: VID3 });
-    fino(K, () => K.seg([Math.cos(a) * 2.4, 0.15, Math.sin(a) * 2.4], [Math.cos(a) * (L - 1), 0.05, Math.sin(a) * (L - 1)], 0.09, ETER, null, { e: 2.0, seg: 4 })); }
-  K.prism(0, -0.5, 0, 4.4, 2.5, 6, '#2B2733', 'rock', { top: 0.82 }); K.tor(0, 1.9, 0, 3.7, 0.2, OURO, 'metal', { ts: ns(K, 24) });
-  const H = [4.6, 4.2, 3.8, 3.4, 3.0], W = [3.1, 2.8, 2.5, 2.2, 1.9]; let y = 2.6;
-  for (let i = 0; i < H.length; i++) { const yy = y, w = W[i], h = H[i];
-    K.anim({ t: 'bob', amp: 0.25 + i * 0.06, speed: 0.9 + i * 0.13, ph: i * 1.1 }, () => grupo(K, giro(0, yy, 0, 0, i * 0.32, 0), () => {
-      K.prism(0, yy, 0, w, h, 6, VID, VIDRO_F, { top: 0.88, pat: 4 }); K.prism(0, yy + h - 0.25, 0, w * 0.9 + 0.05, 0.3, 6, OURO, 'metal', { top: 0.95 });
-      for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + PI / 6; if ((k + i) % 2 && leve(K)) continue; K.box(Math.cos(a) * w * 0.86, yy + h * 0.25, Math.sin(a) * w * 0.86, 0.14, h * 0.5, 0.5, ETER, null, { e: 2.2, ry: -a }); }
-      K.cyl(0, yy - 0.5, 0, w * 0.55, w * 0.55, 0.5, ETER2, null, { e: 1.8, seg: 6 }); })); y += h + 0.7; }
-  K.anim({ t: 'spin', p: [0, y + 3, 0], speed: 1.3 }, () => { K.oct(0, y + 0.3, 0, 2.3, 7.4, ETER2, null, { e: 2.8 }); K.oct(0, y + 1.3, 0, 1.2, 5.2, '#FFFFFF', null, { e: 3.2 }); poe(K, faixa(4.0, 0.5, 0.3, ns(K, 32)).rotateX(0.35).translate(0, y + 4, 0), OURO, 'metal');
-    for (let k = 0; k < 3; k++) { const a = k * 2.094; K.oct(Math.cos(a) * 4.6, y + 2.4 + k * 0.8, Math.sin(a) * 4.6, 0.6, 2.2, VID3, VIDRO, { rz: 0.4 }); } }); }
-/* marca do ponto fraco: losango âmbar girando, aro e a seta para baixo */
-function marca(K) { K.base = 0; K.anim({ t: 'spin', p: [0, 0, 0], speed: 2.2 }, () => { K.oct(0, 0, 0, 1.6, 4.4, PER, null, { e: 3.2, seg: 4 }); K.tor(0, 2.2, 0, 2.6, 0.18, PER, null, { e: 2.6, ts: 24 }); K.cyl(0, -0.4, 0, 0.35, 0.35, 0.8, '#1C1A18', 'dark', { seg: 6 }); /* 5.0g junção: miolo escondido não emissivo — com parte principal a malha ganha o atributo pt e divide o pipeline do material da Raça (só emissiva, era uma variante a mais + a sombra dela) */
-  for (let k = 0; k < 4; k++) { const a = k * PI / 2; K.box(Math.cos(a) * 3.3, 1.6, Math.sin(a) * 3.3, 0.9, 0.22, 0.22, PER, null, { e: 2.4, ry: -a }); } }); }
-
-/* ---------- A Forja-Mãe (Construtores) ---------- */
-let PAL_F = null; /* as cores lineares nascem na primeira montagem (o three carrega depois deste arquivo) */
-function bronze(x, y, z, k) { if (!PAL_F) PAL_F = { PB: cor(BRZ), PB2: cor(BRZ2), PA: cor(ACO) }; const { PB, PB2, PA } = PAL_F; const n = fbm(x * 0.35 + 3, y * 0.35, z * 0.35, 3); const t = sst(0.35, 0.75, n); let c = mixc(PB, PB2, t * 0.8); c = mixc(c, PA, sst(0.6, 0.85, fbm(x * 0.9, y * 0.9 + 5, z * 0.9, 2)) * 0.5); const ao = 0.55 + 0.45 * sst(-0.9, 0.4, k == null ? 0 : k); return [c[0] * ao, c[1] * ao, c[2] * ao]; }
-/* placa do dorso (arco por cima, de um lado ao outro), com o friso de ouro na frente; aberta = gira em volta da borda da frente */
-function placa(K, xk, w, aberta, Y) { const n = ns(K, 14); const pts = []; for (let i = 0; i < n; i++) { const z = -15.6 + 31.2 * i / (n - 1), c = Math.cos(z / 16.2 * PI / 2); pts.push([xk, Y + 6 * Math.pow(Math.max(0, c), 1.1) - (Math.abs(xk) > 12 ? 1.6 : 0), z, w, 1.15]); }
-  const g = varre(pts, { n: ns(K, 10), lado: [Math.cos(0.28), Math.sin(0.28), 0], dentro: [xk, Y - 6, 0], conc: -0.08, c0: BRZ, c1: BRZ, c2: ESC, borda: 0.5 });
-  const col = g.attributes.color, p = g.attributes.position; for (let i = 0; i < p.count; i++) { const b = bronze(p.getX(i), p.getY(i), p.getZ(i), 0.4); const lz = 1.25 + 0.5 * Math.pow(Math.max(0, Math.cos(p.getZ(i) / 16.2 * PI / 2)), 3); col.setXYZ(i, b[0] * 1.45 * lz, b[1] * 1.45 * lz, b[2] * 1.45 * lz); }
-  const M = aberta ? new (TH().Matrix4)().makeTranslation(0, 1.2, 0).multiply(giro(xk + w * 0.9, Y, 0, 0, 0, -0.62)) : new (TH().Matrix4)(); grupo(K, M, () => { poe(K, g, '#FFFFFF', BRONZE, { pat: 1 }); const Q = g.userData.quad;
-    const fr = []; for (const q of Q) { const v = q.c.clone().addScaledVector(q.s, q.w * 0.98).addScaledVector(q.n, 0.15); fr.push([v.x, v.y, v.z, 0.32]); } K.trunk(fr, OV, 'metal', { n: 5 });
-    const qm = Q[Math.floor(Q.length / 2)], vm = qm.c.clone().addScaledVector(qm.n, 0.9); K.spike([vm.x, vm.y - 0.4, vm.z - 0.9], [vm.x - 1.4, vm.y + (Math.abs(xk) > 12 ? 2.6 : 4.2), vm.z], 1.1, '#FFFFFF', BRONZE, { n: 4, c0: BRZ2, c1: OV });
-    fino(K, () => { for (let i = 2; i < Q.length - 2; i += 3) { if (Math.abs(i - Q.length / 2) < 2) continue; const q = Q[i]; const v = q.c.clone().addScaledVector(q.n, 0.9); K.oct(v.x, v.y - 0.2, v.z, 0.45, 1.6, OV, 'metal'); } }); }); }
-function chamine(K, x, y, z, r, h, tilt) { grupo(K, giro(x, y, z, 0, 0, tilt), () => { K.cyl(x, y, z, r * 0.82, r, h, ESC, 'dark', { seg: ns(K, 14) }); for (const f of [0.3, 0.62]) K.tor(x, y + h * f, z, r * 0.96, 0.26, OV, 'metal', { ts: ns(K, 18) });
-  K.tor(x, y + h, z, r * 0.84, 0.32, BRASA, null, { e: 2.6, ts: ns(K, 18) }); K.cyl(x, y + h - 0.25, z, r * 0.66, r * 0.66, 0.3, BRASA2, null, { e: 3.0, seg: ns(K, 12) });
-  fino(K, () => { for (let k = 0; k < 4; k++) { const a = k * PI / 2 + 0.4; K.box(x + Math.cos(a) * r * 0.9, y + h * 0.82, z + Math.sin(a) * r * 0.9, 0.35, 1.6, 0.35, ESC, 'dark', { ry: -a }); } }); }); }
-/* braço-guindaste (mandíbula) com a tocha de solda na ponta */
-function braco(K, sg, aberto) { const S = [13, 27, sg * 11.5], E = aberto ? [20, 33, sg * 13.8] : [19.5, 31, sg * 13], P = aberto ? [25.5, 27.5, sg * 9.5] : [24, 25.5, sg * 8];
-  K.anim({ t: 'sway', p: S, amp: 0.07, speed: 1.6, ph: sg > 0 ? 0 : 1.9 }, () => { K.sph(S[0], S[1], S[2], 1.9, BRZ2, 'metal', { seg: ns(K, 14) });
-    K.trunk([[S[0], S[1], S[2], 1.25], [(S[0] + E[0]) / 2, (S[1] + E[1]) / 2 + 0.8, (S[2] + E[2]) / 2, 1.05], [E[0], E[1], E[2], 0.9]], '#FFFFFF', 'metal', { n: ns(K, 8), c0: BRZ, c1: BRZ2 });
-    K.sph(E[0], E[1], E[2], 1.2, OV, 'metal', { seg: ns(K, 12) }); K.trunk([[E[0], E[1], E[2], 0.8], [(E[0] + P[0]) / 2, (E[1] + P[1]) / 2 + 0.4, (E[2] + P[2]) / 2, 0.7], [P[0], P[1], P[2], 0.5]], '#FFFFFF', 'metal', { n: ns(K, 7), c0: BRZ2, c1: ACO2 });
-    fino(K, () => K.seg([S[0] + 0.5, S[1] - 1.2, S[2]], [(E[0] + P[0]) / 2, (E[1] + P[1]) / 2 - 0.6, (E[2] + P[2]) / 2], 0.28, COB, 'metal', { seg: 6 }));
-    for (let k = 0; k < 3; k++) { const a = k * TAU / 3; K.spike([P[0] - 0.3, P[1] + Math.cos(a) * 0.5, P[2] + Math.sin(a) * 0.5], [P[0] + 1.7, P[1] + Math.cos(a) * 1.1 - 0.4, P[2] + Math.sin(a) * 1.1], 0.32, '#FFFFFF', 'metal', { n: 3, c0: BRZ2, c1: OV }); }
-    K.cone(P[0] + 0.2, P[1], P[2], 0.35, 1.5, SOLDA, null, { e: 3.4, seg: 8, rz: -PI / 2 }); }); }
-function forjaCorpo(fase) { return K => { const caida = fase === 3, b = fase === 2; K.base = caida ? 1.5 : 0; const r = rng(31);
-  if (caida) return forjaCaida(K);
-  const Y = 20.5;
-  /* casco: bloco esculpido (quase uma caixa arredondada), barriga achatada, bronze com pátina */
-  poe(K, esculpe(ns(K, 40), ns(K, 22), 19.5, 8, 15, (x, y, z) => { const p = 3.2; let rr = 1 / Math.pow(Math.pow(Math.abs(x), p) + Math.pow(Math.abs(y), p) + Math.pow(Math.abs(z), p), 1 / p); if (y < 0) rr *= 0.9 + 0.1 * (1 + y); return rr * (1 + 0.025 * (fbm(x * 4, y * 4, z * 4, 2) - 0.5)); }, (x, y, z) => bronze(x * 19.5, y * 8, z * 15, y)).translate(0, Y, 0), '#FFFFFF', BRONZE, { pat: 1 });
-  /* placas do dorso e as costuras de metal derretido entre elas */
-  const XS = [14.2, 8.6, 3.0, -2.6, -8.2, -13.8]; for (const xk of XS) placa(K, xk, 3.4, b, Y + 4.6);
-  for (let i = 0; i < XS.length - 1; i++) { const xs = (XS[i] + XS[i + 1]) / 2 + 0.6, n = ns(K, 10), pts = []; for (let k = 0; k < n; k++) { const z = -14 + 28 * k / (n - 1), c = Math.cos(z / 16.2 * PI / 2); pts.push([xs, Y + 3.6 + 6 * Math.pow(Math.max(0, c), 1.1) - (Math.abs(xs) > 12 ? 1.6 : 0), z, b ? 0.85 : 0.5]); } K.trunk(pts, '#FFFFFF', null, { n: 4, c0: b ? BRASA2 : BRASA, c1: b ? BRASA2 : BRASA, e: b ? 3.0 : 2.3 }); }
-  /* encaixes das pernas nos quatro cantos */
-  for (const sx of [-1, 1]) for (const sz of [-1, 1]) { K.sph(sx * 15, 22.5, sz * 12, 4.3, BRZ2, 'metal', { seg: ns(K, 18), sy: 0.92 }); K.tor(sx * 15, 21.2, sz * 12, 4.1, 0.38, BRASA, null, { e: 2.2, ts: ns(K, 22) });
-    fino(K, () => { for (let k = 0; k < 6; k++) { const a = k / 6 * TAU; K.box(sx * 15 + Math.cos(a) * 3.7, 25.4, sz * 12 + Math.sin(a) * 3.7, 0.7, 0.5, 1.3, OV, 'metal', { ry: -a }); } }); }
-  /* bocarra da frente: maxilares, dentes de prensa, a fornalha lá dentro */
-  K.anim({ t: 'spin', p: [16.8, 19.5, 0], speed: 0.7, axis: 'x' }, () => poe(K, mancha(new (TH().SphereGeometry)(4.6, ns(K, 22), ns(K, 14)), '#2A0800', '#FF5A12', '#FFE6A0', 2.2, 11), '#FFFFFF', null, { e: b ? 2.4 : 1.8, x: 16.8, y: 19.5, sx: 0.7 })); /* 5.0h.2 (ajuste): fornalha com veios */ K.tor(18.2, 19.5, 0, 4.9, 0.5, ESC, 'dark', { rz: PI / 2, ts: ns(K, 24) });
-  const ja = b ? 0.5 : 0.04, jb = b ? -0.34 : -0.03;
-  K.anim(b ? { t: 'sway', p: [15, 23, 0], amp: 0.05, speed: 2.6 } : null, () => grupo(K, giro(15, 23, 0, 0, 0, ja), () => { K.box(19.5, 22.3, 0, 9, 3.2, 17, BRZ, 'metal', { b: 0.6 }); K.box(23.6, 21.6, 0, 1.6, 1.4, 15, OV, 'metal', { b: 0.3 });
-    for (let k = 0; k < nq(K, 7, 0.6); k++) K.box(22.6, 21.0, -6.6 + 13.2 * k / (nq(K, 7, 0.6) - 1), 1.2, 1.6, 1.3, ACO2, 'steel', { b: 0.15 }); }));
-  grupo(K, giro(15, 17, 0, 0, 0, jb), () => { K.box(19.5, 14.6, 0, 9, 2.6, 16, BRZ, 'metal', { b: 0.5 }); for (let k = 0; k < nq(K, 6, 0.6); k++) K.box(22.6, 17.0, -6 + 12 * k / (nq(K, 6, 0.6) - 1), 1.2, 1.4, 1.3, ACO2, 'steel', { b: 0.15 }); });
-  if (b) { for (let k = 0; k < 3; k++) K.anim({ t: 'spin', p: [15.5 + k * 1.6, 17.6, 0], speed: 4, axis: 'z' }, () => K.cyl(15.5 + k * 1.6, 17.6, -6.5, 0.6, 0.6, 13, ACO2, 'steel', { rx: PI / 2, seg: 10 })); for (let k = 0; k < 4; k++) K.box(16 + k * 1.2, 18.3, -4 + k * 2.4, 0.9, 0.5, 0.9, BRASA2, null, { e: 3.0 }); }
-  /* fronte: placa da testa, três olhos de lente antiga e os chifres-antena */
-  poe(K, esculpe(ns(K, 28), ns(K, 18), 6.4, 4.6, 7.2, (x, y, z) => 1 + 0.16 * Math.max(0, y) * (1 - Math.abs(z)) - 0.12 * Math.max(0, -x) + 0.03 * (fbm(x * 5, y * 5, z * 5, 2) - 0.5), (x, y, z) => bronze(x * 6 + 19, y * 4 + 26, z * 7, y + 0.3)).translate(19.2, 26.4, 0), '#FFFFFF', BRONZE, { pat: 1 });
-  K.box(19, 29.6, 0, 7.5, 1.4, 12.5, OV, 'metal', { b: 0.5, rz: -0.18 }); /* a sobrancelha de ouro velho */
-  for (const [ez, ey, er] of [[-2.9, 26.6, 1.15], [2.9, 26.6, 1.15], [0, 28.3, 0.9]]) { K.sph(24.6, ey, ez, er, BRASA2, null, { e: 3.0, seg: ns(K, 12) }); K.tor(24.7, ey, ez, er * 1.18, 0.26, ESC, 'dark', { rz: PI / 2, ts: ns(K, 16) }); }
-  for (const sg of [1, -1]) K.trunk([[18, 29.8, sg * 4.6, 1.35], [14.5, 34.5, sg * 6.8, 1.0], [9.5, 37.5, sg * 9, 0.6], [5, 37.6, sg * 10.6, 0.1]], '#FFFFFF', 'metal', { n: ns(K, 8), c0: BRZ2, c1: OV });
-  /* chaminés do dorso, inclinadas para trás */
-  chamine(K, -5, 29.5, -6.6, 2.1, 11.5, 0.24); chamine(K, -5, 29.5, 6.6, 2.1, 11.5, 0.24); chamine(K, -11.2, 28.5, -4.8, 2.5, 15, 0.3); chamine(K, -11.2, 28.5, 4.8, 2.5, 15, 0.3); fino(K, () => chamine(K, -16.5, 25.5, 0, 1.5, 9, 0.36));
-  /* braços-guindaste */
-  braco(K, 1, b); braco(K, -1, b);
-  /* flancos: canos de cobre, a escrita antiga acesa e as aletas */
-  for (const sg of [1, -1]) { K.trunk([[14, 17.5, sg * 14.6, 0.5], [6, 16.8, sg * 15.4, 0.5], [-4, 17.2, sg * 15.4, 0.5], [-14, 18.2, sg * 14.4, 0.5]], '#FFFFFF', 'metal', { n: 6, c0: COB, c1: COB });
-    fino(K, () => { for (let k = 0; k < 16; k++) { const x = -13 + k * 1.7; if (k % 5 === 4) continue; K.box(x, 21 + (k % 2) * 0.35, sg * 15.25, 0.55, 0.5 + (k % 3) * 0.18, 0.2, BRASA2, null, { e: 1.5 }); } });
-    for (let k = 0; k < 4; k++) K.box(-9 + k * 2.4, 13.6, sg * 12.6, 0.5, 3.2, 3.6, ESC, 'dark', { rz: 0.15 }); }
-  /* traseira: três baias de produção (abertas e acesas na Linha de montagem) */
-  for (const z of [-7, 0, 7]) { if (b) { K.box(-19.6, 15.5, z, 0.6, 6.5, 5, BRASA, null, { e: 2.6 }); K.box(-20.6, 22.6, z, 1.0, 0.6, 5.4, ACO2, 'steel', { rz: 0.6 }); }
-    else { K.box(-19.7, 15.5, z, 0.9, 6.5, 5, ACO2, 'steel', { b: 0.2 }); K.box(-20.2, 18.4, z, 0.3, 0.45, 4.8, BRASA, null, { e: 1.8 }); } }
-  /* barriga: costelas de baixo e correntes */
-  fino(K, () => { for (let k = 0; k < 4; k++) { const x = -9 + k * 6; K.trunk([[x, 14.4, -11, 0.45], [x, 12.4, -5, 0.5], [x, 12.0, 0, 0.5], [x, 12.4, 5, 0.5], [x, 14.4, 11, 0.45]], '#FFFFFF', 'metal', { n: 5, c0: ESC, c1: BRZ }); }
-    for (let k = 0; k < 5; k++) { const x = -12 + k * 6 + r() * 2, z = (r() - 0.5) * 16; K.trunk([[x, 13.2, z, 0.18], [x + 0.6, 9.5 + r() * 2, z + 0.4, 0.16]], ACO, 'metal', { n: 4 }); } });
-}; }
-function forjaCaida(K) { const r = rng(41);
-  grupo(K, giro(0, 0, 0, -0.05, 0, 0.06), () => {
-    poe(K, esculpe(ns(K, 36), ns(K, 18), 19.5, 6.6, 15, (x, y, z) => { const p = 3.0; let rr = 1 / Math.pow(Math.pow(Math.abs(x), p) + Math.pow(Math.abs(y), p) + Math.pow(Math.abs(z), p), 1 / p); return rr * (1 + 0.06 * (fbm(x * 3, y * 3, z * 3, 3) - 0.5)); }, (x, y, z) => { const c = bronze(x * 19.5, y * 6.6, z * 15, y); return [c[0] * 0.8, c[1] * 0.75, c[2] * 0.75]; }).translate(0, 5.2, 0), '#FFFFFF', 'metal', { pat: 1 });
-    /* a cavidade aberta: brasa no fundo e as costelas em volta do núcleo */
-    poe(K, mancha(new (TH().SphereGeometry)(7.0, ns(K, 26), ns(K, 10), 0, TAU, 0, PI / 2), '#200600', '#E04A0E', '#FFD27A', 2.0, 21), '#FFFFFF', null, { e: 1.8, y: 8.2, sy: 0.5 }); /* 5.0h.2 (ajuste) */
-    for (let k = 0; k < nq(K, 6, 0.67); k++) { const x = -7 + k * 2.8; K.trunk([[x, 10, -9.5, 0.6], [x + 0.4, 15.5, -6.5, 0.55], [x + 0.8, 18.5, -1.5 - k * 0.2, 0.45], [x + 1.2, 17, 2.5, 0.35], [x + 1.4, 14.5, 4.2, 0.12]], '#FFFFFF', 'metal', { n: 6, c0: BRZ, c1: OV }); }
-    /* as placas que ficaram, tortas e soltas; rachaduras acesas no casco */
-    for (const [xk, rx, rz] of [[-8.2, 0.18, 0.2], [-13.8, -0.25, 0.3], [9.4, -0.3, -0.35], [14.6, 0.22, -0.5]]) grupo(K, giro(xk, 9, 0, rx, 0, rz), () => placa(K, xk, 3.4, false, 3.6));
-    for (let i = 0; i < nq(K, 9, 0.6); i++) { const a = r() * TAU, rr = 0.55 + r() * 0.35; const x0 = Math.cos(a) * 19.5 * rr, z0 = Math.sin(a) * 15 * rr; const pts = []; let x = x0, z = z0; for (let k = 0; k < 5; k++) { const yy = 5.2 + 6.6 * Math.sqrt(Math.max(0, 1 - (x / 19.5) ** 2 - (z / 15) ** 2)) * 0.98; pts.push([x, yy + 0.15, z, 0.16]); x += (r() - 0.5) * 3.2 - Math.cos(a) * 1.2; z += (r() - 0.5) * 3.2 - Math.sin(a) * 1.2; } K.trunk(pts, '#FFFFFF', null, { n: 3, c0: BRASA2, c1: BRASA, e: 2.6 }); }
-    for (const sg of [1, -1]) { K.trunk([[13, 9, sg * 11.5, 1.2], [18, 6, sg * 14.5, 1.0], [21, 1.2, sg * 16.5, 0.8]], '#FFFFFF', BRONZE, { n: ns(K, 8), c0: BRZ, c1: BRZ2 }); K.sph(21, 1.2, sg * 16.5, 1.1, OV, 'metal', { seg: 10 }); K.trunk([[16.5, 10.6, sg * 4.6, 1.2], [13.5, 13.2, sg * 6.8, 0.9], [11.5, 13.6, sg * 7.6, 0.25]], '#FFFFFF', 'metal', { n: ns(K, 6), c0: BRZ2, c1: OV }); }
-    /* bocarra caída, os olhos quase apagados, chaminés quebradas */
-    grupo(K, giro(15, 8, 0, 0.12, 0, -0.35), () => { K.box(19.5, 6.6, 0, 9, 3.2, 17, BRZ, 'metal', { b: 0.6 }); K.box(17.5, 9.6, 0, 6.5, 2.6, 12, BRZ2, 'metal', { b: 0.6 }); for (const ez of [-2.9, 2.9]) K.sph(20.8, 10.5, ez, 1.0, '#7A3A12', null, { e: 1.2, seg: 10 }); });
-    poe(K, mancha(new (TH().SphereGeometry)(4.0, ns(K, 18), ns(K, 12)), '#1E0600', '#C8400C', '#FFC66A', 2.0, 23), '#FFFFFF', null, { e: 1.5, x: 16.6, y: 6.5, sx: 0.6 });
-    chamine(K, -11.2, 9.5, -4.6, 2.0, 6.5, 0.55); fino(K, () => chamine(K, -5, 10, 6.3, 1.7, 3.5, -0.4));
-    for (const sx of [-1, 1]) for (const sz of [-1, 1]) { K.cyl(sx * 15, 2, sz * 12, 2.6, 3.2, 4.5, ESC, 'dark', { seg: ns(K, 12) }); K.cyl(sx * 15, 6.4, sz * 12, 2.0, 2.0, 0.3, BRASA, null, { e: 2.2, seg: ns(K, 10) }); }
-  });
-  /* chaminé tombada, placas arrancadas no chão, metal derretido escorrendo e poças */
-  K.cyl(-19, 1.6, -15, 1.9, 2.1, 11, ESC, 'dark', { seg: ns(K, 12), rz: PI / 2 - 0.12, ry: 0.6 });
-  grupo(K, giro(10, 0, -19, 1.2, 0.4, 0), () => placa(K, 10, 3.2, false, -2.2)); fino(K, () => grupo(K, giro(-4, 0, 20, -1.25, -0.3, 0), () => placa(K, -4, 3.2, false, -2.2)));
-  for (let i = 0; i < nq(K, 7, 0.6); i++) { const a = i * 0.9 + 0.3, x0 = Math.cos(a) * 9, z0 = Math.sin(a) * 8, x1 = Math.cos(a) * 15, z1 = Math.sin(a) * 13.5;
-    K.trunk([[x0, 7.5, z0, 0.4], [(x0 + x1) / 2, 4.5, (z0 + z1) / 2, 0.35], [x1, 0.3, z1, 0.5]], '#FFFFFF', null, { n: 4, c0: BRASA2, c1: BRASA, e: 2.6 }); K.cyl(x1, 0, z1, 2.2 + r(), 2.6 + r(), 0.2, BRASA, null, { e: 2.2, seg: ns(K, 12) }); }
-  fino(K, () => { for (let i = 0; i < 14; i++) { const a = r() * TAU, d = 16 + r() * 9; K.box(Math.cos(a) * d, 0, Math.sin(a) * d, 0.5 + r() * 0.6, 0.4, 0.5 + r() * 0.6, i % 3 ? ESC : BRASA, i % 3 ? 'dark' : null, i % 3 ? { ry: r() * 3 } : { e: 2.4, ry: r() * 3 }); } });
-}
-/* a perna inteira: quadril em (0, 22, 0), joelho alto e pé no chão a +x; leg na GPU (passo). Coxa blindada, joelho com o anel aceso e o espigão,
-   canela com placas e o pistão, pé de três garras com o esporão */
-function pernaPecas(K, ac) { const Hp = [0, 22, 0], Kn = [9, 30.5, 0], An = [15.6, 3.6, 0], Ft = [17, 0.9, 0];
-  K.sph(Hp[0], Hp[1], Hp[2], 2.9, BRZ2, 'metal', { seg: ns(K, 16) });
-  K.trunk([[Hp[0], Hp[1], 0, 3.0], [4.5, 27.4, 0, 3.3], [Kn[0] - 1, Kn[1] - 0.3, 0, 2.4]], '#FFFFFF', BRONZE, { n: ns(K, 12), c0: BRZ, c1: BRZ2 });
-  const coxa = varre([[0.2, 25.4, 0, 0.4, 0.3], [2.5, 28.6, 0, 3.4, 0.7], [5.5, 31.6, 0, 3.1, 0.6], [8.4, 33.6, 0, 0.4, 0.3]], { n: ns(K, 10), lado: [0, 0, 1], dentro: [4, 26, 0], conc: 0.45, c0: BRZ2, c1: BRZ, borda: 0.6 }); poe(K, coxa, '#FFFFFF', BRONZE, { pat: 1 });
-  K.sph(Kn[0], Kn[1], Kn[2], 3.2, ESC, 'dark', { seg: ns(K, 16) }); K.tor(Kn[0], Kn[1], Kn[2], 3.25, 0.4, ac ? BRASA : '#5A2A10', null, { e: ac ? 2.4 : 0.9, rz: PI / 2, ts: ns(K, 22) });
-  K.spike([Kn[0] + 0.5, Kn[1] + 1.8, 0], [Kn[0] + 4.2, Kn[1] + 5.2, 0], 0.9, '#FFFFFF', 'metal', { n: 4, c0: BRZ2, c1: OV });
-  K.trunk([[Kn[0], Kn[1], 0, 2.9], [12.6, 18, 0, 2.4], [An[0], An[1], 0, 1.7]], '#FFFFFF', BRONZE, { n: ns(K, 14), c0: ACO, c1: BRZ });
-  for (const f of [0.3, 0.55, 0.78]) { const x = Kn[0] + (An[0] - Kn[0]) * f, y = Kn[1] + (An[1] - Kn[1]) * f; K.tor(x, y, 0, 2.75 - f * 1.1, 0.32, OV, 'metal', { ts: ns(K, 18), rz: -0.26 }); }
-  { const jo = varre([[Kn[0] - 3, Kn[1] + 1.2, 0, 0.5, 0.3], [Kn[0] - 0.5, Kn[1] + 3.6, 0, 3.4, 0.7], [Kn[0] + 2.4, Kn[1] + 1.6, 0, 3.0, 0.6], [Kn[0] + 3.4, Kn[1] - 2.5, 0, 0.5, 0.3]], { n: ns(K, 10), lado: [0, 0, 1], dentro: [Kn[0], Kn[1], 0], conc: 0.6, c0: BRZ2, c1: BRZ, borda: 0.8 }); poe(K, jo, '#FFFFFF', BRONZE, { pat: 1 }); } /* joelheira */
-  { const cn = varre([[Kn[0] + 1.2, Kn[1] - 1, 0, 0.5, 0.3], [11.6, 23, 0, 3.6, 0.7], [13.9, 13, 0, 3.1, 0.6], [15.6, 6, 0, 0.5, 0.3]].map(q => [q[0] + 1.3, q[1], q[2], q[3], q[4]]), { n: ns(K, 10), lado: [0, 0, 1], dentro: [10, 15, 0], conc: 0.55, c0: BRZ, c1: BRZ2, borda: 0.6 }); poe(K, cn, '#FFFFFF', BRONZE, { pat: 1 }); } /* caneleira */
-  K.seg([2.2, 24.5, 1.5], [11.8, 21.5, 1.5], 0.55, ACO2, 'steel', { seg: ns(K, 8) }); K.seg([6.5, 23.5, 1.5], [12.2, 15, 1.5], 0.38, COB, 'metal', { seg: ns(K, 8) }); /* pistão */
-  fino(K, () => { K.trunk([[0.5, 23, -1.6, 0.25], [4, 24.5, -2.6, 0.25], [7.5, 28, -2.3, 0.22]], ESC, 'rubber', { n: 4 }); K.trunk([[1, 22, 1.8, 0.22], [5, 22.5, 2.6, 0.22], [9, 26.5, 2.2, 0.2]], ESC, 'rubber', { n: 4 }); });
-  K.sph(An[0], An[1], An[2], 1.5, ESC, 'dark', { seg: ns(K, 12) });
-  for (const [dx, dz] of [[1, 0], [0.7, 0.75], [0.7, -0.75]]) K.trunk([[An[0], An[1] - 0.6, 0, 1.2], [An[0] + dx * 3, 1.4, dz * 3, 0.95], [An[0] + dx * 5.6, 0.15, dz * 5.2, 0.1]], '#FFFFFF', BRONZE, { n: ns(K, 7), c0: BRZ2, c1: OV });
-  K.trunk([[An[0], An[1] - 0.6, 0, 0.7], [An[0] - 2.2, 1, 0, 0.45], [An[0] - 3.4, 0.1, 0, 0.06]], '#FFFFFF', 'metal', { n: ns(K, 5), c0: BRZ, c1: OV }); }
-function forjaPerna(K) { K.base = 0; K.anim({ t: 'leg', p: [0, 22, 0], amp: 0.22, stride: 14, ph: 0 }, () => pernaPecas(K, true)); }
-function forjaPernaCaida(K) { K.base = 0; grupo(K, new (TH().Matrix4)().makeTranslation(0, 2.4, 0).multiply(mat4(0, 0.5, 0, PI / 2 - 0.06, 0, 0)).multiply(new (TH().Matrix4)().makeTranslation(0, -16, 0)), () => pernaPecas(K, false)); }
-/* escora do ponto fraco (a parte 'perna' da simulação, sob o canto do casco): pistão blindado com a bobina acesa à mostra */
-function junta(K) { K.base = 0; K.cyl(0, 0, 0, 3.6, 4.0, 1.4, ESC, 'dark', { seg: ns(K, 14) }); K.cyl(0, 1.4, 0, 2.3, 2.5, 3.6, BRZ, 'metal', { seg: ns(K, 14) });
-  for (let k = 0; k < 4; k++) { const a = k * PI / 2 + PI / 4; K.box(Math.cos(a) * 2.4, 1.4, Math.sin(a) * 2.4, 0.6, 3.6, 0.6, OV, 'metal', { ry: -a }); }
-  K.anim({ t: 'bob', amp: 0.18, speed: 3.6 }, () => { for (let k = 0; k < (leve(K) ? 3 : 5); k++) K.tor(0, 5.4 + k * 0.75, 0, 1.75, 0.26, k % 2 ? COB : BRASA2, k % 2 ? 'metal' : null, k % 2 ? { ts: ns(K, 18) } : { e: 2.3, ts: ns(K, 18) }); poe(K, mancha(new (TH().CylinderGeometry)(1.2, 1.2, 4.2, ns(K, 12), 4).translate(0, 2.1, 0), '#2A0800', '#FF5A12', '#FFE6A0', 2.6, 31), '#FFFFFF', null, { e: 1.8, y: 5 }); });
-  K.cyl(0, 9.4, 0, 1.0, 1.0, 1.6, ACO2, 'steel', { seg: ns(K, 10) }); K.cyl(0, 10.6, 0, 2.6, 2.2, 1.4, BRZ2, 'metal', { seg: ns(K, 14) });
-  fino(K, () => { for (const sg of [1, -1]) K.trunk([[sg * 2.4, 2.6, 0.6, 0.28], [sg * 3.4, 6.5, 1.0, 0.28], [sg * 2.2, 10.8, 0.6, 0.26]], ESC, 'rubber', { n: 4 }); }); }
-/* o núcleo exposto: metal em fusão sob a crosta rachada, gaiola de anéis antigos girando, aletas na base */
-function nucleo(K) { K.base = 0; K.cyl(0, 0, 0, 7, 8, 3, ESC, 'dark', { seg: ns(K, 16) }); K.tor(0, 3, 0, 7.1, 0.4, OV, 'metal', { ts: ns(K, 24) });
-  K.anim({ t: 'bob', amp: 0.4, speed: 3.2 }, () => { poe(K, mancha(new (TH().SphereGeometry)(5.0, ns(K, 26), ns(K, 18)), '#5A1800', '#FF7A1A', '#FFF1C8', 2.6, 41), '#FFFFFF', null, { e: 2.4, y: 8 });
-    const T = TH(); const g = new T.IcosahedronGeometry(5.55, leve(K) ? 2 : 3); const p = g.attributes.position, keep = [], col = []; /* crosta: só as placas onde o ruído é alto (o resto é rachadura acesa) */
-    for (let i = 0; i < p.count; i += 3) { let sx = 0, sy = 0, sz = 0; for (let k = 0; k < 3; k++) { sx += p.getX(i + k); sy += p.getY(i + k); sz += p.getZ(i + k); } const n = fbm(sx * 0.35 + 9, sy * 0.35, sz * 0.35, 3); if (n < 0.4) continue;
-      for (let k = 0; k < 3; k++) { const x = p.getX(i + k), y = p.getY(i + k), z = p.getZ(i + k), b = 1 + (n - 0.4) * 0.6; keep.push(x * b, y * b + 8, z * b); const c = 0.45 + 0.8 * (n - 0.4); col.push(0.32 * c, 0.2 * c, 0.15 * c); } }
-    g.dispose(); const cr = new T.BufferGeometry(); cr.setAttribute('position', new T.Float32BufferAttribute(keep, 3)); cr.setAttribute('color', new T.Float32BufferAttribute(col, 3)); poe(K, cr, '#FFFFFF', 'rock', { flat: true });
-    }); /* (sem casca acesa por fora: a luz sai pelas rachaduras) */
-  for (const [ax, sp, rr] of [['y', 0.8, 7.6], ['x', 0.55, 8.3], ['z', -0.65, 9.0]]) { if (leve(K) && ax === 'z') continue; K.anim({ t: 'spin', p: [0, 8, 0], speed: sp, axis: ax }, () => { const fx = faixa(rr, 0.7, 0.45, ns(K, 40)); if (ax === 'x') fx.rotateX(PI / 2); if (ax === 'z') fx.rotateZ(PI / 2); poe(K, fx.translate(0, 8, 0), OV, 'metal');
-    fino(K, () => { for (let k = 0; k < 10; k++) { const a = k / 10 * TAU; const v = new (TH().Vector3)(Math.cos(a) * (rr + 0.25), 0, Math.sin(a) * (rr + 0.25)); if (ax === 'x') v.applyAxisAngle(new (TH().Vector3)(1, 0, 0), PI / 2); if (ax === 'z') v.applyAxisAngle(new (TH().Vector3)(0, 0, 1), PI / 2); K.box(v.x, v.y + 8 - 0.18, v.z, 0.3, 0.36, 0.3, BRASA2, null, { e: 2.2 }); } }); }); }
-  for (let i = 0; i < 8; i++) { const a = i * PI / 4; K.box(Math.cos(a) * 7.5, 1, Math.sin(a) * 7.5, 1.0, 5, 2.4, BRZ, 'metal', { ry: -a, b: 0.2 }); } }
-
-/* coroa de cacos da Fenda sobre cada cópia espectral (os Ecos do Arauto): três cacos de vidro e a gema magenta, girando */
-function eco(K) { K.base = 0; K.anim({ t: 'spin', p: [0, 0, 0], speed: 1.6 }, () => { for (let k = 0; k < 3; k++) { const a = k * TAU / 3; K.oct(Math.cos(a) * 2.2, 0.2, Math.sin(a) * 2.2, 0.55, 2.6, VID3, VIDRO, { rz: Math.cos(a) * 0.35, rx: -Math.sin(a) * 0.35 }); K.box(Math.cos(a) * 2.2, 1.2, Math.sin(a) * 2.2, 0.12, 0.9, 0.3, FEN, null, { e: 2.4, ry: -a }); }
-  gema(K, 0, 0.4, 0, 0.75, 2.0, '#2A0640', FEN2, 1.8); K.tor(0, 1.0, 0, 2.4, 0.1, FEN, null, { e: 2.0, ts: 20 }); }); }
-
-const RX = ARD.meshes && ARD.meshes.receitas ? ARD.meshes.receitas : {};
-Object.assign(RX, {
-  chefe_arauto_1: arauto('1'), chefe_arauto_2: arauto('2'), chefe_arauto_3: arauto('3'), chefe_arauto_j: arauto('j'),
-  chefe_sentinela: sentinela('1'), chefe_sentinela_j: sentinela('j'), chefe_pilar: pilar, chefe_marca: marca,
-  chefe_forja: forjaCorpo(1), chefe_forja_b: forjaCorpo(2), chefe_forja_caida: forjaCorpo(3),
-  chefe_forja_perna: forjaPerna, chefe_forja_perna_caida: forjaPernaCaida, chefe_junta: junta, chefe_nucleo: nucleo, chefe_eco: eco,
-});
-if (ARD.meshes) ARD.meshes.receitas = RX;
-ARD.chefesModelos = Object.keys(RX).filter(k => k.startsWith('chefe_'));
-/* pontos dos modelos que o src/chefes.js usa para os efeitos (nas coordenadas da receita, antes do ajuste de tamanho) */
-ARD.chefesForma.pontos = {
-  arauto: { olho: [7.0, 27.9, 0], nucleo: [0, 27, 0] }, sentinela: { olho: [5.0, 20.1, 0], nucleo: [0, 19.4, 0] },
-  forja: { tochas: [[27.2, 27.5, 9.5], [27.2, 27.5, -9.5], [25.7, 25.5, 8], [25.7, 25.5, -8]], chamines: [[-7.7, 40.7, -6.6], [-7.7, 40.7, 6.6], [-15.6, 42.8, -4.8], [-15.6, 42.8, 4.8]], boca: [21, 19.5, 0], olhos: [25, 27, 0] },
-};
+ARD.kch = { PI, TAU, TH, C, VIDRO, PELE, UMIDO, PEDRA, OSSOM, CRIST, rng, fbm, vn, cor, mixc, mul, sst, leve, nq, ns, fino, mat4, grupo, geo, poe, bez, varre, esculpe, soldar, casca, folha, disco, mancha, degrade, fio, onda, cristal, olho, gema, poeira, pedra, balanca, registra, FICHAS, RX };
 })(globalThis.ARD = globalThis.ARD || {});
+/* Conceito do Arauto A — "A Medusa do Vazio" (orgânico). Um sino de vidro-da-Fenda vivo, com o olho pendurado embaixo e os fios compridos.
+   kch_arauto_medusa (pose normal) e kch_arauto_medusa_f (fase final: sino rasgado e tombado, olho escancarado em âmbar). */
+(function (ARD) {
+'use strict';
+const B = ARD.kch, { PI, TAU, TH, C, VIDRO, PELE, UMIDO, rng, fbm, mixc, mul, sst, leve, nq, ns, fino, mat4, grupo, poe, varre, casca, disco, fio, onda, olho, poeira, balanca } = B;
+const NL = 16; /* lóbulos da borda do sino */
+let GX = 1, GY = 1; /* contração do sino (antes do golpe o sino aperta e sobe); só valem durante a montagem de um modelo */
+function sup(a, t, off) { t = Math.max(0, Math.min(0.995, t)); const ang = t * PI / 2, w = 1 - t; const r0 = 17 * GX * Math.pow(Math.cos(ang), 0.8), y0 = 29.5 + 12 * GY * Math.pow(Math.sin(ang), 1.05);
+  const r = r0 * (1 + 0.05 * Math.cos(NL * a) * w * w) * (0.97 + 0.06 * fbm(Math.cos(a) * 1.5 + 5, Math.sin(a) * 1.5, t * 2, 2)) + (off || 0) * Math.cos(ang), y = y0 - 1.1 * (0.5 + 0.5 * Math.cos(NL * a)) * w * w * w + (off || 0) * Math.sin(ang); return [r, y]; }
+const P3 = (a, t, off) => { const s = sup(a, t, off); return [Math.cos(a) * s[0], s[1], Math.sin(a) * s[0]]; };
+/* est: '1' Três Pilares (sino baixo e fechado sobre o olho), '2' Ecos (aberta: a pose normal), '3' Colapso (sino rasgando, olho arregalado), 'j' janela de dano (a pose final) */
+/* O.golpe: a pose do aviso de golpe (o sino contrai, as veias e os ganchos acendem, os dois olhos arregalam) */
+function medusa(est, O) { O = O || {}; const golpe = !!O.golpe, gk = golpe ? 1.8 : 1; est = est === true ? 'j' : (est || '2'); const fim = est === 'j', col = est === '3', fech = est === '1', DY = fech ? -4.4 : 0; return function (K) { GX = golpe ? 0.84 : 1; GY = golpe ? 1.14 : 1; try { corpo(K); } finally { GX = 1; GY = 1; } };
+  function corpo(K) { K.base = 0; const T = TH(); const r = rng(fim ? 23 : 17); const IR = fim ? C.AMB : C.FEN, CAN = fim ? '#FF7A3A' : C.ETER;
+  const furo = (fim || col) ? (a, v) => { const n = fbm(Math.cos(a) * 2.2 + 9, Math.sin(a) * 2.2, v * 3.0, 2); return v > 0.1 && v < 0.86 && n > (col ? 0.68 : 0.6); } : null;
+  /* o sino (tombado para trás na fase final, deixando o olho à mostra) */
+  const sino = () => { const M = ns(K, 15), prof = []; for (let j = 0; j < M; j++) prof.push([1, j / (M - 1)]);
+    poe(K, casca(prof, { n: ns(K, 64), esp: 0.5, espR: 1, espY: 0.4, furo, f: (a, v) => sup(a, v * 0.985),
+      cor: (a, v) => { const st = 0.5 + 0.5 * Math.cos(NL * a); let c = mixc(C.VID2, C.VID, sst(0.1, 0.9, v)); c = mixc(c, C.VID3, st * (1 - v) * 0.6); return mul(c, 0.5 + 0.4 * fbm(Math.cos(a) * 4, Math.sin(a) * 4, v * 5, 2)); },
+      corIn: (a, v) => mixc(C.FENV, C.VID2, 0.35 + 0.5 * v) }), '#FFFFFF', VIDRO, { pat: 4 });
+    /* o brilho de baixo do sino (o plasma da Fenda preso lá dentro) */
+    poe(K, disco(2.5, 15.4 * GX, ns(K, 48), 5, (u, a) => { const st = fbm(Math.cos(a) * 6, Math.sin(a) * 6, u * 2, 2); return mul(mixc(fim ? '#FF9A3A' : C.FEN2, fim ? '#3A0A12' : '#3A0E66', sst(0.0, 0.95, u) * (0.75 + 0.5 * st)), fim ? 0.7 : 1); }, { y: u => 34.2 - 4.8 * u * u }), '#FFFFFF', null, { e: fim ? 1.3 : 1.7 });
+    /* canais radiais acesos e os olhinhos da borda */
+    for (let k = 0; k < NL; k++) { if (leve(K) && k % 2) continue; const a = (k + 0.5) * TAU / NL; if (fim && r() < 0.35) continue; const pts = []; for (let i = 0; i <= 10; i++) pts.push(P3(a + Math.sin(i * 0.9 + k) * 0.012, 0.02 + 0.9 * i / 10, 0.12)); fio(K, pts, 0.2, 0.08, { c0: CAN, c1: fim ? '#7A1A0A' : C.ETER, e: fim ? 1.3 : 1.5, n: 4 }); }
+    for (let k = 0; k < NL; k++) { const p = P3(k * TAU / NL, 0.0, 0.1); K.sph(p[0], p[1] - 0.2, p[2], 0.5, fim ? C.AMB0 : C.ETER2, null, { e: fim ? 1.2 : 2.0, seg: 8 });
+      /* a coroa de espinhos da borda (lê de cima): um gancho escuro por lóbulo, com a ponta de Fenda acesa */
+      if (!leve(K) || k % 4 === 0) { const a = k * TAU / NL, ca = Math.cos(a), sa = Math.sin(a), L = (k % 2 ? 2.6 : 4.2) * (golpe ? 1.25 : 1); B.cristal(K, [p[0] - ca * 0.6, p[1] + 0.3, p[2] - sa * 0.6], [p[0] + ca * L, p[1] + L * 0.42, p[2] + sa * L], 0.5, { n: 4, c0: C.VID, c1: C.VID3, mat: VIDRO, pat: 4 }); K.sph(p[0] + ca * L, p[1] + L * 0.42, p[2] + sa * L, 0.2, fim ? C.AMB0 : C.FEN, null, { e: (fim ? 1.0 : 2.0) * gk, seg: 6 }); } }
+    /* os quatro órgãos em ferradura no alto do sino (a marca que se lê de cima) */
+    for (let k = 0; k < 4; k++) { const ak = k * TAU / 4 + 0.4, pts = []; const nn = ns(K, 14); for (let i = 0; i <= nn; i++) { const th = -0.35 * PI + 1.7 * PI * i / nn; pts.push(P3(ak + 0.4 * Math.cos(th), 0.52 + 0.17 * Math.sin(th), 0.3)); } fio(K, pts, 0.5, 0.5, { c0: fim ? '#B8401A' : C.FEN, c1: fim ? '#5A1408' : C.FEN2, e: fim ? 1.4 : 2.3, n: 5, rf: u => 0.55 + 0.6 * Math.sin(u * PI) }); }
+    const ap = P3(0, 0.97, 0.2); K.tor(0, ap[1] - 0.9, 0, 3.9, 0.3, fim ? C.AMB0 : C.ETER, null, { e: 2.2, ts: ns(K, 24), rs: 5 });
+    /* o olho do alto do sino: na câmera do jogo (de cima) é este que encara o jogador; o de baixo é o ponto fraco */
+    for (let k = 0; k < (leve(K) ? 0 : 6); k++) { const a = k * TAU / 6 + 0.3, q0 = P3(a, 0.74, 0.1), q1 = P3(a, 0.62, golpe ? 3.6 : 2.6); B.cristal(K, q0, q1, 0.55, { n: 4, c0: C.VID, c1: C.VID3, mat: VIDRO, pat: 4 }); }
+    olho(K, [0, ap[1] - 2.9, 0], 3.8, { rz: PI / 2, abre: fim ? 1 : (col ? 0.7 : (golpe ? 0.5 : (fech ? 0.03 : 0.14))), iris: IR, iris2: fim ? C.AMB2 : C.FEN2, iris0: fim ? '#4A1C02' : '#2A0A3A', e: fim ? 1.6 : 2.2, tam: 0.8 });
+    /* veias de Fenda no sino: riscos magenta irregulares entre os canais (mais fortes no Colapso) */
+    const qv = rng(91); for (let k = 0; k < nq(K, col ? 16 : 12, 0.34); k++) { let a = qv() * TAU, t = 0.1 + qv() * 0.25; const pts = []; for (let i = 0; i < 7; i++) { pts.push(P3(a, t, 0.14)); a += (qv() - 0.5) * 0.22; t += 0.05 + qv() * 0.06; } fio(K, pts, golpe ? 0.4 : 0.3, 0.06, { c0: fim ? '#7A2A3A' : C.FEN2, c1: fim ? '#5A1A2A' : C.FEN, e: (fim ? 0.9 : (col ? 2.2 : 1.6)) * gk, n: 3, rf: u => 0.3 + Math.sin(u * PI) }); } };
+  if (fim) grupo(K, mat4(-5.5, 2.2, 1.5, 0.12, 0, 0.52).multiply(new T.Matrix4().makeTranslation(0, -3, 0)), sino); else if (fech) grupo(K, mat4(0, DY, 0), sino); else sino();
+  /* o talo e o olho pendurado */
+  const EY = fim ? 22.2 : 21.8, EX = fim ? 2.6 : 1.2, RZ = fim ? -0.2 : -0.36, ER = 6.6;
+  fio(K, [[fim ? -3 : 0, 33 + DY, 0], [fim ? -1.5 : 0, 30.5 + DY * 0.6, 0], [EX * 0.6, 28, 0], [EX, EY + 3, 0]], 3.4, 4.3, { c0: C.VID, c1: C.VID2, mat: PELE, n: ns(K, 12) });
+  olho(K, [EX, EY, 0], ER, { rz: RZ, abre: fim ? 1 : (col ? 0.7 : (golpe ? 0.5 : (fech ? 0.04 : 0.16))), iris: IR, iris2: fim ? C.AMB2 : C.FEN2, iris0: fim ? '#4A1C02' : '#2A0A3A', alvo: fim, e: fim ? 2.1 : 2.2, tam: fim ? 1.05 : 0.95 });
+  grupo(K, mat4(EX, EY, 0, 0, 0, RZ), () => { const th = fim ? 1.72 : (fech ? 2.3 : (col ? 1.85 : 2.02)); const g = new T.SphereGeometry(ER * 1.1, ns(K, 28), ns(K, 12), 0, TAU, 0, th); g.rotateZ(PI / 2); B.degrade(g, C.VID2, C.VID, 1, 'x'); poe(K, g, '#FFFFFF', PELE, { pat: 3 });
+    K.tor(-ER * 1.1 * Math.cos(th), 0, 0, ER * 1.1 * Math.sin(th), 0.2, fim ? C.AMB : C.ETER, null, { e: 2.4, rz: PI / 2, ts: ns(K, 32), rs: 5 });
+    /* a sobrancelha dura: duas placas escuras em V sobre o olho (o cenho fechado); na janela de dano, erguidas */
+    for (const sg of [1, -1]) { const sb = B.bez([[ER * 0.72, ER * (fim ? 0.75 : 0.5), sg * 0.5], [ER * 0.95, ER * (fim ? 1.1 : 0.82), sg * ER * 0.45], [ER * 0.7, ER * (fim ? 1.3 : 1.05), sg * ER * 0.85], [ER * 0.25, ER * (fim ? 1.25 : 1.1), sg * ER * 1.15]], 8).map((p, i) => [p[0], p[1], p[2], ER * 0.3 * Math.sin(PI * (0.25 + 0.7 * i / 7)) + 0.05, 0.42]); poe(K, varre(sb, { n: 6, lado: [1, 0.4, 0], c0: C.VID, c1: C.VID2, c2: C.VID, borda: 0.9 }), '#FFFFFF', VIDRO, { pat: 4 }); } });
+  /* braços orais: fitas largas e franzidas em volta do olho */
+  const NB = nq(K, 5, 0.6); for (let k = 0; k < NB; k++) { const a = k * TAU / NB + 2.2, ca = Math.cos(a), sa = Math.sin(a); if (Math.abs(a % TAU - TAU) < 0.7 || ca > 0.75) continue; const L = (fim ? 13 : 17) + r() * 5, n = ns(K, 16), pts = []; const ab = fim ? 1.7 : 1;
+    for (let i = 0; i < n; i++) { const u = i / (n - 1), rr = 4.2 + (2.5 * ab) * Math.sin(u * PI * 0.9) + u * 1.5 * ab, tw = a + u * (fim ? 0.3 : 1.1); pts.push([Math.cos(tw) * rr, 29.5 - L * u, Math.sin(tw) * rr, (1.9 * Math.pow(Math.sin(PI * (0.15 + 0.85 * u)), 0.7) + 0.05) * (1 + 0.25 * Math.sin(u * 19 + k)), 0.16]); }
+    K.anim(balanca(a, [ca * 4, 29.5, sa * 4], 0.07, 0.7 + r() * 0.3, r() * TAU), () => { const g = varre(pts, { n: ns(K, 8), lado: (i, p) => [-p[2], 0, p[0]], conc: 0.55, c0: C.VID2, c1: fim ? '#5A2A3A' : C.VID3, c2: fim ? '#7A2A2A' : C.FENV, borda: 0.8 }); poe(K, g, '#FFFFFF', UMIDO, { pat: 4 });
+      const Q = g.userData.quad, pe = []; for (let i = 1; i < Q.length; i++) { const q = Q[i]; const v = q.c.clone().addScaledVector(q.s, q.w * 0.98); pe.push([v.x, v.y, v.z]); } fio(K, pe, 0.1, 0.05, { c0: fim ? '#C8501A' : C.FEN, c1: fim ? '#C8501A' : C.FEN2, e: fim ? 1.3 : 1.9, n: 3 }); }); }
+  /* os fios compridos da borda (com contas de luz) e os curtos de dentro */
+  const fios = (n, R, y0, Lm, rr, sd) => { const q = rng(sd); for (let k = 0; k < n; k++) { const a = (k + 0.5) * TAU / n + (q() - 0.5) * 0.12, ca = Math.cos(a), sa = Math.sin(a); const L = Lm * (0.7 + 0.5 * q()) * (fech ? 0.62 : 1); if (fim && q() < 0.45) continue; if (col && q() < 0.25) continue; if (!fim && ca > 0.86) continue; /* a cortina abre na frente do olho */
+      const b0 = fim ? [ca * R - 5, y0 + (ca < 0 ? -4 : 6) * Math.abs(ca), sa * R] : [ca * R, y0, sa * R], b1 = fim ? [b0[0] + ca * 1.5, Math.max(1.5, b0[1] - L * 1.1), b0[2] + sa * 1.5] : [ca * (R * 0.82), Math.max(2.5, y0 - L), sa * (R * 0.82)];
+      const pts = onda(b0, b1, ns(K, 14), { amp: fim ? 0.015 : 0.05, fr: 1.2 + q(), ph: q() * TAU, flecha: fim ? 0 : 0.1, fd: [ca, 0, sa] });
+      K.anim(balanca(a, b0, fim ? 0.03 : 0.09 + q() * 0.05, 0.7 + q() * 0.5, q() * TAU), () => { fio(K, pts, rr, 0.07, { c0: C.VID3, c1: fim ? '#6A3A2A' : '#3FA9C8', n: 5 }); const tp = pts[pts.length - 1]; K.sph(tp[0], tp[1], tp[2], 0.42, fim ? C.AMB0 : C.ETER2, null, { e: fim ? 1.4 : 2.2, seg: 8 }); if (k % 2 === 0 && rr > 0.3) { const t1 = pts[pts.length - 2]; B.cristal(K, tp, [tp[0] + ca * 1.5 + (tp[0] - t1[0]), tp[1] + 1.3, tp[2] + sa * 1.5 + (tp[2] - t1[2])], 0.3, { n: 4, c0: C.VID3, c1: fim ? '#7A5A3A' : C.FEN2, e: (fim ? 0.8 : 1.3) * gk }); }
+        fino(K, () => { for (const f of [0.4, 0.68]) { const p = pts[Math.round(f * (pts.length - 1))]; K.sph(p[0], p[1], p[2], 0.27, fim ? C.AMB0 : C.ETER, null, { e: fim ? 1.2 : 1.7, seg: 6 }); } }); }); } };
+  fios(nq(K, 20, 0.4), 16.2 * GX, 29.4 + DY, 24, 0.34, 5); fino(K, () => fios(9, 10.5 * GX, 30.5 + DY, 13, 0.24, 9));
+  /* plâncton de luz preso sob o sino; na fase final, o plasma que vaza pelos rasgos e sobe */
+  K.anim({ t: 'spin', p: [0, 0, 0], speed: fim ? 0.5 : 0.22 }, () => poeira(K, nq(K, fim ? 90 : 60, 0.5), 3, (i, q) => { const a = q() * TAU, rr = fim ? 3 + q() * 13 : 6 + q() * 9; return fim ? [Math.cos(a) * rr - 5, 30 + q() * 22, Math.sin(a) * rr, 0.16 + q() * 0.3, q() < 0.5 ? C.FEN : C.AMB] : [Math.cos(a) * rr, 12 + q() * 17, Math.sin(a) * rr, 0.12 + q() * 0.2, q() < 0.7 ? C.ETER2 : C.FEN2]; }, 2.6));
+  if (fim) fino(K, () => { for (let k = 0; k < 7; k++) { const a = r() * TAU, t0 = 0.2 + r() * 0.5; const pts = []; let aa = a, tt = t0; for (let i = 0; i < 6; i++) { pts.push(P3(aa, tt, 0.15)); aa += (r() - 0.5) * 0.3; tt += 0.05 + r() * 0.05; } grupo(K, mat4(-5.5, 2.2, 1.5, 0.12, 0, 0.52).multiply(new T.Matrix4().makeTranslation(0, -3, 0)), () => fio(K, pts, 0.16, 0.05, { c0: C.FEN2, c1: C.FEN, e: 2.6, n: 3 })); } });
+}; }
+B.registra('arauto_medusa', { chefe: 'arauto', ordem: 1, nome: 'A Medusa do Vazio', eixo: 'Orgânico, criatura viva',
+  frase: 'Uma água-viva do tamanho de uma cidade, que atravessou a Fenda à deriva e traz um único olho pendurado sob o sino.',
+  fases: 'Três Pilares: o sino fica baixo e fechado sobre o olho (só uma fresta de luz embaixo). Ecos: o sino sobe, o olho aparece e os órgãos em ferradura do alto pulsam. Colapso e janela de dano: o sino rasga e tomba para trás, o plasma vaza para cima e o olho fica escancarado em âmbar, sem proteção.',
+  golpes: 'Anel: os lóbulos da borda acendem em sequência antes da onda. Faixa: o olho estreita a pupila e os braços se afastam. Poço: todos os fios são puxados para o centro.',
+  fraco: 'O olho. Na pose normal é magenta e meio coberto pela pálpebra; na janela de dano vira âmbar, com o aro âmbar em volta.',
+  risco: 'Baixo. Usa as mesmas peças dos chefões de hoje (cascas, fios com balanço, partes acesas). O sino é opaco (o jogo não tem vidro transparente): a transparência é sugerida pelo brilho de baixo.' },
+  { kch_arauto_medusa: medusa('2'), kch_arauto_medusa_f: medusa('j') });
+B.jogo = B.jogo || {}; B.jogo.medusa = medusa;
+})(globalThis.ARD = globalThis.ARD || {});
+/* Rodada 2 — Sentinela da Fenda, a Raia com cara de vilã. Duas variantes do mesmo "mar do vazio" da Medusa (pele quase preta, luz própria, fios):
+   kch_sentinela_ceifadora ("a predadora elegante": asas em foice com a borda de trás serrilhada, pinças de osso na frente, olho em fenda sob uma
+   sobrancelha de osso, cicatrizes de Fenda no lugar das pintas e a cauda erguida em bote, com lâmina) e kch_sentinela_devoradora ("o pesadelo":
+   manto rasgado com dedos de osso e garras, cacho de olhos, a boca redonda de dentes por baixo, pústulas de Fenda no dorso e tentáculos com ganchos).
+   Cada uma com a pose da janela de dano (_f). */
+(function (ARD) {
+'use strict';
+const B = ARD.kch, { PI, TAU, TH, C, rng, fbm, mixc, mul, sst, leve, nq, ns, fino, mat4, grupo, geo, poe, bez, varre, folha, mancha, fio, onda, olho, poeira, cristal } = B;
+const YC = 19.4, MZ = 14.6, P0 = '#040308', P1 = '#0F0B1C', P2 = '#221A3C', BAR = '#2C2840', OS1 = '#1E1A1E', OS2 = '#463E3A', OS3 = '#8A7F70', CIC = '#FF4FB8', CIC2 = '#FFC8F0', PRESA = '#D8CCB4';
+const MP = [0.36, 0.05], MO = [0.7, 0.02];
+/* O.golpe: a pose do aviso de golpe (as mandíbulas abrem, as presas descem, a gengiva e o olho central acendem) */
+function raia2(V, fim, O) { const golpe = !!(O && O.golpe); return function (K) { K.base = 0; const T = TH(); const r = rng(300 + V * 10 + (fim ? 1 : 0)); const dev = V === 2; const die = fim ? -5.5 : (dev ? 1.6 : 4.4);
+  const serra = s => dev ? 0.55 * Math.pow(Math.abs(Math.sin(s * 8.5 + 0.6)), 0.45) + 0.45 * (0.5 + 0.5 * Math.sin(s * 23)) : 1 - 0.2 * Math.abs(((Math.abs(s) * 7) % 1) - 0.5) * 2;
+  const sup = (s, v) => { const as = Math.abs(s); let c, xle; if (dev) { c = 19 * Math.pow(1 - Math.pow(as, 2.2), 0.6) + 0.5; xle = 8.8 - 7.5 * Math.pow(as, 2.0); c *= 1 - (1 - serra(s)) * 0.42 * sst(0.1, 0.5, as); } else { xle = 8.4 - 15 * Math.pow(as, 1.25) + 11.5 * Math.pow(as, 3.2); c = (18 * Math.pow(1 - Math.pow(as, 1.3), 1.05) + 0.25) * (as > 0.12 ? serra(s) : 1); }
+    return [xle - v * c, YC + 2.5 * (1 - as * as) * Math.pow(Math.sin(PI * Math.min(1, v * 1.15)), 0.7) * (1 - as) + die * Math.pow(as, 1.5) + (dev ? 0.9 * Math.sin(s * 8.5 + v * 3) * as : 0) + 0.8 * Math.sin(v * PI) * as * (fim ? -1 : 1), s * MZ]; };
+  const esp = (s, v) => (0.1 + (dev ? 4.8 : 3.8) * Math.pow(1 - Math.abs(s), dev ? 1.4 : 1.9)) * Math.pow(Math.sin(PI * (0.03 + 0.94 * v)), 0.75) * (1 - 0.45 * v);
+  const ACC = fim ? '#6A2A4A' : CIC, ACC2 = fim ? '#8A4A6A' : CIC2, AMBv = fim ? '#8A4A1A' : C.AMB;
+  for (const sg of [1, -1]) K.anim({ t: 'flap', p: [0, YC, 0], amp: fim ? 0.03 : 0.1, speed: dev ? 0.8 : 1.2, side: sg }, () => {
+    poe(K, folha((u, v) => sup(sg * u, v), leve(K) ? 16 : (dev ? 30 : 46), leve(K) ? 12 : (dev ? 22 : 34), { inv: sg > 0, th: (u, v) => esp(u, v),
+      cor: (u, v) => { const n = fbm(u * 6 + (sg > 0 ? 0 : 9), v * 7, 3, 3); let c = mixc(P1, P0, sst(0.0, 0.5, v) * 0.8 + 0.2 * u); c = mixc(c, P2, sst(0.6, 0.85, n) * 0.6 + 0.5 * Math.pow(u, 4)); return mul(c, 0.7 + 0.6 * n); },
+      cor2: (u, v) => mul(mixc(BAR, P1, sst(0.15, 0.9, u)), 0.7 + 0.3 * Math.sin(v * 40) * (1 - u)) }), '#FFFFFF', MP, { pat: 3 });
+    /* a borda da frente: gume de luz fino (âmbar frio na elegante, cicatriz magenta no pesadelo) */
+    const le = []; for (let i = 0; i <= 16; i++) { const u = 0.08 + 0.92 * i / 16, p = sup(sg * u, 0.012); le.push([p[0] + 0.1, p[1] + 0.08, p[2]]); } fio(K, le, dev ? 0.24 : 0.13, dev ? 0.06 : 0.03, { c0: dev ? ACC : AMBv, c1: dev ? ACC2 : AMBv, e: fim ? 0.8 : (dev ? 2.0 : 1.5), n: 4 });
+    /* cicatrizes de Fenda no dorso: riscos irregulares, no lugar das pintas */
+    const NCc = nq(K, dev ? 7 : 6, 0.6); for (let k = 0; k < NCc; k++) { let u = 0.12 + r() * 0.5, v = 0.15 + r() * 0.5; const pts = [], du = 0.05 + r() * 0.05, dv = (r() - 0.35) * 0.09; for (let i = 0; i < 7; i++) { const p = sup(sg * u, v); pts.push([p[0], p[1] + 0.09, p[2]]); u = Math.min(0.94, u + du * (0.6 + r() * 0.8)); v = Math.max(0.06, Math.min(0.92, v + dv + (r() - 0.5) * 0.07)); } fio(K, pts, 0.17, 0.03, { c0: ACC2, c1: ACC, e: fim ? 0.7 : 1.7, n: 3, rf: q => 0.3 + Math.sin(q * PI) }); }
+    fino(K, () => poeira(K, 26, sg > 0 ? 4 : 6, (i, q) => { const u = 0.1 + q() * 0.8, v = 0.2 + q() * 0.6, p = sup(sg * u, v); return [p[0], p[1] + 0.12, p[2], 0.08 + q() * 0.12, fim ? '#5A3A4A' : C.ETER2]; }, fim ? 0.8 : 1.8));
+    /* as guelras âmbar de baixo (abrem com brilho na janela de dano) */
+    for (let k = 0; k < 4; k++) { const v0 = 0.3 + k * 0.1, pts = []; for (let i = 0; i <= 5; i++) { const u = 0.1 + 0.24 * i / 5, p = sup(sg * u, v0 + 0.05 * i / 5); pts.push([p[0], p[1] - esp(u, v0) - 0.08, p[2]]); } fio(K, pts, fim ? 0.38 : 0.16, 0.08, { c0: C.AMB, c1: fim ? C.AMB2 : '#8A4212', e: fim ? 2.4 : 1.0, n: 4 }); }
+    if (!dev) { /* a pinça de osso da frente: gancho comprido que fecha para dentro, com serrilha */
+      const pz = curvaP(sg, fim); poe(K, varre(pz, { n: ns(K, 8), lado: [0, 1, 0], conc: 0.1, dentro: [12, YC, 0], c0: OS1, c1: OS3, c2: OS2, borda: 0.5, pot: 1.6 }), '#FFFFFF', MO, { pat: 3 });
+      fino(K, () => { for (let i = 3; i < pz.length - 2; i += 2) { const p = pz[i]; cristal(K, [p[0], p[1], p[2] - sg * p[3] * 0.6], [p[0] + 0.5, p[1] - 0.2, p[2] - sg * (p[3] + 1.3)], 0.22, { n: 4, c0: OS2, c1: OS3, mat: MO, pat: 3 }); } });
+      /* a ponta da asa em foice: gume de osso */
+      const tp = []; for (let i = 0; i <= 6; i++) { const u = 0.8 + 0.2 * i / 6, p = sup(sg * u, 0.02); tp.push([p[0] + 0.25, p[1] + 0.1, p[2], 0.5 * (1 - i / 7) + 0.05, 0.18]); } poe(K, varre(tp, { n: 6, lado: [1, 0, 0], c0: OS2, c1: OS3 }), '#FFFFFF', MO, { pat: 3 }); }
+    else { /* os dedos de osso do manto (como de asa de morcego), que passam da borda em garras */
+      const ND = nq(K, 4, 0.75); for (let k = 0; k < ND; k++) { const uu = 0.42 + k * 0.17, v1 = 0.98 - k * 0.2, pts = []; const n = ns(K, 10); for (let i = 0; i <= n; i++) { const t = i / n, u = 0.06 + (uu - 0.06) * t, v = 0.32 + (v1 - 0.32) * t * t, p = sup(sg * u, v); pts.push([p[0], p[1] + esp(u, v) * 0.1 + 0.25, p[2]]); } const e = pts[n], e1 = pts[n - 1]; pts.push([e[0] + (e[0] - e1[0]) * 1.4, e[1] - 1.0, e[2] + (e[2] - e1[2]) * 1.4], [e[0] + (e[0] - e1[0]) * 2.4 + 0.6, e[1] - 3.0, e[2] + (e[2] - e1[2]) * 2.0]);
+        fio(K, pts, 0.7, 0.07, { c0: OS2, c1: PRESA, mat: MO, n: 5, pot: 1.4, rf: q => 1 + 0.25 * Math.abs(Math.sin(q * 16)) }); }
+      /* pústulas de Fenda no dorso */
+      for (let k = 0; k < nq(K, 3, 0.67); k++) { const u = 0.2 + k * 0.17, v = 0.5 + 0.12 * k, p = sup(sg * u, v), rr = 0.85 - k * 0.15; K.anim({ t: 'bob', amp: 0.06, speed: 1.5 + r(), ph: r() * 6 }, () => poe(K, mancha(new T.SphereGeometry(rr, ns(K, 12), ns(K, 8)), '#3A0A3A', fim ? '#6A2A4A' : CIC, fim ? '#8A4A6A' : '#FFE0F6', 2.2, k + 3), '#FFFFFF', null, { e: fim ? 0.7 : 1.6, x: p[0], y: p[1] + rr * 0.15, z: p[2], sy: 0.7 })); } } });
+  function curvaP(sg, fm) { return bez([[7.0, YC + 0.4, sg * 3.0], [12, YC + 0.8, sg * 6.5], [17.5, YC - 0.5 - (fm ? 2.5 : 0), sg * (fm ? 6.5 : 4.4)], [19.5, YC - 2.2 - (fm ? 4 : 0), sg * (fm ? 4.5 : 0.7)]], ns(K, 12)).map((p, i, a) => { const u = i / (a.length - 1); return [p[0], p[1], p[2], 1.25 * Math.pow(1 - u, 0.8) + 0.06, 0.55 * (1 - 0.7 * u) + 0.06]; }); }
+  /* a crista de espinhos de osso na linha do dorso */
+  for (let i = 0; i < nq(K, dev ? 7 : 8, 0.6); i++) { const v = (dev ? 0.42 : 0.3) + (dev ? 0.5 : 0.62) * i / (dev ? 6 : 7), p = sup(0, v), L = (dev ? 2.0 : 1.6) + (dev ? 2.2 : 1.8) * Math.sin(PI * (0.15 + 0.75 * i / (dev ? 6 : 7))); cristal(K, [p[0], p[1] - 0.2, 0], [p[0] - L * 0.8, p[1] + L, (dev ? (r() - 0.5) * 1.2 : 0)], dev ? 0.5 : 0.36, { n: 4, c0: OS1, c1: OS3, mat: MO, pat: 3, k: 1.5 }); }
+  /* os olhos: fenda de predador sob a sobrancelha de osso (elegante) ou um cacho de olhos (pesadelo); âmbar, o ponto fraco */
+  const pe = sup(0, 0.15), EX = pe[0] + 0.3, EY = pe[1] + 0.35, ER = dev ? 3.7 : 2.4, RZ = 0.62;
+  const umOlho = (x, y, z, rr, ry, ab) => { olho(K, [x, y, z], rr, { rz: RZ, ry, abre: fim ? 1 : ab, iris: C.AMB, iris2: '#FFE9B8', iris0: fim ? '#5A2402' : '#6A1A02', alvo: fim && rr > 2, e: fim ? 2.4 : (golpe ? 3.0 : 2.5), tam: fim ? 1.15 : 0.95 });
+    grupo(K, mat4(x, y, z, 0, ry, RZ), () => { const th = fim ? 1.5 : (rr > 2.6 ? 1.5 : 2.05); const g = new T.SphereGeometry(rr * 1.1, ns(K, 20), ns(K, 10), 0, TAU, 0, th); g.rotateZ(PI / 2); B.degrade(g, P1, P0, 1, 'x'); poe(K, g, '#FFFFFF', MP, { pat: 3 }); }); };
+  if (!dev) { umOlho(EX, EY, 0, ER, 0, 0.02);
+    for (const sg of [1, -1]) { const sb = bez([[EX - 1.6, EY + 1.2, sg * 0.3], [EX + 0.6, EY + 3.0 + (fim ? 0.6 : 0), sg * 1.6], [EX + 2.8, EY + 2.6, sg * 2.8], [EX + 4.6, EY + (fim ? 1.6 : 0.6), sg * 2.6]], 9).map((p, i) => [p[0], p[1], p[2], 0.75 * Math.sin(PI * (0.25 + 0.7 * i / 8)) + 0.05, 0.4]); poe(K, varre(sb, { n: 7, lado: [0, 0, 1], c0: OS1, c1: OS3, c2: OS1 }), '#FFFFFF', MO, { pat: 3 }); } }
+  else { umOlho(EX, EY, 0, ER, 0, golpe ? 0.55 : 0.08); for (const [dx, dy, dz, rr] of [[2.3, -1.5, 3.3, 0.95], [2.3, -1.5, -3.3, 0.95], [-0.2, -0.6, 4.5, 0.75], [-0.2, -0.6, -4.5, 0.75]]) { if (leve(K) && rr < 1) continue; umOlho(EX + dx, EY + dy, dz, rr, -dz * 0.22, 0.1); }
+    /* a boca na borda da frente (para aparecer na câmera do jogo): a gengiva de Fenda acesa, a fileira de presas compridas para a frente e as duas mandíbulas de osso que abrem para os lados */
+    const gg = []; for (let i = 0; i <= 10; i++) { const s0 = -0.34 + 0.68 * i / 10, p = sup(s0, 0.03); gg.push([p[0] + 0.25, p[1] - esp(s0, 0.03) * 0.5 - 0.35, p[2]]); } fio(K, gg, golpe ? 0.75 : 0.5, golpe ? 0.75 : 0.5, { c0: fim ? '#6A2A4A' : CIC, c1: fim ? '#8A4A6A' : CIC2, e: fim ? 0.8 : (golpe ? 3.0 : 2.2), n: 5, rf: u => 0.5 + 0.7 * Math.sin(u * PI) });
+    const NPr = nq(K, 11, 0.6); for (let i = 0; i < NPr; i++) { const s0 = -0.36 + 0.72 * i / (NPr - 1), p = sup(s0, 0.02), L = ((i % 2 ? 2.4 : 4.4) * (1 - 0.5 * Math.abs(s0) / 0.36) + 1.2) * (golpe ? 1.3 : 1); cristal(K, [p[0] - 0.3, p[1] - 0.5, p[2]], [p[0] + L, p[1] - 1.1 - (fim ? 1.5 : (golpe ? 1.7 : 0.3)) - L * 0.18, p[2] * 1.05], 0.36, { n: 4, c0: OS2, c1: PRESA, mat: MO, pat: 3 }); }
+    for (const sg of [1, -1]) { const md = bez([[6.2, YC + 0.2, sg * 5.2], [10.5, YC + 0.6, sg * 9.2], [15.5, YC - 0.8 - (fim ? 2.5 : 0), sg * (fim ? 9.5 : (golpe ? 10.8 : 7.6))], [17.2, YC - 2.4 - (fim ? 3.5 : 0), sg * (fim ? 7.5 : (golpe ? 9.2 : 3.6))]], ns(K, 12)).map((p, i, a) => { const u = i / (a.length - 1); return [p[0], p[1], p[2], 1.15 * Math.pow(1 - u, 0.8) + 0.06, 0.5 * (1 - 0.7 * u) + 0.06]; });
+      poe(K, varre(md, { n: ns(K, 8), lado: [0, 1, 0], conc: 0.1, dentro: [12, YC, 0], c0: OS2, c1: PRESA, c2: OS2, borda: 0.5, pot: 1.6 }), '#FFFFFF', MO, { pat: 3 }); fino(K, () => { for (let i = 3; i < md.length - 1; i += 2) { const p = md[i]; cristal(K, [p[0], p[1], p[2] - sg * p[3] * 0.6], [p[0] + 0.5, p[1] - 0.2, p[2] - sg * (p[3] + 1.4)], 0.22, { n: 4, c0: OS2, c1: PRESA, mat: MO, pat: 3 }); } }); } }
+  /* a cauda: erguida em bote por cima do dorso, com a lâmina (elegante); ou tentáculos com ganchos, como os da Medusa (pesadelo) */
+  const t0 = sup(0, 0.97);
+  if (!dev) { const cd = fim ? bez([[t0[0], t0[1], 0], [t0[0] - 5, t0[1] - 2, 1], [t0[0] - 7, t0[1] - 9, 2], [t0[0] - 6, 3.5, 1.5]], 16) : bez([[t0[0], t0[1], 0], [t0[0] - 10, t0[1] + 2, 0], [t0[0] - 9, t0[1] + 15, 0.5], [t0[0] + 3.5, t0[1] + 12.5, 0]], 18);
+    K.anim({ t: 'sway', p: [t0[0], t0[1], 0], amp: fim ? 0.02 : 0.05, speed: 0.9 }, () => { fio(K, cd, 1.15, 0.28, { c0: P1, c1: P2, mat: MP, n: 7, pot: 0.8, rf: u => 1 + 0.16 * Math.abs(Math.sin(u * 30)) }); for (let i = 2; i < cd.length - 1; i += 2) cristal(K, cd[i], [cd[i][0] - 0.9, cd[i][1] + 0.6, cd[i][2] + (i % 4 ? 1.3 : -1.3)], 0.2, { n: 4, c0: OS2, c1: OS3, mat: MO, pat: 3 });
+      const e = cd[cd.length - 1], e1 = cd[cd.length - 3], d = [e[0] - e1[0], e[1] - e1[1], e[2] - e1[2]], dl = Math.hypot(d[0], d[1], d[2]), L = 7.5; const lam = []; for (let i = 0; i <= 8; i++) { const u = i / 8; lam.push([e[0] + d[0] / dl * L * u, e[1] + d[1] / dl * L * u - (fim ? 0 : 2.6 * u * u), e[2] + d[2] / dl * L * u, 1.25 * Math.pow(Math.sin(PI * (0.2 + 0.78 * u)), 0.8) * (1 - 0.3 * u) + 0.03, 0.2]); }
+      poe(K, varre(lam, { n: 6, lado: [0, 0, 1], c0: OS1, c1: OS3, c2: OS2, borda: 1.0 }), '#FFFFFF', MO, { pat: 3 }); const g = lam.map(p => [p[0], p[1] - p[3] * 0.0, p[2] + p[3] * 0.98]); fio(K, g, 0.07, 0.03, { c0: AMBv, c1: fim ? AMBv : C.AMB2, e: fim ? 0.8 : 1.8, n: 3 }); }); }
+  const NF = dev ? nq(K, 9, 0.6) : nq(K, 6, 0.6); for (let k = 0; k < NF; k++) { const s = -0.72 + 1.44 * k / (NF - 1); if (!dev && Math.abs(s) < 0.15) continue; const p = sup(s, 0.98), L = (dev ? 9 : 4) + r() * (dev ? 9 : 5), gr = dev ? 0.42 : 0.18;
+    K.anim({ t: 'sway', p, amp: fim ? 0.03 : 0.09, speed: 0.7 + r() * 0.5, ph: r() * TAU }, () => { const pts = onda(p, [p[0] - (fim ? 0.5 : (dev ? 5 + r() * 4 : 3 + r() * 2)), Math.max(2, p[1] - L), p[2] * (dev ? 0.8 : 1.03)], ns(K, 11), { amp: dev ? 0.09 : 0.06, ph: r() * 6, fr: 1.3 }); fio(K, pts, gr, 0.05, { c0: P2, c1: fim ? '#4A2A3A' : (dev ? '#8A2A6A' : '#6A3A5A'), n: dev ? 5 : 4 }); const e = pts[pts.length - 1];
+      if (dev) { cristal(K, e, [e[0] + 1.3, e[1] + 1.1, e[2]], 0.2, { n: 4, c0: OS2, c1: OS3, mat: MO, pat: 3 }); fino(K, () => { for (const f of [0.45, 0.7]) { const q = pts[Math.round(f * (pts.length - 1))]; K.sph(q[0], q[1], q[2], 0.22, ACC, null, { e: fim ? 0.7 : 1.9, seg: 6 }); } }); } else K.sph(e[0], e[1], e[2], 0.22, ACC2, null, { e: fim ? 0.8 : 2.2, seg: 6 }); }); }
+}; }
+B.registra('sentinela_ceifadora', { chefe: 'sentinela', ordem: 4, nome: 'A Ceifadora', eixo: 'Raia vilã: a predadora elegante',
+  frase: 'A mesma raia do vazio, agora em caça: asas em foice, pinças de osso abertas na frente e a cauda erguida por cima do corpo, pronta para o bote.',
+  fases: 'Vigia: plana com a cauda armada, o olho é uma fenda fina sob a sobrancelha de osso, as cicatrizes de Fenda pulsam em magenta. Janela de dano: as asas caem, a cauda desaba, as pinças abrem sem força, o olho escancara e as guelras de baixo acendem em âmbar.',
+  golpes: 'Anel: as duas foices sobem e descem de uma vez. Faixa: as pinças abrem, o olho estreita e a lâmina da cauda desce na linha do golpe.',
+  fraco: 'O olho âmbar no alto da cabeça (aro âmbar na janela de dano) e as guelras âmbar de baixo.',
+  risco: 'Baixo. É a Raia da rodada 1 com peças de osso a mais; continua a melhor leitura de cima. Como a Raia, pede o giro do modelo na direção do alvo.' },
+  { kch_sentinela_ceifadora: raia2(1, false), kch_sentinela_ceifadora_f: raia2(1, true) });
+B.registra('sentinela_devoradora', { chefe: 'sentinela', ordem: 5, nome: 'A Devoradora', eixo: 'Raia vilã: o pesadelo',
+  frase: 'O que a Fenda fez de uma raia: manto rasgado com dedos de osso, um cacho de olhos, a boca redonda de dentes por baixo e tentáculos com ganchos.',
+  fases: 'Vigia: o manto ondula devagar, os seis olhos piscam fora de ritmo, as pústulas do dorso pulsam e a boca de baixo brilha. Janela de dano: o manto desaba, as pústulas apagam, os olhos escancaram todos e as guelras acendem em âmbar.',
+  golpes: 'Anel: as pústulas incham todas e o manto bate. Faixa: a boca de baixo abre os dentes e o brilho da Fenda sai dela na linha do golpe.',
+  fraco: 'O olho grande âmbar do meio do cacho (aro âmbar na janela de dano) e as guelras âmbar de baixo. Os olhos menores são só enfeite e podem confundir: é o ponto a vigiar.',
+  risco: 'Médio. É a mais assustadora, mas tem mais peças pequenas (olhos, dentes, dedos) e a boca fica por baixo: na câmera do jogo ela quase não aparece.' },
+  { kch_sentinela_devoradora: raia2(2, false), kch_sentinela_devoradora_f: raia2(2, true) });
+B.jogo = B.jogo || {}; B.jogo.devoradora = raia2;
+})(globalThis.ARD = globalThis.ARD || {});
+/* Rodada 2 — Forja-Mãe, fusão da Fornalha Viva com a Carcaça-Berço: um titã meio fóssil, meio vivo. Osso velho, escuro e rachado; pele azul-noite
+   com sardas de estrela crescendo por cima das costelas; casulos de drones pendurados; a fornalha-estrela ardendo no peito e vazando pelas frestas;
+   crânio largo com coroa de chifres, três pares de órbitas em brasa e mandíbula partida em duas, com a fornalha no fundo da garganta.
+   Duas variantes: kch_forja_tita1 ("quadrúpede": quatro patas, as da frente maiores, postura de bote) e kch_forja_tita2 ("rastejante": dois braços
+   enormes de osso, corpo que se arrasta numa cauda grossa e dois cotos traseiros). Cada uma com a pose da fase final (_f). */
+(function (ARD) {
+'use strict';
+const B = ARD.kch, { PI, TAU, TH, C, OSSOM, rng, fbm, mixc, mul, sst, leve, nq, ns, fino, mat4, grupo, geo, poe, bez, varre, esculpe, disco, mancha, fio, onda, cristal, poeira } = B;
+const OB0 = '#060508', OB1 = '#1C181F', OB2 = '#3F383E', OB3 = '#635B55', PEL0 = '#0A0C18', PEL1 = '#1B2442', PEL2 = '#30406A', BR = '#FF6A1A', BR2 = '#FFC66A';
+const MOSSO = [0.74, 0.02], MPELE = [0.46, 0.05];
+/* tubo com relevo: raio r(u) amassado por ruído e cor por vértice com rachaduras escuras (osso velho) ou gomos (carne); normais lisas */
+function tubo(K, pts, r, o) { o = o || {}; const T = TH(); if (leve(K) && pts.length > 5) pts = pts.filter((p, i) => i % 2 === 0 || i === pts.length - 1); const N = pts.length, n = leve(K) ? Math.max(4, Math.round((o.n || 8) * 0.6)) : (o.n || 8), sd = o.sd || 1, pele = !!o.pele; const V = p => new T.Vector3(p[0], p[1], p[2]); const pos = [], col = [], idx = [];
+  let Nn = null; for (let i = 0; i < N; i++) { const t = V(pts[Math.min(N - 1, i + 1)]).sub(V(pts[Math.max(0, i - 1)])).normalize(); if (!Nn) Nn = new T.Vector3().crossVectors(t, Math.abs(t.y) < 0.9 ? new T.Vector3(0, 1, 0) : new T.Vector3(1, 0, 0)).normalize(); Nn.sub(t.clone().multiplyScalar(Nn.dot(t))).normalize(); const Bn = new T.Vector3().crossVectors(t, Nn), u = i / (N - 1), r0 = typeof r === 'function' ? r(u) : r;
+    for (let k = 0; k < n; k++) { const a = k / n * TAU, ca = Math.cos(a), sa = Math.sin(a); const n1 = fbm(ca * 1.6 + sd, sa * 1.6 + u * (o.fu || 7), sd * 0.7, 3), n2 = fbm(ca * 3.1 + sd * 2, sa * 3.1, u * (o.fu || 7) * 1.7 + sd, 2); const rr = r0 * (pele ? 1 + 0.1 * Math.sin(u * (o.gomos || 26)) + 0.12 * (n1 - 0.5) : 0.84 + 0.36 * n1);
+      const p = V(pts[i]).addScaledVector(Nn, ca * rr).addScaledVector(Bn, sa * rr); pos.push(p.x, p.y, p.z); let c;
+      if (pele) { c = mul(mixc(PEL1, PEL0, sst(0.3, 0.7, n1)), 0.7 + 0.5 * Math.abs(Math.sin(u * (o.gomos || 26) / 2))); }
+      else { c = mixc(OB1, OB2, sst(0.35, 0.75, n1)); c = mixc(c, OB3, sst(0.62, 0.8, n2) * 0.6); const rach = Math.abs(n2 - 0.5); if (rach < 0.035) c = mixc(OB0, c, rach / 0.035 * 0.6); c = mul(c, o.k || 1); if (o.ponta) c = mixc(c, OB0, sst(o.ponta, 1, u)); }
+      col.push(c[0], c[1], c[2]); } }
+  for (let i = 0; i < N - 1; i++) for (let k = 0; k < n; k++) { const k2 = (k + 1) % n, a = i * n + k, b = i * n + k2, c = (i + 1) * n + k, d = (i + 1) * n + k2; idx.push(a, b, c, b, d, c); }
+  return poe(K, geo(pos, col, idx), '#FFFFFF', pele ? MPELE : MOSSO, { pat: 3 }); }
+const curva = (P, n) => bez(P, n);
+const tres = (a, b, c, n) => { const out = []; for (let i = 0; i < n; i++) { const t = i / (n - 1), u = 1 - t; out.push([u * u * a[0] + 2 * u * t * c[0] + t * t * b[0], u * u * a[1] + 2 * u * t * c[1] + t * t * b[1], u * u * a[2] + 2 * u * t * c[2] + t * t * b[2]]); } return out; };
+const cab = u => 0.62 + 0.5 * Math.pow(Math.abs(2 * u - 1), 1.8); /* osso longo: cabeças grossas, meio fino */
+/* nó âmbar de junta (o ponto fraco de cada perna): dois laços de luz e a bolsa âmbar */
+function junta(K, p, r, fim, sx, sz) { poe(K, mancha(new (TH().SphereGeometry)(r * 0.86, ns(K, 16), ns(K, 10)), '#7A2E00', C.AMB, '#FFF6DC', 2.4, p[0] + p[2]), '#FFFFFF', null, { e: fim ? 0.6 : 1.7, x: p[0], y: p[1], z: p[2] });
+  K.tor(p[0], p[1], p[2], r * 1.08, r * 0.13, C.AMB, null, { e: fim ? 0.5 : 2.0, ts: ns(K, 18), rs: 5, rx: sz * 0.6, rz: -sx * 0.6 }); tubo(K, tres([p[0] - sx * r * 1.2, p[1] + r * 0.9, p[2] - sz * r * 0.3], [p[0] + sx * r * 1.2, p[1] + r * 0.9, p[2] + sz * r * 0.6], [p[0], p[1] + r * 1.7, p[2]], 6), r * 0.42, { n: 6, sd: 9 });
+  cristal(K, [p[0], p[1] + r * 0.6, p[2]], [p[0] + sx * r * 1.1, p[1] + r * 1.9, p[2] + sz * r * 1.1], r * 0.3, { n: 4, c0: OB2, c1: OB0, mat: MOSSO, pat: 3 }); }
+/* garras: n ganchos de osso a partir do ponto p, abertos na direção (dx, dz) */
+function garras(K, p, dx, dz, n, L, r) { if (leve(K)) n = Math.max(2, n - 1); const a0 = Math.atan2(dz, dx); for (let i = 0; i < n; i++) { const a = a0 + (i - (n - 1) / 2) * (1.5 / n); const ca = Math.cos(a), sa = Math.sin(a); tubo(K, curva([[p[0], p[1] + r, p[2]], [p[0] + ca * L * 0.4, p[1] + r + L * 0.42, p[2] + sa * L * 0.4], [p[0] + ca * L * 0.9, p[1] + L * 0.38, p[2] + sa * L * 0.9], [p[0] + ca * L, 0.05, p[2] + sa * L]], ns(K, 8)), u => r * (1 - 0.92 * Math.pow(u, 1.3)) + 0.04, { n: 6, sd: i + 3, ponta: 0.45, k: 1.15 }); } }
+function casulo(K, p, s, fim, k, ab) { /* ab: casulo aberto (Linha de montagem) */ const T = TH(); K.anim(fim ? null : { t: 'sway', p, amp: 0.05, speed: 0.8 + (k % 3) * 0.2, ph: k }, () => grupo(K, mat4(p[0], p[1], p[2], 0, k * 1.3, 0, s), () => { fio(K, [[0, 0, 0], [0.2, -1.2, 0], [0, -2.2, 0]], 0.5, 0.7, { c0: PEL1, c1: PEL0, mat: MPELE, n: 5 });
+    if (!fim) { poe(K, esculpe(ns(K, 16), ns(K, 12), 2.5, 3.8, 2.5, (a, b, c) => (1 + 0.09 * Math.sin(Math.atan2(c, a) * 6)) * (1 - 0.3 * Math.max(0, b)), (a, b, c) => mul(mixc(PEL2, PEL0, sst(-0.6, 0.8, b)), 0.85 + 0.35 * Math.sin(Math.atan2(c, a) * 6))), '#FFFFFF', [0.34, 0.08], { y: -5.2, pat: 4 });
+      const sl = []; for (let i = 0; i <= 7; i++) { const t = 0.5 + 2.2 * i / 7; sl.push([Math.sin(t) * 2.56 * (1 - 0.3 * Math.max(0, -Math.cos(t))), -5.2 - Math.cos(t) * 3.85, 0, (ab ? 1.0 : 0.42) * Math.sin(i / 7 * PI) + 0.04, 0.1]); } for (const ry of [0, 2.1, 4.2]) grupo(K, mat4(0, 0, 0, 0, ry, 0), () => poe(K, varre(sl, { n: 6, lado: [0, 0, 1], c0: BR2, c1: BR }), '#FFFFFF', null, { e: ab ? 2.6 : 1.6 })); if (ab) K.sph(0, -5.2, 0, 1.5, BR2, null, { e: 2.2, seg: 8 }); }
+    else poe(K, B.casca([[0.3, -8.6], [1.9, -7.6], [2.5, -5.6], [1.8, -3.2]], { n: ns(K, 12), esp: 0.3, al: 4.6, a0: k, f: (a, v, rr, y) => [rr * (1 + 0.25 * Math.sin(a * 5) * v), y + v * 0.9 * Math.abs(Math.sin(a * 2.5))], cor: (a, v) => mixc(PEL0, PEL1, v), corIn: () => '#3A1208' }), '#FFFFFF', [0.4, 0.06], { pat: 4 }); })); }
+/* o crânio: largo, de cunha, com coroa de chifres, três pares de órbitas, presas e a mandíbula partida em duas; abre = 0..1 */
+function cranio(K, abre, fim, q) { /* q: quente (aviso de golpe: órbitas e garganta mais acesas) */ const T = TH(); const EM = fim ? '#6A2408' : (q ? BR2 : BR), eb = (fim ? 0.8 : 2.2) * (q ? 1.5 : 1);
+  const orb = [[2.9, 1.0, 3.0, 1.0], [1.0, 1.9, 3.9, 0.72], [-1.0, 2.5, 4.2, 0.55]];
+  poe(K, esculpe(leve(K) ? 16 : 36, leve(K) ? 10 : 24, 6.6, 3.7, 5.8, (x, y, z) => { let f = 1 - 0.34 * sst(0.1, 1, x) * (1 - 0.3 * Math.abs(z)) + 0.2 * sst(0.1, 0.5, y) * sst(0.6, 0.1, Math.abs(x - 0.2)) + 0.16 * (fbm(x * 2.5 + 3, y * 2.5, z * 2.5, 3) - 0.5); if (y < -0.25) f *= 1 - 0.55 * (-y - 0.25); f += 0.22 * sst(0.55, 0.95, Math.abs(z)) * sst(-0.3, 0.3, y) * sst(-0.9, -0.2, x) * sst(0.6, 0.0, x);
+      for (const o of orb) { const d = Math.hypot((x * 6.6 - o[0]) / 1.9, (y * 3.7 - o[1]) / 1.5, (Math.abs(z) * 5.8 - o[2]) / 1.9) / o[3]; if (d < 1) f *= 0.72 + 0.28 * d; } return f; },
+    (x, y, z) => { const n1 = fbm(x * 3 + 1, y * 3, z * 3, 3), n2 = fbm(x * 6.5 + 7, y * 6.5, z * 6.5, 2); let c = mixc(OB1, OB2, sst(0.3, 0.7, n1)); c = mixc(c, OB3, sst(0.6, 0.8, n2) * 0.7 * sst(-0.2, 0.8, y)); const rc = Math.abs(n2 - 0.5); if (rc < 0.03) c = mixc(OB0, c, rc / 0.03 * 0.5); for (const o of orb) { const d = Math.hypot((x * 6.6 - o[0]) / 1.9, (y * 3.7 - o[1]) / 1.5, (Math.abs(z) * 5.8 - o[2]) / 1.9) / o[3]; if (d < 1) c = mul(c, 0.15 + 0.85 * d); } return c; }), '#FFFFFF', MOSSO, { pat: 3 });
+  for (const sg of [1, -1]) { orb.forEach((o, i) => { K.sph(o[0] + 0.1, o[1] - 0.1, sg * (o[2] - 0.3), 1.0 * o[3], EM, null, { e: fim ? 0.8 : (q ? 3.8 : 2.8), seg: 10, sy: q ? 0.8 : 0.6, rz: -0.35 }); fino(K, () => K.sph(o[0] + 0.5 * o[3], o[1] - 0.05, sg * (o[2] - 0.2), 0.2 * o[3], '#FFF1C8', null, { e: fim ? 0.6 : 2.4, seg: 6 })); });
+    /* chifres laterais para a frente e a coroa para trás */
+    tubo(K, curva([[-1.5, 0.6, sg * 5.2], [-1, 3, sg * 10.5], [5, 6, sg * 11.5], [9.5, 3.2, sg * 8.2]], ns(K, 12)), u => 1.5 * (1 - 0.93 * Math.pow(u, 1.2)) + 0.05, { n: 7, sd: 5 + sg, ponta: 0.5 });
+    const NCh = nq(K, 3, 0.4); for (let i = 0; i < NCh; i++) { const a = 0.55 + i * 0.45, L = 11 - i * 2; tubo(K, curva([[-3.6, 2.2, sg * (1.6 + i * 1.5)], [-6.5, 4 + L * 0.12, sg * (2.6 + i * 2.6)], [-9.5 - L * 0.35, 4.5 + L * 0.25, sg * (3.4 + Math.sin(a) * L * 0.8)], [-10.5 - L * 0.7, 3 + L * 0.22, sg * (3.8 + Math.sin(a) * L * 1.15)]], ns(K, 10)), u => (1.25 - i * 0.2) * (1 - 0.94 * Math.pow(u, 1.2)) + 0.05, { n: 6, sd: 11 + i * 2 + sg, ponta: 0.5 }); }
+    /* presas de cima e a meia mandíbula deste lado (abre para baixo e para fora), com os dentes */
+    const NP = nq(K, 6, 0.5); for (let i = 0; i < NP; i++) { const x = 5.6 - i * 1.25, z = sg * (1.2 + i * 0.62), L = i === 1 ? 3.6 : 1.5 + (i % 2) * 0.7; cristal(K, [x, -1.3, z], [x + 0.5, -1.3 - L, z + sg * 0.25], 0.36 + (i === 1 ? 0.2 : 0), { n: 4, c0: OB3, c1: '#C8BCA4', mat: MOSSO, pat: 3 }); }
+    const ab = abre, md = curva([[-3.2, -1.6, sg * 4.6], [0.5, -4.2 - ab * 2, sg * (5.2 + ab * 1.8)], [5, -4.6 - ab * 3.6, sg * (3.6 + ab * 2.2)], [8.6, -2.6 - ab * 3.4, sg * (1.0 + ab * 2.4)]], ns(K, 12));
+    tubo(K, md, u => 1.25 * (1 - 0.85 * Math.pow(u, 1.5)) + 0.08, { n: 7, sd: 21 + sg, ponta: 0.7 }); for (let i = 3; i < md.length - 1; i += leve(K) ? 2 : 1) { const m = md[i], L = 1.1 + (i % 3) * 0.6; cristal(K, [m[0], m[1] + 0.5, m[2]], [m[0] + 0.2, m[1] + 0.6 + L, m[2] - sg * 0.5], 0.3, { n: 4, c0: OB3, c1: '#C8BCA4', mat: MOSSO, pat: 3 }); } }
+  /* a fornalha no fundo da garganta e o nariz em fenda */
+  poe(K, mancha(new T.SphereGeometry(2.7, ns(K, 20), ns(K, 14)), '#4A0E00', fim ? '#7A2408' : BR, fim ? '#B8501A' : '#FFF1C8', 2.6, 7), '#FFFFFF', null, { e: fim ? 0.8 : (q ? 3.4 : 2.4), x: 0.9, y: -2.6 - abre, sx: 1.6, sy: 0.75 + 0.3 * abre });
+  for (const sg of [1, -1]) K.box(5.4, 0.3, sg * 0.5, 1.3, 0.12, 0.24, EM, null, { e: eb * 0.7, ry: sg * 0.3, rz: -0.5 }); }
+/* O (para o jogo): pernas: false = só o corpo (as pernas são desenhadas à parte, uma por canto); estrela: false = sem a estrela na pose caída (o núcleo exposto é outra peça);
+   boca = abertura da mandíbula 0..1; junta: false = pata sem o nó âmbar (o ponto fraco é a peça chefe_junta); soPerna: 'pe' | 'caida' = só uma pata, no eixo +x, com o quadril na origem do canto */
+function tita(V, fim, O) { O = O || {}; return function (K) { K.base = 0; const T = TH(); const r = rng(200 + V * 10 + (fim ? 1 : 0)); const rast = V === 2;
+  const pata = (H, J, P, rb, rc, sx, sz, ng, Lg) => { K.anim(fim || O.soPerna === 'caida' ? null : { t: 'leg', p: H, amp: 0.09, stride: 14, ph: (sx * sz > 0 ? 0 : PI) }, () => { const m1 = [(H[0] + J[0]) / 2, (H[1] + J[1]) / 2 + rb * 0.6, (H[2] + J[2]) / 2];
+      tubo(K, tres(H, J, m1, ns(K, 9)), u => rb * cab(u), { n: 8, sd: sx * 3 + sz * 5 + 20 }); tubo(K, tres([H[0], H[1] + 0.3, H[2]], [H[0] + (J[0] - H[0]) * 0.72, H[1] + (J[1] - H[1]) * 0.72 + 0.4, H[2] + (J[2] - H[2]) * 0.72], [m1[0] - sx * 0.4, m1[1] + 0.6, m1[2]], ns(K, 8)), u => rc * (1.05 - 0.4 * u), { n: 10, pele: true, gomos: 18, sd: sx + sz * 2 + 8 });
+      const m2 = [(J[0] + P[0]) / 2 + sx * rb * 0.8, (J[1] + P[1]) / 2, (J[2] + P[2]) / 2 + sz * rb * 0.8]; tubo(K, tres(J, [P[0], P[1] + rb * 0.9, P[2]], m2, ns(K, 10)), u => rb * 0.92 * cab(u) * (1 + 0.25 * u), { n: 8, sd: sx * 7 + sz * 3 + 40 });
+      fino(K, () => { for (let i = 0; i < 3; i++) { const f = 0.3 + i * 0.2, q = [J[0] + (m2[0] - J[0]) * f * 1.6, J[1] + (P[1] - J[1]) * f, J[2] + (m2[2] - J[2]) * f * 1.6]; cristal(K, q, [q[0] + sx * 2.6, q[1] + 2.4, q[2] + sz * 2.6], 0.5, { n: 4, c0: OB2, c1: OB0, mat: MOSSO, pat: 3 }); } });
+      if (O.junta !== false) junta(K, J, rb * 1.2, fim, sx, sz); else { K.sph(J[0], J[1], J[2], rb * 1.25, OB2, MOSSO, { seg: ns(K, 10), pat: 3 }); cristal(K, [J[0], J[1] + rb * 0.5, J[2]], [J[0] + sx * rb * 1.2, J[1] + rb * 2.4, J[2] + sz * rb * 1.2], rb * 0.4, { n: 4, c0: OB2, c1: OB0, mat: MOSSO, pat: 3 }); } garras(K, [P[0], P[1] + rb * 0.4, P[2]], sx * 0.8, sz, ng, Lg, rb * 0.5); }); };
+  if (O.soPerna) { if (O.soPerna === 'caida') pata([-6, 3.6, 0], [6, 4.4, 1.5], [18, 0.3, -1], 3.0, 4.2, 1, 0.0001, 3, 7); else pata([-8.5, 23.5, 0], [7, 28.5, 0], [14.5, 0, 0], 3.0, 4.6, 1, 0.0001, 3, 8.5); return; }
+  const CX = -3, YN = fim ? 13.5 : (rast ? 16.5 : 18); const QB = fim ? '#7A2A0A' : BR, QB2 = fim ? '#B8501A' : BR2;
+  /* a espinha: da cauda à nuca; baixa na frente (cabeça à frente do corpo), arqueada no meio; na fase final, no chão e partida */
+  const esp = t => { if (fim) return [-19 + 33 * t + (t < 0.55 ? -1.5 : 2), 3.4 + (t < 0.55 ? 4 * (0.55 - t) : 1.5 * (t - 0.55)) + (rast ? 0 : 0), (t < 0.55 ? -2.5 + 6 * t : 4.5 - 7 * (t - 0.55))]; const a = rast ? 12.5 : 11.5; return [-18 + 31 * t, (rast ? 14 + 4 * t : 19.5) + a * Math.pow(Math.sin(PI * (0.1 + 0.72 * t)), 1.2) - 3.5 * t * t, 0]; };
+  const NVt = ns(K, 14); const pe = []; for (let i = 0; i < NVt; i++) pe.push(esp(i / (NVt - 1)));
+  if (!fim) tubo(K, pe, 1.7, { n: 8, sd: 31, fu: 14 }); else { tubo(K, pe.slice(0, Math.floor(NVt * 0.5)), 1.6, { n: 7, sd: 31 }); tubo(K, pe.slice(Math.ceil(NVt * 0.58)), 1.6, { n: 7, sd: 33 }); }
+  for (let i = 0; i < NVt; i += leve(K) ? 2 : 1) { const t = i / (NVt - 1), p = esp(t), s = 0.7 + 0.6 * Math.sin(PI * t); if (fim && Math.abs(t - 0.54) < 0.06) continue; const L = (fim ? 2.5 : 3.2 + 4.2 * Math.sin(PI * (0.15 + 0.7 * t))) * (i % 2 ? 0.75 : 1) * (t > 0.8 ? 0.45 : 1); cristal(K, [p[0], p[1] + 0.8, p[2]], [p[0] - L * 0.55, p[1] + L + 1, p[2] + (r() - 0.5) * 1.2], 0.75 * s, { n: 4, c0: OB2, c1: OB0, mat: MOSSO, pat: 3, k: 1.4 });
+    fino(K, () => { for (const sg of [1, -1]) cristal(K, [p[0], p[1], p[2]], [p[0] - 0.6, p[1] + 0.9, p[2] + sg * (2.6 * s + 0.6)], 0.5 * s, { n: 4, c0: OB2, c1: OB1, mat: MOSSO, pat: 3 }); }); }
+  /* as costelas (sete pares), escuras, com a face de dentro tisnada pela fornalha; na fase final caem abertas */
+  const NCo = nq(K, 7, 0.55), tops = []; for (let k = 0; k < NCo; k++) { const t = 0.24 + 0.52 * k / (NCo - 1), top = esp(t), big = Math.sin(PI * (0.14 + 0.74 * k / (NCo - 1))), R = 7.4 + 6.4 * big; tops.push([top, R, big]); for (const sg of [1, -1]) { const n = ns(K, 14), pts = []; if (fim && (k + (sg > 0 ? 0 : 1)) % 3 === 0) continue; const ab = 0.85 + 0.3 * r();
+      for (let i = 0; i < n; i++) { const u = i / (n - 1), ph = u * 2.5; let y, z; if (!fim) { y = top[1] - R * (1 - Math.cos(ph)) * (rast ? 0.9 : 0.96); z = sg * R * Math.sin(ph) * 1.12; } else { z = top[2] + sg * (1.5 + R * 1.3 * Math.sin(u * 1.45) * ab); y = top[1] - 0.6 + 9 * Math.pow(u, 2.4) * ab; }
+        pts.push([top[0] + (fim ? (k - NCo / 2) * 0.5 * u : 1.8 * Math.sin(u * PI) - u * 1.4), Math.max(0.6, y), z, (1.05 * Math.sin(PI * (0.14 + 0.8 * u)) + 0.14) * (0.8 + 0.4 * big) * (1 + 0.18 * Math.sin(u * 23 + k)), 0.55 * (1 - 0.6 * u) + 0.1]); }
+      const g = varre(pts, { n: ns(K, 8), lado: [1, 0, 0], dentro: [top[0], YN, 0], conc: 0.22, c0: OB2, c1: OB1, c2: fim ? OB0 : '#2A0F08', pot: 1.3, ao: 0.2 }); const cl = g.attributes.color, ps = g.attributes.position; for (let i = 0; i < cl.count; i++) { const nn = fbm(ps.getX(i) * 0.9 + k, ps.getY(i) * 0.9, ps.getZ(i) * 0.9, 3), rc = Math.abs(fbm(ps.getX(i) * 1.7, ps.getY(i) * 1.7 + k, ps.getZ(i) * 1.7, 2) - 0.5), m = (0.55 + 0.9 * nn) * (rc < 0.03 ? 0.35 : 1); cl.setXYZ(i, cl.getX(i) * m, cl.getY(i) * m, cl.getZ(i) * m); }
+      poe(K, g, '#FFFFFF', MOSSO, { pat: 3 }); const e = pts[n - 1]; if (false) fino(K, () => cristal(K, [e[0], e[1], e[2]], [e[0] + 0.5, e[1] - 2.2, e[2] - sg * 1.6], 0.45, { n: 4, c0: OB2, c1: OB0, mat: MOSSO, pat: 3 })); } }
+  /* a pele azul-noite que cresce por cima das costelas (dorso e flancos), rasgada embaixo e furada: a luz da fornalha vaza pelos rasgos */
+  const HX = 15.5, HY = fim ? 7.5 : (rast ? 12.5 : 13), HZ = 15.6, HC = [CX - 1.5, YN + (fim ? -3 : (rast ? 3.2 : 3.6)), 0];
+  const hf = (x, y, z) => 1 + 0.05 * Math.pow(Math.abs(Math.sin(x * 8.4)), 0.6) + 0.07 * (fbm(x * 3 + 4, y * 3, z * 3, 2) - 0.5) + 0.1 * Math.max(0, y) * Math.exp(-(x + 0.1) * (x + 0.1) / 0.2);
+  const hfuro = (x, y, z) => { const rg = fbm(x * 3.2 + 2, z * 3.2 * Math.sign(z || 1), 5, 3), bur = fbm(x * 4.4 + 9, y * 4.4, z * 4.4, 2); if (fim) { const d = Math.hypot((x + 0.05) / 0.62, z / 0.7); return y < 0.25 + 0.3 * rg || (d < 1 && y > 0.3) || bur > 0.64; } if (O.linha && y > 0.42 && Math.abs(x) < 0.72 && Math.abs(z) < 0.2 + 0.07 * Math.sin(x * 16.8)) return true; /* Linha de montagem: o dorso abre ao longo da espinha e a fornalha aparece de cima */ return y < -0.18 + 0.62 * rg - 0.25 * sst(0.4, 0.9, Math.abs(x)) || bur > 0.69 || x > 0.86 || x < -0.93; };
+  poe(K, esculpe(leve(K) ? 22 : 56, leve(K) ? 14 : 34, HX, HY, HZ, hf, (x, y, z) => { const dob = Math.abs(Math.sin(x * 8.4)); let c = mixc(PEL2, PEL1, sst(-0.3, 0.3, y)); c = mixc(c, PEL0, sst(0.3, 0.9, y)); c = mul(c, 0.5 + 0.6 * sst(0, 0.5, dob)); c = mul(c, 0.65 + 0.7 * fbm(x * 9, y * 9, z * 9, 3)); if (y > 0.1) c = mul(c, 0.7 + 0.3 * sst(0.25, 0.5, Math.abs(Math.sin(z * 9 + Math.sin(x * 5) * 1.5)))); return c; }, hfuro), '#FFFFFF', MPELE, { x: HC[0], y: HC[1], z: 0, pat: 3 });
+  const hp = (x, y, z, k) => { const l = Math.hypot(x, y, z); x /= l; y /= l; z /= l; const f = hf(x, y, z) * (k || 1); return [HC[0] + x * f * HX, HC[1] + y * f * HY, z * f * HZ]; };
+  for (let k = -2; k <= 2; k += leve(K) ? 2 : 1) { const nx = k * PI / 8.4; const s = Math.sqrt(1 - nx * nx), n = ns(K, 14); for (const sg of [1, -1]) { const pts = []; for (let i = 0; i <= n; i++) { const th = 0.12 + 1.1 * i / n; pts.push(hp(nx, s * Math.cos(th), sg * s * Math.sin(th), 1.006)); } fio(K, pts, O.linha ? 0.48 : 0.3, O.linha ? 0.48 : 0.3, { c0: QB2, c1: QB, e: fim ? 1.0 : (O.linha || O.golpe ? 2.4 : 1.5), n: 4, rf: u => 0.3 + 0.9 * Math.pow(u, 0.7) }); } }
+  fino(K, () => poeira(K, 120, 12, (i, q) => { const a = q() * TAU, y = 0.2 + q() * 0.75, s = Math.sqrt(1 - y * y), x = Math.cos(a) * s, z = Math.sin(a) * s; if (hfuro(x, y, z)) return null; const p = hp(x, y, z, 1.012); return [p[0], p[1], p[2], 0.1 + q() * 0.16, q() < 0.8 ? C.ETER2 : C.FEN2]; }, fim ? 1.0 : 1.9));
+  /* tendões de pele que descem do dorso até as pontas das costelas */
+  if (!fim && !leve(K)) for (let k = 1; k < NCo - 1; k++) for (const sg of [1, -1]) { if ((k + (sg > 0 ? 0 : 1)) % 2) continue; const [top, R] = tops[k]; const a = hp((top[0] - HC[0]) / HX, 0.05, sg * 0.98, 0.98), b = [top[0] + 0.5, top[1] - R * 1.55, sg * R * 0.95]; tubo(K, tres(a, b, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, sg * (R * 1.25 + 1.5)], 7), u => 0.75 * (1 - 0.6 * u) + 0.12, { n: 5, pele: true, gomos: 14, sd: k }); }
+  /* os casulos dos drones: pendurados entre as costelas e incrustados no dorso */
+  const NCa = nq(K, 8, 0.25); for (let k = 0; k < NCa; k++) { const sg = k % 2 ? 1 : -1, i = 1 + Math.floor(k / 2) % (NCo - 2), [top, R] = tops[Math.min(NCo - 1, i)]; if (k < 4 || fim) casulo(K, fim ? [top[0] + 1.5, 9.5 + (k % 3), sg * (R * 0.9 + 6 + k)] : [top[0] + 1.6, top[1] - R * 0.5, sg * (R * 1.2 + 1.3)], 0.82 + 0.2 * r(), fim, k, !!O.linha);
+    else { const p = hp(0.5 - (k - 4) * 0.33, 0.7, sg * 0.55, 0.96); grupo(K, mat4(p[0], p[1], p[2], sg * 0.5, 0, 0, 0.8), () => grupo(K, mat4(0, 7.2, 0, 0, 0, 0), () => casulo(K, [0, 0, 0], 1, false, k, !!O.linha))); } }
+  /* a fornalha-estrela no peito: plasma que gira, dois discos de nebulosa que saem pelas frestas e as fagulhas (os drones por nascer) */
+  const SX = CX + 0.5; if (!(fim && O.estrela === false)) K.anim({ t: 'spin', p: [SX, YN, 0], speed: 0.45 }, () => poe(K, mancha(new T.SphereGeometry(fim ? 6 : (O.linha ? 6.6 : 5.4), ns(K, 32), ns(K, 22)), fim ? '#8A3200' : '#6A1C00', fim ? C.AMB : '#FF8A2A', '#FFF6DC', 2.6, 23), '#FFFFFF', null, { e: fim ? 2.1 : 1.9, x: SX, y: fim ? YN + 3 : YN }));
+  [[0.3, 0.25, fim ? 13 : 12.5, 0.24, 3, C.FEN], [-0.45, -0.2, fim ? 10.5 : 10.5, -0.32, 8, '#FF9A3A']].forEach(([tx, tz, R, sp, sd, c1], k) => { if (leve(K) && k) return; if (fim && O.estrela === false) return; K.anim({ t: 'spin', p: [SX, YN, 0], speed: sp * (fim ? 2 : 1) }, () => grupo(K, mat4(SX, fim ? YN + 3 : YN, 0, tx, 0, tz), () => poe(K, disco(4.6, R, ns(K, 64), ns(K, 5), (u, a) => { const s1 = fbm(Math.cos(a) * 3 + u * 4 + sd, Math.sin(a) * 3, u * 2, 3); return mul(mixc(fim ? '#FFE9B8' : c1, fim ? '#7A2A06' : '#3B1A7A', sst(0.1, 0.9, u)), (0.12 + 1.6 * sst(0.4, 0.7, s1)) * (1 - sst(0.75, 1, u)) * sst(0, 0.12, u)); }, { tw: 1.6, y: (u, a) => 0.7 * Math.sin(a * 2 + sd) * u, verso: 0.8 }), '#FFFFFF', null, { e: 1.5 }))); });
+  if (fim && O.estrela !== false) K.tor(SX, YN + 3, 0, 8.6, 0.2, C.AMB, null, { e: 2.8, ts: ns(K, 40), rs: 5 });
+  K.anim({ t: 'spin', p: [SX, YN, 0], speed: -0.2 }, () => poeira(K, nq(K, 130, 0.5), 6, (i, q) => { const a = q() * TAU, rr = 5 + q() * (fim ? 13 : 9), y = YN + (q() - 0.3) * (fim ? 18 : 11); return [SX + Math.cos(a) * rr * 1.25, y, Math.sin(a) * rr, 0.1 + q() * 0.24, q() < 0.5 ? '#FFF1C8' : (q() < 0.5 ? BR2 : C.FEN2)]; }, 2.2));
+  /* pescoço de carne e o crânio, baixo e à frente; a boca aberta mostra a fornalha */
+  const nk = esp(1), CR = fim ? [nk[0] + 8, 4.4, nk[2] + 5] : [nk[0] + 13, nk[1] - (rast ? 2.5 : 4.5), 0];
+  tubo(K, tres([nk[0] - 2, nk[1], nk[2]], [CR[0] - 6.5, CR[1] + 0.4, CR[2]], [(nk[0] + CR[0]) / 2, Math.max(nk[1], CR[1]) + 1.5, (nk[2] + CR[2]) / 2], 7), u => 4.4 - 1.2 * u, { n: 10, pele: true, gomos: 16, sd: 3 });
+  grupo(K, mat4(CR[0], CR[1], CR[2], fim ? 0.45 : 0, fim ? -0.5 : 0, fim ? -0.08 : (rast ? -0.3 : -0.36), 1.5), () => cranio(K, O.boca != null ? O.boca : (fim ? 0.25 : 1), fim, !!O.golpe));
+  /* as patas: osso rachado, com carne no trecho de cima, o nó âmbar na junta e as garras */
+  if (O.pernas === false) { /* no jogo as pernas são peças à parte */ } else if (!rast) { for (const sz of [1, -1]) { if (!fim) { pata([7.5, 24.5, sz * 7], [15.5, 27.5, sz * 23.5], [24.5, 0, sz * 27.5], 2.9, 4.4, 1, sz, 3, 8.5); pata([-13.5, 22.5, sz * 6], [-19.5, 23.5, sz * 20.5], [-24.5, 0, sz * 24], 2.3, 3.6, -1, sz, 3, 6.5); }
+      else { pata([8, 4.5, sz * 11], [19, 5, sz * 23], [30, 0.3, sz * 19], 2.9, 4.2, 1, sz, 3, 7); pata([-13, 4, sz * 12], [-21, 4.2, sz * 23], [-31, 0.3, sz * 19], 2.3, 3.4, -1, sz, 3, 5.5); } } }
+  else { for (const sz of [1, -1]) { if (O.pernas === false) break; if (!fim) { pata([7, 25, sz * 8], [13, 33.5, sz * 25], [23.5, 0, sz * 24.5], 3.5, 5.4, 1, sz, 4, 10); pata([-13.5, 12.5, sz * 7.5], [-18.5, 10.5, sz * 16.5], [-20, 0, sz * 20.5], 1.7, 2.6, -1, sz, 2, 4.5); }
+      else { pata([8, 5, sz * 11], [20, 6, sz * 24], [32, 0.3, sz * 17], 3.5, 5, 1, sz, 4, 8); pata([-13, 3.5, sz * 9], [-18, 3.6, sz * 17], [-22, 0.3, sz * 22], 1.7, 2.4, -1, sz, 2, 4); } }
+    /* a cauda grossa que se arrasta: vértebras por dentro, carne por fora, espinhos no dorso e o ferrão de osso */
+    const c0 = esp(0), cd = curva(fim ? [[c0[0], c0[1], c0[2]], [c0[0] - 8, 3.4, c0[2] - 5], [c0[0] - 13, 2.6, c0[2] + 4], [c0[0] - 15, 1.6, c0[2] + 13]] : [[c0[0] + 1, c0[1] - 1, 0], [-25, 9, -1.5], [-31, 4, 5], [-28.5, 2.2, 15.5]], ns(K, 14));
+    K.anim(fim ? null : { t: 'sway', p: [c0[0], 3, 0], amp: 0.035, speed: 0.6 }, () => { tubo(K, cd, u => 5.6 * (1 - 0.8 * Math.pow(u, 0.85)) + 0.5, { n: 10, pele: true, gomos: 34, sd: 5 }); for (let i = 1; i < cd.length - 1; i += leve(K) ? 2 : 1) { const u = i / (cd.length - 1), p = cd[i], rr = 5.6 * (1 - 0.8 * Math.pow(u, 0.85)) + 0.5; cristal(K, [p[0], p[1] + rr * 0.7, p[2]], [p[0] + 1.2, p[1] + rr + 3.6 * (1 - u) + 1, p[2]], 0.75 * (1 - u * 0.5), { n: 4, c0: OB2, c1: OB0, mat: MOSSO, pat: 3 }); }
+      const e = cd[cd.length - 1], e1 = cd[cd.length - 2]; tubo(K, curva([e, [e[0] + (e[0] - e1[0]) * 2, e[1] + 2.5, e[2] + (e[2] - e1[2]) * 2], [e[0] + (e[0] - e1[0]) * 3.5 + 2.5, e[1] + 6, e[2] + (e[2] - e1[2]) * 3], [e[0] + (e[0] - e1[0]) * 2.5 + 6.5, e[1] + 4.5, e[2] + (e[2] - e1[2]) * 2]], 8), u => 1.25 * (1 - 0.94 * u) + 0.05, { n: 6, sd: 77, ponta: 0.4 }); }); }
+  if (!rast && !fim) { const c0 = esp(0), cd = curva([[c0[0], c0[1], 0], [-24, 21, 0], [-29, 15, 2.5], [-32.5, 7.5, -2]], 9); K.anim({ t: 'sway', p: [c0[0], c0[1], 0], amp: 0.06, speed: 0.7 }, () => { tubo(K, cd, u => 1.9 * (1 - 0.85 * u) + 0.2, { n: 7, sd: 55, fu: 16 }); for (let i = 1; i < cd.length; i++) { const s = 1 - i / cd.length; cristal(K, cd[i], [cd[i][0] - 1.2, cd[i][1] + 3.4 * s + 0.6, cd[i][2]], 0.5 * s + 0.14, { n: 4, c0: OB2, c1: OB0, mat: MOSSO, pat: 3 }); } }); }
+}; }
+B.registra('forja_tita1', { chefe: 'forja', ordem: 4, nome: 'O Titã-Fornalha', eixo: 'Fusão A + C, quadrúpede',
+  frase: 'O esqueleto de um gigante de antes das estrelas, com carne nova crescendo por cima do osso: no peito arde a fornalha onde ele derrete destroços e cria os drones.',
+  fases: 'Marcha: anda baixo, de cabeça à frente; a fornalha aparece só pelas frestas da pele e pela garganta. Linha de montagem: os casulos pendurados entre as costelas incham e abrem, a mandíbula partida abre de lado e as fagulhas saem. Núcleo exposto: a espinha parte, o titã desaba, as costelas caem abertas, a pele do dorso rasga e a estrela âmbar fica à mostra.',
+  golpes: 'Pisão: a pata da frente sobe com as garras abertas e o nó âmbar aperta. Solda: as duas metades da mandíbula abrem para os lados e a luz sobe da fornalha pela garganta. Onda de calor: as dobras da pele acendem do peito para fora.',
+  fraco: 'Os quatro nós âmbar das juntas (um por pata) e, na fase final, a estrela âmbar do peito, com o aro âmbar.',
+  risco: 'Médio. É o caminho mais direto: quatro pernas como hoje (a simulação não muda), só que as da frente são maiores. A pele vazada pede cuidado na versão leve.' },
+  { kch_forja_tita1: tita(1, false), kch_forja_tita1_f: tita(1, true) });
+B.registra('forja_tita2', { chefe: 'forja', ordem: 5, nome: 'O Rastejante da Fornalha', eixo: 'Fusão A + C, dois braços e cauda',
+  frase: 'Metade do gigante já virou pó: sobraram dois braços enormes de osso, que puxam pelo chão o resto do corpo e a cauda, com a fornalha acesa no peito.',
+  fases: 'Marcha: avança aos puxões, um braço de cada vez, a cauda varrendo o chão. Linha de montagem: os casulos abrem e a cauda levanta o ferrão. Núcleo exposto: os braços cedem, o corpo deita, a pele do dorso rasga e a estrela âmbar fica à mostra.',
+  golpes: 'Pisão: é o soco do braço, com as quatro garras abertas. Solda: a mandíbula partida abre e a fornalha sobe pela garganta. Onda de calor: a cauda bate no chão e as dobras da pele acendem.',
+  fraco: 'Quatro nós âmbar: os dois cotovelos enormes da frente e os dois cotos de trás, junto da cauda; na fase final, a estrela âmbar do peito.',
+  risco: 'Alto. É o mais monstruoso e o mais vilão dos dois, mas as "pernas" deixam de ser quatro iguais: a queda por perna, a lentidão por perna destruída e os cantos do casco teriam de ser refeitos, e a cauda sai do raio atrás.' },
+  { kch_forja_tita2: tita(2, false), kch_forja_tita2_f: tita(2, true) });
+B.jogo = B.jogo || {}; B.jogo.tita = tita; B.jogo.titaJunta = function (K) { K.base = 0; /* o ponto fraco de cada perna: garra de osso que sai do chão e segura a bolsa âmbar */ for (let i = 0; i < 4; i++) { const a = i * PI / 2 + 0.4; tubo(K, curva([[Math.cos(a) * 3.4, 0, Math.sin(a) * 3.4], [Math.cos(a) * 4.6, 4, Math.sin(a) * 4.6], [Math.cos(a) * 3.8, 8.5, Math.sin(a) * 3.8], [Math.cos(a) * 1.2, 11.5, Math.sin(a) * 1.2]], ns(K, 9)), u => 1.15 * (1 - 0.85 * u) + 0.1, { n: 6, sd: i + 61, ponta: 0.6 }); }
+  K.anim({ t: 'bob', amp: 0.18, speed: 3.2 }, () => { poe(K, mancha(new (TH().SphereGeometry)(2.7, ns(K, 18), ns(K, 12)), '#7A2E00', C.AMB, '#FFF6DC', 2.4, 31), '#FFFFFF', null, { e: 2.0, y: 6.2, sy: 1.15 }); K.tor(0, 6.2, 0, 3.3, 0.16, C.AMB, null, { e: 2.4, ts: ns(K, 20), rs: 5, rx: 0.5 }); }); };
+B.jogo.titaNucleo = function (K) { K.base = 0; /* o núcleo exposto: a estrela âmbar, os dois discos de nebulosa e o aro */ const T = TH();
+  K.anim({ t: 'spin', p: [0, 8, 0], speed: 0.5 }, () => poe(K, mancha(new T.SphereGeometry(6, ns(K, 30), ns(K, 20)), '#8A3200', C.AMB, '#FFF6DC', 2.6, 23), '#FFFFFF', null, { e: 2.1, y: 8 }));
+  [[0.3, 0.25, 12.5, 0.5, 3], [-0.45, -0.2, 10, -0.6, 8]].forEach(([tx, tz, R, sp, sd], k) => { if (leve(K) && k) return; K.anim({ t: 'spin', p: [0, 8, 0], speed: sp }, () => grupo(K, mat4(0, 8, 0, tx, 0, tz), () => poe(K, disco(4.8, R, ns(K, 56), ns(K, 5), (u, a) => { const s1 = fbm(Math.cos(a) * 3 + u * 4 + sd, Math.sin(a) * 3, u * 2, 3); return mul(mixc('#FFE9B8', '#7A2A06', sst(0.1, 0.9, u)), (0.12 + 1.6 * sst(0.4, 0.7, s1)) * (1 - sst(0.75, 1, u)) * sst(0, 0.12, u)); }, { tw: 1.6, verso: 0.8 }), '#FFFFFF', null, { e: 1.5 }))); });
+  K.tor(0, 8, 0, 8.4, 0.2, C.AMB, null, { e: 2.8, ts: ns(K, 36), rs: 5 }); };
+})(globalThis.ARD = globalThis.ARD || {});
+/* Os três chefões no jogo. Os ids internos e os nomes das receitas não mudam (o src/chefes.js continua escolhendo a variante pela fase):
+   arauto = A Medusa da Fenda; sentinela = A Sentinela Devoradora; forja = O Titã-Fornalha. Os modelos 2.0 de cima ficam no arquivo, sem uso
+   (o Pilar, a coroa dos Ecos e a marca do ponto fraco continuam os de antes). */
+(function (ARD) {
+'use strict';
+const J = ARD.kch && ARD.kch.jogo; const RX = ARD.meshes && ARD.meshes.receitas; if (!J || !RX) return;
+Object.assign(RX, {
+  chefe_arauto_1: J.medusa('1'), chefe_arauto_2: J.medusa('2'), chefe_arauto_3: J.medusa('3'), chefe_arauto_j: J.medusa('j'),
+  chefe_arauto_1_g: J.medusa('1', { golpe: true }), chefe_arauto_2_g: J.medusa('2', { golpe: true }), chefe_arauto_3_g: J.medusa('3', { golpe: true }),
+  chefe_sentinela: J.devoradora(2, false), chefe_sentinela_g: J.devoradora(2, false, { golpe: true }), chefe_sentinela_j: J.devoradora(2, true),
+  chefe_forja: J.tita(1, false, { pernas: false, junta: false, boca: 0.2 }), chefe_forja_g: J.tita(1, false, { pernas: false, junta: false, boca: 1, golpe: true }),
+  chefe_forja_b: J.tita(1, false, { pernas: false, junta: false, boca: 0.45, linha: true }), chefe_forja_b_g: J.tita(1, false, { pernas: false, junta: false, boca: 1, linha: true, golpe: true }),
+  chefe_forja_caida: J.tita(1, true, { pernas: false, estrela: false }),
+  chefe_forja_perna: J.tita(1, false, { soPerna: 'pe', junta: false }), chefe_forja_perna_caida: J.tita(1, true, { soPerna: 'caida', junta: false }), chefe_junta: J.titaJunta, chefe_nucleo: J.titaNucleo,
+});
+/* pontos que o src/chefes.js usa para os efeitos (carga do golpe, fumaça, brasas), nas coordenadas da receita */
+ARD.chefesForma.pontos = {
+  arauto: { olho: [8.2, 20.4, 0], nucleo: [0, 31, 0] }, sentinela: { olho: [8.6, 23.2, 0], nucleo: [0, 19.4, 0] },
+  forja: { tochas: [[38, 10, 3.5], [38, 10, -3.5], [36, 12, 3], [36, 12, -3]], chamines: [[4, 33, 7], [4, 33, -7], [-9, 33, 6], [-9, 33, -6]], boca: [31, 12.5, 0], olhos: [31, 19.5, 0] },
+};
+ARD.chefesForma.larg = { arauto: 34, sentinela: 22.9, forja: 37 }; /* largura de referência (o src/chefes.js lê) */
+/* os lacaios da Fenda com a cara da família (o src/render3d.js troca o modelo só para o jogador da Fenda): a fagulha-filhote do Titã no lugar do
+   drone e a cria do vazio (uma medusa pequena que anda nos fios) no lugar da Cria. Mesmos defs, mesma simulação; só o desenho muda */
+const B = ARD.kch, { PI, TAU, TH, C, ns, leve, poe, mancha, fio, esculpe, cristal, balanca, mul, mixc, sst } = B;
+/* o Pilar, a coroa dos Ecos e a marca do ponto fraco no visual da família (vazio: pele violeta quase preta, Éter e Fenda; âmbar só no ponto fraco) */
+RX.chefe_pilar = function (K) { K.base = 0; const T = TH(); const N = ns(K, 12), tr = []; for (let i = 0; i < N; i++) { const u = i / (N - 1); tr.push([Math.sin(u * 5.5) * 1.3 * (1 - u), u * 17, Math.cos(u * 4.3) * 1.1 * (1 - u)]); }
+  fio(K, tr, 3.1, 1.5, { c0: C.VID, c1: C.VID2, mat: B.VIDRO, n: ns(K, 10), rf: u => 1 + 0.16 * Math.sin(u * 30) });
+  for (let k = 0; k < (leve(K) ? 4 : 7); k++) { const a = k / (leve(K) ? 4 : 7) * TAU + 0.2, ca = Math.cos(a), sa = Math.sin(a); fio(K, [[ca * 2.2, 2.2, sa * 2.2], [ca * 4.4, 1.2, sa * 4.4], [ca * 6.2, 0.5, sa * 6.2], [ca * 7.6, 0.05, sa * 7.6]], 1.2, 0.15, { c0: C.VID2, c1: C.VID, mat: B.VIDRO, n: 5 }); }
+  for (let k = 0; k < (leve(K) ? 2 : 4); k++) { const pts = []; for (let i = 0; i <= 8; i++) { const u = i / 8, a = k * PI / 2 + u * 3.2, q = tr[Math.round(u * (N - 1))], rr = (3.1 - 1.6 * u) * 1.03; pts.push([q[0] + Math.cos(a) * rr, q[1], q[2] + Math.sin(a) * rr]); } fio(K, pts, 0.16, 0.08, { c0: C.FEN, c1: C.ETER, e: 1.8, n: 3 }); }
+  K.anim({ t: 'bob', amp: 0.35, speed: 1.4 }, () => { const g = new T.SphereGeometry(3.3, ns(K, 18), ns(K, 10), 0, TAU, 0, PI * 0.58); B.degrade(g, C.VID2, C.VID, 1); poe(K, g, '#FFFFFF', B.VIDRO, { y: 19.2, pat: 4 }); poe(K, mancha(new T.SphereGeometry(2.1, ns(K, 16), ns(K, 10)), '#12305A', C.ETER, '#FFFFFF', 2.4, 9), '#FFFFFF', null, { e: 2.0, y: 18.6 });
+    for (let k = 0; k < (leve(K) ? 4 : 8); k++) { const a = k / (leve(K) ? 4 : 8) * TAU, ca = Math.cos(a), sa = Math.sin(a); fio(K, [[ca * 3.1, 18.4, sa * 3.1], [ca * 3.8, 16.2, sa * 3.8], [ca * 3.3, 13.6, sa * 3.3]], 0.2, 0.05, { c0: C.VID3, c1: '#3FA9C8', n: 4 }); K.sph(ca * 3.3, 13.6, sa * 3.3, 0.26, C.ETER2, null, { e: 2.2, seg: 6 }); } }); };
+RX.chefe_eco = function (K) { K.base = 0; K.anim({ t: 'spin', p: [0, 0, 0], speed: 1.4 }, () => { for (let k = 0; k < 5; k++) { const a = k * TAU / 5, ca = Math.cos(a), sa = Math.sin(a); fio(K, [[ca * 2.3, 0.1, sa * 2.3], [ca * 2.9, 1.1, sa * 2.9], [ca * 2.4, 2.2, sa * 2.4], [ca * 1.5, 2.7, sa * 1.5]], 0.3, 0.06, { c0: C.VID2, c1: C.VID3, mat: B.VIDRO, n: 4 }); K.sph(ca * 1.5, 2.7, sa * 1.5, 0.2, C.FEN2, null, { e: 2.2, seg: 6 }); }
+    K.tor(0, 0.3, 0, 2.3, 0.1, C.FEN, null, { e: 1.9, ts: 20, rs: 4 }); K.sph(0, 1.1, 0, 0.6, C.FEN, null, { e: 2.0, seg: 8, sy: 1.4 }); }); };
+RX.chefe_marca = function (K) { K.base = 0; /* o olho âmbar do ponto fraco: lente acesa com a fenda escura, girando */ K.anim({ t: 'spin', p: [0, 0, 0], speed: 1.6 }, () => { K.sph(0, 2.2, 0, 1.25, C.AMB, null, { e: 2.6, seg: 12, sx: 0.5, sy: 1.5 }); K.box(0, 1.2, 0, 1.3, 2.0, 0.2, '#2A1000', 'gloss'); K.tor(0, 2.2, 0, 1.9, 0.1, C.AMB2, null, { e: 2.4, ts: 20, rs: 4, rx: PI / 2 }); }); };
+RX.chefe_lacaio_drone = function (K) { K.base = 0; const T = TH();
+  K.anim({ t: 'bob', amp: 0.12, speed: 3 }, () => { poe(K, mancha(new T.SphereGeometry(0.95, ns(K, 14), ns(K, 10)), '#7A2400', '#FF7A1A', '#FFF1C8', 2.4, 5), '#FFFFFF', null, { e: 1.9, y: 2.6, sx: 1.25 });
+    poe(K, esculpe(ns(K, 14), ns(K, 10), 1.9, 1.05, 1.25, (x, y) => (y < -0.1 ? 0.2 : 1) * (1 - 0.3 * Math.max(0, -x)), (x, y) => mul(mixc('#1B2442', '#0A0C18', sst(-0.2, 0.9, y)), 0.8 + 0.4 * Math.abs(Math.sin(x * 9)))), '#FFFFFF', [0.46, 0.05], { y: 2.75, pat: 3 });
+    for (const sg of [1, -1]) { cristal(K, [1.2, 2.5, sg * 0.5], [2.9, 2.0, sg * 0.25], 0.2, { n: 4, c0: '#3F383E', c1: '#8A7F70', mat: [0.7, 0.02], pat: 3 }); K.sph(1.35, 2.95, sg * 0.55, 0.16, '#FFC66A', null, { e: 2.4, seg: 6 }); }
+    fio(K, [[-1.5, 2.7, 0], [-2.8, 2.9, 0.3], [-4.0, 2.4, -0.3], [-5.0, 2.7, 0]], 0.5, 0.05, { c0: '#1B2442', c1: '#FF6A1A', n: 5 }); });
+  for (const sg of [1, -1]) K.anim({ t: 'flap', p: [0, 2.9, sg * 0.9], amp: 0.6, speed: 14, side: sg }, () => { const g = new T.BufferGeometry(); const v = [0.9, 2.9, sg * 0.9, -1.6, 2.9, sg * 0.9, -0.9, 3.2, sg * 4.2, 0.7, 3.1, sg * 3.2]; g.setAttribute('position', new T.Float32BufferAttribute(v, 3)); g.setIndex(sg > 0 ? [0, 2, 1, 0, 3, 2, 0, 1, 2, 0, 2, 3] : [0, 1, 2, 0, 2, 3, 0, 2, 1, 0, 3, 2]); g.computeVertexNormals(); poe(K, g, '#30406A', [0.46, 0.05], { pat: 3, flat: true });
+    fio(K, [[0.9, 2.95, sg * 0.9], [0.8, 3.15, sg * 3.2], [-0.9, 3.25, sg * 4.2]], 0.1, 0.04, { c0: '#FFC66A', c1: '#FF6A1A', e: 1.6, n: 3 }); }); };
+RX.chefe_lacaio_cria = function (K) { K.base = 0; const T = TH(); const NF = leve(K) ? 5 : 7;
+  K.anim({ t: 'bob', amp: 0.14, speed: 2.4 }, () => { const g = new T.SphereGeometry(1.9, ns(K, 16), ns(K, 8), 0, TAU, 0, PI * 0.55); B.degrade(g, C.VID2, C.VID, 1); poe(K, g, '#FFFFFF', B.VIDRO, { y: 3.4, pat: 4 });
+    for (let k = 0; k < 4; k++) { const a = k * PI / 2 + 0.4; fio(K, [[Math.cos(a) * 0.3, 5.25, Math.sin(a) * 0.3], [Math.cos(a) * 1.3, 4.6, Math.sin(a) * 1.3], [Math.cos(a) * 1.85, 3.5, Math.sin(a) * 1.85]], 0.09, 0.06, { c0: C.FEN2, c1: C.FEN, e: 1.7, n: 3 }); }
+    K.sph(0.7, 3.1, 0, 1.0, '#0E0816', 'gloss', { seg: ns(K, 10) }); K.sph(1.35, 3.0, 0, 0.55, C.FEN, null, { e: 2.4, seg: 8, sx: 0.5 }); K.box(1.62, 2.72, 0, 0.06, 0.56, 0.16, '#05030A', 'gloss'); });
+  for (let k = 0; k < NF; k++) { const a = k / NF * TAU + 0.3, ca = Math.cos(a), sa = Math.sin(a); K.anim(Object.assign(balanca(a, [ca * 1.5, 3.2, sa * 1.5], 0.22, 5 + (k % 3), k * 1.7)), () => { fio(K, [[ca * 1.5, 3.2, sa * 1.5], [ca * 2.3, 2.2, sa * 2.3], [ca * 2.0, 1.0, sa * 2.0], [ca * 2.6, 0.05, sa * 2.6]], 0.22, 0.05, { c0: C.VID3, c1: '#3FA9C8', n: 4 }); cristal(K, [ca * 2.55, 0.25, sa * 2.55], [ca * 3.3, 0.02, sa * 3.3], 0.1, { n: 4, c0: C.VID3, c1: C.ETER2, e: 1.4 }); }); } };
+ARD.chefesForma.lacaio = { drone: 'chefe_lacaio_drone', cria: 'chefe_lacaio_cria' };
+ARD.chefesModelos = Object.keys(RX).filter(k => k.startsWith('chefe_'));
+})(globalThis.ARD = globalThis.ARD || {});
+/* ==== 5.0h.5 Chefões 3.0: FIM do bloco gerado ==== */
