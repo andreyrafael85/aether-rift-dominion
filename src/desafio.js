@@ -152,14 +152,15 @@ function registrar(data, res) { const D = guardado(); const n = diaNum(data); if
   const novo = { venceu: !!res.venceu, tempo: Math.max(0, Math.round(res.tempo || 0)), dominio: Math.max(0, Math.round(res.dominio || 0)), perdas: Math.max(0, Math.round(res.perdas || 0)), medalha: res.medalha || null, raca: RACAS.includes(res.raca) ? res.raca : null };
   const recorde = melhor(novo, antes && antes.rec); const dia = { n: (antes ? antes.n : 0) + 1, rec: recorde ? novo : antes.rec };
   let primeiraDoDia = !antes;
-  if (primeiraDoDia) { const u = D.ultimo ? diaNum(D.ultimo) : NaN; if (u === n - 1) D.seq = (D.seq || 0) + 1; else if (!(u === n)) D.seq = u > n ? D.seq || 1 : 1; if (!(u > n)) D.ultimo = data; D.melhorSeq = Math.max(D.melhorSeq || 0, D.seq); D.jogados = (D.jogados || 0) + 1; }
+  if (primeiraDoDia) { const u = D.ultimo ? diaNum(D.ultimo) : NaN; if (u === n - 1) D.seq = (D.seq || 0) + 1; else if (!(u === n)) D.seq = u > n ? D.seq || 1 : 1; if (!(u > n)) D.ultimo = data; D.melhorSeq = Math.max(D.melhorSeq || 0, D.seq); D.jogados = (D.jogados || 0) + 1;
+    if (ARD.patentes && ARD.patentes.seqJoga) { const q = ARD.patentes.seqJoga(data); if (q) { D.seq = q.dias; D.melhorSeq = Math.max(D.melhorSeq || 0, D.seq); } } /* 5.5b.2: a sequência segue a regra do escudo (src/patentes.js) */ }
   if (novo.venceu && !(antes && antes.rec && antes.rec.venceu)) D.vitorias = (D.vitorias || 0) + 1;
   D.dias[data] = dia; const ch = Object.keys(D.dias).sort(); while (ch.length > 60) delete D.dias[ch.shift()]; /* guarda os últimos 60 dias jogados */
   try { ARD.progress.save(); } catch (e) {}
   return { recorde, primeiraDoDia, rec: dia.rec, jogadasHoje: dia.n, seq: D.seq, melhorSeq: D.melhorSeq }; }
 /* o que a tela mostra: o recorde do dia, quantas vezes jogou hoje e a sequência (zera se pulou um dia) */
 function estado(data) { const D = guardado(); const n = diaNum(data); if (!D) return { rec: null, jogadasHoje: 0, seq: 0, melhorSeq: 0, jogouHoje: false, jogados: 0, vitorias: 0 }; const dia = D.dias[data] || null; const u = D.ultimo ? diaNum(D.ultimo) : NaN;
-  return { rec: dia ? dia.rec : null, jogadasHoje: dia ? dia.n : 0, jogouHoje: !!dia, seq: u === n || u === n - 1 ? D.seq || 0 : 0, melhorSeq: D.melhorSeq || 0, jogados: D.jogados || 0, vitorias: D.vitorias || 0 }; }
+  return { rec: dia ? dia.rec : null, jogadasHoje: dia ? dia.n : 0, jogouHoje: !!dia, seq: ARD.patentes && ARD.patentes.seqViva ? ARD.patentes.seqViva(data) /* 5.5b.2: com escudo, um dia perdido não zera */ : u === n || u === n - 1 ? D.seq || 0 : 0, melhorSeq: D.melhorSeq || 0, jogados: D.jogados || 0, vitorias: D.vitorias || 0 }; }
 
 ARD.desafio = { FORMATO, RACAS, MODOS, MAPAS, DIFS, CHEFES, MUTS, MUNDO, ARENA, ALFA, LINK_NA_LINHA, BLITZ_MIN,
   dataValida, diaNum, dataDe, dataUTC, faltaMs, diaSemana, receitaDoDia, justa, normaliza, iguais, codigo, bonito, limpa, ler, jogadores, cfgJogo, simCfg, deSim, melhor, registrar, estado };

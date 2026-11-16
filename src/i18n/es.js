@@ -419,7 +419,7 @@ globalThis.ARD.I18N_DIC['es'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aquí es tuyo. Todavía.",
-  "inicio.versao": "Versión 5.5b · build __BUILD__ · Puertas Abiertas · Mundo vivo · multijugador de 2 a 4",
+  "inicio.versao": "Versión 5.5b.2 · build __BUILD__ · Puertas Abiertas · Mundo vivo · multijugador de 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Elige tu Raza",
   "inicio.vitrine.explorar-base": "Explorar la base",
   "inicio.vitrine.som-tela-inicial": "Sonido de la pantalla de inicio",
@@ -488,6 +488,7 @@ globalThis.ARD.I18N_DIC['es'] = {
   "ajustes.btn-bench": "Probar rendimiento (30 s)",
   "ajustes.cfg-feedback": "Enviar comentarios",
   "notas.notas-versao": "Notas de la versión",
+  "notas.5-5b-2": "<b>5.5b.2 — Rangos:</b> ahora todo lo que juegas da <b>Chispas</b>: partidas, victorias, el Desafío del Día, misiones, medallas y logros. Con ellas sube tu <b>rango</b>, de Recluta a Soberano de la Grieta: son 10 rangos con 5 niveles cada uno, y una insignia que aparece junto a tu nombre. Las dos primeras partidas del día dan el doble. Cada Raza tiene su <b>afinidad</b>, que desbloquea títulos y colores. La <b>racha</b> del Desafío del Día ahora tiene hitos a los 3, 7, 14 y 30 días y un <b>escudo</b> por semana, que salva un día perdido. Al subir de rango, la pantalla final ofrece la <b>tarjeta de ascenso</b> para compartir. El <b>Perfil</b>, junto a tu nombre en la pantalla inicial, muestra todo esto y el <b>código de comandante</b>, para llevar tu rango a otro dispositivo. Nada de esto cambia el resultado de una partida, y todo queda solo en tu dispositivo.",
   "notas.5-5b": "<b>5.5b — Compartir:</b> llegó el <b>Desafío del Día</b>: una partida corta por día, igual para todos, con récord y racha de días guardados en el dispositivo. También puedes <b>armar un desafío</b> y enviarlo por enlace, o retar a un amigo a repetir la partida que acabas de jugar. Las <b>tarjetas</b> de resultado y de logro salen en dos tamaños, horizontal y vertical. El <b>panel de la partida ahora es delgado</b>: ocupa mucha menos pantalla y crece solo cuando hay algo que mostrar (en Ajustes, \"Panel completo en la partida\" vuelve al de antes). En las cinco primeras partidas el juego presenta <b>una novedad a la vez</b>. Los objetos del Hangar con candado ahora se <b>desbloquean con los logros</b>. En el móvil, tocar una construcción ya no selecciona al Recolector que pasa cerca. En Ajustes, \"Lo que este juego cuenta\" muestra los conteos de uso guardados solo en tu dispositivo; no se envía nada.",
   "notas.5-5a": "<b>5.5a — Puerta de entrada:</b> quien llega ahora tiene una <b>primera partida guiada</b>, con un objetivo a la vez y el panel apareciendo poco a poco. Llegó el modo <b>Blitz</b>: 1 contra 1, bases más cerca y reloj de 10 minutos. La <b>pantalla final</b> es nueva, con el gráfico del vuelco y el botón Compartir, que genera una tarjeta con el resultado. La sala multijugador tiene un <b>enlace de invitación</b> que entra directo en la sala. El mundo recibió la <b>Luz de la Grieta</b>: sol bajo y cálido, sombras largas. Cada unidad tiene un arco fino del color de su dueño, el enemigo se reconoce también por la forma, el suelo alrededor de la base toma el color de tu Raza y el ascenso aparece como estrella en la barra de vida. <b>Balance:</b> Soldador con daño 16 (antes 20), Cría y Escupidor más caros, Quimera con más vida y el Tirador de Grieta de Erevane disponible en la Era I. El Hangar lista los <b>cosméticos</b> y cómo ganar cada uno; nada está a la venta. En el Motor 5 el juego envía la mitad de los datos por cuadro a la tarjeta gráfica.",
   "notas.5-0h-5": "<b>5.0h.5 — Jefes 3.0:</b> los tres jefes dejaron de ser máquinas y ahora son criaturas de la Grieta, con nombres nuevos. El Heraldo ahora es <b>La Medusa de la Grieta</b>, la Forja Madre es <b>El Titán-Fragua</b> y la Centinela de la Grieta es <b>La Centinela Devoradora</b>, que quedó mucho más grande en pantalla. Antes de cada golpe el cuerpo avisa: el Titán abre la mandíbula de par en par, la Devoradora abre los colmillos y la Medusa contrae la campana. En la Línea de montaje el lomo del Titán se abre y aparecen los puntos débiles ámbar. Los pilares, los Ecos y los esbirros de la Grieta recibieron el aspecto de la misma familia. Las reglas de los combates, la vida y el daño de los jefes no cambiaron.",
@@ -508,7 +509,7 @@ globalThis.ARD.I18N_DIC['es'] = {
   "notas.5-0c": "<b>5.0c — Idiomas:</b> todo el juego ahora está en <b>inglés</b> y <b>español</b>, además de portugués: pantalla de inicio, Sala de Mando, partida, campaña, diplomacia, multijugador, Modo Foto, ayuda y las líneas de la voz del sistema, que ahora usan una voz del idioma elegido. El juego abre en el idioma del navegador y cambia al instante, sin recargar, en <b>Idioma / Language / Idioma</b>: arriba en la pantalla de inicio, en Ajustes y en la ventana de Ajustes de la partida. También en esta versión: los planetas y el cielo de arriba de la Sala de Mando se ven nítidos: en reposo el fondo se dibujaba a media resolución y ahora sale completo, con el detalle de los planetas siguiendo el tamaño del píxel, y la Sala ya no pierde resolución al cambiar de Raza; el locutor de la partida habla en el género del locutor de tu Raza (voz masculina en Vehnar, Quorith y Vorag; femenina en Erevane y Tessara); con el Motor 5, la resolución dinámica solo baja cuando la tarjeta gráfica es el límite, lo que evita los tirones del cambio de resolución; y en el iPhone, <b>Probar sonido</b> muestra un consejo cuando los efectos suenan y la voz no.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 más ligero, faros y sonido en el iPhone:</b> con el <b>Motor 5</b> activado, los shaders que prepara en la carga se redujeron un tercio (los lagos primero) y cada cuadro envía muchos menos datos a la tarjeta gráfica, lo que alivia la CPU en Firefox y en el celular. El brillo alrededor de las luces ahora es el mismo del motor clásico, y en el Modo Foto de la calidad Baja los efectos siguen la exposición como en el clásico. De noche y dentro de la Tormenta de Éter, los faros de los vehículos, recolectores y piratas iluminan el suelo al frente, en los dos motores. La Sala de Mando quedó un poco más clara, sin el resplandor de antes. En el iPhone, el sonido y la voz se desbloquean con el primer toque, suenan con el interruptor de silencio activado y vuelven después de una llamada. Cada líder habla con una voz de su género en todos los navegadores. En Ajustes, <b>Probar sonido</b> toca tres notas y una frase y muestra el estado del audio del dispositivo.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, en prueba:</b> con el <b>Motor 5</b> activado (Ajustes › Motor gráfico), todo el juego ahora corre en WebGPU, con vuelta automática a WebGL2: unidades y construcciones con el detalle de superficie y la animación de cada pieza, ruinas, obras, el holograma de la Erevane, los escudos del Unísono y las banderas; el suelo con todos los biomas, la vegetación al viento, los caminos y el cielo; explosiones, fuego, humo y disparos; los lagos de plasma y de hielo con reflejo, el espacio del Cinturón y la Tormenta de Éter; y el <b>Modo Foto</b> (📷 o tecla J) con desenfoque, los 8 filtros y captura en 4K. La primera vez que el Modo Foto se abre en una partida, tarda unos segundos en prepararse. Con todo esto, la carga del Motor 5 se alargó unos segundos: la próxima versión la mide en los dispositivos y la reduce. El motor clásico sigue siendo el predeterminado y no cambió.",
-  "notas.historico-versoes-anteriores-5": "Notas de versiones anteriores (5.5a → 2.0; desde la 5.0a.3, en portugués)",
+  "notas.historico-versoes-anteriores-5": "Notas de versiones anteriores (5.5b → 2.0; desde la 5.0a.3, en portugués)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Términos de uso",
   "inicio.rodape.foot-priv": "Privacidad",
@@ -2567,4 +2568,143 @@ globalThis.ARD.I18N_DIC['es'] = {
   "medir.modo.multi": "Multijugador", /* 5.5b */
   "medir.modo.desafio": "Desafío del Día", /* 5.5b */
   "cosm.fim.novo": "Nuevo en el Hangar: {itens}", /* 5.5b */
+  "patente.moeda.nome": "Chispas", /* 5.5b.2 patentes */
+  "patente.moeda.um": "Chispa", /* 5.5b.2 patentes */
+  "patente.recruta.nome": "Recluta", /* 5.5b.2 patentes */
+  "patente.batedor.nome": "Explorador", /* 5.5b.2 patentes */
+  "patente.vanguarda.nome": "Vanguardia", /* 5.5b.2 patentes */
+  "patente.capitao.nome": "Capitán de la Grieta", /* 5.5b.2 patentes */
+  "patente.comandante.nome": "Comandante", /* 5.5b.2 patentes */
+  "patente.estrategista.nome": "Estratega", /* 5.5b.2 patentes */
+  "patente.almirante.nome": "Almirante", /* 5.5b.2 patentes */
+  "patente.marechal.nome": "Mariscal del Alineamiento", /* 5.5b.2 patentes */
+  "patente.guardiao.nome": "Guardián de la Grieta", /* 5.5b.2 patentes */
+  "patente.soberano.nome": "Soberano de la Grieta", /* 5.5b.2 patentes */
+  "patente.nivel": "{patente} {n}", /* 5.5b.2 patentes */
+  "patente.historico": "Tu historial valió {n} {moeda}.", /* 5.5b.2 patentes */
+  "patente.motivo.partida.escaramuca": "Escaramuza terminada", /* 5.5b.2 patentes */
+  "patente.motivo.partida.blitz": "Blitz terminado", /* 5.5b.2 patentes */
+  "patente.motivo.partida.cacada": "Cacería terminada", /* 5.5b.2 patentes */
+  "patente.motivo.partida.campanha": "Misión terminada", /* 5.5b.2 patentes */
+  "patente.motivo.partida.multi": "Partida multijugador terminada", /* 5.5b.2 patentes */
+  "patente.motivo.partida.guia": "Primera partida terminada", /* 5.5b.2 patentes */
+  "patente.motivo.vitoria": "Victoria", /* 5.5b.2 patentes */
+  "patente.motivo.dificuldade": "Dificultad {dif}", /* 5.5b.2 patentes */
+  "patente.motivo.descanso": "Primeras partidas del día: el doble", /* 5.5b.2 patentes */
+  "patente.motivo.retorno": "Primera partida de la semana", /* 5.5b.2 patentes */
+  "patente.motivo.repeticao": "Muchas partidas hoy (esta fue la número {n}): rinde menos", /* 5.5b.2 patentes */
+  "patente.motivo.desafio": "Desafío del Día jugado", /* 5.5b.2 patentes */
+  "patente.motivo.desafio-vitoria": "Desafío del Día ganado", /* 5.5b.2 patentes */
+  "patente.motivo.desafio-recorde": "Récord del día superado", /* 5.5b.2 patentes */
+  "patente.motivo.missao": "Misión ganada por primera vez: {nome}", /* 5.5b.2 patentes */
+  "patente.motivo.estrelas": "Estrellas nuevas en {nome}: {n}", /* 5.5b.2 patentes */
+  "patente.motivo.medalha": "Medalla de Cacería: {nome}", /* 5.5b.2 patentes */
+  "patente.motivo.conquista": "Logro: {nome}", /* 5.5b.2 patentes */
+  "patente.motivo.degrau": "Novedad descubierta ({n} de 5)", /* 5.5b.2 patentes */
+  "patente.motivo.marco": "Hito de racha: {n} días", /* 5.5b.2 patentes */
+  "patente.motivo.marco-ciclo": "Racha de {n} días", /* 5.5b.2 patentes */
+  "patente.sem-ganho.curta": "Partida demasiado corta (menos de 3 minutos): no rindió {moeda}.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.teste": "Partida de prueba: no rinde {moeda}.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.replay": "Repetición: no rinde {moeda}.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.guiada-repetida": "La primera partida guiada rinde {moeda} una sola vez.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.retomada-repetida": "Esta partida guardada ya rindió {moeda} antes.", /* 5.5b.2 patentes */
+  "patente.codigo.confirma": "¿Restaurar este código de comandante? Este dispositivo pasa a {patente}, con {n} {moeda}.", /* 5.5b.2 patentes */
+  "patente.codigo.rebaixa": "Atención: el código trae menos de lo que este dispositivo ya tiene. Aquí: {aqui}, {n} {moeda}. En el código: {la}, {m}. ¿Restaurar igual y quedarte con lo que trae el código?", /* 5.5b.2 patentes */
+  "patente.codigo.backup-rebaixa": "Atención: esta copia trae menos de lo que este dispositivo ya tiene. Aquí: {aqui}, {n} {moeda}. En la copia: {la}, {m}. ¿Importar igual?", /* 5.5b.2 patentes */
+  "patente.codigo.feito": "Código restaurado: {patente}, {n} {moeda}.", /* 5.5b.2 patentes */
+  "patente.codigo.igual": "Este código es igual a lo que ya hay en este dispositivo.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.vazio": "Pega el código de comandante.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.formato": "Esto no parece un código de comandante.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.versao": "Este código fue hecho por una versión más nueva del juego. Actualiza el juego e inténtalo de nuevo.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.soma": "El código no cuadra: falta un trozo o hay una letra cambiada. Cópialo otra vez, entero.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.conteudo": "Esta versión del juego no pudo leer este código.", /* 5.5b.2 patentes */
+  "cosm.afinidade": "Afinidad {n} con {raca}", /* 5.5b.2 patentes */
+  "cosm.sequencia": "Racha de {n} días en el Desafío del Día", /* 5.5b.2 patentes */
+  "cosm.item.tit-seq-3": "Habitual de la Grieta", /* 5.5b.2 patentes */
+  "cosm.item.cor-seq-7": "Brasa de siete días", /* 5.5b.2 patentes */
+  "cosm.item.tit-seq-14": "Vigía de la Grieta", /* 5.5b.2 patentes */
+  "cosm.item.tit-seq-30": "Llama que No se Apaga", /* 5.5b.2 patentes */
+  "cosm.item.mol-seq-30": "Marco de la Llama", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vehnar-2": "Socio del Consorcio", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-vehnar-3": "Estandarte del Consorcio", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-vehnar-4": "Tono del Consorcio", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vehnar-5": "Maestro de la Fundición", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-erevane-2": "Sombra de Erevane", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-erevane-3": "Estandarte de Erevane", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-erevane-4": "Tono de Erevane", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-erevane-5": "Señor del Apagón", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-tessara-2": "Brote de Tessara", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-tessara-3": "Estandarte de Tessara", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-tessara-4": "Tono de Tessara", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-tessara-5": "Mano del Molde", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-quorith-2": "Voz del Coro", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-quorith-3": "Estandarte del Coro", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-quorith-4": "Tono del Coro", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-quorith-5": "Director del Unísono", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vorag-2": "Cría de la Prole", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-vorag-3": "Estandarte de la Prole", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-vorag-4": "Tono de la Prole", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vorag-5": "Alfa de la Prole", /* 5.5b.2 patentes */
+  /* 5.5b.2 — chaves do CONTRATO das patentes (as mesmas do src/patentes.js; na junção fica uma cópia só) */
+  /* 5.5b.2 — insígnias, Perfil, tela final e cartões (src/insignias.js e src/perfil-ui.js) */
+  "patente.falta": { one: "Siguiente: {prox} · falta {n}", other: "Siguiente: {prox} · faltan {n}" }, /* 5.5b.2 insignias */
+  "patente.falta.estrela": { one: "Siguiente estrella: falta {n}", other: "Siguiente estrella: faltan {n}" }, /* 5.5b.2 insignias */
+  "patente.fim.titulo": "{@patente.moeda.nome} ganadas", /* 5.5b.2 insignias */
+  "patente.fim.motivos": "De dónde vinieron", /* 5.5b.2 insignias */
+  "patente.fim.promocao": "¡Ascenso!", /* 5.5b.2 insignias */
+  "patente.fim.agora": "Ahora eres {patente}.", /* 5.5b.2 insignias */
+  "patente.fim.nivel": "Nuevo nivel: {patente}", /* 5.5b.2 insignias */
+  "patente.fim.estrela": { one: "{n} estrella después de la cima", other: "{n} estrellas después de la cima" }, /* 5.5b.2 insignias */
+  "patente.fim.afinidade": "Afinidad con {raca}: grado {n}", /* 5.5b.2 insignias */
+  "patente.fim.cartao": "Tarjeta de ascenso", /* 5.5b.2 insignias */
+  "patente.cartao.titulo": "Tarjeta de rango", /* 5.5b.2 insignias */
+  "patente.cartao.rotulo": "Ascenso", /* 5.5b.2 insignias */
+  "patente.cartao.sou": "Ahora soy", /* 5.5b.2 insignias */
+  "patente.cartao.nivel": "Nivel {n}", /* 5.5b.2 insignias */
+  "patente.cartao.raca": "Raza favorita: {raca}", /* 5.5b.2 insignias */
+  "patente.cartao.degrau": "peldaño de la escalera", /* 5.5b.2 insignias */
+  "patente.cartao.degrau.v": "{n}/50", /* 5.5b.2 insignias */
+  "patente.cartao.dias": "días de racha", /* 5.5b.2 insignias */
+  "patente.cartao.texto": "Ahora soy {patente} en Aether Rift: Dominion.", /* 5.5b.2 insignias */
+  "patente.seq.cartao.rotulo": "Desafío del Día", /* 5.5b.2 insignias */
+  "patente.seq.cartao.titulo": "{n} días seguidos", /* 5.5b.2 insignias */
+  "patente.seq.cartao.sub": "sin perder un Desafío del Día", /* 5.5b.2 insignias */
+  "patente.seq.cartao.janela": "Tarjeta de racha", /* 5.5b.2 insignias */
+  "patente.seq.cartao.texto": "{n} días seguidos en el Desafío del Día de Aether Rift: Dominion.", /* 5.5b.2 insignias */
+  "perfil.titulo": "Perfil", /* 5.5b.2 insignias */
+  "perfil.abrir": "Abrir el Perfil — {patente}", /* 5.5b.2 insignias */
+  "perfil.estrelas": { one: "{n} estrella", other: "{n} estrellas" }, /* 5.5b.2 insignias */
+  "perfil.barra": "Camino hasta el siguiente nivel", /* 5.5b.2 insignias */
+  "perfil.cartao": "Tarjeta de rango", /* 5.5b.2 insignias */
+  "perfil.afin.titulo": "Afinidad con las Razas", /* 5.5b.2 insignias */
+  "perfil.afin.degrau": "grado {n} de 5", /* 5.5b.2 insignias */
+  "perfil.seq.titulo": "Racha del Desafío del Día", /* 5.5b.2 insignias */
+  "perfil.seq.dias": { one: "día seguido", other: "días seguidos" }, /* 5.5b.2 insignias */
+  "perfil.seq.escudo.on": "Escudo guardado", /* 5.5b.2 insignias */
+  "perfil.seq.escudo.on-d": "Si pierdes un día, el escudo se gasta solo y la racha sigue.", /* 5.5b.2 insignias */
+  "perfil.seq.escudo.off": "Sin escudo ahora", /* 5.5b.2 insignias */
+  "perfil.seq.escudo.off-d": "Ganas un escudo por semana y guardas uno como máximo.", /* 5.5b.2 insignias */
+  "perfil.seq.marcos": "Hitos de la racha", /* 5.5b.2 insignias */
+  "perfil.seq.marco.ok": "logrado", /* 5.5b.2 insignias */
+  "perfil.seq.marco.falta": { one: "falta {n} día", other: "faltan {n} días" }, /* 5.5b.2 insignias */
+  "perfil.seq.cartao": "Tarjeta de los {n} días", /* 5.5b.2 insignias */
+  "perfil.cod.titulo": "Código de comandante", /* 5.5b.2 insignias */
+  "perfil.cod.texto": "Tus rangos quedan solo en este dispositivo. Guarda este código para llevar todo a otro dispositivo o para recuperarlo después.", /* 5.5b.2 insignias */
+  "perfil.cod.seu": "Tu código", /* 5.5b.2 insignias */
+  "perfil.cod.copiar": "Copiar código", /* 5.5b.2 insignias */
+  "perfil.cod.copiado": "Código copiado.", /* 5.5b.2 insignias */
+  "perfil.cod.restaurar-rot": "¿Tienes un código? Pégalo aquí", /* 5.5b.2 insignias */
+  "perfil.cod.conferir": "Comprobar", /* 5.5b.2 insignias */
+  "perfil.cod.invalido": "Este código no vale: comprueba que se copió entero.", /* 5.5b.2 insignias */
+  "perfil.cod.traz": "Este código trae: {patente} · {n} {@patente.moeda.nome}.", /* 5.5b.2 insignias */
+  "perfil.cod.valido": "Código válido.", /* 5.5b.2 insignias */
+  "perfil.cod.aviso": "Restaurar cambia los rangos de este dispositivo por los del código.", /* 5.5b.2 insignias */
+  "perfil.cod.restaurar": "Restaurar", /* 5.5b.2 insignias */
+  "perfil.cod.cancelar": "Cancelar", /* 5.5b.2 insignias */
+  "perfil.cod.restaurado": "Listo: rangos restaurados.", /* 5.5b.2 insignias */
+  "perfil.escada.titulo": "La escalera de las 50", /* 5.5b.2 insignias */
+  "perfil.escada.conta": "{n} de 50 peldaños logrados", /* 5.5b.2 insignias */
+  "perfil.nota": "Solo apariencia: nada aquí cambia el resultado de una partida.", /* 5.5b.2 insignias */
+  "perfil.cod.igual": "Este código es igual a lo que ya hay en este dispositivo.", /* 5.5b.2 insignias */
+  "perfil.cod.rebaixa": "Atención: este código trae menos de lo que este dispositivo ya tiene. Restaurar lo cambia igual.", /* 5.5b.2 insignias */
 };

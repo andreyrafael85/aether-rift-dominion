@@ -1328,6 +1328,48 @@ body.hudfino.touch .gbtn.empty~.gbtn.empty{display:none}
 .medir-envio{color:var(--good)}.medir-cfg{margin-top:.5rem}
 #end.tem-degrau #fim-prox{display:none} /* 5.5b: o botão "Próximo passo: …" do degrau toma o lugar da frase genérica */
 .fim-cosm{margin:.3rem 0 0;font:600 .9rem/1.3 var(--fb);color:#ffd27a;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+/* 5.5b.2: patentes — a insígnia ao lado do nome, o Perfil, "Centelhas ganhas" na tela final, a sala e o Desafio do Dia (src/perfil-ui.js; os desenhos são do src/insignias.js) */
+.ins,.ins-centelha{display:inline-block;vertical-align:middle;flex:none;user-select:none}
+.cname.com-pat{grid-template-columns:auto minmax(0,1fr) auto}
+.pf-entrada{display:inline-flex;align-items:center;gap:.5rem;min-height:44px;min-width:44px;padding:.2rem .6rem .2rem .35rem;background:rgba(0,0,0,.28);border:1px solid var(--hair);border-radius:8px;color:inherit;cursor:pointer;text-align:left;font:inherit}.pf-entrada[hidden]{display:none}
+.pf-entrada:hover,.pf-entrada:focus-visible{border-color:var(--race)}
+.pf-e-txt{display:grid;line-height:1.15}.pf-e-txt b{font:700 .95rem/1.1 var(--fd);letter-spacing:.03em;text-transform:uppercase;white-space:nowrap}.pf-e-txt small{display:flex;align-items:center;gap:.25rem;font:500 .7rem/1.2 var(--fm);color:var(--fg2);white-space:nowrap}
+.pf-linha>.pf-sala{margin-right:.4rem}
+#perfil.pf{z-index:60}#cartao.modal{z-index:70}#perfil .box{gap:.9rem}
+.pf-topo{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:1rem;align-items:center}
+.pf-id h2{margin:0;font:800 2rem/1 var(--fd);text-transform:uppercase;letter-spacing:.02em}.pf-id h2:focus{outline:none}
+.pf-xp{display:flex;align-items:baseline;gap:.4rem;margin:.35rem 0 .1rem;flex-wrap:wrap}.pf-xp img{align-self:center}.pf-xp b{font:800 1.7rem/1 var(--fd)}.pf-xp span{font:600 .7rem/1.2 var(--fm);letter-spacing:.12em;text-transform:uppercase;color:var(--fg2)}.pf-xp .pf-estrelas{color:#ffe9a8}
+.pf-barra{height:10px;background:#0b0e13;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:.35rem 0 .25rem}.pf-barra i{display:block;height:100%;background:linear-gradient(90deg,#FF5E3A,#E94FA0 55%,#C13CF5);border-radius:999px;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.pf-falta,.fp-quem small{font:500 .78rem/1.3 var(--fb);color:var(--fg2)}
+.pf-sec{display:grid;gap:.5rem;padding-top:.7rem;border-top:1px solid var(--hair)}.pf-sec h3{margin:0;font:600 .68rem/1.3 var(--fm);letter-spacing:.14em;text-transform:uppercase;color:var(--fg2)}
+.pf-p{margin:0;font:400 .86rem/1.45 var(--fb)}
+.pf-afin{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.pf-raca{display:grid;gap:.25rem;padding:.5rem .6rem;background:rgba(0,0,0,.28);border:1px solid var(--hair);border-top:2px solid var(--pf-cor,#fff)}
+.pf-raca b{font:700 1rem/1.1 var(--fd);text-transform:uppercase;letter-spacing:.03em}.pf-raca small{font:500 .68rem/1.2 var(--fm);color:var(--fg2)}
+.pf-degraus{display:flex;gap:3px}.pf-degraus i{width:12px;height:12px;transform:rotate(45deg) scale(.72);border:1px solid rgba(255,255,255,.3)}.pf-degraus i.on{background:var(--pf-cor,#fff);border-color:var(--pf-cor,#fff)}
+.pf-seq{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.6rem;align-items:center}
+.pf-seq-d{display:grid;justify-items:center;min-width:76px}.pf-seq-d b{font:800 2.2rem/1 var(--fd)}.pf-seq-d span{font:600 .62rem/1.2 var(--fm);letter-spacing:.1em;text-transform:uppercase;color:var(--fg2);text-align:center}
+.pf-escudo{display:flex;align-items:center;gap:.55rem;padding:.45rem .6rem;border:1px dashed rgba(255,255,255,.22);border-radius:8px;color:var(--fg2)}.pf-escudo.on{border-style:solid;border-color:#7fd6ff;color:#bfeaff;background:rgba(127,214,255,.08)}
+.pf-esc-i{width:28px;height:28px;flex:none}.pf-escudo:not(.on) .pf-esc-m{display:none}.pf-escudo span{display:grid}.pf-escudo b{font:600 .86rem/1.2 var(--fb);color:#fff}.pf-escudo small{font:400 .72rem/1.3 var(--fb)}
+.pf-marcos{display:flex;gap:5px;list-style:none;margin:0;padding:0}.pf-marcos li{display:grid;justify-items:center;min-width:52px;padding:.3rem .4rem;border:1px solid var(--hair);border-radius:8px;background:rgba(0,0,0,.28);color:var(--fg2)}.pf-marcos li b{font:800 1.25rem/1 var(--fd)}.pf-marcos li small{font:500 .58rem/1.2 var(--fm);letter-spacing:.06em;text-transform:uppercase;text-align:center}.pf-marcos li.ok{border-color:#E94FA0;color:#fff;background:linear-gradient(160deg,rgba(255,94,58,.22),rgba(193,60,245,.22))}
+.pf-linha-cod{flex-wrap:nowrap}.pf-linha-cod input{flex:1 1 auto;min-width:0;font-family:var(--fm)}
+.pf-prev{display:grid;gap:.4rem;padding:.6rem .7rem;border:1px solid #E94FA0;border-radius:8px;background:rgba(233,79,160,.08)}.pf-prev p{margin:0}
+#pf-nota.falhou,.pf-rebaixa{color:#ffb4a8}.fp-motivos li.menos b{color:#9fb2c6}
+.cz-mol-seq-30{border-color:#FF7A45;background:linear-gradient(180deg,rgba(255,94,58,0),rgba(255,94,58,.16));box-shadow:0 0 10px rgba(255,94,58,.45),inset 0 -2px 0 #E94FA0} /* 5.5b.2: a "Moldura da Chama" (30 dias de sequência): brasa embaixo, laranja da Fenda em volta */
+.pf-escada{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 14px}.pf-deg{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.5rem;padding:.25rem .5rem;border:1px solid var(--hair);border-radius:8px;background:rgba(0,0,0,.22)}.pf-deg.atual{border-color:var(--race)}
+.pf-deg-n{font:700 .9rem/1.15 var(--fd);letter-spacing:.03em;text-transform:uppercase;color:var(--fg2)}.pf-deg.feito .pf-deg-n,.pf-deg.atual .pf-deg-n{color:#fff}
+.pf-deg-i{display:flex;gap:2px}.pf-d{display:grid;place-items:center;border-radius:6px}.pf-d.aqui{background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px var(--race)}.pf-d:not(.ok) img{opacity:.55}
+.fim-pat{box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"topo bot" "baixo baixo";align-items:center;gap:.3rem .7rem;max-width:760px;width:100%;text-align:left;background:rgba(9,12,17,.78);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:.45rem .6rem .5rem}.fim-pat[hidden]{display:none}@media (min-width:721px) and (max-height:860px){#end.fim:has(#fim-pat:not([hidden])) #end-title{font-size:clamp(3rem,23vh,13.5rem)}#end.fim:has(#fim-pat:not([hidden])) #fim-prox{display:none}}/* 5.5b.2: em janela baixa, com o bloco das Centelhas, a palavra encolhe e a dica sai, para os botões ficarem na tela */.fim-pat.promo{border-color:#E94FA0;box-shadow:0 0 24px rgba(233,79,160,.25)}
+.fp-topo{grid-area:topo;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.6rem;align-items:center}.fp-quem b{font:700 1.15rem/1.1 var(--fd);letter-spacing:.03em;text-transform:uppercase}.fp-quem .pf-barra{margin:.25rem 0 .15rem;height:8px}
+.fp-total{display:grid;grid-template-columns:auto auto;align-items:center;column-gap:.35rem;justify-items:end}.fp-total b{font:800 1.9rem/1 var(--fd);color:#fff}.fp-total span{grid-column:1/-1;font:600 .6rem/1.2 var(--fm);letter-spacing:.12em;text-transform:uppercase;color:var(--fg2)}
+.fp-baixo{grid-area:baixo;display:flex;flex-wrap:wrap;align-items:center;gap:.2rem .7rem}.fp-motivos{display:flex;flex-wrap:wrap;gap:4px 6px;list-style:none;margin:0;padding:0}.fp-motivos li{display:flex;gap:.4rem;align-items:baseline;padding:.12rem .5rem;border:1px solid var(--hair);border-radius:999px;font:500 .78rem/1.4 var(--fb)}.fp-motivos li b{font:600 .78rem/1.4 var(--fm);color:#ffb088}
+.fp-promo{margin:0;font:600 .95rem/1.3 var(--fb);color:#fff}.fp-promo b{font:800 1.05rem/1 var(--fd);letter-spacing:.08em;text-transform:uppercase;background:linear-gradient(90deg,#FF5E3A,#E94FA0 55%,#C13CF5);-webkit-background-clip:text;background-clip:text;color:transparent;margin-right:.3rem}
+.fp-linha{margin:0;font:500 .8rem/1.3 var(--fb);color:var(--fg2)}
+.fp-botoes{grid-area:bot;gap:.4rem;flex-wrap:nowrap;justify-content:flex-end}#end .fp-botoes .btn{min-width:0;font:600 .82rem/1.2 var(--fb);letter-spacing:0;text-transform:none;padding:.4rem .7rem;min-height:36px;white-space:nowrap}
+.fp-ins.sobe{animation:fpSobe 1.1s cubic-bezier(.2,.8,.2,1) 1}@keyframes fpSobe{0%{transform:scale(.4) rotate(-12deg);opacity:0;filter:brightness(2.2)}55%{transform:scale(1.3);opacity:1;filter:brightness(1.6)}100%{transform:none;filter:none}}
+.fp-logo{position:relative;display:inline-block;line-height:0}.fp-logo.brilha::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.95) 50%,transparent 62%) 130% 0/260% 100% no-repeat;-webkit-mask:var(--m) center/100% 100% no-repeat;mask:var(--m) center/100% 100% no-repeat;opacity:0;animation:fpBrilho 1s ease-out .35s 1}@keyframes fpBrilho{0%{opacity:1;background-position:130% 0}100%{opacity:1;background-position:-30% 0}} /* 5.5b.2: um brilho que atravessa o logo das Centelhas, uma vez, quando elas são ganhas (recortado no formato do logo; desliga em ARD.insignias.BRILHO) */
+.dd-pat .pf-seq-d{display:none}.dd-pat .pf-seq{grid-template-columns:minmax(0,1fr) auto}
+@media (max-width:720px){.pf-afin{grid-template-columns:repeat(2,1fr)}.pf-escada{grid-template-columns:1fr}.pf-topo{grid-template-columns:auto minmax(0,1fr)}.pf-topo>.btn{grid-column:1/-1}.pf-ins{width:84px;height:84px}.pf-id h2{font-size:1.5rem}.pf-seq{grid-template-columns:auto minmax(0,1fr)}.pf-marcos{grid-column:1/-1}.pf-marcos li{flex:1}.pf-linha-cod{flex-wrap:wrap}#perfil .pf-linha-cod input{flex:1 1 100%;min-height:44px;height:auto}.pf-linha-cod .btn{flex:1 1 auto}#perfil .btn,#end .fp-botoes .btn{min-height:44px}.fim-pat{grid-template-columns:minmax(0,1fr);grid-template-areas:"topo" "baixo" "bot"}.fp-botoes{flex-wrap:wrap;justify-content:flex-start}#perfil .mclose{min-width:44px;min-height:44px}.dd-pat .pf-seq{grid-template-columns:1fr}}
+@media (max-width:460px){.pf-e-txt small{display:none}.pf-e-txt b{font-size:.8rem;white-space:normal;max-width:8.5em}.fp-topo{grid-template-columns:auto minmax(0,1fr)}.fp-total{grid-column:1/-1;grid-template-columns:auto auto 1fr;justify-items:start}.fp-total span{grid-column:auto}}
 body.hudfino.touch #panel.collapsed .dtog{right:12px;top:5px}
 </style></head><body>
 
@@ -1335,7 +1377,7 @@ body.hudfino.touch #panel.collapsed .dtog{right:12px;top:5px}
 
 <script>/* 5.0c: idioma antes da primeira pintura — fora do pt-BR, carrega aqui o dicionário do idioma (src/i18n/en.js ou es.js, 33 KB com gzip, enquanto o resto da página chega) e esconde o texto da tela inicial até o src/i18n.js (no fim da página) traduzir; a mesma regra de escolha do i18n.js.
    5.0h.1: a escolha guardada manda antes do ?lang=; navigator.languages na ordem (o primeiro pt/en/es vale; nenhum → en); <html lang> e o manifesto do app já no idioma aqui */
-(function () { try { var re = /^(pt|en|es)/, q = (new URLSearchParams(location.search).get('lang') || '').toLowerCase(), s = ''; try { s = (localStorage.getItem('ard-idioma') || '').toLowerCase(); } catch (e) {} var l = re.test(s) ? s : re.test(q) ? q : ''; if (!l) { var ls = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']; for (var i = 0; i < ls.length && !l; i++) if (re.test(String(ls[i] || '').toLowerCase())) l = String(ls[i]).toLowerCase(); } if (!/^pt/.test(l)) { var k = /^es/.test(l) ? 'es' : 'en', de = document.documentElement; de.lang = k === 'es' ? 'es-419' : 'en'; de.classList.add('i18n-espera'); var mf = document.querySelector('link[rel=manifest]'); if (mf) mf.setAttribute('href', 'manifest.' + k + '.webmanifest'); document.write('<script src="src/i18n/' + k + '.js?v=' + '2026-11-15 21:41Z'.replace(/[^0-9TZ]/g, '') + '"><\/script>'); } } catch (e) {} })();</script>
+(function () { try { var re = /^(pt|en|es)/, q = (new URLSearchParams(location.search).get('lang') || '').toLowerCase(), s = ''; try { s = (localStorage.getItem('ard-idioma') || '').toLowerCase(); } catch (e) {} var l = re.test(s) ? s : re.test(q) ? q : ''; if (!l) { var ls = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']; for (var i = 0; i < ls.length && !l; i++) if (re.test(String(ls[i] || '').toLowerCase())) l = String(ls[i]).toLowerCase(); } if (!/^pt/.test(l)) { var k = /^es/.test(l) ? 'es' : 'en', de = document.documentElement; de.lang = k === 'es' ? 'es-419' : 'en'; de.classList.add('i18n-espera'); var mf = document.querySelector('link[rel=manifest]'); if (mf) mf.setAttribute('href', 'manifest.' + k + '.webmanifest'); document.write('<script src="src/i18n/' + k + '.js?v=' + '2026-11-16 00:28Z'.replace(/[^0-9TZ]/g, '') + '"><\/script>'); } } catch (e) {} })();</script>
 <div id="start" class="screen">
   <canvas id="bgfx" aria-hidden="true"></canvas>
   <!-- 5.0a.1: pôster da Sala de Comando (um render da própria Sala por Raça e por tela, em assets/sala-*.webp): entra na hora, antes da cena 3D -->
@@ -1349,7 +1391,7 @@ body.hudfino.touch #panel.collapsed .dtog{right:12px;top:5px}
   <div class="start-wrap">
     <header class="st-head">
       <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div class="brand-txt"><h1 data-i18n="inicio.aether-rift-dominion">Aether Rift<span>Dominion</span></h1><p class="tagline" data-i18n="inicio.nada-aqui-seu-ainda">Nada aqui é seu. Ainda.</p></div></div>
-      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.5b · build 2026-11-15 21:41Z · Portas Abertas · Mundo vivo · multiplayer 2 a 4</div>
+      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.5b.2 · build 2026-11-16 00:28Z · Portas Abertas · Mundo vivo · multiplayer 2 a 4</div>
       <div class="opt st-lang" data-idioma-sel="idioma-inicio"></div><!-- 5.0c: seletor de idioma, legível em qualquer idioma -->
     </header>
     <div class="start-grid">
@@ -1416,8 +1458,9 @@ body.hudfino.touch #panel.collapsed .dtog{right:12px;top:5px}
       </div>
       <div class="notes">
       <div class="choose" data-i18n="notas.notas-versao">Notas da versão</div>
+      <p class="start-notes" data-i18n="notas.5-5b-2"><b>5.5b.2 — Patentes:</b> agora tudo o que você joga rende <b>Centelhas</b>: partidas, vitórias, o Desafio do Dia, missões, medalhas e conquistas. Elas sobem a sua <b>patente</b>, de Recruta a Soberano da Fenda: são 10 patentes com 5 níveis cada, e uma insígnia que aparece ao lado do seu nome. As duas primeiras partidas do dia rendem em dobro. Cada Raça tem a sua <b>afinidade</b>, que libera títulos e cores. A <b>sequência</b> do Desafio do Dia ganhou marcos em 3, 7, 14 e 30 dias e um <b>escudo</b> por semana, que salva um dia perdido. Ao subir de patente, a tela final oferece o <b>cartão de promoção</b> para compartilhar. O <b>Perfil</b>, ao lado do nome na tela inicial, mostra tudo isso e o <b>código de comandante</b>, para levar a sua patente a outro aparelho. Nada disso muda o resultado de uma partida, e tudo fica só no seu aparelho.</p>
+      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.5b → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-5b"><b>5.5b — Compartilhar:</b> chegou o <b>Desafio do Dia</b>: uma partida curta por dia, igual para todo mundo, com recorde e sequência de dias guardados no aparelho. Você também pode <b>montar um desafio</b> e mandar por link, ou desafiar um amigo a repetir a partida que acabou de jogar. Os <b>cartões</b> de resultado e de conquista saem em dois tamanhos, deitado e em pé. O <b>painel da partida ficou fino</b>: ele ocupa bem menos tela e cresce só quando há o que mostrar (em Ajustes, "Painel completo na partida" volta ao de antes). Nas cinco primeiras partidas o jogo apresenta <b>uma novidade por vez</b>. Os itens do Hangar com cadeado agora são <b>liberados pelas conquistas</b>. No celular, tocar numa construção não seleciona mais o Coletor que passa perto. Em Ajustes, "O que este jogo conta" mostra as contagens de uso guardadas só no seu aparelho; nada é enviado.</p>
-      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.5a → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-5a"><b>5.5a — Porta de entrada:</b> quem chega agora tem uma <b>primeira partida guiada</b>, com um objetivo por vez e o painel aparecendo aos poucos. Chegou o modo <b>Blitz</b>: 1 contra 1, bases mais perto e relógio de 10 minutos. A <b>tela final</b> é nova, com o gráfico da virada e o botão Compartilhar, que gera um cartão com o resultado. A sala multiplayer ganhou um <b>link de convite</b> que já entra na sala. O mundo recebeu a <b>Luz da Fenda</b>: sol baixo e quente, sombras longas. Cada unidade tem um arco fino na cor do dono, o inimigo se reconhece também pela forma, o chão em volta da base ganha a cor da sua Raça e a promoção aparece como estrela na barra de vida. <b>Balanceamento:</b> Soldador com dano 16 (era 20), Cria e Cuspidor mais caros, Quimera com mais vida e o Atirador de Fenda da Erevane liberado na Era I. O Hangar lista os <b>cosméticos</b> e como ganhar cada um; nada está à venda. No Motor 5 o jogo envia metade dos dados por quadro à placa de vídeo.</p>
       <p class="start-notes" data-i18n="notas.5-0h-5"><b>5.0h.5 — Chefões 3.0:</b> os três chefões deixaram de ser máquinas e viraram criaturas da Fenda, com nomes novos. O Arauto agora é <b>A Medusa da Fenda</b>, a Forja-Mãe é <b>O Titã-Fornalha</b> e a Sentinela da Fenda é <b>A Sentinela Devoradora</b>, que ficou bem maior na tela. Antes de cada golpe o corpo avisa: o Titã escancara a mandíbula, a Devoradora abre as presas e a Medusa contrai o sino. Na Linha de montagem o dorso do Titã se abre e os pontos fracos âmbar aparecem. Os pilares, os Ecos e os lacaios da Fenda ganharam o visual da mesma família. As regras das lutas, a vida e o dano dos chefões não mudaram.</p>
       <p class="start-notes" data-i18n="notas.5-0h-4"><b>5.0h.4 — Desempenho no Motor 5:</b> a travada da primeira vez que um lago aparecia na tela acabou. Tudo o que o reflexo dos lagos precisa agora é preparado no carregamento, e no nosso teste nada mais é criado na placa de vídeo no meio da partida. Os retratos das unidades no painel do exército são gerados um por vez, e o jogo cria um pouco menos de lixo de memória por quadro. O Teste de desempenho agora mostra, em cada travada, quanto tempo foi para sombras, reflexo dos lagos, cena e efeitos. A imagem e a simulação continuam as mesmas.</p>
@@ -2112,7 +2155,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aqui é seu. Ainda.",
-  "inicio.versao": "Versão 5.5b · build 2026-11-15 21:41Z · Portas Abertas · Mundo vivo · multiplayer 2 a 4",
+  "inicio.versao": "Versão 5.5b.2 · build 2026-11-16 00:28Z · Portas Abertas · Mundo vivo · multiplayer 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Escolha sua Raça",
   "inicio.vitrine.explorar-base": "Explorar a base",
   "inicio.vitrine.som-tela-inicial": "Som da tela inicial",
@@ -2181,6 +2224,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.btn-bench": "Testar desempenho (30 s)",
   "ajustes.cfg-feedback": "Enviar feedback",
   "notas.notas-versao": "Notas da versão",
+  "notas.5-5b-2": "<b>5.5b.2 — Patentes:</b> agora tudo o que você joga rende <b>Centelhas</b>: partidas, vitórias, o Desafio do Dia, missões, medalhas e conquistas. Elas sobem a sua <b>patente</b>, de Recruta a Soberano da Fenda: são 10 patentes com 5 níveis cada, e uma insígnia que aparece ao lado do seu nome. As duas primeiras partidas do dia rendem em dobro. Cada Raça tem a sua <b>afinidade</b>, que libera títulos e cores. A <b>sequência</b> do Desafio do Dia ganhou marcos em 3, 7, 14 e 30 dias e um <b>escudo</b> por semana, que salva um dia perdido. Ao subir de patente, a tela final oferece o <b>cartão de promoção</b> para compartilhar. O <b>Perfil</b>, ao lado do nome na tela inicial, mostra tudo isso e o <b>código de comandante</b>, para levar a sua patente a outro aparelho. Nada disso muda o resultado de uma partida, e tudo fica só no seu aparelho.",
   "notas.5-5b": "<b>5.5b — Compartilhar:</b> chegou o <b>Desafio do Dia</b>: uma partida curta por dia, igual para todo mundo, com recorde e sequência de dias guardados no aparelho. Você também pode <b>montar um desafio</b> e mandar por link, ou desafiar um amigo a repetir a partida que acabou de jogar. Os <b>cartões</b> de resultado e de conquista saem em dois tamanhos, deitado e em pé. O <b>painel da partida ficou fino</b>: ele ocupa bem menos tela e cresce só quando há o que mostrar (em Ajustes, \"Painel completo na partida\" volta ao de antes). Nas cinco primeiras partidas o jogo apresenta <b>uma novidade por vez</b>. Os itens do Hangar com cadeado agora são <b>liberados pelas conquistas</b>. No celular, tocar numa construção não seleciona mais o Coletor que passa perto. Em Ajustes, \"O que este jogo conta\" mostra as contagens de uso guardadas só no seu aparelho; nada é enviado.",
   "notas.5-5a": "<b>5.5a — Porta de entrada:</b> quem chega agora tem uma <b>primeira partida guiada</b>, com um objetivo por vez e o painel aparecendo aos poucos. Chegou o modo <b>Blitz</b>: 1 contra 1, bases mais perto e relógio de 10 minutos. A <b>tela final</b> é nova, com o gráfico da virada e o botão Compartilhar, que gera um cartão com o resultado. A sala multiplayer ganhou um <b>link de convite</b> que já entra na sala. O mundo recebeu a <b>Luz da Fenda</b>: sol baixo e quente, sombras longas. Cada unidade tem um arco fino na cor do dono, o inimigo se reconhece também pela forma, o chão em volta da base ganha a cor da sua Raça e a promoção aparece como estrela na barra de vida. <b>Balanceamento:</b> Soldador com dano 16 (era 20), Cria e Cuspidor mais caros, Quimera com mais vida e o Atirador de Fenda da Erevane liberado na Era I. O Hangar lista os <b>cosméticos</b> e como ganhar cada um; nada está à venda. No Motor 5 o jogo envia metade dos dados por quadro à placa de vídeo.",
   "notas.5-0h-5": "<b>5.0h.5 — Chefões 3.0:</b> os três chefões deixaram de ser máquinas e viraram criaturas da Fenda, com nomes novos. O Arauto agora é <b>A Medusa da Fenda</b>, a Forja-Mãe é <b>O Titã-Fornalha</b> e a Sentinela da Fenda é <b>A Sentinela Devoradora</b>, que ficou bem maior na tela. Antes de cada golpe o corpo avisa: o Titã escancara a mandíbula, a Devoradora abre as presas e a Medusa contrai o sino. Na Linha de montagem o dorso do Titã se abre e os pontos fracos âmbar aparecem. Os pilares, os Ecos e os lacaios da Fenda ganharam o visual da mesma família. As regras das lutas, a vida e o dano dos chefões não mudaram.",
@@ -2201,7 +2245,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "notas.5-0c": "<b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 mais leve, faróis e som no iPhone:</b> com o <b>Motor 5</b> ligado, os shaders que ele prepara na carga encolheram um terço (os lagos primeiro) e cada quadro manda muito menos dados para a placa de vídeo, o que alivia a CPU no Firefox e no celular. O brilho em volta das luzes agora é o mesmo do motor clássico, e no Modo Foto da qualidade Baixa os efeitos seguem a exposição como no clássico. À noite e dentro da Tempestade de Éter, os faróis dos veículos, coletores e piratas iluminam o chão à frente, nos dois motores. A Sala de Comando ficou um pouco mais clara, sem o clarão de antes. No iPhone, o som e a voz destravam no primeiro toque, tocam com a chave de silêncio ligada e voltam depois de uma ligação. Cada líder fala com uma voz do seu gênero em todo navegador. Em Ajustes, <b>Testar som</b> toca três notas e uma frase e mostra o estado do áudio do aparelho.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, em teste:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o jogo inteiro agora roda em WebGPU, com volta sozinha para WebGL2: unidades e construções com o detalhe de superfície e a animação de cada peça, ruínas, obras, o holograma da Erevane, os escudos do Uníssono e as bandeiras; o chão com todos os biomas, a vegetação ao vento, as estradas e o céu; explosões, fogo, fumaça e tiros; os lagos de plasma e de gelo com reflexo, o espaço do Cinturão e a Tempestade de Éter; e o <b>Modo Foto</b> (📷 ou tecla J) com desfoque, os 8 filtros e captura em 4K. Na primeira vez que o Modo Foto abre numa partida, ele leva alguns segundos para se preparar. Com tudo isso, a carga do Motor 5 ficou alguns segundos mais longa: a próxima versão mede nos aparelhos e enxuga. O motor clássico continua o padrão e não mudou.",
-  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.5a → 2.0)",
+  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.5b → 2.0)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Termos de Uso",
   "inicio.rodape.foot-priv": "Privacidade",
@@ -4260,6 +4304,145 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "medir.modo.multi": "Multiplayer", /* 5.5b */
   "medir.modo.desafio": "Desafio do Dia", /* 5.5b */
   "cosm.fim.novo": "Novo no Hangar: {itens}", /* 5.5b */
+  "patente.moeda.nome": "Centelhas", /* 5.5b.2 patentes */
+  "patente.moeda.um": "Centelha", /* 5.5b.2 patentes */
+  "patente.recruta.nome": "Recruta", /* 5.5b.2 patentes */
+  "patente.batedor.nome": "Batedor", /* 5.5b.2 patentes */
+  "patente.vanguarda.nome": "Vanguarda", /* 5.5b.2 patentes */
+  "patente.capitao.nome": "Capitão de Fenda", /* 5.5b.2 patentes */
+  "patente.comandante.nome": "Comandante", /* 5.5b.2 patentes */
+  "patente.estrategista.nome": "Estrategista", /* 5.5b.2 patentes */
+  "patente.almirante.nome": "Almirante", /* 5.5b.2 patentes */
+  "patente.marechal.nome": "Marechal do Alinhamento", /* 5.5b.2 patentes */
+  "patente.guardiao.nome": "Guardião da Fenda", /* 5.5b.2 patentes */
+  "patente.soberano.nome": "Soberano da Fenda", /* 5.5b.2 patentes */
+  "patente.nivel": "{patente} {n}", /* 5.5b.2 patentes */
+  "patente.historico": "Seu histórico valeu {n} {moeda}.", /* 5.5b.2 patentes */
+  "patente.motivo.partida.escaramuca": "Escaramuça terminada", /* 5.5b.2 patentes */
+  "patente.motivo.partida.blitz": "Blitz terminado", /* 5.5b.2 patentes */
+  "patente.motivo.partida.cacada": "Caçada terminada", /* 5.5b.2 patentes */
+  "patente.motivo.partida.campanha": "Missão terminada", /* 5.5b.2 patentes */
+  "patente.motivo.partida.multi": "Partida multiplayer terminada", /* 5.5b.2 patentes */
+  "patente.motivo.partida.guia": "Primeira partida terminada", /* 5.5b.2 patentes */
+  "patente.motivo.vitoria": "Vitória", /* 5.5b.2 patentes */
+  "patente.motivo.dificuldade": "Dificuldade {dif}", /* 5.5b.2 patentes */
+  "patente.motivo.descanso": "Primeiras partidas do dia: em dobro", /* 5.5b.2 patentes */
+  "patente.motivo.retorno": "Primeira partida da semana", /* 5.5b.2 patentes */
+  "patente.motivo.repeticao": "Muitas partidas hoje (esta foi a de número {n}): rende menos", /* 5.5b.2 patentes */
+  "patente.motivo.desafio": "Desafio do Dia jogado", /* 5.5b.2 patentes */
+  "patente.motivo.desafio-vitoria": "Desafio do Dia vencido", /* 5.5b.2 patentes */
+  "patente.motivo.desafio-recorde": "Recorde do dia batido", /* 5.5b.2 patentes */
+  "patente.motivo.missao": "Missão vencida pela primeira vez: {nome}", /* 5.5b.2 patentes */
+  "patente.motivo.estrelas": "Estrelas novas em {nome}: {n}", /* 5.5b.2 patentes */
+  "patente.motivo.medalha": "Medalha de Caçada: {nome}", /* 5.5b.2 patentes */
+  "patente.motivo.conquista": "Conquista: {nome}", /* 5.5b.2 patentes */
+  "patente.motivo.degrau": "Novidade descoberta ({n} de 5)", /* 5.5b.2 patentes */
+  "patente.motivo.marco": "Marco de sequência: {n} dias", /* 5.5b.2 patentes */
+  "patente.motivo.marco-ciclo": "Sequência de {n} dias", /* 5.5b.2 patentes */
+  "patente.sem-ganho.curta": "Partida curta demais (menos de 3 minutos): não rendeu {moeda}.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.teste": "Partida de teste: não rende {moeda}.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.replay": "Replay: não rende {moeda}.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.guiada-repetida": "A primeira partida guiada rende {moeda} uma vez só.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.retomada-repetida": "Esta partida salva já rendeu {moeda} antes.", /* 5.5b.2 patentes */
+  "patente.codigo.confirma": "Restaurar este código de comandante? Este aparelho passa a {patente}, com {n} {moeda}.", /* 5.5b.2 patentes */
+  "patente.codigo.rebaixa": "Atenção: o código traz menos do que este aparelho já tem. Aqui: {aqui}, {n} {moeda}. No código: {la}, {m}. Restaurar mesmo assim e ficar com o que o código traz?", /* 5.5b.2 patentes */
+  "patente.codigo.backup-rebaixa": "Atenção: este backup traz menos do que este aparelho já tem. Aqui: {aqui}, {n} {moeda}. No backup: {la}, {m}. Importar mesmo assim?", /* 5.5b.2 patentes */
+  "patente.codigo.feito": "Código restaurado: {patente}, {n} {moeda}.", /* 5.5b.2 patentes */
+  "patente.codigo.igual": "Este código é igual ao que já está neste aparelho.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.vazio": "Cole o código de comandante.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.formato": "Isto não parece um código de comandante.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.versao": "Este código foi feito por uma versão mais nova do jogo. Atualize o jogo e tente de novo.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.soma": "O código não confere: falta um pedaço ou há uma letra trocada. Copie de novo, inteiro.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.conteudo": "Este código não pôde ser lido por esta versão do jogo.", /* 5.5b.2 patentes */
+  "cosm.afinidade": "Afinidade {n} com {raca}", /* 5.5b.2 patentes */
+  "cosm.sequencia": "Sequência de {n} dias no Desafio do Dia", /* 5.5b.2 patentes */
+  "cosm.item.tit-seq-3": "Frequentador da Fenda", /* 5.5b.2 patentes */
+  "cosm.item.cor-seq-7": "Brasa de sete dias", /* 5.5b.2 patentes */
+  "cosm.item.tit-seq-14": "Vigia da Fenda", /* 5.5b.2 patentes */
+  "cosm.item.tit-seq-30": "Chama que Não Apaga", /* 5.5b.2 patentes */
+  "cosm.item.mol-seq-30": "Moldura da Chama", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vehnar-2": "Sócio do Consórcio", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-vehnar-3": "Estandarte do Consórcio", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-vehnar-4": "Tom do Consórcio", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vehnar-5": "Mestre da Fundição", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-erevane-2": "Sombra de Erevane", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-erevane-3": "Estandarte de Erevane", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-erevane-4": "Tom de Erevane", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-erevane-5": "Senhor do Blecaute", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-tessara-2": "Broto de Tessara", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-tessara-3": "Estandarte de Tessara", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-tessara-4": "Tom de Tessara", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-tessara-5": "Mão do Molde", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-quorith-2": "Voz do Coro", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-quorith-3": "Estandarte do Coro", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-quorith-4": "Tom do Coro", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-quorith-5": "Regente do Uníssono", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vorag-2": "Cria da Prole", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-vorag-3": "Estandarte da Prole", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-vorag-4": "Tom da Prole", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vorag-5": "Alfa da Prole", /* 5.5b.2 patentes */
+  /* 5.5b.2 — chaves do CONTRATO das patentes (as mesmas do src/patentes.js; na junção fica uma cópia só) */
+  /* 5.5b.2 — insígnias, Perfil, tela final e cartões (src/insignias.js e src/perfil-ui.js) */
+  "patente.falta": { one: "Próximo: {prox} · falta {n}", other: "Próximo: {prox} · faltam {n}" }, /* 5.5b.2 insignias */
+  "patente.falta.estrela": { one: "Próxima estrela: falta {n}", other: "Próxima estrela: faltam {n}" }, /* 5.5b.2 insignias */
+  "patente.fim.titulo": "{@patente.moeda.nome} ganhas", /* 5.5b.2 insignias */
+  "patente.fim.motivos": "De onde vieram", /* 5.5b.2 insignias */
+  "patente.fim.promocao": "Promoção!", /* 5.5b.2 insignias */
+  "patente.fim.agora": "Agora você é {patente}.", /* 5.5b.2 insignias */
+  "patente.fim.nivel": "Novo nível: {patente}", /* 5.5b.2 insignias */
+  "patente.fim.estrela": { one: "{n} estrela depois do topo", other: "{n} estrelas depois do topo" }, /* 5.5b.2 insignias */
+  "patente.fim.afinidade": "Afinidade com {raca}: degrau {n}", /* 5.5b.2 insignias */
+  "patente.fim.cartao": "Cartão de promoção", /* 5.5b.2 insignias */
+  "patente.cartao.titulo": "Cartão de patente", /* 5.5b.2 insignias */
+  "patente.cartao.rotulo": "Promoção", /* 5.5b.2 insignias */
+  "patente.cartao.sou": "Agora sou", /* 5.5b.2 insignias */
+  "patente.cartao.nivel": "Nível {n}", /* 5.5b.2 insignias */
+  "patente.cartao.raca": "Raça favorita: {raca}", /* 5.5b.2 insignias */
+  "patente.cartao.degrau": "degrau da escada", /* 5.5b.2 insignias */
+  "patente.cartao.degrau.v": "{n}/50", /* 5.5b.2 insignias */
+  "patente.cartao.dias": "dias de sequência", /* 5.5b.2 insignias */
+  "patente.cartao.texto": "Agora sou {patente} no Aether Rift: Dominion.", /* 5.5b.2 insignias */
+  "patente.seq.cartao.rotulo": "Desafio do Dia", /* 5.5b.2 insignias */
+  "patente.seq.cartao.titulo": "{n} dias seguidos", /* 5.5b.2 insignias */
+  "patente.seq.cartao.sub": "sem perder um Desafio do Dia", /* 5.5b.2 insignias */
+  "patente.seq.cartao.janela": "Cartão da sequência", /* 5.5b.2 insignias */
+  "patente.seq.cartao.texto": "{n} dias seguidos no Desafio do Dia do Aether Rift: Dominion.", /* 5.5b.2 insignias */
+  "perfil.titulo": "Perfil", /* 5.5b.2 insignias */
+  "perfil.abrir": "Abrir o Perfil — {patente}", /* 5.5b.2 insignias */
+  "perfil.estrelas": { one: "{n} estrela", other: "{n} estrelas" }, /* 5.5b.2 insignias */
+  "perfil.barra": "Caminho até o próximo nível", /* 5.5b.2 insignias */
+  "perfil.cartao": "Cartão da patente", /* 5.5b.2 insignias */
+  "perfil.afin.titulo": "Afinidade com as Raças", /* 5.5b.2 insignias */
+  "perfil.afin.degrau": "degrau {n} de 5", /* 5.5b.2 insignias */
+  "perfil.seq.titulo": "Sequência do Desafio do Dia", /* 5.5b.2 insignias */
+  "perfil.seq.dias": { one: "dia seguido", other: "dias seguidos" }, /* 5.5b.2 insignias */
+  "perfil.seq.escudo.on": "Escudo guardado", /* 5.5b.2 insignias */
+  "perfil.seq.escudo.on-d": "Se você perder um dia, o escudo é gasto sozinho e a sequência continua.", /* 5.5b.2 insignias */
+  "perfil.seq.escudo.off": "Sem escudo agora", /* 5.5b.2 insignias */
+  "perfil.seq.escudo.off-d": "Você ganha um escudo por semana e guarda no máximo um.", /* 5.5b.2 insignias */
+  "perfil.seq.marcos": "Marcos da sequência", /* 5.5b.2 insignias */
+  "perfil.seq.marco.ok": "alcançado", /* 5.5b.2 insignias */
+  "perfil.seq.marco.falta": { one: "falta {n} dia", other: "faltam {n} dias" }, /* 5.5b.2 insignias */
+  "perfil.seq.cartao": "Cartão dos {n} dias", /* 5.5b.2 insignias */
+  "perfil.cod.titulo": "Código de comandante", /* 5.5b.2 insignias */
+  "perfil.cod.texto": "Suas patentes ficam só neste aparelho. Guarde este código para levar tudo a outro aparelho ou para recuperar depois.", /* 5.5b.2 insignias */
+  "perfil.cod.seu": "Seu código", /* 5.5b.2 insignias */
+  "perfil.cod.copiar": "Copiar código", /* 5.5b.2 insignias */
+  "perfil.cod.copiado": "Código copiado.", /* 5.5b.2 insignias */
+  "perfil.cod.restaurar-rot": "Tem um código? Cole aqui", /* 5.5b.2 insignias */
+  "perfil.cod.conferir": "Conferir", /* 5.5b.2 insignias */
+  "perfil.cod.invalido": "Este código não vale: confira se foi copiado inteiro.", /* 5.5b.2 insignias */
+  "perfil.cod.traz": "Este código traz: {patente} · {n} {@patente.moeda.nome}.", /* 5.5b.2 insignias */
+  "perfil.cod.valido": "Código válido.", /* 5.5b.2 insignias */
+  "perfil.cod.aviso": "Restaurar troca as patentes deste aparelho pelas do código.", /* 5.5b.2 insignias */
+  "perfil.cod.restaurar": "Restaurar", /* 5.5b.2 insignias */
+  "perfil.cod.cancelar": "Cancelar", /* 5.5b.2 insignias */
+  "perfil.cod.restaurado": "Pronto: patentes restauradas.", /* 5.5b.2 insignias */
+  "perfil.escada.titulo": "A escada das 50", /* 5.5b.2 insignias */
+  "perfil.escada.conta": "{n} de 50 degraus alcançados", /* 5.5b.2 insignias */
+  "perfil.nota": "Só aparência: nada aqui muda o resultado de uma partida.", /* 5.5b.2 insignias */
+  "perfil.cod.igual": "Este código é igual ao que já está neste aparelho.", /* 5.5b.2 insignias */
+  "perfil.cod.rebaixa": "Atenção: este código traz menos do que este aparelho já tem. Restaurar troca assim mesmo.", /* 5.5b.2 insignias */
 };
 
 /* Aether Rift: Dominion — idiomas (5.0c): português do Brasil (base), inglês e espanhol (neutro latino-americano).
@@ -4296,7 +4479,7 @@ function pronto(l) { const d = DIC[l]; if (!d || PRONTOS.has(d)) return d; PRONT
   const troca = s => s.replace(REF, (m, k) => { const v = acha(k); return v == null ? m : v; });
   for (const k in d) { const v = d[k]; if (typeof v === 'string') { if (v.indexOf('{@') >= 0) d[k] = troca(v); } else if (v && typeof v === 'object') for (const f in v) if (typeof v[f] === 'string' && v[f].indexOf('{@') >= 0) v[f] = troca(v[f]); } return d; }
 function busca(k, l) { const d = pronto(l); return d && Object.prototype.hasOwnProperty.call(d, k) ? d[k] : undefined; }
-const MARCA_BUILD = '__' + 'BUILD__', CARIMBO = '2026-11-15 21:41Z'; /* o en e o es vêm em arquivo à parte, sem a troca do build: o carimbo entra aqui */
+const MARCA_BUILD = '__' + 'BUILD__', CARIMBO = '2026-11-16 00:28Z'; /* o en e o es vêm em arquivo à parte, sem a troca do build: o carimbo entra aqui */
 function preenche(s, vars) { if (s.indexOf(MARCA_BUILD) >= 0) s = s.split(MARCA_BUILD).join(CARIMBO); if (!vars || s.indexOf('{') < 0) return s; return s.replace(/\{(\w+)\}/g, (m, n) => Object.prototype.hasOwnProperty.call(vars, n) ? (typeof vars[n] === 'number' ? num(vars[n]) : String(vars[n])) : m); }
 function t(k, vars, reserva) { const l = ARD.idioma; let v = busca(k, l), ll = l; if (v === undefined) { v = busca(k, 'pt-BR'); ll = 'pt-BR'; } if (v === undefined) { if (reserva != null) return preenche(String(reserva), vars); falta(k); return k; }
   const s = forma(v, vars && vars.n, ll); return preenche(String(s == null ? '' : s), vars); }
@@ -4388,7 +4571,7 @@ function marcaHtml() { try { document.documentElement.lang = LANG_HTML[ARD.idiom
 /* carga dos dicionários: o pt-BR vem embutido no pacote (base e reserva); o en e o es são arquivos à parte (src/i18n/en.js e es.js, com o carimbo
    do build na URL), pedidos só por quem usa o idioma: o script do topo do <body> já carrega o do idioma escolhido antes do jogo; aqui, a troca
    na hora pede o outro. O service worker guarda os dois na instalação, então o jogo troca de idioma também sem internet. */
-const VER = '2026-11-15 21:41Z'.replace(/[^0-9TZ]/g, '');
+const VER = '2026-11-16 00:28Z'.replace(/[^0-9TZ]/g, '');
 const CARGAS = {};
 function carregar(l) { l = normaliza(l) || 'pt-BR'; if (DIC[l]) return Promise.resolve(l); if (CARGAS[l]) return CARGAS[l];
   return (CARGAS[l] = new Promise((ok, falha) => { const sc = document.createElement('script'); sc.src = 'src/i18n/' + l + '.js?v=' + VER; sc.onload = () => { if (DIC[l]) ok(l); else { CARGAS[l] = null; falha(new Error('dicionário vazio')); } }; sc.onerror = () => { CARGAS[l] = null; sc.remove(); falha(new Error('sem rede')); }; document.head.appendChild(sc); })); }
@@ -17150,6 +17333,33 @@ const CATALOGO = [
   { id: 'cor-apoiador', tipo: 'cor-nome', raca: null, ganha: 'apoiador', cor: '#9FE8FF', nome: 'Azul de apoiador' },
   { id: 'ras-padrao', tipo: 'rastro', raca: null, ganha: 'gratis', nome: 'Rastro padrão' },
   { id: 'ras-apoiador', tipo: 'rastro', raca: null, ganha: 'apoiador', pronto: false, nome: 'Rastro do Sifão em espiral' },
+  /* 5.5b.2: só dados (a arte é do src/insignias.js). sequencia: N = marco da sequência do Desafio do Dia; afinidade: N = degrau de afinidade com a Raça do item.
+     A condição mora no src/patentes.js (cumpre). Os itens com pronto: false esperam a arte (moldura e estandartes). */
+  { id: 'tit-seq-3', tipo: 'titulo', raca: null, ganha: 'conquista', sequencia: 3, nome: 'Frequentador da Fenda' },
+  { id: 'cor-seq-7', tipo: 'cor-nome', raca: null, ganha: 'conquista', sequencia: 7, cor: '#FFB066', nome: 'Brasa de sete dias' },
+  { id: 'tit-seq-14', tipo: 'titulo', raca: null, ganha: 'conquista', sequencia: 14, nome: 'Vigia da Fenda' },
+  { id: 'tit-seq-30', tipo: 'titulo', raca: null, ganha: 'conquista', sequencia: 30, nome: 'Chama que Não Apaga' },
+  { id: 'mol-seq-30', tipo: 'moldura', raca: null, ganha: 'conquista', sequencia: 30, pronto: false, nome: 'Moldura da Chama' },
+  { id: 'tit-afin-vehnar-2', tipo: 'titulo', raca: 'vehnar', ganha: 'conquista', afinidade: 2, nome: 'Sócio do Consórcio' },
+  { id: 'est-afin-vehnar-3', tipo: 'estandarte', raca: 'vehnar', ganha: 'conquista', afinidade: 3, pronto: false, nome: 'Estandarte do Consórcio' },
+  { id: 'cor-afin-vehnar-4', tipo: 'cor-nome', raca: 'vehnar', ganha: 'conquista', afinidade: 4, cor: '#FFB088', nome: 'Tom do Consórcio' },
+  { id: 'tit-afin-vehnar-5', tipo: 'titulo', raca: 'vehnar', ganha: 'conquista', afinidade: 5, nome: 'Mestre da Fundição' },
+  { id: 'tit-afin-erevane-2', tipo: 'titulo', raca: 'erevane', ganha: 'conquista', afinidade: 2, nome: 'Sombra de Erevane' },
+  { id: 'est-afin-erevane-3', tipo: 'estandarte', raca: 'erevane', ganha: 'conquista', afinidade: 3, pronto: false, nome: 'Estandarte de Erevane' },
+  { id: 'cor-afin-erevane-4', tipo: 'cor-nome', raca: 'erevane', ganha: 'conquista', afinidade: 4, cor: '#8CFFE6', nome: 'Tom de Erevane' },
+  { id: 'tit-afin-erevane-5', tipo: 'titulo', raca: 'erevane', ganha: 'conquista', afinidade: 5, nome: 'Senhor do Blecaute' },
+  { id: 'tit-afin-tessara-2', tipo: 'titulo', raca: 'tessara', ganha: 'conquista', afinidade: 2, nome: 'Broto de Tessara' },
+  { id: 'est-afin-tessara-3', tipo: 'estandarte', raca: 'tessara', ganha: 'conquista', afinidade: 3, pronto: false, nome: 'Estandarte de Tessara' },
+  { id: 'cor-afin-tessara-4', tipo: 'cor-nome', raca: 'tessara', ganha: 'conquista', afinidade: 4, cor: '#9CF2B8', nome: 'Tom de Tessara' },
+  { id: 'tit-afin-tessara-5', tipo: 'titulo', raca: 'tessara', ganha: 'conquista', afinidade: 5, nome: 'Mão do Molde' },
+  { id: 'tit-afin-quorith-2', tipo: 'titulo', raca: 'quorith', ganha: 'conquista', afinidade: 2, nome: 'Voz do Coro' },
+  { id: 'est-afin-quorith-3', tipo: 'estandarte', raca: 'quorith', ganha: 'conquista', afinidade: 3, pronto: false, nome: 'Estandarte do Coro' },
+  { id: 'cor-afin-quorith-4', tipo: 'cor-nome', raca: 'quorith', ganha: 'conquista', afinidade: 4, cor: '#D2BBFF', nome: 'Tom do Coro' },
+  { id: 'tit-afin-quorith-5', tipo: 'titulo', raca: 'quorith', ganha: 'conquista', afinidade: 5, nome: 'Regente do Uníssono' },
+  { id: 'tit-afin-vorag-2', tipo: 'titulo', raca: 'vorag', ganha: 'conquista', afinidade: 2, nome: 'Cria da Prole' },
+  { id: 'est-afin-vorag-3', tipo: 'estandarte', raca: 'vorag', ganha: 'conquista', afinidade: 3, pronto: false, nome: 'Estandarte da Prole' },
+  { id: 'cor-afin-vorag-4', tipo: 'cor-nome', raca: 'vorag', ganha: 'conquista', afinidade: 4, cor: '#F28C9A', nome: 'Tom da Prole' },
+  { id: 'tit-afin-vorag-5', tipo: 'titulo', raca: 'vorag', ganha: 'conquista', afinidade: 5, nome: 'Alfa da Prole' },
 ];
 const POR_ID = Object.create(null); for (const it of CATALOGO) POR_ID[it.id] = it;
 const PADRAO = Object.create(null); for (const it of CATALOGO) if (it.ganha === 'gratis' && !PADRAO[it.tipo]) PADRAO[it.tipo] = it; /* o primeiro grátis de cada tipo é o padrão */
@@ -17165,6 +17375,7 @@ function tem(id, prog) { const it = porId(id); if (!it || it.pronto === false) r
   return cumpre(it, s); }
 /* 5.5b: a condição do item de conquista vale agora? (a conquista da campanha ou o nível do Comandante) */
 function cumpre(it, s) { if (!it || it.ganha !== 'conquista' || it.pronto === false || !s) return false;
+  if (it.afinidade || it.sequencia) return !!(ARD.patentes && ARD.patentes.cumpre && ARD.patentes.cumpre(it, s)); /* 5.5b.2: afinidade com a Raça e marcos de sequência */
   if (it.conquista) return !!(s.achievements && s.achievements[it.conquista]); if (it.nivel) return ((s.commander && s.commander.level) || 1) >= it.nivel; return false; }
 /* 5.5b: libera de verdade o que a conquista já pagou: grava cada item novo no ProgressStore (cosm: { id: quando }) e devolve a lista dos que
    entraram agora, para o aviso da tela final. Chamado ao abrir o jogo (em silêncio: o que o jogador já tinha não vira aviso) e no fim de cada partida.
@@ -17181,6 +17392,7 @@ function nomeTipo(t) { return T('cosm.tipo.' + t, null, t); }
 /* como se ganha, em texto (nunca um preço) */
 function comoGanha(it) { if (!it) return ''; if (it.pronto === false) return T('cosm.em-producao', null, 'Em produção');
   if (it.ganha === 'gratis') return T('cosm.gratis', null, 'Grátis'); if (it.ganha === 'apoiador') return T('cosm.apoiador', null, 'Edição de Apoiador (ainda não disponível)');
+  if (it.afinidade || it.sequencia) return ARD.patentes ? ARD.patentes.comoGanha(it) : ''; /* 5.5b.2 */
   if (it.nivel) return T('cosm.nivel', { n: it.nivel }, 'Chegue ao nível {n} de Comandante');
   const C = ARD.campaign; return T('cosm.conquista', { nome: C && C.conquista ? C.conquista(it.conquista) : it.conquista }, 'Conquista: {nome}'); }
 /* o que chegou de outro jogador (ou do armazenamento): só ids do catálogo, um por tipo, da Raça certa; o resto cai no padrão */
@@ -29893,7 +30105,8 @@ function create() {
   function broadcast(msg, except) { for (const g of N.guests) if (g.open && (g.ready || !N.started) && g.conn !== except) sendTo(g.conn, msg); }
   const readyGuests = () => N.guests.filter(g => g.ready);
   const cosmDe = c => (ARD.cosmeticos ? ARD.cosmeticos.forma(c) : []); /* 5.5a: os ids de cosmético que cada jogador anuncia (só forma válida; quem recebe confere no próprio catálogo) */
-  N.roster = () => N.role === 'host' ? [{ id: 0, name: N.me.name, faction: N.me.faction, color: N.me.color || null, cosm: cosmDe(N.me.cosm) }].concat(readyGuests().map((g, i) => ({ id: i + 1, name: g.name, faction: g.faction, color: g.color || null, cosm: g.cosm || [] }))) : N.players;
+  const patDe = p => (ARD.insignias ? ARD.insignias.forma(p) : null); /* 5.5b.2: a patente que cada jogador anuncia ([ordem, nível, estrelas], só números na faixa; fora da cfg da partida, como os cosméticos) */
+  N.roster = () => N.role === 'host' ? [{ id: 0, name: N.me.name, faction: N.me.faction, color: N.me.color || null, cosm: cosmDe(N.me.cosm), pat: patDe(N.me.pat) /* 5.5b.2 */ }].concat(readyGuests().map((g, i) => ({ id: i + 1, name: g.name, faction: g.faction, color: g.color || null, cosm: g.cosm || [], pat: g.pat || null /* 5.5b.2 */ }))) : N.players;
   function lobbyMsg() { return { t: 'lobby', players: N.roster(), size: N.size, modo: N.modo || null /* 5.0g: o modo da sala (Escaramuça ou Caçada) */ }; }
   function pushLobby() { const m = lobbyMsg(); broadcast(m); fire('lobby', m); }
   N.relobby = () => { if (N.role === 'host' && !N.started) pushLobby(); }; /* 5.0g: o anfitrião trocou o modo da sala */
@@ -29909,7 +30122,7 @@ function create() {
         if (g.ready) return;
         if (d.v !== PROTO) { sendTo(conn, { t: 'bad-version', v: PROTO, build: N.me.build || '' }); fire('error', { message: 'o convidado ' + String(d.name || '?').slice(0, 18) + ' está com outra versão do jogo; peça para atualizar a página (Ctrl+F5)' }); setTimeout(() => { try { conn.close(); } catch (e) {} }, 500); return; }
         if (full()) { sendTo(conn, { t: 'full' }); return; }
-        g.name = String(d.name || 'Convidado').slice(0, 18); g.faction = String(d.faction || 'vehnar'); g.color = /^#[0-9a-fA-F]{6}$/.test(d.color || '') ? d.color : null; g.cosm = cosmDe(d.cosm); /* 5.5a */ g.ready = true;
+        g.name = String(d.name || 'Convidado').slice(0, 18); g.faction = String(d.faction || 'vehnar'); g.color = /^#[0-9a-fA-F]{6}$/.test(d.color || '') ? d.color : null; g.cosm = cosmDe(d.cosm); /* 5.5a */ g.pat = patDe(d.pat); /* 5.5b.2 */ g.ready = true;
         if (d.build && N.me.build && d.build !== N.me.build) fire('warn', { message: 'build diferente em ' + g.name + ' (' + d.build + ' × ' + N.me.build + '); se algo falhar, Ctrl+F5 nos dois lados' });
         sendTo(conn, { t: 'welcome', size: N.size, v: PROTO, build: N.me.build || '' }); pushLobby();
       }
@@ -29956,7 +30169,7 @@ function create() {
     open();
   };
   N.start = function (cfg) { // só o anfitrião: fixa os ids finais e avisa todos
-    N.me = { name: cfg.players[0].name, faction: cfg.players[0].faction, color: cfg.players[0].color || null, cosm: N.me && N.me.cosm /* 5.5a */ };
+    N.me = { name: cfg.players[0].name, faction: cfg.players[0].faction, color: cfg.players[0].color || null, cosm: N.me && N.me.cosm /* 5.5a */, pat: N.me && N.me.pat /* 5.5b.2 */ };
     const rg = readyGuests(); rg.forEach((g, i) => { g.id = i + 1; });
     N.players = N.roster(); N.started = true;
     for (const g of rg) { N.tokens[g.id] = mkToken(); sendTo(g.conn, { t: 'start', cfg, you: g.id, players: N.players, token: N.tokens[g.id] }); }
@@ -29966,7 +30179,7 @@ function create() {
   function send(msg) { if (N.hostConn && N.state === 'connected') try { N.hostConn.send(msg); } catch (e) {} }
   function bindHost(conn, rejoin) {
     N.hostConn = conn; let parts = null;
-    conn.on('open', () => { N.state = 'connected'; if (rejoin) send({ t: 'rejoin', id: N.id, token: N.token, v: PROTO }); else send({ t: 'hello', name: N.me.name, faction: N.me.faction, color: N.me.color || null, cosm: cosmDe(N.me.cosm) /* 5.5a */, v: PROTO, build: N.me.build || '' }); fire('open', { rejoin: !!rejoin }); });
+    conn.on('open', () => { N.state = 'connected'; if (rejoin) send({ t: 'rejoin', id: N.id, token: N.token, v: PROTO }); else send({ t: 'hello', name: N.me.name, faction: N.me.faction, color: N.me.color || null, cosm: cosmDe(N.me.cosm) /* 5.5a */, pat: patDe(N.me.pat) /* 5.5b.2 */, v: PROTO, build: N.me.build || '' }); fire('open', { rejoin: !!rejoin }); });
     conn.on('data', d => {
       if (!d || typeof d !== 'object' || N.hostConn !== conn) return;
       if (d.t === 'welcome') { if (d.v !== PROTO) { N.state = 'lost'; fire('error', { message: 'versão do jogo diferente da do anfitrião; atualizem a página (Ctrl+F5) nos dois lados' }); try { conn.close(); } catch (e) {} return; } N.size = d.size; if (d.build && N.me.build && d.build !== N.me.build) fire('warn', { message: 'build diferente do anfitrião (' + d.build + ' × ' + N.me.build + '); se algo falhar, Ctrl+F5 nos dois lados' }); }
@@ -33126,7 +33339,9 @@ function mostrar(o) { U = o; const venceu = o.result.outcome === 'victory'; o.ve
   const det = $('fim-det'); if (det) det.open = false;
   o.G.fimCap = 40; /* a foto da cena para o cartão sai nos próximos quadros */
   const v = o.G.view; if (v) { v.reveal = true; o.G.fimGira = true; }
-  if (ARD.desafioUI) try { ARD.desafioUI.fim(o); } catch (e) { console.warn('[ARD] desafio (tela final):', e); } /* 5.5b: linha para colar, recorde do dia, "Desafiar um amigo" e o cartão de conquista */ }
+  if (ARD.desafioUI) try { ARD.desafioUI.fim(o); } catch (e) { console.warn('[ARD] desafio (tela final):', e); } /* 5.5b: linha para colar, recorde do dia, "Desafiar um amigo" e o cartão de conquista */
+  if (ARD.patentes) try { ARD.patentes.credita(o); } catch (e) { console.warn('[ARD] patentes (tela final):', e); } /* 5.5b.2: as Centelhas da partida (src/patentes.js); o resultado fica em o.patentes para a tela mostrar */
+  if (ARD.perfilUI) try { ARD.perfilUI.fim(o); } catch (e) { console.warn('[ARD] patentes (tela final):', e); } /* 5.5b.2: o bloco "Centelhas ganhas" (depois do desafio, para a sequência do dia já estar registrada) */ }
 function pinta(o) { const venceu = o.venceu; const tt = $('end-title'); tt.textContent = o.palavra || T(venceu ? 'fim.vitoria' : 'fim.derrota', null, venceu ? 'VITÓRIA' : 'DERROTA'); tt.className = o.result.outcome;
   if (o.linha) $('end-eyebrow').textContent = o.linha;
   const nm = $('fim-lider-nome'); if (nm) nm.textContent = o.lider && o.lider.nome ? o.lider.nome : '';
@@ -33483,14 +33698,15 @@ function registrar(data, res) { const D = guardado(); const n = diaNum(data); if
   const novo = { venceu: !!res.venceu, tempo: Math.max(0, Math.round(res.tempo || 0)), dominio: Math.max(0, Math.round(res.dominio || 0)), perdas: Math.max(0, Math.round(res.perdas || 0)), medalha: res.medalha || null, raca: RACAS.includes(res.raca) ? res.raca : null };
   const recorde = melhor(novo, antes && antes.rec); const dia = { n: (antes ? antes.n : 0) + 1, rec: recorde ? novo : antes.rec };
   let primeiraDoDia = !antes;
-  if (primeiraDoDia) { const u = D.ultimo ? diaNum(D.ultimo) : NaN; if (u === n - 1) D.seq = (D.seq || 0) + 1; else if (!(u === n)) D.seq = u > n ? D.seq || 1 : 1; if (!(u > n)) D.ultimo = data; D.melhorSeq = Math.max(D.melhorSeq || 0, D.seq); D.jogados = (D.jogados || 0) + 1; }
+  if (primeiraDoDia) { const u = D.ultimo ? diaNum(D.ultimo) : NaN; if (u === n - 1) D.seq = (D.seq || 0) + 1; else if (!(u === n)) D.seq = u > n ? D.seq || 1 : 1; if (!(u > n)) D.ultimo = data; D.melhorSeq = Math.max(D.melhorSeq || 0, D.seq); D.jogados = (D.jogados || 0) + 1;
+    if (ARD.patentes && ARD.patentes.seqJoga) { const q = ARD.patentes.seqJoga(data); if (q) { D.seq = q.dias; D.melhorSeq = Math.max(D.melhorSeq || 0, D.seq); } } /* 5.5b.2: a sequência segue a regra do escudo (src/patentes.js) */ }
   if (novo.venceu && !(antes && antes.rec && antes.rec.venceu)) D.vitorias = (D.vitorias || 0) + 1;
   D.dias[data] = dia; const ch = Object.keys(D.dias).sort(); while (ch.length > 60) delete D.dias[ch.shift()]; /* guarda os últimos 60 dias jogados */
   try { ARD.progress.save(); } catch (e) {}
   return { recorde, primeiraDoDia, rec: dia.rec, jogadasHoje: dia.n, seq: D.seq, melhorSeq: D.melhorSeq }; }
 /* o que a tela mostra: o recorde do dia, quantas vezes jogou hoje e a sequência (zera se pulou um dia) */
 function estado(data) { const D = guardado(); const n = diaNum(data); if (!D) return { rec: null, jogadasHoje: 0, seq: 0, melhorSeq: 0, jogouHoje: false, jogados: 0, vitorias: 0 }; const dia = D.dias[data] || null; const u = D.ultimo ? diaNum(D.ultimo) : NaN;
-  return { rec: dia ? dia.rec : null, jogadasHoje: dia ? dia.n : 0, jogouHoje: !!dia, seq: u === n || u === n - 1 ? D.seq || 0 : 0, melhorSeq: D.melhorSeq || 0, jogados: D.jogados || 0, vitorias: D.vitorias || 0 }; }
+  return { rec: dia ? dia.rec : null, jogadasHoje: dia ? dia.n : 0, jogouHoje: !!dia, seq: ARD.patentes && ARD.patentes.seqViva ? ARD.patentes.seqViva(data) /* 5.5b.2: com escudo, um dia perdido não zera */ : u === n || u === n - 1 ? D.seq || 0 : 0, melhorSeq: D.melhorSeq || 0, jogados: D.jogados || 0, vitorias: D.vitorias || 0 }; }
 
 ARD.desafio = { FORMATO, RACAS, MODOS, MAPAS, DIFS, CHEFES, MUTS, MUNDO, ARENA, ALFA, LINK_NA_LINHA, BLITZ_MIN,
   dataValida, diaNum, dataDe, dataUTC, faltaMs, diaSemana, receitaDoDia, justa, normaliza, iguais, codigo, bonito, limpa, ler, jogadores, cfgJogo, simCfg, deSim, melhor, registrar, estado };
@@ -33648,7 +33864,8 @@ function abrirConquista(id) { const q0 = dadosConquista(id); if (!q0) return Pro
   return abrir({ titulo: T('cartao.conq.titulo'), desenha: fmt => conquista(dadosConquista(id) || q0, fmt), nome: fmt => 'aether-rift-dominion-conquista-' + id + '-' + FORMATOS[fmt].w + 'x' + FORMATOS[fmt].h + '.png', texto: () => { const q = dadosConquista(id) || q0; return T('cartao.conq.texto', { nome: q.nome }); } }); }
 function abrirResultado(o) { return abrir({ desenha: fmt => resultado(o, fmt), nome: fmt => 'aether-rift-dominion-' + (o.venceu ? 'vitoria' : 'derrota') + '-' + FORMATOS[fmt].w + 'x' + FORMATOS[fmt].h + '.png', texto: () => (typeof o.textoLinha === 'function' ? o.textoLinha() : o.textoLinha) || T('fim.cartao.texto', { m: String(ARD.fim.manchete(o)) }) }); }
 
-ARD.cartoes = { FORMATOS, resultado, conquista, abrir, abrirResultado, abrirConquista, dadosConquista, get aberto() { return ABERTO; } };
+ARD.cartoes = { FORMATOS, resultado, conquista, abrir, abrirResultado, abrirConquista, dadosConquista, get aberto() { return ABERTO; },
+  motor: { tela, fontes, imagem, texto, quebra, duasLinhas, cobre, fundoMarca, marca, retrato, GRAD, FD, FB, FM, CLARO, SUAVE } /* 5.5b.2: o motor de desenho (texto medido), para os cartões de promoção e de sequência do src/insignias.js */ };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Aether Rift: Dominion — 5.5b: a interface do Desafio do Dia e do código de desafio por link (a regra mora no src/desafio.js).
@@ -33732,7 +33949,7 @@ function joga(r, raca, diario) { if (!DEPS || (DEPS.ocupado && DEPS.ocupado())) 
 function botoesComuns(box) { box.querySelectorAll('[data-raca]').forEach(b => b.addEventListener('click', () => { V.raca = b.dataset.raca; pinta(); const n = box.querySelector('[data-raca="' + V.raca + '"]'); if (n) n.focus(); }));
   box.querySelectorAll('[data-dd-vista]').forEach(b => b.addEventListener('click', () => { const v = b.dataset.ddVista; if (v === 'fechar') fecha(); else abre(v, { volta: V && V.volta }); })); }
 function pinta() { const el = $('desafio'); if (!el || !V) return; const box = el.querySelector('.box'); const foco = document.activeElement && el.contains(document.activeElement) ? document.activeElement.id : '';
-  const f = { hoje: vistaHoje, montar: vistaMontar, recebido: vistaRecebido, erro: vistaErro, desafiar: vistaDesafiar }[V.vista]; if (f) f(box); el.dataset.vista = V.vista; if (foco && $(foco)) try { $(foco).focus(); } catch (e) {} }
+  const f = { hoje: vistaHoje, montar: vistaMontar, recebido: vistaRecebido, erro: vistaErro, desafiar: vistaDesafiar }[V.vista]; if (f) f(box); el.dataset.vista = V.vista; if (V.vista === 'hoje' && ARD.perfilUI) try { ARD.perfilUI.desafio(box); } catch (e) {} /* 5.5b.2: o escudo e os marcos da sequência */ if (foco && $(foco)) try { $(foco).focus(); } catch (e) {} }
 
 function vistaHoje(box) { const data = hoje(); const r = D().receitaDoDia(data); const st = D().estado(data); if (!V.raca) V.raca = racaInicial(r);
   box.innerHTML = '<div class="eyebrow">' + esc(T('desafio.hoje.eyebrow', { data: dataTxt(data) })) + '</div><h2 id="dd-h">' + esc(titulo(r)) + '</h2><p class="dd-p">' + esc(T('desafio.hoje.texto', { hora: horaVirada() })) + '</p>' + resumoHtml(r) +
@@ -33861,6 +34078,372 @@ function pintaFim() { const F = FIM; const el = $('fim-desafio'); if (!F || !el)
 if (typeof window !== 'undefined') window.addEventListener('ard-idioma', () => { try { if ($('dd-entrada') && !document.body.classList.contains('ingame')) entrada(); if (V && $('desafio') && !$('desafio').hidden) pinta(); if (FIM && $('end') && !$('end').hidden) pintaFim(); const l = $('camp-ach'); if (l) [...l.children].forEach(d => { delete d.dataset.ddConq; }); } catch (e) {} });
 
 ARD.desafioUI = { inicio, fim, abre, fecha, recebe, titulo, itens, curto, curtos, linha, dataTxt, get vista() { return V; }, get ultimoFim() { return FIM; } };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Aether Rift: Dominion — 5.5b.2: o logo das Centelhas, as insígnias das 10 patentes e os cartões de promoção e de sequência.
+   Tudo é desenhado aqui mesmo (canvas 2D, só contas e traços): nenhuma imagem, fonte ou biblioteca nova, nada baixado.
+   - LOGO: qual das três propostas do logo das Centelhas o jogo usa ('fenda', 'orbita' ou 'leque'). Trocar a constante troca o jogo inteiro.
+   - insignia(): uma família só, que cresce da Recruta ao Soberano da Fenda (forma, metal e brilho mudam a cada patente);
+     os cinco níveis são as cinco marcas da base da insígnia (acesas = níveis alcançados); depois do topo, uma estrela no lugar da marca do meio.
+   - Os cartões usam o mesmo motor do src/cartoes.js (ARD.cartoes.motor: texto medido, que encolhe até caber e anota a medida).
+   Só aparência: este arquivo não conhece a simulação nem as regras das patentes (essas moram no src/patentes.js, do contrato ARD.patentes). */
+(function (ARD) {
+'use strict';
+const LOGO = 'gema'; /* 5.5b.2: a proposta em uso. Primeira rodada (traço simples): 'fenda', 'orbita', 'leque'. Segunda rodada (emblemas ilustrados): 'gema', 'moeda', 'orbe'. Todas continuam desenháveis, para a prancha e para a troca */
+const LOGOS = ['fenda', 'orbita', 'leque', 'gema', 'moeda', 'orbe'];
+const BRILHO = true; /* 5.5b.2: o brilho que passa pelo logo quando as Centelhas são ganhas na tela final (uma vez, 1 s); false desliga. "Reduzir movimento" desliga sozinho */
+let ATUAL = LOGO; function usa(v) { if (LOGOS.includes(v)) ATUAL = v; return ATUAL; } /* troca em tempo de execução, só para pranchas e testes */
+const GRAD = ['#FF5E3A', '#E94FA0', '#C13CF5']; /* laranja → magenta → violeta: as cores da marca */
+const TAU = Math.PI * 2;
+const T = (k, v, r) => (ARD.t ? ARD.t(k, v, r) : String(r != null ? r : k));
+const ROMANO = ['', 'I', 'II', 'III', 'IV', 'V'];
+const IDS = ['recruta', 'batedor', 'vanguarda', 'capitao', 'comandante', 'estrategista', 'almirante', 'marechal', 'guardiao', 'soberano']; /* a ordem do contrato (ARD.patentes.PATENTES); usada só quando o contrato ainda não está carregado */
+const lim = (v, a, b) => Math.max(a, Math.min(b, v));
+
+/* ---------- formas ---------- */
+function lente(x, cx, cy, h, w) { x.beginPath(); x.moveTo(cx, cy - h); x.quadraticCurveTo(cx + w, cy, cx, cy + h); x.quadraticCurveTo(cx - w, cy, cx, cy - h); x.closePath(); } /* o rasgo da Fenda: uma lente em pé */
+function poli(x, ps) { x.beginPath(); for (let i = 0; i < ps.length; i += 2) { if (i) x.lineTo(ps[i], ps[i + 1]); else x.moveTo(ps[i], ps[i + 1]); } x.closePath(); }
+function losango(x, cx, cy, rx, ry) { poli(x, [cx, cy - ry, cx + rx, cy, cx, cy + ry, cx - rx, cy]); }
+function estrela(x, cx, cy, r, pontas, dentro) { x.beginPath(); for (let i = 0; i < pontas * 2; i++) { const a = -Math.PI / 2 + i * Math.PI / pontas, rr = i % 2 ? r * dentro : r; const px = cx + Math.cos(a) * rr, py = cy + Math.sin(a) * rr; if (i) x.lineTo(px, py); else x.moveTo(px, py); } x.closePath(); }
+function marcaGrad(x, x0, y0, x1, y1) { const g = x.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, GRAD[0]); g.addColorStop(0.55, GRAD[1]); g.addColorStop(1, GRAD[2]); return g; }
+
+/* ---------- 5.5b.2 (segunda rodada): três emblemas ilustrados — D Gema, E Moeda, F Orbe ----------
+   Cada um tem a versão RICA (acima de 26 px: camadas, chanfro, luz e sombra, brilho) e a SIMPLES derivada dela (16 e 24 px ao lado dos números).
+   Todos desenham em volta de (0, 0), numa caixa de lado s. */
+const RICO = 26; const ESCURO = '#2A0B3E';
+function halo(x, s, f) { const g = x.createRadialGradient(0, 0, s * 0.08, 0, 0, s * 0.5); g.addColorStop(0, 'rgba(233,79,160,' + (0.42 * f).toFixed(2) + ')'); g.addColorStop(0.6, 'rgba(193,60,245,' + (0.16 * f).toFixed(2) + ')'); g.addColorStop(1, 'rgba(193,60,245,0)'); x.fillStyle = g; x.fillRect(-s / 2, -s / 2, s, s); }
+function cintila(x, cx, cy, r) { x.beginPath(); for (let i = 0; i < 8; i++) { const a = -Math.PI / 2 + i * Math.PI / 4, rr = i % 2 ? r * 0.22 : r; const px = cx + Math.cos(a) * rr, py = cy + Math.sin(a) * rr; if (i) x.lineTo(px, py); else x.moveTo(px, py); } x.closePath(); x.fillStyle = '#FFFFFF'; x.fill(); }
+function rasgoLuz(x, cy, h, w, s, brilho) { if (brilho) { x.save(); x.shadowColor = 'rgba(255,220,170,.95)'; x.shadowBlur = s * 0.07; } lente(x, 0, cy, h, w); x.fillStyle = '#FFF6E2'; x.fill(); if (brilho) x.restore(); }
+/* D — Gema da Fenda: uma lasca de cristal facetada, com mesa, chanfros claros e escuros e o rasgo aceso por dentro */
+function gema(x, s) { const O = [0.03, -0.47, 0.28, -0.2, 0.23, 0.21, -0.05, 0.47, -0.28, 0.17, -0.22, -0.23].map(v => v * s); const rico = s > RICO; const k = 0.52; const Tm = O.map(v => v * k);
+  x.rotate(0.14); const corpo = () => { const g = x.createLinearGradient(0, -s * 0.47, 0, s * 0.47); g.addColorStop(0, '#C13CF5'); g.addColorStop(0.5, '#E94FA0'); g.addColorStop(1, '#FF5E3A'); return g; };
+  if (!rico) { x.rotate(-0.04); x.scale(1.22, 1.06); /* no tamanho pequeno a lasca fica mais larga e mais em pé, para não virar um risco */ poli(x, O); x.fillStyle = corpo(); x.fill(); poli(x, [O[0], O[1], O[2], O[3], O[4], O[5], O[6], O[7], 0, 0]); x.fillStyle = 'rgba(42,11,62,.34)'; x.fill(); /* metade direita na sombra: é o que dá o volume no tamanho pequeno */
+    lente(x, 0, 0, s * 0.27, s * 0.2); x.fillStyle = '#FFF6E2'; x.fill(); return; }
+  if (s >= 44) { x.save(); x.rotate(-0.14); halo(x, s, 1); x.restore(); }
+  poli(x, O); x.fillStyle = corpo(); x.fill();
+  const luz = [0.1, -0.34, -0.42, -0.18, 0.2, 0.46]; /* um tom por chanfro, com a luz vindo de cima à esquerda: positivo clareia, negativo escurece */
+  for (let i = 0; i < 6; i++) { const j = (i + 1) % 6; poli(x, [O[i * 2], O[i * 2 + 1], O[j * 2], O[j * 2 + 1], Tm[j * 2], Tm[j * 2 + 1], Tm[i * 2], Tm[i * 2 + 1]]); x.fillStyle = luz[i] > 0 ? 'rgba(255,255,255,' + luz[i] + ')' : 'rgba(42,11,62,' + (-luz[i]) + ')'; x.fill(); x.lineWidth = Math.max(0.6, s * 0.006); x.strokeStyle = 'rgba(255,255,255,.28)'; x.stroke(); }
+  poli(x, Tm); { const g = x.createLinearGradient(-s * 0.15, -s * 0.25, s * 0.15, s * 0.25); g.addColorStop(0, '#5A1A8C'); g.addColorStop(0.55, '#8E2470'); g.addColorStop(1, '#C2401E'); x.fillStyle = g; x.fill(); } /* a mesa: mais funda, para o rasgo acender dentro dela */
+  { const g = x.createRadialGradient(0, 0, 0, 0, 0, s * 0.24); g.addColorStop(0, 'rgba(255,214,150,.85)'); g.addColorStop(1, 'rgba(255,120,80,0)'); x.fillStyle = g; poli(x, Tm); x.fill(); }
+  rasgoLuz(x, 0, s * 0.2, s * 0.13, s, true);
+  poli(x, O); x.lineWidth = Math.max(1.2, s * 0.03); x.strokeStyle = ESCURO; x.stroke();
+  poli(x, [O[10] * 0.93, O[11] * 0.93, O[0] * 0.9 - s * 0.02, O[1] * 0.9, O[0] * 0.62 - s * 0.03, O[1] * 0.62, O[10] * 0.66, O[11] * 0.7]); x.fillStyle = 'rgba(255,255,255,.5)'; x.fill(); /* o reflexo no chanfro de cima */
+  x.rotate(-0.14); cintila(x, s * 0.31, -s * 0.31, s * 0.1); if (s >= 64) cintila(x, -s * 0.34, s * 0.3, s * 0.055); }
+/* E — Selo da Fenda: uma moeda-emblema vista um pouco de lado, com espessura, aro de metal em degradê, miolo escuro e o rasgo com os cinco mundos */
+function moeda(x, s) { const rico = s > RICO; const rx = s * 0.44, ry = s * 0.385, esp = s * (rico ? 0.085 : 0.1); x.rotate(-0.16);
+  const elipse = (cy, k) => { x.beginPath(); x.ellipse(0, cy, rx * k, ry * k, 0, 0, TAU); };
+  if (rico && s >= 44) { x.save(); x.rotate(0.16); halo(x, s, 0.9); x.restore(); }
+  elipse(esp * 0.5, 1); { const g = x.createLinearGradient(-rx, 0, rx, 0); g.addColorStop(0, '#8A2A1C'); g.addColorStop(0.5, '#7A1E5A'); g.addColorStop(1, '#3E1266'); x.fillStyle = g; x.fill(); } /* a espessura: a mesma moeda, mais abaixo e mais escura */
+  if (rico) { x.save(); elipse(esp * 0.5, 1); x.clip(); x.strokeStyle = 'rgba(255,255,255,.2)'; x.lineWidth = Math.max(0.6, s * 0.008); for (let i = -9; i <= 9; i++) { const px = i * rx / 9.5; x.beginPath(); x.moveTo(px, 0); x.lineTo(px, ry + esp); x.stroke(); } x.restore(); } /* o serrilhado da borda */
+  elipse(-esp * 0.5, 1); x.fillStyle = marcaGrad(x, -rx, ry, rx, -ry); x.fill();
+  if (rico) { elipse(-esp * 0.5, 1); x.lineWidth = Math.max(1, s * 0.022); x.strokeStyle = ESCURO; x.stroke(); elipse(-esp * 0.5, 0.93); x.lineWidth = Math.max(0.7, s * 0.012); x.strokeStyle = 'rgba(255,255,255,.55)'; x.stroke(); }
+  elipse(-esp * 0.5, rico ? 0.74 : 0.66); { const g = x.createLinearGradient(0, -ry, 0, ry); g.addColorStop(0, '#2B1646'); g.addColorStop(1, '#0E131B'); x.fillStyle = g; x.fill(); }
+  if (rico) { x.lineWidth = Math.max(0.8, s * 0.014); x.strokeStyle = 'rgba(42,11,62,.9)'; x.stroke(); const g = x.createRadialGradient(0, -esp * 0.5, 0, 0, -esp * 0.5, rx * 0.6); g.addColorStop(0, 'rgba(255,170,110,.5)'); g.addColorStop(1, 'rgba(233,79,160,0)'); x.fillStyle = g; elipse(-esp * 0.5, 0.74); x.fill(); }
+  const cy = -esp * 0.5 + (rico && s >= 44 ? s * 0.035 : 0); if (rico) { lente(x, 0, cy, s * 0.2, s * 0.2); x.fillStyle = marcaGrad(x, 0, cy + s * 0.2, 0, cy - s * 0.2); x.fill(); rasgoLuz(x, cy + s * 0.008, s * 0.12, s * 0.085, s, true); } else { lente(x, 0, cy, s * 0.2, s * 0.17); x.fillStyle = '#FFF6E2'; x.fill(); }
+  if (rico && s >= 44) for (let i = 0; i < 5; i++) { const a = -Math.PI / 2 + (i - 2) * 0.44; x.beginPath(); x.arc(Math.cos(a) * rx * 0.56, -esp * 0.5 + Math.sin(a) * ry * 0.56, s * 0.02, 0, TAU); x.fillStyle = i === 2 ? '#FFFFFF' : '#FFC79A'; x.fill(); } /* os cinco mundos, em arco */
+  if (rico) { x.beginPath(); x.ellipse(0, -esp * 0.5, rx * 0.86, ry * 0.86, 0, 3.45, 4.45); x.lineWidth = s * 0.03; x.lineCap = 'round'; x.strokeStyle = 'rgba(255,255,255,.8)'; x.stroke(); x.rotate(0.16); cintila(x, s * 0.3, -s * 0.33, s * 0.09); } }
+/* F — Coração da Fenda: uma esfera de energia com o rasgo aceso, presa entre três cascas que giram em volta */
+function orbe(x, s) { const rico = s > RICO; const r = s * (rico ? 0.255 : 0.27);
+  const casca = (a0, a1, ro, ri) => { x.beginPath(); x.arc(0, 0, ro, a0, a1); x.arc(0, 0, ri, a1 - 0.2, a0 + 0.2, true); x.closePath(); };
+  const cascas = [[-2.75, -1.35], [-0.6, 0.75], [1.45, 2.7]];
+  if (rico && s >= 44) halo(x, s, 1.15);
+  if (rico) for (const c of cascas) { casca(c[0], c[1], s * 0.46, s * 0.365); x.fillStyle = marcaGrad(x, -s * 0.45, s * 0.45, s * 0.45, -s * 0.45); x.fill(); x.lineWidth = Math.max(1, s * 0.022); x.strokeStyle = ESCURO; x.stroke(); casca(c[0] + 0.1, c[1] - 0.1, s * 0.44, s * 0.415); x.fillStyle = 'rgba(255,255,255,.45)'; x.fill(); } /* cada casca com um filete de luz na borda de fora */
+  else { x.lineWidth = s * 0.12; x.lineCap = 'round'; x.strokeStyle = marcaGrad(x, -s * 0.45, s * 0.45, s * 0.45, -s * 0.45); for (const c of [cascas[0], cascas[1], cascas[2]]) { x.beginPath(); x.arc(0, 0, s * 0.41, c[0] + 0.15, c[1] - 0.15); x.stroke(); } }
+  x.beginPath(); x.arc(0, 0, r, 0, TAU); { const g = x.createRadialGradient(-r * 0.3, -r * 0.35, r * 0.05, 0, 0, r); g.addColorStop(0, '#FFFFFF'); g.addColorStop(0.22, '#FFD9A0'); g.addColorStop(0.5, '#FF5E3A'); g.addColorStop(0.78, '#E94FA0'); g.addColorStop(1, '#6B1FB0'); x.fillStyle = g; x.fill(); }
+  if (rico) { x.lineWidth = Math.max(1, s * 0.02); x.strokeStyle = ESCURO; x.stroke(); rasgoLuz(x, 0, r * 0.72, r * 0.42, s, true); x.beginPath(); x.ellipse(-r * 0.42, -r * 0.5, r * 0.26, r * 0.14, -0.6, 0, TAU); x.fillStyle = 'rgba(255,255,255,.7)'; x.fill(); cintila(x, s * 0.33, -s * 0.34, s * 0.085); if (s >= 64) { x.fillStyle = '#FFC79A'; losango(x, -s * 0.36, s * 0.36, s * 0.025, s * 0.04); x.fill(); } }
+  else { lente(x, 0, 0, r * 0.74, r * 0.5); x.fillStyle = '#FFF6E2'; x.fill(); } }
+
+/* ---------- o logo das Centelhas ----------
+   x: contexto 2D; (cx, cy): centro; s: lado da caixa em px; v: 'fenda' | 'orbita' | 'leque' (padrão: LOGO).
+   Abaixo de 22 px o desenho é simplificado (menos peças, mais grossas) para não virar mancha. */
+function logo(x, cx, cy, s, v) { v = LOGOS.includes(v) ? v : ATUAL; const mini = s < 22; x.save(); x.translate(cx, cy); x.lineJoin = 'round'; x.lineCap = 'round';
+  if (v === 'gema' || v === 'moeda' || v === 'orbe') { x.lineJoin = 'miter'; x.lineCap = 'butt'; (v === 'gema' ? gema : v === 'moeda' ? moeda : orbe)(x, s); x.restore(); return; }
+  if (v === 'fenda') { /* A — Faísca da Fenda: o rasgo de luz da Fenda, inclinado, soltando duas lascas */
+    x.save(); x.rotate(0.3); x.translate(-s * 0.06, s * 0.03); const h = s * (mini ? 0.5 : 0.47), w = s * (mini ? 0.56 : 0.44);
+    lente(x, 0, 0, h, w); x.fillStyle = marcaGrad(x, 0, h, 0, -h); x.fill();
+    lente(x, 0, s * 0.03, h * 0.56, w * 0.42); x.fillStyle = '#FFF4DC'; x.fill(); x.restore();
+    x.fillStyle = GRAD[1]; losango(x, s * 0.33, -s * 0.27, s * (mini ? 0.11 : 0.085), s * (mini ? 0.13 : 0.12)); x.fill();
+    if (!mini) { x.fillStyle = GRAD[0]; losango(x, s * 0.39, s * 0.02, s * 0.05, s * 0.07); x.fill(); } }
+  else if (v === 'orbita') { /* B — Centelha em Órbita: um miolo em losango e a órbita partida em dois arcos, com a centelha na ponta de um deles */
+    const r = s * 0.36, lw = s * (mini ? 0.15 : 0.11); x.lineWidth = lw; x.strokeStyle = marcaGrad(x, -r, r, r, -r);
+    x.beginPath(); x.arc(0, 0, r, 2.2, 4.25); x.stroke(); x.beginPath(); x.arc(0, 0, r, -0.95, 1.1); x.stroke();
+    x.fillStyle = GRAD[0]; x.beginPath(); x.arc(Math.cos(-0.95) * r + s * 0.03, Math.sin(-0.95) * r - s * 0.05, s * (mini ? 0.12 : 0.085), 0, TAU); x.fill();
+    losango(x, 0, 0, s * (mini ? 0.14 : 0.13), s * (mini ? 0.2 : 0.19)); x.fillStyle = mini ? GRAD[0] : '#FFF4DC'; x.fill(); if (!mini) { x.lineWidth = s * 0.035; x.strokeStyle = GRAD[0]; x.stroke(); } }
+  else { /* C — Aurora dos Cinco Mundos: cinco raios soltos que sobem de um ponto, o do meio mais alto (os cinco mundos alinhados) */
+    const by = s * 0.36; const raio = (ang, r0, r1, larg, cor) => { x.save(); x.translate(0, by); x.rotate(ang); poli(x, [0, -r0, larg, -(r0 + (r1 - r0) * 0.3), 0, -r1, -larg, -(r0 + (r1 - r0) * 0.3)]); x.fillStyle = cor; x.fill(); x.restore(); };
+    const L = s * (mini ? 0.085 : 0.06), r0 = s * (mini ? 0.2 : 0.22);
+    raio(-1.3, r0, s * 0.5, L, GRAD[0]); raio(1.3, r0, s * 0.5, L, GRAD[2]); raio(-0.65, r0, s * 0.66, L, '#FF7A52'); raio(0.65, r0, s * 0.66, L, '#D946C8'); raio(0, r0, s * 0.84, L * 1.2, GRAD[1]);
+    x.fillStyle = mini ? GRAD[0] : '#FFF4DC'; x.beginPath(); x.arc(0, by, s * (mini ? 0.1 : 0.09), 0, TAU); x.fill(); if (!mini) { x.lineWidth = s * 0.035; x.strokeStyle = GRAD[0]; x.stroke(); } }
+  x.restore(); }
+
+/* ---------- as insígnias ----------
+   Metal de cada patente: [claro, escuro, brilho]. Do aço da Recruta ao degradê da marca do Soberano. */
+const METAL = [['#C3CDD8', '#627286', '#9FB2C6'], ['#D5DEE7', '#6C7E96', '#FFA066'], ['#FFBC8A', '#B94E25', '#FF7A45'], ['#FFD09A', '#C85A28', '#FFD27A'], ['#FFE9A8', '#D2912A', '#FFD98A'],
+  ['#FFEDB8', '#DA7F3C', '#F578B8'], ['#FFB0D6', '#BF2F78', '#F06CB0'], ['#F9B0EA', '#9C36C6', '#D878FF'], ['#EED6FF', '#7F3AD8', '#C97BFF'], ['#FFFFFF', '#E94FA0', '#FF9A6A']];
+const PLACA = '#0E131B';
+/* pat: { ordem 0–9, nivel 1–5, estrelas ≥ 0 }. R: metade do lado da caixa (a insígnia cabe em 2R × 2R com centro em (cx, cy)).
+   o.apagada: a versão "ainda não alcançada" da escada do Perfil (sem cor nem brilho). */
+function insignia(x, cx, cy, R, pat, o) { o = o || {}; const ord = lim((pat && pat.ordem) | 0, 0, 9), niv = lim((pat && pat.nivel) | 0 || 1, 1, 5), est = Math.max(0, (pat && pat.estrelas) | 0); const px = R * 2; const mini = px < 34, grande = px >= 64;
+  const M = o.apagada ? ['#7A8492', '#3C4551', '#7A8492'] : METAL[ord]; const u = R * (ord >= 8 ? 0.63 : ord >= 6 ? 0.68 : 0.74); const oy = cy - R * (ord === 9 ? 0.1 : 0.17);
+  x.save(); x.lineJoin = 'round'; x.lineCap = 'round';
+  /* brilho de trás (só nas patentes altas e em tamanho que comporta) */
+  if (!o.apagada && ord >= 5 && px >= 40) { const f = (ord - 4) / 5; const g = x.createRadialGradient(cx, oy, R * 0.1, cx, oy, R * 1.05); g.addColorStop(0, 'rgba(233,79,160,' + (0.16 + 0.3 * f).toFixed(2) + ')'); g.addColorStop(0.6, 'rgba(193,60,245,' + (0.05 + 0.12 * f).toFixed(2) + ')'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(cx - R, cy - R, px, px); }
+  x.translate(cx, oy); x.scale(u, u); const lw = Math.max(mini ? 1.5 / u : 1.2 / u, 0.1); /* daqui em diante, unidades da insígnia: o corpo vai de −1 a 1 */
+  const metal = () => { if (ord === 9 && !o.apagada) return marcaGrad(x, -1, 1, 1, -1); const g = x.createLinearGradient(0, -1, 0, 1); g.addColorStop(0, M[0]); g.addColorStop(1, M[1]); return g; };
+  const placa = () => { const g = x.createLinearGradient(0, -1, 0, 1); g.addColorStop(0, o.apagada ? '#161B23' : ord >= 6 ? '#1B1230' : '#161D28'); g.addColorStop(1, PLACA); return g; };
+  const divisa = (y, w, h, t) => { poli(x, [-w, y, 0, y + h, w, y, w, y - t, 0, y + h - t, -w, y - t]); x.fillStyle = metal(); x.fill(); };
+  const rasgo = (y0, y1, w, miolo) => { const cyy = (y0 + y1) / 2, h = (y1 - y0) / 2; lente(x, 0, cyy, h, w); x.fillStyle = o.apagada ? M[0] : ord >= 6 ? marcaGrad(x, 0, y1, 0, y0) : metal(); x.fill(); if (miolo && !mini) { lente(x, 0, cyy + h * 0.05, h * 0.58, w * 0.4); x.fillStyle = o.apagada ? '#2A313B' : '#FFF6E2'; x.fill(); } };
+  const mundos = (r, rp) => { if (mini) return; for (let i = 0; i < 5; i++) { const a = -Math.PI / 2 + (i - 2) * 0.42; x.beginPath(); x.arc(Math.cos(a) * r, Math.sin(a) * r, rp, 0, TAU); x.fillStyle = i === 2 && !o.apagada ? '#FFFFFF' : M[0]; x.fill(); } };
+  const borda = (dupla) => { x.lineWidth = lw * (ord >= 4 ? 1.25 : 1); x.strokeStyle = metal(); x.stroke(); if (dupla && !mini) { x.save(); x.scale(0.8, 0.8); x.lineWidth = lw * 0.45; x.strokeStyle = o.apagada ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.3)'; x.stroke(); x.restore(); } };
+  const asas = (n, y, alc) => { for (const s of [-1, 1]) for (let i = 0; i < n; i++) { const yy = y + i * 0.3, a = alc - i * 0.16; poli(x, [s * 0.66, yy + 0.06, s * a, yy - 0.34, s * (a - 0.06), yy - 0.06, s * 0.7, yy + 0.3]); x.fillStyle = metal(); x.fill(); } };
+  const raios = (n, r0, r1, al) => { if (px < 40 || o.apagada) return; x.save(); x.globalAlpha = al; x.fillStyle = M[2]; for (let i = 0; i < n; i++) { x.save(); x.rotate(i * TAU / n); poli(x, [0, -r1, 0.045, -r0, -0.045, -r0]); x.fill(); x.restore(); } x.restore(); };
+  if (ord === 0) divisa(-0.2, 0.84, 0.66, 0.4); /* Recruta: uma divisa */
+  else if (ord === 1) { divisa(-0.52, 0.84, 0.56, 0.3); divisa(0.02, 0.84, 0.56, 0.3); } /* Batedor: duas divisas */
+  else if (ord === 2) { losango(x, 0, 0, 0.9, 1); x.fillStyle = placa(); x.fill(); borda(false); rasgo(-0.6, 0.12, 0.36, false); divisa(0.2, 0.42, 0.3, 0.2); } /* Vanguarda: a placa em losango, o primeiro rasgo e uma divisa */
+  else if (ord === 3) { losango(x, 0, 0, 0.9, 1); x.fillStyle = placa(); x.fill(); borda(true); rasgo(-0.62, 0.62, 0.5, true); if (!mini) { x.fillStyle = metal(); losango(x, -0.5, 0, 0.09, 0.2); x.fill(); losango(x, 0.5, 0, 0.09, 0.2); x.fill(); } } /* Capitão de Fenda: o rasgo inteiro, com miolo de luz */
+  else if (ord === 4) { poli(x, [-0.82, -0.94, 0.82, -0.94, 0.82, 0.22, 0, 1, -0.82, 0.22]); x.fillStyle = placa(); x.fill(); borda(false); rasgo(-0.72, 0.2, 0.4, true); divisa(0.3, 0.46, 0.34, 0.2); } /* Comandante: o escudo */
+  else if (ord === 5) { poli(x, [-0.82, -0.94, 0.82, -0.94, 0.82, 0.22, 0, 1, -0.82, 0.22]); x.fillStyle = placa(); x.fill(); borda(true); mundos(0.66, 0.07); rasgo(mini ? -0.66 : -0.38, 0.72, 0.42, true); } /* Estrategista: os cinco mundos alinhados sobre o rasgo */
+  else if (ord === 6) { asas(2, -0.2, 1.42); poli(x, [-0.72, -0.94, 0.72, -0.94, 0.72, 0.22, 0, 1, -0.72, 0.22]); x.fillStyle = placa(); x.fill(); borda(false); rasgo(-0.7, 0.66, 0.5, true); } /* Almirante: o escudo ganha asas */
+  else if (ord === 7) { asas(3, -0.36, 1.46); poli(x, [-0.72, -0.94, 0.72, -0.94, 0.72, 0.22, 0, 1, -0.72, 0.22]); x.fillStyle = placa(); x.fill(); borda(true); mundos(0.64, 0.065); rasgo(mini ? -0.66 : -0.36, 0.7, 0.42, true); } /* Marechal do Alinhamento: três asas e os cinco mundos */
+  else { raios(ord === 9 ? 20 : 12, 0.9, ord === 9 ? 1.42 : 1.24, ord === 9 ? 0.7 : 0.5); asas(3, -0.34, 1.52);
+    if (ord === 9) { for (let i = 0; i < 5; i++) { const a = (i - 2) * 0.36, alt = i === 2 ? 1.4 : i % 2 ? 1.27 : 1.16; x.save(); x.rotate(a); poli(x, [-0.16, -0.8, 0, -alt, 0.16, -0.8]); x.fillStyle = metal(); x.fill(); x.restore(); } } /* Soberano: a coroa de cinco pontas */
+    x.beginPath(); x.arc(0, 0, 0.88, 0, TAU); x.fillStyle = placa(); x.fill(); borda(true);
+    if (!mini) { x.beginPath(); x.arc(0, 0, 0.6, 0, TAU); x.lineWidth = lw * 0.5; x.strokeStyle = metal(); x.stroke(); }
+    if (ord === 9) mundos(0.74, 0.06); rasgo(-0.56, 0.56, 0.52, true);
+    if (grande && !o.apagada) { x.save(); x.globalCompositeOperation = 'lighter'; const g = x.createRadialGradient(0, 0, 0.02, 0, 0, 0.6); g.addColorStop(0, ord === 9 ? 'rgba(255,255,255,.55)' : 'rgba(255,255,255,.3)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.beginPath(); x.arc(0, 0, 0.6, 0, TAU); x.fill(); x.restore(); } } /* Guardião e Soberano: o brasão redondo, com anel, asas e raios */
+  x.restore();
+  /* as cinco marcas de nível, na base: acesas = níveis alcançados (em px da caixa, para ficarem nítidas em 20 px) */
+  x.save(); const py = cy + R * 0.8, passo = R * 0.34, rp = Math.max(1, R * 0.115);
+  for (let i = 0; i < 5; i++) { const pxx = cx + (i - 2) * passo; const on = i < niv;
+    if (est > 0 && i === 2) { estrela(x, pxx, py - R * 0.02, R * 0.21, 5, 0.46); x.fillStyle = o.apagada ? '#59626E' : '#FFF1B8'; x.fill(); continue; } /* depois do topo: a estrela no lugar da marca do meio */
+    if (mini) { x.fillStyle = on ? (o.apagada ? '#8A94A2' : ord >= 6 ? '#FFFFFF' : M[0]) : 'rgba(255,255,255,.2)'; x.fillRect(Math.round(pxx - rp), Math.round(py - rp), Math.max(2, Math.round(rp * 2)), Math.max(2, Math.round(rp * 2))); }
+    else { losango(x, pxx, py, rp, rp * 1.25); if (on) { x.fillStyle = o.apagada ? '#8A94A2' : ord >= 6 ? '#FFFFFF' : M[0]; x.fill(); } else { x.fillStyle = 'rgba(255,255,255,.1)'; x.fill(); x.lineWidth = Math.max(1, R * 0.02); x.strokeStyle = 'rgba(255,255,255,.26)'; x.stroke(); } } }
+  x.restore(); }
+
+/* ---------- para a interface: imagens prontas (com memória) ---------- */
+const MEMO = new Map();
+function folha(px) { const k = lim(typeof devicePixelRatio === 'number' ? Math.ceil(devicePixelRatio) : 1, 2, 3); const c = document.createElement('canvas'); c.width = c.height = px * k; const x = c.getContext('2d'); x.scale(k, k); return { c, x }; }
+/* o que viaja na lista da sala: [ordem, nível, estrelas], só números dentro da faixa (o que vier torto vira null: ninguém ganha insígnia por engano) */
+function forma(p) { if (Array.isArray(p)) p = { ordem: p[0], nivel: p[1], estrelas: p[2] }; if (!p || typeof p !== 'object') return null; const o = +p.ordem, n = +p.nivel, e = +p.estrelas || 0;
+  if (!Number.isInteger(o) || o < 0 || o > 9 || !Number.isInteger(n) || n < 1 || n > 5 || !Number.isInteger(e) || e < 0) return null; return [o, n, Math.min(999, o === 9 && n === 5 ? e : 0)]; }
+function dePat(p) { const f = forma(p); return f ? { ordem: f[0], nivel: f[1], estrelas: f[2] } : null; }
+function url(pat, px, apagada) { const p = dePat(pat); if (!p || typeof document === 'undefined') return ''; const k = 'i' + p.ordem + '.' + p.nivel + '.' + (p.estrelas ? 1 : 0) + '.' + px + (apagada ? 'a' : ''); let u = MEMO.get(k); if (!u) { const F = folha(px); insignia(F.x, px / 2, px / 2, px / 2, p, { apagada }); u = F.c.toDataURL('image/png'); MEMO.set(k, u); } return u; }
+function urlLogo(px, v) { if (typeof document === 'undefined') return ''; const k = 'l' + (v || ATUAL) + px; let u = MEMO.get(k); if (!u) { const F = folha(px); logo(F.x, px / 2, px / 2, px, v); u = F.c.toDataURL('image/png'); MEMO.set(k, u); } return u; }
+const escA = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function idDe(ordem) { const P = ARD.patentes && ARD.patentes.PATENTES; const a = P && P[lim(ordem | 0, 0, 9)]; return a ? a.id : IDS[lim(ordem | 0, 0, 9)]; } /* aqui "ordem" é sempre a posição de 0 a 9 na lista (no contrato, patente.ordem vai de 1 a 10: quem converte é o src/perfil-ui.js, pelo id) */
+/* "Capitão de Fenda III" no idioma atual (chaves do contrato: patente.<id>.nome e patente.nivel) */
+function nome(pat) { const p = dePat(pat); if (!p) return ''; const id = (pat && typeof pat.id === 'string' && pat.id) || idDe(p.ordem); return T('patente.nivel', { patente: T('patente.' + id + '.nome', null, id), n: ROMANO[p.nivel] }, '{patente} {n}'); }
+function nomeSo(pat) { const p = dePat(pat); if (!p) return ''; const id = (pat && typeof pat.id === 'string' && pat.id) || idDe(p.ordem); return T('patente.' + id + '.nome', null, id); }
+/* HTML pronto: <img> da insígnia (com o nome da patente como texto alternativo) e <img> do logo das Centelhas (decorativo) */
+function html(pat, px, o) { const p = dePat(pat); if (!p) return ''; o = o || {}; return '<img class="ins' + (o.cls ? ' ' + o.cls : '') + '" src="' + url(p, px, o.apagada) + '" width="' + px + '" height="' + px + '" alt="' + escA(o.semAlt ? '' : nome(pat)) + '"' + (o.semAlt ? ' aria-hidden="true"' : '') + ' draggable="false">'; }
+function htmlLogo(px) { return '<img class="ins-centelha" src="' + urlLogo(px) + '" width="' + px + '" height="' + px + '" alt="" aria-hidden="true" draggable="false">'; }
+
+/* ---------- cartões (motor do src/cartoes.js) ----------
+   q (promoção): { patente: { id, ordem, nivel, estrelas }, cmd (nome do Comandante), raca (nome da Raça favorita, já no idioma; pode faltar), cor (da Raça),
+                   xp (Centelhas), degrau (1 a 50), dias (sequência do Desafio do Dia) } */
+function numTxt(v) { return ARD.i18n && ARD.i18n.num ? ARD.i18n.num(Math.floor(v)) : String(Math.floor(v)); }
+function fundo(K, m) { const x = K.x, W = K.W, H = K.H; m.fundoMarca(K); const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, 'rgba(5,7,11,.55)'); g.addColorStop(0.4, 'rgba(5,7,11,.1)'); g.addColorStop(1, 'rgba(5,7,11,.82)'); x.fillStyle = g; x.fillRect(0, 0, W, H); }
+async function promocao(q, fmt) { const m = ARD.cartoes.motor; const K = m.tela(fmt); const x = K.x, W = K.W, H = K.H; const pe = K.c._fmt === 'pe'; const cor = q.cor || '#FFB088'; await m.fontes(); fundo(K, m);
+  const pat = dePat(q.patente) || { ordem: 0, nivel: 1, estrelas: 0 }; const nm = nomeSo(q.patente).toUpperCase(); const nivel = T('patente.cartao.nivel', { n: ROMANO[pat.nivel] }).toUpperCase() + (pat.estrelas ? ' · ★ ' + pat.estrelas : '');
+  const sou = T('patente.cartao.sou').toUpperCase(); const rot = T('patente.cartao.rotulo').toUpperCase(); const quem = q.cmd || T('geral.comandante'); const fav = q.raca ? T('patente.cartao.raca', { raca: q.raca }) : '';
+  const ns = [{ v: numTxt(q.xp || 0), r: T('patente.moeda.nome'), logo: true }, { v: T('patente.cartao.degrau.v', { n: q.degrau || 1 }), r: T('patente.cartao.degrau') }, { v: numTxt(q.dias || 0), r: T('patente.cartao.dias') }];
+  if (!pe) { const M = 48; m.marca(K, M, 78, 44); m.texto(K, rot, W - M, 70, { id: 'rotulo', peso: '500', tam: 20, min: 13, fam: m.FM, max: 560, cor, alinha: 'dir', esp: 3 });
+    insignia(x, 232, 322, 190, pat); const tx = 468, L = W - M - tx;
+    const ls = m.quebra(x, nm, '800 112px ' + m.FD, L, 2); let tm = 112; for (; tm > 40; tm -= 2) { x.font = '800 ' + tm + 'px ' + m.FD; if (ls.every(l => x.measureText(l).width <= L)) break; }
+    const alt = tm * 0.9; const total = 30 + alt * ls.length + 52; let y = 318 - total / 2 + 24;
+    m.texto(K, sou, tx, y, { id: 'sou', peso: '500', tam: 24, min: 14, fam: m.FM, max: L, cor: m.CLARO, esp: 4 }); y += 8;
+    ls.forEach((l, i) => { y += alt; m.texto(K, l, tx - 3, y, { id: 'nome' + i, peso: '800', tam: tm, min: 40, fam: m.FD, max: L, grad: true }); }); y += 50;
+    m.texto(K, nivel, tx, y, { id: 'nivel', peso: '700', tam: 40, min: 20, fam: m.FD, max: L, cor });
+    x.fillStyle = 'rgba(255,255,255,.16)'; x.fillRect(M, H - 118, W - 2 * M, 2);
+    m.texto(K, quem, M, H - 62, { id: 'quem', peso: '700', tam: 34, min: 16, fam: m.FD, max: 400 }); if (fav) m.texto(K, fav, M, H - 30, { id: 'raca', peso: '500', tam: 20, min: 12, fam: m.FB, max: 400, cor: m.SUAVE });
+    const x0 = 500, cw = (W - M - x0) / 3; ns.forEach((n, i) => { const cx = x0 + i * cw; let dx = 0; if (n.logo) { logo(x, cx + 22, H - 78, 44); dx = 52; }
+      m.texto(K, n.v, cx + dx, H - 58, { id: 'num' + i, peso: '800', tam: 56, min: 22, fam: m.FD, max: cw - 16 - dx }); m.texto(K, String(n.r).toUpperCase(), cx, H - 30, { id: 'rot' + i, peso: '500', tam: 15, min: 10, fam: m.FM, max: cw - 16, cor, esp: 1.5 }); }); }
+  else { const M = 64, L = W - 2 * M, cx = W / 2; m.marca(K, M, 118, 58); m.texto(K, rot, M, 158, { id: 'rotulo', peso: '500', tam: 24, min: 14, fam: m.FM, max: L, cor, esp: 4 });
+    insignia(x, cx, 468, 262, pat);
+    m.texto(K, sou, cx, 800, { id: 'sou', peso: '500', tam: 30, min: 16, fam: m.FM, max: L, cor: m.CLARO, esp: 5, alinha: 'centro' });
+    const ls = m.quebra(x, nm, '800 150px ' + m.FD, L, 2); let tm = ls.length > 1 ? 110 : 150; /* nome em duas linhas: letra menor, para o nível não descer sobre os números */ for (; tm > 48; tm -= 2) { x.font = '800 ' + tm + 'px ' + m.FD; if (ls.every(l => x.measureText(l).width <= L)) break; }
+    let y = 822; const alt = tm * 0.9; ls.forEach((l, i) => { y += alt; m.texto(K, l, cx, y, { id: 'nome' + i, peso: '800', tam: tm, min: 48, fam: m.FD, max: L, grad: true, alinha: 'centro' }); }); y += 64;
+    m.texto(K, nivel, cx, y, { id: 'nivel', peso: '700', tam: 52, min: 24, fam: m.FD, max: L, cor, alinha: 'centro' });
+    x.fillStyle = 'rgba(255,255,255,.16)'; x.fillRect(M, H - 232, L, 2);
+    const cw = L / 3; ns.forEach((n, i) => { const c0 = M + i * cw; let dx = 0; if (n.logo) { logo(x, c0 + 28, H - 168, 56); dx = 66; }
+      m.texto(K, n.v, c0 + dx, H - 142, { id: 'num' + i, peso: '800', tam: 72, min: 26, fam: m.FD, max: cw - 20 - dx }); m.texto(K, String(n.r).toUpperCase(), c0, H - 106, { id: 'rot' + i, peso: '500', tam: 19, min: 11, fam: m.FM, max: cw - 20, cor, esp: 1.5 }); });
+    m.texto(K, fav ? quem + ' · ' + fav : quem, cx, H - 48, { id: 'quem', peso: '700', tam: 34, min: 16, fam: m.FD, max: L, alinha: 'centro', alt: [quem] }); }
+  return K.c; }
+
+/* q (sequência): { dias (7, 14 ou 30; qualquer número serve), patente, cmd, cor, xp } — o número grande dentro de um anel com um traço por dia */
+function anelDias(x, cx, cy, r, dias) { const n = lim(dias | 0, 1, 60); x.save(); x.lineCap = 'butt'; x.lineWidth = r * 0.12; const vao = n > 20 ? 0.035 : 0.06;
+  const halo = x.createRadialGradient(cx, cy, r * 0.3, cx, cy, r * 1.5); halo.addColorStop(0, 'rgba(193,60,245,.42)'); halo.addColorStop(0.6, 'rgba(255,94,58,.12)'); halo.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = halo; x.fillRect(cx - r * 1.6, cy - r * 1.6, r * 3.2, r * 3.2);
+  x.beginPath(); x.arc(cx, cy, r * 0.86, 0, TAU); x.fillStyle = 'rgba(11,15,21,.82)'; x.fill();
+  for (let i = 0; i < n; i++) { const a0 = -Math.PI / 2 + i * TAU / n + vao / 2, a1 = -Math.PI / 2 + (i + 1) * TAU / n - vao / 2; const f = i / Math.max(1, n - 1); x.strokeStyle = f < 0.5 ? GRAD[0] : f < 0.8 ? GRAD[1] : GRAD[2]; x.beginPath(); x.arc(cx, cy, r, a0, a1); x.stroke(); }
+  x.restore(); }
+async function sequencia(q, fmt) { const m = ARD.cartoes.motor; const K = m.tela(fmt); const x = K.x, W = K.W, H = K.H; const pe = K.c._fmt === 'pe'; const cor = q.cor || '#FFB088'; await m.fontes(); fundo(K, m);
+  const dias = Math.max(1, q.dias | 0); const rot = T('patente.seq.cartao.rotulo').toUpperCase(); const tit = T('patente.seq.cartao.titulo', { n: dias }).toUpperCase(); const sub = T('patente.seq.cartao.sub'); const pat = dePat(q.patente);
+  const quem = (q.cmd || T('geral.comandante')) + (pat ? ' · ' + nome(q.patente) : '');
+  if (!pe) { const M = 48; m.marca(K, M, 78, 44); m.texto(K, rot, W - M, 70, { id: 'rotulo', peso: '500', tam: 20, min: 13, fam: m.FM, max: 560, cor, alinha: 'dir', esp: 3 });
+    anelDias(x, 236, 322, 160, dias); m.texto(K, String(dias), 236, 322 + 62, { id: 'dias', peso: '800', tam: 180, min: 80, fam: m.FD, max: 230, grad: true, alinha: 'centro' });
+    const tx = 468, L = W - M - tx; const ls = m.quebra(x, tit, '800 112px ' + m.FD, L, 2); let tm = 112; for (; tm > 40; tm -= 2) { x.font = '800 ' + tm + 'px ' + m.FD; if (ls.every(l => x.measureText(l).width <= L)) break; }
+    const alt = tm * 0.9; let y = 322 - (alt * ls.length + 50) / 2 - 6; ls.forEach((l, i) => { y += alt; m.texto(K, l, tx - 3, y, { id: 'titulo' + i, peso: '800', tam: tm, min: 40, fam: m.FD, max: L, grad: true }); }); y += 48;
+    m.texto(K, sub, tx, y, { id: 'sub', peso: '500', tam: 30, min: 16, fam: m.FB, max: L, cor: m.CLARO });
+    x.fillStyle = 'rgba(255,255,255,.16)'; x.fillRect(M, H - 96, W - 2 * M, 2); let dx = 0; if (pat) { insignia(x, M + 30, H - 50, 30, pat); dx = 74; }
+    m.texto(K, quem, M + dx, H - 38, { id: 'quem', peso: '700', tam: 34, min: 16, fam: m.FD, max: W - 2 * M - dx }); }
+  else { const M = 64, L = W - 2 * M, cx = W / 2; m.marca(K, M, 118, 58); m.texto(K, rot, M, 158, { id: 'rotulo', peso: '500', tam: 24, min: 14, fam: m.FM, max: L, cor, esp: 4 });
+    anelDias(x, cx, 500, 240, dias); m.texto(K, String(dias), cx, 500 + 96, { id: 'dias', peso: '800', tam: 280, min: 120, fam: m.FD, max: 350, grad: true, alinha: 'centro' });
+    const ls = m.quebra(x, tit, '800 140px ' + m.FD, L, 2); let tm = 140; for (; tm > 48; tm -= 2) { x.font = '800 ' + tm + 'px ' + m.FD; if (ls.every(l => x.measureText(l).width <= L)) break; }
+    let y = 800; const alt = tm * 0.9; ls.forEach((l, i) => { y += alt; m.texto(K, l, cx, y, { id: 'titulo' + i, peso: '800', tam: tm, min: 48, fam: m.FD, max: L, grad: true, alinha: 'centro' }); }); y += 62;
+    m.texto(K, sub, cx, y, { id: 'sub', peso: '500', tam: 36, min: 18, fam: m.FB, max: L, cor: m.CLARO, alinha: 'centro' });
+    x.fillStyle = 'rgba(255,255,255,.16)'; x.fillRect(M, H - 190, L, 2); if (pat) insignia(x, cx, H - 128, 40, pat);
+    m.texto(K, quem, cx, H - 44, { id: 'quem', peso: '700', tam: 36, min: 16, fam: m.FD, max: L, alinha: 'centro' }); }
+  return K.c; }
+function arq(nome2, fmt) { const F = ARD.cartoes.FORMATOS[fmt]; return 'aether-rift-dominion-' + nome2 + '-' + F.w + 'x' + F.h + '.png'; }
+/* abre a janela do cartão (a mesma #cartao dos outros cartões). dados(): devolve o q acima, lido na hora (para refazer na troca de idioma) */
+function abrirPromocao(dados) { if (!ARD.cartoes) return Promise.resolve(); return ARD.cartoes.abrir({ titulo: T('patente.cartao.titulo'), desenha: fmt => promocao(dados(), fmt), nome: fmt => arq('patente-' + idDe((dePat(dados().patente) || { ordem: 0 }).ordem), fmt), texto: () => T('patente.cartao.texto', { patente: nome(dados().patente) }) }); }
+function abrirSequencia(dados) { if (!ARD.cartoes) return Promise.resolve(); return ARD.cartoes.abrir({ titulo: T('patente.seq.cartao.janela'), desenha: fmt => sequencia(dados(), fmt), nome: fmt => arq('sequencia-' + (dados().dias | 0), fmt), texto: () => T('patente.seq.cartao.texto', { n: dados().dias | 0 }) }); }
+
+ARD.insignias = { LOGO, LOGOS, BRILHO, usa, get logoAtual() { return ATUAL; }, IDS, ROMANO, logo, insignia, forma, dePat, url, urlLogo, html, htmlLogo, nome, nomeSo, idDe, promocao, sequencia, abrirPromocao, abrirSequencia };
+})(globalThis.ARD = globalThis.ARD || {});
+
+/* Aether Rift: Dominion — 5.5b.2: onde as patentes aparecem (só interface; a regra é do contrato ARD.patentes, no src/patentes.js).
+   - Tela inicial: ao lado do nome, o botão com a insígnia, a patente e as Centelhas; ele abre o Perfil.
+   - Perfil (#perfil): patente e barra até o próximo nível, Centelhas, afinidade com as cinco Raças, a sequência do Desafio do Dia com o
+     escudo e os marcos, o código de comandante (copiar e restaurar) e a escada dos 50 degraus.
+   - Tela final: o bloco #fim-pat, "Centelhas ganhas", com os motivos (de credita(o)), a barra e a subida; quando sobe de PATENTE, oferece
+     o cartão de promoção (subir de nível é só uma linha); quando bate um marco da sequência (7, 14 ou 30 dias), oferece o cartão do marco.
+   - Sala multiplayer: a insígnia de cada jogador antes do nome (viaja na lista da sala como três números, campo pat, fora da cfg da partida).
+   - Desafio do Dia: o escudo e os marcos, abaixo dos três quadros da janela.
+   Sem ARD.patentes carregado, nada disto aparece (o jogo segue igual). Nada aqui entra na simulação nem sai do aparelho. */
+(function (ARD) {
+'use strict';
+const P = () => ARD.patentes; const I = () => ARD.insignias;
+const T = (k, v, r) => (ARD.t ? ARD.t(k, v, r) : String(r != null ? r : k));
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const num = v => (ARD.i18n && ARD.i18n.num ? ARD.i18n.num(Math.floor(v)) : String(Math.floor(v)));
+const RACAS = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag']; const CORES = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
+const MARCOS = [3, 7, 14, 30]; const CARTAO_SEQ = [7, 14, 30]; /* os marcos da sequência (decisão do dono); os três últimos ganham cartão */
+const ESCUDO = '<svg class="pf-esc-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 20 5v6.5c0 4.6-3.2 8.6-8 10.5-4.8-1.9-8-5.9-8-10.5V5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path class="pf-esc-m" d="M12 6.2c1.9 2.6 1.9 7.4 0 10.6-1.9-3.2-1.9-8 0-10.6z" fill="currentColor"/></svg>';
+let ABERTO = null, FIM = null;
+const nRaca = f => (ARD.i18n && ARD.i18n.d ? ARD.i18n.d.racaCurto(f) : f);
+const calmo = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
+const moeda = n => T(n === 1 ? 'patente.moeda.um' : 'patente.moeda.nome');
+
+/* ---------- leitura do contrato (com folga: formas vizinhas da combinada também servem) ---------- */
+function E() { try { const e = P() && P().estado(); return e && e.patente ? e : null; } catch (x) { console.warn('[ARD] patentes (estado):', x); return null; } }
+function indice(p) { const L = P() && P().PATENTES; if (Array.isArray(L)) { let i = L.findIndex(z => z.id === p.id); if (i < 0) i = L.findIndex(z => z.ordem === p.ordem); if (i >= 0) return i; } return p.ordem; } /* no contrato, patente.ordem vai de 1 a 10; o desenho usa a posição de 0 a 9, achada pelo id */
+function patDe(v) { if (!v) return null; const p = v.patente || v; const est = (v.estrelas != null ? v.estrelas : p.estrelas) | 0; const o = indice(p); return I().dePat({ ordem: o, nivel: p.nivel, estrelas: est }) && { id: p.id, ordem: o, nivel: p.nivel, estrelas: est }; }
+function fracao(v) { let x = v && v.prox; if (!x && v && typeof v.xp === 'number') { try { const d = P().deXp(v.xp); if (d && d.ate != null) x = d; } catch (e) {} } if (!x) return null; const larg = (x.ate - x.de) || 0; if (!(larg > 0)) return 1; return Math.max(0, Math.min(1, 1 - x.falta / larg)); }
+function marcosDe(l) { return (Array.isArray(l) ? l : []).map(m => (m && typeof m === 'object' ? +(m.dias || m.n || m.marco) : +m)).filter(n => n > 0); }
+function degrau(p) { return p.ordem * 5 + p.nivel; }
+function proxima(p) { if (degrau(p) >= 50) return null; return p.nivel < 5 ? { ordem: p.ordem, nivel: p.nivel + 1 } : { ordem: p.ordem + 1, nivel: 1 }; }
+function favorita(e) { let best = null, bx = 0; for (const r of RACAS) { const a = e && e.afinidade && e.afinidade[r]; if (a && a.xp > bx) { bx = a.xp; best = r; } } return best; }
+function racaAtual() { return (document.documentElement.dataset.race) || 'vehnar'; }
+function nomeCmd() { const i = $('opt-name'); let n = i && i.value ? i.value.trim().slice(0, 18) : ''; if (!n) { try { n = ARD.progress.load().commander.name || ''; } catch (e) {} } return n || T('geral.comandante'); }
+/* o que este jogador anuncia na sala: [ordem, nível, estrelas] (ou null, sem patentes) */
+function anuncia() { const e = E(); return e ? I().forma(patDe(e)) : null; }
+function faltaTxt(e) { const p = patDe(e); const px = proxima(p); const n = Math.max(0, Math.ceil(e.prox ? e.prox.falta : 0)); return px ? T('patente.falta', { n, prox: I().nome(px) }) : T('patente.falta.estrela', { n }); }
+function dadosCartao() { const e = E(); if (!e) return null; const fav = favorita(e); return { patente: patDe(e), cmd: nomeCmd(), raca: fav ? nRaca(fav) : '', cor: CORES[fav || racaAtual()] || '#FFB088', xp: e.xp, degrau: degrau(patDe(e)), dias: (e.sequencia && e.sequencia.dias) || 0 }; }
+function dadosSeq(dias) { const e = E(); return { dias, patente: e ? patDe(e) : null, cmd: nomeCmd(), cor: CORES[(e && favorita(e)) || racaAtual()] || '#FFB088' }; }
+
+/* ---------- copiar (o jeito novo e, se o navegador não deixar, o antigo) ---------- */
+function copia(txt, campo, nota, okKey) { const toque = (() => { try { return matchMedia('(pointer: coarse)').matches; } catch (e) { return false; } })();
+  const fim = ok => { if (nota) { nota.textContent = T(ok ? okKey : toque ? 'desafio.copie-na-mao-toque' : 'desafio.copie-na-mao'); nota.classList.toggle('falhou', !ok); } if (!ok && campo) { try { campo.focus(); campo.select(); } catch (e) {} } };
+  const peloCampo = () => { try { if (!campo) return false; campo.focus(); campo.select(); return !!(document.execCommand && document.execCommand('copy')); } catch (e) { return false; } };
+  try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(() => fim(true), () => fim(peloCampo())); return; } } catch (e) {}
+  fim(peloCampo()); }
+
+/* ---------- tela inicial: a insígnia ao lado do nome ---------- */
+function entrada() { const cn = document.querySelector('#start .cname'); if (!cn || !P() || !I()) return; let b = $('pf-entrada');
+  if (!b) { b = document.createElement('button'); b.type = 'button'; b.id = 'pf-entrada'; b.className = 'pf-entrada'; cn.appendChild(b); cn.classList.add('com-pat'); b.addEventListener('click', () => abre()); }
+  const e = E(); b.hidden = !e; if (!e) return; const p = patDe(e);
+  b.innerHTML = I().html(p, 32, { semAlt: true }) + '<span class="pf-e-txt"><b>' + esc(I().nome(p)) + '</b><small>' + I().htmlLogo(16) + esc(num(e.xp)) + ' ' + esc(moeda(e.xp)) + (e.estrelas ? ' · ★ ' + esc(num(e.estrelas)) : '') + '</small></span>';
+  b.setAttribute('aria-label', T('perfil.abrir', { patente: I().nome(p) })); b.title = T('perfil.abrir', { patente: I().nome(p) }); }
+
+/* ---------- sala multiplayer: a insígnia antes do nome de cada jogador ---------- */
+function sala(el, p) { if (!el || !I()) return; const pat = I().dePat(p && p.pat); const velho = el.querySelector(':scope > .pf-sala'); if (velho) velho.remove(); if (!pat) return; el.classList.add('pf-linha'); el.insertAdjacentHTML('afterbegin', I().html(pat, 22, { cls: 'pf-sala' })); const im = el.querySelector(':scope > .pf-sala'); if (im) im.title = I().nome(pat); }
+
+/* ---------- sequência: o escudo e os marcos (Perfil e janela do Desafio do Dia) ---------- */
+function seqHtml(e, cartoes) { const s = (e && e.sequencia) || { dias: 0, escudo: 0, marcos: [] }; const dias = s.dias | 0; const tem = marcosDe(s.marcos); const on = !!s.escudo;
+  let h = '<div class="pf-seq"><div class="pf-seq-d"><b>' + esc(num(dias)) + '</b><span>' + esc(T('perfil.seq.dias', { n: dias })) + '</span></div>' +
+    '<div class="pf-escudo' + (on ? ' on' : '') + '">' + ESCUDO + '<span><b>' + esc(T(on ? 'perfil.seq.escudo.on' : 'perfil.seq.escudo.off')) + '</b><small>' + esc(T(on ? 'perfil.seq.escudo.on-d' : 'perfil.seq.escudo.off-d')) + '</small></span></div>' +
+    '<ol class="pf-marcos" aria-label="' + esc(T('perfil.seq.marcos')) + '">' + MARCOS.map(m => { const ok = tem.includes(m) || dias >= m; return '<li class="' + (ok ? 'ok' : '') + '"><b>' + m + '</b><small>' + esc(T(ok ? 'perfil.seq.marco.ok' : 'perfil.seq.marco.falta', { n: Math.max(0, m - dias) })) + '</small></li>'; }).join('') + '</ol></div>';
+  if (cartoes) { const bs = CARTAO_SEQ.filter(m => tem.includes(m) || dias >= m); if (bs.length) h += '<div class="row pf-seq-b">' + bs.map(m => '<button type="button" class="btn" data-pf-seq="' + m + '">' + esc(T('perfil.seq.cartao', { n: m })) + '</button>').join('') + '</div>'; }
+  return h; }
+function ligaSeq(box) { box.querySelectorAll('[data-pf-seq]').forEach(b => b.addEventListener('click', () => { const d = +b.dataset.pfSeq; I().abrirSequencia(() => dadosSeq(d)); })); }
+/* chamado pelo src/desafio-ui.js depois de pintar a vista "hoje" */
+function desafio(box) { if (!box || !P() || !I()) return; const e = E(); if (!e) return; const ref = box.querySelector('.dd-stats'); if (!ref) return; let el = box.querySelector('#dd-pat'); if (!el) { el = document.createElement('div'); el.id = 'dd-pat'; el.className = 'dd-pat'; ref.after(el); } el.innerHTML = seqHtml(e, false); }
+
+/* ---------- Perfil ---------- */
+function caixa() { let el = $('perfil'); if (!el) { el = document.createElement('div'); el.id = 'perfil'; el.className = 'modal pf'; el.hidden = true; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'pf-h'); el.innerHTML = '<div class="box wide"></div>'; document.body.appendChild(el);
+    el.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); fecha(); } }); el.addEventListener('click', e => { if (e.target === el) fecha(); }); }
+  return el; }
+function fecha() { const el = $('perfil'); if (el) el.hidden = true; const volta = ABERTO && ABERTO.volta; ABERTO = null; if (volta && volta.focus) try { volta.focus(); } catch (e) {} }
+function abre() { if (!P() || !I() || !E()) return; const el = caixa(); ABERTO = { volta: document.activeElement, prev: null }; el.hidden = false; pinta(); const h = $('pf-h'); if (h) { h.setAttribute('tabindex', '-1'); try { h.focus(); } catch (e) {} } }
+function escadaHtml(p) { const at = degrau(p); let h = '<div class="pf-escada">';
+  for (let o = 0; o < 10; o++) { h += '<div class="pf-deg' + (o < p.ordem ? ' feito' : o === p.ordem ? ' atual' : '') + '"><span class="pf-deg-n">' + esc(I().nomeSo({ ordem: o, nivel: 1 })) + '</span><span class="pf-deg-i">';
+    for (let n = 1; n <= 5; n++) { const d = o * 5 + n, ok = d <= at; h += '<span class="pf-d' + (ok ? ' ok' : '') + (d === at ? ' aqui' : '') + '">' + I().html({ ordem: o, nivel: n }, 36, { apagada: !ok }) + '</span>'; }
+    h += '</span></div>'; }
+  return h + '</div>'; }
+function pinta() { const el = $('perfil'); if (!el || !ABERTO) return; const box = el.querySelector('.box'); const e = E(); if (!e) { fecha(); return; } const p = patDe(e); const f = fracao(e); let cod = ''; try { cod = P().codigo() || ''; if (P().bonito) cod = P().bonito(cod); } catch (x) {}
+  const foco = document.activeElement && el.contains(document.activeElement) ? document.activeElement.id : ''; const colado = $('pf-colar') ? $('pf-colar').value : '';
+  let h = '<button type="button" class="mclose" id="pf-x" aria-label="' + esc(T('diplo.fechar')) + '">✕</button><div class="eyebrow">' + esc(T('perfil.titulo')) + ' · ' + esc(nomeCmd()) + '</div>' +
+    '<div class="pf-topo">' + I().html(p, 120, { cls: 'pf-ins', semAlt: true }) + '<div class="pf-id"><h2 id="pf-h">' + esc(I().nome(p)) + '</h2>' +
+    '<div class="pf-xp">' + I().htmlLogo(40) + '<b id="pf-xp-n">' + esc(num(e.xp)) + '</b><span>' + esc(moeda(e.xp)) + '</span>' + (e.estrelas ? '<span class="pf-estrelas">★ ' + esc(T('perfil.estrelas', { n: e.estrelas })) + '</span>' : '') + '</div>' +
+    '<div class="pf-barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round((f == null ? 0 : f) * 100) + '" aria-label="' + esc(T('perfil.barra')) + '"><i style="width:' + ((f == null ? 0 : f) * 100).toFixed(1) + '%"></i></div><div class="pf-falta" id="pf-falta">' + esc(faltaTxt(e)) + '</div></div>' +
+    '<button type="button" class="btn" id="pf-cartao">' + esc(T('perfil.cartao')) + '</button></div>';
+  h += '<section class="pf-sec"><h3>' + esc(T('perfil.afin.titulo')) + '</h3><div class="pf-afin">' + RACAS.map(r => { const a = (e.afinidade && e.afinidade[r]) || { xp: 0, degrau: 0 }; const d = Math.max(0, Math.min(5, a.degrau | 0));
+    return '<div class="pf-raca" data-raca="' + r + '" style="--pf-cor:' + CORES[r] + '"><b>' + esc(nRaca(r)) + '</b><span class="pf-degraus" role="img" aria-label="' + esc(T('perfil.afin.degrau', { n: d })) + '">' + [1, 2, 3, 4, 5].map(i => '<i class="' + (i <= d ? 'on' : '') + '"></i>').join('') + '</span><small>' + esc(num(a.xp || 0)) + ' ' + esc(moeda(a.xp || 0)) + '</small></div>'; }).join('') + '</div></section>';
+  h += '<section class="pf-sec"><h3>' + esc(T('perfil.seq.titulo')) + '</h3>' + seqHtml(e, true) + '</section>';
+  h += '<section class="pf-sec"><h3>' + esc(T('perfil.cod.titulo')) + '</h3><p class="pf-p">' + esc(T('perfil.cod.texto')) + '</p>' +
+    '<div class="opt"><label for="pf-cod">' + esc(T('perfil.cod.seu')) + '</label><div class="row pf-linha-cod"><input id="pf-cod" readonly spellcheck="false" value="' + esc(cod) + '"><button type="button" class="btn" id="pf-copiar">' + esc(T('perfil.cod.copiar')) + '</button></div></div>' +
+    '<div class="opt"><label for="pf-colar">' + esc(T('perfil.cod.restaurar-rot')) + '</label><div class="row pf-linha-cod"><input id="pf-colar" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="400"><button type="button" class="btn" id="pf-conferir">' + esc(T('perfil.cod.conferir')) + '</button></div></div>';
+  if (ABERTO.prev) h += '<div class="pf-prev" id="pf-prev"><p>' + esc(ABERTO.prev.txt) + '</p><p class="small' + (ABERTO.prev.rebaixa ? ' pf-rebaixa' : '') + '">' + esc(T(ABERTO.prev.rebaixa ? 'perfil.cod.rebaixa' : 'perfil.cod.aviso')) + '</p><div class="row"><button type="button" class="btn primary" id="pf-restaurar">' + esc(T('perfil.cod.restaurar')) + '</button><button type="button" class="btn" id="pf-cancelar">' + esc(T('perfil.cod.cancelar')) + '</button></div></div>';
+  h += '<div class="small" id="pf-nota" role="status">' + esc(ABERTO.nota || '') + '</div></section>';
+  h += '<section class="pf-sec"><h3>' + esc(T('perfil.escada.titulo')) + '</h3><p class="pf-p">' + esc(T('perfil.escada.conta', { n: degrau(p) })) + '</p>' + escadaHtml(p) + '</section>';
+  h += '<p class="small muted pf-nota-fim">' + esc(T('perfil.nota')) + '</p><div class="row"><button type="button" class="btn" id="pf-fechar">' + esc(T('diplo.fechar')) + '</button></div>';
+  box.innerHTML = h; if (colado && $('pf-colar')) $('pf-colar').value = colado;
+  $('pf-x').addEventListener('click', fecha); $('pf-fechar').addEventListener('click', fecha); ligaSeq(box);
+  $('pf-cartao').addEventListener('click', () => I().abrirPromocao(dadosCartao));
+  $('pf-copiar').addEventListener('click', () => copia($('pf-cod').value, $('pf-cod'), $('pf-nota'), 'perfil.cod.copiado')); $('pf-cod').addEventListener('focus', () => { try { $('pf-cod').select(); } catch (x) {} });
+  const confere = () => { const t = String($('pf-colar').value || '').trim(); if (!t) { $('pf-colar').focus(); return; } let r = null; try { r = P().ler(t); } catch (x) { r = null; } const ok = !!r && r.ok !== false && !r.erro;
+    if (!ok) { ABERTO.prev = null; ABERTO.nota = (r && r.texto) || T('perfil.cod.invalido'); pinta(); const n = $('pf-nota'); if (n) n.classList.add('falhou'); if ($('pf-colar')) $('pf-colar').focus(); return; }
+    const es = r.estado || (r.patente ? r : null); const pp = es ? patDe(es) : null; if (r.igual) { ABERTO.prev = null; ABERTO.nota = T('perfil.cod.igual'); pinta(); return; }
+    ABERTO.prev = { cod: t, rebaixa: !!r.rebaixa, txt: pp ? T('perfil.cod.traz', { patente: I().nome(pp), n: (r.dados && r.dados.xp) != null ? r.dados.xp : es.xp || 0 }) : T('perfil.cod.valido') }; ABERTO.nota = ''; pinta(); const b = $('pf-restaurar'); if (b) b.focus(); };
+  $('pf-conferir').addEventListener('click', confere); $('pf-colar').addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); confere(); } });
+  if (ABERTO.prev) { $('pf-cancelar').addEventListener('click', () => { ABERTO.prev = null; pinta(); });
+    $('pf-restaurar').addEventListener('click', () => { let r = null; try { r = P().restaurar(ABERTO.prev.cod, { confirmado: true, rebaixar: true }); /* a confirmação é esta própria caixa, que já mostrou o que o código traz (e o aviso, quando ele traz menos) */ } catch (x) { r = null; } const ok = !!r && r.ok !== false && !r.erro; ABERTO.prev = null; ABERTO.nota = ok ? T('perfil.cod.restaurado') : (r && r.texto) || T('perfil.cod.invalido'); if ($('pf-colar')) $('pf-colar').value = ''; pinta(); const n = $('pf-nota'); if (n) n.classList.toggle('falhou', !ok); entrada(); const hh = $('pf-h'); if (hh) { hh.setAttribute('tabindex', '-1'); try { hh.focus(); } catch (x) {} } }); }
+  if (foco && $(foco)) try { $(foco).focus(); } catch (x) {} }
+
+/* ---------- tela final: "Centelhas ganhas" ----------
+   o: o objeto da tela final (src/fim.js). O crédito é feito UMA vez por partida: se alguém já creditou (o._patCred), este bloco só mostra. */
+function fim(o) { const end = $('end'); if (!end || !P() || !I()) return; let r = o.patentes;
+  if (r === undefined) { try { r = P().credita(o) || null; } catch (e) { console.warn('[ARD] patentes (crédito):', e); r = null; } } /* o src/fim.js já creditou e deixou o resultado em o.patentes; se este bloco chegar antes, credita() com o mesmo objeto não paga duas vezes */
+  FIM = { o, r, animou: false }; pintaFim(); entrada(); }
+function pintaFim() { const F = FIM; const end = $('end'); if (!F || !end) return; let el = $('fim-pat'); const r = F.r; const gs = r && Array.isArray(r.ganhos) ? r.ganhos.filter(g => g && g.xp) : []; const sem = r && Array.isArray(r.ganhos) ? r.ganhos.filter(g => g && g.motivo === 'sem-ganho') : []; const mTxt = g => g.texto || (P().motivoTxt ? P().motivoTxt(g) : T('patente.motivo.' + g.motivo, g.vars || null, g.motivo));
+  if (!el) { el = document.createElement('div'); el.id = 'fim-pat'; el.className = 'fim-pat'; const ref = $('fim-desafio') || $('fim-cosm') || end.querySelector('.fim-botoes'); if (ref && ref.parentElement) ref.parentElement.insertBefore(el, ref); else end.appendChild(el); }
+  const e = E(); if (!r || (!gs.length && !sem.length) || !e) { el.hidden = true; el.innerHTML = ''; return; }
+  const d = patDe(r.depois) || patDe(e); const a = patDe(r.antes) || d; const total = r.total != null ? r.total : gs.reduce((s, g) => s + g.xp, 0);
+  const promo = d.ordem > a.ordem; const nivelUp = !promo && degrau(d) > degrau(a); const estrela = d.estrelas > a.estrelas; const f1 = fracao(e); const f0 = promo || nivelUp || estrela ? 0 : fracao(r.antes);
+  const anima = !F.animou && !calmo(); F.animou = true; const marcos = marcosDe(r.marcos).filter(m => CARTAO_SEQ.includes(m)); const af = r.subiuAfinidade && typeof r.subiuAfinidade === 'object' ? (Array.isArray(r.subiuAfinidade) ? r.subiuAfinidade[0] : r.subiuAfinidade) : null;
+  let h = '<div class="fp-topo">' + I().html(d, 48, { cls: 'fp-ins' + (promo ? ' sobe' : ''), semAlt: true }) + '<div class="fp-quem"><b id="fp-nome">' + esc(I().nome(d)) + '</b>' +
+    '<div class="pf-barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round((f1 || 0) * 100) + '" aria-label="' + esc(T('perfil.barra')) + '"><i id="fp-barra" style="width:' + (((anima && f0 != null ? f0 : f1) || 0) * 100).toFixed(1) + '%"></i></div><small id="fp-falta">' + esc(faltaTxt(e)) + '</small></div>' +
+    '<div class="fp-total"><i class="fp-logo' + (anima && I().BRILHO ? ' brilha' : '') + '" style="--m:url(' + I().urlLogo(40) + ')">' + I().htmlLogo(40) + '</i><b id="fp-total">+' + esc(num(anima ? 0 : total)) + '</b><span>' + esc(T('patente.fim.titulo')) + '</span></div></div>';
+  let bs = ''; if (promo) bs += '<button type="button" class="btn primary" id="fp-cartao">' + esc(T('patente.fim.cartao')) + '</button>'; for (const m of marcos) bs += '<button type="button" class="btn" data-pf-seq="' + m + '">' + esc(T('perfil.seq.cartao', { n: m })) + '</button>';
+  bs += '<button type="button" class="btn ghost" id="fp-perfil">' + esc(T('perfil.titulo')) + '</button>'; h += '<div class="row fp-botoes">' + bs + '</div><div class="fp-baixo">';
+  h += '<ul class="fp-motivos" aria-label="' + esc(T('patente.fim.motivos')) + '">' + gs.map(g => '<li' + (g.xp < 0 ? ' class="menos"' : '') + '><span>' + esc(mTxt(g)) + '</span><b>' + (g.xp < 0 ? '−' : '+') + esc(num(Math.abs(g.xp))) + '</b></li>').join('') + '</ul>';
+  for (const g of sem) h += '<p class="fp-linha fp-sem">' + esc(mTxt(g)) + '</p>'; /* partida que não rendeu: o motivo, em uma linha */
+  if (promo) h += '<p class="fp-promo" id="fp-promo" role="status"><b>' + esc(T('patente.fim.promocao')) + '</b> ' + esc(T('patente.fim.agora', { patente: I().nome(d) })) + '</p>';
+  else if (nivelUp) h += '<p class="fp-linha" id="fp-nivel" role="status">' + esc(T('patente.fim.nivel', { patente: I().nome(d) })) + '</p>';
+  else if (estrela) h += '<p class="fp-linha" id="fp-nivel" role="status">★ ' + esc(T('patente.fim.estrela', { n: d.estrelas })) + '</p>';
+  if (af && af.raca) h += '<p class="fp-linha" id="fp-afin">' + esc(T('patente.fim.afinidade', { raca: nRaca(af.raca), n: (af.para != null ? af.para : af.degrau) | 0 })) + '</p>';
+  h += '</div>'; el.innerHTML = h; el.hidden = false; el.classList.toggle('promo', promo); ligaSeq(el);
+  const bc = $('fp-cartao'); if (bc) bc.addEventListener('click', () => I().abrirPromocao(dadosCartao)); $('fp-perfil').addEventListener('click', () => abre());
+  if (anima) { const b = $('fp-barra'), tt = $('fp-total'); const t0 = performance.now(), dur = 800; requestAnimationFrame(() => requestAnimationFrame(() => { if (b) b.style.width = ((f1 || 0) * 100).toFixed(1) + '%'; }));
+    const passo = t => { if (FIM !== F || !tt.isConnected) return; const k = Math.min(1, (t - t0) / dur); tt.textContent = '+' + num(Math.round(total * (1 - Math.pow(1 - k, 3)))); if (k < 1) requestAnimationFrame(passo); }; requestAnimationFrame(passo); } }
+
+if (typeof window !== 'undefined') window.addEventListener('ard-idioma', () => { try { entrada(); if (ABERTO && $('perfil') && !$('perfil').hidden) pinta(); if (FIM && $('end') && !$('end').hidden) pintaFim(); } catch (e) {} });
+function montar() { try { entrada(); } catch (e) { console.warn('[ARD] perfil:', e); } const q = (() => { try { return new URLSearchParams(location.search); } catch (e) { return null; } })(); if (q && q.get('perfil') === '1' && !q.get('autostart')) setTimeout(abre, 0); /* ?perfil=1: abre direto (testes e capturas) */ }
+if (typeof document !== 'undefined') { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montar); else montar(); }
+
+ARD.perfilUI = { abre, fecha, entrada, sala, anuncia, desafio, fim, seqHtml, dadosCartao, dadosSeq, get aberto() { return ABERTO; }, get ultimoFim() { return FIM; } };
 })(globalThis.ARD = globalThis.ARD || {});
 
 /* Aether Rift: Dominion — 5.5b (agente m-hud): HUD de moldura fina.
@@ -34108,6 +34691,301 @@ function inicio(deps) { D0 = deps; try { P().degrausInicia(); } catch (e) {} bot
 ARD.degraus = { LISTA, TOTAL, estado, conta, cabe, cfgJogo, nome, frase, aoComecar, aoTerminar, partida, fim, inicio, botaoMenu };
 })(globalThis.ARD = globalThis.ARD || {});
 
+/* Aether Rift: Dominion — 5.5b.2: Patentes. As regras das Centelhas (a experiência do jogador; id interno "xp"), as 10 patentes × 5 níveis,
+   a afinidade por Raça, a sequência do Desafio do Dia com escudo e o código de comandante. Regra pura + guarda no ProgressStore (campo
+   "patentes"); sem servidor e sem nenhum pedido de rede. Roda no Node para os testes (tools/patentes-test.cjs).
+   REGRA DURA: nada aqui entra na simulação. Este arquivo não chama a simulação; só lê o resultado de uma partida que já acabou.
+   - TABELA: quanto rende cada feito. ganhos(o) é pura e explicável: devolve a lista [{ motivo, xp, ... }] sem mudar nada.
+   - credita(o): aplica a lista (uma vez por partida) e devolve { ganhos, total, antes, depois, subiu, subiuAfinidade, marcos }.
+   - O que só se ganha uma vez (missão, estrelas, medalha, conquista, degrau de descoberta, marco de sequência) é pago pela diferença entre
+     o progresso guardado e um "livro" do que já foi pago: nunca paga duas vezes, e é assim que o histórico de quem já jogava vira Centelhas.
+   - Descanso e retorno (reajuste do dono): as 2 primeiras partidas do dia rendem em dobro e a primeira partida de cada semana nova
+     rende um bônus fixo. Os dois valem igual para todos, então pesam mais para quem joga pouco e aproximam os perfis.
+   - Contra fábrica de pontos: partida de teste não rende; partida com menos de 3 minutos não rende; a partida guiada rende uma vez; a mesma
+     partida retomada de um salvamento não rende de novo; a partir da 9ª partida do dia rende metade e, a partir da 15ª, um quinto.
+   - O dia vira em UTC (como o Desafio do Dia). Relógio do aparelho para trás não abre um dia novo: vale o maior dia já visto.
+   Interface: este arquivo não desenha nada (insígnias, telas e cartões são do src/insignias.js); só tem o aviso "Seu histórico valeu N" e a
+   confirmação do código de comandante colado na caixa de backup ou vindo por link (?comandante=CÓDIGO). */
+(function (ARD) {
+'use strict';
+const V = 1;                                           /* versão do campo "patentes" no ProgressStore */
+const FORMATO = 1;                                     /* versão do formato do código de comandante */
+const RACAS = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'];
+const PATENTES = ['recruta', 'batedor', 'vanguarda', 'capitao', 'comandante', 'estrategista', 'almirante', 'marechal', 'guardiao', 'soberano'].map((id, i) => ({ id, ordem: i + 1 }));
+const NIVEIS = 5; const DEGRAUS = PATENTES.length * NIVEIS;
+const ROMANO = ['', 'I', 'II', 'III', 'IV', 'V'];
+
+/* ---------- a tabela de Centelhas por feito ---------- */
+const TABELA = {
+  partida: { escaramuca: 50, blitz: 35, cacada: 45, campanha: 50, multi: 60, guia: 50 }, /* partida terminada, por modo */
+  vitoria: 30,
+  descanso: 2,                                                                            /* 5.5b.2 (reajuste): as primeiras partidas do dia rendem em dobro (partida + vitória + dificuldade); favorece quem joga pouco */
+  retorno: 400,                                                                           /* 5.5b.2 (reajuste): a primeira partida de cada semana nova (a semana vira na segunda, em UTC); não vale na semana de estreia */
+  dificuldade: { facil: 0, normal: 10, dificil: 25, brutal: 40, fenda: 40 },             /* só na vitória */
+  desafio: { jogou: 40, venceu: 40, recorde: 20, recordesPorDia: 3 },                     /* Desafio do Dia: a 1ª partida do dia, a 1ª vitória do dia e bater o próprio recorde */
+  missao: 120,                                                                            /* missão de campanha vencida pela primeira vez */
+  estrela: 20,                                                                            /* cada estrela nova numa missão */
+  medalha: { bronze: 60, prata: 120, ouro: 200 },                                         /* medalha de Caçada (por chefão e dificuldade; na troca por uma melhor, paga a diferença) */
+  conquista: 100,
+  degrau: 60,                                                                             /* degrau de descoberta */
+  marco: { 3: 100, 7: 250, 14: 500, 30: 1000 },                                           /* marcos da sequência do Desafio do Dia */
+  marcoCiclo: 1000,                                                                       /* depois dos 30 dias, cada 30 dias seguidos a mais */
+  minSegundos: 180,                                                                       /* partida mais curta que isto não rende */
+  repeticao: [{ ate: 8, fator: 1 }, { ate: 14, fator: 0.5 }, { ate: Infinity, fator: 0.2 }], /* partidas que renderam no mesmo dia */
+};
+/* ---------- a curva dos 50 degraus ----------
+   Recruta I a V tem custos próprios (a primeira noite); depois, cada patente tem um custo por nível. LIMIAR[k] = Centelhas para estar no
+   degrau k (0 = Recruta I … 49 = Soberano da Fenda V). Depois do topo, uma estrela a cada ESTRELA Centelhas. Ajustada pela simulação dos
+   três perfis (work/ferr/npa-perfis.cjs). */
+const RECRUTA = [0, 60, 160, 310, 500];
+const CUSTO = [0, 280, 500, 870, 1100, 1500, 2000, 2600, 3300, 4600]; /* Centelhas por nível dentro de cada patente (a de Recruta usa a lista acima) */
+const BATEDOR = 740;                                   /* Centelhas para sair de Recruta V */
+const ESTRELA = 13000;
+const LIMIAR = (() => { const L = RECRUTA.slice(); let base = BATEDOR; for (let r = 1; r < PATENTES.length; r++) { for (let j = 0; j < NIVEIS; j++) L.push(base + j * CUSTO[r]); base += NIVEIS * CUSTO[r]; } return L; })();
+const TOPO = LIMIAR[DEGRAUS - 1];
+const AFINIDADE = [300, 1200, 3000, 7000, 15000];      /* Centelhas ganhas com a Raça para cada um dos cinco degraus de afinidade */
+const MARCOS = [3, 7, 14, 30];
+/* os cosméticos que o código de comandante leva, um bit cada. SÓ ACRESCENTE NO FIM (a posição é o que viaja no código). */
+const BITS = ['pin-fortaleza', 'pin-santuario', 'mol-alinhamento', 'mol-cinco-mundos', 'tit-recruta', 'tit-palavra-dada', 'cor-veterano',
+  'tit-seq-3', 'cor-seq-7', 'tit-seq-14', 'tit-seq-30', 'mol-seq-30']
+  .concat(...RACAS.map(r => ['tit-afin-' + r + '-2', 'est-afin-' + r + '-3', 'cor-afin-' + r + '-4', 'tit-afin-' + r + '-5']));
+
+const P = () => ARD.progress;
+const T = (k, v, r) => { const vars = Object.assign({ moeda: moeda(v && v.n) }, v || {}); return ARD.t ? ARD.t(k, vars, r) : String(r != null ? r : k).replace(/\{(\w+)\}/g, (x, n) => (n in vars ? String(vars[n]) : x)); };
+/* o nome da moeda mora em UMA chave por idioma (patente.moeda.nome; .um para o singular): todo texto usa {moeda} */
+function moeda(n) { const um = n === 1; return ARD.t ? ARD.t(um ? 'patente.moeda.um' : 'patente.moeda.nome', null, um ? 'Centelha' : 'Centelhas') : (um ? 'Centelha' : 'Centelhas'); }
+let relogio = () => Date.now();                        /* os testes trocam por um relógio falso (_relogio) */
+const hojeN = () => Math.floor(relogio() / 86400000);  /* o dia em UTC, em número (dias desde 1970-01-01), como o Desafio do Dia */
+const semanaDe = n => Math.floor((n + 3) / 7);         /* semana que começa na segunda (a mesma conta do src/desafio.js) */
+function diaNum(data) { if (typeof data === 'number') return data; if (ARD.desafio && ARD.desafio.diaNum) return ARD.desafio.diaNum(data); const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(data || '')); return m ? Math.floor(Date.UTC(+m[1], +m[2] - 1, +m[3]) / 86400000) : NaN; }
+const int = (v, max) => { v = Math.floor(+v); return v === v && v > 0 ? Math.min(v, max == null ? 1e9 : max) : 0; };
+
+/* ---------- patente de uma quantidade de Centelhas (pura) ---------- */
+function deXp(xp) { xp = int(xp); let k = 0; while (k < DEGRAUS - 1 && xp >= LIMIAR[k + 1]) k++; const p = PATENTES[Math.floor(k / NIVEIS)];
+  const estrelas = xp >= TOPO ? Math.floor((xp - TOPO) / ESTRELA) : 0; const de = k < DEGRAUS - 1 ? LIMIAR[k] : TOPO + estrelas * ESTRELA; const ate = k < DEGRAUS - 1 ? LIMIAR[k + 1] : de + ESTRELA;
+  return { id: p.id, ordem: p.ordem, nivel: k % NIVEIS + 1, falta: ate - xp, degrau: k + 1, de, ate, estrelas }; }
+function afinidadeDe(xp) { xp = int(xp); let d = 0; while (d < AFINIDADE.length && xp >= AFINIDADE[d]) d++; return { xp, degrau: d, falta: d < AFINIDADE.length ? AFINIDADE[d] - xp : 0, de: d ? AFINIDADE[d - 1] : 0, ate: d < AFINIDADE.length ? AFINIDADE[d] : AFINIDADE[AFINIDADE.length - 1] }; }
+/* "Capitão de Fenda III" no idioma (chaves patente.<id>.nome e patente.nivel) */
+function nome(p) { if (!p) return ''; const base = PATENTES.find(x => x.id === p.id); return T('patente.nivel', { patente: T('patente.' + p.id + '.nome', null, base ? base.id : p.id), n: ROMANO[p.nivel] || String(p.nivel) }, '{patente} {n}'); }
+
+/* ---------- o que fica guardado (ProgressStore, campo "patentes"; vai e volta no código de backup) ----------
+   xp: Centelhas; afin: Centelhas por Raça; hist: o que o histórico valeu na primeira abertura; dia: contadores do dia (UTC);
+   livro: o que já foi pago uma vez (missões, estrelas, conquistas, medalhas, degraus, partida guiada, o último Desafio do Dia pago e as
+   últimas partidas pagas); seq: sequência do Desafio do Dia (dias, último dia jogado, escudo, semana do último escudo, melhor, marcos). */
+function novo() { return { v: V, xp: 0, afin: {}, hist: null, dia: { n: 0, p: 0, rec: 0 },
+  livro: { miss: {}, conq: {}, med: {}, deg: 0, guia: 0, desN: 0, desVN: 0, semN: 0, vistas: [] }, seq: { dias: 0, ult: 0, escudo: 0, sem: -1, melhor: 0, marcos: [], pend: [], ciclo: 0 } }; }
+function saneia(g) { const b = novo(); g.xp = int(g.xp, 16777215); if (!g.afin || typeof g.afin !== 'object') g.afin = {}; for (const r of Object.keys(g.afin)) { if (!RACAS.includes(r)) delete g.afin[r]; else g.afin[r] = int(g.afin[r], 1048575); }
+  for (const k of ['dia', 'livro', 'seq']) { if (!g[k] || typeof g[k] !== 'object') g[k] = b[k]; for (const c in b[k]) if (g[k][c] == null || typeof g[k][c] !== typeof b[k][c] || Array.isArray(g[k][c]) !== Array.isArray(b[k][c])) g[k][c] = b[k][c]; }
+  const q = g.seq; q.dias = int(q.dias, 1023); q.melhor = Math.max(int(q.melhor, 1023), q.dias); q.ult = int(q.ult, 65535); q.escudo = q.escudo ? 1 : 0; q.marcos = MARCOS.filter(m => q.marcos.includes(m)); return g; }
+let naMigracao = false;
+function guarda() { const s = P().load(); let g = s.patentes; if (g && typeof g === 'object' && g.v >= 1) return g.__ok ? g : marca(saneia(g));
+  g = s.patentes = marca(novo()); if (!naMigracao) { naMigracao = true; try { migra(s, g); } finally { naMigracao = false; } } salva(); return g; }
+/* __ok: já conferido nesta sessão (não enumerável: não vai para o JSON do ProgressStore) */
+function marca(g) { try { Object.defineProperty(g, '__ok', { value: true, enumerable: false, configurable: true }); } catch (e) {} return g; }
+function salva() { try { return P().save(); } catch (e) { return false; } }
+
+/* ---------- quem já jogava: o histórico vira Centelhas, uma vez só ----------
+   Missões, estrelas, conquistas e medalhas saem do progresso guardado; o Desafio do Dia (5.5b) entra com os dias jogados, as vitórias e a
+   sequência — o recorde de cada dia e a sequência continuam onde estavam (nada do campo "desafio" é mexido). */
+function migra(s, g) { const lin = unicos(s, g, null); const D = s.desafio && typeof s.desafio === 'object' ? s.desafio : null;
+  if (D) { const j = int(D.jogados, 5000), v = int(D.vitorias, 5000); if (j) lin.push({ motivo: 'desafio', n: j, xp: j * TABELA.desafio.jogou }); if (v) lin.push({ motivo: 'desafio-vitoria', n: v, xp: v * TABELA.desafio.venceu });
+    const q = g.seq; const u = D.ultimo ? diaNum(D.ultimo) : NaN; if (u === u && u > 0) { q.ult = int(u, 65535); q.dias = int(D.seq, 1023); g.livro.desN = q.ult; } q.melhor = Math.max(int(D.melhorSeq, 1023), q.dias);
+    for (const m of MARCOS) if (q.melhor >= m) { q.marcos.push(m); lin.push({ motivo: 'marco', ref: m, xp: TABELA.marco[m] }); } q.ciclo = q.melhor >= 60 ? Math.floor(q.melhor / 30) * 30 : 0; }
+  let total = 0; for (const l of lin) { total += l.xp; if (l.raca && RACAS.includes(l.raca)) g.afin[l.raca] = (g.afin[l.raca] || 0) + l.xp; } g.xp = total;
+  g.hist = { xp: total, em: relogio(), visto: total === 0 }; return lin; }
+/* o que só se ganha uma vez: a diferença entre o progresso guardado e o livro (o livro g é atualizado). fato: a partida que acabou (ou null). */
+function unicos(s, g, fato) { const lin = []; const L = g.livro; const MED = { bronze: 1, prata: 2, ouro: 3 }; const VAL = [0, TABELA.medalha.bronze, TABELA.medalha.prata, TABELA.medalha.ouro];
+  const ms = s.missions || {}; for (const id of Object.keys(ms).sort()) { const m = ms[id] || {}; const a = L.miss[id] || (L.miss[id] = { d: 0, e: 0 });
+    if (m.done && !a.d) { a.d = 1; lin.push({ motivo: 'missao', ref: id, xp: TABELA.missao, raca: m.race || null }); }
+    const e = int(m.stars, 3); if (e > a.e) { lin.push({ motivo: 'estrelas', ref: id, n: e - a.e, xp: TABELA.estrela * (e - a.e), raca: m.race || null }); a.e = e; } }
+  const ac = s.achievements || {}; for (const id of Object.keys(ac).sort()) if (ac[id] && !L.conq[id]) { L.conq[id] = 1; lin.push({ motivo: 'conquista', ref: id, xp: TABELA.conquista }); }
+  const rc = (s.cacada && s.cacada.recordes) || {}; for (const k of Object.keys(rc).sort()) { const v = MED[rc[k] && rc[k].medalha] || 0; const pago = int(L.med[k], 3); if (v > pago) { L.med[k] = v; lin.push({ motivo: 'medalha', ref: k, medalha: rc[k].medalha, xp: VAL[v] - VAL[pago] }); } }
+  /* degraus de descoberta: quem já tinha progresso pulou a apresentação (degraus.pulo) e não recebe por ela. O degrau desta partida avança
+     logo depois da tela final (src/degraus.js): fato.degrau diz qual é, para ele ser pago já, e o livro impede o pagamento em dobro. */
+  const dg = s.degraus && typeof s.degraus === 'object' ? s.degraus : null; let n = dg ? int(dg.n, 5) : 0; if (dg && dg.pulo) L.deg = Math.max(L.deg, n);
+  else { if (fato && fato.degrau != null && fato.degrau === n && n === L.deg && n < 5) n++; while (L.deg < n) { L.deg++; lin.push({ motivo: 'degrau', ref: L.deg, xp: TABELA.degrau }); } }
+  return lin; }
+
+/* ---------- a partida que acabou, em fatos (pura: só lê o objeto da tela final) ----------
+   o: o objeto do ARD.fim.mostrar ({ G, sim, human, result, tipo, venceu, tempo }). Os testes passam o.fato pronto. */
+function fatoDe(o) { if (!o) return { tipo: 'escaramuca', venceu: false, tempo: 0, teste: true }; if (o.fato) return o.fato;
+  const G = o.G || {}, cfg = G.cfg || {}, sim = o.sim || {}, sc = sim.cfg || {}; const p = (sim.players && sim.players[o.human]) || {}; const tipo = TABELA.partida[o.tipo] != null ? o.tipo : 'escaramuca';
+  const venceu = o.venceu != null ? !!o.venceu : !!(o.result && o.result.outcome === 'victory'); const cz = o.result && o.result.cacada;
+  let busca = ''; try { busca = typeof location !== 'undefined' ? location.search : ''; } catch (e) {}
+  const teste = !!(cfg.bench || G.bench || (sc.noVeins && !sc.campanha) || sc.eventosTeste || sc.unicasTeste || sc.cmdNivel != null || sc.iaPerfil || (sc.chefe && !sc.cacada) || /[?&](ia=todos|ff=[1-9]|bench=)/.test(busca));
+  const dif = tipo === 'guia' || tipo === 'multi' ? null : tipo === 'campanha' ? ((G.camp && G.camp.prep && G.camp.prep.difficulty) || 'normal') : tipo === 'cacada' ? ((cz && cz.dif) || (cfg.cacada && cfg.cacada.dif) || 'normal') : cfg.diff || 'normal';
+  const f = { tipo, venceu, tempo: Math.max(0, +(o.tempo != null ? o.tempo : sim.time) || 0), dif, raca: RACAS.includes(p.faction) ? p.faction : null, teste, retomada: !!cfg.resume, desafio: null, degrau: null };
+  f.chave = [tipo, tipo === 'campanha' && G.camp && G.camp.prep && G.camp.prep.mission ? G.camp.prep.mission.id : (sim.map && sim.map.type) || cfg.map || '', sim.seed != null ? sim.seed : cfg.seed, f.raca, dif, (sim.players || []).length].join('|');
+  try { const F = ARD.desafioUI && ARD.desafioUI.ultimoFim; if (F && F.o === o && F.diario) { const n = diaNum(F.diario); if (n === n) f.desafio = { data: F.diario, n, venceu, recorde: !!(F.reg && F.reg.recorde), jogadas: F.reg ? F.reg.jogadasHoje | 0 : 1 }; } } catch (e) {}
+  try { const DG = ARD.degraus; if (DG && tipo !== 'guia' && tipo !== 'campanha' && tipo !== 'multi' && !cfg.resume) { const e = DG.estado(); const i = cfg.degrau != null ? cfg.degrau | 0 : e.n; if (!e.pulo && i === e.n && i < DG.TOTAL && DG.cabe(cfg, i)) f.degrau = i; } } catch (e) {}
+  return f; }
+
+/* ---------- a lista de ganhos de uma partida (o livro g é atualizado; ganhos() passa uma cópia, credita() passa o de verdade) ---------- */
+function calcula(fato, g, s, hoje) { const lin = []; const n = Math.max(int(hoje), g.dia.n); if (n !== g.dia.n) g.dia = { n, p: 0, rec: 0 }; /* relógio para trás: continua no maior dia já visto */
+  if (!fato || fato.teste || fato.replay) { lin.push({ motivo: 'sem-ganho', porque: fato && fato.replay ? 'replay' : 'teste', xp: 0 }); return lin; }
+  const L = g.livro; const base = TABELA.partida[fato.tipo]; let porque = null;
+  if (base == null) porque = 'teste'; else if (fato.tipo === 'guia' && L.guia) porque = 'guiada-repetida'; else if (!(fato.tempo >= TABELA.minSegundos)) porque = 'curta'; else if (fato.retomada && fato.chave && L.vistas.includes(fato.chave)) porque = 'retomada-repetida';
+  if (porque) lin.push({ motivo: 'sem-ganho', porque, xp: 0 });
+  else { let parte = base; lin.push({ motivo: 'partida', modo: fato.tipo, xp: base });
+    if (fato.venceu) { lin.push({ motivo: 'vitoria', xp: TABELA.vitoria }); parte += TABELA.vitoria; const d = TABELA.dificuldade[fato.dif] || 0; if (d) { lin.push({ motivo: 'dificuldade', dif: fato.dif, xp: d }); parte += d; } }
+    g.dia.p++; const fx = TABELA.repeticao.find(x => g.dia.p <= x.ate).fator; if (fx < 1) { const corte = Math.round(parte * (1 - fx)); lin.push({ motivo: 'repeticao', n: g.dia.p, xp: -corte }); parte -= corte; }
+    if (g.dia.p <= TABELA.descanso) lin.push({ motivo: 'descanso', n: g.dia.p, xp: parte });
+    { const sem = semanaDe(n); if (L.semN && sem > L.semN) lin.push({ motivo: 'retorno', xp: TABELA.retorno }); if (sem > L.semN) L.semN = sem; }
+    if (fato.tipo === 'guia') L.guia = 1; if (fato.chave) { L.vistas.push(fato.chave); while (L.vistas.length > 60) L.vistas.shift(); }
+    const d = fato.desafio; if (d && d.n > 0) { /* o dia do desafio só anda para a frente: o desafio de um dia já pago (ou de um dia anterior) não paga de novo */
+      if (d.n > L.desN) { L.desN = d.n; lin.push({ motivo: 'desafio', xp: TABELA.desafio.jogou }); }
+      if (d.venceu && d.n >= L.desN && d.n > L.desVN) { L.desVN = d.n; lin.push({ motivo: 'desafio-vitoria', xp: TABELA.desafio.venceu }); }
+      if (d.recorde && d.jogadas > 1 && d.n >= L.desN && g.dia.rec < TABELA.desafio.recordesPorDia) { g.dia.rec++; lin.push({ motivo: 'desafio-recorde', xp: TABELA.desafio.recorde }); } } }
+  for (const l of unicos(s, g, fato)) lin.push(l);
+  const q = g.seq; for (const m of q.pend) lin.push({ motivo: 'marco', ref: m, xp: TABELA.marco[m] || TABELA.marcoCiclo }); q.pend = [];
+  return lin; }
+const soma = lin => lin.reduce((a, l) => a + l.xp, 0);
+const copia = x => JSON.parse(JSON.stringify(x));
+/* pura: a lista que credita(o) aplicaria agora, sem mudar nada. ctx (opcional, para testes): { guardado, progresso, hoje } */
+function ganhos(o, ctx) { const g = saneia(copia(ctx && ctx.guardado ? ctx.guardado : guarda())); const s = ctx && ctx.progresso ? ctx.progresso : P().load(); const fato = fatoDe(o);
+  if (fato && fato.desafio && fato.desafio.n > 0) seqAnda(g.seq, fato.desafio.n); return calcula(fato, g, s, ctx && ctx.hoje != null ? ctx.hoje : hojeN()); }
+function resumo(g) { const d = deXp(g.xp); return { xp: g.xp, id: d.id, ordem: d.ordem, nivel: d.nivel, degrau: d.degrau, estrelas: d.estrelas }; }
+let ULT = null, ULT_SEQ = null;
+/* aplica os ganhos da partida, uma vez (a segunda chamada com o mesmo objeto devolve o mesmo resultado) */
+function credita(o) { if (o && o._pat) return o._pat; const g = guarda(); const s = P().load(); const fato = fatoDe(o);
+  let sq = null; if (fato && fato.desafio && fato.desafio.n > 0) { sq = seqAnda(g.seq, fato.desafio.n); if (!sq.contou && ULT_SEQ && ULT_SEQ.n === fato.desafio.n) sq = ULT_SEQ.r; /* o src/desafio.js já andou a sequência deste dia */ }
+  const antes = resumo(g); const lin = calcula(fato, g, s, hojeN()); const total = Math.max(0, soma(lin)); g.xp = int(g.xp + total, 16777215);
+  let subiuAfinidade = null; for (const l of lin) if (l.raca && RACAS.includes(l.raca) && l.raca !== fato.raca) g.afin[l.raca] = int((g.afin[l.raca] || 0) + l.xp, 1048575); /* a missão conta para a Raça que a venceu */
+  if (fato && fato.raca && total > 0) { const r = fato.raca; const meu = soma(lin.filter(l => !l.raca || l.raca === r)); const a0 = afinidadeDe(g.afin[r] || 0).degrau; g.afin[r] = int((g.afin[r] || 0) + Math.max(0, meu), 1048575); const a1 = afinidadeDe(g.afin[r]).degrau; if (a1 > a0) subiuAfinidade = { raca: r, de: a0, para: a1 }; }
+  const depois = resumo(g); salva();
+  const out = { ganhos: lin, total, antes, depois, subiu: depois.degrau > antes.degrau || depois.estrelas > antes.estrelas ? { de: antes, para: depois, patente: depois.ordem > antes.ordem, estrela: depois.estrelas > antes.estrelas } : null, subiuAfinidade,
+    marcos: lin.filter(l => l.motivo === 'marco').map(l => l.ref), escudo: { usou: !!(sq && sq.usouEscudo), tem: g.seq.escudo, zerou: !!(sq && sq.zerou && sq.antes > 1) }, fato };
+  if (o) { try { o._pat = out; o.patentes = out; } catch (e) {} } ULT = out;
+  try { if (typeof window !== 'undefined' && typeof CustomEvent === 'function') window.dispatchEvent(new CustomEvent('ard-patente', { detail: out })); } catch (e) {}
+  return out; }
+
+/* ---------- sequência do Desafio do Dia, com escudo ----------
+   Conta dias jogados (o dia do desafio, em UTC). Um escudo por semana (a semana vira na segunda), guardando no máximo um. Um dia perdido
+   gasta o escudo sozinho e a sequência continua; sem escudo, ou com dois dias perdidos, a sequência recomeça. O dia só anda para a frente:
+   o mesmo dia, ou um dia anterior (relógio do aparelho para trás), não conta de novo. */
+function concede(q, n) { const sem = semanaDe(n); if (sem > q.sem) { q.sem = sem; q.escudo = 1; return true; } return false; }
+function seqAnda(q, n) { const out = { dias: q.dias, antes: q.dias, contou: false, usouEscudo: false, zerou: false, marcos: [] }; n = int(n, 65535); if (!n || n <= q.ult) return out;
+  if (q.ult) { const falta = n - q.ult - 1; /* dias perdidos entre o último jogado e hoje */
+    if (falta === 1) { concede(q, q.ult + 1); if (q.escudo) { q.escudo = 0; out.usouEscudo = true; } else { q.dias = 0; out.zerou = true; } }
+    else if (falta >= 2) { q.dias = 0; out.zerou = true; } }
+  concede(q, n); q.dias = Math.min(1023, q.dias + 1); q.ult = n; q.melhor = Math.max(q.melhor, q.dias); out.dias = q.dias; out.contou = true;
+  if (MARCOS.includes(q.dias) && !q.marcos.includes(q.dias)) { q.marcos.push(q.dias); q.pend.push(q.dias); out.marcos.push(q.dias); }
+  if (q.dias >= 60 && q.dias % 30 === 0 && q.dias > q.ciclo) { q.ciclo = q.dias; q.pend.push(q.dias); out.marcos.push(q.dias); }
+  return out; }
+/* a sequência que ainda vale no dia n (para a tela): os dias, se o escudo está guardado e se hoje ainda falta jogar */
+function seqEm(q, n) { n = int(n, 65535); const c = copia(q); let dias = c.dias, usaria = false; if (!c.ult) dias = 0; else if (n > c.ult) { const falta = n - c.ult - 1; if (falta === 1) { concede(c, c.ult + 1); if (c.escudo) { c.escudo = 0; usaria = true; } else dias = 0; } else if (falta >= 2) dias = 0; }
+  if (n > 0) concede(c, n); return { dias, escudo: c.escudo, jogouHoje: !!c.ult && n <= c.ult, usaria }; }
+/* chamado pelo src/desafio.js na primeira partida de cada dia do desafio: anda a sequência e devolve os dias (com a regra do escudo) */
+function seqJoga(data) { const n = diaNum(data); if (!(n === n)) return null; const g = guarda(); const r = seqAnda(g.seq, n); if (r.contou) { ULT_SEQ = { n, r }; salva(); } return r; }
+function seqViva(data) { const n = diaNum(data); const g = guarda(); return seqEm(g.seq, n === n ? n : hojeN()).dias; }
+
+/* ---------- o estado para as telas (a forma do contrato) ---------- */
+function estado() { const g = guarda(); const d = deXp(g.xp); const af = {}; for (const r of RACAS) { const a = afinidadeDe(g.afin[r] || 0); af[r] = { xp: a.xp, degrau: a.degrau, falta: a.falta, de: a.de, ate: a.ate }; }
+  const hoje = Math.max(hojeN(), g.dia.n); const sv = seqEm(g.seq, hoje);
+  return { xp: g.xp, patente: { id: d.id, ordem: d.ordem, nivel: d.nivel }, prox: { falta: d.falta, de: d.de, ate: d.ate }, estrelas: d.estrelas, degrau: d.degrau, afinidade: af,
+    sequencia: { dias: sv.dias, escudo: sv.escudo, marcos: g.seq.marcos.slice(), melhor: g.seq.melhor, jogouHoje: sv.jogouHoje, proximoMarco: MARCOS.find(m => m > sv.dias) || (Math.floor(sv.dias / 30) + 1) * 30 },
+    historico: g.hist ? { xp: g.hist.xp, visto: !!g.hist.visto } : null, partidasHoje: g.dia.n === hoje ? g.dia.p : 0 }; }
+/* o aviso "Seu histórico valeu N Centelhas": devolve o texto uma vez (e marca como visto); depois, null */
+function historico(marcar) { const g = guarda(); if (!g.hist || g.hist.visto || !(g.hist.xp > 0)) return null; if (marcar !== false) { g.hist.visto = true; salva(); } return { xp: g.hist.xp, patente: deXp(g.hist.xp), texto: T('patente.historico', { n: g.hist.xp }, 'Seu histórico valeu {n} {moeda}.') }; }
+
+/* ---------- cosméticos por afinidade e por marco de sequência (entradas de dados no src/cosmeticos.js) ---------- */
+function cumpre(it, s) { if (!it) return false; const g = s && s.patentes && typeof s.patentes === 'object' ? s.patentes : null; if (!g) return false;
+  if (it.afinidade) return !!it.raca && afinidadeDe((g.afin && g.afin[it.raca]) || 0).degrau >= it.afinidade; if (it.sequencia) return !!(g.seq && Array.isArray(g.seq.marcos) && g.seq.marcos.includes(it.sequencia)); return false; }
+function comoGanha(it) { if (!it) return ''; if (it.afinidade) { const d = ARD.i18n && ARD.i18n.d; let r = it.raca; try { if (d && d.raca) r = d.raca(it.raca); } catch (e) {} return T('cosm.afinidade', { n: it.afinidade, raca: r }, 'Afinidade {n} com {raca}'); }
+  if (it.sequencia) return T('cosm.sequencia', { n: it.sequencia }, 'Sequência de {n} dias no Desafio do Dia'); return ''; }
+
+/* ---------- código de comandante ----------
+   Leva patente e Centelhas, a afinidade das cinco Raças, a sequência (dias, melhor, último dia, escudo) e os cosméticos liberados, num
+   texto curto: a letra C, a versão do formato, os campos em bits (de 5 em 5, no mesmo alfabeto do código de desafio, sem I, L, O e U) e
+   10 bits de verificação no fim. ler() nunca lança erro. O backup inteiro (ARD1-…, src/progress.js) continua sendo o único backup de
+   tudo e já leva este campo; o código de comandante é só o resumo para levar a patente a outro aparelho. */
+const ALFA = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+function limpa(txt) { let s = String(txt == null ? '' : txt).trim(); const m = /[?&]comandante=([^&#\s]+)/i.exec(s); if (m) { try { s = decodeURIComponent(m[1]); } catch (e) { s = m[1]; } } return s.toUpperCase().replace(/O/g, '0').replace(/[IL]/g, '1').replace(/[^0-9A-Z]/g, ''); }
+function mistura(v) { v = v >>> 0; v ^= v >>> 16; v = Math.imul(v, 0x7feb352d) >>> 0; v ^= v >>> 15; v = Math.imul(v, 0x846ca68b) >>> 0; v ^= v >>> 16; return v >>> 0; }
+function verifica(versao, bits) { let h = 2166136261 >>> 0; const mix = v => { h ^= v; h = Math.imul(h, 16777619) >>> 0; }; mix(versao + 131); for (let i = 0; i < bits.length; i++) mix(bits[i] + 1 + (i % 11)); h = mistura(h); return (h ^ (h >>> 10) ^ (h >>> 20)) & 1023; }
+const CAMPOS = [['xp', 24]].concat(RACAS.map(r => ['a.' + r, 20]), [['dias', 10], ['melhor', 10], ['ult', 16], ['escudo', 1], ['sem', 13]]);
+function dadosAgora() { const g = guarda(); const s = P().load(); const C = ARD.cosmeticos; const cosm = BITS.filter(id => (s.cosm && s.cosm[id]) || (C && C.porId && C.porId(id) && C.tem(id, s)));
+  const afin = {}; for (const r of RACAS) afin[r] = int(g.afin[r], 1048575); return { xp: g.xp, afin, seq: { dias: g.seq.dias, melhor: g.seq.melhor, ult: g.seq.ult, escudo: g.seq.escudo, sem: g.seq.sem }, cosm }; }
+function normal(d) { if (!d || typeof d !== 'object') return null; const sq = d.seq || {}; const afin = {}; for (const r of RACAS) afin[r] = int(d.afin && d.afin[r], 1048575);
+  const dias = int(sq.dias, 1023); return { xp: int(d.xp, 16777215), afin, seq: { dias, melhor: Math.max(int(sq.melhor, 1023), dias), ult: int(sq.ult, 65535), escudo: sq.escudo ? 1 : 0, sem: Math.max(-1, Math.min(8190, Math.floor(+sq.sem === +sq.sem ? +sq.sem : -1))) }, cosm: BITS.filter(id => Array.isArray(d.cosm) && d.cosm.includes(id)) }; }
+function monta(d) { d = normal(d); if (!d) return null; const b = []; const poe = (v, n) => { for (let i = n - 1; i >= 0; i--) b.push(Math.floor(v / Math.pow(2, i)) % 2); };
+  const val = { xp: d.xp, dias: d.seq.dias, melhor: d.seq.melhor, ult: d.seq.ult, escudo: d.seq.escudo, sem: d.seq.sem + 1 }; for (const r of RACAS) val['a.' + r] = d.afin[r];
+  for (const [k, n] of CAMPOS) poe(val[k], n); let nb = 0; BITS.forEach((id, i) => { if (d.cosm.includes(id)) nb = i + 1; }); poe(nb, 6); for (let i = 0; i < nb; i++) b.push(d.cosm.includes(BITS[i]) ? 1 : 0);
+  while (b.length % 5) b.push(0); const cs = verifica(FORMATO, b); let out = 'C' + ALFA[FORMATO]; for (let i = 0; i < b.length; i += 5) out += ALFA[b[i] * 16 + b[i + 1] * 8 + b[i + 2] * 4 + b[i + 3] * 2 + b[i + 4]]; return out + ALFA[cs >> 5] + ALFA[cs & 31]; }
+function codigo() { return monta(dadosAgora()); }
+function bonito(cod) { return limpa(cod).replace(/(.{4})(?=.)/g, '$1-'); }
+/* o link que abre o jogo já pedindo para restaurar (a confirmação vem antes de qualquer mudança) */
+function link(cod) { let base = ''; try { base = location.href.split(/[?#]/)[0]; } catch (e) {} return base + '?comandante=' + (cod || codigo()); }
+function parece(txt) { const s = limpa(txt); return /^C[0-9A-Z]{12,}$/.test(s) && !/^ARD1/i.test(String(txt || '').trim()); }
+/* erros: 'vazio' | 'formato' (não parece um código de comandante) | 'versao' (feito por uma versão mais nova do jogo) | 'soma' (digitado errado ou cortado) | 'conteudo' */
+function decodifica(txt) { try { const s = limpa(txt); if (!s) return { ok: false, erro: 'vazio' }; if (s.length > 120 || s.length < 14 || s[0] !== 'C') return { ok: false, erro: 'formato' };
+    const ver = ALFA.indexOf(s[1]); if (ver < 1) return { ok: false, erro: 'formato' }; const b = []; for (let i = 2; i < s.length; i++) { const v = ALFA.indexOf(s[i]); if (v < 0) return { ok: false, erro: 'formato' }; for (let k = 4; k >= 0; k--) b.push((v >> k) & 1); }
+    const cs = b.splice(b.length - 10, 10).reduce((a, x) => a * 2 + x, 0); if (verifica(ver, b) !== cs) return { ok: false, erro: ver > FORMATO ? 'formato' : 'soma' }; if (ver > FORMATO) return { ok: false, erro: 'versao' };
+    let p = 0, falta = false; const le = n => { let v = 0; for (let i = 0; i < n; i++) { if (p >= b.length) { falta = true; return 0; } v = v * 2 + b[p++]; } return v; }; const val = {}; for (const [k, n] of CAMPOS) val[k] = le(n);
+    const nb = le(6); const cosm = []; for (let i = 0; i < nb; i++) { const x = le(1); if (x && i < BITS.length) cosm.push(BITS[i]); } if (falta || b.length - p >= 5 || b.slice(p).some(x => x)) return { ok: false, erro: 'conteudo' };
+    const afin = {}; for (const r of RACAS) afin[r] = val['a.' + r]; const d = { xp: val.xp, afin, seq: { dias: val.dias, melhor: val.melhor, ult: val.ult, escudo: val.escudo, sem: val.sem - 1 }, cosm };
+    if (nb > BITS.length || val.melhor < val.dias || monta(d) !== s) return { ok: false, erro: 'conteudo' }; /* um código só tem uma forma */
+    return { ok: true, dados: normal(d), codigo: s }; } catch (e) { return { ok: false, erro: 'formato' }; } }
+/* o que se perderia ao trocar o que está no aparelho pelo que o código traz (lista vazia = não rebaixa nada) */
+function perdas(aqui, la) { const out = []; if (la.xp < aqui.xp) out.push({ campo: 'xp', aqui: aqui.xp, la: la.xp }); for (const r of RACAS) if (la.afin[r] < aqui.afin[r]) out.push({ campo: 'afinidade', raca: r, aqui: aqui.afin[r], la: la.afin[r] });
+  if (la.seq.dias < aqui.seq.dias && !(la.seq.ult > aqui.seq.ult)) out.push({ campo: 'sequencia', aqui: aqui.seq.dias, la: la.seq.dias }); if (la.seq.melhor < aqui.seq.melhor) out.push({ campo: 'melhor', aqui: aqui.seq.melhor, la: la.seq.melhor }); return out; }
+function erroTxt(e) { return T('patente.codigo.erro.' + e, null, { vazio: 'Cole o código de comandante.', formato: 'Isto não parece um código de comandante.', versao: 'Este código foi feito por uma versão mais nova do jogo. Atualize o jogo e tente de novo.', soma: 'O código não confere: falta um pedaço ou há uma letra trocada. Copie de novo, inteiro.', conteudo: 'Este código não pôde ser lido por esta versão do jogo.' }[e] || 'Código inválido.'); }
+/* lê sem mudar nada: o que o código traz, a patente dele e o que se perderia */
+function ler(cod) { const r = decodifica(cod); if (!r.ok) return { ok: false, erro: r.erro, texto: erroTxt(r.erro) }; const aqui = normal(dadosAgora()); const perde = perdas(aqui, r.dados);
+  return { ok: true, codigo: r.codigo, dados: r.dados, patente: deXp(r.dados.xp), atual: deXp(aqui.xp), xpAtual: aqui.xp, rebaixa: perde.length > 0, perde, igual: monta(aqui) === r.codigo }; }
+/* restaura. Sem { confirmado: true } nada muda (devolve precisa: 'confirmar'); se o código rebaixa alguma coisa, só com { rebaixar: true }
+   (devolve precisa: 'rebaixar' e a lista do que se perderia). Cosméticos só entram, nunca saem. O livro do que já foi pago fica como está. */
+function restaurar(cod, op) { const r = ler(cod); if (!r.ok) return r; op = op || {}; if (!op.confirmado) return Object.assign({}, r, { ok: false, precisa: 'confirmar' }); if (r.rebaixa && !op.rebaixar) return Object.assign({}, r, { ok: false, precisa: 'rebaixar' });
+  const g = guarda(); const antes = resumo(g); const d = r.dados; g.xp = d.xp; for (const k of RACAS) g.afin[k] = d.afin[k];
+  const q = g.seq; q.dias = d.seq.dias; q.melhor = d.seq.melhor; q.ult = d.seq.ult; q.escudo = d.seq.escudo; q.sem = d.seq.sem; q.pend = []; for (const m of MARCOS) if (q.melhor >= m && !q.marcos.includes(m)) q.marcos.push(m); q.ciclo = Math.max(q.ciclo, q.melhor >= 60 ? Math.floor(q.melhor / 30) * 30 : 0);
+  g.livro.desN = Math.max(g.livro.desN, q.ult); if (g.hist) g.hist.visto = true; const novos = []; const PS = P(); for (const id of d.cosm) if (PS.cosmLibera && PS.cosmLibera(id)) novos.push(id); salva();
+  return { ok: true, antes, depois: resumo(g), cosm: novos, rebaixou: r.rebaixa, perde: r.perde }; }
+
+/* ---------- textos prontos (as telas são do outro arquivo; isto é só para ninguém repetir a montagem) ---------- */
+function motivoTxt(l) { if (!l) return ''; const C = ARD.campaign, d = ARD.i18n && ARD.i18n.d; const seg = f => { try { return f(); } catch (e) { return null; } };
+  const v = { n: l.n != null ? l.n : l.ref, ref: l.ref };
+  if (l.motivo === 'partida') return T('patente.motivo.partida.' + l.modo, v, 'Partida terminada');
+  if (l.motivo === 'dificuldade') v.dif = seg(() => (l.dif === 'fenda' ? C.dificuldade('fenda') : d.dificuldade(l.dif))) || l.dif;
+  if (l.motivo === 'missao' || l.motivo === 'estrelas') v.nome = seg(() => C.titulo(C.BY_ID[l.ref])) || l.ref;
+  if (l.motivo === 'conquista') v.nome = seg(() => C.conquista(l.ref)) || l.ref;
+  if (l.motivo === 'medalha') v.nome = seg(() => T('modos.medalha.' + l.medalha, null, l.medalha)) || l.medalha;
+  if (l.motivo === 'sem-ganho') return T('patente.sem-ganho.' + l.porque, v, 'Esta partida não rendeu {moeda}.');
+  if (l.motivo === 'marco' && !TABELA.marco[l.ref]) return T('patente.motivo.marco-ciclo', v, 'Sequência de {n} dias');
+  return T('patente.motivo.' + l.motivo, v, l.motivo); }
+
+/* ---------- o mínimo de interface (só no navegador) ---------- */
+function confirma(texto, sim) { const m = document.getElementById('confirm'), tx = document.getElementById('confirm-text'), y = document.getElementById('confirm-yes'), nn = document.getElementById('confirm-no');
+  if (!m || !tx || !y || !nn) { if (typeof window.confirm === 'function' && window.confirm(texto)) sim(); return; } m.hidden = false; tx.textContent = texto; y.onclick = () => { m.hidden = true; sim(); }; nn.onclick = () => { m.hidden = true; }; }
+function aviso(texto, ms) { let el = document.getElementById('pat-aviso'); if (!el) { el = document.createElement('div'); el.id = 'pat-aviso'; el.setAttribute('role', 'status'); el.style.cssText = 'position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;max-width:min(92vw,560px);padding:10px 16px;border-radius:10px;background:#12151A;color:#F2F4F7;border:1px solid #FF8A3D;font:600 14px/1.35 system-ui,sans-serif;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.5);pointer-events:none'; document.body.appendChild(el); } /* não recebe toque: nunca fica na frente de um botão */
+  el.textContent = texto; el.hidden = false; clearTimeout(el.__t); el.__t = setTimeout(() => { el.hidden = true; }, ms || 9000); return el; }
+/* o pedido de restauração, com as duas confirmações (a segunda só quando o código rebaixa alguma coisa). fim(resultado) é opcional. */
+function pedeRestaurar(cod, fim) { const r = ler(cod); const feito = x => { if (fim) fim(x); return x; }; if (!r.ok) { aviso(r.texto); return feito(r); }
+  if (r.igual) { aviso(T('patente.codigo.igual', null, 'Este código é igual ao que já está neste aparelho.')); return feito(r); }
+  const aplica = rebaixar => { const x = restaurar(cod, { confirmado: true, rebaixar }); if (x.ok) { aviso(T('patente.codigo.feito', { patente: nome(x.depois), n: x.depois.xp }, 'Código restaurado: {patente}, {n} {moeda}.')); try { window.dispatchEvent(new CustomEvent('ard-patente', { detail: { restaurado: x } })); } catch (e) {} } feito(x); };
+  confirma(T('patente.codigo.confirma', { patente: nome(r.patente), n: r.dados.xp }, 'Restaurar este código de comandante? Este aparelho passa a {patente}, com {n} {moeda}.'), () => {
+    if (!r.rebaixa) return aplica(false);
+    setTimeout(() => confirma(T('patente.codigo.rebaixa', { aqui: nome(r.atual), n: r.xpAtual, la: nome(r.patente), m: r.dados.xp }, 'Atenção: o código traz menos do que este aparelho já tem. Aqui: {aqui}, {n} {moeda}. No código: {la}, {m}. Restaurar mesmo assim e ficar com o que o código traz?'), () => aplica(true)), 0); });
+  return r; }
+/* o backup inteiro (ARD1-…) também pode rebaixar: espia a patente que ele traz, sem aplicar */
+function espiaBackup(txt) { try { const m = /^ARD1-([0-9a-z]+)-([A-Za-z0-9+/=]+)$/.exec(String(txt || '').trim()); if (!m) return null; const json = typeof atob !== 'undefined' ? decodeURIComponent(escape(atob(m[2]))) : Buffer.from(m[2], 'base64').toString('utf8'); const s = JSON.parse(json); return { xp: int(s && s.patentes && s.patentes.xp, 16777215) }; } catch (e) { return null; } }
+function montar() { if (typeof document === 'undefined') return;
+  /* a caixa de backup que já existe (janela da Campanha) aceita também o código de comandante, e o backup inteiro avisa antes de rebaixar a patente */
+  const bi = document.getElementById('camp-import'), ta = document.getElementById('camp-code'); if (bi && ta && !bi.__pat) { bi.__pat = true; bi.addEventListener('click', ev => { if (ta.hidden || !ta.value.trim()) return; const txt = ta.value;
+    if (parece(txt)) { ev.stopImmediatePropagation(); ev.preventDefault(); pedeRestaurar(txt, x => { if (x && x.ok) ta.value = ''; }); return; }
+    if (bi.__patOk) { bi.__patOk = false; return; } const b = espiaBackup(txt); const g = guarda(); if (b && b.xp < g.xp) { ev.stopImmediatePropagation(); ev.preventDefault();
+      confirma(T('patente.codigo.backup-rebaixa', { aqui: nome(deXp(g.xp)), n: g.xp, la: nome(deXp(b.xp)), m: b.xp }, 'Atenção: este backup traz menos do que este aparelho já tem. Aqui: {aqui}, {n} {moeda}. No backup: {la}, {m}. Importar mesmo assim?'), () => { bi.__patOk = true; bi.click(); }); } }, true); }
+  /* ?comandante=CÓDIGO: pede a confirmação e tira o código do endereço (recarregar não pergunta de novo) */
+  try { const u = new URLSearchParams(location.search); const c = u.get('comandante'); if (c) { u.delete('comandante'); const r = u.toString(); history.replaceState(null, '', location.pathname + (r ? '?' + r : '')); setTimeout(() => pedeRestaurar(c), 600); } } catch (e) {}
+  /* quem já jogava: o aviso do histórico, uma vez, na tela inicial (fora de partidas abertas direto pelo endereço) */
+  try { if (!/[?&](autostart|bench|missao|guia|desafio|degrau|retomar|sala|comandante)=/.test(location.search)) setTimeout(() => { try { if (document.body.classList.contains('ingame')) return; const h = historico(true); if (h) aviso(h.texto, 12000); } catch (e) {} }, 1800); } catch (e) {} }
+
+ARD.patentes = { V, FORMATO, PATENTES, NIVEIS, DEGRAUS, RACAS, TABELA, LIMIAR, TOPO, ESTRELA, AFINIDADE, MARCOS, BITS, ROMANO,
+  estado, ganhos, credita, deXp, codigo, ler, restaurar,
+  afinidadeDe, nome, moeda, motivoTxt, erroTxt, fatoDe, historico, seqJoga, seqViva, cumpre, comoGanha, bonito, link, parece, pedeRestaurar, montar,
+  get ultimo() { return ULT; }, _relogio(f) { relogio = typeof f === 'function' ? f : () => Date.now(); }, _monta: monta, _calcula: calcula, _seqAnda: seqAnda, _seqEm: seqEm, _novo: novo };
+if (typeof document !== 'undefined') { try { guarda(); } catch (e) {} if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montar); else montar(); }
+})(globalThis.ARD = globalThis.ARD || {});
+
 /* Bootstrap: tela inicial, laço de jogo, HUD, diplomacia, dicas e tela final. */
 (function (ARD) {
 'use strict';
@@ -34134,13 +35012,13 @@ const RES3 = ['plasma', 'minerio', 'dados'], RES_CLS = { plasma: 'pl', minerio: 
 function costStr(cost) { return Object.keys(cost).filter(k => cost[k]).map(k => `<span class="c-${k}">${RES_ICON[k]} ${cost[k]}</span>`).join(' ') || '<span class="muted">' + Tx('geral.gratis') + '</span>'; } /* 5.0c */
 
 const params = new URLSearchParams(location.search);
-const BUILD = '2026-11-15 21:41Z';
+const BUILD = '2026-11-16 00:28Z';
 const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A', quorith: '#B388FF', vorag: '#E6455A' };
 // Líderes (nomes aprovados 2026-10-10) e a expressão-retrato aprovada de cada um (1 sereno · 2 furioso · 3 triunfante)
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.5b';
+const VERSION = '5.5b.2';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -34260,11 +35138,11 @@ function initStart() {
   // multiplayer P2P por código de sala: 2 a 4 jogadores humanos, sem IAs; o anfitrião é o relé do lockstep
   let lobby = null;
   const mpStatus = t => { $('mp-status').textContent = t; };
-  const myInfo = () => { const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar'; return { name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante') /* 5.0c */, faction, color: ARD.campUI ? ARD.campUI.colorFor(faction) : null, cosm: ARD.cosmeticos ? ARD.cosmeticos.anuncia(faction) : [] /* 5.5a: os cosméticos em uso (só aparência; nunca vão para a cfg da partida) */, build: BUILD }; };
+  const myInfo = () => { const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar'; return { name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante') /* 5.0c */, faction, color: ARD.campUI ? ARD.campUI.colorFor(faction) : null, cosm: ARD.cosmeticos ? ARD.cosmeticos.anuncia(faction) : [] /* 5.5a: os cosméticos em uso (só aparência; nunca vão para a cfg da partida) */, pat: ARD.perfilUI ? ARD.perfilUI.anuncia() : null /* 5.5b.2: a patente, para a insígnia na lista da sala */, build: BUILD }; };
   const facName = f => (S.FACTIONS[f] ? DN.racaCurto(f) : f); /* 5.0c */
   function renderLobby(players, size) {
     const el = $('mp-players'); el.innerHTML = ''; const me = lobby ? lobby.me : null; syncConvite(); /* 5.5a: o link de convite aparece com o código da sala */
-    players.forEach(p => { const d = document.createElement('div'); d.textContent = (p.id === 0 ? '★ ' : '• ') + p.name + ' (' + facName(p.faction) + ')' + (p.id === 0 ? ' ' + Tx('multi.anfitriao') : '') + (me && p.name === me.name && (lobby.role === 'host' ? p.id === 0 : p.id !== 0) ? ' — ' + Tx('multi.voce') : ''); /* 5.0c */ if (ARD.cosmeticos) ARD.cosmeticos.enfeita(d, p.cosm, p.faction); /* 5.5a: moldura, cor do nome e título de cada jogador da sala */ el.appendChild(d); });
+    players.forEach(p => { const d = document.createElement('div'); d.textContent = (p.id === 0 ? '★ ' : '• ') + p.name + ' (' + facName(p.faction) + ')' + (p.id === 0 ? ' ' + Tx('multi.anfitriao') : '') + (me && p.name === me.name && (lobby.role === 'host' ? p.id === 0 : p.id !== 0) ? ' — ' + Tx('multi.voce') : ''); /* 5.0c */ if (ARD.cosmeticos) ARD.cosmeticos.enfeita(d, p.cosm, p.faction); /* 5.5a: moldura, cor do nome e título de cada jogador da sala */ if (ARD.perfilUI) ARD.perfilUI.sala(d, p); /* 5.5b.2: a insígnia da patente antes do nome */ el.appendChild(d); });
     for (let i = players.length; i < size; i++) { const d = document.createElement('div'); d.className = 'muted'; d.textContent = '• ' + Tx('multi.vaga'); /* 5.0c */ el.appendChild(d); }
     if (ARD.modosUI) ARD.modosUI.linhaSala(el, lobby); /* 5.0g: o modo da sala */
     if (lobby && lobby.warn) { const d = document.createElement('div'); d.className = 'warn'; d.textContent = '⚠ ' + TRx(lobby.warn); /* 5.0c */ el.appendChild(d); }

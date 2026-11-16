@@ -672,6 +672,18 @@ Para o jogo circular fora do Brasil. Aprovada pelo dono em 29/10: "precisamos de
   - **QA:** `tools/cosmeticos-test.cjs`, `tools/entrada-test.cjs` e o novo `tools/hud-test.cjs` entraram no `tools/qa.cjs`; `tools/desafio-test.cjs` roda à parte.
   - **Fica para depois:** fichas de seleção mais finas (seguram a cobertura no meio e no fim da partida); tablet; desafio no multiplayer e placar do dia (5.5f); Blitz do desafio só na Planície da Fenda; a manchete do cartão do Desafio do Dia repete o resultado; as fontes e o PeerJS ainda vêm de terceiros (resolve na 5.5h); painel fino e telas do desafio vistos só no Chromium.
 
+##### 5.5b.2 — Patentes · tamanho M · 2 agentes · ✔ 15/11/2026 (pedido do dono em 15/11)
+- **Entra:** uma progressão do jogador que soma tudo o que ele faz, com algo para mostrar nas redes ("agora sou Comandante").
+- **Entregue (agentes n-patentes, n-insignias):**
+  - **Centelhas** (en Sparks, es Chispas; `src/patentes.js`, regra pura com o motivo de cada linha): partida terminada 35 a 60 conforme o modo, vitória +30 e até +40 pela dificuldade, Desafio do Dia, missão (+120 na primeira vez), medalha de Caçada, conquista, degrau de descoberta e marco de sequência. **Descanso:** as 2 primeiras partidas do dia em dobro. **Retorno:** +400 na primeira partida de cada semana nova. Contra fábrica de pontos: menos de 3 minutos não rende; da 9ª partida do dia em diante rende metade e depois um quinto; teste, guiada repetida e salvamento repetido não rendem.
+  - **10 patentes × 5 níveis** (Recruta, Batedor, Vanguarda, Capitão de Fenda, Comandante, Estrategista, Almirante, Marechal do Alinhamento, Guardião da Fenda, Soberano da Fenda); topo em 79.890 Centelhas e uma estrela a cada 13.000 depois dele. Limite do dono: a última patente em até 12 meses para quem joga pouco. Na simulação (15 rodadas): casual (2 partidas, 4 dias por semana) 11,1 meses; regular (1 hora por dia) 5,1 meses; intenso (3 horas por dia) 2,6 meses; Recruta V entre a 3ª e a 5ª partida.
+  - **Afinidade por Raça** (5 degraus) liberando título e cor de nome; **sequência** com marcos em 3, 7, 14 e 30 dias e **um escudo por semana** (guarda no máximo um; jogador novo começa com um; dois dias perdidos zeram).
+  - **Código de comandante** (`?comandante=CÓDIGO`) para levar a patente a outro aparelho; o backup inteiro também leva. Quem já jogava recebe Centelhas pelo histórico, uma vez.
+  - **Logo das Centelhas** (proposta A em uso, trocável pela constante `LOGO`), **insígnias** das 50 (`src/insignias.js`), **Perfil** (`src/perfil-ui.js`), bloco "Centelhas ganhas" na tela final, insígnia na sala multiplayer, e **cartões** de promoção e de marco de sequência nos dois tamanhos e três idiomas.
+  - **Sem servidor:** tudo no aparelho. Quem adianta o relógio ou monta um código à mão consegue se dar patente; por isso o ranking público (5.5f) usa só resultados conferidos.
+  - **QA:** `tools/patentes-test.cjs` e `tools/insignias-test.cjs` na linha de resumo.
+  - **Fica para depois:** os cinco estandartes de Raça e a Moldura da Chama (falta onde desenhar o estandarte); insígnia dos outros jogadores no placar final e na diplomacia; aviso de subida dentro da partida; unificar o nível de Comandante antigo (1 a 30) com as patentes; em 20 px, Comandante e Estrategista ficam parecidas, assim como Almirante e Marechal.
+
 #### Fase 2 — O jogo completo (as especificações estão na Onda 5, abaixo)
 
 ##### 5.5c — Mundos novos · tamanho G/GG · 3 agentes (é a 5.0j)

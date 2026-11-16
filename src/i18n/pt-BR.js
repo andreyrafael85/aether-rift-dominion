@@ -419,7 +419,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nada aqui é seu. Ainda.",
-  "inicio.versao": "Versão 5.5b · build __BUILD__ · Portas Abertas · Mundo vivo · multiplayer 2 a 4",
+  "inicio.versao": "Versão 5.5b.2 · build __BUILD__ · Portas Abertas · Mundo vivo · multiplayer 2 a 4",
   "inicio.vitrine.escolha-sua-raca": "Escolha sua Raça",
   "inicio.vitrine.explorar-base": "Explorar a base",
   "inicio.vitrine.som-tela-inicial": "Som da tela inicial",
@@ -488,6 +488,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "ajustes.btn-bench": "Testar desempenho (30 s)",
   "ajustes.cfg-feedback": "Enviar feedback",
   "notas.notas-versao": "Notas da versão",
+  "notas.5-5b-2": "<b>5.5b.2 — Patentes:</b> agora tudo o que você joga rende <b>Centelhas</b>: partidas, vitórias, o Desafio do Dia, missões, medalhas e conquistas. Elas sobem a sua <b>patente</b>, de Recruta a Soberano da Fenda: são 10 patentes com 5 níveis cada, e uma insígnia que aparece ao lado do seu nome. As duas primeiras partidas do dia rendem em dobro. Cada Raça tem a sua <b>afinidade</b>, que libera títulos e cores. A <b>sequência</b> do Desafio do Dia ganhou marcos em 3, 7, 14 e 30 dias e um <b>escudo</b> por semana, que salva um dia perdido. Ao subir de patente, a tela final oferece o <b>cartão de promoção</b> para compartilhar. O <b>Perfil</b>, ao lado do nome na tela inicial, mostra tudo isso e o <b>código de comandante</b>, para levar a sua patente a outro aparelho. Nada disso muda o resultado de uma partida, e tudo fica só no seu aparelho.",
   "notas.5-5b": "<b>5.5b — Compartilhar:</b> chegou o <b>Desafio do Dia</b>: uma partida curta por dia, igual para todo mundo, com recorde e sequência de dias guardados no aparelho. Você também pode <b>montar um desafio</b> e mandar por link, ou desafiar um amigo a repetir a partida que acabou de jogar. Os <b>cartões</b> de resultado e de conquista saem em dois tamanhos, deitado e em pé. O <b>painel da partida ficou fino</b>: ele ocupa bem menos tela e cresce só quando há o que mostrar (em Ajustes, \"Painel completo na partida\" volta ao de antes). Nas cinco primeiras partidas o jogo apresenta <b>uma novidade por vez</b>. Os itens do Hangar com cadeado agora são <b>liberados pelas conquistas</b>. No celular, tocar numa construção não seleciona mais o Coletor que passa perto. Em Ajustes, \"O que este jogo conta\" mostra as contagens de uso guardadas só no seu aparelho; nada é enviado.",
   "notas.5-5a": "<b>5.5a — Porta de entrada:</b> quem chega agora tem uma <b>primeira partida guiada</b>, com um objetivo por vez e o painel aparecendo aos poucos. Chegou o modo <b>Blitz</b>: 1 contra 1, bases mais perto e relógio de 10 minutos. A <b>tela final</b> é nova, com o gráfico da virada e o botão Compartilhar, que gera um cartão com o resultado. A sala multiplayer ganhou um <b>link de convite</b> que já entra na sala. O mundo recebeu a <b>Luz da Fenda</b>: sol baixo e quente, sombras longas. Cada unidade tem um arco fino na cor do dono, o inimigo se reconhece também pela forma, o chão em volta da base ganha a cor da sua Raça e a promoção aparece como estrela na barra de vida. <b>Balanceamento:</b> Soldador com dano 16 (era 20), Cria e Cuspidor mais caros, Quimera com mais vida e o Atirador de Fenda da Erevane liberado na Era I. O Hangar lista os <b>cosméticos</b> e como ganhar cada um; nada está à venda. No Motor 5 o jogo envia metade dos dados por quadro à placa de vídeo.",
   "notas.5-0h-5": "<b>5.0h.5 — Chefões 3.0:</b> os três chefões deixaram de ser máquinas e viraram criaturas da Fenda, com nomes novos. O Arauto agora é <b>A Medusa da Fenda</b>, a Forja-Mãe é <b>O Titã-Fornalha</b> e a Sentinela da Fenda é <b>A Sentinela Devoradora</b>, que ficou bem maior na tela. Antes de cada golpe o corpo avisa: o Titã escancara a mandíbula, a Devoradora abre as presas e a Medusa contrai o sino. Na Linha de montagem o dorso do Titã se abre e os pontos fracos âmbar aparecem. Os pilares, os Ecos e os lacaios da Fenda ganharam o visual da mesma família. As regras das lutas, a vida e o dano dos chefões não mudaram.",
@@ -508,7 +509,7 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "notas.5-0c": "<b>5.0c — Idiomas:</b> o jogo inteiro agora sai em <b>inglês</b> e <b>espanhol</b>, além do português: tela inicial, Sala de Comando, partida, campanha, diplomacia, multiplayer, Modo Foto, ajuda e as falas da voz do sistema, que passam a usar uma voz do idioma escolhido. O jogo abre no idioma do navegador e troca na hora, sem recarregar, em <b>Idioma / Language / Idioma</b>: no alto da tela inicial, em Ajustes e na janela de Ajustes da partida. Também nesta versão: os planetas e o céu no alto da Sala de Comando ficaram nítidos: em repouso o fundo era desenhado em meia resolução e agora sai inteiro, com o detalhe dos planetas acompanhando o tamanho do pixel, e a Sala não perde mais resolução quando você troca de Raça; o locutor da partida fala no gênero do locutor da sua Raça (voz masculina no Vehnar, no Quorith e no Vorag; feminina na Erevane e na Tessara); com o Motor 5, a resolução dinâmica só baixa quando a placa de vídeo é o limite, o que evita as travadas da troca de resolução; e, no iPhone, o <b>Testar som</b> mostra uma dica quando os efeitos tocam e a voz não.",
   "notas.5-0b-1": "<b>5.0b.1 — Motor 5 mais leve, faróis e som no iPhone:</b> com o <b>Motor 5</b> ligado, os shaders que ele prepara na carga encolheram um terço (os lagos primeiro) e cada quadro manda muito menos dados para a placa de vídeo, o que alivia a CPU no Firefox e no celular. O brilho em volta das luzes agora é o mesmo do motor clássico, e no Modo Foto da qualidade Baixa os efeitos seguem a exposição como no clássico. À noite e dentro da Tempestade de Éter, os faróis dos veículos, coletores e piratas iluminam o chão à frente, nos dois motores. A Sala de Comando ficou um pouco mais clara, sem o clarão de antes. No iPhone, o som e a voz destravam no primeiro toque, tocam com a chave de silêncio ligada e voltam depois de uma ligação. Cada líder fala com uma voz do seu gênero em todo navegador. Em Ajustes, <b>Testar som</b> toca três notas e uma frase e mostra o estado do áudio do aparelho.",
   "notas.5-0b-motor-5": "<b>5.0b — Motor 5 completo, em teste:</b> com o <b>Motor 5</b> ligado (Ajustes › Motor gráfico), o jogo inteiro agora roda em WebGPU, com volta sozinha para WebGL2: unidades e construções com o detalhe de superfície e a animação de cada peça, ruínas, obras, o holograma da Erevane, os escudos do Uníssono e as bandeiras; o chão com todos os biomas, a vegetação ao vento, as estradas e o céu; explosões, fogo, fumaça e tiros; os lagos de plasma e de gelo com reflexo, o espaço do Cinturão e a Tempestade de Éter; e o <b>Modo Foto</b> (📷 ou tecla J) com desfoque, os 8 filtros e captura em 4K. Na primeira vez que o Modo Foto abre numa partida, ele leva alguns segundos para se preparar. Com tudo isso, a carga do Motor 5 ficou alguns segundos mais longa: a próxima versão mede nos aparelhos e enxuga. O motor clássico continua o padrão e não mudou.",
-  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.5a → 2.0)",
+  "notas.historico-versoes-anteriores-5": "Histórico das versões anteriores (5.5b → 2.0)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Termos de Uso",
   "inicio.rodape.foot-priv": "Privacidade",
@@ -2567,4 +2568,143 @@ globalThis.ARD.I18N_DIC['pt-BR'] = {
   "medir.modo.multi": "Multiplayer", /* 5.5b */
   "medir.modo.desafio": "Desafio do Dia", /* 5.5b */
   "cosm.fim.novo": "Novo no Hangar: {itens}", /* 5.5b */
+  "patente.moeda.nome": "Centelhas", /* 5.5b.2 patentes */
+  "patente.moeda.um": "Centelha", /* 5.5b.2 patentes */
+  "patente.recruta.nome": "Recruta", /* 5.5b.2 patentes */
+  "patente.batedor.nome": "Batedor", /* 5.5b.2 patentes */
+  "patente.vanguarda.nome": "Vanguarda", /* 5.5b.2 patentes */
+  "patente.capitao.nome": "Capitão de Fenda", /* 5.5b.2 patentes */
+  "patente.comandante.nome": "Comandante", /* 5.5b.2 patentes */
+  "patente.estrategista.nome": "Estrategista", /* 5.5b.2 patentes */
+  "patente.almirante.nome": "Almirante", /* 5.5b.2 patentes */
+  "patente.marechal.nome": "Marechal do Alinhamento", /* 5.5b.2 patentes */
+  "patente.guardiao.nome": "Guardião da Fenda", /* 5.5b.2 patentes */
+  "patente.soberano.nome": "Soberano da Fenda", /* 5.5b.2 patentes */
+  "patente.nivel": "{patente} {n}", /* 5.5b.2 patentes */
+  "patente.historico": "Seu histórico valeu {n} {moeda}.", /* 5.5b.2 patentes */
+  "patente.motivo.partida.escaramuca": "Escaramuça terminada", /* 5.5b.2 patentes */
+  "patente.motivo.partida.blitz": "Blitz terminado", /* 5.5b.2 patentes */
+  "patente.motivo.partida.cacada": "Caçada terminada", /* 5.5b.2 patentes */
+  "patente.motivo.partida.campanha": "Missão terminada", /* 5.5b.2 patentes */
+  "patente.motivo.partida.multi": "Partida multiplayer terminada", /* 5.5b.2 patentes */
+  "patente.motivo.partida.guia": "Primeira partida terminada", /* 5.5b.2 patentes */
+  "patente.motivo.vitoria": "Vitória", /* 5.5b.2 patentes */
+  "patente.motivo.dificuldade": "Dificuldade {dif}", /* 5.5b.2 patentes */
+  "patente.motivo.descanso": "Primeiras partidas do dia: em dobro", /* 5.5b.2 patentes */
+  "patente.motivo.retorno": "Primeira partida da semana", /* 5.5b.2 patentes */
+  "patente.motivo.repeticao": "Muitas partidas hoje (esta foi a de número {n}): rende menos", /* 5.5b.2 patentes */
+  "patente.motivo.desafio": "Desafio do Dia jogado", /* 5.5b.2 patentes */
+  "patente.motivo.desafio-vitoria": "Desafio do Dia vencido", /* 5.5b.2 patentes */
+  "patente.motivo.desafio-recorde": "Recorde do dia batido", /* 5.5b.2 patentes */
+  "patente.motivo.missao": "Missão vencida pela primeira vez: {nome}", /* 5.5b.2 patentes */
+  "patente.motivo.estrelas": "Estrelas novas em {nome}: {n}", /* 5.5b.2 patentes */
+  "patente.motivo.medalha": "Medalha de Caçada: {nome}", /* 5.5b.2 patentes */
+  "patente.motivo.conquista": "Conquista: {nome}", /* 5.5b.2 patentes */
+  "patente.motivo.degrau": "Novidade descoberta ({n} de 5)", /* 5.5b.2 patentes */
+  "patente.motivo.marco": "Marco de sequência: {n} dias", /* 5.5b.2 patentes */
+  "patente.motivo.marco-ciclo": "Sequência de {n} dias", /* 5.5b.2 patentes */
+  "patente.sem-ganho.curta": "Partida curta demais (menos de 3 minutos): não rendeu {moeda}.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.teste": "Partida de teste: não rende {moeda}.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.replay": "Replay: não rende {moeda}.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.guiada-repetida": "A primeira partida guiada rende {moeda} uma vez só.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.retomada-repetida": "Esta partida salva já rendeu {moeda} antes.", /* 5.5b.2 patentes */
+  "patente.codigo.confirma": "Restaurar este código de comandante? Este aparelho passa a {patente}, com {n} {moeda}.", /* 5.5b.2 patentes */
+  "patente.codigo.rebaixa": "Atenção: o código traz menos do que este aparelho já tem. Aqui: {aqui}, {n} {moeda}. No código: {la}, {m}. Restaurar mesmo assim e ficar com o que o código traz?", /* 5.5b.2 patentes */
+  "patente.codigo.backup-rebaixa": "Atenção: este backup traz menos do que este aparelho já tem. Aqui: {aqui}, {n} {moeda}. No backup: {la}, {m}. Importar mesmo assim?", /* 5.5b.2 patentes */
+  "patente.codigo.feito": "Código restaurado: {patente}, {n} {moeda}.", /* 5.5b.2 patentes */
+  "patente.codigo.igual": "Este código é igual ao que já está neste aparelho.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.vazio": "Cole o código de comandante.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.formato": "Isto não parece um código de comandante.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.versao": "Este código foi feito por uma versão mais nova do jogo. Atualize o jogo e tente de novo.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.soma": "O código não confere: falta um pedaço ou há uma letra trocada. Copie de novo, inteiro.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.conteudo": "Este código não pôde ser lido por esta versão do jogo.", /* 5.5b.2 patentes */
+  "cosm.afinidade": "Afinidade {n} com {raca}", /* 5.5b.2 patentes */
+  "cosm.sequencia": "Sequência de {n} dias no Desafio do Dia", /* 5.5b.2 patentes */
+  "cosm.item.tit-seq-3": "Frequentador da Fenda", /* 5.5b.2 patentes */
+  "cosm.item.cor-seq-7": "Brasa de sete dias", /* 5.5b.2 patentes */
+  "cosm.item.tit-seq-14": "Vigia da Fenda", /* 5.5b.2 patentes */
+  "cosm.item.tit-seq-30": "Chama que Não Apaga", /* 5.5b.2 patentes */
+  "cosm.item.mol-seq-30": "Moldura da Chama", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vehnar-2": "Sócio do Consórcio", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-vehnar-3": "Estandarte do Consórcio", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-vehnar-4": "Tom do Consórcio", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vehnar-5": "Mestre da Fundição", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-erevane-2": "Sombra de Erevane", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-erevane-3": "Estandarte de Erevane", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-erevane-4": "Tom de Erevane", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-erevane-5": "Senhor do Blecaute", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-tessara-2": "Broto de Tessara", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-tessara-3": "Estandarte de Tessara", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-tessara-4": "Tom de Tessara", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-tessara-5": "Mão do Molde", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-quorith-2": "Voz do Coro", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-quorith-3": "Estandarte do Coro", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-quorith-4": "Tom do Coro", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-quorith-5": "Regente do Uníssono", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vorag-2": "Cria da Prole", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-vorag-3": "Estandarte da Prole", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-vorag-4": "Tom da Prole", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vorag-5": "Alfa da Prole", /* 5.5b.2 patentes */
+  /* 5.5b.2 — chaves do CONTRATO das patentes (as mesmas do src/patentes.js; na junção fica uma cópia só) */
+  /* 5.5b.2 — insígnias, Perfil, tela final e cartões (src/insignias.js e src/perfil-ui.js) */
+  "patente.falta": { one: "Próximo: {prox} · falta {n}", other: "Próximo: {prox} · faltam {n}" }, /* 5.5b.2 insignias */
+  "patente.falta.estrela": { one: "Próxima estrela: falta {n}", other: "Próxima estrela: faltam {n}" }, /* 5.5b.2 insignias */
+  "patente.fim.titulo": "{@patente.moeda.nome} ganhas", /* 5.5b.2 insignias */
+  "patente.fim.motivos": "De onde vieram", /* 5.5b.2 insignias */
+  "patente.fim.promocao": "Promoção!", /* 5.5b.2 insignias */
+  "patente.fim.agora": "Agora você é {patente}.", /* 5.5b.2 insignias */
+  "patente.fim.nivel": "Novo nível: {patente}", /* 5.5b.2 insignias */
+  "patente.fim.estrela": { one: "{n} estrela depois do topo", other: "{n} estrelas depois do topo" }, /* 5.5b.2 insignias */
+  "patente.fim.afinidade": "Afinidade com {raca}: degrau {n}", /* 5.5b.2 insignias */
+  "patente.fim.cartao": "Cartão de promoção", /* 5.5b.2 insignias */
+  "patente.cartao.titulo": "Cartão de patente", /* 5.5b.2 insignias */
+  "patente.cartao.rotulo": "Promoção", /* 5.5b.2 insignias */
+  "patente.cartao.sou": "Agora sou", /* 5.5b.2 insignias */
+  "patente.cartao.nivel": "Nível {n}", /* 5.5b.2 insignias */
+  "patente.cartao.raca": "Raça favorita: {raca}", /* 5.5b.2 insignias */
+  "patente.cartao.degrau": "degrau da escada", /* 5.5b.2 insignias */
+  "patente.cartao.degrau.v": "{n}/50", /* 5.5b.2 insignias */
+  "patente.cartao.dias": "dias de sequência", /* 5.5b.2 insignias */
+  "patente.cartao.texto": "Agora sou {patente} no Aether Rift: Dominion.", /* 5.5b.2 insignias */
+  "patente.seq.cartao.rotulo": "Desafio do Dia", /* 5.5b.2 insignias */
+  "patente.seq.cartao.titulo": "{n} dias seguidos", /* 5.5b.2 insignias */
+  "patente.seq.cartao.sub": "sem perder um Desafio do Dia", /* 5.5b.2 insignias */
+  "patente.seq.cartao.janela": "Cartão da sequência", /* 5.5b.2 insignias */
+  "patente.seq.cartao.texto": "{n} dias seguidos no Desafio do Dia do Aether Rift: Dominion.", /* 5.5b.2 insignias */
+  "perfil.titulo": "Perfil", /* 5.5b.2 insignias */
+  "perfil.abrir": "Abrir o Perfil — {patente}", /* 5.5b.2 insignias */
+  "perfil.estrelas": { one: "{n} estrela", other: "{n} estrelas" }, /* 5.5b.2 insignias */
+  "perfil.barra": "Caminho até o próximo nível", /* 5.5b.2 insignias */
+  "perfil.cartao": "Cartão da patente", /* 5.5b.2 insignias */
+  "perfil.afin.titulo": "Afinidade com as Raças", /* 5.5b.2 insignias */
+  "perfil.afin.degrau": "degrau {n} de 5", /* 5.5b.2 insignias */
+  "perfil.seq.titulo": "Sequência do Desafio do Dia", /* 5.5b.2 insignias */
+  "perfil.seq.dias": { one: "dia seguido", other: "dias seguidos" }, /* 5.5b.2 insignias */
+  "perfil.seq.escudo.on": "Escudo guardado", /* 5.5b.2 insignias */
+  "perfil.seq.escudo.on-d": "Se você perder um dia, o escudo é gasto sozinho e a sequência continua.", /* 5.5b.2 insignias */
+  "perfil.seq.escudo.off": "Sem escudo agora", /* 5.5b.2 insignias */
+  "perfil.seq.escudo.off-d": "Você ganha um escudo por semana e guarda no máximo um.", /* 5.5b.2 insignias */
+  "perfil.seq.marcos": "Marcos da sequência", /* 5.5b.2 insignias */
+  "perfil.seq.marco.ok": "alcançado", /* 5.5b.2 insignias */
+  "perfil.seq.marco.falta": { one: "falta {n} dia", other: "faltam {n} dias" }, /* 5.5b.2 insignias */
+  "perfil.seq.cartao": "Cartão dos {n} dias", /* 5.5b.2 insignias */
+  "perfil.cod.titulo": "Código de comandante", /* 5.5b.2 insignias */
+  "perfil.cod.texto": "Suas patentes ficam só neste aparelho. Guarde este código para levar tudo a outro aparelho ou para recuperar depois.", /* 5.5b.2 insignias */
+  "perfil.cod.seu": "Seu código", /* 5.5b.2 insignias */
+  "perfil.cod.copiar": "Copiar código", /* 5.5b.2 insignias */
+  "perfil.cod.copiado": "Código copiado.", /* 5.5b.2 insignias */
+  "perfil.cod.restaurar-rot": "Tem um código? Cole aqui", /* 5.5b.2 insignias */
+  "perfil.cod.conferir": "Conferir", /* 5.5b.2 insignias */
+  "perfil.cod.invalido": "Este código não vale: confira se foi copiado inteiro.", /* 5.5b.2 insignias */
+  "perfil.cod.traz": "Este código traz: {patente} · {n} {@patente.moeda.nome}.", /* 5.5b.2 insignias */
+  "perfil.cod.valido": "Código válido.", /* 5.5b.2 insignias */
+  "perfil.cod.aviso": "Restaurar troca as patentes deste aparelho pelas do código.", /* 5.5b.2 insignias */
+  "perfil.cod.restaurar": "Restaurar", /* 5.5b.2 insignias */
+  "perfil.cod.cancelar": "Cancelar", /* 5.5b.2 insignias */
+  "perfil.cod.restaurado": "Pronto: patentes restauradas.", /* 5.5b.2 insignias */
+  "perfil.escada.titulo": "A escada das 50", /* 5.5b.2 insignias */
+  "perfil.escada.conta": "{n} de 50 degraus alcançados", /* 5.5b.2 insignias */
+  "perfil.nota": "Só aparência: nada aqui muda o resultado de uma partida.", /* 5.5b.2 insignias */
+  "perfil.cod.igual": "Este código é igual ao que já está neste aparelho.", /* 5.5b.2 insignias */
+  "perfil.cod.rebaixa": "Atenção: este código traz menos do que este aparelho já tem. Restaurar troca assim mesmo.", /* 5.5b.2 insignias */
 };

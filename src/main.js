@@ -30,7 +30,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.5b';
+const VERSION = '5.5b.2';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -150,11 +150,11 @@ function initStart() {
   // multiplayer P2P por código de sala: 2 a 4 jogadores humanos, sem IAs; o anfitrião é o relé do lockstep
   let lobby = null;
   const mpStatus = t => { $('mp-status').textContent = t; };
-  const myInfo = () => { const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar'; return { name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante') /* 5.0c */, faction, color: ARD.campUI ? ARD.campUI.colorFor(faction) : null, cosm: ARD.cosmeticos ? ARD.cosmeticos.anuncia(faction) : [] /* 5.5a: os cosméticos em uso (só aparência; nunca vão para a cfg da partida) */, build: BUILD }; };
+  const myInfo = () => { const faction = (document.querySelector('input[name=fac]:checked') || {}).value || 'vehnar'; return { name: $('opt-name').value.trim().slice(0, 18) || Tx('geral.comandante') /* 5.0c */, faction, color: ARD.campUI ? ARD.campUI.colorFor(faction) : null, cosm: ARD.cosmeticos ? ARD.cosmeticos.anuncia(faction) : [] /* 5.5a: os cosméticos em uso (só aparência; nunca vão para a cfg da partida) */, pat: ARD.perfilUI ? ARD.perfilUI.anuncia() : null /* 5.5b.2: a patente, para a insígnia na lista da sala */, build: BUILD }; };
   const facName = f => (S.FACTIONS[f] ? DN.racaCurto(f) : f); /* 5.0c */
   function renderLobby(players, size) {
     const el = $('mp-players'); el.innerHTML = ''; const me = lobby ? lobby.me : null; syncConvite(); /* 5.5a: o link de convite aparece com o código da sala */
-    players.forEach(p => { const d = document.createElement('div'); d.textContent = (p.id === 0 ? '★ ' : '• ') + p.name + ' (' + facName(p.faction) + ')' + (p.id === 0 ? ' ' + Tx('multi.anfitriao') : '') + (me && p.name === me.name && (lobby.role === 'host' ? p.id === 0 : p.id !== 0) ? ' — ' + Tx('multi.voce') : ''); /* 5.0c */ if (ARD.cosmeticos) ARD.cosmeticos.enfeita(d, p.cosm, p.faction); /* 5.5a: moldura, cor do nome e título de cada jogador da sala */ el.appendChild(d); });
+    players.forEach(p => { const d = document.createElement('div'); d.textContent = (p.id === 0 ? '★ ' : '• ') + p.name + ' (' + facName(p.faction) + ')' + (p.id === 0 ? ' ' + Tx('multi.anfitriao') : '') + (me && p.name === me.name && (lobby.role === 'host' ? p.id === 0 : p.id !== 0) ? ' — ' + Tx('multi.voce') : ''); /* 5.0c */ if (ARD.cosmeticos) ARD.cosmeticos.enfeita(d, p.cosm, p.faction); /* 5.5a: moldura, cor do nome e título de cada jogador da sala */ if (ARD.perfilUI) ARD.perfilUI.sala(d, p); /* 5.5b.2: a insígnia da patente antes do nome */ el.appendChild(d); });
     for (let i = players.length; i < size; i++) { const d = document.createElement('div'); d.className = 'muted'; d.textContent = '• ' + Tx('multi.vaga'); /* 5.0c */ el.appendChild(d); }
     if (ARD.modosUI) ARD.modosUI.linhaSala(el, lobby); /* 5.0g: o modo da sala */
     if (lobby && lobby.warn) { const d = document.createElement('div'); d.className = 'warn'; d.textContent = '⚠ ' + TRx(lobby.warn); /* 5.0c */ el.appendChild(d); }

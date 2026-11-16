@@ -79,7 +79,7 @@ function joga(r, raca, diario) { if (!DEPS || (DEPS.ocupado && DEPS.ocupado())) 
 function botoesComuns(box) { box.querySelectorAll('[data-raca]').forEach(b => b.addEventListener('click', () => { V.raca = b.dataset.raca; pinta(); const n = box.querySelector('[data-raca="' + V.raca + '"]'); if (n) n.focus(); }));
   box.querySelectorAll('[data-dd-vista]').forEach(b => b.addEventListener('click', () => { const v = b.dataset.ddVista; if (v === 'fechar') fecha(); else abre(v, { volta: V && V.volta }); })); }
 function pinta() { const el = $('desafio'); if (!el || !V) return; const box = el.querySelector('.box'); const foco = document.activeElement && el.contains(document.activeElement) ? document.activeElement.id : '';
-  const f = { hoje: vistaHoje, montar: vistaMontar, recebido: vistaRecebido, erro: vistaErro, desafiar: vistaDesafiar }[V.vista]; if (f) f(box); el.dataset.vista = V.vista; if (foco && $(foco)) try { $(foco).focus(); } catch (e) {} }
+  const f = { hoje: vistaHoje, montar: vistaMontar, recebido: vistaRecebido, erro: vistaErro, desafiar: vistaDesafiar }[V.vista]; if (f) f(box); el.dataset.vista = V.vista; if (V.vista === 'hoje' && ARD.perfilUI) try { ARD.perfilUI.desafio(box); } catch (e) {} /* 5.5b.2: o escudo e os marcos da sequência */ if (foco && $(foco)) try { $(foco).focus(); } catch (e) {} }
 
 function vistaHoje(box) { const data = hoje(); const r = D().receitaDoDia(data); const st = D().estado(data); if (!V.raca) V.raca = racaInicial(r);
   box.innerHTML = '<div class="eyebrow">' + esc(T('desafio.hoje.eyebrow', { data: dataTxt(data) })) + '</div><h2 id="dd-h">' + esc(titulo(r)) + '</h2><p class="dd-p">' + esc(T('desafio.hoje.texto', { hora: horaVirada() })) + '</p>' + resumoHtml(r) +

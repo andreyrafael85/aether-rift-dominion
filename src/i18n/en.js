@@ -419,7 +419,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   /* inicio-html */
   "inicio.aether-rift-dominion": "Aether Rift<span>Dominion</span>",
   "inicio.nada-aqui-seu-ainda": "Nothing here is yours. Yet.",
-  "inicio.versao": "Version 5.5b · build __BUILD__ · Open Gates · Living world · multiplayer 2 to 4",
+  "inicio.versao": "Version 5.5b.2 · build __BUILD__ · Open Gates · Living world · multiplayer 2 to 4",
   "inicio.vitrine.escolha-sua-raca": "Choose your Race",
   "inicio.vitrine.explorar-base": "Explore the base",
   "inicio.vitrine.som-tela-inicial": "Start screen sound",
@@ -488,6 +488,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "ajustes.btn-bench": "Run benchmark (30 s)",
   "ajustes.cfg-feedback": "Send feedback",
   "notas.notas-versao": "Release notes",
+  "notas.5-5b-2": "<b>5.5b.2 — Ranks:</b> everything you play now earns <b>Sparks</b>: matches, wins, the Daily Challenge, missions, medals and achievements. They raise your <b>rank</b>, from Recruit to Rift Sovereign: 10 ranks with 5 levels each, and an insignia shown next to your name. Your first two matches of the day earn double. Each Race has its own <b>affinity</b>, which unlocks titles and colours. The Daily Challenge <b>streak</b> now has milestones at 3, 7, 14 and 30 days and one <b>shield</b> a week, which saves a missed day. When your rank goes up, the end screen offers a <b>promotion card</b> to share. The <b>Profile</b>, next to your name on the start screen, shows all of this and the <b>commander code</b>, to take your rank to another device. None of this changes the result of a match, and everything stays on your device only.",
   "notas.5-5b": "<b>5.5b — Share:</b> the <b>Daily Challenge</b> is here: one short match a day, the same for everyone, with your record and day streak kept on your device. You can also <b>build a challenge</b> and send it as a link, or dare a friend to repeat the match you just played. Result and achievement <b>cards</b> now come in two sizes, landscape and portrait. The <b>match panel is now slim</b>: it takes much less of the screen and grows only when there is something to show (in Settings, \"Full panel in the match\" brings the old one back). In your first five matches the game introduces <b>one new thing at a time</b>. Locked Hangar items are now <b>unlocked by achievements</b>. On phones, tapping a building no longer selects a Collector passing by. In Settings, \"What this game counts\" shows the usage counts kept only on your device; nothing is sent.",
   "notas.5-5a": "<b>5.5a — Front door:</b> newcomers now get a <b>guided first match</b>, one objective at a time, with the panel appearing little by little. New mode: <b>Blitz</b>, 1 versus 1, bases closer together and a 10-minute clock. The <b>end screen</b> is new, with the turning-point chart and a Share button that builds a result card. The multiplayer room has an <b>invite link</b> that joins the room right away. The world got the <b>Rift Light</b>: a low, warm sun and long shadows. Every unit has a thin arc in its owner's colour, enemies are also recognisable by shape, the ground around your base takes your Race's colour, and promotions show as stars on the health bar. <b>Balance:</b> Welder damage 16 (was 20), Spawn and Spitter cost more, Chimera has more health, and Erevane's Rift Marksman is available in Era I. The Hangar lists the <b>cosmetics</b> and how to earn each one; nothing is for sale. On Motor 5 the game sends half as much data per frame to the graphics card.",
   "notas.5-0h-5": "<b>5.0h.5 — Bosses 3.0:</b> the three bosses are no longer machines: they are creatures of the Rift, with new names. The Herald is now <b>The Rift Medusa</b>, the Mother Forge is <b>The Furnace Titan</b> and the Rift Sentinel is <b>The Devouring Sentinel</b>, which is much larger on screen. Before each strike the body warns you: the Titan throws its jaw open, the Devourer bares its fangs and the Medusa contracts its bell. In the Assembly line phase the Titan's back opens and the amber weak points show. The pillars, the Echoes and the Rift minions got the look of the same family. Fight rules, boss health and damage did not change.",
@@ -508,7 +509,7 @@ globalThis.ARD.I18N_DIC['en'] = {
   "notas.5-0c": "<b>5.0c — Languages:</b> the whole game is now in <b>English</b> and <b>Spanish</b> as well as Portuguese: start screen, War Room, matches, campaign, diplomacy, multiplayer, Photo Mode, help and the system-voice lines, which now use a voice in the chosen language. The game opens in your browser's language and switches instantly, without reloading, under <b>Idioma / Language / Idioma</b>: at the top of the start screen, in Settings and in the in-match Settings window. Also in this version: the planets and sky at the top of the War Room are crisp: at rest the background was drawn at half resolution and is now drawn in full, with the planets' detail following the pixel size, and the room no longer drops resolution when you switch Races; the match announcer speaks in the gender of your Race's announcer (a male voice for the Vehnar, Quorith and Vorag; a female one for the Erevane and Tessara); with Engine 5, dynamic resolution only drops when the graphics card is the limit, which avoids the hitches from resolution changes; and on iPhone, <b>Test sound</b> shows a tip when the effects play but the voice does not.",
   "notas.5-0b-1": "<b>5.0b.1 — Lighter Engine 5, headlights and sound on iPhone:</b> with <b>Engine 5</b> on, the shaders it prepares while loading shrank by a third (the lakes first) and each frame sends much less data to the graphics card, which eases the CPU on Firefox and on phones. The glow around lights is now the same as in the classic engine, and in Photo Mode on Low quality the effects follow the exposure as in the classic engine. At night and inside the Aether Storm, the headlights of vehicles, harvesters and pirates light the ground ahead, in both engines. The War Room got a little brighter, without the glare of before. On iPhone, sound and voice unlock on the first tap, play with the silent switch on and come back after a call. Each leader speaks with a voice of their own gender in every browser. In Settings, <b>Test sound</b> plays three notes and a line and shows the state of the device's audio.",
   "notas.5-0b-motor-5": "<b>5.0b — Engine 5 complete, in testing:</b> with <b>Engine 5</b> on (Settings › Graphics engine), the whole game now runs on WebGPU, falling back to WebGL2 on its own: units and buildings with surface detail and per-part animation, ruins, construction sites, the Erevane hologram, the Unison shields and the banners; the ground with every biome, vegetation in the wind, roads and the sky; explosions, fire, smoke and shots; the plasma and ice lakes with reflections, the Belt's space and the Aether Storm; and <b>Photo Mode</b> (📷 or the J key) with blur, the 8 filters and 4K capture. The first time Photo Mode opens in a match, it takes a few seconds to get ready. With all of this, Engine 5 takes a few seconds longer to load: the next version measures it on real devices and trims it down. The classic engine is still the default and has not changed.",
-  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.5a → 2.0; from 5.0a.3 back, in Portuguese)",
+  "notas.historico-versoes-anteriores-5": "Earlier release notes (5.5b → 2.0; from 5.0a.3 back, in Portuguese)",
   "inicio.rodape.aether-rift": "AETHER RIFT",
   "inicio.rodape.foot-termos": "Terms of Use",
   "inicio.rodape.foot-priv": "Privacy",
@@ -2567,4 +2568,143 @@ globalThis.ARD.I18N_DIC['en'] = {
   "medir.modo.multi": "Multiplayer", /* 5.5b */
   "medir.modo.desafio": "Daily Challenge", /* 5.5b */
   "cosm.fim.novo": "New in the Hangar: {itens}", /* 5.5b */
+  "patente.moeda.nome": "Sparks", /* 5.5b.2 patentes */
+  "patente.moeda.um": "Spark", /* 5.5b.2 patentes */
+  "patente.recruta.nome": "Recruit", /* 5.5b.2 patentes */
+  "patente.batedor.nome": "Scout", /* 5.5b.2 patentes */
+  "patente.vanguarda.nome": "Vanguard", /* 5.5b.2 patentes */
+  "patente.capitao.nome": "Rift Captain", /* 5.5b.2 patentes */
+  "patente.comandante.nome": "Commander", /* 5.5b.2 patentes */
+  "patente.estrategista.nome": "Strategist", /* 5.5b.2 patentes */
+  "patente.almirante.nome": "Admiral", /* 5.5b.2 patentes */
+  "patente.marechal.nome": "Marshal of the Alignment", /* 5.5b.2 patentes */
+  "patente.guardiao.nome": "Rift Guardian", /* 5.5b.2 patentes */
+  "patente.soberano.nome": "Rift Sovereign", /* 5.5b.2 patentes */
+  "patente.nivel": "{patente} {n}", /* 5.5b.2 patentes */
+  "patente.historico": "Your history was worth {n} {moeda}.", /* 5.5b.2 patentes */
+  "patente.motivo.partida.escaramuca": "Skirmish finished", /* 5.5b.2 patentes */
+  "patente.motivo.partida.blitz": "Blitz finished", /* 5.5b.2 patentes */
+  "patente.motivo.partida.cacada": "Hunt finished", /* 5.5b.2 patentes */
+  "patente.motivo.partida.campanha": "Mission finished", /* 5.5b.2 patentes */
+  "patente.motivo.partida.multi": "Multiplayer match finished", /* 5.5b.2 patentes */
+  "patente.motivo.partida.guia": "First match finished", /* 5.5b.2 patentes */
+  "patente.motivo.vitoria": "Victory", /* 5.5b.2 patentes */
+  "patente.motivo.dificuldade": "{dif} difficulty", /* 5.5b.2 patentes */
+  "patente.motivo.descanso": "First matches of the day: doubled", /* 5.5b.2 patentes */
+  "patente.motivo.retorno": "First match of the week", /* 5.5b.2 patentes */
+  "patente.motivo.repeticao": "Many matches today (this was number {n}): earns less", /* 5.5b.2 patentes */
+  "patente.motivo.desafio": "Daily Challenge played", /* 5.5b.2 patentes */
+  "patente.motivo.desafio-vitoria": "Daily Challenge won", /* 5.5b.2 patentes */
+  "patente.motivo.desafio-recorde": "Record of the day beaten", /* 5.5b.2 patentes */
+  "patente.motivo.missao": "Mission won for the first time: {nome}", /* 5.5b.2 patentes */
+  "patente.motivo.estrelas": "New stars in {nome}: {n}", /* 5.5b.2 patentes */
+  "patente.motivo.medalha": "Hunt medal: {nome}", /* 5.5b.2 patentes */
+  "patente.motivo.conquista": "Achievement: {nome}", /* 5.5b.2 patentes */
+  "patente.motivo.degrau": "New feature discovered ({n} of 5)", /* 5.5b.2 patentes */
+  "patente.motivo.marco": "Streak milestone: {n} days", /* 5.5b.2 patentes */
+  "patente.motivo.marco-ciclo": "{n}-day streak", /* 5.5b.2 patentes */
+  "patente.sem-ganho.curta": "Match too short (under 3 minutes): no {moeda} earned.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.teste": "Test match: earns no {moeda}.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.replay": "Replay: earns no {moeda}.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.guiada-repetida": "The guided first match earns {moeda} only once.", /* 5.5b.2 patentes */
+  "patente.sem-ganho.retomada-repetida": "This saved match has already earned {moeda}.", /* 5.5b.2 patentes */
+  "patente.codigo.confirma": "Restore this commander code? This device becomes {patente}, with {n} {moeda}.", /* 5.5b.2 patentes */
+  "patente.codigo.rebaixa": "Warning: the code holds less than this device already has. Here: {aqui}, {n} {moeda}. In the code: {la}, {m}. Restore anyway and keep what the code holds?", /* 5.5b.2 patentes */
+  "patente.codigo.backup-rebaixa": "Warning: this backup holds less than this device already has. Here: {aqui}, {n} {moeda}. In the backup: {la}, {m}. Import anyway?", /* 5.5b.2 patentes */
+  "patente.codigo.feito": "Code restored: {patente}, {n} {moeda}.", /* 5.5b.2 patentes */
+  "patente.codigo.igual": "This code matches what is already on this device.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.vazio": "Paste the commander code.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.formato": "This does not look like a commander code.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.versao": "This code was made by a newer version of the game. Update the game and try again.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.soma": "The code does not check out: a piece is missing or a letter is wrong. Copy it again, in full.", /* 5.5b.2 patentes */
+  "patente.codigo.erro.conteudo": "This code could not be read by this version of the game.", /* 5.5b.2 patentes */
+  "cosm.afinidade": "Affinity {n} with {raca}", /* 5.5b.2 patentes */
+  "cosm.sequencia": "{n}-day streak in the Daily Challenge", /* 5.5b.2 patentes */
+  "cosm.item.tit-seq-3": "Rift Regular", /* 5.5b.2 patentes */
+  "cosm.item.cor-seq-7": "Seven-day ember", /* 5.5b.2 patentes */
+  "cosm.item.tit-seq-14": "Rift Watcher", /* 5.5b.2 patentes */
+  "cosm.item.tit-seq-30": "Unfading Flame", /* 5.5b.2 patentes */
+  "cosm.item.mol-seq-30": "Flame Frame", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vehnar-2": "Consortium Partner", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-vehnar-3": "Consortium Banner", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-vehnar-4": "Consortium hue", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vehnar-5": "Master of the Foundry", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-erevane-2": "Shadow of Erevane", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-erevane-3": "Erevane Banner", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-erevane-4": "Erevane hue", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-erevane-5": "Lord of the Blackout", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-tessara-2": "Tessara Sprout", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-tessara-3": "Tessara Banner", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-tessara-4": "Tessara hue", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-tessara-5": "Hand of the Mold", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-quorith-2": "Voice of the Choir", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-quorith-3": "Choir Banner", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-quorith-4": "Choir hue", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-quorith-5": "Conductor of the Unison", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vorag-2": "Spawn of the Brood", /* 5.5b.2 patentes */
+  "cosm.item.est-afin-vorag-3": "Brood Banner", /* 5.5b.2 patentes */
+  "cosm.item.cor-afin-vorag-4": "Brood hue", /* 5.5b.2 patentes */
+  "cosm.item.tit-afin-vorag-5": "Brood Alpha", /* 5.5b.2 patentes */
+  /* 5.5b.2 — chaves do CONTRATO das patentes (as mesmas do src/patentes.js; na junção fica uma cópia só) */
+  /* 5.5b.2 — insígnias, Perfil, tela final e cartões (src/insignias.js e src/perfil-ui.js) */
+  "patente.falta": { one: "Next: {prox} · {n} to go", other: "Next: {prox} · {n} to go" }, /* 5.5b.2 insignias */
+  "patente.falta.estrela": { one: "Next star: {n} to go", other: "Next star: {n} to go" }, /* 5.5b.2 insignias */
+  "patente.fim.titulo": "{@patente.moeda.nome} earned", /* 5.5b.2 insignias */
+  "patente.fim.motivos": "Where they came from", /* 5.5b.2 insignias */
+  "patente.fim.promocao": "Promotion!", /* 5.5b.2 insignias */
+  "patente.fim.agora": "You are now {patente}.", /* 5.5b.2 insignias */
+  "patente.fim.nivel": "New level: {patente}", /* 5.5b.2 insignias */
+  "patente.fim.estrela": { one: "{n} star past the top", other: "{n} stars past the top" }, /* 5.5b.2 insignias */
+  "patente.fim.afinidade": "Affinity with {raca}: step {n}", /* 5.5b.2 insignias */
+  "patente.fim.cartao": "Promotion card", /* 5.5b.2 insignias */
+  "patente.cartao.titulo": "Rank card", /* 5.5b.2 insignias */
+  "patente.cartao.rotulo": "Promotion", /* 5.5b.2 insignias */
+  "patente.cartao.sou": "I am now", /* 5.5b.2 insignias */
+  "patente.cartao.nivel": "Level {n}", /* 5.5b.2 insignias */
+  "patente.cartao.raca": "Favorite Race: {raca}", /* 5.5b.2 insignias */
+  "patente.cartao.degrau": "step of the ladder", /* 5.5b.2 insignias */
+  "patente.cartao.degrau.v": "{n}/50", /* 5.5b.2 insignias */
+  "patente.cartao.dias": "day streak", /* 5.5b.2 insignias */
+  "patente.cartao.texto": "I am now {patente} in Aether Rift: Dominion.", /* 5.5b.2 insignias */
+  "patente.seq.cartao.rotulo": "Daily Challenge", /* 5.5b.2 insignias */
+  "patente.seq.cartao.titulo": "{n} days in a row", /* 5.5b.2 insignias */
+  "patente.seq.cartao.sub": "without missing a Daily Challenge", /* 5.5b.2 insignias */
+  "patente.seq.cartao.janela": "Streak card", /* 5.5b.2 insignias */
+  "patente.seq.cartao.texto": "{n} days in a row on the Aether Rift: Dominion Daily Challenge.", /* 5.5b.2 insignias */
+  "perfil.titulo": "Profile", /* 5.5b.2 insignias */
+  "perfil.abrir": "Open Profile — {patente}", /* 5.5b.2 insignias */
+  "perfil.estrelas": { one: "{n} star", other: "{n} stars" }, /* 5.5b.2 insignias */
+  "perfil.barra": "Progress to the next level", /* 5.5b.2 insignias */
+  "perfil.cartao": "Rank card", /* 5.5b.2 insignias */
+  "perfil.afin.titulo": "Affinity with the Races", /* 5.5b.2 insignias */
+  "perfil.afin.degrau": "step {n} of 5", /* 5.5b.2 insignias */
+  "perfil.seq.titulo": "Daily Challenge streak", /* 5.5b.2 insignias */
+  "perfil.seq.dias": { one: "day in a row", other: "days in a row" }, /* 5.5b.2 insignias */
+  "perfil.seq.escudo.on": "Shield in reserve", /* 5.5b.2 insignias */
+  "perfil.seq.escudo.on-d": "If you miss one day, the shield is spent automatically and the streak goes on.", /* 5.5b.2 insignias */
+  "perfil.seq.escudo.off": "No shield right now", /* 5.5b.2 insignias */
+  "perfil.seq.escudo.off-d": "You earn one shield a week and can hold only one.", /* 5.5b.2 insignias */
+  "perfil.seq.marcos": "Streak milestones", /* 5.5b.2 insignias */
+  "perfil.seq.marco.ok": "reached", /* 5.5b.2 insignias */
+  "perfil.seq.marco.falta": { one: "{n} day to go", other: "{n} days to go" }, /* 5.5b.2 insignias */
+  "perfil.seq.cartao": "{n}-day card", /* 5.5b.2 insignias */
+  "perfil.cod.titulo": "Commander code", /* 5.5b.2 insignias */
+  "perfil.cod.texto": "Your ranks are stored only on this device. Keep this code to take everything to another device or to recover it later.", /* 5.5b.2 insignias */
+  "perfil.cod.seu": "Your code", /* 5.5b.2 insignias */
+  "perfil.cod.copiar": "Copy code", /* 5.5b.2 insignias */
+  "perfil.cod.copiado": "Code copied.", /* 5.5b.2 insignias */
+  "perfil.cod.restaurar-rot": "Have a code? Paste it here", /* 5.5b.2 insignias */
+  "perfil.cod.conferir": "Check", /* 5.5b.2 insignias */
+  "perfil.cod.invalido": "This code is not valid: check that it was copied in full.", /* 5.5b.2 insignias */
+  "perfil.cod.traz": "This code holds: {patente} · {n} {@patente.moeda.nome}.", /* 5.5b.2 insignias */
+  "perfil.cod.valido": "Valid code.", /* 5.5b.2 insignias */
+  "perfil.cod.aviso": "Restoring replaces the ranks on this device with the ones in the code.", /* 5.5b.2 insignias */
+  "perfil.cod.restaurar": "Restore", /* 5.5b.2 insignias */
+  "perfil.cod.cancelar": "Cancel", /* 5.5b.2 insignias */
+  "perfil.cod.restaurado": "Done: ranks restored.", /* 5.5b.2 insignias */
+  "perfil.escada.titulo": "The ladder of 50", /* 5.5b.2 insignias */
+  "perfil.escada.conta": "{n} of 50 steps reached", /* 5.5b.2 insignias */
+  "perfil.nota": "Looks only: nothing here changes the result of a match.", /* 5.5b.2 insignias */
+  "perfil.cod.igual": "This code matches what is already on this device.", /* 5.5b.2 insignias */
+  "perfil.cod.rebaixa": "Warning: this code holds less than this device already has. Restoring replaces it anyway.", /* 5.5b.2 insignias */
 };

@@ -150,5 +150,6 @@ function abrirConquista(id) { const q0 = dadosConquista(id); if (!q0) return Pro
   return abrir({ titulo: T('cartao.conq.titulo'), desenha: fmt => conquista(dadosConquista(id) || q0, fmt), nome: fmt => 'aether-rift-dominion-conquista-' + id + '-' + FORMATOS[fmt].w + 'x' + FORMATOS[fmt].h + '.png', texto: () => { const q = dadosConquista(id) || q0; return T('cartao.conq.texto', { nome: q.nome }); } }); }
 function abrirResultado(o) { return abrir({ desenha: fmt => resultado(o, fmt), nome: fmt => 'aether-rift-dominion-' + (o.venceu ? 'vitoria' : 'derrota') + '-' + FORMATOS[fmt].w + 'x' + FORMATOS[fmt].h + '.png', texto: () => (typeof o.textoLinha === 'function' ? o.textoLinha() : o.textoLinha) || T('fim.cartao.texto', { m: String(ARD.fim.manchete(o)) }) }); }
 
-ARD.cartoes = { FORMATOS, resultado, conquista, abrir, abrirResultado, abrirConquista, dadosConquista, get aberto() { return ABERTO; } };
+ARD.cartoes = { FORMATOS, resultado, conquista, abrir, abrirResultado, abrirConquista, dadosConquista, get aberto() { return ABERTO; },
+  motor: { tela, fontes, imagem, texto, quebra, duasLinhas, cobre, fundoMarca, marca, retrato, GRAD, FD, FB, FM, CLARO, SUAVE } /* 5.5b.2: o motor de desenho (texto medido), para os cartões de promoção e de sequência do src/insignias.js */ };
 })(globalThis.ARD = globalThis.ARD || {});

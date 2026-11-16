@@ -29,6 +29,33 @@ const CATALOGO = [
   { id: 'cor-apoiador', tipo: 'cor-nome', raca: null, ganha: 'apoiador', cor: '#9FE8FF', nome: 'Azul de apoiador' },
   { id: 'ras-padrao', tipo: 'rastro', raca: null, ganha: 'gratis', nome: 'Rastro padrão' },
   { id: 'ras-apoiador', tipo: 'rastro', raca: null, ganha: 'apoiador', pronto: false, nome: 'Rastro do Sifão em espiral' },
+  /* 5.5b.2: só dados (a arte é do src/insignias.js). sequencia: N = marco da sequência do Desafio do Dia; afinidade: N = degrau de afinidade com a Raça do item.
+     A condição mora no src/patentes.js (cumpre). Os itens com pronto: false esperam a arte (moldura e estandartes). */
+  { id: 'tit-seq-3', tipo: 'titulo', raca: null, ganha: 'conquista', sequencia: 3, nome: 'Frequentador da Fenda' },
+  { id: 'cor-seq-7', tipo: 'cor-nome', raca: null, ganha: 'conquista', sequencia: 7, cor: '#FFB066', nome: 'Brasa de sete dias' },
+  { id: 'tit-seq-14', tipo: 'titulo', raca: null, ganha: 'conquista', sequencia: 14, nome: 'Vigia da Fenda' },
+  { id: 'tit-seq-30', tipo: 'titulo', raca: null, ganha: 'conquista', sequencia: 30, nome: 'Chama que Não Apaga' },
+  { id: 'mol-seq-30', tipo: 'moldura', raca: null, ganha: 'conquista', sequencia: 30, pronto: false, nome: 'Moldura da Chama' },
+  { id: 'tit-afin-vehnar-2', tipo: 'titulo', raca: 'vehnar', ganha: 'conquista', afinidade: 2, nome: 'Sócio do Consórcio' },
+  { id: 'est-afin-vehnar-3', tipo: 'estandarte', raca: 'vehnar', ganha: 'conquista', afinidade: 3, pronto: false, nome: 'Estandarte do Consórcio' },
+  { id: 'cor-afin-vehnar-4', tipo: 'cor-nome', raca: 'vehnar', ganha: 'conquista', afinidade: 4, cor: '#FFB088', nome: 'Tom do Consórcio' },
+  { id: 'tit-afin-vehnar-5', tipo: 'titulo', raca: 'vehnar', ganha: 'conquista', afinidade: 5, nome: 'Mestre da Fundição' },
+  { id: 'tit-afin-erevane-2', tipo: 'titulo', raca: 'erevane', ganha: 'conquista', afinidade: 2, nome: 'Sombra de Erevane' },
+  { id: 'est-afin-erevane-3', tipo: 'estandarte', raca: 'erevane', ganha: 'conquista', afinidade: 3, pronto: false, nome: 'Estandarte de Erevane' },
+  { id: 'cor-afin-erevane-4', tipo: 'cor-nome', raca: 'erevane', ganha: 'conquista', afinidade: 4, cor: '#8CFFE6', nome: 'Tom de Erevane' },
+  { id: 'tit-afin-erevane-5', tipo: 'titulo', raca: 'erevane', ganha: 'conquista', afinidade: 5, nome: 'Senhor do Blecaute' },
+  { id: 'tit-afin-tessara-2', tipo: 'titulo', raca: 'tessara', ganha: 'conquista', afinidade: 2, nome: 'Broto de Tessara' },
+  { id: 'est-afin-tessara-3', tipo: 'estandarte', raca: 'tessara', ganha: 'conquista', afinidade: 3, pronto: false, nome: 'Estandarte de Tessara' },
+  { id: 'cor-afin-tessara-4', tipo: 'cor-nome', raca: 'tessara', ganha: 'conquista', afinidade: 4, cor: '#9CF2B8', nome: 'Tom de Tessara' },
+  { id: 'tit-afin-tessara-5', tipo: 'titulo', raca: 'tessara', ganha: 'conquista', afinidade: 5, nome: 'Mão do Molde' },
+  { id: 'tit-afin-quorith-2', tipo: 'titulo', raca: 'quorith', ganha: 'conquista', afinidade: 2, nome: 'Voz do Coro' },
+  { id: 'est-afin-quorith-3', tipo: 'estandarte', raca: 'quorith', ganha: 'conquista', afinidade: 3, pronto: false, nome: 'Estandarte do Coro' },
+  { id: 'cor-afin-quorith-4', tipo: 'cor-nome', raca: 'quorith', ganha: 'conquista', afinidade: 4, cor: '#D2BBFF', nome: 'Tom do Coro' },
+  { id: 'tit-afin-quorith-5', tipo: 'titulo', raca: 'quorith', ganha: 'conquista', afinidade: 5, nome: 'Regente do Uníssono' },
+  { id: 'tit-afin-vorag-2', tipo: 'titulo', raca: 'vorag', ganha: 'conquista', afinidade: 2, nome: 'Cria da Prole' },
+  { id: 'est-afin-vorag-3', tipo: 'estandarte', raca: 'vorag', ganha: 'conquista', afinidade: 3, pronto: false, nome: 'Estandarte da Prole' },
+  { id: 'cor-afin-vorag-4', tipo: 'cor-nome', raca: 'vorag', ganha: 'conquista', afinidade: 4, cor: '#F28C9A', nome: 'Tom da Prole' },
+  { id: 'tit-afin-vorag-5', tipo: 'titulo', raca: 'vorag', ganha: 'conquista', afinidade: 5, nome: 'Alfa da Prole' },
 ];
 const POR_ID = Object.create(null); for (const it of CATALOGO) POR_ID[it.id] = it;
 const PADRAO = Object.create(null); for (const it of CATALOGO) if (it.ganha === 'gratis' && !PADRAO[it.tipo]) PADRAO[it.tipo] = it; /* o primeiro grátis de cada tipo é o padrão */
@@ -44,6 +71,7 @@ function tem(id, prog) { const it = porId(id); if (!it || it.pronto === false) r
   return cumpre(it, s); }
 /* 5.5b: a condição do item de conquista vale agora? (a conquista da campanha ou o nível do Comandante) */
 function cumpre(it, s) { if (!it || it.ganha !== 'conquista' || it.pronto === false || !s) return false;
+  if (it.afinidade || it.sequencia) return !!(ARD.patentes && ARD.patentes.cumpre && ARD.patentes.cumpre(it, s)); /* 5.5b.2: afinidade com a Raça e marcos de sequência */
   if (it.conquista) return !!(s.achievements && s.achievements[it.conquista]); if (it.nivel) return ((s.commander && s.commander.level) || 1) >= it.nivel; return false; }
 /* 5.5b: libera de verdade o que a conquista já pagou: grava cada item novo no ProgressStore (cosm: { id: quando }) e devolve a lista dos que
    entraram agora, para o aviso da tela final. Chamado ao abrir o jogo (em silêncio: o que o jogador já tinha não vira aviso) e no fim de cada partida.
@@ -60,6 +88,7 @@ function nomeTipo(t) { return T('cosm.tipo.' + t, null, t); }
 /* como se ganha, em texto (nunca um preço) */
 function comoGanha(it) { if (!it) return ''; if (it.pronto === false) return T('cosm.em-producao', null, 'Em produção');
   if (it.ganha === 'gratis') return T('cosm.gratis', null, 'Grátis'); if (it.ganha === 'apoiador') return T('cosm.apoiador', null, 'Edição de Apoiador (ainda não disponível)');
+  if (it.afinidade || it.sequencia) return ARD.patentes ? ARD.patentes.comoGanha(it) : ''; /* 5.5b.2 */
   if (it.nivel) return T('cosm.nivel', { n: it.nivel }, 'Chegue ao nível {n} de Comandante');
   const C = ARD.campaign; return T('cosm.conquista', { nome: C && C.conquista ? C.conquista(it.conquista) : it.conquista }, 'Conquista: {nome}'); }
 /* o que chegou de outro jogador (ou do armazenamento): só ids do catálogo, um por tipo, da Raça certa; o resto cai no padrão */

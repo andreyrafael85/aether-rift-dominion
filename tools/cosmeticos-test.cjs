@@ -7,10 +7,10 @@ const path = require('path'), fs = require('fs'), vm = require('vm'); const root
 globalThis.ARD = {}; for (const f of ['modos.js', 'chefes-sim.js', 'mundo.js', 'unicas-sim.js', 'sim.js', 'ai.js', 'progress.js', 'campaign.js', 'cosmeticos.js']) require(path.join(root, 'src', f));
 const A = globalThis.ARD, C = A.cosmeticos, S = A.sim, AI = A.ai, P = A.progress; const falhas = []; let n = 0; const ok = (c, m) => { n++; if (!c) falhas.push(m); };
 // 1) formato
-const ids = new Set(); const CAMPOS = new Set(['id', 'tipo', 'raca', 'ganha', 'conquista', 'nivel', 'skin', 'cor', 'pronto', 'nome']); const RACAS = Object.keys(S.FACTIONS);
+const ids = new Set(); const CAMPOS = new Set(['id', 'tipo', 'raca', 'ganha', 'conquista', 'nivel', 'skin', 'cor', 'pronto', 'nome', 'afinidade', 'sequencia' /* 5.5b.2 */]); const RACAS = Object.keys(S.FACTIONS);
 for (const it of C.CATALOGO) { ok(/^[a-z0-9-]{1,32}$/.test(it.id), 'id fora do formato: ' + it.id); ok(!ids.has(it.id), 'id repetido: ' + it.id); ids.add(it.id); ok(C.TIPOS.includes(it.tipo), it.id + ': tipo desconhecido'); ok(C.GANHA.includes(it.ganha), it.id + ': ganha desconhecido');
   ok(it.raca === null || RACAS.includes(it.raca), it.id + ': Raça desconhecida'); ok(Object.keys(it).every(k => CAMPOS.has(k)), it.id + ': campo fora do formato (' + Object.keys(it).filter(k => !CAMPOS.has(k)) + ')');
-  if (it.ganha === 'conquista') ok((it.conquista && A.campaign.ACHIEVEMENTS.some(a => a.id === it.conquista)) || (it.nivel >= 2 && it.nivel <= P.MAX_LEVEL), it.id + ': conquista ou nível inexistente'); else ok(!it.conquista && !it.nivel, it.id + ': condição em item que não é de conquista');
+  if (it.ganha === 'conquista') ok((it.conquista && A.campaign.ACHIEVEMENTS.some(a => a.id === it.conquista)) || (it.nivel >= 2 && it.nivel <= P.MAX_LEVEL) || (it.afinidade >= 1 && it.afinidade <= 5 && RACAS.includes(it.raca)) || [3, 7, 14, 30].includes(it.sequencia) /* 5.5b.2: afinidade com a Raça e marco de sequência */, it.id + ': conquista ou nível inexistente'); else ok(!it.conquista && !it.nivel && !it.afinidade && !it.sequencia, it.id + ': condição em item que não é de conquista');
   ok(typeof it.nome === 'string' && it.nome, it.id + ': sem nome'); }
 for (const t of C.TIPOS) { ok(C.PADRAO[t] && C.PADRAO[t].ganha === 'gratis', 'tipo sem padrão grátis: ' + t); ok(C.CATALOGO.some(it => it.tipo === t && it.ganha !== 'gratis'), 'tipo sem item para ganhar: ' + t); }
 const porConquista = C.CATALOGO.filter(it => it.ganha === 'conquista').length; ok(porConquista >= 3, 'menos de 3 itens por conquista');

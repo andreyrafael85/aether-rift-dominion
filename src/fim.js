@@ -60,7 +60,9 @@ function mostrar(o) { U = o; const venceu = o.result.outcome === 'victory'; o.ve
   const det = $('fim-det'); if (det) det.open = false;
   o.G.fimCap = 40; /* a foto da cena para o cartão sai nos próximos quadros */
   const v = o.G.view; if (v) { v.reveal = true; o.G.fimGira = true; }
-  if (ARD.desafioUI) try { ARD.desafioUI.fim(o); } catch (e) { console.warn('[ARD] desafio (tela final):', e); } /* 5.5b: linha para colar, recorde do dia, "Desafiar um amigo" e o cartão de conquista */ }
+  if (ARD.desafioUI) try { ARD.desafioUI.fim(o); } catch (e) { console.warn('[ARD] desafio (tela final):', e); } /* 5.5b: linha para colar, recorde do dia, "Desafiar um amigo" e o cartão de conquista */
+  if (ARD.patentes) try { ARD.patentes.credita(o); } catch (e) { console.warn('[ARD] patentes (tela final):', e); } /* 5.5b.2: as Centelhas da partida (src/patentes.js); o resultado fica em o.patentes para a tela mostrar */
+  if (ARD.perfilUI) try { ARD.perfilUI.fim(o); } catch (e) { console.warn('[ARD] patentes (tela final):', e); } /* 5.5b.2: o bloco "Centelhas ganhas" (depois do desafio, para a sequência do dia já estar registrada) */ }
 function pinta(o) { const venceu = o.venceu; const tt = $('end-title'); tt.textContent = o.palavra || T(venceu ? 'fim.vitoria' : 'fim.derrota', null, venceu ? 'VITÓRIA' : 'DERROTA'); tt.className = o.result.outcome;
   if (o.linha) $('end-eyebrow').textContent = o.linha;
   const nm = $('fim-lider-nome'); if (nm) nm.textContent = o.lider && o.lider.nome ? o.lider.nome : '';
