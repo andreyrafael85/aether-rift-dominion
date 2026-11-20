@@ -90,9 +90,11 @@ A.UI_RACA = Object.keys(UI_RACA); A.SONS = Object.keys(MIN_GAP); /* 5.0f: o que 
 A.sintetiza = function (c, d, t, name, raca, v, delay) { const ant = TG; TG = { c, d, t }; try { const R = raca && UI_RACA[raca]; if (R && R[name]) R[name](); else desenha(name, v == null ? 1 : v, delay); } finally { TG = ant; } };
 /* 5.0f: posição do efeito: o src/main.js passa o evento (A.em(e)) antes do efeito dele; vale para o próximo A.sfx e só para ele */
 let EV = null; A.em = function (e) { EV = e || null; };
+A.descartes = 0; A.parado = () => !!A.enabled && (!A.ctx || A.ctx.state !== 'running'); /* 5.5b.5: som ligado mas ainda sem tocar (o Teste de desempenho mostra "toque para ligar o som") */
+const noGesto = () => { try { const ua = typeof navigator !== 'undefined' && navigator.userActivation; return ua ? !!ua.isActive : !!D.evento; } catch (e) { return true; } }; /* navegador sem userActivation: depois do primeiro gesto, como antes */
 A.sfx = function (name, vol, delay) {
   const ev = EV; EV = null; /* 5.0f */
-  if (!A.enabled || !A.ctx) return; A.resume(); vol = vol == null ? 1 : Math.max(0, Math.min(1, vol)); if (vol < 0.03) return;
+  if (!A.enabled || !A.ctx) return; A.resume(); if (A.ctx.state !== 'running' && !noGesto()) { A.descartes++; return; } /* 5.5b.5: com o contexto parado (página aberta por endereço sem toque, ou interrompida pelo iOS) o som era agendado mesmo assim e tocava tudo junto na hora do primeiro toque (o "som da batalha só no fim do teste" do dono). Agora o efeito é descartado; só passa o que nasce dentro do próprio toque que está ligando o som */ vol = vol == null ? 1 : Math.max(0, Math.min(1, vol)); if (vol < 0.03) return;
   const now = performance.now(); if (A.last[name] && now - A.last[name] < (MIN_GAP[name] || 50)) return;
   A.recent = A.recent.filter(t => now - t < 100); if (A.recent.length > 10) return; A.recent.push(now); A.last[name] = now;
   const s3 = S3(); if (s3 && s3.tocar(name, vol, delay, ev, A.raca || racaDaTela())) return; /* 5.0f: pela voz do mixer (posição, abafamento, reverberação, prioridade) */
@@ -226,7 +228,7 @@ A.onSay = null; /* 5.0b: legendas — cada fala aceita também vai para A.onSay(
    espera (ms para o arquivo chegar), campRaca, g (fala já escolhida), sistema (false = sem a voz do sistema se a gravada falhar), textoSistema, aoFalhar, lider }.
    Com a fala gravada pronta (bytes na memória), ela toca pelo Web Audio e a legenda usa o texto do manifesto do idioma atual; sem ela, a voz do
    sistema, como antes (no iPhone com vozes gravadas, só a legenda); a fala que ainda não chegou é pedida para a próxima vez. */
-A.say = function (text, key, cooldown, quem, o) { /* 5.0a.3: quem = raça do líder que fala (a chave 'sala-<raça>' da Sala de Comando já diz quem é) */
+A.say = function (text, key, cooldown, quem, o) { if (A.ctx && A.ctx.state !== 'running' && !D.evento && !noGesto()) { A.descartes++; return false; } /* 5.5b.5: antes do primeiro toque na página as falas também não se acumulam (depois dele, tudo como antes: a espera pelo 'interrupted' do iOS não muda) */ /* 5.0a.3: quem = raça do líder que fala (a chave 'sala-<raça>' da Sala de Comando já diz quem é) */
   key = key || text; o = o || {}; const now = performance.now(); const d = decide(key, cooldown, now, o.tipo); if (!d) return false;
   const lid = quem || (/^sala-([a-z]+)$/.exec(key) || [])[1]; { if (lid && GENERO_LIDER[lid]) d.genero = GENERO_LIDER[lid]; else if (A.raca && GENERO_LOCUTOR[A.raca]) d.genero = GENERO_LOCUTOR[A.raca]; } /* 5.0a.3; 5.0c: o locutor da Raça */
   const vz = VZ(); if (vz && o.espera == null && /^sala-/.test(key)) o = Object.assign({}, o, { espera: vz.ESPERA_SALA }); /* 5.0c.1: a saudação da Sala espera o arquivo da Raça nova */

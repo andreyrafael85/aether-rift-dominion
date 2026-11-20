@@ -10,20 +10,20 @@ const Q = new URLSearchParams(typeof location !== 'undefined' ? location.search 
 /* ---------- escolha do motor: ?motor=5 | ?motor=classico | Ajustes (ard-beta-prefs.motor) | padrão clássico ---------- */
 function prefMotor() { try { return (JSON.parse(localStorage.getItem('ard-beta-prefs') || '{}') || {}).motor || null; } catch (e) { return null; } }
 const pedido = Q.get('motor') || prefMotor();
-/* 5.5b.4: PRONTO E DESLIGADO — Motor 5 como padrão em tela de toque com WebGPU. Com M5_PADRAO_TOQUE = true (ou ?motor=auto, para testar), quem não escolheu
+/* 5.5b.4 (pronto e desligado) → 5.5b.5 (LIGADO) — Motor 5 como padrão em tela de toque com WebGPU. Com M5_PADRAO_TOQUE = true (ou ?motor=auto, para testar), quem não escolheu
    motor no endereço nem nos Ajustes entra no Motor 5 quando a tela é de toque e o navegador tem WebGPU; se o adaptador ou o aparelho da GPU não puderem ser
    criados, o jogo abre direto no clássico; se o Motor 5 cair na reserva WebGL2, não iniciar ou der erro de GPU nos primeiros quadros, a página recarrega no
-   clássico. Nos dois casos fica anotado no aparelho (ard-m5-auto) para não tentar de novo. Só ligar depois das medições do dono no iPhone. */
-const M5_PADRAO_TOQUE = false;
-const CH_AUTO = 'ard-m5-auto';
+   clássico. Nos dois casos fica anotado no aparelho (ard-m5-auto) para não tentar de novo NESTE build do jogo (5.5b.5: cada versão nova tenta uma vez). */
+const M5_PADRAO_TOQUE = true; /* 5.5b.5: LIGADO por decisão do dono depois das medições no iPhone (Motor 5 a 2×: média 60, 0 travadas; clássico: 45 a 2×) */
+const CH_AUTO = 'ard-m5-auto', MARCA = 'falhou@' + '__BUILD__'; /* 5.5b.5: a anotação de falha vale só para este build; cada versão nova do jogo tenta o Motor 5 de novo uma vez */
 const autoPedido = pedido === 'auto' || (!pedido && M5_PADRAO_TOQUE);
-const autoPode = () => { try { return typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches && !!navigator.gpu && localStorage.getItem(CH_AUTO) !== 'falhou'; } catch (e) { return false; } };
+const autoPode = () => { try { return typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches && !!navigator.gpu && localStorage.getItem(CH_AUTO) !== MARCA; } catch (e) { return false; } };
 const autoM5 = autoPedido && autoPode();
 ARD.motor = pedido === '5' || pedido === 'm5' || pedido === 'webgpu' || autoM5 ? '5' : 'classico';
 const M5 = ARD.m5 = ARD.m5 || {};
 M5.auto = autoM5; M5.autoPend = autoM5; M5.padraoToque = M5_PADRAO_TOQUE;
-M5.autoMarca = function (motivo) { M5.autoMotivo = motivo; try { localStorage.setItem(CH_AUTO, 'falhou'); } catch (e) {} console.warn('[ARD] Motor 5 automático: ' + motivo + '; o jogo segue no motor clássico'); };
-M5.autoFalhou = function (motivo) { if (!M5.auto || M5.autoSaindo) return; M5.autoSaindo = true; M5.autoMarca(motivo); const qq = new URLSearchParams(location.search); qq.set('motor', 'classico'); location.replace(location.pathname + '?' + qq.toString()); }; /* depois que o canvas ganhou o contexto do Motor 5 só dá para voltar recarregando */
+M5.autoMarca = function (motivo) { M5.autoMotivo = motivo; try { localStorage.setItem(CH_AUTO, MARCA); } catch (e) {} console.log('[ARD] Motor 5 automático: ' + motivo + '; o jogo segue no motor clássico'); }; /* 5.5b.5: console.log, não warn: é um caminho normal (navegador que anuncia WebGPU sem adaptador), e com ?debug o warn abria a caixa de erros por cima dos botões */
+M5.autoFalhou = function (motivo) { if (!M5.auto || M5.autoSaindo) return; M5.autoSaindo = true; M5.autoMarca(motivo); try { sessionStorage.setItem('ard-m5-volta', '1'); } catch (e) {} /* 5.5b.5: o src/main.js reabre sozinho a partida que estava começando (escaramuça montada no menu) */ const qq = new URLSearchParams(location.search); qq.set('motor', 'classico'); location.replace(location.pathname + '?' + qq.toString()); }; /* depois que o canvas ganhou o contexto do Motor 5 só dá para voltar recarregando */
 const autoProva = () => { try { return navigator.gpu.requestAdapter().then(a => a ? a.requestDevice().then(d => { try { d.destroy(); } catch (e) {} return true; }) : false).catch(() => false); } catch (e) { return Promise.resolve(false); } }; /* antes de qualquer canvas: dá para criar o adaptador e o aparelho da GPU? */
 M5.versao = '5.0a.1';
 M5.gl = Q.get('m5gl') === '1'; /* força a reserva WebGL2 do WebGPURenderer (teste do caminho de quem não tem WebGPU) */
@@ -157,7 +157,7 @@ M5.create3d = function (canvas, R) {
   X.gpuTimer = on => { X.gpu.on = !!(on && X.timestamp); X.gpu.ms.length = 0; return X.gpu.on; };
   X.marcas = []; X.marca = rot => { const t = performance.now(); X.marcas.push([rot, Math.round(t - (X.marcaT || t)), X.pipes]); X.marcaT = t; }; /* 5.0a.1: passos do aquecimento (ms desde o passo anterior, pipelines até ali) */
   X.frameNo = 0; X.debugPipes = /m5pipes=2/.test(location.search) ? 2 : /m5pipes=1/.test(location.search); /* 1: o que nasce depois do aquecimento; 2: todos */
-  const tsOk = v => { const G = X.gpu; G.busy = false; if (typeof v === 'number' && v > 0) { G.last = v; if (G.on && G.ms.length < 20000) G.ms.push(v); } }, tsErr = () => { X.gpu.busy = false; }; /* funções criadas uma vez (sem fechar escopo novo por quadro) */
+  const tsOk = v => { const G = X.gpu; G.busy = false; if (typeof v === 'number' && v > 0) { G.last = v; G.amostras = (G.amostras || 0) + 1; /* 5.5b.5: conta as leituras (a nitidez automática alisa por leitura nova) */ if (G.on && G.ms.length < 20000) G.ms.push(v); } }, tsErr = () => { X.gpu.busy = false; }; /* funções criadas uma vez (sem fechar escopo novo por quadro) */
   X.afterFrame = () => { X.frameNo++; if (M5.auto && !X.autoOk) { if (X.errors.length) M5.autoFalhou('erro de GPU nos primeiros quadros'); else if (X.frameNo >= 120) X.autoOk = true; } /* 5.5b.4 */ const G = X.gpu; G.n++; if (!X.timestamp || G.busy) return; if (G.on ? G.n % 2 !== 0 : G.n % 30 !== 0) return; G.busy = true; /* no teste, a cada 2 quadros (o three soma o último quadro resolvido); fora dele, a cada 30 */
     renderer.resolveTimestampsAsync('render').then(tsOk, tsErr); };
   return X;
