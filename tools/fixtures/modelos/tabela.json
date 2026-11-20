@@ -1,0 +1,18 @@
+{
+ "v": 1,
+ "racas": {
+  "tessara": {
+   "arquivo": "tessara.otb.gz",
+   "hash": "df597b87b7",
+   "gzip": 177757,
+   "cru": 306426,
+   "completa": false,
+   "mapa": {
+    "colosso": "otb_colosso",
+    "infantaria": "otb_infantaria",
+    "quimera": "otb_quimera",
+    "nucleo": "otb_nucleo"
+   }
+  }
+ }
+}

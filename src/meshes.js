@@ -6065,6 +6065,7 @@ const PROPS = {
 // ---------- API ----------
 const FULL = { veiculo: ['veiculo_hull', 'veiculo_turret'], torre: ['torre_base', 'torre_turret'], bastiao: ['bastiao_base', 'bastiao_turret'] };
 function recipe(race, def) {
+  { const O = ARD.otb, f = O && O.receita ? O.receita(race, def) : null; if (f) return f; } /* 5.5b.4: modelo feito no Blender (src/otb.js), quando o pacote da Raça está instalado e a tabela tem a peça; senão vale a receita de sempre, abaixo */
   { const RX = ARD.meshes && ARD.meshes.receitas; if (RX && RX[def]) return (K, P, tc, seed) => RX[def](K, P, tc, seed); } /* 5.0g: receitas de fora (os chefões, src/chefes-modelos.js) */
   const br = BR[race]; if (br && br[def] && !def.startsWith('_')) return (K, P, tc, seed) => br[def](K, P, tc, seed); /* 4.3f: construção própria da Raça (seed = estilo do Núcleo) */
   const u = U[race]; if (u && u[def]) return (K, P, tc) => u[def](K, P, tc);

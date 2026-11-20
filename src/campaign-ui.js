@@ -109,11 +109,12 @@ function openHangar() {
   const closeObs = new MutationObserver(() => { if ($('hangar').hidden) { pauseViewer(); closeObs.disconnect(); } }); closeObs.observe($('hangar'), { attributes: true, attributeFilter: ['hidden'] });
 }
 const SIGNATURE = { vehnar: ['prensa', 'soldador'], erevane: ['lamina', 'atirador'], tessara: ['colosso', 'quimera'], quorith: ['monolito', 'voz'], vorag: ['brutamonte', 'cria'] };
-let hgPending = null;
+let hgPending = null, hgUlt = null; /* 5.5b.4: o último pedido do Hangar (Raça, cor, pele) */
 function startViewer(race, color, skin) { // 4.1a: um renderizador só, reaproveitado entre aberturas (antes o contexto era descartado e a reabertura ficava em branco)
   const THREE = window.THREE, ME = ARD.meshes, ADD = window.THREE_ADDONS || {}; const cv = D.$('hg-view'); if (!cv) return;
   const note = D.$('hg-loading'); if (!THREE || !ME) { if (note) note.hidden = false; if (!hgPending) { hgPending = () => { hgPending = null; if (!D.$('hangar').hidden) startViewer(race, color, skin); }; window.addEventListener('three-ready', hgPending, { once: true }); } return; }
   if (note) note.hidden = true;
+  { const O = ARD.otb; hgUlt = [race, color, skin]; if (O && O.pede && !O.tem(race)) O.pede(race, { rede: false }).then(ok => { if (ok && hgUlt && hgUlt[0] === race && !D.$('hangar').hidden) startViewer(hgUlt[0], hgUlt[1], hgUlt[2]); }); } /* 5.5b.4: modelos feitos no Blender (src/otb.js) — se o pacote da Raça já está na máquina (embutido ou guardado), o Hangar se refaz com eles; sem pedido de rede aqui */
   try {
     if (!hg) { const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); r.outputColorSpace = THREE.SRGBColorSpace; r.toneMapping = THREE.ACESFilmicToneMapping; r.shadowMap.enabled = true;
       const sc = new THREE.Scene(); sc.background = new THREE.Color(0x0b0d11); if (ADD.RoomEnvironment) { const pm = new THREE.PMREMGenerator(r); sc.environmentIntensity = 0.3; /* 4.3b: r186 */ sc.environment = pm.fromScene(new ADD.RoomEnvironment(), 0.04).texture; pm.dispose(); }

@@ -2,7 +2,7 @@
 <style>html,body{margin:0;background:#0e1116;overflow:hidden}</style>
 <script type="importmap">{"imports":{"three":"../dist/vendor/three/build/three.module.min.js","three/addons/":"../dist/vendor/three/examples/jsm/"}}</script>
 </head><body>
-<script src="../src/unicas-sim.js"></script><script src="../src/mundo.js"></script><script src="../src/sim.js"></script><script src="../src/meshes.js"></script><script src="../src/chefes-modelos.js"></script><script src="../src/unicas-modelos.js"></script>
+<script src="../src/unicas-sim.js"></script><script src="../src/mundo.js"></script><script src="../src/sim.js"></script><script src="../src/meshes.js"></script><script src="../src/chefes-modelos.js"></script><script src="../src/unicas-modelos.js"></script><script src="../src/otb.js"></script>
 <script type="module">
 /* Galeria da documentação (docs/imagens/): um modelo do jogo por vez, em 3/4, com a luz da partida (sol quente, céu frio, reflexo de ambiente
    e sombra), num fundo escuro limpo. As malhas são as do próprio jogo (src/meshes.js e src/chefes-modelos.js), na cor da Raça.
@@ -44,5 +44,7 @@ window.foto = function (o) {
   renderer.render(scene, cam);
   return { url: o.png ? renderer.domElement.toDataURL('image/png') : renderer.domElement.toDataURL(o.jpg ? 'image/jpeg' : 'image/webp', o.q || (o.jpg ? 0.92 : 0.86)), tris: Math.round(g.main.attributes.position.count / 3) }; /* 5.0h.2: PNG sem perda para a redução */
 };
+/* 5.5b.4: modelos feitos no Blender (src/otb.js): o tools/galeria.cjs entrega a tabela e os pacotes (base64 do .otb.gz); devolve { raça: instalou? } */
+window.modelosNovos = async (tab, emb) => { ARD.otb.config({ base: null, racas: tab.racas, emb }); const out = {}; for (const r in emb) out[r] = await ARD.otb.pede(r); return out; };
 window.__done = true;
 </script></body></html>

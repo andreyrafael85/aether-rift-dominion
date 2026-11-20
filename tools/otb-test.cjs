@@ -1,0 +1,175 @@
+// 5.5b.4 — teste dos modelos feitos no Blender (formato .otb): carregador (src/otb.js), tabela (assets/modelos/tabela.json) e a ligação com o jogo.
+// Dois blocos, sempre por contagem e comportamento (nunca por tempo de relógio):
+// (a) "jogo": o jogo como publicado. Com a tabela do jogo SEM Raças (a 5.5b.4 sai só com o carregador): nenhuma Raça pede pacote, nada vai embutido,
+//     todas as peças das cinco Raças são as de antes, vértice a vértice, e a partida abre sem pedido de modelo e sem erro. No dia em que a tabela do jogo
+//     tiver uma Raça, este bloco roda nela TUDO o que o bloco (b) roda, e aí faltar peça é falha (toda peça da Raça com versão cheia e leve e a largura
+//     de hoje ±3%; --parcial só avisa).
+// (b) "carregador": o mesmo código com o pacote de teste do piloto (tools/fixtures/modelos/: tessara.otb.gz e a tabela dele; dado de teste, não vai no jogo):
+//   1) formato: o pacote abre, tem as receitas que a tabela cita, e sem a tabela (ou com ?modelos=antigos) nada muda;
+//   2) pacote estragado: sem a marca, cortado em vários pontos, com o cabeçalho ou os dados trocados, gzip cortado, resposta 404 e rede que cai —
+//      em todos, nenhuma receita fica registrada pela metade, nada estoura e o modelo montado é o de antes, vértice a vértice;
+//   3) cada peça da tabela: receita cheia e leve, a largura do modelo de hoje (±3%), o assento da parte que gira no lugar, os mesmos atributos das
+//      malhas de hoje e triângulos na ordem dos de hoje (até +25%). No pacote de teste, peça que falta e largura fora viram aviso (é dado de teste);
+//   4) a troca: o construtor entrega o modelo novo para a Raça dona e o de antes para as outras; a cor do time muda parte da cor (e só parte); a
+//      torre composta fecha; a barra de carregamento conta o pacote sem voltar atrás;
+//   5) no navegador (Chromium, motor clássico, servidor local só para o teste; a página é o dist/local.html com a tabela de teste posta no lugar da
+//      do jogo, e o pacote servido em assets/modelos/ como no Pages): a partida com a Raça pede UM pacote e usa os modelos novos; ícone 3D do painel;
+//      partida sem a Raça não pede nada; ?modelos=antigos; 404 e pacote estragado = modelos de antes, sem erro na página nem no console; o service
+//      worker guarda o pacote e a segunda partida usa a cópia; a página com o pacote embutido (arquivo único) não pede nada.
+// Uso: NODE_PATH=<pasta com node_modules/playwright> node tools/otb-test.cjs [--json] [--parcial] [--sem-navegador]   (a última linha com --json é o resultado)
+const path = require('path'), fs = require('fs'), zlib = require('zlib'), http = require('http'); const root = path.resolve(__dirname, '..');
+const JSONOUT = process.argv.includes('--json'), PARCIAL = process.argv.includes('--parcial'), SEM_NAV = process.argv.includes('--sem-navegador'); const t00 = Date.now();
+const res = [], avisos = []; let ROT = ''; /* rótulo do bloco: 'jogo: ' ou 'carregador: ' */ const ok = (c, nome, det) => { nome = ROT + nome; res.push({ ok: !!c, nome: nome + (!c && det != null ? ' — ' + (typeof det === 'string' ? det : JSON.stringify(det)) : '') }); if (!JSONOUT) console.log((c ? '  ok   ' : '  FALHA ') + nome + (!c && det != null ? ' — ' + (typeof det === 'string' ? det : JSON.stringify(det)) : '')); };
+const aviso = t => { t = ROT + t; avisos.push(t); if (!JSONOUT) console.log('  aviso ' + t); };
+const fecha = () => { const bad = res.filter(r => !r.ok).length;
+  if (JSONOUT) console.log(JSON.stringify({ ok: res.length - bad, falhas: bad, total: res.length, falhou: res.filter(r => !r.ok).map(r => r.nome), avisos, s: Math.round((Date.now() - t00) / 1000) }));
+  else console.log('otb: ' + (res.length - bad) + ' ok, ' + bad + ' falhas · ' + Math.round((Date.now() - t00) / 1000) + ' s'); process.exit(bad ? 1 : 0); };
+const FONTES = ['src/modos.js', 'src/chefes-sim.js', 'src/mundo.js', 'src/unicas-sim.js', 'src/sim.js', 'src/meshes.js'].map(f => fs.readFileSync(path.join(root, f), 'utf8')); const OTB = fs.readFileSync(path.join(root, 'src/otb.js'), 'utf8');
+/* um jogo novo no Node (construtor + carregador), com a busca da página e a rede de mentira que o teste quiser */
+function novo(o) { o = o || {}; globalThis.ARD = {}; globalThis.location = { search: o.busca || '' }; for (const f of FONTES) (0, eval)(f); if (!o.semOtb) (0, eval)(OTB); if (o.cfg !== undefined && ARD.otb) ARD.otb.config(o.cfg); globalThis.fetch = o.fetch || (async () => { throw new Error('sem rede'); }); return ARD; }
+const tris = g => g ? (g.main.attributes.position.count + (g.em ? g.em.attributes.position.count : 0)) / 3 : -1;
+const soma = g => { let s = 0; const a = g.main.attributes.position.array; for (let i = 0; i < a.length; i += 7) s += a[i]; return Math.round(s * 1000) + ':' + a.length; }; /* assinatura barata da malha: muda se um vértice mudar */
+const finito = g => { for (const gg of [g.main, g.em]) if (gg) for (const k in gg.attributes) { const a = gg.attributes[k].array; for (let i = 0; i < a.length; i++) if (!Number.isFinite(a[i])) return false; } return true; };
+const pecasDe = (M, S, race) => { const out = []; const poe = d => { for (const x of M.FULL[d] || [d]) if (!out.includes(x)) out.push(x); }; M.BUILDING_DEFS.forEach(poe); M.unitsOf(race).forEach(poe); for (const d in S.UNITS) if (S.UNITS[d].faction === race) poe(d); return out; };
+const COMPOSTA = { torre_base: 'torre', bastiao_base: 'bastiao', veiculo_hull: 'veiculo' };
+
+(async () => {
+  globalThis.THREE = await import(path.join(root, 'dist/vendor/three/build/three.module.min.js')).catch(() => null);
+  if (!globalThis.THREE) { ok(false, 'three vendorizado (rode node tools/vendor.mjs)'); return fecha(); }
+  const lerTab = f => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { return null; } }; const JOGO_DIR = path.join(root, 'assets/modelos'), FIX_DIR = path.join(root, 'tools/fixtures/modelos');
+  const TABJ = lerTab(path.join(JOGO_DIR, 'tabela.json')), TABF = lerTab(path.join(FIX_DIR, 'tabela.json')); if (!TABJ || !TABJ.racas) { ok(false, 'assets/modelos/tabela.json existe e tem "racas" (vazia = o jogo sem pacote nenhum)'); return fecha(); } const racasJ = Object.keys(TABJ.racas);
+  ok(!/\botb\b/.test(fs.readFileSync(path.join(root, 'src/sim.js'), 'utf8') + fs.readFileSync(path.join(root, 'src/ai.js'), 'utf8') + fs.readFileSync(path.join(root, 'src/net.js'), 'utf8')), 'a simulação, a IA e a rede não leem nada dos modelos (src/sim.js, src/ai.js, src/net.js sem "otb")');
+  let TAB = null, DIR = null, FIX = false; /* a tabela e a pasta do bloco em curso; FIX = pacote de teste (peça que falta e largura fora viram aviso) */
+  const okOuAviso = (c, nome, det) => { if (c || !FIX) ok(c, nome, det); else aviso(nome + ' — ' + det + ' (dado de teste do piloto, não vai no jogo)'); };
+  const cfgDe = (extra) => Object.assign({ base: 'assets/modelos/', racas: TAB.racas }, extra || {});
+  const arq = r => fs.readFileSync(path.join(DIR, TAB.racas[r].arquivo)); const resp = buf => async () => new Response(buf, { status: 200, headers: { 'content-length': String(buf.length) } });
+  const carregador = async () => {
+  for (const race of Object.keys(TAB.racas)) { const T = TAB.racas[race], gz = arq(race), cru = zlib.gunzipSync(gz); const mapa = T.mapa || {}; const nomeDe = e => typeof e === 'string' ? e : e.r;
+    /* ---------- 1) formato ---------- */
+    ok(gz[0] === 0x1f && gz[1] === 0x8b && cru.toString('latin1', 0, 4) === 'OTB1', race + ': o pacote é gzip de um .otb'); ok(gz.length === T.gzip && cru.length === T.cru, race + ': bytes do pacote iguais aos da tabela', gz.length + '/' + cru.length);
+    { const A = novo({ cfg: undefined }), M = A.meshes; const antes = Object.keys(M.receitas || {}).length; const ref = {}; for (const d in mapa) ref[d] = soma(M.build(d, race, '#55E68A', 0));
+      ok(Object.keys(M.receitas || {}).length === antes && !A.otb.tem(race), race + ': carregar o src/otb.js sem a tabela não registra nem troca nada');
+      let iguais = 0; { const B = novo({ semOtb: true }); for (const d in mapa) if (soma(B.meshes.build(d, race, '#55E68A', 0)) === ref[d]) iguais++; } ok(iguais === Object.keys(mapa).length, race + ': sem o pacote, as peças são as de antes, vértice a vértice (' + iguais + ')');
+      /* ---------- instala e confere a tabela ---------- */
+      const C = novo({ cfg: cfgDe(), fetch: resp(gz) }); const pedidos = []; const f0 = globalThis.fetch; globalThis.fetch = async (u) => { pedidos.push(String(u)); return f0(u); };
+      const prog = []; const n = await C.otb.partida({ players: [{ faction: race }, { faction: race }, { faction: 'vehnar' }, { faction: race, mundo: true }] }, f => prog.push(f));
+      ok(n === 1 && C.otb.tem(race) && C.otb.estado[race] === 'ok', race + ': a carga da partida instala o pacote da Raça', C.otb.estado[race]);
+      ok(pedidos.length === 1 && pedidos[0] === 'assets/modelos/' + T.arquivo + '?v=' + T.hash, race + ': um pedido só, com o ?v= do pacote', pedidos);
+      ok(prog.length > 0 && prog.every((v, i) => v >= 0.02 && v <= 0.08 + 1e-9 && (!i || v >= prog[i - 1])) && Math.abs(prog[prog.length - 1] - 0.08) < 1e-9, race + ': a barra conta o pacote de 2% a 8% sem voltar atrás', prog.slice(0, 6));
+      await C.otb.partida({ players: [{ faction: race }] }); ok(pedidos.length === 1, race + ': a segunda partida não pede o pacote de novo');
+      const M2 = C.meshes, S2 = C.sim, pecas = pecasDe(M2, S2, race); const faltam = pecas.filter(p => !mapa[p]); const sobram = Object.keys(mapa).filter(p => !pecas.includes(p));
+      if ((PARCIAL || FIX) && faltam.length) aviso(race + ': ' + faltam.length + ' de ' + pecas.length + ' peças seguem com o modelo de hoje (' + faltam.join(', ') + ')');
+      else ok(!faltam.length, race + ': toda peça da Raça tem modelo novo (' + (pecas.length - faltam.length) + ' de ' + pecas.length + ')', 'faltam: ' + faltam.join(', '));
+      ok(!sobram.length, race + ': a tabela só cita peças que a Raça tem', sobram); ok(!!T.completa === !faltam.length, race + ': o campo "completa" da tabela diz a verdade');
+      const B = novo({ semOtb: true }).meshes; /* os modelos de hoje, para comparar */ globalThis.ARD = C;
+      for (const d in mapa) { const e = typeof mapa[d] === 'string' ? { r: mapa[d] } : mapa[d]; const nomes = [e.r].concat(Object.values(e.s || {})); const cab = C.otb.modelos[e.r];
+        ok(nomes.every(x => C.otb.modelos[x]), race + '/' + d + ': a receita da tabela veio no pacote', nomes); if (!cab) continue;
+        ok(cab.lods && cab.lods.cheia && cab.lods.cheia.length > 0 && cab.lods.leve && cab.lods.leve.length > 0, race + '/' + d + ': tem versão cheia e leve');
+        globalThis.ARD = C; const a = M2.build(d, race, '#55E68A', 0), l = M2.build(d, race, '#55E68A', 0, { lite: true }), c = M2.build(d, race, '#FF5A5A', 0); const h = B.build(d, race, '#55E68A', 0), hl = B.build(d, race, '#55E68A', 0, { lite: true });
+        ok(!!a && !!l && !!h, race + '/' + d + ': monta cheia e leve'); if (!a || !l || !h) continue;
+        ok(tris(a) === cab.tri.cheia && tris(l) === cab.tri.leve, race + '/' + d + ': o jogo entrega o modelo novo (triângulos do cabeçalho: ' + cab.tri.cheia + ' cheia, ' + cab.tri.leve + ' leve)', tris(a) + '/' + tris(l));
+        okOuAviso(Math.abs(a.width / h.width - 1) <= 0.03 && (Math.abs(l.width / hl.width - 1) <= 0.03 || Math.abs(l.width / a.width - 1) <= 0.03) /* a leve: igual à leve de hoje ou à cheia nova (o jogo ajusta o tamanho pela largura: leve mais estreita = modelo que cresce ao trocar de versão) */, race + '/' + d + ': mesma largura do modelo de hoje (±3%), cheia e leve', a.width.toFixed(2) + ' e ' + l.width.toFixed(2) + ' × hoje ' + h.width.toFixed(2) + ' e ' + hl.width.toFixed(2));
+        ok(tris(a) <= tris(h) * 1.25 && tris(l) <= tris(hl) * 1.25 && tris(l) <= tris(a), race + '/' + d + ': triângulos na ordem dos de hoje (até +25%) e a leve não pesa mais que a cheia', tris(a) + '/' + tris(l) + ' × hoje ' + tris(h) + '/' + tris(hl));
+        ok(finito(a) && finito(l), race + '/' + d + ': sem número inválido');
+        ok(['position', 'normal', 'color', 'rm', 'pt'].every(k => a.main.attributes[k] && l.main.attributes[k]) && !a.main.index && (!h.anim || (a.main.attributes.aAnim && a.main.attributes.aAnimB)), race + '/' + d + ': mesmos atributos das malhas de hoje' + (h.anim ? ' (com animação por peça)' : ''));
+        { let y0 = Infinity; const pa = a.main.attributes.position.array; for (let i = 1; i < pa.length; i += 3) y0 = Math.min(y0, pa[i]); ok(Math.abs(y0) < 0.05 * Math.max(1, a.height) && a.height > 0, race + '/' + d + ': apoiado no chão', y0); }
+        { let dif = 0; const ca = a.main.attributes.color.array, cc = c.main.attributes.color.array; for (let i = 0; i < ca.length; i++) if (Math.abs(ca[i] - cc[i]) > 0.02) dif++; ok(dif > 0 && dif < ca.length * 0.7, race + '/' + d + ': a cor do time muda parte da cor (e só parte)', dif + ' de ' + ca.length); }
+        if (h.mount != null) ok(a.mount != null && Math.abs(a.mount - h.mount) <= Math.max(0.5, h.mount * 0.15) && l.mount != null, race + '/' + d + ': assento da parte que gira no lugar (hoje ' + h.mount.toFixed(2) + ')', a.mount);
+        if (h.pieces > 0) ok(a.pieces > 0, race + '/' + d + ': tem peças que se soltam na destruição (hoje ' + h.pieces + ')', a.pieces);
+        if (COMPOSTA[d] && mapa[d.replace(/_base$|_hull$/, '_turret')]) { const t = M2.build(COMPOSTA[d], race, '#55E68A', 0), tp = M2.build(d.replace(/_base$|_hull$/, '_turret'), race, '#55E68A', 0); ok(!!t && !!tp && tris(t) === tris(a) + tris(tp) && t.height > a.height * 0.99, race + '/' + COMPOSTA[d] + ': o modelo composto (base + parte que gira) fecha', t && tris(t)); }
+        { const o = M2.build(d, race === 'vehnar' ? 'erevane' : 'vehnar', '#55E68A', 0), ho = B.build(d, race === 'vehnar' ? 'erevane' : 'vehnar', '#55E68A', 0); if (ho) ok(!!o && soma(o) === soma(ho), race + '/' + d + ': as outras Raças continuam com o modelo delas'); } }
+      /* ---------- ?modelos=antigos ---------- */
+      { const pd = []; const D = novo({ busca: '?q=alta&modelos=antigos', cfg: cfgDe(), fetch: async u => { pd.push(u); return new Response(gz); } }); const k = await D.otb.partida({ players: [{ faction: race }] }); let ig = 0; for (const d in mapa) if (soma(D.meshes.build(d, race, '#55E68A', 0)) === ref[d]) ig++;
+        ok(k === 0 && !pd.length && !D.otb.tem(race) && ig === Object.keys(mapa).length && D.otb.antigos === true, race + ': ?modelos=antigos não pede nada e monta os modelos de antes (' + ig + ' peças iguais)'); }
+      /* ---------- pacote embutido (arquivo único) ---------- */
+      { const pd = []; const E = novo({ cfg: cfgDe({ base: null, emb: { [race]: gz.toString('base64') } }), fetch: async u => { pd.push(u); throw new Error('sem rede'); } }); const k = await E.otb.partida({ players: [{ faction: race }] }); ok(k === 1 && !pd.length && E.otb.tem(race), race + ': pacote embutido instala sem nenhum pedido de rede'); }
+      /* ---------- 2) pacote estragado ---------- */
+      const ruins = { 'sem a marca OTB1': (() => { const b = Buffer.from(cru); b[0] = 88; return b; })(), 'vazio': Buffer.alloc(0), 'só 9 bytes': Buffer.from([1, 2, 3, 4, 5, 6, 7, 8, 9]), 'cortado no cabeçalho': cru.subarray(0, 60), 'cortado no meio dos dados': cru.subarray(0, Math.floor(cru.length / 2)), 'cortado no último byte': cru.subarray(0, cru.length - 1),
+        'tamanho do cabeçalho errado': (() => { const b = Buffer.from(cru); b.writeUInt32LE(0x7fffffff, 4); return b; })(), 'cabeçalho que não é JSON': (() => { const b = Buffer.from(cru); b.fill(35, 8, 40); return b; })(), 'versão desconhecida': (() => { const n = cru.readUInt32LE(4); const j = JSON.parse(cru.subarray(8, 8 + n).toString('utf8')); j.v = 99; let js = Buffer.from(JSON.stringify(j)); js = Buffer.concat([js, Buffer.alloc((4 - js.length % 4) % 4, 32)]); const h = Buffer.alloc(8); h.write('OTB1', 0, 'latin1'); h.writeUInt32LE(js.length, 4); return Buffer.concat([h, js, cru.subarray(8 + n)]); })(),
+        'dados trocados por lixo': (() => { const b = Buffer.from(cru), n = b.readUInt32LE(4); for (let i = 8 + n; i < b.length; i++) b[i] = (i * 197 + 13) & 255; return b; })(), 'gzip cortado': gz.subarray(0, Math.floor(gz.length / 2)), 'gzip com o miolo trocado': (() => { const b = Buffer.from(gz); for (let i = 200; i < 260; i++) b[i] ^= 0xa5; return b; })(), 'página de erro em HTML': Buffer.from('<!doctype html><title>404</title>não achei') };
+      const redes = { 'resposta 404': async () => new Response('x', { status: 404 }), 'rede que cai': async () => { throw new TypeError('Failed to fetch'); } };
+      for (const nome of Object.keys(ruins).concat(Object.keys(redes))) { let estouro = null, n2 = -1, ig = 0, rx = -1; const F = novo({ cfg: cfgDe(), fetch: redes[nome] || resp(ruins[nome]) }); const n0 = Object.keys(F.meshes.receitas || {}).length; const erros = []; const ce = console.error, cw = console.warn; console.error = (...a) => erros.push(a.join(' ')); console.warn = (...a) => erros.push(a.join(' ')); const ci = console.info; console.info = () => {};
+        try { n2 = await F.otb.partida({ players: [{ faction: race }] }); for (const d in mapa) { const g = F.meshes.build(d, race, '#55E68A', 0); if (g && soma(g) === ref[d]) ig++; } rx = Object.keys(F.meshes.receitas || {}).length - n0; } catch (e) { estouro = e; } console.error = ce; console.warn = cw; console.info = ci;
+        ok(!estouro && n2 === 0 && !F.otb.tem(race) && ig === Object.keys(mapa).length && rx === 0 && !erros.length && /^falhou/.test(F.otb.estado[race] || ''), race + ': ' + nome + ' = modelos de antes, nenhuma receita pela metade, sem erro', estouro ? estouro.message : { n2, ig, rx, erros: erros.slice(0, 2), estado: F.otb.estado[race] }); }
+      { /* depois de uma falha pela rede, a próxima partida tenta de novo e consegue */ let vez = 0; const F = novo({ cfg: cfgDe(), fetch: async () => { vez++; return vez === 1 ? new Response('x', { status: 503 }) : new Response(gz); } }); const ci = console.info; console.info = () => {}; const a = await F.otb.partida({ players: [{ faction: race }] }), b = await F.otb.partida({ players: [{ faction: race }] }); console.info = ci; ok(a === 0 && b === 1 && vez === 2 && F.otb.tem(race), race + ': depois de uma falha, a partida seguinte pede de novo e instala'); }
+    } }
+  };
+  const cfgOtb = h => { const i = h.indexOf('/* 5.5b.4: { base, racas'), k = i < 0 ? -1 : h.lastIndexOf("const CFG_TXT = '", i); if (k < 0) return undefined; const a = k + 17, b = h.indexOf("'; let CFG = null", a); const t = h.slice(a, b); if (t === 'null') return null; try { return JSON.parse(t); } catch (e) { return undefined; } }; /* o que o build pôs no lugar do marcador do src/otb.js: null = sem pacote */
+  const tem = f => fs.existsSync(path.join(root, f)) ? fs.readFileSync(path.join(root, f), 'utf8') : ''; const idx = tem('index.html'), beta = tem('dist/aether-rift-beta.html'), loc = tem('dist/local.html'), sw = tem('sw.js');
+  /* ---------- (a) o jogo como publicado ---------- */
+  ROT = 'jogo: ';
+  if (!racasJ.length) {
+    ok(!fs.readdirSync(JOGO_DIR).some(f => /\.otb(\.gz)?$/.test(f)), 'tabela sem Raças e nenhum pacote em assets/modelos/');
+    ok(idx && cfgOtb(idx) === null && cfgOtb(beta) === null && cfgOtb(loc) === null && !idx.includes("'__MODELOS__'"), 'index.html, arquivo único e dist/local.html sem tabela e sem pacote embutido (rode node tools/build.mjs)', [cfgOtb(idx), cfgOtb(beta), cfgOtb(loc)].map(x => x === null ? 'null' : typeof x));
+    for (const [nome, cfg] of [['como o build deixa (sem tabela)', undefined], ['tabela sem Raças', { base: 'assets/modelos/', racas: {} }]]) { const pd = []; const A = novo({ cfg, fetch: async u => { pd.push(String(u)); throw new Error('sem rede'); } }); const rs = Object.keys(A.meshes.PAL).filter(r => A.sim.FACTIONS && A.sim.FACTIONS[r]);
+      const n = await A.otb.partida({ players: rs.map(r => ({ faction: r })) }, () => {}); for (const r of rs) await A.otb.pede(r); await A.otb.pede('tessara', { rede: false });
+      const B = novo({ semOtb: true }); let pecas = 0, iguais = 0; for (const r of rs) for (const d of pecasDe(B.meshes, B.sim, r)) { pecas++; globalThis.ARD = A; const ga = A.meshes.build(d, r, '#55E68A', 0); globalThis.ARD = B; const gb = B.meshes.build(d, r, '#55E68A', 0); if (ga && gb && soma(ga) === soma(gb)) iguais++; }
+      ok(n === 0 && !pd.length && rs.length === 5 && rs.every(r => !A.otb.tem(r)) && pecas > 100 && iguais === pecas, nome + ': nenhuma Raça pede pacote e as ' + pecas + ' peças das 5 Raças são as de antes, vértice a vértice', { n, pd, iguais, pecas }); }
+  } else { TAB = TABJ; DIR = JOGO_DIR; FIX = false; await carregador();
+    const ci = cfgOtb(idx), cb = cfgOtb(beta), cl = cfgOtb(loc); ok(!idx.includes("'__MODELOS__'") && !!ci && ci.base === 'assets/modelos/' && !ci.emb && racasJ.every(r => ci.racas[r] && ci.racas[r].hash === TABJ.racas[r].hash), 'index.html (Pages): tabela atual, pacotes por URL (rode node tools/build.mjs)');
+    ok(!!cb && cb.base === null && racasJ.every(r => cb.emb && cb.emb[r] === arq(r).toString('base64')), 'dist/aether-rift-beta.html (arquivo único): pacotes embutidos e iguais aos de assets/modelos/'); ok(!!cl && racasJ.every(r => cl.emb && cl.emb[r]), 'dist/local.html (testes): pacotes embutidos'); }
+  ok(/ard-modelos/.test(sw) && /assets\\\/modelos/.test(sw), 'sw.js guarda assets/modelos/ numa cache que passa de uma versão para a outra');
+  /* ---------- (b) o carregador, com o pacote de teste do piloto ---------- */
+  ROT = 'carregador: '; const temFix = !!(TABF && TABF.racas && Object.keys(TABF.racas).length && Object.keys(TABF.racas).every(r => fs.existsSync(path.join(FIX_DIR, TABF.racas[r].arquivo))));
+  ok(temFix, 'tools/fixtures/modelos/ tem a tabela e o pacote de teste'); if (temFix) { TAB = TABF; DIR = FIX_DIR; FIX = true; await carregador(); }
+  ROT = '';
+  if (SEM_NAV) return fecha();
+
+  /* ---------- 5) no navegador ---------- */
+  let pw = null; try { pw = require('playwright'); } catch (e) {} if (!pw) { ok(false, 'playwright disponível (defina NODE_PATH)'); return fecha(); }
+  let race = 'tessara', T = null, gz = null, peca = 'colosso', rec = '', outra = 'vehnar'; /* a Raça, a peça e a receita que a parte do navegador confere (do bloco em curso) */
+  const prepara = () => { const rs = Object.keys(TAB.racas); race = rs.includes('tessara') ? 'tessara' : rs[0]; T = TAB.racas[race]; gz = arq(race); peca = Object.keys(T.mapa)[0]; rec = typeof T.mapa[peca] === 'string' ? T.mapa[peca] : T.mapa[peca].r; outra = race === 'vehnar' ? 'erevane' : 'vehnar'; };
+  /* põe uma tabela no dist/local.html, no lugar do que o build pôs (o marcador do src/otb.js): a página fica igual à do Pages (pacote por URL) ou à de arquivo único (embutido) */
+  const injeta = (html, cfg) => { const i = html.indexOf('/* 5.5b.4: { base, racas'), k = html.lastIndexOf("const CFG_TXT = '", i), a = k + 17, b = html.indexOf("'; let CFG = null", a); if (i < 0 || k < 0 || b < 0) throw new Error('marcador do src/otb.js não encontrado no dist/local.html'); return html.slice(0, a) + JSON.stringify(cfg) + html.slice(b); };
+  const TIPOS = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.gz': 'application/octet-stream', '.webmanifest': 'application/manifest+json', '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg' };
+  let modo = 'ok'; const pedidos = []; /* a página "rede" é o dist/local.html com a tabela apontando para a URL (como no Pages), sem o pacote embutido */
+  const pagina = emb => { const cfg = emb ? { base: null, racas: TAB.racas, emb: {} } : { base: '../assets/modelos/', racas: TAB.racas }; if (emb) for (const r in TAB.racas) cfg.emb[r] = arq(r).toString('base64'); return injeta(fs.readFileSync(path.join(root, 'dist/local.html'), 'utf8'), cfg); };
+  const srv = http.createServer((q, r) => { const u = new URL(q.url, 'http://x'); let p = decodeURIComponent(u.pathname);
+    if (p === '/dist/rede.html' || p === '/dist/emb.html') { r.writeHead(200, { 'content-type': TIPOS['.html'], 'cache-control': 'no-store' }); return r.end(pagina(p === '/dist/emb.html')); }
+    if (/\/modelos\//.test(p)) { pedidos.push(p + u.search); /* todo pedido a uma pasta de modelos conta */ const fp = DIR ? path.join(DIR, path.basename(p)) : ''; if (modo === '404' || !/^\/assets\/modelos\/[^/]+\.otb\.gz$/.test(p) || !fp || !fs.existsSync(fp)) { r.writeHead(404); return r.end('nada'); } let b = fs.readFileSync(fp); /* o pacote do bloco em curso, servido em assets/modelos/ como no Pages */ if (modo === 'estragado') { b = Buffer.from(b); for (let i = 300; i < 400; i++) b[i] ^= 0x5a; } if (modo === 'cortado') b = b.subarray(0, b.length >> 1); if (modo === 'html') b = Buffer.from('<!doctype html><title>manutenção</title>'); r.writeHead(200, { 'content-type': TIPOS['.gz'], 'content-length': b.length, 'cache-control': 'no-store' }); return r.end(b); }
+    const f = path.join(root, p); if (!f.startsWith(root) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': TIPOS[path.extname(f)] || 'application/octet-stream', 'cache-control': 'no-store' }); fs.createReadStream(f).pipe(r); });
+  await new Promise(a => srv.listen(0, '127.0.0.1', a)); const base = 'http://localhost:' + srv.address().port;
+  const b = await pw.chromium.launch({ headless: true, args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--disable-dev-shm-usage'] });
+  const JOGO = 'autostart=1&seed=42&opp=1&debug=1&lang=pt&semsalvar=1&semcine=1&dia=1&q=baixa&motor=classico&sem=aquecer';
+  /* abre uma partida e devolve o que a página montou */
+  const partida = async (ctx, url) => { const p = await ctx.newPage(); p.setDefaultTimeout(600000); const errs = []; p.on('pageerror', e => errs.push('pageerror: ' + e.message.slice(0, 200))); p.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errs.push(m.text().slice(0, 200)); if (/3D indisponível/.test(m.text())) errs.push(m.text().slice(0, 200)); });
+    const fora = []; p.on('request', q => { const u = q.url(); if (!u.startsWith(base) && !u.startsWith('file:') && /modelos|\.otb/.test(u)) fora.push(u.slice(0, 120)); }); /* as fontes e o PeerJS que a página já pedia a terceiros não contam: aqui só interessa se algum pedido de modelo sai do servidor do jogo */
+    await p.goto(url, { waitUntil: 'load' }); let carregou = true; try { await p.waitForFunction(() => window.__ARDG && document.getElementById('loading').hidden, null, { timeout: 600000, polling: 500 }); } catch (e) { carregou = false; }
+    const st = carregou ? await p.evaluate(({ race, peca, rec }) => { const G = window.__ARDG, R = G.R; const dono = G.sim.players.find(x => x.faction === race && !x.mundo); const g = dono ? R.geos.get(peca + '|' + dono.id + '|0') : null; const m = ARD.otb.modelos[rec];
+      let icone = null; try { icone = dono ? R.icon(peca, dono.id) : null; } catch (e) { icone = 'erro ' + e.message; } const tri = g ? (g.main.attributes.position.count + (g.em ? g.em.attributes.position.count : 0)) / 3 : null;
+      return { is3d: !!R.is3d, estado: ARD.otb.estado[race] || null, tem: ARD.otb.tem(race), tri, triNovo: m ? m.tri.cheia : null, icone: typeof icone === 'string' ? icone.length : 0, barra: document.getElementById('load-bar').style.width, lt: R.loadT, racas: G.sim.players.filter(x => !x.mundo).map(x => x.faction), bytes: ARD.otb.medida.bytes }; }, { race, peca, rec }) : null;
+    await p.close(); return { carregou, st, errs, fora }; };
+  const suite = async () => { prepara();
+    const ctx = await b.newContext({ viewport: { width: 960, height: 600 }, serviceWorkers: 'block' });
+    { modo = 'ok'; pedidos.length = 0; const r = await partida(ctx, base + '/dist/rede.html?' + JOGO + '&faction=' + race); const s = r.st || {};
+      ok(r.carregou && s.is3d && !r.errs.length, 'partida com ' + race + ' pela rede: carrega sem erro', r.errs); ok(pedidos.length === 1 && pedidos[0] === '/assets/modelos/' + T.arquivo + '?v=' + T.hash, 'pede UM pacote, o da Raça da partida', pedidos);
+      ok(s.estado === 'ok' && s.tem && s.tri === s.triNovo && s.bytes === gz.length, 'usa os modelos novos (' + peca + ': ' + s.triNovo + ' triângulos) e baixou ' + gz.length + ' bytes', s); ok(s.icone > 2000, 'o ícone 3D do painel sai com o modelo novo', s.icone); ok(s.lt && s.lt.pacotes != null && s.barra === '100%', 'a carga conta o tempo dos pacotes e a barra chega ao fim', { lt: s.lt, barra: s.barra }); ok(!r.fora.length, 'nenhum pedido de modelo para fora do servidor do jogo', r.fora.slice(0, 3)); var triNovo = s.triNovo; }
+    { modo = 'ok'; pedidos.length = 0; const r = await partida(ctx, base + '/dist/rede.html?' + JOGO + '&faction=' + race + '&modelos=antigos'); const s = r.st || {};
+      ok(r.carregou && !r.errs.length && pedidos.length === 0 && !s.tem && s.tri != null && s.tri !== triNovo, '?modelos=antigos: nenhum pedido e os modelos de antes (' + peca + ': ' + s.tri + ' triângulos)', { errs: r.errs, pedidos, s }); var triAntes = s.tri; }
+    { modo = 'ok'; pedidos.length = 0; const r = await partida(ctx, base + '/dist/rede.html?' + JOGO.replace('seed=42', 'seed=7') + '&faction=' + outra); const s = r.st || {}; const temRaca = (s.racas || []).includes(race);
+      if (temRaca) aviso('a partida de ' + outra + ' sorteou ' + race + ' como adversária; a conta de pedidos vale 1'); ok(r.carregou && !r.errs.length && pedidos.length === (temRaca ? 1 : 0), 'partida sem ' + race + ' (' + (s.racas || []).join(' × ') + '): nenhum pacote pedido', { errs: r.errs, pedidos }); }
+    for (const [m, nome] of [['404', 'pacote que falta (404)'], ['estragado', 'pacote com bytes trocados'], ['cortado', 'pacote cortado ao meio'], ['html', 'página de erro no lugar do pacote']]) { modo = m; pedidos.length = 0; const r = await partida(ctx, base + '/dist/rede.html?' + JOGO + '&faction=' + race); const s = r.st || {};
+      ok(r.carregou && s.is3d && !r.errs.length && pedidos.length === 1 && !s.tem && /^falhou/.test(s.estado || '') && s.tri === triAntes, nome + ': a partida usa os modelos de antes, sem erro na página nem no console', { errs: r.errs, pedidos: pedidos.length, estado: s.estado, tri: s.tri }); }
+    { modo = '404'; pedidos.length = 0; const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); await p.goto(base + '/dist/emb.html?lang=pt', { waitUntil: 'load' }); await p.waitForFunction(r => window.ARD && ARD.otb && ARD.otb.estado[r], race, { timeout: 60000 }).catch(() => {}); const s = await p.evaluate(r => ({ tem: ARD.otb.tem(r), estado: ARD.otb.estado[r] }), race); await p.close();
+      ok(s.tem && s.estado === 'ok' && !pedidos.length && !errs.length, 'página de arquivo único (pacote embutido): modelos novos prontos na tela inicial, sem nenhum pedido', { s, errs }); }
+    await ctx.close();
+    /* service worker: guarda o pacote na primeira partida e serve a cópia depois, com o servidor negando o arquivo */
+    { const c2 = await b.newContext({ viewport: { width: 960, height: 600 } }); modo = 'ok'; pedidos.length = 0; const p0 = await c2.newPage(); await p0.goto(base + '/dist/rede.html?lang=pt', { waitUntil: 'load' }); let sw = true; try { await p0.waitForFunction(() => navigator.serviceWorker && navigator.serviceWorker.controller, null, { timeout: 60000 }); } catch (e) { sw = false; } await p0.close();
+      ok(sw, 'o service worker assume a página'); if (sw) { const r1 = await partida(c2, base + '/dist/rede.html?' + JOGO + '&faction=' + race); const n1 = pedidos.length; modo = '404'; const r2 = await partida(c2, base + '/dist/rede.html?' + JOGO + '&faction=' + race);
+        const p3 = await c2.newPage(); await p3.goto(base + '/dist/rede.html?lang=pt', { waitUntil: 'load' }); const chaves = await p3.evaluate(async () => { const c = await caches.open('ard-modelos'); return (await c.keys()).map(k => new URL(k.url).pathname + new URL(k.url).search); }); await p3.close();
+        ok(r1.carregou && r1.st.tem && n1 === 1 && chaves.length === 1 && chaves[0] === '/assets/modelos/' + T.arquivo + '?v=' + T.hash, 'a primeira partida baixa o pacote e o service worker guarda', { n1, chaves, errs: r1.errs });
+        ok(r2.carregou && r2.st.tem && r2.st.estado === 'ok' && pedidos.length === n1 && !r2.errs.length, 'a segunda partida usa a cópia guardada (o servidor negava o arquivo e não foi consultado)', { pedidos: pedidos.length, estado: r2.st && r2.st.estado, errs: r2.errs }); }
+      await c2.close(); } };
+  try {
+    ROT = 'jogo: ';
+    if (!racasJ.length) { TAB = null; DIR = null; race = 'tessara'; peca = 'colosso'; rec = ''; modo = 'ok'; pedidos.length = 0; /* o jogo como publicado: o dist/local.html do build, sem tabela */
+      const ctx = await b.newContext({ viewport: { width: 960, height: 600 }, serviceWorkers: 'block' }); const r = await partida(ctx, base + '/dist/local.html?' + JOGO + '&faction=tessara'); const s = r.st || {}; await ctx.close();
+      ok(r.carregou && s.is3d && !r.errs.length, 'partida com a Tessara: carrega sem erro', r.errs); ok(pedidos.length === 0 && !r.fora.length, 'nenhum pedido de modelo (nem ao servidor do jogo, nem para fora)', pedidos.concat(r.fora)); ok(!s.tem && s.estado == null && s.tri > 0 && s.bytes === 0 && s.icone > 2000, 'a Tessara usa os modelos de hoje (colosso: ' + s.tri + ' triângulos) e o ícone 3D sai', s);
+      const c2 = await b.newContext({ viewport: { width: 960, height: 600 } }); const p0 = await c2.newPage(); const e0 = []; p0.on('pageerror', e => e0.push(e.message.slice(0, 200))); p0.on('console', m => { if ((m.type() === 'error' || m.type() === 'warning') && /service worker|sw\.js/i.test(m.text())) e0.push(m.text().slice(0, 200)); }); await p0.goto(base + '/dist/local.html?lang=pt', { waitUntil: 'load' }); let sw = true; try { await p0.waitForFunction(() => navigator.serviceWorker && navigator.serviceWorker.controller, null, { timeout: 60000 }); } catch (e) { sw = false; }
+      const ch = sw ? await p0.evaluate(async () => (await (await caches.open('ard-modelos')).keys()).length) : -1; await p0.close(); const r2 = sw ? await partida(c2, base + '/dist/local.html?' + JOGO + '&faction=tessara') : null; await c2.close();
+      ok(sw && !e0.length && ch === 0 && r2 && r2.carregou && !r2.errs.length && pedidos.length === 0, 'com o service worker: assume a página sem erro, nada guardado em modelos e a partida abre sem pedido de modelo', { sw, e0, ch, errs: r2 && r2.errs, pedidos });
+    } else { TAB = TABJ; DIR = JOGO_DIR; FIX = false; await suite(); }
+    ROT = 'carregador: '; if (temFix) { TAB = TABF; DIR = FIX_DIR; FIX = true; await suite(); }
+  } catch (e) { ok(false, 'parte do navegador rodou até o fim', e.message); } ROT = '';
+  await b.close(); srv.close(); fecha();
+})().catch(e => { ok(false, 'o teste rodou até o fim', e && e.message); fecha(); });

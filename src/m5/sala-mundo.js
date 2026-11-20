@@ -254,6 +254,7 @@ function modelos(C) { const { W, T } = C.L; const { vertexColor, attribute, unif
 /* ---------- a base da Raça: modelos do jogo montados um por quadro (a página não trava) ---------- */
 const UNID = r => ({ vehnar: ['prensa', 'soldador', 'tratorzao'], erevane: ['lamina', 'atirador', 'ancora'], tessara: ['colosso', 'quimera', 'molde'], quorith: ['monolito', 'prisma', 'voz'], vorag: ['brutamonte', 'escaravelho', 'cuspidor'] }[r] || []);
 async function base(C, race, H, cor, alive) { const { W } = C.L; const ME = ARD.meshes; const g = new W.Group(); g.name = 'base-' + race; const out = { group: g, pick: [], anim: [], fontes: [], disp: [] }; if (!ME) return out;
+  if (ARD.otb && ARD.otb.pede) await ARD.otb.pede(race, { rede: false }); /* 5.5b.4: modelos feitos no Blender, se o pacote da Raça já está na máquina (sem pedido de rede aqui) */ if (!alive()) return out;
   let seed = 3; const place = (def, x, z, ang, o) => { const r = ME.build(def, race, cor, seed++); if (!r || !r.main) return null; const gg = new W.Group();
     const a = new W.Mesh(r.main, C.mats.main); a.castShadow = !(o && o.sombra === false); /* 5.0a.1: o que anda não faz sombra (o mapa de sombra é desenhado uma vez por mundo) */ a.receiveShadow = true; gg.add(a); out.disp.push(r.main);
     if (r.em && r.em.attributes.position.count) { const e = new W.Mesh(r.em, C.mats.em); gg.add(e); out.disp.push(r.em); } else if (r.em) r.em.dispose();
