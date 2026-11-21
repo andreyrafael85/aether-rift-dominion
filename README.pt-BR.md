@@ -20,7 +20,7 @@
   <img src="docs/imagens/partida/batalha.webp" alt="Partida de verdade capturada no próprio jogo: Tessara contra a Erevane, o ataque Tessara à base Erevane e a Fundição Orbital Vehnar derrubando um Bastião do céu" width="800">
 </p>
 
-> Beta de testes, versão **5.5b.5**. O jogo abre no idioma do navegador (português, inglês ou espanhol; qualquer outro idioma abre em inglês). Troque em **Idioma / Language / Idioma** (tela inicial, Ajustes e janela da partida) e o jogo guarda a escolha; `?lang=pt`, `?lang=en` ou `?lang=es` no link escolhe o idioma enquanto você não escolher um.
+> Beta de testes, versão **5.5b.6**. O jogo abre no idioma do navegador (português, inglês ou espanhol; qualquer outro idioma abre em inglês). Troque em **Idioma / Language / Idioma** (tela inicial, Ajustes e janela da partida) e o jogo guarda a escolha; `?lang=pt`, `?lang=en` ou `?lang=es` no link escolhe o idioma enquanto você não escolher um.
 
 ## Destaques
 
@@ -116,7 +116,7 @@ Fases, golpes, vidas e recompensas, e o Mundo vivo: **[Chefões e modos](docs/bo
 
 ## Roteiro
 
-A versão atual é a **5.5b.5** (IA com a personalidade de cada líder, Mundo vivo, construções únicas, módulos e Comandantes em campo; antes, na 5.0g, os chefões, a Caçada, os Eventos da Fenda e os mutadores). Os próximos passos da v5.0 "Além da Fenda":
+A versão atual é a **5.5b.6** (IA com a personalidade de cada líder, Mundo vivo, construções únicas, módulos e Comandantes em campo; antes, na 5.0g, os chefões, a Caçada, os Eventos da Fenda e os mutadores). Os próximos passos da v5.0 "Além da Fenda":
 
 - **5.0h — Inteligência e mundo** ✔: IA com a personalidade de cada líder, Mundo vivo, construções únicas e Comandantes em campo.
 - **5.0i — Campanha 2:** 15 missões e os chefões que faltam.

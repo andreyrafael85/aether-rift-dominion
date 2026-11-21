@@ -17,12 +17,14 @@ const pedido = Q.get('motor') || prefMotor();
 const M5_PADRAO_TOQUE = true; /* 5.5b.5: LIGADO por decisão do dono depois das medições no iPhone (Motor 5 a 2×: média 60, 0 travadas; clássico: 45 a 2×) */
 const CH_AUTO = 'ard-m5-auto', MARCA = 'falhou@' + '__BUILD__'; /* 5.5b.5: a anotação de falha vale só para este build; cada versão nova do jogo tenta o Motor 5 de novo uma vez */
 const autoPedido = pedido === 'auto' || (!pedido && M5_PADRAO_TOQUE);
-const autoPode = () => { try { return typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches && !!navigator.gpu && localStorage.getItem(CH_AUTO) !== MARCA; } catch (e) { return false; } };
+const CH_MOT = 'ard-m5-auto-motivo'; let autoNao = ''; /* 5.5b.6: por que o automático não entrou (vai no diagnóstico do Teste de desempenho) */
+const autoPode = () => { try { if (!(typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches)) { autoNao = 'não é tela de toque'; return false; } if (!navigator.gpu) { autoNao = 'navegador sem WebGPU'; return false; } if (localStorage.getItem(CH_AUTO) === MARCA) { autoNao = 'falha anotada neste build: ' + (localStorage.getItem(CH_MOT) || '?'); return false; } if (sessionStorage.getItem(CH_AUTO) === '1') { autoNao = 'não carregou nesta sessão: ' + (sessionStorage.getItem(CH_MOT) || '?'); return false; } return true; } catch (e) { autoNao = 'armazenamento bloqueado'; return false; } };
 const autoM5 = autoPedido && autoPode();
 ARD.motor = pedido === '5' || pedido === 'm5' || pedido === 'webgpu' || autoM5 ? '5' : 'classico';
 const M5 = ARD.m5 = ARD.m5 || {};
 M5.auto = autoM5; M5.autoPend = autoM5; M5.padraoToque = M5_PADRAO_TOQUE;
-M5.autoMarca = function (motivo) { M5.autoMotivo = motivo; try { localStorage.setItem(CH_AUTO, MARCA); } catch (e) {} console.log('[ARD] Motor 5 automático: ' + motivo + '; o jogo segue no motor clássico'); }; /* 5.5b.5: console.log, não warn: é um caminho normal (navegador que anuncia WebGPU sem adaptador), e com ?debug o warn abria a caixa de erros por cima dos botões */
+M5.porque = () => Q.get('motor') && Q.get('motor') !== 'auto' ? 'endereço (?motor=' + Q.get('motor') + ')' : pedido && pedido !== 'auto' ? 'Ajustes (' + pedido + ')' : !autoPedido ? 'padrão clássico' : autoM5 ? (M5.autoMotivo ? 'automático tentou o Motor 5 e recuou: ' + M5.autoMotivo : 'automático: Motor 5') : 'automático ficou no clássico: ' + autoNao; /* 5.5b.6: quem escolheu o motor desta sessão */
+M5.autoMarca = function (motivo, passageira) { M5.autoMotivo = motivo; try { if (passageira) { sessionStorage.setItem(CH_AUTO, '1'); sessionStorage.setItem(CH_MOT, motivo); } /* 5.5b.6: falha de carga (rede, atualização do jogo no meio) vale só para esta sessão; a de GPU vale para o build */ else { localStorage.setItem(CH_AUTO, MARCA); localStorage.setItem(CH_MOT, motivo); } } catch (e) {} console.log('[ARD] Motor 5 automático: ' + motivo + '; o jogo segue no motor clássico'); }; /* 5.5b.5: console.log, não warn: é um caminho normal (navegador que anuncia WebGPU sem adaptador), e com ?debug o warn abria a caixa de erros por cima dos botões */
 M5.autoFalhou = function (motivo) { if (!M5.auto || M5.autoSaindo) return; M5.autoSaindo = true; M5.autoMarca(motivo); try { sessionStorage.setItem('ard-m5-volta', '1'); } catch (e) {} /* 5.5b.5: o src/main.js reabre sozinho a partida que estava começando (escaramuça montada no menu) */ const qq = new URLSearchParams(location.search); qq.set('motor', 'classico'); location.replace(location.pathname + '?' + qq.toString()); }; /* depois que o canvas ganhou o contexto do Motor 5 só dá para voltar recarregando */
 const autoProva = () => { try { return navigator.gpu.requestAdapter().then(a => a ? a.requestDevice().then(d => { try { d.destroy(); } catch (e) {} return true; }) : false).catch(() => false); } catch (e) { return Promise.resolve(false); } }; /* antes de qualquer canvas: dá para criar o adaptador e o aparelho da GPU? */
 M5.versao = '5.0a.1';
@@ -45,7 +47,7 @@ M5.load = function () {
       M5.ok = true; return true;
     })
     .catch(err => { M5.ok = false; M5.err = err; window.THREE_M5 = null; console.warn('[ARD] Motor 5 indisponível (o jogo segue no clássico): ' + (err && err.message)); return false; })
-    .then(ok => !M5.auto ? ok : (ok ? autoProva() : Promise.resolve(false)).then(p => { if (!p) { M5.autoMarca(ok ? 'o navegador não entregou o adaptador ou o aparelho da GPU' : 'o Motor 5 não carregou'); M5.auto = false; ARD.motor = 'classico'; } M5.autoPend = false; return ok; })) /* 5.5b.4: no modo automático, sem GPU o jogo abre direto no clássico, sem aviso */
+    .then(ok => !M5.auto ? ok : (ok ? autoProva() : Promise.resolve(false)).then(p => { if (!p) { M5.autoMarca(ok ? 'o navegador não entregou o adaptador ou o aparelho da GPU' : 'o Motor 5 não carregou', !ok); M5.auto = false; ARD.motor = 'classico'; } M5.autoPend = false; return ok; })) /* 5.5b.4: no modo automático, sem GPU o jogo abre direto no clássico, sem aviso */
     .then(ok => { try { window.dispatchEvent(new Event('m5-ready')); } catch (e) {} return ok; });
   return M5._load;
 };
