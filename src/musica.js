@@ -217,7 +217,7 @@ function aplicaArq(d, tau) { const [id, v] = faixaAlvo(d); const c = d.c, t = c.
     e => { if (P.deck !== d || d.querId !== id) return; d.querId = null; if (!d.cur) { d.arq = null; console.warn('[ARD] música: arquivo indisponível (' + ((e && e.message) || e) + '), trilha gerada'); aplica(1.5); if (d.modo === 'partida') for (const k of CAMADAS) garante(d, k); else garante(d, 'paz'); } }); }
 const ordem = id => /chefao|superarma/.test(id) ? 4 : /batalha/.test(id) ? 3 : /tensao/.test(id) ? 2 : /cinema/.test(id) ? 1.5 : 1;
 /* a troca no compasso: subindo, no próximo tempo forte; descendo, no fim da frase de 4 compassos (com teto de espera), cruzando */
-function troca(d, id, buf, v, sobe) { const c = d.c, now = c.currentTime, nv = d.arq.musica[id] || {}, at = d.cur; let tb = now + 0.08;
+function troca(d, id, buf, v, sobe) { { const au = A(); if (au && au.emudecido) return; } /* 5.5b.7: depois do silêncio total (fim do Teste de desempenho) nenhuma faixa nova começa */ const c = d.c, now = c.currentTime, nv = d.arq.musica[id] || {}, at = d.cur; let tb = now + 0.08;
   if (at && at.bpm) { const bar = 60 / at.bpm * (at.batidas || 4), frase = sobe ? bar : bar * 4, base = at.t0 + at.fase; const k = Math.ceil((now + 0.1 - base) / frase); tb = base + k * frase; if (tb - now > (sobe ? 3 : 12)) tb = now + 0.1; }
   const semPulso = !at || !at.bpm || !nv.bpm; /* faixa de clima (sem andamento): cruza devagar */ const xIn = !at ? 1.2 : semPulso ? 2.5 : sobe ? 0.35 : 2.5, xOut = !at ? 0 : semPulso ? 3 : sobe ? 1.4 : 3.2, off = nv.bpm && at ? (nv.fase || 0) : 0;
   const s = c.createBufferSource(); s.buffer = buf; s.loop = !!nv.laco; if (nv.laco && nv.dur && nv.dur < buf.duration - 0.001) { s.loopStart = 0; s.loopEnd = nv.dur; }

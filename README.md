@@ -20,7 +20,7 @@
   <img src="docs/imagens/partida/batalha.webp" alt="A real match captured in the game itself: Tessara against the Erevane, the Tessara assault on the Erevane base and the Vehnar Orbital Foundry dropping a Bastion from the sky" width="800">
 </p>
 
-> Playtest beta, version **5.5b.6**. The game opens in your browser's language (Portuguese, English or Spanish; any other language opens in English). Switch it in **Idioma / Language / Idioma** (start screen, Settings and the in-match window) and the game remembers your choice; `?lang=en`, `?lang=es` or `?lang=pt` in the link picks the language until you choose one.
+> Playtest beta, version **5.5b.7**. The game opens in your browser's language (Portuguese, English or Spanish; any other language opens in English). Switch it in **Idioma / Language / Idioma** (start screen, Settings and the in-match window) and the game remembers your choice; `?lang=en`, `?lang=es` or `?lang=pt` in the link picks the language until you choose one.
 
 ## Highlights
 
@@ -116,7 +116,7 @@ Phases, attacks, health and rewards, plus the Living world: **[Bosses and modes]
 
 ## Roadmap
 
-The current version is **5.5b.6** (AI with each leader’s personality, Living world, unique buildings, modules and Field Commanders; 5.0g brought the bosses, the Hunt, Rift Events and mutators). Next steps of v5.0 "Beyond the Rift":
+The current version is **5.5b.7** (AI with each leader’s personality, Living world, unique buildings, modules and Field Commanders; 5.0g brought the bosses, the Hunt, Rift Events and mutators). Next steps of v5.0 "Beyond the Rift":
 
 - **5.0h — Intelligence and world** ✔: AI with each leader's personality, Living world, unique buildings and Field Commanders.
 - **5.0i — Campaign 2:** 15 missions and the remaining bosses.

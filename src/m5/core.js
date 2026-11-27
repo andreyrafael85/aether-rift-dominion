@@ -9,17 +9,17 @@
 const Q = new URLSearchParams(typeof location !== 'undefined' ? location.search : '');
 /* ---------- escolha do motor: ?motor=5 | ?motor=classico | Ajustes (ard-beta-prefs.motor) | padrão clássico ---------- */
 function prefMotor() { try { return (JSON.parse(localStorage.getItem('ard-beta-prefs') || '{}') || {}).motor || null; } catch (e) { return null; } }
-const pedido = Q.get('motor') || prefMotor();
+let pedido = Q.get('motor') || prefMotor(); /* 5.5b.7: muda quando o jogador troca o motor nos Ajustes (M5.setMotor) */
 /* 5.5b.4 (pronto e desligado) → 5.5b.5 (LIGADO) — Motor 5 como padrão em tela de toque com WebGPU. Com M5_PADRAO_TOQUE = true (ou ?motor=auto, para testar), quem não escolheu
    motor no endereço nem nos Ajustes entra no Motor 5 quando a tela é de toque e o navegador tem WebGPU; se o adaptador ou o aparelho da GPU não puderem ser
    criados, o jogo abre direto no clássico; se o Motor 5 cair na reserva WebGL2, não iniciar ou der erro de GPU nos primeiros quadros, a página recarrega no
    clássico. Nos dois casos fica anotado no aparelho (ard-m5-auto) para não tentar de novo NESTE build do jogo (5.5b.5: cada versão nova tenta uma vez). */
 const M5_PADRAO_TOQUE = true; /* 5.5b.5: LIGADO por decisão do dono depois das medições no iPhone (Motor 5 a 2×: média 60, 0 travadas; clássico: 45 a 2×) */
 const CH_AUTO = 'ard-m5-auto', MARCA = 'falhou@' + '__BUILD__'; /* 5.5b.5: a anotação de falha vale só para este build; cada versão nova do jogo tenta o Motor 5 de novo uma vez */
-const autoPedido = pedido === 'auto' || (!pedido && M5_PADRAO_TOQUE);
+let autoPedido = pedido === 'auto' || (!pedido && M5_PADRAO_TOQUE);
 const CH_MOT = 'ard-m5-auto-motivo'; let autoNao = ''; /* 5.5b.6: por que o automático não entrou (vai no diagnóstico do Teste de desempenho) */
 const autoPode = () => { try { if (!(typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches)) { autoNao = 'não é tela de toque'; return false; } if (!navigator.gpu) { autoNao = 'navegador sem WebGPU'; return false; } if (localStorage.getItem(CH_AUTO) === MARCA) { autoNao = 'falha anotada neste build: ' + (localStorage.getItem(CH_MOT) || '?'); return false; } if (sessionStorage.getItem(CH_AUTO) === '1') { autoNao = 'não carregou nesta sessão: ' + (sessionStorage.getItem(CH_MOT) || '?'); return false; } return true; } catch (e) { autoNao = 'armazenamento bloqueado'; return false; } };
-const autoM5 = autoPedido && autoPode();
+let autoM5 = autoPedido && autoPode();
 ARD.motor = pedido === '5' || pedido === 'm5' || pedido === 'webgpu' || autoM5 ? '5' : 'classico';
 const M5 = ARD.m5 = ARD.m5 || {};
 M5.auto = autoM5; M5.autoPend = autoM5; M5.padraoToque = M5_PADRAO_TOQUE;
@@ -33,7 +33,10 @@ M5.u = M5.u || {}; M5.tex = M5.tex || {}; M5.sample = M5.sample || {};
 M5.ready = () => !!(window.THREE_M5 && window.TSL && window.THREE_M5_ADDONS) && !M5.autoPend; /* 5.5b.4: no modo automático só fica pronto depois da prova do adaptador */
 M5.active = () => ARD.motor === '5' && M5.ready();
 M5.motorNome = () => ARD.motor !== '5' ? 'Clássico' : M5.cur ? (M5.cur.isWebGPU ? '5 (WebGPU)' : '5 (WebGL2)') : '5';
-M5.setMotor = function (m) { ARD.motor = m === '5' ? '5' : 'classico'; if (ARD.motor === '5') M5.load(); };
+M5.setMotor = function (m) { if (m === 'auto') { /* 5.5b.7: "Automático" nos Ajustes: vale a regra do padrão (Motor 5 em tela de toque com WebGPU; senão, clássico), com a mesma prova do adaptador antes de ficar pronto */ pedido = null; autoPedido = M5_PADRAO_TOQUE; autoNao = ''; autoM5 = autoPedido && autoPode(); M5.auto = autoM5; M5.autoMotivo = ''; ARD.motor = autoM5 ? '5' : 'classico';
+    if (autoM5) { M5.autoPend = true; M5.load().then(ok => (ok ? autoProva() : Promise.resolve(false)).then(p => { if (!p && M5.auto) { M5.autoMarca(ok ? 'o navegador não entregou o adaptador ou o aparelho da GPU' : 'o Motor 5 não carregou', !ok); M5.auto = false; ARD.motor = 'classico'; } M5.autoPend = false; })); } else M5.autoPend = false; return; }
+  pedido = m === '5' ? '5' : 'classico'; autoPedido = false; M5.auto = false; M5.autoPend = false; ARD.motor = pedido; if (ARD.motor === '5') M5.load(); };
+M5.escolha = () => { const q = Q.get('motor'); return q && q !== 'auto' ? (q === '5' || q === 'm5' || q === 'webgpu' ? '5' : 'classico') : pedido === '5' || pedido === 'm5' || pedido === 'webgpu' ? '5' : pedido && pedido !== 'auto' ? 'classico' : 'auto'; }; /* 5.5b.7: o que está escolhido (para o seletor dos Ajustes): '5', 'classico' ou 'auto' */
 
 /* ---------- carga: three/webgpu, three/tsl e os addons TSL (mesmo núcleo three.core do build clássico, pelo importmap) ---------- */
 M5.load = function () {

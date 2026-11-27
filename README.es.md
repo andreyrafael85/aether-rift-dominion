@@ -20,7 +20,7 @@
   <img src="docs/imagens/partida/batalha.webp" alt="Partida real capturada en el propio juego: Tessara contra los Erevane, el asalto Tessara a la base Erevane y la Fundición Orbital Vehnar dejando caer un Bastión del cielo" width="800">
 </p>
 
-> Beta de pruebas, versión **5.5b.6**. El juego abre en el idioma del navegador (español, inglés o portugués; cualquier otro idioma abre en inglés). Cámbialo en **Idioma / Language / Idioma** (pantalla de inicio, Ajustes y ventana de la partida) y el juego recuerda tu elección; `?lang=es`, `?lang=en` o `?lang=pt` en el enlace elige el idioma mientras no elijas uno.
+> Beta de pruebas, versión **5.5b.7**. El juego abre en el idioma del navegador (español, inglés o portugués; cualquier otro idioma abre en inglés). Cámbialo en **Idioma / Language / Idioma** (pantalla de inicio, Ajustes y ventana de la partida) y el juego recuerda tu elección; `?lang=es`, `?lang=en` o `?lang=pt` en el enlace elige el idioma mientras no elijas uno.
 
 ## Lo más destacado
 
@@ -116,7 +116,7 @@ Fases, golpes, vida y recompensas, y el Mundo vivo: **[Jefes y modos](docs/bosse
 
 ## Hoja de ruta
 
-La versión actual es la **5.5b.6** (IA con la personalidad de cada líder, Mundo vivo, construcciones únicas, módulos y Comandantes en campo; la 5.0g trajo los jefes, la Cacería, los Eventos de la Grieta y los mutadores). Los próximos pasos de la v5.0 "Más allá de la Grieta":
+La versión actual es la **5.5b.7** (IA con la personalidad de cada líder, Mundo vivo, construcciones únicas, módulos y Comandantes en campo; la 5.0g trajo los jefes, la Cacería, los Eventos de la Grieta y los mutadores). Los próximos pasos de la v5.0 "Más allá de la Grieta":
 
 - **5.0h — Inteligencia y mundo** ✔: IA con la personalidad de cada líder, Mundo vivo, construcciones únicas y Comandantes en campo.
 - **5.0i — Campaña 2:** 15 misiones y los jefes que faltan.

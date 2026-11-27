@@ -7,6 +7,6 @@ ARD.i18n.mapa({
   'label[for=opt-quality]': 'ajustes.qualidade', '#opt-quality option[value=auto]': 'ajustes.q-auto', '#opt-quality option[value=baixa]': 'ajustes.q-baixa', '#opt-quality option[value=media]': 'ajustes.q-media', '#opt-quality option[value=alta]': 'ajustes.q-alta', '#opt-quality option[value=ultra]': 'ajustes.q-ultra',
   'label.chk:has(> #opt-bateria)': 'ajustes.bateria', 'label.chk:has(> #opt-cine)': 'ajustes.cine', 'label.chk:has(> #opt-dynres)': 'ajustes.dynres', 'label.chk:has(> #opt-som)': 'ajustes.som', 'label.chk:has(> #opt-voz)': 'ajustes.voz',
   'label[for=opt-voz-sel]': 'janela.ajustes.voz-falas', '#btn-voz-ouvir': 'janela.ajustes.pt-voz-ouvir',
-  'label[for=opt-motor]': 'ajustes.motor', '#opt-motor option[value=classico]': 'ajustes.motor-classico', '#opt-motor option[value="5"]': 'ajustes.motor-5',
+  'label[for=opt-motor]': 'ajustes.motor', '#opt-motor option[value=auto]': 'ajustes.motor-auto', /* 5.5b.7 */ '#opt-motor option[value=classico]': 'ajustes.motor-classico', '#opt-motor option[value="5"]': 'ajustes.motor-5',
   '#btn-install': 'ajustes.instalar'
 });
