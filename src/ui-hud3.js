@@ -78,7 +78,8 @@ function playerColors(sim, me) {
 function prepareSim(sim, resume, me) {
   const cols = playerColors(sim, me);
   if (cols) { sim.players.forEach((p, i) => { if (!p.fenda) p.color = cols[i]; /* 5.0g: a Fenda guarda a cor dela */ }); return; }
-  if (resume && S.assignColors && sim.cfg && sim.cfg.players) { try { const o = S.assignColors(sim.cfg.players); sim.players.forEach((p, i) => { if (o[i] && !p.fenda) p.color = o[i]; }); } catch (e) {} } /* salvo com paleta e retomado sem ela: volta às cores originais */
+  if (resume && S.assignColors && sim.cfg && sim.cfg.players) { try { const art = new Set(); for (const k in PAL) { for (const r in PAL[k].racas) art.add(PAL[k].racas[r]); for (const c of PAL[k].reserva) art.add(c); } for (const k in REL) for (const q in REL[k]) art.add(REL[k][q]);
+      if (sim.players.some(p => !p.fenda && art.has(String(p.color).toUpperCase()))) { const o = S.assignColors(sim.cfg.players); sim.players.forEach((p, i) => { if (o[i] && !p.fenda) p.color = o[i]; }); } } catch (e) {} } /* salvo com paleta (ou cores relativas) e retomado sem ela: volta às cores da regra · 5.5c: salvamento SEM paleta mantém as cores gravadas nele (as partidas salvas antes da regra nova de cor continuam com as cores que tinham) */
 }
 
 // ---------- Ajustes de acessibilidade na tela inicial (aba Ajustes): o bloco entra por script, sem mexer no HTML do #start ----------

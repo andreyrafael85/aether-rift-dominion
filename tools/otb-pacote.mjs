@@ -16,12 +16,15 @@ import { createHash } from 'node:crypto';
 const root = new URL('..', import.meta.url).pathname; const args = process.argv.slice(2); const completa = args.includes('--completa'); let extra = null;
 { const i = args.indexOf('--mapa'); if (i >= 0) { extra = JSON.parse(readFileSync(args[i + 1], 'utf8')); args.splice(i, 2); } }
 let SAIDA = 'assets/modelos/'; { const i = args.findIndex(a => a.startsWith('--saida=')); if (i >= 0) { SAIDA = args[i].slice(8).replace(/\/?$/, '/'); args.splice(i, 1); } } /* --saida=tools/fixtures/modelos: grava o pacote e a tabela em outra pasta (dado de teste), sem tocar no jogo */
-const [race, ...arqs] = args.filter(a => a !== '--completa'); if (!race || !arqs.length) { console.error('uso: node tools/otb-pacote.mjs <raça> <a.otb> [b.otb ...] [--mapa extra.json] [--completa]'); process.exit(2); }
+const [race, ...arqs] = args.filter(a => a !== '--completa');
+if (!extra && race && existsSync(root + 'tools/modelos-extra/' + race + '.json')) extra = JSON.parse(readFileSync(root + 'tools/modelos-extra/' + race + '.json', 'utf8')); /* 5.5c: acréscimos fixos da Raça ao mapa (por exemplo "orc": teto de triângulos liberado pelo dono para uma peça), sem precisar do --mapa */ if (!race || !arqs.length) { console.error('uso: node tools/otb-pacote.mjs <raça> <a.otb> [b.otb ...] [--mapa extra.json] [--completa]'); process.exit(2); }
 /* as peças da Raça e as medidas de hoje (o construtor do jogo, no Node) */
 const THREE = await import(root + 'dist/vendor/three/build/three.module.min.js').catch(() => null); if (!THREE) { console.error('falta dist/vendor: rode node tools/vendor.mjs'); process.exit(2); }
-globalThis.THREE = THREE; globalThis.ARD = {}; for (const f of ['src/modos.js', 'src/chefes-sim.js', 'src/mundo.js', 'src/unicas-sim.js', 'src/sim.js', 'src/meshes.js']) (0, eval)(readFileSync(root + f, 'utf8'));
+globalThis.THREE = THREE; globalThis.ARD = {}; for (const f of ['src/modos.js', 'src/chefes-sim.js', 'src/mundo.js', 'src/unicas-sim.js', 'src/sim.js', 'src/meshes.js', 'src/chefes-modelos.js', 'src/mundo-modelos.js', 'src/unicas-modelos.js' /* 5.5c: os avatares dos líderes e as únicas são receitas de fora */]) (0, eval)(readFileSync(root + f, 'utf8'));
 const M = ARD.meshes, S = ARD.sim; if (!M.PAL[race]) { console.error('Raça desconhecida: ' + race); process.exit(2); }
 const pecas = []; const poe = d => { for (const x of M.FULL[d] || [d]) if (!pecas.includes(x)) pecas.push(x); }; M.BUILDING_DEFS.forEach(poe); M.unitsOf(race).forEach(poe); for (const d in S.UNITS) if (S.UNITS[d].faction === race) poe(d);
+for (const d in S.UNITS) if (S.UNITS[d].cmd && S.UNITS[d].raca === race) poe(d); /* 5.5c: o avatar do líder da Raça (a Guardiã da Tessara) também é peça */
+const opcionais = ((S.UNICAS_DE && S.UNICAS_DE[race]) || []).slice(); /* 5.5c: as construções únicas da Raça entram no mapa se vierem no pacote, mas não são exigidas pelo --completa */
 /* lê as entradas */
 const modelos = {}; const partes = []; let tam = 0;
 for (const a of arqs) { const b = readFileSync(a); if (b.length < 8 || b.toString('latin1', 0, 4) !== 'OTB1') { console.error(a + ': não é um .otb'); process.exit(2); } const n = b.readUInt32LE(4), cab = JSON.parse(b.subarray(8, 8 + n).toString('utf8')), bin = b.subarray(8 + n); if (cab.v !== 2) { console.error(a + ': versão ' + cab.v + ' não suportada'); process.exit(2); }
@@ -32,10 +35,10 @@ const h = Buffer.alloc(8); h.write('OTB1', 0, 'latin1'); h.writeUInt32LE(js.leng
 /* o mapa */
 const mapa = {}; const fora = []; const esc = race.replace(/[^a-z0-9]/g, '');
 for (const nome in modelos) { let id = null, pele = null; const k = nome.startsWith('otb_' + esc + '_') ? nome.slice(5 + esc.length) : nome.startsWith('otb_') ? nome.slice(4) : null;
-  if (k && pecas.includes(k)) id = k; else if (k) { const mm = k.match(/^(.+)_s(\d+)$/); if (mm && pecas.includes(mm[1])) { id = mm[1]; pele = +mm[2]; } }
+  if (k && (pecas.includes(k) || opcionais.includes(k))) id = k; else if (k) { const mm = k.match(/^(.+)_s(\d+)$/); if (mm && pecas.includes(mm[1])) { id = mm[1]; pele = +mm[2]; } }
   if (!id) { fora.push(nome); continue; } const e = mapa[id] = mapa[id] || {}; if (pele == null) e.r = nome; else (e.s = e.s || {})[pele] = nome; }
 for (const id in mapa) { const e = mapa[id]; if (!e.r) { e.r = e.s[Object.keys(e.s)[0]]; } const m = modelos[e.r].m, hoje = M.build(id, race, '#FFFFFF', 0);
-  if (hoje && hoje.mount != null && m.mt == null) e.mt = +hoje.mount.toFixed(3); if (hoje && hoje.beam && !m.beam) e.beam = hoje.beam.map(v => +v.toFixed(3)); }
+  if (hoje && hoje.mount != null && m.mt == null && m.mount == null /* 5.5c: "mount" no cabeçalho também vale */) e.mt = +hoje.mount.toFixed(3); if (hoje && hoje.beam && !m.beam) e.beam = hoje.beam.map(v => +v.toFixed(3)); }
 for (const id in extra || {}) { const x = extra[id]; mapa[id] = typeof x === 'string' ? Object.assign(mapa[id] || {}, { r: x }) : Object.assign(mapa[id] || {}, x); }
 for (const id in mapa) { const e = mapa[id]; if (!modelos[e.r]) { console.error('o mapa aponta ' + id + ' para ' + e.r + ', que não está no pacote'); process.exit(1); } if (Object.keys(e).length === 1) mapa[id] = e.r; }
 const faltam = pecas.filter(p => !mapa[p]);

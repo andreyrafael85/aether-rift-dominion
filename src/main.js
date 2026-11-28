@@ -30,7 +30,7 @@ const RACE_COLORS = { vehnar: '#FF7733', erevane: '#33FFD0', tessara: '#55E68A',
 const LEADER_NAME = { vehnar: 'Barão-Forja', erevane: 'Vesper Ísk', tessara: 'Sylvia Oriel', quorith: 'Zayin Coral', vorag: 'Oru Voraz' }; /* 5.0a.3: Sylva Oriel → Sylvia Oriel (a Tessara passa a ter uma líder) */
 const LEADER_GENDER = { vehnar: 'm', erevane: 'm', tessara: 'f', quorith: 'm', vorag: 'm' }; /* 5.0a.3: gênero de cada líder, para a concordância dos textos (a voz usa a mesma tabela em src/audio.js) */
 const LEADER_FACE = { vehnar: 3, erevane: 2, tessara: 2, quorith: 2, vorag: 1 };
-const VERSION = '5.5b.7';
+const VERSION = '5.5c';
 const ART = (window.ARD && ARD.ART) || null;
 const leaderArt = (fac, mood) => (ART && ART.leader && ART.leader[fac] && ART.leader[fac][(mood || LEADER_FACE[fac] || 1) - 1]) || null;
 function gpuName() { try { const c = document.createElement('canvas'); const gl = c.getContext('webgl2') || c.getContext('webgl'); if (!gl) return 'sem WebGL'; const ext = gl.getExtension('WEBGL_debug_renderer_info'); const n = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); const lose = gl.getExtension('WEBGL_lose_context'); if (lose) lose.loseContext(); return n; } catch (e) { return '?'; } }
@@ -353,6 +353,7 @@ function startGame(cfg, netCtx) {
   const canvas = $('world'), mini = $('minimap'), overlay = $('overlay');
   $('start').hidden = true; $('game').hidden = false; $('end').hidden = true;
   if (ARD.gpuConta) ARD.gpuConta.bench = !!cfg.bench; DG.on = !!(ARD.gpuConta && ARD.gpuConta.quer()); /* 5.0h.3: o contador da GPU liga antes do renderizador nascer */
+  if (ARD.climaDecide) ARD.climaDecide(params.get('q') || cfg.quality || 'auto', matchMedia('(pointer: coarse)').matches || !!params.get('touch')); /* 5.5c: o clima de guerra vale (ou não) para a partida inteira, decidido antes de o renderizador nascer (src/world3d.js) */
   let R = null; const want3d = (cfg.gfx || '3d') === '3d' && params.get('r') !== '2d';
   if (want3d && window.THREE) { try { R = ARD.render3d.create(canvas, overlay, mini); } catch (err) { console.warn('3D indisponível, usando 2D:', err); R = null; } }
   if (!R && want3d && window.THREE && ARD.motor === '5') { console.warn('[ARD] Motor 5 falhou na criação; tentando o motor clássico'); ARD.motor = 'classico'; try { R = ARD.render3d.create(canvas, overlay, mini); } catch (err) { R = null; } } /* 5.0a */

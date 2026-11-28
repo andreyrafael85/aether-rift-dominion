@@ -32,7 +32,7 @@ const C = M5.ceuCfg = {
   envPasso: 2 * DEG, envPassoBaixa: 4 * DEG, envIntervalo: 1.2, /* reflexo: degrau da hora e intervalo mínimo (s) */
 };
 /* ---------- o caminho do sol ---------- */
-const LZ = ARD.luzFenda, SD0 = LZ.sunDir; /* 5.5a: Luz da Fenda (src/world3d.js): o sol do meio-dia agora é baixo (21°); com ?luz=0, o de sempre [-470, 640, 600] (40°) */
+let LZ = ARD.luzFenda; const SD0 = LZ.sunDir; M5.ceuLuz = lz => { LZ = lz || ARD.luzFenda; }; /* 5.5c: com o clima de guerra o render3d passa a luz da partida (a Luz da Fenda com os números da tabela por cima); o meio-dia chega pelo ceuMeioDia */ /* 5.5a: Luz da Fenda (src/world3d.js): o sol do meio-dia agora é baixo (21°); com ?luz=0, o de sempre [-470, 640, 600] (40°) */
 const LEN = Math.hypot(SD0[0], SD0[1], SD0[2]); /* comprimento ~995 (a sombra única e a bruma usam esse tamanho) */
 const N0 = [0, 1, 0]; /* sol do meio-dia = o sol fixo do render3d */
 let ELEV0 = 0;

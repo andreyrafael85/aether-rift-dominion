@@ -96,7 +96,7 @@ M5.buildPost = function (X, scene, camera, q, opts) {
   const touch = matchMedia('(pointer: coarse)').matches;
   const cauda = src => { let c = src, bloomN = null; /* bloom → gradação → tons → AA */
     if (!off.has('bloom') && M5.bloomAntigo && A.bloom) { bloomN = A.bloom(c, 0.55, 0.62, 1.0); bloomN.smoothWidth.value = 0.35; c = vec4(c.rgb.add(bloomN.rgb), 1); } /* ?m5bloom=antigo: o BloomNode da 5.0b */
-    else if (!off.has('bloom')) { bloomN = M5.bloomClassico(c); const b = bloomN.rgb.mul(bloomN.strength); c = vec4(c.rgb.add(b).sub(min(c.rgb.mul(b), 1)), 1); } /* 5.0b.1: o bloom do clássico (BloomEffect do pmndrs, mipmapBlur) e a mistura "screen" dele */
+    else if (!off.has('bloom')) { bloomN = M5.bloomClassico(c, ARD.clima ? { limiar: ARD.clima.bloom.limiar, intensidade: ARD.clima.bloom.forca, raio: ARD.clima.bloom.raio } /* 5.5c-clima: os mesmos números do bloom do clássico (são uniforms: nenhum shader novo) */ : undefined); const b = bloomN.rgb.mul(bloomN.strength); c = vec4(c.rgb.add(b).sub(min(c.rgb.mul(b), 1)), 1); } /* 5.0b.1: o bloom do clássico (BloomEffect do pmndrs, mipmapBlur) e a mistura "screen" dele */
     { let col = c.rgb.mul(GU.uGain).add(GU.uLift); const l = luminance(col); col = mix(vec3(l), col, GU.uSat); col = pow(max(col.div(0.18), vec3(0)), vec3(GU.uCon)).mul(0.18); const dv = distance(uv(), vec2(0.5)); col = col.mul(float(1).sub(GU.uVig.mul(smoothstep(0.35, 0.85, dv)))); c = vec4(col, 1); }
     c = renderOutput(c); /* ACES do renderer (toneMapping) e sRGB (outputColorSpace) */
     if (!off.has('aa')) c = touch ? A.fxaa(c) : A.smaa(c);

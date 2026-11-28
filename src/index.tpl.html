@@ -1391,7 +1391,7 @@ body.hudfino.touch #panel.collapsed .dtog{right:12px;top:5px}
   <div class="start-wrap">
     <header class="st-head">
       <div class="brand-row"><img id="logo-img" class="logo" alt="" hidden><div class="brand-txt"><h1 data-i18n="inicio.aether-rift-dominion">Aether Rift<span>Dominion</span></h1><p class="tagline" data-i18n="inicio.nada-aqui-seu-ainda">Nada aqui é seu. Ainda.</p></div></div>
-      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.5b.7 · build __BUILD__ · Portas Abertas · Mundo vivo · multiplayer 2 a 4</div>
+      <div class="eyebrow st-ver" data-i18n="inicio.versao">Versão 5.5c · build __BUILD__ · Portas Abertas · Mundo vivo · multiplayer 2 a 4</div>
       <div class="opt st-lang" data-idioma-sel="idioma-inicio"></div><!-- 5.0c: seletor de idioma, legível em qualquer idioma -->
     </header>
     <div class="start-grid">
@@ -1458,8 +1458,9 @@ body.hudfino.touch #panel.collapsed .dtog{right:12px;top:5px}
       </div>
       <div class="notes">
       <div class="choose" data-i18n="notas.notas-versao">Notas da versão</div>
+      <p class="start-notes" data-i18n="notas.5-5c"><b>5.5c — Tessara de guerra:</b> a Tessara foi <b>refeita por inteiro</b>: 26 modelos novos (todas as unidades e construções), escuros, cheios de espinhos e acesos por dentro em verde-ácido. O campo de batalha ganhou um <b>clima de guerra</b> na qualidade Média ou superior: luz mais baixa, chão escuro e, sob as bases da Tessara, um tapete de raízes que brilha. A cor de cada jogador agora aparece em fios de luz e no aro do chão, e o jogo nunca dá a um jogador a cor da luz da própria Raça (quem joga de Tessara começa em branco-gelo; o Hangar mostra só os tons permitidos). Os modelos novos são baixados à parte quando há Tessara na partida (cerca de 0,7 MB) e, se a rede falhar, o jogo usa os de antes. No Motor 5 do celular a nitidez automática voltou à regra que se mostrou melhor nas medições. Atenção: as salas multiplayer desta versão não se misturam com as de versões anteriores.</p>
+      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.5b.7 → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-5b-7"><b>5.5b.7 — Som no teste e motor "Automático":</b> o Teste de desempenho aberto por endereço no celular agora espera um <b>toque para começar</b>, e com isso o som da batalha toca durante o teste (antes só tocava no fim); ao terminar, a partida para e fica em silêncio. Em Ajustes › Motor gráfico há a opção <b>Automático</b>, que deixa o jogo escolher o melhor motor para o aparelho, com uma linha dizendo qual está em uso. No Motor 5 do celular a nitidez automática segura a imagem mais nítida durante a batalha e só reduz quando a lentidão persiste. O resultado do teste diz se o som tocou.</p>
-      <details class="oldnotes"><summary data-i18n="notas.historico-versoes-anteriores-5">Histórico das versões anteriores (5.5b.6 → 2.0)</summary>
       <p class="start-notes" data-i18n="notas.5-5b-6"><b>5.5b.6 — Motor do celular explicado:</b> o Teste de desempenho agora diz <b>por que</b> o jogo escolheu o motor clássico ou o Motor 5 naquele aparelho (endereço, Ajustes ou escolha automática, com o motivo quando o Motor 5 não entra). Uma falha passageira ao carregar o Motor 5 (por exemplo, no meio de uma atualização do jogo) deixa de valer para a versão inteira: o jogo tenta de novo na próxima abertura. No computador nada muda.</p>
       <p class="start-notes" data-i18n="notas.5-5b-5"><b>5.5b.5 — Celular no Motor 5:</b> em celulares e tablets com WebGPU (como o iPhone recente) o jogo agora <b>abre no Motor 5 por padrão</b>, que se mostrou mais rápido e mais nítido nesses aparelhos; se ele não funcionar, o jogo volta sozinho ao motor clássico e reabre a partida. A nitidez automática passou a funcionar de verdade no Motor 5 e sobe até onde o aparelho aguenta. O som não se acumula mais quando a página é aberta sem toque (antes tocava tudo de uma vez depois); o Teste de desempenho avisa "Toque na tela para ligar o som" e o resultado copiado começa com uma linha de resumo. Quem escolheu o motor nos Ajustes mantém a escolha. No computador nada muda.</p>
       <p class="start-notes" data-i18n="notas.5-5b-4"><b>5.5b.4 — Celular mais leve e mais esperto:</b> a nitidez automática do celular agora <b>só sobe quando o aparelho aguenta de verdade</b> (antes subia e descia sem parar em aparelhos no limite) e não depende mais da opção "Resolução dinâmica". Na qualidade Baixa do celular o motor clássico ficou mais leve: as luzes das bases à noite passaram a ser desenhadas no chão, como no Motor 5, quase sem diferença na imagem. O Teste de desempenho sempre mede a nitidez automática e mostra em que nível ela terminou. Por baixo do capô: o jogo aprendeu a carregar modelos 3D feitos fora do código, que chegam com a arte nova das Raças nas próximas versões. No computador nada muda.</p>
@@ -1675,7 +1676,7 @@ body.hudfino.touch #panel.collapsed .dtog{right:12px;top:5px}
   <div class="eyebrow">Personalização</div><h2>Hangar</h2>
   <div class="hg"><div class="hg-stage"><canvas id="hg-view" width="640" height="480"></canvas><div id="hg-loading" class="hg-loading" hidden>Carregando o 3D…</div></div><div class="hg-opts">
     <label class="small">Raça <select id="hg-race"></select></label>
-    <div class="small muted">Tom da sua Raça</div><div class="swatches" id="hg-colors"></div>
+    <div class="small muted">Tom do seu time</div><div class="swatches" id="hg-colors"></div>
     <div class="small muted">Núcleo</div><div class="chips2" id="hg-skins"></div>
     <div class="small muted">Retrato do líder no HUD</div><div class="chips2" id="hg-portraits"></div>
     <div class="small muted" id="hg-note"></div>

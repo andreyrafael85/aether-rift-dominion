@@ -4,7 +4,7 @@
 (function (ARD) {
 'use strict';
 const S = ARD.sim, C = ARD.campaign, P = ARD.progress; const RACES = ['vehnar', 'erevane', 'tessara', 'quorith', 'vorag'];
-const SHADES = r => (S.RACE_SHADES && S.RACE_SHADES[r]) || ['#FF8C1A']; // 4.1a: cores do Hangar ligadas à Raça
+const SHADES = r => (S.tonsPermitidos && S.tonsPermitidos(r)) || (S.RACE_SHADES && S.RACE_SHADES[r]) || ['#FF8C1A']; // 4.1a: cores do Hangar · 5.5c: os tons de time permitidos para a Raça (nunca a cor da luz dela nem vizinhos), o primeiro é o padrão
 const SKINS = [{ n: 'Padrão', lv: 1 }, { n: 'Fortaleza', lv: 10 }, { n: 'Santuário', lv: 20 }];
 let D = null; // dependências de main.js: { $, leaderArt, LEADER_NAME, LEADER_GENDER, RACE_COLORS, LEADER_FACE, startGame, loadPrefs, savePrefs, selectedRace }
 const fem = r => !!(D && D.LEADER_GENDER && D.LEADER_GENDER[r] === 'f'); /* 5.0a.3: a líder da Tessara — os textos sobre ela vão para o feminino */
@@ -21,7 +21,7 @@ const stars = n => '<span class="stars">' + [0, 1, 2].map(i => i < n ? '★' : '
 function raceName(r) { return ARD.i18n && ARD.i18n.d ? ARD.i18n.d.raca(r) : ((S.FACTIONS[r] || {}).name || r); } /* 5.0c */
 function totalStars() { const s = P.load(); return Object.values(s.missions).reduce((a, m) => a + (m.stars || 0), 0); }
 function titleOf() { const a = P.load().achievements; let best = '', t = 0; for (const id in a) if (C.TITLES[id] && a[id] >= t) { t = a[id]; best = id; } return best ? C.tituloCmd(best) : ''; /* 5.0c */ } // título automático: o da conquista mais recente que dá título
-function colorFor(race) { const h = P.load().hangar; return (h.colors && h.colors[race]) || null; }
+function colorFor(race) { const h = P.load().hangar; const c = (h.colors && h.colors[race]) || null; if (c && S.tomProibido && S.tomProibido(c, race)) return (S.corPadrao && S.corPadrao(race)) || null; /* 5.5c: escolha antiga que virou proibida (tom da própria Raça) cai no padrão; o Hangar avisa */ return c || (S.corPadrao ? S.corPadrao(race) : null); }
 function refreshMini() { try { refreshCard(); } catch (e) { console.warn('[ARD] cartão da campanha:', e); } const el = D.$('cmdr-mini'); if (!el) return; const li = P.levelInfo(); const s = P.load(); el.textContent = T('camp.mini', { n: li.level, xp: li.xp, e: totalStars() }, 'Comandante nível {n} · {xp} XP · {e} ★ na campanha') + (titleOf() ? ' · "' + titleOf() + '"' : '') + (s.relics.equipped.some(Boolean) ? ' · ' + T('camp.mini.reliquias', { lista: s.relics.equipped.filter(Boolean).map(id => C.reliquia(id)).join(', ') }, 'relíquias: {lista}') : ''); } /* 5.0c */
 
 // ---------- tela da campanha ----------
@@ -91,14 +91,15 @@ function refreshCard() { const $ = D.$; if (!$('camp-card')) return; const s = P
 // ---------- Hangar ----------
 let hg = null;
 function openHangar() {
-  const $ = D.$; const s = P.load(); const li = P.levelInfo(); const st = { race: D.selectedRace(), colors: Object.assign({}, s.hangar.colors || {}), skin: Object.assign({}, s.hangar.skin), portrait: Object.assign({}, s.hangar.portrait) };
+  const $ = D.$; const s = P.load(); const li = P.levelInfo(); const antigas = {}; { const cs = s.hangar.colors || {}; for (const r in cs) if (cs[r] && S.tomProibido && S.tomProibido(cs[r], r)) antigas[r] = cs[r]; } /* 5.5c: tons escolhidos antes da regra nova e hoje proibidos para a Raça */
+  const st = { race: D.selectedRace(), colors: Object.assign({}, s.hangar.colors || {}), skin: Object.assign({}, s.hangar.skin), portrait: Object.assign({}, s.hangar.portrait) }; for (const r in antigas) delete st.colors[r];
   $('hg-race').innerHTML = RACES.map(r => `<option value="${r}">${esc(raceName(r))}</option>`).join(''); $('hg-race').value = st.race;
   const cur = () => st.colors[st.race] || SHADES(st.race)[0];
   const draw = () => { $('hg-colors').innerHTML = SHADES(st.race).map(c => `<button class="swatch ${c === cur() ? 'on' : ''}" style="background:${c}" data-c="${c}" aria-label="${esc(T('camp.hg.tom', { c }, 'tom {c}'))}"></button>`).join(''); /* 5.0c */
     $('hg-skins').innerHTML = SKINS.map((k, i) => `<button class="chip2 ${(st.skin[st.race] || 0) === i ? 'on' : ''}" data-skin="${i}" ${li.level >= k.lv ? '' : 'disabled'}>${esc(T('camp.hg.skin.' + i, null, k.n))}${li.level >= k.lv ? '' : ' · ' + esc(T('camp.nivel', { n: k.lv }, 'nível {n}'))}</button>`).join(''); /* 5.0c */
     $('hg-portraits').innerHTML = [1, 2, 3].map(i => `<button class="chip2 ${(st.portrait[st.race] || D.LEADER_FACE_DEFAULT[st.race]) === i ? 'on' : ''}" data-por="${i}">${esc(TG('camp.hg.retrato.' + i, gen(st.race), null, (fem(st.race) ? ['Serena', 'Furiosa', 'Triunfante'] : ['Sereno', 'Furioso', 'Triunfante'])[i - 1])) /* 5.0a.3; 5.0c: .f/.m no dicionário */}</button>`).join('');
     { const lb = $('hg-portraits').previousElementSibling; if (lb) lb.textContent = TG('camp.hg.retrato-rotulo', gen(st.race), null, 'Retrato d' + (fem(st.race) ? 'a' : 'o') + ' líder no HUD'); } /* 5.0c */ /* 5.0a.3: 'Retrato da líder no HUD' quando a Raça é a Tessara */
-    $('hg-note').textContent = T('camp.hg.nota', { raca: raceName(st.race) }, 'Os tons são da paleta da {raca} e valem no solo, na campanha e no multiplayer (se dois jogadores escolherem tons parecidos, o segundo recebe o próximo tom). O Núcleo e o retrato aparecem nas suas partidas.'); /* 5.0c */
+    $('hg-note').textContent = (antigas[st.race] ? T('camp.hg.cor-antiga', { raca: raceName(st.race) }, 'O tom que você tinha escolhido agora é a cor da luz da {raca} e saiu da lista: voltamos ao tom padrão. Escolha outro se quiser.') + ' ' : '') + T('camp.hg.nota', { raca: raceName(st.race) }, 'O tom do seu time vale no solo, na campanha e no multiplayer. A lista não traz a cor da luz da {raca} nem tons vizinhos dela, para o seu time não se confundir com a Raça (se dois jogadores escolherem tons parecidos, o segundo recebe o próximo tom). O Núcleo e o retrato aparecem nas suas partidas.'); /* 5.0c · 5.5c */
     $('hg-colors').querySelectorAll('[data-c]').forEach(b => b.onclick = () => { st.colors[st.race] = b.dataset.c; draw(); view(); });
     $('hg-skins').querySelectorAll('[data-skin]').forEach(b => b.onclick = () => { st.skin[st.race] = +b.dataset.skin; draw(); view(); });
     $('hg-portraits').querySelectorAll('[data-por]').forEach(b => b.onclick = () => { st.portrait[st.race] = +b.dataset.por; draw(); }); };
@@ -114,7 +115,7 @@ function startViewer(race, color, skin) { // 4.1a: um renderizador só, reaprove
   const THREE = window.THREE, ME = ARD.meshes, ADD = window.THREE_ADDONS || {}; const cv = D.$('hg-view'); if (!cv) return;
   const note = D.$('hg-loading'); if (!THREE || !ME) { if (note) note.hidden = false; if (!hgPending) { hgPending = () => { hgPending = null; if (!D.$('hangar').hidden) startViewer(race, color, skin); }; window.addEventListener('three-ready', hgPending, { once: true }); } return; }
   if (note) note.hidden = true;
-  { const O = ARD.otb; hgUlt = [race, color, skin]; if (O && O.pede && !O.tem(race)) O.pede(race, { rede: false }).then(ok => { if (ok && hgUlt && hgUlt[0] === race && !D.$('hangar').hidden) startViewer(hgUlt[0], hgUlt[1], hgUlt[2]); }); } /* 5.5b.4: modelos feitos no Blender (src/otb.js) — se o pacote da Raça já está na máquina (embutido ou guardado), o Hangar se refaz com eles; sem pedido de rede aqui */
+  { const O = ARD.otb; hgUlt = [race, color, skin]; if (O && O.pede && !O.tem(race)) O.pede(race /* 5.5c: o Hangar baixa o pacote da Raça escolhida ao abrir (um pedido, guardado pelo service worker); se falhar, ficam os modelos de antes */).then(ok => { if (ok && hgUlt && hgUlt[0] === race && !D.$('hangar').hidden) startViewer(hgUlt[0], hgUlt[1], hgUlt[2]); }); } /* 5.5b.4: modelos feitos no Blender (src/otb.js) — quando o pacote da Raça chega (embutido, guardado ou, desde a 5.5c, baixado aqui), o Hangar se refaz com eles */
   try {
     if (!hg) { const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); r.outputColorSpace = THREE.SRGBColorSpace; r.toneMapping = THREE.ACESFilmicToneMapping; r.shadowMap.enabled = true;
       const sc = new THREE.Scene(); sc.background = new THREE.Color(0x0b0d11); if (ADD.RoomEnvironment) { const pm = new THREE.PMREMGenerator(r); sc.environmentIntensity = 0.3; /* 4.3b: r186 */ sc.environment = pm.fromScene(new ADD.RoomEnvironment(), 0.04).texture; pm.dispose(); }
@@ -125,8 +126,8 @@ function startViewer(race, color, skin) { // 4.1a: um renderizador só, reaprove
     }
     const w = cv.clientWidth || 480, h = cv.clientHeight || 360; hg.r.setSize(w, h, false); hg.cam.aspect = w / h; hg.cam.updateProjectionMatrix();
     if (hg.grp) { hg.sc.remove(hg.grp); hg.grp.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
-    const grp = new THREE.Group(); const add = (def, x, z, size, sk) => { const g = ME.build(def, race, color, sk || 0); if (!g) return; const k = size / g.width; const m = new THREE.Mesh(g.main, hg.mat); m.castShadow = m.receiveShadow = true; m.scale.setScalar(k); m.position.set(x, 0, z); grp.add(m); if (g.em) { const e = new THREE.Mesh(g.em, hg.em); e.scale.setScalar(k); e.position.set(x, 0, z); grp.add(e); } };
-    const sig = SIGNATURE[race] || ['veiculo', 'infantaria']; add('nucleo', 0, 0, 62, skin); add(sig[0], 36, 30, 20); add(sig[1], 18, 42, 8); add('coletor', -34, 34, 11); hg.grp = grp; hg.sc.add(grp);
+    let hN = 0; /* 5.5c: altura do Núcleo na cena (os modelos novos são mais altos) */ const grp = new THREE.Group(); const add = (def, x, z, size, sk) => { const g = ME.build(def, race, color, sk || 0); if (!g) return; const k = size / g.width; if (def === 'nucleo') hN = g.height * k; const m = new THREE.Mesh(g.main, hg.mat); m.castShadow = m.receiveShadow = true; m.scale.setScalar(k); m.position.set(x, 0, z); grp.add(m); if (g.em) { const e = new THREE.Mesh(g.em, hg.em); e.scale.setScalar(k); e.position.set(x, 0, z); grp.add(e); } };
+    const sig = SIGNATURE[race] || ['veiculo', 'infantaria']; add('nucleo', 0, 0, 62, skin); add(sig[0], 36, 30, 20); add(sig[1], 18, 42, 8); add('coletor', -34, 34, 11); hg.grp = grp; hg.sc.add(grp); { const f = Math.max(1, hN / 59.5); hg.cam.position.set(104 * f, 74 * f, 104 * f); hg.cam.lookAt(0, 6 + (f - 1) * 77, 0); } /* 5.5c: a câmera do Hangar recua o que for preciso para o Núcleo caber inteiro (com o Núcleo de antes, f = 1: igual a antes) */
     if (!hg.run) { hg.run = true; const loop = now => { if (!hg || !hg.run) return; hg.raf = requestAnimationFrame(loop); if (hg.grp) hg.grp.rotation.y = (now - hg.t0) / 1000 * 0.35; hg.r.render(hg.sc, hg.cam); }; hg.raf = requestAnimationFrame(loop); }
   } catch (e) { console.warn('[ARD] Hangar 3D indisponível: ' + e.message); if (note) { note.hidden = false; note.textContent = T('camp.hg.sem3d', null, 'Visualização 3D indisponível neste navegador.'); } } /* 5.0c */
 }

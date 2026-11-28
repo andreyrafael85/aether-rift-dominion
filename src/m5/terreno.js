@@ -100,7 +100,7 @@ let HB = null; const ardHB = (h, w) => { if (!HB) { const { Fn, vec4, max, step 
 M5.chao = function (U, o) {
   o = o || {}; const Tm = T(); const TL = L();
   const { Fn, If, float, vec2, vec3, vec4, mix, smoothstep, clamp, max, abs, floor, fract, sin, dot, length, step, select, cross, sign, inverseSqrt, dFdx, dFdy, positionWorld, positionView, normalView, normalWorld, normalWorldGeometry, faceDirection } = TL;
-  const m = new Tm.MeshStandardNodeMaterial({ roughness: 0.9, metalness: 0.02 }); m.envMapIntensity = 0.22;
+  const m = new Tm.MeshStandardNodeMaterial({ roughness: 0.9, metalness: 0.02 }); m.envMapIntensity = 0.22; const CL = ARD.clima || null; /* 5.5c-clima: tapete, raízes e poça no chão do Motor 5 (só com o clima de guerra ligado; sem a chave os nós são os de antes) */
   if (!TerrLM) TerrLM = class extends Tm.PhysicalLightingModel { ambientOcclusion(builder) { const { ambientOcclusion, reflectedLight } = builder.context; reflectedLight.indirectDiffuse.mulAssign(ambientOcclusion); reflectedLight.indirectSpecular.mulAssign(mix(0.4, 1.0, ambientOcclusion)); } };
   m.setupLightingModel = () => new TerrLM();
   const bio = M5.attr('bio', vec4(0, 1, 0, 0)), aoc = M5.attr('aoc', vec2(1, 0));
@@ -198,8 +198,19 @@ M5.chao = function (U, o) {
       If(U.uNear.greaterThan(0.0), () => { const m1 = amostra(mt, wuv.mul(260.0)).rgb.toVar(), m2v = amostra(mt, wuv.mul(84.0).add(0.31)).rgb.toVar(); const pe = max(m1.r.mul(0.6), m2v.r); /* ramo uniforme (a câmera inteira): de longe nem amostra */
         dif.mulAssign(mix(float(1), mix(m1.g, m2v.g, step(0.25, m2v.r)).mul(0.28).add(0.86).mul(float(1).sub(max(m1.b, m2v.b.mul(0.8)).mul(0.35))).mul(pe.mul(0.1).add(1.0)), nk.mul(0.7)));
         mh.assign(m1.r.mul(0.3).add(m2v.r.mul(0.7)).sub(m1.b.add(m2v.b).mul(0.25)).mul(nk)); });
-      const tc = A.territorio(); dif.assign(mix(dif, tc.rgb.mul(dot(dif, vec3(0.2126, 0.7152, 0.0722)).mul(2.0).add(0.15)), tc.a.mul(0.36).mul(UNI ? kf : float(1)))); /* 5.5a: território na cor da Raça (antes a cor pura a 0.14): a cor entra no claro ou escuro do próprio chão, como no clássico */ const fv = A.nevoa(); const nvc = M5.nevoaChao ? M5.nevoaChao(fv) : mix(0.06, 1.0, fv); /* 5.0d: chão nunca visto sob as nuvens de guerra (src/m5/nuvens.js) */ dif.mulAssign(UNI ? mix(nvc, 1.0, uFora) : nvc); tEmis.mulAssign(UNI ? mix(fv, 1.0, uFora) : fv); /* 5.0b.1: território e névoa de guerra só no chão (nas mesas, ×1) */
+      const tc = A.territorio(); dif.assign(mix(dif, tc.rgb.mul(dot(dif, vec3(0.2126, 0.7152, 0.0722)).mul(2.0).add(0.15)), tc.a.mul(CL ? 0.36 * CL.territorio : 0.36).mul(UNI ? kf : float(1)))); /* 5.5a: território na cor da Raça (antes a cor pura a 0.14): a cor entra no claro ou escuro do próprio chão, como no clássico */ const fv = A.nevoa(); const nvc = M5.nevoaChao ? M5.nevoaChao(fv) : mix(0.06, 1.0, fv); /* 5.0d: chão nunca visto sob as nuvens de guerra (src/m5/nuvens.js) */ dif.mulAssign(UNI ? mix(nvc, 1.0, uFora) : nvc); tEmis.mulAssign(UNI ? mix(fv, 1.0, uFora) : fv); /* 5.0b.1: território e névoa de guerra só no chão (nas mesas, ×1) */
     }
+    if (CL) { /* 5.5c-clima: a mesma conta do CLIMA_COLOR do clássico (src/terrain3d.js), sem ramo por pixel: chão geral mais escuro, tapete pelo alfa do mapa de clarões com borda de ruído, raízes pela direção em que o tapete enfraquece, poça que acompanha as manchas. Usa só a posição no mundo (nenhum varying novo) e texturas que o chão já lê */
+      const cMin = TL.min, RU = M5.u.claraoRet, XC = M5.tex.clarao, XN = M5.tex.nuvem; dif.mulAssign(M5.u.noite.mul(CL.chaoGeralNoite - CL.chaoGeral).add(CL.chaoGeral));
+      const wv = vec2(positionWorld.x.div(W), positionWorld.z.negate().div(W)); const cn1 = amostra(XN, wv.mul(17.0).add(0.13)).r.toVar(), cn2 = amostra(XN, wv.mul(43.0).add(0.57)).r.toVar(), cn3 = amostra(XN, wv.mul(29.0).add(0.31)).r.toVar();
+      const fu = positionWorld.xz.sub(RU.xy).div(RU.zw).toVar(); const den = step(0, fu.x).mul(step(0, fu.y)).mul(step(fu.x, 1)).mul(step(fu.y, 1)); const bd = cMin(cMin(fu.x, fu.y), cMin(float(1).sub(fu.x), float(1).sub(fu.y)));
+      const f4 = amostra(XC, fu).toVar(); const caRaw = f4.a.mul(den).mul(smoothstep(0.0, 0.05, bd)).toVar(); const ca = cMin(caRaw, 1.0).toVar();
+      const tap = smoothstep(0.34, 0.6, ca.add(cn1.sub(0.5).mul(0.5)).add(cn2.sub(0.5).mul(0.22))).mul(step(0.004, ca)).toVar();
+      const veio = clamp(caRaw.sub(1.0), 0.0, 1.0).mul(A.nevoa()); /* rodada 3: o desenho aceso do chão vem pronto no alfa do mapa de clarões (acima de 1), desenhado pelo disco de cada construção (src/m5/texturas.js) */
+      const flc = f4.rgb.mul(den); const pm = max(flc.r, max(flc.g, flc.b)); const hue = flc.div(max(pm, 0.02)).mul(smoothstep(0.0, 0.03, pm)).toVar();
+      const lum0 = dot(dif, vec3(0.2126, 0.7152, 0.0722)); dif.assign(mix(dif, vec3(CL.tapCor[0], CL.tapCor[1], CL.tapCor[2]).add(hue.mul(0.007)).mul(lum0.mul(3.0).add(0.5)), tap.mul(mix(0.55, 1.0, smoothstep(0.45, 0.85, ca)))));
+            S.clTap = tap; S.clPoca = mix(float(1), tap.mul(0.75).add(0.25).mul(cn1.add(0.5)), step(0.004, ca)).toVar('ardClPoca');
+      S.clVeio = hue.mul(veio).mul(sin(tempo.mul(0.9).add(wv.x.mul(700.0)).add(wv.y.mul(400.0))).mul(0.25).add(0.75)).toVar('ardClVeio'); }
     dif.mulAssign(float(1).sub(U.uCloudK.mul(0.2).mul(float(1).sub(A.nuvem())))); /* sombra de nuvem no material (0 quando a bruma do pós já faz) */
     S.rough = rough; S.tH = hgt.mul(mix(0.25, 1.0, nearK)).toVar('tH'); S.mh = mh; S.tEmis = tEmis; S.wn = wn;
     return dif;
@@ -217,7 +228,7 @@ M5.chao = function (U, o) {
     const n = sn.mul(abs(det)).sub(g); const l2 = dot(n, n); return select(l2.greaterThan(1e-12), n.mul(inverseSqrt(max(l2, 1e-30))), sn);
   })();
   /* clarões no chão (compressão suave; encosta recebe menos) e a luz da Fenda (5.0a.1: era uma PointLight; difusa de Lambert com 1/d² na normal final, como a luz do clássico) */
-  m.emissiveNode = Fn((b) => { const S = saida(b); let luz = A.clarao().mul(max(S.wn.y, 0.0).mul(0.65).add(0.35)); if (dentro && M5.luzFendaChao) luz = luz.add(UNI ? M5.luzFendaChao(normalWorld, positionWorld).mul(kf) : M5.luzFendaChao(normalWorld, positionWorld)); /* 5.0b.1: a luz da Fenda só no chão */ return S.tEmis.add(dif.mul(luz)); })();
+  m.emissiveNode = Fn((b) => { const S = saida(b); let luz = A.clarao().mul(max(S.wn.y, 0.0).mul(0.65).add(0.35)); if (dentro && M5.luzFendaChao) luz = luz.add(UNI ? M5.luzFendaChao(normalWorld, positionWorld).mul(kf) : M5.luzFendaChao(normalWorld, positionWorld)); /* 5.0b.1: a luz da Fenda só no chão */ if (CL && S.clVeio) { const kk = max(S.wn.y, 0.0).mul(0.65).add(0.35); const lc = A.clarao().mul(kk); return S.tEmis.add(dif.add(S.clTap.mul(CL.pocaChao)).mul(lc.mul(S.clPoca).add(luz.sub(lc)))).add(S.clVeio); } /* 5.5c-clima: a poça acompanha o tapete; as raízes acendem na cor da poça */ return S.tEmis.add(dif.mul(luz)); })();
   if (o.vazio) { m.maskNode = pleno ? positionWorld.y.greaterThan(-90.0).and(amostra(M5.tex.vazio, vec2(positionWorld.x, positionWorld.z.negate()).div(W)).r.sub(0.5).mul(128.0).greaterThanEqual(18.0)) /* 5.0b (junção): o corte do clássico (if (vWP.y < −90) discard; esd < 18 discard), que o M5.espacoBorda da água fazia no chão da fundação */
       : M5.vazioMascara ? M5.vazioMascara(positionWorld) : positionWorld.y.greaterThan(-90.0); /* 5.0a.1: some só onde o mapa do vazio diz (nunca pela altura) */
     m.userData.vazio = true; m.userData.voidMap = vMap; m.userData.terrU = U; } /* o space3d (refreshVoid) troca userData.voidMap.value: é o mesmo M5.tex.vazio */

@@ -236,24 +236,46 @@ float ardMh = 0.0;
 { float cl = texture2D(cloudMap, vWuv * 5.0 + vec2(uCloudT * 0.006, uCloudT * 0.0035)).r; diffuseColor.rgb *= 1.0 - uCloudK * 0.2 * (1.0 - cl); }
 #endif
 `;
+/* 5.5c-clima: tapete da Raça e veios acesos no chão (só com o clima de guerra ligado; o material sem a opção "clima" sai igual, letra por letra). O tapete vem no
+   canal alfa do mapa de clarões (discos pintados pelo render3d sob as construções); a borda orgânica e os veios saem do ruído que o chão já tem
+   (cloudMap), presos ao mundo; a cor dos veios é a da poça de luz que a própria Raça põe no mapa de clarões (cada Raça com a sua, sem uniform por Raça). */
+const CLIMA_COLOR = `
+float ardTap = 0.0; float ardVeio = 0.0; vec4 ardFl = vec4(0.0); float ardPoca = 1.0;
+{ diffuseColor.rgb *= uClimaK.z; float cn1 = texture2D(cloudMap, vWuv * 17.0 + 0.13).r, cn2 = texture2D(cloudMap, vWuv * 43.0 + 0.57).r, cn3 = texture2D(cloudMap, vWuv * 29.0 + 0.31).r;
+  vec2 fu = (vWP.xz - uFlashR.xy) / uFlashR.zw;
+  if (fu.x > 0.0 && fu.y > 0.0 && fu.x < 1.0 && fu.y < 1.0) { ardFl = texture2D(uFlash, fu);
+    float bd = min(min(fu.x, fu.y), min(1.0 - fu.x, 1.0 - fu.y)); float caRaw = ardFl.a * smoothstep(0.0, 0.05, bd), ca = min(caRaw, 1.0);
+    ardTap = smoothstep(0.34, 0.6, ca + (cn1 - 0.5) * 0.5 + (cn2 - 0.5) * 0.22) * step(0.004, ca);
+    ardVeio = clamp(caRaw - 1.0, 0.0, 1.0); /* rodada 3: o desenho aceso do chão (raízes, células...) vem pronto no mapa de clarões, acima de 1 no alfa: é o disco de cada construção que o desenha (src/render3d.js), por Raça */
+    ardPoca = (0.25 + 0.75 * ardTap) * (0.5 + 1.0 * cn1); /* rodada 2: a poça de luz acompanha as manchas do tapete (não lê como disco) */
+    float cl0 = dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+    diffuseColor.rgb = mix(diffuseColor.rgb, (uClimaTap.rgb + ardFl.rgb / max(max(ardFl.r, max(ardFl.g, ardFl.b)), 0.02) * (0.007 * smoothstep(0.0, 0.03, max(ardFl.r, max(ardFl.g, ardFl.b))))) * (0.5 + 3.0 * cl0) /* o quase preto do tapete puxa um fio para a cor de luz da Raça */, ardTap * uClimaTap.a * mix(0.55, 1.0, smoothstep(0.45, 0.85, ca))); }
+#ifndef ARD_FORA
+  ardVeio *= texture2D(fogMap, vWuv).r;
+#endif
+}
+`;
+const CLIMA_EMIS = `
+{ vec3 fl = ardFl.rgb * ardPoca; totalEmissiveRadiance += (diffuseColor.rgb + ardTap * uClimaK.x) * fl / (1.0 + 0.3 * fl) * (0.35 + 0.65 * max(vWN.y, 0.0));
+  fl = ardFl.rgb; float pm = max(fl.r, max(fl.g, fl.b)); totalEmissiveRadiance += ardVeio * (fl / max(pm, 0.02)) * smoothstep(0.0, 0.03, pm) * uClimaK.y * (0.75 + 0.25 * sin(uTime * 0.9 + vWuv.x * 700.0 + vWuv.y * 400.0)); }`;
 let VOID0 = null; function voidNeutral(THREE) { if (!VOID0) { VOID0 = new THREE.DataTexture(new Uint8Array([255, 0, 0, 255]), 1, 1, THREE.RGBAFormat, THREE.UnsignedByteType); VOID0.needsUpdate = true; } return VOID0; } /* 4.3h */
 function material(THREE, U, o) {
   o = o || {}; const m = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, metalness: 0.02, envMapIntensity: 0.22 });
   if (o.vazio) { m.userData.vazio = true; m.userData.voidMap = { value: voidNeutral(THREE) }; m.userData.terrU = U; } /* 4.3h: mapa da borda do Cinturão (o space3d põe o de verdade e lê a névoa de guerra) */
   m.onBeforeCompile = sh => {
-    Object.assign(sh.uniforms, U); if (o.vazio) sh.uniforms.uVoidMap = m.userData.voidMap; if (o.onShader) o.onShader(sh);
+    Object.assign(sh.uniforms, U); const clima = o.clima && U.uFlash ? o.clima : null; if (clima) { sh.uniforms.uClimaTap = clima.uTap; sh.uniforms.uClimaK = clima.uK; } /* 5.5c-clima */ if (o.vazio) sh.uniforms.uVoidMap = m.userData.voidMap; if (o.onShader) o.onShader(sh);
     const dbg = +(new URLSearchParams(globalThis.location ? location.search : '').get('terrdbg') || 0); const defs = (o.fora ? '#define ARD_FORA\n' : '') + (o.leve ? '#define ARD_LEVE\n' : '') + (o.vazio ? '#define ARD_VAZIO\n' : '') + (dbg ? '#define ARD_DBG ' + dbg + '\n' : '');
     sh.vertexShader = 'attribute vec4 bio; attribute vec2 aoc; uniform float worldSize; varying vec4 vBio; varying vec2 vAoc; varying vec3 vWP; varying vec3 vWN; varying vec2 vWuv;\n' + sh.vertexShader
       .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n{ vec4 ardW = modelMatrix * vec4(transformed, 1.0); vWP = ardW.xyz; vWN = normalize(mat3(modelMatrix) * objectNormal); vBio = bio; vAoc = aoc; vWuv = vec2(ardW.x / worldSize, -ardW.z / worldSize); }');
-    sh.fragmentShader = defs + (U.uFlash ? 'uniform sampler2D uFlash; uniform vec4 uFlashR;\n' : '') + TERR_PARS + sh.fragmentShader
-      .replace('#include <color_fragment>', '#include <color_fragment>\n' + (o.vazio ? 'if (vWP.y < -90.0) discard; /* 4.3h: abaixo do paredão é o espaço */\nif ((texture2D(uVoidMap, vec2(vWP.x, -vWP.z) / worldSize).r - 0.5) * 128.0 < 18.0) discard; /* 4.3h: corta a 18 da borda: dali para fora é a beirada de rocha e o paredão do space3d (contorno exato, sem os dentes da grade) */\n' : '') + TERR_COLOR)
+    sh.fragmentShader = defs + (U.uFlash ? 'uniform sampler2D uFlash; uniform vec4 uFlashR;\n' : '') + (clima ? 'uniform vec4 uClimaTap; uniform vec3 uClimaK;\n' : '') + TERR_PARS + sh.fragmentShader
+      .replace('#include <color_fragment>', '#include <color_fragment>\n' + (o.vazio ? 'if (vWP.y < -90.0) discard; /* 4.3h: abaixo do paredão é o espaço */\nif ((texture2D(uVoidMap, vec2(vWP.x, -vWP.z) / worldSize).r - 0.5) * 128.0 < 18.0) discard; /* 4.3h: corta a 18 da borda: dali para fora é a beirada de rocha e o paredão do space3d (contorno exato, sem os dentes da grade) */\n' : '') + (clima && clima.terr != null ? TERR_COLOR.replace('tc.a * 0.36)', 'tc.a * ' + (0.36 * clima.terr).toFixed(4) + ')') /* 5.5c-clima, rodada 2: anel do território mais discreto */ : TERR_COLOR) + (clima ? CLIMA_COLOR : ''))
       .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = tRough;')
       .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n{ vec2 dh = vec2(dFdx(tH), dFdy(tH)) + (ardMh != 0.0 ? vec2(dFdx(ardMh), dFdy(ardMh)) * 0.5 : vec2(0.0)); normal = ardTPerturb(-vViewPosition, normal, dh, faceDirection); } /* tH em unidades do mapa */')
-      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += tEmis;' + (U.uFlash ? '\n{ vec2 fu = (vWP.xz - uFlashR.xy) / uFlashR.zw; if (fu.x > 0.0 && fu.y > 0.0 && fu.x < 1.0 && fu.y < 1.0) { vec3 fl = texture2D(uFlash, fu).rgb; totalEmissiveRadiance += diffuseColor.rgb * fl / (1.0 + 0.3 * fl) * (0.35 + 0.65 * max(vWN.y, 0.0)); } } /* 4.3g: clarões no chão (compressão suave) */' : ''))
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += tEmis;' + (clima ? CLIMA_EMIS : U.uFlash ? '\n{ vec2 fu = (vWP.xz - uFlashR.xy) / uFlashR.zw; if (fu.x > 0.0 && fu.y > 0.0 && fu.x < 1.0 && fu.y < 1.0) { vec3 fl = texture2D(uFlash, fu).rgb; totalEmissiveRadiance += diffuseColor.rgb * fl / (1.0 + 0.3 * fl) * (0.35 + 0.65 * max(vWN.y, 0.0)); } } /* 4.3g: clarões no chão (compressão suave) */' : ''))
       .replace('#include <aomap_fragment>', '#include <aomap_fragment>\nreflectedLight.indirectDiffuse *= vAoc.x; reflectedLight.indirectSpecular *= mix(0.4, 1.0, vAoc.x);');
     if (globalThis.__ardTerrDbg) globalThis.__ardTerrDbg.push({ vs: sh.vertexShader, fs: sh.fragmentShader });
   };
-  m.customProgramCacheKey = () => 'ard-terreno-v43c' + (o.fora ? '-fora' : '') + (o.leve ? '-leve' : '') + (o.vazio ? '-vazio' : ''); m.userData.env = 0.22; return m;
+  m.customProgramCacheKey = () => 'ard-terreno-v43c' + (o.fora ? '-fora' : '') + (o.leve ? '-leve' : '') + (o.vazio ? '-vazio' : '') + (o.clima && U.uFlash ? '-clima' : ''); m.userData.env = 0.22; return m;
 }
 
 // ---------- paredões do abismo da Fenda ----------

@@ -15,6 +15,44 @@ ARD.luzFenda = !(typeof location !== 'undefined' && /[?&]luz=0(&|$)/.test(locati
       alto: [0.17, 0.16, 0.42], longe: [0.56, 0.54, 0.82], con: 0.04, vig: 0.08, lift: [0.006, 0.0, 0.016], sunDirBaixa: [-470, 640, 600], sunIBaixa: 1.6 }
   : { on: false, sunDir: [-470, 640, 600], sunCor: [1.0, 0.91, 0.77], sunI: 1.6, ceu: [0.3467, 0.4793, 0.6724], chao: [0.0232, 0.0232, 0.0296], hemiK: 1, ambK: 1, amb: [0.0513, 0.0648, 0.117],
       alto: [0.12, 0.2, 0.36], longe: [0.5, 0.62, 0.8], con: 0, vig: 0, lift: [0, 0, 0.004], sunDirBaixa: [-470, 640, 600], sunIBaixa: 1.6 };
+/* 5.5c: CLIMA DE GUERRA (aprovado pelo dono em 26/11). Tudo num lugar só, por tabela (ARD.climaTabela); ARD.clima é a tabela quando o clima
+   vale nesta partida e null quando não vale (ARD.climaDecide, abaixo).
+   Vale para a partida inteira, em qualquer Raça: luz = o que troca na Luz da Fenda (sol mais rasante e frio, céu e ambiente mais baixos, vinheta);
+   fundo/bruma = fundo escuro, sem véu; chaoGeral = o chão do mapa mais escuro (de dia mais, à noite menos); bloom = brilho mais forte (só o que
+   passa do limiar brilha); aro = arco do time (largura de sempre, brilho moderado) e arco de posse discreto nas construções; territorio = força do
+   anel claro do território; rim = brilho de borda do corpo na cor do TIME, por Raça.
+   Vale só para as Raças LIGADAS em "racas": luz (cor da poça, do desenho do chão e da luz da base), chao (o DESENHO aceso em volta de cada
+   construção: 'raiz' | 'celulas' | 'circuito' | 'laje' | 'cristal'), veio e veioR (força e alcance do desenho), em (quanto a parte acesa do modelo
+   brilha), tapete escuro sob as construções (tap, tapR × raio) e ralo entre elas (espalha, espalhaR), poça de luz de dia e de noite e nas unidades
+   grandes (raio >= uniR), baseNoite (quanto da luz noturna da base fica: a base inteira acesa somava luz demais ao entardecer).
+   O tapete, o desenho e a poça vão no mapa de clarões que já existe (tapete e desenho no canal alfa, poça no RGB): nenhum passe, textura ou luz nova. */
+ARD.climaTabela = {
+  luz: { sunDir: [-766.9, 240.7, 586.5], sunCor: [0.86, 0.87, 0.95], sunI: 1.1, ceu: [0.28, 0.34, 0.56], chao: [0.12, 0.08, 0.13], hemiK: 0.4, ambK: 0.34, alto: [0.05, 0.06, 0.13], longe: [0.16, 0.19, 0.27], con: 0.16, vig: 0.32 },
+  fundo: [0.035, 0.045, 0.07], fundoK: 0.94, bruma: 0.7, morno: 0.06,
+  bloom: { limiar: 0.9, forca: 1.25, raio: 0.8 },
+  aro: { faixa: [0.875, 0.908, 0.966, 0.999], brilho: 1.32, posse: 0.55 },
+  territorio: 0.4,
+  rim: { vehnar: { pow: 3.4, amt: 0.14 }, erevane: { pow: 2.6, amt: 0.3 }, tessara: { pow: 2.6, amt: 0.22 }, quorith: { pow: 1.9, amt: 0.45 }, vorag: { pow: 3.0, amt: 0.22 } },
+  tapCor: [0.016, 0.017, 0.015], pocaChao: 0.1, chaoGeral: 0.42, chaoGeralNoite: 0.56,
+  /* LIGADAS: nesta versão só a Tessara (verde-ácido, chão em raízes). As cores de luz daqui são as mesmas de RACE_LUZ no src/sim.js (a regra de cor dos jogadores foge delas) */
+  racas: { tessara: { luz: [0.58, 1.5, 0.06], chao: 'raiz', veio: 0.5, veioR: 1.15, em: 2.4, tap: 0.9, tapR: 2.7, espalha: 0.6, espalhaR: 5, poca: 0.3, pocaNoite: 0.2, baseNoite: 0.4, uniR: 10, uniK: 0.5 } },
+  /* PREPARADAS e desligadas (para ligar uma, mova a linha para "racas" quando os modelos escuros dela entrarem; ?guerraraca=<raça> liga uma só para teste e foto).
+     Vorag: luz vermelha e células pequenas e irregulares, vista em foto; Erevane, Vehnar e Quorith: desenhos esboçados, ainda não vistos na tela (só no motor clássico) */
+  racasPreparadas: { vorag: { luz: [1.7, 0.10, 0.12], chao: 'celulas', veio: 0.55, veioR: 0.85, em: 2.4, tap: 0.9, tapR: 2.7, espalha: 0.55, espalhaR: 5, poca: 0.3, pocaNoite: 0.2, baseNoite: 0.4, uniR: 10, uniK: 0.5 },
+    erevane: { luz: [0.15, 0.95, 1.6], chao: 'circuito', veio: 0.5, veioR: 0.8, em: 2.2, tap: 0.6, tapR: 2.4, espalha: 0.4, espalhaR: 4.5, poca: 0.3, pocaNoite: 0.2, baseNoite: 0.4, uniR: 10, uniK: 0.5 },
+    vehnar: { luz: [1.6, 0.72, 0.12], chao: 'laje', veio: 0.45, veioR: 0.8, em: 2.2, tap: 0.4, tapR: 2.2, espalha: 0.25, espalhaR: 4, poca: 0.3, pocaNoite: 0.2, baseNoite: 0.4, uniR: 10, uniK: 0.4 },
+    quorith: { luz: [0.85, 0.35, 1.6], chao: 'cristal', veio: 0.5, veioR: 0.8, em: 2.0, tap: 0.45, tapR: 2.2, espalha: 0.3, espalhaR: 4, poca: 0.3, pocaNoite: 0.2, baseNoite: 0.4, uniR: 10, uniK: 0.5 } },
+  desenhos: { raiz: 1, celulas: 2, circuito: 3, laje: 4, cristal: 5 }
+};
+/* quando o clima vale: ?guerra=1 força ligado e ?guerra=0 força desligado (teste e comparação); sem a chave, vale sempre fora de tela de toque e, em tela de
+   toque (celular), só quando a qualidade ESCOLHIDA é Média, Alta ou Ultra — no celular em Automático ou na Baixa fica desligado até a medida no aparelho.
+   É decidido uma vez por partida (o src/main.js chama antes de criar o renderizador, com a qualidade escolhida): o clima não liga nem desliga no meio dela.
+   (O nome da chave é "guerra" porque ?clima= já é o clima do mapa no Teste de desempenho.) */
+ARD.climaDecide = function (qualidade, toque) { const b = typeof location !== 'undefined' ? location.search : ''; const g = /[?&]guerra=([01])(&|$)/.exec(b);
+  const on = g ? g[1] === '1' : !(toque && qualidade !== 'media' && qualidade !== 'alta' && qualidade !== 'ultra');
+  const T = ARD.climaTabela; { const r = /[?&]guerraraca=([a-z]+)(&|$)/.exec(b); if (r && T.racasPreparadas[r[1]] && !T.racas[r[1]]) T.racas[r[1]] = T.racasPreparadas[r[1]]; }
+  ARD.clima = on ? T : null; return ARD.clima; };
+ARD.climaDecide(null, typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches); /* valor inicial (páginas que não passam pelo src/main.js) */
 ARD.luzFenda.ceuN = [0.3467, 0.4793, 0.6724]; ARD.luzFenda.chaoN = [0.0232, 0.0232, 0.0296]; /* de noite o hemisfério volta às cores de sempre (a lua azulada) */
 const PLANETS = { // paletas dos mundos natais aprovados (Postal Dia)
   vehnar:  { pl: ['#1a120c', '#5a3a22', '#a06a3a', '#e6b070'], atmo: 0xff9a4a, bands: true, moon: '#b9a690' },

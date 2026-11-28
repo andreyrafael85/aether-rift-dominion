@@ -4,7 +4,9 @@
    16 bits (dentro da caixa do modelo), normais em 2 bytes, cor em 3 bytes (sRGB, com a sombra de contato já gravada), o peso da cor do time
    em 1 byte, índices em 16 bits e, no cabeçalho (JSON), rugosidade/metal/padrão, a força da emissão (parte acesa), o grupo de animação com
    pivô (os mesmos tipos do construtor: leg, recoil, sway, bob, spin, flap) e o pivô da peça que se solta na destruição. Opcionais por modelo
-   (5.5b.4): mt = altura do assento da parte que gira (o K.mount das receitas de hoje), beam = [x, y, z] do emissor do feixe, base = altura do chão.
+   (5.5b.4): mt (ou mount) = altura do assento da parte que gira (o K.mount das receitas de hoje), beam = [x, y, z] do emissor do feixe, base = altura do chão.
+   Opcionais por parte (5.5c): sk = lista das peles em que a parte aparece (o Núcleo tem três; sem sk, aparece em todas), pi = número da peça que se
+   solta (partes com o mesmo número voam juntas), tc junto com e = parte acesa que leva a cor do time (os veios do time).
    Cada modelo vira uma receita em ARD.meshes.receitas com o nome do pacote (otb_...), montada com o MESMO construtor (Kit) das malhas de
    hoje: mesmo material, mesmas instâncias, mesma animação na GPU, nos dois motores. Nenhum material, textura ou pipeline novo.
    5.5b.4 — como entra no jogo:
@@ -34,12 +36,13 @@ function abre(m, p) {
 }
 /* monta o modelo no construtor do jogo (K = Kit do src/meshes.js): uma peça por parte, com a animação e a peça solta do cabeçalho */
 function monta(K, m, tc, ex) {
-  const T = globalThis.THREE; { const mt = ex && ex.mt != null ? ex.mt : m.mt, bm = ex && ex.beam ? ex.beam : m.beam, bs = ex && ex.base != null ? ex.base : m.base; if (mt != null) K.mount = mt + K.oy; if (bm) K.beam = [bm[0] + K.ox, bm[1] + K.oy, bm[2] + K.oz]; if (bs != null) K.base = bs; } /* 5.5b.4: assento da parte que gira, emissor do feixe e altura do chão, como nas receitas de hoje */ const lod = K.lite && m.lods.leve && m.lods.leve.length ? m.lods.leve : m.lods.cheia; const t = new T.Color(tc || '#FFFFFF');
-  for (const p of lod) { abre(m, p); const nv = p.nv, cor = new Float32Array(nv * 3), c8 = p._cor, w8 = p._tc;
+  const T = globalThis.THREE; { const mt = ex && ex.mt != null ? ex.mt : m.mt != null ? m.mt : m.mount /* 5.5c: os pacotes oficiais trazem o assento como "mount" */, bm = ex && ex.beam ? ex.beam : m.beam, bs = ex && ex.base != null ? ex.base : m.base; if (mt != null) K.mount = mt + K.oy; if (bm) K.beam = [bm[0] + K.ox, bm[1] + K.oy, bm[2] + K.oz]; if (bs != null) K.base = bs; } /* 5.5b.4: assento da parte que gira, emissor do feixe e altura do chão, como nas receitas de hoje */ const lod = K.lite && m.lods.leve && m.lods.leve.length ? m.lods.leve : m.lods.cheia; const t = new T.Color(tc || '#FFFFFF'); const pele = (ex && ex.pele) | 0, soltas = {};
+  for (const p of lod) { if (p.sk && p.sk.indexOf(pele) < 0) continue; /* 5.5c: parte marcada por pele (os três estilos do Núcleo no mesmo modelo): só entra a da pele pedida */ abre(m, p); const nv = p.nv, cor = new Float32Array(nv * 3), c8 = p._cor, w8 = p._tc;
     for (let i = 0; i < nv; i++) { const r = LIN[c8[i * 3]], g = LIN[c8[i * 3 + 1]], b = LIN[c8[i * 3 + 2]]; if (w8 && w8[i]) { const w = w8[i] / 255; cor[i * 3] = r * (1 + (t.r - 1) * w); cor[i * 3 + 1] = g * (1 + (t.g - 1) * w); cor[i * 3 + 2] = b * (1 + (t.b - 1) * w); } else { cor[i * 3] = r; cor[i * 3 + 1] = g; cor[i * 3 + 2] = b; } } /* cor do time: tinge só onde o peso manda, e a sombra gravada continua */
     const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(p._pos.slice(), 3)); g.setAttribute('normal', new T.BufferAttribute(p._nor.slice(), 3)); g.setAttribute('color', new T.BufferAttribute(cor, 3)); g.setIndex(new T.BufferAttribute(p._idx, 1));
     const o = { pat: p.pat || 0 }; if (p.e) o.e = p.e; if (p.an) o.anim = p.an;
-    if (p.pc) K.piece(p.pc, () => K._push(g, '#FFFFFF', p.rm, o)); else K._push(g, '#FFFFFF', p.rm, o); }
+    if (p.pc && p.pi != null) { const ant = K._pc; K._pc = soltas[p.pi] || (soltas[p.pi] = { p: [p.pc[0] + K.ox, p.pc[1] + K.oy, p.pc[2] + K.oz], id: ++K._pcN }); try { K._push(g, '#FFFFFF', p.rm, o); } finally { K._pc = ant; } } /* 5.5c: partes com o mesmo número de peça (pi) soltam-se juntas na destruição (o fruto aceso vai com a capa de osso) */
+    else if (p.pc) K.piece(p.pc, () => K._push(g, '#FFFFFF', p.rm, o)); else K._push(g, '#FFFFFF', p.rm, o); }
 }
 /* instala um pacote .otb (ArrayBuffer ou Uint8Array, já sem compressão): registra uma receita por modelo e devolve os nomes */
 function instala(buf) {
@@ -53,7 +56,7 @@ function instala(buf) {
     m.bin = m.o != null ? bin.slice(m.o, m.o + m.nb) : bin; for (const k of ['cheia', 'leve']) for (const p of m.lods[k] || []) { abre(m, p); for (let i = 0; i < p._idx.length; i++) if (p._idx[i] >= p.nv) throw new Error('pacote .otb estragado: índice fora da parte em ' + nome); } /* decodifica já: índice que aponta para fora da parte também é pacote estragado */
     novos[nome] = m; }
   if (ARD.meshes && !ARD.meshes.receitas) ARD.meshes.receitas = {}; const RX = ARD.meshes ? ARD.meshes.receitas : null;
-  for (const nome in novos) { const m = novos[nome]; MODELOS[nome] = m; nomes.push(nome); if (RX) RX[nome] = (K, P, tc) => monta(K, m, tc); }
+  for (const nome in novos) { const m = novos[nome]; MODELOS[nome] = m; nomes.push(nome); if (RX) RX[nome] = (K, P, tc, seed) => monta(K, m, tc, { pele: seed | 0 }); } /* 5.5c: a semente é a pele */
   return nomes;
 }
 function deB64(s) { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
@@ -72,7 +75,7 @@ function tabela(race) { return CFG && CFG.racas && CFG.racas[race] ? CFG.racas[r
 function entrada(race, def) { const mp = PRONTAS[race]; const e = mp ? mp[def] : null; return e ? (typeof e === 'string' ? { r: e } : e) : null; }
 /* a receita nova de uma peça (ou null = vale a de antes). O src/meshes.js chama a cada montagem; seed = a pele (o Núcleo tem três) */
 function receita(race, def) { if (ANTIGOS) return null; const e = entrada(race, def); if (!e) return null; if (!MODELOS[e.r]) return null;
-  return (K, P, tc, seed) => { const n = e.s && e.s[seed | 0] && MODELOS[e.s[seed | 0]] ? e.s[seed | 0] : e.r; monta(K, MODELOS[n], tc, e); }; }
+  return (K, P, tc, seed) => { const n = e.s && e.s[seed | 0] && MODELOS[e.s[seed | 0]] ? e.s[seed | 0] : e.r; monta(K, MODELOS[n], tc, Object.assign({}, e, { pele: seed | 0 })); }; } /* 5.5c: a pele vale para as partes marcadas (sk) do mesmo modelo; e.s continua valendo para pele em modelo à parte */
 /* marca a Raça como pronta: só entram no mapa as peças cuja receita veio mesmo no pacote (o resto continua com o modelo de antes) */
 function pronta(race, nomes) { const t = tabela(race), mp = {}; let n = 0; for (const def in (t && t.mapa) || {}) { const e = t.mapa[def], r = typeof e === 'string' ? e : e && e.r; if (r && MODELOS[r]) { mp[def] = e; n++; } } if (!n) throw new Error('nenhuma receita da tabela veio no pacote'); PRONTAS[race] = mp; ESTADO[race] = 'ok'; MED.pacotes++; return true; }
 /* a cópia que o service worker guardou (cache 'ard-modelos'), sem pedir nada à rede; null se não há */

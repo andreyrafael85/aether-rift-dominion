@@ -9,7 +9,7 @@ const M5 = ARD.m5 = ARD.m5 || {};
 /* clarões: monta o alvo, as geometrias instanciadas e os dois materiais; o resto (lista, vida, envio dos atributos, desenho) é o mesmo flashRender do render3d */
 M5.flashInit = function (FL, FL_N, FLC_N, ME2) {
   const Tm = window.THREE_M5, L = window.TSL; const { attribute, positionGeometry, vec2, vec4, float, dot, smoothstep, abs, cos, sin, varying } = L;
-  FL.rt = new Tm.RenderTarget(512, 512, { type: Tm.HalfFloatType, depthBuffer: false, magFilter: Tm.LinearFilter, minFilter: Tm.LinearFilter, generateMipmaps: false }); FL.rt.texture.name = 'ard-claroes';
+  const flN = ARD.clima && FL.clt && FL.clt.lado ? FL.clt.lado : 512; /* 5.5c-clima, rodada 3: com o desenho do chão no mapa, 1024 fora do celular */ FL.rt = new Tm.RenderTarget(flN, flN, { type: Tm.HalfFloatType, depthBuffer: false, magFilter: Tm.LinearFilter, minFilter: Tm.LinearFilter, generateMipmaps: false }); FL.rt.texture.name = 'ard-claroes';
   FL.rect = M5.u.claraoRet.value; /* o mesmo Vector4 do uniform compartilhado: o flashRender ajusta e os materiais leem */
   const q = new Tm.PlaneGeometry(1, 1); const g = new Tm.InstancedBufferGeometry(); g.index = q.index; g.setAttribute('position', q.attributes.position); g.instanceCount = 0;
   FL.fa = new Tm.InstancedBufferAttribute(new Float32Array(FL_N * 4), 4); FL.fc = new Tm.InstancedBufferAttribute(new Float32Array(FL_N * 3), 3); /* 5.0b.1: uso padrão (o DynamicDrawUsage subia o buffer inteiro a cada desenho); o flashRender sobe só o trecho usado */ g.setAttribute('fA', FL.fa); g.setAttribute('fC', FL.fc); FL.geo = g;
@@ -28,6 +28,27 @@ M5.flashInit = function (FL, FL_N, FLC_N, ME2) {
   FL.cmesh = new Tm.Mesh(gc, matC); FL.cmesh.frustumCulled = false; FL.scene.add(FL.cmesh);
   /* 5.0b.1: os faróis acendem o chão nos dois motores (o clássico desenha o cone com as duas faces, src/render3d.js flashInit); a 5.0b escondia
      esta malha por paridade, porque no clássico o cone era descartado pela face desde a 4.3g */
+  if (ARD.clima && FL.clt) { /* 5.5c-clima: o tapete da Raça no alfa do mapa de clarões (vale o maior) e a poça no RGB, como no clássico (src/render3d.js flashInit); os clarões de sempre deixam de escrever no alfa */
+    for (const mm of [mat, matC]) { mm.blending = Tm.CustomBlending; mm.blendEquation = Tm.AddEquation; mm.blendSrc = Tm.SrcAlphaFactor; mm.blendDst = Tm.OneFactor; mm.blendEquationAlpha = Tm.AddEquation; mm.blendSrcAlpha = Tm.ZeroFactor; mm.blendDstAlpha = Tm.OneFactor; }
+    const C = FL.clt, N = C.cap; const gt = new Tm.InstancedBufferGeometry(); gt.index = q.index; gt.setAttribute('position', q.attributes.position); gt.instanceCount = 0; C.a = new Tm.InstancedBufferAttribute(new Float32Array(N * 4), 4); C.c = new Tm.InstancedBufferAttribute(new Float32Array(N * 3), 3); C.d = new Tm.InstancedBufferAttribute(new Float32Array(N * 3), 3); gt.setAttribute('tA', C.a); gt.setAttribute('tC', C.c); gt.setAttribute('tD', C.d); C.geo = gt;
+    const matT = new Tm.MeshBasicNodeMaterial({ transparent: true, depthTest: false, depthWrite: false, side: Tm.DoubleSide }); matT.fog = false; matT.toneMapped = false; matT.forceSinglePass = true;
+    matT.blending = Tm.CustomBlending; matT.blendEquation = Tm.AddEquation; matT.blendSrc = Tm.OneFactor; matT.blendDst = Tm.OneFactor; matT.blendEquationAlpha = Tm.MaxEquation; matT.blendSrcAlpha = Tm.OneFactor; matT.blendDstAlpha = Tm.OneFactor;
+    { /* rodada 3: o disco desenha o chão aceso da Raça (tD.x: 1 raiz, 2 células; tD.y força; tD.z alcance), a mesma conta do clássico (src/render3d.js); os esboços 3 a 5 só existem no clássico. Alfa de 0 a 1 = tapete, de 1 a 2 = desenho */
+      const { fract, sqrt, mix, max, min, clamp, step, select, length, floor } = L; const cAtan = L.atan, cMod = L.mod;
+      const tA = attribute('tA', 'vec4'), tD = attribute('tD', 'vec3'); const p2 = positionGeometry.xy.mul(2); const w = tA.xy.add(p2.mul(tA.z)); const n = w.sub(rect.xy).div(rect.zw).mul(2).sub(1); matT.vertexNode = vec4(n.x, n.y.negate(), 0, 1);
+      const vQ = varying(p2), vW = varying(w), vCt = varying(tA.xy), vR = varying(tA.z), vK = varying(tA.w), vD = varying(tD); const h21 = p => fract(sin(dot(p, vec2(127.1, 311.7))).mul(43758.5453));
+      const d = dot(vQ, vQ); const f = float(1).sub(d), r = sqrt(max(d, 1e-8)); const tap = vK.mul(float(1).sub(smoothstep(0.0, 1.0, d))); const sd = h21(vCt.mul(0.37)); const rn = r.div(max(vD.z, 0.05));
+      const ang = cAtan(vQ.y, vQ.x).div(6.2831853).add(sd); const fim = float(1).sub(smoothstep(0.55, 1.0, rn)).mul(smoothstep(0.12, 0.22, r)); const px = rect.z.div(flN).mul(1.5);
+      const a2 = ang.add(sin(r.mul(11.0).add(sd.mul(40.0))).mul(0.03)).add(sin(r.mul(27.0).add(sd.mul(17.0))).mul(0.014)); const arco = r.mul(vR).mul(6.2831853);
+      const t1 = abs(fract(a2.mul(7.0)).sub(0.5)).mul(arco).div(7.0), t2 = abs(fract(a2.mul(14.0)).sub(0.5)).mul(arco).div(14.0); const w1 = mix(2.6, 0.9, rn), w2 = mix(1.6, 0.5, rn); const longe = smoothstep(0.5, 0.64, rn);
+      const raiz = max(float(1).sub(smoothstep(w1, w1.add(px), t1)).mul(float(1).sub(longe.mul(0.45))), float(1).sub(smoothstep(w2, w2.add(px), t2)).mul(longe).mul(0.75)).mul(fim).mul(float(1).sub(smoothstep(0.3, 1.0, rn).mul(0.7)));
+      const SZ = 9.5, k = vec2(1.0, 1.7320508); const wq = vW.add(vec2(sin(vW.y.mul(0.071).add(sd.mul(9.0))).add(sin(vW.y.mul(0.19).add(1.7)).mul(0.6)), sin(vW.x.mul(0.063).add(sd.mul(5.0))).add(sin(vW.x.mul(0.23).add(0.4)).mul(0.6))).mul(3.2)); /* rodada 4: favos menores e tortos */ const hp = wq.div(SZ); const ha = cMod(hp, k).sub(k.mul(0.5)), hb = cMod(hp.sub(k.mul(0.5)), k).sub(k.mul(0.5)); const hg = select(dot(ha, ha).lessThan(dot(hb, hb)), ha, hb);
+      const ed = float(0.5).sub(max(abs(hg.x), dot(abs(hg), vec2(0.5, 0.8660254)))); const hid = hp.sub(hg); const cq = hid.mul(SZ).sub(vCt).div(vR); const cr = length(cq).div(max(vD.z, 0.05)); const tr = float(1).sub(abs(fract(cAtan(cq.y, cq.x).div(6.2831853).add(sd).mul(5.0)).sub(0.5)).mul(2.0)); const hh = h21(hid);
+      const act = max(step(hh.sub(0.5).mul(0.25).add(0.62), tr), step(cr, hh.mul(0.2).add(0.42))).mul(step(0.3, h21(hid.add(1.3)))).mul(step(cr, 0.98)).mul(step(0.2, length(cq))); const borda = float(1).sub(smoothstep(0.05, px.div(SZ).add(0.08), ed)); const resina = step(0.74, h21(hid.add(3.7))).mul(smoothstep(0.02, 0.2, ed)).mul(0.38);
+      const cel = act.mul(max(borda.mul(hh.mul(0.45).add(0.55)), resina)).mul(float(1).sub(smoothstep(0.35, 1.0, cr).mul(0.75)));
+      const pat = select(vD.x.lessThan(1.5), raiz, cel).mul(step(0.5, vD.x)).mul(step(vD.x, 2.5)).mul(vD.y);
+      matT.maskNode = d.lessThanEqual(1); matT.colorNode = attribute('tC', 'vec3').mul(f.mul(f)); matT.opacityNode = mix(tap, 2.0, clamp(pat, 0.0, 1.0)); }
+    C.mesh = new Tm.Mesh(gt, matT); C.mesh.frustumCulled = false; C.mesh.renderOrder = -1; FL.scene.add(C.mesh); M5.registrar('claroes-tapete', matT); }
   M5.tex.clarao.value = FL.rt.texture; if (ME2) { ME2.uFlash.value = FL.rt.texture; ME2.uFlashR.value = FL.rect; }
   M5.registrar('claroes-disco', mat); M5.registrar('claroes-cone', matC);
   return true;

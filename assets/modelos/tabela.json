@@ -1,1 +1,43 @@
-{"v":1,"racas":{}}
+{
+ "v": 1,
+ "racas": {
+  "tessara": {
+   "arquivo": "tessara.otb.gz",
+   "hash": "0f0831e8b3",
+   "gzip": 748580,
+   "cru": 1645460,
+   "completa": true,
+   "mapa": {
+    "coletor": "otb_tessara_coletor",
+    "colosso": "otb_tessara_colosso",
+    "drone": "otb_tessara_drone",
+    "esporo": "otb_tessara_esporo",
+    "guardia": {
+     "r": "otb_tessara_guardia",
+     "orc": 2
+    },
+    "infantaria": "otb_tessara_infantaria",
+    "molde": "otb_tessara_molde",
+    "pirata": "otb_tessara_pirata",
+    "quimera": "otb_tessara_quimera",
+    "suporte": "otb_tessara_suporte",
+    "veiculo_hull": "otb_tessara_veiculo_hull",
+    "veiculo_turret": "otb_tessara_veiculo_turret",
+    "bastiao_base": "otb_tessara_bastiao_base",
+    "bastiao_turret": "otb_tessara_bastiao_turret",
+    "fabrica": "otb_tessara_fabrica",
+    "hangar": "otb_tessara_hangar",
+    "laboratorio": "otb_tessara_laboratorio",
+    "muro": "otb_tessara_muro",
+    "nodulo": "otb_tessara_nodulo",
+    "nucleo": "otb_tessara_nucleo",
+    "portao": "otb_tessara_portao",
+    "quartel": "otb_tessara_quartel",
+    "reator": "otb_tessara_reator",
+    "refinaria": "otb_tessara_refinaria",
+    "torre_base": "otb_tessara_torre_base",
+    "torre_turret": "otb_tessara_torre_turret"
+   }
+  }
+ }
+}

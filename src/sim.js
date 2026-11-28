@@ -18,8 +18,28 @@ const RACE_SHADES = {
 };
 function hexRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
 function colorDist(a, b) { const x = hexRgb(a), y = hexRgb(b); return Math.sqrt((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2 + (x[2] - y[2]) ** 2); }
-function assignColors(pcs) { const out = []; pcs.forEach((pc, i) => { const shades = RACE_SHADES[pc.faction] || PLAYER_COLORS; const want = pc.color && /^#[0-9a-fA-F]{6}$/.test(pc.color) ? [pc.color] : []; let pick = null;
-  for (const c of want.concat(shades)) if (out.every(o => colorDist(o, c) >= 80)) { pick = c; break; } out.push(pick || PLAYER_COLORS[i % PLAYER_COLORS.length]); }); return out; }
+/* 5.5c: cor dos jogadores — regra nova (decisão do dono de 26/11). A cor é só visual: não entra no hash nem em conta nenhuma da partida.
+   (1) ninguém recebe a cor da luz da própria Raça (RACE_LUZ) nem tom vizinho dela; (2) dois jogadores da mesma Raça nunca recebem tons vizinhos;
+   (3) duas cores quaisquer ficam a pelo menos TEAM_DIST no cubo RGB; (4) o jogador humano recebe, se estiver livre, o tom padrão da Raça dele
+   (TEAM_PADRAO: Tessara branco-gelo, Vorag osso, Erevane ouro, Vehnar azul, Quorith ciano); os demais saem de TEAM_PALETA, na ordem;
+   (5) a cor escolhida à mão (Hangar) vale se não for proibida para a Raça; se for (escolha antiga, feita quando os tons eram os da Raça), cai no padrão.
+   Tons quase sem cor (branco-gelo, osso) não têm vizinho no círculo das cores. A ordem é a dos jogadores na partida: todos os clientes calculam igual.
+   Só +, −, ×, ÷, comparações e sqrt (iguais em todo navegador). RACE_SHADES continua sendo a cor de identidade de cada Raça nas telas. */
+const RACE_LUZ = { tessara: '#63FF0A', vorag: '#FF0F12', erevane: '#1897FF', vehnar: '#FF7313', quorith: '#8738FF' };
+const TEAM_PALETA = ['#F04A4A', '#4A8CFF', '#FFC83D', '#E85AD0', '#35D6E8', '#FF8C1A', '#9B6BFF', '#3FD46A', '#DDF2FF', '#F2E6D0'];
+const TEAM_PADRAO = { tessara: '#DDF2FF', vorag: '#F2E6D0', erevane: '#FFC83D', vehnar: '#4A8CFF', quorith: '#35D6E8' };
+const TEAM_FAIXA = 0.13, TEAM_DIST = 90;
+function corHS(h) { const c = hexRgb(h), r = c[0] / 255, g = c[1] / 255, b = c[2] / 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; let t = 0; if (d > 0) { t = mx === r ? (g - b) / d : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; t = t / 6; if (t < 0) t += 1; } return [t, mx > 0 ? d / mx : 0]; }
+function tomVizinho(a, b) { const x = corHS(a), y = corHS(b); if (x[1] < 0.22 || y[1] < 0.22) return false; let d = x[0] - y[0]; if (d < 0) d = -d; if (d > 0.5) d = 1 - d; return d < TEAM_FAIXA; }
+function tomProibido(c, faction) { return !!RACE_LUZ[faction] && tomVizinho(c, RACE_LUZ[faction]); } /* a cor c é a luz da Raça ou vizinha dela */
+function corPadrao(faction) { return TEAM_PADRAO[faction] || PLAYER_COLORS[0]; }
+function tonsPermitidos(faction) { const out = [corPadrao(faction)]; for (const c of TEAM_PALETA) if (!out.includes(c) && !tomProibido(c, faction)) out.push(c); return out; } /* o seletor do Hangar */
+function assignColors(pcs) { const out = [], facs = [];
+  const serve = (c, f, folga) => { if (tomProibido(c, f)) return false; for (let k = 0; k < out.length; k++) { if (colorDist(out[k], c) < TEAM_DIST * folga) return false; if (facs[k] === f && tomVizinho(out[k], c)) return false; } return true; };
+  pcs.forEach((pc, i) => { const f = pc.faction; const manual = pc.color && /^#[0-9a-fA-F]{6}$/.test(pc.color) && !tomProibido(pc.color, f) ? [pc.color] : [];
+    const lista = manual.concat(pc.human && TEAM_PADRAO[f] ? [TEAM_PADRAO[f]] : [], TEAM_PALETA); let pick = null;
+    for (const folga of [1, 0.6, 0.3]) { for (const c of lista) if (serve(c, f, folga)) { pick = c; break; } if (pick) break; }
+    out.push(pick || TEAM_PALETA[i % TEAM_PALETA.length]); facs.push(f); }); return out; }
 const NAV = 32, NW = WORLD / NAV;          // grade de navegação 100×100
 const TILE = 64, TILES = WORLD / TILE;      // grade de exploração 50×50
 const DX8 = [1, 1, 0, -1, -1, -1, 0, 1], DY8 = [0, 1, 1, 1, 0, -1, -1, -1];
@@ -1777,7 +1797,7 @@ function restore(sim, snap) {
 
 ARD.sim = {
   TICK, WORLD, CX, CY, RIFT_R, FACTIONS, BUILDINGS, UNITS, WEAPONS, COUNTER, CLASS_NAMES, VET_RANKS, unitCost, RESEARCH, REGIME, DIFFICULTY, REP_NAMES,
-  SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS, RACE_SHADES, assignColors, FACTION_EXTRAS, producesFor,
+  SUPER_COST, SUPER_CD, OVERCHARGE_COST, OVERCHARGE_CD, PACT_CAUCAO, PACT_DURATION, JUMP_CHANNEL, PLAYER_COLORS, RACE_SHADES, assignColors, RACE_LUZ, TEAM_PALETA, TEAM_PADRAO, tomProibido, corPadrao, tonsPermitidos, /* 5.5c: regra de cor */ FACTION_EXTRAS, producesFor,
   NAV, NW, TILE, TILES, BIOMES, navIdx, passable, flowField, lineFree, inStorm,
   DM,
   createSim, step, enqueue, snapshot, restore, jsonSafe, jsonBack, ERAS, ASCENSION, eraOf, lockReason, eraBlock, territoryOf, canBuild, canAfford, inTerritory, territoryOwner, canSee, entitiesOf, armyValue, hasBuilt, nucleoOf, score, hash, dist, hasPact, isEnemy, sensorRadius, unitName, pactCost, seesPoint, spawnUnit, forceStorm,
